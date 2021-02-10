@@ -8,9 +8,6 @@ class Test(unittest.TestCase):
     # When `maxDiff` is None, `assertMultiLineEqual()` provides better errors.
     maxDiff = None
 
-    def runTest(self):
-        pass
-
     def testMetadataLoadCorpus(self):
         from music21 import converter
         from music21.musicxml import testFiles as mTF
@@ -39,8 +36,8 @@ class Test(unittest.TestCase):
             title='Concerto in F',
             date='2010',
             composer='Frank',
-            )
-        #environLocal.printDebug([str(md.json)])
+        )
+        # environLocal.printDebug([str(md.json)])
         self.assertEqual(md.composer, 'Frank')
         self.assertEqual(md.date, '2010/--/--')
         self.assertEqual(md.composer, 'Frank')
@@ -73,8 +70,8 @@ class Test(unittest.TestCase):
 
         self.assertEqual(
             richMetadata.keySignatureFirst,
-            '<music21.key.Key of F major>',
-            )
+            -1,
+        )
 
         self.assertEqual(str(richMetadata.timeSignatureFirst), '2/4')
 
@@ -84,9 +81,9 @@ class Test(unittest.TestCase):
 
         richMetadata.update(score)
         self.assertEqual(
-            str(richMetadata.keySignatureFirst),
-            '<music21.key.Key of f# minor>',
-            )
+            richMetadata.keySignatureFirst,
+            3,
+        )
         self.assertEqual(str(richMetadata.timeSignatureFirst), '4/4')
 
     def testWorkIds(self):
@@ -98,14 +95,14 @@ class Test(unittest.TestCase):
 
         score = opus.getScoreByNumber(4)
         self.assertEqual(score.metadata.localeOfComposition,
-            'Asien, Ostasien, China, Sichuan')
+                         'Asien, Ostasien, China, Sichuan')
 
         richMetadata = metadata.RichMetadata()
         richMetadata.merge(score.metadata)
         richMetadata.update(score)
 
         self.assertEqual(richMetadata.localeOfComposition,
-            'Asien, Ostasien, China, Sichuan')
+                         'Asien, Ostasien, China, Sichuan')
 
     def testMetadataSearch(self):
         from music21 import corpus
@@ -114,22 +111,22 @@ class Test(unittest.TestCase):
             score.metadata.search(
                 'quod',
                 field='title',
-                ),
+            ),
             (True, 'title'),
-            )
+        )
         self.assertEqual(
             score.metadata.search(
                 'qu.d',
                 field='title',
-                ),
+            ),
             (True, 'title'),
-            )
+        )
         self.assertEqual(
             score.metadata.search(
                 re.compile('(.*)canon(.*)'),
-                ),
+            ),
             (True, 'movementName'),
-            )
+        )
 
     def testRichMetadata02(self):
         from music21 import corpus
@@ -142,7 +139,8 @@ class Test(unittest.TestCase):
         self.assertEqual(richMetadata.noteCount, 165)
         self.assertEqual(richMetadata.quarterLength, 36.0)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
 
 if __name__ == '__main__':
     import music21

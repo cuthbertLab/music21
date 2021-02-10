@@ -1,5 +1,5 @@
-#-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -*- coding: utf-8 -*-
+# ------------------------------------------------------------------------------
 # Name:         common/stringTools.py
 # Purpose:      Utilities for strings
 #
@@ -7,72 +7,72 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 '''
 Tools for working with strings
 '''
 __all__ = [
-           'whitespaceEqual',
-           'getNumFromStr',
-           'hyphenToCamelCase',
-           'camelCaseToHyphen',
-           'spaceCamelCase',
-           'getMd5',
-           'formatStr',
-           'stripAccents',
-           'normalizeFilename',
-           'removePunctuation',
-           ]
+    'whitespaceEqual',
+    'getNumFromStr',
+    'hyphenToCamelCase',
+    'camelCaseToHyphen',
+    'spaceCamelCase',
+    'getMd5',
+    'formatStr',
+    'stripAccents',
+    'normalizeFilename',
+    'removePunctuation',
+]
 
 import hashlib
 import random
 import re
 import time
 import string
-import unicodedata # @UnresolvedImport
+import unicodedata
 
-#-------------------------------------------------------------------------------
+from typing import Tuple
+
+# ------------------------------------------------------------------------------
 WHITESPACE = re.compile(r'\s+')
 LINEFEED = re.compile('\n+')
 
 
-def whitespaceEqual(a, b):
+def whitespaceEqual(a: str, b: str) -> bool:
+    # noinspection PyShadowingNames
     r'''
     returns True if a and b are equal except for whitespace differences
 
-    >>> a = "    hello \nthere "
+    >>> a = "    hello \n there "
     >>> b = "hello there"
     >>> c = " bye there "
     >>> common.whitespaceEqual(a, b)
     True
     >>> common.whitespaceEqual(a, c)
     False
-
-    :rtype: bool
     '''
     a = WHITESPACE.sub('', a)
     b = WHITESPACE.sub('', b)
     a = LINEFEED.sub('', a)
     b = LINEFEED.sub('', b)
-    if (a == b):
+    if a == b:
         return True
-    else: return False
+    else:
+        return False
 
 
-def getNumFromStr(usrStr, numbers='0123456789'):
+def getNumFromStr(usrStr: str, numbers: str = '0123456789') -> Tuple[str, str]:
     '''
     Given a string, extract any numbers.
     Return two strings, the numbers (as strings) and the remaining characters.
 
     >>> common.getNumFromStr('23a')
     ('23', 'a')
-    >>> common.getNumFromStr('23a954sdfwer')
-    ('23954', 'asdfwer')
+    >>> common.getNumFromStr('23a954Hello')
+    ('23954', 'aHello')
     >>> common.getNumFromStr('')
     ('', '')
-
-    :rtype: tuple(str)
     '''
     found = []
     remain = []
@@ -85,7 +85,7 @@ def getNumFromStr(usrStr, numbers='0123456789'):
     return ''.join(found), ''.join(remain)
 
 
-def hyphenToCamelCase(usrStr, replacement='-'):
+def hyphenToCamelCase(usrStr: str, replacement: str = '-') -> str:
     '''
     given a hyphen-connected-string, change it to
     a camelCaseConnectedString.
@@ -102,14 +102,12 @@ def hyphenToCamelCase(usrStr, replacement='-'):
 
     >>> common.hyphenToCamelCase('movement_name', replacement='_')
     'movementName'
-
-    :rtype: str
     '''
     PATTERN = re.compile(r'''
-    (?<!\A) # not at the start of the string
+    (?<!\A)  # not at the start of the string
     ''' + replacement + r'''
-    (?=[a-zA-Z]) # followed by a letter
-    ''', re.X) # @UndefinedVariable
+    (?=[a-zA-Z])  # followed by a letter
+    ''', re.VERBOSE)  # @UndefinedVariable
 
     tokens = PATTERN.split(usrStr)
     response = tokens.pop(0).lower()
@@ -117,7 +115,8 @@ def hyphenToCamelCase(usrStr, replacement='-'):
         response += remain.capitalize()
     return response
 
-def camelCaseToHyphen(usrStr, replacement='-'):
+
+def camelCaseToHyphen(usrStr: str, replacement: str = '-') -> str:
     '''
     Given a camel-cased string, or a mixture of numbers and characters,
     create a space separated string.
@@ -151,17 +150,16 @@ def camelCaseToHyphen(usrStr, replacement='-'):
     >>> common.camelCaseToHyphen('fileName', replacement='A')
     Traceback (most recent call last):
     ValueError: Replacement cannot be an uppercase character.
-
-    :rtype: str    
     '''
     if len(replacement) != 1:
         raise ValueError('Replacement must be a single character.')
-    elif replacement.lower() != replacement:
+    if replacement.lower() != replacement:
         raise ValueError('Replacement cannot be an uppercase character.')
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1' + replacement + r'\2', usrStr)
     return re.sub('([a-z0-9])([A-Z])', r'\1' + replacement + r'\2', s1).lower()
 
-def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
+
+def spaceCamelCase(usrStr: str, replaceUnderscore=True, fixMeList=None) -> str:
     '''
     Given a camel-cased string, or a mixture of numbers and characters,
     create a space separated string.
@@ -188,10 +186,8 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
 
     >>> common.spaceCamelCase('hello_myke')
     'hello myke'
-    >>> common.spaceCamelCase('hello_myke', replaceUnderscore = False)
+    >>> common.spaceCamelCase('hello_myke', replaceUnderscore=False)
     'hello_myke'
-
-    :rtype: str
     '''
     numbers = '0123456789.'
     firstNum = False
@@ -227,7 +223,7 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
             if char.isupper() or firstNum or firstChar:
                 post.append(' ')
             post.append(char)
-        else: # first character
+        else:  # first character
             post.append(char)
 
         if isNumber:
@@ -244,29 +240,27 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
     return postStr
 
 
-
-def getMd5(value=None):
+def getMd5(value=None) -> str:
+    # noinspection SpellCheckingInspection
     '''
     Return an md5 hash from a string.  If no value is given then
     the current time plus a random number is encoded.
 
     >>> common.getMd5('test')
     '098f6bcd4621d373cade4e832627b4f6'
-
-    :rtype: str
     '''
     if value is None:
         value = str(time.time()) + str(random.random())
     m = hashlib.md5()
     try:
         m.update(value)
-    except TypeError: # unicode...
+    except TypeError:  # unicode...
         m.update(value.encode('UTF-8'))
 
     return m.hexdigest()
 
 
-def formatStr(msg, *arguments, **keywords):
+def formatStr(msg, *arguments, **keywords) -> str:
     '''
     Format one or more data elements into string suitable for printing
     straight to stderr or other outputs
@@ -275,8 +269,6 @@ def formatStr(msg, *arguments, **keywords):
     >>> print(a)
     test 1 2 3
     <BLANKLINE>
-
-    :rtype: str
     '''
     if 'format' in keywords:
         formatType = keywords['format']
@@ -297,12 +289,12 @@ def formatStr(msg, *arguments, **keywords):
                 except AttributeError:
                     msg[i] = ""
     if formatType == 'block':
-        return '\n*** '.join(msg)+'\n'
-    else: # catch all others
-        return ' '.join(msg)+'\n'
+        return '\n*** '.join(msg) + '\n'
+    else:  # catch all others
+        return ' '.join(msg) + '\n'
 
 
-def stripAccents(inputString):
+def stripAccents(inputString: str) -> str:
     r'''
     removes accents from unicode strings.
 
@@ -311,13 +303,12 @@ def stripAccents(inputString):
     True
     >>> common.stripAccents(s)
     'tres vite'
-
-    :rtype: str
     '''
     nfkd_form = unicodedata.normalize('NFKD', inputString)
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
-def normalizeFilename(name):
+
+def normalizeFilename(name: str) -> str:
     '''
     take a name that might contain unicode characters, punctuation,
     or spaces and
@@ -329,17 +320,13 @@ def normalizeFilename(name):
 
     >>> common.normalizeFilename('03-Niccolò all’lessandra.not really.xml')
     '03-Niccolo_alllessandra_not_really.xml'
-
-
-    :type name: str
-    :rtype: str
     '''
     extension = None
     lenName = len(name)
 
     if lenName > 5 and name[-4] == '.':
         extension = str(name[lenName - 4:])
-        name = name[:lenName -4]
+        name = name[:lenName - 4]
 
     name = stripAccents(name)
     name = name.encode('ascii', 'ignore').decode('UTF-8')
@@ -348,25 +335,21 @@ def normalizeFilename(name):
         name += extension
     return name
 
-def removePunctuation(s):
+
+def removePunctuation(s: str) -> str:
     '''
     Remove all punctuation from a string.
 
-    >>> common.removePunctuation("This, is! my (face).")
+    >>> common.removePunctuation('This, is! my (face).')
     'This is my face'
-
-    :type s: str
-    :rtype: str
     '''
-    maketrans = str.maketrans("", "", string.punctuation)
+    maketrans = str.maketrans('', '', string.punctuation)
     out = s.translate(maketrans)
     return out
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-if __name__ == "__main__":
-    import music21 # @Reimport
+if __name__ == '__main__':
+    import music21  # @Reimport
     music21.mainTest()
-#------------------------------------------------------------------------------
-# eof

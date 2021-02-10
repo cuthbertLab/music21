@@ -1,7 +1,5 @@
 {% extends "basic/layout.html" %}
 
-{% set script_files = script_files + ["_static/copybutton.js"] %}
-
 {%- block doctype -%}
 <!DOCTYPE html>
 {%- endblock -%}
@@ -10,6 +8,12 @@
 <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.5/require.min.js'></script>
 {%- endblock -%}
+
+{%- block scripts %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ pathto('_static/copybutton.js', 1) }}"></script>
+{%- endblock %}
+
 
 {# put the sidebar before the body #}
 {% block sidebar1 %}{{ sidebar() }}{% endblock %}

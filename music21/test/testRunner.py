@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         testRunner.py
 # Purpose:      Music21 testing suite
 #
@@ -8,8 +8,8 @@
 #
 # Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# -----------------------------------------------------------------------------
 '''
 The testRunner module contains the all important "mainTest" function that runs tests
 in a given module.  Except for the one instance of "defaultImports", everything here
@@ -17,6 +17,7 @@ can run on any system, not just music21.
 '''
 import doctest
 import inspect
+import platform
 import re
 import sys
 import unittest
@@ -24,18 +25,18 @@ import unittest
 defaultImports = ['music21']
 
 
-#ALL_OUTPUT = []
+# ALL_OUTPUT = []
 
-###### test related functions
+# test related functions
 
 def addDocAttrTestsToSuite(suite,
                            moduleVariableLists,
                            outerFilename=None,
                            globs=False,
                            optionflags=(
-                                        doctest.ELLIPSIS |
-                                        doctest.NORMALIZE_WHITESPACE
-                                        )):
+                               doctest.ELLIPSIS
+                               | doctest.NORMALIZE_WHITESPACE
+                           )):
     '''
     takes a suite, such as a doctest.DocTestSuite and the list of variables
     in a module and adds from those classes that have a _DOC_ATTR dictionary
@@ -71,60 +72,65 @@ def addDocAttrTestsToSuite(suite,
             continue
         for dockey in docattr:
             documentation = docattr[dockey]
-            #print(documentation)
+            # print(documentation)
             dt = dtp.get_doctest(documentation, globs, dockey, outerFilename, 0)
             if not dt.examples:
                 continue
             dtc = doctest.DocTestCase(dt,
                                       optionflags=optionflags,
                                       )
-            #print(dtc)
+            # print(dtc)
             suite.addTest(dtc)
 
 
 def fixDoctests(doctestSuite):
     r'''
-    Fix doctests so that adderesses are sanitized, and perhaps a few others.
+    Fix doctests so that addresses are sanitized.
+
+    In the past this fixed other differences among Python versions.
+    In the future, it might again!
     '''
-    for dtc in doctestSuite: # Suite to DocTestCase -- undocumented.
+    windows: bool = platform.system() == 'Windows'
+    for dtc in doctestSuite:  # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
             continue
 
-        dt = dtc._dt_test # DocTest
-        for example in dt.examples: # fix Traceback exception differences Py2 to Py3
+        dt = dtc._dt_test  # DocTest
+        for example in dt.examples:
             example.want = stripAddresses(example.want, '0x...')
+            if windows:
+                example.want = example.want.replace('PosixPath', 'WindowsPath')
+
 
 ADDRESS = re.compile('0x[0-9A-Fa-f]+')
 
-def stripAddresses(textString, replacement="ADDRESS"):
+
+def stripAddresses(textString, replacement='ADDRESS') -> str:
     '''
     Function that changes all memory addresses (pointers) in the given
     textString with (replacement).  This is useful for testing
     that a function gives an expected result even if the result
     contains references to memory locations.  So for instance:
 
-
-    >>> test.testRunner.stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
+    >>> stripA = test.testRunner.stripAddresses
+    >>> stripA('{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>')
     '{0.0} <music21.clef.TrebleClef object at ADDRESS>'
 
     while this is left alone:
 
-    >>> test.testRunner.stripAddresses("{0.0} <music21.humdrum.MiscTandem *>I humdrum control>")
-    '{0.0} <music21.humdrum.MiscTandem *>I humdrum control>'
+    >>> stripA('{0.0} <music21.humdrum.spineParser.MiscTandem *>I>')
+    '{0.0} <music21.humdrum.spineParser.MiscTandem *>I>'
 
 
     For doctests, can strip to '...' to make it work fine with doctest.ELLIPSIS
 
-    >>> test.testRunner.stripAddresses(
-    ...     "{0.0} <music21.base.Music21Object object at 0x102a0ff10>", '0x...')
+    >>> stripA('{0.0} <music21.base.Music21Object object at 0x102a0ff10>', '0x...')
     '{0.0} <music21.base.Music21Object object at 0x...>'
-
-    :rtype: str
     '''
     return ADDRESS.sub(replacement, textString)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 def mainTest(*testClasses, **kwargs):
     '''
@@ -144,8 +150,8 @@ def mainTest(*testClasses, **kwargs):
         import unittest
         class Test(unittest.TestCase):
             def testHello(self):
-                hello = "Hello"
-                self.assertEqual("Hello", hello)
+                hello = 'Hello'
+                self.assertEqual('Hello', hello)
 
         import music21
         if __name__ == '__main__':
@@ -153,7 +159,8 @@ def mainTest(*testClasses, **kwargs):
 
 
     This module tries to fix up some differences between python2 and python3 so
-    that the same doctests can work.
+    that the same doctests can work.  These differences can now be removed, but
+    I cannot remember what they are!
     '''
 
     runAllTests = True
@@ -162,19 +169,21 @@ def mainTest(*testClasses, **kwargs):
     failFast = bool(kwargs.get('failFast', True))
     if failFast:
         optionflags = (
-            doctest.ELLIPSIS |
-            doctest.NORMALIZE_WHITESPACE |
-            doctest.REPORT_ONLY_FIRST_FAILURE
-            )
+            doctest.ELLIPSIS
+            | doctest.NORMALIZE_WHITESPACE
+            | doctest.REPORT_ONLY_FIRST_FAILURE
+        )
     else:
         optionflags = (
-            doctest.ELLIPSIS |
-            doctest.NORMALIZE_WHITESPACE
-            )
+            doctest.ELLIPSIS
+            | doctest.NORMALIZE_WHITESPACE
+        )
 
     globs = None
-    if ('noDocTest' in testClasses or 'noDocTest' in sys.argv
-        or 'nodoctest' in sys.argv or bool(kwargs.get('noDocTest', False))):
+    if ('noDocTest' in testClasses
+            or 'noDocTest' in sys.argv
+            or 'nodoctest' in sys.argv
+            or bool(kwargs.get('noDocTest', False))):
         skipDoctest = True
     else:
         skipDoctest = False
@@ -186,16 +195,16 @@ def mainTest(*testClasses, **kwargs):
     else:
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-        if ('moduleRelative' in testClasses or
-                'moduleRelative' in sys.argv or
-                bool(kwargs.get('moduleRelative', False))):
+        if ('moduleRelative' in testClasses
+                or 'moduleRelative' in sys.argv
+                or bool(kwargs.get('moduleRelative', False))):
             pass
         else:
             for di in defaultImports:
                 globs = __import__(di).__dict__.copy()
-            if ('importPlusRelative' in testClasses or
-                    'importPlusRelative' in sys.argv or
-                    bool(kwargs.get('importPlusRelative', False))):
+            if ('importPlusRelative' in testClasses
+                    or 'importPlusRelative' in sys.argv
+                    or bool(kwargs.get('importPlusRelative', False))):
                 globs.update(inspect.stack()[1][0].f_globals)
 
         try:
@@ -203,24 +212,23 @@ def mainTest(*testClasses, **kwargs):
                 '__main__',
                 globs=globs,
                 optionflags=optionflags,
-                )
-        except ValueError as ve: # no docstrings
-            print("Problem in docstrings [usually a missing r value before " +
-                  "the quotes:] {0}".format(str(ve)))
+            )
+        except ValueError as ve:  # no docstrings
+            print('Problem in docstrings [usually a missing r value before '
+                  + f'the quotes:] {ve}')
             s1 = unittest.TestSuite()
 
-
     verbosity = 1
-    if ('verbose' in testClasses or
-            'verbose' in sys.argv or
-            bool(kwargs.get('verbose', False))):
-        verbosity = 2 # this seems to hide most display
+    if ('verbose' in testClasses
+            or 'verbose' in sys.argv
+            or bool(kwargs.get('verbose', False))):
+        verbosity = 2  # this seems to hide most display
 
     displayNames = False
-    if ('list' in sys.argv or
-            'display' in sys.argv or
-            bool(kwargs.get('display', False)) or
-            bool(kwargs.get('list', False))):
+    if ('list' in sys.argv
+            or 'display' in sys.argv
+            or bool(kwargs.get('display', False))
+            or bool(kwargs.get('list', False))):
         displayNames = True
         runAllTests = False
 
@@ -234,39 +242,38 @@ def mainTest(*testClasses, **kwargs):
         runThisTest = kwargs.get('runTest', False)
 
     # -f, --failfast
-    if ('onlyDocTest' in sys.argv or
-            'onlyDocTest' in testClasses or
-            bool(kwargs.get('onlyDocTest', False))
-            ):
-        testClasses = [] # remove cases
+    if ('onlyDocTest' in sys.argv
+            or 'onlyDocTest' in testClasses
+            or bool(kwargs.get('onlyDocTest', False))):
+        testClasses = []  # remove cases
     for t in testClasses:
         if not isinstance(t, str):
             if displayNames is True:
                 for tName in unittest.defaultTestLoader.getTestCaseNames(t):
-                    print('Unit Test Method: %s' % tName)
+                    print(f'Unit Test Method: {tName}')
             if runThisTest is not None:
-                tObj = t() # call class
+                tObj = t()  # call class
                 # search all names for case-insensitive match
                 for name in dir(tObj):
-                    if (name.lower() == runThisTest.lower() or
-                           name.lower() == ('test' + runThisTest.lower()) or
-                           name.lower() == ('xtest' + runThisTest.lower())):
+                    if (name.lower() == runThisTest.lower()
+                           or name.lower() == ('test' + runThisTest.lower())
+                           or name.lower() == ('xtest' + runThisTest.lower())):
                         runThisTest = name
                         break
                 if hasattr(tObj, runThisTest):
-                    print('Running Named Test Method: %s' % runThisTest)
+                    print(f'Running Named Test Method: {runThisTest}')
                     tObj.setUp()
                     getattr(tObj, runThisTest)()
                     runAllTests = False
                     break
                 else:
-                    print('Could not find named test method: %s, running all tests' % runThisTest)
+                    print(f'Could not find named test method: {runThisTest}, running all tests')
 
             # normally operation collects all tests
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(t)
             s1.addTests(s2)
 
-    ### Add _DOC_ATTR tests...
+    # Add _DOC_ATTR tests...
     if not skipDoctest:
         stacks = inspect.stack()
         if len(stacks) > 1:
@@ -288,6 +295,5 @@ def mainTest(*testClasses, **kwargs):
 
 if __name__ == '__main__':
     mainTest()
-    #from pprint import pprint
-    #pprint(ALL_OUTPUT)
-
+    # from pprint import pprint
+    # pprint(ALL_OUTPUT)

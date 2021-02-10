@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         musicxml/archiveTools.py
-# Purpose:      Tools for compressing and uncompressing MusicXML files
+# Purpose:      Tools for compressing and decompressing MusicXML files
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009, 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# -----------------------------------------------------------------------------
 '''
-Tools for compressing and uncompressing musicxml files.
+Tools for compressing and decompressing musicxml files.
 '''
 import os
+import pathlib
 import zipfile
+from typing import Union
 
 from music21 import common
 from music21 import environment
@@ -21,7 +23,7 @@ _MOD = 'musicxml.archiveTools'
 environLocal = environment.Environment(_MOD)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # compression
 
 
@@ -33,16 +35,18 @@ def compressAllXMLFiles(*, deleteOriginal=False):
     '''
     from music21.corpus.corpora import CoreCorpus
     environLocal.warn("Compressing musicXML files...")
+
+    # this gets all .xml, .musicxml, .mxl etc.
     for filename in CoreCorpus().getPaths(fileExtensions=('.xml',)):
         compressXML(filename, deleteOriginal=deleteOriginal)
     environLocal.warn(
         'Compression complete. '
         'Run the main test suite, fix bugs if necessary,'
         'and then commit modified directories in corpus.'
-        )
+    )
 
 
-def compressXML(filename, *, deleteOriginal=False):
+def compressXML(filename: Union[str, pathlib.Path], *, deleteOriginal=False, silent=False):
     '''
     Takes a filename, and if the filename corresponds to a musicXML file with
     an .xml extension, creates a corresponding compressed .mxl file in the same
@@ -54,39 +58,35 @@ def compressXML(filename, *, deleteOriginal=False):
     filename = str(filename)
     if not filename.endswith('.xml') and not filename.endswith('.musicxml'):
         return  # not a musicXML file
-    filename = common.pathTools.cleanpath(filename, returnPathlib=False)
-    environLocal.warn("Updating file: {0}".format(filename))
-    filenameList = filename.split(os.path.sep)
-    # find the archive name (name w/out filepath)
-    archivedName = filenameList.pop()
-    # new archive name
-    filenameList.append(archivedName[0:len(archivedName) - 4] + ".mxl")
-    newFilename = os.path.sep.join(filenameList)  # new filename
+    fp = common.pathTools.cleanpath(filename, returnPathlib=True)
+    if not silent:  # pragma: no cover
+        environLocal.warn(f"Updating file: {fp}")
+    newFilename = str(fp.with_suffix('.mxl'))
     # contents of container.xml file in META-INF folder
-    container = '''<?xml version="1.0" encoding="UTF-8"?>
+    container = f'''<?xml version="1.0" encoding="UTF-8"?>
 <container>
   <rootfiles>
-    <rootfile full-path="{0}"/>
+    <rootfile full-path="{fp.name}"/>
   </rootfiles>
 </container>
-    '''.format(archivedName)
+    '''
     # Export container and original xml file to system as a compressed XML.
     with zipfile.ZipFile(
             newFilename,
             'w',
             compression=zipfile.ZIP_DEFLATED,
-            ) as myZip:
-        myZip.write(filename, archivedName)
+    ) as myZip:
+        myZip.write(filename, fp.name)
         myZip.writestr(
             'META-INF' + os.path.sep + 'container.xml',
             container,
-            )
+        )
     # Delete uncompressed xml file from system
     if deleteOriginal:
-        os.remove(filename)
+        fp.unlink()
 
 
-def uncompressMXL(filename, deleteOriginal=False):
+def uncompressMXL(filename: Union[str, pathlib.Path], *, deleteOriginal=False):
     '''
     Takes a filename, and if the filename corresponds to a compressed musicXML
     file with an .mxl extension, creates a corresponding uncompressed .xml file
@@ -95,33 +95,49 @@ def uncompressMXL(filename, deleteOriginal=False):
     If deleteOriginal is set to True, the original compressed musicXML file is
     deleted from the system.
     '''
-    if not filename.endswith(".mxl") and not filename.endswith('.musicxml'):
-        return  # not a musicXML file
-    filename = common.pathTools.cleanpath(filename, returnPathlib=False)
-    environLocal.warn("Updating file: {0}".format(filename))
-    filenames = filename.split(os.path.sep)
-    # find the archive name (name w/out filepath)
-    archivedName = filenames.pop()
+    filename = str(filename)
+    if not filename.endswith('.mxl'):
+        return  # not a compressed musicXML file
 
-    unarchivedName = os.path.splitext(archivedName)[0] + '.xml'
-    extractPath = os.path.sep.join(filenames)
+    fp: pathlib.Path = common.pathTools.cleanpath(filename, returnPathlib=True)
+    environLocal.warn(f"Updating file: {fp}")
+    extractPath = str(fp.parent)
+    unarchivedName = fp.with_suffix('.xml').name
     # Export container and original xml file to system as a compressed XML.
     with zipfile.ZipFile(filename, 'r', compression=zipfile.ZIP_DEFLATED) as myZip:
         try:
             myZip.extract(member=unarchivedName, path=extractPath)
         except KeyError:
-            for storedName in myZip.namelist():
-                myZip.extract(member=storedName, path=extractPath)
+            try:
+                unarchivedName = unarchivedName.replace('.xml', '.musicxml')
+                myZip.extract(member=unarchivedName, path=extractPath)
+            except KeyError:
+                found_one_file = False
+                for storedName in myZip.namelist():
+                    if 'META-INF' in storedName:
+                        continue
+                    myZip.extract(member=storedName, path=extractPath)
+                    if not found_one_file:
+                        # only rename one file...hope it is the right one.
+                        extractPath_pathlib = pathlib.Path(extractPath)
+                        wrongName = extractPath_pathlib / storedName
+                        correctName = extractPath_pathlib / unarchivedName
+                        wrongName.rename(correctName)
+                        found_one_file = True
+
 
     # Delete uncompressed xml file from system
     if deleteOriginal:
-        os.remove(filename)
+        fp.unlink()
+
 
 if __name__ == '__main__':
     import sys
     if len(sys.argv) >= 1:
         for xmlName in sys.argv[1:]:
             if xmlName.endswith('.xml'):
+                compressXML(xmlName)
+            elif xmlName.endswith('.musicxml'):
                 compressXML(xmlName)
             elif xmlName.endswith('.mxl'):
                 uncompressMXL(xmlName)

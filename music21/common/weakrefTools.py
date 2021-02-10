@@ -1,5 +1,5 @@
-#-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -*- coding: utf-8 -*-
+# ------------------------------------------------------------------------------
 # Name:         common/weakrefTools.py
 # Purpose:      Utilities for weak references
 #
@@ -7,18 +7,20 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 
 __all__ = ['wrapWeakref', 'unwrapWeakref']
 
 import weakref
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+
 def wrapWeakref(referent):
     '''
     utility function that wraps objects as weakrefs but does not wrap
-    already wrapped objects; also prevents wrapping the unwrapable "None" type, etc.
+    already wrapped objects; also prevents wrapping the unwrappable "None" type, etc.
 
     >>> import weakref
     >>> class Mock:
@@ -34,7 +36,7 @@ def wrapWeakref(referent):
     >>> ref3
     5
     '''
-    #if type(referent) is weakref.ref:
+    # if type(referent) is weakref.ref:
 #     if isinstance(referent, weakref.ref):
 #         return referent
     try:
@@ -45,6 +47,7 @@ def wrapWeakref(referent):
     # slight performance boost rather than checking if None
     except TypeError:
         return referent
+
 
 def unwrapWeakref(referent):
     '''
@@ -73,9 +76,7 @@ def unwrapWeakref(referent):
         return referent
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()
 
-#------------------------------------------------------------------------------
-# eof

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         testSerialization.py
 # Purpose:      tests for serializing music21 objects
 #
@@ -7,30 +7,22 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2012-13 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 
 
 import unittest
-import music21 # needed to do fully-qualified isinstance name checking
+import music21  # needed to do fully-qualified isinstance name checking
 
 from music21 import freezeThaw
 
 from music21 import environment
-_MOD = "test.testSerialization"
+_MOD = 'test.testSerialization'
 environLocal = environment.Environment(_MOD)
 
 
-
-
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        '''Need a comment
-        '''
-        pass
 
     def testBasicC(self):
         from music21 import stream, note, converter
@@ -38,13 +30,12 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         n1 = note.Note('d2', quarterLength=2.0)
         s.append(n1)
-        s.append(note.Note('g~6', quarterLength=.25))
+        s.append(note.Note('g~6', quarterLength=0.25))
 
         temp = converter.freezeStr(s)
         post = converter.thawStr(temp)
         self.assertEqual(len(post.notes), 2)
         self.assertEqual(str(post.notes[0].pitch), 'D2')
-
 
     def testBasicD(self):
         from music21 import stream, note, converter, spanner
@@ -61,7 +52,7 @@ class Test(unittest.TestCase):
 
         # the deepcopy is what creates the bug in the preservation of a weakref
 
-        #temp = converter.freezeStr(s)
+        # temp = converter.freezeStr(s)
 
         sCopy = copy.deepcopy(s)
         temp = converter.freezeStr(sCopy)
@@ -73,20 +64,18 @@ class Test(unittest.TestCase):
         self.assertEqual(spPost.getSpannedElements(), [post.notes[0], post.notes[1]])
         self.assertEqual(spPost.getSpannedElementIds(), [id(post.notes[0]), id(post.notes[1])])
 
-
     def testBasicE(self):
         from music21 import corpus, converter
         s = corpus.parse('bwv66.6')
 
         temp = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(temp)
-        #sPost.show()
+        # sPost.show()
         self.assertEqual(len(s.flat.notes), len(sPost.flat.notes))
 
         self.assertEqual(len(s.parts[0].notes), len(sPost.parts[0].notes))
-        #print s.parts[0].notes
-        #sPost.parts[0].notes
-
+        # print(s.parts[0].notes)
+        # sPost.parts[0].notes
 
     def testBasicF(self):
         from music21 import stream, note, converter, spanner
@@ -98,13 +87,12 @@ class Test(unittest.TestCase):
         s.append(spanner.Slur(s.notes[0], s.notes[-1]))
 
         # file writing
-        #converter.freeze(s, fmt='pickle', fp='/_scratch/test.p')
+        # converter.freeze(s, fmt='pickle', fp='/_scratch/test.p')
 
         data = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(data)
         self.assertEqual(len(sPost.notes), 5)
-        #sPost.show()
-
+        # sPost.show()
 
     def testBasicJ(self):
         from music21 import stream, note, converter
@@ -126,7 +114,7 @@ class Test(unittest.TestCase):
         s = stream.Score()
         s.insert(0, p1)
         s.insert(0, p2)
-        #s.show()
+        # s.show()
 
         temp = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(temp)
@@ -134,7 +122,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.flat.notes), 24)
-
 
     def testBasicI(self):
         from music21 import stream, note, converter
@@ -148,7 +135,7 @@ class Test(unittest.TestCase):
         s = stream.Score()
         s.insert(0, p1)
         s.insert(0, p2)
-        #s.show()
+        # s.show()
 
         temp = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(temp)
@@ -157,7 +144,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.flat.notes), 24)
 
-
     def testSpannerSerializationOfNotesNotInPickle(self):
         '''
         test to see if spanners serialize properly if they
@@ -165,9 +151,9 @@ class Test(unittest.TestCase):
         '''
         from music21 import stream, spanner, converter
         from music21 import note
-        n1 = note.Note("D4")
-        n2 = note.Note("E4")
-        n3 = note.Note("F4")
+        n1 = note.Note('D4')
+        n2 = note.Note('E4')
+        n3 = note.Note('F4')
         slur1 = spanner.Slur([n1, n2])
         s = stream.Part()
         s.insert(0, n3)
@@ -175,40 +161,28 @@ class Test(unittest.TestCase):
         data = converter.freezeStr(s, fmt='pickle')
 
         unused_s2 = converter.thawStr(data)
-        #s2.show('text')
-
+        # s2.show('text')
 
     def testBigCorpus(self):
         from music21 import corpus, converter
-        #import time
-        #print time.time()  # 8.3 sec from pickle; 10.3 sec for forceSource...
-        #s = corpus.parse('beethoven/opus133') #, forceSource = True)
-        #print time.time()  # purePython: 33! sec; cPickle: 25 sec
-        #data = converter.freezeStr(s, fmt='pickle')
-        #print time.time()  # cPickle: 5.5 sec!
+        # import time
+        # print(time.time())  # 8.3 sec from pickle; 10.3 sec for forceSource...
+        # s = corpus.parse('beethoven/opus133') #, forceSource = True)
+        # print(time.time())  # purePython: 33! sec; cPickle: 25 sec
+        # data = converter.freezeStr(s, fmt='pickle')
+        # print(time.time())  # cPickle: 5.5 sec!
         s = corpus.parse('corelli/opus3no1/1grave')
         sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
         data = sf.writeStr()
 
-        #print time.time() # purePython: 9 sec; cPickle: 3.8 sec!
+        # print(time.time())  # purePython: 9 sec; cPickle: 3.8 sec!
         unused_s2 = converter.thawStr(data)
-        #print time.time()
+        # print(time.time())
 #        s2.show()
 
 
-
-
-#------------------------------------------------------------------------------
-
-if __name__ == "__main__":
+# -----------------------------------------------------------------------------
+if __name__ == '__main__':
     music21.mainTest(Test)
-
-
-#------------------------------------------------------------------------------
-# eof
-
-
-
-
 
 

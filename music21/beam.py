@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         beam.py
 # Purpose:      music21 classes for representing notes
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2009-2012, 19 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# -----------------------------------------------------------------------------
 '''
 The module defines Beam and Beams (note plural) objects.
 
@@ -32,9 +32,9 @@ Suppose you had a measure of two eighths and a quarter and wanted to explicitly
 beam the two eighth notes.  You could do this:
 
 >>> m = stream.Measure()
->>> n1 = note.Note('C4', quarterLength = 0.5)
->>> n2 = note.Note('D4', quarterLength = 0.5)
->>> n3 = note.Note('E4', quarterLength = 1.0)
+>>> n1 = note.Note('C4', quarterLength=0.5)
+>>> n2 = note.Note('D4', quarterLength=0.5)
+>>> n3 = note.Note('E4', quarterLength=1.0)
 >>> m.append(n1)
 >>> m.append(n2)
 >>> m.append(n3)
@@ -51,10 +51,10 @@ first 3 notes beamed?  The first note and 3rd are easy to do, using the method
 above:
 
 >>> m = stream.Measure()
->>> n1 = note.Note('C4', quarterLength = 0.25)
->>> n2 = note.Note('D4', quarterLength = 0.25)
->>> n3 = note.Note('E4', quarterLength = 0.5)
->>> n4 = note.Note('F4', quarterLength = 1.0)
+>>> n1 = note.Note('C4', quarterLength=0.25)
+>>> n2 = note.Note('D4', quarterLength=0.25)
+>>> n3 = note.Note('E4', quarterLength=0.5)
+>>> n4 = note.Note('F4', quarterLength=1.0)
 >>> for n in [n1, n2, n3, n4]:
 ...     m.append(n)
 >>> n1.beams.fill('16th', type='start')
@@ -79,8 +79,9 @@ from music21 import common
 from music21 import exceptions21
 from music21 import duration
 from music21 import environment
+from music21 import prebase
 from music21 import style
-from music21.common import EqualSlottedObjectMixin
+from music21.common.objects import EqualSlottedObjectMixin
 
 _MOD = 'meter'
 environLocal = environment.Environment(_MOD)
@@ -89,15 +90,16 @@ environLocal = environment.Environment(_MOD)
 class BeamException(exceptions21.Music21Exception):
     pass
 
+
 beamableDurationTypes = (
     duration.typeFromNumDict[8],
     duration.typeFromNumDict[16], duration.typeFromNumDict[32],
     duration.typeFromNumDict[64], duration.typeFromNumDict[128],
     duration.typeFromNumDict[256],
-    )
+)
 
 
-class Beam(EqualSlottedObjectMixin, style.StyleMixin):
+class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
     '''
     A Beam is an object representation of one single beam, that is, one
     horizontal line connecting two notes together (or less commonly a note to a
@@ -137,7 +139,7 @@ class Beam(EqualSlottedObjectMixin, style.StyleMixin):
     False
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         'direction',
@@ -145,12 +147,12 @@ class Beam(EqualSlottedObjectMixin, style.StyleMixin):
         'independentAngle',
         'number',
         'type',
-        )
+    )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
     # pylint: disable=redefined-builtin
     def __init__(self, type=None, direction=None, number=None):  # type is okay @ReservedAssignment
-        super().__init__()
+        super().__init__()  # must call for style.
         self.type = type  # start, stop, continue, partial
         self.direction = direction  # left or right for partial
         self.independentAngle = None
@@ -159,17 +161,17 @@ class Beam(EqualSlottedObjectMixin, style.StyleMixin):
         self.number = number
         self.id = id(self)
 
-    ### SPECIAL METHODS ###
-    def __repr__(self):
-        if self.direction is None:
-            return '<music21.beam.Beam %s/%s>' % (self.number, self.type)
-        else:
-            return '<music21.beam.Beam %s/%s/%s>' % (self.number, self.type, self.direction)
+    # PRIVATE METHODS #
 
-#------------------------------------------------------------------------------
+    def _reprInternal(self):
+        out = f'{self.number}/{self.type}'
+        if self.direction is not None:
+            out += f'/{self.direction}'
+        return out
 
 
-class Beams(EqualSlottedObjectMixin):
+# -----------------------------------------------------------------------------
+class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     '''
     The Beams object stores in it attribute beamsList (a list) all the Beam
     objects defined above.  Thus len(beam.Beams) tells you how many beams the
@@ -191,30 +193,31 @@ class Beams(EqualSlottedObjectMixin):
 
     >>> print(n.beams)
     <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
-
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         'beamsList',
         'feathered',
         'id',
-        )
+    )
 
     _DOC_ATTR = {
-        'feathered': 'Boolean determining if this is a feathered beam or not ' +
-            '(does nothing for now).',
-        }
+        'feathered': '''
+            Boolean determining if this is a feathered beam or not
+            (does nothing for now).''',
+    }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self):
+        # no need for super() call w/ ProtoM21 and EqualSlottedObject
         self.beamsList = []
         self.feathered = False
         self.id = id(self)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
         return common.Iterator(self.beamsList)
@@ -222,13 +225,17 @@ class Beams(EqualSlottedObjectMixin):
     def __len__(self):
         return len(self.beamsList)
 
-    def __repr__(self):
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and repr(self) == repr(other)
+
+    def _reprInternal(self):
         msg = []
         for beam in self.beamsList:
             msg.append(str(beam))
-        return '<music21.beam.Beams %s>' % '/'.join(msg)
+        return '/'.join(msg)
 
-    ### STATIC METHODS ###
+    # STATIC METHODS #
+
     @staticmethod
     def naiveBeams(srcList):
         '''
@@ -255,9 +262,9 @@ class Beams(EqualSlottedObjectMixin):
             # if a dur cannot be beamable under any circumstance, replace
             # it with None; this includes Rests
             if el.duration.type not in beamableDurationTypes:
-                beamsList.append(None) # placeholder
+                beamsList.append(None)  # placeholder
             elif el.isRest is True:
-                beamsList.append(None) # placeholder
+                beamsList.append(None)  # placeholder
             else:
                 # we have a beamable duration
                 b = Beams()
@@ -326,7 +333,7 @@ class Beams(EqualSlottedObjectMixin):
         over a archetypeSpan, such as 16th notes 2 and 3 in a quarter note span where
         16ths are not beamed by default.
         '''
-        ## sanitize two partials in a row:
+        # sanitize two partials in a row:
         for i in range(len(beamsList) - 1):
             bThis = beamsList[i]
             bNext = beamsList[i + 1]
@@ -352,8 +359,7 @@ class Beams(EqualSlottedObjectMixin):
                     environLocal.warn(
                         'Found a messed up beam pair {}, {}, at index {} of \n{}'.format(
                             bThis, bNext, i, beamsList))
-                    continue #
-
+                    continue
 
                 thisBeam.type = 'start'
                 thisBeam.direction = None
@@ -405,13 +411,13 @@ class Beams(EqualSlottedObjectMixin):
             if beamsList[i] is None:
                 continue
             allTypes = beamsList[i].getTypes()
-            ## clear elements that have partial beams with no full beams:
+            # clear elements that have partial beams with no full beams:
             if 'start' not in allTypes and 'stop' not in allTypes and 'continue' not in allTypes:
                 # nothing but partials
                 beamsList[i] = None
                 continue
-            ## make sure a partial-left does not follow a start or a partial-right does not
-            ## follow a stop
+            # make sure a partial-left does not follow a start or a partial-right does not
+            # follow a stop
             hasStart = False
             hasStop = False
             for b in beamsList[i].beamsList:
@@ -428,12 +434,10 @@ class Beams(EqualSlottedObjectMixin):
 
         return beamsList
 
-
-
-
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
     # pylint: disable=redefined-builtin
-    def append(self, type=None, direction=None): # type is okay @ReservedAssignment
+
+    def append(self, type=None, direction=None):  # type is okay @ReservedAssignment
         '''
         Append a new Beam object to this Beams, automatically creating the Beam
         object and incrementing the number count.
@@ -464,7 +468,7 @@ class Beams(EqualSlottedObjectMixin):
 
         self.beamsList.append(obj)
 
-    def fill(self, level=None, type=None): # type is okay @ReservedAssignment
+    def fill(self, level=None, type=None):  # type is okay @ReservedAssignment
         '''
         A quick way of setting the beams list for a particular duration, for
         instance, `fill('16th')` will clear the current list of beams in the
@@ -517,10 +521,10 @@ class Beams(EqualSlottedObjectMixin):
         Traceback (most recent call last):
         music21.beam.BeamException: cannot fill beams for level 7
         '''
-        #TODO -- why not to 2048th?
+        # TODO -- why not to 2048th?
         self.beamsList = []
         # 8th, 16th, etc represented as 1, 2, ...
-        if level in [1, '8th', duration.typeFromNumDict[8]]: # eighth
+        if level in [1, '8th', duration.typeFromNumDict[8]]:  # eighth
             count = 1
         elif level in [2, duration.typeFromNumDict[16]]:
             count = 2
@@ -533,7 +537,7 @@ class Beams(EqualSlottedObjectMixin):
         elif level in [6, duration.typeFromNumDict[256]]:
             count = 6
         else:
-            raise BeamException('cannot fill beams for level %s' % level)
+            raise BeamException(f'cannot fill beams for level {level}')
         for i in range(1, count + 1):
             if i == 0:
                 raise BeamException('level zero does not exist for this range')
@@ -558,7 +562,7 @@ class Beams(EqualSlottedObjectMixin):
         IndexError: beam number 30 cannot be accessed
         '''
         if number not in self.getNumbers():
-            raise IndexError('beam number %s cannot be accessed' % number)
+            raise IndexError(f'beam number {number} cannot be accessed')
         for i in range(len(self)):
             if self.beamsList[i].number == number:
                 return self.beamsList[i]
@@ -572,7 +576,6 @@ class Beams(EqualSlottedObjectMixin):
         >>> a.fill('32nd')
         >>> a.getNumbers()
         [1, 2, 3]
-
         '''
         return [x.number for x in self.beamsList]
 
@@ -594,7 +597,7 @@ class Beams(EqualSlottedObjectMixin):
         if beamObj.direction is None:
             return beamObj.type
         else:
-            return '%s-%s' % (beamObj.type, beamObj.direction)
+            return f'{beamObj.type}-{beamObj.direction}'
 
     def getTypes(self):
         '''
@@ -608,7 +611,7 @@ class Beams(EqualSlottedObjectMixin):
         '''
         return [x.type for x in self.beamsList]
 
-    def setAll(self, type, direction=None): # type is okay @ReservedAssignment
+    def setAll(self, type, direction=None):  # type is okay @ReservedAssignment
         '''
         `setAll` is a method of convenience that sets the type
         of each of the beam objects within the beamsList to the specified type.
@@ -629,12 +632,12 @@ class Beams(EqualSlottedObjectMixin):
 
         '''
         if type not in ('start', 'stop', 'continue', 'partial'):
-            raise BeamException('beam type cannot be %s' %  type)
+            raise BeamException(f'beam type cannot be {type}')
         for beam in self.beamsList:
             beam.type = type
             beam.direction = direction
 
-    def setByNumber(self, number, type, direction=None): # type is okay @ReservedAssignment
+    def setByNumber(self, number, type, direction=None):  # type is okay @ReservedAssignment
         '''
         Set an internal beam object by number, or rhythmic symbol level.
 
@@ -667,27 +670,25 @@ class Beams(EqualSlottedObjectMixin):
         '''
         # permit providing one argument hyphenated
         if '-' in type:
-            type, direction = type.split('-') # type is okay @ReservedAssignment
+            type, direction = type.split('-')  # type is okay @ReservedAssignment
         if type not in ['start', 'stop', 'continue', 'partial']:
-            raise BeamException('beam type cannot be %s' % type)
+            raise BeamException(f'beam type cannot be {type}')
         if number not in self.getNumbers():
-            raise IndexError('beam number %s cannot be accessed' % number)
+            raise IndexError(f'beam number {number} cannot be accessed')
         for i in range(len(self)):
             if self.beamsList[i].number == number:
                 self.beamsList[i].type = type
                 self.beamsList[i].direction = direction
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # define presented order in documentation
 
 
@@ -697,4 +698,3 @@ _DOC_ORDER = [Beams, Beam]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:          installer.py
 # Purpose:       install and configure
 #
@@ -7,15 +7,15 @@
 #                Michael Scott Cuthbert
 #
 # Copyright:     (c) 2009-2016 Michael Scott Cuthbert and the music21 Project
-# License:       LGPL or BSD
-#-------------------------------------------------------------------------------
+# License:       BSD, see license.txt
+# ------------------------------------------------------------------------------
 
 import os, sys
 
 
 def main():
-    sys.stdout.write("Starting the music21 Configuration Assistant.\n"
-                     + "Module loading could take a few moments, please wait...")
+    sys.stdout.write('Starting the music21 Configuration Assistant.\n'
+                     + 'Module loading could take a few moments, please wait...')
     sys.stdout.flush()
 
     if 'music21' in os.listdir(os.getcwd()):

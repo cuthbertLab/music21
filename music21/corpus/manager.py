@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         corpus/manager.py
 # Purpose:      Manage multiple corpora
 #
@@ -8,8 +8,8 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# -----------------------------------------------------------------------------
 '''
 The manager module handles requests across multiple corpora.  It should be the default
 interface to searching corpora.
@@ -32,9 +32,11 @@ _metadataBundles = {
     'core': None,
     'local': None,
     # 'virtual': None,
-    }
+}
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
+
 def fromName(name):
     '''
     Instantiate a specific corpus based on `name`:
@@ -55,13 +57,13 @@ def fromName(name):
     >>> corpus.manager.fromName('testDummy')
     <music21.corpus.corpora.LocalCorpus: 'testDummy'>
     '''
-#     >>> corpus.manager.fromName('virtual')
-#     <music21.corpus.corpora.VirtualCorpus>
+    # >>> corpus.manager.fromName('virtual')
+    # <music21.corpus.corpora.VirtualCorpus>
 
     if name == 'core':
         return corpora.CoreCorpus()
-#     elif name == 'virtual':
-#         return corpora.VirtualCorpus()
+    # elif name == 'virtual':
+    #     return corpora.VirtualCorpus()
     elif name == 'local':
         return corpora.LocalCorpus()
     else:
@@ -83,7 +85,7 @@ def iterateCorpora(returnObjects=True):
     <music21.corpus.corpora.CoreCorpus>
     <music21.corpus.corpora.LocalCorpus: 'local'>
 
-    We can also get names instead... Note that the name of the main localcorpus is 'local' not
+    We can also get names instead... Note that the name of the main local corpus is 'local' not
     None
 
     >>> for i, corpusName in enumerate(corpus.manager.iterateCorpora(returnObjects=False)):
@@ -109,10 +111,11 @@ def iterateCorpora(returnObjects=True):
             else:
                 yield cn
 
+
 def getWork(workName,
             movementNumber=None,
             fileExtensions=None,
-        ):
+            ):
     '''
     this parse method is called from `corpus.parse()` and does nothing differently from it.
 
@@ -128,7 +131,7 @@ def getWork(workName,
     if not common.isListLike(fileExtensions):
         fileExtensions = [fileExtensions]
 
-    if workNameJoined.endswith('.xml'):
+    if workNameJoined.endswith('.xml') or workNameJoined.endswith('.musicxml'):
         # might be compressed MXL file
         mxlWorkName = os.path.splitext(workNameJoined)[0] + '.mxl'
         addXMLWarning = True
@@ -148,24 +151,26 @@ def getWork(workName,
         warningMessage = 'Could not find a'
         if addXMLWarning:
             warningMessage += 'n xml or mxl'
-        warningMessage += ' work that met this criterion: {0};'.format(workName)
+        warningMessage += f' work that met this criterion: {workName};'
         warningMessage += ' if you are searching for a file on disk, '
         warningMessage += 'use "converter" instead of "corpus".'
         raise CorpusException(warningMessage)
+
+    if len(filePaths) == 1:
+        return pathlib.Path(filePaths[0])
     else:
-        if len(filePaths) == 1:
-            return pathlib.Path(filePaths[0])
-        else:
-            return [pathlib.Path(p) for p in filePaths]
+        return [pathlib.Path(p) for p in filePaths]
+
 
 # pylint: disable=redefined-builtin
+# noinspection PyShadowingBuiltins
 def parse(workName,
             movementNumber=None,
             number=None,
             fileExtensions=None,
             forceSource=False,
-            format=None # @ReservedAssignment
-        ):
+            format=None  # @ReservedAssignment
+          ):
     filePath = getWork(workName=workName,
                         movementNumber=movementNumber,
                         fileExtensions=fileExtensions,
@@ -178,9 +183,10 @@ def parse(workName,
         forceSource=forceSource,
         number=number,
         format=format
-        )
+    )
     _addCorpusFilepathToStreamObject(streamObject, filePath)
     return streamObject
+
 
 def _addCorpusFilepathToStreamObject(streamObj, filePath):
     '''
@@ -192,7 +198,7 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
     '''
     # metadata attribute added to store the file path,
     # for use later in identifying the score
-    #if streamObj.metadata == None:
+    # if streamObj.metadata == None:
     #    streamObj.insert(metadata.Metadata())
     corpusFilePath = str(common.getCorpusFilePath())
     lenCFP = len(corpusFilePath) + len(os.sep)
@@ -200,12 +206,13 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
 
     if filePath.startswith(corpusFilePath):
         fp2 = filePath[lenCFP:]
-        ### corpus fix for windows
+        # corpus fix for windows
         dirsEtc = fp2.split(os.sep)
         fp3 = '/'.join(dirsEtc)
         streamObj.corpusFilepath = fp3
     else:
         streamObj.corpusFilepath = filePath
+
 
 def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwargs):
     '''
@@ -221,7 +228,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     <music21.metadata.bundles.MetadataBundle {0 entries}>
 
     >>> corpus.search('bach', field='composer')
-    <music21.metadata.bundles.MetadataBundle {362 entries}>
+    <music21.metadata.bundles.MetadataBundle {363 entries}>
 
     Note the importance of good metadata -- there's almost 400 pieces by
     Bach in the corpus, but many do not have correct metadata entries.
@@ -229,7 +236,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     This can also be specified as:
 
     >>> corpus.search(composer='bach')
-    <music21.metadata.bundles.MetadataBundle {362 entries}>
+    <music21.metadata.bundles.MetadataBundle {363 entries}>
 
     Or, to get all the chorales (without using `corpus.chorales.Iterator`):
 
@@ -267,7 +274,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     for corpusName in corpusNames:
         c = fromName(corpusName)
         searchResults = c.metadataBundle.search(
-                query, field, fileExtensions=fileExtensions, **kwargs)
+            query, field, fileExtensions=fileExtensions, **kwargs)
         allSearchResults = allSearchResults.union(searchResults)
 
     return allSearchResults
@@ -301,20 +308,23 @@ def getMetadataBundleByCorpus(corpusObject):
     corpusName = corpusObject.name
     if corpusName in _metadataBundles:
         return _metadataBundles[corpusName]
-    else: # pragma: no cover
+    else:  # pragma: no cover
         raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
             corpusObject, corpusName))
+
 
 def cacheMetadataBundleFromDisk(corpusObject):
     r'''
     Update a corpus' metadata bundle from its stored JSON file on disk.
     '''
     corpusName = corpusObject.name
-    if (corpusName not in _metadataBundles or
-            _metadataBundles[corpusName] is None):
+    if (corpusName not in _metadataBundles
+            or _metadataBundles[corpusName] is None):
         metadataBundle = metadata.bundles.MetadataBundle(corpusName)
         metadataBundle.read()
         metadataBundle.validate()
+        # _metadataBundles needs TypedDict.
+        # noinspection PyTypeChecker
         _metadataBundles[corpusName] = metadataBundle
 
 
@@ -324,6 +334,7 @@ def readAllMetadataBundlesFromDisk():
     '''
     for corpusObject in iterateCorpora():
         cacheMetadataBundleFromDisk(corpusObject)
+
 
 def listLocalCorporaNames(skipNone=False):
     '''
@@ -338,6 +349,7 @@ def listLocalCorporaNames(skipNone=False):
         result = []
     result.extend(userSettings['localCorporaSettings'].keys())
     return result
+
 
 def listSearchFields():
     r'''
@@ -358,7 +370,7 @@ def listSearchFields():
     '''
     return tuple(sorted(metadata.RichMetadata.searchAttributes))
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 if __name__ == '__main__':

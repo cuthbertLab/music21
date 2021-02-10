@@ -1,0 +1,32 @@
+[flake8]
+ignore=
+  E127,  # over indented
+  E128,  # under indented
+  E301,  # 0 blank lines -- good test but something going wrong in new algorithm
+  E302,  # blank lines
+  E303,  # blank lines
+  E501,  # let pylint check line length
+  E722,  # let pylint check bare except
+  E731,  # do not assign a lambda
+  F401,  # let pylint check for imported but unused (wildcards and exports trigger)
+  F405,  # __all__ is okay to get from wildcard.
+  F821,  # let pylint check for undefined (del at end of module makes undefined)
+  F841,  # let pylint check for unused
+  W391,  # extra blank lines at end of file
+  W503,  # line break BEFORE binary operator
+
+exclude=
+  .git,
+  __pycache__,
+  *.pyc,
+  ext,
+
+# F403 = from module import *
+
+per-file-ignores =
+  music21/chord/tables.py:E122,E124,E201,E202,E203,E221,E231,E241
+  music21/common/__init__.py:F403
+  music21/features/__init__.py:F403
+  music21/search/__init__.py:F403
+
+max-line-length=100

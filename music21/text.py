@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         text.py
 # Purpose:      music21 classes for text processing
 #
@@ -7,15 +7,15 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 '''
 Utility routines for processing text in scores and other musical objects.
 '''
 import unittest
 import random
 
-#import music21 # needed to properly do isinstance checking
+# import music21  # needed to properly do isinstance checking
 
 from music21 import base
 from music21 import common
@@ -32,32 +32,36 @@ environLocal = environment.Environment(_MOD)
 # http://www.loc.gov/standards/iso639-2/php/code_list.php
 # nice article reference here:
 # http://en.wikipedia.org/wiki/Article_(grammar)
+# noinspection SpellCheckingInspection
 articleReference = {
     # arabic
-    'ar' : ['al-'],
+    'ar': ['al-'],
     # english
-    'en' : ['the', 'a', 'an'],
+    'en': ['the', 'a', 'an'],
     # german
-    'de' : ['der', 'die', 'das', 'des', 'dem', 'den', 'ein', 'eine', 'einer', 'einem', 'einen'],
+    'de': ['der', 'die', 'das', 'des', 'dem', 'den', 'ein', 'eine', 'einer', 'einem', 'einen'],
     # dutch
-    'nl' : ['de', 'het', '\'t', 'een'],
+    'nl': ['de', 'het', '\'t', 'een'],
     # spanish
-    'es' : ['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas'],
+    'es': ['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas'],
     # portuguese
-    'pt' : ['o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas'],
+    'pt': ['o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas'],
     # french
-    'fr' : ['le', 'la', 'les', 'l\'', 'un', 'une', 'des', 'du', 'de la', 'des'],
+    'fr': ['le', 'la', 'les', 'l\'', 'un', 'une', 'des', 'du', 'de la', 'des'],
     # italian
-    'it' : ['il', 'lo', 'la', 'l\'', 'i', 'gli', 'le', 'un\'', 'un', 'uno', 'una',
-            'del', 'dello', 'della', 'dei', 'degli', 'delle'],
-    }
+    'it': ['il', 'lo', 'la', 'l\'', 'i', 'gli', 'le', 'un\'', 'un', 'uno', 'una',
+           'del', 'dello', 'della', 'dei', 'degli', 'delle'],
+}
 
-#-------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 def assembleLyrics(streamIn, lineNumber=1):
     '''
     Concatenate text from a stream. The Stream is automatically flattened.
 
-    The `lineNumber` parameter determines which line of text is assembled.
+    The `lineNumber` parameter determines which line of text is assembled,
+    as an index in the .lyrics array.  (To be changed in v7 to go with an
+    identifier.)
 
 
     >>> s = stream.Stream()
@@ -69,6 +73,17 @@ def assembleLyrics(streamIn, lineNumber=1):
     >>> s.append(n2)
     >>> text.assembleLyrics(s)
     'Hi there'
+
+    Composite lyrics can also be assembled.
+
+    >>> composite = note.Lyric()
+    >>> composite0 = note.Lyric(text="He'", syllabic='begin')
+    >>> composite1 = note.Lyric(text="ya", syllabic='end')
+    >>> composite1.elisionBefore = '_'
+    >>> composite.components = [composite0, composite1]
+    >>> n1.lyrics[0] = composite
+    >>> text.assembleLyrics(s)
+    "He'_ya there"
     '''
     word = []
     words = []
@@ -76,26 +91,33 @@ def assembleLyrics(streamIn, lineNumber=1):
     # need to find maximum number of lyrics on each note
     for n in noteStream:
         try:
-            lyricObj = n.lyrics[lineNumber - 1] # a list of lyric objs
+            lyricObj = n.lyrics[lineNumber - 1]  # a list of lyric objs
         except IndexError:
             continue
-        #environLocal.printDebug(['lyricObj', 'lyricObj.text', lyricObj.text,
+        # environLocal.printDebug(['lyricObj', 'lyricObj.text', lyricObj.text,
         #    'lyricObj.syllabic', lyricObj.syllabic, 'word', word])
 
         # need to match case of non-defined syllabic attribute
-        if lyricObj.text != '_': # continuation syllable in many pieces
-            if lyricObj.syllabic in ['begin', 'middle']:
-                if lyricObj.text is not None: # should not be possible but sometimes happens
+        if lyricObj.text != '_':  # continuation syllable in many pieces
+            if lyricObj.syllabic in ('begin', 'middle'):
+                if lyricObj.text is not None:  # should not be possible but sometimes happens
                     word.append(lyricObj.text)
-            elif lyricObj.syllabic in ['end', 'single', None]:
-                if lyricObj.text is not None: # should not be possible but sometimes happens
+            elif lyricObj.syllabic in ('end', 'single', None):
+                if lyricObj.text is not None:  # should not be possible but sometimes happens
                     word.append(lyricObj.text)
-                #environLocal.printDebug(['word pre-join', word])
+                # environLocal.printDebug(['word pre-join', word])
                 words.append(''.join(word))
                 word = []
+            elif lyricObj.syllabic == 'composite':
+                if lyricObj.text is not None:
+                    word.append(lyricObj.text)
+                if lyricObj.components[-1].syllabic in ('end', 'single', None):
+                    words.append(''.join(word))
+                    word = []
             else:
-                raise Exception('no known Text syllabic setting: %s' % lyricObj.syllabic)
+                raise Exception(f'no known Text syllabic setting: {lyricObj.syllabic}')
     return ' '.join(words)
+
 
 def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     r'''
@@ -115,19 +137,19 @@ def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     '''
     lyrics = ''
     for i in range(1, maxLyrics):
-        l = assembleLyrics(streamIn, i)
-        if l != '':
-            lyrics += lyricSeparation + l
+        lyr = assembleLyrics(streamIn, i)
+        if lyr != '':
+            lyrics += lyricSeparation + lyr
     return lyrics
 
 
 
 
 def prependArticle(src, language=None):
+    # noinspection SpellCheckingInspection
     '''
     Given a text string, if an article is found in a trailing position with a comma,
     place the article in front and remove the comma.
-
 
     >>> text.prependArticle('Ale is Dear, The')
     'The Ale is Dear'
@@ -138,10 +160,10 @@ def prependArticle(src, language=None):
     >>> text.prependArticle('Combattimento di Tancredi e Clorinda, Il', 'it')
     'Il Combattimento di Tancredi e Clorinda'
     '''
-    if ',' not in src: # must have a comma
+    if ',' not in src:  # must have a comma
         return src
 
-    if language is None: # get all languages?
+    if language is None:  # get all languages?
         ref = []
         for key in articleReference:
             ref += articleReference[key]
@@ -157,11 +179,12 @@ def prependArticle(src, language=None):
     if match is not None:
         # recombine everything except the last comma split
         return match + ' ' + ','.join(src.split(',')[:-1])
-    else: # not match
+    else:  # not match
         return src
 
 
 def postpendArticle(src, language=None):
+    # noinspection SpellCheckingInspection
     '''
     Given a text string, if an article is found in a leading position,
     place it at the end with a comma.
@@ -176,10 +199,10 @@ def postpendArticle(src, language=None):
     >>> text.postpendArticle('Il Combattimento di Tancredi e Clorinda', 'it')
     'Combattimento di Tancredi e Clorinda, Il'
     '''
-    if ' ' not in src: # must have at least one space
+    if ' ' not in src:  # must have at least one space
         return src
 
-    if language is None: # get all languages?
+    if language is None:  # get all languages?
         ref = []
         for key in articleReference:
             ref += articleReference[key]
@@ -194,22 +217,22 @@ def postpendArticle(src, language=None):
             break
     if match is not None:
         # recombine everything except the last comma split
-        return ' '.join(src.split(' ')[1:]) + ', %s' % match
-    else: # not match
+        return ' '.join(src.split(' ')[1:]) + f', {match}'
+    else:  # not match
         return src
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TextException(exceptions21.Music21Exception):
     pass
 
 
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TextBoxException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 class TextBox(base.Music21Object):
     '''
     A TextBox is arbitrary text that might be positioned anywhere on a page,
@@ -222,7 +245,7 @@ class TextBox(base.Music21Object):
     RepeatExpressions and TempoTexts.
 
     >>> from music21 import text, stream
-    >>> y = 1000 # set a fixed vertical distance
+    >>> y = 1000  # set a fixed vertical distance
     >>> s = stream.Stream()
 
     Specify character, x position, y position
@@ -262,7 +285,7 @@ class TextBox(base.Music21Object):
 
     '''
     _styleClass = style.TextStyle
-    classSortOrder = -31 # text expressions are -30
+    classSortOrder = -31  # text expressions are -30
 
     def __init__(self, content=None, x=500, y=500):
         super().__init__()
@@ -272,20 +295,20 @@ class TextBox(base.Music21Object):
         self._content = None
         self.content = content   # use property
 
-        self._page = 1 # page one is deafault
+        self._page = 1  # page one is default
         self.style.absoluteX = x
         self.style.absoluteY = y
         self.style.alignVertical = 'top'
         self.style.alignHorizontal = 'center'
 
 
-    def __repr__(self):
+    def _reprInternal(self):
         if self._content is not None and len(self._content) > 10:
-            return '<music21.text.%s "%s...">' % (self.__class__.__name__, self._content[:10])
+            return repr(self._content[:10] + '...')
         elif self._content is not None:
-            return '<music21.text.%s "%s">' % (self.__class__.__name__, self._content)
+            return repr(self._content)
         else:
-            return '<music21.text.%s>' % (self.__class__.__name__)
+            return ''
 
 
     def _getContent(self):
@@ -298,7 +321,7 @@ class TextBox(base.Music21Object):
             self._content = value
 
     content = property(_getContent, _setContent,
-        doc = '''Get or set the content.
+        doc='''Get or set the content.
 
 
         >>> te = text.TextBox('Con fuoco')
@@ -315,12 +338,11 @@ class TextBox(base.Music21Object):
 
     def _setPage(self, value):
         if value is not None:
-            self._page = int(value) # must be an integer
+            self._page = int(value)  # must be an integer
         # do not set otherwise
 
     page = property(_getPage, _setPage,
-        doc = '''Get or set the page number. The first page (page 1) is the default.
-
+        doc='''Get or set the page number. The first page (page 1) is the default.
 
         >>> te = text.TextBox('Great Score')
         >>> te.content
@@ -333,7 +355,7 @@ class TextBox(base.Music21Object):
         ''')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class LanguageDetector:
     '''
     Attempts to detect language on the basis of trigrams
@@ -345,14 +367,15 @@ class LanguageDetector:
     See Trigram docs below.
     '''
     languageCodes = ['en', 'fr', 'it', 'de', 'cn', 'la', 'nl']
-    languageLong = {'en': 'English',
-                    'fr': 'French',
-                    'it': 'Italian',
-                    'de': 'German',
-                    'cn': 'Chinese',
-                    'la': 'Latin',
-                    'nl': 'Dutch',
-                    }
+    languageLong = {
+        'en': 'English',
+        'fr': 'French',
+        'it': 'Italian',
+        'de': 'German',
+        'cn': 'Chinese',
+        'la': 'Latin',
+        'nl': 'Dutch',
+    }
 
     def __init__(self, text=None):
         self.text = text
@@ -369,6 +392,7 @@ class LanguageDetector:
                 self.trigrams[languageCode] = Trigram(excerptWords)
 
     def mostLikelyLanguage(self, excerpt):
+        # noinspection SpellCheckingInspection
         '''
         returns the code of the most likely language for a passage, works on
         unicode or ascii. current languages: en, fr, de, it, cn, or None
@@ -410,8 +434,8 @@ class LanguageDetector:
         The codes are the index of the language name in LanguageDetector.languageCodes + 1
 
         >>> ld = text.LanguageDetector()
-        >>> for i in range(len(ld.languageCodes)):
-        ...    print(str(i + 1) + ' ' +  ld.languageCodes[i])
+        >>> for index in range(len(ld.languageCodes)):
+        ...    print(str(index + 1) + ' ' +  ld.languageCodes[index])
         1 en
         2 fr
         3 it
@@ -435,10 +459,12 @@ class LanguageDetector:
                     return i + 1
             raise TextException('got a language that was not in the codes; should not happen')
 
-#-------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 class Trigram:
+    # noinspection SpellCheckingInspection
     '''
-    See LanguageDector above.
+    See LanguageDetector above.
     From http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
 
     The frequency of three character
@@ -457,7 +483,7 @@ class Trigram:
     >>> #_DOCS_SHOW unknown.similarity(reference_en)
     #_DOCS_SHOW 0.95
 
-    would indicate the unknown text is almost cetrtainly English.  As
+    would indicate the unknown text is almost certainly English.  As
     syntax sugar, the minus sign is overloaded to return the difference
     between texts, so the above objects would give you:
 
@@ -477,8 +503,6 @@ class Trigram:
     >>> #_DOCS_SHOW reference_en.makeWords(30)
     My withillonquiver and ald, by now wittlectionsurper, may sequia,
     tory, I ad my notter. Marriusbabilly She lady for rachalle spen hat knong al elf
-
-
     '''
 
     def __init__(self, excerptList=None):
@@ -516,7 +540,7 @@ class Trigram:
         '''
         total = 0
         for y in self.lut.values():
-            total += sum([ x * x for x in y.values() ])
+            total += sum([x * x for x in y.values()])
         thisLength = total ** 0.5
         self._length = thisLength
 
@@ -540,8 +564,8 @@ class Trigram:
                     if x in b:
                         total += a[x] * b[x]
 
-        #environLocal.warn([self.length, 'self'])
-        #environLocal.warn([other.length, 'other'])
+        # environLocal.warn([self.length, 'self'])
+        # environLocal.warn([other.length, 'other'])
 
         return float(total) / (self.length * other.length)
 
@@ -582,23 +606,19 @@ class Trigram:
         return random.choice(letters)
 
 
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testBasic(self):
         from music21 import converter, corpus
 
         a = converter.parse(corpus.getWork('haydn/opus1no1/movement4.xml'))
         post = assembleLyrics(a)
-        self.assertEqual(post, '') # no lyrics!
+        self.assertEqual(post, '')  # no lyrics!
 
         a = converter.parse(corpus.getWork('luca/gloria'))
         post = assembleLyrics(a)
-        self.assertEqual(post.startswith('Et in terra pax hominibus bone voluntatis'), True)
+        self.assertTrue(post.startswith('Et in terra pax hominibus bone voluntatis'))
 
 
     def testAssembleLyricsA(self):
@@ -617,15 +637,12 @@ class Test(unittest.TestCase):
             n.lyric = syl
             s.append(n)
         post = assembleLyrics(s)
+        # noinspection SpellCheckingInspection
         self.assertEqual(post, 'aristocats are great')
 
-
+    # noinspection SpellCheckingInspection
     def testLanguageDetector(self):
         ld = LanguageDetector()
-        #print ld.trigrams['fr'] - ld.trigrams['it']
-        #print ld.trigrams['fr'] - ld.trigrams['de']
-        #print ld.trigrams['fr'] - ld.trigrams['cn']
-
         diffFrIt = ld.trigrams['fr'] - ld.trigrams['it']
         self.assertTrue(0.50 < diffFrIt < 0.55)
         self.assertTrue(0.67 < ld.trigrams['fr'] - ld.trigrams['de'] < 0.70)
@@ -639,15 +656,15 @@ class Test(unittest.TestCase):
             'ciao amici! cosé trovo in quale lingua ho scritto questo passaggio. Spero che '
             + 'troverà che é stata scritta in italiano'))
 
-        ## TODO: Replace
-        #messiahGovernment = corpus.parse('handel/hwv56/movement1-13.md')
-        #forUntoUs = assembleLyrics(messiahGovernment)
-        #self.assertTrue(forUntoUs.startswith('For unto us a child is born'))
-        #forUntoUs = forUntoUs.replace('_', '')
-        #self.assertEqual('en', ld.mostLikelyLanguage(forUntoUs))
+        # TODO: Replace
+        # messiahGovernment = corpus.parse('handel/hwv56/movement1-13.md')
+        # forUntoUs = assembleLyrics(messiahGovernment)
+        # self.assertTrue(forUntoUs.startswith('For unto us a child is born'))
+        # forUntoUs = forUntoUs.replace('_', '')
+        # self.assertEqual('en', ld.mostLikelyLanguage(forUntoUs))
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [TextBox]
 
@@ -656,6 +673,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-#------------------------------------------------------------------------------
-# eof

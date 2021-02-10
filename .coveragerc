@@ -1,5 +1,15 @@
+[run]
+source =
+    music21/
+
+omit =
+    music21/test/timeGraph*
+
 [report]
 exclude_lines =
     if __name__ == .__main__.:
+    if debug:
+    if self.debug:
     class TestExternal(unittest.TestCase):
+    def x_test
     pragma: no cover

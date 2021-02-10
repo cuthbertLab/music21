@@ -7,15 +7,18 @@ Created on May 24, 2017
 @author: cuthbert
 '''
 import sys
-import pytest # @UnusedImport # pylint: disable=unused-import
-import nbval # @UnusedImport # pylint: disable=unused-import
-import os
+import subprocess
+# noinspection PyPackageRequirements
+import pytest  # @UnusedImport  # pylint: disable=unused-import,import-error
+# noinspection PyPackageRequirements
+import nbval  # @UnusedImport  # pylint: disable=unused-import,import-error
 
 from music21 import environment
 from music21 import common
 
 # pytest --nbval usersGuide_15_key.ipynb --sanitize-with ../../nbval-sanitize.cfg -q
 skip = ['installJupyter.ipynb']
+
 
 def runAll():
     sourcePath = common.getRootFilePath() / 'documentation' / 'source'
@@ -27,11 +30,11 @@ def runAll():
                 continue
             if 'checkpoint' in str(f):
                 continue
-            
+
             goodFiles.append(f)
-        
-    
-    for f in goodFiles:    
+
+
+    for f in goodFiles:
         print("Running: ", str(f))
         try:
             retVal = runOne(f)
@@ -41,18 +44,29 @@ def runAll():
         if retVal == 512:
             return None
 
+
 def runOne(nbFile):
     us = environment.UserSettings()
     museScore = us['musescoreDirectPNGPath']
     us['musescoreDirectPNGPath'] = '/skip' + str(museScore)
-    try:
-        retVal = os.system('pytest --nbval ' + str(nbFile) + ' --sanitize-with '
-                  + str(common.getRootFilePath() 
-                            / 'documentation' /  'docbuild' / 'nbval-sanitize.cfg ') 
-                  + '-q')
-    except (Exception, KeyboardInterrupt):
-        raise
 
+    # this config file changes 0x39f3a0 to 0xADDRESS.
+    sanitize_fn = str(common.getRootFilePath()
+                      / 'documentation'
+                      / 'docbuild'
+                      / 'nbval-sanitize.cfg'
+                      )
+    try:
+        retVal = subprocess.run(
+            ['pytest',
+             '--disable-pytest-warnings',
+             '--nbval', str(nbFile),
+             '--sanitize-with', sanitize_fn,
+             '-q'],
+            check=False,
+        )
+    # except (Exception, KeyboardInterrupt):  # specifically looking at KeyboardInterrupt.
+    #     raise
     finally:
         us['musescoreDirectPNGPath'] = museScore
 

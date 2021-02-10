@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         enharmonics.py
 # Purpose:      Tools for returning best enharmonics
 #
@@ -7,11 +7,14 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 
-import unittest
 import itertools
+from math import inf
+import unittest
+
+
 from music21 import exceptions21
 from music21 import pitch
 from music21 import musedata
@@ -52,6 +55,7 @@ class EnharmonicSimplifier:
         self.pitchList = pitchList
         self.ruleObject = ruleClass()
         self.allPossibleSpellings = None
+        self.allSpellings = []
         self.getRepresentations()
 
     def getRepresentations(self):
@@ -71,9 +75,9 @@ class EnharmonicSimplifier:
 
     def bestPitches(self):
         '''
-        Returns a list of pitches in the best enharmonic 
+        Returns a list of pitches in the best enharmonic
         spelling according to the input criteria.
-        
+
         >>> pList1 = [pitch.Pitch('C'), pitch.Pitch('D'), pitch.Pitch('E')]
         >>> es = analysis.enharmonics.EnharmonicSimplifier(pList1)
         >>> es.bestPitches()
@@ -85,12 +89,12 @@ class EnharmonicSimplifier:
         '''
         self.getProduct()
         bestPitches = []
-        minScore = float('inf')
+        minScore = inf
         for possibility in self.allPossibleSpellings:
             thisAugDimScore = self.getAugDimScore(possibility)
-            thisAterationScore = self.getAlterationScore(possibility)
+            thisAlterationScore = self.getAlterationScore(possibility)
             thisMixSharpsFlatScore = self.getMixSharpFlatsScore(possibility)
-            thisScore = thisAugDimScore + thisAterationScore + thisMixSharpsFlatScore
+            thisScore = thisAugDimScore + thisAlterationScore + thisMixSharpsFlatScore
             if thisScore < minScore:
                 minScore = thisScore
                 bestPitches = possibility
@@ -133,18 +137,18 @@ class EnharmonicSimplifier:
         if self.ruleObject.augDimPenalty is False:
             return 1
 
-        intvStr = ''
+        intervalStr = ''
         for i in range(len(possibility) - 1):
             p0 = musedata.base40.base40Representation[possibility[i].name]
             p1 = musedata.base40.base40Representation[possibility[i + 1].name]
             base40diff = (p1 - p0) % 40
-            intvStr += musedata.base40.base40IntervalTable.get(base40diff, 'ddd')
-        dimCount = intvStr.count('A')
-        augCount = intvStr.count('d')
+            intervalStr += musedata.base40.base40IntervalTable.get(base40diff, 'ddd')
+        dimCount = intervalStr.count('A')
+        augCount = intervalStr.count('d')
         score = (dimCount + augCount + 1) * self.ruleObject.augDimPenalty
         return score
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def testBestPitches(self):
@@ -183,7 +187,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(pList), 3)
         self.assertIsInstance(testAugDimScore, int)
 
-#------------------------------------------------------------------------------
-if __name__ == "__main__":
+
+# -----------------------------------------------------------------------------
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
