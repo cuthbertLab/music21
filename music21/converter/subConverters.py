@@ -1018,22 +1018,26 @@ class ConverterMusicXML(SubConverter):
 # ------------------------------------------------------------------------------
 class ConverterFlatio(SubConverter):
     '''
-    Converter for Flatio. Roughly the same as XMLconverter but sends XML to http://flat.io
+    Converter for Flatio. Sends XML to http://flat.io and then opens it in a browser tab. You must have a flat.io authentication token, and set it like
+
+    >>> us = environment.UserSettings()
+    >>> us['flatioAuthToken'] = '[MY FLAT.IO AUTH TOKEN]'
+
+    See https://flat.io/developers/docs/api/authentication.html#personal-access-tokens
     '''
     registerFormats = ('flat',)
     registerOutputExtensions = ('flat',)
 
     def parseData(self, strData, number=None):
         '''
-        Not implemented
+        Not implemented yet.
         '''
-        # Pull MusicXML from a url?
+        # Pull MusicXML from a flat.io url?
 
     def write(self, obj, fmt, fp=None, subformats=None,
               compress=False, **keywords):  # pragma: no cover
         '''
-        Write to a .xml file.
-        Set `compress=True` to immediately compress the output to a .mxl file.
+        Uploads MusicXML to flat.io via their API.
         '''
         import requests
         from music21.musicxml import m21ToXml
@@ -1063,7 +1067,7 @@ class ConverterFlatio(SubConverter):
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):  # pragma: no cover
         '''
-        Override to do something with png...
+        Uploads MusixXML to flat.io and opens the result in a browser tab.
         '''
         import webbrowser
         url = self.write(obj, fmt, subformats=subformats, **keywords)
