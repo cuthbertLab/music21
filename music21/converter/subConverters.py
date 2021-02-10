@@ -1018,8 +1018,9 @@ class ConverterMusicXML(SubConverter):
 # ------------------------------------------------------------------------------
 class ConverterFlatio(SubConverter):
     '''
-    Converter for Flatio. Sends XML to http://flat.io and then opens it in a browser tab. You must have a flat.io authentication token, and set it like
+    Converter for Flatio. Sends XML to http://flat.io and then opens it in a browser tab.
 
+    You must have a flat.io authentication token, and set it like
     >>> us = environment.UserSettings()
     >>> us['flatioAuthToken'] = '[MY FLAT.IO AUTH TOKEN]'
 
