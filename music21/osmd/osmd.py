@@ -189,6 +189,18 @@ class TestExternal(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         ConverterOpenSheetMusicDisplay().show(s, None)
 
+    @unittest.skipUnless(hasInstalledIPython, "skipping since IPython not installed")
+    def testOpenSheetMusicDisplayColors(self):
+        s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
+
+        for n in s.recurse().getElementsByClass('Note'):
+            n.style.color = 'red'
+            if str(n.pitch) == 'G4':
+                n.style.color = 'blue'
+        for n in s.recurse().getElementsByClass('Rest'):
+            n.style.color = 'green'
+
+        s.show('osmd')
 
 class Test(unittest.TestCase):
 
