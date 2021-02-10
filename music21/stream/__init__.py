@@ -2751,6 +2751,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> m.insert(v2)
         >>> m.splitAtDurations() is None
         True
+
+        For any spanner containing the element being removed, the first or last of the
+        replacing components replaces the removed element
+        (according to whether it was first or last in the spanner.)
+
+        >>> s3 = stream.Stream()
+        >>> n1 = note.Note(quarterLength=5)
+        >>> n2 = note.Note(quarterLength=5)
+        >>> s3.append([n1, n2])
+        >>> s3.insert(0, spanner.Slur([n1, n2]))
+        >>> post = s3.splitAtDurations()
+        >>> s3.spanners.first().getFirst() is n1
+        False
+        >>> s3.spanners.first().getFirst().duration
+        <music21.duration.Duration 4.0>
+        >>> s3.spanners.first().getLast().duration
+        <music21.duration.Duration 1.0>
         '''
 
         def processContainer(container: Stream):
@@ -2762,12 +2779,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                     container.replace(noteObj, objList[0])
                     insertPoint += objList[0].quarterLength
+
                     for subsequent in objList[1:]:
                         container.insert(insertPoint, subsequent)
                         insertPoint += subsequent.quarterLength
 
                     for replacement in objList:
                         replacements.append(replacement)
+
+                    # Replace elements in spanners
+                    for spanner in noteObj.getSpannerSites():
+                        if spanner.getFirst() is noteObj:
+                            spanner.replaceSpannedElement(noteObj, objList[0])
+                        if spanner.getLast() is noteObj:
+                            spanner.replaceSpannedElement(noteObj, objList[-1])
+
             if replacements:
                 post[container] = replacements
 
