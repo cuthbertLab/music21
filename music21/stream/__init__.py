@@ -2788,11 +2788,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         replacements.append(replacement)
 
                     # Replace elements in spanners
-                    for spanner in noteObj.getSpannerSites():
-                        if spanner.getFirst() is noteObj:
-                            spanner.replaceSpannedElement(noteObj, objList[0])
-                        if spanner.getLast() is noteObj:
-                            spanner.replaceSpannedElement(noteObj, objList[-1])
+                    for sp in noteObj.getSpannerSites():
+                        if sp.getFirst() is noteObj:
+                            sp.replaceSpannedElement(noteObj, objList[0])
+                        if sp.getLast() is noteObj:
+                            sp.replaceSpannedElement(noteObj, objList[-1])
 
             if replacements:
                 post[container] = replacements
