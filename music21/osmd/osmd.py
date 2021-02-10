@@ -9,7 +9,8 @@
 # License:      LGPL or BSD, see license.txt
 # -------------------------------------------------------------------------------
 '''
-Registers the .show('osmd') converter for use in IPython browser
+Registers the .show('osmd') converter for use in IPython notebook
+If not in a notebook (e.g. commandline), it will open a browser window with the rendered score
 See OSMD project page here: https://github.com/opensheetmusicdisplay/opensheetmusicdisplay
 '''
 import unittest
@@ -19,6 +20,8 @@ import json
 import os
 import importlib
 import tempfile
+import urllib.request
+import webbrowser
 
 from music21.converter.subConverters import SubConverter
 from music21.instrument import Piano
@@ -39,13 +42,14 @@ hasInstalledIPython = loader is not None
 del importlib
 
 
-
 def getExtendedModules():
+    # pylint: disable=import-outside-toplevel
     if hasInstalledIPython:
         from IPython.core.display import display, HTML, Javascript
     else:
         def display():
-            raise OpenSheetMusicDisplayException('OpenSheetMusicDisplay requires IPython to be installed')
+            raise OpenSheetMusicDisplayException(
+                'OpenSheetMusicDisplay requires IPython to be installed')
 
         HTML = Javascript = display
     return display, HTML, Javascript
@@ -59,13 +63,15 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     '''
     registerFormats = ('osmd',)
     registerShowFormats = ('osmd',)
-    # when updating the script tag osmd will only reload in a notebook if you: Kernel -> restart and clear output, then
-    # save the notebook and refresh the page. Otherwise the script will stay on the page and not reload.
+    # when updating the script tag osmd will only reload in a notebook if you: Kernel -> restart and
+    # clear output, then save the notebook and refresh the page.
+    # Otherwise the script will stay on the page and not reload.
     script_url = ("https://github.com/opensheetmusicdisplay"
                   + "/opensheetmusicdisplay/releases/download/0.6.3/opensheetmusicdisplay.min.js")
     osmd_file = os.path.join(getSourceFilePath(), 'osmd', 'opensheetmusicdisplay.0.6.3.min.js')
 
     def __init__(self):
+        super().__init__()
         self.display, self.HTML, self.Javascript = getExtendedModules()
 
     def show(self, obj, fmt,
@@ -76,11 +82,12 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
         >>> import music21
         >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
-        >>> fig_1 = s.show('osmd')
+        >>> fig_id1 = s.show('osmd')
 
         To update a previously displayed score use the returned divId from before:
 
-        >>> s.show('osmd', divId=fig_1)
+        >>> fig_id2 = s.show('osmd', divId=fig_id1)
+        >>> assert fig_id1 == fig_id2
         '''
         in_ipython = runningUnderIPython()
         score = obj
@@ -101,12 +108,12 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
             tmp = tempfile.NamedTemporaryFile(delete=False)
             tmp_path = tmp.name + '.html'
-            import webbrowser
+
             open(tmp_path, 'w').write(f"""
             <div id="{divId}"></div>
             <script>{script}</script>
             """)
-            filename = 'file:///' + tmp_path #os.path.join(os.getcwd(), 'test_write_osmd.html')
+            filename = 'file:///' + tmp_path
             webbrowser.open_new_tab(filename)
         return divId
 
@@ -135,11 +142,10 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         if offline is True:
             if not os.path.isfile(self.osmd_file):
                 # on first use we download the file and store it locally for subsequent use
-                import urllib.request
                 # TODO: catch error for no internet connection
                 urllib.request.urlretrieve(self.script_url, self.osmd_file)
 
-            # since we can't link to files from a notebook (security risk) we dump the file contents to inject.
+            # since we can't link to files from a notebook (security risk) inject into file.
             script_content = open(self.osmd_file).read()
             script = script.replace('"{{offline_script}}"', json.dumps(script_content), 1)
 
@@ -157,9 +163,9 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         >>> import music21
         >>> # display two scores to demonstrate difference.
         >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
-        >>> s.show('osmd',fixPartName=False)
+        >>> _ = s.show('osmd',fixPartName=False)
         >>> music21.osmd.ConverterOpenSheetMusicDisplay.addDefaultPartName(s)
-        >>> s.show('osmd',fixPartName=False)
+        >>> _ = s.show('osmd',fixPartName=False)
         '''
         # If no partName is present in the first instrument, OSMD will display the ugly 'partId'
         allInstruments = list(score.getInstruments(returnDefault=False, recurse=True))
@@ -178,7 +184,7 @@ class TestExternal(unittest.TestCase):
 
     @unittest.skipUnless(hasInstalledIPython, "skipping since IPython not installed")
     def testOpenSheetMusicDisplayRuns(self):
-        from music21 import corpus, environment
+        from music21 import corpus
 
         s = corpus.parse('bwv66.6')
         ConverterOpenSheetMusicDisplay().show(s, None)
