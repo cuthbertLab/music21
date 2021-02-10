@@ -2741,6 +2741,7 @@ class Music21Object(prebase.ProtoM21Object):
     def splitAtQuarterLength(
         self,
         quarterLength,
+        *,
         retainOrigin=True,
         addTies=True,
         displayTiedAccidentals=False
@@ -2853,6 +2854,8 @@ class Music21Object(prebase.ProtoM21Object):
         Traceback (most recent call last):
         music21.duration.DurationException: cannot split a duration (0.5)
             at this quarterLength (7/10)
+
+        Changed in v7. -- all but quarterLength are keyword only
         '''
         # needed for temporal manipulations; not music21 objects
         from music21 import tie

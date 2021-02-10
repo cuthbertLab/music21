@@ -21,6 +21,7 @@ remain stable.
 
 All functions here will eventually begin with `.core`.
 '''
+import copy
 from typing import List, Dict, Union, Tuple, Optional
 from fractions import Fraction
 import unittest
@@ -289,6 +290,30 @@ class StreamCoreMixin:
             self._cache = {}  # cannot call clearCache() because defined on Stream via Music21Object
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
+
+    def coreCopyAsDerivation(self, methodName: str, *, recurse=True, deep=True):
+        '''
+        Make a copy of this stream with the proper derivation set.
+
+        >>> s = stream.Stream()
+        >>> n = note.Note()
+        >>> s.append(n)
+        >>> s2 = s.coreCopyAsDerivation('exampleCopy')
+        >>> s2.derivation.method
+        'exampleCopy'
+        >>> s2.derivation.origin is s
+        True
+        >>> s2[0].derivation.method
+        'exampleCopy'
+        '''
+        if deep:
+            post = copy.deepcopy(self)
+        else:  # pragma: no cover
+            post = copy.copy(self)
+        post.derivation.method = methodName
+        if recurse and deep:
+            post.setDerivationMethod(methodName, recurse=True)
+        return post
 
     def coreHasElementByMemoryLocation(self, objId: int) -> bool:
         '''
