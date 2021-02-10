@@ -2715,7 +2715,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         so that once each note or rest in the stream having a complex duration is split
         into similar, shorter elements representing each duration component,
         the original GeneralNote is actually replaced in the stream where it was found
-        with the new elements of atomic durations.
+        with those new elements.
 
         Returns a dictionary of the replacements/insertions made, if any, consisting
         of the stream container acted on (key) and the list of inserted elements (value).
