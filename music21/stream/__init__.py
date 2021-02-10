@@ -2801,11 +2801,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # Handle "loose" GeneralNotes in self (usually just Measure or Voice)
         processContainer(self)
+        # Handle inner streams
         if recurse:
-            # Handle inner streams
-            siter = self.recurse(classFilter=('Stream'))
-            for container in siter:
-                processContainer(container)
+            for innerStream in self.recurse(includeSelf=False, streamsOnly=True):
+                processContainer(innerStream)
 
         return post if post else None
 
