@@ -67,8 +67,8 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     # clear output, then save the notebook and refresh the page.
     # Otherwise the script will stay on the page and not reload.
     script_url = ("https://github.com/opensheetmusicdisplay"
-                  + "/opensheetmusicdisplay/releases/download/0.6.3/opensheetmusicdisplay.min.js")
-    osmd_file = os.path.join(getSourceFilePath(), 'osmd', 'opensheetmusicdisplay.0.6.3.min.js')
+                  + "/opensheetmusicdisplay/releases/download/0.9.2/opensheetmusicdisplay.min.js")
+    osmd_file = os.path.join(getSourceFilePath(), 'osmd', 'opensheetmusicdisplay.0.9.2.min.js')
 
     def __init__(self):
         super().__init__()
