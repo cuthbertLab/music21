@@ -36,6 +36,8 @@ INSTALL_REQUIRES = [
     "joblib",
     "more-itertools",
     "webcolors",
+    "requests",
+    "webbrowser"
 ]
 
 

@@ -1016,6 +1016,61 @@ class ConverterMusicXML(SubConverter):
 
 
 # ------------------------------------------------------------------------------
+class ConverterFlatio(SubConverter):
+    '''
+    Converter for Flatio. Roughly the same as XMLconverter but sends XML to http://flat.io
+    '''
+    registerFormats = ('flat',)
+    registerOutputExtensions = ('flat',)
+
+    def parseData(self, strData, number=None):
+        '''
+        Not implemented
+        '''
+        # Pull MusicXML from a url?
+
+    def write(self, obj, fmt, fp=None, subformats=None,
+              compress=False, **keywords):  # pragma: no cover
+        '''
+        Write to a .xml file.
+        Set `compress=True` to immediately compress the output to a .mxl file.
+        '''
+        import requests
+        from music21.musicxml import m21ToXml
+
+        if not environLocal['flatioAuthToken']:
+            raise SubConverterException("Trying to use flat.io subconverter, but no flatioAuthToken is set. See https://flat.io/developers/docs/api/authentication.html#personal-access-tokens to get a token.")
+
+        generalExporter = m21ToXml.GeneralObjectExporter(obj)
+        dataBytes: bytes = generalExporter.parse()
+
+        body = {
+            'title': defaults.title,
+            'privacy': 'private',
+            'data': dataBytes.decode("utf-8")
+        }
+
+        headers = {
+            'Authorization': 'Bearer ' + environLocal['flatioAuthToken'],
+            'Content-Type': 'application/json'
+        }
+        r = requests.post("https://api.flat.io/v2/scores", json=body, headers=headers)
+        print(r.status_code, r.reason)
+
+        return r
+
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):  # pragma: no cover
+        '''
+        Override to do something with png...
+        '''
+        import webbrowser
+        r = self.write(obj, fmt, subformats=subformats, **keywords)
+        json = r.json()
+        print(r.json())
+        print(json['htmlUrl'])
+        webbrowser.open(json['htmlUrl'], new=2)
+
+# ------------------------------------------------------------------------------
 class ConverterMidi(SubConverter):
     '''
     Simple class wrapper for parsing MIDI and sending MIDI data out.

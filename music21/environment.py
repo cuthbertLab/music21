@@ -377,6 +377,9 @@ class _EnvironmentCore:
         self._ref['autoDownload'] = 'ask'
         self._ref['debug'] = 0
 
+        # authentication token for http://flat.io
+        self._ref['flatioAuthToken'] = None
+
         # printing of missing import warnings
         # default/non-zero is on
         self._ref['warnings'] = 1
