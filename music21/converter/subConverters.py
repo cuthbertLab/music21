@@ -1055,20 +1055,19 @@ class ConverterFlatio(SubConverter):
             'Content-Type': 'application/json'
         }
         r = requests.post("https://api.flat.io/v2/scores", json=body, headers=headers)
-        print(r.status_code, r.reason)
+        if r.status_code != 200:
+            print("Could not upload XML to flat.io")
+            print(r.status_code, r.reason)
 
-        return r
+        return r.json()['htmlUrl']
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):  # pragma: no cover
         '''
         Override to do something with png...
         '''
         import webbrowser
-        r = self.write(obj, fmt, subformats=subformats, **keywords)
-        json = r.json()
-        print(r.json())
-        print(json['htmlUrl'])
-        webbrowser.open(json['htmlUrl'], new=2)
+        url = self.write(obj, fmt, subformats=subformats, **keywords)
+        webbrowser.open(url, new=2)
 
 # ------------------------------------------------------------------------------
 class ConverterMidi(SubConverter):
