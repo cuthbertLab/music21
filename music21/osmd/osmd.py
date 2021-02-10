@@ -174,7 +174,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             defaultInstrument = Piano()
             defaultInstrument.instrumentName = 'Default'
             score.insert(0.0, defaultInstrument)
-            score.coreElementsChanged()
         elif not allInstruments[0].instrumentName:
             # instrumentName must not be '' or None
             allInstruments[0].instrumentName = 'Default'
