@@ -7143,19 +7143,18 @@ class Test(unittest.TestCase):
           <alter>1</alter>
           <octave>4</octave>
         </pitch>
-        <duration>10080</duration>1
+        <duration>10080</duration>
         <type>quarter</type>
         <stem>up</stem>
       </note>
       <note>'''
-
         GEX = m21ToXml.GeneralObjectExporter()
         originalRaw = GEX.parse(p).decode('utf-8')
         match = match.replace(' ', '')
         match = match.replace('\n', '')
         raw = originalRaw.replace(' ', '')
         raw = raw.replace('\n', '')
-        self.assertEqual(raw.find(match) > 0, True, raw)
+        self.assertEqual(raw.find(match) > 0, True, originalRaw)
 
     def testInvertDiatonicA(self):
         # TODO: Check results
