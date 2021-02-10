@@ -123,9 +123,9 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         Generates a unique id for the div in which the score is displayed.
         This is so we can update a previously used div.
         '''
-        return "OSMD-div-" + \
-               str(random.randint(0, 1000000)) + \
-               "-" + str(time.time()).replace('.', '-')  # '.' is the class selector
+        return ("OSMD-div-" +
+               str(random.randint(0, 1000000)) +
+               "-" + str(time.time()).replace('.', '-'))  # '.' is the class selector
 
     def musicXMLToScript(self, xml, divId, offline=False):
         '''
