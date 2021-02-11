@@ -117,6 +117,9 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             webbrowser.open_new_tab(filename)
         return divId
 
+    def parseData(self):
+        raise NotImplementedError('osmd is display-only')
+
     @staticmethod
     def getUniqueDivId():
         '''
