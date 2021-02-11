@@ -344,9 +344,9 @@ class ScoreReduction:
             oneVoice = True
 
         if self._score:
-            mTemplate = self._score.parts[0].template(retainVoices=False)
+            mTemplate = self._score.parts.first().template(retainVoices=False)
         else:
-            mTemplate = self._chordReduction.parts[0].template(retainVoices=False)
+            mTemplate = self._chordReduction.parts.first().template(retainVoices=False)
 
         # for each defined reductive group
         for gName in self._reductiveGroups:

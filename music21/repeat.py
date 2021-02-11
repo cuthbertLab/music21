@@ -421,7 +421,7 @@ def insertRepeatEnding(s, start, end, endingNumber=1, *, inPlace=False):
     >>> repeatBrackets = c1.flat.getElementsByClass(spanner.RepeatBracket)
     >>> len(repeatBrackets)
     8
-    >>> len(c1.parts[0].getElementsByClass(spanner.RepeatBracket))
+    >>> len(c1.parts.first().getElementsByClass(spanner.RepeatBracket))
     2
     '''
 
@@ -982,7 +982,7 @@ class Expander:
     def _getRepeatExpressionCommand(self, streamObj):
         '''Get the instance found in this stream; assumes that there is one.
         '''
-        return streamObj.flat.getElementsByClass('RepeatExpressionCommand')[0]
+        return streamObj.flat.getElementsByClass('RepeatExpressionCommand').first()
 
     def _daCapoIsCoherent(self):
         '''Check of a DC statement is coherent.

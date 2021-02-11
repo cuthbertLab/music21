@@ -15,11 +15,12 @@ this class contains iterators and filters for walking through streams
 StreamIterators are explicitly allowed to access private methods on streams.
 '''
 import copy
-from typing import TypeVar, List, Union, Callable
+from typing import TypeVar, List, Union, Callable, Optional, Dict
 import unittest
 import warnings
 
 from music21 import common
+from music21.common.enums import OffsetSpecial
 from music21.exceptions21 import StreamException
 from music21.stream import filters
 from music21 import prebase
@@ -29,6 +30,7 @@ from music21.sites import SitesException
 
 
 _SIter = TypeVar('_SIter')
+FilterType = Union[Callable, filters.StreamFilter]
 
 # -----------------------------------------------------------------------------
 
@@ -88,12 +90,12 @@ class StreamIterator(prebase.ProtoM21Object):
     Changed in v.5.2 -- all arguments except srcStream are keyword only.
     '''
     def __init__(self,
-                 srcStream,
+                 srcStream: 'music21.stream.Stream',
                  *,
-                 filterList=None,
-                 restoreActiveSites=True,
-                 activeInformation=None,
-                 ignoreSorting=False):
+                 filterList: Union[List[FilterType], FilterType, None] = None,
+                 restoreActiveSites: bool = True,
+                 activeInformation: Optional[Dict] = None,
+                 ignoreSorting: bool = False):
         if not ignoreSorting and srcStream.isSorted is False and srcStream.autoSort:
             srcStream.sort()
         self.srcStream: 'music21.stream.Stream' = srcStream
@@ -105,7 +107,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         # this information can help in speed later
         self.elementsLength = len(self.srcStream._elements)
-        self.sectionIndex = -1
+        self.sectionIndex = -1  # where we are within a given section (_elements or _endElements)
         self.iterSection = '_elements'
 
         self.cleanupOnStop = False
@@ -122,7 +124,7 @@ class StreamIterator(prebase.ProtoM21Object):
         # self.filters is a list of expressions that
         # return True or False for an element for
         # whether it should be yielded.
-        self.filters: List[Union[Callable, filters.StreamFilter]] = filterList
+        self.filters: List[FilterType] = filterList
         self._len = None
         self._matchingElements = None
 
@@ -131,7 +133,7 @@ class StreamIterator(prebase.ProtoM21Object):
         if activeInformation is not None:
             self.activeInformation = activeInformation
         else:
-            self.activeInformation = {}
+            self.activeInformation = {}  # in Py3.8 make a TypedDict
             self.updateActiveInformation()
 
     def _reprInternal(self):
@@ -164,7 +166,7 @@ class StreamIterator(prebase.ProtoM21Object):
             try:
                 e = self.srcStreamElements[self.index - 1]
             except IndexError:
-                # this may happen in the number of elements has changed
+                # this may happen if the number of elements has changed
                 continue
 
             if self.matchesFilters(e) is False:
@@ -250,7 +252,21 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.notes.asdf
         Traceback (most recent call last):
         AttributeError: 'StreamIterator' object has no attribute 'asdf'
+
+        OMIT_FROM_DOCS
+
+        srcStream is accessible, but not with "__getattr__", which joblib uses
+
+        >>> s.notes.srcStream is s
+        True
+        >>> s.notes.__getattr__('srcStream') is None
+        True
         '''
+        # Prevent infinite loop in feature extractor task serialization
+        # TODO: investigate if this can be removed once iter becomes iter()
+        if attr == 'srcStream':
+            return None
+
         if not hasattr(self.srcStream, attr):
             # original stream did not have the attribute, so new won't; but raise on iterator.
             raise AttributeError(f'{self.__class__.__name__!r} object has no attribute {attr!r}')
@@ -416,6 +432,94 @@ class StreamIterator(prebase.ProtoM21Object):
         )
         return out
 
+    def first(self) -> Optional[base.Music21Object]:
+        '''
+        Efficiently return the first matching element, or None if no
+        elements match.
+
+        Does not require creating the whole list of matching elements.
+
+        >>> s = converter.parse('tinyNotation: 3/4 D4 E2 F4 r2 G2 r4')
+        >>> s.recurse().notes.first()
+        <music21.note.Note D>
+        >>> s.recurse().getElementsByClass('Rest').first()
+        <music21.note.Rest rest>
+
+        If no elements match, returns None:
+
+        >>> print(s.recurse().getElementsByClass('Chord').first())
+        None
+
+        New in v7.
+
+        OMIT_FROM_DOCS
+
+        Ensure that next continues after the first note running:
+
+        >>> notes = s.recurse().notes
+        >>> notes.first()
+        <music21.note.Note D>
+        >>> next(notes)
+        <music21.note.Note E>
+
+        Now reset on new iteration:
+
+        >>> for n in notes:
+        ...     print(n)
+        <music21.note.Note D>
+        <music21.note.Note E>
+        ...
+
+        An Empty stream:
+
+        >>> s = stream.Stream()
+        >>> s.iter.notes.first() is None
+        True
+        '''
+        iter(self)
+        try:
+            return next(self)
+        except StopIteration:
+            return None
+
+    def last(self) -> Optional[base.Music21Object]:
+        '''
+        Returns the last matching element, or None if no elements match.
+
+        Currently is not efficient (does not iterate backwards, for instance),
+        but easier than checking for an IndexError.  Might be refactored later
+        to iterate the stream backwards instead if it gets a lot of use.
+
+        >>> s = converter.parse('tinyNotation: 3/4 D4 E2 F4 r2 G2 r4')
+        >>> s.recurse().notes.last()
+        <music21.note.Note G>
+        >>> s.recurse().getElementsByClass('Rest').last()
+        <music21.note.Rest rest>
+
+        New in v7.
+
+        OMIT_FROM_DOCS
+
+        Check on empty Stream:
+
+        >>> s2 = stream.Stream()
+        >>> s2.iter.notes.last() is None
+        True
+
+        Next has a different feature from first(), will start again from beginning.
+        This behavior may change.
+
+        >>> notes = s.recurse().notes
+        >>> notes.last()
+        <music21.note.Note G>
+        >>> next(notes)
+        <music21.note.Note D>
+        '''
+        fe = self.matchingElements()
+        if not fe:
+            return None
+        return fe[-1]
+
     # ---------------------------------------------------------------
     # start and stop
     def updateActiveInformation(self):
@@ -441,8 +545,6 @@ class StreamIterator(prebase.ProtoM21Object):
         self.updateActiveInformation()
         for f in self.filters:
             if hasattr(f, 'reset'):
-                # for some reason, PyCharm thinks this is a string...
-                # noinspection PyCallingNonCallable
                 f.reset()
 
     def resetCaches(self):
@@ -620,8 +722,8 @@ class StreamIterator(prebase.ProtoM21Object):
         {2.0} <music21.note.Note D>
         {3.0} <music21.bar.Barline type=regular>
 
-        >>> s3.elementOffset(b, stringReturns=True)
-        'highestTime'
+        >>> s3.elementOffset(b, returnSpecial=True)
+        <OffsetSpecial.AT_END>
 
         >>> s4 = s.iter.getElementsByClass('Barline').stream()
         >>> s4.show('t')
@@ -681,7 +783,7 @@ class StreamIterator(prebase.ProtoM21Object):
         fe = self.matchingElements()
         for e in fe:
             try:
-                o = ss.elementOffset(e, stringReturns=True)
+                o = ss.elementOffset(e, returnSpecial=True)
             except SitesException:
                 # this can happen in the case of, s.recurse().notes.stream() -- need to do new
                 # stream...
@@ -691,7 +793,7 @@ class StreamIterator(prebase.ProtoM21Object):
             if not isinstance(o, str):
                 found.coreInsert(o, e, ignoreSort=True)
             else:
-                if o == 'highestTime':
+                if o == OffsetSpecial.AT_END:
                     found.coreStoreAtEnd(e)
                 else:
                     # TODO: something different...
@@ -772,7 +874,7 @@ class StreamIterator(prebase.ProtoM21Object):
             return e
         return None
 
-    def getElementsByClass(self, classFilterList):
+    def getElementsByClass(self, classFilterList, *, returnClone=True):
         '''
         Add a filter to the Iterator to remove all elements
         except those that match one
@@ -808,9 +910,9 @@ class StreamIterator(prebase.ProtoM21Object):
         <music21.note.Rest rest>
 
         '''
-        return self.addFilter(filters.ClassFilter(classFilterList))
+        return self.addFilter(filters.ClassFilter(classFilterList), returnClone=returnClone)
 
-    def getElementsNotOfClass(self, classFilterList):
+    def getElementsNotOfClass(self, classFilterList, *, returnClone=True):
         '''
         Adds a filter, removing all Elements that do not
         match the one or more classes in the `classFilterList`.
@@ -844,9 +946,9 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> len(found)
         25
         '''
-        return self.addFilter(filters.ClassNotFilter(classFilterList))
+        return self.addFilter(filters.ClassNotFilter(classFilterList), returnClone=returnClone)
 
-    def getElementsByGroup(self, groupFilterList):
+    def getElementsByGroup(self, groupFilterList, *, returnClone=True):
         '''
         >>> n1 = note.Note('C')
         >>> n1.groups.append('trombone')
@@ -871,7 +973,7 @@ class StreamIterator(prebase.ProtoM21Object):
         D
         E
         '''
-        return self.addFilter(filters.GroupFilter(groupFilterList))
+        return self.addFilter(filters.GroupFilter(groupFilterList), returnClone=returnClone)
 
     def getElementsByOffset(
         self,
@@ -883,6 +985,7 @@ class StreamIterator(prebase.ProtoM21Object):
         mustBeginInSpan=True,
         includeElementsThatEndAtStart=True,
         stopAfterEnd=True,
+        returnClone=True,
     ) -> 'StreamIterator':
         '''
         Adds a filter keeping only Music21Objects that
@@ -1130,7 +1233,8 @@ class StreamIterator(prebase.ProtoM21Object):
                 mustBeginInSpan=mustBeginInSpan,
                 includeElementsThatEndAtStart=includeElementsThatEndAtStart,
                 stopAfterEnd=stopAfterEnd,
-            )
+            ),
+            returnClone=returnClone
         )
 
     # ------------------------------------------------------------
@@ -1196,7 +1300,7 @@ class StreamIterator(prebase.ProtoM21Object):
     @property
     def variants(self):
         '''
-        To be deprecated soon...
+        Deprecated in version 7
 
         Adds a ClassFilter for Variant
         '''

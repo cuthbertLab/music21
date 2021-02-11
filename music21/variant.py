@@ -64,10 +64,10 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     {3.0} <music21.variant.Variant object of length 1.0>
     {3.0} <music21.note.Note D>
 
-    >>> v0 = mergedStream.getElementsByClass('Variant')[0]
+    >>> v0 = mergedStream.getElementsByClass('Variant').first()
     >>> v0
     <music21.variant.Variant object of length 1.0>
-    >>> v0[0]
+    >>> v0.first()
     <music21.note.Note B->
 
     >>> streamZ = converter.parse('tinynotation: 4/4 a4 b c d e f g a', makeNotation=False)
@@ -830,7 +830,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
                 if recurseInMeasures is True:
                     returnMeasure = returnObj.iter.getElementsByOffset(
                         ossiaOffset
-                    ).getElementsByClass(stream.Measure)[0]
+                    ).getElementsByClass(stream.Measure).first()
                     mergeVariantsEqualDuration(
                         [returnMeasure, ossiaMeasure],
                         [ossiaName],
@@ -1882,11 +1882,11 @@ def _getNextElements(s, v, numberOfElements=1):
     lengthType = v.lengthType
     # Get class of elements in variant or replaced Region
     if lengthType == 'elongation':
-        vClass = type(v.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
+        vClass = type(v.getElementsByClass(['Measure', 'Note', 'Rest']).first())
         if isinstance(vClass, note.GeneralNote):
             vClass = note.GeneralNote
     else:
-        vClass = type(replacedElements.getElementsByClass(['Measure', 'Note', 'Rest'])[0])
+        vClass = type(replacedElements.getElementsByClass(['Measure', 'Note', 'Rest']).first())
         if isinstance(vClass, note.GeneralNote):
             vClass = note.GeneralNote
 
@@ -2385,7 +2385,7 @@ class Variant(base.Music21Object):
         vStart = self.getOffsetBySite(contextStream)
 
         if includeSpacers is True:
-            spacerDuration = self.getElementsByClass('SpacerRest')[0].duration.quarterLength
+            spacerDuration = self.getElementsByClass('SpacerRest').first().duration.quarterLength
         else:
             spacerDuration = 0.0
 

@@ -41,8 +41,7 @@ try:
         noPIL = False
     else:  # pragma: no cover
         noPIL = True
-except (ModuleNotFoundError, AttributeError):  # pragma: no cover
-    # Python 3.6 raises AttributeError here, remove when 3.7 is minimum.
+except ModuleNotFoundError:  # pragma: no cover
     noPIL = True
 
 del find_spec
@@ -794,6 +793,7 @@ class LilypondConverter:
             text = ' _ '
         else:
             text = '"' + el.text + '"'
+            # TODO: composite
             if el.syllabic == 'end':
                 text = text + '__'
                 inWord = False

@@ -178,7 +178,7 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
     '''
     >>> from music21.braille import translate
     >>> corelli = corpus.parse('monteverdi/madrigal.3.1.rntxt')
-    >>> mdObject = corelli.getElementsByClass('Metadata')[0]
+    >>> mdObject = corelli.getElementsByClass('Metadata').first()
     >>> mdObject.__class__
     <class 'music21.metadata.Metadata'>
     >>> print(translate.metadataToString(mdObject))
@@ -350,13 +350,19 @@ class BrailleTranslateException(exceptions21.Music21Exception):
 
 class Test(unittest.TestCase):
 
-    def x_testTranslateRespectsLineLength(self):
-        # does not yet work.
+    def testTranslateRespectsLineLength(self):
+        from music21 import converter
+        s = converter.parse('tinyNotation: 2/4 c4 d e f8 g a2 B2 c4. d8 e2')
+        x = objectToBraille(s, maxLineLength=12)
+        self.assertEqual([len(line) for line in x.splitlines()], [12, 12, 12])
+
+    def testSplitNoteGroupingLineLength(self):
+        '''Tests loosening the constraint on trailing spaces when there is
+        no other solution.'''
         from music21 import converter
         s = converter.parse('tinyNotation: 2/4 c4 d e f8 g a2 B2 c4. d8 e2')
         x = objectToBraille(s, maxLineLength=10)
-        for line in x:
-            self.assertLessEqual(len(line), 10)
+        self.assertEqual([len(line) for line in x.splitlines()], [10, 10, 7, 10])
 
 
 if __name__ == '__main__':

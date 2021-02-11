@@ -33,7 +33,7 @@ from music21 import volume
 
 from music21 import environment
 from music21.chord import tables as chordTables
-from music21.common.decorators import deprecated, cacheMethod
+from music21.common.decorators import cacheMethod
 
 _MOD = 'chord'
 environLocal = environment.Environment(_MOD)
@@ -926,21 +926,6 @@ class Chord(note.NotRest):
         >>> cmaj1stInv.bass()
         <music21.pitch.Pitch E3>
 
-        The bass is usually defined to the lowest note in the chord,
-        but we want to be able to override this.  You might want an implied
-        bass for instance some people (following the music theorist
-        Rameau) call a diminished seventh chord (vii7)
-        a dominant chord with an omitted bass -- here we will specify the bass
-        to be a note not in the chord:
-
-        >>> vo9 = chord.Chord(['B3', 'D4', 'F4', 'A-4'])
-        >>> vo9.bass()
-        <music21.pitch.Pitch B3>
-
-        >>> vo9.bass(pitch.Pitch('G3'))
-        >>> vo9.bass()
-        <music21.pitch.Pitch G3>
-
         By default this method uses an algorithm to find the bass among the
         chord's pitches, if no bass has been previously specified. If this is
         not intended, set find to False when calling this method, and 'None'
@@ -972,7 +957,7 @@ class Chord(note.NotRest):
                 newbass = common.cleanedFlatNotation(newbass)
                 newbass = pitch.Pitch(newbass)
             # try to set newbass to be a pitch in the chord if possible
-            foundBassInChord = False
+            foundBassInChord: bool = False
             for p in self.pitches:  # first by identity
                 if newbass is p:
                     foundBassInChord = True
@@ -988,8 +973,12 @@ class Chord(note.NotRest):
             if not foundBassInChord:  # finally by name
                 for p in self.pitches:
                     if p.name == newbass.name:
+                        foundBassInChord = True
                         newbass = p
                         break
+
+            if not foundBassInChord:  # it's not there, needs to be added
+                self.pitches = (newbass, *(p for p in self.pitches))
 
             self._overrides['bass'] = newbass
             self._cache['bass'] = newbass
@@ -1335,13 +1324,6 @@ class Chord(note.NotRest):
 
         mostRootyIndex = rootnessFunctionScores.index(max(rootnessFunctionScores))
         return nonDuplicatingPitches[mostRootyIndex]
-
-    @common.deprecated('August 2018, v5.2', 'September 2021, v.7', 'just run .root() directly')
-    def findRoot(self):
-        '''
-        A deprecated function.  Just call .root() directly.
-        '''
-        return self._findRoot()
 
     def geometricNormalForm(self) -> List[int]:
         '''
@@ -3159,11 +3141,28 @@ class Chord(note.NotRest):
         >>> r is lotsOfNotes.pitches[1]
         True
 
+        You might want to supply an implied root. For instance, some people
+        (following the music theorist Rameau) call a diminished seventh chord (vii7)
+        a dominant chord with an omitted root -- here we will specify the root
+        to be a note not in the chord:
+
+        >>> vo9 = chord.Chord(['B3', 'D4', 'F4', 'A-4'])
+        >>> vo9.root()
+        <music21.pitch.Pitch B3>
+
+        >>> vo9.root(pitch.Pitch('G3'))
+        >>> vo9.root()
+        <music21.pitch.Pitch G3>
+
+        Pitches left untouched:
+
+        >>> [p.nameWithOctave for p in vo9.pitches]
+        ['B3', 'D4', 'F4', 'A-4']
 
         By default this method uses an algorithm to find the root among the
         chord's pitches, if no root has been previously specified. If this is
         not intended, set find to False when calling this method, and 'None'
-        will be returned if no root is specified
+        will be returned if no root is specified.
 
         >>> c = chord.Chord(['E3', 'G3', 'B4'])
         >>> c.root(find=False) is None
@@ -5009,14 +5008,14 @@ class Chord(note.NotRest):
         (<music21.pitch.Pitch C#5>, <music21.pitch.Pitch E#5>, <music21.pitch.Pitch G#5>)
 
         >>> rn.scaleDegrees
-        [(5, None), (7, <accidental sharp>), (2, None)]
+        [(5, None), (7, <music21.pitch.Accidental sharp>), (2, None)]
 
         >>> rn2 = roman.RomanNumeral('N6', k)
         >>> rn2.pitches
         (<music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>, <music21.pitch.Pitch G5>)
 
         >>> rn2.scaleDegrees  # N.B. -- natural form used for minor!
-        [(4, None), (6, None), (2, <accidental flat>)]
+        [(4, None), (6, None), (2, <music21.pitch.Accidental flat>)]
 
         As mentioned above, the property can also get its scale from context if
         the chord is embedded in a Stream.  Let's create the same V in f#-minor
@@ -5027,22 +5026,24 @@ class Chord(note.NotRest):
         >>> st1.append(key.Key('c#'))  # c-sharp minor
         >>> st1.append(chord1)
         >>> chord1.scaleDegrees
-        [(1, None), (3, <accidental sharp>), (5, None)]
+        [(1, None), (3, <music21.pitch.Accidental sharp>), (5, None)]
 
         >>> st2 = stream.Stream()
         >>> chord2 = chord.Chord(['C#5', 'E#5', 'G#5'])
         >>> st2.append(key.Key('c'))  # c minor
         >>> st2.append(chord2)        # same pitches as before gives different scaleDegrees
         >>> chord2.scaleDegrees
-        [(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]
+        [(1, <music21.pitch.Accidental sharp>),
+         (3, <music21.pitch.Accidental double-sharp>),
+         (5, <music21.pitch.Accidental sharp>)]
 
         >>> st3 = stream.Stream()
         >>> st3.append(key.Key('C'))  # C major
         >>> chord2 = chord.Chord(['C4', 'C#4', 'D4', 'E-4', 'E4', 'F4'])  # 1st 1/2 of chromatic
         >>> st3.append(chord2)
         >>> chord2.scaleDegrees
-        [(1, None), (1, <accidental sharp>), (2, None),
-         (3, <accidental flat>), (3, None), (4, None)]
+        [(1, None), (1, <music21.pitch.Accidental sharp>), (2, None),
+         (3, <music21.pitch.Accidental flat>), (3, None), (4, None)]
 
         Changed in v6.5 -- will return None if no context can be found:
 
@@ -5294,9 +5295,9 @@ def fromForteClass(notation):
     inv = None
     if isinstance(notation, str):
         if '-' in notation:
-            parts = notation.split('-')
-            card = int(parts[0])
-            num, chars = common.getNumFromStr(parts[1])
+            notationParts = notation.split('-')
+            card = int(notationParts[0])
+            num, chars = common.getNumFromStr(notationParts[1])
             num = int(num)
             if 'a' in chars.lower():
                 inv = 1
@@ -5799,15 +5800,16 @@ class Test(unittest.TestCase):
         st1.append(key.Key('c#'))   # c-sharp minor
         st1.append(chord1)
         self.assertEqual(repr(chord1.scaleDegrees),
-                         '[(1, None), (3, <accidental sharp>), (5, None)]')
+                         '[(1, None), (3, <music21.pitch.Accidental sharp>), (5, None)]')
 
         st2 = stream.Stream()
         st2.append(key.Key('c'))    # c minor
         st2.append(chord1)          # same pitches as before gives different scaleDegrees
         sd2 = chord1.scaleDegrees
         self.assertEqual(repr(sd2),
-                         '[(1, <accidental sharp>), '
-                         + '(3, <accidental double-sharp>), (5, <accidental sharp>)]')
+                         '[(1, <music21.pitch.Accidental sharp>), '
+                         + '(3, <music21.pitch.Accidental double-sharp>), '
+                         + '(5, <music21.pitch.Accidental sharp>)]')
 
         st3 = stream.Stream()
         st3.append(key.Key('C'))    # C major
@@ -5815,8 +5817,8 @@ class Test(unittest.TestCase):
         st3.append(chord2)
         sd3 = chord2.scaleDegrees
         self.assertEqual(repr(sd3),
-                         '[(1, None), (1, <accidental sharp>), (2, None), '
-                         + '(3, <accidental flat>), (3, None), (4, None)]')
+                         '[(1, None), (1, <music21.pitch.Accidental sharp>), (2, None), '
+                         + '(3, <music21.pitch.Accidental flat>), (3, None), (4, None)]')
 
     def testScaleDegreesB(self):
         from music21 import stream, key
@@ -5827,7 +5829,7 @@ class Test(unittest.TestCase):
         st1.append(chord1)
         self.assertEqual(chord1.activeSite, st1)
         self.assertEqual(str(chord1.scaleDegrees),
-                         '[(1, None), (3, <accidental sharp>), (5, None)]')
+                         '[(1, None), (3, <music21.pitch.Accidental sharp>), (5, None)]')
 
         st2 = stream.Stream()
         st2.append(key.Key('c'))    # c minor
@@ -5844,7 +5846,8 @@ class Test(unittest.TestCase):
 
         self.assertEqual(
             str(chord1.scaleDegrees),
-            '[(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]'
+            '[(1, <music21.pitch.Accidental sharp>), '
+            + '(3, <music21.pitch.Accidental double-sharp>), (5, <music21.pitch.Accidental sharp>)]'
         )
 
     def testTiesA(self):
@@ -6078,8 +6081,7 @@ class Test(unittest.TestCase):
         self.assertEqual([x.volume.velocity for x in cCopy], [11, 22, 33])
         self.assertEqual([x.volume.velocity for x in c], [20, 80, 120])
         self.assertEqual([x.volume.client for x in cCopy], [cCopy, cCopy, cCopy])
-        # TODO: not yet working
-        # self.assertEqual([x.volume.client for x in c], [c, c, c])
+        self.assertEqual([x.volume.client for x in c], [c, c, c])
 
     def testChordComponentsA(self):
         from music21 import stream

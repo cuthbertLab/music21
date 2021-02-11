@@ -10,26 +10,36 @@
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
+import logging
 import os
 import pathlib
 import re
 import shutil
 
-from music21 import common
-from music21 import exceptions21
-
 from more_itertools import windowed
 
+from music21 import common
+from music21 import exceptions21
 from music21 import environment
-environLocal = environment.Environment('docbuild.writers')
 
 from . import documenters
 from . import iterators
 
+environLocal = environment.Environment('docbuild.writers')
 
 class DocumentationWritersException(exceptions21.Music21Exception):
     pass
+
+
+class _BuildDirectoryFilter(logging.Filter):
+    def filter(self, record):
+        msg = record.getMessage()
+        if not msg.startswith('Making directory'):
+            return True
+        dirMade = msg[len('Making directory '):].strip()
+        if not os.path.exists(dirMade):
+            return True
+        return False
 
 class DocumentationWriter:
     '''
@@ -68,7 +78,8 @@ class DocumentationWriter:
             outputDirectory = self.outputDirectory
             if outputDirectory is None:
                 raise DocumentationWritersException(
-                    "Cannot setup output directory without guidance")
+                    'Cannot setup output directory without guidance'
+                )
         if outputDirectory.exists():
             return
 
@@ -121,7 +132,7 @@ class ReSTWriter(DocumentationWriter):
                 shouldWrite = False
             else:
                 pass
-                ## uncomment for  help in figuring out why a file keeps being different...
+                # # uncomment for  help in figuring out why a file keeps being different...
                 # import difflib
                 # print(common.relativepath(filePath))
                 # print('\n'.join(difflib.ndiff(rst.split('\n'), oldRst.split('\n'))))
@@ -150,7 +161,7 @@ class ModuleReferenceReSTWriter(ReSTWriter):
     def run(self):
         moduleReferenceDirectoryPath = self.outputDirectory
         referenceNames = []
-        for module in [x for x in iterators.ModuleIterator()]:
+        for module in list(iterators.ModuleIterator()):
             moduleDocumenter = documenters.ModuleDocumenter(module)
             if (not moduleDocumenter.classDocumenters
                     and not moduleDocumenter.functionDocumenters):
@@ -220,7 +231,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
     def __init__(self):
         from .iterators import IPythonNotebookIterator  # @UnresolvedImport
         super(IPythonNotebookReSTWriter, self).__init__()
-        self.ipythonNotebookFilePaths = [x for x in IPythonNotebookIterator()]
+        self.ipythonNotebookFilePaths = list(IPythonNotebookIterator())
         # Do not run self.setupOutputDirectory()
 
     def run(self):
@@ -363,8 +374,9 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         ipythonPromptPattern = re.compile(r'^In\[[\d ]+]:')
         mangledInternalReference = re.compile(
             r':(class|ref|func|meth|attr):``?(.*?)``?')
-        newLines = ['.. _' + notebookFileNameWithoutExtension + ':' ,
-                    ''] + self.rstEditingWarningFormat
+        newLines = [f'.. _{notebookFileNameWithoutExtension}:',
+                    '']
+        newLines += self.rstEditingWarningFormat
         currentLineNumber = 0
 
         while currentLineNumber < len(oldLines):
@@ -389,8 +401,11 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                     newLines.pop()  # remove blank line
                     newLines.pop()  # remove '.. code:: python'
 
-                currentLineNumber += 2  #  # ignore this
-                                        #  %load_ext music21.ipython21.ipExtension
+                # compensate for:
+                # -- # ignore this
+                # -- %load_ext music21.ipython21.ipExtension
+                # by skipping two lines.
+                currentLineNumber += 2
                 # TODO: Skip all % lines, without looking for '#ignore this'
             # Otherwise, nothing special to do, just add the line to our results:
             else:
@@ -399,7 +414,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
                 newCurrentLine = mangledInternalReference.sub(
                     r':\1:`\2`',
                     currentLine
-                    )
+                )
                 newLines.append(newCurrentLine)
                 currentLineNumber += 1
 
@@ -411,7 +426,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         '''
         Guarantee a blank line after literal blocks.
         '''
-        lines = [oldLines[0]]  # start with first line...
+        lines = [oldLines[0]]  # start with first line.
         for first, second in windowed(oldLines, 2):
             if (first.strip()
                     and first[0].isspace()
@@ -431,15 +446,18 @@ class IPythonNotebookReSTWriter(ReSTWriter):
             environLocal.warn('nbconvert is not installed, run pip3 install nbconvert')
             raise
 
-        outputPath = os.path.splitext(str(self.sourceToAutogenerated(
-                                                    ipythonNotebookFilePath)))[0]
+        outputPath = os.path.splitext(
+            str(self.sourceToAutogenerated(ipythonNotebookFilePath))
+        )[0]
 
         app = nb.NbConvertApp.instance()  # @UndefinedVariable
         app.initialize(argv=['--to', 'rst', '--output', outputPath,
                              str(ipythonNotebookFilePath)])
         app.writer.build_directory = str(ipythonNotebookFilePath.parent)
+        app.writer.log.addFilter(_BuildDirectoryFilter())
         app.start()
         return True
+
 
 if __name__ == '__main__':
     i = IPythonNotebookReSTWriter()

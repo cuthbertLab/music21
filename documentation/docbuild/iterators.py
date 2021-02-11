@@ -52,7 +52,7 @@ class IPythonNotebookIterator(Iterator):
 
     def __iter__(self):
         rootFilesystemPath = common.getRootFilePath()
-        documentationPath = rootFilesystemPath / 'documentation' /'source'
+        documentationPath = rootFilesystemPath / 'documentation' / 'source'
         for fileName in sorted(documentationPath.rglob('*.ipynb')):
             if fileName.parent.name.endswith('.ipynb_checkpoints'):
                 continue
@@ -83,23 +83,19 @@ class ModuleIterator(Iterator):
     # CLASS VARIABLES #
 
     _ignoredDirectoryNames = (
-        'archive',
-        'ext',
-        'server',
-        'source',
-        )
+        'source',  # documentation/source perhaps does not need to be here.
+    )
 
-    _ignoredFileNames = (
-        'base-archive.py',
-        'exceldiff.py',
-        )
+    # currently empty
+    _ignoredFileNames = ()
 
     # SPECIAL METHODS #
 
     def __iter__(self):
         rootFilesystemPath = common.getSourceFilePath()
         for directoryPath, directoryNames, fileNames in os.walk(
-            rootFilesystemPath):
+            rootFilesystemPath
+        ):
             directoryNamesToRemove = []
             for directoryName in sorted(directoryNames):
                 if directoryName in self._ignoredDirectoryNames:
@@ -137,8 +133,7 @@ class ModuleIterator(Iterator):
                 packagesystemPath = '.'.join(pathParts)
                 try:
                     module = __import__(packagesystemPath, fromlist=['*'])
-                    if getattr(module, '_DOC_IGNORE_MODULE_OR_PACKAGE',
-                        False):
+                    if getattr(module, '_DOC_IGNORE_MODULE_OR_PACKAGE', False):
                         if self.verbose:
                             print(f'\tIGNORED {common.relativepath(filePath)}')
                         continue
@@ -247,6 +242,7 @@ class FunctionIterator(Iterator):
             # noinspection PyTypeChecker
             if isinstance(x, types.FunctionType):
                 yield x
+
 
 if __name__ == '__main__':
     import music21

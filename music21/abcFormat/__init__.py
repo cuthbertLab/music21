@@ -1641,21 +1641,40 @@ class ABCChord(ABCNote):
 
     A subclass of ABCNote.
     '''
-    def __init__(self, src):
+
+    def __init__(self, src: str = ''):
         super().__init__(src)
         # store a list of component objects
         self.subTokens = []
 
     def parse(self, forceKeySignature=None, forceDefaultQuarterLength=None):
+        '''
+        Handles the following types of chords:
+
+        * Chord without length modifier: [ceg]
+
+        * Chords with outer length modifier: [ceg]2, [ceg]/2
+
+        * Chords with inner length modifier: [c2e2g2], [c2eg]
+
+        * Chords with inner and outer length modifier: [c2e2g2]/2, [c/2e/2g/2]2
+        '''
+
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)
 
-        tokenStr = nonChordSymStr[1:-1]  # remove outer brackets
-        # environLocal.printDebug(['ABCChord:', nonChordSymStr, 'tokenStr', tokenStr])
+        # position of the closing bracket
+        pos = nonChordSymStr.index(']')
+        # Length modifier string behind the chord brackets
+        outerLengthModifierStr = nonChordSymStr[pos + 1:]
+        # String in the chord brackets
+        tokenStr = nonChordSymStr[1:pos]
 
-        self.quarterLength = self.getQuarterLength(
-            nonChordSymStr,
-            forceDefaultQuarterLength=forceDefaultQuarterLength
-        )
+        # environLocal.printDebug(['ABCChord:', nonChordSymStr, 'tokenStr', tokenStr, '
+        # outerLengthModifierStr', outerLengthModifierStr])
+
+        # Get the outer chord length modifier if present
+        outer_lengthModifier = self.getQuarterLength(outerLengthModifierStr,
+                                                     forceDefaultQuarterLength=1.0)
 
         if forceKeySignature is not None:
             activeKeySignature = forceKeySignature
@@ -1669,7 +1688,7 @@ class ABCChord(ABCNote):
         # may need to supply key?
         ah.tokenize(tokenStr)
 
-        chordDurationPost = None
+        inner_quarterLength = 0
         # tokens contained here are each ABCNote instances
         for t in ah.tokens:
             # environLocal.printDebug(['ABCChord: subTokens', t])
@@ -1678,14 +1697,22 @@ class ABCChord(ABCNote):
                 t.parse(
                     forceDefaultQuarterLength=self.activeDefaultQuarterLength,
                     forceKeySignature=activeKeySignature)
+
+                if t.isRest:
+                    continue
+
                 # get the quarter length from the sub-tokens
-                # note: assuming these are the same
-                chordDurationPost = t.quarterLength
-            if isinstance(t, ABCNote) and not t.isRest:
+                # All the notes within a chord should normally have the same length,
+                # but if not, the chord duration is that of the first note.
+                if not inner_quarterLength:
+                    inner_quarterLength = t.quarterLength
+
                 self.subTokens.append(t)
 
-        if chordDurationPost is not None:
-            self.quarterLength = chordDurationPost
+
+        # When both inside and outside the chord length modifiers are used,
+        # they should be multiplied. Example: [C2E2G2]3 has the same meaning as [CEG]6.
+        self.quarterLength = outer_lengthModifier * inner_quarterLength
 
 
 # ------------------------------------------------------------------------------
@@ -1701,7 +1728,7 @@ class ABCHandler:
     define new phrases.  This is useful for parsing extra information from
     the Essen Folksong repertory
 
-    New in v6.2 -- lineBreaksDefinePhrases -- does not yet do anything
+    New in v6.3 -- lineBreaksDefinePhrases -- does not yet do anything
     '''
     def __init__(self, abcVersion=None, lineBreaksDefinePhrases=False):
         # tokens are ABC objects import n a linear stream
@@ -2193,9 +2220,17 @@ class ABCHandler:
             # get chords
             if c == '[':
                 j = self.pos + 1
+
+                # find closing chord bracket
                 while j < self.srcLen - 1 and self.strSrc[j] != ']':
                     j += 1
+
                 j += 1  # need character that caused break
+
+                # find outer chord length modifier
+                while j < self.srcLen and (self.strSrc[j].isdigit() or self.strSrc[j] in '/'):
+                    j += 1
+
                 # prepend chord symbol
                 if activeChordSymbol != '':
                     self.currentCollectStr = activeChordSymbol + self.strSrc[self.pos:j]

@@ -798,14 +798,13 @@ class RTBeat(RTAtom):
         >>> rtc.getOffset(meter.TimeSignature('6/8'))
         1.25
         '''
-        from music21 import meter
         beat = self.getBeatFloatOrFrac()
 
         # environLocal.printDebug(['using beat value:', beat])
         # TODO: check for exceptions/errors if this beat is bad
         try:
             post = timeSignature.getOffsetFromBeat(beat)
-        except meter.TimeSignatureException:
+        except exceptions21.TimeSignatureException:
             environLocal.printDebug(['bad beat specification: %s in a meter of %s' % (
                                     self.src, timeSignature)])
             post = 0.0

@@ -168,14 +168,14 @@ def getStartEvents(mt=None, channel=1, instrumentObj=None):
     A MidiTrack reference can be provided via the `mt` parameter.
 
     >>> midi.translate.getStartEvents()
-    [<MidiEvent DeltaTime, t=0, track=None, channel=1>,
-     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=None, channel=1, data=b''>]
+    [<music21.midi.DeltaTime (empty) track=None, channel=1>,
+     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=None, channel=1, data=b''>]
 
     >>> midi.translate.getStartEvents(channel=2, instrumentObj=instrument.Harpsichord())
-    [<MidiEvent DeltaTime, t=0, track=None, channel=2>,
-     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=None, channel=2, data=b'Harpsichord'>,
-     <MidiEvent DeltaTime, t=0, track=None, channel=2>,
-     <MidiEvent PROGRAM_CHANGE, t=0, track=None, channel=2, data=6>]
+    [<music21.midi.DeltaTime (empty) track=None, channel=2>,
+     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=None, channel=2, data=b'Harpsichord'>,
+     <music21.midi.DeltaTime (empty) track=None, channel=2>,
+     <music21.midi.MidiEvent PROGRAM_CHANGE, track=None, channel=2, data=6>]
 
     '''
     from music21 import midi as midiModule
@@ -212,8 +212,8 @@ def getEndEvents(mt=None, channel=1):
     Returns a list of midi.MidiEvent objects found at the end of a track.
 
     >>> midi.translate.getEndEvents(channel=2)
-    [<MidiEvent DeltaTime, t=1024, track=None, channel=2>,
-     <MidiEvent END_OF_TRACK, t=0, track=None, channel=2, data=b''>]
+    [<music21.midi.DeltaTime t=1024, track=None, channel=2>,
+     <music21.midi.MidiEvent END_OF_TRACK, track=None, channel=2, data=b''>]
     '''
     from music21 import midi as midiModule
 
@@ -382,25 +382,25 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     >>> n1 = note.Note('C#4')
     >>> eventList = midi.translate.noteToMidiEvents(n1)
     >>> eventList
-    [<MidiEvent DeltaTime, t=0, track=None, channel=1>,
-     <MidiEvent NOTE_ON, t=0, track=None, channel=1, pitch=61, velocity=90>,
-     <MidiEvent DeltaTime, t=1024, track=None, channel=1>,
-     <MidiEvent NOTE_OFF, t=0, track=None, channel=1, pitch=61, velocity=0>]
+    [<music21.midi.DeltaTime (empty) track=None, channel=1>,
+     <music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=61, velocity=90>,
+     <music21.midi.DeltaTime t=1024, track=None, channel=1>,
+     <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=61, velocity=0>]
 
     >>> n1.duration.quarterLength = 2.5
     >>> eventList = midi.translate.noteToMidiEvents(n1)
     >>> eventList
-    [<MidiEvent DeltaTime, t=0, track=None, channel=1>,
-     <MidiEvent NOTE_ON, t=0, track=None, channel=1, pitch=61, velocity=90>,
-     <MidiEvent DeltaTime, t=2560, track=None, channel=1>,
-     <MidiEvent NOTE_OFF, t=0, track=None, channel=1, pitch=61, velocity=0>]
+    [<music21.midi.DeltaTime (empty) track=None, channel=1>,
+     <music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=61, velocity=90>,
+     <music21.midi.DeltaTime t=2560, track=None, channel=1>,
+     <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=61, velocity=0>]
 
     Omitting DeltaTimes:
 
     >>> eventList2 = midi.translate.noteToMidiEvents(n1, includeDeltaTime=False, channel=9)
     >>> eventList2
-    [<MidiEvent NOTE_ON, t=0, track=None, channel=9, pitch=61, velocity=90>,
-     <MidiEvent NOTE_OFF, t=0, track=None, channel=9, pitch=61, velocity=0>]
+    [<music21.midi.MidiEvent NOTE_ON, track=None, channel=9, pitch=61, velocity=90>,
+     <music21.midi.MidiEvent NOTE_OFF, track=None, channel=9, pitch=61, velocity=0>]
     '''
     from music21 import midi as midiModule
 
@@ -464,7 +464,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     and :class:`~music21.midi.MidiEvent` objects.  See midiEventsToNote
     for details.
 
-    All DeltaTime objects except the first are ignored.
+    All DeltaTime objects except the first (for the first note on)
+    and last (for the last note off) are ignored.
 
     >>> mt = midi.MidiTrack(1)
 
@@ -481,14 +482,14 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> me2.velocity = 94
 
     >>> dt3 = midi.DeltaTime(mt)
-    >>> dt3.time = 2048
-
     >>> me3 = midi.MidiEvent(mt)
     >>> me3.type = midi.ChannelVoiceMessages.NOTE_OFF
     >>> me3.pitch = 45
     >>> me3.velocity = 0
 
     >>> dt4 = midi.DeltaTime(mt)
+    >>> dt4.time = 2048
+
     >>> me4 = midi.MidiEvent(mt)
     >>> me4.type = midi.ChannelVoiceMessages.NOTE_OFF
     >>> me4.pitch = 46
@@ -499,8 +500,20 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     <music21.chord.Chord A2 B-2>
     >>> c.duration.quarterLength
     2.0
+
+    Providing fewer than four events won't work.
+
+    >>> c = midi.translate.midiEventsToChord([dt1, me1, me2])
+    Traceback (most recent call last):
+    music21.midi.translate.TranslateException: fewer than 4 events provided to midiEventsToChord:
+    [<music21.midi.DeltaTime (empty) track=1, channel=None>,
+        <music21.midi.MidiEvent NOTE_ON, track=1, channel=None, pitch=45, velocity=94>,
+        <music21.midi.MidiEvent NOTE_ON, track=1, channel=None, pitch=46, velocity=94>]
+
+    Changed in v.7 -- Uses the last DeltaTime in the list to get the end time.
     '''
-    tOn = 0
+    tOn: int = 0  # ticks
+    tOff: int = 0  # ticks
 
     if inputM21 is None:
         c = chord.Chord()
@@ -518,11 +531,11 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     # this is a format provided by the Stream conversion of
     # midi events; it pre groups events for a chord together in nested pairs
     # of abs start time and the event object
-    if isinstance(eventList, list) and isinstance(eventList[0], tuple):
+    if isinstance(eventList, list) and eventList and isinstance(eventList[0], tuple):
         # pairs of pairs
-        tOff = eventList[0][1][0]
-        for onPair, unused_offPair in eventList:
+        for onPair, offPair in eventList:
             tOn, eOn = onPair
+            tOff, unused_eOff = offPair
             p = pitch.Pitch()
             p.midi = eOn.pitch
             pitches.append(p)
@@ -530,12 +543,14 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
     # assume it is a flat list
-    else:
+    elif len(eventList) > 3:
         onEvents = eventList[:(len(eventList) // 2)]
         offEvents = eventList[(len(eventList) // 2):]
         # first is always delta time
         tOn = onEvents[0].time
-        tOff = offEvents[0].time
+        # use the off time of the last chord member
+        # -1 is the event, -2 is the delta time for the event
+        tOff = offEvents[-2].time
         # create pitches for the odd on Events:
         for i in range(1, len(onEvents), 2):
             p = pitch.Pitch()
@@ -544,6 +559,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             v = volume.Volume(velocity=onEvents[i].velocity)
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
+    else:
+        raise TranslateException(f'fewer than 4 events provided to midiEventsToChord: {eventList}')
 
     c.pitches = pitches
     c.volume = volumes  # can set a list to volume property
@@ -551,8 +568,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     if (tOff - tOn) != 0:
         ticksToDuration(tOff - tOn, ticksPerQuarter, c.duration)
     else:
-        # environLocal.printDebug(['cannot translate found midi event with zero duration:',
-        #                         eventList, c])
+        environLocal.warn(['midi chord with zero duration will be treated as grace',
+                            eventList, c])
         # for now, get grace
         c.getGrace(inPlace=True)
     return c
@@ -571,18 +588,18 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     >>> c.volume.velocityIsRelative = False
     >>> eventList = midi.translate.chordToMidiEvents(c)
     >>> eventList
-    [<MidiEvent DeltaTime, t=0, track=None, channel=None>,
-     <MidiEvent NOTE_ON, t=0, track=None, channel=1, pitch=48, velocity=90>,
-     <MidiEvent DeltaTime, t=0, track=None, channel=None>,
-     <MidiEvent NOTE_ON, t=0, track=None, channel=1, pitch=68, velocity=90>,
-     <MidiEvent DeltaTime, t=0, track=None, channel=None>,
-     <MidiEvent NOTE_ON, t=0, track=None, channel=1, pitch=83, velocity=90>,
-     <MidiEvent DeltaTime, t=1024, track=None, channel=None>,
-     <MidiEvent NOTE_OFF, t=0, track=None, channel=1, pitch=48, velocity=0>,
-     <MidiEvent DeltaTime, t=0, track=None, channel=None>,
-     <MidiEvent NOTE_OFF, t=0, track=None, channel=1, pitch=68, velocity=0>,
-     <MidiEvent DeltaTime, t=0, track=None, channel=None>,
-     <MidiEvent NOTE_OFF, t=0, track=None, channel=1, pitch=83, velocity=0>]
+    [<music21.midi.DeltaTime (empty) track=None, channel=None>,
+     <music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=48, velocity=90>,
+     <music21.midi.DeltaTime (empty) track=None, channel=None>,
+     <music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=68, velocity=90>,
+     <music21.midi.DeltaTime (empty) track=None, channel=None>,
+     <music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=83, velocity=90>,
+     <music21.midi.DeltaTime t=1024, track=None, channel=None>,
+     <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=48, velocity=0>,
+     <music21.midi.DeltaTime (empty) track=None, channel=None>,
+     <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=68, velocity=0>,
+     <music21.midi.DeltaTime (empty) track=None, channel=None>,
+     <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=83, velocity=0>]
     '''
     from music21 import midi as midiModule
     mt = None  # midi track
@@ -803,9 +820,9 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     >>> ts = meter.TimeSignature('5/4')
     >>> eventList = midi.translate.timeSignatureToMidiEvents(ts)
     >>> eventList[0]
-    <MidiEvent DeltaTime, t=0, track=None, channel=None>
+    <music21.midi.DeltaTime (empty) track=None, channel=None>
     >>> eventList[1]
-    <MidiEvent TIME_SIGNATURE, t=0, track=None, channel=1, data=b'\\x05\\x02\\x18\\x08'>
+    <music21.midi.MidiEvent TIME_SIGNATURE, track=None, channel=1, data=b'\\x05\\x02\\x18\\x08'>
     '''
     from music21 import midi as midiModule
 
@@ -908,15 +925,15 @@ def keySignatureToMidiEvents(ks: 'music21.key.KeySignature', includeDeltaTime=Tr
     <music21.key.KeySignature of 2 sharps>
     >>> eventList = midi.translate.keySignatureToMidiEvents(ks)
     >>> eventList
-    [<MidiEvent DeltaTime, t=0, track=None, channel=None>,
-     <MidiEvent KEY_SIGNATURE, t=0, track=None, channel=1, data=b'\x02\x00'>]
+    [<music21.midi.DeltaTime (empty) track=None, channel=None>,
+     <music21.midi.MidiEvent KEY_SIGNATURE, track=None, channel=1, data=b'\x02\x00'>]
 
     >>> k = key.Key('b-')
     >>> k
     <music21.key.Key of b- minor>
     >>> eventList = midi.translate.keySignatureToMidiEvents(k, includeDeltaTime=False)
     >>> eventList
-    [<MidiEvent KEY_SIGNATURE, t=0, track=None, channel=1, data=b'\xfb\x01'>]
+    [<music21.midi.MidiEvent KEY_SIGNATURE, track=None, channel=1, data=b'\xfb\x01'>]
     '''
     from music21 import midi as midiModule
     mt = None  # use a midi track set to None
@@ -970,16 +987,16 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     >>> mm = tempo.MetronomeMark(number=90)
     >>> events = midi.translate.tempoToMidiEvents(mm)
     >>> events
-    [<MidiEvent DeltaTime...>, <MidiEvent SET_TEMPO...>]
+    [<music21.midi.DeltaTime ...>, <music21.midi.MidiEvent SET_TEMPO...>]
     >>> len(events)
     2
 
     >>> events[0]
-    <MidiEvent DeltaTime, t=0, track=None, channel=None>
+    <music21.midi.DeltaTime (empty) track=None, channel=None>
 
     >>> evt1 = events[1]
     >>> evt1
-    <MidiEvent SET_TEMPO, t=0, track=None, channel=1, data=b'\n,+'>
+    <music21.midi.MidiEvent SET_TEMPO, track=None, channel=1, data=b'\n,+'>
     >>> evt1.data
     b'\n,+'
     >>> microSecondsPerQuarterNote = midi.getNumber(evt1.data, len(evt1.data))[0]
@@ -992,7 +1009,7 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     If includeDeltaTime is False then the DeltaTime object is omitted:
 
     >>> midi.translate.tempoToMidiEvents(mm, includeDeltaTime=False)
-    [<MidiEvent SET_TEMPO...>]
+    [<music21.midi.MidiEvent SET_TEMPO...>]
 
 
     Test round-trip.  Note that for pure tempo numbers, by default
@@ -1046,7 +1063,7 @@ def getPacketFromMidiEvent(
     >>> getPacket(trackId=1, offset=0, midiEvent=midiEvents[0], obj=n)
     {'trackId': 1,
      'offset': 0,
-     'midiEvent': <MidiEvent NOTE_ON, t=0, track=None, channel=1, pitch=60, velocity=90>,
+     'midiEvent': <music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=60, velocity=90>,
      'obj': <music21.note.Note C>,
      'centShift': None,
      'duration': 1024,
@@ -1055,7 +1072,7 @@ def getPacketFromMidiEvent(
     >>> getPacket(trackId=1, offset=0, midiEvent=midiEvents[1], obj=n, lastInstrument=inst)
     {'trackId': 1,
      'offset': 0,
-     'midiEvent': <MidiEvent NOTE_OFF, t=0, track=None, channel=1, pitch=60, velocity=0>,
+     'midiEvent': <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=60, velocity=0>,
      'obj': <music21.note.Note C>,
      'centShift': None,
      'duration': 0,
@@ -1099,8 +1116,8 @@ def elementToMidiEventList(
     >>> n = note.Note('C4')
     >>> midiEvents = midi.translate.elementToMidiEventList(n)
     >>> midiEvents
-    [<MidiEvent NOTE_ON, t=0, track=None, channel=1, pitch=60, velocity=90>,
-     <MidiEvent NOTE_OFF, t=0, track=None, channel=1, pitch=60, velocity=0>]
+    [<music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=60, velocity=90>,
+     <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=60, velocity=0>]
     '''
     classes = el.classes
     if 'Rest' in classes:
@@ -1694,10 +1711,10 @@ def midiTrackToStream(
     >>> mt
     <music21.midi.MidiTrack 0 -- 56 events>
     >>> mt.events
-    [<MidiEvent DeltaTime...>,
-     <MidiEvent SEQUENCE_TRACK_NAME...>,
-     <MidiEvent DeltaTime...>,
-     <MidiEvent NOTE_ON, t=0, track=0, channel=1, pitch=36, velocity=90>,
+    [<music21.midi.DeltaTime ...>,
+     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME...>,
+     <music21.midi.DeltaTime ...>,
+     <music21.midi.MidiEvent NOTE_ON, track=0, channel=1, pitch=36, velocity=90>,
      ...]
     >>> p = midi.translate.midiTrackToStream(mt)
     >>> p
@@ -1755,6 +1772,12 @@ def midiTrackToStream(
     i = 0
     iGathered = []  # store a list of indexes of gathered values put into chords
     voicesRequired = False
+
+    if 'quarterLengthDivisors' in keywords:
+        quarterLengthDivisors = keywords['quarterLengthDivisors']
+    else:
+        quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
+
     if len(notes) > 1:
         # environLocal.printDebug(['\n', 'midiTrackToStream(): notes', notes])
         while i < len(notes):
@@ -1779,10 +1802,15 @@ def midiTrackToStream(
                 tSub, unused_eSub = onSub
                 tOffSub, unused_eOffSub = offSub
 
-                # can set a tolerance for chordSubbing; here at 1/16th
-                # of a quarter
-                chunkTolerance = ticksPerQuarter / 16
-                if abs(tSub - t) <= chunkTolerance:
+                # let tolerance for chord subbing follow the quantization
+                if quantizePost:
+                    divisor = max(quarterLengthDivisors)
+                # fallback: 1/16 of a quarter (64th)
+                else:
+                    divisor = 16
+                chunkTolerance = ticksPerQuarter / divisor
+                # must be strictly less than the quantization unit
+                if abs(tSub - t) < chunkTolerance:
                     # isolate case where end time is not w/n tolerance
                     if abs(tOffSub - tOff) > chunkTolerance:
                         # need to store this as requiring movement to a diff
@@ -1839,14 +1867,11 @@ def midiTrackToStream(
     s.coreElementsChanged()
     # quantize to nearest 16th
     if quantizePost:
-        if 'quarterLengthDivisors' in keywords:
-            quarterLengthDivisors = keywords['quarterLengthDivisors']
-        else:
-            quarterLengthDivisors = None
         s.quantize(quarterLengthDivisors=quarterLengthDivisors,
                    processOffsets=True,
                    processDurations=True,
-                   inPlace=True)
+                   inPlace=True,
+                   recurse=False)  # shouldn't be any substreams yet
 
     if voicesRequired:
         # this procedure will make the appropriate rests
@@ -2100,14 +2125,14 @@ def packetStorageFromSubstreamList(
          'rawPackets': [{'centShift': None,
                          'duration': 0,
                          'lastInstrument': None,
-                         'midiEvent': <MidiEvent SET_TEMPO, t=0, track=None, channel=1, ...>,
+                         'midiEvent': <music21.midi.MidiEvent SET_TEMPO, ... channel=1, ...>,
                          'obj': <music21.tempo.MetronomeMark Quarter=100>,
                          'offset': 0,
                          'trackId': 0},
                         {'centShift': None,
                          'duration': 0,
                          'lastInstrument': None,
-                         'midiEvent': <MidiEvent TIME_SIGNATURE, t=0, ...>,
+                         'midiEvent': <music21.midi.MidiEvent TIME_SIGNATURE, ...>,
                          'obj': <music21.meter.TimeSignature 4/4>,
                          'offset': 0,
                          'trackId': 0}]},
@@ -2115,15 +2140,15 @@ def packetStorageFromSubstreamList(
          'rawPackets': [{'centShift': None,
                          'duration': 0,
                          'lastInstrument': <music21.instrument.Oboe 'Oboe'>,
-                         'midiEvent': <MidiEvent PROGRAM_CHANGE,
-                                          t=0, track=None, channel=1, data=68>,
+                         'midiEvent': <music21.midi.MidiEvent PROGRAM_CHANGE,
+                                          track=None, channel=1, data=68>,
                          'obj': <music21.instrument.Oboe 'Oboe'>,
                          'offset': 0,
                          'trackId': 1},
                         {'centShift': None,
                          'duration': 4096,
                          'lastInstrument': <music21.instrument.Oboe 'Oboe'>,
-                         'midiEvent': <MidiEvent NOTE_ON, t=0,
+                         'midiEvent': <music21.midi.MidiEvent NOTE_ON,
                                           track=None, channel=1, pitch=60, velocity=90>,
                          'obj': <music21.note.Note C>,
                          'offset': 0,
@@ -2131,7 +2156,7 @@ def packetStorageFromSubstreamList(
                         {'centShift': None,
                          'duration': 0,
                          'lastInstrument': <music21.instrument.Oboe 'Oboe'>,
-                         'midiEvent': <MidiEvent NOTE_OFF, t=0,
+                         'midiEvent': <music21.midi.MidiEvent NOTE_OFF,
                                            track=None, channel=1, pitch=60, velocity=0>,
                          'obj': <music21.note.Note C>,
                          'offset': 4096,
@@ -2677,16 +2702,19 @@ class Test(unittest.TestCase):
         # mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature').stream())[0]
         conductorEvents = repr(mt.events)
 
-        match = '''[<MidiEvent DeltaTime, t=0, track=0, channel=None>,
-        <MidiEvent SET_TEMPO, t=0, track=0, channel=None, data=b'\\x07\\xa1 '>,
-        <MidiEvent DeltaTime, t=0, track=0, channel=None>,
-        <MidiEvent TIME_SIGNATURE, t=0, track=0, channel=None, data=b'\\x03\\x02\\x18\\x08'>,
-        <MidiEvent DeltaTime, t=3072, track=0, channel=None>,
-        <MidiEvent TIME_SIGNATURE, t=0, track=0, channel=None, data=b'\\x05\\x02\\x18\\x08'>,
-        <MidiEvent DeltaTime, t=5120, track=0, channel=None>,
-        <MidiEvent TIME_SIGNATURE, t=0, track=0, channel=None, data=b'\\x02\\x02\\x18\\x08'>,
-        <MidiEvent DeltaTime, t=1024, track=0, channel=None>,
-        <MidiEvent END_OF_TRACK, t=0, track=0, channel=None, data=b''>]'''
+        match = '''[<music21.midi.DeltaTime (empty) track=0, channel=None>,
+        <music21.midi.MidiEvent SET_TEMPO, track=0, channel=None, data=b'\\x07\\xa1 '>,
+        <music21.midi.DeltaTime (empty) track=0, channel=None>,
+        <music21.midi.MidiEvent TIME_SIGNATURE, track=0, channel=None,
+            data=b'\\x03\\x02\\x18\\x08'>,
+        <music21.midi.DeltaTime t=3072, track=0, channel=None>,
+        <music21.midi.MidiEvent TIME_SIGNATURE, track=0, channel=None,
+            data=b'\\x05\\x02\\x18\\x08'>,
+        <music21.midi.DeltaTime t=5120, track=0, channel=None>,
+        <music21.midi.MidiEvent TIME_SIGNATURE, track=0, channel=None,
+            data=b'\\x02\\x02\\x18\\x08'>,
+        <music21.midi.DeltaTime t=1024, track=0, channel=None>,
+        <music21.midi.MidiEvent END_OF_TRACK, track=0, channel=None, data=b''>]'''
 
         self.assertTrue(common.whitespaceEqual(conductorEvents, match), conductorEvents)
 
@@ -2799,11 +2827,11 @@ class Test(unittest.TestCase):
 
         # first note-on is not delayed, even w anacrusis
         match = '''
-        [<MidiEvent DeltaTime, t=0, track=1, channel=1>,
-         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>,
-         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-         <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>,
-         <MidiEvent DeltaTime, t=0, track=1, channel=1>]'''
+        [<music21.midi.DeltaTime (empty) track=1, channel=1>,
+         <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=1, channel=1, data=b'Soprano'>,
+         <music21.midi.DeltaTime (empty) track=1, channel=1>,
+         <music21.midi.MidiEvent PITCH_BEND, track=1, channel=1, parameter1=0, parameter2=64>,
+         <music21.midi.DeltaTime (empty) track=1, channel=1>]'''
 
         self.maxDiff = None
         found = str(mts.events[:5])
@@ -2811,14 +2839,14 @@ class Test(unittest.TestCase):
 
         # first note-on is not delayed, even w anacrusis
         match = '''
-        [<MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Alto'>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=62, velocity=90>]'''
+        [<music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=1, channel=1, data=b'Alto'>,
+        <music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent PITCH_BEND, track=1, channel=1, parameter1=0, parameter2=64>,
+        <music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent PROGRAM_CHANGE, track=1, channel=1, data=0>,
+        <music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=62, velocity=90>]'''
 
         alto = s.parts['alto']
         mta = streamHierarchyToMidiTracks(alto)[1]
@@ -2833,16 +2861,16 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mtList), 2)
 
         # it's the same as before
-        match = '''[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>,
-        <MidiEvent DeltaTime, t=512, track=1, channel=1>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=66, velocity=0>]'''
+        match = '''[<music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=1, channel=1, data=b'Soprano'>,
+        <music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent PITCH_BEND, track=1, channel=1, parameter1=0, parameter2=64>,
+        <music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent PROGRAM_CHANGE, track=1, channel=1, data=0>,
+        <music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=66, velocity=90>,
+        <music21.midi.DeltaTime t=512, track=1, channel=1>,
+        <music21.midi.MidiEvent NOTE_OFF, track=1, channel=1, pitch=66, velocity=0>]'''
         found = str(mtList[1].events[:10])
         self.assertTrue(common.whitespaceEqual(found, match), found)
 
@@ -2904,23 +2932,23 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mtList), 2)
 
         # it's the same as before
-        match = '''[<MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=58, velocity=90>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=54, velocity=90>,
-        <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=66, velocity=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=61, velocity=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=58, velocity=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=54, velocity=0>,
-        <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
-        <MidiEvent END_OF_TRACK, t=0, track=1, channel=1, data=b''>]'''
+        match = '''[<music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=66, velocity=90>,
+        <music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=61, velocity=90>,
+        <music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=58, velocity=90>,
+        <music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=54, velocity=90>,
+        <music21.midi.DeltaTime t=1024, track=1, channel=1>,
+        <music21.midi.MidiEvent NOTE_OFF, track=1, channel=1, pitch=66, velocity=0>,
+        <music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent NOTE_OFF, track=1, channel=1, pitch=61, velocity=0>,
+        <music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent NOTE_OFF, track=1, channel=1, pitch=58, velocity=0>,
+        <music21.midi.DeltaTime (empty) track=1, channel=1>,
+        <music21.midi.MidiEvent NOTE_OFF, track=1, channel=1, pitch=54, velocity=0>,
+        <music21.midi.DeltaTime t=1024, track=1, channel=1>,
+        <music21.midi.MidiEvent END_OF_TRACK, track=1, channel=1, data=b''>]'''
 
         results = str(mtList[1].events[-17:])
         self.assertTrue(common.whitespaceEqual(results, match), results)
@@ -3179,7 +3207,7 @@ class Test(unittest.TestCase):
         from music21 import corpus, interval, instrument
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
-        p1.remove(p1.getElementsByClass('Instrument')[0])
+        p1.remove(p1.getElementsByClass('Instrument').first())
         p2 = copy.deepcopy(p1)
         p3 = copy.deepcopy(p1)
 
@@ -3408,7 +3436,9 @@ class Test(unittest.TestCase):
         s.insert(0, s2)
 
         mts = streamHierarchyToMidiTracks(s)
-        mtsRepr = repr(mts[0].events) + repr(mts[1].events)
+        # mts[0] is the conductor track
+        self.assertIn("SET_TEMPO", repr(mts[0].events))
+        mtsRepr = repr(mts[1].events) + repr(mts[2].events)
         self.assertGreater(mtsRepr.count('velocity=51'), 2)
         self.assertGreater(mtsRepr.count('velocity=102'), 2)
         # s.show('midi')

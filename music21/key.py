@@ -92,7 +92,7 @@ def sharpsToPitch(sharpCount):
     >>> k1.step
     'F'
     >>> k1.accidental
-    <accidental sharp>
+    <music21.pitch.Accidental sharp>
 
     OMIT_FROM_DOCS
 
@@ -491,7 +491,7 @@ class KeySignature(base.Music21Object):
         <music21.key.KeySignature of pitches: [E`]>
 
         >>> g.accidentalByStep('E')
-        <accidental half-flat>
+        <music21.pitch.Accidental half-flat>
         '''
         if self.sharps is None and self.alteredPitches:
             return True
@@ -506,13 +506,13 @@ class KeySignature(base.Music21Object):
 
         >>> g = key.KeySignature(1)
         >>> g.accidentalByStep('F')
-        <accidental sharp>
+        <music21.pitch.Accidental sharp>
         >>> g.accidentalByStep('G')
 
         >>> f = key.KeySignature(-1)
         >>> bbNote = note.Note('B-5')
         >>> f.accidentalByStep(bbNote.step)
-        <accidental flat>
+        <music21.pitch.Accidental flat>
 
         Fix a wrong note in F-major:
 
@@ -564,10 +564,10 @@ class KeySignature(base.Music21Object):
         >>> for n in s1.notes:
         ...    n.pitch.accidental = n.getContextByClass(key.KeySignature).accidentalByStep(n.step)
         >>> (nB1.pitch.accidental, nB2.pitch.accidental)
-        (<accidental flat>, <accidental flat>)
+        (<music21.pitch.Accidental flat>, <music21.pitch.Accidental flat>)
         >>> nB1.pitch.accidental.name = 'sharp'
         >>> (nB1.pitch.accidental, nB2.pitch.accidental)
-        (<accidental sharp>, <accidental flat>)
+        (<music21.pitch.Accidental sharp>, <music21.pitch.Accidental flat>)
         '''
         # temp measure to fix dbl flats, etc.
         for thisAlteration in reversed(self.alteredPitches):
@@ -810,7 +810,7 @@ class Key(KeySignature, scale.DiatonicScale):
     >>> fFlatMaj.sharps
     -8
     >>> fFlatMaj.accidentalByStep('B')
-    <accidental double-flat>
+    <music21.pitch.Accidental double-flat>
 
 
     >>> eDor = key.Key('E', 'dorian')

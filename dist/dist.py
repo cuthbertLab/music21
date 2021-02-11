@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         dist.py
 # Purpose:      Distribution and uploading script
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010-2021 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Builds various kinds of music21 distribution files and uploads them to PyPI and GoogleCode.
 
@@ -20,21 +20,22 @@ To do a release,
     (40 min on MacPro) -- either of these MAY change a lot of tests in corpus, metadata, etc.
     so don't skip the next step!
 3. run test/warningMultiprocessTest.py for lowest and highest Py version -- fix all warnings!
-4. run test/testLint.py and fix any lint errors
+4. run test/testLint.py and fix any lint errors (covered now by CI)
 5. commit and then check test/testSingleCoreAll.py or wait for results on Github Actions
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
-6. then python documentation/testDocumentation.py [*]
+6. IMPORTANT: run python documentation/testDocumentation.py and afterwards fix errors [*]
 
 [*] you will need pytest and nbval installed (along with ipython and jupyter), you cannot fix tests
-while it is running.  This takes a while and runs single core, so allocate time.
+while it is running.  This takes a while and runs single core, so allocate time.  Start working on
+the announcement while it's running.
 
-7. run documentation/make.py clean
+7. run documentation/make.py clean  (skip on minor version changes)
 8. run documentation/make.py   [*]
 
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 
-9. ssh to MIT, cd music21/doc and rm -rf *
+9. ssh to MIT, cd music21/doc and rm -rf *  (skip on minor version changes)
 
 10. run documentation/upload.py or upload via ssh.
    -- you will need an MIT username and password
@@ -70,7 +71,9 @@ while it is running.  This takes a while and runs single core, so allocate time.
 
 16. Delete the two .tar.gz files in dist...
 
-17. Immediately increment the number in _version.py and run tests on it here
+17a. For starting a new major release create a GitHub branch for the old one.
+
+17b. Immediately increment the number in _version.py and run tests on it here
     to prepare for next release.
 
 18. Announce on the blog, to the list, and twitter.
@@ -113,8 +116,8 @@ class Distributor:
         parentDir = os.path.dirname(directory)
         parentContents = sorted(os.listdir(parentDir))
         # make sure we are in the proper directory
-        if (not directory.endswith('dist') or
-            'music21' not in parentContents):
+        if (not directory.endswith('dist')
+                or 'music21' not in parentContents):
             raise Exception(f'not in the music21{os.sep}dist directory: {directory}')
 
         self.fpDistDir = directory
@@ -237,17 +240,17 @@ class Distributor:
         post = []
         f = open(sourcesTxt, 'r')
         corpusContentDirs = common.getCorpusContentDirs()
-        for l in f:
+        for line in f:
             match = False
-            if 'corpus' in l:
+            if 'corpus' in line:
                 for fn in corpusContentDirs:
                     # these are relative paths
                     fp = os.path.join('music21', 'corpus', fn)
-                    if l.startswith(fp):
+                    if line.startswith(fp):
                         match = True
                         break
             if not match:
-                post.append(l)
+                post.append(line)
         f.close()
         f = open(sourcesTxt, 'w')
         f.writelines(post)
@@ -290,7 +293,7 @@ class Distributor:
             shutil.rmtree(self.fpBuildDir)
         except FileNotFoundError:
             environLocal.warn(
-                f'Directory was already cleaned up'
+                'Directory was already cleaned up'
             )
 
         if self.buildNoCorpus is True:
@@ -306,9 +309,7 @@ class Distributor:
             return hashlib.md5(open(path, 'rb').read()).digest()
 
 
-
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
     d = Distributor()
     d.buildNoCorpus = True

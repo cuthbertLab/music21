@@ -19,7 +19,7 @@ and used to configure, :class:`~music21.note.Note` objects.
 import copy
 import unittest
 
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Tuple, Iterable
 
 from music21 import base
 from music21 import beam
@@ -35,8 +35,7 @@ from music21 import tie
 from music21 import volume
 
 from music21 import environment
-_MOD = 'note'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('note')
 
 noteheadTypeNames = (
     'arrow down',
@@ -77,6 +76,14 @@ stemDirectionNames = (
     'up',
 )
 
+def __dir__():
+    out = [n for n in globals() if not n.startswith('__') and not n.startswith('Test')]
+    for n in ('Optional', 'List', 'Union', 'Tuple', 'Iterable'):
+        out.remove(n)
+    out.remove('unittest')
+    out.remove('copy')
+    out.remove('_DOC_ORDER')
+    return out
 
 # -----------------------------------------------------------------------------
 class LyricException(exceptions21.Music21Exception):
@@ -1119,6 +1126,19 @@ class NotRest(GeneralNote):
         else:
             return True
 
+    @property
+    def pitches(self) -> Tuple[pitch.Pitch]:
+        '''
+        Returns an empty tuple.  (Useful for iterating over NotRests since they
+        include Notes and Chords
+        '''
+        return ()
+
+    @pitches.setter
+    def pitches(self, _value: Iterable[pitch.Pitch]):
+        pass
+
+
     def _getVolume(self, forceClient: Optional[base.Music21Object] = None) -> volume.Volume:
         # DO NOT CHANGE TO @property because of optional attributes
         # lazy volume creation
@@ -1425,18 +1445,9 @@ class Note(NotRest):
         See :attr:`~music21.pitch.Pitch.octave`.
         ''')
 
-    def _getPitches(self):
-        return (self.pitch,)
-
-    def _setPitches(self, value):
-        if common.isListLike(value):
-            self.pitch = value[0]
-        else:
-            raise NoteException(f'cannot set pitches with provided object: {value}')
-
-    pitches = property(_getPitches,
-                       _setPitches,
-                       doc='''
+    @property
+    def pitches(self) -> Tuple[pitch.Pitch]:
+        '''
         Return the :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
         that found on :class:`~music21.chord.Chord` so that `[c.pitches for c in s.notes]`
@@ -1473,7 +1484,15 @@ class Note(NotRest):
         >>> n.pitch.diatonicNoteNum
         Traceback (most recent call last):
         AttributeError: 'str' object has no attribute 'diatonicNoteNum'
-        ''')
+        '''
+        return (self.pitch,)
+
+    @pitches.setter
+    def pitches(self, value: Iterable[pitch.Pitch]):
+        if common.isListLike(value) and value:
+            self.pitch = value[0]
+        else:
+            raise NoteException(f'cannot set pitches with provided object: {value}')
 
     def transpose(self, value, *, inPlace=False):
         '''
@@ -1764,7 +1783,7 @@ class SpacerRest(Rest):
     This is exactly the same as a rest, but it is a SpacerRest.
     This object should only be used for making hidden space in a score in lilypond.
 
-    This may become deprecated at some point...
+    DEPRECATED in v.7 -- use a normal rest with .hideObjectOnPrint
 
     >>> sr = note.SpacerRest(type='whole')
     >>> sr

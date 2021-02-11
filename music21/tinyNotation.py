@@ -623,7 +623,7 @@ class NoteToken(NoteOrRestToken):
         >>> tPost
         'BB'
         >>> n.pitch.accidental
-        <accidental double-flat>
+        <music21.pitch.Accidental double-flat>
 
         >>> nToken = tinyNotation.NoteToken('BB(--)')
         >>> nToken.isEditorial = True
@@ -633,7 +633,7 @@ class NoteToken(NoteOrRestToken):
         >>> tPost
         'BB'
         >>> n.editorial.ficta
-        <accidental double-flat>
+        <music21.pitch.Accidental double-flat>
         '''
         acc = pitch.Accidental(alter)
         if self.isEditorial:
@@ -658,7 +658,7 @@ class NoteToken(NoteOrRestToken):
         >>> tPost
         'C'
         >>> n.pitch.accidental
-        <accidental double-sharp>
+        <music21.pitch.Accidental double-sharp>
         '''
         alter = len(search.group(1))
         return self._addAccidental(n, alter, pm, t)
@@ -679,7 +679,7 @@ class NoteToken(NoteOrRestToken):
         >>> tPost
         'BB'
         >>> n.pitch.accidental
-        <accidental double-flat>
+        <music21.pitch.Accidental double-flat>
         '''
         alter = -1 * len(search.group(1))
         return self._addAccidental(n, alter, pm, t)
@@ -700,7 +700,7 @@ class NoteToken(NoteOrRestToken):
         >>> tPost
         'E'
         >>> n.pitch.accidental
-        <accidental natural>
+        <music21.pitch.Accidental natural>
         '''
         return self._addAccidental(n, 0, pm, t)
 

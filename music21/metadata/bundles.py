@@ -103,7 +103,7 @@ class MetadataEntry(prebase.ProtoM21Object):
 
     def __fspath__(self):
         '''
-        for Py3.6 to allow MetadataEntries to be used where file paths are being employed
+        for Py3.6+ to allow MetadataEntries to be used where file paths are being employed
 
         Returns self.sourcePath() as a string
 

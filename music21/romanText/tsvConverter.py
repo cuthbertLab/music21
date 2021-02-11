@@ -331,18 +331,19 @@ class TsvHandler:
         self.prepStream()
 
         s = self.preparedStream
-        p = s.parts[0]  # Just to get to the part, not that there are several.
+        p = s.parts.first()  # Just to get to the part, not that there are several.
 
         for thisChord in self.chordList:
             offsetInMeasure = thisChord.beat - 1  # beats always measured in quarter notes
             measureNumber = thisChord.measure
+            m21Measure = p.measure(measureNumber)
 
             if thisChord.representationType == 'DCML':
                 thisChord._changeRepresentation()
 
             thisM21Chord = thisChord.tabToM21()  # In either case.
 
-            p.measure(measureNumber).insert(offsetInMeasure, thisM21Chord)
+            m21Measure.insert(offsetInMeasure, thisM21Chord)
 
         self.m21stream = s
 
@@ -356,7 +357,6 @@ class TsvHandler:
         Works like the .template() method,
         except that we don't have a score to base the template on as such.
         '''
-
         s = stream.Score()
         p = stream.Part()
 
@@ -380,7 +380,7 @@ class TsvHandler:
 
         currentOffset = 0
 
-        previousMeasure = self.chordList[0].measure - 1  # Covers pickups
+        previousMeasure: int = self.chordList[0].measure - 1  # Covers pickups
         for entry in self.chordList:
             if entry.measure == previousMeasure:
                 continue

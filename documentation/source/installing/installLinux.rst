@@ -17,7 +17,7 @@ To reiterate: **GNU/Linux is not a system for which support questions will be an
 Check Your Version of Python
 ----------------------------------------------
 
-`Music21` requires Python 3.6+.
+`Music21` requires Python 3.7+.
 
 To determine the Python version you have installed, open a shell 
 or terminal and enter the following command-line argument (where "$" is the prompt):
@@ -26,7 +26,7 @@ or terminal and enter the following command-line argument (where "$" is the prom
     
 it should display something like:
 
-    Python 3.7.2
+    Python 3.9.2
 
 if so, you're okay.  If not, go to http://www.python.org/download
 and download a newer version.  Multiple versions of Python can exist 

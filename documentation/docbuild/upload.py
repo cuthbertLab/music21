@@ -49,12 +49,12 @@ if you get a 'ssh_askpass' not found error, create this file in
 
 Otherwise just contact MSC...
 '''
-
-import getpass, os
-
+import getpass
+import os
 
 def getDirBuildHtml():
-    '''Return the html directory
+    '''
+    Return the html directory
     '''
     from music21 import common
     parentDir = common.getRootFilePath()
@@ -65,7 +65,6 @@ def getDirBuildHtml():
 
 # noinspection SpellCheckingInspection
 def main():
-
     # this needs to be on level higher then the level of the source
     # DST_MIT = 'athena.dialup.mit.edu:/afs/athena.mit.edu/org/m/music21/doc/'
     remoteHost = 'athena.dialup.mit.edu'
@@ -73,7 +72,6 @@ def main():
     # tar czpf - -C build/html/ . | ssh cuthbert@linux.mit.edu "tar xzpf - -C /afs/athena.mit.edu/org/m/music21/doc/"
 
     user = getpass.getpass('provide user name : ')
-
 
     src = getDirBuildHtml()
     # -r flag makes this recursive

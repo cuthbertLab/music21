@@ -14,7 +14,7 @@ Downloading Python 3 from python.org
 ---------------------------------------
 
 Though Macs come with Python, it's a very old version.  We recommend
-updating that by going to http://www.python.org/ and getting Python 3.6
+updating that by going to http://www.python.org/ and getting Python 3.9
 or later.
 
 (The `music21` team strongly recommends using the version of
@@ -65,7 +65,7 @@ it should display in Terminal something like the following:
 .. image:: images/macScreenPythonVersion.*
     :width: 650
 
-If it says 3.6 or higher (or possibly a number like 3.7.2), you're okay.
+If it says 3.7 or higher (or possibly a number like 3.9.2), you're okay.
 If it says 2.7 or 3.4 or something,
 go to http://www.python.org/download
 and download a newer version.  Multiple versions of Python can exist
@@ -147,18 +147,17 @@ transfer the music you edit or develop in `music21`.
 
 The Configuration Assistant will attempt to find a MusicXML
 reader on your system. If it can't find any, you will be asked
-to open a URL to download Finale Notepad 2012, a simple and free
-MusicXML reader and easy writer. Installing this reader is
+to open a URL to download MuseScore, a simple and free
+MusicXML reader and easy writer. Installing MuseScore is
 recommended for users who do not have Finale, Sibelius, MuseScore,
-or another MusicXML reader. You might want to try MuseScore instead,
-which is also free and doesn't require you to register to download it.
+or another MusicXML reader.
 
 If one or more MusicXML readers are found, skip ahead to the next instructions.
 
 .. image:: images/macScreenConfigAssistantReader.*
     :width: 650
 
-If you choose to install Finale Notepad (formerly Finale Reader; hence the pictures below),
+If you choose to install MuseScore (formerly we suggested Finale Reader; hence the pictures below),
 you will download an installer. Launch the installer immediately, and follow the instructions.
 
 .. image:: images/macScreenConfigAssistantFinaleInstall.*

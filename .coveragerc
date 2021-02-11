@@ -1,8 +1,6 @@
 [run]
 source =
     music21/
-    /home/travis/music21base/music21
-    /home/travis/music21base
 
 omit =
     music21/test/timeGraph*
@@ -13,4 +11,5 @@ exclude_lines =
     if debug:
     if self.debug:
     class TestExternal(unittest.TestCase):
+    def x_test
     pragma: no cover

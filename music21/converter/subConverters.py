@@ -193,7 +193,7 @@ class SubConverter:
                 cmd = ('open', '-a', str(app), str(filePath))
         else:
             raise SubConverterException(f'Cannot launch files on {platform}')
-        subprocess.run(cmd, check=True, shell=shell)
+        subprocess.run(cmd, check=False, shell=shell)
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):
         '''
@@ -642,7 +642,8 @@ class ConverterHumdrum(SubConverter):
     # --------------------------------------------------------------------------
 
     def parseData(self, humdrumString, number=None):
-        '''Open Humdrum data from a string -- calls humdrum.parseData()
+        '''
+        Open Humdrum data from a string -- calls humdrum.parseData()
 
         >>> humData = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n' +
         ...     '24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-')
@@ -651,7 +652,7 @@ class ConverterHumdrum(SubConverter):
         >>> c.stream.show('text')
         {0.0} <music21.metadata.Metadata object at 0x7f33545027b8>
         {0.0} <music21.stream.Part spine_0>
-            {0.0} <music21.humdrum.spineParser.MiscTandem **kern humdrum control>
+            {0.0} <music21.humdrum.spineParser.MiscTandem **kern>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.meter.TimeSignature 2/4>
                 {0.0} <music21.note.Rest rest>
@@ -993,7 +994,7 @@ class ConverterMusicXML(SubConverter):
                 and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
             outFp = self.runThroughMusescore(xmlFp, subformats, **keywords)
         elif compress:
-            archiveTools.compressXML(xmlFp, deleteOriginal=True)
+            archiveTools.compressXML(xmlFp, deleteOriginal=True, silent=True)
             filenameOut = os.path.splitext(str(xmlFp))[0] + '.mxl'
             outFp = common.pathTools.cleanpath(filenameOut, returnPathlib=True)
         else:

@@ -57,10 +57,6 @@ environLocal = environment.Environment(_MOD)
 
 # ------------------------------------------------------------------------------
 
-class NoteheadException(MusicXMLExportException):
-    pass
-
-
 def typeToMusicXMLType(value):
     '''Convert a music21 type to a MusicXML type.
 
@@ -482,7 +478,7 @@ class GeneralObjectExporter:
             st2.metadata = copy.deepcopy(getMetadataFromContext(st))
             return self.fromScore(st2)
 
-        elif st.getElementsByClass('Stream')[0].isFlat:  # like a part w/ measures...
+        elif st.getElementsByClass('Stream').first().isFlat:  # like a part w/ measures...
             st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
@@ -877,6 +873,19 @@ class XMLExporterBase:
         >>> XB.setFont(mxObj, te)
         >>> XB.dump(mxObj)
         <text font-family="Courier,monospaced" font-size="24" font-style="italic">hi</text>
+
+        >>> XB = musicxml.m21ToXml.XMLExporterBase()
+        >>> mxObj = El('<text>hi</text>')
+        >>> te = expressions.TextExpression('hi!')
+        >>> te.style.fontStyle = 'bold'
+        >>> XB.setFont(mxObj, te)
+        >>> XB.dump(mxObj)
+        <text font-weight="bold">hi</text>
+
+        >>> te.style.fontStyle = 'bolditalic'
+        >>> XB.setFont(mxObj, te)
+        >>> XB.dump(mxObj)
+        <text font-style="italic" font-weight="bold">hi</text>
         '''
         musicXMLNames = ('font-style', 'font-size', 'font-weight')
         m21Names = ('fontStyle', 'fontSize', 'fontWeight')
@@ -887,6 +896,15 @@ class XMLExporterBase:
             st = m21Object.style
         else:
             return
+
+        if hasattr(st, 'fontStyle'):
+            # mxml does not support bold or bolditalic as font-style value
+            if st.fontStyle == 'bold':
+                mxObject.set('font-weight', 'bold')
+                mxObject.attrib.pop('font-style', None)
+            elif st.fontStyle == 'bolditalic':
+                mxObject.set('font-weight', 'bold')
+                mxObject.set('font-style', 'italic')
 
         if hasattr(st, 'fontFamily') and st.fontFamily:
             if common.isIterable(st.fontFamily):
@@ -2354,7 +2372,12 @@ class PartExporter(XMLExporterBase):
             self.addDividerComment('Measure ' + str(m.number))
             measureExporter = MeasureExporter(m, parent=self)
             measureExporter.spannerBundle = self.spannerBundle
-            mxMeasure = measureExporter.parse()
+            try:
+                mxMeasure = measureExporter.parse()
+            except MusicXMLExportException as e:
+                e.measureNumber = str(m.number)
+                e.partName = self.stream.partName
+                raise e
             self.xmlRoot.append(mxMeasure)
 
         return self.xmlRoot
@@ -2491,7 +2514,7 @@ class PartExporter(XMLExporterBase):
             stream.makeNotation.makeTupletBrackets(measureStream, inPlace=True)
 
         if not self.spannerBundle:
-            self.spannerBundle = spanner.SpannerBundle(measureStream.flat)
+            self.spannerBundle = measureStream.spannerBundle
 
     def getXmlScorePart(self):
         '''
@@ -4561,6 +4584,29 @@ class MeasureExporter(XMLExporterBase):
         '''
         Convert a NoChord object to an mxHarmony object.
 
+        Expected attributes of the NoChord object:
+
+        >>> nc = harmony.NoChord()
+        >>> nc.chordKind
+        'none'
+
+        >>> nc.chordKindStr
+        'N.C.'
+
+        Other values may not export:
+
+        >>> nc.chordKindStr = ''
+        >>> nc.write()
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+             In part (None), measure (1): NoChord object's chordKindStr must be non-empty
+
+        >>> nc.chordKind = None
+        >>> nc.write()
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+             In part (None), measure (1): NoChord object's chordKind must be 'none'
+
         '''
         if cs.writeAsChord is True:
             return self.chordToXml(cs)
@@ -4579,9 +4625,11 @@ class MeasureExporter(XMLExporterBase):
 
         mxKind = SubElement(mxHarmony, 'kind')
         cKind = cs.chordKind
-        assert cs.chordKind == 'none'
+        if cs.chordKind != 'none':
+            raise MusicXMLExportException("NoChord object's chordKind must be 'none'")
         mxKind.text = str(cKind)
-        assert cs.chordKindStr not in (None, '')
+        if cs.chordKindStr in (None, ''):
+            raise MusicXMLExportException("NoChord object's chordKindStr must be non-empty")
         mxKind.set('text', cs.chordKindStr)
 
         self.setOffsetOptional(cs, mxHarmony)
@@ -5024,7 +5072,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(MEX.xmlRoot.findall('direction')[1])
         <direction>
           <direction-type>
-            <words default-y="45" enclosure="none" font-style="bold"
+            <words default-y="45" enclosure="none" font-weight="bold"
                 justify="left">slow</words>
           </direction-type>
         </direction>
@@ -6072,8 +6120,8 @@ class MeasureExporter(XMLExporterBase):
         '''
         Makes a set of spanners from repeat brackets
         '''
-        self.rbSpanners = self.spannerBundle.getBySpannedElement(
-            self.stream).getByClass('RepeatBracket')
+        spannersOnStream = self.spannerBundle.getBySpannedElement(self.stream)
+        self.rbSpanners = spannersOnStream.getByClass('RepeatBracket')
 
     def setTranspose(self):
         '''
@@ -6140,6 +6188,19 @@ class Test(unittest.TestCase):
         helpers.indent(mxScore)
         return mxScore
 
+    def testExceptionMessage(self):
+        s = stream.Score()
+        p = stream.Part()
+        p.partName = 'Offstage Trumpet'
+        p.insert(note.Note(quarterLength=(4 / 2048)))
+        s.insert(p)
+
+        msg = 'In part (Offstage Trumpet), measure (1): '
+        msg += 'Cannot convert "2048th" duration to MusicXML (too short).'
+        with self.assertRaises(MusicXMLExportException) as error:
+            s.write()
+        self.assertEqual(str(error.exception), msg)
+
     def testSpannersWrite(self):
         from music21 import converter
         p = converter.parse("tinynotation: 4/4 c4 d e f g a b c' b a g2")
@@ -6148,20 +6209,17 @@ class Test(unittest.TestCase):
         d = listNotes[1]
         sl1 = spanner.Slur([c, d])
         p.insert(0.0, sl1)
-        # p.getElementsByClass('Measure')[0].insert(0.0, sl1)
 
         f = listNotes[3]
         g = listNotes[4]
         a = listNotes[5]
         sl2 = spanner.Slur([f, g, a])
         p.insert(0.0, sl2)
-        # p.getElementsByClass('Measure')[0].insert(0.0, sl2)
 
         c2 = listNotes[6]
         g2 = listNotes[-1]
         sl3 = spanner.Slur([c2, g2])
         p.insert(0.0, sl3)
-        # p.getElementsByClass('Measure')[1].insert(0.0, sl3)
         self.assertEqual(self.getXml(p).count('<slur '), 6)
 
     def testSpannersWritePartStaffs(self):
@@ -6367,7 +6425,7 @@ class Test(unittest.TestCase):
         self.assertEqual([e.get('number') for e in endings], ['1,2', '1,2', '3', '3'])
 
         # m21 represents lack of bracket numbers as 0; musicxml uses ''
-        s.parts[0].getElementsByClass('RepeatBracket')[0].number = 0
+        s.parts[0].getElementsByClass('RepeatBracket').first().number = 0
         x = self.getET(s)
         endings = x.findall('.//ending')
         self.assertEqual([e.get('number') for e in endings], ['', '', '3', '3'])
@@ -6443,4 +6501,4 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testSpannersWrite')
+    music21.mainTest(Test)  # , runTest='testExceptionMessage')

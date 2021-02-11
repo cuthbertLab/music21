@@ -152,7 +152,7 @@ class NoteStyle(Style):
         super().__init__()
         self.stemStyle = None
         self.accidentalStyle = None
-        self.noteSize = None  # can be 'cue'...
+        self.noteSize = None  # can be 'cue' etc.
 
 
 class TextStyle(Style):
@@ -565,9 +565,9 @@ class StyleMixin(common.SlottedObjectMixin):
         <music21.editorial.Editorial {}>
         >>> acc.editorial.ficta = pitch.Accidental('sharp')
         >>> acc.editorial.ficta
-        <accidental sharp>
+        <music21.pitch.Accidental sharp>
         >>> acc.editorial
-        <music21.editorial.Editorial {'ficta': <accidental sharp>}>
+        <music21.editorial.Editorial {'ficta': <music21.pitch.Accidental sharp>}>
         '''
         from music21 import editorial
         if self._editorial is None:

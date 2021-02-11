@@ -39,7 +39,7 @@ class RelativeCounter(collections.Counter):
     b 2
     c 1
 
-    Ties are iterated according to which appeared first in the generated list in Py3.6+.
+    Ties are iterated according to which appeared first in the generated list.
 
     >>> rcProportion = rc.asProportion()
     >>> rcProportion['b']
@@ -306,6 +306,8 @@ class Timer:
 
     >>> t = common.Timer()
     >>> now = t()
+    >>> import time  #_DOCS_HIDE
+    >>> time.sleep(0.01)  #_DOCS_HIDE  -- some systems are extremely fast or have wide deltas
     >>> nowNow = t()
     >>> nowNow > now
     True

@@ -17,7 +17,7 @@ __pycache__/
 .idea/other.xml
 .idea/vcs.xml
 .idea/workspace.xml
-
+.idea/markdown-*.xml
 
 # OSX
 .DS_Store
