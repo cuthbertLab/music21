@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
-# Name:         testStream.py
-# Purpose:      tests for stream.py
+# Name:         stream/tests.py
+# Purpose:      tests for streams
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2021 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import random
@@ -16,13 +16,13 @@ import copy
 import music21
 from music21.note import GeneralNote
 
-from music21.stream import StreamException
-from music21.stream import Stream
-from music21.stream import Voice
-from music21.stream import Measure
-from music21.stream import Score
-from music21.stream import Part
-from music21.stream import Opus
+from music21.stream.base import StreamException
+from music21.stream.base import Stream
+from music21.stream.base import Voice
+from music21.stream.base import Measure
+from music21.stream.base import Score
+from music21.stream.base import Part
+from music21.stream.base import Opus
 
 from music21 import bar
 from music21 import beam
@@ -43,8 +43,7 @@ from music21.musicxml import m21ToXml
 from music21.midi import translate as midiTranslate
 
 from music21 import environment
-_MOD = 'testStream'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('stream.tests')
 
 
 # ------------------------------------------------------------------------------
@@ -5926,9 +5925,9 @@ class Test(unittest.TestCase):
         s = corpus.parse('bach/bwv66.6')
         # the part is not derived from anything yet
         self.assertEqual([str(e.__class__) for e in s[1][2][3].containerHierarchy()],
-                         ["<class 'music21.stream.Measure'>",
-                          "<class 'music21.stream.Part'>",
-                          "<class 'music21.stream.Score'>"])
+                         ["<class 'music21.stream.base.Measure'>",
+                          "<class 'music21.stream.base.Part'>",
+                          "<class 'music21.stream.base.Score'>"])
 
         # after extraction and changing activeSite, cannot find
         n = s.flat.notesAndRests[0]

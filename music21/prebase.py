@@ -231,6 +231,8 @@ class ProtoM21Object:
         if self.__module__ != '__main__':
             reprHead += self.__module__ + '.'
         reprHead += self.__class__.__qualname__
+        if '.base.' in reprHead and 'music21.base' not in reprHead:
+            reprHead = reprHead.replace('.base', '')
         strRepr = self._reprInternal()
         if strRepr and not strRepr.startswith(':'):
             reprHead += ' '

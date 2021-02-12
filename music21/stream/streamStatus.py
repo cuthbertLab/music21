@@ -198,7 +198,7 @@ class StreamStatus(SlottedObjectMixin):
 
 class Test(unittest.TestCase):
     '''
-    Note: all Stream tests are found in test/testStream.py
+    Note: most Stream tests are found in stream.tests
     '''
 
     def testHaveBeamsBeenMadeAfterDeepcopy(self):

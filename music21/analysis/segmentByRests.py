@@ -33,12 +33,13 @@ class Segmenter:
     def getSegmentsList(cls,
                         workOrPart,
                         removeEmptyLists=True):
+        # noinspection PyShadowingNames
         '''
         Segments a part by its rests (and clefs) and returns a returns a list of lists where
         each sublist is one segment of contiguous notes. NB Uses .recurse() internally.
 
-        >>> testStream = converter.parse("tinyNotation: C4 r D E r r F r G r A B r c")
-        >>> segments = analysis.segmentByRests.Segmenter.getSegmentsList(testStream)
+        >>> example = converter.parse("tinyNotation: C4 r D E r r F r G r A B r c")
+        >>> segments = analysis.segmentByRests.Segmenter.getSegmentsList(example)
         >>> segments
         [[<music21.note.Note C>],
          [<music21.note.Note D>, <music21.note.Note E>],
@@ -76,8 +77,8 @@ class Segmenter:
         NB Uses .recurse() internally so
         if called on a work then returns a list of lists with one list per part.
 
-        >>> testStream = converter.parse("tinyNotation: 4/4 E4 r F G A r g c r c")
-        >>> intList = analysis.segmentByRests.Segmenter.getIntervalList(testStream)
+        >>> example = converter.parse("tinyNotation: 4/4 E4 r F G A r g c r c")
+        >>> intList = analysis.segmentByRests.Segmenter.getIntervalList(example)
         >>> [x.name for x in intList]
         ['M2', 'M2', 'P5']
         '''
@@ -98,15 +99,15 @@ class Segmenter:
 class Test(unittest.TestCase):
 
     def testGetSegmentsList(self):
-        testStream = converter.parse("tinyNotation: E4 r F G A r g c r c")
-        segments = Segmenter.getSegmentsList(testStream)
+        ex = converter.parse("tinyNotation: E4 r F G A r g c r c")
+        segments = Segmenter.getSegmentsList(ex)
 
         self.assertIsInstance(segments[0], list)
         self.assertEqual(segments[1][0].name, 'F')
 
     def testGetIntervalList(self):
-        testStream = converter.parse("tinyNotation: E4 r F G A r g c r c")
-        intervalList = Segmenter.getIntervalList(testStream)
+        ex = converter.parse("tinyNotation: E4 r F G A r g c r c")
+        intervalList = Segmenter.getIntervalList(ex)
 
         self.assertEqual(intervalList[0].name, 'M2')
         self.assertIsInstance(intervalList, list)

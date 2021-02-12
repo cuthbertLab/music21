@@ -12,7 +12,7 @@
 import math
 import random
 import unittest
-from typing import List, Tuple, Union, Sequence
+from typing import List, Tuple, Union, Sequence, Iterable
 
 from fractions import Fraction
 from music21 import defaults
@@ -840,7 +840,7 @@ def approximateGCD(values: List[Union[int, float]], grain: float = 1e-4) -> floa
     return max(commonUniqueDivisions)
 
 
-def lcm(filterList: List[int]) -> int:
+def lcm(filterList: Iterable[int]) -> int:
     '''
     Find the least common multiple of a list of values
 
@@ -852,6 +852,12 @@ def lcm(filterList: List[int]) -> int:
     2
     >>> common.lcm([3, 6])
     6
+
+    Works with any iterable, like this set
+
+    >>> common.lcm({3, 5, 6})
+    30
+
     '''
     def _lcm(a, b):
         '''find lowest common multiple of a, b'''
@@ -861,8 +867,8 @@ def lcm(filterList: List[int]) -> int:
     # derived from
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022
     lcmVal = 1
-    for index in range(len(filterList)):
-        lcmVal = _lcm(lcmVal, filterList[index])
+    for flValue in filterList:
+        lcmVal = _lcm(lcmVal, flValue)
     return lcmVal
 
 

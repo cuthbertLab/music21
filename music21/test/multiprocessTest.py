@@ -22,11 +22,13 @@ building a new release.
 Run test/testDocumentation after this.
 '''
 import collections
+import dataclasses
 import multiprocessing
 import os
 import sys
 import time
 import unittest
+from typing import Optional, Any
 
 from music21 import environment
 from music21 import common
@@ -36,10 +38,17 @@ from music21.test import commonTest
 _MOD = 'test.multiprocessTest'
 environLocal = environment.Environment(_MOD)
 
-ModuleResponse = collections.namedtuple('ModuleResponse',
-                                        'returnCode fp moduleName success testRunner '
-                                        + 'errors failures testsRun runTime')
-ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
+@dataclasses.dataclass
+class ModuleResponse:
+    returnCode: Optional[str] = None
+    fp: Any = None
+    moduleName: Optional[str] = None
+    success: Any = None
+    testRunner: Any = None
+    errors: Any = None
+    failures: Any = None
+    testsRun: Any = None
+    runTime: Any = None
 
 
 # ------------------------------------------------------------------------------
@@ -53,15 +62,17 @@ def runOneModuleWithoutImp(args):
     moduleObject = modGath.getModuleWithoutImp(fp)
 
     environLocal.printDebug(f'running {fp} \n')
+    namePeriod = modGath._getNamePeriod(fp)
     if moduleObject == 'skip':
         success = f'{fp} is skipped \n'
         environLocal.printDebug(success)
-        return ModuleResponse('Skipped', fp, success)
+        return ModuleResponse(returnCode='Skipped', fp=fp, success=success)
     elif moduleObject == 'notInTree':
-        success = ('%s is in the music21 directory but not imported in music21. Skipped -- fix!' %
-                   modGath._getNamePeriod(fp))
+        success = (
+            f'{namePeriod} is in the music21 directory but not imported in music21. Skipped -- fix!'
+        )
         environLocal.printDebug(success)
-        return ModuleResponse('NotInTree', fp, success)
+        return ModuleResponse(returnCode='NotInTree', fp=fp, success=success)
 
     try:
         moduleName = modGath._getName(fp)
@@ -97,14 +108,28 @@ def runOneModuleWithoutImp(args):
             for f in testResult.failures:
                 failures.append(f[1])
             runTime = round(10 * (time.time() - timeStart)) / 10.0
-            return ModuleResponse('TestsRun', fp, moduleName, testResult.wasSuccessful(),
-                                  str(testResult), errors, failures, testResult.testsRun, runTime)
+            return ModuleResponse(returnCode='TestsRun',
+                                  fp=fp,
+                                  moduleName=moduleName,
+                                  success=testResult.wasSuccessful(),
+                                  testRunner=str(testResult),
+                                  errors=errors,
+                                  failures=failures,
+                                  testsRun=testResult.testsRun,
+                                  runTime=runTime)
         except Exception as excp:  # pylint: disable=broad-except
             environLocal.printDebug(f'*** Exception in running {moduleName}: {excp}...\n')
-            return ModuleResponse('TrappedException', fp, moduleName, None, str(excp))
+            return ModuleResponse(returnCode='TrappedException',
+                                  fp=fp,
+                                  moduleName=moduleName,
+                                  success=None,
+                                  testRunner=str(excp)
+                                  )
     except Exception as excp:  # pylint: disable=broad-except
         environLocal.printDebug(f'*** Large Exception in running {fp}: {excp}...\n')
-        return ModuleResponse('LargeException', fp, None, None, str(excp))
+        return ModuleResponse(returnCode='LargeException',
+                              fp=fp,
+                              testRunner=str(excp))
 
 
 def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveOut=1):
@@ -188,7 +213,10 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             pool.join()
         except Exception as excp:  # pylint: disable=broad-except
             eventsProcessed += 1
-            exceptionLog = ModuleResponse('UntrappedException', None, str(excp))
+            exceptionLog = ModuleResponse(
+                returnCode='UntrappedException',
+                moduleName=str(excp)
+            )
             summaryOutput.append(exceptionLog)
 
     sys.stderr = normalStdError
@@ -197,10 +225,10 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
 
 def printSummary(summaryOutput, timeStart, pathsToRun):
     outStr = ''
-    summaryOutputTwo = [i[1] for i in summaryOutput]
+    summaryOutputTwo = [i.fp for i in summaryOutput]
     for fp in pathsToRun:
         if fp not in summaryOutputTwo:
-            failLog = ModuleResponse('NoResult', fp)
+            failLog = ModuleResponse(returnCode='NoResult', fp=fp)
             summaryOutput.append(failLog)
 
     totalTests = 0
