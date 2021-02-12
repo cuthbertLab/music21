@@ -576,7 +576,7 @@ class TimeSignature(base.Music21Object):
             elif self.numerator == 6 and favorCompound:  # duple meters
                 self.beatSequence.partition(2)
             elif self.numerator == 3 and favorCompound:  # 3/8, 3/16, but not 3/4
-               self.beatSequence.partition(1)
+                self.beatSequence.partition(1)
             elif self.numerator == 3:  # triple meters
                 self.beatSequence.partition([1, 1, 1])
             elif self.numerator == 9 and favorCompound:  # triple meters

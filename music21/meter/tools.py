@@ -33,7 +33,7 @@ validDenominators = [1, 2, 4, 8, 16, 32, 64, 128]  # in order
 validDenominatorsSet = set(validDenominators)
 
 
-@lru_cache
+@lru_cache(maxSize=512)
 def slashToTuple(value: str) -> Optional[MeterTerminalTuple]:
     '''
     Returns a three-element MeterTerminalTuple of numerator, denominator, and optional
@@ -68,7 +68,7 @@ def slashToTuple(value: str) -> Optional[MeterTerminalTuple]:
         return None
 
 
-@lru_cache
+@lru_cache(maxSize=512)
 def slashCompoundToFraction(value: str) -> NumDenomTuple:
     '''
     Change a compount meter into a list of simple numberator, demoninator values
@@ -94,7 +94,7 @@ def slashCompoundToFraction(value: str) -> NumDenomTuple:
     return tuple(post)
 
 
-@lru_cache
+@lru_cache(maxSize=512)
 def slashMixedToFraction(valueSrc: str) -> Tuple[NumDenomTuple, bool]:
     '''
     Given a mixture if possible meter fraction representations, return a list
@@ -168,7 +168,7 @@ def slashMixedToFraction(valueSrc: str) -> Tuple[NumDenomTuple, bool]:
     return tuple(post), summedNumerator
 
 
-@lru_cache
+@lru_cache(maxSize=512)
 def fractionToSlashMixed(fList: NumDenomTuple) -> Tuple[Tuple[str, int], ...]:
     '''
     Given a tuple of fraction values, compact numerators by sum if denominators
@@ -210,7 +210,7 @@ def fractionToSlashMixed(fList: NumDenomTuple) -> Tuple[Tuple[str, int], ...]:
     return tuple(post)
 
 
-@lru_cache
+@lru_cache(maxSize=512)
 def fractionSum(numDenomTuple: NumDenomTuple) -> NumDenom:
     '''
     Given a tuple of tuples of numerator and denominator,
@@ -263,7 +263,7 @@ def fractionSum(numDenomTuple: NumDenomTuple) -> NumDenom:
 
 
 
-@lru_cache
+@lru_cache(maxSize=512)
 def proportionToFraction(value: float) -> NumDenom:
     '''
     Given a floating point proportional value between 0 and 1, return the
@@ -295,7 +295,7 @@ def proportionToFraction(value: float) -> NumDenom:
 # load common meter templates into this sequence
 # no need to cache these -- getPartitionOptions is cached
 
-def divisionOptionsFractionsUpward(n, d)  -> Tuple[str, ...]:
+def divisionOptionsFractionsUpward(n, d) -> Tuple[str, ...]:
     '''
     This simply gets restatements of the same fraction in smaller units,
     up to the largest valid denominator.
@@ -463,7 +463,7 @@ def divisionOptionsAdditiveMultiplesUpward(n, d) -> MeterOptions:
     return tuple(opts)
 
 
-@lru_cache
+@lru_cache(maxSize=512)
 def divisionOptionsAlgo(n, d) -> MeterOptions:
     '''
     This is a primitive approach to algorithmic division production.
@@ -617,7 +617,7 @@ def divisionOptionsAlgo(n, d) -> MeterOptions:
     return tuple(common.misc.unique(o for o in opts if o != ()))
 
 
-@lru_cache
+@lru_cache(512)
 def divisionOptionsPreset(n, d) -> MeterOptions:
     '''
     Provide fixed set of meter divisions that will not be easily
