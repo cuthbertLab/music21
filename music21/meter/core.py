@@ -605,7 +605,6 @@ class MeterSequence(MeterTerminal):
         # all-string python dictionaries are optimized; use string key
         n = int(self.numerator)
         d = int(self.denominator)
-        tsStr = f'{n}/{d}'
         opts = []
         opts.extend(list(tools.divisionOptionsAlgo(n, d)))
         opts.extend(list(tools.divisionOptionsPreset(n, d)))

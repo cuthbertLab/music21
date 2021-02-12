@@ -21,7 +21,6 @@ building a new release.
 
 Run test/testDocumentation after this.
 '''
-import collections
 import dataclasses
 import multiprocessing
 import os

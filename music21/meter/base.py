@@ -15,13 +15,9 @@ This module defines the :class:`~music21.meter.TimeSignature` object,
 as well as component objects for defining nested metrical structures,
 :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects.
 '''
-
-import collections
 import copy
 import fractions
-import re
-import unittest
-from typing import Optional, List, Tuple
+from typing import Optional, List
 
 from music21 import base
 from music21 import beam
@@ -29,14 +25,13 @@ from music21 import common
 from music21 import defaults
 from music21 import duration
 from music21 import environment
-from music21 import exceptions21
 from music21 import style
 from music21.exceptions21 import MeterException, TimeSignatureException
 
 from music21.common.enums import MeterDivision
 from music21.common.numberTools import opFrac
 from music21.meter.tools import slashToTuple, proportionToFraction
-from music21.meter.core import MeterSequence, MeterTerminal
+from music21.meter.core import MeterSequence
 
 environLocal = environment.Environment('meter')
 
@@ -772,7 +767,7 @@ class TimeSignature(base.Music21Object):
                 division = MeterDivision.FAST
             elif numerator == 3:
                 division = MeterDivision.SLOW
-        favorCompound = True if division != MeterDivision.SLOW else False
+        favorCompound = (division != MeterDivision.SLOW)
 
         # used for beaming
         self.beamSequence = MeterSequence(value, divisions)

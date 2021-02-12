@@ -26,7 +26,6 @@ import itertools
 import math
 import pathlib
 import unittest
-import warnings
 import sys
 
 from fractions import Fraction
@@ -48,7 +47,6 @@ from music21 import metadata
 from music21 import meter
 from music21 import note
 from music21 import pitch  # for typing
-from music21 import spanner
 from music21 import tie
 from music21 import repeat
 from music21 import sites
