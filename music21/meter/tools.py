@@ -14,7 +14,7 @@ import collections
 import fractions
 from functools import lru_cache
 import re
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple
 
 from music21 import common
 from music21 import environment

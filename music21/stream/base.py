@@ -54,7 +54,6 @@ from music21 import style
 from music21 import tempo
 
 from music21.stream import core
-from music21.stream import enums
 from music21.stream import makeNotation
 from music21.stream import streamStatus
 from music21.stream import iterator

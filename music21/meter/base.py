@@ -17,7 +17,7 @@ as well as component objects for defining nested metrical structures,
 '''
 import copy
 import fractions
-from typing import Optional, List
+from typing import Optional
 
 from music21 import base
 from music21 import beam
