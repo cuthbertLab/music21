@@ -13479,7 +13479,6 @@ class Score(Stream):
                                refStreamOrTimeRange=refStreamOrTimeRange,
                                inPlace=True,
                                bestClef=bestClef,
-                               splitAtDurations=splitAtDurations,
                                **subroutineKeywords)
             # note: while the local-streams have updated their caches, the
             # containing score has an out-of-date cache of flat.
@@ -13494,7 +13493,6 @@ class Score(Stream):
                                                     refStreamOrTimeRange=refStreamOrTimeRange,
                                                     inPlace=True,
                                                     bestClef=bestClef,
-                                                    splitAtDurations=splitAtDurations,
                                                     **subroutineKeywords)
 
         if inPlace:
