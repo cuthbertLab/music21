@@ -220,7 +220,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     # SPECIAL METHODS #
 
     def __iter__(self):
-        return common.Iterator(self.beamsList)
+        return iter(self.beamsList)
 
     def __len__(self):
         return len(self.beamsList)

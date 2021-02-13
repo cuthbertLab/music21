@@ -344,7 +344,7 @@ class Spanner(base.Music21Object):
         return self.spannerStorage.__getitem__(key)
 
     def __iter__(self):
-        return common.Iterator(self.spannerStorage)
+        return iter(self.spannerStorage)
 
     def __len__(self):
         return len(self.spannerStorage)

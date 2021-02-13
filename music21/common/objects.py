@@ -22,6 +22,7 @@ __all__ = [
 import collections
 import time
 import weakref
+from music21.common.decorators import deprecated
 
 
 class RelativeCounter(collections.Counter):
@@ -266,26 +267,20 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
 
 # ------------------------------------------------------------------------------
-class Iterator(collections.abc.Iterator):
-    '''A simple Iterator object used to handle iteration of Streams and other
+class Iterator(collections.abc.Iterator):  # pragma: no cover
+    '''
+    A simple Iterator object used to handle iteration of Streams and other
     list-like objects.
 
-    >>> i = common.Iterator([2, 3, 4])
-    >>> for x in i:
-    ...     print(x)
-    2
-    3
-    4
-    >>> for y in i:
-    ...     print(y)
-    2
-    3
-    4
+    Deprecated in v7 -- not needed since Python 2.6 became music21 minimum!
     '''
+    # TODO: remove in v.8
     def __init__(self, data):
         self.data = data
         self.index = 0
 
+    @deprecated('2021 Jan v7', '2022 Jan',
+                'common.Iterator is deprecated.  use `iter(X)` instead.')
     def __iter__(self):
         self.index = 0
         return self
