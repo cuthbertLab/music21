@@ -457,7 +457,7 @@ class CTSong(prebase.ProtoM21Object):
         >>> change.homeTimeSig
         <music21.meter.TimeSignature 12/8>
         >>> change.homeTimeSig.beatSequence
-        <music21.meter.MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
+        <music21.meter.core.MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
         '''
         # look at 'S' Rule and grab the home time Signature
         if self.text and 'S:' in self.text:

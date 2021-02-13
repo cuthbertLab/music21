@@ -5801,7 +5801,7 @@ class MeasureExporter(XMLExporterBase):
             return mxTime
 
         # always get a flat version to display any subdivisions created
-        fList = [(mt.numerator, mt.denominator) for mt in ts.displaySequence.flat._partition]
+        fList = [(mt.numerator, mt.denominator) for mt in ts.displaySequence.flat]
         if ts.summedNumerator:
             # this will try to reduce any common denominators into
             # a common group

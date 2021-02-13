@@ -12,7 +12,7 @@
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
-from typing import Tuple, List
+from typing import Tuple, List, Iterable, Optional, Callable
 import platform
 import re
 
@@ -23,6 +23,7 @@ __all__ = [
     'macOSVersion',
     'sortModules',
     'pitchList',
+    'unique',
     'runningUnderIPython',
     'defaultDeepcopy',
     'cleanedFlatNotation',
@@ -48,6 +49,45 @@ def flattenList(originalList: List) -> List:
     [1, 2, 3, 4, 5, 6]
     '''
     return [item for sublist in originalList for item in sublist]
+
+
+def unique(originalList: Iterable, *, key: Optional[Callable] = None) -> List:
+    '''
+    Return a List of unique items from an iterable, preserving order.
+    (unlike casting to a set and back)
+
+    (And why is this not already in Python?)
+
+    >>> common.misc.unique([3, 2, 4, 3, 2, 5])
+    [3, 2, 4, 5]
+
+    Works on any iterable, but order might not be preserved for sets, etc.
+
+    >>> common.misc.unique(range(5))
+    [0, 1, 2, 3, 4]
+
+    If key is a function then use that to get the value:
+
+    >>> s = converter.parse('tinyNotation: c4 E d C f# e a')
+    >>> common.misc.unique(s.recurse().notes, key=lambda n: n.name)
+     [<music21.note.Note C>,
+      <music21.note.Note E>,
+      <music21.note.Note D>,
+      <music21.note.Note F#>,
+      <music21.note.Note A>]
+    '''
+    seen = set()
+    out = []
+    for el in originalList:
+        if key:
+            elKey = key(el)
+        else:
+            elKey = el
+        if elKey in seen:
+            continue
+        seen.add(elKey)
+        out.append(el)
+    return out
 
 # ------------------------------------------------------------------------------
 # provide warning strings to users for use in conditional imports

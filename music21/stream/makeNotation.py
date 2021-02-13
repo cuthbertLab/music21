@@ -1649,7 +1649,7 @@ def setStemDirectionOneGroup(
 
 class Test(unittest.TestCase):
     '''
-    Note: all Stream tests are found in test/testStream.py
+    Note: most Stream tests are found in stream/tests.py
     '''
     allaBreveBeamTest = "tinyNotation: 2/2 c8 d e f   trip{a b c' a b c'}  f' e' d' G  a b c' d'"
 
