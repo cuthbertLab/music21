@@ -6479,10 +6479,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if not measureStream.streamStatus.beams:
             try:
                 measureStream.makeBeams(inPlace=True)
-            except (StreamException, meter.MeterException):
+            except (StreamException, meter.MeterException) as e:
                 # this is a result of makeMeasures not getting everything
                 # note to measure allocation right
-                # environLocal.printDebug(['skipping makeBeams exception', StreamException])
+                environLocal.warn(['skipping makeBeams exception', e])
                 pass
 
         # note: this needs to be after makeBeams, as placing this before
@@ -12358,11 +12358,10 @@ class Measure(Stream):
         if m.streamStatus.beams is False:
             try:
                 m.makeBeams(inPlace=True)
-            except StreamException:
+            except StreamException as se:
                 # this is a result of makeMeasures not getting everything
                 # note to measure allocation right
-                pass
-                # environLocal.printDebug(['skipping makeBeams exception', StreamException])
+                environLocal.warn(['skipping makeBeams exception', se])
         if m.streamStatus.haveTupletBracketsBeenMade() is False:
             makeNotation.makeTupletBrackets(m, inPlace=True)
 
