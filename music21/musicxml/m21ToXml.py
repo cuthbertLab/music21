@@ -3254,7 +3254,7 @@ class MeasureExporter(XMLExporterBase):
         Traceback (most recent call last):
         music21.musicxml.xmlObjects.MusicXMLExportException:
             complex duration encountered:
-            failure to run myStream.makeNotation(splitAtDurations=True) first
+            failure to run myStream.splitAtDurations() first
 
         TODO: Test with spanners...
 
@@ -3290,7 +3290,7 @@ class MeasureExporter(XMLExporterBase):
         if d.type == 'complex':
             raise MusicXMLExportException(
                 'complex duration encountered: '
-                'failure to run myStream.makeNotation(splitAtDurations=True) first')
+                'failure to run myStream.splitAtDurations() first')
         if d.isGrace is True:
             graceElement = SubElement(mxNote, 'grace')
             try:

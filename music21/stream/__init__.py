@@ -13455,7 +13455,6 @@ class Score(Stream):
                      refStreamOrTimeRange=None,
                      inPlace=False,
                      bestClef=False,
-                     splitAtDurations=True,
                      **subroutineKeywords):
         '''
         This method overrides the makeNotation method on Stream,
