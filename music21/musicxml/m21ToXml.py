@@ -2856,7 +2856,8 @@ class MeasureExporter(XMLExporterBase):
         for className, methName in self.wrapAttributeMethodClasses.items():
             if className in classes:
                 meth = getattr(self, methName)
-                self.wrapObjectInAttributes(obj, meth)
+                for o in objList:
+                    self.wrapObjectInAttributes(o, meth)
                 parsedObject = True
                 break
 
