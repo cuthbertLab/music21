@@ -6432,6 +6432,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         measureStream = returnStream.getElementsByClass('Measure').stream()
         # environLocal.printDebug(['Stream.makeNotation(): post makeMeasures,
         #   length', len(returnStream)])
+        if not measureStream:
+            raise StreamException(
+                f'no measures found in stream with {len(self)} elements')
 
         # for now, calling makeAccidentals once per measures
         # pitches from last measure are passed
@@ -6468,12 +6471,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     tiePitchSet=tiePitchSet,
                     inPlace=True,
                     **srkCopy)
-        # environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
-        try:
-            measureStream.makeTies(meterStream, inPlace=True)
-        except StreamException as e:
-            strE = str(e)
-            environLocal.warn('StreamException: makeTies: ' + strE)
+
+        measureStream.makeTies(meterStream, inPlace=True)
 
         # measureStream.makeBeams(inPlace=True)
         if not measureStream.streamStatus.beams:
@@ -6489,12 +6488,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for m in measureStream:
             if m.streamStatus.haveTupletBracketsBeenMade() is False:
                 makeNotation.makeTupletBrackets(m, inPlace=True)
-
-        if not measureStream:
-            raise StreamException(
-                f'no measures found in stream with {len(self)} elements')
-        # environLocal.printDebug(['Stream.makeNotation(): created measures:',
-        #   len(measureStream)])
 
         return returnStream
 
