@@ -6483,7 +6483,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # this is a result of makeMeasures not getting everything
                 # note to measure allocation right
                 environLocal.warn(['skipping makeBeams exception', e])
-                pass
 
         # note: this needs to be after makeBeams, as placing this before
         # makeBeams was causing the duration's tuplet to lose its type setting
