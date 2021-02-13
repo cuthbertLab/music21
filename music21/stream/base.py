@@ -13762,10 +13762,8 @@ class SpannerStorage(Stream):
 
         # environLocal.printDebug('keywords', keywords)
 
-
     # NOTE: for serialization, this will need to properly tag
     # the spanner parent by updating the scaffolding code.
-
     def coreSelfActiveSite(self, el):
         '''
         Never set activeSite to spannerStorage

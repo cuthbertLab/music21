@@ -75,7 +75,6 @@ To get rid of beams on a note do:
 
 import unittest
 
-from music21 import common
 from music21 import exceptions21
 from music21 import duration
 from music21 import environment
