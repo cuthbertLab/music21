@@ -16,8 +16,7 @@ some sort of connection between them.  A slur is one type of spanner -- it might
 connect notes in different Measure objects or even between different parts.
 
 This package defines some of the most common spanners.  Other spanners
-can be found in modules such as :ref:`moduleDynamics` (for things such as crescendos)
-or in :ref:`moduleMeter` (a ritardando, for instance).
+can be found in modules such as :ref:`moduleDynamics` (for things such as crescendos).
 '''
 import unittest
 import copy
@@ -344,7 +343,7 @@ class Spanner(base.Music21Object):
         return self.spannerStorage.__getitem__(key)
 
     def __iter__(self):
-        return common.Iterator(self.spannerStorage)
+        return iter(self.spannerStorage)
 
     def __len__(self):
         return len(self.spannerStorage)

@@ -46,8 +46,6 @@ MIN_DENOMINATOR_TYPE = '128th'
 _meterSequenceAccentArchetypes = {}
 
 
-
-
 def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSignature':
     # noinspection PyShadowingNames
     '''
@@ -454,7 +452,7 @@ class TimeSignature(base.Music21Object):
             so do not expect proper output yet.''',
     }
 
-    def __init__(self, value: Optional[str] = None, divisions=None):
+    def __init__(self, value: str = '4/4', divisions=None):
         super().__init__()
 
         if value is None:
@@ -469,6 +467,9 @@ class TimeSignature(base.Music21Object):
         self.symbolizeDenominator = False
 
         self.resetValues(value, divisions)
+
+    def _reprInternal(self):
+        return self.ratioString
 
     def resetValues(self, value: str = '4/4', divisions=None):
         '''
@@ -487,16 +488,90 @@ class TimeSignature(base.Music21Object):
         # creates .displaySequence, .beamSequence, .beatSequence, .accentSequence
         self.load(value, divisions)
 
-    @property
-    def summedNumerator(self) -> bool:
-        if self.displaySequence is None:
-            return False
-        return self.displaySequence.summedNumerator
+    def load(self, value: str, divisions=None):
+        '''
+        Load up a TimeSignature with a string value.
 
-    @summedNumerator.setter
-    def summedNumerator(self, value: bool):
-        if self.displaySequence is not None:
-            self.displaySequence.summedNumerator = value
+        >>> ts = meter.TimeSignature()
+        >>> ts.load('4/4')
+        >>> ts
+        <music21.meter.TimeSignature 4/4>
+
+        >>> ts.load('c')
+        >>> ts.symbol
+        'common'
+
+
+        >>> ts.load('2/4+3/8')
+        >>> ts
+        <music21.meter.TimeSignature 2/4+3/8>
+
+
+        >>> ts.load('fast 6/8')
+        >>> ts.beatCount
+        2
+        >>> ts.load('slow 6/8')
+        >>> ts.beatCount
+        6
+
+        Loading destroys all preexisting internal representations
+        '''
+        # create parallel MeterSequence objects to provide all data
+        # these all refer to the same .numerator/.denominator
+        # relationship
+
+        # used for drawing the time signature symbol
+        # this is the only one that can be  unlinked
+        if value.lower() in ('common', 'c'):
+            value = '4/4'
+            self.symbol = 'common'
+        elif value.lower() in ('cut', 'allabreve'):
+            # allaBreve is the capella version
+            value = '2/2'
+            self.symbol = 'cut'
+
+        self.displaySequence = MeterSequence(value)
+
+        # get simple representation; presently, only slashToTuple
+        # supports the fast/slow indication
+        numerator, denominator, division = slashToTuple(value)
+        if division == MeterDivision.NONE:
+            if numerator % 3 == 0 and denominator >= 8:
+                division = MeterDivision.FAST
+            elif numerator == 3:
+                division = MeterDivision.SLOW
+        favorCompound = (division != MeterDivision.SLOW)
+
+        # used for beaming
+        self.beamSequence = MeterSequence(value, divisions)
+        # used for getting beat divisions
+        self.beatSequence = MeterSequence(value, divisions)
+
+        # accentSequence is used for setting one level of accents
+        self.accentSequence = MeterSequence(value, divisions)
+
+        if divisions is None:  # set default beam partitions
+            # beam is not adjust by tempo indication
+            self._setDefaultBeamPartitions()
+            self._setDefaultBeatPartitions(favorCompound=favorCompound)
+
+            # for some summed meters default accent weights are difficult
+            # to obtain
+            try:
+                self._setDefaultAccentWeights(3)  # set partitions based on beat
+            except MeterException:
+                environLocal.printDebug(['cannot set default accents for:', self])
+
+    def loadRatio(self, numerator, denominator, divisions=None):
+        '''
+        Change the numerator and denominator, like ratioString, but with
+        optional divisions and without resetting other parameters.
+
+        DEPRECATED in v7. -- call .ratioString or .load with
+        value = f'{numerator}/{denominator}'
+        '''
+        value = f'{numerator}/{denominator}'
+        self.load(value, divisions)
 
     @property
     def ratioString(self):
@@ -531,9 +606,6 @@ class TimeSignature(base.Music21Object):
     def ratioString(self, newRatioString):
         self.resetValues(newRatioString)
 
-    def _reprInternal(self):
-        return self.ratioString
-
     def ratioEqual(self, other):
         '''
         A basic form of comparison; does not determine if any internal structures are equal; o
@@ -546,6 +618,443 @@ class TimeSignature(base.Music21Object):
             return True
         else:
             return False
+
+    # --------------------------------------------------------------------------
+    # properties
+
+    @property
+    def numerator(self):
+        '''
+        Return the numerator of the TimeSignature as a number.
+
+        Can set the numerator for a simple TimeSignature.
+        To set the numerator of a complex TimeSignature, change beatCount.
+
+        (for complex TimeSignatures, note that this comes from the .beamSequence
+        of the TimeSignature)
+
+
+        >>> ts = meter.TimeSignature('3/4')
+        >>> ts.numerator
+        3
+        >>> ts.numerator = 5
+        >>> ts
+        <music21.meter.TimeSignature 5/4>
+
+
+        In this case, the TimeSignature is silently being converted to 9/8
+        to get a single digit numerator:
+
+        >>> ts = meter.TimeSignature('2/4+5/8')
+        >>> ts.numerator
+        9
+
+        Setting a summed time signature's numerator will change to a
+        simple time signature
+
+        >>> ts.numerator = 11
+        >>> ts
+        <music21.meter.TimeSignature 11/8>
+        '''
+        return self.beamSequence.numerator
+
+    @numerator.setter
+    def numerator(self, value):
+        denominator = self.denominator
+        newRatioString = str(value) + '/' + str(denominator)
+        self.resetValues(newRatioString)
+
+
+    @property
+    def denominator(self):
+        '''
+        Return the denominator of the TimeSignature as a number or set it.
+
+        (for complex TimeSignatures, note that this comes from the .beamSequence
+        of the TimeSignature)
+
+        >>> ts = meter.TimeSignature('3/4')
+        >>> ts.denominator
+        4
+        >>> ts.denominator = 8
+        >>> ts.ratioString
+        '3/8'
+
+
+        In this following case, the TimeSignature is silently being converted to 9/8
+        to get a single digit denominator:
+
+        >>> ts = meter.TimeSignature('2/4+5/8')
+        >>> ts.denominator
+        8
+        '''
+        return self.beamSequence.denominator
+
+    @denominator.setter
+    def denominator(self, value):
+        numeratorValue = self.numerator
+        newRatioString = str(numeratorValue) + '/' + str(value)
+        self.resetValues(newRatioString)
+
+    @property
+    def barDuration(self) -> duration.Duration:
+        '''
+        Return a :class:`~music21.duration.Duration` object equal to the
+        total length of this TimeSignature.
+
+        >>> ts = meter.TimeSignature('5/16')
+        >>> ts.barDuration
+        <music21.duration.Duration 1.25>
+
+        >>> ts2 = meter.TimeSignature('3/8')
+        >>> d = ts2.barDuration
+        >>> d.type
+        'quarter'
+        >>> d.dots
+        1
+        >>> d.quarterLength
+        1.5
+
+        This can be overridden to create different representations
+        or to contradict the meter.
+
+        >>> d2 = duration.Duration(1.75)
+        >>> ts2.barDuration = d2
+        >>> ts2.barDuration
+        <music21.duration.Duration 1.75>
+        '''
+
+        if self._overriddenBarDuration:
+            return self._overriddenBarDuration
+        else:
+            # could come from self.beamSequence, self.accentSequence,
+            #   self.displaySequence, self.accentSequence
+            return self.beamSequence.duration
+
+    @barDuration.setter
+    def barDuration(self, value: duration.Duration):
+        self._overriddenBarDuration = value
+
+    @property
+    def beatLengthToQuarterLengthRatio(self):
+        '''
+        Returns 4.0 / denominator... seems a bit silly...
+
+        >>> a = meter.TimeSignature('3/2')
+        >>> a.beatLengthToQuarterLengthRatio
+        2.0
+        '''
+        return 4 / self.denominator
+
+    @property
+    def quarterLengthToBeatLengthRatio(self):
+        '''
+        Returns denominator/4.0... seems a bit silly...
+        '''
+        return self.denominator / 4.0
+
+    # --------------------------------------------------------------------------
+    # meter classifications used for classifying meters such as
+    # duple triple, etc.
+
+    @property
+    def beatCount(self):
+        '''
+        Return or set the count of beat units, or the number of beats in this TimeSignature.
+
+        When setting beat units, one level of sub-partitions is automatically defined.
+        Users can specify beat count values as integers or as lists of durations.
+        For more precise configuration of the beat MeterSequence,
+        manipulate the .beatSequence attribute directly.
+
+        >>> ts = meter.TimeSignature('3/4')
+        >>> ts.beatCount
+        3
+        >>> ts.beatDuration.quarterLength
+        1.0
+        >>> ts.beatCount = [1, 1, 1, 1, 1, 1]
+        >>> ts.beatCount
+        6
+        >>> ts.beatDuration.quarterLength
+        0.5
+
+        Setting a beat-count directly is a simple, high-level way to configure the beatSequence.
+        Note that his may not configure lower level partitions correctly,
+        and will raise an error if the provided beat count is not supported by the
+        overall duration of the .beatSequence MeterSequence.
+
+        >>> ts = meter.TimeSignature('6/8')
+        >>> ts.beatCount  # default is 2 beats
+        2
+        >>> ts.beatSequence
+        <music21.meter.core.MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
+        >>> ts.beatDivisionCountName
+        'Compound'
+        >>> ts.beatCount = 6
+        >>> ts.beatSequence
+        <music21.meter.core.MeterSequence
+            {{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}}>
+        >>> ts.beatDivisionCountName
+        'Simple'
+        >>> ts.beatCount = 123
+        Traceback (most recent call last):
+        music21.exceptions21.TimeSignatureException: cannot partition beat with provided value: 123
+
+        >>> ts = meter.TimeSignature('3/4')
+        >>> ts.beatCount = 6
+        >>> ts.beatDuration.quarterLength
+        0.5
+        '''
+        # the default is for the beat to be defined by the first, not zero,
+        # level partition.
+        return len(self.beatSequence)
+
+    @beatCount.setter
+    def beatCount(self, value):
+        try:
+            self.beatSequence.partition(value)
+        except MeterException:
+            raise TimeSignatureException(f'cannot partition beat with provided value: {value}')
+        # create subdivisions using default parameters
+        if len(self.beatSequence) > 1:  # if partitioned
+            self.beatSequence.subdividePartitionsEqual()
+
+    @property
+    def beatCountName(self):
+        '''
+        Return the beat count name, or the name given for the number of beat units.
+        For example, 2/4 is duple; 9/4 is triple.
+
+        >>> ts = meter.TimeSignature('3/4')
+        >>> ts.beatCountName
+        'Triple'
+
+        >>> ts = meter.TimeSignature('6/8')
+        >>> ts.beatCountName
+        'Duple'
+        '''
+        return self.beatSequence.partitionStr
+
+    @property
+    def beatDuration(self) -> duration.Duration:
+        '''
+        Return a :class:`~music21.duration.Duration` object equal to the beat unit
+        of this Time Signature, if and only if this TimeSignature has a uniform beat unit.
+
+        Otherwise raises an exception in v7.1 but will change to returning NaN
+        soon fasterwards.
+
+        >>> ts = meter.TimeSignature('3/4')
+        >>> ts.beatDuration
+        <music21.duration.Duration 1.0>
+        >>> ts = meter.TimeSignature('6/8')
+        >>> ts.beatDuration
+        <music21.duration.Duration 1.5>
+
+        >>> ts = meter.TimeSignature('7/8')
+        >>> ts.beatDuration
+        <music21.duration.Duration 0.5>
+
+        >>> ts = meter.TimeSignature('3/8')
+        >>> ts.beatDuration
+        <music21.duration.Duration 1.5>
+        >>> ts.beatCount = 3
+        >>> ts.beatDuration
+        <music21.duration.Duration 0.5>
+
+        Cannot do this because of asymmetry
+
+        >>> ts = meter.TimeSignature('2/4+3/16')
+        >>> ts.beatDuration
+        Traceback (most recent call last):
+        music21.exceptions21.TimeSignatureException: non-uniform beat unit: [2.0, 0.75]
+
+        Changed in v7. -- return NaN rather than raising Exception in property.
+        '''
+        post = []
+        for ms in self.beatSequence:
+            post.append(ms.duration.quarterLength)
+        if len(set(post)) == 1:
+            return self.beatSequence[0].duration  # all are the same
+        else:
+            raise TimeSignatureException(f'non-uniform beat unit: {post}')
+
+    @property
+    def beatDivisionCount(self):
+        '''
+        Return the count of background beat units found within one beat,
+        or the number of subdivisions in the beat unit in this TimeSignature.
+
+        >>> ts = meter.TimeSignature('3/4')
+        >>> ts.beatDivisionCount
+        2
+
+        >>> ts = meter.TimeSignature('6/8')
+        >>> ts.beatDivisionCount
+        3
+
+        >>> ts = meter.TimeSignature('15/8')
+        >>> ts.beatDivisionCount
+        3
+
+        >>> ts = meter.TimeSignature('3/8')
+        >>> ts.beatDivisionCount
+        1
+
+        >>> ts = meter.TimeSignature('13/8', 13)
+        >>> ts.beatDivisionCount
+        1
+
+        Changed in v7. -- return 1 instead of a TimeSignatureException.
+        '''
+        # first, find if there is more than one beat and if all beats are uniformly partitioned
+        post = []
+        if len(self.beatSequence) == 1:
+            return 1
+
+        # need to see if first-level subdivisions are partitioned
+        if not isinstance(self.beatSequence[0], MeterSequence):
+            return 1
+
+        # getting length here gives number of subdivisions
+        for ms in self.beatSequence:
+            post.append(len(ms))
+
+        # convert this to a set; if length is 1, then all beats are uniform
+        if len(set(post)) == 1:
+            return len(self.beatSequence[0])  # all are the same
+        else:
+            return 1
+
+    @property
+    def beatDivisionCountName(self):
+        '''
+        Return the beat count name, or the name given for the number of beat units.
+        For example, 2/4 is duple; 9/4 is triple.
+
+        >>> ts = meter.TimeSignature('3/4')
+        >>> ts.beatDivisionCountName
+        'Simple'
+
+        >>> ts = meter.TimeSignature('6/8')
+        >>> ts.beatDivisionCountName
+        'Compound'
+
+        Rare cases of 5-beat divisions return 'Other', like this 10/8 divided into
+        5/8 + 5/8 with no further subdivisions:
+
+        >>> ts = meter.TimeSignature('10/8')
+        >>> ts.beatSequence.partition(2)
+        >>> ts.beatSequence
+        <music21.meter.core.MeterSequence {5/8+5/8}>
+        >>> for i, mt in enumerate(ts.beatSequence):
+        ...     ts.beatSequence[i] = mt.subdivideByCount(5)
+        >>> ts.beatSequence
+        <music21.meter.core.MeterSequence {{1/8+1/8+1/8+1/8+1/8}+{1/8+1/8+1/8+1/8+1/8}}>
+        >>> ts.beatDivisionCountName
+        'Other'
+        '''
+        beatDivision = self.beatDivisionCount
+        if beatDivision == 2:
+            return 'Simple'
+        elif beatDivision == 3:
+            return 'Compound'
+        else:
+            return 'Other'
+
+    @property
+    def beatDivisionDurations(self):
+        '''
+        Return the beat division, or the durations that make up one beat,
+        as a list of :class:`~music21.duration.Duration` objects, if and only if
+        the TimeSignature has a uniform beat division for all beats.
+
+        >>> ts = meter.TimeSignature('3/4')
+        >>> ts.beatDivisionDurations
+        [<music21.duration.Duration 0.5>,
+         <music21.duration.Duration 0.5>]
+
+        >>> ts = meter.TimeSignature('6/8')
+        >>> ts.beatDivisionDurations
+        [<music21.duration.Duration 0.5>,
+         <music21.duration.Duration 0.5>,
+         <music21.duration.Duration 0.5>]
+
+        Value returned of non-uniform beat divisions will change at any time
+        after v7.1 to avoid raising an exception.
+        '''
+        post = []
+        if len(self.beatSequence) == 1:
+            raise TimeSignatureException(
+                'cannot determine beat division for a non-partitioned beat')
+        for mt in self.beatSequence:
+            for subMt in mt:
+                post.append(subMt.duration.quarterLength)
+        if len(set(post)) == 1:  # all the same
+            out = []
+            for subMt in self.beatSequence[0]:
+                out.append(subMt.duration)
+            return out
+        else:
+            raise TimeSignatureException(f'non uniform beat division: {post}')
+
+    @property
+    def beatSubDivisionDurations(self):
+        '''
+        Return a subdivision of the beat division, or a list
+        of :class:`~music21.duration.Duration` objects representing each beat division
+        divided by two.
+
+        >>> ts = meter.TimeSignature('3/4')
+        >>> ts.beatSubDivisionDurations
+        [<music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>,
+         <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>]
+
+        >>> ts = meter.TimeSignature('6/8')
+        >>> ts.beatSubDivisionDurations
+        [<music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>,
+         <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>,
+         <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>]
+        '''
+        post = []
+        src = self.beatDivisionDurations
+        for d in src:
+            # this is too slow... TODO: fix, but make sure all durations are unique.
+            post.append(d.augmentOrDiminish(0.5))
+            post.append(d.augmentOrDiminish(0.5))
+        return post
+
+    @property
+    def classification(self):
+        '''
+        Return the classification of this TimeSignature,
+        such as Simple Triple or Compound Quadruple.
+
+        >>> ts = meter.TimeSignature('3/4')
+        >>> ts.classification
+        'Simple Triple'
+        >>> ts = meter.TimeSignature('6/8')
+        >>> ts.classification
+        'Compound Duple'
+        >>> ts = meter.TimeSignature('4/32')
+        >>> ts.classification
+        'Simple Quadruple'
+        '''
+        return f'{self.beatDivisionCountName} {self.beatCountName}'
+
+    @property
+    def summedNumerator(self) -> bool:
+        if self.displaySequence is None:
+            return False
+        return self.displaySequence.summedNumerator
+
+    @summedNumerator.setter
+    def summedNumerator(self, value: bool):
+        if self.displaySequence is not None:
+            self.displaySequence.summedNumerator = value
+
+    # --------------------------------------------------------------------------
+    # private methods -- most to be put into the various sequences.
 
     def _setDefaultBeatPartitions(self, *, favorCompound=True):
         '''Set default beat partitions based on numerator and denominator.
@@ -560,7 +1069,7 @@ class TimeSignature(base.Music21Object):
         >>> len(ts.beatSequence)
         6
 
-        Changed in v7 -- favorCompound is keywordOnly
+        Changed in v7 -- favorCompound is keyword only
         '''
         # if a non-compound meter has been given, as in
         # not 3+1/4; just 5/4
@@ -588,8 +1097,9 @@ class TimeSignature(base.Music21Object):
             else:  # case of odd meters: 11, 13
                 self.beatSequence.partition(self.numerator)
 
-        # if a compound meter has been given
+        # if a complex meter has been given
         else:  # partition by display
+            # TODO: remove partitionByMeterSequence usage.
             self.beatSequence.partition(self.displaySequence)
 
         # create subdivisions, and thus define compound/simple distinction
@@ -676,9 +1186,11 @@ class TimeSignature(base.Music21Object):
 
         # environLocal.printDebug(['_setDefaultAccentWeights(): firstPartitionForm set to',
         #    firstPartitionForm, 'self.beatSequence: ', self.beatSequence, tsStr])
+        # using cacheKey speeds up TS creation from 2300 microseconds to 500microseconds
         try:
             self.accentSequence = copy.deepcopy(
-                _meterSequenceAccentArchetypes[cacheKey])
+                _meterSequenceAccentArchetypes[cacheKey]
+            )
             # environLocal.printDebug(['using stored accent archetype:'])
         except KeyError:
             # environLocal.printDebug(['creating a new accent archetype'])
@@ -715,495 +1227,8 @@ class TimeSignature(base.Music21Object):
             if cacheKey is not None:
                 _meterSequenceAccentArchetypes[cacheKey] = copy.deepcopy(self.accentSequence)
 
-    def load(self, value: str, divisions=None):
-        '''
-        Load up a TimeSignature with a string value.
-
-        >>> ts = meter.TimeSignature()
-        >>> ts.load('4/4')
-        >>> ts
-        <music21.meter.TimeSignature 4/4>
-
-        >>> ts.load('c')
-        >>> ts.symbol
-        'common'
-
-
-        >>> ts.load('2/4+3/8')
-        >>> ts
-        <music21.meter.TimeSignature 2/4+3/8>
-
-
-        >>> ts.load('fast 6/8')
-        >>> ts.beatCount
-        2
-        >>> ts.load('slow 6/8')
-        >>> ts.beatCount
-        6
-
-        Loading destroys all preexisting internal representations
-        '''
-        # create parallel MeterSequence objects to provide all data
-        # these all refer to the same .numerator/.denominator
-        # relationship
-
-        # used for drawing the time signature symbol
-        # this is the only one that can be  unlinked
-        if value.lower() in ('common', 'c'):
-            value = '4/4'
-            self.symbol = 'common'
-        elif value.lower() in ('cut', 'allabreve'):
-            # allaBreve is the capella version
-            value = '2/2'
-            self.symbol = 'cut'
-
-        self.displaySequence = MeterSequence(value)
-
-        # get simple representation; presently, only slashToTuple
-        # supports the fast/slow indication
-        numerator, denominator, division = slashToTuple(value)
-        if division == MeterDivision.NONE:
-            if numerator % 3 == 0 and denominator >= 8:
-                division = MeterDivision.FAST
-            elif numerator == 3:
-                division = MeterDivision.SLOW
-        favorCompound = (division != MeterDivision.SLOW)
-
-        # used for beaming
-        self.beamSequence = MeterSequence(value, divisions)
-        # used for getting beat divisions
-        self.beatSequence = MeterSequence(value, divisions)
-        # used for setting one level of accents
-        self.accentSequence = MeterSequence(value, divisions)
-
-        if divisions is None:  # set default beam partitions
-            # beam is not adjust by tempo indication
-            self._setDefaultBeamPartitions()
-            self._setDefaultBeatPartitions(favorCompound=favorCompound)
-
-            # for some summed meters default accent weights are difficult
-            # to obtain
-            try:
-                self._setDefaultAccentWeights(3)  # set partitions based on beat
-            except MeterException:
-                environLocal.printDebug(['cannot set default accents for:', self])
-
-    def loadRatio(self, numerator, denominator, partitionRequest=None):
-        '''
-        Change the numerator and denominator for a given partition.
-        '''
-        value = f'{numerator}/{denominator}'
-        self.load(value, partitionRequest)
-
-    # --------------------------------------------------------------------------
-    # properties
-
-    def _getNumerator(self):
-        return self.beamSequence.numerator
-
-    def _setNumerator(self, value):
-        denominator = self.denominator
-        newRatioString = str(value) + '/' + str(denominator)
-        self.resetValues(newRatioString)
-
-    numerator = property(_getNumerator, _setNumerator,
-                         doc='''
-        Return the numerator of the TimeSignature as a number.
-
-        Can set the numerator for a simple TimeSignature.
-        To set the numerator of a complex TimeSignature, change beatCount.
-
-        (for complex TimeSignatures, note that this comes from the .beamSequence
-        of the TimeSignature)
-
-
-        >>> ts = meter.TimeSignature('3/4')
-        >>> ts.numerator
-        3
-        >>> ts.numerator = 5
-        >>> ts
-        <music21.meter.TimeSignature 5/4>
-
-
-        In this case, the TimeSignature is silently being converted to 9/8
-        to get a single digit numerator:
-
-        >>> ts = meter.TimeSignature('2/4+5/8')
-        >>> ts.numerator
-        9
-
-        Setting a summed time signature's numerator will change to a
-        simple time signature
-
-        >>> ts.numerator = 11
-        >>> ts
-        <music21.meter.TimeSignature 11/8>
-        ''')
-
-    def _getDenominator(self):
-        return self.beamSequence.denominator
-
-    def _setDenominator(self, value):
-        numeratorValue = self.numerator
-        newRatioString = str(numeratorValue) + '/' + str(value)
-        self.resetValues(newRatioString)
-
-    denominator = property(_getDenominator, _setDenominator,
-                           doc='''
-        Return the denominator of the TimeSignature as a number or set it.
-
-        (for complex TimeSignatures, note that this comes from the .beamSequence
-        of the TimeSignature)
-
-
-        >>> ts = meter.TimeSignature('3/4')
-        >>> ts.denominator
-        4
-        >>> ts.denominator = 8
-        >>> ts.ratioString
-        '3/8'
-
-
-        In this following case, the TimeSignature is silently being converted to 9/8
-        to get a single digit denominator:
-
-        >>> ts = meter.TimeSignature('2/4+5/8')
-        >>> ts.denominator
-        8
-        ''')
-
-    def _getBarDuration(self):
-        '''
-        barDuration gets or sets a duration value that
-        is equal in length to the total length implied by
-        the time signature
-
-        >>> a = meter.TimeSignature('3/8')
-        >>> d = a.barDuration
-        >>> d.type
-        'quarter'
-        >>> d.dots
-        1
-        >>> d.quarterLength
-        1.5
-        '''
-
-        if self._overriddenBarDuration:
-            return self._overriddenBarDuration
-        else:
-            # could come from self.beamSequence, self.accentSequence,
-            #   self.displaySequence, self.accentSequence
-            return self.beamSequence.duration
-
-    def _setBarDuration(self, value):
-        self._overriddenBarDuration = value
-
-    barDuration = property(_getBarDuration, _setBarDuration,
-                           doc='''
-        Return a :class:`~music21.duration.Duration` object equal to the
-        total length of this TimeSignature.
-
-        >>> ts = meter.TimeSignature('5/16')
-        >>> ts.barDuration
-        <music21.duration.Duration 1.25>
-
-        ''')
-
-    @property
-    def beatLengthToQuarterLengthRatio(self):
-        '''
-        Returns 4.0 / denominator... seems a bit silly...
-
-        >>> a = meter.TimeSignature('3/2')
-        >>> a.beatLengthToQuarterLengthRatio
-        2.0
-        '''
-        return 4 / self.denominator
-
-    @property
-    def quarterLengthToBeatLengthRatio(self):
-        '''
-        Returns denominator/4.0... seems a bit silly...
-        '''
-        return self.denominator / 4.0
-
-    # --------------------------------------------------------------------------
-    # meter classifications used for classifying meters such as
-    # duple triple, etc.
-
-    def _getBeatCount(self):
-        # the default is for the beat to be defined by the first, not zero,
-        # level partition.
-        return len(self.beatSequence)
-
-    def _setBeatCount(self, value):
-        '''
-        Setting a beat-count directly is a simple, high-level way to configure the beatSequence.
-        Note that his may not configure lower level partitions correctly,
-        and will raise an error if the provided beat count is not supported by the
-        overall duration of the .beatSequence MeterSequence.
-
-
-        >>> ts = meter.TimeSignature('6/8')
-        >>> ts.beatCount  # default is 2 beats
-        2
-        >>> ts.beatSequence
-        <music21.meter.core.MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
-        >>> ts.beatDivisionCountName
-        'Compound'
-        >>> ts.beatCount = 6
-        >>> ts.beatSequence
-        <music21.meter.core.MeterSequence
-            {{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}}>
-        >>> ts.beatDivisionCountName
-        'Simple'
-        >>> ts.beatCount = 123
-        Traceback (most recent call last):
-        music21.exceptions21.TimeSignatureException: cannot partition beat with provided value: 123
-
-        >>> ts = meter.TimeSignature('3/4')
-        >>> ts.beatCount = 6
-        >>> ts.beatDuration.quarterLength
-        0.5
-        '''
-        try:
-            self.beatSequence.partition(value)
-        except MeterException:
-            raise TimeSignatureException(f'cannot partition beat with provided value: {value}')
-        # create subdivisions using default parameters
-        if len(self.beatSequence) > 1:  # if partitioned
-            self.beatSequence.subdividePartitionsEqual()
-
-    beatCount = property(_getBeatCount, _setBeatCount,
-                         doc='''
-        Return or set the count of beat units, or the number of beats in this TimeSignature.
-
-        When setting beat units, one level of sub-partitions is automatically defined.
-        Users can specify beat count values as integers or as lists of durations.
-        For more precise configuration of the beat MeterSequence,
-        manipulate the .beatSequence attribute directly.
-
-
-        >>> ts = meter.TimeSignature('3/4')
-        >>> ts.beatCount
-        3
-        >>> ts.beatDuration.quarterLength
-        1.0
-        >>> ts.beatCount = [1, 1, 1, 1, 1, 1]
-        >>> ts.beatCount
-        6
-        >>> ts.beatDuration.quarterLength
-        0.5
-        ''')
-
-    @property
-    def beatCountName(self):
-        '''
-        Return the beat count name, or the name given for the number of beat units.
-        For example, 2/4 is duple; 9/4 is triple.
-
-        >>> ts = meter.TimeSignature('3/4')
-        >>> ts.beatCountName
-        'Triple'
-
-        >>> ts = meter.TimeSignature('6/8')
-        >>> ts.beatCountName
-        'Duple'
-        '''
-        return self.beatSequence.partitionStr
-
-    @property
-    def beatDuration(self):
-        '''
-        Return a :class:`~music21.duration.Duration` object equal to the beat unit
-        of this Time Signature, if and only if this TimeSignature has a uniform beat unit.
-
-        Otherwise raise a TimeSignatureException
-
-
-        >>> ts = meter.TimeSignature('3/4')
-        >>> ts.beatDuration
-        <music21.duration.Duration 1.0>
-        >>> ts = meter.TimeSignature('6/8')
-        >>> ts.beatDuration
-        <music21.duration.Duration 1.5>
-
-        >>> ts = meter.TimeSignature('7/8')
-        >>> ts.beatDuration
-        <music21.duration.Duration 0.5>
-
-
-        >>> ts = meter.TimeSignature('3/8')
-        >>> ts.beatDuration
-        <music21.duration.Duration 1.5>
-        >>> ts.beatCount = 3
-        >>> ts.beatDuration
-        <music21.duration.Duration 0.5>
-
-        Cannot do this because of asymmetry
-
-        >>> ts = meter.TimeSignature('2/4+3/16')
-        >>> ts.beatDuration
-        Traceback (most recent call last):
-        music21.exceptions21.TimeSignatureException: non-uniform beat unit: [2.0, 0.75]
-        '''
-        post = []
-        for ms in self.beatSequence._partition:
-            post.append(ms.duration.quarterLength)
-        if len(set(post)) == 1:
-            return self.beatSequence[0].duration  # all are the same
-        else:
-            raise TimeSignatureException(f'non-uniform beat unit: {post}')
-
-    @property
-    def beatDivisionCount(self):
-        '''
-        Return the count of background beat units found within one beat,
-        or the number of subdivisions in the beat unit in this TimeSignature.
-
-        >>> ts = meter.TimeSignature('3/4')
-        >>> ts.beatDivisionCount
-        2
-
-        >>> ts = meter.TimeSignature('6/8')
-        >>> ts.beatDivisionCount
-        3
-
-        >>> ts = meter.TimeSignature('15/8')
-        >>> ts.beatDivisionCount
-        3
-
-        >>> ts = meter.TimeSignature('3/8')
-        >>> ts.beatDivisionCount
-        1
-
-        >>> ts = meter.TimeSignature('13/8', 13)
-        >>> ts.beatDivisionCount
-        1
-
-        Changed in v7. -- return 1 instead of a TimeSignatureException.
-        '''
-        # first, find if there is more than one beat and if all beats are uniformly partitioned
-        post = []
-        if len(self.beatSequence) == 1:
-            return 1
-
-        # need to see if first-level subdivisions are partitioned
-        if not isinstance(self.beatSequence[0], MeterSequence):
-            return 1
-
-        # getting length here gives number of subdivisions
-        for ms in self.beatSequence._partition:
-            post.append(len(ms))
-
-        # convert this to a set; if length is 1, then all beats are uniform
-        if len(set(post)) == 1:
-            return len(self.beatSequence[0])  # all are the same
-        else:
-            return 1
-
-    @property
-    def beatDivisionCountName(self):
-        '''
-        Return the beat count name, or the name given for the number of beat units.
-        For example, 2/4 is duple; 9/4 is triple.
-
-        >>> ts = meter.TimeSignature('3/4')
-        >>> ts.beatDivisionCountName
-        'Simple'
-
-        >>> ts = meter.TimeSignature('6/8')
-        >>> ts.beatDivisionCountName
-        'Compound'
-        '''
-        beatDivision = self.beatDivisionCount
-        if beatDivision == 2:
-            return 'Simple'
-        elif beatDivision == 3:
-            return 'Compound'
-        else:
-            return 'Other'
-
-    @property
-    def beatDivisionDurations(self):
-        '''
-        Return the beat division, or the durations that make up one beat,
-        as a list of :class:`~music21.duration.Duration` objects, if and only if
-        the TimeSignature has a uniform beat division for all beats.
-
-        >>> ts = meter.TimeSignature('3/4')
-        >>> ts.beatDivisionDurations
-        [<music21.duration.Duration 0.5>,
-         <music21.duration.Duration 0.5>]
-
-        >>> ts = meter.TimeSignature('6/8')
-        >>> ts.beatDivisionDurations
-        [<music21.duration.Duration 0.5>,
-         <music21.duration.Duration 0.5>,
-         <music21.duration.Duration 0.5>]
-        '''
-        post = []
-        if len(self.beatSequence) == 1:
-            raise TimeSignatureException(
-                'cannot determine beat division for a non-partitioned beat')
-        for mt in self.beatSequence._partition:
-            for subMt in mt:
-                post.append(subMt.duration.quarterLength)
-        if len(set(post)) == 1:  # all the same
-            out = []  # could be a Stream, but stream.py imports meter.py
-            for subMt in self.beatSequence[0]._partition:
-                out.append(subMt.duration)
-            return out
-        else:
-            raise TimeSignatureException(f'non uniform beat division: {post}')
-
-    @property
-    def beatSubDivisionDurations(self):
-        '''
-        Return a subdivision of the beat division, or a list
-        of :class:`~music21.duration.Duration` objects representing each beat division
-        divided by two.
-
-
-        >>> ts = meter.TimeSignature('3/4')
-        >>> ts.beatSubDivisionDurations
-        [<music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>,
-         <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>]
-
-        >>> ts = meter.TimeSignature('6/8')
-        >>> ts.beatSubDivisionDurations
-        [<music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>,
-         <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>,
-         <music21.duration.Duration 0.25>, <music21.duration.Duration 0.25>]
-        '''
-        post = []
-        src = self.beatDivisionDurations
-        for d in src:
-            post.append(d.augmentOrDiminish(0.5))
-            post.append(d.augmentOrDiminish(0.5))
-        return post
-
-    @property
-    def classification(self):
-        '''
-        Return the classification of this TimeSignature,
-        such as Simple Triple or Compound Quadruple.
-
-        >>> ts = meter.TimeSignature('3/4')
-        >>> ts.classification
-        'Simple Triple'
-        >>> ts = meter.TimeSignature('6/8')
-        >>> ts.classification
-        'Compound Duple'
-        >>> ts = meter.TimeSignature('4/32')
-        >>> ts.classification
-        'Simple Quadruple'
-        '''
-        return f'{self.beatDivisionCountName} {self.beatCountName}'
-
     # --------------------------------------------------------------------------
     # access data for other processing
-
     def getBeams(self, srcList, measureStartOffset=0.0):
         '''
         Given a qLen position and an iterable music21Objects, return a list of Beams object.
@@ -1256,7 +1281,6 @@ class TimeSignature(base.Music21Object):
         >>> beamList = fourFour.getBeams(nList)
         >>> print(beamList)
         [None, None, None, None, None, None]
-
 
         Pickup measure support included by taking in an additional measureStartOffset argument.
 
@@ -1382,7 +1406,6 @@ class TimeSignature(base.Music21Object):
                 else:
                     beamType = 'start'
 
-
             # last beams was active, last beamNumber was active,
             # and it was stopped or was a partial-left
             elif (beamPrevious is not None
@@ -1475,20 +1498,20 @@ class TimeSignature(base.Music21Object):
             # create a new object; it will not be linked
             self.displaySequence = MeterSequence(value, partitionRequest)
 
-    def getAccent(self, qLenPos):
-        '''Return True or False if the qLenPos is at the start of an accent
+    def getAccent(self, qLenPos: float) -> bool:
+        '''
+        Return True or False if the qLenPos is at the start of an accent
         division.
-
 
         >>> a = meter.TimeSignature('3/4', 3)
         >>> a.accentSequence.partition([2, 1])
         >>> a.accentSequence
         <music21.meter.core.MeterSequence {2/4+1/4}>
-        >>> a.getAccent(0)
+        >>> a.getAccent(0.0)
         True
-        >>> a.getAccent(1)
+        >>> a.getAccent(1.0)
         False
-        >>> a.getAccent(2)
+        >>> a.getAccent(2.0)
         True
         '''
         pos = 0
@@ -1649,7 +1672,7 @@ class TimeSignature(base.Music21Object):
         # might store this weight every time it is set, rather than
         # getting it here
         minWeight = min(
-            [mt.weight for mt in self.accentSequence._partition]) * 0.5
+            [mt.weight for mt in self.accentSequence]) * 0.5
         msLevel = self.accentSequence.getLevel(level)
 
         if permitMeterModulus:
@@ -1706,7 +1729,7 @@ class TimeSignature(base.Music21Object):
         else:
             endOffset = self.barDuration.quarterLength
             o = 0.0
-            for ms in self.beatSequence._partition:
+            for ms in self.beatSequence:
                 o = opFrac(o + ms.duration.quarterLength)
                 if o >= endOffset:
                     return post  # do not add offset for end of bar
