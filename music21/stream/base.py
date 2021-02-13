@@ -2777,13 +2777,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         def processContainer(container: Stream):
             replacements: List[note.GeneralNote] = []
-            for noteObj in container.getElementsByClass('GeneralNote'):
-                if noteObj.duration.type != 'complex':
+            for complexObj in container.getElementsNotOfClass(['Stream', 'Variant', 'Spanner']):
+                if complexObj.duration.type != 'complex':
                     continue
-                insertPoint = noteObj.offset
-                objList = noteObj.splitAtDurations()
+                insertPoint = complexObj.offset
+                objList = complexObj.splitAtDurations()
 
-                container.replace(noteObj, objList[0])
+                container.replace(complexObj, objList[0])
                 insertPoint += objList[0].quarterLength
 
                 for subsequent in objList[1:]:
@@ -2794,11 +2794,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     replacements.append(replacement)
 
                 # Replace elements in spanners
-                for sp in noteObj.getSpannerSites():
-                    if sp.getFirst() is noteObj:
-                        sp.replaceSpannedElement(noteObj, objList[0])
-                    if sp.getLast() is noteObj:
-                        sp.replaceSpannedElement(noteObj, objList[-1])
+                for sp in complexObj.getSpannerSites():
+                    if sp.getFirst() is complexObj:
+                        sp.replaceSpannedElement(complexObj, objList[0])
+                    if sp.getLast() is complexObj:
+                        sp.replaceSpannedElement(complexObj, objList[-1])
 
             if replacements:
                 post[container] = replacements
