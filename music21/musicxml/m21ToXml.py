@@ -2847,7 +2847,7 @@ class MeasureExporter(XMLExporterBase):
             if className in classes:
                 meth = getattr(self, methName)
                 for o in objList:
-                    meth(obj)
+                    meth(o)
                 parsedObject = True
                 break
 
