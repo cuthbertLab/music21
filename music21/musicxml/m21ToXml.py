@@ -373,6 +373,8 @@ class GeneralObjectExporter:
         if obj is None:
             obj = self.generalObj
         outObj = self.fromGeneralObject(obj)
+        if 'Stream' in outObj.classes:
+            unused_tuple = outObj.splitAtDurations(recurse=True)
         # TODO: set whether to do an additional score copy in submethods.
         return self.parseWellformedObject(outObj)
 
@@ -2826,11 +2828,26 @@ class MeasureExporter(XMLExporterBase):
         if 'GeneralNote' in classes:
             self.offsetInMeasure += obj.duration.quarterLength
 
+        # turn inexpressible durations into complex durations (unless unlinked)
+        if obj.duration.type == 'inexpressible':
+            obj.duration.quarterLength = obj.duration.quarterLength
+
+        # make dotGroups into normal notes
+        if len(obj.duration.dotGroups) > 1:
+            obj.duration.splitDotGroups(inPlace=True)
+
+        # Last-chance opportunity to split durations (e.g. if not found in a parent stream)
+        if 'GeneralNote' in classes and obj.duration.type == 'complex':
+            objList = obj.splitAtDurations()
+        else:
+            objList = [obj]
+
         parsedObject = False
         for className, methName in self.classesToMethods.items():
             if className in classes:
                 meth = getattr(self, methName)
-                meth(obj)
+                for o in objList:
+                    meth(obj)
                 parsedObject = True
                 break
 

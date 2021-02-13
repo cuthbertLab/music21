@@ -6320,7 +6320,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                      refStreamOrTimeRange=None,
                      inPlace=False,
                      bestClef=False,
-                     splitAtDurations=True,
                      **subroutineKeywords):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare
@@ -6333,7 +6332,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         makeAccidentalsKeywords can be a dict specifying additional
         parameters to send to makeAccidentals
 
-
         >>> s = stream.Stream()
         >>> n = note.Note('g')
         >>> n.quarterLength = 1.5
@@ -6343,9 +6341,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         4
         >>> sMeasures.getElementsByClass('Measure').last().rightBarline.type
         'final'
-
-        Added in v7 -- `splitAtDurations` keyword runs Stream.splitAtDurations()
-        TODO: doctest
         '''
         # determine what is the object to work on first
         if inPlace:
@@ -6363,31 +6358,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             insert=not inPlace,
             # definitely do NOT put a constrainingSpannerBundle constraint
         )
-
-        notesWithSplitDurations: List[note.GeneralNote] = []
-        if splitAtDurations:
-            for container in returnStream.recurse(includeSelf=True, classFilter=('Stream')):
-                for noteObj in container.getElementsByClass('GeneralNote'):
-                    # turn inexpressible durations into complex durations (unless unlinked)
-                    if noteObj.duration.type == 'inexpressible':
-                        noteObj.duration.quarterLength = noteObj.duration.quarterLength
-
-                    # make dotGroups into normal notes
-                    if len(noteObj.duration.dotGroups) > 1:
-                        noteObj.duration.splitDotGroups(inPlace=True)
-                        # TODO: QUESTION(JTW): also need to replace/insert these?
-
-                    # split at durations
-                    if noteObj.duration.type == 'complex':
-                        insertPoint = noteObj.offset
-                        objList = noteObj.splitAtDurations()
-                        container.replace(noteObj, objList[0])
-                        insertPoint += objList[0].quarterLength
-                        for subsequent in objList[1:]:
-                            container.insert(insertPoint, subsequent)
-                            insertPoint += subsequent.quarterLength
-
-                        notesWithSplitDurations += objList
 
         # only use inPlace arg on first usage
         if not self.hasMeasures():
