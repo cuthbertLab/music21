@@ -2805,7 +2805,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         post = {}
 
-        # Handle "loose" GeneralNotes in self (usually just Measure or Voice)
+        # Handle "loose" objects in self (usually just Measure or Voice)
         processContainer(self)
         # Handle inner streams
         if recurse:
