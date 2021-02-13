@@ -27,17 +27,7 @@ from music21.meter import tools
 
 environLocal = environment.Environment('meter.core')
 
-
-# performance tests showed that caching this additional structures did not
-# show immediate performance benefits
-# _meterSequenceBeatArchetypes = {}
-# _meterSequenceBeamArchetypes = {}
-# store meter sequence division options, once created, in a module
-# level dictionary
-_meterSequenceDivisionOptions = {}
-
 # -----------------------------------------------------------------------------
-
 
 class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     '''
@@ -585,7 +575,7 @@ class MeterSequence(MeterTerminal):
         # clear cache
         self._levelListCache = {}
 
-    def _getOptions(self):
+    def getPartitionOptions(self) -> tools.MeterOptions:
         '''
         Return either a cached or a new set of division/partition options.
 
@@ -594,38 +584,32 @@ class MeterSequence(MeterTerminal):
 
         Works on anything that has a .numerator and .denominator.
 
-        >>> meter.MeterSequence('3/4')._getOptions()
-        [['1/4', '1/4', '1/4'],
-         ['1/8', '1/8', '1/8', '1/8', '1/8', '1/8'],
-         ['1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16',
-          '1/16', '1/16', '1/16', '1/16', '1/16'],
-         ['3/4'], ['6/8'], ['12/16'], ['24/32'], ['48/64'], ['96/128']]
+        >>> meter.MeterSequence('3/4').getPartitionOptions()
+        (('1/4', '1/4', '1/4'),
+         ('1/8', '1/8', '1/8', '1/8', '1/8', '1/8'),
+         ('1/16', '1/16', '1/16', '1/16', '1/16', '1/16', '1/16',
+          '1/16', '1/16', '1/16', '1/16', '1/16'),
+         ('3/4',), ('6/8',), ('12/16',), ('24/32',), ('48/64',), ('96/128',))
 
         The additional 2 + 2 + 1 and 2 + 1 + 2 options for numerator 5 are at the end.
 
-        >>> meter.MeterSequence('5/32')._getOptions()
-        [['2/32', '3/32'],
-         ['3/32', '2/32'],
-         ['1/32', '1/32', '1/32', '1/32', '1/32'],
-         ['1/64', '1/64', '1/64', '1/64', '1/64',
-          '1/64', '1/64', '1/64', '1/64', '1/64'],
-         ['5/32'], ['10/64'], ['20/128'],
-         ['2/32', '2/32', '1/32'], ['2/32', '1/32', '2/32']]
+        >>> meter.MeterSequence('5/32').getPartitionOptions()
+        (('2/32', '3/32'),
+         ('3/32', '2/32'),
+         ('1/32', '1/32', '1/32', '1/32', '1/32'),
+         ('1/64', '1/64', '1/64', '1/64', '1/64',
+          '1/64', '1/64', '1/64', '1/64', '1/64'),
+         ('5/32',), ('10/64',), ('20/128',),
+         ('2/32', '2/32', '1/32'), ('2/32', '1/32', '2/32'))
         '''
         # all-string python dictionaries are optimized; use string key
         n = int(self.numerator)
         d = int(self.denominator)
-        tsStr = f'{n}/{d}'
-        try:
-            # return a stored, cached value
-            return _meterSequenceDivisionOptions[tsStr]
-        except KeyError:
-            opts = []
-            opts += tools.divisionOptionsAlgo(n, d)
-            opts += tools.divisionOptionsPreset(n, d)
-            # store for access later
-            _meterSequenceDivisionOptions[tsStr] = opts
-        return opts
+        opts = []
+        opts.extend(list(tools.divisionOptionsAlgo(n, d)))
+        opts.extend(list(tools.divisionOptionsPreset(n, d)))
+        # store for access later
+        return tuple(opts)
 
     # -------------------------------------------------------------------------
 
@@ -675,7 +659,7 @@ class MeterSequence(MeterTerminal):
         music21.exceptions21.MeterException: Cannot set partition by 11 (5/8)
 
         '''
-        opts = self._getOptions()
+        opts = self.getPartitionOptions()
         optMatch = None
         # get the first encountered load string with the desired
         # number of beats
@@ -763,7 +747,7 @@ class MeterSequence(MeterTerminal):
 
         # last resort: search options
         else:
-            opts = self._getOptions()
+            opts = self.getPartitionOptions()
             optMatch = None
             for opt in opts:
                 # get numerators as numbers
@@ -824,7 +808,6 @@ class MeterSequence(MeterTerminal):
         A simple way to partition based on argument time. Single integers
         are treated as beat counts; lists are treated as numerator lists;
         MeterSequence objects are partitioned by calling partitionByOtherMeterSequence().
-
 
         >>> a = meter.MeterSequence('5/4+3/8')
         >>> len(a)
@@ -1189,11 +1172,11 @@ class MeterSequence(MeterTerminal):
         This should only be called internally, as MeterSequences
         are supposed to be immutable (mostly)
         '''
-        fList = [(mt.numerator, mt.denominator) for mt in self._partition]
+        fTuple = tuple((mt.numerator, mt.denominator) for mt in self._partition)
         # clear first to avoid partial updating
         # can only set to private attributes
         # self._numerator, self._denominator = None, 1
-        self._numerator, self._denominator = tools.fractionSum(fList)
+        self._numerator, self._denominator = tools.fractionSum(fTuple)
         # must call ratio changed directly as not using properties
         self._ratioChanged()
 
