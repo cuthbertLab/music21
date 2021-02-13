@@ -2778,26 +2778,27 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         def processContainer(container: Stream):
             replacements: List[note.GeneralNote] = []
             for noteObj in container.getElementsByClass('GeneralNote'):
-                if noteObj.duration.type == 'complex':
-                    insertPoint = noteObj.offset
-                    objList = noteObj.splitAtDurations()
+                if noteObj.duration.type != 'complex':
+                    continue
+                insertPoint = noteObj.offset
+                objList = noteObj.splitAtDurations()
 
-                    container.replace(noteObj, objList[0])
-                    insertPoint += objList[0].quarterLength
+                container.replace(noteObj, objList[0])
+                insertPoint += objList[0].quarterLength
 
-                    for subsequent in objList[1:]:
-                        container.insert(insertPoint, subsequent)
-                        insertPoint += subsequent.quarterLength
+                for subsequent in objList[1:]:
+                    container.insert(insertPoint, subsequent)
+                    insertPoint += subsequent.quarterLength
 
-                    for replacement in objList:
-                        replacements.append(replacement)
+                for replacement in objList:
+                    replacements.append(replacement)
 
-                    # Replace elements in spanners
-                    for sp in noteObj.getSpannerSites():
-                        if sp.getFirst() is noteObj:
-                            sp.replaceSpannedElement(noteObj, objList[0])
-                        if sp.getLast() is noteObj:
-                            sp.replaceSpannedElement(noteObj, objList[-1])
+                # Replace elements in spanners
+                for sp in noteObj.getSpannerSites():
+                    if sp.getFirst() is noteObj:
+                        sp.replaceSpannedElement(noteObj, objList[0])
+                    if sp.getLast() is noteObj:
+                        sp.replaceSpannedElement(noteObj, objList[-1])
 
             if replacements:
                 post[container] = replacements
