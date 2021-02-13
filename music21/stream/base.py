@@ -2713,13 +2713,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         replaceDerived()
 
-
     def splitAtDurations(self, *, recurse=False) -> base._SplitTuple:
         '''
         Overrides base method :meth:`~music21.base.Music21Object.splitAtDurations`
-        so that once each note or rest in the stream having a complex duration is split
+        so that once each element in the stream having a complex duration is split
         into similar, shorter elements representing each duration component,
-        the original GeneralNote is actually replaced in the stream where it was found
+        the original element is actually replaced in the stream where it was found
         with those new elements.
 
         Returns a 1-tuple containing itself, for consistency with the superclass method.
