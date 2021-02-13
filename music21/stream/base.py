@@ -6479,11 +6479,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if not measureStream.streamStatus.beams:
             try:
                 measureStream.makeBeams(inPlace=True)
-            except (StreamException, meter.MeterException):
-                # this is a result of makeMeasures not getting everything
-                # note to measure allocation right
-                # environLocal.printDebug(['skipping makeBeams exception', StreamException])
-                pass
+            except meter.MeterException as me:
+                environLocal.warn(['skipping makeBeams exception', me])
 
         # note: this needs to be after makeBeams, as placing this before
         # makeBeams was causing the duration's tuplet to lose its type setting
@@ -12356,13 +12353,7 @@ class Measure(Stream):
 
         # environLocal.printDebug(['have time signature', m.timeSignature])
         if m.streamStatus.beams is False:
-            try:
-                m.makeBeams(inPlace=True)
-            except StreamException:
-                # this is a result of makeMeasures not getting everything
-                # note to measure allocation right
-                pass
-                # environLocal.printDebug(['skipping makeBeams exception', StreamException])
+            m.makeBeams(inPlace=True)
         if m.streamStatus.haveTupletBracketsBeenMade() is False:
             makeNotation.makeTupletBrackets(m, inPlace=True)
 
