@@ -1098,19 +1098,6 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     >>> s = converter.parse("2/16 E4 r f# g=lastG trip{b-8 a g} c", format='tinyNotation').flat
     >>> s.getElementsByClass(meter.TimeSignature).first()
     <music21.meter.TimeSignature 2/16>
-
-    .. tip::
-
-        Unlike musicxml, MIDI files are unmeasured. Call :meth:`~music21.stream.Stream.makeNotation`
-        on the parsed result if you wish measures to be created before further manipulation.
-
-        Save the result of `makeNotation`, or use `inPlace=True`::
-
-            unmeasuredStream = converter.parse('/Users/you/Desktop/source.mid')
-            measuredStream = unmeasuredStream.makeNotation()
-
-        This is particularly important when writing formats that do not run `makeNotation` as
-        a convenience during the export (musicxml does; lilypond doesn't.)
     '''
     # environLocal.printDebug(['attempting to parse()', value])
     if 'forceSource' in keywords:
@@ -1691,10 +1678,11 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 2)
         self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 4)
 
-        self.assertEqual(len(s.flat.getElementsByClass(meter.TimeSignature)), 0)
+        # MIDI import makes measures, so we will have one 4/4 time sig
+        self.assertEqual(len(s.flat.getElementsByClass(meter.TimeSignature)), 1)
         self.assertEqual(len(s.flat.getElementsByClass(key.KeySignature)), 0)
 
-        # this sample has eight note triplets
+        # this sample has eighth note triplets
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test06.mid'
         s = parseFile(fp)
         # s.show()
