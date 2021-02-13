@@ -2780,9 +2780,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <music21.duration.Duration 4.0>
         >>> s3.spanners.first().getLast().duration
         <music21.duration.Duration 1.0>
-
-        New in v.7 -- No longer splits durations on the stream itself,
-        e.g. a 5.0QL stream is no longer split into 4.0QL and 1.0QL streams.
         '''
 
         def processContainer(container: Stream):
