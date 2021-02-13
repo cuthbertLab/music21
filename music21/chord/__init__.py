@@ -479,7 +479,7 @@ class Chord(note.NotRest):
         self._notes[keyIndex] = value
 
     def __iter__(self):
-        return common.Iterator(self._notes)
+        return iter(self._notes)
 
     def __len__(self):
         '''

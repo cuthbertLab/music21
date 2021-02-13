@@ -62,6 +62,7 @@ from music21.sites import SitesException
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
+from music21.common.types import OffsetQL, OffsetQLIn
 from music21 import style  # pylint: disable=unused-import
 from music21 import sites
 from music21 import environment
@@ -709,7 +710,7 @@ class Music21Object(prebase.ProtoM21Object):
     # convenience.  used to be in note.Note, but belongs everywhere:
 
     @property
-    def quarterLength(self) -> Union[float, fractions.Fraction]:
+    def quarterLength(self) -> OffsetQL:
         '''
         Set or Return the Duration as represented in Quarter Length, possibly as a fraction.
 
@@ -724,7 +725,7 @@ class Music21Object(prebase.ProtoM21Object):
         return self.duration.quarterLength
 
     @quarterLength.setter
-    def quarterLength(self, value: Union[int, float, fractions.Fraction]):
+    def quarterLength(self, value: OffsetQLIn):
         self.duration.quarterLength = value
 
     @property
@@ -2741,6 +2742,7 @@ class Music21Object(prebase.ProtoM21Object):
     def splitAtQuarterLength(
         self,
         quarterLength,
+        *,
         retainOrigin=True,
         addTies=True,
         displayTiedAccidentals=False
@@ -2853,6 +2855,8 @@ class Music21Object(prebase.ProtoM21Object):
         Traceback (most recent call last):
         music21.duration.DurationException: cannot split a duration (0.5)
             at this quarterLength (7/10)
+
+        Changed in v7. -- all but quarterLength are keyword only
         '''
         # needed for temporal manipulations; not music21 objects
         from music21 import tie
@@ -3263,6 +3267,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> [n._getMeasureOffset(includeMeasurePadding=False) for n in m.notes]
         [0.0, 0.5, 1.0, 1.5]
         '''
+        # TODO: v7 -- expose as public.
         activeS = self.activeSite
         if activeS is not None and activeS.isMeasure:
             # environLocal.printDebug(['found activeSite as Measure, using for offset'])

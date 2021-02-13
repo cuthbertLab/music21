@@ -11,7 +11,7 @@
 # ------------------------------------------------------------------------------
 '''
 This file makes it easier to access Bach's chorales through various
-numbering schemes and filters and includes the Iterator()
+numbering schemes and filters and includes the corpus.chorales.Iterator()
 class for easily iterating through the chorale collection.
 '''
 
@@ -28,7 +28,7 @@ environLocal = environment.Environment(_MOD)
 class ChoraleList:
     # noinspection SpellCheckingInspection
     '''
-    A searchable list of BachChorales by various numbering systems:
+    A searchable list of Bach's chorales by various numbering systems:
 
     Note that multiple chorales share the same title, so it's best to
     iterate over one of the other lists to get them all.
@@ -491,7 +491,7 @@ class ChoraleList:
 class ChoraleListRKBWV:
     # noinspection SpellCheckingInspection
     '''
-    A searchable list of BachChorales by various numbering systems:
+    A searchable list of Bach's chorales by various numbering systems:
 
     Note that multiple chorales share the same title, so it's best to
     iterate over one of the other lists to get them all.
@@ -951,7 +951,7 @@ class Iterator:
     change the range values to span the entire numberList.
     The iterator can be initialized with three parameters
     (currentNumber, highestNumber, numberingSystem). For example
-    BachChoraleIterator(1, 26,'riemenschneider') iterates
+    corpus.chorales.Iterator(1, 26,'riemenschneider') iterates
     through the riemenschneider numbered chorales from 1 to 26.
     Additionally, the following kwargs can be set:
 
@@ -1078,10 +1078,11 @@ class Iterator:
         and returnType = 'stream'
 
         Notes:
-        Two BachChoraleList objects are created. These should probably
+
+        Two ChoraleList objects are created. These should probably
         be consolidated, but they contain
         different information at this time. Also, there are problems
-        with entries in BachChoraleListRKBWV
+        with entries in ChoraleListRKBWV
         that need to be addressed. Namely, chorales that share the
         same key (and thus overwrite each other)
         and chorales that do not appear to be in the corpus at all.

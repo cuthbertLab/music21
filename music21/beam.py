@@ -75,7 +75,6 @@ To get rid of beams on a note do:
 
 import unittest
 
-from music21 import common
 from music21 import exceptions21
 from music21 import duration
 from music21 import environment
@@ -220,7 +219,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     # SPECIAL METHODS #
 
     def __iter__(self):
-        return common.Iterator(self.beamsList)
+        return iter(self.beamsList)
 
     def __len__(self):
         return len(self.beamsList)

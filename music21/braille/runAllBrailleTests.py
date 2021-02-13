@@ -26,7 +26,7 @@ from music21 import braille
 
 current_executable = sys.executable
 
-def runTest():
+def runTest():  # pragma: no cover
     savedStderr = sys.stderr
     totalTests = 0
     hadError = False

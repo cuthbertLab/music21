@@ -57,8 +57,8 @@ document.
 >>> from music21 import *
 >>> conv = mei.MeiToM21Converter(meiString)
 >>> result = conv.run()
->>> type(result)
-<class 'music21.stream.Score'>
+>>> result
+<music21.stream.Score 0x10ee474f0>
 
 **Terminology**
 
@@ -3517,3 +3517,6 @@ _DOC_ORDER = [
     tupletFromElement,
 ]
 
+if __name__ == '__main__':
+    import music21
+    music21.mainTest()
