@@ -6432,6 +6432,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         measureStream = returnStream.getElementsByClass('Measure').stream()
         # environLocal.printDebug(['Stream.makeNotation(): post makeMeasures,
         #   length', len(returnStream)])
+        if not measureStream:
+            raise StreamException(
+                f'no measures found in stream with {len(self)} elements')
 
         # for now, calling makeAccidentals once per measures
         # pitches from last measure are passed
@@ -6468,22 +6471,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     tiePitchSet=tiePitchSet,
                     inPlace=True,
                     **srkCopy)
-        # environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
-        try:
-            measureStream.makeTies(meterStream, inPlace=True)
-        except StreamException as e:
-            strE = str(e)
-            environLocal.warn('StreamException: makeTies: ' + strE)
+
+        measureStream.makeTies(meterStream, inPlace=True)
 
         # measureStream.makeBeams(inPlace=True)
         if not measureStream.streamStatus.beams:
             try:
                 measureStream.makeBeams(inPlace=True)
-            except (StreamException, meter.MeterException):
-                # this is a result of makeMeasures not getting everything
-                # note to measure allocation right
-                # environLocal.printDebug(['skipping makeBeams exception', StreamException])
-                pass
+            except meter.MeterException as me:
+                environLocal.warn(['skipping makeBeams exception', me])
 
         # note: this needs to be after makeBeams, as placing this before
         # makeBeams was causing the duration's tuplet to lose its type setting
@@ -6492,12 +6488,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for m in measureStream:
             if m.streamStatus.haveTupletBracketsBeenMade() is False:
                 makeNotation.makeTupletBrackets(m, inPlace=True)
-
-        if not measureStream:
-            raise StreamException(
-                f'no measures found in stream with {len(self)} elements')
-        # environLocal.printDebug(['Stream.makeNotation(): created measures:',
-        #   len(measureStream)])
 
         return returnStream
 
@@ -12356,13 +12346,7 @@ class Measure(Stream):
 
         # environLocal.printDebug(['have time signature', m.timeSignature])
         if m.streamStatus.beams is False:
-            try:
-                m.makeBeams(inPlace=True)
-            except StreamException:
-                # this is a result of makeMeasures not getting everything
-                # note to measure allocation right
-                pass
-                # environLocal.printDebug(['skipping makeBeams exception', StreamException])
+            m.makeBeams(inPlace=True)
         if m.streamStatus.haveTupletBracketsBeenMade() is False:
             makeNotation.makeTupletBrackets(m, inPlace=True)
 
