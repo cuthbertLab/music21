@@ -18,6 +18,8 @@ import collections
 import re
 import unittest
 
+from typing import Optional
+
 from music21 import base
 from music21 import chord
 from music21 import common
@@ -2247,6 +2249,25 @@ class ChordSymbol(Harmony):
             return False
         else:
             return False
+
+    def transpose(self, value, *, inPlace=False) -> Optional['harmony.ChordSymbol']:
+        '''
+        Overrides :meth:`~music21.chord.Chord.transpose` so that this ChordSymbol's
+        `figure` is appropriately cleared afterward.
+
+        >>> cs = harmony.ChordSymbol('Am')
+        >>> cs.transpose(1)
+        <music21.harmony.ChordSymbol B-m>
+        >>> cs.transpose(5, inPlace=True)
+        >>> cs
+        <music21.harmony.ChordSymbol Dm>
+        '''
+        post = super().transpose(value, inPlace=inPlace)
+        if not inPlace:
+            post.figure = None
+            return post
+        else:
+            self.figure = None
 
 
 class NoChord(ChordSymbol):

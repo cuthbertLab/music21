@@ -3857,7 +3857,7 @@ class Chord(note.NotRest):
 
     def transpose(self, value, *, inPlace=False):
         '''
-        Transpose the Note by the user-provided value. If the value
+        Transpose the Chord by the user-provided value. If the value
         is an integer, the transposition is treated in half steps and
         enharmonics might be simplified (not done yet). If the value is a
         string, any Interval string specification can be provided.
