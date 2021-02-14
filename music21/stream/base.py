@@ -4884,6 +4884,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return post
 
     def getInstruments(self,
+                       *,
                        searchActiveSite=True,
                        returnDefault=True,
                        recurse=False) -> 'music21.stream.Stream':
@@ -4950,6 +4951,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return post
 
     def getInstrument(self,
+                      *,
                       searchActiveSite=True,
                       returnDefault=True) -> Optional['music21.instrument.Instrument']:
         '''
