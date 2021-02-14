@@ -416,6 +416,9 @@ class GeneralObjectExporter:
                 + f'{self.generalObj} to a complete musicXML document; put it in a Stream first!'
             )
         unused_tuple = outObj.splitAtDurations(recurse=True)
+        for container in outObj.recurse(includeSelf=True, streamsOnly=True):
+            # TODO: check if tuplet brackets need to be re-made on the basis of duration splitting
+            pass
         return outObj
 
     def fromScore(self, sc):
@@ -2835,7 +2838,9 @@ class MeasureExporter(XMLExporterBase):
         if len(obj.duration.dotGroups) > 1:
             obj.duration.splitDotGroups(inPlace=True)
 
-        # Last-chance opportunity to split durations (e.g. if not found in a parent stream)
+        # Last-chance opportunity to split durations if complex
+        # e.g. if just converted here from inexpressible
+        # Otherwise this is done in fromGeneralObject()
         if 'GeneralNote' in classes and obj.duration.type == 'complex':
             objList = obj.splitAtDurations()
         else:
