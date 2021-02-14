@@ -1877,10 +1877,6 @@ def midiTrackToStream(
         n.midiTickStart = notes[i][0][0]
         s.coreInsert(o, n)
 
-    else:
-        # Conductor track
-        return s
-
     s.coreElementsChanged()
     # quantize to nearest 16th
     if quantizePost:
@@ -1889,6 +1885,11 @@ def midiTrackToStream(
                    processDurations=True,
                    inPlace=True,
                    recurse=False)  # shouldn't be any substreams yet
+
+    if not notes:
+        # Conductor track doesn't need measures made
+        # It's an intermediate result only -- not provided to user
+        return s
 
     s.makeMeasures(inPlace=True)
     for m in s.getElementsByClass(stream.Measure):
