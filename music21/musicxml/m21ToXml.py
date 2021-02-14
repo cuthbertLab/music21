@@ -373,8 +373,6 @@ class GeneralObjectExporter:
         if obj is None:
             obj = self.generalObj
         outObj = self.fromGeneralObject(obj)
-        if 'Stream' in outObj.classes:
-            unused_tuple = outObj.splitAtDurations(recurse=True)
         # TODO: set whether to do an additional score copy in submethods.
         return self.parseWellformedObject(outObj)
 
@@ -417,6 +415,7 @@ class GeneralObjectExporter:
                 'Cannot translate the object '
                 + f'{self.generalObj} to a complete musicXML document; put it in a Stream first!'
             )
+        unused_tuple = outObj.splitAtDurations(recurse=True)
         return outObj
 
     def fromScore(self, sc):
