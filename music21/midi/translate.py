@@ -1877,6 +1877,10 @@ def midiTrackToStream(
         n.midiTickStart = notes[i][0][0]
         s.coreInsert(o, n)
 
+    else:
+        # Conductor track
+        return s
+
     s.coreElementsChanged()
     # quantize to nearest 16th
     if quantizePost:
