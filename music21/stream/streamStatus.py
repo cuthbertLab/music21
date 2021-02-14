@@ -211,6 +211,10 @@ class StreamStatus(SlottedObjectMixin):
     def tuplets(self):
         if self._tuplets is None:
             self._tuplets = self.haveTupletBracketsBeenMade()
+            # If there were no tuplet durations,
+            # tuplet brackets don't need to be made.
+            if self._tuplets is None:
+                self._tuplets = True
         return self._tuplets
 
     @tuplets.setter
