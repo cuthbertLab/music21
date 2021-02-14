@@ -321,9 +321,9 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
             for partNumber in partNumberTuple:
                 if color is not None:
                     noteA = allParts[partNumber - 1].iter.getElementsByOffset(
-                        initOffsetA, initOffsetA, mustBeginInSpan=False)[0]
+                        initOffsetA, initOffsetA, mustBeginInSpan=False).first()
                     noteB = allParts[partNumber - 1].iter.getElementsByOffset(
-                        initOffsetB, initOffsetB, mustBeginInSpan=False)[0]
+                        initOffsetB, initOffsetB, mustBeginInSpan=False).first()
                     noteA.style.color = color
                     noteB.style.color = color
             if debug is True:

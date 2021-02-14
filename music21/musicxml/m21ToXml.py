@@ -6150,7 +6150,7 @@ class MeasureExporter(XMLExporterBase):
         if not instSubStream:
             return None
 
-        instSubObj = instSubStream[0]
+        instSubObj = instSubStream.first()
         if instSubObj.transposition is None:
             return None
         self.transpositionInterval = instSubObj.transposition

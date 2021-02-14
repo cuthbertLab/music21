@@ -836,10 +836,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         clefList = self.iter.getElementsByClass('Clef').getElementsByOffset(0)
         # casting to list added 20microseconds...
-        if not clefList:
-            return None
-        else:
-            return clefList[0]
+        return clefList.first()
 
     @clef.setter
     def clef(self, clefObj: Optional['music21.clef.Clef']):
@@ -904,10 +901,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # environLocal.printDebug([
         #    'matched Measure classes of type TimeSignature', tsList, len(tsList)])
         # only return timeSignatures at offset = 0.0
-        if not tsList:
-            return None
-        else:
-            return tsList[0]
+        return tsList.first()
 
     @timeSignature.setter
     def timeSignature(self, tsObj: Optional['music21.meter.TimeSignature']):
@@ -2049,7 +2043,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Chords can also be inserted into rests:
 
-        >>> s3.getElementsByOffset(2.0)[0]
+        >>> s3.getElementsByOffset(2.0).first()
         <music21.note.Rest rest>
         >>> s3.insertIntoNoteOrChord(2.0, chord.Chord('C4 E4 G#4'))
         >>> s3.show('text')
@@ -8223,10 +8217,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         mdList = self.getElementsByClass('Metadata')
         # only return metadata that has an offset = 0.0
         mdList = mdList.getElementsByOffset(0)
-        if not mdList:
-            return None
-        else:
-            return mdList[0]
+        return mdList.first()
 
     def _setMetadata(self, metadataObj):
         '''
@@ -13396,7 +13387,7 @@ class Score(Stream):
 
         # find greatest divisor for each measure at a time
         # if no measures this will be zero
-        mStream = returnObj.parts[0].getElementsByClass('Measure')
+        mStream = returnObj.parts.first().getElementsByClass('Measure')
         mCount = len(mStream)
         if mCount == 0:
             mCount = 1  # treat as a single measure
@@ -13598,7 +13589,7 @@ class Score(Stream):
         >>> len(post.flat.notes)
         165
         '''
-        post = self.parts[0].template(fillWithRests=False, retainVoices=False)
+        post = self.parts.first().template(fillWithRests=False, retainVoices=False)
         for i, m in enumerate(post.getElementsByClass('Measure')):
             for p in self.parts:
                 mNew = copy.deepcopy(p.getElementsByClass('Measure')[i]).flat
@@ -13761,7 +13752,7 @@ class Opus(Stream):
         mdNew = metadata.Metadata()
 
         for s in self.scores:
-            p = s.parts[0]  # assuming only one part
+            p = s.parts.first()  # assuming only one part
             sNew.insert(0, p)
 
             md = s.metadata

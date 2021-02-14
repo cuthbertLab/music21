@@ -3597,7 +3597,7 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test16.mid'
         s = converter.parse(fp)
         self.assertEqual(len(s.parts.first().measure(1).voices), 2)
-        els = s.parts[0].flat.getElementsByOffset(0.5)
+        els = s.parts.first().flat.getElementsByOffset(0.5)
         self.assertSequenceEqual([e.duration.quarterLength for e in els], [0, 1])
 
     def testRepeatsExpanded(self):
