@@ -613,6 +613,7 @@ def makeMeasures(
         if not match:
             if start == end == oMax:
                 post.storeAtEnd(e)
+                continue
             else:
                 raise stream.StreamException(
                     f'cannot place element {e} with start/end {start}/{end} within any measures')
