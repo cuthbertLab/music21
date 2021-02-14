@@ -6456,6 +6456,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 tiePitchSet.clear()
 
+        returnObj.streamStatus.accidentals = True
+
         if not inPlace:
             return returnObj
 
@@ -13014,6 +13016,9 @@ class Part(Stream):
                 cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
                 tiePitchSet=tiePitchSet,
             )
+
+        returnObj.streamStatus.accidentals = True
+
         if not inPlace:
             return returnObj
         else:  # in place
