@@ -2502,15 +2502,12 @@ class PartExporter(XMLExporterBase):
             outerTimeSignatures = part.getElementsByClass('TimeSignature')
             if outerTimeSignatures:
                 measureStream[0].timeSignature = outerTimeSignatures[0]
-        # see if accidentals/beams can be processed
-        if not measureStream.streamStatus.haveAccidentalsBeenMade():
+        # see if accidentals/beams/tuplets should be processed
+        if not measureStream.streamStatus.accidentals:
             measureStream.makeAccidentals(inPlace=True)
         if not measureStream.streamStatus.beams:
-            try:
-                measureStream.makeBeams(inPlace=True)
-            except exceptions21.StreamException:
-                pass
-        if measureStream.streamStatus.haveTupletBracketsBeenMade() is False:
+            measureStream.makeBeams(inPlace=True)
+        if not measureStream.streamStatus.tuplets:
             stream.makeNotation.makeTupletBrackets(measureStream, inPlace=True)
 
         if not self.spannerBundle:

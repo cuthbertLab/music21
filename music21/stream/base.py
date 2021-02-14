@@ -6469,7 +6469,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         other than None, this method returns True, regardless
         of if makeAccidentals has actually been run.
         '''
-        return self.streamStatus.haveAccidentalsBeenMade()
+        return self.streamStatus.accidentals
 
     def makeNotation(self,
                      meterStream=None,
@@ -6539,7 +6539,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # pitches from last measure are passed
         # this needs to be called before makeTies
         # note that this functionality is also placed in Part
-        if not measureStream.haveAccidentalsBeenMade():
+        if not measureStream.streamStatus.accidentals:
             ksLast = None
             srkCopy = subroutineKeywords.copy()
             if 'meterStream' in srkCopy:
@@ -6585,7 +6585,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # check for tuplet brackets one measure at a time
         # this means that they will never extend beyond one measure
         for m in measureStream:
-            if m.streamStatus.haveTupletBracketsBeenMade() is False:
+            if not m.streamStatus.tuplets:
                 makeNotation.makeTupletBrackets(m, inPlace=True)
 
         return returnStream
@@ -12444,9 +12444,9 @@ class Measure(Stream):
             m.timeSignature = ts  # a Stream; get the first element
 
         # environLocal.printDebug(['have time signature', m.timeSignature])
-        if m.streamStatus.beams is False:
+        if not m.streamStatus.beams:
             m.makeBeams(inPlace=True)
-        if m.streamStatus.haveTupletBracketsBeenMade() is False:
+        if not m.streamStatus.tuplets:
             makeNotation.makeTupletBrackets(m, inPlace=True)
 
         if not inPlace:
