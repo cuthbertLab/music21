@@ -2783,9 +2783,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
 
         def processContainer(container: Stream):
+            anyComplexObject: bool = False
             for complexObj in container.getElementsNotOfClass(['Stream', 'Variant', 'Spanner']):
                 if complexObj.duration.type != 'complex':
                     continue
+                anyComplexObject = True
+
                 insertPoint = complexObj.offset
                 objList = complexObj.splitAtDurations()
 
@@ -2802,6 +2805,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         sp.replaceSpannedElement(complexObj, objList[0])
                     if sp.getLast() is complexObj:
                         sp.replaceSpannedElement(complexObj, objList[-1])
+
+            # Redraw tuplet brackets
+            if anyComplexObject:
+                makeNotation.makeTupletBrackets(container, inPlace=True)
 
         # Handle "loose" objects in self (usually just Measure or Voice)
         processContainer(self)
