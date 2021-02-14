@@ -2713,6 +2713,105 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         replaceDerived()
 
+    def splitAtDurations(self, *, recurse=False) -> base._SplitTuple:
+        '''
+        Overrides base method :meth:`~music21.base.Music21Object.splitAtDurations`
+        so that once each element in the stream having a complex duration is split
+        into similar, shorter elements representing each duration component,
+        the original element is actually replaced in the stream where it was found
+        with those new elements.
+
+        Returns a 1-tuple containing itself, for consistency with the superclass method.
+
+        >>> s = stream.Stream()
+        >>> s.insert(note.Note(quarterLength=5.0))
+        >>> post = s.splitAtDurations()
+        >>> post
+        (<music21.stream.Stream 0x10955ceb0>,)
+        >>> [n.duration for n in s]
+        [<music21.duration.Duration 4.0>, <music21.duration.Duration 1.0>]
+
+        Unless `recurse=True`, notes in substreams will not be found.
+
+        >>> s2 = stream.Score()
+        >>> p = stream.Part([note.Note(quarterLength=5)])
+        >>> s2.append(p)
+        >>> s2.splitAtDurations()
+        (<music21.stream.Score 0x10d12f100>,)
+        >>> [n.duration for n in s2.recurse().notes]
+        [<music21.duration.Duration 5.0>]
+        >>> s2.splitAtDurations(recurse=True)
+        (<music21.stream.Score 0x10d12f100>,)
+        >>> [n.duration for n in s2.recurse().notes]
+        [<music21.duration.Duration 4.0>, <music21.duration.Duration 1.0>]
+
+        `recurse=True` should not be necessary to find elements in streams
+        without substreams, such as a loose Voice:
+
+        >>> v = stream.Voice([note.Note(quarterLength=5.5)])
+        >>> v.splitAtDurations()
+        (<music21.stream.Voice 0x106020430>,)
+        >>> [n.duration for n in v.notes]
+        [<music21.duration.Duration 4.0>, <music21.duration.Duration 1.5>]
+
+        But a Voice in a Measure (most common) will not be found without `recurse`:
+
+        >>> m = stream.Measure()
+        >>> v2 = stream.Voice([note.Note(quarterLength=5.25)])
+        >>> m.insert(v2)
+        >>> m.splitAtDurations()
+        (<music21.stream.Measure 0 offset=0.0>,)
+        >>> [n.duration for n in m.recurse().notes]
+        [<music21.duration.Duration 5.25>]
+
+        For any spanner containing the element being removed, the first or last of the
+        replacing components replaces the removed element
+        (according to whether it was first or last in the spanner.)
+
+        >>> s3 = stream.Stream()
+        >>> n1 = note.Note(quarterLength=5)
+        >>> n2 = note.Note(quarterLength=5)
+        >>> s3.append([n1, n2])
+        >>> s3.insert(0, spanner.Slur([n1, n2]))
+        >>> post = s3.splitAtDurations()
+        >>> s3.spanners.first().getFirst() is n1
+        False
+        >>> s3.spanners.first().getFirst().duration
+        <music21.duration.Duration 4.0>
+        >>> s3.spanners.first().getLast().duration
+        <music21.duration.Duration 1.0>
+        '''
+
+        def processContainer(container: Stream):
+            for complexObj in container.getElementsNotOfClass(['Stream', 'Variant', 'Spanner']):
+                if complexObj.duration.type != 'complex':
+                    continue
+                insertPoint = complexObj.offset
+                objList = complexObj.splitAtDurations()
+
+                container.replace(complexObj, objList[0])
+                insertPoint += objList[0].quarterLength
+
+                for subsequent in objList[1:]:
+                    container.insert(insertPoint, subsequent)
+                    insertPoint += subsequent.quarterLength
+
+                # Replace elements in spanners
+                for sp in complexObj.getSpannerSites():
+                    if sp.getFirst() is complexObj:
+                        sp.replaceSpannedElement(complexObj, objList[0])
+                    if sp.getLast() is complexObj:
+                        sp.replaceSpannedElement(complexObj, objList[-1])
+
+        # Handle "loose" objects in self (usually just Measure or Voice)
+        processContainer(self)
+        # Handle inner streams
+        if recurse:
+            for innerStream in self.recurse(includeSelf=False, streamsOnly=True):
+                processContainer(innerStream)
+
+        return base._SplitTuple((self,))
+
     def splitAtQuarterLength(self,
                              quarterLength,
                              *,
