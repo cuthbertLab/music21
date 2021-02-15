@@ -1764,18 +1764,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         # this update will not be necessary
         self._quarterLengthNeedsUpdating = False
         if self.linked:
-            try:
-                qlc = quarterConversion(self._qtrLength)
-                self.components = list(qlc.components)
-                if qlc.tuplet is not None:
-                    self.tuplets = (qlc.tuplet,)
-            except DurationException:
-                environLocal.printDebug([
-                    'problem updating components of note with quarterLength ',
-                    self.quarterLength,
-                    'chokes quarterLengthToDurations'
-                ])
-                raise
+            qlc = quarterConversion(self._qtrLength)
+            self.components = list(qlc.components)
+            if qlc.tuplet is not None:
+                self.tuplets = (qlc.tuplet,)
         self._componentsNeedUpdating = False
 
     # PUBLIC METHODS #
