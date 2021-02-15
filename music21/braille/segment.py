@@ -240,18 +240,23 @@ class BrailleElementGrouping(ProtoM21Object):
         of each object in the BrailleElementGrouping.
         '''
         allObjects = []
+        previous_was_voice: bool = False
         for obj in self:
             if isinstance(obj, stream.Voice):
+                if previous_was_voice:
+                    allObjects.append(f"full inaccord {lookup.symbols['full_inaccord']}")
                 for obj2 in obj:
                     try:
                         allObjects.append('\n'.join(obj2.editorial.brailleEnglish))
                     except (AttributeError, TypeError):
                         allObjects.append(str(obj2))
+                previous_was_voice = True
             else:
                 try:
                     allObjects.append('\n'.join(obj.editorial.brailleEnglish))
                 except (AttributeError, TypeError):
                     allObjects.append(str(obj))
+                previous_was_voice = False
         if self.numRepeats > 0:
             allObjects.append(f'** Grouping x {self.numRepeats + 1} **')
         if self.withHyphen is True:
@@ -470,8 +475,8 @@ class BrailleSegment(text.BrailleText):
                 self.extractSignatureGrouping()  # Signature(s) Grouping
             elif cgkAffinityGroup == Affinity.LONG_TEXTEXPR:
                 self.extractLongExpressionGrouping()  # Long Expression(s) Grouping
-            # elif cgkAffinityGroup == Affinity.INACCORD:
-            #     self.extractInaccordGrouping()  # In Accord Grouping
+            elif cgkAffinityGroup == Affinity.INACCORD:
+                self.extractInaccordGrouping()  # In Accord Grouping
             elif cgkAffinityGroup == Affinity.TTEXT:
                 self.extractTempoTextGrouping()  # Tempo Text Grouping
             # noinspection PyAttributeOutsideInit
@@ -589,17 +594,27 @@ class BrailleSegment(text.BrailleText):
             self.addHeading(brailleHeading)
 
 
-    # def extractInaccordGrouping(self):
-    #     inaccords = self._groupingDict.get(self.currentGroupingKey)
-    #     voice_trans = []
-    #     for music21Voice in inaccords:
-    #         noteGrouping = extractBrailleElements(music21Voice)
-    #         noteGrouping.descendingChords = inaccords.descendingChords
-    #         noteGrouping.showClefSigns = inaccords.showClefSigns
-    #         noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
-    #         voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
-    #     brailleInaccord = symbols['full_inaccord'].join(voice_trans)
-    #     self.addInaccord(brailleInaccord)
+    def extractInaccordGrouping(self):
+        inaccords = self._groupingDict.get(self.currentGroupingKey)
+        last_clef: Optional[clef.Clef] = None
+        seen_voice: bool = False
+        for music21VoiceOrClef in inaccords:
+            if isinstance(music21VoiceOrClef, clef.Clef):
+                last_clef = music21VoiceOrClef
+                continue
+            if not isinstance(music21VoiceOrClef, stream.Voice):
+                environRules.warn(f'{music21VoiceOrClef} is neither a voice nor clef; ignoring!')
+            noteGrouping = extractBrailleElements(music21VoiceOrClef)
+            if last_clef:
+                noteGrouping.insert(0, last_clef)
+                last_clef = None
+            noteGrouping.descendingChords = inaccords.descendingChords
+            noteGrouping.showClefSigns = inaccords.showClefSigns
+            noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
+            brailleInaccord = symbols['full_inaccord'] if seen_voice else ''
+            brailleInaccord += ngMod.transcribeNoteGrouping(noteGrouping)
+            self.addInaccord(brailleInaccord)
+            seen_voice = True
 
 
     def extractLongExpressionGrouping(self):
@@ -979,7 +994,7 @@ class BrailleSegment(text.BrailleText):
                     elif isinstance(brailleElement, key.KeySignature):
                         brailleElement.outgoingKeySig = currentKeySig
                         currentKeySig = brailleElement
-            elif groupingKey.affinity == Affinity.NOTEGROUP:
+            elif groupingKey.affinity in (Affinity.INACCORD, Affinity.NOTEGROUP):
                 if isinstance(groupingList[0], clef.Clef):
                     if isinstance(groupingList[0], (clef.TrebleClef, clef.AltoClef)):
                         self.descendingChords = True
@@ -1333,6 +1348,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                     noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
                     voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
                     self._cleanupAttributes(noteGrouping)
+                # Inaccord symbol unnecessary before first voice
                 brailleStr = symbols['full_inaccord'].join(voice_trans)
             elif rightOrLeftKey is not None:
                 noteGrouping = self._groupingDict.get(rightOrLeftKey)
@@ -1881,8 +1897,7 @@ def getRawSegments(music21Part,
 
     startANewSegment: bool = False
 
-    # TODO: why is this skipping the measure layer and getting voices?
-    for music21Measure in music21Part.getElementsByClass([stream.Measure, stream.Voice]):
+    for music21Measure in music21Part.getElementsByClass(stream.Measure):
         prepareBeamedNotes(music21Measure)
         brailleElements = extractBrailleElements(music21Measure)
         ordinal: int = 0
@@ -1996,14 +2011,31 @@ def extractBrailleElements(music21Measure):
     <music21.bar.Barline type=final>
     '''
     allElements = BrailleElementGrouping()
+    last_clef: Optional[clef.Clef] = None
     for music21Object in music21Measure:
+        # Hold the clef in memory in case the next object is a voice
+        if isinstance(music21Object, clef.Clef):
+            last_clef = music21Object
+            continue
         try:
             if isinstance(music21Object, bar.Barline):
                 if music21Object.type == 'regular':
                     continue
             setAffinityCode(music21Object)
-            music21Object.editorial.brailleEnglish = [str(music21Object)]
+
+            if last_clef is not None and isinstance(
+                    music21Object, (note.GeneralNote, stream.Voice)):
+                # Dispose of last clef
+                setAffinityCode(last_clef)
+                # Correct affinity code to ensure it is grouped with voice (inaccord) if need be
+                last_clef.affinityCode = music21Object.affinityCode
+                last_clef.editorial.brailleEnglish = [str(last_clef)]
+                allElements.append(last_clef)
+                last_clef = None
+
             allElements.append(music21Object)
+            music21Object.editorial.brailleEnglish = [str(music21Object)]
+
         except BrailleSegmentException as notSupportedException:  # pragma: no cover
             isExempt = [isinstance(music21Object, music21Class)
                         for music21Class in excludeFromBrailleElements]

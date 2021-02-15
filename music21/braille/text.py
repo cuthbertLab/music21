@@ -182,24 +182,23 @@ class BrailleText(prebase.ProtoM21Object):
             self.makeNewLine()
             self.currentLine.insert(2, brailleExpr)
 
-    # def addInaccord(self, inaccord):
-    #     addSpace = self.optionalAddKeyboardSymbolsAndDots(inaccord)
-    #
-    #     try:
-    #         self.currentLine.append(inaccord, addSpace=addSpace)
-    #     except BrailleTextException:
-    #         self.makeNewLine()
-    #         if self.rightHandSymbol or self.leftHandSymbol:
-    #             if self.rightHandSymbol:
-    #                 self.currentLine.insert(2, symbols['rh_keyboard'])
-    #             elif self.leftHandSymbol:
-    #                 self.currentLine.insert(2, symbols['lh_keyboard'])
-    #             for dot in yieldDots(inaccord[0]):
-    #                 self.currentLine.append(dot, addSpace=False)
-    #             self.currentLine.append(inaccord, addSpace=False)
-    #         else:
-    #             self.currentLine.insert(2, inaccord)
-    #     self.currentLine.containsNoteGrouping = True
+    def addInaccord(self, inaccord):
+        addSpace = self.optionalAddKeyboardSymbolsAndDots(inaccord)
+        try:
+            self.currentLine.append(inaccord, addSpace=addSpace)
+        except BrailleTextException:
+            self.makeNewLine()
+            if self.rightHandSymbol or self.leftHandSymbol:
+                if self.rightHandSymbol:
+                    self.currentLine.insert(2, symbols['rh_keyboard'])
+                elif self.leftHandSymbol:
+                    self.currentLine.insert(2, symbols['lh_keyboard'])
+                for dot in yieldDots(inaccord[0]):
+                    self.currentLine.append(dot, addSpace=False)
+                self.currentLine.append(inaccord, addSpace=False)
+            else:
+                self.currentLine.insert(2, inaccord)
+        self.currentLine.containsNoteGrouping = True
 
     def addMeasureNumber(self, measureNumber):
         '''
