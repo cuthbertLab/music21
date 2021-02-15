@@ -1728,7 +1728,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         # this update will not be necessary
         self._quarterLengthNeedsUpdating = False
-        if self.linked:
+        if self.linked and self.expressionIsInferred:
             qlc = quarterConversion(self._qtrLength)
             self.components = list(qlc.components)
             if qlc.tuplet is not None:
@@ -2789,6 +2789,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             if value == 0.0 and self.linked is True:
                 self.clear()
             self._qtrLength = value
+            self.expressionIsInferred = True
             self._componentsNeedUpdating = True
             self._quarterLengthNeedsUpdating = False
 
