@@ -1178,9 +1178,7 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
                         forceSource=forceSource, **keywords)
     elif isinstance(value, pathlib.Path):
         raise FileNotFoundError(f'Cannot find file in {str(value)}')
-    elif (isinstance(value, str)
-            and 'tinynotation' not in value.lower()
-            and common.findFormatFile(value) is not None):
+    elif (isinstance(value, str) and common.findFormatFile(value) is not None):
         # assume mistyped file path
         raise FileNotFoundError(f'Cannot find file in {str(value)}')
     else:
