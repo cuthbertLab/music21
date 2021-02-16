@@ -368,7 +368,7 @@ def scoreToBraille(music21Score,
     '''
     allBrailleLines = []
     for music21Metadata in music21Score.getElementsByClass(metadata.Metadata):
-        allBrailleLines.append(metadataToString(music21Metadata, returnBrailleUnicode=True))
+        allBrailleLines.append(metadataToString(music21Metadata, returnBrailleUnicode=not debug))
     for p in music21Score.getElementsByClass(stream.Part):
         braillePart = partToBraille(p,
                                     inPlace=inPlace,

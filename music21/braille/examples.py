@@ -1175,7 +1175,8 @@ Barline final ⠣⠅
 
         demo = corpus.parse('demos/two-voices')
         x = objectToBraille(demo, debug=True)
-        y = '''
+        y = '''Movement Name: two-voices.xml
+Title: Music21 Fragment
 ---begin segment---
 <music21.braille.segment BrailleSegment>
 Measure 1, Signature Grouping 1:
