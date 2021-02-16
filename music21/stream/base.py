@@ -6480,7 +6480,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare
         notation, including creating voices for overlapped regions, Measures
-        if necessary, creating ties, beams, and accidentals.
+        if necessary, creating ties, beams, accidentals, and tuplet brackets.
 
         If `inPlace` is True, this is done in-place;
         if `inPlace` is False, this returns a modified deep copy.
@@ -12964,7 +12964,7 @@ class Part(Stream):
         alteredPitches=None,
         cautionaryPitchClass=True,
         cautionaryAll=False,
-        inPlace=True,
+        inPlace=False,
         overrideStatus=False,
         cautionaryNotImmediateRepeat=True,
         tiePitchSet=None,
@@ -12974,7 +12974,7 @@ class Part(Stream):
         provides the management of passing pitches from
         a past Measure to each new measure for processing.
 
-        TODO: by default inPlace should be False
+        Changed in v.7 -- `inPlace` defaults False
         '''
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('makeAccidentals')
