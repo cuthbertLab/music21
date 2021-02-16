@@ -118,11 +118,8 @@ def makeBeams(
         if m.timeSignature is not None:
             lastTimeSignature = m.timeSignature
         if lastTimeSignature is None:
-            # environLocal.printDebug([
-            #    'makeBeams(): lastTimeSignature is None: cannot process'])
-            # TODO: Reduce to warning...
-            raise stream.StreamException(
-                'cannot process beams in a Measure without a time signature')
+            environLocal.printDebug('cannot process beams in a Measure without a time signature')
+            continue
         noteGroups = []
         if m.hasVoices():
             for v in m.voices:
@@ -613,6 +610,7 @@ def makeMeasures(
         if not match:
             if start == end == oMax:
                 post.storeAtEnd(e)
+                continue
             else:
                 raise stream.StreamException(
                     f'cannot place element {e} with start/end {start}/{end} within any measures')
