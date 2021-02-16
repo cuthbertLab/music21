@@ -2044,7 +2044,7 @@ class Test(unittest.TestCase):
         obj = expressions.TextExpression('FREEZE')
         s.insert(3, obj)
         s.makeMeasures(inPlace=True)
-        self.assertEqual(len(s.measure(1).getElementsByClass('Expression')), 1)
+        self.assertEqual(len(s.flat.getElementsByClass('Expression')), 1)
 
     def testRemove(self):
         '''Test removing components from a Stream.
