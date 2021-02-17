@@ -636,7 +636,7 @@ def keyboardPartsToBraille(keyboardScore,
 
     allBrailleText = []
     for (rhSegment, lhSegment) in zip(rhSegments, lhSegments):
-        bg = segment.BrailleGrandSegment()
+        bg = segment.BrailleGrandSegment(lineLength=maxLineLength)
         for rhGroupingKey in rhSegment:
             # print(type(rhSegment), type(rhSegment[rhGroupingKey]))
             # breakpoint()
