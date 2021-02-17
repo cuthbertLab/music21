@@ -135,6 +135,7 @@ def setGroupingGlobals():
         # noinspection PyTypeChecker
         GROUPING_GLOBALS['timeSignature'] = meter.TimeSignature('4/4')
 
+
 SEGMENT_MAXNOTESFORSHORTSLUR = 4
 
 MAX_ELEMENTS_IN_SEGMENT = 48  # 8 measures of 6 notes, etc. each
@@ -1341,12 +1342,11 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
 def findSegments(music21Part,
                  *,
                  setHand=None,
-                 debug=False,
                  cancelOutgoingKeySig=True,
                  descendingChords=None,
                  dummyRestLength=None,
                  maxLineLength=40,
-                 segmentBreaks=None,
+                 # segmentBreaks=None,
                  showClefSigns=False,
                  showFirstMeasureNumber=True,
                  showHand=None,
@@ -1508,12 +1508,12 @@ def findSegments(music21Part,
 
         # Segment Attributes
         # ------------------
-        seg.cancelOutgoingKeySig=cancelOutgoingKeySig
-        seg.dummyRestLength=dummyRestLength
-        seg.showFirstMeasureNumber=showFirstMeasureNumber
-        seg.showHand=showHand
-        seg.showHeading=showHeading
-        seg.suppressOctaveMarks=suppressOctaveMarks
+        seg.cancelOutgoingKeySig = cancelOutgoingKeySig
+        seg.dummyRestLength = dummyRestLength
+        seg.showFirstMeasureNumber = showFirstMeasureNumber
+        seg.showHand = showHand
+        seg.showHeading = showHeading
+        seg.suppressOctaveMarks = suppressOctaveMarks
 
         # Articulations
         # -------------
