@@ -119,11 +119,6 @@ GROUPING_GLOBALS = {
     'keySignature': None,  # will be key.KeySignature(0) on first call
     'timeSignature': None,  # will be meter.TimeSignature('4/4') on first call
 }
-GROUPING_DESC_CHORDS = True
-GROUPING_SHOW_CLEFS = False
-GROUPING_UPPERFIRST_NOTEFINGERING = True
-GROUPING_WITHHYPHEN = False
-GROUPING_NUMREPEATS = 0
 
 
 def setGroupingGlobals():
@@ -140,25 +135,9 @@ def setGroupingGlobals():
         # noinspection PyTypeChecker
         GROUPING_GLOBALS['timeSignature'] = meter.TimeSignature('4/4')
 
-# defaults for BrailleSegments
-
-
-SEGMENT_CANCEL_OUTGOINGKEYSIG = True
-SEGMENT_DUMMYRESTLENGTH = None
-SEGMENT_LINELENGTH = 40
-SEGMENT_SHOWFIRSTMEASURENUMBER = True
-SEGMENT_SHOWHAND = None  # override with None, 'left', or 'right'
-SEGMENT_SHOWHEADING = True
-SEGMENT_SUPPRESSOCTAVEMARKS = False
-SEGMENT_ENDHYPHEN = False
-
-SEGMENT_SLURLONGPHRASEWITHBRACKETS = True
-SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER = False
-SEGMENT_SHOWLONGSLURSANDTIESTOGETHER = False
 SEGMENT_MAXNOTESFORSHORTSLUR = 4
 
 MAX_ELEMENTS_IN_SEGMENT = 48  # 8 measures of 6 notes, etc. each
-
 
 _ThreeDigitNumber = collections.namedtuple('_ThreeDigitNumber', 'hundreds tens ones')
 
@@ -231,11 +210,11 @@ class BrailleElementGrouping(ProtoM21Object):
 
         self.keySignature = GROUPING_GLOBALS['keySignature']
         self.timeSignature = GROUPING_GLOBALS['timeSignature']
-        self.descendingChords = GROUPING_DESC_CHORDS
-        self.showClefSigns = GROUPING_SHOW_CLEFS
-        self.upperFirstInNoteFingering = GROUPING_UPPERFIRST_NOTEFINGERING
-        self.withHyphen = GROUPING_WITHHYPHEN  # False
-        self.numRepeats = GROUPING_NUMREPEATS
+        self.descendingChords = True
+        self.showClefSigns = False
+        self.upperFirstInNoteFingering = True
+        self.withHyphen = False
+        self.numRepeats = 0
 
     def __getitem__(self, item):
         return self.internalList[item]
@@ -309,7 +288,7 @@ class BrailleSegment(text.BrailleText):
                  is starting in the middle of a measure.'''
     }
 
-    def __init__(self):
+    def __init__(self, lineLength: int = 40):
         '''
         A segment is "a group of measures occupying more than one braille line."
         Music is divided into segments so as to "present the music to the reader
@@ -367,7 +346,7 @@ class BrailleSegment(text.BrailleText):
         ===
         ---end segment---
         '''
-        super().__init__(lineLength=SEGMENT_LINELENGTH)
+        super().__init__(lineLength=lineLength)
         self._groupingDict = {}
 
         self.groupingKeysToProcess = None
@@ -375,13 +354,17 @@ class BrailleSegment(text.BrailleText):
         self.lastNote = None
         self.previousGroupingKey = None
 
-        self.cancelOutgoingKeySig = SEGMENT_CANCEL_OUTGOINGKEYSIG
-        self.dummyRestLength = SEGMENT_DUMMYRESTLENGTH
-        self.showFirstMeasureNumber = SEGMENT_SHOWFIRSTMEASURENUMBER
-        self.showHand = SEGMENT_SHOWHAND
-        self.showHeading = SEGMENT_SHOWHEADING
-        self.suppressOctaveMarks = SEGMENT_SUPPRESSOCTAVEMARKS
-        self.endHyphen = SEGMENT_ENDHYPHEN
+        self.showClefSigns: bool = False
+        self.upperFirstInNoteFingering: bool = True
+        self.descendingChords: bool = True
+
+        self.cancelOutgoingKeySig = True
+        self.dummyRestLength = None
+        self.showFirstMeasureNumber = True
+        self.showHand = None  # override with None, 'left', or 'right'
+        self.showHeading = True
+        self.suppressOctaveMarks = False
+        self.endHyphen = False
         self.beginsMidMeasure = False
 
     def __setitem__(self, item, value):
@@ -642,7 +625,7 @@ class BrailleSegment(text.BrailleText):
         >>> bs1.showLeadingOctaveFromNoteGrouping(beg1)
         False
 
-        And that is true no matter how many ties we call it on the same
+        And that is true no matter how many times we call it on the same
         BrailleElementGrouping:
 
         >>> bs1.showLeadingOctaveFromNoteGrouping(beg1)
@@ -933,7 +916,7 @@ class BrailleSegment(text.BrailleText):
         the
         previous
         '''
-        newSegment = BrailleSegment()
+        newSegment = BrailleSegment(self.lineLength)
         pngKey = None
         for (groupingKey, groupingList) in sorted(self.items()):
             if groupingKey.affinity != Affinity.NOTEGROUP:
@@ -946,26 +929,14 @@ class BrailleSegment(text.BrailleText):
                     newSegment[pngKey].append(item)
         return newSegment
 
-    def addGroupingAttributes(self, **partKeywords):
+    def addGroupingAttributes(self):
         '''
         Modifies the attributes of all :class:`~music21.braille.segment.BrailleElementGrouping`
         instances in a list of :class:`~music21.braille.segment.BrailleSegment` instances. The
-        necessary information is retrieved both by passing in partKeywords as an argument and
-        by taking into account the linear progression of the groupings and segments.
+        necessary information is retrieved from the segment and from the found clef, if any.
         '''
         currentKeySig = key.KeySignature(0)
         currentTimeSig = meter.TimeSignature('4/4')
-
-        descendingChords = GROUPING_DESC_CHORDS
-        showClefSigns = GROUPING_SHOW_CLEFS
-        upperFirstInNoteFingering = GROUPING_UPPERFIRST_NOTEFINGERING
-
-        if 'showClefSigns' in partKeywords:
-            showClefSigns = partKeywords['showClefSigns']
-        if 'upperFirstInNoteFingering' in partKeywords:
-            upperFirstInNoteFingering = partKeywords['upperFirstInNoteFingering']
-        if 'descendingChords' in partKeywords:
-            descendingChords = partKeywords['descendingChords']
 
         allGroupings = sorted(self.items())
         (previousKey, previousList) = (None, None)
@@ -996,9 +967,9 @@ class BrailleSegment(text.BrailleText):
             elif groupingKey.affinity == Affinity.NOTEGROUP:
                 if isinstance(groupingList[0], clef.Clef):
                     if isinstance(groupingList[0], (clef.TrebleClef, clef.AltoClef)):
-                        descendingChords = True
+                        self.descendingChords = True
                     elif isinstance(groupingList[0], (clef.BassClef, clef.TenorClef)):
-                        descendingChords = False
+                        self.descendingChords = False
 
                 # make a whole rest no matter the length of the rest if only one note.
                 allGeneralNotes = [n for n in groupingList if isinstance(n, note.GeneralNote)]
@@ -1006,32 +977,12 @@ class BrailleSegment(text.BrailleText):
                     allGeneralNotes[0].fullMeasure = True
             groupingList.keySignature = currentKeySig
             groupingList.timeSignature = currentTimeSig
-            groupingList.descendingChords = descendingChords
-            groupingList.showClefSigns = showClefSigns
-            groupingList.upperFirstInNoteFingering = upperFirstInNoteFingering
+            groupingList.descendingChords = self.descendingChords
+            groupingList.showClefSigns = self.showClefSigns
+            groupingList.upperFirstInNoteFingering = self.upperFirstInNoteFingering
             (previousKey, previousList) = (groupingKey, groupingList)
         if self.endHyphen:
             previousList.withHyphen = True
-
-    def addSegmentAttributes(self, **partKeywords):
-        '''
-        Modifies the attributes of a :class:`~music21.braille.segment.BrailleSegment`
-        by passing partKeywords as an argument.
-        '''
-        if 'cancelOutgoingKeySig' in partKeywords:
-            self.cancelOutgoingKeySig = partKeywords['cancelOutgoingKeySig']
-        if 'dummyRestLength' in partKeywords:
-            self.dummyRestLength = partKeywords['dummyRestLength']
-        if 'maxLineLength' in partKeywords:
-            self.lineLength = partKeywords['maxLineLength']
-        if 'showFirstMeasureNumber' in partKeywords:
-            self.showFirstMeasureNumber = partKeywords['showFirstMeasureNumber']
-        if 'showHand' in partKeywords:
-            self.showHand = partKeywords['showHand']
-        if 'showHeading' in partKeywords:
-            self.showHeading = partKeywords['showHeading']
-        if 'suppressOctaveMarks' in partKeywords:
-            self.suppressOctaveMarks = partKeywords['suppressOctaveMarks']
 
     def fixArticulations(self):
         '''
@@ -1104,7 +1055,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     '''
     def __init__(self):
         BrailleSegment.__init__(self)
-        text.BrailleKeyboard.__init__(self, lineLength=SEGMENT_LINELENGTH)
+        text.BrailleKeyboard.__init__(self, lineLength=40)
         self.allKeyPairs = []
         self.previousGroupingPair = None
         self.currentGroupingPair = None
@@ -1387,10 +1338,27 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
 # ------------------------------------------------------------------------------
 # Grouping + Segment creation from music21.stream Part
 
-def findSegments(music21Part, **partKeywords):
+def findSegments(music21Part,
+                 *,
+                 setHand=None,
+                 debug=False,
+                 cancelOutgoingKeySig=True,
+                 descendingChords=None,
+                 dummyRestLength=None,
+                 maxLineLength=40,
+                 segmentBreaks=None,
+                 showClefSigns=False,
+                 showFirstMeasureNumber=True,
+                 showHand=None,
+                 showHeading=True,
+                 showLongSlursAndTiesTogether=True,
+                 showShortSlursAndTiesTogether=False,
+                 slurLongPhraseWithBrackets=True,
+                 suppressOctaveMarks=False,
+                 upperFirstInNoteFingering=True,
+                 ):
     '''
-    Takes in a :class:`~music21.stream.Part`
-    and a list of partKeywords.
+    Takes in a :class:`~music21.stream.Part`.
 
     Returns a list of :class:`~music21.segment.BrailleSegment` instances.
 
@@ -1520,19 +1488,33 @@ def findSegments(music21Part, **partKeywords):
     '''
     # Slurring
     # --------
-    prepareSlurredNotes(music21Part, **partKeywords)
+    prepareSlurredNotes(music21Part,
+                        showLongSlursAndTiesTogether=showLongSlursAndTiesTogether,
+                        showShortSlursAndTiesTogether=showShortSlursAndTiesTogether,
+                        slurLongPhraseWithBrackets=slurLongPhraseWithBrackets,
+                        )
 
     # Raw Segments
     # ------------
-    setHand = partKeywords['setHand'] if 'setHand' in partKeywords else None
-    allSegments = getRawSegments(music21Part, setHand=setHand)
-    # Grouping Attributes
-    # -------------------
+    allSegments = getRawSegments(music21Part, setHand=setHand, maxLineLength=maxLineLength)
+
     for seg in allSegments:
-        seg.addGroupingAttributes(**partKeywords)
+        # Grouping Attributes
+        # -------------------
+        seg.showClefSigns = showClefSigns
+        seg.upperFirstInNoteFingering = upperFirstInNoteFingering
+        seg.descendingChords = descendingChords
+        seg.addGroupingAttributes()
+
         # Segment Attributes
         # ------------------
-        seg.addSegmentAttributes(**partKeywords)
+        seg.cancelOutgoingKeySig=cancelOutgoingKeySig
+        seg.dummyRestLength=dummyRestLength
+        seg.showFirstMeasureNumber=showFirstMeasureNumber
+        seg.showHand=showHand
+        seg.showHeading=showHeading
+        seg.suppressOctaveMarks=suppressOctaveMarks
+
         # Articulations
         # -------------
         seg.fixArticulations()
@@ -1540,7 +1522,12 @@ def findSegments(music21Part, **partKeywords):
     return allSegments
 
 
-def prepareSlurredNotes(music21Part, **keywords):
+def prepareSlurredNotes(music21Part,
+                        *,
+                        slurLongPhraseWithBrackets=True,
+                        showShortSlursAndTiesTogether=False,
+                        showLongSlursAndTiesTogether=True,
+                        ):
     '''
     Takes in a :class:`~music21.stream.Part` and three keywords:
 
@@ -1611,7 +1598,9 @@ def prepareSlurredNotes(music21Part, **keywords):
     The other way is by using the double slur, setting slurLongPhraseWithBrackets
     to False. The opening sign of the double slur is put after the first note
     (i.e. before the second note) and the closing sign is put before the last
-    note (i.e. before the second to last note).
+    note (i.e. before the second to last note). This will programmatically
+    set `showLongSlursAndTiesTogether` to False.
+    I don't know why, just merely documenting current behavior (JTW 2021)  #_DOCS_HIDE
 
 
     >>> longB = copy.deepcopy(long)
@@ -1661,20 +1650,8 @@ def prepareSlurredNotes(music21Part, **keywords):
     '''
     if not music21Part.spannerBundle:
         return
-
-    slurLongPhraseWithBrackets = keywords.get('slurLongPhraseWithBrackets',
-                                                  SEGMENT_SLURLONGPHRASEWITHBRACKETS)
-    showShortSlursAndTiesTogether = keywords.get('showShortSlursAndTiesTogether',
-                                                     SEGMENT_SHOWSHORTSLURSANDTIESTOGETHER)
-    if 'showLongSlursAndTiesTogether' in keywords:
-        showLongSlursAndTiesTogether = keywords['showLongSlursAndTiesTogether']
-    elif slurLongPhraseWithBrackets:
-        showLongSlursAndTiesTogether = True
-    else:
-        showLongSlursAndTiesTogether = SEGMENT_SHOWLONGSLURSANDTIESTOGETHER
-
-    if slurLongPhraseWithBrackets is False:
-        pass
+    if not slurLongPhraseWithBrackets:
+        showLongSlursAndTiesTogether = False
 
     allNotes = music21Part.flat.notes.stream()
     for slur in music21Part.spannerBundle.getByClass(spanner.Slur):
@@ -1720,7 +1697,11 @@ def prepareSlurredNotes(music21Part, **keywords):
                 allNotes[endIndex - 1].endLongDoubleSlur = True
 
 
-def getRawSegments(music21Part, setHand=None):
+def getRawSegments(music21Part,
+                   *,
+                   setHand=None,
+                   maxLineLength: int = 40,
+                   ):
     '''
     Takes in a :class:`~music21.stream.Part`, divides it up into segments (i.e. instances of
     :class:`~music21.braille.segment.BrailleSegment`). This method assumes
@@ -1869,7 +1850,7 @@ def getRawSegments(music21Part, setHand=None):
     '''
     allSegments = []
 
-    currentSegment = BrailleSegment()
+    currentSegment = BrailleSegment(lineLength=maxLineLength)
 
     elementsInCurrentSegment: int = 0
 
@@ -1892,7 +1873,7 @@ def getRawSegments(music21Part, setHand=None):
 
                 # Start new segment and increment number if this is a midmeasure segment start
                 allSegments.append(currentSegment)
-                currentSegment = BrailleSegment()
+                currentSegment = BrailleSegment(lineLength=maxLineLength)
                 if brailleElement.offset != 0.0:
                     currentSegment.beginsMidMeasure = True
 
