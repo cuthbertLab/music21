@@ -4722,30 +4722,41 @@ class MeasureParser(XMLParserBase):
         '''
         # TODO: offset
         # staff is covered by insertCoreAndReference
-        r = None  # protect against undefined.
+        b: Optional[pitch.Pitch] = None
+        r: Optional[pitch.Pitch] = None
+        inversion: str = ''
+        chordKind: str = ''
+        chordKindStr: str = ''
 
         mxKind = mxHarmony.find('kind')
         if textStripValid(mxKind):
-            kindText = mxKind.text.strip()
-        else:
-            kindText = None
+            chordKind = mxKind.text.strip()
+
         mxFrame = mxHarmony.find('frame')
 
-        # environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
-        if mxFrame is not None:
-            cs = tablature.ChordWithFretBoard()
-        elif kindText == 'none':
-            cs = harmony.NoChord()
-        else:
-            cs = harmony.ChordSymbol()
+        mxBass = mxHarmony.find('bass')
+        if mxBass is not None:
+            # required
+            b = pitch.Pitch(mxBass.find('bass-step').text)
+            # optional
+            mxBassAlter = mxBass.find('bass-alter')
+            if mxBassAlter is not None:
+                # can provide integer or float to create accidental on pitch
+                b.accidental = pitch.Accidental(float(mxBassAlter.text))
 
-        self.setEditorial(mxHarmony, cs)
-        self.setPrintStyle(mxHarmony, cs)
-        self.setPrintObject(mxHarmony, cs)
-        # TODO: attr: print-frame
-        # TODO: attrGroup: placement
+        mxInversion = mxHarmony.find('inversion')
+        if textStripValid(mxInversion):
+            inversion = mxInversion.text.strip()
+        # TODO: print-style
 
-        seta = _setAttributeFromTagText
+        if chordKind:  # two ways of doing it...
+            # Get m21 chord kind from dict of musicxml aliases ("dominant" -> "dominant-seventh")
+            if chordKind in harmony.CHORD_ALIASES:
+                chordKind = harmony.CHORD_ALIASES[chordKind]
+            mxKindText = mxKind.get('text')  # attribute
+            if mxKindText is not None:
+                if not (mxKindText == '' and chordKind != 'none'):
+                    chordKindStr = mxKindText
 
         # TODO: root vs. function;  see group "harmony-chord")
         mxRoot = mxHarmony.find('root')
@@ -4760,59 +4771,25 @@ class MeasureParser(XMLParserBase):
             if mxRootAlter is not None:
                 # can provide integer or float to create accidental on pitch
                 r.accidental = pitch.Accidental(float(mxRootAlter.text))
-            # set Pitch object on Harmony
-            cs.root(r)
+
+        # environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
+        if mxFrame is not None:
+            cs = tablature.ChordWithFretBoard()
+        elif chordKind == 'none':
+            cs = harmony.NoChord(kindStr=chordKindStr)
         else:
+            cs = harmony.ChordSymbol(bass=b,
+                                     root=r,
+                                     inversion=inversion,
+                                     kind=chordKind,
+                                     kindStr=chordKindStr)
+
+        seta = _setAttributeFromTagText
+        if mxRoot is None:
             # function instead
             seta(cs, mxHarmony, 'function', 'romanNumeral')
 
-        if kindText is not None:  # two ways of doing it...
-            cs.chordKind = mxKind.text.strip()
-            # Get m21 chord kind from dict of musicxml aliases ("dominant" -> "dominant-seventh")
-            if cs.chordKind in harmony.CHORD_ALIASES:
-                cs.chordKind = harmony.CHORD_ALIASES[cs.chordKind]
-            mxKindText = mxKind.get('text')  # attribute
-            if mxKindText is not None:
-                if not ('NoChord' in cs.classes and mxKindText == ''):
-                    cs.chordKindStr = mxKindText
-        # TODO: attr: use-symbols
-        # TODO: attr: stack-degrees
-        # TODO: attr: parentheses-degrees
-        # TODO: attr: bracket-degrees
-        # TODO: attrGroup: print-style
-        # TODO: attrGroup: halign
-        # TODO: attrGroup: valign
-
-        mxInversion = mxHarmony.find('inversion')
-        if textStripValid(mxInversion):
-            try:
-                # must be an int
-                cs.inversion(int(mxInversion.text.strip()), transposeOnSet=False)
-            except ValueError:
-                pass
-        # TODO: print-style
-
-        clearBassOverride: bool = False
-        mxBass = mxHarmony.find('bass')
-        if mxBass is not None:
-            # required
-            b = pitch.Pitch(mxBass.find('bass-step').text)
-            # optional
-            mxBassAlter = mxBass.find('bass-alter')
-            if mxBassAlter is not None:
-                # can provide integer or float to create accidental on pitch
-                b.accidental = pitch.Accidental(float(mxBassAlter.text))
-            # set Pitch object on Harmony
-            cs.bass(b)
-        else:
-            cs.bass(r)  # set the bass to the root if root is none
-            # only for the purpose of getting _updatePitches() to run
-            # then, we will need to get rid of this untruthful override
-            # since there may be an inversion!
-            clearBassOverride = True
-
         mxDegrees = mxHarmony.findall('degree')
-
         for mxDegree in mxDegrees:  # a list of components
             hd = harmony.ChordStepModification()
             seta(hd, mxDegree, 'degree-value', 'degree', transform=int)
@@ -4821,19 +4798,21 @@ class MeasureParser(XMLParserBase):
             # TODO: - should allow float, but meaningless to allow microtones in this context.
             seta(hd, mxDegree, 'degree-alter', 'interval', transform=int)
             seta(hd, mxDegree, 'degree-type', 'modType')
-            cs.addChordStepModification(hd, updatePitches=False)
+            cs.addChordStepModification(hd, updatePitches=True)
 
-        if cs.chordKind != 'none':
-            cs._updatePitches()
-            # environLocal.printDebug(['xmlToChordSymbol(): Harmony object', h])
-            if cs.root().name != r.name:
-                cs.root(r)
+        self.setEditorial(mxHarmony, cs)
+        self.setPrintStyle(mxHarmony, cs)
+        self.setPrintObject(mxHarmony, cs)
 
-        if clearBassOverride and cs.inversion() is not None:
-            # 0 inversion = step 1; 2nd inversion = step 5; 4th inversion = step 9, etc.
-            wantedStep = (cs.inversion() * 2) + 1
-            cs.bass(cs.getChordStep(wantedStep))
-            cs._updatePitches()
+        # TODO: attr: print-frame
+        # TODO: attrGroup: placement
+        # TODO: attr: use-symbols
+        # TODO: attr: stack-degrees
+        # TODO: attr: parentheses-degrees
+        # TODO: attr: bracket-degrees
+        # TODO: attrGroup: print-style
+        # TODO: attrGroup: halign
+        # TODO: attrGroup: valign
 
         # TODO: frame
         if mxFrame is not None:

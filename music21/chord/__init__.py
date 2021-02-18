@@ -1977,6 +1977,9 @@ class Chord(ChordBase):
         >>> chord.Chord().inversion(testRoot=pitch.Pitch('C5')) is None
         True
         '''
+        if not self.pitches:
+            return
+
         if testRoot is not None:
             rootPitch = testRoot
         else:
@@ -1997,6 +2000,8 @@ class Chord(ChordBase):
 
                 if 'inversion' in self._overrides:
                     del self._overrides['inversion']
+                if 'bass' in self._overrides:
+                    del self._overrides['bass']
                 currentInversion = self.inversion(find=True)
                 while currentInversion != soughtInversion and numberOfRunsBeforeCrashing > 0:
                     currentMaxMidi = max(self.pitches).ps
