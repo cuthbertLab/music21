@@ -214,12 +214,15 @@ class PartStaffExporterMixin:
         staffGroups = self.stream.getElementsByClass('StaffGroup')
         joinableGroups: List[StaffGroup] = []
         # Joinable groups must consist of only PartStaffs with Measures
+        # and exist in self.stream
         for sg in staffGroups:
             if len(sg) <= 1:
                 continue
             if not all(stream.PartStaff in p.classSet for p in sg):
                 continue
             if not all(p.getElementsByClass('Measure') for p in sg):
+                continue
+            if not all(p in self.stream for p in sg):
                 continue
             joinableGroups.append(sg)
 
@@ -846,6 +849,19 @@ class Test(unittest.TestCase):
         self.assertEqual({staff.text for staff in m2tag.findall('note/staff')}, {'2'})
         self.assertEqual({staff.text for staff in m3tag.findall('note/staff')}, {'1'})
 
+    def testJoinPartStaffsF(self):
+        '''
+        Flattening the score will leave StaffGroup spanners with parts no longer in the stream.
+        '''
+        from music21 import corpus
+        from music21 import musicxml
+        sch = corpus.parse('schoenberg/opus19', 2)
+
+        SX = musicxml.m21ToXml.ScoreExporter(sch.flat)
+        SX.scorePreliminaries()
+        SX.parsePartlikeScore()
+        # Previously, an exception was raised by getRootForPartStaff()
+        SX.joinPartStaffs()
 
 
 if __name__ == '__main__':
