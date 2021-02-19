@@ -435,11 +435,23 @@ class KeySignature(base.Music21Object):
          <music21.pitch.Pitch F#>,
          <music21.pitch.Pitch E->,
          <music21.pitch.Pitch G#>]
+
+        OMIT_FROM_DOCS
+
+        Ensure at least something is provided when the user hasn't provided enough info:
+
+        >>> nonTrad2 = key.KeySignature()
+        >>> nonTrad2.alteredPitches
+        []
+
         '''
         if self._alteredPitches is not None:
             return self._alteredPitches
 
         post = []
+        if self.sharps is None:
+            return post
+
         if self.sharps > 0:
             pKeep = pitch.Pitch('B')
             if self.sharps > 8:
