@@ -3297,11 +3297,17 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts), 3)
         # metronome marks propagate to every staff, but are hidden on subsequent staffs
         self.assertEqual(
-            s.parts[0].getElementsByClass('MetronomeMark').first().numberImplicit, False)
+            [mm.numberImplicit for mm in s.parts[0].getElementsByClass('MetronomeMark')],
+            [False, False, False, False]
+        )
         self.assertEqual(
-            s.parts[1].getElementsByClass('MetronomeMark').first().numberImplicit, True)
+            [mm.numberImplicit for mm in s.parts[1].getElementsByClass('MetronomeMark')],
+            [True, True, True, True]
+        )
         self.assertEqual(
-            s.parts[2].getElementsByClass('MetronomeMark').first().numberImplicit, True)
+            [mm.numberImplicit for mm in s.parts[2].getElementsByClass('MetronomeMark')],
+            [True, True, True, True]
+        )
 
     def testMidiExportConductorA(self):
         '''Export conductor data to MIDI conductor track.'''
