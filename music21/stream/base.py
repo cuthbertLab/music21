@@ -6552,7 +6552,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if m.keySignature is not None:
                     ksLast = m.keySignature
 
-                if i > 0 and ksLast is None:
+                if i > 0 and (ksLast is None or ksLast.sharps == 0):
                     try:
                         previousNoteOrChord = measureStream[i - 1][-1]
                         tiePitchSet = makeNotation.getTiePitchSet(previousNoteOrChord)

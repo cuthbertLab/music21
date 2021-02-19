@@ -2501,6 +2501,14 @@ class Test(unittest.TestCase):
                              '%s failed, %s != %s' %
                                 (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
+    def testMakeNotationTiesKeyless(self):
+        from music21 import converter
+        p = converter.parse('tinynotation: 4/4 f#1~ f#1')
+        p.measure(1).insert(0, key.KeySignature(sharps=0))
+        # makeNotation performs some checks before calling makeAccidentals
+        p.makeNotation(inPlace=True)
+        self.assertEqual(p.measure(2).notes.first().pitch.accidental.displayStatus, False)
+
     def testMakeAccidentalsOctaveKS(self):
         s = Stream()
         k = key.KeySignature(-3)
