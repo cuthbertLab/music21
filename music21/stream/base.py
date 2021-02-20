@@ -6334,7 +6334,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         If `cautionaryAll` is True, all accidentals are shown.
 
-        If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting
+        If `overrideStatus` is True, this method will ignore any current `displayStatus` setting
         found on the Accidental. By default this does not happen. If `displayStatus` is set to
         None, the Accidental's `displayStatus` is set.
 
@@ -6552,7 +6552,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if m.keySignature is not None:
                     ksLast = m.keySignature
 
-                if i > 0 and (ksLast is None or ksLast.sharps == 0):
+                if i > 0:
                     try:
                         previousNoteOrChord = measureStream[i - 1][-1]
                         tiePitchSet = makeNotation.getTiePitchSet(previousNoteOrChord)

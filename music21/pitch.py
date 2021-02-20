@@ -4709,7 +4709,7 @@ class Pitch(prebase.ProtoM21Object):
         # store if a match was found and display set from past pitches
         setFromPitchPast = False
 
-        if cautionaryPitchClass is True:  # warn no mater what octave; thus create new without oct
+        if cautionaryPitchClass is True:  # warn no matter what octave; thus create new without oct
             pSelf = Pitch(self.name)
             pSelf.accidental = self.accidental
         else:
