@@ -9283,7 +9283,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         False
         '''
         def allSubstreamsHaveMeasures(testStream):
-            return all([s.hasMeasures() for s in testStream.getElementsByClass('Stream')])
+            return all(s.hasMeasures() for s in testStream.getElementsByClass('Stream'))
 
         # if a measure, we assume we are well-formed
         if 'Measure' in self.classes:
@@ -9292,7 +9292,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if self.hasMeasures():
                 return True
         elif 'Opus' in self.classes:
-            return all([allSubstreamsHaveMeasures(s) for s in self.scores])
+            return all(allSubstreamsHaveMeasures(s) for s in self.scores)
         elif self.hasPartLikeStreams():
             return allSubstreamsHaveMeasures(self)
         # all other conditions are not well-formed notation
