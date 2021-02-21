@@ -3796,7 +3796,7 @@ class Chord(note.NotRest):
 
         >>> c.simplifyEnharmonics(inPlace=True, keyContext=key.Key('A-'))
         >>> c.pitches
-        (<music21.pitch.Pitch D->, <music21.pitch.Pitch F>, <music21.pitch.Pitch A>)
+        (<music21.pitch.Pitch D->, <music21.pitch.Pitch F>, <music21.pitch.Pitch A->)
         '''
         if inPlace:
             returnObj = self
