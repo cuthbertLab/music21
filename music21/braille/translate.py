@@ -155,6 +155,18 @@ def objectToBraille(music21Obj,
     >>> sampleDynamic = dynamics.Dynamic('fff')
     >>> print(translate.objectToBraille(sampleDynamic))
     ⠜⠋⠋⠋
+
+    Not currently supported: Voice (put it in a measure first)
+
+    >>> sampleVoice = stream.Voice([note.Note()])
+    >>> translate.objectToBraille(sampleVoice)
+    Traceback (most recent call last):
+    music21.braille.translate.BrailleTranslateException: Stream cannot be translated to Braille.
+
+    >>> sampleMeasure = stream.Measure([sampleVoice])
+    >>> print(translate.objectToBraille(sampleMeasure))
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠚
     '''
     if isinstance(music21Obj, stream.Stream):
         return streamToBraille(music21Obj,
