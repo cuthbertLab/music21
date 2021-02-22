@@ -766,7 +766,7 @@ class CTRule(prebase.ProtoM21Object):
         # third pass, make empty content duplicate previous content.
         for content, sep, numReps in measureGroups2:
             contentSplit = content.split()
-            if sep == '|' and all([y.startswith('[') or y == '' for y in contentSplit]):
+            if sep == '|' and all(y.startswith('[') or y == '' for y in contentSplit):
                 content = ' '.join(contentSplit)
                 if content:
                     content += ' '
