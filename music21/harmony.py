@@ -2265,13 +2265,6 @@ class ChordSymbol(Harmony):
         <music21.harmony.ChordSymbol Dm>
         >>> cs.figure
         'Dm'
-        
-        >>> nc = harmony.NoChord()
-        >>> nc.figure
-        'N.C.'
-        >>> nc.transpose(8, inPlace=True)
-        >>> nc.figure
-        'N.C.'
         '''
         post = super().transpose(value, inPlace=inPlace)
         if not inPlace:
@@ -2345,7 +2338,6 @@ class NoChord(ChordSymbol):
     >>> nc2.pitches
     ()
     '''
-
     def __init__(self, figure=None, **keywords):
 
         # override keywords to default values
@@ -2386,6 +2378,22 @@ class NoChord(ChordSymbol):
     @writeAsChord.setter
     def writeAsChord(self, val):
         pass
+
+    def transpose(self: T, _value, *, inPlace=False) -> Optional[T]:
+        '''
+        Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
+
+        >>> nc = harmony.NoChord()
+        >>> nc.figure
+        'N.C.'
+        >>> nc.transpose(8, inPlace=True)
+        >>> nc.figure
+        'N.C.'
+        '''
+        if not inPlace:
+            return copy.deepcopy(self)
+        else:
+            return self
 
 
 # ------------------------------------------------------------------------------
