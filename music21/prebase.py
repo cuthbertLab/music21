@@ -150,7 +150,7 @@ class ProtoM21Object:
         try:
             return self._classTupleCacheDict[self.__class__]
         except KeyError:
-            classTuple = tuple([x.__name__ for x in self.__class__.mro()])
+            classTuple = tuple(x.__name__ for x in self.__class__.mro())
             self._classTupleCacheDict[self.__class__] = classTuple
             return classTuple
 
