@@ -9281,13 +9281,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> o2 = stream.Opus([s2])
         >>> o2.isWellFormedNotation()
         False
+
+        Only Measures and Voices are allowed to contain notes and rests directly:
+        >>> m.isWellFormedNotation()
+        True
+        >>> s2.append(note.Rest())
+        >>> s2.isWellFormedNotation()
+        False
         '''
         def allSubstreamsHaveMeasures(testStream):
             return all(s.hasMeasures() for s in testStream.getElementsByClass('Stream'))
 
-        # if a measure, we assume we are well-formed
-        if 'Measure' in self.classes:
+        # if a measure or voice, we assume we are well-formed
+        if 'Measure' in self.classes or 'Voice' in self.classes:
             return True
+        # all other Stream classes are not well-formed if they have "loose" notes
+        elif self.getElementsByClass('GeneralNote'):
+            return False
         elif 'Part' in self.classes:
             if self.hasMeasures():
                 return True
