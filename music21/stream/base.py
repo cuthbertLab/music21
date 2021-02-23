@@ -9269,29 +9269,42 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.parts[0].getElementsByClass('Measure').first().isWellFormedNotation()
         True
 
-        >>> s = stream.Score()
+        >>> s2 = stream.Score()
         >>> m = stream.Measure()
-        >>> s.append(m)
-        >>> s.isWellFormedNotation()
+        >>> s2.append(m)
+        >>> s2.isWellFormedNotation()
+        False
+
+        >>> o = stream.Opus([s])
+        >>> o.isWellFormedNotation()
+        True
+        >>> o2 = stream.Opus([s2])
+        >>> o2.isWellFormedNotation()
+        False
+
+        Only Measures and Voices are allowed to contain notes and rests directly:
+        >>> m.isWellFormedNotation()
+        True
+        >>> s2.append(note.Rest())
+        >>> s2.isWellFormedNotation()
         False
         '''
-        # if a measure, we assume we are well-formed
-        if 'Measure' in self.classes:
+        def allSubstreamsHaveMeasures(testStream):
+            return all(s.hasMeasures() for s in testStream.getElementsByClass('Stream'))
+
+        # if a measure or voice, we assume we are well-formed
+        if 'Measure' in self.classes or 'Voice' in self.classes:
             return True
+        # all other Stream classes are not well-formed if they have "loose" notes
+        elif self.getElementsByClass('GeneralNote'):
+            return False
         elif 'Part' in self.classes:
             if self.hasMeasures():
                 return True
+        elif 'Opus' in self.classes:
+            return all(allSubstreamsHaveMeasures(s) for s in self.scores)
         elif self.hasPartLikeStreams():
-            # higher constraint than has part-like streams: has sub-streams
-            # with Measures
-            match = 0
-            count = 0
-            for s in self.getElementsByClass('Stream'):
-                count += 1
-                if s.hasMeasures():
-                    match += 1
-            if match == count:
-                return True
+            return allSubstreamsHaveMeasures(self)
         # all other conditions are not well-formed notation
         return False
 
