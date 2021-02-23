@@ -6552,16 +6552,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if m.keySignature is not None:
                     ksLast = m.keySignature
 
+                tiePitchSet = None
+                pitchPastMeasure = None
+                # if beyond the first measure, use the pitches from the last
+                # measure for context (cautionary accidentals)
+                # unless this measure has a key signature object
                 if i > 0:
+                    if m.keySignature is None:
+                        pitchPastMeasure = measureStream[i - 1].pitches
+                    # Get tiePitchSet from previous measure
                     try:
                         previousNoteOrChord = measureStream[i - 1][-1]
                         tiePitchSet = makeNotation.getTiePitchSet(previousNoteOrChord)
                     except (IndexError, StreamException):
-                        tiePitchSet = None
-                    pitchPastMeasure = measureStream[i - 1].pitches
-                else:
-                    tiePitchSet = None
-                    pitchPastMeasure = None
+                        pass
 
                 m.makeAccidentals(
                     pitchPastMeasure=pitchPastMeasure,
@@ -12988,19 +12992,19 @@ class Part(Stream):
             if m.keySignature is not None:
                 ksLast = m.keySignature
             # if beyond the first measure, use the pitches from the last
-            # measure for context
+            # measure for context (cautionary accidentals)
+            # unless this measure has a key signature object
+            tiePitchSet = None
+            pitchPastMeasure = None
             if i > 0:
+                if m.keySignature is None:
+                    pitchPastMeasure = measureStream[i - 1].pitches
+                # Get tiePitchSet from previous measure
                 try:
                     previousNoteOrChord = measureStream[i - 1][-1]
                     tiePitchSet = makeNotation.getTiePitchSet(previousNoteOrChord)
                 except (IndexError, StreamException):
-                    tiePitchSet = None
-
-                pitchPastMeasure = measureStream[i - 1].pitches
-
-            else:
-                pitchPastMeasure = None
-                # use the tie pitchSet from the method argument
+                    pass
 
             m.makeAccidentals(
                 pitchPastMeasure=pitchPastMeasure,
