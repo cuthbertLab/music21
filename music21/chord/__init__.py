@@ -2218,6 +2218,16 @@ class Chord(note.NotRest):
         and `isDominantSeventh()` has intervalArray([0, 4, 7, 10])
 
         intervalArray can be any iterable.
+
+        Though it checks on intervalArray, it does make sure that it is a
+        seventh chord, not D--, D##, G, B-
+
+        >>> chord.Chord('C E G B-').isSeventhOfType((0, 4, 7, 10))
+        True
+        >>> chord.Chord('C E G B-').isSeventhOfType((0, 3, 7, 10))
+        False
+        >>> chord.Chord('D-- D## G B-').isSeventhOfType((0, 4, 7, 10))
+        False
         '''
         if not self.isSeventh():
             return False
