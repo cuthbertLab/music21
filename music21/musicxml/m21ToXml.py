@@ -5856,7 +5856,7 @@ class MeasureExporter(XMLExporterBase):
           <mode>major</mode>
         </key>
 
-        >>> ksNonTrad = key.KeySignature()
+        >>> ksNonTrad = key.KeySignature(sharps=None)
         >>> ksNonTrad.alteredPitches = ['C#', 'E-4']
         >>> ksNonTrad
         <music21.key.KeySignature of pitches: [C#, E-4]>

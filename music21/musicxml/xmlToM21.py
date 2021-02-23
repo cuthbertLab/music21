@@ -5344,7 +5344,7 @@ class MeasureParser(XMLParserBase):
             raise MusicXMLImportException(
                 'For non traditional signatures each step must have an alter')
 
-        ks = key.KeySignature()
+        ks = key.KeySignature(sharps=None)
 
         alteredPitches = []
         for i in range(len(allSteps)):
