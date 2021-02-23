@@ -1880,8 +1880,8 @@ class Test(unittest.TestCase):
             'tinynotation: 12/8 e2.~ e8 f# g# a b- gn c d e f4.~ f8 e f g f e f2.').flat
         bm.insert(0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-        # m = bm.getElementsByClass('Measure')
-        # m[1].notesAndRests[3].pitch.accidental.displayStatus = False
+        m = bm.getElementsByClass('Measure')
+        m[1].notesAndRests[3].pitch.accidental.displayStatus = False
         self.s = bm
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -3174,7 +3174,7 @@ Barline final ⠣⠅
         bm.insert(0, key.KeySignature(3))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure').first().padAsAnacrusis(useInitialRests=True)
-        # bm.getElementsByClass('Measure')[3][1].pitch.accidental.displayStatus = False
+        bm.getElementsByClass('Measure')[3][1].pitch.accidental.displayStatus = False
         # remove cautionary accidental display
         for m in bm:
             m.number -= 1
