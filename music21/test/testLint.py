@@ -141,8 +141,7 @@ def main(fnAccept=None, strict=False):
         'consider-using-enumerate',  # good when i used only once, but
         # x[i] = y[i] is a nice paradigm, even if one can be simplified out.
         'not-callable',  # false positives, for instance on x.next()
-        'consider-using-generator',  # false positives
-        'use-a-generator',  # major false positives.
+
         'raise-missing-from',  # later.
 
     ]
