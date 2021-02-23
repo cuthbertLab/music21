@@ -104,7 +104,8 @@ disable=
     import-outside-toplevel,  # allow for import music21, etc.
     not-callable,  # false positives, for instance on x.next()
     raise-missing-from,  # want to do this eventually, but adding 1000 msgs not helpful
-
+    consider-using-generator,  # I've considered it.  NOPE!
+    use-a-generator,  # False positives
 #       'protected-access', # this is an important one, but for now we do a lot of
 #                           # x = copy.deepcopy(self); x._volume = ... which is not a problem...
 
