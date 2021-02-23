@@ -793,18 +793,16 @@ def romanNumeralFromChord(
     ...     key.Key('G'))
     <music21.roman.RomanNumeral iv65 in G major>
 
-    minor-Major chords are written as [add7]:
+    minor-Major chords are written with a [#7] modifier afterwards:
 
     >>> roman.romanNumeralFromChord(
     ...     chord.Chord('C4 E-4 G4 B4'),
     ...     key.Key('C'))
-    <music21.roman.RomanNumeral i[add7] in C major>
+    <music21.roman.RomanNumeral i7[#7] in C major>
     >>> roman.romanNumeralFromChord(
     ...     chord.Chord('E-4 G4 B4 C5'),
     ...     key.Key('C'))
-    <music21.roman.RomanNumeral i6[add7] in C major>
-
-    (Currently third-inversion minor-Major chords are not supported)
+    <music21.roman.RomanNumeral i65[#7] in C major>
 
 
     Former bugs that are now fixed:
@@ -876,9 +874,14 @@ def romanNumeralFromChord(
         '6b42': '42',
     }
     minorMajorSeventhSubs = {
-        '75b3': '[add7]',
-        '65': '6[add7]',
-        'b643': '64[add7]',
+        '75b3': '7[#7]',  # major key root
+        '65': '65[#7]',  # major key 1st inversion
+        'b643': '43[#7]',  # major key second inversion
+        '6b42': '42[#7]',  # major key form of 3rd inversion mM7...
+        '#753': '#7',  # root position in minor key
+        '6#53': '65[#7]',  # minor key 1st inversion
+        '64#3': '43[#7]',  # minor key 2nd inversion
+        '42': '42[#7]',  # minor key form of 3rd inversion mM7...
     }
 
     noKeyGiven = (keyObj is None)
@@ -1431,13 +1434,51 @@ class RomanNumeral(harmony.Harmony):
     >>> cp(r)
     ['E-4', 'F4', 'A-4', 'C5']
 
-    For a minor-Major chord in major, write it as i[add7]:
+    For a minor-Major 7th chord in major, write it as i[add7] or i7[#7] or another inversion:
 
-    >>> majorMinor = roman.RomanNumeral('i[add7]', 'C')
-    >>> majorMinor
+    >>> minorMajor = roman.RomanNumeral('i[add7]', 'C')
+    >>> minorMajor
     <music21.roman.RomanNumeral i[add7] in C major>
-    >>> cp(majorMinor)
+    >>> cp(minorMajor)
     ['C4', 'E-4', 'G4', 'B4']
+    >>> cp(roman.RomanNumeral('i7[#7]', 'C'))
+    ['C4', 'E-4', 'G4', 'B4']
+
+    Note that this is not the same as i#7, which gives a rather unusual chord in major.
+
+    >>> cp(roman.RomanNumeral('i#7', 'C'))
+    ['C4', 'E-4', 'G4', 'B#4']
+
+    In minor it's just fine, well, as fine:
+
+    >>> cp(roman.RomanNumeral('i#7', 'c'))
+    ['C4', 'E-4', 'G4', 'B4']
+
+
+    >>> cp(roman.RomanNumeral('i42[#7]', 'C'))
+    ['B4', 'C5', 'E-5', 'G5']
+
+    As noted above, Minor-Major 7th chords in minor have a different form in root position:
+
+    >>> cp(roman.RomanNumeral('i#7', 'c'))
+    ['C4', 'E-4', 'G4', 'B4']
+
+    (these are both the same)
+
+    >>> cp(roman.RomanNumeral('i#753', 'c'))
+    ['C4', 'E-4', 'G4', 'B4']
+    >>> cp(roman.RomanNumeral('i7[#7]', 'c'))
+    ['C4', 'E-4', 'G4', 'B4']
+
+
+    Other inversions are the same as with major keys:
+
+    >>> cp(roman.RomanNumeral('i65[#7]', 'c'))
+    ['E-4', 'G4', 'B4', 'C5']
+    >>> cp(roman.RomanNumeral('i43[#7]', 'c'))
+    ['G4', 'B4', 'C5', 'E-5']
+
+
 
     The RomanNumeral constructor accepts a keyword 'updatePitches' which is
     passed to harmony.Harmony. By default it
@@ -3773,6 +3814,54 @@ class Test(unittest.TestCase):
             ch = chord.Chord('B-4 C5 E-5 G5')
             rn = romanNumeralFromChord(ch, k)
             self.assertEqual(rn.figure, 'iv42')
+
+    def testMinorMajor7InMajor(self):
+        def new_fig_equals_old_figure(rn_in, k='C'):
+            p_old = [p.name for p in rn_in.pitches]
+            rn_new = RomanNumeral(rn_in.figure, k)
+            p_new = [p.name for p in rn_new.pitches]
+            # order matters, octave does not
+            self.assertEqual(p_old, p_new, f'{p_old} not equal {p_new} for {rn_in}')
+
+        rn = RomanNumeral('i7[#7]', 'C')
+        pitchStrings = [p.name for p in rn.pitches]
+        self.assertEqual(pitchStrings, ['C', 'E-', 'G', 'B'])
+        ch1 = chord.Chord('C4 E-4 G4 B4')
+        rn1 = romanNumeralFromChord(ch1, 'C')
+        self.assertEqual(rn1.figure, 'i7[#7]')
+        new_fig_equals_old_figure(rn1)
+        ch2 = chord.Chord('E-4 G4 B4 C5')
+        rn2 = romanNumeralFromChord(ch2, 'C')
+        self.assertEqual(rn2.figure, 'i65[#7]')
+        new_fig_equals_old_figure(rn2)
+
+        ch3 = chord.Chord('G4 B4 C5 E-5')
+        rn3 = romanNumeralFromChord(ch3, 'G')
+        self.assertEqual(rn3.figure, 'iv43[#7]')
+        new_fig_equals_old_figure(rn3, 'G')
+        ch4 = chord.Chord('B4 C5 E-5 G5')
+        rn4 = romanNumeralFromChord(ch4, 'G')
+        self.assertEqual(rn4.figure, 'iv42[#7]')
+        new_fig_equals_old_figure(rn4, 'G')
+
+        # in minor these are more normal #7:
+        rn1 = romanNumeralFromChord(ch1, 'c')
+        self.assertEqual(rn1.figure, 'i#7')
+        new_fig_equals_old_figure(rn1, 'c')
+        rn2 = romanNumeralFromChord(ch2, 'c')
+        self.assertEqual(rn2.figure, 'i65[#7]')
+        new_fig_equals_old_figure(rn2, 'c')
+
+        ch3 = chord.Chord('G4 B4 C5 E-5')
+        rn3 = romanNumeralFromChord(ch3, 'g')
+        self.assertEqual(rn3.figure, 'iv43[#7]')
+        new_fig_equals_old_figure(rn3, 'g')
+        # except third-inversion...
+        ch4 = chord.Chord('B4 C5 E-5 G5')
+        rn4 = romanNumeralFromChord(ch4, 'g')
+        self.assertEqual(rn4.figure, 'iv42[#7]')
+        new_fig_equals_old_figure(rn4, 'g')
+
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
