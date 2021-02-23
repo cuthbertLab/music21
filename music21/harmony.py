@@ -18,7 +18,7 @@ import collections
 import re
 import unittest
 
-from typing import Optional
+from typing import Optional, TypeVar
 
 from music21 import base
 from music21 import chord
@@ -34,9 +34,9 @@ from music21 import style
 from music21.figuredBass import realizerScale
 
 from music21 import environment
-_MOD = 'harmony'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('harmony')
 
+T = TypeVar('T')
 
 # --------------------------------------------------------------------------
 
@@ -2250,17 +2250,28 @@ class ChordSymbol(Harmony):
         else:
             return False
 
-    def transpose(self, value, *, inPlace=False) -> Optional['harmony.ChordSymbol']:
+    def transpose(self: T, value, *, inPlace=False) -> Optional[T]:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` so that this ChordSymbol's
         `figure` is appropriately cleared afterward.
 
         >>> cs = harmony.ChordSymbol('Am')
+        >>> cs.figure
+        'Am'
         >>> cs.transpose(1)
         <music21.harmony.ChordSymbol B-m>
         >>> cs.transpose(5, inPlace=True)
         >>> cs
         <music21.harmony.ChordSymbol Dm>
+        >>> cs.figure
+        'Dm'
+        
+        >>> nc = harmony.NoChord()
+        >>> nc.figure
+        'N.C.'
+        >>> nc.transpose(8, inPlace=True)
+        >>> nc.figure
+        'N.C.'
         '''
         post = super().transpose(value, inPlace=inPlace)
         if not inPlace:
