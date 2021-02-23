@@ -15,6 +15,7 @@ An object representation of harmony, a subclass of chord, as encountered as chor
 roman numerals, or other chord representations with a defined root.
 '''
 import collections
+import copy
 import re
 import unittest
 
