@@ -938,15 +938,13 @@ def romanNumeralFromChord(
     rnString = ft.prefix + stepRoman + inversionString
 
     if (not isMajorThird
-        and inversionString in minorSeventhSubs
-        # only do expensive call in case it might be possible...
-        and chordObj.isSeventhOfType((0, 3, 7, 10))
-    ):
+            and inversionString in minorSeventhSubs
+            # only do expensive call in case it might be possible...
+            and chordObj.isSeventhOfType((0, 3, 7, 10))):
         rnString = ft.prefix + stepRoman + minorSeventhSubs[inversionString]
     elif (not isMajorThird
-          and inversionString in minorMajorSeventhSubs
-          and chordObj.isSeventhOfType((0, 3, 7, 11))
-    ):
+              and inversionString in minorMajorSeventhSubs
+              and chordObj.isSeventhOfType((0, 3, 7, 11))):
         rnString = ft.prefix + stepRoman + minorMajorSeventhSubs[inversionString]
 
     elif not noKeyGiven and rnString in aug6subs and chordObj.isAugmentedSixth():
