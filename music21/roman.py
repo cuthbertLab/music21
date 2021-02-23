@@ -313,7 +313,8 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
         isMinorTriad = False
     else:
         isMajorTriad = chordObj.isMajorTriad()
-        isMinorTriad = chordObj.isMinorTriad()
+        # short-circuit this expensive call if we know it's not going to be true.
+        isMinorTriad = False if isMajorTriad else chordObj.isMinorTriad()
         chordObjIsStandardTriad = (
             isMajorTriad
             or isMinorTriad
@@ -469,6 +470,13 @@ def identifyAsTonicOrDominant(
     >>> roman.identifyAsTonicOrDominant(['B3', 'G4'], key.Key('g'))
     'i6'
 
+    >>> roman.identifyAsTonicOrDominant(['C3', 'B-4'], key.Key('f'))
+    'V7'
+
+    Notice that this -- with B-natural is also identified as V7 because
+    it is returning the roman numeral root and the inversion name, not yet
+    checking for correctness.
+
     >>> roman.identifyAsTonicOrDominant(['C3', 'B4'], key.Key('f'))
     'V7'
 
@@ -505,11 +513,11 @@ def identifyAsTonicOrDominant(
 
         oneMatches = len(set(onePitchNameList) & set(pitchNameList))
         fiveMatches = len(set(fivePitchNameList) & set(pitchNameList))
-        if oneMatches > fiveMatches and oneMatches > 0:
+        if oneMatches > fiveMatches:
             oneChordIdentified = True
-        elif oneMatches < fiveMatches and fiveMatches > 0:
+        elif oneMatches < fiveMatches:
             fiveChordIdentified = True
-        else:
+        else:  # both oneMatches and fiveMatches == 0
             return False
 
     if oneChordIdentified:
@@ -633,9 +641,11 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
     return FigureTuple(figureTuple.aboveBass, alter, rootAlterationString)
 
 
-def romanNumeralFromChord(chordObj,
-                          keyObj: Union[key.Key, str] = None,
-                          preferSecondaryDominants=False):
+def romanNumeralFromChord(
+    chordObj,
+    keyObj: Union[key.Key, str] = None,
+    preferSecondaryDominants=False
+):
     # noinspection PyShadowingNames
     '''
     Takes a chord object and returns an appropriate chord name.  If keyObj is
@@ -770,6 +780,15 @@ def romanNumeralFromChord(chordObj,
     ...     )
     <music21.roman.RomanNumeral #io6b3 in C major>
 
+
+    Changed in v7 -- i7 is given for a tonic minor-seventh chord in major:
+
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('C4 E-4 G4 B-4'),
+    ...     key.Key('C'))
+    <music21.roman.RomanNumeral i7 in C major>
+
+
     Former bugs that are now fixed:
 
     >>> romanNumeral11 = roman.romanNumeralFromChord(
@@ -832,6 +851,12 @@ def romanNumeralFromChord(chordObj,
         'i64b3': 'Sw43',
         'io6b5b3': 'Ger65',
     }
+    minorSeventhSubs = {
+        'b75b3': '7',
+        '6b5': '65',
+        'b64b3': '43',
+        '6b42': '42',
+    }
 
     noKeyGiven = (keyObj is None)
 
@@ -848,12 +873,12 @@ def romanNumeralFromChord(chordObj,
     else:
         isMajorThird = False
 
-    if isMajorThird:
-        rootKeyObj = _getKeyFromCache(root.name.upper())
-    else:
-        rootKeyObj = _getKeyFromCache(root.name.lower())
 
     if keyObj is None:
+        if isMajorThird:
+            rootKeyObj = _getKeyFromCache(root.name.upper())
+        else:
+            rootKeyObj = _getKeyFromCache(root.name.lower())
         keyObj = rootKeyObj
     elif isinstance(keyObj, str):
         keyObj = key.Key(keyObj)
@@ -889,6 +914,12 @@ def romanNumeralFromChord(chordObj,
 
     rnString = ft.prefix + stepRoman + inversionString
 
+    if (not isMajorThird
+        and inversionString in minorSeventhSubs
+        # only do expensive call in case it might be possible...
+        and chordObj.isSeventhOfType((0, 3, 7, 10))
+    ):
+        rnString = ft.prefix + stepRoman + minorSeventhSubs[inversionString]
     if not noKeyGiven and rnString in aug6subs and chordObj.isAugmentedSixth():
         rnString = aug6subs[rnString]
     elif noKeyGiven and rnString in aug6NoKeyObjectSubs and chordObj.isAugmentedSixth():
@@ -1349,6 +1380,22 @@ class RomanNumeral(harmony.Harmony):
     <music21.roman.RomanNumeral Cad64/V in c minor>
     >>> [str(p) for p in r.pitches]
     ['D5', 'G5', 'B5']
+
+
+    In a major context, i7 and iv7 and their inversions are treated as minor-7th
+    chords:
+
+    >>> r = roman.RomanNumeral('i7', 'C')
+    >>> r
+    <music21.roman.RomanNumeral i7 in C major>
+    >>> [str(p) for p in r.pitches]
+    ['C4', 'E-4', 'G4', 'B-4']
+
+    >>> r = roman.RomanNumeral('iv42', 'C')
+    >>> r
+    <music21.roman.RomanNumeral iv42 in C major>
+    >>> [str(p) for p in r.pitches]
+    ['E-4', 'F4', 'A-4', 'C5']
 
 
     The RomanNumeral constructor accepts a keyword 'updatePitches' which is
@@ -1961,15 +2008,14 @@ class RomanNumeral(harmony.Harmony):
             # impliedQualitySymbol = '+'
         elif workingFigure.endswith('d7'):
             # this one is different
+            ## TODO(msc): what about d65, etc.?
             workingFigure = workingFigure[:-2] + '7'
             impliedQuality = 'dominant-seventh'
             # impliedQualitySymbol = '(dom7)'
-        elif (self.caseMatters
-              and self.romanNumeralAlone.upper() == self.romanNumeralAlone):
-            impliedQuality = 'major'
-        elif (self.caseMatters
-              and self.romanNumeralAlone.lower() == self.romanNumeralAlone):
-            impliedQuality = 'minor'
+        elif self.caseMatters and self.romanNumeralAlone.upper() == self.romanNumeralAlone:
+                impliedQuality = 'major'
+        elif self.caseMatters and self.romanNumeralAlone.lower() == self.romanNumeralAlone:
+                impliedQuality = 'minor'
         self.impliedQuality = impliedQuality
         return workingFigure
 
@@ -2017,6 +2063,13 @@ class RomanNumeral(harmony.Harmony):
         ()
         >>> r._findSemitoneSizeForQuality('diminished')
         (3, 6, 9)
+
+        OMIT_FROM_DOCS
+
+        This one is not currently used.
+
+        >>> r._findSemitoneSizeForQuality('minor-seventh')
+        (3, 7, 10)
         '''
         if impliedQuality == 'major':
             correctSemitones = (4, 7)
@@ -2028,6 +2081,8 @@ class RomanNumeral(harmony.Harmony):
             correctSemitones = (3, 6, 10)
         elif impliedQuality == 'augmented':
             correctSemitones = (4, 8)
+        elif impliedQuality == 'minor-seventh':
+            correctSemitones = (3, 7, 10)
         elif impliedQuality == 'dominant-seventh':
             correctSemitones = (4, 7, 10)
         else:
@@ -2066,50 +2121,65 @@ class RomanNumeral(harmony.Harmony):
         >>> ' '.join([p.name for p in r.pitches])
         'C E- G- B--'
         '''
+        def correctFaultyPitch(faultyPitch, inner_correctedSemis):
+            if inner_correctedSemis >= 6:
+                inner_correctedSemis = -1 * (12 - inner_correctedSemis)
+            elif inner_correctedSemis <= -6:
+                inner_correctedSemis += 12
+
+            if faultyPitch.accidental is None:
+                faultyPitch.accidental = pitch.Accidental(inner_correctedSemis)
+            else:
+                acc = faultyPitch.accidental
+                inner_correctedSemis += acc.alter
+                if inner_correctedSemis >= 6:
+                    inner_correctedSemis = -1 * (12 - inner_correctedSemis)
+                elif inner_correctedSemis <= -6:
+                    inner_correctedSemis += 12
+
+                acc.set(inner_correctedSemis)
+
+        def shouldSkipThisChordStep(chordStep) -> bool:
+            '''
+            Skip adjusting chordSteps with explicit accidentals.
+
+            For a figure like V7b5, make sure not to correct the b5 back,
+            even though the implied quality requires a Perfect 5th.
+            '''
+            for figure in self.figuresNotationObj.figures:
+                if (figure.number == chordStep
+                        and figure.modifier.accidental is not None
+                        and figure.modifier.accidental.alter != 0):
+                    return True
+            return False
+
+
         correctSemitones = self._findSemitoneSizeForQuality(impliedQuality)
         chordStepsToExamine = (3, 5, 7)
         # newPitches = []
-        for i in range(len(correctSemitones)):  # 3,5,7
-            thisChordStep = chordStepsToExamine[i]
-            skipThisChordStep = False
-            for figure in self.figuresNotationObj.figures:
-                if (figure.number == thisChordStep
-                        and figure.modifier.accidental is not None
-                        and figure.modifier.accidental.alter != 0):
-                    # for a figure like V7b5, make sure not to correct the b5 back,
-                    # even though the implied quality requires a Perfect 5th.
-                    skipThisChordStep = True
 
-            if skipThisChordStep:
+        for i in range(len(correctSemitones)):  # 3, 5, possibly 7
+            thisChordStep = chordStepsToExamine[i]
+            if shouldSkipThisChordStep(thisChordStep):
                 continue
             thisCorrect = correctSemitones[i]
             thisSemis = self.semitonesFromChordStep(thisChordStep)
-            if thisSemis is None:
+            if thisSemis is None:  # no chord step
                 continue
-            if thisSemis == thisCorrect:
+            if thisSemis == thisCorrect:  # nothing to do
                 continue
 
             correctedSemis = thisCorrect - thisSemis
-            if correctedSemis >= 6:
-                correctedSemis = -1 * (12 - correctedSemis)
-            elif correctedSemis <= -6:
-                correctedSemis += 12
+            correctFaultyPitch(self.getChordStep(thisChordStep), correctedSemis)
 
-            faultyPitch = self.getChordStep(thisChordStep)
-            if faultyPitch is None:  # pragma: no cover
-                raise RomanException(
-                    'this is very odd... should have been caught in semitonesFromChordStep')
-            if faultyPitch.accidental is None:
-                faultyPitch.accidental = pitch.Accidental(correctedSemis)
-            else:
-                acc = faultyPitch.accidental
-                correctedSemis += acc.alter
-                if correctedSemis >= 6:
-                    correctedSemis = -1 * (12 - correctedSemis)
-                elif correctedSemis <= -6:
-                    correctedSemis += 12
+        if len(correctSemitones) == 2 and len(self.figuresNotationObj.figures) >= 3:
+            # special cases for chords whose 7th does not necessarily match the scale.
+            if self.impliedQuality == 'minor' and self.semitonesFromChordStep(7) == 11:
+                # i7 or iv7 chord or their inversions, in a major context.
+                # check first that this isn't on purpose...
+                if not shouldSkipThisChordStep(7):
+                    correctFaultyPitch(self.seventh, -1)
 
-                acc.set(correctedSemis)
 
     def _correctForSecondaryRomanNumeral(self, useScale, figure=None):
         '''
@@ -3642,6 +3712,26 @@ class Test(unittest.TestCase):
             self.assertFalse(RomanNumeral(fig, 'A').isMixture())
             # True, minor key:
             self.assertTrue(RomanNumeral(fig, 'a').isMixture())
+
+    def testMinorTonic7InMajor(self):
+        rn = RomanNumeral('i7', 'C')
+        pitchStrings = [p.name for p in rn.pitches]
+        self.assertEqual(pitchStrings, ['C', 'E-', 'G', 'B-'])
+        for k in (key.Key('C'), key.Key('c')):
+            ch1 = chord.Chord('C4 E-4 G4 B-4')
+            rn2 = romanNumeralFromChord(ch1, k)
+            self.assertEqual(rn2.figure, 'i7')
+            ch = chord.Chord('E-4 G4 B-4 C5')
+            rn = romanNumeralFromChord(ch, k)
+            self.assertEqual(rn.figure, 'i65')
+
+        for k in (key.Key('G'), key.Key('g')):
+            ch = chord.Chord('G4 B-4 C5 E-5')
+            rn = romanNumeralFromChord(ch, k)
+            self.assertEqual(rn.figure, 'iv43')
+            ch = chord.Chord('B-4 C5 E-5 G5')
+            rn = romanNumeralFromChord(ch, k)
+            self.assertEqual(rn.figure, 'iv42')
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
