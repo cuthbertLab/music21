@@ -4982,17 +4982,37 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # environLocal.printDebug(['getTimeSignatures(): final result:', post[0]])
         return post
 
-    def getInstruments(self, searchActiveSite=True, returnDefault=True, recurse=False):
+    def getInstruments(self,
+                       *,
+                       searchActiveSite=True,
+                       returnDefault=True,
+                       recurse=False) -> 'music21.stream.Stream':
         '''
         Search this stream or activeSite streams for
-        :class:`~music21.instrument.Instrument` objects, otherwise
-        return a default Instrument
-        '''
-        # environLocal.printDebug(['searching for instrument, called from:',
-        #                        self])
-        # TODO: Rename: getInstruments, and return a Stream of instruments
-        # for cases when there is more than one instrument
+        :class:`~music21.instrument.Instrument` objects, and return a new stream
+        containing them. Otherwise, return a Stream containing a single default `Instrument`.
 
+        >>> p = stream.Part()
+        >>> m = stream.Measure([note.Note()])
+        >>> p.insert(0, m)
+        >>> instrumentStream = p.getInstruments(returnDefault=True)
+        >>> defaultInst = instrumentStream.first()
+        >>> defaultInst
+        <music21.instrument.Instrument ': '>
+
+        Insert the default instrument into the part:
+
+        >>> p.insert(0, defaultInst)
+
+        Searching the measure will find it only if the measure's active site is searched:
+
+        >>> search1 = p.measure(1).getInstruments(searchActiveSite=False, returnDefault=False)
+        >>> search1.first() is None
+        True
+        >>> search2 = p.measure(1).getInstruments(searchActiveSite=True, returnDefault=False)
+        >>> search2.first() is defaultInst
+        True
+        '''
         instObj = None
         if recurse:
             sIter = self.recurse()
@@ -5002,7 +5022,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         post = sIter.getElementsByClass('Instrument').stream()
         if post:
             # environLocal.printDebug(['found local instrument:', post[0]])
-            instObj = post[0]  # get first
+            instObj = post.first()
         else:
             if searchActiveSite:
                 # if isinstance(self.activeSite, Stream) and self.activeSite != self:
@@ -5029,9 +5049,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # returns a Stream
         return post
 
-    def getInstrument(self, searchActiveSite=True, returnDefault=True):
+    def getInstrument(self,
+                      *,
+                      searchActiveSite=True,
+                      returnDefault=True) -> Optional['music21.instrument.Instrument']:
         '''
-        Return the first Instrument found in this Stream.
+        Return the first Instrument found in this Stream, or None.
 
         >>> s = stream.Score()
         >>> p1 = stream.Part()
@@ -5055,10 +5078,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         post = self.getInstruments(searchActiveSite=searchActiveSite,
                                    returnDefault=returnDefault)
-        if post:
-            return post[0]
-        else:
-            return None
+        return post.first()
 
     def getClefs(self, searchActiveSite=False, searchContext=True,
                  returnDefault=True):
