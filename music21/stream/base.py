@@ -12986,7 +12986,8 @@ class Part(Stream):
             returnObj = self
         # process make accidentals for each measure
         measureStream = returnObj.getElementsByClass('Measure')
-        makeNotation.makeAccidentalsInMeasureStream(measureStream,
+        makeNotation.makeAccidentalsInMeasureStream(
+            measureStream,
             alteredPitches=alteredPitches,
             cautionaryPitchClass=cautionaryPitchClass,
             cautionaryAll=cautionaryAll,
