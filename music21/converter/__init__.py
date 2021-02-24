@@ -1171,14 +1171,15 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
           and _osCanLoad(common.cleanpath(valueStr))):
         return parseFile(common.cleanpath(valueStr), number=number, format=m21Format,
                          forceSource=forceSource, **keywords)
-
     elif not isinstance(valueStr, bytes) and (valueStr.startswith('http://')
                                               or valueStr.startswith('https://')):
         # it's a url; may need to broaden these criteria
         return parseURL(value, number=number, format=m21Format,
                         forceSource=forceSource, **keywords)
-
     elif isinstance(value, pathlib.Path):
+        raise FileNotFoundError(f'Cannot find file in {str(value)}')
+    elif (isinstance(value, str) and common.findFormatFile(value) is not None):
+        # assume mistyped file path
         raise FileNotFoundError(f'Cannot find file in {str(value)}')
     else:
         return parseData(value, number=number, format=m21Format, **keywords)
@@ -1942,6 +1943,12 @@ class Test(unittest.TestCase):
 
         with self.assertRaises(FileNotFoundError):
             parse(fp)
+        with self.assertRaises(ConverterException):
+            # nonexistent path ending in incorrect extension
+            # no way to tell apart from data, so failure happens later
+            parse(str(fp))
+        with self.assertRaises(FileNotFoundError):
+            parse('nonexistent_path_ending_in_correct_extension.musicxml')
 
     def testParseURL(self):
         urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'

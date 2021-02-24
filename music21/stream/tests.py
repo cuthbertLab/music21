@@ -4817,7 +4817,7 @@ class Test(unittest.TestCase):
         post = s.sliceByQuarterLengths(0.125, inPlace=False)
         # post.show()
 
-        self.assertTrue(all([n.tie is not None for n in post.notesAndRests]))
+        self.assertTrue(all(n.tie is not None for n in post.notesAndRests))
 
         s = Stream()
         n1 = note.Note()

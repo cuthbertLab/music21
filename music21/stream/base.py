@@ -4982,17 +4982,37 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # environLocal.printDebug(['getTimeSignatures(): final result:', post[0]])
         return post
 
-    def getInstruments(self, searchActiveSite=True, returnDefault=True, recurse=False):
+    def getInstruments(self,
+                       *,
+                       searchActiveSite=True,
+                       returnDefault=True,
+                       recurse=False) -> 'music21.stream.Stream':
         '''
         Search this stream or activeSite streams for
-        :class:`~music21.instrument.Instrument` objects, otherwise
-        return a default Instrument
-        '''
-        # environLocal.printDebug(['searching for instrument, called from:',
-        #                        self])
-        # TODO: Rename: getInstruments, and return a Stream of instruments
-        # for cases when there is more than one instrument
+        :class:`~music21.instrument.Instrument` objects, and return a new stream
+        containing them. Otherwise, return a Stream containing a single default `Instrument`.
 
+        >>> p = stream.Part()
+        >>> m = stream.Measure([note.Note()])
+        >>> p.insert(0, m)
+        >>> instrumentStream = p.getInstruments(returnDefault=True)
+        >>> defaultInst = instrumentStream.first()
+        >>> defaultInst
+        <music21.instrument.Instrument ': '>
+
+        Insert the default instrument into the part:
+
+        >>> p.insert(0, defaultInst)
+
+        Searching the measure will find it only if the measure's active site is searched:
+
+        >>> search1 = p.measure(1).getInstruments(searchActiveSite=False, returnDefault=False)
+        >>> search1.first() is None
+        True
+        >>> search2 = p.measure(1).getInstruments(searchActiveSite=True, returnDefault=False)
+        >>> search2.first() is defaultInst
+        True
+        '''
         instObj = None
         if recurse:
             sIter = self.recurse()
@@ -5002,7 +5022,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         post = sIter.getElementsByClass('Instrument').stream()
         if post:
             # environLocal.printDebug(['found local instrument:', post[0]])
-            instObj = post[0]  # get first
+            instObj = post.first()
         else:
             if searchActiveSite:
                 # if isinstance(self.activeSite, Stream) and self.activeSite != self:
@@ -5029,9 +5049,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # returns a Stream
         return post
 
-    def getInstrument(self, searchActiveSite=True, returnDefault=True):
+    def getInstrument(self,
+                      *,
+                      searchActiveSite=True,
+                      returnDefault=True) -> Optional['music21.instrument.Instrument']:
         '''
-        Return the first Instrument found in this Stream.
+        Return the first Instrument found in this Stream, or None.
 
         >>> s = stream.Score()
         >>> p1 = stream.Part()
@@ -5055,10 +5078,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         post = self.getInstruments(searchActiveSite=searchActiveSite,
                                    returnDefault=returnDefault)
-        if post:
-            return post[0]
-        else:
-            return None
+        return post.first()
 
     def getClefs(self, searchActiveSite=False, searchContext=True,
                  returnDefault=True):
@@ -9240,29 +9260,42 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.parts[0].getElementsByClass('Measure').first().isWellFormedNotation()
         True
 
-        >>> s = stream.Score()
+        >>> s2 = stream.Score()
         >>> m = stream.Measure()
-        >>> s.append(m)
-        >>> s.isWellFormedNotation()
+        >>> s2.append(m)
+        >>> s2.isWellFormedNotation()
+        False
+
+        >>> o = stream.Opus([s])
+        >>> o.isWellFormedNotation()
+        True
+        >>> o2 = stream.Opus([s2])
+        >>> o2.isWellFormedNotation()
+        False
+
+        Only Measures and Voices are allowed to contain notes and rests directly:
+        >>> m.isWellFormedNotation()
+        True
+        >>> s2.append(note.Rest())
+        >>> s2.isWellFormedNotation()
         False
         '''
-        # if a measure, we assume we are well-formed
-        if 'Measure' in self.classes:
+        def allSubstreamsHaveMeasures(testStream):
+            return all(s.hasMeasures() for s in testStream.getElementsByClass('Stream'))
+
+        # if a measure or voice, we assume we are well-formed
+        if 'Measure' in self.classes or 'Voice' in self.classes:
             return True
+        # all other Stream classes are not well-formed if they have "loose" notes
+        elif self.getElementsByClass('GeneralNote'):
+            return False
         elif 'Part' in self.classes:
             if self.hasMeasures():
                 return True
+        elif 'Opus' in self.classes:
+            return all(allSubstreamsHaveMeasures(s) for s in self.scores)
         elif self.hasPartLikeStreams():
-            # higher constraint than has part-like streams: has sub-streams
-            # with Measures
-            match = 0
-            count = 0
-            for s in self.getElementsByClass('Stream'):
-                count += 1
-                if s.hasMeasures():
-                    match += 1
-            if match == count:
-                return True
+            return allSubstreamsHaveMeasures(self)
         # all other conditions are not well-formed notation
         return False
 

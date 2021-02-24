@@ -2218,6 +2218,16 @@ class Chord(note.NotRest):
         and `isDominantSeventh()` has intervalArray([0, 4, 7, 10])
 
         intervalArray can be any iterable.
+
+        Though it checks on intervalArray, it does make sure that it is a
+        seventh chord, not D--, D##, G, B-
+
+        >>> chord.Chord('C E G B-').isSeventhOfType((0, 4, 7, 10))
+        True
+        >>> chord.Chord('C E G B-').isSeventhOfType((0, 3, 7, 10))
+        False
+        >>> chord.Chord('D-- D## G B-').isSeventhOfType((0, 4, 7, 10))
+        False
         '''
         if not self.isSeventh():
             return False
@@ -3776,7 +3786,7 @@ class Chord(note.NotRest):
         if not match:
             raise ChordException(f'the given pitch is not in the Chord: {pitchTarget}')
 
-    def simplifyEnharmonics(self, *, inPlace=False):
+    def simplifyEnharmonics(self, *, inPlace=False, keyContext=None):
         '''
         Calls `pitch.simplifyMultipleEnharmonics` on the pitches of the chord.
 
@@ -3790,13 +3800,20 @@ class Chord(note.NotRest):
         >>> c.simplifyEnharmonics(inPlace=True)
         >>> c.pitches
         (<music21.pitch.Pitch C#>, <music21.pitch.Pitch E#>, <music21.pitch.Pitch G#>)
+
+        If `keyContext` is provided the enharmonics are simplified based on the supplied
+        Key or KeySignature.
+
+        >>> c.simplifyEnharmonics(inPlace=True, keyContext=key.Key('A-'))
+        >>> c.pitches
+        (<music21.pitch.Pitch D->, <music21.pitch.Pitch F>, <music21.pitch.Pitch A->)
         '''
         if inPlace:
             returnObj = self
         else:
             returnObj = copy.deepcopy(self)
 
-        pitches = pitch.simplifyMultipleEnharmonics(self.pitches)
+        pitches = pitch.simplifyMultipleEnharmonics(self.pitches, keyContext=keyContext)
         for i in range(len(pitches)):
             returnObj._notes[i].pitch = pitches[i]
 
