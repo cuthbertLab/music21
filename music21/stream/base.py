@@ -13006,7 +13006,6 @@ class Part(Stream):
             # if beyond the first measure, use the pitches from the last
             # measure for context (cautionary accidentals)
             # unless this measure has a key signature object
-            tiePitchSet = None
             pitchPastMeasure = None
             if i > 0:
                 if m.keySignature is None:
