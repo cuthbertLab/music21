@@ -316,7 +316,7 @@ class ConverterIPython(SubConverter):
     #     '''
     #     import random
     #     from music21.vexflow import toMusic21j
-    #     from IPython.display import HTML # @UnresolvedImport
+    #     from IPython.display import HTML
     #     vfp = toMusic21j.VexflowPickler()
     #     vfp.mode = 'jsonSplit'
     #     outputCode = vfp.fromObject(s)
@@ -1138,7 +1138,7 @@ class ConverterRomanText(SubConverter):
     def parseData(self, strData, number=None):
         from music21.romanText import rtObjects
         from music21.romanText import translate as romanTextTranslate
-        rtf = rtObjects.RTFile()  # not sure why -- @UndefinedVariable
+        rtf = rtObjects.RTFile()
         rtHandler = rtf.readstr(strData)
         if rtHandler.definesMovements():
             # this re-defines Score as an Opus

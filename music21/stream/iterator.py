@@ -20,6 +20,7 @@ import unittest
 import warnings
 
 from music21 import common
+from music21.common.classTools import tempAttribute, saveAttributes
 from music21.common.enums import OffsetSpecial
 from music21.exceptions21 import StreamException
 from music21.stream import filters
@@ -111,7 +112,7 @@ class StreamIterator(prebase.ProtoM21Object):
         self.iterSection = '_elements'
 
         self.cleanupOnStop = False
-        self.restoreActiveSites = restoreActiveSites
+        self.restoreActiveSites: bool = restoreActiveSites
 
         self.overrideDerivation = None
 
@@ -365,7 +366,7 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         if self._len is not None:
             return self._len
-        self._len = len(self.matchingElements())
+        self._len = len(self.matchingElements(restoreActiveSites=False))
         self.reset()
         return self._len
 
@@ -415,8 +416,12 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         if self._len is not None:
             return bool(self._len)
-        for unused in self:
-            return True
+
+        # do not change active site of first element in bool
+        with tempAttribute(self, 'restoreActiveSites', False):
+            for unused in self:
+                return True
+
         return False
 
     def clone(self: _SIter) -> _SIter:
@@ -572,7 +577,7 @@ class StreamIterator(prebase.ProtoM21Object):
     # ---------------------------------------------------------------
     # getting items
 
-    def matchingElements(self):
+    def matchingElements(self, *, restoreActiveSites: bool = True):
         '''
         returns a list of elements that match the filter.
 
@@ -601,7 +606,8 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> sI_notes
         <music21.stream.iterator.StreamIterator for Part:tn3/4 @:0>
 
-        Note that this used to be True until v6.0.3
+        Adding a filter to the Stream iterator returns a new Stream iterator; it
+        does not change the original.
 
         >>> sI_notes is sI
         False
@@ -616,21 +622,24 @@ class StreamIterator(prebase.ProtoM21Object):
         [<music21.note.Note C>, <music21.note.Note D>,
          <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>,
          <music21.note.Note A>]
+
+        If restoreActiveSties is False then the elements will not have
+        their activeSites changed (callers should use it when they do not plan to actually
+        expose the elements to users, such as in `__len__`).
+
+        Added in v7. -- restoreActiveSites
         '''
         if self._matchingElements is not None:
             return self._matchingElements
 
-        savedIndex = self.index
-        savedRestoreActiveSites = self.restoreActiveSites
-        self.restoreActiveSites = True
+        with saveAttributes(self, 'restoreActiveSites', 'index'):
+            self.restoreActiveSites = restoreActiveSites
+            me = [x for x in self]  # pylint: disable=unnecessary-comprehension
+            self.reset()
 
-        me = [x for x in self]  # pylint: disable=unnecessary-comprehension
-
-        self.reset()
-
-        self.index = savedIndex
-        self.restoreActiveSites = savedRestoreActiveSites
-        self._matchingElements = me
+        if restoreActiveSites == self.restoreActiveSites:
+            # cache, if we are using the iterator default.
+            self._matchingElements = me
 
         return me
 
@@ -1606,9 +1615,8 @@ class RecursiveIterator(StreamIterator):
     def matchingElements(self):
         # saved parent iterator later?
         # will this work in mid-iteration? Test, or do not expose till then.
-        savedRecursiveIterator = self.childRecursiveIterator
-        fe = super().matchingElements()
-        self.childRecursiveIterator = savedRecursiveIterator
+        with tempAttribute(self, 'childRecursiveIterator'):
+            fe = super().matchingElements()
         return fe
 
     def iteratorStack(self):

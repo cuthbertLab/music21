@@ -264,14 +264,14 @@ def fromHumdrumInstrument(hdInst):
 class Test(unittest.TestCase):
 
     def testClasses(self):
-        from music21 import instrument  # @UnusedImport  # wrong -- is used
+        from music21 import instrument
 
         for x in humdrumInstrumentClassToInstrument:
             i = humdrumInstrumentClassToInstrument[x]
             self.assertNotEqual(getattr(instrument, i)().instrumentName, None)
 
     def testIndividuals(self):
-        from music21 import instrument  # @UnusedImport  # wrong -- is used
+        from music21 import instrument
 
         for x in humdrumInstruments:
             i = humdrumInstruments[x]

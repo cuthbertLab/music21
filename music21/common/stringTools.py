@@ -107,7 +107,7 @@ def hyphenToCamelCase(usrStr: str, replacement: str = '-') -> str:
     (?<!\A)  # not at the start of the string
     ''' + replacement + r'''
     (?=[a-zA-Z])  # followed by a letter
-    ''', re.VERBOSE)  # @UndefinedVariable
+    ''', re.VERBOSE)
 
     tokens = PATTERN.split(usrStr)
     response = tokens.pop(0).lower()
@@ -351,5 +351,5 @@ def removePunctuation(s: str) -> str:
 # -----------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import music21  # @Reimport
+    import music21
     music21.mainTest()

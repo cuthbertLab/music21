@@ -1543,7 +1543,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             (ScatterPitchClassQuarterLength, None, None),
             (ScatterPitchClassOffset, None, None),
             (ScatterPitchSpaceDynamicSymbol,
-             corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
+             corpus.getWork('schumann/opus41no1', 2),
+             'Schumann Opus 41 No 1'),
 
             # offset based horizontal
             (HorizontalBarPitchSpaceOffset, None, None),
@@ -1552,12 +1553,14 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             (ScatterWeightedPitchSpaceQuarterLength, None, None),
             (ScatterWeightedPitchClassQuarterLength, None, None),
             (ScatterWeightedPitchSpaceDynamicSymbol,
-             corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
+             corpus.getWork('schumann/opus41no1', 2),
+             'Schumann Opus 41 No 1'),
 
 
             # 3d graphs
             (Plot3DBarsPitchSpaceQuarterLength,
-             testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'),  # @UndefinedVariable
+             testFiles.mozartTrioK581Excerpt,
+             'Mozart Trio K581 Excerpt'),
 
             (WindowedKey, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
             (WindowedAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),

@@ -106,7 +106,7 @@ def runParallel(iterable, parallelFunction, *,
     # pylint: disable=not-callable
     numCpus = cpus()
 
-    if numCpus == 1 or multiprocessing.current_process().daemon:  # @UndefinedVariable
+    if numCpus == 1 or multiprocessing.current_process().daemon:
         return runNonParallel(iterable, parallelFunction,
                               updateFunction=updateFunction,
                               updateMultiply=updateMultiply,
@@ -214,7 +214,7 @@ def cpus():
     '''
     Returns the number of CPUs or if >= 3, one less (to leave something out for multiprocessing)
     '''
-    cpuCount = multiprocessing.cpu_count()  # @UndefinedVariable
+    cpuCount = multiprocessing.cpu_count()
     if cpuCount >= 3:
         return cpuCount - 1
     else:
@@ -250,7 +250,7 @@ class Test(unittest.TestCase):
     def x_figure_out_segfault_testMultiprocess(self):
         files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
         # for importing into testSingleCoreAll we need the full path to the modules
-        from music21.common.parallel import _countN, _countUnpacked  # @UnresolvedImport
+        from music21.common.parallel import _countN, _countUnpacked
         output = runParallel(files, _countN)
         self.assertEqual(output, [165, 50, 131])
         runParallel(files, _countN,

@@ -191,7 +191,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             timeouts = 0
             eventsProcessed += 1
             summaryOutput.append(newResult)
-        except multiprocessing.TimeoutError:  # @UndefinedVariable
+        except multiprocessing.TimeoutError:
             timeouts += 1
             if timeouts == 5 and eventsProcessed > 0:
                 print('Delay in processing, seconds: ', end='')

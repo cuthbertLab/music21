@@ -538,7 +538,6 @@ class DataInstance:
     multiple commonly-used stream representations once, providing rapid processing.
     '''
     # pylint: disable=redefined-builtin
-
     def __init__(self, streamOrPath=None, id=None):  # @ReservedAssignment
         if isinstance(streamOrPath, stream.Stream):
             self.stream = streamOrPath
@@ -897,7 +896,6 @@ class DataSet:
             self.addData(d, cv, thisId)
 
     # pylint: disable=redefined-builtin
-
     def addData(self, dataOrStreamOrPath, classValue=None, id=None):  # @ReservedAssignment
         '''
         Add a Stream, DataInstance, MetadataEntry, or path (Posix or str)
@@ -1809,7 +1807,7 @@ class Test(unittest.TestCase):
         from music21 import features
 
         # Need explicit import for pickling within the testSingleCoreAll context
-        from music21.features.base import _pickleFunctionNumPitches  # @UnresolvedImport
+        from music21.features.base import _pickleFunctionNumPitches
         import textwrap
 
         self.maxDiff = None
