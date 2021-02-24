@@ -6563,7 +6563,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         # G-naturals in C major following G-flats in F major need cautionary
                         # G-naturals in C major following G-flats in Db major don't
                         ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
-                        pitchPastMeasure = [p for p in measureStream[i - i].pitches
+                        pitchPastMeasure = [p for p in measureStream[i - 1].pitches
                             if p.name not in ksLastDiatonic]
                     # Get tiePitchSet from previous measure
                     try:
@@ -13017,7 +13017,7 @@ class Part(Stream):
                     # G-naturals in C major following G-flats in F major need cautionary
                     # G-naturals in C major following G-flats in Db major don't
                     ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
-                    pitchPastMeasure = [p for p in measureStream[i - i].pitches
+                    pitchPastMeasure = [p for p in measureStream[i - 1].pitches
                         if p.name not in ksLastDiatonic]
                 # Get tiePitchSet from previous measure
                 try:
