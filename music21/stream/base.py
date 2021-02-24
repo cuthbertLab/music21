@@ -12987,14 +12987,14 @@ class Part(Stream):
         # process make accidentals for each measure
         measureStream = returnObj.getElementsByClass('Measure')
         makeNotation.makeAccidentalsInMeasureStream(measureStream,
-                alteredPitches=alteredPitches,
-                cautionaryPitchClass=cautionaryPitchClass,
-                cautionaryAll=cautionaryAll,
-                inPlace=True,  # always, has have a copy or source
-                overrideStatus=overrideStatus,
-                cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
-                tiePitchSet=tiePitchSet,
-            )
+            alteredPitches=alteredPitches,
+            cautionaryPitchClass=cautionaryPitchClass,
+            cautionaryAll=cautionaryAll,
+            inPlace=True,  # always, has have a copy or source
+            overrideStatus=overrideStatus,
+            cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+            tiePitchSet=tiePitchSet,
+        )
         if not inPlace:
             return returnObj
         else:  # in place
