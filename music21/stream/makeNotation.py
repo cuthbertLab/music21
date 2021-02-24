@@ -27,6 +27,8 @@ from music21 import pitch
 
 from music21.common.numberTools import opFrac
 
+from music21.exceptions21 import StreamException
+
 environLocal = environment.Environment(__file__)
 
 
@@ -1486,6 +1488,74 @@ def getTiePitchSet(prior):
             tiePitchSet.add(n.pitch.nameWithOctave)
         return tiePitchSet
 
+def makeAccidentalsInMeasureStream(s: 'music21.stream.Stream', **subroutineKeywords):
+    '''
+    Makes accidentals in place on a stream consisting of only Measures
+    Helper for Stream.makeNotation and Part.makeAccidentals.
+    '''
+    if s.getElementsNotOfClass('Measure'):
+        raise ValueError(f'{s} must contain only Measures')
+
+    srkCopy = subroutineKeywords.copy()
+    for illegalKeyword in (
+        'meterStream',
+        'refStreamOrTimeRange',
+        'pitchPastMeasure',
+        'useKeySignature',
+        'searchKeySignatureByContext',
+        'tiePitchSet',
+        'inPlace',
+    ):
+        try:
+            del(srkCopy[illegalKeyword])
+        except KeyError:
+            pass
+
+    ksLast = None
+    for i, m in enumerate(s):
+        try:
+            tiePitchSet = subroutineKeywords['tiePitchSet']
+        except KeyError:
+            tiePitchSet = None
+        pitchPastMeasure = None
+        # if beyond the first measure, use the pitches from the last
+        # measure for context (cautionary accidentals)
+        # unless this measure has a key signature object
+        if i > 0:
+            if m.keySignature is None:
+                pitchPastMeasure = s[i - 1].pitches
+            elif ksLast:
+                # If this measure has a key signature object,
+                # just get the chromatic pitches from previous measure
+                # G-naturals in C major following G-flats in F major need cautionary
+                # G-naturals in C major following G-flats in Db major don't
+                ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
+                pitchPastMeasure = [p for p in s[i - 1].pitches
+                    if p.name not in ksLastDiatonic]
+            # Get tiePitchSet from previous measure
+            try:
+                previousNoteOrChord = s[i - 1][-1]
+                tiePitchSet = getTiePitchSet(previousNoteOrChord)
+                if tiePitchSet is not None and m.keySignature is not None:
+                    # Get the diatonic pitches in this (new) key
+                    # and limit tiePitchSet to just those
+                    # Disregard tie continuation on pitches foreign to new key
+                    ksNewDiatonic = [p.name for p in m.keySignature.getScale().pitches]
+                    tiePitchSet = {tp for tp in tiePitchSet if tp in ksNewDiatonic}
+            except (IndexError, StreamException):
+                pass
+
+        if m.keySignature is not None:
+            ksLast = m.keySignature
+
+        m.makeAccidentals(
+            pitchPastMeasure=pitchPastMeasure,
+            useKeySignature=ksLast,
+            searchKeySignatureByContext=False,
+            tiePitchSet=tiePitchSet,
+            inPlace=True,
+            **srkCopy
+        )
 
 def iterateBeamGroups(
     s: 'music21.stream.Stream',
