@@ -2512,22 +2512,36 @@ class Test(unittest.TestCase):
 
     def testMakeNotationTiesKeyChange(self):
         from music21 import converter
+
         p = converter.parse('tinynotation: 4/4 f#1~ f#1')
-        # Insert key change where held-over note is chromatic
-        p.measure(2).insert(0, key.KeySignature(sharps=-1))
+        # Insert key change where held-over note is diatonic
+        p.measure(2).insert(0, key.KeySignature(sharps=1))
         pMade1 = p.makeNotation()
         self.assertEqual(pMade1.measure(2).notes.first().pitch.accidental.displayStatus, False)
 
+        p = converter.parse('tinynotation: 4/4 f#1~ f#1')
+        # Insert key change where held-over note is chromatic
+        p.measure(2).insert(0, key.KeySignature(sharps=-1))
+        pMade = p.makeNotation()
+        self.assertEqual(pMade.measure(2).notes.first().pitch.accidental.displayStatus, True)
+
+        p = converter.parse('tinynotation: 4/4 b1~ b1')
+        # Same, but with a natural
+        p.measure(2).insert(0, key.KeySignature(sharps=-1))
+        pMade = p.makeNotation()
+        self.assertEqual(pMade.measure(2).notes.first().pitch.accidental.displayStatus, True)
+
+        p = converter.parse('tinynotation: 4/4 f#1~ f#1')
         p.measure(1).insert(0, key.KeySignature(sharps=-1))
         # This is no longer a key "change", should still work based on the tie
-        pMade2 = p.makeNotation()
-        self.assertEqual(pMade2.measure(2).notes.first().pitch.accidental.displayStatus, False)
+        pMade = p.makeNotation()
+        self.assertEqual(pMade.measure(2).notes.first().pitch.accidental.displayStatus, False)
 
         # Wipe out the tie; accidental should be reiterated
         for n in p.flat.notes:
             n.tie = None
-        pMade3 = p.makeNotation()
-        self.assertEqual(pMade3.measure(2).notes.first().pitch.accidental.displayStatus, True)
+        pMadeNoTies = p.makeNotation()
+        self.assertEqual(pMadeNoTies.measure(2).notes.first().pitch.accidental.displayStatus, True)
 
     def testMakeAccidentalsOctaveKS(self):
         s = Stream()

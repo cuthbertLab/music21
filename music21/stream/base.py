@@ -6549,9 +6549,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             for i in range(len(measureStream)):
                 m = measureStream[i]
-                if m.keySignature is not None:
-                    ksLast = m.keySignature
-
                 tiePitchSet = None
                 pitchPastMeasure = None
                 # if beyond the first measure, use the pitches from the last
@@ -6560,12 +6557,29 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if i > 0:
                     if m.keySignature is None:
                         pitchPastMeasure = measureStream[i - 1].pitches
+                    elif ksLast:
+                        # If this measure has a key signature object,
+                        # just get the chromatic pitches from previous measure
+                        # G-naturals in C major following G-flats in F major need cautionary
+                        # G-naturals in C major following G-flats in Db major don't
+                        ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
+                        pitchPastMeasure = [p for p in measureStream[i - i].pitches
+                            if p.name not in ksLastDiatonic]
                     # Get tiePitchSet from previous measure
                     try:
                         previousNoteOrChord = measureStream[i - 1][-1]
                         tiePitchSet = makeNotation.getTiePitchSet(previousNoteOrChord)
+                        if tiePitchSet is not None and m.keySignature is not None:
+                            # Get the diatonic pitches in this (new) key
+                            # and limit tiePitchSet to just those
+                            # Disregard tie continuation on pitches foreign to new key
+                            ksNewDiatonic = [p.name for p in m.keySignature.getScale().pitches]
+                            tiePitchSet = {tp for tp in tiePitchSet if tp in ksNewDiatonic}
                     except (IndexError, StreamException):
                         pass
+
+                if m.keySignature is not None:
+                    ksLast = m.keySignature
 
                 m.makeAccidentals(
                     pitchPastMeasure=pitchPastMeasure,
@@ -12989,8 +13003,6 @@ class Part(Stream):
         ksLast = None
         for i in range(len(measureStream)):
             m = measureStream[i]
-            if m.keySignature is not None:
-                ksLast = m.keySignature
             # if beyond the first measure, use the pitches from the last
             # measure for context (cautionary accidentals)
             # unless this measure has a key signature object
@@ -12999,12 +13011,29 @@ class Part(Stream):
             if i > 0:
                 if m.keySignature is None:
                     pitchPastMeasure = measureStream[i - 1].pitches
+                elif ksLast:
+                    # If this measure has a key signature object,
+                    # just get the chromatic pitches from previous measure
+                    # G-naturals in C major following G-flats in F major need cautionary
+                    # G-naturals in C major following G-flats in Db major don't
+                    ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
+                    pitchPastMeasure = [p for p in measureStream[i - i].pitches
+                        if p.name not in ksLastDiatonic]
                 # Get tiePitchSet from previous measure
                 try:
                     previousNoteOrChord = measureStream[i - 1][-1]
                     tiePitchSet = makeNotation.getTiePitchSet(previousNoteOrChord)
+                    if m.keySignature is not None:
+                        # Get the diatonic pitches in this (new) key
+                        # and limit tiePitchSet to just those
+                        # Disregard tie continuation on pitches foreign to new key
+                        ksNewDiatonic = [p.name for p in m.keySignature.getScale().pitches]
+                        tiePitchSet = {tp for tp in tiePitchSet if tp in ksNewDiatonic}
                 except (IndexError, StreamException):
                     pass
+
+            if m.keySignature is not None:
+                ksLast = m.keySignature
 
             m.makeAccidentals(
                 pitchPastMeasure=pitchPastMeasure,
