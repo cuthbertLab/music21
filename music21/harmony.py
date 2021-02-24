@@ -2273,6 +2273,7 @@ class ChordSymbol(Harmony):
             return post
         else:
             self.figure = None
+            return None
 
 
 class NoChord(ChordSymbol):
@@ -2394,7 +2395,7 @@ class NoChord(ChordSymbol):
         if not inPlace:
             return copy.deepcopy(self)
         else:
-            return self
+            return None
 
 
 # ------------------------------------------------------------------------------
