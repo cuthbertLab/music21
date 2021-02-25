@@ -6492,11 +6492,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return self.streamStatus.haveAccidentalsBeenMade()
 
     def makeNotation(self,
+                     *,
                      meterStream=None,
                      refStreamOrTimeRange=None,
                      inPlace=False,
                      bestClef=False,
-                     **subroutineKeywords):
+                     pitchPast: Optional[List[pitch.Pitch]] = None,
+                     pitchPastMeasure: Optional[List[pitch.Pitch]] = None,
+                     useKeySignature: Union[bool, key.KeySignature] = True,
+                     alteredPitches: Optional[List[pitch.Pitch]] = None,
+                     cautionaryPitchClass: bool = True,
+                     cautionaryAll: bool = False,
+                     overrideStatus: bool = False,
+                     cautionaryNotImmediateRepeat: bool = True,
+                     tiePitchSet: Optional[Set[str]] = None
+    ):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare
         notation, including creating voices for overlapped regions, Measures
@@ -6505,8 +6515,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If `inPlace` is True, this is done in-place;
         if `inPlace` is False, this returns a modified deep copy.
 
-        makeAccidentalsKeywords can be a dict specifying additional
-        parameters to send to makeAccidentals
+        The following additional parameters are documented on
+        :meth:`~music21.stream.base.makeAccidentals`::
+
+            pitchPast
+            pitchPastMeasure
+            useKeySignature
+            alteredPitches
+            cautionaryPitchClass
+            cautionaryAll
+            overrideStatus
+            cautionaryNotImmediateRepeat
+            tiePitchSet
 
 
         >>> s = stream.Stream()
@@ -6560,7 +6580,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # this needs to be called before makeTies
         # note that this functionality is also placed in Part
         if not measureStream.haveAccidentalsBeenMade():
-            makeNotation.makeAccidentalsInMeasureStream(measureStream, **subroutineKeywords)
+            makeNotation.makeAccidentalsInMeasureStream(
+                measureStream,
+                pitchPast=pitchPast,
+                pitchPastMeasure=pitchPastMeasure,
+                useKeySignature=useKeySignature,
+                alteredPitches=alteredPitches,
+                cautionaryPitchClass=cautionaryPitchClass,
+                cautionaryAll=cautionaryAll,
+                overrideStatus=overrideStatus,
+                cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                tiePitchSet=tiePitchSet)
 
         measureStream.makeTies(meterStream, inPlace=True)
 
@@ -12991,7 +13021,6 @@ class Part(Stream):
             alteredPitches=alteredPitches,
             cautionaryPitchClass=cautionaryPitchClass,
             cautionaryAll=cautionaryAll,
-            inPlace=True,  # always, has have a copy or source
             overrideStatus=overrideStatus,
             cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
             tiePitchSet=tiePitchSet,

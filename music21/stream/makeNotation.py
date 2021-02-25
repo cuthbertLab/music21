@@ -14,13 +14,14 @@
 
 import copy
 import unittest
-from typing import List, Generator, Optional
+from typing import List, Generator, Optional, Set, Union
 
 from music21 import beam
 from music21 import clef
 from music21 import common
 from music21 import defaults
 from music21 import environment
+from music21 import key
 from music21 import meter
 from music21 import note
 from music21 import pitch
@@ -1488,44 +1489,50 @@ def getTiePitchSet(prior):
             tiePitchSet.add(n.pitch.nameWithOctave)
         return tiePitchSet
 
-def makeAccidentalsInMeasureStream(s: 'music21.stream.Stream', **subroutineKeywords):
+def makeAccidentalsInMeasureStream(
+    s: 'music21.stream.Stream',
+    *,
+    pitchPast: Optional[List[pitch.Pitch]] = None,
+    pitchPastMeasure: Optional[List[pitch.Pitch]] = None,
+    useKeySignature: Union[bool, key.KeySignature] = True,
+    alteredPitches: Optional[List[pitch.Pitch]] = None,
+    cautionaryPitchClass: bool = True,
+    cautionaryAll: bool = False,
+    overrideStatus: bool = False,
+    cautionaryNotImmediateRepeat: bool = True,
+    tiePitchSet: Optional[Set[str]] = None
+):
     '''
-    Makes accidentals in place on a stream consisting of only Measures
+    Makes accidentals in place on a stream consisting of only Measures.
     Helper for Stream.makeNotation and Part.makeAccidentals.
+
+    Walks measures in order to update the values for the following keyword
+    arguments of :meth:`~music21.stream.base.makeAccidentals` and calls
+    that method on each Measure. (For this reason, the values supplied
+    for these arguments in the method signature will be used on the first
+    measure only, or in the case of `useKeySignature`, not at all if the first
+    measure contains a `KeySignature`.)::
+
+        pitchPastMeasure
+        useKeySignature
+        tiePitchSet
+
+    Operates on the measures in place; make a copy first if this is not desired.
     '''
     if s.getElementsNotOfClass('Measure'):
         raise ValueError(f'{s} must contain only Measures')
 
-    srkCopy = subroutineKeywords.copy()
-    for illegalKeyword in (
-        'meterStream',
-        'refStreamOrTimeRange',
-        'pitchPastMeasure',
-        'useKeySignature',
-        'searchKeySignatureByContext',
-        'tiePitchSet',
-        'inPlace',
-    ):
-        try:
-            del(srkCopy[illegalKeyword])
-        except KeyError:
-            pass
-
-    ksLast = None
+    ksLast = useKeySignature
     for i, m in enumerate(s):
-        try:
-            tiePitchSet = subroutineKeywords['tiePitchSet']
-        except KeyError:
-            tiePitchSet = None
-        pitchPastMeasure = None
         # if beyond the first measure, use the pitches from the last
         # measure for context (cautionary accidentals)
         # unless this measure has a key signature object
         if i > 0:
+            pitchPastMeasure = None
             if m.keySignature is None:
                 pitchPastMeasure = s[i - 1].pitches
             elif ksLast:
-                # If this measure has a key signature object,
+                # If there is any key signature object to the left,
                 # just get the chromatic pitches from previous measure
                 # G-naturals in C major following G-flats in F major need cautionary
                 # G-naturals in C major following G-flats in Db major don't
@@ -1549,12 +1556,17 @@ def makeAccidentalsInMeasureStream(s: 'music21.stream.Stream', **subroutineKeywo
             ksLast = m.keySignature
 
         m.makeAccidentals(
+            pitchPast=pitchPast,
             pitchPastMeasure=pitchPastMeasure,
             useKeySignature=ksLast,
+            alteredPitches=alteredPitches,
             searchKeySignatureByContext=False,
-            tiePitchSet=tiePitchSet,
+            cautionaryPitchClass=cautionaryPitchClass,
+            cautionaryAll=cautionaryAll,
             inPlace=True,
-            **srkCopy
+            overrideStatus=overrideStatus,
+            cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+            tiePitchSet=tiePitchSet,
         )
 
 def iterateBeamGroups(
