@@ -7309,7 +7309,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         When, as is commonly the case, we want to find all of the notes,
         but do not care to have offsets related to the origin of the stream,
-        then `.recurse()` is generally a more efficiant way of working:
+        then `.recurse()` is generally a more efficient way of working:
 
         >>> len(bwv66.recurse().notes)
         165
