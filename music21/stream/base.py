@@ -6506,7 +6506,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                      overrideStatus: bool = False,
                      cautionaryNotImmediateRepeat: bool = True,
                      tiePitchSet: Optional[Set[str]] = None
-    ):
+                     ):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare
         notation, including creating voices for overlapped regions, Measures
