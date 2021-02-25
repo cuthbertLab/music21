@@ -1806,6 +1806,13 @@ class Test(unittest.TestCase):
         self.assertEqual(str(cm.exception),
             'meterStream is neither a Stream nor a TimeSignature!')
 
+    def testMakeAccidentalsInMeasureStreamException(self):
+        from music21 import converter
+        p = converter.parse(self.allaBreveBeamTest)
+        with self.assertRaises(ValueError) as cm:
+            makeAccidentalsInMeasureStream(p.measure(1))
+        self.assertIn('must contain only Measures', str(cm.exception))
+
 
 # -----------------------------------------------------------------------------
 
