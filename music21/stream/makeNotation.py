@@ -1522,7 +1522,15 @@ def makeAccidentalsInMeasureStream(
     if s.getElementsNotOfClass('Measure'):
         raise ValueError(f'{s} must contain only Measures')
 
-    ksLast = useKeySignature
+    # bool values for useKeySignature are not helpful here
+    # because we are definitely searching key signature contexts
+    # only key.KeySignature values are interesting
+    # but method arg is typed this way for backwards compatibility
+    if isinstance(useKeySignature, key.KeySignature):
+        ksLast = useKeySignature
+    else:
+        ksLast = None
+
     for i, m in enumerate(s):
         # if beyond the first measure, use the pitches from the last
         # measure for context (cautionary accidentals)
