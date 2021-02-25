@@ -2506,7 +2506,7 @@ class Test(unittest.TestCase):
         p = converter.parse('tinynotation: 4/4 f#1~ f#1')
         # Key of no sharps/flats
         p.measure(1).insert(0, key.KeySignature(sharps=0))
-        # makeNotation performs some checks before calling makeAccidentals
+        # calls makeAccidentalsInMeasureStream()
         p.makeNotation(inPlace=True)
         self.assertEqual(p.measure(2).notes.first().pitch.accidental.displayStatus, False)
 
