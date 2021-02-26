@@ -1624,6 +1624,9 @@ def setStemDirectionOneGroup(
     pitchList: List[pitch.Pitch] = []
     for n in group:
         pitchList.extend(n.pitches)
+    if not pitchList:
+        # Handle empty chord
+        return
     groupStemDirection = clef_context.getStemDirectionForPitches(pitchList)
 
     for n in group:
@@ -1727,6 +1730,23 @@ class Test(unittest.TestCase):
                          ['up'] * 4 + ['down'] * 6 + ['up'] * 4
                          + ['down', 'noStem', 'double', 'down']
                          )
+
+    def testMakeBeamsOnEmptyChord(self):
+        from music21 import chord, converter
+        p = converter.parse('tinyNotation: 4/4')
+        c1 = chord.Chord('d f')
+        c1.quarterLength = 0.5
+        c2 = chord.Chord('d f')
+        c2.quarterLength = 0.5
+        p.measure(1).insert(0, c1)
+        p.measure(1).insert(0.5, c2)
+        p.flat.notes[0].notes = []
+        p.flat.notes[1].notes = []
+        p.makeNotation(inPlace=True)
+        self.assertEqual(
+            [n.stemDirection for n in p.flat.notes],
+            ['unspecified', 'unspecified'],
+        )
 
     def testStreamExceptions(self):
         from music21 import converter, duration, stream
