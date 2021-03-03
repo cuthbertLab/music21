@@ -1059,27 +1059,12 @@ class TwelveToneRow(ToneRow):
         if self.isTwelveToneRow() is False:
             raise SerialException('Combinatoriality applies only to twelve-tone rows.')
 
-        if convention == 'zero':
-            testRow = []
-            trans1 = self.zeroCenteredTransformation(transType1, index1)
+        if convention in ['zero', 'original']:
+            trans1 = getattr(self, convention + 'CenteredTransformation')(transType1, index1)
             pitches1 = trans1.pitchClasses()
-            trans2 = self.zeroCenteredTransformation(transType2, index2)
+            trans2 = getattr(self, convention + 'CenteredTransformation')(transType2, index2)
             pitches2 = trans2.pitchClasses()
-            for i in range(6):
-                testRow.append(pitches1[i])
-            for i in range(6):
-                testRow.append(pitches2[i])
-            return pcToToneRow(testRow).isTwelveToneRow()
-        elif convention == 'original':
-            testRow = []
-            trans1 = self.originalCenteredTransformation(transType1, index1)
-            pitches1 = trans1.pitchClasses()
-            trans2 = self.originalCenteredTransformation(transType2, index2)
-            pitches2 = trans2.pitchClasses()
-            for i in range(6):
-                testRow.append(pitches1[i])
-            for i in range(6):
-                testRow.append(pitches2[6 + i])
+            testRow = pitches1[:6] + pitches2[:6]
             return pcToToneRow(testRow).isTwelveToneRow()
         else:
             raise SerialException("Invalid convention - choose 'zero' or 'original'.")
