@@ -1026,7 +1026,7 @@ def makeTies(
         {0.0} <music21.stream.Voice 2>
             {0.0} <music21.note.Note B>
     {1.0} <music21.stream.Measure 2 offset=1.0>
-        {0.0} <music21.stream.Voice 0x105332ac8>
+        {0.0} <music21.stream.Voice ...>
             {0.0} <music21.note.Note C>
 
     >>> for n in p2.recurse().notes:

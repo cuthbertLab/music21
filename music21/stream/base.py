@@ -2750,7 +2750,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> v = stream.Voice([note.Note(quarterLength=5.5)])
         >>> v.splitAtDurations()
-        (<music21.stream.Voice 0x106020430>,)
+        (<music21.stream.Voice ...,)
         >>> [n.duration for n in v.notes]
         [<music21.duration.Duration 4.0>, <music21.duration.Duration 1.5>]
 
@@ -12199,6 +12199,9 @@ class Voice(Stream):
     '''
     recursionType = 'elementsFirst'
     classSortOrder = 5
+
+    def _reprInternal(self):
+        return str(self.id)
 
 
 # -----------------------------------------------------------------------------
