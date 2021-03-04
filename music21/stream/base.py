@@ -2748,9 +2748,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         `recurse=True` should not be necessary to find elements in streams
         without substreams, such as a loose Voice:
 
-        >>> v = stream.Voice([note.Note(quarterLength=5.5)])
+        >>> v = stream.Voice([note.Note(quarterLength=5.5)], id=1)
         >>> v.splitAtDurations()
-        (<music21.stream.Voice ...,)
+        (<music21.stream.Voice 1>,)
         >>> [n.duration for n in v.notes]
         [<music21.duration.Duration 4.0>, <music21.duration.Duration 1.5>]
 
@@ -12199,9 +12199,6 @@ class Voice(Stream):
     '''
     recursionType = 'elementsFirst'
     classSortOrder = 5
-
-    def _reprInternal(self):
-        return str(self.id)
 
 
 # -----------------------------------------------------------------------------
