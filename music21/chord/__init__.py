@@ -1270,18 +1270,20 @@ class Chord(note.NotRest):
                     score += 1 / (root_index + 6)
             return score
 
-        orderedChordSteps = (3, 5, 7, 2, 4, 6)
-
         # FIND ROOT FAST -- for cases where one note has perfectly stacked
         # thirds, like E C G; but not C E B-
-        # if one pitch has perfectlyStackedThirds, return it always:
+        # if one pitch has perfectlyStackedThirds, return it always.
+
+        # we use the music21 unique function since it preserves the order
         nonDuplicatingPitches = common.misc.unique((n.pitch for n in self._notes),
                                                    key=lambda pp: pp.step)
         lenPitches = len(nonDuplicatingPitches)
         if not lenPitches:
             raise ChordException(f'no pitches in chord {self!r}')
-        if lenPitches == 1:
+        elif lenPitches == 1:
             return self.pitches[0]
+        elif lenPitches == 7:  # 13th chord
+            return self.bass()
 
         stepNumsToPitches: Dict[int, pitch.Pitch] = {pitch.STEP_TO_DNN_OFFSET[p.step]: p
                                                      for p in nonDuplicatingPitches}
@@ -1306,11 +1308,13 @@ class Chord(note.NotRest):
         # this is the slowest...
 
         rootnessFunctionScores = []
+        orderedChordSteps = (3, 5, 7, 2, 4, 6)
 
-        for i, p in enumerate(nonDuplicatingPitches):
+        for p in nonDuplicatingPitches:
             currentListOfThirds = []
+            this_step_num = pitch.STEP_TO_DNN_OFFSET[p.step]
             for chordStepTest in orderedChordSteps:
-                if self.getChordStep(chordStepTest, testRoot=p):
+                if (this_step_num + chordStepTest - 1) % 7 in stepNumsToPitches:
                     currentListOfThirds.append(True)
                 else:
                     currentListOfThirds.append(False)
