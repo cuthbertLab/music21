@@ -6269,8 +6269,6 @@ class Test(unittest.TestCase):
         n = note.Note()
         v1 = stream.Voice([n])
         m = stream.Measure([v1])
-        xmlOut = self.getXml(m)
-        self.assertIn('<voice>1</voice>', xmlOut)
         n2 = note.Note()
         v2 = stream.Voice([n2])
         m.insert(0, v2)
