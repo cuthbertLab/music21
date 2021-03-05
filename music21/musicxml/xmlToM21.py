@@ -5598,8 +5598,8 @@ class MeasureParser(XMLParserBase):
         True
         >>> len(MP.stream)
         2
-        >>> len(MP.stream.getElementsByClass('Voice'))
-        2
+        >>> list(MP.stream.getElementsByClass('Voice'))
+        [<music21.stream.Voice 1>, <music21.stream.Voice 2>]
         '''
         mxm = self.mxMeasure
         for mxn in mxm.findall('note'):
