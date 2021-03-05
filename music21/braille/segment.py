@@ -20,6 +20,8 @@ import copy
 import enum
 import unittest
 
+from typing import Optional
+
 from music21 import bar
 from music21 import chord
 from music21 import clef
@@ -1351,7 +1353,7 @@ def findSegments(music21Part,
                  showFirstMeasureNumber=True,
                  showHand=None,
                  showHeading=True,
-                 showLongSlursAndTiesTogether=True,
+                 showLongSlursAndTiesTogether: Optional[bool] = None,
                  showShortSlursAndTiesTogether=False,
                  slurLongPhraseWithBrackets=True,
                  suppressOctaveMarks=False,
@@ -1526,7 +1528,7 @@ def prepareSlurredNotes(music21Part,
                         *,
                         slurLongPhraseWithBrackets=True,
                         showShortSlursAndTiesTogether=False,
-                        showLongSlursAndTiesTogether=True,
+                        showLongSlursAndTiesTogether: Optional[bool] = None,
                         ):
     '''
     Takes in a :class:`~music21.stream.Part` and three keywords:
@@ -1595,12 +1597,13 @@ def prepareSlurredNotes(music21Part,
     True
 
 
-    The other way is by using the double slur, setting slurLongPhraseWithBrackets
+    The other way is by using the double slur, setting `slurLongPhraseWithBrackets`
     to False. The opening sign of the double slur is put after the first note
     (i.e. before the second note) and the closing sign is put before the last
-    note (i.e. before the second to last note). This will programmatically
-    set `showLongSlursAndTiesTogether` to False.
-    I don't know why, just merely documenting current behavior (JTW 2021)  #_DOCS_HIDE
+    note (i.e. before the second to last note).
+
+    If a value is not supplied for `showLongSlursAndTiesTogether`, it will take the
+    value set for `slurLongPhraseWithBrackets`, which defaults True.
 
 
     >>> longB = copy.deepcopy(long)
@@ -1637,7 +1640,6 @@ def prepareSlurredNotes(music21Part,
     If showShortSlursAndTiesTogether is set to True, then the slurs and ties are
     shown together (i.e. the note has both a shortSlur and a tie).
 
-
     >>> shortC = copy.deepcopy(short)
     >>> segment.prepareSlurredNotes(shortC, showShortSlursAndTiesTogether=True)
     >>> shortC.flat.notes[0].shortSlur
@@ -1650,8 +1652,8 @@ def prepareSlurredNotes(music21Part,
     '''
     if not music21Part.spannerBundle:
         return
-    if not slurLongPhraseWithBrackets:
-        showLongSlursAndTiesTogether = False
+    if showLongSlursAndTiesTogether is None:
+        showLongSlursAndTiesTogether = slurLongPhraseWithBrackets
 
     allNotes = music21Part.flat.notes.stream()
     for slur in music21Part.spannerBundle.getByClass(spanner.Slur):
@@ -1670,7 +1672,7 @@ def prepareSlurredNotes(music21Part,
         delta = abs(endIndex - beginIndex) + 1
 
         if not showShortSlursAndTiesTogether and delta <= SEGMENT_MAXNOTESFORSHORTSLUR:
-            # normally slurs are not shown on a tied notes (unless
+            # normally slurs are not shown on tied notes (unless
             # showShortSlursAndTiesTogether is True, for facsimile transcriptions).
             if (allNotes[beginIndex].tie is not None
                     and allNotes[beginIndex].tie.type == 'start'):

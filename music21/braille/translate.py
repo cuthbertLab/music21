@@ -73,10 +73,12 @@ memorization" (BMTM, 71). Some of these keywords are changed automatically in co
     :class:`~music21.tempo.TempoText`, and :class:`~music21.tempo.MetronomeMark`,
     or any subset thereof. The heading
     is centered above the music automatically.
-* **showLongSlursAndTiesTogether** (True), **showShortSlursAndTiesTogether** (False):
+* **showLongSlursAndTiesTogether** (None), **showShortSlursAndTiesTogether** (False):
     If False, then the slur on either side of the phrase is reduced by the amount
     that ties are present. If True, then slurs and ties are shown together
-    (i.e. the note can have both a slur and a tie).
+    (i.e. the note can have both a slur and a tie). If `showLongSlursAndTiesTogether`
+    is `None` (default), its value is programmatically set to be the value of
+    ``slurLongPhraseWithBrackets``, described next.
 * **slurLongPhraseWithBrackets** (True): If True, then the slur of a
     long phrase (4+ consecutive notes) is brailled using the bracket slur.
     If False, the double slur is used instead.
@@ -89,6 +91,7 @@ memorization" (BMTM, 71). Some of these keywords are changed automatically in co
 import re
 import unittest
 
+from typing import Optional
 
 from music21 import exceptions21
 from music21 import metadata
@@ -114,7 +117,7 @@ def objectToBraille(music21Obj,
                     showFirstMeasureNumber=True,
                     showHand=None,
                     showHeading=True,
-                    showLongSlursAndTiesTogether=True,
+                    showLongSlursAndTiesTogether: Optional[bool] = None,
                     showShortSlursAndTiesTogether=False,
                     slurLongPhraseWithBrackets=True,
                     suppressOctaveMarks=False,
@@ -232,7 +235,7 @@ def streamToBraille(music21Stream,
                     showFirstMeasureNumber=True,
                     showHand=None,
                     showHeading=True,
-                    showLongSlursAndTiesTogether=True,
+                    showLongSlursAndTiesTogether: Optional[bool] = None,
                     showShortSlursAndTiesTogether=False,
                     slurLongPhraseWithBrackets=True,
                     suppressOctaveMarks=False,
@@ -353,7 +356,7 @@ def scoreToBraille(music21Score,
                    showFirstMeasureNumber=True,
                    showHand=None,
                    showHeading=True,
-                   showLongSlursAndTiesTogether=True,
+                   showLongSlursAndTiesTogether: Optional[bool] = None,
                    showShortSlursAndTiesTogether=False,
                    slurLongPhraseWithBrackets=True,
                    suppressOctaveMarks=False,
@@ -431,7 +434,7 @@ def opusToBraille(music21Opus,
                   showFirstMeasureNumber=True,
                   showHand=None,
                   showHeading=True,
-                  showLongSlursAndTiesTogether=True,
+                  showLongSlursAndTiesTogether: Optional[bool] = None,
                   showShortSlursAndTiesTogether=False,
                   slurLongPhraseWithBrackets=True,
                   suppressOctaveMarks=False,
@@ -478,7 +481,7 @@ def measureToBraille(music21Measure,
                      showFirstMeasureNumber=False,  # observe False!
                      showHand=None,
                      showHeading=False,  # observe False!
-                     showLongSlursAndTiesTogether=True,
+                     showLongSlursAndTiesTogether: Optional[bool] = None,
                      showShortSlursAndTiesTogether=False,
                      slurLongPhraseWithBrackets=True,
                      suppressOctaveMarks=False,
@@ -540,7 +543,7 @@ def partToBraille(music21Part,
                   showFirstMeasureNumber=True,
                   showHand=None,
                   showHeading=True,
-                  showLongSlursAndTiesTogether=True,
+                  showLongSlursAndTiesTogether: Optional[bool] = None,
                   showShortSlursAndTiesTogether=False,
                   slurLongPhraseWithBrackets=True,
                   suppressOctaveMarks=False,
@@ -600,7 +603,7 @@ def keyboardPartsToBraille(keyboardScore,
                            showFirstMeasureNumber=True,
                            showHand=None,
                            showHeading=True,
-                           showLongSlursAndTiesTogether=True,
+                           showLongSlursAndTiesTogether: Optional[bool] = None,
                            showShortSlursAndTiesTogether=False,
                            slurLongPhraseWithBrackets=True,
                            suppressOctaveMarks=False,
