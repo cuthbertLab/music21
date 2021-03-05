@@ -18,7 +18,7 @@ __all__ = ['tables', 'Chord', 'ChordException', 'fromIntervalVector', 'fromForte
 import copy
 import unittest
 import re
-from typing import Union, List, Optional, TypeVar, Set, Tuple
+from typing import Union, List, Optional, TypeVar, Set, Tuple, Dict
 
 from music21 import beam
 from music21 import common
@@ -1275,34 +1275,30 @@ class Chord(note.NotRest):
         # FIND ROOT FAST -- for cases where one note has perfectly stacked
         # thirds, like E C G; but not C E B-
         # if one pitch has perfectlyStackedThirds, return it always:
-        stepsFound = set()
-        nonDuplicatingPitches = []
-        for p in self.pitches:
-            if p.step in stepsFound:
-                continue
-            else:
-                stepsFound.add(p.step)
-                nonDuplicatingPitches.append(p)
-
+        nonDuplicatingPitches = common.misc.unique((n.pitch for n in self._notes),
+                                                   key=lambda pp: pp.step)
         lenPitches = len(nonDuplicatingPitches)
         if not lenPitches:
             raise ChordException(f'no pitches in chord {self!r}')
         if lenPitches == 1:
             return self.pitches[0]
 
-        # for C E G C, searchChordSteps will be (3, 5)
-        searchChordSteps = orderedChordSteps[:lenPitches - 1]
-
-        for i, p in enumerate(nonDuplicatingPitches):
-            foundAll = True
-            for chordStepTest in searchChordSteps:
-                if not self.getChordStep(chordStepTest, testRoot=p):
-                    foundAll = False
+        stepNumsToPitches: Dict[int, pitch.Pitch] = {pitch.STEP_TO_DNN_OFFSET[p.step]: p
+                                                     for p in nonDuplicatingPitches}
+        stepNums = sorted(stepNumsToPitches)
+        for startIndex in range(lenPitches):
+            all_are_thirds = True
+            this_step_num = stepNums[startIndex]
+            last_step_num = this_step_num
+            for endIndex in range(startIndex + 1, startIndex + lenPitches):
+                endIndexMod = endIndex % lenPitches
+                endStepNum = stepNums[endIndexMod]
+                if endStepNum - last_step_num not in (2, -5):
+                    all_are_thirds = False
                     break
-            if foundAll:
-                # note that for a 13th chord, this will return the bass,
-                # which is great!
-                return p
+                last_step_num = endStepNum
+            if all_are_thirds:
+                return stepNumsToPitches[this_step_num]
 
         # FIND ROOT SLOW
         # no notes (or more than one...) have perfectlyStackedThirds above them.  Return
@@ -3103,6 +3099,7 @@ class Chord(note.NotRest):
              newroot: Union[bool, str, pitch.Pitch, note.Note] = False,
              *,
              find=None):
+        # noinspection PyShadowingNames
         '''
         Returns or sets the Root of the chord. If not set, will find it.
 
