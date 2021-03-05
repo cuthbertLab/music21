@@ -1280,7 +1280,8 @@ class Chord(note.NotRest):
         lenPitches = len(nonDuplicatingPitches)
         if not lenPitches:
             raise ChordException(f'no pitches in chord {self!r}')
-        elif lenPitches == 1:
+
+        if lenPitches == 1:
             return self.pitches[0]
         elif lenPitches == 7:  # 13th chord
             return self.bass()
