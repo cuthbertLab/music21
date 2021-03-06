@@ -2827,6 +2827,122 @@ class Chord(note.NotRest):
         '''
         return self._checkTriadType((3, 11, 1), 3, 7)
 
+    def isTranspositionallySymmetrical(self, *, requireIntervallicEvenness=False) -> bool:
+        '''
+        Returns True if the Chord is symmetrical under transposition
+        and False otherwise.  A pitch-class-based way of looking at this, is
+        can all the pitch classes be transposed up some number of semitones 1-11
+        and end up with the same pitch-classes.  Like the dyad F-B can have each
+        note transposed up 6 semitones and get another B-F = F-B dyad.
+
+        A tonally-focused way of looking at this would be are we unable
+        to distinguish root position vs. some inversion of the chord by ear alone?
+        For instance, we can see that C-Eb-Gb-Bbb is in root position, while
+        Eb-Gb-Bbb-C is in first inversion.  But only hearing the chord in isolation
+        it would not be possible to tell.
+
+        With either way of looking at it,
+        fourteen set classes of 2-10 pitch classes have this property,
+        including the augmented triad:
+
+        >>> chord.Chord('C E G#').isTranspositionallySymmetrical()
+        True
+
+        ...but not the major triad:
+
+        >>> chord.Chord('C E G').isTranspositionallySymmetrical()
+        False
+
+        The whole-tone scale and the Petrushka chord are both transpositionally symmetrical:
+
+        >>> wholeToneAsChord = chord.Chord('C D E F# G# B- C')
+        >>> wholeToneAsChord.isTranspositionallySymmetrical()
+        True
+
+        >>> petrushka = chord.Chord([0, 1, 3, 6, 7, 9])
+        >>> petrushka.isTranspositionallySymmetrical()
+        True
+
+        If `requireIntervallicEvenness` is True then only chords that also have
+        even spacing / evenly divide the octave are considered transpositionally
+        symmetrical.  The normal cases are the F-B (06) dyad, the augmented triad,
+        the diminished-seventh chord, and the whole-tone scale collection:
+
+        >>> wholeToneAsChord.isTranspositionallySymmetrical(requireIntervallicEvenness=True)
+        True
+
+        >>> petrushka.isTranspositionallySymmetrical(requireIntervallicEvenness=True)
+        False
+
+        Note that complements of these chords (except the whole-tone collection) are
+        not transpositionally symmetrical if `requireIntervallicEvenness` is required:
+
+        >>> chord.Chord([0, 4, 8]).isTranspositionallySymmetrical(requireIntervallicEvenness=True)
+        True
+
+        >>> chord.Chord([1, 2, 3, 5, 6, 7, 9, 10, 11]).isTranspositionallySymmetrical(
+        ...       requireIntervallicEvenness=True)
+        False
+
+        Empty chords and the total aggregate cannot have their inversion determined by ear alone.
+        So they are `True` with or without `requireIntervallicEvenness`.
+
+        >>> chord.Chord().isTranspositionallySymmetrical()
+        True
+
+        >>> chord.Chord(list(range(12))).isTranspositionallySymmetrical()
+        True
+
+        Monads (single-note "chords") cannot be transposed 1-11 semitones to recreate themselves,
+        so they return `False` by default:
+
+        >>> chord.Chord('C').isTranspositionallySymmetrical()
+        False
+
+        But they are the only case where `requireIntervallicEvenness` actually switches from
+        `False` to `True`, because they do evenly divide the octave.
+
+        >>> chord.Chord('C').isTranspositionallySymmetrical(requireIntervallicEvenness=True)
+        True
+
+        11-note chords return `False` in either case:
+
+        >>> chord.Chord(list(range(11))).isTranspositionallySymmetrical()
+        False
+        '''
+        if not self._notes:
+            return True
+
+        address = self.chordTablesAddress
+        if address.cardinality == 1:
+            return requireIntervallicEvenness
+
+        lookup = (address.cardinality, address.forteClass)
+        if lookup in (
+            (2,  6),  # 06 -- omitted by Straus
+            (3, 12),  # augmented triad
+            (4, 28),  # diminished seventh chord
+            (6, 35),  # whole-tone scale
+            (12, 1),  # total aggregate.
+        ):
+            return True
+
+        if not requireIntervallicEvenness and lookup in (
+            (4,  9),  # 0167
+            (4, 25),  # 0268
+            (6,  7),  # 012678
+            (6, 20),  # "Hexatonic scale" 014589
+            (6, 30),  # Petrushka chord 013679
+            (8,  9),  # 01236789
+            (8, 25),  # 0124678T
+            (8, 28),  # octatonic scale
+            (9, 12),  # complement to augmented triad
+            (10, 6),  # complement to 06
+        ):
+            return True
+        else:
+            return False
+
     @cacheMethod
     def isSeventh(self):
         '''
@@ -2948,14 +3064,18 @@ class Chord(note.NotRest):
 
         return True
 
-    @cacheMethod
-    def isTriad(self):
-        '''
-        Returns boolean.
 
-        "Contains vs. Is:" A dominant-seventh chord is NOT a triad.
-        returns True if the chord contains at least one Third and one Fifth and all notes are
-        equivalent to either of those notes. Only returns True if triad is spelled correctly.
+    @cacheMethod
+    def isTriad(self) -> bool:
+        '''
+        Returns True if this Chord is a triad of some sort.  It could even be a rather
+        exotic triad so long as the chord contains at least one Third and one Fifth and
+        all notes have the same name as one of the htree notes.
+
+        Note: only returns True if triad is spelled correctly.
+
+        Note the difference of "containsTriad" vs. "isTriad":
+        A dominant-seventh chord is NOT a triad, but it contains two triads.
 
         >>> cChord = chord.Chord(['C4', 'E4', 'A4'])
         >>> cChord.isTriad()

@@ -35,12 +35,12 @@ class ChordTablesException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 # TNI structures are defined
-# 0=pitches, 1=ICV, 2=invariance vector (Robert Morris), 3 = Z-relation)
+# [0]=pitches, [1]=ICV, [2]=invariance vector (Robert Morris), [3] = Z-relation)
 # invariance vector can be used to determine symmetry.
-# the first four entries in the invariance vector shows how many invariance there
+# the first four entries in the invariance vector shows how many variances there
 # are under Tn, TnI, TnM, TnMI respectively
 # the entries 5-8 show how many map to their complements under Tn, TnI, TnM, and TnMI respectively
-# at index 1, a value of 1 is symmetrical
+# at index 1, a value of 1 is symmetrical under inversion.
 t1   = ((0,), (0,0,0,0,0,0), (1,1,1,1,11,11,11,11), 0)  # 1-1
 monad = (None, t1)
 
@@ -2811,7 +2811,7 @@ def seekChordTablesAddress(c):
     Table addresses are TN based three character codes:
     cardinality, Forte index number, inversion
 
-    Inversion is either 0 (for symmetrical) or -1/1
+    Inversion is either 0 (for symmetrical under inversion) or -1, 1
 
     NOTE: time consuming, and only should be run when necessary.
 
