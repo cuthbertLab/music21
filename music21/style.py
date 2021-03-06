@@ -107,18 +107,17 @@ class Style(ProtoM21Object):
     def _setAbsoluteY(self, value):
         if value is None:
             self._absoluteY = None
+        elif value == 'above':
+            self._absoluteY = 10
+        elif value == 'below':
+            self._absoluteY = -70
         else:
-            if value == 'above':
-                value = 10
-            elif value == 'below':
-                value = -70
             try:
-                value = common.numToIntOrFloat(value)
+                self._absoluteY = common.numToIntOrFloat(value)
             except ValueError as ve:
                 raise TextFormatException(
                     f'Not a supported absoluteY position: {value!r}'
                 ) from ve
-            self._absoluteY = value
 
     absoluteY = property(_getAbsoluteY,
                          _setAbsoluteY,
