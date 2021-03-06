@@ -2919,7 +2919,7 @@ class Chord(note.NotRest):
 
         lookup = (address.cardinality, address.forteClass)
         if lookup in (
-            (2,  6),  # 06 -- omitted by Straus
+            (2,  6),  # 06 -- omitted by Straus  # noqa: E241
             (3, 12),  # augmented triad
             (4, 28),  # diminished seventh chord
             (6, 35),  # whole-tone scale
@@ -2928,12 +2928,12 @@ class Chord(note.NotRest):
             return True
 
         if not requireIntervallicEvenness and lookup in (
-            (4,  9),  # 0167
+            (4,  9),  # 0167  # noqa: E241
             (4, 25),  # 0268
-            (6,  7),  # 012678
+            (6,  7),  # 012678  # noqa: E241
             (6, 20),  # "Hexatonic scale" 014589
             (6, 30),  # Petrushka chord 013679
-            (8,  9),  # 01236789
+            (8,  9),  # 01236789  # noqa: E241
             (8, 25),  # 0124678T
             (8, 28),  # octatonic scale
             (9, 12),  # complement to augmented triad
