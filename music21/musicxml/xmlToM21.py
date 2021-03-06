@@ -3099,7 +3099,7 @@ class MeasureParser(XMLParserBase):
         if freeSpanners is True:
             spannerBundle.freePendingSpannedElementAssignment(n)
 
-        # attributes, including color
+        # attributes, including color and position
         self.setPrintStyle(mxNote, n)
         # print object == 'no' and grace notes may have a type but not
         # a duration. they may be filtered out at the level of Stream
@@ -3136,8 +3136,6 @@ class MeasureParser(XMLParserBase):
         mxType = mxNote.find('type')
         if mxType is not None:
             self.setStyleAttributes(mxType, n, 'size', 'noteSize')
-
-        self.setPosition(mxNote, n)
 
         if mxNote.find('tie') is not None:
             n.tie = self.xmlToTie(mxNote)
