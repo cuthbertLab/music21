@@ -3182,6 +3182,7 @@ class MeasureExporter(XMLExporterBase):
         >>> n = note.Note('D#5')
         >>> n.quarterLength = 3
         >>> n.volume.velocityScalar = 0.5
+        >>> n.style.color = 'silver'
 
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> len(MEX.xmlRoot)
@@ -3190,7 +3191,7 @@ class MeasureExporter(XMLExporterBase):
         >>> mxNote
         <Element 'note' at 0x10113cb38>
         >>> MEX.dump(mxNote)
-        <note dynamics="70.56">
+        <note color="#C0C0C0" dynamics="70.56">
           <pitch>
             <step>D</step>
             <alter>1</alter>
@@ -3200,6 +3201,7 @@ class MeasureExporter(XMLExporterBase):
           <type>half</type>
           <dot />
           <accidental>sharp</accidental>
+          <notehead color="#C0C0C0" parentheses="no">normal</notehead>
         </note>
         >>> len(MEX.xmlRoot)
         1
@@ -3239,9 +3241,9 @@ class MeasureExporter(XMLExporterBase):
         >>> n.articulations.append(articulations.Pizzicato())
         >>> mxNote = MEX.noteToXml(n)
         >>> MEX.dump(mxNote)
-        <note dynamics="70.56" pizzicato="yes">
+        <note color="#C0C0C0" dynamics="70.56" pizzicato="yes">
           ...
-          <notehead parentheses="no">diamond</notehead>
+          <notehead color="#C0C0C0" parentheses="no">diamond</notehead>
         </note>
 
         Notes with complex durations need to be simplified before coming here
@@ -3266,15 +3268,17 @@ class MeasureExporter(XMLExporterBase):
         addChordTag = (noteIndexInChord != 0)
         setb = _setAttributeFromAttribute
 
+        mxNote = Element('note')
         chordOrN: note.GeneralNote
         if chordParent is None:
             chordOrN = n
         else:
             chordOrN = chordParent
+            # Ensure color is set on `n`, since only `chordOrN` is handled below
+            self.setColor(mxNote, n)
 
-        mxNote = Element('note')
         # self.setFont(mxNote, chordOrN)
-        self.setPrintStyle(mxNote, chordOrN)
+        self.setPrintStyle(mxNote, chordOrN)  # sets color
         # TODO: attr-group: printout -- replaces print-object, print-spacing below (3.1)
         # TODO: attr: print-leger -- musicxml 3.1
         if (chordOrN.isRest is False
@@ -3287,7 +3291,6 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attr: attack
         # TODO: attr: release
         # TODO: attr: time-only
-        self.setColor(mxNote, n)  # TODO(msc): is this redundant with setColor below?
         _synchronizeIds(mxNote, n)
 
         d = chordOrN.duration
@@ -3315,7 +3318,6 @@ class MeasureExporter(XMLExporterBase):
                 environLocal.warn(f'Duration set as Grace while not being a GraceDuration {d}')
 
         # TODO: cue... / cue-grace
-        self.setColor(mxNote, chordOrN)
 
         self.setPrintObject(mxNote, n)
         if n.hasStyleInformation and n.style.hideObjectOnPrint is True:
@@ -3658,11 +3660,12 @@ class MeasureExporter(XMLExporterBase):
         >>> g = pitch.Pitch('g3')
         >>> h = note.Note('b4')
         >>> h.notehead = 'diamond'
+        >>> h.style.color = 'gold'
         >>> ch2 = chord.Chord([g, h])
         >>> ch2.quarterLength = 2.0
         >>> mxNoteList = MEX.chordToXml(ch2)
         >>> MEX.dump(mxNoteList[1])
-        <note>
+        <note color="#FFD700">
           <chord />
           <pitch>
             <step>B</step>
@@ -3670,7 +3673,7 @@ class MeasureExporter(XMLExporterBase):
           </pitch>
           <duration>20160</duration>
           <type>half</type>
-          <notehead parentheses="no">diamond</notehead>
+          <notehead color="#FFD700" parentheses="no">diamond</notehead>
         </note>
 
         Test articulations of chords with fingerings. Superfluous fingerings will be ignored.

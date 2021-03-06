@@ -3085,13 +3085,21 @@ class MeasureParser(XMLParserBase):
     def xmlNoteToGeneralNoteHelper(self, n, mxNote, freeSpanners=True):
         '''
         Combined function to work on all <note> tags, where n can be
-        a Note or Rest
+        a Note or Rest.
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> n = note.Note()
+        >>> mxNote = EL('<note color="silver"></note>')
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> n = MP.xmlNoteToGeneralNoteHelper(n, mxNote)
+        >>> n.style.color
+        'silver'
         '''
         spannerBundle = self.spannerBundle
         if freeSpanners is True:
             spannerBundle.freePendingSpannedElementAssignment(n)
 
-        # attributes
+        # attributes, including color
         self.setPrintStyle(mxNote, n)
         # print object == 'no' and grace notes may have a type but not
         # a duration. they may be filtered out at the level of Stream
@@ -3129,7 +3137,6 @@ class MeasureParser(XMLParserBase):
         if mxType is not None:
             self.setStyleAttributes(mxType, n, 'size', 'noteSize')
 
-        self.setColor(mxNote, n)
         self.setPosition(mxNote, n)
 
         if mxNote.find('tie') is not None:
