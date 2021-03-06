@@ -18,13 +18,14 @@ import unittest
 
 from music21 import common
 from music21 import exceptions21
+from music21.prebase import ProtoM21Object
 
 
 class TextFormatException(exceptions21.Music21Exception):
     pass
 
 
-class Style:
+class Style(ProtoM21Object):
     '''
     A style object is a lightweight object that
     keeps track of information about the look of an object.
@@ -158,6 +159,10 @@ class NoteStyle(Style):
 class TextStyle(Style):
     '''
     A Style object that also includes text formatting.
+
+    >>> ts = style.TextStyle()
+    >>> ts.classes
+    ('TextStyle', 'Style', 'ProtoM21Object', 'object')
     '''
 
     def __init__(self):
