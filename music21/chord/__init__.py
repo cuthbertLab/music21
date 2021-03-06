@@ -32,7 +32,7 @@ from music21 import tie
 from music21 import volume
 
 from music21 import environment
-from music21.chord import tables as chordTables
+from music21.chord import tables
 from music21.common.decorators import cacheMethod
 
 _MOD = 'chord'
@@ -908,7 +908,7 @@ class Chord(note.NotRest):
         >>> c4.areZRelations(c3)
         False
         '''
-        zRelationAddress = chordTables.addressToZAddress(self.chordTablesAddress)
+        zRelationAddress = tables.addressToZAddress(self.chordTablesAddress)
         if zRelationAddress is None:
             return False
         if other.chordTablesAddress[0:3] == zRelationAddress[0:3]:
@@ -1665,8 +1665,8 @@ class Chord(note.NotRest):
         '''
         if self.hasZRelation:
             chordTablesAddress = self.chordTablesAddress
-            v = chordTables.addressToIntervalVector(chordTablesAddress)
-            addresses = chordTables.intervalVectorToAddress(v)
+            v = tables.addressToIntervalVector(chordTablesAddress)
+            addresses = tables.intervalVectorToAddress(v)
             # environLocal.printDebug(['addresses', addresses,
             #    'chordTablesAddress', chordTablesAddress])
             # addresses returned here are 2 elements lists
@@ -1675,7 +1675,7 @@ class Chord(note.NotRest):
                 if thisAddress.forteClass != chordTablesAddress.forteClass:
                     other = thisAddress
             # other should always be defined to not None
-            prime = chordTables.addressToTransposedNormalForm(other)
+            prime = tables.addressToTransposedNormalForm(other)
             return Chord(prime)
         return None
         # c2.getZRelation()  # returns a list in non-ET12 space...
@@ -4080,9 +4080,9 @@ class Chord(note.NotRest):
         ChordTableAddress(cardinality=0, forteClass=0, inversion=0, pcOriginal=0)
         '''
         try:
-            return chordTables.seekChordTablesAddress(self)
-        except chordTables.ChordTablesException:
-            return chordTables.ChordTableAddress(0, 0, 0, 0)
+            return tables.seekChordTablesAddress(self)
+        except tables.ChordTablesException:
+            return tables.ChordTableAddress(0, 0, 0, 0)
 
 
     @property
@@ -4215,7 +4215,7 @@ class Chord(note.NotRest):
             else:
                 return 'enharmonic octaves'
 
-        ctn = chordTables.addressToCommonNames(cta)
+        ctn = tables.addressToCommonNames(cta)
         if cta.cardinality == 2:
             pitchNames = {p.name for p in self.pitches}
             pitchPSes = {p.ps for p in self.pitches}
@@ -4380,8 +4380,8 @@ class Chord(note.NotRest):
         '2-2'
         '''
         try:
-            return chordTables.addressToForteName(self.chordTablesAddress, 'tn')
-        except chordTables.ChordTablesException:
+            return tables.addressToForteName(self.chordTablesAddress, 'tn')
+        except tables.ChordTablesException:
             return 'N/A'
 
     @property
@@ -4444,8 +4444,8 @@ class Chord(note.NotRest):
         '2-2'
         '''
         try:
-            return chordTables.addressToForteName(self.chordTablesAddress, 'tni')
-        except chordTables.ChordTablesException:
+            return tables.addressToForteName(self.chordTablesAddress, 'tni')
+        except tables.ChordTablesException:
             return 'N/A'
 
     @property
@@ -4490,8 +4490,8 @@ class Chord(note.NotRest):
         False
         '''
         try:
-            post = chordTables.addressToZAddress(self.chordTablesAddress)
-        except chordTables.ChordTablesException:
+            post = tables.addressToZAddress(self.chordTablesAddress)
+        except tables.ChordTablesException:
             return False  # empty chords have no z-relations
 
         # environLocal.printDebug(['got post', post])
@@ -4522,8 +4522,8 @@ class Chord(note.NotRest):
         [0, 0, 0, 0, 0, 0]
         '''
         try:
-            return list(chordTables.addressToIntervalVector(self.chordTablesAddress))
-        except chordTables.ChordTablesException:
+            return list(tables.addressToIntervalVector(self.chordTablesAddress))
+        except tables.ChordTablesException:
             return [0, 0, 0, 0, 0, 0]
 
     @property
@@ -4702,8 +4702,8 @@ class Chord(note.NotRest):
         '''
         cta = self.chordTablesAddress
         try:
-            transposedNormalForm = chordTables.addressToTransposedNormalForm(cta)
-        except chordTables.ChordTablesException:
+            transposedNormalForm = tables.addressToTransposedNormalForm(cta)
+        except tables.ChordTablesException:
             return []
 
         orderedPCs = self.orderedPitchClasses
@@ -5015,8 +5015,8 @@ class Chord(note.NotRest):
         []
         '''
         try:
-            return list(chordTables.addressToPrimeForm(self.chordTablesAddress))
-        except chordTables.ChordTablesException:
+            return list(tables.addressToPrimeForm(self.chordTablesAddress))
+        except tables.ChordTablesException:
             return []
 
     @property
@@ -5459,7 +5459,7 @@ def fromForteClass(notation):
     else:
         raise ChordException(f'cannot handle specified notation: {notation}')
 
-    prime = chordTables.addressToTransposedNormalForm([card, num, inv])
+    prime = tables.addressToTransposedNormalForm([card, num, inv])
     return Chord(prime)
 
 
@@ -5486,13 +5486,13 @@ def fromIntervalVector(notation, getZRelation=False):
     addressList = None
     if common.isListLike(notation):
         if len(notation) == 6:  # assume its an interval vector
-            addressList = chordTables.intervalVectorToAddress(notation)
+            addressList = tables.intervalVectorToAddress(notation)
     if addressList is None:
         raise ChordException(f'cannot handle specified notation: {notation}')
 
     post = []
     for address in addressList:
-        post.append(Chord(chordTables.addressToTransposedNormalForm(address)))
+        post.append(Chord(tables.addressToTransposedNormalForm(address)))
     # for now, return the first chord
     # z-related chords will have more than one
     if len(post) == 1:
