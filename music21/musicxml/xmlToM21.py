@@ -4731,7 +4731,22 @@ class MeasureParser(XMLParserBase):
 
     def xmlToTextExpression(self, mxWords):
         '''
-        Given an mxDirection, create a textExpression
+        Given an `mxWords`, create a :class:`~music21.expression.TextExpression`
+        and set style attributes, fonts, position, etc.
+
+        Calls `setTextFormatting`, which calls `setPrintStyleAlign`.
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> m = EL('<words default-y="17" font-family="Courier" ' +
+        ... 'font-style="italic" relative-x="-6">a tempo</words>')
+        >>> te = MP.xmlToTextExpression(m)
+        >>> te.content
+        'a tempo'
+        >>> te.style.relativeX
+        -6
+        >>> te.style.fontFamily
+        ['Courier']
         '''
         # TODO: switch to using the setPrintAlign, etc.
 
@@ -4744,7 +4759,6 @@ class MeasureParser(XMLParserBase):
             wordText = ''
         te = expressions.TextExpression(wordText)
         self.setTextFormatting(mxWords, te)
-        self.setPosition(mxWords, te)
         return te
 
     def xmlToRehearsalMark(self, mxRehearsal):
