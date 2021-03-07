@@ -3274,7 +3274,7 @@ class MeasureExporter(XMLExporterBase):
             chordOrN = n
         else:
             chordOrN = chordParent
-            # Ensure color is set on `n`, since only `chordOrN` is handled below
+            # Ensure color is read from `n`, since only `chordOrN` is handled below
             self.setColor(mxNote, n)
 
         # self.setFont(mxNote, chordOrN)
