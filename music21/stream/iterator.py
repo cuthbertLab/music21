@@ -161,14 +161,14 @@ class StreamIterator(prebase.ProtoM21Object):
             else:
                 self.sectionIndex = self.index
 
-            self.index += 1  # increment early in case of an error.
-
             try:
-                e = self.srcStreamElements[self.index - 1]
+                e = self.srcStreamElements[self.index]
             except IndexError:
                 # this may happen if the number of elements has changed
+                self.index += 1
                 continue
 
+            self.index += 1
             if self.matchesFilters(e) is False:
                 continue
 
