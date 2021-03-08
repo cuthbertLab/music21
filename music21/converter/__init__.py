@@ -47,6 +47,7 @@ import unittest
 import urllib
 import zipfile
 
+from math import isclose
 from typing import Union, Tuple
 
 __all__ = [
@@ -1869,12 +1870,11 @@ class Test(unittest.TestCase):
         Checks quantization when parsing a stream. Here everything snaps to the 8th note.
         '''
         from music21 import omr
-        from music21.common import numberTools
         midiFp = omr.correctors.pathName + os.sep + 'k525short.mid'
         midiStream = parse(midiFp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
         # midiStream.show()
         for n in midiStream.recurse(classFilter='Note'):
-            self.assertTrue(numberTools.almostEquals(n.quarterLength % 0.5, 0.0))
+            self.assertTrue(isclose(n.quarterLength % 0.5, 0.0, abs_tol=1e-7))
 
     def testParseMidiNoQuantize(self):
         '''

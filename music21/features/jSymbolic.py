@@ -19,8 +19,8 @@ import math
 import statistics
 import unittest
 from collections import OrderedDict
+from math import isclose
 
-from music21 import common
 from music21 import base
 from music21 import exceptions21
 from music21.features import base as featuresModule
@@ -2332,7 +2332,7 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
             oNext = onsets[i + 1]
             # Don't include simultaneous attacks
             dif = oNext - o
-            if not common.almostEquals(dif, 0.0):
+            if not isclose(dif, 0.0, abs_tol=1e-7):
                 differences.append(dif)
         self.feature.vector[0] = sum(differences) / len(differences)
 
@@ -2373,7 +2373,7 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
             oNext = onsets[i + 1]
             # Don't include simultaneous attacks
             dif = oNext - o
-            if not common.almostEquals(dif, 0.0):
+            if not isclose(dif, 0.0, abs_tol=1e-7):
                 differences.append(dif)
         self.feature.vector[0] = statistics.pstdev(differences)
 
@@ -2426,7 +2426,7 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
                 oNext = onsets[i + 1]
                 # Don't include simultaneous attacks
                 dif = oNext - o
-                if not common.almostEquals(dif, 0.0):
+                if not isclose(dif, 0.0, abs_tol=1e-7):
                     differences.append(dif)
             if not differences:
                 raise JSymbolicFeatureException('at least one part lacks notes')
@@ -2486,7 +2486,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
                 oNext = onsets[i + 1]
                 dif = oNext - o
                 # Don't include simultaneous attacks
-                if not common.almostEquals(dif, 0.0):
+                if not isclose(dif, 0.0, abs_tol=1e-7):
                     differences.append(dif)
             if not differences:
                 raise JSymbolicFeatureException('at least one part lacks notes')
