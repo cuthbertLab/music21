@@ -2674,7 +2674,8 @@ class MeasureParser(XMLParserBase):
 
         # TODO: beams over rests?
         '''
-        n = note.Note()
+        d = self.xmlToDuration(mxNote)
+        n = note.Note(duration=d)
 
         # send whole note since accidental display not in <pitch>
         self.xmlToPitch(mxNote, n.pitch)
@@ -3043,7 +3044,8 @@ class MeasureParser(XMLParserBase):
         Note that we do NOT set `r`'s `.fullMeasure` to True or always, but keep it as
         "auto" so that changes in time signature, etc. will affect output.
         '''
-        r = note.Rest()
+        d = self.xmlToDuration(mxRest)
+        r = note.Rest(duration=d)
         mxRestTag = mxRest.find('rest')
         if mxRestTag is None:
             raise MusicXMLImportException('do not call xmlToRest on a <note> unless it '
@@ -3121,8 +3123,7 @@ class MeasureParser(XMLParserBase):
                 # this technically puts it in the
                 # wrong place in the sequence, but it won't matter
                 ET.SubElement(mxNote, '<type>eighth</type>')
-
-        self.xmlToDuration(mxNote, n.duration)
+            self.xmlToDuration(mxNote, n.duration)
 
         # type styles
         mxType = mxNote.find('type')
