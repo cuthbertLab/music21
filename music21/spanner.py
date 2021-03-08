@@ -396,8 +396,9 @@ class Spanner(base.Music21Object):
     def getSpannedElementIds(self):
         '''
         Return all id() for all stored objects.
+        Performance critical.
         '''
-        return [id(n) for n in self.spannerStorage]
+        return [id(n) for n in self.spannerStorage._elements]
 
     def addSpannedElements(self,
                            spannedElements: Union['music21.base.Music21Object',
