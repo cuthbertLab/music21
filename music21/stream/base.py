@@ -1849,7 +1849,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 raise base.SitesException(
                     f'an entry for this object 0x{id(element):x} is not stored in stream {self}')
 
-        if returnSpecial is False and o in OffsetSpecial:
+        # OffsetSpecial.__contains__() is more expensive, so try to fail fast
+        if isinstance(o, str) and returnSpecial is False and o in OffsetSpecial:
             try:
                 return getattr(self, o)
             except AttributeError:  # pragma: no cover
