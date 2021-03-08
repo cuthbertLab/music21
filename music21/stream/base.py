@@ -29,6 +29,7 @@ import unittest
 import sys
 
 from fractions import Fraction
+from math import isclose
 from typing import Union, List, Optional, Set, Tuple, Sequence
 
 from music21 import base
@@ -6012,7 +6013,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 allTimePoints = (0,) + allTimePoints
 
             for offset, endTime in zip(allTimePoints, allTimePoints[1:]):
-                if common.almostEquals(offset, endTime):
+                if isclose(offset, endTime, abs_tol=1e-7):
                     continue
                 vert = timespanTree.getVerticalityAt(offset)
                 quarterLength = endTime - offset
