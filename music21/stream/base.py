@@ -10857,6 +10857,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     # insert shift + offset w/ voice
                     returnObj.coreInsert(shiftOffset + e.getOffsetBySite(v), e)
                 returnObj.remove(v)
+            returnObj.coreElementsChanged()
 
         if not inPlace:
             return returnObj
@@ -11315,6 +11316,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # Now fix measure numbers given the saved information
         returnObj._fixMeasureNumbers(deletedMeasures, insertedMeasures)
+
+        # have to clear cached variants, as they are no longer the same
+        returnObj.coreElementsChanged()
 
         if not inPlace:
             return returnObj
