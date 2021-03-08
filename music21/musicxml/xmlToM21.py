@@ -3087,13 +3087,21 @@ class MeasureParser(XMLParserBase):
     def xmlNoteToGeneralNoteHelper(self, n, mxNote, freeSpanners=True):
         '''
         Combined function to work on all <note> tags, where n can be
-        a Note or Rest
+        a Note or Rest.
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> n = note.Note()
+        >>> mxNote = EL('<note color="silver"></note>')
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> n = MP.xmlNoteToGeneralNoteHelper(n, mxNote)
+        >>> n.style.color
+        'silver'
         '''
         spannerBundle = self.spannerBundle
         if freeSpanners is True:
             spannerBundle.freePendingSpannedElementAssignment(n)
 
-        # attributes
+        # attributes, including color and position
         self.setPrintStyle(mxNote, n)
         # print object == 'no' and grace notes may have a type but not
         # a duration. they may be filtered out at the level of Stream
@@ -3129,9 +3137,6 @@ class MeasureParser(XMLParserBase):
         mxType = mxNote.find('type')
         if mxType is not None:
             self.setStyleAttributes(mxType, n, 'size', 'noteSize')
-
-        self.setColor(mxNote, n)
-        self.setPosition(mxNote, n)
 
         if mxNote.find('tie') is not None:
             n.tie = self.xmlToTie(mxNote)
@@ -4727,7 +4732,22 @@ class MeasureParser(XMLParserBase):
 
     def xmlToTextExpression(self, mxWords):
         '''
-        Given an mxDirection, create a textExpression
+        Given an `mxWords`, create a :class:`~music21.expression.TextExpression`
+        and set style attributes, fonts, position, etc.
+
+        Calls `setTextFormatting`, which calls `setPrintStyleAlign`.
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> m = EL('<words default-y="17" font-family="Courier" ' +
+        ... 'font-style="italic" relative-x="-6">a tempo</words>')
+        >>> te = MP.xmlToTextExpression(m)
+        >>> te.content
+        'a tempo'
+        >>> te.style.relativeX
+        -6
+        >>> te.style.fontFamily
+        ['Courier']
         '''
         # TODO: switch to using the setPrintAlign, etc.
 
@@ -4740,7 +4760,6 @@ class MeasureParser(XMLParserBase):
             wordText = ''
         te = expressions.TextExpression(wordText)
         self.setTextFormatting(mxWords, te)
-        self.setPosition(mxWords, te)
         return te
 
     def xmlToRehearsalMark(self, mxRehearsal):
