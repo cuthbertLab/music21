@@ -10608,6 +10608,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> ce = c.voicesToParts()
         >>> ce.show('t')
         {0.0} <music21.stream.Part Piano-v0>
+            {0.0} <music21.instrument.Instrument 'P1: Piano: '>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.key.Key of D major>
@@ -10623,6 +10624,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.note.Rest rest>
                 {4.0} <music21.bar.Barline type=final>
         {0.0} <music21.stream.Part Piano-v1>
+            {0.0} <music21.instrument.Instrument 'P1: Piano: '>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.clef.BassClef>
                 {0.0} <music21.key.Key of D major>
@@ -10756,6 +10758,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         continue
                     pInner = partDict[voiceIdInner]
                     pInner.insert(self.elementOffset(mInner), copy.deepcopy(mActive))
+
+        # Place references to any instruments from the original part into the new parts
+        for p in s.parts:
+            p.mergeElements(self, classFilterList=('Instrument',))
 
         if self.hasMeasures():
             for m in self.iter.getElementsByClass('Measure'):
