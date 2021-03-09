@@ -784,7 +784,9 @@ class SpannerBundle(prebase.ProtoM21Object):
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage:  # storage is a list of spanners
-                if idTarget in sp.getSpannedElementIds():
+                # __contains__() will test for identity, not equality
+                # see Spanner.hasSpannedElement(), which just calls __contains__()
+                if spannedElement in sp:
                     post.append(sp)
             self._cache[cacheKey] = post
         return self._cache[cacheKey]
