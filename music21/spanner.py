@@ -346,6 +346,8 @@ class Spanner(base.Music21Object):
         return iter(self.spannerStorage)
 
     def __len__(self):
+        # Check _elements to avoid StreamIterator overhead.
+        # Safe, because impossible to put spanned elements at end.
         return len(self.spannerStorage._elements)
 
     def getSpannedElements(self):
@@ -370,6 +372,8 @@ class Spanner(base.Music21Object):
         >>> sl.getSpannedElements() == [n1, n2, c1]  # make sure that not sorting
         True
         '''
+        # Check _elements to avoid StreamIterator overhead.
+        # Safe, because impossible to put spanned elements at end.
         return list(self.spannerStorage._elements)
 
     def getSpannedElementsByClass(self, classFilterList):
