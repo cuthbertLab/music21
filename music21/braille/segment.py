@@ -1678,8 +1678,8 @@ def prepareSlurredNotes(music21Part, **keywords):
 
     allNotes = music21Part.flat.notes.stream()
     for slur in music21Part.spannerBundle.getByClass(spanner.Slur):
-        firstNote = slur[0]
-        lastNote = slur[1]
+        firstNote = slur.getFirst()
+        lastNote = slur.getLast()
 
         try:
             beginIndex = allNotes.index(firstNote)
