@@ -1171,7 +1171,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         in the other Stream in this Stream. This does not make
         copies of any elements, but simply stores all of them in this Stream.
 
-        Optionally, provide a list of classes to exclude with the `classFilter` list.
+        Optionally, provide a list of classes to include with the `classFilter` list.
 
         This method provides functionality like a shallow copy,
         but manages locations properly, only copies elements,
@@ -1191,6 +1191,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         >>> s1[1] is s2[1]
         True
+
+        >>> viola = instrument.Viola()
+        >>> trumpet = instrument.Trumpet()
+        >>> s1.insert(0, viola)
+        >>> s1.insert(0, trumpet)
+        >>> s2.mergeElements(s1, classFilterList=('BrassInstrument',))
+        >>> len(s2)
+        3
+        >>> viola in s2
+        False
         '''
         if classFilterList is not None:
             classFilterSet = set(classFilterList)
