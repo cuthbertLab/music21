@@ -1873,8 +1873,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         </appearance>
         '''
         st = self.stream.style
-        if not hasattr(st, 'lineWidths'):
-            return  # TODO: remove in v.5 release after all old data is gone.
 
         if (not st.lineWidths
                 and not st.noteSizes
