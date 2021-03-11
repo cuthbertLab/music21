@@ -2558,6 +2558,10 @@ class Music21Object(prebase.ProtoM21Object):
         be used.  For most people that is musicxml.
 
         Returns the full path to the file.
+
+        Some formats, including .musicxml, create a copy of the stream, pack it into a well-formed
+        score if necessary, and run :meth:`~music21.stream.Score.makeNotation`. To
+        avoid this when writing .musicxml, use `makeNotation=False`.
         '''
         if fmt is None:  # get setting in environment
             fmt = environLocal['writeFormat']
@@ -2605,6 +2609,7 @@ class Music21Object(prebase.ProtoM21Object):
         fmt argument or, if not provided, the format set in the user's Environment
 
         Valid formats include (but are not limited to)::
+
             musicxml
             text
             midi
@@ -2618,6 +2623,10 @@ class Music21Object(prebase.ProtoM21Object):
 
         N.B. score.write('lily') returns a bare lilypond file,
         score.show('lily') runs it through lilypond and displays it as a png.
+
+        Some formats, including .musicxml, create a copy of the stream, pack it into a well-formed
+        score if necessary, and run :meth:`~music21.stream.Score.makeNotation`. To
+        avoid this when showing .musicxml, use `makeNotation=False`.
         '''
         # note that all formats here must be defined in
         # common.VALID_SHOW_FORMATS

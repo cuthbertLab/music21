@@ -8179,10 +8179,15 @@ class Test(unittest.TestCase):
 
     def testOpusWrite(self):
         import os
+        from music21 import converter
 
         o = Opus()
         s1 = Score()
         s2 = Score()
+        p1 = converter.parse('tinyNotation: 4/4 e1')
+        p2 = converter.parse('tinyNotation: 4/4 f1')
+        s1.append(p1)
+        s2.append(p2)
         o.append([s1, s2])
 
         out = o.write()

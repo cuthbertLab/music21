@@ -9389,7 +9389,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return False
         return True
 
-    def isWellFormedNotation(self):
+    def isWellFormedNotation(self) -> bool:
         # noinspection PyShadowingNames
         '''
         Return True if, given the context of this Stream or Stream subclass,

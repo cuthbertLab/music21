@@ -952,10 +952,23 @@ class ConverterMusicXML(SubConverter):
 
         return fp
 
-    def write(self, obj, fmt, fp=None, subformats=None,
-              compress=False, **keywords):  # pragma: no cover
+    def write(self,
+              obj,
+              fmt,
+              *,
+              fp=None,
+              subformats=None,
+              makeNotation=True,
+              compress=False,
+              **keywords):  # pragma: no cover
         '''
         Write to a .xml file.
+
+        Set `makeNotation=False` to prevent fixing up the notation, and where possible,
+        to prevent making additional deepcopies. (If `obj` is not a
+        :class:`~music21.stream.Score`, `obj` or its elements might still be copied.
+        See :meth:`~music21.musicxml.m21ToXml.GeneralObjectExporter.fromGeneralObject`.)
+
         Set `compress=True` to immediately compress the output to a .mxl file.
         '''
         from music21.musicxml import archiveTools, m21ToXml
@@ -969,8 +982,13 @@ class ConverterMusicXML(SubConverter):
             defaults.title = ''
             defaults.author = ''
 
+        dataBytes: bytes = b''
         generalExporter = m21ToXml.GeneralObjectExporter(obj)
-        dataBytes: bytes = generalExporter.parse()
+        if makeNotation is False and 'Score' in obj.classes:
+            # Assume well-formed and bypass deepcopy in GeneralObjectExporter.fromScore()
+            dataBytes = generalExporter.parseWellformedObject(obj, makeNotation=False)
+        else:
+            dataBytes = generalExporter.parse(makeNotation=makeNotation)
 
         writeDataStreamFp = fp
         if fp is not None and subformats is not None:
@@ -1450,6 +1468,50 @@ class Test(unittest.TestCase):
         mxlPath = s.write('mxl')
         self.assertTrue(str(mxlPath).endswith('.mxl'))
         os.remove(mxlPath)
+
+    def testWriteMusicXMLMakeNotation(self):
+        import os
+        from music21 import converter
+        from music21 import note
+
+        m1 = stream.Measure(note.Note(quarterLength=5.0))
+        m2 = stream.Measure()
+        p = stream.Part([m1, m2])
+        s = stream.Score(p)
+
+        self.assertEqual(len(m1.notes), 1)
+        self.assertEqual(len(m2.notes), 0)
+
+        out1 = s.write(makeNotation=True)
+        # 4/4 will be assumed; quarter note will be moved to measure 2
+        roundtrip_back = converter.parse(out1)
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 1)
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 1)
+
+        out2 = s.write(makeNotation=False)
+        roundtrip_back = converter.parse(out2)
+        # 4/4 will not be assumed; quarter note will still be split out from 5.0QL
+        # but it will remain in measure 1
+        # and there will be no rests in measure 2
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 2)
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 0)
+
+        # makeNotation=False on a non-Score still prevents some copying,
+        # but packing into Score inevitably does some making of notation
+        out3 = p.write(makeNotation=False)
+        roundtrip_back = converter.parse(out3)
+        # 4/4 will be assumed; quarter note will be moved to measure 2
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 1)
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 1)
+
+        for out in (out1, out2, out3):
+            os.remove(out)
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
