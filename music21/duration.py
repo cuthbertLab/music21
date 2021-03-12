@@ -1476,7 +1476,12 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     half tied to quintuplet sixteenth note" or simply "quarter note."
 
     A Duration object is made of one or more immutable DurationTuple objects stored on the
-    `components` list.
+    `components` list. A Duration created by setting `quarterLength` sets the attribute
+    `expressionIsInferred` to True, which indicates that consuming functions or applications
+    can express this Duration using another combination of components that sums to the
+    `quarterLength`. Otherwise, `expressionIsInferred` is set to False, indicating that
+    components are not allowed to mutate.
+    (N.B.: `music21` does not yet implement such mutating components.)
 
     Multiple DurationTuples in a single Duration may be used to express tied
     notes, or may be used to split duration across barlines or beam groups.
@@ -1513,11 +1518,16 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     (DurationTuple(type='eighth', dots=0, quarterLength=0.5),
      DurationTuple(type='32nd', dots=0, quarterLength=0.125))
 
+    >>> d2.expressionIsInferred
+    True
+
     Example 3: A Duration configured by keywords.
 
     >>> d3 = duration.Duration(type='half', dots=2)
     >>> d3.quarterLength
     3.5
+    >>> d3.expressionIsInferred
+    False
     '''
 
     # CLASS VARIABLES #
@@ -1534,7 +1544,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '_typeNeedsUpdating',
         '_unlinkedType',
         '_dotGroups',
-
+        'expressionIsInferred',
         '_client'
     )
 
@@ -1562,6 +1572,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         # defer updating until necessary
         self._quarterLengthNeedsUpdating = False
         self._linked = True
+
+        self.expressionIsInferred = False
         for a in arguments:
             if common.isNum(a) and 'quarterLength' not in keywords:
                 keywords['quarterLength'] = a
@@ -1590,6 +1602,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         # permit as keyword so can be passed from notes
         elif 'quarterLength' in keywords:
             self.quarterLength = keywords['quarterLength']
+            self.expressionIsInferred = True
 
         if 'client' in keywords:
             self.client = keywords['client']
@@ -1715,19 +1728,11 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         # this update will not be necessary
         self._quarterLengthNeedsUpdating = False
-        if self.linked:
-            try:
-                qlc = quarterConversion(self._qtrLength)
-                self.components = list(qlc.components)
-                if qlc.tuplet is not None:
-                    self.tuplets = (qlc.tuplet,)
-            except DurationException:
-                environLocal.printDebug([
-                    'problem updating components of note with quarterLength ',
-                    self.quarterLength,
-                    'chokes quarterLengthToDurations'
-                ])
-                raise
+        if self.linked and self.expressionIsInferred:
+            qlc = quarterConversion(self._qtrLength)
+            self.components = list(qlc.components)
+            if qlc.tuplet is not None:
+                self.tuplets = (qlc.tuplet,)
         self._componentsNeedUpdating = False
 
     # PUBLIC METHODS #
@@ -1786,10 +1791,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         if isinstance(dur, DurationTuple):
             self._components.append(dur)
-        elif isinstance(dur, Duration):  # its a Duration object
+        elif isinstance(dur, Duration):  # it's a Duration object
             for c in dur.components:
                 self._components.append(c)
-        else:  # its a number that may produce more than one component
+        else:  # it's a number that may produce more than one component
             for c in Duration(dur).components:
                 self._components.append(c)
 
@@ -2784,6 +2789,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             if value == 0.0 and self.linked is True:
                 self.clear()
             self._qtrLength = value
+            self.expressionIsInferred = True
             self._componentsNeedUpdating = True
             self._quarterLengthNeedsUpdating = False
 
