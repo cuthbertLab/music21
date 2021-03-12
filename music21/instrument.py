@@ -1768,12 +1768,12 @@ def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
     >>> s1 = stream.Stream()
     >>> s1.insert(4, i1)
     >>> s1.insert(4, i2)
-    >>> s1.getInstruments().elements
-    (<music21.instrument.Instrument 'Semi-Hollow Body'>,...
-    <music21.instrument.Instrument 'Electric Guitar: '>)
+    >>> list(s1.getInstruments())
+    [<music21.instrument.Instrument 'Semi-Hollow Body'>,
+        <music21.instrument.Instrument 'Electric Guitar: '>]
     >>> post = instrument.deduplicate(s1)
-    >>> post.getInstruments().elements
-    (<music21.instrument.Instrument 'Electric Guitar: Semi-Hollow Body'>,)
+    >>> list(post.getInstruments())
+    [<music21.instrument.Instrument 'Electric Guitar: Semi-Hollow Body'>]
 
     One `Instrument` instance and one subclass instance, with `inPlace` and parts:
 
@@ -1788,15 +1788,15 @@ def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
     >>> p2.append([instrument.Flute(), instrument.Flute()])
     >>> s2.insert(0, p1)
     >>> s2.insert(0, p2)
-    >>> p1.getInstruments().elements
-    (<music21.instrument.Instrument 'Piccolo: '>, <music21.instrument.Piccolo 'Piccolo'>)
-    >>> p2.getInstruments().elements
-    (<music21.instrument.Flute 'Flute'>, <music21.instrument.Flute 'Flute'>)
+    >>> list(p1.getInstruments())
+    [<music21.instrument.Instrument 'Piccolo: '>, <music21.instrument.Piccolo 'Piccolo'>]
+    >>> list(p2.getInstruments())
+    [<music21.instrument.Flute 'Flute'>, <music21.instrument.Flute 'Flute'>]
     >>> s2 = instrument.deduplicate(s2, inPlace=True)
-    >>> p1.getInstruments().elements
-    (<music21.instrument.Piccolo 'Piccolo: Piccolo'>,)
-    >>> p2.getInstruments().elements
-    (<music21.instrument.Flute 'Flute'>,)
+    >>> list(p1.getInstruments())
+    [<music21.instrument.Piccolo 'Piccolo: Piccolo'>]
+    >>> list(p2.getInstruments())
+    [<music21.instrument.Flute 'Flute'>]
     '''
     if inPlace:
         returnObj = s

@@ -2055,6 +2055,8 @@ class Music21Object(prebase.ProtoM21Object):
             activeS = self.activeSite  # might be None...
             if activeS is None:
                 return None
+            if className is not None and not common.isListLike(className):
+                className = (className,)
             asTree = activeS.asTree(classList=className, flatten=False)
             prevNode = asTree.getNodeBefore(self.sortTuple())
             if prevNode is None:

@@ -428,10 +428,10 @@ class Spanner(base.Music21Object):
         # presently, this does not look for redundancies
         if not common.isListLike(spannedElements):
             spannedElements = [spannedElements]
-        else:
+        if arguments:
             spannedElements = spannedElements[:]  # copy
-        # assume all other arguments
-        spannedElements += arguments
+            # assume all other arguments
+            spannedElements += arguments
         # environLocal.printDebug(['addSpannedElements():', spannedElements])
         for c in spannedElements:
             if c is None:

@@ -11,7 +11,7 @@
 # ------------------------------------------------------------------------------
 '''
 A mixin to ScoreExporter that includes the capabilities for producing a single
-MusicXML `<part>` from multiple music21 PartStaff objects.
+MusicXML `<part>` from multiple music21 `PartStaff` objects.
 '''
 from typing import Dict, List, Optional
 import unittest
@@ -28,7 +28,7 @@ from music21.musicxml.xmlObjects import MusicXMLExportException
 def addStaffTags(measure: Element, staffNumber: int, tagList: Optional[List[str]] = None):
     '''
     For a <measure> tag `measure`, add a <staff> grandchild to any instance of
-    a child tag of a type in `tagList`. Raise if a <staff> grandchild already exists.
+    a child tag of a type in `tagList`.
 
     >>> from xml.etree.ElementTree import fromstring as El
     >>> from music21.musicxml.partStaffExporter import addStaffTags
@@ -140,8 +140,8 @@ class PartStaffExporterMixin:
     def joinableGroups(self) -> List[StaffGroup]:
         '''
         Returns a list of :class:`~music21.layout.StaffGroup` objects that
-        represent PartStaff objects that can be joined together into a single
-        MusicXML `<part>`:
+        represent :class:`~music21.stream.PartStaff` objects that can be
+        joined into a single MusicXML `<part>`:
 
         >>> s = stream.Score()
 
@@ -243,7 +243,7 @@ class PartStaffExporterMixin:
         Create child <staff> tags under each <note>, <direction>, and <forward> element
         in the <part>s being joined.
 
-        Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
+        Called by :meth:`joinPartStaffs`.
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
@@ -312,9 +312,10 @@ class PartStaffExporterMixin:
         For every <part> after the first, find the corresponding measure in the initial
         <part> and merge the contents by inserting all of the contained elements.
 
-        Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
+        Called by :meth:`joinPartStaffs`
 
-        StaffGroup must be a valid one from `joinableGroups()`
+        StaffGroup must be a valid one from
+        :meth:`joinableGroups`.
         '''
 
         target = self.getRootForPartStaff(group[0])
@@ -337,8 +338,10 @@ class PartStaffExporterMixin:
         Move elements from subsequent PartStaff's measures into `target`: the <part>
         element representing the initial PartStaff that will soon represent the merged whole.
 
-        Called by movePartStaffMeasureContents(), which is in turn called by
-        :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
+        Called by
+        :meth:`movePartStaffMeasureContents`,
+        which is in turn called by
+        :meth:`joinPartStaffs`.
         '''
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
@@ -410,7 +413,7 @@ class PartStaffExporterMixin:
         e.g. RH of piano doesn't appear until m. 40, and earlier music for LH needs
         to be merged first in order to find earliest <attributes>.
 
-        Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
+        Called by :meth:`joinPartStaffs`
 
         Multiple keys:
 
@@ -583,14 +586,14 @@ class PartStaffExporterMixin:
     def cleanUpSubsequentPartStaffs(self, group: StaffGroup):
         '''
         Now that the contents of all PartStaffs in `group` have been represented
-        by a single :class:`PartExporter`, remove the obsolete `PartExporter`s from
-        `self.partExporterList` so that they are not included in the export.
+        by a single :class:`~music21.musicxml.m21ToXml.PartExporter`, remove any
+        obsolete `PartExporter` from `self.partExporterList`.
 
         In addition, remove any obsolete `PartStaff` from the `StaffGroup`
         (in the deepcopied stream used for exporting) to ensure <part-group type="stop" />
         is written.
 
-        Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
+        Called by :meth:`joinPartStaffs`
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)

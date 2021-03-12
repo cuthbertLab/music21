@@ -643,7 +643,8 @@ class ConverterHumdrum(SubConverter):
 
     def parseData(self, humdrumString, number=None):
         '''
-        Open Humdrum data from a string -- calls humdrum.parseData()
+        Open Humdrum data from a string -- calls
+        :meth:`~music21.humdrum.spineParser.HumdrumDataCollection.parse()`.
 
         >>> humData = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n' +
         ...     '24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-')
