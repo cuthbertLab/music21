@@ -2832,11 +2832,11 @@ class MeasureExporter(XMLExporterBase):
         if len(obj.duration.dotGroups) > 1:
             obj.duration.splitDotGroups(inPlace=True)
 
-        # split at durations, so long as obj is not a full-measure rest (e.g. whole rest in 9/8)
+        # split at durations, if not a full-measure rest (e.g. whole rest in 9/8)
         if 'GeneralNote' in classes and obj.duration.type == 'complex' and not (
             'Rest' in classes and (
-                obj.fullMeasure in (True, 'always') or
-                (obj.fullMeasure == 'auto' and obj.duration == self.stream.barDuration)
+                obj.fullMeasure in (True, 'always')
+                or (obj.fullMeasure == 'auto' and obj.duration == self.stream.barDuration)
             )
         ):
             objList = obj.splitAtDurations()
