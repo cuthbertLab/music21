@@ -1720,7 +1720,7 @@ class Rest(GeneralNote):
                 # TODO: get it to work.
 
                 "auto" is the default, where if the rest value happens to match the current
-                time signature context, then display it as a whole note, centered, etc.
+                time signature context, then display it as a whole rest, centered, etc.
                 otherwise will display normally.
 
                 See examples in :meth:`music21.musicxml.m21ToXml.MeasureExporter.restToXml`
