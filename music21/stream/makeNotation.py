@@ -551,9 +551,17 @@ def makeMeasures(
             #    ['assigned clef to measure', measureCount, m.clef])
 
         # add voices if necessary (voiceCount > 0)
-        for voiceIndex in range(voiceCount):
+        for voiceNumber in range(1, voiceCount + 1):
             v = stream.Voice()
-            v.id = voiceIndex  # id is voice index, starting at 0
+            # id is analytical voice for user to overwrite
+            # but give something to start with so that makeTies
+            # can still bridge logical voices
+            bestStreamName = s.id
+            if hasattr(s, 'partName'):
+                bestStreamName = s.partName
+            v.id = f'{bestStreamName}-v{voiceNumber}'
+            # sequence is what gets renumbered every time flattenUnnecessaryVoices() runs, below
+            v.sequence = voiceNumber
             m.coreInsert(0, v)
         if voiceCount:
             m.coreElementsChanged()
@@ -1124,9 +1132,9 @@ def makeTies(
     >>> p2.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.meter.TimeSignature 1/4>
-        {0.0} <music21.stream.Voice v1>
+        {0.0} <music21.stream.Voice v1 (seq:1)>
             {0.0} <music21.note.Note C>
-        {0.0} <music21.stream.Voice 2>
+        {0.0} <music21.stream.Voice 2 (seq:2)>
             {0.0} <music21.note.Note B>
     {1.0} <music21.stream.Measure 2 offset=1.0>
         {0.0} <music21.note.Note C>
@@ -1279,11 +1287,14 @@ def makeTies(
 
                 # manage bridging voices
                 if mNextHasVoices:
-                    if mHasVoices:  # try to match voice id
+                    if mHasVoices:  # try to match voice id (analytical voices)
                         if not isinstance(vId, int):
                             dst = mNext.voices[vId]
                         else:
                             dst = mNext.getElementById(vId)
+                        if dst is None:
+                            dst = stream.Voice()
+                            mNext.insert(0, dst)
                     # src does not have voice, but dst does
                     else:  # place in top-most voice
                         dst = mNext.voices[0]

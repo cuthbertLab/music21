@@ -2856,9 +2856,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         `recurse=True` should not be necessary to find elements in streams
         without substreams, such as a loose Voice:
 
-        >>> v = stream.Voice([note.Note(quarterLength=5.5)], id=1)
+        >>> v = stream.Voice([note.Note(quarterLength=5.5)], sequence=1)
         >>> v.splitAtDurations()
-        (<music21.stream.Voice 1>,)
+        (<music21.stream.Voice (seq:1)>,)
         >>> [n.duration for n in v.notes]
         [<music21.duration.Duration 4.0>, <music21.duration.Duration 1.5>]
 
@@ -6285,8 +6285,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         consisting of the 'offset' of each element in a stream, the
         'endTime' (that is, the offset plus the duration) and the
         'element' itself.  Also contains a 'voiceIndex' entry which
-        contains the voice number of the element, or None if there
+        contains the voice index of the element, or None if there
         are no voices.
+
+        The `voiceIndex` is 0-indexed and recalculated each time this
+        method is called;
+        it doesn't read from :attr:`Voice.sequence`, which is set by file parsers
+        and by :meth:`flattenUnnecessaryVoices`, which is called during MusicXML
+        export.
 
         >>> n1 = note.Note(type='quarter')
         >>> c1 = clef.AltoClef()
@@ -10569,8 +10575,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # remove from source
             returnObj.remove(e)
         # remove any unused voices (possible if overlap group has sus)
+        voiceSequence: int = 0
         for v in voices:
             if v:  # skip empty voices
+                voiceSequence += 1  # 1-indexed
+                v.sequence = voiceSequence
                 returnObj.insert(0, v)
         if fillGaps:
             returnObj.makeRests(fillGaps=True,
@@ -10663,7 +10672,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if not countById:
                 voiceCount = len(voices)
             else:
-                voiceIds = [v.id for v in voices]
+                voiceIds = [str(v.id) for v in voices]
         else:  # if no measure or voices, get one part
             voiceCount = 1
 
@@ -10696,20 +10705,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.clef.BassClef>
                 {0.0} <music21.key.Key of D major>
                 {0.0} <music21.meter.TimeSignature 4/4>
-                {0.0} <music21.stream.Voice 3>
+                {0.0} <music21.stream.Voice 3 (seq:1)>
                     {0.0} <music21.note.Note E>
                     ...
                     {3.0} <music21.note.Rest quarter>
-                {0.0} <music21.stream.Voice 4>
+                {0.0} <music21.stream.Voice 4 (seq:2)>
                     {0.0} <music21.note.Note F#>
                     ...
                     {3.5} <music21.note.Note B>
             {4.0} <music21.stream.Measure 2 offset=4.0>
-                {0.0} <music21.stream.Voice 3>
+                {0.0} <music21.stream.Voice 3 (seq:1)>
                     {0.0} <music21.note.Note E>
                     ...
                     {3.0} <music21.note.Rest quarter>
-                {0.0} <music21.stream.Voice 4>
+                {0.0} <music21.stream.Voice 4 (seq:2)>
                     {0.0} <music21.note.Note E>
                     ...
                     {3.5} <music21.note.Note A>
@@ -10820,7 +10829,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 partDict[i] = p
             else:
                 voiceId = voiceIds[i]
-                p.id = str(self.id) + '-' + voiceId
+                p.id = str(self.id) + '-' + str(voiceId)
                 partDict[voiceId] = p
 
         def doOneMeasureWithVoices(mInner):
@@ -10925,7 +10934,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         return self.voicesToParts()
 
-    def flattenUnnecessaryVoices(self, *, force=False, inPlace=False):
+    def flattenUnnecessaryVoices(self, *, force=False, inPlace=False, recurse=False):
         '''
         If this Stream defines one or more internal voices, do the following:
 
@@ -10935,8 +10944,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
           elements in the parent Stream.
         * If `force` is True, even if there is more than one Voice left,
           all voices will be flattened.
+        * Renumber the voices beginning at 1,
+          if that voice's `.freezeSequence` is False (default).
+        * If `recurse` is True, process every inner stream. (For instance,
+          to enable calling this on the top-level score.)
 
         Changed in v. 5 -- inPlace is default False and a keyword only arg.
+        Changed in v. 7 -- now renumbers voices and added `recurse`.
 
         >>> s = stream.Stream(note.Note())
         >>> s.insert(0, note.Note())
@@ -10950,14 +10964,46 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> voicesFlattened = s.flattenUnnecessaryVoices()
         >>> len(voicesFlattened.voices)
         0
+
+        >>> s = stream.Stream()
+        >>> s.repeatInsert(note.Note(), [0, 0, 0])  # simultaneous
+        >>> s.makeVoices(inPlace=True)
+        >>> s.voices[0].sequence = -1
+        >>> s.voices[1].sequence = 5
+        >>> s.voices[2].sequence = 10
+        >>> s.voices[2].freezeSequence = True
+        >>> s.flattenUnnecessaryVoices(inPlace=True)
+        >>> [v for v in s.voices]
+        [<music21.stream.Voice (seq:1)>, <music21.stream.Voice (seq:2)>, <music21.stream.Voice (seq:10)>]
+
+        >>> m = stream.Measure()
+        >>> m.repeatInsert(note.Note(), [0, 0, 0])  # simultaneous
+        >>> m.makeVoices(inPlace=True)
+        >>> p = stream.Part([m])
+        >>> p.insert(0, stream.Voice())  # extra unnecessary voice
+        >>> s = stream.Score([p])
+        >>> post = s.flattenUnnecessaryVoices(force=True, recurse=True)
+        >>> post.show('text')
+        {0.0} <music21.stream.Part 0x...>
+            {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.note.Note C>
+                {0.0} <music21.note.Note C>
+                {0.0} <music21.note.Note C>
         '''
-        if not self.voices:
+        if not recurse and not self.voices:
             return None  # do not make copy; return immediately
 
         if not inPlace:  # make a copy
             returnObj = copy.deepcopy(self)
         else:
             returnObj = self
+
+        # Handle inner streams
+        if recurse:
+            for innerStream in list(returnObj.recurse(includeSelf=False, streamsOnly=True)):
+                if 'Voice' in innerStream.classes:
+                    continue
+                innerStream.flattenUnnecessaryVoices(force=force, inPlace=True, recurse=False)
 
         # collect voices for removal and for flattening
         remove = []
@@ -10980,6 +11026,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     returnObj.coreInsert(shiftOffset + e.getOffsetBySite(v), e)
                 returnObj.remove(v)
             returnObj.coreElementsChanged()
+
+        # Renumber voices (1-indexed)
+        for i, v in enumerate(returnObj.voices):
+            if not v.freezeSequence:
+                v.sequence = i + 1
 
         if not inPlace:
             return returnObj
@@ -12317,13 +12368,72 @@ class Voice(Stream):
     stream belongs to a certain "voice" for analysis or display
     purposes.
 
+    `.id` and `.sequence` exist separately so that they can diverge
+    if necessary. The `.id` attribute can be used to track analytical voices if
+    desired, and it can store the voice numbers parsed from a file (which,
+    depending on the format, may or may not truly represent analytical connections).
+    This functionality allows for extracting analytical voices via
+    :meth:`~music21.stream.Stream.voicesToParts` using `separateById=True`.
+    By contrast, the `.sequence` attribute is a 1-indexed sequence that
+    will increment when voices are created by notation routines and
+    will be renumbered after transformations by :meth:`flattenUnnecessaryVoices`,
+    a helper method run by most :meth:`makeNotation` operations, including
+    during musicxml export, in order to guarantee correct MusicXML rendering.
+
+    MusicXML allows any string for the `<voice>` tag, but in practice, MusicXML
+    producers begin at '1' and (should, but not always) continue the numbering
+    on the subsequent staff of a multi-staff part. Since music21 automatically
+    separates multi-staff parts on import, the `.sequence` will reset to reflect
+    the actual count on each :class:`PartStaff` object. The original MusicXML
+    `<voice>` number can be found on :`attr:`Voice.id`, but it may or may not be
+    the same `.sequence` number on export according to stream transformations
+    (or on account of PartStaff separation performed on imports of keyboard
+    and other multi-part staves).
+
+    If default voice numbering produces unsatisfactory MusicXML output,
+    numbering can be overridden by manipulating `.sequence` on the Voice objects
+    and then setting :attr:`freezeSequence` to True to avoid
+    renumbering by :meth:`flattenUnnecessaryVoices`.
+
+    See :meth:`voicesToParts`, especially the keyword `separateById`, for examples
+    of how to extract and associate voices together using `.id` without relying on
+    the `.sequence` attribute.
+
+    :meth:`offsetMap` recalculates a 0-indexed count "voiceIndex" of voices in a container
+    at any given time, since there is no constraint until the user exports MusicXML
+    or elects to run :meth:`flattenUnnecessaryVoices` that the `.sequence` attributes of each
+    Voice form a valid sequence.
+
     Note that both Finale's Layers and Voices as concepts are
     considered Voices here.
 
-    Voices have a sort order of 1 greater than time signatures
+    Voices have a sort order of 1 greater than time signatures.
+
+    Changed in v.7 -- added attribute `.sequence`
     '''
     recursionType = 'elementsFirst'
     classSortOrder = 5
+    _DOC_ORDER = ['']
+    _DOC_ATTR = {
+        'sequence': '''
+            int describing the 1-indexed sequence of this voice in its container
+            (most likely Measure). Renumbering performed by
+            :meth:`flattenUnnecessaryVoices`.''',
+        'freezeSequence': '''
+            bool describing whether the sequence attributes are free to be renumbered
+            by export or notation routines.''',
+    }
+
+    def __init__(self, *args, **keywords):
+        super().__init__(*args, **keywords)
+        self.sequence: int = int(keywords['sequence']) if 'sequence' in keywords else -1
+        self.freezeSequence: bool = False
+
+    def _reprInternal(self):
+        if isinstance(self.id, int) and self.id > defaults.minIdNumberToConsiderMemoryLocation:
+            return f'(seq:{self.sequence})'
+        else:
+            return f'{self.id} (seq:{self.sequence})'
 
 
 # -----------------------------------------------------------------------------

@@ -2727,7 +2727,7 @@ class MeasureExporter(XMLExporterBase):
         self.measureOffsetStart = 0.0
         self.offsetInMeasure = 0.0
         self.currentVoiceId: Optional[int] = None
-        self.nextFreeVoiceNumber = 1
+        # self.nextFreeVoiceNumber = 1
 
         self.rbSpanners = []  # repeatBracket spanners
 
@@ -2800,16 +2800,11 @@ class MeasureExporter(XMLExporterBase):
         self.offsetInMeasure = 0.0
         if 'Voice' in m.classes:
             m: stream.Voice
-            if isinstance(m.id, int) and m.id < defaults.minIdNumberToConsiderMemoryLocation:
-                voiceId = m.id
-            elif isinstance(m.id, int):
-                voiceId = self.nextFreeVoiceNumber
-                self.nextFreeVoiceNumber += 1
-            else:
-                voiceId = m.id
+            voiceId = m.sequence
         else:
             voiceId = None
 
+        # TODO: rename, since this now reads from .sequence
         self.currentVoiceId = voiceId
 
         # group all objects by offsets and then do a different order than normal sort.
@@ -6306,26 +6301,40 @@ class Test(unittest.TestCase):
             stripInnerSpaces(xmlAfterFirstBackup)
         )
 
-    def testLowVoiceNumbers(self):
+    def testVoiceNumbers(self):
         n = note.Note()
-        v1 = stream.Voice([n])
-        m = stream.Measure([v1])
+        v1 = stream.Voice(n)
+        m = stream.Measure(v1)
+
         # Unnecessary voice is removed by makeNotation
         xmlOut = self.getXml(m)
         self.assertNotIn('<voice>1</voice>', xmlOut)
         n2 = note.Note()
-        v2 = stream.Voice([n2])
+        v2 = stream.Voice(n2)
         m.insert(0, v2)
         xmlOut = self.getXml(m)
         self.assertIn('<voice>1</voice>', xmlOut)
         self.assertIn('<voice>2</voice>', xmlOut)
-        v1.id = 234
+        v1.sequence = 234
+        # Number set by user will not be written, because makeNotation renumbers
         xmlOut = self.getXml(m)
-        self.assertIn('<voice>234</voice>', xmlOut)
-        self.assertIn('<voice>1</voice>', xmlOut)  # is v2 now!
+        self.assertNotIn('<voice>234</voice>', xmlOut)
+        self.assertIn('<voice>1</voice>', xmlOut)
+        self.assertIn('<voice>2</voice>', xmlOut)
+
+        # Sequence set by user WILL be written, because makeNotation=False
+        # TODO: implement makeNotation=False
+        # newScore = stream.Score([stream.Part()])
+        # newScore.parts.first().append(m)
+        # root = self.getET(newScore)
+        # xmlOut = helpers.dumpString(root)
+        # self.assertIn('<voice>234</voice>', xmlOut)
+        # self.assertIn('<voice>-1</voice>', xmlOut)  # this voice was never given a .sequence
+
+        # Other fields such as .id will not be written to <voice>
         v2.id = 'hello'
         xmlOut = self.getXml(m)
-        self.assertIn('<voice>hello</voice>', xmlOut)
+        self.assertNotIn('<voice>hello</voice>', xmlOut)
 
     def testCompositeLyrics(self):
         from music21 import converter

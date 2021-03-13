@@ -370,9 +370,10 @@ class ScoreReduction:
                     if not gMeasure.voices:  # common setup routines
                         # if no voices, start by removing rests
                         gMeasure.removeByClass('Rest')
-                        for vId in self._reductiveVoices:
+                        for i, vId in enumerate(self._reductiveVoices):
                             v = stream.Voice()
                             v.id = vId
+                            v.sequence = i + 1  # 1-indexed
                             gMeasure.insert(0, v)
                     if oneVoice:
                         n, te = rn.getNoteAndTextExpression()

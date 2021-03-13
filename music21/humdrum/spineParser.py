@@ -2016,7 +2016,7 @@ class SpineCollection(prebase.ProtoM21Object):
                     voiceNumber = int(voiceName[5])
                     voicePart = voices[voiceNumber]
                     if voicePart is None:
-                        voices[voiceNumber] = stream.Voice()
+                        voices[voiceNumber] = stream.Voice(id=voiceNumber, sequence=voiceNumber)
                         voicePart = voices[voiceNumber]
                         voicePart.groups.append(voiceName)
                     mElOffset = mEl.offset

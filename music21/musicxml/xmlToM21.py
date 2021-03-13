@@ -1723,6 +1723,7 @@ class PartParser(XMLParserBase):
             ):
                 copy_into_partStaff(sourceMeasure, copyMeasure, elementsIdsNotToGoInThisStaff)
                 for sourceVoice, copyVoice in zip(sourceMeasure.voices, copyMeasure.voices):
+                    copyVoice.sequence = sourceVoice.sequence
                     copy_into_partStaff(sourceVoice, copyVoice, elementsIdsNotToGoInThisStaff)
                 copyMeasure.flattenUnnecessaryVoices(force=False, inPlace=True)
 
@@ -5716,7 +5717,7 @@ class MeasureParser(XMLParserBase):
         >>> len(MP.stream)
         2
         >>> list(MP.stream.getElementsByClass('Voice'))
-        [<music21.stream.Voice 1>, <music21.stream.Voice 2>]
+        [<music21.stream.Voice 1 (seq:1)>, <music21.stream.Voice 2 (seq:2)>]
         '''
         mxm = self.mxMeasure
         for mxn in mxm.findall('note'):
@@ -5728,9 +5729,12 @@ class MeasureParser(XMLParserBase):
                 # additional time < 1 sec per ten million ops.
 
         if len(self.voiceIndices) > 1:
-            for vIndex in sorted(self.voiceIndices):
+            vSequence: int = 0
+            for vId in sorted(self.voiceIndices):
+                vSequence += 1
                 v = stream.Voice()
-                v.id = vIndex  # TODO: should use a separate voiceId or something in Voice.
+                v.id = vId  # parsed from XML document
+                v.sequence = vSequence  # 1-indexed sequence in m21
                 self.stream.coreInsert(0.0, v)
                 self.voicesById[v.id] = v
             self.useVoices = True
@@ -5799,6 +5803,7 @@ class Test(unittest.TestCase):
         self.assertTrue(m1.hasVoices())
 
         self.assertEqual([v.id for v in m1.voices], ['1', '2'])
+        self.assertEqual([v.sequence for v in m1.voices], [1, 2])
 
         self.assertEqual([e.offset for e in m1.voices[0]], [0.0, 1.0, 2.0, 3.0])
         self.assertEqual([e.offset for e in m1.voices['1']], [0.0, 1.0, 2.0, 3.0])
@@ -6529,7 +6534,7 @@ class Test(unittest.TestCase):
         c = corpus.parse('demos/voices_with_chords.xml')
         m1 = c.parts[0].measure(1)
         # m1.show('text')
-        firstChord = m1.voices.getElementById('2').getElementsByClass('Chord').first()
+        firstChord = m1.voices.last().getElementsByClass('Chord').first()
         self.assertEqual(repr(firstChord), '<music21.chord.Chord G4 B4>')
         self.assertEqual(firstChord.offset, 1.0)
 
