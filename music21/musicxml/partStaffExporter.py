@@ -141,7 +141,8 @@ class PartStaffExporterMixin:
         '''
         Returns a list of :class:`~music21.layout.StaffGroup` objects that
         represent :class:`~music21.stream.PartStaff` objects that can be
-        joined into a single MusicXML `<part>`:
+        joined into a single MusicXML `<part>`, so long as there exists a
+        `PartExporter` for it in `ScoreExporter.partExporterList`:
 
         >>> s = stream.Score()
 
@@ -207,6 +208,8 @@ class PartStaffExporterMixin:
         ...     s.insert(0, el)
 
         >>> SX = musicxml.m21ToXml.ScoreExporter(s)
+        >>> SX.scorePreliminaries()
+        >>> SX.parsePartlikeScore()  # populate .partExporterList
         >>> SX.joinableGroups()
         [<music21.layout.StaffGroup <... p1a><... p1b><... p1c>>,
          <music21.layout.StaffGroup <... p2a><... p2b>>,
@@ -223,7 +226,10 @@ class PartStaffExporterMixin:
                 continue
             if not all(p.getElementsByClass('Measure') for p in sg):
                 continue
-            if not all(p in self.stream for p in sg):
+            try:
+                for p in sg:
+                    self.getRootForPartStaff(p)
+            except MusicXMLExportException:
                 continue
             joinableGroups.append(sg)
 
@@ -920,9 +926,24 @@ class Test(unittest.TestCase):
 
         SX = musicxml.m21ToXml.ScoreExporter(sch.flat)
         SX.scorePreliminaries()
-        SX.parsePartlikeScore()
+        SX.parseFlatScore()
         # Previously, an exception was raised by getRootForPartStaff()
         SX.joinPartStaffs()
+
+    def testJoinPartStaffsG(self):
+        '''
+        A derived score should still have joinable groups.
+        '''
+        from music21 import corpus
+        from music21 import musicxml
+        s = corpus.parse('demos/two-parts')
+
+        m1 = s.measure(1)
+        self.assertIn('Score', m1.classes)
+        SX = musicxml.m21ToXml.ScoreExporter(m1)
+        SX.scorePreliminaries()
+        SX.parsePartlikeScore()
+        self.assertEqual(len(SX.joinableGroups()), 1)
 
 
 if __name__ == '__main__':

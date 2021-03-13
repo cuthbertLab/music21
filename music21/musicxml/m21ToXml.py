@@ -1545,7 +1545,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         called by .parse() if the score has individual parts.
 
         Calls makeRests() for the part, then creates a PartExporter for each part,
-        and runs .parse() on that part.  appends the PartExporter to self.partExporterList()
+        and runs .parse() on that part.  appends the PartExporter to self.partExporterList
         '''
         # would like to do something like this but cannot
         # replace object inside of the stream
