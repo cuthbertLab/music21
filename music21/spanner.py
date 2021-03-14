@@ -346,7 +346,9 @@ class Spanner(base.Music21Object):
         return iter(self.spannerStorage)
 
     def __len__(self):
-        return len(self.spannerStorage)
+        # Check _elements to avoid StreamIterator overhead.
+        # Safe, because impossible to put spanned elements at end.
+        return len(self.spannerStorage._elements)
 
     def getSpannedElements(self):
         '''
@@ -370,10 +372,9 @@ class Spanner(base.Music21Object):
         >>> sl.getSpannedElements() == [n1, n2, c1]  # make sure that not sorting
         True
         '''
-        post = []
-        for c in self.spannerStorage.elements:
-            post.append(c)
-        return post
+        # Check _elements to avoid StreamIterator overhead.
+        # Safe, because impossible to put spanned elements at end.
+        return list(self.spannerStorage._elements)
 
     def getSpannedElementsByClass(self, classFilterList):
         '''
@@ -470,7 +471,12 @@ class Spanner(base.Music21Object):
         return spannedElement in self
 
     def __contains__(self, spannedElement):
-        return spannedElement in self.spannerStorage
+        # Cannot check `in` spannerStorage._elements,
+        # because it would check __eq__, not identity.
+        for x in self.spannerStorage._elements:
+            if x is spannedElement:
+                return True
+        return False
 
     def replaceSpannedElement(self, old, new) -> None:
         '''
@@ -778,7 +784,9 @@ class SpannerBundle(prebase.ProtoM21Object):
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage:  # storage is a list of spanners
-                if idTarget in sp.getSpannedElementIds():
+                # __contains__() will test for identity, not equality
+                # see Spanner.hasSpannedElement(), which just calls __contains__()
+                if spannedElement in sp:
                     post.append(sp)
             self._cache[cacheKey] = post
         return self._cache[cacheKey]
