@@ -4671,6 +4671,7 @@ class MeasureParser(XMLParserBase):
                                            'placement', 'positionPlacement')
 
                 self.insertCoreAndRef(totalOffset, staffKey, d)
+                self.setPosition(mxDir, d)
                 self.setEditorial(mxDirection, d)
 
         elif tag in ('wedge', 'bracket', 'dashes'):
@@ -4681,6 +4682,7 @@ class MeasureParser(XMLParserBase):
                 spannerList = []
 
             for sp in spannerList:
+                self.setPosition(mxDir, sp)
                 self.setEditorial(mxDirection, sp)
 
         elif tag in ('coda', 'segno'):
@@ -4690,12 +4692,7 @@ class MeasureParser(XMLParserBase):
                 rm = repeat.Coda()
 
             _synchronizeIds(mxDir, rm)
-            dX = mxDir.get('default-x')
-            if dX is not None:
-                rm.style.absoluteX = common.numToIntOrFloat(dX)
-            dY = mxDir.get('default-y')
-            if dY is not None:
-                rm.style.absoluteY = common.numToIntOrFloat(dY)
+            self.setPosition(mxDir, rm)
             self.insertCoreAndRef(totalOffset, staffKey, rm)
             self.setEditorial(mxDirection, rm)
 
@@ -4851,6 +4848,7 @@ class MeasureParser(XMLParserBase):
                 mm.parentheses = True
 
         _synchronizeIds(mxMetronome, mm)
+        self.setPosition(mxMetronome, mm)
         return mm
 
     def xmlToOffset(self, mxObj):
@@ -6824,6 +6822,48 @@ class Test(unittest.TestCase):
         self.assertEqual(ly3.components[1].syllabic, 'middle')
         self.assertEqual(ly3.components[2].syllabic, 'end')
         self.assertEqual(len(s.lyrics(recurse=True)[1][0]), 4)
+
+    def testDirectionPosition(self):
+        from music21 import converter
+        from music21 import corpus
+        from music21.musicxml import testPrimitive, testFiles
+
+        # Dynamic
+        s = converter.parse(testFiles.mozartTrioK581Excerpt)
+        dyn = s.recurse().getElementsByClass('Dynamic').first()
+        self.assertEqual(dyn.style.relativeY, 6)
+
+        # Coda/Segno
+        s = converter.parse(testPrimitive.repeatExpressionsA)
+        seg = s.recurse().getElementsByClass('Segno').first()
+        self.assertEqual(seg.style.relativeX, 10)
+
+        # TextExpression
+        s = converter.parse(testPrimitive.textExpressions)
+        positionedEls = [el for el in s.recurse() if el.hasStyleInformation
+            and el.style.relativeX is not None]
+        self.assertEqual(len(positionedEls), 3)
+        self.assertEqual(
+            list(set(type(el) for el in positionedEls)),
+            [expressions.TextExpression]
+        )
+
+        # Wedge
+        s = corpus.parse('beach')
+        positionedEls = [el for el in s.recurse() if el.hasStyleInformation
+            and el.style.relativeX is not None]
+        self.assertEqual(len(positionedEls), 40)
+        self.assertEqual(
+            sorted(set(type(el) for el in positionedEls), key=repr),
+            [dynamics.Crescendo, dynamics.Diminuendo, dynamics.Dynamic, expressions.TextExpression]
+        )
+        crescendos = [el for el in positionedEls if 'Crescendo' in el.classes]
+        self.assertEqual(crescendos[0].style.relativeX, -6)
+
+        # Metronome
+        s = converter.parse(testFiles.tabTest)
+        metro = s.recurse().getElementsByClass('MetronomeMark').first()
+        self.assertEqual(metro.style.absoluteY, 40)
 
 
 if __name__ == '__main__':
