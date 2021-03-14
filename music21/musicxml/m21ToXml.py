@@ -2832,8 +2832,13 @@ class MeasureExporter(XMLExporterBase):
         if len(obj.duration.dotGroups) > 1:
             obj.duration.splitDotGroups(inPlace=True)
 
-        # split at durations...
-        if 'GeneralNote' in classes and obj.duration.type == 'complex':
+        # split at durations, if not a full-measure rest (e.g. whole rest in 9/8)
+        if 'GeneralNote' in classes and obj.duration.type == 'complex' and not (
+            'Rest' in classes and (
+                obj.fullMeasure in (True, 'always')
+                or (obj.fullMeasure == 'auto' and obj.duration == self.stream.barDuration)
+            )
+        ):
             objList = obj.splitAtDurations()
         else:
             objList = [obj]
@@ -6447,6 +6452,18 @@ class Test(unittest.TestCase):
         for direction in tree.findall('.//direction'):
             self.assertIsNone(direction.find('offset'))
 
+    def testFullMeasureRest(self):
+        from music21 import converter
+        s = converter.parse('tinynotation: 9/8 r1')
+        r = s.flat.notesAndRests.first()
+        r.quarterLength = 4.5
+        self.assertEqual(r.fullMeasure, 'auto')
+        tree = self.getET(s)
+        # Previously, this 4.5QL rest with a duration.type 'complex'
+        # was split on export into 4.0QL and 0.5QL
+        self.assertEqual(len(tree.findall('.//rest')), 1)
+        rest = tree.find('.//rest')
+        self.assertEqual(rest.get('measure'), 'yes')
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
