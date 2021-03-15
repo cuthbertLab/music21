@@ -397,7 +397,9 @@ class Spanner(base.Music21Object):
     def getSpannedElementIds(self):
         '''
         Return all id() for all stored objects.
-        Performance critical.
+        Was performance critical, until most uses removed in v.7.
+        Used only as a testing tool now.
+        Spanner.__contains__() was optimized in 839c7e5.
         '''
         return [id(n) for n in self.spannerStorage._elements]
 
@@ -798,7 +800,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         with new spannedElements
         for all Spanner objects contained in this bundle.
 
-        The `old` parameter can be either an object or object id.
+        The `old` parameter must be an object, not an object id.
 
         If no replacements are found, no errors are raised.
 
@@ -827,15 +829,17 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> su2
         <music21.spanner.Glissando <music21.note.Note E><music21.note.Note C>>
 
+        Changed in v.7 -- id() is no longer allowed for `old`.
 
+        >>> sb.replaceSpannedElement(id(n1), n2)
+        Traceback (most recent call last):
+        TypeError: send elements to replaceSpannedElement(), not ids (deprecated)
         '''
         # environLocal.printDebug(['SpannerBundle.replaceSpannedElement()', 'old', old,
         #    'new', new, 'len(self._storage)', len(self._storage)])
-
-        if common.isNum(old):  # assume this is an id
-            idTarget = old
-        else:
-            idTarget = id(old)
+        # TODO: remove in v.8 for speed?
+        if isinstance(old, int):
+            raise TypeError('send elements to replaceSpannedElement(), not ids (deprecated)')
 
         replacedSpanners = []
         # post = self.__class__()  # return a bundle of spanners that had changes
@@ -844,10 +848,10 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         for sp in self._storage:  # Spanners in a list
             # environLocal.printDebug(['looking at spanner', sp, sp.getSpannedElementIds()])
-
-            # must check to see if this id is in this spanner
             sp._cache = {}
-            if idTarget in sp.getSpannedElementIds():
+            # accurate, so long as Spanner.__contains__() checks identity, not equality
+            # see discussion at https://github.com/cuthbertLab/music21/pull/905
+            if old in sp:
                 sp.replaceSpannedElement(old, new)
                 replacedSpanners.append(sp)
                 # post.append(sp)
