@@ -1057,34 +1057,34 @@ class TwelveToneRow(ToneRow):
         Combinatoriality holds here between P0 and I3
         >>> moses.areCombinatorial('P', 0, 'I', 3, 'zero')
         True
-        
+
         By definition what's true for :meth:`~music21.serial.zeroCenteredTransformation`
         is also true for :meth:`~music21.serial.originalCenteredTransformation`:
-        
+
         >>> moses.areCombinatorial('P', 0, 'I', 3, 'original')
         True
-        
+
         And a combinatorial pair like this between P0 and I3 will also hold
         if you modify both rows in the same way, e.g.
-        if you transpose both by the same amount ... 
-            
+        if you transpose both by the same amount
+
         >>> moses.areCombinatorial('P', 1, 'I', 4, 'original')
         True
-        
-        ... or if you retrograde both:
-        
+
+        or if you retrograde both
+
         >>> moses.areCombinatorial('R', 1, 'RI', 4, 'original')
         True
-        
+
         Any modification made to one row form and not the other means all bets are off
-        
+
         >>> moses.areCombinatorial('R', 6, 'RI', 4, 'original')
         False
         
         '''
         if self.isTwelveToneRow() is False:
             raise SerialException('Combinatoriality applies only to twelve-tone rows.')
-            
+
         if convention == 'zero':
             trans1 = self.zeroCenteredTransformation(transType1, index1)
             trans2 = self.zeroCenteredTransformation(transType2, index2)
