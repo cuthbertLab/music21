@@ -1048,26 +1048,57 @@ class TwelveToneRow(ToneRow):
         :meth:`~music21.serial.zeroCenteredTransformation` and
         :meth:`~music21.serial.originalCenteredTransformation` explanations of these conventions.
 
+        First, let's take a row we know to have a combinatoriality pair:
+        
         >>> moses = serial.getHistoricalRowByName('SchoenbergMosesAron')
         >>> moses.pitchClasses()
         [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]
-        >>> moses.areCombinatorial('P', 1, 'I', 4, 'zero')
+
+        Combinatoriality holds here between P0 and I3
+        >>> moses.areCombinatorial('P', 0, 'I', 3, 'zero')
         True
-        >>> moses.areCombinatorial('R', 5, 'RI', 6, 'original')
+        
+        By definition what's true for :meth:`~music21.serial.zeroCenteredTransformation`
+        is also true for :meth:`~music21.serial.originalCenteredTransformation`:
+        
+        >>> moses.areCombinatorial('P', 0, 'I', 3, 'original')
+        True
+        
+        And a combinatorial pair like this between P0 and I3 will also hold
+        if you modify both rows in the same way, e.g.
+        if you transpose both by the same amount ... 
+            
+        >>> moses.areCombinatorial('P', 1, 'I', 4, 'original')
+        True
+        
+        ... or if you retrograde both:
+        
+        >>> moses.areCombinatorial('R', 1, 'RI', 4, 'original')
+        True
+        
+        Any modification made to one row form and not the other means all bets are off
+        
+        >>> moses.areCombinatorial('R', 6, 'RI', 4, 'original')
         False
+        
         '''
         if self.isTwelveToneRow() is False:
             raise SerialException('Combinatoriality applies only to twelve-tone rows.')
-
-        if convention in ['zero', 'original']:
-            trans1 = getattr(self, convention + 'CenteredTransformation')(transType1, index1)
-            pitches1 = trans1.pitchClasses()
-            trans2 = getattr(self, convention + 'CenteredTransformation')(transType2, index2)
-            pitches2 = trans2.pitchClasses()
-            testRow = pitches1[:6] + pitches2[:6]
-            return pcToToneRow(testRow).isTwelveToneRow()
+            
+        if convention == 'zero':
+            trans1 = self.zeroCenteredTransformation(transType1, index1)
+            trans2 = self.zeroCenteredTransformation(transType2, index2)
+        elif convention == 'original':
+            trans1 = self.originalCenteredTransformation(transType1, index1)
+            trans2 = self.originalCenteredTransformation(transType2, index2)
         else:
             raise SerialException("Invalid convention - choose 'zero' or 'original'.")
+
+        pitches1 = trans1.pitchClasses()
+        pitches2 = trans2.pitchClasses()
+        testRow = pitches1[:6] + pitches2[:6]
+
+        return pcToToneRow(testRow).isTwelveToneRow()
 
 
 class HistoricalTwelveToneRow(TwelveToneRow):
