@@ -1337,7 +1337,7 @@ class Test(unittest.TestCase):
 
         attackedTogether = stream1.simultaneousAttacks(stream2)
         self.assertEqual(len(attackedTogether), 3)  # nx1, nx2, nx4
-        thisNote = stream2.getElementsByOffset(attackedTogether[1])[0]
+        thisNote = stream2.getElementsByOffset(attackedTogether[1]).first()
         self.assertIs(thisNote, n22)
 
         playingWhenAttacked = stream1.playingWhenAttacked(n23)

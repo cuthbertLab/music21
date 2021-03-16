@@ -762,12 +762,12 @@ class XMLExporterBase:
             stObj = m21Object.style
 
         if not common.isIterable(musicXMLNames):
-            musicXMLNames = [musicXMLNames]
+            musicXMLNames = (musicXMLNames,)
 
         if m21Names is None:
-            m21Names = [common.hyphenToCamelCase(x) for x in musicXMLNames]
+            m21Names = (common.hyphenToCamelCase(x) for x in musicXMLNames)
         elif not common.isIterable(m21Names):
-            m21Names = [m21Names]
+            m21Names = (m21Names,)
 
         for xmlName, m21Name in zip(musicXMLNames, m21Names):
             try:
@@ -1545,7 +1545,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         called by .parse() if the score has individual parts.
 
         Calls makeRests() for the part, then creates a PartExporter for each part,
-        and runs .parse() on that part.  appends the PartExporter to self.partExporterList()
+        and runs .parse() on that part.  appends the PartExporter to self.partExporterList
         '''
         # would like to do something like this but cannot
         # replace object inside of the stream
@@ -1873,8 +1873,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         </appearance>
         '''
         st = self.stream.style
-        if not hasattr(st, 'lineWidths'):
-            return  # TODO: remove in v.5 release after all old data is gone.
 
         if (not st.lineWidths
                 and not st.noteSizes
@@ -2834,8 +2832,13 @@ class MeasureExporter(XMLExporterBase):
         if len(obj.duration.dotGroups) > 1:
             obj.duration.splitDotGroups(inPlace=True)
 
-        # split at durations...
-        if 'GeneralNote' in classes and obj.duration.type == 'complex':
+        # split at durations, if not a full-measure rest (e.g. whole rest in 9/8)
+        if 'GeneralNote' in classes and obj.duration.type == 'complex' and not (
+            'Rest' in classes and (
+                obj.fullMeasure in (True, 'always')
+                or (obj.fullMeasure == 'auto' and obj.duration == self.stream.barDuration)
+            )
+        ):
             objList = obj.splitAtDurations()
         else:
             objList = [obj]
@@ -3182,6 +3185,7 @@ class MeasureExporter(XMLExporterBase):
         >>> n = note.Note('D#5')
         >>> n.quarterLength = 3
         >>> n.volume.velocityScalar = 0.5
+        >>> n.style.color = 'silver'
 
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> len(MEX.xmlRoot)
@@ -3190,7 +3194,7 @@ class MeasureExporter(XMLExporterBase):
         >>> mxNote
         <Element 'note' at 0x10113cb38>
         >>> MEX.dump(mxNote)
-        <note dynamics="70.56">
+        <note color="#C0C0C0" dynamics="70.56">
           <pitch>
             <step>D</step>
             <alter>1</alter>
@@ -3200,6 +3204,7 @@ class MeasureExporter(XMLExporterBase):
           <type>half</type>
           <dot />
           <accidental>sharp</accidental>
+          <notehead color="#C0C0C0" parentheses="no">normal</notehead>
         </note>
         >>> len(MEX.xmlRoot)
         1
@@ -3239,9 +3244,9 @@ class MeasureExporter(XMLExporterBase):
         >>> n.articulations.append(articulations.Pizzicato())
         >>> mxNote = MEX.noteToXml(n)
         >>> MEX.dump(mxNote)
-        <note dynamics="70.56" pizzicato="yes">
+        <note color="#C0C0C0" dynamics="70.56" pizzicato="yes">
           ...
-          <notehead parentheses="no">diamond</notehead>
+          <notehead color="#C0C0C0" parentheses="no">diamond</notehead>
         </note>
 
         Notes with complex durations need to be simplified before coming here
@@ -3266,15 +3271,17 @@ class MeasureExporter(XMLExporterBase):
         addChordTag = (noteIndexInChord != 0)
         setb = _setAttributeFromAttribute
 
+        mxNote = Element('note')
         chordOrN: note.GeneralNote
         if chordParent is None:
             chordOrN = n
         else:
             chordOrN = chordParent
+            # Ensure color is read from `n`, since only `chordOrN` is handled below
+            self.setColor(mxNote, n)
 
-        mxNote = Element('note')
         # self.setFont(mxNote, chordOrN)
-        self.setPrintStyle(mxNote, chordOrN)
+        self.setPrintStyle(mxNote, chordOrN)  # sets color
         # TODO: attr-group: printout -- replaces print-object, print-spacing below (3.1)
         # TODO: attr: print-leger -- musicxml 3.1
         if (chordOrN.isRest is False
@@ -3287,7 +3294,6 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attr: attack
         # TODO: attr: release
         # TODO: attr: time-only
-        self.setColor(mxNote, n)  # TODO(msc): is this redundant with setColor below?
         _synchronizeIds(mxNote, n)
 
         d = chordOrN.duration
@@ -3315,7 +3321,6 @@ class MeasureExporter(XMLExporterBase):
                 environLocal.warn(f'Duration set as Grace while not being a GraceDuration {d}')
 
         # TODO: cue... / cue-grace
-        self.setColor(mxNote, chordOrN)
 
         self.setPrintObject(mxNote, n)
         if n.hasStyleInformation and n.style.hideObjectOnPrint is True:
@@ -3658,11 +3663,12 @@ class MeasureExporter(XMLExporterBase):
         >>> g = pitch.Pitch('g3')
         >>> h = note.Note('b4')
         >>> h.notehead = 'diamond'
+        >>> h.style.color = 'gold'
         >>> ch2 = chord.Chord([g, h])
         >>> ch2.quarterLength = 2.0
         >>> mxNoteList = MEX.chordToXml(ch2)
         >>> MEX.dump(mxNoteList[1])
-        <note>
+        <note color="#FFD700">
           <chord />
           <pitch>
             <step>B</step>
@@ -3670,7 +3676,7 @@ class MeasureExporter(XMLExporterBase):
           </pitch>
           <duration>20160</duration>
           <type>half</type>
-          <notehead parentheses="no">diamond</notehead>
+          <notehead color="#FFD700" parentheses="no">diamond</notehead>
         </note>
 
         Test articulations of chords with fingerings. Superfluous fingerings will be ignored.
@@ -6147,7 +6153,7 @@ class MeasureExporter(XMLExporterBase):
         if not instSubStream:
             return None
 
-        instSubObj = instSubStream[0]
+        instSubObj = instSubStream.first()
         if instSubObj.transposition is None:
             return None
         self.transpositionInterval = instSubObj.transposition
@@ -6446,6 +6452,18 @@ class Test(unittest.TestCase):
         for direction in tree.findall('.//direction'):
             self.assertIsNone(direction.find('offset'))
 
+    def testFullMeasureRest(self):
+        from music21 import converter
+        s = converter.parse('tinynotation: 9/8 r1')
+        r = s.flat.notesAndRests.first()
+        r.quarterLength = 4.5
+        self.assertEqual(r.fullMeasure, 'auto')
+        tree = self.getET(s)
+        # Previously, this 4.5QL rest with a duration.type 'complex'
+        # was split on export into 4.0QL and 0.5QL
+        self.assertEqual(len(tree.findall('.//rest')), 1)
+        rest = tree.find('.//rest')
+        self.assertEqual(rest.get('measure'), 'yes')
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover

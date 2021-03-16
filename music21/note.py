@@ -1321,14 +1321,11 @@ class Note(NotRest):
         if other is None or not isinstance(other, Note):
             return NotImplemented
 
-        retVal = super().__eq__(other)
-        if retVal is not True:
-            return retVal
-
         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
         if self.pitch != other.pitch:
             return False
-        return True
+
+        return super().__eq__(other)
 
     def __lt__(self, other):
         '''
@@ -1723,7 +1720,7 @@ class Rest(GeneralNote):
                 # TODO: get it to work.
 
                 "auto" is the default, where if the rest value happens to match the current
-                time signature context, then display it as a whole note, centered, etc.
+                time signature context, then display it as a whole rest, centered, etc.
                 otherwise will display normally.
 
                 See examples in :meth:`music21.musicxml.m21ToXml.MeasureExporter.restToXml`

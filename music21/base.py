@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'7.0.0'
+'7.0.1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -2055,6 +2055,8 @@ class Music21Object(prebase.ProtoM21Object):
             activeS = self.activeSite  # might be None...
             if activeS is None:
                 return None
+            if className is not None and not common.isListLike(className):
+                className = (className,)
             asTree = activeS.asTree(classList=className, flatten=False)
             prevNode = asTree.getNodeBefore(self.sortTuple())
             if prevNode is None:

@@ -1899,7 +1899,7 @@ def _getNextElements(s, v, numberOfElements=1):
                                                   mustFinishInSpan=False,
                                                   mustBeginInSpan=True,
                                                   classList=[vClass])
-        returnElement = potentialTargets[0]
+        returnElement = potentialTargets.first()
 
     else:
         replacementDuration = v.replacementDuration
@@ -1910,7 +1910,7 @@ def _getNextElements(s, v, numberOfElements=1):
                                                   mustFinishInSpan=False,
                                                   mustBeginInSpan=True,
                                                   classList=[vClass])
-        returnElement = potentialTargets[0]
+        returnElement = potentialTargets.first()
 
 
     return returnElement
@@ -1982,7 +1982,7 @@ def _getPreviousElement(s, v):
         mustFinishInSpan=False,
         mustBeginInSpan=True,
     ).getElementsByClass(vClass)
-    returnElement = potentialTargets[-1]
+    returnElement = potentialTargets.last()
 
     return returnElement
 

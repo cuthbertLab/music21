@@ -1719,24 +1719,37 @@ def midiTrackToStream(
     >>> p = midi.translate.midiTrackToStream(mt)
     >>> p
     <music21.stream.Part ...>
-    >>> len(p.notesAndRests)
-    11
-    >>> p.notes[0].pitch.midi
+    >>> len(p.flat.notesAndRests)
+    13
+    >>> p.flat.notes[0].pitch.midi
     36
-    >>> p.notes[0].volume.velocity
+    >>> p.flat.notes[0].volume.velocity
     90
 
-    Note that the output Part has not yet had measures made, nor does it have a
-    TimeSignature yet.
+    Changed in v.7 -- Now makes measures
 
     >>> p.show('text')
-    {0.0} <music21.instrument.Instrument ''>
-    {0.0} <music21.note.Note C>
-    {1.0} <music21.note.Rest rest>
-    {2.0} <music21.chord.Chord F3 G#4 C5>
-    {3.0} <music21.note.Rest rest>
-    {4.5} <music21.note.Note B->
-    ...
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.instrument.Instrument ''>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Rest rest>
+        {2.0} <music21.chord.Chord F3 G#4 C5>
+        {3.0} <music21.note.Rest rest>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0} <music21.note.Rest rest>
+        {0.5} <music21.note.Note B->
+        {1.5} <music21.note.Rest rest>
+        {3.5} <music21.chord.Chord D2 A4>
+    {8.0} <music21.stream.Measure 3 offset=8.0>
+        {0.0} <music21.note.Rest rest>
+        {0.5} <music21.chord.Chord C#2 B-3 G#6>
+        {1.0} <music21.note.Rest rest>
+        {2.5} <music21.chord.Chord F#3 A4 C#5>
+    {12.0} <music21.stream.Measure 4 offset=12.0>
+        {0.0} <music21.note.Rest rest>
+        {4.0} <music21.bar.Barline type=final>
     '''
     # environLocal.printDebug(['midiTrackToStream(): got midi track: events',
     # len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
@@ -1873,12 +1886,17 @@ def midiTrackToStream(
                    inPlace=True,
                    recurse=False)  # shouldn't be any substreams yet
 
-    if voicesRequired:
-        # this procedure will make the appropriate rests
-        s.makeVoices(inPlace=True, fillGaps=True)
-    else:
+    if not notes:
+        # Conductor track doesn't need measures made
+        # It's an intermediate result only -- not provided to user
+        return s
+
+    s.makeMeasures(inPlace=True)
+    for m in s.getElementsByClass(stream.Measure):
+        if voicesRequired:
+            m.makeVoices(inPlace=True, fillGaps=True)
         # always need to fill gaps, as rests are not found in any other way
-        s.makeRests(inPlace=True, fillGaps=True)
+        m.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
     return s
 
 
@@ -2525,14 +2543,19 @@ def midiStringToStream(strData, **keywords):
 
     N.B. -- this has been somewhat problematic, so use at your own risk.
 
-     >>> midiBinStr = (b'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x04\x00'
-     ...               + b'MTrk\x00\x00\x00\x16\x00\xff\x03\x00\x00\xe0\x00@\x00'
-     ...               + b'\x90CZ\x88\x00\x80C\x00\x88\x00\xff/\x00')
-     >>> s = midi.translate.midiStringToStream(midiBinStr)
-     >>> s.show('text')
-     {0.0} <music21.stream.Part ...>
-         {0.0} <music21.note.Note G>
-
+    >>> midiBinStr = (b'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x04\x00'
+    ...               + b'MTrk\x00\x00\x00\x16\x00\xff\x03\x00\x00\xe0\x00@\x00'
+    ...               + b'\x90CZ\x88\x00\x80C\x00\x88\x00\xff/\x00')
+    >>> s = midi.translate.midiStringToStream(midiBinStr)
+    >>> s.show('text')
+    {0.0} <music21.stream.Part 0x108aa94f0>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.instrument.Instrument ''>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.note.Note G>
+            {1.0} <music21.note.Rest rest>
+            {4.0} <music21.bar.Barline type=final>
     '''
     from music21 import midi as midiModule
 
@@ -2576,7 +2599,7 @@ def midiFileToStream(
     >>> s
     <music21.stream.Score ...>
     >>> len(s.flat.notesAndRests)
-    11
+    13
     '''
     # environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
     if inputM21 is None:
@@ -3475,7 +3498,7 @@ class Test(unittest.TestCase):
         s = converter.parse(fp)
         # three chords will be created, as well as two voices
         self.assertEqual(len(s.flat.getElementsByClass('Chord')), 3)
-        self.assertEqual(len(s.parts[0].voices), 2)
+        self.assertEqual(len(s.parts.first().measure(2).voices), 2)
 
     def testImportChordsA(self):
         from music21 import converter
@@ -3552,9 +3575,9 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.transposing01)
         mf = streamToMidiFile(s)
         out = midiFileToStream(mf)
-        instruments = out.parts[0].getElementsByClass('Instrument')
-        self.assertIsInstance(instruments[0], instrument.Oboe)
-        self.assertEqual(instruments[0].quarterLength, 0)
+        first_instrument = out.parts.first().measure(1).getElementsByClass('Instrument').first()
+        self.assertIsInstance(first_instrument, instrument.Oboe)
+        self.assertEqual(first_instrument.quarterLength, 0)
 
         # Unrecognized instrument 'a'
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
@@ -3573,8 +3596,8 @@ class Test(unittest.TestCase):
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test16.mid'
         s = converter.parse(fp)
-        self.assertEqual(len(s.parts[0].voices), 2)
-        els = s.parts[0].flat.getElementsByOffset(0.5)
+        self.assertEqual(len(s.parts.first().measure(1).voices), 2)
+        els = s.parts.first().flat.getElementsByOffset(0.5)
         self.assertSequenceEqual([e.duration.quarterLength for e in els], [0, 1])
 
     def testRepeatsExpanded(self):
@@ -3633,8 +3656,10 @@ class Test(unittest.TestCase):
 
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test17.mid'
         inn = converter.parse(fp)
-        numRests = len(inn.parts[1].voices[0].getElementsByClass('Rest'))
-        self.assertEqual(numRests, 2)
+        self.assertEqual(
+            len(inn.parts[1].measure(2).voices.first().getElementsByClass('Rest')), 1)
+        self.assertEqual(
+            len(inn.parts[1].measure(2).voices.last().getElementsByClass('Rest')), 1)
 
 
 # ------------------------------------------------------------------------------

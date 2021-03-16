@@ -18,7 +18,7 @@ __all__ = ['tables', 'Chord', 'ChordException', 'fromIntervalVector', 'fromForte
 import copy
 import unittest
 import re
-from typing import Union, List, Optional, TypeVar, Set, Tuple
+from typing import Union, List, Optional, TypeVar, Set, Tuple, Dict
 
 from music21 import beam
 from music21 import common
@@ -32,7 +32,7 @@ from music21 import tie
 from music21 import volume
 
 from music21 import environment
-from music21.chord import tables as chordTables
+from music21.chord import tables
 from music21.common.decorators import cacheMethod
 
 _MOD = 'chord'
@@ -908,7 +908,7 @@ class Chord(note.NotRest):
         >>> c4.areZRelations(c3)
         False
         '''
-        zRelationAddress = chordTables.addressToZAddress(self.chordTablesAddress)
+        zRelationAddress = tables.addressToZAddress(self.chordTablesAddress)
         if zRelationAddress is None:
             return False
         if other.chordTablesAddress[0:3] == zRelationAddress[0:3]:
@@ -1270,39 +1270,38 @@ class Chord(note.NotRest):
                     score += 1 / (root_index + 6)
             return score
 
-        orderedChordSteps = (3, 5, 7, 2, 4, 6)
-
         # FIND ROOT FAST -- for cases where one note has perfectly stacked
         # thirds, like E C G; but not C E B-
-        # if one pitch has perfectlyStackedThirds, return it always:
-        stepsFound = set()
-        nonDuplicatingPitches = []
-        for p in self.pitches:
-            if p.step in stepsFound:
-                continue
-            else:
-                stepsFound.add(p.step)
-                nonDuplicatingPitches.append(p)
+        # if one pitch has perfectlyStackedThirds, return it always.
 
+        # we use the music21 unique function since it preserves the order
+        nonDuplicatingPitches = common.misc.unique((n.pitch for n in self._notes),
+                                                   key=lambda pp: pp.step)
         lenPitches = len(nonDuplicatingPitches)
         if not lenPitches:
             raise ChordException(f'no pitches in chord {self!r}')
+
         if lenPitches == 1:
             return self.pitches[0]
+        elif lenPitches == 7:  # 13th chord
+            return self.bass()
 
-        # for C E G C, searchChordSteps will be (3, 5)
-        searchChordSteps = orderedChordSteps[:lenPitches - 1]
-
-        for i, p in enumerate(nonDuplicatingPitches):
-            foundAll = True
-            for chordStepTest in searchChordSteps:
-                if not self.getChordStep(chordStepTest, testRoot=p):
-                    foundAll = False
+        stepNumsToPitches: Dict[int, pitch.Pitch] = {pitch.STEP_TO_DNN_OFFSET[p.step]: p
+                                                     for p in nonDuplicatingPitches}
+        stepNums = sorted(stepNumsToPitches)
+        for startIndex in range(lenPitches):
+            all_are_thirds = True
+            this_step_num = stepNums[startIndex]
+            last_step_num = this_step_num
+            for endIndex in range(startIndex + 1, startIndex + lenPitches):
+                endIndexMod = endIndex % lenPitches
+                endStepNum = stepNums[endIndexMod]
+                if endStepNum - last_step_num not in (2, -5):
+                    all_are_thirds = False
                     break
-            if foundAll:
-                # note that for a 13th chord, this will return the bass,
-                # which is great!
-                return p
+                last_step_num = endStepNum
+            if all_are_thirds:
+                return stepNumsToPitches[this_step_num]
 
         # FIND ROOT SLOW
         # no notes (or more than one...) have perfectlyStackedThirds above them.  Return
@@ -1310,11 +1309,13 @@ class Chord(note.NotRest):
         # this is the slowest...
 
         rootnessFunctionScores = []
+        orderedChordSteps = (3, 5, 7, 2, 4, 6)
 
-        for i, p in enumerate(nonDuplicatingPitches):
+        for p in nonDuplicatingPitches:
             currentListOfThirds = []
+            this_step_num = pitch.STEP_TO_DNN_OFFSET[p.step]
             for chordStepTest in orderedChordSteps:
-                if self.getChordStep(chordStepTest, testRoot=p):
+                if (this_step_num + chordStepTest - 1) % 7 in stepNumsToPitches:
                     currentListOfThirds.append(True)
                 else:
                     currentListOfThirds.append(False)
@@ -1664,8 +1665,8 @@ class Chord(note.NotRest):
         '''
         if self.hasZRelation:
             chordTablesAddress = self.chordTablesAddress
-            v = chordTables.addressToIntervalVector(chordTablesAddress)
-            addresses = chordTables.intervalVectorToAddress(v)
+            v = tables.addressToIntervalVector(chordTablesAddress)
+            addresses = tables.intervalVectorToAddress(v)
             # environLocal.printDebug(['addresses', addresses,
             #    'chordTablesAddress', chordTablesAddress])
             # addresses returned here are 2 elements lists
@@ -1674,7 +1675,7 @@ class Chord(note.NotRest):
                 if thisAddress.forteClass != chordTablesAddress.forteClass:
                     other = thisAddress
             # other should always be defined to not None
-            prime = chordTables.addressToTransposedNormalForm(other)
+            prime = tables.addressToTransposedNormalForm(other)
             return Chord(prime)
         return None
         # c2.getZRelation()  # returns a list in non-ET12 space...
@@ -2826,6 +2827,122 @@ class Chord(note.NotRest):
         '''
         return self._checkTriadType((3, 11, 1), 3, 7)
 
+    def isTranspositionallySymmetrical(self, *, requireIntervallicEvenness=False) -> bool:
+        '''
+        Returns True if the Chord is symmetrical under transposition
+        and False otherwise.  A pitch-class-based way of looking at this, is
+        can all the pitch classes be transposed up some number of semitones 1-11
+        and end up with the same pitch-classes.  Like the dyad F-B can have each
+        note transposed up 6 semitones and get another B-F = F-B dyad.
+
+        A tonally-focused way of looking at this would be are we unable
+        to distinguish root position vs. some inversion of the chord by ear alone?
+        For instance, we can see that C-Eb-Gb-Bbb is in root position, while
+        Eb-Gb-Bbb-C is in first inversion.  But only hearing the chord in isolation
+        it would not be possible to tell.
+
+        With either way of looking at it,
+        fourteen set classes of 2-10 pitch classes have this property,
+        including the augmented triad:
+
+        >>> chord.Chord('C E G#').isTranspositionallySymmetrical()
+        True
+
+        ...but not the major triad:
+
+        >>> chord.Chord('C E G').isTranspositionallySymmetrical()
+        False
+
+        The whole-tone scale and the Petrushka chord are both transpositionally symmetrical:
+
+        >>> wholeToneAsChord = chord.Chord('C D E F# G# B- C')
+        >>> wholeToneAsChord.isTranspositionallySymmetrical()
+        True
+
+        >>> petrushka = chord.Chord([0, 1, 3, 6, 7, 9])
+        >>> petrushka.isTranspositionallySymmetrical()
+        True
+
+        If `requireIntervallicEvenness` is True then only chords that also have
+        even spacing / evenly divide the octave are considered transpositionally
+        symmetrical.  The normal cases are the F-B (06) dyad, the augmented triad,
+        the diminished-seventh chord, and the whole-tone scale collection:
+
+        >>> wholeToneAsChord.isTranspositionallySymmetrical(requireIntervallicEvenness=True)
+        True
+
+        >>> petrushka.isTranspositionallySymmetrical(requireIntervallicEvenness=True)
+        False
+
+        Note that complements of these chords (except the whole-tone collection) are
+        not transpositionally symmetrical if `requireIntervallicEvenness` is required:
+
+        >>> chord.Chord([0, 4, 8]).isTranspositionallySymmetrical(requireIntervallicEvenness=True)
+        True
+
+        >>> chord.Chord([1, 2, 3, 5, 6, 7, 9, 10, 11]).isTranspositionallySymmetrical(
+        ...       requireIntervallicEvenness=True)
+        False
+
+        Empty chords and the total aggregate cannot have their inversion determined by ear alone.
+        So they are `True` with or without `requireIntervallicEvenness`.
+
+        >>> chord.Chord().isTranspositionallySymmetrical()
+        True
+
+        >>> chord.Chord(list(range(12))).isTranspositionallySymmetrical()
+        True
+
+        Monads (single-note "chords") cannot be transposed 1-11 semitones to recreate themselves,
+        so they return `False` by default:
+
+        >>> chord.Chord('C').isTranspositionallySymmetrical()
+        False
+
+        But they are the only case where `requireIntervallicEvenness` actually switches from
+        `False` to `True`, because they do evenly divide the octave.
+
+        >>> chord.Chord('C').isTranspositionallySymmetrical(requireIntervallicEvenness=True)
+        True
+
+        11-note chords return `False` in either case:
+
+        >>> chord.Chord(list(range(11))).isTranspositionallySymmetrical()
+        False
+        '''
+        if not self._notes:
+            return True
+
+        address = self.chordTablesAddress
+        if address.cardinality == 1:
+            return requireIntervallicEvenness
+
+        lookup = (address.cardinality, address.forteClass)
+        if lookup in (
+            (2,  6),  # 06 -- omitted by Straus  # noqa: E241
+            (3, 12),  # augmented triad
+            (4, 28),  # diminished seventh chord
+            (6, 35),  # whole-tone scale
+            (12, 1),  # total aggregate.
+        ):
+            return True
+
+        if not requireIntervallicEvenness and lookup in (
+            (4,  9),  # 0167  # noqa: E241
+            (4, 25),  # 0268
+            (6,  7),  # 012678  # noqa: E241
+            (6, 20),  # "Hexatonic scale" 014589
+            (6, 30),  # Petrushka chord 013679
+            (8,  9),  # 01236789  # noqa: E241
+            (8, 25),  # 0124678T
+            (8, 28),  # octatonic scale
+            (9, 12),  # complement to augmented triad
+            (10, 6),  # complement to 06
+        ):
+            return True
+        else:
+            return False
+
     @cacheMethod
     def isSeventh(self):
         '''
@@ -2947,14 +3064,18 @@ class Chord(note.NotRest):
 
         return True
 
-    @cacheMethod
-    def isTriad(self):
-        '''
-        Returns boolean.
 
-        "Contains vs. Is:" A dominant-seventh chord is NOT a triad.
-        returns True if the chord contains at least one Third and one Fifth and all notes are
-        equivalent to either of those notes. Only returns True if triad is spelled correctly.
+    @cacheMethod
+    def isTriad(self) -> bool:
+        '''
+        Returns True if this Chord is a triad of some sort.  It could even be a rather
+        exotic triad so long as the chord contains at least one Third and one Fifth and
+        all notes have the same name as one of the htree notes.
+
+        Note: only returns True if triad is spelled correctly.
+
+        Note the difference of "containsTriad" vs. "isTriad":
+        A dominant-seventh chord is NOT a triad, but it contains two triads.
 
         >>> cChord = chord.Chord(['C4', 'E4', 'A4'])
         >>> cChord.isTriad()
@@ -3103,6 +3224,7 @@ class Chord(note.NotRest):
              newroot: Union[bool, str, pitch.Pitch, note.Note] = False,
              *,
              find=None):
+        # noinspection PyShadowingNames
         '''
         Returns or sets the Root of the chord. If not set, will find it.
 
@@ -3958,9 +4080,9 @@ class Chord(note.NotRest):
         ChordTableAddress(cardinality=0, forteClass=0, inversion=0, pcOriginal=0)
         '''
         try:
-            return chordTables.seekChordTablesAddress(self)
-        except chordTables.ChordTablesException:
-            return chordTables.ChordTableAddress(0, 0, 0, 0)
+            return tables.seekChordTablesAddress(self)
+        except tables.ChordTablesException:
+            return tables.ChordTableAddress(0, 0, 0, 0)
 
 
     @property
@@ -4093,7 +4215,7 @@ class Chord(note.NotRest):
             else:
                 return 'enharmonic octaves'
 
-        ctn = chordTables.addressToCommonNames(cta)
+        ctn = tables.addressToCommonNames(cta)
         if cta.cardinality == 2:
             pitchNames = {p.name for p in self.pitches}
             pitchPSes = {p.ps for p in self.pitches}
@@ -4258,8 +4380,8 @@ class Chord(note.NotRest):
         '2-2'
         '''
         try:
-            return chordTables.addressToForteName(self.chordTablesAddress, 'tn')
-        except chordTables.ChordTablesException:
+            return tables.addressToForteName(self.chordTablesAddress, 'tn')
+        except tables.ChordTablesException:
             return 'N/A'
 
     @property
@@ -4322,8 +4444,8 @@ class Chord(note.NotRest):
         '2-2'
         '''
         try:
-            return chordTables.addressToForteName(self.chordTablesAddress, 'tni')
-        except chordTables.ChordTablesException:
+            return tables.addressToForteName(self.chordTablesAddress, 'tni')
+        except tables.ChordTablesException:
             return 'N/A'
 
     @property
@@ -4368,8 +4490,8 @@ class Chord(note.NotRest):
         False
         '''
         try:
-            post = chordTables.addressToZAddress(self.chordTablesAddress)
-        except chordTables.ChordTablesException:
+            post = tables.addressToZAddress(self.chordTablesAddress)
+        except tables.ChordTablesException:
             return False  # empty chords have no z-relations
 
         # environLocal.printDebug(['got post', post])
@@ -4400,8 +4522,8 @@ class Chord(note.NotRest):
         [0, 0, 0, 0, 0, 0]
         '''
         try:
-            return list(chordTables.addressToIntervalVector(self.chordTablesAddress))
-        except chordTables.ChordTablesException:
+            return list(tables.addressToIntervalVector(self.chordTablesAddress))
+        except tables.ChordTablesException:
             return [0, 0, 0, 0, 0, 0]
 
     @property
@@ -4580,8 +4702,8 @@ class Chord(note.NotRest):
         '''
         cta = self.chordTablesAddress
         try:
-            transposedNormalForm = chordTables.addressToTransposedNormalForm(cta)
-        except chordTables.ChordTablesException:
+            transposedNormalForm = tables.addressToTransposedNormalForm(cta)
+        except tables.ChordTablesException:
             return []
 
         orderedPCs = self.orderedPitchClasses
@@ -4893,8 +5015,8 @@ class Chord(note.NotRest):
         []
         '''
         try:
-            return list(chordTables.addressToPrimeForm(self.chordTablesAddress))
-        except chordTables.ChordTablesException:
+            return list(tables.addressToPrimeForm(self.chordTablesAddress))
+        except tables.ChordTablesException:
             return []
 
     @property
@@ -5337,7 +5459,7 @@ def fromForteClass(notation):
     else:
         raise ChordException(f'cannot handle specified notation: {notation}')
 
-    prime = chordTables.addressToTransposedNormalForm([card, num, inv])
+    prime = tables.addressToTransposedNormalForm([card, num, inv])
     return Chord(prime)
 
 
@@ -5364,13 +5486,13 @@ def fromIntervalVector(notation, getZRelation=False):
     addressList = None
     if common.isListLike(notation):
         if len(notation) == 6:  # assume its an interval vector
-            addressList = chordTables.intervalVectorToAddress(notation)
+            addressList = tables.intervalVectorToAddress(notation)
     if addressList is None:
         raise ChordException(f'cannot handle specified notation: {notation}')
 
     post = []
     for address in addressList:
-        post.append(Chord(chordTables.addressToTransposedNormalForm(address)))
+        post.append(Chord(tables.addressToTransposedNormalForm(address)))
     # for now, return the first chord
     # z-related chords will have more than one
     if len(post) == 1:
