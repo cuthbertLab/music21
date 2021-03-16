@@ -1049,7 +1049,7 @@ class TwelveToneRow(ToneRow):
         :meth:`~music21.serial.originalCenteredTransformation` explanations of these conventions.
 
         First, let's take a row we know to have a combinatoriality pair:
-        
+
         >>> moses = serial.getHistoricalRowByName('SchoenbergMosesAron')
         >>> moses.pitchClasses()
         [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]
@@ -1080,7 +1080,7 @@ class TwelveToneRow(ToneRow):
 
         >>> moses.areCombinatorial('R', 6, 'RI', 4, 'original')
         False
-        
+
         '''
         if self.isTwelveToneRow() is False:
             raise SerialException('Combinatoriality applies only to twelve-tone rows.')
