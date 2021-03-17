@@ -365,7 +365,7 @@ class TabClef(PitchClef):
     >>> a = clef.TabClef()
     >>> a.sign
     'TAB'
-    
+
     As tab stems are assumed to be mostly downwards (at least for guitar tabs),
     the method `getStemDirectionForPitches` is overriden from `Clef` to
     systematically return "down".
@@ -1099,7 +1099,7 @@ class Test(unittest.TestCase):
         self.assertIs(n6.getContextByClass(Clef), tc1)
 
     def testTabClefBeamDirections(self):
-        
+
         from music21 import stream
         from music21 import clef
         from music21 import meter
@@ -1107,16 +1107,17 @@ class Test(unittest.TestCase):
 
         m = stream.Measure()
 
-        n1 = note.Note(64,quarterLength=0.25)
-        n2 = note.Note(67,quarterLength=0.25)
+        n1 = note.Note(64, quarterLength=0.25)
+        n2 = note.Note(67, quarterLength=0.25)
 
         m.append(clef.TabClef())
         m.append(meter.TimeSignature('4/4'))
         m.append(n1)
         m.append(n2)
-        m=m.makeBeams()
-        
-        self.assertEqual(m.notes[0].stemDirection,'down')
+        m = m.makeBeams()
+
+        self.assertEqual(m.notes[0].stemDirection, 'down')
+
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
