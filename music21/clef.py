@@ -365,10 +365,6 @@ class TabClef(PitchClef):
     >>> a = clef.TabClef()
     >>> a.sign
     'TAB'
-
-    As tab stems are assumed to be mostly downwards (at least for guitar tabs),
-    the method `getStemDirectionForPitches` is overriden from `Clef` to
-    systematically return "down".
     '''
 
     def __init__(self):
@@ -383,7 +379,10 @@ class TabClef(PitchClef):
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
     ) -> str:
-        return "down"
+        '''
+        Overridden to simply return 'down' for guitar tabs.
+        '''
+        return 'down'
 
 # ------------------------------------------------------------------------------
 
