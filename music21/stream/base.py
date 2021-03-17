@@ -6265,11 +6265,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         refStreamOrTimeRange=None,
         fillGaps=False,
         timeRangeFromBarDuration=False,
-        inPlace=True,
+        inPlace=False,
         hideRests=False,
     ):
         '''
         Calls :py:func:`~music21.stream.makeNotation.makeRests`.
+
+        Changed in v.7, inPlace=False by default.
         '''
         return makeNotation.makeRests(
             self,
