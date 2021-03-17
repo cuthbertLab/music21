@@ -1549,13 +1549,14 @@ class RecursiveIterator(StreamIterator):
             else:
                 self.sectionIndex = self.index
 
-            self.index += 1  # increment early in case of an error in the next try.
-
             try:
-                e = self.srcStreamElements[self.index - 1]
+                e = self.srcStreamElements[self.index]
             except IndexError:
-                # this may happen in the number of elements has changed
+                self.index += 1
+                # this may happen if the number of elements has changed
                 continue
+
+            self.index += 1
 
             # in a recursive filter, the stream does not need to match the filter,
             # only the internal elements.
