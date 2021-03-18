@@ -764,27 +764,28 @@ def makeRests(
     4.0
     >>> a.insert(0, meter.TimeSignature('4/4'))
     >>> a.makeMeasures(inPlace=True)
-    >>> a.show('text')
-    {0.0} <music21.stream.Measure 1 offset=0.0>
-        {0.0} <music21.clef.TrebleClef>
-        {0.0} <music21.meter.TimeSignature 4/4>
-    {4.0} <music21.stream.Measure 2 offset=4.0>
-        {0.0} <music21.note.Note C>
-    {8.0} <music21.stream.Measure 3 offset=8.0>
-        {0.0} <music21.note.Note D>
-        {1.0} <music21.bar.Barline type=final>
+    >>> a.show('text', addEndTimes=True)
+    {0.0 - 0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0 - 0.0} <music21.clef.TrebleClef>
+        {0.0 - 0.0} <music21.meter.TimeSignature 4/4>
+    {4.0 - 5.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0 - 1.0} <music21.note.Note C>
+    {8.0 - 9.0} <music21.stream.Measure 3 offset=8.0>
+        {0.0 - 1.0} <music21.note.Note D>
+        {1.0 - 1.0} <music21.bar.Barline type=final>
     >>> a.makeRests(fillGaps=True, inPlace=True)
-    >>> a.show('text')
-    {0.0} <music21.stream.Measure 1 offset=0.0>
-        {0.0} <music21.clef.TrebleClef>
-        {0.0} <music21.meter.TimeSignature 4/4>
-    {0.0} <music21.note.Rest rest>
-    {4.0} <music21.stream.Measure 2 offset=4.0>
-        {0.0} <music21.note.Note C>
-    {5.0} <music21.note.Rest rest>
-    {8.0} <music21.stream.Measure 3 offset=8.0>
-        {0.0} <music21.note.Note D>
-        {1.0} <music21.bar.Barline type=final>
+    >>> a.show('text', addEndTimes=True)
+    {0.0 - 4.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0 - 0.0} <music21.clef.TrebleClef>
+        {0.0 - 0.0} <music21.meter.TimeSignature 4/4>
+        {0.0 - 4.0} <music21.note.Rest rest>
+    {4.0 - 8.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0 - 1.0} <music21.note.Note C>
+        {1.0 - 4.0} <music21.note.Rest rest>
+    {8.0 - 12.0} <music21.stream.Measure 3 offset=8.0>
+        {0.0 - 1.0} <music21.note.Note D>
+        {1.0 - 4.0} <music21.note.Rest rest>
+        {4.0 - 4.0} <music21.bar.Barline type=final>
 
     Changed in v6 -- all but first attribute are keyword only
 
@@ -825,12 +826,19 @@ def makeRests(
         #    len(refStreamOrTimeRange)])
     if returnObj.hasVoices():
         bundle = list(returnObj.voices)
+    elif returnObj.hasMeasures():
+        bundle = returnObj.getElementsByClass('Measure')
     else:
         bundle = [returnObj]
 
+    # bundle components may be voices, measures, or a flat Stream
     for v in bundle:
         oLow = v.lowestOffset
         oHigh = v.highestTime
+        # adjust oHigh to not exceed measure
+        oHighTargetAdjusted = oHighTarget
+        if v.isMeasure:
+            oHighTargetAdjusted = min(v.barDuration.quarterLength, oHighTarget)
 
         # create rest from start to end
         qLen = oLow - oLowTarget
@@ -843,7 +851,7 @@ def makeRests(
             v.insert(oLowTarget, r)
 
         # create rest from end to highest
-        qLen = oHighTarget - oHigh
+        qLen = oHighTargetAdjusted - oHigh
         # environLocal.printDebug(['v', v, oHigh, oHighTarget, 'qLen', qLen])
         if qLen > 0:
             r = note.Rest()
@@ -863,6 +871,9 @@ def makeRests(
                     v.insert(e.offset, r)
         # environLocal.printDebug(['post makeRests show()', v])
 
+    if returnObj.hasMeasures():
+        returnObj.makeTies(classFilterList=(note.Rest,))
+
     if inPlace is not True:
         return returnObj
 
@@ -872,7 +883,8 @@ def makeTies(
     *,
     meterStream=None,
     inPlace=False,
-    displayTiedAccidentals=False
+    displayTiedAccidentals=False,
+    classFilterList=(note.GeneralNote,),
 ):
     # noinspection PyShadowingNames
     '''
@@ -966,6 +978,40 @@ def makeTies(
     Notes: uses base.Music21Object.splitAtQuarterLength() once it has figured out
     what to split.
 
+    Changed in v. 4 -- inPlace = False by default.
+
+    Changed in v6 -- all but first attribute are keyword only
+
+    Added in v. 7 -- `classFilterList` acts as a filter on what elements will
+    be operated on (i.e. have durations split and/or ties made.)
+    The default `(note.GeneralNote,)` includes Notes, Chords, and Rests.
+
+    Here will we split and make ties only on Notes, leaving the too-long
+    rest in measure 1 alone.
+
+    >>> p = stream.Part()
+    >>> p.append(meter.TimeSignature('2/4'))
+    >>> p.insert(0.0, note.Rest(quarterLength=3.0))
+    >>> p.insert(3.0, note.Note(quarterLength=3.0))
+    >>> p.makeMeasures(inPlace=True)
+    >>> p.makeTies(classFilterList=[note.Note], inPlace=True)
+    >>> p.show('text', addEndTimes=True)
+    {0.0 - 3.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0 - 0.0} <music21.clef.TrebleClef>
+        {0.0 - 0.0} <music21.meter.TimeSignature 2/4>
+        {0.0 - 3.0} <music21.note.Rest rest>
+    {2.0 - 4.0} <music21.stream.Measure 2 offset=2.0>
+        {1.0 - 2.0} <music21.note.Note C>
+    {4.0 - 6.0} <music21.stream.Measure 3 offset=4.0>
+        {0.0 - 2.0} <music21.note.Note C>
+        {2.0 - 2.0} <music21.bar.Barline type=final>
+    >>> p.measure(3).notes[0].tie
+    <music21.tie.Tie stop>
+
+    OMIT_FROM_DOCS
+
+    configure ".previous" and ".next" attributes
+
     Previously a note tied from one voice could not make ties into a note
     in the next measure outside of voices.  Fixed May 2017
 
@@ -1022,15 +1068,16 @@ def makeTies(
     <music21.note.Note B> None
     <music21.note.Note C> <music21.tie.Tie stop>
 
+    Be helpful and wrap `classFilterList` in a list if need be.
 
-    Changed in v4 -- inPlace = False by default.
-
-    Changed in v6 -- all but first attribute are keyword only
-
-    OMIT_FROM_DOCS
-    TODO: take a list of classes to act as filter on what elements are tied.
-
-    configure ".previous" and ".next" attributes
+    >>> m = stream.Measure([note.Note(quarterLength=8.0)])
+    >>> m.insert(0, meter.TimeSignature('4/4'))
+    >>> p = stream.Part([m])
+    >>> p.makeTies(inPlace=True, classFilterList='Note')
+    >>> len(p.getElementsByClass('Measure'))
+    2
+    >>> p.recurse().last().tie
+    <music21.tie.Tie stop>
     '''
     from music21 import stream
 
@@ -1043,6 +1090,9 @@ def makeTies(
         returnObj = s
     if not returnObj:
         raise stream.StreamException('cannot process an empty stream')
+
+    if not common.isIterable(classFilterList):
+        classFilterList = [classFilterList]
 
     # get measures from this stream
     measureStream = returnObj.getElementsByClass('Measure')
@@ -1131,6 +1181,8 @@ def makeTies(
         # bundle components may be voices, or just a measure
         for v in bundle:
             for e in v:
+                if e.classSet.isdisjoint(classFilterList):
+                    continue
                 vId = v.id
                 # environLocal.printDebug([
                 #    'Stream.makeTies() iterating over elements in measure',
