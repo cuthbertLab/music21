@@ -789,8 +789,6 @@ def makeRests(
     Changed in v6 -- all but first attribute are keyword only
 
     Changed in v7 -- `inPlace` defaults False.
-
-    Obviously there are problems TODO: fix them
     '''
     from music21 import stream
 
