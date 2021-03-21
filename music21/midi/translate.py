@@ -3513,7 +3513,7 @@ class Test(unittest.TestCase):
         s = converter.parse(fp)
         # three chords will be created, as well as two voices
         self.assertEqual(len(s.flat.getElementsByClass('Chord')), 3)
-        self.assertEqual(len(s.parts.first().measure(2).voices), 2)
+        self.assertEqual(len(s.parts.first().measure(3).voices), 2)
 
     def testImportChordsA(self):
         from music21 import converter
@@ -3670,11 +3670,10 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test17.mid'
-        inn = converter.parse(fp)
+        inn = converter.parse(fp, forceSource=True)
+
         self.assertEqual(
-            len(inn.parts[1].measure(2).voices.first().getElementsByClass('Rest')), 1)
-        self.assertEqual(
-            len(inn.parts[1].measure(2).voices.last().getElementsByClass('Rest')), 1)
+            len(inn.parts[1].measure(3).voices.last().getElementsByClass('Rest')), 1)
 
 
 # ------------------------------------------------------------------------------
