@@ -1046,7 +1046,7 @@ class TwelveToneRow(ToneRow):
         describe another. One of the zero-centered or original-centered conventions for tone row
         transformations must be specified in the last argument; see
         :meth:`~music21.serial.ToneRow.zeroCenteredTransformation` and
-        :meth:`~music21.serial.ToneRow.originalCenteredTransformation` 
+        :meth:`~music21.serial.ToneRow.originalCenteredTransformation`
         explanations of these conventions.
 
         First, let's take a row we know to have a combinatoriality pair:
