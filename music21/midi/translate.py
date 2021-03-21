@@ -3324,6 +3324,16 @@ class Test(unittest.TestCase):
             [True, True, True, True]
         )
 
+    def testMidiImportMeter(self):
+        from music21 import converter
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test17.mid'
+        s = converter.parse(fp)
+        for p in s.parts:
+            m = p.getElementsByClass('Measure').first()
+            ts = m.timeSignature
+            self.assertEqual(ts.ratioString, '3/4')
+            self.assertIn(ts, m)
+
     def testMidiExportConductorA(self):
         '''Export conductor data to MIDI conductor track.'''
         from music21 import meter, tempo
@@ -3670,7 +3680,7 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test17.mid'
-        inn = converter.parse(fp, forceSource=True)
+        inn = converter.parse(fp)
 
         self.assertEqual(
             len(inn.parts[1].measure(3).voices.last().getElementsByClass('Rest')), 1)
