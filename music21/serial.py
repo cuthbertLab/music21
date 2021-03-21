@@ -563,7 +563,7 @@ class ToneRow(stream.Stream):
         to another, the second specified in the argument. Each transformation is given as a
         tuple of the transformation type and index.
 
-        See :meth:`~music21.serial.zeroCenteredTransformation` for
+        See :meth:`~music21.serial.ToneRow.zeroCenteredTransformation` for
         an explanation of this convention.
 
 
@@ -610,7 +610,7 @@ class ToneRow(stream.Stream):
         to another, the second specified in the argument. Each transformation is given as a tuple
         of the transformation type and index.
 
-        See :meth:`~music21.serial.originalCenteredTransformation` for an
+        See :meth:`~music21.serial.ToneRow.originalCenteredTransformation` for an
         explanation of this convention.
 
         >>> chromatic = serial.pcToToneRow(       [2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B',   0, 1])
@@ -1045,8 +1045,9 @@ class TwelveToneRow(ToneRow):
         The first and second arguments describe one transformation, while the third and fourth
         describe another. One of the zero-centered or original-centered conventions for tone row
         transformations must be specified in the last argument; see
-        :meth:`~music21.serial.zeroCenteredTransformation` and
-        :meth:`~music21.serial.originalCenteredTransformation` explanations of these conventions.
+        :meth:`~music21.serial.ToneRow.zeroCenteredTransformation` and
+        :meth:`~music21.serial.ToneRow.originalCenteredTransformation` 
+        explanations of these conventions.
 
         First, let's take a row we know to have a combinatoriality pair:
 
@@ -1055,11 +1056,12 @@ class TwelveToneRow(ToneRow):
         [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]
 
         Combinatoriality holds here between P0 and I3
+
         >>> moses.areCombinatorial('P', 0, 'I', 3, 'zero')
         True
 
-        By definition what's true for :meth:`~music21.serial.zeroCenteredTransformation`
-        is also true for :meth:`~music21.serial.originalCenteredTransformation`:
+        By definition what's true for :meth:`~music21.serial.ToneRow.zeroCenteredTransformation`
+        is also true for :meth:`~music21.serial.ToneRow.originalCenteredTransformation`:
 
         >>> moses.areCombinatorial('P', 0, 'I', 3, 'original')
         True
