@@ -6754,9 +6754,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         1
 
         In cases where chord members are manipulated after initial tie creation,
-        some chord members might lack ties. Whereas `stripTies` ordinarily only acts
-        on chords if every member has a stop tie, this is not necessary if
-        all the pitches match:
+        some chord members might lack ties. (The `.tie` attribute of a Chord only
+        refers to one member of the chord having that attribute.) `stripTies` can
+        run in a "strict" mode (`matchByPitch=False`) whereby every chord member
+        needs to have "continue" or "stop" tie attributes to continue or complete a
+        tie, or it can run in a more "permissive" mode (`matchByPitch=True`) (default)
+        and look first to the tie status of the chord (which might incompletely describe a
+        mixed tie-type scenario) and then simply connect notes and chords
+        where all the pitches match:
 
         >>> c1 = chord.Chord('C4 E4')
         >>> c1.tie = tie.Tie('start')
@@ -6777,14 +6782,61 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(strippedPitchMatching.flat.notes)
         1
 
-        This can be prevented with `matchByPitch=False`, in which case every chord member
-        must have a stop tie:
+        This can be prevented with `matchByPitch=False`, in which case every chord
+        member needs "continue" and/or "stop" tie attributes:
 
-        >>> strippedConservative = m.stripTies(matchByPitch=False)
-        >>> len(strippedConservative.flat.notes)
+        >>> strippedMixedTieTypes = m.stripTies(matchByPitch=False)
+        >>> len(strippedMixedTieTypes.flat.notes)
         2
 
-        Changed in v.7 -- `matchByPitch` defaults to True.
+        >>> c2.notes[0].tie = tie.Tie('stop')
+        >>> c2.notes[1].tie = tie.Tie('stop')
+        >>> c2.notes[2].tie = tie.Tie('stop')
+        >>> strippedUniformTieTypes = m.stripTies(matchByPitch=False)
+        >>> len(strippedUniformTieTypes.flat.notes)
+        1
+
+        Changed in v.7 -- `matchByPitch` defaults True, and the following
+        behavior defined regarding chords with a tie type "continue":
+
+        >>> c1.notes[0].tie = tie.Tie('continue')
+        >>> c1.notes[1].tie = tie.Tie('start')
+        >>> c1.notes[2].tie = tie.Tie('start')
+
+        Continue is accepted here as an ersatz-start:
+
+        >>> stripped1 = m.stripTies(matchByPitch=True)
+        >>> len(stripped1.flat.notes)
+        1
+
+        But prepend an element so that it's considered as a tie continuation:
+
+        >>> c0 = chord.Chord('C4 E4 G4')
+        >>> c0.tie = tie.Tie('start')
+        >>> m2 = stream.Measure()
+        >>> m2.append([c0, c1, c2])
+
+        Now the mixed tie types on c1 will only be connected to c2
+        on the permissive option (`matchByPitch=True`):
+
+        >>> stripped2 = m2.stripTies(matchByPitch=True)
+        >>> stripped2.elements
+        (<music21.chord.Chord C4 E4 G4>,)
+
+        >>> stripped3 = m2.stripTies(matchByPitch=False)
+        >>> stripped3.elements
+        (<music21.chord.Chord C4 E4 G4>,
+         <music21.chord.Chord C4 E4 G4>,
+         <music21.chord.Chord C4 E4 G4>)
+
+        Now correct the tie types on c1 and try the strict option:
+
+        >>> c1.notes[0].tie = tie.Tie('continue')
+        >>> c1.notes[1].tie = tie.Tie('continue')
+        >>> c1.notes[2].tie = tie.Tie('continue')
+        >>> stripped4 = m2.stripTies(matchByPitch=False)
+        >>> stripped4.elements
+        (<music21.chord.Chord C4 E4 G4>,)
         '''
         # environLocal.printDebug(['calling stripTies'])
         if not inPlace:  # make a copy
@@ -6821,7 +6873,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         posConnected = []  # temporary storage for index of tied notes
         posDelete = []  # store deletions to be processed later
 
-        def updateEndMatch(nInner):
+        def updateEndMatch(nInner) -> bool:
             '''
             updateEndMatch based on nList, iLast, matchByPitch, etc.
             '''
@@ -6853,6 +6905,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     and iLast in posConnected
                     and hasattr(nLast, 'pitch')
                     and hasattr(nInner, 'pitch')
+                    # before doing pitch comparison, need to
+                    # make sure we're not comparing a Note to a Chord
+                    and 'Chord' not in nLast.classes
+                    and 'Chord' not in nInner.classes
                     and nLast.pitch == nInner.pitch):
                 return True
             # looking for two chords of equal size
@@ -6872,6 +6928,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return allPitchesMatched
 
             return False
+
+        def allTiesAreContinue(nr: note.NotRest) -> bool:
+            if nr.tie is None:  # pragma: no cover
+                return False
+            if nr.tie.type != 'continue':
+                return False
+            # check every chord member, since tie type "continue" on a chord
+            # only indicates that SOME member is tie-continue.
+            if 'Chord' in nr.classes:
+                for innerN in nr.notes:
+                    if innerN.tie is None:
+                        return False
+                    if innerN.tie.type != 'continue':
+                        return False
+            return True
 
         for i in range(len(notes)):
             endMatch = None  # can be True, False, or None
@@ -6898,12 +6969,33 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # a connection has been started or continued, so no endMatch
                 endMatch = False
 
+            # a continue may or may not imply a connection
             elif (hasattr(n, 'tie')
                     and n.tie is not None
                     and n.tie.type == 'continue'):
-                # a continue always implies a connection
-                posConnected.append(i)
-                endMatch = False
+                # is this actually a start?
+                if not posConnected:
+                    posConnected.append(i)
+                    endMatch = False
+                elif matchByPitch:
+                    # try to match against nLast
+                    tempEndMatch = updateEndMatch(n)
+                    if tempEndMatch:
+                        posConnected.append(i)
+                        # ... and keep going.
+                        endMatch = False
+                    else:
+                        # clear list and populate with this element
+                        posConnected = [i]
+                        endMatch = False
+                elif allTiesAreContinue(n):
+                    # uniform-continue suffices if not matchByPitch
+                    posConnected.append(i)
+                    endMatch = False
+                else:
+                    # only SOME ties on this chord are "continue": reject
+                    posConnected = []
+                    endMatch = False
 
             # establish end condition
             if endMatch is None:  # not yet set, not a start or continue
