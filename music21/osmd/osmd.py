@@ -25,9 +25,12 @@ import webbrowser
 
 from music21.converter.subConverters import SubConverter
 from music21.instrument import Piano
-from music21.common import getSourceFilePath
-from music21.common import runningUnderIPython
+from music21.common import getSourceFilePath, runningUnderIPython
 from music21 import exceptions21
+from music21.musicxml import m21ToXml
+from music21 import environment
+
+environLocal = environment.Environment('osmd.osmd')
 
 
 class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
@@ -68,16 +71,15 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     # Otherwise the script will stay on the page and not reload.
     script_url = ("https://github.com/opensheetmusicdisplay"
                   + "/opensheetmusicdisplay/releases/download/0.9.2/opensheetmusicdisplay.min.js")
-    osmd_file = os.path.join(getSourceFilePath(), 'osmd', 'opensheetmusicdisplay.0.9.2.min.js')
 
     def __init__(self):
         super().__init__()
         self.display, self.HTML, self.Javascript = getExtendedModules()
 
-    def show(self, obj, fmt,
+    def show(self, obj, fmt, *,
              fixPartName=True, offline=False, divId=None,
              **keywords):
-        r'''
+        '''
         Displays the score object in a notebook using the OpenSheetMusicDisplay.js library.
 
         >>> import music21
@@ -98,8 +100,13 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             # create unique reference to output div in case we wish to update it
             divId = self.getUniqueDivId()
 
+        # convert score to xml string
+        gex = m21ToXml.GeneralObjectExporter(score)
+        bytesOut = gex.parse()
+        xml = bytesOut.decode('utf-8')
 
-        xml = open(score.write('musicxml')).read()
+
+
         script = self.musicXMLToScript(xml, divId, offline=offline)
         if in_ipython:
             self.display(self.HTML(f'<div id="{divId}">loading OpenSheetMusicDisplay</div>'))
@@ -109,15 +116,17 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             tmp = tempfile.NamedTemporaryFile(delete=False)
             tmp_path = tmp.name + '.html'
 
-            open(tmp_path, 'w').write(f"""
-            <div id="{divId}"></div>
-            <script>{script}</script>
-            """)
+            with open(tmp_path, 'w') as f:
+                f.write(f'''
+                <div id="{divId}"></div>
+                <script>{script}</script>
+                ''')
             filename = 'file:///' + tmp_path
             webbrowser.open_new_tab(filename)
         return divId
 
     def parseData(self):
+        # pragma: no cover
         raise NotImplementedError('osmd is display-only')
 
     @staticmethod
@@ -142,14 +151,18 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             .replace('{{DIV_ID}}', divId) \
             .replace('"{{data}}"', json.dumps(xml))
 
+        fpScratch = environLocal.getRootTempDir()
+        osmd_file = os.path.join(fpScratch, 'opensheetmusicdisplay.0.9.2.min.js')
+        # osmd_file = os.path.join(UserSettings().getRootTempDir(), 'opensheetmusicdisplay.0.9.2.min.js')
+
         if offline is True:
-            if not os.path.isfile(self.osmd_file):
+            if not os.path.isfile(osmd_file):
                 # on first use we download the file and store it locally for subsequent use
                 # TODO: catch error for no internet connection
-                urllib.request.urlretrieve(self.script_url, self.osmd_file)
+                urllib.request.urlretrieve(self.script_url, osmd_file)
 
             # since we can't link to files from a notebook (security risk) inject into file.
-            script_content = open(self.osmd_file).read()
+            script_content = open(osmd_file).read()
             script = script.replace('"{{offline_script}}"', json.dumps(script_content), 1)
 
         else:
@@ -171,15 +184,15 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         >>> _ = s.show('osmd',fixPartName=False)
         '''
         # If no partName is present in the first instrument, OSMD will display the ugly 'partId'
-        allInstruments = list(score.getInstruments(returnDefault=False, recurse=True))
+        allInstruments = score.getInstruments(returnDefault=False, recurse=True)
 
         if not allInstruments:
             defaultInstrument = Piano()
             defaultInstrument.instrumentName = ' '
             score.insert(0.0, defaultInstrument)
-        elif not allInstruments[0].instrumentName:
+        elif not allInstruments.first().instrumentName:
             # instrumentName must not be '' or None
-            allInstruments[0].instrumentName = ' '
+            allInstruments.first().instrumentName = ' '
 
 
 class TestExternal(unittest.TestCase):
@@ -211,8 +224,8 @@ class Test(unittest.TestCase):
         s = converter.parse("tinyNotation: 3/4 E4 r f#")
 
         ConverterOpenSheetMusicDisplay.addDefaultPartName(s)
-        firstInstrumentObject = s.getInstruments(returnDefault=True, recurse=True)[0]
-        self.assertNotEqual(firstInstrumentObject.instrumentName, None)
+        firstInstrumentObject = s.getInstruments(returnDefault=True, recurse=True).first()
+        self.assertNotNone(firstInstrumentObject.instrumentName)
         self.assertNotEqual(firstInstrumentObject.instrumentName, '')
 
 
