@@ -30,19 +30,19 @@ from music21 import exceptions21
 from music21.musicxml import m21ToXml
 from music21 import environment
 
+# when using offline=True, sets the disk location where we will cache the OSMD.min.js file:
 environLocal = environment.Environment('osmd.osmd')
-
 
 class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
     pass
 
-
+# Determine if we are running inside an IPython notebook
+# if so will render inline - if not we open a new browser window
 try:
     loader = importlib.util.find_spec('IPython.core.display')
 except ImportError:
     loader = None
 hasInstalledIPython = loader is not None
-del importlib
 
 
 def getExtendedModules():
@@ -105,11 +105,10 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         bytesOut = gex.parse()
         xml = bytesOut.decode('utf-8')
 
-
-
+        # generate script to be run on page
         script = self.musicXMLToScript(xml, divId, offline=offline)
         if in_ipython:
-            self.display(self.HTML(f'<div id="{divId}">loading OpenSheetMusicDisplay</div>'))
+            # self.display(self.HTML(f'<div id="{divId}">loading OpenSheetMusicDisplay</div>'))
             self.display(self.Javascript(script))
         else:
 
@@ -153,7 +152,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
         fpScratch = environLocal.getRootTempDir()
         osmd_file = os.path.join(fpScratch, 'opensheetmusicdisplay.0.9.2.min.js')
-        # osmd_file = os.path.join(UserSettings().getRootTempDir(), 'opensheetmusicdisplay.0.9.2.min.js')
 
         if offline is True:
             if not os.path.isfile(osmd_file):
@@ -174,7 +172,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         '''
         Due to a bug in OpenSheetMusicDisplay if a <part-name> is not provided it will default
         to an auto-generated random string. This method is used to fix that by default.
-
 
         >>> import music21
         >>> # display two scores to demonstrate difference.
