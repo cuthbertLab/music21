@@ -8858,7 +8858,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     origin = e.derivation.origin
                     if (origin is not None
                             and e.derivation.method == '__deepcopy__'):
-                        spannerBundle.replaceSpannedElement(id(origin), e)
+                        spannerBundle.replaceSpannedElement(origin, e)
 
         return post
 
@@ -13339,7 +13339,7 @@ class Score(Stream):
             if e.sites.hasSpannerSite():
                 origin = e.derivation.origin
                 if origin is not None and e.derivation.method == '__deepcopy__':
-                    spannerBundle.replaceSpannedElement(id(origin), e)
+                    spannerBundle.replaceSpannedElement(origin, e)
         return post
 
     def measureOffsetMap(self, classFilterList=None):
