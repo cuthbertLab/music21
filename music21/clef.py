@@ -1113,7 +1113,7 @@ class Test(unittest.TestCase):
         m.append(meter.TimeSignature('4/4'))
         m.append(n1)
         m.append(n2)
-        m = m.makeBeams()
+        m.makeBeams(inPlace=True)
 
         self.assertEqual(m.notes[0].stemDirection, 'down')
 
