@@ -5383,22 +5383,23 @@ class Test(unittest.TestCase):
         bm = converter.parse("tinynotation: 4/4 fn1 fn1 e-8 e'-8 fn4 en4 e'n4").flat
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-        assert(bm.flat.notes[0].pitch.accidental.name == 'natural')     # Fn
-        assert(bm.flat.notes[0].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[1].pitch.accidental.name == 'natural')     # Fn
-        assert(bm.flat.notes[1].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[2].pitch.accidental.name == 'flat')        # E-4
-        assert(bm.flat.notes[2].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[3].pitch.accidental.name == 'flat')        # E-5
-        assert(bm.flat.notes[3].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[4].pitch.accidental.name == 'natural')     # En4
-        assert(bm.flat.notes[4].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[5].pitch.accidental.name == 'natural')     # En4
-        assert(bm.flat.notes[5].pitch.accidental.displayStatus is True)
 
-        assert(bm.flat.notes[6].pitch.accidental is not None)  # En5
-        assert(bm.flat.notes[6].pitch.accidental.name == 'natural')
-        assert(bm.flat.notes[6].pitch.accidental.displayStatus is True)
+        self.assertEqual(bm.flat.notes[0].pitch.accidental.name, 'natural')     # Fn
+        self.assertEqual(bm.flat.notes[0].pitch.accidental.displayStatus, True)
+        self.assertEqual(bm.flat.notes[1].pitch.accidental.name, 'natural')     # Fn
+        self.assertEqual(bm.flat.notes[1].pitch.accidental.displayStatus, True)
+        self.assertEqual(bm.flat.notes[2].pitch.accidental.name, 'flat')        # E-4
+        self.assertEqual(bm.flat.notes[2].pitch.accidental.displayStatus, True)
+        self.assertEqual(bm.flat.notes[3].pitch.accidental.name, 'flat')        # E-5
+        self.assertEqual(bm.flat.notes[3].pitch.accidental.displayStatus, True)
+        self.assertEqual(bm.flat.notes[4].pitch.accidental.name, 'natural')     # En4
+        self.assertEqual(bm.flat.notes[4].pitch.accidental.displayStatus, True)
+        self.assertEqual(bm.flat.notes[5].pitch.accidental.name, 'natural')     # En4
+        self.assertEqual(bm.flat.notes[5].pitch.accidental.displayStatus, True)
+
+        self.assertIsNotNone(bm.flat.notes[6].pitch.accidental)  # En5
+        self.assertEqual(bm.flat.notes[6].pitch.accidental.name, 'natural')
+        self.assertEqual(bm.flat.notes[6].pitch.accidental.displayStatus, True)
 
     def testPitchEquality(self):
         '''
