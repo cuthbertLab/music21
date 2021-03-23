@@ -1686,12 +1686,34 @@ def getMetaEvents(events):
 
     return metaEvents
 
+def insertConductorEvents(conductorPart: stream.Part,
+                          target: stream.Part,
+                          *,
+                          isFirst: bool = False,
+                          ):
+    '''
+    Insert a deepcopy of any TimeSignature, KeySignature, or MetronomeMark
+    found in the `conductorPart` into the `target` Part at the same offset.
+
+    Obligatory to do this before making measures. New in v7.
+    '''
+    for e in conductorPart.getElementsByClass(
+            ('TimeSignature', 'KeySignature', 'MetronomeMark')):
+        # create a deepcopy of the element so a flat does not cause
+        # multiple references of the same
+        eventCopy = copy.deepcopy(e)
+        if 'TempoIndication' in eventCopy.classes and not isFirst:
+            eventCopy.style.hideObjectOnPrint = True
+            eventCopy.numberImplicit = True
+        target.insert(conductorPart.elementOffset(e), eventCopy)
 
 def midiTrackToStream(
     mt,
     ticksPerQuarter=None,
     quantizePost=True,
     inputM21=None,
+    conductorPart: Optional[stream.Part] = None,
+    isFirst: bool = False,
     **keywords
 ) -> stream.Part:
     # noinspection PyShadowingNames
@@ -1891,6 +1913,10 @@ def midiTrackToStream(
         # It's an intermediate result only -- not provided to user
         return s
 
+    if conductorPart is not None:
+        insertConductorEvents(conductorPart, s, isFirst=isFirst)
+
+    # Only make measures if time signatures have been inserted
     s.makeMeasures(inPlace=True)
     for m in s.getElementsByClass(stream.Measure):
         if voicesRequired:
@@ -2338,12 +2364,14 @@ def midiTracksToStreams(
     # conductorPart will store common elements such as time sig, key sig
     # from the conductor track (or any track without notes).
     conductorPart = stream.Part()
-
+    firstTrackWithNotes = None
     for mt in midiTracks:
         # not all tracks have notes defined; only creates parts for those
         # that do
         # environLocal.printDebug(['raw midi tracks', mt])
         if mt.hasNotes():
+            if firstTrackWithNotes is None:
+                firstTrackWithNotes = mt
             streamPart = stream.Part()  # create a part instance for each part
             s.insert(0, streamPart)
         else:
@@ -2353,22 +2381,9 @@ def midiTracksToStreams(
                           ticksPerQuarter,
                           quantizePost,
                           inputM21=streamPart,
+                          conductorPart=conductorPart,
+                          isFirst=(mt is firstTrackWithNotes),
                           **keywords)
-
-    # environLocal.printDebug(['show() conductorTrack elements'])
-    # if we have time sig/key sig/tempo elements, add to each part
-
-    for e in conductorPart.getElementsByClass(
-            ('TimeSignature', 'KeySignature', 'MetronomeMark')):
-        for i, p in enumerate(s.getElementsByClass('Stream')):
-            # create a deepcopy of the element so a flat does not cause
-            # multiple references of the same
-            eventCopy = copy.deepcopy(e)
-            if 'TempoIndication' in eventCopy.classes and i != 0:
-                eventCopy.style.hideObjectOnPrint = True
-                eventCopy.numberImplicit = True
-
-            p.insert(conductorPart.elementOffset(e), eventCopy)
 
     return s
 
@@ -3297,17 +3312,27 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts), 3)
         # metronome marks propagate to every staff, but are hidden on subsequent staffs
         self.assertEqual(
-            [mm.numberImplicit for mm in s.parts[0].getElementsByClass('MetronomeMark')],
+            [mm.numberImplicit for mm in s.parts[0].recurse().getElementsByClass('MetronomeMark')],
             [False, False, False, False]
         )
         self.assertEqual(
-            [mm.numberImplicit for mm in s.parts[1].getElementsByClass('MetronomeMark')],
+            [mm.numberImplicit for mm in s.parts[1].recurse().getElementsByClass('MetronomeMark')],
             [True, True, True, True]
         )
         self.assertEqual(
-            [mm.numberImplicit for mm in s.parts[2].getElementsByClass('MetronomeMark')],
+            [mm.numberImplicit for mm in s.parts[2].recurse().getElementsByClass('MetronomeMark')],
             [True, True, True, True]
         )
+
+    def testMidiImportMeter(self):
+        from music21 import converter
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test17.mid'
+        s = converter.parse(fp)
+        for p in s.parts:
+            m = p.getElementsByClass('Measure').first()
+            ts = m.timeSignature
+            self.assertEqual(ts.ratioString, '3/4')
+            self.assertIn(ts, m)
 
     def testMidiExportConductorA(self):
         '''Export conductor data to MIDI conductor track.'''
@@ -3498,7 +3523,7 @@ class Test(unittest.TestCase):
         s = converter.parse(fp)
         # three chords will be created, as well as two voices
         self.assertEqual(len(s.flat.getElementsByClass('Chord')), 3)
-        self.assertEqual(len(s.parts.first().measure(2).voices), 2)
+        self.assertEqual(len(s.parts.first().measure(3).voices), 2)
 
     def testImportChordsA(self):
         from music21 import converter
@@ -3656,10 +3681,9 @@ class Test(unittest.TestCase):
 
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test17.mid'
         inn = converter.parse(fp)
+
         self.assertEqual(
-            len(inn.parts[1].measure(2).voices.first().getElementsByClass('Rest')), 1)
-        self.assertEqual(
-            len(inn.parts[1].measure(2).voices.last().getElementsByClass('Rest')), 1)
+            len(inn.parts[1].measure(3).voices.last().getElementsByClass('Rest')), 1)
 
 
 # ------------------------------------------------------------------------------
