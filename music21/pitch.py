@@ -547,6 +547,10 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
     else:
         simplifiedPitches = _greedyEnharmonicsSearch(oldPitches, criterion)
 
+    # Preserve value of spellingIsInferred
+    for oldP, newP in zip(oldPitches, simplifiedPitches):
+        newP.spellingIsInferred = oldP.spellingIsInferred
+
     if remove_first:
         simplifiedPitches = simplifiedPitches[1:]
 
