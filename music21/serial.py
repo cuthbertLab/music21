@@ -1452,9 +1452,8 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'HistoricalTwelveToneRow', 'ContiguousSegmentOfNotes',
-              'historicalDict',
-              'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 'getHistoricalRowByName',
+_DOC_ORDER = [ToneRow, TwelveToneRow, HistoricalTwelveToneRow,
+              pcToToneRow, TwelveToneMatrix, rowToMatrix, getHistoricalRowByName,
               ]
 
 if __name__ == '__main__':
