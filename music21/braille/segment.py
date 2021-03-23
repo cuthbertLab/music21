@@ -1054,11 +1054,15 @@ class BrailleSegment(text.BrailleText):
 class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     '''
     A BrailleGrandSegment represents a pair of segments (rightSegment, leftSegment)
-    representing the right and left hands of a piano staff (or other two-staff object)
+    representing the right and left hands of a piano staff (or other two-staff object).
+
+    >>> bgs = braille.segment.BrailleGrandSegment(lineLength=36)
+    >>> bgs.lineLength
+    36
     '''
     def __init__(self, lineLength: int = 40):
         BrailleSegment.__init__(self, lineLength=lineLength)
-        text.BrailleKeyboard.__init__(self)
+        text.BrailleKeyboard.__init__(self, lineLength=lineLength)
         self.allKeyPairs = []
         self.previousGroupingPair = None
         self.currentGroupingPair = None
