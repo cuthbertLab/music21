@@ -622,11 +622,16 @@ class _EnvironmentCore:
 
         OMIT_FROM_DOCS
         >>> e = environment.Environment()
-        >>> isinstance(e.getTempFile(returnPathlib=False), str)
+        >>> tmp1 = e.getTempFile(returnPathlib=False)
+        >>> isinstance(tmp1, str)
         True
         >>> import pathlib
-        >>> isinstance(e.getTempFile(), pathlib.Path)
+        >>> tmp2 = e.getTempFile()
+        >>> isinstance(tmp2, pathlib.Path)
         True
+        >>> import os
+        >>> os.remove(tmp1)
+        >>> os.remove(tmp2)
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
@@ -1579,11 +1584,13 @@ class Test(unittest.TestCase):
             # Wipe out write, exec permissions on the default root dir
             os.chmod(e.getDefaultRootTempDir(), stat.S_IREAD)
             # Was the PermissionError caught and a new "music21-{user}" dir created?
-            self.assertIn('music21-' + getpass.getuser(), e.getTempFile(returnPathlib=False))
+            tmp = e.getTempFile(returnPathlib=False)
+            self.assertIn('music21-' + getpass.getuser(), tmp)
         finally:
             # Restore owner read/write/exec permissions and original path
             os.chmod(e.getDefaultRootTempDir(), stat.S_IRWXU)
             e['directoryScratch'] = oldScratchDir
+            os.remove(tmp)
 
 
 # -----------------------------------------------------------------------------
