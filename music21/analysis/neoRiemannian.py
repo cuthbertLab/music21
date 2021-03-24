@@ -689,7 +689,8 @@ class Test(unittest.TestCase):
 
         es_min = chord.Chord('B# E# G#')
         f_min_spelled_diff = chord.Chord('B# F G#')
-        self.assertEqual(chord.Chord('C# E G#').pitches, LRP_combinations(es_min, "LP", raiseException=True).pitches)
+        LRP_es_min = LRP_combinations(es_min, "LP", raiseException=True)
+        self.assertEqual(chord.Chord('C# E G#').pitches, LRP_es_min.pitches)
         with self.assertRaises(LRPException):
             LRP_combinations(f_min_spelled_diff, "LP", raiseException=True)
 
