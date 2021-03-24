@@ -1083,7 +1083,7 @@ class DataSet:
             raise DataSetException('no output format could be defined from file path '
                                    + f'{fp} or format {format}')
 
-        outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
+        return outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
 
 def _dataSetParallelSubprocess(dataInstance, failFast):
@@ -1424,9 +1424,14 @@ class Test(unittest.TestCase):
             'Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,'
             'Range_of_Note_Quarter_Lengths,Composer//3,1.0,1.5,Bach//8,0.5,3.75,Corelli')
 
-        ds.write(format='tab')
-        ds.write(format='csv')
-        ds.write(format='arff')
+        fp1 = ds.write(format='tab')
+        fp2 = ds.write(format='csv')
+        # Also test providing fp
+        fp3 = environLocal.getTempFile(suffix='.arff')
+        ds.write(fp=fp3, format='arff')
+
+        for fp in (fp1, fp2, fp3):
+            os.remove(fp)
 
     def testFeatureFail(self):
         from music21 import features
