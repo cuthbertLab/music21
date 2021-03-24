@@ -236,6 +236,8 @@ class SubConverter:
         >>> tf = str(lpConverter.getTemporaryFile(subformats=['png']))
         >>> tf.endswith('.png')
         True
+        >>> import os
+        >>> os.remove(tf)
 
         Changed in v.6 -- returns pathlib.Path
         '''
@@ -845,7 +847,7 @@ class ConverterMusicXML(SubConverter):
     def findPNGfpFromXMLfp(self, xmlFilePath: Union[str, pathlib.Path]) -> str:
         '''
         Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
-        then return appropriate fp. Raises and exception if png fp does not exist.
+        then return appropriate fp. Raises an exception if png fp does not exist.
         '''
         xmlFilePath = str(xmlFilePath)  # not pathlib.
         path_without_extension = xmlFilePath[:-4]
@@ -1431,9 +1433,11 @@ class Test(unittest.TestCase):
             os.rename(tempFp1, tempFp1 + png_ext)
             tempFp1 += png_ext
             xmlConverter1 = ConverterMusicXML()
-            pngFp1 = xmlConverter1.findPNGfpFromXMLfp(xmlFp1)
-            self.assertEqual(pngFp1, tempFp1)
-
+            try:
+                pngFp1 = xmlConverter1.findPNGfpFromXMLfp(xmlFp1)
+                self.assertEqual(pngFp1, tempFp1)
+            finally:
+                os.remove(tempFp1)
 
     def testXMLtoPNGTooLong(self):
         '''
@@ -1445,16 +1449,21 @@ class Test(unittest.TestCase):
         os.rename(tempFp, tempFp + '-0000001.png')
         tempFp += '-0000001.png'
         xmlConverter = ConverterMusicXML()
-        self.assertRaises(SubConverterFileIOException, xmlConverter.findPNGfpFromXMLfp, xmlFp)
+        try:
+            self.assertRaises(SubConverterFileIOException, xmlConverter.findPNGfpFromXMLfp, xmlFp)
+        finally:
+            os.remove(tempFp)
 
     def testWriteMXL(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parseData(testPrimitive.multiDigitEnding)
-        mxlPath = s.write('mxl')
-        self.assertTrue(str(mxlPath).endswith('.mxl'))
-
+        try:
+            mxlPath = s.write('mxl')
+            self.assertTrue(str(mxlPath).endswith('.mxl'))
+        finally:
+            os.remove(mxlPath)
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
