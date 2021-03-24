@@ -187,6 +187,7 @@ def _singlePitchTransform(c, transposeInterval, changingPitch):
     changingPitchCopy = copy.deepcopy(changingPitch)
     newChord = copy.deepcopy(c)
     for i in range(len(newChord.pitches)):
+        newChord.pitches[i].spellingIsInferred = False
         if changingPitchCopy.name == newChord.pitches[i].name:
             newChord.pitches[i].transpose(transposeInterval, inPlace=True)
     return chord.Chord(newChord.pitches)
@@ -353,7 +354,7 @@ def LRP_combinations(c,
     :func:`~music21.analysis.neoRiemannian.completeHexatonic`.
     '''
 
-    if c.forteClassTnI != '3-11':  # First to avoid doing anything else if fail
+    if not c.isMajorTriad() and not c.isMinorTriad():  # First to avoid doing anything else if fail
         if raiseException is True:
             raise LRPException(
                 f'Cannot perform transformations on chord {c}: not a major or minor triad')
@@ -681,6 +682,17 @@ class Test(unittest.TestCase):
         c8_T = LRP_combinations(c8, 'LP')
         self.assertEqual(str(c8_T), '<music21.chord.Chord B-3 E-4 G4>')
 
+        ds_min = chord.Chord('B- D# F#')
+        self.assertEqual(ds_min, LRP_combinations(ds_min, "LP", raiseException=False))
+        with self.assertRaises(LRPException):
+            LRP_combinations(ds_min, "LP", raiseException=True)
+
+        es_min = chord.Chord('B# E# G#')
+        f_min_spelled_diff = chord.Chord('B# F G#')
+        self.assertEqual(chord.Chord('C# E G#').pitches, LRP_combinations(es_min, "LP", raiseException=True).pitches)
+        with self.assertRaises(LRPException):
+            LRP_combinations(f_min_spelled_diff, "LP", raiseException=True)
+
     def testIsNeoR(self):
 
         c1 = chord.Chord('C4 E4 G4')
@@ -757,6 +769,20 @@ class Test(unittest.TestCase):
 
         N2 = N(c11)
         self.assertEqual([x.name for x in N2.pitches], ['G#', 'B', 'E'])
+
+    def testInstanciatingChordPCNumbers(self):
+
+        L_cs_maj_symb = L(chord.Chord('C# E# G#'))
+        L_cs_maj_nb = L(chord.Chord([1, 5, 8]))
+        self.assertEqual(L_cs_maj_symb, L_cs_maj_nb)
+        self.assertEqual(L_cs_maj_nb.pitches, chord.Chord('B# E# G#').pitches)
+
+        b_maj_symb = chord.Chord('B D# F#')
+        LP_b_maj_symb = LRP_combinations(b_maj_symb, "LP", simplifyEnharmonics=False)
+        b_maj_nb = chord.Chord([11, 3, 6])
+        LP_b_maj_nb = LRP_combinations(b_maj_nb, "LP", simplifyEnharmonics=False)
+        self.assertEqual(LP_b_maj_symb, LP_b_maj_nb)
+        self.assertEqual(LP_b_maj_nb.pitches, chord.Chord('A# D# F##').pitches)
 
 
 # ------------------------------------------------------------------------------
