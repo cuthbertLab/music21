@@ -36,6 +36,7 @@ environLocal = environment.Environment('osmd.osmd')
 class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
     pass
 
+
 # Determine if we are running inside an IPython notebook
 # if so will render inline - if not we open a new browser window
 try:
