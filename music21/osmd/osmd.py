@@ -108,7 +108,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         # generate script to be run on page
         script = self.musicXMLToScript(xml, divId, offline=offline)
         if in_ipython:
-            # self.display(self.HTML(f'<div id="{divId}">loading OpenSheetMusicDisplay</div>'))
+            self.display(self.HTML(f'<div id="{divId}"></div>'))
             self.display(self.Javascript(script))
         else:
 
