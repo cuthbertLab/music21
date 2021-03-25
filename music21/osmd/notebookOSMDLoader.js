@@ -34,7 +34,7 @@ function loadOSMD() {
     }) 
 }
 loadOSMD().then((OSMD)=>{
-    console.log("loaded OSMD",OSMD)
+    console.log("loaded OSMD")
     var div_id = "{{DIV_ID}}";
         console.log(div_id)
     document.querySelector('#'+div_id).innerHTML = "";
