@@ -223,7 +223,7 @@ class Test(unittest.TestCase):
 
         ConverterOpenSheetMusicDisplay.addDefaultPartName(s)
         firstInstrumentObject = s.getInstruments(returnDefault=True, recurse=True).first()
-        self.assertNotNone(firstInstrumentObject.instrumentName)
+        self.assertIsNotNone(firstInstrumentObject.instrumentName)
         self.assertNotEqual(firstInstrumentObject.instrumentName, '')
 
 
