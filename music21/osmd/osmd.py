@@ -33,10 +33,6 @@ from music21 import environment
 # when using offline=True, sets the disk location where we will cache the OSMD.min.js file:
 environLocal = environment.Environment('osmd.osmd')
 
-class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
-    pass
-
-
 # Determine if we are running inside an IPython notebook
 # if so will render inline - if not we open a new browser window
 try:
@@ -44,19 +40,6 @@ try:
 except ImportError:
     loader = None
 hasInstalledIPython = loader is not None
-
-
-def getExtendedModules():
-    # pylint: disable=import-outside-toplevel
-    if hasInstalledIPython:
-        from IPython.core.display import display, HTML, Javascript
-    else:
-        def display():
-            raise OpenSheetMusicDisplayException(
-                'OpenSheetMusicDisplay requires IPython to be installed')
-
-        HTML = Javascript = display
-    return display, HTML, Javascript
 
 
 class ConverterOpenSheetMusicDisplay(SubConverter):
@@ -75,7 +58,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
     def __init__(self):
         super().__init__()
-        self.display, self.HTML, self.Javascript = getExtendedModules()
 
     def show(self, obj, fmt, *,
              fixPartName=True, offline=False, divId=None,
@@ -108,9 +90,11 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
         # generate script to be run on page
         script = self.musicXMLToScript(xml, divId, offline=offline)
-        if in_ipython:
-            self.display(self.HTML(f'<div id="{divId}"></div>'))
-            self.display(self.Javascript(script))
+        if in_ipython and hasInstalledIPython:
+            # pylint: disable=import-outside-toplevel
+            from IPython.core.display import display, HTML, Javascript
+            display(HTML(f'<div id="{divId}"></div>'))
+            display(Javascript(script))
         else:
 
             tmp = tempfile.NamedTemporaryFile(delete=False)
