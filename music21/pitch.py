@@ -4325,6 +4325,12 @@ class Pitch(prebase.ProtoM21Object):
         >>> otherPitch.transpose('m-23', inPlace=True)
         >>> print(otherPitch)
         C#-1
+
+        Test an issue with inPlace not setting spellingIsInferred
+
+        >>> pc6.transpose(10, inPlace=True)
+        >>> pc6.spellingIsInferred
+        True
         '''
         # environLocal.printDebug(['Pitch.transpose()', value])
         if 'IntervalBase' in getattr(value, 'classes', []):
@@ -4352,6 +4358,7 @@ class Pitch(prebase.ProtoM21Object):
             self.accidental = p.accidental
             # set fundamental
             self.fundamental = p.fundamental
+            self.spellingIsInferred = p.spellingIsInferred
             return None
 
     # --------------------------------------------------------------------------
