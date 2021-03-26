@@ -8092,7 +8092,7 @@ class Test(unittest.TestCase):
         tmp = environLocal.getTempFile()
         out = o.write(fp=tmp)
         otherFile = str(out).replace('-2', '-1')
-        self.assertTrue(str(out).endswith('-2.xml'))
+        self.assertTrue(str(out).endswith('-2.musicxml'))
         self.assertTrue(os.path.exists(otherFile))
         os.remove(tmp)
         os.remove(out)

@@ -838,7 +838,7 @@ class ConverterMusicXML(SubConverter):
     '''
     registerFormats = ('musicxml', 'xml')
     registerInputExtensions = ('xml', 'mxl', 'mx', 'musicxml')
-    registerOutputExtensions = ('xml', 'mxl')
+    registerOutputExtensions = ('musicxml', 'xml', 'mxl')
     registerOutputSubformatExtensions = {'png': 'png',
                                          'pdf': 'pdf',
                                          }
@@ -850,7 +850,7 @@ class ConverterMusicXML(SubConverter):
         then return appropriate fp. Raises an exception if png fp does not exist.
         '''
         xmlFilePath = str(xmlFilePath)  # not pathlib.
-        path_without_extension = xmlFilePath[:-4]
+        path_without_extension = xmlFilePath[:-1 * len('.musicxml')]
 
         for search_extension in ('1', '01', '001', '0001', '00001'):
             search_path = path_without_extension + '-' + search_extension + '.png'
@@ -923,7 +923,9 @@ class ConverterMusicXML(SubConverter):
         else:
             subformatExtension = subformats[0]
 
-        fpOut = str(fp)[:-3]
+        if not str(fp).endswith('.musicxml'):
+            raise ValueError('fp must end with the extension .musicxml')
+        fpOut = str(fp)[:-1 * len('musicxml')]
         fpOut += subformatExtension
 
         musescoreRun = [str(musescorePath), fp, '-o', fpOut, '-T', '0']
@@ -963,7 +965,7 @@ class ConverterMusicXML(SubConverter):
     def write(self, obj, fmt, fp=None, subformats=None,
               compress=False, **keywords):  # pragma: no cover
         '''
-        Write to a .xml file.
+        Write to a .musicxml file.
         Set `compress=True` to immediately compress the output to a .mxl file.
         '''
         from music21.musicxml import archiveTools, m21ToXml
@@ -984,7 +986,7 @@ class ConverterMusicXML(SubConverter):
         if fp is not None and subformats is not None:
             fpStr = str(fp)
             noExtFpStr = os.path.splitext(fpStr)[0]
-            writeDataStreamFp = noExtFpStr + '.xml'
+            writeDataStreamFp = noExtFpStr + '.musicxml'
 
         xmlFp = self.writeDataStream(writeDataStreamFp, dataBytes)
 
@@ -1429,7 +1431,7 @@ class Test(unittest.TestCase):
             png_ext = '-' + ext_base + '.png'
 
             tempFp1 = str(env.getTempFile())
-            xmlFp1 = tempFp1 + '.xml'
+            xmlFp1 = tempFp1 + '.musicxml'
             os.rename(tempFp1, tempFp1 + png_ext)
             tempFp1 += png_ext
             xmlConverter1 = ConverterMusicXML()
@@ -1443,7 +1445,7 @@ class Test(unittest.TestCase):
         '''
         env = environment.Environment()
         tempFp = str(env.getTempFile())
-        xmlFp = tempFp + '.xml'
+        xmlFp = tempFp + '.musicxml'
         os.rename(tempFp, tempFp + '-0000001.png')
         tempFp += '-0000001.png'
         xmlConverter = ConverterMusicXML()
