@@ -19,14 +19,12 @@ import random
 import json
 import os
 import importlib
-import tempfile
 import urllib.request
 import webbrowser
 
 from music21.converter.subConverters import SubConverter
 from music21.instrument import Piano
 from music21.common import getSourceFilePath, runningUnderIPython
-from music21 import exceptions21
 from music21.musicxml import m21ToXml
 from music21 import environment
 
@@ -50,6 +48,8 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     '''
     registerFormats = ('osmd',)
     registerShowFormats = ('osmd',)
+    registerOutputExtensions = ('html',)
+
     # when updating the script tag osmd will only reload in a notebook if you: Kernel -> restart and
     # clear output, then save the notebook and refresh the page.
     # Otherwise the script will stay on the page and not reload.
@@ -97,15 +97,17 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             display(Javascript(script))
         else:
 
-            tmp = tempfile.NamedTemporaryFile(delete=False)
-            tmp_path = tmp.name + '.html'
+            # Create a file for the browser to open
+            tempFileName = self.getTemporaryFile()
 
-            with open(tmp_path, 'w') as f:
+            with open(tempFileName, 'w') as f:
                 f.write(f'''
                 <div id="{divId}"></div>
                 <script>{script}</script>
                 ''')
-            filename = 'file:///' + tmp_path
+
+            # make path absolute and add browser prefix for opening a local file
+            filename = 'file:///' + str(tempFileName.resolve())
             webbrowser.open_new_tab(filename)
         return divId
 
