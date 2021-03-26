@@ -56,9 +56,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     script_url = ("https://github.com/opensheetmusicdisplay"
                   + "/opensheetmusicdisplay/releases/download/0.9.2/opensheetmusicdisplay.min.js")
 
-    def __init__(self):
-        super().__init__()
-
     def show(self, obj, fmt, *,
              fixPartName=True, offline=False, divId=None,
              **keywords):
