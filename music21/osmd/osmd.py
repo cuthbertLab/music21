@@ -128,10 +128,10 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     def musicXMLToScript(self, xml, divId, offline=False):
         '''
         Converts the xml into Javascript which can be injected into a webpage to display the score.
-        If divId is provided then it will be used as the container, if not a new
+        If divId is set then it will be used as the container, if not a new div will be created
         '''
-        # script that will replace div contents with OSMD display
 
+        # script that will replace div contents with OSMD display
         script_path = os.path.join(getSourceFilePath(), 'osmd', 'notebookOSMDLoader.js')
         script = open(script_path, 'r').read() \
             .replace('{{DIV_ID}}', divId) \
