@@ -90,6 +90,22 @@ def makeBeams(
     4 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>
     5 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
 
+    Grace notes no longer interfere with beaming:
+
+    >>> m = stream.Measure()
+    >>> m.timeSignature = meter.TimeSignature('3/4')
+    >>> m.repeatAppend(note.Note(quarterLength=0.25), 4)
+    >>> m.repeatAppend(note.Rest(), 2)
+    >>> gn = note.Note(duration=duration.GraceDuration())
+    >>> m.insert(0.25, gn)
+    >>> m.makeBeams(inPlace=True)
+    >>> [n.beams for n in m.notes]
+    [<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>,
+    <music21.beam.Beams>,
+    <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>,
+    <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>,
+    <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>]
+
     OMIT_FROM_DOCS
     TODO: inPlace=False does not work in many cases  ?? still an issue? 2017
     '''
@@ -139,6 +155,8 @@ def makeBeams(
                 continue  # nothing to beam
             durList = []
             for n in noteStream:
+                if n.duration.isGrace:
+                    noteStream.remove(n)
                 durList.append(n.duration)
             # environLocal.printDebug([
             #    'beaming with ts', lastTimeSignature, 'measure', m, durList,
