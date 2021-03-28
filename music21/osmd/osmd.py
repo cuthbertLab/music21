@@ -23,7 +23,7 @@ import urllib.request
 import webbrowser
 
 from music21.converter.subConverters import SubConverter
-from music21.instrument import Piano
+from music21.stream import Part, Score
 from music21.common import getSourceFilePath, runningUnderIPython
 from music21.musicxml import m21ToXml
 from music21 import environment
@@ -163,15 +163,14 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         >>> _ = s.show('osmd',fixPartName=False)
         '''
         # If no partName is present in the first instrument, OSMD will display the ugly 'partId'
-        allInstruments = score.getInstruments(returnDefault=False, recurse=True)
-
-        if not allInstruments:
-            defaultInstrument = Piano()
-            defaultInstrument.instrumentName = ' '
-            score.insert(0.0, defaultInstrument)
-        elif not allInstruments.first().instrumentName:
-            # instrumentName must not be '' or None
-            allInstruments.first().instrumentName = ' '
+        # this ensures partName is not an empty string
+        if type(score) is Part:
+            if not score.partName:
+                score.partName = ' '
+        else:
+            for part in score.parts:
+                if not part.partName:
+                    part.partName = ' '
 
 
 class TestExternal(unittest.TestCase):
