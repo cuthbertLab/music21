@@ -372,6 +372,18 @@ class TabClef(PitchClef):
         self.sign = 'TAB'
         self.line = 5
 
+    def getStemDirectionForPitches(
+        self,
+        pitchList: Union[pitch.Pitch, Iterable[pitch.Pitch]],
+        *,
+        firstLastOnly: bool = True,
+        extremePitchOnly: bool = False,
+    ) -> str:
+        '''
+        Overridden to simply return 'down' for guitar tabs.
+        '''
+        return 'down'
+
 # ------------------------------------------------------------------------------
 
 
@@ -1085,6 +1097,26 @@ class Test(unittest.TestCase):
         self.assertIs(n5.getContextByClass(Clef), tc1)
         self.assertIs(n6.getContextByClass(Clef), tc1)
 
+    def testTabClefBeamDirections(self):
+
+        from music21 import stream
+        from music21 import clef
+        from music21 import meter
+        from music21 import note
+
+        m = stream.Measure()
+
+        n1 = note.Note(64, quarterLength=0.25)
+        n2 = note.Note(67, quarterLength=0.25)
+
+        m.append(clef.TabClef())
+        m.append(meter.TimeSignature('4/4'))
+        m.append(n1)
+        m.append(n2)
+        m.makeBeams(inPlace=True)
+
+        self.assertEqual(m.notes[0].stemDirection, 'down')
+
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1094,4 +1126,3 @@ _DOC_ORDER = [Clef, TrebleClef, BassClef]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
