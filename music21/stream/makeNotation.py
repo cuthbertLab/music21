@@ -681,7 +681,7 @@ def makeRests(
     refStreamOrTimeRange=None,
     fillGaps=False,
     timeRangeFromBarDuration=False,
-    inPlace=True,
+    inPlace=False,
     hideRests=False,
 ):
     '''
@@ -788,10 +788,7 @@ def makeRests(
 
     Changed in v6 -- all but first attribute are keyword only
 
-    Obviously there are problems TODO: fix them
-
-    OMIT_FROM_DOCS
-    TODO: default inPlace=False
+    Changed in v7 -- `inPlace` defaults False.
     '''
     from music21 import stream
 

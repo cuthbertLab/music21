@@ -1880,7 +1880,7 @@ class Test(unittest.TestCase):
             p.transferOffsetToElements()
             self.assertEqual(p.lowestOffset, partOffset)
 
-            p.makeRests()
+            p.makeRests(inPlace=True)
 
             # environLocal.printDebug(['first element', p[0], p[0].duration])
             # by default, initial rest should be made
@@ -1907,8 +1907,8 @@ class Test(unittest.TestCase):
         s.insert(0, m1)
         s.insert(4, m2)
         # must connect Measures to Streams before filling gaps
-        m1.makeRests(fillGaps=True, timeRangeFromBarDuration=True)
-        m2.makeRests(fillGaps=True, timeRangeFromBarDuration=True)
+        m1.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
+        m2.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
         self.assertTrue(m2.isSorted)
         # m2.sort()
 
@@ -3582,7 +3582,7 @@ class Test(unittest.TestCase):
         self.assertEqual(test, match)
 
         self.assertEqual(len(s), 5)
-        s.makeRests(fillGaps=True)
+        s.makeRests(inPlace=True, fillGaps=True)
         self.assertEqual(len(s), 8)
         self.assertEqual(len(s.getElementsByClass(note.Rest)), 3)
 
@@ -4341,7 +4341,7 @@ class Test(unittest.TestCase):
         s.insert(1, n2)  # overlapping, starting after n1 but finishing before
         s.insert(2, n3)
         s.insert(3, n4)  # overlapping, starting after n3 but finishing before
-        # s.makeRests(fillGaps=True)
+        # s.makeRests(inPlace=True, fillGaps=True)
         # this results in two chords; n2 and n4 are effectively shifted
         # to the start of n1 and n3
         sMod = s.makeChords(inPlace=False)
