@@ -130,9 +130,9 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
         # script that will replace div contents with OSMD display
         script_path = os.path.join(getSourceFilePath(), 'osmd', 'notebookOSMDLoader.js')
-        script = open(script_path, 'r').read() \
-            .replace('{{DIV_ID}}', divId) \
-            .replace('"{{data}}"', json.dumps(xml))
+        script = open(script_path, 'r').read()
+        script = script.replace('{{DIV_ID}}', divId)
+        script = script.replace('"{{data}}"', json.dumps(xml))
 
         fpScratch = environLocal.getRootTempDir()
         osmd_file = os.path.join(fpScratch, 'opensheetmusicdisplay.0.9.2.min.js')
