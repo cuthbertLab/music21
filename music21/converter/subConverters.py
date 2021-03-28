@@ -1459,6 +1459,7 @@ class Test(unittest.TestCase):
         self.assertTrue(str(mxlPath).endswith('.mxl'))
         os.remove(mxlPath)
 
+
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testXMLShow(self):
