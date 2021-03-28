@@ -5380,12 +5380,12 @@ class Test(unittest.TestCase):
         s.insert(0, v3)
 
         sPost = s.makeNotation()
-        # voices are retained for all measures after make notation
+        # voices are retained for all measures after makeNotation, unless unnecessary
         self.assertEqual(len(sPost.getElementsByClass('Measure')), 8)
         self.assertEqual(len(sPost.getElementsByClass('Measure')[0].voices), 3)
         self.assertEqual(len(sPost.getElementsByClass('Measure')[1].voices), 3)
-        self.assertEqual(len(sPost.getElementsByClass('Measure')[5].voices), 3)
-        self.assertEqual(len(sPost.getElementsByClass('Measure')[7].voices), 3)
+        self.assertEqual(len(sPost.getElementsByClass('Measure')[4].voices), 2)
+        self.assertEqual(len(sPost.getElementsByClass('Measure')[5].voices), 0)
 
         # s.show()
 

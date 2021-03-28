@@ -966,13 +966,6 @@ def makeTies(
     Notes: uses base.Music21Object.splitAtQuarterLength() once it has figured out
     what to split.
 
-    Changed in v. 4 -- inPlace = False by default.
-
-    OMIT_FROM_DOCS
-    TODO: take a list of classes to act as filter on what elements are tied.
-
-    configure ".previous" and ".next" attributes
-
     Previously a note tied from one voice could not make ties into a note
     in the next measure outside of voices.  Fixed May 2017
 
@@ -996,7 +989,7 @@ def makeTies(
     >>> p.append([m1, m2])
     >>> p2 = p.makeTies()
 
-    test same thing with needed makeTies...creates a possibly unnecessary voice...
+    test same thing with needed makeTies:
 
     >>> p = stream.Part()
     >>> m1 = stream.Measure(number=1)
@@ -1021,8 +1014,7 @@ def makeTies(
         {0.0} <music21.stream.Voice 2>
             {0.0} <music21.note.Note B>
     {1.0} <music21.stream.Measure 2 offset=1.0>
-        {0.0} <music21.stream.Voice 0x105332ac8>
-            {0.0} <music21.note.Note C>
+        {0.0} <music21.note.Note C>
 
     >>> for n in p2.recurse().notes:
     ...     print(n, n.tie)
@@ -1030,7 +1022,15 @@ def makeTies(
     <music21.note.Note B> None
     <music21.note.Note C> <music21.tie.Tie stop>
 
+
+    Changed in v4 -- inPlace = False by default.
+
     Changed in v6 -- all but first attribute are keyword only
+
+    OMIT_FROM_DOCS
+    TODO: take a list of classes to act as filter on what elements are tied.
+
+    configure ".previous" and ".next" attributes
     '''
     from music21 import stream
 
@@ -1193,6 +1193,8 @@ def makeTies(
                     #    mNext])
                     returnObj.insert(mNext.offset, mNext)
         mCount += 1
+    for measure in measureStream:
+        measure.flattenUnnecessaryVoices(inPlace=True)
     del measureStream  # clean up unused streams
 
     if not inPlace:
