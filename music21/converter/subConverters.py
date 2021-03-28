@@ -1433,9 +1433,8 @@ class Test(unittest.TestCase):
             os.rename(tempFp1, tempFp1 + png_ext)
             tempFp1 += png_ext
             xmlConverter1 = ConverterMusicXML()
-            try:
-                pngFp1 = xmlConverter1.findPNGfpFromXMLfp(xmlFp1)
-                self.assertEqual(pngFp1, tempFp1)
+            pngFp1 = xmlConverter1.findPNGfpFromXMLfp(xmlFp1)
+            self.assertEqual(pngFp1, tempFp1)
             os.remove(tempFp1)
 
     def testXMLtoPNGTooLong(self):
