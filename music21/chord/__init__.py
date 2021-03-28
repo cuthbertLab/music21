@@ -5876,6 +5876,14 @@ class Test(unittest.TestCase):
         self.assertEqual(unscrambledChord3.pitches[3].name, 'F')
         self.assertEqual(unscrambledChord3.pitches[4].name, 'A-')
 
+    def testEnharmonicSimplification(self):
+        from music21 import chord
+        eFlat = note.Note(63)
+        self.assertEqual(eFlat.pitch.name, 'E-')
+        bMajor = chord.Chord([59, 63, 66])
+        self.assertEqual([p.name for p in bMajor.pitches], ['B', 'D#', 'F#'])
+        self.assertEqual([p.spellingIsInferred for p in bMajor.pitches], [True, True, True])
+
     def testDurations(self):
         from music21 import chord
 
