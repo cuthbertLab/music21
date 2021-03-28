@@ -236,8 +236,8 @@ class SubConverter:
         >>> tf = str(lpConverter.getTemporaryFile(subformats=['png']))
         >>> tf.endswith('.png')
         True
-        >>> import os
-        >>> os.remove(tf)
+        >>> import os  #_DOCS_HIDE
+        >>> os.remove(tf)  #_DOCS_HIDE
 
         Changed in v.6 -- returns pathlib.Path
         '''
@@ -1436,8 +1436,7 @@ class Test(unittest.TestCase):
             try:
                 pngFp1 = xmlConverter1.findPNGfpFromXMLfp(xmlFp1)
                 self.assertEqual(pngFp1, tempFp1)
-            finally:
-                os.remove(tempFp1)
+            os.remove(tempFp1)
 
     def testXMLtoPNGTooLong(self):
         '''
@@ -1449,21 +1448,17 @@ class Test(unittest.TestCase):
         os.rename(tempFp, tempFp + '-0000001.png')
         tempFp += '-0000001.png'
         xmlConverter = ConverterMusicXML()
-        try:
-            self.assertRaises(SubConverterFileIOException, xmlConverter.findPNGfpFromXMLfp, xmlFp)
-        finally:
-            os.remove(tempFp)
+        self.assertRaises(SubConverterFileIOException, xmlConverter.findPNGfpFromXMLfp, xmlFp)
+        os.remove(tempFp)
 
     def testWriteMXL(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
 
         s = converter.parseData(testPrimitive.multiDigitEnding)
-        try:
-            mxlPath = s.write('mxl')
-            self.assertTrue(str(mxlPath).endswith('.mxl'))
-        finally:
-            os.remove(mxlPath)
+        mxlPath = s.write('mxl')
+        self.assertTrue(str(mxlPath).endswith('.mxl'))
+        os.remove(mxlPath)
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
