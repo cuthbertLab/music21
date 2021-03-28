@@ -1590,7 +1590,7 @@ class Test(unittest.TestCase):
             # Restore owner read/write/exec permissions and original path
             os.chmod(e.getDefaultRootTempDir(), stat.S_IRWXU)
             e['directoryScratch'] = oldScratchDir
-            os.remove(tmp)
+        os.remove(tmp)
 
 
 # -----------------------------------------------------------------------------

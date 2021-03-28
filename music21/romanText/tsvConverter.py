@@ -732,12 +732,10 @@ class Test(unittest.TestCase):
         # Test .write
         envLocal = environment.Environment()
         tempF = envLocal.getTempFile()
-        try:
-            initial.write(tempF)
-            handler = TsvHandler(tempF)
-            self.assertEqual(handler.tsvData[0][0], 'I')
-        finally:
-            os.remove(tempF)
+        initial.write(tempF)
+        handler = TsvHandler(tempF)
+        self.assertEqual(handler.tsvData[0][0], 'I')
+        os.remove(tempF)
 
     def testIsMinor(self):
         self.assertTrue(is_minor('f'))

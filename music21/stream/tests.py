@@ -8085,31 +8085,25 @@ class Test(unittest.TestCase):
 
         out = o.write()
         otherFile = str(out).replace('-2', '-1')
-        try:
-            self.assertIsNotNone(out)
-        finally:
-            os.remove(out)
-            os.remove(otherFile)
+        self.assertIsNotNone(out)
+        os.remove(out)
+        os.remove(otherFile)
 
         tmp = environLocal.getTempFile()
         out = o.write(fp=tmp)
         otherFile = str(out).replace('-2', '-1')
-        try:
-            self.assertTrue(str(out).endswith('-2.xml'))
-            self.assertTrue(os.path.exists(otherFile))
-        finally:
-            os.remove(tmp)
-            os.remove(out)
-            os.remove(otherFile)
+        self.assertTrue(str(out).endswith('-2.xml'))
+        self.assertTrue(os.path.exists(otherFile))
+        os.remove(tmp)
+        os.remove(out)
+        os.remove(otherFile)
 
         out = o.write(fmt='midi')
         otherFile = str(out).replace('-2', '-1')
-        try:
-            self.assertTrue(str(out).endswith('-2.mid'))
-            self.assertTrue(os.path.exists(otherFile))
-        finally:
-            os.remove(out)
-            os.remove(otherFile)
+        self.assertTrue(str(out).endswith('-2.mid'))
+        self.assertTrue(os.path.exists(otherFile))
+        os.remove(out)
+        os.remove(otherFile)
 
 
 # -----------------------------------------------------------------------------
