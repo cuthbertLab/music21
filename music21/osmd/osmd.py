@@ -57,7 +57,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
                   + "/opensheetmusicdisplay/releases/download/0.9.2/opensheetmusicdisplay.min.js")
 
     def show(self, obj, fmt, *,
-             fixPartName=True, offline=False, divId=None,
+             fixPartName=True, offline=False,
              **keywords):
         '''
         Displays the score object in a notebook using the OpenSheetMusicDisplay.js library.
@@ -76,9 +76,8 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         if fixPartName:
             self.addDefaultPartName(score)
 
-        if divId is None:
-            # create unique reference to output div in case we wish to update it
-            divId = self.getUniqueDivId()
+        # create unique reference to output div in case we wish to update it
+        divId = self.getUniqueDivId()
 
         # convert score to xml string
         gex = m21ToXml.GeneralObjectExporter(score)
@@ -106,7 +105,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             # make path absolute and add browser prefix for opening a local file
             filename = 'file:///' + str(tempFileName.resolve())
             webbrowser.open_new_tab(filename)
-        return divId
 
     def parseData(self):
         # pragma: no cover
