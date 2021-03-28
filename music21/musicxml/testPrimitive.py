@@ -12657,7 +12657,7 @@ repeatExpressionsA = '''<?xml version="1.0" encoding="UTF-8"?>
     <measure number="2" width="268">
       <direction placement="above">
         <direction-type>
-          <segno default-x="-2" default-y="18"/>
+          <segno default-x="-2" default-y="18" relative-x="10"/>
         </direction-type>
         <sound divisions="1" segno="2"/>
       </direction>
