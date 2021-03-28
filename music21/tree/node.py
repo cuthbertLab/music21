@@ -299,8 +299,8 @@ class OffsetNode(ElementNode):
     >>> score = tree.makeExampleScore()
     >>> sf = score.flat
     >>> sf.show('text', addEndTimes=True)
-    {0.0 - 0.0} <music21.instrument.Instrument 'PartA: : '>
-    {0.0 - 0.0} <music21.instrument.Instrument 'PartB: : '>
+    {0.0 - 0.0} <music21.instrument.Instrument 'PartA: music21 Part: '>
+    {0.0 - 0.0} <music21.instrument.Instrument 'PartB: music21 Part: '>
     {0.0 - 0.0} <music21.clef.BassClef>
     {0.0 - 0.0} <music21.clef.BassClef>
     {0.0 - 0.0} <music21.meter.TimeSignature 2/4>
@@ -366,8 +366,8 @@ class OffsetNode(ElementNode):
     <OffsetNode 0.0 Indices:0,0,8,8 Length:8>
 
     >>> leftLeft.payload
-    [<ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument 'PartA: : '>>,
-     <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument 'PartB: : '>>,
+    [<ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument 'PartA: music21 Part: '>>,
+     <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument 'PartB: music21 Part: '>>,
      <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>,
      <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>,
      <ElementTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>,

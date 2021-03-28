@@ -54,7 +54,7 @@ partGroupAbbreviation = 'PG'
 durationType = 'quarter'
 
 instrumentName = ''
-partName = ''
+partName = 'music21 Part'
 
 keyFifths = 0
 keyMode = 'major'

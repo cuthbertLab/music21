@@ -169,7 +169,7 @@ def getStartEvents(mt=None, channel=1, instrumentObj=None):
 
     >>> midi.translate.getStartEvents()
     [<music21.midi.DeltaTime (empty) track=None, channel=1>,
-     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=None, channel=1, data=b''>]
+     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=None, channel=1, data=b'music21 Part'>]
 
     >>> midi.translate.getStartEvents(channel=2, instrumentObj=instrument.Harpsichord())
     [<music21.midi.DeltaTime (empty) track=None, channel=2>,
@@ -183,7 +183,7 @@ def getStartEvents(mt=None, channel=1, instrumentObj=None):
     if isinstance(instrumentObj, Conductor):
         return events
     elif instrumentObj is None or instrumentObj.bestName() is None:
-        partName = ''
+        partName = defaults.partName
     else:
         partName = instrumentObj.bestName()
 

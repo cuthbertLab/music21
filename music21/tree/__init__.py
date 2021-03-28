@@ -54,7 +54,7 @@ def makeExampleScore():
     >>> score = tree.makeExampleScore()
     >>> score.show('text')
     {0.0} <music21.stream.Part ...>
-        {0.0} <music21.instrument.Instrument 'PartA: : '>
+        {0.0} <music21.instrument.Instrument 'PartA: music21 Part: '>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.BassClef>
             {0.0} <music21.meter.TimeSignature 2/4>
@@ -71,7 +71,7 @@ def makeExampleScore():
             {1.0} <music21.note.Note C>
             {2.0} <music21.bar.Barline type=final>
     {0.0} <music21.stream.Part ...>
-        {0.0} <music21.instrument.Instrument 'PartB: : '>
+        {0.0} <music21.instrument.Instrument 'PartB: music21 Part: '>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.BassClef>
             {0.0} <music21.meter.TimeSignature 2/4>

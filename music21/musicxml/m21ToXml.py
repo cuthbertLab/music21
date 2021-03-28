@@ -338,7 +338,7 @@ class GeneralObjectExporter:
           </defaults>
           <part-list>
             <score-part id="...">
-              <part-name />
+              <part-name>music21 Part</part-name>
             </score-part>
           </part-list>
           <!--=========================== Part 1 ===========================-->

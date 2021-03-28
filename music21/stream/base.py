@@ -4994,7 +4994,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> instrumentStream = p.getInstruments(returnDefault=True)
         >>> defaultInst = instrumentStream.first()
         >>> defaultInst
-        <music21.instrument.Instrument ': '>
+        <music21.instrument.Instrument 'music21 Part: '>
 
         Insert the default instrument into the part:
 
@@ -5038,8 +5038,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             from music21.instrument import Instrument
             instObj = Instrument()
             # instObj.partId = defaults.partId  # give a default id
-            # TODO: should this be changed to None? MSC 2015-12
-            instObj.partName = defaults.partName  # give a default id
+            instObj.partName = defaults.partName  # give a default part name
             post.insert(0, instObj)
 
         # returns a Stream
