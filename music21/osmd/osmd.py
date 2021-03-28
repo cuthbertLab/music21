@@ -5,8 +5,8 @@
 #
 # Authors:      Sven Hollowell
 #
-# Copyright:    Copyright © 2018 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# Copyright:    Copyright © 2018-21 Michael Scott Cuthbert and the music21 Project
+# License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
 '''
 Registers the .show('osmd') converter for use in IPython notebook

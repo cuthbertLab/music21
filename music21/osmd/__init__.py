@@ -5,8 +5,8 @@
 #
 # Authors:      Sven Hollowell
 #
-# Copyright:    Copyright © 2012-14 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# Copyright:    Copyright © 2018-21 Michael Scott Cuthbert and the music21 Project
+# License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
 
 __all__ = ['ConverterOpenSheetMusicDisplay']
