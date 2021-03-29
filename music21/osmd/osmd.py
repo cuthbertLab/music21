@@ -55,7 +55,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     script_url = ("https://github.com/opensheetmusicdisplay"
                   + "/opensheetmusicdisplay/releases/download/0.9.2/opensheetmusicdisplay.min.js")
 
-    def show(self, obj, fmt, *, offline=False):
+    def show(self, obj, fmt, *, offline=False, **keywords):
         '''
         Displays the score object in a notebook using the OpenSheetMusicDisplay.js library.
 
@@ -82,7 +82,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             if not part.partName:
                 part.partName = ' '
 
-        bytesOut = gex.parseWellFormedObject(score)
+        bytesOut = gex.parseWellformedObject(score)
         xml = bytesOut.decode('utf-8')
 
         # generate script to be run on page
@@ -171,7 +171,10 @@ class TestExternal(unittest.TestCase):
         for n in s.recurse().getElementsByClass('Rest'):
             n.style.color = 'green'
 
+        # Test fixing part name by ensuring we start with None
+        self.assertEqual(s.partName, None)
         s.show('osmd')
+        # Verify no ugly, random part ID written by OSMD.
 
 
 if __name__ == "__main__":
