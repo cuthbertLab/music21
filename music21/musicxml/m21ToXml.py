@@ -385,9 +385,10 @@ class GeneralObjectExporter:
         scoreExporter.parse()
         return scoreExporter.asBytes()
 
-    def fromGeneralObject(self, obj):
+    # TODO: make these methods static or relocate, no self use that I can see!
+    def fromGeneralObject(self, obj) -> stream.Score:
         '''
-        Converts any Music21Object (or a duration or a pitch) to something that
+        Converts any Music21Object (or a duration or a pitch) to a Score that
         can be passed to ScoreExporter()
 
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()

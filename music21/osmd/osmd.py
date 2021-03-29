@@ -55,9 +55,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     script_url = ("https://github.com/opensheetmusicdisplay"
                   + "/opensheetmusicdisplay/releases/download/0.9.2/opensheetmusicdisplay.min.js")
 
-    def show(self, obj, fmt, *,
-             fixPartName=True, offline=False,
-             **keywords):
+    def show(self, obj, fmt, *, offline=False):
         '''
         Displays the score object in a notebook using the OpenSheetMusicDisplay.js library.
 
@@ -71,16 +69,20 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         >>> assert fig_id1 == fig_id2
         '''
         in_ipython = runningUnderIPython()
-        score = obj
-        if fixPartName:
-            self.addDefaultPartName(score)
 
         # create unique reference to output div in case we wish to update it
         divId = self.getUniqueDivId()
 
         # convert score to xml string
-        gex = m21ToXml.GeneralObjectExporter(score)
-        bytesOut = gex.parse()
+        gex = m21ToXml.GeneralObjectExporter()
+        # whether or not obj is score, fromGeneralObject returns a score
+        score = gex.fromGeneralObject(obj)
+        # fix each part name to be not empty: OSMD currently subs ugly, random IDs
+        for part in score.parts:
+            if not part.partName:
+                part.partName = ' '
+
+        bytesOut = gex.parseWellFormedObject(score)
         xml = bytesOut.decode('utf-8')
 
         # generate script to be run on page
@@ -148,29 +150,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             script = script.replace('"{{script_url}}"', json.dumps(self.script_url), 1)
         return script
 
-    @staticmethod
-    def addDefaultPartName(score):
-        '''
-        Due to a bug in OpenSheetMusicDisplay if a <part-name> is not provided it will default
-        to an auto-generated random string. This method is used to fix that by default.
-
-        >>> import music21
-        >>> # display two scores to demonstrate difference.
-        >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
-        >>> _ = s.show('osmd',fixPartName=False)
-        >>> music21.osmd.ConverterOpenSheetMusicDisplay.addDefaultPartName(s)
-        >>> _ = s.show('osmd',fixPartName=False)
-        '''
-        # If no partName is present in the first instrument, OSMD will display the ugly 'partId'
-        # this ensures partName is not an empty string
-        if 'Part' in score.classes:
-            if not score.partName:
-                score.partName = ' '
-        else:
-            for part in score.iter.parts:
-                if not part.partName:
-                    part.partName = ' '
-
 
 class TestExternal(unittest.TestCase):
 
@@ -193,17 +172,6 @@ class TestExternal(unittest.TestCase):
             n.style.color = 'green'
 
         s.show('osmd')
-
-class Test(unittest.TestCase):
-
-    def testAddsDefaultPartId(self):
-        from music21 import converter
-        s = converter.parse("tinyNotation: 3/4 E4 r f#")
-
-        ConverterOpenSheetMusicDisplay.addDefaultPartName(s)
-        firstInstrumentObject = s.getInstruments(returnDefault=True, recurse=True).first()
-        self.assertIsNotNone(firstInstrumentObject.instrumentName)
-        self.assertNotEqual(firstInstrumentObject.instrumentName, '')
 
 
 if __name__ == "__main__":
