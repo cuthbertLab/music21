@@ -70,7 +70,7 @@ def getXml(obj) -> str:
     for part in score.parts:
         if not part.partName:
             part.partName = ' '
-    
+
     bytesOut = gex.parseWellformedObject(score)
     return bytesOut.decode('utf-8')
 
