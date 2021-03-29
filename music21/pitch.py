@@ -2912,6 +2912,10 @@ class Pitch(prebase.ProtoM21Object):
         >>> a.pitchClass = 1
         >>> a
         <music21.pitch.Pitch C#3(+20c)>
+
+        OMIT FROM DOCS
+
+        this is a performance critical operation.
         '''
         pc = round(self.ps) % 12
         if pc == 12:
