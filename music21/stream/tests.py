@@ -1907,8 +1907,7 @@ class Test(unittest.TestCase):
         s.insert(0, m1)
         s.insert(4, m2)
         # must connect Measures to Streams before filling gaps
-        m1.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
-        m2.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
+        s.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
         self.assertTrue(m2.isSorted)
         # m2.sort()
 
