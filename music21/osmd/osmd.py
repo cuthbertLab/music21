@@ -64,7 +64,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
         >>> import music21
         >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
-        >>> fig_id1 = s.show('osmd')
+        >>> fig_id1 = s.show('osmd')  #_DOCS_SHOW
 
         To update a previously displayed score use the returned divId from before:
 
@@ -164,11 +164,11 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         '''
         # If no partName is present in the first instrument, OSMD will display the ugly 'partId'
         # this ensures partName is not an empty string
-        if type(score) is Part:
+        if 'Part' in score.classes:
             if not score.partName:
                 score.partName = ' '
         else:
-            for part in score.parts:
+            for part in score.iter.parts:
                 if not part.partName:
                     part.partName = ' '
 
