@@ -2913,10 +2913,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> a
         <music21.pitch.Pitch C#3(+20c)>
         '''
-        pc = round(self.ps) % 12
-        if pc == 12:
-            pc = 0
-        return pc
+        return round(self.ps) % 12
 
     @pitchClass.setter
     def pitchClass(self, value: Union[str, int]):

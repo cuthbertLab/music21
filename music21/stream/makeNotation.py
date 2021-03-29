@@ -34,7 +34,7 @@ environLocal = environment.Environment(__file__)
 
 
 def makeBeams(
-    s,
+    s: 'music21.stream.Stream',
     *,
     inPlace=False,
     setStemDirections=True,
@@ -97,12 +97,14 @@ def makeBeams(
 
     # environLocal.printDebug(['calling Stream.makeBeams()'])
     if not inPlace:  # make a copy
-        returnObj = copy.deepcopy(s)
+        returnObj: stream.Stream = copy.deepcopy(s)
     else:
-        returnObj = s
+        returnObj: stream.Stream = s
 
     # if s.isClass(Measure):
+    mColl: List[stream.Measure]
     if 'Measure' in s.classes:
+        returnObj: stream.Measure
         mColl = [returnObj]  # store a list of measures for processing
     else:
         mColl = list(returnObj.iter.getElementsByClass('Measure'))  # a list of measures
@@ -112,6 +114,7 @@ def makeBeams(
 
     lastTimeSignature = None
 
+    m: stream.Measure
     for m in mColl:
         # this means that the first of a stream of time signatures will
         # be used
