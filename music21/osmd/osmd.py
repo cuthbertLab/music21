@@ -23,7 +23,6 @@ import urllib.request
 import webbrowser
 
 from music21.converter.subConverters import SubConverter
-from music21.stream import Part, Score
 from music21.common import getSourceFilePath, runningUnderIPython
 from music21.musicxml import m21ToXml
 from music21 import environment
