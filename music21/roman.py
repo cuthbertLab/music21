@@ -2671,7 +2671,8 @@ class RomanNumeral(harmony.Harmony):
                   and workingFigure[0] == '6'
                   and (len(workingFigure) < 2
                         or not workingFigure[1].isdigit()
-                  )):
+                  )
+            ):
                 # Fr6 => Fr43
                 workingFigure = self._aug6defaultInversions[aug6type] + workingFigure[1:]
 

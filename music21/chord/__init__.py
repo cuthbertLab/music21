@@ -2619,7 +2619,7 @@ class Chord(note.NotRest):
         >>> c4.isItalianAugmentedSixth()
         False
 
-        If inversions don't matter to you, add `permitAnyInversion=Tru`:
+        If inversions don't matter to you, add `permitAnyInversion=True`:
 
         >>> c3.isItalianAugmentedSixth(permitAnyInversion=True)
         True
