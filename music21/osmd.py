@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
 '''
-Registers the .show('osmd') converter for use in IPython notebook
+Helper functions for displaying streams in IPython notebooks using Open Sheet Music Display.
 If not in a notebook (e.g. commandline), it will open a browser window with the rendered score
 See OSMD project page here: https://github.com/opensheetmusicdisplay/opensheetmusicdisplay
 '''
@@ -61,8 +61,6 @@ def getXml(obj) -> str:
     Prepare a score even if `obj` is not a Score, and ensure the part name is not empty.
     Return a string dump of the XML.
     '''
-    # convert score to xml string
-    # from music21.musicxml.m21ToXml import GeneralObjectExporter
     gex = GeneralObjectExporter()
     # whether or not obj is score, fromGeneralObject returns a score
     score = gex.fromGeneralObject(obj)

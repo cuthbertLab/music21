@@ -1365,8 +1365,8 @@ class ConverterMEI(SubConverter):
 
 class ConverterOpenSheetMusicDisplay(SubConverter):
     '''
-    Converter for displaying sheet music inline in an IPython notebook.
-    Uses: https://opensheetmusicdisplay.org/ for rendering
+    Converter for displaying sheet music inline in an IPython notebook
+    using Open Sheet Music Display: https://opensheetmusicdisplay.org/
     '''
     registerFormats = ('osmd',)
     registerShowFormats = ('osmd',)
@@ -1379,6 +1379,9 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         >>> import music21
         >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
         >>> #_DOCS_SHOW fig_id1 = s.show('osmd')
+
+        `offline=True` caches the .js script provided by OSMD so that the following
+        calls using `offline=True` will just load the cached version.
         '''
         from music21.osmd import getUniqueDivId, getXml, musicXMLToScript, hasInstalledIPython
         in_ipython = common.runningUnderIPython()
