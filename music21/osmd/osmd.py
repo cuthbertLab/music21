@@ -61,7 +61,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
         >>> import music21
         >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
-        >>> fig_id1 = s.show('osmd')  #_DOCS_SHOW
+        >>> #_DOCS_SHOW fig_id1 = s.show('osmd')
         '''
         in_ipython = runningUnderIPython()
 
