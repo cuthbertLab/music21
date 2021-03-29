@@ -172,7 +172,7 @@ class TestExternal(unittest.TestCase):
             n.style.color = 'green'
 
         # Test fixing part name by ensuring we start with None
-        self.assertEqual(s.partName, None)
+        self.assertNone(s.partName)
         s.show('osmd')
         # Verify no ugly, random part ID written by OSMD.
 
