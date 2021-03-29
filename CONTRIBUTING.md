@@ -41,7 +41,7 @@ or link to a gist if you've already started some of the work.
 Bug fixes, optimizations, and documentation improvements also benefit from
 opening issues first, but it is not required for changes where the necessity is
 self-evident. A draft pull request could also be opened in lieu of an issue if
-if you expect it might help others appreciate the scope or motivation, or if
+you expect it might help others appreciate the scope or motivation, or if
 there are design questions that could be resolved more efficiently by discussing
 specifics.
 
@@ -75,7 +75,7 @@ Conventions:
 
   - `'strings MUST be single-quoted, but "double quotes" are allowed internally'`
   - variable names:
-    - need to be umambiguous
+    - need to be unambiguous
     - must begin with lowercase
     - snake_case is permitted for internal variables
   - line lengths are capped at 100, but if approaching this limit, look for ways to avoid one-lining
@@ -99,7 +99,7 @@ We write doctests and unit tests, and we strive for the total
 test coverage of the project to increase with every pull request. See the developer
 documentation to dig in to specific topics like adjusting doctests to prevent
 actions we don't want executed when running the general test suite (like opening
-browser windows or playing music.)
+browser windows or playing music).
 
 Pull requests that increase or improve coverage of existing features are very welcome.
 Coverage reports can be found at [Coveralls](https://coveralls.io/github/cuthbertLab/music21).
