@@ -14,12 +14,12 @@ Registers the .show('osmd') converter for use in IPython notebook
 If not in a notebook (e.g. commandline), it will open a browser window with the rendered score
 See OSMD project page here: https://github.com/opensheetmusicdisplay/opensheetmusicdisplay
 '''
-import unittest
-import time
-import random
+import importlib
 import json
 import os
-import importlib
+import random
+import time
+import unittest
 import urllib.request
 
 from music21.common import getSourceFilePath
