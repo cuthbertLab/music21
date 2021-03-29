@@ -8076,19 +8076,34 @@ class Test(unittest.TestCase):
         self.assertEqual(beams[4], stop_beam)  # last should be stop
 
     def testOpusWrite(self):
+        import os
+
         o = Opus()
         s1 = Score()
         s2 = Score()
         o.append([s1, s2])
 
         out = o.write()
+        otherFile = str(out).replace('-2', '-1')
         self.assertIsNotNone(out)
+        os.remove(out)
+        os.remove(otherFile)
 
-        out = o.write(fp=environLocal.getTempFile())
+        tmp = environLocal.getTempFile()
+        out = o.write(fp=tmp)
+        otherFile = str(out).replace('-2', '-1')
         self.assertTrue(str(out).endswith('-2.xml'))
+        self.assertTrue(os.path.exists(otherFile))
+        os.remove(tmp)
+        os.remove(out)
+        os.remove(otherFile)
 
         out = o.write(fmt='midi')
+        otherFile = str(out).replace('-2', '-1')
         self.assertTrue(str(out).endswith('-2.mid'))
+        self.assertTrue(os.path.exists(otherFile))
+        os.remove(out)
+        os.remove(otherFile)
 
 
 # -----------------------------------------------------------------------------

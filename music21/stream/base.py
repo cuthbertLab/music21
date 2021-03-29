@@ -24,6 +24,7 @@ import collections
 import copy
 import itertools
 import math
+import os
 import pathlib
 import unittest
 import sys
@@ -13799,12 +13800,15 @@ class Opus(Stream):
         elif common.runningUnderIPython():
             return Stream.write(self, fmt, fp, **keywords)
 
+        delete = False
         if fp is None:
             if fmt is None:
                 suffix = '.' + environLocal['writeFormat']
             else:
                 unused_format, suffix = common.findFormat(fmt)
-            fp = environLocal.getTempFile(returnPathlib=False) + suffix
+            fp = environLocal.getTempFile(suffix=suffix, returnPathlib=False)
+            # Mark for deletion, because it won't actually be used
+            delete = True
         if isinstance(fp, str):
             fp = pathlib.Path(fp)
 
@@ -13824,6 +13828,10 @@ class Opus(Stream):
             fpReturned = s.write(fmt=fmt, fp=fpToUse, **keywords)
             environLocal.printDebug(f'Component {s} written to {fpReturned}')
             post.append(fpReturned)
+
+        if delete:
+            os.remove(fp)
+
         return post[-1] if post else None
 
     def show(self, fmt=None, app=None, **keywords):

@@ -1347,8 +1347,9 @@ class MetadataBundle(prebase.ProtoM21Object):
         True
 
         >>> import os
-        >>> import tempfile
-        >>> tempFilePath = tempfile.mkstemp()[1]
+        >>> from music21 import environment
+        >>> e = environment.Environment()
+        >>> tempFilePath = e.getTempFile()
         >>> bachBundle.write(filePath=tempFilePath)
         <music21.metadata.bundles.MetadataBundle {363 entries}>
         >>> os.remove(tempFilePath)
