@@ -62,11 +62,6 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         >>> import music21
         >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
         >>> fig_id1 = s.show('osmd')  #_DOCS_SHOW
-
-        To update a previously displayed score use the returned divId from before:
-
-        >>> fig_id2 = s.show('osmd', divId=fig_id1)
-        >>> assert fig_id1 == fig_id2
         '''
         in_ipython = runningUnderIPython()
 
