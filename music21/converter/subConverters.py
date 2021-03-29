@@ -1363,6 +1363,52 @@ class ConverterMEI(SubConverter):
     #     raise NotImplementedError('MEI export is not yet implemented.')
 
 
+class ConverterOpenSheetMusicDisplay(SubConverter):
+    '''
+    Converter for displaying sheet music inline in an IPython notebook.
+    Uses: https://opensheetmusicdisplay.org/ for rendering
+    '''
+    registerFormats = ('osmd',)
+    registerShowFormats = ('osmd',)
+    registerOutputExtensions = ('html',)
+
+    def show(self, obj, fmt, *, offline=False, **keywords):
+        '''
+        Displays the score object in a notebook using the OpenSheetMusicDisplay.js library.
+
+        >>> import music21
+        >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
+        >>> #_DOCS_SHOW fig_id1 = s.show('osmd')
+        '''
+        from music21.osmd import getUniqueDivId, getXml, musicXMLToScript, hasInstalledIPython
+        in_ipython = common.runningUnderIPython()
+        # create unique reference to output div in case we wish to update it
+        divId = getUniqueDivId()
+        xml = getXml(obj)
+
+        # generate script to be run on page
+        script = musicXMLToScript(xml, divId, offline=offline)
+        if in_ipython and hasInstalledIPython():
+            # pylint: disable=import-outside-toplevel
+            from IPython.core.display import display, HTML, Javascript
+            display(HTML(f'<div id="{divId}"></div>'))
+            display(Javascript(script))
+        else:
+            import webbrowser
+            # Create a file for the browser to open
+            tempFileName = self.getTemporaryFile()
+
+            with open(tempFileName, 'w') as f:
+                f.write(f'''
+                <div id="{divId}"></div>
+                <script>{script}</script>
+                ''')
+
+            # make path absolute and add browser prefix for opening a local file
+            filename = 'file:///' + str(tempFileName.resolve())
+            webbrowser.open_new_tab(filename)
+
+
 class Test(unittest.TestCase):
 
     def testSimpleTextShow(self):
@@ -1500,6 +1546,6 @@ if __name__ == '__main__':
     import music21
     # import sys
     # sys.argv.append('SimpleTextShow')
-    music21.mainTest(Test)
+    music21.mainTest(Test, verbose=True)
     # run command below to test commands that open musescore, etc.
     # music21.mainTest(TestExternal)

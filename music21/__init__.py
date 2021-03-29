@@ -107,7 +107,6 @@ __all__ = [
     'musedata',
     'musicxml',
     'noteworthy',
-    'osmd',
     'omr',
     'romanText',
     'scale',
@@ -143,6 +142,7 @@ __all__ = [
     'layout',
     'meter',
     'note',
+    'osmd',
     'pitch',
     # prebase listed above
     'repeat',
