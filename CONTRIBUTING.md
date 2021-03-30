@@ -108,4 +108,6 @@ remove this keyword when polishing the patch.
 
 ## Finally ##
 
+If you're looking for ways to get started, browse the issues board, the Coveralls module
+coverage, or the TODO stubs in an area of the code that interests you.
 Thanks for your interest in contributing to music21. We look forward to seeing your work!
