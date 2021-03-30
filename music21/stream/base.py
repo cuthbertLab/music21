@@ -1166,7 +1166,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         in the other Stream in this Stream. This does not make
         copies of any elements, but simply stores all of them in this Stream.
 
-        Optionally, provide a list of classes to exclude with the `classFilter` list.
+        Optionally, provide a list of classes to include with the `classFilter` list.
 
         This method provides functionality like a shallow copy,
         but manages locations properly, only copies elements,
@@ -1186,6 +1186,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         >>> s1[1] is s2[1]
         True
+
+        >>> viola = instrument.Viola()
+        >>> trumpet = instrument.Trumpet()
+        >>> s1.insert(0, viola)
+        >>> s1.insert(0, trumpet)
+        >>> s2.mergeElements(s1, classFilterList=('BrassInstrument',))
+        >>> len(s2)
+        3
+        >>> viola in s2
+        False
         '''
         if classFilterList is not None:
             classFilterSet = set(classFilterList)
@@ -10602,6 +10612,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> ce = c.voicesToParts()
         >>> ce.show('t')
         {0.0} <music21.stream.Part Piano-v0>
+            {0.0} <music21.instrument.Instrument 'P1: Piano: '>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.key.Key of D major>
@@ -10617,6 +10628,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.note.Rest rest>
                 {4.0} <music21.bar.Barline type=final>
         {0.0} <music21.stream.Part Piano-v1>
+            {0.0} <music21.instrument.Instrument 'P1: Piano: '>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.clef.BassClef>
                 {0.0} <music21.key.Key of D major>
@@ -10750,6 +10762,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         continue
                     pInner = partDict[voiceIdInner]
                     pInner.insert(self.elementOffset(mInner), copy.deepcopy(mActive))
+
+        # Place references to any instruments from the original part into the new parts
+        for p in s.parts:
+            p.mergeElements(self, classFilterList=('Instrument',))
 
         if self.hasMeasures():
             for m in self.iter.getElementsByClass('Measure'):
