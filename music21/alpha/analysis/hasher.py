@@ -754,7 +754,7 @@ class Test(unittest.TestCase):
         unused_hashes = h.hashStream(s)
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     # def testBasicHash(self):
     #     # from pprint import pprint as pp

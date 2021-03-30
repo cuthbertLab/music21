@@ -112,7 +112,13 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    try:
+        import pygame
+        pygame_installed = True
+    except ImportError:
+        pygame_installed = False
 
+    @unittest.skipUnless(pygame_installed, 'pygame must be installed')
     def testRecording(self):
         '''
         record one second of data and print 10 records

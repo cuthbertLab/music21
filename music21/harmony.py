@@ -3086,7 +3086,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         from music21 import corpus, stream
         testFile = corpus.parse('leadSheet/fosterBrownHair.xml')
 
-        testFile.show('text')
+        # testFile.show('text')
         testFile = harmony.realizeChordSymbolDurations(testFile)
         # testFile.show()
         chordSymbols = testFile.flat.getElementsByClass(harmony.ChordSymbol)

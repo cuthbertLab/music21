@@ -178,7 +178,13 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    try:
+        import pygame
+        pygame_installed = True
+    except (ModuleNotFoundError, ImportError):
+        pygame_installed = False
 
+    @unittest.skipUnless(pygame_installed, 'pygame is not installed')
     def testBachDetune(self):
         from music21 import corpus
         import random
