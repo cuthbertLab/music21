@@ -34,16 +34,11 @@ or Stack Overflow.
 
 ## Submitting Pull Requests ##
 
-Feature proposals should be sounded out on the issue board or the mailing
-list to canvas opinion before raising a pull request. You can include a diff
-or link to a gist if you've already started some of the work.
-
-Bug fixes, optimizations, and documentation improvements also benefit from
-opening issues first, but it is not required for changes where the necessity is
-self-evident. A draft pull request could also be opened in lieu of an issue if
-you expect it might help others appreciate the scope or motivation, or if
-there are design questions that could be resolved more efficiently by discussing
-specifics.
+Open an issue to propose a feature or report a bug before raising a pull request.
+You can include a diff or link to a gist if you've already started some of the work.
+(Changes where the motivation is self-evident, like handling exceptions or increasing
+test coverage, don't need issue tickets.) A draft pull request can also sometimes
+help resolve design questions faster.
 
 If your PR fixes an existing issue, please use a GitHub keyword ("Fixes #NNN")
 in the body of the PR so that the issue will be closed on merge.
