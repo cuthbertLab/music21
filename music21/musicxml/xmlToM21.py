@@ -3279,7 +3279,7 @@ class MeasureParser(XMLParserBase):
         # can't do this unless we have a type, so if not forceRaw
         if not forceRaw:  # a cooked version builds up from pieces
             dt = duration.durationTupleFromTypeDots(durationType, numDots)
-            if not tuplets and (dt.quarterLength == qLen):
+            if (dt.quarterLength == qLen) and not tuplets:
                 # raw == cooked, so we're done
                 # but this comparison gives false positives if tuplets are involved
                 # don't bother with isclose; merely trying to short-circuit
