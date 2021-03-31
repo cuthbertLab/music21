@@ -9,6 +9,12 @@
     </part-list>
     <part id="P1">
         <measure number="0">
+            <attributes>
+                <time>
+                    <beats>4</beats>
+                    <beat-type>4</beat-type>
+                </time>
+            </attributes>
             <note>
                 <type>quarter</type>
                 <notations>

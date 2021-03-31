@@ -6515,7 +6515,7 @@ class Test(unittest.TestCase):
           <step>D</step>
           <octave>5</octave>
         </pitch>
-        <duration>{defaults.divisionsPerQuarter * 0.5}</duration>
+        <duration>{defaults.divisionsPerQuarter * 0.5 * (2/3) * (2/3)}</duration>
         <voice>1</voice>
         <type>eighth</type>
         <time-modification>
