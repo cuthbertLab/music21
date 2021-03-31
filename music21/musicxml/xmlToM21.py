@@ -18,6 +18,8 @@ import re
 # import sys
 # import traceback
 import unittest
+
+from math import isclose
 from typing import List, Optional, Dict, Tuple, Set
 
 import xml.etree.ElementTree as ET
@@ -3259,8 +3261,8 @@ class MeasureParser(XMLParserBase):
         # can't do this unless we have a type, so if not forceRaw
         if not forceRaw:  # a cooked version builds up from pieces
             dt = duration.durationTupleFromTypeDots(durationType, numDots)
-            if dt.quarterLength == qLen and not tuplets:
-                # raw == cooked, so we're done
+            if isclose(dt.quarterLength, qLen, abs_tol=1e-7) and not tuplets:
+                # raw ~= cooked, so we're done
                 # but this comparison gives false positives if tuplets are involved
                 return d if inputM21 is None else None
             if d is not None:
@@ -3275,8 +3277,8 @@ class MeasureParser(XMLParserBase):
                 qLen = common.opFrac(qLen * tup.tupletMultiplier())
 
             # Second check against qLen (raw), now with tuplets
-            # if != , create unlinked Duration and set raw qLen
-            if d.quarterLength != qLen:
+            # if not isclose , create unlinked Duration and set raw qLen
+            if not isclose(d.quarterLength, qLen, abs_tol=1e-7):
                 d.linked = False
                 d.quarterLength = qLen
 
