@@ -3274,7 +3274,6 @@ class MeasureParser(XMLParserBase):
 
             for tup in tuplets:
                 d.appendTuplet(tup)
-                qLen = common.opFrac(qLen * tup.tupletMultiplier())
 
             # Second check against qLen (raw), now with tuplets
             # if not isclose , create unlinked Duration and set raw qLen
