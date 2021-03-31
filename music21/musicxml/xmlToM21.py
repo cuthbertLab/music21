@@ -3259,8 +3259,9 @@ class MeasureParser(XMLParserBase):
         # can't do this unless we have a type, so if not forceRaw
         if not forceRaw:  # a cooked version builds up from pieces
             dt = duration.durationTupleFromTypeDots(durationType, numDots)
-            if dt.quarterLength == qLen:
+            if dt.quarterLength == qLen and not tuplets:
                 # raw == cooked, so we're done
+                # but this comparison gives false positives if tuplets are involved
                 return d if inputM21 is None else None
             if d is not None:
                 d.clear()
@@ -3271,6 +3272,7 @@ class MeasureParser(XMLParserBase):
 
             for tup in tuplets:
                 d.appendTuplet(tup)
+                qLen = common.opFrac(qLen * tup.tupletMultiplier())
 
             # Second check against qLen (raw), now with tuplets
             # if != , create unlinked Duration and set raw qLen
@@ -6506,13 +6508,13 @@ class Test(unittest.TestCase):
         '''
         test that a note with nested tuplets gets converted properly.
         '''
-        mxN = '''
+        mxN = f'''
         <note default-x="347">
         <pitch>
           <step>D</step>
           <octave>5</octave>
         </pitch>
-        <duration>4</duration>
+        <duration>{defaults.divisionsPerQuarter * 0.5}</duration>
         <voice>1</voice>
         <type>eighth</type>
         <time-modification>
