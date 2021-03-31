@@ -3196,6 +3196,26 @@ class MeasureParser(XMLParserBase):
         'eighth'
         >>> c.dots
         1
+
+        If the `<duration>` doesn't match the `<type>` and `<dots>`,
+        an unlinked duration is created so that `.quarterLength` agrees with
+        `<duration>` but the notated types can still be represented by
+        `.components`.
+
+        Create a second dot on `mxNote` and parse again, observing the identical
+        `quarterLength`:
+
+        >>> from xml.etree.ElementTree import SubElement
+        >>> unused = SubElement(mxNote, 'dot')
+        >>> c2 = MP.xmlToDuration(mxNote)
+        >>> c2
+        <music21.duration.Duration unlinked type:eighth quarterLength:0.75>
+        >>> c2.quarterLength
+        0.75
+        >>> c2.type
+        'eighth'
+        >>> c2.dots
+        2
         '''
         numDots = 0
         tuplets = ()
@@ -3238,7 +3258,6 @@ class MeasureParser(XMLParserBase):
 
         # two ways to create durations, raw (from qLen) and cooked (from type, time-mod, dots)
         if d is not None:
-            # environLocal.printDebug(['forced to use raw duration', durRaw])
             durRaw = duration.Duration()  # raw just uses qLen
             # the qLen set here may not be computable, but is not immediately
             # computed until setting components
