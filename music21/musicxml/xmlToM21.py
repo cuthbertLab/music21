@@ -3199,8 +3199,7 @@ class MeasureParser(XMLParserBase):
 
         If the `<duration>` doesn't match the `<type>` and `<dots>`,
         an unlinked duration is created so that `.quarterLength` agrees with
-        `<duration>` but the notated types can still be represented by
-        `.components`.
+        `<duration>` but the notated types can still be represented.
 
         Create a second dot on `mxNote` and parse again, observing the identical
         `quarterLength`:
