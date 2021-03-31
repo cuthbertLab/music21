@@ -3261,9 +3261,10 @@ class MeasureParser(XMLParserBase):
         # can't do this unless we have a type, so if not forceRaw
         if not forceRaw:  # a cooked version builds up from pieces
             dt = duration.durationTupleFromTypeDots(durationType, numDots)
-            if isclose(dt.quarterLength, qLen, abs_tol=1e-7) and not tuplets:
-                # raw ~= cooked, so we're done
+            if not tuplets and (dt.quarterLength == qLen):
+                # raw == cooked, so we're done
                 # but this comparison gives false positives if tuplets are involved
+                # don't bother with isclose; merely trying to short-circuit
                 return d if inputM21 is None else None
             if d is not None:
                 d.clear()
@@ -3276,7 +3277,7 @@ class MeasureParser(XMLParserBase):
                 d.appendTuplet(tup)
 
             # Second check against qLen (raw), now with tuplets
-            # if not isclose , create unlinked Duration and set raw qLen
+            # if not almost equal, create unlinked Duration and set raw qLen
             if not isclose(d.quarterLength, qLen, abs_tol=1e-7):
                 d.linked = False
                 d.quarterLength = qLen
