@@ -8075,6 +8075,41 @@ class Test(unittest.TestCase):
         self.assertEqual(beams[3], continue_beam)  # fourth should be continue
         self.assertEqual(beams[4], stop_beam)  # last should be stop
 
+    def testWrite(self):
+        import os
+
+        s = Stream([note.Note()])
+        tmpMusicxml = environLocal.getTempFile(suffix='musicxml')
+        tmpXml = environLocal.getTempFile(suffix='xml')
+        tmpNoSuffix = environLocal.getTempFile()
+
+        # Default: .musicxml
+        out1 = s.write()
+        # .musicxml pathlib.Path
+        out2 = s.write(fp=tmpMusicxml)
+        # .xml pathlib.Path
+        out3 = s.write(fp=tmpXml)
+        # .musicxml string
+        out4 = s.write(fp=str(tmpMusicxml))
+        # .xml string
+        out5 = s.write(fp=str(tmpXml))
+        # no suffix
+        out6 = s.write(fp=tmpNoSuffix)
+
+        self.assertTrue(str(out1).endswith('.musicxml'))
+        self.assertTrue(str(out2).endswith('.musicxml'))
+        self.assertTrue(str(out3).endswith('.xml'))
+        self.assertTrue(out4.endswith('.musicxml'))
+        self.assertTrue(out5.endswith('.xml'))
+        # in v7, we no longer coerce fp to end in .xml
+        self.assertNotIn('.xml', str(out6))
+
+        self.assertEqual(str(out2), out4)
+        self.assertEqual(str(out3), out5)
+
+        for fp in (out1, tmpMusicxml, tmpXml, tmpNoSuffix):
+            os.remove(fp)
+
     def testOpusWrite(self):
         import os
 
@@ -8089,7 +8124,16 @@ class Test(unittest.TestCase):
         os.remove(out)
         os.remove(otherFile)
 
-        tmp = environLocal.getTempFile()
+        # test no fp
+        out = o.write()
+        otherFile = str(out).replace('-2', '-1')
+        self.assertTrue(str(out).endswith('-2.musicxml'))
+        self.assertTrue(os.path.exists(otherFile))
+        os.remove(out)
+        os.remove(otherFile)
+
+        # test giving fp
+        tmp = environLocal.getTempFile(suffix='musicxml')
         out = o.write(fp=tmp)
         otherFile = str(out).replace('-2', '-1')
         self.assertTrue(str(out).endswith('-2.musicxml'))
@@ -8098,6 +8142,7 @@ class Test(unittest.TestCase):
         os.remove(out)
         os.remove(otherFile)
 
+        # test another format
         out = o.write(fmt='midi')
         otherFile = str(out).replace('-2', '-1')
         self.assertTrue(str(out).endswith('-2.mid'))

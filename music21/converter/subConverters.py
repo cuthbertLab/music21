@@ -963,7 +963,7 @@ class ConverterMusicXML(SubConverter):
         return fp
 
     def write(self, obj, fmt, fp=None, subformats=None,
-              compress=False, **keywords):  # pragma: no cover
+              compress=False, **keywords):
         '''
         Write to a .musicxml file.
         Set `compress=True` to immediately compress the output to a .mxl file.
@@ -983,7 +983,7 @@ class ConverterMusicXML(SubConverter):
         dataBytes: bytes = generalExporter.parse()
 
         writeDataStreamFp = fp
-        if fp is not None and subformats is not None:
+        if fp is not None and subformats:  # could be empty list
             fpStr = str(fp)
             noExtFpStr = os.path.splitext(fpStr)[0]
             writeDataStreamFp = noExtFpStr + '.musicxml'
