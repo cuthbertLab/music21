@@ -8133,10 +8133,10 @@ class Test(unittest.TestCase):
         os.remove(otherFile)
 
         # test giving fp
-        tmp = environLocal.getTempFile(suffix='musicxml')
+        tmp = environLocal.getTempFile(suffix='xml')
         out = o.write(fp=tmp)
         otherFile = str(out).replace('-2', '-1')
-        self.assertTrue(str(out).endswith('-2.musicxml'))
+        self.assertTrue(str(out).endswith('-2.xml'))
         self.assertTrue(os.path.exists(otherFile))
         os.remove(tmp)
         os.remove(out)
