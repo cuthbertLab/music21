@@ -849,8 +849,9 @@ class ConverterMusicXML(SubConverter):
         Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
         then return appropriate fp. Raises an exception if png fp does not exist.
         '''
+        # TODO: xmlFilePath is misleading, since we're passing in a .png path
         xmlFilePath = str(xmlFilePath)  # not pathlib.
-        path_without_extension = xmlFilePath[:-1 * len('.musicxml')]
+        path_without_extension = xmlFilePath[:-1 * len('.png')]
 
         for search_extension in ('1', '01', '001', '0001', '00001'):
             search_path = path_without_extension + '-' + search_extension + '.png'
