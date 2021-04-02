@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Name:         stream/__init__.py
+# Name:         stream/base.py
 # Purpose:      base classes for dealing with groups of positioned objects
 #
 # Authors:      Michael Scott Cuthbert

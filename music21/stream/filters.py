@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Name:         stream/filter.py
+# Name:         stream/filters.py
 # Purpose:      classes for filtering iterators of  streams...
 #
 # Authors:      Michael Scott Cuthbert
