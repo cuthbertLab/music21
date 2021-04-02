@@ -2126,7 +2126,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         For an 'inexpressible' duration, the opposite of consolidate is
         to set the duration's quarterLength to itself.  It won't necessarily
-        return to the original components, but it will (usually? always?)
+        return to the original components, but it will usually
         create something that can be notated.
 
         >>> a.quarterLength = a.quarterLength
