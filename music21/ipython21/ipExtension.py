@@ -11,9 +11,9 @@ def load_ipython_extension(ip):
 
     MAY 2017: everything happens in converter.subConverters
     '''
-#     pngFormatter = ip.display_formatter.formatters['image/png']
-#     pngFormatter.for_type(music21.ipython21.objects.IPythonPNGObject,
-#                           music21.ipython21.objects.IPythonPNGObject.getData)
+    # pngFormatter = ip.display_formatter.formatters['image/png']
+    # pngFormatter.for_type(music21.ipython21.objects.IPythonPNGObject,
+    #                       music21.ipython21.objects.IPythonPNGObject.getData)
     try:
         from matplotlib import pyplot as plt
         plt.ion()

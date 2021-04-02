@@ -271,7 +271,7 @@ class ModuleGather:
         for dirPath, unused_dirNames, filenames in os.walk(self.dirParent):
             self._visitFunc(None, dirPath, filenames)
 
-        if common.cpus() > 4:  # @UndefinedVariable
+        if common.cpus() > 4:
             self.modulePaths.sort(key=manyCoreSortFunc)
         else:
             self.modulePaths.sort()

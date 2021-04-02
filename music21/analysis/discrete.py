@@ -1537,7 +1537,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testFiles
         # use a musicxml test file with independently confirmed results
-        s = converter.parse(testFiles.edgefield82b)  # @UndefinedVariable
+        s = converter.parse(testFiles.edgefield82b)
 
         p = KrumhanslSchmuckler()
         k = p.getSolution(s)

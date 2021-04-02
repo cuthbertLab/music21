@@ -1785,7 +1785,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         g.process()
 
     def testGraphNetworkxGraph(self):
-        extm = getExtendedModules()  # @UnusedVariable
+        extm = getExtendedModules()
 
         if extm.networkx is not None:  # pragma: no cover
             b = GraphNetworkxGraph(doneAction=None)

@@ -3090,8 +3090,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     # --------------------------------------------------------------------------
     # methods that act on individual elements without requiring
-    # @ coreElementsChanged to fire
-
+    # coreElementsChanged to fire
     def addGroupForElements(self, group, classFilter=None, *, recurse=False):
         '''
         Add the group to the groups attribute of all elements.

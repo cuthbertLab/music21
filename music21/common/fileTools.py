@@ -43,10 +43,7 @@ def cd(targetDir):
 
     will switch temporarily, and then switch back when leaving.
     '''
-    try:
-        cwd = os.getcwdu()  # unicode # @UndefinedVariable
-    except AttributeError:
-        cwd = os.getcwd()  # non unicode
+    cwd = os.getcwd()
 
     try:
         os.chdir(targetDir)

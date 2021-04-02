@@ -12,7 +12,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testFiles as mTF
 
-        c = converter.parse(mTF.mozartTrioK581Excerpt)  # @UndefinedVariable
+        c = converter.parse(mTF.mozartTrioK581Excerpt)
         md = c.metadata
 
         self.assertEqual(md.movementNumber, '3')
@@ -23,7 +23,7 @@ class Test(unittest.TestCase):
         # get contributors directly from Metadata interface
         self.assertEqual(md.composer, 'Wolfgang Amadeus Mozart')
 
-        c = converter.parse(mTF.binchoisMagnificat)  # @UndefinedVariable
+        c = converter.parse(mTF.binchoisMagnificat)
         md = c.metadata
         self.assertEqual(md.composer, 'Gilles Binchois')
 
@@ -44,7 +44,7 @@ class Test(unittest.TestCase):
         self.assertEqual(md.title, 'Concerto in F')
 
         # test getting meta data from an imported source
-        c = converter.parse(mTF.mozartTrioK581Excerpt)  # @UndefinedVariable
+        c = converter.parse(mTF.mozartTrioK581Excerpt)
         md = c.metadata
 
         self.assertEqual(md.movementNumber, '3')

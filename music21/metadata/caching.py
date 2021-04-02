@@ -327,7 +327,7 @@ class JobProcessor:
         jobs is a list of :class:`~music21.metadata.MetadataCachingJob` objects.
 
         '''
-        processCount = processCount or common.cpus()  # @UndefinedVariable
+        processCount = processCount or common.cpus()
         if processCount < 1:
             processCount = 1
         remainingJobs = len(jobs)
@@ -337,8 +337,8 @@ class JobProcessor:
         environLocal.printDebug(
             f'Processing {remainingJobs} jobs in parallel, with {processCount} processes.')
         results = []
-        job_queue = multiprocessing.JoinableQueue()  # @UndefinedVariable
-        result_queue = multiprocessing.Queue()  # @UndefinedVariable
+        job_queue = multiprocessing.JoinableQueue()
+        result_queue = multiprocessing.Queue()
         workers = [WorkerProcess(job_queue, result_queue)
                    for _ in range(processCount)]
         for worker in workers:

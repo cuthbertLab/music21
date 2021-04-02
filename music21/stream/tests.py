@@ -6092,7 +6092,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testFiles
         from music21 import converter
         # testing a file a file with dynamics
-        a = converter.parse(testFiles.schumannOp48No1)  # @UndefinedVariable
+        a = converter.parse(testFiles.schumannOp48No1)
         unused_b = a.flat
         # b= a.flat.extendDuration(dynamics.Dynamic)
 
@@ -8105,6 +8105,13 @@ class Test(unittest.TestCase):
         os.remove(out)
         os.remove(otherFile)
 
+    def testActiveSiteAfterBoolIteration(self):
+        n = note.Note()
+        s1 = Stream([n])
+        s2 = Stream([n])
+        self.assertIs(n.activeSite, s2)
+        self.assertTrue(s1.notes)
+        self.assertIs(n.activeSite, s2)
 
 # -----------------------------------------------------------------------------
 

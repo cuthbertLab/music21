@@ -38,7 +38,7 @@ import os
 import string
 import struct
 import sys
-import unicodedata  # @UnresolvedImport
+import unicodedata
 import unittest
 from typing import Optional, Union, Tuple
 

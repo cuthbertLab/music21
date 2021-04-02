@@ -2494,7 +2494,7 @@ class LilypondConverter:
             from PIL import Image, ImageOps
             # noinspection PyBroadException
             try:
-                lilyImage = Image.open(str(lilyFile))  # @UndefinedVariable
+                lilyImage = Image.open(str(lilyFile))
                 lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')
                 lilyImage2.save(str(lilyFile))
             except Exception:  # pylint: disable=broad-except

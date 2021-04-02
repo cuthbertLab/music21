@@ -352,5 +352,5 @@ def removePunctuation(s: str) -> str:
 # -----------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import music21  # @Reimport
+    import music21
     music21.mainTest()

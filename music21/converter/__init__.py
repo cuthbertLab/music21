@@ -1301,14 +1301,14 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testMusicXMLConversion(self):
         from music21.musicxml import testFiles
-        for mxString in testFiles.ALL:  # @UndefinedVariable
+        for mxString in testFiles.ALL:
             a = subConverters.ConverterMusicXML()
             a.parseData(mxString)
 
     def testMusicXMLTabConversion(self):
         from music21.musicxml import testFiles
 
-        mxString = testFiles.ALL[5]  # @UndefinedVariable
+        mxString = testFiles.ALL[5]
         a = subConverters.ConverterMusicXML()
         a.parseData(mxString)
 
@@ -1569,12 +1569,12 @@ class Test(unittest.TestCase):
     def testConversionMXMetadata(self):
         from music21.musicxml import testFiles
 
-        a = parse(testFiles.mozartTrioK581Excerpt)  # @UndefinedVariable
+        a = parse(testFiles.mozartTrioK581Excerpt)
         self.assertEqual(a.metadata.composer, 'Wolfgang Amadeus Mozart')
         self.assertEqual(a.metadata.title, 'Quintet for Clarinet and Strings')
         self.assertEqual(a.metadata.movementName, 'Menuetto (Excerpt from Second Trio)')
 
-        a = parse(testFiles.binchoisMagnificat)  # @UndefinedVariable
+        a = parse(testFiles.binchoisMagnificat)
         self.assertEqual(a.metadata.composer, 'Gilles Binchois')
         # this gets the best title available, even though this is movement title
         self.assertEqual(a.metadata.title, 'Excerpt from Magnificat secundi toni')
