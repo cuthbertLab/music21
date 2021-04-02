@@ -107,12 +107,11 @@ def isIterable(usrData: Any) -> bool:
     >>> common.isIterable(range(20))
     True
     '''
-    if hasattr(usrData, "__iter__"):
-        if isinstance(usrData, (str, bytes)):
-            return False
-        return True
-    else:
+    if isinstance(usrData, (str, bytes)):
         return False
+    if hasattr(usrData, '__iter__'):
+        return True
+    return False
 
 
 def classToClassStr(classObj: Type) -> str:

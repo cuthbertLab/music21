@@ -346,7 +346,9 @@ class Spanner(base.Music21Object):
         return iter(self.spannerStorage)
 
     def __len__(self):
-        return len(self.spannerStorage)
+        # Check _elements to avoid StreamIterator overhead.
+        # Safe, because impossible to put spanned elements at end.
+        return len(self.spannerStorage._elements)
 
     def getSpannedElements(self):
         '''
@@ -370,10 +372,9 @@ class Spanner(base.Music21Object):
         >>> sl.getSpannedElements() == [n1, n2, c1]  # make sure that not sorting
         True
         '''
-        post = []
-        for c in self.spannerStorage.elements:
-            post.append(c)
-        return post
+        # Check _elements to avoid StreamIterator overhead.
+        # Safe, because impossible to put spanned elements at end.
+        return list(self.spannerStorage._elements)
 
     def getSpannedElementsByClass(self, classFilterList):
         '''
@@ -396,8 +397,11 @@ class Spanner(base.Music21Object):
     def getSpannedElementIds(self):
         '''
         Return all id() for all stored objects.
+        Was performance critical, until most uses removed in v.7.
+        Used only as a testing tool now.
+        Spanner.__contains__() was optimized in 839c7e5.
         '''
-        return [id(n) for n in self.spannerStorage]
+        return [id(n) for n in self.spannerStorage._elements]
 
     def addSpannedElements(self,
                            spannedElements: Union['music21.base.Music21Object',
@@ -427,10 +431,10 @@ class Spanner(base.Music21Object):
         # presently, this does not look for redundancies
         if not common.isListLike(spannedElements):
             spannedElements = [spannedElements]
-        else:
+        if arguments:
             spannedElements = spannedElements[:]  # copy
-        # assume all other arguments
-        spannedElements += arguments
+            # assume all other arguments
+            spannedElements += arguments
         # environLocal.printDebug(['addSpannedElements():', spannedElements])
         for c in spannedElements:
             if c is None:
@@ -469,7 +473,12 @@ class Spanner(base.Music21Object):
         return spannedElement in self
 
     def __contains__(self, spannedElement):
-        return spannedElement in self.spannerStorage
+        # Cannot check `in` spannerStorage._elements,
+        # because it would check __eq__, not identity.
+        for x in self.spannerStorage._elements:
+            if x is spannedElement:
+                return True
+        return False
 
     def replaceSpannedElement(self, old, new) -> None:
         '''
@@ -777,7 +786,9 @@ class SpannerBundle(prebase.ProtoM21Object):
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage:  # storage is a list of spanners
-                if idTarget in sp.getSpannedElementIds():
+                # __contains__() will test for identity, not equality
+                # see Spanner.hasSpannedElement(), which just calls __contains__()
+                if spannedElement in sp:
                     post.append(sp)
             self._cache[cacheKey] = post
         return self._cache[cacheKey]
@@ -789,7 +800,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         with new spannedElements
         for all Spanner objects contained in this bundle.
 
-        The `old` parameter can be either an object or object id.
+        The `old` parameter must be an object, not an object id.
 
         If no replacements are found, no errors are raised.
 
@@ -818,15 +829,17 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> su2
         <music21.spanner.Glissando <music21.note.Note E><music21.note.Note C>>
 
+        Changed in v.7 -- id() is no longer allowed for `old`.
 
+        >>> sb.replaceSpannedElement(id(n1), n2)
+        Traceback (most recent call last):
+        TypeError: send elements to replaceSpannedElement(), not ids (deprecated)
         '''
         # environLocal.printDebug(['SpannerBundle.replaceSpannedElement()', 'old', old,
         #    'new', new, 'len(self._storage)', len(self._storage)])
-
-        if common.isNum(old):  # assume this is an id
-            idTarget = old
-        else:
-            idTarget = id(old)
+        # TODO: remove in v.8 for speed?
+        if isinstance(old, int):
+            raise TypeError('send elements to replaceSpannedElement(), not ids (deprecated)')
 
         replacedSpanners = []
         # post = self.__class__()  # return a bundle of spanners that had changes
@@ -835,10 +848,10 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         for sp in self._storage:  # Spanners in a list
             # environLocal.printDebug(['looking at spanner', sp, sp.getSpannedElementIds()])
-
-            # must check to see if this id is in this spanner
             sp._cache = {}
-            if idTarget in sp.getSpannedElementIds():
+            # accurate, so long as Spanner.__contains__() checks identity, not equality
+            # see discussion at https://github.com/cuthbertLab/music21/pull/905
+            if old in sp:
                 sp.replaceSpannedElement(old, new)
                 replacedSpanners.append(sp)
                 # post.append(sp)

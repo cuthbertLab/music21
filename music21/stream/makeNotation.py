@@ -34,7 +34,7 @@ environLocal = environment.Environment(__file__)
 
 
 def makeBeams(
-    s,
+    s: 'music21.stream.Stream',
     *,
     inPlace=False,
     setStemDirections=True,
@@ -97,12 +97,14 @@ def makeBeams(
 
     # environLocal.printDebug(['calling Stream.makeBeams()'])
     if not inPlace:  # make a copy
-        returnObj = copy.deepcopy(s)
+        returnObj: stream.Stream = copy.deepcopy(s)
     else:
-        returnObj = s
+        returnObj: stream.Stream = s
 
     # if s.isClass(Measure):
+    mColl: List[stream.Measure]
     if 'Measure' in s.classes:
+        returnObj: stream.Measure
         mColl = [returnObj]  # store a list of measures for processing
     else:
         mColl = list(returnObj.iter.getElementsByClass('Measure'))  # a list of measures
@@ -112,6 +114,7 @@ def makeBeams(
 
     lastTimeSignature = None
 
+    m: stream.Measure
     for m in mColl:
         # this means that the first of a stream of time signatures will
         # be used
@@ -462,12 +465,10 @@ def makeMeasures(
     # del clefList
     clefObj = srcObj.clef or srcObj.getContextByClass('Clef')
     if clefObj is None:
-        clefList = list(srcObj.iter.getElementsByClass('Clef').getElementsByOffset(0))
+        clefObj = srcObj.iter.getElementsByClass('Clef').getElementsByOffset(0).first()
         # only return clefs that have offset = 0.0
-        if not clefList:
+        if not clefObj:
             clefObj = clef.bestClef(srcObj, recurse=True)
-        else:
-            clefObj = clefList[0]
 
     # environLocal.printDebug([
     #    'makeMeasures(): first clef found after copying and flattening',
@@ -683,7 +684,7 @@ def makeRests(
     refStreamOrTimeRange=None,
     fillGaps=False,
     timeRangeFromBarDuration=False,
-    inPlace=True,
+    inPlace=False,
     hideRests=False,
 ):
     '''
@@ -790,10 +791,7 @@ def makeRests(
 
     Changed in v6 -- all but first attribute are keyword only
 
-    Obviously there are problems TODO: fix them
-
-    OMIT_FROM_DOCS
-    TODO: default inPlace=False
+    Changed in v7 -- `inPlace` defaults False.
     '''
     from music21 import stream
 
@@ -971,13 +969,6 @@ def makeTies(
     Notes: uses base.Music21Object.splitAtQuarterLength() once it has figured out
     what to split.
 
-    Changed in v. 4 -- inPlace = False by default.
-
-    OMIT_FROM_DOCS
-    TODO: take a list of classes to act as filter on what elements are tied.
-
-    configure ".previous" and ".next" attributes
-
     Previously a note tied from one voice could not make ties into a note
     in the next measure outside of voices.  Fixed May 2017
 
@@ -1001,7 +992,7 @@ def makeTies(
     >>> p.append([m1, m2])
     >>> p2 = p.makeTies()
 
-    test same thing with needed makeTies...creates a possibly unnecessary voice...
+    test same thing with needed makeTies:
 
     >>> p = stream.Part()
     >>> m1 = stream.Measure(number=1)
@@ -1026,8 +1017,7 @@ def makeTies(
         {0.0} <music21.stream.Voice 2>
             {0.0} <music21.note.Note B>
     {1.0} <music21.stream.Measure 2 offset=1.0>
-        {0.0} <music21.stream.Voice 0x105332ac8>
-            {0.0} <music21.note.Note C>
+        {0.0} <music21.note.Note C>
 
     >>> for n in p2.recurse().notes:
     ...     print(n, n.tie)
@@ -1035,7 +1025,15 @@ def makeTies(
     <music21.note.Note B> None
     <music21.note.Note C> <music21.tie.Tie stop>
 
+
+    Changed in v4 -- inPlace = False by default.
+
     Changed in v6 -- all but first attribute are keyword only
+
+    OMIT_FROM_DOCS
+    TODO: take a list of classes to act as filter on what elements are tied.
+
+    configure ".previous" and ".next" attributes
     '''
     from music21 import stream
 
@@ -1198,6 +1196,8 @@ def makeTies(
                     #    mNext])
                     returnObj.insert(mNext.offset, mNext)
         mCount += 1
+    for measure in measureStream:
+        measure.flattenUnnecessaryVoices(inPlace=True)
     del measureStream  # clean up unused streams
 
     if not inPlace:
@@ -1624,6 +1624,9 @@ def setStemDirectionOneGroup(
     pitchList: List[pitch.Pitch] = []
     for n in group:
         pitchList.extend(n.pitches)
+    if not pitchList:
+        # Handle empty chord
+        return
     groupStemDirection = clef_context.getStemDirectionForPitches(pitchList)
 
     for n in group:
@@ -1727,6 +1730,23 @@ class Test(unittest.TestCase):
                          ['up'] * 4 + ['down'] * 6 + ['up'] * 4
                          + ['down', 'noStem', 'double', 'down']
                          )
+
+    def testMakeBeamsOnEmptyChord(self):
+        from music21 import chord, converter
+        p = converter.parse('tinyNotation: 4/4')
+        c1 = chord.Chord('d f')
+        c1.quarterLength = 0.5
+        c2 = chord.Chord('d f')
+        c2.quarterLength = 0.5
+        p.measure(1).insert(0, c1)
+        p.measure(1).insert(0.5, c2)
+        p.flat.notes[0].notes = []
+        p.flat.notes[1].notes = []
+        p.makeNotation(inPlace=True)
+        self.assertEqual(
+            [n.stemDirection for n in p.flat.notes],
+            ['unspecified', 'unspecified'],
+        )
 
     def testStreamExceptions(self):
         from music21 import converter, duration, stream

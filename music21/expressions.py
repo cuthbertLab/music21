@@ -441,7 +441,7 @@ class GeneralMordent(Ornament):
         self.direction = ''  # up or down
         self.size = None  # interval.Interval (General, etc.) class
         self.quarterLength = 0.125  # 32nd note default
-        self.size = interval.Interval(2)
+        self.size = interval.GenericInterval(2)
 
     def realize(self, srcObj: 'music21.note.Note'):
         '''
@@ -504,15 +504,24 @@ class GeneralMordent(Ornament):
 
 class Mordent(GeneralMordent):
     '''
-    A normal Mordent.
+    A normal Mordent -- goes downwards and has a line through it.
+
+    Note that some computer terminology calls this one an inverted mordent, but this
+    is a modern term.  See Apel, _Harvard Dictionary of Music_, "Mordent"::
+
+        A musical ornament consisting of the alternation of the written note
+        with the note immediately below it.
+
 
     >>> m = expressions.Mordent()
     >>> m.direction
     'down'
     >>> m.size
-    <music21.interval.Interval M2>
-    '''
+    <music21.interval.GenericInterval 2>
 
+    Changed in v7: Mordent sizes are GenericIntervals -- as was originally
+    intended but programmed incorrectly.
+    '''
     def __init__(self):
         super().__init__()
         self.direction = 'down'  # up or down
@@ -553,13 +562,25 @@ class WholeStepMordent(Mordent):
 # ------------------------------------------------------------------------------
 class InvertedMordent(GeneralMordent):
     '''
-    An inverted Mordent.
+    An inverted Mordent -- goes upwards and has no line through it.
+
+    Note that some computer terminology calls this one a (normal) mordent, but this
+    is a modern term.    See Apel, _Harvard Dictionary of Music_,
+    "Inverted Mordent"::
+
+        An 18th-century ornament involving alternation of the
+        written note with the note immediately above it.
+
+    An inverted mordent has the size of a generic second, of some form.
 
     >>> m = expressions.InvertedMordent()
     >>> m.direction
     'up'
     >>> m.size
-    <music21.interval.Interval M2>
+    <music21.interval.GenericInterval 2>
+
+    Changed in v7: InvertedMordent sizes are GenericIntervals -- as was originally
+    intended but programmed incorrectly.
     '''
 
     def __init__(self):
@@ -774,6 +795,9 @@ class Schleifer(Ornament):
 
 # ------------------------------------------------------------------------------
 class Turn(Ornament):
+    '''
+    A turn or Gruppetto.
+    '''
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('M2')

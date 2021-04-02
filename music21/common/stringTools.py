@@ -87,33 +87,34 @@ def getNumFromStr(usrStr: str, numbers: str = '0123456789') -> Tuple[str, str]:
 
 def hyphenToCamelCase(usrStr: str, replacement: str = '-') -> str:
     '''
-    given a hyphen-connected-string, change it to
+    Given a hyphen-connected-string, change it to
     a camelCaseConnectedString.
 
     The replacement can be specified to be something besides a hyphen.
-
-    This code is from:
-
-    http://stackoverflow.com/questions/4303492/
-    how-can-i-simplify-this-conversion-from-underscore-to-camelcase-in-python
 
     >>> common.hyphenToCamelCase('movement-name')
     'movementName'
 
     >>> common.hyphenToCamelCase('movement_name', replacement='_')
     'movementName'
-    '''
-    PATTERN = re.compile(r'''
-    (?<!\A)  # not at the start of the string
-    ''' + replacement + r'''
-    (?=[a-zA-Z])  # followed by a letter
-    ''', re.VERBOSE)
 
-    tokens = PATTERN.split(usrStr)
-    response = tokens.pop(0).lower()
-    for remain in tokens:
-        response += remain.capitalize()
-    return response
+    Safe to call on a string lacking the replacement character:
+
+    >>> common.hyphenToCamelCase('voice')
+    'voice'
+
+    And on "words" beginning with numbers:
+
+    >>> common.hyphenToCamelCase('music-21')
+    'music21'
+    '''
+    post = ''
+    for i, word in enumerate(usrStr.split(replacement)):
+        if i == 0:
+            post = word
+        else:
+            post += word.capitalize()
+    return post
 
 
 def camelCaseToHyphen(usrStr: str, replacement: str = '-') -> str:

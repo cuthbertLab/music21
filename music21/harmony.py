@@ -15,8 +15,11 @@ An object representation of harmony, a subclass of chord, as encountered as chor
 roman numerals, or other chord representations with a defined root.
 '''
 import collections
+import copy
 import re
 import unittest
+
+from typing import Optional, TypeVar
 
 from music21 import base
 from music21 import chord
@@ -32,9 +35,9 @@ from music21 import style
 from music21.figuredBass import realizerScale
 
 from music21 import environment
-_MOD = 'harmony'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('harmony')
 
+T = TypeVar('T')
 
 # --------------------------------------------------------------------------
 
@@ -2248,6 +2251,30 @@ class ChordSymbol(Harmony):
         else:
             return False
 
+    def transpose(self: T, value, *, inPlace=False) -> Optional[T]:
+        '''
+        Overrides :meth:`~music21.chord.Chord.transpose` so that this ChordSymbol's
+        `figure` is appropriately cleared afterward.
+
+        >>> cs = harmony.ChordSymbol('Am')
+        >>> cs.figure
+        'Am'
+        >>> cs.transpose(1)
+        <music21.harmony.ChordSymbol B-m>
+        >>> cs.transpose(5, inPlace=True)
+        >>> cs
+        <music21.harmony.ChordSymbol Dm>
+        >>> cs.figure
+        'Dm'
+        '''
+        post = super().transpose(value, inPlace=inPlace)
+        if not inPlace:
+            post.figure = None
+            return post
+        else:
+            self.figure = None
+            return None
+
 
 class NoChord(ChordSymbol):
     '''
@@ -2313,7 +2340,6 @@ class NoChord(ChordSymbol):
     >>> nc2.pitches
     ()
     '''
-
     def __init__(self, figure=None, **keywords):
 
         # override keywords to default values
@@ -2354,6 +2380,22 @@ class NoChord(ChordSymbol):
     @writeAsChord.setter
     def writeAsChord(self, val):
         pass
+
+    def transpose(self: T, _value, *, inPlace=False) -> Optional[T]:
+        '''
+        Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
+
+        >>> nc = harmony.NoChord()
+        >>> nc.figure
+        'N.C.'
+        >>> nc.transpose(8, inPlace=True)
+        >>> nc.figure
+        'N.C.'
+        '''
+        if not inPlace:
+            return copy.deepcopy(self)
+        else:
+            return None
 
 
 # ------------------------------------------------------------------------------

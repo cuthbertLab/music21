@@ -720,6 +720,7 @@ class Test(unittest.TestCase):
         self.assertEqual(out_stream.parts[0].measure(1)[0].figure, 'I')  # First item in measure 1
 
     def testM21ToTsv(self):
+        import os
         from music21 import corpus
 
         bachHarmony = corpus.parse('bach/choraleAnalyses/riemenschneider001.rntxt')
@@ -734,6 +735,7 @@ class Test(unittest.TestCase):
         initial.write(tempF)
         handler = TsvHandler(tempF)
         self.assertEqual(handler.tsvData[0][0], 'I')
+        os.remove(tempF)
 
     def testIsMinor(self):
         self.assertTrue(is_minor('f'))

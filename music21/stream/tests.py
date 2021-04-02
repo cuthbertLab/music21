@@ -1337,7 +1337,7 @@ class Test(unittest.TestCase):
 
         attackedTogether = stream1.simultaneousAttacks(stream2)
         self.assertEqual(len(attackedTogether), 3)  # nx1, nx2, nx4
-        thisNote = stream2.getElementsByOffset(attackedTogether[1])[0]
+        thisNote = stream2.getElementsByOffset(attackedTogether[1]).first()
         self.assertIs(thisNote, n22)
 
         playingWhenAttacked = stream1.playingWhenAttacked(n23)
@@ -1880,7 +1880,7 @@ class Test(unittest.TestCase):
             p.transferOffsetToElements()
             self.assertEqual(p.lowestOffset, partOffset)
 
-            p.makeRests()
+            p.makeRests(inPlace=True)
 
             # environLocal.printDebug(['first element', p[0], p[0].duration])
             # by default, initial rest should be made
@@ -1907,8 +1907,8 @@ class Test(unittest.TestCase):
         s.insert(0, m1)
         s.insert(4, m2)
         # must connect Measures to Streams before filling gaps
-        m1.makeRests(fillGaps=True, timeRangeFromBarDuration=True)
-        m2.makeRests(fillGaps=True, timeRangeFromBarDuration=True)
+        m1.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
+        m2.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
         self.assertTrue(m2.isSorted)
         # m2.sort()
 
@@ -3582,7 +3582,7 @@ class Test(unittest.TestCase):
         self.assertEqual(test, match)
 
         self.assertEqual(len(s), 5)
-        s.makeRests(fillGaps=True)
+        s.makeRests(inPlace=True, fillGaps=True)
         self.assertEqual(len(s), 8)
         self.assertEqual(len(s.getElementsByClass(note.Rest)), 3)
 
@@ -4341,7 +4341,7 @@ class Test(unittest.TestCase):
         s.insert(1, n2)  # overlapping, starting after n1 but finishing before
         s.insert(2, n3)
         s.insert(3, n4)  # overlapping, starting after n3 but finishing before
-        # s.makeRests(fillGaps=True)
+        # s.makeRests(inPlace=True, fillGaps=True)
         # this results in two chords; n2 and n4 are effectively shifted
         # to the start of n1 and n3
         sMod = s.makeChords(inPlace=False)
@@ -5380,12 +5380,12 @@ class Test(unittest.TestCase):
         s.insert(0, v3)
 
         sPost = s.makeNotation()
-        # voices are retained for all measures after make notation
+        # voices are retained for all measures after makeNotation, unless unnecessary
         self.assertEqual(len(sPost.getElementsByClass('Measure')), 8)
         self.assertEqual(len(sPost.getElementsByClass('Measure')[0].voices), 3)
         self.assertEqual(len(sPost.getElementsByClass('Measure')[1].voices), 3)
-        self.assertEqual(len(sPost.getElementsByClass('Measure')[5].voices), 3)
-        self.assertEqual(len(sPost.getElementsByClass('Measure')[7].voices), 3)
+        self.assertEqual(len(sPost.getElementsByClass('Measure')[4].voices), 2)
+        self.assertEqual(len(sPost.getElementsByClass('Measure')[5].voices), 0)
 
         # s.show()
 
@@ -8076,19 +8076,34 @@ class Test(unittest.TestCase):
         self.assertEqual(beams[4], stop_beam)  # last should be stop
 
     def testOpusWrite(self):
+        import os
+
         o = Opus()
         s1 = Score()
         s2 = Score()
         o.append([s1, s2])
 
         out = o.write()
+        otherFile = str(out).replace('-2', '-1')
         self.assertIsNotNone(out)
+        os.remove(out)
+        os.remove(otherFile)
 
-        out = o.write(fp=environLocal.getTempFile())
+        tmp = environLocal.getTempFile()
+        out = o.write(fp=tmp)
+        otherFile = str(out).replace('-2', '-1')
         self.assertTrue(str(out).endswith('-2.xml'))
+        self.assertTrue(os.path.exists(otherFile))
+        os.remove(tmp)
+        os.remove(out)
+        os.remove(otherFile)
 
         out = o.write(fmt='midi')
+        otherFile = str(out).replace('-2', '-1')
         self.assertTrue(str(out).endswith('-2.mid'))
+        self.assertTrue(os.path.exists(otherFile))
+        os.remove(out)
+        os.remove(otherFile)
 
     def testActiveSiteAfterBoolIteration(self):
         n = note.Note()

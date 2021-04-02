@@ -369,12 +369,12 @@ class XMLParserBase:
             stObj = None
 
         if not common.isIterable(musicXMLNames):
-            musicXMLNames = [musicXMLNames]
+            musicXMLNames = (musicXMLNames,)
 
         if m21Names is None:
-            m21Names = [common.hyphenToCamelCase(x) for x in musicXMLNames]
+            m21Names = (common.hyphenToCamelCase(x) for x in musicXMLNames)
         elif not common.isIterable(m21Names):
-            m21Names = [m21Names]
+            m21Names = (m21Names,)
 
         for xmlName, m21Name in zip(musicXMLNames, m21Names):
             mxValue = mxObject.get(xmlName)
@@ -2674,7 +2674,8 @@ class MeasureParser(XMLParserBase):
 
         # TODO: beams over rests?
         '''
-        n = note.Note()
+        d = self.xmlToDuration(mxNote)
+        n = note.Note(duration=d)
 
         # send whole note since accidental display not in <pitch>
         self.xmlToPitch(mxNote, n.pitch)
@@ -3043,7 +3044,8 @@ class MeasureParser(XMLParserBase):
         Note that we do NOT set `r`'s `.fullMeasure` to True or always, but keep it as
         "auto" so that changes in time signature, etc. will affect output.
         '''
-        r = note.Rest()
+        d = self.xmlToDuration(mxRest)
+        r = note.Rest(duration=d)
         mxRestTag = mxRest.find('rest')
         if mxRestTag is None:
             raise MusicXMLImportException('do not call xmlToRest on a <note> unless it '
@@ -3051,7 +3053,7 @@ class MeasureParser(XMLParserBase):
         isFullMeasure = mxRestTag.get('measure')
         if isFullMeasure == 'yes':
             self.fullMeasureRest = True  # force full measure rest...
-            r.measureRest = True
+            r.fullMeasure = True
             # this attribute is not 100% necessary to get a multi-measure rest spanner
 
         if self.parent:  # will apply if active
@@ -3085,13 +3087,21 @@ class MeasureParser(XMLParserBase):
     def xmlNoteToGeneralNoteHelper(self, n, mxNote, freeSpanners=True):
         '''
         Combined function to work on all <note> tags, where n can be
-        a Note or Rest
+        a Note or Rest.
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> n = note.Note()
+        >>> mxNote = EL('<note color="silver"></note>')
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> n = MP.xmlNoteToGeneralNoteHelper(n, mxNote)
+        >>> n.style.color
+        'silver'
         '''
         spannerBundle = self.spannerBundle
         if freeSpanners is True:
             spannerBundle.freePendingSpannedElementAssignment(n)
 
-        # attributes
+        # attributes, including color and position
         self.setPrintStyle(mxNote, n)
         # print object == 'no' and grace notes may have a type but not
         # a duration. they may be filtered out at the level of Stream
@@ -3121,16 +3131,12 @@ class MeasureParser(XMLParserBase):
                 # this technically puts it in the
                 # wrong place in the sequence, but it won't matter
                 ET.SubElement(mxNote, '<type>eighth</type>')
-
-        self.xmlToDuration(mxNote, n.duration)
+            self.xmlToDuration(mxNote, n.duration)
 
         # type styles
         mxType = mxNote.find('type')
         if mxType is not None:
             self.setStyleAttributes(mxType, n, 'size', 'noteSize')
-
-        self.setColor(mxNote, n)
-        self.setPosition(mxNote, n)
 
         if mxNote.find('tie') is not None:
             n.tie = self.xmlToTie(mxNote)
@@ -4665,6 +4671,7 @@ class MeasureParser(XMLParserBase):
                                            'placement', 'positionPlacement')
 
                 self.insertCoreAndRef(totalOffset, staffKey, d)
+                self.setPosition(mxDir, d)
                 self.setEditorial(mxDirection, d)
 
         elif tag in ('wedge', 'bracket', 'dashes'):
@@ -4675,6 +4682,7 @@ class MeasureParser(XMLParserBase):
                 spannerList = []
 
             for sp in spannerList:
+                self.setPosition(mxDir, sp)
                 self.setEditorial(mxDirection, sp)
 
         elif tag in ('coda', 'segno'):
@@ -4684,12 +4692,7 @@ class MeasureParser(XMLParserBase):
                 rm = repeat.Coda()
 
             _synchronizeIds(mxDir, rm)
-            dX = mxDir.get('default-x')
-            if dX is not None:
-                rm.style.absoluteX = common.numToIntOrFloat(dX)
-            dY = mxDir.get('default-y')
-            if dY is not None:
-                rm.style.absoluteY = common.numToIntOrFloat(dY)
+            self.setPosition(mxDir, rm)
             self.insertCoreAndRef(totalOffset, staffKey, rm)
             self.setEditorial(mxDirection, rm)
 
@@ -4726,7 +4729,22 @@ class MeasureParser(XMLParserBase):
 
     def xmlToTextExpression(self, mxWords):
         '''
-        Given an mxDirection, create a textExpression
+        Given an `mxWords`, create a :class:`~music21.expression.TextExpression`
+        and set style attributes, fonts, position, etc.
+
+        Calls `setTextFormatting`, which calls `setPrintStyleAlign`.
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> m = EL('<words default-y="17" font-family="Courier" ' +
+        ... 'font-style="italic" relative-x="-6">a tempo</words>')
+        >>> te = MP.xmlToTextExpression(m)
+        >>> te.content
+        'a tempo'
+        >>> te.style.relativeX
+        -6
+        >>> te.style.fontFamily
+        ['Courier']
         '''
         # TODO: switch to using the setPrintAlign, etc.
 
@@ -4739,7 +4757,6 @@ class MeasureParser(XMLParserBase):
             wordText = ''
         te = expressions.TextExpression(wordText)
         self.setTextFormatting(mxWords, te)
-        self.setPosition(mxWords, te)
         return te
 
     def xmlToRehearsalMark(self, mxRehearsal):
@@ -4831,6 +4848,7 @@ class MeasureParser(XMLParserBase):
                 mm.parentheses = True
 
         _synchronizeIds(mxMetronome, mm)
+        self.setPosition(mxMetronome, mm)
         return mm
 
     def xmlToOffset(self, mxObj):
@@ -5344,7 +5362,7 @@ class MeasureParser(XMLParserBase):
             raise MusicXMLImportException(
                 'For non traditional signatures each step must have an alter')
 
-        ks = key.KeySignature()
+        ks = key.KeySignature(sharps=None)
 
         alteredPitches = []
         for i in range(len(allSteps)):
@@ -5598,8 +5616,8 @@ class MeasureParser(XMLParserBase):
         True
         >>> len(MP.stream)
         2
-        >>> len(MP.stream.getElementsByClass('Voice'))
-        2
+        >>> list(MP.stream.getElementsByClass('Voice'))
+        [<music21.stream.Voice 1>, <music21.stream.Voice 2>]
         '''
         mxm = self.mxMeasure
         for mxn in mxm.findall('note'):
@@ -6804,6 +6822,48 @@ class Test(unittest.TestCase):
         self.assertEqual(ly3.components[1].syllabic, 'middle')
         self.assertEqual(ly3.components[2].syllabic, 'end')
         self.assertEqual(len(s.lyrics(recurse=True)[1][0]), 4)
+
+    def testDirectionPosition(self):
+        from music21 import converter
+        from music21 import corpus
+        from music21.musicxml import testPrimitive, testFiles
+
+        # Dynamic
+        s = converter.parse(testFiles.mozartTrioK581Excerpt)
+        dyn = s.recurse().getElementsByClass('Dynamic').first()
+        self.assertEqual(dyn.style.relativeY, 6)
+
+        # Coda/Segno
+        s = converter.parse(testPrimitive.repeatExpressionsA)
+        seg = s.recurse().getElementsByClass('Segno').first()
+        self.assertEqual(seg.style.relativeX, 10)
+
+        # TextExpression
+        s = converter.parse(testPrimitive.textExpressions)
+        positionedEls = [el for el in s.recurse() if el.hasStyleInformation
+            and el.style.relativeX is not None]
+        self.assertEqual(len(positionedEls), 3)
+        self.assertEqual(
+            list(set(type(el) for el in positionedEls)),
+            [expressions.TextExpression]
+        )
+
+        # Wedge
+        s = corpus.parse('beach')
+        positionedEls = [el for el in s.recurse() if el.hasStyleInformation
+            and el.style.relativeX is not None]
+        self.assertEqual(len(positionedEls), 40)
+        self.assertEqual(
+            sorted(set(type(el) for el in positionedEls), key=repr),
+            [dynamics.Crescendo, dynamics.Diminuendo, dynamics.Dynamic, expressions.TextExpression]
+        )
+        crescendos = [el for el in positionedEls if 'Crescendo' in el.classes]
+        self.assertEqual(crescendos[0].style.relativeX, -6)
+
+        # Metronome
+        s = converter.parse(testFiles.tabTest)
+        metro = s.recurse().getElementsByClass('MetronomeMark').first()
+        self.assertEqual(metro.style.absoluteY, 40)
 
 
 if __name__ == '__main__':
