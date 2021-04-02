@@ -2204,7 +2204,7 @@ class ChordSymbol(Harmony):
             'Tristan',
             'augmented-seventh',
             'diminished-seventh',
-            'dominant',
+            'dominant-seventh',
             'half-diminished',
             'major-minor',
             'major-seventh',
@@ -2708,11 +2708,7 @@ class Test(unittest.TestCase):
           </harmony>
           """
         figure = 'A7/G'
-        pitches = ('G2', 'A3', 'C#4', 'E4', 'G4')
-        # TODO: Get rid of the extra G once we do something about ChordSymbol construction,
-        # since currently bass() is called before _updatePitches()
-        # and each of them is creating a G
-        # https://github.com/cuthbertLab/music21/issues/793
+        pitches = ('G2', 'A2', 'C#3', 'E3')
 
         self.runTestOnChord(xmlString, figure, pitches)
 
