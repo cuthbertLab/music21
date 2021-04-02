@@ -2184,7 +2184,7 @@ class IntervalNetwork:
 
         '''
         # noinspection PyPackageRequirements
-        import networkx
+        import networkx  # pylint: disable=import-error
         weight = 1
         style = 'solid'
 

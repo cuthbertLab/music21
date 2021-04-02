@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import contextlib
-from typing import Any, Type, Iterable, Dict
+from typing import Any, Type, Dict
 
 # from music21 import exceptions21
 __all__ = [
