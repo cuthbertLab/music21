@@ -1415,7 +1415,7 @@ class RomanNumeral(harmony.Harmony):
     'half-diminished seventh chord'
 
     >>> alteredChordHalfDim3rdInv.romanNumeral
-    '-ii'
+    'bii'
 
     >>> alteredChordHalfDim3rdInv.romanNumeralAlone
     'ii'
@@ -1605,6 +1605,41 @@ class RomanNumeral(harmony.Harmony):
     >>> r.pitches
     ()
 
+    Equality:
+
+    Two RomanNumerals compare equal if their `NotRest` components
+    (noteheads, beams, expressions, articulations, etc.) are equal
+    and if their figures and keys are equal:
+
+    >>> c1 = chord.Chord('C4 E4 G4 C5')
+    >>> c2 = chord.Chord('C3 E4 G4')
+    >>> rn1 = roman.romanNumeralFromChord(c1, 'C')
+    >>> rn2 = roman.romanNumeralFromChord(c2, 'C')
+    >>> rn1 == rn2
+    True
+    >>> rn1.duration.type = 'half'
+    >>> rn1 == rn2
+    False
+    >>> rn3 = roman.RomanNumeral('I', 'd')
+    >>> rn2 == rn3
+    False
+    >>> rn3.key = key.Key('C')
+    >>> rn2 == rn3
+    True
+    >>> rn4 = roman.RomanNumeral('ii', 'C')
+    >>> rn2 == rn4
+    False
+    >>> rn4.figure = 'I'
+    >>> rn2 == rn4
+    True
+
+    Changed in v6.5 -- caseMatters is keyword only. It along with sixthMinor and
+    seventhMinor are now the only allowable keywords to pass in.
+
+    Changed in v7 -- RomanNumeral.romanNumeral will always give a "b" for a flattened
+    degree (i.e., '-II' becomes 'bII') as this is what people expect in looking at
+    the figure.
+
 
     OMIT_FROM_DOCS
 
@@ -1649,37 +1684,7 @@ class RomanNumeral(harmony.Harmony):
     >>> cp(r)
     ['G4']
 
-
-    Equality:
-
-    Two RomanNumerals compare equal if their `NotRest` components
-    (noteheads, beams, expressions, articulations, etc.) are equal
-    and if their figures and keys are equal:
-
-    >>> c1 = chord.Chord('C4 E4 G4 C5')
-    >>> c2 = chord.Chord('C3 E4 G4')
-    >>> rn1 = roman.romanNumeralFromChord(c1, 'C')
-    >>> rn2 = roman.romanNumeralFromChord(c2, 'C')
-    >>> rn1 == rn2
-    True
-    >>> rn1.duration.type = 'half'
-    >>> rn1 == rn2
-    False
-    >>> rn3 = roman.RomanNumeral('I', 'd')
-    >>> rn2 == rn3
-    False
-    >>> rn3.key = key.Key('C')
-    >>> rn2 == rn3
-    True
-    >>> rn4 = roman.RomanNumeral('ii', 'C')
-    >>> rn2 == rn4
-    False
-    >>> rn4.figure = 'I'
-    >>> rn2 == rn4
-    True
-
-    Changed in v6.5 -- caseMatters is keyword only. It along with sixthMinor and
-    seventhMinor are now the only allowable keywords to pass in.
+    (NOTE: all this is omitted -- look at OMIT_FROM_DOCS above)
     '''
     # TODO: document better! what is inherited and what is new?
 
