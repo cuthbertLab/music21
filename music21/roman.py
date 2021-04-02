@@ -2923,19 +2923,32 @@ class RomanNumeral(harmony.Harmony):
     def romanNumeral(self):
         '''
         Read-only property that returns either the romanNumeralAlone (e.g. just
-        II) or the frontAlterationAccidental.modifier + romanNumeralAlone (e.g. #II)
+        II) or the frontAlterationAccidental.modifier (with 'b' for '-') + romanNumeralAlone
+        (e.g. #II, bII)
 
         >>> from music21 import roman
         >>> rn = roman.RomanNumeral('#II7')
         >>> rn.romanNumeral
         '#II'
 
+        >>> rn = roman.RomanNumeral('Ger+6')
+        >>> rn.romanNumeral
+        'Ger'
+
+        >>> rn = roman.RomanNumeral('bbII/V')
+        >>> rn.romanNumeral
+        'bbII'
+        >>> rn = roman.RomanNumeral('--II/V')
+        >>> rn.romanNumeral
+        'bbII'
         '''
+        if self.romanNumeralAlone in ('Ger', 'Sw', 'It', 'Fr'):
+            return self.romanNumeralAlone
         if self.frontAlterationAccidental is None:
             return self.romanNumeralAlone
-        else:
-            return (self.frontAlterationAccidental.modifier
-                    + self.romanNumeralAlone)
+
+        return (self.frontAlterationAccidental.modifier.replace('-', 'b')
+                + self.romanNumeralAlone)
 
     @property
     def figure(self):
