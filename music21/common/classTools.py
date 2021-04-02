@@ -169,7 +169,9 @@ def getClassSet(instance, classNameTuple=None):
     classSet = frozenset(classList)
     return classSet
 
+
 TEMP_ATTRIBUTE_SENTINEL = object()
+
 
 @contextlib.contextmanager
 def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
@@ -226,7 +228,7 @@ def saveAttributes(obj, *attributeList):
         yield
     finally:
         for k, v in tempStorage.items():  # dicts are ordered in 3.7
-                setattr(obj, k, v)
+            setattr(obj, k, v)
 
 
 # ------------------------------------------------------------------------------
