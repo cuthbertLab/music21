@@ -1613,11 +1613,11 @@ class RecursiveIterator(StreamIterator):
         self.activeInformation['lastYielded'] = None
         super().reset()
 
-    def matchingElements(self):
+    def matchingElements(self, *, restoreActiveSites=True):
         # saved parent iterator later?
         # will this work in mid-iteration? Test, or do not expose till then.
         with tempAttribute(self, 'childRecursiveIterator'):
-            fe = super().matchingElements()
+            fe = super().matchingElements(restoreActiveSites=restoreActiveSites)
         return fe
 
     def iteratorStack(self):
