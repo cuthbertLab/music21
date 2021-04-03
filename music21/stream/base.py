@@ -231,6 +231,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # TODO: perhaps convert a single element into a list?
             for e in givenElements:
                 try:
+                    self.coreGuardBeforeAddElement(e)
                     self.coreInsert(e.offset, e)
                 except (AttributeError, TypeError):
                     raise StreamException(f'Unable to insert {e}')

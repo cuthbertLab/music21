@@ -384,7 +384,7 @@ class StreamCoreMixin:
         Before adding an element, this method provides
         important checks to that element.
 
-        Used by both insert() and append()
+        Used by insert() and append() and Stream.__init__()
 
         Returns None or raises a StreamException
 
