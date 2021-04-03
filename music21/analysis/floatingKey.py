@@ -59,6 +59,22 @@ class KeyAnalyzer:
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>]
+
+    Fixed in v.7 -- analysis now incorporates final measures in pieces without pickup measures:
+
+    >>> tiny = converter.parse('tinyNotation: c1 e1 g1 c1 d-4 d-4 d-4 d-4')
+    >>> ka = analysis.floatingKey.KeyAnalyzer(tiny)
+    >>> ka.windowSize = 1
+    >>> ka.run()  # This previously only gave four elements: am, CM, CM, CM
+    [<music21.key.Key of a minor>, <music21.key.Key of C major>, <music21.key.Key of C major>,
+     <music21.key.Key of C major>, <music21.key.Key of b- minor>]
+
+    No measures will fail.
+
+    >>> s = stream.Part([note.Note()])
+    >>> ka = analysis.floatingKey.KeyAnalyzer(s)
+    Traceback (most recent call last):
+    music21.analysis.floatingKey.FloatingKeyException: Stream must have Measures inside it
     '''
     def __init__(self, s=None):
         if s is None:
@@ -70,12 +86,21 @@ class KeyAnalyzer:
 
         self.weightAlgorithm = divide
         if s.hasPartLikeStreams():
-            p = s.parts.first()
+            p = s.iter.parts.first()
         else:
             p = s
-        self.numMeasures = len(p.getElementsByClass('Measure'))  # could be wrong for endings, etc.
-        if self.numMeasures == 0:
+        self.firstPartMeasures = p.getElementsByClass('Measure')  # could be wrong for endings, etc.
+
+        if not self.firstPartMeasures:
             raise FloatingKeyException("Stream must have Measures inside it")
+
+        self.anacrusis: bool = self.firstPartMeasures.first().number == 0
+        self.highestMeasureNumber = len(self.firstPartMeasures)
+        if self.anacrusis:
+            self.highestMeasureNumber -= 1
+
+        # NO LONGER USEFUL -- Provided for backwards-compatibility, but can be removed in v.8
+        self.numMeasures = len(self.firstPartMeasures)
 
     def run(self):
         self.getRawKeyByMeasure()
@@ -83,9 +108,10 @@ class KeyAnalyzer:
 
     def getRawKeyByMeasure(self):
         keyByMeasure = []
-        for i in range(self.numMeasures):
-            m = self.stream.measure(i)
-            if m is None or not m.recurse().notes:
+        for firstPartMeasure in self.firstPartMeasures:
+            # now `m` is a measure-slice of the entire stream
+            m = self.stream.measure(firstPartMeasure.number)
+            if not m.recurse().notes:
                 k = None
             else:
                 k = m.analyze('key')
@@ -93,15 +119,22 @@ class KeyAnalyzer:
         self.rawKeyByMeasure = keyByMeasure
         return keyByMeasure
 
-    def getInterpretationByMeasure(self, mNumber):
+    def getInterpretationByMeasure(self, mNumber, anacrusis: bool = True):
         '''
         Returns a dictionary of interpretations for the measure.
+
+        New in v.7 = if anacrusis is True (default), mNumber will be presumed
+        to be 0-indexed. This behavior may change in the future.
         '''
         if mNumber in self._interpretationMeasureDict:
             return self._interpretationMeasureDict[mNumber]  # CACHE
         if not self.rawKeyByMeasure:
             self.getRawKeyByMeasure()
-        mk = self.rawKeyByMeasure[mNumber]
+        if anacrusis:
+            i = mNumber
+        else:
+            i = mNumber - 1
+        mk = self.rawKeyByMeasure[i]
         if mk is None:
             return None
         # noinspection PyDictCreation
@@ -116,15 +149,21 @@ class KeyAnalyzer:
         smoothedKeysByMeasure = []
         algorithm = self.weightAlgorithm
 
-        for i in range(self.numMeasures):
-            baseInterpretations = self.getInterpretationByMeasure(i)
+        for m in self.firstPartMeasures:
+            i = m.number
+            baseInterpretations = self.getInterpretationByMeasure(i, anacrusis=self.anacrusis)
             if baseInterpretations is None:
                 continue
             for j in range(-1 * self.windowSize, self.windowSize + 1):  # -2, -1, 0, 1, 2 etc.
                 mNum = i + j
-                if mNum < 0 or mNum >= self.numMeasures or mNum == i:
+                if (
+                    mNum < 0
+                    or mNum > self.highestMeasureNumber
+                    or mNum == i
+                    or (not self.anacrusis and mNum == 0)
+                ):
                     continue
-                newInterpretations = self.getInterpretationByMeasure(mNum)
+                newInterpretations = self.getInterpretationByMeasure(mNum, anacrusis=self.anacrusis)
                 if newInterpretations is not None:
                     for k in baseInterpretations:
                         coefficient = algorithm(newInterpretations[k], j)
