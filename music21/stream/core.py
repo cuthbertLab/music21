@@ -392,10 +392,18 @@ class StreamCoreMixin:
         >>> s.coreGuardBeforeAddElement(s)
         Traceback (most recent call last):
         music21.exceptions21.StreamException: this Stream cannot be contained within itself
+
+        >>> s.append(s.iter)
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: cannot insert StreamIterator into a Stream
+        Iterate over it instead (Users Guide chs. 6 and 26)
         '''
         # using id() here b/c we do not want to get __eq__ comparisons
         if element is self:  # cannot add this Stream into itself
             raise StreamException('this Stream cannot be contained within itself')
+        if 'StreamIterator' in element.classes:
+            raise StreamException('cannot insert StreamIterator into a Stream\n'
+            'Iterate over it instead (Users Guide chs. 6 and 26)')
         if checkRedundancy:
             idElement = id(element)
             if idElement in self._offsetDict:
