@@ -1357,7 +1357,7 @@ class Converter:
 class Test(unittest.TestCase):
     parseTest = '1/4 trip{C8~ C~_hello C=mine} F~ F~ 2/8 F F# quad{g--16 a## FF(n) g#} g16 F0'
 
-    def testOne(self):
+    def testOne(self) -> None:
         c = Converter(self.parseTest)
         c.parse()
         s = c.stream
@@ -1375,7 +1375,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sfn[12].duration.quarterLength, 1.0)
         self.assertEqual(sfn[12].expressions[0].classes, expressions.Fermata().classes)
 
-    def testRaiseExceptions(self):
+    def testRaiseExceptions(self) -> None:
         error_states = [
             {
                 "string": "h",
@@ -1403,26 +1403,51 @@ class Test(unittest.TestCase):
         ]
 
         for error_state in error_states:
-            try:
-                converter = Converter(error_state["string"], raiseExceptions=True)
-                result = converter.parse()
-                result.stream.show('text')
-                self.fail(
+            with self.assertRaises(TinyNotationException, msg=(
                     "Should have raised a TinyNotationException for input "
                     f'"{error_state["string"]}" because {error_state["reason"]}.'
+            )):
+                converter = Converter(error_state["string"], raiseExceptions=True)
+                converter.parse()
+
+    def testGetDefaultTokenMap(self) -> None:
+        defaultTokenMap = _getDefaultTokenMap()
+
+        self.assertEqual(
+            len(defaultTokenMap),
+            3,
+            (
+                "There should be three valid token types by default: Time "
+                "signatures, Notes, and Rests"
+            )
+        )
+
+        validTokenTypeCounts = {
+            NoteToken: 0,
+            RestToken: 0,
+            TimeSignatureToken: 0,
+        }
+
+        for regex, tokenType in defaultTokenMap:
+            self.assertIn(
+                tokenType,
+                validTokenTypeCounts,
+                (
+                    "Found unexpected token type in default token map:"
+                    f"{tokenType.__class__.__name__}."
                 )
-            except TinyNotationException as e:
-                # We expected to raise this exception
-                pass
-            except AssertionError:
-                # The test failed. Reraise the original test failure
-                raise
-            except Exception as e:
-                raise AssertionError(
-                    "Should have raised a TinyNotationException for input "
-                    f'"{error_state["string"]}" because {error_state["reason"]} '
-                    f"but actually raised {e.__class__.__name__}."
-                ) from e
+            )
+            validTokenTypeCounts[tokenType] += 1
+
+        for tokenType in validTokenTypeCounts:
+            self.assertEqual(
+                validTokenTypeCounts[tokenType],
+                1,
+                (
+                    "Should have found each valid token type exactly once in "
+                    "the default token map."
+                )
+            )
 
 
 
