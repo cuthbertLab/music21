@@ -844,14 +844,18 @@ class ConverterMusicXML(SubConverter):
                                          }
 
     # --------------------------------------------------------------------------
-    def findPNGfpFromXMLfp(self, xmlFilePath: Union[str, pathlib.Path]) -> str:
+    def findNumberedPNGPath(self, inputFp: Union[str, pathlib.Path]) -> str:
         '''
-        Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
-        then return appropriate fp. Raises an exception if png fp does not exist.
+        Find the first numbered file path corresponding to the provided unnumbered file path
+        ending in ".png". Raises an exception if no file can be found.
+
+        Renamed in v7.
         '''
-        # TODO: xmlFilePath is misleading, since we're passing in a .png path
-        xmlFilePath = str(xmlFilePath)  # not pathlib.
-        path_without_extension = xmlFilePath[:-1 * len('.png')]
+        inputFp = str(inputFp)  # not pathlib.
+        if not inputFp.endswith('.png'):
+            raise SubConverterException(f'inputFp must end with ".png"; got {inputFp}')
+
+        path_without_extension = inputFp[:-1 * len('.png')]
 
         for search_extension in ('1', '01', '001', '0001', '00001'):
             search_path = path_without_extension + '-' + search_extension + '.png'
@@ -859,7 +863,7 @@ class ConverterMusicXML(SubConverter):
                 return search_path
 
         raise SubConverterFileIOException(
-            f'No png file for {xmlFilePath} (such as {path_without_extension}-1.png) was found.  '
+            f'No png file for {inputFp} (such as {path_without_extension}-1.png) was found.  '
             + 'The conversion to png failed'
         )
 
@@ -944,7 +948,7 @@ class ConverterMusicXML(SubConverter):
         sys.stderr = storedStrErr
 
         if subformatExtension == 'png':
-            return self.findPNGfpFromXMLfp(fpOut)
+            return self.findNumberedPNGPath(fpOut)
         else:
             return fpOut
         # common.cropImageFromPath(fp)
@@ -1422,39 +1426,29 @@ class Test(unittest.TestCase):
             testConverter.parseFile(testPath)
             self.assertEqual(1, mockConv.call_count)
 
-    def x_testXMLtoPNG(self):
+    def testXMLtoPNG(self):
         '''
-        testing the findPNGfpFromXMLfp method with three different files of lengths
-        that create .png files with -1, -01, and -001 in the fp
-
-        Doesn't work. Was mocking wrong behavior.
-        TODO: fix up
+        Testing findNumberedPNGPath() with files of lengths
+        that create .png files with -1, -01, -001, and -0001 in the fp
         '''
         env = environment.Environment()
-        for ext_base in '1', '01', '001':
+        for ext_base in '1', '01', '001', '0001':
             png_ext = '-' + ext_base + '.png'
 
-            tempFp1 = str(env.getTempFile())
-            xmlFp1 = tempFp1 + '.musicxml'
-            os.rename(tempFp1, tempFp1 + png_ext)
-            tempFp1 += png_ext
-            xmlConverter1 = ConverterMusicXML()
-            pngFp1 = xmlConverter1.findPNGfpFromXMLfp(xmlFp1)
-            self.assertEqual(pngFp1, tempFp1)
-            os.remove(tempFp1)
+            tmp = env.getTempFile(suffix='.png', returnPathlib=False)
+            tmpNumbered = tmp.replace('.png', png_ext)
+            os.rename(tmp, tmpNumbered)
+            pngFp1 = ConverterMusicXML().findNumberedPNGPath(tmp)
+            self.assertEqual(pngFp1, tmpNumbered)
+            os.remove(tmpNumbered)
 
-    def testXMLtoPNGTooLong(self):
-        '''
-        testing the findPNGfpFromXMLfp method with a file that is obscenely long
-        '''
-        env = environment.Environment()
-        tempFp = str(env.getTempFile())
-        xmlFp = tempFp + '.musicxml'
-        os.rename(tempFp, tempFp + '-0000001.png')
-        tempFp += '-0000001.png'
-        xmlConverter = ConverterMusicXML()
-        self.assertRaises(SubConverterFileIOException, xmlConverter.findPNGfpFromXMLfp, xmlFp)
-        os.remove(tempFp)
+        # Now with a very long path.
+        tmp = env.getTempFile(suffix='.png', returnPathlib=False)
+        tmpNumbered = tmp.replace('.png', '-0000001.png')
+        os.rename(tmp, tmpNumbered)
+        with self.assertRaises(SubConverterFileIOException):
+            ConverterMusicXML().findNumberedPNGPath(tmpNumbered)
+        os.remove(tmpNumbered)
 
     def testWriteMXL(self):
         from music21 import converter
