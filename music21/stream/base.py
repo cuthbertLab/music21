@@ -4451,12 +4451,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # Replace old measures in spanners with new measures
         # Example: out is a Part, out.spannerBundle has RepeatBrackets spanning measures
-        if len(self.getElementsByClass('Measure')) == len(out.getElementsByClass('Measure')):
-            for oldM, newM in zip(
-                self.getElementsByClass('Measure'),
-                out.getElementsByClass('Measure')
-            ):
-                out.spannerBundle.replaceSpannedElement(oldM, newM)
+        # TODO: when dropping support for Py3.9 add strict=True
+        for oldM, newM in zip(
+            self.getElementsByClass('Measure'),
+            out.getElementsByClass('Measure')
+        ):
+            out.spannerBundle.replaceSpannedElement(oldM, newM)
 
         optionalAddRest()
         out.coreElementsChanged()
