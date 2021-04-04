@@ -1438,6 +1438,15 @@ class Test(unittest.TestCase):
                 )
             )
             validTokenTypeCounts[tokenType] += 1
+            self.assertGreater(
+                len(regex),
+                0,
+                (
+                    "Should provide a non-empty string for the regular "
+                    "expression in the default token map for tokens of type "
+                    f"{tokenType.__class__.__name__}."
+                )
+            )
 
         for tokenType in validTokenTypeCounts:
             self.assertEqual(
