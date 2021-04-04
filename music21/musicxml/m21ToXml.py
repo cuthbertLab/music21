@@ -6431,6 +6431,13 @@ class Test(unittest.TestCase):
         endings = x.findall('.//ending')
         self.assertEqual([e.get('number') for e in endings], ['1,2', '1,2', '3', '3'])
 
+        # Check templates also
+        template = s.template()
+        template.makeNotation(inPlace=True)  # not essential, but since getET() skips this
+        x = self.getET(template)
+        endings = x.findall('.//ending')
+        self.assertEqual([e.get('number') for e in endings], ['1,2', '1,2', '3', '3'])
+
         # m21 represents lack of bracket numbers as 0; musicxml uses ''
         s.parts[0].getElementsByClass('RepeatBracket').first().number = 0
         x = self.getET(s)
