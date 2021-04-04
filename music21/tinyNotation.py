@@ -230,6 +230,7 @@ import collections
 import copy
 import re
 import sre_parse
+import typing
 import unittest
 
 from music21 import note
@@ -751,6 +752,128 @@ class NoteToken(NoteOrRestToken):
         return t
 
 
+def _getDefaultTokenMap() -> typing.List[
+        typing.Tuple[
+            str,
+            typing.Type[Token]
+        ]
+]:
+    """
+    Returns the default tokenMap for TinyNotation.
+
+    Based on the following grammar (in Extended Backus-Naur form)
+    (https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
+
+    (* Items in (parentheses) are grouped *)
+    (* Items in {curly braces} appear zero or more times *)
+    (* Items in [square brackets] may appear exactly zero or one time *)
+    (* Items in "double quotes" are literal strings *)
+    (* Each rule is ended by a semicolon; *)
+
+    TINY-NOTATION = TOKEN, { WHITESPACE, TOKEN } ;
+    TOKEN = ( TIME-SIGNATURE | TUPLET | REST | NOTE );
+    TIME-SIGNATURE = INTEGER, "/", INTEGER ;
+    INTEGER = { "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" } ;
+    WHITESPACE = " ", { " " } ;
+    TUPLET = ( "trip" | "quad" ), "{",
+        [ WHITESPACE ],
+        ( REST | NOTE ),
+        { WHITESPACE, ( REST | NOTE ) },
+        [ WHITESPACE ],
+    "}" ;
+    REST = "r", [ DURATION ], [ MODIFIER ] ;
+    DURATION = ( EVEN-NUMBER, { "." } | { "." }, EVEN-NUMBER | ".", { "." } ) ;
+    EVEN-NUMBER = { INTEGER }, ( "0" | "2" | "4" | "6" | "8" ) ;
+    NOTE = PITCH, [ DURATION ], [ TIE ], { MODIFIER } ;
+    PITCH = (
+        ( LOW-A | LOW-B | LOW-C | LOW-D | LOW-E | LOW-F | LOW-G ), [ ACCIDENTAL ] |
+        ( HIGH-A | HIGH-B | HIGH-C | HIGH-D | HIGH-E | HIGH-F | HIGH-G ), [ ACCIDENTAL ], { "'" } |
+        ( HIGH-A | HIGH-B | HIGH-C | HIGH-D | HIGH-E | HIGH-F | HIGH-G ), { "'" }, [ ACCIDENTAL ]
+    ) ;
+    LOW-A = "A", { "A" } ;
+    LOW-B = "B", { "B" } ;
+    LOW-C = "C", { "C" } ;
+    LOW-D = "D", { "D" } ;
+    LOW-E = "E", { "E" } ;
+    LOW-F = "F", { "F" } ;
+    LOW-G = "G", { "G" } ;
+    (* I'm pretty sure high notes should only have a single letter, but there *)
+    (* are examples in music21.key.tonalCertainty where the lower-cased *)
+    (* letter is repeated. *)
+    HIGH-A = "a", { "a" } ;
+    HIGH-B = "b", { "b" } ;
+    HIGH-C = "c", { "c" } ;
+    HIGH-D = "d", { "d" } ;
+    HIGH-E = "e", { "e" } ;
+    HIGH-F = "f", { "f" } ;
+    HIGH-G = "g", { "g" } ;
+    ACCIDENTAL = ( EDITORIAL | SHARPS | FLATS | NATURAL ) ;
+    EDITORIAL = "(", ( SHARPS | FLATS | NATURAL ), ")" ;
+    SHARPS = "#", { "#" } ;
+    FLATS = "-", { "-" } ;
+    NATURAL = "n" ;
+    TIE = "~" ;
+    MODIFIER = (
+        EQUALS-MODIFIER |
+        UNDERSCORE-MODIFIER |
+        SQUARE-MODIFIER |
+        ANGLE-MODIFIER |
+        PARENS-MODIFIER |
+        STAR-MODIFIER
+    ) ;
+    EQUALS-MODIFIER = "=", DATA ;
+    UNDERSCORE-MODIFIER = "_", DATA ;
+    SQUARE-MODIFIER = "[", DATA, "]" ;
+    ANGLE-MODIFIER = "<", DATA, ">" ;
+    PARENS-MODIFIER = "(", DATA, ")" ;
+    STAR-MODIFIER = "*", DATA, "*" ;
+    DATA = ALPHANUMERIC, { ALPHANUMERIC } ;
+    (* The following is just shorthand. I think this is more *)
+    (* clear than listing out all 62 alphanumeric characters. *)
+    ALPHANUMERIC = ? Any alphanumeric character. So "a-z", "A-Z", or "0-9" ?
+    """
+    sharpsFlatsOrNaturalRegex = r'#+|-+|n'
+    editorialRegex = fr'\((?:{sharpsFlatsOrNaturalRegex})\)'
+    accidentalRegex = fr'{editorialRegex}|(?:{sharpsFlatsOrNaturalRegex})'
+
+    lowNoteRegex = fr'(?:A+|B+|C+|D+|E+|F+|G+)(?:{accidentalRegex})?'
+    highNoteRegex = (
+        r'(?:a+|b+|c+|d+|e+|f+|g+)'
+        fr"(?:(?:{accidentalRegex})?'*|'*(?:{accidentalRegex})?)"
+    )
+    noteNameRegex = fr'{lowNoteRegex}|{highNoteRegex}'
+
+    durationRegex = r'\d+\.*|\.*\d+|\.+'
+
+    tieStateRegex = r'~'
+
+    equalsRegex = r'=[A-Za-z0-9]*'
+    starRegex = r'\*.*?\*'
+    angleRegex = r'<.*?>'
+    parensRegex = r'\(.*?\)'
+    squareRegex = r'\[.*?]'
+    underscoreRegex = r'_.*'
+    modifierRegex = (
+        fr'{equalsRegex}|{starRegex}|{angleRegex}|'
+        fr'{parensRegex}|{squareRegex}|{underscoreRegex}'
+    )
+
+    return [
+        (r'^(\d+\/\d+)$', TimeSignatureToken),
+        (
+            fr'^r((?:{durationRegex})?(?:{modifierRegex})*)$',
+            RestToken
+        ),
+        (
+            (
+                fr'^((?:{noteNameRegex})(?:{durationRegex})?'
+                fr'(?:{tieStateRegex})?(?:{modifierRegex})*)$'
+            ),
+            NoteToken
+        ),  # last
+    ]
+
+
 class Converter:
     '''
     Main conversion object for TinyNotation.
@@ -942,11 +1065,7 @@ class Converter:
         self.generalBracketStateRe = re.compile(r'(\w+){')
         self.tieStateRe = re.compile(r'~')
 
-        self.tokenMap = [
-            (r'(\d+\/\d+)', TimeSignatureToken),
-            (r'r(\S*)', RestToken),
-            (r'([a-gA-G]\S*)', NoteToken),  # last
-        ]
+        self.tokenMap = _getDefaultTokenMap()
         self.modifierEquals = IdModifier
         self.modifierStar = None
         self.modifierAngle = None
@@ -1255,6 +1374,56 @@ class Test(unittest.TestCase):
         self.assertEqual(sfn[9].editorial.ficta.alter, 0)
         self.assertEqual(sfn[12].duration.quarterLength, 1.0)
         self.assertEqual(sfn[12].expressions[0].classes, expressions.Fermata().classes)
+
+    def testRaiseExceptions(self):
+        error_states = [
+            {
+                "string": "h",
+                "reason": "h is not a valid note",
+            },
+            {
+                "string": "a;",
+                "reason": "a semicolon is not a valid character or modifier",
+            },
+            {
+                "string": "r;",
+                "reason": "a semicolon is not a valid character or modifier",
+            },
+            {
+                "string": "4/4;",
+                "reason": "a semicolon is not a valid character or modifier",
+            },
+            {
+                "string": "ABC",
+                "reason": (
+                    "only the same upper-cased letter may be repeated to "
+                    "indicate lower octaves"
+                ),
+            },
+        ]
+
+        for error_state in error_states:
+            try:
+                converter = Converter(error_state["string"], raiseExceptions=True)
+                result = converter.parse()
+                result.stream.show('text')
+                self.fail(
+                    "Should have raised a TinyNotationException for input "
+                    f'"{error_state["string"]}" because {error_state["reason"]}.'
+                )
+            except TinyNotationException as e:
+                # We expected to raise this exception
+                pass
+            except AssertionError:
+                # The test failed. Reraise the original test failure
+                raise
+            except Exception as e:
+                raise AssertionError(
+                    "Should have raised a TinyNotationException for input "
+                    f'"{error_state["string"]}" because {error_state["reason"]} '
+                    f"but actually raised {e.__class__.__name__}."
+                ) from e
+
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
