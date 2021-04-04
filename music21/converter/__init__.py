@@ -631,7 +631,8 @@ class Converter:
         self.subConverter.keywords = keywords
         self.subConverter.parseData(dataStr, number=number)
 
-    def parseURL(self, url, format=None, number=None, **keywords):  # @ReservedAssignment
+    def parseURL(self, url, *, format=None, number=None,
+                 forceSource=False, **keywords):  # @ReservedAssignment
         '''Given a url, download and parse the file
         into a music21 Stream stored in the `stream`
         property of the converter object.
@@ -639,11 +640,15 @@ class Converter:
         Note that this checks the user Environment
         `autoDownload` setting before downloading.
 
+        Use `forceSource=True` to download every time rather than read from a cached file.
+
         >>> jeanieLightBrownURL = ('https://github.com/cuthbertLab/music21/raw/master' +
         ...        '/music21/corpus/leadSheet/fosterBrownHair.mxl')
         >>> c = converter.Converter()
         >>> #_DOCS_SHOW c.parseURL(jeanieLightBrownURL)
         >>> #_DOCS_SHOW jeanieStream = c.stream
+
+        Changed in v.7 -- made keyword-only and added `forceSource` option.
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload in ('deny', 'ask'):
@@ -670,7 +675,7 @@ class Converter:
         dst = self._getDownloadFp(directory, ext, url)  # returns pathlib.Path
         urlretrieve = urllib.request.urlretrieve
 
-        if not dst.exists():
+        if forceSource is True or not dst.exists():
             try:
                 environLocal.printDebug(['downloading to:', str(dst)])
                 fp, unused_headers = urlretrieve(url, filename=str(dst))
@@ -1041,14 +1046,17 @@ def parseData(dataStr, number=None, format=None, **keywords):  # @ReservedAssign
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-def parseURL(url, number=None, format=None, forceSource=False, **keywords):  # @ReservedAssignment
+def parseURL(url, *, format=None, number=None,
+             forceSource=False, **keywords):  # @ReservedAssignment
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
     URL downloading will not happen automatically unless the user has set their
     Environment "autoDownload" preference to "allow".
+
+    Changed in v.7 -- made keyword-only.
     '''
     v = Converter()
-    v.parseURL(url, format=format, **keywords)
+    v.parseURL(url, format=format, forceSource=forceSource, **keywords)
     return v.stream
 
 
@@ -1939,12 +1947,26 @@ class Test(unittest.TestCase):
             parse('nonexistent_path_ending_in_correct_extension.musicxml')
 
     def testParseURL(self):
+        from music21.humdrum.spineParser import HumdrumException
+
         urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
         url = urlBase + 'chopin/prelude&file=prelude28-20.krn&format=kern'
 
         e = environment.Environment()
         e['autoDownload'] = 'allow'
         s = parseURL(url)
+        self.assertEqual(len(s.parts), 2)
+
+        # This file should have been written, above
+        destFp = Converter()._getDownloadFp(e.getRootTempDir(), '.krn', url)
+        # Hack garbage into it so that we can test whether or not forceSource works
+        with open(destFp, 'a') as fp:
+            fp.write('all sorts of garbage that Humdrum cannot parse')
+
+        with self.assertRaises(HumdrumException):
+            s = parseURL(url, forceSource=False)
+
+        s = parseURL(url, forceSource=True)
         self.assertEqual(len(s.parts), 2)
 
 
