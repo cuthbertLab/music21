@@ -1353,6 +1353,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.partExporterList: List['PartExporter'] = []
 
+        self.joinedGroups: List['StaffGroup'] = []
+
         self.instrumentList = []
         self.midiChannelList = []
 
@@ -1929,6 +1931,20 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
           <score-part id="P4">...
           <part-group number="1" type="stop" />
         </part-list>
+
+        And with a piano staff, to observe that only one <part> tag has both "start" and "stop":
+
+        >>> cpe = corpus.parse('cpebach')
+        >>> SX = musicxml.m21ToXml.ScoreExporter(cpe)
+        >>> SX.scorePreliminaries()
+        >>> SX.parsePartlikeScore()
+
+        >>> mxPartList = SX.setPartList()
+        >>> SX.dump(mxPartList)
+        <part-list>
+          <part-group number="1" type="start">...
+          <part-group number="1" type="stop" />
+        </part-list>
         '''
 
         spannerBundle = self.spannerBundle
@@ -1959,7 +1975,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             # check for last
             activeIndex = None
             for sg in staffGroups:
-                if sg.isLast(p):
+                # Handle last part in the StaffGroup
+                # as well as the first part in the StaffGroup if it was joined to the others
+                # In that latter case, we need the <part-group type="stop" /> on the FIRST m21 part
+                if (sg.isLast(p) or (sg in self.joinedGroups and sg.isFirst(p))):
                     # find the spanner in the dictionary already-assigned
                     for key, value in partGroupIndexRef.items():
                         if value is sg:
