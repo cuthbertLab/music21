@@ -2110,7 +2110,7 @@ class Test(unittest.TestCase):
 
         error_msg = f'no replacement performed, as {n3} already in {s}'
         with self.assertRaises(StreamException, msg=error_msg):
-            s.replace(n3, n1)
+            s.replace(n4, n3)
 
     def testReplaceA1(self):
         sBach = corpus.parse('bach/bwv324.xml')
