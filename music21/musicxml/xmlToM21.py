@@ -3808,7 +3808,7 @@ class MeasureParser(XMLParserBase):
         # add a reference of this note to this spanner
         if target is not None:
             su.addSpannedElements(target)
-        # environLocal.printDebug(['adding n', n, id(n), 'su.getSpannedElements',
+        # environLocal.printDebug(['adding n', target, id(target), 'su.getSpannedElements',
         #     su.getSpannedElements(), su.getSpannedElementIds()])
         if mxObj.get('type') == 'stop':
             su.completeStatus = True

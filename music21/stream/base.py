@@ -2599,7 +2599,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Given a `target` object, replace it with
         the supplied `replacement` object.
 
-        Does nothing if target cannot be found.
+        Does nothing if target cannot be found. Raises StreamException if replacement
+        is already in the stream.
 
         If `allDerived` is True (as it is by default), all sites (stream) that
         this this stream derives from and also
@@ -2668,6 +2669,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         in stream twice.  recurse and shiftOffsets changed to keywordOnly arguments
 
         Changed in v6 -- recurse works
+
+        Changed in v7 -- raises StreamException if replacement is already in the stream.
         '''
         def replaceDerived(startSite=self):
             if not allDerived:
@@ -2679,6 +2682,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                         replacement,
                                         recurse=recurse,
                                         allDerived=False)
+
+        try:
+            i = self.index(replacement)
+        except StreamException:
+            # good. now continue.
+            pass
+        else:
+            raise StreamException(f'{replacement} already in {self}')
 
         try:
             i = self.index(target)
@@ -13910,6 +13921,23 @@ class SpannerStorage(Stream):
 
     def coreStoreAtEnd(self, element, setActiveSite=True):  # pragma: no cover
         raise StreamException('SpannerStorage cannot store at end.')
+
+    def replace(self,
+                target: base.Music21Object,
+                replacement: base.Music21Object,
+                *,
+                recurse: bool = False,
+                allDerived: bool = True) -> None:
+        '''
+        Overrides :meth:`~music21.stream.base.replace` in order to check first
+        whether `replacement` already exists in `self`. If, so delete `target` from
+        `self` and return; otherwise call the superclass method.
+        '''
+        # Does not perform a recursive search, but shouldn't need to
+        if replacement in self:
+            self.remove(target)
+            return
+        super().replace(target, replacement, recurse=recurse, allDerived=allDerived)
 
 
 class VariantStorage(Stream):
