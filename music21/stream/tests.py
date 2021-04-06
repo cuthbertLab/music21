@@ -2108,7 +2108,7 @@ class Test(unittest.TestCase):
         s.replace(n4, n1)
         self.assertEqual([s[0], s[1]], [n3, n1])
 
-        error_msg = f'no replacement performed, as {n3} already in {s}'
+        error_msg = f'{n3} already in {s}'
         with self.assertRaises(StreamException, msg=error_msg):
             s.replace(n4, n3)
 
