@@ -13930,8 +13930,10 @@ class SpannerStorage(Stream):
                 allDerived: bool = True) -> None:
         '''
         Overrides :meth:`~music21.stream.Stream.replace` in order to check first
-        whether `replacement` already exists in `self`. If, so delete `target` from
+        whether `replacement` already exists in `self`. If so, delete `target` from
         `self` and return; otherwise call the superclass method.
+
+        New in v7.
         '''
         # Does not perform a recursive search, but shouldn't need to
         if replacement in self:
