@@ -4043,6 +4043,8 @@ class MeasureExporter(XMLExporterBase):
         for artObj in applicableArticulations:
             if 'Pizzicato' in artObj.classes:
                 continue
+            if 'StringIndication' in artObj.classes and artObj.number < 1:
+                continue
             if 'TechnicalIndication' in artObj.classes:
                 if mxTechnicalMark is None:
                     mxTechnicalMark = Element('technical')
@@ -6492,6 +6494,20 @@ class Test(unittest.TestCase):
         self.assertEqual(len(tree.findall('.//rest')), 1)
         rest = tree.find('.//rest')
         self.assertEqual(rest.get('measure'), 'yes')
+
+    def testArticulationSpecialCases(self):
+        from music21 import articulations
+
+        n = note.Note()
+        a = articulations.StringIndication()
+        n.articulations.append(a)
+
+        # Legal values for StringIndication begin at 1
+        self.assertEqual(a.number, 0)
+        # Use GEX to go through wellformed object conversion
+        gex = GeneralObjectExporter(n)
+        tree = ET.fromstring(gex.parse().decode('utf-8'))
+        self.assertIsNone(tree.find('.//string'))
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
