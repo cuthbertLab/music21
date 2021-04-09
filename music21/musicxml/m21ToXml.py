@@ -2223,8 +2223,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxEncodingDate.text = str(datetime.date.today())  # right format...
         # TODO: encoder
 
-        if self.scoreMetadata is not None and hasattr(self.scoreMetadata, 'software'):
-            # TODO: Remove hasattr after all caches are cleared after v5 release.
+        if self.scoreMetadata is not None:
             for software in self.scoreMetadata.software:
                 mxSoftware = SubElement(mxEncoding, 'software')
                 mxSoftware.text = software
