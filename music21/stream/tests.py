@@ -1305,11 +1305,11 @@ class Test(unittest.TestCase):
         self.assertEqual(chordsOut[3].pitches, ch4.pitches)
         self.assertEqual(chordsOut[4].pitches, ch5.pitches)
 
-    def testStripTiesMatchByPitch(self):
+    def testStripTiesComplexTies(self):
         '''
         Make sure tie types of "stop" or "continue" are not taken at face value
-        for Chord objects; they only represent that SOME chord member has that
-        tie type. Still need to `matchByPitch`.
+        for Chords if matchByPitch=False; they only represent that SOME
+        chord member has that tie type.
         '''
         from music21 import stream, tie
 
