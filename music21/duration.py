@@ -1821,8 +1821,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         True
         '''
         newTuplet.frozen = True
-        self.tuplets = self.tuplets + (newTuplet,)
-        self.informClient()
+        self.tuplets = self._tuplets + (newTuplet,)
 
     def augmentOrDiminish(self, amountToScale, retainComponents=False):
         '''
@@ -2846,9 +2845,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     def tuplets(self) -> Tuple[Tuplet, ...]:
         '''
         Return a tuple of Tuplet objects.
-        May leave a stream containing objects having this duration
-        in an unusable state, requiring :meth:`~music21.stream.core.coreElementsChanged`
-        to be called. For this reason, prefer using :meth:`appendTuplet` to add tuplets.
+        Setting tuplets will inform the client (Note) that the duration has changed.
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
@@ -2859,6 +2856,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         # environLocal.printDebug(['assigning tuplets in Duration', tupletTuple])
         self._tuplets = tuple(tupletTuple)
         self._quarterLengthNeedsUpdating = True
+        self.informClient()
 
     def aggregateTupletMultiplier(self) -> OffsetQL:
         '''
@@ -3593,7 +3591,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(d.components),
                          "(DurationTuple(type='eighth', dots=0, quarterLength=0.5),)")
         self.assertFalse(d._componentsNeedUpdating)
-        self.assertTrue(d._quarterLengthNeedsUpdating)
+        self.assertFalse(d._quarterLengthNeedsUpdating)
         self.assertEqual(repr(d.quarterLength), 'Fraction(1, 3)')
         self.assertEqual(str(unitSpec(d)), "(Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')")
 
