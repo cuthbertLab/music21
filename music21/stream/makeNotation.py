@@ -809,6 +809,10 @@ def makeRests(
         if timeRangeFromBarDuration and returnObj.isMeasure:
             # NOTE: this will raise an exception if no meter can be found
             oHighTarget = returnObj.barDuration.quarterLength
+        elif timeRangeFromBarDuration and returnObj.hasMeasures():
+            oHighTarget = sum(
+                m.barDuration.quarterLength for m in returnObj.getElementsByClass(stream.Measure)
+            )
         else:
             oHighTarget = returnObj.highestTime
     elif isinstance(refStreamOrTimeRange, stream.Stream):
@@ -879,6 +883,14 @@ def makeRests(
             returnObj.setElementOffset(m, accumulatedTime)
             accumulatedTime += m.highestTime
 
+            # process voices
+            for v in m.voices:
+                v.makeRests(inPlace=True,
+                            fillGaps=fillGaps,
+                            hideRests=hideRests,
+                            refStreamOrTimeRange=m,
+                            )
+
     if inPlace is not True:
         return returnObj
 
@@ -894,7 +906,7 @@ def makeTies(
     # noinspection PyShadowingNames
     '''
     Given a stream containing measures, examine each element in the
-    Stream. If the elements duration extends beyond the measure's boundary,
+    Stream. If the element's duration extends beyond the measure's boundary,
     create a tied entity, placing the split Note in the next Measure.
 
     Note that this method assumes that there is appropriate space in the
