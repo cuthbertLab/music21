@@ -870,7 +870,14 @@ def makeRests(
         # environLocal.printDebug(['post makeRests show()', v])
 
     if returnObj.hasMeasures():
+        # split rests at measure boundaries
         returnObj.makeTies(classFilterList=(note.Rest,))
+
+        # reposition measures
+        accumulatedTime = 0.0
+        for m in returnObj.getElementsByClass(stream.Measure):
+            returnObj.setElementOffset(m, accumulatedTime)
+            accumulatedTime += m.highestTime
 
     if inPlace is not True:
         return returnObj
