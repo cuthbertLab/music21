@@ -2845,7 +2845,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     @property
     def tuplets(self) -> Tuple[Tuplet, ...]:
         '''
-        return a tuple of Tuplet objects
+        Return a tuple of Tuplet objects.
+        May leave a stream containing objects having this duration
+        in an unusable state, requiring :meth:`~music21.stream.core.coreElementsChanged`
+        to be called. For this reason, prefer using :meth:`appendTuplet` to add tuplets.
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
