@@ -560,7 +560,7 @@ class Test(unittest.TestCase):
         # Nonstandard workflow requires coreElementsChanged() to be called
         # https://github.com/cuthbertLab/music21/issues/957
         a.coreElementsChanged()
-        self.assertEqual(a.duration.quarterLength, Fraction(2,3))
+        self.assertEqual(a.duration.quarterLength, Fraction(2, 3))
 
     def testMeasureStream(self):
         '''An approach to setting TimeSignature measures in offsets and durations
