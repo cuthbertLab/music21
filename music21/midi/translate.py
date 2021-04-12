@@ -3705,7 +3705,7 @@ class Test(unittest.TestCase):
                 self.assertEqual(
                     sum(m.barDuration.quarterLength for m in part.getElementsByClass(
                         stream.Measure)
-                    ),
+                        ),
                     part.duration.quarterLength
                 )
 
