@@ -835,10 +835,9 @@ def makeRests(
     for v in bundle:
         oLow = v.lowestOffset
         oHigh = v.highestTime
-        # adjust oHigh to not exceed measure
-        oHighTargetAdjusted = oHighTarget
-        if v.isMeasure:
-            oHighTargetAdjusted = min(v.barDuration.quarterLength, oHighTarget)
+        if returnObj.hasMeasures():
+            # adjust oHigh to not exceed measure
+            oHighTarget = min(v.barDuration.quarterLength, oHighTarget)
 
         # create rest from start to end
         qLen = oLow - oLowTarget
@@ -851,7 +850,7 @@ def makeRests(
             v.insert(oLowTarget, r)
 
         # create rest from end to highest
-        qLen = oHighTargetAdjusted - oHigh
+        qLen = oHighTarget - oHigh
         # environLocal.printDebug(['v', v, oHigh, oHighTarget, 'qLen', qLen])
         if qLen > 0:
             r = note.Rest()
@@ -859,7 +858,6 @@ def makeRests(
             r.style.hideObjectOnPrint = hideRests
             # place at oHigh to reach to oHighTarget
             v.insert(oHigh, r)
-
 
         if fillGaps:
             gapStream = v.findGaps()
