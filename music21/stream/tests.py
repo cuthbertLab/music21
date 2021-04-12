@@ -545,6 +545,23 @@ class Test(unittest.TestCase):
         self.assertEqual(a.duration.quarterLength, 2.0)
         self.assertEqual(a.highestTime, 4)
 
+    def testStreamDurationRecalculated(self):
+        from fractions import Fraction
+
+        a = Stream()
+        n = note.Note(quarterLength=1.0)
+        a.append(n)
+        self.assertEqual(a.duration.quarterLength, 1.0)
+
+        # Alter the note's duration in a nonstandard way
+        # Normally, one would call Duration.appendTuplet()
+        tup = duration.Tuplet()
+        n.duration.tuplets = (tup,)
+        # Nonstandard workflow requires coreElementsChanged() to be called
+        # https://github.com/cuthbertLab/music21/issues/957
+        a.coreElementsChanged()
+        self.assertEqual(a.duration.quarterLength, Fraction(2, 3))
+
     def testMeasureStream(self):
         '''An approach to setting TimeSignature measures in offsets and durations
         '''

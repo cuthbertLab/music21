@@ -7882,8 +7882,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return self._cache['Duration']
         else:
             # environLocal.printDebug(['creating new duration based on highest time'])
-            self._cache['Duration'] = duration.Duration()
-            self._cache['Duration'].quarterLength = self.highestTime
+            self._cache['Duration'] = duration.Duration(quarterLength=self.highestTime)
             return self._cache['Duration']
 
     def _setDuration(self, durationObj):
