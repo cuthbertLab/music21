@@ -1780,12 +1780,14 @@ class BachException(exceptions21.Music21Exception):
 #     pass
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
 
     def testGetRiemenschneider1(self):
         from music21 import corpus
         for chorale in corpus.chorales.Iterator(1, 2,
                                                 numberingSystem='riemenschneider', analysis=True):
-            chorale.show()
+            if self.show:
+                chorale.show()
 
 
 if __name__ == '__main__':

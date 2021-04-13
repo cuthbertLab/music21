@@ -392,10 +392,12 @@ class Diminuendo(DynamicWedge):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
 
     def testSingle(self):
         a = Dynamic('ffff')
-        a.show()
+        if self.show:
+            a.show()
 
     def testBasic(self):
         '''present each dynamic in a single measure
@@ -407,7 +409,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             b = Dynamic(dynStr)
             a.insert(o, b)
             o += 4  # increment
-        a.show()
+        if self.show:
+            a.show()
 
 
 # ------------------------------------------------------------------------------

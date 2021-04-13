@@ -5448,12 +5448,14 @@ def fromIntervalVector(notation, getZRelation=False):
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
 
     def testBasic(self):
         for pitchList in [['g2', 'c4', 'c#6'],
                           ['c', 'd-', 'f#', 'g']]:
             a = Chord(pitchList)
-            a.show()
+            if self.show:
+                a.show()
 
     def testPostTonalChords(self):
         import random
@@ -5470,7 +5472,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             c.addLyric(c.forteClass)
             c.addLyric(str(c.primeForm).replace(' ', ''))
             s.append(c)
-        s.show()
+        if self.show:
+            s.show()
 
 
 class Test(unittest.TestCase):

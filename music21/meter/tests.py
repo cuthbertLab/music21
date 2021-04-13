@@ -22,11 +22,14 @@ from music21.meter.base import TimeSignature
 from music21.meter.core import MeterSequence, MeterTerminal
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
+
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
         '''
         a = TimeSignature('3/16')
-        a.show()
+        if self.show:
+            a.show()
 
     def testBasic(self):
         a = stream.Stream()
@@ -36,7 +39,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 m = stream.Measure()
                 m.timeSignature = ts
                 a.insert(m.timeSignature.barDuration.quarterLength, m)
-        a.show()
+        if self.show:
+            a.show()
 
     def testCompound(self):
         a = stream.Stream()
@@ -52,7 +56,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             m = stream.Measure()
             m.timeSignature = ts
             a.insert(m.timeSignature.barDuration.quarterLength, m)
-        a.show()
+        if self.show:
+            a.show()
 
     def testMeterBeam(self):
         ts = TimeSignature('6/8', 2)
@@ -63,7 +68,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             n = note.Note()
             n.duration = x
             s.append(n)
-        s.show()
+        if self.show:
+            s.show()
 
 
 class Test(unittest.TestCase):

@@ -129,13 +129,15 @@ def plotStream(
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
 
     def testAll(self):
         from music21 import corpus, dynamics
         a = corpus.parse('bach/bwv57.8')
         a.parts[0].insert(0, dynamics.Dynamic('mf'))
         a.parts[0].insert(10, dynamics.Dynamic('f'))
-        plotStream(a, 'all')
+        if self.show:
+            plotStream(a, 'all')
 
 
 class Test(unittest.TestCase):

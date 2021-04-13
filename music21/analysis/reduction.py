@@ -1307,9 +1307,11 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
+
     def testPartReductionB(self):
         t = Test()
-        t.testPartReductionB(show=True)
+        t.testPartReductionB(show=self.show)
 
 
 # ------------------------------------------------------------------------------

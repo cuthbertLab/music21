@@ -3317,6 +3317,7 @@ class TupletFixer:
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
 
     def testSingle(self):
         from music21 import note
@@ -3324,7 +3325,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         a.quarterLength = 2.66666
         n = note.Note()
         n.duration = a
-        n.show()
+        if self.show:
+            n.show()
 
     def testBasic(self):
         import random
@@ -3342,7 +3344,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             n.duration = b
             a.append(n)
 
-        a.show()
+        if self.show:
+            a.show()
 
 
 class Test(unittest.TestCase):

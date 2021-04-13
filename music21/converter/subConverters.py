@@ -1496,11 +1496,13 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
 
     def testXMLShow(self):
         from music21 import corpus
         c = corpus.parse('bwv66.6')
-        c.show()  # musicxml
+        if self.show:
+            c.show()  # musicxml
 
     def testWriteLilypond(self):
         from music21 import note
@@ -1508,8 +1510,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         n.duration.type = 'whole'
         s = stream.Stream()
         s.append(n)
-        s.show('lily.png')
-        print(s.write('lily.png'))
+        if self.show:
+            s.show('lily.png')
+            print(s.write('lily.png'))
 
     def testMultiPageXMlShow1(self):
         '''
@@ -1518,8 +1521,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         from music21 import omr, converter
         K525 = omr.correctors.K525groundTruthFilePath
         K525 = converter.parse(K525)
-        K525.show('musicxml.png')
-        print(K525.write('musicxml.png'))
+        if self.show:
+            K525.show('musicxml.png')
+            print(K525.write('musicxml.png'))
 
     # def testMultiPageXMlShow2(self):
     #     '''

@@ -893,14 +893,15 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    pass
+    show = True
 
     def testComplete(self):
         ci = CapellaImporter()
         capellaDirPath = common.getSourceFilePath() / 'capella'
         oswaldPath = capellaDirPath / r'Nu_rue_mit_sorgen.capx'
         partScore = ci.scoreFromFile(oswaldPath)
-        partScore.show()
+        if self.show:
+            partScore.show()
 
     def xtestImportSorgen(self):
         ci = CapellaImporter()
@@ -915,7 +916,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         # scoreElement = ci.mainDom.documentElement.getElementsByTagName('score')[0]
         scoreObj = ci.systemScoreFromScore(ci.mainDom.documentElement)
         partScore = ci.partScoreFromSystemScore(scoreObj)
-        partScore.show()
+        if self.show:
+            partScore.show()
         # ci.walkNodes()
         # print(ci.xmlText)
 

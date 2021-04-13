@@ -2609,19 +2609,24 @@ class Test(unittest.TestCase):
         )
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
+
     def xtestConvertNote(self):
         n = note.Note('C5')
-        n.show('lily.png')
+        if self.show:
+            n.show('lily.png')
 
     def xtestConvertChorale(self):
         b = _getCachedCorpusFile('bach/bwv66.6')
         for n in b.flat:
             n.beams = None
-        b.parts[0].show('lily.svg')
+        if self.show:
+            b.parts[0].show('lily.svg')
 
     def xtestSlowConvertOpus(self):
         fifeOpus = corpus.parse('miscFolk/americanfifeopus.abc')
-        fifeOpus.show('lily.png')
+        if self.show:
+            fifeOpus.show('lily.png')
 
     def xtestBreve(self):
         from music21 import stream, meter
@@ -2634,7 +2639,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         p.append(m)
         s = stream.Score()
         s.append(p)
-        s.show('lily.png')
+        if self.show:
+            s.show('lily.png')
 
     def testStaffLines(self):
         from music21 import stream
@@ -2647,7 +2653,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         p2.append(note.Note('B4', type='whole'))
         p2.staffLines = 7
         s.insert(0, p2)
-        s.show('lily.png')
+        if self.show:
+            s.show('lily.png')
 
 
 # ------------------------------------------------------------------------------

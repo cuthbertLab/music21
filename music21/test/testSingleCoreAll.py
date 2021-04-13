@@ -36,7 +36,12 @@ environLocal = environment.Environment(_MOD)
 cov = coverageM21.getCoverage()
 
 
-def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verbosity=2):
+def main(testGroup=('test',),
+         restoreEnvironmentDefaults=False,
+         limit=None,
+         verbosity=2,
+         show: bool = True,
+         ):
     '''
     Run all tests. Group can be test and external
 
@@ -72,6 +77,8 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
             # environLocal.printDebug(f'{module} has no TestExternal class\n')
         else:
             if 'external' in testGroup or 'testExternal' in testGroup:
+                if not show:
+                    moduleObject.TestExternal.show = False
                 unitTestCases.append(moduleObject.TestExternal)
 
         # for each Test class, load this into a suite
@@ -122,7 +129,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
 def ciMain():
     # the main call for ci tests.
     # exits with the returnCode
-    returnCode = main(testGroup=('test', 'external'), verbosity=1)
+    returnCode = main(testGroup=('test', 'external'), verbosity=1, show=False)
     sys.exit(returnCode)
 
 

@@ -1460,11 +1460,13 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
 
     def testOne(self):
         c = Converter(Test.parseTest)
         c.parse()
-        c.stream.show('musicxml.png')
+        if self.show:
+            c.stream.show('musicxml.png')
 
 
 # TODO: Chords

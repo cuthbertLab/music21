@@ -4075,6 +4075,7 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
 
     def testFromChordify(self):
         from music21 import corpus
@@ -4092,12 +4093,14 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                     figuresCache[figure] += 1
                 x.lyric = figure
 
-        sortedList = sorted(figuresCache, key=figuresCache.get, reverse=True)
-        for thisFigure in sortedList:
-            print(thisFigure, figuresCache[thisFigure])
+        if self.show:
+            sortedList = sorted(figuresCache, key=figuresCache.get, reverse=True)
+            for thisFigure in sortedList:
+                print(thisFigure, figuresCache[thisFigure])
 
         b.insert(0, c)
-        b.show()
+        if self.show:
+            b.show()
 
 
 # -----------------------------------------------------------------------------

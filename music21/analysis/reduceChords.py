@@ -697,6 +697,7 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
 
     def testTrecentoMadrigal(self):
         from music21 import corpus
@@ -726,7 +727,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         for part in reduction:
             score.insert(0, part)
 
-        score.show()
+        if self.show:
+            score.show()
 
 
 # -----------------------------------------------------------------------------

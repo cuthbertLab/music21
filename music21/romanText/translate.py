@@ -1133,22 +1133,18 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
 
 # ------------------------------------------------------------------------------
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
 
+class TestSlow(unittest.TestCase):  # pragma: no cover
+    '''
+    These tests are currently too slow to run every time.
+    '''
     def testExternalA(self):
         from music21.romanText import testFiles
 
         for tf in testFiles.ALL:
             rtf = rtObjects.RTFile()
             rth = rtf.readstr(tf)  # return handler, processes tokens
-            s = romanTextToStreamScore(rth)
-            s.show()
-
-
-class TestSlow(unittest.TestCase):  # pragma: no cover
-    '''
-    These tests are currently too slow to run every time.
-    '''
+            unused_s = romanTextToStreamScore(rth)
 
     # noinspection SpellCheckingInspection
     def testBasicA(self):

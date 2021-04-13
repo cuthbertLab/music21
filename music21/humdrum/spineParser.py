@@ -3118,11 +3118,13 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
 
     def testShowSousa(self):
         hf1 = HumdrumDataCollection(testFiles.sousaStars)
         hf1.parse()
-        hf1.stream.show()
+        if self.show:
+            hf1.stream.show()
 
 
 if __name__ == '__main__':

@@ -6535,9 +6535,7 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def testBasic(self):
-        pass
+    show = True
 
     def testSimple(self):
         from music21 import corpus  # , converter
@@ -6570,7 +6568,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
         # b2 = converter.parse(v)
         fp = b.write('musicxml')
-        print(fp)
+        if self.show:
+            print(fp)
 
         with io.open(fp, encoding='utf-8') as f:
             v2 = f.read()
@@ -6579,10 +6578,11 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             if l.startswith('-') or l.startswith('?') or l.startswith('+'):
                 if 'id=' in l:
                     continue
-                print(l)
-                # for j in range(i - 1,i + 1):
-                #    print(differ[j])
-                # print('------------------')
+                if self.show:
+                    print(l)
+                    # for j in range(i - 1,i + 1):
+                    #    print(differ[j])
+                    # print('------------------')
 
 
 if __name__ == '__main__':

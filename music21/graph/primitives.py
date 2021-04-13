@@ -1591,6 +1591,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
 
     def testBasic(self):
         a = GraphScatter(doneAction=None, title='x to x*x', alpha=1)

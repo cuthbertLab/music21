@@ -964,12 +964,14 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    show = True
 
     def testB(self):
         from music21.romanText import clercqTemperley
         s = clercqTemperley.CTSong(BlitzkriegBopCT)
         scoreObj = s.toScore()
-        scoreObj.show()
+        if self.show:
+            scoreObj.show()
 
     def x_testA(self):
         pass
