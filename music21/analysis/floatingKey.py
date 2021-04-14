@@ -89,18 +89,9 @@ class KeyAnalyzer:
             p = s.iter.parts.first()
         else:
             p = s
-        self.firstPartMeasures = p.getElementsByClass('Measure')  # could be wrong for endings, etc.
-
-        if not self.firstPartMeasures:
+        self.numMeasures = len(p.getElementsByClass('Measure'))  # could be wrong for endings, etc.
+        if self.numMeasures == 0:
             raise FloatingKeyException("Stream must have Measures inside it")
-
-        self.anacrusis: bool = self.firstPartMeasures.first().number == 0
-        self.highestMeasureNumber = len(self.firstPartMeasures)
-        if self.anacrusis:
-            self.highestMeasureNumber -= 1
-
-        # NO LONGER USEFUL -- Provided for backwards-compatibility, but can be removed in v.8
-        self.numMeasures = len(self.firstPartMeasures)
 
     def run(self):
         self.getRawKeyByMeasure()
@@ -108,10 +99,10 @@ class KeyAnalyzer:
 
     def getRawKeyByMeasure(self):
         keyByMeasure = []
-        for firstPartMeasure in self.firstPartMeasures:
+        for i in range(self.numMeasures):
             # now `m` is a measure-slice of the entire stream
-            m = self.stream.measure(firstPartMeasure.number)
-            if not m.recurse().notes:
+            m = self.stream.measure(i, indicesNotNumbers=True)
+            if m is None or not m.recurse().notes:
                 k = None
             else:
                 k = m.analyze('key')
@@ -119,22 +110,16 @@ class KeyAnalyzer:
         self.rawKeyByMeasure = keyByMeasure
         return keyByMeasure
 
-    def getInterpretationByMeasure(self, mNumber, anacrusis: bool = True):
+    def getInterpretationByMeasure(self, mIndex):
         '''
         Returns a dictionary of interpretations for the measure.
-
-        New in v.7 = if anacrusis is True (default), mNumber will be presumed
-        to be 0-indexed. This behavior may change in the future.
+        `mIndex` is 0-indexed.
         '''
-        if mNumber in self._interpretationMeasureDict:
-            return self._interpretationMeasureDict[mNumber]  # CACHE
+        if mIndex in self._interpretationMeasureDict:
+            return self._interpretationMeasureDict[mIndex]  # CACHE
         if not self.rawKeyByMeasure:
             self.getRawKeyByMeasure()
-        if anacrusis:
-            i = mNumber
-        else:
-            i = mNumber - 1
-        mk = self.rawKeyByMeasure[i]
+        mk = self.rawKeyByMeasure[mIndex]
         if mk is None:
             return None
         # noinspection PyDictCreation
@@ -142,28 +127,22 @@ class KeyAnalyzer:
         interpretations[mk.tonicPitchNameWithCase] = mk.correlationCoefficient
         for otherKey in mk.alternateInterpretations:
             interpretations[otherKey.tonicPitchNameWithCase] = otherKey.correlationCoefficient
-        self._interpretationMeasureDict[mNumber] = interpretations
+        self._interpretationMeasureDict[mIndex] = interpretations
         return copy.copy(interpretations)  # for manipulating
 
     def smoothInterpretationByMeasure(self):
         smoothedKeysByMeasure = []
         algorithm = self.weightAlgorithm
 
-        for m in self.firstPartMeasures:
-            i = m.number
-            baseInterpretations = self.getInterpretationByMeasure(i, anacrusis=self.anacrusis)
+        for i in range(self.numMeasures):
+            baseInterpretations = self.getInterpretationByMeasure(i)
             if baseInterpretations is None:
                 continue
             for j in range(-1 * self.windowSize, self.windowSize + 1):  # -2, -1, 0, 1, 2 etc.
                 mNum = i + j
-                if (
-                    mNum < 0
-                    or mNum > self.highestMeasureNumber
-                    or mNum == i
-                    or (not self.anacrusis and mNum == 0)
-                ):
+                if mNum < 0 or mNum >= self.numMeasures or mNum == i:
                     continue
-                newInterpretations = self.getInterpretationByMeasure(mNum, anacrusis=self.anacrusis)
+                newInterpretations = self.getInterpretationByMeasure(mNum)
                 if newInterpretations is not None:
                     for k in baseInterpretations:
                         coefficient = algorithm(newInterpretations[k], j)
