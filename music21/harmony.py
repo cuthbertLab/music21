@@ -1388,7 +1388,7 @@ class ChordSymbol(Harmony):
     0.
 
     To obtain the chord representation of the `ChordSymbol` in the score, change
-    :attr:`~music21.harmony.ChordSymbol.writeAsChord` to True. Unless otherwise
+    :attr:`~music21.harmony.Harmony.writeAsChord` to True. Unless otherwise
     specified, the duration of this chord object will become 1.0. If you have a
     leadsheet, run :meth:`music21.harmony.realizeChordSymbolDurations` on the
     stream to assign the correct (according to offsets) duration to each
