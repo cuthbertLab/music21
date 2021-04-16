@@ -17,6 +17,7 @@ import unittest
 import math
 import copy
 from typing import Optional, List, Tuple, Dict, Union, Any
+import warnings
 
 from music21 import chord
 from music21 import common
@@ -34,6 +35,10 @@ environLocal = environment.Environment(_MOD)
 
 # ------------------------------------------------------------------------------
 class TranslateException(exceptions21.Music21Exception):
+    pass
+
+
+class TranslateWarning(UserWarning):
     pass
 
 # ------------------------------------------------------------------------------
@@ -364,7 +369,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     return n
 
 
-def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
+def noteToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
     # noinspection PyShadowingNames
     '''
     Translate a music21 Note to a list of four MIDI events --
@@ -401,6 +406,8 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     >>> eventList2
     [<music21.midi.MidiEvent NOTE_ON, track=None, channel=9, pitch=61, velocity=90>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=9, pitch=61, velocity=0>]
+
+    Changed in v7 -- made keyword-only.
     '''
     from music21 import midi as midiModule
 
@@ -575,11 +582,13 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     return c
 
 
-def chordToMidiEvents(inputM21, includeDeltaTime=True):
+def chordToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
     # noinspection PyShadowingNames
     '''
     Translates a :class:`~music21.chord.Chord` object to a
     list of base.DeltaTime and base.MidiEvents objects.
+
+    The `channel` can be specified, otherwise channel 1 is assumed.
 
     See noteToMidiEvents above for more details.
 
@@ -600,6 +609,8 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=68, velocity=0>,
      <music21.midi.DeltaTime (empty) track=None, channel=None>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=83, velocity=0>]
+
+    Changed in v7 -- made keyword-only.
     '''
     from music21 import midi as midiModule
     mt = None  # midi track
@@ -662,7 +673,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
 
         me = midiModule.MidiEvent(track=mt)
         me.type = midiModule.ChannelVoiceMessages.NOTE_OFF
-        me.channel = 1
+        me.channel = channel
         me.pitch = pitchObj.midi
         if not pitchObj.isTwelveTone():
             me.centShift = pitchObj.getCentShiftFromMidi()
@@ -1110,7 +1121,7 @@ def elementToMidiEventList(
     assuming that dynamics have already been applied, etc.
     Does not include DeltaTime objects.
 
-    Channel is set to the default, 1.
+    Channel (1-indexed) is set to the default, 1.
     Track is not set.
 
     >>> n = note.Note('C4')
@@ -1269,7 +1280,6 @@ def assignPacketsToChannels(
     if initTrackIdToChannelMap is None:
         initTrackIdToChannelMap = {}
 
-    # allChannels = list(range(1, 10)) + list(range(11, 17))  # all but 10
     uniqueChannelEvents = {}  # dict of (start, stop, usedChannel) : channel
     post = []
     usedTracks = []
@@ -2072,16 +2082,40 @@ def channelInstrumentData(
 
     Only necessarily works if :func:`~music21.midi.translate.prepareStreamForMidi`
     has been run before calling this routine.
+
+    An instrument's `.midiChannel` attribute is observed.
+    `None` is the default `.midiChannel` for all instruments except
+    :class:`~music21.instrument.UnpitchedPercussion`
+    subclasses. Put another way, the priority is:
+
+    - User-manipulated `.midiChannel`
+    - `UnpitchedPercussion` subclasses receive MIDI Channel 10 (9 in music21)
+    - The channel mappings produced by reading from `acceptableChannelList`,
+      or the default range 1-16. (More precisely, 1-15, since once dynamic channel
+      is always reserved.)
+
+    .. warning::
+
+        The attribute `.midiChannel` on :class:`~music21.instrument.Instrument`
+        is 0-indexed, but `.channel` on :class:`~music21.midi.MidiEvent` is 1-indexed,
+        as are all references to channels in this function.
     '''
     # temporary channel allocation
     if acceptableChannelList is not None:
-        allChannels = acceptableChannelList
+        acceptableChannels = acceptableChannelList
     else:
-        allChannels = list(range(1, 10)) + list(range(11, 17))  # all but 10
+        acceptableChannels = list(range(1, 10)) + list(range(11, 17))  # all but 10
 
     # store program numbers
     # tried using set() but does not guarantee proper order.
     allUniqueInstruments = []
+
+    channelByInstrument = {}  # the midiProgram is the key
+    channelsDynamic = []  # remaining channels
+    # create an entry for all unique instruments, assign channels
+    # for each instrument, assign a channel; if we go above 16, that is fine
+    # we just cannot use it and will take modulus later
+    channelsAssigned = set()
 
     # store streams in uniform list
     substreamList = []
@@ -2102,6 +2136,27 @@ def channelInstrumentData(
         instrumentStream = subs.recurse().getElementsByClass('Instrument')
         setAnInstrument = False
         for inst in instrumentStream:
+            if inst.midiChannel is not None and inst.midiProgram not in channelByInstrument:
+                # Assignment Case 1: read from instrument.midiChannel
+                # .midiChannel is 0-indexed, but MIDI channels are 1-indexed, so convert.
+                thisChannel = inst.midiChannel + 1
+                try:
+                    acceptableChannels.remove(thisChannel)
+                except ValueError:
+                    # Don't warn if 10 is missing, since
+                    # we deliberately made it unavailable above.
+                    if thisChannel != 10:
+                        # If the user wants multiple non-drum programs mapped
+                        # to the same MIDI channel for some reason, solution is to provide an
+                        # acceptableChannelList containing duplicate entries.
+                        warnings.warn(
+                            f'{inst} specified 1-indexed MIDI channel {thisChannel} '
+                            f'but acceptable channels were {acceptableChannels}. '
+                            'Defaulting to channel 1.',
+                            TranslateWarning)
+                        thisChannel = 1
+                channelsAssigned.add(thisChannel)
+                channelByInstrument[inst.midiProgram] = thisChannel
             if inst.midiProgram not in allUniqueInstruments:
                 allUniqueInstruments.append(inst.midiProgram)
             setAnInstrument = True
@@ -2110,24 +2165,21 @@ def channelInstrumentData(
             if None not in allUniqueInstruments:
                 allUniqueInstruments.append(None)
 
-    channelByInstrument = {}  # the instrument is the key
-    channelsDynamic = []  # remaining channels
-    # create an entry for all unique instruments, assign channels
-    # for each instrument, assign a channel; if we go above 16, that is fine
-    # we just cannot use it and will take modulus later
-    channelsAssigned = []
+    programsStillNeeded = [x for x in allUniqueInstruments if x not in channelByInstrument]
 
-    for i, iPgm in enumerate(allUniqueInstruments):
-        # the key is the program number; the values is the start channel
-        if i < len(allChannels) - 1:  # save at least one dynamic channel
-            channelByInstrument[iPgm] = allChannels[i]
-            channelsAssigned.append(allChannels[i])
+    for i, iPgm in enumerate(programsStillNeeded):
+        # the key is the program number; the value is the start channel
+        if i < len(acceptableChannels) - 1:  # save at least one dynamic channel
+            # Assignment Case 2: dynamically assign available channels
+            # if Instrument.midiChannel was None
+            channelByInstrument[iPgm] = acceptableChannels[i]
+            channelsAssigned.add(acceptableChannels[i])
         else:  # just use 1, and deal with the mess: cannot allocate
-            channelByInstrument[iPgm] = allChannels[0]
-            channelsAssigned.append(allChannels[0])
+            channelByInstrument[iPgm] = acceptableChannels[0]
+            channelsAssigned.add(acceptableChannels[0])
 
     # get the dynamic channels, or those not assigned
-    for ch in allChannels:
+    for ch in acceptableChannels:
         if ch not in channelsAssigned:
             channelsDynamic.append(ch)
 
@@ -2252,7 +2304,7 @@ def updatePacketStorageWithChannelInfo(
                 initCh = 1  # fallback, should not happen.
         elif 'Conductor' in instObj.classes:
             initCh = None
-        else:  # use midi program
+        else:  # keys are midi program
             initCh = channelByInstrument[instObj.midiProgram]
         bundle['initChannel'] = initCh  # set for bundle too
 
@@ -2272,6 +2324,12 @@ def streamHierarchyToMidiTracks(
 
     acceptableChannelList is a list of MIDI Channel numbers that can be used or None.
     If None, then 1-9, 11-16 are used (10 being reserved for percussion).
+
+    In addition, if an :class:`~music21.instrument.Instrument` object in the stream
+    has a `.midiChannel` that is not None, that channel is observed, and
+    also treated as reserved. Only subclasses of :class:`~music21.instrument.UnpitchedPercussion`
+    have a default `.midiChannel`, but users may manipulate this.
+    See :func:`channelInstrumentData` for more, and for documentation on `acceptableChannelList`.
 
     Called by streamToMidiFile()
 
@@ -2390,7 +2448,9 @@ def midiTracksToStreams(
 
 def streamToMidiFile(
     inputM21: stream.Stream,
+    *,
     addStartDelay: bool = False,
+    acceptableChannelList: List[int] = None,
 ) -> 'music21.midi.MidiFile':
     # noinspection PyShadowingNames
     '''
@@ -2415,11 +2475,16 @@ def streamToMidiFile(
     >>> #_DOCS_SHOW mf.open('/Volumes/disc/_scratch/midi.mid', 'wb')
     >>> #_DOCS_SHOW mf.write()
     >>> #_DOCS_SHOW mf.close()
+
+    See :func:`channelInstrumentData` for documentation on `acceptableChannelList`.
     '''
     from music21 import midi as midiModule
 
     s = inputM21
-    midiTracks = streamHierarchyToMidiTracks(s, addStartDelay=addStartDelay)
+    midiTracks = streamHierarchyToMidiTracks(s,
+                                             addStartDelay=addStartDelay,
+                                             acceptableChannelList=acceptableChannelList,
+                                             )
 
     # may need to update channel information
 
@@ -2780,12 +2845,15 @@ class Test(unittest.TestCase):
     def testChannelAllocation(self):
         # test instrument assignments
         from music21 import instrument
-        from music21.midi import translate
 
         iList = [instrument.Harpsichord,
                  instrument.Viola,
                  instrument.ElectricGuitar,
-                 instrument.Flute]
+                 instrument.Flute,
+                 instrument.Vibraphone,  # not 10
+                 instrument.BassDrum,  # 10
+                 instrument.HiHatCymbal,  # 10
+                 ]
         iObjs = []
 
         s = stream.Score()
@@ -2797,16 +2865,44 @@ class Test(unittest.TestCase):
             p.append(note.Note('C#'))
             s.insert(0, p)
 
-        channelByInstrument, channelsDynamic = translate.channelInstrumentData(s)
+        channelByInstrument, channelsDynamic = channelInstrumentData(s)
+
+        # Default allocations
+        self.assertEqual(channelByInstrument.keys(), set(inst.midiProgram for inst in iObjs))
+        self.assertSetEqual(set(channelByInstrument.values()), {1, 2, 3, 4, 5, 10})
+        self.assertListEqual(channelsDynamic, [6, 7, 8, 9, 11, 12, 13, 14, 15, 16])
+
+        # Limit to given acceptable channels
+        acl = list(range(11, 17))
+        channelByInstrument, channelsDynamic = channelInstrumentData(s, acceptableChannelList=acl)
+        self.assertEqual(channelByInstrument.keys(), set(inst.midiProgram for inst in iObjs))
+        self.assertSetEqual(set(channelByInstrument.values()), {10, 11, 12, 13, 14, 15})
+        self.assertListEqual(channelsDynamic, [16])
+
+        # User specification
+        for i, iObj in enumerate(iObjs):
+            iObj.midiChannel = 15 - i
+
+        channelByInstrument, channelsDynamic = channelInstrumentData(s)
 
         self.assertEqual(channelByInstrument.keys(), set(inst.midiProgram for inst in iObjs))
-        self.assertSetEqual(set(channelByInstrument.values()), {1, 2, 3, 4})
-        self.assertListEqual(channelsDynamic, [5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16])
+        self.assertSetEqual(set(channelByInstrument.values()), {11, 12, 13, 14, 15, 16})
+        self.assertListEqual(channelsDynamic, [1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+        # User error
+        iObjs[0].midiChannel = 100
+        msg = 'Harpsichord specified 1-indexed MIDI channel 101 but '
+        msg += 'acceptable channels were [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16].'
+        msg += 'Defaulting to channel 1.'
+        with self.assertWarns(TranslateWarning, msg=msg):
+            channelByInstrument, channelsDynamic = channelInstrumentData(s)
+        self.assertEqual(channelByInstrument.keys(), set(inst.midiProgram for inst in iObjs))
+        self.assertSetEqual(set(channelByInstrument.values()), {1, 11, 12, 13, 14, 15})
+        self.assertListEqual(channelsDynamic, [2, 3, 4, 5, 6, 7, 8, 9, 16])
 
     def testPacketStorage(self):
         # test instrument assignments
         from music21 import instrument
-        from music21.midi import translate
 
         iList = [None,  # conductor track
                  instrument.Harpsichord,
@@ -2827,7 +2923,7 @@ class Test(unittest.TestCase):
                 p.append(note.Note('C#'))
             substreamList.append(p)
 
-        packetStorage = translate.packetStorageFromSubstreamList(substreamList, addStartDelay=False)
+        packetStorage = packetStorageFromSubstreamList(substreamList, addStartDelay=False)
         self.assertIsInstance(packetStorage, dict)
         self.assertEqual(list(packetStorage.keys()), [0, 1, 2, 3, 4, 5])
 
@@ -2848,7 +2944,7 @@ class Test(unittest.TestCase):
             None: 5,
         }
 
-        translate.updatePacketStorageWithChannelInfo(packetStorage, channelInfo)
+        updatePacketStorageWithChannelInfo(packetStorage, channelInfo)
         self.assertSetEqual(set(harpsPacket.keys()),
                             {'rawPackets', 'initInstrument', 'initChannel'})
         self.assertEqual(harpsPacket['initChannel'], 1)

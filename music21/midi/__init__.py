@@ -446,6 +446,12 @@ class MidiEvent(prebase.ProtoM21Object):
     The `data` attribute is used for storing other messages,
     such as SEQUENCE_TRACK_NAME string values.
 
+    .. warning::
+
+        The attributes `.midiProgram` and `.midiChannel` on :class:`~music21.instrument.Instrument`
+        objects are 0-indexed, just as they need to be in the written binary .mid.
+        However, as a convenience, :attr:`MidiEvent.channel` is 1-indexed. No
+        analogous convenience is provided for program change data.
 
     >>> mt = midi.MidiTrack(1)
     >>> me1 = midi.MidiEvent(mt)
@@ -469,7 +475,7 @@ class MidiEvent(prebase.ProtoM21Object):
                  track: Optional['music21.midi.MidiTrack'] = None,
                  type=None,  # @ReservedAssignment
                  time: int = 0,
-                 channel=None):
+                 channel: Optional[int] = None):
         self.track: Optional['music21.midi.MidiTrack'] = track  # a MidiTrack object
         self.type = type
         self.time: int = time
