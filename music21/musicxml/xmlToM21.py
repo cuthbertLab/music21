@@ -1430,7 +1430,7 @@ class PartParser(XMLParserBase):
         self.mxScorePart = mxScorePart
 
         if mxPart is not None:
-            self.partId = mxPart.get('id', None)
+            self.partId = mxPart.get('id')
             if self.partId is None and parent is not None:
                 self.partId = list(parent.mxScorePartDict.keys())[0]
         else:
