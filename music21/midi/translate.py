@@ -729,7 +729,7 @@ def midiEventsToInstrument(eventList):
 
     >>> me = midi.MidiEvent()
     >>> me.type = midi.ChannelVoiceMessages.PROGRAM_CHANGE
-    >>> me.data = 54  # Voice Oohs
+    >>> me.data = 53  # MIDI program 54: Voice Oohs
     >>> midi.translate.midiEventsToInstrument(me)
     <music21.instrument.Vocalist 'Voice'>
 
@@ -741,7 +741,7 @@ def midiEventsToInstrument(eventList):
     <music21.instrument.Tambourine 'Tambourine'>
     >>> i.midiChannel  # 0-indexed in music21
     9
-    >>> i.midiProgram
+    >>> i.midiProgram  # 0-indexed in music21
     53
     '''
     from music21 import midi as midiModule
@@ -763,11 +763,11 @@ def midiEventsToInstrument(eventList):
         else:
             if event.channel == 10:
                 pm = percussion.PercussionMapper()
-                i = pm.midiPitchToInstrument(event.data)
+                i = pm.midiPitchToInstrument(event.data + 1)
             else:
                 i = instrument.instrumentFromMidiProgram(event.data)
-            # Instrument.midiProgram is 0-indexed
-            i.midiProgram = event.data - 1
+            # Instrument.midiProgram and event.data are both 0-indexed
+            i.midiProgram = event.data
     except (instrument.InstrumentException, UnicodeDecodeError):  # pragma: no cover
         i = instrument.Instrument()
 
