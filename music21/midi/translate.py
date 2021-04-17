@@ -2075,7 +2075,9 @@ def channelInstrumentData(
     Read through Stream `s` and finding instruments in it, return a 2-tuple,
     the first a dictionary mapping MIDI program numbers to channel numbers,
     and the second, a list of unassigned channels that can be used for dynamic
-    allocation.
+    allocation. One channel is always left unassigned for dynamic allocation.
+    If the number of needed channels exceeds the number of available ones,
+    any further MIDI program numbers are assigned to channel 1.
 
     Substreams without notes or rests (e.g. representing a conductor track)
     will not consume a channel.
@@ -2091,7 +2093,7 @@ def channelInstrumentData(
     - User-manipulated `.midiChannel`
     - `UnpitchedPercussion` subclasses receive MIDI Channel 10 (9 in music21)
     - The channel mappings produced by reading from `acceptableChannelList`,
-      or the default range 1-16. (More precisely, 1-15, since once dynamic channel
+      or the default range 1-16. (More precisely, 1-15, since one dynamic channel
       is always reserved.)
 
     .. warning::
