@@ -339,6 +339,7 @@ class Test(unittest.TestCase):
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
+    @unittest.expectedFailure
     def testTrecentoMadrigal(self):
         from music21 import corpus
         # c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
