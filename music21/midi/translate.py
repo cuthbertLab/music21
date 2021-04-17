@@ -28,6 +28,7 @@ from music21 import environment
 from music21 import stream
 
 from music21.instrument import Conductor, deduplicate
+from music21.midi import percussion
 
 _MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
@@ -725,6 +726,23 @@ def instrumentToMidiEvents(inputM21,
 def midiEventsToInstrument(eventList):
     '''
     Convert a single MIDI event into a music21 Instrument object.
+
+    >>> me = midi.MidiEvent()
+    >>> me.type = midi.ChannelVoiceMessages.PROGRAM_CHANGE
+    >>> me.data = 54  # Voice Oohs
+    >>> midi.translate.midiEventsToInstrument(me)
+    <music21.instrument.Vocalist 'Voice'>
+
+    The percussion map will be used if the channel is 10:
+
+    >>> me.channel = 10
+    >>> i = midi.translate.midiEventsToInstrument(me)
+    >>> i
+    <music21.instrument.Tambourine 'Tambourine'>
+    >>> i.midiChannel  # 0-indexed in music21
+    9
+    >>> i.midiProgram
+    53
     '''
     from music21 import midi as midiModule
 
@@ -743,9 +761,21 @@ def midiEventsToInstrument(eventList):
             decoded = decoded.strip()
             i = instrument.fromString(decoded)
         else:
-            i = instrument.instrumentFromMidiProgram(event.data)
+            if event.channel == 10:
+                pm = percussion.PercussionMapper()
+                i = pm.midiPitchToInstrument(event.data)
+            else:
+                i = instrument.instrumentFromMidiProgram(event.data)
+            # Instrument.midiProgram is 0-indexed
+            i.midiProgram = event.data - 1
     except (instrument.InstrumentException, UnicodeDecodeError):  # pragma: no cover
         i = instrument.Instrument()
+
+    # Set MIDI channel
+    # Instrument.midiChannel is 0-indexed
+    if event.channel is not None:
+        i.midiChannel = event.channel - 1
+
     # Set partName or instrumentName with literal value from parsing
     if decoded:
         # Except for lousy instrument names
@@ -2090,7 +2120,7 @@ def channelInstrumentData(
     :class:`~music21.instrument.UnpitchedPercussion`
     subclasses. Put another way, the priority is:
 
-    - User-manipulated `.midiChannel`
+    - Instrument instance `.midiChannel` (set by user or imported from MIDI)
     - `UnpitchedPercussion` subclasses receive MIDI Channel 10 (9 in music21)
     - The channel mappings produced by reading from `acceptableChannelList`,
       or the default range 1-16. (More precisely, 1-15, since one dynamic channel
