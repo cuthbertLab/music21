@@ -1064,6 +1064,15 @@ class Ambitus(DiscreteAnalysis):
         >>> s = stream.Stream()
         >>> ambitusAnalyzer.getPitchRanges(s)
         (0, 0)
+
+        OMIT_FROM_DOCS
+
+        >>> s = stream.Stream()
+        >>> for i in range(12, 61):
+        ...    n = note.Note(i)
+        ...    s.repeatAppend(n, 2)
+        >>> ambitusAnalyzer.getPitchRanges(s)
+        (0, 48)
         '''
         ssfn = subStream.flat.notes
 
@@ -1075,15 +1084,19 @@ class Ambitus(DiscreteAnalysis):
             elif 'Note' in n.classes:
                 pitches = [n.pitch]
             for p in pitches:
-                psFound.append(p.ps)
+                # third insertion would be irrelevant
+                # we will sort next, and having two identical
+                # values is enough to produce an interval of 0.
+                if psFound.count(p.ps) < 2:
+                    psFound.append(p.ps)
         psFound.sort()
-        psRange = []
+        psRange = set()
         for i in range(len(psFound) - 1):
             p1 = psFound[i]
             for j in range(i + 1, len(psFound)):
                 p2 = psFound[j]
                 # p2 should always be equal or greater than p1
-                psRange.append(p2 - p1)
+                psRange.add(p2 - p1)
 
         if not psRange:
             return (0, 0)
