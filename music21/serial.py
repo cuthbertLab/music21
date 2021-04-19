@@ -1046,7 +1046,8 @@ class TwelveToneRow(ToneRow):
         describe another. One of the zero-centered or original-centered conventions for tone row
         transformations must be specified in the last argument; see
         :meth:`~music21.serial.ToneRow.zeroCenteredTransformation` and
-        :meth:`~music21.serial.ToneRow.originalCenteredTransformation` explanations of these conventions.
+        :meth:`~music21.serial.ToneRow.originalCenteredTransformation` explanations
+        of these conventions.
 
         >>> moses = serial.getHistoricalRowByName('SchoenbergMosesAron')
         >>> moses.pitchClasses()

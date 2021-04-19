@@ -507,7 +507,7 @@ class Mordent(GeneralMordent):
     A normal Mordent -- goes downwards and has a line through it.
 
     Note that some computer terminology calls this one an inverted mordent, but this
-    is a modern term.  See Apel, _Harvard Dictionary of Music_, "Mordent"::
+    is a modern term.  See Apel, *Harvard Dictionary of Music*, "Mordent"::
 
         A musical ornament consisting of the alternation of the written note
         with the note immediately below it.
@@ -565,7 +565,7 @@ class InvertedMordent(GeneralMordent):
     An inverted Mordent -- goes upwards and has no line through it.
 
     Note that some computer terminology calls this one a (normal) mordent, but this
-    is a modern term.    See Apel, _Harvard Dictionary of Music_,
+    is a modern term.    See Apel, *Harvard Dictionary of Music*,
     "Inverted Mordent"::
 
         An 18th-century ornament involving alternation of the
