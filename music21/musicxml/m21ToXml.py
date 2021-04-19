@@ -5827,11 +5827,11 @@ class MeasureExporter(XMLExporterBase):
             return mxTime
 
         # always get a flat version to display any subdivisions created
-        fList = [(mt.numerator, mt.denominator) for mt in ts.displaySequence.flat]
+        fList = tuple((mt.numerator, mt.denominator) for mt in ts.displaySequence.flat)
         if ts.summedNumerator:
             # this will try to reduce any common denominators into
             # a common group
-            fList = meter.fractionToSlashMixed(fList)
+            fList = meter.tools.fractionToSlashMixed(fList)
 
         for n, d in fList:
             mxBeats = SubElement(mxTime, 'beats')
@@ -6447,6 +6447,13 @@ class Test(unittest.TestCase):
         # Measure 3, right barline: <ending number="3" type="stop"/>
         s = converter.parse(testPrimitive.multiDigitEnding)
         x = self.getET(s)
+        endings = x.findall('.//ending')
+        self.assertEqual([e.get('number') for e in endings], ['1,2', '1,2', '3', '3'])
+
+        # Check templates also
+        template = s.template()
+        template.makeNotation(inPlace=True)  # not essential, but since getET() skips this
+        x = self.getET(template)
         endings = x.findall('.//ending')
         self.assertEqual([e.get('number') for e in endings], ['1,2', '1,2', '3', '3'])
 
