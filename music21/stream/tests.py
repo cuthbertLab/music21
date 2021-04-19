@@ -553,14 +553,15 @@ class Test(unittest.TestCase):
         a.append(n)
         self.assertEqual(a.duration.quarterLength, 1.0)
 
-        # Alter the note's duration in a nonstandard way
-        # Normally, one would call Duration.appendTuplet()
         tup = duration.Tuplet()
         n.duration.tuplets = (tup,)
-        # Nonstandard workflow requires coreElementsChanged() to be called
-        # https://github.com/cuthbertLab/music21/issues/957
-        a.coreElementsChanged()
         self.assertEqual(a.duration.quarterLength, Fraction(2, 3))
+
+        # Also (regression) test clearing the cache
+        # https://github.com/cuthbertLab/music21/issues/957
+        n.duration.tuplets = (tup, tup)
+        a.coreElementsChanged()
+        self.assertEqual(a.duration.quarterLength, Fraction(4, 9))
 
     def testMeasureStream(self):
         '''An approach to setting TimeSignature measures in offsets and durations
