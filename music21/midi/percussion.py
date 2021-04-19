@@ -39,6 +39,10 @@ class PercussionMapper:
 
     But you're better off using the midiPitchToInstrument() method below!
 
+    .. warning::
+
+        Accepts 1-indexed MIDI programs, unlike music21's 0-indexed `.midiProgram`
+        and `.midiChannel` attributes on Instrument instances.
     '''
 
     i = instrument
@@ -96,7 +100,7 @@ class PercussionMapper:
     def midiPitchToInstrument(self, midiPitch):
         '''
         Takes a pitch.Pitch object or int and returns the corresponding
-        instrument in the GM Percussion Map.
+        instrument in the GM Percussion Map, using 1-indexed MIDI programs.
 
 
         >>> pm = midi.percussion.PercussionMapper()
@@ -167,7 +171,7 @@ class PercussionMapper:
     def midiInstrumentToPitch(self, midiInstrument):
         '''
         Takes an instrument.Instrument object and returns a pitch object
-        with the corresponding MIDI note, according to the GM Percussion Map.
+        with the corresponding 1-indexed MIDI note, according to the GM Percussion Map.
 
 
         >>> pm = midi.percussion.PercussionMapper()
