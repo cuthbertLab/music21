@@ -2134,7 +2134,8 @@ def channelInstrumentData(
     '''
     # temporary channel allocation
     if acceptableChannelList is not None:
-        acceptableChannels = acceptableChannelList
+        # copy user input, because we will manipulate it
+        acceptableChannels = acceptableChannelList[:]
     else:
         acceptableChannels = list(range(1, 10)) + list(range(11, 17))  # all but 10
 
