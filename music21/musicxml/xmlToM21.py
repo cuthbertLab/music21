@@ -3257,10 +3257,9 @@ class MeasureParser(XMLParserBase):
 
         # two ways to create durations, raw (from qLen) and cooked (from type, time-mod, dots)
         if d is not None:
-            durRaw = duration.Duration()  # raw just uses qLen
+            durRaw = duration.Duration(quarterLength=qLen)  # raw just uses qLen
             # the qLen set here may not be computable, but is not immediately
             # computed until setting components
-            durRaw.quarterLength = qLen
             try:
                 d.components = durRaw.components
             except duration.DurationException:  # TODO: Test
