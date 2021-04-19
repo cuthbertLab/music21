@@ -24,7 +24,7 @@ TODO: replace .size with a string representing interval and then
 import copy
 import string
 import unittest
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from music21 import base
 from music21 import common
@@ -622,23 +622,41 @@ class WholeStepInvertedMordent(InvertedMordent):
 
 # ------------------------------------------------------------------------------
 class Trill(Ornament):
-    '''A basic trill marker.
-
-    >>> m = expressions.Trill()
-    >>> m.placement
-    'above'
-    >>> m.size
-    <music21.interval.Interval M2>
     '''
+    A basic trill marker without the trill extension
 
+    >>> tr = expressions.Trill()
+    >>> tr.placement
+    'above'
+    >>> tr.size
+    <music21.interval.GenericInterval 2>
+
+    Trills have a `.nachschlag` attribute which determines whether there
+    should be extra gracenotes at the end of the trill.
+
+    >>> tr.nachschlag
+    False
+    >>> tr.nachschlag = True
+
+    The Trill also has a "quarterLength" attribute that sets how long
+    each trill note should be.  Defaults to 32nd note:
+
+    >>> tr.quarterLength
+    0.125
+    >>> tr.quarterLength == duration.Duration('32nd').quarterLength
+    True
+
+    Changed in v.7 -- the size should be a generic second.
+    '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval('M2')
+        self.size: interval.IntervalBase = interval.GenericInterval(2)
 
         self.placement = 'above'
         self.nachschlag = False  # play little notes at the end of the trill?
         self.tieAttach = 'all'
         self.quarterLength = 0.125
+        self._setAccidentalFromKeySig = True
 
     def splitClient(self, noteList):
         '''
@@ -662,38 +680,109 @@ class Trill(Ornament):
 
         return returnSpanners
 
-    def realize(self, srcObj: 'music21.note.Note'):
+    def realize(
+        self,
+        srcObj: 'music21.note.Note'
+    ) -> Tuple[List['music21.note.Note'], None, List['music21.note.Note']]:
         '''
         realize a trill.
 
-        returns a three-element tuple.
-        The first is a list of the notes that the note was converted to.
-        The second is None because the trill "eats up" the whole note.
-        The third is a list of the notes at the end if nachschlag is True, and empty list if False.
+        Returns a three-element tuple:
 
+        * The first is a list of the notes that the note was converted to.
+        * The second is None because the trill "eats up" the whole note.
+        * The third is a list of the notes at the end if nachschlag is True, and empty list if False.
 
         >>> n1 = note.Note('C4')
-        >>> n1.quarterLength = 0.5
+        >>> n1.duration.type = 'eighth'
         >>> t1 = expressions.Trill()
+        >>> n1.expressions.append(t1)
+        >>> realization = t1.realize(n1)
+        >>> realization
+        ([<music21.note.Note C>,
+          <music21.note.Note D>,
+          <music21.note.Note C>,
+          <music21.note.Note D>], None, [])
+        >>> realization[0][0].quarterLength
+        0.125
+        >>> realization[0][0].pitch.octave
+        4
+
+
+        When inside a stream, the realizations will consult the current key to see
+        if it should be a whole-step or half-step trill:
+
+        >>> m = stream.Measure()
+        >>> k1 = key.Key('D-')
+        >>> m.insert(0, k1)
+        >>> m.append(n1)
+        >>> t1.realize(n1)
+        ([<music21.note.Note C>,
+          <music21.note.Note D->,
+          <music21.note.Note C>,
+          <music21.note.Note D->], None, [])
+
+
+        Note that if the key contradicts the note of the trill, for instance, here
+        having a C-natural rather than a C-sharp, we do not correct the C to C#.
+
+        >>> k2 = key.Key('A')
+        >>> m.replace(k1, k2)
         >>> t1.realize(n1)
         ([<music21.note.Note C>,
           <music21.note.Note D>,
           <music21.note.Note C>,
           <music21.note.Note D>], None, [])
 
+        This can lead to certain unusual circumstances such as augmented second trills
+        which are technically correct, but probably not what a performer exprects.
+
+        >>> k3 = key.Key('E')
+        >>> m.replace(k2, k3)
+        >>> t1.realize(n1)
+        ([<music21.note.Note C>,
+          <music21.note.Note D#>,
+          <music21.note.Note C>,
+          <music21.note.Note D#>], None, [])
+
+
+        To avoid this case, create a :class:`~music21.expressions.HalfStepTrill` or
+        :class:`~music21.expressions.WholeStepTrill`.
+
+
+        If there is a nachschlag, it will appear in the third element of the list.
+
+        >>> n1.duration.type = 'quarter'
+        >>> m.replace(k3, k1)  # back to D-flat major
+        >>> t1.nachschlag = True
+        >>> t1.realize(n1)
+        ([<music21.note.Note C>,
+          <music21.note.Note D->,
+          <music21.note.Note C>,
+          <music21.note.Note D->,
+          <music21.note.Note C>,
+          <music21.note.Note D->], None, [<music21.note.Note C>, <music21.note.Note B->])
+
+        Some notes can be too short to realize.
 
         >>> n2 = note.Note('D4')
-        >>> n2.quarterLength = 0.125
+        >>> n2.duration.type = '32nd'
         >>> t2 = expressions.Trill()
         >>> t2.realize(n2)
         Traceback (most recent call last):
         music21.expressions.ExpressionException: The note is not long enough to realize a trill
 
-        :type srcObj: base.Music21Object
+        A quicker trill makes it possible:
+
+        >>> t2.quarterLength = duration.Duration('64th').quarterLength
+        >>> t2.realize(n2)
+        ([<music21.note.Note D>,
+          <music21.note.Note E>], None, [])
         '''
+        # TODO -- if the trill duration is too short, do not raise an error, simple make the
+        #    quarterLength even shorter.
+
         from music21 import key
-        if self.size == '':
-            raise ExpressionException('Cannot realize a trill if there is no size given')
         if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
         if srcObj.duration.quarterLength < 2 * self.quarterLength:
@@ -704,36 +793,41 @@ class Trill(Ornament):
         transposeInterval = self.size
         transposeIntervalReverse = self.size.reverse()
 
+        numberOfTrillNotes = int(srcObj.duration.quarterLength / self.quarterLength)
         if self.nachschlag:
-            numberOfTrillNotes = int(srcObj.duration.quarterLength / (self.quarterLength - 2))
-        else:
-            numberOfTrillNotes = int(srcObj.duration.quarterLength / self.quarterLength)
+            numberOfTrillNotes -= 2
 
         trillNotes = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval)
 
-        currentKeySig = srcObj.getContextByClass(key.KeySignature)
-        if currentKeySig is None:
-            currentKeySig = key.KeySignature(0)
+        currentKeySig = None
+        if self._setAccidentalFromKeySig:
+            currentKeySig = srcObj.getContextByClass(key.KeySignature)
+            if currentKeySig is None:
+                currentKeySig = key.KeySignature(0)
 
-        for n in trillNotes:
-            n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
+            for n in trillNotes:
+                if n.pitch.nameWithOctave != srcObj.pitch.nameWithOctave:
+                    # do not correct original note, no matter what.
+                    n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
 
         if self.nachschlag:
             firstNoteNachschlag = copy.deepcopy(srcObj)
-            # TODO: remove expressions
+            firstNoteNachschlag.expressions = []
             firstNoteNachschlag.duration.quarterLength = self.quarterLength
-            firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
-                firstNoteNachschlag.step)
 
             secondNoteNachschlag = copy.deepcopy(srcObj)
-            # TODO: remove expressions
+            secondNoteNachschlag.expressions = []
             secondNoteNachschlag.duration.quarterLength = self.quarterLength
             secondNoteNachschlag.transpose(transposeIntervalReverse,
                                            inPlace=True)
-            secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
-                secondNoteNachschlag.step)
+
+            if self._setAccidentalFromKeySig:
+                firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
+                    firstNoteNachschlag.step)
+                secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
+                    secondNoteNachschlag.step)
 
             nachschlag = [firstNoteNachschlag, secondNoteNachschlag]
 
@@ -744,41 +838,73 @@ class Trill(Ornament):
 
 
 class HalfStepTrill(Trill):
-    '''A basic trill marker.
+    '''
+    A trill confined to half steps.
 
-
-    >>> m = expressions.HalfStepTrill()
-    >>> m.placement
+    >>> halfTrill = expressions.HalfStepTrill()
+    >>> halfTrill.placement
     'above'
-    >>> m.size
+    >>> halfTrill.size
     <music21.interval.Interval m2>
+
+    Here the key signature of 2 sharps will not affect the trill:
+
+    >>> n = note.Note('B4', type='eighth')
+    >>> m = stream.Measure()
+    >>> m.insert(0, key.KeySignature(2))
+    >>> m.append(n)
+    >>> halfTrill.realize(n)
+    ([<music21.note.Note B>,
+      <music21.note.Note C>,
+      <music21.note.Note B>,
+      <music21.note.Note C>], None, [])
     '''
 
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('m2')
+        self._setAccidentalFromKeySig = False
 
 
 class WholeStepTrill(Trill):
-    '''A basic trill marker.
+    '''
+    A trill that yields whole steps no matter what.
 
-
-    >>> m = expressions.WholeStepTrill()
-    >>> m.placement
+    >>> wholeTrill = expressions.WholeStepTrill()
+    >>> wholeTrill.placement
     'above'
-    >>> m.size
+    >>> wholeTrill.size
     <music21.interval.Interval M2>
+
+    Here the key signature of one sharp will not affect the trill:
+
+    >>> n = note.Note('B4', type='eighth')
+    >>> m = stream.Measure()
+    >>> m.insert(0, key.KeySignature(1))
+    >>> m.append(n)
+    >>> wholeTrill.realize(n)
+    ([<music21.note.Note B>,
+      <music21.note.Note C#>,
+      <music21.note.Note B>,
+      <music21.note.Note C#>], None, [])
     '''
 
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('M2')
+        self._setAccidentalFromKeySig = False
 
 
 class Shake(Trill):
+    '''
+    A slower trill.
+
+    >>> shake = expressions.Shake()
+    >>> shake.quarterLength
+    0.25
+    '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval('M2')
         self.quarterLength = 0.25
 
 
