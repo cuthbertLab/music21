@@ -965,7 +965,7 @@ class DataSet:
 
     def _processNonParallel(self):
         '''
-        The traditional method: run non-parallel
+        The traditional way: run non-parallel
         '''
         # clear features
         self.features = []

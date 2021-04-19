@@ -282,7 +282,7 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
     ...     )
     'o6#5b3'
 
-    The method substitutes shorthand (e.g., '6' not '63')
+    The function substitutes shorthand (e.g., '6' not '63')
 
     >>> roman.postFigureFromChordAndKey(
     ...     chord.Chord(['E3', 'C4', 'G4']),
@@ -604,7 +604,7 @@ def identifyAsTonicOrDominant(
 def romanInversionName(inChord, inv=None):
     '''
     Extremely similar to Chord's inversionName() method, but returns string
-    values and allows incomplete triads
+    values and allows incomplete triads.
     '''
     if inv is None:
         inv = inChord.inversion()
@@ -3248,7 +3248,7 @@ class RomanNumeral(harmony.Harmony):
     def isNeapolitan(self,
                      require1stInversion: bool = True):
         '''
-        Music21's Chord module offers methods for identifying chords of a particular type,
+        Music21's Chord class contains methods for identifying chords of a particular type,
         such as :meth:`~music21.chord.Chord.isAugmentedSixth`.
 
         Some similar chord types are defined not only by the structure of a chord but
