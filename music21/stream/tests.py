@@ -1199,6 +1199,9 @@ class Test(unittest.TestCase):
         stripped = s.stripTies(inPlace=False)
         sn1 = stripped.flat.notes[0]
 
+        self.assertEqual(len(stripped.spanners[0]), 1)
+        self.assertEqual(len(stripped.spanners[1]), 1)
+
         self.assertTrue(stripped.spanners[0].isFirst(sn1))
         self.assertTrue(stripped.spanners[0].isLast(sn1))
         self.assertTrue(stripped.spanners[1].isFirst(sn1))
@@ -2122,6 +2125,10 @@ class Test(unittest.TestCase):
 
         s.replace(n4, n1)
         self.assertEqual([s[0], s[1]], [n3, n1])
+
+        error_msg = f'{n3} already in {s}'
+        with self.assertRaises(StreamException, msg=error_msg):
+            s.replace(n4, n3)
 
     def testReplaceA1(self):
         sBach = corpus.parse('bach/bwv324.xml')
