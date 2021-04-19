@@ -2482,7 +2482,7 @@ def streamToMidiFile(
     inputM21: stream.Stream,
     *,
     addStartDelay: bool = False,
-    acceptableChannelList: List[int] = None,
+    acceptableChannelList: Optional[List[int]] = None,
 ) -> 'music21.midi.MidiFile':
     # noinspection PyShadowingNames
     '''
