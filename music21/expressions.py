@@ -76,6 +76,7 @@ def realizeOrnaments(srcObject):
                     postExpandList.append(i)
                 if newSrcObject is None:
                     # some ornaments eat up the entire source object. Trills for instance
+                    srcObject = newSrcObject
                     break
                 newSrcObject.expressions = srcObject.expressions[1:]
                 srcObject = newSrcObject
@@ -87,9 +88,11 @@ def realizeOrnaments(srcObject):
                     break
 
         retList = []
+        # TODO: use extend...
         for i in preExpandList:
             retList.append(i)
-        retList.append(srcObject)
+        if srcObject is not None:
+            retList.append(srcObject)
         for i in postExpandList:
             retList.append(i)
         return retList
@@ -691,7 +694,8 @@ class Trill(Ornament):
 
         * The first is a list of the notes that the note was converted to.
         * The second is None because the trill "eats up" the whole note.
-        * The third is a list of the notes at the end if nachschlag is True, and empty list if False.
+        * The third is a list of the notes at the end if nachschlag is True,
+          and empty list if False.
 
         >>> n1 = note.Note('C4')
         >>> n1.duration.type = 'eighth'
@@ -911,11 +915,16 @@ class Shake(Trill):
 # ------------------------------------------------------------------------------
 
 # TODO: BaroqueSlide
-# this is a slide or culee
+
 class Schleifer(Ornament):
+    '''
+    A slide or culee
+
+    Changed in v.7 -- size is a Generic second.  removed unused nachschlag component.
+    '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval('M2')
+        self.size = interval.GenericInterval(2)
         self.quarterLength = 0.25
 
 
@@ -923,12 +932,13 @@ class Schleifer(Ornament):
 class Turn(Ornament):
     '''
     A turn or Gruppetto.
+
+    Changed in v.7 -- size is a Generic second.  removed unused nachschlag component.
     '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval('M2')
+        self.size = interval.GenericInterval(2)
         self.placement = 'above'
-        self.nachschlag = False  # play little notes at the end of the trill?
         self.tieAttach = 'all'
         self.quarterLength = 0.25
 
@@ -954,7 +964,6 @@ class Turn(Ornament):
                                      <music21.note.Note B->,
                                      <music21.note.Note C>])
 
-
         >>> m2 = stream.Measure()
         >>> m2.append(key.KeySignature(5))
         >>> n2 = note.Note('B4')
@@ -965,8 +974,6 @@ class Turn(Ornament):
                                      <music21.note.Note B>,
                                      <music21.note.Note C#>,
                                      <music21.note.Note B>])
-
-
 
         >>> n2 = note.Note('C4')
         >>> n2.quarterLength = 0.125
@@ -989,24 +996,22 @@ class Turn(Ornament):
         transposeIntervalDown = self.size.reverse()
         turnNotes = []
 
-        # TODO: if nachschlag...
-
         firstNote = copy.deepcopy(srcObject)
-        # TODO: remove expressions
+        firstNote.expressions = []
         firstNote.duration.quarterLength = self.quarterLength
         firstNote.transpose(transposeIntervalUp, inPlace=True)
 
         secondNote = copy.deepcopy(srcObject)
-        # TODO: remove expressions
+        secondNote.expressions = []
         secondNote.duration.quarterLength = self.quarterLength
 
         thirdNote = copy.deepcopy(srcObject)
-        # TODO: remove expressions
+        thirdNote.expressions = []
         thirdNote.duration.quarterLength = self.quarterLength
         thirdNote.transpose(transposeIntervalDown, inPlace=True)
 
         fourthNote = copy.deepcopy(srcObject)
-        # TODO: remove expressions
+        fourthNote.expressions = []
         fourthNote.duration.quarterLength = self.quarterLength
 
         turnNotes.append(firstNote)
@@ -1019,6 +1024,7 @@ class Turn(Ornament):
             currentKeySig = key.KeySignature(0)
 
         for n in turnNotes:
+            # TODO: like in trill, do not affect original note.
             n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
 
         remainderNote = copy.deepcopy(srcObject)
@@ -1037,7 +1043,6 @@ class InvertedTurn(Turn):
 class GeneralAppoggiatura(Ornament):
     # up or down -- up means the grace note is below and goes up to the actual note
     direction = ''
-    size = None  # interval.Interval (General, etc.) class
 
     def __init__(self):
         super().__init__()
@@ -1369,7 +1374,7 @@ class TremoloSpanner(spanner.Spanner):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def x_testRealize(self):
+    def testRealize(self):
         from music21 import note
         from music21 import stream
         n1 = note.Note('D4')
@@ -1423,7 +1428,7 @@ class Test(unittest.TestCase):
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'd.s. al fine')
 
-    def x_testExpandTurns(self):
+    def testExpandTurns(self):
         from music21 import note, stream, clef, key, meter
         p1 = stream.Part()
         m1 = stream.Measure()
@@ -1432,35 +1437,51 @@ class Test(unittest.TestCase):
         p1.append(key.Key('F', 'major'))
         p1.append(meter.TimeSignature('2/4'))
         n1 = note.Note('C5', type='half')
-        n1.expressions.append(Turn())
-        n2 = note.Note('B4', type='half')
+        turn0 = Turn()
+        n1.expressions.append(turn0)
+        n2 = note.Note('B4', type='quarter')
+        n2.duration.dots = 1
+
         n2.expressions.append(InvertedTurn())
         m1.append(n1)
         m2.append(key.KeySignature(5))
         m2.append(n2)
+        m2.append(note.Rest('eighth'))
         p1.append(m1)
         p1.append(m2)
-        # print(realizeOrnaments(n1))
-        # print(realizeOrnaments(n2))
+        realized1 = realizeOrnaments(n1)
+        realized2 = realizeOrnaments(n2)
+        self.assertEqual('C5 D5 C5 B-4 C5', ' '.join(n.pitch.nameWithOctave for n in realized1))
+        self.assertEqual('B4 A#4 B4 C#5 B4', ' '.join(n.pitch.nameWithOctave for n in realized2))
+        self.assertEqual(realized1[0].quarterLength, 1.0)
+        self.assertEqual(realized1[1].quarterLength, 0.25)
+        self.assertEqual(realized2[0].quarterLength, 0.5)
+        self.assertEqual(realized2[1].quarterLength, 0.25)
 
-    def x_testExpandTrills(self):
+        turn0.quarterLength = 0.125
+        realized1b = realizeOrnaments(n1)
+        self.assertEqual(realized1b[0].quarterLength, 1.5)
+        self.assertEqual(realized1b[1].quarterLength, 0.125)
+
+
+    def testExpandTrills(self):
         from music21 import note, stream, clef, key, meter
         p1 = stream.Part()
         m1 = stream.Measure()
         p1.append(clef.TrebleClef())
         p1.append(key.Key('D', 'major'))
-        p1.append(meter.TimeSignature('2/4'))
+        p1.append(meter.TimeSignature('1/4'))
         n1 = note.Note('E4', type='eighth')
         n1.expressions.append(Trill())
         m1.append(n1)
         p1.append(m1)
-        # print(realizeOrnaments(n1))
+        realized = realizeOrnaments(n1)
+        self.assertIsInstance(realized, list)
+        self.assertEqual(len(realized), 4)
+        self.assertIsInstance(realized[0], note.Note)
+        self.assertEqual(realized[0].quarterLength, 0.125)
+        self.assertEqual('E4 F#4 E4 F#4', ' '.join(n.pitch.nameWithOctave for n in realized))
 
-    # def testCPEBachRealizeOrnaments(self):
-    #     from music21 import corpus
-    #     cpe = corpus.parse('cpebach/h186').parts[0].measures(1, 4)
-    #     cpe2 = cpe.realizeOrnaments()
-    #     cpe2.show()
 
     def testTrillExtensionA(self):
         '''Test basic wave line creation and output, as well as passing
@@ -1486,6 +1507,14 @@ class Test(unittest.TestCase):
         raw = m21ToXml.GeneralObjectExporter().parse(s)
         # s.show()
         self.assertEqual(raw.count(b'wavy-line'), 2)
+
+
+# class TestExternal(unittest.TestCase):
+#     def testCPEBachRealizeOrnaments(self):
+#         from music21 import corpus
+#         cpe = corpus.parse('cpebach/h186').parts[0].measures(1, 4)
+#         cpe2 = cpe.realizeOrnaments()
+#         cpe2.show()
 
 
 # ------------------------------------------------------------------------------
