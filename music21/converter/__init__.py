@@ -1686,7 +1686,7 @@ class Test(unittest.TestCase):
         # environLocal.printDebug(['\n' + 'opening fp', fp])
 
         self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 2)
-        self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 4)
+        self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 5)
 
         # MIDI import makes measures, so we will have one 4/4 time sig
         self.assertEqual(len(s.flat.getElementsByClass(meter.TimeSignature)), 1)

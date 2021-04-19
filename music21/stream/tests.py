@@ -1927,9 +1927,7 @@ class Test(unittest.TestCase):
 
         s.insert(0, m1)
         s.insert(4, m2)
-        # must connect Measures to Streams before filling gaps
-        m1.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
-        m2.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
+        s.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
         self.assertTrue(m2.isSorted)
         # m2.sort()
 
@@ -1963,6 +1961,32 @@ class Test(unittest.TestCase):
         unused_mx = GEX.parse(s).decode('utf-8')
         # s.show('text')
         # s.show()
+
+    def testMakeRestsInMeasures(self):
+        p = Part()
+        m1 = Measure()
+        m1.timeSignature = meter.TimeSignature('4/4')
+        m1.insert(2, note.Note())
+        m2 = Measure()
+        m2.insert(1, note.Note())
+        p.append(m1)
+        p.append(m2)
+
+        self.assertEqual(m1.duration.quarterLength, 3.0)
+        self.assertEqual(m2.duration.quarterLength, 2.0)
+        self.assertEqual(p.duration.quarterLength, 5.0)
+
+        for m in (m1, m2):
+            m.makeRests(inPlace=True, timeRangeFromBarDuration=True)
+
+        self.assertEqual(m1.duration.quarterLength, 4.0)
+        self.assertEqual(m2.duration.quarterLength, 4.0)
+
+        # m2 was never repositioned in p
+        self.assertEqual(p.duration.quarterLength, 7.0)
+
+        p.makeRests(inPlace=True)
+        self.assertEqual(p.duration.quarterLength, 8.0)
 
     def testMakeMeasuresInPlace(self):
         sScr = Stream()

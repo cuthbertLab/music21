@@ -6316,17 +6316,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                  meterStream=None,
                  inPlace=False,
                  displayTiedAccidentals=False,
+                 classFilterList=(note.GeneralNote,),
                  ):
         '''
         Calls :py:func:`~music21.stream.makeNotation.makeTies`.
 
         Changed in v.4., inPlace=False by default.
+        Added in v.7, `classFilterList`.
         '''
         return makeNotation.makeTies(
             self,
             meterStream=meterStream,
             inPlace=inPlace,
             displayTiedAccidentals=displayTiedAccidentals,
+            classFilterList=classFilterList,
         )
 
     def makeBeams(self, *, inPlace=False, setStemDirections=True):

@@ -1742,7 +1742,7 @@ def midiTrackToStream(
     >>> p
     <music21.stream.Part ...>
     >>> len(p.flat.notesAndRests)
-    13
+    14
     >>> p.flat.notes[0].pitch.midi
     36
     >>> p.flat.notes[0].volume.velocity
@@ -1770,7 +1770,8 @@ def midiTrackToStream(
         {1.0} <music21.note.Rest rest>
         {2.5} <music21.chord.Chord F#3 A4 C#5>
     {12.0} <music21.stream.Measure 4 offset=12.0>
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.chord.Chord F#3 A4 C#5>
+        {2.5} <music21.note.Rest rest>
         {4.0} <music21.bar.Barline type=final>
     '''
     # environLocal.printDebug(['midiTrackToStream(): got midi track: events',
@@ -1921,8 +1922,9 @@ def midiTrackToStream(
     for m in s.getElementsByClass(stream.Measure):
         if voicesRequired:
             m.makeVoices(inPlace=True, fillGaps=True)
-        # always need to fill gaps, as rests are not found in any other way
-        m.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
+    s.makeTies(inPlace=True)
+    # always need to fill gaps, as rests are not found in any other way
+    s.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
     return s
 
 
@@ -2614,7 +2616,7 @@ def midiFileToStream(
     >>> s
     <music21.stream.Score ...>
     >>> len(s.flat.notesAndRests)
-    13
+    14
     '''
     # environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
     if inputM21 is None:
@@ -3534,7 +3536,7 @@ class Test(unittest.TestCase):
         # a simple file created in athenacl
         s = converter.parse(fp)
         # s.show('t')
-        self.assertEqual(len(s.flat.getElementsByClass('Chord')), 4)
+        self.assertEqual(len(s.flat.getElementsByClass('Chord')), 5)
 
     def testMidiEventsImported(self):
         self.maxDiff = None
@@ -3684,6 +3686,28 @@ class Test(unittest.TestCase):
 
         self.assertEqual(
             len(inn.parts[1].measure(3).voices.last().getElementsByClass('Rest')), 1)
+
+    def testRestsMadeInMeasures(self):
+        from music21 import converter
+
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test17.mid'
+        inn = converter.parse(fp)
+        pianoLH = inn.parts.last()
+        m1 = pianoLH.measure(1)  # quarter note, quarter note, quarter rest
+        m2 = pianoLH.measure(2)
+        self.assertEqual(len(m1.notesAndRests), 3)
+        self.assertEqual(len(m1.notes), 2)
+        self.assertEqual(m1.duration.quarterLength, 3.0)
+        self.assertEqual(pianoLH.elementOffset(m2), 3.0)
+
+        for part in inn.parts:
+            with self.subTest(part=part):
+                self.assertEqual(
+                    sum(m.barDuration.quarterLength for m in part.getElementsByClass(
+                        stream.Measure)
+                        ),
+                    part.duration.quarterLength
+                )
 
 
 # ------------------------------------------------------------------------------
