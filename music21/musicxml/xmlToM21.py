@@ -1984,6 +1984,17 @@ class PartParser(XMLParserBase):
 
         sets self.lastMeasureWasShort to True or False if it is an incomplete measure
         that is not a pickup.
+
+        >>> m = stream.Measure([meter.TimeSignature('4/4'), harmony.ChordSymbol('C7')])
+        >>> m.highestTime
+        0.0
+        >>> PP = musicxml.xmlToM21.PartParser()
+        >>> PP.setLastMeasureInfo(m)
+        >>> PP.adjustTimeAttributesFromMeasure(m)
+        >>> m.highestTime
+        4.0
+        >>> PP.lastMeasureWasShort
+        False
         '''
         # note: we cannot assume that the time signature properly
         # describes the offsets w/n this bar. need to look at
@@ -1999,7 +2010,9 @@ class PartParser(XMLParserBase):
         if mHighestTime >= lastTimeSignatureQuarterLength:
             mOffsetShift = mHighestTime
 
-        elif mHighestTime == 0.0 and not m.recurse().notesAndRests:
+        elif (mHighestTime == 0.0
+              and not m.recurse().notesAndRests.getElementsNotOfClass('Harmony')
+              ):
             # this routine fixes a bug in PDFtoMusic and other MusicXML writers
             # that omit empty rests in a Measure.  It is a very quick test if
             # the measure has any notes.  Slower if it does not.
@@ -2007,6 +2020,7 @@ class PartParser(XMLParserBase):
             r.duration.quarterLength = lastTimeSignatureQuarterLength
             m.insert(0.0, r)
             mOffsetShift = lastTimeSignatureQuarterLength
+            self.lastMeasureWasShort = False
 
         else:  # use time signature
             # for the first measure, this may be a pickup
