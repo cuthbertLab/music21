@@ -49,7 +49,7 @@ class TwelveToneMatrix(stream.Stream):
 
     This object is commonly used by calling the
     :meth:`~music21.stream.TwelveToneRow.matrix` method of
-    :meth:`~music21.stream.TwelveToneRow` (or a subclass).
+    :class:`~music21.stream.TwelveToneRow` (or a subclass).
 
     >>> ttr = serial.TwelveToneRow([0, 2, 11, 7, 8, 3, 9, 1, 4, 10, 6, 5])
     >>> aMatrix = ttr.matrix()
@@ -563,7 +563,7 @@ class ToneRow(stream.Stream):
         to another, the second specified in the argument. Each transformation is given as a
         tuple of the transformation type and index.
 
-        See :meth:`~music21.serial.zeroCenteredTransformation` for
+        See :meth:`~music21.serial.ToneRow.zeroCenteredTransformation` for
         an explanation of this convention.
 
 
@@ -766,8 +766,8 @@ class TwelveToneRow(ToneRow):
 
         The convention for serial transformations must also be specified as 'zero' or
         'original', as explained
-        in :meth:`~music21.serial.findZeroCenteredTransformations` and
-        :meth:`~music21.serial.findOriginalCenteredTransformations`.
+        in :meth:`~music21.serial.ToneRow.findZeroCenteredTransformations` and
+        :meth:`~music21.serial.ToneRow.findOriginalCenteredTransformations`.
 
         >>> row = serial.pcToToneRow([5, 9, 11, 3, 6, 7, 4, 10, 0, 8, 2, 1])
         >>> row.findTransformedHistorical('original')
@@ -1045,8 +1045,9 @@ class TwelveToneRow(ToneRow):
         The first and second arguments describe one transformation, while the third and fourth
         describe another. One of the zero-centered or original-centered conventions for tone row
         transformations must be specified in the last argument; see
-        :meth:`~music21.serial.zeroCenteredTransformation` and
-        :meth:`~music21.serial.originalCenteredTransformation` explanations of these conventions.
+        :meth:`~music21.serial.ToneRow.zeroCenteredTransformation` and
+        :meth:`~music21.serial.ToneRow.originalCenteredTransformation` explanations
+        of these conventions.
 
         >>> moses = serial.getHistoricalRowByName('SchoenbergMosesAron')
         >>> moses.pitchClasses()

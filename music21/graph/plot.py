@@ -48,7 +48,7 @@ environLocal = environment.Environment(_MOD)
 
 
 def _mergeDicts(a, b):
-    '''utility method to merge two dictionaries'''
+    '''utility function to merge two dictionaries'''
     c = a.copy()
     c.update(b)
     return c
@@ -916,7 +916,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
 
     def write(self, fp=None):  # pragma: no cover
         '''
-        Process method here overridden to provide legend.
+        Overrides the normal write method here to add a legend.
         '''
         # call the process routine in the base graph
         super().write(fp)
