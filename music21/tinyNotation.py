@@ -761,76 +761,8 @@ def _getDefaultTokenMap() -> typing.List[
     """
     Returns the default tokenMap for TinyNotation.
 
-    Based on the following grammar (in Extended Backus-Naur form)
-    (https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
-
-    (* Items in (parentheses) are grouped *)
-    (* Items in {curly braces} appear zero or more times *)
-    (* Items in [square brackets] may appear exactly zero or one time *)
-    (* Items in "double quotes" are literal strings *)
-    (* Each rule is ended by a semicolon; *)
-
-    TINY-NOTATION = TOKEN, { WHITESPACE, TOKEN } ;
-    TOKEN = ( TIME-SIGNATURE | TUPLET | REST | NOTE );
-    TIME-SIGNATURE = INTEGER, "/", INTEGER ;
-    INTEGER = { "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" } ;
-    WHITESPACE = " ", { " " } ;
-    TUPLET = ( "trip" | "quad" ), "{",
-        [ WHITESPACE ],
-        ( REST | NOTE ),
-        { WHITESPACE, ( REST | NOTE ) },
-        [ WHITESPACE ],
-    "}" ;
-    REST = "r", [ DURATION ], [ MODIFIER ] ;
-    DURATION = ( EVEN-NUMBER, { "." } | { "." }, EVEN-NUMBER | ".", { "." } ) ;
-    EVEN-NUMBER = { INTEGER }, ( "0" | "2" | "4" | "6" | "8" ) ;
-    NOTE = PITCH, [ DURATION ], [ TIE ], { MODIFIER } ;
-    PITCH = (
-        ( LOW-A | LOW-B | LOW-C | LOW-D | LOW-E | LOW-F | LOW-G ), [ ACCIDENTAL ] |
-        ( HIGH-A | HIGH-B | HIGH-C | HIGH-D | HIGH-E | HIGH-F | HIGH-G ), [ ACCIDENTAL ], { "'" } |
-        ( HIGH-A | HIGH-B | HIGH-C | HIGH-D | HIGH-E | HIGH-F | HIGH-G ), { "'" }, [ ACCIDENTAL ]
-    ) ;
-    LOW-A = "A", { "A" } ;
-    LOW-B = "B", { "B" } ;
-    LOW-C = "C", { "C" } ;
-    LOW-D = "D", { "D" } ;
-    LOW-E = "E", { "E" } ;
-    LOW-F = "F", { "F" } ;
-    LOW-G = "G", { "G" } ;
-    (* I'm pretty sure high notes should only have a single letter, but there *)
-    (* are examples in music21.key.tonalCertainty where the lower-cased *)
-    (* letter is repeated. *)
-    HIGH-A = "a", { "a" } ;
-    HIGH-B = "b", { "b" } ;
-    HIGH-C = "c", { "c" } ;
-    HIGH-D = "d", { "d" } ;
-    HIGH-E = "e", { "e" } ;
-    HIGH-F = "f", { "f" } ;
-    HIGH-G = "g", { "g" } ;
-    ACCIDENTAL = ( EDITORIAL | SHARPS | FLATS | NATURAL ) ;
-    EDITORIAL = "(", ( SHARPS | FLATS | NATURAL ), ")" ;
-    SHARPS = "#", { "#" } ;
-    FLATS = "-", { "-" } ;
-    NATURAL = "n" ;
-    TIE = "~" ;
-    MODIFIER = (
-        EQUALS-MODIFIER |
-        UNDERSCORE-MODIFIER |
-        SQUARE-MODIFIER |
-        ANGLE-MODIFIER |
-        PARENS-MODIFIER |
-        STAR-MODIFIER
-    ) ;
-    EQUALS-MODIFIER = "=", DATA ;
-    UNDERSCORE-MODIFIER = "_", DATA ;
-    SQUARE-MODIFIER = "[", DATA, "]" ;
-    ANGLE-MODIFIER = "<", DATA, ">" ;
-    PARENS-MODIFIER = "(", DATA, ")" ;
-    STAR-MODIFIER = "*", DATA, "*" ;
-    DATA = ALPHANUMERIC, { ALPHANUMERIC } ;
-    (* The following is just shorthand. I think this is more *)
-    (* clear than listing out all 62 alphanumeric characters. *)
-    ALPHANUMERIC = ? Any alphanumeric character. So "a-z", "A-Z", or "0-9" ?
+    Based on the grammar in the [TinyNotation Chapter](https://web.mit.edu/music21/doc/usersGuide/usersGuide_16_tinyNotation.html)
+    of the User's Guide
     """
     sharpsFlatsOrNaturalRegex = r'#+|-+|n'
     editorialRegex = fr'\((?:{sharpsFlatsOrNaturalRegex})\)'
