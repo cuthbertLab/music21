@@ -926,7 +926,7 @@ def addVariant(
     {0.0} <music21.note.Note E>
     {1.0} <music21.note.Note E>
     {2.0} <music21.note.Note E>
-    {3.0} <music21.variant.Variant object of length 0.0>
+    {3.0} <music21.variant.Variant object of length 6.0>
     {3.0} <music21.note.Note E>
     {4.0} <music21.note.Note E>
     {5.0} <music21.note.Note E>
@@ -947,12 +947,7 @@ def addVariant(
             tempVariant.append(sVariant)
         else:  # sVariant is not a measure
             sVariantMeasures = sVariant.getElementsByClass('Measure')
-            # apparently expression cannot be simplified. -- this is a mistake
-            # since sVariantMeasures will never == [] even if there are no measures.
-            # yet switching this to `if not sVariantMeasures` breaks things.
-            # TODO(msc) -- figure this out and fix it.
-            # noinspection PySimplifyBooleanCheck
-            if sVariantMeasures == []:  # If there are no measures, work element-wise
+            if not sVariantMeasures:  # If there are no measures, work element-wise
                 for e in sVariant:
                     offset = e.getOffsetBySite(sVariant) + startOffset
                     tempVariant.insert(offset, e)
