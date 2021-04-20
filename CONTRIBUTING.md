@@ -35,7 +35,7 @@ or Stack Overflow.
 ## Submitting Pull Requests ##
 
 Open an issue to propose a feature or report a bug before raising a pull request.
-You can include a diff or link to a gist if you've already started some of the work.
+You can include a diff or link to your own repo if you've already started some of the work.
 (Changes where the motivation is self-evident, like handling exceptions or increasing
 test coverage, don't need issue tickets.) A draft pull request can also sometimes
 help resolve design questions faster.
@@ -57,7 +57,7 @@ reviews. (If this doesn't sound familiar--don't worry!)
 
 ## Style Guide ##
 
-`music21` began in PERL. Now it interfaces with the JS package `music21j`.
+`music21` began in Perl. Now it interfaces with the JS package `music21j`.
 For these reasons, as well as for backward compatibility, we adhere to `camelCase`
 naming--rather than PEP8 `snake_case` naming--for public APIs such as method names,
 arguments, and the like.
@@ -76,12 +76,12 @@ Conventions:
   - line lengths are capped at 100, but if approaching this limit, look for ways to avoid one-lining
   - line continuation characters (`\`) are not allowed; use open parentheses
   - prefer f-strings to `%` or `.format()`
-  - annotating types is encouraged: e.g. `self.counter: int = 0` or `def makeNoises(): -> List[noise.Noise]`
+  - annotating types is encouraged: e.g. `self.counter: int = 0` or `def makeNoises(): -> List['noise.Noise']`
   - prefer enums to string configurations
   - methods:
     - no more than three positional arguments (in addition to `self`)
     - keyword arguments should be keyword-only by using `*`
-      to consume any other positional arguments: `def makeNoise(self, volume, *, color=noise.White):`
+      to consume any other positional arguments: `def makeNoise(self, volume, *, color=noise.Pink):`
     - avoid generic `**kwargs`; make keywords explicit
   - use [Sphinx formatting](http://web.mit.edu/music21/doc/developerReference/documenting.html#documenting-modules-and-classes)
       to link to classes and methods in docstrings
@@ -91,9 +91,10 @@ Conventions:
 ## Testing ##
 
 We write doctests and unit tests, and we strive for the total
-test coverage of the project to increase with every pull request. See the developer
-documentation to dig in to specific topics like adjusting doctests to prevent
-actions we don't want executed when running the general test suite (like opening
+test coverage of the project to increase with every pull request. See the
+[developer docs](http://web.mit.edu/music21/doc/developerReference/index.html)
+to dig in to specific topics like adjusting doctests to prevent
+actions we don't want executed when running the general test suite (such as opening
 browser windows or playing music).
 
 Pull requests that increase or improve coverage of existing features are very welcome.
