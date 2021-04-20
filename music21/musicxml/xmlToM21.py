@@ -2401,20 +2401,46 @@ class MeasureParser(XMLParserBase):
 
     def xmlBackup(self, mxObj):
         '''
-        parse a backup tag by changing .offsetMeasureNote
+        Parse a backup tag by changing :attr:`offsetMeasureNote`.
+
+        A floor of 0.0 is enforced in case of float rounding issues.
+
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.divisions = 100
+        >>> MP.offsetMeasureNote = 1.9979
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> mxBackup = EL('<backup><duration>100</duration></backup>')
+        >>> MP.xmlBackup(mxBackup)
+        >>> MP.offsetMeasureNote
+        0.9979
+
+        >>> MP.xmlBackup(mxBackup)
+        >>> MP.offsetMeasureNote
+        0.0
         '''
-        try:
-            change = float(mxObj.find('duration').text.strip()) / self.divisions
+        mxDuration = mxObj.find('duration')
+        if mxDuration is not None and textStripValid(mxDuration):
+            change = common.numberTools.opFrac(
+                float(mxDuration.text.strip()) / self.divisions
+            )
             self.offsetMeasureNote -= change
-        except AttributeError:
-            pass
+            if self.offsetMeasureNote < 0:
+                # this could happen if the musicxml durations have errors
+                # https://github.com/cuthbertLab/music21/issues/971
+                self.offsetMeasureNote = 0.0
 
     def xmlForward(self, mxObj):
         '''
-        parse a forward tag by changing .offsetMeasureNote
+        Parse a forward tag by changing :attr:`offsetMeasureNote`.
         '''
-        change = float(mxObj.find('duration').text.strip()) / self.divisions
-        self.offsetMeasureNote += change
+        mxDuration = mxObj.find('duration')
+        if mxDuration is not None and textStripValid(mxDuration):
+            change = common.numberTools.opFrac(
+                float(mxDuration.text.strip()) / self.divisions
+            )
+            # Allow overfilled measures for now -- TODO(someday): warn?
+            self.offsetMeasureNote += change
 
     def xmlPrint(self, mxPrint):
         '''
@@ -3257,7 +3283,7 @@ class MeasureParser(XMLParserBase):
         mxDuration = mxNote.find('duration')
         if mxDuration is not None:
             noteDivisions = float(mxDuration.text.strip())
-            qLen = noteDivisions / divisions
+            qLen = common.numberTools.opFrac(noteDivisions / divisions)
         else:
             qLen = 0.0
 
