@@ -761,8 +761,68 @@ def _getDefaultTokenMap() -> typing.List[
     """
     Returns the default tokenMap for TinyNotation.
 
-    Based on the grammar in the [TinyNotation Chapter](https://web.mit.edu/music21/doc/usersGuide/usersGuide_16_tinyNotation.html)
-    of the User's Guide
+    Based on the following grammar (in Extended Backus-Naur form)
+    (https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
+
+    (* Items in parentheses are grouped *)
+    (* Items in curly braces appear zero or more times *)
+    (* Items in square brackets may appear exactly zero or one time *)
+    (* Items in double quotes are literal strings *)
+    (* Items between question marks should be interpreted as English *)
+    (* Each rule is ended by a semicolon *)
+
+    TINY-NOTATION = TOKEN, { WHITESPACE, TOKEN } ;
+    WHITESPACE = ( " " | ? Carriage return ? ) , { " " | ? Carriage return ? } ;
+    TOKEN = ( TIME-SIGNATURE | TUPLET | REST | NOTE );
+    TIME-SIGNATURE = INTEGER, "/", INTEGER ;
+    INTEGER = DIGIT, { DIGIT } ;
+    DIGIT = ( "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ) ;
+    TUPLET = ( "trip" | "quad" | ALPHANUMERIC ), "{",
+        [ WHITESPACE ],
+        ( REST | NOTE ),
+        { WHITESPACE, ( REST | NOTE ) },
+        [ WHITESPACE ],
+    "}" ;
+    REST = "r", [ DURATION ], [ MODIFIER ] ;
+    DURATION = ( EVEN-NUMBER, { "." } | { "." }, EVEN-NUMBER | ".", { "." } ) ;
+    EVEN-NUMBER = { INTEGER }, ( "0" | "2" | "4" | "6" | "8" ) ;
+    NOTE = PITCH, [ DURATION ], [ TIE ], { MODIFIER } ;
+    PITCH = (
+        ( LOW-A | LOW-B | LOW-C | LOW-D | LOW-E | LOW-F | LOW-G ), [ ACCIDENTAL ] |
+        ( "a" | "b" | "c" | "d" | "e" | "f" | "g" ), [ ACCIDENTAL ], { "'" } |
+        ( "a" | "b" | "c" | "d" | "e" | "f" | "g" ), { "'" }, [ ACCIDENTAL ]
+    ) ;
+    LOW-A = "A", { "A" } ;
+    LOW-B = "B", { "B" } ;
+    LOW-C = "C", { "C" } ;
+    LOW-D = "D", { "D" } ;
+    LOW-E = "E", { "E" } ;
+    LOW-F = "F", { "F" } ;
+    LOW-G = "G", { "G" } ;
+    ACCIDENTAL = ( EDITORIAL | SHARPS | FLATS | NATURAL ) ;
+    EDITORIAL = "(", ( SHARPS | FLATS | NATURAL ), ")" ;
+    SHARPS = "#", { "#" } ;
+    FLATS = "-", { "-" } ;
+    NATURAL = "n" ;
+    TIE = "~" ;
+    MODIFIER = (
+        EQUALS-MODIFIER |
+        UNDERSCORE-MODIFIER |
+        SQUARE-MODIFIER |
+        ANGLE-MODIFIER |
+        PARENS-MODIFIER |
+        STAR-MODIFIER
+    ) ;
+    EQUALS-MODIFIER = "=", EQUALS-DATA ;
+    UNDERSCORE-MODIFIER = "_", UNDERSCORE-DATA ;
+    SQUARE-MODIFIER = "[", ALPHANUMERIC, "]" ;
+    ANGLE-MODIFIER = "<", ALPHANUMERIC, ">" ;
+    PARENS-MODIFIER = "(", ALPHANUMERIC, ")" ;
+    STAR-MODIFIER = "*", ALPHANUMERIC, "*" ;
+    (* The following is just shorthand. *)
+    ALPHANUMERIC = ? At least one alphanumeric character. So "a-z", "A-Z", or "0-9" ? ;
+    EQUALS-DATA = ? At least one non-whitespace, non-"_" character. ? ;
+    UNDERSCORE-DATA = ? At least one non-whitespace, non-"=" character. ? ;
     """
     sharpsFlatsOrNaturalRegex = r'#+|-+|n'
     editorialRegex = fr'\((?:{sharpsFlatsOrNaturalRegex})\)'
