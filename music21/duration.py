@@ -3657,11 +3657,11 @@ class Test(unittest.TestCase):
     def testTinyDuration(self):
         # e.g. delta from chordify: 1/9 - 1/8 = 1/72
         # exercises quarterLengthToNonPowerOf2Tuplet()
-        d = Duration(1/72)
+        d = Duration(1 / 72)
         self.assertEqual(d.type, 'inexpressible')
 
         # this failure happens earlier in quarterConversion()
-        d = Duration(1/2049)
+        d = Duration(1 / 2049)
         self.assertEqual(d.type, 'inexpressible')
 
 
