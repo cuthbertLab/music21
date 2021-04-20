@@ -1973,12 +1973,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         except (ValueError, TypeError):
             raise StreamException(f'Offset {offset!r} must be a number.')
 
-        if not isinstance(item, base.Music21Object):
-            raise StreamException('to put a non Music21Object in a stream, '
-                                  + 'create a music21.ElementWrapper for the item')
         element = item
 
-        # checks if element is self; possibly performs additional checks
+        # checks if element is self, among other checks
         self.coreGuardBeforeAddElement(element)
         # main insert procedure here
 
@@ -2350,20 +2347,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             item = itemOrList
 
-        try:
-            unused = item.isStream  # will raise attribute error
-            element = item
-        except AttributeError:  # need to wrap
-            # element = music21.ElementWrapper(item)
-            raise StreamException('to put a non Music21Object in a stream, '
-                                  + 'create a music21.ElementWrapper for the item')
+        element = item
+        # checks if element is self, among other checks
+        self.coreGuardBeforeAddElement(element)
+
         # cannot support elements with Durations in the highest time list
         if element.duration.quarterLength != 0:
             raise StreamException('cannot insert an object with a non-zero '
                                   + 'Duration into the highest time elements list')
 
-        # checks of element is self; possibly performs additional checks
-        self.coreGuardBeforeAddElement(element)
         self.coreStoreAtEnd(element)
         # Streams cannot reside in end elements, thus do not update is flat
         self.coreElementsChanged(updateIsFlat=False)
