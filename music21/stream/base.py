@@ -316,11 +316,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Get a Music21Object from the Stream using a variety of keys or indices.
 
-        If an int is given, the Music21Object at the index is returned. If the Stream is sorted
-        (if isSorted is True), the elements are returned in order.
+        If an int is given, the Music21Object at the index is returned.
+        If the Stream is sorted (isSorted is True), the elements are returned in order.
 
-        If a string is given, :meth:`~music21.stream.Stream.getElementsByGroup` is used to
-        select items. If that search yields nothing, the string is treated as a class, described next.
+        If a string is given, :meth:`~music21.stream.Stream.getElementsByGroup`
+        is used to select items. If that search yields nothing, the string is
+        treated as a class, described next.
 
         If a class name is given (as a string or name),
         :meth:`~music21.stream.Stream.getElementsByClass` is used to return a
