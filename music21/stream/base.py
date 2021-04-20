@@ -281,9 +281,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             append = all(e.offset == 0.0 for e in givenElements)
         except AttributeError:
             pass  # appropriate failure will be raised by coreGuardBeforeAddElement()
-        if append and all(e.isStream for e in givenElements):
-            if all(not e.isMeasure for e in givenElements):
-                append = False
+        if (
+            append
+            and all(e.isStream for e in givenElements)
+            and all(not e.isMeasure for e in givenElements)
+        ):
+            append = False
 
         for e in givenElements:
             self.coreGuardBeforeAddElement(e)
