@@ -115,9 +115,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     The duration, however, can be "unlinked" and explicitly
     set independent of the Stream's contents.
 
-    The first element passed to the Stream is an optional list,
-    tuple, or other Stream of music21 objects which is used to
-    populate the Stream by inserting each object at
+    The first element passed to the Stream is an optional single
+    Music21Object or a list, tuple, or other Stream of Music21Objects
+    which is used to populate the Stream by inserting each object at
     its :attr:`~music21.base.Music21Object.offset`
     property. Other arguments and keywords are ignored, but are
     allowed so that subclassing the Stream is easier.
@@ -154,6 +154,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     {0.0} <music21.stream.Part embeddedPart>
         {0.0} <music21.note.Rest rest>
     {1.0} <music21.note.Note E->
+
+    New in v7 -- providing a single element now works:
+
+    >>> s = stream.Stream(meter.TimeSignature())
+    >>> s.first()
+    <music21.meter.TimeSignature 4/4>
     '''
     # this static attributes offer a performance boost over other
     # forms of checking class
@@ -227,8 +233,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # experimental
         self._mutable = True
 
-        if givenElements and common.isIterable(givenElements):
-            # TODO: perhaps convert a single element into a list?
+        if givenElements and not common.isIterable(givenElements):
+            givenElements = [givenElements]
+
+        if givenElements:
             for e in givenElements:
                 try:
                     self.coreGuardBeforeAddElement(e)
