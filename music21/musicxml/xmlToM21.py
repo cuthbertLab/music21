@@ -18,6 +18,8 @@ import re
 # import sys
 # import traceback
 import unittest
+
+from math import isclose
 from typing import List, Optional, Dict, Tuple, Set
 
 import xml.etree.ElementTree as ET
@@ -2589,6 +2591,8 @@ class MeasureParser(XMLParserBase):
         <music21.pitch.Pitch A3>
         >>> c.pitches[1]
         <music21.pitch.Pitch B3>
+        >>> c.duration
+        <music21.duration.Duration unlinked type:quarter quarterLength:0.75>
 
         >>> a = EL('<note><pitch><step>A</step><octave>3</octave></pitch>'
         ...        + qnDuration
@@ -3208,6 +3212,38 @@ class MeasureParser(XMLParserBase):
         'eighth'
         >>> c.dots
         1
+
+        If the `<duration>` doesn't match the `<type>` and `<dots>`,
+        an unlinked duration is created so that `.quarterLength` agrees with
+        `<duration>` but the notated types can still be represented.
+
+        Create a second dot on `mxNote` and parse again, observing the identical
+        `quarterLength`:
+
+        >>> from xml.etree.ElementTree import SubElement
+        >>> unused = SubElement(mxNote, 'dot')
+        >>> c2 = MP.xmlToDuration(mxNote)
+        >>> c2
+        <music21.duration.Duration unlinked type:eighth quarterLength:0.75>
+        >>> c2.quarterLength
+        0.75
+        >>> c2.type
+        'eighth'
+        >>> c2.dots
+        2
+
+        Grace note durations will be converted later to GraceDurations:
+
+        >>> mxDuration = mxNote.find('duration')
+        >>> mxNote.remove(mxDuration)
+        >>> mxGrace = SubElement(mxNote, 'grace')
+        >>> MP.xmlToDuration(mxNote, inputM21=c2)
+        >>> c2
+        <music21.duration.Duration unlinked type:eighth quarterLength:0.0>
+        >>> gn1 = note.Note(duration=c2)
+        >>> gn2 = MP.xmlGraceToGrace(mxGrace, gn1)
+        >>> gn2.duration
+        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
         '''
         numDots = 0
         tuplets = ()
@@ -3249,42 +3285,48 @@ class MeasureParser(XMLParserBase):
             # TODO: empty-placement
 
         # two ways to create durations, raw (from qLen) and cooked (from type, time-mod, dots)
-        if forceRaw:
-            if d is not None:
-                # environLocal.printDebug(['forced to use raw duration', durRaw])
-                durRaw = duration.Duration()  # raw just uses qLen
-                # the qLen set here may not be computable, but is not immediately
-                # computed until setting components
-                durRaw.quarterLength = qLen
-                try:
-                    d.components = durRaw.components
-                except duration.DurationException:  # TODO: Test
-                    if qLen:
-                        qLenRounded = 2.0 ** round(math.log2(qLen))
-                    else:
-                        qLenRounded = 0.0
-                    environLocal.printDebug(
-                        ['mxToDuration',
-                         f'rounding duration to {qLenRounded} as type is not'
-                         + 'defined and raw quarterLength '
-                         + f'({qLen}) is not a computable duration'])
-                    # environLocal.printDebug(['mxToDuration', 'raw qLen', qLen, durationType,
-                    #                         'mxNote:',
-                    #                         ET.tostring(mxNote, encoding='unicode'),
-                    #                         'last mxDivisions:', divisions])
-                    durRaw.quarterLength = qLenRounded
-            else:
-                d = duration.Duration(quarterLength=qLen)
-        else:  # a cooked version builds up from pieces
+        if d is not None:
+            durRaw = duration.Duration(quarterLength=qLen)  # raw just uses qLen
+            # the qLen set here may not be computable, but is not immediately
+            # computed until setting components
+            try:
+                d.components = durRaw.components
+            except duration.DurationException:  # TODO: Test
+                if qLen:
+                    qLenRounded = 2.0 ** round(math.log2(qLen))
+                else:
+                    qLenRounded = 0.0
+                environLocal.printDebug(
+                    ['mxToDuration',
+                        f'rounding duration to {qLenRounded} as type is not'
+                        + 'defined and raw quarterLength '
+                        + f'({qLen}) is not a computable duration'])
+                durRaw.quarterLength = qLen = qLenRounded
+        else:
+            d = duration.Duration(quarterLength=qLen)
+        # can't do this unless we have a type, so if not forceRaw
+        if not forceRaw:  # a cooked version builds up from pieces
             dt = duration.durationTupleFromTypeDots(durationType, numDots)
+            if (dt.quarterLength == qLen) and not tuplets:
+                # raw == cooked, so we're done
+                # but this comparison gives false positives if tuplets are involved
+                # don't bother with isclose; merely trying to short-circuit
+                return d if inputM21 is None else None
             if d is not None:
                 d.clear()
+                d.tuplets = []
                 d.addDurationTuple(dt)
             else:
                 d = duration.Duration(durationTuple=dt)
 
             for tup in tuplets:
                 d.appendTuplet(tup)
+
+            # Second check against qLen (raw), now with tuplets
+            # if not almost equal, create unlinked Duration and set raw qLen
+            if not isclose(d.quarterLength, qLen, abs_tol=1e-7):
+                d.linked = False
+                d.quarterLength = qLen
 
         if inputM21 is None:
             return d
@@ -6514,13 +6556,13 @@ class Test(unittest.TestCase):
         '''
         test that a note with nested tuplets gets converted properly.
         '''
-        mxN = '''
+        mxN = f'''
         <note default-x="347">
         <pitch>
           <step>D</step>
           <octave>5</octave>
         </pitch>
-        <duration>4</duration>
+        <duration>{defaults.divisionsPerQuarter * 0.5 * (2/3) * (2/3)}</duration>
         <voice>1</voice>
         <type>eighth</type>
         <time-modification>
