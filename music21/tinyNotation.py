@@ -770,7 +770,7 @@ def _getDefaultTokenMap() -> typing.List[
 
     lowNoteRegex = fr'(?:A+|B+|C+|D+|E+|F+|G+)(?:{accidentalRegex})?'
     highNoteRegex = (
-        r'(?:a+|b+|c+|d+|e+|f+|g+)'
+        r'(?:a+|b+|c+|d+|e+|f+|g+)' +
         fr"(?:(?:{accidentalRegex})?'*|'*(?:{accidentalRegex})?)"
     )
     noteNameRegex = fr'{lowNoteRegex}|{highNoteRegex}'
@@ -779,14 +779,14 @@ def _getDefaultTokenMap() -> typing.List[
 
     tieStateRegex = r'~'
 
-    equalsRegex = r'=[A-Za-z0-9]*'
+    equalsRegex = r'=[^\s_]*'
     starRegex = r'\*.*?\*'
     angleRegex = r'<.*?>'
     parensRegex = r'\(.*?\)'
     squareRegex = r'\[.*?]'
-    underscoreRegex = r'_.*'
+    underscoreRegex = r'_[^\s=]'
     modifierRegex = (
-        fr'{equalsRegex}|{starRegex}|{angleRegex}|'
+        fr'{equalsRegex}|{starRegex}|{angleRegex}|' +
         fr'{parensRegex}|{squareRegex}|{underscoreRegex}'
     )
 
@@ -798,7 +798,7 @@ def _getDefaultTokenMap() -> typing.List[
         ),
         (
             (
-                fr'^((?:{noteNameRegex})(?:{durationRegex})?'
+                fr'^((?:{noteNameRegex})(?:{durationRegex})?' +
                 fr'(?:{tieStateRegex})?(?:{modifierRegex})*)$'
             ),
             NoteToken
