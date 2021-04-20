@@ -7929,8 +7929,11 @@ class Test(unittest.TestCase):
 
     def testCoreGuardBeforeAddElement(self):
         n = note.Note()
+        s = Stream()
         with self.assertRaises(StreamException):
             Stream([n, n])
+        with self.assertRaises(StreamException):
+            Stream([n, None, s.iter])
 
     # REMOVED: Turns out that it DOES have fermata on every note!
     # def testSchoenbergChordifyFermatas(self):

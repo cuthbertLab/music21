@@ -177,20 +177,22 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     A list of measures will let each be appended:
 
-    >>> s3 = stream.Part([stream.Measure(n1), stream.Measure(note.Rest())])
+    >>> m1 = stream.Measure(n1, number=1)
+    >>> m2 = stream.Measure(note.Rest(), number=2)
+    >>> s3 = stream.Part([m1, m2])
     >>> s3.show('text')
-    {0.0} <music21.stream.Measure 0 offset=0.0>
+    {0.0} <music21.stream.Measure 1 offset=0.0>
         {1.0} <music21.note.Note E->
-    {1.5} <music21.stream.Measure 0 offset=1.5>
+    {1.5} <music21.stream.Measure 2 offset=1.5>
         {0.0} <music21.note.Rest rest>
 
-    Here, every element is a Stream that's not a Measure, so we insert:
+    Here, every element is a Stream that's not a Measure, so we instead insert:
 
-    >>> s4 = stream.Score([stream.Part(n1), stream.PartStaff(note.Rest())])
+    >>> s4 = stream.Score([stream.PartStaff(n1), stream.PartStaff(note.Rest())])
     >>> s4.show('text')
-    {0.0} <music21.stream.Part 0x102fba940>
+    {0.0} <music21.stream.PartStaff 0x...>
         {1.0} <music21.note.Note E->
-    {0.0} <music21.stream.PartStaff 0x102fba6d0>
+    {0.0} <music21.stream.PartStaff 0x...>
         {0.0} <music21.note.Rest rest>
     '''
     # this static attributes offer a performance boost over other
@@ -271,23 +273,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if not common.isIterable(givenElements):
             givenElements = [givenElements]
 
-        for e in givenElements:
-            # Raises StreamException if not a Music21Object
-            self.coreGuardBeforeAddElement(e)
-
         # Append rather than insert if every offset is 0.0
         # but not if every element is a stream subclass other than a Measure
         # (i.e. Opus, Score, Part, or Voice)
-        append: bool = all(e.offset == 0.0 for e in givenElements)
+        append: bool = False
+        try:
+            append = all(e.offset == 0.0 for e in givenElements)
+        except AttributeError:
+            pass  # appropriate failure will be raised by coreGuardBeforeAddElement()
         if append and all(e.isStream for e in givenElements):
             if all(not e.isMeasure for e in givenElements):
                 append = False
 
-        if append:
-            for e in givenElements:
+        for e in givenElements:
+            self.coreGuardBeforeAddElement(e)
+            if append:
                 self.coreAppend(e)
-        else:
-            for e in givenElements:
+            else:
                 self.coreInsert(e.offset, e)
 
         self.coreElementsChanged()

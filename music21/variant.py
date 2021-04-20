@@ -2584,7 +2584,9 @@ class Test(unittest.TestCase):
         vn1 = note.Note('F#4')
         vn2 = note.Note('A-4')
 
-        v1 = Variant([vn1, vn2])
+        v1 = Variant()
+        v1.insert(0, vn1)
+        v1.insert(0, vn2)
         v1Copy = copy.deepcopy(v1)
         # copies stored objects; they point to the different Notes vn1/vn2
         self.assertIsNot(v1Copy[0], v1[0])
@@ -2614,7 +2616,9 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
         vn2 = note.Note('A-4')
-        v1 = Variant([vn1, vn2])
+        v1 = Variant()
+        v1.insert(0, vn1)
+        v1.insert(0, vn2)
         s.insert(5, v1)
 
         # as we deepcopy the elements in the variants, we have new Notes
