@@ -830,8 +830,8 @@ def _getDefaultTokenMap() -> typing.List[
 
     lowNoteRegex = fr'(?:A+|B+|C+|D+|E+|F+|G+)(?:{accidentalRegex})?'
     highNoteRegex = (
-        r'(?:a|b|c|d|e|f|g)' +
-        fr"(?:(?:{accidentalRegex})?'*|'*(?:{accidentalRegex})?)"
+        r'(?:a|b|c|d|e|f|g)'
+        + fr"(?:(?:{accidentalRegex})?'*|'*(?:{accidentalRegex})?)"
     )
     noteNameRegex = fr'{lowNoteRegex}|{highNoteRegex}'
 
@@ -846,8 +846,8 @@ def _getDefaultTokenMap() -> typing.List[
     squareRegex = r'\[.*?]'
     underscoreRegex = r'_[^\s=]'
     modifierRegex = (
-        fr'{equalsRegex}|{starRegex}|{angleRegex}|' +
-        fr'{parensRegex}|{squareRegex}|{underscoreRegex}'
+        fr'{equalsRegex}|{starRegex}|{angleRegex}|'
+        + fr'{parensRegex}|{squareRegex}|{underscoreRegex}'
     )
 
     return [
@@ -858,8 +858,8 @@ def _getDefaultTokenMap() -> typing.List[
         ),
         (
             (
-                fr'^((?:{noteNameRegex})(?:{durationRegex})?' +
-                fr'(?:{tieStateRegex})?(?:{modifierRegex})*)$'
+                fr'^((?:{noteNameRegex})(?:{durationRegex})?'
+                + fr'(?:{tieStateRegex})?(?:{modifierRegex})*)$'
             ),
             NoteToken
         ),  # last
@@ -1388,23 +1388,23 @@ class Test(unittest.TestCase):
             {
                 'string': 'ABC',
                 'reason': (
-                    'only the same upper-cased letter may be repeated to ' +
-                    'indicate lower octaves'
+                    'only the same upper-cased letter may be repeated to '
+                    + 'indicate lower octaves'
                 ),
             },
             {
                 'string': 'aaa',
                 'reason': (
-                    'the same lower-cased letter may not be repeated to ' +
-                    'indicate higher octaves. Instead use apostrophes.'
+                    'the same lower-cased letter may not be repeated to '
+                    + 'indicate higher octaves. Instead use apostrophes.'
                 ),
             },
         ]
 
         for error_state in error_states:
             with self.assertRaises(TinyNotationException, msg=(
-                    'Should have raised a TinyNotationException for input ' +
-                    f"'{error_state['string']}' because {error_state['reason']}."
+                    'Should have raised a TinyNotationException for input '
+                    + f"'{error_state['string']}' because {error_state['reason']}."
             )):
                 converter = Converter(error_state['string'], raiseExceptions=True)
                 converter.parse()
@@ -1416,8 +1416,8 @@ class Test(unittest.TestCase):
             len(defaultTokenMap),
             3,
             (
-                'There should be three valid token types by default: Time ' +
-                'signatures, Notes, and Rests'
+                'There should be three valid token types by default: Time '
+                + 'signatures, Notes, and Rests'
             )
         )
 
@@ -1432,8 +1432,8 @@ class Test(unittest.TestCase):
                 tokenType,
                 validTokenTypeCounts,
                 (
-                    'Found unexpected token type in default token map:' +
-                    f'{tokenType.__class__.__name__}.'
+                    'Found unexpected token type in default token map:'
+                    + f'{tokenType.__class__.__name__}.'
                 )
             )
             validTokenTypeCounts[tokenType] += 1
@@ -1441,9 +1441,9 @@ class Test(unittest.TestCase):
                 len(regex),
                 0,
                 (
-                    'Should provide a non-empty string for the regular ' +
-                    'expression in the default token map for tokens of type ' +
-                    f'{tokenType.__class__.__name__}.'
+                    'Should provide a non-empty string for the regular '
+                    + 'expression in the default token map for tokens of type '
+                    + f'{tokenType.__class__.__name__}.'
                 )
             )
 
@@ -1452,8 +1452,8 @@ class Test(unittest.TestCase):
                 validTokenTypeCounts[tokenType],
                 1,
                 (
-                    'Should have found each valid token type exactly once in ' +
-                    'the default token map.'
+                    'Should have found each valid token type exactly once in '
+                    + 'the default token map.'
                 )
             )
 
