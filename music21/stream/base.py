@@ -319,13 +319,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If an int is given, the Music21Object at the index is returned. If the Stream is sorted
         (if isSorted is True), the elements are returned in order.
 
-        If a class name is given (as a string or name),
-        :meth:`~music21.stream.Stream.getElementsByClass` is used to return a Stream of the
-        elements that match the requested class.
+        If a string is given, :meth:`~music21.stream.Stream.getElementsByGroup` is used to
+        select items. If that search yields nothing, the string is treated as a class, described next.
 
-        If a string is given, :meth:`~music21.stream.Stream.getElementById` first, then
-        (if no results are found) :meth:`~music21.stream.Stream.getElementsByGroup` is used to
-        collect and return elements as a Stream.
+        If a class name is given (as a string or name),
+        :meth:`~music21.stream.Stream.getElementsByClass` is used to return a
+        :class:`~music21.stream.iterator.StreamIterator`
+        filtering on the elements that match the requested class. It is much preferable to use
+        a class name (`note.Note` rather than `'Note'`).
 
         >>> a = stream.Part(id='hello')
         >>> names = ['C', 'D', 'E', 'F', 'G', 'A']
@@ -360,45 +361,39 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> b.groups.append('violin')
         >>> a.insert(b)
 
-        Get an item by class
+        Get an item by class:
 
         >>> allNotes = a[note.Note]
         >>> allNotes
-        <music21.stream.Part hello>
-        >>> allNotes.derivation
-        <Derivation of <music21.stream.Part hello> from
-            <music21.stream.Part hello> via 'getElementsByClass'>
-        >>> allNotes[0] is b
+        <music21.stream.iterator.StreamIterator for Part:hello @:1>
+        >>> allNotes.first() is b
         True
 
         Get items by groups:
 
         >>> violinGroup = a['violin']
         >>> violinGroup
-        <music21.stream.Part hello>
-        >>> violinGroup.derivation
-        <Derivation of <music21.stream.Part hello> from
-            <music21.stream.Part hello> via 'getElementsByGroup'>
-        >>> violinGroup[0] is b
-        True
-
-        Get a single element by id:
-
-        >>> a['green'] is b
+        <music21.stream.iterator.StreamIterator for Part:hello @:1>
+        >>> violinGroup.first() is b
         True
 
         If a string or class is not found, a KeyError will be raised:
 
         >>> a['purple']
         Traceback (most recent call last):
-        KeyError: 'provided key (purple) does not match any id or group'
+        KeyError: 'provided key (purple) does not match any class or group'
 
         >>> a[layout.StaffLayout]
         Traceback (most recent call last):
-        KeyError: "provided class (<class 'music21.layout.StaffLayout'>) does
-            not match any contained Objects"
+        KeyError: "provided key (<class 'music21.layout.StaffLayout'>) does
+        not match any class or group"
 
-        Changed in v7. -- out of range indexes now raise an IndexError, not StreamException
+        Changed in v7:
+          - out of range indexes now raise an IndexError, not StreamException
+          - strings ('Note') now supported in lieu of class names, but discouraged (slower)
+          - searching by id no longer supported
+          - Unsupported types now raise TypeError
+          - Class and Group searches now return a `StreamIterator` rather than a `Stream`
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
@@ -439,23 +434,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return found
 
         elif isinstance(k, str):
-            # first search id, then search groups
-            idMatch = self.getElementById(k)
-            if idMatch is not None:
-                return idMatch
-            else:  # search groups, return first element match
-                groupStream = self.iter.getElementsByGroup(k)
-                if groupStream:
-                    return groupStream.stream()
-                else:
-                    raise KeyError(f'provided key ({k}) does not match any id or group')
-        elif isinstance(k, type(type)):
-            # assume it is a class name
-            classStream = self.iter.getElementsByClass(k)
-            if classStream:
-                return classStream.stream()
+            groupIter = self.iter.getElementsByGroup(k)
+            if groupIter:
+                return groupIter
+
+        if isinstance(k, (str, type)):
+            classIter = self.getElementsByClass(k)
+            if classIter:
+                return classIter
             else:
-                raise KeyError(f'provided class ({k}) does not match any contained Objects')
+                raise KeyError(f'provided key ({k}) does not match any class or group')
+
+        raise TypeError(f'Get items by int, slice, id, or class; got {type(k)}')
 
     def first(self):
         '''
@@ -13156,26 +13146,8 @@ class Score(Stream):
         >>> s = corpus.parse('bach/bwv66.6')
         >>> s.parts
         <music21.stream.iterator.StreamIterator for Score:0x104af3a58 @:0>
-        >>> partStream = s.parts.stream()
-        >>> partStream.classes
-        ('Score', 'Stream', 'StreamCoreMixin', 'Music21Object', 'ProtoM21Object', 'object')
-        >>> len(partStream)
+        >>> len(s.parts)
         4
-
-        The partStream object is a full `stream.Score` object, thus the elements inside it
-        can be accessed by index number or by id string, or iterated over:
-
-        >>> partStream[0]
-        <music21.stream.Part Soprano>
-        >>> partStream['Alto']
-        <music21.stream.Part Alto>
-        >>> for p in partStream:
-        ...     print(p.id)
-        Soprano
-        Alto
-        Tenor
-        Bass
-
 
         OMIT_FROM_DOCS
 
