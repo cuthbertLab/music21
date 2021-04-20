@@ -2577,6 +2577,8 @@ class MeasureParser(XMLParserBase):
         <music21.pitch.Pitch A3>
         >>> c.pitches[1]
         <music21.pitch.Pitch B3>
+        >>> c.duration
+        <music21.duration.Duration unlinked type:quarter quarterLength:0.75>
 
         >>> a = EL('<note><pitch><step>A</step><octave>3</octave></pitch>'
         ...        + qnDuration
@@ -3215,6 +3217,19 @@ class MeasureParser(XMLParserBase):
         'eighth'
         >>> c2.dots
         2
+
+        Grace note durations will be converted later to GraceDurations:
+
+        >>> mxDuration = mxNote.find('duration')
+        >>> mxNote.remove(mxDuration)
+        >>> mxGrace = SubElement(mxNote, 'grace')
+        >>> MP.xmlToDuration(mxNote, inputM21=c2)
+        >>> c2
+        <music21.duration.Duration unlinked type:eighth quarterLength:0.0>
+        >>> gn1 = note.Note(duration=c2)
+        >>> gn2 = MP.xmlGraceToGrace(mxGrace, gn1)
+        >>> gn2.duration
+        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
         '''
         numDots = 0
         tuplets = ()
