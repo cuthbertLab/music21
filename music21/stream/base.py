@@ -119,7 +119,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     Music21Object or a list, tuple, or other Stream of Music21Objects
     which is used to populate the Stream by inserting each object at
     its :attr:`~music21.base.Music21Object.offset`
-    property. Other arguments and keywords are ignored, but are
+    property. One special case is when every such object, such as a newly created
+    one, has no offset. Then, so long as the entire list is not composed of
+    non-Measure Stream subclasses like Parts or Voices, each element is appended,
+    creating a sequence of elements in time, rather than synchrony.
+
+    Other arguments and keywords are ignored, but are
     allowed so that subclassing the Stream is easier.
 
     >>> s1 = stream.Stream()
@@ -160,6 +165,33 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     >>> s = stream.Stream(meter.TimeSignature())
     >>> s.first()
     <music21.meter.TimeSignature 4/4>
+
+    New in v7 -- providing a list of objects or Measures (but not other Stream
+    subclasses such as Parts) now positions sequentially, i.e. appends:
+
+    >>> s2 = stream.Measure([note.Note(), note.Note(), bar.Barline()])
+    >>> s2.show('text')
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.note.Note C>
+    {2.0} <music21.bar.Barline type=regular>
+
+    A list of measures will let each be appended:
+
+    >>> s3 = stream.Part([stream.Measure(n1), stream.Measure(note.Rest())])
+    >>> s3.show('text')
+    {0.0} <music21.stream.Measure 0 offset=0.0>
+        {1.0} <music21.note.Note E->
+    {1.5} <music21.stream.Measure 0 offset=1.5>
+        {0.0} <music21.note.Rest rest>
+
+    Here, every element is a Stream that's not a Measure, so we insert:
+
+    >>> s4 = stream.Score([stream.Part(n1), stream.PartStaff(note.Rest())])
+    >>> s4.show('text')
+    {0.0} <music21.stream.Part 0x102fba940>
+        {1.0} <music21.note.Note E->
+    {0.0} <music21.stream.PartStaff 0x102fba6d0>
+        {0.0} <music21.note.Rest rest>
     '''
     # this static attributes offer a performance boost over other
     # forms of checking class
@@ -233,17 +265,32 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # experimental
         self._mutable = True
 
-        if givenElements and not common.isIterable(givenElements):
+        if givenElements is None:
+            return
+
+        if not common.isIterable(givenElements):
             givenElements = [givenElements]
 
-        if givenElements:
+        for e in givenElements:
+            # Raises StreamException if not a Music21Object
+            self.coreGuardBeforeAddElement(e)
+
+        # Append rather than insert if every offset is 0.0
+        # but not if every element is a stream subclass other than a Measure
+        # (i.e. Opus, Score, Part, or Voice)
+        append: bool = all(e.offset == 0.0 for e in givenElements)
+        if append and all(e.isStream for e in givenElements):
+            if all(not e.isMeasure for e in givenElements):
+                append = False
+
+        if append:
             for e in givenElements:
-                try:
-                    self.coreGuardBeforeAddElement(e)
-                    self.coreInsert(e.offset, e)
-                except (AttributeError, TypeError):
-                    raise StreamException(f'Unable to insert {e}')
-            self.coreElementsChanged()
+                self.coreAppend(e)
+        else:
+            for e in givenElements:
+                self.coreInsert(e.offset, e)
+
+        self.coreElementsChanged()
 
     def _reprInternal(self):
         if self.id is not None:
@@ -10851,7 +10898,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Changed in v. 5 -- inPlace is default False and a keyword only arg.
 
-        >>> s = stream.Stream([note.Note(), note.Note(), note.Note()])  # simultaneous
+        >>> s = stream.Stream(note.Note())
+        >>> s.insert(0, note.Note())
+        >>> s.insert(0, note.Note())
         >>> s.makeVoices(inPlace=True)
         >>> len(s.voices)
         3
