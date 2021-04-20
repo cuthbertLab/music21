@@ -945,7 +945,7 @@ class Ambitus(DiscreteAnalysis):
 
     name = 'Ambitus Analysis'
     # provide possible string matches for this processor
-    identifiers = ['ambitus', 'range', 'span']
+    identifiers = ['ambitus', 'span']
 
     def __init__(self, referenceStream=None):
         super().__init__(referenceStream=referenceStream)
@@ -970,7 +970,9 @@ class Ambitus(DiscreteAnalysis):
         if numColors is None:
             if self._referenceStream is not None:
                 # get total range for entire piece
-                minPitch, maxPitch = self.getPitchRanges(self._referenceStream)
+                minPitchObj, maxPitchObj = self.getPitchSpan(self._referenceStream)
+                difference = int(maxPitchObj.ps - minPitchObj.ps)
+                minPitch, maxPitch = 0, difference
             else:
                 minPitch, maxPitch = 0, 130  # a large default
         else:  # create minPitch maxPitch
@@ -1038,70 +1040,6 @@ class Ambitus(DiscreteAnalysis):
         maxPitchIndex = psFound.index(max(psFound))
 
         return pitchesFound[minPitchIndex], pitchesFound[maxPitchIndex]
-
-    def getPitchRanges(self, subStream) -> Tuple[int, int]:
-        '''
-        For a given subStream, return the smallest .ps difference
-        between any two pitches and the largest difference
-        between any two pitches. This is used to get the
-        smallest and largest ambitus possible in a given work.
-
-        >>> ambitusAnalyzer = analysis.discrete.Ambitus()
-        >>> s = stream.Stream()
-        >>> c = chord.Chord(['a2', 'b4', 'c8'])
-        >>> s.append(c)
-        >>> [int(thisPitch.ps) for thisPitch in ambitusAnalyzer.getPitchSpan(s)]
-        [45, 108]
-        >>> ambitusAnalyzer.getPitchRanges(s)
-        (26, 63)
-
-        >>> s = corpus.parse('bach/bwv66.6')
-        >>> ambitusAnalyzer.getPitchRanges(s)
-        (0, 34)
-
-        An empty stream has pitch range (0, 0)
-
-        >>> s = stream.Stream()
-        >>> ambitusAnalyzer.getPitchRanges(s)
-        (0, 0)
-
-        OMIT_FROM_DOCS
-
-        >>> s = stream.Stream()
-        >>> for i in range(12, 61):
-        ...    n = note.Note(i)
-        ...    s.repeatAppend(n, 2)
-        >>> ambitusAnalyzer.getPitchRanges(s)
-        (0, 48)
-        '''
-        ssfn = subStream.flat.notes
-
-        psFound = []
-        for n in ssfn:
-            pitches = []
-            if 'Chord' in n.classes:
-                pitches = n.pitches
-            elif 'Note' in n.classes:
-                pitches = [n.pitch]
-            for p in pitches:
-                # third insertion would be irrelevant
-                # we will sort next, and having two identical
-                # values is enough to produce an interval of 0.
-                if psFound.count(p.ps) < 2:
-                    psFound.append(p.ps)
-        psFound.sort()
-        psRange = set()
-        for i in range(len(psFound) - 1):
-            p1 = psFound[i]
-            for j in range(i + 1, len(psFound)):
-                p2 = psFound[j]
-                # p2 should always be equal or greater than p1
-                psRange.add(p2 - p1)
-
-        if not psRange:
-            return (0, 0)
-        else:
-            return (int(min(psRange)), int(max(psRange)))
 
     def solutionLegend(self, compress=False):
         '''
@@ -1343,14 +1281,14 @@ def analyzeStream(streamObj, *args, **keywords):
 
     >>> analysis.discrete.analyzeStream(s, 'key')
     <music21.key.Key of f# minor>
-    >>> analysis.discrete.analyzeStream(s, 'range')
+    >>> analysis.discrete.analyzeStream(s, 'span')
     <music21.interval.Interval m21>
 
 
     Note that the same results can be obtained by calling "analyze" directly on the stream object:
     >>> s.analyze('key')
     <music21.key.Key of f# minor>
-    >>> s.analyze('range')
+    >>> s.analyze('span')
     <music21.interval.Interval m21>
 
     '''
@@ -1360,6 +1298,11 @@ def analyzeStream(streamObj, *args, **keywords):
 
     if args:
         method = args[0]
+
+    if method == 'range':
+        # getPitchRanges() was removed in v7
+        # this synonym is being added for compatibility
+        method = 'span'
 
     match = analysisClassFromMethodName(method)
 
@@ -1383,7 +1326,7 @@ def analysisClassFromMethodName(method):
     >>> acfmn = analysis.discrete.analysisClassFromMethodName
     >>> acfmn('aarden')
     <class 'music21.analysis.discrete.AardenEssen'>
-    >>> acfmn('range')
+    >>> acfmn('span')
     <class 'music21.analysis.discrete.Ambitus'>
 
     This one is fundamentally important...
