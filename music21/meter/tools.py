@@ -48,7 +48,7 @@ def slashToTuple(value: str) -> Optional[MeterTerminalTuple]:
     '''
     # split by numbers, include slash
     valueNumbers, valueChars = common.getNumFromStr(value,
-                                                    numbers='0123456789/')
+                                                    numbers='0123456789/.')
     valueNumbers = valueNumbers.strip()  # remove whitespace
     valueChars = valueChars.strip()  # remove whitespace
     if 'slow' in valueChars.lower():
@@ -134,7 +134,7 @@ def slashMixedToFraction(valueSrc: str) -> Tuple[NumDenomTuple, bool]:
         if '/' in part:
             tup = slashToTuple(part)
             if tup is None:
-                raise TimeSignatureException('cannot create time signature from:', valueSrc)
+                raise TimeSignatureException('Cannot create time signature from "{}"'.format(valueSrc))
             pre.append([tup.numerator, tup.denominator])
         else:  # its just a numerator
             try:
