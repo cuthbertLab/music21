@@ -134,7 +134,8 @@ def slashMixedToFraction(valueSrc: str) -> Tuple[NumDenomTuple, bool]:
         if '/' in part:
             tup = slashToTuple(part)
             if tup is None:
-                raise TimeSignatureException('Cannot create time signature from "{}"'.format(valueSrc))
+                raise TimeSignatureException(
+                    f'Cannot create time signature from "{valueSrc}"')
             pre.append([tup.numerator, tup.denominator])
         else:  # its just a numerator
             try:
