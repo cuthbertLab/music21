@@ -413,8 +413,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return searchElements[k]
 
         elif isinstance(k, type):
-            # shouldn't this have been equivalent? might have revealed a bug.
-            # classIter = iterator.RecursiveIterator(self, filterList=(k,))
             classIter = self.recurse().getElementsByClass(k)
             if classIter:
                 return classIter

@@ -89,6 +89,16 @@ class StreamIterator(prebase.ProtoM21Object):
     * For `activeInformation` see above.
 
     Changed in v.5.2 -- all arguments except srcStream are keyword only.
+
+    OMIT_FROM_DOCS
+
+    Informative exception for user error:
+
+    >>> s = stream.Stream()
+    >>> sIter = stream.iterator.StreamIterator(s, filterList=[note.Note])
+    Traceback (most recent call last):
+    TypeError: filterList expects Filters or callables,
+    not types themselves; got <class 'music21.note.Note'>
     '''
     def __init__(self,
                  srcStream: 'music21.stream.Stream',
@@ -122,6 +132,10 @@ class StreamIterator(prebase.ProtoM21Object):
             filterList = [filterList]
         elif isinstance(filterList, (set, tuple)):
             filterList = list(filterList)  # mutable....
+        for x in filterList:
+            if isinstance(x, type):
+                raise TypeError(
+                    f'filterList expects Filters or callables, not types themselves; got {x}')
         # self.filters is a list of expressions that
         # return True or False for an element for
         # whether it should be yielded.
