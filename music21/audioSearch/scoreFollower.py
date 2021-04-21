@@ -161,7 +161,8 @@ class ScoreFollower:
             detectedPitchObjects)
         self.silencePeriodDetection(notesList)
         environLocal.printDebug('made it to here...')
-        scNotes = stream.Stream(self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)])
+        excerpt = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
+        scNotes = stream.Part(excerpt)
         # print('1')
         transcribedScore, self.qle = audioSearch.notesAndDurationsToStream(
             notesList,
@@ -502,7 +503,8 @@ class ScoreFollower:
                              - math.ceil(tn_window / hop))
 
         for i in range(iterations):
-            scNotes = scoreStream[i * hop + 1:i * hop + tn_recording + 1]
+            excerpt = scoreStream[i * hop + 1:i * hop + tn_recording + 1]
+            scNotes = stream.Part(excerpt)
             name = str(i)
             beginningData.append(i * hop + 1)
             lengthData.append(tn_recording)
