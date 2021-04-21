@@ -64,12 +64,18 @@ def typeToMusicXMLType(value):
     'long'
     >>> musicxml.m21ToXml.typeToMusicXMLType('quarter')
     'quarter'
+    >>> musicxml.m21ToXml.typeToMusicXMLType('inexpressible')
+    Traceback (most recent call last):
+    music21.musicxml.xmlObjects.MusicXMLExportException:
+    Cannot convert inexpressible durations to MusicXML.
     '''
     # MusicXML uses long instead of longa
     if value == 'longa':
         return 'long'
     elif value == '2048th':
         raise MusicXMLExportException('Cannot convert "2048th" duration to MusicXML (too short).')
+    elif value == 'inexpressible':
+        raise MusicXMLExportException('Cannot convert inexpressible durations to MusicXML.')
     else:
         return value
 
