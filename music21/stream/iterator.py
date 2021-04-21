@@ -337,6 +337,9 @@ class StreamIterator(prebase.ProtoM21Object):
 
         (nothing is printed)
         '''
+        if isinstance(k, type):
+            self.addFilter(k)
+            return self
         fe = self.matchingElements()
         try:
             e = fe[k]

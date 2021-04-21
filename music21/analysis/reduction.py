@@ -908,8 +908,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.parts[0].flat.notes), 3)
         # post.parts[0].show('t')
 
-        match = [(repr(e), e.offset, e.duration.quarterLength)
-            for e in post.parts[0].getElementsByClass('Measure').stream()[0:3].flat.notesAndRests]
+        found = post.parts.first().measures(0, 2)[note.GeneralNote]
+        match = [(repr(e), e.offset, e.duration.quarterLength) for e in found]
         self.assertEqual(match,
                          [('<music21.note.Rest rest>', 0.0, 1.0),
                           ('<music21.note.Note F#>', 1.0, 1.0),

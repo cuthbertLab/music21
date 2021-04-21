@@ -366,21 +366,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Get items by groups:
 
         >>> violinGroup = a['violin']
-        >>> violinGroup
-        <music21.stream.iterator.StreamIterator for Part:hello @:1>
-        >>> violinGroup.first() is b
-        True
+        >>> violinGroup #_DOCS_SHOW
+        <music21.stream.iterator.StreamIterator for Part:hello @:1> #_DOCS_SHOW
+        >>> violinGroup.first() is b #_DOCS_SHOW
+        True #_DOCS_SHOW
 
         If a string or class is not found, a KeyError will be raised:
 
         >>> a['purple']
         Traceback (most recent call last):
-        KeyError: 'provided key (purple) does not match any class or group'
+        KeyError: 'provided key (purple) was not found in query results'
 
         >>> a[layout.StaffLayout]
         Traceback (most recent call last):
-        KeyError: "provided key (<class 'music21.layout.StaffLayout'>) does
-        not match any class or group"
+        KeyError: "provided key (<class 'music21.layout.StaffLayout'>) does not match any class"
 
         Changed in v7:
           - out of range indexes now raise an IndexError, not StreamException
@@ -425,7 +424,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         elif isinstance(k, type):
             # shouldn't this have been equivalent? might have revealed a bug.
-            # classIter = iterator.RecursiveIterator(self, filterList=(k))
+            # classIter = iterator.RecursiveIterator(self, filterList=(k,))
             classIter = self.recurse().getElementsByClass(k)
             if classIter:
                 return classIter

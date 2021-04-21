@@ -619,18 +619,18 @@ class Test(unittest.TestCase):
         a = converter.parse(thisWork)
 
         b = a[7][5:10]
-        environLocal.printDebug(['b', b, b.sites.getSiteIds()])
+        #environLocal.printDebug(['b', b, b.sites.getSiteIds()])
         c = a[7][10:15]
-        environLocal.printDebug(['c', c, c.sites.getSiteIds()])
+        #environLocal.printDebug(['c', c, c.sites.getSiteIds()])
         d = a[7][15:20]
-        environLocal.printDebug(['d', d, d.sites.getSiteIds()])
+        #environLocal.printDebug(['d', d, d.sites.getSiteIds()])
 
         s2 = Stream()
-        environLocal.printDebug(['s2', s2, id(s2)])
+        #environLocal.printDebug(['s2', s2, id(s2)])
 
-        s2.insert(b)
-        s2.insert(c)
-        s2.insert(d)
+        for stream_case in (b, c, d):
+            for e in stream_case:
+                s2.insert(e.offset, e)
 
     def testActiveSites(self):
         '''
@@ -2929,7 +2929,8 @@ class Test(unittest.TestCase):
         '''
         src = corpus.parse('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
-        ex = src.parts[0].flat.notesAndRests.stream()[0:30]
+        found = src.parts.first().flat.notesAndRests[0:30]
+        ex = Part(found)
 
         self.assertEqual(ex.highestOffset, 38.0)
         self.assertEqual(ex.highestTime, 42.0)
@@ -2957,7 +2958,8 @@ class Test(unittest.TestCase):
         src = corpus.parse('bach/bwv324.xml')
         # get some measures of the soprano; just get the notes
         # environLocal.printDebug(['testAugmentOrDiminishCorpus()', 'extracting notes:'])
-        ex = src.parts[0].flat.notesAndRests.stream()[0:30]
+        found = src.parts.first().flat.notesAndRests[0:30]
+        ex = Part(found)
         # attach a couple of transformations
         s = Score()
         for scalar in [0.5, 1.5, 2, 0.25]:
