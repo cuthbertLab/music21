@@ -417,9 +417,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # manually inserting elements is critical to setting the element
             # locations
             searchElements = self._elements
-            if k.start < 0 or k.stop < 0:
+            if (k.start is not None and k.start < 0) or (k.stop is not None and k.stop < 0):
                 # Must use .elements property to incorporate end elements
-                searchElements = k.elements
+                searchElements = self.elements
 
             return searchElements[k]
 
