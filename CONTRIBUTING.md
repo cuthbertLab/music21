@@ -19,7 +19,7 @@ documentation improvements. The
 Please use the provided templates for bug reports or feature proposals. For issues
 parsing file formats, (i.e. missing/buggy features not translated to or from that
 format), please add to (or start) a general ticket for all support requests for that format.
-(Some formats are no longer being actively maintained, such as MEI, Lilypond, and MuseData,
+(Some formats are no longer being actively maintained, such as MEI, LilyPond, and MuseData,
 but well-tested patches can be merged.)
 
 Good bug reports clearly state the unexpected behavior and include a short set of
@@ -40,7 +40,7 @@ You can include a diff or link to your own repo if you've already started some o
 test coverage, don't need issue tickets.) A draft pull request can also sometimes
 help resolve design questions faster.
 
-If your PR fixes an existing issue, please use a GitHub keyword ("Fixes #NNN")
+If your PR fixes an existing issue, please use a GitHub keyword ("Fixes #NNNN")
 in the body of the PR so that the issue will be closed on merge.
 
 You can run locally the same tests that GitHub Actions will run. Install `pylint`
@@ -57,7 +57,7 @@ reviews. (If this doesn't sound familiar--don't worry!)
 
 ## Style Guide ##
 
-`music21` began in Perl. Now it interfaces with the JS package `music21j`.
+`music21` began in Perl. Now it interfaces with the TypeScript package `music21j`.
 For these reasons, as well as for backward compatibility, we adhere to `camelCase`
 naming--rather than PEP8 `snake_case` naming--for public APIs such as method names,
 arguments, and the like.
@@ -72,7 +72,7 @@ Conventions:
   - variable names:
     - need to be unambiguous
     - must begin with lowercase
-    - snake_case is permitted for internal variables
+    - snake_case is encouraged for private variables
   - line lengths are capped at 100, but if approaching this limit, look for ways to avoid one-lining
   - line continuation characters (`\`) are not allowed; use open parentheses
   - prefer f-strings to `%` or `.format()`
@@ -102,7 +102,7 @@ Coverage reports can be found at [Coveralls](https://coveralls.io/github/cuthber
 
 For changes to file parsing, please test both import and export (when supported for
 that format), and please increment the most minor version number in `music21.__version__`
-so that cached files will be invalidated. Your tests can use `.parse(fp, forceSource=True)`
+so that cached files will be invalidated. Your tests can use `converter.parse(fp, forceSource=True)`
 so that tests have a chance to fail locally, but in most cases we will ask you to 
 remove this keyword when polishing the patch.
 
