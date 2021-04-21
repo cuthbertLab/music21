@@ -27,6 +27,10 @@ is available also on GitHub.
 
 See: https://groups.google.com/forum/#!forum/music21list
 
+## Contributing Guide ##
+
+[Contributing Guide](CONTRIBUTING.md)
+
 ## Community Code of Conduct ##
 
 Music21 encourages contributions, discussions, and usage from all people interested in
