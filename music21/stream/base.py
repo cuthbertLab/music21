@@ -317,17 +317,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Get a Music21Object from the Stream using a variety of keys or indices.
 
         If an int is given, the Music21Object at the index is returned.
-        If the Stream is sorted (isSorted is True), the elements are returned in order.
+        If a slice of indices is given, a list of elements is returned.
 
-        If a string is given, :meth:`~music21.stream.Stream.getElementsByGroup`
-        is used to select items. If that search yields nothing, the string is
-        treated as a class, described next.
+        If a class name (or a list of them) is given, a
+        :class:`~music21.stream.iterator.RecursiveIterator`
+        filtering on the elements that match the requested class(es) is returned.
 
-        If a class name is given (as a string or name),
-        :meth:`~music21.stream.Stream.getElementsByClass` is used to return a
-        :class:`~music21.stream.iterator.StreamIterator`
-        filtering on the elements that match the requested class. It is much preferable to use
-        a class name (`note.Note` rather than `'Note'`).
+        If a string is given, we do some new stuff. TODO
 
         >>> a = stream.Part(id='hello')
         >>> names = ['C', 'D', 'E', 'F', 'G', 'A']
@@ -346,10 +342,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         IndexError: attempting to access index 99 while elements is of size 6
         >>> subslice = a[2:5]
         >>> subslice
-        <music21.stream.Part hello>
-        >>> subslice.derivation
-        <Derivation of <music21.stream.Part hello> from
-            <music21.stream.Part hello> via '__getitem__'>
+        [<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>]
         >>> len(subslice)
         3
         >>> a[1].offset
@@ -366,7 +359,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> allNotes = a[note.Note]
         >>> allNotes
-        <music21.stream.iterator.StreamIterator for Part:hello @:1>
+        <music21.stream.iterator.RecursiveIterator for Part:hello @:1>
         >>> allNotes.first() is b
         True
 
@@ -392,15 +385,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Changed in v7:
           - out of range indexes now raise an IndexError, not StreamException
           - strings ('Note') now supported in lieu of class names, but discouraged (slower)
-          - searching by id no longer supported
+          - slices with negative indices now supported
           - Unsupported types now raise TypeError
-          - Class and Group searches now return a `StreamIterator` rather than a `Stream`
+          - Class and Group searches now return a recursive `StreamIterator` rather than a `Stream`
+          - Slice searches now return a list of elements rather than a `Stream`
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
             self.sort()  # will set isSorted to True
 
-        if common.isNum(k):
+        if isinstance(k, int):
             match = None
             # handle easy and most common case first
             if 0 <= k < len(self._elements):
@@ -422,31 +416,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elif isinstance(k, slice):  # get a slice of index values
             # manually inserting elements is critical to setting the element
             # locations
-            try:
-                found = self.cloneEmpty(derivationMethod='__getitem__')
-            except TypeError:  # pragma: no cover
-                raise StreamException(f'Error in defining class: {self.__class__}'
-                                      + 'Stream subclasses and Music21Objects cannot have required '
-                                      + 'arguments in __init__')
-            for e in self.elements[k]:
-                found.coreInsert(self.elementOffset(e), e)
+            searchElements = self._elements
+            if k.start < 0 or k.stop < 0:
+                # Must use .elements property to incorporate end elements
+                searchElements = k.elements
 
-            found.coreElementsChanged(clearIsSorted=False)
-            return found
+            return searchElements[k]
 
-        elif isinstance(k, str):
-            groupIter = self.iter.getElementsByGroup(k)
-            if groupIter:
-                return groupIter
-
-        if isinstance(k, (str, type)):
-            classIter = self.getElementsByClass(k)
+        elif isinstance(k, type):
+            # shouldn't this have been equivalent? might have revealed a bug.
+            # classIter = iterator.RecursiveIterator(self, filterList=(k))
+            classIter = self.recurse().getElementsByClass(k)
             if classIter:
                 return classIter
             else:
-                raise KeyError(f'provided key ({k}) does not match any class or group')
+                raise KeyError(f'provided key ({k}) does not match any class')
 
-        raise TypeError(f'Get items by int, slice, id, or class; got {type(k)}')
+        elif isinstance(k, str):
+            raise NotImplementedError('magic method still lacks some magic')
+
+        raise TypeError(f'Get items by int, slice, class, or string query; got {type(k)}')
 
     def first(self):
         '''
