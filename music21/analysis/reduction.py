@@ -908,15 +908,20 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.parts[0].flat.notes), 3)
         # post.parts[0].show('t')
 
-        found = post.parts.first().measures(0, 2)[note.GeneralNote]
-        match = [(repr(e), e.offset, e.duration.quarterLength) for e in found]
+        three_measures = post.parts.first()[stream.Measure][:3]
+        new_stream = stream.Stream()
+        for m in three_measures:
+            new_stream.append(m)
+        flat_stream = new_stream.flat
+        match = [(repr(e), e.offset, e.duration.quarterLength) for e in flat_stream.notesAndRests]
+        self.maxDiff = None
         self.assertEqual(match,
                          [('<music21.note.Rest rest>', 0.0, 1.0),
                           ('<music21.note.Note F#>', 1.0, 1.0),
                           ('<music21.note.Rest rest>', 2.0, 1.0),
                           ('<music21.note.Note C#>', 3.0, 1.0),
-                          ('<music21.note.Rest rest>', 5.0, 1.0),
-                          ('<music21.note.Note G#>', 6.0, 1.0)])
+                          ('<music21.note.Rest rest>', 4.0, 1.0),
+                          ('<music21.note.Note G#>', 5.0, 1.0)])
 
         # test that lyric is found
         self.assertEqual(post.parts[0].flat.notes[0].lyric, 'fromBass')
