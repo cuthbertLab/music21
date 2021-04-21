@@ -17,6 +17,7 @@ from time import time
 
 from music21 import scale
 from music21 import search
+from music21 import stream
 
 from music21 import environment
 _MOD = 'audioSearch.scoreFollower'
@@ -160,7 +161,7 @@ class ScoreFollower:
             detectedPitchObjects)
         self.silencePeriodDetection(notesList)
         environLocal.printDebug('made it to here...')
-        scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
+        scNotes = stream.Stream(self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)])
         # print('1')
         transcribedScore, self.qle = audioSearch.notesAndDurationsToStream(
             notesList,

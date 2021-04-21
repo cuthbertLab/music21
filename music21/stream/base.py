@@ -363,19 +363,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> allNotes.first() is b
         True
 
-        Get items by groups:
-
-        >>> violinGroup = a['violin']
-        >>> violinGroup #_DOCS_SHOW
-        <music21.stream.iterator.StreamIterator for Part:hello @:1> #_DOCS_SHOW
-        >>> violinGroup.first() is b #_DOCS_SHOW
-        True #_DOCS_SHOW
+        TODO: demo string query search
 
         If a string or class is not found, a KeyError will be raised:
-
-        >>> a['purple']
-        Traceback (most recent call last):
-        KeyError: 'provided key (purple) was not found in query results'
 
         >>> a[layout.StaffLayout]
         Traceback (most recent call last):

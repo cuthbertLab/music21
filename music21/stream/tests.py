@@ -619,14 +619,14 @@ class Test(unittest.TestCase):
         a = converter.parse(thisWork)
 
         b = a[7][5:10]
-        #environLocal.printDebug(['b', b, b.sites.getSiteIds()])
+        # environLocal.printDebug(['b', b, b.sites.getSiteIds()])
         c = a[7][10:15]
-        #environLocal.printDebug(['c', c, c.sites.getSiteIds()])
+        # environLocal.printDebug(['c', c, c.sites.getSiteIds()])
         d = a[7][15:20]
-        #environLocal.printDebug(['d', d, d.sites.getSiteIds()])
+        # environLocal.printDebug(['d', d, d.sites.getSiteIds()])
 
         s2 = Stream()
-        #environLocal.printDebug(['s2', s2, id(s2)])
+        # environLocal.printDebug(['s2', s2, id(s2)])
 
         for stream_case in (b, c, d):
             for e in stream_case:
@@ -6548,11 +6548,11 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 25.0])
 
         # s.elements = s1
-        s3 = s1[:]
+        s3 = Stream(s1[:])
         match = []
         for e in s3.elements:
             match.append(e.getOffsetBySite(s3))
-        self.assertEqual(match, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0])
+        self.assertEqual(match, [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 25.0])
 
         # this resets active site, so we get the right offsets on element
         # assignment
