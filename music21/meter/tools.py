@@ -123,6 +123,10 @@ def slashMixedToFraction(valueSrc: str) -> Tuple[NumDenomTuple, bool]:
     Traceback (most recent call last):
     music21.exceptions21.MeterException: cannot match denominator to numerator in: 3+2+5/8+3/4+2+1+4
 
+    >>> meter.tools.slashMixedToFraction('3.0/4.0')
+    Traceback (most recent call last):
+    music21.exceptions21.TimeSignatureException: Cannot create time signature from "3.0/4.0"
+
     Changed in v7 -- new location and returns a tuple as first value.
     '''
     pre = []
