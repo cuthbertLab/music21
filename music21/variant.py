@@ -2365,7 +2365,7 @@ class Variant(base.Music21Object):
             {2.0} <music21.note.Note A>
             {3.0} <music21.note.Note B>
         '''
-        spacerFilter = lambda r: r.hasStyleInformation and r.style.hideObjectOnPrint == True
+        spacerFilter = lambda r: r.hasStyleInformation and r.style.hideObjectOnPrint
 
         if contextStream is None:
             contextStream = self.activeSite
