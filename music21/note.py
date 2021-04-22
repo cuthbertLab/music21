@@ -1775,25 +1775,6 @@ class Rest(GeneralNote):
         return self.duration.fullName + ' Rest'
 
 
-class SpacerRest(Rest):
-    '''
-    This is exactly the same as a rest, but it is a SpacerRest.
-    This object should only be used for making hidden space in a score in lilypond.
-
-    DEPRECATED in v.7 -- use a normal rest with .hideObjectOnPrint
-
-    >>> sr = note.SpacerRest(type='whole')
-    >>> sr
-    <music21.note.SpacerRest rest duration=4.0>
-    '''
-
-    def __init__(self, *arguments, **keywords):
-        super().__init__(**keywords)
-
-    def _reprInternal(self):
-        return f'{self.name} duration={self.duration.quarterLength}'
-
-
 # ------------------------------------------------------------------------------
 # test methods and classes
 
@@ -2185,7 +2166,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Note, Rest, SpacerRest, Unpitched, NotRest, GeneralNote, Lyric]
+_DOC_ORDER = [Note, Rest, Unpitched, NotRest, GeneralNote, Lyric]
 
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()

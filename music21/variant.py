@@ -2365,6 +2365,8 @@ class Variant(base.Music21Object):
             {2.0} <music21.note.Note A>
             {3.0} <music21.note.Note B>
         '''
+        spacerFilter = lambda r: r.hasStyleInformation and r.style.hideObjectOnPrint == True
+
         if contextStream is None:
             contextStream = self.activeSite
             if contextStream is None:
@@ -2380,7 +2382,10 @@ class Variant(base.Music21Object):
         vStart = self.getOffsetBySite(contextStream)
 
         if includeSpacers is True:
-            spacerDuration = self.getElementsByClass('SpacerRest').first().duration.quarterLength
+            spacerDuration = (self
+                              .getElementsByClass('Rest')
+                              .addFilter(spacerFilter)
+                              .first().duration.quarterLength)
         else:
             spacerDuration = 0.0
 

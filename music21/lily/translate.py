@@ -1291,9 +1291,6 @@ class LilypondConverter:
                         simpleElementParts.append('? ')
             else:
                 simpleElementParts.append('s ')
-
-        elif 'SpacerRest' in c:
-            simpleElementParts.append('s ')
         elif 'Rest' in c:
             if noteOrRest.hasStyleInformation and noteOrRest.style.hideObjectOnPrint:
                 simpleElementParts.append('s ')
@@ -1868,7 +1865,8 @@ class LilypondConverter:
         >>> v1.replacementDuration = 4.0
 
         >>> v2 = variant.Variant()
-        >>> sp2 = note.SpacerRest()
+        >>> sp2 = note.Rest()
+        >>> sp2.style.hideObjectOnPrint = True
         >>> sp2.duration.quarterLength = 4.0
         >>> v2.replacementDuration = 4.0
         >>> v2.append(sp2)
@@ -1876,7 +1874,8 @@ class LilypondConverter:
         ...     v2.append(el)
 
         >>> v3 = variant.Variant()
-        >>> sp3 = note.SpacerRest()
+        >>> sp3 = note.Rest()
+        >>> sp3.style.hideObjectOnPrint = True
         >>> sp3.duration.quarterLength = 8.0
         >>> v3.replacementDuration = 4.0
         >>> v3.append(sp3)
@@ -1884,7 +1883,8 @@ class LilypondConverter:
         ...     v3.append(el)
 
         >>> v4 = variant.Variant()
-        >>> sp4 = note.SpacerRest()
+        >>> sp4 = note.Rest()
+        >>> sp4.style.hideObjectOnPrint = True
         >>> sp4.duration.quarterLength = 16.0
         >>> v4.replacementDuration = 4.0
         >>> v4.append(sp4)
@@ -1947,7 +1947,7 @@ class LilypondConverter:
 
         def findOffsetOfFirstNonSpacerElement(inputStream):
             for el in inputStream:
-                if 'SpacerRest' in el.classes:
+                if 'Rest' in el.classes and el.style.hideObjectOnPrint:
                     pass
                 else:
                     return inputStream.elementOffset(el)
@@ -2004,7 +2004,8 @@ class LilypondConverter:
 
             # make spacer with spacerDuration and append
             if spacerDuration > 0.0:
-                spacer = note.SpacerRest()
+                spacer = note.Rest()
+                spacer.style.hideObjectOnPrint = True
                 spacer.duration.quarterLength = spacerDuration
                 # noinspection PyTypeChecker
                 lySpacer = self.lySimpleMusicFromNoteOrRest(spacer)
@@ -2133,7 +2134,9 @@ class LilypondConverter:
 
         musicList = []
 
-        varFilter = variantObject.getElementsByClass('SpacerRest')
+        varFilter = [r for r in variantObject.getElementsByClass('Rest')
+                     if r.style.hideObjectOnPrint]
+
         if varFilter:
             spacer = varFilter[0]
             spacerDur = spacer.duration.quarterLength

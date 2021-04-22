@@ -1408,7 +1408,7 @@ class Test(unittest.TestCase):
         self.assertEqual('the id', actual.id)
         self.assertEqual('start', actual.duration.tuplets[0].type)
 
-    @mock.patch('music21.note.SpacerRest')
+    @mock.patch('music21.note.Rest')
     @mock.patch('music21.mei.base.makeDuration')
     @mock.patch('music21.mei.base.scaleToTuplet')
     def testUnit2TestRestFromElement(self, mockTuplet, mockMakeDur, mockSpacer):
