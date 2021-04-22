@@ -466,7 +466,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...     print(n.name, end=' ')
         C C# D E F G A
 
-        '.ghost', because it begins with is treated as a class name and returns a `RecursiveIterator`:
+        '.ghost', because it begins with is treated as a class name and
+        returns a `RecursiveIterator`:
 
 
         >>> for n in s['.ghost']:
