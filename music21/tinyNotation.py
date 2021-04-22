@@ -58,7 +58,7 @@ Here is an example of TinyNotation in action.
     {0.0} <music21.clef.TrebleClef>
     {0.0} <music21.meter.TimeSignature 3/4>
     {0.0} <music21.note.Note E>
-    {1.0} <music21.note.Rest rest>
+    {1.0} <music21.note.Rest quarter>
     {2.0} <music21.note.Note F#>
 {3.0} <music21.stream.Measure 2 offset=3.0>
     {0.0} <music21.note.Note G>

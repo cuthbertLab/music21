@@ -726,7 +726,7 @@ def makeRests(
     >>> b.lowestOffset
     0.0
     >>> b.show('text')
-    {0.0} <music21.note.Rest rest>
+    {0.0} <music21.note.Rest 20ql>
     {20.0} <music21.note.Note C>
     >>> b[0].duration.quarterLength
     20.0
@@ -749,9 +749,9 @@ def makeRests(
     >>> b.lowestOffset
     0.0
     >>> b.show('text')
-    {0.0} <music21.note.Rest rest>
+    {0.0} <music21.note.Rest 20ql>
     {20.0} <music21.note.Note C>
-    {21.0} <music21.note.Rest rest>
+    {21.0} <music21.note.Rest 9ql>
     {30.0} <music21.note.Note D>
     >>> b[0].style.hideObjectOnPrint
     True
@@ -781,13 +781,13 @@ def makeRests(
     {0.0 - 4.0} <music21.stream.Measure 1 offset=0.0>
         {0.0 - 0.0} <music21.clef.TrebleClef>
         {0.0 - 0.0} <music21.meter.TimeSignature 4/4>
-        {0.0 - 4.0} <music21.note.Rest rest>
+        {0.0 - 4.0} <music21.note.Rest whole>
     {4.0 - 8.0} <music21.stream.Measure 2 offset=4.0>
         {0.0 - 1.0} <music21.note.Note C>
-        {1.0 - 4.0} <music21.note.Rest rest>
+        {1.0 - 4.0} <music21.note.Rest dotted-half>
     {8.0 - 12.0} <music21.stream.Measure 3 offset=8.0>
         {0.0 - 1.0} <music21.note.Note D>
-        {1.0 - 4.0} <music21.note.Rest rest>
+        {1.0 - 4.0} <music21.note.Rest dotted-half>
         {4.0 - 4.0} <music21.bar.Barline type=final>
 
     Changed in v6 -- all but first attribute are keyword only
@@ -988,11 +988,11 @@ def makeTies(
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.meter.TimeSignature 4/4>
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.note.Rest whole>
     {4.0} <music21.stream.Measure 2 offset=4.0>
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.note.Rest whole>
     {8.0} <music21.stream.Measure 3 offset=8.0>
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.note.Rest whole>
         {4.0} <music21.bar.Barline type=final>
 
     Notes: uses base.Music21Object.splitAtQuarterLength() once it has figured out
@@ -1019,7 +1019,7 @@ def makeTies(
     {0.0 - 3.0} <music21.stream.Measure 1 offset=0.0>
         {0.0 - 0.0} <music21.clef.TrebleClef>
         {0.0 - 0.0} <music21.meter.TimeSignature 2/4>
-        {0.0 - 3.0} <music21.note.Rest rest>
+        {0.0 - 3.0} <music21.note.Rest dotted-half>
     {2.0 - 4.0} <music21.stream.Measure 2 offset=2.0>
         {1.0 - 2.0} <music21.note.Note C>
     {4.0 - 6.0} <music21.stream.Measure 3 offset=4.0>

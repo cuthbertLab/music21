@@ -157,7 +157,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     >>> s2.show('text')
     {0.0} <music21.clef.TrebleClef>
     {0.0} <music21.stream.Part embeddedPart>
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.note.Rest quarter>
     {1.0} <music21.note.Note E->
 
     New in v7 -- providing a single element now works:
@@ -184,7 +184,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {1.0} <music21.note.Note E->
     {1.5} <music21.stream.Measure 2 offset=1.5>
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.note.Rest quarter>
 
     Here, every element is a Stream that's not a Measure, so we instead insert:
 
@@ -193,7 +193,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     {0.0} <music21.stream.PartStaff 0x...>
         {1.0} <music21.note.Note E->
     {0.0} <music21.stream.PartStaff 0x...>
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.note.Rest quarter>
     '''
     # this static attributes offer a performance boost over other
     # forms of checking class
@@ -402,7 +402,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> subslice = s[2:5]
         >>> subslice
-        [<music21.note.Note E>, <music21.note.Rest rest>, <music21.note.Note F>]
+        [<music21.note.Note E>, <music21.note.Rest quarter>, <music21.note.Note F>]
         >>> len(subslice)
         3
         >>> s[1].offset
@@ -2098,7 +2098,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.append(c1)
         >>> s.show('text')
         {0.0} <music21.note.Note D>
-        {2.0} <music21.note.Rest rest>
+        {2.0} <music21.note.Rest half>
         {4.0} <music21.chord.Chord C4 E4>
 
         Save the original Streams for later
@@ -2143,7 +2143,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Chords can also be inserted into rests:
 
         >>> s3.getElementsByOffset(2.0).first()
-        <music21.note.Rest rest>
+        <music21.note.Rest half>
         >>> s3.insertIntoNoteOrChord(2.0, chord.Chord('C4 E4 G#4'))
         >>> s3.show('text')
         {0.0} <music21.note.Note D>
@@ -2156,7 +2156,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> s4.show('text', addEndTimes=True)
         {0.0 - 2.0} <music21.note.Note D>
-        {2.0 - 4.0} <music21.note.Rest rest>
+        {2.0 - 4.0} <music21.note.Rest half>
         {4.0 - 5.0} <music21.chord.Chord C4 E4>
 
         >>> for i in [0.0, 4.0, 6.0]:  # skipping 2.0 for now
@@ -2166,9 +2166,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s4.insertIntoNoteOrChord(2.0, r)
         >>> s4.show('text', addEndTimes=True)
         {0.0 - 2.0} <music21.note.Note D>
-        {2.0 - 4.0} <music21.note.Rest rest>
+        {2.0 - 4.0} <music21.note.Rest half>
         {4.0 - 5.0} <music21.chord.Chord C4 E4>
-        {6.0 - 7.0} <music21.note.Rest rest>
+        {6.0 - 7.0} <music21.note.Rest quarter>
 
         Notice that (1) the original duration and not the new duration is used, unless
         there is no element at that place, and (2) if an element is put into a place where
@@ -3905,7 +3905,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> t5 = st1.getElementAfterElement(n1, [note.Rest])
         >>> t5
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
         >>> t5 is r3
         True
         >>> t6 = st1.getElementAfterElement(n1, [note.Rest, note.Note])
@@ -4356,14 +4356,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.key.Key of f# minor>
             {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.note.Rest rest>
+            {0.0} <music21.note.Rest quarter>
         {1.0} <music21.stream.Measure 1 offset=1.0>
-            {0.0} <music21.note.Rest rest>
+            {0.0} <music21.note.Rest whole>
         {5.0} <music21.stream.Measure 2 offset=5.0>
-            {0.0} <music21.note.Rest rest>
+            {0.0} <music21.note.Rest whole>
         {9.0} <music21.stream.Measure 3 offset=9.0>
             {0.0} <music21.layout.SystemLayout>
-            {0.0} <music21.note.Rest rest>
+            {0.0} <music21.note.Rest whole>
         {13.0} <music21.stream.Measure 4 offset=13.0>
         ...
 
@@ -4432,12 +4432,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.key.Key of f# minor>
                 {0.0} <music21.meter.TimeSignature 4/4>
-                {0.0} <music21.note.Rest rest>
+                {0.0} <music21.note.Rest quarter>
             {1.0} <music21.stream.Measure 1 offset=1.0>
-                {0.0} <music21.note.Rest rest>
+                {0.0} <music21.note.Rest whole>
                 ...
             {33.0} <music21.stream.Measure 9 offset=33.0>
-                {0.0} <music21.note.Rest rest>
+                {0.0} <music21.note.Rest dotted-half>
                 {3.0} <music21.bar.Barline type=final>
         {0.0} <music21.stream.Part Alto>
             {0.0} <music21.instrument.Instrument 'P2: Alto: Instrument 2'>
@@ -4445,12 +4445,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.key.Key of f# minor>
                 {0.0} <music21.meter.TimeSignature 4/4>
-                {0.0} <music21.note.Rest rest>
+                {0.0} <music21.note.Rest quarter>
             {1.0} <music21.stream.Measure 1 offset=1.0>
-                {0.0} <music21.note.Rest rest>
+                {0.0} <music21.note.Rest whole>
             ...
             {33.0} <music21.stream.Measure 9 offset=33.0>
-                {0.0} <music21.note.Rest rest>
+                {0.0} <music21.note.Rest dotted-half>
                 {3.0} <music21.bar.Barline type=final>
         {0.0} <music21.layout.StaffGroup ...>
 
@@ -4473,9 +4473,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> pt = p.template(retainVoices=False)
         >>> pt.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.note.Rest rest>
+            {0.0} <music21.note.Rest whole>
         {4.0} <music21.stream.Measure 2 offset=4.0>
-            {0.0} <music21.note.Rest rest>
+            {0.0} <music21.note.Rest whole>
         >>> pt[0][0].quarterLength
         4.0
 
@@ -5985,10 +5985,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.show('text', addEndTimes=True)
         {0.0 - 6.3} <music21.stream.Part part1>
             {4.0 - 5.0} <music21.note.Note C#>
-            {5.3 - 6.3} <music21.note.Rest rest>
+            {5.3 - 6.3} <music21.note.Rest quarter>
         {0.0 - 6.5} <music21.stream.Part part2>
             {2.12 - 4.12} <music21.note.Note D->
-            {5.5 - 6.5} <music21.note.Rest rest>
+            {5.5 - 6.5} <music21.note.Rest quarter>
 
         >>> cc = s.chordify()
 
@@ -5998,11 +5998,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Fraction(22, 25)
 
         >>> cc.show('text', addEndTimes=True)
-        {0.0 - 2.12} <music21.note.Rest rest>
+        {0.0 - 2.12} <music21.note.Rest 53/25ql>
         {2.12 - 4.0} <music21.chord.Chord D-4>
         {4.0 - 4.12} <music21.chord.Chord C#4 D-4>
         {4.12 - 5.0} <music21.chord.Chord C#4>
-        {5.0 - 6.5} <music21.note.Rest rest>
+        {5.0 - 6.5} <music21.note.Rest dotted-quarter>
 
         Here's how addPartIdAsGroup works:
 
@@ -9460,7 +9460,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s1.show('text')
         {0.0} <music21.key.KeySignature of no sharps or flats>
         {0.0} <music21.note.Note B>
-        {1.0} <music21.note.Rest rest>
+        {1.0} <music21.note.Rest quarter>
         {2.0} <music21.chord.Chord A B->
 
         `.notesAndRests` removes the `KeySignature` object but keeps the `Rest`.
@@ -9468,7 +9468,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> notes1 = s1.notesAndRests.stream()
         >>> notes1.show('text')
         {0.0} <music21.note.Note B>
-        {1.0} <music21.note.Rest rest>
+        {1.0} <music21.note.Rest quarter>
         {2.0} <music21.chord.Chord A B->
 
         The same caveats about `Stream` classes and `.flat` in `.notes` apply here.
@@ -9504,7 +9504,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> p1.show('text')
         {0.0} <music21.key.KeySignature of no sharps or flats>
         {0.0} <music21.note.Note B>
-        {1.0} <music21.note.Rest rest>
+        {1.0} <music21.note.Rest quarter>
         {2.0} <music21.chord.Chord A B->
 
         >>> noteStream = p1.notes.stream()
@@ -10041,8 +10041,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.storeAtEnd(bar.Barline('final'))
         >>> gapStream = s.findGaps()
         >>> gapStream.show('text', addEndTimes=True)
-        {0.0 - 1.0} <music21.note.Rest rest>
-        {3.0 - 5.0} <music21.note.Rest rest>
+        {0.0 - 1.0} <music21.note.Rest quarter>
+        {3.0 - 5.0} <music21.note.Rest half>
 
         Returns None if not gaps:
 
@@ -10693,7 +10693,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.stream.Voice 3>
                     {0.0} <music21.note.Note E>
                     ...
-                    {3.0} <music21.note.Rest rest>
+                    {3.0} <music21.note.Rest quarter>
                 {0.0} <music21.stream.Voice 4>
                     {0.0} <music21.note.Note F#>
                     ...
@@ -10702,13 +10702,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.stream.Voice 3>
                     {0.0} <music21.note.Note E>
                     ...
-                    {3.0} <music21.note.Rest rest>
+                    {3.0} <music21.note.Rest quarter>
                 {0.0} <music21.stream.Voice 4>
                     {0.0} <music21.note.Note E>
                     ...
                     {3.5} <music21.note.Note A>
             {8.0} <music21.stream.Measure 3 offset=8.0>
-                {0.0} <music21.note.Rest rest>
+                {0.0} <music21.note.Rest whole>
                 {4.0} <music21.bar.Barline type=final>
         {0.0} <music21.layout.ScoreLayout>
 
@@ -10722,13 +10722,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.meter.TimeSignature 4/4>
                 {0.0} <music21.note.Note E>
                 ...
-                {3.0} <music21.note.Rest rest>
+                {3.0} <music21.note.Rest quarter>
             {4.0} <music21.stream.Measure 2 offset=4.0>
                 {0.0} <music21.note.Note E>
                 ...
-                {3.0} <music21.note.Rest rest>
+                {3.0} <music21.note.Rest quarter>
             {8.0} <music21.stream.Measure 3 offset=8.0>
-                {0.0} <music21.note.Rest rest>
+                {0.0} <music21.note.Rest whole>
                 {4.0} <music21.bar.Barline type=final>
         {0.0} <music21.stream.Part Piano-v1>
             {0.0} <music21.instrument.Instrument 'P1: Piano: '>
@@ -12707,10 +12707,10 @@ class Measure(Stream):
         >>> m.append(note.Note('D4', type='eighth'))
         >>> m.show('text')
         {0.0} <music21.meter.TimeSignature 3/4>
-        {0.0} <music21.note.Rest rest>
-        {0.5} <music21.note.Rest rest>
+        {0.0} <music21.note.Rest eighth>
+        {0.5} <music21.note.Rest eighth>
         {1.0} <music21.note.Note C>
-        {2.0} <music21.note.Rest rest>
+        {2.0} <music21.note.Rest eighth>
         {2.5} <music21.note.Note D>
         >>> m.padAsAnacrusis(useInitialRests=True)
         >>> m.paddingLeft
@@ -12718,7 +12718,7 @@ class Measure(Stream):
         >>> m.show('text')
         {0.0} <music21.meter.TimeSignature 3/4>
         {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Rest rest>
+        {1.0} <music21.note.Rest eighth>
         {1.5} <music21.note.Note D>
         '''
         if useInitialRests:

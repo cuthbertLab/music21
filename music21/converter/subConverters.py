@@ -658,13 +658,13 @@ class ConverterHumdrum(SubConverter):
             {0.0} <music21.humdrum.spineParser.MiscTandem **kern>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.meter.TimeSignature 2/4>
-                {0.0} <music21.note.Rest rest>
+                {0.0} <music21.note.Rest 1/6ql>
                 {0.1667} <music21.note.Note G#>
                 {0.3333} <music21.note.Note F#>
                 {0.5} <music21.note.Note E>
                 {0.6667} <music21.note.Note C#>
                 {0.8333} <music21.note.Note F>
-                {1.0} <music21.note.Rest rest>
+                {1.0} <music21.note.Rest 1/6ql>
                 {1.1667} <music21.note.Note D>
                 {1.3333} <music21.note.Note E->
                 {1.5} <music21.note.Note G>
@@ -727,7 +727,7 @@ class ConverterTinyNotation(SubConverter):
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.note.Note E>
-            {1.0} <music21.note.Rest rest>
+            {1.0} <music21.note.Rest quarter>
             {2.0} <music21.note.Note F#>
         {3.0} <music21.stream.Measure 2 offset=3.0>
             {0.0} <music21.note.Note G>

@@ -570,7 +570,7 @@ class Verticality(prebase.ProtoM21Object):
         <music21.tree.verticality.Verticality 400.0 {}>
         >>> el = verticality.makeElement(1/3)
         >>> el
-        <music21.note.Rest rest>
+        <music21.note.Rest 1/3ql>
         >>> el.duration.fullName
         'Eighth Triplet (1/3 QL)'
 

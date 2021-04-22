@@ -668,7 +668,7 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     >>> len(notesList)
     24
     >>> print(notesList)
-    [<music21.note.Rest rest>, <music21.note.Note C>, <music21.note.Note C>,
+    [<music21.note.Rest quarter>, <music21.note.Note C>, <music21.note.Note C>,
      <music21.note.Note D>, <music21.note.Note E>, <music21.note.Note F>,
      <music21.note.Note G>, <music21.note.Note A>, <music21.note.Note B>,
      <music21.note.Note C>, ...]
@@ -836,7 +836,7 @@ def notesAndDurationsToStream(
         {2.0} <music21.note.Note B>
         {2.5} <music21.note.Note F#>
         {4.0} <music21.note.Note C>
-        {4.25} <music21.note.Rest rest>
+        {4.25} <music21.note.Rest quarter>
     '''
     # rounding lengths
     p2 = stream.Part()

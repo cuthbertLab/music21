@@ -1796,22 +1796,22 @@ def midiTrackToStream(
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.meter.TimeSignature 4/4>
         {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Rest rest>
+        {1.0} <music21.note.Rest quarter>
         {2.0} <music21.chord.Chord F3 G#4 C5>
-        {3.0} <music21.note.Rest rest>
+        {3.0} <music21.note.Rest quarter>
     {4.0} <music21.stream.Measure 2 offset=4.0>
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.note.Rest eighth>
         {0.5} <music21.note.Note B->
-        {1.5} <music21.note.Rest rest>
+        {1.5} <music21.note.Rest half>
         {3.5} <music21.chord.Chord D2 A4>
     {8.0} <music21.stream.Measure 3 offset=8.0>
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.note.Rest eighth>
         {0.5} <music21.chord.Chord C#2 B-3 G#6>
-        {1.0} <music21.note.Rest rest>
+        {1.0} <music21.note.Rest dotted-quarter>
         {2.5} <music21.chord.Chord F#3 A4 C#5>
     {12.0} <music21.stream.Measure 4 offset=12.0>
         {0.0} <music21.chord.Chord F#3 A4 C#5>
-        {2.5} <music21.note.Rest rest>
+        {2.5} <music21.note.Rest dotted-quarter>
         {4.0} <music21.bar.Barline type=final>
     '''
     # environLocal.printDebug(['midiTrackToStream(): got midi track: events',
@@ -2669,7 +2669,7 @@ def midiStringToStream(strData, **keywords):
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Note G>
-            {1.0} <music21.note.Rest rest>
+            {1.0} <music21.note.Rest dotted-half>
             {4.0} <music21.bar.Barline type=final>
     '''
     from music21 import midi as midiModule

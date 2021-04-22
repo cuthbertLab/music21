@@ -196,11 +196,11 @@ class BrailleElementGrouping(ProtoM21Object):
         >>> bg.append(note.Note('F4'))
         >>> bg
         <music21.braille.segment.BrailleElementGrouping [<music21.note.Note C>,
-            <music21.note.Note D>, <music21.note.Rest rest>, <music21.note.Note F>]>
+            <music21.note.Note D>, <music21.note.Rest quarter>, <music21.note.Note F>]>
         >>> print(bg)
         <music21.note.Note C>
         <music21.note.Note D>
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
         <music21.note.Note F>
 
         These are the defaults and they are shared across all objects...
@@ -1504,9 +1504,9 @@ def findSegments(music21Part, **partKeywords):
     ===
     Measure 15, Note Grouping 1:
     <music21.note.Note C>
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
     <music21.note.Note F>
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
     ===
     Measure 16, Note Grouping 1:
     <music21.note.Note A->
@@ -2233,7 +2233,7 @@ def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
 
     >>> right
     <music21.braille.segment.BrailleElementGrouping
-        [<music21.note.Rest rest>, <music21.note.Note E>]>
+        [<music21.note.Rest quarter>, <music21.note.Note E>]>
 
 
     Now split one beat division earlier than it should be.  For 2/2 that means
@@ -2245,7 +2245,7 @@ def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
         [<music21.note.Note C>]>
     >>> right
     <music21.braille.segment.BrailleElementGrouping
-        [<music21.note.Note D>, <music21.note.Rest rest>, <music21.note.Note E>]>
+        [<music21.note.Note D>, <music21.note.Rest quarter>, <music21.note.Note E>]>
     '''
     music21Measure = stream.Measure()
     for brailleElement in noteGrouping:

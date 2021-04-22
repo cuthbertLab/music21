@@ -916,11 +916,11 @@ class Test(unittest.TestCase):
         match = [(repr(e), e.offset, e.duration.quarterLength) for e in flat_stream.notesAndRests]
         self.maxDiff = None
         self.assertEqual(match,
-                         [('<music21.note.Rest rest>', 0.0, 1.0),
+                         [('<music21.note.Rest quarter>', 0.0, 1.0),
                           ('<music21.note.Note F#>', 1.0, 1.0),
-                          ('<music21.note.Rest rest>', 2.0, 1.0),
+                          ('<music21.note.Rest quarter>', 2.0, 1.0),
                           ('<music21.note.Note C#>', 3.0, 1.0),
-                          ('<music21.note.Rest rest>', 4.0, 1.0),
+                          ('<music21.note.Rest quarter>', 4.0, 1.0),
                           ('<music21.note.Note G#>', 5.0, 1.0)])
 
         # test that lyric is found
@@ -1320,4 +1320,3 @@ _DOC_ORDER = []
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testPartReductionSchoenberg')
-

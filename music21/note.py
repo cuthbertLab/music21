@@ -1733,7 +1733,15 @@ class Rest(GeneralNote):
         self.fullMeasure = 'auto'  # see docs; True, False, 'always',
 
     def _reprInternal(self):
-        return self.name
+        duration_name = self.duration.fullName.lower()
+        if len(duration_name) < 15:  # dotted quarter = 14
+            return duration_name.replace(' ', '-')
+        else:
+            ql = self.duration.quarterLength
+            if ql == int(ql):
+                ql = int(ql)
+            ql_string = str(ql)
+            return f'{ql_string}ql'
 
     def __eq__(self, other):
         '''
