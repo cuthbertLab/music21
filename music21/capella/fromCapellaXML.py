@@ -414,7 +414,7 @@ class CapellaImporter:
         >>> restElement = ci.domElementFromText('<rest><duration base="1/2"/></rest>')
         >>> r = ci.restFromRest(restElement)
         >>> r
-        <music21.note.Rest rest>
+        <music21.note.Rest half>
         >>> r.duration.type
         'half'
         '''

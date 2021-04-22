@@ -1800,7 +1800,7 @@ class PartParser(XMLParserBase):
 
         >>> measureRest = m.notesAndRests[0]
         >>> measureRest
-        <music21.note.Rest rest>
+        <music21.note.Rest dotted-half>
         >>> measureRest.duration.type
         'half'
         >>> measureRest.duration.quarterLength
@@ -3051,7 +3051,7 @@ class MeasureParser(XMLParserBase):
         >>> mxr = EL('<note><rest/><duration>5040</duration><type>eighth</type></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> r
-        <music21.note.Rest rest>
+        <music21.note.Rest eighth>
         >>> r.duration.quarterLength
         0.5
 
@@ -3060,7 +3060,7 @@ class MeasureParser(XMLParserBase):
         ...              '</rest><duration>5040</duration><type>eighth</type></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> r
-        <music21.note.Rest rest>
+        <music21.note.Rest eighth>
 
         A rest normally lies at B4 in treble clef, but here we have put it at
         G4, so we'll shift it down two steps.

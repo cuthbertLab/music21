@@ -1933,29 +1933,29 @@ class Test(unittest.TestCase):
 
         match = str([(n.offset, n, n.duration) for n in m2.flat.notesAndRests])
         self.assertEqual(match,
-                         '[(0.0, <music21.note.Rest rest>, <music21.duration.Duration 1.0>), '
+                         '[(0.0, <music21.note.Rest quarter>, <music21.duration.Duration 1.0>), '
                          + '(1.0, <music21.note.Note C>, <music21.duration.Duration 1.0>), '
-                         + '(2.0, <music21.note.Rest rest>, <music21.duration.Duration 2.0>)]')
+                         + '(2.0, <music21.note.Rest half>, <music21.duration.Duration 2.0>)]')
 
         match = str([(n.offset, n, n.duration) for n in m2.flat])
         self.assertEqual(match,
-                         '[(0.0, <music21.note.Rest rest>, <music21.duration.Duration 1.0>), '
+                         '[(0.0, <music21.note.Rest quarter>, <music21.duration.Duration 1.0>), '
                          + '(1.0, <music21.note.Note C>, <music21.duration.Duration 1.0>), '
-                         + '(2.0, <music21.note.Rest rest>, <music21.duration.Duration 2.0>)]')
+                         + '(2.0, <music21.note.Rest half>, <music21.duration.Duration 2.0>)]')
 
         # m2.show()
 
         match = str(list(s.flat.notesAndRests))
-        self.assertEqual(match, '[<music21.note.Rest rest>, <music21.note.Note C>, '
-                                  + '<music21.note.Rest rest>, <music21.note.Rest rest>, '
-                                  + '<music21.note.Note C>, <music21.note.Rest rest>]')
+        self.assertEqual(match, '[<music21.note.Rest half>, <music21.note.Note C>, '
+                                  + '<music21.note.Rest quarter>, <music21.note.Rest quarter>, '
+                                  + '<music21.note.Note C>, <music21.note.Rest half>]')
         match = str([(n, n.duration) for n in s.flat.notesAndRests])
-        self.assertEqual(match, '[(<music21.note.Rest rest>, <music21.duration.Duration 2.0>), '
+        self.assertEqual(match, '[(<music21.note.Rest half>, <music21.duration.Duration 2.0>), '
                                   + '(<music21.note.Note C>, <music21.duration.Duration 1.0>), '
-                                  + '(<music21.note.Rest rest>, <music21.duration.Duration 1.0>), '
-                                  + '(<music21.note.Rest rest>, <music21.duration.Duration 1.0>), '
+                                  + '(<music21.note.Rest quarter>, <music21.duration.Duration 1.0>), '
+                                  + '(<music21.note.Rest quarter>, <music21.duration.Duration 1.0>), '
                                   + '(<music21.note.Note C>, <music21.duration.Duration 1.0>), '
-                                  + '(<music21.note.Rest rest>, <music21.duration.Duration 2.0>)]')
+                                  + '(<music21.note.Rest half>, <music21.duration.Duration 2.0>)]')
 
         GEX = m21ToXml.GeneralObjectExporter()
         unused_mx = GEX.parse(s).decode('utf-8')
@@ -5455,16 +5455,20 @@ class Test(unittest.TestCase):
 
         sPost = s.makeRests(fillGaps=True, inPlace=False)
         self.assertEqual(str(list(sPost.voices[0].notesAndRests)),
-                         '[<music21.note.Rest rest>, <music21.note.Note C>, '
-                         + '<music21.note.Rest rest>, <music21.note.Note C>, '
-                         + '<music21.note.Rest rest>, <music21.note.Note C>, '
-                         + '<music21.note.Rest rest>, <music21.note.Note C>, '
-                         + '<music21.note.Rest rest>]')
+                         '[<music21.note.Rest half>, <music21.note.Note C>, '
+                         + '<music21.note.Rest 2.25ql>, '
+                         + '<music21.note.Note C>, '
+                         + '<music21.note.Rest 2.5ql>, '
+                         + '<music21.note.Note C>, '
+                         + '<music21.note.Rest 4.25ql>, '
+                         + '<music21.note.Note C>, '
+                         + '<music21.note.Rest half>]')
         self.assertEqual(str(list(sPost.voices[1].notesAndRests)),
-                         '[<music21.note.Rest rest>, <music21.note.Note C>, '
-                         + '<music21.note.Rest rest>, <music21.note.Note C>, '
-                         + '<music21.note.Rest rest>, <music21.note.Note C>, '
-                         + '<music21.note.Rest rest>, <music21.note.Note C>]')
+                         '[<music21.note.Rest 16th>, <music21.note.Note C>, '
+                         + '<music21.note.Rest 3.25ql>, '
+                         + '<music21.note.Note C>, '
+                         + '<music21.note.Rest dotted-quarter>, <music21.note.Note C>, '
+                         + '<music21.note.Rest breve>, <music21.note.Note C>]')
 
         # sPost.show()
 

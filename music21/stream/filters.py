@@ -112,7 +112,7 @@ class IsFilter(StreamFilter):
     >>> for el in s.iter.addFilter(isFilter2):
     ...     print(el)
     <music21.note.Note C#>
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
 
     '''
     derivationStr = 'is'
@@ -151,14 +151,14 @@ class IsNotFilter(IsFilter):
     >>> for el in s.iter.addFilter(stream.filters.IsNotFilter(n)):
     ...     el
     <music21.key.KeySignature of 3 flats>
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
 
     test that resetting works...
 
     >>> for el in s.iter.addFilter(stream.filters.IsNotFilter(n)):
     ...     el
     <music21.key.KeySignature of 3 flats>
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
 
 
     multiple...
@@ -229,7 +229,7 @@ class ClassFilter(StreamFilter):
     >>> for x in sI:
     ...     print(x)
     <music21.note.Note C>
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
     <music21.note.Note D>
 
     >>> sI.filters.append(stream.filters.ClassFilter('Note'))
@@ -285,7 +285,7 @@ class ClassNotFilter(ClassFilter):
 
     >>> for x in sI:
     ...     print(x)
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
     '''
     derivationStr = 'getElementsNotOfClass'
 

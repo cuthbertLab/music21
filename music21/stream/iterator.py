@@ -448,7 +448,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.recurse().notes.first()
         <music21.note.Note D>
         >>> s.recurse().getElementsByClass('Rest').first()
-        <music21.note.Rest rest>
+        <music21.note.Rest half>
 
         If no elements match, returns None:
 
@@ -499,7 +499,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.recurse().notes.last()
         <music21.note.Note G>
         >>> s.recurse().getElementsByClass('Rest').last()
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
 
         New in v7.
 
@@ -727,7 +727,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s3 = s.iter.stream()
         >>> s3.show('t')
         {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Rest rest>
+        {1.0} <music21.note.Rest quarter>
         {2.0} <music21.note.Note D>
         {3.0} <music21.bar.Barline type=regular>
 
@@ -897,7 +897,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.append(note.Note('D'))
         >>> for el in s.iter.getElementsByClass('Rest'):
         ...     print(el)
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
 
 
         ActiveSite is restored...
@@ -916,7 +916,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         >>> for el in s.iter.getElementsByClass(note.Rest):
         ...     print(el)
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
 
         '''
         return self.addFilter(filters.ClassFilter(classFilterList), returnClone=returnClone)
@@ -1280,7 +1280,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> for el in s.iter.notesAndRests:
         ...     print(el)
         <music21.note.Note C>
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
         <music21.note.Note D>
 
         chained filters... (this makes no sense since notes is a subset of notesAndRests)

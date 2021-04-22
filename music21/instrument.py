@@ -2123,11 +2123,11 @@ def partitionByInstrument(streamObj):
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
-            {2.0} <music21.note.Rest rest>
+            {2.0} <music21.note.Rest quarter>
             {3.0} <music21.note.Note F#>
         {4.0} <music21.stream.Measure 2 offset=4.0>
             {0.0} <music21.note.Note G#>
-            {1.0} <music21.note.Rest rest>
+            {1.0} <music21.note.Rest half>
             {3.0} <music21.note.Note C>
         {8.0} <music21.stream.Measure 3 offset=8.0>
             {0.0} <music21.note.Note C>
@@ -2137,7 +2137,7 @@ def partitionByInstrument(streamObj):
             {0.0} <music21.instrument.AltoSaxophone 'Alto Saxophone'>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.note.Rest rest>
+            {0.0} <music21.note.Rest half>
             {2.0} <music21.note.Note E>
             {3.0} <music21.note.Note F>
         {4.0} <music21.stream.Measure 2 offset=4.0>
@@ -2153,9 +2153,9 @@ def partitionByInstrument(streamObj):
             {0.0} <music21.note.Note C#>
             {1.0} <music21.note.Note D#>
             {2.0} <music21.note.Note E#>
-            {3.0} <music21.note.Rest rest>
+            {3.0} <music21.note.Rest quarter>
         {4.0} <music21.stream.Measure 2 offset=4.0>
-            {0.0} <music21.note.Rest rest>
+            {0.0} <music21.note.Rest quarter>
             {1.0} <music21.note.Note A#>
             {2.0} <music21.note.Note B#>
             {3.0} <music21.note.Note C#>
@@ -2165,6 +2165,7 @@ def partitionByInstrument(streamObj):
 
     TODO: parts should be in Score Order. Coincidence that this almost works.
     TODO: use proper recursion to make a copy of the stream.
+    TODO: final barlines should be aligned.
     '''
     from music21 import stream
 
