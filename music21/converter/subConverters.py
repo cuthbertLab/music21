@@ -957,6 +957,23 @@ class ConverterMusicXML(SubConverter):
         '''
         Writes `dataBytes` to `fp`.
         Adds `.musicxml` suffix to `fp` if it does not already contain some suffix.
+
+        OMIT_FROM_DOCS
+
+        >>> import os
+        >>> from music21.converter.subConverters import ConverterMusicXML
+        >>> fp = 'nosuffix'
+        >>> sub = ConverterMusicXML()
+        >>> outFp = sub.writeDataStream(fp, b'')
+        >>> str(outFp).endswith('.musicxml')
+        True
+
+        >>> os.remove(outFp)
+        >>> fp = 'other.suffix'
+        >>> outFp = sub.writeDataStream(fp, b'')
+        >>> str(outFp).endswith('.suffix')
+        True
+        >>> os.remove(outFp)
         '''
         if fp is None:
             fp = self.getTemporaryFile()
