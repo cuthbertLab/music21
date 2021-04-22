@@ -1372,7 +1372,8 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     registerShowFormats = ('osmd',)
     registerOutputExtensions = ('html',)
 
-    def show(self, obj, fmt, *, offline=False, **keywords):
+    def show(self, obj, fmt, app=None, subformats=None, *,
+             offline: bool = False, **keywords):  # pragma: no cover
         '''
         Displays the score object in a notebook using the OpenSheetMusicDisplay.js library.
 
