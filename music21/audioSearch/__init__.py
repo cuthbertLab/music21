@@ -920,7 +920,8 @@ def decisionProcess(
     >>> beginningData = []
     >>> lengthData = []
     >>> for i in range(4):
-    ...     scNotes = scoreStream[i * hop + 1:i * hop + tn_recording + 1]
+    ...     excerpt = scoreStream[i * hop + 1:i * hop + tn_recording + 1]
+    ...     scNotes = stream.Part(excerpt)
     ...     name = str(i)
     ...     beginningData.append(i * hop + 1)
     ...     lengthData.append(tn_recording)

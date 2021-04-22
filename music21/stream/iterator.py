@@ -89,6 +89,16 @@ class StreamIterator(prebase.ProtoM21Object):
     * For `activeInformation` see above.
 
     Changed in v.5.2 -- all arguments except srcStream are keyword only.
+
+    OMIT_FROM_DOCS
+
+    Informative exception for user error:
+
+    >>> s = stream.Stream()
+    >>> sIter = stream.iterator.StreamIterator(s, filterList=[note.Note])
+    Traceback (most recent call last):
+    TypeError: filterList expects Filters or callables,
+    not types themselves; got <class 'music21.note.Note'>
     '''
     def __init__(self,
                  srcStream: 'music21.stream.Stream',
@@ -122,6 +132,10 @@ class StreamIterator(prebase.ProtoM21Object):
             filterList = [filterList]
         elif isinstance(filterList, (set, tuple)):
             filterList = list(filterList)  # mutable....
+        for x in filterList:
+            if isinstance(x, type):
+                raise TypeError(
+                    f'filterList expects Filters or callables, not types themselves; got {x}')
         # self.filters is a list of expressions that
         # return True or False for an element for
         # whether it should be yielded.
@@ -920,6 +934,53 @@ class StreamIterator(prebase.ProtoM21Object):
 
         '''
         return self.addFilter(filters.ClassFilter(classFilterList), returnClone=returnClone)
+
+    def getElementsByQuerySelector(self, querySelector: str, *, returnClone=True):
+        '''
+        First implementation of a query selector, similar to CSS QuerySelectors used in
+        HTML DOM:
+
+        * A leading `#` indicates the id of an element, so '#hello' will find elements
+          with `el.id=='hello'` (should only be one)
+        * A leading `.` indicates the group of an element, so '.high' will find elements
+          with `'high' in el.groups`
+        * Any other string is considered to be the type/class of the element.  So `Note`
+          will find all Note elements.  Can be fully qualified like `note.Note`
+
+        Eventually, more complex query selectors will be implemented.  This is just a start.
+
+        Setting up an example:
+
+        >>> s = converter.parse('tinyNotation: 4/4 GG4 AA4 BB4 r4 C4 D4 E4 F4 r1')
+        >>> s[note.Note].last().id = 'last'
+        >>> for n in s[note.Note]:
+        ...     if n.octave == 3:
+        ...         n.groups.append('tenor')
+
+        >>> list(s.recurse().getElementsByQuerySelector('.tenor'))
+        [<music21.note.Note C>,
+         <music21.note.Note D>,
+         <music21.note.Note E>,
+         <music21.note.Note F>]
+
+        >>> list(s.recurse().getElementsByQuerySelector('Rest'))
+        [<music21.note.Rest rest>,
+         <music21.note.Rest rest>]
+
+        Note that unlike with stream slices, the querySelector does not do anything special
+        for id searches.  `.first()` will need to be called to find the element (if any)
+
+        >>> s.recurse().getElementsByQuerySelector('#last').first()
+        <music21.note.Note F>
+
+        New in v.7
+        '''
+        if querySelector.startswith('#'):
+            return self.addFilter(filters.IdFilter(querySelector[1:]), returnClone=returnClone)
+        if querySelector.startswith('.'):
+            return self.addFilter(filters.GroupFilter(querySelector[1:]), returnClone=returnClone)
+        return self.addFilter(filters.ClassFilter(querySelector), returnClone=returnClone)
+
 
     def getElementsNotOfClass(self, classFilterList, *, returnClone=True):
         '''

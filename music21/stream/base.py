@@ -373,95 +373,137 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Get a Music21Object from the Stream using a variety of keys or indices.
 
-        If an int is given, the Music21Object at the index is returned. If the Stream is sorted
-        (if isSorted is True), the elements are returned in order.
+        If an int is given, the Music21Object at the index is returned, as if it were a list
+        or tuple:
 
-        If a class name is given (as a string or name),
-        :meth:`~music21.stream.Stream.getElementsByClass` is used to return a Stream of the
-        elements that match the requested class.
+        >>> c = note.Note('C')
+        >>> d = note.Note('D')
+        >>> e = note.Note('E')
+        >>> r1 = note.Rest()
+        >>> f = note.Note('F')
+        >>> g = note.Note('G')
+        >>> r2 = note.Rest()
+        >>> a = note.Note('A')
+        >>> s = stream.Stream([c, d, e, r1, f, g, r2, a])
 
-        If a string is given, :meth:`~music21.stream.Stream.getElementById` first, then
-        (if no results are found) :meth:`~music21.stream.Stream.getElementsByGroup` is used to
-        collect and return elements as a Stream.
-
-        >>> a = stream.Part(id='hello')
-        >>> names = ['C', 'D', 'E', 'F', 'G', 'A']
-        >>> for i in range(6):
-        ...     name = names[i]
-        ...     a.insert(i + 1, note.Note(name))
-        >>> a[0]
+        >>> s[0]
         <music21.note.Note C>
-        >>> a[-1]
+        >>> s[-1]
         <music21.note.Note A>
 
         Out of range notes raise an IndexError:
 
-        >>> a[99]
+        >>> s[99]
         Traceback (most recent call last):
-        IndexError: attempting to access index 99 while elements is of size 6
-        >>> subslice = a[2:5]
+        IndexError: attempting to access index 99 while elements is of size 8
+
+        If a slice of indices is given, a list of elements is returned, as if the Stream
+        were a list or Tuple.
+
+        >>> subslice = s[2:5]
         >>> subslice
-        <music21.stream.Part hello>
-        >>> subslice.derivation
-        <Derivation of <music21.stream.Part hello> from
-            <music21.stream.Part hello> via '__getitem__'>
+        [<music21.note.Note E>, <music21.note.Rest rest>, <music21.note.Note F>]
         >>> len(subslice)
         3
-        >>> a[1].offset
-        2.0
+        >>> s[1].offset
+        1.0
         >>> subslice[1].offset
-        4.0
+        3.0
 
-        >>> b = note.Note()
-        >>> b.id = 'green'
-        >>> b.groups.append('violin')
-        >>> a.insert(b)
 
-        Get an item by class
+        If a class is given then an iterator of elements
+        that match the requested class(es) is returned, similar
+        to `Stream().recurse().getElementsByClass()`.
 
-        >>> allNotes = a[note.Note]
-        >>> allNotes
-        <music21.stream.Part hello>
-        >>> allNotes.derivation
-        <Derivation of <music21.stream.Part hello> from
-            <music21.stream.Part hello> via 'getElementsByClass'>
-        >>> allNotes[0] is b
+        >>> len(s)
+        8
+        >>> len(s[note.Rest])
+        2
+        >>> len(s[note.Note])
+        6
+
+        >>> for n in s[note.Note]:
+        ...     print(n.name, end=' ')
+        C D E F G A
+
+        Note that this iterator is recursive by default.
+
+        >>> c_sharp = note.Note('C#')
+        >>> v = stream.Voice([c_sharp])
+        >>> s.insert(0.5, c_sharp)
+
+        >>> len(s[note.Note])
+        7
+
+
+        The actual object returned by `s[module.Class]` is a
+        :class:`~music21.stream.iterator.RecursiveIterator` and has all the functions
+        available on it:
+
+        >>> s[note.Note]
+        <...>
+
+        If no elements of the class are found, no error is raised in version 7:
+
+        >>> list(s[layout.StaffLayout])
+        []
+
+
+        If the key is a string, it is treated as a `querySelector` as defined in
+        :meth:`~music21.stream.iterator.getElementsByQuerySelector`, namely that bare strings
+        are treated as class names, strings beginning with `#` are id-queries, and strings
+        beginning with `.` are group queries.
+
+        We can set some ids and groups for demonstrating.
+
+        >>> a.id = 'last_a'
+        >>> c.groups.append('ghost')
+        >>> e.groups.append('ghost')
+
+        'Note' is treated as a class name and returns a `RecursiveIterator`:
+
+        >>> for n in s['Note']:
+        ...     print(n.name, end=' ')
+        C C# D E F G A
+
+        '.ghost', because it begins with is treated as a class name and
+        returns a `RecursiveIterator`:
+
+
+        >>> for n in s['.ghost']:
+        ...     print(n.name, end=' ')
+        C E
+
+        A query selector with a `#`
+
+        >>> s['#last_a']
+        <music21.note.Note A>
+
+        >>> s['#nothing'] is None
         True
 
-        Get items by groups:
 
-        >>> violinGroup = a['violin']
-        >>> violinGroup
-        <music21.stream.Part hello>
-        >>> violinGroup.derivation
-        <Derivation of <music21.stream.Part hello> from
-            <music21.stream.Part hello> via 'getElementsByGroup'>
-        >>> violinGroup[0] is b
-        True
+        Any other query raises a TypeError:
 
-        Get a single element by id:
-
-        >>> a['green'] is b
-        True
-
-        If a string or class is not found, a KeyError will be raised:
-
-        >>> a['purple']
+        >>> s[0.5]
         Traceback (most recent call last):
-        KeyError: 'provided key (purple) does not match any id or group'
+        TypeError: Streams can get items by int, slice, class, or string query; got <class 'float'>
 
-        >>> a[layout.StaffLayout]
-        Traceback (most recent call last):
-        KeyError: "provided class (<class 'music21.layout.StaffLayout'>) does
-            not match any contained Objects"
 
-        Changed in v7. -- out of range indexes now raise an IndexError, not StreamException
+        Changed in v7:
+
+          - out of range indexes now raise an IndexError, not StreamException
+          - strings ('Note', '#id', '.group') are now treated like a query selector.
+          - slices with negative indices now supported
+          - Unsupported types now raise TypeError
+          - Class and Group searches now return a recursive `StreamIterator` rather than a `Stream`
+          - Slice searches now return a list of elements rather than a `Stream`
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
             self.sort()  # will set isSorted to True
 
-        if common.isNum(k):
+        if isinstance(k, int):
             match = None
             # handle easy and most common case first
             if 0 <= k < len(self._elements):
@@ -483,36 +525,27 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elif isinstance(k, slice):  # get a slice of index values
             # manually inserting elements is critical to setting the element
             # locations
-            try:
-                found = self.cloneEmpty(derivationMethod='__getitem__')
-            except TypeError:  # pragma: no cover
-                raise StreamException(f'Error in defining class: {self.__class__}'
-                                      + 'Stream subclasses and Music21Objects cannot have required '
-                                      + 'arguments in __init__')
-            for e in self.elements[k]:
-                found.coreInsert(self.elementOffset(e), e)
+            searchElements = self._elements
+            if (k.start is not None and k.start < 0) or (k.stop is not None and k.stop < 0):
+                # Must use .elements property to incorporate end elements
+                searchElements = self.elements
 
-            found.coreElementsChanged(clearIsSorted=False)
-            return found
+            return searchElements[k]
+
+        elif isinstance(k, type):
+            return self.recurse().getElementsByClass(k)
 
         elif isinstance(k, str):
-            # first search id, then search groups
-            idMatch = self.getElementById(k)
-            if idMatch is not None:
-                return idMatch
-            else:  # search groups, return first element match
-                groupStream = self.iter.getElementsByGroup(k)
-                if groupStream:
-                    return groupStream.stream()
-                else:
-                    raise KeyError(f'provided key ({k}) does not match any id or group')
-        elif isinstance(k, type(type)):
-            # assume it is a class name
-            classStream = self.iter.getElementsByClass(k)
-            if classStream:
-                return classStream.stream()
+            querySelectorIterator = self.recurse().getElementsByQuerySelector(k)
+            if '#' in k:
+                # an id anywhere in the query selector should return only one element
+                return querySelectorIterator.first()
             else:
-                raise KeyError(f'provided class ({k}) does not match any contained Objects')
+                return querySelectorIterator
+
+        raise TypeError(
+            f'Streams can get items by int, slice, class, or string query; got {type(k)}'
+        )
 
     def first(self):
         '''
@@ -13207,26 +13240,8 @@ class Score(Stream):
         >>> s = corpus.parse('bach/bwv66.6')
         >>> s.parts
         <music21.stream.iterator.StreamIterator for Score:0x104af3a58 @:0>
-        >>> partStream = s.parts.stream()
-        >>> partStream.classes
-        ('Score', 'Stream', 'StreamCoreMixin', 'Music21Object', 'ProtoM21Object', 'object')
-        >>> len(partStream)
+        >>> len(s.parts)
         4
-
-        The partStream object is a full `stream.Score` object, thus the elements inside it
-        can be accessed by index number or by id string, or iterated over:
-
-        >>> partStream[0]
-        <music21.stream.Part Soprano>
-        >>> partStream['Alto']
-        <music21.stream.Part Alto>
-        >>> for p in partStream:
-        ...     print(p.id)
-        Soprano
-        Alto
-        Tenor
-        Bass
-
 
         OMIT_FROM_DOCS
 
