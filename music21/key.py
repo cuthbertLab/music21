@@ -1095,7 +1095,7 @@ class Key(KeySignature, scale.DiatonicScale):
         alternateInterpretations list has
         been filled from the use of a KeyWeightKeyAnalysis subclass.
 
-        >>> littlePiece = converter.parse('tinyNotation: 4/4 c4 d e f g a b cc ee gg ee cc')
+        >>> littlePiece = converter.parse("tinyNotation: 4/4 c4 d e f g a b c' e' g' e' c'")
         >>> k = littlePiece.analyze('key')
         >>> k
         <music21.key.Key of C major>
