@@ -113,7 +113,7 @@ class Test(unittest.TestCase):
         self.assertIn('<part-name> </part-name>', dump)
 
 
-class TestExternal(unittest.TestCase):
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     @unittest.skipUnless(hasInstalledIPython(), 'skipping since IPython not installed')
     def testOpenSheetMusicDisplayRuns(self):
