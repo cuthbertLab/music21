@@ -32,8 +32,8 @@ environLocal = environment.Environment('osmd')
 # when updating the script tag osmd will only reload in a notebook if you: Kernel -> restart and
 # clear output, then save the notebook and refresh the page.
 # Otherwise the script will stay on the page and not reload.
-SCRIPT_URL = ("https://github.com/opensheetmusicdisplay"
-            + "/opensheetmusicdisplay/releases/download/0.9.2/opensheetmusicdisplay.min.js")
+SCRIPT_URL = ('https://github.com/opensheetmusicdisplay'
+            + '/opensheetmusicdisplay/releases/download/0.9.2/opensheetmusicdisplay.min.js')
 
 
 def hasInstalledIPython() -> bool:
@@ -52,9 +52,9 @@ def getUniqueDivId() -> str:
     Generates a unique id for the div in which the score is displayed.
     This is so we can update a previously used div.
     '''
-    return ("OSMD-div-"
+    return ('OSMD-div-'
             + str(random.randint(0, 1000000))
-            + "-" + str(time.time()).replace('.', '-'))  # '.' is the class selector
+            + '-' + str(time.time()).replace('.', '-'))  # '.' is the class selector
 
 def getXml(obj) -> str:
     '''
@@ -102,18 +102,29 @@ def musicXMLToScript(xml, divId, offline=False):
     return script
 
 
+class Test(unittest.TestCase):
+
+    def testPlaceholderPartName(self):
+        from music21 import converter
+
+        p = converter.parse('tinyNotation: c1 d1 e1 f1')
+        self.assertIsNone(p.partName)
+        dump = getXml(p)
+        self.assertIn('<part-name> </part-name>', dump)
+
+
 class TestExternal(unittest.TestCase):
 
-    @unittest.skipUnless(hasInstalledIPython(), "skipping since IPython not installed")
+    @unittest.skipUnless(hasInstalledIPython(), 'skipping since IPython not installed')
     def testOpenSheetMusicDisplayRuns(self):
         from music21 import corpus
 
         s = corpus.parse('bwv66.6')
         s.show('osmd')
 
-    @unittest.skipUnless(hasInstalledIPython(), "skipping since IPython not installed")
+    @unittest.skipUnless(hasInstalledIPython(), 'skipping since IPython not installed')
     def testOpenSheetMusicDisplayColors(self):
-        s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
+        s = music21.converter.parse('tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c')
 
         for n in s.recurse().getElementsByClass('Note'):
             n.style.color = 'red'
@@ -128,6 +139,6 @@ class TestExternal(unittest.TestCase):
         # Verify no ugly, random part ID written by OSMD.
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(TestExternal)
