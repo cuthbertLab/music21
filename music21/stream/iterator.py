@@ -964,8 +964,8 @@ class StreamIterator(prebase.ProtoM21Object):
          <music21.note.Note F>]
 
         >>> list(s.recurse().getElementsByQuerySelector('Rest'))
-        [<music21.note.Rest rest>,
-         <music21.note.Rest rest>]
+        [<music21.note.Rest quarter>,
+         <music21.note.Rest whole>]
 
         Note that unlike with stream slices, the querySelector does not do anything special
         for id searches.  `.first()` will need to be called to find the element (if any)

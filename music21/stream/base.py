@@ -402,7 +402,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> subslice = s[2:5]
         >>> subslice
-        [<music21.note.Note E>, <music21.note.Rest rest>, <music21.note.Note F>]
+        [<music21.note.Note E>, <music21.note.Rest quarter>, <music21.note.Note F>]
         >>> len(subslice)
         3
         >>> s[1].offset
