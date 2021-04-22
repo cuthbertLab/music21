@@ -878,7 +878,7 @@ def makeRests(
 
     if returnObj.hasMeasures():
         # split rests at measure boundaries
-        returnObj.makeTies(classFilterList=(note.Rest,))
+        returnObj.makeTies(classFilterList=(note.Rest,), inPlace=True)
 
         # reposition measures
         accumulatedTime = 0.0
