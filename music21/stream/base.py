@@ -115,11 +115,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     The duration, however, can be "unlinked" and explicitly
     set independent of the Stream's contents.
 
-    The first element passed to the Stream is an optional list,
-    tuple, or other Stream of music21 objects which is used to
-    populate the Stream by inserting each object at
+    The first element passed to the Stream is an optional single
+    Music21Object or a list, tuple, or other Stream of Music21Objects
+    which is used to populate the Stream by inserting each object at
     its :attr:`~music21.base.Music21Object.offset`
-    property. Other arguments and keywords are ignored, but are
+    property. One special case is when every such object, such as a newly created
+    one, has no offset. Then, so long as the entire list is not composed of
+    non-Measure Stream subclasses like Parts or Voices, each element is appended,
+    creating a sequence of elements in time, rather than synchrony.
+
+    Other arguments and keywords are ignored, but are
     allowed so that subclassing the Stream is easier.
 
     >>> s1 = stream.Stream()
@@ -154,6 +159,41 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     {0.0} <music21.stream.Part embeddedPart>
         {0.0} <music21.note.Rest rest>
     {1.0} <music21.note.Note E->
+
+    New in v7 -- providing a single element now works:
+
+    >>> s = stream.Stream(meter.TimeSignature())
+    >>> s.first()
+    <music21.meter.TimeSignature 4/4>
+
+    New in v7 -- providing a list of objects or Measures (but not other Stream
+    subclasses such as Parts) now positions sequentially, i.e. appends:
+
+    >>> s2 = stream.Measure([note.Note(), note.Note(), bar.Barline()])
+    >>> s2.show('text')
+    {0.0} <music21.note.Note C>
+    {1.0} <music21.note.Note C>
+    {2.0} <music21.bar.Barline type=regular>
+
+    A list of measures will let each be appended:
+
+    >>> m1 = stream.Measure(n1, number=1)
+    >>> m2 = stream.Measure(note.Rest(), number=2)
+    >>> s3 = stream.Part([m1, m2])
+    >>> s3.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {1.0} <music21.note.Note E->
+    {1.5} <music21.stream.Measure 2 offset=1.5>
+        {0.0} <music21.note.Rest rest>
+
+    Here, every element is a Stream that's not a Measure, so we instead insert:
+
+    >>> s4 = stream.Score([stream.PartStaff(n1), stream.PartStaff(note.Rest())])
+    >>> s4.show('text')
+    {0.0} <music21.stream.PartStaff 0x...>
+        {1.0} <music21.note.Note E->
+    {0.0} <music21.stream.PartStaff 0x...>
+        {0.0} <music21.note.Rest rest>
     '''
     # this static attributes offer a performance boost over other
     # forms of checking class
@@ -227,14 +267,31 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # experimental
         self._mutable = True
 
-        if givenElements and common.isIterable(givenElements):
-            # TODO: perhaps convert a single element into a list?
-            for e in givenElements:
-                try:
-                    self.coreInsert(e.offset, e)
-                except (AttributeError, TypeError):
-                    raise StreamException(f'Unable to insert {e}')
-            self.coreElementsChanged()
+        if givenElements is None:
+            return
+
+        if not common.isIterable(givenElements):
+            givenElements = [givenElements]
+
+        # Append rather than insert if every offset is 0.0
+        # but not if every element is a stream subclass other than a Measure
+        # (i.e. Opus, Score, Part, or Voice)
+        append: bool = False
+        try:
+            append = all(e.offset == 0.0 for e in givenElements)
+        except AttributeError:
+            pass  # appropriate failure will be raised by coreGuardBeforeAddElement()
+        if append and all((e.isStream and not e.isMeasure) for e in givenElements):
+            append = False
+
+        for e in givenElements:
+            self.coreGuardBeforeAddElement(e)
+            if append:
+                self.coreAppend(e)
+            else:
+                self.coreInsert(e.offset, e)
+
+        self.coreElementsChanged()
 
     def _reprInternal(self):
         if self.id is not None:
@@ -2005,12 +2062,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         except (ValueError, TypeError):
             raise StreamException(f'Offset {offset!r} must be a number.')
 
-        if not isinstance(item, base.Music21Object):
-            raise StreamException('to put a non Music21Object in a stream, '
-                                  + 'create a music21.ElementWrapper for the item')
         element = item
 
-        # checks if element is self; possibly performs additional checks
+        # checks if element is self, among other checks
         self.coreGuardBeforeAddElement(element)
         # main insert procedure here
 
@@ -2382,20 +2436,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             item = itemOrList
 
-        try:
-            unused = item.isStream  # will raise attribute error
-            element = item
-        except AttributeError:  # need to wrap
-            # element = music21.ElementWrapper(item)
-            raise StreamException('to put a non Music21Object in a stream, '
-                                  + 'create a music21.ElementWrapper for the item')
+        element = item
+        # checks if element is self, among other checks
+        self.coreGuardBeforeAddElement(element)
+
         # cannot support elements with Durations in the highest time list
         if element.duration.quarterLength != 0:
             raise StreamException('cannot insert an object with a non-zero '
                                   + 'Duration into the highest time elements list')
 
-        # checks of element is self; possibly performs additional checks
-        self.coreGuardBeforeAddElement(element)
         self.coreStoreAtEnd(element)
         # Streams cannot reside in end elements, thus do not update is flat
         self.coreElementsChanged(updateIsFlat=False)
@@ -10883,7 +10932,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Changed in v. 5 -- inPlace is default False and a keyword only arg.
 
-        >>> s = stream.Stream([note.Note(), note.Note(), note.Note()])  # simultaneous
+        >>> s = stream.Stream(note.Note())
+        >>> s.insert(0, note.Note())
+        >>> s.insert(0, note.Note())
         >>> s.makeVoices(inPlace=True)
         >>> len(s.voices)
         3

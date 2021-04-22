@@ -1358,12 +1358,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
         urlB = urlBase + 'schubert/piano/d0576&file=d0576-06.krn&f=kern'
         urlC = urlBase + 'bach/cello&file=bwv1007-01.krn&f=xml'
-        for url in [urlB, urlC]:
-            try:
-                unused_post = parseURL(url)
-            except:
-                print(url)
-                raise
+        unused_post = parseURL(urlB)
+        unused_post = parseURL(urlC)
 
     def testFreezer(self):
         from music21 import corpus
@@ -1949,8 +1945,8 @@ class Test(unittest.TestCase):
     def testParseURL(self):
         from music21.humdrum.spineParser import HumdrumException
 
-        urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
-        url = urlBase + 'chopin/prelude&file=prelude28-20.krn&format=kern'
+        urlBase = 'https://raw.githubusercontent.com/craigsapp/chopin-preludes/'
+        url = urlBase + 'f8fb01f09d717e84929fb8b2950f96dd6bc05686/kern/prelude28-20.krn'
 
         e = environment.Environment()
         e['autoDownload'] = 'allow'

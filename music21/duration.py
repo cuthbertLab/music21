@@ -653,11 +653,11 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
     # Tuplets...
     qLen = opFrac(qLen)
     # try match to type, get next lowest for next part...
-    closestSmallerType, unused_match = quarterLengthToClosestType(qLen)
     try:
+        closestSmallerType, unused_match = quarterLengthToClosestType(qLen)
         nextLargerType(closestSmallerType)
     except DurationException:
-        # too big...
+        # too big or too small
         return QuarterLengthConversion((DurationTuple(type='inexpressible',
                                                       dots=0,
                                                       quarterLength=qLen),), None)
@@ -697,7 +697,13 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
 
     # 8 tied components was not enough.
     # last resort: put one giant tuplet over it.
-    tuplet, component = quarterLengthToNonPowerOf2Tuplet(qLen)
+    try:
+        tuplet, component = quarterLengthToNonPowerOf2Tuplet(qLen)
+    except DurationException:
+        # Failures include 1/72
+        return QuarterLengthConversion((DurationTuple(type='inexpressible',
+                                                      dots=0,
+                                                      quarterLength=qLen),), None)
     return QuarterLengthConversion((component,), tuplet)
 
 
@@ -2119,7 +2125,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         For an 'inexpressible' duration, the opposite of consolidate is
         to set the duration's quarterLength to itself.  It won't necessarily
-        return to the original components, but it will (usually? always?)
+        return to the original components, but it will usually
         create something that can be notated.
 
         >>> a.quarterLength = a.quarterLength
@@ -3648,6 +3654,16 @@ class Test(unittest.TestCase):
             'Dotted Quarter Septuplet (6/7 QL)',
             Duration(fractions.Fraction(6 / 7)).fullName
         )
+
+    def testTinyDuration(self):
+        # e.g. delta from chordify: 1/9 - 1/8 = 1/72
+        # exercises quarterLengthToNonPowerOf2Tuplet()
+        d = Duration(1 / 72)
+        self.assertEqual(d.type, 'inexpressible')
+
+        # this failure happens earlier in quarterConversion()
+        d = Duration(1 / 2049)
+        self.assertEqual(d.type, 'inexpressible')
 
 
 # -------------------------------------------------------------------------------
