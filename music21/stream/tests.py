@@ -8096,18 +8096,18 @@ class Test(unittest.TestCase):
         # no suffix
         out6 = s.write(fp=tmpNoSuffix)
 
-        self.assertTrue(str(out1).endswith('.musicxml'))
-        self.assertTrue(str(out2).endswith('.musicxml'))
-        self.assertTrue(str(out3).endswith('.xml'))
-        self.assertTrue(out4.endswith('.musicxml'))
-        self.assertTrue(out5.endswith('.xml'))
-        # in v7, we no longer coerce fp to end in .xml
-        self.assertNotIn('.xml', str(out6))
+        self.assertEqual(out1.suffix, '.musicxml')
+        self.assertEqual(out2.suffix, '.musicxml')
+        self.assertEqual(out3.suffix, '.xml')
+        self.assertEqual(out4.suffix, '.musicxml')
+        self.assertEqual(out5.suffix, '.xml')
+        # Provide suffix if user didn't provide one
+        self.assertEqual(out6.suffix, '.musicxml')
 
-        self.assertEqual(str(out2), out4)
-        self.assertEqual(str(out3), out5)
+        self.assertEqual(str(out2), str(out4))
+        self.assertEqual(str(out3), str(out5))
 
-        for fp in (out1, tmpMusicxml, tmpXml, tmpNoSuffix):
+        for fp in (out1, tmpMusicxml, tmpXml, tmpNoSuffix, out6):
             os.remove(fp)
 
     def testOpusWrite(self):

@@ -953,10 +953,12 @@ class ConverterMusicXML(SubConverter):
             return fpOut
         # common.cropImageFromPath(fp)
 
-    def writeDataStream(self, fp, dataBytes: bytes):  # pragma: no cover
+    def writeDataStream(self, fp, dataBytes: bytes) -> pathlib.Path:  # pragma: no cover
         '''
         Writes `dataBytes` to `fp`.
         Adds `.musicxml` suffix to `fp` if it does not already contain some suffix.
+
+        Changed in v7 -- returns a pathlib.Path
 
         OMIT_FROM_DOCS
 
@@ -1017,7 +1019,7 @@ class ConverterMusicXML(SubConverter):
             noExtFpStr = os.path.splitext(fpStr)[0]
             writeDataStreamFp = noExtFpStr + '.musicxml'
 
-        xmlFp = self.writeDataStream(writeDataStreamFp, dataBytes)
+        xmlFp: pathlib.Path = self.writeDataStream(writeDataStreamFp, dataBytes)
 
         if subformats is not None and 'png' in subformats:
             defaults.title = savedDefaultTitle
