@@ -938,6 +938,48 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         return self.addFilter(filters.ClassFilter(classFilterList), returnClone=returnClone)
 
+    def getElementsByQuerySelector(self, querySelector: str, *, returnClone=True):
+        '''
+        First implementation of a query selector, similar to CSS QuerySelectors used in
+        HTML DOM:
+
+        * A leading `#` indicates the id of an element, so '#hello' will find elements
+          with `el.id=='hello'` (should only be one)
+        * A leading `.` indicates the group of an element, so '.high' will find elements
+          with `'high' in el.groups`
+        * Any other string is considered to be the type/class of the element.  So `Note`
+          will find all Note elements.  Can be fully qualified like `note.Note`
+
+        Eventually, more complex query selectors will be implemented.  This is just a start.
+
+        Setting up an example:
+
+        >>> s = converter.parse('tinyNotation: 4/4 GG4 AA4 BB4 r4 C4 D4 E4 F4 r1')
+        >>> s[note.Note].last().id = 'last'
+        >>> for n in s[note.Note]:
+        ...     if n.octave == 4:
+        ...         n.groups.append('high')
+
+        >>> s.recurse().getElementsByQuerySelector('#last').first()
+        <music21.note.Note F>
+        >>> list(s.recurse().getElementsByQuerySelector('.high'))
+        [<music21.note.Note C>,
+         <music21.note.Note D>,
+         <music21.note.Note E>,
+         <music21.note.Note F>]
+        >>> list(s.recurse().getElementsByQuerySelector('Rest'))
+        [<music21.note.Rest quarter>,
+         <music21.note.Rest whole>]
+
+        New in v.7
+        '''
+        if querySelector.startswith('#'):
+            return self.addFilter(filters.IdFilter(querySelector[1:]), returnClone=returnClone)
+        if querySelector.startswith('.'):
+            return self.addFilter(filters.GroupFilter(querySelector[1:]), returnClone=returnClone)
+        return self.addFilter(filters.ClassFilter(querySelector), returnClone=returnClone)
+
+
     def getElementsNotOfClass(self, classFilterList, *, returnClone=True):
         '''
         Adds a filter, removing all Elements that do not

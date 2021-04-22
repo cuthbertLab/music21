@@ -316,64 +316,127 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         Get a Music21Object from the Stream using a variety of keys or indices.
 
-        If an int is given, the Music21Object at the index is returned.
-        If a slice of indices is given, a list of elements is returned.
+        If an int is given, the Music21Object at the index is returned, as if it were a list
+        or tuple:
 
-        If a class name (or a list of them) is given, a
-        :class:`~music21.stream.iterator.RecursiveIterator`
-        filtering on the elements that match the requested class(es) is returned.
+        >>> c = note.Note('C')
+        >>> d = note.Note('D')
+        >>> e = note.Note('E')
+        >>> r1 = note.Rest()
+        >>> f = note.Note('F')
+        >>> g = note.Note('G')
+        >>> r2 = note.Rest()
+        >>> a = note.Note('A')
+        >>> s = stream.Stream([c, d, e, r1, f, g, r2, a])
 
-        If a string is given, we do some new stuff. TODO
-
-        >>> a = stream.Part(id='hello')
-        >>> names = ['C', 'D', 'E', 'F', 'G', 'A']
-        >>> for i in range(6):
-        ...     name = names[i]
-        ...     a.insert(i + 1, note.Note(name))
-        >>> a[0]
+        >>> s[0]
         <music21.note.Note C>
-        >>> a[-1]
+        >>> s[-1]
         <music21.note.Note A>
 
         Out of range notes raise an IndexError:
 
-        >>> a[99]
+        >>> s[99]
         Traceback (most recent call last):
-        IndexError: attempting to access index 99 while elements is of size 6
-        >>> subslice = a[2:5]
+        IndexError: attempting to access index 99 while elements is of size 8
+
+        If a slice of indices is given, a list of elements is returned, as if the Stream
+        were a list or Tuple.
+
+        >>> subslice = s[2:5]
         >>> subslice
-        [<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>]
+        [<music21.note.Note E>, <music21.note.Rest rest>, <music21.note.Note F>]
         >>> len(subslice)
         3
-        >>> a[1].offset
-        2.0
+        >>> s[1].offset
+        1.0
         >>> subslice[1].offset
-        4.0
+        3.0
 
-        >>> b = note.Note()
-        >>> b.id = 'green'
-        >>> b.groups.append('violin')
-        >>> a.insert(b)
 
-        Get an item by class:
+        If a class (or a list of classes) is given then an iterator of elements
+        that match the requested class(es) is returned, similar
+        to `Stream().recurse().getElementsByClass()`.
 
-        >>> allNotes = a[note.Note]
-        >>> allNotes
-        <music21.stream.iterator.RecursiveIterator for Part:hello @:1>
-        >>> allNotes.first() is b
+        >>> len(s)
+        8
+        >>> len(s[note.Rest])
+        2
+        >>> len(s[note.Note])
+        6
+        >>> len(s[[note.Note, note.Rest]])
+        8
+
+        >>> for n in s[note.Note]:
+        ...     print(n.name, end=' ')
+        C D E F G A
+
+        Note that this iterator is recursive by default.
+
+        >>> c_sharp = note.Note('C#')
+        >>> v = stream.Voice([c_sharp])
+        >>> s.insert(0.5, c_sharp)
+
+        >>> len(s[note.Note])
+        7
+
+
+        The actual object returned by `s[module.Class]` is a
+        :class:`~music21.stream.iterator.RecursiveIterator` and has all the functions
+        available on it:
+
+        >>> s[note.Note]
+        <...>
+
+        If no elements of the class are found, no error is raised in version 7:
+
+        >>> list(s[layout.StaffLayout])
+        []
+
+
+        If the key is a string, it is treated as a `querySelector` as defined in
+        :meth:`~music21.stream.iterator.getElementsByQuerySelector`, namely that bare strings
+        are treated as class names, strings beginning with `#` are id-queries, and strings
+        beginning with `.` are group queries.
+
+        We can set some ids and groups for demonstrating.
+
+        >>> a.id = 'last_a'
+        >>> c.groups.append('ghost')
+        >>> e.groups.append('ghost')
+
+        'Note' is treated as a class name and returns a `RecursiveIterator`:
+
+        >>> for n in s['Note']:
+        ...     print(n.name, end=' ')
+        C C# D E F G A
+
+        '.ghost', because it begins with is treated as a class name and returns a `RecursiveIterator`:
+
+
+        >>> for n in s['.ghost']:
+        ...     print(n.name, end=' ')
+        C E
+
+        A query selector with a `#`
+
+        >>> s['#last_a']
+        <music21.note.Note A>
+
+        >>> s['#nothing'] is None
         True
 
-        TODO: demo string query search
 
-        If a string or class is not found, a KeyError will be raised:
+        Any other query raises a TypeError:
 
-        >>> a[layout.StaffLayout]
-        Traceback (most recent call last):
-        KeyError: "provided key (<class 'music21.layout.StaffLayout'>) does not match any class"
+        >>> s[0.5]
+
+
 
         Changed in v7:
+
           - out of range indexes now raise an IndexError, not StreamException
-          - strings ('Note') now supported in lieu of class names, but discouraged (slower)
+          - strings ('Note', '#id', '.group') are now treated like a query selector.
           - slices with negative indices now supported
           - Unsupported types now raise TypeError
           - Class and Group searches now return a recursive `StreamIterator` rather than a `Stream`
@@ -413,16 +476,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return searchElements[k]
 
         elif isinstance(k, type):
-            classIter = self.recurse().getElementsByClass(k)
-            if classIter:
-                return classIter
-            else:
-                raise KeyError(f'provided key ({k}) does not match any class')
+            return self.recurse().getElementsByClass(k)
 
         elif isinstance(k, str):
-            raise NotImplementedError('magic method still lacks some magic')
+            querySelectorIterator = self.recurse().getElementsByQuerySelector(k)
+            if '#' in k:
+                # an id anywhere in the query selector should return only one element
+                return querySelectorIterator.first()
+            else:
+                return querySelectorIterator
 
-        raise TypeError(f'Get items by int, slice, class, or string query; got {type(k)}')
+        raise TypeError(
+            f'Streams can get items by int, slice, class, or string query; got {type(k)}'
+        )
 
     def first(self):
         '''
