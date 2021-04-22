@@ -843,8 +843,8 @@ class ConverterMusicXML(SubConverter):
                                          'pdf': 'pdf',
                                          }
 
-    # --------------------------------------------------------------------------
-    def findNumberedPNGPath(self, inputFp: Union[str, pathlib.Path]) -> str:
+    @staticmethod
+    def findNumberedPNGPath(inputFp: Union[str, pathlib.Path]) -> str:
         '''
         Find the first numbered file path corresponding to the provided unnumbered file path
         ending in ".png". Raises an exception if no file can be found.
@@ -948,7 +948,7 @@ class ConverterMusicXML(SubConverter):
         sys.stderr = storedStrErr
 
         if subformatExtension == 'png':
-            return self.findNumberedPNGPath(fpOut)
+            return ConverterMusicXML.findNumberedPNGPath(fpOut)
         else:
             return fpOut
         # common.cropImageFromPath(fp)
@@ -1438,7 +1438,7 @@ class Test(unittest.TestCase):
             tmp = env.getTempFile(suffix='.png', returnPathlib=False)
             tmpNumbered = tmp.replace('.png', png_ext)
             os.rename(tmp, tmpNumbered)
-            pngFp1 = ConverterMusicXML().findNumberedPNGPath(tmp)
+            pngFp1 = ConverterMusicXML.findNumberedPNGPath(tmp)
             self.assertEqual(pngFp1, tmpNumbered)
             os.remove(tmpNumbered)
 
@@ -1447,7 +1447,7 @@ class Test(unittest.TestCase):
         tmpNumbered = tmp.replace('.png', '-0000001.png')
         os.rename(tmp, tmpNumbered)
         with self.assertRaises(SubConverterFileIOException):
-            ConverterMusicXML().findNumberedPNGPath(tmpNumbered)
+            ConverterMusicXML.findNumberedPNGPath(tmpNumbered)
         os.remove(tmpNumbered)
 
     def testWriteMXL(self):
