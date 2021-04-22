@@ -1950,12 +1950,13 @@ class Test(unittest.TestCase):
                                   + '<music21.note.Rest quarter>, <music21.note.Rest quarter>, '
                                   + '<music21.note.Note C>, <music21.note.Rest half>]')
         match = str([(n, n.duration) for n in s.flat.notesAndRests])
-        self.assertEqual(match, '[(<music21.note.Rest half>, <music21.duration.Duration 2.0>), '
-                                  + '(<music21.note.Note C>, <music21.duration.Duration 1.0>), '
-                                  + '(<music21.note.Rest quarter>, <music21.duration.Duration 1.0>), '
-                                  + '(<music21.note.Rest quarter>, <music21.duration.Duration 1.0>), '
-                                  + '(<music21.note.Note C>, <music21.duration.Duration 1.0>), '
-                                  + '(<music21.note.Rest half>, <music21.duration.Duration 2.0>)]')
+        self.assertEqual(match,
+                         '[(<music21.note.Rest half>, <music21.duration.Duration 2.0>), '
+                          + '(<music21.note.Note C>, <music21.duration.Duration 1.0>), '
+                          + '(<music21.note.Rest quarter>, <music21.duration.Duration 1.0>), '
+                          + '(<music21.note.Rest quarter>, <music21.duration.Duration 1.0>), '
+                          + '(<music21.note.Note C>, <music21.duration.Duration 1.0>), '
+                          + '(<music21.note.Rest half>, <music21.duration.Duration 2.0>)]')
 
         GEX = m21ToXml.GeneralObjectExporter()
         unused_mx = GEX.parse(s).decode('utf-8')
