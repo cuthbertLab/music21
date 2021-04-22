@@ -954,10 +954,17 @@ class ConverterMusicXML(SubConverter):
         # common.cropImageFromPath(fp)
 
     def writeDataStream(self, fp, dataBytes: bytes):  # pragma: no cover
+        '''
+        Writes `dataBytes` to `fp`.
+        Adds `.musicxml` suffix to `fp` if it does not already contain some suffix.
+        '''
         if fp is None:
             fp = self.getTemporaryFile()
         else:
-            fp = common.cleanpath(fp)
+            fp = common.cleanpath(fp, returnPathlib=True)
+
+        if not fp.suffix:
+            fp = fp.with_suffix('.musicxml')
 
         writeFlags = 'wb'
 
