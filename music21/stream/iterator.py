@@ -957,19 +957,24 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s = converter.parse('tinyNotation: 4/4 GG4 AA4 BB4 r4 C4 D4 E4 F4 r1')
         >>> s[note.Note].last().id = 'last'
         >>> for n in s[note.Note]:
-        ...     if n.octave == 4:
-        ...         n.groups.append('high')
+        ...     if n.octave == 3:
+        ...         n.groups.append('tenor')
 
-        >>> s.recurse().getElementsByQuerySelector('#last').first()
-        <music21.note.Note F>
-        >>> list(s.recurse().getElementsByQuerySelector('.high'))
+        >>> list(s.recurse().getElementsByQuerySelector('.tenor'))
         [<music21.note.Note C>,
          <music21.note.Note D>,
          <music21.note.Note E>,
          <music21.note.Note F>]
+
         >>> list(s.recurse().getElementsByQuerySelector('Rest'))
-        [<music21.note.Rest quarter>,
-         <music21.note.Rest whole>]
+        [<music21.note.Rest rest>,
+         <music21.note.Rest rest>]
+
+        Note that unlike with stream slices, the querySelector does not do anything special
+        for id searches.  `.first()` will need to be called to find the element (if any)
+
+        >>> s.recurse().getElementsByQuerySelector('#last').first()
+        <music21.note.Note F>
 
         New in v.7
         '''

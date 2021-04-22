@@ -411,7 +411,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         3.0
 
 
-        If a class (or a list of classes) is given then an iterator of elements
+        If a class is given then an iterator of elements
         that match the requested class(es) is returned, similar
         to `Stream().recurse().getElementsByClass()`.
 
@@ -421,8 +421,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         2
         >>> len(s[note.Note])
         6
-        >>> len(s[[note.Note, note.Rest]])
-        8
 
         >>> for n in s[note.Note]:
         ...     print(n.name, end=' ')
@@ -487,7 +485,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Any other query raises a TypeError:
 
         >>> s[0.5]
-
+        Traceback (most recent call last):
+        TypeError: Streams can get items by int, slice, class, or string query; got <class 'float'>
 
 
         Changed in v7:
