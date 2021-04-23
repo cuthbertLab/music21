@@ -68,6 +68,10 @@ def typeToMusicXMLType(value):
     Traceback (most recent call last):
     music21.musicxml.xmlObjects.MusicXMLExportException:
     Cannot convert inexpressible durations to MusicXML.
+    >>> musicxml.m21ToXml.typeToMusicXMLType('zero')
+    Traceback (most recent call last):
+    music21.musicxml.xmlObjects.MusicXMLExportException:
+    Cannot convert durations without types to MusicXML.
     '''
     # MusicXML uses long instead of longa
     if value == 'longa':
@@ -76,6 +80,8 @@ def typeToMusicXMLType(value):
         raise MusicXMLExportException('Cannot convert "2048th" duration to MusicXML (too short).')
     elif value == 'inexpressible':
         raise MusicXMLExportException('Cannot convert inexpressible durations to MusicXML.')
+    elif value == 'zero':
+        raise MusicXMLExportException('Cannot convert durations without types to MusicXML.')
     else:
         return value
 
@@ -3383,27 +3389,13 @@ class MeasureExporter(XMLExporterBase):
             mxVoice = SubElement(mxNote, 'voice')
             mxVoice.text = str(self.currentVoiceId)
 
-        if d.type != 'zero':
-            mxType = Element('type')
-            mxType.text = typeToMusicXMLType(d.type)
-            self.setStyleAttributes(mxType, n, 'size', 'noteSize')
-            mxNote.append(mxType)
-            for unused_dotCounter in range(d.dots):
-                SubElement(mxNote, 'dot')
-                # TODO: dot placement...
-
-        elif d.components:
-            mxType = Element('type')
-            mxType.text = typeToMusicXMLType(d.components[0].type)
-            self.setStyleAttributes(mxType, n, 'size', 'noteSize')
-            if (n.hasStyleInformation
-                    and hasattr(n.style, 'noteSize')
-                    and n.style.noteSize is not None):
-                mxType.set('size', n.style.noteSize)
-
-            mxNote.append(mxType)
-            for unused_dotCounter in range(d.components[0].dots):
-                SubElement(mxNote, 'dot')
+        mxType = Element('type')
+        mxType.text = typeToMusicXMLType(d.type)
+        self.setStyleAttributes(mxType, n, 'size', 'noteSize')
+        mxNote.append(mxType)
+        for unused_dotCounter in range(d.dots):
+            SubElement(mxNote, 'dot')
+            # TODO: dot placement...
 
         if (hasattr(n, 'pitch')
                 and n.pitch.accidental is not None
