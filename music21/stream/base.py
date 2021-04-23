@@ -9448,7 +9448,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         :class:`~music21.note.Note`,
         :class:`~music21.chord.Chord`,
         :class:`~music21.note.Rest`) but also their subclasses, such as
-        `Harmony` objects (`ChordSymbols`, `FiguredBass`), `SpacerRests` etc.
+        `Harmony` objects (`ChordSymbols`, `FiguredBass`), etc.
 
 
         >>> s1 = stream.Stream()
@@ -12290,7 +12290,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     continue  # do nothing
                 else:
                     shiftOffset = self.elementOffset(cV) - startOffset
-                    r = note.SpacerRest()
+                    r = note.Rest()
                     r.duration.quarterLength = shiftOffset
                     r.style.hideObjectOnPrint = True
                     for el in cV._stream:
