@@ -1422,7 +1422,7 @@ class Test(unittest.TestCase):
         actual = base.spaceFromElement(elem)
         self.assertIsInstance(actual, note.Rest)
         self.assertTrue(actual.style.hideObjectOnPrint)
-        self.assertEqual('the id', mockNewSpace.id)
+        self.assertEqual('the id', actual.id)
 
     def testIntegration2TestRestFromElement(self):
         '''
