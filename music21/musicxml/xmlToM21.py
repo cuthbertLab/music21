@@ -3269,7 +3269,7 @@ class MeasureParser(XMLParserBase):
         >>> gn1 = note.Note(duration=c2)
         >>> gn2 = MP.xmlGraceToGrace(mxGrace, gn1)
         >>> gn2.duration
-        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.GraceDuration unlinked type:eighth quarterLength:0.0>
         '''
         numDots = 0
         tuplets = ()

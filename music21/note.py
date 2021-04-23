@@ -839,9 +839,9 @@ class GeneralNote(base.Music21Object):
         >>> ng.duration.isGrace
         True
         >>> ng.duration
-        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.GraceDuration unlinked type:half quarterLength:0.0>
         >>> ng.duration.type
-        'zero'
+        'half'
         >>> ng.duration.components
         (DurationTuple(type='half', dots=0, quarterLength=0.0),)
 
@@ -850,7 +850,7 @@ class GeneralNote(base.Music21Object):
 
         >>> ng2 = n.getGrace(appoggiatura=True)
         >>> ng2.duration
-        <music21.duration.AppoggiaturaDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.AppoggiaturaDuration unlinked type:half quarterLength:0.0>
         >>> ng2.duration.slash
         False
 
@@ -860,7 +860,7 @@ class GeneralNote(base.Music21Object):
         >>> r = note.Rest(quarterLength=0.5)
         >>> r.getGrace(inPlace=True)
         >>> r.duration
-        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.GraceDuration unlinked type:eighth quarterLength:0.0>
         '''
         if inPlace is False:
             e = copy.deepcopy(self)

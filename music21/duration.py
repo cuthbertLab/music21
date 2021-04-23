@@ -2172,7 +2172,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         >>> gd = d.getGraceDuration()
         >>> gd
-        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.GraceDuration unlinked type:complex quarterLength:0.0>
         >>> gd.quarterLength
         0.0
         >>> gd.components
@@ -2198,6 +2198,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             newComponents.append(DurationTuple(c.type, c.dots, 0.0))
         gd.components = newComponents  # set new components
         gd.linked = False
+        gd.type = self.type
         gd.quarterLength = 0.0
         return gd
 
