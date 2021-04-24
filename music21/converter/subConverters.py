@@ -266,36 +266,28 @@ class SubConverter:
         else:
             writeFlags = 'wb'
 
-        if self.codecWrite is False:
-            if hasattr(fp, 'write'):
-                # is a file-like object
-                f = fp
-            else:
-                fp = common.cleanpath(fp)
-                f = open(fp, writeFlags)
-
+        if self.codecWrite is False and isinstance(dataStr, bytes):
             try:
-                if isinstance(dataStr, bytes):
-                    f.write(dataStr.decode('utf-8'))
+                dataStr = dataStr.decode('utf-8')
+            except UnicodeDecodeError:
+                # Reattempt below with self.stringEncoding
+                self.codecWrite = True
+                # Close file if already open, because we need to reopen with encoding
+                if hasattr(fp, 'write'):
+                    fp.close()
 
-                else:
-                    f.write(dataStr)
-            except UnicodeEncodeError:
-                f.close()
-                f = io.open(fp, mode=writeFlags, encoding=self.stringEncoding)
+        if not hasattr(fp, 'write'):
+            fp = common.cleanpath(fp)
+            with open(fp,
+                      mode=writeFlags,
+                      encoding=self.stringEncoding if self.codecWrite else None
+                      ) as f:
                 f.write(dataStr)
-                f.close()
-
-            except TypeError as te:
-                raise SubConverterException(f'Could not convert {dataStr!r} : {te!r}')
         else:
-            if hasattr(fp, 'write'):
-                # is a file-like object
-                f = fp
-            else:
-                f = io.open(fp, mode=writeFlags, encoding=self.stringEncoding)
+            # file-like object
             f.write(dataStr)
             f.close()
+
         return fp
 
 
