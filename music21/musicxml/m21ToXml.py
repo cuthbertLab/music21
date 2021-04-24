@@ -3390,7 +3390,12 @@ class MeasureExporter(XMLExporterBase):
             mxVoice.text = str(self.currentVoiceId)
 
         mxType = Element('type')
-        mxType.text = typeToMusicXMLType(d.type)
+        if d.isGrace is True and d.type == 'zero':
+            # Default type-less grace durations to eighths
+            mxType.text = 'eighth'
+        else:
+            mxType.text = typeToMusicXMLType(d.type)
+
         self.setStyleAttributes(mxType, n, 'size', 'noteSize')
         mxNote.append(mxType)
         for unused_dotCounter in range(d.dots):

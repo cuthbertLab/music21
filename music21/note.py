@@ -494,7 +494,7 @@ class GeneralNote(base.Music21Object):
     double-dotted sixteenth note.
 
     In almost every circumstance, you should
-    create note.Note() or note.Rest() or note.Chord()
+    create note.Note() or note.Rest() or chord.Chord()
     objects directly, and not use this underlying
     structure.
 
