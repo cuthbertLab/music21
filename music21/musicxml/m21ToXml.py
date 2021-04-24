@@ -309,6 +309,7 @@ class GeneralObjectExporter:
         # ## individual parts
         ('GeneralNote', 'fromGeneralNote'),
         ('Pitch', 'fromPitch'),
+        ('Unpitched', 'fromPitch'),
         ('Duration', 'fromDuration'),  # not an m21 object
         ('Dynamic', 'fromDynamic'),
         ('DiatonicScale', 'fromDiatonicScale'),
@@ -669,10 +670,11 @@ class GeneralObjectExporter:
         # call the musicxml property on Stream
         return self.fromMeasure(out)
 
-    def fromPitch(self, p):
+    def fromPitch(self, p: Union[pitch.Pitch, pitch.Unpitched]):
         # noinspection PyShadowingNames
         '''
-        Translate a music21 :class:`~music21.pitch.Pitch` into an object
+        Translate a music21 :class:`~music21.pitch.Pitch` or
+        :class:`~music21.pitch.Unpitched` into an object
         ready to be parsed.
 
         >>> p = pitch.Pitch('c#3')
@@ -684,6 +686,16 @@ class GeneralObjectExporter:
                 {0.0} <music21.clef.BassClef>
                 {0.0} <music21.meter.TimeSignature 1/4>
                 {0.0} <music21.note.Note C#>
+
+        >>> up = pitch.Unpitched('c3')
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
+        >>> sc = GEX.fromPitch(up)
+        >>> sc.show('t')
+        {0.0} <music21.stream.Part 0x1070667c0>
+            {0.0} <music21.stream.Measure 1 offset=0.0>
+                {0.0} <music21.clef.Treble8vaClef>
+                {0.0} <music21.meter.TimeSignature 1/4>
+                {0.0} <music21.note.Note unpitched>
         '''
         n = note.Note()
         n.pitch = copy.deepcopy(p)
@@ -2676,7 +2688,6 @@ class MeasureExporter(XMLExporterBase):
             ('ChordSymbol', 'chordSymbolToXml'),
             ('Chord', 'chordToXml'),
             ('Rest', 'restToXml'),
-            # Skipping unpitched for now
             ('Dynamic', 'dynamicToXml'),
             ('Segno', 'segnoToXml'),
             ('Coda', 'codaToXml'),
@@ -3366,11 +3377,14 @@ class MeasureExporter(XMLExporterBase):
 
         if hasattr(n, 'pitch'):
             n: note.Note
-            mxPitch = self.pitchToXml(n.pitch)
-            mxNote.append(mxPitch)
+            if 'Pitch' in n.pitch.classes:
+                mxPitch = self.pitchToXml(n.pitch)
+                mxNote.append(mxPitch)
+            else:
+                mxUnpitched = self.unpitchedToXml(n.pitch)
+                mxNote.append(mxUnpitched)
         else:
-            # assume rest until unpitched works
-            # TODO: unpitched
+            # assume rest
             SubElement(mxNote, 'rest')
 
         if d.isGrace is not True:
@@ -3749,7 +3763,8 @@ class MeasureExporter(XMLExporterBase):
     def pitchToXml(self, p: pitch.Pitch):
         # noinspection PyShadowingNames
         '''
-        convert a pitch to xml... does not create the <accidental> tag...
+        Convert a :class:`~music21.pitch.Pitch` to xml.
+        Does not create the <accidental> tag.
 
         >>> p = pitch.Pitch('D#5')
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
@@ -3768,6 +3783,24 @@ class MeasureExporter(XMLExporterBase):
             mxAlter.text = str(common.numToIntOrFloat(p.accidental.alter))
         _setTagTextFromAttribute(p, mxPitch, 'octave', 'implicitOctave')
         return mxPitch
+
+    def unpitchedToXml(self, up: pitch.Unpitched):
+        '''
+        Convert a :class:`~music21.pitch.Unpitched` to xml.
+
+        >>> up = pitch.Unpitched('D5')
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxUnpitched = MEX.unpitchedToXml(up)
+        >>> MEX.dump(mxUnpitched)
+        <unpitched>
+          <display-step>D</display-step>
+          <display-octave>5</display-octave>
+        </unpitched>
+        '''
+        mxUnpitched = Element('unpitched')
+        _setTagTextFromAttribute(up, mxUnpitched, 'display-step')
+        _setTagTextFromAttribute(up, mxUnpitched, 'display-octave')
+        return mxUnpitched
 
     def fretNoteToXml(self, fretNote) -> Element:
         '''
@@ -3949,8 +3982,7 @@ class MeasureExporter(XMLExporterBase):
         # noinspection PyShadowingNames
         '''
         Translate a music21 :class:`~music21.note.NotRest` object
-        such as a Note, or Unpitched object, or Chord
-        into a <notehead> tag
+        such as a Note, or Chord into a `<notehead>` tag.
 
         >>> n = note.Note('C#4')
         >>> n.notehead = 'diamond'

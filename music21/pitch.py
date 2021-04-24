@@ -5052,24 +5052,54 @@ class Unpitched(prebase.ProtoM21Object):
     {0.0} <music21.note.Note G>
     {0.5} <music21.note.Note unpitched>
     {1.0} <music21.note.Note unpitched>
+
+    Can be instantiated with note names, but these will create `.displayStep`
+    and `.displayOctave`, not `.name`:
+
+    >>> up = pitch.Unpitched('G4')
+    >>> up.displayStep
+    'G'
+    >>> up.displayOctave
+    4
+    >>> up.name
+    'unpitched'
+    >>> up.midi
+    67
+    >>> up.step
+    'unpitched'
+    >>> up.octave
+    'unpitched'
     '''
 
     def __init__(self,
-                 name: Optional[Union[str, int]] = None,
+                 displayName: Optional[Union[str, int]] = None,
                  **keywords):
         # No need for super().__init__() on protoM21Object
         self._groups = None
 
         self.name = 'unpitched'
+
         self.displayStep = defaults.pitchStep
         self.displayOctave = defaults.pitchOctave
 
         self.accidental = None
 
+        if displayName:
+            if isinstance(displayName, str) and displayName:
+                # Only single digits supported for now
+                if displayName[-1] in '1234567890':
+                    self.displayOctave = int(displayName[-1])
+                if displayName[0] in 'ABCDEFG':
+                    self.displayStep = displayName[0]
+            if isinstance(displayName, Unpitched):
+                displayPitch = displayName.displayPitch()
+                self.displayStep = displayPitch.step
+                self.displayOctave = displayPitch.octave
+            if isinstance(displayName, Pitch):
+                self.displayStep = displayName.step
+                self.displayOctave = displayName.octave
+
         if keywords:
-            if 'name' in keywords:
-                # noinspection PyArgumentList
-                self.name = keywords['name']  # set based on string
             if 'displayStep' in keywords:
                 self.displayStep = keywords['displayStep']
             if 'displayOctave' in keywords:
@@ -5093,14 +5123,6 @@ class Unpitched(prebase.ProtoM21Object):
         if self.displayOctave != other.displayOctave:
             return False
         return True
-
-    def _getStoredInstrument(self):
-        return self._storedInstrument
-
-    def _setStoredInstrument(self, newValue):
-        self._storedInstrument = newValue
-
-    storedInstrument = property(_getStoredInstrument, _setStoredInstrument)
 
     def displayPitch(self) -> Pitch:
         '''

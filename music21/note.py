@@ -19,7 +19,7 @@ and used to configure, :class:`~music21.note.Note` objects.
 import copy
 import unittest
 
-from typing import Optional, List, Union, Tuple, Iterable, TypeVar
+from typing import Optional, List, Union, Tuple, Iterable
 
 from music21 import base
 from music21 import beam
@@ -878,8 +878,8 @@ class NotRest(GeneralNote):
     '''
     Parent class for Note-like objects that are not rests; that is to say
     they have a stem, can be tied, and volume is important.
-    Basically, that's a `Note` or
-    `Unpitched` object for now.
+    Basically, that's a :class:`Note` or :class:`~music21.chord.Chord`
+    (or their subclasses such as :class`~music21.harmony.ChordSymbol`).
     '''
     # unspecified means that there may be a stem, but its orientation
     # has not been declared.
@@ -903,6 +903,7 @@ class NotRest(GeneralNote):
             self.beams = keywords['beams']
         else:
             self.beams = beam.Beams()
+        self._storedInstrument: Optional['music21.instrument.Instrument'] = None
 
     # ==============================================================================================
     # Special functions
@@ -1190,6 +1191,22 @@ class NotRest(GeneralNote):
         [120, 80]
         ''')
 
+    def _getStoredInstrument(self):
+        return self._storedInstrument
+
+    def _setStoredInstrument(self, newValue):
+        self._storedInstrument = newValue
+
+    storedInstrument = property(_getStoredInstrument, _setStoredInstrument)
+
+    def getInstrument(self):
+        '''
+        TOOD: doc and test
+        '''
+        if self.storedInstrument is not None:
+            return self.storedInstrument
+        return self.getContextByClass('Instrument', followDerivation=False)
+
 
 # ------------------------------------------------------------------------------
 class Note(NotRest):
@@ -1238,6 +1255,8 @@ class Note(NotRest):
     >>> note.Note(64).nameWithOctave
     'E4'
 
+    >>> note.Note(pitch.Unpitched())
+    <music21.note.Note unpitched>
 
     Two notes are considered equal if their most important attributes
     (such as pitch, duration,
@@ -1249,6 +1268,14 @@ class Note(NotRest):
 
     >>> note.Note('C4') == note.Note('C4')
     True
+
+    >>> up1 = note.Note(pitch.Unpitched())
+    >>> up2 = note.Note(pitch.Unpitched())
+    >>> up1 == up2
+    True
+    >>> up2.pitch.displayOctave = 2
+    >>> up1 == up2
+    False
     '''
     isNote = True
 
@@ -1603,7 +1630,6 @@ class Note(NotRest):
         if self._chordAttached is not None:
             self._chordAttached.clearCache()
 
-
 # ------------------------------------------------------------------------------
 # convenience classes
 
@@ -1718,6 +1744,14 @@ class Rest(GeneralNote):
         '''
         return self.duration.fullName + ' Rest'
 
+# ------------------------------------------------------------------------------
+
+def unpitched() -> Note:
+    '''
+    Syntactic sugar for creating a note with a default :class:`~music21.pitch.Unpitched`
+    instance.
+    '''
+    return Note(pitch.Unpitched())
 
 # ------------------------------------------------------------------------------
 # test methods and classes

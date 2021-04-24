@@ -897,6 +897,33 @@ def makeRests(
     if inPlace is not True:
         return returnObj
 
+def makeUnpitched(s, *, inPlace=False):
+    '''
+    Return a new Stream, or modify in place, with :class:`~music21.pitch.Unpitched`
+    replacing :class:`~music21.pitch.Pitch` objects on any notes having
+    an :class:`~music21.instrument.UnpitchedPercussion` instrument as either
+    a `storedInstrument` or closest in the stream hierarchy. Instrument
+    lookup is done by :meth:`~music21.note.Note.getInstrument`.
+
+    TODO: implement getInstrument
+    TODO: doctest
+    '''
+    if not inPlace:
+        returnObj = s.coreCopyAsDerivation('makeUnpitched')
+    else:
+        returnObj = s
+
+    for n in s.recurse().notes:
+        found = n.getInstrument()
+        if found and 'UnpitchedPercussion' in found.classes:
+            if hasattr(n, 'pitch'):
+                n.pitch = pitch.Unpitched(n.pitch)
+            elif 'Chord' in n.classes:
+                for innerN in n.notes:
+                    innerN.pitch = pitch.Unpitched(n.pitch)
+
+    if not inPlace:
+        return returnObj
 
 def makeTies(
     s,

@@ -2999,10 +2999,10 @@ class MeasureParser(XMLParserBase):
         >>> n.pitch.displayOctave
         5
         >>> n.pitch.step
-        unpitched
+        'unpitched'
         >>> n.pitch.octave
-        unpitched
-        >>> n.midi
+        'unpitched'
+        >>> n.pitch.midi
         76
         '''
         if inputM21 is None:

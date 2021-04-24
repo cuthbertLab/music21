@@ -4924,7 +4924,8 @@ class Chord(note.NotRest):
         <music21.pitch.Pitch A#4>
         '''
         # noinspection PyTypeChecker
-        pitches: Tuple[pitch.Pitch, pitch.Unpitched] = tuple(component.pitch for component in self._notes)
+        pitches: Tuple[pitch.Pitch, pitch.Unpitched] = tuple(
+            component.pitch for component in self._notes)
         return pitches
 
     @pitches.setter
