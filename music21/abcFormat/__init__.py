@@ -3235,7 +3235,7 @@ class ABCFile(prebase.ProtoM21Object):
         Open a file for reading
         '''
         # try:
-        self.file = io.open(filename, encoding='utf-8')
+        self.file = io.open(filename, encoding='utf-8')  # pylint: disable=consider-using-with
         # except
         # self.file = io.open(filename, encoding='latin-1')
         self.filename = filename

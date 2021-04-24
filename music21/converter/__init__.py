@@ -134,7 +134,8 @@ class ArchiveManager:
             if self.fp.suffix in ('.mxl', '.md'):
                 # try to open it, as some mxl files are not zips
                 try:
-                    unused = zipfile.ZipFile(self.fp, 'r')
+                    with zipfile.ZipFile(self.fp, 'r') as unused:
+                        pass
                 except zipfile.BadZipfile:
                     return False
                 return True
@@ -150,10 +151,9 @@ class ArchiveManager:
         '''
         post = []
         if self.archiveType == 'zip':
-            f = zipfile.ZipFile(self.fp, 'r')
-            for subFp in f.namelist():
-                post.append(subFp)
-            f.close()
+            with zipfile.ZipFile(self.fp, 'r') as f:
+                for subFp in f.namelist():
+                    post.append(subFp)
         return post
 
     def getData(self, name=None, dataFormat='musicxml'):
@@ -168,8 +168,12 @@ class ArchiveManager:
         if self.archiveType != 'zip':
             raise ArchiveManagerException(f'no support for extension: {self.archiveType}')
 
-        f = zipfile.ZipFile(self.fp, 'r')
+        with zipfile.ZipFile(self.fp, 'r') as f:
+            post = self._extractContents(f, name, dataFormat)
 
+        return post
+
+    def _extractContents(self, f: zipfile.ZipFile, name=None, dataFormat='musicxml'):
         if name is None and dataFormat == 'musicxml':  # try to auto-harvest
             # will return data as a string
             # note that we need to read the META-INF/container.xml file
@@ -231,8 +235,6 @@ class ArchiveManager:
                 # post.append(component.read())
                 # post.append(f.read(subFp, 'U'))
                 # msg.append('\n/END\n')
-
-        f.close()
 
         return post
 
