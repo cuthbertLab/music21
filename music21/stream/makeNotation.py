@@ -917,10 +917,14 @@ def makeUnpitched(s, *, inPlace=False):
         found = n.getInstrument()
         if found and 'UnpitchedPercussion' in found.classes:
             if hasattr(n, 'pitch'):
-                n.pitch = pitch.Unpitched(n.pitch)
+                n.pitch = pitch.Unpitched(
+                    displayName=n.pitch.step + str(n.pitch.octave)
+                )
             elif 'Chord' in n.classes:
                 for innerN in n.notes:
-                    innerN.pitch = pitch.Unpitched(n.pitch)
+                    innerN.pitch = pitch.Unpitched(
+                        displayName=innerN.pitch.step + str(innerN.pitch.octave)
+                    )
 
     if not inPlace:
         return returnObj

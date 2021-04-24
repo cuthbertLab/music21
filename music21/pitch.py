@@ -5072,7 +5072,7 @@ class Unpitched(prebase.ProtoM21Object):
     '''
 
     def __init__(self,
-                 displayName: Optional[Union[str, int]] = None,
+                 displayName: Optional[str] = None,
                  **keywords):
         # No need for super().__init__() on protoM21Object
         self._groups = None
@@ -5091,13 +5091,6 @@ class Unpitched(prebase.ProtoM21Object):
                     self.displayOctave = int(displayName[-1])
                 if displayName[0] in 'ABCDEFG':
                     self.displayStep = displayName[0]
-            if isinstance(displayName, Unpitched):
-                displayPitch = displayName.displayPitch()
-                self.displayStep = displayPitch.step
-                self.displayOctave = displayPitch.octave
-            if isinstance(displayName, Pitch):
-                self.displayStep = displayName.step
-                self.displayOctave = displayName.octave
 
         if keywords:
             if 'displayStep' in keywords:
