@@ -1472,7 +1472,7 @@ class Note(NotRest):
         ''')
 
     @property
-    def pitches(self) -> Tuple[pitch.Pitch, pitch.Unpitched]:
+    def pitches(self) -> Tuple[Union[pitch.Pitch, pitch.Unpitched]]:
         '''
         Return the :class:`~music21.pitch.Pitch` or :class:`~music21.pitch.Unpitched`
         objects in a tuple.
