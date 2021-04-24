@@ -735,9 +735,7 @@ class XMLExporterBase:
           <accidental />
           </score-partwise>
         '''
-        commentLength = len(comment)
-        if commentLength > 60:
-            commentLength = 60
+        commentLength = min(len(comment), 60)
         spacerLengthLow = math.floor((60 - commentLength) / 2)
         spacerLengthHigh = math.ceil((60 - commentLength) / 2)
 
