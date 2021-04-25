@@ -9798,7 +9798,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         findConsecutiveNotes.
 
 
-
         >>> s1 = converter.parse("tinynotation: 3/4 c4 d' r b b'", makeNotation=False)
         >>> #_DOCS_SHOW s1.show()
 
@@ -9834,33 +9833,22 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for i in range(len(returnList) - 1):
             firstNote = returnList[i]
             secondNote = returnList[i + 1]
-            firstPitch = None
-            secondPitch = None
-            if firstNote is not None and secondNote is not None:
-                startIsChord = False
-                endIsChord = False
-                if hasattr(firstNote, 'pitch') and firstNote.pitch is not None:
-                    firstPitch = firstNote.pitch
-                elif hasattr(firstNote, 'pitches') and firstNote.pitches:
-                    firstPitch = firstNote.pitches[0]
-                    startIsChord = True
-                if hasattr(secondNote, 'pitch') and secondNote.pitch is not None:
-                    secondPitch = secondNote.pitch
-                elif hasattr(secondNote, 'pitches') and secondNote.pitches:
-                    secondPitch = secondNote.pitches[0]
-                    endIsChord = True
-                if firstPitch is not None and secondPitch is not None:
-                    returnInterval = interval.notesToInterval(firstPitch,
-                                                              secondPitch)
-                    if startIsChord is False:
-                        returnInterval.noteStart = firstNote
-                    if endIsChord is False:
-                        returnInterval.noteEnd = secondNote
-                    returnInterval.offset = opFrac(firstNote.offset
-                                                   + firstNote.duration.quarterLength)
-                    returnInterval.duration = duration.Duration(opFrac(
-                        secondNote.offset - returnInterval.offset))
-                    returnStream.insert(returnInterval)
+            # Protect against empty chords
+            if firstNote.pitches and secondNote.pitches:
+                if chord.Chord in firstNote.classSet:
+                    noteStart = firstNote.notes[0]
+                else:
+                    noteStart = firstNote
+                if chord.Chord in secondNote.classSet:
+                    noteEnd = secondNote.notes[0]
+                else:
+                    noteEnd = secondNote
+                # Prefer Note objects over Pitch objects so that noteStart is set correctly
+                returnInterval = interval.Interval(noteStart, noteEnd)
+                returnInterval.offset = opFrac(firstNote.offset + firstNote.quarterLength)
+                returnInterval.duration = duration.Duration(opFrac(
+                    secondNote.offset - returnInterval.offset))
+                returnStream.insert(returnInterval)
 
         return returnStream
 

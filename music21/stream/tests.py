@@ -994,6 +994,18 @@ class Test(unittest.TestCase):
         self.assertEqual(len(intS1), 2)
         M9 = intS1[0]
         self.assertEqual(M9.niceName, 'Major Ninth')
+
+        # Simple chord example
+        ch1 = chord.Chord('C4 E4 G4')
+        ch2 = chord.Chord('D4 F4 A4')
+        s2 = Stream([ch1, ch2])
+        intS2 = s2.melodicIntervals()
+        self.assertEqual(len(intS2), 1)
+        major_second = intS2.first()
+        self.assertEqual(major_second.niceName, 'Major Second')
+        self.assertIs(major_second.noteStart, ch1.notes[0])
+        self.assertIs(major_second.noteEnd, ch2.notes[0])
+
         # TODO: Many more tests
 
     def testMelodicIntervalsB(self):
