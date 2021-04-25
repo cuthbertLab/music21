@@ -3439,12 +3439,12 @@ class MeasureParser(XMLParserBase):
 
         # two ways to create durations, raw (from qLen) and cooked (from type, time-mod, dots)
         if d is not None:
-            # N.B. this branch currently executes just for grace note corrections
+            # N.B. music21's parser executes this branch just for grace note corrections
             durRaw = duration.Duration(quarterLength=qLen)  # raw just uses qLen
             d.components = durRaw.components
             d.tuplets = durRaw.tuplets
         else:
-            # N.B. this branch executes most of the time
+            # N.B. music21's parser executes this branch most of the time
             d = duration.Duration(quarterLength=qLen)
         # can't do this unless we have a type, so if not forceRaw
         if not forceRaw:  # a cooked version builds up from pieces
