@@ -6754,7 +6754,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         1
 
         In cases where notes are manipulated after initial tie creation,
-        some notes might lack ties. This will not prevent merging the tied notes
+        some chord members might lack ties. This will not prevent merging the tied notes
         if all the pitches match, and `matchByPitch=True` (default):
 
         >>> c1 = chord.Chord('C4 E4')
