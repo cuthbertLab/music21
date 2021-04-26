@@ -711,7 +711,9 @@ def makeRests(
     fill with one Rest preceding this offset.
     This can be called on any Stream,
     a Measure alone, or a Measure that contains
-    Voices.
+    Voices. This method recurses into Parts, Measures, and Voices,
+    since users are unlikely to want "loose" rests outside
+    of sub-containers.
 
     If `refStreamOrTimeRange` is provided as a Stream, this
     Stream is used to get min and max offsets. If a list is provided,
@@ -723,7 +725,10 @@ def makeRests(
 
     If `timeRangeFromBarDuration` is True, and the calling Stream
     is a Measure with a TimeSignature, the time range will be determined
-    based on the .barDuration property.
+    based on the .barDuration property. This keyword takes priority
+    over `refStreamOrTimeRange`. If both are provided, `timeRangeFromBarDuration`
+    prevails, unless no TimeSignature can be found, in which case, the function
+    falls back to `refStreamOrTimeRange`.
 
     If `inPlace` is True, this is done in-place; if `inPlace` is False,
     this returns a modified deepcopy.
@@ -811,7 +816,11 @@ def makeRests(
 
     Changed in v6 -- all but first attribute are keyword only
 
-    Changed in v7 -- `inPlace` defaults False.
+    Changed in v7:
+
+      - `inPlace` defaults False
+      - Recurses into parts, measures, voices
+      - Gave priority to `timeRangeFromBarDuration` over `refStreamOrTimeRange`
     '''
     from music21 import stream
 
@@ -821,35 +830,51 @@ def makeRests(
     else:
         returnObj = s
 
-    oLowTarget = 0
-    oHighTarget = 0
+    if returnObj.iter.parts:
+        for inner_part in returnObj.iter.parts:
+            inner_part.makeRests(
+                inPlace=True,
+                fillGaps=fillGaps,
+                hideRests=hideRests,
+                refStreamOrTimeRange=refStreamOrTimeRange,
+                timeRangeFromBarDuration=timeRangeFromBarDuration,
+            )
+        return returnObj
 
-    # environLocal.printDebug([
-    #    'makeRests(): object lowestOffset, highestTime', oLow, oHigh])
-    if refStreamOrTimeRange is None:  # use local
-        oLowTarget = 0
-        if timeRangeFromBarDuration and returnObj.isMeasure:
-            # NOTE: this will raise an exception if no meter can be found
+    oLowTarget = 0.0
+    oHighTarget = 0.0
+
+    if timeRangeFromBarDuration:
+        if returnObj.isMeasure:
+            # NOTE: this returns 0.0 if no meter can be found
             oHighTarget = returnObj.barDuration.quarterLength
-        elif timeRangeFromBarDuration and returnObj.hasMeasures():
+        elif (
+            stream.Voice in returnObj.classSet
+            and hasattr(refStreamOrTimeRange, 'isMeasure')
+            and refStreamOrTimeRange.isMeasure
+        ):
+            # Alternative to getting measure context would be to access .activeSite
+            # but for now, depend on getting measure context from refStreamOrTimeRange
+            # since we have not documented calling makeRests directly on a Voice and
+            # expecting to infer barDuration from the measure context.
+            # merely trying to support the recursive call for contained voices, below
+            oHighTarget = refStreamOrTimeRange.barDuration.quarterLength
+        elif returnObj.hasMeasures():
             oHighTarget = sum(
                 m.barDuration.quarterLength for m in returnObj.getElementsByClass(stream.Measure)
             )
-        else:
+    # If the above search didn't run or still yielded 0.0, use refStreamOrTimeRange
+    if oHighTarget == 0.0:
+        if refStreamOrTimeRange is None:  # use local
             oHighTarget = returnObj.highestTime
-    elif isinstance(refStreamOrTimeRange, stream.Stream):
-        oLowTarget = refStreamOrTimeRange.lowestOffset
-        oHighTarget = refStreamOrTimeRange.highestTime
-        # environLocal.printDebug([
-        #    'refStream used in makeRests', oLowTarget, oHighTarget,
-        #    len(refStreamOrTimeRange)])
-    # treat as a list
-    elif common.isIterable(refStreamOrTimeRange):
-        oLowTarget = min(refStreamOrTimeRange)
-        oHighTarget = max(refStreamOrTimeRange)
-        # environLocal.printDebug([
-        #    'offsets used in makeRests', oLowTarget, oHighTarget,
-        #    len(refStreamOrTimeRange)])
+        elif isinstance(refStreamOrTimeRange, stream.Stream):
+            oLowTarget = refStreamOrTimeRange.lowestOffset
+            oHighTarget = refStreamOrTimeRange.highestTime
+        # treat as a list
+        elif common.isIterable(refStreamOrTimeRange):
+            oLowTarget = min(refStreamOrTimeRange)
+            oHighTarget = max(refStreamOrTimeRange)
+
     if returnObj.hasVoices():
         bundle = list(returnObj.voices)
     elif returnObj.hasMeasures():
@@ -862,6 +887,17 @@ def makeRests(
         oLow = v.lowestOffset
         oHigh = v.highestTime
         if returnObj.hasMeasures():
+            # process voices
+            for inner_voice in v.voices:
+                inner_voice.makeRests(inPlace=True,
+                                      fillGaps=fillGaps,
+                                      hideRests=hideRests,
+                                      refStreamOrTimeRange=v,
+                                      timeRangeFromBarDuration=timeRangeFromBarDuration,
+                                      )
+            # Refresh these variables given that inner voices were altered
+            oLow = v.lowestOffset
+            oHigh = v.highestTime
             # adjust oHigh to not exceed measure
             oHighTarget = min(v.barDuration.quarterLength, oHighTarget)
 
@@ -904,14 +940,6 @@ def makeRests(
         for m in returnObj.getElementsByClass(stream.Measure):
             returnObj.setElementOffset(m, accumulatedTime)
             accumulatedTime += m.highestTime
-
-            # process voices
-            for v in m.voices:
-                v.makeRests(inPlace=True,
-                            fillGaps=fillGaps,
-                            hideRests=hideRests,
-                            refStreamOrTimeRange=m,
-                            )
 
     if inPlace is not True:
         return returnObj
