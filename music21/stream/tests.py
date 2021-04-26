@@ -1362,13 +1362,31 @@ class Test(unittest.TestCase):
         n4.tie = tie.Tie('stop')
 
         stripped5 = s.stripTies(matchByPitch=False)
-        # now that pitch (and count) don't matter, strip all
-        # notice the additional pitches disappear
-        self.assertEqual(len(stripped5), 1)
+        # notice the note STILL isn't merged to the chords -- because different # of notes
+        self.assertEqual(len(stripped5), 2)
 
         self.assertEqual(
             str(stripped5.elements),
-            '(<music21.note.Note C>,)'
+            '(<music21.note.Note C>, <music21.chord.Chord C4 F4>)'
+        )
+
+        # replace the first note with a Chord bearing a start tie, and everything can be merged
+        s.replace(n0, chord.Chord('C4 F4'))
+        s.first().tie = tie.Tie('start')
+
+        stripped6 = s.stripTies(matchByPitch=False)
+        self.assertEqual(
+            str(stripped6.elements),
+            '(<music21.chord.Chord C4 F4>,)'
+        )
+
+        # make sure matchByPitch=True is still picky about pitch but merges the rest,
+        # including a continue tie, which becomes ersatz-start
+        s.first().transpose(6, inPlace=True)
+        stripped7 = s.stripTies(matchByPitch=True)
+        self.assertEqual(
+            str(stripped7.elements),
+            '(<music21.chord.Chord F#4 B4>, <music21.chord.Chord C4 F4>)'
         )
 
     def testTwoStreamMethods(self):

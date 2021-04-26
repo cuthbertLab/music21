@@ -6753,15 +6753,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(m.flat.notes)
         1
 
-        In cases where chord members are manipulated after initial tie creation,
-        some chord members might lack ties. (The `.tie` attribute of a Chord only
-        refers to one member of the chord having that attribute.) `stripTies` can
-        run in a "strict" mode (`matchByPitch=False`) whereby every chord member
-        needs to have "continue" or "stop" tie attributes to continue or complete a
-        tie, or it can run in a more "permissive" mode (`matchByPitch=True`) (default)
-        and look first to the tie status of the chord (which might incompletely describe a
-        mixed tie-type scenario) and then simply connect notes and chords
-        where all the pitches match:
+        In cases where notes are manipulated after initial tie creation,
+        some notes might lack ties. This will not prevent merging the tied notes
+        if all the pitches match, and `matchByPitch=True` (default):
 
         >>> c1 = chord.Chord('C4 E4')
         >>> c1.tie = tie.Tie('start')
@@ -6782,8 +6776,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(strippedPitchMatching.flat.notes)
         1
 
-        This can be prevented with `matchByPitch=False`, in which case every chord
-        member needs "continue" and/or "stop" tie attributes:
+        This can be prevented with `matchByPitch=False`, in which case every note,
+        including each chord member, must have stop and/or continue tie types,
+        which was not the case above:
 
         >>> strippedMixedTieTypes = m.stripTies(matchByPitch=False)
         >>> len(strippedMixedTieTypes.flat.notes)
@@ -6794,6 +6789,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> c2.notes[2].tie = tie.Tie('stop')
         >>> strippedUniformTieTypes = m.stripTies(matchByPitch=False)
         >>> len(strippedUniformTieTypes.flat.notes)
+        1
+
+        Notice the matching happens even after altering the pitches:
+
+        >>> c3 = c2.transpose(6)
+        >>> otherM = stream.Measure([c1, c3])
+        >>> strippedTransposed = otherM.stripTies(matchByPitch=False)
+        >>> len(strippedTransposed.flat.notes)
         1
 
         Changed in v.7 -- `matchByPitch` defaults True, and the following
@@ -6837,6 +6840,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> stripped4 = m2.stripTies(matchByPitch=False)
         >>> stripped4.elements
         (<music21.chord.Chord C4 E4 G4>,)
+
+        Now replace the first element with just a single C4 note.
+        The following chords will be merged with each other, but not with the single
+        note, even on `matchByPitch=False`.
+        (`matchByPitch=False` is permissive about pitch but strict about cardinality.)
+
+        >>> newC = note.Note('C4')
+        >>> newC.tie = tie.Tie('start')
+        >>> m2.replace(c0, newC)
+        >>> stripped5 = m2.stripTies(matchByPitch=False)
+        >>> stripped5.elements
+        (<music21.note.Note C>, <music21.chord.Chord C4 E4 G4>)
         '''
         # environLocal.printDebug(['calling stripTies'])
         if not inPlace:  # make a copy
@@ -6886,10 +6901,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     and nInner.tie.type == 'stop'):
                 return True
             # but capture case where all chord members have a stop tie
+            # and check cardinality (don't match chords to notes)
             elif (hasattr(nInner, 'tie')
                     and 'Chord' in nInner.classes
                     and None not in [inner_p.tie for inner_p in nInner.notes]
-                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}):
+                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}
+                    and nLast is not None and len(nLast.pitches) == len(nInner.pitches)
+            ):
                 return True
             # if we cannot find a stop tie, see if last note was connected
             # and this and the last note are the same pitch; this assumes
@@ -6978,7 +6996,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     posConnected.append(i)
                     endMatch = False
                 elif matchByPitch:
-                    # try to match against nLast
+                    # try to match pitch against nLast
+                    # updateEndMatch() checks for equal cardinality
                     tempEndMatch = updateEndMatch(n)
                     if tempEndMatch:
                         posConnected.append(i)
@@ -6990,7 +7009,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         endMatch = False
                 elif allTiesAreContinue(n):
                     # uniform-continue suffices if not matchByPitch
-                    posConnected.append(i)
+                    # but still need to check cardinality
+                    if nLast and (len(nLast.pitches) != len(n.pitches)):
+                        # different sizes: clear list and populate with this element
+                        # since allTiesAreContinue, it is okay to treat as ersatz-start
+                        posConnected = [i]
+                    else:
+                        posConnected.append(i)
+                    # either way, this was not a stop
                     endMatch = False
                 else:
                     # only SOME ties on this chord are "continue": reject
