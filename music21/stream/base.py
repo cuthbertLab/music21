@@ -194,6 +194,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {1.0} <music21.note.Note E->
     {0.0} <music21.stream.PartStaff 0x...>
         {0.0} <music21.note.Rest quarter>
+
+    Create nested streams in one fell swoop:
+
+    >>> s5 = stream.Score(stream.Part(stream.Measure(note.Note())))
+    >>> s5.show('text')
+    {0.0} <music21.stream.Part 0x...>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note C>
     '''
     # this static attributes offer a performance boost over other
     # forms of checking class
@@ -270,7 +278,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if givenElements is None:
             return
 
-        if not common.isIterable(givenElements):
+        if not common.isIterable(givenElements) or isinstance(givenElements, Stream):
             givenElements = [givenElements]
 
         # Append rather than insert if every offset is 0.0
