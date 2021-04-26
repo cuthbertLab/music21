@@ -11037,9 +11037,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Note that streams which do not contain any instance of a lyric number will not
         appear anywhere in the final list (not as a [] or otherwise).
 
-        >>> p = stream.Part(s)
-        >>> scr = stream.Score()
-        >>> scr.append(p)
+        >>> scr = stream.Score(s)
 
         >>> scr.lyrics(ignoreBarlines=False, recurse=True)[1]
         [[[<music21.note.Lyric number=1 syllabic=single text='this'>, <...'is'>, <...'a'>, None],
