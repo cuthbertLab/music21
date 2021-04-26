@@ -1989,6 +1989,32 @@ class Test(unittest.TestCase):
         p.makeRests(inPlace=True)
         self.assertEqual(p.duration.quarterLength, 8.0)
 
+    def testMakeRestsInMeasuresWithVoices(self):
+        p = Part()
+        m = Measure(meter.TimeSignature('4/4'), number=1)
+        v1 = Voice(note.Note(quarterLength=3.5))
+        v2 = Voice(note.Note(quarterLength=3.75))
+        m.insert(0, v1)
+        m.insert(0, v2)
+        p.insert(0, m)
+
+        post = p.makeRests(inPlace=False, timeRangeFromBarDuration=True)
+
+        # No loose rests outside voices
+        self.assertEqual(len(post.first().getElementsByClass(note.Rest)), 0)
+        # Total of two rests, one in each voice
+        self.assertEqual(len(post.recurse().getElementsByClass(note.Rest)), 2)
+
+        # Wrap into Score
+        sc = Score([p])
+        post = sc.makeRests(inPlace=False, timeRangeFromBarDuration=True)
+        # No loose rests outside parts
+        self.assertEqual(len(post.first().getElementsByClass(note.Rest)), 0)
+        # ... or outside measures
+        self.assertEqual(len(post.first().measure(1).getElementsByClass(note.Rest)), 0)
+        # Total of two rests, one in each voice
+        self.assertEqual(len(post.recurse().getElementsByClass(note.Rest)), 2)
+
     def testMakeMeasuresInPlace(self):
         sScr = Stream()
         sScr.insert(0, clef.TrebleClef())
