@@ -1788,7 +1788,7 @@ class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     ...     p.insert(0, tempo.MetronomeMark('Langsam', 70))
     >>> fe = features.jSymbolic.StrengthOfStrongestRhythmicPulseFeature(sch)
     >>> fe.extract().vector[0]
-    0.853...
+    0.857...
     '''
     id = 'R4'
 
@@ -1815,7 +1815,7 @@ class StrengthOfSecondStrongestRhythmicPulseFeature(
     ...     p.insert(0, tempo.MetronomeMark('Langsam', 70))
     >>> fe = features.jSymbolic.StrengthOfSecondStrongestRhythmicPulseFeature(sch)
     >>> fe.extract().vector[0]
-    0.12...
+    0.119...
     '''
     id = 'R5'
 
@@ -1851,7 +1851,7 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
     ...     p.insert(0, tempo.MetronomeMark('Langsam', 70))
     >>> fe = features.jSymbolic.StrengthRatioOfTwoStrongestRhythmicPulsesFeature(sch)
     >>> fe.extract().vector[0]
-    7.0
+    7.2
 
     '''
     id = 'R6'
@@ -1887,7 +1887,7 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
     ...     p.insert(0, tempo.MetronomeMark('Langsam', 70))
     >>> fe = features.jSymbolic.CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(sch)
     >>> fe.extract().vector[0]
-    0.975...
+    0.976...
     '''
     id = 'R7'
 

@@ -79,7 +79,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
     now we will try it with the last movement of Schoenberg's opus 19 which has
     no mode explicitly encoded in the musicxml but which our analysis routines
-    believe (having very little to go on) fits the profile of F major best.
+    believe (having very little to go on) fits the profile of e minor best.
 
     >>> schoenberg19mvmt6 = corpus.parse('schoenberg/opus19', 6)
     >>> fe2 = features.native.QualityFeature(schoenberg19mvmt6)
@@ -644,7 +644,7 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s2 = corpus.parse('schoenberg/opus19', 2)
     >>> fe2 = features.native.TriadSimultaneityPrevalence(s2)
     >>> fe2.extract().vector
-    [0.022727...]
+    [0.021739...]
     '''
     id = 'CS9'
 
