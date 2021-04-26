@@ -1389,6 +1389,15 @@ class Test(unittest.TestCase):
             '(<music21.chord.Chord F#4 B4>, <music21.chord.Chord C4 F4>)'
         )
 
+        # also transpose the "continue" chord
+        # to ensure the link from continue -> stop matches pitch
+        s[1].transpose(7, inPlace=True)
+        stripped8 = s.stripTies(matchByPitch=True)
+        self.assertEqual(
+            str(stripped8.elements),
+            '(<music21.chord.Chord F#4 B4>, <music21.chord.Chord G4 C5>, <music21.chord.Chord C4 F4>)'
+        )
+
     def testTwoStreamMethods(self):
         from music21.note import Note
 

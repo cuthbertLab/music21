@@ -6907,7 +6907,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     and None not in [inner_p.tie for inner_p in nInner.notes]
                     and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}
                     and nLast is not None and len(nLast.pitches) == len(nInner.pitches)):
-                return True
+                if not matchByPitch:
+                    return True
+                else:
+                    pass  # cardinality check passed, but still need to match by pitch below!
             # if we cannot find a stop tie, see if last note was connected
             # and this and the last note are the same pitch; this assumes
             # that connected and same pitch value is tied; this is not
