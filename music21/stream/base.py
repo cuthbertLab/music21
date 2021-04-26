@@ -194,6 +194,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {1.0} <music21.note.Note E->
     {0.0} <music21.stream.PartStaff 0x...>
         {0.0} <music21.note.Rest quarter>
+
+    Create nested streams in one fell swoop:
+
+    >>> s5 = stream.Score(stream.Part(stream.Measure(note.Note())))
+    >>> s5.show('text')
+    {0.0} <music21.stream.Part 0x...>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note C>
     '''
     # this static attributes offer a performance boost over other
     # forms of checking class
@@ -270,7 +278,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if givenElements is None:
             return
 
-        if not common.isIterable(givenElements):
+        if isinstance(givenElements, Stream) or not common.isIterable(givenElements):
             givenElements = [givenElements]
 
         # Append rather than insert if every offset is 0.0
@@ -11029,9 +11037,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Note that streams which do not contain any instance of a lyric number will not
         appear anywhere in the final list (not as a [] or otherwise).
 
-        >>> p = stream.Part(s)
-        >>> scr = stream.Score()
-        >>> scr.append(p)
+        >>> scr = stream.Score(s)
 
         >>> scr.lyrics(ignoreBarlines=False, recurse=True)[1]
         [[[<music21.note.Lyric number=1 syllabic=single text='this'>, <...'is'>, <...'a'>, None],

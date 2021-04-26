@@ -553,7 +553,7 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> n2.duration.type = 'whole'
         >>> m2.append(n2)
         >>> s2.append(m2)
-        >>> v = variant.Variant(s2)
+        >>> v = variant.Variant(s2.elements)
         >>> s.insert(0, v)
         >>> sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
         >>> allIds = sf.findActiveStreamIdsInHierarchy()

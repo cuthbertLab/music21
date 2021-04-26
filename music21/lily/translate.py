@@ -1857,7 +1857,7 @@ class LilypondConverter:
         >>> for s in [ s1, s2, s3, s4, s5]:
         ...     s.makeMeasures(inPlace=True)
 
-        >>> activeSite = stream.Part(s5)
+        >>> activeSite = stream.Part(s5.elements)
 
         >>> v1 = variant.Variant()
         >>> for el in s1:
@@ -2070,11 +2070,11 @@ class LilypondConverter:
 
         >>> pStream = converter.parse('tinynotation: 4/4 a4 b c d   e4 f g a')
         >>> pStream.makeMeasures(inPlace=True)
-        >>> p = stream.Part(pStream)
+        >>> p = stream.Part(pStream.elements)
         >>> p.id = 'p1'
         >>> vStream = converter.parse('tinynotation: 4/4 a4. b8 c4 d')
         >>> vStream.makeMeasures(inPlace=True)
-        >>> v = variant.Variant(vStream)
+        >>> v = variant.Variant(vStream.elements)
         >>> v.groups = ['london']
         >>> p.insert(0.0, v)
         >>> lpc = lily.translate.LilypondConverter()
@@ -2221,7 +2221,7 @@ class LilypondConverter:
 
 
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
-        >>> v = variant.Variant(c)
+        >>> v = variant.Variant(c.elements)
         >>> lpc = lily.translate.LilypondConverter()
         >>> lySequentialMusicOut = lpc.lySequentialMusicFromStream(v)
         >>> lySequentialMusicOut

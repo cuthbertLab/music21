@@ -171,15 +171,11 @@ def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
 
     >>> aScore, vScore = stream.Score(), stream.Score()
 
-    >>> ap1 = stream.Part(converter.parse('tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 '
-    ...                                   ).makeMeasures())
-    >>> vp1 = stream.Part(converter.parse('tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 '
-    ...                                   ).makeMeasures())
+    >>> ap1 = converter.parse('tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 ')
+    >>> vp1 = converter.parse('tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 ')
 
-    >>> ap2 = stream.Part(converter.parse('tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 '
-    ...                                   ).makeMeasures())
-    >>> vp2 = stream.Part(converter.parse('tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 '
-    ...                                   ).makeMeasures())
+    >>> ap2 = converter.parse('tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 ')
+    >>> vp2 = converter.parse('tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 ')
 
     >>> aScore.insert(0.0, ap1)
     >>> aScore.insert(0.0, ap2)
@@ -1659,9 +1655,7 @@ def makeAllVariantsReplacements(streamWithVariants,
     >>> s2.makeMeasures(inPlace=True)
     >>> variant.mergeVariants(s, s2, variantName='london', inPlace=True)
 
-    >>> newPart = stream.Part(s)
-    >>> newStream = stream.Score()
-    >>> newStream.append(newPart)
+    >>> newStream = stream.Score(s)
 
     >>> returnStream = variant.makeAllVariantsReplacements(newStream, recurse=False)
     >>> for v in returnStream.parts[0].variants:
