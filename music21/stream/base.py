@@ -8911,8 +8911,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         e.editorial.offsetQuantizationError = signedError * sign
                 if processDurations:
                     ql = e.duration.quarterLength
-                    if ql < 0:  # buggy MIDI file?
-                        ql = 0
+                    ql = max(ql, 0)  # negative ql possible in buggy MIDI files?
                     unused_error, qlNew, signedError = bestMatch(
                         float(ql), quarterLengthDivisors)
                     # Enforce nonzero duration for non-grace notes

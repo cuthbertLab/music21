@@ -198,16 +198,16 @@ class LilypondConverter:
         LILYEXEC = self.findLilyExec()
         command = [LILYEXEC, '--version']
         try:
-            proc = subprocess.Popen(command, stdout=subprocess.PIPE)
-        except OSError:  # pragma: no cover
+            with subprocess.Popen(command, stdout=subprocess.PIPE) as proc:
+                stdout, unused = proc.communicate()
+                stdout = stdout.decode(encoding='utf-8')
+                versionString = stdout.split()[2]
+                versionPieces = versionString.split('.')
+        except OSError as exc:  # pragma: no cover
             raise LilyTranslateException(
                 'Cannot find a copy of Lilypond installed on your system. '
                 + 'Please be sure it is installed. And that your '
-                + "environment.UserSettings()['lilypondPath'] is set to find it.")
-        stdout, unused = proc.communicate()
-        stdout = stdout.decode(encoding='utf-8')
-        versionString = stdout.split()[2]
-        versionPieces = versionString.split('.')
+                + "environment.UserSettings()['lilypondPath'] is set to find it.") from exc
 
         self.majorVersion = versionPieces[0]
         self.minorVersion = versionPieces[1]

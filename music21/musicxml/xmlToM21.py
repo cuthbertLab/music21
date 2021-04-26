@@ -2425,10 +2425,10 @@ class MeasureParser(XMLParserBase):
                 float(mxDuration.text.strip()) / self.divisions
             )
             self.offsetMeasureNote -= change
-            if self.offsetMeasureNote < 0:
-                # this could happen if the musicxml durations have errors
-                # https://github.com/cuthbertLab/music21/issues/971
-                self.offsetMeasureNote = 0.0
+            # check for negative offsets produced by
+            # musicxml durations with float rounding issues
+            # https://github.com/cuthbertLab/music21/issues/971
+            self.offsetMeasureNote = max(self.offsetMeasureNote, 0.0)
 
     def xmlForward(self, mxObj):
         '''
