@@ -278,7 +278,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if givenElements is None:
             return
 
-        if not common.isIterable(givenElements) or isinstance(givenElements, Stream):
+        if isinstance(givenElements, Stream) or not common.isIterable(givenElements):
             givenElements = [givenElements]
 
         # Append rather than insert if every offset is 0.0
