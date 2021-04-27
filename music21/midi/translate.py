@@ -2022,7 +2022,7 @@ def prepareStreamForMidi(s) -> stream.Stream:
     '''
     from music21 import volume
 
-    if s.recurse().stream().hasMeasures():
+    if s[stream.Measure]:
         s = s.expandRepeats()  # makes a deep copy
     else:
         s = s.coreCopyAsDerivation('prepareStreamForMidi')
@@ -2101,15 +2101,13 @@ def conductorStream(s: stream.Stream) -> stream.Part:
     conductorPart.insert(0, Conductor())
 
     for klass in ('MetronomeMark', 'TimeSignature', 'KeySignature'):
-        events = s.flat.getElementsByClass(klass)
         lastOffset = -1
-        for el in events:
-            o = events.srcStream.elementOffset(el)
-            s.remove(el, recurse=True)
+        for el in s[klass]:
             # Don't overwrite an event of the same class at this offset
-            if o > lastOffset:
-                conductorPart.coreInsert(o, el)
-            lastOffset = o
+            if el.offset > lastOffset:
+                conductorPart.coreInsert(el.offset, el)
+            lastOffset = el.offset
+            s.remove(el, recurse=True)
 
     conductorPart.coreElementsChanged()
 
