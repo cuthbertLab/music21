@@ -724,7 +724,8 @@ def makeRests(
     time regions that have no active elements.
 
     If `timeRangeFromBarDuration` is True, and the calling Stream
-    is a Measure with a TimeSignature, the time range will be determined
+    is a Measure with a TimeSignature (or a Part containg them),
+    the time range will be determined
     by taking the :meth:`~music21.stream.Measure.barDuration` and subtracting
     :attr:`~music21.stream.Measure.paddingLeft` and
     :attr:`~music21.stream.Measure.paddingRight`.
