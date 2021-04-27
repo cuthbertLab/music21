@@ -1559,20 +1559,19 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         Calls makeRests() for the part, then creates a PartExporter for each part,
         and runs .parse() on that part.  appends the PartExporter to self.partExporterList
         '''
-        # would like to do something like this but cannot
-        # replace object inside of the stream
-        sp = list(self.parts)
-        for innerStream in sp:
-            innerStream.makeRests(
-                refStreamOrTimeRange=self.refStreamOrTimeRange,
-                inPlace=True,
-                timeRangeFromBarDuration=True,
-                )
+        # self.parts is a stream of streams
+        self.parts.makeRests(refStreamOrTimeRange=self.refStreamOrTimeRange,
+                             inPlace=True,
+                             timeRangeFromBarDuration=True,
+                             )
 
         count = 0
+        sp = list(self.parts)
         for innerStream in sp:
             count += 1
-            if count > len(sp):
+            # This guards against making an error in a future refactor
+            # Raises if editing while iterating instead of casting to list above
+            if count > len(sp):  # pragma: no cover
                 raise MusicXMLExportException('infinite stream encountered')
 
             pp = PartExporter(innerStream, parent=self)
