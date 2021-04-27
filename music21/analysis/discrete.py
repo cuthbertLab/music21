@@ -997,7 +997,7 @@ class Ambitus(DiscreteAnalysis):
 
         # environLocal.printDebug([self._pitchSpanColors])
 
-    def getPitchSpan(self, subStream) -> Tuple[Optional[pitch.Pitch], Optional[pitch.Pitch]]:
+    def getPitchSpan(self, subStream) -> Optional[Tuple[pitch.Pitch, pitch.Pitch]]:
         '''
         For a given subStream, return a tuple consisting of the two pitches
         with the minimum and maximum pitch space value.
@@ -1020,11 +1020,11 @@ class Ambitus(DiscreteAnalysis):
         >>> p.getPitchSpan(s)
         (<music21.pitch.Pitch A2>, <music21.pitch.Pitch C8>)
 
-        Returns (None, None) if the stream contains no pitches.
+        Returns None if the stream contains no pitches.
 
         >>> s = stream.Stream(note.Rest())
         >>> p.getPitchSpan(s)
-        (None, None)
+        None
 
         OMIT_FROM_DOCS
 
@@ -1032,7 +1032,7 @@ class Ambitus(DiscreteAnalysis):
 
         >>> s.insert(4, harmony.ChordSymbol('C6'))
         >>> p.getPitchSpan(s)
-        (None, None)
+        None
         '''
         if subStream is self._referenceStream and self.minPitchObj and self.maxPitchObj:
             return self.minPitchObj, self.maxPitchObj
@@ -1040,7 +1040,7 @@ class Ambitus(DiscreteAnalysis):
         justNotes = subStream.recurse().notes
         if not justNotes:
             # need to handle case of no pitches
-            return (None, None)
+            return None
 
         # find the min and max pitch space value for all pitches
         psFound = []
@@ -1056,7 +1056,7 @@ class Ambitus(DiscreteAnalysis):
             pitchesFound.extend(pitches)
         # in some cases there is stil nothing -- perhaps only ChordSymbols
         if not psFound:
-            return (None, None)
+            return None
         # use built-in functions
         minPitchIndex = psFound.index(min(psFound))
         maxPitchIndex = psFound.index(max(psFound))
