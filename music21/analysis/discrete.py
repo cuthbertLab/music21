@@ -997,10 +997,10 @@ class Ambitus(DiscreteAnalysis):
 
         # environLocal.printDebug([self._pitchSpanColors])
 
-    def getPitchSpan(self, subStream):
+    def getPitchSpan(self, subStream) -> Tuple[Optional[pitch.Pitch], Optional[pitch.Pitch]]:
         '''
-        For a given subStream, return the pitch with the minimum and
-        maximum pitch space value found.
+        For a given subStream, return a tuple consisting of the two pitches
+        with the minimum and maximum pitch space value.
 
         This public method may be used by other classes.
 
@@ -1019,6 +1019,20 @@ class Ambitus(DiscreteAnalysis):
         >>> s.append(c)
         >>> p.getPitchSpan(s)
         (<music21.pitch.Pitch A2>, <music21.pitch.Pitch C8>)
+
+        Returns (None, None) if the stream contains no pitches.
+
+        >>> s = stream.Stream(note.Rest())
+        >>> p.getPitchSpan(s)
+        (None, None)
+
+        OMIT_FROM_DOCS
+
+        And with only ChordSymbols:
+
+        >>> s.insert(4, harmony.ChordSymbol('C6'))
+        >>> p.getPitchSpan(s)
+        (None, None)
         '''
         if subStream is self._referenceStream and self.minPitchObj and self.maxPitchObj:
             return self.minPitchObj, self.maxPitchObj
@@ -1026,7 +1040,7 @@ class Ambitus(DiscreteAnalysis):
         justNotes = subStream.recurse().notes
         if not justNotes:
             # need to handle case of no pitches
-            return None
+            return (None, None)
 
         # find the min and max pitch space value for all pitches
         psFound = []
@@ -1040,9 +1054,9 @@ class Ambitus(DiscreteAnalysis):
                 pitches = [n.pitch]
             psFound += [p.ps for p in pitches]
             pitchesFound.extend(pitches)
-        # in some cases no pitch space values are found due to all rests
+        # in some cases there is stil nothing -- perhaps only ChordSymbols
         if not psFound:
-            return None
+            return (None, None)
         # use built-in functions
         minPitchIndex = psFound.index(min(psFound))
         maxPitchIndex = psFound.index(max(psFound))
