@@ -25,7 +25,7 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 #     range and key modules in analysis
 
 import unittest
-from typing import Union, List, Any, Tuple, Iterable
+from typing import Union, List, Any, Tuple, Iterable, Optional
 
 from collections import OrderedDict
 from music21 import exceptions21
@@ -935,7 +935,7 @@ keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler,
 # -----------------------------------------------------------------------------
 class Ambitus(DiscreteAnalysis):
     '''
-    An basic analysis method for measuring register.
+    A basic analysis method for measuring register.
 
     >>> ambitusAnalysis = analysis.discrete.Ambitus()
     >>> ambitusAnalysis.identifiers[0]
@@ -949,6 +949,11 @@ class Ambitus(DiscreteAnalysis):
 
     def __init__(self, referenceStream=None):
         super().__init__(referenceStream=referenceStream)
+        # Store the min and max Pitch instances for referenceStream
+        # set by getPitchSpan(), which is called by _generateColors()
+        self.minPitchObj: Optional[pitch.Pitch] = None
+        self.maxPitchObj: Optional[pitch.Pitch] = None
+
         self._pitchSpanColors = OrderedDict()
         self._generateColors()
 
@@ -970,8 +975,8 @@ class Ambitus(DiscreteAnalysis):
         if numColors is None:
             if self._referenceStream is not None:
                 # get total range for entire piece
-                minPitchObj, maxPitchObj = self.getPitchSpan(self._referenceStream)
-                difference = int(maxPitchObj.ps - minPitchObj.ps)
+                self.minPitchObj, self.maxPitchObj = self.getPitchSpan(self._referenceStream)
+                difference = int(self.maxPitchObj.ps - self.minPitchObj.ps)
                 minPitch, maxPitch = 0, difference
             else:
                 minPitch, maxPitch = 0, 130  # a large default
@@ -1015,6 +1020,9 @@ class Ambitus(DiscreteAnalysis):
         >>> p.getPitchSpan(s)
         (<music21.pitch.Pitch A2>, <music21.pitch.Pitch C8>)
         '''
+        if subStream is self._referenceStream and self.minPitchObj and self.maxPitchObj:
+            return self.minPitchObj, self.maxPitchObj
+
         justNotes = subStream.recurse().notes
         if not justNotes:
             # need to handle case of no pitches
@@ -1039,7 +1047,12 @@ class Ambitus(DiscreteAnalysis):
         minPitchIndex = psFound.index(min(psFound))
         maxPitchIndex = psFound.index(max(psFound))
 
-        return pitchesFound[minPitchIndex], pitchesFound[maxPitchIndex]
+        minPitchObj, maxPitchObj = pitchesFound[minPitchIndex], pitchesFound[maxPitchIndex]
+
+        if subStream is self._referenceStream:
+            self.minPitchObj, self.maxPitchObj = minPitchObj, maxPitchObj
+
+        return minPitchObj, maxPitchObj
 
     def solutionLegend(self, compress=False):
         '''
