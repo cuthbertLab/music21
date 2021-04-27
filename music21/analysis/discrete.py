@@ -1024,7 +1024,6 @@ class Ambitus(DiscreteAnalysis):
 
         >>> s = stream.Stream(note.Rest())
         >>> p.getPitchSpan(s)
-        None
 
         OMIT_FROM_DOCS
 
@@ -1032,7 +1031,7 @@ class Ambitus(DiscreteAnalysis):
 
         >>> s.insert(4, harmony.ChordSymbol('C6'))
         >>> p.getPitchSpan(s)
-        None
+
         '''
         if subStream is self._referenceStream and self.minPitchObj and self.maxPitchObj:
             return self.minPitchObj, self.maxPitchObj
