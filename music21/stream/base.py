@@ -9833,22 +9833,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for i in range(len(returnList) - 1):
             firstNote = returnList[i]
             secondNote = returnList[i + 1]
+            # returnList could contain None to represent a rest
+            if firstNote is None or secondNote is None:
+                continue
             # Protect against empty chords
-            if firstNote.pitches and secondNote.pitches:
-                if chord.Chord in firstNote.classSet:
-                    noteStart = firstNote.notes[0]
-                else:
-                    noteStart = firstNote
-                if chord.Chord in secondNote.classSet:
-                    noteEnd = secondNote.notes[0]
-                else:
-                    noteEnd = secondNote
-                # Prefer Note objects over Pitch objects so that noteStart is set correctly
-                returnInterval = interval.Interval(noteStart, noteEnd)
-                returnInterval.offset = opFrac(firstNote.offset + firstNote.quarterLength)
-                returnInterval.duration = duration.Duration(opFrac(
-                    secondNote.offset - returnInterval.offset))
-                returnStream.insert(returnInterval)
+            if not (firstNote.pitches and secondNote.pitches):
+                continue
+            if chord.Chord in firstNote.classSet:
+                noteStart = firstNote.notes[0]
+            else:
+                noteStart = firstNote
+            if chord.Chord in secondNote.classSet:
+                noteEnd = secondNote.notes[0]
+            else:
+                noteEnd = secondNote
+            # Prefer Note objects over Pitch objects so that noteStart is set correctly
+            returnInterval = interval.Interval(noteStart, noteEnd)
+            returnInterval.offset = opFrac(firstNote.offset + firstNote.quarterLength)
+            returnInterval.duration = duration.Duration(opFrac(
+                secondNote.offset - returnInterval.offset))
+            returnStream.insert(returnInterval)
 
         return returnStream
 
