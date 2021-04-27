@@ -474,7 +474,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...     print(n.name, end=' ')
         C C# D E F G A
 
-        '.ghost', because it begins with is treated as a class name and
+        '.ghost', because it begins with `.`, is treated as a class name and
         returns a `RecursiveIterator`:
 
 
@@ -482,7 +482,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...     print(n.name, end=' ')
         C E
 
-        A query selector with a `#`
+        A query selector with a `#`:
 
         >>> s['#last_a']
         <music21.note.Note A>
