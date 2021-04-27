@@ -725,8 +725,11 @@ def makeRests(
 
     If `timeRangeFromBarDuration` is True, and the calling Stream
     is a Measure with a TimeSignature, the time range will be determined
-    based on the .barDuration property. This keyword takes priority
-    over `refStreamOrTimeRange`. If both are provided, `timeRangeFromBarDuration`
+    by taking the :meth:`~music21.stream.Measure.barDuration` and subtracting
+    :attr:`~music21.stream.Measure.paddingLeft` and
+    :attr:`~music21.stream.Measure.paddingRight`.
+    This keyword takes priority over `refStreamOrTimeRange`.
+    If both are provided, `timeRangeFromBarDuration`
     prevails, unless no TimeSignature can be found, in which case, the function
     falls back to `refStreamOrTimeRange`.
 
@@ -841,13 +844,19 @@ def makeRests(
             )
         return returnObj
 
+    def oHighTargetForMeasure(m: stream.Measure) -> float:
+        '''Needed for timeRangeFromBarDuration'''
+        # NOTE: this returns 0.0 if no meter can be found
+        post = m.barDuration.quarterLength
+        post -= m.paddingLeft
+        post -= m.paddingRight
+        return max(post, 0.0)
+
     oLowTarget = 0.0
     oHighTarget = 0.0
-
     if timeRangeFromBarDuration:
         if returnObj.isMeasure:
-            # NOTE: this returns 0.0 if no meter can be found
-            oHighTarget = returnObj.barDuration.quarterLength
+            oHighTarget = oHighTargetForMeasure(returnObj)
         elif (
             stream.Voice in returnObj.classSet
             and hasattr(refStreamOrTimeRange, 'isMeasure')
@@ -858,7 +867,7 @@ def makeRests(
             # since we have not documented calling makeRests directly on a Voice and
             # expecting to infer barDuration from the measure context.
             # merely trying to support the recursive call for contained voices, below
-            oHighTarget = refStreamOrTimeRange.barDuration.quarterLength
+            oHighTarget = oHighTargetForMeasure(refStreamOrTimeRange)
         elif returnObj.hasMeasures():
             oHighTarget = sum(
                 m.barDuration.quarterLength for m in returnObj.getElementsByClass(stream.Measure)
@@ -883,23 +892,25 @@ def makeRests(
         bundle = [returnObj]
 
     # bundle components may be voices, measures, or a flat Stream
-    for v in bundle:
-        oLow = v.lowestOffset
-        oHigh = v.highestTime
-        if returnObj.hasMeasures():
+    for component in bundle:
+        oLow = component.lowestOffset
+        oHigh = component.highestTime
+        if component.isMeasure:
+            if timeRangeFromBarDuration:
+                oHighTarget = oHighTargetForMeasure(component)
             # process voices
-            for inner_voice in v.voices:
+            for inner_voice in component.voices:
                 inner_voice.makeRests(inPlace=True,
                                       fillGaps=fillGaps,
                                       hideRests=hideRests,
-                                      refStreamOrTimeRange=v,
+                                      refStreamOrTimeRange=component,
                                       timeRangeFromBarDuration=timeRangeFromBarDuration,
                                       )
             # Refresh these variables given that inner voices were altered
-            oLow = v.lowestOffset
-            oHigh = v.highestTime
+            oLow = component.lowestOffset
+            oHigh = component.highestTime
             # adjust oHigh to not exceed measure
-            oHighTarget = min(v.barDuration.quarterLength, oHighTarget)
+            oHighTarget = min(component.barDuration.quarterLength, oHighTarget)
 
         # create rest from start to end
         qLen = oLow - oLowTarget
@@ -909,27 +920,25 @@ def makeRests(
             r.style.hideObjectOnPrint = hideRests
             # environLocal.printDebug(['makeRests(): add rests', r, r.duration])
             # place at oLowTarget to reach to oLow
-            v.insert(oLowTarget, r)
+            component.insert(oLowTarget, r)
 
         # create rest from end to highest
         qLen = oHighTarget - oHigh
-        # environLocal.printDebug(['v', v, oHigh, oHighTarget, 'qLen', qLen])
         if qLen > 0:
             r = note.Rest()
             r.duration.quarterLength = qLen
             r.style.hideObjectOnPrint = hideRests
             # place at oHigh to reach to oHighTarget
-            v.insert(oHigh, r)
+            component.insert(oHigh, r)
 
         if fillGaps:
-            gapStream = v.findGaps()
+            gapStream = component.findGaps()
             if gapStream is not None:
                 for e in gapStream:
                     r = note.Rest()
                     r.duration.quarterLength = e.duration.quarterLength
                     r.style.hideObjectOnPrint = hideRests
-                    v.insert(e.offset, r)
-        # environLocal.printDebug(['post makeRests show()', v])
+                    component.insert(e.offset, r)
 
     if returnObj.hasMeasures():
         # split rests at measure boundaries

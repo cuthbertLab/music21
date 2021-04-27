@@ -1563,7 +1563,11 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # replace object inside of the stream
         sp = list(self.parts)
         for innerStream in sp:
-            innerStream.makeRests(self.refStreamOrTimeRange, inPlace=True)
+            innerStream.makeRests(
+                refStreamOrTimeRange=self.refStreamOrTimeRange,
+                inPlace=True,
+                timeRangeFromBarDuration=True,
+                )
 
         count = 0
         for innerStream in sp:
@@ -6492,6 +6496,17 @@ class Test(unittest.TestCase):
         self.assertEqual(len(tree.findall('.//rest')), 1)
         rest = tree.find('.//rest')
         self.assertEqual(rest.get('measure'), 'yes')
+
+    def testMeasurePadding(self):
+        from music21 import converter
+        s = stream.Score([converter.parse('tinyNotation: 4/4 c4')])
+        s[stream.Measure].first().paddingLeft = 2.0
+        s[stream.Measure].first().paddingRight = 1.0
+        tree = self.getET(s)
+        self.assertEqual(len(tree.findall('.//rest')), 0)
+        s[stream.Measure].first().paddingLeft = 1.0
+        tree = self.getET(s)
+        self.assertEqual(len(tree.findall('.//rest')), 1)
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover

@@ -10576,7 +10576,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for v in voices:
             if v:  # skip empty voices
                 if fillGaps:
-                    returnObj.makeRests(fillGaps=True, inPlace=True)
+                    returnObj.makeRests(fillGaps=True,
+                                        inPlace=True,
+                                        timeRangeFromBarDuration=True,
+                                        )
                 returnObj.insert(0, v)
         # remove rests in returnObj
         returnObj.removeByClass('Rest')
