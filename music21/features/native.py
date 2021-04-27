@@ -85,7 +85,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
     >>> fe2 = features.native.QualityFeature(schoenberg19mvmt6)
     >>> f2 = fe2.extract()
     >>> f2.vector
-    [0]
+    [1]
 
 
     OMIT_FROM_DOCS
