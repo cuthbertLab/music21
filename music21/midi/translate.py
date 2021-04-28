@@ -3803,7 +3803,7 @@ class Test(unittest.TestCase):
                 self.assertIsNone(i.instrumentName)
 
         # lousy program change
-        # https://github.com/cuthbertLab/music21/issues/398
+        # https://github.com/cuthbertLab/music21/issues/988
         event = midiModule.MidiEvent()
         event.data = 0
         event.channel = 10
