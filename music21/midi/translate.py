@@ -768,7 +768,13 @@ def midiEventsToInstrument(eventList):
                 i = instrument.instrumentFromMidiProgram(event.data)
             # Instrument.midiProgram and event.data are both 0-indexed
             i.midiProgram = event.data
-    except (instrument.InstrumentException, UnicodeDecodeError):  # pragma: no cover
+    except (percussion.MIDIPercussionException,
+            UnicodeDecodeError):
+        warnings.warn(f'Unable to determine instrument from {event}', TranslateWarning)
+        i = instrument.Instrument()
+    except instrument.InstrumentException:
+        # Currently, we risk having an overwhelming number of warnings
+        # but consider consolidating to just one except one day
         i = instrument.Instrument()
 
     # Set MIDI channel
@@ -3784,7 +3790,7 @@ class Test(unittest.TestCase):
         i = midiEventsToInstrument(event)
         self.assertIsInstance(i, instrument.Flute)
 
-    def testLousyInstrumentName(self):
+    def testLousyInstrumentData(self):
         from music21 import midi as midiModule
 
         lousyNames = ('    ', 'Instrument 20', 'Instrument', 'Inst 2', 'instrument')
@@ -3795,6 +3801,19 @@ class Test(unittest.TestCase):
                 event.type = midiModule.MetaEvents.INSTRUMENT_NAME
                 i = midiEventsToInstrument(event)
                 self.assertIsNone(i.instrumentName)
+
+        # lousy program change
+        # https://github.com/cuthbertLab/music21/issues/988
+        event = midiModule.MidiEvent()
+        event.data = 0
+        event.channel = 10
+        event.type = midiModule.ChannelVoiceMessages.PROGRAM_CHANGE
+
+        msg = 'Unable to determine instrument from '
+        msg += '<music21.midi.MidiEvent PROGRAM_CHANGE, track=0, channel=10, data=0>'
+        with self.assertWarns(TranslateWarning, msg=msg):
+            i = midiEventsToInstrument(event)
+            self.assertIsNone(i.instrumentName)
 
     def testConductorStream(self):
         s = stream.Stream()
