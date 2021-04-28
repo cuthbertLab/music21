@@ -772,7 +772,7 @@ def midiEventsToInstrument(eventList):
             UnicodeDecodeError):
         warnings.warn(f'Unable to determine instrument from {event}', TranslateWarning)
         i = instrument.Instrument()
-    except (instrument.InstrumentException):
+    except instrument.InstrumentException:
         # Currently, we risk having an overwhelming number of warnings
         # but consider consolidating to just one except one day
         i = instrument.Instrument()
