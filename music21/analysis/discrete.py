@@ -972,18 +972,18 @@ class Ambitus(DiscreteAnalysis):
         2 #16111d
         3 #16121e
         '''
+        minPitch = 0
         if numColors is None:
             if self._referenceStream is not None:
                 # get total range for entire piece
                 self.minPitchObj, self.maxPitchObj = self.getPitchSpan(self._referenceStream)
-                difference = int(self.maxPitchObj.ps - self.minPitchObj.ps)
-                minPitch, maxPitch = 0, difference
+                maxPitch = int(self.maxPitchObj.ps - self.minPitchObj.ps)
             else:
-                minPitch, maxPitch = 0, 130  # a large default
+                maxPitch = 130  # a large default
         else:  # create minPitch maxPitch
-            minPitch, maxPitch = 0, numColors
+            maxPitch = numColors
 
-        valueRange = maxPitch - minPitch
+        valueRange = maxPitch
         if valueRange == 0:
             valueRange = 1  # avoid float division by zero
         step = 0
@@ -1023,14 +1023,16 @@ class Ambitus(DiscreteAnalysis):
         Returns None if the stream contains no pitches.
 
         >>> s = stream.Stream(note.Rest())
-        >>> p.getPitchSpan(s)
+        >>> p.getPitchSpan(s) is None
+        True
 
         OMIT_FROM_DOCS
 
         And with only ChordSymbols:
 
         >>> s.insert(4, harmony.ChordSymbol('C6'))
-        >>> p.getPitchSpan(s)
+        >>> p.getPitchSpan(s) is None
+        True
 
         '''
         if subStream is self._referenceStream and self.minPitchObj and self.maxPitchObj:
@@ -1060,10 +1062,12 @@ class Ambitus(DiscreteAnalysis):
         minPitchIndex = psFound.index(min(psFound))
         maxPitchIndex = psFound.index(max(psFound))
 
-        minPitchObj, maxPitchObj = pitchesFound[minPitchIndex], pitchesFound[maxPitchIndex]
+        minPitchObj = pitchesFound[minPitchIndex]
+        maxPitchObj = pitchesFound[maxPitchIndex]
 
         if subStream is self._referenceStream:
-            self.minPitchObj, self.maxPitchObj = minPitchObj, maxPitchObj
+            self.minPitchObj = minPitchObj
+            self.maxPitchObj = maxPitchObj
 
         return minPitchObj, maxPitchObj
 
