@@ -1557,11 +1557,24 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         called by .parse() if the score has individual parts.
 
         Calls makeRests() for the part, then creates a PartExporter for each part,
-        and runs .parse() on that part.  appends the PartExporter to self.partExporterList
+        and runs .parse() on that part.  appends the PartExporter to self.
+
+        Hide rests created at this late stage.
+
+        >>> v = stream.Voice(note.Note())
+        >>> m = stream.Measure([meter.TimeSignature(), v])
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter(m)
+        >>> out = GEX.parse()  # out is bytes
+        >>> outStr = out.decode('utf-8')  # now is string
+        >>> '<note print-object="no" print-spacing="yes">' in outStr
+        True
         '''
-        # self.parts is a stream of streams
+        # self.parts is a stream of parts
+        # hide any rests created at this late stage, because we are
+        # merely trying to fill up MusicXML display, not impose things on users
         self.parts.makeRests(refStreamOrTimeRange=self.refStreamOrTimeRange,
                              inPlace=True,
+                             hideRests=True,
                              timeRangeFromBarDuration=True,
                              )
 
