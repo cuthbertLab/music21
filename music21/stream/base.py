@@ -10526,6 +10526,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         [<music21.pitch.Pitch C4>]
         >>> [str(n.pitch) for n in s.voices[1].notes]
         ['B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4', 'B-4']
+
+        Changed in v7 -- if `fillGaps=True` and called on an incomplete measure,
+        makes trailing rests in voices. This scenario occurs when parsing MIDI.
         '''
         # this method may not always
         # produce the optimal voice assignment based on context (register
@@ -10575,12 +10578,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # remove any unused voices (possible if overlap group has sus)
         for v in voices:
             if v:  # skip empty voices
-                if fillGaps:
-                    returnObj.makeRests(fillGaps=True,
-                                        inPlace=True,
-                                        timeRangeFromBarDuration=True,
-                                        )
                 returnObj.insert(0, v)
+        if fillGaps:
+            returnObj.makeRests(fillGaps=True,
+                                inPlace=True,
+                                timeRangeFromBarDuration=True,
+                                )
         # remove rests in returnObj
         returnObj.removeByClass('Rest')
         # elements changed will already have been called
