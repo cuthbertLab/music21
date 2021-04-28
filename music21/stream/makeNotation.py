@@ -157,6 +157,7 @@ def makeBeams(
             for n in noteStream:
                 if n.duration.isGrace:
                     noteStream.remove(n)
+                    continue
                 durList.append(n.duration)
             # environLocal.printDebug([
             #    'beaming with ts', lastTimeSignature, 'measure', m, durList,
