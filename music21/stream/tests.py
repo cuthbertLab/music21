@@ -2015,6 +2015,18 @@ class Test(unittest.TestCase):
         # Total of two rests, one in each voice
         self.assertEqual(len(post.recurse().getElementsByClass(note.Rest)), 2)
 
+    def testMakeRestsByMakingVoices(self):
+        # Create incomplete measure with overlaps, like a MIDI file
+        m = Measure(meter.TimeSignature('4/4'), number=1)
+        m.insert(0, note.Note(quarterLength=3.5))
+        m.insert(0, note.Note(quarterLength=3.75))
+        m.makeVoices(inPlace=True)
+
+        # No loose rests outside voices
+        self.assertEqual(len(m.getElementsByClass(note.Rest)), 0)
+        # Total of two rests, one in each voice. Recursive search.
+        self.assertEqual(len(m[note.Rest]), 2)
+
     def testMakeMeasuresInPlace(self):
         sScr = Stream()
         sScr.insert(0, clef.TrebleClef())
