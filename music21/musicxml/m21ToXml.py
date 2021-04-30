@@ -861,7 +861,7 @@ class XMLExporterBase:
         '''
         Sets mxObject['color'] to a normalized version of m21Object.style.color
         '''
-        self.setStyleAttributes(mxObject, m21Object, 'color')
+        self.setStyleAttributes(mxObject, m21Object, 'color', 'color')
         if 'color' in mxObject.attrib:  # set
             mxObject.attrib['color'] = normalizeColor(mxObject.attrib['color'])
 
@@ -5483,7 +5483,7 @@ class MeasureExporter(XMLExporterBase):
 
         # not to be done: repeater (deprecated)
         self.setColor(mxBeam, beamObject)
-        self.setStyleAttributes(mxBeam, beamObject, 'fan')
+        self.setStyleAttributes(mxBeam, beamObject, 'fan', 'fan')
 
         return mxBeam
 
