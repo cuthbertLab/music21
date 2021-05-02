@@ -309,7 +309,6 @@ class GeneralObjectExporter:
         # ## individual parts
         ('GeneralNote', 'fromGeneralNote'),
         ('Pitch', 'fromPitch'),
-        ('Unpitched', 'fromPitch'),
         ('Duration', 'fromDuration'),  # not an m21 object
         ('Dynamic', 'fromDynamic'),
         ('DiatonicScale', 'fromDiatonicScale'),
@@ -670,11 +669,10 @@ class GeneralObjectExporter:
         # call the musicxml property on Stream
         return self.fromMeasure(out)
 
-    def fromPitch(self, p: Union[pitch.Pitch, pitch.Unpitched]):
+    def fromPitch(self, p: pitch.Pitch):
         # noinspection PyShadowingNames
         '''
-        Translate a music21 :class:`~music21.pitch.Pitch` or
-        :class:`~music21.pitch.Unpitched` into an object
+        Translate a music21 :class:`~music21.pitch.Pitch` into an object
         ready to be parsed.
 
         >>> p = pitch.Pitch('c#3')
@@ -686,16 +684,6 @@ class GeneralObjectExporter:
                 {0.0} <music21.clef.BassClef>
                 {0.0} <music21.meter.TimeSignature 1/4>
                 {0.0} <music21.note.Note C#>
-
-        >>> up = pitch.Unpitched('c3')
-        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
-        >>> sc = GEX.fromPitch(up)
-        >>> sc.show('t')
-        {0.0} <music21.stream.Part 0x1070667c0>
-            {0.0} <music21.stream.Measure 1 offset=0.0>
-                {0.0} <music21.clef.Treble8vaClef>
-                {0.0} <music21.meter.TimeSignature 1/4>
-                {0.0} <music21.note.Note unpitched>
         '''
         n = note.Note()
         n.pitch = copy.deepcopy(p)
@@ -3784,11 +3772,11 @@ class MeasureExporter(XMLExporterBase):
         _setTagTextFromAttribute(p, mxPitch, 'octave', 'implicitOctave')
         return mxPitch
 
-    def unpitchedToXml(self, up: pitch.Unpitched):
+    def unpitchedToXml(self, up: pitch.Unpitched) -> note.Unpitched:
         '''
-        Convert a :class:`~music21.pitch.Unpitched` to xml.
+        Convert a :class:`~music21.note.Unpitched` to xml.
 
-        >>> up = pitch.Unpitched('D5')
+        >>> up = note.Unpitched('D5')
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxUnpitched = MEX.unpitchedToXml(up)
         >>> MEX.dump(mxUnpitched)

@@ -905,7 +905,7 @@ def makeUnpitched(s, *, inPlace=False):
     a `storedInstrument` or closest in the stream hierarchy. Instrument
     lookup is done by :meth:`~music21.note.Note.getInstrument`.
 
-    TODO: implement getInstrument
+    TODO: finish implementing
     TODO: doctest
     '''
     if not inPlace:
@@ -917,14 +917,12 @@ def makeUnpitched(s, *, inPlace=False):
         found = n.getInstrument()
         if found and 'UnpitchedPercussion' in found.classes:
             if hasattr(n, 'pitch'):
-                n.pitch = pitch.Unpitched(
-                    displayName=n.pitch.step + str(n.pitch.octave)
-                )
+                pass
+                # IMPLEMENT
             elif 'Chord' in n.classes:
                 for innerN in n.notes:
-                    innerN.pitch = pitch.Unpitched(
-                        displayName=innerN.pitch.step + str(innerN.pitch.octave)
-                    )
+                    pass
+                    # IMPLEMENT
 
     if not inPlace:
         return returnObj

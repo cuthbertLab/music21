@@ -1255,9 +1255,6 @@ class Note(NotRest):
     >>> note.Note(64).nameWithOctave
     'E4'
 
-    >>> note.Note(pitch.Unpitched())
-    <music21.note.Note unpitched>
-
     Two notes are considered equal if their most important attributes
     (such as pitch, duration,
     articulations, and ornaments) are equal.  Attributes
@@ -1268,14 +1265,6 @@ class Note(NotRest):
 
     >>> note.Note('C4') == note.Note('C4')
     True
-
-    >>> up1 = note.Note(pitch.Unpitched())
-    >>> up2 = note.Note(pitch.Unpitched())
-    >>> up1 == up2
-    True
-    >>> up2.pitch.displayOctave = 2
-    >>> up1 == up2
-    False
     '''
     isNote = True
 
@@ -1472,7 +1461,7 @@ class Note(NotRest):
     @property
     def pitches(self) -> Tuple[pitch.Pitch]:
         '''
-        Return the :class:`~music21.pitch.Pitch` object in a tuple.
+        Return the :class:`~music21.pitch.Pitch` objects in a tuple.
         This property is designed to provide an interface analogous to
         that found on :class:`~music21.chord.Chord` so that `[c.pitches for c in s.notes]`
         provides a consistent interface for all objects.
@@ -1808,14 +1797,6 @@ class Rest(GeneralNote):
         '''
         return self.duration.fullName + ' Rest'
 
-# ------------------------------------------------------------------------------
-
-def unpitched() -> Note:
-    '''
-    Syntactic sugar for creating a note with a default :class:`~music21.pitch.Unpitched`
-    instance.
-    '''
-    return Note(pitch.Unpitched())
 
 # ------------------------------------------------------------------------------
 # test methods and classes

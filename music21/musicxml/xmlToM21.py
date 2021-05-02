@@ -2719,10 +2719,17 @@ class MeasureParser(XMLParserBase):
         # TODO: beams over rests?
         '''
         d = self.xmlToDuration(mxNote)
-        n = note.Note(duration=d)
 
-        # send whole note since accidental display not in <pitch>
-        self.xmlToPitch(mxNote, n.pitch)
+        n = None
+
+        mxUnpitched = mxNote.find('unpitched')
+        if mxUnpitched is None:
+            # send whole note since accidental display not in <pitch>
+            n = note.Note(duration=d)
+            self.xmlToPitch(mxNote, n.pitch)
+        else:
+            n = note.Unpitched(duration=d)
+            self.xmlToUnpitched(mxUnpitched, n)
 
         beamList = mxNote.findall('beam')
         if beamList:
@@ -2975,7 +2982,7 @@ class MeasureParser(XMLParserBase):
 
         return p
 
-    def xmlToUnpitched(self, mxUnpitched, inputM21=None):
+    def xmlToUnpitched(self, mxUnpitched, inputM21=None) -> note.Unpitched:
         '''
         Set `displayStep` and `displayOctave` from `mxUnpitched`.
 
@@ -2990,30 +2997,26 @@ class MeasureParser(XMLParserBase):
         ...                + '</unpitched>')
         >>> mxNote.append(unpitched)
         >>> n = MP.xmlToSimpleNote(mxNote)
-        >>> n.pitch.displayStep
+        >>> n.displayStep
         'E'
-        >>> n.pitch.displayOctave
+        >>> n.displayOctave
         5
-        >>> n.pitch.step
-        'unpitched'
-        >>> n.pitch.octave
-        'unpitched'
-        >>> n.pitch.midi
+        >>> n.midi
         76
         '''
         if inputM21 is None:
-            p = pitch.Unpitched()
+            unp = note.Unpitched()
         else:
-            p = inputM21
+            unp = inputM21
 
         mxDisplayStep = mxUnpitched.find('display-step')
         mxDisplayOctave = mxUnpitched.find('display-octave')
         if textStripValid(mxDisplayStep):
-            p.displayStep = mxDisplayStep.text.strip()
+            unp.displayStep = mxDisplayStep.text.strip()
         if textStripValid(mxDisplayOctave):
-            p.displayOctave = int(mxDisplayOctave.text.strip())
+            unp.displayOctave = int(mxDisplayOctave.text.strip())
 
-        return p
+        return unp
 
     def xmlToAccidental(self, mxAccidental, inputM21=None):
         '''

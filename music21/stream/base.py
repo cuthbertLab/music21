@@ -6429,17 +6429,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             setStemDirections=setStemDirections
         )
 
-    def makeUnpitched(self, *, inPlace=False):
-        '''
-        Return a new Stream, or modify in place, with :class:`~music21.pitch.Unpitched`
-        replacing :class:`~music21.pitch.Pitch` objects on any notes having
-        an :class:`~music21.instrument.UnpitchedPercussion` instrument as either
-        a storedInstrument or closest in the stream hierarchy.
-
-        See :func:`~music21.stream.makeNotation.makeUnpitched`.
-        '''
-        return makeNotation.makeUnpitched(self, inPlace=inPlace)
-
     def makeAccidentals(
         self,
         *,
