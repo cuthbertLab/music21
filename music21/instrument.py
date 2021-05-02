@@ -46,9 +46,9 @@ def unbundleInstruments(streamIn, *, inPlace=False):
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
     and moves their `.storedInstrument` attributes to a new Stream (unless inPlace=True)
 
-    >>> up1 = note.unpitched()
+    >>> up1 = note.Unpitched()
     >>> up1.storedInstrument = instrument.BassDrum()
-    >>> up2 = note.unpitched()
+    >>> up2 = note.Unpitched()
     >>> up2.storedInstrument = instrument.Cowbell()
     >>> s = stream.Stream()
     >>> s.append(up1)
@@ -56,9 +56,9 @@ def unbundleInstruments(streamIn, *, inPlace=False):
     >>> s2 = instrument.unbundleInstruments(s)
     >>> s2.show('text')
     {0.0} <music21.instrument.BassDrum 'Bass Drum'>
-    {0.0} <music21.note.Note unpitched>
+    {0.0} <music21.note.Unpitched object at 0x...>
     {1.0} <music21.instrument.Cowbell 'Cowbell'>
-    {1.0} <music21.note.Note unpitched>
+    {1.0} <music21.note.Unpitched object at 0x...>
     '''
     if inPlace is True:
         s = streamIn
@@ -80,11 +80,11 @@ def unbundleInstruments(streamIn, *, inPlace=False):
 def bundleInstruments(streamIn, *, inPlace=False):
     # noinspection PyShadowingNames
     '''
-    >>> up1 = note.unpitched()
+    >>> up1 = note.Unpitched()
     >>> up1.storedInstrument = instrument.BassDrum()
-    >>> upUnknownInstrument = note.unpitched()
+    >>> upUnknownInstrument = note.Unpitched()
 
-    >>> up2 = note.unpitched()
+    >>> up2 = note.Unpitched()
     >>> up2.storedInstrument = instrument.Cowbell()
     >>> s = stream.Stream()
     >>> s.append(up1)

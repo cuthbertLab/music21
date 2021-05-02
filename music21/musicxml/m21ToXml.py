@@ -3365,14 +3365,11 @@ class MeasureExporter(XMLExporterBase):
 
         if hasattr(n, 'pitch'):
             n: note.Note
-            if 'Pitch' in n.pitch.classes:
-                mxPitch = self.pitchToXml(n.pitch)
-                mxNote.append(mxPitch)
-            else:
-                mxUnpitched = self.unpitchedToXml(n.pitch)
-                mxNote.append(mxUnpitched)
+            mxPitch = self.pitchToXml(n.pitch)
+            mxNote.append(mxPitch)
         else:
-            # assume rest
+            # assume rest until unpitched works
+            # TODO: unpitched
             SubElement(mxNote, 'rest')
 
         if d.isGrace is not True:
