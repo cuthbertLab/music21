@@ -786,7 +786,6 @@ class ConverterNoteworthy(SubConverter):
         '''
         Open Noteworthy data (as nwctxt) from a file path.
 
-        >>> import os #_DOCS_HIDE
         >>> nwcTranslatePath = common.getSourceFilePath() / 'noteworthy' #_DOCS_HIDE
         >>> filePath = nwcTranslatePath / 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
         >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt')
@@ -1470,7 +1469,6 @@ class Test(unittest.TestCase):
         os.remove(mxlPath)
 
     def testWriteMusicXMLMakeNotation(self):
-        import os
         from music21 import converter
         from music21 import note
 
