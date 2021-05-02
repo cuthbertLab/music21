@@ -1068,8 +1068,8 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     `None` is returned if the MetronomeMark lacks a number, which can
     happen with metric modulation marks.
 
-    >>> midi.translate.tempoToMidiEvents(tempo.MetronomeMark(number=None))
-
+    >>> midi.translate.tempoToMidiEvents(tempo.MetronomeMark(number=None)) is None
+    True
     '''
     from music21 import midi as midiModule
     if tempoIndication.number is None:
