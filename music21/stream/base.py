@@ -6623,7 +6623,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         notation, including creating voices for overlapped regions, Measures
         if necessary, creating ties, beams, accidentals, and tuplet brackets.
 
-        If `inPlace` is True, this is done in-place;
+        If `inPlace` is True, this is done in-place (changed in v7 -- returns None);
         if `inPlace` is False, this returns a modified deep copy.
 
         makeAccidentalsKeywords can be a dict specifying additional
@@ -6729,7 +6729,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if m.streamStatus.haveTupletBracketsBeenMade() is False:
                 makeNotation.makeTupletBrackets(m, inPlace=True)
 
-        return returnStream
+        if not inPlace:
+            return returnStream
 
     def extendDuration(self, objName, *, inPlace=False):
         '''
