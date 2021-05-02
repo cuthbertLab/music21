@@ -2667,7 +2667,7 @@ class MeasureParser(XMLParserBase):
         self.spannerBundle.freePendingSpannedElementAssignment(c)
         return c
 
-    def xmlToSimpleNote(self, mxNote, freeSpanners=True) -> note.Note:
+    def xmlToSimpleNote(self, mxNote, freeSpanners=True):
         # noinspection PyShadowingNames
         '''
         Translate a MusicXML <note> (without <chord/>)
@@ -2679,7 +2679,9 @@ class MeasureParser(XMLParserBase):
         If inputM21 is not `None` then that object is used
         for translating. Otherwise a new Note is created.
 
-        if freeSpanners is False then pending spanners will not be freed.
+        if freeSpanners is False then pending spanners will not be freed
+
+        Returns a `note.Note` object.
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
@@ -2717,16 +2719,10 @@ class MeasureParser(XMLParserBase):
         # TODO: beams over rests?
         '''
         d = self.xmlToDuration(mxNote)
-
         n = note.Note(duration=d)
 
-        mxUnpitched = mxNote.find('unpitched')
-        if mxUnpitched is None:
-            # send whole note since accidental display not in <pitch>
-            self.xmlToPitch(mxNote, n.pitch)
-        else:
-            n.pitch = pitch.Unpitched()
-            self.xmlToUnpitched(mxUnpitched, n.pitch)
+        # send whole note since accidental display not in <pitch>
+        self.xmlToPitch(mxNote, n.pitch)
 
         beamList = mxNote.findall('beam')
         if beamList:

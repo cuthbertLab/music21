@@ -1590,7 +1590,7 @@ class Pitch(prebase.ProtoM21Object):
     >>> p3.fullName
     'C-sharp in octave 7 (-30c)'
 
-    The full list of supported keywords are: `name`, `accidental` (which
+    The full list of supported key words are: `name`, `accidental` (which
     can be a string or an :class:`~music21.pitch.Accidental` object), `octave`,
     microtone (which can be a number or a :class:`~music21.pitch.Microtone` object),
     `pitchClass` (0-11), `fundamental` (another `Pitch` object representing the
@@ -5029,132 +5029,6 @@ class Pitch(prebase.ProtoM21Object):
         return chordOut
 
 
-class Unpitched(prebase.ProtoM21Object):
-    '''
-    Represents the lack of definite pitch, such as for notes
-    played by unpitched percussion instruments, or for sound effects and speech.
-
-    Will be found in an array of `.pitches` on Notes, Chords, and Streams,
-    among other :class:`~music21.pitch.Pitch` objects.
-
-    Glide from song into spoken word:
-
-    >>> n1 = note.Note(67, type='eighth')
-    >>> n1.addLyric('he-')
-    >>> n2 = note.Note(pitch.Unpitched(), type='eighth')
-    >>> n2.addLyric('llo')
-    >>> n3 = note.Note(pitch.Unpitched(), type='quarter')
-    >>> n3.addLyric('world')
-    >>> m = stream.Measure([n1, n2, n3])
-    >>> m.pitches
-    [<music21.pitch.Pitch G4>, <music21.pitch.Unpitched C4>, <music21.pitch.Unpitched C4>]
-    >>> m.show('t')
-    {0.0} <music21.note.Note G>
-    {0.5} <music21.note.Note unpitched>
-    {1.0} <music21.note.Note unpitched>
-
-    Can be instantiated with note names, but these will create `.displayStep`
-    and `.displayOctave`, not `.name`:
-
-    >>> up = pitch.Unpitched('G4')
-    >>> up.displayStep
-    'G'
-    >>> up.displayOctave
-    4
-    >>> up.name
-    'unpitched'
-    >>> up.midi
-    67
-    >>> up.step
-    'unpitched'
-    >>> up.octave
-    'unpitched'
-    '''
-
-    def __init__(self,
-                 displayName: Optional[str] = None,
-                 **keywords):
-        # No need for super().__init__() on protoM21Object
-        self._groups = None
-
-        self.name = 'unpitched'
-
-        self.displayStep = defaults.pitchStep
-        self.displayOctave = defaults.pitchOctave
-
-        self.accidental = None
-
-        if displayName:
-            if isinstance(displayName, str) and displayName:
-                # Only single digits supported for now
-                if displayName[-1] in '1234567890':
-                    self.displayOctave = int(displayName[-1])
-                if displayName[0] in 'ABCDEFG':
-                    self.displayStep = displayName[0]
-
-        if keywords:
-            if 'displayStep' in keywords:
-                self.displayStep = keywords['displayStep']
-            if 'displayOctave' in keywords:
-                self.displayOctave = keywords['displayOctave']
-
-        self._storedInstrument = None
-
-    def _reprInternal(self):
-        return str(self)
-
-    def __str__(self):
-        return self.displayStep + str(self.displayOctave)
-
-    def __eq__(self, other):
-        if not super().__eq__(other):
-            return False
-        if not isinstance(other, Unpitched):
-            return False
-        if self.displayStep != other.displayStep:
-            return False
-        if self.displayOctave != other.displayOctave:
-            return False
-        return True
-
-    def displayPitch(self) -> Pitch:
-        '''
-        returns a pitch object that is the same as the displayStep and displayOctave.
-        it will never have an accidental.
-
-        >>> unp = pitch.Unpitched()
-        >>> unp.displayStep = 'E'
-        >>> unp.displayOctave = 4
-        >>> unp.displayPitch()
-        <music21.pitch.Pitch E4>
-        '''
-        p = Pitch()
-        p.step = self.displayStep
-        p.octave = self.displayOctave
-        return p
-
-    @property
-    def step(self):
-        return 'unpitched'
-
-    @property
-    def octave(self):
-        return 'unpitched'
-
-    @property
-    def midi(self):
-        return self.displayPitch().midi
-
-    @property
-    def diatonicNoteNum(self) -> int:
-        '''
-        Provided for compatibility with routines such as
-        :func:`~music21.clef.bestClef`. Simply returns the value of
-        :meth:`~music21.pitch.Unpitched.midi`.
-        '''
-        return self.midi
-
-
 # ------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
@@ -5722,7 +5596,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 
 
-_DOC_ORDER = [Pitch, Unpitched, Accidental, Microtone]
+_DOC_ORDER = [Pitch, Accidental, Microtone]
 
 
 if __name__ == '__main__':

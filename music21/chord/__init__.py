@@ -4939,7 +4939,7 @@ class Chord(ChordBase):
             return f'{rootName}-{nameStr}'
 
     @property
-    def pitches(self) -> Tuple[Union[pitch.Pitch, pitch.Unpitched]]:
+    def pitches(self) -> Tuple[pitch.Pitch]:
         '''
         Get or set a list or tuple of all Pitch objects in this Chord.
 
@@ -4978,8 +4978,7 @@ class Chord(ChordBase):
         <music21.pitch.Pitch A#4>
         '''
         # noinspection PyTypeChecker
-        pitches: Tuple[Union[pitch.Pitch, pitch.Unpitched]] = tuple(
-            component.pitch for component in self._notes)
+        pitches: Tuple[pitch.Pitch] = tuple(component.pitch for component in self._notes)
         return pitches
 
     @pitches.setter

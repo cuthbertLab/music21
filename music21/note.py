@@ -1128,7 +1128,7 @@ class NotRest(GeneralNote):
             return True
 
     @property
-    def pitches(self) -> Tuple[Union[pitch.Pitch, pitch.Unpitched]]:
+    def pitches(self) -> Tuple[pitch.Pitch]:
         '''
         Returns an empty tuple.  (Useful for iterating over NotRests since they
         include Notes and Chords
@@ -1136,7 +1136,7 @@ class NotRest(GeneralNote):
         return ()
 
     @pitches.setter
-    def pitches(self, _value: Iterable[Union[pitch.Pitch, pitch.Unpitched]]):
+    def pitches(self, _value: Iterable[pitch.Pitch]):
         pass
 
 
@@ -1301,8 +1301,6 @@ class Note(NotRest):
 
         if pitchName is not None:
             if isinstance(pitchName, pitch.Pitch):
-                self.pitch = pitchName
-            elif isinstance(pitchName, pitch.Unpitched):
                 self.pitch = pitchName
             else:  # assume first argument is pitch
                 self.pitch = pitch.Pitch(pitchName, **keywords)
@@ -1472,10 +1470,9 @@ class Note(NotRest):
         ''')
 
     @property
-    def pitches(self) -> Tuple[Union[pitch.Pitch, pitch.Unpitched]]:
+    def pitches(self) -> Tuple[pitch.Pitch]:
         '''
-        Return the :class:`~music21.pitch.Pitch` or :class:`~music21.pitch.Unpitched`
-        objects in a tuple.
+        Return the :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
         that found on :class:`~music21.chord.Chord` so that `[c.pitches for c in s.notes]`
         provides a consistent interface for all objects.
@@ -1515,7 +1512,7 @@ class Note(NotRest):
         return (self.pitch,)
 
     @pitches.setter
-    def pitches(self, value: Iterable[Union[pitch.Pitch, pitch.Unpitched]]):
+    def pitches(self, value: Iterable[pitch.Pitch]):
         if common.isListLike(value) and value:
             self.pitch = value[0]
         else:
@@ -1632,6 +1629,73 @@ class Note(NotRest):
 
 # ------------------------------------------------------------------------------
 # convenience classes
+
+
+# ------------------------------------------------------------------------------
+class Unpitched(NotRest):
+    '''
+    A General class of unpitched objects which appear at different places
+    on the staff.  Examples: percussion notation.
+
+    The `Unpitched` object does not currently do anything and should
+    not be used.
+
+    >>> unp = note.Unpitched()
+
+    Unpitched elements have displayStep and displayOctave
+    which shows where they should be displayed, but they do not have pitch
+    objects:
+
+    >>> unp.displayStep
+    'C'
+    >>> unp.displayOctave
+    4
+    >>> unp.displayStep = 'G'
+    >>> unp.pitch
+    Traceback (most recent call last):
+    AttributeError: 'Unpitched' object has no attribute 'pitch'
+    '''
+
+    def __init__(self):
+        super().__init__()
+        self.displayStep = 'C'
+        self.displayOctave = 4
+        self._storedInstrument = None
+
+    def __eq__(self, other):
+        if not super().__eq__(other):
+            return False
+        if not isinstance(other, Unpitched):
+            return False
+        if self.displayStep != other.displayStep:
+            return False
+        if self.displayOctave != other.displayOctave:
+            return False
+        return True
+
+    def _getStoredInstrument(self):
+        return self._storedInstrument
+
+    def _setStoredInstrument(self, newValue):
+        self._storedInstrument = newValue
+
+    storedInstrument = property(_getStoredInstrument, _setStoredInstrument)
+
+    def displayPitch(self) -> pitch.Pitch:
+        '''
+        returns a pitch object that is the same as the displayStep and displayOctave.
+        it will never have an accidental.
+
+        >>> unp = note.Unpitched()
+        >>> unp.displayStep = 'E'
+        >>> unp.displayOctave = 4
+        >>> unp.displayPitch()
+        <music21.pitch.Pitch E4>
+        '''
+        p = pitch.Pitch()
+        p.step = self.displayStep
+        p.octave = self.displayOctave
+        return p
 
 
 # ------------------------------------------------------------------------------
@@ -2144,7 +2208,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Note, Rest, NotRest, GeneralNote, Lyric]
+_DOC_ORDER = [Note, Rest, Unpitched, NotRest, GeneralNote, Lyric]
 
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
