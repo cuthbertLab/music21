@@ -1557,18 +1557,34 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         called by .parse() if the score has individual parts.
 
         Calls makeRests() for the part, then creates a PartExporter for each part,
-        and runs .parse() on that part.  appends the PartExporter to self.partExporterList
+        and runs .parse() on that part.  appends the PartExporter to self.
+
+        Hide rests created at this late stage.
+
+        >>> v = stream.Voice(note.Note())
+        >>> m = stream.Measure([meter.TimeSignature(), v])
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter(m)
+        >>> out = GEX.parse()  # out is bytes
+        >>> outStr = out.decode('utf-8')  # now is string
+        >>> '<note print-object="no" print-spacing="yes">' in outStr
+        True
         '''
-        # would like to do something like this but cannot
-        # replace object inside of the stream
-        sp = list(self.parts)
-        for innerStream in sp:
-            innerStream.makeRests(self.refStreamOrTimeRange, inPlace=True)
+        # self.parts is a stream of parts
+        # hide any rests created at this late stage, because we are
+        # merely trying to fill up MusicXML display, not impose things on users
+        self.parts.makeRests(refStreamOrTimeRange=self.refStreamOrTimeRange,
+                             inPlace=True,
+                             hideRests=True,
+                             timeRangeFromBarDuration=True,
+                             )
 
         count = 0
+        sp = list(self.parts)
         for innerStream in sp:
             count += 1
-            if count > len(sp):
+            # This guards against making an error in a future refactor
+            # Raises if editing while iterating instead of casting to list above
+            if count > len(sp):  # pragma: no cover
                 raise MusicXMLExportException('infinite stream encountered')
 
             pp = PartExporter(innerStream, parent=self)
@@ -6505,6 +6521,17 @@ class Test(unittest.TestCase):
         gex = GeneralObjectExporter(n)
         tree = ET.fromstring(gex.parse().decode('utf-8'))
         self.assertIsNone(tree.find('.//string'))
+
+    def testMeasurePadding(self):
+        from music21 import converter
+        s = stream.Score([converter.parse('tinyNotation: 4/4 c4')])
+        s[stream.Measure].first().paddingLeft = 2.0
+        s[stream.Measure].first().paddingRight = 1.0
+        tree = self.getET(s)
+        self.assertEqual(len(tree.findall('.//rest')), 0)
+        s[stream.Measure].first().paddingLeft = 1.0
+        tree = self.getET(s)
+        self.assertEqual(len(tree.findall('.//rest')), 1)
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover

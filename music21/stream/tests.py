@@ -994,6 +994,18 @@ class Test(unittest.TestCase):
         self.assertEqual(len(intS1), 2)
         M9 = intS1[0]
         self.assertEqual(M9.niceName, 'Major Ninth')
+
+        # Simple chord example
+        ch1 = chord.Chord('C4 E4 G4')
+        ch2 = chord.Chord('D4 F4 A4')
+        s2 = Stream([ch1, ch2])
+        intS2 = s2.melodicIntervals()
+        self.assertEqual(len(intS2), 1)
+        major_second = intS2.first()
+        self.assertEqual(major_second.niceName, 'Major Second')
+        self.assertIs(major_second.noteStart, ch1.notes[0])
+        self.assertIs(major_second.noteEnd, ch2.notes[0])
+
         # TODO: Many more tests
 
     def testMelodicIntervalsB(self):
@@ -1988,6 +2000,44 @@ class Test(unittest.TestCase):
 
         p.makeRests(inPlace=True)
         self.assertEqual(p.duration.quarterLength, 8.0)
+
+    def testMakeRestsInMeasuresWithVoices(self):
+        p = Part()
+        m = Measure(meter.TimeSignature('4/4'), number=1)
+        v1 = Voice(note.Note(quarterLength=3.5))
+        v2 = Voice(note.Note(quarterLength=3.75))
+        m.insert(0, v1)
+        m.insert(0, v2)
+        p.insert(0, m)
+
+        post = p.makeRests(inPlace=False, timeRangeFromBarDuration=True)
+
+        # No loose rests outside voices
+        self.assertEqual(len(post.first().getElementsByClass(note.Rest)), 0)
+        # Total of two rests, one in each voice
+        self.assertEqual(len(post.recurse().getElementsByClass(note.Rest)), 2)
+
+        # Wrap into Score
+        sc = Score([p])
+        post = sc.makeRests(inPlace=False, timeRangeFromBarDuration=True)
+        # No loose rests outside parts
+        self.assertEqual(len(post.first().getElementsByClass(note.Rest)), 0)
+        # ... or outside measures
+        self.assertEqual(len(post.first().measure(1).getElementsByClass(note.Rest)), 0)
+        # Total of two rests, one in each voice
+        self.assertEqual(len(post.recurse().getElementsByClass(note.Rest)), 2)
+
+    def testMakeRestsByMakingVoices(self):
+        # Create incomplete measure with overlaps, like a MIDI file
+        m = Measure(meter.TimeSignature('4/4'), number=1)
+        m.insert(0, note.Note(quarterLength=3.5))
+        m.insert(0, note.Note(quarterLength=3.75))
+        m.makeVoices(inPlace=True)
+
+        # No loose rests outside voices
+        self.assertEqual(len(m.getElementsByClass(note.Rest)), 0)
+        # Total of two rests, one in each voice. Recursive search.
+        self.assertEqual(len(m[note.Rest]), 2)
 
     def testMakeMeasuresInPlace(self):
         sScr = Stream()
