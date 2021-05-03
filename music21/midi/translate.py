@@ -1868,73 +1868,91 @@ def midiTrackToStream(
     else:
         quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
 
-    for i, notePair in enumerate(notes):
-        if i in iGathered:
-            continue
-        # look at each note; get on time and event
-        on, off = notePair
-        t, unused_e = on
-        tOff, unused_eOff = off
-        # environLocal.printDebug(['on, off', on, off, 'i', i, 'len(notes)', len(notes)])
+    if len(notes) > 1:
+        # environLocal.printDebug(['\n', 'midiTrackToStream(): notes', notes])
+        while i < len(notes):
+            if i in iGathered:
+                i += 1
+                continue
+            # look at each note; get on time and event
+            on, off = notes[i]
+            t, unused_e = on
+            tOff, unused_eOff = off
+            # environLocal.printDebug(['on, off', on, off, 'i', i, 'len(notes)', len(notes)])
 
-        # go through all following notes; if there is only 1 note, this will
-        # not execute;
-        # looking for other events that start within a certain small time
-        # window to make into a chord
-        # if we find a note with a different end time but same start
-        # time, throw into a different voice
-        for j in range(i + 1, len(notes)):
-            # look at each on time event
-            onSub, offSub = notes[j]
-            tSub, unused_eSub = onSub
-            tOffSub, unused_eOffSub = offSub
+            # go through all following notes; if there is only 1 note, this will
+            # not execute;
+            # looking for other events that start within a certain small time
+            # window to make into a chord
+            # if we find a note with a different end time but same start
+            # time, throw into a different voice
+            for j in range(i + 1, len(notes)):
+                # look at each on time event
+                onSub, offSub = notes[j]
+                tSub, unused_eSub = onSub
+                tOffSub, unused_eOffSub = offSub
 
-            # let tolerance for chord subbing follow the quantization
-            if quantizePost:
-                divisor = max(quarterLengthDivisors)
-            # fallback: 1/16 of a quarter (64th)
-            else:
-                divisor = 16
-            chunkTolerance = ticksPerQuarter / divisor
-            # must be strictly less than the quantization unit
-            if abs(tSub - t) < chunkTolerance:
-                # isolate case where end time is not w/n tolerance
-                if abs(tOffSub - tOff) > chunkTolerance:
-                    # need to store this as requiring movement to a diff
-                    # voice
-                    voicesRequired = True
-                    continue
-                if chordSub is None:  # start a new one
-                    chordSub = [notes[i]]
-                    iGathered.append(i)
-                chordSub.append(notes[j])
-                iGathered.append(j)
-                continue  # keep looping through events to see
-                # if we can add more elements to this chord group
-            else:  # no more matches; assuming chordSub tones are contiguous
-                break
-        # this comparison must be outside of j loop, as the case where we
-        # have the last note in a list of notes and the j loop does not
-        # execute; chordSub will be None
-        if chordSub is not None:
-            # create a chord here
-            c = chord.Chord()
-            midiEventsToChord(chordSub, ticksPerQuarter, c)
-            o = notes[i][0][0] / ticksPerQuarter
-            c.midiTickStart = notes[i][0][0]
+                # let tolerance for chord subbing follow the quantization
+                if quantizePost:
+                    divisor = max(quarterLengthDivisors)
+                # fallback: 1/16 of a quarter (64th)
+                else:
+                    divisor = 16
+                chunkTolerance = ticksPerQuarter / divisor
+                # must be strictly less than the quantization unit
+                if abs(tSub - t) < chunkTolerance:
+                    # isolate case where end time is not w/n tolerance
+                    if abs(tOffSub - tOff) > chunkTolerance:
+                        # need to store this as requiring movement to a diff
+                        # voice
+                        voicesRequired = True
+                        continue
+                    if chordSub is None:  # start a new one
+                        chordSub = [notes[i]]
+                        iGathered.append(i)
+                    chordSub.append(notes[j])
+                    iGathered.append(j)
+                    continue  # keep looping through events to see
+                    # if we can add more elements to this chord group
+                else:  # no more matches; assuming chordSub tones are contiguous
+                    break
+            # this comparison must be outside of j loop, as the case where we
+            # have the last note in a list of notes and the j loop does not
+            # execute; chordSub will be None
+            if chordSub is not None:
+                # composite.append(chordSub)
+                # create a chord here
+                c = chord.Chord()
+                midiEventsToChord(chordSub, ticksPerQuarter, c)
+                o = notes[i][0][0] / ticksPerQuarter
+                c.midiTickStart = notes[i][0][0]
 
-            s.coreInsert(o, c)
-            chordSub = None
-        else:  # just append the note, chordSub is None
-            # create a note here
-            n = note.Note()
-            midiEventsToNote(notes[i], ticksPerQuarter, n)
-            # the time is the first value in the first pair
-            # need to round, as floating point error is likely
-            o = notes[i][0][0] / ticksPerQuarter
-            n.midiTickStart = notes[i][0][0]
+                s.coreInsert(o, c)
+                # iSkip = len(chordSub)  # amount of accumulated chords
+                chordSub = None
+            else:  # just append the note, chordSub is None
+                # composite.append(notes[i])
+                # create a note here
+                n = note.Note()
+                midiEventsToNote(notes[i], ticksPerQuarter, n)
+                # the time is the first value in the first pair
+                # need to round, as floating point error is likely
+                o = notes[i][0][0] / ticksPerQuarter
+                n.midiTickStart = notes[i][0][0]
 
-            s.coreInsert(o, n)
+                s.coreInsert(o, n)
+                # iSkip = 1
+            # break  # exit secondary loop
+            i += 1
+
+    elif len(notes) == 1:  # rare case of just one note
+        n = note.Note()
+        midiEventsToNote(notes[0], ticksPerQuarter, n)
+        # the time is the first value in the first pair
+        # need to round, as floating point error is likely
+        o = notes[0][0][0] / ticksPerQuarter
+        n.midiTickStart = notes[i][0][0]
+        s.coreInsert(o, n)
 
     s.coreElementsChanged()
     # quantize to nearest 16th
