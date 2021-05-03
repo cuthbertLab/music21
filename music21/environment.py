@@ -1268,8 +1268,8 @@ class UserSettings:
         if key in self._environment.getKeysToPaths():
             # try to expand user if found; otherwise return unaltered
             if value is not None and not str(value).startswith('/skip'):
-                value = common.cleanpath(value, returnPathlib=True)
-                if not value.exists():
+                value = common.cleanpath(value, returnPathlib=False)
+                if not os.path.exists(value):
                     raise UserSettingsException(
                         f'attempting to set a value to a path that does not exist: {value}')
         # when setting a local corpus setting, if not a list, append
