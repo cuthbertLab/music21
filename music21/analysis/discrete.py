@@ -453,6 +453,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             'B-', 'B',
         ]
 
+        colorsUsed = []
         if compress:
             colorsUsed = self.getColorsUsed()
             solutionsUsed = self.getSolutionsUsed()
@@ -471,7 +472,6 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         data = []
         valid = None
-        colorsUsed = []
 
         for yLabel in ['Major', 'Minor']:
             if yLabel == 'Major':
