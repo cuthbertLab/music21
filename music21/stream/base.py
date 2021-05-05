@@ -7719,7 +7719,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if s1.containerInHierarchy(n) is called, it will return m1,
         the Measure that contains the note.
 
-        Unless `setActiveSite` is False, n's activeStie will be set to m1, and
+        Unless `setActiveSite` is False, n's activeSite will be set to m1, and
         its `.offset` will be the offset in `m1`.
 
         >>> s1 = stream.Score(id='s1')
