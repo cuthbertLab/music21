@@ -5,7 +5,7 @@ set -e  # error if anything returns non-zero exit code
 mkdir ~/Desktop
 
 sudo apt-get install -y libpng-dev
-# sudo apt-get install -y python-qt4
+# sudo apt-get install -y python3-pyqt5
 wget -q https://lilypond.org/download/binaries/linux-64/lilypond-2.22.0-1.linux-64.sh
 sh lilypond-2.22.0-1.linux-64.sh --batch
 export PATH=/home/runner/bin:$PATH
@@ -15,5 +15,4 @@ pip3 install scipy
 pip3 install python-Levenshtein
 pip3 install setuptools
 pip3 install coverage
-cd music21
-python -m compileall music21
+python3 -m compileall music21

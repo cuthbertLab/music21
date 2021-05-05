@@ -983,7 +983,7 @@ class Ambitus(DiscreteAnalysis):
         else:  # create minPitch maxPitch
             maxPitch = numColors
 
-        valueRange = maxPitch
+        valueRange = maxPitch - minPitch
         if valueRange == 0:
             valueRange = 1  # avoid float division by zero
         step = 0

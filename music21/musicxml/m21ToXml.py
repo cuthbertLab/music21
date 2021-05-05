@@ -861,7 +861,7 @@ class XMLExporterBase:
         '''
         Sets mxObject['color'] to a normalized version of m21Object.style.color
         '''
-        self.setStyleAttributes(mxObject, m21Object, 'color')
+        self.setStyleAttributes(mxObject, m21Object, 'color', 'color')
         if 'color' in mxObject.attrib:  # set
             mxObject.attrib['color'] = normalizeColor(mxObject.attrib['color'])
 
@@ -2239,8 +2239,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxEncodingDate.text = str(datetime.date.today())  # right format...
         # TODO: encoder
 
-        if self.scoreMetadata is not None and hasattr(self.scoreMetadata, 'software'):
-            # TODO: Remove hasattr after all caches are cleared after v5 release.
+        if self.scoreMetadata is not None:
             for software in self.scoreMetadata.software:
                 mxSoftware = SubElement(mxEncoding, 'software')
                 mxSoftware.text = software
@@ -2796,8 +2795,6 @@ class MeasureExporter(XMLExporterBase):
         Note that if the .id is high enough to be an id(x) memory location, then a small
         voice number is used instead.
         '''
-        # TODO: fix mid-measure clef change with voices and part-staff in Schoenberg op. 19 no 2
-        # staff 2, m. 6... -- placed at the beginning of the measure not at the appropriate place.
         root = self.xmlRoot
         divisions = self.currentDivisions
         self.offsetInMeasure = 0.0
@@ -4058,6 +4055,8 @@ class MeasureExporter(XMLExporterBase):
 
         for artObj in applicableArticulations:
             if 'Pizzicato' in artObj.classes:
+                continue
+            if 'StringIndication' in artObj.classes and artObj.number < 1:
                 continue
             if 'TechnicalIndication' in artObj.classes:
                 if mxTechnicalMark is None:
@@ -5500,7 +5499,7 @@ class MeasureExporter(XMLExporterBase):
 
         # not to be done: repeater (deprecated)
         self.setColor(mxBeam, beamObject)
-        self.setStyleAttributes(mxBeam, beamObject, 'fan')
+        self.setStyleAttributes(mxBeam, beamObject, 'fan', 'fan')
 
         return mxBeam
 
@@ -6508,6 +6507,20 @@ class Test(unittest.TestCase):
         self.assertEqual(len(tree.findall('.//rest')), 1)
         rest = tree.find('.//rest')
         self.assertEqual(rest.get('measure'), 'yes')
+
+    def testArticulationSpecialCases(self):
+        from music21 import articulations
+
+        n = note.Note()
+        a = articulations.StringIndication()
+        n.articulations.append(a)
+
+        # Legal values for StringIndication begin at 1
+        self.assertEqual(a.number, 0)
+        # Use GEX to go through wellformed object conversion
+        gex = GeneralObjectExporter(n)
+        tree = ET.fromstring(gex.parse().decode('utf-8'))
+        self.assertIsNone(tree.find('.//string'))
 
     def testMeasurePadding(self):
         from music21 import converter

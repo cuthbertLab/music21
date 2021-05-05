@@ -474,7 +474,7 @@ class XMLParserBase:
         '''
         Sets m21Object.style.color to be the same as color...
         '''
-        self.setStyleAttributes(mxObject, m21Object, 'color')
+        self.setStyleAttributes(mxObject, m21Object, 'color', 'color')
 
     def setFont(self, mxObject, m21Object):
         '''
@@ -2804,7 +2804,7 @@ class MeasureParser(XMLParserBase):
         # TODO: get number to preserve
         # not to-do: repeater; is deprecated.
         self.setColor(mxBeam, beamOut)
-        self.setStyleAttributes(mxBeam, beamOut, 'fan')
+        self.setStyleAttributes(mxBeam, beamOut, 'fan', 'fan')
 
         try:
             mxType = mxBeam.text.strip()
