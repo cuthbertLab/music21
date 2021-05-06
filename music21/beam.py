@@ -158,6 +158,8 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
         # represents which beam line referred to
         # 8th, 16th, etc represented as 1, 2, ...
         self.number = number
+
+        # this should be called something else.
         self.id = id(self)
 
     # PRIVATE METHODS #
@@ -214,6 +216,8 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         # no need for super() call w/ ProtoM21 and EqualSlottedObject
         self.beamsList = []
         self.feathered = False
+
+        # this should not be called .id.
         self.id = id(self)
 
     # SPECIAL METHODS #

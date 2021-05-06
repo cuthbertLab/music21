@@ -109,6 +109,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
                 f'Type must be one of {self.VALID_TIE_TYPES}, not {type}')
         # naming this 'type' was a mistake, because cannot create a property of this name.
 
+        # this is not the correct way we want to do this, I don't think...
         self.id = id(self)
         self.type = type
         self.style = 'normal'
