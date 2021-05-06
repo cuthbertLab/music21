@@ -2575,7 +2575,6 @@ class Test(unittest.TestCase):
         # s.show('lily.png')
 
     def testCompositeLyrics(self):
-        from music21 import corpus
         s = corpus.parse('theoryExercises/checker_demo.xml')
         lpc = LilypondConverter()
         # previously this choked where .text is None on Lyric object
