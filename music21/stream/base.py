@@ -9669,6 +9669,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
          <music21.note.Note D>, <music21.note.Note D>, <music21.note.Note D>,
          <music21.note.Note B->, <music21.note.Note A->]
 
+        Changed in v7 -- now finds notes in Voices without requiring `getOverlaps=True`
+        and iterates over Parts rather than flattening.
+        If `noNone=False`, inserts `None` when backing up to scan a subsequent voice or part.
+
         OMIT_FROM_DOCS
 
         N.B. for chords, currently, only the first pitch is tested for unison.
@@ -9683,25 +9687,31 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnList = []
         lastStart = 0.0
         lastEnd = 0.0
+        lastContainerEnd = 0.0
         lastWasNone = False
         lastPitch = None
         if skipOctaves is True:
             skipUnisons = True  # implied
 
-        # need to look for voices in self and deal with each one at a time
-        if self.hasVoices():
-            vGroups = []
-            for v in self.voices:
-                vGroups.append(v.flat)
-            vGroups.append(self)
-        else:
-            vGroups = (self.flat,)
+        for container in self.recurse(streamsOnly=True, includeSelf=True):
+            if (container.offset < lastContainerEnd
+                    and container.getElementsByClass(note.GeneralNote)
+                    and noNone is False):
+                returnList.append(None)
+                lastWasNone = True
+                lastPitch = None
 
-        for v in vGroups:
-            for e in v:
-                # Filter out all but notes and rests
-                if 'GeneralNote' not in e.classes:
-                    continue
+            lastStart = 0.0
+            lastEnd = 0.0
+
+            # NB: NOT a recursive search
+            # do not want to capture Measure containing only Voices,
+            # Part containing only Measures, etc.
+            if container.getElementsByClass(note.GeneralNote):
+                lastContainerEnd = container.highestTime
+
+            # Filter out all but notes and rests
+            for e in container.getElementsByClass(note.GeneralNote):
                 if (lastWasNone is False
                         and skipGaps is False
                         and e.offset > lastEnd):
