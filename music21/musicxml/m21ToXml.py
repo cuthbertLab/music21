@@ -2400,17 +2400,18 @@ class PartExporter(XMLExporterBase):
         self.instrumentSetup()
 
         self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
+
+        # Split complex durations in place
+        self.stream = self.stream.splitAtDurations(recurse=True)[0]
+
         # Suppose that everything below this is a measure
-        measureStream = self.stream.getElementsByClass('Stream').stream()
-        if not measureStream:
+        if not self.stream[stream.Measure]:
             self.fixupNotationFlat()
-            # Now we have measures
-            measureStream = self.stream.getElementsByClass('Stream').stream()
         else:
-            self.fixupNotationMeasured(measureStream)
+            self.fixupNotationMeasured()
         # make sure that all instances of the same class have unique ids
         self.spannerBundle.setIdLocals()
-        for m in measureStream:
+        for m in self.stream[stream.Measure]:
             self.addDividerComment('Measure ' + str(m.number))
             measureExporter = MeasureExporter(m, parent=self)
             measureExporter.spannerBundle = self.spannerBundle
@@ -2515,48 +2516,52 @@ class PartExporter(XMLExporterBase):
         # spannerBundle = spanner.SpannerBundle(measureStream.flat)
         self.spannerBundle = part.spannerBundle
 
-    def fixupNotationMeasured(self, measureStream):
+    def fixupNotationMeasured(self):
         '''
         Checks to see if there are any attributes in the part stream and moves
         them into the first measure if necessary.
 
         Checks if makeAccidentals is run, and haveBeamsBeenMade is done, and
         haveTupletBracketsBeenMade is done.
+
+        Changed in v7 -- no longer accepts `measureStream` argument.
         '''
         part = self.stream
+        measures = part.getElementsByClass(stream.Measure)
         # check that first measure has any attributes in outer Stream
         # this is for non-standard Stream formations (some kern imports)
         # that place key/clef information in the containing stream
-        if hasattr(measureStream[0], 'clef') and measureStream[0].clef is None:
-            measureStream[0].makeMutable()  # must mutate
+        if hasattr(measures.first(), 'clef') and measures[0].clef is None:
+            measures.first().makeMutable()  # must mutate
             outerClefs = part.getElementsByClass('Clef')
             if outerClefs:
-                measureStream[0].clef = outerClefs[0]
+                measures.first().clef = outerClefs.first()
 
-        if hasattr(measureStream[0], 'keySignature') and measureStream[0].keySignature is None:
-            measureStream[0].makeMutable()  # must mutate
+        if hasattr(measures.first(), 'keySignature') and measures.first().keySignature is None:
+            measures.first().makeMutable()  # must mutate
             outerKeySignatures = part.getElementsByClass('KeySignature')
             if outerKeySignatures:
-                measureStream[0].keySignature = outerKeySignatures[0]
+                measures.first().keySignature = outerKeySignatures.first()
 
-        if hasattr(measureStream[0], 'timeSignature') and measureStream[0].timeSignature is None:
-            measureStream[0].makeMutable()  # must mutate
+        if hasattr(measures.first(), 'timeSignature') and measures.first().timeSignature is None:
+            measures.first().makeMutable()  # must mutate
             outerTimeSignatures = part.getElementsByClass('TimeSignature')
             if outerTimeSignatures:
-                measureStream[0].timeSignature = outerTimeSignatures[0]
+                measures.first().timeSignature = outerTimeSignatures.first()
+
         # see if accidentals/beams can be processed
-        if not measureStream.streamStatus.haveAccidentalsBeenMade():
-            measureStream.makeAccidentals(inPlace=True)
-        if not measureStream.streamStatus.beams:
+        if not part.streamStatus.haveAccidentalsBeenMade():
+            part.makeAccidentals(inPlace=True)
+        if not part.streamStatus.beams:
             try:
-                measureStream.makeBeams(inPlace=True)
-            except exceptions21.StreamException:
+                part.makeBeams(inPlace=True)
+            except exceptions21.StreamException:  # no measures or no time sig?
                 pass
-        if measureStream.streamStatus.haveTupletBracketsBeenMade() is False:
-            stream.makeNotation.makeTupletBrackets(measureStream, inPlace=True)
+        if part.streamStatus.haveTupletBracketsBeenMade() is False:
+            stream.makeNotation.makeTupletBrackets(part, inPlace=True)
 
         if not self.spannerBundle:
-            self.spannerBundle = measureStream.spannerBundle
+            self.spannerBundle = part.spannerBundle
 
     def getXmlScorePart(self):
         '''
@@ -2874,23 +2879,11 @@ class MeasureExporter(XMLExporterBase):
         if len(obj.duration.dotGroups) > 1:
             obj.duration.splitDotGroups(inPlace=True)
 
-        # split at durations, if not a full-measure rest (e.g. whole rest in 9/8)
-        if 'GeneralNote' in classes and obj.duration.type == 'complex' and not (
-            'Rest' in classes and (
-                obj.fullMeasure in (True, 'always')
-                or (obj.fullMeasure == 'auto' and obj.duration == self.stream.barDuration)
-            )
-        ):
-            objList = obj.splitAtDurations()
-        else:
-            objList = [obj]
-
         parsedObject = False
         for className, methName in self.classesToMethods.items():
             if className in classes:
                 meth = getattr(self, methName)
-                for o in objList:
-                    meth(o)
+                meth(obj)
                 parsedObject = True
                 break
 
@@ -2899,8 +2892,7 @@ class MeasureExporter(XMLExporterBase):
         for className, methName in self.wrapAttributeMethodClasses.items():
             if className in classes:
                 meth = getattr(self, methName)
-                for o in objList:
-                    self.wrapObjectInAttributes(o, meth)
+                self.wrapObjectInAttributes(obj, meth)
                 parsedObject = True
                 break
 
