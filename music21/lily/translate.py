@@ -791,6 +791,8 @@ class LilypondConverter:
             text = ' _ '
         elif el.text == '':
             text = ' _ '
+        elif el.text is None:
+            text = ''
         else:
             text = '"' + el.text + '"'
             # TODO: composite
@@ -2571,6 +2573,12 @@ class Test(unittest.TestCase):
         # print(lpc.topLevelObject)
         # lpc.showPNG()
         # s.show('lily.png')
+
+    def testCompositeLyrics(self):
+        s = corpus.parse('theoryExercises/checker_demo.xml')
+        lpc = LilypondConverter()
+        # previously this choked where .text is None on Lyric object
+        lpc.loadObjectFromScore(s)
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
