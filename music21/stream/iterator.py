@@ -637,7 +637,7 @@ class StreamIterator(prebase.ProtoM21Object):
          <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>,
          <music21.note.Note A>]
 
-        If restoreActiveSties is False then the elements will not have
+        If restoreActiveSites is False then the elements will not have
         their activeSites changed (callers should use it when they do not plan to actually
         expose the elements to users, such as in `__len__`).
 

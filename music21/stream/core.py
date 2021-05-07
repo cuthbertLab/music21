@@ -669,7 +669,7 @@ class StreamCoreMixin:
         that spannerBundle are added.  This can be useful, for instance, in restoring
         spanners from an excerpt that might already have spanners removed.  In
         Jacob Tyler Walls's brilliant phrasing, it prevents regrowing zombie spanners
-        the you thought you had killed.
+        that you thought you had killed.
 
         Here we will constrain only to spanners also present in another Stream:
 

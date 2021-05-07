@@ -994,6 +994,18 @@ class Test(unittest.TestCase):
         self.assertEqual(len(intS1), 2)
         M9 = intS1[0]
         self.assertEqual(M9.niceName, 'Major Ninth')
+
+        # Simple chord example
+        ch1 = chord.Chord('C4 E4 G4')
+        ch2 = chord.Chord('D4 F4 A4')
+        s2 = Stream([ch1, ch2])
+        intS2 = s2.melodicIntervals()
+        self.assertEqual(len(intS2), 1)
+        major_second = intS2.first()
+        self.assertEqual(major_second.niceName, 'Major Second')
+        self.assertIs(major_second.noteStart, ch1.notes[0])
+        self.assertIs(major_second.noteEnd, ch2.notes[0])
+
         # TODO: Many more tests
 
     def testMelodicIntervalsB(self):
@@ -8177,6 +8189,41 @@ class Test(unittest.TestCase):
         self.assertEqual(beams[3], continue_beam)  # fourth should be continue
         self.assertEqual(beams[4], stop_beam)  # last should be stop
 
+    def testWrite(self):
+        import os
+
+        s = Stream([note.Note()])
+        tmpMusicxml = environLocal.getTempFile(suffix='musicxml')
+        tmpXml = environLocal.getTempFile(suffix='xml')
+        tmpNoSuffix = environLocal.getTempFile()
+
+        # Default: .musicxml
+        out1 = s.write()
+        # .musicxml pathlib.Path
+        out2 = s.write(fp=tmpMusicxml)
+        # .xml pathlib.Path
+        out3 = s.write(fp=tmpXml)
+        # .musicxml string
+        out4 = s.write(fp=str(tmpMusicxml))
+        # .xml string
+        out5 = s.write(fp=str(tmpXml))
+        # no suffix
+        out6 = s.write(fp=tmpNoSuffix)
+
+        self.assertEqual(out1.suffix, '.musicxml')
+        self.assertEqual(out2.suffix, '.musicxml')
+        self.assertEqual(out3.suffix, '.xml')
+        self.assertEqual(out4.suffix, '.musicxml')
+        self.assertEqual(out5.suffix, '.xml')
+        # Provide suffix if user didn't provide one
+        self.assertEqual(out6.suffix, '.musicxml')
+
+        self.assertEqual(str(out2), str(out4))
+        self.assertEqual(str(out3), str(out5))
+
+        for fp in (out1, tmpMusicxml, tmpXml, tmpNoSuffix, out6):
+            os.remove(fp)
+
     def testOpusWrite(self):
         import os
         from music21 import converter
@@ -8196,7 +8243,16 @@ class Test(unittest.TestCase):
         os.remove(out)
         os.remove(otherFile)
 
-        tmp = environLocal.getTempFile()
+        # test no fp
+        out = o.write()
+        otherFile = str(out).replace('-2', '-1')
+        self.assertTrue(str(out).endswith('-2.musicxml'))
+        self.assertTrue(os.path.exists(otherFile))
+        os.remove(out)
+        os.remove(otherFile)
+
+        # test giving fp
+        tmp = environLocal.getTempFile(suffix='xml')
         out = o.write(fp=tmp)
         otherFile = str(out).replace('-2', '-1')
         self.assertTrue(str(out).endswith('-2.xml'))
@@ -8205,6 +8261,7 @@ class Test(unittest.TestCase):
         os.remove(out)
         os.remove(otherFile)
 
+        # test another format
         out = o.write(fmt='midi')
         otherFile = str(out).replace('-2', '-1')
         self.assertTrue(str(out).endswith('-2.mid'))

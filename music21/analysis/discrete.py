@@ -453,6 +453,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             'B-', 'B',
         ]
 
+        colorsUsed = []
         if compress:
             colorsUsed = self.getColorsUsed()
             solutionsUsed = self.getSolutionsUsed()
@@ -471,7 +472,6 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         data = []
         valid = None
-        colorsUsed = []
 
         for yLabel in ['Major', 'Minor']:
             if yLabel == 'Major':
@@ -983,7 +983,7 @@ class Ambitus(DiscreteAnalysis):
         else:  # create minPitch maxPitch
             maxPitch = numColors
 
-        valueRange = maxPitch
+        valueRange = maxPitch - minPitch
         if valueRange == 0:
             valueRange = 1  # avoid float division by zero
         step = 0

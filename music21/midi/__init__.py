@@ -29,7 +29,6 @@ __all__ = [
     'DeltaTime',
     'MetaEvents', 'ChannelVoiceMessages', 'ChannelModeMessages',
     'SysExEvents',
-    'EnumerationException',
 ]
 
 import io
@@ -59,10 +58,6 @@ environLocal = environment.Environment(_MOD)
 # good midi reference:
 # http://www.sonicspot.com/guide/midifiles.html
 # ------------------------------------------------------------------------------
-class EnumerationException(exceptions21.Music21Exception):
-    pass
-
-
 class MidiException(exceptions21.Music21Exception):
     pass
 

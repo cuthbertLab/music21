@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Name:         stream/__init__.py
+# Name:         stream/base.py
 # Purpose:      base classes for dealing with groups of positioned objects
 #
 # Authors:      Michael Scott Cuthbert
@@ -6623,7 +6623,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         notation, including creating voices for overlapped regions, Measures
         if necessary, creating ties, beams, accidentals, and tuplet brackets.
 
-        If `inPlace` is True, this is done in-place;
+        If `inPlace` is True, this is done in-place (changed in v7 -- returns None);
         if `inPlace` is False, this returns a modified deep copy.
 
         makeAccidentalsKeywords can be a dict specifying additional
@@ -6729,7 +6729,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if m.streamStatus.haveTupletBracketsBeenMade() is False:
                 makeNotation.makeTupletBrackets(m, inPlace=True)
 
-        return returnStream
+        if not inPlace:
+            return returnStream
 
     def extendDuration(self, objName, *, inPlace=False):
         '''
@@ -7719,7 +7720,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if s1.containerInHierarchy(n) is called, it will return m1,
         the Measure that contains the note.
 
-        Unless `setActiveSite` is False, n's activeStie will be set to m1, and
+        Unless `setActiveSite` is False, n's activeSite will be set to m1, and
         its `.offset` will be the offset in `m1`.
 
         >>> s1 = stream.Score(id='s1')
@@ -9798,7 +9799,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         findConsecutiveNotes.
 
 
-
         >>> s1 = converter.parse("tinynotation: 3/4 c4 d' r b b'", makeNotation=False)
         >>> #_DOCS_SHOW s1.show()
 
@@ -9834,33 +9834,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for i in range(len(returnList) - 1):
             firstNote = returnList[i]
             secondNote = returnList[i + 1]
-            firstPitch = None
-            secondPitch = None
-            if firstNote is not None and secondNote is not None:
-                startIsChord = False
-                endIsChord = False
-                if hasattr(firstNote, 'pitch') and firstNote.pitch is not None:
-                    firstPitch = firstNote.pitch
-                elif hasattr(firstNote, 'pitches') and firstNote.pitches:
-                    firstPitch = firstNote.pitches[0]
-                    startIsChord = True
-                if hasattr(secondNote, 'pitch') and secondNote.pitch is not None:
-                    secondPitch = secondNote.pitch
-                elif hasattr(secondNote, 'pitches') and secondNote.pitches:
-                    secondPitch = secondNote.pitches[0]
-                    endIsChord = True
-                if firstPitch is not None and secondPitch is not None:
-                    returnInterval = interval.notesToInterval(firstPitch,
-                                                              secondPitch)
-                    if startIsChord is False:
-                        returnInterval.noteStart = firstNote
-                    if endIsChord is False:
-                        returnInterval.noteEnd = secondNote
-                    returnInterval.offset = opFrac(firstNote.offset
-                                                   + firstNote.duration.quarterLength)
-                    returnInterval.duration = duration.Duration(opFrac(
-                        secondNote.offset - returnInterval.offset))
-                    returnStream.insert(returnInterval)
+            # returnList could contain None to represent a rest
+            if firstNote is None or secondNote is None:
+                continue
+            # Protect against empty chords
+            if not (firstNote.pitches and secondNote.pitches):
+                continue
+            if chord.Chord in firstNote.classSet:
+                noteStart = firstNote.notes[0]
+            else:
+                noteStart = firstNote
+            if chord.Chord in secondNote.classSet:
+                noteEnd = secondNote.notes[0]
+            else:
+                noteEnd = secondNote
+            # Prefer Note objects over Pitch objects so that noteStart is set correctly
+            returnInterval = interval.Interval(noteStart, noteEnd)
+            returnInterval.offset = opFrac(firstNote.offset + firstNote.quarterLength)
+            returnInterval.duration = duration.Duration(opFrac(
+                secondNote.offset - returnInterval.offset))
+            returnStream.insert(returnInterval)
 
         return returnStream
 
