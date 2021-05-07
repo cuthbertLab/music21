@@ -1266,12 +1266,11 @@ class RichMetadata(Metadata):
         self.pitchHighest = None
         self.pitchLowest = None
         analysisObject = discrete.Ambitus(streamObj)
-        psRange = analysisObject.getPitchSpan(streamObj)
-        if psRange is not None:
+        if analysisObject.minPitchObj is not None and analysisObject.maxPitchObj is not None:
             # may be none if no pitches are stored
             # presently, these are numbers; convert to pitches later
-            self.pitchLowest = psRange[0].nameWithOctave
-            self.pitchHighest = psRange[1].nameWithOctave
+            self.pitchLowest = analysisObject.minPitchObj.nameWithOctave
+            self.pitchHighest = analysisObject.maxPitchObj.nameWithOctave
         ambitusInterval = analysisObject.getSolution(streamObj)
         self.ambitus = AmbitusShort(semitones=ambitusInterval.semitones,
                                     diatonic=ambitusInterval.diatonic.simpleName,

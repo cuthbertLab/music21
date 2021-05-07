@@ -95,7 +95,7 @@ Can I synthesize new sounds with `music21`?
 
     Yes, and no.  `Music21` is primarily built for manipulating symbolic 
     musical data not sound waves.  There are lots of great programs for
-    doing that.  But the symbolic data, however, be used as data within 
+    doing that.  But the symbolic data, however, can be used as data within 
     a large variety of synthesis packages. So you could create new
     `music21` objects that control the synthesis package of your choosing.   
     

@@ -36,8 +36,8 @@ def loadNoMagic():
 
 
 # if we are imported in an IPython environment, then load magic after half a second
-if common.runningUnderIPython():  # @UndefinedVariable
+if common.runningUnderIPython():
     from threading import Timer
     t = Timer(2, loadNoMagic)
     t.start()
-    # ipython21.load_no_magic() # @UndefinedVariable
+    # ipython21.load_no_magic()

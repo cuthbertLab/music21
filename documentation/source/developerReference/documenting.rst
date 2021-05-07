@@ -368,7 +368,7 @@ Documenting Class-Level Methods
 This is the most common type of documentation, and it ensures both excellent
 documentation and doctests. A typical example of source code might look like this::
 
-    class className():
+    class ClassName(base.Music21Object):
 
         [instance variables, __init__, etc.]
 
@@ -376,7 +376,7 @@ documentation and doctests. A typical example of source code might look like thi
             '''
             This is documentation for this method
 
-            >>> myInstance = className()
+            >>> myInstance = ClassName()
             >>> myInstance.myNewMethod(someParameters)
             >>> myUnicorn.someInstanceVariable
             'value'

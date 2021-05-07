@@ -94,11 +94,11 @@ def findFormat(fmt):
     Note that .mxl and .mx are only considered MusicXML input formats.
 
     >>> common.findFormat('mx')
-    ('musicxml', '.xml')
+    ('musicxml', '.musicxml')
     >>> common.findFormat('.mxl')
-    ('musicxml', '.xml')
+    ('musicxml', '.musicxml')
     >>> common.findFormat('musicxml')
-    ('musicxml', '.xml')
+    ('musicxml', '.musicxml')
     >>> common.findFormat('lily')
     ('lilypond', '.ly')
     >>> common.findFormat('lily.png')
@@ -121,9 +121,6 @@ def findFormat(fmt):
     ('vexflow', '.html')
     >>> common.findFormat('capx')
     ('capella', '.capx')
-
-    >>> common.findFormat('mx')
-    ('musicxml', '.xml')
 
 
     Works the same whether you have a leading dot or not:

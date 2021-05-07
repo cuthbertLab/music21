@@ -1408,29 +1408,21 @@ class Test(unittest.TestCase):
         self.assertEqual('the id', actual.id)
         self.assertEqual('start', actual.duration.tuplets[0].type)
 
-    @mock.patch('music21.note.SpacerRest')
-    @mock.patch('music21.mei.base.makeDuration')
-    @mock.patch('music21.mei.base.scaleToTuplet')
-    def testUnit2TestRestFromElement(self, mockTuplet, mockMakeDur, mockSpacer):
+    def testUnit2TestRestFromElement(self):
         '''
         spaceFromElement(): test @dur, @dots, @xml:id, and tuplet-related attributes
         '''
-        elem = ETree.Element('rest', attrib={'dur': '4', 'dots': '1', _XMLID: 'the id',
-                                             'm21TupletNum': '5', 'm21TupletNumbase': '4',
-                                             'm21TupletType': 'start'})
-        mockMakeDur.return_value = 'the duration'
-        mockNewSpace = mock.MagicMock('new rest')
-        mockSpacer.return_value = mockNewSpace
-        mockTuplet.return_value = 'tupletized'
-        expected = mockTuplet.return_value
-
+        elem = ETree.Element('rest', attrib={'dur': '4',
+                                             'dots': '1',
+                                             _XMLID: 'the id',
+                                             'm21TupletNum': '5',
+                                             'm21TupletNumbase': '4',
+                                             'm21TupletType': 'start',
+                                             })
         actual = base.spaceFromElement(elem)
-
-        self.assertEqual(expected, actual)
-        mockSpacer.assert_called_once_with(duration=mockMakeDur.return_value)
-        mockMakeDur.assert_called_once_with(1.0, 1)
-        mockTuplet.assert_called_once_with(mockSpacer.return_value, elem)
-        self.assertEqual('the id', mockNewSpace.id)
+        self.assertIsInstance(actual, note.Rest)
+        self.assertTrue(actual.style.hideObjectOnPrint)
+        self.assertEqual('the id', actual.id)
 
     def testIntegration2TestRestFromElement(self):
         '''
@@ -1450,30 +1442,30 @@ class Test(unittest.TestCase):
         self.assertEqual('start', actual.duration.tuplets[0].type)
 
     @mock.patch('music21.mei.base.restFromElement')
-    def testUnit3TestRestFromElement(self, mockRest):
+    def testUnit3TestRestFromElement(self, mockRestFromElement):
         '''
         mRestFromElement(): reacts properly to an Element with the @dur attribute
         '''
         elem = ETree.Element('mRest', attrib={'dur': '2'})
-        mockRest.return_value = 'the rest'
+        mockRestFromElement.return_value = 'the rest'
 
         actual = base.mRestFromElement(elem)
 
-        self.assertEqual(mockRest.return_value, actual)
-        mockRest.assert_called_once_with(elem, None)
+        self.assertEqual(mockRestFromElement.return_value, actual)
+        mockRestFromElement.assert_called_once_with(elem, None)
 
     @mock.patch('music21.mei.base.restFromElement')
-    def testUnit4TestRestFromElement(self, mockRest):
+    def testUnit4TestRestFromElement(self, mockRestFromElement):
         '''
         mRestFromElement(): reacts properly to an Element without the @dur attribute
         '''
         elem = ETree.Element('mRest')
-        mockRest.return_value = mock.MagicMock()
+        mockRestFromElement.return_value = mock.MagicMock()
 
         actual = base.mRestFromElement(elem)
 
-        self.assertEqual(mockRest.return_value, actual)
-        mockRest.assert_called_once_with(elem, None)
+        self.assertEqual(mockRestFromElement.return_value, actual)
+        mockRestFromElement.assert_called_once_with(elem, None)
         self.assertTrue(actual.m21wasMRest)
 
     @mock.patch('music21.mei.base.spaceFromElement')

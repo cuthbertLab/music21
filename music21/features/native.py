@@ -17,7 +17,7 @@ import math
 from typing import Optional
 
 from urllib.request import Request, urlopen
-from urllib.parse import urlencode  # @UnresolvedImport @Reimport
+from urllib.parse import urlencode
 
 
 from music21.features import base as featuresModule

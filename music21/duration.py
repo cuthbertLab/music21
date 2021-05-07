@@ -653,11 +653,11 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
     # Tuplets...
     qLen = opFrac(qLen)
     # try match to type, get next lowest for next part...
-    closestSmallerType, unused_match = quarterLengthToClosestType(qLen)
     try:
+        closestSmallerType, unused_match = quarterLengthToClosestType(qLen)
         nextLargerType(closestSmallerType)
     except DurationException:
-        # too big...
+        # too big or too small
         return QuarterLengthConversion((DurationTuple(type='inexpressible',
                                                       dots=0,
                                                       quarterLength=qLen),), None)
@@ -697,7 +697,13 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
 
     # 8 tied components was not enough.
     # last resort: put one giant tuplet over it.
-    tuplet, component = quarterLengthToNonPowerOf2Tuplet(qLen)
+    try:
+        tuplet, component = quarterLengthToNonPowerOf2Tuplet(qLen)
+    except DurationException:
+        # Failures include 1/72
+        return QuarterLengthConversion((DurationTuple(type='inexpressible',
+                                                      dots=0,
+                                                      quarterLength=qLen),), None)
     return QuarterLengthConversion((component,), tuplet)
 
 
@@ -1476,7 +1482,12 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     half tied to quintuplet sixteenth note" or simply "quarter note."
 
     A Duration object is made of one or more immutable DurationTuple objects stored on the
-    `components` list.
+    `components` list. A Duration created by setting `quarterLength` sets the attribute
+    `expressionIsInferred` to True, which indicates that consuming functions or applications
+    can express this Duration using another combination of components that sums to the
+    `quarterLength`. Otherwise, `expressionIsInferred` is set to False, indicating that
+    components are not allowed to mutate.
+    (N.B.: `music21` does not yet implement such mutating components.)
 
     Multiple DurationTuples in a single Duration may be used to express tied
     notes, or may be used to split duration across barlines or beam groups.
@@ -1513,11 +1524,16 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     (DurationTuple(type='eighth', dots=0, quarterLength=0.5),
      DurationTuple(type='32nd', dots=0, quarterLength=0.125))
 
+    >>> d2.expressionIsInferred
+    True
+
     Example 3: A Duration configured by keywords.
 
     >>> d3 = duration.Duration(type='half', dots=2)
     >>> d3.quarterLength
     3.5
+    >>> d3.expressionIsInferred
+    False
     '''
 
     # CLASS VARIABLES #
@@ -1534,7 +1550,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '_typeNeedsUpdating',
         '_unlinkedType',
         '_dotGroups',
-
+        'expressionIsInferred',
         '_client'
     )
 
@@ -1562,6 +1578,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         # defer updating until necessary
         self._quarterLengthNeedsUpdating = False
         self._linked = True
+
+        self.expressionIsInferred = False
         for a in arguments:
             if common.isNum(a) and 'quarterLength' not in keywords:
                 keywords['quarterLength'] = a
@@ -1590,6 +1608,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         # permit as keyword so can be passed from notes
         elif 'quarterLength' in keywords:
             self.quarterLength = keywords['quarterLength']
+            self.expressionIsInferred = True
 
         if 'client' in keywords:
             self.client = keywords['client']
@@ -1715,19 +1734,11 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         # this update will not be necessary
         self._quarterLengthNeedsUpdating = False
-        if self.linked:
-            try:
-                qlc = quarterConversion(self._qtrLength)
-                self.components = list(qlc.components)
-                if qlc.tuplet is not None:
-                    self.tuplets = (qlc.tuplet,)
-            except DurationException:
-                environLocal.printDebug([
-                    'problem updating components of note with quarterLength ',
-                    self.quarterLength,
-                    'chokes quarterLengthToDurations'
-                ])
-                raise
+        if self.linked and self.expressionIsInferred:
+            qlc = quarterConversion(self._qtrLength)
+            self.components = list(qlc.components)
+            if qlc.tuplet is not None:
+                self.tuplets = (qlc.tuplet,)
         self._componentsNeedUpdating = False
 
     # PUBLIC METHODS #
@@ -1786,10 +1797,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         if isinstance(dur, DurationTuple):
             self._components.append(dur)
-        elif isinstance(dur, Duration):  # its a Duration object
+        elif isinstance(dur, Duration):  # it's a Duration object
             for c in dur.components:
                 self._components.append(c)
-        else:  # its a number that may produce more than one component
+        else:  # it's a number that may produce more than one component
             for c in Duration(dur).components:
                 self._components.append(c)
 
@@ -1816,8 +1827,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         True
         '''
         newTuplet.frozen = True
-        self.tuplets = self.tuplets + (newTuplet,)
-        self.informClient()
+        self.tuplets = self._tuplets + (newTuplet,)
 
     def augmentOrDiminish(self, amountToScale, retainComponents=False):
         '''
@@ -2115,7 +2125,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         For an 'inexpressible' duration, the opposite of consolidate is
         to set the duration's quarterLength to itself.  It won't necessarily
-        return to the original components, but it will (usually? always?)
+        return to the original components, but it will usually
         create something that can be notated.
 
         >>> a.quarterLength = a.quarterLength
@@ -2162,7 +2172,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         >>> gd = d.getGraceDuration()
         >>> gd
-        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.GraceDuration unlinked type:complex quarterLength:0.0>
         >>> gd.quarterLength
         0.0
         >>> gd.components
@@ -2188,6 +2198,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             newComponents.append(DurationTuple(c.type, c.dots, 0.0))
         gd.components = newComponents  # set new components
         gd.linked = False
+        gd.type = self.type
         gd.quarterLength = 0.0
         return gd
 
@@ -2784,6 +2795,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             if value == 0.0 and self.linked is True:
                 self.clear()
             self._qtrLength = value
+            self.expressionIsInferred = True
             self._componentsNeedUpdating = True
             self._quarterLengthNeedsUpdating = False
 
@@ -2839,7 +2851,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     @property
     def tuplets(self) -> Tuple[Tuplet, ...]:
         '''
-        return a tuple of Tuplet objects
+        Return a tuple of Tuplet objects.
+        Setting tuplets will inform the client (Note) that the duration has changed.
         '''
         if self._componentsNeedUpdating:
             self._updateComponents()
@@ -2850,6 +2863,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         # environLocal.printDebug(['assigning tuplets in Duration', tupletTuple])
         self._tuplets = tuple(tupletTuple)
         self._quarterLengthNeedsUpdating = True
+        self.informClient()
 
     def aggregateTupletMultiplier(self) -> OffsetQL:
         '''
@@ -3584,7 +3598,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(d.components),
                          "(DurationTuple(type='eighth', dots=0, quarterLength=0.5),)")
         self.assertFalse(d._componentsNeedUpdating)
-        self.assertTrue(d._quarterLengthNeedsUpdating)
+        self.assertFalse(d._quarterLengthNeedsUpdating)
         self.assertEqual(repr(d.quarterLength), 'Fraction(1, 3)')
         self.assertEqual(str(unitSpec(d)), "(Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')")
 
@@ -3641,6 +3655,16 @@ class Test(unittest.TestCase):
             'Dotted Quarter Septuplet (6/7 QL)',
             Duration(fractions.Fraction(6 / 7)).fullName
         )
+
+    def testTinyDuration(self):
+        # e.g. delta from chordify: 1/9 - 1/8 = 1/72
+        # exercises quarterLengthToNonPowerOf2Tuplet()
+        d = Duration(1 / 72)
+        self.assertEqual(d.type, 'inexpressible')
+
+        # this failure happens earlier in quarterConversion()
+        d = Duration(1 / 2049)
+        self.assertEqual(d.type, 'inexpressible')
 
 
 # -------------------------------------------------------------------------------

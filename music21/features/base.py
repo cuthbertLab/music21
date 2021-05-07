@@ -538,7 +538,6 @@ class DataInstance:
     multiple commonly-used stream representations once, providing rapid processing.
     '''
     # pylint: disable=redefined-builtin
-
     def __init__(self, streamOrPath=None, id=None):  # @ReservedAssignment
         if isinstance(streamOrPath, stream.Stream):
             self.stream = streamOrPath
@@ -897,7 +896,6 @@ class DataSet:
             self.addData(d, cv, thisId)
 
     # pylint: disable=redefined-builtin
-
     def addData(self, dataOrStreamOrPath, classValue=None, id=None):  # @ReservedAssignment
         '''
         Add a Stream, DataInstance, MetadataEntry, or path (Posix or str)
@@ -967,7 +965,7 @@ class DataSet:
 
     def _processNonParallel(self):
         '''
-        The traditional method: run non-parallel
+        The traditional way: run non-parallel
         '''
         # clear features
         self.features = []
@@ -1083,7 +1081,7 @@ class DataSet:
             raise DataSetException('no output format could be defined from file path '
                                    + f'{fp} or format {format}')
 
-        outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
+        return outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
 
 def _dataSetParallelSubprocess(dataInstance, failFast):
@@ -1424,9 +1422,14 @@ class Test(unittest.TestCase):
             'Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,'
             'Range_of_Note_Quarter_Lengths,Composer//3,1.0,1.5,Bach//8,0.5,3.75,Corelli')
 
-        ds.write(format='tab')
-        ds.write(format='csv')
-        ds.write(format='arff')
+        fp1 = ds.write(format='tab')
+        fp2 = ds.write(format='csv')
+        # Also test providing fp
+        fp3 = environLocal.getTempFile(suffix='.arff')
+        ds.write(fp=fp3, format='arff')
+
+        for fp in (fp1, fp2, fp3):
+            os.remove(fp)
 
     def testFeatureFail(self):
         from music21 import features
@@ -1809,7 +1812,7 @@ class Test(unittest.TestCase):
         from music21 import features
 
         # Need explicit import for pickling within the testSingleCoreAll context
-        from music21.features.base import _pickleFunctionNumPitches  # @UnresolvedImport
+        from music21.features.base import _pickleFunctionNumPitches
         import textwrap
 
         self.maxDiff = None

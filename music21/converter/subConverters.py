@@ -236,6 +236,8 @@ class SubConverter:
         >>> tf = str(lpConverter.getTemporaryFile(subformats=['png']))
         >>> tf.endswith('.png')
         True
+        >>> import os  #_DOCS_HIDE
+        >>> os.remove(tf)  #_DOCS_HIDE
 
         Changed in v.6 -- returns pathlib.Path
         '''
@@ -264,36 +266,28 @@ class SubConverter:
         else:
             writeFlags = 'wb'
 
-        if self.codecWrite is False:
-            if hasattr(fp, 'write'):
-                # is a file-like object
-                f = fp
-            else:
-                fp = common.cleanpath(fp)
-                f = open(fp, writeFlags)
-
+        if self.codecWrite is False and isinstance(dataStr, bytes):
             try:
-                if isinstance(dataStr, bytes):
-                    f.write(dataStr.decode('utf-8'))
+                dataStr = dataStr.decode('utf-8')
+            except UnicodeDecodeError:
+                # Reattempt below with self.stringEncoding
+                self.codecWrite = True
+                # Close file if already open, because we need to reopen with encoding
+                if hasattr(fp, 'write'):
+                    fp.close()
 
-                else:
-                    f.write(dataStr)
-            except UnicodeEncodeError:
-                f.close()
-                f = io.open(fp, mode=writeFlags, encoding=self.stringEncoding)
+        if not hasattr(fp, 'write'):
+            fp = common.cleanpath(fp)
+            with open(fp,
+                      mode=writeFlags,
+                      encoding=self.stringEncoding if self.codecWrite else None
+                      ) as f:
                 f.write(dataStr)
-                f.close()
-
-            except TypeError as te:
-                raise SubConverterException(f'Could not convert {dataStr!r} : {te!r}')
         else:
-            if hasattr(fp, 'write'):
-                # is a file-like object
-                f = fp
-            else:
-                f = io.open(fp, mode=writeFlags, encoding=self.stringEncoding)
+            # file-like object
             f.write(dataStr)
             f.close()
+
         return fp
 
 
@@ -316,7 +310,7 @@ class ConverterIPython(SubConverter):
     #     '''
     #     import random
     #     from music21.vexflow import toMusic21j
-    #     from IPython.display import HTML # @UnresolvedImport
+    #     from IPython.display import HTML
     #     vfp = toMusic21j.VexflowPickler()
     #     vfp.mode = 'jsonSplit'
     #     outputCode = vfp.fromObject(s)
@@ -643,7 +637,8 @@ class ConverterHumdrum(SubConverter):
 
     def parseData(self, humdrumString, number=None):
         '''
-        Open Humdrum data from a string -- calls humdrum.parseData()
+        Open Humdrum data from a string -- calls
+        :meth:`~music21.humdrum.spineParser.HumdrumDataCollection.parse()`.
 
         >>> humData = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n' +
         ...     '24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-')
@@ -655,13 +650,13 @@ class ConverterHumdrum(SubConverter):
             {0.0} <music21.humdrum.spineParser.MiscTandem **kern>
             {0.0} <music21.stream.Measure 1 offset=0.0>
                 {0.0} <music21.meter.TimeSignature 2/4>
-                {0.0} <music21.note.Rest rest>
+                {0.0} <music21.note.Rest 1/6ql>
                 {0.1667} <music21.note.Note G#>
                 {0.3333} <music21.note.Note F#>
                 {0.5} <music21.note.Note E>
                 {0.6667} <music21.note.Note C#>
                 {0.8333} <music21.note.Note F>
-                {1.0} <music21.note.Rest rest>
+                {1.0} <music21.note.Rest 1/6ql>
                 {1.1667} <music21.note.Note D>
                 {1.3333} <music21.note.Note E->
                 {1.5} <music21.note.Note G>
@@ -724,7 +719,7 @@ class ConverterTinyNotation(SubConverter):
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 3/4>
             {0.0} <music21.note.Note E>
-            {1.0} <music21.note.Rest rest>
+            {1.0} <music21.note.Rest quarter>
             {2.0} <music21.note.Note F#>
         {3.0} <music21.stream.Measure 2 offset=3.0>
             {0.0} <music21.note.Note G>
@@ -835,19 +830,24 @@ class ConverterMusicXML(SubConverter):
     '''
     registerFormats = ('musicxml', 'xml')
     registerInputExtensions = ('xml', 'mxl', 'mx', 'musicxml')
-    registerOutputExtensions = ('xml', 'mxl')
+    registerOutputExtensions = ('musicxml', 'xml', 'mxl')
     registerOutputSubformatExtensions = {'png': 'png',
                                          'pdf': 'pdf',
                                          }
 
-    # --------------------------------------------------------------------------
-    def findPNGfpFromXMLfp(self, xmlFilePath: Union[str, pathlib.Path]) -> str:
+    @staticmethod
+    def findNumberedPNGPath(inputFp: Union[str, pathlib.Path]) -> str:
         '''
-        Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
-        then return appropriate fp. Raises and exception if png fp does not exist.
+        Find the first numbered file path corresponding to the provided unnumbered file path
+        ending in ".png". Raises an exception if no file can be found.
+
+        Renamed in v7.
         '''
-        xmlFilePath = str(xmlFilePath)  # not pathlib.
-        path_without_extension = xmlFilePath[:-4]
+        inputFp = str(inputFp)  # not pathlib.
+        if not inputFp.endswith('.png'):
+            raise SubConverterException(f'inputFp must end with ".png"; got {inputFp}')
+
+        path_without_extension = inputFp[:-1 * len('.png')]
 
         for search_extension in ('1', '01', '001', '0001', '00001'):
             search_path = path_without_extension + '-' + search_extension + '.png'
@@ -855,7 +855,7 @@ class ConverterMusicXML(SubConverter):
                 return search_path
 
         raise SubConverterFileIOException(
-            f'No png file for {xmlFilePath} (such as {path_without_extension}-1.png) was found.  '
+            f'No png file for {inputFp} (such as {path_without_extension}-1.png) was found.  '
             + 'The conversion to png failed'
         )
 
@@ -920,7 +920,9 @@ class ConverterMusicXML(SubConverter):
         else:
             subformatExtension = subformats[0]
 
-        fpOut = str(fp)[:-3]
+        if not str(fp).endswith('.musicxml'):
+            raise ValueError('fp must end with the extension .musicxml')
+        fpOut = str(fp)[:-1 * len('musicxml')]
         fpOut += subformatExtension
 
         musescoreRun = [str(musescorePath), fp, '-o', fpOut, '-T', '0']
@@ -938,16 +940,42 @@ class ConverterMusicXML(SubConverter):
         sys.stderr = storedStrErr
 
         if subformatExtension == 'png':
-            return self.findPNGfpFromXMLfp(fpOut)
+            return ConverterMusicXML.findNumberedPNGPath(fpOut)
         else:
             return fpOut
         # common.cropImageFromPath(fp)
 
-    def writeDataStream(self, fp, dataBytes: bytes):  # pragma: no cover
+    def writeDataStream(self, fp, dataBytes: bytes) -> pathlib.Path:  # pragma: no cover
+        '''
+        Writes `dataBytes` to `fp`.
+        Adds `.musicxml` suffix to `fp` if it does not already contain some suffix.
+
+        Changed in v7 -- returns a pathlib.Path
+
+        OMIT_FROM_DOCS
+
+        >>> import os
+        >>> from music21.converter.subConverters import ConverterMusicXML
+        >>> fp = 'nosuffix'
+        >>> sub = ConverterMusicXML()
+        >>> outFp = sub.writeDataStream(fp, b'')
+        >>> str(outFp).endswith('.musicxml')
+        True
+
+        >>> os.remove(outFp)
+        >>> fp = 'other.suffix'
+        >>> outFp = sub.writeDataStream(fp, b'')
+        >>> str(outFp).endswith('.suffix')
+        True
+        >>> os.remove(outFp)
+        '''
         if fp is None:
             fp = self.getTemporaryFile()
         else:
-            fp = common.cleanpath(fp)
+            fp = common.cleanpath(fp, returnPathlib=True)
+
+        if not fp.suffix:
+            fp = fp.with_suffix('.musicxml')
 
         writeFlags = 'wb'
 
@@ -960,7 +988,7 @@ class ConverterMusicXML(SubConverter):
     def write(self, obj, fmt, fp=None, subformats=None,
               compress=False, **keywords):  # pragma: no cover
         '''
-        Write to a .xml file.
+        Write to a .musicxml file.
         Set `compress=True` to immediately compress the output to a .mxl file.
         '''
         from music21.musicxml import archiveTools, m21ToXml
@@ -978,12 +1006,12 @@ class ConverterMusicXML(SubConverter):
         dataBytes: bytes = generalExporter.parse()
 
         writeDataStreamFp = fp
-        if fp is not None and subformats is not None:
+        if fp is not None and subformats:  # could be empty list
             fpStr = str(fp)
             noExtFpStr = os.path.splitext(fpStr)[0]
-            writeDataStreamFp = noExtFpStr + '.xml'
+            writeDataStreamFp = noExtFpStr + '.musicxml'
 
-        xmlFp = self.writeDataStream(writeDataStreamFp, dataBytes)
+        xmlFp: pathlib.Path = self.writeDataStream(writeDataStreamFp, dataBytes)
 
         if subformats is not None and 'png' in subformats:
             defaults.title = savedDefaultTitle
@@ -1138,7 +1166,7 @@ class ConverterRomanText(SubConverter):
     def parseData(self, strData, number=None):
         from music21.romanText import rtObjects
         from music21.romanText import translate as romanTextTranslate
-        rtf = rtObjects.RTFile()  # not sure why -- @UndefinedVariable
+        rtf = rtObjects.RTFile()
         rtHandler = rtf.readstr(strData)
         if rtHandler.definesMovements():
             # this re-defines Score as an Opus
@@ -1418,33 +1446,27 @@ class Test(unittest.TestCase):
 
     def testXMLtoPNG(self):
         '''
-        testing the findPNGfpFromXMLfp method with three different files of lengths
-        that create .png files with -1, -01, and -001 in the fp
+        Testing findNumberedPNGPath() with files of lengths
+        that create .png files with -1, -01, -001, and -0001 in the fp
         '''
         env = environment.Environment()
-        for ext_base in '1', '01', '001':
+        for ext_base in '1', '01', '001', '0001':
             png_ext = '-' + ext_base + '.png'
 
-            tempFp1 = str(env.getTempFile())
-            xmlFp1 = tempFp1 + '.xml'
-            os.rename(tempFp1, tempFp1 + png_ext)
-            tempFp1 += png_ext
-            xmlConverter1 = ConverterMusicXML()
-            pngFp1 = xmlConverter1.findPNGfpFromXMLfp(xmlFp1)
-            self.assertEqual(pngFp1, tempFp1)
+            tmp = env.getTempFile(suffix='.png', returnPathlib=False)
+            tmpNumbered = tmp.replace('.png', png_ext)
+            os.rename(tmp, tmpNumbered)
+            pngFp1 = ConverterMusicXML.findNumberedPNGPath(tmp)
+            self.assertEqual(pngFp1, tmpNumbered)
+            os.remove(tmpNumbered)
 
-
-    def testXMLtoPNGTooLong(self):
-        '''
-        testing the findPNGfpFromXMLfp method with a file that is obscenely long
-        '''
-        env = environment.Environment()
-        tempFp = str(env.getTempFile())
-        xmlFp = tempFp + '.xml'
-        os.rename(tempFp, tempFp + '-0000001.png')
-        tempFp += '-0000001.png'
-        xmlConverter = ConverterMusicXML()
-        self.assertRaises(SubConverterFileIOException, xmlConverter.findPNGfpFromXMLfp, xmlFp)
+        # Now with a very long path.
+        tmp = env.getTempFile(suffix='.png', returnPathlib=False)
+        tmpNumbered = tmp.replace('.png', '-0000001.png')
+        os.rename(tmp, tmpNumbered)
+        with self.assertRaises(SubConverterFileIOException):
+            ConverterMusicXML.findNumberedPNGPath(tmpNumbered)
+        os.remove(tmpNumbered)
 
     def testWriteMXL(self):
         from music21 import converter
@@ -1453,6 +1475,7 @@ class Test(unittest.TestCase):
         s = converter.parseData(testPrimitive.multiDigitEnding)
         mxlPath = s.write('mxl')
         self.assertTrue(str(mxlPath).endswith('.mxl'))
+        os.remove(mxlPath)
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover

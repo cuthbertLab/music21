@@ -47,6 +47,7 @@ import unittest
 import urllib
 import zipfile
 
+from math import isclose
 from typing import Union, Tuple
 
 __all__ = [
@@ -133,7 +134,8 @@ class ArchiveManager:
             if self.fp.suffix in ('.mxl', '.md'):
                 # try to open it, as some mxl files are not zips
                 try:
-                    unused = zipfile.ZipFile(self.fp, 'r')
+                    with zipfile.ZipFile(self.fp, 'r') as unused:
+                        pass
                 except zipfile.BadZipfile:
                     return False
                 return True
@@ -149,10 +151,9 @@ class ArchiveManager:
         '''
         post = []
         if self.archiveType == 'zip':
-            f = zipfile.ZipFile(self.fp, 'r')
-            for subFp in f.namelist():
-                post.append(subFp)
-            f.close()
+            with zipfile.ZipFile(self.fp, 'r') as f:
+                for subFp in f.namelist():
+                    post.append(subFp)
         return post
 
     def getData(self, name=None, dataFormat='musicxml'):
@@ -167,8 +168,12 @@ class ArchiveManager:
         if self.archiveType != 'zip':
             raise ArchiveManagerException(f'no support for extension: {self.archiveType}')
 
-        f = zipfile.ZipFile(self.fp, 'r')
+        with zipfile.ZipFile(self.fp, 'r') as f:
+            post = self._extractContents(f, name, dataFormat)
 
+        return post
+
+    def _extractContents(self, f: zipfile.ZipFile, name=None, dataFormat='musicxml'):
         if name is None and dataFormat == 'musicxml':  # try to auto-harvest
             # will return data as a string
             # note that we need to read the META-INF/container.xml file
@@ -230,8 +235,6 @@ class ArchiveManager:
                 # post.append(component.read())
                 # post.append(f.read(subFp, 'U'))
                 # msg.append('\n/END\n')
-
-        f.close()
 
         return post
 
@@ -630,7 +633,8 @@ class Converter:
         self.subConverter.keywords = keywords
         self.subConverter.parseData(dataStr, number=number)
 
-    def parseURL(self, url, format=None, number=None, **keywords):  # @ReservedAssignment
+    def parseURL(self, url, *, format=None, number=None,
+                 forceSource=False, **keywords):  # @ReservedAssignment
         '''Given a url, download and parse the file
         into a music21 Stream stored in the `stream`
         property of the converter object.
@@ -638,11 +642,15 @@ class Converter:
         Note that this checks the user Environment
         `autoDownload` setting before downloading.
 
+        Use `forceSource=True` to download every time rather than read from a cached file.
+
         >>> jeanieLightBrownURL = ('https://github.com/cuthbertLab/music21/raw/master' +
         ...        '/music21/corpus/leadSheet/fosterBrownHair.mxl')
         >>> c = converter.Converter()
         >>> #_DOCS_SHOW c.parseURL(jeanieLightBrownURL)
         >>> #_DOCS_SHOW jeanieStream = c.stream
+
+        Changed in v.7 -- made keyword-only and added `forceSource` option.
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload in ('deny', 'ask'):
@@ -669,7 +677,7 @@ class Converter:
         dst = self._getDownloadFp(directory, ext, url)  # returns pathlib.Path
         urlretrieve = urllib.request.urlretrieve
 
-        if not dst.exists():
+        if forceSource is True or not dst.exists():
             try:
                 environLocal.printDebug(['downloading to:', str(dst)])
                 fp, unused_headers = urlretrieve(url, filename=str(dst))
@@ -1040,14 +1048,17 @@ def parseData(dataStr, number=None, format=None, **keywords):  # @ReservedAssign
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-def parseURL(url, number=None, format=None, forceSource=False, **keywords):  # @ReservedAssignment
+def parseURL(url, *, format=None, number=None,
+             forceSource=False, **keywords):  # @ReservedAssignment
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
     URL downloading will not happen automatically unless the user has set their
     Environment "autoDownload" preference to "allow".
+
+    Changed in v.7 -- made keyword-only.
     '''
     v = Converter()
-    v.parseURL(url, format=format, **keywords)
+    v.parseURL(url, format=format, forceSource=forceSource, **keywords)
     return v.stream
 
 
@@ -1098,19 +1109,6 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     >>> s = converter.parse("2/16 E4 r f# g=lastG trip{b-8 a g} c", format='tinyNotation').flat
     >>> s.getElementsByClass(meter.TimeSignature).first()
     <music21.meter.TimeSignature 2/16>
-
-    .. tip::
-
-        Unlike musicxml, MIDI files are unmeasured. Call :meth:`~music21.stream.Stream.makeNotation`
-        on the parsed result if you wish measures to be created before further manipulation.
-
-        Save the result of `makeNotation`, or use `inPlace=True`::
-
-            unmeasuredStream = converter.parse('/Users/you/Desktop/source.mid')
-            measuredStream = unmeasuredStream.makeNotation()
-
-        This is particularly important when writing formats that do not run `makeNotation` as
-        a convenience during the export (musicxml does; lilypond doesn't.)
     '''
     # environLocal.printDebug(['attempting to parse()', value])
     if 'forceSource' in keywords:
@@ -1313,14 +1311,14 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testMusicXMLConversion(self):
         from music21.musicxml import testFiles
-        for mxString in testFiles.ALL:  # @UndefinedVariable
+        for mxString in testFiles.ALL:
             a = subConverters.ConverterMusicXML()
             a.parseData(mxString)
 
     def testMusicXMLTabConversion(self):
         from music21.musicxml import testFiles
 
-        mxString = testFiles.ALL[5]  # @UndefinedVariable
+        mxString = testFiles.ALL[5]
         a = subConverters.ConverterMusicXML()
         a.parseData(mxString)
 
@@ -1362,12 +1360,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
         urlB = urlBase + 'schubert/piano/d0576&file=d0576-06.krn&f=kern'
         urlC = urlBase + 'bach/cello&file=bwv1007-01.krn&f=xml'
-        for url in [urlB, urlC]:
-            try:
-                unused_post = parseURL(url)
-            except:
-                print(url)
-                raise
+        unused_post = parseURL(urlB)
+        unused_post = parseURL(urlC)
 
     def testFreezer(self):
         from music21 import corpus
@@ -1581,12 +1575,12 @@ class Test(unittest.TestCase):
     def testConversionMXMetadata(self):
         from music21.musicxml import testFiles
 
-        a = parse(testFiles.mozartTrioK581Excerpt)  # @UndefinedVariable
+        a = parse(testFiles.mozartTrioK581Excerpt)
         self.assertEqual(a.metadata.composer, 'Wolfgang Amadeus Mozart')
         self.assertEqual(a.metadata.title, 'Quintet for Clarinet and Strings')
         self.assertEqual(a.metadata.movementName, 'Menuetto (Excerpt from Second Trio)')
 
-        a = parse(testFiles.binchoisMagnificat)  # @UndefinedVariable
+        a = parse(testFiles.binchoisMagnificat)
         self.assertEqual(a.metadata.composer, 'Gilles Binchois')
         # this gets the best title available, even though this is movement title
         self.assertEqual(a.metadata.title, 'Excerpt from Magnificat secundi toni')
@@ -1690,12 +1684,13 @@ class Test(unittest.TestCase):
         # environLocal.printDebug(['\n' + 'opening fp', fp])
 
         self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 2)
-        self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 4)
+        self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 5)
 
-        self.assertEqual(len(s.flat.getElementsByClass(meter.TimeSignature)), 0)
+        # MIDI import makes measures, so we will have one 4/4 time sig
+        self.assertEqual(len(s.flat.getElementsByClass(meter.TimeSignature)), 1)
         self.assertEqual(len(s.flat.getElementsByClass(key.KeySignature)), 0)
 
-        # this sample has eight note triplets
+        # this sample has eighth note triplets
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test06.mid'
         s = parseFile(fp)
         # s.show()
@@ -1881,12 +1876,11 @@ class Test(unittest.TestCase):
         Checks quantization when parsing a stream. Here everything snaps to the 8th note.
         '''
         from music21 import omr
-        from music21.common import numberTools
         midiFp = omr.correctors.pathName + os.sep + 'k525short.mid'
         midiStream = parse(midiFp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
         # midiStream.show()
         for n in midiStream.recurse(classFilter='Note'):
-            self.assertTrue(numberTools.almostEquals(n.quarterLength % 0.5, 0.0))
+            self.assertTrue(isclose(n.quarterLength % 0.5, 0.0, abs_tol=1e-7))
 
     def testParseMidiNoQuantize(self):
         '''
@@ -1951,12 +1945,26 @@ class Test(unittest.TestCase):
             parse('nonexistent_path_ending_in_correct_extension.musicxml')
 
     def testParseURL(self):
-        urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
-        url = urlBase + 'chopin/prelude&file=prelude28-20.krn&format=kern'
+        from music21.humdrum.spineParser import HumdrumException
+
+        urlBase = 'https://raw.githubusercontent.com/craigsapp/chopin-preludes/'
+        url = urlBase + 'f8fb01f09d717e84929fb8b2950f96dd6bc05686/kern/prelude28-20.krn'
 
         e = environment.Environment()
         e['autoDownload'] = 'allow'
         s = parseURL(url)
+        self.assertEqual(len(s.parts), 2)
+
+        # This file should have been written, above
+        destFp = Converter()._getDownloadFp(e.getRootTempDir(), '.krn', url)
+        # Hack garbage into it so that we can test whether or not forceSource works
+        with open(destFp, 'a') as fp:
+            fp.write('all sorts of garbage that Humdrum cannot parse')
+
+        with self.assertRaises(HumdrumException):
+            s = parseURL(url, forceSource=False)
+
+        s = parseURL(url, forceSource=True)
         self.assertEqual(len(s.parts), 2)
 
 

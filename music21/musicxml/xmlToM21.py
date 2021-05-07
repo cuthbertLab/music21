@@ -18,6 +18,8 @@ import re
 # import sys
 # import traceback
 import unittest
+
+from math import isclose
 from typing import List, Optional, Dict, Tuple, Set
 
 import xml.etree.ElementTree as ET
@@ -369,12 +371,12 @@ class XMLParserBase:
             stObj = None
 
         if not common.isIterable(musicXMLNames):
-            musicXMLNames = [musicXMLNames]
+            musicXMLNames = (musicXMLNames,)
 
         if m21Names is None:
-            m21Names = [common.hyphenToCamelCase(x) for x in musicXMLNames]
+            m21Names = (common.hyphenToCamelCase(x) for x in musicXMLNames)
         elif not common.isIterable(m21Names):
-            m21Names = [m21Names]
+            m21Names = (m21Names,)
 
         for xmlName, m21Name in zip(musicXMLNames, m21Names):
             mxValue = mxObject.get(xmlName)
@@ -472,7 +474,7 @@ class XMLParserBase:
         '''
         Sets m21Object.style.color to be the same as color...
         '''
-        self.setStyleAttributes(mxObject, m21Object, 'color')
+        self.setStyleAttributes(mxObject, m21Object, 'color', 'color')
 
     def setFont(self, mxObject, m21Object):
         '''
@@ -1798,7 +1800,7 @@ class PartParser(XMLParserBase):
 
         >>> measureRest = m.notesAndRests[0]
         >>> measureRest
-        <music21.note.Rest rest>
+        <music21.note.Rest dotted-half>
         >>> measureRest.duration.type
         'half'
         >>> measureRest.duration.quarterLength
@@ -1984,6 +1986,17 @@ class PartParser(XMLParserBase):
 
         sets self.lastMeasureWasShort to True or False if it is an incomplete measure
         that is not a pickup.
+
+        >>> m = stream.Measure([meter.TimeSignature('4/4'), harmony.ChordSymbol('C7')])
+        >>> m.highestTime
+        0.0
+        >>> PP = musicxml.xmlToM21.PartParser()
+        >>> PP.setLastMeasureInfo(m)
+        >>> PP.adjustTimeAttributesFromMeasure(m)
+        >>> m.highestTime
+        4.0
+        >>> PP.lastMeasureWasShort
+        False
         '''
         # note: we cannot assume that the time signature properly
         # describes the offsets w/n this bar. need to look at
@@ -1999,7 +2012,9 @@ class PartParser(XMLParserBase):
         if mHighestTime >= lastTimeSignatureQuarterLength:
             mOffsetShift = mHighestTime
 
-        elif mHighestTime == 0.0 and not m.recurse().notesAndRests:
+        elif (mHighestTime == 0.0
+              and not m.recurse().notesAndRests.getElementsNotOfClass('Harmony')
+              ):
             # this routine fixes a bug in PDFtoMusic and other MusicXML writers
             # that omit empty rests in a Measure.  It is a very quick test if
             # the measure has any notes.  Slower if it does not.
@@ -2007,6 +2022,7 @@ class PartParser(XMLParserBase):
             r.duration.quarterLength = lastTimeSignatureQuarterLength
             m.insert(0.0, r)
             mOffsetShift = lastTimeSignatureQuarterLength
+            self.lastMeasureWasShort = False
 
         else:  # use time signature
             # for the first measure, this may be a pickup
@@ -2385,20 +2401,46 @@ class MeasureParser(XMLParserBase):
 
     def xmlBackup(self, mxObj):
         '''
-        parse a backup tag by changing .offsetMeasureNote
+        Parse a backup tag by changing :attr:`offsetMeasureNote`.
+
+        A floor of 0.0 is enforced in case of float rounding issues.
+
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.divisions = 100
+        >>> MP.offsetMeasureNote = 1.9979
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> mxBackup = EL('<backup><duration>100</duration></backup>')
+        >>> MP.xmlBackup(mxBackup)
+        >>> MP.offsetMeasureNote
+        0.9979
+
+        >>> MP.xmlBackup(mxBackup)
+        >>> MP.offsetMeasureNote
+        0.0
         '''
-        try:
-            change = float(mxObj.find('duration').text.strip()) / self.divisions
+        mxDuration = mxObj.find('duration')
+        if mxDuration is not None and textStripValid(mxDuration):
+            change = common.numberTools.opFrac(
+                float(mxDuration.text.strip()) / self.divisions
+            )
             self.offsetMeasureNote -= change
-        except AttributeError:
-            pass
+            # check for negative offsets produced by
+            # musicxml durations with float rounding issues
+            # https://github.com/cuthbertLab/music21/issues/971
+            self.offsetMeasureNote = max(self.offsetMeasureNote, 0.0)
 
     def xmlForward(self, mxObj):
         '''
-        parse a forward tag by changing .offsetMeasureNote
+        Parse a forward tag by changing :attr:`offsetMeasureNote`.
         '''
-        change = float(mxObj.find('duration').text.strip()) / self.divisions
-        self.offsetMeasureNote += change
+        mxDuration = mxObj.find('duration')
+        if mxDuration is not None and textStripValid(mxDuration):
+            change = common.numberTools.opFrac(
+                float(mxDuration.text.strip()) / self.divisions
+            )
+            # Allow overfilled measures for now -- TODO(someday): warn?
+            self.offsetMeasureNote += change
 
     def xmlPrint(self, mxPrint):
         '''
@@ -2575,6 +2617,8 @@ class MeasureParser(XMLParserBase):
         <music21.pitch.Pitch A3>
         >>> c.pitches[1]
         <music21.pitch.Pitch B3>
+        >>> c.duration
+        <music21.duration.Duration unlinked type:quarter quarterLength:0.75>
 
         >>> a = EL('<note><pitch><step>A</step><octave>3</octave></pitch>'
         ...        + qnDuration
@@ -2674,7 +2718,8 @@ class MeasureParser(XMLParserBase):
 
         # TODO: beams over rests?
         '''
-        n = note.Note()
+        d = self.xmlToDuration(mxNote)
+        n = note.Note(duration=d)
 
         # send whole note since accidental display not in <pitch>
         self.xmlToPitch(mxNote, n.pitch)
@@ -2759,7 +2804,7 @@ class MeasureParser(XMLParserBase):
         # TODO: get number to preserve
         # not to-do: repeater; is deprecated.
         self.setColor(mxBeam, beamOut)
-        self.setStyleAttributes(mxBeam, beamOut, 'fan')
+        self.setStyleAttributes(mxBeam, beamOut, 'fan', 'fan')
 
         try:
             mxType = mxBeam.text.strip()
@@ -3006,7 +3051,7 @@ class MeasureParser(XMLParserBase):
         >>> mxr = EL('<note><rest/><duration>5040</duration><type>eighth</type></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> r
-        <music21.note.Rest rest>
+        <music21.note.Rest eighth>
         >>> r.duration.quarterLength
         0.5
 
@@ -3015,7 +3060,7 @@ class MeasureParser(XMLParserBase):
         ...              '</rest><duration>5040</duration><type>eighth</type></note>')
         >>> r = MP.xmlToRest(mxr)
         >>> r
-        <music21.note.Rest rest>
+        <music21.note.Rest eighth>
 
         A rest normally lies at B4 in treble clef, but here we have put it at
         G4, so we'll shift it down two steps.
@@ -3043,7 +3088,8 @@ class MeasureParser(XMLParserBase):
         Note that we do NOT set `r`'s `.fullMeasure` to True or always, but keep it as
         "auto" so that changes in time signature, etc. will affect output.
         '''
-        r = note.Rest()
+        d = self.xmlToDuration(mxRest)
+        r = note.Rest(duration=d)
         mxRestTag = mxRest.find('rest')
         if mxRestTag is None:
             raise MusicXMLImportException('do not call xmlToRest on a <note> unless it '
@@ -3051,7 +3097,7 @@ class MeasureParser(XMLParserBase):
         isFullMeasure = mxRestTag.get('measure')
         if isFullMeasure == 'yes':
             self.fullMeasureRest = True  # force full measure rest...
-            r.measureRest = True
+            r.fullMeasure = True
             # this attribute is not 100% necessary to get a multi-measure rest spanner
 
         if self.parent:  # will apply if active
@@ -3085,13 +3131,21 @@ class MeasureParser(XMLParserBase):
     def xmlNoteToGeneralNoteHelper(self, n, mxNote, freeSpanners=True):
         '''
         Combined function to work on all <note> tags, where n can be
-        a Note or Rest
+        a Note or Rest.
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> n = note.Note()
+        >>> mxNote = EL('<note color="silver"></note>')
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> n = MP.xmlNoteToGeneralNoteHelper(n, mxNote)
+        >>> n.style.color
+        'silver'
         '''
         spannerBundle = self.spannerBundle
         if freeSpanners is True:
             spannerBundle.freePendingSpannedElementAssignment(n)
 
-        # attributes
+        # attributes, including color and position
         self.setPrintStyle(mxNote, n)
         # print object == 'no' and grace notes may have a type but not
         # a duration. they may be filtered out at the level of Stream
@@ -3121,16 +3175,12 @@ class MeasureParser(XMLParserBase):
                 # this technically puts it in the
                 # wrong place in the sequence, but it won't matter
                 ET.SubElement(mxNote, '<type>eighth</type>')
-
-        self.xmlToDuration(mxNote, n.duration)
+            self.xmlToDuration(mxNote, n.duration)
 
         # type styles
         mxType = mxNote.find('type')
         if mxType is not None:
             self.setStyleAttributes(mxType, n, 'size', 'noteSize')
-
-        self.setColor(mxNote, n)
-        self.setPosition(mxNote, n)
 
         if mxNote.find('tie') is not None:
             n.tie = self.xmlToTie(mxNote)
@@ -3188,6 +3238,38 @@ class MeasureParser(XMLParserBase):
         'eighth'
         >>> c.dots
         1
+
+        If the `<duration>` doesn't match the `<type>` and `<dots>`,
+        an unlinked duration is created so that `.quarterLength` agrees with
+        `<duration>` but the notated types can still be represented.
+
+        Create a second dot on `mxNote` and parse again, observing the identical
+        `quarterLength`:
+
+        >>> from xml.etree.ElementTree import SubElement
+        >>> unused = SubElement(mxNote, 'dot')
+        >>> c2 = MP.xmlToDuration(mxNote)
+        >>> c2
+        <music21.duration.Duration unlinked type:eighth quarterLength:0.75>
+        >>> c2.quarterLength
+        0.75
+        >>> c2.type
+        'eighth'
+        >>> c2.dots
+        2
+
+        Grace note durations will be converted later to GraceDurations:
+
+        >>> mxDuration = mxNote.find('duration')
+        >>> mxNote.remove(mxDuration)
+        >>> mxGrace = SubElement(mxNote, 'grace')
+        >>> MP.xmlToDuration(mxNote, inputM21=c2)
+        >>> c2
+        <music21.duration.Duration unlinked type:eighth quarterLength:0.0>
+        >>> gn1 = note.Note(duration=c2)
+        >>> gn2 = MP.xmlGraceToGrace(mxGrace, gn1)
+        >>> gn2.duration
+        <music21.duration.GraceDuration unlinked type:eighth quarterLength:0.0>
         '''
         numDots = 0
         tuplets = ()
@@ -3201,7 +3283,7 @@ class MeasureParser(XMLParserBase):
         mxDuration = mxNote.find('duration')
         if mxDuration is not None:
             noteDivisions = float(mxDuration.text.strip())
-            qLen = noteDivisions / divisions
+            qLen = common.numberTools.opFrac(noteDivisions / divisions)
         else:
             qLen = 0.0
 
@@ -3229,42 +3311,48 @@ class MeasureParser(XMLParserBase):
             # TODO: empty-placement
 
         # two ways to create durations, raw (from qLen) and cooked (from type, time-mod, dots)
-        if forceRaw:
-            if d is not None:
-                # environLocal.printDebug(['forced to use raw duration', durRaw])
-                durRaw = duration.Duration()  # raw just uses qLen
-                # the qLen set here may not be computable, but is not immediately
-                # computed until setting components
-                durRaw.quarterLength = qLen
-                try:
-                    d.components = durRaw.components
-                except duration.DurationException:  # TODO: Test
-                    if qLen:
-                        qLenRounded = 2.0 ** round(math.log2(qLen))
-                    else:
-                        qLenRounded = 0.0
-                    environLocal.printDebug(
-                        ['mxToDuration',
-                         f'rounding duration to {qLenRounded} as type is not'
-                         + 'defined and raw quarterLength '
-                         + f'({qLen}) is not a computable duration'])
-                    # environLocal.printDebug(['mxToDuration', 'raw qLen', qLen, durationType,
-                    #                         'mxNote:',
-                    #                         ET.tostring(mxNote, encoding='unicode'),
-                    #                         'last mxDivisions:', divisions])
-                    durRaw.quarterLength = qLenRounded
-            else:
-                d = duration.Duration(quarterLength=qLen)
-        else:  # a cooked version builds up from pieces
+        if d is not None:
+            durRaw = duration.Duration(quarterLength=qLen)  # raw just uses qLen
+            # the qLen set here may not be computable, but is not immediately
+            # computed until setting components
+            try:
+                d.components = durRaw.components
+            except duration.DurationException:  # TODO: Test
+                if qLen:
+                    qLenRounded = 2.0 ** round(math.log2(qLen))
+                else:
+                    qLenRounded = 0.0
+                environLocal.printDebug(
+                    ['mxToDuration',
+                        f'rounding duration to {qLenRounded} as type is not'
+                        + 'defined and raw quarterLength '
+                        + f'({qLen}) is not a computable duration'])
+                durRaw.quarterLength = qLen = qLenRounded
+        else:
+            d = duration.Duration(quarterLength=qLen)
+        # can't do this unless we have a type, so if not forceRaw
+        if not forceRaw:  # a cooked version builds up from pieces
             dt = duration.durationTupleFromTypeDots(durationType, numDots)
+            if (dt.quarterLength == qLen) and not tuplets:
+                # raw == cooked, so we're done
+                # but this comparison gives false positives if tuplets are involved
+                # don't bother with isclose; merely trying to short-circuit
+                return d if inputM21 is None else None
             if d is not None:
                 d.clear()
+                d.tuplets = []
                 d.addDurationTuple(dt)
             else:
                 d = duration.Duration(durationTuple=dt)
 
             for tup in tuplets:
                 d.appendTuplet(tup)
+
+            # Second check against qLen (raw), now with tuplets
+            # if not almost equal, create unlinked Duration and set raw qLen
+            if not isclose(d.quarterLength, qLen, abs_tol=1e-7):
+                d.linked = False
+                d.quarterLength = qLen
 
         if inputM21 is None:
             return d
@@ -3802,7 +3890,7 @@ class MeasureParser(XMLParserBase):
         # add a reference of this note to this spanner
         if target is not None:
             su.addSpannedElements(target)
-        # environLocal.printDebug(['adding n', n, id(n), 'su.getSpannedElements',
+        # environLocal.printDebug(['adding n', target, id(target), 'su.getSpannedElements',
         #     su.getSpannedElements(), su.getSpannedElementIds()])
         if mxObj.get('type') == 'stop':
             su.completeStatus = True
@@ -4665,6 +4753,7 @@ class MeasureParser(XMLParserBase):
                                            'placement', 'positionPlacement')
 
                 self.insertCoreAndRef(totalOffset, staffKey, d)
+                self.setPosition(mxDir, d)
                 self.setEditorial(mxDirection, d)
 
         elif tag in ('wedge', 'bracket', 'dashes'):
@@ -4675,6 +4764,7 @@ class MeasureParser(XMLParserBase):
                 spannerList = []
 
             for sp in spannerList:
+                self.setPosition(mxDir, sp)
                 self.setEditorial(mxDirection, sp)
 
         elif tag in ('coda', 'segno'):
@@ -4684,12 +4774,7 @@ class MeasureParser(XMLParserBase):
                 rm = repeat.Coda()
 
             _synchronizeIds(mxDir, rm)
-            dX = mxDir.get('default-x')
-            if dX is not None:
-                rm.style.absoluteX = common.numToIntOrFloat(dX)
-            dY = mxDir.get('default-y')
-            if dY is not None:
-                rm.style.absoluteY = common.numToIntOrFloat(dY)
+            self.setPosition(mxDir, rm)
             self.insertCoreAndRef(totalOffset, staffKey, rm)
             self.setEditorial(mxDirection, rm)
 
@@ -4726,7 +4811,22 @@ class MeasureParser(XMLParserBase):
 
     def xmlToTextExpression(self, mxWords):
         '''
-        Given an mxDirection, create a textExpression
+        Given an `mxWords`, create a :class:`~music21.expression.TextExpression`
+        and set style attributes, fonts, position, etc.
+
+        Calls `setTextFormatting`, which calls `setPrintStyleAlign`.
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> m = EL('<words default-y="17" font-family="Courier" ' +
+        ... 'font-style="italic" relative-x="-6">a tempo</words>')
+        >>> te = MP.xmlToTextExpression(m)
+        >>> te.content
+        'a tempo'
+        >>> te.style.relativeX
+        -6
+        >>> te.style.fontFamily
+        ['Courier']
         '''
         # TODO: switch to using the setPrintAlign, etc.
 
@@ -4739,7 +4839,6 @@ class MeasureParser(XMLParserBase):
             wordText = ''
         te = expressions.TextExpression(wordText)
         self.setTextFormatting(mxWords, te)
-        self.setPosition(mxWords, te)
         return te
 
     def xmlToRehearsalMark(self, mxRehearsal):
@@ -4831,6 +4930,7 @@ class MeasureParser(XMLParserBase):
                 mm.parentheses = True
 
         _synchronizeIds(mxMetronome, mm)
+        self.setPosition(mxMetronome, mm)
         return mm
 
     def xmlToOffset(self, mxObj):
@@ -5344,7 +5444,7 @@ class MeasureParser(XMLParserBase):
             raise MusicXMLImportException(
                 'For non traditional signatures each step must have an alter')
 
-        ks = key.KeySignature()
+        ks = key.KeySignature(sharps=None)
 
         alteredPitches = []
         for i in range(len(allSteps)):
@@ -5598,8 +5698,8 @@ class MeasureParser(XMLParserBase):
         True
         >>> len(MP.stream)
         2
-        >>> len(MP.stream.getElementsByClass('Voice'))
-        2
+        >>> list(MP.stream.getElementsByClass('Voice'))
+        [<music21.stream.Voice 1>, <music21.stream.Voice 2>]
         '''
         mxm = self.mxMeasure
         for mxn in mxm.findall('note'):
@@ -6482,13 +6582,13 @@ class Test(unittest.TestCase):
         '''
         test that a note with nested tuplets gets converted properly.
         '''
-        mxN = '''
+        mxN = f'''
         <note default-x="347">
         <pitch>
           <step>D</step>
           <octave>5</octave>
         </pitch>
-        <duration>4</duration>
+        <duration>{defaults.divisionsPerQuarter * 0.5 * (2/3) * (2/3)}</duration>
         <voice>1</voice>
         <type>eighth</type>
         <time-modification>
@@ -6804,6 +6904,48 @@ class Test(unittest.TestCase):
         self.assertEqual(ly3.components[1].syllabic, 'middle')
         self.assertEqual(ly3.components[2].syllabic, 'end')
         self.assertEqual(len(s.lyrics(recurse=True)[1][0]), 4)
+
+    def testDirectionPosition(self):
+        from music21 import converter
+        from music21 import corpus
+        from music21.musicxml import testPrimitive, testFiles
+
+        # Dynamic
+        s = converter.parse(testFiles.mozartTrioK581Excerpt)
+        dyn = s.recurse().getElementsByClass('Dynamic').first()
+        self.assertEqual(dyn.style.relativeY, 6)
+
+        # Coda/Segno
+        s = converter.parse(testPrimitive.repeatExpressionsA)
+        seg = s.recurse().getElementsByClass('Segno').first()
+        self.assertEqual(seg.style.relativeX, 10)
+
+        # TextExpression
+        s = converter.parse(testPrimitive.textExpressions)
+        positionedEls = [el for el in s.recurse() if el.hasStyleInformation
+            and el.style.relativeX is not None]
+        self.assertEqual(len(positionedEls), 3)
+        self.assertEqual(
+            list(set(type(el) for el in positionedEls)),
+            [expressions.TextExpression]
+        )
+
+        # Wedge
+        s = corpus.parse('beach')
+        positionedEls = [el for el in s.recurse() if el.hasStyleInformation
+            and el.style.relativeX is not None]
+        self.assertEqual(len(positionedEls), 40)
+        self.assertEqual(
+            sorted(set(type(el) for el in positionedEls), key=repr),
+            [dynamics.Crescendo, dynamics.Diminuendo, dynamics.Dynamic, expressions.TextExpression]
+        )
+        crescendos = [el for el in positionedEls if 'Crescendo' in el.classes]
+        self.assertEqual(crescendos[0].style.relativeX, -6)
+
+        # Metronome
+        s = converter.parse(testFiles.tabTest)
+        metro = s.recurse().getElementsByClass('MetronomeMark').first()
+        self.assertEqual(metro.style.absoluteY, 40)
 
 
 if __name__ == '__main__':
