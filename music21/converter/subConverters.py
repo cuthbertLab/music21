@@ -936,9 +936,9 @@ class ConverterMusicXML(SubConverter):
                 # provide defaults to support headless MuseScore in Google Colab
                 # https://github.com/cuthbertLab/music21/issues/260
                 if not prior_qt:
-                    os.putenv('QT_QPA_PLATFORM', 'offscreen')
+                    os.environ['QT_QPA_PLATFORM'] = 'offscreen'
                 if not prior_xdg:
-                    os.putenv('XDG_RUNTIME_DIR', environment.Environment().getRootTempDir())
+                    os.environ['XDG_RUNTIME_DIR'] = environment.Environment().getRootTempDir()
 
             musescoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
 
@@ -950,8 +950,11 @@ class ConverterMusicXML(SubConverter):
         sys.stderr = storedStrErr
 
         if common.runningUnderIPython() and common.getPlatform() == 'nix':
-            os.putenv('QT_QPA_PLATFORM', prior_qt or '')
-            os.putenv('XDG_RUNTIME_DIR', prior_xdg or '')
+            # Leave environment in original state
+            if not prior_qt:
+                os.environ.pop('QT_QPA_PLATFORM')
+            if not prior_xdg:
+                os.environ.pop('XDG_RUNTIME_DIR')
 
         if subformatExtension == 'png':
             return ConverterMusicXML.findNumberedPNGPath(fpOut)
