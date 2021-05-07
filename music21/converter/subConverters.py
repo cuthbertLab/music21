@@ -938,7 +938,7 @@ class ConverterMusicXML(SubConverter):
                 if not prior_qt:
                     os.environ['QT_QPA_PLATFORM'] = 'offscreen'
                 if not prior_xdg:
-                    os.environ['XDG_RUNTIME_DIR'] = environment.Environment().getRootTempDir()
+                    os.environ['XDG_RUNTIME_DIR'] = str(environment.Environment().getRootTempDir())
 
             musescoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
 
