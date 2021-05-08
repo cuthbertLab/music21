@@ -1644,8 +1644,8 @@ class PartParser(XMLParserBase):
 
         New in v7.
         '''
-        if self.lastMeasureParser is None:
-            return
+        if self.lastMeasureParser is None:  # pragma: no cover
+            return  # should not happen
         lmp = self.lastMeasureParser
         self.lastMeasureParser = None  # clean memory
 
