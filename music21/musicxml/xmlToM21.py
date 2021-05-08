@@ -2440,6 +2440,13 @@ class MeasureParser(XMLParserBase):
                 float(mxDuration.text.strip()) / self.divisions
             )
             # Allow overfilled measures for now -- TODO(someday): warn?
+
+            # Create hidden rest (in other words, a spacer)
+            r = note.Rest(quarterLength=change)
+            r.style.hideObjectOnPrint = True
+            self.addToStaffReference(mxObj, r)
+            self.insertInMeasureOrVoice(mxObj, r)
+
             self.offsetMeasureNote += change
 
     def xmlPrint(self, mxPrint):
@@ -6814,6 +6821,7 @@ class Test(unittest.TestCase):
 
     def testHiddenRests(self):
         from music21 import converter
+        from music21 import corpus
         from music21.musicxml import testPrimitive
 
         # Voice 1: Half note, <forward> (quarter), quarter note
@@ -6826,6 +6834,22 @@ class Test(unittest.TestCase):
         self.assertTrue(restV1.style.hideObjectOnPrint)
         restsV2 = v2.getElementsByClass(note.Rest)
         self.assertEqual([r.style.hideObjectOnPrint for r in restsV2], [True, True])
+
+        # Schoenberg op.19/2
+        # previously, last measure of LH duplicated hidden rest belonging to RH
+        # causing unnecessary voices
+        # https://github.com/cuthbertLab/music21/issues/991
+        sch = corpus.parse('schoenberg/opus19', 2)
+        rh_last = sch.parts[0][stream.Measure].last()
+        lh_last = sch.parts[1][stream.Measure].last()
+
+        hiddenRest = rh_last.voices.last().first()
+        self.assertIsInstance(hiddenRest, note.Rest)
+        self.assertEqual(hiddenRest.style.hideObjectOnPrint, True)
+        self.assertEqual(hiddenRest.quarterLength, 2.0)
+
+        self.assertEqual(len(lh_last.voices), 0)
+        self.assertEqual([r.style.hideObjectOnPrint for r in lh_last[note.Rest]], [False] * 3)
 
     def testMultiDigitEnding(self):
         from music21 import converter
