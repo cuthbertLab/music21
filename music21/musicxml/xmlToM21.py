@@ -1631,26 +1631,31 @@ class PartParser(XMLParserBase):
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
 
-        # self.removeEndForwardRest()
+        self.removeEndForwardRest()
         part.coreElementsChanged()
 
-    #     def removeEndForwardRest(self):
-    #         '''
-    #         If the last measure ended with a forward tag, as happens
-    #         in some pieces that end with incomplete measures,
-    #         remove the rest there (for backwards compatibility, esp.
-    #         since bwv66.6 uses it)
-    #         '''
-    #         if self.lastMeasureParser is None:
-    #             return
-    #         lmp = self.lastMeasureParser
-    #         self.lastMeasureParser = None  # clean memory
-    #
-    #         if lmp.endedWithForwardTag is None:
-    #             return
-    #         endedForwardRest = lmp.endedWithForwardTag
-    #         if lmp.stream.recurse().notesAndRests[-1] is endedForwardRest:
-    #             lmp.stream.remove(endedForwardRest, recurse=True)
+    def removeEndForwardRest(self):
+        '''
+        If the last measure ended with a forward tag, as happens
+        in some pieces that end with incomplete measures,
+        and voices are not involved,
+        remove the rest there (for backwards compatibility, esp.
+        since bwv66.6 uses it)
+
+        New in v7.
+        '''
+        if self.lastMeasureParser is None:
+            return
+        lmp = self.lastMeasureParser
+        self.lastMeasureParser = None  # clean memory
+
+        if lmp.endedWithForwardTag is None:
+            return
+        if lmp.useVoices is True:
+            return
+        endedForwardRest = lmp.endedWithForwardTag
+        if lmp.stream.recurse().notesAndRests.last() is endedForwardRest:
+            lmp.stream.remove(endedForwardRest, recurse=True)
 
     def separateOutPartStaves(self):
         '''
@@ -2215,12 +2220,12 @@ class MeasureParser(XMLParserBase):
         # what is the offset in the measure of the current note position?
         self.offsetMeasureNote = 0.0
 
-        # # keep track of the last rest that was added with a forward tag.
-        # # there are many pieces that end with incomplete measures that
-        # # older versions of Finale put a forward tag at the end, but this
-        # # disguises the incomplete last measure.  The PartParser will
-        # # pick this up from the last measure.
-        # self.endedWithForwardTag = None
+        # keep track of the last rest that was added with a forward tag.
+        # there are many pieces that end with incomplete measures that
+        # older versions of Finale put a forward tag at the end, but this
+        # disguises the incomplete last measure.  The PartParser will
+        # pick this up from the last measure.
+        self.endedWithForwardTag: note.Rest = None
 
     @staticmethod
     def getStaffNumber(mxObjectOrNumber) -> int:
@@ -2442,12 +2447,16 @@ class MeasureParser(XMLParserBase):
             # Allow overfilled measures for now -- TODO(someday): warn?
 
             # Create hidden rest (in other words, a spacer)
+            # old Finale documents close incomplete final measures with <forward>
+            # this will be removed afterward by removeEndForwardRest()
             r = note.Rest(quarterLength=change)
             r.style.hideObjectOnPrint = True
             self.addToStaffReference(mxObj, r)
             self.insertInMeasureOrVoice(mxObj, r)
 
             self.offsetMeasureNote += change
+            # xmlToNote() sets None
+            self.endedWithForwardTag = r
 
     def xmlPrint(self, mxPrint):
         '''
@@ -2600,6 +2609,7 @@ class MeasureParser(XMLParserBase):
 
         # only increment Chords after completion
         self.offsetMeasureNote += offsetIncrement
+        self.endedWithForwardTag = None
 
     def xmlToChord(self, mxNoteList):
         # noinspection PyShadowingNames
