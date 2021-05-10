@@ -879,7 +879,7 @@ class NotRest(GeneralNote):
     Parent class for Note-like objects that are not rests; that is to say
     they have a stem, can be tied, and volume is important.
     Basically, that's a :class:`Note` or :class:`~music21.chord.Chord`
-    (or their subclasses such as :class`~music21.harmony.ChordSymbol`).
+    (or their subclasses such as :class:`~music21.harmony.ChordSymbol`).
     '''
     # unspecified means that there may be a stem, but its orientation
     # has not been declared.

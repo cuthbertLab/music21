@@ -3769,7 +3769,7 @@ class MeasureExporter(XMLExporterBase):
         _setTagTextFromAttribute(p, mxPitch, 'octave', 'implicitOctave')
         return mxPitch
 
-    def unpitchedToXml(self, up: pitch.Unpitched) -> note.Unpitched:
+    def unpitchedToXml(self, up: note.Unpitched) -> Element:
         '''
         Convert a :class:`~music21.note.Unpitched` to xml.
 

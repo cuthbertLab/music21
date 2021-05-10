@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
-# Name:         note.py
-# Purpose:      music21 classes for representing notes
+# Name:         percussion.py
+# Purpose:      music21 classes for representing unpitched events
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza

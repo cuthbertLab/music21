@@ -20,7 +20,7 @@ import re
 import unittest
 
 from math import isclose
-from typing import List, Optional, Dict, Tuple, Set
+from typing import List, Optional, Dict, Tuple, Set, Union
 
 import xml.etree.ElementTree as ET
 
