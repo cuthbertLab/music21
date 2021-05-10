@@ -1645,8 +1645,8 @@ class Unpitched(NotRest):
     AttributeError: 'Unpitched' object has no attribute 'pitch'
     '''
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.displayStep = 'C'
         self.displayOctave = 4
         self._storedInstrument = None
