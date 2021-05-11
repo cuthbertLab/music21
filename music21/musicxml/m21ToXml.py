@@ -2411,7 +2411,7 @@ class PartExporter(XMLExporterBase):
             self.fixupNotationMeasured()
         # make sure that all instances of the same class have unique ids
         self.spannerBundle.setIdLocals()
-        for m in self.stream[stream.Measure]:
+        for m in self.stream.getElementsByClass(stream.Measure):
             self.addDividerComment('Measure ' + str(m.number))
             measureExporter = MeasureExporter(m, parent=self)
             measureExporter.spannerBundle = self.spannerBundle
