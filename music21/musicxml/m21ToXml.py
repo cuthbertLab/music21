@@ -2675,6 +2675,7 @@ class MeasureExporter(XMLExporterBase):
             ('ChordWithFretBoard', 'chordWithFretBoardToXml'),
             ('ChordSymbol', 'chordSymbolToXml'),
             ('Chord', 'chordToXml'),
+            ('Unpitched', 'unpitchedToXml'),
             ('Rest', 'restToXml'),
             ('Dynamic', 'dynamicToXml'),
             ('Segno', 'segnoToXml'),
@@ -3367,9 +3368,7 @@ class MeasureExporter(XMLExporterBase):
             n: note.Note
             mxPitch = self.pitchToXml(n.pitch)
             mxNote.append(mxPitch)
-        else:
-            # assume rest until unpitched works
-            # TODO: unpitched
+        elif n.isRest:
             SubElement(mxNote, 'rest')
 
         if d.isGrace is not True:
@@ -3771,21 +3770,31 @@ class MeasureExporter(XMLExporterBase):
 
     def unpitchedToXml(self, up: note.Unpitched) -> Element:
         '''
-        Convert a :class:`~music21.note.Unpitched` to xml.
+        Convert a :class:`~music21.note.Unpitched` to a <note>
+        with an <unpitched> subelement.
 
         >>> up = note.Unpitched('D5')
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxUnpitched = MEX.unpitchedToXml(up)
         >>> MEX.dump(mxUnpitched)
-        <unpitched>
-          <display-step>D</display-step>
-          <display-octave>5</display-octave>
-        </unpitched>
+        <note>
+          <unpitched>
+            <display-step>D</display-step>
+            <display-octave>5</display-octave>
+          </unpitched>
+          <duration>10080</duration>
+          <type>quarter</type>
+        </note>        
         '''
+        mxNote = self.noteToXml(up)
+
         mxUnpitched = Element('unpitched')
         _setTagTextFromAttribute(up, mxUnpitched, 'display-step')
         _setTagTextFromAttribute(up, mxUnpitched, 'display-octave')
-        return mxUnpitched
+
+        helpers.insertBeforeElements(mxNote, mxUnpitched, tagList=['duration'])
+
+        return mxNote
 
     def fretNoteToXml(self, fretNote) -> Element:
         '''
