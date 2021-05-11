@@ -108,9 +108,6 @@ class ChordBase(note.NotRest):
 
         durationKeyword = self._add_core_or_init(notes, useDuration=durationKeyword)
 
-        if all(isinstance(n, int) for n in notes):
-            self.simplifyEnharmonics(inPlace=True)
-
         if durationKeyword is not None:
             self.duration = durationKeyword
         elif 'type' in keywords or 'quarterLength' in keywords:  # dots dont cut it
@@ -130,7 +127,7 @@ class ChordBase(note.NotRest):
 
     def __eq__(self, other):
         '''
-        True if the it passes all `super()`
+        True if the Chord passes all `super()`
         equality tests and the pitches are the same
         (possibly in a different order)
 
@@ -151,6 +148,8 @@ class ChordBase(note.NotRest):
         True
         '''
         if not super().__eq__(other):
+            return False
+        if not hasattr(other, 'notes'):
             return False
         if not len(self.notes) == len(other.notes):
             return False
@@ -217,16 +216,15 @@ class ChordBase(note.NotRest):
                     newNote = note.Note(n)
                 self._notes.append(newNote)
                 # self._notes.append({'pitch':n})
-            elif isinstance(n, note.NotRest):
-                self._notes.append(n)
-                if quickDuration is True:
-                    self.duration = n.duration
-                    # print('got it! %s' % n)
-                    useDuration = None
-                    quickDuration = False
             elif isinstance(n, Chord):
                 for newNote in n._notes:
                     self._notes.append(copy.deepcopy(newNote))
+                if quickDuration is True:
+                    self.duration = n.duration
+                    useDuration = None
+                    quickDuration = False
+            elif isinstance(n, note.NotRest):
+                self._notes.append(n)
                 if quickDuration is True:
                     self.duration = n.duration
                     useDuration = None
@@ -522,7 +520,7 @@ class Chord(ChordBase):
 
     def __eq__(self, other):
         '''
-        True if the it passes all `super()`
+        True if the Chord passes all `super()`
         equality tests and the pitches are the same
         (possibly in a different order)
 

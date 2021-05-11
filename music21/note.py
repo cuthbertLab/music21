@@ -1645,13 +1645,13 @@ class Unpitched(NotRest):
     def __init__(self, displayName=None, **keywords):
         super().__init__(**keywords)
 
+        self.displayStep: str = 'C'
+        self.displayOctave: int = 4
         if displayName:
-            unused_pitch = pitch.Pitch(displayName)
-            self.displayStep = unused_pitch.step
-            self.displayOctave = unused_pitch.octave
-        else:
-            self.displayStep = 'C'
-            self.displayOctave = 4
+            display_pitch = pitch.Pitch(displayName)
+            self.displayStep = display_pitch.step
+            self.displayOctave = display_pitch.octave
+
         self._storedInstrument = None
 
     def __eq__(self, other):
@@ -1688,6 +1688,20 @@ class Unpitched(NotRest):
         p.step = self.displayStep
         p.octave = self.displayOctave
         return p
+
+    @property
+    def midi(self) -> int:
+        '''
+        Returns the MIDI pitch corresponding to the stored display pitch.
+
+        >>> unp = note.Unpitched('D4')
+        >>> unp.midi
+        62
+        >>> unp2 = note.Unpitched()
+        >>> unp2.midi
+        60
+        '''
+        return self.displayPitch().midi
 
 
 # ------------------------------------------------------------------------------

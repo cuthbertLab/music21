@@ -49,13 +49,10 @@ def addDocAttrTestsToSuite(suite,
     >>> test.testRunner.addDocAttrTestsToSuite(s1, allLocals)
     >>> s1TestsAfter = len(s1._tests)
     >>> s1TestsAfter - s1TestsBefore
-    1
+    2
     >>> t = s1._tests[-1]
     >>> t
     isRest ()
-
-    >>> 'hi'
-    'hi'
     '''
     dtp = doctest.DocTestParser()
     if globs is False:
