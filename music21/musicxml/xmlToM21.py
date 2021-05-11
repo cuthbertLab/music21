@@ -2225,7 +2225,7 @@ class MeasureParser(XMLParserBase):
         # older versions of Finale put a forward tag at the end, but this
         # disguises the incomplete last measure.  The PartParser will
         # pick this up from the last measure.
-        self.endedWithForwardTag: note.Rest = None
+        self.endedWithForwardTag: Optional[note.Rest] = None
 
     @staticmethod
     def getStaffNumber(mxObjectOrNumber) -> int:
