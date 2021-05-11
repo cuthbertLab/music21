@@ -432,6 +432,18 @@ class _EnvironmentCore:
             ]:
                 self.__setitem__(name, value)  # use for key checking
 
+    def _checkAccessibility(self, path: Union[str, pathlib.Path]) -> bool:
+        '''
+        Return True if the path exists, is readable and writable.
+        '''
+        if isinstance(path, (pathlib.Path, str)):
+            exists = os.path.exists(path)
+            readable = os.access(path, os.R_OK)
+            writable = os.access(path, os.W_OK)
+            return (exists and readable and writable)
+        else:
+            return False
+
     def toSettingsXML(self, ref=None):
         '''
         Convert a ref dictionary to an xml.etree.ElementTree.Element object
@@ -506,26 +518,46 @@ class _EnvironmentCore:
         True
 
         If failed to create the subdirectory (OSError is raised), this function
-        will return a temporary directory which is created by
+        will return (1), for Linux and Mac platforms, a subdirectory under the
+        system temp directory which is named with 'music21-userid-$UID' or (2),
+        for other platforms, a temporary directory which is created by
         tempfile.mkdtemp(prefix="music21-"), which is named with 'music21-'
-        plus 8 hashed codes. The location of this directory depends on OS.
+        plus 8 hashed codes, and (3) if failing for both above, it will return
+        the directory from tempfile.gettempdir(). The location of this directory
+        depends on OS.
 
-        Note the temporary dirctory will be different in each python session.
+        Note the temporary directory may be different in each python session.
         '''
-        if self.defaultRootTempDir is not None and self.defaultRootTempDir.exists():
+        if self._checkAccessibility(self.defaultRootTempDir):
             return self.defaultRootTempDir
 
         # this returns the root temp dir; this does not create a new dir
         self.defaultRootTempDir = pathlib.Path(tempfile.gettempdir()) / 'music21'
-        # if this path already exists, we have nothing more to do
-        if self.defaultRootTempDir.exists():
+
+        # if this path already exists, readable and writable, we have nothing more to do
+        if self._checkAccessibility(self.defaultRootTempDir):
             return self.defaultRootTempDir
         else:
             # make this directory as a temp directory
             try:
                 self.defaultRootTempDir.mkdir()
-            except OSError:
-                self.defaultRootTempDir = pathlib.Path(tempfile.mkdtemp(prefix="music21-"))
+            except OSError:  # directory already exists or permission denied
+                if common.getPlatform() in ['nix', 'darwin']:
+                    uid = os.getuid()
+                    dir_path = pathlib.Path(tempfile.gettempdir()) / f'music21-userid-{uid}'
+                else:
+                    dir_path = pathlib.Path(tempfile.mkdtemp(prefix="music21-"))
+
+                if self._checkAccessibility(dir_path):
+                    self.defaultRootTempDir = dir_path
+                else:
+                    try:
+                        dir_path.mkdir()
+                        self.defaultRootTempDir = dir_path
+                    except OSError:  # pragma: no cover
+                        # Give up and use /tmp
+                        self.defaultRootTempDir = pathlib.Path(tempfile.gettempdir())
+
             return self.defaultRootTempDir
 
     def getKeysToPaths(self):
@@ -638,23 +670,8 @@ class _EnvironmentCore:
         if suffix and not suffix.startswith('.'):
             suffix = '.' + suffix
 
-        try:
-            with tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix, delete=False) as ntf:
-                ntf_name = ntf.name
-        except PermissionError:
-            # On Linux, only the user who created /tmp/music21 has write access by default
-            # So create a new user-specific directory
-            import getpass
-            newDir = rootDir.parent / f'music21-{getpass.getuser()}'
-            if not newDir.exists():
-                try:
-                    newDir.mkdir()
-                except OSError:  # pragma: no cover
-                    # Give up and use /tmp
-                    newDir = rootDir.parent
-
-            with tempfile.NamedTemporaryFile(dir=newDir, suffix=suffix, delete=False) as ntf:
-                ntf_name = ntf.name
+        with tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix, delete=False) as ntf:
+            ntf_name = ntf.name
 
         if returnPathlib:
             return pathlib.Path(ntf_name)
@@ -1566,31 +1583,34 @@ class Test(unittest.TestCase):
         self.assertEqual(list(env['localCorpusSettings']), ['/a', '/b'])
 
     @unittest.skipUnless(
-        os.access(Environment().getDefaultRootTempDir(), stat.S_IRWXU),
-        'test will programmatically set read/write/exec permissions on this dir'
+        common.getPlatform() in ['nix', 'darwin'],
+        'os.getuid can be called only on Unix platforms'
     )
-    @unittest.skipIf(
-        common.getPlatform() == 'win',
-        'os.chmod does not have the intended effect on Windows'
-    )
-    def testGetTempFile(self):
-        import getpass
+    def testGetDefaultRootTempDir(self):
         import stat
+        import shutil
 
         e = Environment()
         oldScratchDir = e['directoryScratch']
         try:
             e['directoryScratch'] = None
+            oldTempDir = e.getDefaultRootTempDir()
+            oldPermission = oldTempDir.stat()[stat.ST_MODE]
             # Wipe out write, exec permissions on the default root dir
-            os.chmod(e.getDefaultRootTempDir(), stat.S_IREAD)
-            # Was the PermissionError caught and a new "music21-{user}" dir created?
-            tmp = e.getTempFile(returnPathlib=False)
-            self.assertIn('music21-' + getpass.getuser(), tmp)
+            os.chmod(oldTempDir, stat.S_IREAD)
+            newTempDir = e.getDefaultRootTempDir()
+            self.assertIn(f'music21-userid-{os.getuid()}', str(newTempDir))
         finally:
-            # Restore owner read/write/exec permissions and original path
-            os.chmod(e.getDefaultRootTempDir(), stat.S_IRWXU)
+            # Restore original permissions and original path
+            os.chmod(oldTempDir, oldPermission)
             e['directoryScratch'] = oldScratchDir
-        os.remove(tmp)
+
+            # If getting OSError while trying to create the directory on the first fallback,
+            # the default temp directory from tempfile.gettempdir() will be return on the second
+            # fallback. We don't want to delete the default temp directory. Therefore we check
+            # it before deleting.
+            if not newTempDir.samefile(tempfile.gettempdir()):
+                shutil.rmtree(newTempDir)
 
 
 # -----------------------------------------------------------------------------
