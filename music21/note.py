@@ -1626,9 +1626,6 @@ class Unpitched(NotRest):
     A General class of unpitched objects which appear at different places
     on the staff.  Examples: percussion notation.
 
-    The `Unpitched` object does not currently do anything and should
-    not be used.
-
     >>> unp = note.Unpitched()
 
     Unpitched elements have displayStep and displayOctave
@@ -1645,10 +1642,16 @@ class Unpitched(NotRest):
     AttributeError: 'Unpitched' object has no attribute 'pitch'
     '''
 
-    def __init__(self, **keywords):
+    def __init__(self, displayName=None, **keywords):
         super().__init__(**keywords)
-        self.displayStep = 'C'
-        self.displayOctave = 4
+
+        if displayName:
+            unused_pitch = pitch.Pitch(displayName)
+            self.displayStep = unused_pitch.step
+            self.displayOctave = unused_pitch.octave
+        else:
+            self.displayStep = 'C'
+            self.displayOctave = 4
         self._storedInstrument = None
 
     def __eq__(self, other):
