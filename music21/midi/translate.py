@@ -706,6 +706,9 @@ def instrumentToMidiEvents(inputM21,
     inst = inputM21
     mt = midiTrack  # midi track
     events = []
+
+    if isinstance(inst, Conductor):
+        return events
     if includeDeltaTime:
         dt = midiModule.DeltaTime(track=mt, channel=channel)
         events.append(dt)
@@ -2027,7 +2030,7 @@ def prepareStreamForMidi(s) -> stream.Stream:
         # this assumes that dynamics in a part/stream apply to all components
         # of that part stream
         # this sets the cachedRealized value for each Volume
-        for p in s.iter.getElementsByClass('Stream'):
+        for p in s.getElementsByClass('Stream'):
             volume.realizeVolume(p)
 
         s.insert(0, conductor)
@@ -2073,6 +2076,7 @@ def conductorStream(s: stream.Stream) -> stream.Part:
     The MetronomeMark is moved and a default TimeSignature is added:
 
     >>> conductor.show('text')
+    {0.0} <music21.instrument.Conductor 'Conductor'>
     {0.0} <music21.tempo.MetronomeMark Quarter=100>
     {0.0} <music21.meter.TimeSignature 4/4>
 
@@ -2090,6 +2094,7 @@ def conductorStream(s: stream.Stream) -> stream.Part:
 
     conductorPart = stream.Part()
     conductorPart.priority = conductorPriority
+    conductorPart.insert(0, Conductor())
 
     for klass in ('MetronomeMark', 'TimeSignature', 'KeySignature'):
         events = s.flat.getElementsByClass(klass)
@@ -2269,14 +2274,14 @@ def packetStorageFromSubstreamList(
     {0: {'initInstrument': <music21.instrument.Conductor 'Conductor'>,
          'rawPackets': [{'centShift': None,
                          'duration': 0,
-                         'lastInstrument': None,
+                         'lastInstrument': <music21.instrument.Conductor 'Conductor'>,
                          'midiEvent': <music21.midi.MidiEvent SET_TEMPO, ... channel=1, ...>,
                          'obj': <music21.tempo.MetronomeMark Quarter=100>,
                          'offset': 0,
                          'trackId': 0},
                         {'centShift': None,
                          'duration': 0,
-                         'lastInstrument': None,
+                         'lastInstrument': <music21.instrument.Conductor 'Conductor'>,
                          'midiEvent': <music21.midi.MidiEvent TIME_SIGNATURE, ...>,
                          'obj': <music21.meter.TimeSignature 4/4>,
                          'offset': 0,
@@ -2315,11 +2320,12 @@ def packetStorageFromSubstreamList(
         # get a first instrument; iterate over rest
         instrumentStream = subs.iter.getElementsByClass('Instrument')
 
-        # if there is an Instrument object at the start, make instObj that instrument.
+        # if there is an Instrument object at the start, make instObj that instrument
+        # this may be a Conductor object if prepareStreamForMidi() was run
         if instrumentStream and subs.elementOffset(instrumentStream[0]) == 0:
             instObj = instrumentStream[0]
         elif trackId == 0 and not subs.notesAndRests:
-            # Conductor track
+            # maybe prepareStreamForMidi() wasn't run; create Conductor instance
             instObj = Conductor()
         else:
             instObj = None
