@@ -2528,26 +2528,29 @@ class PartExporter(XMLExporterBase):
         '''
         part = self.stream
         measures = part.getElementsByClass(stream.Measure)
+        first_measure = measures.first()
+        if not first_measure:
+            return
         # check that first measure has any attributes in outer Stream
         # this is for non-standard Stream formations (some kern imports)
         # that place key/clef information in the containing stream
-        if hasattr(measures.first(), 'clef') and measures[0].clef is None:
-            measures.first().makeMutable()  # must mutate
+        if hasattr(first_measure, 'clef') and first_measure.clef is None:
+            first_measure.makeMutable()  # must mutate
             outerClefs = part.getElementsByClass('Clef')
             if outerClefs:
-                measures.first().clef = outerClefs.first()
+                first_measure.clef = outerClefs.first()
 
-        if hasattr(measures.first(), 'keySignature') and measures.first().keySignature is None:
-            measures.first().makeMutable()  # must mutate
+        if hasattr(first_measure, 'keySignature') and first_measure.keySignature is None:
+            first_measure.makeMutable()  # must mutate
             outerKeySignatures = part.getElementsByClass('KeySignature')
             if outerKeySignatures:
-                measures.first().keySignature = outerKeySignatures.first()
+                first_measure.keySignature = outerKeySignatures.first()
 
-        if hasattr(measures.first(), 'timeSignature') and measures.first().timeSignature is None:
-            measures.first().makeMutable()  # must mutate
+        if hasattr(first_measure, 'timeSignature') and first_measure.timeSignature is None:
+            first_measure.makeMutable()  # must mutate
             outerTimeSignatures = part.getElementsByClass('TimeSignature')
             if outerTimeSignatures:
-                measures.first().timeSignature = outerTimeSignatures.first()
+                first_measure.timeSignature = outerTimeSignatures.first()
 
         # see if accidentals/beams can be processed
         if not part.streamStatus.haveAccidentalsBeenMade():
