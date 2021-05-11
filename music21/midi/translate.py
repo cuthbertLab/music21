@@ -2170,8 +2170,8 @@ def channelInstrumentData(
     substreamList = []
     if s.hasPartLikeStreams():
         for obj in s.getElementsByClass('Stream'):
-            if not obj.flat.notesAndRests:
-                # Conductor track: don't consume a channel
+            # Conductor track: don't consume a channel
+            if (not obj[note.GeneralNote]) and obj[Conductor]:
                 continue
             else:
                 substreamList.append(obj)
@@ -3864,6 +3864,16 @@ class Test(unittest.TestCase):
                         ),
                     part.duration.quarterLength
                 )
+
+    def testEmptyExport(self):
+        from music21 import instrument
+
+        p = stream.Part()
+        p.insert(instrument.Instrument())
+        # Previously, this errored when we assumed streams lacking notes
+        # to be conductor tracks
+        # https://github.com/cuthbertLab/music21/issues/1013
+        streamToMidiFile(p)
 
 
 # ------------------------------------------------------------------------------
