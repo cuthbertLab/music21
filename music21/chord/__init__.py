@@ -513,9 +513,8 @@ class Chord(ChordBase):
 
     def __init__(self, notes=None, **keywords):
         super().__init__(notes=notes, **keywords)
-        self._notes: List[note.Note]
 
-        if all(isinstance(n, int) for n in notes):
+        if notes is not None and all(isinstance(n, int) for n in notes):
             self.simplifyEnharmonics(inPlace=True)
 
 
