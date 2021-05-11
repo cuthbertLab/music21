@@ -2444,7 +2444,6 @@ class MeasureParser(XMLParserBase):
             change = common.numberTools.opFrac(
                 float(mxDuration.text.strip()) / self.divisions
             )
-            # Allow overfilled measures for now -- TODO(someday): warn?
 
             # Create hidden rest (in other words, a spacer)
             # old Finale documents close incomplete final measures with <forward>
@@ -2454,6 +2453,7 @@ class MeasureParser(XMLParserBase):
             self.addToStaffReference(mxObj, r)
             self.insertInMeasureOrVoice(mxObj, r)
 
+            # Allow overfilled measures for now -- TODO(someday): warn?
             self.offsetMeasureNote += change
             # xmlToNote() sets None
             self.endedWithForwardTag = r
