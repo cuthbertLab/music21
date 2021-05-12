@@ -2877,16 +2877,21 @@ class MeasureExporter(XMLExporterBase):
         # turn inexpressible durations into complex durations (unless unlinked)
         if obj.duration.type == 'inexpressible':
             obj.duration.quarterLength = obj.duration.quarterLength
-
+            objList = obj.splitAtDurations()
         # make dotGroups into normal notes
-        if len(obj.duration.dotGroups) > 1:
+        elif len(obj.duration.dotGroups) > 1:
             obj.duration.splitDotGroups(inPlace=True)
+            objList = obj.splitAtDurations()
+        # otherwise, splitAtDurations() was already called by parse(), no need to repeat
+        else:
+            objList = [obj]
 
         parsedObject = False
         for className, methName in self.classesToMethods.items():
             if className in classes:
                 meth = getattr(self, methName)
-                meth(obj)
+                for o in objList:
+                    meth(o)
                 parsedObject = True
                 break
 
@@ -2895,7 +2900,8 @@ class MeasureExporter(XMLExporterBase):
         for className, methName in self.wrapAttributeMethodClasses.items():
             if className in classes:
                 meth = getattr(self, methName)
-                self.wrapObjectInAttributes(obj, meth)
+                for o in objList:
+                    self.wrapObjectInAttributes(o, meth)
                 parsedObject = True
                 break
 
