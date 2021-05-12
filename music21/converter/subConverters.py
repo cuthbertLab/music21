@@ -951,9 +951,9 @@ class ConverterMusicXML(SubConverter):
 
         if common.runningUnderIPython() and common.getPlatform() == 'nix':
             # Leave environment in original state
-            if not prior_qt:
+            if prior_qt is None:
                 os.environ.pop('QT_QPA_PLATFORM')
-            if not prior_xdg:
+            if prior_xdg is None:
                 os.environ.pop('XDG_RUNTIME_DIR')
 
         if subformatExtension == 'png':
