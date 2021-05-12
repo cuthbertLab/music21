@@ -50,6 +50,7 @@ from music21 import layout
 from music21 import metadata
 from music21 import note
 from music21 import meter
+from music21 import percussion
 from music21 import pitch
 from music21 import repeat
 from music21 import spanner
@@ -2626,11 +2627,22 @@ class MeasureParser(XMLParserBase):
         >>> c = MP.xmlToChord([a, b])
         >>> c.getNotehead(c.pitches[0])
         'diamond'
+
+        >>> a = EL('<note><unpitched><display-step>A</display-step>'
+        ...        + '<display-octave>3</display-octave></unpitched>'
+        ...        + qnDuration
+        ...        + '<notehead>diamond</notehead></note>')
+        >>> MP.xmlToChord([a, b])
+        <music21.percussion.PercussionChord unpitched[A3] B3>
         '''
         notes = []
         for mxNote in mxNoteList:
             notes.append(self.xmlToSimpleNote(mxNote, freeSpanners=False))
-        c = chord.Chord(notes)
+
+        if any(mxNote.find('unpitched') for mxNote in mxNoteList):
+            c = percussion.PercussionChord(notes)
+        else:
+            c = chord.Chord(notes)
 
         # move beams from first note (TODO: confirm style moved already?)
         if notes:
@@ -2645,7 +2657,9 @@ class MeasureParser(XMLParserBase):
         seenArticulations = set()
         seenExpressions = set()
 
-        for n in sorted(notes, key=lambda x: x.pitch.ps):
+        sortKey = lambda x: x.pitch.ps if hasattr(x, 'pitch') else x.displayPitch().midi
+
+        for n in sorted(notes, key=sortKey):
             ss = n.getSpannerSites()
             # transfer all spanners from the notes to the chord.
             for sp in ss:

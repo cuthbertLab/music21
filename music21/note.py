@@ -1703,6 +1703,18 @@ class Unpitched(NotRest):
         '''
         return self.displayPitch().midi
 
+    @property
+    def displayName(self) -> str:
+        '''
+        Returns the `nameWithOctave` of the :meth:`displayPitch`.
+
+        >>> unp = note.Unpitched('B2')
+        >>> unp.displayName
+        'B2'
+        '''
+        display_pitch = self.displayPitch()
+        return display_pitch.nameWithOctave
+
 
 # ------------------------------------------------------------------------------
 class Rest(GeneralNote):
