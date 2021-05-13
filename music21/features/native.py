@@ -12,13 +12,7 @@
 Original music21 feature extractors.
 '''
 import unittest
-import re
-import math
 from typing import Optional
-
-from urllib.request import Request, urlopen
-from urllib.parse import urlencode
-
 
 from music21.features import base as featuresModule
 from music21 import text
