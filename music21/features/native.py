@@ -890,6 +890,8 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
         session = HTMLSession()
         response = session.get(urlStr)
         resultsDiv = response.html.find('div[@id="result-stats"]', first=True)
+        if resultsDiv is None:  # pragma: no cover
+            return 0
         m = self.googleResultsRE.search(resultsDiv.text)
         if m is not None and m.group(0):
             totalRes = int(m.group(1).replace(',', ''))
