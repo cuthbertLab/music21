@@ -1978,8 +1978,10 @@ def midiTrackToStream(
     if conductorPart is not None:
         insertConductorEvents(conductorPart, s, isFirst=isFirst)
 
-    # Only make measures if time signatures have been inserted
-    s.makeMeasures(inPlace=True)
+    # Only make measures once time signatures have been inserted
+    s.makeMeasures(
+        meterStream=conductorPart['TimeSignature'].stream() if conductorPart else None,
+        inPlace=True)
     for m in s.getElementsByClass(stream.Measure):
         if voicesRequired:
             m.makeVoices(inPlace=True, fillGaps=True)
