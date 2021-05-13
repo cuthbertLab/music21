@@ -846,7 +846,7 @@ def romanNumeralFromChord(
     ...     )
     <music21.roman.RomanNumeral #io6b3 in C major>
 
-    :class:`~music21.harmony.NoChord` objects give empty RomanNumerals:
+    Empty chords, including :class:`~music21.harmony.NoChord` objects, give empty RomanNumerals:
 
     >>> roman.romanNumeralFromChord(harmony.NoChord())
     <music21.roman.RomanNumeral>
@@ -1002,7 +1002,7 @@ def romanNumeralFromChord(
 
     noKeyGiven = (keyObj is None)
 
-    if isinstance(chordObj, harmony.NoChord):
+    if not chordObj.pitches:
         return RomanNumeral()
 
     # TODO: Make sure 9 works
