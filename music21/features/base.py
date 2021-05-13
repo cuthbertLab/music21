@@ -1160,7 +1160,7 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
 
     >>> y = [x.id for x in features.extractorsById('all')]
     >>> y[0:3], y[-3:-1]
-    (['M1', 'M2', 'M3'], ['MD1', 'MC1'])
+    (['M1', 'M2', 'M3'], ['CS12', 'MC1'])
 
     '''
     from music21.features import jSymbolic
@@ -1241,7 +1241,7 @@ def getIndex(featureString, extractorType=None):
     >>> features.getIndex('Range')
     (61, 'jsymbolic')
     >>> features.getIndex('Ends With Landini Melodic Contour')
-    (19, 'native')
+    (18, 'native')
     >>> features.getIndex('aBrandNewFeature!') is None
     True
     >>> features.getIndex('Fifths Pitch Histogram', 'jsymbolic')

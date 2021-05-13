@@ -842,67 +842,11 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
 
 class ComposerPopularity(featuresModule.FeatureExtractor):
     '''
-    composer's popularity today, as measured by the number of
-    Google search results (log-10).  Works only on English-language Google
-
-    Requires an internet connection.
-
-
-    >>> #_DOCS_SHOW s = corpus.parse('mozart/k155', 2)
-    >>> s = stream.Score() #_DOCS_HIDE
-    >>> s.append(metadata.Metadata()) #_DOCS_HIDE
-    >>> s.metadata.composer = 'W.A. Mozart' #_DOCS_HIDE
-    >>> fe = features.native.ComposerPopularity(s)
-    >>> #_DOCS_SHOW fe.extract().vector[0] > 5.0
-    >>> True #_DOCS_HIDE
-    True
+    REMOVED in v7 because Google's repsonse no longer includes result counts.
+    Empty class still here so that id won't be reused, but it's been removed
+    from this module's list of features.
     '''
     id = 'MD1'
-    googleResultsRE = re.compile(r'([\d,]+) results')
-    _M21UserAgent = ('Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) '
-                     + 'Gecko/20071127 Firefox/2.0.0.11')
-
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
-
-        self.name = 'Composer Popularity'
-        self.description = ('Composer popularity today, as measured by the number '
-                            'of Google search results (log-10).')
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
-        '''Do processing necessary, storing result in feature.
-        '''
-        # use for total number of chords
-
-        resultsLog = 0
-        md = self.data['metadata']
-        if md is None:
-            return 0
-        composer = md.composer
-        if composer is None or composer == '':
-            return 0
-        paramsBasic = {'q': composer}
-
-        params = urlencode(paramsBasic)
-        urlStr = f'http://www.google.com/search?{params}'
-
-        headers = {'User-Agent': self._M21UserAgent}
-        req = Request(urlStr, headers=headers)
-        with urlopen(req) as response:
-            the_page = response.read()
-            the_page = the_page.decode('utf-8')
-
-        m = self.googleResultsRE.search(the_page)
-        if m is not None and m.group(0):
-            totalRes = int(m.group(1).replace(',', ''))
-            if totalRes > 0:
-                resultsLog = math.log(totalRes, 10)
-            else:
-                resultsLog = -1
-
-        self.feature.vector[0] = resultsLog
 
 
 # ------------------------------------------------------------------------------
@@ -1026,7 +970,7 @@ featureExtractors = [
     IncorrectlySpelledTriadPrevalence,  # cs11
     ChordBassMotionFeature,  # cs12
 
-    ComposerPopularity,  # md1
+    # ComposerPopularity,  # md1
 
     LandiniCadence,  # mc1
 
