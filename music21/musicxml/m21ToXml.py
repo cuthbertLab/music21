@@ -1479,6 +1479,13 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         [0.0, 36.0]
         >>> len(SX.parts)
         4
+
+        >>> b.insert(stream.Score())
+        >>> SX = musicxml.m21ToXml.ScoreExporter(b)
+        >>> SX.setPartsAndRefStream()
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+        Exporting scores nested inside scores is not supported
         '''
         s = self.stream
         # environLocal.printDebug('streamToMx(): interpreting multipart')
@@ -1490,6 +1497,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             # https://github.com/cuthbertLab/music21/issues/580
             if isinstance(innerStream, stream.Measure):
                 ht = innerStream.offset + innerStream.highestTime
+            elif isinstance(innerStream, (stream.Score, stream.Opus)):
+                raise MusicXMLExportException(
+                    'Exporting scores nested inside scores is not supported')
             else:
                 innerStream.transferOffsetToElements()
                 ht = innerStream.highestTime
