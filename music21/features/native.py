@@ -16,7 +16,6 @@ import re
 import math
 from typing import Optional
 
-from urllib.request import Request, urlopen
 from urllib.parse import urlencode
 
 
@@ -847,20 +846,19 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
 
     Requires an internet connection.
 
+    Changed in v7 -- implementation uses the package `requests_html`, which must
+    be installed.
 
     >>> #_DOCS_SHOW s = corpus.parse('mozart/k155', 2)
     >>> s = stream.Score() #_DOCS_HIDE
     >>> s.append(metadata.Metadata()) #_DOCS_HIDE
     >>> s.metadata.composer = 'W.A. Mozart' #_DOCS_HIDE
     >>> fe = features.native.ComposerPopularity(s)
-    >>> #_DOCS_SHOW fe.extract().vector[0] > 5.0
-    >>> True #_DOCS_HIDE
+    >>> fe.extract().vector[0] > 5.0
     True
     '''
     id = 'MD1'
     googleResultsRE = re.compile(r'([\d,]+) results')
-    _M21UserAgent = ('Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) '
-                     + 'Gecko/20071127 Firefox/2.0.0.11')
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
@@ -888,13 +886,11 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
         params = urlencode(paramsBasic)
         urlStr = f'http://www.google.com/search?{params}'
 
-        headers = {'User-Agent': self._M21UserAgent}
-        req = Request(urlStr, headers=headers)
-        with urlopen(req) as response:
-            the_page = response.read()
-            the_page = the_page.decode('utf-8')
-
-        m = self.googleResultsRE.search(the_page)
+        from requests_html import HTMLSession
+        session = HTMLSession()
+        response = session.get(urlStr)
+        resultsDiv = response.html.find('div[@id="result-stats"]', first=True)
+        m = self.googleResultsRE.search(resultsDiv.text)
         if m is not None and m.group(0):
             totalRes = int(m.group(1).replace(',', ''))
             if totalRes > 0:
