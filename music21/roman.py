@@ -846,6 +846,10 @@ def romanNumeralFromChord(
     ...     )
     <music21.roman.RomanNumeral #io6b3 in C major>
 
+    :class:`~music21.harmony.NoChord` objects give empty RomanNumerals:
+
+    >>> roman.romanNumeralFromChord(harmony.NoChord())
+    <music21.roman.RomanNumeral>
 
     Augmented 6th chords in other inversions do not currently find correct roman numerals
 
@@ -997,6 +1001,9 @@ def romanNumeralFromChord(
     }
 
     noKeyGiven = (keyObj is None)
+
+    if isinstance(chordObj, harmony.NoChord):
+        return RomanNumeral()
 
     # TODO: Make sure 9 works
     # stepAdjustments = {'minor' : {3: -1, 6: -1, 7: -1},
