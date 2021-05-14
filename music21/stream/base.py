@@ -14118,7 +14118,7 @@ class Test(unittest.TestCase):
 
 # -----------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Stream, Measure, Part, Score, Opus]
+_DOC_ORDER = [Stream, Measure, Part, Score, Opus, Voice]
 
 
 if __name__ == '__main__':
