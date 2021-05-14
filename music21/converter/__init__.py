@@ -1335,13 +1335,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             c.show()
         # TODO: this is only showing the minimum number of measures
 
-    def testParseURL(self):
-        urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
-        urlB = urlBase + 'schubert/piano/d0576&file=d0576-06.krn&f=kern'
-        urlC = urlBase + 'bach/cello&file=bwv1007-01.krn&f=xml'
-        unused_post = parseURL(urlB)
-        unused_post = parseURL(urlC)
-
     def testFreezer(self):
         from music21 import corpus
         s = corpus.parse('bach/bwv66.6.xml')
