@@ -157,7 +157,7 @@ class Graph(prebase.ProtoM21Object):
         '''
         Matplotlib Figure objects need to be explicitly closed when no longer used...
         '''
-        if hasattr(self, 'figure') and self.figure is not None and self.doneAction is None:
+        if hasattr(self, 'figure') and self.figure is not None:
             etm = getExtendedModules()
             etm.plt.close(self.figure)
 
@@ -1599,14 +1599,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         a.data = data
         a.process()
 
-        del a
-
         a = GraphHistogram(doneAction=None, title='50 x with random(30) y counts')
         data = [(x, random.choice(range(30))) for x in range(50)]
         a.data = data
         a.process()
-
-        del a
 
         a = Graph3DBars(doneAction=None,
                                title='50 x with random values increase by 10 per x',
@@ -1643,7 +1639,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             z = random.choice(range(1, 20))
             data.append([x, y, z])
 
-        a = GraphScatterWeighted()
+        a = GraphScatterWeighted(doneAction=None)
         a.data = data
         a.process()
 
