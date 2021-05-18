@@ -10974,7 +10974,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.voices[2].freezeSequence = True
         >>> s.flattenUnnecessaryVoices(inPlace=True)
         >>> [v for v in s.voices]
-        [<music21.stream.Voice (seq:1)>, <music21.stream.Voice (seq:2)>, <music21.stream.Voice (seq:10)>]
+        [<music21.stream.Voice (seq:1)>,
+         <music21.stream.Voice (seq:2)>,
+         <music21.stream.Voice (seq:10)>]
 
         >>> m = stream.Measure()
         >>> m.repeatInsert(note.Note(), [0, 0, 0])  # simultaneous
