@@ -2608,7 +2608,7 @@ class Test(unittest.TestCase):
             "c' 4  "
         )
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     show = True
 
     def xtestConvertNote(self):

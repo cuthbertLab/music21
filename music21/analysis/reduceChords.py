@@ -696,7 +696,7 @@ class Test(unittest.TestCase):
             s.append(c)
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     show = True
 
     def testTrecentoMadrigal(self):

@@ -3117,7 +3117,7 @@ class Test(unittest.TestCase):
         self.assertEqual(dn.duration.tuplets[0].durationNormal.dots, 0)
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     show = True
 
     def testShowSousa(self):

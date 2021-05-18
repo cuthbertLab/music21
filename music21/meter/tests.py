@@ -21,7 +21,7 @@ from music21 import stream
 from music21.meter.base import TimeSignature
 from music21.meter.core import MeterSequence, MeterTerminal
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     show = True
 
     def testSingle(self):

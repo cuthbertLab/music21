@@ -1459,7 +1459,7 @@ class Test(unittest.TestCase):
 
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     show = True
 
     def testOne(self):

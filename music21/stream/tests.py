@@ -47,7 +47,7 @@ environLocal = environment.Environment('stream.tests')
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     show = True
 
     def testLilySimple(self):

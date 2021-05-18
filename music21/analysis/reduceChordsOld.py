@@ -337,7 +337,7 @@ class Test(unittest.TestCase):
         for c in [c1, c2, c3]:
             s.append(c)
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
 
     @unittest.expectedFailure
     def testTrecentoMadrigal(self):

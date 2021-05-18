@@ -1786,7 +1786,7 @@ class Rest(GeneralNote):
 # ------------------------------------------------------------------------------
 # test methods and classes
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     '''
     These are tests that open windows and rely on external software
     '''

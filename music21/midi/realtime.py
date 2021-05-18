@@ -177,7 +177,7 @@ class Test(unittest.TestCase):
     pass
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     try:
         import pygame
         pygame_installed = True

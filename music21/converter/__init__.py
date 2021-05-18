@@ -1315,7 +1315,7 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
             a.parseData(mxString)
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     show = True
 
     def testConversionMusicXml(self):

@@ -3316,7 +3316,7 @@ class TupletFixer:
 # -------------------------------------------------------------------------------
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     show = True
 
     def testSingle(self):

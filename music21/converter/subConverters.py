@@ -1495,7 +1495,7 @@ class Test(unittest.TestCase):
         os.remove(mxlPath)
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     show = True
 
     def testXMLShow(self):

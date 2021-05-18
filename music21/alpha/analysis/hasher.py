@@ -754,7 +754,7 @@ class Test(unittest.TestCase):
         unused_hashes = h.hashStream(s)
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     show = True
 
     # def testBasicHash(self):
