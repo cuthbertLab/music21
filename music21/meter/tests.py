@@ -47,7 +47,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         meterStrDenominator = [1, 2, 4, 8, 16, 32]
         meterStrNumerator = [2, 3, 4, 5, 6, 7, 9, 11, 12, 13]
 
-        for i in range(30):
+        for i in range(8):
             msg = []
             for j in range(1, random.choice([2, 4])):
                 msg.append('%s/%s' % (random.choice(meterStrNumerator),
