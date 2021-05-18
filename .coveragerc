@@ -10,6 +10,6 @@ exclude_lines =
     if __name__ == .__main__.:
     if debug:
     if self.debug:
-    class TestExternal(unittest.TestCase):
+    if self.show:
     def x_test
     pragma: no cover
