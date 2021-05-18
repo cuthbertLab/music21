@@ -338,6 +338,7 @@ class Test(unittest.TestCase):
             s.append(c)
 
 class TestExternal(unittest.TestCase):
+    show = True
 
     @unittest.expectedFailure
     def testTrecentoMadrigal(self):
@@ -375,7 +376,8 @@ class TestExternal(unittest.TestCase):
 
 
         c.insert(0, p)
-        c.show()
+        if self.show:
+            c.show()
 
 
 # ------------------------------------------------------------------------------
