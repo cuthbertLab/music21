@@ -12,4 +12,5 @@ exclude_lines =
     if self.debug:
     if self.show:
     def x_test
+    def xtest
     pragma: no cover
