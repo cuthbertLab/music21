@@ -1479,6 +1479,13 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         [0.0, 36.0]
         >>> len(SX.parts)
         4
+
+        >>> b.insert(stream.Score())
+        >>> SX = musicxml.m21ToXml.ScoreExporter(b)
+        >>> SX.setPartsAndRefStream()
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+        Exporting scores nested inside scores is not supported
         '''
         s = self.stream
         # environLocal.printDebug('streamToMx(): interpreting multipart')
@@ -1490,6 +1497,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             # https://github.com/cuthbertLab/music21/issues/580
             if isinstance(innerStream, stream.Measure):
                 ht = innerStream.offset + innerStream.highestTime
+            elif isinstance(innerStream, (stream.Score, stream.Opus)):
+                raise MusicXMLExportException(
+                    'Exporting scores nested inside scores is not supported')
             else:
                 innerStream.transferOffsetToElements()
                 ht = innerStream.highestTime
@@ -2400,17 +2410,18 @@ class PartExporter(XMLExporterBase):
         self.instrumentSetup()
 
         self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
+
+        # Split complex durations in place
+        self.stream = self.stream.splitAtDurations(recurse=True)[0]
+
         # Suppose that everything below this is a measure
-        measureStream = self.stream.getElementsByClass('Stream').stream()
-        if not measureStream:
+        if not self.stream[stream.Measure]:
             self.fixupNotationFlat()
-            # Now we have measures
-            measureStream = self.stream.getElementsByClass('Stream').stream()
         else:
-            self.fixupNotationMeasured(measureStream)
+            self.fixupNotationMeasured()
         # make sure that all instances of the same class have unique ids
         self.spannerBundle.setIdLocals()
-        for m in measureStream:
+        for m in self.stream.getElementsByClass(stream.Measure):
             self.addDividerComment('Measure ' + str(m.number))
             measureExporter = MeasureExporter(m, parent=self)
             measureExporter.spannerBundle = self.spannerBundle
@@ -2515,48 +2526,55 @@ class PartExporter(XMLExporterBase):
         # spannerBundle = spanner.SpannerBundle(measureStream.flat)
         self.spannerBundle = part.spannerBundle
 
-    def fixupNotationMeasured(self, measureStream):
+    def fixupNotationMeasured(self):
         '''
         Checks to see if there are any attributes in the part stream and moves
         them into the first measure if necessary.
 
         Checks if makeAccidentals is run, and haveBeamsBeenMade is done, and
         haveTupletBracketsBeenMade is done.
+
+        Changed in v7 -- no longer accepts `measureStream` argument.
         '''
         part = self.stream
+        measures = part.getElementsByClass(stream.Measure)
+        first_measure = measures.first()
+        if not first_measure:
+            return
         # check that first measure has any attributes in outer Stream
         # this is for non-standard Stream formations (some kern imports)
         # that place key/clef information in the containing stream
-        if hasattr(measureStream[0], 'clef') and measureStream[0].clef is None:
-            measureStream[0].makeMutable()  # must mutate
+        if hasattr(first_measure, 'clef') and first_measure.clef is None:
+            first_measure.makeMutable()  # must mutate
             outerClefs = part.getElementsByClass('Clef')
             if outerClefs:
-                measureStream[0].clef = outerClefs[0]
+                first_measure.clef = outerClefs.first()
 
-        if hasattr(measureStream[0], 'keySignature') and measureStream[0].keySignature is None:
-            measureStream[0].makeMutable()  # must mutate
+        if hasattr(first_measure, 'keySignature') and first_measure.keySignature is None:
+            first_measure.makeMutable()  # must mutate
             outerKeySignatures = part.getElementsByClass('KeySignature')
             if outerKeySignatures:
-                measureStream[0].keySignature = outerKeySignatures[0]
+                first_measure.keySignature = outerKeySignatures.first()
 
-        if hasattr(measureStream[0], 'timeSignature') and measureStream[0].timeSignature is None:
-            measureStream[0].makeMutable()  # must mutate
+        if hasattr(first_measure, 'timeSignature') and first_measure.timeSignature is None:
+            first_measure.makeMutable()  # must mutate
             outerTimeSignatures = part.getElementsByClass('TimeSignature')
             if outerTimeSignatures:
-                measureStream[0].timeSignature = outerTimeSignatures[0]
+                first_measure.timeSignature = outerTimeSignatures.first()
+
         # see if accidentals/beams can be processed
-        if not measureStream.streamStatus.haveAccidentalsBeenMade():
-            measureStream.makeAccidentals(inPlace=True)
-        if not measureStream.streamStatus.beams:
+        if not part.streamStatus.haveAccidentalsBeenMade():
+            part.makeAccidentals(inPlace=True)
+        if not part.streamStatus.beams:
             try:
-                measureStream.makeBeams(inPlace=True)
-            except exceptions21.StreamException:
+                part.makeBeams(inPlace=True)
+            except exceptions21.StreamException:  # no measures or no time sig?
                 pass
-        if measureStream.streamStatus.haveTupletBracketsBeenMade() is False:
-            stream.makeNotation.makeTupletBrackets(measureStream, inPlace=True)
+        if part.streamStatus.haveTupletBracketsBeenMade() is False:
+            stream.makeNotation.makeTupletBrackets(part, inPlace=True)
 
         if not self.spannerBundle:
-            self.spannerBundle = measureStream.spannerBundle
+            self.spannerBundle = part.spannerBundle
 
     def getXmlScorePart(self):
         '''
@@ -2869,19 +2887,12 @@ class MeasureExporter(XMLExporterBase):
         # turn inexpressible durations into complex durations (unless unlinked)
         if obj.duration.type == 'inexpressible':
             obj.duration.quarterLength = obj.duration.quarterLength
-
-        # make dotGroups into normal notes
-        if len(obj.duration.dotGroups) > 1:
-            obj.duration.splitDotGroups(inPlace=True)
-
-        # split at durations, if not a full-measure rest (e.g. whole rest in 9/8)
-        if 'GeneralNote' in classes and obj.duration.type == 'complex' and not (
-            'Rest' in classes and (
-                obj.fullMeasure in (True, 'always')
-                or (obj.fullMeasure == 'auto' and obj.duration == self.stream.barDuration)
-            )
-        ):
             objList = obj.splitAtDurations()
+        # make dotGroups into normal notes
+        elif len(obj.duration.dotGroups) > 1:
+            obj.duration.splitDotGroups(inPlace=True)
+            objList = obj.splitAtDurations()
+        # otherwise, splitAtDurations() was already called by parse(), no need to repeat
         else:
             objList = [obj]
 
