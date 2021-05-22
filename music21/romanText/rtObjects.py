@@ -820,7 +820,10 @@ class RTKeyTypeAtom(RTAtom):
     >>> gMinor = romanText.rtObjects.RTKeyTypeAtom('g;:')
     >>> gMinor
     <music21.romanText.rtObjects.RTKeyTypeAtom 'g;:'>
+    >>> gMinor.getKey()
+    <music21.key.Key of g minor>
     '''
+    footerStrip = ';:'
 
     def getKey(self):
         '''
