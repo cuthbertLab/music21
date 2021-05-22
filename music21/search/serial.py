@@ -80,6 +80,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         self.segment = segment
         self.containerStream = containerStream
         self.partNumber = partNumber
+        self.activeSegment = []
         self.matchedSegment = None
 
     def _reprInternal(self):
