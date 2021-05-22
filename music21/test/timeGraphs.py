@@ -36,14 +36,14 @@ class TestTimeMozart(Test):
     def testFocus(self):
         music21.converter.parse(music21.corpus.getWork('k155')[0])
 
-class TestTimeCapua1(Test):
-    def testFocus(self):
-        c1 = music21.trecento.capua.Test()
-        c1.testRunPiece()
+# class TestTimeCapua1(Test):
+#     def testFocus(self):
+#         c1 = music21.trecento.capua.Test()
+#         c1.testRunPiece()
 
-class TestTimeCapua2(Test):
-    def testFocus(self):
-        music21.trecento.capua.ruleFrequency()
+# class TestTimeCapua2(Test):
+#     def testFocus(self):
+#         music21.trecento.capua.ruleFrequency()
 
 class TestTimeIsmir(Test):
     def testFocus(self):
