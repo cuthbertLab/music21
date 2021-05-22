@@ -29,8 +29,7 @@ class TestTimeHumdrum(Test):
     def testFocus(self):
         # pylint: disable=expression-not-assigned
         # noinspection PyStatementEffect
-        music21.humdrum.parseData(music21.humdrum.humdrumTestFiles.mazurka6
-                                  ).stream
+        music21.converter.parse(music21.humdrum.testFiles.mazurka6)
 
 class TestTimeMozart(Test):
     def testFocus(self):
