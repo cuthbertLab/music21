@@ -357,7 +357,8 @@ class ConverterIPython(SubConverter):
             subformats = ['vexflow']
 
         if subformats and subformats[0] == 'vexflow':
-            return self.vfshow(obj)
+            raise NotImplementedError
+            # return self.vfshow(obj)
             # subformats = ['lilypond', 'png']
         if subformats:
             helperFormat = subformats[0]
