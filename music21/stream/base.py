@@ -2908,6 +2908,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> result = m.splitAtDurations(recurse=True)
         >>> list(result[0][note.Rest])
         [<music21.note.Rest whole>, <music21.note.Rest quarter>]
+
+        >>> r2 = note.Rest(quarterLength=5.0)
+        >>> r2.fullMeasure = True
+        >>> m2 = stream.Measure(r2)
+        >>> m2.insert(0, meter.TimeSignature('6/4'))
+        >>> result = m2.splitAtDurations()
+        >>> list(result[0][note.Rest])
+        [<music21.note.Rest 5ql>]
         '''
 
         def processContainer(container: Stream):
