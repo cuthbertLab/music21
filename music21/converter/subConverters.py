@@ -1340,7 +1340,7 @@ class ConverterCapella(SubConverter):
         from music21.capella import fromCapellaXML
         ci = fromCapellaXML.CapellaImporter()
         ci.parseXMLText(strData)
-        scoreObj = ci.systemScoreFromScore(self.mainDom.documentElement)
+        scoreObj = ci.systemScoreFromScore(ci.mainDom.documentElement)
         partScore = ci.partScoreFromSystemScore(scoreObj)
         self.stream = partScore
 
