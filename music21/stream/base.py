@@ -1792,6 +1792,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         elFilter = self.iter().getElementsNotOfClass(classFilterList)
         return self._removeIteration(elFilter)
 
+    # pylint: disable=no-member
     def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
         # NOTE: this is a performance critical operation
         defaultIgnoreSet = {'_offsetDict', 'streamStatus', '_elements', '_endElements', '_cache',
@@ -1867,7 +1868,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         # does not purgeOrphans -- q: is that a bug or by design?
         new = self._deepcopySubclassable(memo)
-        if new._elements:
+        if new._elements:  # pylint: disable:no-member
             self._replaceSpannerBundleForDeepcopy(new)
 
         # purging these orphans works in nearly all cases, but there are a few

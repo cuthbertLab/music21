@@ -4175,6 +4175,7 @@ class Pitch(prebase.ProtoM21Object):
             self._client.pitchChanged()
 
 
+
     def getAllCommonEnharmonics(self: PitchType, alterLimit: int = 2) -> t.List[PitchType]:
         '''
         Return all common unique enharmonics for a pitch,
