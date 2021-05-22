@@ -547,6 +547,10 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
     else:
         simplifiedPitches = _greedyEnharmonicsSearch(oldPitches, criterion)
 
+    # Preserve value of spellingIsInferred
+    for oldP, newP in zip(oldPitches, simplifiedPitches):
+        newP.spellingIsInferred = oldP.spellingIsInferred
+
     if remove_first:
         simplifiedPitches = simplifiedPitches[1:]
 
@@ -2909,10 +2913,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> a
         <music21.pitch.Pitch C#3(+20c)>
         '''
-        pc = round(self.ps) % 12
-        if pc == 12:
-            pc = 0
-        return pc
+        return round(self.ps) % 12
 
     @pitchClass.setter
     def pitchClass(self, value: Union[str, int]):
@@ -4325,6 +4326,12 @@ class Pitch(prebase.ProtoM21Object):
         >>> otherPitch.transpose('m-23', inPlace=True)
         >>> print(otherPitch)
         C#-1
+
+        Test an issue with inPlace not setting spellingIsInferred
+
+        >>> pc6.transpose(10, inPlace=True)
+        >>> pc6.spellingIsInferred
+        True
         '''
         # environLocal.printDebug(['Pitch.transpose()', value])
         if 'IntervalBase' in getattr(value, 'classes', []):
@@ -4352,6 +4359,7 @@ class Pitch(prebase.ProtoM21Object):
             self.accidental = p.accidental
             # set fundamental
             self.fundamental = p.fundamental
+            self.spellingIsInferred = p.spellingIsInferred
             return None
 
     # --------------------------------------------------------------------------
@@ -5383,22 +5391,23 @@ class Test(unittest.TestCase):
         bm = converter.parse("tinynotation: 4/4 fn1 fn1 e-8 e'-8 fn4 en4 e'n4").flat
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-        assert(bm.flat.notes[0].pitch.accidental.name == 'natural')     # Fn
-        assert(bm.flat.notes[0].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[1].pitch.accidental.name == 'natural')     # Fn
-        assert(bm.flat.notes[1].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[2].pitch.accidental.name == 'flat')        # E-4
-        assert(bm.flat.notes[2].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[3].pitch.accidental.name == 'flat')        # E-5
-        assert(bm.flat.notes[3].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[4].pitch.accidental.name == 'natural')     # En4
-        assert(bm.flat.notes[4].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[5].pitch.accidental.name == 'natural')     # En4
-        assert(bm.flat.notes[5].pitch.accidental.displayStatus is True)
 
-        assert(bm.flat.notes[6].pitch.accidental is not None)  # En5
-        assert(bm.flat.notes[6].pitch.accidental.name == 'natural')
-        assert(bm.flat.notes[6].pitch.accidental.displayStatus is True)
+        self.assertEqual(bm.flat.notes[0].pitch.accidental.name, 'natural')     # Fn
+        self.assertEqual(bm.flat.notes[0].pitch.accidental.displayStatus, True)
+        self.assertEqual(bm.flat.notes[1].pitch.accidental.name, 'natural')     # Fn
+        self.assertEqual(bm.flat.notes[1].pitch.accidental.displayStatus, True)
+        self.assertEqual(bm.flat.notes[2].pitch.accidental.name, 'flat')        # E-4
+        self.assertEqual(bm.flat.notes[2].pitch.accidental.displayStatus, True)
+        self.assertEqual(bm.flat.notes[3].pitch.accidental.name, 'flat')        # E-5
+        self.assertEqual(bm.flat.notes[3].pitch.accidental.displayStatus, True)
+        self.assertEqual(bm.flat.notes[4].pitch.accidental.name, 'natural')     # En4
+        self.assertEqual(bm.flat.notes[4].pitch.accidental.displayStatus, True)
+        self.assertEqual(bm.flat.notes[5].pitch.accidental.name, 'natural')     # En4
+        self.assertEqual(bm.flat.notes[5].pitch.accidental.displayStatus, True)
+
+        self.assertIsNotNone(bm.flat.notes[6].pitch.accidental)  # En5
+        self.assertEqual(bm.flat.notes[6].pitch.accidental.name, 'natural')
+        self.assertEqual(bm.flat.notes[6].pitch.accidental.displayStatus, True)
 
     def testPitchEquality(self):
         '''

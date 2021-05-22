@@ -946,7 +946,7 @@ class LocalCorpus(Corpus):
 #         className = getattr(virtual, corpusName)
 #         if callable(className):
 #             obj = className()
-#             if isinstance(obj, virtual.VirtualWork):  # @UndefinedVariable
+#             if isinstance(obj, virtual.VirtualWork):
 #                 if obj.corpusPath is not None:
 #                     _virtualWorks.append(obj)
 #     del corpusName

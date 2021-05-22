@@ -284,12 +284,12 @@ class Harmony(chord.Chord):
         When you instantiate a harmony object, if you pass in a figure it
         is stored internally and returned when you access the figure
         property. If you don't instantiate the object with a figure, this
-        property calls :meth:`music21.harmony.findFigure` method which
+        property calls :meth:`music21.harmony.Harmony.findFigure` method which
         deduces the figure provided other information about the object,
         especially the chord.
 
         If the pitches of the harmony object have been modified after being
-        instantiated, call :meth:`music21.harmony.findFigure` to deduce the
+        instantiated, call :meth:`music21.harmony.Harmony.findFigure` to deduce the
         new figure.
 
         >>> h = harmony.ChordSymbol('CM')
@@ -1074,7 +1074,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
        the most thirds above it
        this is not a consistent way to determine the root of 13th chords, for example
     2. a chord vector is extracted from the chord
-        using  :meth:`music21.chord.semitonesFromChordStep`
+        using  :meth:`music21.chord.Chord.semitonesFromChordStep`
         this vector extracts the following degrees: (2, 3, 4, 5, 6, 7, 9, 11, and 13)
     3. this vector is converted to fbNotationString (in the form of chord step,
         and a '-' or '#' to indicate semitone distance)
@@ -1302,7 +1302,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 def chordSymbolFromChord(inChord):
     '''
     Get the :class:`~music21.harmony.chordSymbol` object from the chord, using
-    :meth:`music21.harmony.chordSymbolFigureFromChord`
+    :meth:`music21.harmony.Harmony.chordSymbolFigureFromChord`
 
     >>> c = chord.Chord(['D3', 'F3', 'A4', 'B-5'])
     >>> symbol = harmony.chordSymbolFromChord(c)
@@ -1387,10 +1387,10 @@ class ChordSymbol(Harmony):
     chords, by default appear as chord symbols in a score and have duration of
     0.
 
-    To obtain the chord representation of the in the score, change the
-    :attr:`music21.harmony.ChordSymbol.writeAsChord` to True. Unless otherwise
+    To obtain the chord representation of the `ChordSymbol` in the score, change
+    :attr:`~music21.harmony.Harmony.writeAsChord` to True. Unless otherwise
     specified, the duration of this chord object will become 1.0. If you have a
-    leadsheet, run :meth:`music21.harmony.realizeChordSymbolDurations` on the
+    leadsheet, run :func:`music21.harmony.realizeChordSymbolDurations` on the
     stream to assign the correct (according to offsets) duration to each
     harmony object.)
 
@@ -2204,7 +2204,7 @@ class ChordSymbol(Harmony):
             'Tristan',
             'augmented-seventh',
             'diminished-seventh',
-            'dominant',
+            'dominant-seventh',
             'half-diminished',
             'major-minor',
             'major-seventh',
@@ -2708,11 +2708,7 @@ class Test(unittest.TestCase):
           </harmony>
           """
         figure = 'A7/G'
-        pitches = ('G2', 'A3', 'C#4', 'E4', 'G4')
-        # TODO: Get rid of the extra G once we do something about ChordSymbol construction,
-        # since currently bass() is called before _updatePitches()
-        # and each of them is creating a G
-        # https://github.com/cuthbertLab/music21/issues/793
+        pitches = ('G2', 'A2', 'C#3', 'E3')
 
         self.runTestOnChord(xmlString, figure, pitches)
 

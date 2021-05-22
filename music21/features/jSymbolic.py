@@ -24,6 +24,7 @@ from math import isclose
 from music21 import base
 from music21 import exceptions21
 from music21.features import base as featuresModule
+from music21.instrument import Instrument
 
 from music21 import environment
 _MOD = 'features.jSymbolic'
@@ -3322,6 +3323,20 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
      1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+    Default instruments will lack a `.midiProgram`, so they raise exceptions:
+
+    >>> i = instrument.Instrument()
+    >>> i.midiProgram is None
+    True
+    >>> s2 = stream.Stream()
+    >>> s2.append(i)
+    >>> s2.append(note.Note())
+    >>> fe2 = features.jSymbolic.PitchedInstrumentsPresentFeature(s2)
+    >>> fe2.extract()
+    Traceback (most recent call last):
+    music21.features.jSymbolic.JSymbolicFeatureException:
+    <music21.instrument.Instrument ''> lacks a midiProgram
     '''
     id = 'I1'
 
@@ -3342,18 +3357,16 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
         s = self.data['partitionByInstrument']
         # each part has content for each instrument
         # count = 0
-        if s is not None:
-            for p in s.parts:
-                # always one instrument
-                x = p.getElementsByClass('Instrument')
-                if x:
-                    i = x[0]
-                    if p.recurse().notes:
-                        self.feature.vector[i.midiProgram] = 1
-                else:
-                    pass
-        else:
+        if not s:
             raise JSymbolicFeatureException('input lacks instruments')
+        for p in s.parts:
+            # always one instrument
+            i = p.getElementsByClass(Instrument).first()
+            if p.recurse().notes:
+                if i.midiProgram is None:
+                    iStr = str(i) or repr(i)
+                    raise JSymbolicFeatureException(f'{iStr} lacks a midiProgram')
+                self.feature.vector[i.midiProgram] = 1
 
 
 class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
@@ -3408,6 +3421,13 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+    `.midiProgram` cannot be None:
+
+    >>> s1.getInstruments().first().midiProgram = None
+    >>> fe2 = features.jSymbolic.NotePrevalenceOfPitchedInstrumentsFeature(s1)
+    >>> fe2.extract()
+    Traceback (most recent call last):
+    music21.features.jSymbolic.JSymbolicFeatureException: Acoustic Guitar lacks a midiProgram
     '''
     id = 'I3'
 
@@ -3434,9 +3454,12 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
             raise JSymbolicFeatureException('input lacks notes')
         for p in s.parts:
             # always one instrument
-            i = p.getElementsByClass('Instrument').first()
+            i = p.getElementsByClass(Instrument).first()
             pNotes = p.recurse().notes
             if pNotes:
+                if i.midiProgram is None:
+                    iStr = str(i) or repr(i)
+                    raise JSymbolicFeatureException(f'{iStr} lacks a midiProgram')
                 self.feature.vector[i.midiProgram] = len(pNotes) / total
 
 
@@ -3539,7 +3562,7 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
         coll = []
         for p in s.parts:
             # always one instrument
-            i = p.getElementsByClass('Instrument').first()
+            i = p.getElementsByClass(Instrument).first()
             pNotes = p.recurse().notes
             if pNotes:
                 coll.append(len(pNotes) / total)
@@ -3689,7 +3712,7 @@ class InstrumentFractionFeature(featuresModule.FeatureExtractor):
         if not total:
             raise JSymbolicFeatureException('input lacks notes')
         for p in s.parts:
-            i = p.getElementsByClass('Instrument').first()
+            i = p.getElementsByClass(Instrument).first()
             if i.midiProgram in self._targetPrograms:
                 count += len(p.flat.notes)
         self.feature.vector[0] = count / total

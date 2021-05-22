@@ -43,12 +43,12 @@ def getExtendedModules():
     if 'matplotlib' in _missingImport:
         raise GraphException(
             'could not find matplotlib, graphing is not allowed')  # pragma: no cover
-    import matplotlib  # @UnresolvedImport
+    import matplotlib
     # backend can be configured from config file, matplotlibrc,
     # but an early test broke all processing
     # matplotlib.use('WXAgg')
     try:
-        from mpl_toolkits.mplot3d import Axes3D  # @UnresolvedImport
+        from mpl_toolkits.mplot3d import Axes3D
     except ImportError:  # pragma: no cover
         Axes3D = None
         environLocal.warn(
@@ -56,13 +56,14 @@ def getExtendedModules():
             + 'old version of six.py (< 1.9.0) on your system somewhere'
         )
 
-    from matplotlib import collections  # @UnresolvedImport
-    from matplotlib import patches  # @UnresolvedImport
+    from matplotlib import collections
+    from matplotlib import patches
 
     # from matplotlib.colors import colorConverter
-    import matplotlib.pyplot as plt  # @UnresolvedImport
+    import matplotlib.pyplot as plt
 
     try:
+        # noinspection PyPackageRequirements
         import networkx
     except ImportError:  # pragma: no cover
         networkx = None  # use for testing

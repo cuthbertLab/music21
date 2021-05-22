@@ -12,7 +12,7 @@
 These are the public methods for the MEI module by Christopher Antila
 
 To convert a string with MEI markup into music21 objects,
-use :meth:`MeiToM21Converter.convertFromString`.
+use :meth:`~music21.mei.MeiToM21Converter.convertFromString`.
 
 In the future, most of the functions in this module should be moved to a separate, import-only
 module, so that functions for writing music21-to-MEI will fit nicely.
@@ -354,7 +354,9 @@ def safePitch(
     function instead returns a default :class:`~music21.pitch.Pitch` instance.
 
     name: Desired name of the :class:`~music21.pitch.Pitch`.
+
     accidental: (Optional) Symbol for the accidental.
+
     octave: (Optional) Octave number.
 
     Returns A :class:`~music21.pitch.Pitch` with the appropriate properties.
@@ -2328,13 +2330,16 @@ def spaceFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     <space>  A placeholder used to fill an incomplete measure, layer, etc. most often so that the
     combined duration of the events equals the number of beats in the measure.
 
+    Returns a Rest element with hideObjectOnPrint = True
+
     In MEI 2013: pg.440 (455 in PDF) (MEI.shared module)
     '''
     # NOTE: keep this in sync with restFromElement()
 
     theDuration = _qlDurationFromAttr(elem.get('dur'))
     theDuration = makeDuration(theDuration, int(elem.get('dots', 0)))
-    theSpace = note.SpacerRest(duration=theDuration)
+    theSpace = note.Rest(duration=theDuration)
+    theSpace.style.hideObjectOnPrint = True
 
     if elem.get(_XMLID) is not None:
         theSpace.id = elem.get(_XMLID)

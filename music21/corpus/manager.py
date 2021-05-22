@@ -117,7 +117,7 @@ def getWork(workName,
             fileExtensions=None,
             ):
     '''
-    this parse method is called from `corpus.parse()` and does nothing differently from it.
+    this parse function is called from `corpus.parse()` and does nothing differently from it.
 
     Searches all corpora for a file that matches the name and returns it parsed.
     '''
@@ -218,7 +218,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     '''
     Search all stored metadata bundles and return a list of file paths.
 
-    This method uses stored metadata and thus, on first usage, will incur a
+    This function uses stored metadata and thus, on first usage, will incur a
     performance penalty during metadata loading.
 
     >>> corpus.search('china')
@@ -244,9 +244,8 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     <music21.metadata.bundles.MetadataBundle {368 entries}>
 
 
-
-    This method is implemented in `corpus.manager` but loaded into corpus for
-    ease of use.
+    This function is implemented in `corpus.manager` as a method there but also directly
+    available in the corpus module for ease of use.
 
     The ``corpusNames`` parameter can be used to specify which corpora to search,
     for example:

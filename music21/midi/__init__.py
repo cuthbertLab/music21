@@ -29,7 +29,6 @@ __all__ = [
     'DeltaTime',
     'MetaEvents', 'ChannelVoiceMessages', 'ChannelModeMessages',
     'SysExEvents',
-    'EnumerationException',
 ]
 
 import io
@@ -38,7 +37,7 @@ import os
 import string
 import struct
 import sys
-import unicodedata  # @UnresolvedImport
+import unicodedata
 import unittest
 from typing import Optional, Union, Tuple
 
@@ -59,10 +58,6 @@ environLocal = environment.Environment(_MOD)
 # good midi reference:
 # http://www.sonicspot.com/guide/midifiles.html
 # ------------------------------------------------------------------------------
-class EnumerationException(exceptions21.Music21Exception):
-    pass
-
-
 class MidiException(exceptions21.Music21Exception):
     pass
 
@@ -446,6 +441,12 @@ class MidiEvent(prebase.ProtoM21Object):
     The `data` attribute is used for storing other messages,
     such as SEQUENCE_TRACK_NAME string values.
 
+    .. warning::
+
+        The attributes `.midiProgram` and `.midiChannel` on :class:`~music21.instrument.Instrument`
+        objects are 0-indexed, just as they need to be in the written binary .mid.
+        However, as a convenience, :attr:`MidiEvent.channel` is 1-indexed. No
+        analogous convenience is provided for program change data.
 
     >>> mt = midi.MidiTrack(1)
     >>> me1 = midi.MidiEvent(mt)
@@ -469,7 +470,7 @@ class MidiEvent(prebase.ProtoM21Object):
                  track: Optional['music21.midi.MidiTrack'] = None,
                  type=None,  # @ReservedAssignment
                  time: int = 0,
-                 channel=None):
+                 channel: Optional[int] = None):
         self.track: Optional['music21.midi.MidiTrack'] = track  # a MidiTrack object
         self.type = type
         self.time: int = time
@@ -1538,7 +1539,7 @@ class MidiFile(prebase.ProtoM21Object):
         '''
         if attrib not in ['rb', 'wb']:
             raise MidiException('cannot read or write unless in binary mode, not:', attrib)
-        self.file = open(filename, attrib)
+        self.file = open(filename, attrib)  # pylint: disable=consider-using-with
 
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by BytesIO, as an open file object.

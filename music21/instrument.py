@@ -131,8 +131,8 @@ class Instrument(base.Music21Object):
     * instrumentId
     * instrumentName
     * instrumentAbbreviation
-    * midiProgram
-    * midiChannel
+    * midiProgram (0-indexed)
+    * midiChannel (0-indexed)
     * lowestNote (a note object or a string for _written_ pitch)
     * highestNote (a note object or a string for _written_ pitch)
     * transposition (an interval object)
@@ -158,8 +158,8 @@ class Instrument(base.Music21Object):
 
         self.instrumentName = instrumentName
         self.instrumentAbbreviation = None
-        self.midiProgram = None
-        self.midiChannel = None
+        self.midiProgram = None  # 0-indexed
+        self.midiChannel = None  # 0-indexed
         self.instrumentSound = None
 
         self.lowestNote = None
@@ -239,7 +239,7 @@ class Instrument(base.Music21Object):
         assigns the number to self.midiChannel and returns
         it as an int.
 
-        Note that midi channel 10 is special, and
+        Note that midi channel 10 (9 in music21) is special, and
         thus is skipped.
 
         Currently only 16 channels are used.
@@ -248,12 +248,28 @@ class Instrument(base.Music21Object):
         signature is NOT a mistake, but necessary for
         the case where there needs to be a global list.
 
-        >>> used = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11]
+        >>> used = [0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11]
         >>> i = instrument.Violin()
         >>> i.autoAssignMidiChannel(used)
         12
         >>> i.midiChannel
         12
+
+        Unpitched percussion will be set to 9, so long as it's not in the filter list:
+
+        >>> used = [0]
+        >>> i = instrument.Maracas()
+        >>> i.autoAssignMidiChannel(used)
+        9
+        >>> i.midiChannel
+        9
+
+        >>> used = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        >>> i = instrument.Woodblock()
+        >>> i.autoAssignMidiChannel(used)
+        11
+        >>> i.midiChannel
+        11
 
         OMIT_FROM_DOCS
 
@@ -272,18 +288,21 @@ class Instrument(base.Music21Object):
 
         if not channelFilter:
             self.midiChannel = 0
-            return 0
+            return self.midiChannel
         elif len(channelFilter) >= maxMidi:
             raise InstrumentException('we are out of midi channels! help!')
+        elif 'UnpitchedPercussion' in self.classes and 9 not in usedChannels:
+            self.midiChannel = 9
+            return self.midiChannel
         else:
             for ch in range(maxMidi):
                 if ch in channelFilter:
                     continue
-                elif ch % 16 == 10:
+                elif ch % 16 == 9:
                     continue  # skip 10 / percussion for now
                 else:
                     self.midiChannel = ch
-                    return ch
+                    return self.midiChannel
             return 0
             # raise InstrumentException('we are out of midi channels and this ' +
             #            'was not already detected PROGRAM BUG!')
@@ -1072,6 +1091,7 @@ class UnpitchedPercussion(Percussion):
         super().__init__()
         self._modifier = None
         self._modifierToPercMapPitch = {}
+        self.midiChannel = 9  # 0-indexed, i.e. MIDI channel 10
 
     def _getModifier(self):
         return self._modifier
@@ -2103,11 +2123,11 @@ def partitionByInstrument(streamObj):
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
-            {2.0} <music21.note.Rest rest>
+            {2.0} <music21.note.Rest quarter>
             {3.0} <music21.note.Note F#>
         {4.0} <music21.stream.Measure 2 offset=4.0>
             {0.0} <music21.note.Note G#>
-            {1.0} <music21.note.Rest rest>
+            {1.0} <music21.note.Rest half>
             {3.0} <music21.note.Note C>
         {8.0} <music21.stream.Measure 3 offset=8.0>
             {0.0} <music21.note.Note C>
@@ -2117,7 +2137,7 @@ def partitionByInstrument(streamObj):
             {0.0} <music21.instrument.AltoSaxophone 'Alto Saxophone'>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>
-            {0.0} <music21.note.Rest rest>
+            {0.0} <music21.note.Rest half>
             {2.0} <music21.note.Note E>
             {3.0} <music21.note.Note F>
         {4.0} <music21.stream.Measure 2 offset=4.0>
@@ -2133,9 +2153,9 @@ def partitionByInstrument(streamObj):
             {0.0} <music21.note.Note C#>
             {1.0} <music21.note.Note D#>
             {2.0} <music21.note.Note E#>
-            {3.0} <music21.note.Rest rest>
+            {3.0} <music21.note.Rest quarter>
         {4.0} <music21.stream.Measure 2 offset=4.0>
-            {0.0} <music21.note.Rest rest>
+            {0.0} <music21.note.Rest quarter>
             {1.0} <music21.note.Note A#>
             {2.0} <music21.note.Note B#>
             {3.0} <music21.note.Note C#>
@@ -2145,6 +2165,7 @@ def partitionByInstrument(streamObj):
 
     TODO: parts should be in Score Order. Coincidence that this almost works.
     TODO: use proper recursion to make a copy of the stream.
+    TODO: final barlines should be aligned.
     '''
     from music21 import stream
 

@@ -50,7 +50,7 @@ class TwelveToneMatrix(stream.Stream):
 
     This object is commonly used by calling the
     :meth:`~music21.stream.TwelveToneRow.matrix` method of
-    :meth:`~music21.stream.TwelveToneRow` (or a subclass).
+    :class:`~music21.stream.TwelveToneRow` (or a subclass).
 
     >>> ttr = serial.TwelveToneRow([0, 2, 11, 7, 8, 3, 9, 1, 4, 10, 6, 5])
     >>> aMatrix = ttr.matrix()
@@ -767,8 +767,8 @@ class TwelveToneRow(ToneRow):
 
         The convention for serial transformations must also be specified as 'zero' or
         'original', as explained
-        in :meth:`~music21.serial.findZeroCenteredTransformations` and
-        :meth:`~music21.serial.findOriginalCenteredTransformations`.
+        in :meth:`~music21.serial.ToneRow.findZeroCenteredTransformations` and
+        :meth:`~music21.serial.ToneRow.findOriginalCenteredTransformations`.
 
         >>> row = serial.pcToToneRow([5, 9, 11, 3, 6, 7, 4, 10, 0, 8, 2, 1])
         >>> row.findTransformedHistorical('original')
@@ -1462,9 +1462,8 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'HistoricalTwelveToneRow', 'ContiguousSegmentOfNotes',
-              'historicalDict',
-              'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 'getHistoricalRowByName',
+_DOC_ORDER = [ToneRow, TwelveToneRow, HistoricalTwelveToneRow,
+              pcToToneRow, TwelveToneMatrix, rowToMatrix, getHistoricalRowByName,
               ]
 
 if __name__ == '__main__':

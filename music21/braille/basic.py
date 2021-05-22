@@ -1093,7 +1093,7 @@ def showOctaveWithNote(previousNote, currentNote):
 
 
     Of course, these rules cease to apply in quite a few cases, which are not directly reflected
-    in the results of this method:
+    in the results of this function:
 
 
     1) If a braille measure goes to a new line, the first note in the measure carries an
@@ -1109,7 +1109,7 @@ def showOctaveWithNote(previousNote, currentNote):
        those cases needs an octave marking.
 
 
-    If any special case happens, previousNote can be set to None and the method will return
+    If any special case happens, previousNote can be set to None and the function will return
     True.
 
 
@@ -1422,7 +1422,7 @@ def brailleUnicodeToBrailleAscii(brailleUnicode):
     which is the format compatible with most braille embossers.
 
 
-    .. note:: The method works by corresponding braille symbols to ASCII symbols.
+    .. note:: The function works by corresponding braille symbols to ASCII symbols.
         The table which corresponds said values can be found
         `here <http://en.wikipedia.org/wiki/Braille_ASCII#Braille_ASCII_values>`_.
         Because of the way in which the braille symbols translate2, the resulting
@@ -1463,7 +1463,7 @@ def brailleAsciiToBrailleUnicode(brailleAscii):
     can then be displayed on-screen in braille on compatible systems.
 
 
-    .. note:: The method works by corresponding ASCII symbols to braille
+    .. note:: The function works by corresponding ASCII symbols to braille
         symbols in a very direct fashion. It is not a translator from plain
         text to braille, because ASCII symbols may not correspond to their
         equivalents in braille. For example, a literal period is a 4 in

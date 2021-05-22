@@ -20,6 +20,7 @@ import unittest
 import warnings
 
 from music21 import common
+from music21.common.classTools import tempAttribute, saveAttributes
 from music21.common.enums import OffsetSpecial
 from music21.exceptions21 import StreamException
 from music21.stream import filters
@@ -88,6 +89,16 @@ class StreamIterator(prebase.ProtoM21Object):
     * For `activeInformation` see above.
 
     Changed in v.5.2 -- all arguments except srcStream are keyword only.
+
+    OMIT_FROM_DOCS
+
+    Informative exception for user error:
+
+    >>> s = stream.Stream()
+    >>> sIter = stream.iterator.StreamIterator(s, filterList=[note.Note])
+    Traceback (most recent call last):
+    TypeError: filterList expects Filters or callables,
+    not types themselves; got <class 'music21.note.Note'>
     '''
     def __init__(self,
                  srcStream: 'music21.stream.Stream',
@@ -111,7 +122,7 @@ class StreamIterator(prebase.ProtoM21Object):
         self.iterSection = '_elements'
 
         self.cleanupOnStop = False
-        self.restoreActiveSites = restoreActiveSites
+        self.restoreActiveSites: bool = restoreActiveSites
 
         self.overrideDerivation = None
 
@@ -121,6 +132,10 @@ class StreamIterator(prebase.ProtoM21Object):
             filterList = [filterList]
         elif isinstance(filterList, (set, tuple)):
             filterList = list(filterList)  # mutable....
+        for x in filterList:
+            if isinstance(x, type):
+                raise TypeError(
+                    f'filterList expects Filters or callables, not types themselves; got {x}')
         # self.filters is a list of expressions that
         # return True or False for an element for
         # whether it should be yielded.
@@ -365,7 +380,7 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         if self._len is not None:
             return self._len
-        self._len = len(self.matchingElements())
+        self._len = len(self.matchingElements(restoreActiveSites=False))
         self.reset()
         return self._len
 
@@ -415,8 +430,12 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         if self._len is not None:
             return bool(self._len)
-        for unused in self:
-            return True
+
+        # do not change active site of first element in bool
+        with tempAttribute(self, 'restoreActiveSites', False):
+            for unused in self:
+                return True
+
         return False
 
     def clone(self: _SIter) -> _SIter:
@@ -443,7 +462,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.recurse().notes.first()
         <music21.note.Note D>
         >>> s.recurse().getElementsByClass('Rest').first()
-        <music21.note.Rest rest>
+        <music21.note.Rest half>
 
         If no elements match, returns None:
 
@@ -494,7 +513,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.recurse().notes.last()
         <music21.note.Note G>
         >>> s.recurse().getElementsByClass('Rest').last()
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
 
         New in v7.
 
@@ -572,7 +591,7 @@ class StreamIterator(prebase.ProtoM21Object):
     # ---------------------------------------------------------------
     # getting items
 
-    def matchingElements(self):
+    def matchingElements(self, *, restoreActiveSites: bool = True):
         '''
         returns a list of elements that match the filter.
 
@@ -601,7 +620,8 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> sI_notes
         <music21.stream.iterator.StreamIterator for Part:tn3/4 @:0>
 
-        Note that this used to be True until v6.0.3
+        Adding a filter to the Stream iterator returns a new Stream iterator; it
+        does not change the original.
 
         >>> sI_notes is sI
         False
@@ -616,21 +636,24 @@ class StreamIterator(prebase.ProtoM21Object):
         [<music21.note.Note C>, <music21.note.Note D>,
          <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>,
          <music21.note.Note A>]
+
+        If restoreActiveSites is False then the elements will not have
+        their activeSites changed (callers should use it when they do not plan to actually
+        expose the elements to users, such as in `__len__`).
+
+        Added in v7. -- restoreActiveSites
         '''
         if self._matchingElements is not None:
             return self._matchingElements
 
-        savedIndex = self.index
-        savedRestoreActiveSites = self.restoreActiveSites
-        self.restoreActiveSites = True
+        with saveAttributes(self, 'restoreActiveSites', 'index'):
+            self.restoreActiveSites = restoreActiveSites
+            me = [x for x in self]  # pylint: disable=unnecessary-comprehension
+            self.reset()
 
-        me = [x for x in self]  # pylint: disable=unnecessary-comprehension
-
-        self.reset()
-
-        self.index = savedIndex
-        self.restoreActiveSites = savedRestoreActiveSites
-        self._matchingElements = me
+        if restoreActiveSites == self.restoreActiveSites:
+            # cache, if we are using the iterator default.
+            self._matchingElements = me
 
         return me
 
@@ -718,7 +741,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s3 = s.iter.stream()
         >>> s3.show('t')
         {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Rest rest>
+        {1.0} <music21.note.Rest quarter>
         {2.0} <music21.note.Note D>
         {3.0} <music21.bar.Barline type=regular>
 
@@ -888,7 +911,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.append(note.Note('D'))
         >>> for el in s.iter.getElementsByClass('Rest'):
         ...     print(el)
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
 
 
         ActiveSite is restored...
@@ -907,10 +930,57 @@ class StreamIterator(prebase.ProtoM21Object):
 
         >>> for el in s.iter.getElementsByClass(note.Rest):
         ...     print(el)
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
 
         '''
         return self.addFilter(filters.ClassFilter(classFilterList), returnClone=returnClone)
+
+    def getElementsByQuerySelector(self, querySelector: str, *, returnClone=True):
+        '''
+        First implementation of a query selector, similar to CSS QuerySelectors used in
+        HTML DOM:
+
+        * A leading `#` indicates the id of an element, so '#hello' will find elements
+          with `el.id=='hello'` (should only be one)
+        * A leading `.` indicates the group of an element, so '.high' will find elements
+          with `'high' in el.groups`
+        * Any other string is considered to be the type/class of the element.  So `Note`
+          will find all Note elements.  Can be fully qualified like `note.Note`
+
+        Eventually, more complex query selectors will be implemented.  This is just a start.
+
+        Setting up an example:
+
+        >>> s = converter.parse('tinyNotation: 4/4 GG4 AA4 BB4 r4 C4 D4 E4 F4 r1')
+        >>> s[note.Note].last().id = 'last'
+        >>> for n in s[note.Note]:
+        ...     if n.octave == 3:
+        ...         n.groups.append('tenor')
+
+        >>> list(s.recurse().getElementsByQuerySelector('.tenor'))
+        [<music21.note.Note C>,
+         <music21.note.Note D>,
+         <music21.note.Note E>,
+         <music21.note.Note F>]
+
+        >>> list(s.recurse().getElementsByQuerySelector('Rest'))
+        [<music21.note.Rest quarter>,
+         <music21.note.Rest whole>]
+
+        Note that unlike with stream slices, the querySelector does not do anything special
+        for id searches.  `.first()` will need to be called to find the element (if any)
+
+        >>> s.recurse().getElementsByQuerySelector('#last').first()
+        <music21.note.Note F>
+
+        New in v.7
+        '''
+        if querySelector.startswith('#'):
+            return self.addFilter(filters.IdFilter(querySelector[1:]), returnClone=returnClone)
+        if querySelector.startswith('.'):
+            return self.addFilter(filters.GroupFilter(querySelector[1:]), returnClone=returnClone)
+        return self.addFilter(filters.ClassFilter(querySelector), returnClone=returnClone)
+
 
     def getElementsNotOfClass(self, classFilterList, *, returnClone=True):
         '''
@@ -1271,7 +1341,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> for el in s.iter.notesAndRests:
         ...     print(el)
         <music21.note.Note C>
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
         <music21.note.Note D>
 
         chained filters... (this makes no sense since notes is a subset of notesAndRests)
@@ -1549,13 +1619,14 @@ class RecursiveIterator(StreamIterator):
             else:
                 self.sectionIndex = self.index
 
-            self.index += 1  # increment early in case of an error in the next try.
-
             try:
-                e = self.srcStreamElements[self.index - 1]
+                e = self.srcStreamElements[self.index]
             except IndexError:
-                # this may happen in the number of elements has changed
+                self.index += 1
+                # this may happen if the number of elements has changed
                 continue
+
+            self.index += 1
 
             # in a recursive filter, the stream does not need to match the filter,
             # only the internal elements.
@@ -1603,12 +1674,11 @@ class RecursiveIterator(StreamIterator):
         self.activeInformation['lastYielded'] = None
         super().reset()
 
-    def matchingElements(self):
+    def matchingElements(self, *, restoreActiveSites=True):
         # saved parent iterator later?
         # will this work in mid-iteration? Test, or do not expose till then.
-        savedRecursiveIterator = self.childRecursiveIterator
-        fe = super().matchingElements()
-        self.childRecursiveIterator = savedRecursiveIterator
+        with tempAttribute(self, 'childRecursiveIterator'):
+            fe = super().matchingElements(restoreActiveSites=restoreActiveSites)
         return fe
 
     def iteratorStack(self):

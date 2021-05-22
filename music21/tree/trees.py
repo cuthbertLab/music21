@@ -978,8 +978,7 @@ class OffsetTree(ElementTree):
                 result.extend(recurseBySlice(node.leftChild, start, stop))
             if start < node.payloadElementsStopIndex and node.payloadElementsStartIndex < stop:
                 indexStart = start - node.payloadElementsStartIndex
-                if indexStart < 0:
-                    indexStart = 0
+                indexStart = max(indexStart, 0)
                 indexStop = stop - node.payloadElementsStartIndex
                 result.extend(node.payload[indexStart:indexStop])
             if node.payloadElementsStopIndex <= stop and node.rightChild:

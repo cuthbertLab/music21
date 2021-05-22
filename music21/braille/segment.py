@@ -8,7 +8,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Inner classes and methods for transcribing musical segments into braille.
+Inner classes and functions for transcribing musical segments into braille.
 
 This module was made in consultation with the manual "Introduction to Braille
 Music Transcription, Second Edition" by Mary Turner De Garmo, 2005. It is
@@ -196,11 +196,11 @@ class BrailleElementGrouping(ProtoM21Object):
         >>> bg.append(note.Note('F4'))
         >>> bg
         <music21.braille.segment.BrailleElementGrouping [<music21.note.Note C>,
-            <music21.note.Note D>, <music21.note.Rest rest>, <music21.note.Note F>]>
+            <music21.note.Note D>, <music21.note.Rest quarter>, <music21.note.Note F>]>
         >>> print(bg)
         <music21.note.Note C>
         <music21.note.Note D>
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
         <music21.note.Note F>
 
         These are the defaults and they are shared across all objects...
@@ -1394,10 +1394,10 @@ def findSegments(music21Part, **partKeywords):
 
     Returns a list of :class:`~music21.segment.BrailleSegment` instances.
 
-    Five methods get called in the generation of segments:
+    Five functions or methods get called in the generation of segments:
 
-    * :meth:`~music21.braille.segment.prepareSlurredNotes`
-    * :meth:`~music21.braille.segment.getRawSegments`
+    * :func:`~music21.braille.segment.prepareSlurredNotes`
+    * :func:`~music21.braille.segment.getRawSegments`
     * :meth:`~music21.braille.segment.BrailleSegment.addGroupingAttributes`
     * :meth:`~music21.braille.segment.BrailleSegment.addSegmentAttributes`
     * :meth:`~music21.braille.segment.BrailleSegment.fixArticulations`
@@ -1504,9 +1504,9 @@ def findSegments(music21Part, **partKeywords):
     ===
     Measure 15, Note Grouping 1:
     <music21.note.Note C>
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
     <music21.note.Note F>
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
     ===
     Measure 16, Note Grouping 1:
     <music21.note.Note A->
@@ -1723,7 +1723,7 @@ def prepareSlurredNotes(music21Part, **keywords):
 def getRawSegments(music21Part, setHand=None):
     '''
     Takes in a :class:`~music21.stream.Part`, divides it up into segments (i.e. instances of
-    :class:`~music21.braille.segment.BrailleSegment`). This method assumes
+    :class:`~music21.braille.segment.BrailleSegment`). This function assumes
     that the Part is already divided up into measures
     (see :class:`~music21.stream.Measure`). An acceptable input is shown below.
 
@@ -1732,10 +1732,10 @@ def getRawSegments(music21Part, setHand=None):
     or :class:`~music21.braille.objects.BrailleOptionalSegmentDivision`
     or after 48 elements if a double bar or repeat sign is encountered.
 
-    Two methods are called on each measure during the creation of segments:
+    Two functions are called for each measure during the creation of segments:
 
-    * :meth:`~music21.braille.segment.prepareBeamedNotes`
-    * :meth:`~music21.braille.segment.extractBrailleElements`
+    * :func:`~music21.braille.segment.prepareBeamedNotes`
+    * :func:`~music21.braille.segment.extractBrailleElements`
 
     >>> tn = converter.parse("tinynotation: 3/4 c4 c c e e e g g g c'2.")
     >>> tn = tn.makeNotation(cautionaryNotImmediateRepeat=False)
@@ -1973,8 +1973,8 @@ def extractBrailleElements(music21Measure):
     {2.0} <music21.bar.Barline type=final>
 
 
-    Spanners are dealt with in :meth:`~music21.braille.segment.prepareSlurredNotes`,
-    so they are not returned by this method, as seen below.
+    Spanners are dealt with in :func:`~music21.braille.segment.prepareSlurredNotes`,
+    so they are not returned by this function, as seen below.
 
     >>> print(segment.extractBrailleElements(measure))
     <music21.meter.TimeSignature 2/4>
@@ -2212,7 +2212,7 @@ def areGroupingsIdentical(noteGroupingA, noteGroupingB):
 
 def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
     '''
-    Almost identical to :meth:`~music21.braille.segment.splitMeasure`, but
+    Almost identical to :func:`~music21.braille.segment.splitMeasure`, but
     functions on a :class:`~music21.braille.segment.BrailleElementGrouping`
     instead.
 
@@ -2233,7 +2233,7 @@ def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
 
     >>> right
     <music21.braille.segment.BrailleElementGrouping
-        [<music21.note.Rest rest>, <music21.note.Note E>]>
+        [<music21.note.Rest quarter>, <music21.note.Note E>]>
 
 
     Now split one beat division earlier than it should be.  For 2/2 that means
@@ -2245,7 +2245,7 @@ def splitNoteGrouping(noteGrouping, beatDivisionOffset=0):
         [<music21.note.Note C>]>
     >>> right
     <music21.braille.segment.BrailleElementGrouping
-        [<music21.note.Note D>, <music21.note.Rest rest>, <music21.note.Note E>]>
+        [<music21.note.Note D>, <music21.note.Rest quarter>, <music21.note.Note E>]>
     '''
     music21Measure = stream.Measure()
     for brailleElement in noteGrouping:

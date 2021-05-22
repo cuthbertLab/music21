@@ -48,7 +48,7 @@ environLocal = environment.Environment(_MOD)
 
 
 def _mergeDicts(a, b):
-    '''utility method to merge two dictionaries'''
+    '''utility function to merge two dictionaries'''
     c = a.copy()
     c.update(b)
     return c
@@ -916,7 +916,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
 
     def write(self, fp=None):  # pragma: no cover
         '''
-        Process method here overridden to provide legend.
+        Overrides the normal write method here to add a legend.
         '''
         # call the process routine in the base graph
         super().write(fp)
@@ -1543,7 +1543,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             (ScatterPitchClassQuarterLength, None, None),
             (ScatterPitchClassOffset, None, None),
             (ScatterPitchSpaceDynamicSymbol,
-             corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
+             corpus.getWork('schumann/opus41no1', 2),
+             'Schumann Opus 41 No 1'),
 
             # offset based horizontal
             (HorizontalBarPitchSpaceOffset, None, None),
@@ -1552,12 +1553,14 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             (ScatterWeightedPitchSpaceQuarterLength, None, None),
             (ScatterWeightedPitchClassQuarterLength, None, None),
             (ScatterWeightedPitchSpaceDynamicSymbol,
-             corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
+             corpus.getWork('schumann/opus41no1', 2),
+             'Schumann Opus 41 No 1'),
 
 
             # 3d graphs
             (Plot3DBarsPitchSpaceQuarterLength,
-             testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'),  # @UndefinedVariable
+             testFiles.mozartTrioK581Excerpt,
+             'Mozart Trio K581 Excerpt'),
 
             (WindowedKey, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
             (WindowedAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
@@ -1662,6 +1665,20 @@ class Test(unittest.TestCase):
                         minWindow=1, windowStep=windowStep,
                         doneAction=doneAction, dpi=300)
         b.run()
+        self.assertEqual(b.graphLegend.data,
+            [
+                ['Major',
+                    [('C#', '#f0727a'), ('D', '#ffd752'), ('E', '#eeff9a'),
+                     ('F#', '#b9f0ff'), ('A', '#bb9aff'), ('B', '#ffb5ff')
+                     ]
+                 ],
+                ['Minor',
+                    [('c#', '#8c0e16'), ('', '#ffffff'), ('', '#ffffff'),
+                     ('f#', '#558caa'), ('', '#ffffff'), ('b', '#9b519b')
+                     ]
+                 ]
+            ]
+        )
 
     def testFeatures(self):
         streamList = ['bach/bwv66.6', 'schoenberg/opus19/movement2', 'corelli/opus3no1/1grave']

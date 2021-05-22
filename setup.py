@@ -21,7 +21,7 @@ with open(path, 'r') as f:
     lines = f.read()
     exec(lines)
 
-m21version = __version__ # @UndefinedVariable
+m21version = __version__
 
 DESCRIPTION = 'A Toolkit for Computer-Aided Musical Analysis.'
 DESCRIPTION_LONG = """A Toolkit for Computer-Aided Musical Analysis.

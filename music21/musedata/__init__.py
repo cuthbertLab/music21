@@ -1449,7 +1449,7 @@ class MuseDataFile(prebase.ProtoM21Object):
     def open(self, fp):
         # self.file = io.open(filename, encoding='utf-8')
 
-        self.file = open(fp, 'rb')
+        self.file = open(fp, 'rb')  # pylint: disable=consider-using-with
         self.filename = fp
 
     def read(self):

@@ -120,8 +120,8 @@ class CapellaImporter:
         Returns self.xmlText
         '''
         self.zipFilename = str(filename)
-        zipFileHandle = zipfile.ZipFile(str(filename), 'r')
-        xmlText = zipFileHandle.read('score.xml')
+        with zipfile.ZipFile(str(filename), 'r') as zipFileHandle:
+            xmlText = zipFileHandle.read('score.xml')
         self.xmlText = xmlText
         return xmlText
 
@@ -414,7 +414,7 @@ class CapellaImporter:
         >>> restElement = ci.domElementFromText('<rest><duration base="1/2"/></rest>')
         >>> r = ci.restFromRest(restElement)
         >>> r
-        <music21.note.Rest rest>
+        <music21.note.Rest half>
         >>> r.duration.type
         'half'
         '''
