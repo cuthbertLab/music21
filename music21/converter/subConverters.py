@@ -829,7 +829,7 @@ class ConverterMusicXML(SubConverter):
     Users should not need this Object.  Call converter.parse directly
     '''
     registerFormats = ('musicxml', 'xml')
-    registerInputExtensions = ('xml', 'mxl', 'mx', 'musicxml')
+    registerInputExtensions = ('xml', 'mxl', 'musicxml')
     registerOutputExtensions = ('musicxml', 'xml', 'mxl')
     registerOutputSubformatExtensions = {'png': 'png',
                                          'pdf': 'pdf',
