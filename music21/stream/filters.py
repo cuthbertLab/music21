@@ -93,7 +93,7 @@ class IsFilter(StreamFilter):
     `.numToFind` is used so that once all elements are found, the iterator can short circuit.
 
 
-    >>> for el in s.iter.addFilter(isFilter):
+    >>> for el in s.iter().addFilter(isFilter):
     ...     print(el is n)
     True
 
@@ -109,7 +109,7 @@ class IsFilter(StreamFilter):
     >>> isFilter2.numToFind
     2
 
-    >>> for el in s.iter.addFilter(isFilter2):
+    >>> for el in s.iter().addFilter(isFilter2):
     ...     print(el)
     <music21.note.Note C#>
     <music21.note.Rest quarter>
@@ -148,14 +148,14 @@ class IsNotFilter(IsFilter):
     >>> n = note.Note('C#')
     >>> s.append(n)
     >>> s.append(note.Rest())
-    >>> for el in s.iter.addFilter(stream.filters.IsNotFilter(n)):
+    >>> for el in s.iter().addFilter(stream.filters.IsNotFilter(n)):
     ...     el
     <music21.key.KeySignature of 3 flats>
     <music21.note.Rest quarter>
 
     test that resetting works...
 
-    >>> for el in s.iter.addFilter(stream.filters.IsNotFilter(n)):
+    >>> for el in s.iter().addFilter(stream.filters.IsNotFilter(n)):
     ...     el
     <music21.key.KeySignature of 3 flats>
     <music21.note.Rest quarter>
@@ -169,7 +169,7 @@ class IsNotFilter(IsFilter):
     >>> s.append(n)
     >>> r = note.Rest()
     >>> s.append(r)
-    >>> for el in s.iter.addFilter(stream.filters.IsNotFilter([n, r])):
+    >>> for el in s.iter().addFilter(stream.filters.IsNotFilter([n, r])):
     ...     print(el)
     <music21.key.KeySignature of 3 flats>
     '''

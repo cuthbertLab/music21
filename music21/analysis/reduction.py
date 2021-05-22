@@ -585,7 +585,7 @@ class PartReduction:
                     # check for activity in any part in the part group
                     for p in partMeasures:  # iter of parts containing measures
                         # print(p, i, p[i], len(p[i].flat.notes))
-                        if p[i].iter.notes:
+                        if p[i].iter().notes:
                             active = True
                             break
                     # environLocal.printDebug([i, 'active', active])
