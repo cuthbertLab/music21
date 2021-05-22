@@ -442,6 +442,9 @@ class ElementTree(core.AVLTree):
             visitedParents.add(parent)
             parentPosition = parent.offset
             parent._removeElementAtPosition(self, oldPosition)
+            # Trees don't have offsets currently
+            raise NotImplementedError
+            # pylint: disable=all
             parent._insertCore(self.offset, self)
 
             parent._updateNodes(parentPosition, visitedParents=visitedParents)
@@ -1046,6 +1049,8 @@ class OffsetTree(ElementTree):
         <Timespan -1.0 6.0>
         <Timespan 10.0 20.0>
         '''
+        raise NotImplementedError
+        # pylint: disable=all
         if isinstance(i, (int, slice)):
             old = self[i]
             self.removeTimespan(old)
