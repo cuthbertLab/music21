@@ -20,6 +20,7 @@ Serial searching methods that were previously here have been moved to `alpha.sea
 import unittest
 import copy
 from typing import Union, List, Any
+import warnings
 
 from music21 import exceptions21
 
@@ -1038,16 +1039,12 @@ class TwelveToneRow(ToneRow):
         else:
             return True
 
-    def areCombinatorial(self, transType1, index1, transType2, index2, convention):
+    def areCombinatorial(self, transType1, index1, transType2, index2, unused_convention=None):
         '''
         Describes whether or not two transformations of a twelve-tone row are combinatorial.
 
         The first and second arguments describe one transformation, while the third and fourth
-        describe another. One of the zero-centered or original-centered conventions for tone row
-        transformations must be specified in the last argument; see
-        :meth:`~music21.serial.ToneRow.zeroCenteredTransformation` and
-        :meth:`~music21.serial.ToneRow.originalCenteredTransformation`
-        explanations of these conventions.
+        describe another.
 
         First, let's take a row we know to have a combinatoriality pair:
 
@@ -1057,44 +1054,39 @@ class TwelveToneRow(ToneRow):
 
         Combinatoriality holds here between P0 and I3
 
-        >>> moses.areCombinatorial('P', 0, 'I', 3, 'zero')
-        True
-
-        By definition what's true for :meth:`~music21.serial.ToneRow.zeroCenteredTransformation`
-        is also true for :meth:`~music21.serial.ToneRow.originalCenteredTransformation`:
-
-        >>> moses.areCombinatorial('P', 0, 'I', 3, 'original')
+        >>> moses.areCombinatorial('P', 0, 'I', 3)
         True
 
         And a combinatorial pair like this between P0 and I3 will also hold
         if you modify both rows in the same way, e.g.
         if you transpose both by the same amount
 
-        >>> moses.areCombinatorial('P', 1, 'I', 4, 'original')
+        >>> moses.areCombinatorial('P', 1, 'I', 4)
         True
 
         or if you retrograde both
 
-        >>> moses.areCombinatorial('R', 1, 'RI', 4, 'original')
+        >>> moses.areCombinatorial('R', 1, 'RI', 4)
         True
 
         Any modification made to one row form and not the other means all bets are off
 
-        >>> moses.areCombinatorial('R', 6, 'RI', 4, 'original')
+        >>> moses.areCombinatorial('R', 6, 'RI', 4)
         False
 
+        Changed in v.7 -- `convention` is no longer necessary and defaults None;
+        to be removed in v.8.
         '''
         if self.isTwelveToneRow() is False:
             raise SerialException('Combinatoriality applies only to twelve-tone rows.')
 
-        if convention == 'zero':
-            trans1 = self.zeroCenteredTransformation(transType1, index1)
-            trans2 = self.zeroCenteredTransformation(transType2, index2)
-        elif convention == 'original':
-            trans1 = self.originalCenteredTransformation(transType1, index1)
-            trans2 = self.originalCenteredTransformation(transType2, index2)
-        else:
-            raise SerialException("Invalid convention - choose 'zero' or 'original'.")
+        if unused_convention is not None:
+            # TODO: remove in v.8
+            warnings.warn('convention is unnecessary and will be removed in v.8')
+
+        # choice of convention does not matter
+        trans1 = self.zeroCenteredTransformation(transType1, index1)
+        trans2 = self.zeroCenteredTransformation(transType2, index2)
 
         pitches1 = trans1.pitchClasses()
         pitches2 = trans2.pitchClasses()
