@@ -1074,8 +1074,8 @@ class TwelveToneRow(ToneRow):
         >>> moses.areCombinatorial('R', 6, 'RI', 4)
         False
 
-        Changed in v.7 -- `convention` is no longer necessary and defaults None;
-        to be removed in v.8.
+        Changed in v.7 -- `convention` is no longer necessary and no longer used.
+        Renamed to `unused_convention` and defaults None; to be removed in v.8.
         '''
         if self.isTwelveToneRow() is False:
             raise SerialException('Combinatoriality applies only to twelve-tone rows.')
