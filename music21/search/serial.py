@@ -60,7 +60,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
             A list of pitch classes representing the way the contiguous
             segment of notes is being read as a sequence of single pitches. Set to None
             unless the container stream is being searched for segments or multisets
-            (for example, using :func:`~music21.search.serial.findSegments`), in which case
+            (for example, using :meth:`~music21.search.serial.SegmentMatcher.find`), in which case
             the representation depends on the segments or multisets being searched for.
             If there are no chords in the segment, this attribute will simply give the
             pitch classes of the notes in the segment.''',
