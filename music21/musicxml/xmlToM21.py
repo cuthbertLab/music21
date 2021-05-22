@@ -1259,7 +1259,7 @@ class MusicXMLImporter(XMLParserBase):
         movement-title, identification
         '''
         if el is None:
-            el = self.root
+            el = self.xmlRoot
 
         if inputM21 is None:
             md = metadata.Metadata()
