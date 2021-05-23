@@ -1879,7 +1879,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         music21.exceptions21.StreamException: Cannot set the offset for element
             <music21.note.Note D>, not in Stream <music21.stream.Stream Stream1>.
 
-        * Changed in v5.5 -- also sets .activeSite for the element unless setActiveSite is False
+        * Changed in v5.5 -- also sets .activeSite for the element
 
         * In v6.7 -- also runs coreElementsChanged()
 
