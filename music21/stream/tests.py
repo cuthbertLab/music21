@@ -5352,7 +5352,7 @@ class Test(unittest.TestCase):
         s1 = Score(Part(Measure(note.Note())))
         s2 = Score(Part(Measure(note.Note())))
         o = Opus([s1, s2])
-        self.assertEqual(s2.offset, 1.0)
+        self.assertEqual(o.elementOffset(s2), 1.0)
 
     def testActiveSiteMangling(self):
         outer = Stream()
