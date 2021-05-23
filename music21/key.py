@@ -37,10 +37,6 @@ _MOD = 'key'
 environLocal = environment.Environment(_MOD)
 
 
-class KeyWarning(Warning):
-    pass
-
-
 # ------------------------------------------------------------------------------
 # store a cache of already-found values
 _sharpsToPitchCache = {}
@@ -256,6 +252,10 @@ class KeyException(exceptions21.Music21Exception):
     pass
 
 
+class KeyWarning(Warning):
+    pass
+
+
 # ------------------------------------------------------------------------------
 class KeySignature(base.Music21Object):
     '''
@@ -396,8 +396,17 @@ class KeySignature(base.Music21Object):
         <music21.key.Key of D major>
         >>> ks.asKey(mode='minor')
         <music21.key.Key of b minor>
+
+        If `mode` is None, an attempt is made to solve for the mode:
+
         >>> ks.asKey(tonic='A')
         <music21.key.Key of A mixolydian>
+
+        But will raise `KeyException` if an impossible solution is requested:
+
+        >>> ks.asKey(tonic='D#')
+        Traceback (most recent call last):
+        music21.key.KeyException: Could not solve for mode from sharps=2, tonic=D#
 
         New in v7 -- `tonic` argument to solve for mode.
         '''
@@ -408,7 +417,11 @@ class KeySignature(base.Music21Object):
         if mode is None and tonic is not None:
             majorSharpsToMode = {v: k for k, v in modeSharpsAlter.items()}
             majorSharps = pitchToSharps(tonic)
-            mode = majorSharpsToMode[self.sharps - majorSharps]
+            try:
+                mode = majorSharpsToMode[self.sharps - majorSharps]
+            except KeyError as ke:
+                raise KeyException(
+                    f'Could not solve for mode from sharps={self.sharps}, tonic={tonic}') from ke
         mode = mode.lower()
         if mode not in modeSharpsAlter:
             raise KeyException(f'Mode {mode} is unknown')
@@ -1323,6 +1336,12 @@ class Test(unittest.TestCase):
             k = ks.asKey(mode='minor', tonic='E')
         self.assertEqual(k.mode, 'minor')
         self.assertEqual(k.tonicPitchNameWithCase, 'b')
+
+        msg = 'Could not solve for mode from sharps=2, tonic=A-'
+        with self.assertRaises(KeyException, msg=msg) as cm:
+            k = ks.asKey(mode=None, tonic='A-')
+        # test exception chained from KeyError
+        self.assertIsInstance(cm.exception.__cause__, KeyError)
 
 
 # ------------------------------------------------------------------------------
