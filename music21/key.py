@@ -21,6 +21,7 @@ import copy
 import re
 import unittest
 from typing import Union, Optional
+import warnings
 
 from music21 import base
 from music21 import exceptions21
@@ -34,6 +35,10 @@ from music21.common.decorators import cacheMethod
 from music21 import environment
 _MOD = 'key'
 environLocal = environment.Environment(_MOD)
+
+
+class KeyWarning(Warning):
+    pass
 
 
 # ------------------------------------------------------------------------------
@@ -72,7 +77,7 @@ def convertKeyStringToMusic21KeyString(textString):
 
 def sharpsToPitch(sharpCount):
     '''
-    Given a number a positive/negative number of sharps, return a Pitch
+    Given a positive/negative number of sharps, return a Pitch
     object set to the appropriate major key value.
 
     >>> key.sharpsToPitch(1)
@@ -380,11 +385,30 @@ class KeySignature(base.Music21Object):
     def _reprInternal(self):
         return 'of ' + self._strDescription()
 
-    def asKey(self, mode='major'):
+    def asKey(self, mode: Optional[str] = None, tonic: Optional[str] = None):
         '''
-        return a `key.Key` object representing this KeySignature object as a key in the
-        given mode (default = major)
+        Return a `key.Key` object representing this KeySignature object as a key in the
+        given mode or in the given tonic. If `mode` is None, and `tonic` is not provided,
+        major is assumed. If both mode and tonic are provided, the tonic is ignored.
+
+        >>> ks = key.KeySignature(2)
+        >>> ks.asKey()
+        <music21.key.Key of D major>
+        >>> ks.asKey(mode='minor')
+        <music21.key.Key of b minor>
+        >>> ks.asKey(tonic='A')
+        <music21.key.Key of A mixolydian>
+
+        New in v7 -- `tonic` argument to solve for mode.
         '''
+        if mode is not None and tonic is not None:
+            warnings.warn(f'ignoring provided tonic: {tonic}', KeyWarning)
+        if mode is None and tonic is None:
+            mode = 'major'
+        if mode is None and tonic is not None:
+            majorSharpsToMode = {v: k for k, v in modeSharpsAlter.items()}
+            majorSharps = pitchToSharps(tonic)
+            mode = majorSharpsToMode[self.sharps - majorSharps]
         mode = mode.lower()
         if mode not in modeSharpsAlter:
             raise KeyException(f'Mode {mode} is unknown')
@@ -1282,6 +1306,23 @@ class Test(unittest.TestCase):
         # k = s.analyze('KrumhanslSchmuckler')
         # k.tonalCertainty(method='correlationCoefficient')
         # s = corpus.parse('bwv48.3')
+
+    def testAsKey(self):
+        ks = KeySignature(2)
+
+        k = ks.asKey(mode=None, tonic=None)
+        self.assertEqual(k.mode, 'major')
+        self.assertEqual(k.tonicPitchNameWithCase, 'D')
+
+        k = ks.asKey(tonic='E')
+        self.assertEqual(k.mode, 'dorian')
+        self.assertEqual(k.tonicPitchNameWithCase, 'E')
+
+        with self.assertWarns(KeyWarning):
+            # warn user we ignored their tonic
+            k = ks.asKey(mode='minor', tonic='E')
+        self.assertEqual(k.mode, 'minor')
+        self.assertEqual(k.tonicPitchNameWithCase, 'b')
 
 
 # ------------------------------------------------------------------------------
