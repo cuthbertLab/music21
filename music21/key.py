@@ -408,6 +408,14 @@ class KeySignature(base.Music21Object):
         Traceback (most recent call last):
         music21.key.KeyException: Could not solve for mode from sharps=2, tonic=D#
 
+        Ionian and Aeolian are supplied instead of major or minor when deriving mode in this way:
+
+        >>> ks2 = key.KeySignature()
+        >>> ks2.asKey()
+        <music21.key.Key of C major>
+        >>> ks2.asKey(tonic='C')
+        <music21.key.Key of C ionian>
+
         New in v7 -- `tonic` argument to solve for mode.
         '''
         if mode is not None and tonic is not None:
