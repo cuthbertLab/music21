@@ -4588,7 +4588,7 @@ class Pitch(prebase.ProtoM21Object):
         different octave.  The sharp must always be displayed.
 
         If `overrideStatus` is True, this method will ignore any current
-        `displayStatus` stetting found on the Accidental. By default this does
+        `displayStatus` setting found on the Accidental. By default this does
         not happen. If `displayStatus` is set to None, the Accidental's
         `displayStatus` is set.
 
