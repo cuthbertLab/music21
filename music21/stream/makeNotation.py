@@ -355,6 +355,8 @@ def makeMeasures(
     >>> longNote.lyric = 'hi'
     >>> p1.append(longNote)
     >>> partWithMeasures = p1.makeMeasures()
+    >>> partWithMeasures is not p1
+    True
     >>> dummy = partWithMeasures.makeTies(inPlace=True)
     >>> partWithMeasures.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -391,8 +393,6 @@ def makeMeasures(
 
     # environLocal.printDebug(['calling Stream.makeMeasures()'])
 
-    # the srcObj should not be modified or changed
-    # removed element copying below and now making a deepcopy of entire stream
     # must take a flat representation, as we need to be able to
     # position components, and sub-streams might hide elements that
     # should be contained
@@ -416,26 +416,18 @@ def makeMeasures(
             return
         else:
             return returnObj
-    elif s.hasVoices():
-        # environLocal.printDebug(['make measures found voices'])
-        # cannot make flat here, as this would destroy stream partitions
-        if s.isSorted:
-            sSorted = s
-        else:
-            sSorted = s.sorted
-        srcObj = copy.deepcopy(sSorted)
-        voiceCount = len(srcObj.voices)
     else:
-        # environLocal.printDebug(['make measures found no voices'])
-        # take flat and sorted version
-        sFlat = s.flat
-        if sFlat.isSorted:
-            sFlatSorted = sFlat
+        if s.hasVoices():
+            # cannot make flat if there are voices, as would destroy stream partitions
+            # parts containing voices are less likely to occur since MIDI parsing changes in v7
+            srcObj = s
         else:
-            sFlatSorted = sFlat.sorted
-
-        srcObj = copy.deepcopy(sFlatSorted)
-        voiceCount = 0
+            srcObj = s.flat
+        if not srcObj.isSorted:
+            srcObj = srcObj.sorted
+        if not inPlace:
+            srcObj = copy.deepcopy(srcObj)
+        voiceCount = len(srcObj.voices)
 
     # environLocal.printDebug([
     #    'Stream.makeMeasures(): passed in meterStream', meterStream,
@@ -554,7 +546,7 @@ def makeMeasures(
         if measureCount == 0:
             m.clef = clefObj
             if voiceCount > 0 and s.keySignature is not None:
-                m.insert(0, s.keySignature)
+                m.insert(0, copy.deepcopy(s.keySignature))
             # environLocal.printDebug(
             #    ['assigned clef to measure', measureCount, m.clef])
 

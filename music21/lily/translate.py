@@ -1265,7 +1265,9 @@ class LilypondConverter:
         >>> n0.style.color = 'blue'
         >>> sm = conv.lySimpleMusicFromNoteOrRest(n0)
         >>> print(sm)
-        \color "blue" dis'' ! ? 4
+        \override NoteHead.color = "blue"
+        \override Stem.color = "blue"
+        dis'' ! ? 4
 
         Now make the note disappear...
 
@@ -1277,10 +1279,15 @@ class LilypondConverter:
         c = noteOrRest.classes
 
         simpleElementParts = []
+
+        # https://lilypond.org/doc/v2.22/Documentation/notation/inside-the-staff#coloring-objects
         if noteOrRest.hasStyleInformation:
             if noteOrRest.style.color and noteOrRest.style.hideObjectOnPrint is False:
-                colorLily = r'\color "' + noteOrRest.style.color + '" '
-                simpleElementParts.append(colorLily)
+                # LilyPond 2.22 (January 2021) supports hex values
+                noteheadColor = rf'\override NoteHead.color = "{noteOrRest.style.color}"' + '\n'
+                stemColor = rf'\override Stem.color = "{noteOrRest.style.color}"' + '\n'
+                simpleElementParts.append(noteheadColor)
+                simpleElementParts.append(stemColor)
 
         if 'Note' in c:
             if not noteOrRest.hasStyleInformation or noteOrRest.style.hideObjectOnPrint is False:
@@ -2449,9 +2456,9 @@ class LilypondConverter:
             # cannot find full path; try current directory
             fileEnd = os.path.basename(fileForm)
             if not os.path.exists(fileEnd):
-                raise LilyTranslateException('cannot find ' + fileEnd
-                                             + ' or the full path ' + fileForm
-                                             + ' original file was ' + fileName)
+                raise LilyTranslateException('cannot find ' + str(fileEnd)
+                                             + ' or the full path ' + str(fileForm)
+                                             + ' original file was ' + str(fileName))
             fileForm = fileEnd
         return pathlib.Path(fileForm)
 
@@ -2580,6 +2587,26 @@ class Test(unittest.TestCase):
         # previously this choked where .text is None on Lyric object
         lpc.loadObjectFromScore(s)
 
+    def testColors(self):
+        red_note = note.Note()
+        red_note.style.color = '#FF0000'
+        sm = LilypondConverter().lySimpleMusicFromNoteOrRest(red_note)
+        self.assertEqual(
+            sm.stringOutput(),
+            r'\override NoteHead.color = "#FF0000"' '\n'
+            r'\override Stem.color = "#FF0000"' '\n'
+            "c' 4  "
+        )
+
+        dark_green_note = note.Note()
+        dark_green_note.style.color = 'darkgreen'
+        sm = LilypondConverter().lySimpleMusicFromNoteOrRest(dark_green_note)
+        self.assertEqual(
+            sm.stringOutput(),
+            r'\override NoteHead.color = "darkgreen"' '\n'
+            r'\override Stem.color = "darkgreen"' '\n'
+            "c' 4  "
+        )
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
     def xtestConvertNote(self):

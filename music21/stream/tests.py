@@ -1226,6 +1226,25 @@ class Test(unittest.TestCase):
         self.assertTrue(s.spanners[1].isFirst(n1))
         self.assertTrue(s.spanners[1].isLast(n3))
 
+    def testStripTiesClearBeaming(self):
+        from music21 import converter
+
+        p = converter.parse('tinyNotation: c2~ c8 c8 c8 c8')
+        p.makeNotation(inPlace=True)
+        self.assertEqual(p.streamStatus.beams, True)
+        p.stripTies(inPlace=True)
+        self.assertEqual(p.streamStatus.beams, False)
+        p = p.splitAtDurations(recurse=True)[0]
+        p.makeBeams(inPlace=True)
+        self.assertEqual([repr(el.beams) for el in p[note.Note]],
+            ['<music21.beam.Beams>',
+             '<music21.beam.Beams <music21.beam.Beam 1/start>>',
+             '<music21.beam.Beams <music21.beam.Beam 1/stop>>',
+             '<music21.beam.Beams <music21.beam.Beam 1/start>>',
+             '<music21.beam.Beams <music21.beam.Beam 1/stop>>'
+             ]
+        )
+
     def testGetElementsByOffsetZeroLength(self):
         '''
         Testing multiple zero-length elements with mustBeginInSpan:

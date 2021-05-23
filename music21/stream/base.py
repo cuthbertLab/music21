@@ -2888,12 +2888,40 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <music21.duration.Duration 4.0>
         >>> s3.spanners.first().getLast().duration
         <music21.duration.Duration 1.0>
+
+        Does not act on rests where `.fullMeasure` is True or 'always',
+        nor when `.fullMeasure` is 'auto' and the duration equals the `.barDuration`.
+
+        >>> r = note.Rest(quarterLength=5.0)
+        >>> r.fullMeasure = 'auto'
+        >>> v = stream.Voice(r)
+        >>> m = stream.Measure(v)
+        >>> result = m.splitAtDurations(recurse=True)
+        >>> list(result[0][note.Rest])
+        [<music21.note.Rest 5ql>]
+
+        >>> m.insert(0, meter.TimeSignature('6/4'))
+        >>> result = m.splitAtDurations(recurse=True)
+        >>> list(result[0][note.Rest])
+        [<music21.note.Rest whole>, <music21.note.Rest quarter>]
         '''
 
         def processContainer(container: Stream):
             for complexObj in container.getElementsNotOfClass(['Stream', 'Variant', 'Spanner']):
                 if complexObj.duration.type != 'complex':
                     continue
+                if 'Rest' in complexObj.classes and complexObj.fullMeasure in (True, 'always'):
+                    continue
+                if 'Rest' in complexObj.classes and complexObj.fullMeasure == 'auto':
+                    if container.isMeasure and (complexObj.duration == container.barDuration):
+                        continue
+                    elif ('Voice' in container.classes
+                          and container.activeSite
+                          and container.activeSite.isMeasure
+                          and complexObj.duration == container.activeSite.barDuration
+                          ):
+                        continue
+
                 insertPoint = complexObj.offset
                 objList = complexObj.splitAtDurations()
 
@@ -2911,11 +2939,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     if sp.getLast() is complexObj:
                         sp.replaceSpannedElement(complexObj, objList[-1])
 
+                container.streamStatus.beams = False
+
         # Handle "loose" objects in self (usually just Measure or Voice)
         processContainer(self)
         # Handle inner streams
         if recurse:
-            for innerStream in self.recurse(includeSelf=False, streamsOnly=True):
+            for innerStream in self.recurse(
+                    includeSelf=False, streamsOnly=True, restoreActiveSites=True):
                 processContainer(innerStream)
 
         return base._SplitTuple((self,))
@@ -6915,6 +6946,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self.coreCopyAsDerivation('stripTies')
         else:
             returnObj = self
+
+        # Clear existing beaming because notes may be deleted at any level of hierarchy
+        returnObj.streamStatus.beams = False
 
         if returnObj.hasPartLikeStreams():
             # part-like does not necessarily mean that the next level down is a stream.Part
