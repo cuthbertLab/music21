@@ -1541,15 +1541,13 @@ class Test(unittest.TestCase):
         self.assertEqual(
             len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 0)
 
-        # makeNotation=False on a non-Score still prevents some copying,
-        # but packing into Score inevitably does some making of notation
         out3 = p.write(makeNotation=False)
         roundtrip_back = converter.parse(out3)
-        # 4/4 will be assumed; quarter note will be moved to measure 2
+        # ensure 5.0QL note is not broken up
         self.assertEqual(
-            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 1)
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 2)
         self.assertEqual(
-            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 1)
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 0)
 
         for out in (out1, out2, out3):
             os.remove(out)
