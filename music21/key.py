@@ -1339,14 +1339,15 @@ class Test(unittest.TestCase):
         self.assertEqual(k.mode, 'dorian')
         self.assertEqual(k.tonicPitchNameWithCase, 'E')
 
-        with self.assertWarns(KeyWarning):
+        expected = 'ignoring provided tonic: E'
+        with self.assertWarnsRegex(KeyWarning, expected) as cm:
             # warn user we ignored their tonic
             k = ks.asKey(mode='minor', tonic='E')
         self.assertEqual(k.mode, 'minor')
         self.assertEqual(k.tonicPitchNameWithCase, 'b')
 
-        msg = 'Could not solve for mode from sharps=2, tonic=A-'
-        with self.assertRaises(KeyException, msg=msg) as cm:
+        expected = 'Could not solve for mode from sharps=2, tonic=A-'
+        with self.assertRaisesRegex(KeyException, expected) as cm:
             k = ks.asKey(mode=None, tonic='A-')
         # test exception chained from KeyError
         self.assertIsInstance(cm.exception.__cause__, KeyError)
