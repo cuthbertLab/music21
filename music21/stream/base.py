@@ -12370,9 +12370,11 @@ class Voice(Stream):
     stream belongs to a certain "voice" for analysis or display
     purposes.
 
-    `.id` and `.sequence` exist separately so that they can diverge
-    if necessary. The `.id` attribute can be used to track analytical voices if
-    desired, and it can store the voice numbers parsed from a file (which,
+    :attr:`~music21.base.Music21Object.id` is used for analysis or association
+    of voices across multiple measures, whereas :attr:`~music21.stream.Voice.sequence`
+    is used to identify the intended display or ordering inside a single measure.
+    
+    The `.id` attribute may also store voice numbers parsed from a file (which,
     depending on the format, may or may not truly represent analytical connections).
     This functionality allows for extracting analytical voices via
     :meth:`~music21.stream.Stream.voicesToParts` using `separateById=True`.
@@ -12380,31 +12382,31 @@ class Voice(Stream):
     will increment when voices are created by notation routines and
     will be renumbered after transformations by :meth:`flattenUnnecessaryVoices`,
     a helper method run by most :meth:`makeNotation` operations, including
-    during musicxml export, in order to guarantee correct MusicXML rendering.
+    during MusicXML export, in order to guarantee correct MusicXML display.
 
     MusicXML allows any string for the `<voice>` tag, but in practice, MusicXML
     producers begin at '1' and (should, but not always) continue the numbering
     on the subsequent staff of a multi-staff part. Since music21 automatically
-    separates multi-staff parts on import, the `.sequence` will reset to reflect
+    separates multi-staff parts on import, the :attr:`sequence` will reset to reflect
     the actual count on each :class:`PartStaff` object. The original MusicXML
-    `<voice>` number can be found on :`attr:`Voice.id`, but it may or may not be
+    `<voice>` number can be found on :attr:`id`, but it may or may not be
     the same `.sequence` number on export according to stream transformations
-    (or on account of PartStaff separation performed on imports of keyboard
-    and other multi-part staves).
+    (or on account of PartStaff separation of keyboard and other multi-part staves
+    on import).
 
-    If default voice numbering produces unsatisfactory MusicXML output,
-    numbering can be overridden by manipulating `.sequence` on the Voice objects
-    and then setting :attr:`freezeSequence` to True to avoid
-    renumbering by :meth:`flattenUnnecessaryVoices`.
+    If default voice numbering produces unsatisfactory output, numbering can be
+    overridden by manipulating `.sequence` on the Voice objects and setting
+    :attr:`~music21.stream.Voice.freezeSequence` to True to avoid renumbering by
+    :meth:`flattenUnnecessaryVoices`.
 
     See :meth:`voicesToParts`, especially the keyword `separateById`, for examples
-    of how to extract and associate voices together using `.id` without relying on
-    the `.sequence` attribute.
+    of how to extract and associate voices together using :attr:`id` without relying on
+    the :attr:`sequence` attribute.
 
     :meth:`offsetMap` recalculates a 0-indexed count "voiceIndex" of voices in a container
     at any given time, since there is no constraint until the user exports MusicXML
-    or elects to run :meth:`flattenUnnecessaryVoices` that the `.sequence` attributes of each
-    Voice form a valid sequence.
+    or elects to run :meth:`flattenUnnecessaryVoices` that the :attr:`sequence`
+    attributes of each Voice form a valid sequence.
 
     Note that both Finale's Layers and Voices as concepts are
     considered Voices here.
