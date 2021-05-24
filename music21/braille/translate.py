@@ -8,7 +8,7 @@
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-Methods for exporting music21 data as braille.
+Functions for exporting music21 data as braille.
 
 This module was made in consultation with the manual "Introduction to Braille
 Music Transcription, Second Edition" by Mary Turner De Garmo, 2005. It is
@@ -16,10 +16,10 @@ available from the Library of Congress `here <http://www.loc.gov/nls/music/>`_,
 and will henceforth be referred to as BMTM.
 
 
-The most important method, and the only one that is needed to translate music
-into braille, is :meth:`~music21.braille.translate.objectToBraille`. This method,
-as well as the others, accept keyword arguments that serve to modify the output.
-If no keyword arguments are needed, then using the method is equivalent to
+The most important function, and the only one that is needed to translate music
+into braille, is :func:`~music21.braille.translate.objectToBraille`. This function,
+as well as the others, accepts keyword arguments that serve to modify the output.
+If no keyword arguments are needed, then using the function is equivalent to
 calling :meth:`~music21.base.Music21Object.show` on the music.
 
 

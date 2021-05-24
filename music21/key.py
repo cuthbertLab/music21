@@ -281,10 +281,10 @@ class KeySignature(base.Music21Object):
     >>> legal
     <music21.key.Key of c# minor>
 
-    To set a non-traditional Key Signature, create a KeySignature object and then
-    set the alteredPitches list:
+    To set a non-traditional Key Signature, create a KeySignature object
+    with `sharps=None`, and then set the `alteredPitches` list:
 
-    >>> unusual = key.KeySignature()
+    >>> unusual = key.KeySignature(sharps=None)
     >>> unusual.alteredPitches = ['E-', 'G#']
     >>> unusual
     <music21.key.KeySignature of pitches: [E-, G#]>
@@ -294,7 +294,7 @@ class KeySignature(base.Music21Object):
     To set a pitch as displayed in a particular octave, create a non-traditional
     KeySignature and then set pitches with octaves:
 
-    >>> unusual = key.KeySignature()
+    >>> unusual = key.KeySignature(sharps=None)
     >>> unusual.alteredPitches = ['F#4']
     >>> unusual
     <music21.key.KeySignature of pitches: [F#4]>
@@ -306,6 +306,9 @@ class KeySignature(base.Music21Object):
     >>> unusual.accidentalsApplyOnlyToOctave
     False
     >>> unusual.accidentalsApplyOnlyToOctave = True
+
+    Changed in v.7 -- `sharps` defaults to 0 (key of no flats/sharps)
+    rather than `None` for nontraditional keys.
     '''
     _styleClass = style.TextStyle
 
@@ -315,7 +318,7 @@ class KeySignature(base.Music21Object):
 
     classSortOrder = 2
 
-    def __init__(self, sharps=None):
+    def __init__(self, sharps: Optional[int] = 0):
         super().__init__()
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
@@ -428,18 +431,30 @@ class KeySignature(base.Music21Object):
         Non-standard, non-traditional key signatures can set their own
         altered pitches cache.
 
-        >>> nonTrad = key.KeySignature()
+        >>> nonTrad = key.KeySignature(sharps=None)
         >>> nonTrad.alteredPitches = ['B-', 'F#', 'E-', 'G#']
         >>> nonTrad.alteredPitches
         [<music21.pitch.Pitch B->,
          <music21.pitch.Pitch F#>,
          <music21.pitch.Pitch E->,
          <music21.pitch.Pitch G#>]
+
+        OMIT_FROM_DOCS
+
+        Ensure at least something is provided when the user hasn't provided enough info:
+
+        >>> nonTrad2 = key.KeySignature(sharps=None)
+        >>> nonTrad2.alteredPitches
+        []
+
         '''
         if self._alteredPitches is not None:
             return self._alteredPitches
 
         post = []
+        if self.sharps is None:
+            return post
+
         if self.sharps > 0:
             pKeep = pitch.Pitch('B')
             if self.sharps > 8:
@@ -482,7 +497,7 @@ class KeySignature(base.Music21Object):
         >>> g.isNonTraditional
         False
 
-        >>> g = key.KeySignature()
+        >>> g = key.KeySignature(sharps=None)
         >>> g.alteredPitches = [pitch.Pitch('E`')]
         >>> g.isNonTraditional
         True
@@ -1080,7 +1095,7 @@ class Key(KeySignature, scale.DiatonicScale):
         alternateInterpretations list has
         been filled from the use of a KeyWeightKeyAnalysis subclass.
 
-        >>> littlePiece = converter.parse('tinyNotation: 4/4 c4 d e f g a b cc ee gg ee cc')
+        >>> littlePiece = converter.parse("tinyNotation: 4/4 c4 d e f g a b c' e' g' e' c'")
         >>> k = littlePiece.analyze('key')
         >>> k
         <music21.key.Key of C major>
@@ -1212,7 +1227,7 @@ class Test(unittest.TestCase):
 
     def testBasic(self):
         a = KeySignature()
-        self.assertEqual(a.sharps, None)
+        self.assertEqual(a.sharps, 0)
 
     def testTonalAmbiguityA(self):
         from music21 import corpus, stream

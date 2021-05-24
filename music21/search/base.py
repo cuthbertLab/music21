@@ -343,7 +343,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
         {2.0} <music21.note.Note F>
     {6.0} <music21.stream.Measure 3 offset=6.0>
         {0.5} <music21.note.Note C>
-        {2.0} <music21.note.Rest rest>
+        {2.0} <music21.note.Rest quarter>
         {3.0} <music21.bar.Barline type=final>
 
     Now we will search for all dotted-quarter/eighth elements in the Stream:

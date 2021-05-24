@@ -171,15 +171,11 @@ def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
 
     >>> aScore, vScore = stream.Score(), stream.Score()
 
-    >>> ap1 = stream.Part(converter.parse('tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 '
-    ...                                   ).makeMeasures())
-    >>> vp1 = stream.Part(converter.parse('tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 '
-    ...                                   ).makeMeasures())
+    >>> ap1 = converter.parse('tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 ')
+    >>> vp1 = converter.parse('tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 ')
 
-    >>> ap2 = stream.Part(converter.parse('tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 '
-    ...                                   ).makeMeasures())
-    >>> vp2 = stream.Part(converter.parse('tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 '
-    ...                                   ).makeMeasures())
+    >>> ap2 = converter.parse('tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 ')
+    >>> vp2 = converter.parse('tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 ')
 
     >>> aScore.insert(0.0, ap1)
     >>> aScore.insert(0.0, ap2)
@@ -926,7 +922,7 @@ def addVariant(
     {0.0} <music21.note.Note E>
     {1.0} <music21.note.Note E>
     {2.0} <music21.note.Note E>
-    {3.0} <music21.variant.Variant object of length 0.0>
+    {3.0} <music21.variant.Variant object of length 6.0>
     {3.0} <music21.note.Note E>
     {4.0} <music21.note.Note E>
     {5.0} <music21.note.Note E>
@@ -947,12 +943,7 @@ def addVariant(
             tempVariant.append(sVariant)
         else:  # sVariant is not a measure
             sVariantMeasures = sVariant.getElementsByClass('Measure')
-            # apparently expression cannot be simplified. -- this is a mistake
-            # since sVariantMeasures will never == [] even if there are no measures.
-            # yet switching this to `if not sVariantMeasures` breaks things.
-            # TODO(msc) -- figure this out and fix it.
-            # noinspection PySimplifyBooleanCheck
-            if sVariantMeasures == []:  # If there are no measures, work element-wise
+            if not sVariantMeasures:  # If there are no measures, work element-wise
                 for e in sVariant:
                     offset = e.getOffsetBySite(sVariant) + startOffset
                     tempVariant.insert(offset, e)
@@ -1664,9 +1655,7 @@ def makeAllVariantsReplacements(streamWithVariants,
     >>> s2.makeMeasures(inPlace=True)
     >>> variant.mergeVariants(s, s2, variantName='london', inPlace=True)
 
-    >>> newPart = stream.Part(s)
-    >>> newStream = stream.Score()
-    >>> newStream.append(newPart)
+    >>> newStream = stream.Score(s)
 
     >>> returnStream = variant.makeAllVariantsReplacements(newStream, recurse=False)
     >>> for v in returnStream.parts[0].variants:
@@ -1899,7 +1888,7 @@ def _getNextElements(s, v, numberOfElements=1):
                                                   mustFinishInSpan=False,
                                                   mustBeginInSpan=True,
                                                   classList=[vClass])
-        returnElement = potentialTargets[0]
+        returnElement = potentialTargets.first()
 
     else:
         replacementDuration = v.replacementDuration
@@ -1910,7 +1899,7 @@ def _getNextElements(s, v, numberOfElements=1):
                                                   mustFinishInSpan=False,
                                                   mustBeginInSpan=True,
                                                   classList=[vClass])
-        returnElement = potentialTargets[0]
+        returnElement = potentialTargets.first()
 
 
     return returnElement
@@ -1982,7 +1971,7 @@ def _getPreviousElement(s, v):
         mustFinishInSpan=False,
         mustBeginInSpan=True,
     ).getElementsByClass(vClass)
-    returnElement = potentialTargets[-1]
+    returnElement = potentialTargets.last()
 
     return returnElement
 
@@ -2370,6 +2359,8 @@ class Variant(base.Music21Object):
             {2.0} <music21.note.Note A>
             {3.0} <music21.note.Note B>
         '''
+        spacerFilter = lambda r: r.hasStyleInformation and r.style.hideObjectOnPrint
+
         if contextStream is None:
             contextStream = self.activeSite
             if contextStream is None:
@@ -2385,7 +2376,10 @@ class Variant(base.Music21Object):
         vStart = self.getOffsetBySite(contextStream)
 
         if includeSpacers is True:
-            spacerDuration = self.getElementsByClass('SpacerRest').first().duration.quarterLength
+            spacerDuration = (self
+                              .getElementsByClass('Rest')
+                              .addFilter(spacerFilter)
+                              .first().duration.quarterLength)
         else:
             spacerDuration = 0.0
 
@@ -2584,7 +2578,9 @@ class Test(unittest.TestCase):
         vn1 = note.Note('F#4')
         vn2 = note.Note('A-4')
 
-        v1 = Variant([vn1, vn2])
+        v1 = Variant()
+        v1.insert(0, vn1)
+        v1.insert(0, vn2)
         v1Copy = copy.deepcopy(v1)
         # copies stored objects; they point to the different Notes vn1/vn2
         self.assertIsNot(v1Copy[0], v1[0])
@@ -2614,7 +2610,9 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
         vn2 = note.Note('A-4')
-        v1 = Variant([vn1, vn2])
+        v1 = Variant()
+        v1.insert(0, vn1)
+        v1.insert(0, vn2)
         s.insert(5, v1)
 
         # as we deepcopy the elements in the variants, we have new Notes

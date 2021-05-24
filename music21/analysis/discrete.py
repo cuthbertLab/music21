@@ -25,7 +25,7 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 #     range and key modules in analysis
 
 import unittest
-from typing import Union, List, Any, Tuple, Iterable
+from typing import Union, List, Any, Tuple, Iterable, Optional
 
 from collections import OrderedDict
 from music21 import exceptions21
@@ -453,6 +453,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             'B-', 'B',
         ]
 
+        colorsUsed = []
         if compress:
             colorsUsed = self.getColorsUsed()
             solutionsUsed = self.getSolutionsUsed()
@@ -471,7 +472,6 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         data = []
         valid = None
-        colorsUsed = []
 
         for yLabel in ['Major', 'Minor']:
             if yLabel == 'Major':
@@ -935,7 +935,7 @@ keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler,
 # -----------------------------------------------------------------------------
 class Ambitus(DiscreteAnalysis):
     '''
-    An basic analysis method for measuring register.
+    A basic analysis method for measuring register.
 
     >>> ambitusAnalysis = analysis.discrete.Ambitus()
     >>> ambitusAnalysis.identifiers[0]
@@ -945,10 +945,15 @@ class Ambitus(DiscreteAnalysis):
 
     name = 'Ambitus Analysis'
     # provide possible string matches for this processor
-    identifiers = ['ambitus', 'range', 'span']
+    identifiers = ['ambitus', 'span']
 
     def __init__(self, referenceStream=None):
         super().__init__(referenceStream=referenceStream)
+        # Store the min and max Pitch instances for referenceStream
+        # set by getPitchSpan(), which is called by _generateColors()
+        self.minPitchObj: Optional[pitch.Pitch] = None
+        self.maxPitchObj: Optional[pitch.Pitch] = None
+
         self._pitchSpanColors = OrderedDict()
         self._generateColors()
 
@@ -967,14 +972,16 @@ class Ambitus(DiscreteAnalysis):
         2 #16111d
         3 #16121e
         '''
+        minPitch = 0
         if numColors is None:
             if self._referenceStream is not None:
                 # get total range for entire piece
-                minPitch, maxPitch = self.getPitchRanges(self._referenceStream)
+                self.minPitchObj, self.maxPitchObj = self.getPitchSpan(self._referenceStream)
+                maxPitch = int(self.maxPitchObj.ps - self.minPitchObj.ps)
             else:
-                minPitch, maxPitch = 0, 130  # a large default
+                maxPitch = 130  # a large default
         else:  # create minPitch maxPitch
-            minPitch, maxPitch = 0, numColors
+            maxPitch = numColors
 
         valueRange = maxPitch - minPitch
         if valueRange == 0:
@@ -990,10 +997,10 @@ class Ambitus(DiscreteAnalysis):
 
         # environLocal.printDebug([self._pitchSpanColors])
 
-    def getPitchSpan(self, subStream):
+    def getPitchSpan(self, subStream) -> Optional[Tuple[pitch.Pitch, pitch.Pitch]]:
         '''
-        For a given subStream, return the pitch with the minimum and
-        maximum pitch space value found.
+        For a given subStream, return a tuple consisting of the two pitches
+        with the minimum and maximum pitch space value.
 
         This public method may be used by other classes.
 
@@ -1012,7 +1019,25 @@ class Ambitus(DiscreteAnalysis):
         >>> s.append(c)
         >>> p.getPitchSpan(s)
         (<music21.pitch.Pitch A2>, <music21.pitch.Pitch C8>)
+
+        Returns None if the stream contains no pitches.
+
+        >>> s = stream.Stream(note.Rest())
+        >>> p.getPitchSpan(s) is None
+        True
+
+        OMIT_FROM_DOCS
+
+        And with only ChordSymbols:
+
+        >>> s.insert(4, harmony.ChordSymbol('C6'))
+        >>> p.getPitchSpan(s) is None
+        True
+
         '''
+        if subStream is self._referenceStream and self.minPitchObj and self.maxPitchObj:
+            return self.minPitchObj, self.maxPitchObj
+
         justNotes = subStream.recurse().notes
         if not justNotes:
             # need to handle case of no pitches
@@ -1030,65 +1055,21 @@ class Ambitus(DiscreteAnalysis):
                 pitches = [n.pitch]
             psFound += [p.ps for p in pitches]
             pitchesFound.extend(pitches)
-        # in some cases no pitch space values are found due to all rests
+        # in some cases there is stil nothing -- perhaps only ChordSymbols
         if not psFound:
             return None
         # use built-in functions
         minPitchIndex = psFound.index(min(psFound))
         maxPitchIndex = psFound.index(max(psFound))
 
-        return pitchesFound[minPitchIndex], pitchesFound[maxPitchIndex]
+        minPitchObj = pitchesFound[minPitchIndex]
+        maxPitchObj = pitchesFound[maxPitchIndex]
 
-    def getPitchRanges(self, subStream) -> Tuple[int, int]:
-        '''
-        For a given subStream, return the smallest .ps difference
-        between any two pitches and the largest difference
-        between any two pitches. This is used to get the
-        smallest and largest ambitus possible in a given work.
+        if subStream is self._referenceStream:
+            self.minPitchObj = minPitchObj
+            self.maxPitchObj = maxPitchObj
 
-        >>> ambitusAnalyzer = analysis.discrete.Ambitus()
-        >>> s = stream.Stream()
-        >>> c = chord.Chord(['a2', 'b4', 'c8'])
-        >>> s.append(c)
-        >>> [int(thisPitch.ps) for thisPitch in ambitusAnalyzer.getPitchSpan(s)]
-        [45, 108]
-        >>> ambitusAnalyzer.getPitchRanges(s)
-        (26, 63)
-
-        >>> s = corpus.parse('bach/bwv66.6')
-        >>> ambitusAnalyzer.getPitchRanges(s)
-        (0, 34)
-
-        An empty stream has pitch range (0, 0)
-
-        >>> s = stream.Stream()
-        >>> ambitusAnalyzer.getPitchRanges(s)
-        (0, 0)
-        '''
-        ssfn = subStream.flat.notes
-
-        psFound = []
-        for n in ssfn:
-            pitches = []
-            if 'Chord' in n.classes:
-                pitches = n.pitches
-            elif 'Note' in n.classes:
-                pitches = [n.pitch]
-            for p in pitches:
-                psFound.append(p.ps)
-        psFound.sort()
-        psRange = []
-        for i in range(len(psFound) - 1):
-            p1 = psFound[i]
-            for j in range(i + 1, len(psFound)):
-                p2 = psFound[j]
-                # p2 should always be equal or greater than p1
-                psRange.append(p2 - p1)
-
-        if not psRange:
-            return (0, 0)
-        else:
-            return (int(min(psRange)), int(max(psRange)))
+        return minPitchObj, maxPitchObj
 
     def solutionLegend(self, compress=False):
         '''
@@ -1330,14 +1311,14 @@ def analyzeStream(streamObj, *args, **keywords):
 
     >>> analysis.discrete.analyzeStream(s, 'key')
     <music21.key.Key of f# minor>
-    >>> analysis.discrete.analyzeStream(s, 'range')
+    >>> analysis.discrete.analyzeStream(s, 'span')
     <music21.interval.Interval m21>
 
 
     Note that the same results can be obtained by calling "analyze" directly on the stream object:
     >>> s.analyze('key')
     <music21.key.Key of f# minor>
-    >>> s.analyze('range')
+    >>> s.analyze('span')
     <music21.interval.Interval m21>
 
     '''
@@ -1347,6 +1328,11 @@ def analyzeStream(streamObj, *args, **keywords):
 
     if args:
         method = args[0]
+
+    if method == 'range':
+        # getPitchRanges() was removed in v7
+        # this synonym is being added for compatibility
+        method = 'span'
 
     match = analysisClassFromMethodName(method)
 
@@ -1370,7 +1356,7 @@ def analysisClassFromMethodName(method):
     >>> acfmn = analysis.discrete.analysisClassFromMethodName
     >>> acfmn('aarden')
     <class 'music21.analysis.discrete.AardenEssen'>
-    >>> acfmn('range')
+    >>> acfmn('span')
     <class 'music21.analysis.discrete.Ambitus'>
 
     This one is fundamentally important...
@@ -1537,7 +1523,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testFiles
         # use a musicxml test file with independently confirmed results
-        s = converter.parse(testFiles.edgefield82b)  # @UndefinedVariable
+        s = converter.parse(testFiles.edgefield82b)
 
         p = KrumhanslSchmuckler()
         k = p.getSolution(s)

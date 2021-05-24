@@ -494,7 +494,7 @@ class GeneralNote(base.Music21Object):
     double-dotted sixteenth note.
 
     In almost every circumstance, you should
-    create note.Note() or note.Rest() or note.Chord()
+    create note.Note() or note.Rest() or chord.Chord()
     objects directly, and not use this underlying
     structure.
 
@@ -839,9 +839,9 @@ class GeneralNote(base.Music21Object):
         >>> ng.duration.isGrace
         True
         >>> ng.duration
-        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.GraceDuration unlinked type:half quarterLength:0.0>
         >>> ng.duration.type
-        'zero'
+        'half'
         >>> ng.duration.components
         (DurationTuple(type='half', dots=0, quarterLength=0.0),)
 
@@ -850,7 +850,7 @@ class GeneralNote(base.Music21Object):
 
         >>> ng2 = n.getGrace(appoggiatura=True)
         >>> ng2.duration
-        <music21.duration.AppoggiaturaDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.AppoggiaturaDuration unlinked type:half quarterLength:0.0>
         >>> ng2.duration.slash
         False
 
@@ -860,7 +860,7 @@ class GeneralNote(base.Music21Object):
         >>> r = note.Rest(quarterLength=0.5)
         >>> r.getGrace(inPlace=True)
         >>> r.duration
-        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.GraceDuration unlinked type:eighth quarterLength:0.0>
         '''
         if inPlace is False:
             e = copy.deepcopy(self)
@@ -1321,14 +1321,11 @@ class Note(NotRest):
         if other is None or not isinstance(other, Note):
             return NotImplemented
 
-        retVal = super().__eq__(other)
-        if retVal is not True:
-            return retVal
-
         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
         if self.pitch != other.pitch:
             return False
-        return True
+
+        return super().__eq__(other)
 
     def __lt__(self, other):
         '''
@@ -1723,7 +1720,7 @@ class Rest(GeneralNote):
                 # TODO: get it to work.
 
                 "auto" is the default, where if the rest value happens to match the current
-                time signature context, then display it as a whole note, centered, etc.
+                time signature context, then display it as a whole rest, centered, etc.
                 otherwise will display normally.
 
                 See examples in :meth:`music21.musicxml.m21ToXml.MeasureExporter.restToXml`
@@ -1736,7 +1733,15 @@ class Rest(GeneralNote):
         self.fullMeasure = 'auto'  # see docs; True, False, 'always',
 
     def _reprInternal(self):
-        return self.name
+        duration_name = self.duration.fullName.lower()
+        if len(duration_name) < 15:  # dotted quarter = 14
+            return duration_name.replace(' ', '-')
+        else:
+            ql = self.duration.quarterLength
+            if ql == int(ql):
+                ql = int(ql)
+            ql_string = str(ql)
+            return f'{ql_string}ql'
 
     def __eq__(self, other):
         '''
@@ -1776,25 +1781,6 @@ class Rest(GeneralNote):
         'Whole Rest'
         '''
         return self.duration.fullName + ' Rest'
-
-
-class SpacerRest(Rest):
-    '''
-    This is exactly the same as a rest, but it is a SpacerRest.
-    This object should only be used for making hidden space in a score in lilypond.
-
-    DEPRECATED in v.7 -- use a normal rest with .hideObjectOnPrint
-
-    >>> sr = note.SpacerRest(type='whole')
-    >>> sr
-    <music21.note.SpacerRest rest duration=4.0>
-    '''
-
-    def __init__(self, *arguments, **keywords):
-        super().__init__(**keywords)
-
-    def _reprInternal(self):
-        return f'{self.name} duration={self.duration.quarterLength}'
 
 
 # ------------------------------------------------------------------------------
@@ -2188,7 +2174,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Note, Rest, SpacerRest, Unpitched, NotRest, GeneralNote, Lyric]
+_DOC_ORDER = [Note, Rest, Unpitched, NotRest, GeneralNote, Lyric]
 
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()

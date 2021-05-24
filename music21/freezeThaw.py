@@ -553,7 +553,7 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> n2.duration.type = 'whole'
         >>> m2.append(n2)
         >>> s2.append(m2)
-        >>> v = variant.Variant(s2)
+        >>> v = variant.Variant(s2.elements)
         >>> s.insert(0, v)
         >>> sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
         >>> allIds = sf.findActiveStreamIdsInHierarchy()
@@ -918,9 +918,8 @@ class StreamThawer(StreamFreezeThawBase):
             directory = environLocal.getRootTempDir()
             fp = directory / fp
 
-        f = open(fp, 'rb')
-        fileData = f.read()  # TODO: do not read entire file
-        f.close()
+        with open(fp, 'rb') as f:
+            fileData = f.read()  # TODO: do not read entire file
 
         fmt = self.parseOpenFmt(fileData)
         if fmt == 'pickle':
@@ -946,9 +945,8 @@ class StreamThawer(StreamFreezeThawBase):
             common.restorePathClassesAfterUnpickling()
         elif fmt == 'jsonpickle':
             import jsonpickle
-            f = open(fp, 'r')
-            data = f.read()
-            f.close()
+            with open(fp, 'r') as f:
+                data = f.read()
             storage = jsonpickle.decode(data)
             self.stream = self.unpackStream(storage)
         else:  # pragma: no cover
@@ -1229,7 +1227,7 @@ class Test(unittest.TestCase):
         c = converter.parse(a)
         f = converter.freezeStr(c)
         d = converter.thawStr(f)
-        self.assertEqual(d[1][20].volume._client.__class__.__name__, 'weakref')
+        self.assertEqual(d.parts[1].flat.notes[20].volume._client.__class__.__name__, 'weakref')
 
 
 # -----------------------------------------------------------------------------

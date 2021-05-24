@@ -132,6 +132,8 @@ class OffsetSpecial(StrEnum):
     False
     >>> 'lowestOffset' in OffsetSpecial
     True
+    >>> str(OffsetSpecial.AT_END)
+    'highestTime'
 
     New in v7.
     '''

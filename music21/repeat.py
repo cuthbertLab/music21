@@ -788,7 +788,7 @@ class Expander:
         for m in srcStream:
             # processes uses the spanner bundle stored on this Stream
             self._repeatBrackets.spannerBundle.replaceSpannedElement(
-                id(m.derivation.origin), m)
+                m.derivation.origin, m)
 
         # srcStream = self._srcMeasureStream
         # post = copy.deepcopy(self._srcMeasureStream)
