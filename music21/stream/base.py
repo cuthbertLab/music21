@@ -12373,7 +12373,7 @@ class Voice(Stream):
     :attr:`~music21.base.Music21Object.id` is used for analysis or association
     of voices across multiple measures, whereas :attr:`~music21.stream.Voice.sequence`
     is used to identify the intended display or ordering inside a single measure.
-    
+
     The `.id` attribute may also store voice numbers parsed from a file (which,
     depending on the format, may or may not truly represent analytical connections).
     This functionality allows for extracting analytical voices via
