@@ -121,8 +121,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     its :attr:`~music21.base.Music21Object.offset`
     property. One special case is when every such object, such as a newly created
     one, has no offset. Then, so long as the entire list is not composed of
-    non-Measure Stream subclasses like Parts or Voices, each element is appended,
-    creating a sequence of elements in time, rather than synchrony.
+    non-Measure Stream subclasses representing synchrony like Parts or Voices,
+    each element is appended, creating a sequence of elements in time,
+    rather than synchrony.
 
     Other arguments and keywords are ignored, but are
     allowed so that subclassing the Stream is easier.
@@ -166,8 +167,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     >>> s.first()
     <music21.meter.TimeSignature 4/4>
 
-    New in v7 -- providing a list of objects or Measures (but not other Stream
-    subclasses such as Parts) now positions sequentially, i.e. appends:
+    New in v7 -- providing a list of objects or Measures or Scores (but not other Stream
+    subclasses such as Parts or Voices) now positions sequentially, i.e. appends:
 
     >>> s2 = stream.Measure([note.Note(), note.Note(), bar.Barline()])
     >>> s2.show('text')
@@ -197,11 +198,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     Create nested streams in one fell swoop:
 
-    >>> s5 = stream.Score(stream.Part(stream.Measure(note.Note())))
+    >>> s5 = stream.Score(stream.Part(stream.Measure(chord.Chord('C2 A2'))))
     >>> s5.show('text')
     {0.0} <music21.stream.Part 0x...>
         {0.0} <music21.stream.Measure 0 offset=0.0>
-            {0.0} <music21.note.Note C>
+            {0.0} <music21.chord.Chord C2 A2>
     '''
     # this static attributes offer a performance boost over other
     # forms of checking class
@@ -278,18 +279,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if givenElements is None:
             return
 
-        if isinstance(givenElements, Stream) or not common.isIterable(givenElements):
+        if isinstance(givenElements, base.Music21Object) or not common.isIterable(givenElements):
             givenElements = [givenElements]
 
         # Append rather than insert if every offset is 0.0
-        # but not if every element is a stream subclass other than a Measure
-        # (i.e. Opus, Score, Part, or Voice)
+        # but not if every element is a stream subclass other than a Measure or Score
+        # (i.e. Part or Voice generally, but even Opus theoretically)
+        # because these classes usually represent synchrony
         append: bool = False
         try:
             append = all(e.offset == 0.0 for e in givenElements)
         except AttributeError:
             pass  # appropriate failure will be raised by coreGuardBeforeAddElement()
-        if append and all((e.isStream and not e.isMeasure) for e in givenElements):
+        if append and all(
+                (e.isStream and e.classSet.isdisjoint((Measure, Score)))
+                for e in givenElements):
             append = False
 
         for e in givenElements:

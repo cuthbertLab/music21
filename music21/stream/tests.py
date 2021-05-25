@@ -5344,6 +5344,16 @@ class Test(unittest.TestCase):
         s = o.getScoreByTitle(re.compile('Pfal(.*)'))
         self.assertEqual(s.metadata.title, 'Es fuhr sich ein Pfalzgraf')
 
+    def testOpusSequence(self):
+        '''
+        Providing a sequence of Scores to an Opus container should append
+        rather than insert each at 0.0.
+        '''
+        s1 = Score(Part(Measure(note.Note())))
+        s2 = Score(Part(Measure(note.Note())))
+        o = Opus([s1, s2])
+        self.assertEqual(o.elementOffset(s2), 1.0)
+
     def testActiveSiteMangling(self):
         outer = Stream()
         inner = Stream()
