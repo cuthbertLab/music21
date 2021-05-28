@@ -1790,11 +1790,13 @@ class Test(unittest.TestCase):
         self.assertEqual(s2.elementOffset(s1), 0.0)
         self.assertRaises(sites.SitesException, s2.elementOffset, s1.flat)
 
-        # getContextByClass will not work; the clef is in s2; its not in a context of s2
+        # getContextByClass now finds this as of v7
+        # it performs what getClefs() used to do
+        # by searching a stream at 0.0 before searching the context
         post = s2.getContextByClass(clef.Clef)
-        self.assertIsNone(post)
+        self.assertIsInstance(post, clef.AltoClef)
 
-        # but s2.clef works...
+        # s2.clef works fine
         self.assertIsInstance(s2.clef, clef.AltoClef)
 
         # we can find the clef from the flat version of s1 also:

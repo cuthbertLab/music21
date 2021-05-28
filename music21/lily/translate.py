@@ -2113,7 +2113,8 @@ class LilypondConverter:
         ['london']
 
         '''
-        replacedElementsClef = replacedElements[0].getContextByClass('Clef')
+        replacedElementsClef = replacedElements[0].getContextByClass(
+            'Clef', getElementMethod='getElementBefore')
 
         variantContainerStream = variantObject.getContextByClass('Part')
         if variantContainerStream is None:

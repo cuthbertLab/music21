@@ -4662,6 +4662,10 @@ class Test(unittest.TestCase):
         c = b.getContextByClass('Note', getElementMethod='getElementAfterOffset')
         self.assertEqual(c.name, 'C')
 
+        # And in 2021...
+        m = p.measure(1)
+        self.assertIsNotNone(m.getContextByClass('Clef'))
+
     def testGetContextByClassB(self):
         from music21 import stream, note, meter
 

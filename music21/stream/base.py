@@ -3709,7 +3709,71 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             sIterator = sIterator.getElementsByClass(classList)
         return sIterator
 
-    def getElementAtOrBefore(self, offset, classList=None):
+    def getContextByClass(
+        self,
+        className,
+        *,
+        getElementMethod='getElementAtOrBefore',
+        sortByCreationTime=False,
+        followDerivation=True,
+        priorityTargetOnly=False,
+    ) -> Optional[base.Music21Object]:
+        '''
+        Overrides :meth:`~music21.base.Music21Object.getContextByClass` in order
+        to look first in this stream's elements at offset 0.0 before executing the
+        rest of the context search, so long as `getElementMethod` is the default
+        `getElementAtOrBefore`.
+
+        These `getElementMethod` values are documented on the superclass
+        :meth:`~music21.base.Music21Object.getContextByClass`:
+
+        *    `'getElementBefore'`
+        *    `'getElementAfter'`
+        *    `'getElementAtOrBefore'` (Default)
+        *    `'getElementAtOrAfter'`
+
+        Ask for measure 2's clef context and get the clef at 0.0 in measure 2:
+
+        >>> p = converter.parse('tinyNotation: c1 d1')
+        >>> m = p.measure(2)
+        >>> m.insert(0, clef.BassClef())
+        >>> m.getContextByClass(clef.Clef, getElementMethod='getElementAtOrBefore')
+        <music21.clef.BassClef>
+
+        Searching before yields the clef in m. 1:
+
+        >>> m.getContextByClass(clef.Clef, getElementMethod='getElementBefore')
+        <music21.clef.TrebleClef>
+
+        Searching at-or-after, or even just plain after, since the next element
+        of this stream is the clef in question, yields the clef in m.2:
+
+        >>> m.getContextByClass(clef.Clef, getElementMethod='getElementAtOrAfter')
+        <music21.clef.BassClef>
+        >>> m.getContextByClass(clef.Clef, getElementMethod='getElementAfter')
+        <music21.clef.BassClef>
+
+        Failed searches return None:
+
+        >>> m.getContextByClass(clef.TenorClef) is None
+        True
+
+        New in v7.
+        '''
+
+        if getElementMethod == 'getElementAtOrBefore':
+            found = self.getElementsByOffset(0.0, classList=className)
+            if found:
+                return found.first()
+        return super().getContextByClass(
+            className,
+            getElementMethod=getElementMethod,
+            sortByCreationTime=sortByCreationTime,
+            followDerivation=followDerivation,
+            priorityTargetOnly=priorityTargetOnly
+        )
+
+    def getElementAtOrBefore(self, offset, classList=None) -> Optional[base.Music21Object]:
         # noinspection PyShadowingNames
         '''
         Given an offset, find the element at this offset,
@@ -3829,7 +3893,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             return None
 
-    def getElementBeforeOffset(self, offset, classList=None):
+    def getElementBeforeOffset(self, offset, classList=None) -> Optional[base.Music21Object]:
         '''
         Get element before (and not at) a provided offset.
 
