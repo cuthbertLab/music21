@@ -3813,7 +3813,19 @@ class MeasureExporter(XMLExporterBase):
           </unpitched>
           <duration>10080</duration>
           <type>quarter</type>
-        </note>        
+        </note>
+
+        >>> graceUp = up.getGrace()
+        >>> mxUnpitched = MEX.unpitchedToXml(graceUp)
+        >>> MEX.dump(mxUnpitched)
+        <note>
+          <grace slash="yes" />
+          <unpitched>
+            <display-step>D</display-step>
+            <display-octave>5</display-octave>
+          </unpitched>
+          <type>quarter</type>
+        </note>
         '''
         mxNote = self.noteToXml(up, noteIndexInChord=noteIndexInChord, chordParent=chordParent)
 
@@ -3821,7 +3833,7 @@ class MeasureExporter(XMLExporterBase):
         _setTagTextFromAttribute(up, mxUnpitched, 'display-step')
         _setTagTextFromAttribute(up, mxUnpitched, 'display-octave')
 
-        helpers.insertBeforeElements(mxNote, mxUnpitched, tagList=['duration'])
+        helpers.insertBeforeElements(mxNote, mxUnpitched, tagList=['duration', 'type'])
 
         return mxNote
 
