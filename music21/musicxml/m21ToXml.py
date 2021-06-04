@@ -3708,7 +3708,7 @@ class MeasureExporter(XMLExporterBase):
           <type>quarter</type>
         </note>
         <note>
-        <chord />
+          <chord />
           <unpitched>
             <display-step>C</display-step>
             <display-octave>4</display-octave>
