@@ -2674,7 +2674,7 @@ class MeasureExporter(XMLExporterBase):
             ('NoChord', 'noChordToXml'),
             ('ChordWithFretBoard', 'chordWithFretBoardToXml'),
             ('ChordSymbol', 'chordSymbolToXml'),
-            ('Chord', 'chordToXml'),
+            ('ChordBase', 'chordToXml'),
             ('Unpitched', 'unpitchedToXml'),
             ('Rest', 'restToXml'),
             ('Dynamic', 'dynamicToXml'),
@@ -3609,7 +3609,7 @@ class MeasureExporter(XMLExporterBase):
 
         return mxNote
 
-    def chordToXml(self, c: chord.Chord):
+    def chordToXml(self, c: chord.ChordBase):
         # noinspection PyShadowingNames
         '''
         Returns a list of <note> tags, all but the first with a <chord/> tag on them.
@@ -3694,6 +3694,29 @@ class MeasureExporter(XMLExporterBase):
           <notehead color="#FFD700" parentheses="no">diamond</notehead>
         </note>
 
+        And unpitched chord members:
+
+        >>> perc = percussion.PercussionChord([note.Unpitched(), note.Unpitched()])
+        >>> for n in MEX.chordToXml(perc): 
+        ...     MEX.dump(n)
+        <note>
+          <unpitched>
+            <display-step>C</display-step>
+            <display-octave>4</display-octave>
+          </unpitched>
+          <duration>10080</duration>
+          <type>quarter</type>
+        </note>
+        <note>
+        <chord />
+          <unpitched>
+            <display-step>C</display-step>
+            <display-octave>4</display-octave>
+          </unpitched>
+          <duration>10080</duration>
+          <type>quarter</type>
+        </note>
+
         Test articulations of chords with fingerings. Superfluous fingerings will be ignored.
 
         >>> testChord = chord.Chord('E4 C5')
@@ -3725,7 +3748,10 @@ class MeasureExporter(XMLExporterBase):
         '''
         mxNoteList = []
         for i, n in enumerate(c):
-            mxNoteList.append(self.noteToXml(n, i, chordParent=c))
+            if 'Unpitched' in n.classSet:
+                mxNoteList.append(self.unpitchedToXml(n, noteIndexInChord=i, chordParent=c))
+            else:
+                mxNoteList.append(self.noteToXml(n, noteIndexInChord=i, chordParent=c))
         return mxNoteList
 
     def durationXml(self, dur: duration.Duration):
@@ -3768,7 +3794,10 @@ class MeasureExporter(XMLExporterBase):
         _setTagTextFromAttribute(p, mxPitch, 'octave', 'implicitOctave')
         return mxPitch
 
-    def unpitchedToXml(self, up: note.Unpitched) -> Element:
+    def unpitchedToXml(self,
+                       up: note.Unpitched,
+                       noteIndexInChord: int=0,
+                       chordParent: chord.ChordBase=None) -> Element:
         '''
         Convert a :class:`~music21.note.Unpitched` to a <note>
         with an <unpitched> subelement.
@@ -3786,7 +3815,7 @@ class MeasureExporter(XMLExporterBase):
           <type>quarter</type>
         </note>        
         '''
-        mxNote = self.noteToXml(up)
+        mxNote = self.noteToXml(up, noteIndexInChord=noteIndexInChord, chordParent=chordParent)
 
         mxUnpitched = Element('unpitched')
         _setTagTextFromAttribute(up, mxUnpitched, 'display-step')
