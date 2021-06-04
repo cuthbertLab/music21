@@ -3796,8 +3796,8 @@ class MeasureExporter(XMLExporterBase):
 
     def unpitchedToXml(self,
                        up: note.Unpitched,
-                       noteIndexInChord: int=0,
-                       chordParent: chord.ChordBase=None) -> Element:
+                       noteIndexInChord: int = 0,
+                       chordParent: chord.ChordBase = None) -> Element:
         '''
         Convert a :class:`~music21.note.Unpitched` to a <note>
         with an <unpitched> subelement.
