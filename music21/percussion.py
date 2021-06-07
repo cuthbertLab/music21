@@ -9,8 +9,7 @@
 # Copyright:    Copyright © 2006-2019 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-'''
-'''
+
 import unittest
 
 from music21 import common

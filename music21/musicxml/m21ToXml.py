@@ -3697,7 +3697,7 @@ class MeasureExporter(XMLExporterBase):
         And unpitched chord members:
 
         >>> perc = percussion.PercussionChord([note.Unpitched(), note.Unpitched()])
-        >>> for n in MEX.chordToXml(perc): 
+        >>> for n in MEX.chordToXml(perc):
         ...     MEX.dump(n)
         <note>
           <unpitched>
@@ -3744,7 +3744,6 @@ class MeasureExporter(XMLExporterBase):
             </technical>
           </notations>
         </note>
-
         '''
         mxNoteList = []
         for i, n in enumerate(c):
