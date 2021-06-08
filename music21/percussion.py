@@ -26,6 +26,31 @@ class PercussionChord(chord.ChordBase):
     >>> pChord = percussion.PercussionChord([note.Unpitched('D4'), note.Note('E5')])
     >>> pChord.isChord
     False
+
+    Has notes, just like any ChordBase:
+
+    >>> pChord.notes
+    (<music21.note.Unpitched object at 0x...>, <music21.note.Note E>)
+
+    Assign them to another PercussionChord:
+
+    >>> pChord2 = percussion.PercussionChord()
+    >>> pChord2.notes = pChord.notes
+    >>> pChord2.notes
+    (<music21.note.Unpitched object at 0x...>, <music21.note.Note E>)
+
+    Don't attempt setting anything but Note or Unpitched objects as notes:
+
+    >>> pChord2.notes = [note.Rest()]
+    Traceback (most recent call last):
+    TypeError: every element of notes must be a note.Note or note.Unpitched object
+
+    OMIT_FROM_DOCS
+
+    See the repr of an empty percussion chord:
+
+    >>> percussion.PercussionChord()
+    <music21.percussion.PercussionChord object at 0x...>
     '''
 
     isChord = False
