@@ -12,6 +12,7 @@
 import random
 import unittest
 import copy
+from typing import List
 
 import music21
 from music21.note import GeneralNote
@@ -7043,12 +7044,22 @@ class Test(unittest.TestCase):
         s.insert(0, p1)
         s.insert(0, p2)
 
-        self.assertEqual([str(p) for p in p1.pitches], ['C4', 'C4', 'C4', 'C4'])
-        test = p1._transposeByInstrument(inPlace=False)
-        self.assertEqual([str(p) for p in test.pitches], ['F3', 'F3', 'B-3', 'B-3'])
+        def simulateRecursing(myStream, reverse=False) -> List[pitch.Pitch]:
+            '''
+            _transposeByInstrument() doesn't recurse at the moment,
+            so we have to dip into each measure. Not exposed publicly anyway.
+            '''
+            demoPitches = []
+            for m in myStream[Measure]:
+                post = m._transposeByInstrument(inPlace=False, reverse=reverse)
+                for n in post.notes:
+                    demoPitches.extend(n.pitches)
+            return demoPitches
 
-        test = p1._transposeByInstrument(inPlace=False, reverse=True)
-        self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'D4', 'D4'])
+        self.assertEqual([str(p) for p in p1.pitches], ['C4', 'C4', 'C4', 'C4'])
+        self.assertEqual([str(p) for p in simulateRecursing(p1)], ['F3', 'F3', 'B-3', 'B-3'])
+        self.assertEqual([str(p) for p in simulateRecursing(p1, reverse=True)],
+                          ['G4', 'G4', 'D4', 'D4'])
 
         # declare that at written pitch
         p1.atSoundingPitch = False
@@ -7084,11 +7095,11 @@ class Test(unittest.TestCase):
         self.assertEqual([str(p) for p in test.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3'])
 
         # test same in place
-        s.parts[0].atSoundingPitch = False
-        s.parts[1].atSoundingPitch = False
+        self.assertEqual(s.parts[0].atSoundingPitch, False)
+        self.assertEqual(s.parts[1].atSoundingPitch, False)
         s.toSoundingPitch(inPlace=True)
         self.assertEqual([str(p) for p in s.parts[0].pitches], ['F3', 'F3', 'B-3', 'B-3'])
-        self.assertEqual([str(p) for p in test.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3'])
+        self.assertEqual([str(p) for p in s.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3'])
 
     def testTransposeByPitchB(self):
         from music21.musicxml import testPrimitive
@@ -7108,6 +7119,7 @@ class Test(unittest.TestCase):
         self.assertEqual([str(p) for p in s.parts[1].pitches],
                          ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5'])
 
+        self.assertEqual(s.atSoundingPitch, 'unknown')
         s.toSoundingPitch(inPlace=True)
 
         self.assertEqual([str(p) for p in s.parts[0].pitches],

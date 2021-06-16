@@ -4932,6 +4932,28 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # print(k, i.transposition)
         return returnObj
 
+    def _updateSoundingPitchFromSitesOrSubstreams(self):
+        '''
+        Try sites first. If still not evident, search for agreement among
+        ALL substreams one level down.
+        '''
+        if self.atSoundingPitch == 'unknown':
+            for site in self.sites:
+                if hasattr(site, 'atSoundingPitch') and site.atSoundingPitch != 'unknown':
+                    self.atSoundingPitch = site.atSoundingPitch
+                    return
+        # If still unknown, check ALL substreams ONE level down
+        # Example: score, and all parts know what they are
+        # But also: part, and all measures know what they are (no transposition changes)
+        substream_iter = self.getElementsByClass(Stream)
+        if not substream_iter:
+            return
+        if all(subst.atSoundingPitch is True for subst in substream_iter):
+            self.atSoundingPitch = True
+            return
+        if all(subst.atSoundingPitch is False for subst in substream_iter):
+            self.atSoundingPitch = False
+
     def toSoundingPitch(self, *, inPlace=False):
         # noinspection PyShadowingNames
         '''
@@ -4966,38 +4988,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> scSounding.recurse().notes[0].nameWithOctave
         'C3'
 
-        If 'atSoundingPitch' is unknown for this Stream and all of its parent Streams
-        then will raise a StreamException:
-
-        >>> s = stream.Score()
-        >>> p = stream.Part(id='partEmpty')
-        >>> s.append(p)
-        >>> p.toSoundingPitch()
-        Traceback (most recent call last):
-        music21.exceptions21.StreamException: atSoundingPitch is unknown: cannot transpose
-        >>> s.atSoundingPitch = False
-        >>> sp = p.toSoundingPitch()
-        >>> sp
-        <music21.stream.Part partEmpty>
-        >>> sp.derivation.origin is p
-        True
+        Changed in v.7 -- no longer raises `StreamException` if `atSoundingPitch`
+        is `'unknown'`.
         '''
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('toSoundingPitch')
         else:
             returnObj = self
 
-        if self.atSoundingPitch == 'unknown':
-            for site in self.sites:
-                if hasattr(site, 'atSoundingPitch') and site.atSoundingPitch != 'unknown':
-                    self.atSoundingPitch = site.atSoundingPitch
-                    break
-            else:
-                raise StreamException('atSoundingPitch is unknown: cannot transpose')
+        returnObj._updateSoundingPitchFromSitesOrSubstreams()
+        original_atSoundingPitch = returnObj.atSoundingPitch
 
-        if self.atSoundingPitch is False:
+        if returnObj.atSoundingPitch is not True:  # unknown or False
             for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
-                if container.atSoundingPitch is not True:
+                if original_atSoundingPitch is False or container.atSoundingPitch is False:
                     # transposition defined on instrument goes from written to sounding
                     container._transposeByInstrument(reverse=False, inPlace=True)
                     container.atSoundingPitch = True
@@ -5036,23 +5040,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         False
         >>> scWritten.recurse().notes[0].nameWithOctave
         'A4'
+
+        Changed in v.7 -- no longer raises `StreamException` if `atSoundingPitch`
+        is `'unknown'`.
         '''
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('toWrittenPitch')
         else:
             returnObj = self
 
-        if self.atSoundingPitch == 'unknown':
-            for site in self.sites:
-                if hasattr(site, 'atSoundingPitch') and site.atSoundingPitch != 'unknown':
-                    self.atSoundingPitch = site.atSoundingPitch
-                    break
-            else:
-                raise StreamException('atSoundingPitch is unknown: cannot transpose')
+        returnObj._updateSoundingPitchFromSitesOrSubstreams()
+        original_atSoundingPitch = returnObj.atSoundingPitch
 
-        if self.atSoundingPitch is True:
+        if returnObj.atSoundingPitch is not False:  # unknown or True
             for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
-                if container.atSoundingPitch is not False:
+                if original_atSoundingPitch is True or container.atSoundingPitch is True:
                     # transposition defined on instrument goes from written to sounding
                     # need to reverse to go to written
                     container._transposeByInstrument(reverse=True, inPlace=True)
