@@ -4932,13 +4932,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # print(k, i.transposition)
         return returnObj
 
-    def _findAtSoundingPitchFromSites(self):
-        if self.atSoundingPitch != 'unknown':
-            return self.atSoundingPitch
-        for site in self.sites:
-            if hasattr(site, 'atSoundingPitch') and site.atSoundingPitch != 'unknown':
-                return site.atSoundingPitch
-        return 'unknown'
+    def _shouldBeAtSoundingPitch(self, contextStream):
+        '''
+        Find the desired state of .atSoundingPitch for `self` so it can be compared to
+        the actual state. Let `contextStream` dictate; but if both `contextStream`
+        and `self` are unknown, then search sites.
+        '''
+        if contextStream != 'unknown':
+            return contextStream.atSoundingPitch
+        if self.atSoundingPitch == 'unknown':
+            for site in self.sites:
+                if site.isStream and site.atSoundingPitch != 'unknown':
+                    return site.atSoundingPitch
+        return self.atSoundingPitch
 
     def toSoundingPitch(self, *, inPlace=False):
         # noinspection PyShadowingNames
@@ -4985,13 +4991,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if returnObj.atSoundingPitch is not True:  # unknown or False
             transposed_containers = []
             for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
-                if returnObj.atSoundingPitch == 'unknown' and container.atSoundingPitch == 'unknown':
-                    should_be_at_sounding = container._findAtSoundingPitchFromSites()
-                elif returnObj.atSoundingPitch == 'unknown':
-                    should_be_at_sounding = container.atSoundingPitch
-                else:
-                    should_be_at_sounding = returnObj.atSoundingPitch
-
+                should_be_at_sounding = container._shouldBeAtSoundingPitch(returnObj)
                 if should_be_at_sounding is False and container.atSoundingPitch is not True:
                     # transposition defined on instrument goes from written to sounding
                     container._transposeByInstrument(reverse=False, inPlace=True)
@@ -5000,6 +5000,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     for ottava in container.getElementsByClass('Ottava'):
                         ottava.performTransposition()
 
+            # One container might be another stream's context, so do this afterward
             for c in transposed_containers:
                 c.atSoundingPitch = True
 
@@ -5046,13 +5047,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if returnObj.atSoundingPitch is not False:  # unknown or True
             transposed_containers = []
             for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
-                if returnObj.atSoundingPitch == 'unknown' and container.atSoundingPitch == 'unknown':
-                    should_be_at_sounding = container._findAtSoundingPitchFromSites()
-                elif returnObj.atSoundingPitch == 'unknown':
-                    should_be_at_sounding = container.atSoundingPitch
-                else:
-                    should_be_at_sounding = returnObj.atSoundingPitch
-
+                should_be_at_sounding = container._shouldBeAtSoundingPitch(returnObj)
                 if should_be_at_sounding is True and container.atSoundingPitch is not False:
                     # transposition defined on instrument goes from written to sounding
                     # need to reverse to go to written
@@ -5061,6 +5056,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     for ottava in container.getElementsByClass('Ottava'):
                         ottava.undoTransposition()
 
+            # One container might be another stream's context, so do this afterward
             for c in transposed_containers:
                 c.atSoundingPitch = False
 
