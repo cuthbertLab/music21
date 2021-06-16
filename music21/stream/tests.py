@@ -7101,6 +7101,15 @@ class Test(unittest.TestCase):
         self.assertEqual([str(p) for p in s.parts[0].pitches], ['F3', 'F3', 'B-3', 'B-3'])
         self.assertEqual([str(p) for p in s.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3'])
 
+        # again, with atSoundingPitch=True and unknown top-level
+        self.assertEqual(s.atSoundingPitch, True)
+        s.atSoundingPitch = 'unknown'
+        self.assertEqual(s.parts[0].atSoundingPitch, True)
+        self.assertEqual(s.parts[1].atSoundingPitch, True)
+        s.toWrittenPitch(inPlace=True)
+        self.assertEqual([str(p) for p in p1.pitches], ['C4', 'C4', 'C4', 'C4'])
+        self.assertEqual([str(p) for p in p2.pitches], ['C4', 'C4', 'C4', 'C4'])
+
     def testTransposeByPitchB(self):
         from music21.musicxml import testPrimitive
         from music21 import converter
