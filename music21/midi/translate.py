@@ -2318,7 +2318,7 @@ def packetStorageFromSubstreamList(
         subs = subs.flat
 
         # get a first instrument; iterate over rest
-        instrumentStream = subs.iter().getElementsByClass('Instrument')
+        instrumentStream = subs.getElementsByClass('Instrument')
 
         # if there is an Instrument object at the start, make instObj that instrument
         # this may be a Conductor object if prepareStreamForMidi() was run

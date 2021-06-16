@@ -1988,8 +1988,8 @@ class Music21Object(prebase.ProtoM21Object):
         The `className` can be used to specify one or more classes to match.
 
         >>> s = corpus.parse('bwv66.6')
-        >>> m2 = s.parts[0].iter().getElementsByClass('Measure')[2]  # pickup measure
-        >>> m3 = s.parts[0].iter().getElementsByClass('Measure')[3]
+        >>> m2 = s.parts[0].getElementsByClass('Measure')[2]  # pickup measure
+        >>> m3 = s.parts[0].getElementsByClass('Measure')[3]
         >>> m3
         <music21.stream.Measure 3 offset=9.0>
         >>> m3prev = m3.previous()
@@ -2002,7 +2002,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         We'll iterate backwards from the first note of the second measure of the Alto part.
 
-        >>> o = s.parts[1].iter().getElementsByClass('Measure')[2][0]
+        >>> o = s.parts[1].getElementsByClass('Measure')[2][0]
         >>> while o:
         ...    print(o)
         ...    o = o.previous()
@@ -4957,7 +4957,7 @@ class Test(unittest.TestCase):
 #     def testPreviousA(self):
 #         from music21 import corpus
 #         s = corpus.parse('bwv66.6')
-#         o = s.parts[0].iter().getElementsByClass('Measure')[2][1]
+#         o = s.parts[0].getElementsByClass('Measure')[2][1]
 #         i = 20
 #         while o and i:
 #             print(o)

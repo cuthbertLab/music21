@@ -6126,8 +6126,8 @@ class Test(unittest.TestCase):
 
         # try imported
         s = corpus.parse('bwv66.6')
-        p = s.iter().getElementsByClass('Part').first()  # for test, not .parts, use .iter()
-        m = p.iter().getElementsByClass('Measure')[2]  # for test, not .getElementsByClass('Measure')
+        p = s.getElementsByClass('Part').first()  # for test, not .parts, use .iter()
+        m = p.iter().getElementsByClass(Measure)[2]  # for test, not .getElementsByClass('Measure')
         rn = m[2]
 
         self.assertEqual(id(rn.activeSite), id(m))

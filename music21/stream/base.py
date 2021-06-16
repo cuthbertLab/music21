@@ -938,7 +938,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.clef.BassClef>
         {0.0} <music21.note.Note D#>
         '''
-        clefList = self.iter().getElementsByClass('Clef').getElementsByOffset(0)
+        clefList = self.getElementsByClass('Clef').getElementsByOffset(0)
         # casting to list added 20microseconds...
         return clefList.first()
 
@@ -1001,7 +1001,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         '''
         # there could be more than one
-        tsList = self.iter().getElementsByClass('TimeSignature').getElementsByOffset(0)
+        tsList = self.getElementsByClass('TimeSignature').getElementsByOffset(0)
         # environLocal.printDebug([
         #    'matched Measure classes of type TimeSignature', tsList, len(tsList)])
         # only return timeSignatures at offset = 0.0
@@ -10686,7 +10686,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         voiceIds = []
 
         if self.hasMeasures():
-            for m in self.iter().getElementsByClass('Measure'):
+            for m in self.getElementsByClass('Measure'):
                 mVoices = m.voices
                 mVCount = len(mVoices)
                 if not countById:
@@ -10915,7 +10915,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             p.mergeElements(self, classFilterList=('Instrument',))
 
         if self.hasMeasures():
-            for m in self.iter().getElementsByClass('Measure'):
+            for m in self.getElementsByClass('Measure'):
                 if m.hasVoices():
                     doOneMeasureWithVoices(m)
                 # if a measure does not have voices, simply populate
@@ -13474,7 +13474,7 @@ class Score(Stream):
             eNew = copy.deepcopy(e)  # assume that this is needed
             post.insert(self.elementOffset(e), eNew)
 
-        for p in self.iter().getElementsByClass('Part'):
+        for p in self.getElementsByClass('Part'):
             # get spanners at highest level, not by Part
             post.insert(0, p.expandRepeats(copySpanners=False))
 
@@ -13775,7 +13775,7 @@ class Score(Stream):
 
         # do not assume that we have parts here
         if self.hasPartLikeStreams():
-            for s in returnStream.iter().getElementsByClass('Stream'):
+            for s in returnStream.getElementsByClass('Stream'):
                 # process all component Streams inPlace
                 s.makeNotation(meterStream=meterStream,
                                refStreamOrTimeRange=refStreamOrTimeRange,
@@ -13823,7 +13823,7 @@ class Opus(Stream):
         ['1', '2', '3']
         '''
         post = []
-        for s in self.iter().getElementsByClass('Score'):
+        for s in self.getElementsByClass('Score'):
             post.append(s.metadata.number)
         return post
 
@@ -13844,7 +13844,7 @@ class Opus(Stream):
         >>> s.metadata.alternativeTitle
         'Tenor'
         '''
-        for s in self.iter().getElementsByClass('Score'):
+        for s in self.getElementsByClass('Score'):
             match, unused_field = s.metadata.search(opusMatch, 'number')
             if match:
                 return s

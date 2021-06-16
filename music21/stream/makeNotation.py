@@ -123,7 +123,7 @@ def makeBeams(
         returnObj: stream.Measure
         mColl = [returnObj]  # store a list of measures for processing
     else:
-        mColl = list(returnObj.iter().getElementsByClass('Measure'))  # a list of measures
+        mColl = list(returnObj.getElementsByClass('Measure'))  # a list of measures
         if not mColl:
             raise stream.StreamException(
                 'cannot process a stream that is neither a Measure nor has no Measures')
@@ -476,7 +476,7 @@ def makeMeasures(
     # del clefList
     clefObj = srcObj.clef or srcObj.getContextByClass('Clef')
     if clefObj is None:
-        clefObj = srcObj.iter().getElementsByClass('Clef').getElementsByOffset(0).first()
+        clefObj = srcObj.getElementsByClass('Clef').getElementsByOffset(0).first()
         # only return clefs that have offset = 0.0
         if not clefObj:
             clefObj = clef.bestClef(srcObj, recurse=True)
@@ -1543,7 +1543,7 @@ def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
     dst = Voice()
 
     # cast to list so source can be edited.
-    affectedElements = list(source.iter().getElementsByClass(classFilterList))
+    affectedElements = list(source.getElementsByClass(classFilterList))
 
     for e in affectedElements:
         dst.insert(source.elementOffset(e), e)

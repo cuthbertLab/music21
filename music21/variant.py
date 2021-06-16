@@ -153,7 +153,7 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     classesX = streamX.classes
     if 'Score' in classesX:
         return mergeVariantScores(streamX, streamY, variantName, inPlace=inPlace)
-    elif streamX.iter().getElementsByClass('Measure'):
+    elif streamX.getElementsByClass('Measure'):
         return mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace=inPlace)
     elif (streamX.iter().notesAndRests
             and streamX.duration.quarterLength == streamY.duration.quarterLength):
@@ -1952,9 +1952,9 @@ def _getPreviousElement(s, v):
     # Get class of elements in variant or replaced Region
     foundStream = None
     if lengthType == 'elongation':
-        foundStream = v.iter().getElementsByClass(['Measure', 'Note', 'Rest'])
+        foundStream = v.getElementsByClass(['Measure', 'Note', 'Rest'])
     else:
-        foundStream = replacedElements.iter().getElementsByClass(['Measure', 'Note', 'Rest'])
+        foundStream = replacedElements.getElementsByClass(['Measure', 'Note', 'Rest'])
 
     if not foundStream:
         raise VariantException('Cannot find any Measures, Notes, or Rests in variant')
