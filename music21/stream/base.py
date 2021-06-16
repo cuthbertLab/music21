@@ -4938,7 +4938,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         the actual state. Let `contextStream` dictate; but if both `contextStream`
         and `self` are unknown, then search sites.
         '''
-        if contextStream != 'unknown':
+        if contextStream.atSoundingPitch != 'unknown':
             return contextStream.atSoundingPitch
         if self.atSoundingPitch == 'unknown':
             for site in self.sites:
