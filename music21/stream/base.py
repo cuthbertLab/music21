@@ -4987,30 +4987,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             returnObj = self
 
-        if returnObj.hasPartLikeStreams():
-            for p in returnObj.getElementsByClass('Stream'):
-                # call on each part
-                p.toSoundingPitch(inPlace=True)
-                returnObj.atSoundingPitch = True
-            return returnObj
-
-        # else...
-        atSoundingPitch = self.atSoundingPitch
-        if atSoundingPitch == 'unknown':
+        if self.atSoundingPitch == 'unknown':
             for site in self.sites:
                 if hasattr(site, 'atSoundingPitch') and site.atSoundingPitch != 'unknown':
-                    atSoundingPitch = site.atSoundingPitch
+                    self.atSoundingPitch = site.atSoundingPitch
                     break
             else:
                 raise StreamException('atSoundingPitch is unknown: cannot transpose')
 
-        if atSoundingPitch is False:
-            # transposition defined on instrument goes from written to sounding
-            returnObj._transposeByInstrument(reverse=False, inPlace=True)
-            returnObj.atSoundingPitch = True
+        if self.atSoundingPitch is False:
+            for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
+                if container.atSoundingPitch is not True:
+                    # transposition defined on instrument goes from written to sounding
+                    container._transposeByInstrument(reverse=False, inPlace=True)
+                    container.atSoundingPitch = True
 
-        for ottava in returnObj.recurse().getElementsByClass('Ottava'):
-            ottava.performTransposition()
+                    for ottava in container.getElementsByClass('Ottava'):
+                        ottava.performTransposition()
 
         if not inPlace:
             return returnObj  # the Stream or None
@@ -5049,34 +5042,24 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             returnObj = self
 
-        if returnObj.hasPartLikeStreams():
-            for partLike in returnObj.getElementsByClass('Stream'):
-                # call on each part
-                partLike.toWrittenPitch(inPlace=True)
-            returnObj.atSoundingPitch = False
-            if inPlace:
-                return None
-            else:
-                return returnObj
-
-        # else...
-        atSoundingPitch = self.atSoundingPitch
-        if atSoundingPitch == 'unknown':
+        if self.atSoundingPitch == 'unknown':
             for site in self.sites:
                 if hasattr(site, 'atSoundingPitch') and site.atSoundingPitch != 'unknown':
-                    atSoundingPitch = site.atSoundingPitch
+                    self.atSoundingPitch = site.atSoundingPitch
                     break
             else:
                 raise StreamException('atSoundingPitch is unknown: cannot transpose')
 
-        if atSoundingPitch is True:
-            # transposition defined on instrument goes from written to sounding
-            # need to reverse to go to written
-            returnObj._transposeByInstrument(reverse=True, inPlace=True)
-            returnObj.atSoundingPitch = False
+        if self.atSoundingPitch is True:
+            for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
+                if container.atSoundingPitch is not False:
+                    # transposition defined on instrument goes from written to sounding
+                    # need to reverse to go to written
+                    container._transposeByInstrument(reverse=True, inPlace=True)
+                    container.atSoundingPitch = False
 
-        for ottava in returnObj.recurse().getElementsByClass('Ottava'):
-            ottava.undoTransposition()
+                    for ottava in container.getElementsByClass('Ottava'):
+                        ottava.undoTransposition()
 
         if not inPlace:
             return returnObj

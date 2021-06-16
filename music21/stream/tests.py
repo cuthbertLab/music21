@@ -7034,9 +7034,11 @@ class Test(unittest.TestCase):
         p1.repeatAppend(note.Note('C4'), 4)
         p1.insert(0, i1)
         p1.insert(2, i2)
+        p1.makeMeasures(inPlace=True)
         p2 = Part()
         p2.repeatAppend(note.Note('C4'), 4)
         p2.insert(0, i2)
+        p2.makeMeasures(inPlace=True)
         s = Score()
         s.insert(0, p1)
         s.insert(0, p2)
@@ -7067,7 +7069,7 @@ class Test(unittest.TestCase):
         test = p1.toSoundingPitch(inPlace=False)
         self.assertEqual([str(p) for p in test.pitches], ['C4', 'C4', 'C4', 'C4'])
 
-        # declare  at sounding pitch
+        # declare at sounding pitch
         p1.atSoundingPitch = True
         # reverse intervals; app pitches should be upward
         test = p1.toWrittenPitch(inPlace=False)
