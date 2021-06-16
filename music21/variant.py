@@ -824,7 +824,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
             if ossiaMeasure.notes:  # If the measure is not just rests
                 ossiaOffset = ossiaMeasure.getOffsetBySite(ossiaPart)
                 if recurseInMeasures is True:
-                    returnMeasure = returnObj.iter().getElementsByOffset(
+                    returnMeasure = returnObj.getElementsByOffset(
                         ossiaOffset
                     ).getElementsByClass(stream.Measure).first()
                     mergeVariantsEqualDuration(
@@ -1964,7 +1964,7 @@ def _getPreviousElement(s, v):
 
     # Get next element in s after v which is of type vClass
     variantOffset = v.getOffsetBySite(s)
-    potentialTargets = s.iter().getElementsByOffset(
+    potentialTargets = s.getElementsByOffset(
         0.0,
         offsetEnd=variantOffset,
         includeEndBoundary=False,

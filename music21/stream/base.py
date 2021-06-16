@@ -1596,11 +1596,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 shiftDur += matchDuration
                 if shiftDur != 0.0:
                     # can this be done with recurse???
-                    for e in self.iter().getElementsByOffset(shiftedRegionStart,
-                                                           shiftedRegionEnd,
-                                                           includeEndBoundary=False,
-                                                           mustFinishInSpan=False,
-                                                           mustBeginInSpan=True):
+                    for e in self.getElementsByOffset(shiftedRegionStart,
+                                                        shiftedRegionEnd,
+                                                        includeEndBoundary=False,
+                                                        mustFinishInSpan=False,
+                                                        mustBeginInSpan=True):
 
                         elementOffset = self.elementOffset(e)
                         self.coreSetElementOffset(e, elementOffset - shiftDur)
@@ -2204,7 +2204,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # could use duration of Note to get end offset span
         targets = list(
-            self.iter().getElementsByOffset(
+            self.getElementsByOffset(
                 offset,
                 offset + noteOrChord.quarterLength,  # set end to dur of supplied
                 includeEndBoundary=False,
@@ -11562,7 +11562,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # get target offset relative to Stream
                 oInStream = vStart + e.getOffsetBySite(v.containedSite)
                 # get all elements at this offset, force a class match
-                targets = self.iter().getElementsByOffset(oInStream).getElementsByClass(e.classes[0])
+                targets = self.getElementsByOffset(oInStream).getElementsByClass(e.classes[0])
                 # only replace if we match the start
                 if targets:
                     targetsMatched += 1
