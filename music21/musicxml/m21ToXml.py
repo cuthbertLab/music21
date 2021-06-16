@@ -2400,13 +2400,22 @@ class PartExporter(XMLExporterBase):
 
     def parse(self):
         '''
-        Set up instruments, create a partId (if no good one exists) and sets it on
-        <part>, fixes up the notation (`fixupNotationFlat()` or `fixupNotationMeasured()`)
-        setsIdLocals on spanner bundle. runs parse() on each measure's MeasureExporter and
-        appends the output to the <part> object.
+        Set up instruments, convert sounding pitch to written pitch,
+        create a partId (if no good one exists) and set it on
+        <part>, fix up the notation (`fixupNotationFlat()` or `fixupNotationMeasured()`),
+        setIdLocals() on spanner bundle. Run parse() on each measure's MeasureExporter and
+        append the output to the <part> object.
 
         In other words, one-stop shopping.
         '''
+        # A copy has already been made
+        # When we merge makeNotation=False, possibly document this as a side effect
+        # but even that case that should be alright: the user
+        # should have called toWrittenPitch() first
+        # and is explicitly asking for no further copies to be made
+        if self.stream.atSoundingPitch is True:
+            self.stream.toWrittenPitch(inPlace=True)
+
         self.instrumentSetup()
 
         self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
@@ -6186,8 +6195,6 @@ class MeasureExporter(XMLExporterBase):
             return None
         if self.parent.stream is None:
             return None
-        if self.parent.stream.atSoundingPitch is True:
-            return None
 
         m = self.stream
         self.measureOffsetStart = m.getOffsetBySite(self.parent.stream)
@@ -6448,6 +6455,16 @@ class Test(unittest.TestCase):
         tree = scExporter.parse()
         # Measures should have been made
         self.assertIsNotNone(tree.find('.//measure'))
+
+    def testFromSoundingPitch(self):
+        from music21.instrument import Clarinet
+        m = stream.Measure([Clarinet(), note.Note('C')])
+        p = stream.Part(m)
+        p.atSoundingPitch = True
+        gex = GeneralObjectExporter(p)
+        root = ET.fromstring(gex.parse().decode('utf-8'))
+        self.assertEqual(len(root.findall('.//transpose')), 1)
+        self.assertEqual(root.find('.//step').text, 'D')
 
     def testMidiInstrumentNoName(self):
         from music21 import converter, instrument
