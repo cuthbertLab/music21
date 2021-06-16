@@ -7139,6 +7139,21 @@ class Test(unittest.TestCase):
         self.assertEqual([str(p) for p in s.parts[1].pitches],
                          ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'])
 
+    def testTransposeByPitchC(self):
+        from music21 import converter, instrument
+        p = converter.parse('tinyNotation: c1 d1')
+        p.insert(0, instrument.Horn())
+        s = Score(p)
+        s.atSoundingPitch = True
+        self.assertEqual(p.atSoundingPitch, 'unknown')
+
+        # Can still perform toWrittenPitch by getting the value of atSoundingPitch
+        # from the score
+        p.toWrittenPitch(inPlace=True)
+        self.assertEqual(p.flat.notes[0].nameWithOctave, 'G4')
+        # TODO: test also with measure
+        # fails currently, since _transposeByInstrument doesn't search context for instruments
+
     def testExtendTiesA(self):
         s = Stream()
         s.append(note.Note('g4'))
