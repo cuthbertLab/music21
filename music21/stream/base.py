@@ -4932,7 +4932,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # print(k, i.transposition)
         return returnObj
 
-    def _updateSoundingPitchFromSitesOrSubstreams(self):
+    def _updateAtSoundingPitchFromSitesOrSubstreams(self):
         '''
         Try sites first. If still not evident, search for agreement among
         ALL substreams one level down.
@@ -4996,7 +4996,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             returnObj = self
 
-        returnObj._updateSoundingPitchFromSitesOrSubstreams()
+        returnObj._updateAtSoundingPitchFromSitesOrSubstreams()
         original_atSoundingPitch = returnObj.atSoundingPitch
 
         if returnObj.atSoundingPitch is not True:  # unknown or False
@@ -5049,7 +5049,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             returnObj = self
 
-        returnObj._updateSoundingPitchFromSitesOrSubstreams()
+        returnObj._updateAtSoundingPitchFromSitesOrSubstreams()
         original_atSoundingPitch = returnObj.atSoundingPitch
 
         if returnObj.atSoundingPitch is not False:  # unknown or True
