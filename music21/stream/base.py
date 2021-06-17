@@ -6892,25 +6892,28 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             '''
             updateEndMatch based on nList, iLast, matchByPitch, etc.
             '''
-            # ties tell us when they are ended
-            # unless n is a chord, which only tells if SOME member has a tie
+            # 2 cases before matchByPitch=False returns early.
+
+            # Case 1: nInner is not a chord, and it has a stop tie
+            # can't trust chords, which only tell if SOME member has a tie
+            # matchByPitch does not matter here
             # https://github.com/cuthbertLab/music21/issues/502
             if (hasattr(nInner, 'tie')
                     and 'Chord' not in nInner.classes
                     and nInner.tie is not None
                     and nInner.tie.type == 'stop'):
                 return True
-            # but capture case where all chord members have a stop tie
-            # and check cardinality (don't match chords to notes)
+            # Case 2: matchByPitch=False and all chord members have a stop tie
+            # and checking cardinality passes (don't match chords to single notes)
             elif (hasattr(nInner, 'tie')
+                    and not matchByPitch
                     and 'Chord' in nInner.classes
                     and None not in [inner_p.tie for inner_p in nInner.notes]
                     and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}
                     and nLast is not None and len(nLast.pitches) == len(nInner.pitches)):
-                if not matchByPitch:
-                    return True
-                else:
-                    pass  # cardinality check passed, but still need to match by pitch below!
+                return True
+
+            # Now, matchByPitch
             # if we cannot find a stop tie, see if last note was connected
             # and this and the last note are the same pitch; this assumes
             # that connected and same pitch value is tied; this is not
@@ -6918,7 +6921,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             elif not matchByPitch:
                 return False
 
-            # else...
             # find out if the last index is in position connected
             # if the pitches are the same for each note
             if (nLast is not None
