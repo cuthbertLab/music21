@@ -2385,7 +2385,7 @@ class MeasureParser(XMLParserBase):
                     meth(mxObj)
 
         if self.useVoices is True:
-            for v in self.stream.iter.voices:
+            for v in self.stream.iter().voices:
                 if v:  # do not bother with empty voices
                     # the musicDataMethods use insertCore, thus the voices need to run
                     # coreElementsChanged

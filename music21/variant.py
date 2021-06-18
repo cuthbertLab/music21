@@ -153,9 +153,9 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     classesX = streamX.classes
     if 'Score' in classesX:
         return mergeVariantScores(streamX, streamY, variantName, inPlace=inPlace)
-    elif streamX.iter.getElementsByClass('Measure'):
+    elif streamX.getElementsByClass('Measure'):
         return mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace=inPlace)
-    elif (streamX.iter.notesAndRests
+    elif (streamX.iter().notesAndRests
             and streamX.duration.quarterLength == streamY.duration.quarterLength):
         return mergeVariantsEqualDuration([streamX, streamY], [variantName], inPlace=inPlace)
     else:
@@ -221,7 +221,7 @@ def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
             {3.0} <music21.note.Note F>
             {4.0} <music21.bar.Barline type=final>
     '''
-    if len(aScore.iter.parts) != len(vScore.iter.parts):
+    if len(aScore.iter().parts) != len(vScore.iter().parts):
         raise VariantException(
             'These scores do not have the same number of parts and cannot be merged.')
 
@@ -824,7 +824,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
             if ossiaMeasure.notes:  # If the measure is not just rests
                 ossiaOffset = ossiaMeasure.getOffsetBySite(ossiaPart)
                 if recurseInMeasures is True:
-                    returnMeasure = returnObj.iter.getElementsByOffset(
+                    returnMeasure = returnObj.getElementsByOffset(
                         ossiaOffset
                     ).getElementsByClass(stream.Measure).first()
                     mergeVariantsEqualDuration(
@@ -1952,9 +1952,9 @@ def _getPreviousElement(s, v):
     # Get class of elements in variant or replaced Region
     foundStream = None
     if lengthType == 'elongation':
-        foundStream = v.iter.getElementsByClass(['Measure', 'Note', 'Rest'])
+        foundStream = v.getElementsByClass(['Measure', 'Note', 'Rest'])
     else:
-        foundStream = replacedElements.iter.getElementsByClass(['Measure', 'Note', 'Rest'])
+        foundStream = replacedElements.getElementsByClass(['Measure', 'Note', 'Rest'])
 
     if not foundStream:
         raise VariantException('Cannot find any Measures, Notes, or Rests in variant')
@@ -1964,7 +1964,7 @@ def _getPreviousElement(s, v):
 
     # Get next element in s after v which is of type vClass
     variantOffset = v.getOffsetBySite(s)
-    potentialTargets = s.iter.getElementsByOffset(
+    potentialTargets = s.getElementsByOffset(
         0.0,
         offsetEnd=variantOffset,
         includeEndBoundary=False,

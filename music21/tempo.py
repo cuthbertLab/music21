@@ -1245,7 +1245,7 @@ def interpolateElements(element1, element2, sourceStream,
 
     scaleAmount = ((endOffsetDest - startOffsetDest) / (endOffsetSrc - startOffsetSrc))
 
-    interpolatedElements = sourceStream.iter.getElementsByOffset(
+    interpolatedElements = sourceStream.getElementsByOffset(
         offsetStart=startOffsetSrc,
         offsetEnd=endOffsetSrc
     )

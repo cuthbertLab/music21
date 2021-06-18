@@ -195,7 +195,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         if self.recurse:
             sIter = self.streamObj.recurse()
         else:
-            sIter = self.streamObj.iter
+            sIter = self.streamObj.iter()
 
         if self.classFilterList:
             sIter = sIter.getElementsByClass(self.classFilterList)

@@ -396,7 +396,7 @@ class LilypondConverter:
 
         # Also get the variants, and the total number of measures here and make start each
         # staff context with { \stopStaff s1*n} where n is the number of measures.
-        if hasattr(scoreIn, 'parts') and scoreIn.iter.parts:  # or has variants
+        if hasattr(scoreIn, 'parts') and scoreIn.iter().parts:  # or has variants
             if scoreIn.recurse().variants:
                 lpPartsAndOssiaInit = self.lyPartsAndOssiaInitFromScore(scoreIn)
                 lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(

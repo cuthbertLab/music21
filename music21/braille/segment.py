@@ -2066,8 +2066,8 @@ def prepareBeamedNotes(music21Measure):
     def beamStopFilter(el, unused):
         return el.beams.getByNumber(1).type == 'stop'
 
-    allStartIter = allNotes.iter.addFilter(withBeamFilter).addFilter(beamStartFilter)
-    allStopIter = allNotes.iter.addFilter(withBeamFilter).addFilter(beamStopFilter)
+    allStartIter = allNotes.iter().addFilter(withBeamFilter).addFilter(beamStartFilter)
+    allStopIter = allNotes.iter().addFilter(withBeamFilter).addFilter(beamStopFilter)
 
     if len(allStartIter) != len(allStopIter):
         environRules.warn('Incorrect beaming: number of start notes != to number of stop notes.')
