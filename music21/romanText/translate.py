@@ -1154,8 +1154,8 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
             rtf = rtObjects.RTFile()
             rth = rtf.readstr(tf)  # return handler, processes tokens
             # will run romanTextToStreamScore on all but k273
-            unused_s = romanTextToStreamOpus(rth)
-            # s.show()
+            s = romanTextToStreamOpus(rth)
+            s.show()
 
         s = romanTextToStreamScore(testFiles.swv23)
         self.assertEqual(s.metadata.composer, 'Heinrich Schutz')
