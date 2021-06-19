@@ -6486,7 +6486,7 @@ class Test(unittest.TestCase):
         self.assertIn(' is not well-formed; see isWellFormedNotation()', str(cm.warning))
         # The original score with its original address should not
         # be found in the message because makeNotation=True makes a copy
-        self.assertNotIn(str(s), str(cm.warning))
+        self.assertNotIn(repr(s), str(cm.warning))
 
         # Assert no gaps in stream
         self.assertSequenceEqual(tree.findall('.//forward'), [])
