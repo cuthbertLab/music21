@@ -289,6 +289,15 @@ class AbstractScale(Scale):
         >>> abstractScale._net.realizePitch('D5')
         [<music21.pitch.Pitch D5>, <music21.pitch.Pitch F#5>,
          <music21.pitch.Pitch A#5>, <music21.pitch.Pitch D6>]
+
+        Also possible with implicit octaves:
+
+        >>> abstract_scale = scale.AbstractScale()
+        >>> abstract_scale.buildNetworkFromPitches(['C', 'F'])
+        >>> abstract_scale.octaveDuplicating
+        True
+        >>> abstract_scale._net.realizePitch('G')
+        [<music21.pitch.Pitch G4>, <music21.pitch.Pitch C5>, <music21.pitch.Pitch G5>]
         '''
         pitchListReal = []
         for p in pitchList:
@@ -321,6 +330,8 @@ class AbstractScale(Scale):
                 self.octaveDuplicating = False
         else:
             p = copy.deepcopy(pitchList[0])
+            if p.octave is None:
+                p.octave = p.implicitOctave
             if pitchList[-1] > pitchList[0]:  # ascending
                 while p.ps < pitchList[-1].ps:
                     p.octave += 1
