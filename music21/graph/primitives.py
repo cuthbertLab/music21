@@ -1639,7 +1639,11 @@ class TestExternal(unittest.TestCase):
             z = random.choice(range(1, 20))
             data.append([x, y, z])
 
-        a = GraphScatterWeighted(doneAction=None)
+        if self.show:
+            doneAction = 'write'
+        else:
+            doneAction = None
+        a = GraphScatterWeighted(doneAction=doneAction)
         a.data = data
         a.process()
 
