@@ -2895,6 +2895,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Does not act on rests where `.fullMeasure` is True or 'always',
         nor when `.fullMeasure` is 'auto' and the duration equals the `.barDuration`.
+        This is because full measure rests are usually represented
+        as a single whole rest regardless of their duration.
 
         >>> r = note.Rest(quarterLength=5.0)
         >>> r.fullMeasure = 'auto'
@@ -2904,10 +2906,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> list(result[0][note.Rest])
         [<music21.note.Rest 5ql>]
 
+        Here is a rest that doesn't fill the measure:
+
         >>> m.insert(0, meter.TimeSignature('6/4'))
         >>> result = m.splitAtDurations(recurse=True)
         >>> list(result[0][note.Rest])
         [<music21.note.Rest whole>, <music21.note.Rest quarter>]
+
+        But by calling it a full-measure rest, we won't try to split it:
 
         >>> r2 = note.Rest(quarterLength=5.0)
         >>> r2.fullMeasure = True
