@@ -200,8 +200,12 @@ class Chord(note.NotRest):
     def __init__(self, notes=None, **keywords):
         if notes is None:
             notes = []
-        if isinstance(notes, str) and ' ' in notes:
-            notes = notes.split()
+        if isinstance(notes, str):
+            if ' ' in notes:
+                notes = notes.split()
+            else:
+                notes = [notes]
+
         # the list of pitch objects is managed by a property; this permits
         # only updating the _chordTablesAddress when pitches has changed
 
@@ -5850,6 +5854,9 @@ class Test(unittest.TestCase):
         chord1 = Chord(['C#4', 'E4', 'G4'])
         self.assertTrue(chord1.isDiminishedTriad())
         self.assertFalse(chord1.isMajorTriad())
+
+        chord2 = Chord(['C4'])
+        self.assertFalse(chord2.isMajorTriad())
 
     def testClosedPosition(self):
         from music21 import chord
