@@ -254,7 +254,7 @@ class Chord(note.NotRest):
 
     def __eq__(self, other):
         '''
-        True if the it passes all `super()`
+        True if the Chord passes all `super()`
         equality tests and the pitches are the same
         (possibly in a different order)
 
