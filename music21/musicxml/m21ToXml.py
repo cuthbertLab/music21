@@ -1968,18 +1968,20 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
           <part-group number="1" type="stop" />
         </part-list>
 
-        And with a piano staff, to observe that only one <part> tag has both "start" and "stop":
+        Multi-staff parts (such as piano staves), should NOT receive `<part-group>` tags,
+        since they are joined by `<staff>` tags:
 
         >>> cpe = corpus.parse('cpebach')
         >>> SX = musicxml.m21ToXml.ScoreExporter(cpe)
         >>> SX.scorePreliminaries()
         >>> SX.parsePartlikeScore()
+        >>> SX.joinPartStaffs()
 
         >>> mxPartList = SX.setPartList()
         >>> SX.dump(mxPartList)
         <part-list>
-          <part-group number="1" type="start">...
-          <part-group number="1" type="stop" />
+          <score-part id="P1">...
+          </score-part>
         </part-list>
         '''
 
@@ -1998,6 +2000,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             p = pex.stream
             # check for first
             for sg in staffGroups:
+                if sg in self.joinedGroups:
+                    continue
                 if sg.isFirst(p):
                     mxPartGroup = self.staffGroupToXmlPartGroup(sg)
                     mxPartGroup.set('number', str(partGroupIndex))
@@ -2011,10 +2015,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             # check for last
             activeIndex = None
             for sg in staffGroups:
+                if sg in self.joinedGroups:
+                    continue
                 # Handle last part in the StaffGroup
-                # as well as the first part in the StaffGroup if it was joined to the others
-                # In that latter case, we need the <part-group type="stop" /> on the FIRST m21 part
-                if (sg.isLast(p) or (sg in self.joinedGroups and sg.isFirst(p))):
+                if sg.isLast(p):
                     # find the spanner in the dictionary already-assigned
                     for key, value in partGroupIndexRef.items():
                         if value is sg:
