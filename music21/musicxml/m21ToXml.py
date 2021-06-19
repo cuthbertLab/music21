@@ -6471,15 +6471,23 @@ class Test(unittest.TestCase):
         self.assertSequenceEqual(measuresAtOffsetZero, p.elements[:1])
 
     def testFromScoreNoParts(self):
+        '''
+        Badly nested streams should warn but output no gaps.
+        '''
         s = stream.Score()
         s.append(meter.TimeSignature('1/4'))
         s.append(note.Note())
         s.append(note.Note())
         gex = GeneralObjectExporter(s)
 
-        warn_msg = f'{s} is not well-formed; see isWellFormedNotation()'
-        with self.assertWarns(MusicXMLWarning, msg=warn_msg):
+        with self.assertWarns(MusicXMLWarning) as cm:
             tree = ET.fromstring(gex.parse().decode('utf-8'))
+        self.assertIn(repr(s).split(' 0x')[0], str(cm.warning))
+        self.assertIn(' is not well-formed; see isWellFormedNotation()', str(cm.warning))
+        # The original score with its original address should not
+        # be found in the message because makeNotation=True makes a copy
+        self.assertNotIn(str(s), str(cm.warning))
+
         # Assert no gaps in stream
         self.assertSequenceEqual(tree.findall('.//forward'), [])
 
