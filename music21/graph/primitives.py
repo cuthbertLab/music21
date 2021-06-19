@@ -104,7 +104,9 @@ class Graph(prebase.ProtoM21Object):
     )
 
     def __init__(self, *args, **keywords):
-        getExtendedModules()
+        extm = getExtendedModules()
+        self.plt = extm.plt  # wrapper to matplotlib.pyplot
+
         self.data = None
         self.figure = None  # a matplotlib.Figure object
         self.subplot = None  # an Axes, AxesSubplot or potentially list of these object
@@ -155,11 +157,10 @@ class Graph(prebase.ProtoM21Object):
 
     def __del__(self):
         '''
-        Matplotlib Figure objects need to be explicitly closed when no longer used...
+        Matplotlib Figure objects need to be explicitly closed when no longer used.
         '''
         if hasattr(self, 'figure') and self.figure is not None:
-            etm = getExtendedModules()
-            etm.plt.close(self.figure)
+            self.plt.close(self.figure)
 
     @property
     def doneAction(self):
