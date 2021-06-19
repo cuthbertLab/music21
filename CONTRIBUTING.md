@@ -49,9 +49,8 @@ If you miss something and GitHub Actions pesters you with red "X"s, just
 expand the details to get the line-by-line violations, and push another commit.
 
 Speaking of commits, use incremental commits with descriptive messages rather
-than force-pushing, unless the reviewer asked you to or the approach is changing
-completely. Force-pushing prevents the reviewer from assessing what changed between
-reviews, and squashing commits (or not) will be handled by the merger.
+than force-pushing, which prevents the reviewer from assessing what changed
+between reviews. (Squashing commits will be handled by the merger.)
 
 
 ## Style Guide ##
