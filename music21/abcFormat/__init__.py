@@ -54,9 +54,7 @@ __all__ = [
     'ABCFile',
 ]
 
-import copy
 import io
-import pathlib
 import re
 import unittest
 from typing import Union, Optional, List, Tuple, Any

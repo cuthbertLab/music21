@@ -1879,7 +1879,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         music21.exceptions21.StreamException: Cannot set the offset for element
             <music21.note.Note D>, not in Stream <music21.stream.Stream Stream1>.
 
-        * Changed in v5.5 -- also sets .activeSite for the element unless setActiveSite is False
+        * Changed in v5.5 -- also sets .activeSite for the element
 
         * In v6.7 -- also runs coreElementsChanged()
 
@@ -2895,6 +2895,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Does not act on rests where `.fullMeasure` is True or 'always',
         nor when `.fullMeasure` is 'auto' and the duration equals the `.barDuration`.
+        This is because full measure rests are usually represented
+        as a single whole rest regardless of their duration.
 
         >>> r = note.Rest(quarterLength=5.0)
         >>> r.fullMeasure = 'auto'
@@ -2904,10 +2906,22 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> list(result[0][note.Rest])
         [<music21.note.Rest 5ql>]
 
+        Here is a rest that doesn't fill the measure:
+
         >>> m.insert(0, meter.TimeSignature('6/4'))
         >>> result = m.splitAtDurations(recurse=True)
         >>> list(result[0][note.Rest])
         [<music21.note.Rest whole>, <music21.note.Rest quarter>]
+
+        But by calling it a full-measure rest, we won't try to split it:
+
+        >>> r2 = note.Rest(quarterLength=5.0)
+        >>> r2.fullMeasure = True
+        >>> m2 = stream.Measure(r2)
+        >>> m2.insert(0, meter.TimeSignature('6/4'))
+        >>> result = m2.splitAtDurations()
+        >>> list(result[0][note.Rest])
+        [<music21.note.Rest 5ql>]
         '''
 
         def processContainer(container: Stream):
@@ -6510,7 +6524,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         If `cautionaryAll` is True, all accidentals are shown.
 
-        If `overrideStatus` is True, this method will ignore any current `displayStatus` stetting
+        If `overrideStatus` is True, this method will ignore any current `displayStatus` setting
         found on the Accidental. By default this does not happen. If `displayStatus` is set to
         None, the Accidental's `displayStatus` is set.
 
@@ -14128,7 +14142,7 @@ class Test(unittest.TestCase):
 
 # -----------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Stream, Measure, Part, Score, Opus]
+_DOC_ORDER = [Stream, Measure, Part, Score, Opus, Voice]
 
 
 if __name__ == '__main__':

@@ -6239,6 +6239,10 @@ class Test(unittest.TestCase):
         return bytesOutUnicode
 
     def getET(self, obj):
+        '''
+        Return a <score-partwise> ElementTree.
+        Does NOT call makeNotation() like most calls to show() and write().
+        '''
         SX = ScoreExporter(obj)
         mxScore = SX.parse()
         helpers.indent(mxScore)

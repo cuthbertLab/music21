@@ -17,7 +17,6 @@ __all__ = ['tables', 'Chord', 'ChordException', 'fromIntervalVector', 'fromForte
 
 import copy
 import unittest
-import re
 from typing import Union, List, Optional, TypeVar, Set, Tuple, Dict
 
 from music21 import beam

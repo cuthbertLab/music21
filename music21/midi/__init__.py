@@ -33,8 +33,6 @@ __all__ = [
 
 import io
 import re
-import os
-import string
 import struct
 import sys
 import unicodedata
