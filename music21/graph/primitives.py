@@ -162,6 +162,17 @@ class Graph(prebase.ProtoM21Object):
         if hasattr(self, 'figure') and self.figure is not None:
             self.plt.close(self.figure)
 
+    def __getstate__(self):
+        '''
+        The wrapper to matplotlib.pyplot stored as self.plt cannot be pickled/deepcopied.
+        '''
+        state = self.__dict__.copy()
+        del state['plt']
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+
     @property
     def doneAction(self):
         '''
