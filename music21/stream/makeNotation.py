@@ -90,6 +90,22 @@ def makeBeams(
     4 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>
     5 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
 
+    Grace notes no longer interfere with beaming:
+
+    >>> m = stream.Measure()
+    >>> m.timeSignature = meter.TimeSignature('3/4')
+    >>> m.repeatAppend(note.Note(quarterLength=0.25), 4)
+    >>> m.repeatAppend(note.Rest(), 2)
+    >>> gn = note.Note(duration=duration.GraceDuration())
+    >>> m.insert(0.25, gn)
+    >>> m.makeBeams(inPlace=True)
+    >>> [n.beams for n in m.notes]
+    [<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>,
+    <music21.beam.Beams>,
+    <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>,
+    <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>,
+    <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>]
+
     OMIT_FROM_DOCS
     TODO: inPlace=False does not work in many cases  ?? still an issue? 2017
     '''
@@ -107,7 +123,7 @@ def makeBeams(
         returnObj: stream.Measure
         mColl = [returnObj]  # store a list of measures for processing
     else:
-        mColl = list(returnObj.iter.getElementsByClass('Measure'))  # a list of measures
+        mColl = list(returnObj.getElementsByClass('Measure'))  # a list of measures
         if not mColl:
             raise stream.StreamException(
                 'cannot process a stream that is neither a Measure nor has no Measures')
@@ -139,6 +155,9 @@ def makeBeams(
                 continue  # nothing to beam
             durList = []
             for n in noteStream:
+                if n.duration.isGrace:
+                    noteStream.remove(n)
+                    continue
                 durList.append(n.duration)
             # environLocal.printDebug([
             #    'beaming with ts', lastTimeSignature, 'measure', m, durList,
@@ -336,6 +355,8 @@ def makeMeasures(
     >>> longNote.lyric = 'hi'
     >>> p1.append(longNote)
     >>> partWithMeasures = p1.makeMeasures()
+    >>> partWithMeasures is not p1
+    True
     >>> dummy = partWithMeasures.makeTies(inPlace=True)
     >>> partWithMeasures.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -372,8 +393,6 @@ def makeMeasures(
 
     # environLocal.printDebug(['calling Stream.makeMeasures()'])
 
-    # the srcObj should not be modified or changed
-    # removed element copying below and now making a deepcopy of entire stream
     # must take a flat representation, as we need to be able to
     # position components, and sub-streams might hide elements that
     # should be contained
@@ -397,26 +416,18 @@ def makeMeasures(
             return
         else:
             return returnObj
-    elif s.hasVoices():
-        # environLocal.printDebug(['make measures found voices'])
-        # cannot make flat here, as this would destroy stream partitions
-        if s.isSorted:
-            sSorted = s
-        else:
-            sSorted = s.sorted
-        srcObj = copy.deepcopy(sSorted)
-        voiceCount = len(srcObj.voices)
     else:
-        # environLocal.printDebug(['make measures found no voices'])
-        # take flat and sorted version
-        sFlat = s.flat
-        if sFlat.isSorted:
-            sFlatSorted = sFlat
+        if s.hasVoices():
+            # cannot make flat if there are voices, as would destroy stream partitions
+            # parts containing voices are less likely to occur since MIDI parsing changes in v7
+            srcObj = s
         else:
-            sFlatSorted = sFlat.sorted
-
-        srcObj = copy.deepcopy(sFlatSorted)
-        voiceCount = 0
+            srcObj = s.flat
+        if not srcObj.isSorted:
+            srcObj = srcObj.sorted
+        if not inPlace:
+            srcObj = copy.deepcopy(srcObj)
+        voiceCount = len(srcObj.voices)
 
     # environLocal.printDebug([
     #    'Stream.makeMeasures(): passed in meterStream', meterStream,
@@ -465,7 +476,7 @@ def makeMeasures(
     # del clefList
     clefObj = srcObj.clef or srcObj.getContextByClass('Clef')
     if clefObj is None:
-        clefObj = srcObj.iter.getElementsByClass('Clef').getElementsByOffset(0).first()
+        clefObj = srcObj.getElementsByClass('Clef').getElementsByOffset(0).first()
         # only return clefs that have offset = 0.0
         if not clefObj:
             clefObj = clef.bestClef(srcObj, recurse=True)
@@ -535,7 +546,7 @@ def makeMeasures(
         if measureCount == 0:
             m.clef = clefObj
             if voiceCount > 0 and s.keySignature is not None:
-                m.insert(0, s.keySignature)
+                m.insert(0, copy.deepcopy(s.keySignature))
             # environLocal.printDebug(
             #    ['assigned clef to measure', measureCount, m.clef])
 
@@ -692,7 +703,9 @@ def makeRests(
     fill with one Rest preceding this offset.
     This can be called on any Stream,
     a Measure alone, or a Measure that contains
-    Voices.
+    Voices. This method recurses into Parts, Measures, and Voices,
+    since users are unlikely to want "loose" rests outside
+    of sub-containers.
 
     If `refStreamOrTimeRange` is provided as a Stream, this
     Stream is used to get min and max offsets. If a list is provided,
@@ -703,8 +716,15 @@ def makeRests(
     time regions that have no active elements.
 
     If `timeRangeFromBarDuration` is True, and the calling Stream
-    is a Measure with a TimeSignature, the time range will be determined
-    based on the .barDuration property.
+    is a Measure with a TimeSignature (or a Part containing them),
+    the time range will be determined
+    by taking the :meth:`~music21.stream.Measure.barDuration` and subtracting
+    :attr:`~music21.stream.Measure.paddingLeft` and
+    :attr:`~music21.stream.Measure.paddingRight`.
+    This keyword takes priority over `refStreamOrTimeRange`.
+    If both are provided, `timeRangeFromBarDuration`
+    prevails, unless no TimeSignature can be found, in which case, the function
+    falls back to `refStreamOrTimeRange`.
 
     If `inPlace` is True, this is done in-place; if `inPlace` is False,
     this returns a modified deepcopy.
@@ -792,7 +812,11 @@ def makeRests(
 
     Changed in v6 -- all but first attribute are keyword only
 
-    Changed in v7 -- `inPlace` defaults False.
+    Changed in v7:
+
+      - `inPlace` defaults False
+      - Recurses into parts, measures, voices
+      - Gave priority to `timeRangeFromBarDuration` over `refStreamOrTimeRange`
     '''
     from music21 import stream
 
@@ -802,35 +826,57 @@ def makeRests(
     else:
         returnObj = s
 
-    oLowTarget = 0
-    oHighTarget = 0
+    if returnObj.iter().parts:
+        for inner_part in returnObj.iter().parts:
+            inner_part.makeRests(
+                inPlace=True,
+                fillGaps=fillGaps,
+                hideRests=hideRests,
+                refStreamOrTimeRange=refStreamOrTimeRange,
+                timeRangeFromBarDuration=timeRangeFromBarDuration,
+            )
+        return returnObj
 
-    # environLocal.printDebug([
-    #    'makeRests(): object lowestOffset, highestTime', oLow, oHigh])
-    if refStreamOrTimeRange is None:  # use local
-        oLowTarget = 0
-        if timeRangeFromBarDuration and returnObj.isMeasure:
-            # NOTE: this will raise an exception if no meter can be found
-            oHighTarget = returnObj.barDuration.quarterLength
-        elif timeRangeFromBarDuration and returnObj.hasMeasures():
+    def oHighTargetForMeasure(m: stream.Measure) -> float:
+        '''Needed for timeRangeFromBarDuration'''
+        # NOTE: this returns 0.0 if no meter can be found
+        post = m.barDuration.quarterLength
+        post -= m.paddingLeft
+        post -= m.paddingRight
+        return max(post, 0.0)
+
+    oLowTarget = 0.0
+    oHighTarget = 0.0
+    if timeRangeFromBarDuration:
+        if returnObj.isMeasure:
+            oHighTarget = oHighTargetForMeasure(returnObj)
+        elif (
+            stream.Voice in returnObj.classSet
+            and hasattr(refStreamOrTimeRange, 'isMeasure')
+            and refStreamOrTimeRange.isMeasure
+        ):
+            # Alternative to getting measure context would be to access .activeSite
+            # but for now, depend on getting measure context from refStreamOrTimeRange
+            # since we have not documented calling makeRests directly on a Voice and
+            # expecting to infer barDuration from the measure context.
+            # merely trying to support the recursive call for contained voices, below
+            oHighTarget = oHighTargetForMeasure(refStreamOrTimeRange)
+        elif returnObj.hasMeasures():
             oHighTarget = sum(
                 m.barDuration.quarterLength for m in returnObj.getElementsByClass(stream.Measure)
             )
-        else:
+    # If the above search didn't run or still yielded 0.0, use refStreamOrTimeRange
+    if oHighTarget == 0.0:
+        if refStreamOrTimeRange is None:  # use local
             oHighTarget = returnObj.highestTime
-    elif isinstance(refStreamOrTimeRange, stream.Stream):
-        oLowTarget = refStreamOrTimeRange.lowestOffset
-        oHighTarget = refStreamOrTimeRange.highestTime
-        # environLocal.printDebug([
-        #    'refStream used in makeRests', oLowTarget, oHighTarget,
-        #    len(refStreamOrTimeRange)])
-    # treat as a list
-    elif common.isIterable(refStreamOrTimeRange):
-        oLowTarget = min(refStreamOrTimeRange)
-        oHighTarget = max(refStreamOrTimeRange)
-        # environLocal.printDebug([
-        #    'offsets used in makeRests', oLowTarget, oHighTarget,
-        #    len(refStreamOrTimeRange)])
+        elif isinstance(refStreamOrTimeRange, stream.Stream):
+            oLowTarget = refStreamOrTimeRange.lowestOffset
+            oHighTarget = refStreamOrTimeRange.highestTime
+        # treat as a list
+        elif common.isIterable(refStreamOrTimeRange):
+            oLowTarget = min(refStreamOrTimeRange)
+            oHighTarget = max(refStreamOrTimeRange)
+
     if returnObj.hasVoices():
         bundle = list(returnObj.voices)
     elif returnObj.hasMeasures():
@@ -839,12 +885,25 @@ def makeRests(
         bundle = [returnObj]
 
     # bundle components may be voices, measures, or a flat Stream
-    for v in bundle:
-        oLow = v.lowestOffset
-        oHigh = v.highestTime
-        if returnObj.hasMeasures():
+    for component in bundle:
+        oLow = component.lowestOffset
+        oHigh = component.highestTime
+        if component.isMeasure:
+            if timeRangeFromBarDuration:
+                oHighTarget = oHighTargetForMeasure(component)
+            # process voices
+            for inner_voice in component.voices:
+                inner_voice.makeRests(inPlace=True,
+                                      fillGaps=fillGaps,
+                                      hideRests=hideRests,
+                                      refStreamOrTimeRange=component,
+                                      timeRangeFromBarDuration=timeRangeFromBarDuration,
+                                      )
+            # Refresh these variables given that inner voices were altered
+            oLow = component.lowestOffset
+            oHigh = component.highestTime
             # adjust oHigh to not exceed measure
-            oHighTarget = min(v.barDuration.quarterLength, oHighTarget)
+            oHighTarget = min(component.barDuration.quarterLength, oHighTarget)
 
         # create rest from start to end
         qLen = oLow - oLowTarget
@@ -854,27 +913,25 @@ def makeRests(
             r.style.hideObjectOnPrint = hideRests
             # environLocal.printDebug(['makeRests(): add rests', r, r.duration])
             # place at oLowTarget to reach to oLow
-            v.insert(oLowTarget, r)
+            component.insert(oLowTarget, r)
 
         # create rest from end to highest
         qLen = oHighTarget - oHigh
-        # environLocal.printDebug(['v', v, oHigh, oHighTarget, 'qLen', qLen])
         if qLen > 0:
             r = note.Rest()
             r.duration.quarterLength = qLen
             r.style.hideObjectOnPrint = hideRests
             # place at oHigh to reach to oHighTarget
-            v.insert(oHigh, r)
+            component.insert(oHigh, r)
 
         if fillGaps:
-            gapStream = v.findGaps()
+            gapStream = component.findGaps()
             if gapStream is not None:
                 for e in gapStream:
                     r = note.Rest()
                     r.duration.quarterLength = e.duration.quarterLength
                     r.style.hideObjectOnPrint = hideRests
-                    v.insert(e.offset, r)
-        # environLocal.printDebug(['post makeRests show()', v])
+                    component.insert(e.offset, r)
 
     if returnObj.hasMeasures():
         # split rests at measure boundaries
@@ -885,14 +942,6 @@ def makeRests(
         for m in returnObj.getElementsByClass(stream.Measure):
             returnObj.setElementOffset(m, accumulatedTime)
             accumulatedTime += m.highestTime
-
-            # process voices
-            for v in m.voices:
-                v.makeRests(inPlace=True,
-                            fillGaps=fillGaps,
-                            hideRests=hideRests,
-                            refStreamOrTimeRange=m,
-                            )
 
     if inPlace is not True:
         return returnObj
@@ -1493,7 +1542,7 @@ def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
     dst = Voice()
 
     # cast to list so source can be edited.
-    affectedElements = list(source.iter.getElementsByClass(classFilterList))
+    affectedElements = list(source.getElementsByClass(classFilterList))
 
     for e in affectedElements:
         dst.insert(source.elementOffset(e), e)
@@ -1603,7 +1652,7 @@ def iterateBeamGroups(
 
     New in v6.7.
     '''
-    iterator: 'music21.stream.iterator.StreamIterator' = s.recurse() if recurse else s.iter
+    iterator: 'music21.stream.iterator.StreamIterator' = s.recurse() if recurse else s.iter()
     current_beam_group: List[note.NotRest] = []
     in_beam_group: bool = False
     for el in iterator.getElementsByClass('NotRest'):

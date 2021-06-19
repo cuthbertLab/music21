@@ -48,13 +48,12 @@ def runTranscribe(show=True, plot=True, useMic=True,
     if useScale is None:
         useScale = scale.ChromaticScale('C4')
     # beginning - recording or not
-    if saveFile is not False:
-        if saveFile:
-            waveFilename = environLocal.getRootTempDir() / 'ex.wav'
-        else:
-            waveFilename = saveFile
-    else:
+    if saveFile is True:
+        waveFilename = environLocal.getRootTempDir() / 'ex.wav'
+    elif saveFile is False:
         waveFilename = False
+    else:
+        waveFilename = saveFile
 
     # the rest of the score
     if useMic is True:

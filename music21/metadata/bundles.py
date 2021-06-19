@@ -815,7 +815,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             accumulatedErrors.extend(result['errors'])
             for metadataEntry in result['metadataEntries']:
                 self._metadataEntries[metadataEntry.corpusPath] = metadataEntry
-            if (currentIteration % 50) and (storeOnDisk is True) == 0:
+            if (currentIteration % 50 == 0) and storeOnDisk is True:
                 self.write()
         self.validate()
         if storeOnDisk is True:
@@ -1222,7 +1222,7 @@ class MetadataBundle(prebase.ProtoM21Object):
                             include = True
                             break
                         elif (fileExtension.endswith('xml')
-                                and sp.suffix in ('.mxl', '.mx')):
+                                and sp.suffix == '.mxl'):
                             include = True
                             break
                 else:

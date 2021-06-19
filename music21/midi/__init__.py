@@ -29,13 +29,10 @@ __all__ = [
     'DeltaTime',
     'MetaEvents', 'ChannelVoiceMessages', 'ChannelModeMessages',
     'SysExEvents',
-    'EnumerationException',
 ]
 
 import io
 import re
-import os
-import string
 import struct
 import sys
 import unicodedata
@@ -59,10 +56,6 @@ environLocal = environment.Environment(_MOD)
 # good midi reference:
 # http://www.sonicspot.com/guide/midifiles.html
 # ------------------------------------------------------------------------------
-class EnumerationException(exceptions21.Music21Exception):
-    pass
-
-
 class MidiException(exceptions21.Music21Exception):
     pass
 
@@ -1544,7 +1537,7 @@ class MidiFile(prebase.ProtoM21Object):
         '''
         if attrib not in ['rb', 'wb']:
             raise MidiException('cannot read or write unless in binary mode, not:', attrib)
-        self.file = open(filename, attrib)
+        self.file = open(filename, attrib)  # pylint: disable=consider-using-with
 
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by BytesIO, as an open file object.

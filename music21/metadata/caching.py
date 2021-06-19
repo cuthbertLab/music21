@@ -328,11 +328,10 @@ class JobProcessor:
 
         '''
         processCount = processCount or common.cpus()
-        if processCount < 1:
-            processCount = 1
+        processCount = max(processCount, 1)
+        # do not start more processes than jobs...
         remainingJobs = len(jobs)
-        if processCount > remainingJobs:  # do not start more processes than jobs...
-            processCount = remainingJobs
+        processCount = min(processCount, remainingJobs)
 
         environLocal.printDebug(
             f'Processing {remainingJobs} jobs in parallel, with {processCount} processes.')

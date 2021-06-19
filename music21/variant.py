@@ -153,9 +153,9 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     classesX = streamX.classes
     if 'Score' in classesX:
         return mergeVariantScores(streamX, streamY, variantName, inPlace=inPlace)
-    elif streamX.iter.getElementsByClass('Measure'):
+    elif streamX.getElementsByClass('Measure'):
         return mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace=inPlace)
-    elif (streamX.iter.notesAndRests
+    elif (streamX.iter().notesAndRests
             and streamX.duration.quarterLength == streamY.duration.quarterLength):
         return mergeVariantsEqualDuration([streamX, streamY], [variantName], inPlace=inPlace)
     else:
@@ -171,15 +171,11 @@ def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
 
     >>> aScore, vScore = stream.Score(), stream.Score()
 
-    >>> ap1 = stream.Part(converter.parse('tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 '
-    ...                                   ).makeMeasures())
-    >>> vp1 = stream.Part(converter.parse('tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 '
-    ...                                   ).makeMeasures())
+    >>> ap1 = converter.parse('tinynotation: 4/4   a4 b c d    e2 f2   g2 f4 g4 ')
+    >>> vp1 = converter.parse('tinynotation: 4/4   a4 b c e    e2 f2   g2 f4 a4 ')
 
-    >>> ap2 = stream.Part(converter.parse('tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 '
-    ...                                   ).makeMeasures())
-    >>> vp2 = stream.Part(converter.parse('tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 '
-    ...                                   ).makeMeasures())
+    >>> ap2 = converter.parse('tinynotation: 4/4   a4 g f e    f2 e2   d2 g4 f4 ')
+    >>> vp2 = converter.parse('tinynotation: 4/4   a4 g f e    f2 g2   f2 g4 d4 ')
 
     >>> aScore.insert(0.0, ap1)
     >>> aScore.insert(0.0, ap2)
@@ -225,7 +221,7 @@ def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
             {3.0} <music21.note.Note F>
             {4.0} <music21.bar.Barline type=final>
     '''
-    if len(aScore.iter.parts) != len(vScore.iter.parts):
+    if len(aScore.iter().parts) != len(vScore.iter().parts):
         raise VariantException(
             'These scores do not have the same number of parts and cannot be merged.')
 
@@ -828,7 +824,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
             if ossiaMeasure.notes:  # If the measure is not just rests
                 ossiaOffset = ossiaMeasure.getOffsetBySite(ossiaPart)
                 if recurseInMeasures is True:
-                    returnMeasure = returnObj.iter.getElementsByOffset(
+                    returnMeasure = returnObj.getElementsByOffset(
                         ossiaOffset
                     ).getElementsByClass(stream.Measure).first()
                     mergeVariantsEqualDuration(
@@ -1659,9 +1655,7 @@ def makeAllVariantsReplacements(streamWithVariants,
     >>> s2.makeMeasures(inPlace=True)
     >>> variant.mergeVariants(s, s2, variantName='london', inPlace=True)
 
-    >>> newPart = stream.Part(s)
-    >>> newStream = stream.Score()
-    >>> newStream.append(newPart)
+    >>> newStream = stream.Score(s)
 
     >>> returnStream = variant.makeAllVariantsReplacements(newStream, recurse=False)
     >>> for v in returnStream.parts[0].variants:
@@ -1958,9 +1952,9 @@ def _getPreviousElement(s, v):
     # Get class of elements in variant or replaced Region
     foundStream = None
     if lengthType == 'elongation':
-        foundStream = v.iter.getElementsByClass(['Measure', 'Note', 'Rest'])
+        foundStream = v.getElementsByClass(['Measure', 'Note', 'Rest'])
     else:
-        foundStream = replacedElements.iter.getElementsByClass(['Measure', 'Note', 'Rest'])
+        foundStream = replacedElements.getElementsByClass(['Measure', 'Note', 'Rest'])
 
     if not foundStream:
         raise VariantException('Cannot find any Measures, Notes, or Rests in variant')
@@ -1970,7 +1964,7 @@ def _getPreviousElement(s, v):
 
     # Get next element in s after v which is of type vClass
     variantOffset = v.getOffsetBySite(s)
-    potentialTargets = s.iter.getElementsByOffset(
+    potentialTargets = s.getElementsByOffset(
         0.0,
         offsetEnd=variantOffset,
         includeEndBoundary=False,

@@ -399,7 +399,7 @@ class StreamCoreMixin:
         Traceback (most recent call last):
         music21.exceptions21.StreamException: this Stream cannot be contained within itself
 
-        >>> s.append(s.iter)
+        >>> s.append(s.iter())
         Traceback (most recent call last):
         music21.exceptions21.StreamException: cannot insert StreamIterator into a Stream
         Iterate over it instead (User's Guide chs. 6 and 26)
@@ -669,7 +669,7 @@ class StreamCoreMixin:
         that spannerBundle are added.  This can be useful, for instance, in restoring
         spanners from an excerpt that might already have spanners removed.  In
         Jacob Tyler Walls's brilliant phrasing, it prevents regrowing zombie spanners
-        the you thought you had killed.
+        that you thought you had killed.
 
         Here we will constrain only to spanners also present in another Stream:
 
@@ -694,7 +694,7 @@ class StreamCoreMixin:
         if recurse is True:
             sIter = self.recurse()
         else:
-            sIter = self.iter
+            sIter = self.iter()
 
         collectList = []
         for el in list(sIter):

@@ -198,16 +198,16 @@ class LilypondConverter:
         LILYEXEC = self.findLilyExec()
         command = [LILYEXEC, '--version']
         try:
-            proc = subprocess.Popen(command, stdout=subprocess.PIPE)
-        except OSError:  # pragma: no cover
+            with subprocess.Popen(command, stdout=subprocess.PIPE) as proc:
+                stdout, unused = proc.communicate()
+                stdout = stdout.decode(encoding='utf-8')
+                versionString = stdout.split()[2]
+                versionPieces = versionString.split('.')
+        except OSError as exc:  # pragma: no cover
             raise LilyTranslateException(
                 'Cannot find a copy of Lilypond installed on your system. '
                 + 'Please be sure it is installed. And that your '
-                + "environment.UserSettings()['lilypondPath'] is set to find it.")
-        stdout, unused = proc.communicate()
-        stdout = stdout.decode(encoding='utf-8')
-        versionString = stdout.split()[2]
-        versionPieces = versionString.split('.')
+                + "environment.UserSettings()['lilypondPath'] is set to find it.") from exc
 
         self.majorVersion = versionPieces[0]
         self.minorVersion = versionPieces[1]
@@ -396,7 +396,7 @@ class LilypondConverter:
 
         # Also get the variants, and the total number of measures here and make start each
         # staff context with { \stopStaff s1*n} where n is the number of measures.
-        if hasattr(scoreIn, 'parts') and scoreIn.iter.parts:  # or has variants
+        if hasattr(scoreIn, 'parts') and scoreIn.iter().parts:  # or has variants
             if scoreIn.recurse().variants:
                 lpPartsAndOssiaInit = self.lyPartsAndOssiaInitFromScore(scoreIn)
                 lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(
@@ -791,6 +791,8 @@ class LilypondConverter:
             text = ' _ '
         elif el.text == '':
             text = ' _ '
+        elif el.text is None:
+            text = ''
         else:
             text = '"' + el.text + '"'
             # TODO: composite
@@ -1263,7 +1265,9 @@ class LilypondConverter:
         >>> n0.style.color = 'blue'
         >>> sm = conv.lySimpleMusicFromNoteOrRest(n0)
         >>> print(sm)
-        \color "blue" dis'' ! ? 4
+        \override NoteHead.color = "blue"
+        \override Stem.color = "blue"
+        dis'' ! ? 4
 
         Now make the note disappear...
 
@@ -1275,10 +1279,15 @@ class LilypondConverter:
         c = noteOrRest.classes
 
         simpleElementParts = []
+
+        # https://lilypond.org/doc/v2.22/Documentation/notation/inside-the-staff#coloring-objects
         if noteOrRest.hasStyleInformation:
             if noteOrRest.style.color and noteOrRest.style.hideObjectOnPrint is False:
-                colorLily = r'\color "' + noteOrRest.style.color + '" '
-                simpleElementParts.append(colorLily)
+                # LilyPond 2.22 (January 2021) supports hex values
+                noteheadColor = rf'\override NoteHead.color = "{noteOrRest.style.color}"' + '\n'
+                stemColor = rf'\override Stem.color = "{noteOrRest.style.color}"' + '\n'
+                simpleElementParts.append(noteheadColor)
+                simpleElementParts.append(stemColor)
 
         if 'Note' in c:
             if not noteOrRest.hasStyleInformation or noteOrRest.style.hideObjectOnPrint is False:
@@ -1857,7 +1866,7 @@ class LilypondConverter:
         >>> for s in [ s1, s2, s3, s4, s5]:
         ...     s.makeMeasures(inPlace=True)
 
-        >>> activeSite = stream.Part(s5)
+        >>> activeSite = stream.Part(s5.elements)
 
         >>> v1 = variant.Variant()
         >>> for el in s1:
@@ -2070,11 +2079,11 @@ class LilypondConverter:
 
         >>> pStream = converter.parse('tinynotation: 4/4 a4 b c d   e4 f g a')
         >>> pStream.makeMeasures(inPlace=True)
-        >>> p = stream.Part(pStream)
+        >>> p = stream.Part(pStream.elements)
         >>> p.id = 'p1'
         >>> vStream = converter.parse('tinynotation: 4/4 a4. b8 c4 d')
         >>> vStream.makeMeasures(inPlace=True)
-        >>> v = variant.Variant(vStream)
+        >>> v = variant.Variant(vStream.elements)
         >>> v.groups = ['london']
         >>> p.insert(0.0, v)
         >>> lpc = lily.translate.LilypondConverter()
@@ -2221,7 +2230,7 @@ class LilypondConverter:
 
 
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
-        >>> v = variant.Variant(c)
+        >>> v = variant.Variant(c.elements)
         >>> lpc = lily.translate.LilypondConverter()
         >>> lySequentialMusicOut = lpc.lySequentialMusicFromStream(v)
         >>> lySequentialMusicOut
@@ -2447,9 +2456,9 @@ class LilypondConverter:
             # cannot find full path; try current directory
             fileEnd = os.path.basename(fileForm)
             if not os.path.exists(fileEnd):
-                raise LilyTranslateException('cannot find ' + fileEnd
-                                             + ' or the full path ' + fileForm
-                                             + ' original file was ' + fileName)
+                raise LilyTranslateException('cannot find ' + str(fileEnd)
+                                             + ' or the full path ' + str(fileForm)
+                                             + ' original file was ' + str(fileName))
             fileForm = fileEnd
         return pathlib.Path(fileForm)
 
@@ -2572,6 +2581,32 @@ class Test(unittest.TestCase):
         # lpc.showPNG()
         # s.show('lily.png')
 
+    def testCompositeLyrics(self):
+        s = corpus.parse('theoryExercises/checker_demo.xml')
+        lpc = LilypondConverter()
+        # previously this choked where .text is None on Lyric object
+        lpc.loadObjectFromScore(s)
+
+    def testColors(self):
+        red_note = note.Note()
+        red_note.style.color = '#FF0000'
+        sm = LilypondConverter().lySimpleMusicFromNoteOrRest(red_note)
+        self.assertEqual(
+            sm.stringOutput(),
+            r'\override NoteHead.color = "#FF0000"' '\n'
+            r'\override Stem.color = "#FF0000"' '\n'
+            "c' 4  "
+        )
+
+        dark_green_note = note.Note()
+        dark_green_note.style.color = 'darkgreen'
+        sm = LilypondConverter().lySimpleMusicFromNoteOrRest(dark_green_note)
+        self.assertEqual(
+            sm.stringOutput(),
+            r'\override NoteHead.color = "darkgreen"' '\n'
+            r'\override Stem.color = "darkgreen"' '\n'
+            "c' 4  "
+        )
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
     def xtestConvertNote(self):

@@ -934,7 +934,7 @@ def bestClef(streamObj: 'music21.stream.Stream',
     totalNotes = 0
     totalHeight = 0
 
-    sIter = streamObj.recurse() if recurse else streamObj.iter
+    sIter = streamObj.recurse() if recurse else streamObj.iter()
 
     notes = sIter.getElementsByClass('GeneralNote')
 

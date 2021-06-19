@@ -150,73 +150,72 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     pathsToRun = modGather.modulePaths  # [30:60]
 
     # pylint: disable=not-callable
-    pool = multiprocessing.Pool(processes=poolSize)
+    with multiprocessing.Pool(processes=poolSize) as pool:
 
-    # imap returns the results as they are completed.  Since the number of files is small,
-    # the overhead of returning is outweighed by the positive aspect of getting results immediately
-    # unordered says that results can RETURN in any order; not that they'd be pooled out in any
-    # order.
-    res = pool.imap_unordered(runOneModuleWithoutImp,
-                              ((modGather, fp) for fp in pathsToRun))
+        # imap returns the results as they are completed.
+        # Since the number of files is small, the overhead of returning is
+        # outweighed by the positive aspect of getting results immediately
+        # unordered says that results can RETURN in any order; not that
+        # they'd be pooled out in any order.
+        res = pool.imap_unordered(runOneModuleWithoutImp,
+                                    ((modGather, fp) for fp in pathsToRun))
 
-    continueIt = True
-    timeouts = 0
-    eventsProcessed = 0
-    summaryOutput = []
+        continueIt = True
+        timeouts = 0
+        eventsProcessed = 0
+        summaryOutput = []
 
-    while continueIt is True:
-        try:
-            newResult = res.next(timeout=1)
-            if timeouts >= 5:
-                print('')
-            if newResult is not None:
-                if newResult.moduleName is not None:
-                    mn = newResult.moduleName
-                    mn = mn.replace('___init__', '')
-                    mn = mn.replace('_', '.')
-                else:
-                    mn = ''
-                rt = newResult.runTime
-                if rt is not None:
-                    rt = round(newResult.runTime * 10) / 10.0
-                    if not newResult.errors and not newResult.failures:
-                        print(f'\t\t\t\t{mn}: {newResult.testsRun} tests in {rt} secs')
+        while continueIt is True:
+            try:
+                newResult = res.next(timeout=1)
+                if timeouts >= 5:
+                    print('')
+                if newResult is not None:
+                    if newResult.moduleName is not None:
+                        mn = newResult.moduleName
+                        mn = mn.replace('___init__', '')
+                        mn = mn.replace('_', '.')
                     else:
-                        print('\t\t\t\t{0}: {1} tests, {2} errors {3} failures in {4} secs'.format(
-                            mn,
-                            newResult.testsRun,
-                            len(newResult.errors),
-                            len(newResult.failures),
-                            rt))
-            timeouts = 0
-            eventsProcessed += 1
-            summaryOutput.append(newResult)
-        except multiprocessing.TimeoutError:
-            timeouts += 1
-            if timeouts == 5 and eventsProcessed > 0:
-                print('Delay in processing, seconds: ', end='')
-            elif timeouts == 5:
-                print('Starting first modules, should take 5-10 seconds: ', end='')
+                        mn = ''
+                    rt = newResult.runTime
+                    if rt is not None:
+                        rt = round(newResult.runTime * 10) / 10.0
+                        if not newResult.errors and not newResult.failures:
+                            print(f'\t\t\t\t{mn}: {newResult.testsRun} tests in {rt} secs')
+                        else:
+                            numErr = len(newResult.errors)
+                            numFail = len(newResult.failures)
+                            print(f'\t\t\t\t{mn}: {newResult.testsRun} tests, '
+                                  f'{numErr} errors {numFail} failures in {rt} secs')
+                timeouts = 0
+                eventsProcessed += 1
+                summaryOutput.append(newResult)
+            except multiprocessing.TimeoutError:
+                timeouts += 1
+                if timeouts == 5 and eventsProcessed > 0:
+                    print('Delay in processing, seconds: ', end='')
+                elif timeouts == 5:
+                    print('Starting first modules, should take 5-10 seconds: ', end='')
 
-            if timeouts % 5 == 0:
-                print(str(timeouts) + ' ', end='', flush=True)
-            if timeouts > maxTimeout and eventsProcessed > 0:
-                print('\nToo many delays, giving up...', flush=True)
+                if timeouts % 5 == 0:
+                    print(str(timeouts) + ' ', end='', flush=True)
+                if timeouts > maxTimeout and eventsProcessed > 0:
+                    print('\nToo many delays, giving up...', flush=True)
+                    continueIt = False
+                    printSummary(summaryOutput, timeStart, pathsToRun)
+                    pool.close()
+                    sys.exit()
+            except StopIteration:
                 continueIt = False
-                printSummary(summaryOutput, timeStart, pathsToRun)
                 pool.close()
-                sys.exit()
-        except StopIteration:
-            continueIt = False
-            pool.close()
-            pool.join()
-        except Exception as excp:  # pylint: disable=broad-except
-            eventsProcessed += 1
-            exceptionLog = ModuleResponse(
-                returnCode='UntrappedException',
-                moduleName=str(excp)
-            )
-            summaryOutput.append(exceptionLog)
+                pool.join()
+            except Exception as excp:  # pylint: disable=broad-except
+                eventsProcessed += 1
+                exceptionLog = ModuleResponse(
+                    returnCode='UntrappedException',
+                    moduleName=str(excp)
+                )
+                summaryOutput.append(exceptionLog)
 
     sys.stderr = normalStdError
     printSummary(summaryOutput, timeStart, pathsToRun)

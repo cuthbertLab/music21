@@ -21,6 +21,7 @@ import copy
 import re
 import unittest
 from typing import Union, Optional
+import warnings
 
 from music21 import base
 from music21 import exceptions21
@@ -72,7 +73,7 @@ def convertKeyStringToMusic21KeyString(textString):
 
 def sharpsToPitch(sharpCount):
     '''
-    Given a number a positive/negative number of sharps, return a Pitch
+    Given a positive/negative number of sharps, return a Pitch
     object set to the appropriate major key value.
 
     >>> key.sharpsToPitch(1)
@@ -251,6 +252,10 @@ class KeyException(exceptions21.Music21Exception):
     pass
 
 
+class KeyWarning(Warning):
+    pass
+
+
 # ------------------------------------------------------------------------------
 class KeySignature(base.Music21Object):
     '''
@@ -380,11 +385,51 @@ class KeySignature(base.Music21Object):
     def _reprInternal(self):
         return 'of ' + self._strDescription()
 
-    def asKey(self, mode='major'):
+    def asKey(self, mode: Optional[str] = None, tonic: Optional[str] = None):
         '''
-        return a `key.Key` object representing this KeySignature object as a key in the
-        given mode (default = major)
+        Return a `key.Key` object representing this KeySignature object as a key in the
+        given mode or in the given tonic. If `mode` is None, and `tonic` is not provided,
+        major is assumed. If both mode and tonic are provided, the tonic is ignored.
+
+        >>> ks = key.KeySignature(2)
+        >>> ks.asKey()
+        <music21.key.Key of D major>
+        >>> ks.asKey(mode='minor')
+        <music21.key.Key of b minor>
+
+        If `mode` is None, an attempt is made to solve for the mode:
+
+        >>> ks.asKey(tonic='A')
+        <music21.key.Key of A mixolydian>
+
+        But will raise `KeyException` if an impossible solution is requested:
+
+        >>> ks.asKey(tonic='D#')
+        Traceback (most recent call last):
+        music21.key.KeyException: Could not solve for mode from sharps=2, tonic=D#
+
+        Ionian and Aeolian are supplied instead of major or minor when deriving mode in this way:
+
+        >>> ks2 = key.KeySignature()
+        >>> ks2.asKey()
+        <music21.key.Key of C major>
+        >>> ks2.asKey(tonic='C')
+        <music21.key.Key of C ionian>
+
+        New in v7 -- `tonic` argument to solve for mode.
         '''
+        if mode is not None and tonic is not None:
+            warnings.warn(f'ignoring provided tonic: {tonic}', KeyWarning)
+        if mode is None and tonic is None:
+            mode = 'major'
+        if mode is None and tonic is not None:
+            majorSharpsToMode = {v: k for k, v in modeSharpsAlter.items()}
+            majorSharps = pitchToSharps(tonic)
+            try:
+                mode = majorSharpsToMode[self.sharps - majorSharps]
+            except KeyError as ke:
+                raise KeyException(
+                    f'Could not solve for mode from sharps={self.sharps}, tonic={tonic}') from ke
         mode = mode.lower()
         if mode not in modeSharpsAlter:
             raise KeyException(f'Mode {mode} is unknown')
@@ -1282,6 +1327,30 @@ class Test(unittest.TestCase):
         # k = s.analyze('KrumhanslSchmuckler')
         # k.tonalCertainty(method='correlationCoefficient')
         # s = corpus.parse('bwv48.3')
+
+    def testAsKey(self):
+        ks = KeySignature(2)
+
+        k = ks.asKey(mode=None, tonic=None)
+        self.assertEqual(k.mode, 'major')
+        self.assertEqual(k.tonicPitchNameWithCase, 'D')
+
+        k = ks.asKey(tonic='E')
+        self.assertEqual(k.mode, 'dorian')
+        self.assertEqual(k.tonicPitchNameWithCase, 'E')
+
+        expected = 'ignoring provided tonic: E'
+        with self.assertWarnsRegex(KeyWarning, expected) as cm:
+            # warn user we ignored their tonic
+            k = ks.asKey(mode='minor', tonic='E')
+        self.assertEqual(k.mode, 'minor')
+        self.assertEqual(k.tonicPitchNameWithCase, 'b')
+
+        expected = 'Could not solve for mode from sharps=2, tonic=A-'
+        with self.assertRaisesRegex(KeyException, expected) as cm:
+            k = ks.asKey(mode=None, tonic='A-')
+        # test exception chained from KeyError
+        self.assertIsInstance(cm.exception.__cause__, KeyError)
 
 
 # ------------------------------------------------------------------------------

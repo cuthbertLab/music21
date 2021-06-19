@@ -195,7 +195,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         if self.recurse:
             sIter = self.streamObj.recurse()
         else:
-            sIter = self.streamObj.iter
+            sIter = self.streamObj.iter()
 
         if self.classFilterList:
             sIter = sIter.getElementsByClass(self.classFilterList)
@@ -1665,6 +1665,20 @@ class Test(unittest.TestCase):
                         minWindow=1, windowStep=windowStep,
                         doneAction=doneAction, dpi=300)
         b.run()
+        self.assertEqual(b.graphLegend.data,
+            [
+                ['Major',
+                    [('C#', '#f0727a'), ('D', '#ffd752'), ('E', '#eeff9a'),
+                     ('F#', '#b9f0ff'), ('A', '#bb9aff'), ('B', '#ffb5ff')
+                     ]
+                 ],
+                ['Minor',
+                    [('c#', '#8c0e16'), ('', '#ffffff'), ('', '#ffffff'),
+                     ('f#', '#558caa'), ('', '#ffffff'), ('b', '#9b519b')
+                     ]
+                 ]
+            ]
+        )
 
     def testFeatures(self):
         streamList = ['bach/bwv66.6', 'schoenberg/opus19/movement2', 'corelli/opus3no1/1grave']

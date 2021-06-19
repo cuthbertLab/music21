@@ -475,7 +475,7 @@ class XMLParserBase:
         '''
         Sets m21Object.style.color to be the same as color...
         '''
-        self.setStyleAttributes(mxObject, m21Object, 'color')
+        self.setStyleAttributes(mxObject, m21Object, 'color', 'color')
 
     def setFont(self, mxObject, m21Object):
         '''
@@ -1632,26 +1632,31 @@ class PartParser(XMLParserBase):
         for mxMeasure in self.mxPart.iterfind('measure'):
             self.xmlMeasureToMeasure(mxMeasure)
 
-        # self.removeEndForwardRest()
+        self.removeEndForwardRest()
         part.coreElementsChanged()
 
-    #     def removeEndForwardRest(self):
-    #         '''
-    #         If the last measure ended with a forward tag, as happens
-    #         in some pieces that end with incomplete measures,
-    #         remove the rest there (for backwards compatibility, esp.
-    #         since bwv66.6 uses it)
-    #         '''
-    #         if self.lastMeasureParser is None:
-    #             return
-    #         lmp = self.lastMeasureParser
-    #         self.lastMeasureParser = None  # clean memory
-    #
-    #         if lmp.endedWithForwardTag is None:
-    #             return
-    #         endedForwardRest = lmp.endedWithForwardTag
-    #         if lmp.stream.recurse().notesAndRests[-1] is endedForwardRest:
-    #             lmp.stream.remove(endedForwardRest, recurse=True)
+    def removeEndForwardRest(self):
+        '''
+        If the last measure ended with a forward tag, as happens
+        in some pieces that end with incomplete measures,
+        and voices are not involved,
+        remove the rest there (for backwards compatibility, esp.
+        since bwv66.6 uses it)
+
+        New in v7.
+        '''
+        if self.lastMeasureParser is None:  # pragma: no cover
+            return  # should not happen
+        lmp = self.lastMeasureParser
+        self.lastMeasureParser = None  # clean memory
+
+        if lmp.endedWithForwardTag is None:
+            return
+        if lmp.useVoices is True:
+            return
+        endedForwardRest = lmp.endedWithForwardTag
+        if lmp.stream.recurse().notesAndRests.last() is endedForwardRest:
+            lmp.stream.remove(endedForwardRest, recurse=True)
 
     def separateOutPartStaves(self):
         '''
@@ -2197,9 +2202,12 @@ class MeasureParser(XMLParserBase):
         self.nLast = None  # for adding notes to spanners.
 
         # Sibelius 7.1 only puts a <voice> tag on the
-        # first note of a chord, so we need to make sure
-        # that we keep track of the last voice...
-        self.chordVoice = None
+        # first note of a chord, and MuseScore doesn't put one
+        # on <forward> elements for hidden rests, so we need to make sure
+        # that we keep track of the last voice.
+        # there is an effort to translate the voice text to an int, but if that fails (unlikely)
+        # we store whatever we find
+        self.lastVoice = None
         self.fullMeasureRest = False
 
         # for keeping track of full-measureRests.
@@ -2216,12 +2224,12 @@ class MeasureParser(XMLParserBase):
         # what is the offset in the measure of the current note position?
         self.offsetMeasureNote = 0.0
 
-        # # keep track of the last rest that was added with a forward tag.
-        # # there are many pieces that end with incomplete measures that
-        # # older versions of Finale put a forward tag at the end, but this
-        # # disguises the incomplete last measure.  The PartParser will
-        # # pick this up from the last measure.
-        # self.endedWithForwardTag = None
+        # keep track of the last rest that was added with a forward tag.
+        # there are many pieces that end with incomplete measures that
+        # older versions of Finale put a forward tag at the end, but this
+        # disguises the incomplete last measure.  The PartParser will
+        # pick this up from the last measure.
+        self.endedWithForwardTag: Optional[note.Rest] = None
 
     @staticmethod
     def getStaffNumber(mxObjectOrNumber) -> int:
@@ -2381,7 +2389,7 @@ class MeasureParser(XMLParserBase):
                     meth(mxObj)
 
         if self.useVoices is True:
-            for v in self.stream.iter.voices:
+            for v in self.stream.iter().voices:
                 if v:  # do not bother with empty voices
                     # the musicDataMethods use insertCore, thus the voices need to run
                     # coreElementsChanged
@@ -2426,10 +2434,10 @@ class MeasureParser(XMLParserBase):
                 float(mxDuration.text.strip()) / self.divisions
             )
             self.offsetMeasureNote -= change
-            if self.offsetMeasureNote < 0:
-                # this could happen if the musicxml durations have errors
-                # https://github.com/cuthbertLab/music21/issues/971
-                self.offsetMeasureNote = 0.0
+            # check for negative offsets produced by
+            # musicxml durations with float rounding issues
+            # https://github.com/cuthbertLab/music21/issues/971
+            self.offsetMeasureNote = max(self.offsetMeasureNote, 0.0)
 
     def xmlForward(self, mxObj):
         '''
@@ -2440,8 +2448,19 @@ class MeasureParser(XMLParserBase):
             change = common.numberTools.opFrac(
                 float(mxDuration.text.strip()) / self.divisions
             )
+
+            # Create hidden rest (in other words, a spacer)
+            # old Finale documents close incomplete final measures with <forward>
+            # this will be removed afterward by removeEndForwardRest()
+            r = note.Rest(quarterLength=change)
+            r.style.hideObjectOnPrint = True
+            self.addToStaffReference(mxObj, r)
+            self.insertInMeasureOrVoice(mxObj, r)
+
             # Allow overfilled measures for now -- TODO(someday): warn?
             self.offsetMeasureNote += change
+            # xmlToNote() sets None
+            self.endedWithForwardTag = r
 
     def xmlPrint(self, mxPrint):
         '''
@@ -2548,7 +2567,7 @@ class MeasureParser(XMLParserBase):
                     vIndex = int(vIndex)
                 except ValueError:
                     pass
-                self.chordVoice = vIndex
+                self.lastVoice = vIndex
 
         if isChord is True:  # and isRest is False...?
             n = None  # fo linting
@@ -2594,6 +2613,7 @@ class MeasureParser(XMLParserBase):
 
         # only increment Chords after completion
         self.offsetMeasureNote += offsetIncrement
+        self.endedWithForwardTag = None
 
     def xmlToChord(self, mxNoteList):
         # noinspection PyShadowingNames
@@ -2823,7 +2843,7 @@ class MeasureParser(XMLParserBase):
         # TODO: get number to preserve
         # not to-do: repeater; is deprecated.
         self.setColor(mxBeam, beamOut)
-        self.setStyleAttributes(mxBeam, beamOut, 'fan')
+        self.setStyleAttributes(mxBeam, beamOut, 'fan', 'fan')
 
         try:
             mxType = mxBeam.text.strip()
@@ -4381,6 +4401,10 @@ class MeasureParser(XMLParserBase):
             return
 
         mxVoice = mxElement.find('voice')
+
+        # MuseScore doesn't write `<voice>` children on `<forward>` elements,
+        # and Sibelius 7.1 skips it on subsequent chord members, so this might be None
+        # no matter: go on to findM21VoiceFromXmlVoice()
         thisVoice = self.findM21VoiceFromXmlVoice(mxVoice)
         if thisVoice is not None:
             insertStream = thisVoice
@@ -4392,7 +4416,7 @@ class MeasureParser(XMLParserBase):
         '''
         m = self.stream
         if not textStripValid(mxVoice):
-            useVoice = self.chordVoice
+            useVoice = self.lastVoice
             if useVoice is None:
                 environLocal.warn('Cannot put in an element with a missing voice tag when '
                                   + 'no previous voice tag was given.  Assuming voice 1... '
@@ -4400,6 +4424,10 @@ class MeasureParser(XMLParserBase):
                 useVoice = 1
         else:
             useVoice = mxVoice.text.strip()
+            try:
+                self.lastVoice = int(useVoice)
+            except ValueError:
+                self.lastVoice = useVoice
 
         thisVoice = None
         if useVoice in self.voicesById:
@@ -6869,6 +6897,7 @@ class Test(unittest.TestCase):
 
     def testHiddenRests(self):
         from music21 import converter
+        from music21 import corpus
         from music21.musicxml import testPrimitive
 
         # Voice 1: Half note, <forward> (quarter), quarter note
@@ -6881,6 +6910,41 @@ class Test(unittest.TestCase):
         self.assertTrue(restV1.style.hideObjectOnPrint)
         restsV2 = v2.getElementsByClass(note.Rest)
         self.assertEqual([r.style.hideObjectOnPrint for r in restsV2], [True, True])
+
+        # Schoenberg op.19/2
+        # previously, last measure of LH duplicated hidden rest belonging to RH
+        # causing unnecessary voices
+        # https://github.com/cuthbertLab/music21/issues/991
+        sch = corpus.parse('schoenberg/opus19', 2)
+        rh_last = sch.parts[0][stream.Measure].last()
+        lh_last = sch.parts[1][stream.Measure].last()
+
+        hiddenRest = rh_last.voices.last().first()
+        self.assertIsInstance(hiddenRest, note.Rest)
+        self.assertEqual(hiddenRest.style.hideObjectOnPrint, True)
+        self.assertEqual(hiddenRest.quarterLength, 2.0)
+
+        self.assertEqual(len(lh_last.voices), 0)
+        self.assertEqual([r.style.hideObjectOnPrint for r in lh_last[note.Rest]], [False] * 3)
+
+    def testHiddenRestImpliedVoice(self):
+        '''
+        MuseScore expects readers to infer the voice context surrounding
+        a <forward> tag.
+        '''
+        from xml.etree.ElementTree import fromstring as EL
+        elStr = '<measure><note><rest/><duration>20160</duration><voice>1</voice></note>'
+        elStr += '<backup><duration>20160</duration></backup>'
+        elStr += '<note><rest/><duration>10080</duration><voice>non-integer-value</voice></note>'
+        elStr += '<forward><duration>10080</duration></forward></measure>'
+        mxMeasure = EL(elStr)
+        MP = MeasureParser(mxMeasure=mxMeasure)
+        MP.parse()
+
+        self.assertEqual(len(MP.stream.voices), 2)
+        self.assertEqual(len(MP.stream.voices[0].elements), 1)
+        self.assertEqual(len(MP.stream.voices[1].elements), 2)
+        self.assertEqual(MP.stream.voices[1].id, 'non-integer-value')
 
     def testMultiDigitEnding(self):
         from music21 import converter

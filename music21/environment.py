@@ -407,6 +407,7 @@ class _EnvironmentCore:
             for name, value in [
                 ('lilypondPath', '/usr/bin/lilypond'),
                 ('musicxmlPath', '/usr/bin/mscore3'),
+                ('musescoreDirectPNGPath', '/usr/bin/mscore3'),
                 ('graphicsPath', '/usr/bin/xdg-open'),
                 ('pdfPath', '/usr/bin/xdg-open')
             ]:

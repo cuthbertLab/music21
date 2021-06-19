@@ -91,14 +91,10 @@ def findFormat(fmt):
     All but the first element of the tuple are deprecated for use, since
     the extension can vary by subconverter (e.g., lily.png)
 
-    Note that .mxl and .mx are only considered MusicXML input formats.
-
-    >>> common.findFormat('mx')
-    ('musicxml', '.xml')
     >>> common.findFormat('.mxl')
-    ('musicxml', '.xml')
+    ('musicxml', '.musicxml')
     >>> common.findFormat('musicxml')
-    ('musicxml', '.xml')
+    ('musicxml', '.musicxml')
     >>> common.findFormat('lily')
     ('lilypond', '.ly')
     >>> common.findFormat('lily.png')
@@ -121,9 +117,6 @@ def findFormat(fmt):
     ('vexflow', '.html')
     >>> common.findFormat('capx')
     ('capella', '.capx')
-
-    >>> common.findFormat('mx')
-    ('musicxml', '.xml')
 
 
     Works the same whether you have a leading dot or not:
@@ -192,23 +185,17 @@ def findInputExtension(fmt):
 
     >>> a = common.findInputExtension('musicxml')
     >>> a
-    ('.xml', '.mxl', '.mx', '.musicxml')
+    ('.xml', '.mxl', '.musicxml')
     >>> a = common.findInputExtension('humdrum')
     >>> a
     ('.krn',)
     >>> common.findInputExtension('musedata')
     ('.md', '.musedata', '.zip')
 
-    mx is not a music21 format but it is a file format
-
-    >>> common.findInputExtension('mx')
-    ('.xml', '.mxl', '.mx', '.musicxml')
-
     Leading dots don't matter...
 
-    >>> common.findInputExtension('.mx')
-    ('.xml', '.mxl', '.mx', '.musicxml')
-
+    >>> common.findInputExtension('.mxl')
+    ('.xml', '.mxl', '.musicxml')
 
     blah is neither
 
@@ -279,8 +266,8 @@ def findFormatExtFile(fp):
 
     DEPRECATED May 2014 -- moving to converter
 
-    >>> common.findFormatExtFile('test.mx')
-    ('musicxml', '.mx')
+    >>> common.findFormatExtFile('test.mxl')
+    ('musicxml', '.mxl')
     >>> common.findFormatExtFile('long/file/path/test-2009.03.02.xml')
     ('musicxml', '.xml')
     >>> common.findFormatExtFile('long/file/path.intermediate.png/test-2009.03.xml')

@@ -86,7 +86,7 @@ class KeyAnalyzer:
 
         self.weightAlgorithm = divide
         if s.hasPartLikeStreams():
-            p = s.iter.parts.first()
+            p = s.iter().parts.first()
         else:
             p = s
         self.numMeasures = len(p.getElementsByClass('Measure'))  # could be wrong for endings, etc.
