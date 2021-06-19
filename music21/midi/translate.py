@@ -2946,10 +2946,10 @@ class Test(unittest.TestCase):
 
         # User error
         iObjs[0].midiChannel = 100
-        msg = 'Harpsichord specified 1-indexed MIDI channel 101 but '
-        msg += 'acceptable channels were [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16].'
-        msg += 'Defaulting to channel 1.'
-        with self.assertWarns(TranslateWarning, msg=msg):
+        want = 'Harpsichord specified 1-indexed MIDI channel 101 but '
+        want += r'acceptable channels were \[1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16\]. '
+        want += 'Defaulting to channel 1.'
+        with self.assertWarnsRegex(TranslateWarning, want):
             channelByInstrument, channelsDynamic = channelInstrumentData(s)
         self.assertEqual(channelByInstrument.keys(), set(inst.midiProgram for inst in iObjs))
         self.assertSetEqual(set(channelByInstrument.values()), {1, 11, 12, 13, 14, 15})
@@ -3823,9 +3823,9 @@ class Test(unittest.TestCase):
         event.channel = 10
         event.type = midiModule.ChannelVoiceMessages.PROGRAM_CHANGE
 
-        msg = 'Unable to determine instrument from '
-        msg += '<music21.midi.MidiEvent PROGRAM_CHANGE, track=0, channel=10, data=0>'
-        with self.assertWarns(TranslateWarning, msg=msg):
+        expected = 'Unable to determine instrument from '
+        expected += '<music21.midi.MidiEvent PROGRAM_CHANGE, track=None, channel=10, data=0>'
+        with self.assertWarnsRegex(TranslateWarning, expected):
             i = midiEventsToInstrument(event)
             self.assertIsNone(i.instrumentName)
 
