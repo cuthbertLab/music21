@@ -5003,6 +5003,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         >>> scSounding.recurse().notes[0].nameWithOctave
         'C3'
+
+        If 'atSoundingPitch' is unknown for this Stream and all of its parent Streams
+        then will raise a StreamException:
+        >>> s = stream.Score()
+        >>> p = stream.Part(id='partEmpty')
+        >>> s.append(p)
+        >>> p.toSoundingPitch()
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: atSoundingPitch is unknown: cannot transpose
+        >>> s.atSoundingPitch = False
+        >>> sp = p.toSoundingPitch()
+        >>> sp
+        <music21.stream.Part partEmpty>
+        >>> sp.derivation.origin is p
+        True
         '''
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('toSoundingPitch')
