@@ -6461,11 +6461,24 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(tree.find('.//measure'))
 
     def testFromSoundingPitch(self):
-        from music21.instrument import Clarinet
+        '''
+        A score with mixed sounding and written parts.
+        '''
+        from music21.instrument import Clarinet, Bassoon
+
         m = stream.Measure([Clarinet(), note.Note('C')])
-        p = stream.Part(m)
-        p.atSoundingPitch = True
-        gex = GeneralObjectExporter(p)
+        p1 = stream.Part(m)
+        p1.atSoundingPitch = True
+        p2 = stream.Part(stream.Measure([Bassoon(), note.Note()]))
+        s = stream.Score([p1, p2])
+        self.assertEqual(s.atSoundingPitch, 'unknown')
+        gex = GeneralObjectExporter(s)
+        root = ET.fromstring(gex.parse().decode('utf-8'))
+        self.assertEqual(len(root.findall('.//transpose')), 1)
+        self.assertEqual(root.find('.//step').text, 'D')
+
+        s.atSoundingPitch = True
+        gex = GeneralObjectExporter(s)
         root = ET.fromstring(gex.parse().decode('utf-8'))
         self.assertEqual(len(root.findall('.//transpose')), 1)
         self.assertEqual(root.find('.//step').text, 'D')
