@@ -4932,7 +4932,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         return returnObj
 
-    def _treatAsAtSoundingPitch(self) -> Union[bool, str]:
+    def _treatAtSoundingPitch(self) -> Union[bool, str]:
         '''
         `atSoundingPitch` might be True, False, or 'unknown'. Given that
         setting the property does not automatically synchronize the corresponding
@@ -5006,6 +5006,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         If 'atSoundingPitch' is unknown for this Stream and all of its parent Streams
         then will raise a StreamException:
+
         >>> s = stream.Score()
         >>> p = stream.Part(id='partEmpty')
         >>> s.append(p)
@@ -5031,7 +5032,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj.atSoundingPitch = True
             return returnObj
 
-        at_sounding = returnObj._treatAsAtSoundingPitch()
+        at_sounding = returnObj._treatAtSoundingPitch()
 
         if at_sounding is False:
             # transposition defined on instrument goes from written to sounding
@@ -5086,7 +5087,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj.atSoundingPitch = False
             return returnObj
 
-        at_sounding = returnObj._treatAsAtSoundingPitch()
+        at_sounding = returnObj._treatAtSoundingPitch()
 
         if at_sounding is True:
             # need to reverse to go to written
