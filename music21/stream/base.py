@@ -5030,7 +5030,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # call on each part
                 partLike.toSoundingPitch(inPlace=True)
             returnObj.atSoundingPitch = True
-            return returnObj
+            return returnObj if not inPlace else None
 
         at_sounding = returnObj._treatAtSoundingPitch()
 
@@ -5085,7 +5085,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # call on each part
                 partLike.toWrittenPitch(inPlace=True)
             returnObj.atSoundingPitch = False
-            return returnObj
+            return returnObj if not inPlace else None
 
         at_sounding = returnObj._treatAtSoundingPitch()
 
