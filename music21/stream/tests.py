@@ -7044,22 +7044,8 @@ class Test(unittest.TestCase):
         s.insert(0, p1)
         s.insert(0, p2)
 
-        def simulateRecursing(myStream, reverse=False) -> List[pitch.Pitch]:
-            '''
-            _transposeByInstrument() doesn't recurse at the moment,
-            so we have to dip into each measure. Not exposed publicly anyway.
-            '''
-            demoPitches = []
-            for m in myStream[Measure]:
-                post = m._transposeByInstrument(inPlace=False, reverse=reverse)
-                for n in post.notes:
-                    demoPitches.extend(n.pitches)
-            return demoPitches
-
-        self.assertEqual([str(p) for p in p1.pitches], ['C4', 'C4', 'C4', 'C4'])
-        self.assertEqual([str(p) for p in simulateRecursing(p1)], ['F3', 'F3', 'B-3', 'B-3'])
-        self.assertEqual([str(p) for p in simulateRecursing(p1, reverse=True)],
-                          ['G4', 'G4', 'D4', 'D4'])
+        test = p1._transposeByInstrument(inPlace=False, reverse=True)
+        self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'D4', 'D4'])
 
         # declare that at written pitch
         p1.atSoundingPitch = False
@@ -7305,7 +7291,6 @@ class Test(unittest.TestCase):
         <duration>5040</duration>
         <type>eighth</type>
         <stem>up</stem>
-        <beam number="1">begin</beam>
       </note>
       <note>
         <rest/>
