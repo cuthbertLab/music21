@@ -4934,12 +4934,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _treatAsAtSoundingPitch(self, contextStream):
         '''
-        :attr:`atSoundingPitch` might be True, False, or "Unknown". Given that 
-        setting the attribute does not automatically synchronize the corresponding
-        attribute on contained or containing streams, any time a method relying on the
+        `atSoundingPitch` might be True, False, or "Unknown". Given that
+        setting the property does not automatically synchronize the corresponding
+        property on contained or containing streams, any time a method relying on the
         value of `atSoundingPitch` such as :meth:`toSoundingPitch` visits a stream,
         it will need to resolve "Unknown" values or even possibly conflicting values.
-        
+
         This helper method gives priority to the `contextStream` which, in all likelihood,
         will contain `self` at some higher level. If both `contextStream` and `self`
         have "unknown" sounding pitch, search this stream's sites until a True or False
@@ -4989,7 +4989,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'C3'
 
         Changed in v.7 -- no longer raises `StreamException` if `atSoundingPitch`
-        is `'unknown'`.
+        is `'unknown'`and not a stream containing a Part. Instead, an attempt is
+        made to resolve 'unknown' by checking this object's sites. Then, even if
+        this stream's value of `atSoundingPitch` is still 'unknown', all substreams
+        will be transposed if necessary (for instance, if `atSoundingPitch` is
+        False or it is 'unknown' but an intermediate site has the value False.)
         '''
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('toSoundingPitch')
@@ -5045,7 +5049,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'A4'
 
         Changed in v.7 -- no longer raises `StreamException` if `atSoundingPitch`
-        is `'unknown'`.
+        is `'unknown'`and not a stream containing a Part. Instead, an attempt is
+        made to resolve 'unknown' by checking this object's sites. Then, even if
+        this stream's value of `atSoundingPitch` is still 'unknown', all substreams
+        will be transposed if necessary (for instance, if `atSoundingPitch` is
+        True or it is 'unknown' but an intermediate site has the value True.)
         '''
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('toWrittenPitch')
