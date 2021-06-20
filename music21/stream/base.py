@@ -4932,11 +4932,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # print(k, i.transposition)
         return returnObj
 
-    def _shouldBeAtSoundingPitch(self, contextStream):
+    def _treatAsAtSoundingPitch(self, contextStream):
         '''
-        Find the desired state of .atSoundingPitch for `self` so it can be compared to
-        the actual state. Let `contextStream` dictate; but if both `contextStream`
-        and `self` are unknown, then search sites.
+        :attr:`atSoundingPitch` might be True, False, or "Unknown". Given that 
+        setting the attribute does not automatically synchronize the corresponding
+        attribute on contained or containing streams, any time a method relying on the
+        value of `atSoundingPitch` such as :meth:`toSoundingPitch` visits a stream,
+        it will need to resolve "Unknown" values or even possibly conflicting values.
+        
+        This helper method gives priority to the `contextStream` which, in all likelihood,
+        will contain `self` at some higher level. If both `contextStream` and `self`
+        have "unknown" sounding pitch, search this stream's sites until a True or False
+        value for `atSoundingPitch` is found, since it is possible a user only manipulated
+        the value on the top-level stream.
         '''
         if contextStream.atSoundingPitch != 'unknown':
             return contextStream.atSoundingPitch
@@ -4991,8 +4999,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if returnObj.atSoundingPitch is not True:  # unknown or False
             transposed_containers = []
             for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
-                should_be_at_sounding = container._shouldBeAtSoundingPitch(returnObj)
-                if should_be_at_sounding is False and container.atSoundingPitch is not True:
+                treat_as_at_sounding = container._treatAsAtSoundingPitch(returnObj)
+                if treat_as_at_sounding is False and container.atSoundingPitch is not True:
                     # transposition defined on instrument goes from written to sounding
                     container._transposeByInstrument(reverse=False, inPlace=True)
                     transposed_containers.append(container)
@@ -5047,8 +5055,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if returnObj.atSoundingPitch is not False:  # unknown or True
             transposed_containers = []
             for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
-                should_be_at_sounding = container._shouldBeAtSoundingPitch(returnObj)
-                if should_be_at_sounding is True and container.atSoundingPitch is not False:
+                treat_as_at_sounding = container._treatAsAtSoundingPitch(returnObj)
+                if treat_as_at_sounding is True and container.atSoundingPitch is not False:
                     # transposition defined on instrument goes from written to sounding
                     # need to reverse to go to written
                     container._transposeByInstrument(reverse=True, inPlace=True)
