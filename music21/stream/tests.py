@@ -12,7 +12,6 @@
 import random
 import unittest
 import copy
-from typing import List
 
 import music21
 from music21.note import GeneralNote

@@ -5025,9 +5025,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classSet:
-            for p in returnObj.getElementsByClass(Stream):
+            for partLike in returnObj.getElementsByClass(Stream):
                 # call on each part
-                p.toSoundingPitch(inPlace=True)
+                partLike.toSoundingPitch(inPlace=True)
             returnObj.atSoundingPitch = True
             return returnObj
 
@@ -5080,9 +5080,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classSet:
-            for p in returnObj.getElementsByClass(Stream):
+            for partLike in returnObj.getElementsByClass(Stream):
                 # call on each part
-                p.toWrittenPitch(inPlace=True)
+                partLike.toWrittenPitch(inPlace=True)
             returnObj.atSoundingPitch = False
             return returnObj
 
