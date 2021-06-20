@@ -1375,7 +1375,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         the main function to call.
 
         If self.stream is empty, call self.emptyObject().  Otherwise,
-
+        convert sounding to written pitch,
         set scorePreliminaries(), call parsePartlikeScore or parseFlatScore, then postPartProcess(),
         clean up circular references for garbage collection, and returns the <score-partwise>
         object.
@@ -1389,6 +1389,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         s = self.stream
         if not s:
             return self.emptyObject()
+
+        if s.atSoundingPitch is True:
+            # A copy was already made or elected NOT to be made.
+            s.toWrittenPitch(inPlace=True)
 
         self.scorePreliminaries()
 
