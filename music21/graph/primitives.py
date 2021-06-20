@@ -172,6 +172,8 @@ class Graph(prebase.ProtoM21Object):
 
     def __setstate__(self, state):
         self.__dict__.update(state)
+        extm = getExtendedModules()
+        self.plt = extm.plt
 
     @property
     def doneAction(self):
