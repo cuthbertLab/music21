@@ -4947,7 +4947,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Then, contained streams are searched to verify that they do not contain
         conflicting values (i.e. .atSoundingPitch = True when the container has
-        .asSoundingPitch = False). Conflicting values are resolved by converting
+        .atSoundingPitch = False). Conflicting values are resolved by converting
         the inner streams to written or sounding pitch as necessary to match this
         stream's value.
         '''
