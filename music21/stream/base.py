@@ -4934,15 +4934,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _treatAsAtSoundingPitch(self, contextStream):
         '''
-        `atSoundingPitch` might be True, False, or "Unknown". Given that
+        `atSoundingPitch` might be True, False, or 'unknown'. Given that
         setting the property does not automatically synchronize the corresponding
         property on contained or containing streams, any time a method relying on the
         value of `atSoundingPitch` such as :meth:`toSoundingPitch` visits a stream,
-        it will need to resolve "Unknown" values or even possibly conflicting values.
+        it will need to resolve 'unknown' values or even possibly conflicting values.
 
         This helper method gives priority to the `contextStream` which, in all likelihood,
         will contain `self` at some higher level. If both `contextStream` and `self`
-        have "unknown" sounding pitch, search this stream's sites until a True or False
+        have 'unknown' sounding pitch, search this stream's sites until a True or False
         value for `atSoundingPitch` is found, since it is possible a user only manipulated
         the value on the top-level stream.
         '''
@@ -4989,7 +4989,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'C3'
 
         Changed in v.7 -- no longer raises `StreamException` if `atSoundingPitch`
-        is `'unknown'`and not a stream containing a Part. Instead, an attempt is
+        is `'unknown'` and not a stream containing a Part. Instead, an attempt is
         made to resolve 'unknown' by checking this object's sites. Then, even if
         this stream's value of `atSoundingPitch` is still 'unknown', all substreams
         will be transposed if necessary (for instance, if `atSoundingPitch` is
@@ -5049,7 +5049,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'A4'
 
         Changed in v.7 -- no longer raises `StreamException` if `atSoundingPitch`
-        is `'unknown'`and not a stream containing a Part. Instead, an attempt is
+        is `'unknown'` and not a stream containing a Part. Instead, an attempt is
         made to resolve 'unknown' by checking this object's sites. Then, even if
         this stream's value of `atSoundingPitch` is still 'unknown', all substreams
         will be transposed if necessary (for instance, if `atSoundingPitch` is
