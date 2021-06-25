@@ -50,14 +50,14 @@ __all__ = [
     'TERMINUS_LOW', 'TERMINUS_HIGH',
     'ScaleException', 'Scale',
     'AbstractScale', 'AbstractDiatonicScale', 'AbstractOctatonicScale',
-    'AbstractHarmonicMinorScale', 'AbstractMelodicMinorScale',
+    'AbstractHarmonicMinorScale', 'AbstractJazzMinorScale', 'AbstractMelodicMinorScale',
     'AbstractCyclicalScale', 'AbstractOctaveRepeatingScale',
     'AbstractRagAsawari', 'AbstractRagMarwa', 'AbstractWeightedHexatonicBlues',
     'ConcreteScale', 'DiatonicScale', 'MajorScale',
     'MinorScale', 'DorianScale', 'PhrygianScale', 'LydianScale', 'MixolydianScale',
     'HypodorianScale', 'HypophrygianScale', 'HypolydianScale', 'HypomixolydianScale',
     'LocrianScale', 'HypolocrianScale', 'HypoaeolianScale',
-    'HarmonicMinorScale', 'MelodicMinorScale',
+    'HarmonicMinorScale', 'JazzMinorScale', 'MelodicMinorScale',
     'OctatonicScale', 'OctaveRepeatingScale', 'CyclicalScale', 'ChromaticScale',
     'WholeToneScale', 'SieveScale', 'ScalaScale', 'RagAsawari',
     'RagMarwa', 'WeightedHexatonicBlues',
@@ -847,13 +847,16 @@ class AbstractHarmonicMinorScale(AbstractScale):
     A true bi-directional scale that with the augmented
     second to a leading tone.
 
-    This is the only scale to use the "_alteredDegrees" property.
+    The harmonic and jazz minor scales are the only to
+    use the "_alteredDegrees" property.
     '''
 
     def __init__(self, mode=None):
         super().__init__()
         self.type = 'Abstract Harmonic Minor'
         self.octaveDuplicating = True
+        self.relativeMinorDegree = 1
+        self.relativeMajorDegree = 3
         self.dominantDegree: int = -1
         self.buildNetwork()
 
@@ -872,6 +875,57 @@ class AbstractHarmonicMinorScale(AbstractScale):
             'interval': interval.Interval('a1')
         }
 
+    def getRelativeMajor(self):
+        return MajorScale(self.tonic)
+
+    def getRelativeMinor(self):
+        return MinorScale(self.tonic)
+
+
+class AbstractJazzMinorScale(AbstractScale):
+    '''
+    A true bi-directional scale containing the raised
+    6th and 7th scale degrees.
+
+    The harmonic and jazz minor scales are the only to
+    use the "_alteredDegrees" property.
+    '''
+
+    def __init__(self, mode=None):
+        super().__init__()
+        self.type = 'Abstract Jazz Minor'
+        self.relativeMinorDegree = 1
+        self.relativeMajorDegree = 3
+        self.octaveDuplicating = True
+        self.dominantDegree: int = -1
+        self.buildNetwork()
+
+    def buildNetwork(self):
+        intervalList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2']  # a to A
+        self.tonicDegree = 1
+        self.dominantDegree = 5
+        self._net = intervalNetwork.IntervalNetwork(intervalList,
+                                                    octaveDuplicating=self.octaveDuplicating,
+                                                    pitchSimplification=None)
+
+        # raise the sixth and seventh in all directions
+        # 6 and 7 here are both scale step/degree, not node id
+        self._alteredDegrees[6] = {
+            'direction': intervalNetwork.DIRECTION_BI,
+            'interval': interval.Interval('a1')
+        }
+
+        self._alteredDegrees[7] = {
+            'direction': intervalNetwork.DIRECTION_BI,
+            'interval': interval.Interval('a1')
+        }
+
+    def getRelativeMajor(self):
+        return MajorScale(self.tonic)
+
+    def getRelativeMinor(self):
+        return MinorScale(self.tonic)
+
 
 class AbstractMelodicMinorScale(AbstractScale):
     '''
@@ -882,6 +936,8 @@ class AbstractMelodicMinorScale(AbstractScale):
         super().__init__()
         self.type = 'Abstract Melodic Minor'
         self.octaveDuplicating = True
+        self.relativeMinorDegree = 1
+        self.relativeMajorDegree = 3
         self.dominantDegree: int = -1
         self.buildNetwork()
 
@@ -893,6 +949,11 @@ class AbstractMelodicMinorScale(AbstractScale):
             pitchSimplification=None)
         self._net.fillMelodicMinor()
 
+    def getRelativeMajor(self):
+        return MajorScale(self.tonic)
+
+    def getRelativeMinor(self):
+        return MinorScale(self.tonic)
 
 class AbstractCyclicalScale(AbstractScale):
     '''
@@ -2830,9 +2891,9 @@ class HarmonicMinorScale(DiatonicScale):
     '''
     The harmonic minor collection, realized as a scale.
 
-    (The usage of this collection as a scale, is quite ahistorical for
+    (The usage of this collection as a scale is quite ahistorical for
     Western European classical music, but it is common in other parts of the
-    world, but where the term "HarmonicMinor" would not be appropriate).
+    world, where the term "Harmonic Minor" would not be appropriate).
 
     >>> sc = scale.HarmonicMinorScale('e4')
     >>> [str(p) for p in sc.pitches]
@@ -2860,6 +2921,38 @@ class HarmonicMinorScale(DiatonicScale):
         # from the DiatonicScale base class
 
         self._abstract = AbstractHarmonicMinorScale()
+        # network building happens on object creation
+        # self._abstract.buildNetwork()
+
+
+class JazzMinorScale(DiatonicScale):
+    '''
+    The jazz minor scale.
+    >>> sc = scale.JazzMinorScale('e4')
+    >>> [str(p) for p in sc.pitches]
+    ['E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D#5', 'E5']
+    >>> sc.getTonic()
+    <music21.pitch.Pitch E4>
+    >>> sc.getDominant()
+    <music21.pitch.Pitch B4>
+    >>> sc.pitchFromDegree(1)  # scale degree 1 is treated as lowest
+    <music21.pitch.Pitch E4>
+    >>> sc = scale.JazzMinorScale()
+    >>> sc.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
+    [(3, <music21.scale.JazzMinorScale G jazz minor>),
+     (3, <music21.scale.JazzMinorScale F jazz minor>),
+      (2, <music21.scale.JazzMinorScale B- jazz minor>),
+       (2, <music21.scale.JazzMinorScale A jazz minor>)]
+    '''
+
+    def __init__(self, tonic=None):
+        super().__init__(tonic=tonic)
+        self.type = 'jazz minor'
+
+        # note: this changes the previously assigned AbstractDiatonicScale
+        # from the DiatonicScale base class
+
+        self._abstract = AbstractJazzMinorScale()
         # network building happens on object creation
         # self._abstract.buildNetwork()
 
