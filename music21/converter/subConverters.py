@@ -1033,11 +1033,14 @@ class ConverterMusicXML(SubConverter):
 
         dataBytes: bytes = b''
         generalExporter = m21ToXml.GeneralObjectExporter(obj)
-        if makeNotation is False and 'Score' in obj.classes:
-            # Assume well-formed and bypass deepcopy in GeneralObjectExporter.fromScore()
-            dataBytes = generalExporter.parseWellformedObject(obj, makeNotation=False)
+        generalExporter.makeNotation = makeNotation
+        if makeNotation is False:
+            if 'Score' not in obj.classes:
+                raise SubConverterException('Can only export Scores with makeNotation=False')
+            # bypass deepcopy in GeneralObjectExporter.fromScore()
+            dataBytes = generalExporter.parseWellformedObject(obj)
         else:
-            dataBytes = generalExporter.parse(makeNotation=makeNotation)
+            dataBytes = generalExporter.parse()
 
         writeDataStreamFp = fp
         if fp is not None and subformats:  # could be empty list
@@ -1541,15 +1544,11 @@ class Test(unittest.TestCase):
         self.assertEqual(
             len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 0)
 
-        out3 = p.write(makeNotation=False)
-        roundtrip_back = converter.parse(out3)
-        # ensure 5.0QL note is not broken up
-        self.assertEqual(
-            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 2)
-        self.assertEqual(
-            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 0)
+        # makeNotation = False cannot be used on non-scores
+        with self.assertRaises(SubConverterException):
+            p.write(makeNotation=False)
 
-        for out in (out1, out2, out3):
+        for out in (out1, out2):
             os.remove(out)
 
 

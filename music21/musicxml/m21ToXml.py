@@ -302,6 +302,10 @@ def _synchronizeIds(element: Element, m21Object: Optional[base.Music21Object]) -
 
 
 class GeneralObjectExporter:
+    '''
+    Packs any `Music21Object` into a well-formed score and exports
+    a bytes object MusicXML representation.
+    '''
     classMapping = OrderedDict([
         ('Score', 'fromScore'),
         ('Part', 'fromPart'),
@@ -320,15 +324,17 @@ class GeneralObjectExporter:
 
     def __init__(self, obj=None):
         self.generalObj = obj
+        self.makeNotation: bool = True
 
-    def parse(self, obj=None, *, makeNotation: bool = True):
+    def parse(self, obj=None):
         r'''
         Return a bytes object representation of anything from a
         Score to a single pitch.
 
         Wrap `obj` in a well-formed stream (using
         :meth:`parseWellformedObject`), making a copy and making notation
-        along the way. To skip making notation, pass `makeNotation=False`.
+        along the way. To skip making notation, set `.makeNotation` on this
+        `GeneralObjectExporter` instance to False.
         To skip making a copy, call `parseWellformedObject()` directly.
 
         >>> p = pitch.Pitch('D#4')
@@ -392,19 +398,20 @@ class GeneralObjectExporter:
         if obj is None:
             obj = self.generalObj
         outObj = self.fromGeneralObject(obj)
-        return self.parseWellformedObject(outObj, makeNotation=makeNotation)
+        return self.parseWellformedObject(outObj)
 
-    def parseWellformedObject(self, sc, *, makeNotation: bool = True) -> bytes:
+    def parseWellformedObject(self, sc) -> bytes:
         '''
         Parse an object that has usually already gone through the
         `.fromGeneralObject` conversion, which has produced a copy with
         :meth:`~music21.stream.Score.makeNotation` run on it.
 
-        `makeNotation=True` (default) runs :meth:`~music21.stream.makeNotation`
+        When :attr:`makeNotation` is True (default), runs
+        :meth:`~music21.stream.makeNotation`
         on each of the parts, this time without making a copy, possibly leaving
         side effects on `sc`.
 
-        Set `makeNotation=False` to avoid making notation.
+        Set `.makeNotation` to False to avoid making notation.
 
         Returns bytes.
         '''
@@ -412,8 +419,8 @@ class GeneralObjectExporter:
             warnings.warn(f'{sc} is not well-formed; see isWellFormedNotation()',
                 category=MusicXMLWarning)
 
-        scoreExporter = ScoreExporter(sc)
-        scoreExporter.parse(makeNotation=makeNotation)
+        scoreExporter = ScoreExporter(sc, makeNotation=self.makeNotation)
+        scoreExporter.parse()
         return scoreExporter.asBytes()
 
     def fromGeneralObject(self, obj):
@@ -1358,7 +1365,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
     a musicxml Element.
     '''
 
-    def __init__(self, score: Optional[stream.Score] = None):
+    def __init__(self, score: Optional[stream.Score] = None, makeNotation: bool = True):
         super().__init__()
         if score is None:
             # should not be done this way.
@@ -1389,7 +1396,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.parts = []
 
-    def parse(self, makeNotation: bool = True):
+        self.makeNotation: bool = makeNotation
+
+    def parse(self):
         '''
         the main function to call.
 
@@ -1412,9 +1421,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.scorePreliminaries()
 
         if s.hasPartLikeStreams():
-            self.parsePartlikeScore(makeNotation=makeNotation)
+            self.parsePartlikeScore()
         else:
-            self.parseFlatScore(makeNotation=makeNotation)
+            self.parseFlatScore()
 
         self.postPartProcess()
 
@@ -1581,11 +1590,11 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.scoreLayouts = scoreLayouts
         self.firstScoreLayout = scoreLayout
 
-    def parsePartlikeScore(self, makeNotation: bool = True):
+    def parsePartlikeScore(self):
         '''
         Called by .parse() if the score has individual parts.
 
-        Calls makeRests() for the part (if `makeNotation=True`),
+        Calls makeRests() for the part (if `ScoreExporter.makeNotation` is True),
         then creates a `PartExporter` for each part, and runs .parse() on that part.
         Appends the PartExporter to `self.partExporterList`
         and runs .parse() on that part. Appends the PartExporter to self.
@@ -1600,7 +1609,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         >>> '<note print-object="no" print-spacing="yes">' in outStr
         True
         '''
-        if makeNotation:
+        if self.makeNotation:
             # self.parts is a stream of parts
             # hide any rests created at this late stage, because we are
             # merely trying to fill up MusicXML display, not impose things on users
@@ -1624,7 +1633,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             pp.parse()
             self.partExporterList.append(pp)
 
-    def parseFlatScore(self, makeNotation: bool = True):
+    def parseFlatScore(self):
         '''
         creates a single PartExporter for this Stream and parses it.
 
@@ -1647,7 +1656,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         '''
         s = self.stream
         pp = PartExporter(s, parent=self)
-        pp.parse(makeNotation=makeNotation)
+        pp.parse()
         self.partExporterList.append(pp)
 
     def postPartProcess(self):
@@ -2406,10 +2415,12 @@ class PartExporter(XMLExporterBase):
             self.meterStream = stream.Stream()
             self.refStreamOrTimeRange = [0.0, 0.0]
             self.midiChannelList = []
+            self.makeNotation = True
         else:
             self.meterStream = parent.meterStream
             self.refStreamOrTimeRange = parent.refStreamOrTimeRange
             self.midiChannelList = parent.midiChannelList  # shared list
+            self.makeNotation = parent.makeNotation
 
         self.instrumentStream = None
         self.firstInstrumentObject = None
@@ -2420,7 +2431,7 @@ class PartExporter(XMLExporterBase):
 
         self.spannerBundle = partObj.spannerBundle
 
-    def parse(self, makeNotation: bool = True):
+    def parse(self):
         '''
         Set up instruments, create a partId (if no good one exists) and sets it on
         <part>, fixes up the notation (:meth:`fixupNotationFlat` or :meth:`fixupNotationMeasured`,
@@ -2430,15 +2441,16 @@ class PartExporter(XMLExporterBase):
 
         In other words, one-stop shopping.
 
-        `makeNotation=False` is used to avoid running `makeNotation` on the Part.
-        This keyword is passed down from `show()`, `write()`, and
-        :meth:`~music21.musicxml.m21ToXml.ScoreExporter.parse`. It
-        will raise if no measures are present in the part.
+        :attr:`makeNotation` when False, will avoid running `makeNotation` on the Part.
+        Generally this attribute is set on `GeneralObjectExporter` or `ScoreExporter`
+        and read from there. Running with `makeNotation` as False will raise
+        `MusicXMLExportException` if no measures are present in the part.
 
         >>> from music21.musicxml.m21ToXml import PartExporter
         >>> noMeasures = stream.Part(note.Note())
         >>> pex = PartExporter(noMeasures)
-        >>> pex.parse(makeNotation=False)
+        >>> pex.makeNotation = False
+        >>> pex.parse()
         Traceback (most recent call last):
         music21.musicxml.xmlObjects.MusicXMLExportException:
         Cannot export with makeNotation=False if there are no measures
@@ -2451,11 +2463,11 @@ class PartExporter(XMLExporterBase):
         self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
         # Suppose that everything below this is a measure
-        if makeNotation and not self.stream.getElementsByClass(stream.Measure):
+        if self.makeNotation and not self.stream.getElementsByClass(stream.Measure):
             self.fixupNotationFlat()
-        elif makeNotation:
+        elif self.makeNotation:
             self.fixupNotationMeasured()
-        else:
+        elif not self.stream.getElementsByClass(stream.Measure):
             raise MusicXMLExportException(
                 'Cannot export with makeNotation=False if there are no measures')
         # make sure that all instances of the same class have unique ids
