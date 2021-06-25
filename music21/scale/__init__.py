@@ -1378,7 +1378,7 @@ class ConcreteScale(Scale):
             return ' '.join([self.tonic.name, self.type])
 
     def _reprInternal(self):
-        return f'{self.tonic.name} {self.type}'
+        return self.name
 
     # --------------------------------------------------------------------------
 
@@ -2845,6 +2845,8 @@ class HarmonicMinorScale(DiatonicScale):
     <music21.pitch.Pitch E4>
 
     >>> sc = scale.HarmonicMinorScale()
+    >>> sc
+    <music21.scale.HarmonicMinorScale Abstract harmonic minor>
     >>> sc.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
     [(3, <music21.scale.HarmonicMinorScale F harmonic minor>),
      (3, <music21.scale.HarmonicMinorScale E harmonic minor>),
