@@ -882,6 +882,35 @@ class AbstractHarmonicMinorScale(AbstractScale):
         return MinorScale(self.tonic)
 
 
+class AbstractMelodicMinorScale(AbstractScale):
+    '''
+    A directional scale.
+    '''
+
+    def __init__(self, mode=None):
+        super().__init__()
+        self.type = 'Abstract Melodic Minor'
+        self.octaveDuplicating = True
+        self.relativeMinorDegree = 1
+        self.relativeMajorDegree = 3
+        self.dominantDegree: int = -1
+        self.buildNetwork()
+
+    def buildNetwork(self):
+        self.tonicDegree = 1
+        self.dominantDegree = 5
+        self._net = intervalNetwork.IntervalNetwork(
+            octaveDuplicating=self.octaveDuplicating,
+            pitchSimplification=None)
+        self._net.fillMelodicMinor()
+
+    def getRelativeMajor(self):
+        return MajorScale(self.tonic)
+
+    def getRelativeMinor(self):
+        return MinorScale(self.tonic)
+    
+    
 class AbstractJazzMinorScale(AbstractScale):
     '''
     A true bi-directional scale containing the raised
@@ -926,35 +955,7 @@ class AbstractJazzMinorScale(AbstractScale):
     def getRelativeMinor(self):
         return MinorScale(self.tonic)
 
-
-class AbstractMelodicMinorScale(AbstractScale):
-    '''
-    A directional scale.
-    '''
-
-    def __init__(self, mode=None):
-        super().__init__()
-        self.type = 'Abstract Melodic Minor'
-        self.octaveDuplicating = True
-        self.relativeMinorDegree = 1
-        self.relativeMajorDegree = 3
-        self.dominantDegree: int = -1
-        self.buildNetwork()
-
-    def buildNetwork(self):
-        self.tonicDegree = 1
-        self.dominantDegree = 5
-        self._net = intervalNetwork.IntervalNetwork(
-            octaveDuplicating=self.octaveDuplicating,
-            pitchSimplification=None)
-        self._net.fillMelodicMinor()
-
-    def getRelativeMajor(self):
-        return MajorScale(self.tonic)
-
-    def getRelativeMinor(self):
-        return MinorScale(self.tonic)
-
+    
 class AbstractCyclicalScale(AbstractScale):
     '''
     A scale of any size built with an interval list of any form.
@@ -2925,9 +2926,28 @@ class HarmonicMinorScale(DiatonicScale):
         # self._abstract.buildNetwork()
 
 
+class MelodicMinorScale(DiatonicScale):
+    '''
+    A melodic minor scale, which is not the same ascending or descending
+
+    >>> sc = scale.MelodicMinorScale('e4')
+    '''
+
+    def __init__(self, tonic=None):
+        super().__init__(tonic=tonic)
+        self.type = 'melodic minor'
+
+        # note: this changes the previously assigned AbstractDiatonicScale
+        # from the DiatonicScale base class
+        self._abstract = AbstractMelodicMinorScale()
+        
+        
 class JazzMinorScale(DiatonicScale):
     '''
     The jazz minor scale.
+    
+    A synthetic scale identical to the ascending melodic minor. Useful in
+    jazz, especially over harmonies that employ minor-major seventh chords.
     >>> sc = scale.JazzMinorScale('e4')
     >>> [str(p) for p in sc.pitches]
     ['E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D#5', 'E5']
@@ -2949,28 +2969,7 @@ class JazzMinorScale(DiatonicScale):
         super().__init__(tonic=tonic)
         self.type = 'jazz minor'
 
-        # note: this changes the previously assigned AbstractDiatonicScale
-        # from the DiatonicScale base class
-
         self._abstract = AbstractJazzMinorScale()
-        # network building happens on object creation
-        # self._abstract.buildNetwork()
-
-
-class MelodicMinorScale(DiatonicScale):
-    '''
-    A melodic minor scale, which is not the same ascending or descending
-
-    >>> sc = scale.MelodicMinorScale('e4')
-    '''
-
-    def __init__(self, tonic=None):
-        super().__init__(tonic=tonic)
-        self.type = 'melodic minor'
-
-        # note: this changes the previously assigned AbstractDiatonicScale
-        # from the DiatonicScale base class
-        self._abstract = AbstractMelodicMinorScale()
 
 
 # ------------------------------------------------------------------------------
