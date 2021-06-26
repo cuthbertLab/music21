@@ -332,9 +332,9 @@ class GeneralObjectExporter:
         Score to a single pitch.
 
         When :attr:`makeNotation` is True (default), wraps `obj` in a well-formed
-        `Score`, makes a copy, and runs
-        :meth:`~music21.stream.makeNotation` on each of the parts. To skip copying
-        and making notation, set `.makeNotation` on this instance to False.
+        `Score`, makes a copy, and runs :meth:`~music21.stream.base.Stream.makeNotation`
+        on each of the parts. To skip copying and making notation, set `.makeNotation`
+        on this instance to False.
 
         >>> p = pitch.Pitch('D#4')
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter(p)
@@ -2438,7 +2438,8 @@ class PartExporter(XMLExporterBase):
 
         In other words, one-stop shopping.
 
-        :attr:`makeNotation` when False, will avoid running :meth:`~music21.stream.makeNotation`
+        :attr:`makeNotation` when False, will avoid running
+        :meth:`~music21.stream.base.Stream.makeNotation`
         on the Part. Generally this attribute is set on `GeneralObjectExporter`
         or `ScoreExporter` and read from there. Running with `makeNotation`
         as False will raise `MusicXMLExportException` if no measures are present.
