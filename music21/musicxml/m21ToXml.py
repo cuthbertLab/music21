@@ -331,11 +331,10 @@ class GeneralObjectExporter:
         Return a bytes object representation of anything from a
         Score to a single pitch.
 
-        Wrap `obj` in a well-formed stream (using
-        :meth:`parseWellformedObject`), making a copy and making notation
-        along the way. To skip making notation, set `.makeNotation` on this
-        `GeneralObjectExporter` instance to False.
-        To skip making a copy, call `parseWellformedObject()` directly.
+        When :attr:`makeNotation` is True (default), wraps `obj` in a well-formed
+        `Score`, makes a copy, and runs
+        :meth:`~music21.stream.makeNotation` on each of the parts. To skip copying
+        and making notation, set `.makeNotation` on this instance to False.
 
         >>> p = pitch.Pitch('D#4')
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter(p)
@@ -397,21 +396,19 @@ class GeneralObjectExporter:
         '''
         if obj is None:
             obj = self.generalObj
-        outObj = self.fromGeneralObject(obj)
-        return self.parseWellformedObject(outObj)
+        if self.makeNotation:
+            outObj = self.fromGeneralObject(obj)
+            return self.parseWellformedObject(outObj)
+        else:
+            if 'Score' not in obj.classes:
+                raise MusicXMLExportException('Can only export Scores with makeNotation=False')
+            return self.parseWellformedObject(obj)
 
     def parseWellformedObject(self, sc) -> bytes:
         '''
         Parse an object that has usually already gone through the
         `.fromGeneralObject` conversion, which has produced a copy with
         :meth:`~music21.stream.Score.makeNotation` run on it.
-
-        When :attr:`makeNotation` is True (default), runs
-        :meth:`~music21.stream.makeNotation`
-        on each of the parts, this time without making a copy, possibly leaving
-        side effects on `sc`.
-
-        Set `.makeNotation` to False to avoid making notation.
 
         Returns bytes.
         '''
@@ -2435,16 +2432,16 @@ class PartExporter(XMLExporterBase):
         '''
         Set up instruments, create a partId (if no good one exists) and sets it on
         <part>, fixes up the notation (:meth:`fixupNotationFlat` or :meth:`fixupNotationMeasured`,
-        if `makeNotation` is True),
+        if :attr:`makeNotation` is True),
         setsIdLocals on spanner bundle. runs parse() on each measure's MeasureExporter and
         appends the output to the <part> object.
 
         In other words, one-stop shopping.
 
-        :attr:`makeNotation` when False, will avoid running `makeNotation` on the Part.
-        Generally this attribute is set on `GeneralObjectExporter` or `ScoreExporter`
-        and read from there. Running with `makeNotation` as False will raise
-        `MusicXMLExportException` if no measures are present in the part.
+        :attr:`makeNotation` when False, will avoid running :meth:`~music21.stream.makeNotation`
+        on the Part. Generally this attribute is set on `GeneralObjectExporter`
+        or `ScoreExporter` and read from there. Running with `makeNotation`
+        as False will raise `MusicXMLExportException` if no measures are present.
 
         >>> from music21.musicxml.m21ToXml import PartExporter
         >>> noMeasures = stream.Part(note.Note())

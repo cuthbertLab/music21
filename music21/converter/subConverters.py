@@ -1015,8 +1015,8 @@ class ConverterMusicXML(SubConverter):
 
         Set `makeNotation=False` to prevent fixing up the notation, and where possible,
         to prevent making additional deepcopies. (This option cannot be used if `obj` is not a
-        :class:`~music21.stream.Score`). `makeNotation=True` generally solves common notation
-        issues, whereas makeNotation=False is intended for advanced users facing
+        :class:`~music21.stream.Score`.) `makeNotation=True` generally solves common notation
+        issues, whereas `makeNotation=False` is intended for advanced users facing
         special cases where speed is a priority or making notation reverses user choices.
 
         Set `compress=True` to immediately compress the output to a .mxl file.
@@ -1035,13 +1035,7 @@ class ConverterMusicXML(SubConverter):
         dataBytes: bytes = b''
         generalExporter = m21ToXml.GeneralObjectExporter(obj)
         generalExporter.makeNotation = makeNotation
-        if makeNotation is False:
-            if 'Score' not in obj.classes:
-                raise SubConverterException('Can only export Scores with makeNotation=False')
-            # bypass deepcopy in GeneralObjectExporter.fromScore()
-            dataBytes = generalExporter.parseWellformedObject(obj)
-        else:
-            dataBytes = generalExporter.parse()
+        dataBytes = generalExporter.parse()
 
         writeDataStreamFp = fp
         if fp is not None and subformats:  # could be empty list
@@ -1518,6 +1512,7 @@ class Test(unittest.TestCase):
     def testWriteMusicXMLMakeNotation(self):
         from music21 import converter
         from music21 import note
+        from music21.musicxml.xmlObjects import MusicXMLExportException
 
         m1 = stream.Measure(note.Note(quarterLength=5.0))
         m2 = stream.Measure()
@@ -1546,7 +1541,7 @@ class Test(unittest.TestCase):
             len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 0)
 
         # makeNotation = False cannot be used on non-scores
-        with self.assertRaises(converter.subConverters.SubConverterException):
+        with self.assertRaises(MusicXMLExportException):
             p.write(makeNotation=False)
 
         for out in (out1, out2):
