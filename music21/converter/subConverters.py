@@ -1517,7 +1517,6 @@ class Test(unittest.TestCase):
     def testWriteMusicXMLMakeNotation(self):
         from music21 import converter
         from music21 import note
-        from .subConverters import SubConverterException as subEx
 
         m1 = stream.Measure(note.Note(quarterLength=5.0))
         m2 = stream.Measure()
@@ -1546,7 +1545,7 @@ class Test(unittest.TestCase):
             len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 0)
 
         # makeNotation = False cannot be used on non-scores
-        with self.assertRaises(subEx):
+        with self.assertRaises(converter.subConverters.SubConverterException):
             p.write(makeNotation=False)
 
         for out in (out1, out2):
