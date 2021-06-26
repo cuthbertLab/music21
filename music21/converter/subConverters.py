@@ -1014,9 +1014,10 @@ class ConverterMusicXML(SubConverter):
         Write to a .musicxml file.
 
         Set `makeNotation=False` to prevent fixing up the notation, and where possible,
-        to prevent making additional deepcopies. (If `obj` is not a
-        :class:`~music21.stream.Score`, `obj` or its elements might still be copied.
-        See :meth:`~music21.musicxml.m21ToXml.GeneralObjectExporter.fromGeneralObject`.)
+        to prevent making additional deepcopies. (This option cannot be used if `obj` is not a
+        :class:`~music21.stream.Score`). `makeNotation=True` generally solves common notation
+        issues, whereas makeNotation=False is intended for advanced users facing
+        special cases where speed is a priority or making notation reverses user choices.
 
         Set `compress=True` to immediately compress the output to a .mxl file.
         '''

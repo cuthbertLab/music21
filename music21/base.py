@@ -2561,7 +2561,8 @@ class Music21Object(prebase.ProtoM21Object):
 
         Some formats, including .musicxml, create a copy of the stream, pack it into a well-formed
         score if necessary, and run :meth:`~music21.stream.Score.makeNotation`. To
-        avoid this when writing .musicxml, use `makeNotation=False`.
+        avoid this when writing .musicxml, use `makeNotation=False`, an advanced option
+        that prioritizes speed but may not guarantee satisfactory notation.
         '''
         if fmt is None:  # get setting in environment
             fmt = environLocal['writeFormat']
@@ -2626,7 +2627,8 @@ class Music21Object(prebase.ProtoM21Object):
 
         Some formats, including .musicxml, create a copy of the stream, pack it into a well-formed
         score if necessary, and run :meth:`~music21.stream.Score.makeNotation`. To
-        avoid this when showing .musicxml, use `makeNotation=False`.
+        avoid this when showing .musicxml, use `makeNotation=False`, an advanced option
+        that prioritizes speed but may not guarantee satisfactory notation.
         '''
         # note that all formats here must be defined in
         # common.VALID_SHOW_FORMATS
