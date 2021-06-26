@@ -406,16 +406,13 @@ class GeneralObjectExporter:
 
     def parseWellformedObject(self, sc) -> bytes:
         '''
-        Parse an object that has usually already gone through the
+        Parse an object that has already gone through the
         `.fromGeneralObject` conversion, which has produced a copy with
-        :meth:`~music21.stream.Score.makeNotation` run on it.
+        :meth:`~music21.stream.Score.makeNotation` run on it
+        (unless :attr:`makeNotation` is False).
 
         Returns bytes.
         '''
-        if not sc.isWellFormedNotation():
-            warnings.warn(f'{sc} is not well-formed; see isWellFormedNotation()',
-                category=MusicXMLWarning)
-
         scoreExporter = ScoreExporter(sc, makeNotation=self.makeNotation)
         scoreExporter.parse()
         return scoreExporter.asBytes()
@@ -457,6 +454,9 @@ class GeneralObjectExporter:
         Copies the input score and runs :meth:`~music21.stream.Score.makeNotation` on the copy.
         '''
         scOut = sc.makeNotation(inPlace=False)
+        if not scOut.isWellFormedNotation():
+            warnings.warn(f'{scOut} is not well-formed; see isWellFormedNotation()',
+                category=MusicXMLWarning)
         # scOut.makeImmutable()
         return scOut
 
