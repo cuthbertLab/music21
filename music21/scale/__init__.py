@@ -50,7 +50,6 @@ __all__ = [
     'TERMINUS_LOW', 'TERMINUS_HIGH',
     'ScaleException', 'Scale',
     'AbstractScale', 'AbstractDiatonicScale', 'AbstractOctatonicScale',
-    'AbstractHarmonicMinorScale', 'AbstractJazzMinorScale', 'AbstractMelodicMinorScale',
     'AbstractCyclicalScale', 'AbstractOctaveRepeatingScale',
     'AbstractRagAsawari', 'AbstractRagMarwa', 'AbstractWeightedHexatonicBlues',
     'ConcreteScale', 'DiatonicScale', 'MajorScale',
@@ -752,6 +751,22 @@ class AbstractDiatonicScale(AbstractScale):
             intervalList = srcList[5:] + srcList[:5]  # a to A
             self.relativeMajorDegree = 3
             self.relativeMinorDegree = 1
+        elif mode == 'harmonic minor':
+            intervalList = srcList[5:] + srcList[:5]  # a to A
+            self.relativeMajorDegree = 3
+            self.relativeMinorDegree = 1
+        elif mode == 'melodic minor':
+            self._net = intervalNetwork.IntervalNetwork(
+                octaveDuplicating=self.octaveDuplicating,
+                pitchSimplification=None)
+            self.relativeMajorDegree = 3
+            self.relativeMinorDegree = 1
+            self._net.fillMelodicMinor()
+            return
+        elif mode == 'jazz minor':
+            intervalList = ['M2', 'm2', 'M2', 'M2', 'M2', 'M2', 'm2']  # a to A
+            self.relativeMajorDegree = 3
+            self.relativeMinorDegree = 1
         elif mode == 'locrian':
             intervalList = srcList[6:] + srcList[:6]  # b to B
             self.relativeMajorDegree = 2
@@ -842,120 +857,6 @@ class AbstractOctatonicScale(AbstractScale):
         # might also set weights for tonic and dominant here
 
 
-class AbstractHarmonicMinorScale(AbstractScale):
-    '''
-    A true bi-directional scale that with the augmented
-    second to a leading tone.
-
-    The harmonic and jazz minor scales are the only to
-    use the "_alteredDegrees" property.
-    '''
-
-    def __init__(self, mode=None):
-        super().__init__()
-        self.type = 'Abstract Harmonic Minor'
-        self.octaveDuplicating = True
-        self.relativeMinorDegree = 1
-        self.relativeMajorDegree = 3
-        self.dominantDegree: int = -1
-        self.buildNetwork()
-
-    def buildNetwork(self):
-        intervalList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2']  # a to A
-        self.tonicDegree = 1
-        self.dominantDegree = 5
-        self._net = intervalNetwork.IntervalNetwork(intervalList,
-                                                    octaveDuplicating=self.octaveDuplicating,
-                                                    pitchSimplification=None)
-
-        # raise the seventh in all directions
-        # 7 here is scale step/degree, not node id
-        self._alteredDegrees[7] = {
-            'direction': intervalNetwork.DIRECTION_BI,
-            'interval': interval.Interval('a1')
-        }
-
-    def getRelativeMajor(self):
-        return MajorScale(self.tonic)
-
-    def getRelativeMinor(self):
-        return MinorScale(self.tonic)
-
-
-class AbstractMelodicMinorScale(AbstractScale):
-    '''
-    A directional scale.
-    '''
-
-    def __init__(self, mode=None):
-        super().__init__()
-        self.type = 'Abstract Melodic Minor'
-        self.octaveDuplicating = True
-        self.relativeMinorDegree = 1
-        self.relativeMajorDegree = 3
-        self.dominantDegree: int = -1
-        self.buildNetwork()
-
-    def buildNetwork(self):
-        self.tonicDegree = 1
-        self.dominantDegree = 5
-        self._net = intervalNetwork.IntervalNetwork(
-            octaveDuplicating=self.octaveDuplicating,
-            pitchSimplification=None)
-        self._net.fillMelodicMinor()
-
-    def getRelativeMajor(self):
-        return MajorScale(self.tonic)
-
-    def getRelativeMinor(self):
-        return MinorScale(self.tonic)
-    
-    
-class AbstractJazzMinorScale(AbstractScale):
-    '''
-    A true bi-directional scale containing the raised
-    6th and 7th scale degrees.
-
-    The harmonic and jazz minor scales are the only to
-    use the "_alteredDegrees" property.
-    '''
-
-    def __init__(self, mode=None):
-        super().__init__()
-        self.type = 'Abstract Jazz Minor'
-        self.relativeMinorDegree = 1
-        self.relativeMajorDegree = 3
-        self.octaveDuplicating = True
-        self.dominantDegree: int = -1
-        self.buildNetwork()
-
-    def buildNetwork(self):
-        intervalList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2']  # a to A
-        self.tonicDegree = 1
-        self.dominantDegree = 5
-        self._net = intervalNetwork.IntervalNetwork(intervalList,
-                                                    octaveDuplicating=self.octaveDuplicating,
-                                                    pitchSimplification=None)
-
-        # raise the sixth and seventh in all directions
-        # 6 and 7 here are both scale step/degree, not node id
-        self._alteredDegrees[6] = {
-            'direction': intervalNetwork.DIRECTION_BI,
-            'interval': interval.Interval('a1')
-        }
-
-        self._alteredDegrees[7] = {
-            'direction': intervalNetwork.DIRECTION_BI,
-            'interval': interval.Interval('a1')
-        }
-
-    def getRelativeMajor(self):
-        return MajorScale(self.tonic)
-
-    def getRelativeMinor(self):
-        return MinorScale(self.tonic)
-
-    
 class AbstractCyclicalScale(AbstractScale):
     '''
     A scale of any size built with an interval list of any form.
@@ -2791,7 +2692,7 @@ class HypophrygianScale(DiatonicScale):
     <music21.pitch.Pitch E4>
     >>> sc.getDominant()
     <music21.pitch.Pitch A4>
-    >>> sc.pitchFromDegree(1)  # scale degree 1 is treated as lowest
+    >>> sc.pitchFromDegree(1)
     <music21.pitch.Pitch B3>
     '''
     def __init__(self, tonic=None):
@@ -2903,7 +2804,7 @@ class HarmonicMinorScale(DiatonicScale):
     <music21.pitch.Pitch E4>
     >>> sc.getDominant()
     <music21.pitch.Pitch B4>
-    >>> sc.pitchFromDegree(1)  # scale degree 1 is treated as lowest
+    >>> sc.pitchFromDegree(1)
     <music21.pitch.Pitch E4>
 
     >>> sc = scale.HarmonicMinorScale()
@@ -2918,12 +2819,7 @@ class HarmonicMinorScale(DiatonicScale):
         super().__init__(tonic=tonic)
         self.type = 'harmonic minor'
 
-        # note: this changes the previously assigned AbstractDiatonicScale
-        # from the DiatonicScale base class
-
-        self._abstract = AbstractHarmonicMinorScale()
-        # network building happens on object creation
-        # self._abstract.buildNetwork()
+        self._abstract.buildNetwork(self.type)
 
 
 class MelodicMinorScale(DiatonicScale):
@@ -2937,17 +2833,16 @@ class MelodicMinorScale(DiatonicScale):
         super().__init__(tonic=tonic)
         self.type = 'melodic minor'
 
-        # note: this changes the previously assigned AbstractDiatonicScale
-        # from the DiatonicScale base class
-        self._abstract = AbstractMelodicMinorScale()
-        
-        
+        self._abstract.buildNetwork(self.type)
+
+
 class JazzMinorScale(DiatonicScale):
     '''
     The jazz minor scale.
-    
+
     A synthetic scale identical to the ascending melodic minor. Useful in
     jazz, especially over harmonies that employ minor-major seventh chords.
+
     >>> sc = scale.JazzMinorScale('e4')
     >>> [str(p) for p in sc.pitches]
     ['E4', 'F#4', 'G4', 'A4', 'B4', 'C#5', 'D#5', 'E5']
@@ -2955,7 +2850,7 @@ class JazzMinorScale(DiatonicScale):
     <music21.pitch.Pitch E4>
     >>> sc.getDominant()
     <music21.pitch.Pitch B4>
-    >>> sc.pitchFromDegree(1)  # scale degree 1 is treated as lowest
+    >>> sc.pitchFromDegree(1)
     <music21.pitch.Pitch E4>
     >>> sc = scale.JazzMinorScale()
     >>> sc.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
@@ -2969,7 +2864,7 @@ class JazzMinorScale(DiatonicScale):
         super().__init__(tonic=tonic)
         self.type = 'jazz minor'
 
-        self._abstract = AbstractJazzMinorScale()
+        self._abstract.buildNetwork(self.type)
 
 
 # ------------------------------------------------------------------------------
