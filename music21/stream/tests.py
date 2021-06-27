@@ -7132,12 +7132,16 @@ class Test(unittest.TestCase):
         s.atSoundingPitch = True
         self.assertEqual(p.atSoundingPitch, 'unknown')
 
+        # Following case fails because we check sites, not containerHierarchy
+        # so the only site is the Part, which is 'unknown' and raises StreamException
+        # m = p.measure(1)
+        # m.toWrittenPitch(inPlace=True)
+        # self.assertEqual(m.notes[0].nameWithOctave, 'G4')
+
         # Can still perform toWrittenPitch by getting the value of atSoundingPitch
         # from the score
         p.toWrittenPitch(inPlace=True)
         self.assertEqual(p.flat.notes[0].nameWithOctave, 'G4')
-        # TODO: test also with measure
-        # fails currently, since _transposeByInstrument doesn't search context for instruments
 
     def testExtendTiesA(self):
         s = Stream()
