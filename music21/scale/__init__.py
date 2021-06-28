@@ -752,7 +752,7 @@ class AbstractDiatonicScale(AbstractScale):
             self.relativeMajorDegree = 3
             self.relativeMinorDegree = 1
         elif mode == 'harmonic minor':
-            intervalList = srcList[5:] + srcList[:5]  # a to A
+            intervalList = ['M2', 'm2', 'M2', 'M2', 'm2', 'A2', 'm2']  # a to A
             self.relativeMajorDegree = 3
             self.relativeMinorDegree = 1
         elif mode == 'melodic minor':
