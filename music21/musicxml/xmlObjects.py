@@ -123,6 +123,10 @@ class MusicXMLImportException(MusicXMLException):
     pass
 
 
+class MusicXMLWarning(UserWarning):
+    pass
+
+
 # ------------------------------------------------------------------------------
 # helpers
 STYLE_ATTRIBUTES_YES_NO_TO_BOOL = ('hideObjectOnPrint', )

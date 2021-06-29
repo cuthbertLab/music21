@@ -4898,7 +4898,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             raise StreamException(f'not a valid at sounding pitch value: {value}')
 
-
     def _transposeByInstrument(self,
                                reverse=False,
                                inPlace=False,
@@ -4918,11 +4917,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             returnObj = self
 
-        # this will change the working Stream; not sure if a problem
-        try:
-            boundaries = returnObj.extendDurationAndGetBoundaries('Instrument')
-        except StreamException:
-            return returnObj  # there are no instruments in the Stream.
+        instrument_stream = returnObj.getInstruments(recurse=True)
+        instrument_stream.duration = returnObj.duration
+        instrument_stream.extendDuration('Instrument', inPlace=True)
 
         # store class filter list for transposition
         if transposeKeySignature:
@@ -4930,21 +4927,62 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             classFilterList = ('Note', 'Chord')
 
-        for k in boundaries:
-            i = boundaries[k]
-            if i.transposition is None:
+        for inst in instrument_stream:
+            if inst.transposition is None:
                 continue
-            start, end = k
-            focus = returnObj.getElementsByOffset(start, end,
-                                                  includeEndBoundary=False, mustFinishInSpan=False,
-                                                  mustBeginInSpan=True).stream()
-            trans = i.transposition
+            start = inst.offset
+            end = start + inst.quarterLength
+            focus = returnObj.flat.getElementsByOffset(
+                start,
+                end,
+                includeEndBoundary=False,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True).stream()
+            trans = inst.transposition
             if reverse:
                 trans = trans.reverse()
             focus.transpose(trans, inPlace=True,
                             classFilterList=classFilterList)
-            # print(k, i.transposition)
+
         return returnObj
+
+    def _treatAtSoundingPitch(self) -> Union[bool, str]:
+        '''
+        `atSoundingPitch` might be True, False, or 'unknown'. Given that
+        setting the property does not automatically synchronize the corresponding
+        property on contained or containing streams, any time a method relying on the
+        value of `atSoundingPitch` such as :meth:`toSoundingPitch` visits a stream,
+        it will need to resolve 'unknown' values or even possibly conflicting values.
+
+        If this stream's `.atSoundingPitch` is 'unknown', this helper method searches
+        this stream's sites until a True or False
+        value for `.atSoundingPitch` is found, since it is possible a user only manipulated
+        the value on the top-level stream.
+
+        Then, contained streams are searched to verify that they do not contain
+        conflicting values (i.e. .atSoundingPitch = True when the container has
+        .atSoundingPitch = False). Conflicting values are resolved by converting
+        the inner streams to written or sounding pitch as necessary to match this
+        stream's value.
+        '''
+        at_sounding = self.atSoundingPitch
+        if self.atSoundingPitch == 'unknown':
+            for site in self.sites:
+                if site.isStream and site.atSoundingPitch != 'unknown':
+                    at_sounding = site.atSoundingPitch
+                    break
+            else:
+                raise StreamException('atSoundingPitch is unknown: cannot transpose')
+
+        for substream in self.recurse(streamsOnly=True, includeSelf=False):
+            if substream.atSoundingPitch == 'unknown':
+                continue
+            if substream.atSoundingPitch is False and at_sounding is True:
+                substream.toSoundingPitch(inPlace=True)
+            elif substream.atSoundingPitch is True and at_sounding is False:
+                substream.toWrittenPitch(inPlace=True)
+
+        return at_sounding
 
     def toSoundingPitch(self, *, inPlace=False):
         # noinspection PyShadowingNames
@@ -5001,27 +5039,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             returnObj = self
 
-        if returnObj.hasPartLikeStreams():
-            for p in returnObj.getElementsByClass('Stream'):
+        if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classSet:
+            for partLike in returnObj.getElementsByClass(Stream):
                 # call on each part
-                p.toSoundingPitch(inPlace=True)
-                returnObj.atSoundingPitch = True
-            return returnObj
+                partLike.toSoundingPitch(inPlace=True)
+            returnObj.atSoundingPitch = True
+            return returnObj if not inPlace else None
 
-        # else...
-        atSoundingPitch = self.atSoundingPitch
-        if atSoundingPitch == 'unknown':
-            for site in self.sites:
-                if hasattr(site, 'atSoundingPitch') and site.atSoundingPitch != 'unknown':
-                    atSoundingPitch = site.atSoundingPitch
-                    break
-            else:
-                raise StreamException('atSoundingPitch is unknown: cannot transpose')
+        at_sounding = returnObj._treatAtSoundingPitch()
 
-        if atSoundingPitch is False:
+        if at_sounding is False:
             # transposition defined on instrument goes from written to sounding
             returnObj._transposeByInstrument(reverse=False, inPlace=True)
-            returnObj.atSoundingPitch = True
+            for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
+                container.atSoundingPitch = True
 
         for ottava in returnObj.recurse().getElementsByClass('Ottava'):
             ottava.performTransposition()
@@ -5063,31 +5094,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             returnObj = self
 
-        if returnObj.hasPartLikeStreams():
-            for partLike in returnObj.getElementsByClass('Stream'):
+        if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classSet:
+            for partLike in returnObj.getElementsByClass(Stream):
                 # call on each part
                 partLike.toWrittenPitch(inPlace=True)
             returnObj.atSoundingPitch = False
-            if inPlace:
-                return None
-            else:
-                return returnObj
+            return returnObj if not inPlace else None
 
-        # else...
-        atSoundingPitch = self.atSoundingPitch
-        if atSoundingPitch == 'unknown':
-            for site in self.sites:
-                if hasattr(site, 'atSoundingPitch') and site.atSoundingPitch != 'unknown':
-                    atSoundingPitch = site.atSoundingPitch
-                    break
-            else:
-                raise StreamException('atSoundingPitch is unknown: cannot transpose')
+        at_sounding = returnObj._treatAtSoundingPitch()
 
-        if atSoundingPitch is True:
-            # transposition defined on instrument goes from written to sounding
+        if at_sounding is True:
             # need to reverse to go to written
             returnObj._transposeByInstrument(reverse=True, inPlace=True)
-            returnObj.atSoundingPitch = False
+            for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
+                container.atSoundingPitch = False
 
         for ottava in returnObj.recurse().getElementsByClass('Ottava'):
             ottava.undoTransposition()
@@ -9442,7 +9462,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return False
         return True
 
-    def isWellFormedNotation(self):
+    def isWellFormedNotation(self) -> bool:
         # noinspection PyShadowingNames
         '''
         Return True if, given the context of this Stream or Stream subclass,

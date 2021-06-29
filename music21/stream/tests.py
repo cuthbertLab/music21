@@ -7090,16 +7090,14 @@ class Test(unittest.TestCase):
         p1.repeatAppend(note.Note('C4'), 4)
         p1.insert(0, i1)
         p1.insert(2, i2)
+        p1.makeMeasures(inPlace=True)
         p2 = Part()
         p2.repeatAppend(note.Note('C4'), 4)
         p2.insert(0, i2)
+        p2.makeMeasures(inPlace=True)
         s = Score()
         s.insert(0, p1)
         s.insert(0, p2)
-
-        self.assertEqual([str(p) for p in p1.pitches], ['C4', 'C4', 'C4', 'C4'])
-        test = p1._transposeByInstrument(inPlace=False)
-        self.assertEqual([str(p) for p in test.pitches], ['F3', 'F3', 'B-3', 'B-3'])
 
         test = p1._transposeByInstrument(inPlace=False, reverse=True)
         self.assertEqual([str(p) for p in test.pitches], ['G4', 'G4', 'D4', 'D4'])
@@ -7123,7 +7121,7 @@ class Test(unittest.TestCase):
         test = p1.toSoundingPitch(inPlace=False)
         self.assertEqual([str(p) for p in test.pitches], ['C4', 'C4', 'C4', 'C4'])
 
-        # declare  at sounding pitch
+        # declare at sounding pitch
         p1.atSoundingPitch = True
         # reverse intervals; app pitches should be upward
         test = p1.toWrittenPitch(inPlace=False)
@@ -7138,11 +7136,23 @@ class Test(unittest.TestCase):
         self.assertEqual([str(p) for p in test.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3'])
 
         # test same in place
-        s.parts[0].atSoundingPitch = False
-        s.parts[1].atSoundingPitch = False
+        self.assertEqual(s.parts[0].atSoundingPitch, False)
+        self.assertEqual(s.parts[1].atSoundingPitch, False)
         s.toSoundingPitch(inPlace=True)
         self.assertEqual([str(p) for p in s.parts[0].pitches], ['F3', 'F3', 'B-3', 'B-3'])
-        self.assertEqual([str(p) for p in test.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3'])
+        self.assertEqual([str(p) for p in s.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3'])
+
+        # mixture of atSoundingPitch=True and False; and unknown top-level
+        s.atSoundingPitch = 'unknown'
+        s.parts[0].atSoundingPitch = True
+        s.parts[1].atSoundingPitch = False
+        for measure in s.parts[1][Measure]:
+            # This was made True, above, and we have no way of knowing we need to
+            # transpose again unless we say so
+            measure.atSoundingPitch = False
+        s.toWrittenPitch(inPlace=True)
+        self.assertEqual([str(p) for p in s.parts[0].pitches], ['C4', 'C4', 'C4', 'C4'])
+        self.assertEqual([str(p) for p in s.parts[1].pitches], ['B-3', 'B-3', 'B-3', 'B-3'])
 
     def testTransposeByPitchB(self):
         from music21.musicxml import testPrimitive
@@ -7162,12 +7172,32 @@ class Test(unittest.TestCase):
         self.assertEqual([str(p) for p in s.parts[1].pitches],
                          ['A4', 'B4', 'C#5', 'D5', 'E5', 'F#5', 'G#5', 'A5'])
 
+        self.assertEqual(s.atSoundingPitch, 'unknown')
         s.toSoundingPitch(inPlace=True)
 
         self.assertEqual([str(p) for p in s.parts[0].pitches],
                          ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'])
         self.assertEqual([str(p) for p in s.parts[1].pitches],
                          ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'])
+
+    def testTransposeByPitchC(self):
+        from music21 import converter, instrument
+        p = converter.parse('tinyNotation: c1 d1')
+        p.insert(0, instrument.Horn())
+        s = Score(p)
+        s.atSoundingPitch = True
+        self.assertEqual(p.atSoundingPitch, 'unknown')
+
+        # Following case fails because we check sites, not containerHierarchy
+        # so the only site is the Part, which is 'unknown' and raises StreamException
+        # m = p.measure(1)
+        # m.toWrittenPitch(inPlace=True)
+        # self.assertEqual(m.notes[0].nameWithOctave, 'G4')
+
+        # Can still perform toWrittenPitch by getting the value of atSoundingPitch
+        # from the score
+        p.toWrittenPitch(inPlace=True)
+        self.assertEqual(p.flat.notes[0].nameWithOctave, 'G4')
 
     def testExtendTiesA(self):
         s = Stream()
@@ -7320,7 +7350,6 @@ class Test(unittest.TestCase):
         <duration>5040</duration>
         <type>eighth</type>
         <stem>up</stem>
-        <beam number="1">begin</beam>
       </note>
       <note>
         <rest/>
@@ -8311,10 +8340,15 @@ class Test(unittest.TestCase):
 
     def testOpusWrite(self):
         import os
+        from music21 import converter
 
         o = Opus()
         s1 = Score()
         s2 = Score()
+        p1 = converter.parse('tinyNotation: 4/4 e1')
+        p2 = converter.parse('tinyNotation: 4/4 f1')
+        s1.append(p1)
+        s2.append(p2)
         o.append([s1, s2])
 
         out = o.write()

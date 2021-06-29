@@ -1397,6 +1397,21 @@ class Ottava(Spanner):
 
     >>> ottava.validOttavaTypes
     ('8va', '8vb', '15ma', '15mb', '22da', '22db')
+
+    OMIT_FROM_DOCS
+
+    Test the round-trip back:
+
+    >>> s3 = s2.toWrittenPitch()
+    >>> s3.show('text')
+    {0.0} <music21.spanner.Ottava 8vb transposing<music21.note.Note D><music21.note.Note E>>
+    {0.0} <music21.note.Note D>
+    {2.0} <music21.note.Note E>
+
+    >>> for n in s3.notes:
+    ...    print(n.nameWithOctave)
+    D4
+    E4
     '''
     validOttavaTypes = ('8va', '8vb', '15ma', '15mb', '22da', '22db')
 
