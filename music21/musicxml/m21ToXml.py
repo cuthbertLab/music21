@@ -1400,7 +1400,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         the main function to call.
 
         If self.stream is empty, call self.emptyObject().  Otherwise,
-
+        convert sounding to written pitch,
         set scorePreliminaries(), call parsePartlikeScore or parseFlatScore, then postPartProcess(),
         clean up circular references for garbage collection, and returns the <score-partwise>
         object.
@@ -1414,6 +1414,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         s = self.stream
         if not s:
             return self.emptyObject()
+
+        if s.atSoundingPitch is True:
+            # A copy was already made or elected NOT to be made.
+            s.toWrittenPitch(inPlace=True)
 
         self.scorePreliminaries()
 
@@ -2434,11 +2438,12 @@ class PartExporter(XMLExporterBase):
 
     def parse(self):
         '''
-        Set up instruments, create a partId (if no good one exists) and sets it on
-        <part>, fixes up the notation (:meth:`fixupNotationFlat` or :meth:`fixupNotationMeasured`,
-        if :attr:`makeNotation` is True),
-        setsIdLocals on spanner bundle. runs parse() on each measure's MeasureExporter and
-        appends the output to the <part> object.
+        Set up instruments, convert sounding pitch to written pitch,
+        create a partId (if no good one exists) and set it on
+        <part>, fixes up the notation
+        (:meth:`fixupNotationFlat` or :meth:`fixupNotationMeasured`),
+        setIdLocals() on spanner bundle. Run parse() on each measure's MeasureExporter and
+        append the output to the <part> object.
 
         In other words, one-stop shopping.
 
@@ -2447,6 +2452,8 @@ class PartExporter(XMLExporterBase):
         on the Part. Generally this attribute is set on `GeneralObjectExporter`
         or `ScoreExporter` and read from there. Running with `makeNotation`
         as False will raise `MusicXMLExportException` if no measures are present.
+        If `makeNotation` is False, the transposition to written pitch is still
+        performed and thus will be done in place.
 
         >>> from music21.musicxml.m21ToXml import PartExporter
         >>> noMeasures = stream.Part(note.Note())
@@ -2457,6 +2464,13 @@ class PartExporter(XMLExporterBase):
         music21.musicxml.xmlObjects.MusicXMLExportException:
         Cannot export with makeNotation=False if there are no measures
         '''
+        # A copy has already been made
+        # unless makeNotation=False, but the user
+        # should have called toWrittenPitch() first
+        # and is explicitly asking for no further copies to be made
+        if self.stream.atSoundingPitch is True:
+            self.stream.toWrittenPitch(inPlace=True)
+
         self.instrumentSetup()
 
         self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
@@ -6239,8 +6253,6 @@ class MeasureExporter(XMLExporterBase):
             return None
         if self.parent.stream is None:
             return None
-        if self.parent.stream.atSoundingPitch is True:
-            return None
 
         m = self.stream
         self.measureOffsetStart = m.getOffsetBySite(self.parent.stream)
@@ -6516,6 +6528,29 @@ class Test(unittest.TestCase):
         tree = scExporter.parse()
         # Measures should have been made
         self.assertIsNotNone(tree.find('.//measure'))
+
+    def testFromSoundingPitch(self):
+        '''
+        A score with mixed sounding and written parts.
+        '''
+        from music21.instrument import Clarinet, Bassoon
+
+        m = stream.Measure([Clarinet(), note.Note('C')])
+        p1 = stream.Part(m)
+        p1.atSoundingPitch = True
+        p2 = stream.Part(stream.Measure([Bassoon(), note.Note()]))
+        s = stream.Score([p1, p2])
+        self.assertEqual(s.atSoundingPitch, 'unknown')
+        gex = GeneralObjectExporter(s)
+        root = ET.fromstring(gex.parse().decode('utf-8'))
+        self.assertEqual(len(root.findall('.//transpose')), 1)
+        self.assertEqual(root.find('.//step').text, 'D')
+
+        s.atSoundingPitch = True
+        gex = GeneralObjectExporter(s)
+        root = ET.fromstring(gex.parse().decode('utf-8'))
+        self.assertEqual(len(root.findall('.//transpose')), 1)
+        self.assertEqual(root.find('.//step').text, 'D')
 
     def testMidiInstrumentNoName(self):
         from music21 import converter, instrument
