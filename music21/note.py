@@ -878,7 +878,7 @@ class NotRest(GeneralNote):
     '''
     Parent class for Note-like objects that are not rests; that is to say
     they have a stem, can be tied, and volume is important.
-    Basically, that's a `Note` or
+    Basically, that's a `Note` or `Chord` or
     `Unpitched` object for now.
     '''
     # unspecified means that there may be a stem, but its orientation
@@ -1130,7 +1130,7 @@ class NotRest(GeneralNote):
     def pitches(self) -> Tuple[pitch.Pitch]:
         '''
         Returns an empty tuple.  (Useful for iterating over NotRests since they
-        include Notes and Chords
+        include Notes and Chords.)
         '''
         return ()
 
