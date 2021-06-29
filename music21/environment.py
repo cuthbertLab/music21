@@ -30,6 +30,7 @@ import tempfile
 import unittest
 
 from typing import Union
+from typing import Optional
 
 import xml.etree.ElementTree as ET
 from xml.sax import saxutils
@@ -432,7 +433,7 @@ class _EnvironmentCore:
             ]:
                 self.__setitem__(name, value)  # use for key checking
 
-    def _checkAccessibility(self, path: Union[str, pathlib.Path]) -> bool:
+    def _checkAccessibility(self, path: Optional[Union[str, pathlib.Path]]) -> bool:
         '''
         Return True if the path exists, is readable and writable.
         '''
