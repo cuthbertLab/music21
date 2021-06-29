@@ -1988,8 +1988,8 @@ class Music21Object(prebase.ProtoM21Object):
         The `className` can be used to specify one or more classes to match.
 
         >>> s = corpus.parse('bwv66.6')
-        >>> m2 = s.parts[0].iter.getElementsByClass('Measure')[2]  # pickup measure
-        >>> m3 = s.parts[0].iter.getElementsByClass('Measure')[3]
+        >>> m2 = s.parts[0].getElementsByClass('Measure')[2]  # pickup measure
+        >>> m3 = s.parts[0].getElementsByClass('Measure')[3]
         >>> m3
         <music21.stream.Measure 3 offset=9.0>
         >>> m3prev = m3.previous()
@@ -2002,7 +2002,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         We'll iterate backwards from the first note of the second measure of the Alto part.
 
-        >>> o = s.parts[1].iter.getElementsByClass('Measure')[2][0]
+        >>> o = s.parts[1].getElementsByClass('Measure')[2][0]
         >>> while o:
         ...    print(o)
         ...    o = o.previous()
@@ -2558,6 +2558,11 @@ class Music21Object(prebase.ProtoM21Object):
         be used.  For most people that is musicxml.
 
         Returns the full path to the file.
+
+        Some formats, including .musicxml, create a copy of the stream, pack it into a well-formed
+        score if necessary, and run :meth:`~music21.stream.Score.makeNotation`. To
+        avoid this when writing .musicxml, use `makeNotation=False`, an advanced option
+        that prioritizes speed but may not guarantee satisfactory notation.
         '''
         if fmt is None:  # get setting in environment
             fmt = environLocal['writeFormat']
@@ -2605,6 +2610,7 @@ class Music21Object(prebase.ProtoM21Object):
         fmt argument or, if not provided, the format set in the user's Environment
 
         Valid formats include (but are not limited to)::
+
             musicxml
             text
             midi
@@ -2618,6 +2624,11 @@ class Music21Object(prebase.ProtoM21Object):
 
         N.B. score.write('lily') returns a bare lilypond file,
         score.show('lily') runs it through lilypond and displays it as a png.
+
+        Some formats, including .musicxml, create a copy of the stream, pack it into a well-formed
+        score if necessary, and run :meth:`~music21.stream.Score.makeNotation`. To
+        avoid this when showing .musicxml, use `makeNotation=False`, an advanced option
+        that prioritizes speed but may not guarantee satisfactory notation.
         '''
         # note that all formats here must be defined in
         # common.VALID_SHOW_FORMATS
@@ -4957,7 +4968,7 @@ class Test(unittest.TestCase):
 #     def testPreviousA(self):
 #         from music21 import corpus
 #         s = corpus.parse('bwv66.6')
-#         o = s.parts[0].iter.getElementsByClass('Measure')[2][1]
+#         o = s.parts[0].getElementsByClass('Measure')[2][1]
 #         i = 20
 #         while o and i:
 #             print(o)

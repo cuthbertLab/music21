@@ -208,7 +208,7 @@ class StreamSearcher:
             if self.recurse:
                 thisStreamIterator = self.streamSearch.recurse()
             else:
-                thisStreamIterator = self.streamSearch.iter
+                thisStreamIterator = self.streamSearch.iter()
 
             if self.filterNotesAndRests:
                 thisStreamIterator = thisStreamIterator.addFilter(

@@ -28,7 +28,6 @@ Low level MuseData conversion is facilitated by the objects in this module and
 
 import unittest
 import os
-import pathlib
 
 from music21 import exceptions21
 from music21.musedata import base12_26

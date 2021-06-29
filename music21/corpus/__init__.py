@@ -53,13 +53,8 @@ __all__ = [
 
 ]
 
-import re
-import os
-import unittest
 
 from music21 import common
-from music21 import converter
-from music21 import exceptions21
 from music21 import metadata
 
 from music21.corpus import chorales

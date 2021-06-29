@@ -983,6 +983,60 @@ class Test(unittest.TestCase):
         l15 = s7.findConsecutiveNotes()
         self.assertSequenceEqual(l15, [])
 
+        # with voices in a measure
+        m = Measure()
+        m.repeatAppend(note.Note(), 4)
+        m.repeatInsert(note.Note(), [0, 1, 2, 3])
+        m.makeVoices(inPlace=True)
+
+        for i, elem in enumerate(list(m.recurse().notes)):
+            elem.transpose(i, inPlace=True)
+
+        consec = m.findConsecutiveNotes()
+
+        self.assertEqual([repr(x) for x in consec],
+            ['<music21.note.Note C>',
+             '<music21.note.Note C#>',
+             '<music21.note.Note D>',
+             '<music21.note.Note E->',
+             'None',
+             '<music21.note.Note E>',
+             '<music21.note.Note F>',
+             '<music21.note.Note F#>',
+             '<music21.note.Note G>',
+             ]
+        )
+
+        # with voices in each of two measures
+        m.insert(meter.TimeSignature('2/4'))
+        p = Part(m)
+        p.makeMeasures(inPlace=True)
+        for mm in list(p[Measure]):
+            mm.makeVoices(inPlace=True)
+        consec2 = p.findConsecutiveNotes()
+
+        expected2 = ['<music21.note.Note C>',
+                     '<music21.note.Note C#>',
+                     'None',
+                     '<music21.note.Note E>',
+                     '<music21.note.Note F>',
+                     'None',
+                     '<music21.note.Note D>',
+                     '<music21.note.Note E->',
+                     'None',
+                     '<music21.note.Note F#>',
+                     '<music21.note.Note G>',
+                     ]
+
+        self.assertEqual([repr(x) for x in consec2], expected2)
+
+        # with two identical parts
+        p2 = copy.deepcopy(p)
+        s = Score([p, p2])
+        consec3 = s.findConsecutiveNotes()
+
+        self.assertEqual([repr(x) for x in consec3], expected2 + ['None'] + expected2)
+
     def testMelodicIntervals(self):
         c4 = note.Note('C4')
         d5 = note.Note('D5')
@@ -994,6 +1048,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(intS1), 2)
         M9 = intS1[0]
         self.assertEqual(M9.niceName, 'Major Ninth')
+
+        self.assertIs(M9.noteStart.activeSite, s1)
 
         # Simple chord example
         ch1 = chord.Chord('C4 E4 G4')
@@ -2220,8 +2276,8 @@ class Test(unittest.TestCase):
         s.replace(n4, n1)
         self.assertEqual([s[0], s[1]], [n3, n1])
 
-        error_msg = f'{n3} already in {s}'
-        with self.assertRaises(StreamException, msg=error_msg):
+        expected = f'{n3} already in {s}'
+        with self.assertRaisesRegex(StreamException, expected):
             s.replace(n4, n3)
 
     def testReplaceA1(self):
@@ -6126,8 +6182,8 @@ class Test(unittest.TestCase):
 
         # try imported
         s = corpus.parse('bwv66.6')
-        p = s.iter.getElementsByClass('Part').first()  # for test, not .parts, use .iter
-        m = p.iter.getElementsByClass('Measure')[2]  # for test, not .getElementsByClass('Measure')
+        p = s.getElementsByClass('Part').first()  # for test, not .parts, use .iter()
+        m = p.iter().getElementsByClass(Measure)[2]  # for test, not .getElementsByClass('Measure')
         rn = m[2]
 
         self.assertEqual(id(rn.activeSite), id(m))
@@ -8048,7 +8104,7 @@ class Test(unittest.TestCase):
         with self.assertRaises(StreamException):
             Stream([n, n])
         with self.assertRaises(StreamException):
-            Stream([n, None, s.iter])
+            Stream([n, None, s.iter()])
 
     # REMOVED: Turns out that it DOES have fermata on every note!
     # def testSchoenbergChordifyFermatas(self):
@@ -8284,10 +8340,15 @@ class Test(unittest.TestCase):
 
     def testOpusWrite(self):
         import os
+        from music21 import converter
 
         o = Opus()
         s1 = Score()
         s2 = Score()
+        p1 = converter.parse('tinyNotation: 4/4 e1')
+        p2 = converter.parse('tinyNotation: 4/4 f1')
+        s1.append(p1)
+        s2.append(p2)
         o.append([s1, s2])
 
         out = o.write()

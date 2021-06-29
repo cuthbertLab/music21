@@ -2201,9 +2201,12 @@ class MeasureParser(XMLParserBase):
         self.nLast = None  # for adding notes to spanners.
 
         # Sibelius 7.1 only puts a <voice> tag on the
-        # first note of a chord, so we need to make sure
-        # that we keep track of the last voice...
-        self.chordVoice = None
+        # first note of a chord, and MuseScore doesn't put one
+        # on <forward> elements for hidden rests, so we need to make sure
+        # that we keep track of the last voice.
+        # there is an effort to translate the voice text to an int, but if that fails (unlikely)
+        # we store whatever we find
+        self.lastVoice = None
         self.fullMeasureRest = False
 
         # for keeping track of full-measureRests.
@@ -2385,7 +2388,7 @@ class MeasureParser(XMLParserBase):
                     meth(mxObj)
 
         if self.useVoices is True:
-            for v in self.stream.iter.voices:
+            for v in self.stream.iter().voices:
                 if v:  # do not bother with empty voices
                     # the musicDataMethods use insertCore, thus the voices need to run
                     # coreElementsChanged
@@ -2563,7 +2566,7 @@ class MeasureParser(XMLParserBase):
                     vIndex = int(vIndex)
                 except ValueError:
                     pass
-                self.chordVoice = vIndex
+                self.lastVoice = vIndex
 
         if isChord is True:  # and isRest is False...?
             n = None  # fo linting
@@ -4343,6 +4346,10 @@ class MeasureParser(XMLParserBase):
             return
 
         mxVoice = mxElement.find('voice')
+
+        # MuseScore doesn't write `<voice>` children on `<forward>` elements,
+        # and Sibelius 7.1 skips it on subsequent chord members, so this might be None
+        # no matter: go on to findM21VoiceFromXmlVoice()
         thisVoice = self.findM21VoiceFromXmlVoice(mxVoice)
         if thisVoice is not None:
             insertStream = thisVoice
@@ -4354,7 +4361,7 @@ class MeasureParser(XMLParserBase):
         '''
         m = self.stream
         if not textStripValid(mxVoice):
-            useVoice = self.chordVoice
+            useVoice = self.lastVoice
             if useVoice is None:
                 environLocal.warn('Cannot put in an element with a missing voice tag when '
                                   + 'no previous voice tag was given.  Assuming voice 1... '
@@ -4362,6 +4369,10 @@ class MeasureParser(XMLParserBase):
                 useVoice = 1
         else:
             useVoice = mxVoice.text.strip()
+            try:
+                self.lastVoice = int(useVoice)
+            except ValueError:
+                self.lastVoice = useVoice
 
         thisVoice = None
         if useVoice in self.voicesById:
@@ -6860,6 +6871,25 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(lh_last.voices), 0)
         self.assertEqual([r.style.hideObjectOnPrint for r in lh_last[note.Rest]], [False] * 3)
+
+    def testHiddenRestImpliedVoice(self):
+        '''
+        MuseScore expects readers to infer the voice context surrounding
+        a <forward> tag.
+        '''
+        from xml.etree.ElementTree import fromstring as EL
+        elStr = '<measure><note><rest/><duration>20160</duration><voice>1</voice></note>'
+        elStr += '<backup><duration>20160</duration></backup>'
+        elStr += '<note><rest/><duration>10080</duration><voice>non-integer-value</voice></note>'
+        elStr += '<forward><duration>10080</duration></forward></measure>'
+        mxMeasure = EL(elStr)
+        MP = MeasureParser(mxMeasure=mxMeasure)
+        MP.parse()
+
+        self.assertEqual(len(MP.stream.voices), 2)
+        self.assertEqual(len(MP.stream.voices[0].elements), 1)
+        self.assertEqual(len(MP.stream.voices[1].elements), 2)
+        self.assertEqual(MP.stream.voices[1].id, 'non-integer-value')
 
     def testMultiDigitEnding(self):
         from music21 import converter

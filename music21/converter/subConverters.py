@@ -786,7 +786,6 @@ class ConverterNoteworthy(SubConverter):
         '''
         Open Noteworthy data (as nwctxt) from a file path.
 
-        >>> import os #_DOCS_HIDE
         >>> nwcTranslatePath = common.getSourceFilePath() / 'noteworthy' #_DOCS_HIDE
         >>> filePath = nwcTranslatePath / 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
         >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt')
@@ -829,7 +828,7 @@ class ConverterMusicXML(SubConverter):
     Users should not need this Object.  Call converter.parse directly
     '''
     registerFormats = ('musicxml', 'xml')
-    registerInputExtensions = ('xml', 'mxl', 'mx', 'musicxml')
+    registerInputExtensions = ('xml', 'mxl', 'musicxml')
     registerOutputExtensions = ('musicxml', 'xml', 'mxl')
     registerOutputSubformatExtensions = {'png': 'png',
                                          'pdf': 'pdf',
@@ -1002,10 +1001,24 @@ class ConverterMusicXML(SubConverter):
 
         return fp
 
-    def write(self, obj, fmt, fp=None, subformats=None,
-              compress=False, **keywords):  # pragma: no cover
+    def write(self,
+              obj,
+              fmt,
+              *,
+              fp=None,
+              subformats=None,
+              makeNotation=True,
+              compress=False,
+              **keywords):  # pragma: no cover
         '''
         Write to a .musicxml file.
+
+        Set `makeNotation=False` to prevent fixing up the notation, and where possible,
+        to prevent making additional deepcopies. (This option cannot be used if `obj` is not a
+        :class:`~music21.stream.Score`.) `makeNotation=True` generally solves common notation
+        issues, whereas `makeNotation=False` is intended for advanced users facing
+        special cases where speed is a priority or making notation reverses user choices.
+
         Set `compress=True` to immediately compress the output to a .mxl file.
         '''
         from music21.musicxml import archiveTools, m21ToXml
@@ -1019,8 +1032,10 @@ class ConverterMusicXML(SubConverter):
             defaults.title = ''
             defaults.author = ''
 
+        dataBytes: bytes = b''
         generalExporter = m21ToXml.GeneralObjectExporter(obj)
-        dataBytes: bytes = generalExporter.parse()
+        generalExporter.makeNotation = makeNotation
+        dataBytes = generalExporter.parse()
 
         writeDataStreamFp = fp
         if fp is not None and subformats:  # could be empty list
@@ -1493,6 +1508,44 @@ class Test(unittest.TestCase):
         mxlPath = s.write('mxl')
         self.assertTrue(str(mxlPath).endswith('.mxl'))
         os.remove(mxlPath)
+
+    def testWriteMusicXMLMakeNotation(self):
+        from music21 import converter
+        from music21 import note
+        from music21.musicxml.xmlObjects import MusicXMLExportException
+
+        m1 = stream.Measure(note.Note(quarterLength=5.0))
+        m2 = stream.Measure()
+        p = stream.Part([m1, m2])
+        s = stream.Score(p)
+
+        self.assertEqual(len(m1.notes), 1)
+        self.assertEqual(len(m2.notes), 0)
+
+        out1 = s.write(makeNotation=True)
+        # 4/4 will be assumed; quarter note will be moved to measure 2
+        roundtrip_back = converter.parse(out1)
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 1)
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 1)
+
+        out2 = s.write(makeNotation=False)
+        roundtrip_back = converter.parse(out2)
+        # 4/4 will not be assumed; quarter note will still be split out from 5.0QL
+        # but it will remain in measure 1
+        # and there will be no rests in measure 2
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 2)
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 0)
+
+        # makeNotation = False cannot be used on non-scores
+        with self.assertRaises(MusicXMLExportException):
+            p.write(makeNotation=False)
+
+        for out in (out1, out2):
+            os.remove(out)
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover

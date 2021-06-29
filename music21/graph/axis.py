@@ -1107,7 +1107,7 @@ class QuarterLengthAxis(PositionAxis):
         elif self.client.recurse:
             sSrc = s.recurse()
         else:
-            sSrc = s.iter
+            sSrc = s.iter()
 
         sSrc = sSrc.getElementsByClass(self.client.classFilterList)
         # get all quarter lengths

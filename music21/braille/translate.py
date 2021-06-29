@@ -26,12 +26,12 @@ calling :meth:`~music21.base.Music21Object.show` on the music.
 Keywords:
 
 
-* **inPlace** (False): If False, then :meth:`~music21.stream.Stream.makeNotation` is called
+* **inPlace** (False): If False, then :meth:`~music21.stream.base.Stream.makeNotation` is called
   on all :class:`~music21.stream.Measure`, :class:`~music21.stream.Part`, and
   :class:`~music21.stream.PartStaff` instances. Copies of those objects are then
   used to transcribe the music. If True, the transcription is done "as is."
   This is useful for strict transcription because
-  sometimes :meth:`~music21.stream.Stream.makeNotation`
+  sometimes :meth:`~music21.stream.base.Stream.makeNotation`
   introduces some unwanted artifacts in the music. However, the music needs
   to be organized into measures for transcription to work.
 * **debug** (False): If True, a braille-english representation of the music is returned. Useful
