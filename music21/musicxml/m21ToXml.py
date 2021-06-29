@@ -2452,6 +2452,8 @@ class PartExporter(XMLExporterBase):
         on the Part. Generally this attribute is set on `GeneralObjectExporter`
         or `ScoreExporter` and read from there. Running with `makeNotation`
         as False will raise `MusicXMLExportException` if no measures are present.
+        If `makeNotation` is False, the transposition to written pitch is still
+        performed and thus will be done in place.
 
         >>> from music21.musicxml.m21ToXml import PartExporter
         >>> noMeasures = stream.Part(note.Note())
@@ -2463,8 +2465,7 @@ class PartExporter(XMLExporterBase):
         Cannot export with makeNotation=False if there are no measures
         '''
         # A copy has already been made
-        # When we merge makeNotation=False, possibly document this as a side effect
-        # but even that case that should be alright: the user
+        # unless makeNotation=False, but the user
         # should have called toWrittenPitch() first
         # and is explicitly asking for no further copies to be made
         if self.stream.atSoundingPitch is True:
