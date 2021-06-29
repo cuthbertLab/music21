@@ -3737,7 +3737,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> p = converter.parse('tinyNotation: c1 d1')
         >>> m = p.measure(2)
         >>> m.insert(0, clef.BassClef())
-        >>> m.getContextByClass(clef.Clef, getElementMethod='getElementAtOrBefore')
+        >>> m.getContextByClass(clef.Clef)
         <music21.clef.BassClef>
 
         Searching before yields the clef in m. 1:
