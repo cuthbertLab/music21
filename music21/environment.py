@@ -1589,10 +1589,12 @@ class Test(unittest.TestCase):
     )
     def testGetDefaultRootTempDir(self):
         import stat
-        import shutil
 
         e = Environment()
         oldScratchDir = e['directoryScratch']
+        oldTempDir = None
+        oldPermission = None
+        newTempDir = None
         try:
             e['directoryScratch'] = None
             oldTempDir = e.getDefaultRootTempDir()
@@ -1602,17 +1604,31 @@ class Test(unittest.TestCase):
             newTempDir = e.getDefaultRootTempDir()
             self.assertIn(f'music21-userid-{os.getuid()}', str(newTempDir))
         finally:
-            # Restore original permissions and original path
-            os.chmod(oldTempDir, oldPermission)
-            e['directoryScratch'] = oldScratchDir
+            # Make sure oldTempDir and oldPermission is set in 'try' block
+            if oldTempDir is not None and oldPermission is not None:
+                # Restore original permissions and original path
+                os.chmod(oldTempDir, oldPermission)
+                e['directoryScratch'] = oldScratchDir
 
-            # If getting OSError while trying to create the directory on the first fallback,
-            # the default temp directory from tempfile.gettempdir() will be return on the second
-            # fallback. We don't want to delete the default temp directory. Therefore we check
-            # it before deleting.
-            if not newTempDir.samefile(tempfile.gettempdir()):
-                shutil.rmtree(newTempDir)
-
+            # Make sure newTempDir is set in 'try' block
+            if newTempDir is not None:
+                # If getting OSError while trying to create the directory on the first fallback,
+                # the default temp directory from tempfile.gettempdir() will be return on the second
+                # fallback. We don't want to delete the default temp directory. Therefore we check
+                # it before deleting.
+                #
+                # For security concerns, we are not sure that newTempDir is always a directory
+                # which can be removed safely. For example, if newTempDir is "/" for unknown reason,
+                # remove newTempDir could potentially destroy an entire hard drive. To avoid this
+                # situation, we check newTempDir first, making sure that newTempDir is an empty
+                # directory which means (1) it's a directory we create in this test or (2) we won't
+                # destroy anything if we delete it, and then delete it with os.rmdir, which could
+                # only delete a empty directory. We don't set an exception-catching block here
+                # because we have checked this directory is empty.
+                tmp = newTempDir.samefile(tempfile.gettempdir())
+                empty = len(os.listdir(newTempDir)) == 0
+                if not tmp and empty:
+                    os.rmdir(newTempDir)
 
 # -----------------------------------------------------------------------------
 
