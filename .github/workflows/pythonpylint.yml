@@ -24,6 +24,7 @@ jobs:
                   pip install -r requirements.txt
                   pip install IPython
                   pip install pylint
+                  pip install astroid==2.5.7
             - name: Lint with pylint
               run: |
                   pylint -j0 music21
