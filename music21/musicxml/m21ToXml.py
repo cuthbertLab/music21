@@ -38,6 +38,7 @@ from music21 import bar
 from music21 import clef
 from music21 import chord  # for typing
 from music21 import duration
+from music21.instrument import Instrument
 from music21 import metadata
 from music21 import note
 from music21 import meter
@@ -2676,17 +2677,16 @@ class PartExporter(XMLExporterBase):
 
         # TODO: part-abbreviation-display
         # TODO: group
+        for inst in self.instrumentStream:
+            if (inst.instrumentName is not None
+                    or inst.instrumentAbbreviation is not None
+                    or inst.midiProgram is not None):
+                mxScorePart.append(self.instrumentToXmlScoreInstrument(inst))
 
-        # TODO: unbounded...
-        i = self.firstInstrumentObject
-
-        if (i.instrumentName is not None or i.instrumentAbbreviation is not None
-                or i.midiProgram is not None):
-            mxScorePart.append(self.instrumentToXmlScoreInstrument(i))
-
-        # TODO: midi-device
-        if i.midiProgram is not None:
-            mxScorePart.append(self.instrumentToXmlMidiInstrument(i))
+        for inst in self.instrumentStream:
+            # TODO: midi-device
+            if inst.midiProgram is not None:
+                mxScorePart.append(self.instrumentToXmlMidiInstrument(inst))
 
         return mxScorePart
 
@@ -2717,7 +2717,7 @@ class PartExporter(XMLExporterBase):
         </score-instrument>
         '''
         mxScoreInstrument = Element('score-instrument')
-        mxScoreInstrument.set('id', str(i.instrumentId))
+        mxScoreInstrument.set('id', i.instrumentId)
         mxInstrumentName = SubElement(mxScoreInstrument, 'instrument-name')
         mxInstrumentName.text = str(i.instrumentName)
         if i.instrumentAbbreviation is not None:
@@ -2746,7 +2746,7 @@ class PartExporter(XMLExporterBase):
         </midi-instrument>
         '''
         mxMidiInstrument = Element('midi-instrument')
-        mxMidiInstrument.set('id', str(i.instrumentId))
+        mxMidiInstrument.set('id', i.instrumentId)
         if i.midiChannel is None:
             i.autoAssignMidiChannel()
             # TODO: allocate channels from a higher level
@@ -3472,7 +3472,13 @@ class MeasureExporter(XMLExporterBase):
             for t in mxTieList:
                 mxNote.append(t)
 
-        # TODO: instrument
+        # instrument tags are necessary when there is more than one
+        if self.parent is not None and len(self.parent.instrumentStream) > 1:
+            closestInstrument = n.getContextByClass(Instrument)
+            if closestInstrument in self.parent.instrumentStream:
+                mxInstrument = SubElement(mxNote, 'instrument')
+                mxInstrument.set('id', closestInstrument.instrumentId)
+
         self.setEditorial(mxNote, n)
         if self.currentVoiceId is not None:
             mxVoice = SubElement(mxNote, 'voice')
@@ -6551,6 +6557,23 @@ class Test(unittest.TestCase):
         root = ET.fromstring(gex.parse().decode('utf-8'))
         self.assertEqual(len(root.findall('.//transpose')), 1)
         self.assertEqual(root.find('.//step').text, 'D')
+
+    def testMultipleInstruments(self):
+        from music21 import instrument
+
+        p = stream.Part([
+            stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
+            stream.Measure([instrument.Flute(), note.Note(type='whole')])
+        ])
+        s = stream.Score(p)
+        scEx = ScoreExporter(s)
+        tree = scEx.parse()
+        self.assertEqual(len(tree.findall('.//score-instrument')), 2)
+        self.assertEqual(len(tree.findall('.//measure/note/instrument')), 2)
+        self.assertEqual(tree.find('.//score-instrument').get('id'),
+                         tree.find('.//measure/note/instrument').get('id'))
+        self.assertNotEqual(tree.find('.//score-instrument').get('id'),
+                            tree.findall('.//measure/note/instrument')[-1].get('id'))
 
     def testMidiInstrumentNoName(self):
         from music21 import converter, instrument
