@@ -2564,9 +2564,11 @@ class PartExporter(XMLExporterBase):
                     and thisInstrument.instrumentId in self.parent.instrumentIdList)):
                 thisInstrument.instrumentIdRandomize()
 
-            # add to list for checking on next part
+            # add to lists for checking on next part
             if self.parent is not None:
                 self.parent.instrumentIdList.append(thisInstrument.instrumentId)
+                if thisInstrument is self.firstInstrumentObject:
+                    self.parent.instrumentList.append(thisInstrument)
 
     def fixupNotationFlat(self):
         '''
