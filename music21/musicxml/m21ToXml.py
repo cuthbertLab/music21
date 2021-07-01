@@ -2684,17 +2684,20 @@ class PartExporter(XMLExporterBase):
         # TODO: group
         for inst in self.instrumentStream:
             # only use the first instance of this class
-            use = self.instrumentStream[type(inst)].first()
-            if (use.instrumentName is not None
-                    or use.instrumentAbbreviation is not None
-                    or use.midiProgram is not None):
-                mxScorePart.append(self.instrumentToXmlScoreInstrument(use))
+            if inst is not self.instrumentStream[type(inst)].first():
+                continue
+            if (inst.instrumentName is not None
+                    or inst.instrumentAbbreviation is not None
+                    or inst.midiProgram is not None):
+                mxScorePart.append(self.instrumentToXmlScoreInstrument(inst))
 
         for inst in self.instrumentStream:
-            use = self.instrumentStream[type(inst)].first()
+            # TODO: disambiguate instrument instance with different midi programs?
+            if inst is not self.instrumentStream[type(inst)].first():
+                continue
             # TODO: midi-device
             if inst.midiProgram is not None:
-                mxScorePart.append(self.instrumentToXmlMidiInstrument(use))
+                mxScorePart.append(self.instrumentToXmlMidiInstrument(inst))
 
         return mxScorePart
 
@@ -3482,10 +3485,10 @@ class MeasureExporter(XMLExporterBase):
 
         # instrument tags are necessary when there is more than one
         if self.parent is not None and len(self.parent.instrumentStream) > 1:
-            closestInstrument = n.getContextByClass(Instrument)
-            if closestInstrument in self.parent.instrumentStream:
-                mxInstrument = SubElement(mxNote, 'instrument')
-                mxInstrument.set('id', closestInstrument.instrumentId)
+            closest_instrument = n.getContextByClass(Instrument)
+            instance_to_use = self.parent.instrumentStream[type(closest_instrument)].first()
+            mxInstrument = SubElement(mxNote, 'instrument')
+            mxInstrument.set('id', instance_to_use.instrumentId)
 
         self.setEditorial(mxNote, n)
         if self.currentVoiceId is not None:
