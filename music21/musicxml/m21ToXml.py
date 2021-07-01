@@ -3484,7 +3484,7 @@ class MeasureExporter(XMLExporterBase):
                 mxNote.append(t)
 
         # instrument tags are necessary when there is more than one
-        if self.parent is not None and len(self.parent.instrumentStream) > 1:
+        if self.parent is not None and len(self.parent.instrumentStream) > 1 and not n.isRest:
             if n._chordAttached:
                 closest_instrument = n._chordAttached.getContextByClass(Instrument)
             else:
