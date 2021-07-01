@@ -3493,7 +3493,7 @@ class MeasureExporter(XMLExporterBase):
             if instance_to_use is None:
                 # exempt coverage, because this is only for safety/unreachable
                 raise MusicXMLExportException(f'Could not find {closest_instrument} for note {n}'
-                    + 'in instrumentStream') # pragma: no cover
+                    + 'in instrumentStream')  # pragma: no cover
             mxInstrument = SubElement(mxNote, 'instrument')
             mxInstrument.set('id', instance_to_use.instrumentId)
 
@@ -6585,9 +6585,9 @@ class Test(unittest.TestCase):
             stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
         ])
         p2 = stream.Part([
-            stream.Measure([instrument.Flute(), note.Note(type='whole')]),
             stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
             stream.Measure([instrument.Flute(), note.Note(type='whole')]),
+            stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
         ])
         s = stream.Score([p1, p2])
         scEx = ScoreExporter(s)
