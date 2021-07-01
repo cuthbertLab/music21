@@ -3485,8 +3485,14 @@ class MeasureExporter(XMLExporterBase):
 
         # instrument tags are necessary when there is more than one
         if self.parent is not None and len(self.parent.instrumentStream) > 1:
-            closest_instrument = n.getContextByClass(Instrument)
+            if n._chordAttached:
+                closest_instrument = n._chordAttached.getContextByClass(Instrument)
+            else:
+                closest_instrument = n.getContextByClass(Instrument)
             instance_to_use = self.parent.instrumentStream[type(closest_instrument)].first()
+            if instance_to_use is None:
+                raise MusicXMLExportException(
+                    f'Could not find {closest_instrument} for note {n} in instrumentStream')
             mxInstrument = SubElement(mxNote, 'instrument')
             mxInstrument.set('id', instance_to_use.instrumentId)
 
