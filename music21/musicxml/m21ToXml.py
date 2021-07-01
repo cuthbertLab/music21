@@ -3492,9 +3492,8 @@ class MeasureExporter(XMLExporterBase):
             instance_to_use = self.parent.instrumentStream[type(closest_instrument)].first()
             if instance_to_use is None:
                 # exempt coverage, because this is only for safety/unreachable
-                # pragma: no cover
-                raise MusicXMLExportException(
-                    f'Could not find {closest_instrument} for note {n} in instrumentStream')
+                raise MusicXMLExportException(f'Could not find {closest_instrument} for note {n}'
+                    + 'in instrumentStream') # pragma: no cover
             mxInstrument = SubElement(mxNote, 'instrument')
             mxInstrument.set('id', instance_to_use.instrumentId)
 
@@ -6580,15 +6579,21 @@ class Test(unittest.TestCase):
     def testMultipleInstruments(self):
         from music21 import instrument
 
-        p = stream.Part([
+        p1 = stream.Part([
             stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
-            stream.Measure([instrument.Flute(), note.Note(type='whole')])
+            stream.Measure([instrument.Flute(), note.Note(type='whole')]),
+            stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
         ])
-        s = stream.Score(p)
+        p2 = stream.Part([
+            stream.Measure([instrument.Flute(), note.Note(type='whole')]),
+            stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
+            stream.Measure([instrument.Flute(), note.Note(type='whole')]),
+        ])
+        s = stream.Score([p1, p2])
         scEx = ScoreExporter(s)
         tree = scEx.parse()
-        self.assertEqual(len(tree.findall('.//score-instrument')), 2)
-        self.assertEqual(len(tree.findall('.//measure/note/instrument')), 2)
+        self.assertEqual(len(tree.findall('.//score-instrument')), 4)
+        self.assertEqual(len(tree.findall('.//measure/note/instrument')), 6)
         self.assertEqual(tree.find('.//score-instrument').get('id'),
                          tree.find('.//measure/note/instrument').get('id'))
         self.assertNotEqual(tree.find('.//score-instrument').get('id'),
