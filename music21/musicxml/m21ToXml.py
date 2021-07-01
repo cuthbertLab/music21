@@ -2542,7 +2542,12 @@ class PartExporter(XMLExporterBase):
         if firstInstId in instIdList or firstInstId is None:  # must have unique ids
             self.firstInstrumentObject.partIdRandomize()  # set new random id
 
+        seenInstrumentClasses = set()
         for thisInstrument in self.instrumentStream:
+            if type(thisInstrument) in seenInstrumentClasses:
+                continue
+            else:
+                seenInstrumentClasses.add(type(thisInstrument))
             if (thisInstrument.midiChannel is None
                     or thisInstrument.midiChannel in self.midiChannelList):
                 try:
@@ -2678,15 +2683,18 @@ class PartExporter(XMLExporterBase):
         # TODO: part-abbreviation-display
         # TODO: group
         for inst in self.instrumentStream:
-            if (inst.instrumentName is not None
-                    or inst.instrumentAbbreviation is not None
-                    or inst.midiProgram is not None):
-                mxScorePart.append(self.instrumentToXmlScoreInstrument(inst))
+            # only use the first instance of this class
+            use = self.instrumentStream[type(inst)].first()
+            if (use.instrumentName is not None
+                    or use.instrumentAbbreviation is not None
+                    or use.midiProgram is not None):
+                mxScorePart.append(self.instrumentToXmlScoreInstrument(use))
 
         for inst in self.instrumentStream:
+            use = self.instrumentStream[type(inst)].first()
             # TODO: midi-device
             if inst.midiProgram is not None:
-                mxScorePart.append(self.instrumentToXmlMidiInstrument(inst))
+                mxScorePart.append(self.instrumentToXmlMidiInstrument(use))
 
         return mxScorePart
 
