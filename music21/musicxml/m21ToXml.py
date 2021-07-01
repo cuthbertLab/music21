@@ -1389,7 +1389,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.joinedGroups: List['StaffGroup'] = []
 
-        self.instrumentList = []
+        self.instrumentIdList = []
         self.midiChannelList = []
 
         self.parts = []
@@ -2505,11 +2505,8 @@ class PartExporter(XMLExporterBase):
 
     def instrumentSetup(self):
         '''
-        sets self.instrumentStream and self.firstInstrumentObject for the stream,
+        Sets self.instrumentStream and self.firstInstrumentObject for the stream,
         checks for a unique midiChannel and then blocks it off from future use.
-
-        Note that there's a deficiency currently that only the first instrument is fully
-        converted.
 
         >>> p = converter.parse('tinyNotation: 4/4 c1 d1 e1')
         >>> p.getElementsByClass('Measure')[0].insert(0, instrument.Clarinet())
@@ -2533,15 +2530,6 @@ class PartExporter(XMLExporterBase):
         self.instrumentStream = self.stream.getInstruments(returnDefault=True, recurse=True)
         self.firstInstrumentObject = self.instrumentStream[0]  # store first, as handled differently
 
-        if self.parent is not None:
-            instIdList = [x.partId for x in self.parent.instrumentList]
-        else:
-            instIdList = [self.stream.id]
-
-        firstInstId = self.firstInstrumentObject.partId
-        if firstInstId in instIdList or firstInstId is None:  # must have unique ids
-            self.firstInstrumentObject.partIdRandomize()  # set new random id
-
         seenInstrumentClasses = set()
         for thisInstrument in self.instrumentStream:
             if type(thisInstrument) in seenInstrumentClasses:
@@ -2560,15 +2548,15 @@ class PartExporter(XMLExporterBase):
             self.midiChannelList.append(thisInstrument.midiChannel)
             # environLocal.printDebug(['midiChannel list', self.midiChannelList])
 
+            # Enforce uniqueness
+            if (thisInstrument.instrumentId is None
+                or (self.parent
+                    and thisInstrument.instrumentId in self.parent.instrumentIdList)):
+                thisInstrument.instrumentIdRandomize()
+
             # add to list for checking on next part
             if self.parent is not None:
-                self.parent.instrumentList.append(thisInstrument)
-            # force this instrument into this part
-            # meterStream is only used here if there are no measures
-            # defined in this part
-
-            if thisInstrument.instrumentId is None:
-                thisInstrument.instrumentIdRandomize()
+                self.parent.instrumentIdList.append(thisInstrument.instrumentId)
 
     def fixupNotationFlat(self):
         '''
