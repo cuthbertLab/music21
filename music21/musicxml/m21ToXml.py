@@ -1389,6 +1389,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.joinedGroups: List['StaffGroup'] = []
 
+        self.instrumentList = []
         self.instrumentIdList = []
         self.midiChannelList = []
 
@@ -2530,6 +2531,15 @@ class PartExporter(XMLExporterBase):
         self.instrumentStream = self.stream.getInstruments(returnDefault=True, recurse=True)
         self.firstInstrumentObject = self.instrumentStream[0]  # store first, as handled differently
 
+        if self.parent is not None:
+            instIdList = [x.partId for x in self.parent.instrumentList]
+        else:
+            instIdList = [self.stream.id]
+
+        firstInstId = self.firstInstrumentObject.partId
+        if firstInstId in instIdList or firstInstId is None:  # must have unique ids
+            self.firstInstrumentObject.partIdRandomize()  # set new random id
+
         seenInstrumentClasses = set()
         for thisInstrument in self.instrumentStream:
             if type(thisInstrument) in seenInstrumentClasses:
@@ -3479,6 +3489,8 @@ class MeasureExporter(XMLExporterBase):
                 closest_instrument = n.getContextByClass(Instrument)
             instance_to_use = self.parent.instrumentStream[type(closest_instrument)].first()
             if instance_to_use is None:
+                # exempt coverage, because this is only for safety/unreachable
+                # pragma: no cover
                 raise MusicXMLExportException(
                     f'Could not find {closest_instrument} for note {n} in instrumentStream')
             mxInstrument = SubElement(mxNote, 'instrument')
