@@ -584,7 +584,7 @@ class GeneralNote(base.Music21Object):
             return None
 
         allText = [ly.text for ly in self.lyrics]
-        return '\n'.join(allText)
+        return '\n'.join([t for t in allText if t is not None])
 
     def _setLyric(self, value: Union[str, Lyric, None]) -> None:
         self.lyrics = []
