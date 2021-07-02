@@ -31,12 +31,17 @@ DESCRIPTION_LONG = """A Toolkit for Computer-Aided Musical Analysis.
                         The development of music21 is supported by the
                         generosity of the Seaver Institute and the NEH."""
 
-INSTALL_REQUIRES = [
-    "chardet",
-    "joblib",
-    "more-itertools",
-    "webcolors",
-]
+min_requirements_path = os.path.join(
+    os.path.dirname(__file__), "requirements-minimum.txt"
+)
+with open(min_requirements_path, 'r') as f:
+    INSTALL_REQUIRES = f.read().splitlines()
+all_requirements_path = os.path.join(os.path.dirname(__file__), "requirements.txt")
+with open(all_requirements_path, 'r') as f:
+    extra_requirements = [
+        req for req in f.read().splitlines() if req not in INSTALL_REQUIRES
+    ]
+    EXTRAS_REQUIRE = {"all": extra_requirements}
 
 
 classifiers = [
@@ -79,6 +84,7 @@ if __name__ == '__main__':
         download_url=f'{download_base}v{m21version}/music21-{m21version}.tar.gz',
         packages=setuptools.find_packages(exclude=['ez_setup']),
         install_requires=INSTALL_REQUIRES,
+        extras_require=EXTRAS_REQUIRE,
         include_package_data=True,
         zip_safe=False,
     )
