@@ -4363,9 +4363,7 @@ class MeasureParser(XMLParserBase):
         if not textStripValid(mxVoice):
             useVoice = self.lastVoice
             if useVoice is None:
-                # # Commenting this out -- this is very common with SmartScore OMR software.
-                environLocal.printDebug(
-                    'Cannot put in an element with a missing voice tag when '
+                environLocal.warn('Cannot put in an element with a missing voice tag when '
                     + 'no previous voice tag was given.  Assuming voice 1... '
                 )
                 useVoice = 1
