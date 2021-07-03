@@ -130,9 +130,10 @@ class ChordBase(note.NotRest):
 
     def __eq__(self, other):
         '''
-        True if the Chord passes all `super()`
-        equality tests and the pitches are the same
-        (possibly in a different order)
+        True if the ChordBase passes all `super()`
+        equality tests and the pitches
+        (or display pitches, for Unpitched objects)
+        are the same (but possibly in a different order).
 
         >>> c1 = chord.Chord('C4 E4 G4')
         >>> c2 = chord.Chord('E4 C4 G4')
@@ -219,7 +220,7 @@ class ChordBase(note.NotRest):
                     newNote = note.Note(n)
                 self._notes.append(newNote)
                 # self._notes.append({'pitch':n})
-            elif isinstance(n, Chord):
+            elif isinstance(n, ChordBase):
                 for newNote in n._notes:
                     self._notes.append(copy.deepcopy(newNote))
                 if quickDuration is True:

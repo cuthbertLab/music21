@@ -3795,7 +3795,7 @@ class MeasureExporter(XMLExporterBase):
         ...     MEX.dump(n)
         <note>
           <unpitched>
-            <display-step>C</display-step>
+            <display-step>B</display-step>
             <display-octave>4</display-octave>
           </unpitched>
           <duration>10080</duration>
@@ -3804,7 +3804,7 @@ class MeasureExporter(XMLExporterBase):
         <note>
           <chord />
           <unpitched>
-            <display-step>C</display-step>
+            <display-step>B</display-step>
             <display-octave>4</display-octave>
           </unpitched>
           <duration>10080</duration>
@@ -5896,6 +5896,8 @@ class MeasureExporter(XMLExporterBase):
               <staff-lines>3</staff-lines>
         </staff-details>
         '''
+        # TODO: number lines from the bottom and hide others as necessary
+        # see: https://github.com/w3c/musicxml/issues/351
         # TODO: number (bigger issue)
         # TODO: show-frets
         # TODO: print-spacing

@@ -3033,7 +3033,7 @@ class MeasureParser(XMLParserBase):
         'E'
         >>> n.displayOctave
         5
-        >>> n.midi
+        >>> n.displayPitch().midi
         76
         '''
         if inputM21 is None:

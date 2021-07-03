@@ -1462,7 +1462,7 @@ class Note(NotRest):
     @property
     def pitches(self) -> Tuple[pitch.Pitch]:
         '''
-        Return the :class:`~music21.pitch.Pitch` objects in a tuple.
+        Return the single :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
         that found on :class:`~music21.chord.Chord` so that `[c.pitches for c in s.notes]`
         provides a consistent interface for all objects.
@@ -1629,12 +1629,13 @@ class Unpitched(NotRest):
 
     >>> unp = note.Unpitched()
 
-    Unpitched elements have displayStep and displayOctave
-    which shows where they should be displayed, but they do not have pitch
+    Unpitched elements have :attr:`displayStep` and :attr:`displayOctave`,
+    which shows where they should be displayed as if the staff were a
+    5-line staff in treble clef, but they do not have pitch
     objects:
 
     >>> unp.displayStep
-    'C'
+    'B'
     >>> unp.displayOctave
     4
     >>> unp.displayStep = 'G'
@@ -1646,14 +1647,12 @@ class Unpitched(NotRest):
     def __init__(self, displayName=None, **keywords):
         super().__init__(**keywords)
 
-        self.displayStep: str = 'C'
+        self.displayStep: str = 'B'
         self.displayOctave: int = 4
         if displayName:
             display_pitch = pitch.Pitch(displayName)
             self.displayStep = display_pitch.step
             self.displayOctave = display_pitch.octave
-
-        self._storedInstrument = None
 
     def __eq__(self, other):
         if not super().__eq__(other):
@@ -1689,20 +1688,6 @@ class Unpitched(NotRest):
         p.step = self.displayStep
         p.octave = self.displayOctave
         return p
-
-    @property
-    def midi(self) -> int:
-        '''
-        Returns the MIDI pitch corresponding to the stored display pitch.
-
-        >>> unp = note.Unpitched('D4')
-        >>> unp.midi
-        62
-        >>> unp2 = note.Unpitched()
-        >>> unp2.midi
-        60
-        '''
-        return self.displayPitch().midi
 
     @property
     def displayName(self) -> str:
