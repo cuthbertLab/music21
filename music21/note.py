@@ -1876,7 +1876,7 @@ class Test(unittest.TestCase):
         self.assertEqual(matchStr, outStr)
         i = 0
         for thisNote in note1.splitAtDurations():
-            matchSub = matchStr.split('\n')[i]
+            matchSub = matchStr.split('\n')[i]  # pylint: disable=use-maxsplit-arg
             conv = LilypondConverter()
             conv.appendM21ObjectToContext(thisNote)
             outStr = str(conv.context).replace(' ', '').strip()
