@@ -4362,10 +4362,10 @@ class MeasureParser(XMLParserBase):
         m = self.stream
         if not textStripValid(mxVoice):
             useVoice = self.lastVoice
-            if useVoice is None:
-                environLocal.warn('Cannot put in an element with a missing voice tag when '
-                                  + 'no previous voice tag was given.  Assuming voice 1... '
-                                  )
+            if useVoice is None:  # pragma: no cover
+                environLocal.warn(
+                    'Cannot put in an element with a missing voice tag when '
+                    + 'no previous voice tag was given.  Assuming voice 1... ')
                 useVoice = 1
         else:
             useVoice = mxVoice.text.strip()
