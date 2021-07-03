@@ -315,10 +315,22 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Returns `self` without any changes.
 
-        TODO: manage and emit DeprecationWarnings in v.8
-        TODO: remove in v.9
+        TODO: remove in v.8
         '''
+        self._cache.pop('sortedByProperty', None)
         return self
+
+    def __del__(self):
+        '''
+        Temporary means of emitting a DeprecationWarning once per stream per session
+        if .sorted was called rather than .sorted()
+
+        TODO: remove in v.8
+        '''
+        if self._cache.get('sortedByProperty', None) and not self._cache.get('sorted', None):
+            raise StreamDeprecationWarning(
+                f'sorted (called on {self}) is deprecated in favor of sorted() and '
+                + 'will be removed in v.8')
 
     def _reprInternal(self):
         if self.id is not None:
@@ -7299,10 +7311,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         priority, then classSortOrder (so that, for instance, a Clef at offset 0 appears before
         a Note at offset 0)
 
-        if this Stream is not flat, then only the highest elements are sorted.  To sort all,
-        run myStream.flat.sorted()
+        If this Stream is not flat, then only the highest elements are sorted.  To sort all,
+        run myStream.flat.sorted().
 
-        For instance, here is an unsorted Stream
+        Calling `.sorted` as a property will be disabled in v.8 when this property will become
+        a method instead. These examples model the intended usage as of v.7 to call
+        `.sorted()`.
+
+        For instance, here is an unsorted Stream:
 
         >>> s = stream.Stream()
         >>> s.autoSort = False  # if True, sorting is automatic
@@ -7383,6 +7399,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # isSorted attribute and sort only if not already sorted
             s.sort()
             self._cache['sorted'] = s
+        self._cache['sortedByProperty'] = True
         return self._cache['sorted']
 
     def _getFlatOrSemiFlat(self, retainContainers=False):
