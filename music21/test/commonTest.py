@@ -15,6 +15,7 @@ Things that are common to testing...
 from unittest.signals import registerResult
 
 import doctest
+import importlib
 import os
 import types
 import unittest.runner
@@ -23,13 +24,6 @@ import warnings
 import music21
 from music21 import environment
 from music21 import common
-
-# import importlib
-with warnings.catch_warnings():
-    warnings.simplefilter('ignore', DeprecationWarning)
-    warnings.simplefilter('ignore', PendingDeprecationWarning)
-    import imp
-
 
 environLocal = environment.Environment('test.commonTest')
 
@@ -362,17 +356,11 @@ class ModuleGather:
         if skip:
             return None
 
-        name = self._getName(fp)
-        # for importlib
-        # name = self._getNamePeriod(fp, addM21=True)
+        name = self._getNamePeriod(fp, addM21=True)
 
         # print(name, os.path.dirname(fp))
         try:
-            with warnings.catch_warnings():
-                # warnings.simplefilter('ignore', RuntimeWarning)
-                # importlib is messing with coverage...
-                mod = imp.load_source(name, fp)
-                # mod = importlib.import_module(name)
+            mod = importlib.import_module(name)
         except Exception as excp:  # pylint: disable=broad-except
             environLocal.warn(['failed import:', fp, '\n',
                                '\tEXCEPTION:', str(excp).strip()])
