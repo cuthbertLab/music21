@@ -424,7 +424,7 @@ def makeMeasures(
         else:
             srcObj = s.flat
         if not srcObj.isSorted:
-            srcObj = srcObj.sorted
+            srcObj = srcObj.sorted()
         if not inPlace:
             srcObj = copy.deepcopy(srcObj)
         voiceCount = len(srcObj.voices)
@@ -682,7 +682,7 @@ def makeMeasures(
         if post.isSorted:
             postSorted = post
         else:
-            postSorted = post.sorted
+            postSorted = post.sorted()
 
         for e in postSorted:
             # may need to handle spanners; already have s as site
