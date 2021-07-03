@@ -27,9 +27,7 @@ Tests for :mod:`music21.mei.base`.
 # pylint: disable=maybe-no-member
 
 # pylint: disable=ungrouped-imports
-# pylint: disable=redefined-builtin
 # pylint: disable=import-error
-# pylint: disable=unused-import
 import unittest
 
 # To have working MagicMock objects, we can't use cElementTree even though it would be faster.
@@ -56,8 +54,7 @@ from music21 import spanner
 from music21 import stream
 from music21 import tie
 
-# Importing from base.py
-import music21.mei.base as base  # pylint: disable=useless-import-alias
+from music21.mei import base
 from music21.mei.base import _XMLID
 from music21.mei.base import MEI_NS
 
