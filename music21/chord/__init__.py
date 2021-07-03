@@ -363,7 +363,7 @@ class ChordBase(note.NotRest):
                 removeItem))
         if 'Pitch' in removeItem.classes:
             for n in self._notes:
-                if n.pitch == removeItem:
+                if hasattr(n, 'pitch') and n.pitch == removeItem:
                     self._notes.remove(n)
                     self.clearCache()
                     return
