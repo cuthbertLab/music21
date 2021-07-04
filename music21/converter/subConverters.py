@@ -551,7 +551,7 @@ class ConverterTextLine(SubConverter):
 
     >>> s = corpus.parse('bwv66.6')
     >>> s.measures(1, 4).show('textline')
-    "{0.0} <music21.stream.Part Soprano> / {0.0} <music21.instrument.Instrument '... 1'>..."
+    "{0.0} <music21.stream.Part Soprano> / {0.0} <music21.instrument.Piano '... 1'>..."
     '''
     registerFormats = ('textline',)
     registerOutputExtensions = ('txt',)

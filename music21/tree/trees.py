@@ -525,9 +525,9 @@ class ElementTree(core.AVLTree):
             Payload:<music21.key.Key of f# minor>>
         <ElementNode: Start:0.0 <0.0...>   Indices:(l:0 *6* r:12) Payload:<music21.clef.TrebleClef>>
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *3* r:6)
-            Payload:<music21.instrument.Instrument 'P3: Tenor: Instrument 3'>>
+            Payload:<music21.instrument.Piano 'P3: Tenor: Instrument 3'>>
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *1* r:3)
-            Payload:<music21.instrument.Instrument 'P1: Soprano: Instrument 1'>>
+            Payload:<music21.instrument.Piano 'P1: Soprano: Instrument 1'>>
         <ElementNode: Start:0.0 <0.-30...> Indices:(l:0 *0* r:1)
             Payload:<music21.metadata.Metadata object at 0x104adbdd8>>
 
