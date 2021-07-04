@@ -1940,7 +1940,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
     @mock.patch('music21.mei.base._guessTuplets')
-    def testUnit1aLayerFromElemen(self, mockTuplets, mockVoice, mockNoteFromElement):
+    def testUnit1aLayerFromElement(self, mockTuplets, mockVoice, mockNoteFromElement):
         '''
         layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
                             mapping works; that tags not in the mapping are ignored; and that a
@@ -1983,7 +1983,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
     @mock.patch('music21.mei.base._guessTuplets')
-    def testUnit1bLayerFromElemen(self, mockTuplets, mockVoice, mockNoteFromElement):
+    def testUnit1bLayerFromElement(self, mockTuplets, mockVoice, mockNoteFromElement):
         '''
         Same as testUnit1a() *but* with ``overrideN`` provided.
         '''
@@ -2584,7 +2584,7 @@ class Test(unittest.TestCase):
 
     @mock.patch('music21.mei.base._timeSigFromAttrs')
     @mock.patch('music21.mei.base._keySigFromAttrs')
-    def testUnit1ScoreDefFromElemen(self, mockKey, mockTime):
+    def testUnit1ScoreDefFromElement(self, mockKey, mockTime):
         '''
         scoreDefFromElement(): proper handling of the following attributes (see function docstring
             for more information).
