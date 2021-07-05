@@ -5237,7 +5237,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def getInstrument(self,
                       *,
                       searchActiveSite=True,
-                      returnDefault=True) -> Optional['music21.instrument.Instrument']:
+                      returnDefault=True,
+                      recurse=False) -> Optional['music21.instrument.Instrument']:
         '''
         Return the first Instrument found in this Stream, or None.
 
@@ -5260,9 +5261,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'Violin'
         >>> p2.getInstrument(returnDefault=False).instrumentName
         'Viola'
+
+        Changed in v.7 -- added `recurse` (default False)
         '''
         post = self.getInstruments(searchActiveSite=searchActiveSite,
-                                   returnDefault=returnDefault)
+                                   returnDefault=returnDefault,
+                                   recurse=recurse)
         return post.first()
 
     def getClefs(self, searchActiveSite=False, searchContext=True,

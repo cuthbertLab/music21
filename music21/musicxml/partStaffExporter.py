@@ -131,7 +131,10 @@ class PartStaffExporterMixin:
         >>> len(staffTags)
         2
         '''
-        self.joinedGroups = self.joinableGroups()
+        # starting with v.7, self.joinedGroups is already set earlier
+        # but check to be safe
+        if not self.joinedGroups:
+            self.joinedGroups = self.joinableGroups()
         for group in self.joinedGroups:
             self.addStaffTagsMultiStaffParts(group)
             self.movePartStaffMeasureContents(group)

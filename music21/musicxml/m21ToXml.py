@@ -22,7 +22,7 @@ import unittest
 import warnings
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement, ElementTree
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 # external dependencies
 import webcolors
@@ -38,7 +38,7 @@ from music21 import bar
 from music21 import clef
 from music21 import chord  # for typing
 from music21 import duration
-from music21.instrument import Instrument
+from music21.instrument import Instrument, deduplicate
 from music21 import metadata
 from music21 import note
 from music21 import meter
@@ -1388,6 +1388,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.partExporterList: List['PartExporter'] = []
 
         self.joinedGroups: List['StaffGroup'] = []
+        # key = id(stream) (NB: not stream.id); value = .instrumentStream
+        self.instrumentsByStream: Dict[int, stream.Stream] = {}
 
         self.instrumentList = []
         self.instrumentIdList = []
@@ -1424,6 +1426,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.scorePreliminaries()
 
         if s.hasPartLikeStreams():
+            # Prepopulate partExporterList so that joinable groups can be identified
+            # before attempting to identify and count instruments
+            self._populatePartExporterList()
+            self.joinedGroups = self.joinableGroups()
             self.parsePartlikeScore()
         else:
             self.parseFlatScore()
@@ -1593,25 +1599,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.scoreLayouts = scoreLayouts
         self.firstScoreLayout = scoreLayout
 
-    def parsePartlikeScore(self):
-        '''
-        Called by .parse() if the score has individual parts.
-
-        Calls makeRests() for the part (if `ScoreExporter.makeNotation` is True),
-        then creates a `PartExporter` for each part, and runs .parse() on that part.
-        Appends the PartExporter to `self.partExporterList`
-        and runs .parse() on that part. Appends the PartExporter to self.
-
-        Hide rests created at this late stage.
-
-        >>> v = stream.Voice(note.Note())
-        >>> m = stream.Measure([meter.TimeSignature(), v])
-        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter(m)
-        >>> out = GEX.parse()  # out is bytes
-        >>> outStr = out.decode('utf-8')  # now is string
-        >>> '<note print-object="no" print-spacing="yes">' in outStr
-        True
-        '''
+    def _populatePartExporterList(self):
         if self.makeNotation:
             # self.parts is a stream of parts
             # hide any rests created at this late stage, because we are
@@ -1633,8 +1621,31 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
             pp = PartExporter(innerStream, parent=self)
             pp.spannerBundle = self.spannerBundle
-            pp.parse()
             self.partExporterList.append(pp)
+
+    def parsePartlikeScore(self):
+        '''
+        Called by .parse() if the score has individual parts.
+
+        Calls makeRests() for the part (if `ScoreExporter.makeNotation` is True),
+        then creates a `PartExporter` for each part, and runs .parse() on that part.
+        Appends the PartExporter to `self.partExporterList`
+        and runs .parse() on that part. Appends the PartExporter to self.
+
+        Hide rests created at this late stage.
+
+        >>> v = stream.Voice(note.Note())
+        >>> m = stream.Measure([meter.TimeSignature(), v])
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter(m)
+        >>> out = GEX.parse()  # out is bytes
+        >>> outStr = out.decode('utf-8')  # now is string
+        >>> '<note print-object="no" print-spacing="yes">' in outStr
+        True
+        '''
+        if not self.partExporterList:
+            self._populatePartExporterList()
+        for part_ex in self.partExporterList:
+            part_ex.parse()
 
     def parseFlatScore(self):
         '''
@@ -2528,7 +2539,10 @@ class PartExporter(XMLExporterBase):
         {4.0} <music21.instrument.BassClarinet 'Bass clarinet'>
         '''
         # get a default instrument if not assigned
-        self.instrumentStream = self.stream.getInstruments(returnDefault=True, recurse=True)
+        if self.parent is not None and id(self.stream) in self.parent.instrumentsByStream:
+            self.instrumentStream = self.parent.instrumentsByStream[id(self.stream)]
+        else:
+            self.instrumentStream = self.stream.getInstruments(returnDefault=True, recurse=True)
         self.firstInstrumentObject = self.instrumentStream[0]  # store first, as handled differently
 
         if self.parent is not None:
@@ -2539,6 +2553,22 @@ class PartExporter(XMLExporterBase):
         firstInstId = self.firstInstrumentObject.partId
         if firstInstId in instIdList or firstInstId is None:  # must have unique ids
             self.firstInstrumentObject.partIdRandomize()  # set new random id
+
+        if self.parent is not None:
+            groups = self.parent.joinedGroups
+        else:
+            groups = []
+        for joined_group in groups:
+            if joined_group.isFirst(self.stream):
+                # need to insert instruments from subsequent staffs
+                for subseq_staff in joined_group[1:]:
+                    other_insts = subseq_staff.getInstruments(returnDefault=True, recurse=True)
+                    self.instrumentStream += other_insts
+                    deduplicate(self.instrumentStream, inPlace=True)
+                    # Place a reference to this instrument stream in a place
+                    # where subsequent staffs entering this method will find and use it
+                    if self.parent:
+                        self.parent.instrumentsByStream[id(subseq_staff)] = self.instrumentStream
 
         seenInstrumentClasses = set()
         for thisInstrument in self.instrumentStream:
