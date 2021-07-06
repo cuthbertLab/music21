@@ -2484,10 +2484,6 @@ class PartExporter(XMLExporterBase):
         if self.stream.atSoundingPitch is True:
             self.stream.toWrittenPitch(inPlace=True)
 
-        self.instrumentSetup()
-
-        self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
-
         # Split complex durations in place
         self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
@@ -2501,6 +2497,12 @@ class PartExporter(XMLExporterBase):
                 'Cannot export with makeNotation=False if there are no measures')
         # make sure that all instances of the same class have unique ids
         self.spannerBundle.setIdLocals()
+
+        # must do after fixupNotation, since instrument instances may be created anew!
+        self.instrumentSetup()
+
+        self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
+
         for m in self.stream.getElementsByClass(stream.Measure):
             self.addDividerComment('Measure ' + str(m.number))
             measureExporter = MeasureExporter(m, parent=self)
@@ -2569,6 +2571,12 @@ class PartExporter(XMLExporterBase):
                     # where subsequent staffs entering this method will find and use it
                     if self.parent:
                         self.parent.instrumentsByStream[id(subseq_staff)] = self.instrumentStream
+            elif self.stream in joined_group:
+                # This stream was already processed
+                # UNLESS there is a spaghetti case where
+                # this stream is second in groupB, but first in groupA,
+                # but PartStaffExporterMixin guarantees that won't happen
+                return
 
         seenInstrumentClasses = set()
         for thisInstrument in self.instrumentStream:
@@ -3515,16 +3523,19 @@ class MeasureExporter(XMLExporterBase):
 
         # instrument tags are necessary when there is more than one
         if self.parent is not None and len(self.parent.instrumentStream) > 1 and not n.isRest:
-            if n._chordAttached:
-                closest_instrument = n._chordAttached.getContextByClass(Instrument)
+            if chordParent:
+                closest_inst = chordParent.getContextByClass(Instrument, followDerivation=False)
+                assert closest_inst in self.parent.instrumentStream
             else:
-                closest_instrument = n.getContextByClass(Instrument)
-            instance_to_use = self.parent.instrumentStream[type(closest_instrument)].first()
+                closest_inst = n.getContextByClass(Instrument, followDerivation=False)
+                assert closest_inst in self.parent.instrumentStream
+            instance_to_use = self.parent.instrumentStream[type(closest_inst)].first()
             if instance_to_use is None:
                 # exempt coverage, because this is only for safety/unreachable
-                raise MusicXMLExportException(f'Could not find {closest_instrument} for note {n}'
+                raise MusicXMLExportException(f'Could not find {closest_inst} for note {n}'
                     + 'in instrumentStream')  # pragma: no cover
             mxInstrument = SubElement(mxNote, 'instrument')
+            assert instance_to_use.instrumentId, id(instance_to_use)
             mxInstrument.set('id', instance_to_use.instrumentId)
 
         self.setEditorial(mxNote, n)
