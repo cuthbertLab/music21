@@ -2572,7 +2572,7 @@ class PartExporter(XMLExporterBase):
                     if self.parent:
                         self.parent.instrumentsByStream[id(subseq_staff)] = self.instrumentStream
             elif self.stream in joined_group:
-                # This stream was already processed
+                # This stream was already (or will be) processed
                 # UNLESS there is a spaghetti case where
                 # this stream is second in groupB, but first in groupA,
                 # but PartStaffExporterMixin guarantees that won't happen
