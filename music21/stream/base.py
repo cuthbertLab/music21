@@ -4919,7 +4919,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         instrument_stream = returnObj.getInstruments(recurse=True)
         instrument_stream.duration = returnObj.duration
-        instrument_stream.extendDuration('Instrument', inPlace=True)
+        # inPlace=False here because we are only doing calculations
+        # toWrittenPitch() shouldn't be inserting extra instruments
+        instrument_stream = instrument_stream.extendDuration('Instrument', inPlace=False)
 
         # store class filter list for transposition
         if transposeKeySignature:
