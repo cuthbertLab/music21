@@ -7014,6 +7014,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testFiles.tabTest)
         metro = s.recurse().getElementsByClass('MetronomeMark').first()
         self.assertEqual(metro.style.absoluteY, 40)
+        self.assertEqual(metro.positionPlacement, 'above')
 
 
 if __name__ == '__main__':
