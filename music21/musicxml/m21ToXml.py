@@ -5331,6 +5331,10 @@ class MeasureExporter(XMLExporterBase):
                 te.offset = ti.offset
                 unused_mxDirectionText = self.textExpressionToXml(te)
 
+        if ti.placement is not None:
+            assert ti.placement in {'above', 'below'}
+            mxDirection.set('placement', ti.placement)
+
         return mxDirection
 
     def rehearsalMarkToXml(self, rm):

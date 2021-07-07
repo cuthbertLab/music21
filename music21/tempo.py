@@ -376,9 +376,12 @@ class MetronomeMark(TempoIndication):
     True
     >>> tm2.number
     144
+
+    If placement is given, it must be either 'above' or 'below' and will force
+    metronome mark to be placed either above or below the staff
     '''
 
-    def __init__(self, text=None, number=None, referent=None, parentheses=False):
+    def __init__(self, text=None, number=None, referent=None, parentheses=False, placement=None):
         super().__init__()
 
         if number is None and isinstance(text, int):
@@ -397,6 +400,10 @@ class MetronomeMark(TempoIndication):
 
         # TODO: style??
         self.parentheses = parentheses
+
+        if placement is not None:
+            assert placement in {'above', 'below'}
+        self.placement = placement
 
         self._referent = None  # set with property
         if referent is None:
@@ -1666,4 +1673,3 @@ _DOC_ORDER = [MetronomeMark, TempoText, MetricModulation, TempoIndication,
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testStylesAreShared')
-
