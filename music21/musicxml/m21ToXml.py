@@ -5331,7 +5331,7 @@ class MeasureExporter(XMLExporterBase):
                 te.offset = ti.offset
                 unused_mxDirectionText = self.textExpressionToXml(te)
 
-        if ti.placement is not None:
+        if hasattr(ti, 'placement') and ti.placement is not None:
             assert ti.placement in {'above', 'below'}
             mxDirection.set('placement', ti.placement)
 

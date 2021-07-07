@@ -903,6 +903,8 @@ class MetricModulation(TempoIndication):
         # showing parens or not
         self.parentheses = False
 
+        self.placement = None
+
         # store two MetronomeMark objects
         self._oldMetronome = None
         self._newMetronome = None
