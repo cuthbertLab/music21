@@ -4957,6 +4957,10 @@ class MeasureParser(XMLParserBase):
             if paren == 'yes':
                 mm.parentheses = True
 
+        placement = mxMetronome.get('placement')
+        if placement is not None:
+            mm.positionPlacement = placement
+
         _synchronizeIds(mxMetronome, mm)
         self.setPosition(mxMetronome, mm)
         return mm
