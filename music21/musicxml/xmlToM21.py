@@ -4809,6 +4809,8 @@ class MeasureParser(XMLParserBase):
         elif tag == 'metronome':
             mm = self.xmlToTempoIndication(mxDir)
             # SAX was offsetMeasureNote; bug? should be totalOffset???
+            _setAttributeFromAttribute(mm, mxDirection,
+                            'placement', 'positionPlacement')
             self.insertCoreAndRef(totalOffset, staffKey, mm)
             self.setEditorial(mxDirection, mm)
 
@@ -4956,10 +4958,6 @@ class MeasureParser(XMLParserBase):
         if paren is not None:
             if paren == 'yes':
                 mm.parentheses = True
-
-        placement = mxMetronome.get('placement')
-        if placement is not None:
-            mm.positionPlacement = placement
 
         _synchronizeIds(mxMetronome, mm)
         self.setPosition(mxMetronome, mm)
