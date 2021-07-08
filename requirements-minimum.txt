@@ -1,4 +1,4 @@
 chardet
 joblib
 more-itertools
-webcolors
+webcolors>=1.5

@@ -1102,8 +1102,8 @@ class VerticalitySequence(prebase.ProtoM21Object, collections.abc.Sequence):
                 if timespan.part not in unwrapped:
                     unwrapped[timespan.part] = []
                 unwrapped[timespan.part].append(timespan)
-        for part, unused_timespans in unwrapped.items():
-            horizontality = Horizontality(timespans=unwrapped[part],)
+        for part, timespans in unwrapped.items():
+            horizontality = Horizontality(timespans=timespans)
             unwrapped[part] = horizontality
         return unwrapped
 
