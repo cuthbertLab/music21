@@ -212,6 +212,7 @@ class Dynamic(base.Music21Object):
             >>> d.englishName
             'very soft'
             ''',
+        'placement': "Staff placement: 'above', 'below', or None.",
     }
 
     def __init__(self, value=None):
@@ -237,7 +238,7 @@ class Dynamic(base.Music21Object):
         self.style.absoluteX = -36
         self.style.absoluteY = -80  # below top line
         # this value provides good 16th note alignment
-        self.positionPlacement = None
+        self.placement = None
 
     def _reprInternal(self):
         return str(self.value)

@@ -377,6 +377,9 @@ class MetronomeMark(TempoIndication):
     >>> tm2.number
     144
     '''
+    _DOC_ATTR = {
+        'placement': "Staff placement: 'above', 'below', or None.",
+    }
 
     def __init__(self, text=None, number=None, referent=None, parentheses=False):
         super().__init__()
@@ -398,7 +401,7 @@ class MetronomeMark(TempoIndication):
         # TODO: style??
         self.parentheses = parentheses
 
-        self.positionPlacement = None
+        self.placement = None
 
         self._referent = None  # set with property
         if referent is None:
