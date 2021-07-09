@@ -2207,7 +2207,7 @@ def partitionByInstrument(streamObj):
         for sub in streamObj.getElementsByClass('Stream'):
             s.insert(0, sub.flat)
 
-    # first, lets extend the duration of each instrument to match stream
+    # first, let's extend the duration of each instrument to match stream
     for sub in s.getElementsByClass('Stream'):
         sub.extendDuration('Instrument', inPlace=True)
 

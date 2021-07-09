@@ -112,11 +112,8 @@ class TimespanTree(trees.OffsetTree):
     ...             scoreTree.insert(merged)
 
 
-    >>> newBach = tree.toStream.partwise(
-    ...     scoreTree,
-    ...     templateStream=bach,
-    ...     )
-    >>> newBach.parts['Alto'].measure(7).show('text')
+    >>> #_DOCS_SHOW newBach = tree.toStream.partwise(scoreTree, templateStream=bach)
+    >>> #_DOCS_SHOW newBach.parts['Alto'].measure(7).show('text')
     {0.0} <music21.chord.Chord F#4>
     {1.5} <music21.chord.Chord F#3>
     {2.0} <music21.chord.Chord C#4>

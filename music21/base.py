@@ -1477,7 +1477,7 @@ class Music21Object(prebase.ProtoM21Object):
         if className and not common.isListLike(className):
             className = (className,)
 
-        if 'At' in getElementMethod and self.isClassOrSubclass(className):
+        if 'At' in getElementMethod and not self.classSet.isdisjoint(className):
             return self
 
         for site, positionStart, searchType in self.contextSites(
@@ -1502,7 +1502,7 @@ class Music21Object(prebase.ProtoM21Object):
             if searchType != 'elementsOnly':  # flatten or elementsFirst
                 if ('After' in getElementMethod
                         and (not className
-                             or site.isClassOrSubclass(className))):
+                             or not site.classSet.isdisjoint(className))):
                     if 'NotSelf' in getElementMethod and self is site:
                         pass
                     elif 'NotSelf' not in getElementMethod:  # for 'After' we can't do the
@@ -1521,7 +1521,7 @@ class Music21Object(prebase.ProtoM21Object):
 
                 if ('Before' in getElementMethod
                         and (not className
-                             or site.isClassOrSubclass(className))):
+                             or not site.classSet.isdisjoint(className))):
                     if 'NotSelf' in getElementMethod and self is site:
                         pass
                     else:
@@ -2060,7 +2060,7 @@ class Music21Object(prebase.ProtoM21Object):
             asTree = activeS.asTree(classList=className, flatten=False)
             prevNode = asTree.getNodeBefore(self.sortTuple())
             if prevNode is None:
-                if className is None or activeS.isClassOrSubclass(className):
+                if className is None or not activeS.classSet.isdisjoint(className):
                     return activeS
                 else:
                     return None
@@ -4207,9 +4207,6 @@ class Test(unittest.TestCase):
         # we should be able to find a clef from the lower-level stream
         post = sInner.getContextByClass(clef.Clef)
         self.assertTrue(isinstance(post, clef.AltoClef), post)
-
-        post = sInner.getClefs(clef.Clef)
-        self.assertTrue(isinstance(post[0], clef.AltoClef), post[0])
 
     def testBeatAccess(self):
         '''Test getting beat data from various Music21Objects.
