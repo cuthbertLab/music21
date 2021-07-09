@@ -60,7 +60,7 @@ from typing import (
 
 from music21.sites import SitesException
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
-from music21.common.enums import OffsetSpecial
+from music21.common.enums import ElementSearch, OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL, OffsetQLIn
 from music21 import style  # pylint: disable=unused-import
@@ -1158,7 +1158,7 @@ class Music21Object(prebase.ProtoM21Object):
         self,
         className,
         *,
-        getElementMethod='getElementAtOrBefore',
+        getElementMethod=ElementSearch.AT_OR_BEFORE,
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
@@ -1237,14 +1237,16 @@ class Music21Object(prebase.ProtoM21Object):
         need a flat representation, the caller needs to be the source Stream,
         not its Sites reference.
 
-        The `getElementMethod` is a string that selects which Stream method is
-        used to get elements for searching. These strings are accepted:
+        The `getElementMethod` is an enum value (new in v7) from
+        :class:`~music21.common.enums.ElementSearch` that selects which
+        Stream method is used to get elements for searching. (The historical form
+        of specifying a string is also accepted):
 
         *    'getElementBefore'
         *    'getElementAfter'
         *    'getElementAtOrBefore' (Default)
         *    'getElementAtOrAfter'
-        *    'all'
+        *    'all' (new in v. 7)
 
         The "after" do forward contexts -- looking ahead.
 
@@ -1261,9 +1263,12 @@ class Music21Object(prebase.ProtoM21Object):
         >>> s.getContextByClass(clef.Clef, getElementMethod='getElementAtOrAfter')
         <music21.clef.BassClef>
 
-        This can be remedied by removing the offset constraint, that is, searching
-        all elements contained at some given level of the hierarchy, no matter
-        their temporal position.
+        This can be remedied by explicitly searching by offsets:
+
+        >>> s.getContextByClass(clef.Clef, getElementMethod='getElementAtOrBeforeOffset')
+        <music21.clef.BassClef>
+
+        Or by not limiting the search by temporal position at all:
 
         >>> s.getContextByClass(clef.Clef, getElementMethod='all')
         <music21.clef.BassClef>
@@ -1358,6 +1363,38 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.stream.Measure 3 offset=5.0> SortTuple(atEnd=0, offset=1.0, ...) elementsFirst
         <music21.stream.Part 0x1118cadd8> SortTuple(atEnd=0, offset=6.0, ...) flatten
         '''
+        OFFSET_METHODS = (
+            ElementSearch.BEFORE_OFFSET,
+            ElementSearch.AFTER_OFFSET,
+            ElementSearch.AT_OR_BEFORE_OFFSET,
+            ElementSearch.AT_OR_AFTER_OFFSET,
+        )
+        BEFORE_METHODS = {
+            ElementSearch.BEFORE,
+            ElementSearch.BEFORE_OFFSET,
+            ElementSearch.AT_OR_BEFORE,
+            ElementSearch.AT_OR_BEFORE_OFFSET,
+            ElementSearch.BEFORE_NOT_SELF,
+        }
+        AFTER_METHODS = {
+            ElementSearch.AFTER,
+            ElementSearch.AFTER_OFFSET,
+            ElementSearch.AT_OR_AFTER,
+            ElementSearch.AT_OR_AFTER,
+            ElementSearch.AT_OR_AFTER_OFFSET,
+            ElementSearch.AFTER_NOT_SELF,
+        }
+        AT_METHODS = {
+            ElementSearch.AT_OR_BEFORE,
+            ElementSearch.AT_OR_AFTER,
+            ElementSearch.AT_OR_BEFORE_OFFSET,
+            ElementSearch.AT_OR_AFTER_OFFSET,
+        }
+        NOT_SELF_METHODS = {
+            ElementSearch.BEFORE_NOT_SELF,
+            ElementSearch.AFTER_NOT_SELF,
+        }
+        # ALL is just a no-op
         def payloadExtractor(checkSite, flatten, innerPositionStart):
             '''
             change the site (stream) to a Tree (using caches if possible),
@@ -1367,19 +1404,14 @@ class Music21Object(prebase.ProtoM21Object):
             flatten can be True, 'semiFlat', or False.
             '''
             siteTree = checkSite.asTree(flatten=flatten, classList=className)
-            if 'Offset' in getElementMethod:
+            if getElementMethod in OFFSET_METHODS:
                 # these methods match only by offset.  Used in .getBeat among other places
-                if (('At' in getElementMethod and 'Before' in getElementMethod)
-                        or ('At' not in getElementMethod and 'After' in getElementMethod)):
-                    innerPositionStart = ZeroSortTupleHigh.modify(offset=innerPositionStart.offset)
-                elif (('At' in getElementMethod and 'After' in getElementMethod)
-                        or ('At' not in getElementMethod and 'Before' in getElementMethod)):
+                if getElementMethod in (ElementSearch.BEFORE_OFFSET, ElementSearch.AT_OR_AFTER_OFFSET):
                     innerPositionStart = ZeroSortTupleLow.modify(offset=innerPositionStart.offset)
                 else:
-                    raise Music21Exception(
-                        f'Incorrect getElementMethod: {getElementMethod}')
+                    innerPositionStart = ZeroSortTupleHigh.modify(offset=innerPositionStart.offset)
 
-            if 'Before' in getElementMethod:
+            if getElementMethod in BEFORE_METHODS:
                 contextNode = siteTree.getNodeBefore(innerPositionStart)
             else:
                 contextNode = siteTree.getNodeAfter(innerPositionStart)
@@ -1484,21 +1516,24 @@ class Music21Object(prebase.ProtoM21Object):
                 # when crossing measure borders.  Thus it's well-formed.
                 return True
 
-            if 'Before' in getElementMethod and selfSortTuple < contextSortTuple:
+            if getElementMethod in BEFORE_METHODS and selfSortTuple < contextSortTuple:
                 # print(getElementMethod, selfSortTuple.shortRepr(),
                 #       contextSortTuple.shortRepr(), self, contextEl)
                 return False
-            elif 'After' in getElementMethod and selfSortTuple > contextSortTuple:
+            elif getElementMethod in AFTER_METHODS and selfSortTuple > contextSortTuple:
                 # print(getElementMethod, selfSortTuple.shortRepr(),
                 #       contextSortTuple.shortRepr(), self, contextEl)
                 return False
             else:
                 return True
 
+        if getElementMethod not in ElementSearch:
+            raise ValueError(f'Invalid getElementMethod: {getElementMethod}')
+
         if className and not common.isListLike(className):
             className = (className,)
 
-        if 'At' in getElementMethod and not self.classSet.isdisjoint(className):
+        if getElementMethod in AT_METHODS and not self.classSet.isdisjoint(className):
             return self
 
         for site, positionStart, searchType in self.contextSites(
@@ -1521,12 +1556,12 @@ class Music21Object(prebase.ProtoM21Object):
                 # otherwise, continue to check for flattening...
 
             if searchType != 'elementsOnly':  # flatten or elementsFirst
-                if ('After' in getElementMethod
+                if (getElementMethod in AFTER_METHODS
                         and (not className
                              or not site.classSet.isdisjoint(className))):
-                    if 'NotSelf' in getElementMethod and self is site:
+                    if getElementMethod in NOT_SELF_METHODS and self is site:
                         pass
-                    elif 'NotSelf' not in getElementMethod:  # for 'After' we can't do the
+                    elif getElementMethod not in NOT_SELF_METHODS:  # for 'After' we can't do the
                         # containing site because that comes before.
                         return site  # if the site itself is the context, return it...
 
@@ -1540,10 +1575,10 @@ class Music21Object(prebase.ProtoM21Object):
                         pass
                     return contextEl
 
-                if ('Before' in getElementMethod
+                if (getElementMethod in BEFORE_METHODS
                         and (not className
                              or not site.classSet.isdisjoint(className))):
-                    if 'NotSelf' in getElementMethod and self is site:
+                    if getElementMethod in NOT_SELF_METHODS and self is site:
                         pass
                     else:
                         return site  # if the site itself is the context, return it...
