@@ -3753,7 +3753,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             sIterator = sIterator.getElementsByClass(classList)
         return sIterator
 
-    def getElementAtOrBefore(self, offset, classList=None):
+    def getElementAtOrBefore(self, offset, classList=None) -> Optional[base.Music21Object]:
         # noinspection PyShadowingNames
         '''
         Given an offset, find the element at this offset,
@@ -3873,7 +3873,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             return None
 
-    def getElementBeforeOffset(self, offset, classList=None):
+    def getElementBeforeOffset(self, offset, classList=None) -> Optional[base.Music21Object]:
         '''
         Get element before (and not at) a provided offset.
 

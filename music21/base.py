@@ -1244,8 +1244,29 @@ class Music21Object(prebase.ProtoM21Object):
         *    'getElementAfter'
         *    'getElementAtOrBefore' (Default)
         *    'getElementAtOrAfter'
+        *    'all'
 
         The "after" do forward contexts -- looking ahead.
+
+        A Stream might contain several elements at the same offset, leading to
+        potentially surprising results where searching "atOrBefore" does not search
+        an element that is technically the NEXT node in the tree but still at 0.0:
+
+        >>> s = stream.Stream()
+        >>> s.insert(0, clef.BassClef())
+        >>> s.next()
+        <music21.clef.BassClef>
+        >>> s.getContextByClass(clef.Clef) is None
+        True
+        >>> s.getContextByClass(clef.Clef, getElementMethod='getElementAtOrAfter')
+        <music21.clef.BassClef>
+
+        This can be remedied by removing the offset constraint, that is, searching
+        all elements contained at some given level of the hierarchy, no matter
+        their temporal position.
+
+        >>> s.getContextByClass(clef.Clef, getElementMethod='all')
+        <music21.clef.BassClef>
 
         Demonstrations of these keywords:
 
@@ -4669,6 +4690,9 @@ class Test(unittest.TestCase):
         b = p.measure(3).notes[-1]
         c = b.getContextByClass('Note', getElementMethod='getElementAfterOffset')
         self.assertEqual(c.name, 'C')
+
+        m = p.measure(1)
+        self.assertIsNotNone(m.getContextByClass('Clef', getElementMethod='all'))
 
     def testGetContextByClassB(self):
         from music21 import stream, note, meter
