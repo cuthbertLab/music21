@@ -398,6 +398,8 @@ class MetronomeMark(TempoIndication):
         # TODO: style??
         self.parentheses = parentheses
 
+        self.positionPlacement = None
+
         self._referent = None  # set with property
         if referent is None:
             # if referent is None, set a default quarter note duration
@@ -1666,4 +1668,3 @@ _DOC_ORDER = [MetronomeMark, TempoText, MetricModulation, TempoIndication,
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testStylesAreShared')
-
