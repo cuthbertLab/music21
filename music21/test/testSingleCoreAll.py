@@ -43,11 +43,12 @@ def main(testGroup=('test',),
          show: bool = True,
          ):
     '''
-    Run all tests. Group can be test and external
-
-    >>> print(None)
-    None
+    Run all tests. Group can be 'test' and/or 'external'.
+    External will not run doctests.
     '''
+    for group in testGroup:
+        if group not in ('test', 'external'):
+            raise ValueError(f"Valid test groups are 'test' and 'external'; got {group}")
     commonTest.testImports()
     s1 = commonTest.defaultDoctestSuite(__name__)
 
@@ -76,7 +77,7 @@ def main(testGroup=('test',),
             pass
             # environLocal.printDebug(f'{module} has no TestExternal class\n')
         else:
-            if 'external' in testGroup or 'testExternal' in testGroup:
+            if 'external' in testGroup:
                 if not show:
                     moduleObject.TestExternal.show = False
                 unitTestCases.append(moduleObject.TestExternal)
@@ -85,6 +86,9 @@ def main(testGroup=('test',),
         for testCase in unitTestCases:
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(testCase)
             s1.addTests(s2)
+        if testGroup == ('external',):
+            # don't load doctests for runs consisting solely of TestExternal
+            continue
         try:
             s3 = commonTest.defaultDoctestSuite(moduleObject)
             s1.addTests(s3)
@@ -128,9 +132,12 @@ def main(testGroup=('test',),
 
 def ciMain():
     # the main call for ci tests.
-    # exits with the returnCode
-    returnCode = main(testGroup=('test', 'external'), verbosity=1, show=False)
-    sys.exit(returnCode)
+    # runs Test classes (including doctests)
+    # and TestExternal (without doctests) with show=False
+    # exits with the aggregated returnCode
+    returnCodeTest = main(testGroup=('test',), verbosity=1)
+    returnCodeExternal = main(testGroup=('external',), verbosity=1, show=False)
+    sys.exit(returnCodeTest + returnCodeExternal)
 
 
 # ------------------------------------------------------------------------------
