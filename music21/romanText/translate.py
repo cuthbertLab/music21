@@ -1144,7 +1144,8 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
         for tf in testFiles.ALL:
             rtf = rtObjects.RTFile()
             rth = rtf.readstr(tf)  # return handler, processes tokens
-            unused_s = romanTextToStreamScore(rth)
+            s = romanTextToStreamScore(rth)
+            s.show()
 
     # noinspection SpellCheckingInspection
     def testBasicA(self):
