@@ -1406,7 +1406,8 @@ class Music21Object(prebase.ProtoM21Object):
             siteTree = checkSite.asTree(flatten=flatten, classList=className)
             if getElementMethod in OFFSET_METHODS:
                 # these methods match only by offset.  Used in .getBeat among other places
-                if getElementMethod in (ElementSearch.BEFORE_OFFSET, ElementSearch.AT_OR_AFTER_OFFSET):
+                if getElementMethod in (ElementSearch.BEFORE_OFFSET,
+                                        ElementSearch.AT_OR_AFTER_OFFSET):
                     innerPositionStart = ZeroSortTupleLow.modify(offset=innerPositionStart.offset)
                 else:
                     innerPositionStart = ZeroSortTupleHigh.modify(offset=innerPositionStart.offset)
