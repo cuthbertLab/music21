@@ -135,9 +135,8 @@ def ciMain():
     # runs Test classes (including doctests)
     # and TestExternal (without doctests) with show=False
     # exits with the aggregated returnCode
-    # run external first to avoid coverage report issues
-    returnCodeExternal = main(testGroup=('external',), verbosity=1, show=False)
     returnCodeTest = main(testGroup=('test',), verbosity=1)
+    returnCodeExternal = main(testGroup=('external',), verbosity=1, show=False)
     sys.exit(returnCodeTest + returnCodeExternal)
 
 
