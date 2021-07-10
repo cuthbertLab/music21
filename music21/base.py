@@ -1226,8 +1226,8 @@ class Music21Object(prebase.ProtoM21Object):
         part.  This is all you need to know for most uses.  The rest of the
         docs are for advanced uses:
 
-        The methods searches both Sites as well as associated objects to find a
-        matching class. Returns None if not match is found.
+        The method searches both Sites as well as associated objects to find a
+        matching class. Returns `None` if no match is found.
 
         A reference to the caller is required to find the offset of the object
         of the caller.
@@ -1237,41 +1237,26 @@ class Music21Object(prebase.ProtoM21Object):
         need a flat representation, the caller needs to be the source Stream,
         not its Sites reference.
 
-        The `getElementMethod` is an enum value (new in v7) from
+        The `getElementMethod` is an enum value (new in v.7) from
         :class:`~music21.common.enums.ElementSearch` that selects which
         Stream method is used to get elements for searching. (The historical form
-        of specifying a string is also accepted):
+        of supplying one of the following values as a string is also supported.)
 
-        *    'getElementBefore'
-        *    'getElementAfter'
-        *    'getElementAtOrBefore' (Default)
-        *    'getElementAtOrAfter'
-        *    'all' (new in v. 7)
+        >>> from music21.common.enums import ElementSearch
+        >>> [x for x in ElementSearch]
+        [<ElementSearch.BEFORE>,
+         <ElementSearch.AFTER>,
+         <ElementSearch.AT_OR_BEFORE>,
+         <ElementSearch.AT_OR_AFTER>,
+         <ElementSearch.BEFORE_OFFSET>,
+         <ElementSearch.AFTER_OFFSET>,
+         <ElementSearch.AT_OR_BEFORE_OFFSET>,
+         <ElementSearch.AT_OR_AFTER_OFFSET>,
+         <ElementSearch.BEFORE_NOT_SELF>,
+         <ElementSearch.AFTER_NOT_SELF>,
+         <ElementSearch.ALL>]
 
         The "after" do forward contexts -- looking ahead.
-
-        A Stream might contain several elements at the same offset, leading to
-        potentially surprising results where searching "atOrBefore" does not search
-        an element that is technically the NEXT node in the tree but still at 0.0:
-
-        >>> s = stream.Stream()
-        >>> s.insert(0, clef.BassClef())
-        >>> s.next()
-        <music21.clef.BassClef>
-        >>> s.getContextByClass(clef.Clef) is None
-        True
-        >>> s.getContextByClass(clef.Clef, getElementMethod='getElementAtOrAfter')
-        <music21.clef.BassClef>
-
-        This can be remedied by explicitly searching by offsets:
-
-        >>> s.getContextByClass(clef.Clef, getElementMethod='getElementAtOrBeforeOffset')
-        <music21.clef.BassClef>
-
-        Or by not limiting the search by temporal position at all:
-
-        >>> s.getContextByClass(clef.Clef, getElementMethod='all')
-        <music21.clef.BassClef>
 
         Demonstrations of these keywords:
 
@@ -1303,6 +1288,29 @@ class Music21Object(prebase.ProtoM21Object):
 
         >>> b.next('Note')
         <music21.note.Note C>
+
+        A Stream might contain several elements at the same offset, leading to
+        potentially surprising results where searching "atOrBefore" does not search
+        an element that is technically the NEXT node in the tree but still at 0.0:
+
+        >>> s = stream.Stream()
+        >>> s.insert(0, clef.BassClef())
+        >>> s.next()
+        <music21.clef.BassClef>
+        >>> s.getContextByClass(clef.Clef) is None
+        True
+        >>> s.getContextByClass(clef.Clef, getElementMethod='getElementAtOrAfter')
+        <music21.clef.BassClef>
+
+        This can be remedied by explicitly searching by offsets:
+
+        >>> s.getContextByClass(clef.Clef, getElementMethod='getElementAtOrBeforeOffset')
+        <music21.clef.BassClef>
+
+        Or by not limiting the search by temporal position at all:
+
+        >>> s.getContextByClass(clef.Clef, getElementMethod='all')
+        <music21.clef.BassClef>
 
         Notice that if searching for a `Stream` context, the element is not
         guaranteed to be in that Stream.  This is obviously true in this case:
@@ -1347,6 +1355,13 @@ class Music21Object(prebase.ProtoM21Object):
         * changed in v.5.7 -- added followDerivation=False and made
             everything but the class keyword only
         * added in v.6 -- added priorityTargetOnly -- see contextSites for description.
+        * added in v.7 -- added getElementMethod `all` and `ElementSearch` enum.
+
+        Raises `ValueError` if `getElementMethod` is not a value in `ElementSearch`.
+
+        >>> n2.getContextByClass('TextExpression', getElementMethod='invalid')
+        Traceback (most recent call last):
+        ValueError: Invalid getElementMethod: invalid
 
         OMIT_FROM_DOCS
 

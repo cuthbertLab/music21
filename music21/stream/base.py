@@ -3011,7 +3011,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Changed in v7. -- all but quarterLength are keyword only
         '''
-        # pylint: disable=attribute-defined-outside-init
         quarterLength = opFrac(quarterLength)
         if retainOrigin:
             sLeft = self
