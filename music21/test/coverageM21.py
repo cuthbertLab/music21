@@ -29,7 +29,6 @@ exclude_lines = [
     r'\s*import music21\s*',
     r'\s*music21.mainTest\(\)\s*',
     r'.*#\s*pragma:\s*no cover.*',
-    r'class TestExternal.*',
 ]
 
 
