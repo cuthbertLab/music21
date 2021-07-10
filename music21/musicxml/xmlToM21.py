@@ -4362,10 +4362,10 @@ class MeasureParser(XMLParserBase):
         m = self.stream
         if not textStripValid(mxVoice):
             useVoice = self.lastVoice
-            if useVoice is None:
-                environLocal.warn('Cannot put in an element with a missing voice tag when '
-                                  + 'no previous voice tag was given.  Assuming voice 1... '
-                                  )
+            if useVoice is None:  # pragma: no cover
+                environLocal.warn(
+                    'Cannot put in an element with a missing voice tag when '
+                    + 'no previous voice tag was given.  Assuming voice 1... ')
                 useVoice = 1
         else:
             useVoice = mxVoice.text.strip()
@@ -4809,6 +4809,8 @@ class MeasureParser(XMLParserBase):
         elif tag == 'metronome':
             mm = self.xmlToTempoIndication(mxDir)
             # SAX was offsetMeasureNote; bug? should be totalOffset???
+            _setAttributeFromAttribute(mm, mxDirection,
+                            'placement', 'positionPlacement')
             self.insertCoreAndRef(totalOffset, staffKey, mm)
             self.setEditorial(mxDirection, mm)
 
@@ -7010,6 +7012,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testFiles.tabTest)
         metro = s.recurse().getElementsByClass('MetronomeMark').first()
         self.assertEqual(metro.style.absoluteY, 40)
+        self.assertEqual(metro.positionPlacement, 'above')
 
 
 if __name__ == '__main__':

@@ -45,6 +45,7 @@ abbreviationToBestName = {
     'cb': 'contrabass',
     'cel': 'celesta',
     'cga dr': 'conga drum',
+    'ch': 'choir',
     'cl': 'clarinet',
     'clst': 'celesta',
     'clv': 'clavichord',
@@ -173,6 +174,7 @@ bestNameToInstrumentClass = {
     'bongo drums': 'BongoDrums',
     'castanets': 'Castanets',
     'celesta': 'Celesta',
+    'choir': 'Choir',
     'clarinet': 'Clarinet',
     'clavichord': 'Clavichord',
     'conga drum': 'CongaDrum',
@@ -182,6 +184,7 @@ bestNameToInstrumentClass = {
     'dulcimer': 'Dulcimer',
     'electric bass': 'ElectricBass',
     'electric guitar': 'ElectricGuitar',
+    'electric piano': 'ElectricPiano',
     'electric organ': 'ElectricOrgan',
     'english horn': 'EnglishHorn',
     'finger cymbals': 'FingerCymbals',
@@ -261,6 +264,7 @@ englishToBestName = {
     'agogo': 'agogo',
     'alto': 'alto',
     'alto saxophone': 'alto saxophone',
+    'bagpipe': 'bagpipes',
     'bagpipes': 'bagpipes',
     'banjo': 'banjo',
     'baritone': 'baritone',
@@ -348,6 +352,7 @@ englishToBestName = {
     'snare drum': 'snare drum',
     'soprano': 'soprano',
     'soprano saxophone': 'soprano saxophone',
+    'steel drums': 'steel drum',
     'steel drum': 'steel drum',
     'steel pan': 'steel drum',
     'suspended cymbal': 'suspended cymbal',
@@ -1141,7 +1146,8 @@ transliteration = {
     'violin': 'viol\xedn',
     'xilofon': 'xilof\xf3n',
     'xilofono': 'xil\xf3fono',
-    'zamponas': 'zampo\xf1as'}
+    'zamponas': 'zampo\xf1as',
+}
 
 transposition = {
     'clarinet': {'a': 'm-3',

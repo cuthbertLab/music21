@@ -1556,7 +1556,7 @@ class ABCNote(ABCToken):
             ql = activeDefaultQuarterLength / int(numStr.split('/')[1])
         # uncommon usage: 3/ short for 3/2
         elif numStr.endswith('/'):
-            n = int(numStr.split('/')[0].strip())
+            n = int(numStr.split('/', maxsplit=1)[0].strip())
             d = 2
             ql = activeDefaultQuarterLength * n / d
         # if we have two, this is usually an error

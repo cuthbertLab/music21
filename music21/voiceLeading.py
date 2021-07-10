@@ -110,8 +110,8 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.v2n1 = v2n1
         self.v2n2 = v2n2
 
-        self.vIntervals = []  # vertical intervals (harmonic)
-        self.hIntervals = []  # horizontal intervals (melodic)
+        self.vIntervals: List[interval.Interval] = []  # vertical intervals (harmonic)
+        self.hIntervals: List[interval.Interval] = []  # horizontal intervals (melodic)
 
         self._key = None
         if analyticKey is not None:

@@ -307,7 +307,7 @@ class Test(unittest.TestCase):
         s.repeatInsert(note.Note('C#'), [0.0, 2.0, 4.0])
         s.repeatInsert(note.Note('D-'), [1.0, 3.0, 5.0])
         self.assertFalse(s.isSorted)
-        y = s.sorted
+        y = s.sorted()
         self.assertTrue(y.isSorted)
         g = ''
         for myElement in y:
@@ -400,8 +400,8 @@ class Test(unittest.TestCase):
         n1 = note.Note()
         st2.insert(10, n1)
         st1.insert(12, st2)
-        self.assertIs(st1.flat.sorted[0], n1)
-        self.assertEqual(st1.flat.sorted[0].offset, 22.0)
+        self.assertIs(st1.flat.sorted()[0], n1)
+        self.assertEqual(st1.flat.sorted()[0].offset, 22.0)
 
     def testStreamExceptionsOnAssert(self):
         with self.assertRaises(StreamException):
@@ -432,7 +432,7 @@ class Test(unittest.TestCase):
         # environLocal.printDebug(['pre flat of mid stream'])
         self.assertEqual(len(midStream.flat), 24)
 #        self.assertEqual(len(midStream.getOverlaps()), 0)
-        mfs = midStream.flat.sorted
+        mfs = midStream.flat.sorted()
         self.assertEqual(mfs[7].getOffsetBySite(mfs), 11.0)
 
         farStream = Stream()
@@ -473,7 +473,7 @@ class Test(unittest.TestCase):
 
         # get just offset times
         # elementsSorted returns offset, dur, element
-        fs_fs = farStream.flat.sorted
+        fs_fs = farStream.flat.sorted()
         offsets = [a.offset for a in fs_fs]  # safer is a.getOffsetBySite(fs_fs)
         offsetsBrief = offsets[:20]
         self.assertEqual(offsetsBrief,
@@ -4341,7 +4341,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual([x.name for x in s], ['B', 'A'])
         # try getting sorted
-        sSorted = s.sorted
+        sSorted = s.sorted()
         # original unchanged
         self.assertEqual([x.name for x in s], ['B', 'A'])
         # new is changed

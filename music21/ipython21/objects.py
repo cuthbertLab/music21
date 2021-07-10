@@ -15,6 +15,7 @@ class IPythonPNGObject:
 
     def getData(self):
         fp = self.fp
-        data = open(fp, 'rb').read()
+        with open(fp, 'rb') as f:
+            data = f.read()
         os.remove(fp)
         return data

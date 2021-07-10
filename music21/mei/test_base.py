@@ -27,9 +27,7 @@ Tests for :mod:`music21.mei.base`.
 # pylint: disable=maybe-no-member
 
 # pylint: disable=ungrouped-imports
-# pylint: disable=redefined-builtin
 # pylint: disable=import-error
-# pylint: disable=unused-import
 import unittest
 
 # To have working MagicMock objects, we can't use cElementTree even though it would be faster.
@@ -56,8 +54,7 @@ from music21 import spanner
 from music21 import stream
 from music21 import tie
 
-# Importing from base.py
-import music21.mei.base as base  # pylint: disable=useless-import-alias
+from music21.mei import base
 from music21.mei.base import _XMLID
 from music21.mei.base import MEI_NS
 
@@ -1943,7 +1940,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
     @mock.patch('music21.mei.base._guessTuplets')
-    def testUnit1aLayerFromElemen(self, mockTuplets, mockVoice, mockNoteFromElement):
+    def testUnit1aLayerFromElement(self, mockTuplets, mockVoice, mockNoteFromElement):
         '''
         layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
                             mapping works; that tags not in the mapping are ignored; and that a
@@ -1986,7 +1983,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
     @mock.patch('music21.mei.base._guessTuplets')
-    def testUnit1bLayerFromElemen(self, mockTuplets, mockVoice, mockNoteFromElement):
+    def testUnit1bLayerFromElement(self, mockTuplets, mockVoice, mockNoteFromElement):
         '''
         Same as testUnit1a() *but* with ``overrideN`` provided.
         '''
@@ -2587,7 +2584,7 @@ class Test(unittest.TestCase):
 
     @mock.patch('music21.mei.base._timeSigFromAttrs')
     @mock.patch('music21.mei.base._keySigFromAttrs')
-    def testUnit1ScoreDefFromElemen(self, mockKey, mockTime):
+    def testUnit1ScoreDefFromElement(self, mockKey, mockTime):
         '''
         scoreDefFromElement(): proper handling of the following attributes (see function docstring
             for more information).

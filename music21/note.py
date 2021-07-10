@@ -584,7 +584,7 @@ class GeneralNote(base.Music21Object):
             return None
 
         allText = [ly.text for ly in self.lyrics]
-        return '\n'.join(allText)
+        return '\n'.join([t for t in allText if t is not None])
 
     def _setLyric(self, value: Union[str, Lyric, None]) -> None:
         self.lyrics = []
@@ -1876,7 +1876,7 @@ class Test(unittest.TestCase):
         self.assertEqual(matchStr, outStr)
         i = 0
         for thisNote in note1.splitAtDurations():
-            matchSub = matchStr.split('\n')[i]
+            matchSub = matchStr.split('\n')[i]  # pylint: disable=use-maxsplit-arg
             conv = LilypondConverter()
             conv.appendM21ObjectToContext(thisNote)
             outStr = str(conv.context).replace(' ', '').strip()
