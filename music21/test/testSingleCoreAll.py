@@ -136,6 +136,8 @@ def ciMain():
     # and TestExternal (without doctests) with show=False
     # exits with the aggregated returnCode
     returnCodeTest = main(testGroup=('test',), verbosity=1)
+    # restart coverage if running main() twice
+    coverageM21.startCoverage(cov)
     returnCodeExternal = main(testGroup=('external',), verbosity=1, show=False)
     sys.exit(returnCodeTest + returnCodeExternal)
 
