@@ -6583,6 +6583,8 @@ class TestExternal(unittest.TestCase):
                     # for j in range(i - 1,i + 1):
                     #    print(differ[j])
                     # print('------------------')
+        import os
+        os.remove(fp)
 
 
 if __name__ == '__main__':

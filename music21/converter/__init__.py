@@ -1223,6 +1223,11 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') ->
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note F>
         {4.0} <music21.bar.Barline type=final>
+
+    OMIT_FROM_DOCS
+
+    >>> import os 
+    >>> os.remove(fp)
     '''
     from music21 import freezeThaw
     v = freezeThaw.StreamFreezer(streamObj, fastButUnsafe=fastButUnsafe)
@@ -1342,6 +1347,7 @@ class TestExternal(unittest.TestCase):
         s2 = thaw(fp)
         if self.show:
             s2.show()
+        os.remove(fp)
 
     def testMusicXMLTabConversion(self):
         from music21.musicxml import testFiles
@@ -1963,6 +1969,8 @@ class Test(unittest.TestCase):
 
         s = parseURL(url, forceSource=True)
         self.assertEqual(len(s.parts), 2)
+
+        os.remove(destFp)
 
 
 # ------------------------------------------------------------------------------
