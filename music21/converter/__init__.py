@@ -1226,7 +1226,7 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') ->
 
     OMIT_FROM_DOCS
 
-    >>> import os 
+    >>> import os
     >>> os.remove(fp)
     '''
     from music21 import freezeThaw
