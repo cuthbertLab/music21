@@ -5003,9 +5003,9 @@ class MeasureExporter(XMLExporterBase):
         mxDirectionType = SubElement(mxDirection, 'direction-type')
         mxDirectionType.append(mxObj)
         if (m21Obj is not None
-                and hasattr(m21Obj, 'positionPlacement')
-                and m21Obj.positionPlacement is not None):
-            mxDirection.set('placement', m21Obj.positionPlacement)
+                and hasattr(m21Obj, 'placement')
+                and m21Obj.placement is not None):
+            mxDirection.set('placement', m21Obj.placement)
 
         return mxDirection
 
@@ -6603,7 +6603,7 @@ class Test(unittest.TestCase):
         c.useSymbol = False
         f = repeat.Fine()
         mm = tempo.MetronomeMark(text='Langsam')
-        mm.positionPlacement = 'above'
+        mm.placement = 'above'
         s.measure(1).storeAtEnd([c, f, mm])
 
         tree = self.getET(s)

@@ -322,6 +322,10 @@ class TextExpression(Expression):
     classSortOrder = -30
     _styleClass = style.TextStyle
 
+    _DOC_ATTR = {
+        'placement': "Staff placement: 'above', 'below', or None.",
+    }
+
     def __init__(self, content=None):
         super().__init__()
         # numerous properties are inherited from TextFormat
@@ -335,7 +339,7 @@ class TextExpression(Expression):
         self._enclosure = None
 
         # this does not do anything if default y is defined
-        self.positionPlacement = None
+        self.placement = None
 
     def _reprInternal(self):
         if len(self._content) >= 13:
