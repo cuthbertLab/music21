@@ -8905,7 +8905,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If `recurse` is True, then all substreams are also quantized.
         If False (default), then only the highest level of the Stream is quantized.
 
-        Changed in v.7 -- recurse defaults False
+        Changed in v.7:
+           - `recurse` defaults False
+           - look-ahead approach to choosing divisors to avoid gaps when processing durations
 
         >>> n = note.Note()
         >>> n.quarterLength = 0.49
@@ -8953,6 +8955,29 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> [e.offset for e in myPart.measure(1).notes]
         [0.0, 0.0, 0.25, Fraction(1, 3)]
 
+        New in v.7: if both `processDurations` and `processOffsets` are True, then
+        the next note's quantized offset is taken into account when quantizing the
+        duration of the current note. This is to prevent unnecessary gaps from applying
+        different quantization units to adjacent notes:
+
+        >>> s2 = stream.Stream()
+        >>> nOddLength = note.Note(quarterLength=0.385)
+        >>> s2.repeatInsert(nOddLength, [0, 0.5, 1, 1.5])
+        >>> s2.show('t', addEndTimes=True)
+            {0.0 - 0.385} <music21.note.Note C>
+            {0.5 - 0.885} <music21.note.Note C>
+            {1.0 - 1.385} <music21.note.Note C>
+            {1.5 - 1.885} <music21.note.Note C>
+
+        Before v.7, this would have yielded four triplet-eighths (separated by 1/6 QL rests):
+
+        >>> s2.quantize(processOffsets=True, processDurations=True, inPlace=True)
+        >>> s2.show('text', addEndTimes=True)
+            {0.0 - 0.5} <music21.note.Note C>
+            {0.5 - 1.0} <music21.note.Note C>
+            {1.0 - 1.5} <music21.note.Note C>
+            {1.5 - 1.8333} <music21.note.Note C>
+
         OMIT_FROM_DOCS
 
         Test changing defaults, running, and changing back...
@@ -8988,7 +9013,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             found = []
             for div in divisors:
                 match, error, signedErrorInner = common.nearestMultiple(target, (1 / div))
-                found.append((error, match, signedErrorInner))  # reverse match, error for sorting
+                # reverse match, error for sorting and add divisor expressed as qL
+                found.append((error, match, signedErrorInner, 1 / div))
             # get first, and leave out the error
             bestMatchTuple = sorted(found)[0]
             return bestMatchTuple
@@ -8996,28 +9022,25 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # if we have a min of 0.25 (sixteenth)
         # quarterLengthMin = quarterLengthDivisors[0]
 
-        # TODO: Use new filters...
         if inPlace is False:
             returnStream = self.coreCopyAsDerivation('quantize')
-
         else:
             returnStream = self
 
         useStreams = [returnStream]
         if recurse is True:
-            for obj in returnStream.recurse():
-                if 'Stream' in obj.classes:
-                    useStreams.append(obj)
+            useStreams = returnStream.recurse(streamsOnly=True, includeSelf=True)
 
         for useStream in useStreams:
-            for e in useStream._elements:
+            for i, e in enumerate(useStream._elements):
                 if processOffsets:
                     o = useStream.elementOffset(e)
                     sign = 1
                     if o < 0:
                         sign = -1
                         o = -1 * o
-                    unused_error, oNew, signedError = bestMatch(float(o), quarterLengthDivisors)
+                    unused_error, oNew, signedError, unused_inverse_divisor = bestMatch(
+                        float(o), quarterLengthDivisors)
                     useStream.coreSetElementOffset(e, oNew * sign)
                     if (hasattr(e, 'editorial')
                             and signedError != 0):
@@ -9025,9 +9048,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if processDurations:
                     ql = e.duration.quarterLength
                     ql = max(ql, 0)  # negative ql possible in buggy MIDI files?
-                    unused_error, qlNew, signedError = bestMatch(
+                    unused_error, qlNew, signedError, unused_inverse_divisor = bestMatch(
                         float(ql), quarterLengthDivisors)
+                    # Check that any gaps from this quantized duration to the next onset
+                    # are at least as large as the smallest quantization unit (largest divisor)
+                    # If not, then re-quantize this duration with the divisor
+                    # that will be used to quantize the next element's offset
+                    if processOffsets and i + 1 < len(useStream._elements):
+                        next_element = useStream._elements[i + 1]
+                        next_offset = useStream.elementOffset(next_element)
+                        look_ahead_result = bestMatch(float(next_offset), quarterLengthDivisors)
+                        next_offset = look_ahead_result[1]
+                        next_divisor = 1 / look_ahead_result[3]
+                        if 0 < next_offset - (e.offset + qlNew) < 1 / max(quarterLengthDivisors):
+                            unused_error, qlNew, signedError, unused_inverse_divisor = bestMatch(
+                                float(ql), (next_divisor,))
                     # Enforce nonzero duration for non-grace notes
+                    # TODO: what about rests? remove rests with ql=0?
                     if qlNew == 0 and 'GeneralNote' in e.classes and not e.duration.isGrace:
                         qlNew = 1 / max(quarterLengthDivisors)
                         signedError = ql - qlNew
