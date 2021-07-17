@@ -24,7 +24,7 @@ the `converter` module:
 
 For users who will be editing ABC extensively or need a way to have music21 output ABC
 (which it doesn't do natively), we suggest using the open source EasyABC package:
-http://www.nilsliberg.se/ksp/easyabc/ .  You can set it up as a MusicXML reader through:
+https://www.nilsliberg.se/ksp/easyabc/ .  You can set it up as a MusicXML reader through:
 
 >>> #_DOCS_SHOW us = environment.UserSettings()
 >>> #_DOCS_SHOW us['musicxmlPath'] = '/Applications/EasyABC.app'

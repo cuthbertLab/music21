@@ -31,7 +31,7 @@ environLocal = environment.Environment(_MOD)
 # using ISO 639-1 Code from here:
 # http://www.loc.gov/standards/iso639-2/php/code_list.php
 # nice article reference here:
-# http://en.wikipedia.org/wiki/Article_(grammar)
+# https://en.wikipedia.org/wiki/Article_(grammar)
 # noinspection SpellCheckingInspection
 articleReference = {
     # arabic
@@ -361,7 +361,7 @@ class LanguageDetector:
     Attempts to detect language on the basis of trigrams
 
     uses code from
-    http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
+    https://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
     unknown author.  No license given.
 
     See Trigram docs below.
@@ -465,7 +465,7 @@ class Trigram:
     # noinspection SpellCheckingInspection
     '''
     See LanguageDetector above.
-    From http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
+    From https://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
 
     The frequency of three character
     sequences is calculated.  When treated as a vector, this information

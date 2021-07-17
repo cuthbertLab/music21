@@ -4278,7 +4278,7 @@ class MeasureExporter(XMLExporterBase):
                 orientation = 'under'
             # MuseScore requires 'orientation' not placement
             # should be no need for separate orientation
-            # http://forums.makemusic.com/viewtopic.php?f=12&t=2179&start=0
+            # https://forums.makemusic.com/viewtopic.php?f=12&t=2179&start=0
             mxTied.set('orientation', orientation)
 
         # TODO: attrGroup: bezier

@@ -21,7 +21,7 @@ Note, etc., objects takes place in :ref:`moduleMidiTranslate`.
 
 This module originally used routines from Will Ware's public domain midi.py
 library from 2001 see
-http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
+https://groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
 '''
 __all__ = [
     'realtime', 'percussion',

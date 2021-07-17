@@ -14,13 +14,13 @@ Downloading Python 3 from python.org
 ---------------------------------------
 
 Though Macs come with Python, it's a very old version.  We recommend
-updating that by going to http://www.python.org/ and getting Python 3.9
-or later.
+updating that by going to https://www.python.org/downloads and getting
+Python 3.9 or later.
 
 (The `music21` team strongly recommends using the version of
 Python 3 from the python.org website and not the Conda version
-(or Enthought Canopy) because it is fully compatiable with
-matplotlib.  If you have no plans on plotting functions,
+(or Enthought Canopy) because it is fully compatible with
+`matplotlib`.  If you have no plans on plotting functions,
 feel free to use any flavor of Python 3.)
 
 
@@ -67,7 +67,7 @@ it should display in Terminal something like the following:
 
 If it says 3.7 or higher (or possibly a number like 3.9.2), you're okay.
 If it says 2.7 or 3.4 or something,
-go to http://www.python.org/download
+go to https://www.python.org/downloads/
 and download a newer version.  Multiple versions of Python can exist
 on a single computer without any problems.
 
@@ -204,5 +204,5 @@ If you have followed all the instructions and still encounter problems, start ov
 and try it again very carefully.  If you still have problems
 contact the `music21` group and someone should be able to help:
 
-http://groups.google.com/group/music21list
+https://groups.google.com/g/music21list
 
