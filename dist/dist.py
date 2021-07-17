@@ -30,7 +30,8 @@ To do a release,
 while it is running.  This takes a while and runs single core, so allocate time.  Start working on
 the announcement while it's running.
 
-7. run documentation/make.py clean  (skip on minor version changes)
+7a. run documentation/make.py clean  (skip on minor version changes)
+7b. run documentation/make.py linkcheck
 8. run documentation/make.py   [*]
 
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
