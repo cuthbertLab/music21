@@ -1837,7 +1837,7 @@ class Test(unittest.TestCase):
                          + ['down', 'noStem', 'double', 'down']
                          )
 
-    def testSetStemDirectionOneGroups(self):
+    def testSetStemDirectionConsistency(self):
         """
         Stems that would all be up starting from scratch,
         but because of overrideConsistentStemDirections=False,
@@ -1853,9 +1853,9 @@ class Test(unittest.TestCase):
 
         # make manual changes
         dStems = ['down', 'unspecified', 'down', 'down']
-
         for n, stemDir in zip(p.flat.notes, dStems):
             n.stemDirection = stemDir
+
         setStemDirectionForBeamGroups(p, setNewStems=True, overrideConsistentStemDirections=False)
         self.assertEqual(
             [n.stemDirection for n in p.flat.notes],
