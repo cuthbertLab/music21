@@ -8303,6 +8303,33 @@ class Test(unittest.TestCase):
         self.assertEqual(beams[3], continue_beam)  # fourth should be continue
         self.assertEqual(beams[4], stop_beam)  # last should be stop
 
+    def test_makeBeams__paddingRight(self):
+        m = Measure()
+        m.timeSignature = meter.TimeSignature('6/8')
+        m.paddingRight = 1.0
+        m.append(note.Note(type='quarter'))
+        m.append(note.Note(type='eighth'))
+        m.append(note.Note(type='eighth'))
+
+        m.makeBeams(inPlace=True)
+        beams = self.get_beams_from_stream(m)
+
+        no_beam = beam.Beams()
+        start_beam = beam.Beams()
+        start_beam.append('start')
+        stop_beam = beam.Beams()
+        stop_beam.append('stop')
+
+        self.assertEqual(beams, [no_beam, no_beam, no_beam])
+
+        m.paddingRight = 0.5
+        m.append(note.Note(type='eighth'))
+
+        m.makeBeams(inPlace=True)
+        beams = self.get_beams_from_stream(m)
+
+        self.assertEqual(beams, [no_beam, no_beam, start_beam, stop_beam])
+
     def testWrite(self):
         import os
 
