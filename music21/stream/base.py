@@ -9071,7 +9071,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             and not e.duration.isGrace):
                         e.quarterLength = 1 / max(quarterLengthDivisors)
                         if hasattr(e, 'editorial'):
-                            e.editorial.quarterLengthQuantizationError = 0 - e.quarterLength
+                            e.editorial.quarterLengthQuantizationError = ql - e.quarterLength
                     elif d_matchTuple.match == 0 and 'Rest' in e.classes:
                         rests_lacking_durations.append(e)
                     else:
