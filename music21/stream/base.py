@@ -29,6 +29,7 @@ import pathlib
 import unittest
 import sys
 
+from collections import namedtuple
 from fractions import Fraction
 from math import isclose
 from typing import Union, List, Optional, Set, Tuple, Sequence
@@ -70,6 +71,7 @@ environLocal = environment.Environment('stream')
 StreamException = exceptions21.StreamException
 ImmutableStreamException = exceptions21.ImmutableStreamException
 
+BestQuantizationMatch = namedtuple('BestQuantizationMatch', ['error', 'match', 'signedError', 'divisor'])
 
 class StreamDeprecationWarning(UserWarning):
     # Do not subclass Deprecation warning, because these
@@ -9013,8 +9015,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             found = []
             for div in divisors:
                 match, error, signedErrorInner = common.nearestMultiple(target, (1 / div))
-                # reverse match, error for sorting and add divisor expressed as qL
-                found.append((error, match, signedErrorInner, 1 / div))
+                # reverse match, error for sorting
+                found.append(BestQuantizationMatch(error, match, signedErrorInner, div))
             # get first, and leave out the error
             bestMatchTuple = sorted(found)[0]
             return bestMatchTuple
@@ -9040,17 +9042,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     if o < 0:
                         sign = -1
                         o = -1 * o
-                    unused_error, oNew, signedError, unused_inverse_divisor = bestMatch(
-                        float(o), quarterLengthDivisors)
-                    useStream.coreSetElementOffset(e, oNew * sign)
+                    matchTuple = bestMatch(float(o), quarterLengthDivisors)
+                    useStream.coreSetElementOffset(e, matchTuple.match * sign)
                     if (hasattr(e, 'editorial')
                             and signedError != 0):
                         e.editorial.offsetQuantizationError = signedError * sign
                 if processDurations:
                     ql = e.duration.quarterLength
                     ql = max(ql, 0)  # negative ql possible in buggy MIDI files?
-                    unused_error, qlNew, signedError, unused_inverse_divisor = bestMatch(
-                        float(ql), quarterLengthDivisors)
+                    matchTuple = bestMatch(float(ql), quarterLengthDivisors)
                     # Check that any gaps from this quantized duration to the next onset
                     # are at least as large as the smallest quantization unit (largest divisor)
                     # If not, then re-quantize this duration with the divisor
@@ -9059,21 +9059,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         next_element = useStream._elements[i + 1]
                         next_offset = useStream.elementOffset(next_element)
                         look_ahead_result = bestMatch(float(next_offset), quarterLengthDivisors)
-                        next_offset = look_ahead_result[1]
-                        next_divisor = 1 / look_ahead_result[3]
-                        if 0 < next_offset - (e.offset + qlNew) < 1 / max(quarterLengthDivisors):
-                            unused_error, qlNew, signedError, unused_inverse_divisor = bestMatch(
-                                float(ql), (next_divisor,))
+                        next_offset = look_ahead_result.match
+                        next_divisor = look_ahead_result.divisor
+                        if (0
+                            < next_offset - (e.offset + matchTuple.match)
+                            < 1 / max(quarterLengthDivisors)
+                        ):
+                            # Overwrite the earlier matchTuple with a better result
+                            matchTuple = bestMatch(float(ql), (next_divisor,))
                     # Enforce nonzero duration for non-grace notes
-                    if qlNew == 0 and 'NotRest' in e.classes and not e.duration.isGrace:
-                        qlNew = 1 / max(quarterLengthDivisors)
-                        signedError = ql - qlNew
-                    elif qlNew == 0 and 'Rest' in e.classes:
+                    if matchTuple.match == 0 and 'NotRest' in e.classes and not e.duration.isGrace:
+                        e.quarterLength = 1 / max(quarterLengthDivisors)
+                        signedError = ql - e.duration.quarterLength
+                        if hasattr(e, 'editorial'):
+                            e.editorial.quarterLengthQuantizationError = 0 - e.quarterLength
+                    elif matchTuple.match == 0 and 'Rest' in e.classes:
                         rests_lacking_durations.append(e)
-                    e.duration.quarterLength = qlNew
-                    if (hasattr(e, 'editorial')
-                            and signedError != 0):
-                        e.editorial.quarterLengthQuantizationError = signedError
+                    else:
+                        e.duration.quarterLength = matchTuple.match
+                        if (hasattr(e, 'editorial') and matchTuple.signedError != 0):
+                            e.editorial.quarterLengthQuantizationError = matchTuple.signedError
 
             # end for e in ._elements
             # ran coreSetElementOffset
