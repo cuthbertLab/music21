@@ -1293,6 +1293,14 @@ class TimeSignature(base.Music21Object):
          <music21.beam.Beams <music21.beam.Beam 1/continue>>,
          <music21.beam.Beams <music21.beam.Beam 1/continue>>,
          <music21.beam.Beams <music21.beam.Beam 1/stop>>]
+
+        Fixed in v.7 -- incomplete final measures in 6/8:
+
+        >>> sixEight = meter.TimeSignature('6/8')
+        >>> nList = [note.Note(type='quarter'), note.Note(type='eighth'), note.Note(type='eighth')]
+        >>> beamList = sixEight.getBeams(nList)
+        >>> print(beamList)
+        [None, None, None]
         '''
         from music21 import stream
         if isinstance(srcList, stream.Stream):
@@ -1352,8 +1360,11 @@ class TimeSignature(base.Music21Object):
 
             # watch for a special case where a duration completely fills
             # the archetype; this generally should not be beamed
-            if (start == archetypeSpanStart
-                    and end == archetypeSpanEnd):
+            # same if beamPrevious is None and beamNumber == 1 (quarter-eighth in 6/8)
+            if end == archetypeSpanEnd and (
+                start == archetypeSpanStart
+                or (beamPrevious is None and beamNumber == 1)
+            ):
                 # increment position and continue loop
                 beamsList[i] = None  # replace with None!
                 return
@@ -1368,7 +1379,7 @@ class TimeSignature(base.Music21Object):
 
             elif isLast:  # last is always stop
                 beamType = 'stop'
-                # get a partial beam if we cannot come form a beam
+                # get a partial beam if we cannot form a beam
                 if (beamPrevious is None
                         or beamNumber not in beamPrevious.getNumbers()):
                     # environLocal.warn(['triggering partial left where a stop normally falls'])

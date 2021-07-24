@@ -188,6 +188,9 @@ def makeBeams(
             offset = 0.0
             if m.paddingLeft != 0.0:
                 offset = opFrac(m.paddingLeft)
+            elif m.paddingRight != 0.0:
+                pass
+            # Incomplete measure without any padding set: assume paddingLeft
             elif noteStream.highestTime < barQL:
                 offset = barQL - noteStream.highestTime
 

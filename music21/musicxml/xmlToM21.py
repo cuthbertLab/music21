@@ -1989,8 +1989,8 @@ class PartParser(XMLParserBase):
         Fills an empty measure with a measure of rest (bug in PDFtoMusic and
         other MusicXML writers).
 
-        sets self.lastMeasureWasShort to True or False if it is an incomplete measure
-        that is not a pickup.
+        Sets self.lastMeasureWasShort to True or False if it is an incomplete measure
+        that is not a pickup and sets paddingRight.
 
         >>> m = stream.Measure([meter.TimeSignature('4/4'), harmony.ChordSymbol('C7')])
         >>> m.highestTime
@@ -2002,6 +2002,17 @@ class PartParser(XMLParserBase):
         4.0
         >>> PP.lastMeasureWasShort
         False
+
+        Incomplete final measure:
+
+        >>> m = stream.Measure([meter.TimeSignature('6/8'), note.Note(), note.Note()])
+        >>> m.offset = 24.0
+        >>> PP = musicxml.xmlToM21.PartParser()
+        >>> PP.lastMeasureOffset = 21.0
+        >>> PP.setLastMeasureInfo(m)
+        >>> PP.adjustTimeAttributesFromMeasure(m)
+        >>> m.paddingRight
+        1.0
         '''
         # note: we cannot assume that the time signature properly
         # describes the offsets w/n this bar. need to look at
@@ -2049,6 +2060,9 @@ class PartParser(XMLParserBase):
                         # or something
                         self.lastMeasureWasShort = False
                 else:
+                    # Incomplete measure that is likely NOT an anacrusis, set paddingRight
+                    if m.barDurationProportion() < 1.0:
+                        m.paddingRight = m.barDuration.quarterLength - m.highestTime
                     if mHighestTime < lastTimeSignatureQuarterLength:
                         self.lastMeasureWasShort = True
                     else:
