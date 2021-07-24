@@ -71,7 +71,8 @@ environLocal = environment.Environment('stream')
 StreamException = exceptions21.StreamException
 ImmutableStreamException = exceptions21.ImmutableStreamException
 
-BestQuantizationMatch = namedtuple('BestQuantizationMatch', ['error', 'match', 'signedError', 'divisor'])
+BestQuantizationMatch = namedtuple('BestQuantizationMatch',
+    ['error', 'match', 'signedError', 'divisor'])
 
 class StreamDeprecationWarning(UserWarning):
     # Do not subclass Deprecation warning, because these
@@ -9061,10 +9062,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         look_ahead_result = bestMatch(float(next_offset), quarterLengthDivisors)
                         next_offset = look_ahead_result.match
                         next_divisor = look_ahead_result.divisor
-                        if (0
-                            < next_offset - (e.offset + matchTuple.match)
-                            < 1 / max(quarterLengthDivisors)
-                        ):
+                        if (0 < next_offset - (e.offset + matchTuple.match)
+                                < 1 / max(quarterLengthDivisors)):
                             # Overwrite the earlier matchTuple with a better result
                             matchTuple = bestMatch(float(ql), (next_divisor,))
                     # Enforce nonzero duration for non-grace notes
