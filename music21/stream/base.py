@@ -9043,15 +9043,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     if o < 0:
                         sign = -1
                         o = -1 * o
-                    matchTuple = bestMatch(float(o), quarterLengthDivisors)
-                    useStream.coreSetElementOffset(e, matchTuple.match * sign)
-                    if (hasattr(e, 'editorial')
-                            and signedError != 0):
-                        e.editorial.offsetQuantizationError = signedError * sign
+                    o_matchTuple = bestMatch(float(o), quarterLengthDivisors)
+                    useStream.coreSetElementOffset(e, o_matchTuple.match * sign)
+                    if (hasattr(e, 'editorial') and o_matchTuple.signedError != 0):
+                        e.editorial.offsetQuantizationError = o_matchTuple.signedError * sign
                 if processDurations:
                     ql = e.duration.quarterLength
                     ql = max(ql, 0)  # negative ql possible in buggy MIDI files?
-                    matchTuple = bestMatch(float(ql), quarterLengthDivisors)
+                    d_matchTuple = bestMatch(float(ql), quarterLengthDivisors)
                     # Check that any gaps from this quantized duration to the next onset
                     # are at least as large as the smallest quantization unit (largest divisor)
                     # If not, then re-quantize this duration with the divisor
@@ -9062,22 +9061,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         look_ahead_result = bestMatch(float(next_offset), quarterLengthDivisors)
                         next_offset = look_ahead_result.match
                         next_divisor = look_ahead_result.divisor
-                        if (0 < next_offset - (e.offset + matchTuple.match)
+                        if (0 < next_offset - (e.offset + d_matchTuple.match)
                                 < 1 / max(quarterLengthDivisors)):
                             # Overwrite the earlier matchTuple with a better result
-                            matchTuple = bestMatch(float(ql), (next_divisor,))
+                            d_matchTuple = bestMatch(float(ql), (next_divisor,))
                     # Enforce nonzero duration for non-grace notes
-                    if matchTuple.match == 0 and 'NotRest' in e.classes and not e.duration.isGrace:
+                    if (d_matchTuple.match == 0
+                            and 'NotRest' in e.classes
+                            and not e.duration.isGrace):
                         e.quarterLength = 1 / max(quarterLengthDivisors)
-                        signedError = ql - e.duration.quarterLength
                         if hasattr(e, 'editorial'):
                             e.editorial.quarterLengthQuantizationError = 0 - e.quarterLength
-                    elif matchTuple.match == 0 and 'Rest' in e.classes:
+                    elif d_matchTuple.match == 0 and 'Rest' in e.classes:
                         rests_lacking_durations.append(e)
                     else:
-                        e.duration.quarterLength = matchTuple.match
-                        if (hasattr(e, 'editorial') and matchTuple.signedError != 0):
-                            e.editorial.quarterLengthQuantizationError = matchTuple.signedError
+                        e.duration.quarterLength = d_matchTuple.match
+                        if (hasattr(e, 'editorial') and d_matchTuple.signedError != 0):
+                            e.editorial.quarterLengthQuantizationError = d_matchTuple.signedError
 
             # end for e in ._elements
             # ran coreSetElementOffset
