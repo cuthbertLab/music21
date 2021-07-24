@@ -137,7 +137,7 @@ def monophonicStreamFromFile(fileName, useScale=None):
     return myScore.parts.first()
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
 
     def xtestRunTranscribe(self):
         saveFile = environLocal.getRootTempDir() / 'new_song.wav'

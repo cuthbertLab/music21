@@ -1223,6 +1223,11 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') ->
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note F>
         {4.0} <music21.bar.Barline type=final>
+
+    OMIT_FROM_DOCS
+
+    >>> import os
+    >>> os.remove(fp)
     '''
     from music21 import freezeThaw
     v = freezeThaw.StreamFreezer(streamObj, fastButUnsafe=fastButUnsafe)
@@ -1306,8 +1311,7 @@ def _osCanLoad(fp: str) -> bool:
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
-    # interpreter loading
+class TestSlow(unittest.TestCase):  # pragma: no cover
 
     def testMusicXMLConversion(self):
         from music21.musicxml import testFiles
@@ -1315,30 +1319,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             a = subConverters.ConverterMusicXML()
             a.parseData(mxString)
 
-    def testMusicXMLTabConversion(self):
-        from music21.musicxml import testFiles
 
-        mxString = testFiles.ALL[5]
-        a = subConverters.ConverterMusicXML()
-        a.parseData(mxString)
-
-        b = parseData(mxString)
-        b.show('text')
-
-        # {0.0} <music21.metadata.Metadata object at 0x04501CD0>
-        # {0.0} <music21.stream.Part Electric Guitar>
-        #    {0.0} <music21.instrument.Instrument P0: Electric Guitar: >
-        #    {0.0} <music21.stream.Measure 0 offset=0.0>
-        #        {0.0} <music21.layout.StaffLayout distance None, ...staffLines 6>
-        #        {0.0} <music21.clef.TabClef>
-        #        {0.0} <music21.tempo.MetronomeMark animato Quarter=120.0>
-        #        {0.0} <music21.key.KeySignature of no sharps or flats, mode major>
-        #        {0.0} <music21.meter.TimeSignature 4/4>
-        #        {0.0} <music21.note.Note F>
-        #        {2.0} <music21.note.Note F#>
-
-        b.show()
-        pass
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testConversionMusicXml(self):
         c = stream.Score()
@@ -1353,22 +1336,42 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
         c.append(a[0])
         c.append(b[0])
-        c.show()
+        if self.show:
+            c.show()
         # TODO: this is only showing the minimum number of measures
-
-    def testParseURL(self):
-        urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
-        urlB = urlBase + 'schubert/piano/d0576&file=d0576-06.krn&f=kern'
-        urlC = urlBase + 'bach/cello&file=bwv1007-01.krn&f=xml'
-        unused_post = parseURL(urlB)
-        unused_post = parseURL(urlC)
 
     def testFreezer(self):
         from music21 import corpus
         s = corpus.parse('bach/bwv66.6.xml')
         fp = freeze(s)
         s2 = thaw(fp)
-        s2.show()
+        if self.show:
+            s2.show()
+        os.remove(fp)
+
+    def testMusicXMLTabConversion(self):
+        from music21.musicxml import testFiles
+
+        mxString = testFiles.ALL[5]
+        a = subConverters.ConverterMusicXML()
+        a.parseData(mxString)
+
+        b = parseData(mxString)
+        if self.show:
+            b.show('text')
+            b.show()
+
+        # {0.0} <music21.metadata.Metadata object at 0x04501CD0>
+        # {0.0} <music21.stream.Part Electric Guitar>
+        #    {0.0} <music21.instrument.Instrument P0: Electric Guitar: >
+        #    {0.0} <music21.stream.Measure 0 offset=0.0>
+        #        {0.0} <music21.layout.StaffLayout distance None, ...staffLines 6>
+        #        {0.0} <music21.clef.TabClef>
+        #        {0.0} <music21.tempo.MetronomeMark animato Quarter=120.0>
+        #        {0.0} <music21.key.KeySignature of no sharps or flats, mode major>
+        #        {0.0} <music21.meter.TimeSignature 4/4>
+        #        {0.0} <music21.note.Note F>
+        #        {2.0} <music21.note.Note F#>
 
 
 class Test(unittest.TestCase):
@@ -1966,6 +1969,8 @@ class Test(unittest.TestCase):
 
         s = parseURL(url, forceSource=True)
         self.assertEqual(len(s.parts), 2)
+
+        os.remove(destFp)
 
 
 # ------------------------------------------------------------------------------

@@ -3117,12 +3117,14 @@ class Test(unittest.TestCase):
         self.assertEqual(dn.duration.tuplets[0].durationNormal.dots, 0)
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testShowSousa(self):
         hf1 = HumdrumDataCollection(testFiles.sousaStars)
         hf1.parse()
-        hf1.stream.show()
+        if self.show:
+            hf1.stream.show()
 
 
 if __name__ == '__main__':

@@ -1207,7 +1207,7 @@ class TimeSignature(base.Music21Object):
             weightInts = [0] * accentCount  # weights as integer/depth counts
             for i in range(accentCount):
                 ql = i * divStep
-                weightInts[i] = ms.offsetToDepth(ql, align='quantize')
+                weightInts[i] = ms.offsetToDepth(ql, align='quantize', index=i)
 
             maxInt = max(weightInts)
             weightValues = {}  # reference dictionary

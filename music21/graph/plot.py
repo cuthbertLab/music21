@@ -1441,7 +1441,7 @@ class Features(MultiStream):
 # -----------------------------------------------------------------------------------
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternalManual(unittest.TestCase):  # pragma: no cover
 
     def testHorizontalBarPitchSpaceOffset(self):
         a = corpus.parse('bach/bwv57.8')
@@ -2020,4 +2020,4 @@ _DOC_ORDER = [
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='test3DPitchSpaceQuarterLengthCount')
+    music21.mainTest(TestExternalManual)  # , runTest='test3DPitchSpaceQuarterLengthCount')

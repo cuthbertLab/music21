@@ -1306,10 +1306,12 @@ class Test(unittest.TestCase):
         unused_target = pr.getGraphHorizontalBarWeightedData()
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
+
     def testPartReductionB(self):
         t = Test()
-        t.testPartReductionB(show=True)
+        t.testPartReductionB(show=self.show)
 
 
 # ------------------------------------------------------------------------------

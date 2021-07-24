@@ -198,6 +198,10 @@ class StreamFreezer(StreamFreezeThawBase):
     >>> len(s3.parts[0].measure(7).notes) == 6
     True
 
+    OMIT_FROM_DOCS
+
+    >>> import os
+    >>> os.remove(fp2)
     '''
 
     def __init__(self, streamObj=None, fastButUnsafe=False, topLevel=True, streamIds=None):
