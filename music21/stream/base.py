@@ -72,7 +72,7 @@ StreamException = exceptions21.StreamException
 ImmutableStreamException = exceptions21.ImmutableStreamException
 
 BestQuantizationMatch = namedtuple('BestQuantizationMatch',
-    ['error', 'match', 'signedError', 'divisor'])
+    ['error', 'tick', 'match', 'signedError', 'divisor'])
 
 class StreamDeprecationWarning(UserWarning):
     # Do not subclass Deprecation warning, because these
@@ -9016,8 +9016,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             found = []
             for div in divisors:
                 match, error, signedErrorInner = common.nearestMultiple(target, (1 / div))
-                # reverse match, error for sorting
-                found.append(BestQuantizationMatch(error, match, signedErrorInner, div))
+                # Sort by unsigned error, then "tick" (divisor expressed as QL, e.g. 0.25)
+                found.append(BestQuantizationMatch(error, 1 / div, match, signedErrorInner, div))
             # get first, and leave out the error
             bestMatchTuple = sorted(found)[0]
             return bestMatchTuple
