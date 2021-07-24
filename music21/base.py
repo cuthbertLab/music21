@@ -1265,9 +1265,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> b.getContextByClass('Note') is b
         True
 
-        To get the previous `Note`, use `getElementMethod='getElementBefore'`
+        To get the previous `Note`, use `getElementMethod=ElementSearch.BEFORE`:
 
-        >>> a = b.getContextByClass('Note', getElementMethod='getElementBefore')
+        >>> a = b.getContextByClass('Note', getElementMethod=ElementSearch.BEFORE)
         >>> a
         <music21.note.Note A>
 
@@ -1277,21 +1277,21 @@ class Music21Object(prebase.ProtoM21Object):
         >>> b.previous('Note')
         <music21.note.Note A>
 
-        To get the following `Note` use `getElementMethod='getElementAfter'`
+        To get the following `Note` use `getElementMethod=ElementSearch.AFTER`:
 
-        >>> c = b.getContextByClass('Note', getElementMethod='getElementAfter')
+        >>> c = b.getContextByClass('Note', getElementMethod=ElementSearch.AFTER)
         >>> c
         <music21.note.Note C>
 
-        This is similar to `.next('Note')`. though again that method is a bit more
+        This is similar to `.next('Note')`, though, again, that method is a bit more
         sophisticated:
 
         >>> b.next('Note')
         <music21.note.Note C>
 
         A Stream might contain several elements at the same offset, leading to
-        potentially surprising results where searching "atOrBefore" does not search
-        an element that is technically the NEXT node in the tree but still at 0.0:
+        potentially surprising results where searching by `ElementSearch.AT_OR_BEFORE`
+        does not find an element that is technically the NEXT node but still at 0.0:
 
         >>> s = stream.Stream()
         >>> s.insert(0, clef.BassClef())
@@ -1299,17 +1299,17 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.clef.BassClef>
         >>> s.getContextByClass(clef.Clef) is None
         True
-        >>> s.getContextByClass(clef.Clef, getElementMethod='getElementAtOrAfter')
+        >>> s.getContextByClass(clef.Clef, getElementMethod=ElementSearch.AT_OR_AFTER)
         <music21.clef.BassClef>
 
         This can be remedied by explicitly searching by offsets:
 
-        >>> s.getContextByClass(clef.Clef, getElementMethod='getElementAtOrBeforeOffset')
+        >>> s.getContextByClass(clef.Clef, getElementMethod=ElementSearch.AT_OR_BEFORE_OFFSET)
         <music21.clef.BassClef>
 
         Or by not limiting the search by temporal position at all:
 
-        >>> s.getContextByClass(clef.Clef, getElementMethod='all')
+        >>> s.getContextByClass(clef.Clef, getElementMethod=ElementSearch.ALL)
         <music21.clef.BassClef>
 
         Notice that if searching for a `Stream` context, the element is not
