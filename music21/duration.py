@@ -2593,6 +2593,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         for i, dt in enumerate(self._components):
             self._components[i] = durationTupleFromTypeDots(dt.type, value)
         self._quarterLengthNeedsUpdating = True
+        if self.linked is True:
+            self.expressionIsInferred = False
         self.informClient()
 
     @property
@@ -2935,6 +2937,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             nt = durationTupleFromTypeDots(value, self.dots)
             self.components = [nt]
             self._quarterLengthNeedsUpdating = True
+            self.expressionIsInferred = False
             self.informClient()
 
         else:
@@ -3665,6 +3668,31 @@ class Test(unittest.TestCase):
         # this failure happens earlier in quarterConversion()
         d = Duration(1 / 2049)
         self.assertEqual(d.type, 'inexpressible')
+
+    def testExpressionIsInferred(self):
+        d = Duration(0.5)
+        self.assertEqual(d.expressionIsInferred, True)
+
+        d.type = 'whole'
+        self.assertEqual(d.expressionIsInferred, False)
+
+        d.quarterLength = 0.25
+        self.assertEqual(d.expressionIsInferred, True)
+
+        d.dots = 1
+        self.assertEqual(d.expressionIsInferred, False)
+
+        d.appendTuplet(Tuplet(3, 2))
+        # No change
+        self.assertEqual(d.expressionIsInferred, False)
+
+        d.linked = False
+        d.quarterLength = 4
+        d.dots = 1
+        # No change, since this relationship between type
+        # and quarterLength is usually accomplished in multiple
+        # attribute assignments that could occur in any order
+        self.assertEqual(d.expressionIsInferred, False)
 
 
 # -------------------------------------------------------------------------------
