@@ -9031,6 +9031,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if recurse is True:
             useStreams = returnStream.recurse(streamsOnly=True, includeSelf=True)
 
+        rests_lacking_durations: List[note.Rest] = []
         for useStream in useStreams:
             for i, e in enumerate(useStream._elements):
                 if processOffsets:
@@ -9064,10 +9065,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             unused_error, qlNew, signedError, unused_inverse_divisor = bestMatch(
                                 float(ql), (next_divisor,))
                     # Enforce nonzero duration for non-grace notes
-                    # TODO: what about rests? remove rests with ql=0?
-                    if qlNew == 0 and 'GeneralNote' in e.classes and not e.duration.isGrace:
+                    if qlNew == 0 and 'NotRest' in e.classes and not e.duration.isGrace:
                         qlNew = 1 / max(quarterLengthDivisors)
                         signedError = ql - qlNew
+                    elif qlNew == 0 and 'Rest' in e.classes:
+                        rests_lacking_durations.append(e)
                     e.duration.quarterLength = qlNew
                     if (hasattr(e, 'editorial')
                             and signedError != 0):
@@ -9076,6 +9078,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # end for e in ._elements
             # ran coreSetElementOffset
             useStream.coreElementsChanged(updateIsFlat=False)
+
+            for rest_to_remove in rests_lacking_durations:
+                useStream.remove(rest_to_remove)
 
         if inPlace is False:
             return returnStream
