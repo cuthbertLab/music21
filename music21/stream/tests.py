@@ -1807,6 +1807,7 @@ class Test(unittest.TestCase):
         '''Testing getting clefs from higher-level streams
         '''
         from music21 import sites
+        from music21.common.enums import ElementSearch
 
         s1 = Stream(id='s1')
         n1 = note.Note()
@@ -1836,7 +1837,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s2.elementOffset(s1), 0.0)
         self.assertRaises(sites.SitesException, s2.elementOffset, s1.flat)
 
-        post = s2.getContextByClass(clef.Clef, getElementMethod='all')
+        post = s2.getContextByClass(clef.Clef, getElementMethod=ElementSearch.ALL)
         self.assertIsInstance(post, clef.AltoClef)
 
         self.assertIsInstance(s2.clef, clef.AltoClef)
