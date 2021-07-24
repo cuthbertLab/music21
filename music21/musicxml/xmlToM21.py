@@ -383,9 +383,9 @@ class XMLParserBase:
             if mxValue is None:
                 continue
 
-            if m21Name in xmlObjects.STYLE_ATTRIBUTES_STR_NONE_TO_NONE and mxValue == 'none':
+            if mxValue == 'none' and m21Name in xmlObjects.STYLE_ATTRIBUTES_STR_NONE_TO_NONE:
                 mxValue = None
-            if m21Name in xmlObjects.STYLE_ATTRIBUTES_YES_NO_TO_BOOL:
+            elif m21Name in xmlObjects.STYLE_ATTRIBUTES_YES_NO_TO_BOOL:
                 mxValue = xmlObjects.yesNoToBoolean(mxValue)
 
             try:
