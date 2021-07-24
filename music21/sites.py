@@ -13,7 +13,6 @@
 sites.py -- Objects for keeping track of relationships among Music21Objects
 '''
 import collections
-from music21.common.enums import ElementSearch
 import unittest
 import weakref
 from typing import Union
@@ -572,7 +571,7 @@ class Sites(common.SlottedObjectMixin):
         callerFirst=None,
         sortByCreationTime=False,
         priorityTarget=None,
-        getElementMethod=ElementSearch.AT_OR_BEFORE,
+        getElementMethod=common.enums.ElementSearch.AT_OR_BEFORE,
         memo=None
     ):
         '''
