@@ -3886,5 +3886,5 @@ _DOC_ORDER = [streamToMidiFile, midiFileToStream]
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, runTest='testMidiEventsImported')
+    music21.mainTest(Test)  # , runTest='testConductorStream')
 
