@@ -3711,7 +3711,6 @@ class Test(unittest.TestCase):
                  (0, 'SET_TEMPO', None),
                  (1024, 'END_OF_TRACK', None),
                  (0, 'SEQUENCE_TRACK_NAME', None),  # Music track
-                 (0, 'PROGRAM_CHANGE', None),
                  (0, 'PITCH_BEND', None),
                  (0, 'PROGRAM_CHANGE', None),
                  (0, 'NOTE_ON', 69),
@@ -3887,5 +3886,5 @@ _DOC_ORDER = [streamToMidiFile, midiFileToStream]
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testConductorStream')
+    music21.mainTest(Test, runTest='testMidiEventsImported')
 

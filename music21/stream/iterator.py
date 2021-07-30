@@ -1219,7 +1219,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> list(bwv66.recurse().getElementsByOffset(0.0))
         [<music21.metadata.Metadata object at 0x10a32f490>,
          <music21.stream.Part Soprano>,
-         <music21.instrument.Piano 'P1: Soprano: Instrument 1'>,
+         <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>,
          <music21.stream.Measure 0 offset=0.0>,
          <music21.clef.TrebleClef>,
          <music21.key.Key of f# minor>,

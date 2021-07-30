@@ -1606,10 +1606,18 @@ class PartParser(XMLParserBase):
                     i = instrument.instrumentFromMidiProgram(_adjustMidiData(mxMidiProgram.text))
                 except instrument.InstrumentException as ie:
                     warnings.warn(MusicXMLWarning(ie))
+                    # Invalid MIDI program, out of range 0-127
                     i = instrument.Instrument()
                 seta(i, mxMIDIInstrument, 'midi-channel', transform=_adjustMidiData)
         if i is None:
+            # This catches textStripValid() returning False or no mxMIDIInstrument
             i = instrument.Instrument()
+
+        # for now, just get first instrument
+        # TODO: get all instruments!
+        mxScoreInstrument = mxScorePart.find('score-instrument')
+        if isinstance(i, instrument.Piano) and mxScoreInstrument is not None:
+            i = self.reclassifyInstrumentFromName(i, mxScoreInstrument)
 
         i.partId = self.partId
         i.groups.append(self.partId)
@@ -1617,9 +1625,6 @@ class PartParser(XMLParserBase):
         i.partAbbreviation = self.stream.partAbbreviation
         # TODO: groups
 
-        # for now, just get first instrument
-        # TODO: get all instruments!
-        mxScoreInstrument = mxScorePart.find('score-instrument')
         if mxScoreInstrument is not None:
             seta(i, mxScoreInstrument, 'instrument-name', transform=_clean)
             seta(i, mxScoreInstrument, 'instrument-abbreviation', transform=_clean)
@@ -1628,6 +1633,19 @@ class PartParser(XMLParserBase):
         # TODO: virtual-instrument
         # TODO: store id attribute somewhere
 
+        return i
+
+    @staticmethod
+    def reclassifyInstrumentFromName(
+            i: instrument.Instrument, mxScoreInstrument: ET.Element) -> instrument.Instrument:
+        mxInstrumentName = mxScoreInstrument.find('instrument-name')
+        if mxInstrumentName is not None and textStripValid(mxInstrumentName):
+            previous_midi_channel = i.midiChannel
+            try:
+                i = instrument.fromString(mxInstrumentName.text.strip())
+            except instrument.InstrumentException:
+                i = instrument.Instrument()
+            i.midiChannel = previous_midi_channel
         return i
 
     def parseMeasures(self):

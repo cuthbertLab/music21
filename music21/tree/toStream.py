@@ -34,7 +34,7 @@ def chordified(timespans, templateStream=None):
     >>> chordifiedScore = tree.toStream.chordified(
     ...     scoreTree, templateStream=score)
     >>> chordifiedScore.show('text')
-    {0.0} <music21.instrument.Piano 'P1: Soprano: Instrument 1'>
+    {0.0} <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.key.Key of f# minor>

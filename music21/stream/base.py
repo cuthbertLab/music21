@@ -4423,7 +4423,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> sopr = b.parts[0]
         >>> soprEmpty = sopr.template()
         >>> soprEmpty.show('text')
-        {0.0} <music21.instrument.Piano 'P1: Soprano: Instrument 1'>
+        {0.0} <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.key.Key of f# minor>
@@ -4445,7 +4445,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> alto = b.parts[1]
         >>> altoEmpty = alto.template(fillWithRests=False)
         >>> altoEmpty.show('text')
-        {0.0} <music21.instrument.Piano 'P2: Alto: Instrument 2'>
+        {0.0} <music21.instrument.Instrument 'P2: Alto: Instrument 2'>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.key.Key of f# minor>
@@ -4499,7 +4499,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> b.template().show('text')
         {0.0} <music21.metadata.Metadata object at 0x106151940>
         {0.0} <music21.stream.Part Soprano>
-            {0.0} <music21.instrument.Piano 'P1: Soprano: Instrument 1'>
+            {0.0} <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.key.Key of f# minor>
