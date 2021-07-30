@@ -1984,7 +1984,8 @@ def midiTrackToStream(
         inPlace=True)
     if voicesRequired:
         for m in s.getElementsByClass(stream.Measure):
-            m.makeVoices(inPlace=True, fillGaps=True)
+            # Gaps will be filled by makeRests, below, which now recurses
+            m.makeVoices(inPlace=True, fillGaps=False)
     s.makeTies(inPlace=True)
     # always need to fill gaps, as rests are not found in any other way
     s.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
