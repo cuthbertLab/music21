@@ -4512,7 +4512,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 {0.0} <music21.note.Rest dotted-half>
                 {3.0} <music21.bar.Barline type=final>
         {0.0} <music21.stream.Part Alto>
-            {0.0} <music21.instrument.Piano 'P2: Alto: Instrument 2'>
+            {0.0} <music21.instrument.Instrument 'P2: Alto: Instrument 2'>
             {0.0} <music21.stream.Measure 0 offset=0.0>
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.key.Key of f# minor>
