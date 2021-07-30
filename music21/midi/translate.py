@@ -763,21 +763,25 @@ def midiEventsToInstrument(eventList):
             decoded = event.data.decode('utf-8').split('\x00')[0]
             decoded = decoded.strip()
             i = instrument.fromString(decoded)
+        elif event.channel == 10:
+            pm = percussion.PercussionMapper()
+            i = pm.midiPitchToInstrument(event.data + 1)
         else:
-            if event.channel == 10:
-                pm = percussion.PercussionMapper()
-                i = pm.midiPitchToInstrument(event.data + 1)
-            else:
-                i = instrument.instrumentFromMidiProgram(event.data)
-            # Instrument.midiProgram and event.data are both 0-indexed
-            i.midiProgram = event.data
-    except (percussion.MIDIPercussionException,
-            UnicodeDecodeError):
-        warnings.warn(f'Unable to determine instrument from {event}', TranslateWarning)
+            i = instrument.instrumentFromMidiProgram(event.data)
+        # Instrument.midiProgram and event.data are both 0-indexed
+        i.midiProgram = event.data
+    except UnicodeDecodeError:
+        warnings.warn(
+            f'Unable to determine instrument from {event}; getting generic Instrument',
+            TranslateWarning)
         i = instrument.Instrument()
+    except percussion.MIDIPercussionException:
+        warnings.warn(
+            f'Unable to determine instrument from {event}; getting generic UnpitchedPercussion',
+            TranslateWarning)
+        i = instrument.UnpitchedPercussion()
     except instrument.InstrumentException:
-        # Currently, we risk having an overwhelming number of warnings
-        # but consider consolidating to just one except one day
+        # Debug logging would be better than warning here
         i = instrument.Instrument()
 
     # Set MIDI channel
@@ -3805,6 +3809,7 @@ class Test(unittest.TestCase):
         self.assertIsInstance(i, instrument.Flute)
 
     def testLousyInstrumentData(self):
+        from music21 import instrument
         from music21 import midi as midiModule
 
         lousyNames = ('    ', 'Instrument 20', 'Instrument', 'Inst 2', 'instrument')
@@ -3825,9 +3830,10 @@ class Test(unittest.TestCase):
 
         expected = 'Unable to determine instrument from '
         expected += '<music21.midi.MidiEvent PROGRAM_CHANGE, track=None, channel=10, data=0>'
+        expected += '; getting generic UnpitchedPercussion'
         with self.assertWarnsRegex(TranslateWarning, expected):
             i = midiEventsToInstrument(event)
-            self.assertIsNone(i.instrumentName)
+            self.assertIsInstance(i, instrument.UnpitchedPercussion)
 
     def testConductorStream(self):
         s = stream.Stream()
