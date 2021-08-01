@@ -1375,7 +1375,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     def show(self, obj, fmt, app=None, subformats=None, *,
              offline: bool = False, **keywords):  # pragma: no cover
         '''
-        Displays the score object in a notebook using the OpenSheetMusicDisplay.js library.
+        Displays the Stream in a notebook using the OpenSheetMusicDisplay.js library.
 
         >>> import music21
         >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
