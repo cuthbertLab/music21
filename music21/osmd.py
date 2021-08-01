@@ -79,8 +79,10 @@ def musicXMLToScript(xml, divId, offline=False):
     '''
 
     # script that will replace div contents with OSMD display
+    script = ''
     script_path = os.path.join(getSourceFilePath(), 'js', 'notebookOSMDLoader.js')
-    script = open(script_path, 'r').read()
+    with open(script_path, 'r') as f:
+        script = f.read()
     script = script.replace('{{DIV_ID}}', divId)
     script = script.replace('"{{data}}"', json.dumps(xml))
 
@@ -94,7 +96,9 @@ def musicXMLToScript(xml, divId, offline=False):
             urllib.request.urlretrieve(SCRIPT_URL, osmd_file)
 
         # since we can't link to files from a notebook (security risk) inject into file.
-        script_content = open(osmd_file).read()
+        script_content = ''
+        with open(osmd_file, 'r') as f:
+            script_content = f.read()
         script = script.replace('"{{offline_script}}"', json.dumps(script_content), 1)
 
     else:
