@@ -1374,10 +1374,10 @@ def makeTupletBrackets(s, *, inPlace=False):
                 continue
             durationList.append(n.duration)
 
-    tupletMap = []  # a list of (tuplet obj / Duration) pairs
+    tupletMap = []  # a list of [tuplet obj, Duration] pairs
     for dur in durationList:  # all Duration objects
         tupletList = dur.tuplets
-        if tupletList in [(), None]:  # no tuplets, length is zero
+        if tupletList in [(), None]:  # no tuplets, length is zero  # should never be None.
             tupletMap.append([None, dur])
         elif len(tupletList) > 1:
             # for i in range(len(tuplets)):
@@ -1385,16 +1385,15 @@ def makeTupletBrackets(s, *, inPlace=False):
             environLocal.warn(
                 f'got multi-tuplet duration; cannot yet handle this. {tupletList!r}'
             )
+            tupletMap.append([None, dur])
         elif len(tupletList) == 1:
             tupletMap.append([tupletList[0], dur])
-            if tupletList[0] != dur.tuplets[0]:
-                raise Exception('cannot access Tuplets object from within DurationTuple.')
         else:
             raise Exception(f'cannot handle these tuplets: {tupletList}')
 
     # have a list of tuplet, Duration pairs
-    completionCount = 0  # qLen currently filled
-    completionTarget = None  # qLen necessary to fill tuplet
+    completionCount: Union[float, int, Fraction] = 0  # qLen currently filled
+    completionTarget: Union[float, int, Fraction, None] = None  # qLen necessary to fill tuplet
     for i in range(len(tupletMap)):
         tupletObj, dur = tupletMap[i]
 
