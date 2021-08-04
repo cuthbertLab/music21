@@ -1596,7 +1596,7 @@ class ConfigurationAssistant:
 _DOC_ORDER = []
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestUserInput(unittest.TestCase):  # pragma: no cover
 
     def testYesOrNo(self):
         print()
@@ -1762,7 +1762,7 @@ if __name__ == '__main__':
     else:
         # only if running tests
         t = Test()
-        te = TestExternal()
+        te = TestUserInput()
 
         if len(sys.argv) < 2 or sys.argv[1] in ['all', 'test']:
             import music21
@@ -1770,7 +1770,7 @@ if __name__ == '__main__':
 
         # arg[1] is test to launch
         elif sys.argv[1] == 'te':
-            # run test external
+            # run test user input
             getattr(te, sys.argv[2])()
         # just run named Test
         elif hasattr(t, sys.argv[1]):

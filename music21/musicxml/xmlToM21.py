@@ -1989,8 +1989,8 @@ class PartParser(XMLParserBase):
         Fills an empty measure with a measure of rest (bug in PDFtoMusic and
         other MusicXML writers).
 
-        sets self.lastMeasureWasShort to True or False if it is an incomplete measure
-        that is not a pickup.
+        Sets self.lastMeasureWasShort to True or False if it is an incomplete measure
+        that is not a pickup and sets paddingRight.
 
         >>> m = stream.Measure([meter.TimeSignature('4/4'), harmony.ChordSymbol('C7')])
         >>> m.highestTime
@@ -2002,6 +2002,17 @@ class PartParser(XMLParserBase):
         4.0
         >>> PP.lastMeasureWasShort
         False
+
+        Incomplete final measure:
+
+        >>> m = stream.Measure([meter.TimeSignature('6/8'), note.Note(), note.Note()])
+        >>> m.offset = 24.0
+        >>> PP = musicxml.xmlToM21.PartParser()
+        >>> PP.lastMeasureOffset = 21.0
+        >>> PP.setLastMeasureInfo(m)
+        >>> PP.adjustTimeAttributesFromMeasure(m)
+        >>> m.paddingRight
+        1.0
         '''
         # note: we cannot assume that the time signature properly
         # describes the offsets w/n this bar. need to look at
@@ -2049,6 +2060,9 @@ class PartParser(XMLParserBase):
                         # or something
                         self.lastMeasureWasShort = False
                 else:
+                    # Incomplete measure that is likely NOT an anacrusis, set paddingRight
+                    if m.barDurationProportion() < 1.0:
+                        m.paddingRight = m.barDuration.quarterLength - m.highestTime
                     if mHighestTime < lastTimeSignatureQuarterLength:
                         self.lastMeasureWasShort = True
                     else:
@@ -4777,8 +4791,7 @@ class MeasureParser(XMLParserBase):
                 d = dynamics.Dynamic(m21DynamicText)
 
                 _synchronizeIds(dyn, d)
-                _setAttributeFromAttribute(d, mxDirection,
-                                           'placement', 'positionPlacement')
+                _setAttributeFromAttribute(d, mxDirection, 'placement', 'placement')
 
                 self.insertCoreAndRef(totalOffset, staffKey, d)
                 self.setPosition(mxDir, d)
@@ -4809,6 +4822,7 @@ class MeasureParser(XMLParserBase):
         elif tag == 'metronome':
             mm = self.xmlToTempoIndication(mxDir)
             # SAX was offsetMeasureNote; bug? should be totalOffset???
+            _setAttributeFromAttribute(mm, mxDirection, 'placement', 'placement')
             self.insertCoreAndRef(totalOffset, staffKey, mm)
             self.setEditorial(mxDirection, mm)
 
@@ -4823,8 +4837,7 @@ class MeasureParser(XMLParserBase):
             # environLocal.printDebug(['got TextExpression object', repr(te)])
             # offset here is a combination of the current position
             # (offsetMeasureNote) and and the direction's offset
-            _setAttributeFromAttribute(textExpression, mxDirection,
-                                       'placement', 'positionPlacement')
+            _setAttributeFromAttribute(textExpression, mxDirection, 'placement', 'placement')
 
             repeatExpression = textExpression.getRepeatExpression()
             if repeatExpression is not None:
@@ -7010,6 +7023,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testFiles.tabTest)
         metro = s.recurse().getElementsByClass('MetronomeMark').first()
         self.assertEqual(metro.style.absoluteY, 40)
+        self.assertEqual(metro.placement, 'above')
 
 
 if __name__ == '__main__':

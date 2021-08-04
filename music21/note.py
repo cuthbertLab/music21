@@ -1786,17 +1786,19 @@ class Rest(GeneralNote):
 # ------------------------------------------------------------------------------
 # test methods and classes
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     '''
     These are tests that open windows and rely on external software
     '''
+    show = True
 
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
         '''
         a = Note('d-3')
         a.quarterLength = 2.25
-        a.show()
+        if self.show:
+            a.show()
 
     def testBasic(self):
         from music21 import stream
@@ -1813,7 +1815,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             b.style.color = '#FF00FF'
             a.append(b)
 
-        a.show()
+        if self.show:
+            a.show()
 
 
 # ------------------------------------------------------------------------------
@@ -1876,7 +1879,7 @@ class Test(unittest.TestCase):
         self.assertEqual(matchStr, outStr)
         i = 0
         for thisNote in note1.splitAtDurations():
-            matchSub = matchStr.split('\n')[i]
+            matchSub = matchStr.split('\n')[i]  # pylint: disable=use-maxsplit-arg
             conv = LilypondConverter()
             conv.appendM21ObjectToContext(thisNote)
             outStr = str(conv.context).replace(' ', '').strip()

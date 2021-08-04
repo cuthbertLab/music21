@@ -160,7 +160,8 @@ def thomassenMelodicAccent(streamIn):
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
@@ -181,8 +182,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         s = s.makeMeasures()
         s = labelBeatDepth(s)
 
-        s.show()
-
+        if self.show:
+            s.show()
 
 
 class Test(unittest.TestCase):

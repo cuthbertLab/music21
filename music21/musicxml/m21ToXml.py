@@ -432,6 +432,7 @@ class GeneralObjectExporter:
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.meter.TimeSignature 6/8>
                 {0.0} <music21.note.Note C>
+                {3.0} <music21.bar.Barline type=final>
         >>> s.flat.notes[0].duration
         <music21.duration.Duration 3.0>
         '''
@@ -668,6 +669,9 @@ class GeneralObjectExporter:
         Translate a music21 :class:`~music21.note.Note` into an object
         ready to be parsed.
 
+        An attempt is made to find the best TimeSignature for quarterLengths
+        <= 6:
+
         >>> n = note.Note('c3')
         >>> n.quarterLength = 3
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
@@ -678,19 +682,29 @@ class GeneralObjectExporter:
                 {0.0} <music21.clef.BassClef>
                 {0.0} <music21.meter.TimeSignature 6/8>
                 {0.0} <music21.note.Note C>
+                {3.0} <music21.bar.Barline type=final>
+
+        But longer notes will be broken into tied components placed in
+        4/4 measures:
+
+        >>> long_note = note.Note('e5', quarterLength=40)
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
+        >>> sc = GEX.fromGeneralNote(long_note)
+        >>> sc[meter.TimeSignature].first()
+        <music21.meter.TimeSignature 4/4>
+        >>> len(sc[stream.Measure])
+        10
         '''
         # make a copy, as this process will change tuple types
-        # this method is called infrequently, and only for display of a single
-        # note
+        # this method is called infrequently (only displaying a single note)
         nCopy = copy.deepcopy(n)
-
-        # modifies in place
-        stream.makeNotation.makeTupletBrackets([nCopy.duration], inPlace=True)
-        out = stream.Measure(number=1)
-        out.append(nCopy)
-
-        # call the musicxml property on Stream
-        return self.fromMeasure(out)
+        new_part = stream.Part(nCopy)
+        if 0 < n.quarterLength <= 6.0:
+            new_part.insert(0, meter.bestTimeSignature(new_part))
+        stream.makeNotation.makeMeasures(
+            new_part, inPlace=True, refStreamOrTimeRange=[0, nCopy.quarterLength])
+        stream.makeNotation.makeTupletBrackets(new_part, inPlace=True)
+        return self.fromPart(new_part)
 
     def fromPitch(self, p):
         # noinspection PyShadowingNames
@@ -5003,9 +5017,9 @@ class MeasureExporter(XMLExporterBase):
         mxDirectionType = SubElement(mxDirection, 'direction-type')
         mxDirectionType.append(mxObj)
         if (m21Obj is not None
-                and hasattr(m21Obj, 'positionPlacement')
-                and m21Obj.positionPlacement is not None):
-            mxDirection.set('placement', m21Obj.positionPlacement)
+                and hasattr(m21Obj, 'placement')
+                and m21Obj.placement is not None):
+            mxDirection.set('placement', m21Obj.placement)
 
         return mxDirection
 
@@ -6603,11 +6617,16 @@ class Test(unittest.TestCase):
         c.useSymbol = False
         f = repeat.Fine()
         mm = tempo.MetronomeMark(text='Langsam')
+        mm.placement = 'above'
         s.measure(1).storeAtEnd([c, f, mm])
 
         tree = self.getET(s)
         for direction in tree.findall('.//direction'):
             self.assertIsNone(direction.find('offset'))
+
+        # Also check position
+        mxDirection = tree.find('part/measure/direction')
+        self.assertEqual(mxDirection.get('placement'), 'above')
 
     def testFullMeasureRest(self):
         from music21 import converter
@@ -6648,10 +6667,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(tree.findall('.//rest')), 1)
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def testBasic(self):
-        pass
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testSimple(self):
         from music21 import corpus  # , converter
@@ -6684,7 +6701,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
         # b2 = converter.parse(v)
         fp = b.write('musicxml')
-        print(fp)
+        if self.show:
+            print(fp)
 
         with io.open(fp, encoding='utf-8') as f:
             v2 = f.read()
@@ -6693,10 +6711,13 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             if l.startswith('-') or l.startswith('?') or l.startswith('+'):
                 if 'id=' in l:
                     continue
-                print(l)
-                # for j in range(i - 1,i + 1):
-                #    print(differ[j])
-                # print('------------------')
+                if self.show:
+                    print(l)
+                    # for j in range(i - 1,i + 1):
+                    #    print(differ[j])
+                    # print('------------------')
+        import os
+        os.remove(fp)
 
 
 if __name__ == '__main__':

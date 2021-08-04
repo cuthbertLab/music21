@@ -305,6 +305,33 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         self.coreElementsChanged()
 
+    def __call__(self):
+        '''
+        Temporary workaround to support both prior usage of `.sorted`
+        and new recommended usage of `.sorted()`.
+        During the period where `.sorted` is still supported, even calling `.sorted()`
+        (recommended) will retrieve the property `.sorted` and necessitate
+        this workaround.
+
+        Returns `self` without any changes.
+
+        TODO: remove in v.8
+        '''
+        self._cache.pop('sortedByProperty', None)
+        return self
+
+    def __del__(self):
+        '''
+        Temporary means of emitting a DeprecationWarning once per stream per session
+        if .sorted was called rather than .sorted()
+
+        TODO: remove in v.8
+        '''
+        if self._cache.get('sortedByProperty', None) and not self._cache.get('sorted', None):
+            raise StreamDeprecationWarning(
+                f'sorted (called on {self}) is deprecated in favor of sorted() and '
+                + 'will be removed in v.8')
+
     def _reprInternal(self):
         if self.id is not None:
             if self.id != id(self) and str(self.id) != str(id(self)):
@@ -7284,10 +7311,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         priority, then classSortOrder (so that, for instance, a Clef at offset 0 appears before
         a Note at offset 0)
 
-        if this Stream is not flat, then only the highest elements are sorted.  To sort all,
-        run myStream.flat.sorted
+        If this Stream is not flat, then only the highest elements are sorted.  To sort all,
+        run myStream.flat.sorted().
 
-        For instance, here is an unsorted Stream
+        Calling `.sorted` as a property will be disabled in v.8 when this property will become
+        a method instead. These examples model the intended usage as of v.7 to call
+        `.sorted()`.
+
+        For instance, here is an unsorted Stream:
 
         >>> s = stream.Stream()
         >>> s.autoSort = False  # if True, sorting is automatic
@@ -7300,7 +7331,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         But a sorted version of the Stream puts the C first:
 
-        >>> s.sorted.show('text')
+        >>> s.sorted().show('text')
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
 
@@ -7324,7 +7355,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
         >>> g
         '0.0: C#; 2.0: C#; 4.0: C#; 1.0: D-; 3.0: D-; 5.0: D-; '
-        >>> y = s.sorted
+        >>> y = s.sorted()
         >>> y.isSorted
         True
         >>> g = ''
@@ -7341,7 +7372,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
         >>> g
         '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; 2.0: E; '
-        >>> z = y.sorted
+        >>> z = y.sorted()
         >>> g = ''
         >>> for myElement in z:
         ...    g += '%s: %s; ' % (myElement.offset, myElement.name)
@@ -7368,6 +7399,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # isSorted attribute and sort only if not already sorted
             s.sort()
             self._cache['sorted'] = s
+        self._cache['sortedByProperty'] = True
         return self._cache['sorted']
 
     def _getFlatOrSemiFlat(self, retainContainers=False):
@@ -7528,7 +7560,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> g
         '0.0: C#; 2.0: C#; 4.0: C#; 1.0: D-; 3.0: D-; 5.0: D-; '
 
-        >>> y = s.sorted
+        >>> y = s.sorted()
         >>> y.isSorted
         True
 
@@ -10013,7 +10045,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         flatStream = self.flat
         if flatStream.isSorted is False:
-            flatStream = flatStream.sorted
+            flatStream = flatStream.sorted()
         # these may not be sorted
         durSpanSorted = self._getDurSpan(flatStream)
         # According to the above comment, the spans may not be sorted
@@ -10049,7 +10081,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         flatStream = self.flat
         if flatStream.isSorted is False:
-            flatStream = flatStream.sorted
+            flatStream = flatStream.sorted()
 
         if len(layeringMap) != len(flatStream):
             raise StreamException('layeringMap must be the same length as flatStream')

@@ -15,6 +15,7 @@ This module defines two component objects for defining nested metrical structure
 :class:`~music21.meter.core.MeterTerminal` and :class:`~music21.meter.core.MeterSequence`.
 '''
 import copy
+from typing import Optional
 
 from music21 import prebase
 from music21.common.numberTools import opFrac
@@ -1765,9 +1766,9 @@ class MeterSequence(MeterTerminal):
         iMatch = self.offsetToIndex(qLenPos)
         return opFrac(self[iMatch].weight)
 
-    def offsetToDepth(self, qLenPos, align='quantize'):
+    def offsetToDepth(self, qLenPos, align='quantize', index: Optional[int] = None):
         '''
-        Given a qLenPos, return the maximum available depth at this position
+        Given a qLenPos, return the maximum available depth at this position.
 
         >>> b = meter.MeterSequence('4/4', 4)
         >>> b[1] = b[1].subdivide(2)
@@ -1787,6 +1788,9 @@ class MeterSequence(MeterTerminal):
         >>> b.offsetToDepth(-1)
         Traceback (most recent call last):
         music21.exceptions21.MeterException: cannot access from qLenPos -1.0
+
+        Changed in v.7 -- `index` can be provided, if known, for some long
+        `MeterSequence`s to improve performance.
         '''
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
@@ -1797,7 +1801,9 @@ class MeterSequence(MeterTerminal):
         # need to quantize by lowest level
         mapMin = self.getLevelSpan(self.depth - 1)
         msMin = self.getLevel(self.depth - 1)
-        qStart, unused_qEnd = mapMin[msMin.offsetToIndex(qLenPos)]
+        if index is None:
+            index = msMin.offsetToIndex(qLenPos)
+        qStart, unused_qEnd = mapMin[index]
         if align == 'quantize':
             posMatch = opFrac(qStart)
         else:

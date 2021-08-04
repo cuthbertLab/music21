@@ -47,7 +47,8 @@ environLocal = environment.Environment('stream.tests')
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testLilySimple(self):
         a = Stream()
@@ -63,7 +64,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         a.insert(0, ts)
         a.insert(0, b)
 
-        a.show('lily.png')
+        if self.show:
+            a.show('lily.png')
 
     def testLilySemiComplex(self):
         a = Stream()
@@ -94,7 +96,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         a.insert(0, bestC)
         a.insert(0, ts)
         a.insert(0, b)
-        a.show('lily.png')
+        if self.show:
+            a.show('lily.png')
 
     def testScoreLily(self):
         '''
@@ -113,7 +116,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         score1.insert(ts)
         score1.insert(s1)
         score1.insert(s2)
-        score1.show('lily.png')
+        if self.show:
+            score1.show('lily.png')
 
     def testMXOutput(self):
         '''A simple test of adding notes to measures in a stream.
@@ -125,7 +129,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 a = note.Note(p)
                 b.append(a)
             c.append(b)
-        c.show()
+        if self.show:
+            c.show()
 
     def testMxMeasures(self):
         '''A test of the automatic partitioning of notes in a measure and the creation of ties.
@@ -142,7 +147,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         a.insert(3, meter.TimeSignature('3/16'))
         a.insert(20, meter.TimeSignature('9/8'))
         a.insert(40, meter.TimeSignature('10/4'))
-        a.show()
+        if self.show:
+            a.show()
 
     def testMultipartStreams(self):
         '''Test the creation of multi-part streams by simply having streams within streams.
@@ -166,7 +172,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         s.insert(3, meter.TimeSignature('5/4'))
         s.insert(8, meter.TimeSignature('3/4'))
 
-        s.show()
+        if self.show:
+            s.show()
 
     def testMultipartMeasures(self):
         '''
@@ -193,7 +200,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         s.append(violin_i_part_slice)
         s.append(violin_ii_part_slice)
         s.append(viola_part_slice)
-        s.show()
+        if self.show:
+            s.show()
 
     def testCanons(self):
         '''
@@ -220,7 +228,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             s.insert(p)
             partOffset += partOffsetShift
 
-        s.show()
+        if self.show:
+            s.show()
 
     def testBeamsPartial(self):
         '''
@@ -239,7 +248,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         s.insert(3, meter.TimeSignature('5/4'))
         s.insert(8, meter.TimeSignature('4/4'))
 
-        s.show()
+        if self.show:
+            s.show()
 
     def testBeamsStream(self):
         '''A test of beams applied to different time signatures.
@@ -269,7 +279,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         s.insert(8, meter.TimeSignature('4/4'))
         self.assertEqual(len(s.flat.notes), 360)
 
-        s.show()
+        if self.show:
+            s.show()
 
     def testBeamsMeasure(self):
         aMeasure = Measure()
@@ -278,7 +289,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         aNote.quarterLength = 0.25
         aMeasure.repeatAppend(aNote, 16)
         bMeasure = aMeasure.makeBeams()
-        bMeasure.show()
+        if self.show:
+            bMeasure.show()
 
 
 # ------------------------------------------------------------------------------
@@ -307,7 +319,7 @@ class Test(unittest.TestCase):
         s.repeatInsert(note.Note('C#'), [0.0, 2.0, 4.0])
         s.repeatInsert(note.Note('D-'), [1.0, 3.0, 5.0])
         self.assertFalse(s.isSorted)
-        y = s.sorted
+        y = s.sorted()
         self.assertTrue(y.isSorted)
         g = ''
         for myElement in y:
@@ -400,8 +412,8 @@ class Test(unittest.TestCase):
         n1 = note.Note()
         st2.insert(10, n1)
         st1.insert(12, st2)
-        self.assertIs(st1.flat.sorted[0], n1)
-        self.assertEqual(st1.flat.sorted[0].offset, 22.0)
+        self.assertIs(st1.flat.sorted()[0], n1)
+        self.assertEqual(st1.flat.sorted()[0].offset, 22.0)
 
     def testStreamExceptionsOnAssert(self):
         with self.assertRaises(StreamException):
@@ -432,7 +444,7 @@ class Test(unittest.TestCase):
         # environLocal.printDebug(['pre flat of mid stream'])
         self.assertEqual(len(midStream.flat), 24)
 #        self.assertEqual(len(midStream.getOverlaps()), 0)
-        mfs = midStream.flat.sorted
+        mfs = midStream.flat.sorted()
         self.assertEqual(mfs[7].getOffsetBySite(mfs), 11.0)
 
         farStream = Stream()
@@ -473,7 +485,7 @@ class Test(unittest.TestCase):
 
         # get just offset times
         # elementsSorted returns offset, dur, element
-        fs_fs = farStream.flat.sorted
+        fs_fs = farStream.flat.sorted()
         offsets = [a.offset for a in fs_fs]  # safer is a.getOffsetBySite(fs_fs)
         offsetsBrief = offsets[:20]
         self.assertEqual(offsetsBrief,
@@ -4341,7 +4353,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual([x.name for x in s], ['B', 'A'])
         # try getting sorted
-        sSorted = s.sorted
+        sSorted = s.sorted()
         # original unchanged
         self.assertEqual([x.name for x in s], ['B', 'A'])
         # new is changed
@@ -8302,6 +8314,33 @@ class Test(unittest.TestCase):
         self.assertEqual(beams[2], continue_beam)  # third should be continue
         self.assertEqual(beams[3], continue_beam)  # fourth should be continue
         self.assertEqual(beams[4], stop_beam)  # last should be stop
+
+    def test_makeBeams__paddingRight(self):
+        m = Measure()
+        m.timeSignature = meter.TimeSignature('6/8')
+        m.paddingRight = 1.0
+        m.append(note.Note(type='quarter'))
+        m.append(note.Note(type='eighth'))
+        m.append(note.Note(type='eighth'))
+
+        m.makeBeams(inPlace=True)
+        beams = self.get_beams_from_stream(m)
+
+        no_beam = beam.Beams()
+        start_beam = beam.Beams()
+        start_beam.append('start')
+        stop_beam = beam.Beams()
+        stop_beam.append('stop')
+
+        self.assertEqual(beams, [no_beam, no_beam, no_beam])
+
+        m.paddingRight = 0.5
+        m.append(note.Note(type='eighth'))
+
+        m.makeBeams(inPlace=True)
+        beams = self.get_beams_from_stream(m)
+
+        self.assertEqual(beams, [no_beam, no_beam, start_beam, stop_beam])
 
     def testWrite(self):
         import os

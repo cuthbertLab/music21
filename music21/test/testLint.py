@@ -85,6 +85,8 @@ def main(fnAccept=None, strict=False):
     disable = [  # These also need to be changed in MUSIC21BASE/.pylintrc
         'arguments-differ',  # -- no -- should be able to add additional arguments so long
         # as initial ones are the same.
+        'arguments-renamed',  # not an issue
+
         'multiple-imports',  # import os, sys -- fine...
         'redefined-variable-type',  # would be good, but currently
         # lines like: if x: y = note.Note() ; else: y = note.Rest()
@@ -117,6 +119,7 @@ def main(fnAccept=None, strict=False):
         # sometimes .keys() is a good test against
         # changing the dictionary size while iterating.
         'consider-iterating-dictionary',
+        'consider-using-dict-items',  # readability improvement depends on excellent variable names
 
         'invalid-name',      # these are good music21 names; fix the regexp instead...
         'no-self-use',       # maybe later

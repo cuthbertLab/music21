@@ -123,7 +123,7 @@ def classToClassStr(classObj: Type) -> str:
     'Chord'
     '''
     # remove closing quotes
-    return str(classObj).split('.')[-1][:-2]
+    return str(classObj).rsplit('.', maxsplit=1)[-1][:-2]
 
 
 def getClassSet(instance, classNameTuple=None):

@@ -278,7 +278,7 @@ class Test(unittest.TestCase):
     pass
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestCuthbert(unittest.TestCase):  # pragma: no cover
 
     def testCuthbertLocal(self):
         '''

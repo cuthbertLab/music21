@@ -337,8 +337,10 @@ class Test(unittest.TestCase):
         for c in [c1, c2, c3]:
             s.append(c)
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
+    @unittest.expectedFailure
     def testTrecentoMadrigal(self):
         from music21 import corpus
         # c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
@@ -374,7 +376,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
         c.insert(0, p)
-        c.show()
+        if self.show:
+            c.show()
 
 
 # ------------------------------------------------------------------------------

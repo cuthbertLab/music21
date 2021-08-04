@@ -188,6 +188,9 @@ def makeBeams(
             offset = 0.0
             if m.paddingLeft != 0.0:
                 offset = opFrac(m.paddingLeft)
+            elif m.paddingRight != 0.0:
+                pass
+            # Incomplete measure without any padding set: assume paddingLeft
             elif noteStream.highestTime < barQL:
                 offset = barQL - noteStream.highestTime
 
@@ -424,7 +427,7 @@ def makeMeasures(
         else:
             srcObj = s.flat
         if not srcObj.isSorted:
-            srcObj = srcObj.sorted
+            srcObj = srcObj.sorted()
         if not inPlace:
             srcObj = copy.deepcopy(srcObj)
         voiceCount = len(srcObj.voices)
@@ -682,7 +685,7 @@ def makeMeasures(
         if post.isSorted:
             postSorted = post
         else:
-            postSorted = post.sorted
+            postSorted = post.sorted()
 
         for e in postSorted:
             # may need to handle spanners; already have s as site
@@ -1727,9 +1730,11 @@ def setStemDirectionOneGroup(
     if not group:  # pragma: no cover
         return  # should not happen
 
-    up_down_stem_directions = set(n.stemDirection for n in group
-                                  if n.stemDirection in ('up', 'down'))
-    if len(up_down_stem_directions) < 2:
+    stem_directions = {n.stemDirection for n in group
+                       if n.stemDirection in ('up', 'down', 'unspecified')}
+    if 'unspecified' in stem_directions:
+        has_consistent_stem_directions = False
+    elif len(stem_directions) < 2:
         has_consistent_stem_directions = True
     else:
         has_consistent_stem_directions = False
@@ -1757,8 +1762,6 @@ def setStemDirectionOneGroup(
             continue
         elif noteDirection in ('up', 'down', 'unspecified'):
             n.stemDirection = groupStemDirection
-
-
 
 
 
@@ -1836,6 +1839,31 @@ class Test(unittest.TestCase):
                          ['up'] * 4 + ['down'] * 6 + ['up'] * 4
                          + ['down', 'noStem', 'double', 'down']
                          )
+
+    def testSetStemDirectionConsistency(self):
+        """
+        Stems that would all be up starting from scratch,
+        but because of overrideConsistentStemDirections=False,
+        we only change the first group with an "unspecified" direction
+        """
+        from music21 import converter
+        p = converter.parse('tinyNotation: 2/4 b8 f8 a8 b8')
+        p.makeBeams(inPlace=True)
+        self.assertEqual(
+            [n.stemDirection for n in p.flat.notes],
+            ['up', 'up', 'up', 'up']
+        )
+
+        # make manual changes
+        dStems = ['down', 'unspecified', 'down', 'down']
+        for n, stemDir in zip(p.flat.notes, dStems):
+            n.stemDirection = stemDir
+
+        setStemDirectionForBeamGroups(p, setNewStems=True, overrideConsistentStemDirections=False)
+        self.assertEqual(
+            [n.stemDirection for n in p.flat.notes],
+            ['up', 'up', 'down', 'down']
+        )
 
     def testMakeBeamsWithStemDirection(self):
         from music21 import converter

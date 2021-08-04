@@ -2634,14 +2634,16 @@ class Test(unittest.TestCase):
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testMergeJacopoVariants(self):
         from music21 import corpus
         j1 = corpus.parse('trecento/PMFC_06-Jacopo-03a')
         j2 = corpus.parse('trecento/PMFC_06-Jacopo-03b')
         jMerged = mergeVariantScores(j1, j2)
-        jMerged.show('lily.pdf')
+        if self.show:
+            jMerged.show('musicxml.png')
 
 
 if __name__ == '__main__':
