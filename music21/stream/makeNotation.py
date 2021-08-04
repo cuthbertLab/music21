@@ -14,7 +14,8 @@
 
 import copy
 import unittest
-from typing import List, Generator, Optional
+from typing import List, Generator, Optional, Union
+from fractions import Fraction  # typing only
 
 from music21 import beam
 from music21 import clef
