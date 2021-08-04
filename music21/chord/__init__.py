@@ -2035,6 +2035,37 @@ class Chord(note.NotRest):
         else:
             raise ChordException('Not a triad or Seventh, cannot determine inversion.')
 
+    def inversionText(self) -> str:
+        '''
+        A helper method to return a readable inversion text (with capitalization) for a chord:
+
+        >>> chord.Chord('C4 E4 G4').inversionText()
+        'Root Position'
+        >>> chord.Chord('E4 G4 C5').inversionText()
+        'First Inversion'
+
+        >>> chord.Chord('B-3 C4 E4 G4').inversionText()
+        'Third Inversion'
+
+        >>> chord.Chord().inversionText()
+        'Unknown Position'
+        '''
+        UNKNOWN = 'Unknown Position'
+
+        try:
+            inv: Union[int, None] = self.inversion()
+        except ChordException:
+            return UNKNOWN
+
+        if inv is None:
+            return UNKNOWN
+
+        if inv == 0:
+            return 'Root Position'
+
+        return common.numberTools.ordinals[inv] + ' Inversion'
+
+
 
     def isAugmentedSixth(self, *, permitAnyInversion=False):
         '''
@@ -4072,6 +4103,13 @@ class Chord(note.NotRest):
         >>> c4c.commonName  # some call it Alsacian or English
         'Swiss augmented sixth chord'
 
+        When in an unusual inversion, augmented sixth chords have their inversion added:
+
+        >>> c4b = chord.Chord('A#3 C4 E4 G4')
+        >>> c4b.commonName
+        'German augmented sixth chord in root position'
+
+
         Dyads are called by actual name:
 
         >>> dyad1 = chord.Chord('C E')
@@ -4103,7 +4141,7 @@ class Chord(note.NotRest):
 
 
 
-        Special handling of one-pitchClass chords:
+        Special handling of one- and two-pitchClass chords:
 
         >>> gAlone = chord.Chord(['G4'])
         >>> gAlone.commonName
@@ -4134,6 +4172,7 @@ class Chord(note.NotRest):
 
         Changed in v5.5: special cases for checking enharmonics in some cases
         Changed in v6.5: better handling of 0-, 1-, and 2-pitchClass and microtonal chords.
+        Changed in v7: Inversions of augmented triads are used.
         '''
         if any(not p.isTwelveTone() for p in self.pitches):
             return 'microtonal chord'
@@ -4204,18 +4243,26 @@ class Chord(note.NotRest):
                 return ctn[0]
             elif self.isGermanAugmentedSixth():
                 return ctn[2]
+            elif self.isGermanAugmentedSixth(permitAnyInversion=True):
+                return ctn[2] + ' in ' + self.inversionText().lower()
             elif self.isSwissAugmentedSixth():
                 return ctn[3]
+            elif self.isSwissAugmentedSixth(permitAnyInversion=True):
+                return ctn[3] + ' in ' + self.inversionText().lower()
             else:
                 return 'enharmonic to ' + ctn[0]
         elif forteClass == '4-25':
             if self.isFrenchAugmentedSixth():
                 return ctn[1]
+            elif self.isFrenchAugmentedSixth(permitAnyInversion=True):
+                return ctn[1] + ' in ' + self.inversionText().lower()
             else:
                 return ctn[0]
         elif forteClass == '3-8A':
             if self.isItalianAugmentedSixth():
                 return ctn[1]
+            elif self.isItalianAugmentedSixth(permitAnyInversion=True):
+                return ctn[1] + ' in ' + self.inversionText().lower()
             else:
                 return ctn[0]
 
