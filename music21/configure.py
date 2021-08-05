@@ -45,9 +45,9 @@ reFinaleReaderApp = re.compile(r'Finale Reader\.app', IGNORECASE)
 reMuseScoreApp = re.compile(r'MuseScore.*\.app', IGNORECASE)
 reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.*\.exe', IGNORECASE)
 
-urlMusic21 = 'http://web.mit.edu/music21'
+urlMusic21 = 'https://web.mit.edu/music21'
 urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'http://web.mit.edu/music21/doc/'
+urlGettingStarted = 'https://web.mit.edu/music21/doc/'
 urlMusic21List = 'https://groups.google.com/g/music21list'
 
 LINE_WIDTH = 78
