@@ -15,7 +15,7 @@ use `music21`.
 Windows users should download and install Python version
 3.8 or higher.
 
-To get Python for Windows, go to http://www.python.org/download/
+To get Python for Windows, go to https://www.python.org/downloads/
 and click on the "Windows installer" link.  It is probably the
 first link.  Save the file to your desktop
 and then click on it there.
@@ -90,4 +90,4 @@ If you have followed all the instructions and still encounter problems, start ov
 and try it again very carefully.  If you still have problems
 contact the `music21` group and someone should be able to help:
 
-http://groups.google.com/group/music21list
+https://groups.google.com/g/music21list

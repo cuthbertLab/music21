@@ -1420,8 +1420,8 @@ def brailleUnicodeToBrailleAscii(brailleUnicode):
 
 
     .. note:: The function works by corresponding braille symbols to ASCII symbols.
-        The table which corresponds said values can be found
-        `here <http://en.wikipedia.org/wiki/Braille_ASCII#Braille_ASCII_values>`_.
+        The table which corresponds to said values can be found
+        `here <https://en.wikipedia.org/wiki/Braille_ASCII#Braille_ASCII_values>`_.
         Because of the way in which the braille symbols translate2, the resulting
         ASCII string will look to a non-reader as gibberish. Also, the eighth-note notes
         in braille

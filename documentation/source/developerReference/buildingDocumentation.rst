@@ -19,12 +19,12 @@ git repository (git://github.org/cuthbertLab/music21.git).
 In order to get additional modules, you'll need a way of getting them more easily.  
 Recent versions of Python include `pip` or `pip3`; if you don't have it, you
 should download it.   
-Just go to https://pip.pypa.io/ and they'll help you out.
+Just go to https://pip.pypa.io/en/stable and they'll help you out.
 
 **2) Install pandoc**
 
 Pandoc is a universal documentation converter that we use.
-You can get pandoc at: http://pandoc.org/installing.html
+You can get pandoc at: https://pandoc.org/installing.html
 
 Note that pandoc 1.14-1.15.0 do not work.  1.15.1 and newer are recommended.
 
