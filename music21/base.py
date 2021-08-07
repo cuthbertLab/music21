@@ -302,11 +302,11 @@ class Music21Object(prebase.ProtoM21Object):
     within Note)
     '''
 
-    classSortOrder = 20  # default classSortOrder
+    classSortOrder: Union[int, float] = 20  # default classSortOrder
     # these values permit fast class comparisons for performance critical cases
     isStream = False
 
-    _styleClass = style.Style
+    _styleClass: Type[style.Style] = style.Style
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = []
@@ -358,24 +358,24 @@ class Music21Object(prebase.ProtoM21Object):
     def __init__(self, *arguments, **keywords):
         # do not call super().__init__() since it just wastes time
         # None is stored as the internal location of an obj w/o any sites
-        self._activeSite = None  # type: Optional['music21.stream.Stream']
+        self._activeSite: Optional['music21.stream.Stream'] = None
         # offset when no activeSite is available
-        self._naiveOffset = 0.0  # type: float
+        self._naiveOffset: Union[float, fractions.Fraction] = 0.0
 
         # offset when activeSite is already garbage collected/dead,
         # as in short-lived sites
         # like .getElementsByClass().stream()
-        self._activeSiteStoredOffset = None  # type: Optional[float]
+        self._activeSiteStoredOffset: Union[float, fractions.Fraction, None] = None
 
         # store a derivation object to track derivations from other Streams
         # pass a reference to this object
-        self._derivation = None  # type: Optional['music21.derivation.Derivation']
+        self._derivation: Optional[derivation.Derivation] = None
 
-        self._style = None  # type: Optional['music21.style.Style']
+        self._style: Optional[style.Style] = None
         self._editorial = None
 
         # private duration storage; managed by property
-        self._duration = None  # type: Optional['music21.duration.Duration']
+        self._duration: Optional[duration.Duration] = None
         self._priority = 0  # default is zero
 
         # store cached values here:
@@ -2449,7 +2449,7 @@ class Music21Object(prebase.ProtoM21Object):
                           self.classSortOrder, isNotGrace, insertIndex)
 
     # -----------------------------------------------------------------
-    def _getDuration(self):
+    def _getDuration(self) -> Optional[duration.Duration]:
         '''
         Gets the DurationObject of the object or None
         '''
@@ -2458,17 +2458,17 @@ class Music21Object(prebase.ProtoM21Object):
             self._duration = duration.Duration(0)
         return self._duration
 
-    def _setDuration(self, durationObj: 'music21.duration.Duration'):
+    def _setDuration(self, durationObj: duration.Duration):
         '''
         Set the duration as a quarterNote length
         '''
-        replacingDuration = not (self._duration is None)
+        durationObjAlreadyExists = not (self._duration is None)
 
         try:
             ql = durationObj.quarterLength
             self._duration = durationObj
             durationObj.client = self
-            if replacingDuration:
+            if durationObjAlreadyExists:
                 self.informSites({'changedElement': 'duration', 'quarterLength': ql})
 
         except AttributeError as ae:

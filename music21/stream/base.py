@@ -31,7 +31,7 @@ import sys
 
 from fractions import Fraction
 from math import isclose
-from typing import Union, List, Optional, Set, Tuple, Sequence
+from typing import Union, List, Optional, Set, Tuple, Sequence, TypeVar
 
 from music21 import base
 
@@ -70,6 +70,8 @@ environLocal = environment.Environment('stream')
 StreamException = exceptions21.StreamException
 ImmutableStreamException = exceptions21.ImmutableStreamException
 
+T = TypeVar('T')
+StreamType = TypeVar('StreamType', bound='music21.stream.Stream')
 
 class StreamDeprecationWarning(UserWarning):
     # Do not subclass Deprecation warning, because these
@@ -586,7 +588,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             f'Streams can get items by int, slice, class, or string query; got {type(k)}'
         )
 
-    def first(self):
+    def first(self) -> Optional[base.Music21Object]:
         '''
         Return the first element of a Stream.  (Added for compatibility with StreamIterator)
         Or None if the Stream is empty.
@@ -612,7 +614,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         except IndexError:
             return None
 
-    def last(self):
+    def last(self) -> Optional[base.Music21Object]:
         '''
         Return the last element of a Stream.  (Added for compatibility with StreamIterator)
         Or None if the Stream is empty.
@@ -828,7 +830,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         del self._elements[k]
         self.coreElementsChanged()
 
-    def __add__(self, other):
+    def __add__(self: T, other: 'Stream') -> T:
         '''
         Add, or concatenate, two Streams.
 
@@ -983,7 +985,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self.insert(0.0, clefObj)
 
     @property
-    def timeSignature(self):
+    def timeSignature(self) -> Optional['music21.meter.TimeSignature']:
         '''
         Gets or sets the timeSignature at offset 0.0 of the Stream (generally a Measure)
 
@@ -1164,9 +1166,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             firstLayout = staffLayouts.first()
             firstLayout.staffLines = newStaffLines
 
-
-
-    def clear(self):
+    def clear(self) -> None:
         '''
         Remove all elements in a stream.
 
@@ -1186,7 +1186,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         self.elements = []
 
-    def cloneEmpty(self, derivationMethod=None):
+    def cloneEmpty(self: StreamType, derivationMethod: Optional[str] = None) -> StreamType:
         '''
         Create a Stream that is identical to this one except that the elements are empty
         and set derivation.
@@ -1207,7 +1207,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(q)
         0
         '''
-        returnObj = self.__class__()
+        returnObj: StreamType = self.__class__()
         returnObj.derivation.client = returnObj
         returnObj.derivation.origin = self
         if derivationMethod is not None:
