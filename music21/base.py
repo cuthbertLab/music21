@@ -55,7 +55,8 @@ from typing import (
     Optional,
     Union,
     Tuple,
-    TypeVar
+    Type,
+    TypeVar,
 )
 
 from music21.sites import SitesException

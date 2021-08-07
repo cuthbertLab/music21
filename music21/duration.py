@@ -3422,7 +3422,7 @@ class Test(unittest.TestCase):
         Test setting of tuplet type when durations sum to expected completion
         '''
         # default tuplets group into threes when possible
-        from music21 import base
+        from music21 import note  # only Notes/Rests/Chords can have tuplets, not music21Objects
         from music21 import stream
         test, match = ([0.333333] * 3 + [0.1666666] * 6,
                        ['start', None, 'stop', 'start', None, 'stop', 'start', None, 'stop'])
@@ -3434,7 +3434,7 @@ class Test(unittest.TestCase):
 
         inputTupletStream = stream.Stream()
         for dur in inputTuplets:
-            m21Obj = base.Music21Object(duration=dur)
+            m21Obj = note.Note(duration=dur)
             inputTupletStream.append(m21Obj)
 
         stream.makeNotation.makeTupletBrackets(inputTupletStream, inPlace=True)
@@ -3444,7 +3444,7 @@ class Test(unittest.TestCase):
         self.assertEqual(output, match)
 
     def testTupletTypeComplete2(self):
-        from music21 import base
+        from music21 import note
         from music21 import stream
 
         tup6 = Duration()
@@ -3464,7 +3464,7 @@ class Test(unittest.TestCase):
 
         inputTupletStream = stream.Stream()
         for dur in inputTuplets:
-            m21Obj = base.Music21Object(duration=dur)
+            m21Obj = note.Note(duration=dur)
             inputTupletStream.append(m21Obj)
 
         match = ['start', None, None, None, None, 'stop',
@@ -3481,7 +3481,7 @@ class Test(unittest.TestCase):
         Test setting of tuplet type when durations do not sum to expected
         completion.
         '''
-        from music21 import base
+        from music21 import note
         from music21 import stream
         # the current match results here are a good compromise
         # for a difficult situation.
@@ -3498,7 +3498,7 @@ class Test(unittest.TestCase):
 
         inputTupletStream = stream.Stream()
         for dur in inputDurations:
-            m21Obj = base.Music21Object(duration=dur)
+            m21Obj = note.Note(duration=dur)
             inputTupletStream.append(m21Obj)
 
         stream.makeNotation.makeTupletBrackets(inputTupletStream, inPlace=True)
