@@ -22,6 +22,7 @@ how-can-i-produce-real-time-audio-output-from-music-made-with-music21
 
 Requires pygame: http://www.pygame.org/download.shtml
 '''
+from importlib.util import find_spec
 import unittest
 from io import BytesIO
 
@@ -178,10 +179,10 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    try:
-        import pygame
+    loader = find_spec('pygame')
+    if loader is not None:  # pragma: no cover
         pygame_installed = True
-    except (ModuleNotFoundError, ImportError):
+    else:
         pygame_installed = False
 
     @unittest.skipUnless(pygame_installed, 'pygame is not installed')

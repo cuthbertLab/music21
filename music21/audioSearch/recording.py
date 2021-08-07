@@ -20,6 +20,7 @@ users of 64-bit windows but 32-bit python should download the win32 port
 
 users of 64-bit windows and 64-bit python should download the amd64 port
 '''
+from importlib.util import find_spec
 import unittest
 import wave
 
@@ -111,14 +112,16 @@ class Test(unittest.TestCase):
     pass
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
-    try:
-        import pygame
-        pygame_installed = True
-    except ImportError:
-        pygame_installed = False
 
-    @unittest.skipUnless(pygame_installed, 'pygame must be installed')
+
+class TestExternal(unittest.TestCase):  # pragma: no cover
+    loader = find_spec('pyaudio')
+    if loader is not None:  # pragma: no cover
+        pyaudio_installed = True
+    else:
+        pyaudio_installed = False
+
+    @unittest.skipUnless(pyaudio_installed, 'pyaudio must be installed')
     def testRecording(self):
         '''
         record one second of data and print 10 records
