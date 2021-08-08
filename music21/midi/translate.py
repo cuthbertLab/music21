@@ -765,11 +765,13 @@ def midiEventsToInstrument(eventList):
             i = instrument.fromString(decoded)
         elif event.channel == 10:
             pm = percussion.PercussionMapper()
+            # PercussionMapper.midiPitchToInstrument() is 1-indexed
             i = pm.midiPitchToInstrument(event.data + 1)
+            i.midiProgram = event.data
         else:
             i = instrument.instrumentFromMidiProgram(event.data)
-        # Instrument.midiProgram and event.data are both 0-indexed
-        i.midiProgram = event.data
+            # Instrument.midiProgram and event.data are both 0-indexed
+            i.midiProgram = event.data
     except UnicodeDecodeError:
         warnings.warn(
             f'Unable to determine instrument from {event}; getting generic Instrument',
