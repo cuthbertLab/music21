@@ -453,7 +453,7 @@ class MetronomeMark(TempoIndication):
         # assume ql value or a type string
         elif common.isNum(value) or isinstance(value, str):
             self._referent = duration.Duration(value)
-        elif 'Duration' not in value.classes:
+        elif not isinstance(value, duration.Duration):
             # try get duration object, like from Note
             self._referent = value.duration
         elif 'Duration' in value.classes:

@@ -476,7 +476,7 @@ class Chord(note.NotRest):
             raise ValueError('Chord index must be set to a valid note object')
         elif isinstance(value, pitch.Pitch):
             value = note.Note(pitch=value)
-        elif 'Note' not in value.classes:
+        elif not isinstance(value, note.Note):
             raise ValueError('Chord index must be set to a valid note object')
 
         self._notes[keyIndex] = value

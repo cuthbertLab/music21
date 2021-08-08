@@ -56,7 +56,7 @@ class WindowedAnalysis:
     def __init__(self, streamObj, analysisProcessor):
         self.processor = analysisProcessor
         # environLocal.printDebug(self.processor)
-        if 'Stream' not in streamObj.classes:
+        if not isinstance(streamObj, stream.Stream):
             raise WindowedAnalysisException('non-stream provided as argument')
         if streamObj.hasPartLikeStreams():
             raise WindowedAnalysisException('part-like substreams are not supported; use .flat')

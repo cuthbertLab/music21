@@ -34,6 +34,7 @@ from music21 import common
 from music21 import defaults
 from music21 import exceptions21
 
+from music21 import articulations
 from music21 import bar
 from music21 import clef
 from music21 import chord
@@ -402,7 +403,7 @@ class GeneralObjectExporter:
             outObj = self.fromGeneralObject(obj)
             return self.parseWellformedObject(outObj)
         else:
-            if 'Score' not in obj.classes:
+            if not isinstance(obj, stream.Score):
                 raise MusicXMLExportException('Can only export Scores with makeNotation=False')
             return self.parseWellformedObject(obj)
 
@@ -4140,7 +4141,7 @@ class MeasureExporter(XMLExporterBase):
         applicableArticulations = []
         fingeringNumber = 0
         for a in chordOrNote.articulations:
-            if 'Fingering' in a.classSet:
+            if isinstance(a, articulations.Fingering):
                 if fingeringNumber == noteIndexInChord:
                     applicableArticulations.append(a)
                 fingeringNumber += 1
@@ -4148,11 +4149,11 @@ class MeasureExporter(XMLExporterBase):
                 applicableArticulations.append(a)
 
         for artObj in applicableArticulations:
-            if 'Pizzicato' in artObj.classes:
+            if isinstance(artObj, articulations.Pizzicato):
                 continue
-            if 'StringIndication' in artObj.classes and artObj.number < 1:
+            if isinstance(artObj, articulations.StringIndication) and artObj.number < 1:
                 continue
-            if 'TechnicalIndication' in artObj.classes:
+            if isinstance(artObj, articulations.TechnicalIndication):
                 if mxTechnicalMark is None:
                     mxTechnicalMark = Element('technical')
                 mxTechnicalMark.append(self.articulationToXmlTechnical(artObj))

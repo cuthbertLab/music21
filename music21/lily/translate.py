@@ -29,6 +29,7 @@ from music21 import corpus
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
+from music21 import key
 from music21 import note
 from music21 import stream
 from music21 import variant
@@ -583,7 +584,7 @@ class LilypondConverter:
         # mostRecentDur = ''
         # recentDurCount = 0
         for el in streamIn:
-            if 'Measure' not in el.classes:
+            if not isinstance(el, stream.Measure):
                 continue
             if el.duration.quarterLength == 0.0:
                 continue
@@ -1658,7 +1659,7 @@ class LilypondConverter:
         \key fis \major
 
         '''
-        if 'music21.key.Key' not in keyObj.classSet:
+        if not isinstance(keyObj, key.Key):
             keyObj = keyObj.asKey('major')
 
         p = keyObj.tonic

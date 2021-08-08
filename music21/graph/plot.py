@@ -32,6 +32,7 @@ from music21 import dynamics
 from music21 import features
 from music21 import note
 from music21 import prebase
+from music21 import stream
 
 from music21.graph import axis
 from music21.graph import primitives
@@ -233,7 +234,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         formatDict = {}
         # should be two for most things...
 
-        if 'Chord' not in el.classes:
+        if not isinstance(el, chord.Chord):
             for i, thisAxis in enumerate(self.allAxes):
                 axisValue = thisAxis.extractOneElement(el, formatDict)
                 # use isinstance(List) not isiterable, since
@@ -1107,7 +1108,7 @@ class HorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMix
         '''
         Extract the data from the Stream.
         '''
-        if 'Score' not in self.streamObj.classes:
+        if not isinstance(self.streamObj, stream.Score):
             raise GraphException('provided Stream must be Score')
         # parameters: x, span, heightScalar, color, alpha, yShift
         pr = reduction.PartReduction(

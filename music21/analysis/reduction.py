@@ -212,7 +212,7 @@ class ScoreReduction:
 
 
     def _setScore(self, value):
-        if 'Stream' not in value.classes:
+        if not isinstance(value, stream.Stream):
             raise ScoreReductionException('cannot set a non Stream')
         if value.hasPartLikeStreams:
             # make a local copy
@@ -237,7 +237,7 @@ class ScoreReduction:
 
 
     def _setChordReduction(self, value):
-        if 'Stream' not in value.classes:
+        if not isinstance(value, stream.Stream):
             raise ScoreReductionException('cannot set a non Stream')
         if value.hasPartLikeStreams():
             # make a local copy
@@ -466,7 +466,7 @@ class PartReduction:
     def __init__(self, srcScore=None, *args, **keywords):
         if srcScore is None:
             return
-        if 'Score' not in srcScore.classes:
+        if not isinstance(srcScore, stream.Score):
             raise PartReductionException('provided Stream must be Score')
         self._score = srcScore
         # an ordered list of dictionaries for

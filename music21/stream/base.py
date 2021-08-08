@@ -4360,7 +4360,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def measure(self,
                 measureNumber,
                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
-                indicesNotNumbers=False) -> 'music21.stream.Measure':
+                indicesNotNumbers=False) -> Optional['music21.stream.Measure']:
         '''
         Given a measure number, return a single
         :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
@@ -4413,6 +4413,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                               collect=collect,
                               indicesNotNumbers=indicesNotNumbers)
             measureIter = s.getElementsByClass('Measure')
+            m: Optional[Measure]
+            # noinspection PyTypeChecker
             m = measureIter.first()
             if m is None:  # not 'if not m' because m might be an empty measure.
                 return None
@@ -6258,7 +6260,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         def consolidateRests(templateInner):
             consecutiveRests = []
             for el in list(templateInner.getElementsByClass('GeneralNote')):
-                if 'Rest' not in el.classes:
+                if not isinstance(el, note.Rest):
                     removeConsecutiveRests(templateInner, consecutiveRests)
                     consecutiveRests = []
                 else:
@@ -7070,13 +7072,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # unless n is a chord, which only tells if SOME member has a tie
             # https://github.com/cuthbertLab/music21/issues/502
             if (hasattr(nInner, 'tie')
-                    and 'Chord' not in nInner.classes
+                    and not isinstance(nInner, chord.Chord)
                     and nInner.tie is not None
                     and nInner.tie.type == 'stop'):
                 return True
             # but capture case where all chord members have a stop tie
             elif (hasattr(nInner, 'tie')
-                    and 'Chord' in nInner.classes
+                    and isinstance(nInner, chord.Chord)
                     and None not in [inner_p.tie for inner_p in nInner.notes]
                     and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}):
                 return True
@@ -7098,7 +7100,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return True
             # looking for two chords of equal size
             elif (nLast is not None
-                    and 'Note' not in nInner.classes
+                    and not isinstance(nInner, note.Note)
                     and iLast in posConnected
                     and hasattr(nLast, 'pitches')
                     and hasattr(nInner, 'pitches')):
@@ -8572,7 +8574,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if myStream.hasPartLikeStreams():
                 foundPart = False
                 for subStream in myStream:
-                    if 'Stream' not in subStream.classes:
+                    if not subStream.isStream:
                         continue
                     if subStream.hasMeasures():
                         foundPart = True
@@ -8719,7 +8721,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if (hasattr(value, 'classes')
                         and 'GenericInterval' in value.classes):
                     # do not transpose KeySignatures w/ Generic Intervals
-                    if 'KeySignature' not in e.classes and hasattr(e, 'pitches'):
+                    if not isinstance(e, key.KeySignature) and hasattr(e, 'pitches'):
                         k = e.getContextByClass('KeySignature')
                         for p in e.pitches:
                             value.transposePitchKeyAware(p, k, inPlace=True)
@@ -9779,8 +9781,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         post = []
         for e in self.elements:
-            if 'music21.key.Key' in e.classSet:  # use fully qualified name
-                continue
+            if isinstance(e, key.Key):
+                continue  # has .pitches but should not be added
             if hasattr(e, 'pitch'):
                 post.append(e.pitch)
             # both Chords and Stream have a pitches properties; this just
@@ -12905,7 +12907,7 @@ class Measure(Stream):
         if useInitialRests:
             removeList = []
             for gn in self.getElementsByClass('GeneralNote'):
-                if 'Rest' not in gn.classes:
+                if not isinstance(gn, note.Rest):
                     break
                 removeList.append(gn)
             if removeList:
