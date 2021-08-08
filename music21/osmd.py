@@ -82,7 +82,7 @@ def getXml(obj) -> str:
     bytesOut = gex.parseWellformedObject(score)
     return bytesOut.decode('utf-8')
 
-def musicXMLToScript(xml, divId, offline=False):
+def musicXMLToScript(xml, divId, *, offline=False):
     '''
     Converts the xml into Javascript which can be injected into a webpage to display the score.
     If divId is set then it will be used as the container, if not a new div will be created
