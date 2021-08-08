@@ -21,7 +21,9 @@ import unittest
 from music21 import exceptions21
 from music21 import common
 from music21.common.objects import SlottedObjectMixin
+from music21 import dynamics
 from music21 import prebase
+from music21 import note
 
 from music21 import environment
 _MOD = 'volume'
@@ -241,7 +243,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         if self.velocityIsRelative:
             if useDynamicContext is not False:
                 if (hasattr(useDynamicContext, 'classes')
-                        and 'Dynamic' in useDynamicContext.classes):
+                        and isinstance(useDynamicContext, dynamics.Dynamic)):
                     dm = useDynamicContext  # it is a dynamic
                 elif self.client is not None:
                     dm = self.getDynamicContext()  # dm may be None
@@ -323,7 +325,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     @client.setter
     def client(self, client):
         if client is not None:
-            if hasattr(client, 'classes') and 'NotRest' in client.classes:
+            if hasattr(client, 'classes') and isinstance(client, note.NotRest):
                 self._client = common.wrapWeakref(client)
         else:
             self._client = None
@@ -470,7 +472,7 @@ def realizeVolume(srcStream,
     # key, avoiding searching through entire list every time
     lastRelevantKeyIndex = 0
     for e in flatSrc:  # iterate over all elements
-        if hasattr(e, 'volume') and 'NotRest' in e.classes:
+        if hasattr(e, 'volume') and isinstance(e, note.NotRest):
             # try to find a dynamic
             eStart = e.getOffsetBySite(flatSrc)
 

@@ -21,6 +21,7 @@ import copy
 
 from music21 import exceptions21
 
+from music21 import chord
 from music21 import clef
 from music21 import common
 from music21 import expressions
@@ -989,12 +990,12 @@ class Test(unittest.TestCase):
 
         src = corpus.parse('schoenberg/opus19', 6)
         for n in src.flat.notes:
-            if 'Note' in n.classes:
+            if isinstance(n, note.Note):
                 if n.pitch.name == 'F#':
                     n.addLyric('::/p:f#/o:4')
         #                 if n.pitch.name == 'C':
         #                     n.addLyric('::/p:c/o:4/g:C')
-            elif 'Chord' in n.classes:
+            elif isinstance(n, chord.Chord):
                 if 'F#' in [p.name for p in n.pitches]:
                     n.addLyric('::/p:f#/o:4')
         #                 if 'C' in [p.name for p in n.pitches]:
@@ -1012,12 +1013,12 @@ class Test(unittest.TestCase):
 
         src = corpus.parse('schoenberg/opus19', 6)
         for n in src.flat.notes:
-            if 'Note' in n.classes:
+            if isinstance(n, note.Note):
                 if n.pitch.name == 'F#':
                     n.addLyric('::/p:f#/o:4/g:F#')
                 if n.pitch.name == 'C':
                     n.addLyric('::/p:c/o:4/g:C')
-            elif 'Chord' in n.classes:
+            elif isinstance(n, chord.Chord):
                 if 'F#' in [p.name for p in n.pitches]:
                     n.addLyric('::/p:f#/o:4/g:F#')
                 if 'C' in [p.name for p in n.pitches]:

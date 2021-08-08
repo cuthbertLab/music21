@@ -75,6 +75,7 @@ from music21 import base
 from music21 import common
 from music21 import environment
 from music21 import exceptions21
+from music21 import note
 from music21 import pitch
 from music21 import interval
 from music21 import sieve
@@ -174,7 +175,7 @@ class Scale(base.Music21Object):
             for p in other:
                 if hasattr(p, 'pitch'):
                     pre.append(p.pitch)
-                elif hasattr(p, 'classes') and 'Pitch' in p.classes:
+                elif hasattr(p, 'classes') and isinstance(p, pitch.Pitch):
                     pre.append(p)
                 else:
                     pre.append(pitch.Pitch(p))
@@ -303,7 +304,7 @@ class AbstractScale(Scale):
         for p in pitchList:
             if isinstance(p, str):
                 pitchListReal.append(pitch.Pitch(p))
-            elif hasattr(p, 'classes') and 'Note' in p.classes:
+            elif hasattr(p, 'classes') and isinstance(p, note.Note):
                 pitchListReal.append(p.pitch)
             else:  # assume this is a pitch object
                 pitchListReal.append(p)
@@ -1282,7 +1283,7 @@ class ConcreteScale(Scale):
             self.tonic = None  # pitch.Pitch()
         elif isinstance(tonic, str):
             self.tonic = pitch.Pitch(tonic)
-        elif hasattr(tonic, 'classes') and 'GeneralNote' in tonic.classes:
+        elif hasattr(tonic, 'classes') and isinstance(tonic, note.GeneralNote):
             self.tonic = tonic.pitch
         else:  # assume this is a pitch object
             self.tonic = tonic

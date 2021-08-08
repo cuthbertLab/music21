@@ -597,7 +597,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
     >>> firstSystem
     <music21.layout.System ...>
-    >>> 'Score' in firstSystem.classes
+    >>> isinstance(firstSystem, stream.Score)
     True
 
     Each System has staves (layout.Staff objects) not parts, though Staff is a subclass of Part
@@ -607,7 +607,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     5
     >>> secondStaff
     <music21.layout.Staff ...>
-    >>> 'Part' in secondStaff.classes
+    >>> isinstance(secondStaff, stream.Part)
     True
     '''
     def getRichSystemLayout(inner_allSystemLayouts):

@@ -866,10 +866,10 @@ class Expander:
         from music21 import bar
         lb = m.leftBarline
         rb = m.rightBarline
-        if lb is not None and 'Repeat' in lb.classes:
+        if lb is not None and 'music21.bar.Repeat' in lb.classSet:
             # environLocal.printDebug(['inserting new barline: %s' % newStyle])
             m.leftBarline = bar.Barline(newType)
-        if rb is not None and 'Repeat' in rb.classes:
+        if rb is not None  and 'music21.bar.Repeat' in rb.classSet:
             m.rightBarline = bar.Barline(newType)
 
     def _stripRepeatExpressions(self, streamObj):
@@ -900,7 +900,7 @@ class Expander:
             lb = m.leftBarline
             rb = m.rightBarline
 
-            if lb is not None and 'Repeat' in lb.classes:
+            if lb is not None and 'music21.bar.Repeat' in lb.classSet:
                 if lb.direction == 'start':
                     startCount += 1
                     countBalance += 1
@@ -911,7 +911,7 @@ class Expander:
                         countBalance += 1  # simulate first
                     endCount += 1
                     countBalance -= 1
-            if rb is not None and 'Repeat' in rb.classes:
+            if rb is not None and 'music21.bar.Repeat' in rb.classSet:
                 if rb.direction == 'end':
                     # if this is the first of all repeats found, then we
                     # have an acceptable case where the first repeat is omitted
@@ -1208,10 +1208,10 @@ class Expander:
             # this does not check for well-balanced formations,
             # only presence
             if (lb is not None
-                    and 'Repeat' in lb.classes):
+                    and 'music21.bar.Repeat' in lb.classSet):
                 return True
             if (rb is not None
-                    and 'Repeat' in rb.classes
+                    and 'music21.bar.Repeat' in rb.classSet
                     and rb.direction == 'end'):
                 return True
         return False
@@ -1255,7 +1255,7 @@ class Expander:
             except AttributeError:
                 continue  # probably not a measure
 
-            if lb is not None and 'Repeat' in lb.classes:
+            if lb is not None and 'music21.bar.Repeat' in lb.classSet:
                 if lb.direction == 'start':
                     startIndices.append(i)
                 # an end may be placed on the left barline; of the next measure
@@ -1270,7 +1270,7 @@ class Expander:
                         barRepeatIndices = range(startIndices[-1], i)
                         break
             if (rb is not None
-                    and 'Repeat' in rb.classes
+                    and 'music21.bar.Repeat' in rb.classSet
                     and rb.direction == 'end'):
                 # if this is the first end found and no starts found,
                 # assume we are counting from zero
@@ -1298,7 +1298,7 @@ class Expander:
         rb = mLast.rightBarline
         # if right barline of end is a repeat
         if (rb is not None
-                and 'Repeat' in rb.classes
+                and 'music21.bar.Repeat' in rb.classSet
                 and rb.direction == 'end'):
             mEndBarline = mLast  # they are the same
             repeatTimes = rb.times
@@ -1311,7 +1311,7 @@ class Expander:
             mEndBarline = streamObj[index + 1]
             lb = mEndBarline.leftBarline
             if (lb is not None
-                    and 'Repeat' in lb.classes
+                    and 'music21.bar.Repeat' in lb.classSet
                     and lb.direction == 'end'):
                 repeatTimes = lb.times
             else:
@@ -1634,7 +1634,7 @@ class Expander:
             # if mLast does not have a repeat bar, its probably not a repeat
             mLastRightBar = mLast.rightBarline
             if (mLastRightBar is not None
-                    and 'Repeat' in mLastRightBar.classes):
+                    and  'music21.bar.Repeat' in mLastRightBar.classSet):
                 indices = list(range(startIndex, endIndex + 1))
             # condition of when to repeat next is not always clear
             # if we have  [1 x :|[2 x | x still need to repeat

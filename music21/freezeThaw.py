@@ -82,6 +82,8 @@ from music21 import common
 from music21 import defaults
 from music21 import derivation
 from music21 import exceptions21
+from music21 import spanner
+from music21 import variant
 # from music21.tree.trees import ElementTree
 
 from music21 import environment
@@ -275,7 +277,7 @@ class StreamFreezer(StreamFreezeThawBase):
             self.findActiveStreamIdsInHierarchy(streamObj)
 
         for el in allEls:
-            if 'Variant' in el.classes:
+            if isinstance(el, variant.Variant):
                 # works like a whole new hierarchy...  # no need for deepcopy
                 subSF = StreamFreezer(
                     el._stream,
@@ -284,7 +286,7 @@ class StreamFreezer(StreamFreezeThawBase):
                     topLevel=False,
                 )
                 subSF.setupSerializationScaffold()
-            elif 'Spanner' in el.classes:
+            elif isinstance(el, spanner.Spanner):
                 # works like a whole new hierarchy...  # no need for deepcopy
                 subSF = StreamFreezer(
                     el.spannerStorage,
@@ -380,9 +382,9 @@ class StreamFreezer(StreamFreezeThawBase):
             for el, unused_offset in storedElementOffsetTuples:
                 if el.isStream:
                     self.recursiveClearSites(el)
-                if 'Spanner' in el.classes:
+                if isinstance(el, spanner.Spanner):
                     self.recursiveClearSites(el.spannerStorage)
-                if 'Variant' in el.classes:
+                if isinstance(el, variant.Variant):
                     self.recursiveClearSites(el._stream)
                 if hasattr(el, '_derivation'):
                     el._derivation = derivation.Derivation()  # reset

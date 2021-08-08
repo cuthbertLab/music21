@@ -20,6 +20,7 @@ from music21 import common
 from music21 import converter
 from music21 import corpus
 from music21 import exceptions21
+from music21 import note
 from music21 import stream
 from music21 import text
 
@@ -165,7 +166,7 @@ class FeatureExtractor:
         '''
         if dataOrStream is not None:
             if (hasattr(dataOrStream, 'classes')
-                    and 'Stream' in dataOrStream.classes):
+                    and isinstance(dataOrStream, stream.Stream)):
                 # environLocal.printDebug(['creating new DataInstance: this should be a Stream:',
                 #     dataOrStream])
                 # if we are passed a stream, create a DataInstance to
@@ -412,7 +413,7 @@ class StreamForms:
         return histo
 
     def formGetElementsByClassMeasure(self, prepared):
-        if 'Score' in prepared.classes:
+        if isinstance(prepared, stream.Score):
             post = stream.Stream()
             for p in prepared.parts:
                 # insert in overlapping offset positions
@@ -423,7 +424,7 @@ class StreamForms:
         return post
 
     def formChordify(self, prepared):
-        if 'Score' in prepared.classes:
+        if isinstance(prepared, stream.Score):
             # options here permit getting part information out
             # of chordified representation
             return prepared.chordify(
@@ -489,7 +490,7 @@ class StreamForms:
         secondsMap = prepared.secondsMap
         # filter only notes; all elements would otherwise be gathered
         for bundle in secondsMap:
-            if 'NotRest' in bundle['element'].classes:
+            if isinstance(bundle['element'], note.NotRest):
                 post.append(bundle)
         return post
 

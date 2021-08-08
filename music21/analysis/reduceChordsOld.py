@@ -278,7 +278,7 @@ class ChordReducer:
         cLastEnd = 0.0
         for cEl in newPart:
             cElCopy = copy.deepcopy(cEl)
-            if 'Chord' in cEl.classes and closedPosition is not False:
+            if isinstance(cEl, chord.Chord) and closedPosition is not False:
                 if forceOctave is not False:
                     cElCopy.closedPosition(forceOctave=forceOctave, inPlace=True)
                 else:

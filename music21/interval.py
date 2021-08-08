@@ -305,7 +305,7 @@ class IntervalException(exceptions21.Music21Exception):
 # some utility functions
 
 
-def _extractPitch(nOrP):
+def _extractPitch(nOrP: Union['music21.note.Note', 'music21.pitch.Pitch']):
     '''
     utility function to return either the object itself
     or the `.pitch` if it's a Note.
@@ -318,10 +318,10 @@ def _extractPitch(nOrP):
     True
 
     '''
-    if 'Pitch' in nOrP.classes:
-        return nOrP
-    else:
+    if hasattr(nOrP, 'pitch'):
         return nOrP.pitch
+    else:
+        return nOrP
 
 
 def convertStaffDistanceToInterval(staffDist):

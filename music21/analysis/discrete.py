@@ -30,9 +30,12 @@ from typing import Union, List, Any, Tuple, Iterable, Optional
 from collections import OrderedDict
 from music21 import exceptions21
 
-from music21 import pitch
+from music21 import chord
+from music21 import harmony
 from music21 import interval
+from music21 import note
 from music21 import key
+from music21 import pitch
 
 
 from music21 import environment
@@ -1049,13 +1052,13 @@ class Ambitus(DiscreteAnalysis):
         for n in justNotes:
             # environLocal.printDebug([n])
             pitches = []
-            if 'Chord' in n.classes and 'ChordSymbol' not in n.classes:
+            if isinstance(n, chord.Chord) and not isinstance(n, harmony.ChordSymbol):
                 pitches = n.pitches
-            elif 'Note' in n.classes:
+            elif isinstance(n, note.Note):
                 pitches = [n.pitch]
             psFound += [p.ps for p in pitches]
             pitchesFound.extend(pitches)
-        # in some cases there is stil nothing -- perhaps only ChordSymbols
+        # in some cases there is still nothing -- perhaps only ChordSymbols
         if not psFound:
             return None
         # use built-in functions

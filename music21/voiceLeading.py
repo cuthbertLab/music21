@@ -180,7 +180,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 ) from e
         else:
             try:
-                isKey = ('Key' in keyValue.classes)
+                isKey = (isinstance(keyValue, key.Key))
                 if isKey is False:
                     raise AttributeError
             except AttributeError:  # pragma: no cover  # pylint: disable=raise-missing-from
@@ -197,9 +197,9 @@ class VoiceLeadingQuartet(base.Music21Object):
             setattr(self, which, note.Note(value))
         else:
             try:
-                if 'Note' in value.classes:
+                if isinstance(value, note.Note):
                     setattr(self, which, value)
-                elif 'Pitch' in value.classes:
+                elif isinstance(value, pitch.Pitch):
                     n = note.Note()
                     n.duration.quarterLength = 0.0
                     n.pitch = value
@@ -1428,10 +1428,10 @@ class Verticality(base.Music21Object):
         '''
         pitches = []
         for el in self.objects:
-            if 'Chord' in el.classes:
+            if isinstance(el, chord.Chord):
                 for x in el.pitches:
                     pitches.append(x.nameWithOctave)
-            elif 'Note' in el.classes:
+            elif isinstance(el, note.Note):
                 pitches.append(el)
         ch = chord.Chord(pitches)
         ch.style = self.style

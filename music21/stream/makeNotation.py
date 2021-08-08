@@ -19,6 +19,7 @@ from typing import List, Generator, Optional
 from music21 import beam
 from music21 import clef
 from music21 import common
+from music21 import chord
 from music21 import defaults
 from music21 import environment
 from music21 import meter
@@ -119,7 +120,7 @@ def makeBeams(
 
     # if s.isClass(Measure):
     mColl: List[stream.Measure]
-    if 'Measure' in s.classes:
+    if isinstance(s, stream.Measure):
         returnObj: stream.Measure
         mColl = [returnObj]  # store a list of measures for processing
     else:
@@ -602,7 +603,7 @@ def makeMeasures(
         # can contain this element
 
         # collect all spanners and move to outer Stream
-        if 'Spanner' in e.classes:
+        if isinstance(e, spanner.Spanner):
             spannerBundleAccum.append(e)
             continue
 
@@ -646,7 +647,7 @@ def makeMeasures(
             continue
         # do not accept another time signature at the zero position: this
         # is handled above
-        if oNew == 0 and 'TimeSignature' in e.classes:
+        if oNew == 0 and isinstance(e, meter.TimeSignature):
             continue
 
         # environLocal.printDebug(['makeMeasures()', 'inserting', oNew, e])
@@ -1594,7 +1595,7 @@ def getTiePitchSet(prior):
         return None
     else:
         tiePitchSet = set()
-        if 'Chord' in prior.classes:
+        if isinstance(prior, chord.Chord):
             previousNotes = list(prior)
         else:
             previousNotes = [prior]

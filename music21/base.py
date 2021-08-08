@@ -55,26 +55,29 @@ from typing import (
     Optional,
     Union,
     Tuple,
-    TypeVar
+    TypeVar,
 )
 
-from music21.sites import SitesException
-from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
+from music21 import common
 from music21.common.enums import ElementSearch, OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL, OffsetQLIn
-from music21 import style  # pylint: disable=unused-import
-from music21 import sites
 from music21 import environment
 from music21 import editorial
-from music21 import duration
-from music21.derivation import Derivation
 from music21 import defaults
-from music21 import common
+from music21.derivation import Derivation
+from music21 import duration
 from music21 import prebase
+from music21 import sites
+from music21 import style  # pylint: disable=unused-import
+from music21.sites import SitesException
+from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
+# needed for temporal manipulations; not music21 objects
+from music21 import tie
 from music21 import exceptions21
 from music21._version import __version__, __version_info__
 from music21.test.testRunner import mainTest
+
 
 # This should actually be bound to Music21Object, but cannot import here.
 _M21T = TypeVar('_M21T', bound=prebase.ProtoM21Object)
@@ -1791,6 +1794,8 @@ class Music21Object(prebase.ProtoM21Object):
         *  changed in v6: added `priorityTargetOnly=False` to only search in the
             context of the priorityTarget.
         '''
+        from music21 import stream
+
         if memo is None:
             memo = []
 
@@ -1821,7 +1826,7 @@ class Music21Object(prebase.ProtoM21Object):
                                              excludeNone=True):
             if siteObj in memo:
                 continue
-            if 'SpannerStorage' in siteObj.classes:
+            if isinstance(siteObj, stream.SpannerStorage):
                 continue
 
             try:
@@ -2819,7 +2824,7 @@ class Music21Object(prebase.ProtoM21Object):
                         candidate = alt
                 else:
                     return post
-            if includeNonStreamDerivations is True or 'Stream' in candidate.classes:
+            if includeNonStreamDerivations is True or candidate.isStream:
                 post.append(candidate)
             focus = candidate
         return post
@@ -2943,8 +2948,8 @@ class Music21Object(prebase.ProtoM21Object):
 
         Changed in v7. -- all but quarterLength are keyword only
         '''
-        # needed for temporal manipulations; not music21 objects
-        from music21 import tie
+        from music21 import chord
+        from music21 import note
         quarterLength = opFrac(quarterLength)
 
         if quarterLength > self.duration.quarterLength:
@@ -3010,8 +3015,8 @@ class Music21Object(prebase.ProtoM21Object):
 
         # some higher-level classes need this functionality
         # set ties
-        if addTies and ('Note' in e.classes
-                        or 'Unpitched' in e.classes):
+        if addTies and (isinstance(e, note.Note)
+                        or isinstance(e, note.Unpitched)):
 
             forceEndTieType = 'stop'
             if hasattr(e, 'tie') and e.tie is not None:
@@ -3036,7 +3041,7 @@ class Music21Object(prebase.ProtoM21Object):
                 # pylint: disable=attribute-defined-outside-init
                 eRemain.tie = tie.Tie(forceEndTieType)
 
-        elif addTies and 'Chord' in e.classes:
+        elif addTies and isinstance(e, chord.Chord):
             for i in range(len(e.notes)):
                 component = e.notes[i]
                 remainComponent = eRemain.notes[i]
@@ -3320,7 +3325,7 @@ class Music21Object(prebase.ProtoM21Object):
             # as we often want the most recent measure
             for cs in self.contextSites():
                 m = cs[0]
-                if 'Measure' in m.classes:
+                if m.isMeasure:
                     mNumber = m.number
         return mNumber
 
@@ -5044,7 +5049,7 @@ class Test(unittest.TestCase):
 #         i = 20
 #         while o and i:
 #             print(o)
-#             if 'Part' in o.classes:
+#             if isinstance(o, stream.Part):
 #                 pass
 #             o = o.previous()
 #             i -= 1

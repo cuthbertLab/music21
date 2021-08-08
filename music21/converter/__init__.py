@@ -1483,7 +1483,7 @@ class Test(unittest.TestCase):
                 self.assertEqual(knownSize[i], len(chords[i].pitches))
 
     def testConversionMXBeams(self):
-
+        from music21 import note
         from music21.musicxml import testPrimitive
 
         mxString = testPrimitive.beams01
@@ -1492,7 +1492,7 @@ class Test(unittest.TestCase):
         notes = part.flat.notesAndRests
         beams = []
         for n in notes:
-            if 'Note' in n.classes:
+            if isinstance(n, note.Note):
                 beams += n.beams.beamsList
         self.assertEqual(len(beams), 152)
 

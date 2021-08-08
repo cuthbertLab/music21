@@ -141,9 +141,9 @@ class TempoIndication(base.Music21Object):
         if found is None:
             found = self
 
-        if 'MetricModulation' in found.classes:
+        if isinstance(found, MetricModulation):
             return found.newMetronome
-        elif 'MetronomeMark' in found.classes:
+        elif isinstance(found, MetronomeMark):
             return found
         elif 'TempoText' in found.classes:
             return found.getMetronomeMark()

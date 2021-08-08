@@ -24,13 +24,14 @@ from collections import OrderedDict
 from importlib.util import find_spec
 
 from music21 import common
+from music21.converter.subConverters import SubConverter
 from music21 import corpus
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
-from music21 import variant
 from music21 import note
-from music21.converter.subConverters import SubConverter
+from music21 import stream
+from music21 import variant
 from music21.lily import lilyObjects as lyo
 
 _MOD = 'lily.translate'
@@ -991,9 +992,9 @@ class LilypondConverter:
                 variantList = []
                 otherList = []
                 for el in groupedElements:
-                    if 'Voice' in el.classes:
+                    if isinstance(el, stream.Voice):
                         voiceList.append(el)
-                    elif 'Variant' in el.classes:
+                    elif isinstance(el, variant.Variant):
                         variantList.append(el)
                     else:
                         el.activeSite = streamObject
@@ -1169,7 +1170,7 @@ class LilypondConverter:
         # commented out until complete
 #         if self.variantMode is True:
 #             # TODO: attach \noBeam to note if it is the last note
-#             if 'NotRest' in noteOrRest.classes:
+#             if isinstance(noteOrRest, note.NotRest):
 #                 n = noteOrRest
 #                 activeSite = n.activeSite
 #                 offset = n.offset
@@ -1956,7 +1957,7 @@ class LilypondConverter:
 
         def findOffsetOfFirstNonSpacerElement(inputStream):
             for el in inputStream:
-                if 'Rest' in el.classes and el.style.hideObjectOnPrint:
+                if isinstance(el, note.Rest) and el.style.hideObjectOnPrint:
                     pass
                 else:
                     return inputStream.elementOffset(el)

@@ -36,8 +36,9 @@ from music21 import exceptions21
 
 from music21 import bar
 from music21 import clef
-from music21 import chord  # for typing
+from music21 import chord
 from music21 import duration
+from music21 import harmony
 from music21 import metadata
 from music21 import note
 from music21 import meter
@@ -45,6 +46,7 @@ from music21 import pitch
 from music21 import spanner
 from music21 import stream
 from music21 import style
+from music21 import tempo
 from music21.stream.iterator import OffsetIterator
 
 from music21.musicxml import helpers
@@ -2897,7 +2899,7 @@ class MeasureExporter(XMLExporterBase):
         root = self.xmlRoot
         divisions = self.currentDivisions
         self.offsetInMeasure = 0.0
-        if 'Voice' in m.classes:
+        if isinstance(m, stream.Voice):
             m: stream.Voice
             if isinstance(m.id, int) and m.id < defaults.minIdNumberToConsiderMemoryLocation:
                 voiceId = m.id
@@ -2930,7 +2932,7 @@ class MeasureExporter(XMLExporterBase):
             for obj in objGroup:
                 # we do all non-note elements (including ChordSymbols)
                 # first before note elements, in musicxml
-                if 'GeneralNote' in obj.classes and 'Harmony' not in obj.classes:
+                if isinstance(obj, note.GeneralNote) and not isinstance(obj, harmony.Harmony):
                     notesForLater.append(obj)
                 else:
                     self.parseOneElement(obj)
@@ -5277,7 +5279,7 @@ class MeasureExporter(XMLExporterBase):
         hideNumber = []  # hide the number after equal, e.g., quarter=120, hide 120
         # store the last value necessary as a sounding tag in bpm
         soundingQuarterBPM = False
-        if 'MetronomeMark' in ti.classes:
+        if isinstance(ti, tempo.MetronomeMark):
             # will not show a number of implicit
             if ti.numberImplicit or ti.number is None:
                 # environLocal.printDebug(['found numberImplicit', ti.numberImplicit])
@@ -5290,7 +5292,7 @@ class MeasureExporter(XMLExporterBase):
             # number (if implicit, that is fine); get in terms of quarter bpm
             soundingQuarterBPM = ti.getQuarterBPM()
 
-        elif 'MetricModulation' in ti.classes:
+        elif isinstance(ti, tempo.MetricModulation):
             # may need to reverse order if classical style or otherwise
             # may want to show first number
             hideNumericalMetro = False  # must show for metric modulation
@@ -5339,7 +5341,7 @@ class MeasureExporter(XMLExporterBase):
         if hideNumericalMetro is not None:
             self.xmlRoot.append(mxDirection)
 
-        if 'MetronomeMark' in ti.classes:
+        if isinstance(ti, tempo.MetronomeMark):
             if ti.getTextExpression(returnImplicit=False) is not None:
                 te = ti.getTextExpression(returnImplicit=False)
                 te.offset = ti.offset
@@ -5638,7 +5640,7 @@ class MeasureExporter(XMLExporterBase):
         if barline is None:
             mxBarline = Element('barline')
         else:
-            if 'Repeat' in barline.classes:
+            if isinstance(barline, bar.Repeat):
                 mxBarline = Element('barline')
                 mxRepeat = self.repeatToXml(barline)
             else:
@@ -5761,7 +5763,7 @@ class MeasureExporter(XMLExporterBase):
             mxDivisions.text = str(self.currentDivisions)
             self.parent.lastDivisions = self.currentDivisions
 
-        if 'Measure' in m.classes:
+        if isinstance(m, stream.Measure):
             if m.keySignature is not None:
                 mxAttributes.append(self.keySignatureToXml(m.keySignature))
             if m.timeSignature is not None:

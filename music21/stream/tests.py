@@ -2240,7 +2240,8 @@ class Test(unittest.TestCase):
 
         expected = "clef.TrebleClef is not a Music21Object; got <class 'str'>"
         with self.assertRaisesRegex(TypeError, expected):
-            s.remove('clef.TrebleClef')
+            # noinspection PyTypeChecker
+            s.remove('clef.TrebleClef')  # cannot remove by Class str.
 
     def testRemoveByClass(self):
         s = Stream()
@@ -7194,7 +7195,7 @@ class Test(unittest.TestCase):
         s.extendTies()
         post = []
         for n in s.flat.getElementsByClass('GeneralNote'):
-            if 'Chord' in n.classes:
+            if isinstance(n, chord.Chord):
                 post.append([repr(q.tie) for q in n])
             else:
                 post.append(repr(n.tie))
@@ -8035,7 +8036,7 @@ class Test(unittest.TestCase):
         bass = b.parts[3]
         bassEmpty = bass.template(fillWithRests=False, removeClasses=True)
         for x in bassEmpty:
-            if 'Measure' in x.classes:
+            if isinstance(x, Measure):
                 self.assertEqual(len(x), 0)
 
     def testSetElements(self):

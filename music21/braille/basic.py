@@ -14,6 +14,7 @@ from typing import List
 
 # from music21 import articulations
 from music21 import clef
+from music21 import duration
 from music21 import environment
 from music21 import exceptions21
 from music21 import interval
@@ -743,7 +744,7 @@ def noteToBraille(
 
     # note duration
     # -------------
-    if 'GraceDuration' in music21Note.duration.classes:
+    if isinstance(music21Note.duration, duration.GraceDuration):
         # TODO: Short Appoggiatura mark...
         nameWithDuration = notesInStep['eighth']
         noteTrans.append(nameWithDuration)

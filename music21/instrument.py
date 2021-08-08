@@ -29,6 +29,7 @@ from collections import OrderedDict
 from music21 import base
 from music21 import common
 from music21 import interval
+from music21 import note
 from music21 import pitch
 from music21.stream import Stream  # for typing
 from music21.tree.trees import OffsetTree
@@ -66,7 +67,7 @@ def unbundleInstruments(streamIn, *, inPlace=False):
         s = streamIn.coreCopyAsDerivation('unbundleInstruments')
 
     for thisObj in s:
-        if 'Unpitched' in thisObj.classes:
+        if isinstance(thisObj, note.Unpitched):
             i = thisObj.storedInstrument
             if i is not None:
                 off = thisObj.offset
@@ -109,7 +110,7 @@ def bundleInstruments(streamIn, *, inPlace=False):
         if 'Instrument' in thisObj.classes:
             lastInstrument = thisObj
             s.remove(thisObj)
-        elif 'Unpitched' in thisObj.classes:
+        elif isinstance(thisObj, note.Unpitched):
             thisObj.storedInstrument = lastInstrument
 
     if inPlace is False:

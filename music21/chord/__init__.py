@@ -391,7 +391,7 @@ class Chord(note.NotRest):
         elif not hasattr(key, 'classes'):
             raise KeyError(keyErrorStr)
 
-        elif 'Note' in key.classes:
+        elif isinstance(key, note.Note):
             for n in self._notes:
                 if n is key:
                     foundNote = n
@@ -404,7 +404,7 @@ class Chord(note.NotRest):
                 else:
                     raise KeyError(keyErrorStr)
 
-        elif 'Pitch' in key.classes:
+        elif isinstance(key, pitch.Pitch):
             for n in self._notes:
                 if n.pitch is key:
                     foundNote = n
@@ -474,7 +474,7 @@ class Chord(note.NotRest):
             value = note.Note(value)
         elif not hasattr(value, 'classes'):
             raise ValueError('Chord index must be set to a valid note object')
-        elif 'Pitch' in value.classes:
+        elif isinstance(value, pitch.Pitch):
             value = note.Note(pitch=value)
         elif 'Note' not in value.classes:
             raise ValueError('Chord index must be set to a valid note object')
@@ -770,7 +770,7 @@ class Chord(note.NotRest):
         if not hasattr(removeItem, 'classes'):
             raise ValueError('Cannot remove {} from a chord; try a Pitch or Note object'.format(
                 removeItem))
-        if 'Pitch' in removeItem.classes:
+        if isinstance(removeItem, pitch.Pitch):
             for n in self._notes:
                 if n.pitch == removeItem:
                     self._notes.remove(n)
@@ -1424,7 +1424,7 @@ class Chord(note.NotRest):
             if testRoot is None:
                 # can this be tested?
                 raise ChordException('Cannot run getChordStep without a root')
-        elif 'Note' in testRoot.classes:
+        elif isinstance(testRoot, note.Note):
             testRoot = testRoot.pitch
 
         rootDNN = testRoot.diatonicNoteNum

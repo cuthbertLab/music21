@@ -2476,7 +2476,7 @@ class Test(unittest.TestCase):
     def testRemoveSpanners(self):
         from music21 import stream
         from music21 import note
-        from music21.spanner import Slur
+        from music21.spanner import Spanner, Slur
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -2492,7 +2492,7 @@ class Test(unittest.TestCase):
         sl = Slur([n1, n2])
         p.insert(0, sl)
         for x in p:
-            if 'Spanner' in x.classes:
+            if isinstance(x, Spanner):
                 p.remove(x)
         self.assertEqual(len(p.spanners), 0)
 

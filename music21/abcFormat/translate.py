@@ -170,7 +170,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
         # append measure to part; in the case of trailing meta data
         # dst may be part, even though useMeasures is True
-        if useMeasures and 'Measure' in dst.classes:
+        if useMeasures and isinstance(dst, stream.Measure):
             # check for incomplete bars
             # must have a time signature in this bar, or defined recently
             # could use getTimeSignatures() on Stream
