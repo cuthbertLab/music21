@@ -1661,7 +1661,7 @@ class TestExternal(unittest.TestCase):
         a.data = data
         a.process()
 
-    def writeAllGraphs(self):
+    def x_test_writeAllGraphs(self):
         '''
         Write a graphic file for all graphs,
         naming them after the appropriate class.
@@ -1710,7 +1710,7 @@ class TestExternal(unittest.TestCase):
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
 
-    def writeGraphColorGrid(self):
+    def x_test_writeGraphColorGrid(self):
         # this is temporary
         a = GraphColorGrid(doneAction=None)
         data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c',
@@ -1739,7 +1739,7 @@ class TestExternal(unittest.TestCase):
 
         a.write(fp)
 
-    def writeGraphingDocs(self):
+    def x_test_writeGraphingDocs(self):
         '''
         Write graphing examples for the docs
         '''

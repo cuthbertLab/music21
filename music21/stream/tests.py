@@ -2249,6 +2249,10 @@ class Test(unittest.TestCase):
         # activeSite is Now sent to None
         self.assertEqual(n1.activeSite, None)
 
+        expected = "clef.TrebleClef is not a Music21Object; got <class 'str'>"
+        with self.assertRaisesRegex(TypeError, expected):
+            s.remove('clef.TrebleClef')
+
     def testRemoveByClass(self):
         s = Stream()
         s.repeatAppend(clef.BassClef(), 2)
@@ -8435,4 +8439,3 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     music21.mainTest(Test, 'verbose')  # , runTest='test_makeBeams__paddingLeft_2_2')
-

@@ -56,9 +56,9 @@ In addition, we acknowledge consistent support from `M.I.T.`_, the
 `School of Humanities Arts and Social Sciences`_, and the
 `Music and Theater Arts`_ section.
 
-.. _M.I.T.: http://web.mit.edu/
-.. _School of Humanities Arts and Social Sciences: http://shass.mit.edu/
-.. _Music and Theater Arts: http://web.mit.edu/mta/
+.. _M.I.T.: https://web.mit.edu/
+.. _School of Humanities Arts and Social Sciences: https://shass.mit.edu/
+.. _Music and Theater Arts: https://mta.mit.edu/
 
 Colleagues and Institutions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -77,7 +77,7 @@ working on other music and technology projects, in particular:
 
 .. _David Huron: http://www.musiccog.ohio-state.edu/Huron/
 .. _Humdrum: http://www.musiccog.ohio-state.edu/Humdrum/
-.. _Michael Good: http://www.recordare.com
+.. _Michael Good: https://www.musicxml.com
 .. _Center for Computer-Assisted Research in the Humanities: http://www.ccarh.org/
 
 Contributors
@@ -137,18 +137,18 @@ to this project.  Their contributions and generosity are greatly appreciated.
   Haydn, and Mozart, in musicxml format which we have been able to include in music21.
 
 .. _Donald Byrd: http://www.informatics.indiana.edu/donbyrd/CMNExtremes.htm
-.. _Laura E. Conrad: http://www.serpentpublications.org/
+.. _Laura E. Conrad: http://www.serpentpublications.org/drupal7/
 .. _Margaret Greentree: http://www.jsbchorales.net
-.. _MuseScore: http://www.musescore.com
-.. _Justin London: http://www.people.carleton.edu/~jlondon/2ndviennese.htm
+.. _MuseScore: https://musescore.com/
+.. _Justin London: https://people.carleton.edu/~jlondon/2ndviennese.htm
 .. _Bryen Travis: http://www.bachcentral.com/
 .. _Ewa Dahlig-Turek: http://www.esac-data.org
 .. _Seymour Shlien: http://ifdo.pugmarks.com/~seymour/runabc/esac/esacdatabase.html
 .. _Manuel Op de Coul: http://www.huygens-fokker.org/scala
 .. _John Chambers: http://trillian.mit.edu/~jc/music/book
 .. _Jack Campin: http://www.campin.me.uk/
-.. _McGill University: http://digihum.mcgill.ca/blog/2012/11/30/elvis-digging-into-data-at-mcgill/
-.. _Project Gutenberg: http://www.gutenberg.org/browse/categories/4
+.. _McGill University: https://digihum.mcgill.ca/blog/2012/11/30/elvis-digging-into-data-at-mcgill/
+.. _Project Gutenberg: https://www.gutenberg.org/browse/categories/4
 
 
 How to Contribute
@@ -162,7 +162,7 @@ advance your work ... or in problems with `music21` itself or contributions you'
 
 You can contact the larger `music21` community through the `music21 list`_.
 
-.. _music21 list: http://groups.google.com/group/music21list
+.. _music21 list: https://groups.google.com/g/music21list
 
 In particular, if you are interested in contributing documentation, tests,
 or new features to music21, please contact the lead author on GitHub or through the

@@ -22,6 +22,7 @@ import warnings
 from music21 import chord
 from music21 import common
 from music21 import defaults
+from music21 import duration
 from music21 import note
 from music21 import exceptions21
 from music21 import environment
@@ -150,7 +151,6 @@ def ticksToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
 
     '''
     if inputM21DurationObject is None:
-        from music21 import duration
         d = duration.Duration()
     else:
         d = inputM21DurationObject
@@ -268,7 +268,7 @@ def music21ObjectToMidiFile(
 # ------------------------------------------------------------------------------
 # Notes
 
-def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
+def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None) -> note.Note:
     # noinspection PyShadowingNames
     '''
     Convert from a list of midi.DeltaTime and midi.MidiEvent objects to a music21 Note.
@@ -332,11 +332,6 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     94
 
     '''
-    if inputM21 is None:
-        n = note.Note()
-    else:
-        n = inputM21
-
     if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
@@ -355,17 +350,26 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     else:
         raise TranslateException(f'cannot handle MIDI event list in the form: {eventList!r}')
 
+    # here we are handling an issue that might arise with double-stemmed notes
+    if (tOff - tOn) != 0:
+        if inputM21 is None:
+            n = note.Note(duration=ticksToDuration(tOff - tOn, ticksPerQuarter))
+        else:
+            n = inputM21
+            n.duration = ticksToDuration(tOff - tOn, ticksPerQuarter, n.duration)
+    else:
+        # environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
+        # for now, substitute grace note
+        if inputM21 is None:
+            n = note.Note()
+        else:
+            n = inputM21
+        n.getGrace(inPlace=True)
+
     n.pitch.midi = eOn.pitch
     n.volume.velocity = eOn.velocity
     n.volume.velocityIsRelative = False  # not relative coming from MIDI
     # n._midiVelocity = eOn.velocity
-    # here we are handling an issue that might arise with double-stemmed notes
-    if (tOff - tOn) != 0:
-        ticksToDuration(tOff - tOn, ticksPerQuarter, n.duration)
-    else:
-        # environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
-        # for now, substitute grace note
-        n.getGrace(inPlace=True)
 
     return n
 
@@ -523,11 +527,6 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     tOn: int = 0  # ticks
     tOff: int = 0  # ticks
 
-    if inputM21 is None:
-        c = chord.Chord()
-    else:
-        c = inputM21
-
     if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
@@ -570,16 +569,26 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     else:
         raise TranslateException(f'fewer than 4 events provided to midiEventsToChord: {eventList}')
 
-    c.pitches = pitches
-    c.volume = volumes  # can set a list to volume property
     # can simply use last-assigned pair of tOff, tOn
     if (tOff - tOn) != 0:
-        ticksToDuration(tOff - tOn, ticksPerQuarter, c.duration)
+        if inputM21 is None:
+            c = chord.Chord(duration=ticksToDuration(tOff - tOn, ticksPerQuarter))
+        else:
+            c = inputM21
+            c.duration = ticksToDuration(tOff - tOn, ticksPerQuarter, c.duration)
     else:
         environLocal.warn(['midi chord with zero duration will be treated as grace',
                             eventList, c])
         # for now, get grace
+        if inputM21 is None:
+            c = chord.Chord()
+        else:
+            c = inputM21
         c.getGrace(inPlace=True)
+
+    c.pitches = pitches
+    c.volume = volumes  # can set a list to volume property
+
     return c
 
 
@@ -1924,9 +1933,7 @@ def midiTrackToStream(
             # execute; chordSub will be None
             if chordSub is not None:
                 # composite.append(chordSub)
-                # create a chord here
-                c = chord.Chord()
-                midiEventsToChord(chordSub, ticksPerQuarter, c)
+                c = midiEventsToChord(chordSub, ticksPerQuarter)
                 o = notes[i][0][0] / ticksPerQuarter
                 c.midiTickStart = notes[i][0][0]
 
@@ -1935,9 +1942,7 @@ def midiTrackToStream(
                 chordSub = None
             else:  # just append the note, chordSub is None
                 # composite.append(notes[i])
-                # create a note here
-                n = note.Note()
-                midiEventsToNote(notes[i], ticksPerQuarter, n)
+                n = midiEventsToNote(notes[i], ticksPerQuarter)
                 # the time is the first value in the first pair
                 # need to round, as floating point error is likely
                 o = notes[i][0][0] / ticksPerQuarter
@@ -1949,12 +1954,11 @@ def midiTrackToStream(
             i += 1
 
     elif len(notes) == 1:  # rare case of just one note
-        n = note.Note()
-        midiEventsToNote(notes[0], ticksPerQuarter, n)
+        n = midiEventsToNote(notes[0], ticksPerQuarter)
         # the time is the first value in the first pair
         # need to round, as floating point error is likely
         o = notes[0][0][0] / ticksPerQuarter
-        n.midiTickStart = notes[i][0][0]
+        n.midiTickStart = notes[0][0][0]
         s.coreInsert(o, n)
 
     s.coreElementsChanged()
@@ -1974,11 +1978,14 @@ def midiTrackToStream(
     if conductorPart is not None:
         insertConductorEvents(conductorPart, s, isFirst=isFirst)
 
-    # Only make measures if time signatures have been inserted
-    s.makeMeasures(inPlace=True)
-    for m in s.getElementsByClass(stream.Measure):
-        if voicesRequired:
-            m.makeVoices(inPlace=True, fillGaps=True)
+    # Only make measures once time signatures have been inserted
+    s.makeMeasures(
+        meterStream=conductorPart['TimeSignature'].stream() if conductorPart else None,
+        inPlace=True)
+    if voicesRequired:
+        for m in s.getElementsByClass(stream.Measure):
+            # Gaps will be filled by makeRests, below, which now recurses
+            m.makeVoices(inPlace=True, fillGaps=False)
     s.makeTies(inPlace=True)
     # always need to fill gaps, as rests are not found in any other way
     s.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
@@ -2018,10 +2025,10 @@ def prepareStreamForMidi(s) -> stream.Stream:
     '''
     from music21 import volume
 
-    if s.recurse().stream().hasMeasures():
+    if s[stream.Measure]:
         s = s.expandRepeats()  # makes a deep copy
     else:
-        s = copy.deepcopy(s)
+        s = s.coreCopyAsDerivation('prepareStreamForMidi')
 
     conductor = conductorStream(s)
 
@@ -2097,15 +2104,13 @@ def conductorStream(s: stream.Stream) -> stream.Part:
     conductorPart.insert(0, Conductor())
 
     for klass in ('MetronomeMark', 'TimeSignature', 'KeySignature'):
-        events = s.flat.getElementsByClass(klass)
         lastOffset = -1
-        for el in events:
-            o = events.srcStream.elementOffset(el)
-            s.remove(el, recurse=True)
+        for el in s[klass]:
             # Don't overwrite an event of the same class at this offset
-            if o > lastOffset:
-                conductorPart.coreInsert(o, el)
-            lastOffset = o
+            if el.offset > lastOffset:
+                conductorPart.coreInsert(el.offset, el)
+            lastOffset = el.offset
+            s.remove(el, recurse=True)
 
     conductorPart.coreElementsChanged()
 

@@ -233,41 +233,41 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
     '''
     name = ''
 
-    # rounding here is essential
-    ps = round(ps, PITCH_SPACE_SIG_DIGITS)
-    pcReal = ps % 12
-    # micro here will be between 0 and 1
-    pc, micro = divmod(pcReal, 1)
-
-    # environLocal.printDebug(['_convertPsToStep(): post divmod',  'ps', repr(ps),
-    #    'pcReal', repr(pcReal), 'pc', repr(pc), 'micro', repr(micro)])
-
-    # if close enough to a quarter tone
-    if round(micro, 1) == 0.5:
-        # if can round to 0.5, than this is a quarter-tone accidental
-        alter = 0.5
-        # need to find microtonal alteration around this value
-        # of alter is 0.5 and micro is 0.7 than  micro should be 0.2
-        # of alter is 0.5 and micro is 0.4 than  micro should be -0.1
-        micro = micro - alter
-
-    # if greater than 0.5
-    elif 0.25 < micro < 0.75:
-        alter = 0.5
-        micro = micro - alter
-    # if closer to 1, than go to the higher alter and get negative micro
-    elif 0.75 <= micro < 1:
-        alter = 1
-        micro = micro - alter
-    # not greater than 0.25
-    elif micro > 0:
-        alter = 0
-        # micro = micro  # no change necessary
-    else:
+    if isinstance(ps, int):
+        pc = ps % 12
         alter = 0
         micro = 0
+    else:
+        # rounding here is essential
+        ps = round(ps, PITCH_SPACE_SIG_DIGITS)
+        # micro here will be between 0 and 1
+        pcReal = ps % 12
+        pc, micro = divmod(pcReal, 1)
+        pc = int(pc)
 
-    pc = int(pc)
+        # if close enough to a quarter tone
+        if round(micro, 1) == 0.5:
+            # if can round to 0.5, than this is a quarter-tone accidental
+            alter = 0.5
+            # need to find microtonal alteration around this value
+            # of alter is 0.5 and micro is 0.7 than  micro should be 0.2
+            # of alter is 0.5 and micro is 0.4 than  micro should be -0.1
+            micro = micro - alter
+        # if greater than 0.5
+        elif 0.25 < micro < 0.75:
+            alter = 0.5
+            micro = micro - alter
+        # if closer to 1, than go to the higher alter and get negative micro
+        elif 0.75 <= micro < 1:
+            alter = 1
+            micro = micro - alter
+        # not greater than 0.25
+        elif micro > 0:
+            alter = 0
+            # micro = micro  # no change necessary
+        else:
+            alter = 0
+            micro = 0
 
     # environLocal.printDebug(['_convertPsToStep(): post', 'alter', alter,
     #    'micro', micro, 'pc', pc])

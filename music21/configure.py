@@ -45,10 +45,10 @@ reFinaleReaderApp = re.compile(r'Finale Reader\.app', IGNORECASE)
 reMuseScoreApp = re.compile(r'MuseScore.*\.app', IGNORECASE)
 reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.*\.exe', IGNORECASE)
 
-urlMusic21 = 'http://web.mit.edu/music21'
+urlMusic21 = 'https://web.mit.edu/music21'
 urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'http://web.mit.edu/music21/doc/'
-urlMusic21List = 'http://groups.google.com/group/music21list'
+urlGettingStarted = 'https://web.mit.edu/music21/doc/'
+urlMusic21List = 'https://groups.google.com/g/music21list'
 
 LINE_WIDTH = 78
 
@@ -1537,7 +1537,7 @@ class ConfigurationAssistant:
 
 # ------------------------------------------------------------------------------
 # for time-out gather of arguments: possibly look at:
-# http://code.activestate.com/recipes/576780/
+# https://code.activestate.com/recipes/576780/
 # http://www.garyrobinson.net/2009/10/non-blocking-raw_input-for-python.html
 # class Prompt(threading.Thread):
 #     def __init__ (self, prompt, timeOutTime):

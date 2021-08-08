@@ -3871,7 +3871,7 @@ class ElementWrapper(Music21Object):
         Using this also avoids the potential recursion problems of subclassing
         __getattribute__()_
 
-        see: http://stackoverflow.com/questions/371753/python-using-getattribute-method
+        see: https://stackoverflow.com/questions/371753/python-using-getattribute-method
         for examples
         '''
         storedObj = Music21Object.__getattribute__(self, 'obj')

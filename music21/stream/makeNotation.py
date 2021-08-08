@@ -114,7 +114,7 @@ def makeBeams(
 
     # environLocal.printDebug(['calling Stream.makeBeams()'])
     if not inPlace:  # make a copy
-        returnObj: stream.Stream = copy.deepcopy(s)
+        returnObj: stream.Stream = s.coreCopyAsDerivation('makeBeams')
     else:
         returnObj: stream.Stream = s
 
@@ -677,6 +677,7 @@ def makeMeasures(
             m.clef = clef.bestClef(m, recurse=True)
 
     if not inPlace:
+        post.setDerivationMethod('makeMeasures', recurse=True)
         return post  # returns a new stream populated w/ new measure streams
     else:  # clear the stored elements list of this Stream and repopulate
         # with Measures created above
@@ -825,8 +826,7 @@ def makeRests(
     from music21 import stream
 
     if not inPlace:  # make a copy
-        returnObj = copy.deepcopy(s)
-        returnObj.derivation.method = 'makeRests'
+        returnObj = s.coreCopyAsDerivation('makeRests')
     else:
         returnObj = s
 
@@ -1157,8 +1157,7 @@ def makeTies(
     # environLocal.printDebug(['calling Stream.makeTies()'])
 
     if not inPlace:  # make a copy
-        returnObj = copy.deepcopy(s)
-        returnObj.derivation.method = 'makeTies'
+        returnObj = s.coreCopyAsDerivation('makeTies')
     else:
         returnObj = s
     if not returnObj:
@@ -1356,8 +1355,7 @@ def makeTupletBrackets(s: 'music21.stream.Stream', *, inPlace=False):
 
     # Stream, as it should be...
     if not inPlace:  # make a copy
-        returnObj = copy.deepcopy(s)
-        returnObj.derivation.method = 'makeTupletBrackets'
+        returnObj = s.coreCopyAsDerivation('makeTupletBrackets')
     else:
         returnObj = s
 

@@ -426,7 +426,7 @@ def insertRepeatEnding(s, start, end, endingNumber=1, *, inPlace=False):
     '''
 
     if not inPlace:
-        s = copy.deepcopy(s)
+        s.coreCopyAsDerivation('insertRepeatEnding')
 
     if s is None:
         return None  # or raise an exception!
@@ -493,7 +493,7 @@ def insertRepeat(s, start, end, *, inPlace=False):
         return None
 
     if not inPlace:
-        s = copy.deepcopy(s)
+        s.coreCopyAsDerivation('insertRepeat')
 
     if not s.hasMeasures():
         for part in s.parts:
@@ -565,7 +565,7 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
         return None
 
     if not inPlace:
-        s = copy.deepcopy(s)
+        s = s.coreCopyAsDerivation('deleteMeasures')
 
     if s.hasMeasures():
         for mNumber in toDelete:
@@ -773,7 +773,7 @@ class Expander:
         # need to copy source measures, as may later measures before copying
         # them, and this can result in orphaned spanners
         if deepcopy is not False:
-            srcStream = copy.deepcopy(self._srcMeasureStream)
+            srcStream = self._srcMeasureStream.coreCopyAsDerivation('expandRepeats')
         else:
             srcStream = self._srcMeasureStream
 
@@ -2457,7 +2457,7 @@ class RepeatFinder:
         if inPlace:
             s = self.s
         else:
-            s = copy.deepcopy(self.s)
+            s = self.s.coreCopyAsDerivation('RepeatFinder.simplify')
 
         if s is None:
             raise NoInternalStreamException(

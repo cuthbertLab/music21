@@ -1575,7 +1575,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for i, target in enumerate(targetList):
             try:
                 indexInStream = self.index(target)
-            except StreamException:
+            except StreamException as se:
+                if not isinstance(target, base.Music21Object):
+                    raise TypeError(f'{target} is not a Music21Object; got {type(target)}') from se
                 if recurse is True:
                     for s in self.recurse(streamsOnly=True):
                         try:

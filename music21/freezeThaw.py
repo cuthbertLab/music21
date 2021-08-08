@@ -44,7 +44,7 @@ JSON was originally created to pass
 JavaScript objects from a web server to a web browser, but its utility
 (combining the power of XML with the ease of use of objects) has made it a
 growing standard for other languages.  (see
-http://docs.python.org/library/json.html).
+https://docs.python.org/3/library/json.html).
 Music21 has two implementations of JSON (confusing, no?)
 because we weren't sure and are still not sure which will be best in the long-run:
 the first approach
