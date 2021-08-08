@@ -116,17 +116,6 @@ def musicXMLToScript(xml, divId, *, offline=False):
     return script
 
 
-class Test(unittest.TestCase):
-
-    def testPlaceholderPartName(self):
-        from music21 import converter
-
-        p = converter.parse('tinyNotation: c1 d1 e1 f1')
-        self.assertIsNone(p.partName)
-        dump = getXml(p)
-        self.assertIn('<part-name> </part-name>', dump)
-
-
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
     @unittest.skipUnless(hasInstalledIPython(), 'skipping since IPython not installed')
