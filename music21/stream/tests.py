@@ -3833,16 +3833,25 @@ class Test(unittest.TestCase):
 
     def testQuantizeMinimumDuration(self):
         '''
-        Notes of nonzero duration should retain a nonzero
-        duration after quantizing.
+        Notes (not rests!) of nonzero duration should retain a nonzero
+        duration after quantizing. Zero duration rests should be removed.
         '''
         from music21 import converter
 
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test15.mid'  # 3 16ths, 2 32nds
         s = converter.parse(fp, quarterLengthDivisors=[2])
-        self.assertEqual(s.flat.notes[-1].duration.quarterLength, 0.5)
-        self.assertEqual(s.flat.notes[-1].editorial.quarterLengthQuantizationError, .125 - .5)
+        last_note = s.flat.notes[-1]
+        self.assertEqual(last_note.duration.quarterLength, 0.5)
+        self.assertEqual(last_note.editorial.quarterLengthQuantizationError, .125 - .5)
+
+        # build up the same score from scratch and show
+        # minimum duration constraint does not apply to rests
+        s2 = Stream()
+        s2.repeatAppend(note.Note(type='16th'), 3)
+        s2.repeatAppend(note.Rest(type='32nd'), 2)
+        s2.quantize(inPlace=True, quarterLengthDivisors=[2])
+        self.assertEqual(len(s2.notesAndRests), 3)
 
     def testAnalyze(self):
 

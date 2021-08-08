@@ -1983,5 +1983,3 @@ if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)  # , runTest='testConverterFromPath')
-
-
