@@ -51,6 +51,9 @@ def getUniqueDivId() -> str:
     '''
     Generates a unique id for the div in which the score is displayed.
     This is so we can update a previously used div.
+
+    >>> osmd.getUniqueDivId()
+    'OSMD-div-...'
     '''
     return ('OSMD-div-'
             + str(random.randint(0, 1000000))
@@ -60,6 +63,13 @@ def getXml(obj) -> str:
     '''
     Prepare a score even if `obj` is not a Score, and ensure the part name is not empty.
     Return a string dump of the XML.
+
+    >>> p = converter.parse('tinyNotation: c1 d1')
+    >>> p.partName is None
+    True
+    >>> dump = osmd.getXml(p)
+    >>> '<part-name> </part-name>' in dump
+    True
     '''
     gex = GeneralObjectExporter()
     # whether or not obj is score, fromGeneralObject returns a score
