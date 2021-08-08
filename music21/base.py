@@ -370,7 +370,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         # store a derivation object to track derivations from other Streams
         # pass a reference to this object
-        self._derivation: Optional[derivation.Derivation] = None
+        self._derivation: Optional[Derivation] = None
 
         self._style: Optional[style.Style] = None
         self._editorial = None
