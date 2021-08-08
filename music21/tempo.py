@@ -168,7 +168,7 @@ class TempoIndication(base.Music21Object):
         # search for TempoIndication objects, not just MetronomeMark objects
         # must provide getElementBefore, as will otherwise return self
         obj = self.getContextByClass('TempoIndication',
-                                     getElementMethod='getElementBeforeOffset')
+                                     getElementMethod=common.enums.ElementSearch.BEFORE_OFFSET)
         if obj is None:
             return None  # nothing to do
         return self.getSoundingMetronomeMark(obj)

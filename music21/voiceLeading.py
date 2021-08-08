@@ -1558,7 +1558,7 @@ class Verticality(base.Music21Object):
             if classFilterList == [None]:
                 retList.append(el)
             else:
-                if el.isClassOrSubclass(classFilterList):
+                if not el.classSet.isdisjoint(classFilterList):
                     retList.append(el)
         if len(retList) > 1:
             return retList
@@ -1591,7 +1591,7 @@ class Verticality(base.Music21Object):
         for part, objList in self.contentDict.items():
             for m21object in objList:
 
-                if m21object is None or not m21object.isClassOrSubclass(classFilterList):
+                if m21object is None or m21object.classSet.isdisjoint(classFilterList):
                     continue
                 else:
                     if partNums and part not in partNums:
@@ -1884,7 +1884,7 @@ class NNoteLinearSegment(base.Music21Object):
                 self._noteList.append(note.Note(value))
             else:
                 try:
-                    if value.isClassOrSubclass([note.Note, pitch.Pitch]):
+                    if not value.classSet.isdisjoint([note.Note, pitch.Pitch]):
                         self._noteList.append(value)
                 except (AttributeError, NameError):
                     self._noteList.append(None)
@@ -2017,7 +2017,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
             return note.Note(value)
         else:
             try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
+                if not value.classSet.isdisjoint([note.Note, pitch.Pitch]):
                     return value
                 else:
                     return None
@@ -2078,7 +2078,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     def _reprInternal(self):
         return f'n1={self.n1} n2={self.n2} n3={self.n3}'
 
-    def color(self, color='red', noteList=(2,)):
+    @common.deprecated('v7', 'v8', 'assign colors to n1.style.color (etc.) directly')
+    def color(self, color='red', noteList=(2,)):  # pragma: no cover
         '''
         color all the notes in noteList (1, 2, 3). Default is to color
         only the second note red
@@ -2299,7 +2300,7 @@ class NChordLinearSegment(NObjectLinearSegment):
                 self._chordList.append(None)
             else:
                 try:
-                    if value.isClassOrSubclass(['Chord', 'Harmony']):
+                    if not value.classSet.isdisjoint(['Chord', 'Harmony']):
                         self._chordList.append(value)
                     # else:
                         # raise NChordLinearSegmentException(

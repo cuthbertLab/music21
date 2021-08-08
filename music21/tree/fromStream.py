@@ -33,7 +33,7 @@ def listOfTreesByClass(inputStream,
     encountered substream and PitchedTimespan for each encountered non-stream
     element.
 
-    `classLists` should be a sequence of valid inputs for `isClassOrSubclass()`. One
+    `classLists` should be a sequence of elements contained in `classSet`. One
     TimespanTree will be constructed for each element in `classLists`, in
     a single optimized pass through the `inputStream`.
 
@@ -118,7 +118,7 @@ def listOfTreesByClass(inputStream,
             endTime = offset + element.duration.quarterLength
 
             for classBasedTree, classList in zip(outputTrees, classLists):
-                if classList and not element.isClassOrSubclass(classList):
+                if classList and element.classSet.isdisjoint(classList):
                     continue
                 if useTimespans:
                     if hasattr(element, 'pitches') and 'music21.key.Key' not in element.classSet:
@@ -213,7 +213,7 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
                 if flatten != 'semiFlat':
                     continue  # do not insert the stream itself unless we are doing semiflat
 
-            if classList and not element.isClassOrSubclass(classList):
+            if classList and element.classSet.isdisjoint(classList):
                 continue
 
             endTime = flatOffset + element.duration.quarterLength
@@ -262,7 +262,7 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
             elementTupleList = [(e.sortTuple(inputStream), e) for e in inputStreamElements]
         else:
             elementTupleList = [(e.sortTuple(inputStream), e) for e in inputStreamElements
-                                    if e.isClassOrSubclass(classList)]
+                                    if not e.classSet.isdisjoint(classList)]
         outputTree.populateFromSortedList(elementTupleList)
         if outputTree.rootNode is not None:
             outputTree.rootNode.updateEndTimes()

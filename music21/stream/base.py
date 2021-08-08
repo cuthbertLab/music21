@@ -3016,7 +3016,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Changed in v7. -- all but quarterLength are keyword only
         '''
-        # pylint: disable=attribute-defined-outside-init
         quarterLength = opFrac(quarterLength)
         if retainOrigin:
             sLeft = self
@@ -3033,9 +3032,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             )
             if timeSignatures:
                 sRight.keySignature = copy.deepcopy(timeSignatures[0])
-            keySignatures = sLeft.getKeySignatures(
-                searchContext=searchContext,
-            )
+            if searchContext:
+                keySignatures = sLeft.getContextByClass(key.KeySignature)
+                if keySignatures is not None:
+                    keySignatures = [keySignatures]
+            else:
+                keySignatures = sLeft.getElementsByClass(key.KeySignature)
             if keySignatures:
                 sRight.keySignature = copy.deepcopy(keySignatures[0])
             endClef = sLeft.getContextByClass('Clef')
@@ -3755,7 +3757,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             sIterator = sIterator.getElementsByClass(classList)
         return sIterator
 
-    def getElementAtOrBefore(self, offset, classList=None):
+    def getElementAtOrBefore(self, offset, classList=None) -> Optional[base.Music21Object]:
         # noinspection PyShadowingNames
         '''
         Given an offset, find the element at this offset,
@@ -3875,7 +3877,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             return None
 
-    def getElementBeforeOffset(self, offset, classList=None):
+    def getElementBeforeOffset(self, offset, classList=None) -> Optional[base.Music21Object]:
         '''
         Get element before (and not at) a provided offset.
 
@@ -5297,10 +5299,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                    returnDefault=returnDefault)
         return post.first()
 
+    @common.deprecated('v7', 'v8', 'use getElementsByClass() or getContextByClass() or bestClef()')
     def getClefs(self, searchActiveSite=False, searchContext=True,
-                 returnDefault=True):
+                 returnDefault=True):  # pragma: no cover
         '''
-        DEPRECATED...
+        DEPRECATED in v7.
 
         Collect all :class:`~music21.clef.Clef` objects in
         this Stream in a list. Optionally search the
@@ -5314,8 +5317,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> b = clef.AltoClef()
         >>> a.insert(0, b)
         >>> a.repeatInsert(note.Note('C#'), list(range(10)))
-        >>> c = a.getClefs()
-        >>> len(c) == 1
+        >>> #_DOCS_SHOW c = a.getClefs()
+        >>> #_DOCS_SHOW len(c) == 1
         True
         '''
         # TODO: activeSite searching is not yet implemented
@@ -5340,7 +5343,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             post.insert(0, clef.bestClef(self))
         return post
 
-    def getKeySignatures(self, searchActiveSite=True, searchContext=True):
+    @common.deprecated('v7', 'v8', 'use getElementsByClass() or getContextByClass()')
+    def getKeySignatures(self, searchActiveSite=True, searchContext=True):  # pragma: no cover
         '''
         Collect all :class:`~music21.key.KeySignature` objects in this
         Stream in a new Stream. Optionally search the activeSite
@@ -5348,15 +5352,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         If no KeySignature objects are defined, returns an empty Stream
 
-        TO BE DEPRECATED...
-
+        DEPRECATED in v7.
 
         >>> a = stream.Stream()
         >>> b = key.KeySignature(3)
         >>> a.insert(0, b)
         >>> a.repeatInsert(note.Note('C#'), list(range(10)))
-        >>> c = a.getKeySignatures()
-        >>> len(c) == 1
+        >>> #_DOCS_SHOW c = a.getKeySignatures()
+        >>> #_DOCS_SHOW len(c) == 1
         True
         '''
         # TODO: activeSite searching is not yet implemented
@@ -5539,7 +5542,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 continue
             if endOffset is not None and self.elementOffset(e) >= endOffset:
                 continue
-            if classFilterList is not None and not e.isClassOrSubclass(classFilterList):
+            if classFilterList is not None and e.classSet.isdisjoint(classFilterList):
                 continue
 
             self.coreSetElementOffset(e, opFrac(self.elementOffset(e) + offset))
@@ -5765,6 +5768,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             for v in offsetDictValues}
         return sorted(offsets.union(endTimes))
 
+    @common.deprecated('v7', 'v8', 'use chordify() instead')
     def makeChords(self,
                    minimumWindowSize=0.125,
                    includePostWindow=True,
@@ -5774,9 +5778,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                    gatherExpressions=True,
                    inPlace=False,
                    transferGroupsToPitches=False,
-                   makeRests=True):
+                   makeRests=True):  # pragma: no cover
         '''
-        TO BE DEPRECATED SOON!  Use Chordify instead!
+        DEPRECATED in v7.  Use Chordify instead!
 
         Gathers simultaneously sounding :class:`~music21.note.Note` objects
         into :class:`~music21.chord.Chord` objects, each of which
@@ -5805,8 +5809,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> sc1 = stream.Score()
         >>> sc1.insert(0, p1)
         >>> sc1.insert(0, p2)
-        >>> scChords = sc1.flat.makeChords()
-        >>> scChords.show('text')
+        >>> #_DOCS_SHOW scChords = sc1.flat.makeChords()
+        >>> #_DOCS_SHOW scChords.show('text')
         {0.0} <music21.chord.Chord C4 C#5 D4>
         {2.0} <music21.chord.Chord E4 E#5>
         {3.0} <music21.chord.Chord B2 E4 G5 C#7>
@@ -6622,12 +6626,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             addAlteredPitches = useKeySignature.alteredPitches
         elif useKeySignature is True:  # get from defined contexts
             # will search local, then activeSite
-            ksStream = self.getKeySignatures(
-                searchContext=searchKeySignatureByContext)
-            if ksStream:
+            ksIter = None
+            if searchKeySignatureByContext:
+                ks = self.getContextByClass(key.KeySignature)
+                if ks is not None:
+                    ksIter = [ks]
+            else:
+                ksIter = self.getElementsByClass(key.KeySignature)
+            if ksIter:
                 # assume we want the first found; in some cases it is possible
                 # that this may not be true
-                addAlteredPitches = ksStream[0].alteredPitches
+                addAlteredPitches = ksIter[0].alteredPitches
         alteredPitches += addAlteredPitches
         # environLocal.printDebug(['processing makeAccidentals() with alteredPitches:',
         #   alteredPitches])
@@ -6904,9 +6913,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if not inPlace:
             return returnObj
 
-    def extendDurationAndGetBoundaries(self, objName, *, inPlace=False):
+    @common.deprecated('v7', 'v8', 'call extendDurations() and getElementsByClass() separately')
+    def extendDurationAndGetBoundaries(self, objName, *, inPlace=False):  # pragma: no cover
         '''
-        DEPRECATED in v.6 -- to be removed in v.7
+        DEPRECATED in v.7 -- to be removed in v.8
 
         Extend the Duration of elements specified by objName;
         then, collect a dictionary for every matched element of objName class,
@@ -6917,7 +6927,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.insert(3, dynamics.Dynamic('mf'))
         >>> s.insert(7, dynamics.Dynamic('f'))
         >>> s.insert(12, dynamics.Dynamic('ff'))
-        >>> pp(s.extendDurationAndGetBoundaries('Dynamic'))
+        >>> #_DOCS_SHOW pp(s.extendDurationAndGetBoundaries('Dynamic'))
         {(3.0, 7.0): <music21.dynamics.Dynamic mf>,
          (7.0, 12.0): <music21.dynamics.Dynamic f>,
          (12.0, 12.0): <music21.dynamics.Dynamic ff>}

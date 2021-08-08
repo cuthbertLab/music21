@@ -1725,15 +1725,7 @@ class Test(unittest.TestCase):
         # from the lower level stream, we should be able to get to the
         # higher level clef
         post = s1.getContextByClass(clef.Clef)
-        self.assertTrue(isinstance(post, clef.AltoClef), post)
-
-        # we can also use getClefs to get this from s1 or s2
-        post = s1.getClefs()[0]
-        self.assertTrue(isinstance(post, clef.AltoClef), post)
-
-        post = s2.getClefs()[0]
-        self.assertTrue(isinstance(post, clef.AltoClef), post)
-
+        self.assertIsInstance(post, clef.AltoClef)
         # environLocal.printDebug(['sites.get() of s1', s1.sites.get()])
 
         # attempting to move the substream into a new stream
@@ -1741,19 +1733,17 @@ class Test(unittest.TestCase):
         s3.insert(s1)  # insert at same offset as s2
 
         # we cannot get the alto clef from s3; this makes sense
-        post = s3.getClefs()[0]
-        self.assertTrue(isinstance(post, clef.TrebleClef), post)
+        post = s3.getContextByClass(clef.Clef)
+        self.assertIsNone(post)  # was TrebleClef in virtue of getClefs() giving default
 
         # s1 has both streams as sites
         self.assertIn(s3, s1.sites)
         self.assertIn(s2, s1.sites)
 
-        # but if we search s1, should not it find an alto clef?
-        post = s1.getClefs()
-        # environLocal.printDebug(['should not be treble clef:', post])
-        self.assertTrue(isinstance(post[0], clef.AltoClef), post[0])
+        # if we search s1, we should find an alto clef
+        post = s1.getContextByClass(clef.Clef)
+        self.assertIsInstance(post, clef.AltoClef)
 
-        # this all works fine
         sMeasures = s2.makeMeasures(finalBarline='regular')
         self.assertEqual(len(sMeasures), 2)  # AltoClef and substream
         self.assertEqual(len(sMeasures.last().getElementsByClass('Measure')), 1)
@@ -1829,6 +1819,7 @@ class Test(unittest.TestCase):
         '''Testing getting clefs from higher-level streams
         '''
         from music21 import sites
+        from music21.common.enums import ElementSearch
 
         s1 = Stream(id='s1')
         n1 = note.Note()
@@ -1858,11 +1849,9 @@ class Test(unittest.TestCase):
         self.assertEqual(s2.elementOffset(s1), 0.0)
         self.assertRaises(sites.SitesException, s2.elementOffset, s1.flat)
 
-        # getContextByClass will not work; the clef is in s2; its not in a context of s2
-        post = s2.getContextByClass(clef.Clef)
-        self.assertIsNone(post)
+        post = s2.getContextByClass(clef.Clef, getElementMethod=ElementSearch.ALL)
+        self.assertIsInstance(post, clef.AltoClef)
 
-        # but s2.clef works...
         self.assertIsInstance(s2.clef, clef.AltoClef)
 
         # we can find the clef from the flat version of s1 also:
@@ -1889,7 +1878,7 @@ class Test(unittest.TestCase):
         sOuter.insert(0, s1)
         sOuter.insert(0, s2)
 
-        self.assertEqual(s1.activeSite, sOuter)
+        self.assertIs(s1.activeSite, sOuter)
 
         ac = clef.AltoClef()
         ac.priority = -1
@@ -1897,12 +1886,12 @@ class Test(unittest.TestCase):
         # both output parts have alto clefs
         # get clef from higher level stream; only option
         self.assertIs(s1.activeSite, sOuter)
-        post = s1.getClefs()[0]
+        post = s1.getContextByClass(clef.Clef)
 
         self.assertIsInstance(post, clef.AltoClef)
         self.assertIs(s1.activeSite, sOuter)
 
-        post = s2.getClefs()[0]
+        post = s2.getContextByClass(clef.Clef)
         self.assertIsInstance(post, clef.AltoClef)
 
         # now we insert a clef in s2; s2 will get this clef first
@@ -1910,26 +1899,26 @@ class Test(unittest.TestCase):
         tenorC.priority = -1
         s2.insert(0, tenorC)
         # only second part should have tenor clef
-        post = s2.getClefs()[0]
-        self.assertIsInstance(post, clef.TenorClef)
+        post = s2.getElementsByClass(clef.Clef)
+        self.assertIsInstance(post[0], clef.TenorClef)
 
         # but stream s1 should get the alto clef still
         # print(list(s1.contextSites()))
-        post = s1.getContextByClass('Clef')
+        post = s1.getContextByClass(clef.Clef)
         # print(post)
         self.assertIsInstance(post, clef.AltoClef)
 
         # s2 flat gets the tenor clef; it was inserted in it
-        post = s2.flat.getClefs()[0]
-        self.assertIsInstance(post, clef.TenorClef)
+        post = s2.flat.getElementsByClass(clef.Clef)
+        self.assertIsInstance(post[0], clef.TenorClef)
 
         # a copy copies the clef; so we still get the same clef
         s2FlatCopy = copy.deepcopy(s2.flat)
-        post = s2FlatCopy.getClefs()[0]
-        self.assertIsInstance(post, clef.TenorClef)
+        post = s2FlatCopy.getElementsByClass(clef.Clef)
+        self.assertIsInstance(post[0], clef.TenorClef)
 
         # s1 flat will get the alto clef; it still has a pathway
-        post = s1.flat.getClefs()[0]
+        post = s1.flat.getContextByClass(clef.Clef)
         self.assertIsInstance(post, clef.AltoClef)
 
         # once we create a deepcopy of s1, it is no longer connected to
@@ -1938,11 +1927,11 @@ class Test(unittest.TestCase):
         s1Flat.id = 's1Flat'
         s1FlatCopy = copy.deepcopy(s1Flat)
         s1FlatCopy.id = 's1FlatCopy'
-        self.assertEqual(len(s1FlatCopy.getClefs(returnDefault=False)), 1)
-        post = s1FlatCopy.getClefs(returnDefault=False)[0]
+        self.assertIsNotNone(s1FlatCopy.getContextByClass(clef.Clef))
+        post = s1FlatCopy.getContextByClass(clef.Clef)
         self.assertIsInstance(post, clef.AltoClef)
 
-        post = s1Flat.getClefs()[0]
+        post = s1Flat.getContextByClass(clef.Clef)
         self.assertIsInstance(post, clef.AltoClef, post)
         # environLocal.printDebug(['s1.activeSite', s1.activeSite])
         self.assertIn(sOuter, s1.sites.get())
@@ -1978,8 +1967,8 @@ class Test(unittest.TestCase):
 
         # now we insert a clef in s2; s2 will get this clef first
         s1.insert(0, clef.BassClef())
-        post = s1.getClefs()[0]
-        self.assertIsInstance(post, clef.BassClef)
+        post = s1.getElementsByClass(clef.Clef)
+        self.assertIsInstance(post[0], clef.BassClef)
 
         # s3.show()
 
@@ -2438,7 +2427,7 @@ class Test(unittest.TestCase):
         ks2 = key.KeySignature(-2)
         s.append(ks1)
         s.append(ks2)
-        post = s.getKeySignatures()
+        post = s.getElementsByClass(key.KeySignature)
         self.assertEqual(post[0], ks1)
         self.assertEqual(post[1], ks2)
 
@@ -2461,16 +2450,16 @@ class Test(unittest.TestCase):
         s.append(m2)
 
         # can get from measure
-        post = m1.getKeySignatures()
-        self.assertEqual(post[0], ks1)
+        post = m1.getElementsByClass(key.KeySignature)
+        self.assertIs(post[0], ks1)
 
         # we can get from the Stream by flattening
-        post = s.flat.getKeySignatures()
-        self.assertEqual(post[0], ks1)
+        post = s.flat.getElementsByClass(key.KeySignature)
+        self.assertIs(post[0], ks1)
 
         # we can get the key signature in m1 from m2
-        post = m2.getKeySignatures()
-        self.assertEqual(post[0], ks1)
+        post = m2.getContextByClass(key.KeySignature)
+        self.assertIs(post, ks1)
 
     def testGetKeySignaturesThreeMeasures(self):
         '''Searching contexts for key signatures
@@ -2502,16 +2491,16 @@ class Test(unittest.TestCase):
         s.append(m3)
 
         # can get from measure
-        post = m1.getKeySignatures()
-        self.assertEqual(repr(post[0]), repr(ks1))
+        post = m1.getElementsByClass(key.KeySignature)
+        self.assertIs(post[0], ks1)
 
         # we can get the key signature in m1 from m2
-        post = m2.getKeySignatures()
-        self.assertEqual(repr(post[0]), repr(ks1))
+        post = m2.getContextByClass(key.KeySignature)
+        self.assertIs(post, ks1)
 
         # if we search m3, we get the key signature in m3
-        post = m3.getKeySignatures()
-        self.assertEqual(repr(post[0]), repr(ks3))
+        post = m3.getContextByClass(key.KeySignature)
+        self.assertIs(post, ks1)
 
     def testMakeAccidentalsA(self):
         '''Test accidental display setting
@@ -4466,9 +4455,9 @@ class Test(unittest.TestCase):
 
     def testMakeChordsBuiltA(self):
         # test with equal durations
-        pitchCol = [('A2', 'C2'),
+        pitchCol = [('C2', 'A2'),
                     ('A#1', 'C-3', 'G5'),
-                    ('D3', 'B-1', 'C4', 'D#2')]
+                    ('B-1', 'D#2', 'D3', 'C4')]
         # try with different duration assignments; should always get
         # the same results
         for durCol in [[1, 1, 1], [0.5, 2, 3], [0.25, 0.25, 0.5], [6, 6, 8]]:
@@ -4485,8 +4474,8 @@ class Test(unittest.TestCase):
             self.assertEqual(len(s.getElementsByClass('Chord')), 0)
 
             # do both in place and not in place, compare results
-            sMod = s.makeChords(inPlace=False)
-            s.makeChords(inPlace=True)
+            sMod = s.chordify()
+            s = s.chordify()
             for sEval in [s, sMod]:
                 self.assertEqual(len(sEval.getElementsByClass('Chord')), 3)
                 # make sure we have all the original pitches
@@ -4494,7 +4483,7 @@ class Test(unittest.TestCase):
                     match = [p.nameWithOctave for p in
                              sEval.getElementsByClass('Chord')[i].pitches]
                     self.assertEqual(match, list(pitchCol[i]))
-        # print('post makeChords')
+        # print('post chordify')
         # s.show('t')
         # sMod.show('t')
         # s.show()
@@ -4519,11 +4508,12 @@ class Test(unittest.TestCase):
         self.assertEqual([e.offset for e in s], [0.0, 1.0, 2.0, 3.0])
         # this results in two chords; n2 and n4 are effectively shifted
         # to the start of n1 and n3
-        sMod = s.makeChords(inPlace=False)
-        s.makeChords(inPlace=True)
+        sMod = s.chordify()
+        s = s.chordify()
         for sEval in [s, sMod]:
-            self.assertEqual(len(sEval.getElementsByClass('Chord')), 2)
-            self.assertEqual([c.offset for c in sEval], [0.0, 2.0])
+            # of these 6 chords, only 2 have more than one note
+            self.assertEqual(len(sEval.getElementsByClass('Chord')), 6)
+            self.assertEqual([c.offset for c in sEval], [0.0, 1.0, 1.5, 2.0, 3.0, 3.5])
 
         # do the same, but reverse the short/long duration relation
         # because the default min window is 0.25, the first  and last
@@ -4546,14 +4536,7 @@ class Test(unittest.TestCase):
         # s.makeRests(inPlace=True, fillGaps=True)
         # this results in two chords; n2 and n4 are effectively shifted
         # to the start of n1 and n3
-        sMod = s.makeChords(inPlace=False)
-        # sMod.show()
-        s.makeChords(inPlace=True)
-        for sEval in [s, sMod]:
-            # have three chords, even though 1 only has more than 1 pitch
-            # might change this?
-            self.assertEqual(len(sEval.getElementsByClass('Chord')), 3)
-            self.assertEqual([c.offset for c in sEval], [0.0, 0.5, 1.0, 2.5, 3.0])
+        sMod = s.chordify()
 
     def testMakeChordsBuiltC(self):
         # test removal of redundant pitches
@@ -4579,7 +4562,7 @@ class Test(unittest.TestCase):
         s1.insert(0.5, n5)
         s1.insert(0.5, n6)
 
-        sMod = s1.makeChords(inPlace=False, removeRedundantPitches=True)
+        sMod = s1.chordify(removeRedundantPitches=True)
         self.assertEqual([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches],
                           ['C2', 'G2'])
 
@@ -4587,7 +4570,7 @@ class Test(unittest.TestCase):
                           ['E4', 'F#4'])
 
         # without redundant pitch gathering
-        sMod = s1.makeChords(inPlace=False, removeRedundantPitches=False)
+        sMod = s1.chordify(removeRedundantPitches=False)
         self.assertEqual([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches],
                           ['C2', 'C2', 'G2'])
 
@@ -4621,33 +4604,11 @@ class Test(unittest.TestCase):
         s.insert([0, p2])
         s.insert([0, p3])
 
-        post = s.flat.makeChords()
+        post = s.flat.chordify()
         # post.show('t')
         self.assertEqual(len(post.getElementsByClass('Rest')), 1)
-        self.assertEqual(len(post.getElementsByClass('Chord')), 5)
+        self.assertEqual(len(post.getElementsByClass('Chord')), 6)
         # post.show()
-
-    def testMakeChordsImported(self):
-        s = corpus.parse('bach/bwv66.6')
-        # s.show()
-        # using in place to get the stored flat version
-        sMod = s.flat.makeChords(includePostWindow=False)
-        self.assertEqual(len(sMod.getElementsByClass('Chord')), 35)
-        # sMod.show()
-        self.assertEqual(
-            [len(c.pitches) for c in sMod.getElementsByClass('Chord')],
-            [3, 4, 4, 3, 4, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 4, 3,
-             4, 3, 4, 3, 4, 4, 4, 4, 3, 4, 4, 2, 4, 3, 4, 4])
-
-        # when we include post-window, we get more tones, per chord
-        # but the same number of chords
-        sMod = s.flat.makeChords(includePostWindow=True)
-        self.assertEqual(len(sMod.getElementsByClass('Chord')), 35)
-        self.assertEqual(
-            [len(c.pitches) for c in sMod.getElementsByClass('Chord')],
-            [6, 4, 4, 3, 4, 5, 5, 4, 4, 4, 4, 5, 4, 4, 5, 5, 5, 4, 5, 5, 3, 4, 3,
-             4, 4, 4, 7, 5, 4, 6, 2, 6, 4, 5, 4])
-        # sMod.show()
 
     def testGetElementAtOrBeforeBarline(self):
         '''
@@ -5090,7 +5051,7 @@ class Test(unittest.TestCase):
 
         s = copy.deepcopy(sSrc)
         s.sliceByGreatestDivisor(inPlace=True, addTies=True)
-        # s.flat.makeChords().show()
+        # s.flat.chordify().show()
         # s.show()
 
     def testSliceAtOffsetsSimple(self):
@@ -5251,26 +5212,26 @@ class Test(unittest.TestCase):
         score.insert(0, p2)
         # parts retain their characteristics
         # rests are recast
-        scoreChords = score.makeChords()
-        # scoreChords.show()
+        p1Chords = score.parts[0].chordify()
+        p2Chords = score.parts[1].chordify()
 
-        self.assertEqual(len(scoreChords.parts[0].flat), 5)
-        self.assertEqual(len(scoreChords.parts[0].flat.getElementsByClass(
+        self.assertEqual(len(p1Chords.flat), 5)
+        self.assertEqual(len(p1Chords.flat.getElementsByClass(
             'Chord')), 3)
-        self.assertEqual(len(scoreChords.parts[0].flat.getElementsByClass(
+        self.assertEqual(len(p1Chords.flat.getElementsByClass(
             'Rest')), 2)
 
-        self.assertEqual(len(scoreChords.parts[1].flat), 6)
-        self.assertEqual(len(scoreChords.parts[1].flat.getElementsByClass(
+        self.assertEqual(len(p2Chords.flat), 6)
+        self.assertEqual(len(p2Chords.flat.getElementsByClass(
             'Chord')), 3)
-        self.assertEqual(len(scoreChords.parts[1].flat.getElementsByClass(
+        self.assertEqual(len(p2Chords.flat.getElementsByClass(
             'Rest')), 3)
 
         # calling this on a flattened version
         scoreFlat = score.flat
-        scoreChords = scoreFlat.makeChords()
+        scoreChords = scoreFlat.chordify()
         self.assertEqual(len(scoreChords.flat.getElementsByClass(
-            'Chord')), 3)
+            'Chord')), 4)  # fourth chord actually comprises only one note!
         self.assertEqual(len(scoreChords.flat.getElementsByClass(
             'Rest')), 2)
 

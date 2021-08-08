@@ -26,6 +26,7 @@ from typing import (
     Tuple,
 )
 
+from music21.common import deprecated
 
 class ProtoM21Object:
     '''
@@ -42,8 +43,14 @@ class ProtoM21Object:
     ('PitchCounter', 'ProtoM21Object', 'object')
     >>> PitchCounter in pc.classSet
     True
-    >>> pc.isClassOrSubclass(('music21.note.Note',))
+    >>> 'Note' in pc.classSet
     False
+
+    For a True/False intersection check against an iterable, use `classSet.isdisjoint`:
+
+    >>> classList = ('music21.note.Note', 'music21.note.Rest')
+    >>> pc.classSet.isdisjoint(classList)
+    True
     >>> repr(pc)
     '<music21.PitchCounter no pitches>'
 
@@ -82,6 +89,8 @@ class ProtoM21Object:
 
     __slots__ = ()
 
+    @deprecated('v7', 'v8', 'use `someClass in .classSet`'
+        'or for intersection: `not classSet.isdisjoint(classList)`')
     def isClassOrSubclass(self, classFilterList: Sequence) -> bool:
         '''
         Given a class filter list (a list or tuple must be submitted),
@@ -91,18 +100,21 @@ class ProtoM21Object:
         NOTE: this is a performance critical operation
         for performance, only accept lists or tuples
 
+        DEPRECATED in v7 -- prefer `someClass in el.classSet` or
+        `not el.classSet.isdisjoint(classList)` instead.
+
         >>> n = note.Note()
-        >>> n.isClassOrSubclass(('Note',))
+        >>> #_DOCS_SHOW n.isClassOrSubclass(('Note',))
         True
-        >>> n.isClassOrSubclass(('GeneralNote',))
+        >>> #_DOCS_SHOW n.isClassOrSubclass(('GeneralNote',))
         True
-        >>> n.isClassOrSubclass((note.Note,))
+        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Note,))
         True
-        >>> n.isClassOrSubclass((note.Rest,))
+        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Rest,))
         False
-        >>> n.isClassOrSubclass((note.Note, note.Rest))
+        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Note, note.Rest))
         True
-        >>> n.isClassOrSubclass(('Rest', 'Note'))
+        >>> #_DOCS_SHOW n.isClassOrSubclass(('Rest', 'Note'))
         True
         '''
         return not self.classSet.isdisjoint(classFilterList)

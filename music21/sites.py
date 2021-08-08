@@ -571,7 +571,7 @@ class Sites(common.SlottedObjectMixin):
         callerFirst=None,
         sortByCreationTime=False,
         priorityTarget=None,
-        getElementMethod='getElementAtOrBefore',
+        getElementMethod=common.enums.ElementSearch.AT_OR_BEFORE,
         memo=None
     ):
         '''

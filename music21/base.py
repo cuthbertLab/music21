@@ -60,7 +60,7 @@ from typing import (
 
 from music21.sites import SitesException
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
-from music21.common.enums import OffsetSpecial
+from music21.common.enums import ElementSearch, OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL, OffsetQLIn
 from music21 import style  # pylint: disable=unused-import
@@ -1158,7 +1158,7 @@ class Music21Object(prebase.ProtoM21Object):
         self,
         className,
         *,
-        getElementMethod='getElementAtOrBefore',
+        getElementMethod=ElementSearch.AT_OR_BEFORE,
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
@@ -1226,8 +1226,8 @@ class Music21Object(prebase.ProtoM21Object):
         part.  This is all you need to know for most uses.  The rest of the
         docs are for advanced uses:
 
-        The methods searches both Sites as well as associated objects to find a
-        matching class. Returns None if not match is found.
+        The method searches both Sites as well as associated objects to find a
+        matching class. Returns `None` if no match is found.
 
         A reference to the caller is required to find the offset of the object
         of the caller.
@@ -1237,13 +1237,24 @@ class Music21Object(prebase.ProtoM21Object):
         need a flat representation, the caller needs to be the source Stream,
         not its Sites reference.
 
-        The `getElementMethod` is a string that selects which Stream method is
-        used to get elements for searching. These strings are accepted:
+        The `getElementMethod` is an enum value (new in v.7) from
+        :class:`~music21.common.enums.ElementSearch` that selects which
+        Stream method is used to get elements for searching. (The historical form
+        of supplying one of the following values as a string is also supported.)
 
-        *    'getElementBefore'
-        *    'getElementAfter'
-        *    'getElementAtOrBefore' (Default)
-        *    'getElementAtOrAfter'
+        >>> from music21.common.enums import ElementSearch
+        >>> [x for x in ElementSearch]
+        [<ElementSearch.BEFORE>,
+         <ElementSearch.AFTER>,
+         <ElementSearch.AT_OR_BEFORE>,
+         <ElementSearch.AT_OR_AFTER>,
+         <ElementSearch.BEFORE_OFFSET>,
+         <ElementSearch.AFTER_OFFSET>,
+         <ElementSearch.AT_OR_BEFORE_OFFSET>,
+         <ElementSearch.AT_OR_AFTER_OFFSET>,
+         <ElementSearch.BEFORE_NOT_SELF>,
+         <ElementSearch.AFTER_NOT_SELF>,
+         <ElementSearch.ALL>]
 
         The "after" do forward contexts -- looking ahead.
 
@@ -1254,9 +1265,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> b.getContextByClass('Note') is b
         True
 
-        To get the previous `Note`, use `getElementMethod='getElementBefore'`
+        To get the previous `Note`, use `getElementMethod=ElementSearch.BEFORE`:
 
-        >>> a = b.getContextByClass('Note', getElementMethod='getElementBefore')
+        >>> a = b.getContextByClass('Note', getElementMethod=ElementSearch.BEFORE)
         >>> a
         <music21.note.Note A>
 
@@ -1266,17 +1277,40 @@ class Music21Object(prebase.ProtoM21Object):
         >>> b.previous('Note')
         <music21.note.Note A>
 
-        To get the following `Note` use `getElementMethod='getElementAfter'`
+        To get the following `Note` use `getElementMethod=ElementSearch.AFTER`:
 
-        >>> c = b.getContextByClass('Note', getElementMethod='getElementAfter')
+        >>> c = b.getContextByClass('Note', getElementMethod=ElementSearch.AFTER)
         >>> c
         <music21.note.Note C>
 
-        This is similar to `.next('Note')`. though again that method is a bit more
+        This is similar to `.next('Note')`, though, again, that method is a bit more
         sophisticated:
 
         >>> b.next('Note')
         <music21.note.Note C>
+
+        A Stream might contain several elements at the same offset, leading to
+        potentially surprising results where searching by `ElementSearch.AT_OR_BEFORE`
+        does not find an element that is technically the NEXT node but still at 0.0:
+
+        >>> s = stream.Stream()
+        >>> s.insert(0, clef.BassClef())
+        >>> s.next()
+        <music21.clef.BassClef>
+        >>> s.getContextByClass(clef.Clef) is None
+        True
+        >>> s.getContextByClass(clef.Clef, getElementMethod=ElementSearch.AT_OR_AFTER)
+        <music21.clef.BassClef>
+
+        This can be remedied by explicitly searching by offsets:
+
+        >>> s.getContextByClass(clef.Clef, getElementMethod=ElementSearch.AT_OR_BEFORE_OFFSET)
+        <music21.clef.BassClef>
+
+        Or by not limiting the search by temporal position at all:
+
+        >>> s.getContextByClass(clef.Clef, getElementMethod=ElementSearch.ALL)
+        <music21.clef.BassClef>
 
         Notice that if searching for a `Stream` context, the element is not
         guaranteed to be in that Stream.  This is obviously true in this case:
@@ -1321,6 +1355,13 @@ class Music21Object(prebase.ProtoM21Object):
         * changed in v.5.7 -- added followDerivation=False and made
             everything but the class keyword only
         * added in v.6 -- added priorityTargetOnly -- see contextSites for description.
+        * added in v.7 -- added getElementMethod `all` and `ElementSearch` enum.
+
+        Raises `ValueError` if `getElementMethod` is not a value in `ElementSearch`.
+
+        >>> n2.getContextByClass('TextExpression', getElementMethod='invalid')
+        Traceback (most recent call last):
+        ValueError: Invalid getElementMethod: invalid
 
         OMIT_FROM_DOCS
 
@@ -1337,6 +1378,38 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.stream.Measure 3 offset=5.0> SortTuple(atEnd=0, offset=1.0, ...) elementsFirst
         <music21.stream.Part 0x1118cadd8> SortTuple(atEnd=0, offset=6.0, ...) flatten
         '''
+        OFFSET_METHODS = (
+            ElementSearch.BEFORE_OFFSET,
+            ElementSearch.AFTER_OFFSET,
+            ElementSearch.AT_OR_BEFORE_OFFSET,
+            ElementSearch.AT_OR_AFTER_OFFSET,
+        )
+        BEFORE_METHODS = {
+            ElementSearch.BEFORE,
+            ElementSearch.BEFORE_OFFSET,
+            ElementSearch.AT_OR_BEFORE,
+            ElementSearch.AT_OR_BEFORE_OFFSET,
+            ElementSearch.BEFORE_NOT_SELF,
+        }
+        AFTER_METHODS = {
+            ElementSearch.AFTER,
+            ElementSearch.AFTER_OFFSET,
+            ElementSearch.AT_OR_AFTER,
+            ElementSearch.AT_OR_AFTER,
+            ElementSearch.AT_OR_AFTER_OFFSET,
+            ElementSearch.AFTER_NOT_SELF,
+        }
+        AT_METHODS = {
+            ElementSearch.AT_OR_BEFORE,
+            ElementSearch.AT_OR_AFTER,
+            ElementSearch.AT_OR_BEFORE_OFFSET,
+            ElementSearch.AT_OR_AFTER_OFFSET,
+        }
+        NOT_SELF_METHODS = {
+            ElementSearch.BEFORE_NOT_SELF,
+            ElementSearch.AFTER_NOT_SELF,
+        }
+        # ALL is just a no-op
         def payloadExtractor(checkSite, flatten, innerPositionStart):
             '''
             change the site (stream) to a Tree (using caches if possible),
@@ -1346,19 +1419,15 @@ class Music21Object(prebase.ProtoM21Object):
             flatten can be True, 'semiFlat', or False.
             '''
             siteTree = checkSite.asTree(flatten=flatten, classList=className)
-            if 'Offset' in getElementMethod:
+            if getElementMethod in OFFSET_METHODS:
                 # these methods match only by offset.  Used in .getBeat among other places
-                if (('At' in getElementMethod and 'Before' in getElementMethod)
-                        or ('At' not in getElementMethod and 'After' in getElementMethod)):
-                    innerPositionStart = ZeroSortTupleHigh.modify(offset=innerPositionStart.offset)
-                elif (('At' in getElementMethod and 'After' in getElementMethod)
-                        or ('At' not in getElementMethod and 'Before' in getElementMethod)):
+                if getElementMethod in (ElementSearch.BEFORE_OFFSET,
+                                        ElementSearch.AT_OR_AFTER_OFFSET):
                     innerPositionStart = ZeroSortTupleLow.modify(offset=innerPositionStart.offset)
                 else:
-                    raise Music21Exception(
-                        f'Incorrect getElementMethod: {getElementMethod}')
+                    innerPositionStart = ZeroSortTupleHigh.modify(offset=innerPositionStart.offset)
 
-            if 'Before' in getElementMethod:
+            if getElementMethod in BEFORE_METHODS:
                 contextNode = siteTree.getNodeBefore(innerPositionStart)
             else:
                 contextNode = siteTree.getNodeAfter(innerPositionStart)
@@ -1463,21 +1532,24 @@ class Music21Object(prebase.ProtoM21Object):
                 # when crossing measure borders.  Thus it's well-formed.
                 return True
 
-            if 'Before' in getElementMethod and selfSortTuple < contextSortTuple:
+            if getElementMethod in BEFORE_METHODS and selfSortTuple < contextSortTuple:
                 # print(getElementMethod, selfSortTuple.shortRepr(),
                 #       contextSortTuple.shortRepr(), self, contextEl)
                 return False
-            elif 'After' in getElementMethod and selfSortTuple > contextSortTuple:
+            elif getElementMethod in AFTER_METHODS and selfSortTuple > contextSortTuple:
                 # print(getElementMethod, selfSortTuple.shortRepr(),
                 #       contextSortTuple.shortRepr(), self, contextEl)
                 return False
             else:
                 return True
 
+        if getElementMethod not in ElementSearch:
+            raise ValueError(f'Invalid getElementMethod: {getElementMethod}')
+
         if className and not common.isListLike(className):
             className = (className,)
 
-        if 'At' in getElementMethod and self.isClassOrSubclass(className):
+        if getElementMethod in AT_METHODS and not self.classSet.isdisjoint(className):
             return self
 
         for site, positionStart, searchType in self.contextSites(
@@ -1500,12 +1572,12 @@ class Music21Object(prebase.ProtoM21Object):
                 # otherwise, continue to check for flattening...
 
             if searchType != 'elementsOnly':  # flatten or elementsFirst
-                if ('After' in getElementMethod
+                if (getElementMethod in AFTER_METHODS
                         and (not className
-                             or site.isClassOrSubclass(className))):
-                    if 'NotSelf' in getElementMethod and self is site:
+                             or not site.classSet.isdisjoint(className))):
+                    if getElementMethod in NOT_SELF_METHODS and self is site:
                         pass
-                    elif 'NotSelf' not in getElementMethod:  # for 'After' we can't do the
+                    elif getElementMethod not in NOT_SELF_METHODS:  # for 'After' we can't do the
                         # containing site because that comes before.
                         return site  # if the site itself is the context, return it...
 
@@ -1519,10 +1591,10 @@ class Music21Object(prebase.ProtoM21Object):
                         pass
                     return contextEl
 
-                if ('Before' in getElementMethod
+                if (getElementMethod in BEFORE_METHODS
                         and (not className
-                             or site.isClassOrSubclass(className))):
-                    if 'NotSelf' in getElementMethod and self is site:
+                             or not site.classSet.isdisjoint(className))):
+                    if getElementMethod in NOT_SELF_METHODS and self is site:
                         pass
                     else:
                         return site  # if the site itself is the context, return it...
@@ -2060,7 +2132,7 @@ class Music21Object(prebase.ProtoM21Object):
             asTree = activeS.asTree(classList=className, flatten=False)
             prevNode = asTree.getNodeBefore(self.sortTuple())
             if prevNode is None:
-                if className is None or activeS.isClassOrSubclass(className):
+                if className is None or not activeS.classSet.isdisjoint(className):
                     return activeS
                 else:
                     return None
@@ -4208,9 +4280,6 @@ class Test(unittest.TestCase):
         post = sInner.getContextByClass(clef.Clef)
         self.assertTrue(isinstance(post, clef.AltoClef), post)
 
-        post = sInner.getClefs(clef.Clef)
-        self.assertTrue(isinstance(post[0], clef.AltoClef), post[0])
-
     def testBeatAccess(self):
         '''Test getting beat data from various Music21Objects.
         '''
@@ -4672,6 +4741,9 @@ class Test(unittest.TestCase):
         b = p.measure(3).notes[-1]
         c = b.getContextByClass('Note', getElementMethod='getElementAfterOffset')
         self.assertEqual(c.name, 'C')
+
+        m = p.measure(1)
+        self.assertIsNotNone(m.getContextByClass('Clef', getElementMethod='all'))
 
     def testGetContextByClassB(self):
         from music21 import stream, note, meter

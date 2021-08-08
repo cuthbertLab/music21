@@ -456,7 +456,12 @@ def realizeVolume(srcStream,
     if dynamicsAvailable:
         # extend durations of all dynamics
         # doing this in place as this is a destructive operation
-        boundaries = flatSrc.extendDurationAndGetBoundaries('Dynamic')
+        flatSrc.extendDuration('Dynamic', inPlace=True)
+        elements = flatSrc.getElementsByClass('Dynamic')
+        for e in elements:
+            start = flatSrc.elementOffset(e)
+            end = start + e.duration.quarterLength
+            boundaries[(start, end)] = e
         bKeys = list(boundaries.keys())
         bKeys.sort()  # sort
 
