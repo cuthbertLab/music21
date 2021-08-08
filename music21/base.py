@@ -1378,37 +1378,37 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.stream.Measure 3 offset=5.0> SortTuple(atEnd=0, offset=1.0, ...) elementsFirst
         <music21.stream.Part 0x1118cadd8> SortTuple(atEnd=0, offset=6.0, ...) flatten
         '''
-        OFFSET_METHODS = (
+        OFFSET_METHODS = [
             ElementSearch.BEFORE_OFFSET,
             ElementSearch.AFTER_OFFSET,
             ElementSearch.AT_OR_BEFORE_OFFSET,
             ElementSearch.AT_OR_AFTER_OFFSET,
-        )
-        BEFORE_METHODS = {
+        ]
+        BEFORE_METHODS = [
             ElementSearch.BEFORE,
             ElementSearch.BEFORE_OFFSET,
             ElementSearch.AT_OR_BEFORE,
             ElementSearch.AT_OR_BEFORE_OFFSET,
             ElementSearch.BEFORE_NOT_SELF,
-        }
-        AFTER_METHODS = {
+        ]
+        AFTER_METHODS = [
             ElementSearch.AFTER,
             ElementSearch.AFTER_OFFSET,
             ElementSearch.AT_OR_AFTER,
             ElementSearch.AT_OR_AFTER,
             ElementSearch.AT_OR_AFTER_OFFSET,
             ElementSearch.AFTER_NOT_SELF,
-        }
-        AT_METHODS = {
+        ]
+        AT_METHODS = [
             ElementSearch.AT_OR_BEFORE,
             ElementSearch.AT_OR_AFTER,
             ElementSearch.AT_OR_BEFORE_OFFSET,
             ElementSearch.AT_OR_AFTER_OFFSET,
-        }
-        NOT_SELF_METHODS = {
+        ]
+        NOT_SELF_METHODS = [
             ElementSearch.BEFORE_NOT_SELF,
             ElementSearch.AFTER_NOT_SELF,
-        }
+        ]
         # ALL is just a no-op
         def payloadExtractor(checkSite, flatten, innerPositionStart):
             '''
