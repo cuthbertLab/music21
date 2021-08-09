@@ -283,7 +283,6 @@ class LilypondConverter:
         TODO: make lilypond automatically run makeNotation.makeTupletBrackets(s)
         TODO: Add tests...
         '''
-        from music21 import stream
         c = m21ObjectIn.classes
         if 'Stream' in c:
             if m21ObjectIn.recurse().variants:
@@ -1815,8 +1814,8 @@ class LilypondConverter:
                 else:
                     variantDict[variantName] = [variantObject]
 
-            for key in variantDict:
-                variantList = variantDict[key]
+            for variant_key in variantDict:
+                variantList = variantDict[variant_key]
                 if len(variantList) == 1:
                     variantObject = variantList[0]
                     replacedElements = variantObject.replacedElements(activeSite)
@@ -2566,7 +2565,7 @@ class Test(unittest.TestCase):
         # print(lpc.topLevelObject)
 
     def testComplexDuration(self):
-        from music21 import stream, meter
+        from music21 import meter
         s = stream.Stream()
         n1 = note.Note('C')  # test no octave also!
         n1.duration.quarterLength = 2.5  # BUG 2.3333333333 doesn't work right
@@ -2631,7 +2630,7 @@ class TestExternal(unittest.TestCase):
             fifeOpus.show('lily.png')
 
     def xtestBreve(self):
-        from music21 import stream, meter
+        from music21 import meter
         n = note.Note('C5')
         n.duration.quarterLength = 8.0
         m = stream.Measure()
@@ -2645,7 +2644,6 @@ class TestExternal(unittest.TestCase):
             s.show('lily.png')
 
     def testStaffLines(self):
-        from music21 import stream
         s = stream.Score()
         p = stream.Part()
         p.append(note.Note('B4', type='whole'))

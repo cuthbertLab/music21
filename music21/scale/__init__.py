@@ -175,7 +175,7 @@ class Scale(base.Music21Object):
             for p in other:
                 if hasattr(p, 'pitch'):
                     pre.append(p.pitch)
-                elif hasattr(p, 'classes') and isinstance(p, pitch.Pitch):
+                elif isinstance(p, pitch.Pitch):
                     pre.append(p)
                 else:
                     pre.append(pitch.Pitch(p))
@@ -304,7 +304,7 @@ class AbstractScale(Scale):
         for p in pitchList:
             if isinstance(p, str):
                 pitchListReal.append(pitch.Pitch(p))
-            elif hasattr(p, 'classes') and isinstance(p, note.Note):
+            elif isinstance(p, note.Note):
                 pitchListReal.append(p.pitch)
             else:  # assume this is a pitch object
                 pitchListReal.append(p)
@@ -1257,7 +1257,7 @@ class ConcreteScale(Scale):
     usePitchDegreeCache = False
 
     def __init__(self,
-                 tonic: Optional[Union[str, pitch.Pitch, 'music21.note.Note']] = None,
+                 tonic: Optional[Union[str, pitch.Pitch, note.Note]] = None,
                  pitches: Optional[List[Union[pitch.Pitch, str]]] = None):
         super().__init__()
 
@@ -1283,7 +1283,7 @@ class ConcreteScale(Scale):
             self.tonic = None  # pitch.Pitch()
         elif isinstance(tonic, str):
             self.tonic = pitch.Pitch(tonic)
-        elif hasattr(tonic, 'classes') and isinstance(tonic, note.GeneralNote):
+        elif isinstance(tonic, note.GeneralNote):
             self.tonic = tonic.pitch
         else:  # assume this is a pitch object
             self.tonic = tonic
@@ -3204,7 +3204,6 @@ class Test(unittest.TestCase):
         return out
 
     def testBasicLegacy(self):
-        from music21 import note
         from music21 import scale
 
         n1 = note.Note()
@@ -3278,7 +3277,6 @@ class Test(unittest.TestCase):
     def testBasic(self):
         from music21 import corpus
         from music21 import stream
-        from music21 import note
         from music21 import scale
         # deriving a scale from a Stream
 
@@ -3526,7 +3524,7 @@ class Test(unittest.TestCase):
     def testMelodicMinorB(self):
         '''Need to test descending form of getting pitches with no defined min and max
         '''
-        from music21 import stream, note
+        from music21 import stream
         mm = MelodicMinorScale('a')
         # self.assertEqual(str(mm.getPitches(None, None, direction='ascending')),
         #    '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
@@ -3848,7 +3846,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
     def testScalaScaleB(self):
         # test importing from scala archive
-        from music21 import stream, meter, note
+        from music21 import stream, meter
 
         sc = ScalaScale('e2', 'fj 12tet')
         self.assertEqual(sc._abstract._net.pitchSimplification, 'mostCommon')

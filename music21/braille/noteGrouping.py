@@ -256,7 +256,8 @@ class NoteGroupingTranscriber:
         if (isinstance(prev, dynamics.Dynamic)
             or (isinstance(prev, clef.Clef)
                 and self.showClefSigns)
-            or (isinstance(prev, expressions.TextExpression)  # TE is an abbreviation, no extra dot 3 necessary
+            or (isinstance(prev, expressions.TextExpression)
+                # TE is an abbreviation, no extra dot 3 necessary
                 and prev.content[-1] != '.')):
             for dot in basic.yieldDots(self.trans[-1][0]):
                 self.trans.insert(-1, dot)  # insert one before the end, not append...

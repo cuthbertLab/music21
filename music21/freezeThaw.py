@@ -1014,7 +1014,7 @@ class Test(unittest.TestCase):
         self.assertEqual(outStream[0].offset, 2.0)
 
     def testFreezeThawWithSpanner(self):
-        from music21 import stream, note, spanner
+        from music21 import stream, note
         s = stream.Stream()
         sDummy = stream.Stream()
         n = note.Note()
@@ -1123,7 +1123,6 @@ class Test(unittest.TestCase):
 
     def testFreezeThawSimpleVariant(self):
         from music21 import freezeThaw
-        from music21 import variant
         from music21 import stream
         from music21 import note
 
@@ -1152,7 +1151,6 @@ class Test(unittest.TestCase):
     def testFreezeThawVariant(self):
         from music21 import freezeThaw
         from music21 import corpus
-        from music21 import variant
         from music21 import stream
         from music21 import note
 
@@ -1210,7 +1208,7 @@ class Test(unittest.TestCase):
         self.assertTrue(s1.hasElement(n1))
 
     def testJSONPickleSpanner(self):
-        from music21 import converter, note, stream, spanner
+        from music21 import converter, note, stream
         n1 = note.Note('C')
         n2 = note.Note('D')
         s1 = stream.Stream()

@@ -3015,9 +3015,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         # some higher-level classes need this functionality
         # set ties
-        if addTies and (isinstance(e, note.Note)
-                        or isinstance(e, note.Unpitched)):
-
+        if addTies and isinstance(e, (note.Note, note.Unpitched)):
             forceEndTieType = 'stop'
             if hasattr(e, 'tie') and e.tie is not None:
                 # the last tie of what was formally a start should

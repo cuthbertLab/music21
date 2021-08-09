@@ -869,7 +869,7 @@ class Expander:
         if lb is not None and 'music21.bar.Repeat' in lb.classSet:
             # environLocal.printDebug(['inserting new barline: %s' % newStyle])
             m.leftBarline = bar.Barline(newType)
-        if rb is not None  and 'music21.bar.Repeat' in rb.classSet:
+        if rb is not None and 'music21.bar.Repeat' in rb.classSet:
             m.rightBarline = bar.Barline(newType)
 
     def _stripRepeatExpressions(self, streamObj):
@@ -1634,7 +1634,7 @@ class Expander:
             # if mLast does not have a repeat bar, its probably not a repeat
             mLastRightBar = mLast.rightBarline
             if (mLastRightBar is not None
-                    and  'music21.bar.Repeat' in mLastRightBar.classSet):
+                    and 'music21.bar.Repeat' in mLastRightBar.classSet):
                 indices = list(range(startIndex, endIndex + 1))
             # condition of when to repeat next is not always clear
             # if we have  [1 x :|[2 x | x still need to repeat

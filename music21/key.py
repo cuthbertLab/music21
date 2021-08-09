@@ -895,8 +895,7 @@ class Key(KeySignature, scale.DiatonicScale):
     def __init__(self,
                  tonic: Union[str, pitch.Pitch, note.Note] = 'C',
                  mode=None):
-        if hasattr(tonic, 'classes') and (isinstance(tonic, base.Music21Object)
-                                          or isinstance(tonic, pitch.Pitch)):
+        if isinstance(tonic, (base.Music21Object, pitch.Pitch)):
             if hasattr(tonic, 'name'):
                 tonic = tonic.name
             elif hasattr(tonic, 'pitches') and tonic.pitches:  # chord w/ >= 1 pitch
@@ -925,7 +924,7 @@ class Key(KeySignature, scale.DiatonicScale):
         KeySignature.__init__(self, sharps)
         scale.DiatonicScale.__init__(self, tonic=tonic)
 
-        if hasattr(tonic, 'classes') and isinstance(tonic, pitch.Pitch):
+        if isinstance(tonic, pitch.Pitch):
             self.tonic = tonic
         else:
             self.tonic = pitch.Pitch(tonic)

@@ -1877,7 +1877,7 @@ class Test(unittest.TestCase):
                          )
 
     def testMakeBeamsOnEmptyChord(self):
-        from music21 import chord, converter
+        from music21 import converter
         p = converter.parse('tinyNotation: 4/4')
         c1 = chord.Chord('d f')
         c1.quarterLength = 0.5
@@ -1894,7 +1894,9 @@ class Test(unittest.TestCase):
         )
 
     def testStreamExceptions(self):
-        from music21 import converter, duration, stream
+        from music21 import converter
+        from music21 import duration
+        from music21 import stream
         p = converter.parse(self.allaBreveBeamTest)
         with self.assertRaises(stream.StreamException) as cm:
             p.makeMeasures(meterStream=duration.Duration())

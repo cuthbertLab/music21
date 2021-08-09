@@ -1324,8 +1324,7 @@ class Test(unittest.TestCase):
                          [47, 2, 25, 0, 25, 42, 0, 33, 0, 38, 22, 4])
 
     def testStreamFormsB(self):
-
-        from music21 import features, note
+        from music21 import features
 
         s = stream.Stream()
         for p in ['c4', 'c4', 'd-4', 'd#4', 'f#4', 'a#4', 'd#5', 'a5', 'a5']:
@@ -1342,7 +1341,7 @@ class Test(unittest.TestCase):
 
     def testStreamFormsC(self):
         from pprint import pformat
-        from music21 import features, note
+        from music21 import features
 
         s = stream.Stream()
         for p in ['c4', 'c4', 'd-4', 'd#4', 'f#4', 'a#4', 'd#5', 'a5']:

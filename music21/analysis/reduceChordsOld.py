@@ -14,13 +14,11 @@ Automatically reduce a MeasureStack to a single chord or group of chords.
 import unittest
 import copy
 
+from music21 import chord
 from music21 import clef
 from music21 import meter
 from music21 import stream
 from music21 import tie
-
-
-
 
 def testMeasureStream1():
     '''
@@ -33,7 +31,6 @@ def testMeasureStream1():
     {2.0} <music21.chord.Chord C4 E4 F4 B4>
     {3.0} <music21.chord.Chord C4 E4 G4 C5>
     '''
-    from music21 import chord
     s = stream.Measure()
     t = meter.TimeSignature('4/4')
     c1 = chord.Chord('C4 E4 G4 C5')
@@ -328,7 +325,6 @@ class ChordReducer:
 class Test(unittest.TestCase):
 
     def testSimpleMeasure(self):
-        from music21 import chord
         s = stream.Measure()
         c1 = chord.Chord('C4 E4 G4 C5')
         c1.quarterLength = 2.0

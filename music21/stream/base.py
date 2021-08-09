@@ -44,7 +44,6 @@ from music21 import defaults
 from music21 import derivation
 from music21 import duration
 from music21 import exceptions21
-from music21 import harmony
 from music21 import interval
 from music21 import key
 from music21 import metadata

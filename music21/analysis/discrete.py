@@ -1462,7 +1462,8 @@ class Test(unittest.TestCase):
         # print(post)
 
     def testIntervalDiversity(self):
-        from music21 import note, stream, corpus
+        from music21 import stream
+        from music21 import corpus
 
         s = stream.Stream()
         s.append(note.Note('g#3'))
@@ -1515,7 +1516,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(midDict['m2']), '[<music21.interval.Interval m2>, 43]')
 
     def testKeyAnalysisSpelling(self):
-        from music21 import stream, note
+        from music21 import stream
 
         for p in ['A', 'B-', 'A-']:
             s = stream.Stream()
@@ -1560,7 +1561,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(post[1]), 'minor')
 
     def testKeyAnalysisLikelyKeys(self):
-        from music21 import note, stream
+        from music21 import stream
         s = stream.Stream()
         s.repeatAppend(note.Note('c'), 6)
         s.repeatAppend(note.Note('g'), 4)

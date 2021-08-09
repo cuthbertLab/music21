@@ -32,7 +32,7 @@ from music21 import dynamics
 from music21 import features
 from music21 import note
 from music21 import prebase
-from music21 import stream
+from music21 import stream  # circular, but okay, because not used at top level.
 
 from music21.graph import axis
 from music21.graph import primitives
@@ -1696,7 +1696,7 @@ class Test(unittest.TestCase):
         b.run()
 
     def testChordsA(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         b = Histogram(stream.Stream(), doneAction=None)
@@ -1749,7 +1749,7 @@ class Test(unittest.TestCase):
         # matching the number of pitches for each data point may be needed
 
     def testChordsA2(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1770,7 +1770,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsA3(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1789,7 +1789,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsA4(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1811,7 +1811,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsA5(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1833,7 +1833,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsB(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1927,7 +1927,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsB2(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1964,7 +1964,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsB3(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()

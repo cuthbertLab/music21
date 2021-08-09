@@ -2472,7 +2472,7 @@ class Test(unittest.TestCase):
                 j = copy.deepcopy(obj)
 
     def testMusicXMLExport(self):
-        from music21 import stream, note
+        from music21 import stream
 
         s1 = stream.Stream()
         i1 = Violin()
@@ -2523,7 +2523,7 @@ class Test(unittest.TestCase):
         # post.show('t')
 
     def testPartitionByInstrumentB(self):
-        from music21 import instrument, stream, note
+        from music21 import instrument, stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2544,7 +2544,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.parts[1].notes), 12)
 
     def testPartitionByInstrumentC(self):
-        from music21 import instrument, stream, note
+        from music21 import instrument, stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2580,7 +2580,7 @@ class Test(unittest.TestCase):
         # post.show('t')
 
     def testPartitionByInstrumentD(self):
-        from music21 import instrument, stream, note
+        from music21 import instrument, stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2618,7 +2618,7 @@ class Test(unittest.TestCase):
         # post.show('t')
 
     def testPartitionByInstrumentE(self):
-        from music21 import instrument, stream, note
+        from music21 import instrument, stream
 
         # basic case of instruments in Parts
         # s = stream.Score()
@@ -2656,7 +2656,7 @@ class Test(unittest.TestCase):
                          [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 12.0, 13.0, 20.0])
 
     def testPartitionByInstrumentF(self):
-        from music21 import instrument, stream, note
+        from music21 import instrument, stream
 
         s1 = stream.Stream()
         s1.append(instrument.AcousticGuitar())

@@ -250,8 +250,6 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 class Test(unittest.TestCase):
 
     def testFindConsecutiveScaleA(self):
-        from music21 import note
-
         sc = scale.MajorScale('a4')
 
         # fixed collection

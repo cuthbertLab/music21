@@ -639,7 +639,7 @@ class ChordStepModification(prebase.ProtoM21Object):
     def interval(self, value):
         if value in (None,):
             self._interval = None
-        elif hasattr(value, 'classes') and isinstance(value, interval.Interval):
+        elif isinstance(value, interval.Interval):
             # an interval object: set directly
             self._interval = value
         else:

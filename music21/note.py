@@ -1538,7 +1538,7 @@ class Note(NotRest):
         {1.0} <music21.note.Note G->
 
         '''
-        if hasattr(value, 'classes') and isinstance(value, interval.IntervalBase):
+        if isinstance(value, interval.IntervalBase):
             intervalObj = value
         else:  # try to process
             intervalObj = interval.Interval(value)
