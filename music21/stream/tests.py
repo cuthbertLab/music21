@@ -705,7 +705,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n.getOffsetBySite(a), 10)
 
     def testExtractedNoteAssignLyric(self):
-        from music21 import converter, text
+        from music21 import converter
+        from music21 import text
         a = converter.parse(corpus.getWork('corelli/opus3no1/1grave'))
         b = a.parts[1]
         c = b.flat
@@ -7168,7 +7169,8 @@ class Test(unittest.TestCase):
                          ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'])
 
     def testTransposeByPitchC(self):
-        from music21 import converter, instrument
+        from music21 import converter
+        from music21 import instrument
         p = converter.parse('tinyNotation: c1 d1')
         p.insert(0, instrument.Horn())
         s = Score(p)
@@ -7954,7 +7956,8 @@ class Test(unittest.TestCase):
     def testActivateVariantsBySpanA(self):
         # this tests replacing 1 note with a 3-note variant
 
-        from music21 import variant, dynamics
+        from music21 import variant
+        from music21 import dynamics
 
         s = Stream()
         s.repeatAppend(note.Note('d2'), 12)

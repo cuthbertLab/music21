@@ -977,7 +977,9 @@ featureExtractors = [
 class Test(unittest.TestCase):
 
     def testIncorrectlySpelledTriadPrevalence(self):
-        from music21 import stream, features, chord
+        from music21 import stream
+        from music21 import features
+        from music21 import chord
 
         s = stream.Stream()
         s.append(chord.Chord(['c', 'e', 'g']))
@@ -989,7 +991,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(fe.extract().vector[0]), '0.5')
 
     def testLandiniCadence(self):
-        from music21 import converter, features
+        from music21 import converter
+        from music21 import features
 
         s = converter.parse('tinynotation: 3/4 f#4 f# e g2')
         fe = features.native.LandiniCadence(s)

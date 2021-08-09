@@ -993,7 +993,8 @@ class StreamThawer(StreamFreezeThawBase):
 class Test(unittest.TestCase):
 
     def testSimpleFreezeThaw(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         s = stream.Stream()
         sDummy = stream.Stream()
         n = note.Note()
@@ -1014,7 +1015,8 @@ class Test(unittest.TestCase):
         self.assertEqual(outStream[0].offset, 2.0)
 
     def testFreezeThawWithSpanner(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         s = stream.Stream()
         sDummy = stream.Stream()
         n = note.Note()
@@ -1189,7 +1191,8 @@ class Test(unittest.TestCase):
         # v2.show('t')
 
     def testSerializationScaffoldA(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         from music21 import freezeThaw
 
         n1 = note.Note()
@@ -1208,7 +1211,9 @@ class Test(unittest.TestCase):
         self.assertTrue(s1.hasElement(n1))
 
     def testJSONPickleSpanner(self):
-        from music21 import converter, note, stream
+        from music21 import converter
+        from music21 import note
+        from music21 import stream
         n1 = note.Note('C')
         n2 = note.Note('D')
         s1 = stream.Stream()

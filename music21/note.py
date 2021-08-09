@@ -1921,7 +1921,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(found), 24)
 
     def testNoteBeatProperty(self):
-        from music21 import stream, meter
+        from music21 import stream
+        from music21 import meter
 
         data = [
             ['3/4', 0.5, 6, [1.0, 1.5, 2.0, 2.5, 3.0, 3.5],
@@ -2097,7 +2098,8 @@ class Test(unittest.TestCase):
             self.assertEqual(a == b, match)  # sub6
 
     def testMetricalAccent(self):
-        from music21 import meter, stream
+        from music21 import meter
+        from music21 import stream
         data = [
             ('4/4', 8, 0.5, [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
             ('3/4', 6, 0.5, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]),

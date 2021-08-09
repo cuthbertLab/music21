@@ -363,7 +363,8 @@ class TestExternal(unittest.TestCase):
         # cr.printDebug = True
         p = cr.multiPartReduction(c, maxChords=3)
         # p = cr.multiPartReduction(c, closedPosition=True)
-        from music21 import key, roman
+        from music21 import key
+        from music21 import roman
         cm = key.Key('G')
         for thisChord in p.recurse().getElementsByClass('Chord'):
             thisChord.lyric = roman.romanNumeralFromChord(thisChord,

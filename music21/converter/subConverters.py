@@ -1571,7 +1571,8 @@ class TestExternal(unittest.TestCase):
         '''
         tests whether show() works for music that is 10-99 pages long
         '''
-        from music21 import omr, converter
+        from music21 import omr
+        from music21 import converter
         K525 = omr.correctors.K525groundTruthFilePath
         K525 = converter.parse(K525)
         if self.show:

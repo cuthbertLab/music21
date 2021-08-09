@@ -892,7 +892,8 @@ class PartReduction:
 class Test(unittest.TestCase):
 
     def testExtractionA(self):
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
         s = corpus.parse('bwv66.6')
         # s.show()
         s.parts[0].flat.notes[3].addLyric('test')
@@ -930,7 +931,8 @@ class Test(unittest.TestCase):
 
 
     def testExtractionB(self):
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
         s = corpus.parse('bwv66.6')
 
         s.parts[0].flat.notes[4].addLyric('::/o:6/v:1/tb:s/g:Ursatz')
@@ -951,7 +953,8 @@ class Test(unittest.TestCase):
         # post.show()
 
     def testExtractionC(self):
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
         # http://solomonsmusic.net/schenker.htm
         # shows extracting an Ursatz line
 
@@ -986,7 +989,8 @@ class Test(unittest.TestCase):
 
     def testExtractionD(self):
         # this shows a score, extracting a single pitch
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
 
         src = corpus.parse('schoenberg/opus19', 6)
         for n in src.flat.notes:
@@ -1009,7 +1013,8 @@ class Test(unittest.TestCase):
 
     def testExtractionD2(self):
         # this shows a score, extracting a single pitch
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
 
         src = corpus.parse('schoenberg/opus19', 6)
         for n in src.flat.notes:
@@ -1032,7 +1037,8 @@ class Test(unittest.TestCase):
 
 
     def testExtractionE(self):
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
 
         src = corpus.parse('corelli/opus3no1/1grave')
 
@@ -1047,8 +1053,8 @@ class Test(unittest.TestCase):
 
 
     def testPartReductionA(self):
-
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
 
         s = corpus.parse('bwv66.6')
 
@@ -1093,7 +1099,9 @@ class Test(unittest.TestCase):
     def testPartReductionB(self, show=False):
         '''Artificially create test cases.
         '''
-        from music21 import dynamics, graph, analysis
+        from music21 import dynamics
+        from music21 import graph
+        from music21 import analysis
         durDynPairsA = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
         durDynPairsB = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
 
@@ -1138,7 +1146,8 @@ class Test(unittest.TestCase):
     def testPartReductionC(self):
         '''Artificially create test cases.
         '''
-        from music21 import dynamics, analysis
+        from music21 import dynamics
+        from music21 import analysis
 
         s = stream.Score()
         p1 = stream.Part()
@@ -1172,7 +1181,8 @@ class Test(unittest.TestCase):
     def testPartReductionD(self):
         '''Artificially create test cases. Here, uses rests.
         '''
-        from music21 import dynamics, analysis
+        from music21 import dynamics
+        from music21 import analysis
 
         s = stream.Score()
         p1 = stream.Part()
@@ -1212,7 +1222,8 @@ class Test(unittest.TestCase):
     def testPartReductionE(self):
         '''Artificially create test cases.
         '''
-        from music21 import dynamics, analysis
+        from music21 import dynamics
+        from music21 import analysis
         s = stream.Score()
         p1 = stream.Part()
         p1.id = 0

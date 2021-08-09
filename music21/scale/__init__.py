@@ -3846,7 +3846,8 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
     def testScalaScaleB(self):
         # test importing from scala archive
-        from music21 import stream, meter
+        from music21 import stream
+        from music21 import meter
 
         sc = ScalaScale('e2', 'fj 12tet')
         self.assertEqual(sc._abstract._net.pitchSimplification, 'mostCommon')
@@ -3987,7 +3988,8 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         and then uses Marchetto da Padova's very high sharps and very low
         flats (except B-flat) to inflect the accidentals
         '''
-        from music21 import corpus, instrument
+        from music21 import corpus
+        from music21 import instrument
 
         s = corpus.parse('luca/gloria').measures(70, 79)
         for p in s.parts:

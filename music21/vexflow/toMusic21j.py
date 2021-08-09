@@ -284,7 +284,8 @@ class TestCuthbert(unittest.TestCase):  # pragma: no cover
         '''
         test a local version of this mess...
         '''
-        from music21 import corpus, environment
+        from music21 import corpus
+        from music21 import environment
         environLocal = environment.Environment()
 
         s = corpus.parse('luca/gloria').measures(1, 19)

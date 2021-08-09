@@ -139,7 +139,8 @@ def testCode():
 
 
 def testMIDIParse():
-    from music21 import converter, common
+    from music21 import converter
+    from music21 import common
     from music21 import freezeThaw
 
     # a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'

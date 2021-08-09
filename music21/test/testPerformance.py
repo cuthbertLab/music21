@@ -35,7 +35,8 @@ class Test(unittest.TestCase):
     def runStreamIterationByIterator(self):
         '''Stream iteration by iterator
         '''
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         # create a stream with 750 notes, 250 rests
         s = stream.Stream()
         for i in range(1000):
@@ -52,7 +53,8 @@ class Test(unittest.TestCase):
     def runStreamIterationByElements(self):
         '''Stream iteration by .elements access
         '''
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         # create a stream with 750 notes, 250 rests
         s = stream.Stream()
         for i in range(1000):
@@ -69,7 +71,8 @@ class Test(unittest.TestCase):
     def runGetElementsByClassType(self):
         '''Getting elements by class type
         '''
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
 
         # create a stream with 750 notes, 250 rests
         s = stream.Stream()
@@ -87,7 +90,8 @@ class Test(unittest.TestCase):
     def runGetElementsByClassString(self):
         '''Getting elements by string
         '''
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
 
         # create a stream with 750 notes, 250 rests
         s = stream.Stream()

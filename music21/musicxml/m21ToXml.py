@@ -6366,7 +6366,9 @@ class Test(unittest.TestCase):
         objects, where usually all the spanners will remain on the first object.
         '''
         import re
-        from music21 import converter, dynamics, layout
+        from music21 import converter
+        from music21 import dynamics
+        from music21 import layout
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         s = converter.parse(xmlDir / '43e-Multistaff-ClefDynamics.xml')
 
@@ -6566,7 +6568,8 @@ class Test(unittest.TestCase):
         self.assertEqual(root.find('.//step').text, 'D')
 
     def testMidiInstrumentNoName(self):
-        from music21 import converter, instrument
+        from music21 import converter
+        from music21 import instrument
 
         i = instrument.Instrument()
         i.midiProgram = 42
@@ -6669,7 +6672,7 @@ class TestExternal(unittest.TestCase):
     show = True
 
     def testSimple(self):
-        from music21 import corpus  # , converter
+        from music21 import corpus
         import difflib
 
         # b = converter.parse(corpus.corpora.CoreCorpus().getWorkList('cpebach')[0],

@@ -832,7 +832,8 @@ class Test(unittest.TestCase):
         # sMerged.show()
 
     def testChordSymbols(self):
-        from music21 import corpus, pitch
+        from music21 import corpus
+        from music21 import pitch
         # noinspection SpellCheckingInspection
         o = corpus.parse('nottingham-dataset/reelsa-c')
         self.assertEqual(len(o), 2)

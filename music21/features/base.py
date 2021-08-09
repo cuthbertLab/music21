@@ -1457,7 +1457,8 @@ class Test(unittest.TestCase):
             ds.process()
 
     def testEmptyStreamCustomErrors(self):
-        from music21 import analysis, features
+        from music21 import analysis
+        from music21 import features
         from music21.features import jSymbolic, native
 
         ds = DataSet(classLabel='')

@@ -4982,7 +4982,8 @@ class Pitch(prebase.ProtoM21Object):
 
         '''
         # Takes in a chord, finds the interval between the notes
-        from music21 import note, chord
+        from music21 import note
+        from music21 import chord
 
         pitchList = chordIn.pitches
         isStringHarmonic = False
@@ -5387,7 +5388,8 @@ class Test(unittest.TestCase):
         cautionaryNotImmediateRepeat=False
         and key signature conflicts.
         '''
-        from music21 import converter, key
+        from music21 import converter
+        from music21 import key
         bm = converter.parse("tinynotation: 4/4 fn1 fn1 e-8 e'-8 fn4 en4 e'n4").flat
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -5441,7 +5443,9 @@ class Test(unittest.TestCase):
         self.assertEqual(lowC.octave, -1)
 
     def testQuarterToneA(self):
-        from music21 import stream, note, scale
+        from music21 import stream
+        from music21 import note
+        from music21 import scale
         from music21.musicxml import m21ToXml
 
         p1 = Pitch('D#~')

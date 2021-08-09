@@ -2595,7 +2595,10 @@ class RepeatFinder:
 class Test(unittest.TestCase):
 
     def testFilterByRepeatMark(self):
-        from music21 import stream, bar, repeat, note
+        from music21 import stream
+        from music21 import bar
+        from music21 import repeat
+        from music21 import note
 
         s = stream.Part()
         m1 = stream.Measure()
@@ -2624,7 +2627,10 @@ class Test(unittest.TestCase):
         self.assertEqual(ex.findInnermostRepeatIndices(s), [0])
 
     def testRepeatCoherenceB(self):
-        from music21 import stream, bar, repeat, note
+        from music21 import stream
+        from music21 import bar
+        from music21 import repeat
+        from music21 import note
 
         s = stream.Part()
         m1 = stream.Measure()
@@ -2649,7 +2655,10 @@ class Test(unittest.TestCase):
         self.assertEqual(ex.findInnermostRepeatIndices(s), [0])
 
     def testRepeatCoherenceB2(self):
-        from music21 import stream, bar, repeat, note
+        from music21 import stream
+        from music21 import bar
+        from music21 import repeat
+        from music21 import note
 
         # a nested repeat; acceptable
         s = stream.Part()
@@ -2706,7 +2715,8 @@ class Test(unittest.TestCase):
     def testRepeatCoherenceC(self):
         '''Using da capo/dal segno
         '''
-        from music21 import stream, repeat
+        from music21 import stream
+        from music21 import repeat
 
         # no repeats
         s = stream.Part()
@@ -2828,7 +2838,10 @@ class Test(unittest.TestCase):
         # ex._processRepeatExpression(s, s)
 
     def testExpandRepeatA(self):
-        from music21 import stream, bar, repeat, note
+        from music21 import stream
+        from music21 import bar
+        from music21 import repeat
+        from music21 import note
 
         # two repeat bars in a row
         p = stream.Part()
@@ -2899,7 +2912,8 @@ class Test(unittest.TestCase):
 
     def testExpandRepeatB(self):
         from music21.abcFormat import testFiles
-        from music21 import converter, repeat
+        from music21 import converter
+        from music21 import repeat
 
         s = converter.parse(testFiles.draughtOfAle)
         # s.show()
@@ -2921,7 +2935,8 @@ class Test(unittest.TestCase):
 
     def testExpandRepeatC(self):
         from music21.abcFormat import testFiles
-        from music21 import converter, repeat
+        from music21 import converter
+        from music21 import repeat
 
         s = converter.parse(testFiles.kingOfTheFairies)
         self.assertEqual(len(s.parts[0].getElementsByClass('Measure')),
@@ -2947,7 +2962,9 @@ class Test(unittest.TestCase):
     def testExpandRepeatD(self):
 
         # test one back repeat at end of a measure
-        from music21 import stream, bar, note
+        from music21 import stream
+        from music21 import bar
+        from music21 import note
 
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)
@@ -2971,7 +2988,9 @@ class Test(unittest.TestCase):
     def testExpandRepeatE(self):
 
         # test one back repeat at end of a measure
-        from music21 import stream, bar, note
+        from music21 import stream
+        from music21 import bar
+        from music21 import note
 
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)
@@ -3013,7 +3032,10 @@ class Test(unittest.TestCase):
     def testExpandRepeatF(self):
         # an algorithmic generation approach
         import random
-        from music21 import bar, note, stream, meter
+        from music21 import bar
+        from music21 import note
+        from music21 import stream
+        from music21 import meter
 
         dur = [0.125, 0.25, 0.5, 0.125]
         durA = dur
@@ -3056,9 +3078,12 @@ class Test(unittest.TestCase):
 
     def testExpandRepeatH(self):
         # an algorithmic generation approach
-
-        from music21 import bar, note, stream, meter, pitch
+        from music21 import bar
         from music21 import features
+        from music21 import meter
+        from music21 import note
+        from music21 import pitch
+        from music21 import stream
 
         dur = [0.125, 0.25, 0.5, 0.125]
         repeatTimesCycle = [0, 1, 3, 5]
@@ -3157,7 +3182,10 @@ class Test(unittest.TestCase):
         self.assertTrue(rm.isValidText('dal segno al coda'))
 
     def testRepeatExpressionOnStream(self):
-        from music21 import stream, repeat, meter, converter
+        from music21 import stream
+        from music21 import repeat
+        from music21 import meter
+        from music21 import converter
         from music21.musicxml import m21ToXml
 
         GEX = m21ToXml.GeneralObjectExporter()
@@ -3193,7 +3221,9 @@ class Test(unittest.TestCase):
     def testExpandDaCapoA(self):
 
         # test one back repeat at end of a measure
-        from music21 import stream, bar, note
+        from music21 import stream
+        from music21 import bar
+        from music21 import note
 
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)
@@ -3241,7 +3271,9 @@ class Test(unittest.TestCase):
         self.assertEqual(ex._daCapoOrSegno(), DaCapo)
 
     def testRemoveRepeatExpressions(self):
-        from music21 import stream, repeat, bar
+        from music21 import stream
+        from music21 import repeat
+        from music21 import bar
 
         s = stream.Part()
         m1 = stream.Measure()
@@ -3316,7 +3348,8 @@ class Test(unittest.TestCase):
     def testExpandRepeatExpressionA(self):
 
         # test one back repeat at end of a measure
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
 
         # a da capo al fine without a fine is not valid
         m1 = stream.Measure()
@@ -3372,7 +3405,8 @@ class Test(unittest.TestCase):
     def testExpandRepeatExpressionB(self):
 
         # test one back repeat at end of a measure
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
 
         # simple da capo alone
         m1 = stream.Measure()
@@ -3397,7 +3431,8 @@ class Test(unittest.TestCase):
                           'E4', 'E4', 'G4', 'G4', 'A4', 'A4'])
 
     def testExpandRepeatExpressionC(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
 
         # da capo al fine
         m1 = stream.Measure()
@@ -3423,7 +3458,8 @@ class Test(unittest.TestCase):
                          ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4'])
 
     def testExpandRepeatExpressionD(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
 
         # da capo al coda
         m1 = stream.Measure()
@@ -3454,7 +3490,9 @@ class Test(unittest.TestCase):
                           'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
 
     def testExpandRepeatExpressionE(self):
-        from music21 import repeat, stream, note
+        from music21 import repeat
+        from music21 import stream
+        from music21 import note
         # dal segno simple
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4', type='half'), 2)
@@ -3482,7 +3520,8 @@ class Test(unittest.TestCase):
                           'G4', 'G4', 'A4', 'A4'])
 
     def testExpandRepeatExpressionF(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         from music21 import repeat
         # dal segno al fine
         m1 = stream.Measure()
@@ -3513,7 +3552,8 @@ class Test(unittest.TestCase):
                           'E4', 'E4', 'G4', 'G4'])
 
     def testExpandRepeatExpressionG(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         from music21 import repeat
         # dal segno al coda
         m1 = stream.Measure()
@@ -3551,7 +3591,9 @@ class Test(unittest.TestCase):
 
     def testExpandRepeatExpressionH(self):
         # test one back repeat at end of a measure
-        from music21 import stream, bar, note
+        from music21 import stream
+        from music21 import bar
+        from music21 import note
 
         # simple da capo alone
         m1 = stream.Measure()
@@ -3601,7 +3643,10 @@ class Test(unittest.TestCase):
 
     def testExpandRepeatExpressionI(self):
         # test one back repeat at end of a measure
-        from music21 import stream, bar, note, repeat
+        from music21 import stream
+        from music21 import bar
+        from music21 import note
+        from music21 import repeat
 
         # simple da capo alone
         m1 = stream.Measure()
@@ -3640,7 +3685,11 @@ class Test(unittest.TestCase):
 
     def testExpandRepeatExpressionJ(self):
         # test one back repeat at end of a measure
-        from music21 import stream, bar, note, repeat, instrument
+        from music21 import stream
+        from music21 import bar
+        from music21 import note
+        from music21 import repeat
+        from music21 import instrument
 
         # simple da capo alone
         m1 = stream.Measure()
@@ -3778,7 +3827,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(ex._repeatBrackets), 2)
 
     def testRepeatEndingsB(self):
-        from music21 import stream, note, bar
+        from music21 import stream
+        from music21 import note
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -3825,7 +3876,9 @@ class Test(unittest.TestCase):
         # p.show()
 
     def testRepeatEndingsB2(self):
-        from music21 import stream, note, bar
+        from music21 import stream
+        from music21 import note
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -3872,7 +3925,9 @@ class Test(unittest.TestCase):
         # p.show()
 
     def testRepeatEndingsC(self):
-        from music21 import stream, note, bar
+        from music21 import stream
+        from music21 import note
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -3910,7 +3965,9 @@ class Test(unittest.TestCase):
         self.assertTrue(ex._repeatBracketsAreCoherent())
 
     def testRepeatEndingsD(self):
-        from music21 import stream, note, bar
+        from music21 import stream
+        from music21 import note
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure(number=1)
@@ -3946,7 +4003,9 @@ class Test(unittest.TestCase):
     def testRepeatEndingsE(self):
         '''Expanding two endings (1, 2, then 3) without a start repeat
         '''
-        from music21 import stream, note, bar
+        from music21 import stream
+        from music21 import note
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -3981,7 +4040,9 @@ class Test(unittest.TestCase):
     def testRepeatEndingsF(self):
         '''Two sets of two endings (1, 2, then 3) without a start repeat
         '''
-        from music21 import stream, note, bar
+        from music21 import stream
+        from music21 import note
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -4035,7 +4096,9 @@ class Test(unittest.TestCase):
     def testRepeatEndingsG(self):
         '''Two sets of two endings (1, 2, then 3) without a start repeat
         '''
-        from music21 import stream, note, bar
+        from music21 import stream
+        from music21 import note
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -4076,7 +4139,9 @@ class Test(unittest.TestCase):
     def testRepeatEndingsH(self):
         '''Two sets of two endings (1, 2, then 3) without a start repeat
         '''
-        from music21 import stream, note, bar
+        from music21 import stream
+        from music21 import note
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure(number=1)
@@ -4121,7 +4186,9 @@ class Test(unittest.TestCase):
     def testRepeatEndingsI(self):
         '''Two sets of two endings (1, 2, then 3) without a start repeat
         '''
-        from music21 import stream, note, bar
+        from music21 import stream
+        from music21 import note
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure(number=1)
@@ -4177,7 +4244,9 @@ class Test(unittest.TestCase):
     def testRepeatEndingsJ(self):
         '''Two sets of two endings (1, 2, then 3) without a start repeat
         '''
-        from music21 import stream, note, bar
+        from music21 import stream
+        from music21 import note
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure(number=1)

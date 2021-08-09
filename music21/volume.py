@@ -517,7 +517,8 @@ class Test(unittest.TestCase):
 
 
     def testGetContextSearchA(self):
-        from music21 import stream, volume
+        from music21 import stream
+        from music21 import volume
 
         s = stream.Stream()
         d1 = dynamics.Dynamic('mf')
@@ -617,7 +618,8 @@ class Test(unittest.TestCase):
 
 
     def testRealizeVolumeA(self):
-        from music21 import stream, volume
+        from music21 import stream
+        from music21 import volume
 
         s = stream.Stream()
         s.repeatAppend(note.Note('g3'), 16)
@@ -727,7 +729,8 @@ class Test(unittest.TestCase):
 
 
     def testRealizeVolumeC(self):
-        from music21 import stream, articulations
+        from music21 import stream
+        from music21 import articulations
 
         s = stream.Stream()
         s.repeatAppend(note.Note('g3'), 16)

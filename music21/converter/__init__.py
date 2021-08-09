@@ -1522,8 +1522,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(clefs), 18)
 
     def testConversionMXClefTimeCorpus(self):
-
-        from music21 import corpus, clef, meter
+        from music21 import corpus
+        from music21 import clef
+        from music21 import meter
         a = corpus.parse('luca')
 
         # there should be only one clef in each part
@@ -1671,7 +1672,10 @@ class Test(unittest.TestCase):
         parse(data)
 
     def testConversionMidiNotes(self):
-        from music21 import meter, key, chord, note
+        from music21 import meter
+        from music21 import key
+        from music21 import chord
+        from music21 import note
 
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test01.mid'
         # a simple file created in athenacl

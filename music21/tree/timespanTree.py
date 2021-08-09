@@ -737,7 +737,9 @@ class TimespanTree(trees.OffsetTree):
 class Test(unittest.TestCase):
 
     def testGetVerticalityAtWithKey(self):
-        from music21 import stream, key, note
+        from music21 import stream
+        from music21 import key
+        from music21 import note
         s = stream.Stream()
         s.insert(0, key.Key('C'))
         s.insert(0, note.Note('F#4'))

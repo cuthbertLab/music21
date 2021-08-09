@@ -5965,7 +5965,8 @@ class Test(unittest.TestCase):
                          + '(3, <music21.pitch.Accidental flat>), (3, None), (4, None)]')
 
     def testScaleDegreesB(self):
-        from music21 import stream, key
+        from music21 import stream
+        from music21 import key
         # trying to isolate problematic context searches
         chord1 = Chord(['C#5', 'E#5', 'G#5'])
         st1 = stream.Stream()
@@ -6058,7 +6059,8 @@ class Test(unittest.TestCase):
                         out)
 
     def testTiesB(self):
-        from music21 import stream, scale
+        from music21 import stream
+        from music21 import scale
         sc = scale.WholeToneScale()
         s = stream.Stream()
         for i in range(7):
@@ -6136,7 +6138,8 @@ class Test(unittest.TestCase):
 
     def testVolumePerPitchC(self):
         import random
-        from music21 import stream, tempo
+        from music21 import stream
+        from music21 import tempo
         c = Chord(['f-2', 'a-2', 'c-3', 'f-3', 'g3', 'b-3', 'd-4', 'e-4'])
         c.duration.quarterLength = 0.5
         s = stream.Stream()

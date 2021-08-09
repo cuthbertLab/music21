@@ -2094,7 +2094,8 @@ def conductorStream(s: stream.Stream) -> stream.Part:
         {0.0} <music21.stream.Stream measureLike>
             {0.0} <music21.note.Note C>
     '''
-    from music21 import tempo, meter
+    from music21 import tempo
+    from music21 import meter
     partsList = list(s.getElementsByClass('Stream').getElementsByOffset(0))
     minPriority = min(p.priority for p in partsList) if partsList else 0
     conductorPriority = minPriority - 1
@@ -2882,7 +2883,8 @@ class Test(unittest.TestCase):
         self.assertTrue(common.whitespaceEqual(conductorEvents, match), conductorEvents)
 
     def testKeySignature(self):
-        from music21 import meter, key
+        from music21 import meter
+        from music21 import key
         n = note.Note()
         n.quarterLength = 0.5
         s = stream.Stream()
@@ -3092,7 +3094,8 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testMidiProgramChangeB(self):
-        from music21 import instrument, scale
+        from music21 import instrument
+        from music21 import scale
         import random
 
         iList = [instrument.Harpsichord,
@@ -3171,7 +3174,8 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testOverlappedEventsC(self):
-        from music21 import meter, key
+        from music21 import meter
+        from music21 import key
 
         s = stream.Stream()
         s.insert(key.KeySignature(3))
@@ -3194,7 +3198,8 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testExternalMidiProgramChangeB(self):
-        from music21 import instrument, scale
+        from music21 import instrument
+        from music21 import scale
 
         iList = [instrument.Harpsichord, instrument.Clavichord, instrument.Accordion,
                  instrument.Celesta, instrument.Contrabass, instrument.Viola,
@@ -3348,7 +3353,8 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testMicrotonalOutputE(self):
-        from music21 import corpus, interval
+        from music21 import corpus
+        from music21 import interval
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
         p2 = copy.deepcopy(p1)
@@ -3369,7 +3375,8 @@ class Test(unittest.TestCase):
         # post.show('midi', app='Logic Express')
 
     def testMicrotonalOutputF(self):
-        from music21 import corpus, interval
+        from music21 import corpus
+        from music21 import interval
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
         p2 = copy.deepcopy(p1)
@@ -3397,8 +3404,9 @@ class Test(unittest.TestCase):
         # post.show('midi', app='Logic Express')
 
     def testMicrotonalOutputG(self):
-
-        from music21 import corpus, interval, instrument
+        from music21 import corpus
+        from music21 import interval
+        from music21 import instrument
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
         p1.remove(p1.getElementsByClass('Instrument').first())
@@ -3492,7 +3500,8 @@ class Test(unittest.TestCase):
 
     def testMidiExportConductorA(self):
         '''Export conductor data to MIDI conductor track.'''
-        from music21 import meter, tempo
+        from music21 import meter
+        from music21 import tempo
 
         p1 = stream.Part()
         p1.repeatAppend(note.Note('c4'), 12)
@@ -3523,7 +3532,8 @@ class Test(unittest.TestCase):
         # s.show('midi', app='Logic Express')
 
     def testMidiExportConductorB(self):
-        from music21 import tempo, corpus
+        from music21 import tempo
+        from music21 import corpus
         s = corpus.parse('bwv66.6')
         s.insert(0, tempo.MetronomeMark(number=240))
         s.insert(4, tempo.MetronomeMark(number=30))
@@ -3568,7 +3578,9 @@ class Test(unittest.TestCase):
 
     def testMidiExportConductorE(self):
         '''The conductor only gets the first element at an offset.'''
-        from music21 import converter, tempo, key
+        from music21 import converter
+        from music21 import tempo
+        from music21 import key
 
         s = stream.Stream()
         p1 = converter.parse('tinynotation: c1')

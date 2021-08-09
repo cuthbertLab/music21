@@ -4163,7 +4163,8 @@ class Test(unittest.TestCase):
                           None, 'x', 'x', 'x', None, None, None])
 
     def testIntervalMicrotonesA(self):
-        from music21 import interval, pitch
+        from music21 import interval
+        from music21 import pitch
 
         i = interval.Interval('m3')
         self.assertEqual(i.chromatic.cents, 300)
@@ -4266,7 +4267,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(p2), 'E`5(+15c)')
 
     def testIntervalMicrotonesB(self):
-        from music21 import interval, note
+        from music21 import interval
+        from music21 import note
         i = interval.Interval(note.Note('c4'), note.Note('c#4'))
         self.assertEqual(str(i), '<music21.interval.Interval A1>')
 
@@ -4274,7 +4276,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(i), '<music21.interval.Interval A1 (-50c)>')
 
     def testDescendingAugmentedUnison(self):
-        from music21 import interval, note
+        from music21 import interval
+        from music21 import note
         ns = note.Note('C4')
         ne = note.Note('C-4')
         i = interval.Interval(noteStart=ns, noteEnd=ne)
@@ -4282,7 +4285,8 @@ class Test(unittest.TestCase):
         self.assertEqual(directedNiceName, 'Descending Diminished Unison')
 
     def testTransposeWithChromaticInterval(self):
-        from music21 import interval, note
+        from music21 import interval
+        from music21 import note
         ns = note.Note('C4')
         i = interval.ChromaticInterval(5)
         n2 = ns.transpose(i)
@@ -4294,7 +4298,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n2.nameWithOctave, 'F4')
 
     def testIntervalWithOneNoteGiven(self):
-        from music21 import interval, note
+        from music21 import interval
+        from music21 import note
         noteC = note.Note('C4')
         i = interval.Interval(name='P4', noteStart=noteC)
         self.assertEqual(i.noteEnd.nameWithOctave, 'F4')
