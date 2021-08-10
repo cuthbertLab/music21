@@ -28,7 +28,7 @@ from music21 import common
 with warnings.catch_warnings():
     warnings.simplefilter('ignore', DeprecationWarning)
     warnings.simplefilter('ignore', PendingDeprecationWarning)
-    import imp
+    import imp  # pylint: disable=deprecated-module
 
 
 environLocal = environment.Environment('test.commonTest')
@@ -271,7 +271,7 @@ class ModuleGather:
         for dirPath, unused_dirNames, filenames in os.walk(self.dirParent):
             self._visitFunc(None, dirPath, filenames)
 
-        if common.cpus() > 4:  # @UndefinedVariable
+        if common.cpus() > 4:
             self.modulePaths.sort(key=manyCoreSortFunc)
         else:
             self.modulePaths.sort()

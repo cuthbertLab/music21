@@ -20,5 +20,5 @@ from music21.features import jSymbolic
 from music21.features import native
 
 # pylint: disable=redefined-builtin
-__doc__ = base.__doc__  # @ReservedAssignment @UndefinedVariable
+__doc__ = base.__doc__
 

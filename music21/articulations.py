@@ -83,6 +83,7 @@ import unittest
 
 from music21 import base
 from music21 import common
+from music21.common.classTools import tempAttribute
 from music21 import exceptions21
 from music21 import environment
 from music21 import style
@@ -295,9 +296,8 @@ class Spiccato(Staccato, Accent):
     '''
     def __init__(self):
         Staccato.__init__(self)
-        storedLengthShift = self.lengthShift
-        Accent.__init__(self)  # order matters...
-        self.lengthShift = storedLengthShift
+        with tempAttribute(self, 'lengthShift'):
+            Accent.__init__(self)  # order matters...
 
 
 class Tenuto(LengthArticulation):

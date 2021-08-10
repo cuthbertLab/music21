@@ -494,7 +494,7 @@ class GeneralNote(base.Music21Object):
     double-dotted sixteenth note.
 
     In almost every circumstance, you should
-    create note.Note() or note.Rest() or note.Chord()
+    create note.Note() or note.Rest() or chord.Chord()
     objects directly, and not use this underlying
     structure.
 
@@ -584,7 +584,7 @@ class GeneralNote(base.Music21Object):
             return None
 
         allText = [ly.text for ly in self.lyrics]
-        return '\n'.join(allText)
+        return '\n'.join([t for t in allText if t is not None])
 
     def _setLyric(self, value: Union[str, Lyric, None]) -> None:
         self.lyrics = []
@@ -839,9 +839,9 @@ class GeneralNote(base.Music21Object):
         >>> ng.duration.isGrace
         True
         >>> ng.duration
-        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.GraceDuration unlinked type:half quarterLength:0.0>
         >>> ng.duration.type
-        'zero'
+        'half'
         >>> ng.duration.components
         (DurationTuple(type='half', dots=0, quarterLength=0.0),)
 
@@ -850,7 +850,7 @@ class GeneralNote(base.Music21Object):
 
         >>> ng2 = n.getGrace(appoggiatura=True)
         >>> ng2.duration
-        <music21.duration.AppoggiaturaDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.AppoggiaturaDuration unlinked type:half quarterLength:0.0>
         >>> ng2.duration.slash
         False
 
@@ -860,7 +860,7 @@ class GeneralNote(base.Music21Object):
         >>> r = note.Rest(quarterLength=0.5)
         >>> r.getGrace(inPlace=True)
         >>> r.duration
-        <music21.duration.GraceDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.GraceDuration unlinked type:eighth quarterLength:0.0>
         '''
         if inPlace is False:
             e = copy.deepcopy(self)
@@ -878,7 +878,7 @@ class NotRest(GeneralNote):
     '''
     Parent class for Note-like objects that are not rests; that is to say
     they have a stem, can be tied, and volume is important.
-    Basically, that's a `Note` or
+    Basically, that's a `Note` or `Chord` or
     `Unpitched` object for now.
     '''
     # unspecified means that there may be a stem, but its orientation
@@ -1130,7 +1130,7 @@ class NotRest(GeneralNote):
     def pitches(self) -> Tuple[pitch.Pitch]:
         '''
         Returns an empty tuple.  (Useful for iterating over NotRests since they
-        include Notes and Chords
+        include Notes and Chords.)
         '''
         return ()
 
@@ -1538,7 +1538,7 @@ class Note(NotRest):
         {1.0} <music21.note.Note G->
 
         '''
-        if hasattr(value, 'classes') and 'IntervalBase' in value.classes:
+        if isinstance(value, interval.IntervalBase):
             intervalObj = value
         else:  # try to process
             intervalObj = interval.Interval(value)
@@ -1733,7 +1733,15 @@ class Rest(GeneralNote):
         self.fullMeasure = 'auto'  # see docs; True, False, 'always',
 
     def _reprInternal(self):
-        return self.name
+        duration_name = self.duration.fullName.lower()
+        if len(duration_name) < 15:  # dotted quarter = 14
+            return duration_name.replace(' ', '-')
+        else:
+            ql = self.duration.quarterLength
+            if ql == int(ql):
+                ql = int(ql)
+            ql_string = str(ql)
+            return f'{ql_string}ql'
 
     def __eq__(self, other):
         '''
@@ -1775,39 +1783,22 @@ class Rest(GeneralNote):
         return self.duration.fullName + ' Rest'
 
 
-class SpacerRest(Rest):
-    '''
-    This is exactly the same as a rest, but it is a SpacerRest.
-    This object should only be used for making hidden space in a score in lilypond.
-
-    DEPRECATED in v.7 -- use a normal rest with .hideObjectOnPrint
-
-    >>> sr = note.SpacerRest(type='whole')
-    >>> sr
-    <music21.note.SpacerRest rest duration=4.0>
-    '''
-
-    def __init__(self, *arguments, **keywords):
-        super().__init__(**keywords)
-
-    def _reprInternal(self):
-        return f'{self.name} duration={self.duration.quarterLength}'
-
-
 # ------------------------------------------------------------------------------
 # test methods and classes
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     '''
     These are tests that open windows and rely on external software
     '''
+    show = True
 
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
         '''
         a = Note('d-3')
         a.quarterLength = 2.25
-        a.show()
+        if self.show:
+            a.show()
 
     def testBasic(self):
         from music21 import stream
@@ -1824,7 +1815,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             b.style.color = '#FF00FF'
             a.append(b)
 
-        a.show()
+        if self.show:
+            a.show()
 
 
 # ------------------------------------------------------------------------------
@@ -1866,7 +1858,8 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(ly), "<music21.note.Lyric number=1 identifier='verse'>")
 
     def testComplex(self):
-        note1 = Note()
+        from music21 import note
+        note1 = note.Note()
         note1.duration.clear()
         d1 = duration.DurationTuple('whole', 0, 4.0)
         d2 = duration.DurationTuple('quarter', 0, 1.0)
@@ -1887,7 +1880,7 @@ class Test(unittest.TestCase):
         self.assertEqual(matchStr, outStr)
         i = 0
         for thisNote in note1.splitAtDurations():
-            matchSub = matchStr.split('\n')[i]
+            matchSub = matchStr.split('\n')[i]  # pylint: disable=use-maxsplit-arg
             conv = LilypondConverter()
             conv.appendM21ObjectToContext(thisNote)
             outStr = str(conv.context).replace(' ', '').strip()
@@ -1928,7 +1921,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(found), 24)
 
     def testNoteBeatProperty(self):
-        from music21 import stream, meter
+        from music21 import stream
+        from music21 import meter
 
         data = [
             ['3/4', 0.5, 6, [1.0, 1.5, 2.0, 2.5, 3.0, 3.5],
@@ -2104,7 +2098,8 @@ class Test(unittest.TestCase):
             self.assertEqual(a == b, match)  # sub6
 
     def testMetricalAccent(self):
-        from music21 import meter, stream
+        from music21 import meter
+        from music21 import stream
         data = [
             ('4/4', 8, 0.5, [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
             ('3/4', 6, 0.5, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]),
@@ -2157,10 +2152,11 @@ class Test(unittest.TestCase):
         # s.show()
 
     def testVolumeA(self):
+        from music21 import note
         v1 = volume.Volume()
 
-        n1 = Note()
-        n2 = Note()
+        n1 = note.Note()
+        n2 = note.Note()
 
         n1.volume = v1  # can set as v1 has no client
         self.assertEqual(n1.volume, v1)
@@ -2171,8 +2167,9 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(n2.volume)
 
     def testVolumeB(self):
+        from music21 import note
         # manage deepcopying properly
-        n1 = Note()
+        n1 = note.Note()
 
         n1.volume.velocity = 100
         self.assertEqual(n1.volume.velocity, 100)
@@ -2185,7 +2182,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Note, Rest, SpacerRest, Unpitched, NotRest, GeneralNote, Lyric]
+_DOC_ORDER = [Note, Rest, Unpitched, NotRest, GeneralNote, Lyric]
 
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()

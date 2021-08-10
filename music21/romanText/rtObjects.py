@@ -1394,6 +1394,7 @@ class RTFile(prebase.ProtoM21Object):
         '''
         for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16'):
             try:
+                # pylint: disable=consider-using-with
                 self.file = io.open(filename, encoding=encoding)
                 if self.file is not None:
                     break
@@ -1402,6 +1403,7 @@ class RTFile(prebase.ProtoM21Object):
         if self.file is None:
             for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16', None):
                 try:
+                    # pylint: disable=consider-using-with
                     self.file = io.open(filename, encoding=encoding, errors='ignore')
                     if self.file is not None:
                         break

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Name:         stream/filter.py
+# Name:         stream/filters.py
 # Purpose:      classes for filtering iterators of  streams...
 #
 # Authors:      Michael Scott Cuthbert
@@ -93,7 +93,7 @@ class IsFilter(StreamFilter):
     `.numToFind` is used so that once all elements are found, the iterator can short circuit.
 
 
-    >>> for el in s.iter.addFilter(isFilter):
+    >>> for el in s.iter().addFilter(isFilter):
     ...     print(el is n)
     True
 
@@ -109,10 +109,10 @@ class IsFilter(StreamFilter):
     >>> isFilter2.numToFind
     2
 
-    >>> for el in s.iter.addFilter(isFilter2):
+    >>> for el in s.iter().addFilter(isFilter2):
     ...     print(el)
     <music21.note.Note C#>
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
 
     '''
     derivationStr = 'is'
@@ -148,17 +148,17 @@ class IsNotFilter(IsFilter):
     >>> n = note.Note('C#')
     >>> s.append(n)
     >>> s.append(note.Rest())
-    >>> for el in s.iter.addFilter(stream.filters.IsNotFilter(n)):
+    >>> for el in s.iter().addFilter(stream.filters.IsNotFilter(n)):
     ...     el
     <music21.key.KeySignature of 3 flats>
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
 
     test that resetting works...
 
-    >>> for el in s.iter.addFilter(stream.filters.IsNotFilter(n)):
+    >>> for el in s.iter().addFilter(stream.filters.IsNotFilter(n)):
     ...     el
     <music21.key.KeySignature of 3 flats>
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
 
 
     multiple...
@@ -169,7 +169,7 @@ class IsNotFilter(IsFilter):
     >>> s.append(n)
     >>> r = note.Rest()
     >>> s.append(r)
-    >>> for el in s.iter.addFilter(stream.filters.IsNotFilter([n, r])):
+    >>> for el in s.iter().addFilter(stream.filters.IsNotFilter([n, r])):
     ...     print(el)
     <music21.key.KeySignature of 3 flats>
     '''
@@ -229,7 +229,7 @@ class ClassFilter(StreamFilter):
     >>> for x in sI:
     ...     print(x)
     <music21.note.Note C>
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
     <music21.note.Note D>
 
     >>> sI.filters.append(stream.filters.ClassFilter('Note'))
@@ -260,7 +260,7 @@ class ClassFilter(StreamFilter):
         return True
 
     def __call__(self, item, iterator):
-        return item.isClassOrSubclass(self.classList)
+        return not item.classSet.isdisjoint(self.classList)
 
     def _reprInternal(self):
         if len(self.classList) == 1:
@@ -285,12 +285,12 @@ class ClassNotFilter(ClassFilter):
 
     >>> for x in sI:
     ...     print(x)
-    <music21.note.Rest rest>
+    <music21.note.Rest quarter>
     '''
     derivationStr = 'getElementsNotOfClass'
 
     def __call__(self, item, iterator):
-        return not item.isClassOrSubclass(self.classList)
+        return item.classSet.isdisjoint(self.classList)
 
 
 class GroupFilter(StreamFilter):

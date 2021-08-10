@@ -48,7 +48,7 @@ def slashToTuple(value: str) -> Optional[MeterTerminalTuple]:
     '''
     # split by numbers, include slash
     valueNumbers, valueChars = common.getNumFromStr(value,
-                                                    numbers='0123456789/')
+                                                    numbers='0123456789/.')
     valueNumbers = valueNumbers.strip()  # remove whitespace
     valueChars = valueChars.strip()  # remove whitespace
     if 'slow' in valueChars.lower():
@@ -123,6 +123,10 @@ def slashMixedToFraction(valueSrc: str) -> Tuple[NumDenomTuple, bool]:
     Traceback (most recent call last):
     music21.exceptions21.MeterException: cannot match denominator to numerator in: 3+2+5/8+3/4+2+1+4
 
+    >>> meter.tools.slashMixedToFraction('3.0/4.0')
+    Traceback (most recent call last):
+    music21.exceptions21.TimeSignatureException: Cannot create time signature from "3.0/4.0"
+
     Changed in v7 -- new location and returns a tuple as first value.
     '''
     pre = []
@@ -134,7 +138,8 @@ def slashMixedToFraction(valueSrc: str) -> Tuple[NumDenomTuple, bool]:
         if '/' in part:
             tup = slashToTuple(part)
             if tup is None:
-                raise TimeSignatureException('cannot create time signature from:', valueSrc)
+                raise TimeSignatureException(
+                    f'Cannot create time signature from "{valueSrc}"')
             pre.append([tup.numerator, tup.denominator])
         else:  # its just a numerator
             try:

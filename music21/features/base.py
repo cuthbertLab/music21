@@ -20,6 +20,7 @@ from music21 import common
 from music21 import converter
 from music21 import corpus
 from music21 import exceptions21
+from music21 import note
 from music21 import stream
 from music21 import text
 
@@ -165,7 +166,7 @@ class FeatureExtractor:
         '''
         if dataOrStream is not None:
             if (hasattr(dataOrStream, 'classes')
-                    and 'Stream' in dataOrStream.classes):
+                    and isinstance(dataOrStream, stream.Stream)):
                 # environLocal.printDebug(['creating new DataInstance: this should be a Stream:',
                 #     dataOrStream])
                 # if we are passed a stream, create a DataInstance to
@@ -411,7 +412,7 @@ class StreamForms:
         return histo
 
     def formGetElementsByClassMeasure(self, prepared):
-        if 'Score' in prepared.classes:
+        if isinstance(prepared, stream.Score):
             post = stream.Stream()
             for p in prepared.parts:
                 # insert in overlapping offset positions
@@ -422,7 +423,7 @@ class StreamForms:
         return post
 
     def formChordify(self, prepared):
-        if 'Score' in prepared.classes:
+        if isinstance(prepared, stream.Score):
             # options here permit getting part information out
             # of chordified representation
             return prepared.chordify(
@@ -488,7 +489,7 @@ class StreamForms:
         secondsMap = prepared.secondsMap
         # filter only notes; all elements would otherwise be gathered
         for bundle in secondsMap:
-            if 'NotRest' in bundle['element'].classes:
+            if isinstance(bundle['element'], note.NotRest):
                 post.append(bundle)
         return post
 
@@ -537,7 +538,6 @@ class DataInstance:
     multiple commonly-used stream representations once, providing rapid processing.
     '''
     # pylint: disable=redefined-builtin
-
     def __init__(self, streamOrPath=None, id=None):  # @ReservedAssignment
         if isinstance(streamOrPath, stream.Stream):
             self.stream = streamOrPath
@@ -896,7 +896,6 @@ class DataSet:
             self.addData(d, cv, thisId)
 
     # pylint: disable=redefined-builtin
-
     def addData(self, dataOrStreamOrPath, classValue=None, id=None):  # @ReservedAssignment
         '''
         Add a Stream, DataInstance, MetadataEntry, or path (Posix or str)
@@ -966,7 +965,7 @@ class DataSet:
 
     def _processNonParallel(self):
         '''
-        The traditional method: run non-parallel
+        The traditional way: run non-parallel
         '''
         # clear features
         self.features = []
@@ -1082,7 +1081,7 @@ class DataSet:
             raise DataSetException('no output format could be defined from file path '
                                    + f'{fp} or format {format}')
 
-        outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
+        return outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
 
 def _dataSetParallelSubprocess(dataInstance, failFast):
@@ -1161,7 +1160,7 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
 
     >>> y = [x.id for x in features.extractorsById('all')]
     >>> y[0:3], y[-3:-1]
-    (['M1', 'M2', 'M3'], ['MD1', 'MC1'])
+    (['M1', 'M2', 'M3'], ['CS12', 'MC1'])
 
     '''
     from music21.features import jSymbolic
@@ -1242,7 +1241,7 @@ def getIndex(featureString, extractorType=None):
     >>> features.getIndex('Range')
     (61, 'jsymbolic')
     >>> features.getIndex('Ends With Landini Melodic Contour')
-    (19, 'native')
+    (18, 'native')
     >>> features.getIndex('aBrandNewFeature!') is None
     True
     >>> features.getIndex('Fifths Pitch Histogram', 'jsymbolic')
@@ -1324,8 +1323,7 @@ class Test(unittest.TestCase):
                          [47, 2, 25, 0, 25, 42, 0, 33, 0, 38, 22, 4])
 
     def testStreamFormsB(self):
-
-        from music21 import features, note
+        from music21 import features
 
         s = stream.Stream()
         for p in ['c4', 'c4', 'd-4', 'd#4', 'f#4', 'a#4', 'd#5', 'a5', 'a5']:
@@ -1342,7 +1340,7 @@ class Test(unittest.TestCase):
 
     def testStreamFormsC(self):
         from pprint import pformat
-        from music21 import features, note
+        from music21 import features
 
         s = stream.Stream()
         for p in ['c4', 'c4', 'd-4', 'd#4', 'f#4', 'a#4', 'd#5', 'a5']:
@@ -1423,9 +1421,14 @@ class Test(unittest.TestCase):
             'Unique_Note_Quarter_Lengths,Most_Common_Note_Quarter_Length,'
             'Range_of_Note_Quarter_Lengths,Composer//3,1.0,1.5,Bach//8,0.5,3.75,Corelli')
 
-        ds.write(format='tab')
-        ds.write(format='csv')
-        ds.write(format='arff')
+        fp1 = ds.write(format='tab')
+        fp2 = ds.write(format='csv')
+        # Also test providing fp
+        fp3 = environLocal.getTempFile(suffix='.arff')
+        ds.write(fp=fp3, format='arff')
+
+        for fp in (fp1, fp2, fp3):
+            os.remove(fp)
 
     def testFeatureFail(self):
         from music21 import features
@@ -1453,7 +1456,8 @@ class Test(unittest.TestCase):
             ds.process()
 
     def testEmptyStreamCustomErrors(self):
-        from music21 import analysis, features
+        from music21 import analysis
+        from music21 import features
         from music21.features import jSymbolic, native
 
         ds = DataSet(classLabel='')
@@ -1808,7 +1812,7 @@ class Test(unittest.TestCase):
         from music21 import features
 
         # Need explicit import for pickling within the testSingleCoreAll context
-        from music21.features.base import _pickleFunctionNumPitches  # @UnresolvedImport
+        from music21.features.base import _pickleFunctionNumPitches
         import textwrap
 
         self.maxDiff = None

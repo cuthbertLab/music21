@@ -17,16 +17,19 @@ import unittest
 import math
 import copy
 from typing import Optional, List, Tuple, Dict, Union, Any
+import warnings
 
 from music21 import chord
 from music21 import common
 from music21 import defaults
+from music21 import duration
 from music21 import note
 from music21 import exceptions21
 from music21 import environment
 from music21 import stream
 
 from music21.instrument import Conductor, deduplicate
+from music21.midi import percussion
 
 _MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
@@ -34,6 +37,10 @@ environLocal = environment.Environment(_MOD)
 
 # ------------------------------------------------------------------------------
 class TranslateException(exceptions21.Music21Exception):
+    pass
+
+
+class TranslateWarning(UserWarning):
     pass
 
 # ------------------------------------------------------------------------------
@@ -144,7 +151,6 @@ def ticksToDuration(ticks, ticksPerQuarter=None, inputM21DurationObject=None):
 
     '''
     if inputM21DurationObject is None:
-        from music21 import duration
         d = duration.Duration()
     else:
         d = inputM21DurationObject
@@ -262,7 +268,7 @@ def music21ObjectToMidiFile(
 # ------------------------------------------------------------------------------
 # Notes
 
-def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
+def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None) -> note.Note:
     # noinspection PyShadowingNames
     '''
     Convert from a list of midi.DeltaTime and midi.MidiEvent objects to a music21 Note.
@@ -326,11 +332,6 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     94
 
     '''
-    if inputM21 is None:
-        n = note.Note()
-    else:
-        n = inputM21
-
     if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
@@ -349,22 +350,31 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     else:
         raise TranslateException(f'cannot handle MIDI event list in the form: {eventList!r}')
 
+    # here we are handling an issue that might arise with double-stemmed notes
+    if (tOff - tOn) != 0:
+        if inputM21 is None:
+            n = note.Note(duration=ticksToDuration(tOff - tOn, ticksPerQuarter))
+        else:
+            n = inputM21
+            n.duration = ticksToDuration(tOff - tOn, ticksPerQuarter, n.duration)
+    else:
+        # environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
+        # for now, substitute grace note
+        if inputM21 is None:
+            n = note.Note()
+        else:
+            n = inputM21
+        n.getGrace(inPlace=True)
+
     n.pitch.midi = eOn.pitch
     n.volume.velocity = eOn.velocity
     n.volume.velocityIsRelative = False  # not relative coming from MIDI
     # n._midiVelocity = eOn.velocity
-    # here we are handling an issue that might arise with double-stemmed notes
-    if (tOff - tOn) != 0:
-        ticksToDuration(tOff - tOn, ticksPerQuarter, n.duration)
-    else:
-        # environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
-        # for now, substitute grace note
-        n.getGrace(inPlace=True)
 
     return n
 
 
-def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
+def noteToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
     # noinspection PyShadowingNames
     '''
     Translate a music21 Note to a list of four MIDI events --
@@ -401,6 +411,8 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     >>> eventList2
     [<music21.midi.MidiEvent NOTE_ON, track=None, channel=9, pitch=61, velocity=90>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=9, pitch=61, velocity=0>]
+
+    Changed in v7 -- made keyword-only.
     '''
     from music21 import midi as midiModule
 
@@ -515,11 +527,6 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     tOn: int = 0  # ticks
     tOff: int = 0  # ticks
 
-    if inputM21 is None:
-        c = chord.Chord()
-    else:
-        c = inputM21
-
     if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
@@ -562,24 +569,36 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     else:
         raise TranslateException(f'fewer than 4 events provided to midiEventsToChord: {eventList}')
 
-    c.pitches = pitches
-    c.volume = volumes  # can set a list to volume property
     # can simply use last-assigned pair of tOff, tOn
     if (tOff - tOn) != 0:
-        ticksToDuration(tOff - tOn, ticksPerQuarter, c.duration)
+        if inputM21 is None:
+            c = chord.Chord(duration=ticksToDuration(tOff - tOn, ticksPerQuarter))
+        else:
+            c = inputM21
+            c.duration = ticksToDuration(tOff - tOn, ticksPerQuarter, c.duration)
     else:
         environLocal.warn(['midi chord with zero duration will be treated as grace',
                             eventList, c])
         # for now, get grace
+        if inputM21 is None:
+            c = chord.Chord()
+        else:
+            c = inputM21
         c.getGrace(inPlace=True)
+
+    c.pitches = pitches
+    c.volume = volumes  # can set a list to volume property
+
     return c
 
 
-def chordToMidiEvents(inputM21, includeDeltaTime=True):
+def chordToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
     # noinspection PyShadowingNames
     '''
     Translates a :class:`~music21.chord.Chord` object to a
     list of base.DeltaTime and base.MidiEvents objects.
+
+    The `channel` can be specified, otherwise channel 1 is assumed.
 
     See noteToMidiEvents above for more details.
 
@@ -600,6 +619,8 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=68, velocity=0>,
      <music21.midi.DeltaTime (empty) track=None, channel=None>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=83, velocity=0>]
+
+    Changed in v7 -- made keyword-only.
     '''
     from music21 import midi as midiModule
     mt = None  # midi track
@@ -662,7 +683,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
 
         me = midiModule.MidiEvent(track=mt)
         me.type = midiModule.ChannelVoiceMessages.NOTE_OFF
-        me.channel = 1
+        me.channel = channel
         me.pitch = pitchObj.midi
         if not pitchObj.isTwelveTone():
             me.centShift = pitchObj.getCentShiftFromMidi()
@@ -694,6 +715,9 @@ def instrumentToMidiEvents(inputM21,
     inst = inputM21
     mt = midiTrack  # midi track
     events = []
+
+    if isinstance(inst, Conductor):
+        return events
     if includeDeltaTime:
         dt = midiModule.DeltaTime(track=mt, channel=channel)
         events.append(dt)
@@ -714,6 +738,23 @@ def instrumentToMidiEvents(inputM21,
 def midiEventsToInstrument(eventList):
     '''
     Convert a single MIDI event into a music21 Instrument object.
+
+    >>> me = midi.MidiEvent()
+    >>> me.type = midi.ChannelVoiceMessages.PROGRAM_CHANGE
+    >>> me.data = 53  # MIDI program 54: Voice Oohs
+    >>> midi.translate.midiEventsToInstrument(me)
+    <music21.instrument.Vocalist 'Voice'>
+
+    The percussion map will be used if the channel is 10:
+
+    >>> me.channel = 10
+    >>> i = midi.translate.midiEventsToInstrument(me)
+    >>> i
+    <music21.instrument.Tambourine 'Tambourine'>
+    >>> i.midiChannel  # 0-indexed in music21
+    9
+    >>> i.midiProgram  # 0-indexed in music21
+    53
     '''
     from music21 import midi as midiModule
 
@@ -731,10 +772,34 @@ def midiEventsToInstrument(eventList):
             decoded = event.data.decode('utf-8').split('\x00')[0]
             decoded = decoded.strip()
             i = instrument.fromString(decoded)
+        elif event.channel == 10:
+            pm = percussion.PercussionMapper()
+            # PercussionMapper.midiPitchToInstrument() is 1-indexed
+            i = pm.midiPitchToInstrument(event.data + 1)
+            i.midiProgram = event.data
         else:
             i = instrument.instrumentFromMidiProgram(event.data)
-    except (instrument.InstrumentException, UnicodeDecodeError):  # pragma: no cover
+            # Instrument.midiProgram and event.data are both 0-indexed
+            i.midiProgram = event.data
+    except UnicodeDecodeError:
+        warnings.warn(
+            f'Unable to determine instrument from {event}; getting generic Instrument',
+            TranslateWarning)
         i = instrument.Instrument()
+    except percussion.MIDIPercussionException:
+        warnings.warn(
+            f'Unable to determine instrument from {event}; getting generic UnpitchedPercussion',
+            TranslateWarning)
+        i = instrument.UnpitchedPercussion()
+    except instrument.InstrumentException:
+        # Debug logging would be better than warning here
+        i = instrument.Instrument()
+
+    # Set MIDI channel
+    # Instrument.midiChannel is 0-indexed
+    if event.channel is not None:
+        i.midiChannel = event.channel - 1
+
     # Set partName or instrumentName with literal value from parsing
     if decoded:
         # Except for lousy instrument names
@@ -1017,8 +1082,16 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
 
     >>> midi.translate.midiEventsToTempo(events)
     <music21.tempo.MetronomeMark maestoso Quarter=90.0>
+
+    `None` is returned if the MetronomeMark lacks a number, which can
+    happen with metric modulation marks.
+
+    >>> midi.translate.tempoToMidiEvents(tempo.MetronomeMark(number=None)) is None
+    True
     '''
     from music21 import midi as midiModule
+    if tempoIndication.number is None:
+        return
     mt = None  # use a midi track set to None
     eventList = []
     if includeDeltaTime:
@@ -1110,7 +1183,7 @@ def elementToMidiEventList(
     assuming that dynamics have already been applied, etc.
     Does not include DeltaTime objects.
 
-    Channel is set to the default, 1.
+    Channel (1-indexed) is set to the default, 1.
     Track is not set.
 
     >>> n = note.Note('C4')
@@ -1269,7 +1342,6 @@ def assignPacketsToChannels(
     if initTrackIdToChannelMap is None:
         initTrackIdToChannelMap = {}
 
-    # allChannels = list(range(1, 10)) + list(range(11, 17))  # all but 10
     uniqueChannelEvents = {}  # dict of (start, stop, usedChannel) : channel
     post = []
     usedTracks = []
@@ -1662,7 +1734,8 @@ def getMetaEvents(events):
     from music21.midi import MetaEvents, ChannelVoiceMessages
 
     metaEvents = []  # store pairs of abs time, m21 object
-    for i, eventTuple in enumerate(events):
+    last_program: int = -1
+    for eventTuple in events:
         t, e = eventTuple
         metaObj = None
         if e.type == MetaEvents.TIME_SIGNATURE:
@@ -1673,9 +1746,16 @@ def getMetaEvents(events):
         elif e.type == MetaEvents.SET_TEMPO:
             metaObj = midiEventsToTempo(e)
         elif e.type in (MetaEvents.INSTRUMENT_NAME, MetaEvents.SEQUENCE_TRACK_NAME):
+            # midiEventsToInstrument() WILL NOT have knowledge of the current
+            # program, so set it here
             metaObj = midiEventsToInstrument(e)
+            if last_program != -1:
+                # Only update if we have had an initial PROGRAM_CHANGE
+                metaObj.midiProgram = last_program
         elif e.type == ChannelVoiceMessages.PROGRAM_CHANGE:
+            # midiEventsToInstrument() WILL set the program on the instance
             metaObj = midiEventsToInstrument(e)
+            last_program = e.data
         elif e.type == MetaEvents.MIDI_PORT:
             pass
         else:
@@ -1742,7 +1822,7 @@ def midiTrackToStream(
     >>> p
     <music21.stream.Part ...>
     >>> len(p.flat.notesAndRests)
-    13
+    14
     >>> p.flat.notes[0].pitch.midi
     36
     >>> p.flat.notes[0].volume.velocity
@@ -1756,21 +1836,22 @@ def midiTrackToStream(
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.meter.TimeSignature 4/4>
         {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Rest rest>
+        {1.0} <music21.note.Rest quarter>
         {2.0} <music21.chord.Chord F3 G#4 C5>
-        {3.0} <music21.note.Rest rest>
+        {3.0} <music21.note.Rest quarter>
     {4.0} <music21.stream.Measure 2 offset=4.0>
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.note.Rest eighth>
         {0.5} <music21.note.Note B->
-        {1.5} <music21.note.Rest rest>
+        {1.5} <music21.note.Rest half>
         {3.5} <music21.chord.Chord D2 A4>
     {8.0} <music21.stream.Measure 3 offset=8.0>
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.note.Rest eighth>
         {0.5} <music21.chord.Chord C#2 B-3 G#6>
-        {1.0} <music21.note.Rest rest>
+        {1.0} <music21.note.Rest dotted-quarter>
         {2.5} <music21.chord.Chord F#3 A4 C#5>
     {12.0} <music21.stream.Measure 4 offset=12.0>
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.chord.Chord F#3 A4 C#5>
+        {2.5} <music21.note.Rest dotted-quarter>
         {4.0} <music21.bar.Barline type=final>
     '''
     # environLocal.printDebug(['midiTrackToStream(): got midi track: events',
@@ -1866,9 +1947,7 @@ def midiTrackToStream(
             # execute; chordSub will be None
             if chordSub is not None:
                 # composite.append(chordSub)
-                # create a chord here
-                c = chord.Chord()
-                midiEventsToChord(chordSub, ticksPerQuarter, c)
+                c = midiEventsToChord(chordSub, ticksPerQuarter)
                 o = notes[i][0][0] / ticksPerQuarter
                 c.midiTickStart = notes[i][0][0]
 
@@ -1877,9 +1956,7 @@ def midiTrackToStream(
                 chordSub = None
             else:  # just append the note, chordSub is None
                 # composite.append(notes[i])
-                # create a note here
-                n = note.Note()
-                midiEventsToNote(notes[i], ticksPerQuarter, n)
+                n = midiEventsToNote(notes[i], ticksPerQuarter)
                 # the time is the first value in the first pair
                 # need to round, as floating point error is likely
                 o = notes[i][0][0] / ticksPerQuarter
@@ -1891,12 +1968,11 @@ def midiTrackToStream(
             i += 1
 
     elif len(notes) == 1:  # rare case of just one note
-        n = note.Note()
-        midiEventsToNote(notes[0], ticksPerQuarter, n)
+        n = midiEventsToNote(notes[0], ticksPerQuarter)
         # the time is the first value in the first pair
         # need to round, as floating point error is likely
         o = notes[0][0][0] / ticksPerQuarter
-        n.midiTickStart = notes[i][0][0]
+        n.midiTickStart = notes[0][0][0]
         s.coreInsert(o, n)
 
     s.coreElementsChanged()
@@ -1916,13 +1992,17 @@ def midiTrackToStream(
     if conductorPart is not None:
         insertConductorEvents(conductorPart, s, isFirst=isFirst)
 
-    # Only make measures if time signatures have been inserted
-    s.makeMeasures(inPlace=True)
-    for m in s.getElementsByClass(stream.Measure):
-        if voicesRequired:
-            m.makeVoices(inPlace=True, fillGaps=True)
-        # always need to fill gaps, as rests are not found in any other way
-        m.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
+    # Only make measures once time signatures have been inserted
+    s.makeMeasures(
+        meterStream=conductorPart['TimeSignature'].stream() if conductorPart else None,
+        inPlace=True)
+    if voicesRequired:
+        for m in s.getElementsByClass(stream.Measure):
+            # Gaps will be filled by makeRests, below, which now recurses
+            m.makeVoices(inPlace=True, fillGaps=False)
+    s.makeTies(inPlace=True)
+    # always need to fill gaps, as rests are not found in any other way
+    s.makeRests(inPlace=True, fillGaps=True, timeRangeFromBarDuration=True)
     return s
 
 
@@ -1959,10 +2039,10 @@ def prepareStreamForMidi(s) -> stream.Stream:
     '''
     from music21 import volume
 
-    if s.recurse().stream().hasMeasures():
+    if s[stream.Measure]:
         s = s.expandRepeats()  # makes a deep copy
     else:
-        s = copy.deepcopy(s)
+        s = s.coreCopyAsDerivation('prepareStreamForMidi')
 
     conductor = conductorStream(s)
 
@@ -1971,7 +2051,7 @@ def prepareStreamForMidi(s) -> stream.Stream:
         # this assumes that dynamics in a part/stream apply to all components
         # of that part stream
         # this sets the cachedRealized value for each Volume
-        for p in s.iter.getElementsByClass('Stream'):
+        for p in s.getElementsByClass('Stream'):
             volume.realizeVolume(p)
 
         s.insert(0, conductor)
@@ -2017,6 +2097,7 @@ def conductorStream(s: stream.Stream) -> stream.Part:
     The MetronomeMark is moved and a default TimeSignature is added:
 
     >>> conductor.show('text')
+    {0.0} <music21.instrument.Conductor 'Conductor'>
     {0.0} <music21.tempo.MetronomeMark Quarter=100>
     {0.0} <music21.meter.TimeSignature 4/4>
 
@@ -2027,24 +2108,24 @@ def conductorStream(s: stream.Stream) -> stream.Part:
         {0.0} <music21.stream.Stream measureLike>
             {0.0} <music21.note.Note C>
     '''
-    from music21 import tempo, meter
+    from music21 import tempo
+    from music21 import meter
     partsList = list(s.getElementsByClass('Stream').getElementsByOffset(0))
     minPriority = min(p.priority for p in partsList) if partsList else 0
     conductorPriority = minPriority - 1
 
     conductorPart = stream.Part()
     conductorPart.priority = conductorPriority
+    conductorPart.insert(0, Conductor())
 
     for klass in ('MetronomeMark', 'TimeSignature', 'KeySignature'):
-        events = s.flat.getElementsByClass(klass)
         lastOffset = -1
-        for el in events:
-            o = events.srcStream.elementOffset(el)
-            s.remove(el, recurse=True)
+        for el in s[klass]:
             # Don't overwrite an event of the same class at this offset
-            if o > lastOffset:
-                conductorPart.coreInsert(o, el)
-            lastOffset = o
+            if el.offset > lastOffset:
+                conductorPart.coreInsert(el.offset, el)
+            lastOffset = el.offset
+            s.remove(el, recurse=True)
 
     conductorPart.coreElementsChanged()
 
@@ -2065,30 +2146,57 @@ def channelInstrumentData(
     Read through Stream `s` and finding instruments in it, return a 2-tuple,
     the first a dictionary mapping MIDI program numbers to channel numbers,
     and the second, a list of unassigned channels that can be used for dynamic
-    allocation.
+    allocation. One channel is always left unassigned for dynamic allocation.
+    If the number of needed channels exceeds the number of available ones,
+    any further MIDI program numbers are assigned to channel 1.
 
     Substreams without notes or rests (e.g. representing a conductor track)
     will not consume a channel.
 
     Only necessarily works if :func:`~music21.midi.translate.prepareStreamForMidi`
     has been run before calling this routine.
+
+    An instrument's `.midiChannel` attribute is observed.
+    `None` is the default `.midiChannel` for all instruments except
+    :class:`~music21.instrument.UnpitchedPercussion`
+    subclasses. Put another way, the priority is:
+
+    - Instrument instance `.midiChannel` (set by user or imported from MIDI)
+    - `UnpitchedPercussion` subclasses receive MIDI Channel 10 (9 in music21)
+    - The channel mappings produced by reading from `acceptableChannelList`,
+      or the default range 1-16. (More precisely, 1-15, since one dynamic channel
+      is always reserved.)
+
+    .. warning::
+
+        The attribute `.midiChannel` on :class:`~music21.instrument.Instrument`
+        is 0-indexed, but `.channel` on :class:`~music21.midi.MidiEvent` is 1-indexed,
+        as are all references to channels in this function.
     '''
     # temporary channel allocation
     if acceptableChannelList is not None:
-        allChannels = acceptableChannelList
+        # copy user input, because we will manipulate it
+        acceptableChannels = acceptableChannelList[:]
     else:
-        allChannels = list(range(1, 10)) + list(range(11, 17))  # all but 10
+        acceptableChannels = list(range(1, 10)) + list(range(11, 17))  # all but 10
 
     # store program numbers
     # tried using set() but does not guarantee proper order.
     allUniqueInstruments = []
 
+    channelByInstrument = {}  # the midiProgram is the key
+    channelsDynamic = []  # remaining channels
+    # create an entry for all unique instruments, assign channels
+    # for each instrument, assign a channel; if we go above 16, that is fine
+    # we just cannot use it and will take modulus later
+    channelsAssigned = set()
+
     # store streams in uniform list
     substreamList = []
     if s.hasPartLikeStreams():
         for obj in s.getElementsByClass('Stream'):
-            if not obj.flat.notesAndRests:
-                # Conductor track: don't consume a channel
+            # Conductor track: don't consume a channel
+            if (not obj[note.GeneralNote]) and obj[Conductor]:
                 continue
             else:
                 substreamList.append(obj)
@@ -2102,6 +2210,27 @@ def channelInstrumentData(
         instrumentStream = subs.recurse().getElementsByClass('Instrument')
         setAnInstrument = False
         for inst in instrumentStream:
+            if inst.midiChannel is not None and inst.midiProgram not in channelByInstrument:
+                # Assignment Case 1: read from instrument.midiChannel
+                # .midiChannel is 0-indexed, but MIDI channels are 1-indexed, so convert.
+                thisChannel = inst.midiChannel + 1
+                try:
+                    acceptableChannels.remove(thisChannel)
+                except ValueError:
+                    # Don't warn if 10 is missing, since
+                    # we deliberately made it unavailable above.
+                    if thisChannel != 10:
+                        # If the user wants multiple non-drum programs mapped
+                        # to the same MIDI channel for some reason, solution is to provide an
+                        # acceptableChannelList containing duplicate entries.
+                        warnings.warn(
+                            f'{inst} specified 1-indexed MIDI channel {thisChannel} '
+                            f'but acceptable channels were {acceptableChannels}. '
+                            'Defaulting to channel 1.',
+                            TranslateWarning)
+                        thisChannel = 1
+                channelsAssigned.add(thisChannel)
+                channelByInstrument[inst.midiProgram] = thisChannel
             if inst.midiProgram not in allUniqueInstruments:
                 allUniqueInstruments.append(inst.midiProgram)
             setAnInstrument = True
@@ -2110,24 +2239,21 @@ def channelInstrumentData(
             if None not in allUniqueInstruments:
                 allUniqueInstruments.append(None)
 
-    channelByInstrument = {}  # the instrument is the key
-    channelsDynamic = []  # remaining channels
-    # create an entry for all unique instruments, assign channels
-    # for each instrument, assign a channel; if we go above 16, that is fine
-    # we just cannot use it and will take modulus later
-    channelsAssigned = []
+    programsStillNeeded = [x for x in allUniqueInstruments if x not in channelByInstrument]
 
-    for i, iPgm in enumerate(allUniqueInstruments):
-        # the key is the program number; the values is the start channel
-        if i < len(allChannels) - 1:  # save at least one dynamic channel
-            channelByInstrument[iPgm] = allChannels[i]
-            channelsAssigned.append(allChannels[i])
+    for i, iPgm in enumerate(programsStillNeeded):
+        # the key is the program number; the value is the start channel
+        if i < len(acceptableChannels) - 1:  # save at least one dynamic channel
+            # Assignment Case 2: dynamically assign available channels
+            # if Instrument.midiChannel was None
+            channelByInstrument[iPgm] = acceptableChannels[i]
+            channelsAssigned.add(acceptableChannels[i])
         else:  # just use 1, and deal with the mess: cannot allocate
-            channelByInstrument[iPgm] = allChannels[0]
-            channelsAssigned.append(allChannels[0])
+            channelByInstrument[iPgm] = acceptableChannels[0]
+            channelsAssigned.add(acceptableChannels[0])
 
     # get the dynamic channels, or those not assigned
-    for ch in allChannels:
+    for ch in acceptableChannels:
         if ch not in channelsAssigned:
             channelsDynamic.append(ch)
 
@@ -2168,14 +2294,14 @@ def packetStorageFromSubstreamList(
     {0: {'initInstrument': <music21.instrument.Conductor 'Conductor'>,
          'rawPackets': [{'centShift': None,
                          'duration': 0,
-                         'lastInstrument': None,
+                         'lastInstrument': <music21.instrument.Conductor 'Conductor'>,
                          'midiEvent': <music21.midi.MidiEvent SET_TEMPO, ... channel=1, ...>,
                          'obj': <music21.tempo.MetronomeMark Quarter=100>,
                          'offset': 0,
                          'trackId': 0},
                         {'centShift': None,
                          'duration': 0,
-                         'lastInstrument': None,
+                         'lastInstrument': <music21.instrument.Conductor 'Conductor'>,
                          'midiEvent': <music21.midi.MidiEvent TIME_SIGNATURE, ...>,
                          'obj': <music21.meter.TimeSignature 4/4>,
                          'offset': 0,
@@ -2212,13 +2338,14 @@ def packetStorageFromSubstreamList(
         subs = subs.flat
 
         # get a first instrument; iterate over rest
-        instrumentStream = subs.iter.getElementsByClass('Instrument')
+        instrumentStream = subs.getElementsByClass('Instrument')
 
-        # if there is an Instrument object at the start, make instObj that instrument.
+        # if there is an Instrument object at the start, make instObj that instrument
+        # this may be a Conductor object if prepareStreamForMidi() was run
         if instrumentStream and subs.elementOffset(instrumentStream[0]) == 0:
             instObj = instrumentStream[0]
         elif trackId == 0 and not subs.notesAndRests:
-            # Conductor track
+            # maybe prepareStreamForMidi() wasn't run; create Conductor instance
             instObj = Conductor()
         else:
             instObj = None
@@ -2252,7 +2379,7 @@ def updatePacketStorageWithChannelInfo(
                 initCh = 1  # fallback, should not happen.
         elif 'Conductor' in instObj.classes:
             initCh = None
-        else:  # use midi program
+        else:  # keys are midi program
             initCh = channelByInstrument[instObj.midiProgram]
         bundle['initChannel'] = initCh  # set for bundle too
 
@@ -2272,6 +2399,12 @@ def streamHierarchyToMidiTracks(
 
     acceptableChannelList is a list of MIDI Channel numbers that can be used or None.
     If None, then 1-9, 11-16 are used (10 being reserved for percussion).
+
+    In addition, if an :class:`~music21.instrument.Instrument` object in the stream
+    has a `.midiChannel` that is not None, that channel is observed, and
+    also treated as reserved. Only subclasses of :class:`~music21.instrument.UnpitchedPercussion`
+    have a default `.midiChannel`, but users may manipulate this.
+    See :func:`channelInstrumentData` for more, and for documentation on `acceptableChannelList`.
 
     Called by streamToMidiFile()
 
@@ -2390,7 +2523,9 @@ def midiTracksToStreams(
 
 def streamToMidiFile(
     inputM21: stream.Stream,
+    *,
     addStartDelay: bool = False,
+    acceptableChannelList: Optional[List[int]] = None,
 ) -> 'music21.midi.MidiFile':
     # noinspection PyShadowingNames
     '''
@@ -2415,11 +2550,16 @@ def streamToMidiFile(
     >>> #_DOCS_SHOW mf.open('/Volumes/disc/_scratch/midi.mid', 'wb')
     >>> #_DOCS_SHOW mf.write()
     >>> #_DOCS_SHOW mf.close()
+
+    See :func:`channelInstrumentData` for documentation on `acceptableChannelList`.
     '''
     from music21 import midi as midiModule
 
     s = inputM21
-    midiTracks = streamHierarchyToMidiTracks(s, addStartDelay=addStartDelay)
+    midiTracks = streamHierarchyToMidiTracks(s,
+                                             addStartDelay=addStartDelay,
+                                             acceptableChannelList=acceptableChannelList,
+                                             )
 
     # may need to update channel information
 
@@ -2569,7 +2709,7 @@ def midiStringToStream(strData, **keywords):
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>
             {0.0} <music21.note.Note G>
-            {1.0} <music21.note.Rest rest>
+            {1.0} <music21.note.Rest dotted-half>
             {4.0} <music21.bar.Barline type=final>
     '''
     from music21 import midi as midiModule
@@ -2614,7 +2754,7 @@ def midiFileToStream(
     >>> s
     <music21.stream.Score ...>
     >>> len(s.flat.notesAndRests)
-    13
+    14
     '''
     # environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
     if inputM21 is None:
@@ -2757,7 +2897,8 @@ class Test(unittest.TestCase):
         self.assertTrue(common.whitespaceEqual(conductorEvents, match), conductorEvents)
 
     def testKeySignature(self):
-        from music21 import meter, key
+        from music21 import meter
+        from music21 import key
         n = note.Note()
         n.quarterLength = 0.5
         s = stream.Stream()
@@ -2780,12 +2921,15 @@ class Test(unittest.TestCase):
     def testChannelAllocation(self):
         # test instrument assignments
         from music21 import instrument
-        from music21.midi import translate
 
         iList = [instrument.Harpsichord,
                  instrument.Viola,
                  instrument.ElectricGuitar,
-                 instrument.Flute]
+                 instrument.Flute,
+                 instrument.Vibraphone,  # not 10
+                 instrument.BassDrum,  # 10
+                 instrument.HiHatCymbal,  # 10
+                 ]
         iObjs = []
 
         s = stream.Score()
@@ -2797,16 +2941,44 @@ class Test(unittest.TestCase):
             p.append(note.Note('C#'))
             s.insert(0, p)
 
-        channelByInstrument, channelsDynamic = translate.channelInstrumentData(s)
+        channelByInstrument, channelsDynamic = channelInstrumentData(s)
+
+        # Default allocations
+        self.assertEqual(channelByInstrument.keys(), set(inst.midiProgram for inst in iObjs))
+        self.assertSetEqual(set(channelByInstrument.values()), {1, 2, 3, 4, 5, 10})
+        self.assertListEqual(channelsDynamic, [6, 7, 8, 9, 11, 12, 13, 14, 15, 16])
+
+        # Limit to given acceptable channels
+        acl = list(range(11, 17))
+        channelByInstrument, channelsDynamic = channelInstrumentData(s, acceptableChannelList=acl)
+        self.assertEqual(channelByInstrument.keys(), set(inst.midiProgram for inst in iObjs))
+        self.assertSetEqual(set(channelByInstrument.values()), {10, 11, 12, 13, 14, 15})
+        self.assertListEqual(channelsDynamic, [16])
+
+        # User specification
+        for i, iObj in enumerate(iObjs):
+            iObj.midiChannel = 15 - i
+
+        channelByInstrument, channelsDynamic = channelInstrumentData(s)
 
         self.assertEqual(channelByInstrument.keys(), set(inst.midiProgram for inst in iObjs))
-        self.assertSetEqual(set(channelByInstrument.values()), {1, 2, 3, 4})
-        self.assertListEqual(channelsDynamic, [5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16])
+        self.assertSetEqual(set(channelByInstrument.values()), {11, 12, 13, 14, 15, 16})
+        self.assertListEqual(channelsDynamic, [1, 2, 3, 4, 5, 6, 7, 8, 9])
+
+        # User error
+        iObjs[0].midiChannel = 100
+        want = 'Harpsichord specified 1-indexed MIDI channel 101 but '
+        want += r'acceptable channels were \[1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16\]. '
+        want += 'Defaulting to channel 1.'
+        with self.assertWarnsRegex(TranslateWarning, want):
+            channelByInstrument, channelsDynamic = channelInstrumentData(s)
+        self.assertEqual(channelByInstrument.keys(), set(inst.midiProgram for inst in iObjs))
+        self.assertSetEqual(set(channelByInstrument.values()), {1, 11, 12, 13, 14, 15})
+        self.assertListEqual(channelsDynamic, [2, 3, 4, 5, 6, 7, 8, 9, 16])
 
     def testPacketStorage(self):
         # test instrument assignments
         from music21 import instrument
-        from music21.midi import translate
 
         iList = [None,  # conductor track
                  instrument.Harpsichord,
@@ -2827,7 +2999,7 @@ class Test(unittest.TestCase):
                 p.append(note.Note('C#'))
             substreamList.append(p)
 
-        packetStorage = translate.packetStorageFromSubstreamList(substreamList, addStartDelay=False)
+        packetStorage = packetStorageFromSubstreamList(substreamList, addStartDelay=False)
         self.assertIsInstance(packetStorage, dict)
         self.assertEqual(list(packetStorage.keys()), [0, 1, 2, 3, 4, 5])
 
@@ -2848,7 +3020,7 @@ class Test(unittest.TestCase):
             None: 5,
         }
 
-        translate.updatePacketStorageWithChannelInfo(packetStorage, channelInfo)
+        updatePacketStorageWithChannelInfo(packetStorage, channelInfo)
         self.assertSetEqual(set(harpsPacket.keys()),
                             {'rawPackets', 'initInstrument', 'initChannel'})
         self.assertEqual(harpsPacket['initChannel'], 1)
@@ -2936,7 +3108,8 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testMidiProgramChangeB(self):
-        from music21 import instrument, scale
+        from music21 import instrument
+        from music21 import scale
         import random
 
         iList = [instrument.Harpsichord,
@@ -3015,7 +3188,8 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testOverlappedEventsC(self):
-        from music21 import meter, key
+        from music21 import meter
+        from music21 import key
 
         s = stream.Stream()
         s.insert(key.KeySignature(3))
@@ -3038,7 +3212,8 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testExternalMidiProgramChangeB(self):
-        from music21 import instrument, scale
+        from music21 import instrument
+        from music21 import scale
 
         iList = [instrument.Harpsichord, instrument.Clavichord, instrument.Accordion,
                  instrument.Celesta, instrument.Contrabass, instrument.Viola,
@@ -3192,7 +3367,8 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testMicrotonalOutputE(self):
-        from music21 import corpus, interval
+        from music21 import corpus
+        from music21 import interval
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
         p2 = copy.deepcopy(p1)
@@ -3213,7 +3389,8 @@ class Test(unittest.TestCase):
         # post.show('midi', app='Logic Express')
 
     def testMicrotonalOutputF(self):
-        from music21 import corpus, interval
+        from music21 import corpus
+        from music21 import interval
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
         p2 = copy.deepcopy(p1)
@@ -3241,8 +3418,9 @@ class Test(unittest.TestCase):
         # post.show('midi', app='Logic Express')
 
     def testMicrotonalOutputG(self):
-
-        from music21 import corpus, interval, instrument
+        from music21 import corpus
+        from music21 import interval
+        from music21 import instrument
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
         p1.remove(p1.getElementsByClass('Instrument').first())
@@ -3336,7 +3514,8 @@ class Test(unittest.TestCase):
 
     def testMidiExportConductorA(self):
         '''Export conductor data to MIDI conductor track.'''
-        from music21 import meter, tempo
+        from music21 import meter
+        from music21 import tempo
 
         p1 = stream.Part()
         p1.repeatAppend(note.Note('c4'), 12)
@@ -3367,7 +3546,8 @@ class Test(unittest.TestCase):
         # s.show('midi', app='Logic Express')
 
     def testMidiExportConductorB(self):
-        from music21 import tempo, corpus
+        from music21 import tempo
+        from music21 import corpus
         s = corpus.parse('bwv66.6')
         s.insert(0, tempo.MetronomeMark(number=240))
         s.insert(4, tempo.MetronomeMark(number=30))
@@ -3412,7 +3592,9 @@ class Test(unittest.TestCase):
 
     def testMidiExportConductorE(self):
         '''The conductor only gets the first element at an offset.'''
-        from music21 import converter, tempo, key
+        from music21 import converter
+        from music21 import tempo
+        from music21 import key
 
         s = stream.Stream()
         p1 = converter.parse('tinynotation: c1')
@@ -3534,7 +3716,7 @@ class Test(unittest.TestCase):
         # a simple file created in athenacl
         s = converter.parse(fp)
         # s.show('t')
-        self.assertEqual(len(s.flat.getElementsByClass('Chord')), 4)
+        self.assertEqual(len(s.flat.getElementsByClass('Chord')), 5)
 
     def testMidiEventsImported(self):
         self.maxDiff = None
@@ -3560,7 +3742,6 @@ class Test(unittest.TestCase):
                  (0, 'SET_TEMPO', None),
                  (1024, 'END_OF_TRACK', None),
                  (0, 'SEQUENCE_TRACK_NAME', None),  # Music track
-                 (0, 'PROGRAM_CHANGE', None),
                  (0, 'PITCH_BEND', None),
                  (0, 'PROGRAM_CHANGE', None),
                  (0, 'NOTE_ON', 69),
@@ -3653,7 +3834,8 @@ class Test(unittest.TestCase):
         i = midiEventsToInstrument(event)
         self.assertIsInstance(i, instrument.Flute)
 
-    def testLousyInstrumentName(self):
+    def testLousyInstrumentData(self):
+        from music21 import instrument
         from music21 import midi as midiModule
 
         lousyNames = ('    ', 'Instrument 20', 'Instrument', 'Inst 2', 'instrument')
@@ -3664,6 +3846,20 @@ class Test(unittest.TestCase):
                 event.type = midiModule.MetaEvents.INSTRUMENT_NAME
                 i = midiEventsToInstrument(event)
                 self.assertIsNone(i.instrumentName)
+
+        # lousy program change
+        # https://github.com/cuthbertLab/music21/issues/988
+        event = midiModule.MidiEvent()
+        event.data = 0
+        event.channel = 10
+        event.type = midiModule.ChannelVoiceMessages.PROGRAM_CHANGE
+
+        expected = 'Unable to determine instrument from '
+        expected += '<music21.midi.MidiEvent PROGRAM_CHANGE, track=None, channel=10, data=0>'
+        expected += '; getting generic UnpitchedPercussion'
+        with self.assertWarnsRegex(TranslateWarning, expected):
+            i = midiEventsToInstrument(event)
+            self.assertIsInstance(i, instrument.UnpitchedPercussion)
 
     def testConductorStream(self):
         s = stream.Stream()
@@ -3684,6 +3880,70 @@ class Test(unittest.TestCase):
 
         self.assertEqual(
             len(inn.parts[1].measure(3).voices.last().getElementsByClass('Rest')), 1)
+
+    def testRestsMadeInMeasures(self):
+        from music21 import converter
+
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test17.mid'
+        inn = converter.parse(fp)
+        pianoLH = inn.parts.last()
+        m1 = pianoLH.measure(1)  # quarter note, quarter note, quarter rest
+        m2 = pianoLH.measure(2)
+        self.assertEqual(len(m1.notesAndRests), 3)
+        self.assertEqual(len(m1.notes), 2)
+        self.assertEqual(m1.duration.quarterLength, 3.0)
+        self.assertEqual(pianoLH.elementOffset(m2), 3.0)
+
+        for part in inn.parts:
+            with self.subTest(part=part):
+                self.assertEqual(
+                    sum(m.barDuration.quarterLength for m in part.getElementsByClass(
+                        stream.Measure)
+                        ),
+                    part.duration.quarterLength
+                )
+
+    def testEmptyExport(self):
+        from music21 import instrument
+
+        p = stream.Part()
+        p.insert(instrument.Instrument())
+        # Previously, this errored when we assumed streams lacking notes
+        # to be conductor tracks
+        # https://github.com/cuthbertLab/music21/issues/1013
+        streamToMidiFile(p)
+
+    def testImportInstrumentsWithoutProgramChanges(self):
+        '''
+        Instrument instances are created from both program changes and
+        track or sequence names. Since we have a MIDI file, we should not
+        rely on default MIDI programs defined in the instrument module; we
+        should just keep track of the active program number.
+        https://github.com/cuthbertLab/music21/issues/1085
+        '''
+        from music21 import midi as midiModule
+
+        event1 = midiModule.MidiEvent()
+        event1.data = 0
+        event1.channel = 1
+        event1.type = midiModule.ChannelVoiceMessages.PROGRAM_CHANGE
+
+        event2 = midiModule.MidiEvent()
+        # This will normalize to an instrument.Soprano, but we don't want
+        # the default midiProgram, we want 0.
+        event2.data = b'Soprano'
+        event2.channel = 2
+        event2.type = midiModule.MetaEvents.SEQUENCE_TRACK_NAME
+
+        DUMMY_DELTA_TIME = None
+        meta_event_pairs = getMetaEvents([(DUMMY_DELTA_TIME, event1), (DUMMY_DELTA_TIME, event2)])
+        # Second element of the tuple is the instrument instance
+        self.assertEqual(meta_event_pairs[0][1].midiProgram, 0)
+        self.assertEqual(meta_event_pairs[1][1].midiProgram, 0)
+
+        # Remove the initial PROGRAM_CHANGE and get a default midiProgram
+        meta_event_pairs = getMetaEvents([(DUMMY_DELTA_TIME, event2)])
+        self.assertEqual(meta_event_pairs[0][1].midiProgram, 53)
 
 
 # ------------------------------------------------------------------------------

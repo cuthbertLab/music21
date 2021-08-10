@@ -205,7 +205,7 @@ def runningUnderIPython() -> bool:
 
     This post:
 
-    http://stackoverflow.com/questions/15411967/
+    https://stackoverflow.com/questions/15411967/
     how-can-i-check-if-code-is-executed-in-the-ipython-notebook
 
     says not to do this, but really, I can't think of another way
@@ -228,7 +228,7 @@ def runningUnderIPython() -> bool:
 # ------------------------------------------------------------------------------
 def defaultDeepcopy(obj, memo, callInit=True):
     '''
-    Unfortunately, it is not possible to do something like:
+    Unfortunately, it is not possible to do something like::
 
         def __deepcopy__(self, memo):
             if self._noDeepcopy:
@@ -238,7 +238,7 @@ def defaultDeepcopy(obj, memo, callInit=True):
 
     Or, else: return NotImplemented
 
-    so that's what this is for:
+    so that's what this is for::
 
         def __deepcopy__(self, memo):
             if self._noDeepcopy:

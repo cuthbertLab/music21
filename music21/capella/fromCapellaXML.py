@@ -120,8 +120,8 @@ class CapellaImporter:
         Returns self.xmlText
         '''
         self.zipFilename = str(filename)
-        zipFileHandle = zipfile.ZipFile(str(filename), 'r')
-        xmlText = zipFileHandle.read('score.xml')
+        with zipfile.ZipFile(str(filename), 'r') as zipFileHandle:
+            xmlText = zipFileHandle.read('score.xml')
         self.xmlText = xmlText
         return xmlText
 
@@ -414,7 +414,7 @@ class CapellaImporter:
         >>> restElement = ci.domElementFromText('<rest><duration base="1/2"/></rest>')
         >>> r = ci.restFromRest(restElement)
         >>> r
-        <music21.note.Rest rest>
+        <music21.note.Rest half>
         >>> r.duration.type
         'half'
         '''
@@ -892,15 +892,16 @@ class Test(unittest.TestCase):
     pass
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
-    pass
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testComplete(self):
         ci = CapellaImporter()
         capellaDirPath = common.getSourceFilePath() / 'capella'
         oswaldPath = capellaDirPath / r'Nu_rue_mit_sorgen.capx'
         partScore = ci.scoreFromFile(oswaldPath)
-        partScore.show()
+        if self.show:
+            partScore.show()
 
     def xtestImportSorgen(self):
         ci = CapellaImporter()
@@ -915,7 +916,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         # scoreElement = ci.mainDom.documentElement.getElementsByTagName('score')[0]
         scoreObj = ci.systemScoreFromScore(ci.mainDom.documentElement)
         partScore = ci.partScoreFromSystemScore(scoreObj)
-        partScore.show()
+        if self.show:
+            partScore.show()
         # ci.walkNodes()
         # print(ci.xmlText)
 

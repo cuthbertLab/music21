@@ -570,7 +570,7 @@ class Verticality(prebase.ProtoM21Object):
         <music21.tree.verticality.Verticality 400.0 {}>
         >>> el = verticality.makeElement(1/3)
         >>> el
-        <music21.note.Rest rest>
+        <music21.note.Rest 1/3ql>
         >>> el.duration.fullName
         'Eighth Triplet (1/3 QL)'
 
@@ -827,7 +827,7 @@ class Verticality(prebase.ProtoM21Object):
             if not isinstance(ts, spans.PitchedTimespan):
                 continue
             el = ts.element
-            if 'Chord' in el.classes:
+            if isinstance(el, chord.Chord):
                 if len(el) == 0:  # pylint: disable=len-as-condition
                     continue
 
@@ -1102,8 +1102,8 @@ class VerticalitySequence(prebase.ProtoM21Object, collections.abc.Sequence):
                 if timespan.part not in unwrapped:
                     unwrapped[timespan.part] = []
                 unwrapped[timespan.part].append(timespan)
-        for part, unused_timespans in unwrapped.items():
-            horizontality = Horizontality(timespans=unwrapped[part],)
+        for part, timespans in unwrapped.items():
+            horizontality = Horizontality(timespans=timespans)
             unwrapped[part] = horizontality
         return unwrapped
 

@@ -34,5 +34,6 @@ myStream2.insert(note.Rest(0.5))
 <!-- If relevant: OS, suggested fix, attempted workarounds -->
 
 <!-- Note: only Mac and Windows are directly supported by music21 staff.  
-     Bug reports that are specific to other OSes w/o a PR will be closed.
+     Bug reports that are specific to other OSes w/o a PR will be closed
+     unless the reporter is willing to contribute a fix.
  -->

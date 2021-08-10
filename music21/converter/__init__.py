@@ -134,7 +134,8 @@ class ArchiveManager:
             if self.fp.suffix in ('.mxl', '.md'):
                 # try to open it, as some mxl files are not zips
                 try:
-                    unused = zipfile.ZipFile(self.fp, 'r')
+                    with zipfile.ZipFile(self.fp, 'r') as unused:
+                        pass
                 except zipfile.BadZipfile:
                     return False
                 return True
@@ -150,10 +151,9 @@ class ArchiveManager:
         '''
         post = []
         if self.archiveType == 'zip':
-            f = zipfile.ZipFile(self.fp, 'r')
-            for subFp in f.namelist():
-                post.append(subFp)
-            f.close()
+            with zipfile.ZipFile(self.fp, 'r') as f:
+                for subFp in f.namelist():
+                    post.append(subFp)
         return post
 
     def getData(self, name=None, dataFormat='musicxml'):
@@ -168,8 +168,12 @@ class ArchiveManager:
         if self.archiveType != 'zip':
             raise ArchiveManagerException(f'no support for extension: {self.archiveType}')
 
-        f = zipfile.ZipFile(self.fp, 'r')
+        with zipfile.ZipFile(self.fp, 'r') as f:
+            post = self._extractContents(f, name, dataFormat)
 
+        return post
+
+    def _extractContents(self, f: zipfile.ZipFile, name=None, dataFormat='musicxml'):
         if name is None and dataFormat == 'musicxml':  # try to auto-harvest
             # will return data as a string
             # note that we need to read the META-INF/container.xml file
@@ -231,8 +235,6 @@ class ArchiveManager:
                 # post.append(component.read())
                 # post.append(f.read(subFp, 'U'))
                 # msg.append('\n/END\n')
-
-        f.close()
 
         return post
 
@@ -631,7 +633,8 @@ class Converter:
         self.subConverter.keywords = keywords
         self.subConverter.parseData(dataStr, number=number)
 
-    def parseURL(self, url, format=None, number=None, **keywords):  # @ReservedAssignment
+    def parseURL(self, url, *, format=None, number=None,
+                 forceSource=False, **keywords):  # @ReservedAssignment
         '''Given a url, download and parse the file
         into a music21 Stream stored in the `stream`
         property of the converter object.
@@ -639,11 +642,15 @@ class Converter:
         Note that this checks the user Environment
         `autoDownload` setting before downloading.
 
+        Use `forceSource=True` to download every time rather than read from a cached file.
+
         >>> jeanieLightBrownURL = ('https://github.com/cuthbertLab/music21/raw/master' +
         ...        '/music21/corpus/leadSheet/fosterBrownHair.mxl')
         >>> c = converter.Converter()
         >>> #_DOCS_SHOW c.parseURL(jeanieLightBrownURL)
         >>> #_DOCS_SHOW jeanieStream = c.stream
+
+        Changed in v.7 -- made keyword-only and added `forceSource` option.
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload in ('deny', 'ask'):
@@ -670,7 +677,7 @@ class Converter:
         dst = self._getDownloadFp(directory, ext, url)  # returns pathlib.Path
         urlretrieve = urllib.request.urlretrieve
 
-        if not dst.exists():
+        if forceSource is True or not dst.exists():
             try:
                 environLocal.printDebug(['downloading to:', str(dst)])
                 fp, unused_headers = urlretrieve(url, filename=str(dst))
@@ -1041,14 +1048,17 @@ def parseData(dataStr, number=None, format=None, **keywords):  # @ReservedAssign
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-def parseURL(url, number=None, format=None, forceSource=False, **keywords):  # @ReservedAssignment
+def parseURL(url, *, format=None, number=None,
+             forceSource=False, **keywords):  # @ReservedAssignment
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
     URL downloading will not happen automatically unless the user has set their
     Environment "autoDownload" preference to "allow".
+
+    Changed in v.7 -- made keyword-only.
     '''
     v = Converter()
-    v.parseURL(url, format=format, **keywords)
+    v.parseURL(url, format=format, forceSource=forceSource, **keywords)
     return v.stream
 
 
@@ -1213,6 +1223,11 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') ->
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note F>
         {4.0} <music21.bar.Barline type=final>
+
+    OMIT_FROM_DOCS
+
+    >>> import os
+    >>> os.remove(fp)
     '''
     from music21 import freezeThaw
     v = freezeThaw.StreamFreezer(streamObj, fastButUnsafe=fastButUnsafe)
@@ -1296,39 +1311,17 @@ def _osCanLoad(fp: str) -> bool:
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
-    # interpreter loading
+class TestSlow(unittest.TestCase):  # pragma: no cover
 
     def testMusicXMLConversion(self):
         from music21.musicxml import testFiles
-        for mxString in testFiles.ALL:  # @UndefinedVariable
+        for mxString in testFiles.ALL:
             a = subConverters.ConverterMusicXML()
             a.parseData(mxString)
 
-    def testMusicXMLTabConversion(self):
-        from music21.musicxml import testFiles
 
-        mxString = testFiles.ALL[5]  # @UndefinedVariable
-        a = subConverters.ConverterMusicXML()
-        a.parseData(mxString)
-
-        b = parseData(mxString)
-        b.show('text')
-
-        # {0.0} <music21.metadata.Metadata object at 0x04501CD0>
-        # {0.0} <music21.stream.Part Electric Guitar>
-        #    {0.0} <music21.instrument.Instrument P0: Electric Guitar: >
-        #    {0.0} <music21.stream.Measure 0 offset=0.0>
-        #        {0.0} <music21.layout.StaffLayout distance None, ...staffLines 6>
-        #        {0.0} <music21.clef.TabClef>
-        #        {0.0} <music21.tempo.MetronomeMark animato Quarter=120.0>
-        #        {0.0} <music21.key.KeySignature of no sharps or flats, mode major>
-        #        {0.0} <music21.meter.TimeSignature 4/4>
-        #        {0.0} <music21.note.Note F>
-        #        {2.0} <music21.note.Note F#>
-
-        b.show()
-        pass
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testConversionMusicXml(self):
         c = stream.Score()
@@ -1343,26 +1336,42 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
         c.append(a[0])
         c.append(b[0])
-        c.show()
+        if self.show:
+            c.show()
         # TODO: this is only showing the minimum number of measures
-
-    def testParseURL(self):
-        urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
-        urlB = urlBase + 'schubert/piano/d0576&file=d0576-06.krn&f=kern'
-        urlC = urlBase + 'bach/cello&file=bwv1007-01.krn&f=xml'
-        for url in [urlB, urlC]:
-            try:
-                unused_post = parseURL(url)
-            except:
-                print(url)
-                raise
 
     def testFreezer(self):
         from music21 import corpus
         s = corpus.parse('bach/bwv66.6.xml')
         fp = freeze(s)
         s2 = thaw(fp)
-        s2.show()
+        if self.show:
+            s2.show()
+        os.remove(fp)
+
+    def testMusicXMLTabConversion(self):
+        from music21.musicxml import testFiles
+
+        mxString = testFiles.ALL[5]
+        a = subConverters.ConverterMusicXML()
+        a.parseData(mxString)
+
+        b = parseData(mxString)
+        if self.show:
+            b.show('text')
+            b.show()
+
+        # {0.0} <music21.metadata.Metadata object at 0x04501CD0>
+        # {0.0} <music21.stream.Part Electric Guitar>
+        #    {0.0} <music21.instrument.Instrument P0: Electric Guitar: >
+        #    {0.0} <music21.stream.Measure 0 offset=0.0>
+        #        {0.0} <music21.layout.StaffLayout distance None, ...staffLines 6>
+        #        {0.0} <music21.clef.TabClef>
+        #        {0.0} <music21.tempo.MetronomeMark animato Quarter=120.0>
+        #        {0.0} <music21.key.KeySignature of no sharps or flats, mode major>
+        #        {0.0} <music21.meter.TimeSignature 4/4>
+        #        {0.0} <music21.note.Note F>
+        #        {2.0} <music21.note.Note F#>
 
 
 class Test(unittest.TestCase):
@@ -1474,7 +1483,7 @@ class Test(unittest.TestCase):
                 self.assertEqual(knownSize[i], len(chords[i].pitches))
 
     def testConversionMXBeams(self):
-
+        from music21 import note
         from music21.musicxml import testPrimitive
 
         mxString = testPrimitive.beams01
@@ -1483,7 +1492,7 @@ class Test(unittest.TestCase):
         notes = part.flat.notesAndRests
         beams = []
         for n in notes:
-            if 'Note' in n.classes:
+            if isinstance(n, note.Note):
                 beams += n.beams.beamsList
         self.assertEqual(len(beams), 152)
 
@@ -1513,8 +1522,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(clefs), 18)
 
     def testConversionMXClefTimeCorpus(self):
-
-        from music21 import corpus, clef, meter
+        from music21 import corpus
+        from music21 import clef
+        from music21 import meter
         a = corpus.parse('luca')
 
         # there should be only one clef in each part
@@ -1569,12 +1579,12 @@ class Test(unittest.TestCase):
     def testConversionMXMetadata(self):
         from music21.musicxml import testFiles
 
-        a = parse(testFiles.mozartTrioK581Excerpt)  # @UndefinedVariable
+        a = parse(testFiles.mozartTrioK581Excerpt)
         self.assertEqual(a.metadata.composer, 'Wolfgang Amadeus Mozart')
         self.assertEqual(a.metadata.title, 'Quintet for Clarinet and Strings')
         self.assertEqual(a.metadata.movementName, 'Menuetto (Excerpt from Second Trio)')
 
-        a = parse(testFiles.binchoisMagnificat)  # @UndefinedVariable
+        a = parse(testFiles.binchoisMagnificat)
         self.assertEqual(a.metadata.composer, 'Gilles Binchois')
         # this gets the best title available, even though this is movement title
         self.assertEqual(a.metadata.title, 'Excerpt from Magnificat secundi toni')
@@ -1662,7 +1672,10 @@ class Test(unittest.TestCase):
         parse(data)
 
     def testConversionMidiNotes(self):
-        from music21 import meter, key, chord, note
+        from music21 import meter
+        from music21 import key
+        from music21 import chord
+        from music21 import note
 
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test01.mid'
         # a simple file created in athenacl
@@ -1678,7 +1691,7 @@ class Test(unittest.TestCase):
         # environLocal.printDebug(['\n' + 'opening fp', fp])
 
         self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 2)
-        self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 4)
+        self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 5)
 
         # MIDI import makes measures, so we will have one 4/4 time sig
         self.assertEqual(len(s.flat.getElementsByClass(meter.TimeSignature)), 1)
@@ -1939,13 +1952,29 @@ class Test(unittest.TestCase):
             parse('nonexistent_path_ending_in_correct_extension.musicxml')
 
     def testParseURL(self):
-        urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
-        url = urlBase + 'chopin/prelude&file=prelude28-20.krn&format=kern'
+        from music21.humdrum.spineParser import HumdrumException
+
+        urlBase = 'https://raw.githubusercontent.com/craigsapp/chopin-preludes/'
+        url = urlBase + 'f8fb01f09d717e84929fb8b2950f96dd6bc05686/kern/prelude28-20.krn'
 
         e = environment.Environment()
         e['autoDownload'] = 'allow'
         s = parseURL(url)
         self.assertEqual(len(s.parts), 2)
+
+        # This file should have been written, above
+        destFp = Converter()._getDownloadFp(e.getRootTempDir(), '.krn', url)
+        # Hack garbage into it so that we can test whether or not forceSource works
+        with open(destFp, 'a') as fp:
+            fp.write('all sorts of garbage that Humdrum cannot parse')
+
+        with self.assertRaises(HumdrumException):
+            s = parseURL(url, forceSource=False)
+
+        s = parseURL(url, forceSource=True)
+        self.assertEqual(len(s.parts), 2)
+
+        os.remove(destFp)
 
 
 # ------------------------------------------------------------------------------
@@ -1958,5 +1987,3 @@ if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)  # , runTest='testConverterFromPath')
-
-

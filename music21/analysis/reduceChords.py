@@ -72,7 +72,7 @@ class ChordReducer:
             closedPosition=False,
             forbiddenChords=None,
             maximumNumberOfChords=3):
-        if 'Score' not in inputScore.classes:
+        if not isinstance(inputScore, stream.Score):
             raise ChordReducerException("Must be called on a stream.Score")
 
         if allowableChords is not None:
@@ -696,7 +696,8 @@ class Test(unittest.TestCase):
             s.append(c)
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testTrecentoMadrigal(self):
         from music21 import corpus
@@ -726,7 +727,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         for part in reduction:
             score.insert(0, part)
 
-        score.show()
+        if self.show:
+            score.show()
 
 
 # -----------------------------------------------------------------------------

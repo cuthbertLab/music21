@@ -125,7 +125,7 @@ def camelCaseToHyphen(usrStr: str, replacement: str = '-') -> str:
     The replacement can be specified to be something besides a hyphen, but only
     a single character and not (for internal reasons) an uppercase character.
 
-    code from http://stackoverflow.com/questions/1175208/
+    code from https://stackoverflow.com/questions/1175208/
         elegant-python-function-to-convert-camelcase-to-camel-case
 
     >>> common.camelCaseToHyphen('movementName')
@@ -352,5 +352,5 @@ def removePunctuation(s: str) -> str:
 # -----------------------------------------------------------------------------
 
 if __name__ == '__main__':
-    import music21  # @Reimport
+    import music21
     music21.mainTest()

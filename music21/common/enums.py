@@ -115,6 +115,24 @@ class StrEnum(str, Enum, metaclass=StrEnumMeta):
         return str(self.value)
 
 
+class ElementSearch(StrEnum):
+    '''
+    An enum representing the element search directions that can be provided
+    to :meth:`~music21.base.Music21Object.getContextByClass`.
+    '''
+    BEFORE = 'getElementBefore'
+    AFTER = 'getElementAfter'
+    AT_OR_BEFORE = 'getElementAtOrBefore'
+    AT_OR_AFTER = 'getElementAtOrAfter'
+    BEFORE_OFFSET = 'getElementBeforeOffset'
+    AFTER_OFFSET = 'getElementAfterOffset'
+    AT_OR_BEFORE_OFFSET = 'getElementAtOrBeforeOffset'
+    AT_OR_AFTER_OFFSET = 'getElementAtOrAfterOffset'
+    BEFORE_NOT_SELF = 'getElementBeforeNotSelf'
+    AFTER_NOT_SELF = 'getElementAfterNotSelf'
+    ALL = 'all'
+
+
 class OffsetSpecial(StrEnum):
     '''
     An enum that represents special offsets.
@@ -132,6 +150,8 @@ class OffsetSpecial(StrEnum):
     False
     >>> 'lowestOffset' in OffsetSpecial
     True
+    >>> str(OffsetSpecial.AT_END)
+    'highestTime'
 
     New in v7.
     '''

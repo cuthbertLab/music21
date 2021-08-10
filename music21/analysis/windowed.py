@@ -56,7 +56,7 @@ class WindowedAnalysis:
     def __init__(self, streamObj, analysisProcessor):
         self.processor = analysisProcessor
         # environLocal.printDebug(self.processor)
-        if 'Stream' not in streamObj.classes:
+        if not isinstance(streamObj, stream.Stream):
             raise WindowedAnalysisException('non-stream provided as argument')
         if streamObj.hasPartLikeStreams():
             raise WindowedAnalysisException('part-like substreams are not supported; use .flat')
@@ -354,7 +354,7 @@ class WindowedAnalysis:
 
 
 # -----------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     pass
 
 
@@ -445,7 +445,8 @@ class Test(unittest.TestCase):
 
     def testVariableWindowing(self):
         from music21.analysis import discrete
-        from music21 import corpus, graph
+        from music21 import corpus
+        from music21 import graph
 
         p = discrete.KrumhanslSchmuckler()
         s = corpus.parse('bach/bwv66.6')

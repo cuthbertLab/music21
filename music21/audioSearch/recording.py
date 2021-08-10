@@ -14,12 +14,13 @@ modules for audio searching that directly record from the microphone.
 
 Requires PyAudio and portaudio to be installed (http://www.portaudio.com/download.html)
 
-To download pyaudio for windows 64-bit go to http://www.lfd.uci.edu/~gohlke/pythonlibs/
+To download pyaudio for windows 64-bit go to https://www.lfd.uci.edu/~gohlke/pythonlibs/
 
 users of 64-bit windows but 32-bit python should download the win32 port
 
 users of 64-bit windows and 64-bit python should download the amd64 port
 '''
+from importlib.util import find_spec
 import unittest
 import wave
 
@@ -32,7 +33,7 @@ environLocal = environment.Environment(_MOD)
 
 
 ###
-# to download pyaudio for windows 64-bit go to http://www.lfd.uci.edu/~gohlke/pythonlibs/
+# to download pyaudio for windows 64-bit go to https://www.lfd.uci.edu/~gohlke/pythonlibs/
 # users of 64-bit windows but 32-bit python should download the win32 port
 # users of 64-bit windows and 64-bit python should download the amd64 port
 # requires portaudio to be installed http://www.portaudio.com/download.html
@@ -53,14 +54,9 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
 
     Returns a list of samples.
     '''
-    try:
-        # noinspection PyPackageRequirements
-        import pyaudio  # @UnresolvedImport
-        recordFormatDefault = pyaudio.paInt16
-    except (ImportError, SystemExit):
-        pyaudio = None
-        environLocal.warn("No Pyaudio found. Recording will probably not work.")
-        recordFormatDefault = 8  # pyaudio.paInt16
+    # noinspection PyPackageRequirements
+    import pyaudio  # @UnresolvedImport  # pylint: disable=import-error
+    recordFormatDefault = pyaudio.paInt16
 
     if recordFormat is None:
         recordFormat = recordFormatDefault
@@ -116,8 +112,16 @@ class Test(unittest.TestCase):
     pass
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
 
+
+class TestExternal(unittest.TestCase):  # pragma: no cover
+    loader = find_spec('pyaudio')
+    if loader is not None:  # pragma: no cover
+        pyaudio_installed = True
+    else:
+        pyaudio_installed = False
+
+    @unittest.skipUnless(pyaudio_installed, 'pyaudio must be installed')
     def testRecording(self):
         '''
         record one second of data and print 10 records

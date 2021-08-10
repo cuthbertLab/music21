@@ -131,7 +131,8 @@ class PartStaffExporterMixin:
         >>> len(staffTags)
         2
         '''
-        for group in self.joinableGroups():
+        self.joinedGroups = self.joinableGroups()
+        for group in self.joinedGroups:
             self.addStaffTagsMultiStaffParts(group)
             self.movePartStaffMeasureContents(group)
             self.setEarliestAttributesAndClefsPartStaff(group)
@@ -283,13 +284,6 @@ class PartStaffExporterMixin:
             <staff>2</staff>
           </note>
         </measure>
-
-        Fails if attempted a second time:
-
-        >>> root = SX.parse()
-        Traceback (most recent call last):
-        music21.musicxml.xmlObjects.MusicXMLExportException:
-            In part (MusicXML Part), measure (1): Attempted to create a second <staff> tag
         '''
         initialPartStaffRoot: Optional[Element] = None
         for i, ps in enumerate(group):
@@ -595,10 +589,6 @@ class PartStaffExporterMixin:
         by a single :class:`~music21.musicxml.m21ToXml.PartExporter`, remove any
         obsolete `PartExporter` from `self.partExporterList`.
 
-        In addition, remove any obsolete `PartStaff` from the `StaffGroup`
-        (in the deepcopied stream used for exporting) to ensure <part-group type="stop" />
-        is written.
-
         Called by :meth:`joinPartStaffs`
 
         >>> from music21.musicxml import testPrimitive
@@ -611,9 +601,6 @@ class PartStaffExporterMixin:
         >>> SX.postPartProcess()
         >>> len(SX.partExporterList)
         1
-        >>> partGroupStop = SX.xmlRoot.findall('.//part-group')[1]
-        >>> SX.dump(partGroupStop)
-        <part-group number="1" type="stop" />
         '''
         for ps in group[1:]:
             partStaffRoot: Element = self.getRootForPartStaff(ps)
@@ -621,8 +608,6 @@ class PartStaffExporterMixin:
             # noinspection PyAttributeOutsideInit
             self.partExporterList = [pex for pex in self.partExporterList
                                         if pex.xmlRoot != partStaffRoot]
-            # Replace PartStaff in StaffGroup -- ensures <part-group number="1" type="stop" />
-            group.replaceSpannedElement(ps, group.getFirst())
 
     @staticmethod
     def moveMeasureContents(measure: Element, otherMeasure: Element, staffNumber: int):
@@ -944,6 +929,18 @@ class Test(unittest.TestCase):
         SX.scorePreliminaries()
         SX.parsePartlikeScore()
         self.assertEqual(len(SX.joinableGroups()), 1)
+
+    def testJoinPartStaffsAgain(self):
+        '''
+        Regression test for side effects on the stream passed to ScoreExporter
+        preventing it from being written out again.
+        '''
+        from music21 import corpus
+        from music21.musicxml.m21ToXml import ScoreExporter
+        b = corpus.parse('cpebach')
+        SX = ScoreExporter(b)
+        SX.parse()
+        SX.parse()
 
 
 if __name__ == '__main__':

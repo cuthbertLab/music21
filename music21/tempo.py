@@ -141,9 +141,9 @@ class TempoIndication(base.Music21Object):
         if found is None:
             found = self
 
-        if 'MetricModulation' in found.classes:
+        if isinstance(found, MetricModulation):
             return found.newMetronome
-        elif 'MetronomeMark' in found.classes:
+        elif isinstance(found, MetronomeMark):
             return found
         elif 'TempoText' in found.classes:
             return found.getMetronomeMark()
@@ -168,7 +168,7 @@ class TempoIndication(base.Music21Object):
         # search for TempoIndication objects, not just MetronomeMark objects
         # must provide getElementBefore, as will otherwise return self
         obj = self.getContextByClass('TempoIndication',
-                                     getElementMethod='getElementBeforeOffset')
+                                     getElementMethod=common.enums.ElementSearch.BEFORE_OFFSET)
         if obj is None:
             return None  # nothing to do
         return self.getSoundingMetronomeMark(obj)
@@ -377,6 +377,9 @@ class MetronomeMark(TempoIndication):
     >>> tm2.number
     144
     '''
+    _DOC_ATTR = {
+        'placement': "Staff placement: 'above', 'below', or None.",
+    }
 
     def __init__(self, text=None, number=None, referent=None, parentheses=False):
         super().__init__()
@@ -397,6 +400,8 @@ class MetronomeMark(TempoIndication):
 
         # TODO: style??
         self.parentheses = parentheses
+
+        self.placement = None
 
         self._referent = None  # set with property
         if referent is None:
@@ -448,7 +453,7 @@ class MetronomeMark(TempoIndication):
         # assume ql value or a type string
         elif common.isNum(value) or isinstance(value, str):
             self._referent = duration.Duration(value)
-        elif 'Duration' not in value.classes:
+        elif not isinstance(value, duration.Duration):
             # try get duration object, like from Note
             self._referent = value.duration
         elif 'Duration' in value.classes:
@@ -1245,7 +1250,7 @@ def interpolateElements(element1, element2, sourceStream,
 
     scaleAmount = ((endOffsetDest - startOffsetDest) / (endOffsetSrc - startOffsetSrc))
 
-    interpolatedElements = sourceStream.iter.getElementsByOffset(
+    interpolatedElements = sourceStream.getElementsByOffset(
         offsetStart=startOffsetSrc,
         offsetEnd=endOffsetSrc
     )
@@ -1666,4 +1671,3 @@ _DOC_ORDER = [MetronomeMark, TempoText, MetricModulation, TempoIndication,
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testStylesAreShared')
-

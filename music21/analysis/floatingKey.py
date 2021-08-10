@@ -59,6 +59,22 @@ class KeyAnalyzer:
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>]
+
+    Fixed in v.7 -- analysis now incorporates final measures in pieces without pickup measures:
+
+    >>> tiny = converter.parse('tinyNotation: c1 e1 g1 c1 d-4 d-4 d-4 d-4')
+    >>> ka = analysis.floatingKey.KeyAnalyzer(tiny)
+    >>> ka.windowSize = 1
+    >>> ka.run()  # This previously only gave four elements: am, CM, CM, CM
+    [<music21.key.Key of a minor>, <music21.key.Key of C major>, <music21.key.Key of C major>,
+     <music21.key.Key of C major>, <music21.key.Key of b- minor>]
+
+    No measures will fail.
+
+    >>> s = stream.Part([note.Note()])
+    >>> ka = analysis.floatingKey.KeyAnalyzer(s)
+    Traceback (most recent call last):
+    music21.analysis.floatingKey.FloatingKeyException: Stream must have Measures inside it
     '''
     def __init__(self, s=None):
         if s is None:
@@ -70,7 +86,7 @@ class KeyAnalyzer:
 
         self.weightAlgorithm = divide
         if s.hasPartLikeStreams():
-            p = s.parts.first()
+            p = s.iter().parts.first()
         else:
             p = s
         self.numMeasures = len(p.getElementsByClass('Measure'))  # could be wrong for endings, etc.
@@ -84,7 +100,8 @@ class KeyAnalyzer:
     def getRawKeyByMeasure(self):
         keyByMeasure = []
         for i in range(self.numMeasures):
-            m = self.stream.measure(i)
+            # now `m` is a measure-slice of the entire stream
+            m = self.stream.measure(i, indicesNotNumbers=True)
             if m is None or not m.recurse().notes:
                 k = None
             else:
@@ -93,15 +110,16 @@ class KeyAnalyzer:
         self.rawKeyByMeasure = keyByMeasure
         return keyByMeasure
 
-    def getInterpretationByMeasure(self, mNumber):
+    def getInterpretationByMeasure(self, mIndex):
         '''
         Returns a dictionary of interpretations for the measure.
+        `mIndex` is 0-indexed.
         '''
-        if mNumber in self._interpretationMeasureDict:
-            return self._interpretationMeasureDict[mNumber]  # CACHE
+        if mIndex in self._interpretationMeasureDict:
+            return self._interpretationMeasureDict[mIndex]  # CACHE
         if not self.rawKeyByMeasure:
             self.getRawKeyByMeasure()
-        mk = self.rawKeyByMeasure[mNumber]
+        mk = self.rawKeyByMeasure[mIndex]
         if mk is None:
             return None
         # noinspection PyDictCreation
@@ -109,7 +127,7 @@ class KeyAnalyzer:
         interpretations[mk.tonicPitchNameWithCase] = mk.correlationCoefficient
         for otherKey in mk.alternateInterpretations:
             interpretations[otherKey.tonicPitchNameWithCase] = otherKey.correlationCoefficient
-        self._interpretationMeasureDict[mNumber] = interpretations
+        self._interpretationMeasureDict[mIndex] = interpretations
         return copy.copy(interpretations)  # for manipulating
 
     def smoothInterpretationByMeasure(self):

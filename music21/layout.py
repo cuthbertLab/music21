@@ -597,7 +597,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
     >>> firstSystem
     <music21.layout.System ...>
-    >>> 'Score' in firstSystem.classes
+    >>> isinstance(firstSystem, stream.Score)
     True
 
     Each System has staves (layout.Staff objects) not parts, though Staff is a subclass of Part
@@ -607,7 +607,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     5
     >>> secondStaff
     <music21.layout.Staff ...>
-    >>> 'Part' in secondStaff.classes
+    >>> isinstance(secondStaff, stream.Part)
     True
     '''
     def getRichSystemLayout(inner_allSystemLayouts):
@@ -635,7 +635,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     scoreLists.measureStart = firstMeasureNumber
     scoreLists.measureEnd = lastMeasureNumber
     for el in scoreIn:
-        if 'Part' not in el.classes:
+        if not isinstance(el, stream.Part):
             if 'ScoreLayout' in el.classes:
                 scoreLists.scoreLayout = el
             scoreLists.insert(scoreIn.elementOffset(el), el)
@@ -658,7 +658,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
             thisPageAll = scoreIn.measures(pageStartM, pageEndM)
         thisPage.systemStart = systemNumber + 1
         for el in thisPageAll:
-            if 'Part' not in el.classes and 'StaffGroup' not in el.classes:
+            if not isinstance(el.classes and 'StaffGroup' not in el, stream.Part):
                 thisPage.insert(thisPageAll.elementOffset(el), el)
         firstMeasureOfFirstPart = thisPageAll.parts.first().getElementsByClass('Measure').first()
         for el in firstMeasureOfFirstPart:
@@ -861,7 +861,7 @@ class LayoutScore(stream.Opus):
 
 
         >>> #_DOCS_SHOW g = corpus.parse('luca/gloria')
-        >>> #_DOCS_SHOW m22 = g.parts[0].iter.getElementsByClass('Measure')[22]
+        >>> #_DOCS_SHOW m22 = g.parts[0].getElementsByClass('Measure')[22]
         >>> #_DOCS_SHOW m22.getElementsByClass('PageLayout').first().leftMargin = 204.0
         >>> #_DOCS_SHOW gl = layout.divideByPages(g)
         >>> #_DOCS_SHOW gl.getMarginsAndSizeForPageId(1)
@@ -1196,7 +1196,7 @@ class LayoutScore(stream.Opus):
                 f'No measures found in pageId {pageId}, systemId {systemId}, staffId {staffId}'
             )
 
-        allStaffLayouts = firstMeasureOfStaff.iter.getElementsByClass('StaffLayout')
+        allStaffLayouts = firstMeasureOfStaff.getElementsByClass('StaffLayout')
         if allStaffLayouts:
             # print('Got staffLayouts: ')
             for slTemp in allStaffLayouts:
@@ -1252,7 +1252,7 @@ class LayoutScore(stream.Opus):
 
         staffSize = staffSizeBase
 
-        allStaffLayouts = list(firstMeasureOfStaff.iter.getElementsByClass('StaffLayout'))
+        allStaffLayouts = list(firstMeasureOfStaff.getElementsByClass('StaffLayout'))
         if allStaffLayouts:
             # print('Got staffLayouts: ')
             staffLayoutObj = allStaffLayouts[0]
@@ -1302,7 +1302,7 @@ class LayoutScore(stream.Opus):
         thisStaff = self.pages[pageId].systems[systemId].staves[staffId]
 
         staffLayoutObject = None
-        allStaffLayoutObjects = list(thisStaff.flat.iter.getElementsByClass('StaffLayout'))
+        allStaffLayoutObjects = list(thisStaff.flat.getElementsByClass('StaffLayout'))
         if allStaffLayoutObjects:
             staffLayoutObject = allStaffLayoutObjects[0]
         if staffLayoutObject is None or staffLayoutObject.hidden is None:
@@ -1477,7 +1477,7 @@ class LayoutScore(stream.Opus):
                 # first system is hidden, thus has no width information
                 for j in range(1, len(thisSystemStaves)):
                     searchOtherStaffForWidth = thisSystemStaves[j]
-                    searchIter = searchOtherStaffForWidth.iter
+                    searchIter = searchOtherStaffForWidth.iter()
                     searchOtherStaffMeasure = searchIter.getElementsByClass('Measure')[i]
                     if searchOtherStaffMeasure.layoutWidth is not None:
                         currentWidth = searchOtherStaffMeasure.layoutWidth

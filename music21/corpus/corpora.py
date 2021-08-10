@@ -120,7 +120,6 @@ class Corpus(prebase.ProtoM21Object):
         '.midi'
         '.xml'
         '.mxl'
-        '.mx'
         '.musicxml'
         '.md'
         '.musedata'
@@ -142,10 +141,10 @@ class Corpus(prebase.ProtoM21Object):
         It does not matter if you choose a canonical name or not, the output is the same:
 
         >>> coreCorpus._translateExtensions('.musicxml', True)
-        ['.xml', '.mxl', '.mx', '.musicxml']
+        ['.xml', '.mxl', '.musicxml']
 
         >>> coreCorpus._translateExtensions('.xml', True)
-        ['.xml', '.mxl', '.mx', '.musicxml']
+        ['.xml', '.mxl', '.musicxml']
         '''
         if not common.isListLike(fileExtensions):
             fileExtensions = [fileExtensions]
@@ -946,7 +945,7 @@ class LocalCorpus(Corpus):
 #         className = getattr(virtual, corpusName)
 #         if callable(className):
 #             obj = className()
-#             if isinstance(obj, virtual.VirtualWork):  # @UndefinedVariable
+#             if isinstance(obj, virtual.VirtualWork):
 #                 if obj.corpusPath is not None:
 #                     _virtualWorks.append(obj)
 #     del corpusName
