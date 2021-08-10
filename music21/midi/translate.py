@@ -1728,7 +1728,7 @@ def getMetaEvents(events):
     from music21.midi import MetaEvents, ChannelVoiceMessages
 
     metaEvents = []  # store pairs of abs time, m21 object
-    last_program: int = 0
+    last_program: int = -1
     for eventTuple in events:
         t, e = eventTuple
         metaObj = None
@@ -1743,7 +1743,9 @@ def getMetaEvents(events):
             # midiEventsToInstrument() WILL NOT have knowledge of the current
             # program, so set it here
             metaObj = midiEventsToInstrument(e)
-            metaObj.midiProgram = last_program
+            if last_program != -1:
+                # Only update if we have had an initial PROGRAM_CHANGE
+                metaObj.midiProgram = last_program
         elif e.type == ChannelVoiceMessages.PROGRAM_CHANGE:
             # midiEventsToInstrument() WILL set the program on the instance
             metaObj = midiEventsToInstrument(e)
@@ -3918,6 +3920,10 @@ class Test(unittest.TestCase):
         # Second element of the tuple is the instrument instance
         self.assertEqual(meta_event_pairs[0][1].midiProgram, 0)
         self.assertEqual(meta_event_pairs[1][1].midiProgram, 0)
+
+        # Remove the initial PROGRAM_CHANGE and get a default midiProgram
+        meta_event_pairs = getMetaEvents([(DUMMY_DELTA_TIME, event2)])
+        self.assertEqual(meta_event_pairs[0][1].midiProgram, 53)
 
 
 # ------------------------------------------------------------------------------
