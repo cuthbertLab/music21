@@ -1728,7 +1728,8 @@ def getMetaEvents(events):
     from music21.midi import MetaEvents, ChannelVoiceMessages
 
     metaEvents = []  # store pairs of abs time, m21 object
-    for i, eventTuple in enumerate(events):
+    last_program: int = 0
+    for eventTuple in events:
         t, e = eventTuple
         metaObj = None
         if e.type == MetaEvents.TIME_SIGNATURE:
@@ -1739,9 +1740,14 @@ def getMetaEvents(events):
         elif e.type == MetaEvents.SET_TEMPO:
             metaObj = midiEventsToTempo(e)
         elif e.type in (MetaEvents.INSTRUMENT_NAME, MetaEvents.SEQUENCE_TRACK_NAME):
+            # midiEventsToInstrument() WILL NOT have knowledge of the current
+            # program, so set it here
             metaObj = midiEventsToInstrument(e)
+            metaObj.midiProgram = last_program
         elif e.type == ChannelVoiceMessages.PROGRAM_CHANGE:
+            # midiEventsToInstrument() WILL set the program on the instance
             metaObj = midiEventsToInstrument(e)
+            last_program = e.data
         elif e.type == MetaEvents.MIDI_PORT:
             pass
         else:
@@ -3884,6 +3890,34 @@ class Test(unittest.TestCase):
         # to be conductor tracks
         # https://github.com/cuthbertLab/music21/issues/1013
         streamToMidiFile(p)
+
+    def testImportInstrumentsWithoutProgramChanges(self):
+        '''
+        Instrument instances are created from both program changes and
+        track or sequence names. In case the information is redundant,
+        do not let there be a default MIDI program on the instrument created
+        from the name--we should defer to the active patch number.
+        https://github.com/cuthbertLab/music21/issues/1085
+        '''
+        from music21 import midi as midiModule
+
+        event1 = midiModule.MidiEvent()
+        event1.data = 0
+        event1.channel = 1
+        event1.type = midiModule.ChannelVoiceMessages.PROGRAM_CHANGE
+
+        event2 = midiModule.MidiEvent()
+        # This will normalize to an instrument.Soprano, but we don't want
+        # the default midiProgram, we want 0.
+        event2.data = b'Soprano'
+        event2.channel = 2
+        event2.type = midiModule.MetaEvents.SEQUENCE_TRACK_NAME
+
+        DUMMY_DELTA_TIME = None
+        meta_event_pairs = getMetaEvents([(DUMMY_DELTA_TIME, event1), (DUMMY_DELTA_TIME, event2)])
+        # Second element of the tuple is the instrument instance
+        self.assertEqual(meta_event_pairs[0][1].midiProgram, 0)
+        self.assertEqual(meta_event_pairs[1][1].midiProgram, 0)
 
 
 # ------------------------------------------------------------------------------
