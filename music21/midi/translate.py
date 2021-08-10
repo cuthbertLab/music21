@@ -3895,7 +3895,7 @@ class Test(unittest.TestCase):
         '''
         Instrument instances are created from both program changes and
         track or sequence names. Since we have a MIDI file, we should not
-        rely on default MIDI programs defined in the instrument file; we
+        rely on default MIDI programs defined in the instrument module; we
         should just keep track of the active program number.
         https://github.com/cuthbertLab/music21/issues/1085
         '''
