@@ -38,7 +38,7 @@ the data to make a histogram of scale degree usage within a key:
 
 >>> degreeDictionary = {}
 >>> for el in monteverdi.recurse():
-...    if 'RomanNumeral' in el.classes:
+...    if isinstance(el, roman.RomanNumeral):
 ...         print(f'{el.figure} {el.key}')
 ...         for p in el.pitches:
 ...              degree, accidental = el.key.getScaleDegreeAndAccidentalFromPitch(p)
@@ -1278,7 +1278,7 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
 
         # make sure a normal file is still a Score
         s = converter.parse(testFiles.riemenschneider001)
-        self.assertTrue('Score' in s.classes)
+        self.assertTrue(isinstance(s, stream.Score))
 
 
 class Test(unittest.TestCase):

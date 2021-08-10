@@ -1206,7 +1206,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         currentMeasureOffset = 0
         hasMeasureOne = False
         for el in streamIn:
-            if 'Stream' in el.classes:
+            if isinstance(el, stream.Stream):
                 if currentMeasureNumber != 0 or currentMeasure:
                     currentMeasure.coreElementsChanged()
                     # streamOut.append(currentMeasure)
@@ -1237,7 +1237,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
                 m1.number = 1
             beginningStuff = streamOut.getElementsByOffset(0)
             for el in beginningStuff:
-                if 'Stream' in el.classes:
+                if isinstance(el, stream.Stream):
                     pass
                 elif 'MiscTandem' in el.classes:
                     pass
@@ -1834,7 +1834,7 @@ class SpineCollection(prebase.ProtoM21Object):
             voiceNumber += 1
             voiceStr = 'voice' + str(voiceNumber)
             for insertEl in insertSpine.stream._elements:
-                if insertSpine.isFirstVoice is False and 'Measure' in insertEl.classes:
+                if insertSpine.isFirstVoice is False and isinstance(insertEl, stream.Measure):
                     pass  # only insert one measure object per spine
                 else:
                     insertEl.groups.append(voiceStr)
@@ -1938,7 +1938,7 @@ class SpineCollection(prebase.ProtoM21Object):
                     break
             if thisSpine.spineType == 'dynam':
                 for dynamic in thisSpine.stream.flat:
-                    if 'Dynamic' in dynamic.classes:
+                    if isinstance(dynamic, dynamics.Dynamic):
                         prioritiesToSearch[dynamic.humdrumPosition] = dynamic
                 for applyStaff in stavesAppliedTo:
                     applyStream = kernStreams[applyStaff]
@@ -1955,7 +1955,7 @@ class SpineCollection(prebase.ProtoM21Object):
                             #    copy.deepcopy(prioritiesToSearch[el.priority]))
             elif thisSpine.spineType == 'harm':
                 for harm in thisSpine.stream.flat:
-                    if 'RomanNumeral' in harm.classes:
+                    if isinstance(harm, roman.RomanNumeral):
                         prioritiesToSearch[harm.humdrumPosition] = harm
                 for applyStaff in stavesAppliedTo:
                     applyStream = kernStreams[applyStaff]

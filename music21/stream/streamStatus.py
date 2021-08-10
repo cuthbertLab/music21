@@ -203,7 +203,8 @@ class Test(unittest.TestCase):
 
     def testHaveBeamsBeenMadeAfterDeepcopy(self):
         import copy
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         m = stream.Measure()
         c = note.Note('C4', type='quarter')
         m.append(c)

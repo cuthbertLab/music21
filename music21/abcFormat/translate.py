@@ -170,7 +170,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
         # append measure to part; in the case of trailing meta data
         # dst may be part, even though useMeasures is True
-        if useMeasures and 'Measure' in dst.classes:
+        if useMeasures and isinstance(dst, stream.Measure):
             # check for incomplete bars
             # must have a time signature in this bar, or defined recently
             # could use getTimeSignatures() on Stream
@@ -832,7 +832,8 @@ class Test(unittest.TestCase):
         # sMerged.show()
 
     def testChordSymbols(self):
-        from music21 import corpus, pitch
+        from music21 import corpus
+        from music21 import pitch
         # noinspection SpellCheckingInspection
         o = corpus.parse('nottingham-dataset/reelsa-c')
         self.assertEqual(len(o), 2)

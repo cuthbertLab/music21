@@ -1433,7 +1433,11 @@ class Test(unittest.TestCase):
         self.assertEqual(re.getTextExpression().content, 'd.s. al fine')
 
     def testExpandTurns(self):
-        from music21 import note, stream, clef, key, meter
+        from music21 import note
+        from music21 import stream
+        from music21 import clef
+        from music21 import key
+        from music21 import meter
         p1 = stream.Part()
         m1 = stream.Measure()
         m2 = stream.Measure()
@@ -1469,7 +1473,11 @@ class Test(unittest.TestCase):
 
 
     def testExpandTrills(self):
-        from music21 import note, stream, clef, key, meter
+        from music21 import note
+        from music21 import stream
+        from music21 import clef
+        from music21 import key
+        from music21 import meter
         p1 = stream.Part()
         m1 = stream.Measure()
         p1.append(clef.TrebleClef())
@@ -1491,7 +1499,10 @@ class Test(unittest.TestCase):
         '''Test basic wave line creation and output, as well as passing
         objects through make measure calls.
         '''
-        from music21 import stream, note, chord, expressions
+        from music21 import stream
+        from music21 import note
+        from music21 import chord
+        from music21 import expressions
         from music21.musicxml import m21ToXml
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)

@@ -21,7 +21,9 @@ import unittest
 from music21 import exceptions21
 from music21 import common
 from music21.common.objects import SlottedObjectMixin
+from music21 import dynamics
 from music21 import prebase
+from music21 import note  # circular but acceptable, because not used at highest level.
 
 from music21 import environment
 _MOD = 'volume'
@@ -130,7 +132,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             self.velocityIsRelative = other.velocityIsRelative
 
     def getRealizedStr(self,
-                       useDynamicContext: Union['music21.dynamics.Dynamic', bool] = True,
+                       useDynamicContext: Union[dynamics.Dynamic, bool] = True,
                        useVelocity=True,
                        useArticulations: Union[bool, 'music21.articulations.Articulation'] = True,
                        baseLevel=0.5,
@@ -151,7 +153,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def getRealized(
         self,
-        useDynamicContext: Union[bool, 'music21.dynamics.Dynamic'] = True,
+        useDynamicContext: Union[bool, dynamics.Dynamic] = True,
         useVelocity=True,
         useArticulations: Union[bool, 'music21.articulations.Articulation'] = True,
         baseLevel=0.5,
@@ -241,7 +243,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         if self.velocityIsRelative:
             if useDynamicContext is not False:
                 if (hasattr(useDynamicContext, 'classes')
-                        and 'Dynamic' in useDynamicContext.classes):
+                        and isinstance(useDynamicContext, dynamics.Dynamic)):
                     dm = useDynamicContext  # it is a dynamic
                 elif self.client is not None:
                     dm = self.getDynamicContext()  # dm may be None
@@ -323,7 +325,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     @client.setter
     def client(self, client):
         if client is not None:
-            if hasattr(client, 'classes') and 'NotRest' in client.classes:
+            if isinstance(client, note.NotRest):
                 self._client = common.wrapWeakref(client)
         else:
             self._client = None
@@ -447,7 +449,7 @@ def realizeVolume(srcStream,
 
     # check for any dynamics
     dynamicsAvailable = False
-    if flatSrc.getElementsByClass('Dynamic'):
+    if flatSrc.getElementsByClass(dynamics.Dynamic):
         dynamicsAvailable = True
     else:  # no dynamics available
         if useDynamicContext is True:  # only if True, and non avail, override
@@ -456,8 +458,8 @@ def realizeVolume(srcStream,
     if dynamicsAvailable:
         # extend durations of all dynamics
         # doing this in place as this is a destructive operation
-        flatSrc.extendDuration('Dynamic', inPlace=True)
-        elements = flatSrc.getElementsByClass('Dynamic')
+        flatSrc.extendDuration(dynamics.Dynamic, inPlace=True)
+        elements = flatSrc.getElementsByClass(dynamics.Dynamic)
         for e in elements:
             start = flatSrc.elementOffset(e)
             end = start + e.duration.quarterLength
@@ -470,7 +472,7 @@ def realizeVolume(srcStream,
     # key, avoiding searching through entire list every time
     lastRelevantKeyIndex = 0
     for e in flatSrc:  # iterate over all elements
-        if hasattr(e, 'volume') and 'NotRest' in e.classes:
+        if hasattr(e, 'volume') and isinstance(e, note.NotRest):
             # try to find a dynamic
             eStart = e.getOffsetBySite(flatSrc)
 
@@ -503,7 +505,7 @@ class Test(unittest.TestCase):
 
     def testBasic(self):
         import gc
-        from music21 import volume, note
+        from music21 import volume
 
         n1 = note.Note()
         v = volume.Volume(client=n1)
@@ -515,7 +517,8 @@ class Test(unittest.TestCase):
 
 
     def testGetContextSearchA(self):
-        from music21 import stream, note, volume, dynamics
+        from music21 import stream
+        from music21 import volume
 
         s = stream.Stream()
         d1 = dynamics.Dynamic('mf')
@@ -533,7 +536,7 @@ class Test(unittest.TestCase):
 
 
     def testGetContextSearchB(self):
-        from music21 import stream, note, dynamics
+        from music21 import stream
 
         s = stream.Stream()
         d1 = dynamics.Dynamic('mf')
@@ -550,7 +553,7 @@ class Test(unittest.TestCase):
 
     def testDeepCopyA(self):
         import copy
-        from music21 import volume, note
+        from music21 import volume
         n1 = note.Note()
 
         v1 = volume.Volume()
@@ -566,7 +569,7 @@ class Test(unittest.TestCase):
 
 
     def testGetRealizedA(self):
-        from music21 import volume, dynamics
+        from music21 import volume
 
         v1 = volume.Volume(velocity=64)
         self.assertEqual(v1.getRealizedStr(), '0.5')
@@ -615,7 +618,8 @@ class Test(unittest.TestCase):
 
 
     def testRealizeVolumeA(self):
-        from music21 import stream, dynamics, note, volume
+        from music21 import stream
+        from music21 import volume
 
         s = stream.Stream()
         s.repeatAppend(note.Note('g3'), 16)
@@ -669,7 +673,7 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testRealizeVolumeB(self):
-        from music21 import corpus, dynamics
+        from music21 import corpus
         s = corpus.parse('bwv66.6')
 
         durUnit = s.highestTime // 8  # let floor
@@ -725,7 +729,8 @@ class Test(unittest.TestCase):
 
 
     def testRealizeVolumeC(self):
-        from music21 import stream, note, articulations
+        from music21 import stream
+        from music21 import articulations
 
         s = stream.Stream()
         s.repeatAppend(note.Note('g3'), 16)

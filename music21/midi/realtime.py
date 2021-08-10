@@ -255,7 +255,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         doesn't work -- no matter what there's always at least a small lag, even with queues
         '''
         # pylint: disable=attribute-defined-outside-init
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         import random
 
         def getRandomStream():

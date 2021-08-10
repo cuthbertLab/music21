@@ -21,6 +21,7 @@ import copy
 
 from music21 import exceptions21
 
+from music21 import chord
 from music21 import clef
 from music21 import common
 from music21 import expressions
@@ -211,7 +212,7 @@ class ScoreReduction:
 
 
     def _setScore(self, value):
-        if 'Stream' not in value.classes:
+        if not isinstance(value, stream.Stream):
             raise ScoreReductionException('cannot set a non Stream')
         if value.hasPartLikeStreams:
             # make a local copy
@@ -236,7 +237,7 @@ class ScoreReduction:
 
 
     def _setChordReduction(self, value):
-        if 'Stream' not in value.classes:
+        if not isinstance(value, stream.Stream):
             raise ScoreReductionException('cannot set a non Stream')
         if value.hasPartLikeStreams():
             # make a local copy
@@ -465,7 +466,7 @@ class PartReduction:
     def __init__(self, srcScore=None, *args, **keywords):
         if srcScore is None:
             return
-        if 'Score' not in srcScore.classes:
+        if not isinstance(srcScore, stream.Score):
             raise PartReductionException('provided Stream must be Score')
         self._score = srcScore
         # an ordered list of dictionaries for
@@ -891,7 +892,8 @@ class PartReduction:
 class Test(unittest.TestCase):
 
     def testExtractionA(self):
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
         s = corpus.parse('bwv66.6')
         # s.show()
         s.parts[0].flat.notes[3].addLyric('test')
@@ -929,7 +931,8 @@ class Test(unittest.TestCase):
 
 
     def testExtractionB(self):
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
         s = corpus.parse('bwv66.6')
 
         s.parts[0].flat.notes[4].addLyric('::/o:6/v:1/tb:s/g:Ursatz')
@@ -950,7 +953,8 @@ class Test(unittest.TestCase):
         # post.show()
 
     def testExtractionC(self):
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
         # http://solomonsmusic.net/schenker.htm
         # shows extracting an Ursatz line
 
@@ -985,16 +989,17 @@ class Test(unittest.TestCase):
 
     def testExtractionD(self):
         # this shows a score, extracting a single pitch
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
 
         src = corpus.parse('schoenberg/opus19', 6)
         for n in src.flat.notes:
-            if 'Note' in n.classes:
+            if isinstance(n, note.Note):
                 if n.pitch.name == 'F#':
                     n.addLyric('::/p:f#/o:4')
         #                 if n.pitch.name == 'C':
         #                     n.addLyric('::/p:c/o:4/g:C')
-            elif 'Chord' in n.classes:
+            elif isinstance(n, chord.Chord):
                 if 'F#' in [p.name for p in n.pitches]:
                     n.addLyric('::/p:f#/o:4')
         #                 if 'C' in [p.name for p in n.pitches]:
@@ -1008,16 +1013,17 @@ class Test(unittest.TestCase):
 
     def testExtractionD2(self):
         # this shows a score, extracting a single pitch
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
 
         src = corpus.parse('schoenberg/opus19', 6)
         for n in src.flat.notes:
-            if 'Note' in n.classes:
+            if isinstance(n, note.Note):
                 if n.pitch.name == 'F#':
                     n.addLyric('::/p:f#/o:4/g:F#')
                 if n.pitch.name == 'C':
                     n.addLyric('::/p:c/o:4/g:C')
-            elif 'Chord' in n.classes:
+            elif isinstance(n, chord.Chord):
                 if 'F#' in [p.name for p in n.pitches]:
                     n.addLyric('::/p:f#/o:4/g:F#')
                 if 'C' in [p.name for p in n.pitches]:
@@ -1031,7 +1037,8 @@ class Test(unittest.TestCase):
 
 
     def testExtractionE(self):
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
 
         src = corpus.parse('corelli/opus3no1/1grave')
 
@@ -1046,8 +1053,8 @@ class Test(unittest.TestCase):
 
 
     def testPartReductionA(self):
-
-        from music21 import analysis, corpus
+        from music21 import analysis
+        from music21 import corpus
 
         s = corpus.parse('bwv66.6')
 
@@ -1092,7 +1099,9 @@ class Test(unittest.TestCase):
     def testPartReductionB(self, show=False):
         '''Artificially create test cases.
         '''
-        from music21 import dynamics, graph, analysis
+        from music21 import dynamics
+        from music21 import graph
+        from music21 import analysis
         durDynPairsA = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
         durDynPairsB = [(1, 'mf'), (3, 'f'), (2, 'p'), (4, 'ff'), (2, 'mf')]
 
@@ -1137,7 +1146,8 @@ class Test(unittest.TestCase):
     def testPartReductionC(self):
         '''Artificially create test cases.
         '''
-        from music21 import dynamics, analysis
+        from music21 import dynamics
+        from music21 import analysis
 
         s = stream.Score()
         p1 = stream.Part()
@@ -1171,7 +1181,8 @@ class Test(unittest.TestCase):
     def testPartReductionD(self):
         '''Artificially create test cases. Here, uses rests.
         '''
-        from music21 import dynamics, analysis
+        from music21 import dynamics
+        from music21 import analysis
 
         s = stream.Score()
         p1 = stream.Part()
@@ -1211,7 +1222,8 @@ class Test(unittest.TestCase):
     def testPartReductionE(self):
         '''Artificially create test cases.
         '''
-        from music21 import dynamics, analysis
+        from music21 import dynamics
+        from music21 import analysis
         s = stream.Score()
         p1 = stream.Part()
         p1.id = 0

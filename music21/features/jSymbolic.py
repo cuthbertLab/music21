@@ -4460,7 +4460,10 @@ def getCompletionStats():
 class Test(unittest.TestCase):
 
     def testAverageMelodicIntervalFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4475,7 +4478,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [6.0])
 
     def testMostCommonMelodicIntervalFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4490,7 +4496,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [5])
 
     def testDistanceBetweenMostCommonMelodicIntervalsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4504,7 +4513,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [2])
 
     def testMostCommonMelodicIntervalPrevalenceFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4518,7 +4530,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [0.5])
 
     def testRelativeStrengthOfMostCommonIntervalsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4532,7 +4547,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [0.75])
 
     def testNumberOfCommonMelodicIntervalsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4546,7 +4564,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [1])
 
     def testAmountOfArpeggiationFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4560,7 +4581,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [0.5])
 
     def testRepeatedNotesFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4574,7 +4598,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [0.5])
 
     def testChromaticMotionFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4588,7 +4615,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [0.5])
 
     def testStepwiseMotionFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4602,7 +4632,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [2 / 3])
 
     def testMelodicThirdsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4616,7 +4649,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [1 / 6])
 
     def testMelodicFifthsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4630,7 +4666,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [2 / 6])
 
     def testMelodicTritonesFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4644,7 +4683,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [1 / 6])
 
     def testMelodicOctavesFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4658,7 +4700,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [1 / 6])
 
     def testDirectionOfMotionFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         # all up
         s = stream.Stream()
         p = pitch.Pitch('c2')
@@ -4693,7 +4738,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [0.0])
 
     def testDurationOfMelodicArcsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         # all up
         # in jSymbolic implementation, all up means there
         # is no melodic arc and thus the average duration
@@ -4719,7 +4767,10 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(f.vector[0], 8 / 5)
 
     def testSizeOfMelodicArcsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         # all up
         s = stream.Stream()
         p = pitch.Pitch('c2')
@@ -4742,7 +4793,10 @@ class Test(unittest.TestCase):
         # self.assertAlmostEqual(f.vector[0], 1 + 2/3)
 
     def testNoteDensityFeatureA(self):
-        from music21 import stream, note, tempo, features
+        from music21 import stream
+        from music21 import note
+        from music21 import tempo
+        from music21 import features
         s = stream.Stream()
         s.insert(0, tempo.MetronomeMark(number=60))
         s.insert(0, note.Note(quarterLength=8))
@@ -4790,7 +4844,8 @@ class Test(unittest.TestCase):
                                  feImplemented, 'percent', feImplemented / feTotal])
 
     def testBeatHistogram(self):
-        from music21 import corpus, tempo
+        from music21 import corpus
+        from music21 import tempo
         sch = corpus.parse('schoenberg/opus19', 2)
         for p in sch.parts:
             p.insert(0, tempo.MetronomeMark('Langsam', 70))

@@ -977,7 +977,10 @@ class Sites(common.SlottedObjectMixin):
 
 class Test(unittest.TestCase):
     def testSites(self):
-        from music21 import note, stream, corpus, clef
+        from music21 import note
+        from music21 import stream
+        from music21 import corpus
+        from music21 import clef
 
         m = stream.Measure()
         m.number = 34

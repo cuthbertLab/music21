@@ -18170,7 +18170,12 @@ class Test(unittest.TestCase):
         '''
         Tests if there are mid-measure clefs clefs: single staff
         '''
-        from music21 import stream, note, clef, musicxml, converter, meter
+        from music21 import stream
+        from music21 import note
+        from music21 import clef
+        from music21 import musicxml
+        from music21 import converter
+        from music21 import meter
 
         orig_stream = stream.Stream()
         orig_stream.append(meter.TimeSignature('4/4'))
@@ -18195,7 +18200,12 @@ class Test(unittest.TestCase):
         '''
         Tests if there are mid-measure clefs clefs: multiple staves.
         '''
-        from music21 import stream, note, clef, musicxml, converter, meter
+        from music21 import clef
+        from music21 import converter
+        from music21 import meter
+        from music21 import musicxml
+        from music21 import note
+        from music21 import stream
 
         orig_stream = stream.Stream()
         orig_stream.append(stream.Part())

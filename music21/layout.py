@@ -597,7 +597,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
     >>> firstSystem
     <music21.layout.System ...>
-    >>> 'Score' in firstSystem.classes
+    >>> isinstance(firstSystem, stream.Score)
     True
 
     Each System has staves (layout.Staff objects) not parts, though Staff is a subclass of Part
@@ -607,7 +607,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     5
     >>> secondStaff
     <music21.layout.Staff ...>
-    >>> 'Part' in secondStaff.classes
+    >>> isinstance(secondStaff, stream.Part)
     True
     '''
     def getRichSystemLayout(inner_allSystemLayouts):
@@ -635,7 +635,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     scoreLists.measureStart = firstMeasureNumber
     scoreLists.measureEnd = lastMeasureNumber
     for el in scoreIn:
-        if 'Part' not in el.classes:
+        if not isinstance(el, stream.Part):
             if 'ScoreLayout' in el.classes:
                 scoreLists.scoreLayout = el
             scoreLists.insert(scoreIn.elementOffset(el), el)
@@ -658,7 +658,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
             thisPageAll = scoreIn.measures(pageStartM, pageEndM)
         thisPage.systemStart = systemNumber + 1
         for el in thisPageAll:
-            if 'Part' not in el.classes and 'StaffGroup' not in el.classes:
+            if not isinstance(el.classes and 'StaffGroup' not in el, stream.Part):
                 thisPage.insert(thisPageAll.elementOffset(el), el)
         firstMeasureOfFirstPart = thisPageAll.parts.first().getElementsByClass('Measure').first()
         for el in firstMeasureOfFirstPart:
