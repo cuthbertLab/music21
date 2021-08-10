@@ -2608,7 +2608,7 @@ class Test(unittest.TestCase):
         p.measure(1).insert(0, key.KeySignature(sharps=0))
         # calls makeAccidentalsInMeasureStream()
         p.makeNotation(inPlace=True)
-        self.assertEqual(p.measure(2).notes.first().pitch.accidental.displayStatus, False)
+        self.assertIs(p.measure(2).notes.first().pitch.accidental.displayStatus, False)
 
     def testMakeNotationTiesKeyChange(self):
         from music21 import converter
@@ -2616,32 +2616,32 @@ class Test(unittest.TestCase):
         p = converter.parse('tinynotation: 4/4 f#1~ f#1')
         # Insert key change where held-over note is diatonic
         p.measure(2).insert(0, key.KeySignature(sharps=1))
-        pMade1 = p.makeNotation()
-        self.assertEqual(pMade1.measure(2).notes.first().pitch.accidental.displayStatus, False)
+        made = p.makeNotation()
+        self.assertIs(made.measure(2).notes.first().pitch.accidental.displayStatus, False)
 
         p = converter.parse('tinynotation: 4/4 f#1~ f#1')
         # Insert key change where held-over note is chromatic
         p.measure(2).insert(0, key.KeySignature(sharps=-1))
-        pMade = p.makeNotation()
-        self.assertEqual(pMade.measure(2).notes.first().pitch.accidental.displayStatus, True)
+        made = p.makeNotation()
+        self.assertIs(made.measure(2).notes.first().pitch.accidental.displayStatus, True)
 
         p = converter.parse('tinynotation: 4/4 b1~ b1')
         # Same, but with a natural
         p.measure(2).insert(0, key.KeySignature(sharps=-1))
-        pMade = p.makeNotation()
-        self.assertEqual(pMade.measure(2).notes.first().pitch.accidental.displayStatus, True)
+        made = p.makeNotation()
+        self.assertIs(made.measure(2).notes.first().pitch.accidental.displayStatus, True)
 
         p = converter.parse('tinynotation: 4/4 f#1~ f#1')
         p.measure(1).insert(0, key.KeySignature(sharps=-1))
         # This is no longer a key "change", should still work based on the tie
-        pMade = p.makeNotation()
-        self.assertEqual(pMade.measure(2).notes.first().pitch.accidental.displayStatus, False)
+        made = p.makeNotation()
+        self.assertIs(made.measure(2).notes.first().pitch.accidental.displayStatus, False)
 
         # Wipe out the tie; accidental should be reiterated
         for n in p.flat.notes:
             n.tie = None
-        pMadeNoTies = p.makeNotation()
-        self.assertEqual(pMadeNoTies.measure(2).notes.first().pitch.accidental.displayStatus, True)
+        made_no_ties = p.makeNotation()
+        self.assertIs(made_no_ties.measure(2).notes.first().pitch.accidental.displayStatus, True)
 
     def testMakeAccidentalsOctaveKS(self):
         s = Stream()
