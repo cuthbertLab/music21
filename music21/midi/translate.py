@@ -3894,9 +3894,9 @@ class Test(unittest.TestCase):
     def testImportInstrumentsWithoutProgramChanges(self):
         '''
         Instrument instances are created from both program changes and
-        track or sequence names. In case the information is redundant,
-        do not let there be a default MIDI program on the instrument created
-        from the name--we should defer to the active patch number.
+        track or sequence names. Since we have a MIDI file, we should not
+        rely on default MIDI programs defined in the instrument file; we
+        should just keep track of the active program number.
         https://github.com/cuthbertLab/music21/issues/1085
         '''
         from music21 import midi as midiModule
