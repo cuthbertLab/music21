@@ -1336,7 +1336,7 @@ class Test(unittest.TestCase):
         # pitches of c1 don't match pitch of n0,
         # so disregard the "continue" and treat instead as a start
         # and match against the pitches of c2
-        self.assertEqual(len(stripped1), 2)  # was 1
+        self.assertEqual(len(stripped1), 2)  # previously was 1
 
         stripped2 = s.stripTies(matchByPitch=False)
         # strict mode: this shouldn't do anything,
@@ -1349,7 +1349,7 @@ class Test(unittest.TestCase):
         stripped3 = s.stripTies(matchByPitch=True)
         # number of pitches in c1 doesn't match n0
         # but does match c2, so lack of uniform-tie stop is irrelevant
-        self.assertEqual(len(stripped3), 2)  # was 1
+        self.assertEqual(len(stripped3), 2)  # previously was 1
         self.assertEqual(
             str(stripped3.elements),
             '(<music21.note.Note C>, <music21.chord.Chord C4 F4>)'
@@ -1387,7 +1387,7 @@ class Test(unittest.TestCase):
         self.assertEqual(
             str(stripped7.elements),
             '(<music21.chord.Chord F#4 B4>, <music21.chord.Chord C4 F4>)'
-        )
+        )  # previously was 1 element
 
         # also transpose the "continue" chord
         # to ensure the link from continue -> stop matches pitch
@@ -1397,7 +1397,7 @@ class Test(unittest.TestCase):
             str(stripped8.elements),
             '(<music21.chord.Chord F#4 B4>, '
             + '<music21.chord.Chord G4 C5>, <music21.chord.Chord C4 F4>)'
-        )
+        )  # previously was 1 element
 
     def testTwoStreamMethods(self):
         from music21.note import Note
