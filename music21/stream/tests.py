@@ -1426,6 +1426,100 @@ class Test(unittest.TestCase):
         self.assertEqual(chordsOut[3].pitches, ch4.pitches)
         self.assertEqual(chordsOut[4].pitches, ch5.pitches)
 
+    def testStripTiesComplexTies(self):
+        '''
+        Make sure tie types of "stop" or "continue" are not taken at face value
+        for Chords if matchByPitch=False; they only represent that SOME
+        chord member has that tie type.
+        '''
+        from music21 import stream, tie
+
+        n0 = note.Note('C4')
+        n0.tie = tie.Tie('start')
+
+        n1 = note.Note('C4')
+        n2 = note.Note('F4')
+        n1.tie = tie.Tie('continue')
+
+        n3 = note.Note('C4')
+        n4 = note.Note('F4')
+        n3.tie = tie.Tie('stop')
+
+        c1 = chord.Chord([n1, n2])
+        c2 = chord.Chord([n3, n4])
+
+        s = stream.Stream()
+        s.append(n0)
+        s.append(c1)
+        s.append(c2)
+
+        stripped1 = s.stripTies(matchByPitch=True)
+        # pitches of c1 don't match pitch of n0,
+        # so disregard the "continue" and treat instead as a start
+        # and match against the pitches of c2
+        self.assertEqual(len(stripped1), 2)  # previously was 1
+
+        stripped2 = s.stripTies(matchByPitch=False)
+        # strict mode: this shouldn't do anything,
+        # because the middle element isn't uniform-continue
+        # and the last element isn't uniform-stop
+        self.assertEqual(len(stripped2), 3)
+
+        n2.tie = tie.Tie('continue')
+
+        stripped3 = s.stripTies(matchByPitch=True)
+        # number of pitches in c1 doesn't match n0
+        # but does match c2, so lack of uniform-tie stop is irrelevant
+        self.assertEqual(len(stripped3), 2)  # previously was 1
+        self.assertEqual(
+            str(stripped3.elements),
+            '(<music21.note.Note C>, <music21.chord.Chord C4 F4>)'
+        )
+
+        stripped4 = s.stripTies(matchByPitch=False)
+        # matchByPitch=False requires last element to be uniform-stop
+        self.assertEqual(len(stripped4), 3)
+
+        n4.tie = tie.Tie('stop')
+
+        stripped5 = s.stripTies(matchByPitch=False)
+        # notice the note STILL isn't merged to the chords -- because different # of notes
+        self.assertEqual(len(stripped5), 2)
+
+        self.assertEqual(
+            str(stripped5.elements),
+            '(<music21.note.Note C>, <music21.chord.Chord C4 F4>)'
+        )
+
+        # replace the first note with a Chord bearing a start tie, and everything can be merged
+        s.replace(n0, chord.Chord('C4 F4'))
+        s.first().tie = tie.Tie('start')
+
+        stripped6 = s.stripTies(matchByPitch=False)
+        self.assertEqual(
+            str(stripped6.elements),
+            '(<music21.chord.Chord C4 F4>,)'
+        )
+
+        # make sure matchByPitch=True is still picky about pitch but merges the rest,
+        # including a continue tie, which becomes ersatz-start
+        s.first().transpose(6, inPlace=True)
+        stripped7 = s.stripTies(matchByPitch=True)
+        self.assertEqual(
+            str(stripped7.elements),
+            '(<music21.chord.Chord F#4 B4>, <music21.chord.Chord C4 F4>)'
+        )  # previously was 1 element
+
+        # also transpose the "continue" chord
+        # to ensure the link from continue -> stop matches pitch
+        s[1].transpose(7, inPlace=True)
+        stripped8 = s.stripTies(matchByPitch=True)
+        self.assertEqual(
+            str(stripped8.elements),
+            '(<music21.chord.Chord F#4 B4>, '
+            + '<music21.chord.Chord G4 C5>, <music21.chord.Chord C4 F4>)'
+        )  # previously was 1 element
+
     def testTwoStreamMethods(self):
         from music21.note import Note
 

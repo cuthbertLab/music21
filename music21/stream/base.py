@@ -6992,10 +6992,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(m.flat.notes)
         1
 
-        In cases where chord members are manipulated after initial tie creation,
-        some chord members might lack ties. Whereas `stripTies` ordinarily only acts
-        on chords if every member has a stop tie, this is not necessary if
-        all the pitches match:
+        In cases where notes are manipulated after initial tie creation,
+        some chord members might lack ties. This will not prevent merging the tied notes
+        if all the pitches match, and `matchByPitch=True` (default):
 
         >>> c1 = chord.Chord('C4 E4')
         >>> c1.tie = tie.Tie('start')
@@ -7016,14 +7015,82 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(strippedPitchMatching.flat.notes)
         1
 
-        This can be prevented with `matchByPitch=False`, in which case every chord member
-        must have a stop tie:
+        This can be prevented with `matchByPitch=False`, in which case every note,
+        including each chord member, must have stop and/or continue tie types,
+        which was not the case above:
 
-        >>> strippedConservative = m.stripTies(matchByPitch=False)
-        >>> len(strippedConservative.flat.notes)
+        >>> strippedMixedTieTypes = m.stripTies(matchByPitch=False)
+        >>> len(strippedMixedTieTypes.flat.notes)
         2
 
-        Changed in v.7 -- `matchByPitch` defaults to True.
+        >>> c2.notes[0].tie = tie.Tie('stop')
+        >>> c2.notes[1].tie = tie.Tie('stop')
+        >>> c2.notes[2].tie = tie.Tie('stop')
+        >>> strippedUniformTieTypes = m.stripTies(matchByPitch=False)
+        >>> len(strippedUniformTieTypes.flat.notes)
+        1
+
+        Notice the matching happens even after altering the pitches:
+
+        >>> c3 = c2.transpose(6)
+        >>> otherM = stream.Measure([c1, c3])
+        >>> strippedTransposed = otherM.stripTies(matchByPitch=False)
+        >>> len(strippedTransposed.flat.notes)
+        1
+
+        Changed in v.7 -- `matchByPitch` defaults True, and the following
+        behavior defined regarding chords with a tie type "continue":
+
+        >>> c1.notes[0].tie = tie.Tie('continue')
+        >>> c1.notes[1].tie = tie.Tie('start')
+        >>> c1.notes[2].tie = tie.Tie('start')
+
+        Continue is accepted here as an ersatz-start:
+
+        >>> stripped1 = m.stripTies(matchByPitch=True)
+        >>> len(stripped1.flat.notes)
+        1
+
+        But prepend an element so that it's considered as a tie continuation:
+
+        >>> c0 = chord.Chord('C4 E4 G4')
+        >>> c0.tie = tie.Tie('start')
+        >>> m2 = stream.Measure()
+        >>> m2.append([c0, c1, c2])
+
+        Now the mixed tie types on c1 will only be connected to c2
+        on the permissive option (`matchByPitch=True`):
+
+        >>> stripped2 = m2.stripTies(matchByPitch=True)
+        >>> stripped2.elements
+        (<music21.chord.Chord C4 E4 G4>,)
+
+        >>> stripped3 = m2.stripTies(matchByPitch=False)
+        >>> stripped3.elements
+        (<music21.chord.Chord C4 E4 G4>,
+         <music21.chord.Chord C4 E4 G4>,
+         <music21.chord.Chord C4 E4 G4>)
+
+        Now correct the tie types on c1 and try the strict option:
+
+        >>> c1.notes[0].tie = tie.Tie('continue')
+        >>> c1.notes[1].tie = tie.Tie('continue')
+        >>> c1.notes[2].tie = tie.Tie('continue')
+        >>> stripped4 = m2.stripTies(matchByPitch=False)
+        >>> stripped4.elements
+        (<music21.chord.Chord C4 E4 G4>,)
+
+        Now replace the first element with just a single C4 note.
+        The following chords will be merged with each other, but not with the single
+        note, even on `matchByPitch=False`.
+        (`matchByPitch=False` is permissive about pitch but strict about cardinality.)
+
+        >>> newC = note.Note('C4')
+        >>> newC.tie = tie.Tie('start')
+        >>> m2.replace(c0, newC)
+        >>> stripped5 = m2.stripTies(matchByPitch=False)
+        >>> stripped5.elements
+        (<music21.note.Note C>, <music21.chord.Chord C4 E4 G4>)
         '''
         # environLocal.printDebug(['calling stripTies'])
         if not inPlace:  # make a copy
@@ -7063,24 +7130,32 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         posConnected = []  # temporary storage for index of tied notes
         posDelete = []  # store deletions to be processed later
 
-        def updateEndMatch(nInner):
+        def updateEndMatch(nInner) -> bool:
             '''
             updateEndMatch based on nList, iLast, matchByPitch, etc.
             '''
-            # ties tell us when they are ended
-            # unless n is a chord, which only tells if SOME member has a tie
+            # 2 cases before matchByPitch=False returns early.
+
+            # Case 1: nInner is not a chord, and it has a stop tie
+            # can't trust chords, which only tell if SOME member has a tie
+            # matchByPitch does not matter here
             # https://github.com/cuthbertLab/music21/issues/502
             if (hasattr(nInner, 'tie')
                     and not isinstance(nInner, chord.Chord)
                     and nInner.tie is not None
                     and nInner.tie.type == 'stop'):
                 return True
-            # but capture case where all chord members have a stop tie
+            # Case 2: matchByPitch=False and all chord members have a stop tie
+            # and checking cardinality passes (don't match chords to single notes)
             elif (hasattr(nInner, 'tie')
+                    and not matchByPitch
                     and isinstance(nInner, chord.Chord)
                     and None not in [inner_p.tie for inner_p in nInner.notes]
-                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}):
+                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}
+                    and nLast is not None and len(nLast.pitches) == len(nInner.pitches)):
                 return True
+
+            # Now, matchByPitch
             # if we cannot find a stop tie, see if last note was connected
             # and this and the last note are the same pitch; this assumes
             # that connected and same pitch value is tied; this is not
@@ -7088,13 +7163,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             elif not matchByPitch:
                 return False
 
-            # else...
             # find out if the last index is in position connected
             # if the pitches are the same for each note
             if (nLast is not None
                     and iLast in posConnected
                     and hasattr(nLast, 'pitch')
                     and hasattr(nInner, 'pitch')
+                    # before doing pitch comparison, need to
+                    # make sure we're not comparing a Note to a Chord
+                    and 'Chord' not in nLast.classes
+                    and 'Chord' not in nInner.classes
                     and nLast.pitch == nInner.pitch):
                 return True
             # looking for two chords of equal size
@@ -7114,6 +7192,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return allPitchesMatched
 
             return False
+
+        def allTiesAreContinue(nr: note.NotRest) -> bool:
+            if nr.tie is None:  # pragma: no cover
+                return False
+            if nr.tie.type != 'continue':
+                return False
+            # check every chord member, since tie type "continue" on a chord
+            # only indicates that SOME member is tie-continue.
+            if 'Chord' in nr.classes:
+                for innerN in nr.notes:
+                    if innerN.tie is None:
+                        return False
+                    if innerN.tie.type != 'continue':
+                        return False
+            return True
 
         for i in range(len(notes)):
             endMatch = None  # can be True, False, or None
@@ -7140,12 +7233,41 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # a connection has been started or continued, so no endMatch
                 endMatch = False
 
+            # a continue may or may not imply a connection
             elif (hasattr(n, 'tie')
                     and n.tie is not None
                     and n.tie.type == 'continue'):
-                # a continue always implies a connection
-                posConnected.append(i)
-                endMatch = False
+                # is this actually a start?
+                if not posConnected:
+                    posConnected.append(i)
+                    endMatch = False
+                elif matchByPitch:
+                    # try to match pitch against nLast
+                    # updateEndMatch() checks for equal cardinality
+                    tempEndMatch = updateEndMatch(n)
+                    if tempEndMatch:
+                        posConnected.append(i)
+                        # ... and keep going.
+                        endMatch = False
+                    else:
+                        # clear list and populate with this element
+                        posConnected = [i]
+                        endMatch = False
+                elif allTiesAreContinue(n):
+                    # uniform-continue suffices if not matchByPitch
+                    # but still need to check cardinality
+                    if nLast and (len(nLast.pitches) != len(n.pitches)):
+                        # different sizes: clear list and populate with this element
+                        # since allTiesAreContinue, it is okay to treat as ersatz-start
+                        posConnected = [i]
+                    else:
+                        posConnected.append(i)
+                    # either way, this was not a stop
+                    endMatch = False
+                else:
+                    # only SOME ties on this chord are "continue": reject
+                    posConnected = []
+                    endMatch = False
 
             # establish end condition
             if endMatch is None:  # not yet set, not a start or continue

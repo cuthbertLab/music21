@@ -318,9 +318,8 @@ class StreamForms:
 
         Currently: runs stripTies.
         '''
-        # this causes lots of deepcopies, but an inPlace operation loses
-        # accuracy on feature extractors
-        streamObj = streamObj.stripTies()
+        # Let stripTies make a copy so that we don't leave side effects on the input stream
+        streamObj = streamObj.stripTies(inPlace=False)
         return streamObj
 
     def __getitem__(self, key):
