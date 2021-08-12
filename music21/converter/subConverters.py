@@ -1548,7 +1548,6 @@ class Test(unittest.TestCase):
             os.remove(out)
 
     def testBrailleKeywords(self):
-        from music21 import braille
         from music21 import converter
 
         p = converter.parse('tinyNotation: c1 d1 e1 f1')
