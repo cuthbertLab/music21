@@ -501,7 +501,7 @@ class ConverterBraille(SubConverter):
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
         from music21 import braille
-        dataStr = braille.translate.objectToBraille(obj)
+        dataStr = braille.translate.objectToBraille(obj, **keywords)
         if subformats is not None and 'ascii' in subformats:
             dataStr = braille.basic.brailleUnicodeToBrailleAscii(dataStr)
         fp = self.writeDataStream(fp, dataStr)
@@ -1546,6 +1546,16 @@ class Test(unittest.TestCase):
 
         for out in (out1, out2):
             os.remove(out)
+
+    def testBrailleKeywords(self):
+        from music21 import braille
+        from music21 import converter
+
+        part = converter.parse('tinyNotation: c1 d1 e1 f1')
+        out = part.write('braille', debug=True)
+        with open(out, 'r') as f:
+            self.assertIn('<music21.braille.segment BrailleSegment>', f.read())
+        os.remove(out)
 
 
 class TestExternal(unittest.TestCase):
