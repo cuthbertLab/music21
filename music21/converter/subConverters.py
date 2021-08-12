@@ -1551,8 +1551,8 @@ class Test(unittest.TestCase):
         from music21 import braille
         from music21 import converter
 
-        part = converter.parse('tinyNotation: c1 d1 e1 f1')
-        out = part.write('braille', debug=True)
+        p = converter.parse('tinyNotation: c1 d1 e1 f1')
+        out = p.write('braille', debug=True)
         with open(out, 'r') as f:
             self.assertIn('<music21.braille.segment BrailleSegment>', f.read())
         os.remove(out)
