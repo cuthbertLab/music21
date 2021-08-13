@@ -941,12 +941,7 @@ class ConverterMusicXML(SubConverter):
 
             musescoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
 
-        storedStrErr = sys.stderr
-        fileLikeOpen = io.StringIO()
-        sys.stderr = fileLikeOpen
-        subprocess.run(musescoreRun, check=False)
-        fileLikeOpen.close()
-        sys.stderr = storedStrErr
+        subprocess.run(musescoreRun, capture_output=True, check=False)
 
         if common.runningUnderIPython() and common.getPlatform() == 'nix':
             # Leave environment in original state
