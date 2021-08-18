@@ -940,7 +940,11 @@ class ConverterMusicXML(SubConverter):
 
             musescoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
 
-        subprocess.run(musescoreRun, capture_output=True, check=False)
+        completed_process = subprocess.run(musescoreRun, capture_output=True, check=False)
+        if completed_process.returncode != 0:
+            # Raise same exception class as findNumberedPNGPath()
+            # for backward compatibility
+            raise SubConverterFileIOException(completed_process.stderr)
 
         if common.runningUnderIPython() and common.getPlatform() == 'nix':
             # Leave environment in original state
