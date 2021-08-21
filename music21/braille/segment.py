@@ -12,7 +12,8 @@ Inner classes and functions for transcribing musical segments into braille.
 
 This module was made in consultation with the manual "Introduction to Braille
 Music Transcription, Second Edition" by Mary Turner De Garmo, 2005. It is
-available from the Library of Congress `here <http://www.loc.gov/nls/music/>`_,
+available from the Library of Congress
+`here <https://www.loc.gov/nls/braille-audio-reading-materials/music-materials/>`_,
 and will henceforth be referred to as BMTM.
 '''
 import collections
@@ -702,7 +703,7 @@ class BrailleSegment(text.BrailleText):
             return False
 
         # can't use Filter because noteGrouping is list-like not Stream-like
-        allNotes = [n for n in noteGrouping if 'Note' in n.classes]
+        allNotes = [n for n in noteGrouping if isinstance(n, note.Note)]
         showLeadingOctave = True
         if allNotes:
             if self.lastNote is not None:
@@ -1912,7 +1913,7 @@ def getRawSegments(music21Part, setHand=None):
                 # All cases: continue, so we don't add anything to the segment
                 continue
             elif (
-                'Barline' in brailleElement.classes
+                isinstance(brailleElement, bar.Barline)
                 and elementsInCurrentSegment > MAX_ELEMENTS_IN_SEGMENT
                 and brailleElement.type in ('double', 'final')
             ):

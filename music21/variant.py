@@ -27,9 +27,11 @@ import copy
 import difflib
 
 from music21 import base
+from music21 import clef
 from music21 import common
 from music21 import environment
 from music21 import exceptions21
+from music21 import meter
 from music21 import note
 from music21 import search
 from music21 import stream
@@ -228,7 +230,7 @@ def mergeVariantScores(aScore, vScore, variantName='variant', *, inPlace=False):
     if inPlace is True:
         returnObj = aScore
     else:
-        returnObj = copy.deepcopy(aScore)
+        returnObj = aScore.coreCopyAsDerivation('mergeVariantScores')
 
     for returnPart, vPart in zip(returnObj.parts, vScore.parts):
         mergeVariantMeasureStreams(returnPart, vPart, variantName, inPlace=True)
@@ -391,7 +393,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
     if inPlace is True:
         returnObj = streamX
     else:
-        returnObj = copy.deepcopy(streamX)
+        returnObj = streamX.coreCopyAsDerivation('mergeVariantMeasureStreams')
 
     regions = _getRegionsFromStreams(returnObj, streamY)
     for (regionType, xRegionStartMeasure, xRegionEndMeasure,
@@ -644,7 +646,7 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
     if inPlace is True:
         returnObj = streams[0]
     else:
-        returnObj = copy.deepcopy(streams[0])
+        returnObj = streams[0].coreCopyAsDerivation('mergeVariantsEqualDuration')
 
     # Adds a None element at beginning (corresponding to default variant streams[0])
     variantNames.insert(0, None)
@@ -797,7 +799,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
     if inPlace is True:
         returnObj = mainPart
     else:
-        returnObj = copy.deepcopy(mainPart)
+        returnObj = mainPart.coreCopyAsDerivation('mergePartAsOssia')
 
     if compareByMeasureNumber is True:
         for ossiaMeasure in ossiaPart.getElementsByClass('Measure'):
@@ -939,7 +941,7 @@ def addVariant(
     if sVariant is None:  # deletion
         pass
     else:  # replacement or insertion
-        if 'Measure' in sVariant.classes:  # sVariant is a measure put it in a variant and insert.
+        if isinstance(sVariant, stream.Measure):  # sVariant is a measure put it in a variant and insert.
             tempVariant.append(sVariant)
         else:  # sVariant is not a measure
             sVariantMeasures = sVariant.getElementsByClass('Measure')
@@ -1044,7 +1046,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
     else:
         sVariantIndex = s.variants.index(sVariant)
 
-        returnObject = copy.deepcopy(s)
+        returnObject = s.coreCopyAsDerivation('refineVariant')
         variantRegion = returnObject.variants(sVariantIndex)
 
 
@@ -1798,10 +1800,10 @@ def _doVariantFixingOnStream(s, variantNames=None):
             targetElement = _getNextElements(s, v)
 
             # Delete initial clefs, etc. from initial insertion targetElement if it exists
-            if 'Stream' in targetElement.classes:
+            if isinstance(targetElement, stream.Stream):
                 # Must use .elements, because of removal of elements
                 for e in targetElement.elements:
-                    if 'Clef' in e.classes or 'TimeSignature' in e.classes:
+                    if isinstance(e, (clef.Clef, meter.TimeSignature)):
                         targetElement.remove(e)
 
             v.append(copy.deepcopy(targetElement))  # Appends a copy
@@ -2634,14 +2636,16 @@ class Test(unittest.TestCase):
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testMergeJacopoVariants(self):
         from music21 import corpus
         j1 = corpus.parse('trecento/PMFC_06-Jacopo-03a')
         j2 = corpus.parse('trecento/PMFC_06-Jacopo-03b')
         jMerged = mergeVariantScores(j1, j2)
-        jMerged.show('lily.pdf')
+        if self.show:
+            jMerged.show('musicxml.png')
 
 
 if __name__ == '__main__':

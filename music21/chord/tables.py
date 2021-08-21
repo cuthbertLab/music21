@@ -2944,7 +2944,7 @@ class Test(unittest.TestCase):
 
         for key, value in partition.items():
             # the length of the list should be the max value stored
-            self.assertEqual(max(value), len(partition[key]))
+            self.assertEqual(max(value), len(value))
 
     def testScDict(self):
         for key, value in SCDICT.items():

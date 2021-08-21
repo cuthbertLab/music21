@@ -111,7 +111,7 @@ edit, and export musical data for working in `music21`.
 Downloading MuseScore (version 2 or higher)
 is highly recommended for working with `music21`.
 
-http://www.musescore.org
+https://musescore.org/en
 
 
 

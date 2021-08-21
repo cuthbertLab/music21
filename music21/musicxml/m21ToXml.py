@@ -34,10 +34,12 @@ from music21 import common
 from music21 import defaults
 from music21 import exceptions21
 
+from music21 import articulations
 from music21 import bar
 from music21 import clef
-from music21 import chord  # for typing
+from music21 import chord
 from music21 import duration
+from music21 import harmony
 from music21 import metadata
 from music21 import note
 from music21 import meter
@@ -45,6 +47,7 @@ from music21 import pitch
 from music21 import spanner
 from music21 import stream
 from music21 import style
+from music21 import tempo
 from music21.stream.iterator import OffsetIterator
 
 from music21.musicxml import helpers
@@ -400,7 +403,7 @@ class GeneralObjectExporter:
             outObj = self.fromGeneralObject(obj)
             return self.parseWellformedObject(outObj)
         else:
-            if 'Score' not in obj.classes:
+            if not isinstance(obj, stream.Score):
                 raise MusicXMLExportException('Can only export Scores with makeNotation=False')
             return self.parseWellformedObject(obj)
 
@@ -432,6 +435,7 @@ class GeneralObjectExporter:
                 {0.0} <music21.clef.TrebleClef>
                 {0.0} <music21.meter.TimeSignature 6/8>
                 {0.0} <music21.note.Note C>
+                {3.0} <music21.bar.Barline type=final>
         >>> s.flat.notes[0].duration
         <music21.duration.Duration 3.0>
         '''
@@ -668,6 +672,9 @@ class GeneralObjectExporter:
         Translate a music21 :class:`~music21.note.Note` into an object
         ready to be parsed.
 
+        An attempt is made to find the best TimeSignature for quarterLengths
+        <= 6:
+
         >>> n = note.Note('c3')
         >>> n.quarterLength = 3
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
@@ -678,19 +685,29 @@ class GeneralObjectExporter:
                 {0.0} <music21.clef.BassClef>
                 {0.0} <music21.meter.TimeSignature 6/8>
                 {0.0} <music21.note.Note C>
+                {3.0} <music21.bar.Barline type=final>
+
+        But longer notes will be broken into tied components placed in
+        4/4 measures:
+
+        >>> long_note = note.Note('e5', quarterLength=40)
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
+        >>> sc = GEX.fromGeneralNote(long_note)
+        >>> sc[meter.TimeSignature].first()
+        <music21.meter.TimeSignature 4/4>
+        >>> len(sc[stream.Measure])
+        10
         '''
         # make a copy, as this process will change tuple types
-        # this method is called infrequently, and only for display of a single
-        # note
+        # this method is called infrequently (only displaying a single note)
         nCopy = copy.deepcopy(n)
-
-        # modifies in place
-        stream.makeNotation.makeTupletBrackets([nCopy.duration], inPlace=True)
-        out = stream.Measure(number=1)
-        out.append(nCopy)
-
-        # call the musicxml property on Stream
-        return self.fromMeasure(out)
+        new_part = stream.Part(nCopy)
+        if 0 < n.quarterLength <= 6.0:
+            new_part.insert(0, meter.bestTimeSignature(new_part))
+        stream.makeNotation.makeMeasures(
+            new_part, inPlace=True, refStreamOrTimeRange=[0, nCopy.quarterLength])
+        stream.makeNotation.makeTupletBrackets(new_part, inPlace=True)
+        return self.fromPart(new_part)
 
     def fromPitch(self, p: pitch.Pitch):
         # noinspection PyShadowingNames
@@ -2883,7 +2900,7 @@ class MeasureExporter(XMLExporterBase):
         root = self.xmlRoot
         divisions = self.currentDivisions
         self.offsetInMeasure = 0.0
-        if 'Voice' in m.classes:
+        if isinstance(m, stream.Voice):
             m: stream.Voice
             if isinstance(m.id, int) and m.id < defaults.minIdNumberToConsiderMemoryLocation:
                 voiceId = m.id
@@ -2916,7 +2933,7 @@ class MeasureExporter(XMLExporterBase):
             for obj in objGroup:
                 # we do all non-note elements (including ChordSymbols)
                 # first before note elements, in musicxml
-                if 'GeneralNote' in obj.classes and 'Harmony' not in obj.classes:
+                if isinstance(obj, note.GeneralNote) and not isinstance(obj, harmony.Harmony):
                     notesForLater.append(obj)
                 else:
                     self.parseOneElement(obj)
@@ -4190,7 +4207,7 @@ class MeasureExporter(XMLExporterBase):
         applicableArticulations = []
         fingeringNumber = 0
         for a in chordOrNote.articulations:
-            if 'Fingering' in a.classSet:
+            if isinstance(a, articulations.Fingering):
                 if fingeringNumber == noteIndexInChord:
                     applicableArticulations.append(a)
                 fingeringNumber += 1
@@ -4198,11 +4215,11 @@ class MeasureExporter(XMLExporterBase):
                 applicableArticulations.append(a)
 
         for artObj in applicableArticulations:
-            if 'Pizzicato' in artObj.classes:
+            if isinstance(artObj, articulations.Pizzicato):
                 continue
-            if 'StringIndication' in artObj.classes and artObj.number < 1:
+            if isinstance(artObj, articulations.StringIndication) and artObj.number < 1:
                 continue
-            if 'TechnicalIndication' in artObj.classes:
+            if isinstance(artObj, articulations.TechnicalIndication):
                 if mxTechnicalMark is None:
                     mxTechnicalMark = Element('technical')
                 mxTechnicalMark.append(self.articulationToXmlTechnical(artObj))
@@ -4344,7 +4361,7 @@ class MeasureExporter(XMLExporterBase):
                 orientation = 'under'
             # MuseScore requires 'orientation' not placement
             # should be no need for separate orientation
-            # http://forums.makemusic.com/viewtopic.php?f=12&t=2179&start=0
+            # https://forums.makemusic.com/viewtopic.php?f=12&t=2179&start=0
             mxTied.set('orientation', orientation)
 
         # TODO: attrGroup: bezier
@@ -4946,8 +4963,6 @@ class MeasureExporter(XMLExporterBase):
         if cs.writeAsChord is True:
             return self.chordToXml(cs)
 
-        from music21 import harmony
-
         mxHarmony = Element('harmony')
         _synchronizeIds(mxHarmony, cs)
 
@@ -5069,9 +5084,9 @@ class MeasureExporter(XMLExporterBase):
         mxDirectionType = SubElement(mxDirection, 'direction-type')
         mxDirectionType.append(mxObj)
         if (m21Obj is not None
-                and hasattr(m21Obj, 'positionPlacement')
-                and m21Obj.positionPlacement is not None):
-            mxDirection.set('placement', m21Obj.positionPlacement)
+                and hasattr(m21Obj, 'placement')
+                and m21Obj.placement is not None):
+            mxDirection.set('placement', m21Obj.placement)
 
         return mxDirection
 
@@ -5329,7 +5344,7 @@ class MeasureExporter(XMLExporterBase):
         hideNumber = []  # hide the number after equal, e.g., quarter=120, hide 120
         # store the last value necessary as a sounding tag in bpm
         soundingQuarterBPM = False
-        if 'MetronomeMark' in ti.classes:
+        if isinstance(ti, tempo.MetronomeMark):
             # will not show a number of implicit
             if ti.numberImplicit or ti.number is None:
                 # environLocal.printDebug(['found numberImplicit', ti.numberImplicit])
@@ -5342,7 +5357,7 @@ class MeasureExporter(XMLExporterBase):
             # number (if implicit, that is fine); get in terms of quarter bpm
             soundingQuarterBPM = ti.getQuarterBPM()
 
-        elif 'MetricModulation' in ti.classes:
+        elif isinstance(ti, tempo.MetricModulation):
             # may need to reverse order if classical style or otherwise
             # may want to show first number
             hideNumericalMetro = False  # must show for metric modulation
@@ -5391,7 +5406,7 @@ class MeasureExporter(XMLExporterBase):
         if hideNumericalMetro is not None:
             self.xmlRoot.append(mxDirection)
 
-        if 'MetronomeMark' in ti.classes:
+        if isinstance(ti, tempo.MetronomeMark):
             if ti.getTextExpression(returnImplicit=False) is not None:
                 te = ti.getTextExpression(returnImplicit=False)
                 te.offset = ti.offset
@@ -5690,7 +5705,7 @@ class MeasureExporter(XMLExporterBase):
         if barline is None:
             mxBarline = Element('barline')
         else:
-            if 'Repeat' in barline.classes:
+            if isinstance(barline, bar.Repeat):
                 mxBarline = Element('barline')
                 mxRepeat = self.repeatToXml(barline)
             else:
@@ -5813,7 +5828,7 @@ class MeasureExporter(XMLExporterBase):
             mxDivisions.text = str(self.currentDivisions)
             self.parent.lastDivisions = self.currentDivisions
 
-        if 'Measure' in m.classes:
+        if isinstance(m, stream.Measure):
             if m.keySignature is not None:
                 mxAttributes.append(self.keySignatureToXml(m.keySignature))
             if m.timeSignature is not None:
@@ -6419,7 +6434,9 @@ class Test(unittest.TestCase):
         objects, where usually all the spanners will remain on the first object.
         '''
         import re
-        from music21 import converter, dynamics, layout
+        from music21 import converter
+        from music21 import dynamics
+        from music21 import layout
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         s = converter.parse(xmlDir / '43e-Multistaff-ClefDynamics.xml')
 
@@ -6518,8 +6535,6 @@ class Test(unittest.TestCase):
         self.assertEqual(ly2.findall('text')[1].text, 'e')
 
     def testExportNC(self):
-        from music21 import harmony
-
         s = stream.Score()
         p = stream.Part()
         m = stream.Measure()
@@ -6621,7 +6636,8 @@ class Test(unittest.TestCase):
         self.assertEqual(root.find('.//step').text, 'D')
 
     def testMidiInstrumentNoName(self):
-        from music21 import converter, instrument
+        from music21 import converter
+        from music21 import instrument
 
         i = instrument.Instrument()
         i.midiProgram = 42
@@ -6664,18 +6680,24 @@ class Test(unittest.TestCase):
     def testTextExpressionOffset(self):
         '''Transfer element offset after calling getTextExpression().'''
         # https://github.com/cuthbertLab/music21/issues/624
-        from music21 import converter, repeat, tempo
+        from music21 import converter
+        from music21 import repeat
 
         s = converter.parse('tinynotation: 4/4 c1')
         c = repeat.Coda()
         c.useSymbol = False
         f = repeat.Fine()
         mm = tempo.MetronomeMark(text='Langsam')
+        mm.placement = 'above'
         s.measure(1).storeAtEnd([c, f, mm])
 
         tree = self.getET(s)
         for direction in tree.findall('.//direction'):
             self.assertIsNone(direction.find('offset'))
+
+        # Also check position
+        mxDirection = tree.find('part/measure/direction')
+        self.assertEqual(mxDirection.get('placement'), 'above')
 
     def testFullMeasureRest(self):
         from music21 import converter
@@ -6691,8 +6713,6 @@ class Test(unittest.TestCase):
         self.assertEqual(rest.get('measure'), 'yes')
 
     def testArticulationSpecialCases(self):
-        from music21 import articulations
-
         n = note.Note()
         a = articulations.StringIndication()
         n.articulations.append(a)
@@ -6716,13 +6736,11 @@ class Test(unittest.TestCase):
         self.assertEqual(len(tree.findall('.//rest')), 1)
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def testBasic(self):
-        pass
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testSimple(self):
-        from music21 import corpus  # , converter
+        from music21 import corpus
         import difflib
 
         # b = converter.parse(corpus.corpora.CoreCorpus().getWorkList('cpebach')[0],
@@ -6752,7 +6770,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
         # b2 = converter.parse(v)
         fp = b.write('musicxml')
-        print(fp)
+        if self.show:
+            print(fp)
 
         with io.open(fp, encoding='utf-8') as f:
             v2 = f.read()
@@ -6761,10 +6780,13 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             if l.startswith('-') or l.startswith('?') or l.startswith('+'):
                 if 'id=' in l:
                     continue
-                print(l)
-                # for j in range(i - 1,i + 1):
-                #    print(differ[j])
-                # print('------------------')
+                if self.show:
+                    print(l)
+                    # for j in range(i - 1,i + 1):
+                    #    print(differ[j])
+                    # print('------------------')
+        import os
+        os.remove(fp)
 
 
 if __name__ == '__main__':

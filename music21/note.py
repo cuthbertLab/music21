@@ -584,7 +584,7 @@ class GeneralNote(base.Music21Object):
             return None
 
         allText = [ly.text for ly in self.lyrics]
-        return '\n'.join(allText)
+        return '\n'.join([t for t in allText if t is not None])
 
     def _setLyric(self, value: Union[str, Lyric, None]) -> None:
         self.lyrics = []
@@ -910,6 +910,8 @@ class NotRest(GeneralNote):
     # Special functions
     # ==============================================================================================
     def __eq__(self, other):
+        if super().__eq__(other) is NotImplemented:
+            return NotImplemented
         if not super().__eq__(other):
             return False
         if not isinstance(other, NotRest):
@@ -1555,7 +1557,7 @@ class Note(NotRest):
         {1.0} <music21.note.Note G->
 
         '''
-        if hasattr(value, 'classes') and 'IntervalBase' in value.classes:
+        if isinstance(value, interval.IntervalBase):
             intervalObj = value
         else:  # try to process
             intervalObj = interval.Interval(value)
@@ -1655,6 +1657,8 @@ class Unpitched(NotRest):
             self.displayOctave = display_pitch.octave
 
     def __eq__(self, other):
+        if super().__eq__(other) is NotImplemented:
+            return NotImplemented
         if not super().__eq__(other):
             return False
         if not isinstance(other, Unpitched):
@@ -1816,17 +1820,19 @@ class Rest(GeneralNote):
 # ------------------------------------------------------------------------------
 # test methods and classes
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     '''
     These are tests that open windows and rely on external software
     '''
+    show = True
 
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
         '''
         a = Note('d-3')
         a.quarterLength = 2.25
-        a.show()
+        if self.show:
+            a.show()
 
     def testBasic(self):
         from music21 import stream
@@ -1843,7 +1849,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             b.style.color = '#FF00FF'
             a.append(b)
 
-        a.show()
+        if self.show:
+            a.show()
 
 
 # ------------------------------------------------------------------------------
@@ -1885,7 +1892,8 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(ly), "<music21.note.Lyric number=1 identifier='verse'>")
 
     def testComplex(self):
-        note1 = Note()
+        from music21 import note
+        note1 = note.Note()
         note1.duration.clear()
         d1 = duration.DurationTuple('whole', 0, 4.0)
         d2 = duration.DurationTuple('quarter', 0, 1.0)
@@ -1906,7 +1914,7 @@ class Test(unittest.TestCase):
         self.assertEqual(matchStr, outStr)
         i = 0
         for thisNote in note1.splitAtDurations():
-            matchSub = matchStr.split('\n')[i]
+            matchSub = matchStr.split('\n')[i]  # pylint: disable=use-maxsplit-arg
             conv = LilypondConverter()
             conv.appendM21ObjectToContext(thisNote)
             outStr = str(conv.context).replace(' ', '').strip()
@@ -1947,7 +1955,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(found), 24)
 
     def testNoteBeatProperty(self):
-        from music21 import stream, meter
+        from music21 import stream
+        from music21 import meter
 
         data = [
             ['3/4', 0.5, 6, [1.0, 1.5, 2.0, 2.5, 3.0, 3.5],
@@ -2123,7 +2132,8 @@ class Test(unittest.TestCase):
             self.assertEqual(a == b, match)  # sub6
 
     def testMetricalAccent(self):
-        from music21 import meter, stream
+        from music21 import meter
+        from music21 import stream
         data = [
             ('4/4', 8, 0.5, [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
             ('3/4', 6, 0.5, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]),
@@ -2176,10 +2186,11 @@ class Test(unittest.TestCase):
         # s.show()
 
     def testVolumeA(self):
+        from music21 import note
         v1 = volume.Volume()
 
-        n1 = Note()
-        n2 = Note()
+        n1 = note.Note()
+        n2 = note.Note()
 
         n1.volume = v1  # can set as v1 has no client
         self.assertEqual(n1.volume, v1)
@@ -2190,8 +2201,9 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(n2.volume)
 
     def testVolumeB(self):
+        from music21 import note
         # manage deepcopying properly
-        n1 = Note()
+        n1 = note.Note()
 
         n1.volume.velocity = 100
         self.assertEqual(n1.volume.velocity, 100)

@@ -28,7 +28,7 @@ it should display something like:
 
     Python 3.9.2
 
-if so, you're okay.  If not, go to http://www.python.org/download
+if so, you're okay.  If not, go to https://www.python.org/downloads/
 and download a newer version.  Multiple versions of Python can exist 
 on a single computer without any problems. 
 

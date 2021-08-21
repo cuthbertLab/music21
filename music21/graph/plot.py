@@ -32,6 +32,7 @@ from music21 import dynamics
 from music21 import features
 from music21 import note
 from music21 import prebase
+from music21 import stream  # circular, but okay, because not used at top level.
 
 from music21.graph import axis
 from music21.graph import primitives
@@ -233,7 +234,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         formatDict = {}
         # should be two for most things...
 
-        if 'Chord' not in el.classes:
+        if not isinstance(el, chord.Chord):
             for i, thisAxis in enumerate(self.allAxes):
                 axisValue = thisAxis.extractOneElement(el, formatDict)
                 # use isinstance(List) not isiterable, since
@@ -1107,7 +1108,7 @@ class HorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMix
         '''
         Extract the data from the Stream.
         '''
-        if 'Score' not in self.streamObj.classes:
+        if not isinstance(self.streamObj, stream.Score):
             raise GraphException('provided Stream must be Score')
         # parameters: x, span, heightScalar, color, alpha, yShift
         pr = reduction.PartReduction(
@@ -1441,7 +1442,7 @@ class Features(MultiStream):
 # -----------------------------------------------------------------------------------
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternalManual(unittest.TestCase):  # pragma: no cover
 
     def testHorizontalBarPitchSpaceOffset(self):
         a = corpus.parse('bach/bwv57.8')
@@ -1695,7 +1696,7 @@ class Test(unittest.TestCase):
         b.run()
 
     def testChordsA(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         b = Histogram(stream.Stream(), doneAction=None)
@@ -1748,7 +1749,7 @@ class Test(unittest.TestCase):
         # matching the number of pitches for each data point may be needed
 
     def testChordsA2(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1769,7 +1770,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsA3(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1788,7 +1789,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsA4(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1810,7 +1811,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsA5(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1832,7 +1833,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsB(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1926,7 +1927,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsB2(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1963,7 +1964,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsB3(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -2020,4 +2021,4 @@ _DOC_ORDER = [
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='test3DPitchSpaceQuarterLengthCount')
+    music21.mainTest(TestExternalManual)  # , runTest='test3DPitchSpaceQuarterLengthCount')

@@ -110,8 +110,8 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.v2n1 = v2n1
         self.v2n2 = v2n2
 
-        self.vIntervals = []  # vertical intervals (harmonic)
-        self.hIntervals = []  # horizontal intervals (melodic)
+        self.vIntervals: List[interval.Interval] = []  # vertical intervals (harmonic)
+        self.hIntervals: List[interval.Interval] = []  # horizontal intervals (melodic)
 
         self._key = None
         if analyticKey is not None:
@@ -180,7 +180,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 ) from e
         else:
             try:
-                isKey = ('Key' in keyValue.classes)
+                isKey = (isinstance(keyValue, key.Key))
                 if isKey is False:
                     raise AttributeError
             except AttributeError:  # pragma: no cover  # pylint: disable=raise-missing-from
@@ -197,9 +197,9 @@ class VoiceLeadingQuartet(base.Music21Object):
             setattr(self, which, note.Note(value))
         else:
             try:
-                if 'Note' in value.classes:
+                if isinstance(value, note.Note):
                     setattr(self, which, value)
-                elif 'Pitch' in value.classes:
+                elif isinstance(value, pitch.Pitch):
                     n = note.Note()
                     n.duration.quarterLength = 0.0
                     n.pitch = value
@@ -1428,10 +1428,10 @@ class Verticality(base.Music21Object):
         '''
         pitches = []
         for el in self.objects:
-            if 'Chord' in el.classes:
+            if isinstance(el, chord.Chord):
                 for x in el.pitches:
                     pitches.append(x.nameWithOctave)
-            elif 'Note' in el.classes:
+            elif isinstance(el, note.Note):
                 pitches.append(el)
         ch = chord.Chord(pitches)
         ch.style = self.style
@@ -1558,7 +1558,7 @@ class Verticality(base.Music21Object):
             if classFilterList == [None]:
                 retList.append(el)
             else:
-                if el.isClassOrSubclass(classFilterList):
+                if not el.classSet.isdisjoint(classFilterList):
                     retList.append(el)
         if len(retList) > 1:
             return retList
@@ -1591,7 +1591,7 @@ class Verticality(base.Music21Object):
         for part, objList in self.contentDict.items():
             for m21object in objList:
 
-                if m21object is None or not m21object.isClassOrSubclass(classFilterList):
+                if m21object is None or m21object.classSet.isdisjoint(classFilterList):
                     continue
                 else:
                     if partNums and part not in partNums:
@@ -1884,7 +1884,7 @@ class NNoteLinearSegment(base.Music21Object):
                 self._noteList.append(note.Note(value))
             else:
                 try:
-                    if value.isClassOrSubclass([note.Note, pitch.Pitch]):
+                    if not value.classSet.isdisjoint([note.Note, pitch.Pitch]):
                         self._noteList.append(value)
                 except (AttributeError, NameError):
                     self._noteList.append(None)
@@ -2017,7 +2017,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
             return note.Note(value)
         else:
             try:
-                if value.isClassOrSubclass([note.Note, pitch.Pitch]):
+                if not value.classSet.isdisjoint([note.Note, pitch.Pitch]):
                     return value
                 else:
                     return None
@@ -2078,7 +2078,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     def _reprInternal(self):
         return f'n1={self.n1} n2={self.n2} n3={self.n3}'
 
-    def color(self, color='red', noteList=(2,)):
+    @common.deprecated('v7', 'v8', 'assign colors to n1.style.color (etc.) directly')
+    def color(self, color='red', noteList=(2,)):  # pragma: no cover
         '''
         color all the notes in noteList (1, 2, 3). Default is to color
         only the second note red
@@ -2299,7 +2300,7 @@ class NChordLinearSegment(NObjectLinearSegment):
                 self._chordList.append(None)
             else:
                 try:
-                    if value.isClassOrSubclass(['Chord', 'Harmony']):
+                    if not value.classSet.isdisjoint(['Chord', 'Harmony']):
                         self._chordList.append(value)
                     # else:
                         # raise NChordLinearSegmentException(
@@ -2426,7 +2427,7 @@ class Test(unittest.TestCase):
         assert d.hiddenInterval(interval.Interval('AA4')) is False
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     pass
 
 

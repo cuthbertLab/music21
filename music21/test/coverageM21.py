@@ -49,6 +49,9 @@ def getCoverage(overrideVersion=False):
         cov = None
     return cov
 
+def startCoverage(cov):
+    if cov is not None:
+        cov.start()
 
 def stopCoverage(cov):
     if cov is not None:

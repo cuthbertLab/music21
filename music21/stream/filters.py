@@ -260,7 +260,7 @@ class ClassFilter(StreamFilter):
         return True
 
     def __call__(self, item, iterator):
-        return item.isClassOrSubclass(self.classList)
+        return not item.classSet.isdisjoint(self.classList)
 
     def _reprInternal(self):
         if len(self.classList) == 1:
@@ -290,7 +290,7 @@ class ClassNotFilter(ClassFilter):
     derivationStr = 'getElementsNotOfClass'
 
     def __call__(self, item, iterator):
-        return not item.isClassOrSubclass(self.classList)
+        return item.classSet.isdisjoint(self.classList)
 
 
 class GroupFilter(StreamFilter):

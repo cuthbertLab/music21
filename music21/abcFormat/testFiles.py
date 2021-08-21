@@ -695,7 +695,8 @@ class Test(unittest.TestCase):
         self.assertEqual(sharps, 7, 'C# key signature should be parsed as 7 sharps')
 
     def testAbc21(self):
-        from music21 import abcFormat, note
+        from music21 import abcFormat
+        from music21 import note
         from music21.abcFormat import translate
 
         af = abcFormat.ABCFile(abcVersion=(2, 1, 0))
@@ -727,7 +728,8 @@ class Test(unittest.TestCase):
         # self.assertEqual(notes[6].pitch.midi, 69, 'Tied-over sharp persists past the tie')
 
     def testAbc21DirectiveCarryPitch(self):
-        from music21 import abcFormat, note
+        from music21 import abcFormat
+        from music21 import note
         from music21.abcFormat import translate
 
         af = abcFormat.ABCFile()
@@ -757,7 +759,8 @@ class Test(unittest.TestCase):
         self.assertEqual(notes[12].pitch.midi, 72, 'Natural is ignored')
 
     def testAbc21DirectiveCarryOctave(self):
-        from music21 import abcFormat, note
+        from music21 import abcFormat
+        from music21 import note
         from music21.abcFormat import translate
 
         af = abcFormat.ABCFile()
@@ -787,7 +790,8 @@ class Test(unittest.TestCase):
         self.assertEqual(notes[12].pitch.midi, 72, 'Natural is ignored')
 
     def testAbc21DirectiveCarryNot(self):
-        from music21 import abcFormat, note
+        from music21 import abcFormat
+        from music21 import note
         from music21.abcFormat import translate
 
         af = abcFormat.ABCFile()
@@ -820,7 +824,8 @@ class Test(unittest.TestCase):
         '''
         Translation of ABC Chord variations
         '''
-        from music21 import abcFormat, chord
+        from music21 import abcFormat
+        from music21 import chord
         from music21.abcFormat import translate
 
         af = abcFormat.ABCFile()
@@ -868,7 +873,8 @@ class Test(unittest.TestCase):
 
     def testAbc21ChordSymbol(self):
         # Test the chord symbol for note and chord
-        from music21 import abcFormat, harmony
+        from music21 import abcFormat
+        from music21 import harmony
         from music21.abcFormat import translate
 
         # default length of this test
@@ -886,7 +892,8 @@ class Test(unittest.TestCase):
 
     def testAbc21BrokenRhythm(self):
         # Test the chord symbol for note and chord
-        from music21 import abcFormat, note
+        from music21 import abcFormat
+        from music21 import note
         from music21.abcFormat import translate
 
         # default length of this test
