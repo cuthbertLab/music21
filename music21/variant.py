@@ -27,9 +27,11 @@ import copy
 import difflib
 
 from music21 import base
+from music21 import clef
 from music21 import common
 from music21 import environment
 from music21 import exceptions21
+from music21 import meter
 from music21 import note
 from music21 import search
 from music21 import stream
@@ -939,7 +941,7 @@ def addVariant(
     if sVariant is None:  # deletion
         pass
     else:  # replacement or insertion
-        if 'Measure' in sVariant.classes:  # sVariant is a measure put it in a variant and insert.
+        if isinstance(sVariant, stream.Measure):  # sVariant is a measure put it in a variant and insert.
             tempVariant.append(sVariant)
         else:  # sVariant is not a measure
             sVariantMeasures = sVariant.getElementsByClass('Measure')
@@ -1798,10 +1800,10 @@ def _doVariantFixingOnStream(s, variantNames=None):
             targetElement = _getNextElements(s, v)
 
             # Delete initial clefs, etc. from initial insertion targetElement if it exists
-            if 'Stream' in targetElement.classes:
+            if isinstance(targetElement, stream.Stream):
                 # Must use .elements, because of removal of elements
                 for e in targetElement.elements:
-                    if 'Clef' in e.classes or 'TimeSignature' in e.classes:
+                    if isinstance(e, (clef.Clef, meter.TimeSignature)):
                         targetElement.remove(e)
 
             v.append(copy.deepcopy(targetElement))  # Appends a copy

@@ -1483,7 +1483,7 @@ class Test(unittest.TestCase):
                 self.assertEqual(knownSize[i], len(chords[i].pitches))
 
     def testConversionMXBeams(self):
-
+        from music21 import note
         from music21.musicxml import testPrimitive
 
         mxString = testPrimitive.beams01
@@ -1492,7 +1492,7 @@ class Test(unittest.TestCase):
         notes = part.flat.notesAndRests
         beams = []
         for n in notes:
-            if 'Note' in n.classes:
+            if isinstance(n, note.Note):
                 beams += n.beams.beamsList
         self.assertEqual(len(beams), 152)
 
@@ -1522,8 +1522,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(clefs), 18)
 
     def testConversionMXClefTimeCorpus(self):
-
-        from music21 import corpus, clef, meter
+        from music21 import corpus
+        from music21 import clef
+        from music21 import meter
         a = corpus.parse('luca')
 
         # there should be only one clef in each part
@@ -1671,7 +1672,10 @@ class Test(unittest.TestCase):
         parse(data)
 
     def testConversionMidiNotes(self):
-        from music21 import meter, key, chord, note
+        from music21 import meter
+        from music21 import key
+        from music21 import chord
+        from music21 import note
 
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test01.mid'
         # a simple file created in athenacl
@@ -1983,5 +1987,3 @@ if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)  # , runTest='testConverterFromPath')
-
-

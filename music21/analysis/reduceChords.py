@@ -72,7 +72,7 @@ class ChordReducer:
             closedPosition=False,
             forbiddenChords=None,
             maximumNumberOfChords=3):
-        if 'Score' not in inputScore.classes:
+        if not isinstance(inputScore, stream.Score):
             raise ChordReducerException("Must be called on a stream.Score")
 
         if allowableChords is not None:

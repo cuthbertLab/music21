@@ -507,7 +507,8 @@ class Test(unittest.TestCase):
 
 
     def testBackBasic(self):
-        from music21 import converter, common
+        from music21 import converter
+        from music21 import common
         fpDir = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01'
         s = converter.parse(fpDir)
         # note: this is a multi-staff work, but presently gets encoded

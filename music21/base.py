@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'7.0.8'
+'7.0.9'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -59,23 +59,26 @@ from typing import (
     TypeVar,
 )
 
-from music21.sites import SitesException
-from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
-from music21.common.enums import OffsetSpecial
+from music21 import common
+from music21.common.enums import ElementSearch, OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL, OffsetQLIn
-from music21 import style  # pylint: disable=unused-import
-from music21 import sites
 from music21 import environment
 from music21 import editorial
-from music21 import duration
-from music21.derivation import Derivation
 from music21 import defaults
-from music21 import common
+from music21.derivation import Derivation
+from music21 import duration
 from music21 import prebase
+from music21 import sites
+from music21 import style  # pylint: disable=unused-import
+from music21.sites import SitesException
+from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
+# needed for temporal manipulations; not music21 objects
+from music21 import tie
 from music21 import exceptions21
 from music21._version import __version__, __version_info__
 from music21.test.testRunner import mainTest
+
 
 # This should actually be bound to Music21Object, but cannot import here.
 _M21T = TypeVar('_M21T', bound=prebase.ProtoM21Object)
@@ -1159,7 +1162,7 @@ class Music21Object(prebase.ProtoM21Object):
         self,
         className,
         *,
-        getElementMethod='getElementAtOrBefore',
+        getElementMethod=ElementSearch.AT_OR_BEFORE,
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
@@ -1227,8 +1230,8 @@ class Music21Object(prebase.ProtoM21Object):
         part.  This is all you need to know for most uses.  The rest of the
         docs are for advanced uses:
 
-        The methods searches both Sites as well as associated objects to find a
-        matching class. Returns None if not match is found.
+        The method searches both Sites as well as associated objects to find a
+        matching class. Returns `None` if no match is found.
 
         A reference to the caller is required to find the offset of the object
         of the caller.
@@ -1238,13 +1241,24 @@ class Music21Object(prebase.ProtoM21Object):
         need a flat representation, the caller needs to be the source Stream,
         not its Sites reference.
 
-        The `getElementMethod` is a string that selects which Stream method is
-        used to get elements for searching. These strings are accepted:
+        The `getElementMethod` is an enum value (new in v.7) from
+        :class:`~music21.common.enums.ElementSearch` that selects which
+        Stream method is used to get elements for searching. (The historical form
+        of supplying one of the following values as a string is also supported.)
 
-        *    'getElementBefore'
-        *    'getElementAfter'
-        *    'getElementAtOrBefore' (Default)
-        *    'getElementAtOrAfter'
+        >>> from music21.common.enums import ElementSearch
+        >>> [x for x in ElementSearch]
+        [<ElementSearch.BEFORE>,
+         <ElementSearch.AFTER>,
+         <ElementSearch.AT_OR_BEFORE>,
+         <ElementSearch.AT_OR_AFTER>,
+         <ElementSearch.BEFORE_OFFSET>,
+         <ElementSearch.AFTER_OFFSET>,
+         <ElementSearch.AT_OR_BEFORE_OFFSET>,
+         <ElementSearch.AT_OR_AFTER_OFFSET>,
+         <ElementSearch.BEFORE_NOT_SELF>,
+         <ElementSearch.AFTER_NOT_SELF>,
+         <ElementSearch.ALL>]
 
         The "after" do forward contexts -- looking ahead.
 
@@ -1255,9 +1269,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> b.getContextByClass('Note') is b
         True
 
-        To get the previous `Note`, use `getElementMethod='getElementBefore'`
+        To get the previous `Note`, use `getElementMethod=ElementSearch.BEFORE`:
 
-        >>> a = b.getContextByClass('Note', getElementMethod='getElementBefore')
+        >>> a = b.getContextByClass('Note', getElementMethod=ElementSearch.BEFORE)
         >>> a
         <music21.note.Note A>
 
@@ -1267,17 +1281,40 @@ class Music21Object(prebase.ProtoM21Object):
         >>> b.previous('Note')
         <music21.note.Note A>
 
-        To get the following `Note` use `getElementMethod='getElementAfter'`
+        To get the following `Note` use `getElementMethod=ElementSearch.AFTER`:
 
-        >>> c = b.getContextByClass('Note', getElementMethod='getElementAfter')
+        >>> c = b.getContextByClass('Note', getElementMethod=ElementSearch.AFTER)
         >>> c
         <music21.note.Note C>
 
-        This is similar to `.next('Note')`. though again that method is a bit more
+        This is similar to `.next('Note')`, though, again, that method is a bit more
         sophisticated:
 
         >>> b.next('Note')
         <music21.note.Note C>
+
+        A Stream might contain several elements at the same offset, leading to
+        potentially surprising results where searching by `ElementSearch.AT_OR_BEFORE`
+        does not find an element that is technically the NEXT node but still at 0.0:
+
+        >>> s = stream.Stream()
+        >>> s.insert(0, clef.BassClef())
+        >>> s.next()
+        <music21.clef.BassClef>
+        >>> s.getContextByClass(clef.Clef) is None
+        True
+        >>> s.getContextByClass(clef.Clef, getElementMethod=ElementSearch.AT_OR_AFTER)
+        <music21.clef.BassClef>
+
+        This can be remedied by explicitly searching by offsets:
+
+        >>> s.getContextByClass(clef.Clef, getElementMethod=ElementSearch.AT_OR_BEFORE_OFFSET)
+        <music21.clef.BassClef>
+
+        Or by not limiting the search by temporal position at all:
+
+        >>> s.getContextByClass(clef.Clef, getElementMethod=ElementSearch.ALL)
+        <music21.clef.BassClef>
 
         Notice that if searching for a `Stream` context, the element is not
         guaranteed to be in that Stream.  This is obviously true in this case:
@@ -1322,6 +1359,13 @@ class Music21Object(prebase.ProtoM21Object):
         * changed in v.5.7 -- added followDerivation=False and made
             everything but the class keyword only
         * added in v.6 -- added priorityTargetOnly -- see contextSites for description.
+        * added in v.7 -- added getElementMethod `all` and `ElementSearch` enum.
+
+        Raises `ValueError` if `getElementMethod` is not a value in `ElementSearch`.
+
+        >>> n2.getContextByClass('TextExpression', getElementMethod='invalid')
+        Traceback (most recent call last):
+        ValueError: Invalid getElementMethod: invalid
 
         OMIT_FROM_DOCS
 
@@ -1338,6 +1382,38 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.stream.Measure 3 offset=5.0> SortTuple(atEnd=0, offset=1.0, ...) elementsFirst
         <music21.stream.Part 0x1118cadd8> SortTuple(atEnd=0, offset=6.0, ...) flatten
         '''
+        OFFSET_METHODS = [
+            ElementSearch.BEFORE_OFFSET,
+            ElementSearch.AFTER_OFFSET,
+            ElementSearch.AT_OR_BEFORE_OFFSET,
+            ElementSearch.AT_OR_AFTER_OFFSET,
+        ]
+        BEFORE_METHODS = [
+            ElementSearch.BEFORE,
+            ElementSearch.BEFORE_OFFSET,
+            ElementSearch.AT_OR_BEFORE,
+            ElementSearch.AT_OR_BEFORE_OFFSET,
+            ElementSearch.BEFORE_NOT_SELF,
+        ]
+        AFTER_METHODS = [
+            ElementSearch.AFTER,
+            ElementSearch.AFTER_OFFSET,
+            ElementSearch.AT_OR_AFTER,
+            ElementSearch.AT_OR_AFTER,
+            ElementSearch.AT_OR_AFTER_OFFSET,
+            ElementSearch.AFTER_NOT_SELF,
+        ]
+        AT_METHODS = [
+            ElementSearch.AT_OR_BEFORE,
+            ElementSearch.AT_OR_AFTER,
+            ElementSearch.AT_OR_BEFORE_OFFSET,
+            ElementSearch.AT_OR_AFTER_OFFSET,
+        ]
+        NOT_SELF_METHODS = [
+            ElementSearch.BEFORE_NOT_SELF,
+            ElementSearch.AFTER_NOT_SELF,
+        ]
+        # ALL is just a no-op
         def payloadExtractor(checkSite, flatten, innerPositionStart):
             '''
             change the site (stream) to a Tree (using caches if possible),
@@ -1347,19 +1423,15 @@ class Music21Object(prebase.ProtoM21Object):
             flatten can be True, 'semiFlat', or False.
             '''
             siteTree = checkSite.asTree(flatten=flatten, classList=className)
-            if 'Offset' in getElementMethod:
+            if getElementMethod in OFFSET_METHODS:
                 # these methods match only by offset.  Used in .getBeat among other places
-                if (('At' in getElementMethod and 'Before' in getElementMethod)
-                        or ('At' not in getElementMethod and 'After' in getElementMethod)):
-                    innerPositionStart = ZeroSortTupleHigh.modify(offset=innerPositionStart.offset)
-                elif (('At' in getElementMethod and 'After' in getElementMethod)
-                        or ('At' not in getElementMethod and 'Before' in getElementMethod)):
+                if getElementMethod in (ElementSearch.BEFORE_OFFSET,
+                                        ElementSearch.AT_OR_AFTER_OFFSET):
                     innerPositionStart = ZeroSortTupleLow.modify(offset=innerPositionStart.offset)
                 else:
-                    raise Music21Exception(
-                        f'Incorrect getElementMethod: {getElementMethod}')
+                    innerPositionStart = ZeroSortTupleHigh.modify(offset=innerPositionStart.offset)
 
-            if 'Before' in getElementMethod:
+            if getElementMethod in BEFORE_METHODS:
                 contextNode = siteTree.getNodeBefore(innerPositionStart)
             else:
                 contextNode = siteTree.getNodeAfter(innerPositionStart)
@@ -1464,21 +1536,24 @@ class Music21Object(prebase.ProtoM21Object):
                 # when crossing measure borders.  Thus it's well-formed.
                 return True
 
-            if 'Before' in getElementMethod and selfSortTuple < contextSortTuple:
+            if getElementMethod in BEFORE_METHODS and selfSortTuple < contextSortTuple:
                 # print(getElementMethod, selfSortTuple.shortRepr(),
                 #       contextSortTuple.shortRepr(), self, contextEl)
                 return False
-            elif 'After' in getElementMethod and selfSortTuple > contextSortTuple:
+            elif getElementMethod in AFTER_METHODS and selfSortTuple > contextSortTuple:
                 # print(getElementMethod, selfSortTuple.shortRepr(),
                 #       contextSortTuple.shortRepr(), self, contextEl)
                 return False
             else:
                 return True
 
+        if getElementMethod not in ElementSearch:
+            raise ValueError(f'Invalid getElementMethod: {getElementMethod}')
+
         if className and not common.isListLike(className):
             className = (className,)
 
-        if 'At' in getElementMethod and self.isClassOrSubclass(className):
+        if getElementMethod in AT_METHODS and not self.classSet.isdisjoint(className):
             return self
 
         for site, positionStart, searchType in self.contextSites(
@@ -1501,12 +1576,12 @@ class Music21Object(prebase.ProtoM21Object):
                 # otherwise, continue to check for flattening...
 
             if searchType != 'elementsOnly':  # flatten or elementsFirst
-                if ('After' in getElementMethod
+                if (getElementMethod in AFTER_METHODS
                         and (not className
-                             or site.isClassOrSubclass(className))):
-                    if 'NotSelf' in getElementMethod and self is site:
+                             or not site.classSet.isdisjoint(className))):
+                    if getElementMethod in NOT_SELF_METHODS and self is site:
                         pass
-                    elif 'NotSelf' not in getElementMethod:  # for 'After' we can't do the
+                    elif getElementMethod not in NOT_SELF_METHODS:  # for 'After' we can't do the
                         # containing site because that comes before.
                         return site  # if the site itself is the context, return it...
 
@@ -1520,10 +1595,10 @@ class Music21Object(prebase.ProtoM21Object):
                         pass
                     return contextEl
 
-                if ('Before' in getElementMethod
+                if (getElementMethod in BEFORE_METHODS
                         and (not className
-                             or site.isClassOrSubclass(className))):
-                    if 'NotSelf' in getElementMethod and self is site:
+                             or not site.classSet.isdisjoint(className))):
+                    if getElementMethod in NOT_SELF_METHODS and self is site:
                         pass
                     else:
                         return site  # if the site itself is the context, return it...
@@ -1720,6 +1795,8 @@ class Music21Object(prebase.ProtoM21Object):
         *  changed in v6: added `priorityTargetOnly=False` to only search in the
             context of the priorityTarget.
         '''
+        from music21 import stream
+
         if memo is None:
             memo = []
 
@@ -1750,7 +1827,7 @@ class Music21Object(prebase.ProtoM21Object):
                                              excludeNone=True):
             if siteObj in memo:
                 continue
-            if 'SpannerStorage' in siteObj.classes:
+            if isinstance(siteObj, stream.SpannerStorage):
                 continue
 
             try:
@@ -2061,7 +2138,7 @@ class Music21Object(prebase.ProtoM21Object):
             asTree = activeS.asTree(classList=className, flatten=False)
             prevNode = asTree.getNodeBefore(self.sortTuple())
             if prevNode is None:
-                if className is None or activeS.isClassOrSubclass(className):
+                if className is None or not activeS.classSet.isdisjoint(className):
                     return activeS
                 else:
                     return None
@@ -2748,7 +2825,7 @@ class Music21Object(prebase.ProtoM21Object):
                         candidate = alt
                 else:
                     return post
-            if includeNonStreamDerivations is True or 'Stream' in candidate.classes:
+            if includeNonStreamDerivations is True or candidate.isStream:
                 post.append(candidate)
             focus = candidate
         return post
@@ -2872,8 +2949,8 @@ class Music21Object(prebase.ProtoM21Object):
 
         Changed in v7. -- all but quarterLength are keyword only
         '''
-        # needed for temporal manipulations; not music21 objects
-        from music21 import tie
+        from music21 import chord
+        from music21 import note
         quarterLength = opFrac(quarterLength)
 
         if quarterLength > self.duration.quarterLength:
@@ -2939,9 +3016,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         # some higher-level classes need this functionality
         # set ties
-        if addTies and ('Note' in e.classes
-                        or 'Unpitched' in e.classes):
-
+        if addTies and isinstance(e, (note.Note, note.Unpitched)):
             forceEndTieType = 'stop'
             if hasattr(e, 'tie') and e.tie is not None:
                 # the last tie of what was formally a start should
@@ -2965,7 +3040,7 @@ class Music21Object(prebase.ProtoM21Object):
                 # pylint: disable=attribute-defined-outside-init
                 eRemain.tie = tie.Tie(forceEndTieType)
 
-        elif addTies and 'Chord' in e.classes:
+        elif addTies and isinstance(e, chord.Chord):
             for i in range(len(e.notes)):
                 component = e.notes[i]
                 remainComponent = eRemain.notes[i]
@@ -3249,7 +3324,7 @@ class Music21Object(prebase.ProtoM21Object):
             # as we often want the most recent measure
             for cs in self.contextSites():
                 m = cs[0]
-                if 'Measure' in m.classes:
+                if m.isMeasure:
                     mNumber = m.number
         return mNumber
 
@@ -3998,7 +4073,8 @@ class Test(unittest.TestCase):
         self.assertEqual(a.offset, 23.0)
 
     def testObjectsAndElements(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         note1 = note.Note('B-')
         note1.duration.type = 'whole'
         stream1 = stream.Stream()
@@ -4019,7 +4095,8 @@ class Test(unittest.TestCase):
         '''
         Basic testing of M21 base object sites
         '''
-        from music21 import stream, base  # self import needed.
+        from music21 import stream
+        from music21 import base  # self import needed.
         a = base.Music21Object()
         b = stream.Stream()
 
@@ -4059,7 +4136,8 @@ class Test(unittest.TestCase):
         '''
         Basic testing of M21 base object
         '''
-        from music21 import stream, base
+        from music21 import stream
+        from music21 import base
         a = stream.Stream()
         a.id = 'a obj'
         b = base.Music21Object()
@@ -4079,7 +4157,8 @@ class Test(unittest.TestCase):
     def testM21BaseLocationsCopyB(self):
         # the active site of a deepcopy should not be the same?
         # self.assertEqual(post[-1].activeSite, a)
-        from music21 import stream, base
+        from music21 import stream
+        from music21 import base
         a = stream.Stream()
         b = base.Music21Object()
         b.id = 'test'
@@ -4099,7 +4178,9 @@ class Test(unittest.TestCase):
         # this fails! post[-1].getOffsetBySite(a)
 
     def testSitesSearch(self):
-        from music21 import note, stream, clef
+        from music21 import note
+        from music21 import stream
+        from music21 import clef
 
         n1 = note.Note('A')
         n2 = note.Note('B')
@@ -4149,7 +4230,9 @@ class Test(unittest.TestCase):
     def testSitesMeasures(self):
         '''Can a measure determine the last Clef used?
         '''
-        from music21 import corpus, clef, stream
+        from music21 import corpus
+        from music21 import clef
+        from music21 import stream
         a = corpus.parse('bach/bwv324.xml')
         measures = a.parts[0].getElementsByClass('Measure').stream()  # measures of first part
 
@@ -4188,7 +4271,9 @@ class Test(unittest.TestCase):
         self.assertTrue(isinstance(post, clef.TrebleClef), post)
 
     def testSitesClef(self):
-        from music21 import note, stream, clef
+        from music21 import note
+        from music21 import stream
+        from music21 import clef
         sOuter = stream.Stream()
         sOuter.id = 'sOuter'
         sInner = stream.Stream()
@@ -4208,9 +4293,6 @@ class Test(unittest.TestCase):
         # we should be able to find a clef from the lower-level stream
         post = sInner.getContextByClass(clef.Clef)
         self.assertTrue(isinstance(post, clef.AltoClef), post)
-
-        post = sInner.getClefs(clef.Clef)
-        self.assertTrue(isinstance(post[0], clef.AltoClef), post[0])
 
     def testBeatAccess(self):
         '''Test getting beat data from various Music21Objects.
@@ -4287,7 +4369,9 @@ class Test(unittest.TestCase):
         self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None])
 
     def testGetBeatStrengthA(self):
-        from music21 import stream, note, meter
+        from music21 import stream
+        from music21 import note
+        from music21 import meter
 
         n = note.Note('g')
         n.quarterLength = 1
@@ -4308,7 +4392,9 @@ class Test(unittest.TestCase):
     def testMeasureNumberAccess(self):
         '''Test getting measure number data from various Music21Objects.
         '''
-        from music21 import corpus, stream, note
+        from music21 import corpus
+        from music21 import stream
+        from music21 import note
 
         s = corpus.parse('bach/bwv66.6.xml')
         p1 = s.parts['Soprano']
@@ -4336,7 +4422,9 @@ class Test(unittest.TestCase):
         self.assertEqual(n.measureNumber, 74)
 
     def testPickupMeasuresBuilt(self):
-        from music21 import stream, meter, note
+        from music21 import stream
+        from music21 import meter
+        from music21 import note
 
         s = stream.Score()
 
@@ -4435,7 +4523,9 @@ class Test(unittest.TestCase):
                           43.0, 44.0, 44.5, 45.0, 47.0])
 
     def testHighestTime(self):
-        from music21 import stream, note, bar
+        from music21 import stream
+        from music21 import note
+        from music21 import bar
         s = stream.Stream()
         n1 = note.Note()
         n1.quarterLength = 30
@@ -4454,7 +4544,9 @@ class Test(unittest.TestCase):
         self.assertEqual(b1.getOffsetBySite(s), 50.0)
 
     def testRecurseByClass(self):
-        from music21 import note, stream, clef
+        from music21 import note
+        from music21 import stream
+        from music21 import clef
         s1 = stream.Stream()
         s2 = stream.Stream()
         s3 = stream.Stream()
@@ -4501,7 +4593,8 @@ class Test(unittest.TestCase):
         self.assertEqual(id(n2.derivation.origin), id(n1))
 
     def testHasElement(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         n1 = note.Note()
         s1 = stream.Stream()
         s1.append(n1)
@@ -4514,7 +4607,9 @@ class Test(unittest.TestCase):
         self.assertTrue(s2 in n2.sites)
 
     def testGetContextByClassA(self):
-        from music21 import stream, note, tempo
+        from music21 import stream
+        from music21 import note
+        from music21 import tempo
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -4537,7 +4632,8 @@ class Test(unittest.TestCase):
                          '<music21.tempo.MetronomeMark lento 16th=50>')
 
     def testElementWrapperOffsetAccess(self):
-        from music21 import stream, meter
+        from music21 import stream
+        from music21 import meter
         from music21 import base
 
         class Mock:
@@ -4563,7 +4659,8 @@ class Test(unittest.TestCase):
 
     def testGetActiveSiteTimeSignature(self):
         from music21 import base
-        from music21 import stream, meter
+        from music21 import stream
+        from music21 import meter
 
         class Wave_read:
             def getnchannels(self):
@@ -4598,7 +4695,9 @@ class Test(unittest.TestCase):
 
     def testGetMeasureOffsetOrMeterModulusOffsetA(self):
         # test getting metric position in a Stream with a TS
-        from music21 import stream, note, meter
+        from music21 import stream
+        from music21 import note
+        from music21 import meter
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -4617,7 +4716,9 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5])
 
     def testGetMeasureOffsetOrMeterModulusOffsetB(self):
-        from music21 import stream, note, meter
+        from music21 import stream
+        from music21 import note
+        from music21 import meter
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -4635,7 +4736,9 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [1.0, 0.5, 0.5, 1.0, 0.25, 0.5, 0.25, 1.0, 0.5, 1.0, 0.5, 1.0])
 
     def testSecondsPropertyA(self):
-        from music21 import stream, note, tempo
+        from music21 import stream
+        from music21 import note
+        from music21 import tempo
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
         s.insert(0, tempo.MetronomeMark(number=120))
@@ -4674,8 +4777,13 @@ class Test(unittest.TestCase):
         c = b.getContextByClass('Note', getElementMethod='getElementAfterOffset')
         self.assertEqual(c.name, 'C')
 
+        m = p.measure(1)
+        self.assertIsNotNone(m.getContextByClass('Clef', getElementMethod='all'))
+
     def testGetContextByClassB(self):
-        from music21 import stream, note, meter
+        from music21 import stream
+        from music21 import note
+        from music21 import meter
 
         s = stream.Score()
 
@@ -4733,7 +4841,9 @@ class Test(unittest.TestCase):
                          '<music21.meter.TimeSignature 3/4>')
 
     def testNextA(self):
-        from music21 import stream, scale, note
+        from music21 import stream
+        from music21 import scale
+        from music21 import note
         s = stream.Stream()
         sc = scale.MajorScale()
         notes = []
@@ -4755,7 +4865,8 @@ class Test(unittest.TestCase):
         self.assertEqual(notes[7], s.notes[6].next())
 
     def testNextB(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
 
         m1 = stream.Measure()
         m1.number = 1
@@ -4822,7 +4933,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(measures[0].previous()), str(p1))
 
     def testActiveSiteCopyingA(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
 
         n1 = note.Note()
         s1 = stream.Stream()
@@ -4834,7 +4946,9 @@ class Test(unittest.TestCase):
         self.assertIs(n2.derivation.origin.activeSite, s1)
 
     def testSpannerSites(self):
-        from music21 import note, spanner, dynamics
+        from music21 import note
+        from music21 import spanner
+        from music21 import dynamics
 
         n1 = note.Note('C4')
         n2 = note.Note('D4')
@@ -4921,7 +5035,8 @@ class Test(unittest.TestCase):
                           "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
 
     def testContextSitesB(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         p1 = stream.Part()
         p1.id = 'p1'
         m1 = stream.Measure()
@@ -4973,7 +5088,7 @@ class Test(unittest.TestCase):
 #         i = 20
 #         while o and i:
 #             print(o)
-#             if 'Part' in o.classes:
+#             if isinstance(o, stream.Part):
 #                 pass
 #             o = o.previous()
 #             i -= 1
@@ -5000,7 +5115,8 @@ class Test(unittest.TestCase):
 #             i -= 1
 
     def testPreviousAfterDeepcopy(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         e1 = note.Note('C')
         e2 = note.Note('D')
         s = stream.Stream()
@@ -5057,4 +5173,3 @@ del (Any,
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testPreviousB')
-

@@ -277,6 +277,8 @@ class Chord(note.NotRest):
         >>> c1 != c2
         True
         '''
+        if super().__eq__(other) is NotImplemented:
+            return NotImplemented
         if not super().__eq__(other):
             return False
         if not isinstance(other, self.__class__):
@@ -391,7 +393,7 @@ class Chord(note.NotRest):
         elif not hasattr(key, 'classes'):
             raise KeyError(keyErrorStr)
 
-        elif 'Note' in key.classes:
+        elif isinstance(key, note.Note):
             for n in self._notes:
                 if n is key:
                     foundNote = n
@@ -404,7 +406,7 @@ class Chord(note.NotRest):
                 else:
                     raise KeyError(keyErrorStr)
 
-        elif 'Pitch' in key.classes:
+        elif isinstance(key, pitch.Pitch):
             for n in self._notes:
                 if n.pitch is key:
                     foundNote = n
@@ -474,9 +476,9 @@ class Chord(note.NotRest):
             value = note.Note(value)
         elif not hasattr(value, 'classes'):
             raise ValueError('Chord index must be set to a valid note object')
-        elif 'Pitch' in value.classes:
+        elif isinstance(value, pitch.Pitch):
             value = note.Note(pitch=value)
-        elif 'Note' not in value.classes:
+        elif not isinstance(value, note.Note):
             raise ValueError('Chord index must be set to a valid note object')
 
         self._notes[keyIndex] = value
@@ -770,7 +772,7 @@ class Chord(note.NotRest):
         if not hasattr(removeItem, 'classes'):
             raise ValueError('Cannot remove {} from a chord; try a Pitch or Note object'.format(
                 removeItem))
-        if 'Pitch' in removeItem.classes:
+        if isinstance(removeItem, pitch.Pitch):
             for n in self._notes:
                 if n.pitch == removeItem:
                     self._notes.remove(n)
@@ -1424,7 +1426,7 @@ class Chord(note.NotRest):
             if testRoot is None:
                 # can this be tested?
                 raise ChordException('Cannot run getChordStep without a root')
-        elif 'Note' in testRoot.classes:
+        elif isinstance(testRoot, note.Note):
             testRoot = testRoot.pitch
 
         rootDNN = testRoot.diatonicNoteNum
@@ -5965,7 +5967,8 @@ class Test(unittest.TestCase):
                          + '(3, <music21.pitch.Accidental flat>), (3, None), (4, None)]')
 
     def testScaleDegreesB(self):
-        from music21 import stream, key
+        from music21 import stream
+        from music21 import key
         # trying to isolate problematic context searches
         chord1 = Chord(['C#5', 'E#5', 'G#5'])
         st1 = stream.Stream()
@@ -6058,7 +6061,8 @@ class Test(unittest.TestCase):
                         out)
 
     def testTiesB(self):
-        from music21 import stream, scale
+        from music21 import stream
+        from music21 import scale
         sc = scale.WholeToneScale()
         s = stream.Stream()
         for i in range(7):
@@ -6136,7 +6140,8 @@ class Test(unittest.TestCase):
 
     def testVolumePerPitchC(self):
         import random
-        from music21 import stream, tempo
+        from music21 import stream
+        from music21 import tempo
         c = Chord(['f-2', 'a-2', 'c-3', 'f-3', 'g3', 'b-3', 'd-4', 'e-4'])
         c.duration.quarterLength = 0.5
         s = stream.Stream()

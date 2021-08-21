@@ -639,7 +639,7 @@ class ChordStepModification(prebase.ProtoM21Object):
     def interval(self, value):
         if value in (None,):
             self._interval = None
-        elif hasattr(value, 'classes') and 'Interval' in value.classes:
+        elif isinstance(value, interval.Interval):
             # an interval object: set directly
             self._interval = value
         else:
@@ -2552,7 +2552,8 @@ class Test(unittest.TestCase):
         because ChordSymbol used to have the same `.classSortOrder`
         as Note.
         '''
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
 
         cs = ChordSymbol('C')
         n = note.Note('C')
@@ -3083,7 +3084,8 @@ class TestExternal(unittest.TestCase):
 
     def testReadInXML(self):
         from music21 import harmony
-        from music21 import corpus, stream
+        from music21 import corpus
+        from music21 import stream
         testFile = corpus.parse('leadSheet/fosterBrownHair.xml')
 
         # testFile.show('text')
@@ -3101,7 +3103,10 @@ class TestExternal(unittest.TestCase):
         # self.assertEqual(len(csChords), 40)
 
     def testChordRealization(self):
-        from music21 import harmony, corpus, note, stream
+        from music21 import harmony
+        from music21 import corpus
+        from music21 import note
+        from music21 import stream
         # There is a test file under demos called ComprehensiveChordSymbolsTestFile.xml
         # that should contain a complete iteration of tests of chord symbol objects
         # this test makes sure that no error exists, and checks that 57 chords were

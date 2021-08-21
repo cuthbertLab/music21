@@ -610,7 +610,8 @@ class Trigram:
 class Test(unittest.TestCase):
 
     def testBasic(self):
-        from music21 import converter, corpus
+        from music21 import converter
+        from music21 import corpus
 
         a = converter.parse(corpus.getWork('haydn/opus1no1/movement4.xml'))
         post = assembleLyrics(a)
@@ -622,7 +623,8 @@ class Test(unittest.TestCase):
 
 
     def testAssembleLyricsA(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         s = stream.Stream()
         for syl in ['hel-', '-lo', 'a-', '-gain']:
             n = note.Note()

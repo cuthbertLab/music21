@@ -1853,7 +1853,8 @@ class RecursiveIterator(StreamIterator):
 
 class Test(unittest.TestCase):
     def testSimpleClone(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         s = stream.Stream()
         r = note.Rest()
         n = note.Note()
@@ -1867,7 +1868,8 @@ class Test(unittest.TestCase):
         self.assertIs(s_notes[0], n)
 
     def testAddingFiltersMidIteration(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         s = stream.Stream()
         r = note.Rest()
         n = note.Note()
@@ -1894,7 +1896,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n.activeSite.number, 2)
 
     def testCurrentHierarchyOffsetReset(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         p = stream.Part()
         m = stream.Measure()
         m.append(note.Note('D'))
@@ -1910,7 +1913,8 @@ class Test(unittest.TestCase):
         self.assertIsNone(currentOffset)
 
     def testAddingFiltersMidRecursiveIteration(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         from music21.stream.iterator import RecursiveIterator as ImportedRecursiveIterator
         m = stream.Measure()
         r = note.Rest()

@@ -141,9 +141,9 @@ class TempoIndication(base.Music21Object):
         if found is None:
             found = self
 
-        if 'MetricModulation' in found.classes:
+        if isinstance(found, MetricModulation):
             return found.newMetronome
-        elif 'MetronomeMark' in found.classes:
+        elif isinstance(found, MetronomeMark):
             return found
         elif 'TempoText' in found.classes:
             return found.getMetronomeMark()
@@ -168,7 +168,7 @@ class TempoIndication(base.Music21Object):
         # search for TempoIndication objects, not just MetronomeMark objects
         # must provide getElementBefore, as will otherwise return self
         obj = self.getContextByClass('TempoIndication',
-                                     getElementMethod='getElementBeforeOffset')
+                                     getElementMethod=common.enums.ElementSearch.BEFORE_OFFSET)
         if obj is None:
             return None  # nothing to do
         return self.getSoundingMetronomeMark(obj)
@@ -453,7 +453,7 @@ class MetronomeMark(TempoIndication):
         # assume ql value or a type string
         elif common.isNum(value) or isinstance(value, str):
             self._referent = duration.Duration(value)
-        elif 'Duration' not in value.classes:
+        elif not isinstance(value, duration.Duration):
             # try get duration object, like from Note
             self._referent = value.duration
         elif 'Duration' in value.classes:

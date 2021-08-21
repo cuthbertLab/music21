@@ -1477,7 +1477,8 @@ class Test(unittest.TestCase):
         test that get position after works with
         an offset when the tree is built on SortTuples.
         '''
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
 
         et = ElementTree()
 
@@ -1535,7 +1536,9 @@ class Test(unittest.TestCase):
 
         G# was coming from an incorrect activeSite.  activeSite should not be used!
         '''
-        from music21 import corpus, stream, note
+        from music21 import corpus
+        from music21 import stream
+        from music21 import note
         s = stream.Stream()
         n0 = note.Note('A')
         n0.duration.quarterLength = 3.0

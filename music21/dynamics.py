@@ -467,7 +467,8 @@ class Test(unittest.TestCase):
         self.assertNotEqual(xmlOut.find(match), -1, xmlOut)
 
     def testDynamicsPositionA(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         s = stream.Stream()
         selections = ['pp', 'f', 'mf', 'fff']
         # positions = [-20, 0, 20]
@@ -479,7 +480,9 @@ class Test(unittest.TestCase):
 
     def testDynamicsPositionB(self):
         import random
-        from music21 import stream, note, layout
+        from music21 import stream
+        from music21 import note
+        from music21 import layout
         s = stream.Stream()
         for i in range(6):
             m = stream.Measure(number=i + 1)

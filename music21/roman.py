@@ -2148,6 +2148,8 @@ class RomanNumeral(harmony.Harmony):
         '''
         Compare equality, just based on NotRest and on figure and key
         '''
+        if note.NotRest.__eq__(self, other) is NotImplemented:
+            return NotImplemented
         if not note.NotRest.__eq__(self, other):
             return False
         if self.key != other.key:
@@ -2648,7 +2650,7 @@ class RomanNumeral(harmony.Harmony):
 
         if aug6Match:
             # NB -- could be Key or Scale
-            if (('Key' in useScale.classes and useScale.mode == 'major')
+            if ((isinstance(useScale, key.Key) and useScale.mode == 'major')
                     or ('DiatonicScale' in useScale.classes and useScale.type == 'major')):
                 useScale = key.Key(useScale.tonic, 'minor')
                 self.impliedScale = useScale
@@ -3652,7 +3654,7 @@ class Test(unittest.TestCase):
             targetCount,
         )
         for e in s3.recurse(streamsOnly=True):
-            if 'KeySignature' in e.classes:
+            if isinstance(e, key.KeySignature):
                 # all active sites are None because of deep-copying
                 if e.activeSite is not None:
                     e.activeSite.remove(e)
@@ -3665,7 +3667,7 @@ class Test(unittest.TestCase):
         )
         # do not remove in iteration.
         for c in list(s4.recurse(streamsOnly=False)):
-            if 'Stream' in c.classes:
+            if isinstance(c, stream.Stream):
                 for e in c.getElementsByClass('KeySignature'):
                     c.remove(e)
 
@@ -4084,7 +4086,7 @@ class TestExternal(unittest.TestCase):
         cKey = b.analyze('key')
         figuresCache = {}
         for x in c.recurse():
-            if 'Chord' in x.classes:
+            if isinstance(x, chord.Chord):
                 rnc = romanNumeralFromChord(x, cKey)
                 figure = rnc.figure
                 if figure not in figuresCache:
