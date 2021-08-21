@@ -2720,6 +2720,20 @@ class Test(unittest.TestCase):
         m = p1.measure(1)
         self.assertEqual(str(m.rightBarline), '<music21.bar.Barline type=final>')
 
+    def testMakeAccidentalsInScore(self):
+        '''
+        Making accidentals on a score having a part with measures
+        should still reiterate accidentals measure by measure.
+        '''
+        n1 = note.Note('f#', type='whole')
+        n2 = note.Note('f#', type='whole')
+        m1 = Measure(n1)
+        m2 = Measure(n2)
+        p = Part([m1, m2])
+        s = Score(p)
+        s.makeAccidentals(inPlace=True)
+        self.assertIs(s[note.Note].last().pitch.accidental.displayStatus, True)
+
     def testMakeAccidentalsWithKeysInMeasures(self):
         scale1 = ['c4', 'd4', 'e4', 'f4', 'g4', 'a4', 'b4', 'c5']
         scale2 = ['c', 'd', 'e-', 'f', 'g', 'a-', 'b-', 'c5']

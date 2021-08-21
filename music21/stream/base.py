@@ -6655,7 +6655,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if tiePitchSet is None:
             tiePitchSet = set()
 
+        last_measure: Optional[Measure] = None
+
         for e in noteIterator:
+            if e.activeSite is not None and e.activeSite.isMeasure:
+                if last_measure is not None and e.activeSite is not last_measure:
+                    # New measure encountered: move pitchPast to
+                    # pitchPastMeasure and clear pitchPast
+                    pitchPastMeasure = pitchPast[:]
+                    pitchPast = []
+                last_measure = e.activeSite
             if isinstance(e, note.Note):
                 if e.pitch.nameWithOctave in tiePitchSet:
                     lastNoteWasTied = True

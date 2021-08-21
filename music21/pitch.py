@@ -3065,7 +3065,7 @@ class Pitch(prebase.ProtoM21Object):
             if tempStep in ('C', 'D', 'F', 'G', 'H'):
                 firstFlatName = 'es'
             else:  # A, E.  Bs should never occur...
-                firstFlatName = u's'
+                firstFlatName = 's'
             multipleFlats = abs(tempAlter) - 1
             tempName = tempStep + firstFlatName + (multipleFlats * 'es')
             return tempName
