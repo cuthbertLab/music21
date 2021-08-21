@@ -14,7 +14,8 @@
 
 import copy
 import unittest
-from typing import List, Generator, Optional
+from typing import List, Generator, Optional, Union
+from fractions import Fraction  # typing only
 
 from music21 import beam
 from music21 import clef
@@ -843,18 +844,17 @@ def makeRests(
     def oHighTargetForMeasure(
         m: Optional[stream.Measure] = None,
         ts: Optional[meter.TimeSignature] = None
-    ) -> float:
+    ) -> Union[float, Fraction]:
         """
         Needed for timeRangeFromBarDuration.
         Returns 0.0 if no meter can be found.
         """
-        bar_duration: float = 0.0
+        post: Union[float, Fraction] = 0.0
         if ts is not None:
-            bar_duration = ts.barDuration
+            post = ts.barDuration.quarterLength
         elif m is not None:
             # More expensive context search
-            bar_duration = m.barDuration
-        post = bar_duration.quarterLength
+            post = m.barDuration.quarterLength
         if m is not None:
             post -= m.paddingLeft
             post -= m.paddingRight
