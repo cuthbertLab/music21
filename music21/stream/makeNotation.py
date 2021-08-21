@@ -1344,16 +1344,11 @@ def makeTies(
         return None
 
 
-def makeTupletBrackets(s, *, inPlace=False):
+def makeTupletBrackets(s: 'music21.stream.Stream', *, inPlace=False):
     # noinspection PyShadowingNames
     '''
-    Given a Stream of mixed durations, designates the first and last tuplet of any group
+    Given a flat Stream of mixed durations, designates the first and last tuplet of any group
     of tuplets as the start or end of the tuplet, respectively.
-
-    Changed in 1.8::
-
-        * `inPlace` is False by default
-        * to incorporate duration.updateTupletType, can take a list of durations
 
     TODO: does not handle nested tuplets
 
@@ -1369,31 +1364,28 @@ def makeTupletBrackets(s, *, inPlace=False):
     >>> tupletTypes = [x.duration.tuplets[0].type for x in s.notes]
     >>> tupletTypes
     ['start', None, 'stop', 'start', None, 'stop']
+
+    Changed in v1.8: `inPlace` is False by default
+    Changed in v7: Legacy behavior of taking in a list of durations removed.
     '''
     durationList = []
 
-    # legacy -- works on lists not just streams...
-    if isinstance(s, (list, tuple)):
-        durationList = s
-        returnObj = None
+    # Stream, as it should be...
+    if not inPlace:  # make a copy
+        returnObj = s.coreCopyAsDerivation('makeTupletBrackets')
     else:
-        # Stream, as it should be...
-        if not inPlace:  # make a copy
-            returnObj = s.coreCopyAsDerivation('makeTupletBrackets')
-        else:
-            returnObj = s
+        returnObj = s
 
-        # only want to look at notes
-        notes = returnObj.notesAndRests
-        for n in notes:
-            if n.duration.isGrace:
-                continue
-            durationList.append(n.duration)
+    # only want to look at notes and rests.
+    for n in returnObj.notesAndRests:
+        if n.duration.isGrace:
+            continue
+        durationList.append(n.duration)
 
-    tupletMap = []  # a list of (tuplet obj / Duration) pairs
+    tupletMap = []  # a list of [tuplet obj, Duration] pairs
     for dur in durationList:  # all Duration objects
         tupletList = dur.tuplets
-        if tupletList in [(), None]:  # no tuplets, length is zero
+        if not tupletList:  # no tuplets
             tupletMap.append([None, dur])
         elif len(tupletList) > 1:
             # for i in range(len(tuplets)):
@@ -1401,16 +1393,13 @@ def makeTupletBrackets(s, *, inPlace=False):
             environLocal.warn(
                 f'got multi-tuplet duration; cannot yet handle this. {tupletList!r}'
             )
-        elif len(tupletList) == 1:
-            tupletMap.append([tupletList[0], dur])
-            if tupletList[0] != dur.tuplets[0]:
-                raise Exception('cannot access Tuplets object from within DurationTuple.')
+            tupletMap.append([None, dur])
         else:
-            raise Exception(f'cannot handle these tuplets: {tupletList}')
+            tupletMap.append([tupletList[0], dur])
 
     # have a list of tuplet, Duration pairs
-    completionCount = 0  # qLen currently filled
-    completionTarget = None  # qLen necessary to fill tuplet
+    completionCount: Union[float, int, Fraction] = 0  # qLen currently filled
+    completionTarget: Union[float, int, Fraction, None] = None  # qLen necessary to fill tuplet
     for i in range(len(tupletMap)):
         tupletObj, dur = tupletMap[i]
 
@@ -1476,7 +1465,7 @@ def makeTupletBrackets(s, *, inPlace=False):
         return returnObj
 
 
-def realizeOrnaments(s):
+def realizeOrnaments(s: 'music21.stream.Stream'):
     '''
     Realize all ornaments on a stream
 
@@ -1520,7 +1509,7 @@ def realizeOrnaments(s):
     TODO: does not work for Gapful streams because it uses append rather
        than the offset of the original
     '''
-    newStream = s.cloneEmpty()
+    newStream = s.cloneEmpty(derivationMethod='realizeOrnaments')
     newStream.offset = s.offset
 
     def realizeElementExpressions(innerElement):
@@ -1554,9 +1543,9 @@ def realizeOrnaments(s):
     return newStream
 
 
-def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
+def moveNotesToVoices(source: 'music21.stream.Stream', classFilterList=('GeneralNote',)):
     '''
-    Move notes into voices.
+    Move notes into voices.  Happens inplace always.  Returns None
     '''
     from music21.stream import Voice
     dst = Voice()
@@ -1570,7 +1559,7 @@ def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
     source.insert(0, dst)
 
 
-def getTiePitchSet(prior):
+def getTiePitchSet(prior: 'music21.note.NotRest'):
     # noinspection PyShadowingNames
     '''
     helper method for makeAccidentals to get the tie pitch set (or None)
@@ -1610,18 +1599,18 @@ def getTiePitchSet(prior):
     '''
     if not hasattr(prior, 'tie') or not hasattr(prior, 'pitches'):
         return None
-    else:
-        tiePitchSet = set()
-        if isinstance(prior, chord.Chord):
-            previousNotes = list(prior)
-        else:
-            previousNotes = [prior]
 
-        for n in previousNotes:
-            if n.tie is None or n.tie.type == 'stop':
-                continue
-            tiePitchSet.add(n.pitch.nameWithOctave)
-        return tiePitchSet
+    tiePitchSet = set()
+    if isinstance(prior, chord.Chord):
+        previousNotes = list(prior)
+    else:
+        previousNotes = [prior]
+
+    for n in previousNotes:
+        if n.tie is None or n.tie.type == 'stop':
+            continue
+        tiePitchSet.add(n.pitch.nameWithOctave)
+    return tiePitchSet
 
 def makeAccidentalsInMeasureStream(
     s: 'music21.stream.Stream',

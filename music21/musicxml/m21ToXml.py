@@ -4381,7 +4381,7 @@ class MeasureExporter(XMLExporterBase):
         brackets.
 
         TODO: make sure something happens if
-        makeTupletBrackets is not set.
+            makeTupletBrackets is not set.
 
         >>> t = duration.Tuplet(11, 8)
         >>> t.type = 'start'
