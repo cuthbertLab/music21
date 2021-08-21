@@ -15,6 +15,7 @@
 import copy
 import unittest
 from typing import List, Generator, Optional, Set, Union
+from fractions import Fraction  # typing only
 
 from music21 import beam
 from music21 import clef
@@ -844,34 +845,45 @@ def makeRests(
             )
         return returnObj
 
-    def oHighTargetForMeasure(m: stream.Measure) -> float:
-        '''Needed for timeRangeFromBarDuration'''
-        # NOTE: this returns 0.0 if no meter can be found
-        post = m.barDuration.quarterLength
-        post -= m.paddingLeft
-        post -= m.paddingRight
+    def oHighTargetForMeasure(
+        m: Optional[stream.Measure] = None,
+        ts: Optional[meter.TimeSignature] = None
+    ) -> Union[float, Fraction]:
+        """
+        Needed for timeRangeFromBarDuration.
+        Returns 0.0 if no meter can be found.
+        """
+        post: Union[float, Fraction] = 0.0
+        if ts is not None:
+            post = ts.barDuration.quarterLength
+        elif m is not None:
+            # More expensive context search
+            post = m.barDuration.quarterLength
+        if m is not None:
+            post -= m.paddingLeft
+            post -= m.paddingRight
         return max(post, 0.0)
 
     oLowTarget = 0.0
     oHighTarget = 0.0
     if timeRangeFromBarDuration:
-        if returnObj.isMeasure:
-            oHighTarget = oHighTargetForMeasure(returnObj)
-        elif (
-            stream.Voice in returnObj.classSet
-            and hasattr(refStreamOrTimeRange, 'isMeasure')
-            and refStreamOrTimeRange.isMeasure
-        ):
-            # Alternative to getting measure context would be to access .activeSite
-            # but for now, depend on getting measure context from refStreamOrTimeRange
-            # since we have not documented calling makeRests directly on a Voice and
-            # expecting to infer barDuration from the measure context.
-            # merely trying to support the recursive call for contained voices, below
-            oHighTarget = oHighTargetForMeasure(refStreamOrTimeRange)
+        if isinstance(returnObj, stream.Measure):
+            oHighTarget = oHighTargetForMeasure(m=returnObj)
+        elif isinstance(returnObj, stream.Voice):
+            if isinstance(refStreamOrTimeRange, stream.Measure):
+                oHighTarget = oHighTargetForMeasure(m=refStreamOrTimeRange)
+            elif isinstance(refStreamOrTimeRange, meter.TimeSignature):
+                maybe_measure: Optional[stream.Measure] = None
+                if isinstance(returnObj.activeSite, stream.Measure):
+                    maybe_measure = returnObj.activeSite
+                oHighTarget = oHighTargetForMeasure(m=maybe_measure, ts=refStreamOrTimeRange)
         elif returnObj.hasMeasures():
+            # This could be optimized to save some context searches,
+            # but at the cost of readability.
             oHighTarget = sum(
                 m.barDuration.quarterLength for m in returnObj.getElementsByClass(stream.Measure)
             )
+
     # If the above search didn't run or still yielded 0.0, use refStreamOrTimeRange
     if oHighTarget == 0.0:
         if refStreamOrTimeRange is None:  # use local
@@ -891,26 +903,29 @@ def makeRests(
     else:
         bundle = [returnObj]
 
+    lastTimeSignature: Optional[meter.TimeSignature] = None
     # bundle components may be voices, measures, or a flat Stream
     for component in bundle:
         oLow = component.lowestOffset
         oHigh = component.highestTime
-        if component.isMeasure:
+        lastTimeSignature = component.timeSignature or lastTimeSignature
+        if isinstance(component, stream.Measure):
+            ts_or_measure = lastTimeSignature or component
             if timeRangeFromBarDuration:
-                oHighTarget = oHighTargetForMeasure(component)
+                oHighTarget = oHighTargetForMeasure(component, lastTimeSignature)
             # process voices
             for inner_voice in component.voices:
                 inner_voice.makeRests(inPlace=True,
                                       fillGaps=fillGaps,
                                       hideRests=hideRests,
-                                      refStreamOrTimeRange=component,
+                                      refStreamOrTimeRange=ts_or_measure,
                                       timeRangeFromBarDuration=timeRangeFromBarDuration,
                                       )
             # Refresh these variables given that inner voices were altered
             oLow = component.lowestOffset
             oHigh = component.highestTime
             # adjust oHigh to not exceed measure
-            oHighTarget = min(component.barDuration.quarterLength, oHighTarget)
+            oHighTarget = min(ts_or_measure.barDuration.quarterLength, oHighTarget)
 
         # create rest from start to end
         qLen = oLow - oLowTarget
