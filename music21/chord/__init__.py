@@ -277,6 +277,8 @@ class Chord(note.NotRest):
         >>> c1 != c2
         True
         '''
+        if super().__eq__(other) is NotImplemented:
+            return NotImplemented
         if not super().__eq__(other):
             return False
         if not isinstance(other, self.__class__):

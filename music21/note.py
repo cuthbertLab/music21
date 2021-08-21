@@ -908,6 +908,8 @@ class NotRest(GeneralNote):
     # Special functions
     # ==============================================================================================
     def __eq__(self, other):
+        if super().__eq__(other) is NotImplemented:
+            return NotImplemented
         if not super().__eq__(other):
             return False
         if not isinstance(other, NotRest):
@@ -1637,6 +1639,8 @@ class Unpitched(NotRest):
         self._storedInstrument = None
 
     def __eq__(self, other):
+        if super().__eq__(other) is NotImplemented:
+            return NotImplemented
         if not super().__eq__(other):
             return False
         if not isinstance(other, Unpitched):
