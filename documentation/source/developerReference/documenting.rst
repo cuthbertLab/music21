@@ -26,12 +26,12 @@ etc.  It is somewhat similar to Markdown format.   These files should *not* cont
 they will not be tested. (You may find some older files that do contain code; we should be translating these
 in the future).
 
-.. _reStructuredText: http://docutils.sourceforge.net/rst.html
+.. _reStructuredText: https://docutils.sourceforge.net/rst.html
 
 These files get converted to .html when you run `/documentation/make.py` so long as the excellent module
 Sphinx_ has been installed.
 
-.. _Sphinx: http://www.sphinx-doc.org/
+.. _Sphinx: https://www.sphinx-doc.org/en/master
 
 You can also edit these .rst files directly in Jupyter notebook, which will make them show the
 layout as well.

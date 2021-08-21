@@ -895,7 +895,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.pitch.accidental.alter, -1.0)
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testComplete(self):
         nwcTranslatePath = common.getSourceFilePath() / 'noteworthy'
@@ -903,7 +904,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         # 'Part_OWeisheit.nwctxt' #
 
         myScore = NoteworthyTranslator().parseFile(complete)
-        myScore.show()
+        if self.show:
+            myScore.show()
 
 
 if __name__ == '__main__':

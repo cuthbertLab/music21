@@ -142,6 +142,7 @@ __all__ = [
     'layout',
     'meter',
     'note',
+    'percussion',
     'pitch',
     # prebase listed above
     'repeat',

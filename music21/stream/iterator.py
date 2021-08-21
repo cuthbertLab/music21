@@ -164,6 +164,21 @@ class StreamIterator(prebase.ProtoM21Object):
 
         return f'for {streamClass}:{srcStreamId} @:{self.index}'
 
+    def __call__(self) -> _SIter:
+        '''
+        Temporary workaround to support both prior usage of `.iter`
+        and new recommended usage of `.iter()`.
+        During the period where `.iter` is still supported, even calling `.iter()`
+        (recommended) will retrieve the property `.iter` and necessitate
+        this workaround.
+
+        Returns `self` without any changes.
+
+        TODO: manage and emit DeprecationWarnings in v.8
+        TODO: remove in v.9
+        '''
+        return self
+
     def __iter__(self):
         self.reset()
         return self
@@ -302,7 +317,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s = stream.Stream()
         >>> s.insert(0, note.Note('F#'))
         >>> s.repeatAppend(note.Note('C'), 2)
-        >>> sI = s.iter
+        >>> sI = s.iter()
         >>> sI
         <music21.stream.iterator.StreamIterator for Stream:0x104743be0 @:0>
 
@@ -331,7 +346,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.insert(0, clef.TrebleClef())
         >>> s[0]
         <music21.clef.TrebleClef>
-        >>> s.iter.notes[0]
+        >>> s.iter().notes[0]
         <music21.note.Note F#>
 
         Demo of cleanupOnStop = True
@@ -371,11 +386,11 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s = converter.parse('tinynotation: 3/4 c4 d e f g a', makeNotation=False)
         >>> len(s)
         7
-        >>> len(s.iter)
+        >>> len(s.iter())
         7
-        >>> len(s.iter.notes)
+        >>> len(s.iter().notes)
         6
-        >>> [n.name for n in s.iter.notes]
+        >>> [n.name for n in s.iter().notes]
         ['C', 'D', 'E', 'F', 'G', 'A']
         '''
         if self._len is not None:
@@ -492,7 +507,7 @@ class StreamIterator(prebase.ProtoM21Object):
         An Empty stream:
 
         >>> s = stream.Stream()
-        >>> s.iter.notes.first() is None
+        >>> s.iter().notes.first() is None
         True
         '''
         iter(self)
@@ -522,7 +537,7 @@ class StreamIterator(prebase.ProtoM21Object):
         Check on empty Stream:
 
         >>> s2 = stream.Stream()
-        >>> s2.iter.notes.last() is None
+        >>> s2.iter().notes.last() is None
         True
 
         Next has a different feature from first(), will start again from beginning.
@@ -607,7 +622,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         >>> s = converter.parse('tinynotation: 3/4 c4 d e f g a', makeNotation=False)
         >>> s.id = 'tn3/4'
-        >>> sI = s.iter
+        >>> sI = s.iter()
         >>> sI
         <music21.stream.iterator.StreamIterator for Part:tn3/4 @:0>
 
@@ -689,7 +704,7 @@ class StreamIterator(prebase.ProtoM21Object):
         cannot just call `type(StreamIterator.srcStream)()`
 
         >>> p = stream.Part()
-        >>> pi = p.iter
+        >>> pi = p.iter()
         >>> s = pi._newBaseStream()
         >>> s
         <music21.stream.Stream 0x1047eb2e8>
@@ -720,7 +735,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         In other words:
 
-        `s.getElementsByClass()` == `s.iter.getElementsByClass().stream()`
+        `s.getElementsByClass()` == `s.iter().getElementsByClass().stream()`
 
         >>> s = stream.Part()
         >>> s.insert(0, note.Note('C'))
@@ -729,7 +744,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> b = bar.Barline()
         >>> s.storeAtEnd(b)
 
-        >>> s2 = s.iter.getElementsByClass('Note').stream()
+        >>> s2 = s.iter().getElementsByClass('Note').stream()
         >>> s2.show('t')
         {0.0} <music21.note.Note C>
         {2.0} <music21.note.Note D>
@@ -738,7 +753,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s2
         <music21.stream.Part ...>
 
-        >>> s3 = s.iter.stream()
+        >>> s3 = s.iter().stream()
         >>> s3.show('t')
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Rest quarter>
@@ -748,7 +763,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s3.elementOffset(b, returnSpecial=True)
         <OffsetSpecial.AT_END>
 
-        >>> s4 = s.iter.getElementsByClass('Barline').stream()
+        >>> s4 = s.iter().getElementsByClass('Barline').stream()
         >>> s4.show('t')
         {0.0} <music21.bar.Barline type=regular>
 
@@ -909,7 +924,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> r = note.Rest()
         >>> s.append(r)
         >>> s.append(note.Note('D'))
-        >>> for el in s.iter.getElementsByClass('Rest'):
+        >>> for el in s.iter().getElementsByClass('Rest'):
         ...     print(el)
         <music21.note.Rest quarter>
 
@@ -921,14 +936,14 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> r.activeSite.id
         's2'
 
-        >>> for el in s.iter.getElementsByClass('Rest'):
+        >>> for el in s.iter().getElementsByClass('Rest'):
         ...     print(el.activeSite.id)
         s1
 
 
         Classes work in addition to strings...
 
-        >>> for el in s.iter.getElementsByClass(note.Rest):
+        >>> for el in s.iter().getElementsByClass(note.Rest):
         ...     print(el)
         <music21.note.Rest quarter>
 
@@ -995,13 +1010,13 @@ class StreamIterator(prebase.ProtoM21Object):
         ...     n = note.Note('G#')
         ...     n.offset = x * 3
         ...     a.insert(n)
-        >>> found = a.iter.getElementsNotOfClass(note.Note)
+        >>> found = a.iter().getElementsNotOfClass(note.Note)
         >>> len(found)
         10
-        >>> found = a.iter.getElementsNotOfClass('Rest')
+        >>> found = a.iter().getElementsNotOfClass('Rest')
         >>> len(found)
         4
-        >>> found = a.iter.getElementsNotOfClass(['Note', 'Rest'])
+        >>> found = a.iter().getElementsNotOfClass(['Note', 'Rest'])
         >>> len(found)
         0
 
@@ -1032,12 +1047,12 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s1.append(n2)
         >>> s1.append(n3)
 
-        >>> tboneSubStream = s1.iter.getElementsByGroup('trombone')
+        >>> tboneSubStream = s1.iter().getElementsByGroup('trombone')
         >>> for thisNote in tboneSubStream:
         ...     print(thisNote.name)
         C
         D
-        >>> tubaSubStream = s1.iter.getElementsByGroup('tuba')
+        >>> tubaSubStream = s1.iter().getElementsByGroup('tuba')
         >>> for thisNote in tubaSubStream:
         ...     print(thisNote.name)
         D
@@ -1119,34 +1134,34 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> n2.duration.type = 'half'
         >>> n2.offset = 2
         >>> st1.insert(n2)
-        >>> out1 = list(st1.iter.getElementsByOffset(2))
+        >>> out1 = list(st1.iter().getElementsByOffset(2))
         >>> len(out1)
         1
         >>> out1[0].step
         'D'
-        >>> out2 = list(st1.iter.getElementsByOffset(1, 3))
+        >>> out2 = list(st1.iter().getElementsByOffset(1, 3))
         >>> len(out2)
         1
         >>> out2[0].step
         'D'
-        >>> out3 = list(st1.iter.getElementsByOffset(1, 3, mustFinishInSpan=True))
+        >>> out3 = list(st1.iter().getElementsByOffset(1, 3, mustFinishInSpan=True))
         >>> len(out3)
         0
-        >>> out4 = list(st1.iter.getElementsByOffset(1, 2))
+        >>> out4 = list(st1.iter().getElementsByOffset(1, 2))
         >>> len(out4)
         1
         >>> out4[0].step
         'D'
-        >>> out5 = list(st1.iter.getElementsByOffset(1, 2, includeEndBoundary=False))
+        >>> out5 = list(st1.iter().getElementsByOffset(1, 2, includeEndBoundary=False))
         >>> len(out5)
         0
-        >>> out6 = list(st1.iter.getElementsByOffset(1, 2, includeEndBoundary=False,
+        >>> out6 = list(st1.iter().getElementsByOffset(1, 2, includeEndBoundary=False,
         ...                                          mustBeginInSpan=False))
         >>> len(out6)
         1
         >>> out6[0].step
         'C'
-        >>> out7 = list(st1.iter.getElementsByOffset(1, 3, mustBeginInSpan=False))
+        >>> out7 = list(st1.iter().getElementsByOffset(1, 3, mustBeginInSpan=False))
         >>> len(out7)
         2
         >>> [el.step for el in out7]
@@ -1154,7 +1169,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         Note, that elements that end at the start offset are included if mustBeginInSpan is False
 
-        >>> out8 = list(st1.iter.getElementsByOffset(2, 4, mustBeginInSpan=False))
+        >>> out8 = list(st1.iter().getElementsByOffset(2, 4, mustBeginInSpan=False))
         >>> len(out8)
         2
         >>> [el.step for el in out8]
@@ -1162,7 +1177,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         To change this behavior set includeElementsThatEndAtStart=False
 
-        >>> out9 = list(st1.iter.getElementsByOffset(2, 4, mustBeginInSpan=False,
+        >>> out9 = list(st1.iter().getElementsByOffset(2, 4, mustBeginInSpan=False,
         ...                                          includeElementsThatEndAtStart=False))
         >>> len(out9)
         1
@@ -1175,10 +1190,10 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> a.repeatInsert(n, list(range(8)))
         >>> b = stream.Stream(id='b')
         >>> b.repeatInsert(a, [0, 3, 6])
-        >>> c = list(b.iter.getElementsByOffset(2, 6.9))
+        >>> c = list(b.iter().getElementsByOffset(2, 6.9))
         >>> len(c)
         2
-        >>> c = list(b.flat.iter.getElementsByOffset(2, 6.9))
+        >>> c = list(b.flat.iter().getElementsByOffset(2, 6.9))
         >>> len(c)
         10
 
@@ -1191,9 +1206,9 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.insert(0.0, c)
         >>> s.insert(0.0, ts)
         >>> s.insert(0.0, ks)
-        >>> len(list(s.iter.getElementsByOffset(0.0, mustBeginInSpan=True)))
+        >>> len(list(s.iter().getElementsByOffset(0.0, mustBeginInSpan=True)))
         3
-        >>> len(list(s.iter.getElementsByOffset(0.0, mustBeginInSpan=False)))
+        >>> len(list(s.iter().getElementsByOffset(0.0, mustBeginInSpan=False)))
         3
 
         On a :class:`~music21.stream.iterator.RecursiveIterator`,
@@ -1249,46 +1264,46 @@ class StreamIterator(prebase.ProtoM21Object):
 
         Same test as above, but with floats
 
-        >>> out1 = list(st1.iter.getElementsByOffset(2.0))
+        >>> out1 = list(st1.iter().getElementsByOffset(2.0))
         >>> len(out1)
         1
         >>> out1[0].step
         'D'
-        >>> out2 = list(st1.iter.getElementsByOffset(1.0, 3.0))
+        >>> out2 = list(st1.iter().getElementsByOffset(1.0, 3.0))
         >>> len(out2)
         1
         >>> out2[0].step
         'D'
-        >>> out3 = list(st1.iter.getElementsByOffset(1.0, 3.0, mustFinishInSpan=True))
+        >>> out3 = list(st1.iter().getElementsByOffset(1.0, 3.0, mustFinishInSpan=True))
         >>> len(out3)
         0
-        >>> out3b = list(st1.iter.getElementsByOffset(0.0, 3.001, mustFinishInSpan=True))
+        >>> out3b = list(st1.iter().getElementsByOffset(0.0, 3.001, mustFinishInSpan=True))
         >>> len(out3b)
         1
         >>> out3b[0].step
         'C'
-        >>> out3b = list(st1.iter.getElementsByOffset(1.0, 3.001, mustFinishInSpan=True,
+        >>> out3b = list(st1.iter().getElementsByOffset(1.0, 3.001, mustFinishInSpan=True,
         ...                                           mustBeginInSpan=False))
         >>> len(out3b)
         1
         >>> out3b[0].step
         'C'
 
-        >>> out4 = list(st1.iter.getElementsByOffset(1.0, 2.0))
+        >>> out4 = list(st1.iter().getElementsByOffset(1.0, 2.0))
         >>> len(out4)
         1
         >>> out4[0].step
         'D'
-        >>> out5 = list(st1.iter.getElementsByOffset(1.0, 2.0, includeEndBoundary=False))
+        >>> out5 = list(st1.iter().getElementsByOffset(1.0, 2.0, includeEndBoundary=False))
         >>> len(out5)
         0
-        >>> out6 = list(st1.iter.getElementsByOffset(1.0, 2.0, includeEndBoundary=False,
+        >>> out6 = list(st1.iter().getElementsByOffset(1.0, 2.0, includeEndBoundary=False,
         ...                                          mustBeginInSpan=False))
         >>> len(out6)
         1
         >>> out6[0].step
         'C'
-        >>> out7 = list(st1.iter.getElementsByOffset(1.0, 3.0, mustBeginInSpan=False))
+        >>> out7 = list(st1.iter().getElementsByOffset(1.0, 3.0, mustBeginInSpan=False))
         >>> len(out7)
         2
         >>> [el.step for el in out7]
@@ -1321,7 +1336,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.append(note.Note('C'))
         >>> s.append(note.Rest())
         >>> s.append(note.Note('D'))
-        >>> for el in s.iter.notes:
+        >>> for el in s.iter().notes:
         ...     print(el)
         <music21.note.Note C>
         <music21.note.Note D>
@@ -1338,7 +1353,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.append(note.Note('C'))
         >>> s.append(note.Rest())
         >>> s.append(note.Note('D'))
-        >>> for el in s.iter.notesAndRests:
+        >>> for el in s.iter().notesAndRests:
         ...     print(el)
         <music21.note.Note C>
         <music21.note.Rest quarter>
@@ -1346,7 +1361,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         chained filters... (this makes no sense since notes is a subset of notesAndRests)
 
-        >>> for el in s.iter.notesAndRests.notes:
+        >>> for el in s.iter().notesAndRests.notes:
         ...     print(el)
         <music21.note.Note C>
         <music21.note.Note D>
@@ -1838,26 +1853,28 @@ class RecursiveIterator(StreamIterator):
 
 class Test(unittest.TestCase):
     def testSimpleClone(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         s = stream.Stream()
         r = note.Rest()
         n = note.Note()
         s.append([r, n])
-        all_s = list(s.iter)
+        all_s = list(s.iter())
         self.assertEqual(len(all_s), 2)
         self.assertIs(all_s[0], r)
         self.assertIs(all_s[1], n)
-        s_notes = list(s.iter.notes)
+        s_notes = list(s.iter().notes)
         self.assertEqual(len(s_notes), 1)
         self.assertIs(s_notes[0], n)
 
     def testAddingFiltersMidIteration(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         s = stream.Stream()
         r = note.Rest()
         n = note.Note()
         s.append([r, n])
-        sIter = s.iter
+        sIter = s.iter()
         r0 = next(sIter)
         self.assertIs(r0, r)
 
@@ -1879,7 +1896,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n.activeSite.number, 2)
 
     def testCurrentHierarchyOffsetReset(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         p = stream.Part()
         m = stream.Measure()
         m.append(note.Note('D'))
@@ -1895,7 +1913,8 @@ class Test(unittest.TestCase):
         self.assertIsNone(currentOffset)
 
     def testAddingFiltersMidRecursiveIteration(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         from music21.stream.iterator import RecursiveIterator as ImportedRecursiveIterator
         m = stream.Measure()
         r = note.Rest()

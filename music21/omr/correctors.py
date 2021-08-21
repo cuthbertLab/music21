@@ -9,13 +9,14 @@
 # Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import math
-import difflib
 import copy
 import collections
-
-import os
+import difflib
 import inspect
+import math
+import os
+
+from music21 import note
 
 pathName = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
@@ -321,7 +322,7 @@ class ScoreCorrector:
         for el in correctMeasure:
             newEl = copy.deepcopy(el)
             try:
-                if 'Note' in newEl.classes:
+                if isinstance(newEl, note.Note):
                     oldPitch = oldNotePitches[pitchIndex]
                     newEl.pitch.octave = oldPitch.octave
                     newEl.pitch.name = oldPitch.name

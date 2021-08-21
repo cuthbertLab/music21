@@ -24,7 +24,7 @@ the `converter` module:
 
 For users who will be editing ABC extensively or need a way to have music21 output ABC
 (which it doesn't do natively), we suggest using the open source EasyABC package:
-http://www.nilsliberg.se/ksp/easyabc/ .  You can set it up as a MusicXML reader through:
+https://www.nilsliberg.se/ksp/easyabc/ .  You can set it up as a MusicXML reader through:
 
 >>> #_DOCS_SHOW us = environment.UserSettings()
 >>> #_DOCS_SHOW us['musicxmlPath'] = '/Applications/EasyABC.app'
@@ -54,9 +54,7 @@ __all__ = [
     'ABCFile',
 ]
 
-import copy
 import io
-import pathlib
 import re
 import unittest
 from typing import Union, Optional, List, Tuple, Any
@@ -1558,7 +1556,7 @@ class ABCNote(ABCToken):
             ql = activeDefaultQuarterLength / int(numStr.split('/')[1])
         # uncommon usage: 3/ short for 3/2
         elif numStr.endswith('/'):
-            n = int(numStr.split('/')[0].strip())
+            n = int(numStr.split('/', maxsplit=1)[0].strip())
             d = 2
             ql = activeDefaultQuarterLength * n / d
         # if we have two, this is usually an error

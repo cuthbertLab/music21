@@ -820,7 +820,7 @@ def notesAndDurationsToStream(
 
     returns a :class:`~music21.stream.Score` object, containing
     a metadata object and a single :class:`~music21.stream.Part` object, which in turn
-    contains the notes, etc.  Does not run :meth:`~music21.stream.Stream.makeNotation`
+    contains the notes, etc.  Does not run :meth:`~music21.stream.base.Stream.makeNotation`
     on the Score.
 
 

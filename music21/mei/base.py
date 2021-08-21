@@ -3062,7 +3062,7 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     :param elem: The ``<measure>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :param int backupNum: A fallback value for the resulting
-        :class:`~music21.measure.Measure` objects' number attribute.
+        :class:`~music21.stream.Measure` objects' number attribute.
     :param expectedNs: A list of the expected @n attributes for the <staff> tags in this <measure>.
         If an expected <staff> isn't in the <measure>, it will be created with a full-measure rest.
     :type expectedNs: iterable of str

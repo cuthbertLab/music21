@@ -45,7 +45,7 @@ class OutputTabOrange(OutputFormat):
 
     For more information, see:
 
-    http://docs.orange.biolab.si/3/data-mining-library/tutorial/data.html#saving-the-data
+    https://docs.orange.biolab.si/3/data-mining-library/tutorial/data.html#saving-the-data
     '''
 
     def __init__(self, dataSet=None):

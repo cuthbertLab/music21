@@ -31,7 +31,7 @@ __all__ = [
     'makeExampleScore',
 ]
 
-import unittest
+# import unittest
 
 from music21.tree import analysis
 from music21.tree import core
