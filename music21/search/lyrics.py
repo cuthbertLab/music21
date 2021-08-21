@@ -386,7 +386,8 @@ class Test(unittest.TestCase):
         '''
         This score uses a non-breaking space as an elision
         '''
-        from music21 import converter, search
+        from music21 import converter
+        from music21 import search
 
         partXML = '''
         <score-partwise>
@@ -433,7 +434,8 @@ class Test(unittest.TestCase):
         runSearch()
 
     def testMultipleVerses(self):
-        from music21 import converter, search
+        from music21 import converter
+        from music21 import search
 
         # noinspection SpellCheckingInspection
         partXML = '''

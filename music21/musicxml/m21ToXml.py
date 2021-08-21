@@ -34,10 +34,12 @@ from music21 import common
 from music21 import defaults
 from music21 import exceptions21
 
+from music21 import articulations
 from music21 import bar
 from music21 import clef
-from music21 import chord  # for typing
+from music21 import chord
 from music21 import duration
+from music21 import harmony
 from music21 import metadata
 from music21 import note
 from music21 import meter
@@ -45,6 +47,7 @@ from music21 import pitch
 from music21 import spanner
 from music21 import stream
 from music21 import style
+from music21 import tempo
 from music21.stream.iterator import OffsetIterator
 
 from music21.musicxml import helpers
@@ -400,7 +403,7 @@ class GeneralObjectExporter:
             outObj = self.fromGeneralObject(obj)
             return self.parseWellformedObject(outObj)
         else:
-            if 'Score' not in obj.classes:
+            if not isinstance(obj, stream.Score):
                 raise MusicXMLExportException('Can only export Scores with makeNotation=False')
             return self.parseWellformedObject(obj)
 
@@ -2897,7 +2900,7 @@ class MeasureExporter(XMLExporterBase):
         root = self.xmlRoot
         divisions = self.currentDivisions
         self.offsetInMeasure = 0.0
-        if 'Voice' in m.classes:
+        if isinstance(m, stream.Voice):
             m: stream.Voice
             if isinstance(m.id, int) and m.id < defaults.minIdNumberToConsiderMemoryLocation:
                 voiceId = m.id
@@ -2930,7 +2933,7 @@ class MeasureExporter(XMLExporterBase):
             for obj in objGroup:
                 # we do all non-note elements (including ChordSymbols)
                 # first before note elements, in musicxml
-                if 'GeneralNote' in obj.classes and 'Harmony' not in obj.classes:
+                if isinstance(obj, note.GeneralNote) and not isinstance(obj, harmony.Harmony):
                     notesForLater.append(obj)
                 else:
                     self.parseOneElement(obj)
@@ -4138,7 +4141,7 @@ class MeasureExporter(XMLExporterBase):
         applicableArticulations = []
         fingeringNumber = 0
         for a in chordOrNote.articulations:
-            if 'Fingering' in a.classSet:
+            if isinstance(a, articulations.Fingering):
                 if fingeringNumber == noteIndexInChord:
                     applicableArticulations.append(a)
                 fingeringNumber += 1
@@ -4146,11 +4149,11 @@ class MeasureExporter(XMLExporterBase):
                 applicableArticulations.append(a)
 
         for artObj in applicableArticulations:
-            if 'Pizzicato' in artObj.classes:
+            if isinstance(artObj, articulations.Pizzicato):
                 continue
-            if 'StringIndication' in artObj.classes and artObj.number < 1:
+            if isinstance(artObj, articulations.StringIndication) and artObj.number < 1:
                 continue
-            if 'TechnicalIndication' in artObj.classes:
+            if isinstance(artObj, articulations.TechnicalIndication):
                 if mxTechnicalMark is None:
                     mxTechnicalMark = Element('technical')
                 mxTechnicalMark.append(self.articulationToXmlTechnical(artObj))
@@ -4894,8 +4897,6 @@ class MeasureExporter(XMLExporterBase):
         if cs.writeAsChord is True:
             return self.chordToXml(cs)
 
-        from music21 import harmony
-
         mxHarmony = Element('harmony')
         _synchronizeIds(mxHarmony, cs)
 
@@ -5277,7 +5278,7 @@ class MeasureExporter(XMLExporterBase):
         hideNumber = []  # hide the number after equal, e.g., quarter=120, hide 120
         # store the last value necessary as a sounding tag in bpm
         soundingQuarterBPM = False
-        if 'MetronomeMark' in ti.classes:
+        if isinstance(ti, tempo.MetronomeMark):
             # will not show a number of implicit
             if ti.numberImplicit or ti.number is None:
                 # environLocal.printDebug(['found numberImplicit', ti.numberImplicit])
@@ -5290,7 +5291,7 @@ class MeasureExporter(XMLExporterBase):
             # number (if implicit, that is fine); get in terms of quarter bpm
             soundingQuarterBPM = ti.getQuarterBPM()
 
-        elif 'MetricModulation' in ti.classes:
+        elif isinstance(ti, tempo.MetricModulation):
             # may need to reverse order if classical style or otherwise
             # may want to show first number
             hideNumericalMetro = False  # must show for metric modulation
@@ -5339,7 +5340,7 @@ class MeasureExporter(XMLExporterBase):
         if hideNumericalMetro is not None:
             self.xmlRoot.append(mxDirection)
 
-        if 'MetronomeMark' in ti.classes:
+        if isinstance(ti, tempo.MetronomeMark):
             if ti.getTextExpression(returnImplicit=False) is not None:
                 te = ti.getTextExpression(returnImplicit=False)
                 te.offset = ti.offset
@@ -5638,7 +5639,7 @@ class MeasureExporter(XMLExporterBase):
         if barline is None:
             mxBarline = Element('barline')
         else:
-            if 'Repeat' in barline.classes:
+            if isinstance(barline, bar.Repeat):
                 mxBarline = Element('barline')
                 mxRepeat = self.repeatToXml(barline)
             else:
@@ -5761,7 +5762,7 @@ class MeasureExporter(XMLExporterBase):
             mxDivisions.text = str(self.currentDivisions)
             self.parent.lastDivisions = self.currentDivisions
 
-        if 'Measure' in m.classes:
+        if isinstance(m, stream.Measure):
             if m.keySignature is not None:
                 mxAttributes.append(self.keySignatureToXml(m.keySignature))
             if m.timeSignature is not None:
@@ -6365,7 +6366,9 @@ class Test(unittest.TestCase):
         objects, where usually all the spanners will remain on the first object.
         '''
         import re
-        from music21 import converter, dynamics, layout
+        from music21 import converter
+        from music21 import dynamics
+        from music21 import layout
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         s = converter.parse(xmlDir / '43e-Multistaff-ClefDynamics.xml')
 
@@ -6464,8 +6467,6 @@ class Test(unittest.TestCase):
         self.assertEqual(ly2.findall('text')[1].text, 'e')
 
     def testExportNC(self):
-        from music21 import harmony
-
         s = stream.Score()
         p = stream.Part()
         m = stream.Measure()
@@ -6567,7 +6568,8 @@ class Test(unittest.TestCase):
         self.assertEqual(root.find('.//step').text, 'D')
 
     def testMidiInstrumentNoName(self):
-        from music21 import converter, instrument
+        from music21 import converter
+        from music21 import instrument
 
         i = instrument.Instrument()
         i.midiProgram = 42
@@ -6610,7 +6612,8 @@ class Test(unittest.TestCase):
     def testTextExpressionOffset(self):
         '''Transfer element offset after calling getTextExpression().'''
         # https://github.com/cuthbertLab/music21/issues/624
-        from music21 import converter, repeat, tempo
+        from music21 import converter
+        from music21 import repeat
 
         s = converter.parse('tinynotation: 4/4 c1')
         c = repeat.Coda()
@@ -6642,8 +6645,6 @@ class Test(unittest.TestCase):
         self.assertEqual(rest.get('measure'), 'yes')
 
     def testArticulationSpecialCases(self):
-        from music21 import articulations
-
         n = note.Note()
         a = articulations.StringIndication()
         n.articulations.append(a)
@@ -6671,7 +6672,7 @@ class TestExternal(unittest.TestCase):
     show = True
 
     def testSimple(self):
-        from music21 import corpus  # , converter
+        from music21 import corpus
         import difflib
 
         # b = converter.parse(corpus.corpora.CoreCorpus().getWorkList('cpebach')[0],

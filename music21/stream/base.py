@@ -1420,7 +1420,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         raise StreamException(f'cannot find object ({el}) in Stream')
 
     def remove(self,
-               targetOrList,
+               targetOrList: Union[base.Music21Object, List[base.Music21Object]],
                *,
                shiftOffsets=False,
                recurse=False):
@@ -1803,7 +1803,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     newElement = e._deepcopySubclassable(memo)
 
                 # ## TEST on copying!!!!
-                # if 'Note' in newElement.classes:
+                # if isinstance(newElement, note.Note):
                 #     newElement.pitch.ps += 2.0
                 new.coreInsert(offset, newElement, ignoreSort=True)
         if '_endElements' in ignoreAttributes:
@@ -2252,30 +2252,30 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             target = targets[0]  # assume first
             removeTarget = target
-            if 'Rest' in target.classes:
-                if 'Note' in noteOrChord.classes:
+            if isinstance(target, note.Rest):
+                if isinstance(noteOrChord, note.Note):
                     pitches = [noteOrChord.pitch]
                     components = [noteOrChord]
-                elif 'Chord' in noteOrChord.classes:
+                elif isinstance(noteOrChord, chord.Chord):
                     pitches = list(noteOrChord.pitches)
                     components = list(noteOrChord)
-            if 'Note' in target.classes:
+            if isinstance(target, note.Note):
                 # if a note, make it into a chord
-                if 'Note' in noteOrChord.classes:
+                if isinstance(noteOrChord, note.Note):
                     pitches = [target.pitch, noteOrChord.pitch]
                     components = [target, noteOrChord]
-                elif 'Chord' in noteOrChord.classes:
+                elif isinstance(noteOrChord, chord.Chord):
                     pitches = [target.pitch] + list(noteOrChord.pitches)
                     components = [target] + list(noteOrChord)
                 else:
                     pitches = [target.pitch]
                     components = [target]
-            if 'Chord' in target.classes:
+            if isinstance(target, chord.Chord):
                 # if a chord, make it into a chord
-                if 'Note' in noteOrChord.classes:
+                if isinstance(noteOrChord, note.Note):
                     pitches = list(target.pitches) + [noteOrChord.pitch]
                     components = list(target) + [noteOrChord]
-                elif 'Chord' in noteOrChord.classes:
+                elif isinstance(noteOrChord, chord.Chord):
                     pitches = list(target.pitches) + list(noteOrChord.pitches)
                     components = list(target) + list(noteOrChord)
                 else:
@@ -2304,7 +2304,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 finalTarget.noteheadFill = target.noteheadFill
 
             # fill component details
-            if 'Chord' in finalTarget.classes:
+            if isinstance(finalTarget, chord.Chord):
                 for i, n in enumerate(finalTarget):
                     nPrevious = components[i]
                     n.noteheadFill = nPrevious.noteheadFill
@@ -2960,9 +2960,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for complexObj in container.getElementsNotOfClass(['Stream', 'Variant', 'Spanner']):
                 if complexObj.duration.type != 'complex':
                     continue
-                if 'Rest' in complexObj.classes and complexObj.fullMeasure in (True, 'always'):
+                if isinstance(complexObj, note.Rest) and complexObj.fullMeasure in (True, 'always'):
                     continue
-                if 'Rest' in complexObj.classes and complexObj.fullMeasure == 'auto':
+                if isinstance(complexObj, note.Rest) and complexObj.fullMeasure == 'auto':
                     if container.isMeasure and (complexObj.duration == container.barDuration):
                         continue
                     elif ('Voice' in container.classes
@@ -3355,7 +3355,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'sharp'
 
         >>> foundStream = found.stream()
-        >>> 'Score' in foundStream.classes
+        >>> isinstance(foundStream, stream.Score)
         True
 
 
@@ -4359,7 +4359,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def measure(self,
                 measureNumber,
                 collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
-                indicesNotNumbers=False):
+                indicesNotNumbers=False) -> Optional['music21.stream.Measure']:
         '''
         Given a measure number, return a single
         :class:`~music21.stream.Measure` object if the Measure number exists, otherwise return None.
@@ -4412,6 +4412,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                               collect=collect,
                               indicesNotNumbers=indicesNotNumbers)
             measureIter = s.getElementsByClass('Measure')
+            m: Optional[Measure]
+            # noinspection PyTypeChecker
             m = measureIter.first()
             if m is None:  # not 'if not m' because m might be an empty measure.
                 return None
@@ -5128,7 +5130,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             returnObj = self
 
-        if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classSet:
+        if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classes:
             for partLike in returnObj.getElementsByClass(Stream):
                 # call on each part
                 partLike.toWrittenPitch(inPlace=True)
@@ -6257,7 +6259,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         def consolidateRests(templateInner):
             consecutiveRests = []
             for el in list(templateInner.getElementsByClass('GeneralNote')):
-                if 'Rest' not in el.classes:
+                if not isinstance(el, note.Rest):
                     removeConsecutiveRests(templateInner, consecutiveRests)
                     consecutiveRests = []
                 else:
@@ -6299,7 +6301,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if template.hasMeasures():
             measureIterator = template.getElementsByClass('Measure')
+            templateMeasure: 'Measure'
             for i, templateMeasure in enumerate(measureIterator):
+                measurePart: 'Measure'
                 measurePart = workObj.measure(i, collect=(), indicesNotNumbers=True)
                 if measurePart is not None:
                     chordifyOneMeasure(templateMeasure, measurePart)
@@ -6651,7 +6655,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if tiePitchSet is None:
             tiePitchSet = set()
 
+        last_measure: Optional[Measure] = None
+
         for e in noteIterator:
+            if e.activeSite is not None and e.activeSite.isMeasure:
+                if last_measure is not None and e.activeSite is not last_measure:
+                    # New measure encountered: move pitchPast to
+                    # pitchPastMeasure and clear pitchPast
+                    pitchPastMeasure = pitchPast[:]
+                    pitchPast = []
+                last_measure = e.activeSite
             if isinstance(e, note.Note):
                 if e.pitch.nameWithOctave in tiePitchSet:
                     lastNoteWasTied = True
@@ -6723,11 +6736,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return self.streamStatus.haveAccidentalsBeenMade()
 
     def makeNotation(self,
+                     *,
                      meterStream=None,
                      refStreamOrTimeRange=None,
                      inPlace=False,
                      bestClef=False,
-                     **subroutineKeywords):
+                     pitchPast: Optional[List[pitch.Pitch]] = None,
+                     pitchPastMeasure: Optional[List[pitch.Pitch]] = None,
+                     useKeySignature: Union[bool, key.KeySignature] = True,
+                     alteredPitches: Optional[List[pitch.Pitch]] = None,
+                     cautionaryPitchClass: bool = True,
+                     cautionaryAll: bool = False,
+                     overrideStatus: bool = False,
+                     cautionaryNotImmediateRepeat: bool = True,
+                     tiePitchSet: Optional[Set[str]] = None
+                     ):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare
         notation, including creating voices for overlapped regions, Measures
@@ -6736,8 +6759,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If `inPlace` is True, this is done in-place (changed in v7 -- returns None);
         if `inPlace` is False, this returns a modified deep copy.
 
-        makeAccidentalsKeywords can be a dict specifying additional
-        parameters to send to makeAccidentals
+        The following additional parameters are documented on
+        :meth:`~music21.stream.base.makeAccidentals`::
+
+            pitchPast
+            pitchPastMeasure
+            useKeySignature
+            alteredPitches
+            cautionaryPitchClass
+            cautionaryAll
+            overrideStatus
+            cautionaryNotImmediateRepeat
+            tiePitchSet
 
 
         >>> s = stream.Stream()
@@ -6791,36 +6824,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # this needs to be called before makeTies
         # note that this functionality is also placed in Part
         if not measureStream.haveAccidentalsBeenMade():
-            ksLast = None
-            srkCopy = subroutineKeywords.copy()
-            if 'meterStream' in srkCopy:
-                del(srkCopy['meterStream'])
-            if 'refStreamOrTimeRange' in srkCopy:
-                del(srkCopy['refStreamOrTimeRange'])
-
-            for i in range(len(measureStream)):
-                m = measureStream[i]
-                if m.keySignature is not None:
-                    ksLast = m.keySignature
-
-                if i > 0 and ksLast is None:
-                    try:
-                        previousNoteOrChord = measureStream[i - 1][-1]
-                        tiePitchSet = makeNotation.getTiePitchSet(previousNoteOrChord)
-                    except (IndexError, StreamException):
-                        tiePitchSet = None
-                    pitchPastMeasure = measureStream[i - 1].pitches
-                else:
-                    tiePitchSet = None
-                    pitchPastMeasure = None
-
-                m.makeAccidentals(
-                    pitchPastMeasure=pitchPastMeasure,
-                    useKeySignature=ksLast,
-                    searchKeySignatureByContext=False,
-                    tiePitchSet=tiePitchSet,
-                    inPlace=True,
-                    **srkCopy)
+            makeNotation.makeAccidentalsInMeasureStream(
+                measureStream,
+                pitchPast=pitchPast,
+                pitchPastMeasure=pitchPastMeasure,
+                useKeySignature=useKeySignature,
+                alteredPitches=alteredPitches,
+                cautionaryPitchClass=cautionaryPitchClass,
+                cautionaryAll=cautionaryAll,
+                overrideStatus=overrideStatus,
+                cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                tiePitchSet=tiePitchSet)
 
         measureStream.makeTies(meterStream, inPlace=True)
 
@@ -6988,10 +7002,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(m.flat.notes)
         1
 
-        In cases where chord members are manipulated after initial tie creation,
-        some chord members might lack ties. Whereas `stripTies` ordinarily only acts
-        on chords if every member has a stop tie, this is not necessary if
-        all the pitches match:
+        In cases where notes are manipulated after initial tie creation,
+        some chord members might lack ties. This will not prevent merging the tied notes
+        if all the pitches match, and `matchByPitch=True` (default):
 
         >>> c1 = chord.Chord('C4 E4')
         >>> c1.tie = tie.Tie('start')
@@ -7012,14 +7025,82 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(strippedPitchMatching.flat.notes)
         1
 
-        This can be prevented with `matchByPitch=False`, in which case every chord member
-        must have a stop tie:
+        This can be prevented with `matchByPitch=False`, in which case every note,
+        including each chord member, must have stop and/or continue tie types,
+        which was not the case above:
 
-        >>> strippedConservative = m.stripTies(matchByPitch=False)
-        >>> len(strippedConservative.flat.notes)
+        >>> strippedMixedTieTypes = m.stripTies(matchByPitch=False)
+        >>> len(strippedMixedTieTypes.flat.notes)
         2
 
-        Changed in v.7 -- `matchByPitch` defaults to True.
+        >>> c2.notes[0].tie = tie.Tie('stop')
+        >>> c2.notes[1].tie = tie.Tie('stop')
+        >>> c2.notes[2].tie = tie.Tie('stop')
+        >>> strippedUniformTieTypes = m.stripTies(matchByPitch=False)
+        >>> len(strippedUniformTieTypes.flat.notes)
+        1
+
+        Notice the matching happens even after altering the pitches:
+
+        >>> c3 = c2.transpose(6)
+        >>> otherM = stream.Measure([c1, c3])
+        >>> strippedTransposed = otherM.stripTies(matchByPitch=False)
+        >>> len(strippedTransposed.flat.notes)
+        1
+
+        Changed in v.7 -- `matchByPitch` defaults True, and the following
+        behavior defined regarding chords with a tie type "continue":
+
+        >>> c1.notes[0].tie = tie.Tie('continue')
+        >>> c1.notes[1].tie = tie.Tie('start')
+        >>> c1.notes[2].tie = tie.Tie('start')
+
+        Continue is accepted here as an ersatz-start:
+
+        >>> stripped1 = m.stripTies(matchByPitch=True)
+        >>> len(stripped1.flat.notes)
+        1
+
+        But prepend an element so that it's considered as a tie continuation:
+
+        >>> c0 = chord.Chord('C4 E4 G4')
+        >>> c0.tie = tie.Tie('start')
+        >>> m2 = stream.Measure()
+        >>> m2.append([c0, c1, c2])
+
+        Now the mixed tie types on c1 will only be connected to c2
+        on the permissive option (`matchByPitch=True`):
+
+        >>> stripped2 = m2.stripTies(matchByPitch=True)
+        >>> stripped2.elements
+        (<music21.chord.Chord C4 E4 G4>,)
+
+        >>> stripped3 = m2.stripTies(matchByPitch=False)
+        >>> stripped3.elements
+        (<music21.chord.Chord C4 E4 G4>,
+         <music21.chord.Chord C4 E4 G4>,
+         <music21.chord.Chord C4 E4 G4>)
+
+        Now correct the tie types on c1 and try the strict option:
+
+        >>> c1.notes[0].tie = tie.Tie('continue')
+        >>> c1.notes[1].tie = tie.Tie('continue')
+        >>> c1.notes[2].tie = tie.Tie('continue')
+        >>> stripped4 = m2.stripTies(matchByPitch=False)
+        >>> stripped4.elements
+        (<music21.chord.Chord C4 E4 G4>,)
+
+        Now replace the first element with just a single C4 note.
+        The following chords will be merged with each other, but not with the single
+        note, even on `matchByPitch=False`.
+        (`matchByPitch=False` is permissive about pitch but strict about cardinality.)
+
+        >>> newC = note.Note('C4')
+        >>> newC.tie = tie.Tie('start')
+        >>> m2.replace(c0, newC)
+        >>> stripped5 = m2.stripTies(matchByPitch=False)
+        >>> stripped5.elements
+        (<music21.note.Note C>, <music21.chord.Chord C4 E4 G4>)
         '''
         # environLocal.printDebug(['calling stripTies'])
         if not inPlace:  # make a copy
@@ -7059,24 +7140,32 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         posConnected = []  # temporary storage for index of tied notes
         posDelete = []  # store deletions to be processed later
 
-        def updateEndMatch(nInner):
+        def updateEndMatch(nInner) -> bool:
             '''
             updateEndMatch based on nList, iLast, matchByPitch, etc.
             '''
-            # ties tell us when they are ended
-            # unless n is a chord, which only tells if SOME member has a tie
+            # 2 cases before matchByPitch=False returns early.
+
+            # Case 1: nInner is not a chord, and it has a stop tie
+            # can't trust chords, which only tell if SOME member has a tie
+            # matchByPitch does not matter here
             # https://github.com/cuthbertLab/music21/issues/502
             if (hasattr(nInner, 'tie')
-                    and 'Chord' not in nInner.classes
+                    and not isinstance(nInner, chord.Chord)
                     and nInner.tie is not None
                     and nInner.tie.type == 'stop'):
                 return True
-            # but capture case where all chord members have a stop tie
+            # Case 2: matchByPitch=False and all chord members have a stop tie
+            # and checking cardinality passes (don't match chords to single notes)
             elif (hasattr(nInner, 'tie')
-                    and 'Chord' in nInner.classes
+                    and not matchByPitch
+                    and isinstance(nInner, chord.Chord)
                     and None not in [inner_p.tie for inner_p in nInner.notes]
-                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}):
+                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}
+                    and nLast is not None and len(nLast.pitches) == len(nInner.pitches)):
                 return True
+
+            # Now, matchByPitch
             # if we cannot find a stop tie, see if last note was connected
             # and this and the last note are the same pitch; this assumes
             # that connected and same pitch value is tied; this is not
@@ -7084,18 +7173,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             elif not matchByPitch:
                 return False
 
-            # else...
             # find out if the last index is in position connected
             # if the pitches are the same for each note
             if (nLast is not None
                     and iLast in posConnected
                     and hasattr(nLast, 'pitch')
                     and hasattr(nInner, 'pitch')
+                    # before doing pitch comparison, need to
+                    # make sure we're not comparing a Note to a Chord
+                    and 'Chord' not in nLast.classes
+                    and 'Chord' not in nInner.classes
                     and nLast.pitch == nInner.pitch):
                 return True
             # looking for two chords of equal size
             elif (nLast is not None
-                    and 'Note' not in nInner.classes
+                    and not isinstance(nInner, note.Note)
                     and iLast in posConnected
                     and hasattr(nLast, 'pitches')
                     and hasattr(nInner, 'pitches')):
@@ -7110,6 +7202,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return allPitchesMatched
 
             return False
+
+        def allTiesAreContinue(nr: note.NotRest) -> bool:
+            if nr.tie is None:  # pragma: no cover
+                return False
+            if nr.tie.type != 'continue':
+                return False
+            # check every chord member, since tie type "continue" on a chord
+            # only indicates that SOME member is tie-continue.
+            if 'Chord' in nr.classes:
+                for innerN in nr.notes:
+                    if innerN.tie is None:
+                        return False
+                    if innerN.tie.type != 'continue':
+                        return False
+            return True
 
         for i in range(len(notes)):
             endMatch = None  # can be True, False, or None
@@ -7136,12 +7243,41 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # a connection has been started or continued, so no endMatch
                 endMatch = False
 
+            # a continue may or may not imply a connection
             elif (hasattr(n, 'tie')
                     and n.tie is not None
                     and n.tie.type == 'continue'):
-                # a continue always implies a connection
-                posConnected.append(i)
-                endMatch = False
+                # is this actually a start?
+                if not posConnected:
+                    posConnected.append(i)
+                    endMatch = False
+                elif matchByPitch:
+                    # try to match pitch against nLast
+                    # updateEndMatch() checks for equal cardinality
+                    tempEndMatch = updateEndMatch(n)
+                    if tempEndMatch:
+                        posConnected.append(i)
+                        # ... and keep going.
+                        endMatch = False
+                    else:
+                        # clear list and populate with this element
+                        posConnected = [i]
+                        endMatch = False
+                elif allTiesAreContinue(n):
+                    # uniform-continue suffices if not matchByPitch
+                    # but still need to check cardinality
+                    if nLast and (len(nLast.pitches) != len(n.pitches)):
+                        # different sizes: clear list and populate with this element
+                        # since allTiesAreContinue, it is okay to treat as ersatz-start
+                        posConnected = [i]
+                    else:
+                        posConnected.append(i)
+                    # either way, this was not a stop
+                    endMatch = False
+                else:
+                    # only SOME ties on this chord are "continue": reject
+                    posConnected = []
+                    endMatch = False
 
             # establish end condition
             if endMatch is None:  # not yet set, not a start or continue
@@ -7222,7 +7358,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # need to find the offset of the first thing that is not rest
                 for j in range(currentIndex + 1, len(srcStream._elements)):
                     el = srcStream._elements[j]
-                    if 'NotRest' in el.classes:
+                    if isinstance(el, note.NotRest):
                         # change target offset to this position
                         targetOffset = srcStream._elements[j].getOffsetBySite(
                             srcStream)
@@ -7231,7 +7367,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # filter matched elements
             post = []
             for matchEl in match:
-                if 'NotRest' in matchEl.classes:
+                if isinstance(matchEl, note.NotRest):
                     post.append(matchEl)
             return post
 
@@ -7241,9 +7377,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         srcFlat = self.flat.notes.stream()
         for i, e in enumerate(srcFlat):
             pSrc = []
-            if 'Note' in e.classes:
+            if isinstance(e, note.Note):
                 pSrc = [e]
-            elif 'Chord' in e.classes:
+            elif isinstance(e, chord.Chord):
                 pSrc = list(e)  # get components
             else:
                 continue
@@ -7256,9 +7392,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # for each p, see if there is match in the next position
                 # for each element, look for a pitch to match
                 mSrc = []
-                if 'Note' in m.classes:
+                if isinstance(m, note.Note):
                     mSrc = [m]
-                elif 'Chord' in m.classes:
+                elif isinstance(m, chord.Chord):
                     mSrc = list(m)  # get components
                 # final note comparison
                 for q in mSrc:
@@ -7549,7 +7685,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         When, as is commonly the case, we want to find all of the notes,
         but do not care to have offsets related to the origin of the stream,
-        then `.recurse()` is generally a more efficiant way of working:
+        then `.recurse()` is generally a more efficient way of working:
 
         >>> len(bwv66.recurse().notes)
         165
@@ -8569,7 +8705,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if myStream.hasPartLikeStreams():
                 foundPart = False
                 for subStream in myStream:
-                    if 'Stream' not in subStream.classes:
+                    if not subStream.isStream:
                         continue
                     if subStream.hasMeasures():
                         foundPart = True
@@ -8716,7 +8852,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if (hasattr(value, 'classes')
                         and 'GenericInterval' in value.classes):
                     # do not transpose KeySignatures w/ Generic Intervals
-                    if 'KeySignature' not in e.classes and hasattr(e, 'pitches'):
+                    if not isinstance(e, key.KeySignature) and hasattr(e, 'pitches'):
                         k = e.getContextByClass('KeySignature')
                         for p in e.pitches:
                             value.transposePitchKeyAware(p, k, inPlace=True)
@@ -9079,16 +9215,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             d_matchTuple = bestMatch(float(ql), (next_divisor,))
                     # Enforce nonzero duration for non-grace notes
                     if (d_matchTuple.match == 0
-                            and 'NotRest' in e.classes
+                            and isinstance(e, note.NotRest)
                             and not e.duration.isGrace):
                         e.quarterLength = 1 / max(quarterLengthDivisors)
                         if hasattr(e, 'editorial'):
                             e.editorial.quarterLengthQuantizationError = ql - e.quarterLength
-                    elif d_matchTuple.match == 0 and 'Rest' in e.classes:
+                    elif d_matchTuple.match == 0 and isinstance(e, note.Rest):
                         rests_lacking_durations.append(e)
                     else:
                         e.duration.quarterLength = d_matchTuple.match
-                        if (hasattr(e, 'editorial') and d_matchTuple.signedError != 0):
+                        if hasattr(e, 'editorial') and d_matchTuple.signedError != 0:
                             e.editorial.quarterLengthQuantizationError = d_matchTuple.signedError
 
             # end for e in ._elements
@@ -9436,7 +9572,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # do not need to look in endElements
             for obj in self._elements:
                 # if obj is a Part, we have multi-parts
-                if 'Measure' in obj.classes:
+                if getattr(obj, 'isMeasure', False):
                     post = True
                     break  # only need one
             self._cache['hasMeasures'] = post
@@ -9512,6 +9648,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             multiPart = False
             if not self.isFlat:  # if flat, does not have parts!
                 # do not need to look in endElements
+                obj: base.Music21Object
                 for obj in self.getElementsByClass('Stream'):
                     # if obj is a Part, we have multi-parts
                     if 'Part' in obj.classes:
@@ -9775,8 +9912,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         post = []
         for e in self.elements:
-            if 'music21.key.Key' in e.classSet:  # use fully qualified name
-                continue
+            if isinstance(e, key.Key):
+                continue  # has .pitches but should not be added
             if hasattr(e, 'pitch'):
                 post.append(e.pitch)
             # both Chords and Stream have a pitches properties; this just
@@ -10524,8 +10661,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         previousObject = None
         while currentObject is not None:
             if (previousObject is not None
-                    and 'Note' in currentObject.classes
-                    and 'Note' in previousObject.classes):
+                    and isinstance(currentObject, note.Note)
+                    and isinstance(previousObject, note.Note)):
                 currentObject.editorial.melodicInterval = interval.notesToInterval(
                     previousObject, currentObject)
             previousObject = currentObject
@@ -11710,7 +11847,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     # extract the variant component and insert into place
                     self.insert(oInStream, e)
 
-                    if 'Measure' in targetToReplace.classes:
+                    if getattr(targetToReplace, 'isMeasure', False):
                         e.number = targetToReplace.number
             # only remove old and add removed if we matched
             if targetsMatched > 0:
@@ -11736,13 +11873,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # environLocal.printDebug(
                 #     ['matchBySpan', matchBySpan, 'activateVariants', 'removing', e])
                 self.remove(e)
-                if 'Measure' in e.classes:  # Save deleted measure numbers.
+                if getattr(e, 'isMeasure', False):
+                    # Save deleted measure numbers.
                     deletedMeasures.append(e.number)
 
             for e in v.elements:
                 oInStream = vStart + e.getOffsetBySite(v.containedSite)
                 self.insert(oInStream, e)
-                if 'Measure' in e.classes:
+                if getattr(e, 'isMeasure', False):
                     if deletedMeasures:  # If there measure numbers left to use, use them.
                         # Assign the next highest deleted measure number
                         e.number = deletedMeasures.pop(False)
@@ -11858,7 +11996,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # this will always remove elements before inserting
         for e in targets:
-            if 'Measure' in e.classes:  # if a measure is deleted, save its number
+            if getattr(e, 'isMeasure', False):  # if a measure is deleted, save its number
                 deletedMeasures.append(e.number)
             oInVariant = self.elementOffset(e) - vStart
             removed.insert(oInVariant, e)
@@ -11868,7 +12006,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         highestNumber = None
         insertedMeasures = []
         for e in v.elements:
-            if 'Measure' in e.classes:
+            if getattr(e, 'isMeasure', False):
                 # If there are deleted numbers still saved, assign this measure the
                 # next highest and remove it from the list.
                 if deletedMeasures:
@@ -11988,7 +12126,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # this will always remove elements before inserting
         for e in targets:
-            if 'Measure' in e.classes:  # Save deleted measure numbers.
+            if getattr(e, 'isMeasure', False):  # Save deleted measure numbers.
                 deletedMeasures.append(e.number)
             oInVariant = self.elementOffset(e) - vStart
             removed.insert(oInVariant, e)
@@ -11998,7 +12136,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         highestMeasure = None
         insertedMeasures = []
         for e in v.elements:
-            if 'Measure' in e.classes:
+            if getattr(e, 'isMeasure', False):
                 # If there are deleted measure numbers left, assign the next
                 # inserted measure the next highest number and remove it.
                 if deletedMeasures:
@@ -12900,7 +13038,7 @@ class Measure(Stream):
         if useInitialRests:
             removeList = []
             for gn in self.getElementsByClass('GeneralNote'):
-                if 'Rest' not in gn.classes:
+                if not isinstance(gn, note.Rest):
                     break
                 removeList.append(gn)
             if removeList:
@@ -13036,7 +13174,7 @@ class Measure(Stream):
         # directly access _elements, as do not want to get any bars
         # in _endElements
         for e in self._elements:
-            if 'Barline' in e.classes:  # take the first
+            if isinstance(e, bar.Barline):  # take the first
                 if self.elementOffset(e) == 0.0:
                     barList.append(e)
                     break
@@ -13079,7 +13217,7 @@ class Measure(Stream):
         # look on _endElements
         barList = []
         for e in self._endElements:
-            if 'Barline' in e.classes:  # take the first
+            if isinstance(e, bar.Barline):  # take the first
                 barList.append(e)
                 break
         # barList = self.getElementsByClass(bar.Barline)
@@ -13099,7 +13237,7 @@ class Measure(Stream):
             barlineObj.location = 'right'
 
         # if a repeat, setup direction if not assigned
-        if barlineObj is not None and 'Repeat' in barlineObj.classes:
+        if barlineObj is not None and isinstance(barlineObj, bar.Repeat):
             # environLocal.printDebug(['got barline obj w/ direction', barlineObj.direction])
             if barlineObj.direction in ['start', None]:
                 barlineObj.direction = 'end'
@@ -13311,39 +13449,16 @@ class Part(Stream):
         else:
             returnObj = self
         # process make accidentals for each measure
-        measureStream = returnObj.getElementsByClass('Measure')
-        ksLast = None
-        for i in range(len(measureStream)):
-            m = measureStream[i]
-            if m.keySignature is not None:
-                ksLast = m.keySignature
-            # if beyond the first measure, use the pitches from the last
-            # measure for context
-            if i > 0:
-                try:
-                    previousNoteOrChord = measureStream[i - 1][-1]
-                    tiePitchSet = makeNotation.getTiePitchSet(previousNoteOrChord)
-                except (IndexError, StreamException):
-                    tiePitchSet = None
-
-                pitchPastMeasure = measureStream[i - 1].pitches
-
-            else:
-                pitchPastMeasure = None
-                # use the tie pitchSet from the method argument
-
-            m.makeAccidentals(
-                pitchPastMeasure=pitchPastMeasure,
-                useKeySignature=ksLast,
-                alteredPitches=alteredPitches,
-                searchKeySignatureByContext=False,
-                cautionaryPitchClass=cautionaryPitchClass,
-                cautionaryAll=cautionaryAll,
-                inPlace=True,  # always, has have a copy or source
-                overrideStatus=overrideStatus,
-                cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
-                tiePitchSet=tiePitchSet,
-            )
+        measureStream = returnObj.getElementsByClass(Measure)
+        makeNotation.makeAccidentalsInMeasureStream(
+            measureStream,
+            alteredPitches=alteredPitches,
+            cautionaryPitchClass=cautionaryPitchClass,
+            cautionaryAll=cautionaryAll,
+            overrideStatus=overrideStatus,
+            cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+            tiePitchSet=tiePitchSet,
+        )
         if not inPlace:
             return returnObj
         else:  # in place
@@ -13867,7 +13982,7 @@ class Score(Stream):
         >>> len(s.flat.notes)
         165
         >>> post = s.flattenParts()
-        >>> 'Part' in post.classes
+        >>> isinstance(post, stream.Part)
         True
         >>> len(post.flat.notes)
         165

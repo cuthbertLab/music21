@@ -29,6 +29,7 @@ from collections import OrderedDict
 from music21 import base
 from music21 import common
 from music21 import interval
+from music21 import note
 from music21 import pitch
 from music21.stream import Stream  # for typing
 from music21.tree.trees import OffsetTree
@@ -66,7 +67,7 @@ def unbundleInstruments(streamIn, *, inPlace=False):
         s = streamIn.coreCopyAsDerivation('unbundleInstruments')
 
     for thisObj in s:
-        if 'Unpitched' in thisObj.classes:
+        if isinstance(thisObj, note.Unpitched):
             i = thisObj.storedInstrument
             if i is not None:
                 off = thisObj.offset
@@ -109,7 +110,7 @@ def bundleInstruments(streamIn, *, inPlace=False):
         if 'Instrument' in thisObj.classes:
             lastInstrument = thisObj
             s.remove(thisObj)
-        elif 'Unpitched' in thisObj.classes:
+        elif isinstance(thisObj, note.Unpitched):
             thisObj.storedInstrument = lastInstrument
 
     if inPlace is False:
@@ -2471,7 +2472,7 @@ class Test(unittest.TestCase):
                 j = copy.deepcopy(obj)
 
     def testMusicXMLExport(self):
-        from music21 import stream, note
+        from music21 import stream
 
         s1 = stream.Stream()
         i1 = Violin()
@@ -2493,7 +2494,8 @@ class Test(unittest.TestCase):
         # s3.show()
 
     def testPartitionByInstrumentA(self):
-        from music21 import instrument, stream
+        from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2522,7 +2524,8 @@ class Test(unittest.TestCase):
         # post.show('t')
 
     def testPartitionByInstrumentB(self):
-        from music21 import instrument, stream, note
+        from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2543,7 +2546,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.parts[1].notes), 12)
 
     def testPartitionByInstrumentC(self):
-        from music21 import instrument, stream, note
+        from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2579,7 +2583,8 @@ class Test(unittest.TestCase):
         # post.show('t')
 
     def testPartitionByInstrumentD(self):
-        from music21 import instrument, stream, note
+        from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2617,7 +2622,8 @@ class Test(unittest.TestCase):
         # post.show('t')
 
     def testPartitionByInstrumentE(self):
-        from music21 import instrument, stream, note
+        from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         # s = stream.Score()
@@ -2655,7 +2661,8 @@ class Test(unittest.TestCase):
                          [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 9.0, 10.0, 11.0, 12.0, 13.0, 20.0])
 
     def testPartitionByInstrumentF(self):
-        from music21 import instrument, stream, note
+        from music21 import instrument
+        from music21 import stream
 
         s1 = stream.Stream()
         s1.append(instrument.AcousticGuitar())

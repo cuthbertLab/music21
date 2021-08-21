@@ -772,21 +772,27 @@ def midiEventsToInstrument(eventList):
             decoded = event.data.decode('utf-8').split('\x00')[0]
             decoded = decoded.strip()
             i = instrument.fromString(decoded)
+        elif event.channel == 10:
+            pm = percussion.PercussionMapper()
+            # PercussionMapper.midiPitchToInstrument() is 1-indexed
+            i = pm.midiPitchToInstrument(event.data + 1)
+            i.midiProgram = event.data
         else:
-            if event.channel == 10:
-                pm = percussion.PercussionMapper()
-                i = pm.midiPitchToInstrument(event.data + 1)
-            else:
-                i = instrument.instrumentFromMidiProgram(event.data)
+            i = instrument.instrumentFromMidiProgram(event.data)
             # Instrument.midiProgram and event.data are both 0-indexed
             i.midiProgram = event.data
-    except (percussion.MIDIPercussionException,
-            UnicodeDecodeError):
-        warnings.warn(f'Unable to determine instrument from {event}', TranslateWarning)
+    except UnicodeDecodeError:
+        warnings.warn(
+            f'Unable to determine instrument from {event}; getting generic Instrument',
+            TranslateWarning)
         i = instrument.Instrument()
+    except percussion.MIDIPercussionException:
+        warnings.warn(
+            f'Unable to determine instrument from {event}; getting generic UnpitchedPercussion',
+            TranslateWarning)
+        i = instrument.UnpitchedPercussion()
     except instrument.InstrumentException:
-        # Currently, we risk having an overwhelming number of warnings
-        # but consider consolidating to just one except one day
+        # Debug logging would be better than warning here
         i = instrument.Instrument()
 
     # Set MIDI channel
@@ -1728,7 +1734,8 @@ def getMetaEvents(events):
     from music21.midi import MetaEvents, ChannelVoiceMessages
 
     metaEvents = []  # store pairs of abs time, m21 object
-    for i, eventTuple in enumerate(events):
+    last_program: int = -1
+    for eventTuple in events:
         t, e = eventTuple
         metaObj = None
         if e.type == MetaEvents.TIME_SIGNATURE:
@@ -1739,9 +1746,16 @@ def getMetaEvents(events):
         elif e.type == MetaEvents.SET_TEMPO:
             metaObj = midiEventsToTempo(e)
         elif e.type in (MetaEvents.INSTRUMENT_NAME, MetaEvents.SEQUENCE_TRACK_NAME):
+            # midiEventsToInstrument() WILL NOT have knowledge of the current
+            # program, so set it here
             metaObj = midiEventsToInstrument(e)
+            if last_program != -1:
+                # Only update if we have had an initial PROGRAM_CHANGE
+                metaObj.midiProgram = last_program
         elif e.type == ChannelVoiceMessages.PROGRAM_CHANGE:
+            # midiEventsToInstrument() WILL set the program on the instance
             metaObj = midiEventsToInstrument(e)
+            last_program = e.data
         elif e.type == MetaEvents.MIDI_PORT:
             pass
         else:
@@ -2094,7 +2108,8 @@ def conductorStream(s: stream.Stream) -> stream.Part:
         {0.0} <music21.stream.Stream measureLike>
             {0.0} <music21.note.Note C>
     '''
-    from music21 import tempo, meter
+    from music21 import tempo
+    from music21 import meter
     partsList = list(s.getElementsByClass('Stream').getElementsByOffset(0))
     minPriority = min(p.priority for p in partsList) if partsList else 0
     conductorPriority = minPriority - 1
@@ -2882,7 +2897,8 @@ class Test(unittest.TestCase):
         self.assertTrue(common.whitespaceEqual(conductorEvents, match), conductorEvents)
 
     def testKeySignature(self):
-        from music21 import meter, key
+        from music21 import meter
+        from music21 import key
         n = note.Note()
         n.quarterLength = 0.5
         s = stream.Stream()
@@ -3092,7 +3108,8 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testMidiProgramChangeB(self):
-        from music21 import instrument, scale
+        from music21 import instrument
+        from music21 import scale
         import random
 
         iList = [instrument.Harpsichord,
@@ -3171,7 +3188,8 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testOverlappedEventsC(self):
-        from music21 import meter, key
+        from music21 import meter
+        from music21 import key
 
         s = stream.Stream()
         s.insert(key.KeySignature(3))
@@ -3194,7 +3212,8 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testExternalMidiProgramChangeB(self):
-        from music21 import instrument, scale
+        from music21 import instrument
+        from music21 import scale
 
         iList = [instrument.Harpsichord, instrument.Clavichord, instrument.Accordion,
                  instrument.Celesta, instrument.Contrabass, instrument.Viola,
@@ -3348,7 +3367,8 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testMicrotonalOutputE(self):
-        from music21 import corpus, interval
+        from music21 import corpus
+        from music21 import interval
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
         p2 = copy.deepcopy(p1)
@@ -3369,7 +3389,8 @@ class Test(unittest.TestCase):
         # post.show('midi', app='Logic Express')
 
     def testMicrotonalOutputF(self):
-        from music21 import corpus, interval
+        from music21 import corpus
+        from music21 import interval
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
         p2 = copy.deepcopy(p1)
@@ -3397,8 +3418,9 @@ class Test(unittest.TestCase):
         # post.show('midi', app='Logic Express')
 
     def testMicrotonalOutputG(self):
-
-        from music21 import corpus, interval, instrument
+        from music21 import corpus
+        from music21 import interval
+        from music21 import instrument
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
         p1.remove(p1.getElementsByClass('Instrument').first())
@@ -3492,7 +3514,8 @@ class Test(unittest.TestCase):
 
     def testMidiExportConductorA(self):
         '''Export conductor data to MIDI conductor track.'''
-        from music21 import meter, tempo
+        from music21 import meter
+        from music21 import tempo
 
         p1 = stream.Part()
         p1.repeatAppend(note.Note('c4'), 12)
@@ -3523,7 +3546,8 @@ class Test(unittest.TestCase):
         # s.show('midi', app='Logic Express')
 
     def testMidiExportConductorB(self):
-        from music21 import tempo, corpus
+        from music21 import tempo
+        from music21 import corpus
         s = corpus.parse('bwv66.6')
         s.insert(0, tempo.MetronomeMark(number=240))
         s.insert(4, tempo.MetronomeMark(number=30))
@@ -3568,7 +3592,9 @@ class Test(unittest.TestCase):
 
     def testMidiExportConductorE(self):
         '''The conductor only gets the first element at an offset.'''
-        from music21 import converter, tempo, key
+        from music21 import converter
+        from music21 import tempo
+        from music21 import key
 
         s = stream.Stream()
         p1 = converter.parse('tinynotation: c1')
@@ -3809,6 +3835,7 @@ class Test(unittest.TestCase):
         self.assertIsInstance(i, instrument.Flute)
 
     def testLousyInstrumentData(self):
+        from music21 import instrument
         from music21 import midi as midiModule
 
         lousyNames = ('    ', 'Instrument 20', 'Instrument', 'Inst 2', 'instrument')
@@ -3829,9 +3856,10 @@ class Test(unittest.TestCase):
 
         expected = 'Unable to determine instrument from '
         expected += '<music21.midi.MidiEvent PROGRAM_CHANGE, track=None, channel=10, data=0>'
+        expected += '; getting generic UnpitchedPercussion'
         with self.assertWarnsRegex(TranslateWarning, expected):
             i = midiEventsToInstrument(event)
-            self.assertIsNone(i.instrumentName)
+            self.assertIsInstance(i, instrument.UnpitchedPercussion)
 
     def testConductorStream(self):
         s = stream.Stream()
@@ -3884,6 +3912,38 @@ class Test(unittest.TestCase):
         # to be conductor tracks
         # https://github.com/cuthbertLab/music21/issues/1013
         streamToMidiFile(p)
+
+    def testImportInstrumentsWithoutProgramChanges(self):
+        '''
+        Instrument instances are created from both program changes and
+        track or sequence names. Since we have a MIDI file, we should not
+        rely on default MIDI programs defined in the instrument module; we
+        should just keep track of the active program number.
+        https://github.com/cuthbertLab/music21/issues/1085
+        '''
+        from music21 import midi as midiModule
+
+        event1 = midiModule.MidiEvent()
+        event1.data = 0
+        event1.channel = 1
+        event1.type = midiModule.ChannelVoiceMessages.PROGRAM_CHANGE
+
+        event2 = midiModule.MidiEvent()
+        # This will normalize to an instrument.Soprano, but we don't want
+        # the default midiProgram, we want 0.
+        event2.data = b'Soprano'
+        event2.channel = 2
+        event2.type = midiModule.MetaEvents.SEQUENCE_TRACK_NAME
+
+        DUMMY_DELTA_TIME = None
+        meta_event_pairs = getMetaEvents([(DUMMY_DELTA_TIME, event1), (DUMMY_DELTA_TIME, event2)])
+        # Second element of the tuple is the instrument instance
+        self.assertEqual(meta_event_pairs[0][1].midiProgram, 0)
+        self.assertEqual(meta_event_pairs[1][1].midiProgram, 0)
+
+        # Remove the initial PROGRAM_CHANGE and get a default midiProgram
+        meta_event_pairs = getMetaEvents([(DUMMY_DELTA_TIME, event2)])
+        self.assertEqual(meta_event_pairs[0][1].midiProgram, 53)
 
 
 # ------------------------------------------------------------------------------

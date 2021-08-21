@@ -73,13 +73,13 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
     now we will try it with the last movement of Schoenberg's opus 19 which has
     no mode explicitly encoded in the musicxml but which our analysis routines
-    believe (having very little to go on) fits the profile of F major best.
+    believe (having very little to go on) fits the profile of e minor best.
 
     >>> schoenberg19mvmt6 = corpus.parse('schoenberg/opus19', 6)
     >>> fe2 = features.native.QualityFeature(schoenberg19mvmt6)
     >>> f2 = fe2.extract()
     >>> f2.vector
-    [0]
+    [1]
 
 
     OMIT_FROM_DOCS
@@ -638,7 +638,7 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s2 = corpus.parse('schoenberg/opus19', 2)
     >>> fe2 = features.native.TriadSimultaneityPrevalence(s2)
     >>> fe2.extract().vector
-    [0.022727...]
+    [0.021739...]
     '''
     id = 'CS9'
 
@@ -977,7 +977,9 @@ featureExtractors = [
 class Test(unittest.TestCase):
 
     def testIncorrectlySpelledTriadPrevalence(self):
-        from music21 import stream, features, chord
+        from music21 import stream
+        from music21 import features
+        from music21 import chord
 
         s = stream.Stream()
         s.append(chord.Chord(['c', 'e', 'g']))
@@ -989,7 +991,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(fe.extract().vector[0]), '0.5')
 
     def testLandiniCadence(self):
-        from music21 import converter, features
+        from music21 import converter
+        from music21 import features
 
         s = converter.parse('tinynotation: 3/4 f#4 f# e g2')
         fe = features.native.LandiniCadence(s)

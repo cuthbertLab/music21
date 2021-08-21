@@ -151,7 +151,7 @@ class ProtoM21Object:
         >>> s.insert(50, clef.BassClef())
         >>> s2 = stream.Stream()
         >>> for t in s:
-        ...    if 'GClef' in t.classes and 'TrebleClef' not in t.classes:
+        ...    if isinstance(t, clef.GClef) and not isinstance(t, clef.TrebleClef):
         ...        s2.insert(t)
         >>> s2.show('text')
         {10.0} <music21.clef.GClef>

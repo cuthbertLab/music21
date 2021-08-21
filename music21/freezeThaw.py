@@ -82,6 +82,8 @@ from music21 import common
 from music21 import defaults
 from music21 import derivation
 from music21 import exceptions21
+from music21 import spanner
+from music21 import variant
 # from music21.tree.trees import ElementTree
 
 from music21 import environment
@@ -275,7 +277,7 @@ class StreamFreezer(StreamFreezeThawBase):
             self.findActiveStreamIdsInHierarchy(streamObj)
 
         for el in allEls:
-            if 'Variant' in el.classes:
+            if isinstance(el, variant.Variant):
                 # works like a whole new hierarchy...  # no need for deepcopy
                 subSF = StreamFreezer(
                     el._stream,
@@ -284,7 +286,7 @@ class StreamFreezer(StreamFreezeThawBase):
                     topLevel=False,
                 )
                 subSF.setupSerializationScaffold()
-            elif 'Spanner' in el.classes:
+            elif isinstance(el, spanner.Spanner):
                 # works like a whole new hierarchy...  # no need for deepcopy
                 subSF = StreamFreezer(
                     el.spannerStorage,
@@ -380,9 +382,9 @@ class StreamFreezer(StreamFreezeThawBase):
             for el, unused_offset in storedElementOffsetTuples:
                 if el.isStream:
                     self.recursiveClearSites(el)
-                if 'Spanner' in el.classes:
+                if isinstance(el, spanner.Spanner):
                     self.recursiveClearSites(el.spannerStorage)
-                if 'Variant' in el.classes:
+                if isinstance(el, variant.Variant):
                     self.recursiveClearSites(el._stream)
                 if hasattr(el, '_derivation'):
                     el._derivation = derivation.Derivation()  # reset
@@ -991,7 +993,8 @@ class StreamThawer(StreamFreezeThawBase):
 class Test(unittest.TestCase):
 
     def testSimpleFreezeThaw(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         s = stream.Stream()
         sDummy = stream.Stream()
         n = note.Note()
@@ -1012,7 +1015,8 @@ class Test(unittest.TestCase):
         self.assertEqual(outStream[0].offset, 2.0)
 
     def testFreezeThawWithSpanner(self):
-        from music21 import stream, note, spanner
+        from music21 import stream
+        from music21 import note
         s = stream.Stream()
         sDummy = stream.Stream()
         n = note.Note()
@@ -1121,7 +1125,6 @@ class Test(unittest.TestCase):
 
     def testFreezeThawSimpleVariant(self):
         from music21 import freezeThaw
-        from music21 import variant
         from music21 import stream
         from music21 import note
 
@@ -1150,7 +1153,6 @@ class Test(unittest.TestCase):
     def testFreezeThawVariant(self):
         from music21 import freezeThaw
         from music21 import corpus
-        from music21 import variant
         from music21 import stream
         from music21 import note
 
@@ -1189,7 +1191,8 @@ class Test(unittest.TestCase):
         # v2.show('t')
 
     def testSerializationScaffoldA(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         from music21 import freezeThaw
 
         n1 = note.Note()
@@ -1208,7 +1211,9 @@ class Test(unittest.TestCase):
         self.assertTrue(s1.hasElement(n1))
 
     def testJSONPickleSpanner(self):
-        from music21 import converter, note, stream, spanner
+        from music21 import converter
+        from music21 import note
+        from music21 import stream
         n1 = note.Note('C')
         n2 = note.Note('D')
         s1 = stream.Stream()

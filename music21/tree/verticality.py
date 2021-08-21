@@ -827,7 +827,7 @@ class Verticality(prebase.ProtoM21Object):
             if not isinstance(ts, spans.PitchedTimespan):
                 continue
             el = ts.element
-            if 'Chord' in el.classes:
+            if isinstance(el, chord.Chord):
                 if len(el) == 0:  # pylint: disable=len-as-condition
                     continue
 

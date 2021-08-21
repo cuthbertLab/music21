@@ -375,7 +375,10 @@ class Repeat(repeat.RepeatMark, Barline):
 class Test(unittest.TestCase):
 
     def testSortOrder(self):
-        from music21 import stream, clef, note, metadata
+        from music21 import stream
+        from music21 import clef
+        from music21 import note
+        from music21 import metadata
         m = stream.Measure()
         b = Repeat()
         m.leftBarline = b
@@ -397,7 +400,8 @@ class Test(unittest.TestCase):
         self.assertEqual(m[1], b)
 
     def testFreezeThaw(self):
-        from music21 import converter, stream
+        from music21 import converter
+        from music21 import stream
 
         b = Barline()
         self.assertNotIn('StyleMixin', b.classes)

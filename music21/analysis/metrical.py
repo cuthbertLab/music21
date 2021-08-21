@@ -166,7 +166,8 @@ class TestExternal(unittest.TestCase):
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
         '''
-        from music21 import note, meter
+        from music21 import note
+        from music21 import meter
         s = stream.Stream()
         ts = meter.TimeSignature('4/4')
 

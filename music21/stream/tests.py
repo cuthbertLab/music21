@@ -705,7 +705,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n.getOffsetBySite(a), 10)
 
     def testExtractedNoteAssignLyric(self):
-        from music21 import converter, text
+        from music21 import converter
+        from music21 import text
         a = converter.parse(corpus.getWork('corelli/opus3no1/1grave'))
         b = a.parts[1]
         c = b.flat
@@ -1424,6 +1425,100 @@ class Test(unittest.TestCase):
         self.assertEqual(chordsOut[2].pitches, ch3.pitches)
         self.assertEqual(chordsOut[3].pitches, ch4.pitches)
         self.assertEqual(chordsOut[4].pitches, ch5.pitches)
+
+    def testStripTiesComplexTies(self):
+        '''
+        Make sure tie types of "stop" or "continue" are not taken at face value
+        for Chords if matchByPitch=False; they only represent that SOME
+        chord member has that tie type.
+        '''
+        from music21 import stream, tie
+
+        n0 = note.Note('C4')
+        n0.tie = tie.Tie('start')
+
+        n1 = note.Note('C4')
+        n2 = note.Note('F4')
+        n1.tie = tie.Tie('continue')
+
+        n3 = note.Note('C4')
+        n4 = note.Note('F4')
+        n3.tie = tie.Tie('stop')
+
+        c1 = chord.Chord([n1, n2])
+        c2 = chord.Chord([n3, n4])
+
+        s = stream.Stream()
+        s.append(n0)
+        s.append(c1)
+        s.append(c2)
+
+        stripped1 = s.stripTies(matchByPitch=True)
+        # pitches of c1 don't match pitch of n0,
+        # so disregard the "continue" and treat instead as a start
+        # and match against the pitches of c2
+        self.assertEqual(len(stripped1), 2)  # previously was 1
+
+        stripped2 = s.stripTies(matchByPitch=False)
+        # strict mode: this shouldn't do anything,
+        # because the middle element isn't uniform-continue
+        # and the last element isn't uniform-stop
+        self.assertEqual(len(stripped2), 3)
+
+        n2.tie = tie.Tie('continue')
+
+        stripped3 = s.stripTies(matchByPitch=True)
+        # number of pitches in c1 doesn't match n0
+        # but does match c2, so lack of uniform-tie stop is irrelevant
+        self.assertEqual(len(stripped3), 2)  # previously was 1
+        self.assertEqual(
+            str(stripped3.elements),
+            '(<music21.note.Note C>, <music21.chord.Chord C4 F4>)'
+        )
+
+        stripped4 = s.stripTies(matchByPitch=False)
+        # matchByPitch=False requires last element to be uniform-stop
+        self.assertEqual(len(stripped4), 3)
+
+        n4.tie = tie.Tie('stop')
+
+        stripped5 = s.stripTies(matchByPitch=False)
+        # notice the note STILL isn't merged to the chords -- because different # of notes
+        self.assertEqual(len(stripped5), 2)
+
+        self.assertEqual(
+            str(stripped5.elements),
+            '(<music21.note.Note C>, <music21.chord.Chord C4 F4>)'
+        )
+
+        # replace the first note with a Chord bearing a start tie, and everything can be merged
+        s.replace(n0, chord.Chord('C4 F4'))
+        s.first().tie = tie.Tie('start')
+
+        stripped6 = s.stripTies(matchByPitch=False)
+        self.assertEqual(
+            str(stripped6.elements),
+            '(<music21.chord.Chord C4 F4>,)'
+        )
+
+        # make sure matchByPitch=True is still picky about pitch but merges the rest,
+        # including a continue tie, which becomes ersatz-start
+        s.first().transpose(6, inPlace=True)
+        stripped7 = s.stripTies(matchByPitch=True)
+        self.assertEqual(
+            str(stripped7.elements),
+            '(<music21.chord.Chord F#4 B4>, <music21.chord.Chord C4 F4>)'
+        )  # previously was 1 element
+
+        # also transpose the "continue" chord
+        # to ensure the link from continue -> stop matches pitch
+        s[1].transpose(7, inPlace=True)
+        stripped8 = s.stripTies(matchByPitch=True)
+        self.assertEqual(
+            str(stripped8.elements),
+            '(<music21.chord.Chord F#4 B4>, '
+            + '<music21.chord.Chord G4 C5>, <music21.chord.Chord C4 F4>)'
+        )  # previously was 1 element
 
     def testTwoStreamMethods(self):
         from music21.note import Note
@@ -2240,7 +2335,8 @@ class Test(unittest.TestCase):
 
         expected = "clef.TrebleClef is not a Music21Object; got <class 'str'>"
         with self.assertRaisesRegex(TypeError, expected):
-            s.remove('clef.TrebleClef')
+            # noinspection PyTypeChecker
+            s.remove('clef.TrebleClef')  # cannot remove by Class str.
 
     def testRemoveByClass(self):
         s = Stream()
@@ -2624,6 +2720,20 @@ class Test(unittest.TestCase):
         m = p1.measure(1)
         self.assertEqual(str(m.rightBarline), '<music21.bar.Barline type=final>')
 
+    def testMakeAccidentalsInScore(self):
+        '''
+        Making accidentals on a score having a part with measures
+        should still reiterate accidentals measure by measure.
+        '''
+        n1 = note.Note('f#', type='whole')
+        n2 = note.Note('f#', type='whole')
+        m1 = Measure(n1)
+        m2 = Measure(n2)
+        p = Part([m1, m2])
+        s = Score(p)
+        s.makeAccidentals(inPlace=True)
+        self.assertIs(s[note.Note].last().pitch.accidental.displayStatus, True)
+
     def testMakeAccidentalsWithKeysInMeasures(self):
         scale1 = ['c4', 'd4', 'e4', 'f4', 'g4', 'a4', 'b4', 'c5']
         scale2 = ['c', 'd', 'e-', 'f', 'g', 'a-', 'b-', 'c5']
@@ -2680,6 +2790,48 @@ class Test(unittest.TestCase):
                              ds[i],
                              '%s failed, %s != %s' %
                                 (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
+
+    def testMakeNotationTiesKeyless(self):
+        from music21 import converter
+        p = converter.parse('tinynotation: 4/4 f#1~ f#1')
+        # Key of no sharps/flats
+        p.measure(1).insert(0, key.KeySignature(sharps=0))
+        # calls makeAccidentalsInMeasureStream()
+        p.makeNotation(inPlace=True)
+        self.assertIs(p.measure(2).notes.first().pitch.accidental.displayStatus, False)
+
+    def testMakeNotationTiesKeyChange(self):
+        from music21 import converter
+
+        p = converter.parse('tinynotation: 4/4 f#1~ f#1')
+        # Insert key change where held-over note is diatonic
+        p.measure(2).insert(0, key.KeySignature(sharps=1))
+        made = p.makeNotation()
+        self.assertIs(made.measure(2).notes.first().pitch.accidental.displayStatus, False)
+
+        p = converter.parse('tinynotation: 4/4 f#1~ f#1')
+        # Insert key change where held-over note is chromatic
+        p.measure(2).insert(0, key.KeySignature(sharps=-1))
+        made = p.makeNotation()
+        self.assertIs(made.measure(2).notes.first().pitch.accidental.displayStatus, True)
+
+        p = converter.parse('tinynotation: 4/4 b1~ b1')
+        # Same, but with a natural
+        p.measure(2).insert(0, key.KeySignature(sharps=-1))
+        made = p.makeNotation()
+        self.assertIs(made.measure(2).notes.first().pitch.accidental.displayStatus, True)
+
+        p = converter.parse('tinynotation: 4/4 f#1~ f#1')
+        p.measure(1).insert(0, key.KeySignature(sharps=-1))
+        # This is no longer a key "change", should still work based on the tie
+        made = p.makeNotation()
+        self.assertIs(made.measure(2).notes.first().pitch.accidental.displayStatus, False)
+
+        # Wipe out the tie; accidental should be reiterated
+        for n in p.flat.notes:
+            n.tie = None
+        made_no_ties = p.makeNotation()
+        self.assertIs(made_no_ties.measure(2).notes.first().pitch.accidental.displayStatus, True)
 
     def testMakeAccidentalsOctaveKS(self):
         s = Stream()
@@ -7167,7 +7319,8 @@ class Test(unittest.TestCase):
                          ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5'])
 
     def testTransposeByPitchC(self):
-        from music21 import converter, instrument
+        from music21 import converter
+        from music21 import instrument
         p = converter.parse('tinyNotation: c1 d1')
         p.insert(0, instrument.Horn())
         s = Score(p)
@@ -7194,7 +7347,7 @@ class Test(unittest.TestCase):
         s.extendTies()
         post = []
         for n in s.flat.getElementsByClass('GeneralNote'):
-            if 'Chord' in n.classes:
+            if isinstance(n, chord.Chord):
                 post.append([repr(q.tie) for q in n])
             else:
                 post.append(repr(n.tie))
@@ -7953,7 +8106,8 @@ class Test(unittest.TestCase):
     def testActivateVariantsBySpanA(self):
         # this tests replacing 1 note with a 3-note variant
 
-        from music21 import variant, dynamics
+        from music21 import variant
+        from music21 import dynamics
 
         s = Stream()
         s.repeatAppend(note.Note('d2'), 12)
@@ -8035,7 +8189,7 @@ class Test(unittest.TestCase):
         bass = b.parts[3]
         bassEmpty = bass.template(fillWithRests=False, removeClasses=True)
         for x in bassEmpty:
-            if 'Measure' in x.classes:
+            if isinstance(x, Measure):
                 self.assertEqual(len(x), 0)
 
     def testSetElements(self):
