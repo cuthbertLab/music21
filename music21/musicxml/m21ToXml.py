@@ -3912,7 +3912,7 @@ class MeasureExporter(XMLExporterBase):
         Convert a :class:`~music21.note.Unpitched` to a <note>
         with an <unpitched> subelement.
 
-        >>> up = note.Unpitched('D5')
+        >>> up = note.Unpitched(displayName='D5')
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> mxUnpitched = MEX.unpitchedToXml(up)
         >>> MEX.dump(mxUnpitched)
