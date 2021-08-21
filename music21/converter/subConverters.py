@@ -23,7 +23,6 @@ import io
 import os
 import pathlib
 import subprocess
-import sys
 import unittest
 
 from typing import Union
@@ -941,12 +940,17 @@ class ConverterMusicXML(SubConverter):
 
             musescoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
 
-        storedStrErr = sys.stderr
-        fileLikeOpen = io.StringIO()
-        sys.stderr = fileLikeOpen
-        subprocess.run(musescoreRun, check=False)
-        fileLikeOpen.close()
-        sys.stderr = storedStrErr
+        completed_process = subprocess.run(musescoreRun, capture_output=True, check=False)
+        if completed_process.returncode != 0:
+            # Raise same exception class as findNumberedPNGPath()
+            # for backward compatibility
+            stderr_bytes = completed_process.stderr
+            try:
+                import locale
+                stderr_str = stderr_bytes.decode(locale.getpreferredencoding(do_setlocale=False))
+            except UnicodeDecodeError:
+                stderr_str = stderr_bytes  # not really a str, but best we can do.
+            raise SubConverterFileIOException(stderr_str)
 
         if common.runningUnderIPython() and common.getPlatform() == 'nix':
             # Leave environment in original state
