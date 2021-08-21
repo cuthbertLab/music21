@@ -953,7 +953,6 @@ def makeRests(
     if inPlace is not True:
         return returnObj
 
-
 def makeTies(
     s,
     *,

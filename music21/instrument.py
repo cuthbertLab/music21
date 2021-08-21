@@ -31,7 +31,7 @@ from music21 import common
 from music21 import interval
 from music21 import note
 from music21 import pitch
-from music21.stream import Stream  # for typing
+from music21 import stream
 from music21.tree.trees import OffsetTree
 
 from music21.exceptions21 import InstrumentException
@@ -44,7 +44,7 @@ environLocal = environment.Environment(_MOD)
 def unbundleInstruments(streamIn, *, inPlace=False):
     # noinspection PyShadowingNames
     '''
-    takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.Unpitched` objects
+    takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
     and moves their `.storedInstrument` attributes to a new Stream (unless inPlace=True)
 
     >>> up1 = note.Unpitched()
@@ -67,7 +67,8 @@ def unbundleInstruments(streamIn, *, inPlace=False):
         s = streamIn.coreCopyAsDerivation('unbundleInstruments')
 
     for thisObj in s:
-        if isinstance(thisObj, note.Unpitched):
+        if isinstance(thisObj, note.NotRest):
+            # eventually also unbundle each note of chord, but need new voices
             i = thisObj.storedInstrument
             if i is not None:
                 off = thisObj.offset
@@ -110,7 +111,7 @@ def bundleInstruments(streamIn, *, inPlace=False):
         if 'Instrument' in thisObj.classes:
             lastInstrument = thisObj
             s.remove(thisObj)
-        elif isinstance(thisObj, note.Unpitched):
+        elif isinstance(thisObj, note.NotRest):
             thisObj.storedInstrument = lastInstrument
 
     if inPlace is False:
@@ -1798,7 +1799,7 @@ def ensembleNameBySize(number):
     else:
         return ensembleNamesBySize[int(number)]
 
-def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
+def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
     '''
     Check every offset in `s` for multiple instrument instances.
     If the `.partName` can be standardized across instances,
@@ -2196,8 +2197,6 @@ def partitionByInstrument(streamObj):
     TODO: use proper recursion to make a copy of the stream.
     TODO: final barlines should be aligned.
     '''
-    from music21 import stream
-
     if not streamObj.hasPartLikeStreams():
         # place in a score for uniform operations
         s = stream.Score()
@@ -2205,15 +2204,15 @@ def partitionByInstrument(streamObj):
     else:
         s = stream.Score()
         # append flat parts
-        for sub in streamObj.getElementsByClass('Stream'):
+        for sub in streamObj.getElementsByClass(stream.Stream):
             s.insert(0, sub.flat)
 
     # first, let's extend the duration of each instrument to match stream
-    for sub in s.getElementsByClass('Stream'):
+    for sub in s.getElementsByClass(stream.Stream):
         sub.extendDuration('Instrument', inPlace=True)
 
     # first, find all unique instruments
-    instrumentIterator = s.recurse().getElementsByClass('Instrument')
+    instrumentIterator = s.recurse().getElementsByClass(Instrument)
     if not instrumentIterator:
         # TODO(msc): v7 return s.
         return None  # no partition is available
@@ -2243,7 +2242,7 @@ def partitionByInstrument(streamObj):
             post.insert(el.offset, el)
 
         subStream = el
-        for i in subStream.getElementsByClass('Instrument'):
+        for i in subStream.getElementsByClass(Instrument):
             start = i.offset
             # duration will have been set with sub.extendDuration above
             end = i.offset + i.duration.quarterLength
@@ -2260,7 +2259,7 @@ def partitionByInstrument(streamObj):
             )
             # add to part at original offset
             # do not gather instrument
-            for e in coll.getElementsNotOfClass('Instrument'):
+            for e in coll.getElementsNotOfClass(Instrument):
                 try:
                     p.insert(subStream.elementOffset(e), e)
                 except stream.StreamException:
@@ -2269,7 +2268,7 @@ def partitionByInstrument(streamObj):
                     # might return something twice if it's at the same offset as the
                     # instrument switch...
 
-    for inst in post.recurse().getElementsByClass('Instrument'):
+    for inst in post.recurse().getElementsByClass(Instrument):
         inst.duration.quarterLength = 0
     return post
 
@@ -2472,8 +2471,6 @@ class Test(unittest.TestCase):
                 j = copy.deepcopy(obj)
 
     def testMusicXMLExport(self):
-        from music21 import stream
-
         s1 = stream.Stream()
         i1 = Violin()
         i1.partName = 'test'
@@ -2495,7 +2492,6 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentA(self):
         from music21 import instrument
-        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2525,7 +2521,6 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentB(self):
         from music21 import instrument
-        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2547,7 +2542,6 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentC(self):
         from music21 import instrument
-        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2584,7 +2578,6 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentD(self):
         from music21 import instrument
-        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2623,7 +2616,6 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentE(self):
         from music21 import instrument
-        from music21 import stream
 
         # basic case of instruments in Parts
         # s = stream.Score()
@@ -2662,7 +2654,6 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentF(self):
         from music21 import instrument
-        from music21 import stream
 
         s1 = stream.Stream()
         s1.append(instrument.AcousticGuitar())

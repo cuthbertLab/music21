@@ -709,7 +709,7 @@ class GeneralObjectExporter:
         stream.makeNotation.makeTupletBrackets(new_part, inPlace=True)
         return self.fromPart(new_part)
 
-    def fromPitch(self, p):
+    def fromPitch(self, p: pitch.Pitch):
         # noinspection PyShadowingNames
         '''
         Translate a music21 :class:`~music21.pitch.Pitch` into an object
@@ -2789,9 +2789,9 @@ class MeasureExporter(XMLExporterBase):
             ('NoChord', 'noChordToXml'),
             ('ChordWithFretBoard', 'chordWithFretBoardToXml'),
             ('ChordSymbol', 'chordSymbolToXml'),
-            ('Chord', 'chordToXml'),
+            ('ChordBase', 'chordToXml'),
+            ('Unpitched', 'unpitchedToXml'),
             ('Rest', 'restToXml'),
-            # Skipping unpitched for now
             ('Dynamic', 'dynamicToXml'),
             ('Segno', 'segnoToXml'),
             ('Coda', 'codaToXml'),
@@ -3474,9 +3474,7 @@ class MeasureExporter(XMLExporterBase):
             n: note.Note
             mxPitch = self.pitchToXml(n.pitch)
             mxNote.append(mxPitch)
-        else:
-            # assume rest until unpitched works
-            # TODO: unpitched
+        elif n.isRest:
             SubElement(mxNote, 'rest')
 
         if d.isGrace is not True:
@@ -3722,7 +3720,7 @@ class MeasureExporter(XMLExporterBase):
 
         return mxNote
 
-    def chordToXml(self, c: chord.Chord):
+    def chordToXml(self, c: chord.ChordBase):
         # noinspection PyShadowingNames
         '''
         Returns a list of <note> tags, all but the first with a <chord/> tag on them.
@@ -3807,6 +3805,29 @@ class MeasureExporter(XMLExporterBase):
           <notehead color="#FFD700" parentheses="no">diamond</notehead>
         </note>
 
+        And unpitched chord members:
+
+        >>> perc = percussion.PercussionChord([note.Unpitched(), note.Unpitched()])
+        >>> for n in MEX.chordToXml(perc):
+        ...     MEX.dump(n)
+        <note>
+          <unpitched>
+            <display-step>B</display-step>
+            <display-octave>4</display-octave>
+          </unpitched>
+          <duration>10080</duration>
+          <type>quarter</type>
+        </note>
+        <note>
+          <chord />
+          <unpitched>
+            <display-step>B</display-step>
+            <display-octave>4</display-octave>
+          </unpitched>
+          <duration>10080</duration>
+          <type>quarter</type>
+        </note>
+
         Test articulations of chords with fingerings. Superfluous fingerings will be ignored.
 
         >>> testChord = chord.Chord('E4 C5')
@@ -3834,11 +3855,13 @@ class MeasureExporter(XMLExporterBase):
             </technical>
           </notations>
         </note>
-
         '''
         mxNoteList = []
         for i, n in enumerate(c):
-            mxNoteList.append(self.noteToXml(n, i, chordParent=c))
+            if 'Unpitched' in n.classSet:
+                mxNoteList.append(self.unpitchedToXml(n, noteIndexInChord=i, chordParent=c))
+            else:
+                mxNoteList.append(self.noteToXml(n, noteIndexInChord=i, chordParent=c))
         return mxNoteList
 
     def durationXml(self, dur: duration.Duration):
@@ -3860,7 +3883,8 @@ class MeasureExporter(XMLExporterBase):
     def pitchToXml(self, p: pitch.Pitch):
         # noinspection PyShadowingNames
         '''
-        convert a pitch to xml... does not create the <accidental> tag...
+        Convert a :class:`~music21.pitch.Pitch` to xml.
+        Does not create the <accidental> tag.
 
         >>> p = pitch.Pitch('D#5')
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
@@ -3879,6 +3903,49 @@ class MeasureExporter(XMLExporterBase):
             mxAlter.text = str(common.numToIntOrFloat(p.accidental.alter))
         _setTagTextFromAttribute(p, mxPitch, 'octave', 'implicitOctave')
         return mxPitch
+
+    def unpitchedToXml(self,
+                       up: note.Unpitched,
+                       noteIndexInChord: int = 0,
+                       chordParent: chord.ChordBase = None) -> Element:
+        '''
+        Convert a :class:`~music21.note.Unpitched` to a <note>
+        with an <unpitched> subelement.
+
+        >>> up = note.Unpitched(displayName='D5')
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxUnpitched = MEX.unpitchedToXml(up)
+        >>> MEX.dump(mxUnpitched)
+        <note>
+          <unpitched>
+            <display-step>D</display-step>
+            <display-octave>5</display-octave>
+          </unpitched>
+          <duration>10080</duration>
+          <type>quarter</type>
+        </note>
+
+        >>> graceUp = up.getGrace()
+        >>> mxUnpitched = MEX.unpitchedToXml(graceUp)
+        >>> MEX.dump(mxUnpitched)
+        <note>
+          <grace slash="yes" />
+          <unpitched>
+            <display-step>D</display-step>
+            <display-octave>5</display-octave>
+          </unpitched>
+          <type>quarter</type>
+        </note>
+        '''
+        mxNote = self.noteToXml(up, noteIndexInChord=noteIndexInChord, chordParent=chordParent)
+
+        mxUnpitched = Element('unpitched')
+        _setTagTextFromAttribute(up, mxUnpitched, 'display-step')
+        _setTagTextFromAttribute(up, mxUnpitched, 'display-octave')
+
+        helpers.insertBeforeElements(mxNote, mxUnpitched, tagList=['duration', 'type'])
+
+        return mxNote
 
     def fretNoteToXml(self, fretNote) -> Element:
         '''
@@ -4060,8 +4127,7 @@ class MeasureExporter(XMLExporterBase):
         # noinspection PyShadowingNames
         '''
         Translate a music21 :class:`~music21.note.NotRest` object
-        such as a Note, or Unpitched object, or Chord
-        into a <notehead> tag
+        such as a Note, or Chord into a `<notehead>` tag.
 
         >>> n = note.Note('C#4')
         >>> n.notehead = 'diamond'
@@ -5845,6 +5911,8 @@ class MeasureExporter(XMLExporterBase):
               <staff-lines>3</staff-lines>
         </staff-details>
         '''
+        # TODO: number lines from the bottom and hide others as necessary
+        # see: https://github.com/w3c/musicxml/issues/351
         # TODO: number (bigger issue)
         # TODO: show-frets
         # TODO: print-spacing

@@ -878,8 +878,9 @@ class NotRest(GeneralNote):
     '''
     Parent class for Note-like objects that are not rests; that is to say
     they have a stem, can be tied, and volume is important.
-    Basically, that's a `Note` or `Chord` or
-    `Unpitched` object for now.
+    Basically, that's a :class:`Note` or :class:`~music21.chord.Chord`
+    (or their subclasses such as :class:`~music21.harmony.ChordSymbol`), or
+    :class:`Unpitched` object.
     '''
     # unspecified means that there may be a stem, but its orientation
     # has not been declared.
@@ -903,6 +904,7 @@ class NotRest(GeneralNote):
             self.beams = keywords['beams']
         else:
             self.beams = beam.Beams()
+        self._storedInstrument: Optional['music21.instrument.Instrument'] = None
 
     # ==============================================================================================
     # Special functions
@@ -1192,6 +1194,22 @@ class NotRest(GeneralNote):
         [120, 80]
         ''')
 
+    def _getStoredInstrument(self):
+        return self._storedInstrument
+
+    def _setStoredInstrument(self, newValue):
+        self._storedInstrument = newValue
+
+    storedInstrument = property(_getStoredInstrument, _setStoredInstrument)
+
+    def getInstrument(self):
+        '''
+        TOOD: doc and test
+        '''
+        if self.storedInstrument is not None:
+            return self.storedInstrument
+        return self.getContextByClass('Instrument', followDerivation=False)
+
 
 # ------------------------------------------------------------------------------
 class Note(NotRest):
@@ -1239,7 +1257,6 @@ class Note(NotRest):
 
     >>> note.Note(64).nameWithOctave
     'E4'
-
 
     Two notes are considered equal if their most important attributes
     (such as pitch, duration,
@@ -1447,7 +1464,7 @@ class Note(NotRest):
     @property
     def pitches(self) -> Tuple[pitch.Pitch]:
         '''
-        Return the :class:`~music21.pitch.Pitch` object in a tuple.
+        Return the single :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
         that found on :class:`~music21.chord.Chord` so that `[c.pitches for c in s.notes]`
         provides a consistent interface for all objects.
@@ -1602,7 +1619,6 @@ class Note(NotRest):
         if self._chordAttached is not None:
             self._chordAttached.clearCache()
 
-
 # ------------------------------------------------------------------------------
 # convenience classes
 
@@ -1613,17 +1629,15 @@ class Unpitched(NotRest):
     A General class of unpitched objects which appear at different places
     on the staff.  Examples: percussion notation.
 
-    The `Unpitched` object does not currently do anything and should
-    not be used.
-
     >>> unp = note.Unpitched()
 
-    Unpitched elements have displayStep and displayOctave
-    which shows where they should be displayed, but they do not have pitch
+    Unpitched elements have :attr:`displayStep` and :attr:`displayOctave`,
+    which shows where they should be displayed as if the staff were a
+    5-line staff in treble clef, but they do not have pitch
     objects:
 
     >>> unp.displayStep
-    'C'
+    'B'
     >>> unp.displayOctave
     4
     >>> unp.displayStep = 'G'
@@ -1632,11 +1646,15 @@ class Unpitched(NotRest):
     AttributeError: 'Unpitched' object has no attribute 'pitch'
     '''
 
-    def __init__(self):
-        super().__init__()
-        self.displayStep = 'C'
-        self.displayOctave = 4
-        self._storedInstrument = None
+    def __init__(self, displayName=None, **keywords):
+        super().__init__(**keywords)
+
+        self.displayStep: str = 'B'
+        self.displayOctave: int = 4
+        if displayName:
+            display_pitch = pitch.Pitch(displayName)
+            self.displayStep = display_pitch.step
+            self.displayOctave = display_pitch.octave
 
     def __eq__(self, other):
         if super().__eq__(other) is NotImplemented:
@@ -1674,6 +1692,18 @@ class Unpitched(NotRest):
         p.step = self.displayStep
         p.octave = self.displayOctave
         return p
+
+    @property
+    def displayName(self) -> str:
+        '''
+        Returns the `nameWithOctave` of the :meth:`displayPitch`.
+
+        >>> unp = note.Unpitched('B2')
+        >>> unp.displayName
+        'B2'
+        '''
+        display_pitch = self.displayPitch()
+        return display_pitch.nameWithOctave
 
 
 # ------------------------------------------------------------------------------
