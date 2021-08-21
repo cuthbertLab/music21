@@ -1588,14 +1588,10 @@ def getTiePitchSet(prior: 'music21.note.NotRest'):
         return None
 
     tiePitchSet = set()
-    if 'Chord' in prior.classes:
-        prior: 'music21.chord.Chord'
+    if isinstance(prior, chord.Chord):
         previousNotes = list(prior)
     else:
-        if isinstance(prior, chord.Chord):
-            previousNotes = list(prior)
-        else:
-            previousNotes = [prior]
+        previousNotes = [prior]
 
     for n in previousNotes:
         if n.tie is None or n.tie.type == 'stop':
