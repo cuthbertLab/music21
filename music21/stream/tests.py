@@ -2777,6 +2777,48 @@ class Test(unittest.TestCase):
                              '%s failed, %s != %s' %
                                 (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
+    def testMakeNotationTiesKeyless(self):
+        from music21 import converter
+        p = converter.parse('tinynotation: 4/4 f#1~ f#1')
+        # Key of no sharps/flats
+        p.measure(1).insert(0, key.KeySignature(sharps=0))
+        # calls makeAccidentalsInMeasureStream()
+        p.makeNotation(inPlace=True)
+        self.assertIs(p.measure(2).notes.first().pitch.accidental.displayStatus, False)
+
+    def testMakeNotationTiesKeyChange(self):
+        from music21 import converter
+
+        p = converter.parse('tinynotation: 4/4 f#1~ f#1')
+        # Insert key change where held-over note is diatonic
+        p.measure(2).insert(0, key.KeySignature(sharps=1))
+        made = p.makeNotation()
+        self.assertIs(made.measure(2).notes.first().pitch.accidental.displayStatus, False)
+
+        p = converter.parse('tinynotation: 4/4 f#1~ f#1')
+        # Insert key change where held-over note is chromatic
+        p.measure(2).insert(0, key.KeySignature(sharps=-1))
+        made = p.makeNotation()
+        self.assertIs(made.measure(2).notes.first().pitch.accidental.displayStatus, True)
+
+        p = converter.parse('tinynotation: 4/4 b1~ b1')
+        # Same, but with a natural
+        p.measure(2).insert(0, key.KeySignature(sharps=-1))
+        made = p.makeNotation()
+        self.assertIs(made.measure(2).notes.first().pitch.accidental.displayStatus, True)
+
+        p = converter.parse('tinynotation: 4/4 f#1~ f#1')
+        p.measure(1).insert(0, key.KeySignature(sharps=-1))
+        # This is no longer a key "change", should still work based on the tie
+        made = p.makeNotation()
+        self.assertIs(made.measure(2).notes.first().pitch.accidental.displayStatus, False)
+
+        # Wipe out the tie; accidental should be reiterated
+        for n in p.flat.notes:
+            n.tie = None
+        made_no_ties = p.makeNotation()
+        self.assertIs(made_no_ties.measure(2).notes.first().pitch.accidental.displayStatus, True)
+
     def testMakeAccidentalsOctaveKS(self):
         s = Stream()
         k = key.KeySignature(-3)

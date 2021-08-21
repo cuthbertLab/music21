@@ -6727,11 +6727,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return self.streamStatus.haveAccidentalsBeenMade()
 
     def makeNotation(self,
+                     *,
                      meterStream=None,
                      refStreamOrTimeRange=None,
                      inPlace=False,
                      bestClef=False,
-                     **subroutineKeywords):
+                     pitchPast: Optional[List[pitch.Pitch]] = None,
+                     pitchPastMeasure: Optional[List[pitch.Pitch]] = None,
+                     useKeySignature: Union[bool, key.KeySignature] = True,
+                     alteredPitches: Optional[List[pitch.Pitch]] = None,
+                     cautionaryPitchClass: bool = True,
+                     cautionaryAll: bool = False,
+                     overrideStatus: bool = False,
+                     cautionaryNotImmediateRepeat: bool = True,
+                     tiePitchSet: Optional[Set[str]] = None
+                     ):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare
         notation, including creating voices for overlapped regions, Measures
@@ -6740,8 +6750,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If `inPlace` is True, this is done in-place (changed in v7 -- returns None);
         if `inPlace` is False, this returns a modified deep copy.
 
-        makeAccidentalsKeywords can be a dict specifying additional
-        parameters to send to makeAccidentals
+        The following additional parameters are documented on
+        :meth:`~music21.stream.base.makeAccidentals`::
+
+            pitchPast
+            pitchPastMeasure
+            useKeySignature
+            alteredPitches
+            cautionaryPitchClass
+            cautionaryAll
+            overrideStatus
+            cautionaryNotImmediateRepeat
+            tiePitchSet
 
 
         >>> s = stream.Stream()
@@ -6795,36 +6815,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # this needs to be called before makeTies
         # note that this functionality is also placed in Part
         if not measureStream.haveAccidentalsBeenMade():
-            ksLast = None
-            srkCopy = subroutineKeywords.copy()
-            if 'meterStream' in srkCopy:
-                del(srkCopy['meterStream'])
-            if 'refStreamOrTimeRange' in srkCopy:
-                del(srkCopy['refStreamOrTimeRange'])
-
-            for i in range(len(measureStream)):
-                m = measureStream[i]
-                if m.keySignature is not None:
-                    ksLast = m.keySignature
-
-                if i > 0 and ksLast is None:
-                    try:
-                        previousNoteOrChord = measureStream[i - 1][-1]
-                        tiePitchSet = makeNotation.getTiePitchSet(previousNoteOrChord)
-                    except (IndexError, StreamException):
-                        tiePitchSet = None
-                    pitchPastMeasure = measureStream[i - 1].pitches
-                else:
-                    tiePitchSet = None
-                    pitchPastMeasure = None
-
-                m.makeAccidentals(
-                    pitchPastMeasure=pitchPastMeasure,
-                    useKeySignature=ksLast,
-                    searchKeySignatureByContext=False,
-                    tiePitchSet=tiePitchSet,
-                    inPlace=True,
-                    **srkCopy)
+            makeNotation.makeAccidentalsInMeasureStream(
+                measureStream,
+                pitchPast=pitchPast,
+                pitchPastMeasure=pitchPastMeasure,
+                useKeySignature=useKeySignature,
+                alteredPitches=alteredPitches,
+                cautionaryPitchClass=cautionaryPitchClass,
+                cautionaryAll=cautionaryAll,
+                overrideStatus=overrideStatus,
+                cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                tiePitchSet=tiePitchSet)
 
         measureStream.makeTies(meterStream, inPlace=True)
 
@@ -7675,7 +7676,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         When, as is commonly the case, we want to find all of the notes,
         but do not care to have offsets related to the origin of the stream,
-        then `.recurse()` is generally a more efficiant way of working:
+        then `.recurse()` is generally a more efficient way of working:
 
         >>> len(bwv66.recurse().notes)
         165
@@ -13439,39 +13440,16 @@ class Part(Stream):
         else:
             returnObj = self
         # process make accidentals for each measure
-        measureStream = returnObj.getElementsByClass('Measure')
-        ksLast = None
-        for i in range(len(measureStream)):
-            m = measureStream[i]
-            if m.keySignature is not None:
-                ksLast = m.keySignature
-            # if beyond the first measure, use the pitches from the last
-            # measure for context
-            if i > 0:
-                try:
-                    previousNoteOrChord = measureStream[i - 1][-1]
-                    tiePitchSet = makeNotation.getTiePitchSet(previousNoteOrChord)
-                except (IndexError, StreamException):
-                    tiePitchSet = None
-
-                pitchPastMeasure = measureStream[i - 1].pitches
-
-            else:
-                pitchPastMeasure = None
-                # use the tie pitchSet from the method argument
-
-            m.makeAccidentals(
-                pitchPastMeasure=pitchPastMeasure,
-                useKeySignature=ksLast,
-                alteredPitches=alteredPitches,
-                searchKeySignatureByContext=False,
-                cautionaryPitchClass=cautionaryPitchClass,
-                cautionaryAll=cautionaryAll,
-                inPlace=True,  # always, has have a copy or source
-                overrideStatus=overrideStatus,
-                cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
-                tiePitchSet=tiePitchSet,
-            )
+        measureStream = returnObj.getElementsByClass(Measure)
+        makeNotation.makeAccidentalsInMeasureStream(
+            measureStream,
+            alteredPitches=alteredPitches,
+            cautionaryPitchClass=cautionaryPitchClass,
+            cautionaryAll=cautionaryAll,
+            overrideStatus=overrideStatus,
+            cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+            tiePitchSet=tiePitchSet,
+        )
         if not inPlace:
             return returnObj
         else:  # in place
