@@ -944,7 +944,13 @@ class ConverterMusicXML(SubConverter):
         if completed_process.returncode != 0:
             # Raise same exception class as findNumberedPNGPath()
             # for backward compatibility
-            raise SubConverterFileIOException(completed_process.stderr)
+            stderr_bytes = completed_process.stderr
+            try:
+                import locale
+                stderr_str = stderr_bytes.decode(locale.getpreferredencoding(do_setlocale=False))
+            except UnicodeDecodeError:
+                stderr_str = stderr_bytes  # not really a str, but best we can do.
+            raise SubConverterFileIOException(stderr_str)
 
         if common.runningUnderIPython() and common.getPlatform() == 'nix':
             # Leave environment in original state
