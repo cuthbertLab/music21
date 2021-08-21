@@ -1675,7 +1675,7 @@ def makeAccidentalsInMeasureStream(
                     if p.name not in ksLastDiatonic]
             # Get tiePitchSet from previous measure
             try:
-                previousNoteOrChord = s[i - 1][-1]
+                previousNoteOrChord = s[i - 1][note.NotRest][-1]
                 tiePitchSet = getTiePitchSet(previousNoteOrChord)
                 if tiePitchSet is not None and m.keySignature is not None:
                     # Get the diatonic pitches in this (new) key
