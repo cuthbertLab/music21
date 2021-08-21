@@ -2148,6 +2148,8 @@ class RomanNumeral(harmony.Harmony):
         '''
         Compare equality, just based on NotRest and on figure and key
         '''
+        if note.NotRest.__eq__(self, other) is NotImplemented:
+            return NotImplemented
         if not note.NotRest.__eq__(self, other):
             return False
         if self.key != other.key:
