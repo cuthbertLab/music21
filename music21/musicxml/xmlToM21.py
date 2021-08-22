@@ -1838,12 +1838,20 @@ class PartParser(XMLParserBase):
         3.0
         '''
         measureParser = MeasureParser(mxMeasure, parent=self)
+        # noinspection PyBroadException
         try:
             measureParser.parse()
         except MusicXMLImportException as e:
             e.measureNumber = measureParser.measureNumber
             e.partName = self.stream.partName
             raise e
+        except Exception as e:  # pylint: disable=broad-except
+            warnings.warn(
+                f'The following exception took place in m. {measureParser.measureNumber} in '
+                + f'part {self.stream.partName}.'
+            )
+            raise e
+
         self.lastMeasureParser = measureParser
 
         if measureParser.staves > self.maxStaves:
@@ -4479,7 +4487,7 @@ class MeasureParser(XMLParserBase):
         else:
             environLocal.warn(f'Cannot find voice {useVoice!r}; putting outside of voices.')
             environLocal.warn(f'Current voiceIds: {list(self.voicesById)}')
-            environLocal.warn(f'Current voices: {m.voices}')
+            environLocal.warn(f'Current voices: {list(m.voices)} in m. {m.number}')
 
         return thisVoice
 

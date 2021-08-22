@@ -275,6 +275,8 @@ def parseTokens(mh, dst, p, useMeasures):
                 try:
                     if cs_name in ('NC', 'N.C.', 'No Chord', 'None'):
                         cs = harmony.NoChord(cs_name)
+                    elif cs_name.startswith('>'):
+                        continue  # fingering diagram?  Appears in some pieces, ryans-Neumedia
                     else:
                         cs = harmony.ChordSymbol(cs_name)
                     dst.coreAppend(cs, setActiveSite=False)
