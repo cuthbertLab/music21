@@ -1198,13 +1198,63 @@ class NotRest(GeneralNote):
         return self._storedInstrument
 
     def _setStoredInstrument(self, newValue):
+        if not hasattr(newValue, 'instrumentId'):
+            raise TypeError(f'Expected Instrument; got {type(newValue)}')
         self._storedInstrument = newValue
 
-    storedInstrument = property(_getStoredInstrument, _setStoredInstrument)
+    storedInstrument = property(_getStoredInstrument,
+                                _setStoredInstrument,
+                                doc='''
+        Get and set the :class:`~music21.instrument.Instrument` that
+        should be used to play this note, overriding whatever
+        Instrument object may be active in the Stream. (See
+        :meth:`getInstrument` for a means of retrieving `storedInstrument`
+        if available before falling back to a context search to find
+        the active instrument.)
+        ''')
 
-    def getInstrument(self):
+    def getInstrument(self) -> Optional['music21.instrument.Instrument']:
         '''
-        TODO: doc and test
+        Retrieves the `.storedInstrument` on this `NotRest` instance, if any.
+        If one is not found, executes a context search (without following
+        derivations) to find the closest (i.e., active) instrument in the
+        stream hierarchy.
+
+        Does not return a default instrument.
+
+        >>> n = note.Note()
+        >>> m = stream.Measure([n])
+        >>> n.getInstrument() is None
+        True
+        >>> dulc = instrument.Dulcimer()
+        >>> m.insert(0, dulc)
+        >>> n.getInstrument() is dulc
+        True
+        
+        Overridden `.storedInstrument` is privileged:
+
+        >>> picc = instrument.Piccolo()
+        >>> n.storedInstrument = picc
+        >>> n.getInstrument() is picc
+        True
+
+        Instruments in containing streams ARE found:
+
+        >>> n.storedInstrument = None
+        >>> m.remove(dulc)
+        >>> p = stream.Part([m])
+        >>> p.insert(0, dulc)
+        >>> n.getInstrument() is dulc
+        True
+
+        But not if the instrument is only found in a derived stream:
+
+        >>> derived = p.stripTies()
+        >>> p.remove(dulc)
+        >>> dulc in derived
+        True
+        >>> n.getInstrument() is None
+        True
         '''
         if self.storedInstrument is not None:
             return self.storedInstrument
