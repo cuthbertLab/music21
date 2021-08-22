@@ -1404,7 +1404,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.partExporterList: List['PartExporter'] = []
 
-        self.joinedGroups: List['StaffGroup'] = []
+        self.groupsToJoin: List['StaffGroup'] = []
         # key = id(stream) (NB: not stream.id); value = .instrumentStream
         self.instrumentsByStream: Dict[int, stream.Stream] = {}
 
@@ -1446,7 +1446,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             # Pre-populate partExporterList so that joinable groups can be identified
             # before attempting to identify and count instruments
             self._populatePartExporterList()
-            self.joinedGroups = self.joinableGroups()
+            self.groupsToJoin = self.joinableGroups()
             self.parsePartlikeScore()
         else:
             self.parseFlatScore()
@@ -2062,7 +2062,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             p = pex.stream
             # check for first
             for sg in staffGroups:
-                if sg in self.joinedGroups:
+                if sg in self.groupsToJoin:
                     continue
                 if sg.isFirst(p):
                     mxPartGroup = self.staffGroupToXmlPartGroup(sg)
@@ -2077,7 +2077,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             # check for last
             activeIndex = None
             for sg in staffGroups:
-                if sg in self.joinedGroups:
+                if sg in self.groupsToJoin:
                     continue
                 # Handle last part in the StaffGroup
                 if sg.isLast(p):
@@ -2624,7 +2624,7 @@ class PartExporter(XMLExporterBase):
         if self.parent is None:
             return False
 
-        groups = self.parent.joinedGroups
+        groups = self.parent.groupsToJoin
         if len(groups) < 2:
             return False
 
