@@ -1204,7 +1204,7 @@ class NotRest(GeneralNote):
 
     def getInstrument(self):
         '''
-        TOOD: doc and test
+        TODO: doc and test
         '''
         if self.storedInstrument is not None:
             return self.storedInstrument
