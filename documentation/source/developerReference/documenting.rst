@@ -26,7 +26,7 @@ etc.  It is somewhat similar to Markdown format.   These files should *not* cont
 they will not be tested. (You may find some older files that do contain code; we should be translating these
 in the future).
 
-.. _reStructuredText: https://docutils.sourceforge.net/rst.html
+.. _reStructuredText: https://docutils.sourceforge.io/rst.html
 
 These files get converted to .html when you run `/documentation/make.py` so long as the excellent module
 Sphinx_ has been installed.
@@ -44,7 +44,7 @@ IPython Notebook) format.  These files should never be edited directly, but inst
 edited using Jupyter Notebook running Python 3.7 or higher.
 
 A lot of the music21 documentation is automatically generated from the documentation strings
-found in music21 modules.  We strongly encourage other module 
+found in music21 modules.  We strongly encourage other module
 writers to create documentation that works
 the same way.  In fact, we won't add your module to the music21 repository without documentation
 in this form -- there's a test that ensures that code coverage increases with each build -- but

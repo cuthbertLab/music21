@@ -9,7 +9,8 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Instrument translations from http://www.music-cog.ohio-state.edu/Humdrum/guide.append2.html
+Instrument translations from
+https://web.archive.org/web/20100115001258/http://www.music-cog.ohio-state.edu/Humdrum/guide.append2.html
 '''
 import unittest
 from music21 import exceptions21

@@ -20,8 +20,8 @@ Further conversion to-and-from MidiEvent/MidiTrack/MidiFile and music21 Stream,
 Note, etc., objects takes place in :ref:`moduleMidiTranslate`.
 
 This module originally used routines from Will Ware's public domain midi.py
-library from 2001 see
-https://groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
+library from 2001 which was once posted at (http link)
+groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
 '''
 __all__ = [
     'realtime', 'percussion',

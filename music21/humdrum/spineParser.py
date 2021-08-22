@@ -2120,8 +2120,9 @@ def hdStringToNote(contents):
     Does not check to see that it is sane or part of a :samp:`**kern` spine, etc.
 
 
-    New rhythmic extensions defined in
-    http://wiki.humdrum.org/index.php/Rational_rhythms
+    New rhythmic extensions formerly defined in
+    `wiki.humdrum.org/index.php/Rational_rhythms`
+    and now at http://extras.humdrum.org/man/rscale/
     are fully implemented:
 
 
@@ -2328,12 +2329,12 @@ def hdStringToNote(contents):
         if durationType == 0:
             durationString = foundNumber.group(1)
             if durationString == '000':
-                # for larger values, see http://wiki.humdrum.org/index.php/Rational_rhythms
+                # for larger values, see http://extras.humdrum.org/man/rscale/
                 thisObject.duration.type = 'maxima'
                 if contents.count('.'):
                     thisObject.duration.dots = contents.count('.')
             elif durationString == '00':
-                # for larger values, see http://wiki.humdrum.org/index.php/Rational_rhythms
+                # for larger values, see http://extras.humdrum.org/man/rscale/
                 thisObject.duration.type = 'longa'
                 if contents.count('.'):
                     thisObject.duration.dots = contents.count('.')

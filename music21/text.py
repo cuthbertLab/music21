@@ -385,7 +385,7 @@ class LanguageDetector:
     def readExcerpts(self):
         for languageCode in self.languageCodes:
             thisExcerpt = (common.getSourceFilePath() / 'languageExcerpts'
-                            / (languageCode + '.txt'))
+                            / 'trainingData' / (languageCode + '.txt'))
 
             with thisExcerpt.open(encoding='utf-8') as f:
                 excerptWords = f.read().split()

@@ -205,8 +205,7 @@ def runningUnderIPython() -> bool:
 
     This post:
 
-    https://stackoverflow.com/questions/15411967/
-    how-can-i-check-if-code-is-executed-in-the-ipython-notebook
+    https://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
 
     says not to do this, but really, I can't think of another way
     to have different output as default.

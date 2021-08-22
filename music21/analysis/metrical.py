@@ -83,7 +83,7 @@ def thomassenMelodicAccent(streamIn):
 
     Similar to the humdrum melac_ tool.
 
-    .. _melac: http://www.music-cog.ohio-state.edu/Humdrum/commands/melac.html
+    .. _melac: https://www.humdrum.org/Humdrum/commands/melac.html
 
     Takes in a Stream of :class:`~music21.note.Note` objects (use `.flat.notes` to get it, or
     better `.flat.getElementsByClass('Note')` to filter out chords) and adds the attribute to
