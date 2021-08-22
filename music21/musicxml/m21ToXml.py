@@ -2812,7 +2812,7 @@ class PartExporter(XMLExporterBase):
         </score-instrument>
         '''
         mxScoreInstrument = Element('score-instrument')
-        mxScoreInstrument.set('id', i.instrumentId)
+        mxScoreInstrument.set('id', str(i.instrumentId))
         mxInstrumentName = SubElement(mxScoreInstrument, 'instrument-name')
         mxInstrumentName.text = str(i.instrumentName)
         if i.instrumentAbbreviation is not None:
@@ -2841,7 +2841,7 @@ class PartExporter(XMLExporterBase):
         </midi-instrument>
         '''
         mxMidiInstrument = Element('midi-instrument')
-        mxMidiInstrument.set('id', i.instrumentId)
+        mxMidiInstrument.set('id', str(i.instrumentId))
         if i.midiChannel is None:
             i.autoAssignMidiChannel()
             # TODO: allocate channels from a higher level
