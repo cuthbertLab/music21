@@ -79,7 +79,6 @@ from typing import Union, List
 
 from music21 import base
 from music21 import common
-from music21 import defaults
 from music21 import derivation
 from music21 import exceptions21
 from music21 import spanner
