@@ -411,9 +411,14 @@ class Music21Object(prebase.ProtoM21Object):
     @property
     def id(self):
         '''
-        A unique identification string; not to be confused with the
-        default `.id()` method. However, if not set, will return
-        the `id()` number
+        A unique identification string; not to be confused with Python's
+        built-in `id()` method. However, if not set, will return
+        Python's `id()` number.
+
+        "Unique" is intended with respect to the stream hierarchy one is likely
+        to query with :meth:`~music21.stream.Stream.getElementById`. For
+        instance, the `.id` of a Voice should be unique in any single Measure,
+        but the id's may reset from measure to measure across a Part.
         '''
         if self._id is not None:
             return self._id
