@@ -41,7 +41,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
 
     Generally Ties have a placement of None, but if they are defined
     as 'above' or 'below' this will be retained.  (see:
-    http://forums.makemusic.com/viewtopic.php?f=12&t=2179&start=0
+    https://forums.makemusic.com/viewtopic.php?f=12&t=2179&start=0
     for how orientation and placement in musicxml are essentially the same
     content).
 

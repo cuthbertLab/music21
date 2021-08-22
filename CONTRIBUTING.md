@@ -5,9 +5,9 @@ documentation improvements. The
 
 ## Resources ##
 
-[Module Documentation and User's Guide](http://web.mit.edu/music21/doc/index.html)
+[Module Documentation and User's Guide](https://web.mit.edu/music21/doc/index.html)
 
-[Developer Reference](http://web.mit.edu/music21/doc/developerReference/index.html)
+[Developer Reference](https://web.mit.edu/music21/doc/developerReference/index.html)
 
 [Mailing List](https://groups.google.com/forum/#!forum/music21list)
 
@@ -37,8 +37,7 @@ or Stack Overflow.
 Open an issue to propose a feature or report a bug before raising a pull request.
 You can include a diff or link to your own repo if you've already started some of the work.
 (Changes where the motivation is self-evident, like handling exceptions or increasing
-test coverage, don't need issue tickets.) A draft pull request can also sometimes
-help resolve design questions faster.
+test coverage, don't need issue tickets.)
 
 If your PR fixes an existing issue, please use a GitHub keyword ("Fixes #NNNN")
 in the body of the PR so that the issue will be closed on merge.
@@ -50,9 +49,8 @@ If you miss something and GitHub Actions pesters you with red "X"s, just
 expand the details to get the line-by-line violations, and push another commit.
 
 Speaking of commits, use incremental commits with descriptive messages rather
-than force-pushing, unless the reviewer asked you to or the approach is changing
-completely. Force-pushing prevents the reviewer from assessing what changed between
-reviews. (If this doesn't sound familiar--don't worry!)
+than force-pushing, which prevents the reviewer from assessing what changed
+between reviews. (Squashing commits will be handled by the merger.)
 
 
 ## Style Guide ##
@@ -76,14 +74,14 @@ Conventions:
   - line lengths are capped at 100, but if approaching this limit, look for ways to avoid one-lining
   - line continuation characters (`\`) are not allowed; use open parentheses
   - prefer f-strings to `%` or `.format()`
-  - annotating types is encouraged: e.g. `self.counter: int = 0` or `def makeNoises(): -> List['noise.Noise']`
+  - annotating types is encouraged: e.g. `self.counter: int = 0` or `def makeNoises() -> List['noise.Noise']:`
   - prefer enums to string configurations
   - methods:
     - no more than three positional arguments (in addition to `self`)
     - keyword arguments should be keyword-only by using `*`
       to consume any other positional arguments: `def makeNoise(self, volume, *, color=noise.Pink):`
     - avoid generic `**kwargs`; make keywords explicit
-  - use [Sphinx formatting](http://web.mit.edu/music21/doc/developerReference/documenting.html#documenting-modules-and-classes)
+  - use [Sphinx formatting](https://web.mit.edu/music21/doc/developerReference/documenting.html#documenting-modules-and-classes)
       to link to classes and methods in docstrings
   - use descriptive pull request titles (rather than GitHub's default "Update pitch.py")
 
@@ -92,7 +90,7 @@ Conventions:
 
 We write doctests and unit tests, and we strive for the total
 test coverage of the project to increase with every pull request. See the
-[developer docs](http://web.mit.edu/music21/doc/developerReference/index.html)
+[developer docs](https://web.mit.edu/music21/doc/developerReference/index.html)
 to dig in to specific topics like adjusting doctests to prevent
 actions we don't want executed when running the general test suite (such as opening
 browser windows or playing music).

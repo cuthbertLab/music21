@@ -183,7 +183,7 @@ class PachelbelCanonD(VirtualWork):
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     # interpreter loading
     pass
 

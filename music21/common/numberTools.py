@@ -945,7 +945,7 @@ def fromRoman(num: str, *, strictModern=False) -> int:
 
     Convert a Roman numeral (upper or lower) to an int
 
-    http://code.activestate.com/recipes/81611-roman-numerals/
+    https://code.activestate.com/recipes/81611-roman-numerals/
 
 
     >>> common.fromRoman('ii')

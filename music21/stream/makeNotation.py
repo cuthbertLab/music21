@@ -14,18 +14,23 @@
 
 import copy
 import unittest
-from typing import List, Generator, Optional
+from typing import List, Generator, Optional, Set, Union
+from fractions import Fraction  # typing only
 
 from music21 import beam
 from music21 import clef
 from music21 import common
+from music21 import chord
 from music21 import defaults
 from music21 import environment
+from music21 import key
 from music21 import meter
 from music21 import note
 from music21 import pitch
 
 from music21.common.numberTools import opFrac
+
+from music21.exceptions21 import StreamException
 
 environLocal = environment.Environment(__file__)
 
@@ -113,17 +118,17 @@ def makeBeams(
 
     # environLocal.printDebug(['calling Stream.makeBeams()'])
     if not inPlace:  # make a copy
-        returnObj: stream.Stream = copy.deepcopy(s)
+        returnObj: stream.Stream = s.coreCopyAsDerivation('makeBeams')
     else:
         returnObj: stream.Stream = s
 
     # if s.isClass(Measure):
     mColl: List[stream.Measure]
-    if 'Measure' in s.classes:
+    if isinstance(s, stream.Measure):
         returnObj: stream.Measure
         mColl = [returnObj]  # store a list of measures for processing
     else:
-        mColl = list(returnObj.iter.getElementsByClass('Measure'))  # a list of measures
+        mColl = list(returnObj.getElementsByClass('Measure'))  # a list of measures
         if not mColl:
             raise stream.StreamException(
                 'cannot process a stream that is neither a Measure nor has no Measures')
@@ -188,6 +193,9 @@ def makeBeams(
             offset = 0.0
             if m.paddingLeft != 0.0:
                 offset = opFrac(m.paddingLeft)
+            elif m.paddingRight != 0.0:
+                pass
+            # Incomplete measure without any padding set: assume paddingLeft
             elif noteStream.highestTime < barQL:
                 offset = barQL - noteStream.highestTime
 
@@ -355,6 +363,8 @@ def makeMeasures(
     >>> longNote.lyric = 'hi'
     >>> p1.append(longNote)
     >>> partWithMeasures = p1.makeMeasures()
+    >>> partWithMeasures is not p1
+    True
     >>> dummy = partWithMeasures.makeTies(inPlace=True)
     >>> partWithMeasures.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -391,8 +401,6 @@ def makeMeasures(
 
     # environLocal.printDebug(['calling Stream.makeMeasures()'])
 
-    # the srcObj should not be modified or changed
-    # removed element copying below and now making a deepcopy of entire stream
     # must take a flat representation, as we need to be able to
     # position components, and sub-streams might hide elements that
     # should be contained
@@ -416,26 +424,18 @@ def makeMeasures(
             return
         else:
             return returnObj
-    elif s.hasVoices():
-        # environLocal.printDebug(['make measures found voices'])
-        # cannot make flat here, as this would destroy stream partitions
-        if s.isSorted:
-            sSorted = s
-        else:
-            sSorted = s.sorted
-        srcObj = copy.deepcopy(sSorted)
-        voiceCount = len(srcObj.voices)
     else:
-        # environLocal.printDebug(['make measures found no voices'])
-        # take flat and sorted version
-        sFlat = s.flat
-        if sFlat.isSorted:
-            sFlatSorted = sFlat
+        if s.hasVoices():
+            # cannot make flat if there are voices, as would destroy stream partitions
+            # parts containing voices are less likely to occur since MIDI parsing changes in v7
+            srcObj = s
         else:
-            sFlatSorted = sFlat.sorted
-
-        srcObj = copy.deepcopy(sFlatSorted)
-        voiceCount = 0
+            srcObj = s.flat
+        if not srcObj.isSorted:
+            srcObj = srcObj.sorted()
+        if not inPlace:
+            srcObj = copy.deepcopy(srcObj)
+        voiceCount = len(srcObj.voices)
 
     # environLocal.printDebug([
     #    'Stream.makeMeasures(): passed in meterStream', meterStream,
@@ -484,7 +484,7 @@ def makeMeasures(
     # del clefList
     clefObj = srcObj.clef or srcObj.getContextByClass('Clef')
     if clefObj is None:
-        clefObj = srcObj.iter.getElementsByClass('Clef').getElementsByOffset(0).first()
+        clefObj = srcObj.getElementsByClass('Clef').getElementsByOffset(0).first()
         # only return clefs that have offset = 0.0
         if not clefObj:
             clefObj = clef.bestClef(srcObj, recurse=True)
@@ -554,7 +554,7 @@ def makeMeasures(
         if measureCount == 0:
             m.clef = clefObj
             if voiceCount > 0 and s.keySignature is not None:
-                m.insert(0, s.keySignature)
+                m.insert(0, copy.deepcopy(s.keySignature))
             # environLocal.printDebug(
             #    ['assigned clef to measure', measureCount, m.clef])
 
@@ -607,7 +607,7 @@ def makeMeasures(
         # can contain this element
 
         # collect all spanners and move to outer Stream
-        if 'Spanner' in e.classes:
+        if isinstance(e, spanner.Spanner):
             spannerBundleAccum.append(e)
             continue
 
@@ -651,7 +651,7 @@ def makeMeasures(
             continue
         # do not accept another time signature at the zero position: this
         # is handled above
-        if oNew == 0 and 'TimeSignature' in e.classes:
+        if oNew == 0 and isinstance(e, meter.TimeSignature):
             continue
 
         # environLocal.printDebug(['makeMeasures()', 'inserting', oNew, e])
@@ -681,6 +681,7 @@ def makeMeasures(
             m.clef = clef.bestClef(m, recurse=True)
 
     if not inPlace:
+        post.setDerivationMethod('makeMeasures', recurse=True)
         return post  # returns a new stream populated w/ new measure streams
     else:  # clear the stored elements list of this Stream and repopulate
         # with Measures created above
@@ -690,7 +691,7 @@ def makeMeasures(
         if post.isSorted:
             postSorted = post
         else:
-            postSorted = post.sorted
+            postSorted = post.sorted()
 
         for e in postSorted:
             # may need to handle spanners; already have s as site
@@ -829,13 +830,12 @@ def makeRests(
     from music21 import stream
 
     if not inPlace:  # make a copy
-        returnObj = copy.deepcopy(s)
-        returnObj.derivation.method = 'makeRests'
+        returnObj = s.coreCopyAsDerivation('makeRests')
     else:
         returnObj = s
 
-    if returnObj.iter.parts:
-        for inner_part in returnObj.iter.parts:
+    if returnObj.iter().parts:
+        for inner_part in returnObj.iter().parts:
             inner_part.makeRests(
                 inPlace=True,
                 fillGaps=fillGaps,
@@ -845,34 +845,45 @@ def makeRests(
             )
         return returnObj
 
-    def oHighTargetForMeasure(m: stream.Measure) -> float:
-        '''Needed for timeRangeFromBarDuration'''
-        # NOTE: this returns 0.0 if no meter can be found
-        post = m.barDuration.quarterLength
-        post -= m.paddingLeft
-        post -= m.paddingRight
+    def oHighTargetForMeasure(
+        m: Optional[stream.Measure] = None,
+        ts: Optional[meter.TimeSignature] = None
+    ) -> Union[float, Fraction]:
+        """
+        Needed for timeRangeFromBarDuration.
+        Returns 0.0 if no meter can be found.
+        """
+        post: Union[float, Fraction] = 0.0
+        if ts is not None:
+            post = ts.barDuration.quarterLength
+        elif m is not None:
+            # More expensive context search
+            post = m.barDuration.quarterLength
+        if m is not None:
+            post -= m.paddingLeft
+            post -= m.paddingRight
         return max(post, 0.0)
 
     oLowTarget = 0.0
     oHighTarget = 0.0
     if timeRangeFromBarDuration:
-        if returnObj.isMeasure:
-            oHighTarget = oHighTargetForMeasure(returnObj)
-        elif (
-            stream.Voice in returnObj.classSet
-            and hasattr(refStreamOrTimeRange, 'isMeasure')
-            and refStreamOrTimeRange.isMeasure
-        ):
-            # Alternative to getting measure context would be to access .activeSite
-            # but for now, depend on getting measure context from refStreamOrTimeRange
-            # since we have not documented calling makeRests directly on a Voice and
-            # expecting to infer barDuration from the measure context.
-            # merely trying to support the recursive call for contained voices, below
-            oHighTarget = oHighTargetForMeasure(refStreamOrTimeRange)
+        if isinstance(returnObj, stream.Measure):
+            oHighTarget = oHighTargetForMeasure(m=returnObj)
+        elif isinstance(returnObj, stream.Voice):
+            if isinstance(refStreamOrTimeRange, stream.Measure):
+                oHighTarget = oHighTargetForMeasure(m=refStreamOrTimeRange)
+            elif isinstance(refStreamOrTimeRange, meter.TimeSignature):
+                maybe_measure: Optional[stream.Measure] = None
+                if isinstance(returnObj.activeSite, stream.Measure):
+                    maybe_measure = returnObj.activeSite
+                oHighTarget = oHighTargetForMeasure(m=maybe_measure, ts=refStreamOrTimeRange)
         elif returnObj.hasMeasures():
+            # This could be optimized to save some context searches,
+            # but at the cost of readability.
             oHighTarget = sum(
                 m.barDuration.quarterLength for m in returnObj.getElementsByClass(stream.Measure)
             )
+
     # If the above search didn't run or still yielded 0.0, use refStreamOrTimeRange
     if oHighTarget == 0.0:
         if refStreamOrTimeRange is None:  # use local
@@ -892,26 +903,29 @@ def makeRests(
     else:
         bundle = [returnObj]
 
+    lastTimeSignature: Optional[meter.TimeSignature] = None
     # bundle components may be voices, measures, or a flat Stream
     for component in bundle:
         oLow = component.lowestOffset
         oHigh = component.highestTime
-        if component.isMeasure:
+        lastTimeSignature = component.timeSignature or lastTimeSignature
+        if isinstance(component, stream.Measure):
+            ts_or_measure = lastTimeSignature or component
             if timeRangeFromBarDuration:
-                oHighTarget = oHighTargetForMeasure(component)
+                oHighTarget = oHighTargetForMeasure(component, lastTimeSignature)
             # process voices
             for inner_voice in component.voices:
                 inner_voice.makeRests(inPlace=True,
                                       fillGaps=fillGaps,
                                       hideRests=hideRests,
-                                      refStreamOrTimeRange=component,
+                                      refStreamOrTimeRange=ts_or_measure,
                                       timeRangeFromBarDuration=timeRangeFromBarDuration,
                                       )
             # Refresh these variables given that inner voices were altered
             oLow = component.lowestOffset
             oHigh = component.highestTime
             # adjust oHigh to not exceed measure
-            oHighTarget = min(component.barDuration.quarterLength, oHighTarget)
+            oHighTarget = min(ts_or_measure.barDuration.quarterLength, oHighTarget)
 
         # create rest from start to end
         qLen = oLow - oLowTarget
@@ -953,7 +967,6 @@ def makeRests(
 
     if inPlace is not True:
         return returnObj
-
 
 def makeTies(
     s,
@@ -1161,8 +1174,7 @@ def makeTies(
     # environLocal.printDebug(['calling Stream.makeTies()'])
 
     if not inPlace:  # make a copy
-        returnObj = copy.deepcopy(s)
-        returnObj.derivation.method = 'makeTies'
+        returnObj = s.coreCopyAsDerivation('makeTies')
     else:
         returnObj = s
     if not returnObj:
@@ -1332,16 +1344,11 @@ def makeTies(
         return None
 
 
-def makeTupletBrackets(s, *, inPlace=False):
+def makeTupletBrackets(s: 'music21.stream.Stream', *, inPlace=False):
     # noinspection PyShadowingNames
     '''
-    Given a Stream of mixed durations, designates the first and last tuplet of any group
+    Given a flat Stream of mixed durations, designates the first and last tuplet of any group
     of tuplets as the start or end of the tuplet, respectively.
-
-    Changed in 1.8::
-
-        * `inPlace` is False by default
-        * to incorporate duration.updateTupletType, can take a list of durations
 
     TODO: does not handle nested tuplets
 
@@ -1357,32 +1364,28 @@ def makeTupletBrackets(s, *, inPlace=False):
     >>> tupletTypes = [x.duration.tuplets[0].type for x in s.notes]
     >>> tupletTypes
     ['start', None, 'stop', 'start', None, 'stop']
+
+    Changed in v1.8: `inPlace` is False by default
+    Changed in v7: Legacy behavior of taking in a list of durations removed.
     '''
     durationList = []
 
-    # legacy -- works on lists not just streams...
-    if isinstance(s, (list, tuple)):
-        durationList = s
-        returnObj = None
+    # Stream, as it should be...
+    if not inPlace:  # make a copy
+        returnObj = s.coreCopyAsDerivation('makeTupletBrackets')
     else:
-        # Stream, as it should be...
-        if not inPlace:  # make a copy
-            returnObj = copy.deepcopy(s)
-            returnObj.derivation.method = 'makeTupletBrackets'
-        else:
-            returnObj = s
+        returnObj = s
 
-        # only want to look at notes
-        notes = returnObj.notesAndRests
-        for n in notes:
-            if n.duration.isGrace:
-                continue
-            durationList.append(n.duration)
+    # only want to look at notes and rests.
+    for n in returnObj.notesAndRests:
+        if n.duration.isGrace:
+            continue
+        durationList.append(n.duration)
 
-    tupletMap = []  # a list of (tuplet obj / Duration) pairs
+    tupletMap = []  # a list of [tuplet obj, Duration] pairs
     for dur in durationList:  # all Duration objects
         tupletList = dur.tuplets
-        if tupletList in [(), None]:  # no tuplets, length is zero
+        if not tupletList:  # no tuplets
             tupletMap.append([None, dur])
         elif len(tupletList) > 1:
             # for i in range(len(tuplets)):
@@ -1390,16 +1393,13 @@ def makeTupletBrackets(s, *, inPlace=False):
             environLocal.warn(
                 f'got multi-tuplet duration; cannot yet handle this. {tupletList!r}'
             )
-        elif len(tupletList) == 1:
-            tupletMap.append([tupletList[0], dur])
-            if tupletList[0] != dur.tuplets[0]:
-                raise Exception('cannot access Tuplets object from within DurationTuple.')
+            tupletMap.append([None, dur])
         else:
-            raise Exception(f'cannot handle these tuplets: {tupletList}')
+            tupletMap.append([tupletList[0], dur])
 
     # have a list of tuplet, Duration pairs
-    completionCount = 0  # qLen currently filled
-    completionTarget = None  # qLen necessary to fill tuplet
+    completionCount: Union[float, int, Fraction] = 0  # qLen currently filled
+    completionTarget: Union[float, int, Fraction, None] = None  # qLen necessary to fill tuplet
     for i in range(len(tupletMap)):
         tupletObj, dur = tupletMap[i]
 
@@ -1461,11 +1461,13 @@ def makeTupletBrackets(s, *, inPlace=False):
                 # environLocal.printDebug(['completion count, target:',
                 #                          completionCount, completionTarget])
 
+    returnObj.streamStatus.tuplets = True
+
     if not inPlace:
         return returnObj
 
 
-def realizeOrnaments(s):
+def realizeOrnaments(s: 'music21.stream.Stream'):
     '''
     Realize all ornaments on a stream
 
@@ -1509,7 +1511,7 @@ def realizeOrnaments(s):
     TODO: does not work for Gapful streams because it uses append rather
        than the offset of the original
     '''
-    newStream = s.cloneEmpty()
+    newStream = s.cloneEmpty(derivationMethod='realizeOrnaments')
     newStream.offset = s.offset
 
     def realizeElementExpressions(innerElement):
@@ -1543,15 +1545,15 @@ def realizeOrnaments(s):
     return newStream
 
 
-def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
+def moveNotesToVoices(source: 'music21.stream.Stream', classFilterList=('GeneralNote',)):
     '''
-    Move notes into voices.
+    Move notes into voices.  Happens inplace always.  Returns None
     '''
     from music21.stream import Voice
     dst = Voice()
 
     # cast to list so source can be edited.
-    affectedElements = list(source.iter.getElementsByClass(classFilterList))
+    affectedElements = list(source.getElementsByClass(classFilterList))
 
     for e in affectedElements:
         dst.insert(source.elementOffset(e), e)
@@ -1559,7 +1561,7 @@ def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
     source.insert(0, dst)
 
 
-def getTiePitchSet(prior):
+def getTiePitchSet(prior: 'music21.note.NotRest'):
     # noinspection PyShadowingNames
     '''
     helper method for makeAccidentals to get the tie pitch set (or None)
@@ -1599,19 +1601,106 @@ def getTiePitchSet(prior):
     '''
     if not hasattr(prior, 'tie') or not hasattr(prior, 'pitches'):
         return None
+
+    tiePitchSet = set()
+    if isinstance(prior, chord.Chord):
+        previousNotes = list(prior)
     else:
-        tiePitchSet = set()
-        if 'Chord' in prior.classes:
-            previousNotes = list(prior)
-        else:
-            previousNotes = [prior]
+        previousNotes = [prior]
 
-        for n in previousNotes:
-            if n.tie is None or n.tie.type == 'stop':
-                continue
-            tiePitchSet.add(n.pitch.nameWithOctave)
-        return tiePitchSet
+    for n in previousNotes:
+        if n.tie is None or n.tie.type == 'stop':
+            continue
+        tiePitchSet.add(n.pitch.nameWithOctave)
+    return tiePitchSet
 
+def makeAccidentalsInMeasureStream(
+    s: 'music21.stream.Stream',
+    *,
+    pitchPast: Optional[List[pitch.Pitch]] = None,
+    pitchPastMeasure: Optional[List[pitch.Pitch]] = None,
+    useKeySignature: Union[bool, key.KeySignature] = True,
+    alteredPitches: Optional[List[pitch.Pitch]] = None,
+    cautionaryPitchClass: bool = True,
+    cautionaryAll: bool = False,
+    overrideStatus: bool = False,
+    cautionaryNotImmediateRepeat: bool = True,
+    tiePitchSet: Optional[Set[str]] = None
+):
+    '''
+    Makes accidentals in place on a stream consisting of only Measures.
+    Helper for Stream.makeNotation and Part.makeAccidentals.
+
+    Walks measures in order to update the values for the following keyword
+    arguments of :meth:`~music21.stream.base.makeAccidentals` and calls
+    that method on each Measure. (For this reason, the values supplied
+    for these arguments in the method signature will be used on the first
+    measure only, or in the case of `useKeySignature`, not at all if the first
+    measure contains a `KeySignature`.)::
+
+        pitchPastMeasure
+        useKeySignature
+        tiePitchSet
+
+    Operates on the measures in place; make a copy first if this is not desired.
+    '''
+    if s.getElementsNotOfClass('Measure'):
+        raise ValueError(f'{s} must contain only Measures')
+
+    # bool values for useKeySignature are not helpful here
+    # because we are definitely searching key signature contexts
+    # only key.KeySignature values are interesting
+    # but method arg is typed this way for backwards compatibility
+    if isinstance(useKeySignature, key.KeySignature):
+        ksLast = useKeySignature
+    else:
+        ksLast = None
+
+    for i, m in enumerate(s):
+        # if beyond the first measure, use the pitches from the last
+        # measure for context (cautionary accidentals)
+        # unless this measure has a key signature object
+        if i > 0:
+            pitchPastMeasure = None
+            if m.keySignature is None:
+                pitchPastMeasure = s[i - 1].pitches
+            elif ksLast:
+                # If there is any key signature object to the left,
+                # just get the chromatic pitches from previous measure
+                # G-naturals in C major following G-flats in F major need cautionary
+                # G-naturals in C major following G-flats in Db major don't
+                ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
+                pitchPastMeasure = [p for p in s[i - 1].pitches
+                    if p.name not in ksLastDiatonic]
+            # Get tiePitchSet from previous measure
+            try:
+                previousNoteOrChord = s[i - 1][note.NotRest][-1]
+                tiePitchSet = getTiePitchSet(previousNoteOrChord)
+                if tiePitchSet is not None and m.keySignature is not None:
+                    # Get the diatonic pitches in this (new) key
+                    # and limit tiePitchSet to just those
+                    # Disregard tie continuation on pitches foreign to new key
+                    ksNewDiatonic = [p.name for p in m.keySignature.getScale().pitches]
+                    tiePitchSet = {tp for tp in tiePitchSet if tp in ksNewDiatonic}
+            except (IndexError, StreamException):
+                pass
+
+        if m.keySignature is not None:
+            ksLast = m.keySignature
+
+        m.makeAccidentals(
+            pitchPast=pitchPast,
+            pitchPastMeasure=pitchPastMeasure,
+            useKeySignature=ksLast,
+            alteredPitches=alteredPitches,
+            searchKeySignatureByContext=False,
+            cautionaryPitchClass=cautionaryPitchClass,
+            cautionaryAll=cautionaryAll,
+            inPlace=True,
+            overrideStatus=overrideStatus,
+            cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+            tiePitchSet=tiePitchSet,
+        )
 
 def iterateBeamGroups(
     s: 'music21.stream.Stream',
@@ -1661,7 +1750,7 @@ def iterateBeamGroups(
 
     New in v6.7.
     '''
-    iterator: 'music21.stream.iterator.StreamIterator' = s.recurse() if recurse else s.iter
+    iterator: 'music21.stream.iterator.StreamIterator' = s.recurse() if recurse else s.iter()
     current_beam_group: List[note.NotRest] = []
     in_beam_group: bool = False
     for el in iterator.getElementsByClass('NotRest'):
@@ -1735,9 +1824,11 @@ def setStemDirectionOneGroup(
     if not group:  # pragma: no cover
         return  # should not happen
 
-    up_down_stem_directions = set(n.stemDirection for n in group
-                                  if n.stemDirection in ('up', 'down'))
-    if len(up_down_stem_directions) < 2:
+    stem_directions = {n.stemDirection for n in group
+                       if n.stemDirection in ('up', 'down', 'unspecified')}
+    if 'unspecified' in stem_directions:
+        has_consistent_stem_directions = False
+    elif len(stem_directions) < 2:
         has_consistent_stem_directions = True
     else:
         has_consistent_stem_directions = False
@@ -1765,8 +1856,6 @@ def setStemDirectionOneGroup(
             continue
         elif noteDirection in ('up', 'down', 'unspecified'):
             n.stemDirection = groupStemDirection
-
-
 
 
 
@@ -1845,6 +1934,31 @@ class Test(unittest.TestCase):
                          + ['down', 'noStem', 'double', 'down']
                          )
 
+    def testSetStemDirectionConsistency(self):
+        """
+        Stems that would all be up starting from scratch,
+        but because of overrideConsistentStemDirections=False,
+        we only change the first group with an "unspecified" direction
+        """
+        from music21 import converter
+        p = converter.parse('tinyNotation: 2/4 b8 f8 a8 b8')
+        p.makeBeams(inPlace=True)
+        self.assertEqual(
+            [n.stemDirection for n in p.flat.notes],
+            ['up', 'up', 'up', 'up']
+        )
+
+        # make manual changes
+        dStems = ['down', 'unspecified', 'down', 'down']
+        for n, stemDir in zip(p.flat.notes, dStems):
+            n.stemDirection = stemDir
+
+        setStemDirectionForBeamGroups(p, setNewStems=True, overrideConsistentStemDirections=False)
+        self.assertEqual(
+            [n.stemDirection for n in p.flat.notes],
+            ['up', 'up', 'down', 'down']
+        )
+
     def testMakeBeamsWithStemDirection(self):
         from music21 import converter
         p = converter.parse(self.allaBreveBeamTest)
@@ -1858,7 +1972,7 @@ class Test(unittest.TestCase):
                          )
 
     def testMakeBeamsOnEmptyChord(self):
-        from music21 import chord, converter
+        from music21 import converter
         p = converter.parse('tinyNotation: 4/4')
         c1 = chord.Chord('d f')
         c1.quarterLength = 0.5
@@ -1875,12 +1989,21 @@ class Test(unittest.TestCase):
         )
 
     def testStreamExceptions(self):
-        from music21 import converter, duration, stream
+        from music21 import converter
+        from music21 import duration
+        from music21 import stream
         p = converter.parse(self.allaBreveBeamTest)
         with self.assertRaises(stream.StreamException) as cm:
             p.makeMeasures(meterStream=duration.Duration())
         self.assertEqual(str(cm.exception),
             'meterStream is neither a Stream nor a TimeSignature!')
+
+    def testMakeAccidentalsInMeasureStreamException(self):
+        from music21 import converter
+        p = converter.parse(self.allaBreveBeamTest)
+        with self.assertRaises(ValueError) as cm:
+            makeAccidentalsInMeasureStream(p.measure(1))
+        self.assertIn('must contain only Measures', str(cm.exception))
 
 
 # -----------------------------------------------------------------------------

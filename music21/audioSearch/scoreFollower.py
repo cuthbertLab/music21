@@ -570,7 +570,7 @@ class ScoreFollower:
 # -----------------------------------------------------------------------------
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
 
     def xtestRunScoreFollower(self):
         from music21 import corpus

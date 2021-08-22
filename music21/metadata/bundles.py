@@ -1222,7 +1222,7 @@ class MetadataBundle(prebase.ProtoM21Object):
                             include = True
                             break
                         elif (fileExtension.endswith('xml')
-                                and sp.suffix in ('.mxl', '.mx')):
+                                and sp.suffix == '.mxl'):
                             include = True
                             break
                 else:

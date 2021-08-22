@@ -46,8 +46,10 @@ Example usage:
 2
 '''
 
+import contextlib
 import copy
 import fractions
+import io
 import unittest
 from math import inf
 from typing import Union, Tuple, Dict, List, Optional, Iterable
@@ -1197,7 +1199,7 @@ class Tuplet(prebase.ProtoM21Object):
 
     def setDurationType(
         self,
-        durType: str,
+        durType: Union[str, int, float, fractions.Fraction],
         dots=0
     ):
         '''
@@ -1568,8 +1570,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         self._typeNeedsUpdating = False
 
         self._unlinkedType: Optional[str] = None
-        self._dotGroups: Tuplet[int, ...] = (0,)
-        self._tuplets: Tuple['Tuplet'] = ()  # an empty tuple
+        self._dotGroups: Tuple[int, ...] = (0,)
+        self._tuplets: Union[Tuple['Tuplet', ...], Tuple] = ()  # an empty tuple
         self._qtrLength: OffsetQL = 0.0
 
         # DurationTuples go here
@@ -2593,6 +2595,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         for i, dt in enumerate(self._components):
             self._components[i] = durationTupleFromTypeDots(dt.type, value)
         self._quarterLengthNeedsUpdating = True
+        if self.linked is True:
+            self.expressionIsInferred = False
         self.informClient()
 
     @property
@@ -2935,6 +2939,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             nt = durationTupleFromTypeDots(value, self.dots)
             self.components = [nt]
             self._quarterLengthNeedsUpdating = True
+            self.expressionIsInferred = False
             self.informClient()
 
         else:
@@ -3316,7 +3321,8 @@ class TupletFixer:
 # -------------------------------------------------------------------------------
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testSingle(self):
         from music21 import note
@@ -3324,7 +3330,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         a.quarterLength = 2.66666
         n = note.Note()
         n.duration = a
-        n.show()
+        if self.show:
+            n.show()
 
     def testBasic(self):
         import random
@@ -3342,7 +3349,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             n.duration = b
             a.append(n)
 
-        a.show()
+        if self.show:
+            a.show()
 
 
 class Test(unittest.TestCase):
@@ -3416,6 +3424,7 @@ class Test(unittest.TestCase):
         Test setting of tuplet type when durations sum to expected completion
         '''
         # default tuplets group into threes when possible
+        from music21 import note  # only Notes/Rests/Chords can have tuplets, not music21Objects
         from music21 import stream
         test, match = ([0.333333] * 3 + [0.1666666] * 6,
                        ['start', None, 'stop', 'start', None, 'stop', 'start', None, 'stop'])
@@ -3425,11 +3434,20 @@ class Test(unittest.TestCase):
             d.quarterLength = qLen
             inputTuplets.append(d)
 
-        stream.makeNotation.makeTupletBrackets(inputTuplets, inPlace=True)
+        inputTupletStream = stream.Stream()
+        for dur in inputTuplets:
+            m21Obj = note.Note(duration=dur)
+            inputTupletStream.append(m21Obj)
+
+        stream.makeNotation.makeTupletBrackets(inputTupletStream, inPlace=True)
         output = []
         for d in inputTuplets:
             output.append(d.tuplets[0].type)
         self.assertEqual(output, match)
+
+    def testTupletTypeComplete2(self):
+        from music21 import note
+        from music21 import stream
 
         tup6 = Duration()
         tup6.quarterLength = 0.16666666
@@ -3446,10 +3464,15 @@ class Test(unittest.TestCase):
             copy.deepcopy(tup5), copy.deepcopy(tup5),
         ]
 
+        inputTupletStream = stream.Stream()
+        for dur in inputTuplets:
+            m21Obj = note.Note(duration=dur)
+            inputTupletStream.append(m21Obj)
+
         match = ['start', None, None, None, None, 'stop',
                  'start', None, None, None, 'stop']
 
-        stream.makeNotation.makeTupletBrackets(inputTuplets, inPlace=True)
+        stream.makeNotation.makeTupletBrackets(inputTupletStream, inPlace=True)
         output = []
         for d in inputTuplets:
             output.append(d.tuplets[0].type)
@@ -3460,6 +3483,7 @@ class Test(unittest.TestCase):
         Test setting of tuplet type when durations do not sum to expected
         completion.
         '''
+        from music21 import note
         from music21 import stream
         # the current match results here are a good compromise
         # for a difficult situation.
@@ -3473,12 +3497,49 @@ class Test(unittest.TestCase):
             d = Duration()
             d.quarterLength = qLen
             inputDurations.append(d)
-        stream.makeNotation.makeTupletBrackets(inputDurations, inPlace=True)
+
+        inputTupletStream = stream.Stream()
+        for dur in inputDurations:
+            m21Obj = note.Note(duration=dur)
+            inputTupletStream.append(m21Obj)
+
+        stream.makeNotation.makeTupletBrackets(inputTupletStream, inPlace=True)
         output = []
         for d in inputDurations:
             output.append(d.tuplets[0].type)
         # environLocal.printDebug(['got', output])
         self.assertEqual(output, match)
+
+    def testTupletTypeNested(self):
+        '''
+        Nested tuplets are not fully supported (TODO).
+        '''
+        from music21 import note
+        from music21 import stream
+
+        gapful = stream.Measure()
+        half = note.Note(type='half')
+        gapful.repeatAppend(half, 3)
+        for n in gapful:
+            n.duration.appendTuplet(Tuplet(3, 2))
+
+        # create nested tuplet on middle note
+        gapful.notes[1].duration.appendTuplet(Tuplet(2, 1))
+
+        gapless = stream.Measure()
+        for n in gapful:
+            gapless.append(n)
+
+        # Redirect stderr to suppress printed warning
+        # TODO: change to python warnings
+        file_like = io.StringIO()
+        with contextlib.redirect_stderr(file_like):
+            made = stream.makeNotation.makeTupletBrackets(gapless)
+
+        self.assertEqual(
+            [el.duration.tuplets[0].type for el in made],
+            ['startStop', None, 'startStop'],  # was ['start', None, 'stop']
+        )
 
     def testAugmentOrDiminish(self):
 
@@ -3665,6 +3726,31 @@ class Test(unittest.TestCase):
         # this failure happens earlier in quarterConversion()
         d = Duration(1 / 2049)
         self.assertEqual(d.type, 'inexpressible')
+
+    def testExpressionIsInferred(self):
+        d = Duration(0.5)
+        self.assertEqual(d.expressionIsInferred, True)
+
+        d.type = 'whole'
+        self.assertEqual(d.expressionIsInferred, False)
+
+        d.quarterLength = 0.25
+        self.assertEqual(d.expressionIsInferred, True)
+
+        d.dots = 1
+        self.assertEqual(d.expressionIsInferred, False)
+
+        d.appendTuplet(Tuplet(3, 2))
+        # No change
+        self.assertEqual(d.expressionIsInferred, False)
+
+        d.linked = False
+        d.quarterLength = 4
+        d.dots = 1
+        # No change, since this relationship between type
+        # and quarterLength is usually accomplished in multiple
+        # attribute assignments that could occur in any order
+        self.assertEqual(d.expressionIsInferred, False)
 
 
 # -------------------------------------------------------------------------------
