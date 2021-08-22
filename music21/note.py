@@ -1230,7 +1230,7 @@ class NotRest(GeneralNote):
         >>> m.insert(0, dulc)
         >>> n.getInstrument() is dulc
         True
-        
+
         Overridden `.storedInstrument` is privileged:
 
         >>> picc = instrument.Piccolo()
