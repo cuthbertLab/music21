@@ -2646,7 +2646,7 @@ class PartExporter(XMLExporterBase):
             if outerTimeSignatures:
                 first_measure.timeSignature = outerTimeSignatures.first()
 
-        # see if accidentals/beams can be processed
+        # see if accidentals/beams/tuplets should be processed
         if not part.streamStatus.haveAccidentalsBeenMade():
             part.makeAccidentals(inPlace=True)
         if not part.streamStatus.beams:

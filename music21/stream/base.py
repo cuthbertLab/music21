@@ -4720,15 +4720,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             <music21.stream.Measure 1 offset=0.0>]),
                       (4.0, [<music21.stream.Measure 2 offset=4.0>,
                              ...])])
-        >>> for m in mom[8.0]:
-        ...     print(m, m.getContextByClass('Part').id)
+        >>> for measure_obj in mom[8.0]:
+        ...     print(measure_obj, measure_obj.getContextByClass('Part').id)
         <music21.stream.Measure 3 offset=8.0> Soprano
         <music21.stream.Measure 3 offset=8.0> Alto
         <music21.stream.Measure 3 offset=8.0> Tenor
         <music21.stream.Measure 3 offset=8.0> Bass
 
         OMIT_FROM_DOCS
-        see important examples in testMeasureOffsetMap() and testMeasureOffsetMapPostTie()
+
+        see important examples in testMeasureOffsetMap() and
+        testMeasureOffsetMapPostTie()
         '''
         if classFilterList is None:
             classFilterList = [Measure]
@@ -6721,6 +6723,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 tiePitchSet.clear()
 
+        returnObj.streamStatus.accidentals = True
+
         if not inPlace:
             return returnObj
 
@@ -6734,7 +6738,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         other than None, this method returns True, regardless
         of if makeAccidentals has actually been run.
         '''
-        return self.streamStatus.haveAccidentalsBeenMade()
+        return self.streamStatus.accidentals
 
     def makeNotation(self,
                      *,
@@ -6824,7 +6828,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # pitches from last measure are passed
         # this needs to be called before makeTies
         # note that this functionality is also placed in Part
-        if not measureStream.haveAccidentalsBeenMade():
+        if not measureStream.streamStatus.accidentals:
             makeNotation.makeAccidentalsInMeasureStream(
                 measureStream,
                 pitchPast=pitchPast,
@@ -6851,7 +6855,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # check for tuplet brackets one measure at a time
         # this means that they will never extend beyond one measure
         for m in measureStream:
-            if m.streamStatus.haveTupletBracketsBeenMade() is False:
+            if not m.streamStatus.tuplets:
                 makeNotation.makeTupletBrackets(m, inPlace=True)
 
         if not inPlace:
@@ -9194,7 +9198,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         o = -1 * o
                     o_matchTuple = bestMatch(float(o), quarterLengthDivisors)
                     useStream.coreSetElementOffset(e, o_matchTuple.match * sign)
-                    if (hasattr(e, 'editorial') and o_matchTuple.signedError != 0):
+                    if hasattr(e, 'editorial') and o_matchTuple.signedError != 0:
                         e.editorial.offsetQuantizationError = o_matchTuple.signedError * sign
                 if processDurations:
                     ql = e.duration.quarterLength
@@ -12913,9 +12917,9 @@ class Measure(Stream):
             m.timeSignature = ts  # a Stream; get the first element
 
         # environLocal.printDebug(['have time signature', m.timeSignature])
-        if m.streamStatus.beams is False:
+        if not m.streamStatus.beams:
             m.makeBeams(inPlace=True)
-        if m.streamStatus.haveTupletBracketsBeenMade() is False:
+        if not m.streamStatus.tuplets:
             makeNotation.makeTupletBrackets(m, inPlace=True)
 
         if not inPlace:
@@ -13465,7 +13469,6 @@ class Part(Stream):
         else:  # in place
             return None
 
-
 class PartStaff(Part):
     '''
     A Part subclass for designating music that is
@@ -13871,6 +13874,7 @@ class Score(Stream):
                 bundle.append(sub)
         # else, assume it is a list of groupings
         elif common.isIterable(voiceAllocation):
+            voiceAllocation: List[Union[List, int]]
             for group in voiceAllocation:
                 sub = []
                 # if a single entry

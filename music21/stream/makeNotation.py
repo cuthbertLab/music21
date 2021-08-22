@@ -1461,6 +1461,8 @@ def makeTupletBrackets(s: 'music21.stream.Stream', *, inPlace=False):
                 # environLocal.printDebug(['completion count, target:',
                 #                          completionCount, completionTarget])
 
+    returnObj.streamStatus.tuplets = True
+
     if not inPlace:
         return returnObj
 
