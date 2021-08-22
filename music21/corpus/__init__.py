@@ -53,13 +53,8 @@ __all__ = [
 
 ]
 
-import re
-import os
-import unittest
 
 from music21 import common
-from music21 import converter
-from music21 import exceptions21
 from music21 import metadata
 
 from music21.corpus import chorales
@@ -299,8 +294,8 @@ def parse(workName,
     '''
     The most important method call for corpus.
 
-    Similar to the :meth:`~music21.converter.parse` method of converter (which
-    takes in a filepath on the local hard drive), this method searches the
+    Similar to the :func:`~music21.converter.parse` function of converter (which
+    takes in a filepath on the local hard drive), this function searches the
     corpus (including local corpora) for a work fitting the workName
     description and returns a :class:`music21.stream.Stream`.
 

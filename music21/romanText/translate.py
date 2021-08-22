@@ -38,7 +38,7 @@ the data to make a histogram of scale degree usage within a key:
 
 >>> degreeDictionary = {}
 >>> for el in monteverdi.recurse():
-...    if 'RomanNumeral' in el.classes:
+...    if isinstance(el, roman.RomanNumeral):
 ...         print(f'{el.figure} {el.key}')
 ...         for p in el.pitches:
 ...              degree, accidental = el.key.getScaleDegreeAndAccidentalFromPitch(p)
@@ -1133,8 +1133,11 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
 
 # ------------------------------------------------------------------------------
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
 
+class TestSlow(unittest.TestCase):  # pragma: no cover
+    '''
+    These tests are currently too slow to run every time.
+    '''
     def testExternalA(self):
         from music21.romanText import testFiles
 
@@ -1144,12 +1147,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             s = romanTextToStreamScore(rth)
             s.show()
 
-
-class TestSlow(unittest.TestCase):  # pragma: no cover
-    '''
-    These tests are currently too slow to run every time.
-    '''
-
     # noinspection SpellCheckingInspection
     def testBasicA(self):
         from music21.romanText import testFiles
@@ -1158,8 +1155,8 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
             rtf = rtObjects.RTFile()
             rth = rtf.readstr(tf)  # return handler, processes tokens
             # will run romanTextToStreamScore on all but k273
-            unused_s = romanTextToStreamOpus(rth)
-            # s.show()
+            s = romanTextToStreamOpus(rth)
+            s.show()
 
         s = romanTextToStreamScore(testFiles.swv23)
         self.assertEqual(s.metadata.composer, 'Heinrich Schutz')
@@ -1281,7 +1278,7 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
 
         # make sure a normal file is still a Score
         s = converter.parse(testFiles.riemenschneider001)
-        self.assertTrue('Score' in s.classes)
+        self.assertTrue(isinstance(s, stream.Score))
 
 
 class Test(unittest.TestCase):

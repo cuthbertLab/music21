@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2021 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from enum import Enum, EnumMeta
@@ -96,7 +96,44 @@ class BooleanEnum(Enum):
         return f'<{self.__class__.__name__}.{self.name}>'
 
 
-class OffsetSpecial(str, Enum, metaclass=StrEnumMeta):
+class StrEnum(str, Enum, metaclass=StrEnumMeta):
+    '''
+    An enumeration where strings can equal the value.
+
+    See :class:`music21.common.enums.OffsetSpecial` for an
+    example of how these work.
+    '''
+    def __repr__(self):
+        return f'<{self.__class__.__name__}.{self.name}>'
+
+    def __str__(self):
+        '''
+        >>> from music21.common.enums import OffsetSpecial
+        >>> str(OffsetSpecial.AT_END)
+        'highestTime'
+        '''
+        return str(self.value)
+
+
+class ElementSearch(StrEnum):
+    '''
+    An enum representing the element search directions that can be provided
+    to :meth:`~music21.base.Music21Object.getContextByClass`.
+    '''
+    BEFORE = 'getElementBefore'
+    AFTER = 'getElementAfter'
+    AT_OR_BEFORE = 'getElementAtOrBefore'
+    AT_OR_AFTER = 'getElementAtOrAfter'
+    BEFORE_OFFSET = 'getElementBeforeOffset'
+    AFTER_OFFSET = 'getElementAfterOffset'
+    AT_OR_BEFORE_OFFSET = 'getElementAtOrBeforeOffset'
+    AT_OR_AFTER_OFFSET = 'getElementAtOrAfterOffset'
+    BEFORE_NOT_SELF = 'getElementBeforeNotSelf'
+    AFTER_NOT_SELF = 'getElementAfterNotSelf'
+    ALL = 'all'
+
+
+class OffsetSpecial(StrEnum):
     '''
     An enum that represents special offsets.
 
@@ -113,23 +150,14 @@ class OffsetSpecial(str, Enum, metaclass=StrEnumMeta):
     False
     >>> 'lowestOffset' in OffsetSpecial
     True
+    >>> str(OffsetSpecial.AT_END)
+    'highestTime'
 
     New in v7.
     '''
     AT_END: str = 'highestTime'
     LOWEST_OFFSET: str = 'lowestOffset'
     HIGHEST_OFFSET: str = 'highestOffset'
-
-    def __repr__(self):
-        return f'<{self.__class__.__name__}.{self.name}>'
-
-    def __str__(self):
-        '''
-        >>> from music21.common.enums import OffsetSpecial
-        >>> str(OffsetSpecial.AT_END)
-        'highestTime'
-        '''
-        return str(self.value)
 
 
 class GatherSpanners(BooleanEnum):
@@ -163,6 +191,17 @@ class GatherSpanners(BooleanEnum):
     ALL = True
     NONE = False
     COMPLETE_ONLY = 'completeOnly'
+
+
+class MeterDivision(StrEnum):
+    '''
+    Represents an indication of how to divide a TimeSignature
+
+    new in v7.
+    '''
+    FAST = 'fast'
+    SLOW = 'slow'
+    NONE = 'none'
 
 
 if __name__ == '__main__':

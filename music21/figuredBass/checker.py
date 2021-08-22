@@ -179,7 +179,7 @@ def correlateHarmonies(currentMapping, music21Part):
 
     for offsets in sorted(currentMapping.keys()):
         (initOffset, endTime) = offsets
-        notesInRange = music21Part.flat.iter.getElementsByClass('GeneralNote').getElementsByOffset(
+        notesInRange = music21Part.flat.getElementsByClass('GeneralNote').getElementsByOffset(
             initOffset, offsetEnd=endTime,
             includeEndBoundary=False, mustFinishInSpan=False,
             mustBeginInSpan=False, includeElementsThatEndAtStart=False)
@@ -250,7 +250,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
         for partNumberTuple in vlm_violations:
             for partNumber in partNumberTuple:
                 if color is not None:
-                    noteA = allParts[partNumber - 1].iter.getElementsByOffset(
+                    noteA = allParts[partNumber - 1].getElementsByOffset(
                         initOffset,
                         initOffset,
                         mustBeginInSpan=False)[0]
@@ -320,10 +320,10 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
         for partNumberTuple in vlm_violations:
             for partNumber in partNumberTuple:
                 if color is not None:
-                    noteA = allParts[partNumber - 1].iter.getElementsByOffset(
-                        initOffsetA, initOffsetA, mustBeginInSpan=False)[0]
-                    noteB = allParts[partNumber - 1].iter.getElementsByOffset(
-                        initOffsetB, initOffsetB, mustBeginInSpan=False)[0]
+                    noteA = allParts[partNumber - 1].getElementsByOffset(
+                        initOffsetA, initOffsetA, mustBeginInSpan=False).first()
+                    noteB = allParts[partNumber - 1].getElementsByOffset(
+                        initOffsetB, initOffsetB, mustBeginInSpan=False).first()
                     noteA.style.color = color
                     noteB.style.color = color
             if debug is True:

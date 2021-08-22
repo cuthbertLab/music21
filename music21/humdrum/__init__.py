@@ -37,7 +37,7 @@ extract_      Not needed                                         Use python comm
 fields_       Not needed
 fin2hum_      `music21.converter.parse` (filename)               Enigma Transport Format did not take off and is rarely used. Software to convert Enigma to MusicXML is available from recordare
 freq_         see :meth:`~music21.pitch.Pitch.frequency`
-hint_         see Notes                                          :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams` See alpha.trecento.capua demo to show how it can be done.
+hint_         see Notes                                          :meth:`~music21.stream.Stream.attachIntervalsBetweenStreams` See music21-tools trecento.capua demo to show how it can be done.
 hum2fin_      `.write('musicxml')`                               Writes to musicXML.  A music21 to Enigma converter will not be written (obsolete format)
 humdrum_      Not needed                                         The `spineParser` will report errors when parsing.
 humsed_       Not needed

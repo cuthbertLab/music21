@@ -404,7 +404,7 @@ class ScalaFile:
         '''
         Open a file for reading
         '''
-        self.file = io.open(fp, mode, encoding='latin-1')
+        self.file = io.open(fp, mode, encoding='latin-1')  # pylint: disable=consider-using-with
         self.fileName = os.path.basename(fp)
 
     def openFileLike(self, fileLike):
@@ -556,7 +556,7 @@ def search(target):
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     pass
 
 

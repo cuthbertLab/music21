@@ -16,8 +16,7 @@ some sort of connection between them.  A slur is one type of spanner -- it might
 connect notes in different Measure objects or even between different parts.
 
 This package defines some of the most common spanners.  Other spanners
-can be found in modules such as :ref:`moduleDynamics` (for things such as crescendos)
-or in :ref:`moduleMeter` (a ritardando, for instance).
+can be found in modules such as :ref:`moduleDynamics` (for things such as crescendos).
 '''
 import unittest
 import copy
@@ -344,10 +343,12 @@ class Spanner(base.Music21Object):
         return self.spannerStorage.__getitem__(key)
 
     def __iter__(self):
-        return common.Iterator(self.spannerStorage)
+        return iter(self.spannerStorage)
 
     def __len__(self):
-        return len(self.spannerStorage)
+        # Check _elements to avoid StreamIterator overhead.
+        # Safe, because impossible to put spanned elements at end.
+        return len(self.spannerStorage._elements)
 
     def getSpannedElements(self):
         '''
@@ -371,10 +372,9 @@ class Spanner(base.Music21Object):
         >>> sl.getSpannedElements() == [n1, n2, c1]  # make sure that not sorting
         True
         '''
-        post = []
-        for c in self.spannerStorage.elements:
-            post.append(c)
-        return post
+        # Check _elements to avoid StreamIterator overhead.
+        # Safe, because impossible to put spanned elements at end.
+        return list(self.spannerStorage._elements)
 
     def getSpannedElementsByClass(self, classFilterList):
         '''
@@ -397,8 +397,11 @@ class Spanner(base.Music21Object):
     def getSpannedElementIds(self):
         '''
         Return all id() for all stored objects.
+        Was performance critical, until most uses removed in v.7.
+        Used only as a testing tool now.
+        Spanner.__contains__() was optimized in 839c7e5.
         '''
-        return [id(n) for n in self.spannerStorage]
+        return [id(n) for n in self.spannerStorage._elements]
 
     def addSpannedElements(self,
                            spannedElements: Union['music21.base.Music21Object',
@@ -428,10 +431,10 @@ class Spanner(base.Music21Object):
         # presently, this does not look for redundancies
         if not common.isListLike(spannedElements):
             spannedElements = [spannedElements]
-        else:
+        if arguments:
             spannedElements = spannedElements[:]  # copy
-        # assume all other arguments
-        spannedElements += arguments
+            # assume all other arguments
+            spannedElements += arguments
         # environLocal.printDebug(['addSpannedElements():', spannedElements])
         for c in spannedElements:
             if c is None:
@@ -470,7 +473,12 @@ class Spanner(base.Music21Object):
         return spannedElement in self
 
     def __contains__(self, spannedElement):
-        return spannedElement in self.spannerStorage
+        # Cannot check `in` spannerStorage._elements,
+        # because it would check __eq__, not identity.
+        for x in self.spannerStorage._elements:
+            if x is spannedElement:
+                return True
+        return False
 
     def replaceSpannedElement(self, old, new) -> None:
         '''
@@ -778,7 +786,9 @@ class SpannerBundle(prebase.ProtoM21Object):
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage:  # storage is a list of spanners
-                if idTarget in sp.getSpannedElementIds():
+                # __contains__() will test for identity, not equality
+                # see Spanner.hasSpannedElement(), which just calls __contains__()
+                if spannedElement in sp:
                     post.append(sp)
             self._cache[cacheKey] = post
         return self._cache[cacheKey]
@@ -790,7 +800,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         with new spannedElements
         for all Spanner objects contained in this bundle.
 
-        The `old` parameter can be either an object or object id.
+        The `old` parameter must be an object, not an object id.
 
         If no replacements are found, no errors are raised.
 
@@ -819,15 +829,17 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> su2
         <music21.spanner.Glissando <music21.note.Note E><music21.note.Note C>>
 
+        Changed in v.7 -- id() is no longer allowed for `old`.
 
+        >>> sb.replaceSpannedElement(id(n1), n2)
+        Traceback (most recent call last):
+        TypeError: send elements to replaceSpannedElement(), not ids (deprecated)
         '''
         # environLocal.printDebug(['SpannerBundle.replaceSpannedElement()', 'old', old,
         #    'new', new, 'len(self._storage)', len(self._storage)])
-
-        if common.isNum(old):  # assume this is an id
-            idTarget = old
-        else:
-            idTarget = id(old)
+        # TODO: remove in v.8 for speed?
+        if isinstance(old, int):
+            raise TypeError('send elements to replaceSpannedElement(), not ids (deprecated)')
 
         replacedSpanners = []
         # post = self.__class__()  # return a bundle of spanners that had changes
@@ -836,10 +848,10 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         for sp in self._storage:  # Spanners in a list
             # environLocal.printDebug(['looking at spanner', sp, sp.getSpannedElementIds()])
-
-            # must check to see if this id is in this spanner
             sp._cache = {}
-            if idTarget in sp.getSpannedElementIds():
+            # accurate, so long as Spanner.__contains__() checks identity, not equality
+            # see discussion at https://github.com/cuthbertLab/music21/pull/905
+            if old in sp:
                 sp.replaceSpannedElement(old, new)
                 replacedSpanners.append(sp)
                 # post.append(sp)
@@ -1385,6 +1397,21 @@ class Ottava(Spanner):
 
     >>> ottava.validOttavaTypes
     ('8va', '8vb', '15ma', '15mb', '22da', '22db')
+
+    OMIT_FROM_DOCS
+
+    Test the round-trip back:
+
+    >>> s3 = s2.toWrittenPitch()
+    >>> s3.show('text')
+    {0.0} <music21.spanner.Ottava 8vb transposing<music21.note.Note D><music21.note.Note E>>
+    {0.0} <music21.note.Note D>
+    {2.0} <music21.note.Note E>
+
+    >>> for n in s3.notes:
+    ...    print(n.nameWithOctave)
+    D4
+    E4
     '''
     validOttavaTypes = ('8va', '8vb', '15ma', '15mb', '22da', '22db')
 
@@ -1817,7 +1844,9 @@ class Test(unittest.TestCase):
     def testBasic(self):
 
         # how parts might be grouped
-        from music21 import stream, note, layout
+        from music21 import stream
+        from music21 import note
+        from music21 import layout
         s = stream.Score()
         p1 = stream.Part()
         p2 = stream.Part()
@@ -1869,7 +1898,8 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(su1), '<music21.spanner.Slur>')
 
     def testSpannerBundle(self):
-        from music21 import spanner, stream
+        from music21 import spanner
+        from music21 import stream
 
         su1 = spanner.Slur()
         su1.idLocal = 1
@@ -1894,7 +1924,8 @@ class Test(unittest.TestCase):
         self.assertEqual(sb2[1], su4)
 
     def testDeepcopySpanner(self):
-        from music21 import spanner, note
+        from music21 import spanner
+        from music21 import note
 
         # how slurs might be defined
         n1 = note.Note()
@@ -1923,7 +1954,8 @@ class Test(unittest.TestCase):
         self.assertNotEqual(id(sb2[0]), id(sb1[0]))
 
     def testReplaceSpannedElement(self):
-        from music21 import note, spanner
+        from music21 import note
+        from music21 import spanner
 
         n1 = note.Note()
         n2 = note.Note()
@@ -1982,7 +2014,8 @@ class Test(unittest.TestCase):
         self.assertEqual(sb1[2].getSpannedElements(), [n4a, n5])
 
     def testRepeatBracketA(self):
-        from music21 import spanner, stream
+        from music21 import spanner
+        from music21 import stream
 
         m1 = stream.Measure()
         rb1 = spanner.RepeatBracket(m1)
@@ -1991,7 +2024,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(rb1), 1)
 
     def testRepeatBracketB(self):
-        from music21 import note, spanner, stream, bar
+        from music21 import note
+        from music21 import spanner
+        from music21 import stream
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -2028,7 +2064,10 @@ class Test(unittest.TestCase):
 
     # noinspection DuplicatedCode
     def testRepeatBracketC(self):
-        from music21 import note, spanner, stream, bar
+        from music21 import note
+        from music21 import spanner
+        from music21 import stream
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -2070,7 +2109,10 @@ class Test(unittest.TestCase):
 
     # noinspection DuplicatedCode
     def testRepeatBracketD(self):
-        from music21 import note, spanner, stream, bar
+        from music21 import note
+        from music21 import spanner
+        from music21 import stream
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -2167,7 +2209,10 @@ class Test(unittest.TestCase):
         self.assertGreater(raw.find('''<ending number="2" type="start" />'''), 1)
 
     def testRepeatBracketE(self):
-        from music21 import note, spanner, stream, bar
+        from music21 import note
+        from music21 import spanner
+        from music21 import stream
+        from music21 import bar
 
         p = stream.Part()
         m1 = stream.Measure(number=1)
@@ -2230,7 +2275,9 @@ class Test(unittest.TestCase):
         '''Test basic octave shift creation and output, as well as passing
         objects through make measure calls.
         '''
-        from music21 import stream, note, chord
+        from music21 import stream
+        from music21 import note
+        from music21 import chord
         from music21.spanner import Ottava   # need to do it this way for classSet
         s = stream.Stream()
         s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
@@ -2280,7 +2327,9 @@ class Test(unittest.TestCase):
     def testOttavaShiftB(self):
         '''Test a single note octave
         '''
-        from music21 import stream, note, spanner
+        from music21 import stream
+        from music21 import note
+        from music21 import spanner
         s = stream.Stream()
         n = note.Note('c4')
         sp = spanner.Ottava(n)
@@ -2292,7 +2341,9 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count('type="down"'), 1)
 
     def testCrescendoA(self):
-        from music21 import stream, note, dynamics
+        from music21 import stream
+        from music21 import note
+        from music21 import dynamics
         s = stream.Stream()
         # n1 = note.Note('C')
         # n2 = note.Note('D')
@@ -2328,7 +2379,9 @@ class Test(unittest.TestCase):
         # self.assertEqual(raw.count('octave-shift'), 2)
 
     def testLineA(self):
-        from music21 import stream, note, spanner
+        from music21 import stream
+        from music21 import note
+        from music21 import spanner
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -2346,7 +2399,9 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count('<bracket'), 4)
 
     def testLineB(self):
-        from music21 import stream, note, spanner
+        from music21 import stream
+        from music21 import note
+        from music21 import spanner
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -2371,7 +2426,9 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count('line-end="down"'), 1)
 
     def testGlissandoA(self):
-        from music21 import stream, note, spanner
+        from music21 import stream
+        from music21 import note
+        from music21 import spanner
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 3)
@@ -2395,7 +2452,9 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count('line-type="dashed"'), 2)
 
     def testGlissandoB(self):
-        from music21 import stream, note, spanner
+        from music21 import stream
+        from music21 import note
+        from music21 import spanner
 
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -2449,7 +2508,7 @@ class Test(unittest.TestCase):
     def testRemoveSpanners(self):
         from music21 import stream
         from music21 import note
-        from music21.spanner import Slur
+        from music21.spanner import Spanner, Slur
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -2465,7 +2524,7 @@ class Test(unittest.TestCase):
         sl = Slur([n1, n2])
         p.insert(0, sl)
         for x in p:
-            if 'Spanner' in x.classes:
+            if isinstance(x, Spanner):
                 p.remove(x)
         self.assertEqual(len(p.spanners), 0)
 
@@ -2491,7 +2550,8 @@ class Test(unittest.TestCase):
         unused_data = converter.freezeStr(p, fmt='pickle')
 
     def testDeepcopyJustSpannerAndNotes(self):
-        from music21 import note, clef
+        from music21 import note
+        from music21 import clef
         from music21.spanner import Spanner
 
         n1 = note.Note('g')
@@ -2508,7 +2568,9 @@ class Test(unittest.TestCase):
         self.assertIs(sp2[0], n1)
 
     def testDeepcopySpannerInStreamNotNotes(self):
-        from music21 import note, clef, stream
+        from music21 import note
+        from music21 import clef
+        from music21 import stream
         from music21.spanner import Spanner
 
         n1 = note.Note('g')
@@ -2529,7 +2591,9 @@ class Test(unittest.TestCase):
         self.assertIs(sp2[0], n1)
 
     def testDeepcopyNotesInStreamNotSpanner(self):
-        from music21 import note, clef, stream
+        from music21 import note
+        from music21 import clef
+        from music21 import stream
         from music21.spanner import Spanner
 
         n1 = note.Note('g')
@@ -2552,7 +2616,8 @@ class Test(unittest.TestCase):
         self.assertIs(sp2[0], n1)
 
     def testDeepcopyNotesAndSpannerInStream(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         from music21.spanner import Spanner
 
         n1 = note.Note('g')
@@ -2577,7 +2642,8 @@ class Test(unittest.TestCase):
         self.assertIs(sp2[0], n3)
 
     def testDeepcopyStreamWithSpanners(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         from music21.spanner import Slur
 
         n1 = note.Note()

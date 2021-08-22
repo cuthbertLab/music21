@@ -21,12 +21,13 @@ building a new release.
 
 Run test/testDocumentation after this.
 '''
-import collections
+import dataclasses
 import multiprocessing
 import os
 import sys
 import time
 import unittest
+from typing import Optional, Any
 
 from music21 import environment
 from music21 import common
@@ -36,10 +37,17 @@ from music21.test import commonTest
 _MOD = 'test.multiprocessTest'
 environLocal = environment.Environment(_MOD)
 
-ModuleResponse = collections.namedtuple('ModuleResponse',
-                                        'returnCode fp moduleName success testRunner '
-                                        + 'errors failures testsRun runTime')
-ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
+@dataclasses.dataclass
+class ModuleResponse:
+    returnCode: Optional[str] = None
+    fp: Any = None
+    moduleName: Optional[str] = None
+    success: Any = None
+    testRunner: Any = None
+    errors: Any = None
+    failures: Any = None
+    testsRun: Any = None
+    runTime: Any = None
 
 
 # ------------------------------------------------------------------------------
@@ -53,15 +61,17 @@ def runOneModuleWithoutImp(args):
     moduleObject = modGath.getModuleWithoutImp(fp)
 
     environLocal.printDebug(f'running {fp} \n')
+    namePeriod = modGath._getNamePeriod(fp)
     if moduleObject == 'skip':
         success = f'{fp} is skipped \n'
         environLocal.printDebug(success)
-        return ModuleResponse('Skipped', fp, success)
+        return ModuleResponse(returnCode='Skipped', fp=fp, success=success)
     elif moduleObject == 'notInTree':
-        success = ('%s is in the music21 directory but not imported in music21. Skipped -- fix!' %
-                   modGath._getNamePeriod(fp))
+        success = (
+            f'{namePeriod} is in the music21 directory but not imported in music21. Skipped -- fix!'
+        )
         environLocal.printDebug(success)
-        return ModuleResponse('NotInTree', fp, success)
+        return ModuleResponse(returnCode='NotInTree', fp=fp, success=success)
 
     try:
         moduleName = modGath._getName(fp)
@@ -97,14 +107,28 @@ def runOneModuleWithoutImp(args):
             for f in testResult.failures:
                 failures.append(f[1])
             runTime = round(10 * (time.time() - timeStart)) / 10.0
-            return ModuleResponse('TestsRun', fp, moduleName, testResult.wasSuccessful(),
-                                  str(testResult), errors, failures, testResult.testsRun, runTime)
+            return ModuleResponse(returnCode='TestsRun',
+                                  fp=fp,
+                                  moduleName=moduleName,
+                                  success=testResult.wasSuccessful(),
+                                  testRunner=str(testResult),
+                                  errors=errors,
+                                  failures=failures,
+                                  testsRun=testResult.testsRun,
+                                  runTime=runTime)
         except Exception as excp:  # pylint: disable=broad-except
             environLocal.printDebug(f'*** Exception in running {moduleName}: {excp}...\n')
-            return ModuleResponse('TrappedException', fp, moduleName, None, str(excp))
+            return ModuleResponse(returnCode='TrappedException',
+                                  fp=fp,
+                                  moduleName=moduleName,
+                                  success=None,
+                                  testRunner=str(excp)
+                                  )
     except Exception as excp:  # pylint: disable=broad-except
         environLocal.printDebug(f'*** Large Exception in running {fp}: {excp}...\n')
-        return ModuleResponse('LargeException', fp, None, None, str(excp))
+        return ModuleResponse(returnCode='LargeException',
+                              fp=fp,
+                              testRunner=str(excp))
 
 
 def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveOut=1):
@@ -126,70 +150,72 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     pathsToRun = modGather.modulePaths  # [30:60]
 
     # pylint: disable=not-callable
-    pool = multiprocessing.Pool(processes=poolSize)
+    with multiprocessing.Pool(processes=poolSize) as pool:
 
-    # imap returns the results as they are completed.  Since the number of files is small,
-    # the overhead of returning is outweighed by the positive aspect of getting results immediately
-    # unordered says that results can RETURN in any order; not that they'd be pooled out in any
-    # order.
-    res = pool.imap_unordered(runOneModuleWithoutImp,
-                              ((modGather, fp) for fp in pathsToRun))
+        # imap returns the results as they are completed.
+        # Since the number of files is small, the overhead of returning is
+        # outweighed by the positive aspect of getting results immediately
+        # unordered says that results can RETURN in any order; not that
+        # they'd be pooled out in any order.
+        res = pool.imap_unordered(runOneModuleWithoutImp,
+                                    ((modGather, fp) for fp in pathsToRun))
 
-    continueIt = True
-    timeouts = 0
-    eventsProcessed = 0
-    summaryOutput = []
+        continueIt = True
+        timeouts = 0
+        eventsProcessed = 0
+        summaryOutput = []
 
-    while continueIt is True:
-        try:
-            newResult = res.next(timeout=1)
-            if timeouts >= 5:
-                print('')
-            if newResult is not None:
-                if newResult.moduleName is not None:
-                    mn = newResult.moduleName
-                    mn = mn.replace('___init__', '')
-                    mn = mn.replace('_', '.')
-                else:
-                    mn = ''
-                rt = newResult.runTime
-                if rt is not None:
-                    rt = round(newResult.runTime * 10) / 10.0
-                    if not newResult.errors and not newResult.failures:
-                        print(f'\t\t\t\t{mn}: {newResult.testsRun} tests in {rt} secs')
+        while continueIt is True:
+            try:
+                newResult = res.next(timeout=1)
+                if timeouts >= 5:
+                    print('')
+                if newResult is not None:
+                    if newResult.moduleName is not None:
+                        mn = newResult.moduleName
+                        mn = mn.replace('___init__', '')
+                        mn = mn.replace('_', '.')
                     else:
-                        print('\t\t\t\t{0}: {1} tests, {2} errors {3} failures in {4} secs'.format(
-                            mn,
-                            newResult.testsRun,
-                            len(newResult.errors),
-                            len(newResult.failures),
-                            rt))
-            timeouts = 0
-            eventsProcessed += 1
-            summaryOutput.append(newResult)
-        except multiprocessing.TimeoutError:  # @UndefinedVariable
-            timeouts += 1
-            if timeouts == 5 and eventsProcessed > 0:
-                print('Delay in processing, seconds: ', end='')
-            elif timeouts == 5:
-                print('Starting first modules, should take 5-10 seconds: ', end='')
+                        mn = ''
+                    rt = newResult.runTime
+                    if rt is not None:
+                        rt = round(newResult.runTime * 10) / 10.0
+                        if not newResult.errors and not newResult.failures:
+                            print(f'\t\t\t\t{mn}: {newResult.testsRun} tests in {rt} secs')
+                        else:
+                            numErr = len(newResult.errors)
+                            numFail = len(newResult.failures)
+                            print(f'\t\t\t\t{mn}: {newResult.testsRun} tests, '
+                                  f'{numErr} errors {numFail} failures in {rt} secs')
+                timeouts = 0
+                eventsProcessed += 1
+                summaryOutput.append(newResult)
+            except multiprocessing.TimeoutError:
+                timeouts += 1
+                if timeouts == 5 and eventsProcessed > 0:
+                    print('Delay in processing, seconds: ', end='')
+                elif timeouts == 5:
+                    print('Starting first modules, should take 5-10 seconds: ', end='')
 
-            if timeouts % 5 == 0:
-                print(str(timeouts) + ' ', end='', flush=True)
-            if timeouts > maxTimeout and eventsProcessed > 0:
-                print('\nToo many delays, giving up...', flush=True)
+                if timeouts % 5 == 0:
+                    print(str(timeouts) + ' ', end='', flush=True)
+                if timeouts > maxTimeout and eventsProcessed > 0:
+                    print('\nToo many delays, giving up...', flush=True)
+                    continueIt = False
+                    printSummary(summaryOutput, timeStart, pathsToRun)
+                    pool.close()
+                    sys.exit()
+            except StopIteration:
                 continueIt = False
-                printSummary(summaryOutput, timeStart, pathsToRun)
                 pool.close()
-                sys.exit()
-        except StopIteration:
-            continueIt = False
-            pool.close()
-            pool.join()
-        except Exception as excp:  # pylint: disable=broad-except
-            eventsProcessed += 1
-            exceptionLog = ModuleResponse('UntrappedException', None, str(excp))
-            summaryOutput.append(exceptionLog)
+                pool.join()
+            except Exception as excp:  # pylint: disable=broad-except
+                eventsProcessed += 1
+                exceptionLog = ModuleResponse(
+                    returnCode='UntrappedException',
+                    moduleName=str(excp)
+                )
+                summaryOutput.append(exceptionLog)
 
     sys.stderr = normalStdError
     printSummary(summaryOutput, timeStart, pathsToRun)
@@ -197,10 +223,10 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
 
 def printSummary(summaryOutput, timeStart, pathsToRun):
     outStr = ''
-    summaryOutputTwo = [i[1] for i in summaryOutput]
+    summaryOutputTwo = [i.fp for i in summaryOutput]
     for fp in pathsToRun:
         if fp not in summaryOutputTwo:
-            failLog = ModuleResponse('NoResult', fp)
+            failLog = ModuleResponse(returnCode='NoResult', fp=fp)
             summaryOutput.append(failLog)
 
     totalTests = 0

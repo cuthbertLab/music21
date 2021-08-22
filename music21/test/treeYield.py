@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert
 # License:      CC-BY (see StackOverflow link below)
 # ------------------------------------------------------------------------------
-# http://stackoverflow.com/questions/12611337/
+# https://stackoverflow.com/questions/12611337/
 #     recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer
 
 
@@ -139,7 +139,8 @@ def testCode():
 
 
 def testMIDIParse():
-    from music21 import converter, common
+    from music21 import converter
+    from music21 import common
     from music21 import freezeThaw
 
     # a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'

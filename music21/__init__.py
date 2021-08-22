@@ -143,6 +143,7 @@ __all__ = [
     'meter',
     'note',
     'osmd',
+    'percussion',
     'pitch',
     # prebase listed above
     'repeat',

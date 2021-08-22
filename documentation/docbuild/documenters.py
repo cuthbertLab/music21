@@ -1375,11 +1375,10 @@ class ModuleDocumenter(ObjectDocumenter):
         >>> for classDocumenter in modDocumenter.classDocumenters:
         ...     print(classDocumenter.referentPackageSystemPath)
         ...
-        music21.serial.HistoricalTwelveToneRow
         music21.serial.ToneRow
-        music21.serial.TwelveToneMatrix
         music21.serial.TwelveToneRow
-
+        music21.serial.HistoricalTwelveToneRow
+        music21.serial.TwelveToneMatrix
         '''
         result = []
         classDocumenters = {}

@@ -18,15 +18,18 @@ from music21 import common
 from music21 import duration
 from music21 import note
 from music21 import stream
-from music21.meter import TimeSignature, MeterSequence
+from music21.meter.base import TimeSignature
+from music21.meter.core import MeterSequence, MeterTerminal
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
         '''
         a = TimeSignature('3/16')
-        a.show()
+        if self.show:
+            a.show()
 
     def testBasic(self):
         a = stream.Stream()
@@ -36,14 +39,15 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 m = stream.Measure()
                 m.timeSignature = ts
                 a.insert(m.timeSignature.barDuration.quarterLength, m)
-        a.show()
+        if self.show:
+            a.show()
 
     def testCompound(self):
         a = stream.Stream()
         meterStrDenominator = [1, 2, 4, 8, 16, 32]
         meterStrNumerator = [2, 3, 4, 5, 6, 7, 9, 11, 12, 13]
 
-        for i in range(30):
+        for i in range(8):
             msg = []
             for j in range(1, random.choice([2, 4])):
                 msg.append('%s/%s' % (random.choice(meterStrNumerator),
@@ -52,7 +56,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             m = stream.Measure()
             m.timeSignature = ts
             a.insert(m.timeSignature.barDuration.quarterLength, m)
-        a.show()
+        if self.show:
+            a.show()
 
     def testMeterBeam(self):
         ts = TimeSignature('6/8', 2)
@@ -63,11 +68,11 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             n = note.Note()
             n.duration = x
             s.append(n)
-        s.show()
+        if self.show:
+            s.show()
 
 
 class Test(unittest.TestCase):
-
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
@@ -237,7 +242,7 @@ class Test(unittest.TestCase):
                 for ms in ts.beatSequence:  # should be divided in three
                     self.assertEqual(len(ms), 3)
 
-        src = ['3/2', '3/4', '3/8', '9/4', '9/8', '9/16']
+        src = ['3/2', '3/4', '9/4', '9/8', '9/16']
         for tsStr in src:
             ts = TimeSignature(tsStr)
             self.assertEqual(len(ts.beatSequence), 3)
@@ -248,6 +253,14 @@ class Test(unittest.TestCase):
             elif ts.numerator == 9:
                 for ms in ts.beatSequence:  # should be divided in three
                     self.assertEqual(len(ms), 3)
+
+        src = ['3/8', '3/16', '3/32']
+        for tsStr in src:
+            ts = TimeSignature(tsStr)
+            self.assertEqual(len(ts.beatSequence), 1)
+            self.assertEqual(ts.beatCountName, 'Single')
+            for ms in ts.beatSequence:  # should not be divided
+                self.assertIsInstance(ms, MeterTerminal)
 
         src = ['4/2', '4/4', '4/8', '12/4', '12/8', '12/16']
         for tsStr in src:

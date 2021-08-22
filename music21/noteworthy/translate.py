@@ -519,8 +519,8 @@ class NoteworthyTranslator:
         >>> nwt.translateRest({'Dur': '4th'})
         >>> measureIn.show('text')
         {0.0} <music21.note.Note C#>
-        {2.0} <music21.note.Rest rest>
-        {2.75} <music21.note.Rest rest>
+        {2.0} <music21.note.Rest dotted-eighth>
+        {2.75} <music21.note.Rest quarter>
 
         '''
         durationInfo = attributes['Dur']
@@ -628,7 +628,7 @@ class NoteworthyTranslator:
         >>> nwt.currentKey.sharps
         4
         >>> measureIn.show('text')
-        {0.0} <music21.note.Rest rest>
+        {0.0} <music21.note.Rest dotted-half>
         {3.0} <music21.key.KeySignature of 4 sharps>
         '''
         ke = attributes['Signature']
@@ -895,7 +895,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.pitch.accidental.alter, -1.0)
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testComplete(self):
         nwcTranslatePath = common.getSourceFilePath() / 'noteworthy'
@@ -903,7 +904,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         # 'Part_OWeisheit.nwctxt' #
 
         myScore = NoteworthyTranslator().parseFile(complete)
-        myScore.show()
+        if self.show:
+            myScore.show()
 
 
 if __name__ == '__main__':

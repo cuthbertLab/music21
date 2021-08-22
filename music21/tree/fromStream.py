@@ -17,6 +17,7 @@ import unittest
 
 from music21.base import Music21Object
 from music21 import common
+from music21 import key
 from music21.tree import spans
 from music21.tree import timespanTree
 from music21.tree import trees
@@ -33,7 +34,7 @@ def listOfTreesByClass(inputStream,
     encountered substream and PitchedTimespan for each encountered non-stream
     element.
 
-    `classLists` should be a sequence of valid inputs for `isClassOrSubclass()`. One
+    `classLists` should be a sequence of elements contained in `classSet`. One
     TimespanTree will be constructed for each element in `classLists`, in
     a single optimized pass through the `inputStream`.
 
@@ -118,10 +119,10 @@ def listOfTreesByClass(inputStream,
             endTime = offset + element.duration.quarterLength
 
             for classBasedTree, classList in zip(outputTrees, classLists):
-                if classList and not element.isClassOrSubclass(classList):
+                if classList and element.classSet.isdisjoint(classList):
                     continue
                 if useTimespans:
-                    if hasattr(element, 'pitches') and 'music21.key.Key' not in element.classSet:
+                    if hasattr(element, 'pitches') and not isinstance(element, key.Key):
                         spanClass = spans.PitchedTimespan
                     else:
                         spanClass = spans.ElementTimespan
@@ -182,7 +183,7 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
     >>> etFlat.getPositionAfter(0.5)
     SortTuple(atEnd=0, offset=1.0, priority=0, classSortOrder=20, isNotGrace=1, insertIndex=...)
 
-    >>> etFlatNotes = tree.fromStream.asTree(score, flatten=True, classList=[note.Note])
+    >>> etFlatNotes = tree.fromStream.asTree(score, flatten=True, classList=(note.Note,))
     >>> etFlatNotes
     <ElementTree {12} (0.0 <0.20...> to 8.0) <music21.stream.Score exampleScore>>
 
@@ -213,7 +214,7 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
                 if flatten != 'semiFlat':
                     continue  # do not insert the stream itself unless we are doing semiflat
 
-            if classList and not element.isClassOrSubclass(classList):
+            if classList and element.classSet.isdisjoint(classList):
                 continue
 
             endTime = flatOffset + element.duration.quarterLength
@@ -262,7 +263,7 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
             elementTupleList = [(e.sortTuple(inputStream), e) for e in inputStreamElements]
         else:
             elementTupleList = [(e.sortTuple(inputStream), e) for e in inputStreamElements
-                                    if e.isClassOrSubclass(classList)]
+                                    if not e.classSet.isdisjoint(classList)]
         outputTree.populateFromSortedList(elementTupleList)
         if outputTree.rootNode is not None:
             outputTree.rootNode.updateEndTimes()

@@ -1107,7 +1107,7 @@ class QuarterLengthAxis(PositionAxis):
         elif self.client.recurse:
             sSrc = s.recurse()
         else:
-            sSrc = s.iter
+            sSrc = s.iter()
 
         sSrc = sSrc.getElementsByClass(self.client.classFilterList)
         # get all quarter lengths
@@ -1289,7 +1289,7 @@ class CountingAxis(Axis):
         if not common.isIterable(countAxes):
             countAxes = (countAxes,)
 
-        axesIndices = tuple([self.axisDataMap[axisName] for axisName in countAxes])
+        axesIndices = tuple(self.axisDataMap[axisName] for axisName in countAxes)
         thisIndex = self.axisDataMap[self.axisName]
         selector = itemgetter(*axesIndices)
         relevantData = [selector(innerTuple) for innerTuple in client.data]

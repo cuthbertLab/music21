@@ -32,6 +32,7 @@ from music21.common.numberTools import opFrac
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
+from music21.stream.iterator import StreamIterator
 
 # pylint: disable=attribute-defined-outside-init
 class StreamCoreMixin:
@@ -381,10 +382,15 @@ class StreamCoreMixin:
     # --------------------------------------------------------------------------
     def coreGuardBeforeAddElement(self, element, *, checkRedundancy=True):
         '''
-        Before adding an element, this method provides
-        important checks to that element.
+        Before adding an element, this method performs
+        important checks on that element.
 
-        Used by both insert() and append()
+        Used by:
+
+          - :meth:`~music21.stream.Stream.insert`
+          - :meth:`~music21.stream.Stream.append`
+          - :meth:`~music21.stream.Stream.storeAtEnd`
+          - `Stream.__init__()`
 
         Returns None or raises a StreamException
 
@@ -392,11 +398,27 @@ class StreamCoreMixin:
         >>> s.coreGuardBeforeAddElement(s)
         Traceback (most recent call last):
         music21.exceptions21.StreamException: this Stream cannot be contained within itself
+
+        >>> s.append(s.iter())
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: cannot insert StreamIterator into a Stream
+        Iterate over it instead (User's Guide chs. 6 and 26)
+
+        >>> s.insert(4, 3.14159)
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: to put a non Music21Object in a stream,
+        create a music21.ElementWrapper for the item
         '''
-        # using id() here b/c we do not want to get __eq__ comparisons
         if element is self:  # cannot add this Stream into itself
             raise StreamException('this Stream cannot be contained within itself')
+        if not isinstance(element, Music21Object):
+            if isinstance(element, StreamIterator):
+                raise StreamException('cannot insert StreamIterator into a Stream\n'
+                    "Iterate over it instead (User's Guide chs. 6 and 26)")
+            raise StreamException('to put a non Music21Object in a stream, '
+                                  'create a music21.ElementWrapper for the item')
         if checkRedundancy:
+            # using id() here b/c we do not want to get __eq__ comparisons
             idElement = id(element)
             if idElement in self._offsetDict:
                 # now go slow for safety -- maybe something is amiss in the index.
@@ -647,7 +669,7 @@ class StreamCoreMixin:
         that spannerBundle are added.  This can be useful, for instance, in restoring
         spanners from an excerpt that might already have spanners removed.  In
         Jacob Tyler Walls's brilliant phrasing, it prevents regrowing zombie spanners
-        the you thought you had killed.
+        that you thought you had killed.
 
         Here we will constrain only to spanners also present in another Stream:
 
@@ -672,7 +694,7 @@ class StreamCoreMixin:
         if recurse is True:
             sIter = self.recurse()
         else:
-            sIter = self.iter
+            sIter = self.iter()
 
         collectList = []
         for el in list(sIter):
