@@ -2639,7 +2639,8 @@ class PartExporter(XMLExporterBase):
                     # Place a reference to this instrument stream in a place
                     # where subsequent staffs entering this method will find and use it
                     if self.parent:
-                        self.parent.instrumentsByStream[id(subseq_staff)] = self.instrumentStream
+                        next_id = id(subsequent_staff)
+                        self.parent.instrumentsByStream[next_id] = self.instrumentStream
             elif self.stream in joined_group:
                 # This stream was already (or will be) processed
                 # UNLESS there is a spaghetti case where
@@ -3563,7 +3564,7 @@ class MeasureExporter(XMLExporterBase):
             for t in mxTieList:
                 mxNote.append(t)
 
-        self.setNoteInstrument(n, chordParent)
+        self.setNoteInstrument(n, mxNote, chordParent)
         self.setEditorial(mxNote, n)
         if self.currentVoiceId is not None:
             mxVoice = SubElement(mxNote, 'voice')
@@ -3669,7 +3670,10 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot.append(mxNote)
         return mxNote
 
-    def setNoteInstrument(self, n: note.NotRest, chordParent: Optional[chord.Chord]):
+    def setNoteInstrument(self,
+                          n: note.NotRest,
+                          mxNote: Element,
+                          chordParent: Optional[chord.Chord]):
         # instrument tags are necessary when there is more than one
         # instrument anywhere in the same musicxml <part>
         if self.parent is None:
