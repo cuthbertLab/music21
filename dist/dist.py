@@ -37,10 +37,10 @@ the announcement while it's running.
 
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 
-10. ssh to dialup.athena.mit.edu, cd music21/doc and rm -rf *  (skip on minor version changes)
+10. ssh to athena.dialup.mit.edu (yes, dialup!), cd music21/doc and rm -rf *  (skip on minor version changes)
 
 11. run documentation/upload.py or upload via ssh.
-   -- you will need an MIT username and password
+   -- you will need an MIT username and password + a dual authentication passcode
 
 12. zip up documentation/build/html and get ready to upload/delete it. (skip for Alpha/Beta)
 

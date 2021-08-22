@@ -165,7 +165,7 @@ class OutputARFF(OutputFormat):
     '''An ARFF (Attribute-Relation File Format) file.
 
     See
-    https://web.archive.org/web/20160212022757/http://weka.wikispaces.com/ARFF+(stable+version)
+    https://web.archive.org/web/20160212022757/http://weka.wikispaces.com/ARFF+%28stable+version%29
     for more details
 
 

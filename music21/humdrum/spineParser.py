@@ -2154,7 +2154,7 @@ def hdStringToNote(contents):
     http://kern.ccarh.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
     and the Josquin Research Project [JRP] is incorrect, seeing as it
     contradicts the specification in
-    http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.html#N-Tuplets
+    https://web.archive.org/web/20100203144730/http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.html#N-Tuplets
 
     >>> storedFlavors = humdrum.spineParser.flavors['JRP']  #_DOCS_HIDE
 

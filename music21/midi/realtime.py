@@ -14,11 +14,9 @@ Objects for realtime playback of Music21 Streams as MIDI.
 
 From an idea of Joe "Codeswell":
 
-https://joecodeswell.wordpress.com/2012/06/13/
-how-to-produce-python-controlled-audio-output-from-music-made-with-music21
+https://joecodeswell.wordpress.com/2012/06/13/how-to-produce-python-controlled-audio-output-from-music-made-with-music21
 
-https://stackoverflow.com/questions/10983462/
-how-can-i-produce-real-time-audio-output-from-music-made-with-music21
+https://stackoverflow.com/questions/10983462/how-can-i-produce-real-time-audio-output-from-music-made-with-music21
 
 Requires pygame: http://www.pygame.org/download.shtml
 '''
