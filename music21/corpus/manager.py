@@ -221,13 +221,16 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     This function uses stored metadata and thus, on first usage, will incur a
     performance penalty during metadata loading.
 
-    >>> corpus.search('china')
+    >>> #_DOCS_SHOW corpus.search('china')
+    >>> corpus.search('china', corpusNames=('core',))  #_DOCS_HIDE
     <music21.metadata.bundles.MetadataBundle {1235 entries}>
 
-    >>> corpus.search('china', fileExtensions='.mid')
+    >>> #_DOCS_SHOW corpus.search('china', fileExtensions='.mid')
+    >>> corpus.search('china', fileExtensions='.mid', corpusNames=('core',))  #_DOCS_HIDE
     <music21.metadata.bundles.MetadataBundle {0 entries}>
 
-    >>> corpus.search('bach', field='composer')
+    >>> #_DOCS_SHOW corpus.search('bach', field='composer')
+    >>> corpus.search('bach', field='composer', corpusNames=('core',))  #_DOCS_HIDE
     <music21.metadata.bundles.MetadataBundle {363 entries}>
 
     Note the importance of good metadata -- there's almost 400 pieces by
@@ -235,12 +238,14 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
 
     This can also be specified as:
 
-    >>> corpus.search(composer='bach')
+    >>> #_DOCS_SHOW corpus.search(composer='bach')
+    >>> corpus.search(composer='bach', corpusNames=('core',))  #_DOCS_HIDE
     <music21.metadata.bundles.MetadataBundle {363 entries}>
 
     Or, to get all the chorales (without using `corpus.chorales.Iterator`):
 
-    >>> corpus.search(sourcePath='bach', numberOfParts=4)
+    >>> #_DOCS_SHOW corpus.search(sourcePath='bach', numberOfParts=4)
+    >>> corpus.search(sourcePath='bach', numberOfParts=4, corpusNames=('core',))  #_DOCS_HIDE
     <music21.metadata.bundles.MetadataBundle {368 entries}>
 
 

@@ -14,9 +14,9 @@
 
 
 This module contains methods which can properly resolve
-`dominant seventh <http://en.wikipedia.org/wiki/Dominant_seventh_chord>`_,
-`diminished seventh <http://en.wikipedia.org/wiki/Diminished_seventh_chord>`_, and
-`augmented sixth <http://en.wikipedia.org/wiki/Augmented_sixth_chord>`_
+`dominant seventh <https://en.wikipedia.org/wiki/Dominant_seventh_chord>`_,
+`diminished seventh <https://en.wikipedia.org/wiki/Diminished_seventh_chord>`_, and
+`augmented sixth <https://en.wikipedia.org/wiki/Augmented_sixth_chord>`_
 chords expressed as possibilities (See :mod:`~music21.figuredBass.possibility`).
 Although these methods can stand alone, they are speed-enhanced for instances
 of :class:`~music21.figuredBass.segment.Segment`, where there are many

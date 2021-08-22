@@ -23,7 +23,6 @@ import io
 import os
 import pathlib
 import subprocess
-import sys
 import unittest
 
 from typing import Union
@@ -501,7 +500,7 @@ class ConverterBraille(SubConverter):
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
         from music21 import braille
-        dataStr = braille.translate.objectToBraille(obj)
+        dataStr = braille.translate.objectToBraille(obj, **keywords)
         if subformats is not None and 'ascii' in subformats:
             dataStr = braille.basic.brailleUnicodeToBrailleAscii(dataStr)
         fp = self.writeDataStream(fp, dataStr)
@@ -941,12 +940,17 @@ class ConverterMusicXML(SubConverter):
 
             musescoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
 
-        storedStrErr = sys.stderr
-        fileLikeOpen = io.StringIO()
-        sys.stderr = fileLikeOpen
-        subprocess.run(musescoreRun, check=False)
-        fileLikeOpen.close()
-        sys.stderr = storedStrErr
+        completed_process = subprocess.run(musescoreRun, capture_output=True, check=False)
+        if completed_process.returncode != 0:
+            # Raise same exception class as findNumberedPNGPath()
+            # for backward compatibility
+            stderr_bytes = completed_process.stderr
+            try:
+                import locale
+                stderr_str = stderr_bytes.decode(locale.getpreferredencoding(do_setlocale=False))
+            except UnicodeDecodeError:
+                stderr_str = stderr_bytes  # not really a str, but best we can do.
+            raise SubConverterFileIOException(stderr_str)
 
         if common.runningUnderIPython() and common.getPlatform() == 'nix':
             # Leave environment in original state
@@ -1547,13 +1551,24 @@ class Test(unittest.TestCase):
         for out in (out1, out2):
             os.remove(out)
 
+    def testBrailleKeywords(self):
+        from music21 import converter
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+        p = converter.parse('tinyNotation: c1 d1 e1 f1')
+        out = p.write('braille', debug=True)
+        with open(out, 'r') as f:
+            self.assertIn('<music21.braille.segment BrailleSegment>', f.read())
+        os.remove(out)
+
+
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testXMLShow(self):
         from music21 import corpus
         c = corpus.parse('bwv66.6')
-        c.show()  # musicxml
+        if self.show:
+            c.show()  # musicxml
 
     def testWriteLilypond(self):
         from music21 import note
@@ -1561,18 +1576,21 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         n.duration.type = 'whole'
         s = stream.Stream()
         s.append(n)
-        s.show('lily.png')
-        print(s.write('lily.png'))
+        if self.show:
+            s.show('lily.png')
+            print(s.write('lily.png'))
 
     def testMultiPageXMlShow1(self):
         '''
         tests whether show() works for music that is 10-99 pages long
         '''
-        from music21 import omr, converter
+        from music21 import omr
+        from music21 import converter
         K525 = omr.correctors.K525groundTruthFilePath
         K525 = converter.parse(K525)
-        K525.show('musicxml.png')
-        print(K525.write('musicxml.png'))
+        if self.show:
+            K525.show('musicxml.png')
+            print(K525.write('musicxml.png'))
 
     # def testMultiPageXMlShow2(self):
     #     '''

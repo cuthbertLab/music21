@@ -97,7 +97,9 @@ disable=
     no-else-continue,  # not so bad...
     no-else-break,  # same...
     consider-using-enumerate,  # sometimes parallelism is better than enumerate.
+    consider-using-dict-items,  # readability improvement depends on excellent variable names
     arguments-differ,  # we are not purists.
+    arguments-renamed,  # same
     simplifiable-if-statement,  # simpler to a computer maybe...
     unsubscriptable-object,  # too many errors
     import-outside-toplevel,  # allow for import music21, etc.

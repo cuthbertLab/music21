@@ -223,9 +223,9 @@ def pitchToSharps(value, mode=None):
     '''
     if isinstance(value, str):
         value = pitch.Pitch(value)
-    elif 'Pitch' in value.classes:
+    elif isinstance(value, pitch.Pitch):
         pass
-    elif 'Note' in value.classes:
+    elif isinstance(value, note.Note):
         value = value.pitch
     else:
         raise KeyException('Cannot get a sharp number from value')
@@ -527,9 +527,9 @@ class KeySignature(base.Music21Object):
         for p in newAlteredPitches:
             if not hasattr(p, 'classes'):
                 newList.append(pitch.Pitch(p))
-            elif 'Pitch' in p.classes:
+            elif isinstance(p, pitch.Pitch):
                 newList.append(p)
-            elif 'Note' in p.classes:
+            elif isinstance(p, note.Note):
                 newList.append(copy.deepcopy(p.pitch))
         self._alteredPitches = newList
 
@@ -895,8 +895,7 @@ class Key(KeySignature, scale.DiatonicScale):
     def __init__(self,
                  tonic: Union[str, pitch.Pitch, note.Note] = 'C',
                  mode=None):
-        if hasattr(tonic, 'classes') and ('Music21Object' in tonic.classes
-                                          or 'Pitch' in tonic.classes):
+        if isinstance(tonic, (base.Music21Object, pitch.Pitch)):
             if hasattr(tonic, 'name'):
                 tonic = tonic.name
             elif hasattr(tonic, 'pitches') and tonic.pitches:  # chord w/ >= 1 pitch
@@ -925,7 +924,7 @@ class Key(KeySignature, scale.DiatonicScale):
         KeySignature.__init__(self, sharps)
         scale.DiatonicScale.__init__(self, tonic=tonic)
 
-        if hasattr(tonic, 'classes') and 'Pitch' in tonic.classes:
+        if isinstance(tonic, pitch.Pitch):
             self.tonic = tonic
         else:
             self.tonic = pitch.Pitch(tonic)
@@ -1275,7 +1274,8 @@ class Test(unittest.TestCase):
         self.assertEqual(a.sharps, 0)
 
     def testTonalAmbiguityA(self):
-        from music21 import corpus, stream
+        from music21 import corpus
+        from music21 import stream
         # s = corpus.parse('bwv64.2')
         # k = s.analyze('KrumhanslSchmuckler')
         # k.tonalCertainty(method='correlationCoefficient')

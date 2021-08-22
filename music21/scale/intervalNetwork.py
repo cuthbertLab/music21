@@ -34,9 +34,10 @@ import unittest
 
 from collections import OrderedDict
 
+from music21 import common
 from music21 import exceptions21
 from music21 import interval
-from music21 import common
+from music21 import note
 from music21 import pitch
 from music21 import prebase
 
@@ -2310,7 +2311,7 @@ class IntervalNetwork:
 
         if isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
-        elif 'Note' in pitchTarget.classes:
+        elif isinstance(pitchTarget, note.Note):
             pitchTarget = pitchTarget.pitch
 
         saveOctave = pitchTarget.octave

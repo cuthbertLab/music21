@@ -5,9 +5,9 @@ documentation improvements. The
 
 ## Resources ##
 
-[Module Documentation and User's Guide](http://web.mit.edu/music21/doc/index.html)
+[Module Documentation and User's Guide](https://web.mit.edu/music21/doc/index.html)
 
-[Developer Reference](http://web.mit.edu/music21/doc/developerReference/index.html)
+[Developer Reference](https://web.mit.edu/music21/doc/developerReference/index.html)
 
 [Mailing List](https://groups.google.com/forum/#!forum/music21list)
 
@@ -81,7 +81,7 @@ Conventions:
     - keyword arguments should be keyword-only by using `*`
       to consume any other positional arguments: `def makeNoise(self, volume, *, color=noise.Pink):`
     - avoid generic `**kwargs`; make keywords explicit
-  - use [Sphinx formatting](http://web.mit.edu/music21/doc/developerReference/documenting.html#documenting-modules-and-classes)
+  - use [Sphinx formatting](https://web.mit.edu/music21/doc/developerReference/documenting.html#documenting-modules-and-classes)
       to link to classes and methods in docstrings
   - use descriptive pull request titles (rather than GitHub's default "Update pitch.py")
 
@@ -90,7 +90,7 @@ Conventions:
 
 We write doctests and unit tests, and we strive for the total
 test coverage of the project to increase with every pull request. See the
-[developer docs](http://web.mit.edu/music21/doc/developerReference/index.html)
+[developer docs](https://web.mit.edu/music21/doc/developerReference/index.html)
 to dig in to specific topics like adjusting doctests to prevent
 actions we don't want executed when running the general test suite (such as opening
 browser windows or playing music).

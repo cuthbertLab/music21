@@ -18,16 +18,17 @@ import re
 # import sys
 # import traceback
 import unittest
+import warnings
 
 from math import isclose
-from typing import List, Optional, Dict, Tuple, Set
+from typing import List, Optional, Dict, Tuple, Set, Union
 
 import xml.etree.ElementTree as ET
 
 from music21 import common
 from music21 import exceptions21
 from music21.musicxml import xmlObjects
-from music21.musicxml.xmlObjects import MusicXMLImportException
+from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
 
 # modules that import this include converter.py.
 # thus, cannot import these here
@@ -50,6 +51,7 @@ from music21 import layout
 from music21 import metadata
 from music21 import note
 from music21 import meter
+from music21 import percussion
 from music21 import pitch
 from music21 import repeat
 from music21 import spanner
@@ -383,9 +385,9 @@ class XMLParserBase:
             if mxValue is None:
                 continue
 
-            if m21Name in xmlObjects.STYLE_ATTRIBUTES_STR_NONE_TO_NONE and mxValue == 'none':
+            if mxValue == 'none' and m21Name in xmlObjects.STYLE_ATTRIBUTES_STR_NONE_TO_NONE:
                 mxValue = None
-            if m21Name in xmlObjects.STYLE_ATTRIBUTES_YES_NO_TO_BOOL:
+            elif m21Name in xmlObjects.STYLE_ATTRIBUTES_YES_NO_TO_BOOL:
                 mxValue = xmlObjects.yesNoToBoolean(mxValue)
 
             try:
@@ -1586,17 +1588,44 @@ class PartParser(XMLParserBase):
 
         seta = _setAttributeFromTagText
 
-        # print(ET.tostring(mxScorePart, encoding='unicode'))
-        i = instrument.Instrument()
+        # for now, just get first midi instrument
+        # TODO: get all
+        # TODO: midi-device
+        # TODO: midi-name
+        # TODO: midi-bank transform=_adjustMidiData
+        # TODO: midi-unpitched
+        # TODO: midi-volume
+        # TODO: pan
+        # TODO: elevation
+        # TODO: store id attribute somewhere
+        mxMIDIInstrument = mxScorePart.find('midi-instrument')
+        i: Optional[instrument.Instrument] = None
+        if mxMIDIInstrument is not None:
+            mxMidiProgram = mxMIDIInstrument.find('midi-program')
+            if textStripValid(mxMidiProgram):
+                try:
+                    i = instrument.instrumentFromMidiProgram(_adjustMidiData(mxMidiProgram.text))
+                except instrument.InstrumentException as ie:
+                    warnings.warn(MusicXMLWarning(ie))
+                    # Invalid MIDI program, out of range 0-127
+                    i = instrument.Instrument()
+                seta(i, mxMIDIInstrument, 'midi-channel', transform=_adjustMidiData)
+        if i is None:
+            # This catches textStripValid() returning False or no mxMIDIInstrument
+            i = instrument.Instrument()
+
+        # for now, just get first instrument
+        # TODO: get all instruments!
+        mxScoreInstrument = mxScorePart.find('score-instrument')
+        if isinstance(i, instrument.Piano) and mxScoreInstrument is not None:
+            i = self.reclassifyInstrumentFromName(i, mxScoreInstrument)
+
         i.partId = self.partId
         i.groups.append(self.partId)
         i.partName = self.stream.partName
         i.partAbbreviation = self.stream.partAbbreviation
         # TODO: groups
 
-        # for now, just get first instrument
-        # TODO: get all instruments!
-        mxScoreInstrument = mxScorePart.find('score-instrument')
         if mxScoreInstrument is not None:
             seta(i, mxScoreInstrument, 'instrument-name', transform=_clean)
             seta(i, mxScoreInstrument, 'instrument-abbreviation', transform=_clean)
@@ -1605,22 +1634,19 @@ class PartParser(XMLParserBase):
         # TODO: virtual-instrument
         # TODO: store id attribute somewhere
 
-        # for now, just get first midi instrument
-        # TODO: get all
-        # TODO: midi-device
-        mxMIDIInstrument = mxScorePart.find('midi-instrument')
-        # TODO: midi-name
-        # TODO: midi-bank transform=_adjustMidiData
-        # TODO: midi-unpitched
-        # TODO: midi-volume
-        # TODO: pan
-        # TODO: elevation
-        # TODO: store id attribute somewhere
-        if mxMIDIInstrument is not None:
-            seta(i, mxMIDIInstrument, 'midi-program', transform=_adjustMidiData)
-            seta(i, mxMIDIInstrument, 'midi-channel', transform=_adjustMidiData)
+        return i
 
-        # TODO: reclassify
+    @staticmethod
+    def reclassifyInstrumentFromName(
+            i: instrument.Instrument, mxScoreInstrument: ET.Element) -> instrument.Instrument:
+        mxInstrumentName = mxScoreInstrument.find('instrument-name')
+        if mxInstrumentName is not None and textStripValid(mxInstrumentName):
+            previous_midi_channel = i.midiChannel
+            try:
+                i = instrument.fromString(mxInstrumentName.text.strip())
+            except instrument.InstrumentException:
+                i = instrument.Instrument()
+            i.midiChannel = previous_midi_channel
         return i
 
     def parseMeasures(self):
@@ -1874,8 +1900,9 @@ class PartParser(XMLParserBase):
                 # no need for a change of instrument
                 pass
                 # environLocal.warn('Put trans on active instrument')
-            else:
-                # We have an activeInstrument, so this change of transposition
+            elif self.activeInstrument.transposition != newTransposition:
+                # We have an activeInstrument with a transposition that does
+                # not match, so this change of transposition
                 # requires us to create a new one (think of physical instruments
                 # such as Bb clarinet to A clarinet.
                 newInst = copy.deepcopy(self.activeInstrument)
@@ -1893,7 +1920,7 @@ class PartParser(XMLParserBase):
 
         # STEP 2:
         # Actually change the transposition of the instrument
-        # and note that the score is definitely NOT all at sounding pitch
+        # and note that the part is definitely NOT all at sounding pitch
         self.activeInstrument.transposition = newTransposition
         self.atSoundingPitch = False
 
@@ -1989,8 +2016,8 @@ class PartParser(XMLParserBase):
         Fills an empty measure with a measure of rest (bug in PDFtoMusic and
         other MusicXML writers).
 
-        sets self.lastMeasureWasShort to True or False if it is an incomplete measure
-        that is not a pickup.
+        Sets self.lastMeasureWasShort to True or False if it is an incomplete measure
+        that is not a pickup and sets paddingRight.
 
         >>> m = stream.Measure([meter.TimeSignature('4/4'), harmony.ChordSymbol('C7')])
         >>> m.highestTime
@@ -2002,6 +2029,17 @@ class PartParser(XMLParserBase):
         4.0
         >>> PP.lastMeasureWasShort
         False
+
+        Incomplete final measure:
+
+        >>> m = stream.Measure([meter.TimeSignature('6/8'), note.Note(), note.Note()])
+        >>> m.offset = 24.0
+        >>> PP = musicxml.xmlToM21.PartParser()
+        >>> PP.lastMeasureOffset = 21.0
+        >>> PP.setLastMeasureInfo(m)
+        >>> PP.adjustTimeAttributesFromMeasure(m)
+        >>> m.paddingRight
+        1.0
         '''
         # note: we cannot assume that the time signature properly
         # describes the offsets w/n this bar. need to look at
@@ -2049,6 +2087,9 @@ class PartParser(XMLParserBase):
                         # or something
                         self.lastMeasureWasShort = False
                 else:
+                    # Incomplete measure that is likely NOT an anacrusis, set paddingRight
+                    if m.barDurationProportion() < 1.0:
+                        m.paddingRight = m.barDuration.quarterLength - m.highestTime
                     if mHighestTime < lastTimeSignatureQuarterLength:
                         self.lastMeasureWasShort = True
                     else:
@@ -2646,11 +2687,22 @@ class MeasureParser(XMLParserBase):
         >>> c = MP.xmlToChord([a, b])
         >>> c.getNotehead(c.pitches[0])
         'diamond'
+
+        >>> a = EL('<note><unpitched><display-step>A</display-step>'
+        ...        + '<display-octave>3</display-octave></unpitched>'
+        ...        + qnDuration
+        ...        + '<notehead>diamond</notehead></note>')
+        >>> MP.xmlToChord([a, b])
+        <music21.percussion.PercussionChord unpitched[A3] B3>
         '''
         notes = []
         for mxNote in mxNoteList:
             notes.append(self.xmlToSimpleNote(mxNote, freeSpanners=False))
-        c = chord.Chord(notes)
+
+        if any(mxNote.find('unpitched') for mxNote in mxNoteList):
+            c = percussion.PercussionChord(notes)
+        else:
+            c = chord.Chord(notes)
 
         # move beams from first note (TODO: confirm style moved already?)
         if notes:
@@ -2665,7 +2717,9 @@ class MeasureParser(XMLParserBase):
         seenArticulations = set()
         seenExpressions = set()
 
-        for n in sorted(notes, key=lambda x: x.pitch.ps):
+        sortKey = lambda x: x.pitch.ps if hasattr(x, 'pitch') else x.displayPitch().midi
+
+        for n in sorted(notes, key=sortKey):
             ss = n.getSpannerSites()
             # transfer all spanners from the notes to the chord.
             for sp in ss:
@@ -2687,7 +2741,7 @@ class MeasureParser(XMLParserBase):
         self.spannerBundle.freePendingSpannedElementAssignment(c)
         return c
 
-    def xmlToSimpleNote(self, mxNote, freeSpanners=True):
+    def xmlToSimpleNote(self, mxNote, freeSpanners=True) -> Union[note.Note, note.Unpitched]:
         # noinspection PyShadowingNames
         '''
         Translate a MusicXML <note> (without <chord/>)
@@ -2699,9 +2753,7 @@ class MeasureParser(XMLParserBase):
         If inputM21 is not `None` then that object is used
         for translating. Otherwise a new Note is created.
 
-        if freeSpanners is False then pending spanners will not be freed
-
-        Returns a `note.Note` object.
+        if freeSpanners is False then pending spanners will not be freed.
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
@@ -2739,10 +2791,17 @@ class MeasureParser(XMLParserBase):
         # TODO: beams over rests?
         '''
         d = self.xmlToDuration(mxNote)
-        n = note.Note(duration=d)
 
-        # send whole note since accidental display not in <pitch>
-        self.xmlToPitch(mxNote, n.pitch)
+        n = None
+
+        mxUnpitched = mxNote.find('unpitched')
+        if mxUnpitched is None:
+            # send whole note since accidental display not in <pitch>
+            n = note.Note(duration=d)
+            self.xmlToPitch(mxNote, n.pitch)
+        else:
+            n = note.Unpitched(duration=d)
+            self.xmlToUnpitched(mxUnpitched, n)
 
         beamList = mxNote.findall('beam')
         if beamList:
@@ -2994,6 +3053,42 @@ class MeasureParser(XMLParserBase):
             p.accidental.displayStatus = False
 
         return p
+
+    def xmlToUnpitched(self, mxUnpitched, inputM21=None) -> note.Unpitched:
+        '''
+        Set `displayStep` and `displayOctave` from `mxUnpitched`.
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.divisions = 10080
+
+        >>> mxNote = EL('<note><duration>7560</duration><type>eighth</type></note>')
+        >>> unpitched = EL('<unpitched>'
+        ...                + '<display-step>E</display-step>'
+        ...                + '<display-octave>5</display-octave>'
+        ...                + '</unpitched>')
+        >>> mxNote.append(unpitched)
+        >>> n = MP.xmlToSimpleNote(mxNote)
+        >>> n.displayStep
+        'E'
+        >>> n.displayOctave
+        5
+        >>> n.displayPitch().midi
+        76
+        '''
+        if inputM21 is None:
+            unp = note.Unpitched()
+        else:
+            unp = inputM21
+
+        mxDisplayStep = mxUnpitched.find('display-step')
+        mxDisplayOctave = mxUnpitched.find('display-octave')
+        if textStripValid(mxDisplayStep):
+            unp.displayStep = mxDisplayStep.text.strip()
+        if textStripValid(mxDisplayOctave):
+            unp.displayOctave = int(mxDisplayOctave.text.strip())
+
+        return unp
 
     def xmlToAccidental(self, mxAccidental, inputM21=None):
         '''
@@ -4362,10 +4457,10 @@ class MeasureParser(XMLParserBase):
         m = self.stream
         if not textStripValid(mxVoice):
             useVoice = self.lastVoice
-            if useVoice is None:
-                environLocal.warn('Cannot put in an element with a missing voice tag when '
-                                  + 'no previous voice tag was given.  Assuming voice 1... '
-                                  )
+            if useVoice is None:  # pragma: no cover
+                environLocal.warn(
+                    'Cannot put in an element with a missing voice tag when '
+                    + 'no previous voice tag was given.  Assuming voice 1... ')
                 useVoice = 1
         else:
             useVoice = mxVoice.text.strip()
@@ -4777,8 +4872,7 @@ class MeasureParser(XMLParserBase):
                 d = dynamics.Dynamic(m21DynamicText)
 
                 _synchronizeIds(dyn, d)
-                _setAttributeFromAttribute(d, mxDirection,
-                                           'placement', 'positionPlacement')
+                _setAttributeFromAttribute(d, mxDirection, 'placement', 'placement')
 
                 self.insertCoreAndRef(totalOffset, staffKey, d)
                 self.setPosition(mxDir, d)
@@ -4809,6 +4903,7 @@ class MeasureParser(XMLParserBase):
         elif tag == 'metronome':
             mm = self.xmlToTempoIndication(mxDir)
             # SAX was offsetMeasureNote; bug? should be totalOffset???
+            _setAttributeFromAttribute(mm, mxDirection, 'placement', 'placement')
             self.insertCoreAndRef(totalOffset, staffKey, mm)
             self.setEditorial(mxDirection, mm)
 
@@ -4823,8 +4918,7 @@ class MeasureParser(XMLParserBase):
             # environLocal.printDebug(['got TextExpression object', repr(te)])
             # offset here is a combination of the current position
             # (offsetMeasureNote) and and the direction's offset
-            _setAttributeFromAttribute(textExpression, mxDirection,
-                                       'placement', 'positionPlacement')
+            _setAttributeFromAttribute(textExpression, mxDirection, 'placement', 'placement')
 
             repeatExpression = textExpression.getRepeatExpression()
             if repeatExpression is not None:
@@ -6166,14 +6260,19 @@ class Test(unittest.TestCase):
         iStream1 = s.parts[0].flat.getElementsByClass('Instrument').stream()
         # three instruments; one initial, and then one for each transposition
         self.assertEqual(len(iStream1), 3)
+        i1 = iStream1[0]
+        self.assertIsInstance(i1, instrument.Oboe)
+
         # should be 3
         iStream2 = s.parts[1].flat.getElementsByClass('Instrument').stream()
         self.assertEqual(len(iStream2), 3)
-        # i2 = iStream2[0]
+        i2 = iStream2[0]
+        self.assertIsInstance(i2, instrument.Clarinet)
 
         iStream3 = s.parts[2].flat.getElementsByClass('Instrument').stream()
         self.assertEqual(len(iStream3), 1)
         i3 = iStream3[0]
+        self.assertIsInstance(i3, instrument.Horn)
 
         self.assertEqual(str(iStream1[0].transposition), 'None')
         self.assertEqual(str(iStream1[1].transposition), '<music21.interval.Interval P-5>')
@@ -7010,6 +7109,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testFiles.tabTest)
         metro = s.recurse().getElementsByClass('MetronomeMark').first()
         self.assertEqual(metro.style.absoluteY, 40)
+        self.assertEqual(metro.placement, 'above')
 
 
 if __name__ == '__main__':

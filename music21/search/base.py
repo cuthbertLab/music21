@@ -24,6 +24,7 @@ from more_itertools import windowed
 from music21 import base as m21Base
 from music21 import exceptions21
 from music21 import duration
+from music21 import note
 from music21.stream import filters
 
 __all__ = [
@@ -1079,7 +1080,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
             measureNotes = thisMeasure.notes
             foundNote = False
             for i in range(len(measureNotes)):
-                if 'Note' in measureNotes[i].classes:
+                if isinstance(measureNotes[i], note.Note):
                     distanceToTranspose = 72 - measureNotes[0].pitch.ps
                     foundNote = True
                     break
