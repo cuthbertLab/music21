@@ -13469,6 +13469,7 @@ class Part(Stream):
         else:  # in place
             return None
 
+
 class PartStaff(Part):
     '''
     A Part subclass for designating music that is
