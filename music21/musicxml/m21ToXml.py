@@ -3669,7 +3669,7 @@ class MeasureExporter(XMLExporterBase):
         self.xmlRoot.append(mxNote)
         return mxNote
 
-    def setNoteInstrument(self, n: note.NotRest, chordParent: Optional[note.Chord]):
+    def setNoteInstrument(self, n: note.NotRest, chordParent: Optional[chord.Chord]):
         # instrument tags are necessary when there is more than one
         # instrument anywhere in the same musicxml <part>
         if self.parent is None:
