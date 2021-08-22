@@ -577,13 +577,13 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             c = inputM21
             c.duration = ticksToDuration(tOff - tOn, ticksPerQuarter, c.duration)
     else:
-        environLocal.warn(['midi chord with zero duration will be treated as grace',
-                            eventList, c])
         # for now, get grace
         if inputM21 is None:
             c = chord.Chord()
         else:
             c = inputM21
+        environLocal.warn(['midi chord with zero duration will be treated as grace',
+                            eventList, c])
         c.getGrace(inPlace=True)
 
     c.pitches = pitches
