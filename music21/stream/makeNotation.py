@@ -1472,8 +1472,7 @@ def makeTupletBrackets(s, *, inPlace=False):
                 # environLocal.printDebug(['completion count, target:',
                 #                          completionCount, completionTarget])
 
-    if returnObj:
-        returnObj.streamStatus.tuplets = True
+    returnObj.streamStatus.tuplets = True
 
     if not inPlace:
         return returnObj
