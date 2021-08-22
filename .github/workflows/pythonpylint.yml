@@ -23,7 +23,7 @@ jobs:
                   python -m pip install --upgrade pip
                   pip install -r requirements.txt
                   pip install IPython
-                  pip install pylint
+                  pip install pylint==2.9.6
             - name: Lint with pylint
               run: |
                   pylint -j0 music21

@@ -34,7 +34,7 @@ class ChoraleList:
     iterate over one of the other lists to get them all.
 
     The list of chorales comes from
-    http://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
+    https://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
     which does not have all chorales in the Bärenreitter-Kirnberger or Riemenschneider
     numberings since it only includes BWV 250-438.
 
@@ -81,8 +81,8 @@ class ChoraleList:
 
         etc.
         '''
-        # From http://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
-        # CC license. http://en.wikipedia.org/wiki/WP:CC-BY-SA
+        # From https://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
+        # CC license. https://en.wikipedia.org/wiki/WP:CC-BY-SA
         # Some of these are problematic--I have removed them for now: --Evan Lynch
         # |Seelen-Bräutigam||409||0||5||306||141||Actually 5a in Bärenreiter, not in Kalmus
         # |-
@@ -1779,13 +1779,15 @@ class BachException(exceptions21.Music21Exception):
 # class Test(unittest.TestCase):
 #     pass
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testGetRiemenschneider1(self):
         from music21 import corpus
         for chorale in corpus.chorales.Iterator(1, 2,
                                                 numberingSystem='riemenschneider', analysis=True):
-            chorale.show()
+            if self.show:
+                chorale.show()
 
 
 if __name__ == '__main__':

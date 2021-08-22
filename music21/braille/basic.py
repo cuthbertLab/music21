@@ -14,6 +14,7 @@ from typing import List
 
 # from music21 import articulations
 from music21 import clef
+from music21 import duration
 from music21 import environment
 from music21 import exceptions21
 from music21 import interval
@@ -743,7 +744,7 @@ def noteToBraille(
 
     # note duration
     # -------------
-    if 'GraceDuration' in music21Note.duration.classes:
+    if isinstance(music21Note.duration, duration.GraceDuration):
         # TODO: Short Appoggiatura mark...
         nameWithDuration = notesInStep['eighth']
         noteTrans.append(nameWithDuration)
@@ -1268,10 +1269,7 @@ def transcribeHeading(
 
 def transcribeNoteFingering(sampleNoteFingering='1', upperFirstInFingering=True):
     '''
-    Takes in a note fingering, an attribute :attr:`~music21.note.Note.editorial.fingering`, and
-    returns its correct transcription to braille. Fingering is not officially supported
-    by music21, but it is described in Chapter 9 of the "Introduction to Braille Music
-    Transcription" manual.
+    Takes in a note fingering and returns its correct transcription to braille.
 
     >>> from music21.braille import basic
     >>> print(basic.transcribeNoteFingering('4'))
@@ -1423,9 +1421,9 @@ def brailleUnicodeToBrailleAscii(brailleUnicode):
 
 
     .. note:: The function works by corresponding braille symbols to ASCII symbols.
-        The table which corresponds said values can be found
-        `here <http://en.wikipedia.org/wiki/Braille_ASCII#Braille_ASCII_values>`_.
-        Because of the way in which the braille symbols translate2, the resulting
+        The table which corresponds to said values can be found
+        `here <https://en.wikipedia.org/wiki/Braille_ASCII#Braille_ASCII_values>`_.
+        Because of the way in which the braille symbols translate, the resulting
         ASCII string will look to a non-reader as gibberish. Also, the eighth-note notes
         in braille
         music are one-off their corresponding letters in both ASCII and written braille.

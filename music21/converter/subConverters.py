@@ -23,7 +23,6 @@ import io
 import os
 import pathlib
 import subprocess
-import sys
 import unittest
 
 from typing import Union
@@ -501,7 +500,7 @@ class ConverterBraille(SubConverter):
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
         from music21 import braille
-        dataStr = braille.translate.objectToBraille(obj)
+        dataStr = braille.translate.objectToBraille(obj, **keywords)
         if subformats is not None and 'ascii' in subformats:
             dataStr = braille.basic.brailleUnicodeToBrailleAscii(dataStr)
         fp = self.writeDataStream(fp, dataStr)
@@ -786,7 +785,6 @@ class ConverterNoteworthy(SubConverter):
         '''
         Open Noteworthy data (as nwctxt) from a file path.
 
-        >>> import os #_DOCS_HIDE
         >>> nwcTranslatePath = common.getSourceFilePath() / 'noteworthy' #_DOCS_HIDE
         >>> filePath = nwcTranslatePath / 'Part_OWeisheit.nwctxt' #_DOCS_HIDE
         >>> #_DOCS_SHOW paertPath = converter.parse('d:/desktop/arvo_part_o_weisheit.nwctxt')
@@ -829,7 +827,7 @@ class ConverterMusicXML(SubConverter):
     Users should not need this Object.  Call converter.parse directly
     '''
     registerFormats = ('musicxml', 'xml')
-    registerInputExtensions = ('xml', 'mxl', 'mx', 'musicxml')
+    registerInputExtensions = ('xml', 'mxl', 'musicxml')
     registerOutputExtensions = ('musicxml', 'xml', 'mxl')
     registerOutputSubformatExtensions = {'png': 'png',
                                          'pdf': 'pdf',
@@ -942,12 +940,17 @@ class ConverterMusicXML(SubConverter):
 
             musescoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
 
-        storedStrErr = sys.stderr
-        fileLikeOpen = io.StringIO()
-        sys.stderr = fileLikeOpen
-        subprocess.run(musescoreRun, check=False)
-        fileLikeOpen.close()
-        sys.stderr = storedStrErr
+        completed_process = subprocess.run(musescoreRun, capture_output=True, check=False)
+        if completed_process.returncode != 0:
+            # Raise same exception class as findNumberedPNGPath()
+            # for backward compatibility
+            stderr_bytes = completed_process.stderr
+            try:
+                import locale
+                stderr_str = stderr_bytes.decode(locale.getpreferredencoding(do_setlocale=False))
+            except UnicodeDecodeError:
+                stderr_str = stderr_bytes  # not really a str, but best we can do.
+            raise SubConverterFileIOException(stderr_str)
 
         if common.runningUnderIPython() and common.getPlatform() == 'nix':
             # Leave environment in original state
@@ -1002,10 +1005,24 @@ class ConverterMusicXML(SubConverter):
 
         return fp
 
-    def write(self, obj, fmt, fp=None, subformats=None,
-              compress=False, **keywords):  # pragma: no cover
+    def write(self,
+              obj,
+              fmt,
+              *,
+              fp=None,
+              subformats=None,
+              makeNotation=True,
+              compress=False,
+              **keywords):  # pragma: no cover
         '''
         Write to a .musicxml file.
+
+        Set `makeNotation=False` to prevent fixing up the notation, and where possible,
+        to prevent making additional deepcopies. (This option cannot be used if `obj` is not a
+        :class:`~music21.stream.Score`.) `makeNotation=True` generally solves common notation
+        issues, whereas `makeNotation=False` is intended for advanced users facing
+        special cases where speed is a priority or making notation reverses user choices.
+
         Set `compress=True` to immediately compress the output to a .mxl file.
         '''
         from music21.musicxml import archiveTools, m21ToXml
@@ -1019,8 +1036,10 @@ class ConverterMusicXML(SubConverter):
             defaults.title = ''
             defaults.author = ''
 
+        dataBytes: bytes = b''
         generalExporter = m21ToXml.GeneralObjectExporter(obj)
-        dataBytes: bytes = generalExporter.parse()
+        generalExporter.makeNotation = makeNotation
+        dataBytes = generalExporter.parse()
 
         writeDataStreamFp = fp
         if fp is not None and subformats:  # could be empty list
@@ -1494,13 +1513,62 @@ class Test(unittest.TestCase):
         self.assertTrue(str(mxlPath).endswith('.mxl'))
         os.remove(mxlPath)
 
+    def testWriteMusicXMLMakeNotation(self):
+        from music21 import converter
+        from music21 import note
+        from music21.musicxml.xmlObjects import MusicXMLExportException
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+        m1 = stream.Measure(note.Note(quarterLength=5.0))
+        m2 = stream.Measure()
+        p = stream.Part([m1, m2])
+        s = stream.Score(p)
+
+        self.assertEqual(len(m1.notes), 1)
+        self.assertEqual(len(m2.notes), 0)
+
+        out1 = s.write(makeNotation=True)
+        # 4/4 will be assumed; quarter note will be moved to measure 2
+        roundtrip_back = converter.parse(out1)
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 1)
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 1)
+
+        out2 = s.write(makeNotation=False)
+        roundtrip_back = converter.parse(out2)
+        # 4/4 will not be assumed; quarter note will still be split out from 5.0QL
+        # but it will remain in measure 1
+        # and there will be no rests in measure 2
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 2)
+        self.assertEqual(
+            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 0)
+
+        # makeNotation = False cannot be used on non-scores
+        with self.assertRaises(MusicXMLExportException):
+            p.write(makeNotation=False)
+
+        for out in (out1, out2):
+            os.remove(out)
+
+    def testBrailleKeywords(self):
+        from music21 import converter
+
+        p = converter.parse('tinyNotation: c1 d1 e1 f1')
+        out = p.write('braille', debug=True)
+        with open(out, 'r') as f:
+            self.assertIn('<music21.braille.segment BrailleSegment>', f.read())
+        os.remove(out)
+
+
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testXMLShow(self):
         from music21 import corpus
         c = corpus.parse('bwv66.6')
-        c.show()  # musicxml
+        if self.show:
+            c.show()  # musicxml
 
     def testWriteLilypond(self):
         from music21 import note
@@ -1508,18 +1576,21 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         n.duration.type = 'whole'
         s = stream.Stream()
         s.append(n)
-        s.show('lily.png')
-        print(s.write('lily.png'))
+        if self.show:
+            s.show('lily.png')
+            print(s.write('lily.png'))
 
     def testMultiPageXMlShow1(self):
         '''
         tests whether show() works for music that is 10-99 pages long
         '''
-        from music21 import omr, converter
+        from music21 import omr
+        from music21 import converter
         K525 = omr.correctors.K525groundTruthFilePath
         K525 = converter.parse(K525)
-        K525.show('musicxml.png')
-        print(K525.write('musicxml.png'))
+        if self.show:
+            K525.show('musicxml.png')
+            print(K525.write('musicxml.png'))
 
     # def testMultiPageXMlShow2(self):
     #     '''

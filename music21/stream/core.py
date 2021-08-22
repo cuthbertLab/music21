@@ -399,7 +399,7 @@ class StreamCoreMixin:
         Traceback (most recent call last):
         music21.exceptions21.StreamException: this Stream cannot be contained within itself
 
-        >>> s.append(s.iter)
+        >>> s.append(s.iter())
         Traceback (most recent call last):
         music21.exceptions21.StreamException: cannot insert StreamIterator into a Stream
         Iterate over it instead (User's Guide chs. 6 and 26)
@@ -694,7 +694,7 @@ class StreamCoreMixin:
         if recurse is True:
             sIter = self.recurse()
         else:
-            sIter = self.iter
+            sIter = self.iter()
 
         collectList = []
         for el in list(sIter):

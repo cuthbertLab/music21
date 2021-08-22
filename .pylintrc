@@ -62,7 +62,6 @@ disable=
     unnecessary-pass,  #  not really a problem..
     locally-disabled,  # test for this later, but hopefully will know what we're doing
     duplicate-code,   # needs to ignore strings -- keeps getting doctests...
-    abstract-class-instantiated,  # this trips on the fractions.Fraction() class.
     fixme,  # obviously known
     superfluous-parens,  # nope -- if they make things clearer...
     too-many-statements,  # someday
@@ -98,7 +97,9 @@ disable=
     no-else-continue,  # not so bad...
     no-else-break,  # same...
     consider-using-enumerate,  # sometimes parallelism is better than enumerate.
+    consider-using-dict-items,  # readability improvement depends on excellent variable names
     arguments-differ,  # we are not purists.
+    arguments-renamed,  # same
     simplifiable-if-statement,  # simpler to a computer maybe...
     unsubscriptable-object,  # too many errors
     import-outside-toplevel,  # allow for import music21, etc.

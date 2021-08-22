@@ -128,14 +128,17 @@ def plotStream(
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testAll(self):
-        from music21 import corpus, dynamics
+        from music21 import corpus
+        from music21 import dynamics
         a = corpus.parse('bach/bwv57.8')
         a.parts[0].insert(0, dynamics.Dynamic('mf'))
         a.parts[0].insert(10, dynamics.Dynamic('f'))
-        plotStream(a, 'all')
+        if self.show:
+            plotStream(a, 'all')
 
 
 class Test(unittest.TestCase):
@@ -169,7 +172,10 @@ class Test(unittest.TestCase):
         plotStream(a.flat, doneAction=None)
 
     def testPlotChordsC(self):
-        from music21 import dynamics, note, stream, scale
+        from music21 import dynamics
+        from music21 import note
+        from music21 import stream
+        from music21 import scale
 
         sc = scale.MajorScale('c4')
 
@@ -202,7 +208,8 @@ class Test(unittest.TestCase):
             s.plot(*args, doneAction=None)
 
     def testHorizontalInstrumentationB(self):
-        from music21 import corpus, dynamics
+        from music21 import corpus
+        from music21 import dynamics
         s = corpus.parse('bwv66.6')
         dyn = ['p', 'mf', 'f', 'ff', 'mp', 'fff', 'ppp']
         i = 0
