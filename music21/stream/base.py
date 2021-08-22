@@ -3205,7 +3205,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # import is here to avoid import of matplotlib problems
         from music21 import graph
         # first ordered arg can be method type
-        graph.plotStream(self, *args, **keywords)
+        return graph.plotStream(self, *args, **keywords)
 
     def analyze(self, *args, **keywords):
         '''
@@ -5079,7 +5079,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classSet:
-            for partLike in returnObj.getElementsByClass(Stream):
+            for partLike in returnObj.getElementsByClass('Stream'):
                 # call on each part
                 partLike.toSoundingPitch(inPlace=True)
             returnObj.atSoundingPitch = True
@@ -5134,7 +5134,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         if returnObj.hasPartLikeStreams() or 'Opus' in returnObj.classes:
-            for partLike in returnObj.getElementsByClass(Stream):
+            for partLike in returnObj.getElementsByClass('Stream'):
                 # call on each part
                 partLike.toWrittenPitch(inPlace=True)
             returnObj.atSoundingPitch = False
@@ -13454,7 +13454,7 @@ class Part(Stream):
         else:
             returnObj = self
         # process make accidentals for each measure
-        measureStream = returnObj.getElementsByClass(Measure)
+        measureStream = returnObj.getElementsByClass('Measure')
         makeNotation.makeAccidentalsInMeasureStream(
             measureStream,
             alteredPitches=alteredPitches,
@@ -14134,7 +14134,7 @@ class Opus(Stream):
         Return all :class:`~music21.stream.Score` objects
         in an iterator
         '''
-        return self.getElementsByClass(Score)
+        return self.getElementsByClass('Score')  # replacing with bare Score is not working.
 
     def mergeScores(self):
         # noinspection PyShadowingNames
@@ -14156,7 +14156,7 @@ class Opus(Stream):
         mdNew = metadata.Metadata()
 
         for s in self.scores:
-            p = s.parts.first()  # assuming only one part
+            p = s.parts.first().makeNotation()  # assuming only one part
             sNew.insert(0, p)
 
             md = s.metadata

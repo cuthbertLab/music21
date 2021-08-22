@@ -113,6 +113,8 @@ def plotStream(
     '''
     plotMake = findPlot.getPlotsToMake(graphFormat, xValue, yValue, zValue)
     # environLocal.printDebug(['plotClassName found', plotMake])
+
+    obj = None
     for plotInfo in plotMake:
         if not common.isIterable(plotInfo):
             plotClassName = plotInfo
@@ -126,6 +128,8 @@ def plotStream(
                 setattr(obj, attrName, axisClass(obj, axisName))
         obj.run()
 
+    if obj:
+        return obj  # just first one...
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):

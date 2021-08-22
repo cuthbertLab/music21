@@ -1584,7 +1584,10 @@ class PartParser(XMLParserBase):
             mxScorePart = self.mxScorePart
 
         def _adjustMidiData(mc):
-            return int(mc) - 1
+            adjusted = int(mc) - 1
+            if adjusted == -1:
+                adjusted = 0  # a lot of zero indexed pianos...
+            return adjusted
 
         seta = _setAttributeFromTagText
 

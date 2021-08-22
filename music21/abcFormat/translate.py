@@ -222,6 +222,12 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     for sp in rm:
         spannerBundle.remove(sp)
     p.coreElementsChanged()
+
+    # first_ts = p[meter.TimeSignature].first()
+    # ts_ql = first_ts.barDuration.quarterLength if first_ts else 4.0
+    # if p.highestTime >= ts_ql * 3:
+    #     p = p.makeMeasures()
+
     return p
 
 
@@ -441,7 +447,6 @@ def abcToStreamScore(abcHandler, inputM21=None):
     s.coreElementsChanged()
     return s
 
-
 def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     '''Convert a multi-work stream into one or more complete works packed into a an Opus Stream.
 
@@ -463,11 +468,12 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
             opus = abcToStreamScore(abcDict[number])  # return a score, not an opus
         else:  # build entire opus into an opus stream
             scoreList = []
-            for key in sorted(abcDict.keys()):
+            for key, value in sorted(abcDict.items()):
                 # do not need to set work number, as that will be gathered
                 # with meta data in abcToStreamScore
                 try:
-                    scoreList.append(abcToStreamScore(abcDict[key]))
+                    sc = abcToStreamScore(value)
+                    scoreList.append(sc)
                 except IndexError:
                     environLocal.warn(f'Failure for piece number {key}')
             for scoreDocument in scoreList:

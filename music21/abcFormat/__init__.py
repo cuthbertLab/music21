@@ -2774,7 +2774,6 @@ class ABCHandler:
         Returns True if this token structure defines Measures in a normal Measure form.
         Otherwise False
 
-
         >>> abcStr = ('M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" ' +
         ...     'snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" ' +
         ...     'snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" ' +

@@ -59,7 +59,7 @@ class WindowedAnalysis:
         if not isinstance(streamObj, stream.Stream):
             raise WindowedAnalysisException('non-stream provided as argument')
         if streamObj.hasPartLikeStreams():
-            raise WindowedAnalysisException('part-like substreams are not supported; use .flat')
+            streamObj = streamObj.flat  # part-like substreams not supported.
         self._srcStream = streamObj
         # store a windowed Stream, partitioned into bars of 1/4
         self._windowedStream = self.getMinimumWindowStream()
