@@ -2625,11 +2625,11 @@ class PartExporter(XMLExporterBase):
         if self.parent is None:
             return False
 
-        groups = self.parent.groupsToJoin
-        if len(groups) < 2:
+        # This is a list of StaffGroups, not PartStaffs, so check if any
+        if not self.parent.groupsToJoin:
             return False
 
-        for joined_group in groups:
+        for joined_group in self.parent.groupsToJoin:
             if joined_group.isFirst(self.stream):
                 # need to insert instruments from subsequent staffs
                 for subsequent_staff in joined_group[1:]:
