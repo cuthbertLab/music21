@@ -2772,8 +2772,8 @@ class PartExporter(XMLExporterBase):
                     or inst.midiProgram is not None):
                 mxScorePart.append(self.instrumentToXmlScoreInstrument(inst))
 
-        # now iterate again to get subsequent instruments to
-        # store as <midi-instrument>
+        # now iterate again to write <midi-instrument> tags for those
+        # same instruments, tags which must follow all <score-instrument> tags.
         for inst in self.instrumentStream:
             # TODO: disambiguate instrument instance with different midi programs?
             if inst is not self.instrumentStream[type(inst)].first():
