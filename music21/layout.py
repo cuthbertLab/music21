@@ -753,7 +753,7 @@ def getRegionMeasureNumbers(scoreIn, region='Page'):
     lastMeasureNumber = allMeasures.last().number
     measureStartList = [firstMeasureNumber]
     measureEndList = []
-    allAppropriateLayout = firstPart.flat.getElementsByClass(classesToReturn)
+    allAppropriateLayout = firstPart.flatten().getElementsByClass(classesToReturn)
 
     for pl in allAppropriateLayout:
         plMeasureNumber = pl.measureNumber
@@ -1302,7 +1302,7 @@ class LayoutScore(stream.Opus):
         thisStaff = self.pages[pageId].systems[systemId].staves[staffId]
 
         staffLayoutObject = None
-        allStaffLayoutObjects = list(thisStaff.flat.getElementsByClass('StaffLayout'))
+        allStaffLayoutObjects = list(thisStaff.flatten().getElementsByClass('StaffLayout'))
         if allStaffLayoutObjects:
             staffLayoutObject = allStaffLayoutObjects[0]
         if staffLayoutObject is None or staffLayoutObject.hidden is None:
@@ -1669,8 +1669,8 @@ class Test(unittest.TestCase):
         sl.rightMargin = 0
         s.getElementsByClass('Measure')[8].insert(0, sl)
 
-#         systemLayoutList = s.flat.getElementsByClass(music21.layout.SystemLayout)
-#         self.assertEqual(len(systemLayoutList), 4)
+        # systemLayoutList = s[music21.layout.SystemLayout]
+        # self.assertEqual(len(systemLayoutList), 4)
 
         # s.show()
         unused_raw = m21ToXml.GeneralObjectExporter().parse(s)
@@ -1680,7 +1680,7 @@ class Test(unittest.TestCase):
         c = corpus.parse('luca/gloria').parts[0]
         # c.show('text')
         retStr = ''
-        for x in c.flat:
+        for x in c.flatten():
             if 'PageLayout' in x.classes:
                 retStr += str(x.pageNumber) + ': ' + str(x.measureNumber) + ', '
 #        print(retStr)

@@ -287,7 +287,7 @@ class Test(unittest.TestCase):
                 foundInstruments.append(str(x))
         self.assertEqual(foundInstruments,
                          ['Soprano', 'Alto', 'Tenor', 'Tenor', 'Bass'])
-        alto = c.parts[1].flat.getInstrument()
+        alto = c.parts[1].flatten().getInstrument()
         self.assertIn('Alto', alto.classes)
 
 

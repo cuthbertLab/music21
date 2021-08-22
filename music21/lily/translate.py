@@ -2619,7 +2619,7 @@ class TestExternal(unittest.TestCase):
 
     def xtestConvertChorale(self):
         b = _getCachedCorpusFile('bach/bwv66.6')
-        for n in b.flat:
+        for n in b.flatten():
             n.beams = None
         if self.show:
             b.parts[0].show('lily.svg')

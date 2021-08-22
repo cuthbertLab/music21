@@ -3997,7 +3997,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
             inst.midiProgram = 52
         sc = ScalaScale('F2', 'pyth_12.scl')
         sc.tune(s)
-        for p in s.flat.pitches:
+        for p in s.flatten().pitches:
             if p.accidental is not None:
                 if p.accidental.name == 'sharp':
                     p.microtone = p.microtone.cents + 45

@@ -109,16 +109,16 @@ Now generate the histogram:
 OMIT_FROM_DOCS
 
 >>> x = converter.parse('romantext: m1 a: VI')
->>> [str(p) for p in x.flat.getElementsByClass('RomanNumeral').first().pitches]
+>>> [str(p) for p in x[roman.RomanNumeral].first().pitches]
 ['F5', 'A5', 'C6']
 
 >>> x = converter.parse('romantext: m1 a: vi')
->>> [str(p) for p in x.flat.getElementsByClass('RomanNumeral').first().pitches]
+>>> [str(p) for p in x[roman.RomanNumeral.first().pitches]
 ['F#5', 'A5', 'C#6']
 
 >>> [str(p) for p in
 ...  converter.parse('romantext: m1 a: vio'
-...                  ).flat.getElementsByClass('RomanNumeral').first().pitches]
+...                  )[roman.RomanNumeral].first().pitches]
 ['F#5', 'A5', 'C6']
 '''
 import copy
@@ -1249,7 +1249,7 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
         from music21.romanText import testFiles
         s = converter.parse(testFiles.monteverdi_3_13)
         m25 = s.measure(25)
-        rn = m25.flat.getElementsByClass('RomanNumeral')
+        rn = m25.flatten().getElementsByClass('RomanNumeral')
         self.assertEqual(rn[1].figure, 'III')
         self.assertEqual(str(rn[1].key), 'd minor')
 
@@ -1311,9 +1311,9 @@ m6-7 = m3-4
 m8 I
 '''
         s = converter.parse(testCase, format='romanText')
-        m = s.measure(7).flat
+        m = s.measure(7).flatten()
         self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'D major')
-        m = s.measure(8).flat
+        m = s.measure(8).flatten()
         self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'D major')
 
     def testPivotInCopyMultiple2(self):
@@ -1332,7 +1332,7 @@ m6-7 = m4-5
 m8 I
 '''
         s = converter.parse(testCase, format='romanText')
-        m = s.measure(5).flat
+        m = s.measure(5).flatten()
         self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'G major')
 
     def testPivotInCopySingle(self):
@@ -1346,7 +1346,7 @@ m5 = m3
 m6 I
 '''
         s = converter.parse(testCase, format='romanText')
-        m = s.measure(6).flat
+        m = s.measure(6).flatten()
         self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'D major')
 
     def testSecondaryInCopyMultiple(self):
@@ -1365,10 +1365,10 @@ m7 = m3
 '''
 
         s = romanTextToStreamScore(testSecondaryInCopy)
-        m = s.measure(6).flat
+        m = s.measure(6).flatten()
         self.assertEqual(m.getElementsByClass('RomanNumeral').first().pitchedCommonName,
                          'E-dominant seventh chord')
-        m = s.measure(7).flat
+        m = s.measure(7).flatten()
         self.assertEqual(m.getElementsByClass('RomanNumeral').first().pitchedCommonName,
                          'E-dominant seventh chord')
         # s.show()
@@ -1385,7 +1385,7 @@ m7 = m3
                             + 'm4 KS-3 vi \n m5 a: i b3 V4/2 \n m6 I',
                             format='romantext')
 
-        rnStream = s.flat.getElementsByClass('RomanNumeral')
+        rnStream = s.flatten().getElementsByClass('RomanNumeral').stream()
         self.assertEqual(rnStream[0].figure, 'I')
         self.assertEqual(rnStream[1].figure, 'V6/5')
         self.assertEqual(rnStream[2].figure, 'I')
@@ -1395,7 +1395,7 @@ m7 = m3
         self.assertEqual(rnStream[6].figure, 'V4/2')
         self.assertEqual(rnStream[7].figure, 'I')
 
-        rnStreamKey = s.flat.getElementsByClass('KeySignature')
+        rnStreamKey = s.flatten().getElementsByClass('KeySignature')
         self.assertEqual(rnStreamKey[0].sharps, 1)
         self.assertEqual(rnStreamKey[1].sharps, -3)
 
@@ -1412,7 +1412,7 @@ m4-5 = m2-3
 m6-7 = m4-5
 '''
         s = converter.parse(src, format='romantext')
-        rnStream = s.flat.getElementsByClass('RomanNumeral')
+        rnStream = s.flatten().getElementsByClass('RomanNumeral')
 
         for elementNumber in [0, 6, 12]:
             self.assertEqual(rnStream[elementNumber + 4].figure, 'III6')
@@ -1566,22 +1566,22 @@ m1 C: I'''
     def testTuplets(self):
         from music21 import converter
         c = converter.parse('m1 C: I b2.66 V', format='romantext')
-        n1 = c.flat.notes[0]
-        n2 = c.flat.notes[1]
+        n1 = c.flatten().notes[0]
+        n2 = c.flatten().notes[1]
         self.assertEqual(n1.duration.quarterLength, common.opFrac(5 / 3))
         self.assertEqual(n2.offset, common.opFrac(5 / 3))
         self.assertEqual(n2.duration.quarterLength, common.opFrac(7 / 3))
 
         c = converter.parse('TimeSignature: 6/8\nm1 C: I b2.66 V', format='romantext')
-        n1 = c.flat.notes[0]
-        n2 = c.flat.notes[1]
+        n1 = c.flatten().notes[0]
+        n2 = c.flatten().notes[1]
         self.assertEqual(n1.duration.quarterLength, 5 / 2)
         self.assertEqual(n2.offset, 5 / 2)
         self.assertEqual(n2.duration.quarterLength, 1 / 2)
 
         c = converter.parse('m1 C: I b2.66.5 V', format='romantext')
-        n1 = c.flat.notes[0]
-        n2 = c.flat.notes[1]
+        n1 = c.flatten().notes[0]
+        n2 = c.flatten().notes[1]
         self.assertEqual(n1.duration.quarterLength, common.opFrac(11 / 6))
         self.assertEqual(n2.offset, common.opFrac(11 / 6))
         self.assertEqual(n2.duration.quarterLength, common.opFrac(13 / 6))

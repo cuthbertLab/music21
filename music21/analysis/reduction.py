@@ -547,14 +547,14 @@ class PartReduction:
         # create flat representation of all parts in a bundle
         for partBundle in self._partBundles:
             if len(partBundle['parts']) == 1:
-                partBundle['parts.flat'] = partBundle['parts'][0].flat
+                partBundle['parts.flat'] = partBundle['parts'][0].flatten()
             else:
                 # align all parts and flatten
                 # this takes a flat presentation of all parts
                 s = stream.Stream()
                 for p in partBundle['parts']:
                     s.insert(0, p)
-                partBundle['parts.flat'] = s.flat
+                partBundle['parts.flat'] = s.flatten()
 
 
     def _createEventSpans(self):
@@ -586,7 +586,7 @@ class PartReduction:
                     active = False
                     # check for activity in any part in the part group
                     for p in partMeasures:  # iter of parts containing measures
-                        # print(p, i, p[i], len(p[i].flat.notes))
+                        # print(p, i, p[i], len(p[i].flatten().notes))
                         if p[i].iter().notes:
                             active = True
                             break
@@ -896,11 +896,11 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         # s.show()
-        s.parts[0].flat.notes[3].addLyric('test')
-        s.parts[0].flat.notes[4].addLyric('::/o:6/tb:here')
-        s.parts[3].flat.notes[2].addLyric('::/o:5/tb:fromBass')
+        s.parts[0].flatten().notes[3].addLyric('test')
+        s.parts[0].flatten().notes[4].addLyric('::/o:6/tb:here')
+        s.parts[3].flatten().notes[2].addLyric('::/o:5/tb:fromBass')
 
-        s.parts[1].flat.notes[7].addLyric('::/o:4/nf:no/g:Ursatz/ta:3 3 200')
+        s.parts[1].flatten().notes[7].addLyric('::/o:4/nf:no/g:Ursatz/ta:3 3 200')
 
         sr = analysis.reduction.ScoreReduction()
         sr.score = s
@@ -908,14 +908,14 @@ class Test(unittest.TestCase):
         post = sr.reduce()
         # post.show()
         # post.parts[0].show('t')
-        self.assertEqual(len(post.parts[0].flat.notes), 3)
+        self.assertEqual(len(post.parts[0].flatten().notes), 3)
         # post.parts[0].show('t')
 
         three_measures = post.parts.first()[stream.Measure][:3]
         new_stream = stream.Stream()
         for m in three_measures:
             new_stream.append(m)
-        flat_stream = new_stream.flat
+        flat_stream = new_stream.flatten()
         match = [(repr(e), e.offset, e.duration.quarterLength) for e in flat_stream.notesAndRests]
         self.maxDiff = None
         self.assertEqual(match,
@@ -927,7 +927,7 @@ class Test(unittest.TestCase):
                           ('<music21.note.Note G#>', 5.0, 1.0)])
 
         # test that lyric is found
-        self.assertEqual(post.parts[0].flat.notes[0].lyric, 'fromBass')
+        self.assertEqual(post.parts[0].flatten().notes[0].lyric, 'fromBass')
 
 
     def testExtractionB(self):
@@ -935,10 +935,10 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
 
-        s.parts[0].flat.notes[4].addLyric('::/o:6/v:1/tb:s/g:Ursatz')
-        s.parts[3].flat.notes[2].addLyric('::/o:5/v:2/tb:b')
-        s.parts[2].flat.notes[3].addLyric('::/o:4/v:2/tb:t')
-        s.parts[1].flat.notes[2].addLyric('::/o:4/v:2/tb:a')
+        s.parts[0].flatten().notes[4].addLyric('::/o:6/v:1/tb:s/g:Ursatz')
+        s.parts[3].flatten().notes[2].addLyric('::/o:5/v:2/tb:b')
+        s.parts[2].flatten().notes[3].addLyric('::/o:4/v:2/tb:t')
+        s.parts[1].flatten().notes[2].addLyric('::/o:4/v:2/tb:a')
 
         sr = analysis.reduction.ScoreReduction()
         extract = s.measures(0, 10)
@@ -948,7 +948,7 @@ class Test(unittest.TestCase):
         post = sr.reduce()
         # post.show()
         self.assertEqual(len(post.parts), 5)
-        match = post.parts[0].flat.notes
+        match = post.parts[0].flatten().notes
         self.assertEqual(len(match), 3)
         # post.show()
 
@@ -963,7 +963,7 @@ class Test(unittest.TestCase):
         src = corpus.parse('bwv846')
         chords = src.flattenParts().makeChords(minimumWindowSize=4,
                                     makeRests=False)
-        for c in chords.flat.notes:
+        for c in chords.flatten().notes:
             c.quarterLength = 4
         for m in chords.getElementsByClass('Measure'):
             m.clef = clef.bestClef(m, recurse=True)
@@ -993,7 +993,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
 
         src = corpus.parse('schoenberg/opus19', 6)
-        for n in src.flat.notes:
+        for n in src.flatten().notes:
             if isinstance(n, note.Note):
                 if n.pitch.name == 'F#':
                     n.addLyric('::/p:f#/o:4')
@@ -1017,7 +1017,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
 
         src = corpus.parse('schoenberg/opus19', 6)
-        for n in src.flat.notes:
+        for n in src.flatten().notes:
             if isinstance(n, note.Note):
                 if n.pitch.name == 'F#':
                     n.addLyric('::/p:f#/o:4/g:F#')

@@ -94,18 +94,18 @@ def plotStream(
 
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
+    >>> thePlot = s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW s.plot('histogram', 'pitch')
+    >>> #_DOCS_SHOW thePlot = s.plot('histogram', 'pitch')
 
     .. image:: images/HistogramPitchSpace.*
         :width: 600
 
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
+    >>> thePlot = s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW s.plot('pianoroll')
+    >>> #_DOCS_SHOW thePlot = s.plot('pianoroll')
 
     .. image:: images/HorizontalBarPitchSpaceOffset.*
         :width: 600
@@ -173,7 +173,7 @@ class Test(unittest.TestCase):
     def testAll(self):
         from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
-        plotStream(a.flat, doneAction=None)
+        plotStream(a.flatten(), doneAction=None)
 
     def testPlotChordsC(self):
         from music21 import dynamics

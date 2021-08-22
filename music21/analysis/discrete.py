@@ -302,7 +302,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.KrumhanslSchmuckler()
-        >>> p._getSharpFlatCount(s.flat)
+        >>> p._getSharpFlatCount(s.flatten())
         (87, 0)
         '''
         # pitches gets a flat representation
@@ -615,7 +615,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         The data list contains a key (as a string), a mode
         (as a string), and a correlation value (degree of certainty)
         '''
-        sStream = sStream.flat.notesAndRests
+        sStream = sStream.flatten().notesAndRests
         # this is the sample distribution used in the paper, for some testing purposes
         # pcDistribution = [7, 0, 5, 0, 7, 16, 0, 16, 0, 15, 6, 0]
 
@@ -700,7 +700,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         <music21.key.Key of B- major>
         '''
         # always take a flat version here, otherwise likely to get nothing
-        solution, unused_color = self.process(sStream.flat, storeAlternatives=True)
+        solution, unused_color = self.process(sStream.flatten(), storeAlternatives=True)
         # assign best solution
         k = self._solutionToObject(solution)
         if k.alternateInterpretations is None:
@@ -1240,7 +1240,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         for p in procList:
             # get only Notes for now, skipping rests and chords
             # flatten to reach notes contained in measures
-            noteStream = p.flat.stripTies(inPlace=False).getElementsByClass('Note').stream()
+            noteStream = p.flatten().stripTies(inPlace=False).getElementsByClass('Note').stream()
             # noteStream.show()
             for i, n in enumerate(noteStream):
                 if i <= len(noteStream) - 2:
@@ -1280,7 +1280,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
     def getSolution(self, sStream):
         '''Solution is the number of unique intervals.
         '''
-        solution, unused_color = self.process(sStream.flat)
+        solution, unused_color = self.process(sStream.flatten())
         return solution
 
 
@@ -1422,8 +1422,8 @@ class Test(unittest.TestCase):
         # self.assertEqual(p._getPitchClassDistribution(s1),
         #            [1.0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
-        p.process(s1.flat)
-        likelyKeysMajor1, likelyKeysMinor1 = p._likelyKeys(s1.flat)
+        p.process(s1.flatten())
+        likelyKeysMajor1, likelyKeysMinor1 = p._likelyKeys(s1.flatten())
         likelyKeysMajor1.sort()
         likelyKeysMinor1.sort()
         allResults1 = likelyKeysMajor1 + likelyKeysMinor1
@@ -1431,8 +1431,8 @@ class Test(unittest.TestCase):
         unused_post = sorted([(y, x) for x, y in allResults1])
         # print(post)
 
-        p.process(s2.flat)
-        likelyKeysMajor2, likelyKeysMinor2 = p._likelyKeys(s2.flat)
+        p.process(s2.flatten())
+        likelyKeysMajor2, likelyKeysMinor2 = p._likelyKeys(s2.flatten())
         likelyKeysMajor2.sort()
         likelyKeysMinor2.sort()
         allResults2 = likelyKeysMajor2 + likelyKeysMinor2
@@ -1440,7 +1440,7 @@ class Test(unittest.TestCase):
         unused_post = sorted([(y, x) for x, y in allResults2])
         # print(post)
 
-        likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3.flat)
+        likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3.flatten())
         likelyKeysMajor3.sort()
         likelyKeysMinor3.sort()
         allResults3 = likelyKeysMajor3 + likelyKeysMinor3

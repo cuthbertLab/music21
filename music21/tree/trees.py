@@ -126,7 +126,7 @@ class ElementTree(core.AVLTree):
 
         >>> score = tree.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True)
-        >>> lastNote = score.flat.notes[-1]
+        >>> lastNote = score.flatten().notes[-1]
         >>> lastNote in scoreTree
         True
         >>> n = note.Note('E--')
@@ -212,7 +212,7 @@ class ElementTree(core.AVLTree):
 
         These should all be the same as the flat version:
 
-        >>> scoreFlat = score.flat
+        >>> scoreFlat = score.flatten()
         >>> for i in (0, -1, 10):
         ...     if scoreFlat[i] is not scoreTree[i]:
         ...          print('false!')
@@ -497,7 +497,7 @@ class ElementTree(core.AVLTree):
         If any of the conditions is not true, expect to get a dangerously
         badly sorted tree that will be useless.
 
-        >>> bFlat = corpus.parse('bwv66.6').flat
+        >>> bFlat = corpus.parse('bwv66.6').flatten()
         >>> bFlat.isSorted
         True
 
@@ -697,7 +697,7 @@ class ElementTree(core.AVLTree):
         If the element is in the original score, then it should be very fast (O(log n))
 
         >>> score = tree.makeExampleScore()
-        >>> scoreFlat = score.flat
+        >>> scoreFlat = score.flatten()
         >>> n = scoreFlat.notes[-1]
 
         >>> flatTree = scoreFlat.asTree()
@@ -708,7 +708,7 @@ class ElementTree(core.AVLTree):
         it on a stream (O (n log n)).
 
         >>> scoreTree = score.asTree(flatten=True)
-        >>> n = score.flat.notes[-1]
+        >>> n = score.flatten().notes[-1]
         >>> scoreTree.index(n)
         17
 
@@ -910,7 +910,7 @@ class OffsetTree(ElementTree):
         >>> score = tree.makeExampleScore()
         >>> scoreTree = score.asTree(flatten=True, groupOffsets=True)
 
-        >>> score.flat[5] in scoreTree
+        >>> score.flatten()[5] in scoreTree
         True
 
         Note that this way of finding an item won't work because the offset is different

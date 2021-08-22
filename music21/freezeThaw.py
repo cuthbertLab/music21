@@ -791,7 +791,7 @@ class StreamThawer(StreamFreezeThawBase):
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e._stream)
                 e._cache = {}
-                # for el in e._stream.flat:
+                # for el in e._stream.flatten():
                 #    print(el, el.offset, el.sites.siteDict)
             elif 'Spanner' in eClasses:
                 subSF = StreamThawer()
@@ -1236,7 +1236,7 @@ class Test(unittest.TestCase):
         c = converter.parse(a)
         f = converter.freezeStr(c)
         d = converter.thawStr(f)
-        self.assertEqual(d.parts[1].flat.notes[20].volume._client.__class__.__name__, 'weakref')
+        self.assertEqual(d.parts[1].flatten().notes[20].volume._client.__class__.__name__, 'weakref')
 
 
 # -----------------------------------------------------------------------------

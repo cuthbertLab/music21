@@ -656,18 +656,18 @@ class Test(unittest.TestCase):
         s = abcToStreamScore(af.readstr(tf))
         # s.show()
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.parts[0].flat.notesAndRests), 111)
-        self.assertEqual(len(s.parts[1].flat.notesAndRests), 127)
+        self.assertEqual(len(s.parts[0].flatten().notesAndRests), 111)
+        self.assertEqual(len(s.parts[1].flatten().notesAndRests), 127)
 
         # chords are defined in second part here
-        self.assertEqual(len(s.parts[1].flat.getElementsByClass('Chord')), 32)
+        self.assertEqual(len(s.parts[1].flatten().getElementsByClass('Chord')), 32)
 
         # check pitches in chords; sharps are applied due to key signature
-        match = [p.nameWithOctave for p in s.parts[1].flat.getElementsByClass(
+        match = [p.nameWithOctave for p in s.parts[1].flatten().getElementsByClass(
             'Chord')[4].pitches]
         self.assertEqual(match, ['F#4', 'D4', 'B3'])
 
-        match = [p.nameWithOctave for p in s.parts[1].flat.getElementsByClass(
+        match = [p.nameWithOctave for p in s.parts[1].flatten().getElementsByClass(
             'Chord')[3].pitches]
         self.assertEqual(match, ['E4', 'C#4', 'A3'])
 
@@ -686,9 +686,9 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(s.parts), 3)
         # must flatten b/c  there are measures
-        self.assertEqual(len(s.parts[0].flat.notesAndRests), 6)
-        self.assertEqual(len(s.parts[1].flat.notesAndRests), 17)
-        self.assertEqual(len(s.parts[2].flat.notesAndRests), 6)
+        self.assertEqual(len(s.parts[0].flatten().notesAndRests), 6)
+        self.assertEqual(len(s.parts[1].flatten().notesAndRests), 17)
+        self.assertEqual(len(s.parts[2].flatten().notesAndRests), 6)
 
         # s.show()
         # s.show('midi')
@@ -703,7 +703,7 @@ class Test(unittest.TestCase):
         s = abcToStreamScore(af.readstr(tf))
         match = []
         # match strings for better comparison
-        for n in s.flat.notesAndRests:
+        for n in s.flatten().notesAndRests:
             match.append(n.quarterLength)
         shouldFind = [
             1 / 3, 1 / 3, 1 / 3,
@@ -812,19 +812,19 @@ class Test(unittest.TestCase):
         # each score in the opus is a Stream that contains a Part and metadata
         p1 = o.getScoreByNumber(1).parts[0]
         self.assertEqual(p1.offset, 0.0)
-        self.assertEqual(len(p1.flat.notesAndRests), 90)
+        self.assertEqual(len(p1.flatten().notesAndRests), 90)
 
         p2 = o.getScoreByNumber(2).parts[0]
         self.assertEqual(p2.offset, 0.0)
-        self.assertEqual(len(p2.flat.notesAndRests), 80)
+        self.assertEqual(len(p2.flatten().notesAndRests), 80)
 
         p3 = o.getScoreByNumber(3).parts[0]
         self.assertEqual(p3.offset, 0.0)
-        self.assertEqual(len(p3.flat.notesAndRests), 86)
+        self.assertEqual(len(p3.flatten().notesAndRests), 86)
 
         p4 = o.getScoreByNumber(4).parts[0]
         self.assertEqual(p4.offset, 0.0)
-        self.assertEqual(len(p4.flat.notesAndRests), 78)
+        self.assertEqual(len(p4.flatten().notesAndRests), 78)
 
         sMerged = o.mergeScores()
         self.assertEqual(sMerged.metadata.title, 'Mille regrets')
@@ -849,17 +849,17 @@ class Test(unittest.TestCase):
 
         p1 = o.getScoreByNumber(81).parts[0]
         self.assertEqual(p1.offset, 0.0)
-        self.assertEqual(len(p1.flat.notesAndRests), 77)
-        self.assertEqual(len(list(p1.flat.getElementsByClass('ChordSymbol'))), 25)
+        self.assertEqual(len(p1.flatten().notesAndRests), 77)
+        self.assertEqual(len(list(p1.flatten().getElementsByClass('ChordSymbol'))), 25)
         # Am/C
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].root(),
+        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[7].root(),
                          pitch.Pitch('A3'))
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].bass(),
+        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[7].bass(),
                          pitch.Pitch('C3'))
         # G7/B
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].root(),
+        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[14].root(),
                          pitch.Pitch('G3'))
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].bass(),
+        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[14].bass(),
                          pitch.Pitch('B2'))
 
     def testNoChord(self):
@@ -877,9 +877,9 @@ class Test(unittest.TestCase):
             '''
         score = converter.parse(target_str, format='abc')
 
-        self.assertEqual(len(list(score.flat.getElementsByClass(
+        self.assertEqual(len(list(score.flatten().getElementsByClass(
             'ChordSymbol'))), 9)
-        self.assertEqual(len(list(score.flat.getElementsByClass(
+        self.assertEqual(len(list(score.flatten().getElementsByClass(
             'NoChord'))), 4)
 
         score = harmony.realizeChordSymbolDurations(score)
@@ -944,13 +944,13 @@ class Test(unittest.TestCase):
         # s.show()
         # one start, one end
         # s.parts[0].show('t')
-        self.assertEqual(len(s.flat.getElementsByClass('Repeat')), 2)
+        self.assertEqual(len(s.flatten().getElementsByClass('Repeat')), 2)
         # s.show()
 
         # this has a 1 note pickup
         # has three repeat bars; first one is implied
         s = converter.parse(testFiles.draughtOfAle)
-        self.assertEqual(len(s.flat.getElementsByClass('Repeat')), 3)
+        self.assertEqual(len(s.flatten().getElementsByClass('Repeat')), 3)
         self.assertEqual(s.parts[0].getElementsByClass(
             'Measure')[0].notes[0].pitch.nameWithOctave, 'D4')
 
@@ -965,32 +965,32 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = converter.parse(testFiles.morrisonsJig)
         # TODO: get
-        self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 2)
+        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 2)
         # s.show()
         # four repeat brackets here; 2 at beginning, 2 at end
         s = converter.parse(testFiles.hectorTheHero)
-        self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 4)
+        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 4)
 
         s = corpus.parse('JollyTinkersReel')
-        self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 4)
+        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 4)
 
     def testMetronomeMarkA(self):
         from music21.abcFormat import testFiles
         from music21 import converter
         s = converter.parse(testFiles.fullRiggedShip)
-        mmStream = s.flat.getElementsByClass('TempoIndication')
+        mmStream = s.flatten().getElementsByClass('TempoIndication')
         self.assertEqual(len(mmStream), 1)
         self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark Quarter=100.0>')
 
         s = converter.parse(testFiles.aleIsDear)
-        mmStream = s.flat.getElementsByClass('TempoIndication')
+        mmStream = s.flatten().getElementsByClass('TempoIndication')
         # this is a two-part pieces, and this is being added for each part
         # not sure if this is a problem
         self.assertEqual(len(mmStream), 2)
         self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark Quarter=211.0>')
 
         s = converter.parse(testFiles.theBeggerBoy)
-        mmStream = s.flat.getElementsByClass('TempoIndication')
+        mmStream = s.flatten().getElementsByClass('TempoIndication')
         # this is a two-part pieces, and this is being added for each part
         # not sure if this is a problem
         self.assertEqual(len(mmStream), 1)
@@ -1070,7 +1070,7 @@ class Test(unittest.TestCase):
     def testTiesTranslate(self):
         from music21 import converter
         notes = converter.parse('L:1/8\na-a-a', format='abc')
-        ties = [n.tie.type for n in notes.flat.notesAndRests]
+        ties = [n.tie.type for n in notes.flatten().notesAndRests]
         self.assertListEqual(ties, ['start', 'continue', 'stop'])
 
     def xtestMergeScores(self):

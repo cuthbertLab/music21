@@ -718,7 +718,7 @@ class ABCMetadata(ABCToken):
 
         >>> x = 'L:1/4\nM:3/4\n\nf'
         >>> sc = converter.parse(x, format='abc')
-        >>> sc.flat.notes[0].duration.type
+        >>> sc.recurse().notes.first().duration.type
         'quarter'
         '''
         # environLocal.printDebug(['getDefaultQuarterLength', self.data])

@@ -1821,11 +1821,11 @@ def midiTrackToStream(
     >>> p = midi.translate.midiTrackToStream(mt)
     >>> p
     <music21.stream.Part ...>
-    >>> len(p.flat.notesAndRests)
+    >>> len(p.recurse().notesAndRests)
     14
-    >>> p.flat.notes[0].pitch.midi
+    >>> p.recurse().notes.first().pitch.midi
     36
-    >>> p.flat.notes[0].volume.velocity
+    >>> p.recurse().notes.first().volume.velocity
     90
 
     Changed in v.7 -- Now makes measures
@@ -2335,7 +2335,7 @@ def packetStorageFromSubstreamList(
     packetStorage = {}
 
     for trackId, subs in enumerate(substreamList):  # Conductor track is track 0
-        subs = subs.flat
+        subs = subs.flatten()
 
         # get a first instrument; iterate over rest
         instrumentStream = subs.getElementsByClass('Instrument')
@@ -2753,7 +2753,7 @@ def midiFileToStream(
     >>> s = midi.translate.midiFileToStream(mf)
     >>> s
     <music21.stream.Score ...>
-    >>> len(s.flat.notesAndRests)
+    >>> len(s.flatten().notesAndRests)
     14
     '''
     # environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
@@ -3138,7 +3138,7 @@ class Test(unittest.TestCase):
     def testOverlappedEventsA(self):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
-        sFlat = s.flat
+        sFlat = s.flatten()
         mtList = streamHierarchyToMidiTracks(sFlat)
         self.assertEqual(len(mtList), 2)
 
@@ -3461,7 +3461,7 @@ class Test(unittest.TestCase):
         # a simple file created in athenacl
         fp = dirLib / 'test10.mid'
         s = converter.parse(fp)
-        mmStream = s.flat.getElementsByClass('MetronomeMark')
+        mmStream = s.flatten().getElementsByClass('MetronomeMark')
         self.assertEqual(len(mmStream), 4)
         self.assertEqual(mmStream[0].number, 120.0)
         self.assertEqual(mmStream[1].number, 110.0)
@@ -3470,13 +3470,13 @@ class Test(unittest.TestCase):
 
         fp = dirLib / 'test06.mid'
         s = converter.parse(fp)
-        mmStream = s.flat.getElementsByClass('MetronomeMark')
+        mmStream = s.flatten().getElementsByClass('MetronomeMark')
         self.assertEqual(len(mmStream), 1)
         self.assertEqual(mmStream[0].number, 120.0)
 
         fp = dirLib / 'test07.mid'
         s = converter.parse(fp)
-        mmStream = s.flat.getElementsByClass('MetronomeMark')
+        mmStream = s.flatten().getElementsByClass('MetronomeMark')
         self.assertEqual(len(mmStream), 1)
         self.assertEqual(mmStream[0].number, 180.0)
 
@@ -3681,10 +3681,10 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test12.mid'
         s = converter.parse(fp)
 
-        self.assertEqual(len(s.parts[0].flat.notes), 3)
-        self.assertEqual(len(s.parts[1].flat.notes), 3)
-        self.assertEqual(len(s.parts[2].flat.notes), 3)
-        self.assertEqual(len(s.parts[3].flat.notes), 3)
+        self.assertEqual(len(s.parts[0].flatten().notes), 3)
+        self.assertEqual(len(s.parts[1].flatten().notes), 3)
+        self.assertEqual(len(s.parts[2].flatten().notes), 3)
+        self.assertEqual(len(s.parts[3].flatten().notes), 3)
 
         # s.show('t')
         # s.show('midi')
@@ -3698,13 +3698,13 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test13.mid'
         s = converter.parse(fp)
         # s.show('t')
-        self.assertEqual(len(s.flat.notes), 7)
+        self.assertEqual(len(s.flatten().notes), 7)
         # s.show('midi')
 
         fp = dirLib / 'test14.mid'
         s = converter.parse(fp)
         # three chords will be created, as well as two voices
-        self.assertEqual(len(s.flat.getElementsByClass('Chord')), 3)
+        self.assertEqual(len(s.flatten().getElementsByClass('Chord')), 3)
         self.assertEqual(len(s.parts.first().measure(3).voices), 2)
 
     def testImportChordsA(self):
@@ -3716,7 +3716,7 @@ class Test(unittest.TestCase):
         # a simple file created in athenacl
         s = converter.parse(fp)
         # s.show('t')
-        self.assertEqual(len(s.flat.getElementsByClass('Chord')), 5)
+        self.assertEqual(len(s.flatten().getElementsByClass('Chord')), 5)
 
     def testMidiEventsImported(self):
         self.maxDiff = None
@@ -3803,7 +3803,7 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test16.mid'
         s = converter.parse(fp)
         self.assertEqual(len(s.parts.first().measure(1).voices), 2)
-        els = s.parts.first().flat.getElementsByOffset(0.5)
+        els = s.parts.first().flatten().getElementsByOffset(0.5)
         self.assertSequenceEqual([e.duration.quarterLength for e in els], [0, 1])
 
     def testRepeatsExpanded(self):
@@ -3811,9 +3811,9 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.repeatBracketsA)
-        num_notes_before = len(s.flat.notes)
+        num_notes_before = len(s.flatten().notes)
         prepared = prepareStreamForMidi(s)
-        num_notes_after = len(prepared.flat.notes)
+        num_notes_after = len(prepared.flatten().notes)
         self.assertGreater(num_notes_after, num_notes_before)
 
     def testNullTerminatedInstrumentName(self):

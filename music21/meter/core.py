@@ -1296,20 +1296,20 @@ class MeterSequence(MeterTerminal):
         '''
         Return a new MeterSequence composed of the flattened representation.
 
-        >>> a = meter.MeterSequence('3/4', 3)
-        >>> b = a.flat
+        >>> ms = meter.MeterSequence('3/4', 3)
+        >>> b = ms.flat
         >>> len(b)
         3
 
-        >>> a[1] = a[1].subdivide(4)
-        >>> b = a.flat
+        >>> ms[1] = ms[1].subdivide(4)
+        >>> b = ms.flat
         >>> len(b)
         6
 
-        >>> a[1][2] = a[1][2].subdivide(4)
-        >>> a
+        >>> ms[1][2] = ms[1][2].subdivide(4)
+        >>> ms
         <music21.meter.core.MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
-        >>> b = a.flat
+        >>> b = ms.flat
         >>> len(b)
         9
         '''

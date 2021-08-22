@@ -54,7 +54,7 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
 
     Note: this does not yet accommodate triplets.
 
-    >>> s = converter.parse('tinynotation: C4 D4 E8 F8').flat.notes
+    >>> s = converter.parse('tinynotation: C4 D4 E8 F8').flatten().notes
     >>> m = stream.Measure()
     >>> for el in s:
     ...     m.insert(el.offset, el)
@@ -62,7 +62,7 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
     >>> ts
     <music21.meter.TimeSignature 3/4>
 
-    >>> s2 = converter.parse('tinynotation: C8. D16 E8 F8. G16 A8').flat.notes
+    >>> s2 = converter.parse('tinynotation: C8. D16 E8 F8. G16 A8').flatten().notes
     >>> m2 = stream.Measure()
     >>> for el in s2:
     ...     m2.insert(el.offset, el)
@@ -70,7 +70,7 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
     >>> ts2
     <music21.meter.TimeSignature 6/8>
 
-    >>> s3 = converter.parse('C2 D2 E2', format='tinyNotation').flat.notes
+    >>> s3 = converter.parse('C2 D2 E2', format='tinyNotation').flatten().notes
     >>> m3 = stream.Measure()
     >>> for el in s3:
     ...     m3.insert(el.offset, el)
@@ -78,7 +78,7 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
     >>> ts3
     <music21.meter.TimeSignature 3/2>
 
-    >>> s4 = converter.parse('C8. D16 E8 F8. G16 A8 C4. D4.', format='tinyNotation').flat.notes
+    >>> s4 = converter.parse('C8. D16 E8 F8. G16 A8 C4. D4.', format='tinyNotation').flatten().notes
     >>> m4 = stream.Measure()
     >>> for el in s4:
     ...     m4.insert(el.offset, el)
@@ -86,7 +86,7 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
     >>> ts4
     <music21.meter.TimeSignature 12/8>
 
-    >>> s5 = converter.parse('C4 D2 E4 F2', format='tinyNotation').flat.notes
+    >>> s5 = converter.parse('C4 D2 E4 F2', format='tinyNotation').flatten().notes
     >>> m5 = stream.Measure()
     >>> for el in s5:
     ...     m5.insert(el.offset, el)
@@ -94,7 +94,7 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
     >>> ts5
     <music21.meter.TimeSignature 6/4>
 
-    >>> s6 = converter.parse('C4 D16.', format='tinyNotation').flat.notes
+    >>> s6 = converter.parse('C4 D16.', format='tinyNotation').flatten().notes
     >>> m6 = stream.Measure()
     >>> for el in s6:
     ...     m6.insert(el.offset, el)
@@ -1201,7 +1201,7 @@ class TimeSignature(base.Music21Object):
                                         firstPartitionForm=firstPartitionForm)
 
             # provide a partition for each flat division
-            accentCount = len(ms.flat)
+            accentCount = len(ms.flatten())
             # environLocal.printDebug(['got accentCount', accentCount, 'ms: ', ms])
             divStep = self.barDuration.quarterLength / accentCount
             weightInts = [0] * accentCount  # weights as integer/depth counts
@@ -1570,7 +1570,7 @@ class TimeSignature(base.Music21Object):
         [default] only the notes) in the `Stream` specified as streamIn.
 
 
-        >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation').flat.notes.stream()
+        >>> s = converter.parse('C4 D4 E8 F8', format='tinyNotation').flatten().notes.stream()
         >>> sixEight = meter.TimeSignature('6/8')
         >>> sixEight.averageBeatStrength(s)
         0.4375

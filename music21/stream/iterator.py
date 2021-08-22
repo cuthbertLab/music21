@@ -772,7 +772,7 @@ class StreamIterator(prebase.ProtoM21Object):
         stream did not, in the case of recursion:
 
         >>> bach = corpus.parse('bwv66.6')
-        >>> bn = bach.flat[30]
+        >>> bn = bach.flatten()[30]
         >>> bn
         <music21.note.Note E>
 
@@ -1193,7 +1193,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> c = list(b.iter().getElementsByOffset(2, 6.9))
         >>> len(c)
         2
-        >>> c = list(b.flat.iter().getElementsByOffset(2, 6.9))
+        >>> c = list(b.flatten().iter().getElementsByOffset(2, 6.9))
         >>> len(c)
         10
 

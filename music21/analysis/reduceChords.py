@@ -176,7 +176,7 @@ class ChordReducer:
             note.Note,
             note.Rest,
         )
-        for element in inputStream.flat:
+        for element in inputStream.flatten():
             if not isinstance(element, prototype):
                 continue
             elementBuffer.append(element)
@@ -500,11 +500,11 @@ class ChordReducer:
         '''
         # from music21 import note
         # if inputMeasure.isFlat is False:
-        #    measureObject = inputMeasure.flat.notes
+        #    measureObject = inputMeasure.flatten().notes
         # else:
         #    measureObject = inputMeasure.notes
         chordWeights = self.computeMeasureChordWeights(
-            measureObject.flat.notes,
+            measureObject.flatten().notes,
             weightAlgorithm,
         )
         if maximumNumberOfChords > len(chordWeights):

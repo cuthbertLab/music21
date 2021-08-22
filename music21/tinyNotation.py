@@ -69,15 +69,15 @@ Here is an example of TinyNotation in action.
 {6.0} <music21.stream.Measure 3 offset=6.0>
     {0.0} <music21.note.Note C>
     {1.0} <music21.bar.Barline type=final>
->>> stream1.flat.getElementById('lastG').step
+>>> stream1.recurse().getElementById('lastG').step
 'G'
->>> stream1.flat.notesAndRests[1].isRest
+>>> stream1.flatten().notesAndRests[1].isRest
 True
->>> stream1.flat.notesAndRests[0].octave
+>>> stream1.flatten().notesAndRests[0].octave
 3
->>> stream1.flat.notes[-2].tie.type
+>>> stream1.flatten().notes[-2].tie.type
 'start'
->>> stream1.flat.notes[-1].tie.type
+>>> stream1.flatten().notes[-1].tie.type
 'stop'
 
 Changing time signatures are supported:
@@ -676,7 +676,7 @@ class NoteToken(NoteOrRestToken):
         >>> n = note.Note('B')
         >>> n.octave = 2
         >>> searchResult = re.search(nToken.pitchMap['flats'], tStr)
-        >>> tPost = nToken.flats(n, searchResult, nToken.pitchMap['flats'], tStr)
+        >>> tPost = nToken.flatten()s(n, searchResult, nToken.pitchMap['flats'], tStr)
         >>> tPost
         'BB'
         >>> n.pitch.accidental
@@ -1088,7 +1088,7 @@ class Converter:
         >>> s = tnc.parse().stream
         >>> tnc.load('4/4 f e d c')
         >>> s2 = tnc.parse().stream
-        >>> ns2 = s2.flat.notes
+        >>> ns2 = s2.flatten().notes
 
         Check that the duration of 2.0 from the first load did not carry over.
 
@@ -1353,7 +1353,7 @@ class Test(unittest.TestCase):
         c = Converter(self.parseTest)
         c.parse()
         s = c.stream
-        sfn = s.flat.notes
+        sfn = s.flatten().notes
         self.assertEqual(sfn[0].tie.type, 'start')
         self.assertEqual(sfn[1].tie.type, 'continue')
         self.assertEqual(sfn[2].tie.type, 'stop')

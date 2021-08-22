@@ -991,7 +991,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     >>> score = corpus.parse('bach/bwv380')
     >>> excerpt = score.measures(2, 3)
     >>> chfy = excerpt.chordify()
-    >>> for c in chfy.flat.getElementsByClass(chord.Chord):
+    >>> for c in chfy.flatten().getElementsByClass(chord.Chord):
     ...   print(harmony.chordSymbolFigureFromChord(c))
     B-7
     E-maj7/B-
@@ -1524,7 +1524,7 @@ class ChordSymbol(Harmony):
     And now, and example of parsing in the wild:
 
     >>> s = corpus.parse('leadsheet/fosterBrownHair')
-    >>> initialSymbols = s.flat.getElementsByClass(harmony.ChordSymbol)[0:5]
+    >>> initialSymbols = s.flatten().getElementsByClass(harmony.ChordSymbol)[0:5]
     >>> [[str(c.name) for c in c.pitches] for c in initialSymbols]
     [['F', 'A', 'C'], ['B-', 'D', 'F'], ['F', 'A', 'C'], ['C', 'E', 'G'], ['F', 'A', 'C']]
 
@@ -2474,7 +2474,7 @@ def realizeChordSymbolDurations(piece):
     {11.0} <music21.note.Note C>
     {12.0} <music21.bar.Barline type=final>
     '''
-    pf = piece.flat
+    pf = piece.flatten()
     onlyChords = pf.getElementsByClass(ChordSymbol).stream()
     first = True
     lastChord = None
@@ -3091,14 +3091,14 @@ class TestExternal(unittest.TestCase):
         # testFile.show('text')
         testFile = harmony.realizeChordSymbolDurations(testFile)
         # testFile.show()
-        chordSymbols = testFile.flat.getElementsByClass(harmony.ChordSymbol)
+        chordSymbols = testFile.flatten().getElementsByClass(harmony.ChordSymbol)
         s = stream.Stream()
 
         for cS in chordSymbols:
             cS.writeAsChord = False
             s.append(cS)
 
-        # csChords = s.flat.getElementsByClass(chord.Chord)
+        # csChords = s.flatten().getElementsByClass(chord.Chord)
         # s.show()
         # self.assertEqual(len(csChords), 40)
 
@@ -3115,7 +3115,7 @@ class TestExternal(unittest.TestCase):
         testFile = corpus.parse('demos/ComprehensiveChordSymbolsTestFile.xml')
 
         testFile = harmony.realizeChordSymbolDurations(testFile)
-        chords = testFile.flat.getElementsByClass(harmony.ChordSymbol)
+        chords = testFile.flatten().getElementsByClass(harmony.ChordSymbol)
         # testFile.show()
         s = stream.Stream()
         # i = 0
@@ -3129,7 +3129,7 @@ class TestExternal(unittest.TestCase):
 
         s.makeRests(fillGaps=True, inPlace=True)
         s.append(note.Rest(quarterLength=4))
-        unused_csChords = s.flat.getElementsByClass(chord.Chord)
+        unused_csChords = s.flatten().getElementsByClass(chord.Chord)
         # self.assertEqual(len(csChords), 57)
         # s.show()
         # s.show('text')

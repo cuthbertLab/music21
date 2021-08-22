@@ -1948,7 +1948,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         a = corpus.parse('bach/bwv5.7')
         found = []
-        for n in a.flat.notesAndRests:
+        for n in a.flatten().notesAndRests:
             for obj in n.expressions:
                 if isinstance(obj, expressions.Fermata):
                     found.append(obj)
@@ -2043,7 +2043,7 @@ class Test(unittest.TestCase):
             s = corpus.parse(work)
             # always use tenor line
             found = []
-            for n in s.parts[2].flat.notesAndRests:
+            for n in s.parts[2].flatten().notesAndRests:
                 n.lyric = n.beatStr
                 found.append(n.beat)
 

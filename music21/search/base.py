@@ -25,6 +25,7 @@ from music21 import base as m21Base
 from music21 import exceptions21
 from music21 import duration
 from music21 import note
+from music21.stream import Measure
 from music21.stream import filters
 
 __all__ = [
@@ -398,7 +399,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     >>> term1results = []
     >>> term2results = []
     >>> for p in grave.parts:
-    ...    pf = p.flat.stripTies().notesAndRests  # consider tied notes as one long note
+    ...    pf = p.flatten().stripTies().notesAndRests  # consider tied notes as one long note
     ...    temp1 = search.rhythmicSearch(pf, searchStream1)
     ...    temp2 = search.rhythmicSearch(pf, searchStream2)
     ...    for found in temp1:
@@ -508,11 +509,11 @@ def approximateNoteSearch(thisStream, otherStreams):
     o2 0.083333...
     '''
     isJunk = None
-    n = thisStream.flat.notesAndRests
+    n = thisStream.flatten().notesAndRests
     thisStreamStr = translateStreamToString(n)
     sorterList = []
     for s in otherStreams:
-        sn = s.flat.notesAndRests
+        sn = s.flatten().notesAndRests
         thatStreamStr = translateStreamToString(sn)
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
@@ -543,11 +544,11 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
     o2 0.1666666...
     '''
     isJunk = None
-    n = thisStream.flat.notesAndRests.stream()
+    n = thisStream.flatten().notesAndRests.stream()
     thisStreamStr = translateStreamToStringNoRhythm(n)
     sorterList = []
     for s in otherStreams:
-        sn = s.flat.notesAndRests.stream()
+        sn = s.flatten().notesAndRests.stream()
         thatStreamStr = translateStreamToStringNoRhythm(sn)
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
@@ -579,11 +580,11 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
     o2 0.0
     '''
     isJunk = None
-    n = thisStream.flat.notesAndRests.stream()
+    n = thisStream.flatten().notesAndRests.stream()
     thisStreamStr = translateStreamToStringOnlyRhythm(n)
     sorterList = []
     for s in otherStreams:
-        sn = s.flat.notesAndRests.stream()
+        sn = s.flatten().notesAndRests.stream()
         thatStreamStr = translateStreamToStringOnlyRhythm(sn)
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
@@ -618,14 +619,14 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     o2 0.25
     '''
     isJunk = None
-    n = thisStream.flat.notesAndRests.stream()
+    n = thisStream.flatten().notesAndRests.stream()
     thisStreamStrPitches = translateStreamToStringNoRhythm(n)
     thisStreamStrDuration = translateStreamToStringOnlyRhythm(n)
     # print('notes',thisStreamStrPitches)
     # print('rhythm',thisStreamStrDuration)
     sorterList = []
     for s in otherStreams:
-        sn = s.flat.notesAndRests
+        sn = s.flatten().notesAndRests
         thatStreamStrPitches = translateStreamToStringNoRhythm(sn)
         thatStreamStrDuration = translateStreamToStringOnlyRhythm(sn)
         # print('notes2',thisStreamStrPitches)
@@ -651,7 +652,7 @@ def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
     a string for searching on.
 
     >>> s = converter.parse("tinynotation: 3/4 c4 d8 r16 FF8. a'8 b-2.")
-    >>> sn = s.flat.notesAndRests
+    >>> sn = s.flatten().notesAndRests
     >>> streamString = search.translateStreamToString(sn)
     >>> print(streamString)
     <P>F<)KQFF_
@@ -764,7 +765,7 @@ def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
 
 
     >>> s = converter.parse("tinynotation: 3/4 c4 d8~ d16 r16 F8 F#8 F8 a'8 b-2")
-    >>> sn = s.flat.notesAndRests.stream()
+    >>> sn = s.flatten().notesAndRests.stream()
     >>> streamString = search.translateIntervalsAndSpeed(sn)
     >>> print(streamString)
     Ib RHJ<9
@@ -848,7 +849,7 @@ def translateStreamToStringNoRhythm(inputStream, returnMeasures=False):
     a string for searching on, using translateNoteToByte.
 
     >>> s = converter.parse("tinynotation: 4/4 c4 d e FF a'2 b-2")
-    >>> sn = s.flat.notesAndRests
+    >>> sn = s.flatten().notesAndRests
     >>> search.translateStreamToStringNoRhythm(sn)
     '<>@)QF'
 
@@ -875,7 +876,7 @@ def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
     a string for searching on.
 
     >>> s = converter.parse("tinynotation: 3/4 c4 d8 e16 FF8. a'8 b-2.")
-    >>> sn = s.flat.notesAndRests
+    >>> sn = s.flatten().notesAndRests
     >>> streamString = search.translateStreamToStringOnlyRhythm(sn)
     >>> print(streamString)
     PF<KF_
@@ -1063,7 +1064,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     returnDicts = []
     distanceToTranspose = 0
 
-    for thisMeasure in streamIn.semiFlat.getElementsByClass('Measure'):
+    for thisMeasure in streamIn[Measure]:
         rhythmString = translateStreamToStringOnlyRhythm(thisMeasure.notesAndRests)
         rhythmFound = False
         for entry in returnDicts:

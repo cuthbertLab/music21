@@ -422,7 +422,7 @@ class GeneralObjectExporter:
 
     def fromGeneralObject(self, obj):
         '''
-        Converts any Music21Object (or a duration or a pitch) to something that
+        Converts any Music21Object (or a Duration or a Pitch) to something that
         can be passed to ScoreExporter()
 
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
@@ -436,7 +436,7 @@ class GeneralObjectExporter:
                 {0.0} <music21.meter.TimeSignature 6/8>
                 {0.0} <music21.note.Note C>
                 {3.0} <music21.bar.Barline type=final>
-        >>> s.flat.notes[0].duration
+        >>> s[note.Note].first().duration
         <music21.duration.Duration 3.0>
         '''
         classes = obj.classes
@@ -1502,7 +1502,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.setMeterStream()
         self.setPartsAndRefStream()
         # get all text boxes
-        self.textBoxes = self.stream.flat.getElementsByClass('TextBox')
+        self.textBoxes = self.stream.flatten().getElementsByClass('TextBox')
 
         # we need independent sub-stream elements to shift in presentation
         self.highestTime = 0.0  # redundant, but set here.
@@ -1581,8 +1581,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         #                meterStream, meterStream[0]])
         if not meterStream:
             # note: this will return a default if no meters are found
-            meterStream = s.flat.getTimeSignatures(searchContext=False,
-                                                   sortByCreationTime=True, returnDefault=True)
+            meterStream = s.flatten().getTimeSignatures(searchContext=False,
+                                                        sortByCreationTime=True,
+                                                        returnDefault=True)
         self.meterStream = meterStream
 
     def setScoreLayouts(self):
@@ -2600,14 +2601,14 @@ class PartExporter(XMLExporterBase):
         # might need to getAll b/c might need spanners
         # from a higher level container
         # allContexts = []
-        # spannerContext = measureStream.flat.getContextByClass('Spanner')
+        # spannerContext = measureStream.flatten().getContextByClass('Spanner')
         # while spannerContext:
         #    allContexts.append(spannerContext)
         #    spannerContext = spannerContext.getContextByClass('Spanner')
         #
         # spannerBundle = spanner.SpannerBundle(allContexts)
         # only getting spanners at this level
-        # spannerBundle = spanner.SpannerBundle(measureStream.flat)
+        # spannerBundle = spanner.SpannerBundle(measureStream.flatten())
         self.spannerBundle = part.spannerBundle
 
     def fixupNotationMeasured(self):
@@ -6498,7 +6499,7 @@ class Test(unittest.TestCase):
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         fp = xmlDir / '61l-Lyrics-Elisions-Syllables.xml'
         s = converter.parse(fp)
-        notes = list(s.flat.notes)
+        notes = list(s.flatten().notes)
         n1 = notes[0]
         xmlOut = self.getXml(n1)
         self.assertIn('<lyric name="1" number="1">', xmlOut)
@@ -6702,7 +6703,7 @@ class Test(unittest.TestCase):
     def testFullMeasureRest(self):
         from music21 import converter
         s = converter.parse('tinynotation: 9/8 r1')
-        r = s.flat.notesAndRests.first()
+        r = s.reccurse().notesAndRests.first()
         r.quarterLength = 4.5
         self.assertEqual(r.fullMeasure, 'auto')
         tree = self.getET(s)
@@ -6747,7 +6748,7 @@ class TestExternal(unittest.TestCase):
         #    format='musicxml', forceSource=True)
         b = corpus.parse('cpebach')
         # b.show('text')
-        # n = b.flat.notes[0]
+        # n = b.flatten().notes[0]
         # print(n.expressions)
         # return
 

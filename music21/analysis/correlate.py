@@ -66,7 +66,7 @@ class ActivityMatch:
             objNameDst = dynamics.Dynamic
 
         post = []
-        streamFlat = self.streamObj.flat
+        streamFlat = self.streamObj.flatten()
 
         streamFlat = streamFlat.extendDuration(objNameDst)
 
@@ -107,7 +107,7 @@ class ActivityMatch:
         No dynamics here.
 
         >>> s = corpus.parse('bach/bwv8.6.xml')
-        >>> am = analysis.correlate.ActivityMatch(s.parts.first().flat)
+        >>> am = analysis.correlate.ActivityMatch(s.parts.first().flatten())
         >>> am.pitchToDynamic()
         Traceback (most recent call last):
         music21.analysis.correlate.CorrelateException: cannot create correlation:
@@ -116,7 +116,7 @@ class ActivityMatch:
         Many dynamics
 
         >>> s = corpus.parse('schoenberg/opus19/movement2')
-        >>> am = analysis.correlate.ActivityMatch(s.parts.first().flat)
+        >>> am = analysis.correlate.ActivityMatch(s.parts.first().flatten())
         >>> data = am.pitchToDynamic()
         >>> len(data)
         39
@@ -128,7 +128,7 @@ class ActivityMatch:
         objNameDst = dynamics.Dynamic
 
         for objName in [objNameSrc, objNameDst]:
-            dstCheck = self.streamObj.flat.getElementsByClass(objName)
+            dstCheck = self.streamObj.recurse().getElementsByClass(objName)
             if not dstCheck:
                 raise CorrelateException('cannot create correlation: an object '
                                          + f'that is not found in the Stream: {objName}')
@@ -217,7 +217,7 @@ class Test(unittest.TestCase):
 
         a = corpus.parse('schoenberg/opus19', 2)
 
-        b = ActivityMatch(a.flat)
+        b = ActivityMatch(a.flatten())
         dataPairs = b.pitchToDynamic()
         # print(dataPairs)
         # previous pair count was 401

@@ -77,7 +77,7 @@ class Test(unittest.TestCase):
         temp = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(temp)
         # sPost.show()
-        self.assertEqual(len(s.flat.notes), len(sPost.flat.notes))
+        self.assertEqual(len(s.recurse().notes), len(sPost.flatten().notes))
 
         self.assertEqual(len(s.parts[0].notes), len(sPost.parts[0].notes))
         # print(s.parts[0].notes)
@@ -132,7 +132,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.parts), 2)
         self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
-        self.assertEqual(len(sPost.flat.notes), 24)
+        self.assertEqual(len(sPost.recurse().notes), 24)
 
     def testBasicI(self):
         from music21 import stream
@@ -155,7 +155,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.parts), 2)
         self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
-        self.assertEqual(len(sPost.flat.notes), 24)
+        self.assertEqual(len(sPost.recurse().notes), 24)
 
     def testSpannerSerializationOfNotesNotInPickle(self):
         '''
