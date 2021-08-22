@@ -428,8 +428,8 @@ class Music21Object(prebase.ProtoM21Object):
     @id.setter
     def id(self, new_id):
         if isinstance(new_id, int) and new_id > defaults.minIdNumberToConsiderMemoryLocation:
-            msg = "Setting an ID that could be mistaken for a memory location "
-            msg += f"is discouraged: got {new_id}"
+            msg = 'Setting an ID that could be mistaken for a memory location '
+            msg += f'is discouraged: got {new_id}'
             warnings.warn(msg)
         self._id = new_id
 
