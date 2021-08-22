@@ -1198,7 +1198,7 @@ class NotRest(GeneralNote):
         return self._storedInstrument
 
     def _setStoredInstrument(self, newValue):
-        if not hasattr(newValue, 'instrumentId'):
+        if not (hasattr(newValue, 'instrumentId') or newValue is None):
             raise TypeError(f'Expected Instrument; got {type(newValue)}')
         self._storedInstrument = newValue
 
@@ -1251,8 +1251,8 @@ class NotRest(GeneralNote):
 
         >>> derived = p.stripTies()
         >>> p.remove(dulc)
-        >>> dulc in derived
-        True
+        >>> derived.getInstruments().first()
+        <music21.instrument.Dulcimer 'Dulcimer'>
         >>> n.getInstrument() is None
         True
         '''
