@@ -2557,12 +2557,13 @@ class PartExporter(XMLExporterBase):
         {0.0} <music21.instrument.Clarinet 'P...: Clarinet'>
         {4.0} <music21.instrument.BassClarinet 'Bass clarinet'>
         '''
-        # get a default instrument if not assigned
+        # Collect instruments
         if self.parent is not None and id(self.stream) in self.parent.instrumentsByStream:
             # this condition will be satisfied if this is the second or subsequent
             # PartStaff in a StaffGroup
             self.instrumentStream = self.parent.instrumentsByStream[id(self.stream)]
         else:
+            # get a default instrument if not assigned
             self.instrumentStream = self.stream.getInstruments(returnDefault=True, recurse=True)
         self.firstInstrumentObject = self.instrumentStream[0]  # store first, as handled differently
 
