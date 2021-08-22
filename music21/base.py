@@ -5167,6 +5167,18 @@ class Test(unittest.TestCase):
         prev = eCopy2.previous('Note')
         self.assertIs(prev, eCopy1)
 
+    def testWarnCopyingIds(self):
+        '''
+        It is not recommended to copy .id values between objects without being
+        sure the original .id value is not a memory location.
+        '''
+        obj = Music21Object()
+        obj2 = Music21Object()
+        msg = 'Setting an ID that could be mistaken for a memory location '
+        msg += f'is discouraged: got {obj.id}'
+        with self.assertWarnsRegex(Warning, msg):
+            obj2.id = obj.id
+
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
