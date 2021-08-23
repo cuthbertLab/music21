@@ -113,7 +113,7 @@ OMIT_FROM_DOCS
 ['F5', 'A5', 'C6']
 
 >>> x = converter.parse('romantext: m1 a: vi')
->>> [str(p) for p in x[roman.RomanNumeral.first().pitches]
+>>> [str(p) for p in x[roman.RomanNumeral].first().pitches]
 ['F#5', 'A5', 'C#6']
 
 >>> [str(p) for p in

@@ -6703,7 +6703,7 @@ class Test(unittest.TestCase):
     def testFullMeasureRest(self):
         from music21 import converter
         s = converter.parse('tinynotation: 9/8 r1')
-        r = s.reccurse().notesAndRests.first()
+        r = s.recurse().notesAndRests.first()
         r.quarterLength = 4.5
         self.assertEqual(r.fullMeasure, 'auto')
         tree = self.getET(s)

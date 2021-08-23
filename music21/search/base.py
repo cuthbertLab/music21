@@ -1064,7 +1064,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     returnDicts = []
     distanceToTranspose = 0
 
-    for thisMeasure in streamIn[Measure]:
+    for thisMeasure in streamIn.flatten().getElementsByClass('Measure'):
         rhythmString = translateStreamToStringOnlyRhythm(thisMeasure.notesAndRests)
         rhythmFound = False
         for entry in returnDicts:

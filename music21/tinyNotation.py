@@ -676,7 +676,7 @@ class NoteToken(NoteOrRestToken):
         >>> n = note.Note('B')
         >>> n.octave = 2
         >>> searchResult = re.search(nToken.pitchMap['flats'], tStr)
-        >>> tPost = nToken.flatten()s(n, searchResult, nToken.pitchMap['flats'], tStr)
+        >>> tPost = nToken.flats(n, searchResult, nToken.pitchMap['flats'], tStr)
         >>> tPost
         'BB'
         >>> n.pitch.accidental

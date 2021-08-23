@@ -7636,8 +7636,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> sf.elements
         (<music21.stream.Part part1>,
          <music21.stream.Part part2>,
-         <music21.stream.Measure 1 offset=0.0>,
-         <music21.stream.Measure 1 offset=0.0>,
+         <music21.stream.Measure 1a offset=0.0>,
+         <music21.stream.Measure 1b offset=0.0>,
          <music21.note.Note C>,
          <music21.note.Note D>)
         >>> sf[0]
@@ -7662,7 +7662,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> for el in sc.recurse():
         ...     print(el)
         <music21.stream.Part part1>
-        <music21.stream.Measure 1 offset=0.0>
+        <music21.stream.Measure 1a offset=0.0>
         <music21.note.Note C>
         <music21.stream.Part part2>
         <music21.stream.Measure 1b offset=0.0>

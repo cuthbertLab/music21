@@ -3107,12 +3107,12 @@ class Test(unittest.TestCase):
             s.append(m)
 
         self.assertEqual(len(s), 8)
-        self.assertEqual(str(s.recurse().pitches[0]), 'A2')
+        self.assertEqual(str(s.flatten().pitches[0]), 'A2')
 
         self.assertEqual(features.vectorById(s, 'p20'),
                          [3 / 16, 1 / 16, 0.0, 3 / 16, 1 / 16,
                           0.0, 3 / 16, 1 / 16, 0.0, 3 / 16, 1 / 16, 0.0])
-        self.assertEqual([x.nameWithOctave for x in s.recurse().pitches],
+        self.assertEqual([x.nameWithOctave for x in s.flatten().pitches],
                          ['A2', 'B-3', 'A2', 'A2', 'C3', 'C#4', 'C3', 'C3', 'E-3',
                           'E4', 'E-3', 'E-3', 'F#3', 'G4', 'F#3', 'F#3', 'A3',
                           'B-4', 'A3', 'A3', 'C4', 'C#5', 'C4', 'C4', 'E-4', 'E5',
