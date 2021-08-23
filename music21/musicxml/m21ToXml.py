@@ -2580,14 +2580,14 @@ class PartExporter(XMLExporterBase):
         if should_short_circuit:
             return
 
-        seenInstrumentClasses = set()
+        seen_instrument_classes = set()
         for thisInstrument in self.instrumentStream:
             # fragile against two or more instruments with the same
             # Instrument subclass but different MIDI numbers or channels.
-            if type(thisInstrument) in seenInstrumentClasses:
+            if type(thisInstrument) in seen_instrument_classes:
                 continue
 
-            seenInstrumentClasses.add(type(thisInstrument))
+            seen_instrument_classes.add(type(thisInstrument))
             if (thisInstrument.midiChannel is None
                     or thisInstrument.midiChannel in self.midiChannelList):
                 try:
@@ -2763,25 +2763,29 @@ class PartExporter(XMLExporterBase):
         # TODO: part-abbreviation-display
         # TODO: group
 
+        seen_instrument_classes = set()
         # The first instrument of each Class appears as a <score-instrument>
         for inst in self.instrumentStream:
             # only use the first instance of this class
-            if inst is not self.instrumentStream[type(inst)].first():
+            if type(inst) in seen_instrument_classes:
                 continue
             if (inst.instrumentName is not None
                     or inst.instrumentAbbreviation is not None
                     or inst.midiProgram is not None):
                 mxScorePart.append(self.instrumentToXmlScoreInstrument(inst))
+                seen_instrument_classes.add(type(inst))
 
+        seen_instrument_classes = set()
         # now iterate again to write <midi-instrument> tags for those
         # same instruments, tags which must follow all <score-instrument> tags.
         for inst in self.instrumentStream:
             # TODO: disambiguate instrument instance with different midi programs?
-            if inst is not self.instrumentStream[type(inst)].first():
+            if type(inst) in seen_instrument_classes:
                 continue
             # TODO: midi-device
             if inst.midiProgram is not None:
                 mxScorePart.append(self.instrumentToXmlMidiInstrument(inst))
+                seen_instrument_classes.add(type(inst))
 
         return mxScorePart
 
@@ -3690,11 +3694,17 @@ class MeasureExporter(XMLExporterBase):
         closest_inst = searchingObject.getInstrument()
         if closest_inst is None:
             return
-        instance_to_use = self.parent.instrumentStream[type(closest_inst)].first()
+
+        instance_to_use = None
+        for inst in self.parent.instrumentStream:
+            if inst.classSet == closest_inst.classSet:
+                instance_to_use = inst
+                break
+
         if instance_to_use is None:
             # exempt coverage, because this is only for safety/unreachable
             raise MusicXMLExportException(
-                f'Could not find {closest_inst} for note {n} in instrumentStream'
+                f'Could not find instrument instance for note {n} in instrumentStream'
             )  # pragma: no cover
         mxInstrument = SubElement(mxNote, 'instrument')
         mxInstrument.set('id', instance_to_use.instrumentId)
@@ -6771,6 +6781,30 @@ class Test(unittest.TestCase):
         self.assertNotEqual(tree.find('.//score-instrument').get('id'),
                             tree.findall('.//measure/note/instrument')[-1].get('id'))
 
+    def testMultipleInstrumentsPiano(self):
+        from music21 import layout
+
+        ps1 = stream.PartStaff([
+            stream.Measure([instrument.ElectricPiano(), note.Note(type='whole')]),
+            stream.Measure([instrument.ElectricOrgan(), note.Note(type='whole')]),
+            stream.Measure([instrument.Piano(), note.Note(type='whole')]),
+        ])
+        ps2 = stream.PartStaff([
+            stream.Measure([instrument.Vocalist(), note.Note(type='whole')]),
+            stream.Measure([note.Note(type='whole')]),
+            stream.Measure([note.Note(type='whole')]),
+        ])
+        sg = layout.StaffGroup([ps1, ps2])
+        s = stream.Score([ps1, ps2, sg])
+        scEx = ScoreExporter(s)
+        tree = scEx.parse()
+
+        self.assertEqual(
+            [el.text for el in tree.findall('.//instrument-name')],
+            ['Electric Piano', 'Voice', 'Electric Organ', 'Piano']
+        )
+        self.assertEqual(len(tree.findall('.//measure/note/instrument')), 6)
+
     def testMidiInstrumentNoName(self):
         from music21 import converter
 
@@ -6781,6 +6815,7 @@ class Test(unittest.TestCase):
         scExporter = ScoreExporter(s)
 
         tree = scExporter.parse()
+        s.write(fp='noname')
         mxScoreInstrument = tree.findall('.//score-instrument')[0]
         mxMidiInstrument = tree.findall('.//midi-instrument')[0]
         self.assertEqual(mxScoreInstrument.get('id'), mxMidiInstrument.get('id'))
