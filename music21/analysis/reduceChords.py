@@ -119,6 +119,9 @@ class ChordReducer:
         # partwiseReduction = tree.toPartwiseScore()
         # for part in partwiseReduction:
         #    reduction.append(part)
+
+        # TODO: make chordified a method on TimespanTree and move stream.chordify guts there
+        #   then use that and remove this deprecated call.
         chordifiedReduction = tree.toStream.chordified(
             scoreTree,
             templateStream=inputScore,
