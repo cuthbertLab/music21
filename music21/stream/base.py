@@ -11343,7 +11343,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
          <music21.note.Lyric number=1 syllabic=single text='words'>]
 
         If ignoreBarlines is True, it will behave as if the elements in measures are all
-        in a flattened stream (note that this is not stream.flatten() as it does not copy the elements)
+        in a flattened stream (note that this is not stream.flatten()
+        as it does not copy the elements)
         together without measure containers. This means that even if recurse is
         False, lyrics() will still essentially recurse through measures.
 

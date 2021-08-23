@@ -65,7 +65,7 @@ def compressXML(filename: Union[str, pathlib.Path],
     '''
     filename = str(filename)
     if strictMxlCheck and not filename.endswith('.xml') and not filename.endswith('.musicxml'):
-        return False # not a musicXML file
+        return False  # not a musicXML file
     fp = common.pathTools.cleanpath(filename, returnPathlib=True)
     if not silent:  # pragma: no cover
         environLocal.warn(f"Updating file: {fp}")

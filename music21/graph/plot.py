@@ -1523,7 +1523,8 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
 
     def testPlot3DPitchSpaceQuarterLengthCount(self):
         a = corpus.parse('schoenberg/opus19', 6)  # also tests Tuplets
-        b = Plot3DBarsPitchSpaceQuarterLength(a.flatten().stripTies(), title='Schoenberg pitch space')
+        b = Plot3DBarsPitchSpaceQuarterLength(a.flatten().stripTies(),
+                                              title='Schoenberg pitch space')
         b.run()
 
     def writeAllPlots(self):

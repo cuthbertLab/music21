@@ -118,6 +118,7 @@ def hyphenToCamelCase(usrStr: str, replacement: str = '-') -> str:
 
 
 def camelCaseToHyphen(usrStr: str, replacement: str = '-') -> str:
+    # pylint: disable=line-too-long
     '''
     Given a camel-cased string, or a mixture of numbers and characters,
     create a space separated string.

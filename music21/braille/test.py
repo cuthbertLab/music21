@@ -325,7 +325,8 @@ class Test(unittest.TestCase):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse("tinynotation: 3/4 g4 g8 d4 d8 g4 b8 d'8 b8 "
                              "g8 a4 a8 a8 b8 c'8 b4 b8 "
-                             "g4 r8 a4 a8 d4 d8 g4 b8 a4 c'8 b8 c'8 d'8 c'4 a8 g4 g8 g4 r8").flatten()
+                             "g4 r8 a4 a8 d4 d8 g4 b8 a4 c'8 b8 c'8 d'8 c'4 a8 g4 g8 g4 r8"
+                             ).flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -351,7 +352,8 @@ class Test(unittest.TestCase):
     def test_example04_2(self):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse(
-            'tinynotation: 4/4 F2 A2 G2 C2 D4 C4 D4 E4 F2 r2 D2 F2 C2 F2 E4 F4 G4 A4 F2 r2').flatten()
+            'tinynotation: 4/4 F2 A2 G2 C2 D4 C4 D4 E4 F2 r2 D2 F2 C2 F2 E4 F4 G4 A4 F2 r2'
+        ).flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -1507,7 +1509,8 @@ class Test(unittest.TestCase):
     def test_drill09_1(self):
         bm = converter.parse("tinynotation: 6/8 r2 g8 a- b-4.~ b-8 g b- d'4.~ d'8 c' "
                              "b- a-4 g8 e-4 f8 g4. r8 a- b- "
-                             "c'4.~ c'8 a- c' e'-4.~ e'-8 d' f' e'- d' c' b- a- f e-4.~ e-8").flatten()
+                             "c'4.~ c'8 a- c' e'-4.~ e'-8 d' f' e'- d' c' b- a- f e-4.~ e-8"
+                             ).flatten()
         bm.insert(0.0, tempo.TempoText('Allegretto'))
         bm.insert(0.0, key.KeySignature(-3))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -3521,7 +3524,8 @@ Barline final ⠣⠅
         self.method = keyboardPartsToBraille
         rightHand = converter.parse("tinynotation: 4/4 d'16 b16 a16 f#16 e4~ e16 d16 A16 d16 e4 "
                                     "c#16 B16 c#16 d16 e16 g16 f#16 e16 f#16 e16 f#16 g16 a16 "
-                                    "b16 c'#16 d'16 e'16 d'16 c'#16 b16 a16 g16 f#16 e16 d2").flatten()
+                                    "b16 c'#16 d'16 e'16 d'16 c'#16 b16 a16 g16 f#16 e16 d2"
+                                    ).flatten()
         leftHand = converter.parse("tinynotation: 4/4 d'4~ d'16 c'#16 b16 g16 f#4~ f#16 g16 "
                                    "b16 g16 a4 c'#4 d'8 d'16 e'16 f'#16 g'16 e'16 f'#16 g'4 "
                                    "c'#4 r16 a16 f#16 e16 d4").flatten()
