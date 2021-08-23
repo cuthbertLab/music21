@@ -32,7 +32,7 @@ import sys
 from collections import namedtuple
 from fractions import Fraction
 from math import isclose
-from typing import Dict, Union, List, Optional, Set, Tuple, Sequence, TypeVar
+from typing import Dict, Union, List, Optional, Set, Tuple, Sequence, TypeVar, TYPE_CHECKING
 
 from music21 import base
 
@@ -44,7 +44,6 @@ from music21 import defaults
 from music21 import derivation
 from music21 import duration
 from music21 import exceptions21
-from music21 import instrument  # for typing
 from music21 import interval
 from music21 import key
 from music21 import metadata
@@ -67,6 +66,10 @@ from music21.common.numberTools import opFrac
 from music21.common.enums import GatherSpanners, OffsetSpecial
 
 from music21 import environment
+
+if TYPE_CHECKING:
+    from music21 import instrument
+
 environLocal = environment.Environment('stream')
 
 StreamException = exceptions21.StreamException
