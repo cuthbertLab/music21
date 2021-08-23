@@ -12,7 +12,6 @@
 import copy
 import fractions
 import io
-import math
 # import pprint
 import re
 # import sys
@@ -3427,23 +3426,12 @@ class MeasureParser(XMLParserBase):
 
         # two ways to create durations, raw (from qLen) and cooked (from type, time-mod, dots)
         if d is not None:
+            # N.B. this branch currently executes just for grace note corrections
             durRaw = duration.Duration(quarterLength=qLen)  # raw just uses qLen
-            # the qLen set here may not be computable, but is not immediately
-            # computed until setting components
-            try:
-                d.components = durRaw.components
-            except duration.DurationException:  # TODO: Test
-                if qLen:
-                    qLenRounded = 2.0 ** round(math.log2(qLen))
-                else:
-                    qLenRounded = 0.0
-                environLocal.printDebug(
-                    ['mxToDuration',
-                        f'rounding duration to {qLenRounded} as type is not'
-                        + 'defined and raw quarterLength '
-                        + f'({qLen}) is not a computable duration'])
-                durRaw.quarterLength = qLen = qLenRounded
+            d.components = durRaw.components
+            d.tuplets = durRaw.tuplets
         else:
+            # N.B. this branch executes most of the time
             d = duration.Duration(quarterLength=qLen)
         # can't do this unless we have a type, so if not forceRaw
         if not forceRaw:  # a cooked version builds up from pieces
@@ -3455,7 +3443,7 @@ class MeasureParser(XMLParserBase):
                 return d if inputM21 is None else None
             if d is not None:
                 d.clear()
-                d.tuplets = []
+                d.tuplets = ()
                 d.addDurationTuple(dt)
             else:
                 d = duration.Duration(durationTuple=dt)
@@ -7110,6 +7098,19 @@ class Test(unittest.TestCase):
         metro = s.recurse().getElementsByClass('MetronomeMark').first()
         self.assertEqual(metro.style.absoluteY, 40)
         self.assertEqual(metro.placement, 'above')
+
+    def testClearingTuplets(self):
+        from xml.etree.ElementTree import fromstring as EL
+
+        MP = MeasureParser()
+        MP.divisions = 4
+        d = duration.Duration(2 / 3)
+        self.assertEqual(len(d.tuplets), 1)
+        mxNoteNoType = EL('<note><pitch><step>D</step><octave>6</octave></pitch>'
+                            '<duration>3</duration></note>')
+        MP.xmlToDuration(mxNoteNoType, inputM21=d)
+        self.assertEqual(len(d.tuplets), 0)
+        self.assertEqual(d.linked, True)
 
 
 if __name__ == '__main__':
