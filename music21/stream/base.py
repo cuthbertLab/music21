@@ -4957,6 +4957,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         instrument_stream = returnObj.getInstruments(recurse=True)
+        instrument_map: Dict[Instrument, Union[float, Fraction]] = {}
+        for inst in instrument_stream:
+            # keep track of original durations of each instrument
+            instrument_map[inst] = inst.duration.quarterLength
+            # this loses the expression of duration, but should be fine for instruments.
+
         instrument_stream.duration = returnObj.duration
         instrument_stream.extendDuration('Instrument', inPlace=True)
 
@@ -4982,6 +4988,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 trans = trans.reverse()
             focus.transpose(trans, inPlace=True,
                             classFilterList=classFilterList)
+
+        # restore original durations
+        for inst, original_ql in instrument_map.items():
+            inst.duration.quarterLength = original_ql
 
         return returnObj
 

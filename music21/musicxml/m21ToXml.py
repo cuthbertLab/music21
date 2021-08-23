@@ -2492,8 +2492,14 @@ class PartExporter(XMLExporterBase):
 
         self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
 
-        # Split complex durations in place
-        self.stream = self.stream.splitAtDurations(recurse=True)[0]
+        # Split complex durations in place if needed
+        has_complex_durations = bool(
+            self.stream.recurse().getElementsNotOfClass(
+                ['Stream', 'Variant', 'Spanner']
+            ).addFilter(lambda el: el.duration.type == 'complex')
+        )
+        if has_complex_durations:
+            self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
         # Suppose that everything below this is a measure
         if self.makeNotation and not self.stream.getElementsByClass(stream.Measure):
@@ -6735,6 +6741,26 @@ class Test(unittest.TestCase):
         tree = self.getET(s)
         self.assertEqual(len(tree.findall('.//rest')), 1)
 
+    def test_instrumentDoesNotCreateForward(self):
+        '''
+        Instrument tags were causing forward motion in some cases.
+        From Chapter 14, Key Signatures
+
+        This is a transposed score.  Instruments were being extended in duration
+        in the toSoundingPitch and not having their durations restored afterwards
+        leading to Instrument objects being split if the duration was complex
+        '''
+        from music21 import corpus
+        from music21 import meter
+        alto = corpus.parse('bach/bwv57.8').parts['Alto']
+        alto.measure(7).timeSignature = meter.TimeSignature('6/8')
+        newAlto = alto.flat.getElementsNotOfClass(meter.TimeSignature).stream()
+        newAlto.insert(0, meter.TimeSignature('2/4'))
+        newAlto.makeMeasures(inPlace=True)
+        newAltoFixed = newAlto.makeNotation()
+        tree = self.getET(newAltoFixed)
+        self.assertTrue(tree.findall('.//note'))
+        self.assertFalse(tree.findall('.//forward'))
 
 class TestExternal(unittest.TestCase):
     show = True
@@ -6791,4 +6817,4 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testExceptionMessage')
+    music21.mainTest(Test)  # , runTest='test_instrumentDoesNotCreateForward')
