@@ -32,7 +32,7 @@ import sys
 from collections import namedtuple
 from fractions import Fraction
 from math import isclose
-from typing import Dict, Union, List, Optional, Set, Tuple, Sequence, TypeVar, TYPE_CHECKING
+from typing import Dict, Union, List, Optional, Set, Tuple, Sequence, TypeVar
 
 from music21 import base
 
@@ -66,9 +66,6 @@ from music21.common.numberTools import opFrac
 from music21.common.enums import GatherSpanners, OffsetSpecial
 
 from music21 import environment
-
-if TYPE_CHECKING:
-    from music21 import instrument
 
 environLocal = environment.Environment('stream')
 
@@ -4961,7 +4958,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         instrument_stream = returnObj.getInstruments(recurse=True)
-        instrument_map: Dict[instrument.Instrument, Union[float, Fraction]] = {}
+        instrument_map: Dict['music21.instrument.Instrument', Union[float, Fraction]] = {}
         for inst in instrument_stream:
             # keep track of original durations of each instrument
             instrument_map[inst] = inst.duration.quarterLength
