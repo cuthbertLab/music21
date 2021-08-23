@@ -1201,7 +1201,7 @@ class TimeSignature(base.Music21Object):
                                         firstPartitionForm=firstPartitionForm)
 
             # provide a partition for each flat division
-            accentCount = len(ms.flatten())
+            accentCount = len(ms.flat)
             # environLocal.printDebug(['got accentCount', accentCount, 'ms: ', ms])
             divStep = self.barDuration.quarterLength / accentCount
             weightInts = [0] * accentCount  # weights as integer/depth counts
