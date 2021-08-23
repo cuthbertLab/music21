@@ -1609,7 +1609,7 @@ def getTiePitchSet(prior: 'music21.note.NotRest'):
         previousNotes = [prior]
 
     for n in previousNotes:
-        if n.tie is None or n.tie.type == 'stop':
+        if n.tie is None or n.tie.type == 'stop' or isinstance(n, note.Unpitched):
             continue
         tiePitchSet.add(n.pitch.nameWithOctave)
     return tiePitchSet
