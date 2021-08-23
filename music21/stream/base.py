@@ -32,7 +32,7 @@ import sys
 from collections import namedtuple
 from fractions import Fraction
 from math import isclose
-from typing import Union, List, Optional, Set, Tuple, Sequence, TypeVar
+from typing import Dict, Union, List, Optional, Set, Tuple, Sequence, TypeVar
 
 from music21 import base
 
@@ -44,6 +44,7 @@ from music21 import defaults
 from music21 import derivation
 from music21 import duration
 from music21 import exceptions21
+from music21 import instrument  # for typing
 from music21 import interval
 from music21 import key
 from music21 import metadata
@@ -4957,7 +4958,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         instrument_stream = returnObj.getInstruments(recurse=True)
-        instrument_map: Dict[Instrument, Union[float, Fraction]] = {}
+        instrument_map: Dict[instrument.Instrument, Union[float, Fraction]] = {}
         for inst in instrument_stream:
             # keep track of original durations of each instrument
             instrument_map[inst] = inst.duration.quarterLength

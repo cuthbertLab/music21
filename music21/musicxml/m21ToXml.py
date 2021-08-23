@@ -6751,7 +6751,6 @@ class Test(unittest.TestCase):
         leading to Instrument objects being split if the duration was complex
         '''
         from music21 import corpus
-        from music21 import meter
         alto = corpus.parse('bach/bwv57.8').parts['Alto']
         alto.measure(7).timeSignature = meter.TimeSignature('6/8')
         newAlto = alto.flat.getElementsNotOfClass(meter.TimeSignature).stream()
