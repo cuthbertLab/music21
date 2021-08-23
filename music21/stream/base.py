@@ -6203,6 +6203,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         (<music21.pitch.Pitch C4>, <music21.pitch.Pitch D#4>)
         '''
         def chordifyOneMeasure(templateInner, streamToChordify):
+            '''
+            streamToChordify is either a Measure or a Score=MeasureSlice
+            '''
             timespanTree = streamToChordify.asTimespans(classList=('GeneralNote',))
             allTimePoints = timespanTree.allTimePoints()
             if 0 not in allTimePoints:
@@ -6213,7 +6216,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     continue
                 vert = timespanTree.getVerticalityAt(offset)
                 quarterLength = endTime - offset
-                if quarterLength < 0:
+                if quarterLength < 0:  # pragma: no cover
                     environLocal.warn(
                         'Something is wrong with the verticality '
                         + f'in stream {templateInner!r}: {vert!r} '
@@ -6266,6 +6269,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             workObj = self
 
         if self.hasPartLikeStreams():
+            # use the measure boundaries of the first Part as a template.
             templateStream = workObj.getElementsByClass('Stream').first()
         else:
             templateStream = workObj
@@ -6278,6 +6282,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             measureIterator = template.getElementsByClass('Measure')
             templateMeasure: 'Measure'
             for i, templateMeasure in enumerate(measureIterator):
+                # measurePart is likely a Score (MeasureSlice), not a measure
                 measurePart: 'Measure'
                 measurePart = workObj.measure(i, collect=(), indicesNotNumbers=True)
                 if measurePart is not None:
@@ -6289,7 +6294,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # accidental displayStatus needs to change.
         for p in template.pitches:
-            if p.accidental is not None and p.accidental.displayStatus != 'even-tied':
+            if p.accidental is not None and p.accidental.displayType != 'even-tied':
                 p.accidental.displayStatus = None
 
         if (hasattr(workObj, 'metadata')
@@ -7635,8 +7640,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> sf = sc.flatten(retainContainers=True)
         >>> sf.elements
         (<music21.stream.Part part1>,
-         <music21.stream.Part part2>,
          <music21.stream.Measure 1a offset=0.0>,
+         <music21.stream.Part part2>,
          <music21.stream.Measure 1b offset=0.0>,
          <music21.note.Note C>,
          <music21.note.Note D>)
@@ -7647,7 +7652,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> sf[0][0][0]
         <music21.note.Note C>
-        >>> sf[2][0]
+        >>> sf[1][0]
         <music21.note.Note C>
         >>> sf[4]
         <music21.note.Note C>

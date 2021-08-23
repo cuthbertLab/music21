@@ -1036,35 +1036,37 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     >>> bach = corpus.parse('bwv1.6')
     >>> sortedRhythms = search.mostCommonMeasureRhythms(bach)
     >>> for in_dict in sortedRhythms[0:3]:
-    ...     print('no: %s %s %s' % (in_dict['number'], 'rhythmString:', in_dict['rhythmString']))
+    ...     print(f"no: {in_dict['number']} rhythmString: {in_dict['rhythmString']}")
     ...     print('bars: %r' % ([(m.number,
-    ...                               str(m.getContextByClass('Part').id))
+    ...                               str(m.getContextByClass(stream.Part).id))
     ...                            for m in in_dict['measures']]))
     ...     in_dict['rhythm'].show('text')
     ...     print('-----')
     no: 34 rhythmString: PPPP
-    bars: [(1, 'Soprano'), (1, 'Alto'), (1, 'Tenor'), (1, 'Bass'), (2, ...), ..., (19, 'Soprano')]
+    bars: [(1, 'Soprano'), (2, 'Soprano'), (3, 'Soprano'), ..., (1, 'Alto'), ..., (10, 'Bass')]
     {0.0} <music21.note.Note C>
     {1.0} <music21.note.Note A>
     {2.0} <music21.note.Note F>
     {3.0} <music21.note.Note C>
     -----
     no: 7 rhythmString: ZZ
-    bars: [(13, 'Soprano'), (13, 'Alto'), ..., (14, 'Bass')]
+    bars: [(13, 'Soprano'), (14, 'Soprano'), ..., (14, 'Bass')]
     {0.0} <music21.note.Note C>
     {2.0} <music21.note.Note A>
     -----
     no: 6 rhythmString: ZPP
-    bars: [(6, 'Soprano'), (6, 'Bass'), ..., (18, 'Tenor')]
+    bars: [(6, 'Soprano'), (12, 'Soprano'), ..., (18, 'Tenor'), ... (12, 'Bass')]
     {0.0} <music21.note.Note C>
     {2.0} <music21.note.Note B->
     {3.0} <music21.note.Note B->
     -----
+
+    Changed in v7 -- bars are ordered first by number then by part.
     '''
     returnDicts = []
     distanceToTranspose = 0
 
-    for thisMeasure in streamIn.flatten().getElementsByClass('Measure'):
+    for thisMeasure in streamIn[Measure]:
         rhythmString = translateStreamToStringOnlyRhythm(thisMeasure.notesAndRests)
         rhythmFound = False
         for entry in returnDicts:

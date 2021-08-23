@@ -831,11 +831,11 @@ class Test(unittest.TestCase):
         self.assertEqual(sMerged.metadata.composer, 'Josquin des Prez')
         self.assertEqual(len(sMerged.parts), 4)
 
-        self.assertEqual(sMerged.parts[0].getElementsByClass('Clef').first().sign, 'G')
-        self.assertEqual(sMerged.parts[1].getElementsByClass('Clef').first().sign, 'G')
-        self.assertEqual(sMerged.parts[2].getElementsByClass('Clef').first().sign, 'G')
-        self.assertEqual(sMerged.parts[2].getElementsByClass('Clef').first().octaveChange, -1)
-        self.assertEqual(sMerged.parts[3].getElementsByClass('Clef').first().sign, 'F')
+        self.assertEqual(sMerged.parts[0][clef.Clef].first().sign, 'G')
+        self.assertEqual(sMerged.parts[1][clef.Clef].first().sign, 'G')
+        self.assertEqual(sMerged.parts[2][clef.Clef].first().sign, 'G')
+        self.assertEqual(sMerged.parts[2][clef.Clef].first().octaveChange, -1)
+        self.assertEqual(sMerged.parts[3][clef.Clef].first().sign, 'F')
 
         # sMerged.show()
 
