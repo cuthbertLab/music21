@@ -2492,14 +2492,8 @@ class PartExporter(XMLExporterBase):
 
         self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
 
-        # Split complex durations in place if needed
-        has_complex_durations = bool(
-            self.stream.recurse().getElementsNotOfClass(
-                ['Stream', 'Variant', 'Spanner']
-            ).addFilter(lambda el: el.duration.type == 'complex')
-        )
-        if has_complex_durations:
-            self.stream = self.stream.splitAtDurations(recurse=True)[0]
+        # Split complex durations in place (fast if none are found)
+        self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
         # Suppose that everything below this is a measure
         if self.makeNotation and not self.stream.getElementsByClass(stream.Measure):
