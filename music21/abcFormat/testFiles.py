@@ -704,7 +704,7 @@ class Test(unittest.TestCase):
         title = ah.getTitle()
         environLocal.printDebug([title])
         s = translate.abcToStreamScore(ah)
-        notes = s.flat.getElementsByClass(note.Note)
+        notes = s.flatten().getElementsByClass(note.Note)
         cSharp = notes[3]
         cThrough = notes[5]
         self.assertEqual(cSharp.pitch.midi, cThrough.pitch.midi,
@@ -723,7 +723,7 @@ class Test(unittest.TestCase):
         self.assertEqual(notes[17].pitch.midi, 74, 'Sharp (D5) carries over measure incorrectly')
         self.assertEqual(notes[18].pitch.midi, 78, 'Natural (F5) carries over measure incorrectly')
         # TODO: Carrying an accidental into the next measure with a tie does not work.
-        # notes = s.flat.getElementsByClass(note.Note)
+        # notes = s.flatten().getElementsByClass(note.Note)
         # self.assertEqual(notes[4].pitch.midi, 70, 'Tied note loses it sharp')
         # self.assertEqual(notes[6].pitch.midi, 69, 'Tied-over sharp persists past the tie')
 
@@ -735,7 +735,7 @@ class Test(unittest.TestCase):
         af = abcFormat.ABCFile()
         ah = af.readstr(directiveCarryPitch)
         s = translate.abcToStreamScore(ah)
-        notes = s.flat.getElementsByClass(note.Note)
+        notes = s.flatten().getElementsByClass(note.Note)
         gSharp = notes[1]
         g8va = notes[3]
         self.assertEqual(gSharp.pitch.midi % 12,
@@ -766,7 +766,7 @@ class Test(unittest.TestCase):
         af = abcFormat.ABCFile()
         ah = af.readstr(directiveCarryOctave)
         s = translate.abcToStreamScore(ah)
-        notes = s.flat.getElementsByClass(note.Note)
+        notes = s.flatten().getElementsByClass(note.Note)
         gSharp = notes[1]
         g8va = notes[3]
         self.assertGreater(gSharp.pitch.midi % 12,
@@ -797,7 +797,7 @@ class Test(unittest.TestCase):
         af = abcFormat.ABCFile()
         ah = af.readstr(directiveCarryNot)
         s = translate.abcToStreamScore(ah)
-        notes = s.flat.getElementsByClass(note.Note)
+        notes = s.flatten().getElementsByClass(note.Note)
         gSharp = notes[1]
         g8va = notes[3]
         self.assertGreater(gSharp.pitch.midi % 12,

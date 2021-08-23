@@ -445,7 +445,7 @@ def realizeVolume(srcStream,
     bKeys = []
     boundaries = {}
     # get dynamic map
-    flatSrc = srcStream.flat  # assuming sorted
+    flatSrc = srcStream.flatten()  # assuming sorted
 
     # check for any dynamics
     dynamicsAvailable = False
@@ -695,7 +695,7 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
         # TODO: BUG -- one note too loud.
-        match = [n.volume.cachedRealizedStr for n in s.parts[0].flat.notes]
+        match = [n.volume.cachedRealizedStr for n in s.parts[0].flatten().notes]
         self.assertEqual(match, ['0.35', '0.35', '0.35', '0.35', '0.35',
                                  '0.5', '0.5', '0.5', '0.5',
                                  '0.64', '0.64', '0.64', '0.64', '0.64',
@@ -705,7 +705,7 @@ class Test(unittest.TestCase):
                                  '0.99', '0.99', '0.99', '0.99',
                                  '0.78', '0.78', '0.78', '0.78', '0.78', '0.78', '0.78'])
 
-        match = [n.volume.cachedRealizedStr for n in s.parts[1].flat.notes]
+        match = [n.volume.cachedRealizedStr for n in s.parts[1].flatten().notes]
 
         self.assertEqual(match, ['0.64', '0.64', '0.64', '0.64',
                                  '0.99', '0.99', '0.99', '0.99', '0.99',
@@ -716,7 +716,7 @@ class Test(unittest.TestCase):
                                  '0.35', '0.35', '0.35', '0.35', '0.35', '0.35',
                                  '0.5', '0.5', '0.5', '0.5', '0.5', '0.5', '0.5', '0.5', '0.5'])
 
-        match = [n.volume.cachedRealizedStr for n in s.parts[3].flat.notes]
+        match = [n.volume.cachedRealizedStr for n in s.parts[3].flatten().notes]
 
         self.assertEqual(match, ['0.99', '0.99', '0.99', '0.99', '0.99',
                                  '0.78', '0.78', '0.78', '0.78', '0.78',

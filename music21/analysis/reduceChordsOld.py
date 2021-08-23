@@ -76,7 +76,7 @@ class ChordReducer:
         '''
         from music21 import note
         if measureObj.isFlat is False:
-            mObj = measureObj.flat.notes.stream()
+            mObj = measureObj.flatten().notes.stream()
         else:
             mObj = measureObj.notes.stream()
 

@@ -6089,7 +6089,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         from music21 import converter
         s = converter.parse(testPrimitive.chordIndependentTies)
-        chords = s.flat.getElementsByClass('Chord')
+        chords = s.flatten().getElementsByClass('Chord')
         # the middle pitch should have a tie
         self.assertEqual(chords[0].getTie(pitch.Pitch('a4')).type, 'start')
         self.assertEqual(chords[0].getTie(pitch.Pitch('c5')), None)

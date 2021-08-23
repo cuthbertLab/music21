@@ -1101,13 +1101,13 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     Data is preceded by an identifier such as "tinynotation:"
 
     >>> s = converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c", makeNotation=False)
-    >>> s.getElementsByClass(meter.TimeSignature).first()
+    >>> s[meter.TimeSignature].first()
     <music21.meter.TimeSignature 3/4>
 
     or the format can be passed directly:
 
-    >>> s = converter.parse("2/16 E4 r f# g=lastG trip{b-8 a g} c", format='tinyNotation').flat
-    >>> s.getElementsByClass(meter.TimeSignature).first()
+    >>> s = converter.parse("2/16 E4 r f# g=lastG trip{b-8 a g} c", format='tinyNotation')
+    >>> s[meter.TimeSignature].first()
     <music21.meter.TimeSignature 2/16>
     '''
     # environLocal.printDebug(['attempting to parse()', value])
@@ -1399,7 +1399,7 @@ class Test(unittest.TestCase):
 
         mxString = testPrimitive.pitches01a
         a = parse(mxString)
-        a = a.flat
+        a = a.flatten()
         b = a.getElementsByClass(note.Note)
         # there should be 102 notes
         self.assertEqual(len(b), 102)
@@ -1407,7 +1407,7 @@ class Test(unittest.TestCase):
         # test directions, dynamics, wedges
         mxString = testPrimitive.directions31a
         a = parse(mxString)
-        a = a.flat
+        a = a.flatten()
         b = a.getElementsByClass(dynamics.Dynamic)
         # there should be 27 dynamics found in this file
         self.assertEqual(len(b), 27)
@@ -1421,7 +1421,7 @@ class Test(unittest.TestCase):
         # test lyrics
         mxString = testPrimitive.lyricsMelisma61d
         a = parse(mxString)
-        a = a.flat
+        a = a.flatten()
         b = a.getElementsByClass(note.Note)
         found = []
         for noteObj in b:
@@ -1432,14 +1432,14 @@ class Test(unittest.TestCase):
         # test we are getting rests
         mxString = testPrimitive.restsDurations02a
         a = parse(mxString)
-        a = a.flat
+        a = a.flatten()
         b = a.getElementsByClass(note.Rest)
         self.assertEqual(len(b), 19)
 
         # test if we can get trills
         mxString = testPrimitive.notations32a
         a = parse(mxString)
-        a = a.flat
+        a = a.flatten()
         b = a.getElementsByClass(note.Note)
 
         mxString = testPrimitive.rhythmDurations03a
@@ -1459,7 +1459,7 @@ class Test(unittest.TestCase):
         # # get the third movement
         # mxFile = corpus.getWork('opus18no1')[2]
         # a = parse(mxFile)
-        # a = a.flat
+        # a = a.flatten()
         # b = a.getElementsByClass(dynamics.Dynamic)
         # # 110 dynamics
         # self.assertEqual(len(b), 110)
@@ -1475,7 +1475,7 @@ class Test(unittest.TestCase):
         mxString = testPrimitive.chordsThreeNotesDuration21c
         a = parse(mxString)
         for part in a.getElementsByClass(stream.Part):
-            chords = part.flat.getElementsByClass(chord.Chord)
+            chords = part[chord.Chord]
             self.assertEqual(len(chords), 7)
             knownSize = [3, 2, 3, 3, 3, 3, 3]
             for i in range(len(knownSize)):
@@ -1489,7 +1489,7 @@ class Test(unittest.TestCase):
         mxString = testPrimitive.beams01
         a = parse(mxString)
         part = a.parts[0]
-        notes = part.flat.notesAndRests
+        notes = part.recurse().notesAndRests
         beams = []
         for n in notes:
             if isinstance(n, note.Note):
@@ -1508,7 +1508,7 @@ class Test(unittest.TestCase):
         a = parse(mxString)
         part = a.parts[0]
 
-        notes = part.flat.notesAndRests
+        notes = part.recurse().notesAndRests
         self.assertEqual(len(notes), 11)
 
     def testConversionMXClefPrimitive(self):
@@ -1518,7 +1518,7 @@ class Test(unittest.TestCase):
         a = parse(mxString)
         part = a.parts[0]
 
-        clefs = part.flat.getElementsByClass(clef.Clef)
+        clefs = part[clef.Clef]
         self.assertEqual(len(clefs), 18)
 
     def testConversionMXClefTimeCorpus(self):
@@ -1528,22 +1528,22 @@ class Test(unittest.TestCase):
         a = corpus.parse('luca')
 
         # there should be only one clef in each part
-        clefs = a.parts[0].flat.getElementsByClass(clef.Clef)
+        clefs = a.parts[0][clef.Clef]
         self.assertEqual(len(clefs), 1)
         self.assertEqual(clefs[0].sign, 'G')
 
         # second part
-        clefs = a.parts[1].flat.getElementsByClass(clef.Clef)
+        clefs = a.parts[1][clef.Clef]
         self.assertEqual(len(clefs), 1)
         self.assertEqual(clefs[0].octaveChange, -1)
         self.assertEqual(type(clefs[0]).__name__, 'Treble8vbClef')
 
         # third part
-        clefs = a.parts[2].flat.getElementsByClass(clef.Clef)
+        clefs = a.parts[2][clef.Clef]
         self.assertEqual(len(clefs), 1)
 
         # check time signature count
-        ts = a.parts[1].flat.getElementsByClass(meter.TimeSignature)
+        ts = a.parts[1][meter.TimeSignature]
         self.assertEqual(len(ts), 4)
 
     def testConversionMXArticulations(self):
@@ -1554,7 +1554,7 @@ class Test(unittest.TestCase):
         a = parse(mxString)
         part = a.parts[0]
 
-        notes = part.flat.getElementsByClass(note.Note)
+        notes = part.flatten().getElementsByClass(note.Note)
         self.assertEqual(len(notes), 4)
         post = []
         match = ["<class 'music21.articulations.Staccatissimo'>",
@@ -1573,7 +1573,7 @@ class Test(unittest.TestCase):
         a = parse(mxString)
         part = a.parts[0]
 
-        keyList = part.flat.getElementsByClass(key.KeySignature)
+        keyList = part[key.KeySignature]
         self.assertEqual(len(keyList), 46)
 
     def testConversionMXMetadata(self):
@@ -1594,7 +1594,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         a = parse(testPrimitive.barlines46a)
         part = a.parts[0]
-        barlineList = part.flat.getElementsByClass(bar.Barline)
+        barlineList = part[bar.Barline]
         self.assertEqual(len(barlineList), 11)
 
     def testConversionXMLayout(self):
@@ -1606,7 +1606,7 @@ class Test(unittest.TestCase):
         # a.show()
 
         part = a.getElementsByClass(stream.Part).first()
-        systemLayoutList = part.flat.getElementsByClass(layout.SystemLayout)
+        systemLayoutList = part[layout.SystemLayout]
         measuresWithSL = []
         for e in systemLayoutList:
             measuresWithSL.append(e.measureNumber)
@@ -1626,7 +1626,7 @@ class Test(unittest.TestCase):
         for p in a.parts:
             post = p.recurse().notes[0].getContextByClass('Clef')
             self.assertIsInstance(post, clef.TenorClef)
-            for n in p.flat.notes:
+            for n in p.recurse().notes:
                 if n.tie is not None:
                     countTies += 1
                     if n.tie.type == 'start' or n.tie.type == 'continue':
@@ -1637,15 +1637,16 @@ class Test(unittest.TestCase):
 
     def testConversionMXInstrument(self):
         from music21 import corpus
+        from music21 import instrument
         s = corpus.parse('schumann_clara/opus17', 3)
         # s.show()
-        is1 = s.parts[0].flat.getElementsByClass('Instrument')
+        is1 = s.parts[0][instrument.Instrument]
         self.assertEqual(len(is1), 1)
         # self.assertIn('Violin', is1[0].classes)
-        is2 = s.parts[1].flat.getElementsByClass('Instrument')
+        is2 = s.parts[1][instrument.Instrument]
         self.assertEqual(len(is2), 1)
         # self.assertIn('Violoncello', is1[0].classes)
-        is3 = s.parts[2].flat.getElementsByClass('Instrument')
+        is3 = s.parts[2][instrument.Instrument]
         self.assertEqual(len(is3), 1)
         # self.assertIn('Piano', is1[0].classes)
 
@@ -1682,7 +1683,7 @@ class Test(unittest.TestCase):
         # for fn in ['test01.mid', 'test02.mid', 'test03.mid', 'test04.mid']:
         s = parseFile(fp)
         # s.show()
-        self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 18)
+        self.assertEqual(len(s[note.Note]), 18)
 
         # has chords and notes
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
@@ -1690,12 +1691,12 @@ class Test(unittest.TestCase):
         # s.show()
         # environLocal.printDebug(['\n' + 'opening fp', fp])
 
-        self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 2)
-        self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 5)
+        self.assertEqual(len(s[note.Note]), 2)
+        self.assertEqual(len(s[chord.Chord]), 5)
 
         # MIDI import makes measures, so we will have one 4/4 time sig
-        self.assertEqual(len(s.flat.getElementsByClass(meter.TimeSignature)), 1)
-        self.assertEqual(len(s.flat.getElementsByClass(key.KeySignature)), 0)
+        self.assertEqual(len(s[meter.TimeSignature]), 1)
+        self.assertEqual(len(s[key.KeySignature]), 0)
 
         # this sample has eighth note triplets
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test06.mid'
@@ -1706,14 +1707,14 @@ class Test(unittest.TestCase):
 
         # s.show()
         from fractions import Fraction as F
-        dList = [n.quarterLength for n in s.flat.notesAndRests[:30]]
+        dList = [n.quarterLength for n in s.flatten().notesAndRests[:30]]
         match = [0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5,
                  0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
                  0.5, 0.5, 0.5, 0.5, F(1, 3), F(1, 3), F(1, 3), 0.5, 0.5, 1.0]
         self.assertEqual(dList, match)
 
-        self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
-        self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 1)
+        self.assertEqual(len(s[meter.TimeSignature]), 1)
+        self.assertEqual(len(s[key.KeySignature]), 1)
 
         # this sample has sixteenth note triplets
         # TODO much work is still needed on getting timing right
@@ -1722,16 +1723,16 @@ class Test(unittest.TestCase):
         # environLocal.printDebug(['\n' + 'opening fp', fp])
         s = parseFile(fp)
         # s.show('t')
-        self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
-        self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 1)
+        self.assertEqual(len(s[meter.TimeSignature]), 1)
+        self.assertEqual(len(s[key.KeySignature]), 1)
 
         # this sample has dynamic changes in key signature
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test08.mid'
         # environLocal.printDebug(['\n' + 'opening fp', fp])
         s = parseFile(fp)
         # s.show('t')
-        self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
-        found = s.flat.getElementsByClass('KeySignature')
+        self.assertEqual(len(s[meter.TimeSignature]), 1)
+        found = s[key.KeySignature]
         self.assertEqual(len(found), 3)
         # test the right keys
         self.assertEqual(found[0].sharps, -3)
@@ -1756,7 +1757,7 @@ class Test(unittest.TestCase):
         mxString = testPrimitive.repeatMultipleTimes45c
         s = parse(mxString)
 
-        self.assertEqual(len(s.flat.getElementsByClass(bar.Barline)), 4)
+        self.assertEqual(len(s[bar.Barline]), 4)
         part = s.parts[0]
         measures = part.getElementsByClass('Measure')
 
@@ -1771,14 +1772,14 @@ class Test(unittest.TestCase):
         # get a Stream object, not an opus
         self.assertIsInstance(s, stream.Score)
         self.assertNotIsInstance(s, stream.Opus)
-        self.assertEqual(len(s.flat.notesAndRests), 66)
+        self.assertEqual(len(s.recurse().notesAndRests), 66)
 
         # a small essen collection
         op = corpus.parse('essenFolksong/teste')
         # get a Stream object, not an opus
         # self.assertIsInstance(op, stream.Score)
         self.assertIsInstance(op, stream.Opus)
-        self.assertEqual([len(s.flat.notesAndRests) for s in op],
+        self.assertEqual([len(s.recurse().notesAndRests) for s in op],
                          [33, 51, 59, 33, 29, 174, 67, 88])
         # op.show()
 
@@ -1799,7 +1800,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s.metadata.title, 'Yi gan hongqi kongzhong piao')
         # make sure that beams are being made
         self.assertEqual(
-            str(s.parts[0].flat.notesAndRests[4].beams),
+            str(s.parts[0].recurse().notesAndRests[4].beams),
             '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
         # s.show()
 
@@ -1898,19 +1899,19 @@ class Test(unittest.TestCase):
 
         # Don't forceSource: test that pickles contemplate quantization keywords
         streamFpQuantized = parse(fp)
-        self.assertNotIn(0.875, streamFpQuantized.flat._uniqueOffsetsAndEndTimes())
+        self.assertNotIn(0.875, streamFpQuantized.flatten()._uniqueOffsetsAndEndTimes())
 
         streamFpNotQuantized = parse(fp, quantizePost=False)
-        self.assertIn(0.875, streamFpNotQuantized.flat._uniqueOffsetsAndEndTimes())
+        self.assertIn(0.875, streamFpNotQuantized.flatten()._uniqueOffsetsAndEndTimes())
 
         streamFpCustomQuantized = parse(fp, quarterLengthDivisors=[2])
-        self.assertNotIn(0.75, streamFpCustomQuantized.flat._uniqueOffsetsAndEndTimes())
+        self.assertNotIn(0.75, streamFpCustomQuantized.flatten()._uniqueOffsetsAndEndTimes())
 
         # Also check raw data: https://github.com/cuthbertLab/music21/issues/546
         with fp.open('rb') as f:
             data = f.read()
         streamDataNotQuantized = parse(data, quantizePost=False)
-        self.assertIn(0.875, streamDataNotQuantized.flat._uniqueOffsetsAndEndTimes())
+        self.assertIn(0.875, streamDataNotQuantized.flatten()._uniqueOffsetsAndEndTimes())
 
         # Remove pickles so that failures are possible in future
         pf1 = PickleFilter(fp)

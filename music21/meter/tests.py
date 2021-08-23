@@ -498,9 +498,9 @@ class Test(unittest.TestCase):
 
     def testMixedDurationBeams2(self):
         from music21 import converter
-        bm = converter.parse('tinyNotation: 3/8 b8 c16 r e. d32').flat
+        bm = converter.parse('tinyNotation: 3/8 b8 c16 r e. d32').flatten()
         bm2 = bm.makeNotation()
-        beamList = [n.beams for n in bm2.flat.notes]
+        beamList = [n.beams for n in bm2.recurse().notes]
         self.assertEqual(
             [repr(b) for b in beamList],
             ['<music21.beam.Beams <music21.beam.Beam 1/start>>',
@@ -512,7 +512,7 @@ class Test(unittest.TestCase):
 
         bm = converter.parse("tinyNotation: 2/4 b16 c' b a g f# g r")
         bm2 = bm.makeNotation()
-        beamList = [n.beams for n in bm2.flat.notes]
+        beamList = [n.beams for n in bm2.recurse().notes]
         beamListRepr = [str(i) + ' ' + repr(beamList[i]) for i in range(len(beamList))]
         self.maxDiff = 2000
         self.assertEqual(beamListRepr, [
@@ -528,7 +528,7 @@ class Test(unittest.TestCase):
     def testBestTimeSignature(self):
         from music21 import converter
         from music21 import meter
-        s6 = converter.parse('C4 D16.', format='tinyNotation').flat.notes
+        s6 = converter.parse('C4 D16.', format='tinyNotation').flatten().notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
@@ -558,21 +558,21 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21 import meter
 
-        s6 = converter.parse('C4.', format='tinyNotation').flat.notes
+        s6 = converter.parse('C4.', format='tinyNotation').flatten().notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
         ts6 = meter.bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 3/8>')
 
-        s6 = converter.parse('C2..', format='tinyNotation').flat.notes
+        s6 = converter.parse('C2..', format='tinyNotation').flatten().notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
         ts6 = meter.bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 7/8>')
 
-        s6 = converter.parse('C2...', format='tinyNotation').flat.notes
+        s6 = converter.parse('C2...', format='tinyNotation').flatten().notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
@@ -586,14 +586,14 @@ class Test(unittest.TestCase):
         '''
         from music21 import converter
         from music21 import meter
-        s6 = converter.parse('C2 D4 E8', format='tinyNotation').flat.notes
+        s6 = converter.parse('C2 D4 E8', format='tinyNotation').flatten().notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
         ts6 = meter.bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 7/8>')
 
-        s6 = converter.parse('C2 D4 E8 F16', format='tinyNotation').flat.notes
+        s6 = converter.parse('C2 D4 E8 F16', format='tinyNotation').flatten().notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
@@ -608,14 +608,14 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21 import meter
 
-        s6 = converter.parse('C4.. D4..', format='tinyNotation').flat.notes
+        s6 = converter.parse('C4.. D4..', format='tinyNotation').flatten().notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
         ts6 = meter.bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 7/8>')
 
-        s6 = converter.parse('C4... D4...', format='tinyNotation').flat.notes
+        s6 = converter.parse('C4... D4...', format='tinyNotation').flatten().notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)

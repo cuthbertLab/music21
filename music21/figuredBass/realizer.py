@@ -90,7 +90,7 @@ def figuredBassFromStream(streamPart):
         :width: 500
 
     '''
-    sf = streamPart.flat
+    sf = streamPart.flatten()
     sfn = sf.notes
 
     keyList = sf.getElementsByClass(key.Key)
@@ -318,7 +318,7 @@ class FiguredBassLine:
         else:
             currentMapping = checker.createOffsetMapping(bassLine)
         allKeys = sorted(currentMapping.keys())
-        bassLine = bassLine.flat.notes
+        bassLine = bassLine.flatten().notes
         bassNoteIndex = 0
         previousBassNote = bassLine[bassNoteIndex]
         bassNote = currentMapping[allKeys[0]][-1]

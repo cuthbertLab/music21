@@ -418,6 +418,7 @@ class KeySignature(base.Music21Object):
 
         New in v7 -- `tonic` argument to solve for mode.
         '''
+        our_sharps = self.sharps or 0  # || 0 in case of None -- non-standard key-signature
         if mode is not None and tonic is not None:
             warnings.warn(f'ignoring provided tonic: {tonic}', KeyWarning)
         if mode is None and tonic is None:
@@ -426,7 +427,7 @@ class KeySignature(base.Music21Object):
             majorSharpsToMode = {v: k for k, v in modeSharpsAlter.items()}
             majorSharps = pitchToSharps(tonic)
             try:
-                mode = majorSharpsToMode[self.sharps - majorSharps]
+                mode = majorSharpsToMode[our_sharps - majorSharps]
             except KeyError as ke:
                 raise KeyException(
                     f'Could not solve for mode from sharps={self.sharps}, tonic={tonic}') from ke
@@ -434,7 +435,9 @@ class KeySignature(base.Music21Object):
         if mode not in modeSharpsAlter:
             raise KeyException(f'Mode {mode} is unknown')
         sharpAlterationFromMajor = modeSharpsAlter[mode]
-        pitchObj = sharpsToPitch(self.sharps - sharpAlterationFromMajor)
+
+        pitchObj = sharpsToPitch(our_sharps - sharpAlterationFromMajor)
+
         return Key(pitchObj.name, mode)
 
     @property
@@ -811,10 +814,10 @@ class KeySignature(base.Music21Object):
     # --------------------------------------------------------------------------
     # properties
 
-    def _getSharps(self):
+    def _getSharps(self) -> Optional[int]:
         return self._sharps
 
-    def _setSharps(self, value):
+    def _setSharps(self, value: Optional[int]):
         if value != self._sharps:
             self._sharps = value
             self.clearCache()
@@ -831,6 +834,8 @@ class KeySignature(base.Music21Object):
         >>> ks1.sharps = -4
         >>> ks1
         <music21.key.KeySignature of 4 flats>
+
+        Can be set to None for a non-traditional key signature
         ''')
 
 

@@ -715,7 +715,7 @@ class AVLTree:
         <ElementNode: Start:End <0.-5...> Indices:(l:194 *194* r:195)
             Payload:<music21.bar.Barline type=final>>
 
-        >>> note1 = score.flat.notes[30]
+        >>> note1 = score.flatten().notes[30]
 
         Works with sortTuple positions as well...
 

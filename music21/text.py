@@ -87,7 +87,7 @@ def assembleLyrics(streamIn, lineNumber=1):
     '''
     word = []
     words = []
-    noteStream = streamIn.flat.notesAndRests
+    noteStream = streamIn.flatten().notesAndRests
     # need to find maximum number of lyrics on each note
     for n in noteStream:
         try:
@@ -385,7 +385,7 @@ class LanguageDetector:
     def readExcerpts(self):
         for languageCode in self.languageCodes:
             thisExcerpt = (common.getSourceFilePath() / 'languageExcerpts'
-                            / (languageCode + '.txt'))
+                            / 'trainingData' / (languageCode + '.txt'))
 
             with thisExcerpt.open(encoding='utf-8') as f:
                 excerptWords = f.read().split()

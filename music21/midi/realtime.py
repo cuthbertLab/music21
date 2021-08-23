@@ -14,11 +14,9 @@ Objects for realtime playback of Music21 Streams as MIDI.
 
 From an idea of Joe "Codeswell":
 
-https://joecodeswell.wordpress.com/2012/06/13/
-how-to-produce-python-controlled-audio-output-from-music-made-with-music21
+https://joecodeswell.wordpress.com/2012/06/13/how-to-produce-python-controlled-audio-output-from-music-made-with-music21
 
-https://stackoverflow.com/questions/10983462/
-how-can-i-produce-real-time-audio-output-from-music-made-with-music21
+https://stackoverflow.com/questions/10983462/how-can-i-produce-real-time-audio-output-from-music-made-with-music21
 
 Requires pygame: http://www.pygame.org/download.shtml
 '''
@@ -51,7 +49,7 @@ class StreamPlayer:  # pragma: no cover
     ...    keyDetune.append(random.randint(-30, 30))
 
     >>> #_DOCS_SHOW b = corpus.parse('bwv66.6')
-    >>> #_DOCS_SHOW for n in b.flat.notes:
+    >>> #_DOCS_SHOW for n in b.flatten().notes:
     >>> class PitchMock: midi = 20  #_DOCS_HIDE
     >>> class Mock: pitch = PitchMock()  #_DOCS_HIDE
     >>> #_DOCS_HIDE -- should not playback in doctests, see TestExternal
@@ -193,7 +191,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         keyDetune = []
         for i in range(127):
             keyDetune.append(random.randint(-30, 30))
-        for n in b.flat.notes:
+        for n in b.recurse().notes:
             n.pitch.microtone = keyDetune[n.pitch.midi]
         sp = StreamPlayer(b)
         sp.play()
@@ -231,7 +229,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         keyDetune = []
         for i in range(127):
             keyDetune.append(random.randint(-30, 30))
-        for n in b.flat.notes:
+        for n in b.recurse().notes:
             n.pitch.microtone = keyDetune[n.pitch.midi]
         sp = StreamPlayer(b)
         sp.play(busyFunction=busyCounter, busyArgs=[timeCounter], busyWaitMilliseconds=500)

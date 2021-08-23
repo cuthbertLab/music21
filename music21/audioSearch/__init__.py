@@ -898,7 +898,7 @@ def decisionProcess(
     Outputs: Returns the beginning of the best matching fragment of
     score and the countdown.
 
-    >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes.stream()
+    >>> scNotes = corpus.parse('luca/gloria').parts[0].flatten().notes.stream()
     >>> scoreStream = scNotes
     >>> sfp = common.getSourceFilePath() #_DOCS_HIDE
     >>> readPath = sfp / 'audioSearch' / 'test_audio.wav' #_DOCS_HIDE
@@ -927,7 +927,8 @@ def decisionProcess(
     ...     lengthData.append(tn_recording)
     ...     scNotes.id = name
     ...     totScores.append(scNotes)
-    >>> listOfParts = search.approximateNoteSearch(transcribedScore.flat.notes.stream(), totScores)
+    >>> listOfParts = search.approximateNoteSearch(transcribedScore.flatten().notes.stream(),
+    ...                                            totScores)
     >>> notePrediction = 0
     >>> lastNotePosition = 0
     >>> countdown = 0

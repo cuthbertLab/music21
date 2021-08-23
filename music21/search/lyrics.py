@@ -419,7 +419,7 @@ class Test(unittest.TestCase):
         </score-partwise>
         '''
         s = converter.parse(partXML, format='MusicXML')
-        ly = s.flat.notes[0].lyrics[0]
+        ly = s.flatten().notes[0].lyrics[0]
 
         def runSearch():
             ls = search.lyrics.LyricSearcher(s)
@@ -505,7 +505,7 @@ class Test(unittest.TestCase):
         self.assertEqual(ls.indexText, "hi there! // bye Michael.")
         tuples = ls.indexTuples
         self.assertEqual(len(tuples), 5)
-        notes = list(s.flat.notes)
+        notes = list(s.flatten().notes)
         self.assertIs(tuples[0].lyric, notes[0].lyrics[0])
         self.assertIs(tuples[1].lyric, notes[1].lyrics[0])
         self.assertIs(tuples[2].lyric, notes[0].lyrics[1])

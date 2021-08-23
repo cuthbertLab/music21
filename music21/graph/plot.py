@@ -1202,7 +1202,7 @@ class Dolan(HorizontalBarWeighted):
             return  # keep what the user set
         if self.streamObj:
             return None
-        instStream = self.streamObj.flat.getElementsByClass('Instrument')
+        instStream = self.streamObj.flatten().getElementsByClass('Instrument')
         if not instStream:
             return  # do not set anything
 
@@ -1464,7 +1464,7 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
         b.run()
 
     def testScatterWeightedPitchSpaceQuarterLength(self):
-        a = corpus.parse('bach/bwv57.8').parts[0].flat
+        a = corpus.parse('bach/bwv57.8').parts[0].flatten()
         for xLog in [True, False]:
             b = ScatterWeightedPitchSpaceQuarterLength(
                 a, title='Pitch Space Bach (soprano voice)',
@@ -1480,50 +1480,51 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
 
     def testPitchSpace(self):
         a = corpus.parse('bach/bwv57.8')
-        b = HistogramPitchSpace(a.parts[0].flat, title='Bach (soprano voice)')
+        b = HistogramPitchSpace(a.parts[0].flatten(), title='Bach (soprano voice)')
         b.run()
 
     def testPitchClass(self):
         a = corpus.parse('bach/bwv57.8')
-        b = HistogramPitchClass(a.parts[0].flat, title='Bach (soprano voice)')
+        b = HistogramPitchClass(a.parts[0].flatten(), title='Bach (soprano voice)')
         b.run()
 
     def testQuarterLength(self):
         a = corpus.parse('bach/bwv57.8')
-        b = HistogramQuarterLength(a.parts[0].flat, title='Bach (soprano voice)')
+        b = HistogramQuarterLength(a.parts[0].flatten(), title='Bach (soprano voice)')
         b.run()
 
     def testScatterPitchSpaceQuarterLength(self):
         for xLog in [True, False]:
 
             a = corpus.parse('bach/bwv57.8')
-            b = ScatterPitchSpaceQuarterLength(a.parts[0].flat, title='Bach (soprano voice)',
+            b = ScatterPitchSpaceQuarterLength(a.parts[0].flatten(), title='Bach (soprano voice)',
                                                )
             b.axisX.useLogScale = xLog
             b.run()
 
-            b = ScatterPitchClassQuarterLength(a.parts[0].flat, title='Bach (soprano voice)',
+            b = ScatterPitchClassQuarterLength(a.parts[0].flatten(), title='Bach (soprano voice)',
                                                )
             b.axisX.useLogScale = xLog
             b.run()
 
     def testScatterPitchClassOffset(self):
         a = corpus.parse('bach/bwv57.8')
-        b = ScatterPitchClassOffset(a.parts[0].flat, title='Bach (soprano voice)')
+        b = ScatterPitchClassOffset(a.parts[0].flatten(), title='Bach (soprano voice)')
         b.run()
 
     def testScatterPitchSpaceDynamicSymbol(self):
         a = corpus.parse('schumann/opus41no1', 2)
-        b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flat, title='Schumann (soprano voice)')
+        b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flatten(), title='Schumann (soprano voice)')
         b.run()
 
-        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat,
+        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flatten(),
                                                        title='Schumann (soprano voice)')
         b.run()
 
     def testPlot3DPitchSpaceQuarterLengthCount(self):
         a = corpus.parse('schoenberg/opus19', 6)  # also tests Tuplets
-        b = Plot3DBarsPitchSpaceQuarterLength(a.flat.stripTies(), title='Schoenberg pitch space')
+        b = Plot3DBarsPitchSpaceQuarterLength(a.flatten().stripTies(),
+                                              title='Schoenberg pitch space')
         b.run()
 
     def writeAllPlots(self):
@@ -1617,37 +1618,37 @@ class Test(unittest.TestCase):
 
     def testPitchSpaceDurationCount(self):
         a = corpus.parse('bach/bwv57.8')
-        b = ScatterWeightedPitchSpaceQuarterLength(a.parts[0].flat, doneAction=None,
+        b = ScatterWeightedPitchSpaceQuarterLength(a.parts[0].flatten(), doneAction=None,
                                                    title='Bach (soprano voice)')
         b.run()
 
     def testPitchSpace(self):
         a = corpus.parse('bach')
-        b = HistogramPitchSpace(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
+        b = HistogramPitchSpace(a.parts[0].flatten(), doneAction=None, title='Bach (soprano voice)')
         b.run()
 
     def testPitchClass(self):
         a = corpus.parse('bach/bwv57.8')
-        b = HistogramPitchClass(a.parts[0].flat,
+        b = HistogramPitchClass(a.parts[0].flatten(),
                                 doneAction=None,
                                 title='Bach (soprano voice)')
         b.run()
 
     def testQuarterLength(self):
         a = corpus.parse('bach/bwv57.8')
-        b = HistogramQuarterLength(a.parts[0].flat,
+        b = HistogramQuarterLength(a.parts[0].flatten(),
                                    doneAction=None,
                                    title='Bach (soprano voice)')
         b.run()
 
     def testPitchDuration(self):
         a = corpus.parse('schoenberg/opus19', 2)
-        b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flat,
+        b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flatten(),
                                            doneAction=None,
                                            title='Schoenberg (piano)')
         b.run()
 
-        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat,
+        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flatten(),
                                                    doneAction=None,
                                                    title='Schoenberg (piano)')
         b.run()
@@ -1662,7 +1663,7 @@ class Test(unittest.TestCase):
 #             doneAction=doneAction)
 #         b.run()
 
-        b = WindowedKey(a.flat, title=fn,
+        b = WindowedKey(a.flatten(), title=fn,
                         minWindow=1, windowStep=windowStep,
                         doneAction=doneAction, dpi=300)
         b.run()

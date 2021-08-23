@@ -2196,11 +2196,18 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             gd = GraceDuration()
 
         newComponents = []
+        new_type = self.type
+        if new_type == 'zero':
+            new_type = 'eighth'  # now that it is not a grace, it needs a type.
+
         for c in self.components:
+            c_type = c.type
+            if c_type == 'zero':
+                c_type = 'eighth'
             newComponents.append(DurationTuple(c.type, c.dots, 0.0))
         gd.components = newComponents  # set new components
         gd.linked = False
-        gd.type = self.type
+        gd.type = new_type
         gd.quarterLength = 0.0
         return gd
 

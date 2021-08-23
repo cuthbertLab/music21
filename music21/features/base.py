@@ -505,7 +505,7 @@ class StreamForms:
         return histogram
 
     keysToMethods = {
-        'flat': lambda unused, p: p.flat,
+        'flat': lambda unused, p: p.flatten(),
         'pitches': lambda unused, p: p.pitches,
         'notes': lambda unused, p: p.notes,
         'getElementsByClass(Measure)': formGetElementsByClassMeasure,

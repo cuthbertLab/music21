@@ -4137,7 +4137,7 @@ class Test(unittest.TestCase):
 
         def collectAccidentalDisplayStatus(s_inner):
             post = []
-            for e in s_inner.flat.notes:
+            for e in s_inner.flatten().notes:
                 if e.pitch.accidental is not None:
                     post.append(e.pitch.accidental.displayStatus)
                 else:  # mark as not having an accidental
@@ -4154,7 +4154,7 @@ class Test(unittest.TestCase):
                           False, False, False, 'x', 'x', 'x', False, False, False,
                           'x', 'x', 'x', 'x', True, False])
 
-        sTransposed = sSub.flat.transpose('p5')
+        sTransposed = sSub.flatten().transpose('p5')
         # sTransposed.show()
 
         self.assertEqual(collectAccidentalDisplayStatus(sTransposed),

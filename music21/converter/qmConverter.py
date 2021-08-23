@@ -101,7 +101,7 @@ class QMConverter(converter.subConverters.SubConverter):
         if fp is None:
             fp = environLocal.getTempFile('.qm')
 
-        for n in obj.flat.notes:
+        for n in obj.flatten().notes:
             music = music + n.name + ' '
         music += '\n'
 
