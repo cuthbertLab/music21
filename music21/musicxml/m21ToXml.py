@@ -6815,7 +6815,6 @@ class Test(unittest.TestCase):
         scExporter = ScoreExporter(s)
 
         tree = scExporter.parse()
-        s.write(fp='noname')
         mxScoreInstrument = tree.findall('.//score-instrument')[0]
         mxMidiInstrument = tree.findall('.//midi-instrument')[0]
         self.assertEqual(mxScoreInstrument.get('id'), mxMidiInstrument.get('id'))
