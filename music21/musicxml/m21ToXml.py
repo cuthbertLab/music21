@@ -3691,9 +3691,9 @@ class MeasureExporter(XMLExporterBase):
             return
 
         searchingObject = chordParent if chordParent else n
-        closest_inst = searchingObject.getInstrument(returnDefault=True)
+        closest_inst = searchingObject.getInstrument()
         if closest_inst is None:  # pragma: no cover
-            # unreachable; purely for extra safety
+            # unexpected; just for safety
             return
 
         instance_to_use = None
