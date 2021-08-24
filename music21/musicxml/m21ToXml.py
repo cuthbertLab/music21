@@ -2502,7 +2502,7 @@ class PartExporter(XMLExporterBase):
         if self.stream.atSoundingPitch is True:
             self.stream.toWrittenPitch(inPlace=True)
 
-        # Split complex durations in place (fast if not are found)
+        # Split complex durations in place (fast if none found)
         self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
         # Suppose that everything below this is a measure
