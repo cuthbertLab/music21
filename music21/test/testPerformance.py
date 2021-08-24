@@ -84,7 +84,7 @@ class Test(unittest.TestCase):
             s.append(r)
 
         for i in range(2):
-            post = s.flat.getElementsByClass([note.Rest, note.Note])
+            post = s.recurse().getElementsByClass([note.Rest, note.Note])
             self.assertEqual(len(post), 1500)
 
     def runGetElementsByClassString(self):
@@ -103,7 +103,7 @@ class Test(unittest.TestCase):
             s.append(r)
 
         for i in range(2):
-            post = s.flat.getElementsByClass(['Rest', 'Note'])
+            post = s.recurse().getElementsByClass(['Rest', 'Note'])
             self.assertEqual(len(post), 1500)
 
     def runParseBeethoven(self):
@@ -195,8 +195,8 @@ class Test(unittest.TestCase):
         '''
         s = corpus.parse('bwv66.6')
         # create a few secondary streams to add more sites
-        unused_flat = s.flat
-        unused_notes = s.flat.notes
+        unused_flat = s.flatten()
+        unused_notes = s.flatten().notes
 
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
@@ -222,8 +222,8 @@ class Test(unittest.TestCase):
         '''
         s = corpus.parse('bwv66.6')
         # create a few secondary streams to add more sites
-        unused_flat = s.flat
-        unused_notes = s.flat.notes
+        unused_flat = s.flatten()
+        unused_notes = s.flatten().notes
 
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):

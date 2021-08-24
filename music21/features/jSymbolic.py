@@ -3714,7 +3714,7 @@ class InstrumentFractionFeature(featuresModule.FeatureExtractor):
         for p in s.parts:
             i = p.getElementsByClass(Instrument).first()
             if i.midiProgram in self._targetPrograms:
-                count += len(p.flat.notes)
+                count += len(p.recurse().notes)
         self.feature.vector[0] = count / total
 
 

@@ -377,7 +377,7 @@ def makeMeasures(
         {0.0} <music21.note.Note D#>
         {1.5} <music21.bar.Barline type=final>
 
-    >>> allNotes = partWithMeasures.flat.notes
+    >>> allNotes = partWithMeasures.flatten().notes
     >>> allNotes[0].articulations
     []
 
@@ -430,7 +430,7 @@ def makeMeasures(
             # parts containing voices are less likely to occur since MIDI parsing changes in v7
             srcObj = s
         else:
-            srcObj = s.flat
+            srcObj = s.flatten()
         if not srcObj.isSorted:
             srcObj = srcObj.sorted()
         if not inPlace:
@@ -444,7 +444,7 @@ def makeMeasures(
     # may need to look in activeSite if no time signatures are found
     if meterStream is None:
         # get from this Stream, or search the contexts
-        meterStream = srcObj.flat.getTimeSignatures(
+        meterStream = srcObj.flatten().getTimeSignatures(
             returnDefault=True,
             searchContext=False,
             sortByCreationTime=False
@@ -1609,7 +1609,7 @@ def getTiePitchSet(prior: 'music21.note.NotRest'):
         previousNotes = [prior]
 
     for n in previousNotes:
-        if n.tie is None or n.tie.type == 'stop':
+        if n.tie is None or n.tie.type == 'stop' or isinstance(n, note.Unpitched):
             continue
         tiePitchSet.add(n.pitch.nameWithOctave)
     return tiePitchSet
@@ -1742,7 +1742,7 @@ def iterateBeamGroups(
     >>> for beamGroup in iterateBeamGroups(sc, recurse=False):
     ...     print(beamGroup)
 
-    >>> for beamGroup in iterateBeamGroups(sc.flat, recurse=False):
+    >>> for beamGroup in iterateBeamGroups(sc.flatten(), recurse=False):
     ...     print(beamGroup)
     [<music21.note.Note C>, <music21.note.Note D>]
     [<music21.note.Note E>, <music21.note.Note F>]
@@ -1929,7 +1929,7 @@ class Test(unittest.TestCase):
             n.stemDirection = dStems[i]
 
         setStemDirectionForBeamGroups(p)
-        self.assertEqual([n.stemDirection for n in p.flat.notes],
+        self.assertEqual([n.stemDirection for n in p.flatten().notes],
                          ['up'] * 4 + ['down'] * 6 + ['up'] * 4
                          + ['down', 'noStem', 'double', 'down']
                          )
@@ -1944,18 +1944,18 @@ class Test(unittest.TestCase):
         p = converter.parse('tinyNotation: 2/4 b8 f8 a8 b8')
         p.makeBeams(inPlace=True)
         self.assertEqual(
-            [n.stemDirection for n in p.flat.notes],
+            [n.stemDirection for n in p.flatten().notes],
             ['up', 'up', 'up', 'up']
         )
 
         # make manual changes
         dStems = ['down', 'unspecified', 'down', 'down']
-        for n, stemDir in zip(p.flat.notes, dStems):
+        for n, stemDir in zip(p.flatten().notes, dStems):
             n.stemDirection = stemDir
 
         setStemDirectionForBeamGroups(p, setNewStems=True, overrideConsistentStemDirections=False)
         self.assertEqual(
-            [n.stemDirection for n in p.flat.notes],
+            [n.stemDirection for n in p.flatten().notes],
             ['up', 'up', 'down', 'down']
         )
 
@@ -1963,10 +1963,10 @@ class Test(unittest.TestCase):
         from music21 import converter
         p = converter.parse(self.allaBreveBeamTest)
         dStems = ['down', 'noStem', 'double', 'up']
-        for i, n in enumerate(p.flat.notes[-4:]):
+        for i, n in enumerate(p.flatten().notes[-4:]):
             n.stemDirection = dStems[i]
         p.makeBeams(inPlace=True)
-        self.assertEqual([n.stemDirection for n in p.flat.notes],
+        self.assertEqual([n.stemDirection for n in p.flatten().notes],
                          ['up'] * 4 + ['down'] * 6 + ['up'] * 4
                          + ['down', 'noStem', 'double', 'down']
                          )
@@ -1980,11 +1980,11 @@ class Test(unittest.TestCase):
         c2.quarterLength = 0.5
         p.measure(1).insert(0, c1)
         p.measure(1).insert(0.5, c2)
-        p.flat.notes[0].notes = []
-        p.flat.notes[1].notes = []
+        p.flatten().notes[0].notes = []
+        p.flatten().notes[1].notes = []
         p.makeNotation(inPlace=True)
         self.assertEqual(
-            [n.stemDirection for n in p.flat.notes],
+            [n.stemDirection for n in p.flatten().notes],
             ['unspecified', 'unspecified'],
         )
 

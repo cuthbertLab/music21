@@ -118,6 +118,7 @@ def hyphenToCamelCase(usrStr: str, replacement: str = '-') -> str:
 
 
 def camelCaseToHyphen(usrStr: str, replacement: str = '-') -> str:
+    # pylint: disable=line-too-long
     '''
     Given a camel-cased string, or a mixture of numbers and characters,
     create a space separated string.
@@ -125,8 +126,7 @@ def camelCaseToHyphen(usrStr: str, replacement: str = '-') -> str:
     The replacement can be specified to be something besides a hyphen, but only
     a single character and not (for internal reasons) an uppercase character.
 
-    code from https://stackoverflow.com/questions/1175208/
-        elegant-python-function-to-convert-camelcase-to-camel-case
+    code from https://stackoverflow.com/questions/1175208/elegant-python-function-to-convert-camelcase-to-snake-case
 
     >>> common.camelCaseToHyphen('movementName')
     'movement-name'

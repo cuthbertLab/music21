@@ -1869,7 +1869,7 @@ class SpineCollection(prebase.ProtoM21Object):
         positionDict = {}
         for thisSpine in self.spines:
             if thisSpine.parentSpine is None:
-                sf = thisSpine.stream.flat
+                sf = thisSpine.stream.flatten()
                 for el in sf:
                     if hasattr(el, 'humdrumPosition'):
                         if el.humdrumPosition not in positionDict:
@@ -1937,7 +1937,7 @@ class SpineCollection(prebase.ProtoM21Object):
                     stavesAppliedTo = [int(x) for x in staffInfo.split('/')]
                     break
             if thisSpine.spineType == 'dynam':
-                for dynamic in thisSpine.stream.flat:
+                for dynamic in thisSpine.stream.flatten():
                     if isinstance(dynamic, dynamics.Dynamic):
                         prioritiesToSearch[dynamic.humdrumPosition] = dynamic
                 for applyStaff in stavesAppliedTo:
@@ -1954,7 +1954,7 @@ class SpineCollection(prebase.ProtoM21Object):
                             # el.activeSite.insert(el.offset,
                             #    copy.deepcopy(prioritiesToSearch[el.priority]))
             elif thisSpine.spineType == 'harm':
-                for harm in thisSpine.stream.flat:
+                for harm in thisSpine.stream.flatten():
                     if isinstance(harm, roman.RomanNumeral):
                         prioritiesToSearch[harm.humdrumPosition] = harm
                 for applyStaff in stavesAppliedTo:
@@ -2120,8 +2120,9 @@ def hdStringToNote(contents):
     Does not check to see that it is sane or part of a :samp:`**kern` spine, etc.
 
 
-    New rhythmic extensions defined in
-    http://wiki.humdrum.org/index.php/Rational_rhythms
+    New rhythmic extensions formerly defined in
+    `wiki.humdrum.org/index.php/Rational_rhythms`
+    and now at http://extras.humdrum.org/man/rscale/
     are fully implemented:
 
 
@@ -2153,7 +2154,7 @@ def hdStringToNote(contents):
     http://kern.ccarh.org/cgi-bin/ksdata?l=musedata/mozart/quartet&file=k421-01.krn&f=kern
     and the Josquin Research Project [JRP] is incorrect, seeing as it
     contradicts the specification in
-    http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.html#N-Tuplets
+    https://web.archive.org/web/20100203144730/http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.html#N-Tuplets
 
     >>> storedFlavors = humdrum.spineParser.flavors['JRP']  #_DOCS_HIDE
 
@@ -2328,12 +2329,12 @@ def hdStringToNote(contents):
         if durationType == 0:
             durationString = foundNumber.group(1)
             if durationString == '000':
-                # for larger values, see http://wiki.humdrum.org/index.php/Rational_rhythms
+                # for larger values, see http://extras.humdrum.org/man/rscale/
                 thisObject.duration.type = 'maxima'
                 if contents.count('.'):
                     thisObject.duration.dots = contents.count('.')
             elif durationString == '00':
-                # for larger values, see http://wiki.humdrum.org/index.php/Rational_rhythms
+                # for larger values, see http://extras.humdrum.org/man/rscale/
                 thisObject.duration.type = 'longa'
                 if contents.count('.'):
                     thisObject.duration.dots = contents.count('.')
@@ -2931,7 +2932,7 @@ class Test(unittest.TestCase):
         s = hf1.stream  # .show()
         p = s.parts[2]  # last part has a comment
         comments = []
-        for c in p.flat.getElementsByClass('SpineComment'):
+        for c in p.flatten().getElementsByClass('SpineComment'):
             comments.append(c.comment)
         self.assertTrue('spine comment' in comments)
         # s.show('text')
@@ -2968,7 +2969,7 @@ class Test(unittest.TestCase):
             32.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
             33.0: ('I in c minor', [0, 4, 7], 'C', 'C', 53, False)
         }
-        for harm in s.flat.getElementsByClass('RomanNumeral'):
+        for harm in s.flatten().getElementsByClass('RomanNumeral'):
             figureAndKey = harm.figureAndKey
             pitchClasses = harm.pitchClasses
             root = harm.root().name
@@ -3023,7 +3024,7 @@ class Test(unittest.TestCase):
             42.0: ('V43 in a minor', [11, 2, 4, 8], 'E', 'B', 43, True),
             43.0: ('i in a minor', [9, 0, 4], 'A', 'A', 53, False)
         }
-        for harm in s.flat.getElementsByClass('RomanNumeral'):
+        for harm in s.flatten().getElementsByClass('RomanNumeral'):
             figureAndKey = harm.figureAndKey
             pitchClasses = harm.pitchClasses
             root = harm.root().name
@@ -3072,7 +3073,7 @@ class Test(unittest.TestCase):
             32.0: (False, False, False, False),
             33.0: (False, False, False, False)
         }
-        for harm in s.flat.getElementsByClass('RomanNumeral'):
+        for harm in s.flatten().getElementsByClass('RomanNumeral'):
             isAugmentedSixth = harm.isAugmentedSixth()
             isItalianAugmentedSixth = harm.isItalianAugmentedSixth()
             isFrenchAugmentedSixth = harm.isFrenchAugmentedSixth()

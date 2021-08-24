@@ -1867,7 +1867,7 @@ class Test(unittest.TestCase):
     #         # make sure there are no empty strings
     #         self.assertEqual(match.count(''), 0)
     #
-    #     self.assertEqual(len(s.parts[-1].flat.notes), 287)
+    #     self.assertEqual(len(s.parts[-1].recurse().notes), 287)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [MuseDataWork]

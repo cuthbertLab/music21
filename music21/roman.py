@@ -3627,7 +3627,7 @@ class Test(unittest.TestCase):
         s.append(p)
         targetCount = 1
         self.assertEqual(
-            len(s.flat.getElementsByClass('KeySignature')),
+            len(s.flatten().getElementsByClass('KeySignature')),
             targetCount,
         )
         # through sequential iteration
@@ -3636,13 +3636,13 @@ class Test(unittest.TestCase):
             for m in p.getElementsByClass('Measure'):
                 for e in m.getElementsByClass('KeySignature'):
                     m.remove(e)
-        self.assertEqual(len(s1.flat.getElementsByClass('KeySignature')), 0)
+        self.assertEqual(len(s1.flatten().getElementsByClass('KeySignature')), 0)
         s2 = copy.deepcopy(s)
         self.assertEqual(
-            len(s2.flat.getElementsByClass('KeySignature')),
+            len(s2.flatten().getElementsByClass('KeySignature')),
             targetCount,
         )
-        for e in s2.flat.getElementsByClass('KeySignature'):
+        for e in s2.flatten().getElementsByClass('KeySignature'):
             for site in e.sites.get():
                 if site is not None:
                     site.remove(e)
@@ -3650,7 +3650,7 @@ class Test(unittest.TestCase):
         # yield elements and containers
         s3 = copy.deepcopy(s)
         self.assertEqual(
-            len(s3.flat.getElementsByClass('KeySignature')),
+            len(s3.flatten().getElementsByClass('KeySignature')),
             targetCount,
         )
         for e in s3.recurse(streamsOnly=True):
@@ -3662,7 +3662,7 @@ class Test(unittest.TestCase):
         # yield containers
         s4 = copy.deepcopy(s)
         self.assertEqual(
-            len(s4.flat.getElementsByClass('KeySignature')),
+            len(s4.flatten().getElementsByClass('KeySignature')),
             targetCount,
         )
         # do not remove in iteration.

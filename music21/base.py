@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'7.0.9'
+'7.1.0'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -1008,11 +1008,12 @@ class Music21Object(prebase.ProtoM21Object):
         Timing: 113microseconds for a search vs 1 microsecond for getOffsetBySite
         vs 0.4 for elementOffset.  Hence the short-circuit for easy looking below...
 
-        TODO: If timing permits, replace .flat and .semiFlat with this routine.
-        Currently not possible; b = bwv66.6
+        TODO: If timing permits, replace .flatten() w/ and w/o retainContainers with this routine.
+
+        Currently not possible; for instance, if b = bwv66.6
 
         %timeit b = corpus.parse('bwv66.6') -- 24.8ms
-        %timeit b = corpus.parse('bwv66.6'); b.flat -- 42.9ms
+        %timeit b = corpus.parse('bwv66.6'); b.flatten() -- 42.9ms
         %timeit b = corpus.parse('bwv66.6'); b.recurse().stream() -- 83.1ms
         '''
         try:
@@ -1452,8 +1453,8 @@ class Music21Object(prebase.ProtoM21Object):
             (I'll take the example of Before; After is much harder
             to construct, but possible).
 
-            Assume that s is a Score, and tb2 = s.flat[1] and tb1 is the previous element
-            (would be s.flat[0]) -- both are at offset 0 in s and are of the same class
+            Assume that s is a Score, and tb2 = s.flatten()[1] and tb1 is the previous element
+            (would be s.flatten()[0]) -- both are at offset 0 in s and are of the same class
             (so same sort order and priority) and are thus ordered entirely by insert
             order.
 
@@ -1463,35 +1464,36 @@ class Music21Object(prebase.ProtoM21Object):
             tb1.sortTuple = 0.0 <0.-31.1>
             tb2.sortTuple = 0.0 <0.-31.2>
 
-            in s.flat we have:
+            in s.flatten() we have:
 
-            s.flat.sortTuple = 0.0 <0.-20.0>  # not inserted
-            tb1.sortTuple    = 0.0 <0.-31.3>
-            tb2.sortTuple    = 0.0 <0.-31.4>
+            s.flatten().sortTuple = 0.0 <0.-20.0>  # not inserted
+            tb1.sortTuple         = 0.0 <0.-31.3>
+            tb2.sortTuple         = 0.0 <0.-31.4>
 
-            Now tb2 is declared through s.flat[1], so its activeSite
-            is s.flat.  Calling .previous() finds tb1 in s.flat.  This is normal.
+            Now tb2 is declared through s.flatten()[1], so its activeSite
+            is s.flatten().  Calling .previous() finds tb1 in s.flatten().  This is normal.
 
             tb1 calls .previous().  Search of first site finds nothing before tb1,
             so .getContextByClass() is ready to return None.  But other sites need to be checked
 
             Search returns to s.  .getContextByClass() asks is there anything before tb1's
             sort tuple of 0.0 <0.-31.3> (.3 is the insertIndex) in s?  Yes, it's tb2 at
-            0.0 <0.-31.2> (because s was created before s.flat, the insert indices of objects
-            in s are lower than the insert indices of objects in s.flat (perhaps insert indices
+            0.0 <0.-31.2> (because s was created before s.flatten(), the insert indices of objects
+            in s are lower than the insert indices of objects in s.flatten() (perhaps insert indices
             should be eventually made global within the context of a stream, but not global
             overall? but that wasn't the solution here).  So we go back to tb2 in s. Then in
             theory we should go to tb1 in s, then s, then None.  This would have certain
             elements appear twice in a .previous() search, which is not optimal, but wouldn't be
             such a huge bug to make this method necessary.
 
-            That'd be the only bug that would occur if we did: sf = s.flat, tb2 = sf[1]. But
-            consider the exact phrasing above:  tb2 = s.flat[1].  s.flat is created for an instant,
+            That'd be the only bug that would occur if we did: sf = s.flatten(), tb2 = sf[1]. But
+            consider the exact phrasing above:  tb2 = s.flatten()[1].
+            s.flatten() is created for an instant,
             it is assigned to tb2's ._activeSite via weakRef, and then tb2's sortTuple is set
             via this temporary stream.
 
-            Suppose tb2 is from that temp s.flat[1].  Then tb1 = tb2.previous() which is found
-            in s.flat.  Suppose then that for some reason s._cache['flat'] gets cleaned up
+            Suppose tb2 is from that temp s.flatten()[1].  Then tb1 = tb2.previous() which is found
+            in s.flatten().  Suppose then that for some reason s._cache['flat'] gets cleaned up
             (It was a bug that s._cache was being cleaned by the positioning of notes during
             s_flat's setOffset,
             but _cache cleanups are allowed to happen at any time,
@@ -1499,7 +1501,7 @@ class Music21Object(prebase.ProtoM21Object):
             would be the bug) and garbage collection runs.
 
             Now we get tb1.previous() would get tb2 in s. Okay, it's redundant but not a huge deal,
-            and tb2.previous() gets tb1.  tb1's ._activeSite is still a weakref to s.flat.
+            and tb2.previous() gets tb1.  tb1's ._activeSite is still a weakref to s.flatten().
             When tb1's getContextByClass() is called, it needs its .sortTuple().  This looks
             first at .activeSite.  That is None, so it gets it from .offset which is the .offset
             of the last .activeSite (even if it is dead.  A lot of code depends on .offset
@@ -3445,7 +3447,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> m2.repeatAppend(n, 4)
 
         >>> p.append([m1, m2])
-        >>> [n.beat for n in p.flat.notes]
+        >>> [n.beat for n in p.flatten().notes]
         [1.0, 1.5, 2.0, 2.5, 1.0, 1.5, 2.0, 2.5]
 
 
@@ -4199,18 +4201,18 @@ class Test(unittest.TestCase):
 
         self.assertEqual(s1.getOffsetBySite(s2), 10)
         # make sure in the context of s1 things are as we expect
-        self.assertEqual(s2.flat.getElementAtOrBefore(0), c1)
-        self.assertEqual(s2.flat.getElementAtOrBefore(100), c2)
-        self.assertEqual(s2.flat.getElementAtOrBefore(20), n1)
-        self.assertEqual(s2.flat.getElementAtOrBefore(110), n2)
+        self.assertEqual(s2.flatten().getElementAtOrBefore(0), c1)
+        self.assertEqual(s2.flatten().getElementAtOrBefore(100), c2)
+        self.assertEqual(s2.flatten().getElementAtOrBefore(20), n1)
+        self.assertEqual(s2.flatten().getElementAtOrBefore(110), n2)
 
         # note: we cannot do this
-        #    self.assertEqual(s2.flat.getOffsetBySite(n2), 110)
+        #    self.assertEqual(s2.flatten().getOffsetBySite(n2), 110)
         # we can do this:
-        self.assertEqual(n2.getOffsetBySite(s2.flat), 110)
+        self.assertEqual(n2.getOffsetBySite(s2.flatten()), 110)
 
         # this seems more idiomatic
-        self.assertEqual(s2.flat.elementOffset(n2), 110)
+        self.assertEqual(s2.flatten().elementOffset(n2), 110)
 
         # both notes can find the treble clef in the activeSite stream
         post = n1.getContextByClass(clef.TrebleClef)
@@ -4247,7 +4249,7 @@ class Test(unittest.TestCase):
         self.assertIsInstance(post[0], clef.TrebleClef)
 
         # make sure we can find offset in a flat representation
-        self.assertRaises(SitesException, a.parts[0].flat.elementOffset, a.parts[0][3])
+        self.assertRaises(SitesException, a.parts[0].flatten().elementOffset, a.parts[0][3])
 
         # for the second measure
         post = a.parts[0][3].getContextByClass(clef.Clef)
@@ -4306,18 +4308,18 @@ class Test(unittest.TestCase):
 
         # clef/ks can get its beat; these objects are in a pickup,
         # and this give their bar offset relative to the bar
-        eClef = p1.flat.getElementsByClass('Clef').first()
+        eClef = p1.flatten().getElementsByClass('Clef').first()
         self.assertEqual(eClef.beat, 4.0)
         self.assertEqual(eClef.beatDuration.quarterLength, 1.0)
         self.assertEqual(eClef.beatStrength, 0.25)
 
-        eKS = p1.flat.getElementsByClass('KeySignature').first()
+        eKS = p1.flatten().getElementsByClass('KeySignature').first()
         self.assertEqual(eKS.beat, 4.0)
         self.assertEqual(eKS.beatDuration.quarterLength, 1.0)
         self.assertEqual(eKS.beatStrength, 0.25)
 
         # ts can get beatStrength, beatDuration
-        eTS = p1.flat.getElementsByClass('TimeSignature').first()
+        eTS = p1.flatten().getElementsByClass('TimeSignature').first()
         self.assertEqual(eTS.beatDuration.quarterLength, 1.0)
         self.assertEqual(eTS.beatStrength, 0.25)
 
@@ -4325,7 +4327,7 @@ class Test(unittest.TestCase):
         # as the first bar is a pickup, the measure offset here is returned
         # with padding (resulting in 3)
         post = []
-        for n in p1.flat.notesAndRests:
+        for n in p1.flatten().notesAndRests:
             post.append(n._getMeasureOffset())
         self.assertEqual(post, [3.0, 3.5, 0.0, 1.0, 2.0, 3.0, 0.0,
                                 1.0, 2.0, 3.0, 0.0, 0.5, 1.0, 2.0,
@@ -4335,7 +4337,7 @@ class Test(unittest.TestCase):
 
         # compare derived beat string
         post = []
-        for n in p1.flat.notesAndRests:
+        for n in p1.flatten().notesAndRests:
             post.append(n.beatStr)
         self.assertEqual(post, ['4', '4 1/2', '1', '2', '3', '4', '1',
                                 '2', '3', '4', '1', '1 1/2', '2', '3',
@@ -4399,11 +4401,11 @@ class Test(unittest.TestCase):
         s = corpus.parse('bach/bwv66.6.xml')
         p1 = s.parts['Soprano']
         for classStr in ['Clef', 'KeySignature', 'TimeSignature']:
-            self.assertEqual(p1.flat.getElementsByClass(
+            self.assertEqual(p1.flatten().getElementsByClass(
                 classStr)[0].measureNumber, 0)
 
         match = []
-        for n in p1.flat.notesAndRests:
+        for n in p1.flatten().notesAndRests:
             match.append(n.measureNumber)
         self.assertEqual(match, [0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3,
                                  4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7,
@@ -4485,7 +4487,7 @@ class Test(unittest.TestCase):
         # highest time of score takes into account new measure
         self.assertEqual(s.highestTime, 5.0)
         # offset are contiguous when accessed in a flat form
-        self.assertEqual([n.offset for n in s.flat.notesAndRests], [0.0, 1.0])
+        self.assertEqual([n.offset for n in s.flatten().notesAndRests], [0.0, 1.0])
 
         m3 = stream.Measure()
         n3 = note.Note('f#2')
@@ -4499,7 +4501,7 @@ class Test(unittest.TestCase):
         # highest time of score takes into account new measure
         self.assertEqual(s.highestTime, 8.0)
         # offset are contiguous when accessed in a flat form
-        self.assertEqual([n.offset for n in s.flat.notesAndRests], [0.0, 1.0, 5.0])
+        self.assertEqual([n.offset for n in s.flatten().notesAndRests], [0.0, 1.0, 5.0])
 
     def testPickupMeasuresImported(self):
         from music21 import corpus
@@ -4512,7 +4514,7 @@ class Test(unittest.TestCase):
         self.assertEqual([n.offset for n in m1.notesAndRests], [0.0, 0.5])
         self.assertEqual(m1.paddingLeft, 3.0)
 
-        offsets = [n.offset for n in p.flat.notesAndRests]
+        offsets = [n.offset for n in p.flatten().notesAndRests]
         # offsets for flat representation have proper spacing
         self.assertEqual(offsets,
                          [0.0, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0,
@@ -4895,7 +4897,7 @@ class Test(unittest.TestCase):
 
         # getting time signature and key sig
         p1 = s.parts[0]
-        nLast = p1.flat.notes[-1]
+        nLast = p1.flatten().notes[-1]
         self.assertEqual(str(nLast.previous('TimeSignature')),
                          '<music21.meter.TimeSignature 4/4>')
         self.assertEqual(str(nLast.previous('KeySignature')),
@@ -5101,7 +5103,7 @@ class Test(unittest.TestCase):
 #         '''
 #         from music21 import corpus
 #         s = corpus.parse('luca/gloria')
-#         sf = s.flat
+#         sf = s.flatten()
 #         o = sf[1]
 #         # o = s[2]
 #         i = 200

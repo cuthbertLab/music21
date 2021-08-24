@@ -899,9 +899,9 @@ class MeasureHash:
 
         Example of Violin II vs. Viola and Cello in K525 I, m. 17
 
-        >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flat.notes.stream()
-        >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flat.notes.stream()
-        >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flat.notes.stream()
+        >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flatten().notes.stream()
+        >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flatten().notes.stream()
+        >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flatten().notes.stream()
         >>> vlnII_MH = omr.correctors.MeasureHash(vlnII)
         >>> viola_MH = omr.correctors.MeasureHash(viola)
         >>> cello_MH = omr.correctors.MeasureHash(cello)
@@ -931,9 +931,9 @@ class MeasureHash:
 
         Example of Violin II vs. Viola and Cello in K525 I, m. 17
 
-        >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flat.notes.stream()
-        >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flat.notes.stream()
-        >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flat.notes.stream()
+        >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flatten().notes.stream()
+        >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flatten().notes.stream()
+        >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flatten().notes.stream()
         >>> vlnII_MH = omr.correctors.MeasureHash(vlnII)
         >>> viola_MH = omr.correctors.MeasureHash(viola)
         >>> cello_MH = omr.correctors.MeasureHash(cello)
@@ -992,8 +992,8 @@ class MeasureHash:
 
         Example of Violin II vs. Viola in K525 I, m. 17
 
-        >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flat.notes.stream()
-        >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flat.notes.stream()
+        >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flatten().notes.stream()
+        >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flatten().notes.stream()
         >>> vlnIIMH = omr.correctors.MeasureHash(vlnII)
         >>> violaMH = omr.correctors.MeasureHash(viola)
         >>> vlnIIMH.hashString

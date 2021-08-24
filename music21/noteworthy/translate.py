@@ -852,9 +852,9 @@ class Test(unittest.TestCase):
         nwcTranslatePath = common.getSourceFilePath() / 'noteworthy'
         simplePath = nwcTranslatePath / 'verySimple.nwctxt'
         myScore = NoteworthyTranslator().parseFile(simplePath)
-        self.assertEqual(len(myScore.flat.notes), 1)
-        self.assertEqual(str(myScore.flat.notes[0].name), 'E')
-        self.assertEqual(str(myScore.flat.getElementsByClass('Clef').first()),
+        self.assertEqual(len(myScore[note.Note]), 1)
+        self.assertEqual(str(myScore[note.Note].first().name), 'E')
+        self.assertEqual(str(myScore[clef.Clef].first()),
                          '<music21.clef.BassClef>')
 
     def testKeySignatureAtBeginning(self):

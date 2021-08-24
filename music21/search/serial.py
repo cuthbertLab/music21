@@ -2193,7 +2193,7 @@ def labelTransformedSegments(inputStream,
 
     OMIT_FROM_DOCS
 
-    >>> [len(n.lyrics) for n in labeledPart.flat.notes]
+    >>> [len(n.lyrics) for n in labeledPart.flatten().notes]
     [1, 1, 0]
     '''
     streamCopy = copy.deepcopy(inputStream)
@@ -2265,7 +2265,7 @@ def labelMultisets(inputStream, multisetDict, reps='skipConsecutive', includeCho
 
     OMIT_FROM_DOCS
 
-    >>> [len(n.lyrics) for n in labeledPart.flat.notes]
+    >>> [len(n.lyrics) for n in labeledPart.flatten().notes]
     [1, 1, 0, 0]
     '''
     streamCopy = copy.deepcopy(inputStream)

@@ -703,7 +703,7 @@ class Sites(common.SlottedObjectMixin):
         >>> s.append(a)
         >>> a.sites.getSiteCount()
         1
-        >>> sf = s.flat
+        >>> sf = s.flatten()
         >>> a.sites.getSiteCount()
         2
         '''
@@ -1005,7 +1005,7 @@ class Test(unittest.TestCase):
             3,
             fileExtensions='xml',
         ).getElementById('Violin I')
-        lastNote = violin1.flat.notes[-1]
+        lastNote = violin1.flatten().notes[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)
         self.assertIsInstance(lastNoteClef, clef.TrebleClef)
 

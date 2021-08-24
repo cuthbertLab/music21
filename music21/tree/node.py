@@ -297,7 +297,7 @@ class OffsetNode(ElementNode):
     Here's an example of what it means and does:
 
     >>> score = tree.makeExampleScore()
-    >>> sf = score.flat
+    >>> sf = score.flatten()
     >>> sf.show('text', addEndTimes=True)
     {0.0 - 0.0} <music21.instrument.Instrument 'PartA: : '>
     {0.0 - 0.0} <music21.instrument.Instrument 'PartB: : '>

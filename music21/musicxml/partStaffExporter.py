@@ -921,7 +921,7 @@ class Test(unittest.TestCase):
         from music21 import musicxml
         sch = corpus.parse('schoenberg/opus19', 2)
 
-        SX = musicxml.m21ToXml.ScoreExporter(sch.flat)
+        SX = musicxml.m21ToXml.ScoreExporter(sch.flatten())
         SX.scorePreliminaries()
         SX.parseFlatScore()
         # Previously, an exception was raised by getRootForPartStaff()

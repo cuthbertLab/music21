@@ -394,7 +394,7 @@ class Test(unittest.TestCase):
         for sc in [scGMajor, scDMajor, scAMajor]:
             for part in s.parts:  # just first part
                 # must provide flat version
-                post = findConsecutiveScale(part.flat, sc, degreesRequired=5,
+                post = findConsecutiveScale(part.flatten(), sc, degreesRequired=5,
                                             comparisonAttribute='name')
                 for g, group in enumerate(post):
                     for n in group:
