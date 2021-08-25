@@ -834,12 +834,12 @@ class ConverterMusicXML(SubConverter):
                                          }
 
     @staticmethod
-    def findNumberedPNGPath(inputFp: Union[str, pathlib.Path]) -> str:
+    def findNumberedPNGPath(inputFp: Union[str, pathlib.Path]) -> pathlib.Path:
         '''
         Find the first numbered file path corresponding to the provided unnumbered file path
         ending in ".png". Raises an exception if no file can be found.
 
-        Renamed in v7.
+        Renamed in v7.  Returns a pathlib.Path
         '''
         inputFp = str(inputFp)  # not pathlib.
         if not inputFp.endswith('.png'):
@@ -848,8 +848,8 @@ class ConverterMusicXML(SubConverter):
         path_without_extension = inputFp[:-1 * len('.png')]
 
         for search_extension in ('1', '01', '001', '0001', '00001'):
-            search_path = path_without_extension + '-' + search_extension + '.png'
-            if os.path.exists(search_path):
+            search_path = pathlib.Path(path_without_extension + '-' + search_extension + '.png')
+            if search_path.exists():
                 return search_path
 
         raise SubConverterFileIOException(
@@ -898,7 +898,10 @@ class ConverterMusicXML(SubConverter):
             c.stream.metadata.movementName = fn  # this should become a Path
         self.stream = c.stream
 
-    def runThroughMusescore(self, fp, subformats=None, **keywords):  # pragma: no cover
+    def runThroughMusescore(self,
+                            fp,
+                            subformats=None,
+                            **keywords) -> pathlib.Path:  # pragma: no cover
         '''
         Take the output of the conversion process and run it through musescore to convert it
         to a png.
@@ -962,7 +965,7 @@ class ConverterMusicXML(SubConverter):
         if subformatExtension == 'png':
             return ConverterMusicXML.findNumberedPNGPath(fpOut)
         else:
-            return fpOut
+            return pathlib.Path(fpOut)
         # common.cropImageFromPath(fp)
 
     def writeDataStream(self, fp, dataBytes: bytes) -> pathlib.Path:  # pragma: no cover
@@ -1071,7 +1074,7 @@ class ConverterMusicXML(SubConverter):
                                      deleteOriginal=True,
                                      silent=True,
                                      strictMxlCheck=False)
-            filenameOut = os.path.splitext(str(xmlFp))[0] + '.mxl'
+            filenameOut = xmlFp.with_suffix('.mxl')
             outFp = common.pathTools.cleanpath(filenameOut, returnPathlib=True)
         else:
             outFp = xmlFp
@@ -1505,7 +1508,7 @@ class Test(unittest.TestCase):
             tmpNumbered = tmp.replace('.png', png_ext)
             os.rename(tmp, tmpNumbered)
             pngFp1 = ConverterMusicXML.findNumberedPNGPath(tmp)
-            self.assertEqual(pngFp1, tmpNumbered)
+            self.assertEqual(str(pngFp1), tmpNumbered)
             os.remove(tmpNumbered)
 
         # Now with a very long path.
@@ -1522,7 +1525,7 @@ class Test(unittest.TestCase):
 
         s = converter.parseData(testPrimitive.multiDigitEnding)
         mxlPath = s.write('mxl')
-        self.assertTrue(str(mxlPath).endswith('.mxl'))
+        self.assertTrue(str(mxlPath).endswith('.mxl'), f'{mxlPath} does not end with .mxl')
         os.remove(mxlPath)
 
     def testWriteMusicXMLMakeNotation(self):
