@@ -25,7 +25,7 @@ import pathlib
 import subprocess
 import unittest
 
-from typing import Union
+from typing import Union, Optional
 
 from music21 import common
 from music21 import defaults
@@ -284,8 +284,8 @@ class SubConverter:
                 f.write(dataStr)
         else:
             # file-like object
-            f.write(dataStr)
-            f.close()
+            fp.write(dataStr)
+            fp.close()
 
         return fp
 
@@ -966,6 +966,7 @@ class ConverterMusicXML(SubConverter):
         # common.cropImageFromPath(fp)
 
     def writeDataStream(self, fp, dataBytes: bytes) -> pathlib.Path:  # pragma: no cover
+        # noinspection PyShadowingNames
         '''
         Writes `dataBytes` to `fp`.
         Adds `.musicxml` suffix to `fp` if it does not already contain some suffix.
@@ -976,7 +977,7 @@ class ConverterMusicXML(SubConverter):
 
         >>> import os
         >>> from music21.converter.subConverters import ConverterMusicXML
-        >>> fp = 'nosuffix'
+        >>> fp = 'noSuffix'
         >>> sub = ConverterMusicXML()
         >>> outFp = sub.writeDataStream(fp, b'')
         >>> str(outFp).endswith('.musicxml')
@@ -994,7 +995,7 @@ class ConverterMusicXML(SubConverter):
         else:
             fp = common.cleanpath(fp, returnPathlib=True)
 
-        if not fp.suffix:
+        if not fp.suffix or fp.suffix == '.mxl':
             fp = fp.with_suffix('.musicxml')
 
         writeFlags = 'wb'
@@ -1012,7 +1013,7 @@ class ConverterMusicXML(SubConverter):
               fp=None,
               subformats=None,
               makeNotation=True,
-              compress=False,
+              compress: Optional[bool] = None,
               **keywords):  # pragma: no cover
         '''
         Write to a .musicxml file.
@@ -1023,12 +1024,20 @@ class ConverterMusicXML(SubConverter):
         issues, whereas `makeNotation=False` is intended for advanced users facing
         special cases where speed is a priority or making notation reverses user choices.
 
-        Set `compress=True` to immediately compress the output to a .mxl file.
+        Set `compress=True` to immediately compress the output to a .mxl file.  Set
+        to True automatically if format='mxl' or if `fp` is given and ends with `.mxl`
         '''
         from music21.musicxml import archiveTools, m21ToXml
 
         savedDefaultTitle = defaults.title
         savedDefaultAuthor = defaults.author
+
+        if compress is None and fp and str(fp).endswith('.mxl'):
+            compress = True
+        elif compress is None and fmt.startswith('mxl'):
+            compress = True
+        else:
+            compress = False
 
         # hack to make musescore excerpts -- fix with a converter class in MusicXML
         if subformats is not None and 'png' in subformats:
@@ -1058,7 +1067,10 @@ class ConverterMusicXML(SubConverter):
                 and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
             outFp = self.runThroughMusescore(xmlFp, subformats, **keywords)
         elif compress:
-            archiveTools.compressXML(xmlFp, deleteOriginal=True, silent=True)
+            archiveTools.compressXML(xmlFp,
+                                     deleteOriginal=True,
+                                     silent=True,
+                                     strictMxlCheck=False)
             filenameOut = os.path.splitext(str(xmlFp))[0] + '.mxl'
             outFp = common.pathTools.cleanpath(filenameOut, returnPathlib=True)
         else:
@@ -1528,21 +1540,21 @@ class Test(unittest.TestCase):
 
         out1 = s.write(makeNotation=True)
         # 4/4 will be assumed; quarter note will be moved to measure 2
-        roundtrip_back = converter.parse(out1)
+        round_trip_back = converter.parse(out1)
         self.assertEqual(
-            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 1)
+            len(round_trip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 1)
         self.assertEqual(
-            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 1)
+            len(round_trip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 1)
 
         out2 = s.write(makeNotation=False)
-        roundtrip_back = converter.parse(out2)
+        round_trip_back = converter.parse(out2)
         # 4/4 will not be assumed; quarter note will still be split out from 5.0QL
         # but it will remain in measure 1
         # and there will be no rests in measure 2
         self.assertEqual(
-            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 2)
+            len(round_trip_back.parts.first().getElementsByClass(stream.Measure)[0].notes), 2)
         self.assertEqual(
-            len(roundtrip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 0)
+            len(round_trip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 0)
 
         # makeNotation = False cannot be used on non-scores
         with self.assertRaises(MusicXMLExportException):
