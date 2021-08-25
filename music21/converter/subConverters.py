@@ -1035,12 +1035,13 @@ class ConverterMusicXML(SubConverter):
         savedDefaultTitle = defaults.title
         savedDefaultAuthor = defaults.author
 
-        if compress is None and fp and str(fp).endswith('.mxl'):
-            compress = True
-        elif compress is None and fmt.startswith('mxl'):
-            compress = True
-        else:
-            compress = False
+        if compress is None:
+            if fp and str(fp).endswith('.mxl'):
+                compress = True
+            elif fmt.startswith('mxl'):
+                compress = True
+            else:
+                compress = False
 
         # hack to make musescore excerpts -- fix with a converter class in MusicXML
         if subformats is not None and 'png' in subformats:
