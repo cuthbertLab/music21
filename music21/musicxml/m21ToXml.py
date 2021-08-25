@@ -20,8 +20,9 @@ import io
 import math
 import unittest
 import warnings
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element, SubElement, ElementTree
+from xml.etree.ElementTree import (
+    Element, SubElement, ElementTree, Comment, fromstring as et_fromstring
+)
 from typing import List, Optional, Union
 
 # external dependencies
@@ -422,7 +423,7 @@ class GeneralObjectExporter:
 
     def fromGeneralObject(self, obj):
         '''
-        Converts any Music21Object (or a Duration or a Pitch) to something that
+        Converts any Music21Object (or a duration or a pitch) to something that
         can be passed to ScoreExporter()
 
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
@@ -436,7 +437,7 @@ class GeneralObjectExporter:
                 {0.0} <music21.meter.TimeSignature 6/8>
                 {0.0} <music21.note.Note C>
                 {3.0} <music21.bar.Barline type=final>
-        >>> s[note.Note].first().duration
+        >>> s.flat.notes[0].duration
         <music21.duration.Duration 3.0>
         '''
         classes = obj.classes
@@ -709,7 +710,7 @@ class GeneralObjectExporter:
         stream.makeNotation.makeTupletBrackets(new_part, inPlace=True)
         return self.fromPart(new_part)
 
-    def fromPitch(self, p: pitch.Pitch):
+    def fromPitch(self, p):
         # noinspection PyShadowingNames
         '''
         Translate a music21 :class:`~music21.pitch.Pitch` into an object
@@ -781,7 +782,7 @@ class XMLExporterBase:
 
         commentText = ('=' * spacerLengthLow) + ' ' + comment + ' ' + ('=' * spacerLengthHigh)
 
-        divider = ET.Comment(commentText)
+        divider = Comment(commentText)
         self.xmlRoot.append(divider)
 
     # ------------------------------------------------------------------------------
@@ -1502,7 +1503,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.setMeterStream()
         self.setPartsAndRefStream()
         # get all text boxes
-        self.textBoxes = self.stream.flatten().getElementsByClass('TextBox')
+        self.textBoxes = self.stream.flat.getElementsByClass('TextBox')
 
         # we need independent sub-stream elements to shift in presentation
         self.highestTime = 0.0  # redundant, but set here.
@@ -1581,9 +1582,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         #                meterStream, meterStream[0]])
         if not meterStream:
             # note: this will return a default if no meters are found
-            meterStream = s.flatten().getTimeSignatures(searchContext=False,
-                                                        sortByCreationTime=True,
-                                                        returnDefault=True)
+            meterStream = s.flat.getTimeSignatures(searchContext=False,
+                                                   sortByCreationTime=True, returnDefault=True)
         self.meterStream = meterStream
 
     def setScoreLayouts(self):
@@ -2493,7 +2493,7 @@ class PartExporter(XMLExporterBase):
 
         self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
 
-        # Split complex durations in place (fast if none are found)
+        # Split complex durations in place
         self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
         # Suppose that everything below this is a measure
@@ -2601,14 +2601,14 @@ class PartExporter(XMLExporterBase):
         # might need to getAll b/c might need spanners
         # from a higher level container
         # allContexts = []
-        # spannerContext = measureStream.flatten().getContextByClass('Spanner')
+        # spannerContext = measureStream.flat.getContextByClass('Spanner')
         # while spannerContext:
         #    allContexts.append(spannerContext)
         #    spannerContext = spannerContext.getContextByClass('Spanner')
         #
         # spannerBundle = spanner.SpannerBundle(allContexts)
         # only getting spanners at this level
-        # spannerBundle = spanner.SpannerBundle(measureStream.flatten())
+        # spannerBundle = spanner.SpannerBundle(measureStream.flat)
         self.spannerBundle = part.spannerBundle
 
     def fixupNotationMeasured(self):
@@ -2647,7 +2647,7 @@ class PartExporter(XMLExporterBase):
             if outerTimeSignatures:
                 first_measure.timeSignature = outerTimeSignatures.first()
 
-        # see if accidentals/beams/tuplets should be processed
+        # see if accidentals/beams can be processed
         if not part.streamStatus.haveAccidentalsBeenMade():
             part.makeAccidentals(inPlace=True)
         if not part.streamStatus.beams:
@@ -2790,9 +2790,9 @@ class MeasureExporter(XMLExporterBase):
             ('NoChord', 'noChordToXml'),
             ('ChordWithFretBoard', 'chordWithFretBoardToXml'),
             ('ChordSymbol', 'chordSymbolToXml'),
-            ('ChordBase', 'chordToXml'),
-            ('Unpitched', 'unpitchedToXml'),
+            ('Chord', 'chordToXml'),
             ('Rest', 'restToXml'),
+            # Skipping unpitched for now
             ('Dynamic', 'dynamicToXml'),
             ('Segno', 'segnoToXml'),
             ('Coda', 'codaToXml'),
@@ -3475,7 +3475,9 @@ class MeasureExporter(XMLExporterBase):
             n: note.Note
             mxPitch = self.pitchToXml(n.pitch)
             mxNote.append(mxPitch)
-        elif n.isRest:
+        else:
+            # assume rest until unpitched works
+            # TODO: unpitched
             SubElement(mxNote, 'rest')
 
         if d.isGrace is not True:
@@ -3721,7 +3723,7 @@ class MeasureExporter(XMLExporterBase):
 
         return mxNote
 
-    def chordToXml(self, c: chord.ChordBase):
+    def chordToXml(self, c: chord.Chord):
         # noinspection PyShadowingNames
         '''
         Returns a list of <note> tags, all but the first with a <chord/> tag on them.
@@ -3806,29 +3808,6 @@ class MeasureExporter(XMLExporterBase):
           <notehead color="#FFD700" parentheses="no">diamond</notehead>
         </note>
 
-        And unpitched chord members:
-
-        >>> perc = percussion.PercussionChord([note.Unpitched(), note.Unpitched()])
-        >>> for n in MEX.chordToXml(perc):
-        ...     MEX.dump(n)
-        <note>
-          <unpitched>
-            <display-step>B</display-step>
-            <display-octave>4</display-octave>
-          </unpitched>
-          <duration>10080</duration>
-          <type>quarter</type>
-        </note>
-        <note>
-          <chord />
-          <unpitched>
-            <display-step>B</display-step>
-            <display-octave>4</display-octave>
-          </unpitched>
-          <duration>10080</duration>
-          <type>quarter</type>
-        </note>
-
         Test articulations of chords with fingerings. Superfluous fingerings will be ignored.
 
         >>> testChord = chord.Chord('E4 C5')
@@ -3856,13 +3835,11 @@ class MeasureExporter(XMLExporterBase):
             </technical>
           </notations>
         </note>
+
         '''
         mxNoteList = []
         for i, n in enumerate(c):
-            if 'Unpitched' in n.classSet:
-                mxNoteList.append(self.unpitchedToXml(n, noteIndexInChord=i, chordParent=c))
-            else:
-                mxNoteList.append(self.noteToXml(n, noteIndexInChord=i, chordParent=c))
+            mxNoteList.append(self.noteToXml(n, i, chordParent=c))
         return mxNoteList
 
     def durationXml(self, dur: duration.Duration):
@@ -3884,8 +3861,7 @@ class MeasureExporter(XMLExporterBase):
     def pitchToXml(self, p: pitch.Pitch):
         # noinspection PyShadowingNames
         '''
-        Convert a :class:`~music21.pitch.Pitch` to xml.
-        Does not create the <accidental> tag.
+        convert a pitch to xml... does not create the <accidental> tag...
 
         >>> p = pitch.Pitch('D#5')
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
@@ -3904,49 +3880,6 @@ class MeasureExporter(XMLExporterBase):
             mxAlter.text = str(common.numToIntOrFloat(p.accidental.alter))
         _setTagTextFromAttribute(p, mxPitch, 'octave', 'implicitOctave')
         return mxPitch
-
-    def unpitchedToXml(self,
-                       up: note.Unpitched,
-                       noteIndexInChord: int = 0,
-                       chordParent: chord.ChordBase = None) -> Element:
-        '''
-        Convert a :class:`~music21.note.Unpitched` to a <note>
-        with an <unpitched> subelement.
-
-        >>> up = note.Unpitched(displayName='D5')
-        >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> mxUnpitched = MEX.unpitchedToXml(up)
-        >>> MEX.dump(mxUnpitched)
-        <note>
-          <unpitched>
-            <display-step>D</display-step>
-            <display-octave>5</display-octave>
-          </unpitched>
-          <duration>10080</duration>
-          <type>quarter</type>
-        </note>
-
-        >>> graceUp = up.getGrace()
-        >>> mxUnpitched = MEX.unpitchedToXml(graceUp)
-        >>> MEX.dump(mxUnpitched)
-        <note>
-          <grace slash="yes" />
-          <unpitched>
-            <display-step>D</display-step>
-            <display-octave>5</display-octave>
-          </unpitched>
-          <type>quarter</type>
-        </note>
-        '''
-        mxNote = self.noteToXml(up, noteIndexInChord=noteIndexInChord, chordParent=chordParent)
-
-        mxUnpitched = Element('unpitched')
-        _setTagTextFromAttribute(up, mxUnpitched, 'display-step')
-        _setTagTextFromAttribute(up, mxUnpitched, 'display-octave')
-
-        helpers.insertBeforeElements(mxNote, mxUnpitched, tagList=['duration', 'type'])
-
-        return mxNote
 
     def fretNoteToXml(self, fretNote) -> Element:
         '''
@@ -4128,7 +4061,8 @@ class MeasureExporter(XMLExporterBase):
         # noinspection PyShadowingNames
         '''
         Translate a music21 :class:`~music21.note.NotRest` object
-        such as a Note, or Chord into a `<notehead>` tag.
+        such as a Note, or Unpitched object, or Chord
+        into a <notehead> tag
 
         >>> n = note.Note('C#4')
         >>> n.notehead = 'diamond'
@@ -4382,7 +4316,7 @@ class MeasureExporter(XMLExporterBase):
         brackets.
 
         TODO: make sure something happens if
-            makeTupletBrackets is not set.
+        makeTupletBrackets is not set.
 
         >>> t = duration.Tuplet(11, 8)
         >>> t.type = 'start'
@@ -5912,8 +5846,6 @@ class MeasureExporter(XMLExporterBase):
               <staff-lines>3</staff-lines>
         </staff-details>
         '''
-        # TODO: number lines from the bottom and hide others as necessary
-        # see: https://github.com/w3c/musicxml/issues/351
         # TODO: number (bigger issue)
         # TODO: show-frets
         # TODO: print-spacing
@@ -6279,8 +6211,8 @@ class MeasureExporter(XMLExporterBase):
         # TODO: measure-layout
         if m.hasStyleInformation and m.style.measureNumbering is not None:
             if mxPrint is None:
-                mxPrint = ET.Element('print')
-            mxMeasureNumbering = ET.SubElement(mxPrint, 'measure-numbering')
+                mxPrint = Element('print')
+            mxMeasureNumbering = SubElement(mxPrint, 'measure-numbering')
             mxMeasureNumbering.text = m.style.measureNumbering
             mnStyle = m.style.measureNumberingStyle
             if mnStyle is not None:
@@ -6499,7 +6431,7 @@ class Test(unittest.TestCase):
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         fp = xmlDir / '61l-Lyrics-Elisions-Syllables.xml'
         s = converter.parse(fp)
-        notes = list(s.flatten().notes)
+        notes = list(s.flat.notes)
         n1 = notes[0]
         xmlOut = self.getXml(n1)
         self.assertIn('<lyric name="1" number="1">', xmlOut)
@@ -6595,7 +6527,7 @@ class Test(unittest.TestCase):
         gex = GeneralObjectExporter(s)
 
         with self.assertWarns(MusicXMLWarning) as cm:
-            tree = ET.fromstring(gex.parse().decode('utf-8'))
+            tree = et_fromstring(gex.parse().decode('utf-8'))
         self.assertIn(repr(s).split(' 0x')[0], str(cm.warning))
         self.assertIn(' is not well-formed; see isWellFormedNotation()', str(cm.warning))
         # The original score with its original address should not
@@ -6626,13 +6558,13 @@ class Test(unittest.TestCase):
         s = stream.Score([p1, p2])
         self.assertEqual(s.atSoundingPitch, 'unknown')
         gex = GeneralObjectExporter(s)
-        root = ET.fromstring(gex.parse().decode('utf-8'))
+        root = et_fromstring(gex.parse().decode('utf-8'))
         self.assertEqual(len(root.findall('.//transpose')), 1)
         self.assertEqual(root.find('.//step').text, 'D')
 
         s.atSoundingPitch = True
         gex = GeneralObjectExporter(s)
-        root = ET.fromstring(gex.parse().decode('utf-8'))
+        root = et_fromstring(gex.parse().decode('utf-8'))
         self.assertEqual(len(root.findall('.//transpose')), 1)
         self.assertEqual(root.find('.//step').text, 'D')
 
@@ -6703,7 +6635,7 @@ class Test(unittest.TestCase):
     def testFullMeasureRest(self):
         from music21 import converter
         s = converter.parse('tinynotation: 9/8 r1')
-        r = s.recurse().notesAndRests.first()
+        r = s.flat.notesAndRests.first()
         r.quarterLength = 4.5
         self.assertEqual(r.fullMeasure, 'auto')
         tree = self.getET(s)
@@ -6722,7 +6654,7 @@ class Test(unittest.TestCase):
         self.assertEqual(a.number, 0)
         # Use GEX to go through wellformed object conversion
         gex = GeneralObjectExporter(n)
-        tree = ET.fromstring(gex.parse().decode('utf-8'))
+        tree = et_fromstring(gex.parse().decode('utf-8'))
         self.assertIsNone(tree.find('.//string'))
 
     def testMeasurePadding(self):
@@ -6736,25 +6668,6 @@ class Test(unittest.TestCase):
         tree = self.getET(s)
         self.assertEqual(len(tree.findall('.//rest')), 1)
 
-    def test_instrumentDoesNotCreateForward(self):
-        '''
-        Instrument tags were causing forward motion in some cases.
-        From Chapter 14, Key Signatures
-
-        This is a transposed score.  Instruments were being extended in duration
-        in the toSoundingPitch and not having their durations restored afterwards
-        leading to Instrument objects being split if the duration was complex
-        '''
-        from music21 import corpus
-        alto = corpus.parse('bach/bwv57.8').parts['Alto']
-        alto.measure(7).timeSignature = meter.TimeSignature('6/8')
-        newAlto = alto.flat.getElementsNotOfClass(meter.TimeSignature).stream()
-        newAlto.insert(0, meter.TimeSignature('2/4'))
-        newAlto.makeMeasures(inPlace=True)
-        newAltoFixed = newAlto.makeNotation()
-        tree = self.getET(newAltoFixed)
-        self.assertTrue(tree.findall('.//note'))
-        self.assertFalse(tree.findall('.//forward'))
 
 class TestExternal(unittest.TestCase):
     show = True
@@ -6767,7 +6680,7 @@ class TestExternal(unittest.TestCase):
         #    format='musicxml', forceSource=True)
         b = corpus.parse('cpebach')
         # b.show('text')
-        # n = b.flatten().notes[0]
+        # n = b.flat.notes[0]
         # print(n.expressions)
         # return
 
@@ -6811,4 +6724,4 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='test_instrumentDoesNotCreateForward')
+    music21.mainTest(Test)  # , runTest='testExceptionMessage')

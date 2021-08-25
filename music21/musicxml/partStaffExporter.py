@@ -15,8 +15,7 @@ MusicXML `<part>` from multiple music21 `PartStaff` objects.
 '''
 from typing import Dict, List, Optional
 import unittest
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element, SubElement
+from xml.etree.ElementTree import Element, SubElement, Comment
 
 from music21.key import KeySignature
 from music21.layout import StaffGroup
@@ -377,7 +376,7 @@ class PartStaffExporterMixin:
 
             # Or, gap in measure numbers in target: record necessary insertions until gap is closed
             while helpers.measureNumberComesBefore(sourceNumber, targetNumber):
-                divider: Element = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
+                divider: Element = Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
                 try:
                     insertions[i] += [divider, sourceMeasure]
                 except KeyError:
@@ -396,7 +395,7 @@ class PartStaffExporterMixin:
             remainingMeasures.insert(0, sourceMeasure)
         for remaining in remainingMeasures:
             sourceNumber = remaining.get('number')
-            divider: Element = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
+            divider: Element = Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
             try:
                 insertions[len(target)] += [divider, remaining]
             except KeyError:
