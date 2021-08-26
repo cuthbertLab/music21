@@ -6550,10 +6550,9 @@ class Test(unittest.TestCase):
         p.append(m)
         s.append(p)
 
-        self.assertEqual(3, self.getXml(s).count(u'<harmony'))
-        self.assertEqual(1, self.getXml(s).count(u'<kind '
-                                                  u'text="N.C.">none</kind>'))
-        self.assertEqual(1, self.getXml(s).count(u'<root-step text="">'))
+        self.assertEqual(3, self.getXml(s).count('<harmony'))
+        self.assertEqual(1, self.getXml(s).count('<kind text="N.C.">none</kind>'))
+        self.assertEqual(1, self.getXml(s).count('<root-step text="">'))
 
         s = stream.Score()
         p = stream.Part()
@@ -6571,10 +6570,8 @@ class Test(unittest.TestCase):
         p.append(m)
         s.append(p)
 
-        self.assertEqual(1, self.getXml(s).count(u'<kind '
-                                                 u'text="N.C.">none</kind>'))
-        self.assertEqual(1, self.getXml(s).count(u'<kind '
-                                                 u'text="No Chord">none</kind>'))
+        self.assertEqual(1, self.getXml(s).count('<kind text="N.C.">none</kind>'))
+        self.assertEqual(1, self.getXml(s).count('<kind text="No Chord">none</kind>'))
 
     def testSetPartsAndRefStreamMeasure(self):
         from music21 import converter
