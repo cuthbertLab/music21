@@ -3910,7 +3910,7 @@ class MeasureExporter(XMLExporterBase):
                        noteIndexInChord: int = 0,
                        chordParent: chord.ChordBase = None) -> Element:
         '''
-        Convert a :class:`~music21.note.Unpitched` to a <note>
+        Convert an :class:`~music21.note.Unpitched` to a <note>
         with an <unpitched> subelement.
 
         >>> up = note.Unpitched(displayName='D5')
