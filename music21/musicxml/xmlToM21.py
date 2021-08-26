@@ -1881,7 +1881,9 @@ class PartParser(XMLParserBase):
                 r1.duration.quarterLength = lastTSQl
                 r1.fullMeasure = True
 
-        self.stream.coreInsert(self.lastMeasureOffset, m)
+        # NB: not coreInsert, because barDurationProportion()
+        # is called in adjustTimeAttributesFromMeasure()
+        self.stream.insert(self.lastMeasureOffset, m)
         self.adjustTimeAttributesFromMeasure(m)
 
         return m
