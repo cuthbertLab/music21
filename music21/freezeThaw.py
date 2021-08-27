@@ -682,7 +682,7 @@ class StreamFreezer(StreamFreezeThawBase):
             import jsonpickle
             data = jsonpickle.encode(storage, **keywords)
             if zipType == 'zlib':
-                data = zlib.compress(data)
+                data = zlib.compress(data.encode())
 
             with open(fp, 'w') as f:
                 f.write(data)
