@@ -1629,14 +1629,14 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         True
         '''
         if self.makeNotation:
-            # self.parts is a stream of parts
             # hide any rests created at this late stage, because we are
             # merely trying to fill up MusicXML display, not impose things on users
-            self.parts.makeRests(refStreamOrTimeRange=self.refStreamOrTimeRange,
-                                 inPlace=True,
-                                 hideRests=True,
-                                 timeRangeFromBarDuration=True,
-                                 )
+            for p in self.parts:
+                p.makeRests(refStreamOrTimeRange=self.refStreamOrTimeRange,
+                            inPlace=True,
+                            hideRests=True,
+                            timeRangeFromBarDuration=True,
+                            )
 
         count = 0
         sp = list(self.parts)
