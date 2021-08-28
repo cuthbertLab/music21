@@ -5,16 +5,16 @@
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
+#               Jacob Walls
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2013 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2008-2021 Michael Scott Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 
 import copy
 import unittest
-import warnings
 from typing import List, Generator, Optional, Set, Union
 from fractions import Fraction  # typing only
 
@@ -44,6 +44,7 @@ def makeBeams(
     *,
     inPlace=False,
     setStemDirections=True,
+    failOnNoTimeSignature=False,
 ):
     # noinspection PyShadowingNames
     '''
@@ -144,8 +145,9 @@ def makeBeams(
             lastTimeSignature = m.timeSignature
         if lastTimeSignature is None:
             lastTimeSignature = m.getContextByClass(meter.TimeSignature)
-            if lastTimeSignature is None:
-                warnings.warn('cannot process beams in a Measure without a time signature')
+            if lastTimeSignature is None and failOnNoTimeSignature:
+                raise stream.StreamException('cannot process beams in a Measure without a time signature')
+            else:
                 continue
         noteGroups = []
         if m.hasVoices():
@@ -2007,8 +2009,8 @@ class Test(unittest.TestCase):
         m1 = p[stream.Measure].first()
         m1.timeSignature = None
         msg = 'cannot process beams in a Measure without a time signature'
-        with self.assertWarnsRegex(Warning, msg):
-            m2.makeBeams(inPlace=True)
+        with self.assertRaisesRegex(stream.StreamException, msg):
+            m2.makeBeams(inPlace=True, failOnNoTimeSignature=True)
 
     def testStreamExceptions(self):
         from music21 import converter
