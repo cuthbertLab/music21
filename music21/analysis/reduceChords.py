@@ -122,10 +122,13 @@ class ChordReducer:
 
         # TODO: make chordified a method on TimespanTree and move stream.chordify guts there
         #   then use that and remove this deprecated call.
-        chordifiedReduction = tree.toStream.chordified(
-            scoreTree,
-            templateStream=inputScore,
-        )
+        import warnings
+        with warnings.catch_warnings():  # catch deprecation warning
+            warnings.simplefilter('ignore', category=exceptions21.Music21DeprecationWarning)
+            chordifiedReduction = tree.toStream.chordified(
+                scoreTree,
+                templateStream=inputScore,
+            )
         chordifiedPart = stream.Part()
         for measure in chordifiedReduction.getElementsByClass('Measure'):
             reducedMeasure = self.reduceMeasureToNChords(

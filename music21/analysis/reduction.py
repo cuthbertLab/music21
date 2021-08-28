@@ -961,8 +961,11 @@ class Test(unittest.TestCase):
         # BACH pre;ide !, WTC
 
         src = corpus.parse('bwv846')
-        chords = src.flattenParts().makeChords(minimumWindowSize=4,
-                                    makeRests=False)
+        import warnings
+        with warnings.catch_warnings():  # catch deprecation warning
+            warnings.simplefilter('ignore', category=exceptions21.Music21DeprecationWarning)
+            chords = src.flattenParts().makeChords(minimumWindowSize=4,
+                                        makeRests=False)
         for c in chords.flatten().notes:
             c.quarterLength = 4
         for m in chords.getElementsByClass('Measure'):
