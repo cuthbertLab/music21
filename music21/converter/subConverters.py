@@ -1526,7 +1526,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(m1.notes), 1)
         self.assertEqual(len(m2.notes), 0)
 
-        out1 = s.write(makeNotation=True)
+        out1 = s.write()  # makeNotation=True is assumed
         # 4/4 will be assumed; quarter note will be moved to measure 2
         roundtrip_back = converter.parse(out1)
         self.assertEqual(
