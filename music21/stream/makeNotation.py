@@ -14,6 +14,7 @@
 
 import copy
 import unittest
+import warnings
 from typing import List, Generator, Optional, Set, Union
 from fractions import Fraction  # typing only
 
@@ -142,8 +143,10 @@ def makeBeams(
         if m.timeSignature is not None:
             lastTimeSignature = m.timeSignature
         if lastTimeSignature is None:
-            environLocal.printDebug('cannot process beams in a Measure without a time signature')
-            continue
+            lastTimeSignature = m.getContextByClass(meter.TimeSignature)
+            if lastTimeSignature is None:
+                warnings.warn('cannot process beams in a Measure without a time signature')
+                continue
         noteGroups = []
         if m.hasVoices():
             for v in m.voices:
@@ -1987,6 +1990,25 @@ class Test(unittest.TestCase):
             [n.stemDirection for n in p.flatten().notes],
             ['unspecified', 'unspecified'],
         )
+
+    def testMakeBeamsFromTimeSignatureInContext(self):
+        from music21 import converter
+        from music21 import stream
+
+        p = converter.parse('tinyNotation: 2/4 r2 d8 d8 d8 d8')
+        m2 = p[stream.Measure].last()
+        self.assertIsNone(m2.timeSignature)
+        m2_n0 = m2.notes.first()
+        self.assertEqual(len(m2_n0.beams.beamsList), 0)
+        m2.makeBeams(inPlace=True)
+        self.assertEqual(len(m2_n0.beams.beamsList), 1)
+
+        # Failure if no TimeSignature in context
+        m1 = p[stream.Measure].first()
+        m1.timeSignature = None
+        msg = 'cannot process beams in a Measure without a time signature'
+        with self.assertWarnsRegex(Warning, msg):
+            m2.makeBeams(inPlace=True)
 
     def testStreamExceptions(self):
         from music21 import converter
