@@ -146,8 +146,7 @@ def makeBeams(
             if failOnNoTimeSignature:
                 raise stream.StreamException(
                     'cannot process beams in a Measure without a time signature')
-            else:
-                continue
+            continue
         noteGroups = []
         if m.hasVoices():
             for v in m.voices:
