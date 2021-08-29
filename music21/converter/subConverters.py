@@ -1537,7 +1537,7 @@ class Test(unittest.TestCase):
                 f.read(20)
 
         # Same, but from the ConverterMusicXML object directly
-        conv = converter.subConverters.ConverterMusicXML()
+        conv = ConverterMusicXML()
         conv.write(fp=mxlPath, obj=s, fmt='musicxml')
         with self.assertRaises(UnicodeDecodeError):
             with open(mxlPath, 'r', encoding='utf-8') as f:
