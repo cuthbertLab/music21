@@ -1039,7 +1039,7 @@ class ConverterMusicXML(SubConverter):
             if fp and str(fp).endswith('.mxl'):
                 compress = True
             elif fmt.startswith('mxl'):
-                # currently unreachable from Stream.write()
+                # currently unreachable from Music21Object.write()
                 compress = True
             else:
                 compress = False
