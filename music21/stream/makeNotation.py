@@ -141,12 +141,11 @@ def makeBeams(
     for m in mColl:
         # this means that the first of a stream of time signatures will
         # be used
-        if m.timeSignature is not None:
-            lastTimeSignature = m.timeSignature
+        lastTimeSignature = m.timeSignature or m.getContextByClass(meter.TimeSignature)
         if lastTimeSignature is None:
-            lastTimeSignature = m.getContextByClass(meter.TimeSignature)
-            if lastTimeSignature is None and failOnNoTimeSignature:
-                raise stream.StreamException('cannot process beams in a Measure without a time signature')
+            if failOnNoTimeSignature:
+                raise stream.StreamException(
+                    'cannot process beams in a Measure without a time signature')
             else:
                 continue
         noteGroups = []
