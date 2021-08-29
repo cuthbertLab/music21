@@ -1528,6 +1528,21 @@ class Test(unittest.TestCase):
         s = converter.parseData(testPrimitive.multiDigitEnding)
         mxlPath = s.write('mxl')
         self.assertTrue(str(mxlPath).endswith('.mxl'), f'{mxlPath} does not end with .mxl')
+
+        # Just the filepath ending in .mxl is sufficient to write .mxl
+        s.write(fp=mxlPath)
+        # Verify that it actually wrote bytes
+        with self.assertRaises(UnicodeDecodeError):
+            with open(mxlPath, 'r', encoding='utf-8') as f:
+                f.read(20)
+
+        # Same, but from the ConverterMusicXML object directly
+        conv = converter.subConverters.ConverterMusicXML()
+        conv.write(fp=mxlPath, obj=s, fmt='musicxml')
+        with self.assertRaises(UnicodeDecodeError):
+            with open(mxlPath, 'r', encoding='utf-8') as f:
+                f.read(20)
+
         os.remove(mxlPath)
 
     def testWriteMusicXMLMakeNotation(self):
