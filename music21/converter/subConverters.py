@@ -1017,7 +1017,7 @@ class ConverterMusicXML(SubConverter):
               subformats=None,
               makeNotation=True,
               compress: Optional[bool] = None,
-              **keywords):  # pragma: no cover
+              **keywords):
         '''
         Write to a .musicxml file.
 
@@ -1039,6 +1039,7 @@ class ConverterMusicXML(SubConverter):
             if fp and str(fp).endswith('.mxl'):
                 compress = True
             elif fmt.startswith('mxl'):
+                # currently unreachable from Stream.write()
                 compress = True
             else:
                 compress = False
