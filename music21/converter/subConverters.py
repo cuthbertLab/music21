@@ -1536,14 +1536,15 @@ class Test(unittest.TestCase):
             with open(mxlPath, 'r', encoding='utf-8') as f:
                 f.read(20)
 
-        # Same, but from the ConverterMusicXML object directly
+        # Also test ConverterMusicXML object directly
         conv = ConverterMusicXML()
-        conv.write(fp=mxlPath, obj=s, fmt='musicxml')
+        mxlPath2 = conv.write(obj=s, fmt='mxl')
         with self.assertRaises(UnicodeDecodeError):
-            with open(mxlPath, 'r', encoding='utf-8') as f:
+            with open(mxlPath2, 'r', encoding='utf-8') as f:
                 f.read(20)
 
         os.remove(mxlPath)
+        os.remove(mxlPath2)
 
     def testWriteMusicXMLMakeNotation(self):
         from music21 import converter
