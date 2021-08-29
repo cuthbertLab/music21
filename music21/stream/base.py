@@ -6521,7 +6521,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             classFilterList=classFilterList,
         )
 
-    def makeBeams(self, *, inPlace=False, setStemDirections=True):
+    def makeBeams(self, *, inPlace=False, setStemDirections=True, failOnNoTimeSignature=False):
         '''
         Return a new Stream, or modify the Stream in place, with beams applied to all
         notes.
@@ -6529,11 +6529,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         See :py:func:`~music21.stream.makeNotation.makeBeams`.
 
         New in v6.7 -- setStemDirections.
+        New in v.7 -- failOnNoTimeSignature raises StreamException if no TimeSignature
+        exists in the stream context from which to make measures.
         '''
         return makeNotation.makeBeams(
             self,
             inPlace=inPlace,
-            setStemDirections=setStemDirections
+            setStemDirections=setStemDirections,
+            failOnNoTimeSignature=failOnNoTimeSignature,
         )
 
     def makeAccidentals(
