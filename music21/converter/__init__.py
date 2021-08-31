@@ -186,7 +186,8 @@ class ArchiveManager:
                 # xml file
                 if 'META-INF' in subFp:
                     continue
-                if not subFp.endswith('.xml') and not subFp.endswith('musicxml'):
+                # include .mxl to be kind to users who zipped up mislabeled files
+                if pathlib.Path(subFp).suffix not in ['.musicxml', '.xml', '.mxl']:
                     continue
 
                 post = f.read(subFp)
