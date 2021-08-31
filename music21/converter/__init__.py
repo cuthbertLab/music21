@@ -174,6 +174,7 @@ class ArchiveManager:
         return post
 
     def _extractContents(self, f: zipfile.ZipFile, name=None, dataFormat='musicxml'):
+        post = None
         if name is None and dataFormat == 'musicxml':  # try to auto-harvest
             # will return data as a string
             # note that we need to read the META-INF/container.xml file
