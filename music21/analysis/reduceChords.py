@@ -229,6 +229,9 @@ class ChordReducer:
         '''
         for verticalities in scoreTree.iterateVerticalitiesNwise(n=2):
             one, two = verticalities
+            if not one.pitchSet or not two.pitchSet:
+                # TODO: fix root cause (barline detected as verticality)
+                continue
             onePitches = sorted(one.pitchSet)
             twoPitches = sorted(two.pitchSet)
             if onePitches[0].nameWithOctave != twoPitches[0].nameWithOctave:
