@@ -1213,18 +1213,19 @@ class NotRest(GeneralNote):
         the active instrument.)
         ''')
 
-    def getInstrument(self, *, returnDefault: bool = False) -> Optional['music21.instrument.Instrument']:
+    def getInstrument(self, *, returnDefault: bool = True) -> Optional['music21.instrument.Instrument']:
         '''
         Retrieves the `.storedInstrument` on this `NotRest` instance, if any.
         If one is not found, executes a context search (without following
         derivations) to find the closest (i.e., active) instrument in the
         stream hierarchy.
 
-        Returns a default instrument if `returnDefault` is True.
+        Returns a default instrument if no instrument is found in the context
+        and `returnDefault` is True (default).
 
         >>> n = note.Note()
         >>> m = stream.Measure([n])
-        >>> n.getInstrument() is None
+        >>> n.getInstrument(returnDefault=False) is None
         True
         >>> dulc = instrument.Dulcimer()
         >>> m.insert(0, dulc)
@@ -1253,7 +1254,7 @@ class NotRest(GeneralNote):
         >>> p.remove(dulc)
         >>> derived.getInstruments().first()
         <music21.instrument.Dulcimer 'Dulcimer'>
-        >>> n.getInstrument() is None
+        >>> n.getInstrument(returnDefault=False) is None
         True
 
         Electing to return a default generic `Instrument`:

@@ -3680,8 +3680,10 @@ class MeasureExporter(XMLExporterBase):
                           n: note.NotRest,
                           mxNote: Element,
                           chordParent: Optional[chord.Chord]):
-        # instrument tags are necessary when there is more than one
-        # instrument anywhere in the same musicxml <part>
+        '''
+        Insert <instrument> tags if necessary, that is, when there is more than one
+        instrument anywhere in the same musicxml <part>.
+        '''
         if self.parent is None:
             return
 
@@ -3692,10 +3694,7 @@ class MeasureExporter(XMLExporterBase):
             return
 
         searchingObject = chordParent if chordParent else n
-        closest_inst = searchingObject.getInstrument()
-        if closest_inst is None:  # pragma: no cover
-            # unexpected; just for safety
-            return
+        closest_inst = searchingObject.getInstrument(returnDefault=True)
 
         instance_to_use = None
         for inst in self.parent.instrumentStream:
