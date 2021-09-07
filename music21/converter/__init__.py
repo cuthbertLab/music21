@@ -1968,7 +1968,7 @@ class Test(unittest.TestCase):
         # This file should have been written, above
         destFp = Converter()._getDownloadFp(e.getRootTempDir(), '.krn', url)
         # Hack garbage into it so that we can test whether or not forceSource works
-        with open(destFp, 'a') as fp:
+        with open(destFp, 'a', encoding='utf-8') as fp:
             fp.write('all sorts of garbage that Humdrum cannot parse')
 
         with self.assertRaises(HumdrumException):
