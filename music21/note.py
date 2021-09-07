@@ -1213,14 +1213,14 @@ class NotRest(GeneralNote):
         the active instrument.)
         ''')
 
-    def getInstrument(self) -> Optional['music21.instrument.Instrument']:
+    def getInstrument(self, *, returnDefault: bool = False) -> Optional['music21.instrument.Instrument']:
         '''
         Retrieves the `.storedInstrument` on this `NotRest` instance, if any.
         If one is not found, executes a context search (without following
         derivations) to find the closest (i.e., active) instrument in the
         stream hierarchy.
 
-        Does not return a default instrument.
+        Returns a default instrument if `returnDefault` is True.
 
         >>> n = note.Note()
         >>> m = stream.Measure([n])
@@ -1255,10 +1255,20 @@ class NotRest(GeneralNote):
         <music21.instrument.Dulcimer 'Dulcimer'>
         >>> n.getInstrument() is None
         True
+
+        Electing to return a default generic `Instrument`:
+
+        >>> n.getInstrument(returnDefault=True)
+        <music21.instrument.Instrument ''>
         '''
+        from music21 import instrument
         if self.storedInstrument is not None:
             return self.storedInstrument
-        return self.getContextByClass('Instrument', followDerivation=False)
+        instrument_or_none = self.getContextByClass(
+            instrument.Instrument, followDerivation=False)
+        if returnDefault and instrument_or_none is None:
+            return instrument.Instrument()
+        return instrument_or_none
 
 
 # ------------------------------------------------------------------------------
