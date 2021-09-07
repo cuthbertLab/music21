@@ -1213,7 +1213,10 @@ class NotRest(GeneralNote):
         the active instrument.)
         ''')
 
-    def getInstrument(self, *, returnDefault: bool = True) -> Optional['music21.instrument.Instrument']:
+    def getInstrument(self,
+                      *,
+                      returnDefault: bool = True
+                      ) -> Optional['music21.instrument.Instrument']:
         '''
         Retrieves the `.storedInstrument` on this `NotRest` instance, if any.
         If one is not found, executes a context search (without following
