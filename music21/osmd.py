@@ -33,7 +33,7 @@ environLocal = environment.Environment('osmd')
 # clear output, then save the notebook and refresh the page.
 # Otherwise the script will stay on the page and not reload.
 SCRIPT_URL = ('https://github.com/opensheetmusicdisplay'
-            + '/opensheetmusicdisplay/releases/download/0.9.2/opensheetmusicdisplay.min.js')
+            + '/opensheetmusicdisplay/releases/download/1.1.0/opensheetmusicdisplay.min.js')
 
 
 def hasInstalledIPython() -> bool:
@@ -90,7 +90,7 @@ def musicXMLToScript(xml, divId, *, offline=False):
     >>> excerpt = corpus.parse('demos/two-parts')
     >>> xml = osmd.getXml(excerpt)
     >>> divId = osmd.getUniqueDivId()
-    >>> js = osmd.musicXMLToScript(xml, divId)
+    >>> js = osmd.musicXMLToScript(xml, divId, offline=True)
     >>> 'window.openSheetMusicDisplay = new OSMD.OpenSheetMusicDisplay(div_id);' in js
     True
     '''
@@ -98,7 +98,7 @@ def musicXMLToScript(xml, divId, *, offline=False):
     # script that will replace div contents with OSMD display
     script = ''
     script_path = os.path.join(getSourceFilePath(), 'js', 'notebookOSMDLoader.js')
-    with open(script_path, 'r') as f:
+    with open(script_path, 'r', encoding='utf-8') as f:
         script = f.read()
     script = script.replace('{{DIV_ID}}', divId)
     script = script.replace('"{{data}}"', json.dumps(xml))
@@ -114,7 +114,7 @@ def musicXMLToScript(xml, divId, *, offline=False):
 
         # since we can't link to files from a notebook (security risk) inject into file.
         script_content = ''
-        with open(osmd_file, 'r') as f:
+        with open(osmd_file, 'r', encoding='utf-8') as f:
             script_content = f.read()
         script = script.replace('"{{offline_script}}"', json.dumps(script_content), 1)
 
