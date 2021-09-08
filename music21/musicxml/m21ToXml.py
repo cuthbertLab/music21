@@ -903,6 +903,9 @@ class XMLExporterBase:
         '''
         Sets mxObject['color'] to a normalized version of m21Object.style.color
         '''
+        # we repeat 'color' rather than just letting setStyleAttributes
+        # handle it, because otherwise it will run the expensive
+        # hyphenToCamelCase routine on something called on each note.
         self.setStyleAttributes(mxObject, m21Object, 'color', 'color')
         if 'color' in mxObject.attrib:  # set
             mxObject.attrib['color'] = normalizeColor(mxObject.attrib['color'])
@@ -969,7 +972,6 @@ class XMLExporterBase:
         set positioning information for an mxObject from
         default-x, default-y, relative-x, relative-y from
         the .style attribute's absoluteX, relativeX, etc. attributes.
-
         '''
         musicXMLNames = ('default-x', 'default-y', 'relative-x', 'relative-y')
         m21Names = ('absoluteX', 'absoluteY', 'relativeX', 'relativeY')
@@ -2317,11 +2319,20 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # TODO: encoder
 
         if self.scoreMetadata is not None:
+            found_m21_already = False
             for software in self.scoreMetadata.software:
+                if 'music21 v.' in software:
+                    if found_m21_already:
+                        # only write out one copy of the music21 software
+                        # tag.  First one should be current version.
+                        continue
+                    else:
+                        found_m21_already = True
                 mxSoftware = SubElement(mxEncoding, 'software')
                 mxSoftware.text = software
-
         else:
+            # there will not be a music21 software tag if no scoreMetadata
+            # if not for this.
             mxSoftware = SubElement(mxEncoding, 'software')
             mxSoftware.text = defaults.software
 
@@ -5776,6 +5787,8 @@ class MeasureExporter(XMLExporterBase):
 
         # not to be done: repeater (deprecated)
         self.setColor(mxBeam, beamObject)
+        # again, we pass the name 'fan' twice so we don't have to run
+        # hyphenToCamelCase on it.
         self.setStyleAttributes(mxBeam, beamObject, 'fan', 'fan')
 
         return mxBeam

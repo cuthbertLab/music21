@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
-# Name:         vexflow/toM21j.py
+# Name:         vexflow/toMusic21j.py
 # Purpose:      music21 classes for converting music21 objects to music21j
 #
 # Authors:      Michael Scott Cuthbert

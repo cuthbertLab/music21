@@ -697,9 +697,9 @@ class Converter:
         self.setSubconverterFromFormat(useFormat)
         self.subConverter.keywords = keywords
         self.subConverter.parseFile(fp, number=number)
-        self.stream.filePath = fp
-        self.stream.fileNumber = number
-        self.stream.fileFormat = useFormat
+        self.stream.filePath = fp  # These are attributes defined outside of
+        self.stream.fileNumber = number  # __init__ and will be moved to
+        self.stream.fileFormat = useFormat  # Metadata in v8.
 
     # -----------------------------------------------------------------------#
     # Subconverters

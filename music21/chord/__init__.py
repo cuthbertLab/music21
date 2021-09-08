@@ -4228,7 +4228,7 @@ class Chord(ChordBase):
 
         Changed in v5.5: special cases for checking enharmonics in some cases
         Changed in v6.5: better handling of 0-, 1-, and 2-pitchClass and microtonal chords.
-        Changed in v7: Inversions of augmented triads are used.
+        Changed in v7: Inversions of augmented sixth-chords are specified.
         '''
         if any(not p.isTwelveTone() for p in self.pitches):
             return 'microtonal chord'
