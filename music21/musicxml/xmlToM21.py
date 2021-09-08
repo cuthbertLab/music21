@@ -475,6 +475,9 @@ class XMLParserBase:
         '''
         Sets m21Object.style.color to be the same as color...
         '''
+        # we repeat 'color' rather than just letting setStyleAttributes
+        # handle it, because otherwise it will run the expensive
+        # hyphenToCamelCase routine on something called on each note.
         self.setStyleAttributes(mxObject, m21Object, 'color', 'color')
 
     def setFont(self, mxObject, m21Object):

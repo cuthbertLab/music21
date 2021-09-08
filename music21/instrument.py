@@ -24,7 +24,6 @@ ensemble.py module.
 import copy
 import unittest
 import sys
-from typing import Optional
 from collections import OrderedDict
 from typing import Optional
 

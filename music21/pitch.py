@@ -48,6 +48,16 @@ STEPREF = {
     'A': 9,
     'B': 11,
 }
+NATURAL_PCS = (0, 2, 4, 5, 7, 9, 11)
+STEPREF_REVERSED = {
+    0: 'C',
+    2: 'D',
+    4: 'E',
+    5: 'F',
+    7: 'G',
+    9: 'A',
+    11: 'B',
+}
 STEPNAMES = {'C', 'D', 'E', 'F', 'G', 'A', 'B'}  # set
 STEP_TO_DNN_OFFSET = {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6}
 
@@ -231,10 +241,12 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
     >>> pitch._convertPsToStep(42.999739)
     ('G', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (-0c)>, 0)
     '''
-    name = ''
-
     if isinstance(ps, int):
         pc = ps % 12
+        alter = 0
+        micro = 0
+    elif ps == int(ps):
+        pc = int(ps) % 12
         alter = 0
         micro = 0
     else:
@@ -274,7 +286,7 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
 
     octShift = 0
     # check for unnecessary enharmonics
-    if pc in (4, 11) and alter == 1:
+    if alter == 1 and pc in (4, 11):
         acc = Accidental(0)
         pcName = (pc + 1) % 12
         # if a B, we are shifting out of this octave, and need to get
@@ -282,10 +294,9 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
         if pc == 11:
             octShift = 1
     # its a natural; nothing to do
-    elif pc in STEPREF.values():
-        acc = Accidental(0 + alter)
+    elif pc in NATURAL_PCS:  # 0, 2, 4, 5, 7, 9, 11
+        acc = Accidental(0 + alter)  # alter is usually 0 unless half-sharp.
         pcName = pc
-
     elif (pc - 1) in (0, 5, 7) and alter >= 1:  # is this going to be a C##, F##, G##?
         acc = Accidental(alter - 1)
         pcName = pc + 1
@@ -306,10 +317,7 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
     else:  # pragma: no cover
         raise PitchException(f'cannot match condition for pc: {pc}')
 
-    for key, value in STEPREF.items():
-        if pcName == value:
-            name = key
-            break
+    name = STEPREF_REVERSED.get(pcName, '')
 
     # create a micro object always
     if micro != 0:
