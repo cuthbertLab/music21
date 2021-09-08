@@ -101,10 +101,11 @@ class SubConverter:
         '''
         Called when a file is encountered. If all that needs to be done is
         loading the file and putting the data into parseData then there is no need
-        to do implement this method.  Just set self.readBinary to True|False.
+        to implement this method.  Just set self.readBinary to True|False.
         '''
         if self.readBinary is False:
-            with open(filePath) as f:
+            import locale
+            with open(filePath, encoding=locale.getpreferredencoding()) as f:
                 dataStream = f.read()
         else:
             with open(filePath, 'rb') as f:
@@ -1246,7 +1247,7 @@ class ConverterRomanText(SubConverter):
         if fp is None:
             fp = self.getTemporaryFile()
 
-        with open(fp, 'w') as text_file:
+        with open(fp, 'w', encoding='utf-8') as text_file:
             for entry in writeRoman.RnWriter(obj).combinedList:
                 text_file.write(entry + '\n')
 
@@ -1589,7 +1590,7 @@ class Test(unittest.TestCase):
 
         p = converter.parse('tinyNotation: c1 d1 e1 f1')
         out = p.write('braille', debug=True)
-        with open(out, 'r') as f:
+        with open(out, 'r', encoding='utf-8') as f:
             self.assertIn('<music21.braille.segment BrailleSegment>', f.read())
         os.remove(out)
 
