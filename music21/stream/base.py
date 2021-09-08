@@ -1568,7 +1568,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 continue
 
             # Anything that messes with ._elements or ._endElements should be in core.py
-            #     TODO: move it...
+            # TODO: move it...
             matchedEndElement = False
             baseElementCount = len(self._elements)
             matchOffset = 0.0  # to avoid possibility of undefined
