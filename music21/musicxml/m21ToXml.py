@@ -20,9 +20,10 @@ import io
 import math
 import unittest
 import warnings
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element, SubElement, ElementTree
-from typing import List, Optional, Union
+from xml.etree.ElementTree import (
+    Element, SubElement, ElementTree, Comment, fromstring as et_fromstring
+)
+from typing import Dict, List, Optional, Union
 
 # external dependencies
 import webcolors
@@ -40,6 +41,7 @@ from music21 import clef
 from music21 import chord
 from music21 import duration
 from music21 import harmony
+from music21 import instrument
 from music21 import metadata
 from music21 import note
 from music21 import meter
@@ -422,7 +424,7 @@ class GeneralObjectExporter:
 
     def fromGeneralObject(self, obj):
         '''
-        Converts any Music21Object (or a Duration or a Pitch) to something that
+        Converts any Music21Object (or a duration or a pitch) to something that
         can be passed to ScoreExporter()
 
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter()
@@ -436,7 +438,7 @@ class GeneralObjectExporter:
                 {0.0} <music21.meter.TimeSignature 6/8>
                 {0.0} <music21.note.Note C>
                 {3.0} <music21.bar.Barline type=final>
-        >>> s[note.Note].first().duration
+        >>> s.flat.notes[0].duration
         <music21.duration.Duration 3.0>
         '''
         classes = obj.classes
@@ -781,7 +783,7 @@ class XMLExporterBase:
 
         commentText = ('=' * spacerLengthLow) + ' ' + comment + ' ' + ('=' * spacerLengthHigh)
 
-        divider = ET.Comment(commentText)
+        divider = Comment(commentText)
         self.xmlRoot.append(divider)
 
     # ------------------------------------------------------------------------------
@@ -1403,9 +1405,12 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.partExporterList: List['PartExporter'] = []
 
-        self.joinedGroups: List['StaffGroup'] = []
+        self.groupsToJoin: List['StaffGroup'] = []
+        # key = id(stream) (NB: not stream.id); value = .instrumentStream
+        self.instrumentsByStream: Dict[int, stream.Stream] = {}
 
         self.instrumentList = []
+        self.instrumentIdList = []
         self.midiChannelList = []
 
         self.parts = []
@@ -1439,6 +1444,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.scorePreliminaries()
 
         if s.hasPartLikeStreams():
+            # Pre-populate partExporterList so that joinable groups can be identified
+            # before attempting to identify and count instruments
+            self._populatePartExporterList()
+            self.groupsToJoin = self.joinableGroups()
             self.parsePartlikeScore()
         else:
             self.parseFlatScore()
@@ -1502,7 +1511,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.setMeterStream()
         self.setPartsAndRefStream()
         # get all text boxes
-        self.textBoxes = self.stream.flatten().getElementsByClass('TextBox')
+        self.textBoxes = self.stream.flat.getElementsByClass('TextBox')
 
         # we need independent sub-stream elements to shift in presentation
         self.highestTime = 0.0  # redundant, but set here.
@@ -1581,9 +1590,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         #                meterStream, meterStream[0]])
         if not meterStream:
             # note: this will return a default if no meters are found
-            meterStream = s.flatten().getTimeSignatures(searchContext=False,
-                                                        sortByCreationTime=True,
-                                                        returnDefault=True)
+            meterStream = s.flat.getTimeSignatures(searchContext=False,
+                                                   sortByCreationTime=True, returnDefault=True)
         self.meterStream = meterStream
 
     def setScoreLayouts(self):
@@ -1609,6 +1617,30 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.scoreLayouts = scoreLayouts
         self.firstScoreLayout = scoreLayout
 
+    def _populatePartExporterList(self):
+        if self.makeNotation:
+            # hide any rests created at this late stage, because we are
+            # merely trying to fill up MusicXML display, not impose things on users
+            for p in self.parts:
+                p.makeRests(refStreamOrTimeRange=self.refStreamOrTimeRange,
+                            inPlace=True,
+                            hideRests=True,
+                            timeRangeFromBarDuration=True,
+                            )
+
+        count = 0
+        sp = list(self.parts)
+        for innerStream in sp:
+            count += 1
+            # This guards against making an error in a future refactor
+            # Raises if editing while iterating instead of casting to list above
+            if count > len(sp):  # pragma: no cover
+                raise MusicXMLExportException('infinite stream encountered')
+
+            pp = PartExporter(innerStream, parent=self)
+            pp.spannerBundle = self.spannerBundle
+            self.partExporterList.append(pp)
+
     def parsePartlikeScore(self):
         '''
         Called by .parse() if the score has individual parts.
@@ -1628,29 +1660,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         >>> '<note print-object="no" print-spacing="yes">' in outStr
         True
         '''
-        if self.makeNotation:
-            # self.parts is a stream of parts
-            # hide any rests created at this late stage, because we are
-            # merely trying to fill up MusicXML display, not impose things on users
-            self.parts.makeRests(refStreamOrTimeRange=self.refStreamOrTimeRange,
-                                 inPlace=True,
-                                 hideRests=True,
-                                 timeRangeFromBarDuration=True,
-                                 )
-
-        count = 0
-        sp = list(self.parts)
-        for innerStream in sp:
-            count += 1
-            # This guards against making an error in a future refactor
-            # Raises if editing while iterating instead of casting to list above
-            if count > len(sp):  # pragma: no cover
-                raise MusicXMLExportException('infinite stream encountered')
-
-            pp = PartExporter(innerStream, parent=self)
-            pp.spannerBundle = self.spannerBundle
-            pp.parse()
-            self.partExporterList.append(pp)
+        if not self.partExporterList:
+            self._populatePartExporterList()
+        for part_ex in self.partExporterList:
+            part_ex.parse()
 
     def parseFlatScore(self):
         '''
@@ -2050,7 +2063,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             p = pex.stream
             # check for first
             for sg in staffGroups:
-                if sg in self.joinedGroups:
+                if sg in self.groupsToJoin:
                     continue
                 if sg.isFirst(p):
                     mxPartGroup = self.staffGroupToXmlPartGroup(sg)
@@ -2065,7 +2078,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             # check for last
             activeIndex = None
             for sg in staffGroups:
-                if sg in self.joinedGroups:
+                if sg in self.groupsToJoin:
                     continue
                 # Handle last part in the StaffGroup
                 if sg.isLast(p):
@@ -2489,11 +2502,7 @@ class PartExporter(XMLExporterBase):
         if self.stream.atSoundingPitch is True:
             self.stream.toWrittenPitch(inPlace=True)
 
-        self.instrumentSetup()
-
-        self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
-
-        # Split complex durations in place (fast if none are found)
+        # Split complex durations in place (fast if none found)
         self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
         # Suppose that everything below this is a measure
@@ -2506,6 +2515,12 @@ class PartExporter(XMLExporterBase):
                 'Cannot export with makeNotation=False if there are no measures')
         # make sure that all instances of the same class have unique ids
         self.spannerBundle.setIdLocals()
+
+        # must do after fixupNotation, since instrument instances may be created anew!
+        self.instrumentSetup()
+
+        self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
+
         for m in self.stream.getElementsByClass(stream.Measure):
             self.addDividerComment('Measure ' + str(m.number))
             measureExporter = MeasureExporter(m, parent=self)
@@ -2522,11 +2537,8 @@ class PartExporter(XMLExporterBase):
 
     def instrumentSetup(self):
         '''
-        sets self.instrumentStream and self.firstInstrumentObject for the stream,
+        Sets self.instrumentStream and self.firstInstrumentObject for the stream,
         checks for a unique midiChannel and then blocks it off from future use.
-
-        Note that there's a deficiency currently that only the first instrument is fully
-        converted.
 
         >>> p = converter.parse('tinyNotation: 4/4 c1 d1 e1')
         >>> p.getElementsByClass('Measure')[0].insert(0, instrument.Clarinet())
@@ -2546,8 +2558,14 @@ class PartExporter(XMLExporterBase):
         {0.0} <music21.instrument.Clarinet 'P...: Clarinet'>
         {4.0} <music21.instrument.BassClarinet 'Bass clarinet'>
         '''
-        # get a default instrument if not assigned
-        self.instrumentStream = self.stream.getInstruments(returnDefault=True, recurse=True)
+        # Collect instruments
+        if self.parent is not None and id(self.stream) in self.parent.instrumentsByStream:
+            # this condition will be satisfied if this is the second or subsequent
+            # PartStaff in a StaffGroup
+            self.instrumentStream = self.parent.instrumentsByStream[id(self.stream)]
+        else:
+            # get a default instrument if not assigned
+            self.instrumentStream = self.stream.getInstruments(returnDefault=True, recurse=True)
         self.firstInstrumentObject = self.instrumentStream[0]  # store first, as handled differently
 
         if self.parent is not None:
@@ -2559,7 +2577,18 @@ class PartExporter(XMLExporterBase):
         if firstInstId in instIdList or firstInstId is None:  # must have unique ids
             self.firstInstrumentObject.partIdRandomize()  # set new random id
 
+        should_short_circuit = self.mergeInstrumentStreamPartStaffAware()
+        if should_short_circuit:
+            return
+
+        seen_instrument_classes = set()
         for thisInstrument in self.instrumentStream:
+            # fragile against two or more instruments with the same
+            # Instrument subclass but different MIDI numbers or channels.
+            if type(thisInstrument) in seen_instrument_classes:
+                continue
+
+            seen_instrument_classes.add(type(thisInstrument))
             if (thisInstrument.midiChannel is None
                     or thisInstrument.midiChannel in self.midiChannelList):
                 try:
@@ -2572,15 +2601,55 @@ class PartExporter(XMLExporterBase):
             self.midiChannelList.append(thisInstrument.midiChannel)
             # environLocal.printDebug(['midiChannel list', self.midiChannelList])
 
-            # add to list for checking on next part
-            if self.parent is not None:
-                self.parent.instrumentList.append(thisInstrument)
-            # force this instrument into this part
-            # meterStream is only used here if there are no measures
-            # defined in this part
-
-            if thisInstrument.instrumentId is None:
+            # Enforce uniqueness
+            if (thisInstrument.instrumentId is None
+                or (self.parent
+                    and thisInstrument.instrumentId in self.parent.instrumentIdList)):
                 thisInstrument.instrumentIdRandomize()
+
+            # add to lists for checking on next part
+            if self.parent is not None:
+                self.parent.instrumentIdList.append(thisInstrument.instrumentId)
+                if thisInstrument is self.firstInstrumentObject:
+                    self.parent.instrumentList.append(thisInstrument)
+
+    def mergeInstrumentStreamPartStaffAware(self) -> bool:
+        '''
+        Merges instrument streams from subsequent parts in a PartStaff group.
+
+        Does nothing in the normal case of single staves.
+
+        Returns whether or not instrument processing should short circuit,
+        which is False for the general case and True for subsequent
+        PartStaff objects after the first in a group.
+        '''
+        if self.parent is None:
+            return False
+
+        # This is a list of StaffGroups, not PartStaffs, so check if any
+        if not self.parent.groupsToJoin:
+            return False
+
+        for joined_group in self.parent.groupsToJoin:
+            if joined_group.isFirst(self.stream):
+                # need to insert instruments from subsequent staffs
+                for subsequent_staff in joined_group[1:]:
+                    other_instruments = subsequent_staff.getInstruments(
+                        returnDefault=True, recurse=True)
+                    self.instrumentStream += other_instruments
+                    instrument.deduplicate(self.instrumentStream, inPlace=True)
+                    # Place a reference to this instrument stream in a place
+                    # where subsequent staffs entering this method will find and use it
+                    if self.parent:
+                        next_id = id(subsequent_staff)
+                        self.parent.instrumentsByStream[next_id] = self.instrumentStream
+            elif self.stream in joined_group:
+                # This stream was already (or will be) processed
+                # UNLESS there is a spaghetti case where
+                # this stream is second in groupB, but first in groupA,
+                # but PartStaffExporterMixin guarantees that won't happen
+                return True
+        return False
 
     def fixupNotationFlat(self):
         '''
@@ -2601,14 +2670,14 @@ class PartExporter(XMLExporterBase):
         # might need to getAll b/c might need spanners
         # from a higher level container
         # allContexts = []
-        # spannerContext = measureStream.flatten().getContextByClass('Spanner')
+        # spannerContext = measureStream.flat.getContextByClass('Spanner')
         # while spannerContext:
         #    allContexts.append(spannerContext)
         #    spannerContext = spannerContext.getContextByClass('Spanner')
         #
         # spannerBundle = spanner.SpannerBundle(allContexts)
         # only getting spanners at this level
-        # spannerBundle = spanner.SpannerBundle(measureStream.flatten())
+        # spannerBundle = spanner.SpannerBundle(measureStream.flat)
         self.spannerBundle = part.spannerBundle
 
     def fixupNotationMeasured(self):
@@ -2695,16 +2764,29 @@ class PartExporter(XMLExporterBase):
         # TODO: part-abbreviation-display
         # TODO: group
 
-        # TODO: unbounded...
-        i = self.firstInstrumentObject
+        seen_instrument_classes = set()
+        # The first instrument of each Class appears as a <score-instrument>
+        for inst in self.instrumentStream:
+            # only use the first instance of this class
+            if type(inst) in seen_instrument_classes:
+                continue
+            if (inst.instrumentName is not None
+                    or inst.instrumentAbbreviation is not None
+                    or inst.midiProgram is not None):
+                mxScorePart.append(self.instrumentToXmlScoreInstrument(inst))
+                seen_instrument_classes.add(type(inst))
 
-        if (i.instrumentName is not None or i.instrumentAbbreviation is not None
-                or i.midiProgram is not None):
-            mxScorePart.append(self.instrumentToXmlScoreInstrument(i))
-
-        # TODO: midi-device
-        if i.midiProgram is not None:
-            mxScorePart.append(self.instrumentToXmlMidiInstrument(i))
+        seen_instrument_classes = set()
+        # now iterate again to write <midi-instrument> tags for those
+        # same instruments, tags which must follow all <score-instrument> tags.
+        for inst in self.instrumentStream:
+            # TODO: disambiguate instrument instance with different midi programs?
+            if type(inst) in seen_instrument_classes:
+                continue
+            # TODO: midi-device
+            if inst.midiProgram is not None:
+                mxScorePart.append(self.instrumentToXmlMidiInstrument(inst))
+                seen_instrument_classes.add(type(inst))
 
         return mxScorePart
 
@@ -3488,7 +3570,7 @@ class MeasureExporter(XMLExporterBase):
             for t in mxTieList:
                 mxNote.append(t)
 
-        # TODO: instrument
+        self.setNoteInstrument(n, mxNote, chordParent)
         self.setEditorial(mxNote, n)
         if self.currentVoiceId is not None:
             mxVoice = SubElement(mxNote, 'voice')
@@ -3593,6 +3675,40 @@ class MeasureExporter(XMLExporterBase):
         # TODO: play
         self.xmlRoot.append(mxNote)
         return mxNote
+
+    def setNoteInstrument(self,
+                          n: note.NotRest,
+                          mxNote: Element,
+                          chordParent: Optional[chord.Chord]):
+        '''
+        Insert <instrument> tags if necessary, that is, when there is more than one
+        instrument anywhere in the same musicxml <part>.
+        '''
+        if self.parent is None:
+            return
+
+        if len(self.parent.instrumentStream) <= 1:
+            return
+
+        if n.isRest:
+            return
+
+        searchingObject = chordParent if chordParent else n
+        closest_inst = searchingObject.getInstrument(returnDefault=True)
+
+        instance_to_use = None
+        for inst in self.parent.instrumentStream:
+            if inst.classSet == closest_inst.classSet:
+                instance_to_use = inst
+                break
+
+        if instance_to_use is None:
+            # exempt coverage, because this is only for safety/unreachable
+            raise MusicXMLExportException(
+                f'Could not find instrument instance for note {n} in instrumentStream'
+            )  # pragma: no cover
+        mxInstrument = SubElement(mxNote, 'instrument')
+        mxInstrument.set('id', instance_to_use.instrumentId)
 
     def restToXml(self, r: note.Rest):
         # noinspection PyShadowingNames
@@ -3909,8 +4025,9 @@ class MeasureExporter(XMLExporterBase):
                        up: note.Unpitched,
                        noteIndexInChord: int = 0,
                        chordParent: chord.ChordBase = None) -> Element:
+        # noinspection PyShadowingNames
         '''
-        Convert a :class:`~music21.note.Unpitched` to a <note>
+        Convert an :class:`~music21.note.Unpitched` to a <note>
         with an <unpitched> subelement.
 
         >>> up = note.Unpitched(displayName='D5')
@@ -6279,8 +6396,8 @@ class MeasureExporter(XMLExporterBase):
         # TODO: measure-layout
         if m.hasStyleInformation and m.style.measureNumbering is not None:
             if mxPrint is None:
-                mxPrint = ET.Element('print')
-            mxMeasureNumbering = ET.SubElement(mxPrint, 'measure-numbering')
+                mxPrint = Element('print')
+            mxMeasureNumbering = SubElement(mxPrint, 'measure-numbering')
             mxMeasureNumbering.text = m.style.measureNumbering
             mnStyle = m.style.measureNumberingStyle
             if mnStyle is not None:
@@ -6499,7 +6616,7 @@ class Test(unittest.TestCase):
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         fp = xmlDir / '61l-Lyrics-Elisions-Syllables.xml'
         s = converter.parse(fp)
-        notes = list(s.flatten().notes)
+        notes = list(s.flat.notes)
         n1 = notes[0]
         xmlOut = self.getXml(n1)
         self.assertIn('<lyric name="1" number="1">', xmlOut)
@@ -6550,10 +6667,9 @@ class Test(unittest.TestCase):
         p.append(m)
         s.append(p)
 
-        self.assertEqual(3, self.getXml(s).count(u'<harmony'))
-        self.assertEqual(1, self.getXml(s).count(u'<kind '
-                                                  u'text="N.C.">none</kind>'))
-        self.assertEqual(1, self.getXml(s).count(u'<root-step text="">'))
+        self.assertEqual(3, self.getXml(s).count('<harmony'))
+        self.assertEqual(1, self.getXml(s).count('<kind text="N.C.">none</kind>'))
+        self.assertEqual(1, self.getXml(s).count('<root-step text="">'))
 
         s = stream.Score()
         p = stream.Part()
@@ -6571,10 +6687,8 @@ class Test(unittest.TestCase):
         p.append(m)
         s.append(p)
 
-        self.assertEqual(1, self.getXml(s).count(u'<kind '
-                                                 u'text="N.C.">none</kind>'))
-        self.assertEqual(1, self.getXml(s).count(u'<kind '
-                                                 u'text="No Chord">none</kind>'))
+        self.assertEqual(1, self.getXml(s).count('<kind text="N.C.">none</kind>'))
+        self.assertEqual(1, self.getXml(s).count('<kind text="No Chord">none</kind>'))
 
     def testSetPartsAndRefStreamMeasure(self):
         from music21 import converter
@@ -6595,7 +6709,7 @@ class Test(unittest.TestCase):
         gex = GeneralObjectExporter(s)
 
         with self.assertWarns(MusicXMLWarning) as cm:
-            tree = ET.fromstring(gex.parse().decode('utf-8'))
+            tree = et_fromstring(gex.parse().decode('utf-8'))
         self.assertIn(repr(s).split(' 0x')[0], str(cm.warning))
         self.assertIn(' is not well-formed; see isWellFormedNotation()', str(cm.warning))
         # The original score with its original address should not
@@ -6626,19 +6740,71 @@ class Test(unittest.TestCase):
         s = stream.Score([p1, p2])
         self.assertEqual(s.atSoundingPitch, 'unknown')
         gex = GeneralObjectExporter(s)
-        root = ET.fromstring(gex.parse().decode('utf-8'))
+        root = et_fromstring(gex.parse().decode('utf-8'))
         self.assertEqual(len(root.findall('.//transpose')), 1)
         self.assertEqual(root.find('.//step').text, 'D')
 
         s.atSoundingPitch = True
         gex = GeneralObjectExporter(s)
-        root = ET.fromstring(gex.parse().decode('utf-8'))
+        root = et_fromstring(gex.parse().decode('utf-8'))
         self.assertEqual(len(root.findall('.//transpose')), 1)
         self.assertEqual(root.find('.//step').text, 'D')
 
+    def testMultipleInstruments(self):
+        '''
+        This is a score for two woodwind players both doubling on
+        flute and oboe. They both switch to flute and then back to oboe.
+        There are six m21 instruments to represent this, but the
+        <score-instrument> tags need just four, since no
+        musicXML <part> needs two oboes in it, etc., unless
+        there is a patch change/MIDI instrument change.
+        '''
+        p1 = stream.Part([
+            stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
+            stream.Measure([instrument.Flute(), note.Note(type='whole')]),
+            stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
+        ])
+        p2 = stream.Part([
+            stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
+            stream.Measure([instrument.Flute(), note.Note(type='whole')]),
+            stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
+        ])
+        s = stream.Score([p1, p2])
+        scEx = ScoreExporter(s)
+        tree = scEx.parse()
+        self.assertEqual(len(tree.findall('.//score-instrument')), 4)
+        self.assertEqual(len(tree.findall('.//measure/note/instrument')), 6)
+        self.assertEqual(tree.find('.//score-instrument').get('id'),
+                         tree.find('.//measure/note/instrument').get('id'))
+        self.assertNotEqual(tree.find('.//score-instrument').get('id'),
+                            tree.findall('.//measure/note/instrument')[-1].get('id'))
+
+    def testMultipleInstrumentsPiano(self):
+        from music21 import layout
+
+        ps1 = stream.PartStaff([
+            stream.Measure([instrument.ElectricPiano(), note.Note(type='whole')]),
+            stream.Measure([instrument.ElectricOrgan(), note.Note(type='whole')]),
+            stream.Measure([instrument.Piano(), note.Note(type='whole')]),
+        ])
+        ps2 = stream.PartStaff([
+            stream.Measure([instrument.Vocalist(), note.Note(type='whole')]),
+            stream.Measure([note.Note(type='whole')]),
+            stream.Measure([note.Note(type='whole')]),
+        ])
+        sg = layout.StaffGroup([ps1, ps2])
+        s = stream.Score([ps1, ps2, sg])
+        scEx = ScoreExporter(s)
+        tree = scEx.parse()
+
+        self.assertEqual(
+            [el.text for el in tree.findall('.//instrument-name')],
+            ['Electric Piano', 'Voice', 'Electric Organ', 'Piano']
+        )
+        self.assertEqual(len(tree.findall('.//measure/note/instrument')), 6)
+
     def testMidiInstrumentNoName(self):
         from music21 import converter
-        from music21 import instrument
 
         i = instrument.Instrument()
         i.midiProgram = 42
@@ -6703,7 +6869,7 @@ class Test(unittest.TestCase):
     def testFullMeasureRest(self):
         from music21 import converter
         s = converter.parse('tinynotation: 9/8 r1')
-        r = s.recurse().notesAndRests.first()
+        r = s.flat.notesAndRests.first()
         r.quarterLength = 4.5
         self.assertEqual(r.fullMeasure, 'auto')
         tree = self.getET(s)
@@ -6722,7 +6888,7 @@ class Test(unittest.TestCase):
         self.assertEqual(a.number, 0)
         # Use GEX to go through wellformed object conversion
         gex = GeneralObjectExporter(n)
-        tree = ET.fromstring(gex.parse().decode('utf-8'))
+        tree = et_fromstring(gex.parse().decode('utf-8'))
         self.assertIsNone(tree.find('.//string'))
 
     def testMeasurePadding(self):
@@ -6756,6 +6922,7 @@ class Test(unittest.TestCase):
         self.assertTrue(tree.findall('.//note'))
         self.assertFalse(tree.findall('.//forward'))
 
+
 class TestExternal(unittest.TestCase):
     show = True
 
@@ -6767,7 +6934,7 @@ class TestExternal(unittest.TestCase):
         #    format='musicxml', forceSource=True)
         b = corpus.parse('cpebach')
         # b.show('text')
-        # n = b.flatten().notes[0]
+        # n = b.flat.notes[0]
         # print(n.expressions)
         # return
 
@@ -6811,4 +6978,4 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='test_instrumentDoesNotCreateForward')
+    music21.mainTest(Test)  # , runTest='testExceptionMessage')

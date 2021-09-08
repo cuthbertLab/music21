@@ -1567,9 +1567,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # recursion matched or didn't or wasn't run. either way no need for rest...
                 continue
 
-            # TODO: Anything that messes with ._elements or ._endElements should be in core.py
-            # move it...
-            match = None
+            # Anything that messes with ._elements or ._endElements should be in core.py
+            #     TODO: move it...
             matchedEndElement = False
             baseElementCount = len(self._elements)
             matchOffset = 0.0  # to avoid possibility of undefined
@@ -1604,10 +1603,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if shiftDur != 0.0:
                     # can this be done with recurse???
                     for e in self.getElementsByOffset(shiftedRegionStart,
-                                                        shiftedRegionEnd,
-                                                        includeEndBoundary=False,
-                                                        mustFinishInSpan=False,
-                                                        mustBeginInSpan=True):
+                                                      shiftedRegionEnd,
+                                                      includeEndBoundary=False,
+                                                      mustFinishInSpan=False,
+                                                      mustBeginInSpan=True):
 
                         elementOffset = self.elementOffset(e)
                         self.coreSetElementOffset(e, elementOffset - shiftDur)
@@ -4937,7 +4936,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # this loses the expression of duration, but should be fine for instruments.
 
         instrument_stream.duration = returnObj.duration
-        instrument_stream.extendDuration('Instrument', inPlace=True)
+        # inPlace=False here because we are only doing calculations
+        # toWrittenPitch() shouldn't be inserting extra instruments
+        instrument_stream = instrument_stream.extendDuration('Instrument', inPlace=False)
 
         # store class filter list for transposition
         if transposeKeySignature:
@@ -5259,7 +5260,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def getInstrument(self,
                       *,
                       searchActiveSite=True,
-                      returnDefault=True) -> Optional['music21.instrument.Instrument']:
+                      returnDefault=True,
+                      recurse=False) -> Optional['music21.instrument.Instrument']:
         '''
         Return the first Instrument found in this Stream, or None.
 
@@ -5282,9 +5284,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'Violin'
         >>> p2.getInstrument(returnDefault=False).instrumentName
         'Viola'
+
+        Changed in v.7 -- added `recurse` (default False)
         '''
         post = self.getInstruments(searchActiveSite=searchActiveSite,
-                                   returnDefault=returnDefault)
+                                   returnDefault=returnDefault,
+                                   recurse=recurse)
         return post.first()
 
     @common.deprecated('v7', 'v8', 'use getElementsByClass() or getContextByClass() or bestClef()')
@@ -6522,7 +6527,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             classFilterList=classFilterList,
         )
 
-    def makeBeams(self, *, inPlace=False, setStemDirections=True):
+    def makeBeams(self, *, inPlace=False, setStemDirections=True, failOnNoTimeSignature=False):
         '''
         Return a new Stream, or modify the Stream in place, with beams applied to all
         notes.
@@ -6530,11 +6535,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         See :py:func:`~music21.stream.makeNotation.makeBeams`.
 
         New in v6.7 -- setStemDirections.
+        New in v.7 -- failOnNoTimeSignature raises StreamException if no TimeSignature
+        exists in the stream context from which to make measures.
         '''
         return makeNotation.makeBeams(
             self,
             inPlace=inPlace,
-            setStemDirections=setStemDirections
+            setStemDirections=setStemDirections,
+            failOnNoTimeSignature=failOnNoTimeSignature,
         )
 
     def makeAccidentals(
@@ -7150,7 +7158,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return True
             # Case 2: matchByPitch=False and all chord members have a stop tie
             # and checking cardinality passes (don't match chords to single notes)
-            elif (hasattr(nInner, 'tie')
+            if (hasattr(nInner, 'tie')
                     and not matchByPitch
                     and isinstance(nInner, chord.Chord)
                     and None not in [inner_p.tie for inner_p in nInner.notes]
@@ -7179,7 +7187,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     and nLast.pitch == nInner.pitch):
                 return True
             # looking for two chords of equal size
-            elif (nLast is not None
+            if (nLast is not None
                     and not isinstance(nInner, note.Note)
                     and iLast in posConnected
                     and hasattr(nLast, 'pitches')
@@ -7187,12 +7195,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if len(nLast.pitches) != len(nInner.pitches):
                     return False
 
-                allPitchesMatched = True
                 for pitchIndex in range(len(nLast.pitches)):
                     if nLast.pitches[pitchIndex] != nInner.pitches[pitchIndex]:
-                        allPitchesMatched = False
-                        break
-                return allPitchesMatched
+                        return False
+                return True
 
             return False
 

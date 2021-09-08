@@ -174,6 +174,7 @@ class ArchiveManager:
         return post
 
     def _extractContents(self, f: zipfile.ZipFile, name=None, dataFormat='musicxml'):
+        post = None
         if name is None and dataFormat == 'musicxml':  # try to auto-harvest
             # will return data as a string
             # note that we need to read the META-INF/container.xml file
@@ -185,7 +186,8 @@ class ArchiveManager:
                 # xml file
                 if 'META-INF' in subFp:
                     continue
-                if not subFp.endswith('.xml') and not subFp.endswith('musicxml'):
+                # include .mxl to be kind to users who zipped up mislabeled files
+                if pathlib.Path(subFp).suffix not in ['.musicxml', '.xml', '.mxl']:
                     continue
 
                 post = f.read(subFp)
@@ -1966,7 +1968,7 @@ class Test(unittest.TestCase):
         # This file should have been written, above
         destFp = Converter()._getDownloadFp(e.getRootTempDir(), '.krn', url)
         # Hack garbage into it so that we can test whether or not forceSource works
-        with open(destFp, 'a') as fp:
+        with open(destFp, 'a', encoding='utf-8') as fp:
             fp.write('all sorts of garbage that Humdrum cannot parse')
 
         with self.assertRaises(HumdrumException):

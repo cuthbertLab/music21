@@ -101,10 +101,11 @@ class SubConverter:
         '''
         Called when a file is encountered. If all that needs to be done is
         loading the file and putting the data into parseData then there is no need
-        to do implement this method.  Just set self.readBinary to True|False.
+        to implement this method.  Just set self.readBinary to True|False.
         '''
         if self.readBinary is False:
-            with open(filePath) as f:
+            import locale
+            with open(filePath, encoding=locale.getpreferredencoding()) as f:
                 dataStream = f.read()
         else:
             with open(filePath, 'rb') as f:
@@ -1017,7 +1018,7 @@ class ConverterMusicXML(SubConverter):
               subformats=None,
               makeNotation=True,
               compress: Optional[bool] = None,
-              **keywords):  # pragma: no cover
+              **keywords):
         '''
         Write to a .musicxml file.
 
@@ -1039,6 +1040,7 @@ class ConverterMusicXML(SubConverter):
             if fp and str(fp).endswith('.mxl'):
                 compress = True
             elif fmt.startswith('mxl'):
+                # currently unreachable from Music21Object.write()
                 compress = True
             else:
                 compress = False
@@ -1245,7 +1247,7 @@ class ConverterRomanText(SubConverter):
         if fp is None:
             fp = self.getTemporaryFile()
 
-        with open(fp, 'w') as text_file:
+        with open(fp, 'w', encoding='utf-8') as text_file:
             for entry in writeRoman.RnWriter(obj).combinedList:
                 text_file.write(entry + '\n')
 
@@ -1527,7 +1529,25 @@ class Test(unittest.TestCase):
         s = converter.parseData(testPrimitive.multiDigitEnding)
         mxlPath = s.write('mxl')
         self.assertTrue(str(mxlPath).endswith('.mxl'), f'{mxlPath} does not end with .mxl')
-        os.remove(mxlPath)
+
+        # Just the filepath ending in .mxl is sufficient to write .mxl
+        s.write(fp=mxlPath)
+        # Verify that it actually wrote bytes
+        with self.assertRaises(UnicodeDecodeError):
+            with open(mxlPath, 'r', encoding='utf-8') as f:
+                f.read(20)
+
+        # Also test ConverterMusicXML object directly
+        conv = ConverterMusicXML()
+        mxlPath2 = conv.write(obj=s, fmt='mxl')
+        with self.assertRaises(UnicodeDecodeError):
+            with open(mxlPath2, 'r', encoding='utf-8') as f:
+                f.read(20)
+
+        if os.exists(mxlPath):
+            os.remove(mxlPath)
+        if os.exists(mxlPath2):
+            os.remove(mxlPath2)
 
     def testWriteMusicXMLMakeNotation(self):
         from music21 import converter
@@ -1542,7 +1562,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(m1.notes), 1)
         self.assertEqual(len(m2.notes), 0)
 
-        out1 = s.write(makeNotation=True)
+        out1 = s.write()  # makeNotation=True is assumed
         # 4/4 will be assumed; quarter note will be moved to measure 2
         round_trip_back = converter.parse(out1)
         self.assertEqual(
@@ -1572,7 +1592,7 @@ class Test(unittest.TestCase):
 
         p = converter.parse('tinyNotation: c1 d1 e1 f1')
         out = p.write('braille', debug=True)
-        with open(out, 'r') as f:
+        with open(out, 'r', encoding='utf-8') as f:
             self.assertIn('<music21.braille.segment BrailleSegment>', f.read())
         os.remove(out)
 

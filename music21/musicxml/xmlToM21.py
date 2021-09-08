@@ -828,7 +828,7 @@ class MusicXMLImporter(XMLParserBase):
         self.partGroupList = []
         self.parts = []
 
-        self.musicXmlVersion = '3.0'
+        self.musicXmlVersion = '3.1'
 
     def scoreFromFile(self, filename):
         '''
@@ -1275,7 +1275,7 @@ class MusicXMLImporter(XMLParserBase):
 
     def identificationToMetadata(self, identification, inputM21=None):
         '''
-        Converter an <identification> tag, containing <creator> tags, <rights> tags, and
+        Convert an <identification> tag, containing <creator> tags, <rights> tags, and
         <miscellaneous> tag.
 
         Not supported: source, relation
@@ -1351,7 +1351,7 @@ class MusicXMLImporter(XMLParserBase):
     def creatorToContributor(self, creator, inputM21=None):
         # noinspection PyShadowingNames
         '''
-        Given an <creator> tag, fill the necessary parameters of a Contributor.
+        Given a <creator> tag, fill the necessary parameters of a Contributor.
 
         >>> import xml.etree.ElementTree as ET
         >>> creator = ET.fromstring('<creator type="composer">Beethoven, Ludwig van</creator>')
@@ -1391,7 +1391,7 @@ class MusicXMLImporter(XMLParserBase):
     def rightsToCopyright(self, rights):
         # noinspection PyShadowingNames
         '''
-        Given an <rights> tag, fill the necessary parameters of a
+        Given a <rights> tag, fill the necessary parameters of a
         :class:`~music21.metadata.primitives.Copyright` object.
 
         >>> import xml.etree.ElementTree as ET
@@ -1881,7 +1881,9 @@ class PartParser(XMLParserBase):
                 r1.duration.quarterLength = lastTSQl
                 r1.fullMeasure = True
 
-        self.stream.coreInsert(self.lastMeasureOffset, m)
+        # NB: not coreInsert, because barDurationProportion()
+        # is called in adjustTimeAttributesFromMeasure()
+        self.stream.insert(self.lastMeasureOffset, m)
         self.adjustTimeAttributesFromMeasure(m)
 
         return m

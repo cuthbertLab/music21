@@ -5,9 +5,10 @@
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
+#               Jacob Walls
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2013 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2008-2021 Michael Scott Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -43,6 +44,7 @@ def makeBeams(
     *,
     inPlace=False,
     setStemDirections=True,
+    failOnNoTimeSignature=False,
 ):
     # noinspection PyShadowingNames
     '''
@@ -139,10 +141,11 @@ def makeBeams(
     for m in mColl:
         # this means that the first of a stream of time signatures will
         # be used
-        if m.timeSignature is not None:
-            lastTimeSignature = m.timeSignature
+        lastTimeSignature = m.timeSignature or m.getContextByClass(meter.TimeSignature)
         if lastTimeSignature is None:
-            environLocal.printDebug('cannot process beams in a Measure without a time signature')
+            if failOnNoTimeSignature:
+                raise stream.StreamException(
+                    'cannot process beams in a Measure without a time signature')
             continue
         noteGroups = []
         if m.hasVoices():
@@ -1987,6 +1990,25 @@ class Test(unittest.TestCase):
             [n.stemDirection for n in p.flatten().notes],
             ['unspecified', 'unspecified'],
         )
+
+    def testMakeBeamsFromTimeSignatureInContext(self):
+        from music21 import converter
+        from music21 import stream
+
+        p = converter.parse('tinyNotation: 2/4 r2 d8 d8 d8 d8')
+        m2 = p[stream.Measure].last()
+        self.assertIsNone(m2.timeSignature)
+        m2_n0 = m2.notes.first()
+        self.assertEqual(len(m2_n0.beams.beamsList), 0)
+        m2.makeBeams(inPlace=True)
+        self.assertEqual(len(m2_n0.beams.beamsList), 1)
+
+        # Failure if no TimeSignature in context
+        m1 = p[stream.Measure].first()
+        m1.timeSignature = None
+        msg = 'cannot process beams in a Measure without a time signature'
+        with self.assertRaisesRegex(stream.StreamException, msg):
+            m2.makeBeams(inPlace=True, failOnNoTimeSignature=True)
 
     def testStreamExceptions(self):
         from music21 import converter
