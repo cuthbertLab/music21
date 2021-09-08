@@ -85,7 +85,14 @@ def getXml(obj) -> str:
 def musicXMLToScript(xml, divId, *, offline=False):
     '''
     Converts the xml into Javascript which can be injected into a webpage to display the score.
-    If divId is set then it will be used as the container, if not a new div will be created
+    If divId is set then it will be used as the container, if not a new div will be created.
+
+    >>> excerpt = corpus.parse('demos/two-parts')
+    >>> xml = osmd.getXml(excerpt)
+    >>> divId = osmd.getUniqueDivId()
+    >>> js = osmd.musicXMLToScript(xml, divId)
+    >>> 'window.openSheetMusicDisplay = new OSMD.OpenSheetMusicDisplay(div_id);' in js
+    True
     '''
 
     # script that will replace div contents with OSMD display
