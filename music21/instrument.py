@@ -25,6 +25,7 @@ import copy
 import unittest
 import sys
 from collections import OrderedDict
+from typing import Optional
 
 from music21 import base
 from music21 import common
@@ -155,7 +156,7 @@ class Instrument(base.Music21Object):
         self.printPartName = None  # True = yes, False = no, None = let others decide
         self.printPartAbbreviation = None
 
-        self.instrumentId = None  # apply to midi and instrument
+        self.instrumentId: Optional[str] = None  # apply to midi and instrument
         self._instrumentIdIsRandom = False
 
         self.instrumentName = instrumentName

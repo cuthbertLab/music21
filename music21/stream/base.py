@@ -4936,7 +4936,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # this loses the expression of duration, but should be fine for instruments.
 
         instrument_stream.duration = returnObj.duration
-        instrument_stream.extendDuration('Instrument', inPlace=True)
+        # inPlace=False here because we are only doing calculations
+        # toWrittenPitch() shouldn't be inserting extra instruments
+        instrument_stream = instrument_stream.extendDuration('Instrument', inPlace=False)
 
         # store class filter list for transposition
         if transposeKeySignature:
@@ -5258,7 +5260,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def getInstrument(self,
                       *,
                       searchActiveSite=True,
-                      returnDefault=True) -> Optional['music21.instrument.Instrument']:
+                      returnDefault=True,
+                      recurse=False) -> Optional['music21.instrument.Instrument']:
         '''
         Return the first Instrument found in this Stream, or None.
 
@@ -5281,9 +5284,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'Violin'
         >>> p2.getInstrument(returnDefault=False).instrumentName
         'Viola'
+
+        Changed in v.7 -- added `recurse` (default False)
         '''
         post = self.getInstruments(searchActiveSite=searchActiveSite,
-                                   returnDefault=returnDefault)
+                                   returnDefault=returnDefault,
+                                   recurse=recurse)
         return post.first()
 
     @common.deprecated('v7', 'v8', 'use getElementsByClass() or getContextByClass() or bestClef()')
