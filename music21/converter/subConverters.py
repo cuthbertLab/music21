@@ -1544,9 +1544,9 @@ class Test(unittest.TestCase):
             with open(mxlPath2, 'r', encoding='utf-8') as f:
                 f.read(20)
 
-        if os.exists(mxlPath):
+        if os.path.exists(mxlPath):
             os.remove(mxlPath)
-        if os.exists(mxlPath2):
+        if os.path.exists(mxlPath2):
             os.remove(mxlPath2)
 
     def testWriteMusicXMLMakeNotation(self):
