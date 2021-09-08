@@ -226,9 +226,31 @@ class ChordReducer:
     def collapseArpeggios(self, scoreTree):
         r'''
         Collapses arpeggios in `tree`.
+
+        >>> m = stream.Measure([chord.Chord('C4 E4'), chord.Chord('C4 G4')])
+        >>> cr = analysis.reduceChords.ChordReducer()
+        >>> spans = m.asTimespans(classList=(note.NotRest,))
+        >>> len(spans)
+        2
+        >>> cr.collapseArpeggios(spans)
+        >>> len(spans)
+        1
+
+        OMIT_FROM_DOCS
+
+        Ensure it doesn't crash without a class filter:
+
+        >>> s = corpus.parse('beach')
+        >>> cr2 = analysis.reduceChords.ChordReducer()
+        >>> excerpt_tree = s.parts.first().asTimespans()
+        >>> cr2.collapseArpeggios(excerpt_tree)
+        >>> excerpt_tree
+        <TimespanTree {162} (0.0 to 124.0) <music21.stream.Part Soprano I>>
         '''
         for verticalities in scoreTree.iterateVerticalitiesNwise(n=2):
             one, two = verticalities
+            if not one.pitchSet or not two.pitchSet:
+                continue
             onePitches = sorted(one.pitchSet)
             twoPitches = sorted(two.pitchSet)
             if onePitches[0].nameWithOctave != twoPitches[0].nameWithOctave:
@@ -251,6 +273,8 @@ class ChordReducer:
             horizontalities = scoreTree.unwrapVerticalities(verticalities)
             for unused_part, timespanList in horizontalities.items():
                 if len(timespanList) < 2:
+                    continue
+                elif not all(isinstance(x, tree.spans.PitchedTimespan) for x in timespanList):
                     continue
                 elif timespanList[0].pitches == timespanList[1].pitches:
                     continue
