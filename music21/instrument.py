@@ -24,6 +24,7 @@ ensemble.py module.
 import copy
 import unittest
 import sys
+from typing import Optional
 from collections import OrderedDict
 from typing import Optional
 
@@ -40,9 +41,10 @@ from music21.exceptions21 import InstrumentException
 from music21 import environment
 _MOD = 'instrument'
 environLocal = environment.Environment(_MOD)
+StreamType = stream.StreamType
 
 
-def unbundleInstruments(streamIn, *, inPlace=False):
+def unbundleInstruments(streamIn: StreamType, *, inPlace=False) -> Optional[StreamType]:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -79,7 +81,7 @@ def unbundleInstruments(streamIn, *, inPlace=False):
         return s
 
 
-def bundleInstruments(streamIn, *, inPlace=False):
+def bundleInstruments(streamIn: stream.Stream, *, inPlace=False) -> Optional[stream.Stream]:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
@@ -169,7 +171,7 @@ class Instrument(base.Music21Object):
         self.highestNote = None
 
         # define interval to go from written to sounding
-        self.transposition = None
+        self.transposition: Optional[interval.Interval] = None
 
         self.inGMPercMap = False
         self.soundfontFn = None  # if defined...

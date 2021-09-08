@@ -2317,11 +2317,20 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # TODO: encoder
 
         if self.scoreMetadata is not None:
+            found_m21_already = False
             for software in self.scoreMetadata.software:
+                if 'music21 v.' in software:
+                    if found_m21_already:
+                        # only write out one copy of the music21 software
+                        # tag.  First one should be current version.
+                        continue
+                    else:
+                        found_m21_already = True
                 mxSoftware = SubElement(mxEncoding, 'software')
                 mxSoftware.text = software
-
         else:
+            # there will not be a music21 software tag if no scoreMetadata
+            # if not for this.
             mxSoftware = SubElement(mxEncoding, 'software')
             mxSoftware.text = defaults.software
 
