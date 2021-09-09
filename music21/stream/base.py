@@ -10644,7 +10644,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         None
         '''
         for n in self.notes:
-            # get simultaneous elements form other stream
+            # clear any previous result
+            n.editorial.harmonicInterval = None
+            # get simultaneous elements from other stream
             simultEls = cmpStream.getElementsByOffset(self.elementOffset(n),
                                                       mustBeginInSpan=False,
                                                       mustFinishInSpan=False)
