@@ -361,6 +361,9 @@ class PartStaffExporterMixin:
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
 
+        def makeDivider(sourceNumber: int) -> Element:
+            return Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
+
         sourceMeasures = iter(source.findall('measure'))
         sourceMeasure = None  # Set back to None when disposed of
         insertions: Dict[int, List[Element]] = {}
@@ -392,11 +395,9 @@ class PartStaffExporterMixin:
 
             # Or, gap in measure numbers in target: record necessary insertions until gap is closed
             while helpers.measureNumberComesBefore(sourceNumber, targetNumber):
-                divider: Element = Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
-                try:
-                    insertions[i] += [divider, sourceMeasure]
-                except KeyError:
-                    insertions[i] = [divider, sourceMeasure]
+                if i not in insertions:
+                    insertions[i] = []
+                insertions[i] += [makeDivider(sourceNumber), sourceMeasure]
                 try:
                     sourceMeasure = next(sourceMeasures)
                 except StopIteration:
@@ -411,11 +412,10 @@ class PartStaffExporterMixin:
             remainingMeasures.insert(0, sourceMeasure)
         for remaining in remainingMeasures:
             sourceNumber = remaining.get('number')
-            divider: Element = Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
-            try:
-                insertions[len(target)] += [divider, remaining]
-            except KeyError:
-                insertions[len(target)] = [divider, remaining]
+            idx = len(target)
+            if idx not in insertions:
+                insertions[idx] = []
+            insertions[idx] += [makeDivider(sourceNumber), remaining]
         return insertions
 
     def setEarliestAttributesAndClefsPartStaff(self, group: StaffGroup):
