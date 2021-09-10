@@ -2671,7 +2671,7 @@ class MeasureParser(XMLParserBase):
         self.offsetMeasureNote += offsetIncrement
         self.endedWithForwardTag = None
 
-    def xmlToChord(self, mxNoteList: List[ET.Element]) -> chord.Chord:
+    def xmlToChord(self, mxNoteList: List[ET.Element]) -> chord.ChordBase:
         # noinspection PyShadowingNames
         '''
         Given an a list of mxNotes, fill the necessary parameters

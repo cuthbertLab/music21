@@ -344,7 +344,11 @@ class PartStaffExporterMixin:
                     target.insert(originalIdx + insertionCounter, element)
                     insertionCounter += 1
 
-    def processSubsequentPartStaff(self, target: Element, source: Element, staffNum: int) -> Dict:
+    def processSubsequentPartStaff(self,
+                                   target: Element,
+                                   source: Element,
+                                   staffNum: int
+                                   ) -> Dict[int, List[Element]]:
         '''
         Move elements from subsequent PartStaff's measures into `target`: the <part>
         element representing the initial PartStaff that will soon represent the merged whole.
@@ -359,7 +363,7 @@ class PartStaffExporterMixin:
 
         sourceMeasures = iter(source.findall('measure'))
         sourceMeasure = None  # Set back to None when disposed of
-        insertions = {}
+        insertions: Dict[int, List[Element]] = {}
 
         # Walk through <measures> of the target <part>, compare measure numbers
         for i, targetMeasure in enumerate(target):
