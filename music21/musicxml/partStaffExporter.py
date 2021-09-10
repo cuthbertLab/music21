@@ -667,17 +667,17 @@ class PartStaffExporterMixin:
         maxVoices: int = 0
         otherMeasureLackedVoice: bool = False
 
-        for voice in otherMeasure.findall('*/voice'):
-            maxVoices = max(maxVoices, int(voice.text))
+        for other_voice in otherMeasure.findall('*/voice'):
+            maxVoices = max(maxVoices, int(other_voice.text))
 
         if maxVoices == 0:
             otherMeasureLackedVoice = True
             for elem in otherMeasure.findall('note'):
-                voice = Element('voice')
-                voice.text = '1'
+                new_voice = Element('voice')
+                new_voice.text = '1'
                 helpers.insertBeforeElements(
                     elem,
-                    voice,
+                    new_voice,
                     tagList=[
                         'type', 'dot', 'accidental', 'time-modification',
                         'stem', 'notehead', 'notehead-text', 'staff',
