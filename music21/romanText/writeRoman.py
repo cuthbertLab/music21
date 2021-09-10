@@ -187,7 +187,7 @@ class RnWriter(prebase.ProtoM21Object):
         self.container.insert(0, m)
 
     def prepTitle(self,
-                  md: metadata):
+                  md: metadata.Metadata):
         '''
         Attempt to prepare a single work title from the score metadata looking at each of
         the title, movementNumber and movementName attributes.
