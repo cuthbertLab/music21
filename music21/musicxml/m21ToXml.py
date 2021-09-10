@@ -1861,7 +1861,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         # get score defaults if any:
         if self.firstScoreLayout is None:
-            from music21 import layout
             scoreLayout = layout.ScoreLayout()
             scoreLayout.scalingMillimeters = defaults.scalingMillimeters
             scoreLayout.scalingTenths = defaults.scalingTenths
@@ -6568,7 +6567,6 @@ class Test(unittest.TestCase):
         import re
         from music21 import converter
         from music21 import dynamics
-        from music21 import layout
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         s = converter.parse(xmlDir / '43e-Multistaff-ClefDynamics.xml')
 
@@ -6794,8 +6792,6 @@ class Test(unittest.TestCase):
                             tree.findall('.//measure/note/instrument')[-1].get('id'))
 
     def testMultipleInstrumentsPiano(self):
-        from music21 import layout
-
         ps1 = stream.PartStaff([
             stream.Measure([instrument.ElectricPiano(), note.Note(type='whole')]),
             stream.Measure([instrument.ElectricOrgan(), note.Note(type='whole')]),
