@@ -60,7 +60,7 @@ import copy
 import random
 import string
 import unittest
-from typing import Union
+from typing import List, Union
 
 from music21 import exceptions21
 from music21 import pitch
@@ -2195,7 +2195,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[str] = []
 
 if __name__ == '__main__':
     import music21

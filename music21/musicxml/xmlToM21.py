@@ -20,7 +20,7 @@ import unittest
 import warnings
 
 from math import isclose
-from typing import List, Optional, Dict, Tuple, Set, Union
+from typing import cast, List, Optional, Dict, Tuple, Set, Union
 
 import xml.etree.ElementTree as ET
 
@@ -2605,7 +2605,7 @@ class MeasureParser(XMLParserBase):
         isRest = False
         # TODO: Unpitched
 
-        offsetIncrement = 0.0
+        offsetIncrement: Union[float, fractions.Fraction] = 0.0
 
         if mxNote.find('rest') is not None:  # it is a Rest
             isRest = True
@@ -2715,6 +2715,7 @@ class MeasureParser(XMLParserBase):
         for mxNote in mxNoteList:
             notes.append(self.xmlToSimpleNote(mxNote, freeSpanners=False))
 
+        c: chord.ChordBase
         if any(mxNote.find('unpitched') for mxNote in mxNoteList):
             c = percussion.PercussionChord(notes)
         else:
@@ -2831,7 +2832,8 @@ class MeasureParser(XMLParserBase):
                 stemStyle = style.Style()
                 self.setColor(mxStem, stemStyle)
                 self.setPosition(mxStem, stemStyle)
-                n.style.stemStyle = stemStyle
+                this_note_style = cast(style.NoteStyle, n.style)
+                this_note_style.stemStyle = stemStyle
 
         # gets the notehead object from the mxNote and sets value of the music21 note
         # to the value of the notehead object

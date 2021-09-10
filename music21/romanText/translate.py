@@ -123,6 +123,7 @@ OMIT_FROM_DOCS
 '''
 import copy
 import traceback
+from typing import Dict, List, Tuple
 import unittest
 
 from music21 import bar
@@ -316,7 +317,7 @@ def _getKeyAndPrefix(rtKeyOrString):
 
 
 # Cache each of the created keys so that we don't recreate them.
-_rnKeyCache = {}
+_rnKeyCache: Dict[Tuple[str, str], roman.RomanNumeral] = {}
 
 
 class PartTranslator:
@@ -1590,7 +1591,7 @@ m1 C: I'''
 # ------------------------------------------------------------------------------
 
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[str] = []
 
 
 if __name__ == '__main__':

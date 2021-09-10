@@ -267,7 +267,7 @@ class State:
     >>> ts.autoExpires
     2
     '''
-    autoExpires = False  # expires after N tokens or never.
+    autoExpires: typing.Union[bool, int] = False  # expires after N tokens or never.
 
     def __init__(self, parent=None, stateInfo=None):
         self.affectedTokens = []
