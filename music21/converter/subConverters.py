@@ -1439,14 +1439,16 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     def show(self, obj, fmt, app=None, subformats=None, *,
              offline: bool = False, **keywords):  # pragma: no cover
         '''
-        Displays the Stream in a notebook using the OpenSheetMusicDisplay.js library.
+        Displays the Stream in a notebook (or HTML page) using the
+        OpenSheetMusicDisplay.js library.
 
         >>> import music21
         >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
         >>> #_DOCS_SHOW fig_id1 = s.show('osmd')
 
-        `offline=True` caches the .js script provided by OSMD so that the following
-        calls using `offline=True` will just load the cached version.
+        `offline=True` caches the .js script provided by OSMD and injects the
+        OSMD-released .js bundle into the notebook (or HTML page) for offline use.
+        Otherwise, OSMD's .js is served from a CDN (requiring internet access).
         '''
         from music21.osmd import getUniqueDivId, getXml, musicXMLToScript, hasInstalledIPython
         in_ipython = common.runningUnderIPython()

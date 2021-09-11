@@ -23,6 +23,7 @@ import unittest
 import urllib.request
 
 from music21.common import getSourceFilePath
+from music21.exceptions21 import Music21Exception
 from music21.musicxml.m21ToXml import GeneralObjectExporter
 from music21 import environment
 
@@ -90,8 +91,18 @@ def musicXMLToScript(xml, divId, *, offline=False):
     >>> excerpt = corpus.parse('demos/two-parts')
     >>> xml = osmd.getXml(excerpt)
     >>> divId = osmd.getUniqueDivId()
-    >>> js = osmd.musicXMLToScript(xml, divId, offline=True)
+    >>> js = osmd.musicXMLToScript(xml, divId)
     >>> 'window.openSheetMusicDisplay = new OSMD.OpenSheetMusicDisplay(div_id);' in js
+    True
+
+    Setting `offline` to True will look for a cached version of the .js released
+    by OSMD and inject it into the script instead of loading it from a CDN.
+    If a cached version does not yet exist, a download is attempted. For that
+    reason, `offline` mode should be run at least once with an internet
+    connection to cache the script for future use.
+
+    >>> js = osmd.musicXMLToScript(xml, divId, offline=True)
+    >>> len(js) > 1000000
     True
     '''
 
@@ -109,8 +120,13 @@ def musicXMLToScript(xml, divId, *, offline=False):
     if offline is True:
         if not os.path.isfile(osmd_file):
             # on first use we download the file and store it locally for subsequent use
-            # TODO: catch error for no internet connection
-            urllib.request.urlretrieve(SCRIPT_URL, osmd_file)
+            try:
+                urllib.request.urlretrieve(SCRIPT_URL, osmd_file)
+            except urllib.error.URLError as ue:
+                raise Music21Exception(
+                    'No cached version of the OSMD bundle exists locally. '
+                    'Offline mode should be run at least once with an internet connection.'
+                ) from ue
 
         # since we can't link to files from a notebook (security risk) inject into file.
         script_content = ''
