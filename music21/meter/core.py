@@ -15,7 +15,7 @@ This module defines two component objects for defining nested metrical structure
 :class:`~music21.meter.core.MeterTerminal` and :class:`~music21.meter.core.MeterSequence`.
 '''
 import copy
-from typing import Optional
+from typing import List, Optional, Tuple
 
 from music21 import prebase
 from music21.common.numberTools import opFrac
@@ -615,14 +615,12 @@ class MeterSequence(MeterTerminal):
 
     # -------------------------------------------------------------------------
 
-    def partitionByCount(self, countRequest, loadDefault=True):
+    def partitionByCount(self, countRequest, loadDefault=True, preservePartition=False):
         '''
         Divide the current MeterSequence into the requested number of parts.
 
         If it is not possible to divide it into the requested number, and
         loadDefault is `True`, then give the default partition:
-
-        This will destroy any established structure in the stored partition.
 
         >>> a = meter.MeterSequence('4/4')
         >>> a
@@ -667,15 +665,45 @@ class MeterSequence(MeterTerminal):
         Traceback (most recent call last):
         music21.exceptions21.MeterException: Cannot set partition by 11 (5/8)
 
+        This method will destroy any established structure in the stored partition
+        unless `preservePartition` is True (new in v7.3):
+
+        >>> threeAndTwo = meter.MeterSequence('3+2/8')
+        >>> threeAndTwo.partitionByCount(2, preservePartition=True)
+        >>> str(threeAndTwo)
+        '{3/8+2/8}'
+        >>> threeAndTwo.partitionByCount(2, preservePartition=False)
+        >>> str(threeAndTwo)
+        '{2/8+3/8}'
         '''
+        def partitionMatchesTuple(partition: List[MeterTerminal], test_tuple: Tuple[str]) -> bool:
+            if len(partition) != len(test_tuple):
+                return False
+            if not partition:
+                return False
+            partition_as_strings = []
+            denominator = partition[0].denominator
+            for terminal in partition:
+                combined_numerator = 0
+                combined_numerator += terminal.numerator
+                if terminal.denominator != denominator:
+                    raise MeterException(
+                        f'Cannot preserve mixed-denominator partition: got {partition}')
+                partition_as_strings.append(f'{combined_numerator}/{denominator}')
+            built_tuple = tuple(x for x in partition_as_strings)
+            return built_tuple == test_tuple
+
         opts = self.getPartitionOptions()
         optMatch = None
         # get the first encountered load string with the desired
         # number of beats
         for opt in opts:
             if len(opt) == countRequest:
-                optMatch = opt
-                break
+                if preservePartition and not partitionMatchesTuple(self._partition, opt):
+                    continue
+                else:
+                    optMatch = opt
+                    break
 
         # if no matches this method provides a default
         if optMatch is None:
