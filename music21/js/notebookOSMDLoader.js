@@ -25,7 +25,7 @@ function loadOSMD() {
             document.body.appendChild(s); // browser will try to load the new script tag
             oncompleted();
         }
-        var script_url = '{{script_url}}';
+        var script_url = "{{script_url}}";
         if (script_url !== '{{script_url}}') {
             s.setAttribute('src', script_url);
             s.onload=oncompleted;
@@ -35,12 +35,12 @@ function loadOSMD() {
 }
 loadOSMD().then((OSMD) => {
     // console.log("loaded OSMD")
-    var div_id = '{{DIV_ID}}';
+    var div_id = "{{DIV_ID}}";
     // console.log(div_id)
     document.querySelector('#' + div_id).innerHTML = '';
     window.openSheetMusicDisplay = new OSMD.OpenSheetMusicDisplay(div_id);
     openSheetMusicDisplay
-        .load('{{data}}') // this is replaced by the xml generated in python
+        .load("{{data}}") // this is replaced by the xml generated in python
         .then(
             function () {
                 // console.log("rendering data")
