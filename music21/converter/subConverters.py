@@ -1468,7 +1468,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
             # Create a file for the browser to open
             tempFileName = self.getTemporaryFile()
 
-            with open(tempFileName, 'w') as f:
+            with open(tempFileName, 'w', encoding='utf-8') as f:
                 f.write(f'''
                 <div id="{divId}"></div>
                 <script>{script}</script>
