@@ -615,7 +615,7 @@ class MeterSequence(MeterTerminal):
 
     # -------------------------------------------------------------------------
 
-    def partitionByCount(self, countRequest, loadDefault=True, preservePartition=False):
+    def partitionByCount(self, countRequest, loadDefault=True, preserveExisting=False):
         '''
         Divide the current MeterSequence into the requested number of parts.
 
@@ -666,13 +666,13 @@ class MeterSequence(MeterTerminal):
         music21.exceptions21.MeterException: Cannot set partition by 11 (5/8)
 
         This method will destroy any established structure in the stored partition
-        unless `preservePartition` is True (new in v7.3):
+        unless `preserveExisting` is True (new in v7.3):
 
         >>> threeAndTwo = meter.MeterSequence('3+2/8')
-        >>> threeAndTwo.partitionByCount(2, preservePartition=True)
+        >>> threeAndTwo.partitionByCount(2, preserveExisting=True)
         >>> str(threeAndTwo)
         '{3/8+2/8}'
-        >>> threeAndTwo.partitionByCount(2, preservePartition=False)
+        >>> threeAndTwo.partitionByCount(2, preserveExisting=False)
         >>> str(threeAndTwo)
         '{2/8+3/8}'
         '''
@@ -699,7 +699,7 @@ class MeterSequence(MeterTerminal):
         # number of beats
         for opt in opts:
             if len(opt) == countRequest:
-                if preservePartition and not partitionMatchesTuple(self._partition, opt):
+                if preserveExisting and not partitionMatchesTuple(self._partition, opt):
                     continue
                 else:
                     optMatch = opt
