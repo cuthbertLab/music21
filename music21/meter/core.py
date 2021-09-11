@@ -675,12 +675,21 @@ class MeterSequence(MeterTerminal):
         >>> threeAndTwo.partitionByCount(2, preserveExisting=False)
         >>> str(threeAndTwo)
         '{2/8+3/8}'
+
+        A value of `countRequest` inconsistent with `preserveExisting=True`
+        raises a `ValueError`:
+
+        >>> threeAndTwo.partitionByCount(3, preserveExisting=True)
+        Traceback (most recent call last):
+        ValueError: Cannot partition into 3 while preserving existing 2-part partition:
+        [<music21.meter.core.MeterTerminal 2/8>, <music21.meter.core.MeterTerminal 3/8>]
         '''
         def partitionMatchesTuple(partition: List[MeterTerminal], test_tuple: Tuple[str]) -> bool:
+            # These two checks for safety only: currently unreachable given `len(opt)` check
             if len(partition) != len(test_tuple):
-                return False
+                return False  # pragma: no cover
             if not partition:
-                return False
+                return False  # pragma: no cover
             partition_as_strings = []
             denominator = partition[0].denominator
             for terminal in partition:
@@ -692,6 +701,10 @@ class MeterSequence(MeterTerminal):
                 partition_as_strings.append(f'{combined_numerator}/{denominator}')
             built_tuple = tuple(x for x in partition_as_strings)
             return built_tuple == test_tuple
+
+        if preserveExisting and len(self._partition) != countRequest:
+            raise ValueError(f'Cannot partition into {countRequest} while '
+                f'preserving existing {len(self._partition)}-part partition: {self._partition}')
 
         opts = self.getPartitionOptions()
         optMatch = None
