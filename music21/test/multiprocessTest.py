@@ -306,9 +306,8 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
     sys.stdout.flush()
 
     import datetime
-    import locale
     lastResults = os.path.join(environLocal.getRootTempDir(), 'lastResults.txt')
-    with open(lastResults, 'w', encoding=locale.getdefaultencoding()) as f:
+    with open(lastResults, 'w', encoding='utf-8') as f:
         f.write(outStr)
         f.write('Run at ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
