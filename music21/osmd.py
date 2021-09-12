@@ -115,7 +115,7 @@ def musicXMLToScript(xml, divId, *, offline=False):
     script = script.replace('"{{data}}"', json.dumps(xml))
 
     fpScratch = environLocal.getRootTempDir()
-    osmd_file = os.path.join(fpScratch, 'opensheetmusicdisplay.0.9.2.min.js')
+    osmd_file = os.path.join(fpScratch, 'opensheetmusicdisplay.1.1.0.min.js')
 
     if offline is True:
         if not os.path.isfile(osmd_file):
