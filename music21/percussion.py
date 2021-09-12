@@ -71,7 +71,7 @@ class PercussionChord(chord.ChordBase):
         if not all(isinstance(n, (note.Unpitched, note.Note)) for n in newNotes):
             raise TypeError('every element of notes must be a note.Note or note.Unpitched object')
         self._notes.clear()
-        self.add(newNotes, runSort=False)
+        self.add(newNotes)
 
     def _reprInternal(self) -> str:
         if not self.notes:

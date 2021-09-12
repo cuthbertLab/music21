@@ -251,12 +251,10 @@ class ChordBase(note.NotRest):
     def add(
         self,
         notes,
-        *,
-        runSort=True
     ) -> None:
         '''
         Add a note, pitch, the notes of another chord, or string representing a pitch,
-        or a list of any of the above to a Chord.
+        or a list of any of the above to a Chord or PercussionChord.
 
         If runSort is True (default=True) then after appending, the
         chord will be sorted.
@@ -296,8 +294,6 @@ class ChordBase(note.NotRest):
             notes = [notes]
 
         self._add_core_or_init(notes, useDuration=False)
-        if runSort:
-            self.sortAscending(inPlace=True)
 
     def remove(self, removeItem):
         '''
@@ -839,6 +835,55 @@ class Chord(ChordBase):
 
     # PUBLIC METHODS #
 
+    def add(
+        self,
+        notes,
+        *,
+        runSort=True
+    ) -> None:
+        '''
+        Add a note, pitch, the notes of another chord, or string representing a pitch,
+        or a list of any of the above to a Chord.
+
+        If `runSort` is True (default=True) then after appending, the
+        chord will be sorted.
+
+        >>> c = chord.Chord('C4 E4 G4')
+        >>> c.add('B3')
+        >>> c
+        <music21.chord.Chord B3 C4 E4 G4>
+        >>> c.duration
+        <music21.duration.Duration 1.0>
+
+        >>> c.add('A2', runSort=False)
+        >>> c
+        <music21.chord.Chord B3 C4 E4 G4 A2>
+
+        >>> c.add(['B5', 'C6'])
+        >>> c
+        <music21.chord.Chord A2 B3 C4 E4 G4 B5 C6>
+
+        >>> c.add(pitch.Pitch('D6'))
+        >>> c
+        <music21.chord.Chord A2 B3 C4 E4 G4 B5 C6 D6>
+
+        >>> n = note.Note('E6')
+        >>> n.duration.type = 'half'
+        >>> c.add(n)
+        >>> c
+        <music21.chord.Chord A2 B3 C4 E4 G4 B5 C6 D6 E6>
+        >>> c.duration
+        <music21.duration.Duration 1.0>
+        >>> c[-1]
+        <music21.note.Note E>
+        >>> c[-1].duration
+        <music21.duration.Duration 2.0>
+
+        Overrides `ChordBase.add()` to permit sorting with `runSort`.
+        '''
+        super().add(notes)
+        if runSort:
+            self.sortAscending(inPlace=True)
 
     def annotateIntervals(
         self,
