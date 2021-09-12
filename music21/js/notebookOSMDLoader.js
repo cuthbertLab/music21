@@ -17,7 +17,7 @@ function loadOSMD() {
             resolve(opensheetmusicdisplay);
         }
         
-        var offline_script = '{{offline_script}}';
+        var offline_script = "{{offline_script}}";
         if (offline_script!=='{{offline_script}}') {
             // if python has given us an offline script to use:
             s.type = 'text/javascript';
