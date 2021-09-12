@@ -1446,9 +1446,10 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
         >>> #_DOCS_SHOW fig_id1 = s.show('osmd')
 
-        `offline=True` caches the .js script provided by OSMD and injects the
-        OSMD-released .js bundle into the notebook (or HTML page) for offline use.
-        Otherwise, OSMD's .js is served from a CDN (requiring internet access).
+        `offline=True` injects the OSMD .js bundle into the notebook (or HTML page)
+        for offline use. (The bundle is also cached to music21's scratch directory.)
+        When `offline` is False (default), OSMD's .js will be served from a CDN
+        instead, requiring viewers to have an internet connection.
         '''
         from music21.osmd import getUniqueDivId, getXml, musicXMLToScript, hasInstalledIPython
         in_ipython = common.runningUnderIPython()
