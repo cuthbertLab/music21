@@ -22,6 +22,7 @@ ensembles is also included here though it may later be separated out into its ow
 ensemble.py module.
 '''
 import copy
+import importlib
 import unittest
 import sys
 from collections import OrderedDict
@@ -2394,6 +2395,7 @@ def fromString(instrumentString):
     bestInstrument = None
     bestName = None
 
+    this_module = importlib.import_module('music21.instrument')
     for substring in allCombinations:
         substring = substring.lower()
         try:
@@ -2402,16 +2404,7 @@ def fromString(instrumentString):
             else:
                 englishName = instrumentLookup.allToBestName[substring]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
-
-            # This would be unsafe...
-            thisInstClass = globals()[className]
-            thisInstClassParentClasses = [parentCls.__name__ for parentCls in thisInstClass.mro()]
-            # if not for this...
-            if ('Instrument' not in thisInstClassParentClasses
-                    or 'Music21Object' not in thisInstClassParentClasses):
-                # little bit of security against calling another global...
-                raise KeyError
-
+            thisInstClass = getattr(this_module, className)
             thisInstrument = thisInstClass()
             thisBestName = thisInstrument.bestName().lower()
             if (bestInstClass is None
