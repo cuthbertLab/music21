@@ -122,7 +122,7 @@ def musicXMLToScript(xml, divId, *, offline=False):
             # on first use we download the file and store it locally for subsequent use
             try:
                 urllib.request.urlretrieve(SCRIPT_URL, osmd_file)
-            except urllib.error.URLError as ue:
+            except urllib.error.URLError as ue:  # pragma: no cover
                 raise Music21Exception(
                     'No cached version of the OSMD bundle exists locally. '
                     'Offline mode should be run at least once with an internet connection.'
