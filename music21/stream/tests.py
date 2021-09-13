@@ -1314,6 +1314,21 @@ class Test(unittest.TestCase):
              ]
         )
 
+    def testStripTiesStopTieChordFollowsRest(self):
+        '''
+        Ensure stripTies() gracefully handles "stop" or "continue" tie types
+        following rests as it flattens a stream.
+        '''
+        from music21 import tie
+
+        v1 = Measure([note.Rest()])
+        v2 = Measure([chord.Chord('C4 E-4 B-4')])
+        m = Measure([v1, v2])
+        v2.notes.first().tie = tie.Tie('stop')
+        _ = m.stripTies(inPlace=False, matchByPitch=False)
+        v2.notes.first().tie = tie.Tie('continue')
+        _ = m.stripTies(inPlace=False, matchByPitch=False)
+
     def testGetElementsByOffsetZeroLength(self):
         '''
         Testing multiple zero-length elements with mustBeginInSpan:
