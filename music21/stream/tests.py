@@ -1321,8 +1321,8 @@ class Test(unittest.TestCase):
         '''
         from music21 import tie
 
-        v1 = Measure([note.Rest()])
-        v2 = Measure([chord.Chord('C4 E-4 B-4')])
+        v1 = Voice([note.Rest()])
+        v2 = Voice([chord.Chord('C4 E-4 B-4')])
         m = Measure([v1, v2])
         v2.notes.first().tie = tie.Tie('stop')
         _ = m.stripTies(inPlace=False, matchByPitch=False)
