@@ -293,7 +293,6 @@ def augmentedSixthResolutionExample():
     '''
     This example was retrieved from page 61 of *The Music Theory Handbook* by Marjorie Merryman.
 
-
     Italian (8,#6,3), French (#6,4,3), German (#6,5,3), and Swiss (#6,#4,3)
     augmented sixth resolutions to
     either the major dominant or the major/minor tonic 6,4 are supported.
@@ -301,6 +300,7 @@ def augmentedSixthResolutionExample():
     resolutions to the dominant in the order above, while the last bar
     shows the German augmented sixth
     resolving to the tonic.
+
     >>> from music21.figuredBass import examples
     >>> fbLine = examples.augmentedSixthResolutionExample()
     >>> fbRealization = fbLine.realize()
