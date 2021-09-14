@@ -89,6 +89,7 @@ def figuredBassFromStream(streamPart):
     .. image:: images/figuredBass/fbRealizer_fbStreamPart.*
         :width: 500
 
+    Changed in v7.3: multiple figures in same lyric (e.g. '64') now supported.
     '''
     sf = streamPart.flatten()
     sfn = sf.notes
@@ -118,7 +119,15 @@ def figuredBassFromStream(streamPart):
 
     for n in sfn:
         if n.lyrics:
-            annotationString = ', '.join([x.text for x in n.lyrics])
+            annotationString: str = ''
+            for i, lyric_line in enumerate(n.lyrics):
+                # "64" but not necessarily "4-3" or "sus4"
+                if all(char.isnumeric() for char in lyric_line.text):
+                    annotationString += ', '.join(lyric_line.text)
+                else:
+                    annotationString += lyric_line.text
+                if i + 1 < len(n.lyrics):
+                    annotationString += ', '
             fb.addElement(n, annotationString)
         else:
             fb.addElement(n)
@@ -793,7 +802,14 @@ class FiguredBassLineException(exceptions21.Music21Exception):
 
 
 class Test(unittest.TestCase):
-    pass
+    def testMultipleFiguresInLyric(self):
+        from music21 import converter
+
+        s = converter.parse('tinynotation: 4/4 C4 F4 G4_64 G4 C1', makeNotation=False)
+        third_note = s[note.Note][2]
+        self.assertEqual(third_note.lyric, '64')
+        fb = figuredBassFromStream(s)
+        self.assertEqual(third_note.notationString, '6, 4')
 
 
 if __name__ == '__main__':
