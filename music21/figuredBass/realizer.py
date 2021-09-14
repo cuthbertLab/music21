@@ -811,6 +811,10 @@ class Test(unittest.TestCase):
         fb = figuredBassFromStream(s)
         self.assertEqual(third_note.notationString, '6, 4')
 
+        third_note.lyric = '6\n4'
+        fb = figuredBassFromStream(s)
+        self.assertEqual(third_note.notationString, '6, 4')
+
 
 if __name__ == '__main__':
     import music21
