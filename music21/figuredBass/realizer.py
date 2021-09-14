@@ -117,15 +117,28 @@ def figuredBassFromStream(streamPart):
         if paddingLeft != 0.0:
             fb._paddingLeft = paddingLeft
 
+    def updateAnnotationString(annotationString, inputText):
+        # "64" and "#6#42" but not necessarily "4-3" or "sus4"
+        if all(char.isnumeric() for char in inputText):
+            annotationString += ', '.join(inputText)
+        elif inputText[0] in '#-' and inputText[1].isnumeric():
+            annotationString += inputText[:2]
+            # Recursive...
+            if inputText[2:]:
+                annotationString += ', '
+                annotationString = updateAnnotationString(annotationString, inputText[2:])
+        # Catch-all
+        else:
+            annotationString += inputText
+        return annotationString
+
     for n in sfn:
         if n.lyrics:
             annotationString: str = ''
             for i, lyric_line in enumerate(n.lyrics):
-                # "64" but not necessarily "4-3" or "sus4"
-                if all(char.isnumeric() for char in lyric_line.text):
-                    annotationString += ', '.join(lyric_line.text)
-                else:
-                    annotationString += lyric_line.text
+                if lyric_line.text is None:
+                    continue
+                annotationString = updateAnnotationString(annotationString, lyric_line.text)
                 if i + 1 < len(n.lyrics):
                     annotationString += ', '
             fb.addElement(n, annotationString)
@@ -808,11 +821,16 @@ class Test(unittest.TestCase):
         s = converter.parse('tinynotation: 4/4 C4 F4 G4_64 G4 C1', makeNotation=False)
         third_note = s[note.Note][2]
         self.assertEqual(third_note.lyric, '64')
-        fb = figuredBassFromStream(s)
+        unused_fb = figuredBassFromStream(s)
         self.assertEqual(third_note.notationString, '6, 4')
 
+        third_note.lyric = '#6#42'
+        unused_fb = figuredBassFromStream(s)
+        self.assertEqual(third_note.notationString, '#6, #4, 2')
+
+        # original case
         third_note.lyric = '6\n4'
-        fb = figuredBassFromStream(s)
+        unused_fb = figuredBassFromStream(s)
         self.assertEqual(third_note.notationString, '6, 4')
 
 
