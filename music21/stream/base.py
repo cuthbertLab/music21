@@ -7136,7 +7136,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # need to just get .notesAndRests, as there may be other objects in the Measure
         # that come before the first Note, such as a SystemLayout object
         f = returnObj.flatten()
-        notes = f.notesAndRests.stream()
+        notes_and_rests = f.notesAndRests.stream()
 
         posConnected = []  # temporary storage for index of tied notes
         posDelete = []  # store deletions to be processed later
@@ -7158,12 +7158,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return True
             # Case 2: matchByPitch=False and all chord members have a stop tie
             # and checking cardinality passes (don't match chords to single notes)
-            if (hasattr(nInner, 'tie')
-                    and not matchByPitch
+            if (not matchByPitch
                     and isinstance(nInner, chord.Chord)
+                    and isinstance(nLast, chord.Chord)
                     and None not in [inner_p.tie for inner_p in nInner.notes]
                     and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}
-                    and nLast is not None and len(nLast.pitches) == len(nInner.pitches)):
+                    and len(nLast.pitches) == len(nInner.pitches)):
                 return True
 
             # Now, matchByPitch
@@ -7217,12 +7217,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         return False
             return True
 
-        for i in range(len(notes)):
+        for i in range(len(notes_and_rests)):
             endMatch = None  # can be True, False, or None
-            n = notes[i]
+            n = notes_and_rests[i]
             if i > 0:  # get i and n for the previous value
                 iLast = i - 1
-                nLast = notes[iLast]
+                nLast = notes_and_rests[iLast]
             else:
                 iLast = None
                 nLast = None
@@ -7265,7 +7265,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 elif allTiesAreContinue(n):
                     # uniform-continue suffices if not matchByPitch
                     # but still need to check cardinality
-                    if nLast and (len(nLast.pitches) != len(n.pitches)):
+                    if isinstance(nLast, note.NotRest) and (len(nLast.pitches) != len(n.pitches)):
                         # different sizes: clear list and populate with this element
                         # since allTiesAreContinue, it is okay to treat as ersatz-start
                         posConnected = [i]
@@ -7300,24 +7300,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # do not include first; will add to later; do not delete
                 durSum = 0
                 for q in posConnected[1:]:  # all but the first
-                    durSum += notes[q].quarterLength
+                    durSum += notes_and_rests[q].quarterLength
                     posDelete.append(q)  # store for deleting later
                 # dur sum should always be greater than zero
                 if durSum == 0:
                     raise StreamException('aggregated ties have a zero duration sum')
                 # change the duration of the first note to be self + sum
                 # of all others
-                qLen = notes[posConnected[0]].quarterLength
-                notes[posConnected[0]].quarterLength = qLen + durSum
+                qLen = notes_and_rests[posConnected[0]].quarterLength
+                notes_and_rests[posConnected[0]].quarterLength = qLen + durSum
 
                 # set tie to None on first note
-                notes[posConnected[0]].tie = None
+                notes_and_rests[posConnected[0]].tie = None
 
                 # replace removed elements in spanners
                 for sp in f.spanners:
                     for index in posConnected[1:]:
-                        if notes[index] in sp:
-                            sp.replaceSpannedElement(notes[index], notes[posConnected[0]])
+                        if notes_and_rests[index] in sp:
+                            sp.replaceSpannedElement(
+                                notes_and_rests[index],
+                                notes_and_rests[posConnected[0]])
 
                 posConnected = []  # reset to empty
 
@@ -7327,7 +7329,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for i in posDelete:
             # environLocal.printDebug(['removing note', notes[i]])
             # get the obj ref
-            nTarget = notes[i]
+            nTarget = notes_and_rests[i]
             # Recurse rather than depend on the containers being Measures
             # https://github.com/cuthbertLab/music21/issues/266
             returnObj.remove(nTarget, recurse=True)
