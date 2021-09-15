@@ -117,28 +117,38 @@ def figuredBassFromStream(streamPart):
         if paddingLeft != 0.0:
             fb._paddingLeft = paddingLeft
 
-    def updateAnnotationString(annotationString, inputText):
+    def updateAnnotationString(annotationString: str, inputText: str) -> str:
+        '''
+        Continue building the working `annotationString` based on some `inputText`
+        that has yet to be processed. Called recursively until `inputText` is exhausted
+        or contains unexpected characters.
+        '''
         # "64" and "#6#42" but not necessarily "4-3" or "sus4"
-        if all(char.isnumeric() for char in inputText):
-            annotationString += ', '.join(inputText)
-        elif inputText[0] in '#-' and inputText[1].isnumeric():
-            annotationString += inputText[:2]
-            # Recursive...
-            if inputText[2:]:
-                annotationString += ', '
-                annotationString = updateAnnotationString(annotationString, inputText[2:])
-        # Catch-all
-        else:
-            annotationString += inputText
+        stop_index_exclusive: int = 0
+        if inputText[0] in '#-' and len(inputText) > 1 and inputText[1].isnumeric():
+            stop_index_exclusive = 2
+        elif inputText[0].isnumeric():
+            stop_index_exclusive = 1
+        annotationString += inputText[:stop_index_exclusive]
+        # Is there more?
+        if inputText[stop_index_exclusive:]:
+            annotationString += ', '
+            annotationString = updateAnnotationString(annotationString, inputText[stop_index_exclusive:])
         return annotationString
 
     for n in sfn:
         if n.lyrics:
             annotationString: str = ''
             for i, lyric_line in enumerate(n.lyrics):
-                if lyric_line.text is None:
+                if lyric_line.text in (None, ''):
                     continue
-                annotationString = updateAnnotationString(annotationString, lyric_line.text)
+                if ',' in lyric_line.text:
+                    # presence of comma suggests we already have a separated
+                    # sequence of figures, e.g. "#6, 4, 2"
+                    annotationString = lyric_line.text
+                else:
+                    # parse it more carefully
+                    annotationString = updateAnnotationString(annotationString, lyric_line.text)
                 if i + 1 < len(n.lyrics):
                     annotationString += ', '
             fb.addElement(n, annotationString)
@@ -827,6 +837,10 @@ class Test(unittest.TestCase):
         third_note.lyric = '#6#42'
         unused_fb = figuredBassFromStream(s)
         self.assertEqual(third_note.notationString, '#6, #4, 2')
+
+        third_note.lyric = '#64#2'
+        unused_fb = figuredBassFromStream(s)
+        self.assertEqual(third_note.notationString, '#6, 4, #2')
 
         # original case
         third_note.lyric = '6\n4'
