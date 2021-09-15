@@ -133,7 +133,8 @@ def figuredBassFromStream(streamPart):
         # Is there more?
         if inputText[stop_index_exclusive:]:
             annotationString += ', '
-            annotationString = updateAnnotationString(annotationString, inputText[stop_index_exclusive:])
+            annotationString = updateAnnotationString(
+                annotationString, inputText[stop_index_exclusive:])
         return annotationString
 
     for n in sfn:
