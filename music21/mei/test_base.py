@@ -3897,7 +3897,7 @@ class Test(unittest.TestCase):
         # ensure the right number and @n of parts
         self.assertEqual(4, len(actual.keys()))
         for eachN in expectedNs:
-            self.assertTrue(eachN in actual.keys())
+            self.assertTrue(eachN in actual)
         # ensure the measure number is set properly,
         #        there is one voice with one note with its octave set equal to the staff's @n,
         #        the right barline was set properly
@@ -4020,8 +4020,8 @@ class Test(unittest.TestCase):
         # ensure the right number and @n of parts (we expect one additional key, for the "rptboth")
         self.assertEqual(5, len(actual.keys()))
         for eachN in expectedNs:
-            self.assertTrue(eachN in actual.keys())
-        self.assertTrue('next @left' in actual.keys())
+            self.assertTrue(eachN in actual)
+        self.assertTrue('next @left' in actual)
         # ensure the measure number is set properly,
         #        there is one voice with one note with its octave set equal to the staff's @n,
         #        the right barline was set properly
