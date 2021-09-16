@@ -6,11 +6,14 @@
 # Authors:      Michael Scott Cuthbert
 #               Jacob Tyler Walls
 #
-# Copyright:    Copyright © 2013-2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-2021 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy
+from typing import List
+
 from xml.etree.ElementTree import tostring as et_tostring
+from xml.etree.ElementTree import Element  # for typing
 
 def dumpString(obj, *, noCopy=False) -> str:
     r'''
@@ -178,6 +181,42 @@ def measureNumberComesBefore(mNum1: str, mNum2: str) -> bool:
     else:
         sortedSuffixes = sorted([m1Suffix, m2Suffix])
         return m1Suffix is sortedSuffixes[0]
+
+def childrenEqual(e1: Element, e2: Element, children: List[str]) -> bool:
+    '''
+    Tests whether the given child tags exist under each given element
+    and the texts of those child tags compare equal.
+
+    >>> from xml.etree.ElementTree import fromstring as El
+    >>> from xml.etree.ElementTree import SubElement
+    >>> a = El('<clef />')
+    >>> b = El('<clef />')
+    >>> a_sign = SubElement(a, 'sign')
+    >>> a_sign.text = 'G'
+    >>> b_sign = SubElement(b, 'sign')
+    >>> b_sign.text = 'F'
+
+    >>> from music21.musicxml.helpers import childrenEqual
+    >>> childrenEqual(a, b, children=['sign'])
+    False
+
+    >>> b_sign.text = 'G'
+    >>> childrenEqual(a, b, children=['sign'])
+    True
+
+    >>> childrenEqual(a, b, children=['sign', 'line'])
+    False
+    '''
+    for child in children:
+        e1_child = e1.find(child)
+        if e1_child is None:
+            return False
+        e2_child = e2.find(child)
+        if e2_child is None:
+            return False
+        if e1_child.text != e2_child.text:
+            return False
+    return True
 
 
 if __name__ == '__main__':

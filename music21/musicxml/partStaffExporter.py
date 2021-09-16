@@ -629,6 +629,7 @@ class PartStaffExporterMixin:
         bump voice numbers if they conflict;
         account for <backup> and <forward> tags;
         skip <print> tags;
+        skip superfluous <time> and <key> tags;
         set "number" on midmeasure clef changes;
         replace existing <barline> tags.
 
@@ -705,11 +706,48 @@ class PartStaffExporterMixin:
             if elem.tag == 'print':
                 continue
             if elem.tag == 'attributes':
-                if elem.findall('divisions'):
-                    # This is likely the initial mxAttributes
-                    continue
                 for midMeasureClef in elem.findall('clef'):
                     midMeasureClef.set('number', str(staffNumber))
+
+                # Determine how much of the <attributes> tag to move
+                target_measure_meters_or_none = otherMeasure.findall('attributes/time')
+                target_measure_keys_or_none = otherMeasure.findall('attributes/key')
+                source_measure_meter_or_none = elem.find('time')
+                source_measure_key_or_none = elem.find('key')
+                skippable_meter = False
+                skippable_key = False
+                if (
+                    source_measure_meter_or_none is not None
+                    and target_measure_meters_or_none is not None
+                    and helpers.childrenEqual(otherMeasure.findall('attributes/time')[-1],
+                                              source_measure_meter_or_none,
+                                              children=['beats', 'beat-type'])
+                ):
+                    skippable_meter = True
+                if (
+                    source_measure_key_or_none is not None
+                    and target_measure_keys_or_none is not None
+                    and helpers.childrenEqual(otherMeasure.findall('attributes/key')[-1],
+                                              source_measure_key_or_none,
+                                              children=['fifths'])
+                ):
+                    skippable_key = True
+                if skippable_meter and source_measure_meter_or_none is not None:
+                    elem.remove(source_measure_meter_or_none)
+                if skippable_key and source_measure_key_or_none is not None:
+                    elem.remove(source_measure_key_or_none)
+                if len(elem) == 0:
+                    # we stripped all the information, so skip
+                    continue
+                if (
+                    len(elem) == 2
+                    and elem.find('divisions') is not None
+                    and elem.find('clef') is not None
+                ):
+                    # Initial clef doesn't need to be written after a <backup> tag
+                    # So this is also superfluous
+                    # Presence of "divisions" child: proxy for first relevant measure
+                    continue
             if elem.tag == 'barline':
                 # Remove existing <barline>, if any
                 for existingBarline in otherMeasure.findall('barline'):
@@ -808,6 +846,7 @@ class Test(unittest.TestCase):
 
         m1 = root.find('part/measure')
         clefs = m1.findall('attributes/clef')
+        # Two initial clefs + one clef change
         self.assertEqual(len(clefs), 3)
         self.assertEqual(clefs[0].get('number'), '1')
         self.assertEqual(clefs[1].get('number'), '2')
@@ -972,6 +1011,25 @@ class Test(unittest.TestCase):
         SX = ScoreExporter(b)
         SX.parse()
         SX.parse()
+
+    def testMeterChanges(self):
+        from music21 import layout
+        from music21 import meter
+        from music21 import note
+
+        ps1 = stream.PartStaff()
+        ps2 = stream.PartStaff()
+        sg = layout.StaffGroup([ps1, ps2])
+        s = stream.Score([ps1, ps2, sg])
+        for ps in ps1, ps2:
+            ps.insert(0, meter.TimeSignature('3/1'))
+            ps.repeatAppend(note.Note(type='whole'), 6)
+            ps.makeNotation(inPlace=True)  # makes measures
+            ps[stream.Measure][1].insert(meter.TimeSignature('4/1'))
+
+        root = self.getET(s)
+        # Just two <attributes> tags, a 3/1 in measure 1 and a 4/1 in measure 2
+        self.assertEqual(len(root.findall('part/measure/attributes/time')), 2)
 
 
 if __name__ == '__main__':
