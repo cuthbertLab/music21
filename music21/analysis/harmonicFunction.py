@@ -12,7 +12,6 @@
 from typing import Union
 import unittest
 
-from music21 import exceptions21
 from music21 import roman
 
 from music21 import environment
