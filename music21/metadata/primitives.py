@@ -1040,7 +1040,7 @@ class Contributor(prebase.ProtoM21Object):
     def role(self, value):
         if value is None or value in self.roleAbbreviationsDict.values():
             self._role = value
-        elif value in self.roleAbbreviationsDict.keys():
+        elif value in self.roleAbbreviationsDict:
             self._role = self.roleAbbreviationsDict[value]
         else:
             self._role = value
