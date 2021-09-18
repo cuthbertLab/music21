@@ -36,7 +36,6 @@ __all__ = [
 
 import copy
 import math
-import os
 import pathlib
 import wave
 import warnings
@@ -1002,7 +1001,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []  # type: List[Class]
+_DOC_ORDER: List[object] = []
 
 
 if __name__ == '__main__':
