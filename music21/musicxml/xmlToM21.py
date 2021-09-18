@@ -1710,6 +1710,7 @@ class PartParser(XMLParserBase):
             'GeneralNote',
             'KeySignature',
             'StaffLayout',
+            'TempoIndication',
             'TimeSignature',
         ]
 
@@ -6172,6 +6173,13 @@ class Test(unittest.TestCase):
         # has only sound tempo=x tag
         # s = converter.parse(testPrimitive.articulations01)
         # s.show()
+
+    def testImportMetronomeMarksC(self):
+        '''Import tempo into only the first PartStaff'''
+        from music21 import corpus
+        s = corpus.parse('demos/two-parts')
+        self.assertEqual(len(s.parts.first()[tempo.MetronomeMark]), 1)
+        self.assertEqual(len(s.parts.last()[tempo.MetronomeMark]), 0)
 
     def testImportGraceNotesA(self):
         # test importing from musicxml
