@@ -374,6 +374,162 @@ class ChordBase(note.NotRest):
             raise ValueError('Chord.remove(x), x not in chord')
 
 
+    @property
+    def tie(self):
+        '''
+        Get or set a single tie based on all the ties in this Chord.
+
+        This overloads the behavior of the tie attribute found in all
+        NotRest classes.
+
+        If setting a tie, tie is applied to all pitches.
+
+        >>> c1 = chord.Chord(['c4', 'g4'])
+        >>> tie1 = tie.Tie('start')
+        >>> c1.tie = tie1
+        >>> c1.tie
+        <music21.tie.Tie start>
+
+        >>> c1.getTie(c1.pitches[1])
+        <music21.tie.Tie start>
+        '''
+        for d in self._notes:
+            if d.tie is not None:
+                return d.tie
+        return None
+
+    @tie.setter
+    def tie(self, value):
+        for d in self._notes:
+            d.tie = value
+            # set the same instance for each pitch
+            # d['tie'] = value
+
+    @property
+    def volume(self):
+        '''
+        Get or set the :class:`~music21.volume.Volume` object for this
+        Chord.
+
+        When setting the .volume property, all pitches are treated as
+        having the same Volume object.
+
+        >>> c = chord.Chord(['g#', 'd-'])
+        >>> c.volume
+        <music21.volume.Volume realized=0.71>
+
+        >>> c.volume = volume.Volume(velocity=64)
+        >>> c.volume.velocityIsRelative = False
+        >>> c.volume
+        <music21.volume.Volume realized=0.5>
+
+        >>> c.volume = [volume.Volume(velocity=96), volume.Volume(velocity=96)]
+        >>> c.hasComponentVolumes()
+        True
+
+        Note that this means that the chord itself does not have a volume at this moment!
+
+        >>> c.hasVolumeInformation()
+        False
+
+        >>> c.volume.velocity
+        96
+
+        But after called, now it does:
+
+        >>> c.hasVolumeInformation()
+        True
+
+        Return a new volume that is an average of the components
+
+        >>> c.volume.velocityIsRelative = False
+        >>> c.volume
+        <music21.volume.Volume realized=0.76>
+
+        OMIT_FROM_DOCS
+
+        Make sure that empty chords have a volume:
+
+        >>> chord.Chord().volume
+        <music21.volume.Volume realized=0.71>
+        '''
+        if self._volume is not None:
+            # if we already have a Volume, use that
+            return self._volume
+
+        if not self.hasComponentVolumes():
+            # create a single new Volume object for the chord
+            self._volume = note.NotRest._getVolume(self, forceClient=self)
+            return self._volume
+
+        # if we have components and _volume is None, create a volume from
+        # components
+        velocities = []
+        for d in self._notes:
+            velocities.append(d.volume.velocity)
+        # create new local object
+        self._volume = volume.Volume(client=self)
+        if velocities:  # avoid division by zero error
+            self._volume.velocity = int(round(sum(velocities) / len(velocities)))
+        return self._volume
+
+
+    @volume.setter
+    def volume(self, expr):
+        if isinstance(expr, volume.Volume):
+            expr.client = self
+            # remove any component volumes
+            for c in self._notes:
+                c._volume = None
+            note.NotRest._setVolume(self, expr, setClient=False)
+        elif common.isNum(expr):
+            vol = self._getVolume()
+            if expr < 1:  # assume a scalar
+                vol.velocityScalar = expr
+            else:  # assume velocity
+                vol.velocity = expr
+        elif common.isListLike(expr):  # assume an array of vol objects
+            # if setting components, remove single velocity
+            self._volume = None
+            for i, c in enumerate(self._notes):
+                v = expr[i % len(expr)]
+                if common.isNum(v):  # create a new Volume
+                    if v < 1:  # assume a scalar
+                        v = volume.Volume(velocityScalar=v)
+                    else:  # assume velocity
+                        v = volume.Volume(velocity=v)
+                v.client = self
+                # noinspection PyArgumentList
+                c._setVolume(v, setClient=False)
+        else:
+            raise ChordException(f'unhandled setting expr: {expr}')
+
+    # --------------------------------------------------------------------------
+    # volume per pitch ??
+    # --------------------------------------------------------------------------
+
+    def setVolume(self, vol, pitchTarget=None):
+        '''
+        Set the :class:`~music21.volume.Volume` object of a specific pitch
+        target. If no pitch target is given, the first pitch is used.
+        '''
+        # assign to first pitch by default
+        if pitchTarget is None and self._notes:  # if no pitches
+            pitchTarget = self._notes[0].pitch
+        elif isinstance(pitchTarget, str):
+            pitchTarget = pitch.Pitch(pitchTarget)
+        match = False
+        for d in self._notes:
+            if d.pitch is pitchTarget or d.pitch == pitchTarget:
+                vol.client = self
+                # noinspection PyArgumentList
+                d._setVolume(vol, setClient=False)
+                match = True
+                break
+        if not match:
+            raise ChordException(f'the given pitch is not in the Chord: {pitchTarget}')
+
+
 # ------------------------------------------------------------------------------
 
 class Chord(ChordBase):
@@ -3969,27 +4125,6 @@ class Chord(ChordBase):
             raise ChordException(
                 f'the given pitch is not in the Chord: {pitchTarget}')
 
-    def setVolume(self, vol, pitchTarget=None):
-        '''
-        Set the :class:`~music21.volume.Volume` object of a specific pitch
-        target. If no pitch target is given, the first pitch is used.
-        '''
-        # assign to first pitch by default
-        if pitchTarget is None and self._notes:  # if no pitches
-            pitchTarget = self._notes[0].pitch
-        elif isinstance(pitchTarget, str):
-            pitchTarget = pitch.Pitch(pitchTarget)
-        match = False
-        for d in self._notes:
-            if d.pitch is pitchTarget or d.pitch == pitchTarget:
-                vol.client = self
-                # noinspection PyArgumentList
-                d._setVolume(vol, setClient=False)
-                match = True
-                break
-        if not match:
-            raise ChordException(f'the given pitch is not in the Chord: {pitchTarget}')
-
     def simplifyEnharmonics(self, *, inPlace=False, keyContext=None):
         '''
         Calls `pitch.simplifyMultipleEnharmonics` on the pitches of the chord.
@@ -5371,139 +5506,6 @@ class Chord(ChordBase):
         except ChordException:
             return None
 
-    @property
-    def tie(self):
-        '''
-        Get or set a single tie based on all the ties in this Chord.
-
-        This overloads the behavior of the tie attribute found in all
-        NotRest classes.
-
-        If setting a tie, tie is applied to all pitches.
-
-        >>> c1 = chord.Chord(['c4', 'g4'])
-        >>> tie1 = tie.Tie('start')
-        >>> c1.tie = tie1
-        >>> c1.tie
-        <music21.tie.Tie start>
-
-        >>> c1.getTie(c1.pitches[1])
-        <music21.tie.Tie start>
-        '''
-        for d in self._notes:
-            if d.tie is not None:
-                return d.tie
-        return None
-
-    @tie.setter
-    def tie(self, value):
-        for d in self._notes:
-            d.tie = value
-            # set the same instance for each pitch
-            # d['tie'] = value
-
-    @property
-    def volume(self):
-        '''
-        Get or set the :class:`~music21.volume.Volume` object for this
-        Chord.
-
-        When setting the .volume property, all pitches are treated as
-        having the same Volume object.
-
-        >>> c = chord.Chord(['g#', 'd-'])
-        >>> c.volume
-        <music21.volume.Volume realized=0.71>
-
-        >>> c.volume = volume.Volume(velocity=64)
-        >>> c.volume.velocityIsRelative = False
-        >>> c.volume
-        <music21.volume.Volume realized=0.5>
-
-        >>> c.volume = [volume.Volume(velocity=96), volume.Volume(velocity=96)]
-        >>> c.hasComponentVolumes()
-        True
-
-        Note that this means that the chord itself does not have a volume at this moment!
-
-        >>> c.hasVolumeInformation()
-        False
-
-        >>> c.volume.velocity
-        96
-
-        But after called, now it does:
-
-        >>> c.hasVolumeInformation()
-        True
-
-        Return a new volume that is an average of the components
-
-        >>> c.volume.velocityIsRelative = False
-        >>> c.volume
-        <music21.volume.Volume realized=0.76>
-
-        OMIT_FROM_DOCS
-
-        Make sure that empty chords have a volume:
-
-        >>> chord.Chord().volume
-        <music21.volume.Volume realized=0.71>
-        '''
-        if self._volume is not None:
-            # if we already have a Volume, use that
-            return self._volume
-
-        if not self.hasComponentVolumes():
-            # create a single new Volume object for the chord
-            self._volume = note.NotRest._getVolume(self, forceClient=self)
-            return self._volume
-
-        # if we have components and _volume is None, create a volume from
-        # components
-        velocities = []
-        for d in self._notes:
-            velocities.append(d.volume.velocity)
-        # create new local object
-        self._volume = volume.Volume(client=self)
-        if velocities:  # avoid division by zero error
-            self._volume.velocity = int(round(sum(velocities) / len(velocities)))
-        return self._volume
-
-
-    @volume.setter
-    def volume(self, expr):
-        if isinstance(expr, volume.Volume):
-            expr.client = self
-            # remove any component volumes
-            for c in self._notes:
-                c._volume = None
-            note.NotRest._setVolume(self, expr, setClient=False)
-        elif common.isNum(expr):
-            vol = self._getVolume()
-            if expr < 1:  # assume a scalar
-                vol.velocityScalar = expr
-            else:  # assume velocity
-                vol.velocity = expr
-        elif common.isListLike(expr):  # assume an array of vol objects
-            # if setting components, remove single velocity
-            self._volume = None
-            for i, c in enumerate(self._notes):
-                v = expr[i % len(expr)]
-                if common.isNum(v):  # create a new Volume
-                    if v < 1:  # assume a scalar
-                        v = volume.Volume(velocityScalar=v)
-                    else:  # assume velocity
-                        v = volume.Volume(velocity=v)
-                v.client = self
-                # noinspection PyArgumentList
-                c._setVolume(v, setClient=False)
-        else:
-            raise ChordException(f'unhandled setting expr: {expr}')
-
-    # --------------------------------------------------------------------------
-    # volume per pitch ??
-    # --------------------------------------------------------------------------
 
 
 def fromForteClass(notation):

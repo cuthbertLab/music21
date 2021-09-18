@@ -16,20 +16,22 @@ notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here
 import unittest
 import math
 import copy
-from typing import Optional, List, Tuple, Dict, Union, Any
+from typing import Callable, Optional, List, Tuple, Dict, Union, Any
 import warnings
 
 from music21 import chord
 from music21 import common
 from music21 import defaults
 from music21 import duration
-from music21 import note
 from music21 import exceptions21
 from music21 import environment
+from music21 import note
+from music21 import percussion
+from music21 import pitch
 from music21 import stream
 
 from music21.instrument import Conductor, deduplicate
-from music21.midi import percussion
+from music21.midi import percussion as midiPercussion
 
 _MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
@@ -268,7 +270,60 @@ def music21ObjectToMidiFile(
 # ------------------------------------------------------------------------------
 # Notes
 
-def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None) -> note.Note:
+def _constructOrUpdateNotRest(
+    eOn: 'music21.midi.MidiEvent',
+    tOn: int,
+    tOff: int,
+    ticksPerQuarter: int,
+    *,
+    inputM21: Optional[note.NotRest] = None,
+    preferredClass: Optional[Callable] = note.Note,
+) -> note.NotRest:
+    '''
+    Construct (or edit the duration of) a NotRest subclass, usually
+    a note.Note (or a chord.Chord if provided to `preferredClass`).
+
+    If the MidiEvent is on channel 10, then an Unpitched or PercussionChord
+    is constructed instead. Raises TypeError if an incompatible object is provided
+    for `inputM21`, e.g. a `chord.Chord` when a `percussion.PercussionChord` is needed.
+    '''
+    if not isinstance(preferredClass(), note.NotRest):
+        raise TypeError(f'Expected subclass of note.NotRest; got {preferredClass}')
+
+    if eOn.channel == 10:
+        if preferredClass in (chord.Chord, percussion.PercussionChord):
+            preferredClass = percussion.PercussionChord
+        else:
+            preferredClass = note.Unpitched
+
+    if inputM21 is not None:
+        if not isinstance(inputM21, preferredClass):
+            raise TypeError(f'Provided object {inputM21} must be an instance of {preferredClass}')
+
+    if (tOff - tOn) != 0:
+        if inputM21 is None:
+            nr = preferredClass(duration=ticksToDuration(tOff - tOn, ticksPerQuarter))
+        else:
+            nr = inputM21
+            nr.duration = ticksToDuration(tOff - tOn, ticksPerQuarter, nr.duration)
+    else:
+        # here we are handling an issue that might arise with double-stemmed notes
+        # environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
+        # for now, substitute grace note
+        if inputM21 is None:
+            nr = preferredClass()
+        else:
+            nr = inputM21
+        nr.getGrace(inPlace=True)
+
+    return nr
+
+
+def midiEventsToNote(
+    eventList,
+    ticksPerQuarter=None,
+    inputM21: Optional[note.NotRest] = None,
+) -> Optional[note.NotRest]:
     # noinspection PyShadowingNames
     '''
     Convert from a list of midi.DeltaTime and midi.MidiEvent objects to a music21 Note.
@@ -284,9 +339,10 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None) -> note.Not
     It is assumed, but not checked, that midiEvent2 is an appropriate Note_Off command.  Thus, only
     three elements are really needed.
 
-    The `inputM21` parameter can be a Note or None; in the case of None, a Note object is created.
-    In either case it returns a Note (N.B.: this will change soon so that None will be returned
-    if `inputM21` is given.  This will match the behavior of other translate objects).
+    The `inputM21` parameter can be a NotRest or None; in the case of None,
+    a Note or Unpitched object is created.
+
+    Changed in v.7.3: Returns None if `inputM21` is provided.
 
     N.B. this takes in a list of music21 MidiEvent objects so see [...] on how to
     convert raw MIDI data to MidiEvent objects
@@ -331,6 +387,12 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None) -> note.Not
     >>> m.volume.velocity
     94
 
+    Changed in v.7.3 -- Returns a :class:`~music21.note.Unpitched` instance if the event
+    is on Channel 10.
+
+    >>> me1.channel = 10
+    >>> midi.translate.midiEventsToNote([dt1, me1, dt2, me2])
+    <music21.note.Unpitched object at 0x...>
     '''
     if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
@@ -350,28 +412,23 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None) -> note.Not
     else:
         raise TranslateException(f'cannot handle MIDI event list in the form: {eventList!r}')
 
-    # here we are handling an issue that might arise with double-stemmed notes
-    if (tOff - tOn) != 0:
-        if inputM21 is None:
-            n = note.Note(duration=ticksToDuration(tOff - tOn, ticksPerQuarter))
-        else:
-            n = inputM21
-            n.duration = ticksToDuration(tOff - tOn, ticksPerQuarter, n.duration)
-    else:
-        # environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
-        # for now, substitute grace note
-        if inputM21 is None:
-            n = note.Note()
-        else:
-            n = inputM21
-        n.getGrace(inPlace=True)
+    nr = _constructOrUpdateNotRest(
+        eOn, tOn, tOff, ticksPerQuarter, inputM21=inputM21, preferredClass=note.Note)
 
-    n.pitch.midi = eOn.pitch
-    n.volume.velocity = eOn.velocity
-    n.volume.velocityIsRelative = False  # not relative coming from MIDI
+    if isinstance(nr, note.Note):
+        nr.pitch.midi = eOn.pitch
+    elif isinstance(nr, note.Unpitched):
+        display_pitch = pitch.Pitch(eOn.pitch)
+        nr.displayStep = display_pitch.step
+        nr.displayOctave = display_pitch.octave
+    nr.volume.velocity = eOn.velocity
+    nr.volume.velocityIsRelative = False  # not relative coming from MIDI
     # n._midiVelocity = eOn.velocity
 
-    return n
+    if inputM21 is None:
+        return nr
+    else:
+        return None
 
 
 def noteToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
@@ -469,7 +526,11 @@ def noteToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
 # ------------------------------------------------------------------------------
 # Chords
 
-def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
+def midiEventsToChord(
+    eventList: List['music21.midi.MidiEvent'],
+    ticksPerQuarter: Optional[int] = None,
+    inputM21: Optional[chord.ChordBase] = None
+) -> Optional[chord.ChordBase]:
     # noinspection PyShadowingNames
     '''
     Creates a Chord from a list of :class:`~music21.midi.DeltaTime`
@@ -523,6 +584,12 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
         <music21.midi.MidiEvent NOTE_ON, track=1, channel=None, pitch=46, velocity=94>]
 
     Changed in v.7 -- Uses the last DeltaTime in the list to get the end time.
+    Changed in v.7.3 -- Returns a :class:`~music21.percussion.PercussionChord` if the
+    any event is on channel 10. Returns None if `inputM21` provided.
+
+    >>> me2.channel = 10
+    >>> midi.translate.midiEventsToChord([dt1, me1, dt2, me2, dt3, me3, dt4, me4])
+    <music21.percussion.PercussionChord unpitched[A2] unpitched[B2]>
     '''
     tOn: int = 0  # ticks
     tOff: int = 0  # ticks
@@ -530,11 +597,12 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
-    from music21 import pitch
     from music21 import volume
-    pitches = []
+    pitches: List[pitch.Pitch] = []
     volumes = []
 
+    firstOn: Optional['music21.midi.MidiEvent'] = None
+    any_channel_10 = False
     # this is a format provided by the Stream conversion of
     # midi events; it pre groups events for a chord together in nested pairs
     # of abs start time and the event object
@@ -542,6 +610,9 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
         # pairs of pairs
         for onPair, offPair in eventList:
             tOn, eOn = onPair
+            if firstOn is None:
+                firstOn = eOn
+            any_channel_10 |= eOn.channel == 10
             tOff, unused_eOff = offPair
             p = pitch.Pitch()
             p.midi = eOn.pitch
@@ -555,13 +626,17 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
         offEvents = eventList[(len(eventList) // 2):]
         # first is always delta time
         tOn = onEvents[0].time
+        # second is the MidiEvent NOTE_ON
+        firstOn = onEvents[1]
         # use the off time of the last chord member
         # -1 is the event, -2 is the delta time for the event
         tOff = offEvents[-2].time
         # create pitches for the odd on Events:
         for i in range(1, len(onEvents), 2):
             p = pitch.Pitch()
-            p.midi = onEvents[i].pitch
+            on_event = onEvents[i]
+            any_channel_10 |= on_event.channel == 10
+            p.midi = on_event.pitch
             pitches.append(p)
             v = volume.Volume(velocity=onEvents[i].velocity)
             v.velocityIsRelative = False  # velocity is absolute coming from
@@ -569,27 +644,28 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     else:
         raise TranslateException(f'fewer than 4 events provided to midiEventsToChord: {eventList}')
 
-    # can simply use last-assigned pair of tOff, tOn
-    if (tOff - tOn) != 0:
-        if inputM21 is None:
-            c = chord.Chord(duration=ticksToDuration(tOff - tOn, ticksPerQuarter))
-        else:
-            c = inputM21
-            c.duration = ticksToDuration(tOff - tOn, ticksPerQuarter, c.duration)
+    if any_channel_10:
+        preferredClass = percussion.PercussionChord
     else:
-        # for now, get grace
-        if inputM21 is None:
-            c = chord.Chord()
-        else:
-            c = inputM21
-        environLocal.warn(['midi chord with zero duration will be treated as grace',
-                            eventList, c])
-        c.getGrace(inPlace=True)
+        preferredClass = chord.Chord
+    c: chord.ChordBase = _constructOrUpdateNotRest(
+        firstOn, tOn, tOff, ticksPerQuarter, inputM21=inputM21, preferredClass=preferredClass)
 
-    c.pitches = pitches
+    if isinstance(c, percussion.PercussionChord):
+        # Construct note.Unpitched objects
+        for display_pitch in pitches:
+            unp = note.Unpitched()
+            unp.displayStep = display_pitch.step
+            unp.displayOctave = display_pitch.octave
+            c.add(unp)
+    else:
+        c.pitches = pitches
     c.volume = volumes  # can set a list to volume property
 
-    return c
+    if inputM21 is None:
+        return c
+    else:
+        return None
 
 
 def chordToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
@@ -773,7 +849,7 @@ def midiEventsToInstrument(eventList):
             decoded = decoded.strip()
             i = instrument.fromString(decoded)
         elif event.channel == 10:
-            pm = percussion.PercussionMapper()
+            pm = midiPercussion.PercussionMapper()
             # PercussionMapper.midiPitchToInstrument() is 1-indexed
             i = pm.midiPitchToInstrument(event.data + 1)
             i.midiProgram = event.data
@@ -786,7 +862,7 @@ def midiEventsToInstrument(eventList):
             f'Unable to determine instrument from {event}; getting generic Instrument',
             TranslateWarning)
         i = instrument.Instrument()
-    except percussion.MIDIPercussionException:
+    except midiPercussion.MIDIPercussionException:
         warnings.warn(
             f'Unable to determine instrument from {event}; getting generic UnpitchedPercussion',
             TranslateWarning)
