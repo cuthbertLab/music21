@@ -2632,7 +2632,7 @@ class Chord(ChordBase):
 
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 4):
+            if thisInterval.chromatic.mod12 not in (0, 4):
                 return False
 
         return True
@@ -2678,7 +2678,7 @@ class Chord(ChordBase):
 
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 3):
+            if thisInterval.chromatic.mod12 not in (0, 3):
                 return False
 
         return True

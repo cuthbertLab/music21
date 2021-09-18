@@ -2386,7 +2386,7 @@ class Variant(base.Music21Object):
             spacerDuration = 0.0
 
 
-        if self.lengthType == 'replacement' or self.lengthType == 'elongation':
+        if self.lengthType in ('replacement', 'elongation'):
             vEnd = vStart + self.replacementDuration + spacerDuration
             classes = []
             for e in self.elements:

@@ -2199,10 +2199,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         '''
 
         return (self._isComplete()
-                and ((self.iLeft.generic.undirected == 2
-                            or self.iLeft.generic.undirected == 1)
-                     and (self.iRight.generic.undirected == 2
-                            or self.iRight.generic.undirected == 1)
+                and (self.iLeft.generic.undirected in (1, 2)
+                     and self.iRight.generic.undirected in (1, 2)
                      and self.iLeft.generic.undirected * self.iRight.generic.undirected == 2
                      and self.iLeft.isChromaticStep
                      and self.iRight.isChromaticStep

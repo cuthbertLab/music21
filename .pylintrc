@@ -105,7 +105,6 @@ disable=
     import-outside-toplevel,  # allow for import music21, etc.
     not-callable,  # false positives, for instance on x.next()
     raise-missing-from,  # want to do this eventually, but adding 1000 msgs not helpful
-    consider-using-in,  # future?
     consider-using-f-string,  # future?
 
 #       'protected-access', # this is an important one, but for now we do a lot of
