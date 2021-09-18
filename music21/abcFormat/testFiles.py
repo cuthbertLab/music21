@@ -838,7 +838,7 @@ class Test(unittest.TestCase):
             s = translate.abcToStreamScore(ah)
             part = s.parts[0]
             self.assertFalse(part.getElementsByClass(chord.Chord),
-                             'Empty chord "%s" in Score' % abc_chord)
+                             f'Empty chord "{abc_chord}" in Score')
 
         # list of test abc chords and their quarter lengths at the default length of 1/8
         # list[tuple(str, int)] = of abc chords and= [( abc_chord: str)]
@@ -861,7 +861,7 @@ class Test(unittest.TestCase):
             ah = af.readstr(abc_dl + abc_chord)
             s = translate.abcToStreamScore(ah)
             self.assertEqual(s.duration.quarterLength, quarter_length,
-                             'invalid duration of chord "%s"' % abc_chord)
+                             f'invalid duration of chord "{abc_chord}"')
 
             notes = s.parts[0].notes
             chord0 = notes[0]
@@ -869,7 +869,7 @@ class Test(unittest.TestCase):
             self.assertIsInstance(chord0, chord.Chord, 'Not a Chord!')
             for pitch_name in chord_pitches:
                 self.assertIn(pitch_name, chord0.pitchNames,
-                              'Pitch not in Chord "%s"' % abc_chord)
+                              f'Pitch not in Chord "{abc_chord}"')
 
     def testAbc21ChordSymbol(self):
         # Test the chord symbol for note and chord
@@ -885,10 +885,10 @@ class Test(unittest.TestCase):
             ah = af.readstr(abc_dl + abc_text)
             part = translate.abcToStreamScore(ah).parts[0]
             chord_symbol = part.getElementsByClass(harmony.ChordSymbol)
-            self.assertTrue(chord_symbol, 'No ChordSymbol found in abc: "%s"' % abc_text)
+            self.assertTrue(chord_symbol, f'No ChordSymbol found in abc: "{abc_text}"')
             for pitch_name in 'CEG':
                 self.assertIn(pitch_name, chord_symbol[0].pitchNames,
-                              'Pitch not in ChordSymbol of abc: "%s"' % abc_text)
+                              f'Pitch not in ChordSymbol of abc: "{abc_text}"')
 
     def testAbc21BrokenRhythm(self):
         # Test the chord symbol for note and chord
