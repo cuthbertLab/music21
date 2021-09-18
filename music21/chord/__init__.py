@@ -240,6 +240,7 @@ class ChordBase(note.NotRest):
                     self._notes.append(note.Note(n))
                 # self._notes.append({'pitch':music21.pitch.Pitch(n)})
             else:
+                # TODO: v.8 raise TypeError
                 raise ChordException(f'Could not process input argument {n}')
 
         for n in self._notes:
@@ -292,7 +293,6 @@ class ChordBase(note.NotRest):
         '''
         if not common.isIterable(notes):
             notes = [notes]
-
         self._add_core_or_init(notes, useDuration=False)
 
     def remove(self, removeItem):
@@ -512,6 +512,8 @@ class Chord(ChordBase):
     # INITIALIZER #
 
     def __init__(self, notes=None, **keywords):
+        if notes is not None and any(isinstance(n, note.Unpitched) for n in notes):
+            raise TypeError(f'Use a PercussionChord to contain Unpitched objects; got {notes}')
         super().__init__(notes=notes, **keywords)
 
         if notes is not None and all(isinstance(n, int) for n in notes):
@@ -881,6 +883,10 @@ class Chord(ChordBase):
 
         Overrides `ChordBase.add()` to permit sorting with `runSort`.
         '''
+        if not common.isIterable(notes):
+            notes = [notes]
+        if any(isinstance(n, note.Unpitched) for n in notes):
+            raise TypeError(f'Use a PercussionChord to contain Unpitched objects; got {notes}')
         super().add(notes)
         if runSort:
             self.sortAscending(inPlace=True)
@@ -6366,6 +6372,11 @@ class Test(unittest.TestCase):
         self.assertEqual(ch.bass().name, 'E')
 
         # TODO(msc): overrides do not invalidate.  Should they?
+
+    def testChordCannotContainUnpitched(self):
+        msg = r'Use a PercussionChord to contain Unpitched objects; got \[<music21.note.Unpitched'
+        with self.assertRaisesRegex(TypeError, msg):
+            Chord([note.Unpitched()])
 
 
 # ------------------------------------------------------------------------------
