@@ -505,7 +505,7 @@ class Test(unittest.TestCase):
         actual = base.metaSetComposer(work, meta)
 
         self.assertIs(meta, actual)
-        if expComposer1 != actual.composer and expComposer2 != actual.composer:
+        if actual.composer not in (expComposer1, expComposer2):
             self.fail('composer names do not match in either order')
 
     def testMetaDate1(self):

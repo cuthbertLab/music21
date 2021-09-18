@@ -800,7 +800,7 @@ class LilypondConverter:
             if el.syllabic == 'end':
                 text = text + '__'
                 inWord = False
-            elif el.syllabic == 'begin' or el.syllabic == 'middle':
+            elif el.syllabic in ('begin', 'middle'):
                 text = text + ' --'
                 inWord = True
             # else: pass

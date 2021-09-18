@@ -1133,7 +1133,7 @@ def showOctaveWithNote(previousNote, currentNote):
         return True
     i = interval.notesToInterval(previousNote, currentNote)
     isSixthOrGreater = i.generic.undirected >= 6
-    isFourthOrFifth = i.generic.undirected == 4 or i.generic.undirected == 5
+    isFourthOrFifth = i.generic.undirected in (4, 5)
     sameOctaveAsPrevious = previousNote.octave == currentNote.octave
     doShowOctave = False
     if isSixthOrGreater or (isFourthOrFifth and not sameOctaveAsPrevious):

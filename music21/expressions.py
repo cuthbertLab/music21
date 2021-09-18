@@ -481,7 +481,7 @@ class GeneralMordent(Ornament):
         '''
         from music21 import key
 
-        if self.direction != 'up' and self.direction != 'down':
+        if self.direction not in ('up', 'down'):
             raise ExpressionException('Cannot realize a mordent if I do not know its direction')
         if self.size == '':
             raise ExpressionException('Cannot realize a mordent if there is no size given')
@@ -1080,7 +1080,7 @@ class GeneralAppoggiatura(Ornament):
         :type srcObj: base.Music21Object
         '''
         from music21 import key
-        if self.direction != 'up' and self.direction != 'down':
+        if self.direction not in ('up', 'down'):
             raise ExpressionException(
                 'Cannot realize an Appoggiatura if I do not know its direction')
         if self.size == '':

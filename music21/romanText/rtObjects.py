@@ -977,7 +977,7 @@ class RTOptionalKeyClose(RTAtom):
 
     def getKey(self):
         # alter flat symbol
-        if self.src == '?)b:' or self.src == '?)b':
+        if self.src in ('?)b:', '?)b'):
             return key.Key('b')
         else:
             keyStr = self.src.replace('b', '-')
