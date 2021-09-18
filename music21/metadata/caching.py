@@ -15,6 +15,7 @@ import os
 import pathlib
 import pickle
 import traceback
+from typing import List
 import unittest
 
 from music21 import common
@@ -423,7 +424,7 @@ class Test(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
-_DOC_ORDER = []
+_DOC_ORDER: List[object] = []
 
 if __name__ == '__main__':
     import music21

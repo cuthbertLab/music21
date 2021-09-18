@@ -684,6 +684,7 @@ class Metadata(base.Music21Object):
         if result is not None:
             # get just the name of the first contributor
             return str(result[0].name)
+        return None
 
     def _contributor_role_setter(self, role: str, name: str) -> None:
         '''
@@ -960,6 +961,7 @@ class Metadata(base.Music21Object):
         result = self._workIds['movementNumber']
         if result is not None:
             return str(result)
+        return None
 
     @movementNumber.setter
     def movementNumber(self, value):
@@ -1284,7 +1286,7 @@ class Test(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
-_DOC_ORDER = []
+_DOC_ORDER: List[object] = []
 
 
 if __name__ == '__main__':

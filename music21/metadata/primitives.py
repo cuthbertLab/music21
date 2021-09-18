@@ -12,7 +12,7 @@
 import datetime
 import os
 import unittest
-from typing import Optional, Iterable, Any
+from typing import List, Optional, Iterable, Any
 
 from music21 import common
 from music21 import exceptions21
@@ -423,13 +423,13 @@ class DateSingle(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self, data: Any = '', relevance='certain'):
-        self._data = []  # store a list of one or more Date objects
+        self._data: List[Date] = []
         self._relevance = None  # managed by property
         # not yet implemented
         # store an array of values marking if date data itself
         # is certain, approximate, or uncertain
         # here, dataError is relevance
-        self._dataError = []  # store a list of one or more strings
+        self._dataError: List[str] = []
         self._prepareData(data)
         self.relevance = relevance  # will use property
 
