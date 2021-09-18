@@ -37,7 +37,7 @@ import struct
 import sys
 import unicodedata
 import unittest
-from typing import Optional, Union, Tuple
+from typing import List, Optional, Union, Tuple
 
 from enum import IntEnum
 
@@ -1983,7 +1983,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[object] = []
 
 if __name__ == '__main__':
     import music21
