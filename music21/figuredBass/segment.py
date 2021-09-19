@@ -119,6 +119,7 @@ class Segment:
             if _defaultRealizerScale['scale'] is None:
                 _defaultRealizerScale['scale'] = realizerScale.FiguredBassScale()
             fbScale = _defaultRealizerScale['scale']  # save making it
+        assert fbScale is not None  # tells mypy that we have it now
 
         if fbRules is None:
             self.fbRules = rules.Rules()
@@ -912,6 +913,8 @@ def getPitches(pitchNames=('C', 'E', 'G'),
     if isinstance(maxPitch, str):
         maxPitch = pitch.Pitch(maxPitch)
 
+    if maxPitch.octave is None:
+        raise ValueError('maxPitch must be given an octave')
     iter1 = itertools.product(pitchNames, range(maxPitch.octave + 1))
     iter2 = map(lambda x: pitch.Pitch(x[0] + str(x[1])), iter1)
     iter3 = itertools.filterfalse(lambda samplePitch: bassPitch > samplePitch, iter2)
