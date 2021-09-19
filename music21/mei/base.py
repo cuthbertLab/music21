@@ -369,7 +369,7 @@ def safePitch(
     if not name:
         return pitch.Pitch()
     elif accidental is None:
-        return pitch.Pitch(name + octave)
+        return pitch.Pitch(name, octave=int(octave))
     else:
         return pitch.Pitch(name, accidental=accidental, octave=int(octave))
 
@@ -1041,6 +1041,7 @@ def _keySigFromAttrs(elem: Element) -> Union[key.Key, key.KeySignature]:
         # noinspection PyTypeChecker
         mode = elem.get('key.mode', '')
         step = elem.get('key.pname')
+        assert step is not None, 'Key missing step'  # needed for type-checking
         accidental = _accidentalFromAttr(elem.get('key.accid'))
         if accidental is None:
             tonic = step
