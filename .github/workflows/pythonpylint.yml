@@ -60,5 +60,5 @@ jobs:
                   python -m pip install data-science-stubs
             - name: Type-check certain modules with mypy
               run: |
-                  mypy music21/capella music21/common music21/corpus music21/features music21/figuredBass music21/humdrum music21/ipython21 music21/metadata music21/omr music21/romanText
+                  mypy music21/capella music21/common music21/corpus music21/features music21/figuredBass music21/humdrum music21/ipython21 music21/languageExcerpts music21/metadata music21/omr music21/romanText
                   mypy music21/percussion.py music21/repeat.py music21/serial.py music21/sieve.py music21/style.py music21/tablature.py music21/tempo.py music21/text.py music21/tie.py music21/tinyNotation.py music21/volpiano.py

@@ -12,6 +12,7 @@
 Multi-lingual conversion of pitch, etc. objects
 '''
 
+from typing import List
 import unittest
 from music21 import pitch
 
@@ -267,7 +268,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 
 
-_DOC_ORDER = []
+_DOC_ORDER: List[object] = []
 
 
 if __name__ == '__main__':
