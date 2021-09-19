@@ -12,7 +12,7 @@
 
 import abc
 import pathlib
-from typing import List
+from typing import Dict, List, Sequence, Tuple, Union, cast
 
 from music21 import common
 # from music21.corpus import virtual
@@ -43,9 +43,9 @@ class Corpus(prebase.ProtoM21Object):
     _allExtensions = tuple(common.flattenList([common.findInputExtension(x)
                                                for x in _acceptableExtensions]))
 
-    _pathsCache = {}
+    _pathsCache: Dict[Tuple[str, Tuple[str]], pathlib.Path] = {}
 
-    _directoryInformation = ()  # a tuple of triples -- see coreCorpus
+    _directoryInformation: Union[Tuple[()], Sequence[Tuple[str, str, bool]]] = ()
 
     parseUsingCorpus = True
 
@@ -81,7 +81,7 @@ class Corpus(prebase.ProtoM21Object):
 
         Generally cached.
         '''
-        rdp = common.cleanpath(rootDirectoryPath, returnPathlib=True)
+        rdp = cast(pathlib.Path, common.cleanpath(rootDirectoryPath, returnPathlib=True))
         matched = []
 
         for filename in sorted(rdp.rglob('*')):
@@ -688,7 +688,7 @@ class LocalCorpus(Corpus):
 
     # CLASS VARIABLES #
 
-    _temporaryLocalPaths = {}
+    _temporaryLocalPaths: Dict[str, set] = {}
 
     parseUsingCorpus = False
     # INITIALIZER #
