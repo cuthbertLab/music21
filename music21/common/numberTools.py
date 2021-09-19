@@ -449,7 +449,7 @@ def almostEquals(x, y=0.0, grain=1e-7) -> bool:
     return isclose(x, y, abs_tol=grain)
 
 
-def addFloatPrecision(x, grain=1e-2) -> Union[float, 'fractions.Fraction']:
+def addFloatPrecision(x, grain=1e-2) -> Union[float, Fraction]:
     '''
     Given a value that suggests a floating point fraction, like 0.33,
     return a Fraction or float that provides greater specification, such as Fraction(1, 3)
@@ -709,7 +709,7 @@ def unitBoundaryProportion(series: Sequence[int]) -> List[Tuple[Union[int, float
     '''
     unit = unitNormalizeProportion(series)
     bounds = []
-    summation = 0
+    summation = 0.0
     for index in range(len(unit)):
         if index != len(unit) - 1:  # not last
             bounds.append((summation, summation + unit[index]))
