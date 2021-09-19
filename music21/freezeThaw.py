@@ -679,7 +679,7 @@ class StreamFreezer(StreamFreezeThawBase):
             else:
                 fp.write(pickleString)
         elif fmt == 'jsonpickle':
-            import jsonpickle
+            import jsonpickle  # type: ignore
             data = jsonpickle.encode(storage, **keywords)
             if zipType == 'zlib':
                 data = zlib.compress(data.encode())
