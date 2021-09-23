@@ -125,10 +125,13 @@ def figuredBassFromStream(streamPart):
         '''
         # "64" and "#6#42" but not necessarily "4-3" or "sus4"
         stop_index_exclusive: int = 0
-        if inputText[0] in '#-' and len(inputText) > 1 and inputText[1].isnumeric():
+        if inputText[0] in '+#bn' and len(inputText) > 1 and inputText[1].isnumeric():
             stop_index_exclusive = 2
         elif inputText[0].isnumeric():
             stop_index_exclusive = 1
+        else:
+            # quit
+            stop_index_exclusive = 1000
         annotationString += inputText[:stop_index_exclusive]
         # Is there more?
         if inputText[stop_index_exclusive:]:
@@ -847,6 +850,13 @@ class Test(unittest.TestCase):
         third_note.lyric = '6\n4'
         unused_fb = figuredBassFromStream(s)
         self.assertEqual(third_note.notationString, '6, 4')
+
+        # single accidental
+        for single_symbol in '+#bn':
+            with self.subTest(single_symbol=single_symbol):
+                third_note.lyric = single_symbol
+                unused_fb = figuredBassFromStream(s)
+                self.assertEqual(third_note.notationString, single_symbol)
 
 
 if __name__ == '__main__':
