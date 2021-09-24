@@ -1218,7 +1218,8 @@ class SelectFilePath(SelectFromList):
         This looks at everything in Applications, as well as every directory in Applications
         '''
         post: List[str] = []
-        for path0 in ('/Applications', common.cleanpath('~/Applications')):
+        for path0 in ('/Applications', common.cleanpath('~/Applications', returnPathlib=False)):
+            assert isinstance(path0, str)
             self._getAppOSIndependent(comparisonFunction, path0, post, glob='*')
         return post
 
@@ -1593,7 +1594,7 @@ class ConfigurationAssistant:
 #         print('got: %s' % post)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[object] = []
 
 
 class TestUserInput(unittest.TestCase):  # pragma: no cover
