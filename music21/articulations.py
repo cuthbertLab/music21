@@ -78,7 +78,7 @@ A longer test showing the utility of the module:
     :width: 628
 
 '''
-from typing import Optional
+from typing import Optional, Type
 import unittest
 
 from music21 import base
@@ -107,7 +107,7 @@ class Articulation(base.Music21Object):
     >>> x.displayText = '>'
 
     '''
-    _styleClass = style.TextStyle
+    _styleClass: Type[style.Style] = style.TextStyle
 
     def __init__(self):
         super().__init__()
