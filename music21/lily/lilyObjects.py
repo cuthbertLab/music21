@@ -20,6 +20,7 @@ this replaces (April 2012) the old LilyString() conversion methods.
 The Grammar for Lilypond comes from
 http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
 '''
+from typing import Any, Dict, List
 import unittest
 from music21 import common
 from music21 import exceptions21
@@ -39,9 +40,9 @@ class LyObject(prebase.ProtoM21Object):
     ''
 
     '''
-    supportedClasses = []  # ordered list of classes to support
-    m21toLy = {}
-    defaultAttributes = {}
+    supportedClasses: List[object] = []  # ordered list of classes to support
+    m21toLy: Dict[str, dict] = {}
+    defaultAttributes: Dict[str, Any] = {}
     backslash = '\\'
 
     def __init__(self):
