@@ -11171,7 +11171,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 partDict[i] = p
             else:
                 voiceId = voiceIds[i]
-                p.id = str(self.id) + '-' + voiceId
+                p.id = str(self.id) + '-' + str(voiceId)
                 partDict[voiceId] = p
 
         def doOneMeasureWithVoices(mInner):
