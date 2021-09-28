@@ -87,6 +87,7 @@ from music21.common.classTools import tempAttribute
 from music21 import exceptions21
 from music21 import environment
 from music21 import style
+from music21 import spanner
 
 _MOD = 'articulations'
 environLocal = environment.Environment(_MOD)
@@ -583,10 +584,16 @@ class FrettedPluck(FretIndication, Fingering):
     '''
     pass
 
-class HammerOn(FretIndication):
+class HammerOn(spanner.Spanner, FretIndication):
+    '''
+    A hammer-on represented as a spanner between two Notes.
+    '''
     pass
 
-class PullOff(FretIndication):
+class PullOff(spanner.Spanner, FretIndication):
+    '''
+    A pull-off represented as a spanner between two Notes.
+    '''
     pass
 
 class FretBend(FretIndication):
@@ -692,4 +699,3 @@ _DOC_ORDER = [Articulation]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

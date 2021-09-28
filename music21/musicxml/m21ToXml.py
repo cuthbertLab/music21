@@ -3403,6 +3403,71 @@ class MeasureExporter(XMLExporterBase):
 
         return notations
 
+    def objectAttachedSpannersToTechnicals(self, obj, objectSpannerBundle=None):
+        '''
+        return a list of <technical> from spanners related to the object that should appear
+        in the technical tag of the notations tag (hammer-on, pull-off etc.)
+
+        >>> n0 = note.Note('C')
+        >>> n1 = note.Note('D')
+        >>> n2 = note.Note('F')
+        >>> n3 = note.Note('E')
+        >>> hammerOn01 = articulations.HammerOn([n0,n1])
+        >>> pullOff23 = articulations.PullOff([n2,n3])
+        >>> m = stream.Measure()
+        >>> m.insert(0, hammerOn01)
+        >>> m.insert(0, pullOff23)
+        >>> m.append(n0)
+        >>> m.append(n1)
+        >>> m.append(n2)
+        >>> m.append(n3)
+        >>> mex = musicxml.m21ToXml.MeasureExporter(m)
+        >>> out = mex.objectAttachedSpannersToTechnicals(n0, m.spannerBundle)
+        >>> out
+        [<Element 'hammer-on' at 0x102857f40>]
+        >>> mex.dump(out[0])
+        <hammer-on number="1" type="start">H</hammer-on>
+        >>> out = mex.objectAttachedSpannersToTechnicals(n3, m.spannerBundle)
+        >>> mex.dump(out[0])
+        <pull-off number="1" type="stop" />
+
+
+        '''
+        technicals = []
+        if objectSpannerBundle is not None:
+            sb = objectSpannerBundle
+        else:
+            sb = self.objectSpannerBundle
+
+        if not sb:
+            return technicals
+
+        for su in sb.getByClass('HammerOn'):
+            mxHammerOn = Element('hammer-on')
+            if su.isFirst(obj):
+                mxHammerOn.set('type', 'start')
+                mxHammerOn.text = 'H'
+            elif su.isLast(obj):
+                mxHammerOn.set('type', 'stop')
+            else:
+                continue
+            mxHammerOn.set('number', "1")
+            technicals.append(mxHammerOn)
+
+        for su in sb.getByClass('PullOff'):
+            mxPullOff = Element('pull-off')
+            if su.isFirst(obj):
+                mxPullOff.set('type', 'start')
+                mxPullOff.text = 'P'
+            elif su.isLast(obj):
+                mxPullOff.set('type', 'stop')
+            else:
+                continue
+            mxPullOff.set('number', "1")
+            technicals.append(mxPullOff)
+
+        return technicals
+
     def noteToXml(self, n: note.GeneralNote, noteIndexInChord=0, chordParent=None):
         # noinspection PyShadowingNames
         '''
@@ -4374,9 +4439,16 @@ class MeasureExporter(XMLExporterBase):
             pass
         else:
             notations.extend(self.objectAttachedSpannersToNotations(n))
+
         # TODO: slur
         # TODO: glissando
         # TODO: slide
+
+        spannerTechnicals = self.objectAttachedSpannersToTechnicals(n)
+        if spannerTechnicals:
+            if mxTechnicalMark is None:
+                mxTechnicalMark = Element('technical')
+            mxTechnicalMark.extend(spannerTechnicals)
 
         for x in (mxArticulations,
                   mxTechnicalMark,
@@ -4823,7 +4895,7 @@ class MeasureExporter(XMLExporterBase):
             musicXMLTechnicalName = 'other-technical'
 
         # TODO: support additional technical marks listed above
-        if musicXMLTechnicalName in ('hammer-on', 'pull-off', 'bend', 'hole', 'arrow'):
+        if musicXMLTechnicalName in ('bend', 'hole', 'arrow'):
             musicXMLTechnicalName = 'other-technical'
 
         mxTechnicalMark = Element(musicXMLTechnicalName)
