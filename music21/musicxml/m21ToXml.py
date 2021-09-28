@@ -3430,8 +3430,6 @@ class MeasureExporter(XMLExporterBase):
         >>> out = mex.objectAttachedSpannersToTechnicals(n3, m.spannerBundle)
         >>> mex.dump(out[0])
         <pull-off number="1" type="stop" />
-
-
         '''
         technicals = []
         if objectSpannerBundle is not None:
