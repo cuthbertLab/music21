@@ -2707,6 +2707,7 @@ class Test(unittest.TestCase):
         self.assertEqual(pull_n0.getSpannerSites()[0], pull_off)
         self.assertEqual(pull_n1.getSpannerSites()[0], pull_off)
 
+
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Spanner]
