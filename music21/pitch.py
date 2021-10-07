@@ -4670,14 +4670,15 @@ class Pitch(prebase.ProtoM21Object):
 
         # no pitches in past...
         if not pitchPastAll:
-            # if we have no past, we always need to show the accidental,
-            # unless this accidental is in the alteredPitches list
+            # if we have no past, we show the accidental if this accidental
+            # is not in the alteredPitches list, or vice versa for naturals
             if (self.accidental is not None
                     and self.accidental.displayStatus in (False, None)):
-                if not self._nameInKeySignature(alteredPitches):
-                    self.accidental.displayStatus = True
+                name_in_ks = self._nameInKeySignature(alteredPitches)
+                if self.accidental.name == 'natural':
+                    self.accidental.displayStatus = name_in_ks
                 else:
-                    self.accidental.displayStatus = False
+                    self.accidental.displayStatus = not name_in_ks
 
             # in case display set to True and in alteredPitches, makeFalse
             elif (self.accidental is not None
@@ -5404,7 +5405,7 @@ class Test(unittest.TestCase):
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         notes = bm[note.Note]
         self.assertEqual(notes[0].pitch.accidental.name, 'natural')     # Fn
-        self.assertEqual(notes[0].pitch.accidental.displayStatus, True)
+        self.assertEqual(notes[0].pitch.accidental.displayStatus, False)
         self.assertEqual(notes[1].pitch.accidental.name, 'natural')     # Fn
         self.assertEqual(notes[1].pitch.accidental.displayStatus, True)
         self.assertEqual(notes[2].pitch.accidental.name, 'flat')        # E-4
