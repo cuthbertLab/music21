@@ -4804,7 +4804,7 @@ class Pitch(prebase.ProtoM21Object):
                     self.accidental.displayStatus = False
                 return
 
-            # repeats of the same accidentally immediately following
+            # repeats of the same accidental immediately following
             # if An to An or A# to A#: do not need unless repeats requested,
             # regardless of if 'unless-repeated' is set, this will catch
             # a repeated case
@@ -4904,9 +4904,12 @@ class Pitch(prebase.ProtoM21Object):
 
             # going from a natural to an accidental, we should already be
             # showing the accidental, but just to check
-            # if A to A#, or A to A-, but not A# to A
+            # if A to A#, or A to A-, but not A# to A, nor A (implicit) to An (explicit)
             elif pPast.accidental is None and pSelf.accidental is not None:
-                self.accidental.displayStatus = True
+                if pSelf.accidental.name == 'natural':
+                    self.accidental.displayStatus = False
+                else:
+                    self.accidental.displayStatus = True
                 # environLocal.printDebug(['match previous no mark'])
                 setFromPitchPast = True
                 break
@@ -5104,15 +5107,15 @@ class Test(unittest.TestCase):
 
         a = Pitch('c')
         a.accidental = Accidental('natural')
-        a.accidental.displayStatus = False  # hide
+        a.accidental.displayStatus = True
         self.assertEqual(a.name, 'C')
-        self.assertFalse(a.accidental.displayStatus)
-
-        a.updateAccidentalDisplay(past, overrideStatus=True)
         self.assertTrue(a.accidental.displayStatus)
 
+        a.updateAccidentalDisplay(past, overrideStatus=True)
+        self.assertFalse(a.accidental.displayStatus)
+
         b = copy.deepcopy(a)
-        self.assertTrue(b.accidental.displayStatus)
+        self.assertFalse(b.accidental.displayStatus)
         self.assertEqual(b.accidental.name, 'natural')
 
     def testUpdateAccidentalDisplaySeries(self):
@@ -5420,6 +5423,13 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(notes[6].pitch.accidental)  # En5
         self.assertEqual(notes[6].pitch.accidental.name, 'natural')
         self.assertEqual(notes[6].pitch.accidental.displayStatus, True)
+
+    def testImplicitToExplicitNatural(self):
+        from music21 import converter
+        from music21 import note
+
+        p = converter.parse('tinyNotation: 4/4 f1 fn1')
+        self.assertIs(p[note.Note].last().pitch.accidental.displayStatus, None)
 
     def testPitchEquality(self):
         '''
