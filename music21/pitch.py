@@ -4959,10 +4959,11 @@ class Pitch(prebase.ProtoM21Object):
                 self.accidental.displayStatus = False
             # displayAccidentalIfNoPreviousAccidentals = False  # just to be sure
         elif not setFromPitchPast and self.accidental is not None:
-            if not self._nameInKeySignature(alteredPitches):
-                self.accidental.displayStatus = True
+            name_in_ks = self._nameInKeySignature(alteredPitches)
+            if self.accidental.name == 'natural':
+                self.accidental.displayStatus = name_in_ks
             else:
-                self.accidental.displayStatus = False
+                self.accidental.displayStatus = not name_in_ks
 
         # if we have natural that alters the key sig, create a natural
         elif not setFromPitchPast and self.accidental is None:
@@ -5428,8 +5429,17 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21 import note
 
-        p = converter.parse('tinyNotation: 4/4 f1 fn1')
-        self.assertIs(p[note.Note].last().pitch.accidental.displayStatus, None)
+        p = converter.parse('tinyNotation: 2/4 f4 fn4')
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(p[note.Note].last().pitch.accidental.displayStatus, False)
+
+    def testNaturalOutsideAlteredPitches(self):
+        from music21 import converter
+        from music21 import note
+
+        p = converter.parse('tinyNotation: 2/4 f4 dn4')
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(p[note.Note].last().pitch.accidental.displayStatus, False)
 
     def testPitchEquality(self):
         '''
