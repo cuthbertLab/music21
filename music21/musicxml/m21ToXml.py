@@ -3440,7 +3440,7 @@ class MeasureExporter(XMLExporterBase):
         if not sb:
             return technicals
 
-        for su in sb.getByClass('HammerOn'):
+        for su in sb.getByClass('articulations.HammerOn'):
             mxHammerOn = Element('hammer-on')
             if su.isFirst(obj):
                 mxHammerOn.set('type', 'start')
@@ -3452,7 +3452,7 @@ class MeasureExporter(XMLExporterBase):
             mxHammerOn.set('number', "1")
             technicals.append(mxHammerOn)
 
-        for su in sb.getByClass('PullOff'):
+        for su in sb.getByClass('articulations.PullOff'):
             mxPullOff = Element('pull-off')
             if su.isFirst(obj):
                 mxPullOff.set('type', 'start')
@@ -4870,13 +4870,9 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxOther)
         <other-technical>unda maris</other-technical>
 
-        Same with technical marks not yet supported.
-        TODO: support HammerOn, PullOff, Bend, Hole, Arrow.
-
         >>> h = articulations.HammerOn()
         >>> mxOther = MEX.articulationToXmlTechnical(h)
         >>> MEX.dump(mxOther)
-        <other-technical />
         '''
         # these technical have extra information
         # TODO: hammer-on
@@ -4893,7 +4889,7 @@ class MeasureExporter(XMLExporterBase):
             musicXMLTechnicalName = 'other-technical'
 
         # TODO: support additional technical marks listed above
-        if musicXMLTechnicalName in ('bend', 'hole', 'arrow'):
+        if musicXMLTechnicalName in ('bend', 'hole', 'arrow'):  # pragma: no cover
             musicXMLTechnicalName = 'other-technical'
 
         mxTechnicalMark = Element(musicXMLTechnicalName)
