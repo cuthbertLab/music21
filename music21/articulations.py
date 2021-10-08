@@ -584,13 +584,13 @@ class FrettedPluck(FretIndication, Fingering):
     '''
     pass
 
-class HammerOn(spanner.Spanner, FretIndication):
+class HammerOn(spanner.Spanner, TechnicalIndication):
     '''
     A hammer-on represented as a spanner between two Notes.
     '''
     pass
 
-class PullOff(spanner.Spanner, FretIndication):
+class PullOff(spanner.Spanner, TechnicalIndication):
     '''
     A pull-off represented as a spanner between two Notes.
     '''
