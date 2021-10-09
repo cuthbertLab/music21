@@ -3452,7 +3452,7 @@ class MeasureExporter(XMLExporterBase):
             mxHammerOn.set('number', "1")
             technicals.append(mxHammerOn)
 
-        for su in sb.getByClass('articulations.PullOff'):
+        for su in sb.getByClass(articulations.PullOff):
             mxPullOff = Element('pull-off')
             if su.isFirst(obj):
                 mxPullOff.set('type', 'start')
