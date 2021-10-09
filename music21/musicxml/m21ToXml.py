@@ -3440,7 +3440,7 @@ class MeasureExporter(XMLExporterBase):
         if not sb:
             return technicals
 
-        for su in sb.getByClass('articulations.HammerOn'):
+        for su in sb.getByClass(articulations.HammerOn):
             mxHammerOn = Element('hammer-on')
             if su.isFirst(obj):
                 mxHammerOn.set('type', 'start')
