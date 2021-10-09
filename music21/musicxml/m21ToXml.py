@@ -4872,7 +4872,8 @@ class MeasureExporter(XMLExporterBase):
 
         >>> h = articulations.HammerOn()
         >>> mxOther = MEX.articulationToXmlTechnical(h)
-        >>> MEX.dump(mxOther)
+        >>> MEX.dump(mxOther) is None
+        True
         '''
         # these technical have extra information
         # TODO: hammer-on
