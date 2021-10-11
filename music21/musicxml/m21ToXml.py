@@ -2896,7 +2896,6 @@ class MeasureExporter(XMLExporterBase):
             ('RehearsalMark', 'rehearsalMarkToXml'),
         ]
     )
-
     # these need to be wrapped in an attributes tag if not at the beginning of the measure.
     wrapAttributeMethodClasses = OrderedDict(
         [('Clef', 'clefToXml'),
@@ -4366,6 +4365,11 @@ class MeasureExporter(XMLExporterBase):
         Take information from .expressions,
         .articulations, and spanners to
         make the <notations> tag for a note.
+
+        >>> h = articulations.HammerOn()
+        >>> mxOther = MEX.articulationToXmlTechnical(h)
+        >>> MEX.dump(mxOther) is None
+        True
         '''
         mxArticulations = None
         mxTechnicalMark = None
@@ -4395,7 +4399,8 @@ class MeasureExporter(XMLExporterBase):
                 else:
                     notations.append(mxExpression)
 
-        # apply all articulations apart from fingerings only to first note of chord
+        # apply all articulations apart from fingerings and hammer-on/pull-off
+        # only to first note of chord
         applicableArticulations = []
         fingeringNumber = 0
         for a in chordOrNote.articulations:
@@ -4404,7 +4409,9 @@ class MeasureExporter(XMLExporterBase):
                     applicableArticulations.append(a)
                 fingeringNumber += 1
             elif isSingleNoteOrFirstInChord:
-                applicableArticulations.append(a)
+                # hammer-on/pull-off are written from their Spanner representation
+                if not isinstance(a, (articulations.HammerOn,articulations.PullOff)):
+                    applicableArticulations.append(a)
 
         for artObj in applicableArticulations:
             if isinstance(artObj, articulations.Pizzicato):
@@ -4414,6 +4421,7 @@ class MeasureExporter(XMLExporterBase):
             if isinstance(artObj, articulations.TechnicalIndication):
                 if mxTechnicalMark is None:
                     mxTechnicalMark = Element('technical')
+
                 mxTechnicalMark.append(self.articulationToXmlTechnical(artObj))
             else:
                 if mxArticulations is None:
@@ -4869,11 +4877,6 @@ class MeasureExporter(XMLExporterBase):
         >>> mxOther = MEX.articulationToXmlTechnical(g)
         >>> MEX.dump(mxOther)
         <other-technical>unda maris</other-technical>
-
-        >>> h = articulations.HammerOn()
-        >>> mxOther = MEX.articulationToXmlTechnical(h)
-        >>> MEX.dump(mxOther) is None
-        True
         '''
         # these technical have extra information
         # TODO: hammer-on
