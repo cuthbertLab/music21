@@ -6963,6 +6963,10 @@ class Test(unittest.TestCase):
         n1.articulations.append(a)
         n2 = note.Note()
         hammerOn = articulations.HammerOn([n1, n2])
+        m = stream.Measure()
+        m.insert(0, hammerOn)
+        m.append(n1)
+        m.append(n2)
 
         # Legal values for StringIndication begin at 1
         self.assertEqual(a.number, 0)
@@ -6970,6 +6974,9 @@ class Test(unittest.TestCase):
         gex = GeneralObjectExporter(n1)
         tree = et_fromstring(gex.parse().decode('utf-8'))
         self.assertIsNone(tree.find('.//string'))
+
+        mex = MeasureExporter(m)
+        tree = et_fromstring(mex.parse().decode('utf-8'))
         self.assertIsNone(tree.find('.//other-technical'))
 
     def testMeasurePadding(self):
