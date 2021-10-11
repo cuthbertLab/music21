@@ -4365,12 +4365,6 @@ class MeasureExporter(XMLExporterBase):
         Take information from .expressions,
         .articulations, and spanners to
         make the <notations> tag for a note.
-
-        >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> h = articulations.HammerOn()
-        >>> mxOther = MEX.articulationToXmlTechnical(h)
-        >>> MEX.dump(mxOther) is None
-        True
         '''
         mxArticulations = None
         mxTechnicalMark = None
@@ -6964,16 +6958,19 @@ class Test(unittest.TestCase):
         self.assertEqual(rest.get('measure'), 'yes')
 
     def testArticulationSpecialCases(self):
-        n = note.Note()
+        n1 = note.Note()
         a = articulations.StringIndication()
-        n.articulations.append(a)
+        n1.articulations.append(a)
+        n2 = note.Note()
+        hammerOn = articulations.HammerOn([n1, n2])
 
         # Legal values for StringIndication begin at 1
         self.assertEqual(a.number, 0)
         # Use GEX to go through wellformed object conversion
-        gex = GeneralObjectExporter(n)
+        gex = GeneralObjectExporter(n1)
         tree = et_fromstring(gex.parse().decode('utf-8'))
         self.assertIsNone(tree.find('.//string'))
+        self.assertIsNone(tree.find('.//other-technical'))
 
     def testMeasurePadding(self):
         from music21 import converter
