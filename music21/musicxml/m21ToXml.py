@@ -4410,7 +4410,7 @@ class MeasureExporter(XMLExporterBase):
                 fingeringNumber += 1
             elif isSingleNoteOrFirstInChord:
                 # hammer-on/pull-off are written from their Spanner representation
-                if not isinstance(a, (articulations.HammerOn,articulations.PullOff)):
+                if not isinstance(a, (articulations.HammerOn, articulations.PullOff)):
                     applicableArticulations.append(a)
 
         for artObj in applicableArticulations:
