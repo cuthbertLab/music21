@@ -4366,6 +4366,7 @@ class MeasureExporter(XMLExporterBase):
         .articulations, and spanners to
         make the <notations> tag for a note.
 
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> h = articulations.HammerOn()
         >>> mxOther = MEX.articulationToXmlTechnical(h)
         >>> MEX.dump(mxOther) is None
