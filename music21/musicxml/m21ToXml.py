@@ -3429,7 +3429,7 @@ class MeasureExporter(XMLExporterBase):
         >>> out = mex.objectAttachedSpannersToTechnicals(n3, m.spannerBundle)
         >>> mex.dump(out[0])
         <pull-off number="1" type="stop" />
-        
+
         OMIT_FROM_DOCS
 
         The other permutations of class and first/last:
