@@ -3940,12 +3940,12 @@ class MeasureParser(XMLParserBase):
             self.setColor(mxObj, slur)
 
         for mxObj in mxNotations.findall('technical/hammer-on'):
-            self.xmlOneSpanner(mxObj, n, articulations.HammerOn)
-            n.articulations.append(articulations.HammerOn())
+            hammerOn = self.xmlOneSpanner(mxObj, n, articulations.HammerOn)
+            n.articulations.append(hammerOn)
 
         for mxObj in mxNotations.findall('technical/pull-off'):
-            self.xmlOneSpanner(mxObj, n, articulations.PullOff)
-            n.articulations.append(articulations.PullOff())
+            pullOff = self.xmlOneSpanner(mxObj, n, articulations.PullOff)
+            n.articulations.append(pullOff)
 
         for tagSearch in ('glissando', 'slide'):
             for mxObj in mxNotations.findall(tagSearch):
