@@ -3429,6 +3429,17 @@ class MeasureExporter(XMLExporterBase):
         >>> out = mex.objectAttachedSpannersToTechnicals(n3, m.spannerBundle)
         >>> mex.dump(out[0])
         <pull-off number="1" type="stop" />
+
+        OMIT_FROM_DOCS
+
+        The other permutations of class and first/last:
+
+        >>> out = mex.objectAttachedSpannersToTechnicals(n1, m.spannerBundle)
+        >>> mex.dump(out[0])
+        <hammer-on number="1" type="stop" />
+        >>> out = mex.objectAttachedSpannersToTechnicals(n2, m.spannerBundle)
+        >>> mex.dump(out[0])
+        <pull-off number="1" type="start">P</pull-off>
         '''
         technicals = []
         if objectSpannerBundle is not None:
