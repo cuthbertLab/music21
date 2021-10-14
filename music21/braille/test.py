@@ -720,7 +720,9 @@ class Test(unittest.TestCase):
 
         bm = converter.parse("tinynotation: 3/4 e4 e8 a8 c'8 e'8 f'2.", makeNotation=False)
         bm.notes[0].pitch.accidental = pitch.Accidental()
+        bm.notes[0].pitch.accidental.displayStatus = True
         bm.notes[4].pitch.accidental = pitch.Accidental()
+        bm.notes[4].pitch.accidental.displayStatus = True
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[-1].rightBarline = None
