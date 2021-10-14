@@ -3446,6 +3446,7 @@ class MeasureExporter(XMLExporterBase):
             sb = objectSpannerBundle
         else:
             sb = self.objectSpannerBundle
+
         if not sb:
             return technicals
 
