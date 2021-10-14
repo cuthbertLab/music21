@@ -852,7 +852,9 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
     def __init__(self, specifier: Union[int, str, float] = 'natural'):
         super().__init__()
         # managed by properties
-        self._displayType = 'normal'  # always, never, unless-repeated, even-tied
+        self._displayType = 'normal'
+        # normal, always, never, if-absolutely-necessary,
+        # unless-repeated, even-tied
         self._displayStatus = None  # None, True, False
 
         # not yet managed by properties: TODO
@@ -1337,14 +1339,22 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         '''
         Returns or sets the display type of the accidental
 
-        "normal" (default) displays it if it is the first in measure,
+        `"normal"` (default) displays it if it is the first in measure,
         or is needed to contradict a previous accidental, etc.
 
         other valid terms:
-        "always", "never", "unless-repeated" (show always unless
-        the immediately preceding note is the same), "even-tied"
-        (stronger than always: shows even if it is tied to the
-        previous note)
+
+        * "always"
+        * "never"
+        * "unless-repeated" (show always unless
+          the immediately preceding note is the same)
+        * "even-tied" (stronger than always: shows even
+          if it is tied to the previous note)
+        * "if-absolutely-necessary" (display only if it is absolutely necessary,
+          like an F-natural after an F-sharp in the same measure, but not an
+          F-natural following an F-sharp directly across a barline.  Or an
+          F-natural in a different octave immediately following an F-sharp).
+          This is not yet implemented.
 
         >>> a = pitch.Accidental('flat')
         >>> a.displayType = 'unless-repeated'
@@ -1359,7 +1369,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
     @displayType.setter
     def displayType(self, value: str):
         if value not in ('normal', 'always', 'never',
-                         'unless-repeated', 'even-tied'):
+                         'unless-repeated', 'even-tied', "if-absolutely-necessary"):
             raise AccidentalException(f'Supplied display type is not supported: {value!r}')
         self._displayType = value
 
@@ -1367,7 +1377,9 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
     def displayStatus(self):
         '''
         Determines if this Accidental is to be displayed;
-        can be None (for not set), True, or False.
+        can be None (for not set), True, or False.  In general do not
+        set this, set .displayType instead.  Music21 will change displayStatus
+        at any time without warning.
 
         While `.displayType` gives general rules about when this accidental
         should be displayed or not, `displayStatus` determines whether after
@@ -4525,13 +4537,30 @@ class Pitch(prebase.ProtoM21Object):
         Determine if this pitch is in the collection of supplied altered
         pitches, derived from a KeySignature object
 
-        >>> a = pitch.Pitch('c#')
-        >>> b = pitch.Pitch('g#')
         >>> ks = key.KeySignature(2)
-        >>> a._nameInKeySignature(ks.alteredPitches)
-        True
+        >>> altered = ks.alteredPitches
+        >>> altered
+        [<music21.pitch.Pitch F#>, <music21.pitch.Pitch C#>]
 
-        >>> b._nameInKeySignature(ks.alteredPitches)
+        >>> cs = pitch.Pitch('c#')
+        >>> gs = pitch.Pitch('g#')
+        >>> cs._nameInKeySignature(altered)
+        True
+        >>> gs._nameInKeySignature(altered)
+        False
+
+        Note that False is returned regardless of the name if the
+        key signature has no entry for the pitch:
+
+        >>> pitch.Pitch('G')._nameInKeySignature(altered)
+        False
+
+        Other accidentals for pitches whose `.step` is in the
+        key signature also do not match:
+
+        >>> pitch.Pitch('F')._nameInKeySignature(altered)
+        False
+        >>> pitch.Pitch('C-')._nameInKeySignature(altered)
         False
         '''
         for p in alteredPitches:  # all are altered tones, must have acc
@@ -4593,7 +4622,9 @@ class Pitch(prebase.ProtoM21Object):
         octaves above a present natural, a natural sign is still displayed.
         Note that this has nothing to do with whether a sharp (not in the key
         signature) is found in a different octave from the same note in a
-        different octave.  The sharp must always be displayed.
+        different octave.  The sharp must always be displayed.  Notes
+        with displayType = 'if-absolutely-necessary' will ignore the True
+        setting.
 
         If `overrideStatus` is True, this method will ignore any current
         `displayStatus` setting found on the Accidental. By default this does
@@ -4602,7 +4633,9 @@ class Pitch(prebase.ProtoM21Object):
 
         If `cautionaryNotImmediateRepeat` is True, cautionary accidentals will
         be displayed for an altered pitch even if that pitch had already been
-        displayed as altered (unless it's an immediate repetition).
+        displayed as altered (unless it's an immediate repetition).  Notes
+        with displayType = 'if-absolutely-necessary' will ignore the True
+        setting.
 
         If `lastNoteWasTied` is True then this note will be treated as
         immediately following a tie.
@@ -4631,6 +4664,7 @@ class Pitch(prebase.ProtoM21Object):
         '''
         # N.B. -- this is a very complex method
         # do not alter it without significant testing.
+        acc = self.accidental
 
         if pitchPast is None:
             pitchPast = []
@@ -4698,9 +4732,11 @@ class Pitch(prebase.ProtoM21Object):
         # at this octave contradicts this pitch.  if so then no matter what
         # we need an accidental.
         for i in reversed(range(len(pitchPast))):
+            # check previous in measure.
             thisPPast = pitchPast[i]
             if thisPPast.step == self.step and thisPPast.octave == self.octave:
-                if thisPPast.name != self.name:  # conflicting alters, need accidental and return
+                # conflicting alters, need accidental and return
+                if thisPPast.name != self.name:
                     if self.accidental is None:
                         self.accidental = Accidental('natural')
                     self.accidental.displayStatus = True
@@ -5099,7 +5135,7 @@ class Test(unittest.TestCase):
         '''Test updating accidental display.
         '''
 
-        past = [Pitch('a3#'), Pitch('c#'), Pitch('c')]
+        past = [Pitch('A#3'), Pitch('C#'), Pitch('C')]
 
         a = Pitch('c')
         a.accidental = Accidental('natural')
