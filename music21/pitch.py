@@ -4907,7 +4907,7 @@ class Pitch(prebase.ProtoM21Object):
             # if A to A#, or A to A-, but not A# to A, nor A (implicit) to An (explicit)
             elif pPast.accidental is None and pSelf.accidental is not None:
                 if pSelf.accidental.name == 'natural':
-                    self.accidental.displayStatus = False
+                    self.accidental.displayStatus = self._stepInKeySignature(alteredPitches)
                 else:
                     self.accidental.displayStatus = True
                 # environLocal.printDebug(['match previous no mark'])
@@ -5426,11 +5426,17 @@ class Test(unittest.TestCase):
 
     def testImplicitToExplicitNatural(self):
         from music21 import converter
-        from music21 import note
+        from music21 import key
 
         p = converter.parse('tinyNotation: 2/4 f4 fn4')
+        last_note = p.recurse().notes.last()
         p.makeAccidentals(inPlace=True)
-        self.assertIs(p[note.Note].last().pitch.accidental.displayStatus, False)
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+        last_note.pitch.accidental.displayStatus = None
+        p['Measure'].first().insert(0, key.Key('C-'))
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
 
     def testNaturalOutsideAlteredPitches(self):
         from music21 import converter
