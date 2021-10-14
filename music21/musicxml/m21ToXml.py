@@ -3446,7 +3446,6 @@ class MeasureExporter(XMLExporterBase):
             sb = objectSpannerBundle
         else:
             sb = self.objectSpannerBundle
-
         if not sb:
             return technicals
 
@@ -4456,7 +4455,12 @@ class MeasureExporter(XMLExporterBase):
         # TODO: glissando
         # TODO: slide
 
-        spannerTechnicals = self.objectAttachedSpannersToTechnicals(n)
+        if isSingleNoteOrFirstInChord and chordParent is not None:
+            spannerTechnicals = self.objectAttachedSpannersToTechnicals(chordParent)
+        elif chordParent is not None:
+            spannerTechnicals = None
+        else:
+            spannerTechnicals = self.objectAttachedSpannersToTechnicals(n)
         if spannerTechnicals:
             if mxTechnicalMark is None:
                 mxTechnicalMark = Element('technical')
