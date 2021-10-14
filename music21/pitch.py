@@ -4558,11 +4558,20 @@ class Pitch(prebase.ProtoM21Object):
         Other accidentals for pitches whose `.step` is in the
         key signature also do not match:
 
-        >>> pitch.Pitch('F')._nameInKeySignature(altered)
+        >>> f = pitch.Pitch('F')
+        >>> f._nameInKeySignature(altered)
+        False
+        >>> f.accidental = pitch.Accidental('natural')
+        >>> f._nameInKeySignature(altered)
+        False
+        >>> pitch.Pitch('F##')._nameInKeySignature(altered)
         False
         >>> pitch.Pitch('C-')._nameInKeySignature(altered)
         False
         '''
+        if self.accidental is None:
+            return False
+
         for p in alteredPitches:  # all are altered tones, must have acc
             if p.step == self.step:  # A# to A or A# to A-, etc
                 if p.accidental.name == self.accidental.name:
