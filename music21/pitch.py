@@ -4670,15 +4670,15 @@ class Pitch(prebase.ProtoM21Object):
 
         # no pitches in past...
         if not pitchPastAll:
-            # if we have no past, we show the accidental if this accidental
-            # is not in the alteredPitches list, or vice versa for naturals
+            # if we have no past, we show the accidental if this pitch name
+            # is not in the alteredPitches list, or for naturals: if the
+            # step is IN the altered pitches
             if (self.accidental is not None
                     and self.accidental.displayStatus in (False, None)):
-                name_in_ks = self._nameInKeySignature(alteredPitches)
                 if self.accidental.name == 'natural':
-                    self.accidental.displayStatus = name_in_ks
+                    self.accidental.displayStatus = self._stepInKeySignature(alteredPitches)
                 else:
-                    self.accidental.displayStatus = not name_in_ks
+                    self.accidental.displayStatus = not self._nameInKeySignature(alteredPitches)
 
             # in case display set to True and in alteredPitches, makeFalse
             elif (self.accidental is not None
@@ -4959,11 +4959,10 @@ class Pitch(prebase.ProtoM21Object):
                 self.accidental.displayStatus = False
             # displayAccidentalIfNoPreviousAccidentals = False  # just to be sure
         elif not setFromPitchPast and self.accidental is not None:
-            name_in_ks = self._nameInKeySignature(alteredPitches)
             if self.accidental.name == 'natural':
-                self.accidental.displayStatus = name_in_ks
+                self.accidental.displayStatus = self._stepInKeySignature(alteredPitches)
             else:
-                self.accidental.displayStatus = not name_in_ks
+                self.accidental.displayStatus = not self._nameInKeySignature(alteredPitches)
 
         # if we have natural that alters the key sig, create a natural
         elif not setFromPitchPast and self.accidental is None:
@@ -5409,7 +5408,7 @@ class Test(unittest.TestCase):
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         notes = bm[note.Note]
         self.assertEqual(notes[0].pitch.accidental.name, 'natural')     # Fn
-        self.assertEqual(notes[0].pitch.accidental.displayStatus, False)
+        self.assertEqual(notes[0].pitch.accidental.displayStatus, True)
         self.assertEqual(notes[1].pitch.accidental.name, 'natural')     # Fn
         self.assertEqual(notes[1].pitch.accidental.displayStatus, True)
         self.assertEqual(notes[2].pitch.accidental.name, 'flat')        # E-4
@@ -5435,11 +5434,19 @@ class Test(unittest.TestCase):
 
     def testNaturalOutsideAlteredPitches(self):
         from music21 import converter
+        from music21 import key
         from music21 import note
 
         p = converter.parse('tinyNotation: 2/4 f4 dn4')
         p.makeAccidentals(inPlace=True)
-        self.assertIs(p[note.Note].last().pitch.accidental.displayStatus, False)
+        last_note = p[note.Note].last()
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+        # Rerun test with C-flat major
+        last_note.pitch.accidental.displayStatus = None
+        p['Measure'].first().insert(0, key.Key('C-'))
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, True)
 
     def testPitchEquality(self):
         '''
