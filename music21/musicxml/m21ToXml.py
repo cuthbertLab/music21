@@ -1592,7 +1592,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         #                meterStream, meterStream[0]])
         if not meterStream:
             # note: this will return a default if no meters are found
-            meterStream = s.recurse().getTimeSignatures(searchContext=False,
+            meterStream = s.flatten().getTimeSignatures(searchContext=False,
                                                         sortByCreationTime=True, returnDefault=True)
         self.meterStream = meterStream
 
