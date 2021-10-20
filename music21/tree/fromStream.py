@@ -30,7 +30,7 @@ def listOfTreesByClass(
     currentParentage: Optional[Tuple['music21.stream.Stream', ...]] = None,
     initialOffset: float = 0.0,
     flatten: Union[bool, str] = False,
-    classLists: List[Sequence[Type]]=None,
+    classLists: List[Sequence[Type]] = None,
     useTimespans: bool = False
 ) -> List[Union[trees.OffsetTree, timespanTree.TimespanTree]]:
     r'''
