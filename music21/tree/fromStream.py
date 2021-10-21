@@ -24,13 +24,80 @@ from music21.tree import timespanTree
 from music21.tree import trees
 
 
+TreeType = Union[trees.OffsetTree, trees.ElementTree, timespanTree.TimespanTree]
+
+
+def treeByClass(
+    inputStream: 'music21.stream.Stream',
+    *,
+    currentParentage: Optional[Tuple['music21.stream.Stream', ...]] = None,
+    initialOffset: float = 0.0,
+    flatten: Union[bool, str] = False,
+    classList: Sequence[Type] = (),
+    useTimespans: bool = False
+) -> Union[trees.OffsetTree, timespanTree.TimespanTree]:
+    if currentParentage is None:
+        currentParentage = (inputStream,)
+        # fix non-tuple classLists -- first call only...
+        if not common.isIterable(classList):
+            classList = (classList,)
+
+    lastParentage = currentParentage[-1]
+
+    if useTimespans:
+        treeClass = timespanTree.TimespanTree
+    else:
+        treeClass = trees.OffsetTree
+
+    outputTree = treeClass(source=lastParentage)
+
+    inputStreamElements = inputStream._elements[:] + inputStream._endElements
+
+    for element in inputStreamElements:
+        flat_offset = lastParentage.elementOffset(element) + initialOffset
+        wasStream = False
+
+        if (element.isStream and flatten is not True) or not element.isStream:
+            parentOffset = initialOffset
+            parentEndTime = initialOffset + lastParentage.duration.quarterLength
+            endTime = flat_offset + element.duration.quarterLength
+            if not classList or not element.classSet.isdisjoint(classList):
+                if useTimespans:
+                    if hasattr(element, 'pitches') and not isinstance(element, key.Key):
+                        spanClass = spans.PitchedTimespan
+                    else:
+                        spanClass = spans.ElementTimespan
+                    elementTimespan = spanClass(element=element,
+                                                parentage=tuple(reversed(currentParentage)),
+                                                parentOffset=parentOffset,
+                                                parentEndTime=parentEndTime,
+                                                offset=flat_offset,
+                                                endTime=endTime)
+                    outputTree.insert(elementTimespan)
+                else:
+                    outputTree.insert(flat_offset, element)
+
+        if element.isStream and flatten is not False:
+            element: 'music21.stream.Stream'
+            localParentage = currentParentage + (element,)
+            containedTree = treeByClass(element,
+                                        currentParentage=localParentage,
+                                        initialOffset=offset,
+                                        flatten=flatten,
+                                        classList=classList,
+                                        useTimespans=useTimespans,
+                                        )
+            outputTree.insert(containedTree[:])
+
+    return outputTree
+
 def listOfTreesByClass(
     inputStream: 'music21.stream.Stream',
     *,
     currentParentage: Optional[Tuple['music21.stream.Stream', ...]] = None,
     initialOffset: float = 0.0,
     flatten: Union[bool, str] = False,
-    classLists: List[Sequence[Type]] = None,
+    classLists: Optional[List[Sequence[Type]]] = None,
     useTimespans: bool = False
 ) -> List[Union[trees.OffsetTree, timespanTree.TimespanTree]]:
     r'''
@@ -79,6 +146,10 @@ def listOfTreesByClass(
     [<TimespanTree {12} (0.0 to 8.0) <music21.stream.Score ...>>,
      <TimespanTree {4} (0.0 to 0.0) <music21.stream.Score ...>>]
     '''
+    outputTrees = []
+    for classList in classLists:
+        thisTree = treeByClass(source=inputStream, )
+
     if currentParentage is None:
         currentParentage = (inputStream,)
         # fix non-tuple classLists -- first call only...
@@ -155,7 +226,7 @@ def asTree(
     classList: Optional[Sequence[Type]] = None,
     useTimespans: bool = False,
     groupOffsets: bool = False
-) -> Union[trees.OffsetTree, trees.ElementTree, timespanTree.TimespanTree]:
+) -> TreeType:
     '''
     Converts a Stream and constructs an :class:`~music21.tree.trees.ElementTree` based on this.
 
@@ -205,10 +276,11 @@ def asTree(
 
     '''
     def recurseGetTreeByClass(
-            innerStream,
-            currentParentage,
-            initialOffset,
-            inner_outputTree=None):
+        innerStream: 'music21.stream.Stream',
+        currentParentage: Tuple['music21.stream.Stream', ...],
+        initialOffset: float,
+        inner_outputTree: Optional[TreeType] = None
+    ) -> TreeType:
         lastParentage = currentParentage[-1]
 
         if inner_outputTree is None:
@@ -222,6 +294,7 @@ def asTree(
             flatOffset = common.opFrac(lastParentage.elementOffset(element) + initialOffset)
 
             if element.isStream and flatten is not False:  # True or 'semiFlat'
+                element: 'music21.stream.Stream'
                 localParentage = currentParentage + (element,)
                 recurseGetTreeByClass(element,  # put the elements into the current tree...
                                       currentParentage=localParentage,
@@ -257,10 +330,10 @@ def asTree(
     # first time through...
     if useTimespans:
         treeClass = timespanTree.TimespanTree
-    elif groupOffsets is False:
-        treeClass = trees.ElementTree
-    else:
+    elif groupOffsets:
         treeClass = trees.OffsetTree
+    else:
+        treeClass = trees.ElementTree
 
     # this lets us use the much faster populateFromSortedList -- the one-time
     # sort in C is faster than the node implementation.
