@@ -1479,8 +1479,8 @@ class ConfigurationAssistant:
 
     def _introduction(self):
         msg = []
-        msg.append('Welcome the music21 Configuration Assistant. You will be guided '
-                   + 'through a number of questions to install and setup music21. '
+        msg.append('Welcome to the music21 Configuration Assistant. You will be guided '
+                   + 'through a number of questions to install and set up music21. '
                    + 'Simply pressing return at a prompt will select a default, if available.')
         msg.append('')  # will cause a line break
         msg.append('You may run this configuration again at a later time '

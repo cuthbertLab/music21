@@ -1568,7 +1568,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 continue
 
             # Anything that messes with ._elements or ._endElements should be in core.py
-            #     TODO: move it...
+            # TODO: move it...
             matchedEndElement = False
             baseElementCount = len(self._elements)
             matchOffset = 0.0  # to avoid possibility of undefined
@@ -11173,7 +11173,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 partDict[i] = p
             else:
                 voiceId = voiceIds[i]
-                p.id = str(self.id) + '-' + voiceId
+                p.id = str(self.id) + '-' + str(voiceId)
                 partDict[voiceId] = p
 
         def doOneMeasureWithVoices(mInner):
@@ -13484,8 +13484,22 @@ class Part(Stream):
     ):
         '''
         This overridden method of Stream.makeAccidentals
-        provides the management of passing pitches from
-        a past Measure to each new measure for processing.
+        walks measures to arrive at desired values for keyword arguments
+        `tiePitchSet` and `pitchPastMeasure` when calling `makeAccidentals()`
+        on each Measure.
+
+        1. Ties across barlines are detected so that accidentals are not
+        unnecessarily reiterated. (`tiePitchSet`)
+
+        2. Pitches appearing on the same step in an immediately preceding measure,
+        if foreign to the key signature of that previous measure,
+        are printed with cautionary accidentals in the subsequent measure.
+        (`pitchPastMeasure`)
+
+        Most of the logic has been factored out to
+        :meth:`~music21.stream.makeNotation.makeAccidentalsInMeasureStream`,
+        which is called after managing the `inPlace` keyword and finding
+        measures to iterate.
 
         Changed in v.7 -- `inPlace` defaults False
         '''
