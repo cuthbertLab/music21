@@ -4708,7 +4708,8 @@ class Pitch(prebase.ProtoM21Object):
                 return  # exit: already set, do not override
 
         if acc and acc.displayType == 'never':
-            acc.displayStatus = True
+            acc.displayStatus = False
+            return
 
         if lastNoteWasTied is True:
             if acc is not None:
