@@ -1352,7 +1352,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
           if it is tied to the previous note)
         * "if-absolutely-necessary" (display only if it is absolutely necessary,
           like an F-natural after an F-sharp in the same measure, but not an
-          F-natural following an F-sharp directly across a barline.  Or an
+          F-natural following an F-sharp directly across a barline.  Nor an
           F-natural in a different octave immediately following an F-sharp).
           This is not yet implemented.
 
