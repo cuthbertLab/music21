@@ -2405,6 +2405,9 @@ def fromString(instrumentString):
                 englishName = instrumentLookup.allToBestName[substring]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
             thisInstClass = getattr(this_module, className)
+            # In case users have overridden the module and imported more things
+            if base.Music21Object not in thisInstClass.__mro__:  # pragma: no cover
+                raise KeyError
             thisInstrument = thisInstClass()
             thisBestName = thisInstrument.bestName().lower()
             if (bestInstClass is None
