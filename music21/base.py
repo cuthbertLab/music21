@@ -412,7 +412,7 @@ class Music21Object(prebase.ProtoM21Object):
     @property
     def id(self):
         '''
-        A unique identification string; not to be confused with Python's
+        A unique identification string or int; not to be confused with Python's
         built-in `id()` method. However, if not set, will return
         Python's `id()` number.
 
