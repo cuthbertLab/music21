@@ -1030,7 +1030,7 @@ class IntervalNetwork:
                 if nodeId == nStep:
                     post.append(self.nodes[nId])
             # if no matches, and moduli comparisons are permitted
-            if post == [] and permitDegreeModuli:
+            if not post and permitDegreeModuli:
                 for nId, nStep in nodeStep.items():
                     if self.degreeModulus(nodeId) == nStep:
                         post.append(self.nodes[nId])
