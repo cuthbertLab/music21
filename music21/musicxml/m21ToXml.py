@@ -3459,7 +3459,7 @@ class MeasureExporter(XMLExporterBase):
                 mxHammerOn.set('type', 'stop')
             else:
                 continue
-            mxHammerOn.set('number', "1")
+            mxHammerOn.set('number', '1')
             technicals.append(mxHammerOn)
 
         for su in sb.getByClass(articulations.PullOff):
@@ -3471,7 +3471,7 @@ class MeasureExporter(XMLExporterBase):
                 mxPullOff.set('type', 'stop')
             else:
                 continue
-            mxPullOff.set('number', "1")
+            mxPullOff.set('number', '1')
             technicals.append(mxPullOff)
 
         return technicals
