@@ -3508,8 +3508,8 @@ class MeasureExporter(XMLExporterBase):
             chordOrN = n
         else:
             chordOrN = chordParent
-            # Ensure color is read from `n`, since only `chordOrN` is handled below
-            self.setColor(mxNote, n)
+            # Ensure style is read from `n` before reading from `chordOrN`
+            self.setPrintStyle(mxNote, n)  # sets color
 
         # self.setFont(mxNote, chordOrN)
         self.setPrintStyle(mxNote, chordOrN)  # sets color
@@ -3912,17 +3912,18 @@ class MeasureExporter(XMLExporterBase):
         </note>
 
 
-        Test that notehead translation works:
+        Test that notehead and style translation works:
 
         >>> g = pitch.Pitch('g3')
         >>> h = note.Note('b4')
         >>> h.notehead = 'diamond'
         >>> h.style.color = 'gold'
+        >>> h.style.absoluteX = 176
         >>> ch2 = chord.Chord([g, h])
         >>> ch2.quarterLength = 2.0
         >>> mxNoteList = MEX.chordToXml(ch2)
         >>> MEX.dump(mxNoteList[1])
-        <note color="#FFD700">
+        <note color="#FFD700" default-x="176">
           <chord />
           <pitch>
             <step>B</step>
