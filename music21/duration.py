@@ -745,6 +745,12 @@ def convertTypeToQuarterLength(
     ).
     >>> duration.convertTypeToQuarterLength('half', dots=1, dotGroups=[1, 1])
     4.5
+
+    Unknown values raise `DurationException`:
+
+    >>> duration.convertTypeToQuarterLength('minim')
+    Traceback (most recent call last):
+    music21.duration.DurationException: no such type (minim) available for conversion
     '''
     if dType in typeToDuration:
         durationFromType = typeToDuration[dType]
@@ -898,6 +904,12 @@ def durationTupleFromTypeDots(durType='quarter', dots=0):
     >>> dt = duration.durationTupleFromTypeDots(durType='zero', dots=0)
     >>> dt
     DurationTuple(type='zero', dots=0, quarterLength=0.0)
+
+    Unknown values raise `DurationException`:
+
+    >>> dt = duration.durationTupleFromTypeDots(durType='minim', dots=0)
+    Traceback (most recent call last):
+    music21.duration.DurationException: Unknown type: minim
 
     OMIT_FROM_DOCS
 
