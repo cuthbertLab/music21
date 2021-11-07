@@ -2506,17 +2506,12 @@ Barline final ⠣⠅
         m[2].append(spanner.Slur(m[0].notes[0], m[2].notes[0]))
         m[3].append(spanner.Slur(m[2].notes[0], m[3].notes[0]))
         m[3].rightBarline = None
-
-        # need two copies because of a bug...
-        import copy
-        bmm = copy.deepcopy(bm)
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠰⠃⠐⠎⠺⠀⠊⠨⠛⠋⠑⠙⠚⠀⠰⠃⠘⠆⠪⠚⠙⠑⠋⠀⠟⠄⠘⠆
         '''
-        self.s = bmm
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -2549,15 +2544,12 @@ Barline final ⠣⠅
         m = bm.getElementsByClass('Measure')
         m[-1].append(spanner.Slur(m[0].notes[0], m[-1].notes[-1]))
         m[-1].rightBarline = None
-        import copy
-        bmm = copy.deepcopy(bm)
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
         ⠰⠃⠨⠟⠄⠈⠉⠀⠛⠙⠑⠙⠚⠊⠘⠆
         '''
-        self.s = bmm
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
@@ -2571,15 +2563,12 @@ Barline final ⠣⠅
         ml = bm.getElementsByClass('Measure').last()
         ml.append(spanner.Slur(ml.notes.first(), ml.notes.last()))
         ml.rightBarline = None
-        import copy
-        bmm = copy.deepcopy(bm)
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
         ⠨⠟⠄⠈⠉⠀⠰⠃⠛⠙⠑⠙⠚⠊⠘⠆
         '''
-        self.s = bmm
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
@@ -2592,15 +2581,12 @@ Barline final ⠣⠅
         m = bm.getElementsByClass('Measure')
         m[-1].append(spanner.Slur(m[0].notes[0], m[-1].notes[-1]))
         m[-1].rightBarline = None
-        import copy
-        bmm = copy.deepcopy(bm)
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠈⠉⠀⠹⠘⠆⠧⠧
         '''
-        self.s = bmm
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
@@ -2613,15 +2599,11 @@ Barline final ⠣⠅
         m = bm.getElementsByClass('Measure')
         m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[0]))
         m[-1].rightBarline = None
-        import copy
-        bmm = copy.deepcopy(bm)
-        self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠘⠆⠈⠉⠀⠹⠧⠧
         '''
-        self.s = bmm
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
