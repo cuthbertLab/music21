@@ -144,7 +144,10 @@ class ChordReducer:
                 c.offset = int(cOffsetCurrent)
                 c.quarterLength += cOffsetSyncop
 
-
+        # Remove zero-duration chords
+        for c in list(mObj):
+            if not c.quarterLength:
+                mObj.remove(c)
 
         return mObj
         # closed position
@@ -289,7 +292,7 @@ class ChordReducer:
                     cLast.quarterLength += newOffset - cLastEnd
             cLast = cElCopy
             cLastEnd = newOffset + cElCopy.quarterLength
-            m.coreInsert(newOffset, cElCopy)
+            m.coreInsert(newOffset, cElCopy, ignoreSort=True)
 
         tsContext = mI.parts.first().getContextByClass('TimeSignature')
         if tsContext is not None:
@@ -336,7 +339,6 @@ class Test(unittest.TestCase):
 class TestExternal(unittest.TestCase):
     show = True
 
-    @unittest.expectedFailure
     def testTrecentoMadrigal(self):
         from music21 import corpus
         # c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
