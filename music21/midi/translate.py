@@ -584,7 +584,7 @@ def midiEventsToChord(
         <music21.midi.MidiEvent NOTE_ON, track=1, channel=None, pitch=46, velocity=94>]
 
     Changed in v.7 -- Uses the last DeltaTime in the list to get the end time.
-    Changed in v.7.3 -- Returns a :class:`~music21.percussion.PercussionChord` if the
+    Changed in v.7.3 -- Returns a :class:`~music21.percussion.PercussionChord` if
     any event is on channel 10. Returns None if `inputM21` provided.
 
     >>> me2.channel = 10
