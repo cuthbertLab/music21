@@ -3787,7 +3787,7 @@ class Test(unittest.TestCase):
 
     def testExceptions(self):
         '''
-        These errors consitute user errors, so they raise generic exceptions
+        These errors are user errors, so they raise generic exceptions
         so that catches for DurationException only get library calculation
         failures (e.g. bound checking).
         '''
