@@ -51,7 +51,7 @@ import copy
 import fractions
 import io
 import unittest
-from math import inf
+from math import inf, isnan
 from typing import Union, Tuple, Dict, List, Optional, Iterable
 
 from collections import namedtuple
@@ -1816,6 +1816,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self._updateComponents()
 
         if isinstance(dur, DurationTuple):
+            if isnan(dur.quarterLength):
+                raise ValueError('Invalid quarterLength for DurationTuple: nan')
             self._components.append(dur)
         elif isinstance(dur, Duration):  # it's a Duration object
             for c in dur.components:
@@ -3784,8 +3786,22 @@ class Test(unittest.TestCase):
         self.assertEqual(d.expressionIsInferred, False)
 
     def testExceptions(self):
+        '''
+        These errors consitute user errors, so they raise generic exceptions
+        so that catches for DurationException only get library calculation
+        failures (e.g. bound checking).
+        '''
         with self.assertRaises(TypeError):
-            unused = Duration('redundant type', type='eighth')
+            Duration('redundant type', type='eighth')
+        dt = DurationTuple(None, None, float('nan'))
+        msg = 'Invalid quarterLength for DurationTuple: nan'
+        with self.assertRaisesRegex(ValueError, msg):
+            Duration(dt)
+        # opFrac raises the ValueError for Duration(float('nan')), but
+        # if opFrac ever changes still need to block creating duration
+        # could cause infinite loop in makeMeasures() since nan != 0.0
+        with self.assertRaises(ValueError):
+            Duration(float('nan'))
 
         d = Duration(1 / 3)
         with self.assertRaises(TypeError):
