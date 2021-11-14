@@ -774,8 +774,8 @@ def midiEventsToInstrument(eventList):
             i = instrument.fromString(decoded)
         elif event.channel == 10:
             pm = percussion.PercussionMapper()
-            # PercussionMapper.midiPitchToInstrument() is 1-indexed
-            i = pm.midiPitchToInstrument(event.data + 1)
+            # PercussionMapper.midiPitchToInstrument() is 0-indexed
+            i = pm.midiPitchToInstrument(event.data)
             i.midiProgram = event.data
         else:
             i = instrument.instrumentFromMidiProgram(event.data)
