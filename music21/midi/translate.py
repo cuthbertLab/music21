@@ -29,7 +29,6 @@ from music21 import environment
 from music21 import stream
 
 from music21.instrument import Conductor, deduplicate
-from music21.midi import percussion
 
 _MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
