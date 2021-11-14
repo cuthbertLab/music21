@@ -750,7 +750,7 @@ def midiEventsToInstrument(eventList):
     >>> me.channel = 10
     >>> i = midi.translate.midiEventsToInstrument(me)
     >>> i
-    <music21.instrument.Tambourine 'Tambourine'>
+    <music21.instrument.UnpitchedPercussion 'Percussion'>
     >>> i.midiChannel  # 0-indexed in music21
     9
     >>> i.midiProgram  # 0-indexed in music21
@@ -773,9 +773,8 @@ def midiEventsToInstrument(eventList):
             decoded = decoded.strip()
             i = instrument.fromString(decoded)
         elif event.channel == 10:
-            pm = percussion.PercussionMapper()
-            # PercussionMapper.midiPitchToInstrument() is 0-indexed
-            i = pm.midiPitchToInstrument(event.data)
+            # Can only get correct instruments from reading NOTE_ON
+            i = instrument.UnpitchedPercussion()
             i.midiProgram = event.data
         else:
             i = instrument.instrumentFromMidiProgram(event.data)
@@ -786,11 +785,6 @@ def midiEventsToInstrument(eventList):
             f'Unable to determine instrument from {event}; getting generic Instrument',
             TranslateWarning)
         i = instrument.Instrument()
-    except percussion.MIDIPercussionException:
-        warnings.warn(
-            f'Unable to determine instrument from {event}; getting generic UnpitchedPercussion',
-            TranslateWarning)
-        i = instrument.UnpitchedPercussion()
     except instrument.InstrumentException:
         # Debug logging would be better than warning here
         i = instrument.Instrument()
@@ -3855,12 +3849,8 @@ class Test(unittest.TestCase):
         event.channel = 10
         event.type = midiModule.ChannelVoiceMessages.PROGRAM_CHANGE
 
-        expected = 'Unable to determine instrument from '
-        expected += '<music21.midi.MidiEvent PROGRAM_CHANGE, track=None, channel=10, data=0>'
-        expected += '; getting generic UnpitchedPercussion'
-        with self.assertWarnsRegex(TranslateWarning, expected):
-            i = midiEventsToInstrument(event)
-            self.assertIsInstance(i, instrument.UnpitchedPercussion)
+        i = midiEventsToInstrument(event)
+        self.assertIsInstance(i, instrument.UnpitchedPercussion)
 
     def testConductorStream(self):
         s = stream.Stream()
