@@ -113,7 +113,6 @@ def main(fnAccept=None, strict=False):
         # can be fine...
         'too-many-boolean-expressions',
 
-        'misplaced-comparison-constant',  # sometimes 2 < x is what we want
         'unsubscriptable-object',  # unfortunately, thinks that Streams are unsubscriptable.
 
         # sometimes .keys() is a good test against
