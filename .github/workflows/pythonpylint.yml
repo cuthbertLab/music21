@@ -27,6 +27,7 @@ jobs:
             - name: Lint with pylint
               run: |
                   pylint -j0 music21
+                  pylint -j0 documentation
 
     flake:
         runs-on: ubuntu-latest

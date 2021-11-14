@@ -920,7 +920,7 @@ class ClassDocumenter(ObjectDocumenter):
         result = []
         if self.docAttr:
             for attrName, attrDescription in sorted(self.docAttr.items()):
-                lastRef = self.referentPackageSystemPath.split('.')[-1]
+                lastRef = self.referentPackageSystemPath.rsplit('.', maxsplit=1)[-1]
                 path = f'{lastRef}.{attrName}'
                 directive = f'.. attribute:: {path}'
                 result.extend((directive, ''))
