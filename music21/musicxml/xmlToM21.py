@@ -5698,7 +5698,6 @@ class MeasureParser(XMLParserBase):
             tuning_pitches = []
             for i in range(len(mxStaffTuning)):
                 staff_tuning = mxStaffTuning[i]
-                line = int(staff_tuning.get('line'))
                 tuning_step = staff_tuning.find('tuning-step').text
                 tuning_octave = int(staff_tuning.find('tuning-octave').text)
                 tuning_pitches.append(pitch.Pitch(tuning_step + str(tuning_octave)))
