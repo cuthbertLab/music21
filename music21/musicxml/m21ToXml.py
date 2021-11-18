@@ -6062,6 +6062,16 @@ class MeasureExporter(XMLExporterBase):
             mxStaffLines.text = str(staffLayout.staffLines)
 
         # TODO: staff-tuning
+        if hasattr(staffLayout, 'fretboard'):
+            tuning_pitches = staffLayout.fretboard.tuning
+            for i in range(len(tuning_pitches)):
+                mxStaffTuning = SubElement(mxStaffDetails, 'staff-tuning')
+                mxStaffTuning.set('line', str(i + 1))
+                mxTuningStep = SubElement(mxStaffTuning, 'tuning-step')
+                mxTuningStep.text = tuning_pitches[i].name
+                mxTuningOctave = SubElement(mxStaffTuning, 'tuning-octave')
+                mxTuningOctave.text = str(tuning_pitches[i].octave)
+
         # TODO: capo
         # TODO: staff-size
         return mxStaffDetails

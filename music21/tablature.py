@@ -244,6 +244,13 @@ class FretBoard(prebase.ProtoM21Object):
 
         return pitchList
 
+    @staticmethod
+    def getFretBoardFromTuning(pitches):
+        standard_fret_boards = [GuitarFretBoard, UkeleleFretBoard, BassGuitarFretBoard, MandolinFretBoard]
+        for standard_fret_board in standard_fret_boards:
+            if pitches == standard_fret_board().tuning:
+                return standard_fret_board()
+        return CustomFretBoard(pitches)
 
 class FirstFret:
     '''
@@ -344,6 +351,17 @@ class MandolinFretBoard(FretBoard):
         super().__init__(numStrings, fretNotes, displayFrets)
 
         self.tuning = [pitch.Pitch('G3'), pitch.Pitch('D4'), pitch.Pitch('A4'), pitch.Pitch('E5')]
+
+class CustomFretBoard(FretBoard):
+    '''
+    A custom fretboard tuned with any list of pitches
+    '''
+
+    def __init__(self, pitches, fretNotes=None, displayFrets=4):
+        numStrings = len(pitches)
+        super().__init__(numStrings, fretNotes, displayFrets)
+
+        self.tuning = pitches.copy()
 # ------------------------------------------------------------------------------
 
 

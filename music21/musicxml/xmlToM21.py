@@ -5691,7 +5691,20 @@ class MeasureParser(XMLParserBase):
                 stl.staffType = stream.enums.StaffType(xmlText)
             except ValueError:
                 environLocal.warn(f'Got an incorrect staff-type in details: {mxStaffType}')
+
         # TODO: staff-tuning*
+        mxStaffTuning = mxDetails.findall('staff-tuning')
+        if mxStaffTuning is not None:
+            tuning_pitches = []
+            for i in range(len(mxStaffTuning)):
+                staff_tuning = mxStaffTuning[i]
+                line = int(staff_tuning.get('line'))
+                tuning_step = staff_tuning.find('tuning-step').text
+                tuning_octave = int(staff_tuning.find('tuning-octave').text)
+                tuning_pitches.append(pitch.Pitch(tuning_step + str(tuning_octave)))
+            fretboard = tablature.FretBoard.getFretBoardFromTuning(tuning_pitches)
+            setattr(stl, 'fretboard', fretboard)
+
         # TODO: capo
         # TODO: show-frets
         # TODO: print-spacing
