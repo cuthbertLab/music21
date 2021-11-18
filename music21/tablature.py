@@ -246,7 +246,8 @@ class FretBoard(prebase.ProtoM21Object):
 
     @staticmethod
     def getFretBoardFromTuning(pitches):
-        standard_fret_boards = [GuitarFretBoard, UkeleleFretBoard, BassGuitarFretBoard, MandolinFretBoard]
+        standard_fret_boards = [GuitarFretBoard, UkeleleFretBoard,
+        BassGuitarFretBoard, MandolinFretBoard]
         for standard_fret_board in standard_fret_boards:
             if pitches == standard_fret_board().tuning:
                 return standard_fret_board()
