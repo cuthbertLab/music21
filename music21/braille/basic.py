@@ -13,7 +13,8 @@ import unittest
 from typing import List
 
 # from music21 import articulations
-from music21 import articulations, clef
+from music21 import articulations
+from music21 import clef
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
