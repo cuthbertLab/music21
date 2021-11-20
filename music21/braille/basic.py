@@ -13,7 +13,7 @@ import unittest
 from typing import List
 
 # from music21 import articulations
-from music21 import clef
+from music21 import articulations, clef
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
@@ -558,8 +558,8 @@ def yieldBrailleArticulations(noteEl):
 
     '''
     def _brailleArticulationsSortKey(inner_articulation):
-        isBowing = 'Bowing' in inner_articulation.classes
-        isStaccato = 'Staccato' in inner_articulation.classes
+        isBowing = isinstance(inner_articulation, articulations.Bowing)
+        isStaccato = isinstance(inner_articulation, articulations.Staccato)
         # need True to sort before False (reverse alphabetical)
         return (not isBowing, not isStaccato, inner_articulation.name)
 
