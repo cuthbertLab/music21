@@ -1046,8 +1046,8 @@ class BrailleSegment(text.BrailleText):
             for noteIndexStart_outer in range(len(allNotes_outer)):
                 music21NoteStart_outer = allNotes_outer[noteIndexStart_outer]
                 for artic_outer in music21NoteStart_outer.articulations:
-                    if ('TechnicalIndication' not in artic_outer.classes
-                            or 'Bowing' in artic_outer.classes):
+                    if (not isinstance(artic_outer, articulations.TechnicalIndication)
+                            or isinstance(artic_outer, articulations.Bowing)):
                         fixOneArticulation(
                             artic_outer,
                             music21NoteStart_outer,
