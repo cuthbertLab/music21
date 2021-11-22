@@ -13,6 +13,7 @@ import unittest
 from typing import List
 
 # from music21 import articulations
+from music21 import articulations
 from music21 import clef
 from music21 import duration
 from music21 import environment
@@ -518,7 +519,11 @@ def yieldBrailleArticulations(noteEl):
     "When a staccato or staccatissimo is shown with any of the other
     [before note expressions], it is brailled first."
 
-    Beyond that, we yield in alphabetical order
+    "The up-bow and down-bow marks for bowed string instruments are brailled before any other
+    signs from Column A and before an ornament." (BMTM, 114)
+
+    Beyond that, we yield in alphabetical order, which happens to satisfy this:
+    "When an accent is shown with a tenuto, the accent is brailled first." (BMTM, 113)
 
     For reference:
 
@@ -530,31 +535,46 @@ def yieldBrailleArticulations(noteEl):
     >>> print(brailleArt['accent'])
     ⠨⠦
 
+    >>> brailleBowings = braille.lookup.bowingSymbols
+    >>> print(brailleBowings['down bow'])
+    ⠣⠃
+    >>> print(brailleBowings['up bow'])
+    ⠣⠄
+
     >>> n = note.Note()
+    >>> n.articulations.append(articulations.DownBow())
     >>> n.articulations.append(articulations.Tenuto())
     >>> n.articulations.append(articulations.Staccato())
     >>> n.articulations.append(articulations.Accent())
+    >>> n.articulations.append(articulations.Scoop())  # example unsupported articulation
 
-    This will yield in order: Staccato, Accent, Tenuto.
+    This will yield in order: DownBow, Staccato, Accent, Tenuto.
 
     >>> for brailleArt in braille.basic.yieldBrailleArticulations(n):
     ...     print(brailleArt)
+    ⠣⠃
     ⠦
     ⠨⠦
     ⠸⠦
 
     '''
     def _brailleArticulationsSortKey(inner_articulation):
-        isStaccato = (inner_articulation.name not in ('staccato', 'staccatissimo'))
-        return (isStaccato, inner_articulation.name)
+        isBowing = isinstance(inner_articulation, articulations.Bowing)
+        isStaccato = isinstance(inner_articulation, articulations.Staccato)
+        # need True to sort before False (reverse alphabetical)
+        return (not isBowing, not isStaccato, inner_articulation.name)
 
     if hasattr(noteEl, 'articulations'):  # should be True, but safe side.
         for art in sorted(noteEl.articulations, key=_brailleArticulationsSortKey):
-            if art.name in lookup.beforeNoteExpr:
+            if art.name in lookup.bowingSymbols:
+                brailleArt = lookup.bowingSymbols[art.name]
+            elif art.name in lookup.beforeNoteExpr:
                 brailleArt = lookup.beforeNoteExpr[art.name]
-                if 'brailleEnglish' in noteEl.editorial:
-                    noteEl.editorial.brailleEnglish.append(f'Articulation {art.name} {brailleArt}')
-                yield brailleArt
+            else:
+                continue
+            if 'brailleEnglish' in noteEl.editorial:
+                noteEl.editorial.brailleEnglish.append(f'Articulation {art.name} {brailleArt}')
+            yield brailleArt
 
 
 def noteToBraille(
@@ -705,7 +725,7 @@ def noteToBraille(
             beamStatus['beamContinue'] = False
 
     # signs of expression or execution that precede a note
-    # articulations
+    # articulations and bowings
     # -------------
     for brailleArticulation in yieldBrailleArticulations(music21Note):
         noteTrans.append(brailleArticulation)
