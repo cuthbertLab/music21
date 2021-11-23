@@ -6943,8 +6943,8 @@ class Test(unittest.TestCase):
             harmony.realizeChordSymbolDurations(m)
             obj = gex.fromGeneralObject(m)
             tree = self.getET(obj)
-            self.assertEqual(len(tree.findall('.//forward')), bool(forwardTag))
-            self.assertEqual(len(tree.findall('.//offset')), bool(offsetTag))
+            self.assertIs(bool(tree.findall('.//forward')), forwardTag)
+            self.assertIs(bool(tree.findall('.//offset')), offsetTag)
 
         # Two consecutive chord symbols, no rests
         cs1 = harmony.ChordSymbol('C7')
