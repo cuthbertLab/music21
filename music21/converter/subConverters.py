@@ -193,7 +193,13 @@ class SubConverter:
                 cmd = ('open', '-a', str(app), str(filePath))
         else:
             raise SubConverterException(f'Cannot launch files on {platform}')
-        subprocess.run(cmd, check=False, shell=shell)
+        try:
+            subprocess.run(cmd, check=False, shell=shell)
+        except FileNotFoundError as e:
+            # musicXML path misconfigured
+            raise SubConverterException(
+                'Most issues with show() can be resolved by calling configure.run()'
+            ) from e
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):
         '''
