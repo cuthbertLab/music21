@@ -715,7 +715,7 @@ class MidiEvent(prebase.ProtoM21Object):
         self.parameter1 = d2
         self.parameter2 = d1  # d1 is most significant byte here
 
-    def parseChannelVoiceMessage(self, midiBytes: bytes) -> bytes:
+    def parseChannelVoiceMessage(self, byte0: int, midiBytes: bytes) -> bytes:
         r'''
         Take a set of bytes that represent a ChannelVoiceMessage and set the
         appropriate enumeration value and data, returning the remaining bytes.
@@ -738,7 +738,7 @@ class MidiEvent(prebase.ProtoM21Object):
 
         Now show how the midiBytes changes the event:
 
-        >>> remainder = me1.parseChannelVoiceMessage(midBytes)
+        >>> remainder = me1.parseChannelVoiceMessage(midBytes[0], midBytes[1:])
         >>> me1
         <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=60, velocity=120>
 
@@ -764,7 +764,7 @@ class MidiEvent(prebase.ProtoM21Object):
 
         Here we send the message for a note on on another channel (0x91 = channel 2):
 
-        >>> rem = me1.parseChannelVoiceMessage(to_bytes([0x91, 60, 120]))
+        >>> rem = me1.parseChannelVoiceMessage(0x91, to_bytes([60, 120]))
         >>> me1
         <music21.midi.MidiEvent NOTE_ON, track=1, channel=2, pitch=60, velocity=120>
         >>> me1.channel
@@ -773,7 +773,7 @@ class MidiEvent(prebase.ProtoM21Object):
         Now let's make a program change
 
         >>> me2 = midi.MidiEvent(mt)
-        >>> rem = me2.parseChannelVoiceMessage(to_bytes([0xC0, 71]))
+        >>> rem = me2.parseChannelVoiceMessage(0xC0, to_bytes([71]))
         >>> me2
         <music21.midi.MidiEvent PROGRAM_CHANGE, track=1, channel=1, data=71>
         >>> me2.data  # 71 = clarinet (0-127 indexed)
@@ -781,7 +781,7 @@ class MidiEvent(prebase.ProtoM21Object):
 
         Program change and channel pressure only go to 127.  More than that is an error:
 
-        >>> me2.parseChannelVoiceMessage(to_bytes([0xC0, 200]))
+        >>> me2.parseChannelVoiceMessage(0xC0, to_bytes([200]))
         Traceback (most recent call last):
         music21.midi.MidiException: Cannot have a
             <ChannelVoiceMessages.PROGRAM_CHANGE: 0xC0> followed by a byte > 127: 200
@@ -789,14 +789,15 @@ class MidiEvent(prebase.ProtoM21Object):
         # x, y, and z define characteristics of the first two chars
         # for x: The left nybble (4 bits) contains the actual command, and the right nibble
         # contains the midi channel number on which the command will be executed.
-        if len(midiBytes) < 2:
-            raise ValueError(f'length of {midiBytes!r} must be at least 2')
+        if len(midiBytes) < 1:
+            raise ValueError(f'length of {midiBytes!r} must be at least 1')
 
-        byte0 = midiBytes[0]
-        byte1 = midiBytes[1]
+        # We accept byte0 as a separate argument, so that the rsb can be artifically added
+        # during read() without a memory copy
+        byte1 = midiBytes[0]
         byte2 = 0
-        if len(midiBytes) > 2:  # very likely, but may be translating in pieces
-            byte2 = midiBytes[2]
+        if len(midiBytes) > 1:  # very likely, but may be translating in pieces
+            byte2 = midiBytes[1]
 
         msgNybble: int = byte0 & 0xF0  # 0x80, 0x90, 0xA0 ... 0xE0
         channelNybble: int = byte0 & 0x0F  # 0-15
@@ -811,35 +812,35 @@ class MidiEvent(prebase.ProtoM21Object):
                 raise MidiException(
                     f'Cannot have a {self.type!r} followed by a byte > 127: {byte1}')
             self.data = byte1
-            return midiBytes[2:]
+            return midiBytes[1:]
         elif self.type == ChannelVoiceMessages.CONTROLLER_CHANGE:
             specificDataSet = False
             if ChannelModeMessages.hasValue(byte1):
                 self.type = ChannelModeMessages(byte1)
                 if self.type == ChannelModeMessages.LOCAL_CONTROL:
                     specificDataSet = True
-                    self.data = (midiBytes[2] == 0x7F)
+                    self.data = (midiBytes[1] == 0x7F)
                 elif self.type == ChannelModeMessages.MONO_MODE_ON:
                     specificDataSet = True
                     # see http://midi.teragonaudio.com/tech/midispec/mono.htm
-                    self.data = midiBytes[2]
+                    self.data = midiBytes[1]
             if not specificDataSet:
                 self.parameter1 = byte1  # this is the controller id
                 self.parameter2 = byte2  # this is the controller value
-            return midiBytes[3:]
+            return midiBytes[2:]
         elif self.type == ChannelVoiceMessages.PITCH_BEND:
             self.parameter1 = byte1  # least significant byte
             self.parameter2 = byte2  # most significant byte
-            return midiBytes[3:]
+            return midiBytes[2:]
         elif self.type in (ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF):
             # next two bytes:  pitch, velocity
             self.pitch = byte1
             self.velocity = byte2
-            return midiBytes[3:]
+            return midiBytes[2:]
         elif self.type == ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE:
             self.parameter1 = byte1  # pitch
             self.parameter2 = byte2  # pressure
-            return midiBytes[3:]
+            return midiBytes[2:]
         raise TypeError(f'expected ChannelVoiceMessage, got {self.type}')  # pragma: no cover
 
     def read(self, midiBytes):
@@ -884,20 +885,19 @@ class MidiEvent(prebase.ProtoM21Object):
             # 'self.lastStatusByte:', self.lastStatusByte])
 
             if self.lastStatusByte is not None:
-                rsb = bytes([self.lastStatusByte])
+                byte0 = bytes([self.lastStatusByte])
             else:  # provide a default
-                rsb = b'\x90'
-            # add the running status byte to the front of the string
-            # and process as before
-            midiBytes = rsb + midiBytes
-            byte0 = midiBytes[0]
+                byte0 = b'\x90'
         else:
             # store last status byte
-            self.lastStatusByte = midiBytes[0]
+            self.lastStatusByte = byte0
+            # remove the running status byte from the front of the string
+            # and continue to process
+            midiBytes = midiBytes[1:]
 
         msgType: int = byte0 & 0xF0  # bitwise and to derive message type w/o channel
 
-        byte1: int = midiBytes[1]
+        byte1: int = midiBytes[0]
 
         # environLocal.printDebug([
         #    'MidiEvent.read(): trying to parse a MIDI event, looking at first two chars:',
@@ -905,11 +905,11 @@ class MidiEvent(prebase.ProtoM21Object):
 
         if ChannelVoiceMessages.hasValue(msgType):
             # NOTE_ON and NOTE_OFF and PROGRAM_CHANGE, PITCH_BEND, etc.
-            return self.parseChannelVoiceMessage(midiBytes)
+            return self.parseChannelVoiceMessage(byte0, midiBytes)
 
         elif SysExEvents.hasValue(byte0):
             self.type = SysExEvents(byte0)
-            length, midiBytesAfterLength = getVariableLengthNumber(midiBytes[1:])
+            length, midiBytesAfterLength = getVariableLengthNumber(midiBytes)
             self.data = midiBytesAfterLength[:length]
             return midiBytesAfterLength[length:]
 
@@ -920,14 +920,14 @@ class MidiEvent(prebase.ProtoM21Object):
                 sys.stdout.flush()
                 raise MidiException(f'Unknown midi event type: FF {byte1:02X}')
             self.type = MetaEvents(byte1)
-            length, midiBytesAfterLength = getVariableLengthNumber(midiBytes[2:])
+            length, midiBytesAfterLength = getVariableLengthNumber(midiBytes[1:])
             self.data = midiBytesAfterLength[:length]
             # return remainder
             return midiBytesAfterLength[length:]
         else:
             # an uncaught message
             environLocal.printDebug(['got unknown midi event type', hex(byte0),
-                                     'hex(midiBytes[1])', hex(midiBytes[1])])
+                                     'hex(midiBytes[1])', hex(byte1)])
             raise MidiException(f'Unknown midi event type {hex(byte0)}')
 
     def getBytes(self):
@@ -1576,6 +1576,8 @@ class MidiFile(prebase.ProtoM21Object):
 
         The name readstr is a carryover from Python 2.  It works on bytes objects, not strings
         '''
+        # memoryview avoids memory copies and improves performance ~5%
+        midiBytes = memoryview(midiBytes)
         if not midiBytes[:4] == b'MThd':
             raise MidiException(f'badly formatted midi bytes, got: {midiBytes[:20]}')
 
