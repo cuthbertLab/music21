@@ -107,7 +107,6 @@ def main(fnAccept=None, strict=False):
         'too-many-locals',   # no
         'bad-whitespace',  # maybe later, but "bad" isn't something I necessarily agree with
         'bad-continuation',  # never remove -- this is a good thing many times.
-        'unpacking-non-sequence',  # gets it wrong too often.
 
         # AbstractDiatonicScale.__eq__ shows how this
         # can be fine...
