@@ -39,9 +39,8 @@ environLocal = environment.Environment(_MOD)
 
 _ChordType = TypeVar('_ChordType')
 
+
 # ------------------------------------------------------------------------------
-
-
 class ChordException(exceptions21.Music21Exception):
     pass
 
@@ -51,6 +50,9 @@ class ChordBase(note.NotRest):
     '''
     A base class for NotRest objects that have multiple underlying structures
     like notes or unpitched percussion.
+
+    As of Version 7, ChordBase lies between Chord and NotRest in the music21
+    hierarchy, so that features can be shared with PercussionChord.
     '''
     isNote = False
     isRest = False
