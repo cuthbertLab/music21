@@ -19,7 +19,7 @@ and used to configure, :class:`~music21.note.Note` objects.
 import copy
 import unittest
 
-from typing import Optional, List, Union, Tuple, Iterable
+from typing import Optional, List, Union, Tuple, Iterable, cast
 
 from music21 import base
 from music21 import beam
@@ -296,7 +296,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._syllabic = newSyllabic
 
     @property
-    def identifier(self) -> str:
+    def identifier(self) -> Union[str, int]:
         '''
         By default, this is the same as self.number. However, if there is a
         descriptive identifier like 'part2verse1', it is stored here and
@@ -1131,7 +1131,7 @@ class NotRest(GeneralNote):
             return True
 
     @property
-    def pitches(self) -> Tuple[pitch.Pitch]:
+    def pitches(self) -> Tuple[pitch.Pitch, ...]:
         '''
         Returns an empty tuple.  (Useful for iterating over NotRests since they
         include Notes and Chords.)
@@ -1230,9 +1230,9 @@ class NotRest(GeneralNote):
         >>> m = stream.Measure([n])
         >>> n.getInstrument(returnDefault=False) is None
         True
-        >>> dulc = instrument.Dulcimer()
-        >>> m.insert(0, dulc)
-        >>> n.getInstrument() is dulc
+        >>> dulcimer = instrument.Dulcimer()
+        >>> m.insert(0, dulcimer)
+        >>> n.getInstrument() is dulcimer
         True
 
         Overridden `.storedInstrument` is privileged:
@@ -1245,16 +1245,16 @@ class NotRest(GeneralNote):
         Instruments in containing streams ARE found:
 
         >>> n.storedInstrument = None
-        >>> m.remove(dulc)
+        >>> m.remove(dulcimer)
         >>> p = stream.Part([m])
-        >>> p.insert(0, dulc)
-        >>> n.getInstrument() is dulc
+        >>> p.insert(0, dulcimer)
+        >>> n.getInstrument() is dulcimer
         True
 
         But not if the instrument is only found in a derived stream:
 
         >>> derived = p.stripTies()
-        >>> p.remove(dulc)
+        >>> p.remove(dulcimer)
         >>> derived.getInstruments().first()
         <music21.instrument.Dulcimer 'Dulcimer'>
         >>> n.getInstrument(returnDefault=False) is None
@@ -1272,7 +1272,9 @@ class NotRest(GeneralNote):
             instrument.Instrument, followDerivation=False)
         if returnDefault and instrument_or_none is None:
             return instrument.Instrument()
-        return instrument_or_none
+        elif instrument_or_none is None:
+            return None
+        return cast(instrument.Instrument, instrument_or_none)
 
 
 # ------------------------------------------------------------------------------
