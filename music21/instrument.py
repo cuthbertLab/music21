@@ -833,6 +833,7 @@ class Whistle(Flute):
         self.instrumentAbbreviation = 'Whs'
         self.instrumentSound = 'wind.flutes.whistle'
         self.inGMPercMap = True
+        # TODO: why is this not inheriting from UnpitchedPercussion if we're giving it percMapPitch?
         self.percMapPitch = 71
         self.midiProgram = 78
 
