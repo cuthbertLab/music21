@@ -890,9 +890,9 @@ class MidiEvent(prebase.ProtoM21Object):
             # 'self.lastStatusByte:', self.lastStatusByte])
 
             if self.lastStatusByte is not None:
-                byte0 = bytes([self.lastStatusByte])
+                byte0 = self.lastStatusByte
             else:  # provide a default
-                byte0 = b'\x90'
+                byte0 = 0x90
         else:
             # store last status byte
             self.lastStatusByte = byte0
