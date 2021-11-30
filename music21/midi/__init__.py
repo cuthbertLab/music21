@@ -352,10 +352,10 @@ class _ContainsEnum(IntEnum):
     def hasValue(cls, val):
         # using a stored set() here improves performance by ~5%
         try:
-            return val in cls.__values__
+            return val in cls._values
         except AttributeError:
-            cls.__values__ = frozenset(cls.__members__.values())
-            return val in cls.__values__
+            cls._values = frozenset(cls.__members__.values())
+            return val in cls._values
 
 
 class ChannelVoiceMessages(_ContainsEnum):
