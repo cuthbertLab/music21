@@ -720,7 +720,7 @@ class MidiEvent(prebase.ProtoM21Object):
         self.parameter1 = d2
         self.parameter2 = d1  # d1 is most significant byte here
 
-    def parseChannelVoiceMessage(self, byte0: int, midiBytes: bytes) -> bytes:
+    def parseChannelVoiceMessage(self, midiBytes: bytes, byte0: int = None) -> bytes:
         r'''
         Take a set of bytes that represent a ChannelVoiceMessage and set the
         appropriate enumeration value and data, returning the remaining bytes.
@@ -743,7 +743,13 @@ class MidiEvent(prebase.ProtoM21Object):
 
         Now show how the midiBytes changes the event:
 
-        >>> remainder = me1.parseChannelVoiceMessage(midBytes[0], midBytes[1:])
+        >>> remainder = me1.parseChannelVoiceMessage(midBytes)
+        >>> me1
+        <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=60, velocity=120>
+
+        It works also if you specify the status byte separately.
+
+        >>> remainder = me1.parseChannelVoiceMessage(midBytes[1:], byte0=midBytes[0])
         >>> me1
         <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=60, velocity=120>
 
@@ -769,7 +775,7 @@ class MidiEvent(prebase.ProtoM21Object):
 
         Here we send the message for a note on on another channel (0x91 = channel 2):
 
-        >>> rem = me1.parseChannelVoiceMessage(0x91, to_bytes([60, 120]))
+        >>> rem = me1.parseChannelVoiceMessage(to_bytes([0x91, 60, 120]))
         >>> me1
         <music21.midi.MidiEvent NOTE_ON, track=1, channel=2, pitch=60, velocity=120>
         >>> me1.channel
@@ -778,7 +784,7 @@ class MidiEvent(prebase.ProtoM21Object):
         Now let's make a program change
 
         >>> me2 = midi.MidiEvent(mt)
-        >>> rem = me2.parseChannelVoiceMessage(0xC0, to_bytes([71]))
+        >>> rem = me2.parseChannelVoiceMessage(to_bytes([0xC0, 71]))
         >>> me2
         <music21.midi.MidiEvent PROGRAM_CHANGE, track=1, channel=1, data=71>
         >>> me2.data  # 71 = clarinet (0-127 indexed)
@@ -786,7 +792,7 @@ class MidiEvent(prebase.ProtoM21Object):
 
         Program change and channel pressure only go to 127.  More than that is an error:
 
-        >>> me2.parseChannelVoiceMessage(0xC0, to_bytes([200]))
+        >>> me2.parseChannelVoiceMessage(to_bytes([0xC0, 200]))
         Traceback (most recent call last):
         music21.midi.MidiException: Cannot have a
             <ChannelVoiceMessages.PROGRAM_CHANGE: 0xC0> followed by a byte > 127: 200
@@ -799,6 +805,9 @@ class MidiEvent(prebase.ProtoM21Object):
 
         # We accept byte0 as a separate argument, so that the rsb can be artifically added
         # during read() without a memory copy
+        if byte0 is None:
+            byte0 = midiBytes[0]
+            midiBytes = midiBytes[1:]
         byte1 = midiBytes[0]
         byte2 = 0
         if len(midiBytes) > 1:  # very likely, but may be translating in pieces
@@ -910,7 +919,7 @@ class MidiEvent(prebase.ProtoM21Object):
 
         if ChannelVoiceMessages.hasValue(msgType):
             # NOTE_ON and NOTE_OFF and PROGRAM_CHANGE, PITCH_BEND, etc.
-            return self.parseChannelVoiceMessage(byte0, midiBytes)
+            return self.parseChannelVoiceMessage(midiBytes, byte0=byte0)
 
         elif SysExEvents.hasValue(byte0):
             self.type = SysExEvents(byte0)
