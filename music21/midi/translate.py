@@ -769,7 +769,7 @@ def midiEventsToInstrument(eventList):
         if isinstance(event.data, (bytes, memoryview)):
             # MuseScore writes MIDI files with null-terminated
             # instrument names.  Thus stop before the byte-0x0
-            decoded = bytes(event.data).decode('utf-8').split('\x00', maxsplit=1)[0]
+            decoded = event.data.decode('utf-8').split('\x00', maxsplit=1)[0]
             decoded = decoded.strip()
             i = instrument.fromString(decoded)
         elif event.channel == 10:

@@ -915,7 +915,7 @@ class MidiEvent(prebase.ProtoM21Object):
         elif SysExEvents.hasValue(byte0):
             self.type = SysExEvents(byte0)
             length, midiBytesAfterLength = getVariableLengthNumber(midiBytes)
-            self.data = midiBytesAfterLength[:length]
+            self.data = bytes(midiBytesAfterLength[:length])
             return midiBytesAfterLength[length:]
 
         # SEQUENCE_TRACK_NAME and other MetaEvents are here
@@ -926,7 +926,7 @@ class MidiEvent(prebase.ProtoM21Object):
                 raise MidiException(f'Unknown midi event type: FF {byte1:02X}')
             self.type = MetaEvents(byte1)
             length, midiBytesAfterLength = getVariableLengthNumber(midiBytes[1:])
-            self.data = midiBytesAfterLength[:length]
+            self.data = bytes(midiBytesAfterLength[:length])
             # return remainder
             return midiBytesAfterLength[length:]
         else:
@@ -1293,7 +1293,7 @@ class MidiTrack(prebase.ProtoM21Object):
 
         # all event data is in the track str
         trackData = midiBytes[:length]
-        self.data = trackData
+        self.data = bytes(trackData)
 
         remainder = midiBytes[length:]
         self.processDataToEvents(trackData)
