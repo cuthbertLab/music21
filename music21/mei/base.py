@@ -368,10 +368,14 @@ def safePitch(
     '''
     if not name:
         return pitch.Pitch()
-    elif accidental is None:
+    if octave and accidental is not None:
+        return pitch.Pitch(name, octave=int(octave), accidental=accidental)
+    if octave:
         return pitch.Pitch(name, octave=int(octave))
+    if accidental is not None:
+        return pitch.Pitch(name, accidental=accidental)
     else:
-        return pitch.Pitch(name, accidental=accidental, octave=int(octave))
+        return pitch.Pitch(name)
 
 
 def makeDuration(
