@@ -203,7 +203,9 @@ class Harmony(chord.Chord):
         self._degreesList = []
         self._key = None
         # senseless to parse inversion until chord members are populated
-        self._updateBasedOnXMLInput(keywords, parseInversion=False)
+        keywords_without_inversion = keywords.copy()
+        keywords_without_inversion.pop('inversion', None)
+        self._updateBasedOnXMLInput(keywords_without_inversion)
         # figure is the string representation of a Harmony object
         # for example, for Chord Symbols the figure might be 'Cm7'
         # for roman numerals, the figure might be 'I7'
@@ -246,7 +248,7 @@ class Harmony(chord.Chord):
         '''
         return
 
-    def _updateBasedOnXMLInput(self, keywords, *, parseInversion=True):
+    def _updateBasedOnXMLInput(self, keywords):
         '''
         This method must be called twice, once before the pitches
         are rendered, and once after. This is because after the pitches
@@ -268,7 +270,7 @@ class Harmony(chord.Chord):
                     self.bass(pitch.Pitch(keywords[kw], octave=3))
                 else:
                     self.bass(keywords[kw])
-            elif kw == 'inversion' and parseInversion:
+            elif kw == 'inversion':
                 self.inversion(int(keywords[kw]), transposeOnSet=True)
             elif kw in ('duration', 'quarterLength'):
                 self.duration = duration.Duration(keywords[kw])
