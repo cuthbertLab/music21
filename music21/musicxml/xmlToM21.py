@@ -2823,10 +2823,7 @@ class MeasureParser(XMLParserBase):
 
         mxStem = mxNote.find('stem')
         if mxStem is not None:
-            try:
-                n.stemDirection = mxStem.text.strip()
-            except AttributeError:
-                pass
+            n.stemDirection = mxStem.text.strip()
 
             if mxStem.attrib:
                 stemStyle = style.Style()
