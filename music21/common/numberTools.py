@@ -703,9 +703,9 @@ def unitBoundaryProportion(series: Sequence[int]) -> List[Tuple[Union[int, float
     unit-interval boundaries proportional to the series components.
 
     >>> common.unitBoundaryProportion([1, 1, 2])
-    [(0, 0.25), (0.25, 0.5), (0.5, 1.0)]
-    >>> common.unitBoundaryProportion([8, 1, 1])
-    [(0, 0.8...), (0.8..., 0.9...), (0.9..., 1.0)]
+    [(0.0, 0.25), (0.25, 0.5), (0.5, 1.0)]
+    >>> common.unitBoundaryProportion([9, 1, 1])
+    [(0.0, 0.8...), (0.8..., 0.9...), (0.9..., 1.0)]
     '''
     unit = unitNormalizeProportion(series)
     bounds = []
