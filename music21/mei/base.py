@@ -365,6 +365,8 @@ def safePitch(
     <music21.pitch.Pitch D#6>
     >>> safePitch('D', '#', '6')
     <music21.pitch.Pitch D#6>
+    >>> safePitch('D', '#')
+    <music21.pitch.Pitch D#>
     '''
     if not name:
         return pitch.Pitch()
