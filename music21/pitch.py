@@ -3179,13 +3179,13 @@ class Pitch(prebase.ProtoM21Object):
         (Microtones and Quarter tones raise an error).
 
         >>> print(pitch.Pitch('B-').spanish)
-        si bèmol
+        si bemol
         >>> print(pitch.Pitch('E-').spanish)
-        mi bèmol
+        mi bemol
         >>> print(pitch.Pitch('C#').spanish)
         do sostenido
         >>> print(pitch.Pitch('A--').spanish)
-        la doble bèmol
+        la doble bemol
         >>> p1 = pitch.Pitch('C')
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.spanish
@@ -3195,7 +3195,7 @@ class Pitch(prebase.ProtoM21Object):
         Note these rarely used pitches:
 
         >>> print(pitch.Pitch('B--').spanish)
-        si doble bèmol
+        si doble bemol
         >>> print(pitch.Pitch('B#').spanish)
         si sostenido
         '''
@@ -3212,7 +3212,7 @@ class Pitch(prebase.ProtoM21Object):
         elif abs(tempAlter) > 4:
             raise PitchException('Unsupported accidental type.')
         elif tempAlter in {-4, -3, -2, -1}:
-            return solfege + self._getSpanishCardinal() + ' bèmol'
+            return solfege + self._getSpanishCardinal() + ' bemol'
         elif tempAlter in {1, 2, 3, 4}:
             return solfege + self._getSpanishCardinal() + ' sostenido'
 
