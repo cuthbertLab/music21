@@ -2795,7 +2795,7 @@ class PartExporter(XMLExporterBase):
             if type(inst) in seen_instrument_classes:
                 continue
             # TODO: midi-device
-            if inst.midiProgram is not None:
+            if inst.midiProgram is not None or isinstance(inst, instrument.UnpitchedPercussion):
                 mxScorePart.append(self.instrumentToXmlMidiInstrument(inst))
                 seen_instrument_classes.add(type(inst))
 
@@ -2855,6 +2855,20 @@ class PartExporter(XMLExporterBase):
           <midi-channel>5</midi-channel>
           <midi-program>72</midi-program>
         </midi-instrument>
+
+        >>> m = instrument.Maracas()
+        >>> m.instrumentId = 'my maracas'
+        >>> m.midiChannel  # 0-indexed
+        9
+        >>> m.percMapPitch
+        70
+        >>> PEX = musicxml.m21ToXml.PartExporter()
+        >>> mxMidiInstrument = PEX.instrumentToXmlMidiInstrument(m)
+        >>> PEX.dump(mxMidiInstrument)  # 1-indexed in MusicXML
+        <midi-instrument id="my maracas">
+          <midi-channel>10</midi-channel>
+          <midi-unpitched>71</midi-unpitched>
+        </midi-instrument>
         '''
         mxMidiInstrument = Element('midi-instrument')
         mxMidiInstrument.set('id', str(i.instrumentId))
@@ -2865,9 +2879,12 @@ class PartExporter(XMLExporterBase):
         mxMidiChannel.text = str(i.midiChannel + 1)
         # TODO: midi-name
         # TODO: midi-bank
-        mxMidiProgram = SubElement(mxMidiInstrument, 'midi-program')
-        mxMidiProgram.text = str(i.midiProgram + 1)
-        # TODO: midi-unpitched
+        if i.midiProgram is not None:
+            mxMidiProgram = SubElement(mxMidiInstrument, 'midi-program')
+            mxMidiProgram.text = str(i.midiProgram + 1)
+        if isinstance(i, instrument.UnpitchedPercussion) and i.percMapPitch is not None:
+            mxMidiUnpitched = SubElement(mxMidiInstrument, 'midi-unpitched')
+            mxMidiUnpitched.text = str(i.percMapPitch + 1)
         # TODO: volume
         # TODO: pan
         # TODO: elevation
@@ -3508,8 +3525,8 @@ class MeasureExporter(XMLExporterBase):
             chordOrN = n
         else:
             chordOrN = chordParent
-            # Ensure color is read from `n`, since only `chordOrN` is handled below
-            self.setColor(mxNote, n)
+            # Ensure style is read from `n` before reading from `chordOrN`
+            self.setPrintStyle(mxNote, n)  # sets color
 
         # self.setFont(mxNote, chordOrN)
         self.setPrintStyle(mxNote, chordOrN)  # sets color
@@ -3912,17 +3929,18 @@ class MeasureExporter(XMLExporterBase):
         </note>
 
 
-        Test that notehead translation works:
+        Test that notehead and style translation works:
 
         >>> g = pitch.Pitch('g3')
         >>> h = note.Note('b4')
         >>> h.notehead = 'diamond'
         >>> h.style.color = 'gold'
+        >>> h.style.absoluteX = 176
         >>> ch2 = chord.Chord([g, h])
         >>> ch2.quarterLength = 2.0
         >>> mxNoteList = MEX.chordToXml(ch2)
         >>> MEX.dump(mxNoteList[1])
-        <note color="#FFD700">
+        <note color="#FFD700" default-x="176">
           <chord />
           <pitch>
             <step>B</step>

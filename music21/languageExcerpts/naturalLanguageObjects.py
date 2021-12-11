@@ -161,7 +161,7 @@ class Test(unittest.TestCase):
                                                                    'it')))
         self.assertEqual('<music21.pitch.Pitch F##>', repr(toPitch('fa doble sostenido',
                                                                    'es')))
-        self.assertEqual('<music21.pitch.Pitch G--->', repr(toPitch('sol triple bèmol',
+        self.assertEqual('<music21.pitch.Pitch G--->', repr(toPitch('sol triple bemol',
                                                                     'es')))
         self.assertEqual('<music21.pitch.Pitch D>', repr(toPitch('re', 'it')))
         self.assertEqual('<music21.pitch.Pitch B-->', repr(toPitch('Heses', 'de')))
@@ -200,7 +200,7 @@ class Test(unittest.TestCase):
         # testing defaults in case of valid input string and valid language
         self.assertEqual('<music21.note.Note C##>', repr(toNote('do doppio diesis', 'it')))
         self.assertEqual('<music21.note.Note F##>', repr(toNote('fa doble sostenido', 'es')))
-        self.assertEqual('<music21.note.Note G--->', repr(toNote('sol triple bèmol', 'es')))
+        self.assertEqual('<music21.note.Note G--->', repr(toNote('sol triple bemol', 'es')))
         self.assertEqual('<music21.note.Note D>', repr(toNote('re', 'it')))
         self.assertEqual('<music21.note.Note B-->', repr(toNote('Heses', 'de')))
         self.assertEqual('<music21.note.Note E##>', repr(toNote('Eisis', 'de')))
@@ -245,7 +245,7 @@ class Test(unittest.TestCase):
         self.assertEqual('<music21.chord.Chord F##>',
                          repr(toChord(['fa doble sostenido'], 'es')))
         self.assertEqual('<music21.chord.Chord G--->',
-                         repr(toChord(['sol triple bèmol'], 'es')))
+                         repr(toChord(['sol triple bemol'], 'es')))
         self.assertEqual('<music21.chord.Chord D>', repr(toChord(['re'], 'it')))
         self.assertEqual('<music21.chord.Chord B-->', repr(toChord(['Heses'], 'de')))
         self.assertEqual('<music21.chord.Chord E##>', repr(toChord(['Eisis'], 'de')))
@@ -257,7 +257,7 @@ class Test(unittest.TestCase):
         self.assertEqual('<music21.chord.Chord C## D>',
                          repr(toChord(['do doppio diesis', 're'], 'it')))
         self.assertEqual('<music21.chord.Chord F## G--->',
-                         repr(toChord(['fa doble sostenido', 'sol triple bèmol'], 'es')))
+                         repr(toChord(['fa doble sostenido', 'sol triple bemol'], 'es')))
         self.assertEqual('<music21.chord.Chord B-- E##>',
                          repr(toChord(['Heses', 'Eisis'], 'de')))
         self.assertEqual('<music21.chord.Chord A#### B--->',
