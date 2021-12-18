@@ -44,11 +44,13 @@ reSibeliusExe = re.compile(r'Sibelius\.exe', IGNORECASE)
 reFinaleReaderApp = re.compile(r'Finale Reader\.app', IGNORECASE)
 reMuseScoreApp = re.compile(r'MuseScore.*\.app', IGNORECASE)
 reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.*\.exe', IGNORECASE)
+reDoricoApp = re.compile(r'Dorico.*\.app', IGNORECASE)
+reDoricoExe = re.compile(r'Dorico.*\.exe', IGNORECASE)
 
-urlMusic21 = 'https://web.mit.edu/music21'
+urlMusic21 = 'http://web.mit.edu/music21'
 urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'https://web.mit.edu/music21/doc/'
-urlMusic21List = 'https://groups.google.com/g/music21list'
+urlGettingStarted = 'http://web.mit.edu/music21/doc/'
+urlMusic21List = 'http://groups.google.com/group/music21list'
 
 LINE_WIDTH = 78
 
@@ -1309,11 +1311,15 @@ class SelectMusicXMLReader(SelectFilePath):
         def comparisonSibelius(x):
             return reSibeliusApp.search(x) is not None
 
+        def comparisonDorico(x):
+            return reDoricoApp.search(x) is not None    
+
         # order here results in ranks
         results = self._getDarwinApp(comparisonMuseScore)
         results += self._getDarwinApp(comparisonFinale)
         results += self._getDarwinApp(comparisonFinaleReader)
         results += self._getDarwinApp(comparisonSibelius)
+        results += self._getDarwinApp(comparisonDorico)
 
         # de-duplicate
         res = []
@@ -1336,10 +1342,15 @@ class SelectMusicXMLReader(SelectFilePath):
         def comparisonSibelius(x):
             return reSibeliusExe.search(x) is not None
 
+        def comparisonDorico(x):
+            return reDoricoExe.search(x) is not None    
+
+
         # order here results in ranks
         results = self._getWinApp(comparisonMuseScore)
         results += self._getWinApp(comparisonFinale)
         results += self._getWinApp(comparisonSibelius)
+        results += self._getWinApp(comparisonDorico)
 
         # de-duplicate (Windows especially can put the same environment var twice)
         res = []
@@ -1479,8 +1490,8 @@ class ConfigurationAssistant:
 
     def _introduction(self):
         msg = []
-        msg.append('Welcome to the music21 Configuration Assistant. You will be guided '
-                   + 'through a number of questions to install and set up music21. '
+        msg.append('Welcome the music21 Configuration Assistant. You will be guided '
+                   + 'through a number of questions to install and setup music21. '
                    + 'Simply pressing return at a prompt will select a default, if available.')
         msg.append('')  # will cause a line break
         msg.append('You may run this configuration again at a later time '
@@ -1537,7 +1548,7 @@ class ConfigurationAssistant:
 
 # ------------------------------------------------------------------------------
 # for time-out gather of arguments: possibly look at:
-# https://code.activestate.com/recipes/576780/
+# http://code.activestate.com/recipes/576780/
 # http://www.garyrobinson.net/2009/10/non-blocking-raw_input-for-python.html
 # class Prompt(threading.Thread):
 #     def __init__ (self, prompt, timeOutTime):
@@ -1596,7 +1607,7 @@ class ConfigurationAssistant:
 _DOC_ORDER = []
 
 
-class TestUserInput(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testYesOrNo(self):
         print()
@@ -1762,7 +1773,7 @@ if __name__ == '__main__':
     else:
         # only if running tests
         t = Test()
-        te = TestUserInput()
+        te = TestExternal()
 
         if len(sys.argv) < 2 or sys.argv[1] in ['all', 'test']:
             import music21
@@ -1770,7 +1781,7 @@ if __name__ == '__main__':
 
         # arg[1] is test to launch
         elif sys.argv[1] == 'te':
-            # run test user input
+            # run test external
             getattr(te, sys.argv[2])()
         # just run named Test
         elif hasattr(t, sys.argv[1]):
