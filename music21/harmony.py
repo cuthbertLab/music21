@@ -1763,7 +1763,7 @@ class ChordSymbol(Harmony):
     def _parseAddAlterSubtract(self, remaining: str, modType: str) -> str:
         '''
         Removes and parses the first instance of a given `modType` such as
-        'add', 'alter', 'omit', or 'subtract'.
+        'add', 'alter', 'omit', or 'subtract'. Returns the unparsed remainder.
 
         >>> cs = harmony.ChordSymbol()
         >>> cs._parseAddAlterSubtract('add#9omit5', 'add')
