@@ -1902,7 +1902,7 @@ class ChordSymbol(Harmony):
         st = self._getKindFromShortHand(remaining)
 
         ALTER_TYPES = ('add', 'alter', 'omit', 'subtract')
-        searchStart: int = -1
+        searchStart: int = 1000  # not -1 for the sake of min(), below
         for alterType in ALTER_TYPES:
             try:
                 searchStart = min(remaining.index(alterType), searchStart)
