@@ -454,19 +454,14 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
 
     if triadAward:
         # score_triad = number of thirds per pitch (avoid double-base-thirds)
-        triad_bases = []
         for p1, p2 in itertools.combinations(pitches, 2):
             this_interval = interval.Interval(noteStart=p1, noteEnd=p2)
-            generic_interval_value = abs(this_interval.generic.value) % 8
+            simple_directed = this_interval.generic.simpleDirected
             interval_semitones = this_interval.chromatic.semitones % 12
-            if generic_interval_value == 3 and interval_semitones in (3, 4):
-                triad_steps = (p1.step, p2.step)
-                if triad_steps not in triad_bases:
-                    score_triad -= 1.0
-            elif generic_interval_value == 6 and interval_semitones in (8, 9):
-                triad_steps = (p2.step, p1.step)
-                if triad_steps not in triad_bases:
-                    score_triad -= 1.0
+            if simple_directed == 3 and interval_semitones in (3, 4):
+                score_triad -= 1.0
+            elif simple_directed == 6 and interval_semitones in (8, 9):
+                score_triad -= 1.0
         score_triad /= len(pitches)
 
     return (score_accidentals + score_ratio + score_triad) / int(smallPythagoreanRatio
@@ -540,6 +535,12 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
     ...                                    pitch.Pitch('A--3')],
     ...                                    keyContext=key.Key('C'))
     [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>]
+
+    Changed in v7.3 -- fixed a bug with compound intervals (such as formed against
+    the tonic of a KeySignature defaulting to octave 4):
+
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('B5')], keyContext=key.Key('D'))
+    [<music21.pitch.Pitch B5>]
     '''
 
     oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
