@@ -747,7 +747,8 @@ class MidiEvent(prebase.ProtoM21Object):
         >>> me1
         <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=60, velocity=120>
 
-        It works also if you specify the status byte separately.
+        Added in v.7.3 -- The optional `byte0` argument to separately supply the
+        status byte was added to improve performance.
 
         >>> remainder = me1.parseChannelVoiceMessage(midBytes[1:], byte0=midBytes[0])
         >>> me1
