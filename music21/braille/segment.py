@@ -998,6 +998,10 @@ class BrailleSegment(text.BrailleText):
           are found in a row, the first instance of the articulation is doubled and the rest are
           omitted.
 
+          It is permissible (not mandatory) to observe this doubling with bowings. (BMTM, 114)
+          For this reason, any :class:`~music21.articulations.TechnicalIndication` but for bowings
+          (e.g. fingering, harmonic) is skipped, because it does not braille as an articulation.
+
         * Staccato, Tenuto rule => "If two repeated notes appear to be tied, but either is marked
           staccato or tenuto, they are treated as slurred instead of tied." (BMTM, 112)
         '''
@@ -1005,8 +1009,6 @@ class BrailleSegment(text.BrailleText):
 
         def fixOneArticulation(artic, music21NoteStart, allNotes, noteIndexStart):
             articName = artic.name
-            if articName == 'fingering':  # fingerings are not considered articulations...
-                return
             if (isinstance(artic, (articulations.Staccato, articulations.Tenuto))
                     and music21NoteStart.tie is not None):
                 if music21NoteStart.tie.type == 'stop':
@@ -1044,12 +1046,14 @@ class BrailleSegment(text.BrailleText):
             for noteIndexStart_outer in range(len(allNotes_outer)):
                 music21NoteStart_outer = allNotes_outer[noteIndexStart_outer]
                 for artic_outer in music21NoteStart_outer.articulations:
-                    fixOneArticulation(
-                        artic_outer,
-                        music21NoteStart_outer,
-                        allNotes_outer,
-                        noteIndexStart_outer
-                    )
+                    if (not isinstance(artic_outer, articulations.TechnicalIndication)
+                            or isinstance(artic_outer, articulations.Bowing)):
+                        fixOneArticulation(
+                            artic_outer,
+                            music21NoteStart_outer,
+                            allNotes_outer,
+                            noteIndexStart_outer
+                        )
 
 
 class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):

@@ -23,6 +23,12 @@ is available also on GitHub.
 [![Lint Status](https://github.com/cuthbertLab/music21/workflows/PyLint/badge.svg)](https://github.com/cuthbertLab/music21)
 [![Coverage Status](https://coveralls.io/repos/github/cuthbertLab/music21/badge.svg?branch=master)](https://coveralls.io/github/cuthbertLab/music21?branch=master)
 
+## Documentation ##
+
+[User's Guide](https://web.mit.edu/music21/doc/usersGuide/index.html)
+
+[Module Documentation](https://web.mit.edu/music21/doc/moduleReference/index.html)
+
 ## Mailing list ##
 
 See: https://groups.google.com/forum/#!forum/music21list

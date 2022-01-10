@@ -454,19 +454,14 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
 
     if triadAward:
         # score_triad = number of thirds per pitch (avoid double-base-thirds)
-        triad_bases = []
         for p1, p2 in itertools.combinations(pitches, 2):
             this_interval = interval.Interval(noteStart=p1, noteEnd=p2)
-            generic_interval_value = abs(this_interval.generic.value) % 8
+            simple_directed = this_interval.generic.simpleDirected
             interval_semitones = this_interval.chromatic.semitones % 12
-            if generic_interval_value == 3 and interval_semitones in (3, 4):
-                triad_steps = (p1.step, p2.step)
-                if triad_steps not in triad_bases:
-                    score_triad -= 1.0
-            elif generic_interval_value == 6 and interval_semitones in (8, 9):
-                triad_steps = (p2.step, p1.step)
-                if triad_steps not in triad_bases:
-                    score_triad -= 1.0
+            if simple_directed == 3 and interval_semitones in (3, 4):
+                score_triad -= 1.0
+            elif simple_directed == 6 and interval_semitones in (8, 9):
+                score_triad -= 1.0
         score_triad /= len(pitches)
 
     return (score_accidentals + score_ratio + score_triad) / int(smallPythagoreanRatio
@@ -540,6 +535,12 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
     ...                                    pitch.Pitch('A--3')],
     ...                                    keyContext=key.Key('C'))
     [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>]
+
+    Changed in v7.3 -- fixed a bug with compound intervals (such as formed against
+    the tonic of a KeySignature defaulting to octave 4):
+
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('B5')], keyContext=key.Key('D'))
+    [<music21.pitch.Pitch B5>]
     '''
 
     oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
@@ -3179,13 +3180,13 @@ class Pitch(prebase.ProtoM21Object):
         (Microtones and Quarter tones raise an error).
 
         >>> print(pitch.Pitch('B-').spanish)
-        si bèmol
+        si bemol
         >>> print(pitch.Pitch('E-').spanish)
-        mi bèmol
+        mi bemol
         >>> print(pitch.Pitch('C#').spanish)
         do sostenido
         >>> print(pitch.Pitch('A--').spanish)
-        la doble bèmol
+        la doble bemol
         >>> p1 = pitch.Pitch('C')
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.spanish
@@ -3195,7 +3196,7 @@ class Pitch(prebase.ProtoM21Object):
         Note these rarely used pitches:
 
         >>> print(pitch.Pitch('B--').spanish)
-        si doble bèmol
+        si doble bemol
         >>> print(pitch.Pitch('B#').spanish)
         si sostenido
         '''
@@ -3212,7 +3213,7 @@ class Pitch(prebase.ProtoM21Object):
         elif abs(tempAlter) > 4:
             raise PitchException('Unsupported accidental type.')
         elif tempAlter in {-4, -3, -2, -1}:
-            return solfege + self._getSpanishCardinal() + ' bèmol'
+            return solfege + self._getSpanishCardinal() + ' bemol'
         elif tempAlter in {1, 2, 3, 4}:
             return solfege + self._getSpanishCardinal() + ' sostenido'
 
@@ -4670,14 +4671,15 @@ class Pitch(prebase.ProtoM21Object):
 
         # no pitches in past...
         if not pitchPastAll:
-            # if we have no past, we always need to show the accidental,
-            # unless this accidental is in the alteredPitches list
+            # if we have no past, we show the accidental if this pitch name
+            # is not in the alteredPitches list, or for naturals: if the
+            # step is IN the altered pitches
             if (self.accidental is not None
                     and self.accidental.displayStatus in (False, None)):
-                if not self._nameInKeySignature(alteredPitches):
-                    self.accidental.displayStatus = True
+                if self.accidental.name == 'natural':
+                    self.accidental.displayStatus = self._stepInKeySignature(alteredPitches)
                 else:
-                    self.accidental.displayStatus = False
+                    self.accidental.displayStatus = not self._nameInKeySignature(alteredPitches)
 
             # in case display set to True and in alteredPitches, makeFalse
             elif (self.accidental is not None
@@ -4803,7 +4805,7 @@ class Pitch(prebase.ProtoM21Object):
                     self.accidental.displayStatus = False
                 return
 
-            # repeats of the same accidentally immediately following
+            # repeats of the same accidental immediately following
             # if An to An or A# to A#: do not need unless repeats requested,
             # regardless of if 'unless-repeated' is set, this will catch
             # a repeated case
@@ -4903,9 +4905,12 @@ class Pitch(prebase.ProtoM21Object):
 
             # going from a natural to an accidental, we should already be
             # showing the accidental, but just to check
-            # if A to A#, or A to A-, but not A# to A
+            # if A to A#, or A to A-, but not A# to A, nor A (implicit) to An (explicit)
             elif pPast.accidental is None and pSelf.accidental is not None:
-                self.accidental.displayStatus = True
+                if pSelf.accidental.name == 'natural':
+                    self.accidental.displayStatus = self._stepInKeySignature(alteredPitches)
+                else:
+                    self.accidental.displayStatus = True
                 # environLocal.printDebug(['match previous no mark'])
                 setFromPitchPast = True
                 break
@@ -4955,10 +4960,10 @@ class Pitch(prebase.ProtoM21Object):
                 self.accidental.displayStatus = False
             # displayAccidentalIfNoPreviousAccidentals = False  # just to be sure
         elif not setFromPitchPast and self.accidental is not None:
-            if not self._nameInKeySignature(alteredPitches):
-                self.accidental.displayStatus = True
+            if self.accidental.name == 'natural':
+                self.accidental.displayStatus = self._stepInKeySignature(alteredPitches)
             else:
-                self.accidental.displayStatus = False
+                self.accidental.displayStatus = not self._nameInKeySignature(alteredPitches)
 
         # if we have natural that alters the key sig, create a natural
         elif not setFromPitchPast and self.accidental is None:
@@ -5103,15 +5108,15 @@ class Test(unittest.TestCase):
 
         a = Pitch('c')
         a.accidental = Accidental('natural')
-        a.accidental.displayStatus = False  # hide
+        a.accidental.displayStatus = True
         self.assertEqual(a.name, 'C')
-        self.assertFalse(a.accidental.displayStatus)
-
-        a.updateAccidentalDisplay(past, overrideStatus=True)
         self.assertTrue(a.accidental.displayStatus)
 
+        a.updateAccidentalDisplay(past, overrideStatus=True)
+        self.assertFalse(a.accidental.displayStatus)
+
         b = copy.deepcopy(a)
-        self.assertTrue(b.accidental.displayStatus)
+        self.assertFalse(b.accidental.displayStatus)
         self.assertEqual(b.accidental.name, 'natural')
 
     def testUpdateAccidentalDisplaySeries(self):
@@ -5419,6 +5424,36 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(notes[6].pitch.accidental)  # En5
         self.assertEqual(notes[6].pitch.accidental.name, 'natural')
         self.assertEqual(notes[6].pitch.accidental.displayStatus, True)
+
+    def testImplicitToExplicitNatural(self):
+        from music21 import converter
+        from music21 import key
+
+        p = converter.parse('tinyNotation: 2/4 f4 fn4')
+        last_note = p.recurse().notes.last()
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+        last_note.pitch.accidental.displayStatus = None
+        p['Measure'].first().insert(0, key.Key('C-'))
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+    def testNaturalOutsideAlteredPitches(self):
+        from music21 import converter
+        from music21 import key
+        from music21 import note
+
+        p = converter.parse('tinyNotation: 2/4 f4 dn4')
+        p.makeAccidentals(inPlace=True)
+        last_note = p[note.Note].last()
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+        # Rerun test with C-flat major
+        last_note.pitch.accidental.displayStatus = None
+        p['Measure'].first().insert(0, key.Key('C-'))
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, True)
 
     def testPitchEquality(self):
         '''

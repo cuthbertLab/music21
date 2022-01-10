@@ -1575,7 +1575,7 @@ class ABCNote(ABCToken):
             ql = activeDefaultQuarterLength * int(numStr)
 
         if self.brokenRhythmMarker is not None:
-            symbol, direction = self.brokenRhythmMarker
+            symbol, direction = self.brokenRhythmMarker  # pylint: disable=unpacking-non-sequence
             if symbol == '>':
                 modPair = (1.5, 0.5)
             elif symbol == '<':

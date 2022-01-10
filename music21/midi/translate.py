@@ -30,7 +30,6 @@ from music21 import environment
 from music21 import stream
 
 from music21.instrument import Conductor, deduplicate
-from music21.midi import percussion
 
 _MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
@@ -751,7 +750,7 @@ def midiEventsToInstrument(eventList):
     >>> me.channel = 10
     >>> i = midi.translate.midiEventsToInstrument(me)
     >>> i
-    <music21.instrument.Tambourine 'Tambourine'>
+    <music21.instrument.UnpitchedPercussion 'Percussion'>
     >>> i.midiChannel  # 0-indexed in music21
     9
     >>> i.midiProgram  # 0-indexed in music21
@@ -774,9 +773,8 @@ def midiEventsToInstrument(eventList):
             decoded = decoded.strip()
             i = instrument.fromString(decoded)
         elif event.channel == 10:
-            pm = percussion.PercussionMapper()
-            # PercussionMapper.midiPitchToInstrument() is 1-indexed
-            i = pm.midiPitchToInstrument(event.data + 1)
+            # Can only get correct instruments from reading NOTE_ON
+            i = instrument.UnpitchedPercussion()
             i.midiProgram = event.data
         else:
             i = instrument.instrumentFromMidiProgram(event.data)
@@ -787,11 +785,6 @@ def midiEventsToInstrument(eventList):
             f'Unable to determine instrument from {event}; getting generic Instrument',
             TranslateWarning)
         i = instrument.Instrument()
-    except percussion.MIDIPercussionException:
-        warnings.warn(
-            f'Unable to determine instrument from {event}; getting generic UnpitchedPercussion',
-            TranslateWarning)
-        i = instrument.UnpitchedPercussion()
     except instrument.InstrumentException:
         # Debug logging would be better than warning here
         i = instrument.Instrument()
@@ -2437,7 +2430,7 @@ def streamHierarchyToMidiTracks(
 
     # strip all ties inPlace
     for subs in substreamList:
-        subs.stripTies(inPlace=True, matchByPitch=False)
+        subs.stripTies(inPlace=True, matchByPitch=True)
 
     packetStorage = packetStorageFromSubstreamList(substreamList, addStartDelay=addStartDelay)
     updatePacketStorageWithChannelInfo(packetStorage, channelByInstrument)
@@ -2480,12 +2473,13 @@ def midiTracksToStreams(
     quantizePost=True,
     inputM21: Optional[stream.Score] = None,
     **keywords
-) -> stream.Stream():
+) -> stream.Score:
     '''
     Given a list of midiTracks, populate either a new stream.Score or inputM21
     with a Part for each track.
     '''
     # environLocal.printDebug(['midi track count', len(midiTracks)])
+    s: stream.Score
     if inputM21 is None:
         s = stream.Score()
     else:
@@ -3849,12 +3843,8 @@ class Test(unittest.TestCase):
         event.channel = 10
         event.type = midiModule.ChannelVoiceMessages.PROGRAM_CHANGE
 
-        expected = 'Unable to determine instrument from '
-        expected += '<music21.midi.MidiEvent PROGRAM_CHANGE, track=None, channel=10, data=0>'
-        expected += '; getting generic UnpitchedPercussion'
-        with self.assertWarnsRegex(TranslateWarning, expected):
-            i = midiEventsToInstrument(event)
-            self.assertIsInstance(i, instrument.UnpitchedPercussion)
+        i = midiEventsToInstrument(event)
+        self.assertIsInstance(i, instrument.UnpitchedPercussion)
 
     def testConductorStream(self):
         s = stream.Stream()

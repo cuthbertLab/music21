@@ -1178,7 +1178,10 @@ class TimeSignature(base.Music21Object):
         # create a scratch MeterSequence for structure
         tsStr = f'{self.numerator}/{self.denominator}'
         if self.beatSequence.isUniformPartition():
-            firstPartitionForm = len(self.beatSequence)
+            if len(self.beatSequence) > 1:
+                firstPartitionForm = len(self.beatSequence)
+            else:
+                firstPartitionForm = None
             cacheKey = (tsStr, firstPartitionForm, depth)
         else:  # derive from meter sequence
             firstPartitionForm = self.beatSequence

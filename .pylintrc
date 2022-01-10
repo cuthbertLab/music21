@@ -74,7 +74,6 @@ disable=
     bad-whitespace,  # maybe later, but "bad" isn't something I necessarily agree with
     bad-continuation,  # never remove -- this is a good thing many times.
     too-many-return-statements,  # we'll see
-    unpacking-non-sequence,  # gets it wrong too often.
     too-many-instance-attributes,  # maybe later
     invalid-name,  # these are good music21 names; fix the regexp instead...
     no-self-use,  # maybe later

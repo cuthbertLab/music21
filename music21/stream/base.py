@@ -1568,7 +1568,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 continue
 
             # Anything that messes with ._elements or ._endElements should be in core.py
-            #     TODO: move it...
+            # TODO: move it...
             matchedEndElement = False
             baseElementCount = len(self._elements)
             matchOffset = 0.0  # to avoid possibility of undefined
@@ -9822,17 +9822,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         The same caveats about `Stream` classes and `.flatten()` in `.notes` apply here.
         '''
-        if 'notesAndRests' not in self._cache or self._cache['notesAndRests'] is None:
-            # environLocal.printDebug(['updating noteAndRests cache:', str(self), id(self)])
-            noteIterator = self.getElementsByClass('GeneralNote')
-            noteIterator.overrideDerivation = 'notesAndRests'
-            self._cache['notesAndRests'] = noteIterator
-        return self._cache['notesAndRests']
-
-        # return self.getElementsByClass([note.GeneralNote, chord.Chord])
-        # using string class names is import for some test contexts where
-        # absolute class name matching fails
-        # return self.getElementsByClass(['GeneralNote', 'Chord'])
+        noteIterator = self.getElementsByClass(note.GeneralNote)
+        noteIterator.overrideDerivation = 'notesAndRests'
+        return noteIterator
 
     @property
     def notes(self):
@@ -9842,7 +9834,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         :class:`~music21.note.Note`,
         :class:`~music21.chord.Chord`, etc.) found
         in the stream. This excludes :class:`~music21.note.Rest` objects.
-
 
         >>> p1 = stream.Part()
         >>> k1 = key.KeySignature(0)  # key of C
@@ -9891,11 +9882,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Unpitched objects, so that all elements returned by
         `.notes` have a `.pitches` attribute.
         '''
-        if 'notes' not in self._cache or self._cache['notes'] is None:
-            noteIterator = self.getElementsByClass('NotRest')
-            noteIterator.overrideDerivation = 'notes'
-            self._cache['notes'] = noteIterator
-        return self._cache['notes']
+        noteIterator = self.getElementsByClass(note.NotRest)
+        noteIterator.overrideDerivation = 'notes'
+        return noteIterator
 
     @property
     def pitches(self):
@@ -10644,7 +10633,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         None
         '''
         for n in self.notes:
-            # get simultaneous elements form other stream
+            # clear any previous result
+            n.editorial.harmonicInterval = None
+            # get simultaneous elements from other stream
             simultEls = cmpStream.getElementsByOffset(self.elementOffset(n),
                                                       mustBeginInSpan=False,
                                                       mustFinishInSpan=False)
@@ -11171,7 +11162,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 partDict[i] = p
             else:
                 voiceId = voiceIds[i]
-                p.id = str(self.id) + '-' + voiceId
+                p.id = str(self.id) + '-' + str(voiceId)
                 partDict[voiceId] = p
 
         def doOneMeasureWithVoices(mInner):
@@ -11504,7 +11495,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return self._cache['variants']
 
     # ---- Variant Activation Methods
-
     def activateVariants(self, group=None, *, matchBySpan=True, inPlace=False):
         '''
         For any :class:`~music21.variant.Variant` objects defined in this Stream
@@ -13482,8 +13472,22 @@ class Part(Stream):
     ):
         '''
         This overridden method of Stream.makeAccidentals
-        provides the management of passing pitches from
-        a past Measure to each new measure for processing.
+        walks measures to arrive at desired values for keyword arguments
+        `tiePitchSet` and `pitchPastMeasure` when calling `makeAccidentals()`
+        on each Measure.
+
+        1. Ties across barlines are detected so that accidentals are not
+        unnecessarily reiterated. (`tiePitchSet`)
+
+        2. Pitches appearing on the same step in an immediately preceding measure,
+        if foreign to the key signature of that previous measure,
+        are printed with cautionary accidentals in the subsequent measure.
+        (`pitchPastMeasure`)
+
+        Most of the logic has been factored out to
+        :meth:`~music21.stream.makeNotation.makeAccidentalsInMeasureStream`,
+        which is called after managing the `inPlace` keyword and finding
+        measures to iterate.
 
         Changed in v.7 -- `inPlace` defaults False
         '''
@@ -13570,33 +13574,15 @@ class Score(Stream):
         It filters out all other things that might be in a Score object, such as Metadata
         returning just the Parts.
 
-
         >>> s = corpus.parse('bach/bwv66.6')
         >>> s.parts
         <music21.stream.iterator.StreamIterator for Score:0x104af3a58 @:0>
         >>> len(s.parts)
         4
-
-        OMIT_FROM_DOCS
-
-        Ensure that getting from cache still will reset the iteration.
-
-        >>> for i, p in enumerate(s.parts):
-        ...     print(i, p)
-        ...     break
-        0 <music21.stream.Part Soprano>
-
-        >>> for i, p in enumerate(s.parts):
-        ...     print(i, p)
-        ...     break
-        0 <music21.stream.Part Soprano>
         '''
-        # return self.getElementsByClass('Part')
-        if 'parts' not in self._cache or self._cache['parts'] is None:
-            partIterator = self.getElementsByClass('Part')
-            partIterator.overrideDerivation = 'parts'
-            self._cache['parts'] = partIterator
-        return self._cache['parts']
+        partIterator = self.getElementsByClass(Part)
+        partIterator.overrideDerivation = 'parts'
+        return partIterator
 
     def measures(self,
                  numberStart,
