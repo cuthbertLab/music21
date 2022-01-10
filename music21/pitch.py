@@ -4669,6 +4669,10 @@ class Pitch(prebase.ProtoM21Object):
             else:
                 return  # exit: nothing more to do
 
+        if self.accidental is not None and self.accidental.displayType == 'never':
+            self.accidental.displayStatus = False
+            return
+
         # no pitches in past...
         if not pitchPastAll:
             # if we have no past, we show the accidental if this pitch name

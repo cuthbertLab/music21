@@ -2807,6 +2807,16 @@ class Test(unittest.TestCase):
                              '%s failed, %s != %s' %
                                 (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
+    def testMakeAccidentalsRespectsDisplayType(self):
+        n = note.Note('D#')
+        n.pitch.accidental.displayType = 'never'
+        s = Stream(n)
+        self.assertIsNone(n.pitch.accidental.displayStatus)
+        s.makeAccidentals(inPlace=True)
+        self.assertIs(n.pitch.accidental.displayStatus, False)
+
+        # TODO: other types
+
     def testMakeNotationTiesKeyless(self):
         from music21 import converter
         p = converter.parse('tinynotation: 4/4 f#1~ f#1')
