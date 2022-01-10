@@ -4659,6 +4659,10 @@ class Pitch(prebase.ProtoM21Object):
             elif self.accidental.displayStatus in (True, False):
                 return  # exit: already set, do not override
 
+        if self.accidental is not None and self.accidental.displayType == 'never':
+            self.accidental.displayStatus = False
+            return
+
         if lastNoteWasTied is True:
             if self.accidental is not None:
                 if self.accidental.displayType != 'even-tied':
@@ -4668,10 +4672,6 @@ class Pitch(prebase.ProtoM21Object):
                 return
             else:
                 return  # exit: nothing more to do
-
-        if self.accidental is not None and self.accidental.displayType == 'never':
-            self.accidental.displayStatus = False
-            return
 
         # no pitches in past...
         if not pitchPastAll:
