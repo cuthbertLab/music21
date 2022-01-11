@@ -733,7 +733,8 @@ class Sites(common.SlottedObjectMixin):
 
     def getSitesByClass(self, className):
         '''
-        Return a list of unwrapped site from siteDict.site [SiteRef.site] (generally a Stream)
+        Return a list of unwrapped site from siteDict.site [SiteRef.site]
+        (generally a Stream)
         that matches the provided class.
 
         Input can be either a Class object or a string

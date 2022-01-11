@@ -1058,20 +1058,22 @@ class Music21Object(prebase.ProtoM21Object):
         >>> set(n2.getSpannerSites()) == {sp1, sp2}
         True
 
-        Optionally a class name or list of class names can be
-        specified and only Spanners of that class will be returned
+        Optionally a class name or list of class names (as Classes or strings)
+        can be specified and only Spanners of that class will be returned
 
         >>> sp3 = dynamics.Diminuendo(n1, n2)
-        >>> n2.getSpannerSites('Diminuendo') == [sp3]
+        >>> n2.getSpannerSites(dynamics.Diminuendo) == [sp3]
         True
 
         A larger class name can be used to get all subclasses:
 
-        >>> set(n2.getSpannerSites('DynamicWedge')) == {sp2, sp3}
+        >>> set(n2.getSpannerSites(dynamics.DynamicWedge)) == {sp2, sp3}
         True
         >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == {sp1, sp3}
         True
 
+        Note that the order of spanners returned from this routine can vary, so
+        changing to a set is useful:
 
         >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == {sp3, sp1}
         True
@@ -1086,8 +1088,8 @@ class Music21Object(prebase.ProtoM21Object):
         ...    for nOther in [n1, n2, n3]:
         ...        if n is nOther:
         ...            continue
-        ...        nSlurs = n.getSpannerSites('Slur')
-        ...        nOtherSlurs = nOther.getSpannerSites('Slur')
+        ...        nSlurs = n.getSpannerSites(spanner.Slur)
+        ...        nOtherSlurs = nOther.getSpannerSites(spanner.Slur)
         ...        for thisSlur in nSlurs:
         ...            if thisSlur in nOtherSlurs:
         ...               print(f'{n.name} shares a slur with {nOther.name}')
@@ -1109,7 +1111,7 @@ class Music21Object(prebase.ProtoM21Object):
                 post.append(obj.spannerParent)
             else:
                 for spannerClass in spannerClassList:
-                    if spannerClass in obj.spannerParent.classes:
+                    if spannerClass in obj.spannerParent.classSet:
                         post.append(obj.spannerParent)
                         break
 
