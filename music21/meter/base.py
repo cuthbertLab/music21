@@ -1178,7 +1178,10 @@ class TimeSignature(base.Music21Object):
         # create a scratch MeterSequence for structure
         tsStr = f'{self.numerator}/{self.denominator}'
         if self.beatSequence.isUniformPartition():
-            firstPartitionForm = len(self.beatSequence)
+            if len(self.beatSequence) > 1:
+                firstPartitionForm = len(self.beatSequence)
+            else:
+                firstPartitionForm = None
             cacheKey = (tsStr, firstPartitionForm, depth)
         else:  # derive from meter sequence
             firstPartitionForm = self.beatSequence
@@ -1231,7 +1234,7 @@ class TimeSignature(base.Music21Object):
     # access data for other processing
     def getBeams(self, srcList, measureStartOffset=0.0):
         '''
-        Given a qLen position and an iterable music21Objects, return a list of Beams object.
+        Given a qLen position and an iterable of Music21Objects, return a list of Beams objects.
 
         The iterable can be a list (of elements) or a Stream (preferably flat)
         or a :class:`~music21.stream.iterator.StreamIterator` from which Durations
@@ -1301,11 +1304,21 @@ class TimeSignature(base.Music21Object):
         >>> beamList = sixEight.getBeams(nList)
         >>> print(beamList)
         [None, None, None]
+
+        And Measure objects with :attr:`~music21.stream.Measure.paddingRight` set:
+
+        >>> twoFour = meter.TimeSignature('2/4')
+        >>> m = stream.Measure([note.Note(type='eighth') for _ in range(3)])
+        >>> m.paddingRight = 0.5
+        >>> twoFour.getBeams(m)
+        [<music21.beam.Beams <music21.beam.Beam 1/start>>,
+         <music21.beam.Beams <music21.beam.Beam 1/stop>>,
+         None]
         '''
         from music21 import stream
         if isinstance(srcList, stream.Stream):
-            srcList = list(srcList)  # do not change to [srcList]
             srcStream = srcList
+            srcList = list(srcList)  # do not change to [srcList]
         elif srcList and isinstance(srcList[0], base.Music21Object):
             # make into a stream to get proper offsets:
             # for eventually removing measureStartOffset
@@ -1370,14 +1383,16 @@ class TimeSignature(base.Music21Object):
                 return
 
             # determine beamType
-            if isFirst and measureStartOffset == 0:  # if the first w/o pickup, we always start
+            # if first w/o pickup, always start
+            if isFirst and measureStartOffset == 0:
                 beamType = 'start'
                 # get a partial beam if we cannot continue this
                 if (beamNext is None
                         or beamNumber not in beamNext.getNumbers()):
                     beamType = 'partial-right'
 
-            elif isLast:  # last is always stop
+            # if last in complete measure or not in a measure, always stop
+            elif isLast and (not srcStream.isMeasure or srcStream.paddingRight == 0.0):
                 beamType = 'stop'
                 # get a partial beam if we cannot form a beam
                 if (beamPrevious is None
@@ -1477,7 +1492,7 @@ class TimeSignature(base.Music21Object):
         for outer_depth in range(len(beam.beamableDurationTypes)):
             # increment to count from 1 not 0
             # assume we are always starting at offset w/n this meter (Jose)
-            for outer_i, outer_el in enumerate(srcStream):
+            for outer_i, outer_el in enumerate(srcList):
                 fixBeamsOneElementDepth(outer_i, outer_el, outer_depth)
 
         beamsList = beam.Beams.sanitizePartialBeams(beamsList)

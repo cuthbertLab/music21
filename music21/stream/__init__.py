@@ -14,7 +14,7 @@
 from music21.exceptions21 import StreamException, ImmutableStreamException
 from music21.stream.base import (
     Stream, Opus, Score, Part, PartStaff, Measure, Voice,
-    SpannerStorage, VariantStorage, System,
+    SpannerStorage, VariantStorage, System, StreamType
 )
 from music21.stream import core
 from music21.stream import enums

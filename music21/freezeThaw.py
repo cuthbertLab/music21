@@ -682,9 +682,9 @@ class StreamFreezer(StreamFreezeThawBase):
             import jsonpickle
             data = jsonpickle.encode(storage, **keywords)
             if zipType == 'zlib':
-                data = zlib.compress(data)
+                data = zlib.compress(data.encode())
 
-            with open(fp, 'w') as f:
+            with open(fp, 'w', encoding='utf-8') as f:
                 f.write(data)
 
         else:  # pragma: no cover
@@ -951,7 +951,7 @@ class StreamThawer(StreamFreezeThawBase):
             common.restorePathClassesAfterUnpickling()
         elif fmt == 'jsonpickle':
             import jsonpickle
-            with open(fp, 'r') as f:
+            with open(fp, 'r', encoding='utf-8') as f:
                 data = f.read()
             storage = jsonpickle.decode(data)
             self.stream = self.unpackStream(storage)

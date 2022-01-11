@@ -681,7 +681,6 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
             returnObjMeasures = returnObj.getElementsByClass('Measure')
             if returnObjMeasures:  # If no parts, but still measures, iterate through them.
                 for j, returnObjMeasure in enumerate(returnObjMeasures):
-                    returnObjMeasure = returnObjMeasures[j]
                     sMeasure = s.getElementsByClass('Measure')[j]
                     _mergeVariants(returnObjMeasure, sMeasure,
                                    variantName=variantName, inPlace=True)
@@ -2386,7 +2385,7 @@ class Variant(base.Music21Object):
             spacerDuration = 0.0
 
 
-        if self.lengthType == 'replacement' or self.lengthType == 'elongation':
+        if self.lengthType in ('replacement', 'elongation'):
             vEnd = vStart + self.replacementDuration + spacerDuration
             classes = []
             for e in self.elements:

@@ -48,6 +48,7 @@ from music21 import interval  # for transposing instruments
 from music21 import key
 from music21 import layout
 from music21 import metadata
+from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 from music21 import note
 from music21 import meter
 from music21 import percussion
@@ -108,7 +109,7 @@ def textNotNone(mxObj):
     return True
 
 
-def textStripValid(mxObj):
+def textStripValid(mxObj: ET.Element):
     '''
     returns True if textNotNone(mxObj)
     and mxObj.text.strip() is not empty
@@ -131,7 +132,7 @@ def textStripValid(mxObj):
     return True
 
 
-def musicXMLTypeToType(value):
+def musicXMLTypeToType(value: str) -> str:
     '''
     Utility function to convert a MusicXML duration type to an music21 duration type.
 
@@ -475,6 +476,9 @@ class XMLParserBase:
         '''
         Sets m21Object.style.color to be the same as color...
         '''
+        # we repeat 'color' rather than just letting setStyleAttributes
+        # handle it, because otherwise it will run the expensive
+        # hyphenToCamelCase routine on something called on each note.
         self.setStyleAttributes(mxObject, m21Object, 'color', 'color')
 
     def setFont(self, mxObject, m21Object):
@@ -828,7 +832,7 @@ class MusicXMLImporter(XMLParserBase):
         self.partGroupList = []
         self.parts = []
 
-        self.musicXmlVersion = '3.0'
+        self.musicXmlVersion = '3.1'
 
     def scoreFromFile(self, filename):
         '''
@@ -1273,9 +1277,11 @@ class MusicXMLImporter(XMLParserBase):
         if inputM21 is None:
             return md
 
-    def identificationToMetadata(self, identification, inputM21=None):
+    def identificationToMetadata(self,
+                                 identification: ET.Element,
+                                 inputM21: Optional[metadata.Metadata] = None):
         '''
-        Converter an <identification> tag, containing <creator> tags, <rights> tags, and
+        Convert an <identification> tag, containing <creator> tags, <rights> tags, and
         <miscellaneous> tag.
 
         Not supported: source, relation
@@ -1302,30 +1308,7 @@ class MusicXMLImporter(XMLParserBase):
 
         encoding = identification.find('encoding')
         if encoding is not None:
-            # TODO: encoder (text + type = role) multiple
-            # TODO: encoding date multiple
-            # TODO: encoding-description (string) multiple
-            for software in encoding.findall('software'):
-                if textStripValid(software):
-                    md.software.append(software.text.strip())
-
-            for supports in encoding.findall('supports'):
-                # todo: element: required
-                # todo: type: required -- not sure of the difference between this and value
-                #         though type is yes-no while value is string
-                attr = supports.get('attribute')
-                value = supports.get('value')
-                if value is None:
-                    value = supports.get('type')
-
-                # found in wild: element=accidental type="no" -- No accidentals are indicated
-                # found in wild: transpose
-                # found in wild: beam
-                # found in wild: stem
-                if (attr, value) == ('new-system', 'yes'):
-                    self.definesExplicitSystemBreaks = True
-                elif (attr, value) == ('new-page', 'yes'):
-                    self.definesExplicitPageBreaks = True
+            self.processEncoding(encoding, md)
 
         # TODO: source
         # TODO: relation
@@ -1348,10 +1331,38 @@ class MusicXMLImporter(XMLParserBase):
         if inputM21 is None:
             return md
 
-    def creatorToContributor(self, creator, inputM21=None):
+    def processEncoding(self, encoding: ET.Element, md: metadata.Metadata):
+        # TODO: encoder (text + type = role) multiple
+        # TODO: encoding date multiple
+        # TODO: encoding-description (string) multiple
+        for software in encoding.findall('software'):
+            if textStripValid(software):
+                md.software.append(software.text.strip())
+
+        for supports in encoding.findall('supports'):
+            # todo: element: required
+            # todo: type: required -- not sure of the difference between this and value
+            #         though type is yes-no while value is string
+            attr = supports.get('attribute')
+            value = supports.get('value')
+            if value is None:
+                value = supports.get('type')
+
+            # found in wild: element=accidental type="no" -- No accidentals are indicated
+            # found in wild: transpose
+            # found in wild: beam
+            # found in wild: stem
+            if (attr, value) == ('new-system', 'yes'):
+                self.definesExplicitSystemBreaks = True
+            elif (attr, value) == ('new-page', 'yes'):
+                self.definesExplicitPageBreaks = True
+
+    def creatorToContributor(self,
+                             creator: ET.Element,
+                             inputM21: Optional[metadata.primitives.Contributor] = None):
         # noinspection PyShadowingNames
         '''
-        Given an <creator> tag, fill the necessary parameters of a Contributor.
+        Given a <creator> tag, fill the necessary parameters of a Contributor.
 
         >>> import xml.etree.ElementTree as ET
         >>> creator = ET.fromstring('<creator type="composer">Beethoven, Ludwig van</creator>')
@@ -1391,7 +1402,7 @@ class MusicXMLImporter(XMLParserBase):
     def rightsToCopyright(self, rights):
         # noinspection PyShadowingNames
         '''
-        Given an <rights> tag, fill the necessary parameters of a
+        Given a <rights> tag, fill the necessary parameters of a
         :class:`~music21.metadata.primitives.Copyright` object.
 
         >>> import xml.etree.ElementTree as ET
@@ -1595,7 +1606,6 @@ class PartParser(XMLParserBase):
         # TODO: midi-device
         # TODO: midi-name
         # TODO: midi-bank transform=_adjustMidiData
-        # TODO: midi-unpitched
         # TODO: midi-volume
         # TODO: pan
         # TODO: elevation
@@ -1604,7 +1614,17 @@ class PartParser(XMLParserBase):
         i: Optional[instrument.Instrument] = None
         if mxMIDIInstrument is not None:
             mxMidiProgram = mxMIDIInstrument.find('midi-program')
-            if textStripValid(mxMidiProgram):
+            mxMidiUnpitched = mxMIDIInstrument.find('midi-unpitched')
+            if textStripValid(mxMidiUnpitched):
+                pm = PercussionMapper()
+                try:
+                    i = pm.midiPitchToInstrument(_adjustMidiData(mxMidiUnpitched.text))
+                except MIDIPercussionException as mpe:
+                    # objects not yet existing in m21 such as Cabasa
+                    warnings.warn(MusicXMLWarning(mpe))
+                    i = instrument.UnpitchedPercussion()
+                    i.percMapPitch = _adjustMidiData(mxMidiUnpitched.text)
+            elif textStripValid(mxMidiProgram):
                 try:
                     i = instrument.instrumentFromMidiProgram(_adjustMidiData(mxMidiProgram.text))
                 except instrument.InstrumentException as ie:
@@ -1700,6 +1720,7 @@ class PartParser(XMLParserBase):
             'GeneralNote',
             'KeySignature',
             'StaffLayout',
+            'TempoIndication',
             'TimeSignature',
         ]
 
@@ -1768,7 +1789,6 @@ class PartParser(XMLParserBase):
         staffGroup.style.hideObjectOnPrint = True  # in truth, hide the name, not the brace
         self.parent.stream.insert(0, staffGroup)
 
-
     def _getStaffExclude(
         self,
         staffReference: StaffReferenceType,
@@ -1807,7 +1827,7 @@ class PartParser(XMLParserBase):
         post.sort()
         return post
 
-    def xmlMeasureToMeasure(self, mxMeasure):
+    def xmlMeasureToMeasure(self, mxMeasure: ET.Element) -> stream.Measure:
         # noinspection PyShadowingNames
         '''
         Convert a measure element to a Measure, using
@@ -1888,7 +1908,7 @@ class PartParser(XMLParserBase):
 
         return m
 
-    def updateTransposition(self, newTransposition):
+    def updateTransposition(self, newTransposition: interval.Interval):
         '''
         As you might expect, a measureParser that reveals a change
         in transposition is going to have an effect on the
@@ -1936,7 +1956,7 @@ class PartParser(XMLParserBase):
         self.activeInstrument.transposition = newTransposition
         self.atSoundingPitch = False
 
-    def setLastMeasureInfo(self, m):
+    def setLastMeasureInfo(self, m: stream.Measure):
         # noinspection PyShadowingNames
         '''
         Sets self.lastMeasureNumber and self.lastMeasureSuffix from the measure,
@@ -2017,7 +2037,7 @@ class PartParser(XMLParserBase):
             ts = meter.TimeSignature('4/4')
             self.lastTimeSignature = ts
 
-    def adjustTimeAttributesFromMeasure(self, m):
+    def adjustTimeAttributesFromMeasure(self, m: stream.Measure):
         '''
         Adds padAsAnacrusis to pickup measures and other measures that
         do not fill the whole tile, if the first measure of the piece, or
@@ -2109,7 +2129,7 @@ class PartParser(XMLParserBase):
 
         self.lastMeasureOffset += mOffsetShift
 
-    def applyMultiMeasureRest(self, r):
+    def applyMultiMeasureRest(self, r: note.Rest):
         '''
         If there is an active MultiMeasureRestSpanner, add the Rest, r, to it:
 
@@ -2201,11 +2221,6 @@ class MeasureParser(XMLParserBase):
         'bookmark': None,
         # Note: <print> is handled separately...
     }
-
-    # TODO: editorial, i.e., footnote and level
-    # staves: see separateOutPartStaves()
-    # TODO: part-symbol
-    # not to be done: directive DEPRECATED since MusicXML 2.0
     def __init__(self, mxMeasure=None, parent=None):
         super().__init__()
 
@@ -2460,7 +2475,7 @@ class MeasureParser(XMLParserBase):
             self.fullMeasureRest = True
             # it might already be True because a rest had a "measure='yes'" attribute
 
-    def xmlBackup(self, mxObj):
+    def xmlBackup(self, mxObj: ET.Element):
         '''
         Parse a backup tag by changing :attr:`offsetMeasureNote`.
 
@@ -2491,7 +2506,7 @@ class MeasureParser(XMLParserBase):
             # https://github.com/cuthbertLab/music21/issues/971
             self.offsetMeasureNote = max(self.offsetMeasureNote, 0.0)
 
-    def xmlForward(self, mxObj):
+    def xmlForward(self, mxObj: ET.Element):
         '''
         Parse a forward tag by changing :attr:`offsetMeasureNote`.
         '''
@@ -2514,7 +2529,7 @@ class MeasureParser(XMLParserBase):
             # xmlToNote() sets None
             self.endedWithForwardTag = r
 
-    def xmlPrint(self, mxPrint):
+    def xmlPrint(self, mxPrint: ET.Element):
         '''
         <print> handles changes in pages, numbering, layout,
         etc. so can generate PageLayout, SystemLayout, or StaffLayout
@@ -2574,7 +2589,7 @@ class MeasureParser(XMLParserBase):
         # TODO: part-abbreviation display
         # TODO: print-attributes: staff-spacing, blank-page; skip deprecated staff-spacing
 
-    def xmlToNote(self, mxNote):
+    def xmlToNote(self, mxNote: ET.Element) -> None:
         '''
         Handles everything for creating a Note or Rest or Chord
 
@@ -2667,7 +2682,7 @@ class MeasureParser(XMLParserBase):
         self.offsetMeasureNote += offsetIncrement
         self.endedWithForwardTag = None
 
-    def xmlToChord(self, mxNoteList):
+    def xmlToChord(self, mxNoteList: List[ET.Element]) -> chord.Chord:
         # noinspection PyShadowingNames
         '''
         Given an a list of mxNotes, fill the necessary parameters
@@ -2762,9 +2777,6 @@ class MeasureParser(XMLParserBase):
         The `spannerBundle` parameter can be a list or a Stream
         for storing and processing Spanner objects.
 
-        If inputM21 is not `None` then that object is used
-        for translating. Otherwise a new Note is created.
-
         if freeSpanners is False then pending spanners will not be freed.
 
         >>> from xml.etree.ElementTree import fromstring as EL
@@ -2804,7 +2816,7 @@ class MeasureParser(XMLParserBase):
         '''
         d = self.xmlToDuration(mxNote)
 
-        n = None
+        n: Union[note.Note, note.Unpitched]
 
         mxUnpitched = mxNote.find('unpitched')
         if mxUnpitched is None:
@@ -2844,7 +2856,7 @@ class MeasureParser(XMLParserBase):
 
     # beam and beams
 
-    def xmlToBeam(self, mxBeam, inputM21=None):
+    def xmlToBeam(self, mxBeam: ET.Element, inputM21=None):
         # noinspection PyShadowingNames
         '''
         given an mxBeam object return a :class:`~music21.beam.Beam` object
@@ -5119,20 +5131,24 @@ class MeasureParser(XMLParserBase):
         self.activeAttributes = mxAttributes
         for mxSub in mxAttributes:
             tag = mxSub.tag
-            meth = None
-            # key, clef, time, details
+            # clef, key, measure-style, time, staff-details
             if tag in self.attributeTagsToMethods:
                 meth = getattr(self, self.attributeTagsToMethods[tag])
-
-            if meth is not None:
                 meth(mxSub)
-            elif tag == 'staves':
-                self.staves = int(mxSub.text)
+            # NOT to be done: directive -- deprecated since v2.
             elif tag == 'divisions':
                 self.divisions = common.opFrac(float(mxSub.text))
+            # TODO: for-part
+            # TODO: instruments -- int if more than one instrument plays most of the time
+            # TODO: part-symbol
+            elif tag == 'staves':
+                self.staves = int(mxSub.text)
             elif tag == 'transpose':
                 self.transposition = self.xmlTransposeToInterval(mxSub)
                 # environLocal.warn('Got a transposition of ', str(self.transposition) )
+
+        # footnote, level
+        self.setEditorial(mxAttributes, self.stream)
 
         if self.parent is not None:
             self.parent.lastDivisions = self.divisions
@@ -6168,6 +6184,13 @@ class Test(unittest.TestCase):
         # s = converter.parse(testPrimitive.articulations01)
         # s.show()
 
+    def testImportMetronomeMarksC(self):
+        '''Import tempo into only the first PartStaff'''
+        from music21 import corpus
+        s = corpus.parse('demos/two-parts')
+        self.assertEqual(len(s.parts.first()[tempo.MetronomeMark]), 1)
+        self.assertEqual(len(s.parts.last()[tempo.MetronomeMark]), 0)
+
     def testImportGraceNotesA(self):
         # test importing from musicxml
         from music21.musicxml import testPrimitive
@@ -7124,6 +7147,39 @@ class Test(unittest.TestCase):
         MP.xmlToDuration(mxNoteNoType, inputM21=d)
         self.assertEqual(len(d.tuplets), 0)
         self.assertEqual(d.linked, True)
+
+    def testImportUnpitchedPercussion(self):
+        from xml.etree.ElementTree import fromstring as EL
+        scorePart = '''
+        <score-part id="P4"><part-name>Tambourine</part-name>
+        <part-abbreviation>Tamb.</part-abbreviation>
+        <score-instrument id="P4-I55">
+            <instrument-name>Tambourine</instrument-name>
+        </score-instrument>
+        <midi-instrument id="P4-I55">
+           <midi-channel>10</midi-channel>
+           <midi-unpitched>55</midi-unpitched>
+        </midi-instrument>
+        </score-part>
+        '''
+
+        PP = PartParser()
+        mxScorePart = EL(scorePart)
+        tmb = PP.getDefaultInstrument(mxScorePart)
+        self.assertIsInstance(tmb, instrument.Tambourine)
+        self.assertEqual(tmb.percMapPitch, 54)  # 1-indexed
+
+        # An instrument music21 doesn't have yet (Cabasa):
+        scorePart = scorePart.replace('Tambourine', 'Cabasa')
+        scorePart = scorePart.replace('Tamb.', 'Cab.')
+        scorePart = scorePart.replace('55', '70')  # 1-indexed
+        PP = PartParser()
+        mxScorePart = EL(scorePart)
+        msg = '69 does not map to a valid instrument!'
+        with self.assertWarnsRegex(MusicXMLWarning, msg):
+            unp = PP.getDefaultInstrument(mxScorePart)
+        self.assertIsInstance(unp, instrument.UnpitchedPercussion)
+        self.assertEqual(unp.percMapPitch, 69)
 
 
 if __name__ == '__main__':

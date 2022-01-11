@@ -173,7 +173,6 @@ tool.
 * <sb>: a system break
 
 '''
-# pylint: disable=misplaced-comparison-constant
 from typing import Optional, Union, List, Tuple
 from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
 

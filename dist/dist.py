@@ -42,9 +42,12 @@ the announcement while it's running.
 11. run documentation/upload.py or upload via ssh.
    -- you will need an MIT username and password + a dual authentication passcode
 
-12. zip up documentation/build/html and get ready to upload/delete it. (skip for Alpha/Beta)
+12. zip up documentation/build/html and get ready to upload/delete it.
+    Rename to music21.v.7.1.0-docs.zip (skip for Alpha/Beta)
 
-13. And finally this file. (from the command line; not as python -m... Catalina needs sudo)
+12b. If any new file extensions have been added, be sure to add them to MANIFEST.in
+
+13. And finally this file. (from the command line; not as python -m... OS 11+ needs sudo)
 
 14. COMMIT to Github at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
@@ -181,7 +184,7 @@ class Distributor:
         '''
         TAR = 'TAR'
         # EGG = 'EGG'
-        if fp.endswith('.tar.gz'):
+        if fp and fp.endswith('.tar.gz'):
             mode = TAR
             modeExt = '.tar.gz'
         else:

@@ -33,7 +33,7 @@ class OutputFormat:
             fp = environLocal.getTempFile(suffix=self.ext)
         if not str(fp).endswith(self.ext):
             raise OutputFormatException('Could not get a temp file with the right extension')
-        with open(fp, 'w') as f:
+        with open(fp, 'w', encoding='utf-8') as f:
             f.write(self.getString(includeClassLabel=includeClassLabel,
                                    includeId=includeId))
         return fp

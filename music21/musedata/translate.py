@@ -239,7 +239,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             if mdr.isBack():
                 # the current use of back assumes tt back assumes tt we always
                 # return to the start of the measure; this may not be the case
-                if pendingRecords != []:
+                if pendingRecords:
                     eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
                     pendingRecords = []
 
@@ -251,7 +251,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             if mdr.isRest():
                 # environLocal.printDebug(['got mdr rest, parent:', mdr.parent])
                 # check for pending records first
-                if pendingRecords != []:
+                if pendingRecords:
                     eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
                     pendingRecords = []
                 # create rest after clearing pending records
@@ -273,7 +273,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 # either this is a note alone, or this is the first
                 # note found that is not a chord; if first not a chord
                 # need to append immediately
-                if pendingRecords != []:
+                if pendingRecords:
                     # this could be a Chord or Note
                     eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
                     pendingRecords = []
@@ -281,7 +281,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 pendingRecords.append(mdr)
 
         # check for any remaining single notes (if last) or chords
-        if pendingRecords != []:
+        if pendingRecords:
             eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
 
         # may be bending elements in a voice to append to a measure
