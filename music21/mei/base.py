@@ -173,10 +173,8 @@ tool.
 * <sb>: a system break
 
 '''
-# pylint: disable=misplaced-comparison-constant
 from typing import Optional, Union, List, Tuple
-from xml.etree import ElementTree as ETree
-from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
 
 from collections import defaultdict
 from fractions import Fraction  # for typing
@@ -289,14 +287,14 @@ class MeiToM21Converter:
             self.documentRoot = Element(f'{MEI_NS}mei')
         else:
             try:
-                self.documentRoot = ETree.fromstring(theDocument)
-            except ETree.ParseError as parseErr:
+                self.documentRoot = fromstring(theDocument)
+            except ParseError as parseErr:
                 environLocal.printDebug(
                     '\n\nERROR: Parsing the MEI document with ElementTree failed.')
                 environLocal.printDebug(f'We got the following error:\n{parseErr}')
                 raise MeiValidityError(_INVALID_XML_DOC)
 
-            if isinstance(self.documentRoot, ETree.ElementTree):
+            if isinstance(self.documentRoot, ElementTree):
                 # pylint warns that :class:`Element` doesn't have a getroot() method, which is
                 # true enough, but...
                 self.documentRoot = self.documentRoot.getroot()  # pylint: disable=maybe-no-member

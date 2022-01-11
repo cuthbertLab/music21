@@ -718,7 +718,7 @@ class ABCMetadata(ABCToken):
 
         >>> x = 'L:1/4\nM:3/4\n\nf'
         >>> sc = converter.parse(x, format='abc')
-        >>> sc.flat.notes[0].duration.type
+        >>> sc.recurse().notes.first().duration.type
         'quarter'
         '''
         # environLocal.printDebug(['getDefaultQuarterLength', self.data])
@@ -1575,7 +1575,7 @@ class ABCNote(ABCToken):
             ql = activeDefaultQuarterLength * int(numStr)
 
         if self.brokenRhythmMarker is not None:
-            symbol, direction = self.brokenRhythmMarker
+            symbol, direction = self.brokenRhythmMarker  # pylint: disable=unpacking-non-sequence
             if symbol == '>':
                 modPair = (1.5, 0.5)
             elif symbol == '<':
@@ -2773,7 +2773,6 @@ class ABCHandler:
         '''
         Returns True if this token structure defines Measures in a normal Measure form.
         Otherwise False
-
 
         >>> abcStr = ('M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" ' +
         ...     'snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" ' +

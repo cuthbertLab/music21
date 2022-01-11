@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2021 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -46,8 +46,10 @@ Example usage:
 2
 '''
 
+import contextlib
 import copy
 import fractions
+import io
 import unittest
 from math import inf
 from typing import Union, Tuple, Dict, List, Optional, Iterable
@@ -2194,11 +2196,18 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             gd = GraceDuration()
 
         newComponents = []
+        new_type = self.type
+        if new_type == 'zero':
+            new_type = 'eighth'  # now that it is not a grace, it needs a type.
+
         for c in self.components:
+            c_type = c.type
+            if c_type == 'zero':
+                c_type = 'eighth'
             newComponents.append(DurationTuple(c.type, c.dots, 0.0))
         gd.components = newComponents  # set new components
         gd.linked = False
-        gd.type = self.type
+        gd.type = new_type
         gd.quarterLength = 0.0
         return gd
 
@@ -3507,6 +3516,37 @@ class Test(unittest.TestCase):
             output.append(d.tuplets[0].type)
         # environLocal.printDebug(['got', output])
         self.assertEqual(output, match)
+
+    def testTupletTypeNested(self):
+        '''
+        Nested tuplets are not fully supported (TODO).
+        '''
+        from music21 import note
+        from music21 import stream
+
+        gapful = stream.Measure()
+        half = note.Note(type='half')
+        gapful.repeatAppend(half, 3)
+        for n in gapful:
+            n.duration.appendTuplet(Tuplet(3, 2))
+
+        # create nested tuplet on middle note
+        gapful.notes[1].duration.appendTuplet(Tuplet(2, 1))
+
+        gapless = stream.Measure()
+        for n in gapful:
+            gapless.append(n)
+
+        # Redirect stderr to suppress printed warning
+        # TODO: change to python warnings
+        file_like = io.StringIO()
+        with contextlib.redirect_stderr(file_like):
+            made = stream.makeNotation.makeTupletBrackets(gapless)
+
+        self.assertEqual(
+            [el.duration.tuplets[0].type for el in made],
+            ['startStop', None, 'startStop'],  # was ['start', None, 'stop']
+        )
 
     def testAugmentOrDiminish(self):
 

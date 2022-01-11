@@ -12,7 +12,6 @@
 import copy
 import fractions
 import io
-import math
 # import pprint
 import re
 # import sys
@@ -49,6 +48,7 @@ from music21 import interval  # for transposing instruments
 from music21 import key
 from music21 import layout
 from music21 import metadata
+from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 from music21 import note
 from music21 import meter
 from music21 import percussion
@@ -109,7 +109,7 @@ def textNotNone(mxObj):
     return True
 
 
-def textStripValid(mxObj):
+def textStripValid(mxObj: ET.Element):
     '''
     returns True if textNotNone(mxObj)
     and mxObj.text.strip() is not empty
@@ -132,7 +132,7 @@ def textStripValid(mxObj):
     return True
 
 
-def musicXMLTypeToType(value):
+def musicXMLTypeToType(value: str) -> str:
     '''
     Utility function to convert a MusicXML duration type to an music21 duration type.
 
@@ -476,6 +476,9 @@ class XMLParserBase:
         '''
         Sets m21Object.style.color to be the same as color...
         '''
+        # we repeat 'color' rather than just letting setStyleAttributes
+        # handle it, because otherwise it will run the expensive
+        # hyphenToCamelCase routine on something called on each note.
         self.setStyleAttributes(mxObject, m21Object, 'color', 'color')
 
     def setFont(self, mxObject, m21Object):
@@ -829,7 +832,7 @@ class MusicXMLImporter(XMLParserBase):
         self.partGroupList = []
         self.parts = []
 
-        self.musicXmlVersion = '3.0'
+        self.musicXmlVersion = '3.1'
 
     def scoreFromFile(self, filename):
         '''
@@ -1274,9 +1277,11 @@ class MusicXMLImporter(XMLParserBase):
         if inputM21 is None:
             return md
 
-    def identificationToMetadata(self, identification, inputM21=None):
+    def identificationToMetadata(self,
+                                 identification: ET.Element,
+                                 inputM21: Optional[metadata.Metadata] = None):
         '''
-        Converter an <identification> tag, containing <creator> tags, <rights> tags, and
+        Convert an <identification> tag, containing <creator> tags, <rights> tags, and
         <miscellaneous> tag.
 
         Not supported: source, relation
@@ -1303,30 +1308,7 @@ class MusicXMLImporter(XMLParserBase):
 
         encoding = identification.find('encoding')
         if encoding is not None:
-            # TODO: encoder (text + type = role) multiple
-            # TODO: encoding date multiple
-            # TODO: encoding-description (string) multiple
-            for software in encoding.findall('software'):
-                if textStripValid(software):
-                    md.software.append(software.text.strip())
-
-            for supports in encoding.findall('supports'):
-                # todo: element: required
-                # todo: type: required -- not sure of the difference between this and value
-                #         though type is yes-no while value is string
-                attr = supports.get('attribute')
-                value = supports.get('value')
-                if value is None:
-                    value = supports.get('type')
-
-                # found in wild: element=accidental type="no" -- No accidentals are indicated
-                # found in wild: transpose
-                # found in wild: beam
-                # found in wild: stem
-                if (attr, value) == ('new-system', 'yes'):
-                    self.definesExplicitSystemBreaks = True
-                elif (attr, value) == ('new-page', 'yes'):
-                    self.definesExplicitPageBreaks = True
+            self.processEncoding(encoding, md)
 
         # TODO: source
         # TODO: relation
@@ -1349,10 +1331,38 @@ class MusicXMLImporter(XMLParserBase):
         if inputM21 is None:
             return md
 
-    def creatorToContributor(self, creator, inputM21=None):
+    def processEncoding(self, encoding: ET.Element, md: metadata.Metadata):
+        # TODO: encoder (text + type = role) multiple
+        # TODO: encoding date multiple
+        # TODO: encoding-description (string) multiple
+        for software in encoding.findall('software'):
+            if textStripValid(software):
+                md.software.append(software.text.strip())
+
+        for supports in encoding.findall('supports'):
+            # todo: element: required
+            # todo: type: required -- not sure of the difference between this and value
+            #         though type is yes-no while value is string
+            attr = supports.get('attribute')
+            value = supports.get('value')
+            if value is None:
+                value = supports.get('type')
+
+            # found in wild: element=accidental type="no" -- No accidentals are indicated
+            # found in wild: transpose
+            # found in wild: beam
+            # found in wild: stem
+            if (attr, value) == ('new-system', 'yes'):
+                self.definesExplicitSystemBreaks = True
+            elif (attr, value) == ('new-page', 'yes'):
+                self.definesExplicitPageBreaks = True
+
+    def creatorToContributor(self,
+                             creator: ET.Element,
+                             inputM21: Optional[metadata.primitives.Contributor] = None):
         # noinspection PyShadowingNames
         '''
-        Given an <creator> tag, fill the necessary parameters of a Contributor.
+        Given a <creator> tag, fill the necessary parameters of a Contributor.
 
         >>> import xml.etree.ElementTree as ET
         >>> creator = ET.fromstring('<creator type="composer">Beethoven, Ludwig van</creator>')
@@ -1392,7 +1402,7 @@ class MusicXMLImporter(XMLParserBase):
     def rightsToCopyright(self, rights):
         # noinspection PyShadowingNames
         '''
-        Given an <rights> tag, fill the necessary parameters of a
+        Given a <rights> tag, fill the necessary parameters of a
         :class:`~music21.metadata.primitives.Copyright` object.
 
         >>> import xml.etree.ElementTree as ET
@@ -1584,7 +1594,10 @@ class PartParser(XMLParserBase):
             mxScorePart = self.mxScorePart
 
         def _adjustMidiData(mc):
-            return int(mc) - 1
+            adjusted = int(mc) - 1
+            if adjusted == -1:
+                adjusted = 0  # a lot of zero indexed pianos...
+            return adjusted
 
         seta = _setAttributeFromTagText
 
@@ -1593,7 +1606,6 @@ class PartParser(XMLParserBase):
         # TODO: midi-device
         # TODO: midi-name
         # TODO: midi-bank transform=_adjustMidiData
-        # TODO: midi-unpitched
         # TODO: midi-volume
         # TODO: pan
         # TODO: elevation
@@ -1602,7 +1614,17 @@ class PartParser(XMLParserBase):
         i: Optional[instrument.Instrument] = None
         if mxMIDIInstrument is not None:
             mxMidiProgram = mxMIDIInstrument.find('midi-program')
-            if textStripValid(mxMidiProgram):
+            mxMidiUnpitched = mxMIDIInstrument.find('midi-unpitched')
+            if textStripValid(mxMidiUnpitched):
+                pm = PercussionMapper()
+                try:
+                    i = pm.midiPitchToInstrument(_adjustMidiData(mxMidiUnpitched.text))
+                except MIDIPercussionException as mpe:
+                    # objects not yet existing in m21 such as Cabasa
+                    warnings.warn(MusicXMLWarning(mpe))
+                    i = instrument.UnpitchedPercussion()
+                    i.percMapPitch = _adjustMidiData(mxMidiUnpitched.text)
+            elif textStripValid(mxMidiProgram):
                 try:
                     i = instrument.instrumentFromMidiProgram(_adjustMidiData(mxMidiProgram.text))
                 except instrument.InstrumentException as ie:
@@ -1698,6 +1720,7 @@ class PartParser(XMLParserBase):
             'GeneralNote',
             'KeySignature',
             'StaffLayout',
+            'TempoIndication',
             'TimeSignature',
         ]
 
@@ -1766,7 +1789,6 @@ class PartParser(XMLParserBase):
         staffGroup.style.hideObjectOnPrint = True  # in truth, hide the name, not the brace
         self.parent.stream.insert(0, staffGroup)
 
-
     def _getStaffExclude(
         self,
         staffReference: StaffReferenceType,
@@ -1805,7 +1827,7 @@ class PartParser(XMLParserBase):
         post.sort()
         return post
 
-    def xmlMeasureToMeasure(self, mxMeasure):
+    def xmlMeasureToMeasure(self, mxMeasure: ET.Element) -> stream.Measure:
         # noinspection PyShadowingNames
         '''
         Convert a measure element to a Measure, using
@@ -1838,12 +1860,20 @@ class PartParser(XMLParserBase):
         3.0
         '''
         measureParser = MeasureParser(mxMeasure, parent=self)
+        # noinspection PyBroadException
         try:
             measureParser.parse()
         except MusicXMLImportException as e:
             e.measureNumber = measureParser.measureNumber
             e.partName = self.stream.partName
             raise e
+        except Exception as e:  # pylint: disable=broad-except
+            warnings.warn(
+                f'The following exception took place in m. {measureParser.measureNumber} in '
+                + f'part {self.stream.partName}.'
+            )
+            raise e
+
         self.lastMeasureParser = measureParser
 
         if measureParser.staves > self.maxStaves:
@@ -1871,12 +1901,14 @@ class PartParser(XMLParserBase):
                 r1.duration.quarterLength = lastTSQl
                 r1.fullMeasure = True
 
-        self.stream.coreInsert(self.lastMeasureOffset, m)
+        # NB: not coreInsert, because barDurationProportion()
+        # is called in adjustTimeAttributesFromMeasure()
+        self.stream.insert(self.lastMeasureOffset, m)
         self.adjustTimeAttributesFromMeasure(m)
 
         return m
 
-    def updateTransposition(self, newTransposition):
+    def updateTransposition(self, newTransposition: interval.Interval):
         '''
         As you might expect, a measureParser that reveals a change
         in transposition is going to have an effect on the
@@ -1924,7 +1956,7 @@ class PartParser(XMLParserBase):
         self.activeInstrument.transposition = newTransposition
         self.atSoundingPitch = False
 
-    def setLastMeasureInfo(self, m):
+    def setLastMeasureInfo(self, m: stream.Measure):
         # noinspection PyShadowingNames
         '''
         Sets self.lastMeasureNumber and self.lastMeasureSuffix from the measure,
@@ -2005,7 +2037,7 @@ class PartParser(XMLParserBase):
             ts = meter.TimeSignature('4/4')
             self.lastTimeSignature = ts
 
-    def adjustTimeAttributesFromMeasure(self, m):
+    def adjustTimeAttributesFromMeasure(self, m: stream.Measure):
         '''
         Adds padAsAnacrusis to pickup measures and other measures that
         do not fill the whole tile, if the first measure of the piece, or
@@ -2097,7 +2129,7 @@ class PartParser(XMLParserBase):
 
         self.lastMeasureOffset += mOffsetShift
 
-    def applyMultiMeasureRest(self, r):
+    def applyMultiMeasureRest(self, r: note.Rest):
         '''
         If there is an active MultiMeasureRestSpanner, add the Rest, r, to it:
 
@@ -2189,11 +2221,6 @@ class MeasureParser(XMLParserBase):
         'bookmark': None,
         # Note: <print> is handled separately...
     }
-
-    # TODO: editorial, i.e., footnote and level
-    # staves: see separateOutPartStaves()
-    # TODO: part-symbol
-    # not to be done: directive DEPRECATED since MusicXML 2.0
     def __init__(self, mxMeasure=None, parent=None):
         super().__init__()
 
@@ -2448,7 +2475,7 @@ class MeasureParser(XMLParserBase):
             self.fullMeasureRest = True
             # it might already be True because a rest had a "measure='yes'" attribute
 
-    def xmlBackup(self, mxObj):
+    def xmlBackup(self, mxObj: ET.Element):
         '''
         Parse a backup tag by changing :attr:`offsetMeasureNote`.
 
@@ -2479,7 +2506,7 @@ class MeasureParser(XMLParserBase):
             # https://github.com/cuthbertLab/music21/issues/971
             self.offsetMeasureNote = max(self.offsetMeasureNote, 0.0)
 
-    def xmlForward(self, mxObj):
+    def xmlForward(self, mxObj: ET.Element):
         '''
         Parse a forward tag by changing :attr:`offsetMeasureNote`.
         '''
@@ -2502,7 +2529,7 @@ class MeasureParser(XMLParserBase):
             # xmlToNote() sets None
             self.endedWithForwardTag = r
 
-    def xmlPrint(self, mxPrint):
+    def xmlPrint(self, mxPrint: ET.Element):
         '''
         <print> handles changes in pages, numbering, layout,
         etc. so can generate PageLayout, SystemLayout, or StaffLayout
@@ -2562,7 +2589,7 @@ class MeasureParser(XMLParserBase):
         # TODO: part-abbreviation display
         # TODO: print-attributes: staff-spacing, blank-page; skip deprecated staff-spacing
 
-    def xmlToNote(self, mxNote):
+    def xmlToNote(self, mxNote: ET.Element) -> None:
         '''
         Handles everything for creating a Note or Rest or Chord
 
@@ -2655,7 +2682,7 @@ class MeasureParser(XMLParserBase):
         self.offsetMeasureNote += offsetIncrement
         self.endedWithForwardTag = None
 
-    def xmlToChord(self, mxNoteList):
+    def xmlToChord(self, mxNoteList: List[ET.Element]) -> chord.Chord:
         # noinspection PyShadowingNames
         '''
         Given an a list of mxNotes, fill the necessary parameters
@@ -2750,9 +2777,6 @@ class MeasureParser(XMLParserBase):
         The `spannerBundle` parameter can be a list or a Stream
         for storing and processing Spanner objects.
 
-        If inputM21 is not `None` then that object is used
-        for translating. Otherwise a new Note is created.
-
         if freeSpanners is False then pending spanners will not be freed.
 
         >>> from xml.etree.ElementTree import fromstring as EL
@@ -2792,7 +2816,7 @@ class MeasureParser(XMLParserBase):
         '''
         d = self.xmlToDuration(mxNote)
 
-        n = None
+        n: Union[note.Note, note.Unpitched]
 
         mxUnpitched = mxNote.find('unpitched')
         if mxUnpitched is None:
@@ -2832,7 +2856,7 @@ class MeasureParser(XMLParserBase):
 
     # beam and beams
 
-    def xmlToBeam(self, mxBeam, inputM21=None):
+    def xmlToBeam(self, mxBeam: ET.Element, inputM21=None):
         # noinspection PyShadowingNames
         '''
         given an mxBeam object return a :class:`~music21.beam.Beam` object
@@ -3427,23 +3451,12 @@ class MeasureParser(XMLParserBase):
 
         # two ways to create durations, raw (from qLen) and cooked (from type, time-mod, dots)
         if d is not None:
+            # N.B. this branch currently executes just for grace note corrections
             durRaw = duration.Duration(quarterLength=qLen)  # raw just uses qLen
-            # the qLen set here may not be computable, but is not immediately
-            # computed until setting components
-            try:
-                d.components = durRaw.components
-            except duration.DurationException:  # TODO: Test
-                if qLen:
-                    qLenRounded = 2.0 ** round(math.log2(qLen))
-                else:
-                    qLenRounded = 0.0
-                environLocal.printDebug(
-                    ['mxToDuration',
-                        f'rounding duration to {qLenRounded} as type is not'
-                        + 'defined and raw quarterLength '
-                        + f'({qLen}) is not a computable duration'])
-                durRaw.quarterLength = qLen = qLenRounded
+            d.components = durRaw.components
+            d.tuplets = durRaw.tuplets
         else:
+            # N.B. this branch executes most of the time
             d = duration.Duration(quarterLength=qLen)
         # can't do this unless we have a type, so if not forceRaw
         if not forceRaw:  # a cooked version builds up from pieces
@@ -3455,7 +3468,7 @@ class MeasureParser(XMLParserBase):
                 return d if inputM21 is None else None
             if d is not None:
                 d.clear()
-                d.tuplets = []
+                d.tuplets = ()
                 d.addDurationTuple(dt)
             else:
                 d = duration.Duration(durationTuple=dt)
@@ -4479,7 +4492,7 @@ class MeasureParser(XMLParserBase):
         else:
             environLocal.warn(f'Cannot find voice {useVoice!r}; putting outside of voices.')
             environLocal.warn(f'Current voiceIds: {list(self.voicesById)}')
-            environLocal.warn(f'Current voices: {m.voices}')
+            environLocal.warn(f'Current voices: {list(m.voices)} in m. {m.number}')
 
         return thisVoice
 
@@ -5118,20 +5131,24 @@ class MeasureParser(XMLParserBase):
         self.activeAttributes = mxAttributes
         for mxSub in mxAttributes:
             tag = mxSub.tag
-            meth = None
-            # key, clef, time, details
+            # clef, key, measure-style, time, staff-details
             if tag in self.attributeTagsToMethods:
                 meth = getattr(self, self.attributeTagsToMethods[tag])
-
-            if meth is not None:
                 meth(mxSub)
-            elif tag == 'staves':
-                self.staves = int(mxSub.text)
+            # NOT to be done: directive -- deprecated since v2.
             elif tag == 'divisions':
                 self.divisions = common.opFrac(float(mxSub.text))
+            # TODO: for-part
+            # TODO: instruments -- int if more than one instrument plays most of the time
+            # TODO: part-symbol
+            elif tag == 'staves':
+                self.staves = int(mxSub.text)
             elif tag == 'transpose':
                 self.transposition = self.xmlTransposeToInterval(mxSub)
                 # environLocal.warn('Got a transposition of ', str(self.transposition) )
+
+        # footnote, level
+        self.setEditorial(mxAttributes, self.stream)
 
         if self.parent is not None:
             self.parent.lastDivisions = self.divisions
@@ -5889,7 +5906,7 @@ class Test(unittest.TestCase):
         # this is a good example with repeats
         s = corpus.parse('k80/movement3')
         for p in s.parts:
-            post = p.flat.getElementsByClass('Repeat')
+            post = p.recurse().getElementsByClass('Repeat')
             self.assertEqual(len(post), 6)
 
         # a = corpus.parse('opus41no1/movement3')
@@ -5918,7 +5935,7 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.spannersSlurs33c)
         # have 5 spanners
-        self.assertEqual(len(s.flat.getElementsByClass('Spanner')), 5)
+        self.assertEqual(len(s.flatten().getElementsByClass('Spanner')), 5)
 
         # can get the same from a recurse search
         self.assertEqual(len(s.recurse().getElementsByClass('Spanner')), 5)
@@ -5933,14 +5950,14 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.pianoStaff43a)
         self.assertEqual(len(s.parts), 2)
         # s.show()
-        self.assertEqual(len(s.parts[0].flat.getElementsByClass('Note')), 1)
-        self.assertEqual(len(s.parts[1].flat.getElementsByClass('Note')), 1)
+        self.assertEqual(len(s.parts[0][note.Note]), 1)
+        self.assertEqual(len(s.parts[1][note.Note]), 1)
 
         self.assertIsInstance(s.parts[0], stream.PartStaff)
         self.assertIsInstance(s.parts[1], stream.PartStaff)
 
         # make sure both staves get identical key signatures, but not the same object
-        keySigs = s.recurse().getElementsByClass('KeySignature')
+        keySigs = s[key.KeySignature]
         self.assertEqual(len(keySigs), 2)
         self.assertEqual(keySigs[0], keySigs[1])
         self.assertIsNot(keySigs[0], keySigs[1])
@@ -5952,12 +5969,12 @@ class Test(unittest.TestCase):
         s = converter.parse(testFiles.moussorgskyPromenade)
         self.assertEqual(len(s.parts), 2)
 
-        self.assertEqual(len(s.parts[0].flat.getElementsByClass('Note')), 19)
+        self.assertEqual(len(s.parts[0][note.Note]), 19)
         # only chords in the second part
-        self.assertEqual(len(s.parts[1].flat.getElementsByClass('Note')), 0)
+        self.assertEqual(len(s.parts[1][note.Note]), 0)
 
-        self.assertEqual(len(s.parts[0].flat.getElementsByClass('Chord')), 11)
-        self.assertEqual(len(s.parts[1].flat.getElementsByClass('Chord')), 11)
+        self.assertEqual(len(s.parts[0][chord.Chord]), 11)
+        self.assertEqual(len(s.parts[1][chord.Chord]), 11)
 
         # s.show()
 
@@ -5991,13 +6008,13 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.spanners33a)
         # this number will change as more are being imported
-        self.assertGreaterEqual(len(s.flat.spanners), 2)
+        self.assertGreaterEqual(len(s.flatten().spanners), 2)
 
         # environLocal.printDebug(['pre s.measures(2,3)', 's', s])
         ex = s.measures(2, 3)
 
         # just the relevant spanners
-        self.assertEqual(len(ex.flat.spanners), 2)
+        self.assertEqual(len(ex.flatten().spanners), 2)
         # ex.show()
 
         # slurs are on measures 2, 3
@@ -6013,7 +6030,7 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.textExpressions)
         # s.show()
-        self.assertEqual(len(s.flat.getElementsByClass('TextExpression')), 3)
+        self.assertEqual(len(s.flatten().getElementsByClass('TextExpression')), 3)
 
         p1 = s.parts[0]
         m1 = p1.getElementsByClass('Measure')[0]
@@ -6032,7 +6049,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         p = s.parts[0]
         for m in p.getElementsByClass('Measure'):
-            for n in m.flat.notes:
+            for n in m.flatten().notes:
                 if n.pitch.name in ['B']:
                     msg = f'{n.pitch.nameWithOctave}\n{n.duration.quarterLength}'
                     te = expressions.TextExpression(msg)
@@ -6085,22 +6102,22 @@ class Test(unittest.TestCase):
 
         # has one segno
         s = converter.parse(testPrimitive.repeatExpressionsA)
-        self.assertEqual(len(s.flat.getElementsByClass(repeat.Segno)), 1)
-        self.assertEqual(len(s.flat.getElementsByClass(repeat.Fine)), 1)
-        self.assertEqual(len(s.flat.getElementsByClass(repeat.DalSegnoAlFine)), 1)
+        self.assertEqual(len(s.flatten().getElementsByClass(repeat.Segno)), 1)
+        self.assertEqual(len(s.flatten().getElementsByClass(repeat.Fine)), 1)
+        self.assertEqual(len(s.flatten().getElementsByClass(repeat.DalSegnoAlFine)), 1)
 
         # has two codas
         s = converter.parse(testPrimitive.repeatExpressionsB)
-        self.assertEqual(len(s.flat.getElementsByClass(repeat.Coda)), 2)
+        self.assertEqual(len(s.flatten().getElementsByClass(repeat.Coda)), 2)
         # has one d.c.al coda
-        self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapoAlCoda)), 1)
+        self.assertEqual(len(s.flatten().getElementsByClass(repeat.DaCapoAlCoda)), 1)
 
     def testImportRepeatBracketA(self):
         from music21 import corpus
         # has repeats in it; start with single measure
         s = corpus.parse('opus74no1', 3)
         # there are 2 for each part, totaling 8
-        self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 8)
+        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 8)
         # can get for each part as spanners are stored in Part now
 
         # TODO: need to test getting repeat brackets after measure extraction
@@ -6155,7 +6172,7 @@ class Test(unittest.TestCase):
         # has metronome marks defined, not with sound tag
         s = converter.parse(testPrimitive.metronomeMarks31c)
         # get all tempo indications
-        mms = s.flat.getElementsByClass('TempoIndication')
+        mms = s.flatten().getElementsByClass('TempoIndication')
         self.assertGreater(len(mms), 3)
 
     def testImportMetronomeMarksB(self):
@@ -6166,6 +6183,13 @@ class Test(unittest.TestCase):
         # has only sound tempo=x tag
         # s = converter.parse(testPrimitive.articulations01)
         # s.show()
+
+    def testImportMetronomeMarksC(self):
+        '''Import tempo into only the first PartStaff'''
+        from music21 import corpus
+        s = corpus.parse('demos/two-parts')
+        self.assertEqual(len(s.parts.first()[tempo.MetronomeMark]), 1)
+        self.assertEqual(len(s.parts.last()[tempo.MetronomeMark]), 0)
 
     def testImportGraceNotesA(self):
         # test importing from musicxml
@@ -6196,7 +6220,7 @@ class Test(unittest.TestCase):
         # print(xml.decode('utf-8'))
         # c.show()
         inputStream = converter.parse(xml)
-        chordResult = inputStream.flat.notes[0]
+        chordResult = inputStream.flatten().notes[0]
         #         for n in chordResult:
         #             print(n.stemDirection)
 
@@ -6238,9 +6262,9 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         s = converter.parse(testPrimitive.transposingInstruments72a)
-        i1 = s.parts[0].flat.getElementsByClass('Instrument').first()
-        i2 = s.parts[1].flat.getElementsByClass('Instrument').first()
-        # unused_i3 = s.parts[2].flat.getElementsByClass('Instrument').first()
+        i1 = s.parts[0].flatten().getElementsByClass('Instrument').first()
+        i2 = s.parts[1].flatten().getElementsByClass('Instrument').first()
+        # unused_i3 = s.parts[2].flatten().getElementsByClass('Instrument').first()
 
         self.assertEqual(str(i1.transposition), '<music21.interval.Interval M-2>')
         self.assertEqual(str(i2.transposition), '<music21.interval.Interval M-6>')
@@ -6257,19 +6281,19 @@ class Test(unittest.TestCase):
         # N.B. names dont change just transpositions.
         # all playing A4 in concert pitch.
 
-        iStream1 = s.parts[0].flat.getElementsByClass('Instrument').stream()
+        iStream1 = s.parts[0].flatten().getElementsByClass('Instrument').stream()
         # three instruments; one initial, and then one for each transposition
         self.assertEqual(len(iStream1), 3)
         i1 = iStream1[0]
         self.assertIsInstance(i1, instrument.Oboe)
 
         # should be 3
-        iStream2 = s.parts[1].flat.getElementsByClass('Instrument').stream()
+        iStream2 = s.parts[1].flatten().getElementsByClass('Instrument').stream()
         self.assertEqual(len(iStream2), 3)
         i2 = iStream2[0]
         self.assertIsInstance(i2, instrument.Clarinet)
 
-        iStream3 = s.parts[2].flat.getElementsByClass('Instrument').stream()
+        iStream3 = s.parts[2].flatten().getElementsByClass('Instrument').stream()
         self.assertEqual(len(iStream3), 1)
         i3 = iStream3[0]
         self.assertIsInstance(i3, instrument.Horn)
@@ -6283,33 +6307,33 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(i3.transposition), '<music21.interval.Interval P-5>')
 
-        self.assertEqual(self.pitchOut(s.parts[0].flat.pitches),
+        self.assertEqual(self.pitchOut(s.parts[0].flatten().pitches),
                          '[A4, A4, A4, A4, A4, A4, A4, A4, '
                          + 'E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, '
                          + 'A4, A4, A4, A4]')
-        self.assertEqual(self.pitchOut(s.parts[1].flat.pitches),
+        self.assertEqual(self.pitchOut(s.parts[1].flatten().pitches),
                          '[B4, B4, B4, B4, '
                          + 'F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, '
                          + 'F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
-        self.assertEqual(self.pitchOut(s.parts[2].flat.pitches),
+        self.assertEqual(self.pitchOut(s.parts[2].flatten().pitches),
                          '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, '
                          + 'E5, E5, E5, E5, E5, E5, E5, E5]')
 
-        self.assertFalse(s.parts[0].flat.atSoundingPitch)
+        self.assertFalse(s.parts[0].flatten().atSoundingPitch)
 
         sSounding = s.toSoundingPitch(inPlace=False)
 
         # all A4s
-        self.assertEqual({p.nameWithOctave for p in sSounding.parts[0].flat.pitches},
+        self.assertEqual({p.nameWithOctave for p in sSounding.parts[0].flatten().pitches},
                          {'A4'})
-        self.assertEqual({p.nameWithOctave for p in sSounding.parts[1].flat.pitches},
+        self.assertEqual({p.nameWithOctave for p in sSounding.parts[1].flatten().pitches},
                          {'A4'})
-        self.assertEqual({p.nameWithOctave for p in sSounding.parts[2].flat.pitches},
+        self.assertEqual({p.nameWithOctave for p in sSounding.parts[2].flatten().pitches},
                          {'A4'})
 
         # chordification by default places notes at sounding pitch
         sChords = s.chordify()
-        self.assertEqual({p.nameWithOctave for p in sChords.flat.pitches},
+        self.assertEqual({p.nameWithOctave for p in sChords.flatten().pitches},
                          {'A4'})
         # sChords.show()
 
@@ -6319,7 +6343,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.transposing01)
-        instStream = s.flat.getElementsByClass('Instrument')
+        instStream = s.flatten().getElementsByClass('Instrument')
         # for i in instStream:
         #    print(i.offset, i, i.transposition)
         self.assertEqual(len(instStream), 7)
@@ -6329,29 +6353,29 @@ class Test(unittest.TestCase):
         from music21 import corpus
 
         s = corpus.parse('leadSheet/berlinAlexandersRagtime.xml')
-        self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 19)
+        self.assertEqual(len(s.flatten().getElementsByClass('ChordSymbol')), 19)
 
-        match = [h.chordKind for h in s.flat.getElementsByClass('ChordSymbol')]
+        match = [h.chordKind for h in s.recurse().getElementsByClass('ChordSymbol')]
         self.assertEqual(match, ['major', 'dominant-seventh', 'major', 'major', 'major',
                                  'major', 'dominant-seventh', 'major', 'dominant-seventh',
                                  'major', 'dominant-seventh', 'major', 'dominant-seventh',
                                  'major', 'dominant-seventh', 'major', 'dominant-seventh',
                                  'major', 'major'])
 
-        match = [str(h.root()) for h in s.flat.getElementsByClass('ChordSymbol')]
+        match = [str(h.root()) for h in s.recurse().getElementsByClass('ChordSymbol')]
 
         self.assertEqual(match, ['F3', 'C3', 'F3', 'B-2', 'F3', 'C3', 'G2', 'C3', 'C3',
                                  'F3', 'C3', 'F3', 'F2', 'B-2', 'F2', 'F3', 'C3', 'F3', 'C3'])
 
-        match = {str(h.figure) for h in s.flat.getElementsByClass('ChordSymbol')}
+        match = {str(h.figure) for h in s.recurse().getElementsByClass('ChordSymbol')}
 
         self.assertEqual(match, {'F', 'F7', 'B-', 'C7', 'G7', 'C'})
 
         s = corpus.parse('monteverdi/madrigal.3.12.xml')
-        self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 10)
+        self.assertEqual(len(s[harmony.ChordSymbol]), 10)
 
         s = corpus.parse('leadSheet/fosterBrownHair.xml')
-        self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 40)
+        self.assertEqual(len(s[harmony.ChordSymbol]), 40)
 
         # s.show()
 
@@ -6362,7 +6386,7 @@ class Test(unittest.TestCase):
         s = converter.parse(beethoven, format='musicxml')
         ex = s.parts[0]
         countTrill = 0
-        for n in ex.flat.notes:
+        for n in ex.recurse().notes:
             for e in n.expressions:
                 if 'Trill' in e.classes:
                     countTrill += 1
@@ -6371,7 +6395,7 @@ class Test(unittest.TestCase):
         # TODO: Get a better test... the single harmonic in the viola part,
         # m. 482 is probably a mistake for an open string.
         countTechnical = 0
-        for n in s.parts[2].flat.notes:
+        for n in s.parts[2].recurse().notes:
             for a in n.articulations:
                 if 'TechnicalIndication' in a.classes:
                     countTechnical += 1
@@ -6384,40 +6408,40 @@ class Test(unittest.TestCase):
         # has many ornaments
         s = converter.parse(testPrimitive.notations32a)
 
-        # s.flat.show('t')
-        num_tremolo_spanners = len(s.flat.getElementsByClass('TremoloSpanner'))
+        # s.flatten().show('t')
+        num_tremolo_spanners = len(s.flatten().getElementsByClass('TremoloSpanner'))
         self.assertEqual(num_tremolo_spanners, 0)  # no spanned tremolos
 
         count = 0
-        for n in s.flat.notes:
+        for n in s.recurse().notes:
             for e in n.expressions:
                 if 'Tremolo' in e.classes:
                     count += 1
         self.assertEqual(count, 1)  # One single Tremolo
 
         count = 0
-        for n in s.flat.notes:
+        for n in s.recurse().notes:
             for e in n.expressions:
                 if 'Turn' in e.classes:
                     count += 1
         self.assertEqual(count, 4)  # include inverted turn
 
         count = 0
-        for n in s.flat.notes:
+        for n in s.recurse().notes:
             for e in n.expressions:
                 if 'InvertedTurn' in e.classes:
                     count += 1
         self.assertEqual(count, 1)
 
         count = 0
-        for n in s.flat.notes:
+        for n in s.recurse().notes:
             for e in n.expressions:
                 if 'Shake' in e.classes:
                     count += 1
         self.assertEqual(count, 1)
 
         count = 0
-        for n in s.flat.notes:
+        for n in s.recurse().notes:
             for e in n.expressions:
                 if 'Schleifer' in e.classes:
                     count += 1
@@ -6428,7 +6452,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.textBoxes01)
-        tbs = s.flat.getElementsByClass('TextBox')
+        tbs = s.flatten().getElementsByClass('TextBox')
         self.assertEqual(len(tbs), 5)
 
         msg = []
@@ -6443,11 +6467,11 @@ class Test(unittest.TestCase):
         # this is a good test as this encoding uses staffs, not parts
         # to encode both parts; this requires special spanner handling
         s = corpus.parse('mozart/k545/movement1_exposition')
-        sf = s.flat
+        sf = s.flatten()
         slurs = sf.getElementsByClass(spanner.Slur)
         self.assertEqual(len(slurs), 2)
 
-        n1, n2 = s.parts[0].flat.notes[3], s.parts[0].flat.notes[5]
+        n1, n2 = s.parts[0].flatten().notes[3], s.parts[0].flatten().notes[5]
         # environLocal.printDebug(['n1', n1, 'id(n1)', id(n1),
         #     slurs[0].getSpannedElementIds(), slurs[0].getSpannedElementIds()])
         self.assertEqual(id(n1), slurs[0].getSpannedElementIds()[0])
@@ -6460,8 +6484,8 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.spanners33a)
-        self.assertEqual(len(s.flat.getElementsByClass('Crescendo')), 1)
-        self.assertEqual(len(s.flat.getElementsByClass('Diminuendo')), 1)
+        self.assertEqual(len(s.recurse().getElementsByClass('Crescendo')), 1)
+        self.assertEqual(len(s.recurse().getElementsByClass('Diminuendo')), 1)
 
     def testImportWedgeB(self):
         from music21 import converter
@@ -6469,7 +6493,7 @@ class Test(unittest.TestCase):
 
         # this produces a single component cresc
         s = converter.parse(testPrimitive.directions31a)
-        self.assertEqual(len(s.flat.getElementsByClass('Crescendo')), 2)
+        self.assertEqual(len(s.recurse().getElementsByClass('Crescendo')), 2)
 
     def testBracketImportB(self):
         from music21 import converter
@@ -6477,14 +6501,14 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.spanners33a)
         # s.show()
-        self.assertEqual(len(s.flat.getElementsByClass('Line')), 6)
+        self.assertEqual(len(s.recurse().getElementsByClass('Line')), 6)
 
     def testTrillExtensionImportA(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
         s = converter.parse(testPrimitive.notations32a)
         # s.show()
-        self.assertEqual(len(s.flat.getElementsByClass('TrillExtension')), 2)
+        self.assertEqual(len(s.recurse().getElementsByClass('TrillExtension')), 2)
 
     def testGlissandoImportA(self):
         from music21 import converter
@@ -6543,7 +6567,7 @@ class Test(unittest.TestCase):
     def testStaffLayout(self):
         from music21 import corpus
         c = corpus.parse('demos/layoutTest.xml')
-        layouts = c.flat.getElementsByClass('LayoutBase').stream()
+        layouts = c.flatten().getElementsByClass('LayoutBase').stream()
         systemLayouts = layouts.getElementsByClass('SystemLayout')
         self.assertEqual(len(systemLayouts), 42)
         staffLayouts = layouts.getElementsByClass('StaffLayout')
@@ -6570,7 +6594,7 @@ class Test(unittest.TestCase):
     def testStaffLayoutMore(self):
         from music21 import corpus
         c = corpus.parse('demos/layoutTestMore.xml')
-        layouts = c.flat.getElementsByClass('LayoutBase').stream()
+        layouts = c.flatten().getElementsByClass('LayoutBase').stream()
         self.assertEqual(len(layouts), 76)
         systemLayouts = layouts.getElementsByClass('SystemLayout')
         sl0 = systemLayouts[0]
@@ -6592,12 +6616,12 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         c = corpus.parse('schoenberg/opus19/movement2.mxl')
-        dynAll = c.flat.getElementsByClass('Dynamic')
+        dynAll = c.flatten().getElementsByClass('Dynamic')
         self.assertEqual(len(dynAll), 6)
         notesOrChords = (note.Note, chord.Chord)
-        allNotesOrChords = c.flat.getElementsByClass(notesOrChords)
+        allNotesOrChords = c.flatten().getElementsByClass(notesOrChords)
         self.assertEqual(len(allNotesOrChords), 50)
-        allChords = c.flat.getElementsByClass('Chord')
+        allChords = c.flatten().getElementsByClass('Chord')
         self.assertEqual(len(allChords), 45)
         pCount = 0
         for cc in allChords:
@@ -6790,7 +6814,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.tupletsImplied)
         # First tuplet group of 3 is silent on bracket and show-number: draw bracket
         # Second tuplet group of 3 is silent on bracket but show-number="none": don't draw bracket
-        tuplets = [n.duration.tuplets[0] for n in s.flat.notes]
+        tuplets = [n.duration.tuplets[0] for n in s.recurse().notes]
         self.assertEqual([tup.bracket for tup in tuplets], [True, True, True, False, False, False])
 
     def test34MeasureRestWithoutTag(self):
@@ -6838,18 +6862,18 @@ class Test(unittest.TestCase):
         testFp = thisDir / 'testNC.xml'
         s = converter.parse(testFp)
 
-        self.assertEqual(5, len(s.flat.getElementsByClass('ChordSymbol')))
-        self.assertEqual(2, len(s.flat.getElementsByClass('NoChord')))
+        self.assertEqual(5, len(s.recurse().getElementsByClass('ChordSymbol')))
+        self.assertEqual(2, len(s.recurse().getElementsByClass('NoChord')))
 
         self.assertEqual('augmented-seventh',
-                         s.flat.getElementsByClass('ChordSymbol')[0].chordKind)
+                         s.recurse().getElementsByClass('ChordSymbol')[0].chordKind)
         self.assertEqual('none',
-                         s.flat.getElementsByClass('ChordSymbol')[1].chordKind)
+                         s.recurse().getElementsByClass('ChordSymbol')[1].chordKind)
 
-        self.assertEqual('random', str(s.flat.getElementsByClass('NoChord')[
-            0].chordKindStr))
-        self.assertEqual('N.C.', str(s.flat.getElementsByClass('NoChord')[
-            1].chordKindStr))
+        self.assertEqual('random', str(s.recurse().getElementsByClass('NoChord')[
+                                       0].chordKindStr))
+        self.assertEqual('N.C.', str(s.recurse().getElementsByClass('NoChord')[
+                                     1].chordKindStr))
 
     def testChordAlias(self):
         '''
@@ -7032,7 +7056,7 @@ class Test(unittest.TestCase):
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         fp = xmlDir / '61l-Lyrics-Elisions-Syllables.xml'
         s = converter.parse(fp)
-        notes = list(s.flat.notes)
+        notes = list(s.flatten().notes)
 
         # Check that the second note has one composite lyric
         self.assertEqual(len(notes[1].lyrics), 1)
@@ -7110,6 +7134,52 @@ class Test(unittest.TestCase):
         metro = s.recurse().getElementsByClass('MetronomeMark').first()
         self.assertEqual(metro.style.absoluteY, 40)
         self.assertEqual(metro.placement, 'above')
+
+    def testClearingTuplets(self):
+        from xml.etree.ElementTree import fromstring as EL
+
+        MP = MeasureParser()
+        MP.divisions = 4
+        d = duration.Duration(2 / 3)
+        self.assertEqual(len(d.tuplets), 1)
+        mxNoteNoType = EL('<note><pitch><step>D</step><octave>6</octave></pitch>'
+                            '<duration>3</duration></note>')
+        MP.xmlToDuration(mxNoteNoType, inputM21=d)
+        self.assertEqual(len(d.tuplets), 0)
+        self.assertEqual(d.linked, True)
+
+    def testImportUnpitchedPercussion(self):
+        from xml.etree.ElementTree import fromstring as EL
+        scorePart = '''
+        <score-part id="P4"><part-name>Tambourine</part-name>
+        <part-abbreviation>Tamb.</part-abbreviation>
+        <score-instrument id="P4-I55">
+            <instrument-name>Tambourine</instrument-name>
+        </score-instrument>
+        <midi-instrument id="P4-I55">
+           <midi-channel>10</midi-channel>
+           <midi-unpitched>55</midi-unpitched>
+        </midi-instrument>
+        </score-part>
+        '''
+
+        PP = PartParser()
+        mxScorePart = EL(scorePart)
+        tmb = PP.getDefaultInstrument(mxScorePart)
+        self.assertIsInstance(tmb, instrument.Tambourine)
+        self.assertEqual(tmb.percMapPitch, 54)  # 1-indexed
+
+        # An instrument music21 doesn't have yet (Cabasa):
+        scorePart = scorePart.replace('Tambourine', 'Cabasa')
+        scorePart = scorePart.replace('Tamb.', 'Cab.')
+        scorePart = scorePart.replace('55', '70')  # 1-indexed
+        PP = PartParser()
+        mxScorePart = EL(scorePart)
+        msg = '69 does not map to a valid instrument!'
+        with self.assertWarnsRegex(MusicXMLWarning, msg):
+            unp = PP.getDefaultInstrument(mxScorePart)
+        self.assertIsInstance(unp, instrument.UnpitchedPercussion)
+        self.assertEqual(unp.percMapPitch, 69)
 
 
 if __name__ == '__main__':

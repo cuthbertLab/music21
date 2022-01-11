@@ -215,7 +215,7 @@ class Derivation(SlottedObjectMixin):
         from. This provides a way to obtain all Streams that the client passed
         through, such as those created by
         :meth:`~music21.stream.Stream.getElementsByClass` or
-        :attr:`~music21.stream.Stream.flat`.
+        :meth:`~music21.stream.Stream.flatten`.
 
         >>> s1 = stream.Stream()
         >>> s1.id = 's1'

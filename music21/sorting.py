@@ -198,7 +198,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         >>> st.offset
         1.0
 
-        Changing offset, but nothing else, helps in creating .flat positions.
+        Changing offset, but nothing else, helps in creating .flatten() positions.
         '''
         outList = [kw.get(attr, getattr(self, attr)) for attr in _attrList]
         return self.__class__(*outList)

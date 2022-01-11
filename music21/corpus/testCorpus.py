@@ -35,8 +35,7 @@ class Test(unittest.TestCase):
         for filePath in corpus.getComposer('bach')[23:28]:  # get 5 in the middle
             s = corpus.parse(filePath)
             # get keys from first part
-            keyStream = s.parts[0].flat.getElementsByClass(key.KeySignature)
-            keyObj = keyStream[0]
+            keyObj = s.parts[0][key.KeySignature].first()
             keyObjs.append(keyObj)
             # environLocal.printDebug([keyObj])
         self.assertEqual(len(keyObjs), 5)

@@ -704,7 +704,7 @@ class Test(unittest.TestCase):
         title = ah.getTitle()
         environLocal.printDebug([title])
         s = translate.abcToStreamScore(ah)
-        notes = s.flat.getElementsByClass(note.Note)
+        notes = s.flatten().getElementsByClass(note.Note)
         cSharp = notes[3]
         cThrough = notes[5]
         self.assertEqual(cSharp.pitch.midi, cThrough.pitch.midi,
@@ -723,7 +723,7 @@ class Test(unittest.TestCase):
         self.assertEqual(notes[17].pitch.midi, 74, 'Sharp (D5) carries over measure incorrectly')
         self.assertEqual(notes[18].pitch.midi, 78, 'Natural (F5) carries over measure incorrectly')
         # TODO: Carrying an accidental into the next measure with a tie does not work.
-        # notes = s.flat.getElementsByClass(note.Note)
+        # notes = s.flatten().getElementsByClass(note.Note)
         # self.assertEqual(notes[4].pitch.midi, 70, 'Tied note loses it sharp')
         # self.assertEqual(notes[6].pitch.midi, 69, 'Tied-over sharp persists past the tie')
 
@@ -735,7 +735,7 @@ class Test(unittest.TestCase):
         af = abcFormat.ABCFile()
         ah = af.readstr(directiveCarryPitch)
         s = translate.abcToStreamScore(ah)
-        notes = s.flat.getElementsByClass(note.Note)
+        notes = s.flatten().getElementsByClass(note.Note)
         gSharp = notes[1]
         g8va = notes[3]
         self.assertEqual(gSharp.pitch.midi % 12,
@@ -766,7 +766,7 @@ class Test(unittest.TestCase):
         af = abcFormat.ABCFile()
         ah = af.readstr(directiveCarryOctave)
         s = translate.abcToStreamScore(ah)
-        notes = s.flat.getElementsByClass(note.Note)
+        notes = s.flatten().getElementsByClass(note.Note)
         gSharp = notes[1]
         g8va = notes[3]
         self.assertGreater(gSharp.pitch.midi % 12,
@@ -797,7 +797,7 @@ class Test(unittest.TestCase):
         af = abcFormat.ABCFile()
         ah = af.readstr(directiveCarryNot)
         s = translate.abcToStreamScore(ah)
-        notes = s.flat.getElementsByClass(note.Note)
+        notes = s.flatten().getElementsByClass(note.Note)
         gSharp = notes[1]
         g8va = notes[3]
         self.assertGreater(gSharp.pitch.midi % 12,
@@ -838,7 +838,7 @@ class Test(unittest.TestCase):
             s = translate.abcToStreamScore(ah)
             part = s.parts[0]
             self.assertFalse(part.getElementsByClass(chord.Chord),
-                             'Empty chord "%s" in Score' % abc_chord)
+                             f'Empty chord "{abc_chord}" in Score')
 
         # list of test abc chords and their quarter lengths at the default length of 1/8
         # list[tuple(str, int)] = of abc chords and= [( abc_chord: str)]
@@ -861,7 +861,7 @@ class Test(unittest.TestCase):
             ah = af.readstr(abc_dl + abc_chord)
             s = translate.abcToStreamScore(ah)
             self.assertEqual(s.duration.quarterLength, quarter_length,
-                             'invalid duration of chord "%s"' % abc_chord)
+                             f'invalid duration of chord "{abc_chord}"')
 
             notes = s.parts[0].notes
             chord0 = notes[0]
@@ -869,7 +869,7 @@ class Test(unittest.TestCase):
             self.assertIsInstance(chord0, chord.Chord, 'Not a Chord!')
             for pitch_name in chord_pitches:
                 self.assertIn(pitch_name, chord0.pitchNames,
-                              'Pitch not in Chord "%s"' % abc_chord)
+                              f'Pitch not in Chord "{abc_chord}"')
 
     def testAbc21ChordSymbol(self):
         # Test the chord symbol for note and chord
@@ -885,10 +885,10 @@ class Test(unittest.TestCase):
             ah = af.readstr(abc_dl + abc_text)
             part = translate.abcToStreamScore(ah).parts[0]
             chord_symbol = part.getElementsByClass(harmony.ChordSymbol)
-            self.assertTrue(chord_symbol, 'No ChordSymbol found in abc: "%s"' % abc_text)
+            self.assertTrue(chord_symbol, f'No ChordSymbol found in abc: "{abc_text}"')
             for pitch_name in 'CEG':
                 self.assertIn(pitch_name, chord_symbol[0].pitchNames,
-                              'Pitch not in ChordSymbol of abc: "%s"' % abc_text)
+                              f'Pitch not in ChordSymbol of abc: "{abc_text}"')
 
     def testAbc21BrokenRhythm(self):
         # Test the chord symbol for note and chord

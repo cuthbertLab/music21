@@ -18,6 +18,7 @@ absolutely balanced by having O(log n) search times.
 '''
 from typing import Optional
 
+from music21 import prebase
 from music21.exceptions21 import TreeException
 from music21 import common
 
@@ -475,7 +476,7 @@ class AVLNode(common.SlottedObjectMixin):
 
 # ---------------------------------------------------------------------------
 
-class AVLTree:
+class AVLTree(prebase.ProtoM21Object):
     r'''
     Data structure for working with tree.node.AVLNode objects.
 
@@ -715,7 +716,7 @@ class AVLTree:
         <ElementNode: Start:End <0.-5...> Indices:(l:194 *194* r:195)
             Payload:<music21.bar.Barline type=final>>
 
-        >>> note1 = score.flat.notes[30]
+        >>> note1 = score.flatten().notes[30]
 
         Works with sortTuple positions as well...
 

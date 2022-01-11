@@ -29,7 +29,6 @@ from music21 import environment
 from music21 import stream
 
 from music21.instrument import Conductor, deduplicate
-from music21.midi import percussion
 
 _MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
@@ -577,13 +576,13 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             c = inputM21
             c.duration = ticksToDuration(tOff - tOn, ticksPerQuarter, c.duration)
     else:
-        environLocal.warn(['midi chord with zero duration will be treated as grace',
-                            eventList, c])
         # for now, get grace
         if inputM21 is None:
             c = chord.Chord()
         else:
             c = inputM21
+        environLocal.warn(['midi chord with zero duration will be treated as grace',
+                            eventList, c])
         c.getGrace(inPlace=True)
 
     c.pitches = pitches
@@ -750,7 +749,7 @@ def midiEventsToInstrument(eventList):
     >>> me.channel = 10
     >>> i = midi.translate.midiEventsToInstrument(me)
     >>> i
-    <music21.instrument.Tambourine 'Tambourine'>
+    <music21.instrument.UnpitchedPercussion 'Percussion'>
     >>> i.midiChannel  # 0-indexed in music21
     9
     >>> i.midiProgram  # 0-indexed in music21
@@ -773,9 +772,8 @@ def midiEventsToInstrument(eventList):
             decoded = decoded.strip()
             i = instrument.fromString(decoded)
         elif event.channel == 10:
-            pm = percussion.PercussionMapper()
-            # PercussionMapper.midiPitchToInstrument() is 1-indexed
-            i = pm.midiPitchToInstrument(event.data + 1)
+            # Can only get correct instruments from reading NOTE_ON
+            i = instrument.UnpitchedPercussion()
             i.midiProgram = event.data
         else:
             i = instrument.instrumentFromMidiProgram(event.data)
@@ -786,11 +784,6 @@ def midiEventsToInstrument(eventList):
             f'Unable to determine instrument from {event}; getting generic Instrument',
             TranslateWarning)
         i = instrument.Instrument()
-    except percussion.MIDIPercussionException:
-        warnings.warn(
-            f'Unable to determine instrument from {event}; getting generic UnpitchedPercussion',
-            TranslateWarning)
-        i = instrument.UnpitchedPercussion()
     except instrument.InstrumentException:
         # Debug logging would be better than warning here
         i = instrument.Instrument()
@@ -1821,11 +1814,11 @@ def midiTrackToStream(
     >>> p = midi.translate.midiTrackToStream(mt)
     >>> p
     <music21.stream.Part ...>
-    >>> len(p.flat.notesAndRests)
+    >>> len(p.recurse().notesAndRests)
     14
-    >>> p.flat.notes[0].pitch.midi
+    >>> p.recurse().notes.first().pitch.midi
     36
-    >>> p.flat.notes[0].volume.velocity
+    >>> p.recurse().notes.first().volume.velocity
     90
 
     Changed in v.7 -- Now makes measures
@@ -2335,7 +2328,7 @@ def packetStorageFromSubstreamList(
     packetStorage = {}
 
     for trackId, subs in enumerate(substreamList):  # Conductor track is track 0
-        subs = subs.flat
+        subs = subs.flatten()
 
         # get a first instrument; iterate over rest
         instrumentStream = subs.getElementsByClass('Instrument')
@@ -2440,7 +2433,7 @@ def streamHierarchyToMidiTracks(
 
     # strip all ties inPlace
     for subs in substreamList:
-        subs.stripTies(inPlace=True, matchByPitch=False)
+        subs.stripTies(inPlace=True, matchByPitch=True)
 
     packetStorage = packetStorageFromSubstreamList(substreamList, addStartDelay=addStartDelay)
     updatePacketStorageWithChannelInfo(packetStorage, channelByInstrument)
@@ -2483,12 +2476,13 @@ def midiTracksToStreams(
     quantizePost=True,
     inputM21: stream.Score = None,
     **keywords
-) -> stream.Stream():
+) -> stream.Score:
     '''
     Given a list of midiTracks, populate either a new stream.Score or inputM21
     with a Part for each track.
     '''
     # environLocal.printDebug(['midi track count', len(midiTracks)])
+    s: stream.Score
     if inputM21 is None:
         s = stream.Score()
     else:
@@ -2753,7 +2747,7 @@ def midiFileToStream(
     >>> s = midi.translate.midiFileToStream(mf)
     >>> s
     <music21.stream.Score ...>
-    >>> len(s.flat.notesAndRests)
+    >>> len(s.flatten().notesAndRests)
     14
     '''
     # environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
@@ -3138,7 +3132,7 @@ class Test(unittest.TestCase):
     def testOverlappedEventsA(self):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
-        sFlat = s.flat
+        sFlat = s.flatten()
         mtList = streamHierarchyToMidiTracks(sFlat)
         self.assertEqual(len(mtList), 2)
 
@@ -3461,7 +3455,7 @@ class Test(unittest.TestCase):
         # a simple file created in athenacl
         fp = dirLib / 'test10.mid'
         s = converter.parse(fp)
-        mmStream = s.flat.getElementsByClass('MetronomeMark')
+        mmStream = s.flatten().getElementsByClass('MetronomeMark')
         self.assertEqual(len(mmStream), 4)
         self.assertEqual(mmStream[0].number, 120.0)
         self.assertEqual(mmStream[1].number, 110.0)
@@ -3470,13 +3464,13 @@ class Test(unittest.TestCase):
 
         fp = dirLib / 'test06.mid'
         s = converter.parse(fp)
-        mmStream = s.flat.getElementsByClass('MetronomeMark')
+        mmStream = s.flatten().getElementsByClass('MetronomeMark')
         self.assertEqual(len(mmStream), 1)
         self.assertEqual(mmStream[0].number, 120.0)
 
         fp = dirLib / 'test07.mid'
         s = converter.parse(fp)
-        mmStream = s.flat.getElementsByClass('MetronomeMark')
+        mmStream = s.flatten().getElementsByClass('MetronomeMark')
         self.assertEqual(len(mmStream), 1)
         self.assertEqual(mmStream[0].number, 180.0)
 
@@ -3681,10 +3675,10 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test12.mid'
         s = converter.parse(fp)
 
-        self.assertEqual(len(s.parts[0].flat.notes), 3)
-        self.assertEqual(len(s.parts[1].flat.notes), 3)
-        self.assertEqual(len(s.parts[2].flat.notes), 3)
-        self.assertEqual(len(s.parts[3].flat.notes), 3)
+        self.assertEqual(len(s.parts[0].flatten().notes), 3)
+        self.assertEqual(len(s.parts[1].flatten().notes), 3)
+        self.assertEqual(len(s.parts[2].flatten().notes), 3)
+        self.assertEqual(len(s.parts[3].flatten().notes), 3)
 
         # s.show('t')
         # s.show('midi')
@@ -3698,13 +3692,13 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test13.mid'
         s = converter.parse(fp)
         # s.show('t')
-        self.assertEqual(len(s.flat.notes), 7)
+        self.assertEqual(len(s.flatten().notes), 7)
         # s.show('midi')
 
         fp = dirLib / 'test14.mid'
         s = converter.parse(fp)
         # three chords will be created, as well as two voices
-        self.assertEqual(len(s.flat.getElementsByClass('Chord')), 3)
+        self.assertEqual(len(s.flatten().getElementsByClass('Chord')), 3)
         self.assertEqual(len(s.parts.first().measure(3).voices), 2)
 
     def testImportChordsA(self):
@@ -3716,7 +3710,7 @@ class Test(unittest.TestCase):
         # a simple file created in athenacl
         s = converter.parse(fp)
         # s.show('t')
-        self.assertEqual(len(s.flat.getElementsByClass('Chord')), 5)
+        self.assertEqual(len(s.flatten().getElementsByClass('Chord')), 5)
 
     def testMidiEventsImported(self):
         self.maxDiff = None
@@ -3803,7 +3797,7 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test16.mid'
         s = converter.parse(fp)
         self.assertEqual(len(s.parts.first().measure(1).voices), 2)
-        els = s.parts.first().flat.getElementsByOffset(0.5)
+        els = s.parts.first().flatten().getElementsByOffset(0.5)
         self.assertSequenceEqual([e.duration.quarterLength for e in els], [0, 1])
 
     def testRepeatsExpanded(self):
@@ -3811,9 +3805,9 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.repeatBracketsA)
-        num_notes_before = len(s.flat.notes)
+        num_notes_before = len(s.flatten().notes)
         prepared = prepareStreamForMidi(s)
-        num_notes_after = len(prepared.flat.notes)
+        num_notes_after = len(prepared.flatten().notes)
         self.assertGreater(num_notes_after, num_notes_before)
 
     def testNullTerminatedInstrumentName(self):
@@ -3854,12 +3848,8 @@ class Test(unittest.TestCase):
         event.channel = 10
         event.type = midiModule.ChannelVoiceMessages.PROGRAM_CHANGE
 
-        expected = 'Unable to determine instrument from '
-        expected += '<music21.midi.MidiEvent PROGRAM_CHANGE, track=None, channel=10, data=0>'
-        expected += '; getting generic UnpitchedPercussion'
-        with self.assertWarnsRegex(TranslateWarning, expected):
-            i = midiEventsToInstrument(event)
-            self.assertIsInstance(i, instrument.UnpitchedPercussion)
+        i = midiEventsToInstrument(event)
+        self.assertIsInstance(i, instrument.UnpitchedPercussion)
 
     def testConductorStream(self):
         s = stream.Stream()

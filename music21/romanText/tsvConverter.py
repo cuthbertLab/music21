@@ -290,7 +290,7 @@ class TsvHandler:
 
         fileName = self.tsvFileName
 
-        with open(fileName, 'r') as f:
+        with open(fileName, 'r', encoding='utf-8') as f:
             data = []
             for row_num, line in enumerate(f):
                 if row_num == 0:  # Ignore first row (headers)
@@ -505,7 +505,7 @@ class M21toTSV:
         '''
         Writes a list of lists (e.g. from m21ToTsv()) to a tsv file.
         '''
-        with open(filePathAndName, 'a', newline='') as csvFile:
+        with open(filePathAndName, 'a', newline='', encoding='utf-8') as csvFile:
             csvOut = csv.writer(csvFile,
                                 delimiter='\t',
                                 quotechar='"',

@@ -421,8 +421,11 @@ class Ornament(Expression):
         transposeInterval
     ):
         '''
-        Used by trills and mordants to fill out their realization
+        Used by trills and mordents to fill out their realization.
         '''
+        if not hasattr(srcObj, 'transpose'):
+            raise TypeError(f'Expected note; got {type(srcObj)}')
+
         firstNote = copy.deepcopy(srcObj)
         # TODO: remove expressions
         # firstNote.expressions = None
@@ -478,7 +481,7 @@ class GeneralMordent(Ornament):
         '''
         from music21 import key
 
-        if self.direction != 'up' and self.direction != 'down':
+        if self.direction not in ('up', 'down'):
             raise ExpressionException('Cannot realize a mordent if I do not know its direction')
         if self.size == '':
             raise ExpressionException('Cannot realize a mordent if there is no size given')
@@ -1077,7 +1080,7 @@ class GeneralAppoggiatura(Ornament):
         :type srcObj: base.Music21Object
         '''
         from music21 import key
-        if self.direction != 'up' and self.direction != 'down':
+        if self.direction not in ('up', 'down'):
             raise ExpressionException(
                 'Cannot realize an Appoggiatura if I do not know its direction')
         if self.size == '':
@@ -1522,6 +1525,14 @@ class Test(unittest.TestCase):
         raw = m21ToXml.GeneralObjectExporter().parse(s)
         # s.show()
         self.assertEqual(raw.count(b'wavy-line'), 2)
+
+    def testUnpitchedUnsupported(self):
+        from music21 import note
+
+        unp = note.Unpitched()
+        mord = Mordent()
+        with self.assertRaises(TypeError):
+            mord.realize(unp)
 
 
 # class TestExternal(unittest.TestCase):

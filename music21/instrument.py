@@ -22,9 +22,11 @@ ensembles is also included here though it may later be separated out into its ow
 ensemble.py module.
 '''
 import copy
+import importlib
 import unittest
 import sys
 from collections import OrderedDict
+from typing import Optional
 
 from music21 import base
 from music21 import common
@@ -39,9 +41,10 @@ from music21.exceptions21 import InstrumentException
 from music21 import environment
 _MOD = 'instrument'
 environLocal = environment.Environment(_MOD)
+StreamType = stream.StreamType
 
 
-def unbundleInstruments(streamIn, *, inPlace=False):
+def unbundleInstruments(streamIn: StreamType, *, inPlace=False) -> Optional[StreamType]:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -78,7 +81,7 @@ def unbundleInstruments(streamIn, *, inPlace=False):
         return s
 
 
-def bundleInstruments(streamIn, *, inPlace=False):
+def bundleInstruments(streamIn: stream.Stream, *, inPlace=False) -> Optional[stream.Stream]:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
@@ -155,7 +158,7 @@ class Instrument(base.Music21Object):
         self.printPartName = None  # True = yes, False = no, None = let others decide
         self.printPartAbbreviation = None
 
-        self.instrumentId = None  # apply to midi and instrument
+        self.instrumentId: Optional[str] = None  # apply to midi and instrument
         self._instrumentIdIsRandom = False
 
         self.instrumentName = instrumentName
@@ -168,7 +171,7 @@ class Instrument(base.Music21Object):
         self.highestNote = None
 
         # define interval to go from written to sounding
-        self.transposition = None
+        self.transposition: Optional[interval.Interval] = None
 
         self.inGMPercMap = False
         self.soundfontFn = None  # if defined...
@@ -831,6 +834,7 @@ class Whistle(Flute):
         self.instrumentAbbreviation = 'Whs'
         self.instrumentSound = 'wind.flutes.whistle'
         self.inGMPercMap = True
+        # TODO: why is this not inheriting from UnpitchedPercussion if we're giving it percMapPitch?
         self.percMapPitch = 71
         self.midiProgram = 78
 
@@ -1859,7 +1863,7 @@ def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
         substreams = returnObj.getElementsByClass('Stream')
 
     for sub in substreams:
-        oTree = OffsetTree(sub.recurse().getElementsByClass('Instrument'))
+        oTree = OffsetTree(sub[Instrument].stream())
         for o in oTree:
             if len(o) == 1:
                 continue
@@ -2200,12 +2204,12 @@ def partitionByInstrument(streamObj):
     if not streamObj.hasPartLikeStreams():
         # place in a score for uniform operations
         s = stream.Score()
-        s.insert(0, streamObj.flat)
+        s.insert(0, streamObj.flatten())
     else:
         s = stream.Score()
         # append flat parts
         for sub in streamObj.getElementsByClass(stream.Stream):
-            s.insert(0, sub.flat)
+            s.insert(0, sub.flatten())
 
     # first, let's extend the duration of each instrument to match stream
     for sub in s.getElementsByClass(stream.Stream):
@@ -2392,6 +2396,7 @@ def fromString(instrumentString):
     bestInstrument = None
     bestName = None
 
+    this_module = importlib.import_module('music21.instrument')
     for substring in allCombinations:
         substring = substring.lower()
         try:
@@ -2400,16 +2405,10 @@ def fromString(instrumentString):
             else:
                 englishName = instrumentLookup.allToBestName[substring]
             className = instrumentLookup.bestNameToInstrumentClass[englishName]
-
-            # This would be unsafe...
-            thisInstClass = globals()[className]
-            thisInstClassParentClasses = [parentCls.__name__ for parentCls in thisInstClass.mro()]
-            # if not for this...
-            if ('Instrument' not in thisInstClassParentClasses
-                    or 'Music21Object' not in thisInstClassParentClasses):
-                # little bit of security against calling another global...
+            thisInstClass = getattr(this_module, className)
+            # In case users have overridden the module and imported more things
+            if base.Music21Object not in thisInstClass.__mro__:  # pragma: no cover
                 raise KeyError
-
             thisInstrument = thisInstClass()
             thisBestName = thisInstrument.bestName().lower()
             if (bestInstClass is None
@@ -2505,7 +2504,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 2)
 
         # post.show('t')
 
@@ -2516,7 +2515,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 2)
         # post.show('t')
 
     def testPartitionByInstrumentB(self):
@@ -2536,7 +2535,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 2)
         self.assertEqual(len(post.parts[0].notes), 6)
         self.assertEqual(len(post.parts[1].notes), 12)
 
@@ -2563,7 +2562,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
+        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 4)
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 6)
         self.assertEqual(post.parts[1].getInstrument().instrumentName, 'Acoustic Guitar')
@@ -2603,7 +2602,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
+        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 12)
@@ -2639,7 +2638,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
+        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
 

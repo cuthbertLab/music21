@@ -681,7 +681,6 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
             returnObjMeasures = returnObj.getElementsByClass('Measure')
             if returnObjMeasures:  # If no parts, but still measures, iterate through them.
                 for j, returnObjMeasure in enumerate(returnObjMeasures):
-                    returnObjMeasure = returnObjMeasures[j]
                     sMeasure = s.getElementsByClass('Measure')[j]
                     _mergeVariants(returnObjMeasure, sMeasure,
                                    variantName=variantName, inPlace=True)
@@ -1511,8 +1510,8 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
     i = 0
     j = 0
     inVariant = False
-    streamANotes = streamA.flat.notesAndRests
-    streamBNotes = streamB.flat.notesAndRests
+    streamANotes = streamA.flatten().notesAndRests
+    streamBNotes = streamB.flatten().notesAndRests
 
     noteBuffer = []
     variantStart = 0.0
@@ -1522,14 +1521,14 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
             i = len(streamANotes) - 1
         if j == len(streamBNotes):
             break
-        if (streamANotes[i].getOffsetBySite(streamA.flat)
-                == streamBNotes[j].getOffsetBySite(streamB.flat)):
+        if (streamANotes[i].getOffsetBySite(streamA.flatten())
+                == streamBNotes[j].getOffsetBySite(streamB.flatten())):
             # Comparing Notes at same offset
             #    TODO: Will not work until __eq__ overwritten for Generalized Notes
             if streamANotes[i] != streamBNotes[j]:
                 # If notes are different, start variant if not started and append note.
                 if inVariant is False:
-                    variantStart = streamBNotes[j].getOffsetBySite(streamB.flat)
+                    variantStart = streamBNotes[j].getOffsetBySite(streamB.flatten())
                     inVariant = True
                     noteBuffer = []
                     noteBuffer.append(streamBNotes[j])
@@ -1555,10 +1554,10 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
             j += 1
             continue
 
-        elif (streamANotes[i].getOffsetBySite(streamA.flat)
-              > streamBNotes[j].getOffsetBySite(streamB.flat)):
+        elif (streamANotes[i].getOffsetBySite(streamA.flatten())
+              > streamBNotes[j].getOffsetBySite(streamB.flatten())):
             if inVariant is False:
-                variantStart = streamBNotes[j].getOffsetBySite(streamB.flat)
+                variantStart = streamBNotes[j].getOffsetBySite(streamB.flatten())
                 noteBuffer = []
                 noteBuffer.append(streamBNotes[j])
                 inVariant = True
@@ -1624,7 +1623,7 @@ def _generateVariant(noteList, originStream, start, variantName=None):
     '''
     returnVariant = Variant()
     for n in noteList:
-        returnVariant.insert(n.getOffsetBySite(originStream.flat) - start, n)
+        returnVariant.insert(n.getOffsetBySite(originStream.flatten()) - start, n)
     if variantName is not None:
         returnVariant.groups.append(variantName)
     return returnVariant
@@ -2021,7 +2020,7 @@ class Variant(base.Music21Object):
     >>> s.show('t')
     {0.0} <music21.variant.Variant object of length 8.0>
     {0.0} <music21.note.Note C>
-    >>> s.flat.show('t')
+    >>> s.flatten().show('t')
     {0.0} <music21.variant.Variant object of length 8.0>
     {0.0} <music21.note.Note C>
     '''
@@ -2386,7 +2385,7 @@ class Variant(base.Music21Object):
             spacerDuration = 0.0
 
 
-        if self.lengthType == 'replacement' or self.lengthType == 'elongation':
+        if self.lengthType in ('replacement', 'elongation'):
             vEnd = vStart + self.replacementDuration + spacerDuration
             classes = []
             for e in self.elements:

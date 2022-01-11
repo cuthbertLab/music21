@@ -682,9 +682,9 @@ class StreamFreezer(StreamFreezeThawBase):
             import jsonpickle
             data = jsonpickle.encode(storage, **keywords)
             if zipType == 'zlib':
-                data = zlib.compress(data)
+                data = zlib.compress(data.encode())
 
-            with open(fp, 'w') as f:
+            with open(fp, 'w', encoding='utf-8') as f:
                 f.write(data)
 
         else:  # pragma: no cover
@@ -791,7 +791,7 @@ class StreamThawer(StreamFreezeThawBase):
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e._stream)
                 e._cache = {}
-                # for el in e._stream.flat:
+                # for el in e._stream.flatten():
                 #    print(el, el.offset, el.sites.siteDict)
             elif 'Spanner' in eClasses:
                 subSF = StreamThawer()
@@ -951,7 +951,7 @@ class StreamThawer(StreamFreezeThawBase):
             common.restorePathClassesAfterUnpickling()
         elif fmt == 'jsonpickle':
             import jsonpickle
-            with open(fp, 'r') as f:
+            with open(fp, 'r', encoding='utf-8') as f:
                 data = f.read()
             storage = jsonpickle.decode(data)
             self.stream = self.unpackStream(storage)
@@ -1236,7 +1236,8 @@ class Test(unittest.TestCase):
         c = converter.parse(a)
         f = converter.freezeStr(c)
         d = converter.thawStr(f)
-        self.assertEqual(d.parts[1].flat.notes[20].volume._client.__class__.__name__, 'weakref')
+        self.assertEqual(d.parts[1].flatten().notes[20].volume._client.__class__.__name__,
+                         'weakref')
 
 
 # -----------------------------------------------------------------------------

@@ -20,8 +20,8 @@ Further conversion to-and-from MidiEvent/MidiTrack/MidiFile and music21 Stream,
 Note, etc., objects takes place in :ref:`moduleMidiTranslate`.
 
 This module originally used routines from Will Ware's public domain midi.py
-library from 2001 see
-https://groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
+library from 2001 which was once posted at (http link)
+groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
 '''
 __all__ = [
     'realtime', 'percussion',
@@ -1537,7 +1537,8 @@ class MidiFile(prebase.ProtoM21Object):
         '''
         if attrib not in ['rb', 'wb']:
             raise MidiException('cannot read or write unless in binary mode, not:', attrib)
-        self.file = open(filename, attrib)  # pylint: disable=consider-using-with
+        # pylint: disable-next=consider-using-with, unspecified-encoding
+        self.file = open(filename, attrib)
 
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by BytesIO, as an open file object.
@@ -1945,8 +1946,8 @@ class Test(unittest.TestCase):
         # dealing with midi files that use running status compression
         s = converter.parse(fp)
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.parts[0].flat.notes), 704)
-        self.assertEqual(len(s.parts[1].flat.notes), 856)
+        self.assertEqual(len(s.parts[0].recurse().notes), 704)
+        self.assertEqual(len(s.parts[1].recurse().notes), 856)
 
         # for n in s.parts[0].notes:
         #    print(n, n.quarterLength)

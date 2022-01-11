@@ -5,7 +5,7 @@ music21 -- A Toolkit for Computational Musicology
 Copyright © 2006-2021, Michael Scott Cuthbert and cuthbertLab
 
 For more information, visit:
-https://web.mit.edu/music21 or https://music21.readthedocs.org/en/latest/index.html
+https://web.mit.edu/music21
 
 And to install, see:
 https://web.mit.edu/music21/doc/usersGuide/usersGuide_01_installing.html
@@ -22,6 +22,12 @@ is available also on GitHub.
 [![Build Status](https://github.com/cuthbertLab/music21/workflows/maincheck/badge.svg)](https://github.com/cuthbertLab/music21)
 [![Lint Status](https://github.com/cuthbertLab/music21/workflows/PyLint/badge.svg)](https://github.com/cuthbertLab/music21)
 [![Coverage Status](https://coveralls.io/repos/github/cuthbertLab/music21/badge.svg?branch=master)](https://coveralls.io/github/cuthbertLab/music21?branch=master)
+
+## Documentation ##
+
+[User's Guide](https://web.mit.edu/music21/doc/usersGuide/index.html)
+
+[Module Documentation](https://web.mit.edu/music21/doc/moduleReference/index.html)
 
 ## Mailing list ##
 

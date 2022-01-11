@@ -244,7 +244,7 @@ class StreamCoreMixin:
             return
         memo.append(id(self))
 
-        # WHY??? THIS SEEMS OVERKILL, esp. since the first call to .sort() in .flat will
+        # WHY??? THIS SEEMS OVERKILL, esp. since the first call to .sort() in .flatten() will
         # invalidate it! TODO: Investigate if this is necessary and then remove if not necessary
         # should not need to do this...
 
@@ -260,7 +260,7 @@ class StreamCoreMixin:
                 origin.clearCache()
 
         # may not always need to clear cache of all living sites, but may
-        # always be a good idea since .flat has changed etc.
+        # always be a good idea since .flatten() has changed etc.
         # should not need to do derivation.origin sites.
         for livingSite in self.sites:
             livingSite.coreElementsChanged(memo=memo)
@@ -465,7 +465,7 @@ class StreamCoreMixin:
             self._cache['spannerBundle'] = spanner.SpannerBundle(list(spanners))
         return self._cache['spannerBundle']
 
-    def asTimespans(self, classList=None, flatten=True):
+    def asTimespans(self, *, flatten=True, classList=None):
         r'''
         Convert stream to a :class:`~music21.tree.trees.TimespanTree` instance, a
         highly optimized data structure for searching through elements and
@@ -514,7 +514,7 @@ class StreamCoreMixin:
         '''
         el.activeSite = self
 
-    def asTree(self, flatten=False, classList=None, useTimespans=False, groupOffsets=False):
+    def asTree(self, *, flatten=False, classList=None, useTimespans=False, groupOffsets=False):
         '''
         Returns an elementTree of the score, using exact positioning.
 

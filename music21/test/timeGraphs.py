@@ -268,7 +268,7 @@ class TestGetElementsByClassA(Test):
         self.s = corpus.parse('bwv66.6')
 
     def testFocus(self):
-        len(self.s.flat.notes)
+        len(self.s.flatten().notes)
 
 
 

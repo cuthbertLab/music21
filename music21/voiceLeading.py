@@ -1293,7 +1293,7 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
     (under development)
 
     >>> c = corpus.parse('bach/bwv66.6')
-    >>> n1 = c.flat.getElementsByClass(note.Note).first()
+    >>> n1 = c.flatten().getElementsByClass(note.Note).first()
     >>> voiceLeading.getVerticalityFromObject(n1, c)
     <music21.voiceLeading.Verticality
         contentDict={0: [<music21.instrument.Instrument 'P1: Soprano: Instrument 1'>,
@@ -1326,11 +1326,11 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
               2: [<music21.note.Note A>],
               3: [<music21.note.Note A>]}>
     '''
-    offsetOfObject = music21Obj.getOffsetBySite(scoreObjectIsFrom.flat)
+    offsetOfObject = music21Obj.getOffsetBySite(scoreObjectIsFrom.flatten())
 
     contentDict = {}
     for partNum, partObj in enumerate(scoreObjectIsFrom.parts):
-        elementSelection = partObj.flat.getElementsByOffset(offsetOfObject,
+        elementSelection = partObj.flatten().getElementsByOffset(offsetOfObject,
                                                          mustBeginInSpan=False,
                                                          classList=classFilterList)
         for el in elementSelection:
@@ -1630,9 +1630,9 @@ class Verticality(base.Music21Object):
         {0.0} <music21.stream.Part part-1>
             {0.0} <music21.note.Note C>
 
-        >>> len(vsStream.flat.getElementsByClass(note.Note))
+        >>> len(vsStream.flatten().getElementsByClass(note.Note))
         2
-        >>> len(vsStream.flat.getElementsByClass('Harmony'))
+        >>> len(vsStream.flatten().getElementsByClass('Harmony'))
         1
         '''
         from music21 import stream
@@ -1709,7 +1709,7 @@ class Verticality(base.Music21Object):
 
         >>> h = voiceLeading.Verticality({1: note.Note('C'), 2: harmony.ChordSymbol('C')})
         >>> h.lyric = 'Verticality 1'
-        >>> h.getStream().flat.getElementsByClass(note.Note).first().lyric
+        >>> h.getStream().flatten().getElementsByClass(note.Note).first().lyric
         'Verticality 1'
         ''')
 
@@ -2199,10 +2199,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         '''
 
         return (self._isComplete()
-                and ((self.iLeft.generic.undirected == 2
-                            or self.iLeft.generic.undirected == 1)
-                     and (self.iRight.generic.undirected == 2
-                            or self.iRight.generic.undirected == 1)
+                and (self.iLeft.generic.undirected in (1, 2)
+                     and self.iRight.generic.undirected in (1, 2)
                      and self.iLeft.generic.undirected * self.iRight.generic.undirected == 2
                      and self.iLeft.isChromaticStep
                      and self.iRight.isChromaticStep

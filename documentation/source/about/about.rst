@@ -66,7 +66,8 @@ Colleagues and Institutions
 Music21 is unthinkable without our colleagues and friends
 working on other music and technology projects, in particular:
 
-* `David Huron`_, inventor of `Humdrum`_, the inspiration for music21.
+* `David Huron`_, inventor of `Humdrum`_ (the link refers to a changed version of the project),
+   the inspiration for music21.
 
 * `Michael Good`_ and Recordare.com for creating MusicXML and many
    discussions about the project.
@@ -75,8 +76,8 @@ working on other music and technology projects, in particular:
   contributing to the knowledge of music since 1984, and
   publishers of *Computing in Musicology*.
 
-.. _David Huron: http://www.musiccog.ohio-state.edu/Huron/
-.. _Humdrum: http://www.musiccog.ohio-state.edu/Humdrum/
+.. _David Huron: https://www.musiccognition.osu.edu/people/david-huron/
+.. _Humdrum: https://www.humdrum.org
 .. _Michael Good: https://www.musicxml.com
 .. _Center for Computer-Assisted Research in the Humanities: http://www.ccarh.org/
 
@@ -136,18 +137,18 @@ to this project.  Their contributions and generosity are greatly appreciated.
 * `Project Gutenberg`_ houses public domain music, including the quartets of Beethoven,
   Haydn, and Mozart, in musicxml format which we have been able to include in music21.
 
-.. _Donald Byrd: http://www.informatics.indiana.edu/donbyrd/CMNExtremes.htm
+.. _Donald Byrd: https://homes.luddy.indiana.edu/donbyrd/CMNExtremes.htm
 .. _Laura E. Conrad: http://www.serpentpublications.org/drupal7/
 .. _Margaret Greentree: http://www.jsbchorales.net
 .. _MuseScore: https://musescore.com/
 .. _Justin London: https://people.carleton.edu/~jlondon/2ndviennese.htm
 .. _Bryen Travis: http://www.bachcentral.com/
 .. _Ewa Dahlig-Turek: http://www.esac-data.org
-.. _Seymour Shlien: http://ifdo.pugmarks.com/~seymour/runabc/esac/esacdatabase.html
+.. _Seymour Shlien: tps://ifdo.ca/~seymour/runabc/esac/esacdatabase.html
 .. _Manuel Op de Coul: http://www.huygens-fokker.org/scala
 .. _John Chambers: http://trillian.mit.edu/~jc/music/book
 .. _Jack Campin: http://www.campin.me.uk/
-.. _McGill University: https://digihum.mcgill.ca/blog/2012/11/30/elvis-digging-into-data-at-mcgill/
+.. _McGill University: https://hcommons.org/deposits/item/hc:12359/
 .. _Project Gutenberg: https://www.gutenberg.org/browse/categories/4
 
 

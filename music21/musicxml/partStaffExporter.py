@@ -15,15 +15,16 @@ MusicXML `<part>` from multiple music21 `PartStaff` objects.
 '''
 from typing import Dict, List, Optional
 import unittest
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element, SubElement
+import warnings
+from xml.etree.ElementTree import Element, SubElement, Comment
 
+from music21.common.misc import flattenList
 from music21.key import KeySignature
 from music21.layout import StaffGroup
 from music21.meter import TimeSignature
 from music21 import stream  # for typing
 from music21.musicxml import helpers
-from music21.musicxml.xmlObjects import MusicXMLExportException
+from music21.musicxml.xmlObjects import MusicXMLExportException, MusicXMLWarning
 
 def addStaffTags(measure: Element, staffNumber: int, tagList: Optional[List[str]] = None):
     '''
@@ -131,8 +132,11 @@ class PartStaffExporterMixin:
         >>> len(staffTags)
         2
         '''
-        self.joinedGroups = self.joinableGroups()
-        for group in self.joinedGroups:
+        # starting with v.7, self.groupsToJoin is already set earlier,
+        # but check to be safe
+        if not self.groupsToJoin:
+            self.groupsToJoin = self.joinableGroups()
+        for group in self.groupsToJoin:
             self.addStaffTagsMultiStaffParts(group)
             self.movePartStaffMeasureContents(group)
             self.setEarliestAttributesAndClefsPartStaff(group)
@@ -242,6 +246,13 @@ class PartStaffExporterMixin:
             if containedParts not in permutations:
                 deduplicatedGroups.append(jg)
             permutations.add(containedParts)
+
+        # But forbid overlapping, spaghetti StaffGroups
+        joinable_components_list = flattenList(deduplicatedGroups)
+        if len(set(joinable_components_list)) != len(joinable_components_list):
+            warnings.warn(
+                MusicXMLWarning('Got overlapping StaffGroups; will not merge ANY groups.'))
+            return []
 
         return deduplicatedGroups
 
@@ -377,7 +388,7 @@ class PartStaffExporterMixin:
 
             # Or, gap in measure numbers in target: record necessary insertions until gap is closed
             while helpers.measureNumberComesBefore(sourceNumber, targetNumber):
-                divider: Element = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
+                divider: Element = Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
                 try:
                     insertions[i] += [divider, sourceMeasure]
                 except KeyError:
@@ -396,7 +407,7 @@ class PartStaffExporterMixin:
             remainingMeasures.insert(0, sourceMeasure)
         for remaining in remainingMeasures:
             sourceNumber = remaining.get('number')
-            divider: Element = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
+            divider: Element = Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
             try:
                 insertions[len(target)] += [divider, remaining]
             except KeyError:
@@ -909,7 +920,7 @@ class Test(unittest.TestCase):
         from music21 import musicxml
         sch = corpus.parse('schoenberg/opus19', 2)
 
-        SX = musicxml.m21ToXml.ScoreExporter(sch.flat)
+        SX = musicxml.m21ToXml.ScoreExporter(sch.flatten())
         SX.scorePreliminaries()
         SX.parseFlatScore()
         # Previously, an exception was raised by getRootForPartStaff()
@@ -929,6 +940,26 @@ class Test(unittest.TestCase):
         SX.scorePreliminaries()
         SX.parsePartlikeScore()
         self.assertEqual(len(SX.joinableGroups()), 1)
+
+    def testJoinPartStaffsH(self):
+        '''
+        Overlapping PartStaffs cannot be guaranteed to export correctly,
+        so they fall back to the old export paradigm (no joinable groups).
+        '''
+        from music21 import musicxml
+
+        ps1 = stream.PartStaff(stream.Measure())
+        ps2 = stream.PartStaff(stream.Measure())
+        ps3 = stream.PartStaff(stream.Measure())
+        sg1 = StaffGroup([ps1, ps2])
+        sg2 = StaffGroup([ps1, ps3])
+        s = stream.Score([ps1, ps2, ps3, sg1, sg2])
+
+        SX = musicxml.m21ToXml.ScoreExporter(s)
+        SX.scorePreliminaries()
+        with self.assertWarns(MusicXMLWarning):
+            SX.parsePartlikeScore()
+            self.assertEqual(SX.joinableGroups(), [])
 
     def testJoinPartStaffsAgain(self):
         '''

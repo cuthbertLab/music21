@@ -13,7 +13,7 @@
 '''
 Parses the de Clercq-Temperley popular music flavor of RomanText.
 The Clercq-Temperley file format and additional rock corpus analysis
-information may be located at http://theory.esm.rochester.edu/rock_corpus/
+information may be located at http://rockcorpus.midside.com
 '''
 import copy
 import io
@@ -986,7 +986,7 @@ class TestExternal(unittest.TestCase):
         #     txt = f.read()
         #
         #     s = clercqTemperley.CTSong(txt)
-        #     for chord in s.toScore().flat.getElementsByClass('Chord'):
+        #     for chord in s.toScore().flatten().getElementsByClass('Chord'):
         #         try:
         #             x = chord.pitches
         #         except:

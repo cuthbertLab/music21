@@ -59,6 +59,7 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 # |Chord|Dur:8th|Pos:-4,n-3,b-2,#-1,x0,v1,2x|Opts:Stem=Down,Crescendo|Dur2:8th,DblDotted|Pos2:3x
 
 import unittest
+import warnings
 from music21 import bar
 from music21 import chord
 from music21 import clef
@@ -226,7 +227,7 @@ class NoteworthyTranslator:
         for kk in parts:
             if kk == 'Grace':
                 # Now it doesn't work, the function for grace notes have to be added here
-                environLocal.warn('skipping grace note')
+                warnings.warn('skipping grace note')
                 return
             elif kk == 'Slur':
                 if self.withinSlur is False:
@@ -852,9 +853,9 @@ class Test(unittest.TestCase):
         nwcTranslatePath = common.getSourceFilePath() / 'noteworthy'
         simplePath = nwcTranslatePath / 'verySimple.nwctxt'
         myScore = NoteworthyTranslator().parseFile(simplePath)
-        self.assertEqual(len(myScore.flat.notes), 1)
-        self.assertEqual(str(myScore.flat.notes[0].name), 'E')
-        self.assertEqual(str(myScore.flat.getElementsByClass('Clef').first()),
+        self.assertEqual(len(myScore[note.Note]), 1)
+        self.assertEqual(str(myScore[note.Note].first().name), 'E')
+        self.assertEqual(str(myScore[clef.Clef].first()),
                          '<music21.clef.BassClef>')
 
     def testKeySignatureAtBeginning(self):
@@ -903,7 +904,9 @@ class TestExternal(unittest.TestCase):
         complete = nwcTranslatePath / 'NWCTEXT_Really_complete_example_file.nwctxt'
         # 'Part_OWeisheit.nwctxt' #
 
-        myScore = NoteworthyTranslator().parseFile(complete)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', Warning)
+            myScore = NoteworthyTranslator().parseFile(complete)
         if self.show:
             myScore.show()
 

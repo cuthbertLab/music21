@@ -998,6 +998,10 @@ class BrailleSegment(text.BrailleText):
           are found in a row, the first instance of the articulation is doubled and the rest are
           omitted.
 
+          It is permissible (not mandatory) to observe this doubling with bowings. (BMTM, 114)
+          For this reason, any :class:`~music21.articulations.TechnicalIndication` but for bowings
+          (e.g. fingering, harmonic) is skipped, because it does not braille as an articulation.
+
         * Staccato, Tenuto rule => "If two repeated notes appear to be tied, but either is marked
           staccato or tenuto, they are treated as slurred instead of tied." (BMTM, 112)
         '''
@@ -1005,8 +1009,6 @@ class BrailleSegment(text.BrailleText):
 
         def fixOneArticulation(artic, music21NoteStart, allNotes, noteIndexStart):
             articName = artic.name
-            if articName == 'fingering':  # fingerings are not considered articulations...
-                return
             if (isinstance(artic, (articulations.Staccato, articulations.Tenuto))
                     and music21NoteStart.tie is not None):
                 if music21NoteStart.tie.type == 'stop':
@@ -1044,12 +1046,14 @@ class BrailleSegment(text.BrailleText):
             for noteIndexStart_outer in range(len(allNotes_outer)):
                 music21NoteStart_outer = allNotes_outer[noteIndexStart_outer]
                 for artic_outer in music21NoteStart_outer.articulations:
-                    fixOneArticulation(
-                        artic_outer,
-                        music21NoteStart_outer,
-                        allNotes_outer,
-                        noteIndexStart_outer
-                    )
+                    if (not isinstance(artic_outer, articulations.TechnicalIndication)
+                            or isinstance(artic_outer, articulations.Bowing)):
+                        fixOneArticulation(
+                            artic_outer,
+                            music21NoteStart_outer,
+                            allNotes_outer,
+                            noteIndexStart_outer
+                        )
 
 
 class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
@@ -1553,7 +1557,7 @@ def prepareSlurredNotes(music21Part,
     >>> import copy
     >>> from music21.braille import segment
     >>> short = converter.parse('tinynotation: 3/4 c4 d e')
-    >>> s1 = spanner.Slur(short.flat.notes.first(), short.flat.notes.last())
+    >>> s1 = spanner.Slur(short.recurse().notes.first(), short.recurse().notes.last())
     >>> short.append(s1)
     >>> short.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1566,9 +1570,9 @@ def prepareSlurredNotes(music21Part,
     {3.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note E>>
     >>> shortA = copy.deepcopy(short)
     >>> segment.prepareSlurredNotes(shortA)
-    >>> shortA.flat.notes[0].shortSlur
+    >>> shortA.recurse().notes[0].shortSlur
     True
-    >>> shortA.flat.notes[1].shortSlur
+    >>> shortA.recurse().notes[1].shortSlur
     True
 
 
@@ -1580,7 +1584,7 @@ def prepareSlurredNotes(music21Part,
 
 
     >>> long = converter.parse('tinynotation: 3/4 c8 d e f g a')
-    >>> s2 = spanner.Slur(long.flat.notes.first(), long.flat.notes.last())
+    >>> s2 = spanner.Slur(long[note.Note].first(), long[note.Note].last())
     >>> long.append(s2)
     >>> long.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1596,9 +1600,9 @@ def prepareSlurredNotes(music21Part,
     {3.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note A>>
     >>> longA = copy.deepcopy(long)
     >>> segment.prepareSlurredNotes(longA)
-    >>> longA.flat.notes[0].beginLongBracketSlur
+    >>> longA[note.Note].first().beginLongBracketSlur
     True
-    >>> longA.flat.notes[-1].endLongBracketSlur
+    >>> longA[note.Note].last().endLongBracketSlur
     True
 
 
@@ -1613,9 +1617,9 @@ def prepareSlurredNotes(music21Part,
 
     >>> longB = copy.deepcopy(long)
     >>> segment.prepareSlurredNotes(longB, slurLongPhraseWithBrackets=False)
-    >>> longB.flat.notes[1].beginLongDoubleSlur
+    >>> longB.recurse().notes[1].beginLongDoubleSlur
     True
-    >>> longB.flat.notes[-2].endLongDoubleSlur
+    >>> longB.recurse().notes[-2].endLongDoubleSlur
     True
 
 
@@ -1630,15 +1634,15 @@ def prepareSlurredNotes(music21Part,
     ties are present, as shown below.
 
 
-    >>> short.flat.notes[0].tie = tie.Tie('start')
+    >>> short.recurse().notes[0].tie = tie.Tie('start')
     >>> shortB = copy.deepcopy(short)
     >>> segment.prepareSlurredNotes(shortB)
-    >>> shortB.flat.notes[0].shortSlur
+    >>> shortB.recurse().notes[0].shortSlur
     Traceback (most recent call last):
     AttributeError: 'Note' object has no attribute 'shortSlur'
-    >>> shortB.flat.notes[0].tie
+    >>> shortB.recurse().notes[0].tie
     <music21.tie.Tie start>
-    >>> shortB.flat.notes[1].shortSlur
+    >>> shortB.recurse().notes[1].shortSlur
     True
 
 
@@ -1647,9 +1651,9 @@ def prepareSlurredNotes(music21Part,
 
     >>> shortC = copy.deepcopy(short)
     >>> segment.prepareSlurredNotes(shortC, showShortSlursAndTiesTogether=True)
-    >>> shortC.flat.notes[0].shortSlur
+    >>> shortC.recurse().notes[0].shortSlur
     True
-    >>> shortC.flat.notes[0].tie
+    >>> shortC.recurse().notes[0].tie
     <music21.tie.Tie start>
 
     TODO: This should not add attributes to Note objects but instead return a collection
@@ -1660,7 +1664,7 @@ def prepareSlurredNotes(music21Part,
     if showLongSlursAndTiesTogether is None:
         showLongSlursAndTiesTogether = slurLongPhraseWithBrackets
 
-    allNotes = music21Part.flat.notes.stream()
+    allNotes = music21Part.flatten().notes.stream()
     for slur in music21Part.spannerBundle.getByClass(spanner.Slur):
         firstNote = slur.getFirst()
         lastNote = slur.getLast()

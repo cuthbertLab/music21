@@ -39,9 +39,8 @@ environLocal = environment.Environment(_MOD)
 
 _ChordType = TypeVar('_ChordType')
 
+
 # ------------------------------------------------------------------------------
-
-
 class ChordException(exceptions21.Music21Exception):
     pass
 
@@ -51,6 +50,9 @@ class ChordBase(note.NotRest):
     '''
     A base class for NotRest objects that have multiple underlying structures
     like notes or unpitched percussion.
+
+    As of Version 7, ChordBase lies between Chord and NotRest in the music21
+    hierarchy, so that features can be shared with PercussionChord.
     '''
     isNote = False
     isRest = False
@@ -2632,7 +2634,7 @@ class Chord(ChordBase):
 
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 4):
+            if thisInterval.chromatic.mod12 not in (0, 4):
                 return False
 
         return True
@@ -2678,7 +2680,7 @@ class Chord(ChordBase):
 
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if (thisInterval.chromatic.mod12 != 0) and (thisInterval.chromatic.mod12 != 3):
+            if thisInterval.chromatic.mod12 not in (0, 3):
                 return False
 
         return True
@@ -4228,7 +4230,7 @@ class Chord(ChordBase):
 
         Changed in v5.5: special cases for checking enharmonics in some cases
         Changed in v6.5: better handling of 0-, 1-, and 2-pitchClass and microtonal chords.
-        Changed in v7: Inversions of augmented triads are used.
+        Changed in v7: Inversions of augmented sixth-chords are specified.
         '''
         if any(not p.isTwelveTone() for p in self.pitches):
             return 'microtonal chord'
@@ -6089,7 +6091,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         from music21 import converter
         s = converter.parse(testPrimitive.chordIndependentTies)
-        chords = s.flat.getElementsByClass('Chord')
+        chords = s.flatten().getElementsByClass('Chord')
         # the middle pitch should have a tie
         self.assertEqual(chords[0].getTie(pitch.Pitch('a4')).type, 'start')
         self.assertEqual(chords[0].getTie(pitch.Pitch('c5')), None)

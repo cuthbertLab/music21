@@ -154,7 +154,7 @@ class ModuleReferenceReSTWriter(ReSTWriter):
     Writes module reference ReST files, and their index.rst file.
     '''
     def __init__(self):
-        super(ModuleReferenceReSTWriter, self).__init__()
+        super().__init__()
         self.outputDirectory = self.docGeneratedPath / 'moduleReference'
         self.setupOutputDirectory()
 
@@ -209,7 +209,7 @@ class CorpusReferenceReSTWriter(ReSTWriter):
     into about/
     '''
     def __init__(self):
-        super(CorpusReferenceReSTWriter, self).__init__()
+        super().__init__()
         self.outputDirectory = self.docGeneratedPath / 'about'
         self.setupOutputDirectory()
 
@@ -230,7 +230,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
     '''
     def __init__(self):
         from .iterators import IPythonNotebookIterator
-        super(IPythonNotebookReSTWriter, self).__init__()
+        super().__init__()
         self.ipythonNotebookFilePaths = list(IPythonNotebookIterator())
         # Do not run self.setupOutputDirectory()
 
