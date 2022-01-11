@@ -979,30 +979,40 @@ class Chord(ChordBase):
     def bass(self,
              newbass: Union[bool, str, pitch.Pitch, note.Note] = None,
              *,
-             find=True):
+             find: Union[bool, None] = None):
         '''
-        Return the bass Pitch or set it to the given Pitch:
+        Generally used to find and return the bass Pitch:
 
         >>> cmaj1stInv = chord.Chord(['C4', 'E3', 'G5'])
         >>> cmaj1stInv.bass()
         <music21.pitch.Pitch E3>
 
-        By default this method uses an algorithm to find the bass among the
+        Subclasses of Chord often have basses that are harder to determine.
+
+        >>> cmaj = harmony.ChordSymbol('CM')
+        >>> cmaj.bass()
+        <music21.pitch.Pitch C3>
+
+        >>> cmin_inv = harmony.ChordSymbol('Cm/E-')
+        >>> cmin_inv.bass()
+        <music21.pitch.Pitch E-3>
+
+        Can also be used in rare occasions to set the bass note to a new Pitch.
+
+        Note that overridding the bass currently will add the bass to the
+        chord itself.  This behavior differs from root() and
+        may change in subsequent versions without a deprecation cycle.  It is
+        better to explicitly add the bass to the chord.
+
+        By default if nothing has been overridden, this method uses a
+        quick algorithm to find the bass among the
         chord's pitches, if no bass has been previously specified. If this is
         not intended, set find to False when calling this method, and 'None'
         will be returned if no bass is specified
 
-        >>> c = chord.Chord(['E3', 'G3', 'B4'])
-        >>> c.bass(find=False) is None
-        True
-
-        >>> d = harmony.ChordSymbol('CM')
-        >>> d.bass()
-        <music21.pitch.Pitch C3>
-
-        >>> d = harmony.ChordSymbol('Cm/E-')
-        >>> d.bass()
-        <music21.pitch.Pitch E-3>
+        >>> em = chord.Chord(['E3', 'G3', 'B4'])
+        >>> print(em.bass(find=False))
+        None
 
         OMIT_FROM_DOCS
 
@@ -1011,12 +1021,36 @@ class Chord(ChordBase):
         >>> a = chord.Chord(['C4'])
         >>> a.bass()
         <music21.pitch.Pitch C4>
+        >>> a.bass()
+        <music21.pitch.Pitch C4>
+
+        # After changing behavior uncomment these lines.
+
+        # Setting a new bass note might be helpful to move it to a different
+        # octave.  Otherwise, it is likely just to lead to confusion and
+        # hard to diagnose errors.
+        #
+        # >>> cmin_inv.bass('E-2')
+        # >>> cmin_inv.bass()
+        # <music21.pitch.Pitch E-2>
+        #
+        # To find the bass again from the pitches in the chord, set find=True
+        #
+        # >>> cmin_inv.bass(find=True)
+        # <music21.pitch.Pitch E-3>
+        #
+        # Subsequent calls after an overridden bass has been cleared by find=True
+        # will continue to return the algorithmically determined bass.
+        #
+        # >>> cmin_inv.bass()
+        # <music21.pitch.Pitch E-3>
 
         '''
         if newbass:
             if isinstance(newbass, str):
                 newbass = common.cleanedFlatNotation(newbass)
                 newbass = pitch.Pitch(newbass)
+
             # try to set newbass to be a pitch in the chord if possible
             foundBassInChord: bool = False
             for p in self.pitches:  # first by identity
@@ -1040,23 +1074,30 @@ class Chord(ChordBase):
 
             if not foundBassInChord:  # it's not there, needs to be added
                 self.pitches = (newbass, *(p for p in self.pitches))
+            # to be changed in v8 -- do not add this bass to the chord itself.
 
             self._overrides['bass'] = newbass
             self._cache['bass'] = newbass
             if 'inversion' in self._cache:
                 del self._cache['inversion']
             # reset inversion if bass changes
-        elif ('bass' not in self._overrides) and find:
-            if 'bass' in self._cache:
-                return self._cache['bass']
-            else:
-                self._cache['bass'] = self._findBass()
-                return self._cache['bass']
+            return None
+
+        if 'bass' in self._overrides and find is not True:
+            return self._overrides['bass']
+
+        if find is False:
+            return None
+
+        if 'bass' in self._overrides:
+            del self._overrides['bass']
+
+        if find is not True and 'bass' in self._cache:
+            return self._cache['bass']
         else:
-            if 'bass' in self._overrides:
-                return self._overrides['bass']
-            else:
-                return None
+            self._cache['bass'] = self._findBass()
+            return self._cache['bass']
+
 
     def canBeDominantV(self) -> bool:
         '''
@@ -1890,71 +1931,84 @@ class Chord(ChordBase):
                 return thisInterval
         return None
 
-    def inversion(self, newInversion=None, *, find=True, testRoot=None, transposeOnSet=True):
+    def inversion(
+        self,
+        newInversion: Union[int, None] = None,
+        *,
+        find: bool = True,
+        testRoot: Union[None, pitch.Pitch] = None,
+        transposeOnSet: bool = True
+    ) -> Union[int, None]:
         '''
-        Returns an integer representing which inversion (if any) the chord is in. Chord
-        does not have to be complete, but determines the inversion by looking at the relationship
-        of the bass note to the root. Returns max value of 5 for inversion of a thirteenth chord.
-        Returns 0 if bass to root interval is 1 or if interval is not a common inversion (1st-5th).
-        Octave of bass and root are irrelevant to this calculation of inversion.
+        Find the chord's inversion or (if called with a number) set the chord to
+        the new inversion.
 
-        Method doesn't check to see if inversion is reasonable according to the chord provided
-        (if only two pitches given, an inversion is still returned)
-        see :meth:`~music21.harmony.ChordSymbol.inversionIsValid`
-        for checker method on ChordSymbolObjects.
+        When called without a number argument, returns an integer (or None)
+        representing which inversion (if any)
+        the chord is in. The Chord does not have to be complete, in which case
+        this function determines the inversion by looking at the relationship
+        of the bass note to the root.
 
-        >>> a = chord.Chord(['g4', 'b4', 'd5', 'f5'])
-        >>> a.inversion()
+        Returns a maximum value of 5 for the fifth inversion of a thirteenth chord.
+        Returns 0 if the bass to root interval is a unison
+        or if interval is not a common inversion (1st-5th).
+        The octave of the bass and root are irrelevant to this calculation of inversion.
+        Returns None if the Chord has no pitches.
+
+        >>> g7 = chord.Chord(['g4', 'b4', 'd5', 'f5'])
+        >>> g7.inversion()
         0
-        >>> a.inversion(1)
-        >>> a
+        >>> g7.inversion(1)
+        >>> g7
         <music21.chord.Chord B4 D5 F5 G5>
-
 
         With implicit octaves, D becomes the bass (since octaves start on C):
 
-        >>> a = chord.Chord(['g', 'b', 'd', 'f'])
-        >>> a.inversion()
+        >>> g7_implicit = chord.Chord(['g', 'b', 'd', 'f'])
+        >>> g7_implicit.inversion()
         2
 
         Note that in inverting a chord with implicit octaves, some
-        pitches will gain octave designations, but not necessarily all of them:
+        pitches will gain octave designations, but not necessarily all of them
+        (this behavior might change in the future):
 
-        >>> a.inversion(1)
-        >>> a
+        >>> g7_implicit.inversion(1)
+        >>> g7_implicit
         <music21.chord.Chord B D5 F5 G5>
 
+        Examples of each inversion:
 
-        >>> CTriad1stInversion = chord.Chord(['E1', 'G1', 'C2'])
-        >>> CTriad1stInversion.inversion()
+        >>> cTriad1stInversion = chord.Chord(['E1', 'G1', 'C2'])
+        >>> cTriad1stInversion.inversion()
         1
 
-        >>> CTriad2ndInversion = chord.Chord(['G1', 'E2', 'C2'])
-        >>> CTriad2ndInversion.inversion()
+        >>> cTriad2ndInversion = chord.Chord(['G1', 'E2', 'C2'])
+        >>> cTriad2ndInversion.inversion()
         2
 
-        >>> DSeventh3rdInversion = chord.Chord(['C4', 'B4'])
-        >>> DSeventh3rdInversion.bass(pitch.Pitch('B4'))
-        >>> DSeventh3rdInversion.inversion()
+        >>> dSeventh3rdInversion = chord.Chord(['C4', 'B4'])
+        >>> dSeventh3rdInversion.bass(pitch.Pitch('B4'))
+        >>> dSeventh3rdInversion.inversion()
         3
 
-        >>> GNinth4thInversion = chord.Chord(['G4', 'B4', 'D5', 'F5', 'A4'])
-        >>> GNinth4thInversion.bass(pitch.Pitch('A4'))
-        >>> GNinth4thInversion.inversion()
+        >>> gNinth4thInversion = chord.Chord(['G4', 'B4', 'D5', 'F5', 'A4'])
+        >>> gNinth4thInversion.bass(pitch.Pitch('A4'))
+        >>> gNinth4thInversion.inversion()
         4
 
-        >>> BbEleventh5thInversion = chord.Chord(['B-', 'D', 'F', 'A', 'C', 'E-'])
-        >>> BbEleventh5thInversion.bass(pitch.Pitch('E-4'))
-        >>> BbEleventh5thInversion.inversion()
+        >>> bbEleventh5thInversion = chord.Chord(['B-', 'D', 'F', 'A', 'C', 'E-'])
+        >>> bbEleventh5thInversion.bass(pitch.Pitch('E-4'))
+        >>> bbEleventh5thInversion.inversion()
         5
 
+        Repeated notes do not affect the inversion:
 
-        >>> GMajRepeats = chord.Chord(['G4', 'B5', 'G6', 'B6', 'D7'])
-        >>> GMajRepeats.inversion(2)
-        >>> GMajRepeats
+        >>> gMajRepeats = chord.Chord(['G4', 'B5', 'G6', 'B6', 'D7'])
+        >>> gMajRepeats.inversion(2)
+        >>> gMajRepeats
         <music21.chord.Chord D7 G7 B7 G8 B8>
 
-        >>> GMajRepeats.inversion(3)
+        >>> gMajRepeats.inversion(3)
         Traceback (most recent call last):
         music21.chord.ChordException: Could not invert chord...inversion may not exist
 
@@ -1972,10 +2026,29 @@ class Chord(ChordBase):
         Traceback (most recent call last):
         music21.chord.ChordException: Inversion must be an integer
 
-        if you are trying to crash the system...
+        Chords without pitches return None:
 
-        >>> chord.Chord().inversion(testRoot=pitch.Pitch('C5')) is None
-        True
+        >>> print(chord.Chord().inversion(testRoot=pitch.Pitch('C5')))
+        None
+
+        For Harmony subclasses, this method does not check to see if
+        the inversion is reasonable according to the figure provided.
+        see :meth:`~music21.harmony.ChordSymbol.inversionIsValid`
+        for checker method on ChordSymbolObjects.
+
+        If only two pitches given, an inversion is still returned, often as
+        if it were a triad:
+
+        >>> chord.Chord('C4 G4').inversion()
+        0
+        >>> chord.Chord('G4 C5').inversion()
+        2
+
+
+        If transposeOnSet is False then setting the inversion simply
+        sets the value to be returned later, which might be useful for
+        cases where the chords are poorly spelled, or there is an added note.
+
         '''
         if not self.pitches:
             return
@@ -1991,39 +2064,7 @@ class Chord(ChordBase):
                     newInversion = int(newInversion)
                 except:
                     raise ChordException("Inversion must be an integer")
-            if transposeOnSet is False:
-                self._overrides['inversion'] = newInversion
-            else:
-                # could have set bass or root externally
-                numberOfRunsBeforeCrashing = len(self.pitches) + 2
-                soughtInversion = newInversion
-
-                if 'inversion' in self._overrides:
-                    del self._overrides['inversion']
-                if 'bass' in self._overrides:
-                    del self._overrides['bass']
-                currentInversion = self.inversion(find=True)
-                while currentInversion != soughtInversion and numberOfRunsBeforeCrashing > 0:
-                    currentMaxMidi = max(self.pitches).ps
-                    tempBassPitch = self.bass()
-                    while tempBassPitch.ps < currentMaxMidi:
-                        try:
-                            # will this work with implicit octave chords???
-                            tempBassPitch.octave += 1
-                        except TypeError:
-                            tempBassPitch.octave = tempBassPitch.implicitOctave + 1
-
-                    # housekeeping for next loop tests
-                    self.clearCache()
-                    currentInversion = self.inversion(find=True)
-                    numberOfRunsBeforeCrashing -= 1
-
-                if numberOfRunsBeforeCrashing == 0:
-                    raise ChordException('Could not invert chord...inversion may not exist')
-
-                self.sortAscending(inPlace=True)
-                return
-
+            return self._setInversion(newInversion, rootPitch, transposeOnSet)
         elif ('inversion' not in self._overrides and find) or testRoot is not None:
             try:
                 if rootPitch is None or self.bass() is None:
@@ -2031,40 +2072,87 @@ class Chord(ChordBase):
             except ChordException:
                 raise ChordException('Not a normal inversion')  # can this be run?
 
-            # bassNote = self.bass()
-            # do all interval calculations with bassNote being one octave below root note
-            tempBassPitch = copy.deepcopy(self.bass())
-            tempBassPitch.octave = 1
-            tempRootPitch = copy.deepcopy(rootPitch)
-            tempRootPitch.octave = 2
-
-            bassToRoot = interval.notesToInterval(tempBassPitch,
-                                                  tempRootPitch).generic.simpleDirected
-            # print('bassToRoot', bassToRoot)
-            if bassToRoot == 1:
-                inv = 0
-            elif bassToRoot == 6:  # triads
-                inv = 1
-            elif bassToRoot == 4:  # triads
-                inv = 2
-            elif bassToRoot == 2:  # sevenths
-                inv = 3
-            elif bassToRoot == 7:  # ninths
-                inv = 4
-            elif bassToRoot == 5:  # eleventh
-                inv = 5
-            elif bassToRoot == 3:  # thirteenth
-                inv = 6
-            else:
-                inv = None  # no longer raise an exception if not normal inversion
-
-            # is this cache worth it? or more trouble than it's worth...
-            self._cache['inversion'] = inv
-            return inv
+            return self._findInversion(rootPitch)
         elif 'inversion' in self._overrides:
             return self._overrides['inversion']
         else:
             return None
+
+    def _setInversion(self,
+                      newInversion: int,
+                      rootPitch: pitch.Pitch,
+                      transposeOnSet: bool
+                      ) -> None:
+        '''
+        Helper function for inversion(int)
+        '''
+        if transposeOnSet is False:
+            self._overrides['inversion'] = newInversion
+            return
+        # could have set bass or root externally
+        numberOfRunsBeforeCrashing = len(self.pitches) + 2
+        soughtInversion = newInversion
+
+        if 'inversion' in self._overrides:
+            del self._overrides['inversion']
+        if 'bass' in self._overrides:
+            # bass might have been overridden for a different octave
+            del self._overrides['bass']
+        currentInversion = self.inversion(find=True)
+        while currentInversion != soughtInversion and numberOfRunsBeforeCrashing > 0:
+            currentMaxMidi = max(self.pitches).ps
+            tempBassPitch = self.bass()
+            while tempBassPitch.ps < currentMaxMidi:
+                try:
+                    # will this work with implicit octave chords???
+                    tempBassPitch.octave += 1
+                except TypeError:
+                    tempBassPitch.octave = tempBassPitch.implicitOctave + 1
+
+            # housekeeping for next loop tests
+            self.clearCache()
+            currentInversion = self.inversion(find=True)
+            numberOfRunsBeforeCrashing -= 1
+
+        if numberOfRunsBeforeCrashing == 0:
+            raise ChordException('Could not invert chord...inversion may not exist')
+
+        self.sortAscending(inPlace=True)
+
+    def _findInversion(self, rootPitch: pitch.Pitch) -> int:
+        '''
+        Helper function for .inversion()
+        '''
+        # bassNote = self.bass()
+        # do all interval calculations with bassNote being one octave below root note
+        tempBassPitch = copy.deepcopy(self.bass())
+        tempBassPitch.octave = 1
+        tempRootPitch = copy.deepcopy(rootPitch)
+        tempRootPitch.octave = 2
+
+        bassToRoot = interval.notesToInterval(tempBassPitch,
+                                              tempRootPitch).generic.simpleDirected
+        # print('bassToRoot', bassToRoot)
+        if bassToRoot == 1:
+            inv = 0
+        elif bassToRoot == 6:  # triads
+            inv = 1
+        elif bassToRoot == 4:  # triads
+            inv = 2
+        elif bassToRoot == 2:  # sevenths
+            inv = 3
+        elif bassToRoot == 7:  # ninths
+            inv = 4
+        elif bassToRoot == 5:  # eleventh
+            inv = 5
+        elif bassToRoot == 3:  # thirteenth
+            inv = 6
+        else:
+            inv = None  # no longer raise an exception if not normal inversion
+
+        # is this cache worth it? or more trouble than it's worth...
+        self._cache['inversion'] = inv
+        return inv
 
     def inversionName(self):
         '''
@@ -3259,12 +3347,13 @@ class Chord(ChordBase):
                                                      inPlace=inPlace)
 
     def root(self,
-             newroot: Union[bool, str, pitch.Pitch, note.Note] = False,
+             newroot: Union[None, str, pitch.Pitch, note.Note] = None,
              *,
-             find=None):
+             find: Union[bool, None] = None):
         # noinspection PyShadowingNames
         '''
-        Returns or sets the Root of the chord. If not set, will find it.
+        Returns the root of the chord.  Or if given a Pitch as the
+        newroot will override the algorithm and always return that Pitch.
 
         >>> cmaj = chord.Chord(['E3', 'C4', 'G5'])
         >>> cmaj.root()
@@ -3293,13 +3382,11 @@ class Chord(ChordBase):
         >>> aDim7no3rdInv.root()
         <music21.pitch.Pitch A4>
 
-
         The root of a 13th chord (which could be any chord in any inversion) is
         designed to be the bass:
 
         >>> chord.Chord('F3 A3 C4 E-4 G-4 B4 D5').root()
         <music21.pitch.Pitch F3>
-
 
         Multiple pitches in different octaves do not interfere with root.
 
@@ -3311,9 +3398,31 @@ class Chord(ChordBase):
         >>> r is lotsOfNotes.pitches[1]
         True
 
-        You might want to supply an implied root. For instance, some people
-        (following the music theorist Rameau) call a diminished seventh chord (vii7)
-        a dominant chord with an omitted root -- here we will specify the root
+        Setting of a root may happen for a number of reasons, such as
+        in the case where music21's idea of a root differs from the interpreter's.
+
+        To specify the root directly, pass the pitch to the root function:
+
+        >>> cSus4 = chord.Chord('C4 F4 G4')
+        >>> cSus4.root()  # considered by music21 to be an F9 chord in 2nd inversion
+        <music21.pitch.Pitch F4>
+
+        Change it to be a Csus4:
+
+        >>> cSus4.root('C4')
+        >>> cSus4.root()
+        <music21.pitch.Pitch C4>
+
+        Note that if passing in a string as the root,
+        the root is set to a pitch in the chord if possible.
+
+        >>> cSus4.root() is cSus4.pitches[0]
+        True
+
+
+        You might also want to supply an "implied root." For instance, some people
+        call a diminished seventh chord (generally viio7)
+        a dominant chord with an omitted root (Vo9) -- here we will specify the root
         to be a note not in the chord:
 
         >>> vo9 = chord.Chord(['B3', 'D4', 'F4', 'A-4'])
@@ -3324,48 +3433,43 @@ class Chord(ChordBase):
         >>> vo9.root()
         <music21.pitch.Pitch G3>
 
-        Pitches left untouched:
+        When setting a root, the pitches of the chord are left untouched:
 
         >>> [p.nameWithOctave for p in vo9.pitches]
         ['B3', 'D4', 'F4', 'A-4']
 
         By default this method uses an algorithm to find the root among the
-        chord's pitches, if no root has been previously specified. If this is
-        not intended, set find to False when calling this method, and 'None'
-        will be returned if no root is specified.
+        chord's pitches, if no root has been previously specified.  If a root
+        has been explicitly specified, as in the Csus4 chord above, it can be
+        returned to the original root() by setting find explicitly to True:
+
+        >>> cSus4.root(find=True)
+        <music21.pitch.Pitch F4>
+
+        Subsequent calls without find=True have also removed the overridden root:
+
+        >>> cSus4.root()
+        <music21.pitch.Pitch F4>
+
+        If for some reason you do not want the root-finding algorithm to be
+        run (for instance, checking to see if an overridden root has been
+        specified) set find=False.  "None" may be returned if
+        will be returned if no root has been specified.
 
         >>> c = chord.Chord(['E3', 'G3', 'B4'])
-        >>> c.root(find=False) is None
-        True
+        >>> print(c.root(find=False))
+        None
+
+        Chord symbols, for instance, have their root already specified on construction:
 
         >>> d = harmony.ChordSymbol('CM/E')
         >>> d.root(find=False)
         <music21.pitch.Pitch C4>
 
+        There is no need to set find=False in this case, however, the
+        algorithm will skip the slow part of finding the root if it
+        has been specified (or already found and no pitches have changed).
 
-        To specify the root directly, pass the pitch to the root function:
-
-        >>> cSus4 = chord.Chord('C4 F4 G4')
-        >>> cSus4.root()  # considered to be an F9 chord in 2nd inversion
-        <music21.pitch.Pitch F4>
-        >>> cSus4.root('C4')
-        >>> cSus4.root()
-        <music21.pitch.Pitch C4>
-
-        Note that the root is set to a pitch in the chord if possible.
-
-        >>> cSus4.root() is cSus4.pitches[0]
-        True
-
-        Return to the original root() by setting find explicitly to True:
-
-        >>> cSus4.root(find=True)
-        <music21.pitch.Pitch F4>
-
-        the find algorithm ensures that the overridden root is gone:
-
-        >>> cSus4.root()
-        <music21.pitch.Pitch F4>
 
         A chord with no pitches has no root and raises a ChordException.
 

@@ -2024,14 +2024,14 @@ class ChordSymbol(Harmony):
         chord in first inversion, but is considered to be a D- chord in root
         position:
 
-        >>> csMaj6 = CS('D-6')
-        >>> [str(pi) for pi in csMaj6.pitches]
+        >>> dFlatMaj6 = CS('D-6')
+        >>> [str(pi) for pi in dFlatMaj6.pitches]
         ['D-3', 'F3', 'A-3', 'B-3']
 
-        >>> csMaj6.root()
+        >>> dFlatMaj6.root()
         <music21.pitch.Pitch D-3>
 
-        >>> csMaj6.inversion()
+        >>> dFlatMaj6.inversion()
         0
 
         OMIT_FROM_DOCS
@@ -2045,7 +2045,6 @@ class ChordSymbol(Harmony):
         >>> CS('E11omit3').root().nameWithOctave
         'E2'
         '''
-
         if 'root' not in self._overrides or 'bass' not in self._overrides or self.chordKind is None:
             return
 
@@ -2422,13 +2421,13 @@ class NoChord(ChordSymbol):
         if self._figure is None:
             self._figure = self.chordKindStr
 
-    def root(self, newroot=False, find=False):
+    def root(self, newroot=None, *, find=None):
         # Ignore newroot, and set find to False to always return None
-        return super().root(newroot=False, find=False)
+        return None
 
-    def bass(self, newbass=None, *, find=True):
+    def bass(self, newbass=None, *, find=None):
         # Ignore newbass, and set find to False to always return None
-        return super().bass(newbass=None, find=False)
+        return None
 
     def _parseFigure(self):
         # do nothing, everything is already set.
