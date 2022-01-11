@@ -94,18 +94,18 @@ def plotStream(
 
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
+    >>> thePlot = s.plot('histogram', 'pitch', doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW s.plot('histogram', 'pitch')
+    >>> #_DOCS_SHOW thePlot = s.plot('histogram', 'pitch')
 
     .. image:: images/HistogramPitchSpace.*
         :width: 600
 
 
     >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-    >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
+    >>> thePlot = s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-    >>> #_DOCS_SHOW s.plot('pianoroll')
+    >>> #_DOCS_SHOW thePlot = s.plot('pianoroll')
 
     .. image:: images/HorizontalBarPitchSpaceOffset.*
         :width: 600
@@ -113,6 +113,8 @@ def plotStream(
     '''
     plotMake = findPlot.getPlotsToMake(graphFormat, xValue, yValue, zValue)
     # environLocal.printDebug(['plotClassName found', plotMake])
+
+    obj = None
     for plotInfo in plotMake:
         if not common.isIterable(plotInfo):
             plotClassName = plotInfo
@@ -126,16 +128,21 @@ def plotStream(
                 setattr(obj, attrName, axisClass(obj, axisName))
         obj.run()
 
+    if obj:
+        return obj  # just first one...
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testAll(self):
-        from music21 import corpus, dynamics
+        from music21 import corpus
+        from music21 import dynamics
         a = corpus.parse('bach/bwv57.8')
         a.parts[0].insert(0, dynamics.Dynamic('mf'))
         a.parts[0].insert(10, dynamics.Dynamic('f'))
-        plotStream(a, 'all')
+        if self.show:
+            plotStream(a, 'all')
 
 
 class Test(unittest.TestCase):
@@ -166,10 +173,13 @@ class Test(unittest.TestCase):
     def testAll(self):
         from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
-        plotStream(a.flat, doneAction=None)
+        plotStream(a.flatten(), doneAction=None)
 
     def testPlotChordsC(self):
-        from music21 import dynamics, note, stream, scale
+        from music21 import dynamics
+        from music21 import note
+        from music21 import stream
+        from music21 import scale
 
         sc = scale.MajorScale('c4')
 
@@ -202,7 +212,8 @@ class Test(unittest.TestCase):
             s.plot(*args, doneAction=None)
 
     def testHorizontalInstrumentationB(self):
-        from music21 import corpus, dynamics
+        from music21 import corpus
+        from music21 import dynamics
         s = corpus.parse('bwv66.6')
         dyn = ['p', 'mf', 'f', 'ff', 'mp', 'fff', 'ppp']
         i = 0

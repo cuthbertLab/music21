@@ -34,7 +34,7 @@ class DefaultsException(Exception):
 title = 'Music21 Fragment'
 author = 'Music21'
 software = 'music21 v.' + _version.__version__  # used in xml encoding source software
-musicxmlVersion = '3.0'
+musicxmlVersion = '3.1'
 
 meterNumerator = 4
 meterDenominator = 'quarter'

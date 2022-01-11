@@ -13,7 +13,7 @@
 '''
 Parses the de Clercq-Temperley popular music flavor of RomanText.
 The Clercq-Temperley file format and additional rock corpus analysis
-information may be located at http://theory.esm.rochester.edu/rock_corpus/
+information may be located at http://rockcorpus.midside.com
 '''
 import copy
 import io
@@ -766,7 +766,7 @@ class CTRule(prebase.ProtoM21Object):
         # third pass, make empty content duplicate previous content.
         for content, sep, numReps in measureGroups2:
             contentSplit = content.split()
-            if sep == '|' and all([y.startswith('[') or y == '' for y in contentSplit]):
+            if sep == '|' and all(y.startswith('[') or y == '' for y in contentSplit):
                 content = ' '.join(contentSplit)
                 if content:
                     content += ' '
@@ -963,13 +963,15 @@ class Test(unittest.TestCase):
     pass
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testB(self):
         from music21.romanText import clercqTemperley
         s = clercqTemperley.CTSong(BlitzkriegBopCT)
         scoreObj = s.toScore()
-        scoreObj.show()
+        if self.show:
+            scoreObj.show()
 
     def x_testA(self):
         pass
@@ -984,7 +986,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         #     txt = f.read()
         #
         #     s = clercqTemperley.CTSong(txt)
-        #     for chord in s.toScore().flat.getElementsByClass('Chord'):
+        #     for chord in s.toScore().flatten().getElementsByClass('Chord'):
         #         try:
         #             x = chord.pitches
         #         except:

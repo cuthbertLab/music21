@@ -1351,8 +1351,8 @@ class TransformedSegmentMatcher(SegmentMatcher):
     The convention for serial
     transformations must be specified to either
     'zero' or 'original', as described in
-    :meth:`~music21.search.serial.zeroCenteredTransformation` and
-    :func:`~music21.search.serial.originalCenteredTransformation` - the default setting
+    :meth:`~music21.search.serial.ToneRow.zeroCenteredTransformation` and
+    :func:`~music21.search.serial.ToneRow.originalCenteredTransformation` - the default setting
     is 'original', as to relate found segments
     directly to the given segments, without first transposing the given segment to
     begin on the pitch class 0.
@@ -1716,7 +1716,7 @@ class TransposedMultisetMatcher(SegmentMatcher):
     Finds all instances of given multisets of pitch classes, with transpositions,
     within a :class:`~music21.stream.Stream`. A multiset
     is a generalization of a set, as described in
-    :meth:`~music21.search.serial.findMultisets`.
+    :class:`~music21.search.serial.MultisetSegmentMatcher`.
 
     The inputStream is :class:`~music21.stream.Stream`; as
     in :class:`~music21.search.serial.ContiguousSegmentSearcher`,
@@ -1828,7 +1828,7 @@ class TransposedInvertedMultisetMatcher(TransposedMultisetMatcher):
     Finds all instances of given multisets of pitch classes, with
     transpositions and inversions, within a :class:`~music21.stream.Stream`.
     A multiset is a generalization of a set, as described in
-    :meth:`~music21.search.serial.findMultisets`.
+    :class:`~music21.search.serial.MultisetSegmentMatcher`.
 
     The inputStream is :class:`~music21.stream.Stream`; as
     in :class:`~music21.search.serial.ContiguousSegmentSearcher`,
@@ -2138,7 +2138,7 @@ def labelTransposedSegments(inputStream, segmentDict, reps='skipConsecutive', in
     >>> len(labeledSC.parts[0].getElementsByClass(spanner.Line))
     2
     '''
-    streamCopy = copy.deepcopy(inputStream)
+    streamCopy = inputStream.coreCopyAsDerivation('labelTransposedSegments')
     segmentList = [segmentDict[label] for label in segmentDict]
     segmentsToLabel = TransposedSegmentMatcher(streamCopy, reps, includeChords).find(segmentList)
     return _labelGeneral(segmentsToLabel, streamCopy, segmentDict, reps, includeChords)
@@ -2193,7 +2193,7 @@ def labelTransformedSegments(inputStream,
 
     OMIT_FROM_DOCS
 
-    >>> [len(n.lyrics) for n in labeledPart.flat.notes]
+    >>> [len(n.lyrics) for n in labeledPart.flatten().notes]
     [1, 1, 0]
     '''
     streamCopy = copy.deepcopy(inputStream)
@@ -2214,13 +2214,13 @@ def labelMultisets(inputStream, multisetDict, reps='skipConsecutive', includeCho
     Labels all instances of a given collection of multisets of pitch classes in a
     :class:`~music21.stream.Stream`. A multiset
     is a generalization of a set, as described in
-    :meth:`~music21.search.serial.findMultisets`.
+    :class:`~music21.search.serial.MultisetSegmentMatcher`.
 
     The multisetDict is a dictionary whose keys are names of
     the multisets to be searched for, and whose
     values are the segments of pitch classes. The values will be
-    turned in to a segmentList, as in :func:`~music21.search.serial.findMultisets`.
-    All other settings are as in :func:`~music21.search.serial.findMultisets` as well.
+    turned in to a segmentList, as in :class:`~music21.search.serial.MultisetSegmentMatcher`.
+    All other settings are as in :class:`~music21.search.serial.MultisetSegmentMatcher` as well.
 
     Returns a deep copy of the inputStream
     with a :class:`~music21.spanner.Line` connecting the first and last notes
@@ -2265,7 +2265,7 @@ def labelMultisets(inputStream, multisetDict, reps='skipConsecutive', includeCho
 
     OMIT_FROM_DOCS
 
-    >>> [len(n.lyrics) for n in labeledPart.flat.notes]
+    >>> [len(n.lyrics) for n in labeledPart.flatten().notes]
     [1, 1, 0, 0]
     '''
     streamCopy = copy.deepcopy(inputStream)
@@ -2281,12 +2281,12 @@ def labelTransposedMultisets(inputStream, multisetDict,
     transpositions, of pitch classes in a :class:`~music21.stream.Stream`.
 
     A multiset is a generalization of a set, as described in
-    :meth:`~music21.search.serial.findMultisets`.
+    :class:`~music21.search.serial.MultisetSegmentMatcher`.
 
     The multisetDict is a dictionary whose keys are names of the multisets to
     be searched for, and whose values are the segments of pitch classes. The
     values will be turned in to a segmentList, as in
-    :func:`~music21.search.serial.findMultisets`.
+    :class:`~music21.search.serial.MultisetSegmentMatcher`.
 
     All other settings are as in
     :func:`~music21.search.serial.findTransposedMultisets` as well.
@@ -2345,12 +2345,12 @@ def labelTransposedAndInvertedMultisets(inputStream,
     :class:`~music21.stream.Stream`.
 
     A multiset is a generalization of a set, as described in
-    :meth:`~music21.search.serial.findMultisets`.
+    :class:`~music21.search.serial.MultisetSegmentMatcher`.
 
     The multisetDict is a dictionary whose keys are names of the multisets to
     be searched for, and whose values are the segments of pitch classes. The
     values will be turned in to a segmentList, as in
-    :func:`~music21.search.serial.findMultisets`.
+    :class:`~music21.search.serial.MultisetSegmentMatcher`.
 
     All other settings are as in
     :func:`~music21.search.serial.findTransposedMultisets` as well.

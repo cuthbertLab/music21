@@ -112,11 +112,8 @@ class TimespanTree(trees.OffsetTree):
     ...             scoreTree.insert(merged)
 
 
-    >>> newBach = tree.toStream.partwise(
-    ...     scoreTree,
-    ...     templateStream=bach,
-    ...     )
-    >>> newBach.parts['Alto'].measure(7).show('text')
+    >>> #_DOCS_SHOW newBach = tree.toStream.partwise(scoreTree, templateStream=bach)
+    >>> #_DOCS_SHOW newBach.parts['Alto'].measure(7).show('text')
     {0.0} <music21.chord.Chord F#4>
     {1.5} <music21.chord.Chord F#3>
     {2.0} <music21.chord.Chord C#4>
@@ -148,13 +145,13 @@ class TimespanTree(trees.OffsetTree):
     @staticmethod
     def _insertCorePayloadSortKey(x):
         return x.endTime
-#             if hasattr(x, 'element'):
-#                 return x.element.sortTuple()[2:]
-#             elif isinstance(x, TimespanTree) and x.source is not None:
-#                 environLocal.printDebug("Timespan tree added to Tree...nope...")
-#                 return x.source.sortTuple()[2:]
-#             else:
-#                 return x.endTime  # PitchedTimespan with no Element!
+        # if hasattr(x, 'element'):
+        #     return x.element.sortTuple()[2:]
+        # elif isinstance(x, TimespanTree) and x.source is not None:
+        #     environLocal.printDebug("Timespan tree added to Tree...nope...")
+        #     return x.source.sortTuple()[2:]
+        # else:
+        #     return x.endTime  # PitchedTimespan with no Element!
 
     # PUBLIC METHODS #
 
@@ -204,9 +201,13 @@ class TimespanTree(trees.OffsetTree):
         index = node.payload.index(span) + node.payloadElementsStartIndex
         return index
 
+    @property
     def offset(self):
         '''
         this is just for mimicking elements as streams.
+
+        Changed in v7 -- this was always meant to be a property, but was
+        incorrectly a method earlier.
         '''
         return self.lowestPosition()
 
@@ -620,7 +621,8 @@ class TimespanTree(trees.OffsetTree):
         and each key is a TimeSpan tree containing only element timespans belonging
         to that part.
 
-        Used by reduceChords.  May disappear.
+        Used by reduceChords.  May disappear at any time without a deprecation
+        notice.
         '''
         partwiseTimespanTrees = {}
         for part in self.allParts():
@@ -740,7 +742,9 @@ class TimespanTree(trees.OffsetTree):
 class Test(unittest.TestCase):
 
     def testGetVerticalityAtWithKey(self):
-        from music21 import stream, key, note
+        from music21 import stream
+        from music21 import key
+        from music21 import note
         s = stream.Stream()
         s.insert(0, key.Key('C'))
         s.insert(0, note.Note('F#4'))

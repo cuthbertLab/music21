@@ -28,7 +28,6 @@ Low level MuseData conversion is facilitated by the objects in this module and
 
 import unittest
 import os
-import pathlib
 
 from music21 import exceptions21
 from music21.musedata import base12_26
@@ -1449,7 +1448,7 @@ class MuseDataFile(prebase.ProtoM21Object):
     def open(self, fp):
         # self.file = io.open(filename, encoding='utf-8')
 
-        self.file = open(fp, 'rb')
+        self.file = open(fp, 'rb')  # pylint: disable=consider-using-with
         self.filename = fp
 
     def read(self):
@@ -1868,7 +1867,7 @@ class Test(unittest.TestCase):
     #         # make sure there are no empty strings
     #         self.assertEqual(match.count(''), 0)
     #
-    #     self.assertEqual(len(s.parts[-1].flat.notes), 287)
+    #     self.assertEqual(len(s.parts[-1].recurse().notes), 287)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [MuseDataWork]

@@ -20,6 +20,7 @@ import unittest
 import warnings
 
 from music21 import common
+from music21.common.classTools import tempAttribute, saveAttributes
 from music21.common.enums import OffsetSpecial
 from music21.exceptions21 import StreamException
 from music21.stream import filters
@@ -88,6 +89,16 @@ class StreamIterator(prebase.ProtoM21Object):
     * For `activeInformation` see above.
 
     Changed in v.5.2 -- all arguments except srcStream are keyword only.
+
+    OMIT_FROM_DOCS
+
+    Informative exception for user error:
+
+    >>> s = stream.Stream()
+    >>> sIter = stream.iterator.StreamIterator(s, filterList=[note.Note])
+    Traceback (most recent call last):
+    TypeError: filterList expects Filters or callables,
+    not types themselves; got <class 'music21.note.Note'>
     '''
     def __init__(self,
                  srcStream: 'music21.stream.Stream',
@@ -111,7 +122,7 @@ class StreamIterator(prebase.ProtoM21Object):
         self.iterSection = '_elements'
 
         self.cleanupOnStop = False
-        self.restoreActiveSites = restoreActiveSites
+        self.restoreActiveSites: bool = restoreActiveSites
 
         self.overrideDerivation = None
 
@@ -121,6 +132,10 @@ class StreamIterator(prebase.ProtoM21Object):
             filterList = [filterList]
         elif isinstance(filterList, (set, tuple)):
             filterList = list(filterList)  # mutable....
+        for x in filterList:
+            if isinstance(x, type):
+                raise TypeError(
+                    f'filterList expects Filters or callables, not types themselves; got {x}')
         # self.filters is a list of expressions that
         # return True or False for an element for
         # whether it should be yielded.
@@ -149,6 +164,21 @@ class StreamIterator(prebase.ProtoM21Object):
 
         return f'for {streamClass}:{srcStreamId} @:{self.index}'
 
+    def __call__(self) -> _SIter:
+        '''
+        Temporary workaround to support both prior usage of `.iter`
+        and new recommended usage of `.iter()`.
+        During the period where `.iter` is still supported, even calling `.iter()`
+        (recommended) will retrieve the property `.iter` and necessitate
+        this workaround.
+
+        Returns `self` without any changes.
+
+        TODO: manage and emit DeprecationWarnings in v.8
+        TODO: remove in v.9
+        '''
+        return self
+
     def __iter__(self):
         self.reset()
         return self
@@ -161,14 +191,14 @@ class StreamIterator(prebase.ProtoM21Object):
             else:
                 self.sectionIndex = self.index
 
-            self.index += 1  # increment early in case of an error.
-
             try:
-                e = self.srcStreamElements[self.index - 1]
+                e = self.srcStreamElements[self.index]
             except IndexError:
                 # this may happen if the number of elements has changed
+                self.index += 1
                 continue
 
+            self.index += 1
             if self.matchesFilters(e) is False:
                 continue
 
@@ -287,7 +317,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s = stream.Stream()
         >>> s.insert(0, note.Note('F#'))
         >>> s.repeatAppend(note.Note('C'), 2)
-        >>> sI = s.iter
+        >>> sI = s.iter()
         >>> sI
         <music21.stream.iterator.StreamIterator for Stream:0x104743be0 @:0>
 
@@ -316,7 +346,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.insert(0, clef.TrebleClef())
         >>> s[0]
         <music21.clef.TrebleClef>
-        >>> s.iter.notes[0]
+        >>> s.iter().notes[0]
         <music21.note.Note F#>
 
         Demo of cleanupOnStop = True
@@ -356,16 +386,16 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s = converter.parse('tinynotation: 3/4 c4 d e f g a', makeNotation=False)
         >>> len(s)
         7
-        >>> len(s.iter)
+        >>> len(s.iter())
         7
-        >>> len(s.iter.notes)
+        >>> len(s.iter().notes)
         6
-        >>> [n.name for n in s.iter.notes]
+        >>> [n.name for n in s.iter().notes]
         ['C', 'D', 'E', 'F', 'G', 'A']
         '''
         if self._len is not None:
             return self._len
-        self._len = len(self.matchingElements())
+        self._len = len(self.matchingElements(restoreActiveSites=False))
         self.reset()
         return self._len
 
@@ -415,8 +445,12 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         if self._len is not None:
             return bool(self._len)
-        for unused in self:
-            return True
+
+        # do not change active site of first element in bool
+        with tempAttribute(self, 'restoreActiveSites', False):
+            for unused in self:
+                return True
+
         return False
 
     def clone(self: _SIter) -> _SIter:
@@ -443,7 +477,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.recurse().notes.first()
         <music21.note.Note D>
         >>> s.recurse().getElementsByClass('Rest').first()
-        <music21.note.Rest rest>
+        <music21.note.Rest half>
 
         If no elements match, returns None:
 
@@ -473,7 +507,7 @@ class StreamIterator(prebase.ProtoM21Object):
         An Empty stream:
 
         >>> s = stream.Stream()
-        >>> s.iter.notes.first() is None
+        >>> s.iter().notes.first() is None
         True
         '''
         iter(self)
@@ -494,7 +528,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.recurse().notes.last()
         <music21.note.Note G>
         >>> s.recurse().getElementsByClass('Rest').last()
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
 
         New in v7.
 
@@ -503,7 +537,7 @@ class StreamIterator(prebase.ProtoM21Object):
         Check on empty Stream:
 
         >>> s2 = stream.Stream()
-        >>> s2.iter.notes.last() is None
+        >>> s2.iter().notes.last() is None
         True
 
         Next has a different feature from first(), will start again from beginning.
@@ -572,7 +606,7 @@ class StreamIterator(prebase.ProtoM21Object):
     # ---------------------------------------------------------------
     # getting items
 
-    def matchingElements(self):
+    def matchingElements(self, *, restoreActiveSites: bool = True):
         '''
         returns a list of elements that match the filter.
 
@@ -588,7 +622,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         >>> s = converter.parse('tinynotation: 3/4 c4 d e f g a', makeNotation=False)
         >>> s.id = 'tn3/4'
-        >>> sI = s.iter
+        >>> sI = s.iter()
         >>> sI
         <music21.stream.iterator.StreamIterator for Part:tn3/4 @:0>
 
@@ -601,7 +635,8 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> sI_notes
         <music21.stream.iterator.StreamIterator for Part:tn3/4 @:0>
 
-        Note that this used to be True until v6.0.3
+        Adding a filter to the Stream iterator returns a new Stream iterator; it
+        does not change the original.
 
         >>> sI_notes is sI
         False
@@ -616,21 +651,24 @@ class StreamIterator(prebase.ProtoM21Object):
         [<music21.note.Note C>, <music21.note.Note D>,
          <music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>,
          <music21.note.Note A>]
+
+        If restoreActiveSites is False then the elements will not have
+        their activeSites changed (callers should use it when they do not plan to actually
+        expose the elements to users, such as in `__len__`).
+
+        Added in v7. -- restoreActiveSites
         '''
         if self._matchingElements is not None:
             return self._matchingElements
 
-        savedIndex = self.index
-        savedRestoreActiveSites = self.restoreActiveSites
-        self.restoreActiveSites = True
+        with saveAttributes(self, 'restoreActiveSites', 'index'):
+            self.restoreActiveSites = restoreActiveSites
+            me = [x for x in self]  # pylint: disable=unnecessary-comprehension
+            self.reset()
 
-        me = [x for x in self]  # pylint: disable=unnecessary-comprehension
-
-        self.reset()
-
-        self.index = savedIndex
-        self.restoreActiveSites = savedRestoreActiveSites
-        self._matchingElements = me
+        if restoreActiveSites == self.restoreActiveSites:
+            # cache, if we are using the iterator default.
+            self._matchingElements = me
 
         return me
 
@@ -666,7 +704,7 @@ class StreamIterator(prebase.ProtoM21Object):
         cannot just call `type(StreamIterator.srcStream)()`
 
         >>> p = stream.Part()
-        >>> pi = p.iter
+        >>> pi = p.iter()
         >>> s = pi._newBaseStream()
         >>> s
         <music21.stream.Stream 0x1047eb2e8>
@@ -697,7 +735,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         In other words:
 
-        `s.getElementsByClass()` == `s.iter.getElementsByClass().stream()`
+        `s.getElementsByClass()` == `s.iter().getElementsByClass().stream()`
 
         >>> s = stream.Part()
         >>> s.insert(0, note.Note('C'))
@@ -706,7 +744,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> b = bar.Barline()
         >>> s.storeAtEnd(b)
 
-        >>> s2 = s.iter.getElementsByClass('Note').stream()
+        >>> s2 = s.iter().getElementsByClass('Note').stream()
         >>> s2.show('t')
         {0.0} <music21.note.Note C>
         {2.0} <music21.note.Note D>
@@ -715,17 +753,17 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s2
         <music21.stream.Part ...>
 
-        >>> s3 = s.iter.stream()
+        >>> s3 = s.iter().stream()
         >>> s3.show('t')
         {0.0} <music21.note.Note C>
-        {1.0} <music21.note.Rest rest>
+        {1.0} <music21.note.Rest quarter>
         {2.0} <music21.note.Note D>
         {3.0} <music21.bar.Barline type=regular>
 
         >>> s3.elementOffset(b, returnSpecial=True)
         <OffsetSpecial.AT_END>
 
-        >>> s4 = s.iter.getElementsByClass('Barline').stream()
+        >>> s4 = s.iter().getElementsByClass('Barline').stream()
         >>> s4.show('t')
         {0.0} <music21.bar.Barline type=regular>
 
@@ -734,7 +772,7 @@ class StreamIterator(prebase.ProtoM21Object):
         stream did not, in the case of recursion:
 
         >>> bach = corpus.parse('bwv66.6')
-        >>> bn = bach.flat[30]
+        >>> bn = bach.flatten()[30]
         >>> bn
         <music21.note.Note E>
 
@@ -886,9 +924,9 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> r = note.Rest()
         >>> s.append(r)
         >>> s.append(note.Note('D'))
-        >>> for el in s.iter.getElementsByClass('Rest'):
+        >>> for el in s.iter().getElementsByClass('Rest'):
         ...     print(el)
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
 
 
         ActiveSite is restored...
@@ -898,19 +936,66 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> r.activeSite.id
         's2'
 
-        >>> for el in s.iter.getElementsByClass('Rest'):
+        >>> for el in s.iter().getElementsByClass('Rest'):
         ...     print(el.activeSite.id)
         s1
 
 
         Classes work in addition to strings...
 
-        >>> for el in s.iter.getElementsByClass(note.Rest):
+        >>> for el in s.iter().getElementsByClass(note.Rest):
         ...     print(el)
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
 
         '''
         return self.addFilter(filters.ClassFilter(classFilterList), returnClone=returnClone)
+
+    def getElementsByQuerySelector(self, querySelector: str, *, returnClone=True):
+        '''
+        First implementation of a query selector, similar to CSS QuerySelectors used in
+        HTML DOM:
+
+        * A leading `#` indicates the id of an element, so '#hello' will find elements
+          with `el.id=='hello'` (should only be one)
+        * A leading `.` indicates the group of an element, so '.high' will find elements
+          with `'high' in el.groups`
+        * Any other string is considered to be the type/class of the element.  So `Note`
+          will find all Note elements.  Can be fully qualified like `note.Note`
+
+        Eventually, more complex query selectors will be implemented.  This is just a start.
+
+        Setting up an example:
+
+        >>> s = converter.parse('tinyNotation: 4/4 GG4 AA4 BB4 r4 C4 D4 E4 F4 r1')
+        >>> s[note.Note].last().id = 'last'
+        >>> for n in s[note.Note]:
+        ...     if n.octave == 3:
+        ...         n.groups.append('tenor')
+
+        >>> list(s.recurse().getElementsByQuerySelector('.tenor'))
+        [<music21.note.Note C>,
+         <music21.note.Note D>,
+         <music21.note.Note E>,
+         <music21.note.Note F>]
+
+        >>> list(s.recurse().getElementsByQuerySelector('Rest'))
+        [<music21.note.Rest quarter>,
+         <music21.note.Rest whole>]
+
+        Note that unlike with stream slices, the querySelector does not do anything special
+        for id searches.  `.first()` will need to be called to find the element (if any)
+
+        >>> s.recurse().getElementsByQuerySelector('#last').first()
+        <music21.note.Note F>
+
+        New in v.7
+        '''
+        if querySelector.startswith('#'):
+            return self.addFilter(filters.IdFilter(querySelector[1:]), returnClone=returnClone)
+        if querySelector.startswith('.'):
+            return self.addFilter(filters.GroupFilter(querySelector[1:]), returnClone=returnClone)
+        return self.addFilter(filters.ClassFilter(querySelector), returnClone=returnClone)
+
 
     def getElementsNotOfClass(self, classFilterList, *, returnClone=True):
         '''
@@ -925,13 +1010,13 @@ class StreamIterator(prebase.ProtoM21Object):
         ...     n = note.Note('G#')
         ...     n.offset = x * 3
         ...     a.insert(n)
-        >>> found = a.iter.getElementsNotOfClass(note.Note)
+        >>> found = a.iter().getElementsNotOfClass(note.Note)
         >>> len(found)
         10
-        >>> found = a.iter.getElementsNotOfClass('Rest')
+        >>> found = a.iter().getElementsNotOfClass('Rest')
         >>> len(found)
         4
-        >>> found = a.iter.getElementsNotOfClass(['Note', 'Rest'])
+        >>> found = a.iter().getElementsNotOfClass(['Note', 'Rest'])
         >>> len(found)
         0
 
@@ -962,12 +1047,12 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s1.append(n2)
         >>> s1.append(n3)
 
-        >>> tboneSubStream = s1.iter.getElementsByGroup('trombone')
+        >>> tboneSubStream = s1.iter().getElementsByGroup('trombone')
         >>> for thisNote in tboneSubStream:
         ...     print(thisNote.name)
         C
         D
-        >>> tubaSubStream = s1.iter.getElementsByGroup('tuba')
+        >>> tubaSubStream = s1.iter().getElementsByGroup('tuba')
         >>> for thisNote in tubaSubStream:
         ...     print(thisNote.name)
         D
@@ -1049,34 +1134,34 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> n2.duration.type = 'half'
         >>> n2.offset = 2
         >>> st1.insert(n2)
-        >>> out1 = list(st1.iter.getElementsByOffset(2))
+        >>> out1 = list(st1.iter().getElementsByOffset(2))
         >>> len(out1)
         1
         >>> out1[0].step
         'D'
-        >>> out2 = list(st1.iter.getElementsByOffset(1, 3))
+        >>> out2 = list(st1.iter().getElementsByOffset(1, 3))
         >>> len(out2)
         1
         >>> out2[0].step
         'D'
-        >>> out3 = list(st1.iter.getElementsByOffset(1, 3, mustFinishInSpan=True))
+        >>> out3 = list(st1.iter().getElementsByOffset(1, 3, mustFinishInSpan=True))
         >>> len(out3)
         0
-        >>> out4 = list(st1.iter.getElementsByOffset(1, 2))
+        >>> out4 = list(st1.iter().getElementsByOffset(1, 2))
         >>> len(out4)
         1
         >>> out4[0].step
         'D'
-        >>> out5 = list(st1.iter.getElementsByOffset(1, 2, includeEndBoundary=False))
+        >>> out5 = list(st1.iter().getElementsByOffset(1, 2, includeEndBoundary=False))
         >>> len(out5)
         0
-        >>> out6 = list(st1.iter.getElementsByOffset(1, 2, includeEndBoundary=False,
+        >>> out6 = list(st1.iter().getElementsByOffset(1, 2, includeEndBoundary=False,
         ...                                          mustBeginInSpan=False))
         >>> len(out6)
         1
         >>> out6[0].step
         'C'
-        >>> out7 = list(st1.iter.getElementsByOffset(1, 3, mustBeginInSpan=False))
+        >>> out7 = list(st1.iter().getElementsByOffset(1, 3, mustBeginInSpan=False))
         >>> len(out7)
         2
         >>> [el.step for el in out7]
@@ -1084,7 +1169,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         Note, that elements that end at the start offset are included if mustBeginInSpan is False
 
-        >>> out8 = list(st1.iter.getElementsByOffset(2, 4, mustBeginInSpan=False))
+        >>> out8 = list(st1.iter().getElementsByOffset(2, 4, mustBeginInSpan=False))
         >>> len(out8)
         2
         >>> [el.step for el in out8]
@@ -1092,7 +1177,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         To change this behavior set includeElementsThatEndAtStart=False
 
-        >>> out9 = list(st1.iter.getElementsByOffset(2, 4, mustBeginInSpan=False,
+        >>> out9 = list(st1.iter().getElementsByOffset(2, 4, mustBeginInSpan=False,
         ...                                          includeElementsThatEndAtStart=False))
         >>> len(out9)
         1
@@ -1105,10 +1190,10 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> a.repeatInsert(n, list(range(8)))
         >>> b = stream.Stream(id='b')
         >>> b.repeatInsert(a, [0, 3, 6])
-        >>> c = list(b.iter.getElementsByOffset(2, 6.9))
+        >>> c = list(b.iter().getElementsByOffset(2, 6.9))
         >>> len(c)
         2
-        >>> c = list(b.flat.iter.getElementsByOffset(2, 6.9))
+        >>> c = list(b.flatten().iter().getElementsByOffset(2, 6.9))
         >>> len(c)
         10
 
@@ -1121,9 +1206,9 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.insert(0.0, c)
         >>> s.insert(0.0, ts)
         >>> s.insert(0.0, ks)
-        >>> len(list(s.iter.getElementsByOffset(0.0, mustBeginInSpan=True)))
+        >>> len(list(s.iter().getElementsByOffset(0.0, mustBeginInSpan=True)))
         3
-        >>> len(list(s.iter.getElementsByOffset(0.0, mustBeginInSpan=False)))
+        >>> len(list(s.iter().getElementsByOffset(0.0, mustBeginInSpan=False)))
         3
 
         On a :class:`~music21.stream.iterator.RecursiveIterator`,
@@ -1179,46 +1264,46 @@ class StreamIterator(prebase.ProtoM21Object):
 
         Same test as above, but with floats
 
-        >>> out1 = list(st1.iter.getElementsByOffset(2.0))
+        >>> out1 = list(st1.iter().getElementsByOffset(2.0))
         >>> len(out1)
         1
         >>> out1[0].step
         'D'
-        >>> out2 = list(st1.iter.getElementsByOffset(1.0, 3.0))
+        >>> out2 = list(st1.iter().getElementsByOffset(1.0, 3.0))
         >>> len(out2)
         1
         >>> out2[0].step
         'D'
-        >>> out3 = list(st1.iter.getElementsByOffset(1.0, 3.0, mustFinishInSpan=True))
+        >>> out3 = list(st1.iter().getElementsByOffset(1.0, 3.0, mustFinishInSpan=True))
         >>> len(out3)
         0
-        >>> out3b = list(st1.iter.getElementsByOffset(0.0, 3.001, mustFinishInSpan=True))
+        >>> out3b = list(st1.iter().getElementsByOffset(0.0, 3.001, mustFinishInSpan=True))
         >>> len(out3b)
         1
         >>> out3b[0].step
         'C'
-        >>> out3b = list(st1.iter.getElementsByOffset(1.0, 3.001, mustFinishInSpan=True,
+        >>> out3b = list(st1.iter().getElementsByOffset(1.0, 3.001, mustFinishInSpan=True,
         ...                                           mustBeginInSpan=False))
         >>> len(out3b)
         1
         >>> out3b[0].step
         'C'
 
-        >>> out4 = list(st1.iter.getElementsByOffset(1.0, 2.0))
+        >>> out4 = list(st1.iter().getElementsByOffset(1.0, 2.0))
         >>> len(out4)
         1
         >>> out4[0].step
         'D'
-        >>> out5 = list(st1.iter.getElementsByOffset(1.0, 2.0, includeEndBoundary=False))
+        >>> out5 = list(st1.iter().getElementsByOffset(1.0, 2.0, includeEndBoundary=False))
         >>> len(out5)
         0
-        >>> out6 = list(st1.iter.getElementsByOffset(1.0, 2.0, includeEndBoundary=False,
+        >>> out6 = list(st1.iter().getElementsByOffset(1.0, 2.0, includeEndBoundary=False,
         ...                                          mustBeginInSpan=False))
         >>> len(out6)
         1
         >>> out6[0].step
         'C'
-        >>> out7 = list(st1.iter.getElementsByOffset(1.0, 3.0, mustBeginInSpan=False))
+        >>> out7 = list(st1.iter().getElementsByOffset(1.0, 3.0, mustBeginInSpan=False))
         >>> len(out7)
         2
         >>> [el.step for el in out7]
@@ -1251,7 +1336,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.append(note.Note('C'))
         >>> s.append(note.Rest())
         >>> s.append(note.Note('D'))
-        >>> for el in s.iter.notes:
+        >>> for el in s.iter().notes:
         ...     print(el)
         <music21.note.Note C>
         <music21.note.Note D>
@@ -1268,15 +1353,15 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.append(note.Note('C'))
         >>> s.append(note.Rest())
         >>> s.append(note.Note('D'))
-        >>> for el in s.iter.notesAndRests:
+        >>> for el in s.iter().notesAndRests:
         ...     print(el)
         <music21.note.Note C>
-        <music21.note.Rest rest>
+        <music21.note.Rest quarter>
         <music21.note.Note D>
 
         chained filters... (this makes no sense since notes is a subset of notesAndRests)
 
-        >>> for el in s.iter.notesAndRests.notes:
+        >>> for el in s.iter().notesAndRests.notes:
         ...     print(el)
         <music21.note.Note C>
         <music21.note.Note D>
@@ -1549,13 +1634,14 @@ class RecursiveIterator(StreamIterator):
             else:
                 self.sectionIndex = self.index
 
-            self.index += 1  # increment early in case of an error in the next try.
-
             try:
-                e = self.srcStreamElements[self.index - 1]
+                e = self.srcStreamElements[self.index]
             except IndexError:
-                # this may happen in the number of elements has changed
+                self.index += 1
+                # this may happen if the number of elements has changed
                 continue
+
+            self.index += 1
 
             # in a recursive filter, the stream does not need to match the filter,
             # only the internal elements.
@@ -1603,12 +1689,11 @@ class RecursiveIterator(StreamIterator):
         self.activeInformation['lastYielded'] = None
         super().reset()
 
-    def matchingElements(self):
+    def matchingElements(self, *, restoreActiveSites=True):
         # saved parent iterator later?
         # will this work in mid-iteration? Test, or do not expose till then.
-        savedRecursiveIterator = self.childRecursiveIterator
-        fe = super().matchingElements()
-        self.childRecursiveIterator = savedRecursiveIterator
+        with tempAttribute(self, 'childRecursiveIterator'):
+            fe = super().matchingElements(restoreActiveSites=restoreActiveSites)
         return fe
 
     def iteratorStack(self):
@@ -1768,26 +1853,28 @@ class RecursiveIterator(StreamIterator):
 
 class Test(unittest.TestCase):
     def testSimpleClone(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         s = stream.Stream()
         r = note.Rest()
         n = note.Note()
         s.append([r, n])
-        all_s = list(s.iter)
+        all_s = list(s.iter())
         self.assertEqual(len(all_s), 2)
         self.assertIs(all_s[0], r)
         self.assertIs(all_s[1], n)
-        s_notes = list(s.iter.notes)
+        s_notes = list(s.iter().notes)
         self.assertEqual(len(s_notes), 1)
         self.assertIs(s_notes[0], n)
 
     def testAddingFiltersMidIteration(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         s = stream.Stream()
         r = note.Rest()
         n = note.Note()
         s.append([r, n])
-        sIter = s.iter
+        sIter = s.iter()
         r0 = next(sIter)
         self.assertIs(r0, r)
 
@@ -1809,7 +1896,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n.activeSite.number, 2)
 
     def testCurrentHierarchyOffsetReset(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         p = stream.Part()
         m = stream.Measure()
         m.append(note.Note('D'))
@@ -1825,7 +1913,8 @@ class Test(unittest.TestCase):
         self.assertIsNone(currentOffset)
 
     def testAddingFiltersMidRecursiveIteration(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         from music21.stream.iterator import RecursiveIterator as ImportedRecursiveIterator
         m = stream.Measure()
         r = note.Rest()

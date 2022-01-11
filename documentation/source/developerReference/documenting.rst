@@ -26,12 +26,12 @@ etc.  It is somewhat similar to Markdown format.   These files should *not* cont
 they will not be tested. (You may find some older files that do contain code; we should be translating these
 in the future).
 
-.. _reStructuredText: http://docutils.sourceforge.net/rst.html
+.. _reStructuredText: https://docutils.sourceforge.io/rst.html
 
 These files get converted to .html when you run `/documentation/make.py` so long as the excellent module
 Sphinx_ has been installed.
 
-.. _Sphinx: http://www.sphinx-doc.org/
+.. _Sphinx: https://www.sphinx-doc.org/en/master
 
 You can also edit these .rst files directly in Jupyter notebook, which will make them show the
 layout as well.
@@ -44,7 +44,7 @@ IPython Notebook) format.  These files should never be edited directly, but inst
 edited using Jupyter Notebook running Python 3.7 or higher.
 
 A lot of the music21 documentation is automatically generated from the documentation strings
-found in music21 modules.  We strongly encourage other module 
+found in music21 modules.  We strongly encourage other module
 writers to create documentation that works
 the same way.  In fact, we won't add your module to the music21 repository without documentation
 in this form -- there's a test that ensures that code coverage increases with each build -- but
@@ -368,7 +368,7 @@ Documenting Class-Level Methods
 This is the most common type of documentation, and it ensures both excellent
 documentation and doctests. A typical example of source code might look like this::
 
-    class className():
+    class ClassName(base.Music21Object):
 
         [instance variables, __init__, etc.]
 
@@ -376,7 +376,7 @@ documentation and doctests. A typical example of source code might look like thi
             '''
             This is documentation for this method
 
-            >>> myInstance = className()
+            >>> myInstance = ClassName()
             >>> myInstance.myNewMethod(someParameters)
             >>> myUnicorn.someInstanceVariable
             'value'

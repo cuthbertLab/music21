@@ -829,7 +829,7 @@ class OffsetAxis(PositionAxis):
         [(0.0, '0'), (1.0, '1'), (5.0, '2'), (9.0, '3'), (13.0, '4'), (17.0, '5'),
          (21.0, '6'), (25.0, '7'), (29.0, '8')]
 
-        >>> a = graph.plot.PlotStream(s.parts.first().flat)  # on a Part
+        >>> a = graph.plot.PlotStream(s.parts.first().flatten())  # on a Part
         >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.OffsetAxis(plotS)
         >>> ax.setBoundariesFromData()
@@ -1107,7 +1107,7 @@ class QuarterLengthAxis(PositionAxis):
         elif self.client.recurse:
             sSrc = s.recurse()
         else:
-            sSrc = s.iter
+            sSrc = s.iter()
 
         sSrc = sSrc.getElementsByClass(self.client.classFilterList)
         # get all quarter lengths
@@ -1289,7 +1289,7 @@ class CountingAxis(Axis):
         if not common.isIterable(countAxes):
             countAxes = (countAxes,)
 
-        axesIndices = tuple([self.axisDataMap[axisName] for axisName in countAxes])
+        axesIndices = tuple(self.axisDataMap[axisName] for axisName in countAxes)
         thisIndex = self.axisDataMap[self.axisName]
         selector = itemgetter(*axesIndices)
         relevantData = [selector(innerTuple) for innerTuple in client.data]

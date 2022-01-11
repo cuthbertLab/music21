@@ -44,7 +44,7 @@ def getVoiceLeadingMoments(music21Stream):
     '''
     allHarmonies = extractHarmonies(music21Stream)
     allParts = music21Stream.getElementsByClass('Part').stream()
-    newParts = [allParts[i].flat.getElementsNotOfClass('GeneralNote').stream()
+    newParts = [allParts[i].flatten().getElementsNotOfClass('GeneralNote').stream()
                 for i in range(len(allParts))]
     paddingLeft = allParts[0].getElementsByClass('Measure').first().paddingLeft
     for (offsets, notes) in sorted(allHarmonies.items()):
@@ -138,7 +138,7 @@ def createOffsetMapping(music21Part):
     (11.0, 12.0)   [<music21.note.Note A> ]
     '''
     currentMapping = collections.defaultdict(list)
-    for music21GeneralNote in music21Part.flat.getElementsByClass('GeneralNote'):
+    for music21GeneralNote in music21Part.flatten().getElementsByClass('GeneralNote'):
         initOffset = music21GeneralNote.offset
         endTime = initOffset + music21GeneralNote.quarterLength
         currentMapping[(initOffset, endTime)].append(music21GeneralNote)
@@ -179,7 +179,7 @@ def correlateHarmonies(currentMapping, music21Part):
 
     for offsets in sorted(currentMapping.keys()):
         (initOffset, endTime) = offsets
-        notesInRange = music21Part.flat.iter.getElementsByClass('GeneralNote').getElementsByOffset(
+        notesInRange = music21Part.flatten().getElementsByClass('GeneralNote').getElementsByOffset(
             initOffset, offsetEnd=endTime,
             includeEndBoundary=False, mustFinishInSpan=False,
             mustBeginInSpan=False, includeElementsThatEndAtStart=False)
@@ -242,7 +242,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
         debugInfo.append(f"{'(Offset, End Time):'!s:25}Part Numbers:")
 
     allHarmonies = sorted(list(extractHarmonies(music21Stream).items()))
-    allParts = [p.flat for p in music21Stream.getElementsByClass('Part')]
+    allParts = [p.flatten() for p in music21Stream.getElementsByClass('Part')]
     for (offsets, notes) in allHarmonies:
         vlm = [generalNoteToPitch(n) for n in notes]
         vlm_violations = functionToApply(vlm)
@@ -250,7 +250,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
         for partNumberTuple in vlm_violations:
             for partNumber in partNumberTuple:
                 if color is not None:
-                    noteA = allParts[partNumber - 1].iter.getElementsByOffset(
+                    noteA = allParts[partNumber - 1].getElementsByOffset(
                         initOffset,
                         initOffset,
                         mustBeginInSpan=False)[0]
@@ -308,7 +308,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
         debugInfo.append('(Offset A, End Time A):  (Offset B, End Time B): Part Numbers:')
 
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
-    allParts = [p.flat for p in music21Stream.getElementsByClass('Part')]
+    allParts = [p.flatten() for p in music21Stream.getElementsByClass('Part')]
     (previousOffsets, previousNotes) = allHarmonies[0]
     vlmA = [generalNoteToPitch(n) for n in previousNotes]
     initOffsetA = previousOffsets[0]
@@ -320,10 +320,10 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
         for partNumberTuple in vlm_violations:
             for partNumber in partNumberTuple:
                 if color is not None:
-                    noteA = allParts[partNumber - 1].iter.getElementsByOffset(
-                        initOffsetA, initOffsetA, mustBeginInSpan=False)[0]
-                    noteB = allParts[partNumber - 1].iter.getElementsByOffset(
-                        initOffsetB, initOffsetB, mustBeginInSpan=False)[0]
+                    noteA = allParts[partNumber - 1].getElementsByOffset(
+                        initOffsetA, initOffsetA, mustBeginInSpan=False).first()
+                    noteB = allParts[partNumber - 1].getElementsByOffset(
+                        initOffsetB, initOffsetB, mustBeginInSpan=False).first()
                     noteA.style.color = color
                     noteB.style.color = color
             if debug is True:

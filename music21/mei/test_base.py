@@ -27,9 +27,7 @@ Tests for :mod:`music21.mei.base`.
 # pylint: disable=maybe-no-member
 
 # pylint: disable=ungrouped-imports
-# pylint: disable=redefined-builtin
 # pylint: disable=import-error
-# pylint: disable=unused-import
 import unittest
 
 # To have working MagicMock objects, we can't use cElementTree even though it would be faster.
@@ -56,8 +54,7 @@ from music21 import spanner
 from music21 import stream
 from music21 import tie
 
-# Importing from base.py
-import music21.mei.base as base  # pylint: disable=useless-import-alias
+from music21.mei import base
 from music21.mei.base import _XMLID
 from music21.mei.base import MEI_NS
 
@@ -508,7 +505,7 @@ class Test(unittest.TestCase):
         actual = base.metaSetComposer(work, meta)
 
         self.assertIs(meta, actual)
-        if expComposer1 != actual.composer and expComposer2 != actual.composer:
+        if actual.composer not in (expComposer1, expComposer2):
             self.fail('composer names do not match in either order')
 
     def testMetaDate1(self):
@@ -1408,29 +1405,21 @@ class Test(unittest.TestCase):
         self.assertEqual('the id', actual.id)
         self.assertEqual('start', actual.duration.tuplets[0].type)
 
-    @mock.patch('music21.note.SpacerRest')
-    @mock.patch('music21.mei.base.makeDuration')
-    @mock.patch('music21.mei.base.scaleToTuplet')
-    def testUnit2TestRestFromElement(self, mockTuplet, mockMakeDur, mockSpacer):
+    def testUnit2TestRestFromElement(self):
         '''
         spaceFromElement(): test @dur, @dots, @xml:id, and tuplet-related attributes
         '''
-        elem = ETree.Element('rest', attrib={'dur': '4', 'dots': '1', _XMLID: 'the id',
-                                             'm21TupletNum': '5', 'm21TupletNumbase': '4',
-                                             'm21TupletType': 'start'})
-        mockMakeDur.return_value = 'the duration'
-        mockNewSpace = mock.MagicMock('new rest')
-        mockSpacer.return_value = mockNewSpace
-        mockTuplet.return_value = 'tupletized'
-        expected = mockTuplet.return_value
-
+        elem = ETree.Element('rest', attrib={'dur': '4',
+                                             'dots': '1',
+                                             _XMLID: 'the id',
+                                             'm21TupletNum': '5',
+                                             'm21TupletNumbase': '4',
+                                             'm21TupletType': 'start',
+                                             })
         actual = base.spaceFromElement(elem)
-
-        self.assertEqual(expected, actual)
-        mockSpacer.assert_called_once_with(duration=mockMakeDur.return_value)
-        mockMakeDur.assert_called_once_with(1.0, 1)
-        mockTuplet.assert_called_once_with(mockSpacer.return_value, elem)
-        self.assertEqual('the id', mockNewSpace.id)
+        self.assertIsInstance(actual, note.Rest)
+        self.assertTrue(actual.style.hideObjectOnPrint)
+        self.assertEqual('the id', actual.id)
 
     def testIntegration2TestRestFromElement(self):
         '''
@@ -1450,30 +1439,30 @@ class Test(unittest.TestCase):
         self.assertEqual('start', actual.duration.tuplets[0].type)
 
     @mock.patch('music21.mei.base.restFromElement')
-    def testUnit3TestRestFromElement(self, mockRest):
+    def testUnit3TestRestFromElement(self, mockRestFromElement):
         '''
         mRestFromElement(): reacts properly to an Element with the @dur attribute
         '''
         elem = ETree.Element('mRest', attrib={'dur': '2'})
-        mockRest.return_value = 'the rest'
+        mockRestFromElement.return_value = 'the rest'
 
         actual = base.mRestFromElement(elem)
 
-        self.assertEqual(mockRest.return_value, actual)
-        mockRest.assert_called_once_with(elem, None)
+        self.assertEqual(mockRestFromElement.return_value, actual)
+        mockRestFromElement.assert_called_once_with(elem, None)
 
     @mock.patch('music21.mei.base.restFromElement')
-    def testUnit4TestRestFromElement(self, mockRest):
+    def testUnit4TestRestFromElement(self, mockRestFromElement):
         '''
         mRestFromElement(): reacts properly to an Element without the @dur attribute
         '''
         elem = ETree.Element('mRest')
-        mockRest.return_value = mock.MagicMock()
+        mockRestFromElement.return_value = mock.MagicMock()
 
         actual = base.mRestFromElement(elem)
 
-        self.assertEqual(mockRest.return_value, actual)
-        mockRest.assert_called_once_with(elem, None)
+        self.assertEqual(mockRestFromElement.return_value, actual)
+        mockRestFromElement.assert_called_once_with(elem, None)
         self.assertTrue(actual.m21wasMRest)
 
     @mock.patch('music21.mei.base.spaceFromElement')
@@ -1951,7 +1940,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
     @mock.patch('music21.mei.base._guessTuplets')
-    def testUnit1aLayerFromElemen(self, mockTuplets, mockVoice, mockNoteFromElement):
+    def testUnit1aLayerFromElement(self, mockTuplets, mockVoice, mockNoteFromElement):
         '''
         layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
                             mapping works; that tags not in the mapping are ignored; and that a
@@ -1994,7 +1983,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
     @mock.patch('music21.mei.base._guessTuplets')
-    def testUnit1bLayerFromElemen(self, mockTuplets, mockVoice, mockNoteFromElement):
+    def testUnit1bLayerFromElement(self, mockTuplets, mockVoice, mockNoteFromElement):
         '''
         Same as testUnit1a() *but* with ``overrideN`` provided.
         '''
@@ -2595,7 +2584,7 @@ class Test(unittest.TestCase):
 
     @mock.patch('music21.mei.base._timeSigFromAttrs')
     @mock.patch('music21.mei.base._keySigFromAttrs')
-    def testUnit1ScoreDefFromElemen(self, mockKey, mockTime):
+    def testUnit1ScoreDefFromElement(self, mockKey, mockTime):
         '''
         scoreDefFromElement(): proper handling of the following attributes (see function docstring
             for more information).
@@ -3908,7 +3897,7 @@ class Test(unittest.TestCase):
         # ensure the right number and @n of parts
         self.assertEqual(4, len(actual.keys()))
         for eachN in expectedNs:
-            self.assertTrue(eachN in actual.keys())
+            self.assertTrue(eachN in actual)
         # ensure the measure number is set properly,
         #        there is one voice with one note with its octave set equal to the staff's @n,
         #        the right barline was set properly
@@ -4031,8 +4020,8 @@ class Test(unittest.TestCase):
         # ensure the right number and @n of parts (we expect one additional key, for the "rptboth")
         self.assertEqual(5, len(actual.keys()))
         for eachN in expectedNs:
-            self.assertTrue(eachN in actual.keys())
-        self.assertTrue('next @left' in actual.keys())
+            self.assertTrue(eachN in actual)
+        self.assertTrue('next @left' in actual)
         # ensure the measure number is set properly,
         #        there is one voice with one note with its octave set equal to the staff's @n,
         #        the right barline was set properly

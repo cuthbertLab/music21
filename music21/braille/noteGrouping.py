@@ -12,7 +12,10 @@ import unittest
 
 from collections import OrderedDict
 
+from music21 import clef
+from music21 import dynamics
 from music21 import environment
+from music21 import expressions
 from music21.braille import basic
 from music21.braille.lookup import symbols
 
@@ -245,15 +248,16 @@ class NoteGroupingTranscriber:
         if not self.trans:
             return False  # need to consult previous element in translation
 
-        if el is not None and 'Dynamic' in el.classes:
+        if el is not None and isinstance(el, dynamics.Dynamic):
             return False
-        if el is not None and 'TextExpression' in el.classes:
+        if el is not None and isinstance(el, expressions.TextExpression):
             return False
 
-        if ('Dynamic' in prev.classes
-            or ('Clef' in prev.classes
+        if (isinstance(prev, dynamics.Dynamic)
+            or (isinstance(prev, clef.Clef)
                 and self.showClefSigns)
-            or ('TextExpression' in prev.classes  # TE is an abbreviation, no extra dot 3 necessary
+            or (isinstance(prev, expressions.TextExpression)
+                # TE is an abbreviation, no extra dot 3 necessary
                 and prev.content[-1] != '.')):
             for dot in basic.yieldDots(self.trans[-1][0]):
                 self.trans.insert(-1, dot)  # insert one before the end, not append...

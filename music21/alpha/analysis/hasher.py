@@ -755,6 +755,7 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):
+    show = True
 
     # def testBasicHash(self):
     #     # from pprint import pprint as pp
@@ -832,10 +833,11 @@ class TestExternal(unittest.TestCase):
         hashes2 = h.hashStream(s2)
         hashes3 = h.hashStream(s3)
 
-        print(difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio())
-        print(difflib.SequenceMatcher(a=hashes1, b=hashes3).ratio())
-        print(difflib.SequenceMatcher(a=hashes2, b=hashes3).ratio())
-        s2.show()
+        if self.show:
+            print(difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio())
+            print(difflib.SequenceMatcher(a=hashes1, b=hashes3).ratio())
+            print(difflib.SequenceMatcher(a=hashes2, b=hashes3).ratio())
+            s2.show()
 
         h.hashPitch = False
         h.hashDuration = True
@@ -845,9 +847,10 @@ class TestExternal(unittest.TestCase):
         hashes2 = h.hashStream(s2)
         hashes3 = h.hashStream(s3)
 
-        print(difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio())
-        print(difflib.SequenceMatcher(a=hashes1, b=hashes3).ratio())
-        print(difflib.SequenceMatcher(a=hashes2, b=hashes3).ratio())
+        if self.show:
+            print(difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio())
+            print(difflib.SequenceMatcher(a=hashes1, b=hashes3).ratio())
+            print(difflib.SequenceMatcher(a=hashes2, b=hashes3).ratio())
 
     def testInterval(self):
         from music21 import corpus
@@ -858,7 +861,8 @@ class TestExternal(unittest.TestCase):
         hashes3 = h.hashStream(s3)
         hashes4 = h.hashStream(s4)
 
-        print(difflib.SequenceMatcher(a=hashes3, b=hashes4).ratio())
+        if self.show:
+            print(difflib.SequenceMatcher(a=hashes3, b=hashes4).ratio())
 
         h.hashIntervalFromLastNote = True
         h.hashPitch = False
@@ -866,7 +870,8 @@ class TestExternal(unittest.TestCase):
         hashes3 = h.hashStream(s3)
         hashes4 = h.hashStream(s4)
 
-        print(difflib.SequenceMatcher(a=hashes3, b=hashes4).ratio())
+        if self.show:
+            print(difflib.SequenceMatcher(a=hashes3, b=hashes4).ratio())
 
 
 if __name__ == '__main__':

@@ -17,6 +17,7 @@ from time import time
 
 from music21 import scale
 from music21 import search
+from music21 import stream
 
 from music21 import environment
 _MOD = 'audioSearch.scoreFollower'
@@ -28,7 +29,7 @@ class ScoreFollower:
     def __init__(self, scoreStream=None):
         self.scoreStream = scoreStream
         if scoreStream is not None:
-            self.scoreNotesOnly = scoreStream.flat.notesAndRests.stream()
+            self.scoreNotesOnly = scoreStream.flatten().notesAndRests.stream()
         else:
             self.scoreNotesOnly = None
         self.waveFile = str(environLocal.getRootTempDir() / 'scoreFollowerTemp.wav')
@@ -160,7 +161,8 @@ class ScoreFollower:
             detectedPitchObjects)
         self.silencePeriodDetection(notesList)
         environLocal.printDebug('made it to here...')
-        scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
+        excerpt = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
+        scNotes = stream.Part(excerpt)
         # print('1')
         transcribedScore, self.qle = audioSearch.notesAndDurationsToStream(
             notesList,
@@ -210,7 +212,7 @@ class ScoreFollower:
         Useful if the musician has some consecutive measures of silence.
 
         >>> from music21.audioSearch import scoreFollower
-        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes.stream()
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flatten().notes.stream()
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> notesList = []
         >>> notesList.append(note.Rest())
@@ -263,7 +265,7 @@ class ScoreFollower:
 
         >>> from time import time
         >>> from music21.audioSearch import scoreFollower
-        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes.stream()
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flatten().notes.stream()
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.begins = True
         >>> ScF.startSearchAtSlot = 15
@@ -283,7 +285,7 @@ class ScoreFollower:
         starts to search at, and the position in which the music should start.
 
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
-        >>> ScF.scoreNotesOnly = scNotes.flat.notesAndRests
+        >>> ScF.scoreNotesOnly = scNotes.flatten().notesAndRests
         >>> ScF.begins = False
         >>> ScF.countdown = 0
         >>> ScF.startSearchAtSlot = 15
@@ -452,9 +454,9 @@ class ScoreFollower:
 
         >>> from time import time
         >>> from music21.audioSearch import scoreFollower
-        >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes.stream()
+        >>> scNotes = corpus.parse('luca/gloria').parts[0].flatten().notes.stream()
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
-        >>> ScF.scoreNotesOnly = ScF.scoreStream.flat.notesAndRests
+        >>> ScF.scoreNotesOnly = ScF.scoreStream.flatten().notesAndRests
         >>> ScF.lastNotePosition = 14
         >>> ScF.seconds_recording = 10.0
         >>> totalLengthPeriod = 8
@@ -486,7 +488,7 @@ class ScoreFollower:
         from music21 import audioSearch
 
         # Analyzing streams
-        tn_recording = int(len(transcribedScore.flat.notesAndRests))
+        tn_recording = int(len(transcribedScore.flatten().notesAndRests))
         totScores = []
         beginningData = []
         lengthData = []
@@ -501,14 +503,15 @@ class ScoreFollower:
                              - math.ceil(tn_window / hop))
 
         for i in range(iterations):
-            scNotes = scoreStream[i * hop + 1:i * hop + tn_recording + 1]
+            excerpt = scoreStream[i * hop + 1:i * hop + tn_recording + 1]
+            scNotes = stream.Part(excerpt)
             name = str(i)
             beginningData.append(i * hop + 1)
             lengthData.append(tn_recording)
             scNotes.id = name
             totScores.append(scNotes)
         listOfParts = search.approximateNoteSearchWeighted(
-            transcribedScore.flat.notesAndRests.stream(), totScores)
+            transcribedScore.flatten().notesAndRests.stream(), totScores)
 
         # decision process
         if notePrediction > len(scoreStream) - tn_recording - hop - 1:
@@ -542,11 +545,11 @@ class ScoreFollower:
             probabilityHit = listOfParts[position].matchProbability
 
         unused_listOfParts2 = search.approximateNoteSearch(
-            transcribedScore.flat.notesAndRests.stream(), totScores)
+            transcribedScore.flatten().notesAndRests.stream(), totScores)
         unused_listOfParts3 = search.approximateNoteSearchNoRhythm(
-            transcribedScore.flat.notesAndRests.stream(), totScores)
+            transcribedScore.flatten().notesAndRests.stream(), totScores)
         unused_listOfParts4 = search.approximateNoteSearchOnlyRhythm(
-            transcribedScore.flat.notesAndRests.stream(), totScores)
+            transcribedScore.flatten().notesAndRests.stream(), totScores)
         # print('PROBABILITIES:',)
         # print('pitches and durations weighted (current)',
         #     listOfParts[position].matchProbability,)
@@ -567,11 +570,11 @@ class ScoreFollower:
 # -----------------------------------------------------------------------------
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
 
     def xtestRunScoreFollower(self):
         from music21 import corpus
-        scNotes = corpus.parse('luca/gloria').parts[0].flat.notesAndRests
+        scNotes = corpus.parse('luca/gloria').parts[0].flatten().notesAndRests
         ScF = ScoreFollower(scoreStream=scNotes)
         ScF.runScoreFollower(plot=False, useMic=True, seconds=10.0)
 

@@ -1283,7 +1283,6 @@ class LyPrefixCompositeMusic(LyObject):
                        | re_rhythmed_music
     '''
     # pylint: disable=redefined-builtin
-
     def __init__(self, type=None, genericPrefixMusicScm=None,  # @ReservedAssignment
                  simpleString=None, optionalId=None, optionalContextMod=None,
                  music=None, fraction=None, repeatedMusic=None,
@@ -2044,7 +2043,7 @@ class LyNumberTerm(LyObject):
 
 
 class LyLyricMarkup(LyObject):
-    def __init_(self, lyricMarkupOrIdentifier=None, markupTop=None):
+    def __init__(self, lyricMarkupOrIdentifier=None, markupTop=None):
         super().__init__()
         self.lyricMarkupOrIdentifier = lyricMarkupOrIdentifier
         self.markupTop = markupTop
@@ -2057,7 +2056,7 @@ class LyLyricMarkup(LyObject):
 
 
 class LyFullMarkupList(LyObject):
-    def __init_(self, markupListOrIdentifier=None):
+    def __init__(self, markupListOrIdentifier=None):
         super().__init__()
         self.markupListOrIdentifier = markupListOrIdentifier
 
@@ -2070,7 +2069,7 @@ class LyFullMarkupList(LyObject):
 
 
 class LyFullMarkup(LyObject):
-    def __init_(self, markupTopOrIdentifier=None):
+    def __init__(self, markupTopOrIdentifier=None):
         super().__init__()
         self.markupTopOrIdentifier = markupTopOrIdentifier
 

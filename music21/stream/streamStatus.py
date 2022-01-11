@@ -64,6 +64,7 @@ class StreamStatus(SlottedObjectMixin):
         '_ornaments',
         '_rests',
         '_ties',
+        '_tuplets',
     )
 
     # INITIALIZER #
@@ -79,6 +80,7 @@ class StreamStatus(SlottedObjectMixin):
         self._ornaments = None
         self._rests = None
         self._ties = None
+        self._tuplets = None
         self.client = client
 
     # SPECIAL METHODS #
@@ -180,6 +182,19 @@ class StreamStatus(SlottedObjectMixin):
         self._client = common.wrapWeakref(client)
 
     @property
+    def accidentals(self):
+        if self._accidentals is None:
+            self._accidentals = self.haveAccidentalsBeenMade()
+        return self._accidentals
+
+    @accidentals.setter
+    def accidentals(self, expr):
+        if expr is not None:
+            self._accidentals = bool(expr)
+        else:
+            self._accidentals = None
+
+    @property
     def beams(self):
         if self._beams is None:
             self._beams = self.haveBeamsBeenMade()
@@ -192,18 +207,36 @@ class StreamStatus(SlottedObjectMixin):
         else:
             self._beams = None
 
+    @property
+    def tuplets(self):
+        if self._tuplets is None:
+            self._tuplets = self.haveTupletBracketsBeenMade()
+            # If there were no tuplet durations,
+            # tuplet brackets don't need to be made.
+            if self._tuplets is None:
+                self._tuplets = True
+        return self._tuplets
+
+    @tuplets.setter
+    def tuplets(self, expr):
+        if expr is not None:
+            self._tuplets = bool(expr)
+        else:
+            self._tuplets = None
+
 
 # -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
     '''
-    Note: all Stream tests are found in test/testStream.py
+    Note: most Stream tests are found in stream.tests
     '''
 
     def testHaveBeamsBeenMadeAfterDeepcopy(self):
         import copy
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         m = stream.Measure()
         c = note.Note('C4', type='quarter')
         m.append(c)

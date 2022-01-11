@@ -12,7 +12,7 @@
 These are the public methods for the MEI module by Christopher Antila
 
 To convert a string with MEI markup into music21 objects,
-use :meth:`MeiToM21Converter.convertFromString`.
+use :meth:`~music21.mei.MeiToM21Converter.convertFromString`.
 
 In the future, most of the functions in this module should be moved to a separate, import-only
 module, so that functions for writing music21-to-MEI will fit nicely.
@@ -57,8 +57,8 @@ document.
 >>> from music21 import *
 >>> conv = mei.MeiToM21Converter(meiString)
 >>> result = conv.run()
->>> type(result)
-<class 'music21.stream.Score'>
+>>> result
+<music21.stream.Score 0x10ee474f0>
 
 **Terminology**
 
@@ -173,10 +173,8 @@ tool.
 * <sb>: a system break
 
 '''
-# pylint: disable=misplaced-comparison-constant
 from typing import Optional, Union, List, Tuple
-from xml.etree import ElementTree as ETree
-from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
 
 from collections import defaultdict
 from fractions import Fraction  # for typing
@@ -289,14 +287,14 @@ class MeiToM21Converter:
             self.documentRoot = Element(f'{MEI_NS}mei')
         else:
             try:
-                self.documentRoot = ETree.fromstring(theDocument)
-            except ETree.ParseError as parseErr:
+                self.documentRoot = fromstring(theDocument)
+            except ParseError as parseErr:
                 environLocal.printDebug(
                     '\n\nERROR: Parsing the MEI document with ElementTree failed.')
                 environLocal.printDebug(f'We got the following error:\n{parseErr}')
                 raise MeiValidityError(_INVALID_XML_DOC)
 
-            if isinstance(self.documentRoot, ETree.ElementTree):
+            if isinstance(self.documentRoot, ElementTree):
                 # pylint warns that :class:`Element` doesn't have a getroot() method, which is
                 # true enough, but...
                 self.documentRoot = self.documentRoot.getroot()  # pylint: disable=maybe-no-member
@@ -354,7 +352,9 @@ def safePitch(
     function instead returns a default :class:`~music21.pitch.Pitch` instance.
 
     name: Desired name of the :class:`~music21.pitch.Pitch`.
+
     accidental: (Optional) Symbol for the accidental.
+
     octave: (Optional) Octave number.
 
     Returns A :class:`~music21.pitch.Pitch` with the appropriate properties.
@@ -2328,13 +2328,16 @@ def spaceFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     <space>  A placeholder used to fill an incomplete measure, layer, etc. most often so that the
     combined duration of the events equals the number of beats in the measure.
 
+    Returns a Rest element with hideObjectOnPrint = True
+
     In MEI 2013: pg.440 (455 in PDF) (MEI.shared module)
     '''
     # NOTE: keep this in sync with restFromElement()
 
     theDuration = _qlDurationFromAttr(elem.get('dur'))
     theDuration = makeDuration(theDuration, int(elem.get('dots', 0)))
-    theSpace = note.SpacerRest(duration=theDuration)
+    theSpace = note.Rest(duration=theDuration)
+    theSpace.style.hideObjectOnPrint = True
 
     if elem.get(_XMLID) is not None:
         theSpace.id = elem.get(_XMLID)
@@ -3057,7 +3060,7 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     :param elem: The ``<measure>`` element to process.
     :type elem: :class:`~xml.etree.ElementTree.Element`
     :param int backupNum: A fallback value for the resulting
-        :class:`~music21.measure.Measure` objects' number attribute.
+        :class:`~music21.stream.Measure` objects' number attribute.
     :param expectedNs: A list of the expected @n attributes for the <staff> tags in this <measure>.
         If an expected <staff> isn't in the <measure>, it will be created with a full-measure rest.
     :type expectedNs: iterable of str
@@ -3517,3 +3520,6 @@ _DOC_ORDER = [
     tupletFromElement,
 ]
 
+if __name__ == '__main__':
+    import music21
+    music21.mainTest()

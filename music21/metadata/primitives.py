@@ -251,15 +251,20 @@ class Date(prebase.ProtoM21Object):
         r'''
         Load values based on another Date object:
 
-        >>> a = metadata.Date(year=1843, month=3, day=3)
+        >>> a = metadata.Date(year=1843, month=3, day=3, yearError='approximate')
         >>> b = metadata.Date()
         >>> b.loadOther(a)
         >>> b.year
         1843
+        >>> b.yearError
+        'approximate'
         '''
         for attr in self.attrNames:
             if getattr(other, attr) is not None:
                 setattr(self, attr, getattr(other, attr))
+                errorAttr = attr + 'Error'
+                if getattr(other, errorAttr) is not None:
+                    setattr(self, errorAttr, getattr(other, errorAttr))
 
     def loadStr(self, dateStr):
         r'''
@@ -1040,7 +1045,7 @@ class Contributor(prebase.ProtoM21Object):
     def role(self, value):
         if value is None or value in self.roleAbbreviationsDict.values():
             self._role = value
-        elif value in self.roleAbbreviationsDict.keys():
+        elif value in self.roleAbbreviationsDict:
             self._role = self.roleAbbreviationsDict[value]
         else:
             self._role = value

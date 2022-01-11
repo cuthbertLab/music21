@@ -46,22 +46,32 @@ def compressAllXMLFiles(*, deleteOriginal=False):
     )
 
 
-def compressXML(filename: Union[str, pathlib.Path], *, deleteOriginal=False, silent=False):
+def compressXML(filename: Union[str, pathlib.Path],
+                *,
+                deleteOriginal=False,
+                silent=False,
+                strictMxlCheck=True) -> bool:
     '''
     Takes a filename, and if the filename corresponds to a musicXML file with
-    an .xml extension, creates a corresponding compressed .mxl file in the same
+    an .musicxml or .xml extension, creates a corresponding compressed .mxl file in the same
     directory.
 
     If deleteOriginal is set to True, the original musicXML file is deleted
     from the system.
+
+    If strictMxlCheck is False then any suffix will do.
+
+    Returns bool if successful.
     '''
     filename = str(filename)
-    if not filename.endswith('.xml') and not filename.endswith('.musicxml'):
-        return  # not a musicXML file
+    if strictMxlCheck and not filename.endswith('.xml') and not filename.endswith('.musicxml'):
+        return False  # not a musicXML file
     fp = common.pathTools.cleanpath(filename, returnPathlib=True)
     if not silent:  # pragma: no cover
         environLocal.warn(f"Updating file: {fp}")
     newFilename = str(fp.with_suffix('.mxl'))
+
+
     # contents of container.xml file in META-INF folder
     container = f'''<?xml version="1.0" encoding="UTF-8"?>
 <container>
@@ -85,24 +95,33 @@ def compressXML(filename: Union[str, pathlib.Path], *, deleteOriginal=False, sil
     if deleteOriginal:
         fp.unlink()
 
+    return True
 
-def uncompressMXL(filename: Union[str, pathlib.Path], *, deleteOriginal=False):
+
+def uncompressMXL(filename: Union[str, pathlib.Path],
+                  *,
+                  deleteOriginal=False,
+                  strictMxlCheck=True) -> bool:
     '''
     Takes a filename, and if the filename corresponds to a compressed musicXML
-    file with an .mxl extension, creates a corresponding uncompressed .xml file
+    file with an .mxl extension, creates a corresponding uncompressed .musicxml file
     in the same directory.
 
     If deleteOriginal is set to True, the original compressed musicXML file is
     deleted from the system.
+
+    If strictMxlCheck is False then any type of file will attempt to be extracted.
+
+    Returns bool if successful.
     '''
     filename = str(filename)
-    if not filename.endswith('.mxl'):
+    if not filename.endswith('.mxl') and strictMxlCheck:
         return  # not a compressed musicXML file
 
     fp: pathlib.Path = common.pathTools.cleanpath(filename, returnPathlib=True)
     environLocal.warn(f"Updating file: {fp}")
     extractPath = str(fp.parent)
-    unarchivedName = fp.with_suffix('.xml').name
+    unarchivedName = fp.with_suffix('.musicxml').name
     # Export container and original xml file to system as a compressed XML.
     with zipfile.ZipFile(filename, 'r', compression=zipfile.ZIP_DEFLATED) as myZip:
         try:

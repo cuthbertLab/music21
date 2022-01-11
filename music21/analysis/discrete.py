@@ -25,14 +25,17 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 #     range and key modules in analysis
 
 import unittest
-from typing import Union, List, Any, Tuple, Iterable
+from typing import Union, List, Any, Tuple, Iterable, Optional
 
 from collections import OrderedDict
 from music21 import exceptions21
 
-from music21 import pitch
+from music21 import chord
+from music21 import harmony
 from music21 import interval
+from music21 import note
 from music21 import key
+from music21 import pitch
 
 
 from music21 import environment
@@ -299,7 +302,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.KrumhanslSchmuckler()
-        >>> p._getSharpFlatCount(s.flat)
+        >>> p._getSharpFlatCount(s.flatten())
         (87, 0)
         '''
         # pitches gets a flat representation
@@ -453,6 +456,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             'B-', 'B',
         ]
 
+        colorsUsed = []
         if compress:
             colorsUsed = self.getColorsUsed()
             solutionsUsed = self.getSolutionsUsed()
@@ -471,7 +475,6 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         data = []
         valid = None
-        colorsUsed = []
 
         for yLabel in ['Major', 'Minor']:
             if yLabel == 'Major':
@@ -612,7 +615,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         The data list contains a key (as a string), a mode
         (as a string), and a correlation value (degree of certainty)
         '''
-        sStream = sStream.flat.notesAndRests
+        sStream = sStream.flatten().notesAndRests
         # this is the sample distribution used in the paper, for some testing purposes
         # pcDistribution = [7, 0, 5, 0, 7, 16, 0, 16, 0, 15, 6, 0]
 
@@ -697,7 +700,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         <music21.key.Key of B- major>
         '''
         # always take a flat version here, otherwise likely to get nothing
-        solution, unused_color = self.process(sStream.flat, storeAlternatives=True)
+        solution, unused_color = self.process(sStream.flatten(), storeAlternatives=True)
         # assign best solution
         k = self._solutionToObject(solution)
         if k.alternateInterpretations is None:
@@ -716,7 +719,7 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     Implementation of Krumhansl-Schmuckler/Kessler weightings for
     Krumhansl-Schmuckler key determination algorithm.
 
-    Values from from http://extra.humdrum.org/man/keycor/, which describes these
+    Values from from http://extras.humdrum.org/man/keycor/, which describes these
     weightings as "Strong tendency to identify the dominant key as the tonic."
 
     Changed in v.6.3 -- it used to be that these were different from the
@@ -764,13 +767,12 @@ class AardenEssen(KeyWeightKeyAnalysis):
     '''
     Implementation of Aarden-Essen weightings for Krumhansl-Schmuckler key determination algorithm.
 
-    Values from from http://extra.humdrum.org/man/keycor/, which
+    Values from from http://extras.humdrum.org/man/keycor/, which
     describes these weightings as "Weak tendency to identify the subdominant key as the tonic."
 
     (N.B. -- we are not sure exactly where the minor weightings come from, and recommend
     only using these weights for major).
     '''
-    # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Aarden Essen Key Analysis'
     identifiers = ['key.aarden', 'key.essen', 'key.aarden-essen', 'key.aardenessen',
@@ -810,11 +812,10 @@ class SimpleWeights(KeyWeightKeyAnalysis):
     Implementation of simple weights by Craig Sapp for Krumhansl-Schmuckler
     key determination algorithm.
 
-    Values from from http://extra.humdrum.org/man/keycor/, which describes
+    Values from from http://extras.humdrum.org/man/keycor/, which describes
     these weightings as "Performs most consistently with large regions of music,
     becomes noisier with smaller regions of music."
     '''
-    # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Simple Weight Key Analysis'
     identifiers = ['key.simple', 'key.weight', 'key.simple-weight', 'key.simpleweight',
@@ -848,10 +849,9 @@ class BellmanBudge(KeyWeightKeyAnalysis):
     '''
     Implementation of Bellman-Budge weightings for Krumhansl-Schmuckler key determination algorithm.
 
-    Values from from http://extra.humdrum.org/man/keycor/, which describes these
+    Values from from http://extras.humdrum.org/man/keycor/, which describes these
     weightings as "No particular tendencies for confusions with neighboring keys."
     '''
-    # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Bellman Budge Key Analysis'
     identifiers = ['key.bellman', 'key.budge', 'key.bellman-budge', 'key.bellmanbudge',
@@ -889,11 +889,10 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
     Implementation of Temperley-Kostka-Payne weightings for Krumhansl-Schmuckler
     key determination algorithm.
 
-    Values from from http://extra.humdrum.org/man/keycor/, which describes
+    Values from from http://extras.humdrum.org/man/keycor/, which describes
     these weightings as "Strong tendency to identify the relative major as the tonic
     in minor keys. Well-balanced for major keys."
     '''
-    # from http://extra.humdrum.org/man/keycor/
     _DOC_ALL_INHERITED = False
     name = 'Temperley Kostka Payne Key Analysis'
     identifiers = ['key.temperley', 'key.kostka', 'key.payne',
@@ -935,7 +934,7 @@ keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler,
 # -----------------------------------------------------------------------------
 class Ambitus(DiscreteAnalysis):
     '''
-    An basic analysis method for measuring register.
+    A basic analysis method for measuring register.
 
     >>> ambitusAnalysis = analysis.discrete.Ambitus()
     >>> ambitusAnalysis.identifiers[0]
@@ -945,10 +944,15 @@ class Ambitus(DiscreteAnalysis):
 
     name = 'Ambitus Analysis'
     # provide possible string matches for this processor
-    identifiers = ['ambitus', 'range', 'span']
+    identifiers = ['ambitus', 'span']
 
     def __init__(self, referenceStream=None):
         super().__init__(referenceStream=referenceStream)
+        # Store the min and max Pitch instances for referenceStream
+        # set by getPitchSpan(), which is called by _generateColors()
+        self.minPitchObj: Optional[pitch.Pitch] = None
+        self.maxPitchObj: Optional[pitch.Pitch] = None
+
         self._pitchSpanColors = OrderedDict()
         self._generateColors()
 
@@ -967,14 +971,16 @@ class Ambitus(DiscreteAnalysis):
         2 #16111d
         3 #16121e
         '''
+        minPitch = 0
         if numColors is None:
             if self._referenceStream is not None:
                 # get total range for entire piece
-                minPitch, maxPitch = self.getPitchRanges(self._referenceStream)
+                self.minPitchObj, self.maxPitchObj = self.getPitchSpan(self._referenceStream)
+                maxPitch = int(self.maxPitchObj.ps - self.minPitchObj.ps)
             else:
-                minPitch, maxPitch = 0, 130  # a large default
+                maxPitch = 130  # a large default
         else:  # create minPitch maxPitch
-            minPitch, maxPitch = 0, numColors
+            maxPitch = numColors
 
         valueRange = maxPitch - minPitch
         if valueRange == 0:
@@ -990,10 +996,10 @@ class Ambitus(DiscreteAnalysis):
 
         # environLocal.printDebug([self._pitchSpanColors])
 
-    def getPitchSpan(self, subStream):
+    def getPitchSpan(self, subStream) -> Optional[Tuple[pitch.Pitch, pitch.Pitch]]:
         '''
-        For a given subStream, return the pitch with the minimum and
-        maximum pitch space value found.
+        For a given subStream, return a tuple consisting of the two pitches
+        with the minimum and maximum pitch space value.
 
         This public method may be used by other classes.
 
@@ -1012,7 +1018,25 @@ class Ambitus(DiscreteAnalysis):
         >>> s.append(c)
         >>> p.getPitchSpan(s)
         (<music21.pitch.Pitch A2>, <music21.pitch.Pitch C8>)
+
+        Returns None if the stream contains no pitches.
+
+        >>> s = stream.Stream(note.Rest())
+        >>> p.getPitchSpan(s) is None
+        True
+
+        OMIT_FROM_DOCS
+
+        And with only ChordSymbols:
+
+        >>> s.insert(4, harmony.ChordSymbol('C6'))
+        >>> p.getPitchSpan(s) is None
+        True
+
         '''
+        if subStream is self._referenceStream and self.minPitchObj and self.maxPitchObj:
+            return self.minPitchObj, self.maxPitchObj
+
         justNotes = subStream.recurse().notes
         if not justNotes:
             # need to handle case of no pitches
@@ -1024,71 +1048,27 @@ class Ambitus(DiscreteAnalysis):
         for n in justNotes:
             # environLocal.printDebug([n])
             pitches = []
-            if 'Chord' in n.classes and 'ChordSymbol' not in n.classes:
+            if isinstance(n, chord.Chord) and not isinstance(n, harmony.ChordSymbol):
                 pitches = n.pitches
-            elif 'Note' in n.classes:
+            elif isinstance(n, note.Note):
                 pitches = [n.pitch]
             psFound += [p.ps for p in pitches]
             pitchesFound.extend(pitches)
-        # in some cases no pitch space values are found due to all rests
+        # in some cases there is still nothing -- perhaps only ChordSymbols
         if not psFound:
             return None
         # use built-in functions
         minPitchIndex = psFound.index(min(psFound))
         maxPitchIndex = psFound.index(max(psFound))
 
-        return pitchesFound[minPitchIndex], pitchesFound[maxPitchIndex]
+        minPitchObj = pitchesFound[minPitchIndex]
+        maxPitchObj = pitchesFound[maxPitchIndex]
 
-    def getPitchRanges(self, subStream) -> Tuple[int, int]:
-        '''
-        For a given subStream, return the smallest .ps difference
-        between any two pitches and the largest difference
-        between any two pitches. This is used to get the
-        smallest and largest ambitus possible in a given work.
+        if subStream is self._referenceStream:
+            self.minPitchObj = minPitchObj
+            self.maxPitchObj = maxPitchObj
 
-        >>> ambitusAnalyzer = analysis.discrete.Ambitus()
-        >>> s = stream.Stream()
-        >>> c = chord.Chord(['a2', 'b4', 'c8'])
-        >>> s.append(c)
-        >>> [int(thisPitch.ps) for thisPitch in ambitusAnalyzer.getPitchSpan(s)]
-        [45, 108]
-        >>> ambitusAnalyzer.getPitchRanges(s)
-        (26, 63)
-
-        >>> s = corpus.parse('bach/bwv66.6')
-        >>> ambitusAnalyzer.getPitchRanges(s)
-        (0, 34)
-
-        An empty stream has pitch range (0, 0)
-
-        >>> s = stream.Stream()
-        >>> ambitusAnalyzer.getPitchRanges(s)
-        (0, 0)
-        '''
-        ssfn = subStream.flat.notes
-
-        psFound = []
-        for n in ssfn:
-            pitches = []
-            if 'Chord' in n.classes:
-                pitches = n.pitches
-            elif 'Note' in n.classes:
-                pitches = [n.pitch]
-            for p in pitches:
-                psFound.append(p.ps)
-        psFound.sort()
-        psRange = []
-        for i in range(len(psFound) - 1):
-            p1 = psFound[i]
-            for j in range(i + 1, len(psFound)):
-                p2 = psFound[j]
-                # p2 should always be equal or greater than p1
-                psRange.append(p2 - p1)
-
-        if not psRange:
-            return (0, 0)
-        else:
-            return (int(min(psRange)), int(max(psRange)))
+        return minPitchObj, maxPitchObj
 
     def solutionLegend(self, compress=False):
         '''
@@ -1260,7 +1240,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         for p in procList:
             # get only Notes for now, skipping rests and chords
             # flatten to reach notes contained in measures
-            noteStream = p.flat.stripTies(inPlace=False).getElementsByClass('Note').stream()
+            noteStream = p.flatten().stripTies(inPlace=False).getElementsByClass('Note').stream()
             # noteStream.show()
             for i, n in enumerate(noteStream):
                 if i <= len(noteStream) - 2:
@@ -1300,7 +1280,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
     def getSolution(self, sStream):
         '''Solution is the number of unique intervals.
         '''
-        solution, unused_color = self.process(sStream.flat)
+        solution, unused_color = self.process(sStream.flatten())
         return solution
 
 
@@ -1330,14 +1310,14 @@ def analyzeStream(streamObj, *args, **keywords):
 
     >>> analysis.discrete.analyzeStream(s, 'key')
     <music21.key.Key of f# minor>
-    >>> analysis.discrete.analyzeStream(s, 'range')
+    >>> analysis.discrete.analyzeStream(s, 'span')
     <music21.interval.Interval m21>
 
 
     Note that the same results can be obtained by calling "analyze" directly on the stream object:
     >>> s.analyze('key')
     <music21.key.Key of f# minor>
-    >>> s.analyze('range')
+    >>> s.analyze('span')
     <music21.interval.Interval m21>
 
     '''
@@ -1347,6 +1327,11 @@ def analyzeStream(streamObj, *args, **keywords):
 
     if args:
         method = args[0]
+
+    if method == 'range':
+        # getPitchRanges() was removed in v7
+        # this synonym is being added for compatibility
+        method = 'span'
 
     match = analysisClassFromMethodName(method)
 
@@ -1370,7 +1355,7 @@ def analysisClassFromMethodName(method):
     >>> acfmn = analysis.discrete.analysisClassFromMethodName
     >>> acfmn('aarden')
     <class 'music21.analysis.discrete.AardenEssen'>
-    >>> acfmn('range')
+    >>> acfmn('span')
     <class 'music21.analysis.discrete.Ambitus'>
 
     This one is fundamentally important...
@@ -1437,8 +1422,8 @@ class Test(unittest.TestCase):
         # self.assertEqual(p._getPitchClassDistribution(s1),
         #            [1.0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
-        p.process(s1.flat)
-        likelyKeysMajor1, likelyKeysMinor1 = p._likelyKeys(s1.flat)
+        p.process(s1.flatten())
+        likelyKeysMajor1, likelyKeysMinor1 = p._likelyKeys(s1.flatten())
         likelyKeysMajor1.sort()
         likelyKeysMinor1.sort()
         allResults1 = likelyKeysMajor1 + likelyKeysMinor1
@@ -1446,8 +1431,8 @@ class Test(unittest.TestCase):
         unused_post = sorted([(y, x) for x, y in allResults1])
         # print(post)
 
-        p.process(s2.flat)
-        likelyKeysMajor2, likelyKeysMinor2 = p._likelyKeys(s2.flat)
+        p.process(s2.flatten())
+        likelyKeysMajor2, likelyKeysMinor2 = p._likelyKeys(s2.flatten())
         likelyKeysMajor2.sort()
         likelyKeysMinor2.sort()
         allResults2 = likelyKeysMajor2 + likelyKeysMinor2
@@ -1455,7 +1440,7 @@ class Test(unittest.TestCase):
         unused_post = sorted([(y, x) for x, y in allResults2])
         # print(post)
 
-        likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3.flat)
+        likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3.flatten())
         likelyKeysMajor3.sort()
         likelyKeysMinor3.sort()
         allResults3 = likelyKeysMajor3 + likelyKeysMinor3
@@ -1473,7 +1458,8 @@ class Test(unittest.TestCase):
         # print(post)
 
     def testIntervalDiversity(self):
-        from music21 import note, stream, corpus
+        from music21 import stream
+        from music21 import corpus
 
         s = stream.Stream()
         s.append(note.Note('g#3'))
@@ -1526,7 +1512,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(midDict['m2']), '[<music21.interval.Interval m2>, 43]')
 
     def testKeyAnalysisSpelling(self):
-        from music21 import stream, note
+        from music21 import stream
 
         for p in ['A', 'B-', 'A-']:
             s = stream.Stream()
@@ -1537,7 +1523,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testFiles
         # use a musicxml test file with independently confirmed results
-        s = converter.parse(testFiles.edgefield82b)  # @UndefinedVariable
+        s = converter.parse(testFiles.edgefield82b)
 
         p = KrumhanslSchmuckler()
         k = p.getSolution(s)
@@ -1571,7 +1557,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(post[1]), 'minor')
 
     def testKeyAnalysisLikelyKeys(self):
-        from music21 import note, stream
+        from music21 import stream
         s = stream.Stream()
         s.repeatAppend(note.Note('c'), 6)
         s.repeatAppend(note.Note('g'), 4)

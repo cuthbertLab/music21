@@ -290,7 +290,7 @@ class TsvHandler:
 
         fileName = self.tsvFileName
 
-        with open(fileName, 'r') as f:
+        with open(fileName, 'r', encoding='utf-8') as f:
             data = []
             for row_num, line in enumerate(f):
                 if row_num == 0:  # Ignore first row (headers)
@@ -505,7 +505,7 @@ class M21toTSV:
         '''
         Writes a list of lists (e.g. from m21ToTsv()) to a tsv file.
         '''
-        with open(filePathAndName, 'a', newline='') as csvFile:
+        with open(filePathAndName, 'a', newline='', encoding='utf-8') as csvFile:
             csvOut = csv.writer(csvFile,
                                 delimiter='\t',
                                 quotechar='"',
@@ -720,6 +720,7 @@ class Test(unittest.TestCase):
         self.assertEqual(out_stream.parts[0].measure(1)[0].figure, 'I')  # First item in measure 1
 
     def testM21ToTsv(self):
+        import os
         from music21 import corpus
 
         bachHarmony = corpus.parse('bach/choraleAnalyses/riemenschneider001.rntxt')
@@ -734,6 +735,7 @@ class Test(unittest.TestCase):
         initial.write(tempF)
         handler = TsvHandler(tempF)
         self.assertEqual(handler.tsvData[0][0], 'I')
+        os.remove(tempF)
 
     def testIsMinor(self):
         self.assertTrue(is_minor('f'))

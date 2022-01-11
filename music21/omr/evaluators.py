@@ -193,8 +193,8 @@ class OmrGroundTruthPair:
         Returns the total edit distance as an Int between
         the two scores
 
-        This function is based on the James H. Martin's minimum edit distance,
-        http://www.cs.colorado.edu/~martin/csci5832/edit-dist-blurb.html
+        This function is based on James H. Martin's minimum edit distance,
+        https://web.archive.org/web/20121219013556/http://www.cs.colorado.edu/~martin/csci5832/edit-dist-blurb.html
 
         >>> omrPath = omr.correctors.K525omrShortPath
         >>> ground = omr.correctors.K525groundTruthShortPath

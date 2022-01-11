@@ -212,6 +212,7 @@ class Dynamic(base.Music21Object):
             >>> d.englishName
             'very soft'
             ''',
+        'placement': "Staff placement: 'above', 'below', or None.",
     }
 
     def __init__(self, value=None):
@@ -237,7 +238,7 @@ class Dynamic(base.Music21Object):
         self.style.absoluteX = -36
         self.style.absoluteY = -80  # below top line
         # this value provides good 16th note alignment
-        self.positionPlacement = None
+        self.placement = None
 
     def _reprInternal(self):
         return str(self.value)
@@ -391,11 +392,13 @@ class Diminuendo(DynamicWedge):
 # ------------------------------------------------------------------------------
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testSingle(self):
         a = Dynamic('ffff')
-        a.show()
+        if self.show:
+            a.show()
 
     def testBasic(self):
         '''present each dynamic in a single measure
@@ -407,7 +410,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             b = Dynamic(dynStr)
             a.insert(o, b)
             o += 4  # increment
-        a.show()
+        if self.show:
+            a.show()
 
 
 # ------------------------------------------------------------------------------
@@ -448,10 +452,10 @@ class Test(unittest.TestCase):
     def testCorpusDynamicsWedge(self):
         from music21 import corpus
         a = corpus.parse('opus41no1/movement2')  # has dynamics!
-        b = a.parts[0].flat.getElementsByClass('Dynamic')
+        b = a.parts[0].flatten().getElementsByClass('Dynamic')
         self.assertEqual(len(b), 35)
 
-        b = a.parts[0].flat.getElementsByClass('DynamicWedge')
+        b = a.parts[0].flatten().getElementsByClass('DynamicWedge')
         self.assertEqual(len(b), 2)
 
     def testMusicxmlOutput(self):
@@ -463,7 +467,8 @@ class Test(unittest.TestCase):
         self.assertNotEqual(xmlOut.find(match), -1, xmlOut)
 
     def testDynamicsPositionA(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         s = stream.Stream()
         selections = ['pp', 'f', 'mf', 'fff']
         # positions = [-20, 0, 20]
@@ -475,7 +480,9 @@ class Test(unittest.TestCase):
 
     def testDynamicsPositionB(self):
         import random
-        from music21 import stream, note, layout
+        from music21 import stream
+        from music21 import note
+        from music21 import layout
         s = stream.Stream()
         for i in range(6):
             m = stream.Measure(number=i + 1)

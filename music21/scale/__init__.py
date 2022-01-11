@@ -75,6 +75,7 @@ from music21 import base
 from music21 import common
 from music21 import environment
 from music21 import exceptions21
+from music21 import note
 from music21 import pitch
 from music21 import interval
 from music21 import sieve
@@ -174,7 +175,7 @@ class Scale(base.Music21Object):
             for p in other:
                 if hasattr(p, 'pitch'):
                     pre.append(p.pitch)
-                elif hasattr(p, 'classes') and 'Pitch' in p.classes:
+                elif isinstance(p, pitch.Pitch):
                     pre.append(p)
                 else:
                     pre.append(pitch.Pitch(p))
@@ -289,12 +290,21 @@ class AbstractScale(Scale):
         >>> abstractScale._net.realizePitch('D5')
         [<music21.pitch.Pitch D5>, <music21.pitch.Pitch F#5>,
          <music21.pitch.Pitch A#5>, <music21.pitch.Pitch D6>]
+
+        Also possible with implicit octaves:
+
+        >>> abstract_scale = scale.AbstractScale()
+        >>> abstract_scale.buildNetworkFromPitches(['C', 'F'])
+        >>> abstract_scale.octaveDuplicating
+        True
+        >>> abstract_scale._net.realizePitch('G')
+        [<music21.pitch.Pitch G4>, <music21.pitch.Pitch C5>, <music21.pitch.Pitch G5>]
         '''
         pitchListReal = []
         for p in pitchList:
             if isinstance(p, str):
                 pitchListReal.append(pitch.Pitch(p))
-            elif hasattr(p, 'classes') and 'Note' in p.classes:
+            elif isinstance(p, note.Note):
                 pitchListReal.append(p.pitch)
             else:  # assume this is a pitch object
                 pitchListReal.append(p)
@@ -321,6 +331,8 @@ class AbstractScale(Scale):
                 self.octaveDuplicating = False
         else:
             p = copy.deepcopy(pitchList[0])
+            if p.octave is None:
+                p.octave = p.implicitOctave
             if pitchList[-1] > pitchList[0]:  # ascending
                 while p.ps < pitchList[-1].ps:
                     p.octave += 1
@@ -1245,7 +1257,7 @@ class ConcreteScale(Scale):
     usePitchDegreeCache = False
 
     def __init__(self,
-                 tonic: Optional[Union[str, pitch.Pitch, 'music21.note.Note']] = None,
+                 tonic: Optional[Union[str, pitch.Pitch, note.Note]] = None,
                  pitches: Optional[List[Union[pitch.Pitch, str]]] = None):
         super().__init__()
 
@@ -1271,7 +1283,7 @@ class ConcreteScale(Scale):
             self.tonic = None  # pitch.Pitch()
         elif isinstance(tonic, str):
             self.tonic = pitch.Pitch(tonic)
-        elif hasattr(tonic, 'classes') and 'GeneralNote' in tonic.classes:
+        elif isinstance(tonic, note.GeneralNote):
             self.tonic = tonic.pitch
         else:  # assume this is a pitch object
             self.tonic = tonic
@@ -1367,7 +1379,7 @@ class ConcreteScale(Scale):
             return ' '.join([self.tonic.name, self.type])
 
     def _reprInternal(self):
-        return f'{self.tonic.name} {self.type}'
+        return self.name
 
     # --------------------------------------------------------------------------
 
@@ -2834,6 +2846,8 @@ class HarmonicMinorScale(DiatonicScale):
     <music21.pitch.Pitch E4>
 
     >>> sc = scale.HarmonicMinorScale()
+    >>> sc
+    <music21.scale.HarmonicMinorScale Abstract harmonic minor>
     >>> sc.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
     [(3, <music21.scale.HarmonicMinorScale F harmonic minor>),
      (3, <music21.scale.HarmonicMinorScale E harmonic minor>),
@@ -3190,7 +3204,6 @@ class Test(unittest.TestCase):
         return out
 
     def testBasicLegacy(self):
-        from music21 import note
         from music21 import scale
 
         n1 = note.Note()
@@ -3264,7 +3277,6 @@ class Test(unittest.TestCase):
     def testBasic(self):
         from music21 import corpus
         from music21 import stream
-        from music21 import note
         from music21 import scale
         # deriving a scale from a Stream
 
@@ -3512,7 +3524,7 @@ class Test(unittest.TestCase):
     def testMelodicMinorB(self):
         '''Need to test descending form of getting pitches with no defined min and max
         '''
-        from music21 import stream, note
+        from music21 import stream
         mm = MelodicMinorScale('a')
         # self.assertEqual(str(mm.getPitches(None, None, direction='ascending')),
         #    '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
@@ -3834,7 +3846,8 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
     def testScalaScaleB(self):
         # test importing from scala archive
-        from music21 import stream, meter, note
+        from music21 import stream
+        from music21 import meter
 
         sc = ScalaScale('e2', 'fj 12tet')
         self.assertEqual(sc._abstract._net.pitchSimplification, 'mostCommon')
@@ -3975,7 +3988,8 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         and then uses Marchetto da Padova's very high sharps and very low
         flats (except B-flat) to inflect the accidentals
         '''
-        from music21 import corpus, instrument
+        from music21 import corpus
+        from music21 import instrument
 
         s = corpus.parse('luca/gloria').measures(70, 79)
         for p in s.parts:
@@ -3983,7 +3997,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
             inst.midiProgram = 52
         sc = ScalaScale('F2', 'pyth_12.scl')
         sc.tune(s)
-        for p in s.flat.pitches:
+        for p in s.flatten().pitches:
             if p.accidental is not None:
                 if p.accidental.name == 'sharp':
                     p.microtone = p.microtone.cents + 45

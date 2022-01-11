@@ -26,6 +26,7 @@ from typing import (
     Tuple,
 )
 
+from music21.common import deprecated
 
 class ProtoM21Object:
     '''
@@ -42,8 +43,14 @@ class ProtoM21Object:
     ('PitchCounter', 'ProtoM21Object', 'object')
     >>> PitchCounter in pc.classSet
     True
-    >>> pc.isClassOrSubclass(('music21.note.Note',))
+    >>> 'Note' in pc.classSet
     False
+
+    For a True/False intersection check against an iterable, use `classSet.isdisjoint`:
+
+    >>> classList = ('music21.note.Note', 'music21.note.Rest')
+    >>> pc.classSet.isdisjoint(classList)
+    True
     >>> repr(pc)
     '<music21.PitchCounter no pitches>'
 
@@ -82,6 +89,8 @@ class ProtoM21Object:
 
     __slots__ = ()
 
+    @deprecated('v7', 'v8', 'use `someClass in .classSet`'
+        'or for intersection: `not classSet.isdisjoint(classList)`')
     def isClassOrSubclass(self, classFilterList: Sequence) -> bool:
         '''
         Given a class filter list (a list or tuple must be submitted),
@@ -91,18 +100,21 @@ class ProtoM21Object:
         NOTE: this is a performance critical operation
         for performance, only accept lists or tuples
 
+        DEPRECATED in v7 -- prefer `someClass in el.classSet` or
+        `not el.classSet.isdisjoint(classList)` instead.
+
         >>> n = note.Note()
-        >>> n.isClassOrSubclass(('Note',))
+        >>> #_DOCS_SHOW n.isClassOrSubclass(('Note',))
         True
-        >>> n.isClassOrSubclass(('GeneralNote',))
+        >>> #_DOCS_SHOW n.isClassOrSubclass(('GeneralNote',))
         True
-        >>> n.isClassOrSubclass((note.Note,))
+        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Note,))
         True
-        >>> n.isClassOrSubclass((note.Rest,))
+        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Rest,))
         False
-        >>> n.isClassOrSubclass((note.Note, note.Rest))
+        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Note, note.Rest))
         True
-        >>> n.isClassOrSubclass(('Rest', 'Note'))
+        >>> #_DOCS_SHOW n.isClassOrSubclass(('Rest', 'Note'))
         True
         '''
         return not self.classSet.isdisjoint(classFilterList)
@@ -139,7 +151,7 @@ class ProtoM21Object:
         >>> s.insert(50, clef.BassClef())
         >>> s2 = stream.Stream()
         >>> for t in s:
-        ...    if 'GClef' in t.classes and 'TrebleClef' not in t.classes:
+        ...    if isinstance(t, clef.GClef) and not isinstance(t, clef.TrebleClef):
         ...        s2.insert(t)
         >>> s2.show('text')
         {10.0} <music21.clef.GClef>
@@ -150,7 +162,7 @@ class ProtoM21Object:
         try:
             return self._classTupleCacheDict[self.__class__]
         except KeyError:
-            classTuple = tuple([x.__name__ for x in self.__class__.mro()])
+            classTuple = tuple(x.__name__ for x in self.__class__.mro())
             self._classTupleCacheDict[self.__class__] = classTuple
             return classTuple
 
@@ -231,6 +243,8 @@ class ProtoM21Object:
         if self.__module__ != '__main__':
             reprHead += self.__module__ + '.'
         reprHead += self.__class__.__qualname__
+        if '.base.' in reprHead and 'music21.base' not in reprHead:
+            reprHead = reprHead.replace('.base', '')
         strRepr = self._reprInternal()
         if strRepr and not strRepr.startswith(':'):
             reprHead += ' '

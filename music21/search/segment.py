@@ -18,11 +18,10 @@ Speed notes:
    give you a 3-5x speedup.
 
    If you really want to do lots of comparisons, the `scoreSimilarity` method will
-   use pyLevenshtein if it is installed from http://code.google.com/p/pylevenshtein/ .
-   You will need to compile it by running **sudo python setup.py install** on Mac or
-   Unix (compilation is much more difficult on Windows; sorry). The ratios are very
-   slightly different, but the speedup is between 10 and 100x!
-   (but then PyPy probably won't work)
+   use python-Levenshtein if it is installed, unless forceDifflib is set to True.
+   python-Levenshtein can be installed via **pip install python-Levenshtein**.
+   The ratios are very slightly different, but the speedup is between 10 and 100x!
+   (But then PyPy probably won't work.)
 
 '''
 import copy

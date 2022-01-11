@@ -93,7 +93,7 @@ class QMConverter(converter.subConverters.SubConverter):
             {2.0} <music21.note.Note C>
             {3.0} <music21.bar.Barline type=final>
         '''
-        with open(filePath, 'r') as f:
+        with open(filePath, 'r', encoding='utf-8') as f:
             self.parseData(f.read())
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
@@ -101,11 +101,11 @@ class QMConverter(converter.subConverters.SubConverter):
         if fp is None:
             fp = environLocal.getTempFile('.qm')
 
-        for n in obj.flat.notes:
+        for n in obj.flatten().notes:
             music = music + n.name + ' '
         music += '\n'
 
-        with open(fp, 'w') as f:
+        with open(fp, 'w', encoding='utf-8') as f:
             f.write(music)
 
         return fp

@@ -50,7 +50,6 @@ from typing import Optional, List
 from music21 import base
 from music21 import common
 from music21 import defaults
-from music21 import freezeThaw
 from music21 import exceptions21
 
 from music21.metadata import bundles
@@ -210,8 +209,8 @@ class Metadata(base.Music21Object):
         self.software = [defaults.software]
 
         # Copyright can be None or a copyright object
-        # TODO: Change to property to prevent text setting
-        # (but need to regenerate CoreCorpus() after doing so.)
+        # TODO: Change to property to prevent setting as a plain string
+        #     (but need to regenerate CoreCorpus() after doing so.)
         self.copyright = None
 
         # a dictionary of Text elements, where keys are work id strings
@@ -1199,7 +1198,7 @@ class RichMetadata(Metadata):
 
         environLocal.printDebug(['RichMetadata: update(): start'])
 
-        flat = streamObj.flat.sorted
+        flat = streamObj.flatten().sorted()
 
         self.numberOfParts = len(streamObj.parts)
         self.keySignatureFirst = None
@@ -1266,12 +1265,11 @@ class RichMetadata(Metadata):
         self.pitchHighest = None
         self.pitchLowest = None
         analysisObject = discrete.Ambitus(streamObj)
-        psRange = analysisObject.getPitchSpan(streamObj)
-        if psRange is not None:
+        if analysisObject.minPitchObj is not None and analysisObject.maxPitchObj is not None:
             # may be none if no pitches are stored
             # presently, these are numbers; convert to pitches later
-            self.pitchLowest = psRange[0].nameWithOctave
-            self.pitchHighest = psRange[1].nameWithOctave
+            self.pitchLowest = analysisObject.minPitchObj.nameWithOctave
+            self.pitchHighest = analysisObject.maxPitchObj.nameWithOctave
         ambitusInterval = analysisObject.getSolution(streamObj)
         self.ambitus = AmbitusShort(semitones=ambitusInterval.semitones,
                                     diatonic=ambitusInterval.diatonic.simpleName,

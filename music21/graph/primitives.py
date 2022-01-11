@@ -104,7 +104,9 @@ class Graph(prebase.ProtoM21Object):
     )
 
     def __init__(self, *args, **keywords):
-        getExtendedModules()
+        extm = getExtendedModules()
+        self.plt = extm.plt  # wrapper to matplotlib.pyplot
+
         self.data = None
         self.figure = None  # a matplotlib.Figure object
         self.subplot = None  # an Axes, AxesSubplot or potentially list of these object
@@ -155,11 +157,23 @@ class Graph(prebase.ProtoM21Object):
 
     def __del__(self):
         '''
-        Matplotlib Figure objects need to be explicitly closed when no longer used...
+        Matplotlib Figure objects need to be explicitly closed when no longer used.
         '''
-        if hasattr(self, 'figure') and self.figure is not None and self.doneAction is None:
-            etm = getExtendedModules()
-            etm.plt.close(self.figure)
+        if hasattr(self, 'figure') and self.figure is not None:
+            self.plt.close(self.figure)
+
+    def __getstate__(self):
+        '''
+        The wrapper to matplotlib.pyplot stored as self.plt cannot be pickled/deepcopied.
+        '''
+        state = self.__dict__.copy()
+        del state['plt']
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        extm = getExtendedModules()
+        self.plt = extm.plt
 
     @property
     def doneAction(self):
@@ -1590,7 +1604,8 @@ class Test(unittest.TestCase):
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testBasic(self):
         a = GraphScatter(doneAction=None, title='x to x*x', alpha=1)
@@ -1598,14 +1613,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         a.data = data
         a.process()
 
-        del a
-
         a = GraphHistogram(doneAction=None, title='50 x with random(30) y counts')
         data = [(x, random.choice(range(30))) for x in range(50)]
         a.data = data
         a.process()
-
-        del a
 
         a = Graph3DBars(doneAction=None,
                                title='50 x with random values increase by 10 per x',
@@ -1642,11 +1653,15 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             z = random.choice(range(1, 20))
             data.append([x, y, z])
 
-        a = GraphScatterWeighted()
+        if self.show:
+            doneAction = 'write'
+        else:
+            doneAction = None
+        a = GraphScatterWeighted(doneAction=doneAction)
         a.data = data
         a.process()
 
-    def writeAllGraphs(self):
+    def x_test_writeAllGraphs(self):
         '''
         Write a graphic file for all graphs,
         naming them after the appropriate class.
@@ -1695,7 +1710,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
 
-    def writeGraphColorGrid(self):
+    def x_test_writeGraphColorGrid(self):
         # this is temporary
         a = GraphColorGrid(doneAction=None)
         data = [['#525252', '#5f5f5f', '#797979', '#858585', '#727272', '#6c6c6c',
@@ -1724,7 +1739,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
         a.write(fp)
 
-    def writeGraphingDocs(self):
+    def x_test_writeGraphingDocs(self):
         '''
         Write graphing examples for the docs
         '''
@@ -1785,7 +1800,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         g.process()
 
     def testGraphNetworkxGraph(self):
-        extm = getExtendedModules()  # @UnusedVariable
+        extm = getExtendedModules()
 
         if extm.networkx is not None:  # pragma: no cover
             b = GraphNetworkxGraph(doneAction=None)

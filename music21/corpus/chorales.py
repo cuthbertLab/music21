@@ -11,7 +11,7 @@
 # ------------------------------------------------------------------------------
 '''
 This file makes it easier to access Bach's chorales through various
-numbering schemes and filters and includes the Iterator()
+numbering schemes and filters and includes the corpus.chorales.Iterator()
 class for easily iterating through the chorale collection.
 '''
 
@@ -28,13 +28,13 @@ environLocal = environment.Environment(_MOD)
 class ChoraleList:
     # noinspection SpellCheckingInspection
     '''
-    A searchable list of BachChorales by various numbering systems:
+    A searchable list of Bach's chorales by various numbering systems:
 
     Note that multiple chorales share the same title, so it's best to
     iterate over one of the other lists to get them all.
 
     The list of chorales comes from
-    http://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
+    https://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
     which does not have all chorales in the Bärenreitter-Kirnberger or Riemenschneider
     numberings since it only includes BWV 250-438.
 
@@ -81,8 +81,8 @@ class ChoraleList:
 
         etc.
         '''
-        # From http://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
-        # CC license. http://en.wikipedia.org/wiki/WP:CC-BY-SA
+        # From https://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
+        # CC license. https://en.wikipedia.org/wiki/WP:CC-BY-SA
         # Some of these are problematic--I have removed them for now: --Evan Lynch
         # |Seelen-Bräutigam||409||0||5||306||141||Actually 5a in Bärenreiter, not in Kalmus
         # |-
@@ -491,7 +491,7 @@ class ChoraleList:
 class ChoraleListRKBWV:
     # noinspection SpellCheckingInspection
     '''
-    A searchable list of BachChorales by various numbering systems:
+    A searchable list of Bach's chorales by various numbering systems:
 
     Note that multiple chorales share the same title, so it's best to
     iterate over one of the other lists to get them all.
@@ -951,7 +951,7 @@ class Iterator:
     change the range values to span the entire numberList.
     The iterator can be initialized with three parameters
     (currentNumber, highestNumber, numberingSystem). For example
-    BachChoraleIterator(1, 26,'riemenschneider') iterates
+    corpus.chorales.Iterator(1, 26,'riemenschneider') iterates
     through the riemenschneider numbered chorales from 1 to 26.
     Additionally, the following kwargs can be set:
 
@@ -1078,10 +1078,11 @@ class Iterator:
         and returnType = 'stream'
 
         Notes:
-        Two BachChoraleList objects are created. These should probably
+
+        Two ChoraleList objects are created. These should probably
         be consolidated, but they contain
         different information at this time. Also, there are problems
-        with entries in BachChoraleListRKBWV
+        with entries in ChoraleListRKBWV
         that need to be addressed. Namely, chorales that share the
         same key (and thus overwrite each other)
         and chorales that do not appear to be in the corpus at all.
@@ -1778,13 +1779,15 @@ class BachException(exceptions21.Music21Exception):
 # class Test(unittest.TestCase):
 #     pass
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testGetRiemenschneider1(self):
         from music21 import corpus
         for chorale in corpus.chorales.Iterator(1, 2,
                                                 numberingSystem='riemenschneider', analysis=True):
-            chorale.show()
+            if self.show:
+                chorale.show()
 
 
 if __name__ == '__main__':

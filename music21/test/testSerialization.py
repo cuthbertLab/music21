@@ -25,7 +25,9 @@ environLocal = environment.Environment(_MOD)
 class Test(unittest.TestCase):
 
     def testBasicC(self):
-        from music21 import stream, note, converter
+        from music21 import stream
+        from music21 import note
+        from music21 import converter
 
         s = stream.Stream()
         n1 = note.Note('d2', quarterLength=2.0)
@@ -38,7 +40,10 @@ class Test(unittest.TestCase):
         self.assertEqual(str(post.notes[0].pitch), 'D2')
 
     def testBasicD(self):
-        from music21 import stream, note, converter, spanner
+        from music21 import stream
+        from music21 import note
+        from music21 import converter
+        from music21 import spanner
         import copy
 
         s = stream.Stream()
@@ -65,20 +70,24 @@ class Test(unittest.TestCase):
         self.assertEqual(spPost.getSpannedElementIds(), [id(post.notes[0]), id(post.notes[1])])
 
     def testBasicE(self):
-        from music21 import corpus, converter
+        from music21 import corpus
+        from music21 import converter
         s = corpus.parse('bwv66.6')
 
         temp = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(temp)
         # sPost.show()
-        self.assertEqual(len(s.flat.notes), len(sPost.flat.notes))
+        self.assertEqual(len(s.recurse().notes), len(sPost.flatten().notes))
 
         self.assertEqual(len(s.parts[0].notes), len(sPost.parts[0].notes))
         # print(s.parts[0].notes)
         # sPost.parts[0].notes
 
     def testBasicF(self):
-        from music21 import stream, note, converter, spanner
+        from music21 import stream
+        from music21 import note
+        from music21 import converter
+        from music21 import spanner
 
         s = stream.Score()
         s.repeatAppend(note.Note('G4'), 5)
@@ -95,7 +104,9 @@ class Test(unittest.TestCase):
         # sPost.show()
 
     def testBasicJ(self):
-        from music21 import stream, note, converter
+        from music21 import stream
+        from music21 import note
+        from music21 import converter
 
         p1 = stream.Part()
         for m in range(3):
@@ -121,10 +132,12 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.parts), 2)
         self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
-        self.assertEqual(len(sPost.flat.notes), 24)
+        self.assertEqual(len(sPost.recurse().notes), 24)
 
     def testBasicI(self):
-        from music21 import stream, note, converter
+        from music21 import stream
+        from music21 import note
+        from music21 import converter
 
         p1 = stream.Part()
         p1.repeatAppend(note.Note('C4'), 12)
@@ -142,14 +155,16 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.parts), 2)
         self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
-        self.assertEqual(len(sPost.flat.notes), 24)
+        self.assertEqual(len(sPost.recurse().notes), 24)
 
     def testSpannerSerializationOfNotesNotInPickle(self):
         '''
         test to see if spanners serialize properly if they
         contain notes not in the pickle...
         '''
-        from music21 import stream, spanner, converter
+        from music21 import stream
+        from music21 import spanner
+        from music21 import converter
         from music21 import note
         n1 = note.Note('D4')
         n2 = note.Note('E4')
@@ -164,7 +179,8 @@ class Test(unittest.TestCase):
         # s2.show('text')
 
     def testBigCorpus(self):
-        from music21 import corpus, converter
+        from music21 import corpus
+        from music21 import converter
         # import time
         # print(time.time())  # 8.3 sec from pickle; 10.3 sec for forceSource...
         # s = corpus.parse('beethoven/opus133') #, forceSource = True)

@@ -11,24 +11,25 @@
 # ------------------------------------------------------------------------------
 '''
 A mixin to ScoreExporter that includes the capabilities for producing a single
-MusicXML `<part>` from multiple music21 PartStaff objects.
+MusicXML `<part>` from multiple music21 `PartStaff` objects.
 '''
 from typing import Dict, List, Optional
 import unittest
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element, SubElement
+import warnings
+from xml.etree.ElementTree import Element, SubElement, Comment
 
+from music21.common.misc import flattenList
 from music21.key import KeySignature
 from music21.layout import StaffGroup
 from music21.meter import TimeSignature
 from music21 import stream  # for typing
 from music21.musicxml import helpers
-from music21.musicxml.xmlObjects import MusicXMLExportException
+from music21.musicxml.xmlObjects import MusicXMLExportException, MusicXMLWarning
 
 def addStaffTags(measure: Element, staffNumber: int, tagList: Optional[List[str]] = None):
     '''
     For a <measure> tag `measure`, add a <staff> grandchild to any instance of
-    a child tag of a type in `tagList`. Raise if a <staff> grandchild already exists.
+    a child tag of a type in `tagList`.
 
     >>> from xml.etree.ElementTree import fromstring as El
     >>> from music21.musicxml.partStaffExporter import addStaffTags
@@ -131,7 +132,11 @@ class PartStaffExporterMixin:
         >>> len(staffTags)
         2
         '''
-        for group in self.joinableGroups():
+        # starting with v.7, self.groupsToJoin is already set earlier,
+        # but check to be safe
+        if not self.groupsToJoin:
+            self.groupsToJoin = self.joinableGroups()
+        for group in self.groupsToJoin:
             self.addStaffTagsMultiStaffParts(group)
             self.movePartStaffMeasureContents(group)
             self.setEarliestAttributesAndClefsPartStaff(group)
@@ -140,8 +145,9 @@ class PartStaffExporterMixin:
     def joinableGroups(self) -> List[StaffGroup]:
         '''
         Returns a list of :class:`~music21.layout.StaffGroup` objects that
-        represent PartStaff objects that can be joined together into a single
-        MusicXML `<part>`:
+        represent :class:`~music21.stream.PartStaff` objects that can be
+        joined into a single MusicXML `<part>`, so long as there exists a
+        `PartExporter` for it in `ScoreExporter.partExporterList`:
 
         >>> s = stream.Score()
 
@@ -207,6 +213,8 @@ class PartStaffExporterMixin:
         ...     s.insert(0, el)
 
         >>> SX = musicxml.m21ToXml.ScoreExporter(s)
+        >>> SX.scorePreliminaries()
+        >>> SX.parsePartlikeScore()  # populate .partExporterList
         >>> SX.joinableGroups()
         [<music21.layout.StaffGroup <... p1a><... p1b><... p1c>>,
          <music21.layout.StaffGroup <... p2a><... p2b>>,
@@ -215,12 +223,18 @@ class PartStaffExporterMixin:
         staffGroups = self.stream.getElementsByClass('StaffGroup')
         joinableGroups: List[StaffGroup] = []
         # Joinable groups must consist of only PartStaffs with Measures
+        # and exist in self.stream
         for sg in staffGroups:
             if len(sg) <= 1:
                 continue
             if not all(stream.PartStaff in p.classSet for p in sg):
                 continue
             if not all(p.getElementsByClass('Measure') for p in sg):
+                continue
+            try:
+                for p in sg:
+                    self.getRootForPartStaff(p)
+            except MusicXMLExportException:
                 continue
             joinableGroups.append(sg)
 
@@ -233,6 +247,13 @@ class PartStaffExporterMixin:
                 deduplicatedGroups.append(jg)
             permutations.add(containedParts)
 
+        # But forbid overlapping, spaghetti StaffGroups
+        joinable_components_list = flattenList(deduplicatedGroups)
+        if len(set(joinable_components_list)) != len(joinable_components_list):
+            warnings.warn(
+                MusicXMLWarning('Got overlapping StaffGroups; will not merge ANY groups.'))
+            return []
+
         return deduplicatedGroups
 
     def addStaffTagsMultiStaffParts(self, group: StaffGroup):
@@ -240,7 +261,7 @@ class PartStaffExporterMixin:
         Create child <staff> tags under each <note>, <direction>, and <forward> element
         in the <part>s being joined.
 
-        Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
+        Called by :meth:`joinPartStaffs`.
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
@@ -274,13 +295,6 @@ class PartStaffExporterMixin:
             <staff>2</staff>
           </note>
         </measure>
-
-        Fails if attempted a second time:
-
-        >>> root = SX.parse()
-        Traceback (most recent call last):
-        music21.musicxml.xmlObjects.MusicXMLExportException:
-            In part (MusicXML Part), measure (1): Attempted to create a second <staff> tag
         '''
         initialPartStaffRoot: Optional[Element] = None
         for i, ps in enumerate(group):
@@ -309,9 +323,10 @@ class PartStaffExporterMixin:
         For every <part> after the first, find the corresponding measure in the initial
         <part> and merge the contents by inserting all of the contained elements.
 
-        Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
+        Called by :meth:`joinPartStaffs`
 
-        StaffGroup must be a valid one from `joinableGroups()`
+        StaffGroup must be a valid one from
+        :meth:`joinableGroups`.
         '''
 
         target = self.getRootForPartStaff(group[0])
@@ -334,8 +349,10 @@ class PartStaffExporterMixin:
         Move elements from subsequent PartStaff's measures into `target`: the <part>
         element representing the initial PartStaff that will soon represent the merged whole.
 
-        Called by movePartStaffMeasureContents(), which is in turn called by
-        :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
+        Called by
+        :meth:`movePartStaffMeasureContents`,
+        which is in turn called by
+        :meth:`joinPartStaffs`.
         '''
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
@@ -371,7 +388,7 @@ class PartStaffExporterMixin:
 
             # Or, gap in measure numbers in target: record necessary insertions until gap is closed
             while helpers.measureNumberComesBefore(sourceNumber, targetNumber):
-                divider: Element = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
+                divider: Element = Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
                 try:
                     insertions[i] += [divider, sourceMeasure]
                 except KeyError:
@@ -390,7 +407,7 @@ class PartStaffExporterMixin:
             remainingMeasures.insert(0, sourceMeasure)
         for remaining in remainingMeasures:
             sourceNumber = remaining.get('number')
-            divider: Element = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
+            divider: Element = Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
             try:
                 insertions[len(target)] += [divider, remaining]
             except KeyError:
@@ -407,7 +424,7 @@ class PartStaffExporterMixin:
         e.g. RH of piano doesn't appear until m. 40, and earlier music for LH needs
         to be merged first in order to find earliest <attributes>.
 
-        Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
+        Called by :meth:`joinPartStaffs`
 
         Multiple keys:
 
@@ -580,14 +597,10 @@ class PartStaffExporterMixin:
     def cleanUpSubsequentPartStaffs(self, group: StaffGroup):
         '''
         Now that the contents of all PartStaffs in `group` have been represented
-        by a single :class:`PartExporter`, remove the obsolete `PartExporter`s from
-        `self.partExporterList` so that they are not included in the export.
+        by a single :class:`~music21.musicxml.m21ToXml.PartExporter`, remove any
+        obsolete `PartExporter` from `self.partExporterList`.
 
-        In addition, remove any obsolete `PartStaff` from the `StaffGroup`
-        (in the deepcopied stream used for exporting) to ensure <part-group type="stop" />
-        is written.
-
-        Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
+        Called by :meth:`joinPartStaffs`
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
@@ -599,9 +612,6 @@ class PartStaffExporterMixin:
         >>> SX.postPartProcess()
         >>> len(SX.partExporterList)
         1
-        >>> partGroupStop = SX.xmlRoot.findall('.//part-group')[1]
-        >>> SX.dump(partGroupStop)
-        <part-group number="1" type="stop" />
         '''
         for ps in group[1:]:
             partStaffRoot: Element = self.getRootForPartStaff(ps)
@@ -609,8 +619,6 @@ class PartStaffExporterMixin:
             # noinspection PyAttributeOutsideInit
             self.partExporterList = [pex for pex in self.partExporterList
                                         if pex.xmlRoot != partStaffRoot]
-            # Replace PartStaff in StaffGroup -- ensures <part-group number="1" type="stop" />
-            group.replaceSpannedElement(ps, group.getFirst())
 
     @staticmethod
     def moveMeasureContents(measure: Element, otherMeasure: Element, staffNumber: int):
@@ -904,6 +912,66 @@ class Test(unittest.TestCase):
         self.assertEqual({staff.text for staff in m2tag.findall('note/staff')}, {'2'})
         self.assertEqual({staff.text for staff in m3tag.findall('note/staff')}, {'1'})
 
+    def testJoinPartStaffsF(self):
+        '''
+        Flattening the score will leave StaffGroup spanners with parts no longer in the stream.
+        '''
+        from music21 import corpus
+        from music21 import musicxml
+        sch = corpus.parse('schoenberg/opus19', 2)
+
+        SX = musicxml.m21ToXml.ScoreExporter(sch.flatten())
+        SX.scorePreliminaries()
+        SX.parseFlatScore()
+        # Previously, an exception was raised by getRootForPartStaff()
+        SX.joinPartStaffs()
+
+    def testJoinPartStaffsG(self):
+        '''
+        A derived score should still have joinable groups.
+        '''
+        from music21 import corpus
+        from music21 import musicxml
+        s = corpus.parse('demos/two-parts')
+
+        m1 = s.measure(1)
+        self.assertIn('Score', m1.classes)
+        SX = musicxml.m21ToXml.ScoreExporter(m1)
+        SX.scorePreliminaries()
+        SX.parsePartlikeScore()
+        self.assertEqual(len(SX.joinableGroups()), 1)
+
+    def testJoinPartStaffsH(self):
+        '''
+        Overlapping PartStaffs cannot be guaranteed to export correctly,
+        so they fall back to the old export paradigm (no joinable groups).
+        '''
+        from music21 import musicxml
+
+        ps1 = stream.PartStaff(stream.Measure())
+        ps2 = stream.PartStaff(stream.Measure())
+        ps3 = stream.PartStaff(stream.Measure())
+        sg1 = StaffGroup([ps1, ps2])
+        sg2 = StaffGroup([ps1, ps3])
+        s = stream.Score([ps1, ps2, ps3, sg1, sg2])
+
+        SX = musicxml.m21ToXml.ScoreExporter(s)
+        SX.scorePreliminaries()
+        with self.assertWarns(MusicXMLWarning):
+            SX.parsePartlikeScore()
+            self.assertEqual(SX.joinableGroups(), [])
+
+    def testJoinPartStaffsAgain(self):
+        '''
+        Regression test for side effects on the stream passed to ScoreExporter
+        preventing it from being written out again.
+        '''
+        from music21 import corpus
+        from music21.musicxml.m21ToXml import ScoreExporter
+        b = corpus.parse('cpebach')
+        SX = ScoreExporter(b)
+        SX.parse()
+        SX.parse()
 
 
 if __name__ == '__main__':

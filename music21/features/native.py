@@ -12,13 +12,7 @@
 Original music21 feature extractors.
 '''
 import unittest
-import re
-import math
 from typing import Optional
-
-from urllib.request import Request, urlopen
-from urllib.parse import urlencode  # @UnresolvedImport @Reimport
-
 
 from music21.features import base as featuresModule
 from music21 import text
@@ -79,13 +73,13 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
     now we will try it with the last movement of Schoenberg's opus 19 which has
     no mode explicitly encoded in the musicxml but which our analysis routines
-    believe (having very little to go on) fits the profile of F major best.
+    believe (having very little to go on) fits the profile of e minor best.
 
     >>> schoenberg19mvmt6 = corpus.parse('schoenberg/opus19', 6)
     >>> fe2 = features.native.QualityFeature(schoenberg19mvmt6)
     >>> f2 = fe2.extract()
     >>> f2.vector
-    [0]
+    [1]
 
 
     OMIT_FROM_DOCS
@@ -644,7 +638,7 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s2 = corpus.parse('schoenberg/opus19', 2)
     >>> fe2 = features.native.TriadSimultaneityPrevalence(s2)
     >>> fe2.extract().vector
-    [0.022727...]
+    [0.021739...]
     '''
     id = 'CS9'
 
@@ -842,67 +836,11 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
 
 class ComposerPopularity(featuresModule.FeatureExtractor):
     '''
-    composer's popularity today, as measured by the number of
-    Google search results (log-10).  Works only on English-language Google
-
-    Requires an internet connection.
-
-
-    >>> #_DOCS_SHOW s = corpus.parse('mozart/k155', 2)
-    >>> s = stream.Score() #_DOCS_HIDE
-    >>> s.append(metadata.Metadata()) #_DOCS_HIDE
-    >>> s.metadata.composer = 'W.A. Mozart' #_DOCS_HIDE
-    >>> fe = features.native.ComposerPopularity(s)
-    >>> #_DOCS_SHOW fe.extract().vector[0] > 5.0
-    >>> True #_DOCS_HIDE
-    True
+    REMOVED in v7 because Google's repsonse no longer includes result counts.
+    Empty class still here so that id won't be reused, but it's been removed
+    from this module's list of features.
     '''
     id = 'MD1'
-    googleResultsRE = re.compile(r'([\d,]+) results')
-    _M21UserAgent = ('Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) '
-                     + 'Gecko/20071127 Firefox/2.0.0.11')
-
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
-        super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
-
-        self.name = 'Composer Popularity'
-        self.description = ('Composer popularity today, as measured by the number '
-                            'of Google search results (log-10).')
-        self.dimensions = 1
-        self.discrete = False
-
-    def process(self):
-        '''Do processing necessary, storing result in feature.
-        '''
-        # use for total number of chords
-
-        resultsLog = 0
-        md = self.data['metadata']
-        if md is None:
-            return 0
-        composer = md.composer
-        if composer is None or composer == '':
-            return 0
-        paramsBasic = {'q': composer}
-
-        params = urlencode(paramsBasic)
-        urlStr = f'http://www.google.com/search?{params}'
-
-        headers = {'User-Agent': self._M21UserAgent}
-        req = Request(urlStr, headers=headers)
-        with urlopen(req) as response:
-            the_page = response.read()
-            the_page = the_page.decode('utf-8')
-
-        m = self.googleResultsRE.search(the_page)
-        if m is not None and m.group(0):
-            totalRes = int(m.group(1).replace(',', ''))
-            if totalRes > 0:
-                resultsLog = math.log(totalRes, 10)
-            else:
-                resultsLog = -1
-
-        self.feature.vector[0] = resultsLog
 
 
 # ------------------------------------------------------------------------------
@@ -1026,7 +964,7 @@ featureExtractors = [
     IncorrectlySpelledTriadPrevalence,  # cs11
     ChordBassMotionFeature,  # cs12
 
-    ComposerPopularity,  # md1
+    # ComposerPopularity,  # md1
 
     LandiniCadence,  # mc1
 
@@ -1039,7 +977,9 @@ featureExtractors = [
 class Test(unittest.TestCase):
 
     def testIncorrectlySpelledTriadPrevalence(self):
-        from music21 import stream, features, chord
+        from music21 import stream
+        from music21 import features
+        from music21 import chord
 
         s = stream.Stream()
         s.append(chord.Chord(['c', 'e', 'g']))
@@ -1051,7 +991,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(fe.extract().vector[0]), '0.5')
 
     def testLandiniCadence(self):
-        from music21 import converter, features
+        from music21 import converter
+        from music21 import features
 
         s = converter.parse('tinynotation: 3/4 f#4 f# e g2')
         fe = features.native.LandiniCadence(s)

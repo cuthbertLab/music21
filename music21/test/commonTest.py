@@ -28,7 +28,7 @@ from music21 import common
 with warnings.catch_warnings():
     warnings.simplefilter('ignore', DeprecationWarning)
     warnings.simplefilter('ignore', PendingDeprecationWarning)
-    import imp
+    import imp  # pylint: disable=deprecated-module
 
 
 environLocal = environment.Environment('test.commonTest')
@@ -218,7 +218,7 @@ class ModuleGather:
                             'features/native',
                             'figuredBass/examples',
                             'braille/test',
-                            'test/testStream',
+                            'stream/tests',
                             'analysis/windowed',
                             'converter/__init__',
 
@@ -230,8 +230,7 @@ class ModuleGather:
                             ]
 
         # skip any path that contains this string
-        self.pathSkip = ['music21/ext',  # not just 'ext' because of 'text!'
-                         ]
+        self.pathSkip = []  # 'music21/ext',  # not just 'ext' because of 'text!'
         self.pathSkipExtended = self.pathSkip + []
 
         self.moduleSkip = [x.replace('/', os.sep) for x in self.moduleSkip]
@@ -272,13 +271,14 @@ class ModuleGather:
         for dirPath, unused_dirNames, filenames in os.walk(self.dirParent):
             self._visitFunc(None, dirPath, filenames)
 
-        if common.cpus() > 4:  # @UndefinedVariable
+        if common.cpus() > 4:
             self.modulePaths.sort(key=manyCoreSortFunc)
         else:
             self.modulePaths.sort()
 
-        # for p in self.modulePaths:
-        #    print(p)
+        # I don't know why we do this, but it happened this way in an early m21 version,
+        # and it's just tradition now. It'd wig me out
+        # if I ever didn't see them in reverse alphabetical order.
         self.modulePaths.reverse()
 
     def _getName(self, fp):

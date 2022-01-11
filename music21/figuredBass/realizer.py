@@ -89,8 +89,9 @@ def figuredBassFromStream(streamPart):
     .. image:: images/figuredBass/fbRealizer_fbStreamPart.*
         :width: 500
 
+    Changed in v7.3: multiple figures in same lyric (e.g. '64') now supported.
     '''
-    sf = streamPart.flat
+    sf = streamPart.flatten()
     sfn = sf.notes
 
     keyList = sf.getElementsByClass(key.Key)
@@ -116,9 +117,44 @@ def figuredBassFromStream(streamPart):
         if paddingLeft != 0.0:
             fb._paddingLeft = paddingLeft
 
+    def updateAnnotationString(annotationString: str, inputText: str) -> str:
+        '''
+        Continue building the working `annotationString` based on some `inputText`
+        that has yet to be processed. Called recursively until `inputText` is exhausted
+        or contains unexpected characters.
+        '''
+        # "64" and "#6#42" but not necessarily "4-3" or "sus4"
+        stop_index_exclusive: int = 0
+        if inputText[0] in '+#bn' and len(inputText) > 1 and inputText[1].isnumeric():
+            stop_index_exclusive = 2
+        elif inputText[0].isnumeric():
+            stop_index_exclusive = 1
+        else:
+            # quit
+            stop_index_exclusive = 1000
+        annotationString += inputText[:stop_index_exclusive]
+        # Is there more?
+        if inputText[stop_index_exclusive:]:
+            annotationString += ', '
+            annotationString = updateAnnotationString(
+                annotationString, inputText[stop_index_exclusive:])
+        return annotationString
+
     for n in sfn:
         if n.lyrics:
-            annotationString = ', '.join([x.text for x in n.lyrics])
+            annotationString: str = ''
+            for i, lyric_line in enumerate(n.lyrics):
+                if lyric_line.text in (None, ''):
+                    continue
+                if ',' in lyric_line.text:
+                    # presence of comma suggests we already have a separated
+                    # sequence of figures, e.g. "#6, 4, 2"
+                    annotationString = lyric_line.text
+                else:
+                    # parse it more carefully
+                    annotationString = updateAnnotationString(annotationString, lyric_line.text)
+                if i + 1 < len(n.lyrics):
+                    annotationString += ', '
             fb.addElement(n, annotationString)
         else:
             fb.addElement(n)
@@ -263,7 +299,7 @@ class FiguredBassLine:
 
         >>> from music21 import corpus
         >>> sBach = corpus.parse('bach/bwv307')
-        >>> sBach['bass'].measure(0).show('text')
+        >>> sBach.parts.last().measure(0).show('text')
         {0.0} ...
         {0.0} <music21.clef.BassClef>
         {0.0} <music21.key.Key of B- major>
@@ -271,7 +307,7 @@ class FiguredBassLine:
         {0.0} <music21.note.Note B->
         {0.5} <music21.note.Note C>
 
-        >>> fbLine = realizer.figuredBassFromStream(sBach['bass'])
+        >>> fbLine = realizer.figuredBassFromStream(sBach.parts.last())
         >>> fbLine.generateBassLine().measure(1).show('text')
         {0.0} <music21.clef.BassClef>
         {0.0} <music21.key.KeySignature of 2 flats>
@@ -318,7 +354,7 @@ class FiguredBassLine:
         else:
             currentMapping = checker.createOffsetMapping(bassLine)
         allKeys = sorted(currentMapping.keys())
-        bassLine = bassLine.flat.notes
+        bassLine = bassLine.flatten().notes
         bassNoteIndex = 0
         previousBassNote = bassLine[bassNoteIndex]
         bassNote = currentMapping[allKeys[0]][-1]
@@ -793,7 +829,34 @@ class FiguredBassLineException(exceptions21.Music21Exception):
 
 
 class Test(unittest.TestCase):
-    pass
+    def testMultipleFiguresInLyric(self):
+        from music21 import converter
+
+        s = converter.parse('tinynotation: 4/4 C4 F4 G4_64 G4 C1', makeNotation=False)
+        third_note = s[note.Note][2]
+        self.assertEqual(third_note.lyric, '64')
+        unused_fb = figuredBassFromStream(s)
+        self.assertEqual(third_note.notationString, '6, 4')
+
+        third_note.lyric = '#6#42'
+        unused_fb = figuredBassFromStream(s)
+        self.assertEqual(third_note.notationString, '#6, #4, 2')
+
+        third_note.lyric = '#64#2'
+        unused_fb = figuredBassFromStream(s)
+        self.assertEqual(third_note.notationString, '#6, 4, #2')
+
+        # original case
+        third_note.lyric = '6\n4'
+        unused_fb = figuredBassFromStream(s)
+        self.assertEqual(third_note.notationString, '6, 4')
+
+        # single accidental
+        for single_symbol in '+#bn':
+            with self.subTest(single_symbol=single_symbol):
+                third_note.lyric = single_symbol
+                unused_fb = figuredBassFromStream(s)
+                self.assertEqual(third_note.notationString, single_symbol)
 
 
 if __name__ == '__main__':
