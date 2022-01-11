@@ -1767,12 +1767,56 @@ class ChordSymbol(Harmony):
 
         return tuple(pitches)
 
+    def _parseAddAlterSubtract(self, remaining: str, modType: str) -> str:
+        '''
+        Removes and parses the first instance of a given `modType` such as
+        'add', 'alter', 'omit', or 'subtract'. Returns the unparsed remainder.
+
+        >>> cs = harmony.ChordSymbol()
+        >>> cs._parseAddAlterSubtract('add#9omit5', 'add')
+        'omit5'
+        >>> cs.chordStepModifications
+        [<music21.harmony.ChordStepModification
+            modType=add degree=9 interval=<music21.interval.Interval A1>>]
+        '''
+        degree: str = ''
+        alter: int = 0
+        startIndex: int = remaining.index(modType) + len(modType)
+
+        # Remove modType
+        remaining = remaining[startIndex:]
+
+        if remaining[:1] == 'b':
+            alter = -1
+            remaining = remaining[1:]
+        elif remaining[:1] == '#':
+            alter = 1
+            remaining = remaining[1:]
+        # 11, 13, etc.
+        if remaining[:2].isnumeric():
+            degree = remaining[:2]
+            remaining = remaining[2:]
+        # 9, 6, 4, etc.
+        elif remaining[0].isnumeric():
+            degree = remaining[0]
+            remaining = remaining[1:]
+        if degree:
+            if modType == 'omit':
+                modType = 'subtract'
+            self.addChordStepModification(
+                ChordStepModification(modType, int(degree), alter), updatePitches=False)
+        return remaining
+
     def _getKindFromShortHand(self, sH):
         originalsH = sH
         if 'add' in sH:
             sH = sH[0:sH.index('add')]
+        if 'alter' in sH:
+            sH = sH[0:sH.index('alter')]
         if 'omit' in sH:
             sH = sH[0:sH.index('omit')]
+        if 'subtract' in sH:
+            sH = sH[0:sH.index('subtract')]
         if '#' in sH and sH[sH.index('#') + 1].isdigit():
             sH = sH[0:sH.index('#')]
         if ('b' in sH and sH.index('b') < len(sH) - 1
@@ -1859,29 +1903,40 @@ class ChordSymbol(Harmony):
             bass = m2.group()
             bass = bass.replace('/', '')
             self.bass(bass)
-            # remove the root and bass from the string and any additions/omissions/alterations/
+            # remove the root and bass from the string
             remaining = st.replace(m2.group(), '')
 
         st = self._getKindFromShortHand(remaining)
-        # 'add', 'alter' and 'omit' in the chordString is kinda broken, not a high
-        # priority since there is no well defined nomenclature
-        if 'add' in remaining:
-            degree = remaining[remaining.index('add') + 3:]
-            self.addChordStepModification(
-                ChordStepModification('add', int(degree)), updatePitches=False)
-            return
-        if 'alter' in remaining:
-            degree = remaining[remaining.index('alter') + 5:]
-            self.addChordStepModification(
-                ChordStepModification('alter', int(degree)), updatePitches=False)
-            return
-        if 'omit' in remaining or 'subtract' in remaining:
-            degree = remaining[remaining.index('omit') + 4:]
-            self.addChordStepModification(
-                ChordStepModification('subtract', int(degree)), updatePitches=False)
-            return
+
+        ALTER_TYPES = ('add', 'alter', 'omit', 'subtract')
+        searchStart: int = 1000  # not -1 for the sake of min(), below
+        for alterType in ALTER_TYPES:
+            try:
+                searchStart = min(remaining.index(alterType), searchStart)
+            except ValueError:
+                pass
+
+        searchStringForAlterTypes: str = remaining[searchStart:]
+        substring: str = ''
+        i = 0
+        while searchStringForAlterTypes and i < len(searchStringForAlterTypes):
+            for char in searchStringForAlterTypes:
+                i += 1
+                if char.isalpha():
+                    substring += char
+                if substring in ALTER_TYPES:
+                    searchStringForAlterTypes = self._parseAddAlterSubtract(
+                        searchStringForAlterTypes, substring)
+                    substring = ''
+                    i = 0
+                    break
 
         st = st.replace(',', '')
+        # Unsafe to proceed until every alterType and anything following
+        # is stripped from 'st'
+        for alterType in ALTER_TYPES:
+            if alterType in st:
+                st = st[:st.index(alterType)]
 
         if 'b' in st or '#' in st:
             splitter = re.compile('([b#]+[^b#]+)')
@@ -2952,10 +3007,7 @@ class Test(unittest.TestCase):
         self.assertEqual('E3', str(cs.bass()))
 
 
-    def x_testChordStepFromFigure(self):
-        '''To make this work, will need some regex work.
-        See Alex's work @ https://github.com/cuthbertLab/music21/pull/383'''
-
+    def testChordStepFromFigure(self):
         xmlString = """
           <harmony>
             <root>
@@ -3058,7 +3110,7 @@ class Test(unittest.TestCase):
 
         self.runTestOnChord(xmlString, figure, pitches)
 
-    def x_testExpressSusUsingAlterations(self):
+    def testExpressSusUsingAlterations(self):
         ch1 = ChordSymbol('F7 add 4 subtract 3')
         ch2 = ChordSymbol('F7sus4')
 

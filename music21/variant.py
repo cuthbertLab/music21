@@ -681,7 +681,6 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
             returnObjMeasures = returnObj.getElementsByClass('Measure')
             if returnObjMeasures:  # If no parts, but still measures, iterate through them.
                 for j, returnObjMeasure in enumerate(returnObjMeasures):
-                    returnObjMeasure = returnObjMeasures[j]
                     sMeasure = s.getElementsByClass('Measure')[j]
                     _mergeVariants(returnObjMeasure, sMeasure,
                                    variantName=variantName, inPlace=True)

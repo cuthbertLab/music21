@@ -1623,7 +1623,7 @@ class PartParser(XMLParserBase):
                     # objects not yet existing in m21 such as Cabasa
                     warnings.warn(MusicXMLWarning(mpe))
                     i = instrument.UnpitchedPercussion()
-                    i.percMapPitch = int(_adjustMidiData(mxMidiUnpitched.text))
+                    i.percMapPitch = _adjustMidiData(mxMidiUnpitched.text)
             elif textStripValid(mxMidiProgram):
                 try:
                     i = instrument.instrumentFromMidiProgram(_adjustMidiData(mxMidiProgram.text))
