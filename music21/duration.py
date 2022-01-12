@@ -118,7 +118,7 @@ typeFromNumDict: Dict[float, str] = {
     256.0: '256th',
     512.0: '512th',
     1024.0: '1024th',
-    2048.0: '2048th',
+    2048.0: '2048th',  # if extended, update beam.beamableDurationTypes
     0.0: 'zero',
     0.5: 'breve',
     0.25: 'longa',

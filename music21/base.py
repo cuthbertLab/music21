@@ -385,7 +385,6 @@ class Music21Object(prebase.ProtoM21Object):
         # store cached values here:
         self._cache: Dict[str, Any] = {}
 
-
         if 'id' in keywords:
             self.id = keywords['id']
         else:
@@ -617,10 +616,10 @@ class Music21Object(prebase.ProtoM21Object):
         Returns True if there is a :class:`~music21.editorial.Editorial` object
         already associated with this object, False otherwise.
 
-        Calling .style on an object will always create a new
-        Style object, so even though a new Style object isn't too expensive
-        to create, this property helps to prevent creating new Styles more than
-        necessary.
+        Calling .editorial on an object will always create a new
+        Editorial object, so even though a new Editorial object isn't too expensive
+        to create, this property helps to prevent creating new Editorial objects
+        more than is necessary.
 
         >>> mObj = base.Music21Object()
         >>> mObj.hasEditorialInformation
@@ -701,9 +700,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n.style.absoluteX is None
         True
         '''
-        if self._style is None:
-            styleClass = self._styleClass
-            self._style = styleClass()
+        if not self.hasStyleInformation:
+            StyleClass = self._styleClass
+            self._style = StyleClass()
         return self._style
 
     @style.setter
