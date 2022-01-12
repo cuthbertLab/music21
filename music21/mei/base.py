@@ -1046,7 +1046,8 @@ def _keySigFromAttrs(elem: Element) -> Union[key.Key, key.KeySignature]:
         # noinspection PyTypeChecker
         mode = elem.get('key.mode', '')
         step = elem.get('key.pname')
-        assert step is not None, 'Key missing step'  # needed for type-checking
+        if step is None:
+            raise MeiValidityError('Key missing step')
         accidental = _accidentalFromAttr(elem.get('key.accid'))
         if accidental is None:
             tonic = step

@@ -1201,12 +1201,15 @@ def elementToMidiEventList(
         return None  # dynamics have already been applied to notes
     elif 'TimeSignature' in classes:
         # return a pair of events
+        el: 'music21.meter.TimeSignature'
         sub = timeSignatureToMidiEvents(el, includeDeltaTime=False)
     elif 'KeySignature' in classes:
+        el: 'music21.key.KeySignature'
         sub = keySignatureToMidiEvents(el, includeDeltaTime=False)
     elif 'TempoIndication' in classes:
         # any tempo indication will work
         # note: tempo indications need to be in channel one for most playback
+        el: 'music21.tempo.TempoIndication'
         sub = tempoToMidiEvents(el, includeDeltaTime=False)
     elif 'Instrument' in classes:
         # first instrument will have been gathered above with get start elements

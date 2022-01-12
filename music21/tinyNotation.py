@@ -267,6 +267,7 @@ class State:
     >>> ts.autoExpires
     2
     '''
+    # TODO in Python 3.8+: typing.Union[typing.Literal[False], int]
     autoExpires: typing.Union[bool, int] = False  # expires after N tokens or never.
 
     def __init__(self, parent=None, stateInfo=None):
