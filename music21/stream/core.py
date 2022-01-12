@@ -465,7 +465,7 @@ class StreamCoreMixin:
             self._cache['spannerBundle'] = spanner.SpannerBundle(list(spanners))
         return self._cache['spannerBundle']
 
-    def asTimespans(self, classList=None, flatten=True):
+    def asTimespans(self, *, flatten=True, classList=None):
         r'''
         Convert stream to a :class:`~music21.tree.trees.TimespanTree` instance, a
         highly optimized data structure for searching through elements and
@@ -514,7 +514,7 @@ class StreamCoreMixin:
         '''
         el.activeSite = self
 
-    def asTree(self, flatten=False, classList=None, useTimespans=False, groupOffsets=False):
+    def asTree(self, *, flatten=False, classList=None, useTimespans=False, groupOffsets=False):
         '''
         Returns an elementTree of the score, using exact positioning.
 

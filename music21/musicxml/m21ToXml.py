@@ -438,7 +438,7 @@ class GeneralObjectExporter:
                 {0.0} <music21.meter.TimeSignature 6/8>
                 {0.0} <music21.note.Note C>
                 {3.0} <music21.bar.Barline type=final>
-        >>> s.flat.notes[0].duration
+        >>> s[note.NotRest].first().duration
         <music21.duration.Duration 3.0>
         '''
         classes = obj.classes
@@ -1513,7 +1513,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.setMeterStream()
         self.setPartsAndRefStream()
         # get all text boxes
-        self.textBoxes = self.stream.flat.getElementsByClass('TextBox')
+        self.textBoxes = self.stream['TextBox']
 
         # we need independent sub-stream elements to shift in presentation
         self.highestTime = 0.0  # redundant, but set here.
@@ -1592,8 +1592,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         #                meterStream, meterStream[0]])
         if not meterStream:
             # note: this will return a default if no meters are found
-            meterStream = s.flat.getTimeSignatures(searchContext=False,
-                                                   sortByCreationTime=True, returnDefault=True)
+            meterStream = s.flatten().getTimeSignatures(searchContext=False,
+                                                        sortByCreationTime=True, returnDefault=True)
         self.meterStream = meterStream
 
     def setScoreLayouts(self):
@@ -2681,14 +2681,14 @@ class PartExporter(XMLExporterBase):
         # might need to getAll b/c might need spanners
         # from a higher level container
         # allContexts = []
-        # spannerContext = measureStream.flat.getContextByClass('Spanner')
+        # spannerContext = measureStream.flatten().getContextByClass('Spanner')
         # while spannerContext:
         #    allContexts.append(spannerContext)
         #    spannerContext = spannerContext.getContextByClass('Spanner')
         #
         # spannerBundle = spanner.SpannerBundle(allContexts)
         # only getting spanners at this level
-        # spannerBundle = spanner.SpannerBundle(measureStream.flat)
+        # spannerBundle = spanner.SpannerBundle(measureStream.flatten())
         self.spannerBundle = part.spannerBundle
 
     def fixupNotationMeasured(self):
@@ -2795,7 +2795,7 @@ class PartExporter(XMLExporterBase):
             if type(inst) in seen_instrument_classes:
                 continue
             # TODO: midi-device
-            if inst.midiProgram is not None:
+            if inst.midiProgram is not None or isinstance(inst, instrument.UnpitchedPercussion):
                 mxScorePart.append(self.instrumentToXmlMidiInstrument(inst))
                 seen_instrument_classes.add(type(inst))
 
@@ -2855,6 +2855,20 @@ class PartExporter(XMLExporterBase):
           <midi-channel>5</midi-channel>
           <midi-program>72</midi-program>
         </midi-instrument>
+
+        >>> m = instrument.Maracas()
+        >>> m.instrumentId = 'my maracas'
+        >>> m.midiChannel  # 0-indexed
+        9
+        >>> m.percMapPitch
+        70
+        >>> PEX = musicxml.m21ToXml.PartExporter()
+        >>> mxMidiInstrument = PEX.instrumentToXmlMidiInstrument(m)
+        >>> PEX.dump(mxMidiInstrument)  # 1-indexed in MusicXML
+        <midi-instrument id="my maracas">
+          <midi-channel>10</midi-channel>
+          <midi-unpitched>71</midi-unpitched>
+        </midi-instrument>
         '''
         mxMidiInstrument = Element('midi-instrument')
         mxMidiInstrument.set('id', str(i.instrumentId))
@@ -2865,9 +2879,12 @@ class PartExporter(XMLExporterBase):
         mxMidiChannel.text = str(i.midiChannel + 1)
         # TODO: midi-name
         # TODO: midi-bank
-        mxMidiProgram = SubElement(mxMidiInstrument, 'midi-program')
-        mxMidiProgram.text = str(i.midiProgram + 1)
-        # TODO: midi-unpitched
+        if i.midiProgram is not None:
+            mxMidiProgram = SubElement(mxMidiInstrument, 'midi-program')
+            mxMidiProgram.text = str(i.midiProgram + 1)
+        if isinstance(i, instrument.UnpitchedPercussion) and i.percMapPitch is not None:
+            mxMidiUnpitched = SubElement(mxMidiInstrument, 'midi-unpitched')
+            mxMidiUnpitched.text = str(i.percMapPitch + 1)
         # TODO: volume
         # TODO: pan
         # TODO: elevation
@@ -3508,8 +3525,8 @@ class MeasureExporter(XMLExporterBase):
             chordOrN = n
         else:
             chordOrN = chordParent
-            # Ensure color is read from `n`, since only `chordOrN` is handled below
-            self.setColor(mxNote, n)
+            # Ensure style is read from `n` before reading from `chordOrN`
+            self.setPrintStyle(mxNote, n)  # sets color
 
         # self.setFont(mxNote, chordOrN)
         self.setPrintStyle(mxNote, chordOrN)  # sets color
@@ -3912,17 +3929,18 @@ class MeasureExporter(XMLExporterBase):
         </note>
 
 
-        Test that notehead translation works:
+        Test that notehead and style translation works:
 
         >>> g = pitch.Pitch('g3')
         >>> h = note.Note('b4')
         >>> h.notehead = 'diamond'
         >>> h.style.color = 'gold'
+        >>> h.style.absoluteX = 176
         >>> ch2 = chord.Chord([g, h])
         >>> ch2.quarterLength = 2.0
         >>> mxNoteList = MEX.chordToXml(ch2)
         >>> MEX.dump(mxNoteList[1])
-        <note color="#FFD700">
+        <note color="#FFD700" default-x="176">
           <chord />
           <pitch>
             <step>B</step>
@@ -6629,8 +6647,7 @@ class Test(unittest.TestCase):
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         fp = xmlDir / '61l-Lyrics-Elisions-Syllables.xml'
         s = converter.parse(fp)
-        notes = list(s.flat.notes)
-        n1 = notes[0]
+        n1 = s[note.NotRest].first()
         xmlOut = self.getXml(n1)
         self.assertIn('<lyric name="1" number="1">', xmlOut)
         self.assertIn('<syllabic>begin</syllabic>', xmlOut)
@@ -6882,7 +6899,7 @@ class Test(unittest.TestCase):
     def testFullMeasureRest(self):
         from music21 import converter
         s = converter.parse('tinynotation: 9/8 r1')
-        r = s.flat.notesAndRests.first()
+        r = s[note.Rest].first()
         r.quarterLength = 4.5
         self.assertEqual(r.fullMeasure, 'auto')
         tree = self.getET(s)
@@ -6947,7 +6964,7 @@ class TestExternal(unittest.TestCase):
         #    format='musicxml', forceSource=True)
         b = corpus.parse('cpebach')
         # b.show('text')
-        # n = b.flat.notes[0]
+        # n = b[note.NotRest].first()
         # print(n.expressions)
         # return
 

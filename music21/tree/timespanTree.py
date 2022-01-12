@@ -145,13 +145,13 @@ class TimespanTree(trees.OffsetTree):
     @staticmethod
     def _insertCorePayloadSortKey(x):
         return x.endTime
-#             if hasattr(x, 'element'):
-#                 return x.element.sortTuple()[2:]
-#             elif isinstance(x, TimespanTree) and x.source is not None:
-#                 environLocal.printDebug("Timespan tree added to Tree...nope...")
-#                 return x.source.sortTuple()[2:]
-#             else:
-#                 return x.endTime  # PitchedTimespan with no Element!
+        # if hasattr(x, 'element'):
+        #     return x.element.sortTuple()[2:]
+        # elif isinstance(x, TimespanTree) and x.source is not None:
+        #     environLocal.printDebug("Timespan tree added to Tree...nope...")
+        #     return x.source.sortTuple()[2:]
+        # else:
+        #     return x.endTime  # PitchedTimespan with no Element!
 
     # PUBLIC METHODS #
 
@@ -201,9 +201,13 @@ class TimespanTree(trees.OffsetTree):
         index = node.payload.index(span) + node.payloadElementsStartIndex
         return index
 
+    @property
     def offset(self):
         '''
         this is just for mimicking elements as streams.
+
+        Changed in v7 -- this was always meant to be a property, but was
+        incorrectly a method earlier.
         '''
         return self.lowestPosition()
 
@@ -617,7 +621,8 @@ class TimespanTree(trees.OffsetTree):
         and each key is a TimeSpan tree containing only element timespans belonging
         to that part.
 
-        Used by reduceChords.  May disappear.
+        Used by reduceChords.  May disappear at any time without a deprecation
+        notice.
         '''
         partwiseTimespanTrees = {}
         for part in self.allParts():

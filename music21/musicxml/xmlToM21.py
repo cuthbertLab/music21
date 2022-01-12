@@ -48,6 +48,7 @@ from music21 import interval  # for transposing instruments
 from music21 import key
 from music21 import layout
 from music21 import metadata
+from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 from music21 import note
 from music21 import meter
 from music21 import percussion
@@ -1605,7 +1606,6 @@ class PartParser(XMLParserBase):
         # TODO: midi-device
         # TODO: midi-name
         # TODO: midi-bank transform=_adjustMidiData
-        # TODO: midi-unpitched
         # TODO: midi-volume
         # TODO: pan
         # TODO: elevation
@@ -1614,7 +1614,17 @@ class PartParser(XMLParserBase):
         i: Optional[instrument.Instrument] = None
         if mxMIDIInstrument is not None:
             mxMidiProgram = mxMIDIInstrument.find('midi-program')
-            if textStripValid(mxMidiProgram):
+            mxMidiUnpitched = mxMIDIInstrument.find('midi-unpitched')
+            if textStripValid(mxMidiUnpitched):
+                pm = PercussionMapper()
+                try:
+                    i = pm.midiPitchToInstrument(_adjustMidiData(mxMidiUnpitched.text))
+                except MIDIPercussionException as mpe:
+                    # objects not yet existing in m21 such as Cabasa
+                    warnings.warn(MusicXMLWarning(mpe))
+                    i = instrument.UnpitchedPercussion()
+                    i.percMapPitch = _adjustMidiData(mxMidiUnpitched.text)
+            elif textStripValid(mxMidiProgram):
                 try:
                     i = instrument.instrumentFromMidiProgram(_adjustMidiData(mxMidiProgram.text))
                 except instrument.InstrumentException as ie:
@@ -1710,6 +1720,7 @@ class PartParser(XMLParserBase):
             'GeneralNote',
             'KeySignature',
             'StaffLayout',
+            'TempoIndication',
             'TimeSignature',
         ]
 
@@ -6173,6 +6184,13 @@ class Test(unittest.TestCase):
         # s = converter.parse(testPrimitive.articulations01)
         # s.show()
 
+    def testImportMetronomeMarksC(self):
+        '''Import tempo into only the first PartStaff'''
+        from music21 import corpus
+        s = corpus.parse('demos/two-parts')
+        self.assertEqual(len(s.parts.first()[tempo.MetronomeMark]), 1)
+        self.assertEqual(len(s.parts.last()[tempo.MetronomeMark]), 0)
+
     def testImportGraceNotesA(self):
         # test importing from musicxml
         from music21.musicxml import testPrimitive
@@ -7129,6 +7147,39 @@ class Test(unittest.TestCase):
         MP.xmlToDuration(mxNoteNoType, inputM21=d)
         self.assertEqual(len(d.tuplets), 0)
         self.assertEqual(d.linked, True)
+
+    def testImportUnpitchedPercussion(self):
+        from xml.etree.ElementTree import fromstring as EL
+        scorePart = '''
+        <score-part id="P4"><part-name>Tambourine</part-name>
+        <part-abbreviation>Tamb.</part-abbreviation>
+        <score-instrument id="P4-I55">
+            <instrument-name>Tambourine</instrument-name>
+        </score-instrument>
+        <midi-instrument id="P4-I55">
+           <midi-channel>10</midi-channel>
+           <midi-unpitched>55</midi-unpitched>
+        </midi-instrument>
+        </score-part>
+        '''
+
+        PP = PartParser()
+        mxScorePart = EL(scorePart)
+        tmb = PP.getDefaultInstrument(mxScorePart)
+        self.assertIsInstance(tmb, instrument.Tambourine)
+        self.assertEqual(tmb.percMapPitch, 54)  # 1-indexed
+
+        # An instrument music21 doesn't have yet (Cabasa):
+        scorePart = scorePart.replace('Tambourine', 'Cabasa')
+        scorePart = scorePart.replace('Tamb.', 'Cab.')
+        scorePart = scorePart.replace('55', '70')  # 1-indexed
+        PP = PartParser()
+        mxScorePart = EL(scorePart)
+        msg = '69 does not map to a valid instrument!'
+        with self.assertWarnsRegex(MusicXMLWarning, msg):
+            unp = PP.getDefaultInstrument(mxScorePart)
+        self.assertIsInstance(unp, instrument.UnpitchedPercussion)
+        self.assertEqual(unp.percMapPitch, 69)
 
 
 if __name__ == '__main__':

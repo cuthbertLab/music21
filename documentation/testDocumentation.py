@@ -22,12 +22,12 @@ from typing import Union
 
 from collections import namedtuple
 # noinspection PyPackageRequirements
-from docutils.core import publish_doctree
+from docutils.core import publish_doctree  # pylint: disable=import-error
+
+import nbvalNotebook
 
 from music21.exceptions21 import Music21Exception
 from music21.test import testRunner
-
-import nbvalNotebook
 
 
 ModTuple = namedtuple('ModTuple', 'module fullModulePath moduleNoExtension autoGen')
