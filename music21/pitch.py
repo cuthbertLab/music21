@@ -5435,7 +5435,8 @@ class Test(unittest.TestCase):
 
         n = note.Note('Cn')
         n.pitch.accidental.displayStatus = True
-        n.pitch.updateAccidentalDisplay(overrideStatus=True, alteredPitches=key.Key('C').alteredPitches)
+        k = key.Key('C')
+        n.pitch.updateAccidentalDisplay(overrideStatus=True, alteredPitches=k.alteredPitches)
         self.assertIs(n.pitch.accidental.displayStatus, False)
 
     def testImplicitToExplicitNatural(self):
