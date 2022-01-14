@@ -4679,7 +4679,7 @@ class Pitch(prebase.ProtoM21Object):
             # is not in the alteredPitches list, or for naturals: if the
             # step is IN the altered pitches
             if (self.accidental is not None
-                    and self.accidental.displayStatus in (False, None)):
+                    and (overrideStatus or self.accidental.displayStatus in (False, None))):
                 if self.accidental.name == 'natural':
                     self.accidental.displayStatus = self._stepInKeySignature(alteredPitches)
                 else:
@@ -5428,6 +5428,16 @@ class Test(unittest.TestCase):
         self.assertIsNotNone(notes[6].pitch.accidental)  # En5
         self.assertEqual(notes[6].pitch.accidental.name, 'natural')
         self.assertEqual(notes[6].pitch.accidental.displayStatus, True)
+
+    def testOverrideDisplayStatus(self):
+        from music21 import key
+        from music21 import note
+
+        n = note.Note('Cn')
+        n.pitch.accidental.displayStatus = True
+        k = key.Key('C')
+        n.pitch.updateAccidentalDisplay(overrideStatus=True, alteredPitches=k.alteredPitches)
+        self.assertIs(n.pitch.accidental.displayStatus, False)
 
     def testImplicitToExplicitNatural(self):
         from music21 import converter
