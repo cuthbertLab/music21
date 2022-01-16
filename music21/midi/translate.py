@@ -16,7 +16,7 @@ notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here
 import unittest
 import math
 import copy
-from typing import Callable, Optional, List, Tuple, Dict, Union, Any
+from typing import Optional, List, Tuple, Dict, Union, Any
 import warnings
 
 from music21 import chord
@@ -276,7 +276,7 @@ def _constructOrUpdateNotRest(
     ticksPerQuarter: int,
     *,
     inputM21: Optional[note.NotRest] = None,
-    preferredClass: Optional[Callable] = note.Note,
+    preferredClass: type = note.Note,
 ) -> note.NotRest:
     '''
     Construct (or edit the duration of) a NotRest subclass, usually
@@ -286,7 +286,7 @@ def _constructOrUpdateNotRest(
     is constructed instead. Raises TypeError if an incompatible object is provided
     for `inputM21`, e.g. a `chord.Chord` when a `percussion.PercussionChord` is needed.
     '''
-    if not isinstance(preferredClass(), note.NotRest):
+    if not issubclass(preferredClass, note.NotRest):
         raise TypeError(f'Expected subclass of note.NotRest; got {preferredClass}')
 
     if eOn.channel == 10:
@@ -294,10 +294,6 @@ def _constructOrUpdateNotRest(
             preferredClass = percussion.PercussionChord
         else:
             preferredClass = note.Unpitched
-
-    if inputM21 is not None:
-        if not isinstance(inputM21, preferredClass):
-            raise TypeError(f'Provided object {inputM21} must be an instance of {preferredClass}')
 
     if (tOff - tOn) != 0:
         if inputM21 is None:
