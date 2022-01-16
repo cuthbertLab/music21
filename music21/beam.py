@@ -72,10 +72,8 @@ To get rid of beams on a note do:
 
 >>> n2.beams.beamsList = []
 '''
-from typing import List, Union
+from typing import List, Optional, Union
 import unittest
-
-from typing import List, Optional
 
 from music21 import exceptions21
 from music21 import duration
