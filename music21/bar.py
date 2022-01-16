@@ -293,7 +293,8 @@ class Repeat(repeat.RepeatMark, Barline):
 
         TODO: show how changing direction changes type.
         '''
-        assert self._direction is not None, '_direction unexpectedly None after initialization'
+        if self._direction is None:
+            raise BarException('_direction unexpectedly None after initialization')
         return self._direction
 
     @direction.setter
