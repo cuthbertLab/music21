@@ -344,7 +344,11 @@ class PartStaffExporterMixin:
                     target.insert(originalIdx + insertionCounter, element)
                     insertionCounter += 1
 
-    def processSubsequentPartStaff(self, target: Element, source: Element, staffNum: int) -> Dict:
+    def processSubsequentPartStaff(self,
+                                   target: Element,
+                                   source: Element,
+                                   staffNum: int
+                                   ) -> Dict[int, List[Element]]:
         '''
         Move elements from subsequent PartStaff's measures into `target`: the <part>
         element representing the initial PartStaff that will soon represent the merged whole.
@@ -357,9 +361,12 @@ class PartStaffExporterMixin:
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
 
+        def makeDivider(sourceNumber: int) -> Element:
+            return Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
+
         sourceMeasures = iter(source.findall('measure'))
         sourceMeasure = None  # Set back to None when disposed of
-        insertions = {}
+        insertions: Dict[int, List[Element]] = {}
 
         # Walk through <measures> of the target <part>, compare measure numbers
         for i, targetMeasure in enumerate(target):
@@ -388,11 +395,9 @@ class PartStaffExporterMixin:
 
             # Or, gap in measure numbers in target: record necessary insertions until gap is closed
             while helpers.measureNumberComesBefore(sourceNumber, targetNumber):
-                divider: Element = Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
-                try:
-                    insertions[i] += [divider, sourceMeasure]
-                except KeyError:
-                    insertions[i] = [divider, sourceMeasure]
+                if i not in insertions:
+                    insertions[i] = []
+                insertions[i] += [makeDivider(sourceNumber), sourceMeasure]
                 try:
                     sourceMeasure = next(sourceMeasures)
                 except StopIteration:
@@ -407,11 +412,10 @@ class PartStaffExporterMixin:
             remainingMeasures.insert(0, sourceMeasure)
         for remaining in remainingMeasures:
             sourceNumber = remaining.get('number')
-            divider: Element = Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
-            try:
-                insertions[len(target)] += [divider, remaining]
-            except KeyError:
-                insertions[len(target)] = [divider, remaining]
+            idx = len(target)
+            if idx not in insertions:
+                insertions[idx] = []
+            insertions[idx] += [makeDivider(sourceNumber), remaining]
         return insertions
 
     def setEarliestAttributesAndClefsPartStaff(self, group: StaffGroup):
@@ -667,17 +671,17 @@ class PartStaffExporterMixin:
         maxVoices: int = 0
         otherMeasureLackedVoice: bool = False
 
-        for voice in otherMeasure.findall('*/voice'):
-            maxVoices = max(maxVoices, int(voice.text))
+        for other_voice in otherMeasure.findall('*/voice'):
+            maxVoices = max(maxVoices, int(other_voice.text))
 
         if maxVoices == 0:
             otherMeasureLackedVoice = True
             for elem in otherMeasure.findall('note'):
-                voice = Element('voice')
-                voice.text = '1'
+                new_voice = Element('voice')
+                new_voice.text = '1'
                 helpers.insertBeforeElements(
                     elem,
-                    voice,
+                    new_voice,
                     tagList=[
                         'type', 'dot', 'accidental', 'time-modification',
                         'stem', 'notehead', 'notehead-text', 'staff',

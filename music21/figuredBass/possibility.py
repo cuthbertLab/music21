@@ -68,6 +68,7 @@ The application of these methods is controlled by corresponding instance variabl
 .. note:: The number of parts and maxPitch are universal for a
     :class:`~music21.figuredBass.realizer.FiguredBassLine`.
 '''
+from typing import Dict, Tuple
 import unittest
 
 from music21 import chord
@@ -275,10 +276,11 @@ def limitPartToPitch(possibA, partPitchLimits=None):
 # CONSECUTIVE POSSIBILITY RULE-CHECKING METHODS
 # ---------------------------------------------
 # Speedup tables
-parallelFifthsTable = {}
-parallelOctavesTable = {}
-hiddenFifthsTable = {}
-hiddenOctavesTable = {}
+PITCH_QUARTET_TO_BOOL_TYPE = Dict[Tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch], bool]
+parallelFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+parallelOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+hiddenFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+hiddenOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
 
 
 def parallelFifths(possibA, possibB):

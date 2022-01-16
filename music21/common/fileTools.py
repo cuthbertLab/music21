@@ -113,7 +113,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
             data = thisFile.read()
             return data
     except UnicodeDecodeError:
-        import chardet
+        import chardet  # type: ignore
         with io.open(filePath, 'rb') as thisFileBinary:
             dataBinary = thisFileBinary.read()
             encoding = chardet.detect(dataBinary)['encoding']

@@ -123,12 +123,11 @@ class RnWriter(prebase.ProtoM21Object):
 
         self.composer = 'Composer unknown'
         self.title = 'Title unknown'
+        self.combinedList: List[str] = []
 
-        if obj.isStream:
-
+        if isinstance(obj, stream.Stream):
             if isinstance(obj, stream.Opus):
                 constituentElements = [RnWriter(x) for x in obj]
-                self.combinedList = []
                 for scoreOrSim in constituentElements:
                     for x in scoreOrSim.combinedList:
                         self.combinedList.append(x)
@@ -187,7 +186,7 @@ class RnWriter(prebase.ProtoM21Object):
         self.container.insert(0, m)
 
     def prepTitle(self,
-                  md: metadata):
+                  md: metadata.Metadata):
         '''
         Attempt to prepare a single work title from the score metadata looking at each of
         the title, movementNumber and movementName attributes.

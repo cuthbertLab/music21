@@ -118,7 +118,7 @@ typeFromNumDict: Dict[float, str] = {
     256.0: '256th',
     512.0: '512th',
     1024.0: '1024th',
-    2048.0: '2048th',
+    2048.0: '2048th',  # if extended, update beam.beamableDurationTypes
     0.0: 'zero',
     0.5: 'breve',
     0.25: 'longa',
@@ -1111,7 +1111,7 @@ class Tuplet(prebase.ProtoM21Object):
 
     # MAGIC METHODS #
 
-    def __eq__(self, other: 'Tuplet') -> bool:
+    def __eq__(self, other) -> bool:
         '''
         Two Tuplets are equal if their numbers are equal and durations are equal.
 
@@ -1130,7 +1130,7 @@ class Tuplet(prebase.ProtoM21Object):
         False
         '''
         if not isinstance(other, Tuplet):
-            return False
+            return NotImplemented
         for attr in ('numberNotesActual', 'numberNotesNormal',
                      'durationActual', 'durationNormal'):
             myAttr = getattr(self, attr, None)
@@ -2190,6 +2190,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self._updateComponents()
 
         # create grace duration
+        gd: GraceDuration
         if appoggiatura is True:
             gd = AppoggiaturaDuration()
         else:

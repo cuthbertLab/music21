@@ -20,7 +20,7 @@ import unittest
 import warnings
 
 from math import isclose
-from typing import List, Optional, Dict, Tuple, Set, Union
+from typing import cast, List, Optional, Dict, Tuple, Set, Union
 
 import xml.etree.ElementTree as ET
 
@@ -1623,7 +1623,7 @@ class PartParser(XMLParserBase):
                     # objects not yet existing in m21 such as Cabasa
                     warnings.warn(MusicXMLWarning(mpe))
                     i = instrument.UnpitchedPercussion()
-                    i.percMapPitch = int(_adjustMidiData(mxMidiUnpitched.text))
+                    i.percMapPitch = _adjustMidiData(mxMidiUnpitched.text)
             elif textStripValid(mxMidiProgram):
                 try:
                     i = instrument.instrumentFromMidiProgram(_adjustMidiData(mxMidiProgram.text))
@@ -2616,7 +2616,7 @@ class MeasureParser(XMLParserBase):
         isRest = False
         # TODO: Unpitched
 
-        offsetIncrement = 0.0
+        offsetIncrement: Union[float, fractions.Fraction] = 0.0
 
         if mxNote.find('rest') is not None:  # it is a Rest
             isRest = True
@@ -2682,7 +2682,7 @@ class MeasureParser(XMLParserBase):
         self.offsetMeasureNote += offsetIncrement
         self.endedWithForwardTag = None
 
-    def xmlToChord(self, mxNoteList: List[ET.Element]) -> chord.Chord:
+    def xmlToChord(self, mxNoteList: List[ET.Element]) -> chord.ChordBase:
         # noinspection PyShadowingNames
         '''
         Given an a list of mxNotes, fill the necessary parameters
@@ -2726,6 +2726,7 @@ class MeasureParser(XMLParserBase):
         for mxNote in mxNoteList:
             notes.append(self.xmlToSimpleNote(mxNote, freeSpanners=False))
 
+        c: chord.ChordBase
         if any(mxNote.find('unpitched') for mxNote in mxNoteList):
             c = percussion.PercussionChord(notes)
         else:
@@ -2833,16 +2834,14 @@ class MeasureParser(XMLParserBase):
 
         mxStem = mxNote.find('stem')
         if mxStem is not None:
-            try:
-                n.stemDirection = mxStem.text.strip()
-            except AttributeError:
-                pass
+            n.stemDirection = mxStem.text.strip()
 
             if mxStem.attrib:
                 stemStyle = style.Style()
                 self.setColor(mxStem, stemStyle)
                 self.setPosition(mxStem, stemStyle)
-                n.style.stemStyle = stemStyle
+                this_note_style = cast(style.NoteStyle, n.style)
+                this_note_style.stemStyle = stemStyle
 
         # gets the notehead object from the mxNote and sets value of the music21 note
         # to the value of the notehead object

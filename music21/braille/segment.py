@@ -479,6 +479,16 @@ class BrailleSegment(text.BrailleText):
 
         return self.brailleText
 
+    def _cleanupAttributes(self, noteGrouping):
+        '''
+        Removes temporary attributes from Music21Objects set during transcription.
+        Run this only AFTER any possible re-transcription in extractNoteGrouping().
+        '''
+        for el in noteGrouping:
+            for kw in basic.TEMPORARY_ATTRIBUTES:
+                if hasattr(el, kw):
+                    delattr(el, kw)
+
     def addDummyRests(self):
         '''
         Adds as many dummy rests as self.dummyRestLength to the signatures of
@@ -821,6 +831,7 @@ class BrailleSegment(text.BrailleText):
                 self.addToNewLine(brailleNoteGrouping)
 
         self.addRepeatSymbols(noteGrouping.numRepeats)
+        self._cleanupAttributes(noteGrouping)
 
     def addRepeatSymbols(self, repeatTimes):
         '''
@@ -1321,9 +1332,12 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                     noteGrouping.showClefSigns = inaccords.showClefSigns
                     noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
                     voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
+                    self._cleanupAttributes(noteGrouping)
                 brailleStr = symbols['full_inaccord'].join(voice_trans)
             elif rightOrLeftKey is not None:
-                brailleStr = ngMod.transcribeNoteGrouping(self._groupingDict.get(rightOrLeftKey))
+                noteGrouping = self._groupingDict.get(rightOrLeftKey)
+                brailleStr = ngMod.transcribeNoteGrouping(noteGrouping)
+                self._cleanupAttributes(noteGrouping)
             else:
                 brailleStr = ''
 

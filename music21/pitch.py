@@ -454,19 +454,14 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
 
     if triadAward:
         # score_triad = number of thirds per pitch (avoid double-base-thirds)
-        triad_bases = []
         for p1, p2 in itertools.combinations(pitches, 2):
             this_interval = interval.Interval(noteStart=p1, noteEnd=p2)
-            generic_interval_value = abs(this_interval.generic.value) % 8
+            simple_directed = this_interval.generic.simpleDirected
             interval_semitones = this_interval.chromatic.semitones % 12
-            if generic_interval_value == 3 and interval_semitones in (3, 4):
-                triad_steps = (p1.step, p2.step)
-                if triad_steps not in triad_bases:
-                    score_triad -= 1.0
-            elif generic_interval_value == 6 and interval_semitones in (8, 9):
-                triad_steps = (p2.step, p1.step)
-                if triad_steps not in triad_bases:
-                    score_triad -= 1.0
+            if simple_directed == 3 and interval_semitones in (3, 4):
+                score_triad -= 1.0
+            elif simple_directed == 6 and interval_semitones in (8, 9):
+                score_triad -= 1.0
         score_triad /= len(pitches)
 
     return (score_accidentals + score_ratio + score_triad) / int(smallPythagoreanRatio
@@ -540,6 +535,12 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
     ...                                    pitch.Pitch('A--3')],
     ...                                    keyContext=key.Key('C'))
     [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>]
+
+    Changed in v7.3 -- fixed a bug with compound intervals (such as formed against
+    the tonic of a KeySignature defaulting to octave 4):
+
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('B5')], keyContext=key.Key('D'))
+    [<music21.pitch.Pitch B5>]
     '''
 
     oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
@@ -4658,6 +4659,10 @@ class Pitch(prebase.ProtoM21Object):
             elif self.accidental.displayStatus in (True, False):
                 return  # exit: already set, do not override
 
+        if self.accidental is not None and self.accidental.displayType == 'never':
+            self.accidental.displayStatus = False
+            return
+
         if lastNoteWasTied is True:
             if self.accidental is not None:
                 if self.accidental.displayType != 'even-tied':
@@ -4674,7 +4679,7 @@ class Pitch(prebase.ProtoM21Object):
             # is not in the alteredPitches list, or for naturals: if the
             # step is IN the altered pitches
             if (self.accidental is not None
-                    and self.accidental.displayStatus in (False, None)):
+                    and (overrideStatus or self.accidental.displayStatus in (False, None))):
                 if self.accidental.name == 'natural':
                     self.accidental.displayStatus = self._stepInKeySignature(alteredPitches)
                 else:
@@ -4708,7 +4713,7 @@ class Pitch(prebase.ProtoM21Object):
                     return
                 else:  # names are the same, skip this line of questioning
                     break
-        # nope, no previous pitches in this octave and register, now more complex things...
+        # nope, no conflicting accidentals at this name and octave in past...
 
         # here tied and always are treated the same; we assume that
         # making ties sets the displayStatus, and thus we would not be
@@ -4874,6 +4879,7 @@ class Pitch(prebase.ProtoM21Object):
             # if A# to A, or A- to A, but not A# to A#
             # we use step and octave though not necessarily a ps comparison
             elif (pPast.accidental is not None
+                  and pPast.name != pSelf.name
                   and pPast.accidental.name != 'natural'
                   and (pSelf.accidental is None
                        or pSelf.accidental.displayStatus is False)):
@@ -5424,6 +5430,16 @@ class Test(unittest.TestCase):
         self.assertEqual(notes[6].pitch.accidental.name, 'natural')
         self.assertEqual(notes[6].pitch.accidental.displayStatus, True)
 
+    def testOverrideDisplayStatus(self):
+        from music21 import key
+        from music21 import note
+
+        n = note.Note('Cn')
+        n.pitch.accidental.displayStatus = True
+        k = key.Key('C')
+        n.pitch.updateAccidentalDisplay(overrideStatus=True, alteredPitches=k.alteredPitches)
+        self.assertIs(n.pitch.accidental.displayStatus, False)
+
     def testImplicitToExplicitNatural(self):
         from music21 import converter
         from music21 import key
@@ -5453,6 +5469,17 @@ class Test(unittest.TestCase):
         p['Measure'].first().insert(0, key.Key('C-'))
         p.makeAccidentals(inPlace=True)
         self.assertIs(last_note.pitch.accidental.displayStatus, True)
+
+    def testInterveningNoteBetweenIdenticalChromaticPitches(self):
+        from music21 import converter
+        from music21 import key
+
+        p = converter.parse('tinyNotation: f#4 e f#')
+        p.measure(1).insert(0, key.Key('G'))
+        p.recurse().notes.last().pitch.accidental.displayStatus = False
+        p.makeAccidentals(inPlace=True, overrideStatus=True)
+        self.assertIs(p.measure(1).notes.first().pitch.accidental.displayStatus, False)
+        self.assertIs(p.measure(1).notes.last().pitch.accidental.displayStatus, False)
 
     def testPitchEquality(self):
         '''

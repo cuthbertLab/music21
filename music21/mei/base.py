@@ -364,13 +364,19 @@ def safePitch(
     <music21.pitch.Pitch D#6>
     >>> safePitch('D', '#', '6')
     <music21.pitch.Pitch D#6>
+    >>> safePitch('D', '#')
+    <music21.pitch.Pitch D#>
     '''
     if not name:
         return pitch.Pitch()
-    elif accidental is None:
-        return pitch.Pitch(name + octave)
+    if octave and accidental is not None:
+        return pitch.Pitch(name, octave=int(octave), accidental=accidental)
+    if octave:
+        return pitch.Pitch(name, octave=int(octave))
+    if accidental is not None:
+        return pitch.Pitch(name, accidental=accidental)
     else:
-        return pitch.Pitch(name, accidental=accidental, octave=int(octave))
+        return pitch.Pitch(name)
 
 
 def makeDuration(
@@ -1040,6 +1046,8 @@ def _keySigFromAttrs(elem: Element) -> Union[key.Key, key.KeySignature]:
         # noinspection PyTypeChecker
         mode = elem.get('key.mode', '')
         step = elem.get('key.pname')
+        if step is None:  # pragma: no cover
+            raise MeiValidityError('Key missing step')
         accidental = _accidentalFromAttr(elem.get('key.accid'))
         if accidental is None:
             tonic = step

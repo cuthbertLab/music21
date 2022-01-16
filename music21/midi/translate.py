@@ -23,6 +23,8 @@ from music21 import chord
 from music21 import common
 from music21 import defaults
 from music21 import duration
+from music21 import key
+from music21 import note
 from music21 import exceptions21
 from music21 import environment
 from music21 import instrument
@@ -1043,7 +1045,6 @@ def midiEventsToKey(eventList) -> 'music21.key.Key':
     # the key specifies the number of sharps and a negative value specifies
     # the number of flats. A value of 0 for the scale specifies a major key
     # and a value of 1 specifies a minor key.
-    from music21 import key
     from music21 import midi as midiModule
 
     if not common.isListLike(eventList):
@@ -1103,7 +1104,7 @@ def keySignatureToMidiEvents(ks: 'music21.key.KeySignature', includeDeltaTime=Tr
         # add to track events
         eventList.append(dt)
     sharpCount = ks.sharps
-    if hasattr(ks, 'mode') and ks.mode == 'minor':
+    if isinstance(ks, key.Key) and ks.mode == 'minor':
         mode = 1
     else:  # major or None; must define one
         mode = 0
@@ -1288,7 +1289,7 @@ def elementToMidiEventList(
     '''
     classes = el.classes
     if 'Rest' in classes:
-        return
+        return None
     elif 'Note' in classes:
         # get a list of midi events
         # using this property here is easier than using the above conversion
@@ -1299,7 +1300,7 @@ def elementToMidiEventList(
         # TODO: skip Harmony unless showAsChord
         sub = chordToMidiEvents(el, includeDeltaTime=False)
     elif 'Dynamic' in classes:
-        return  # dynamics have already been applied to notes
+        return None  # dynamics have already been applied to notes
     elif 'TimeSignature' in classes:
         # return a pair of events
         el: 'music21.meter.TimeSignature'
@@ -1317,7 +1318,7 @@ def elementToMidiEventList(
         sub = instrumentToMidiEvents(el, includeDeltaTime=False)
     else:
         # other objects may have already been added
-        return
+        return None
 
     return sub
 
@@ -1491,8 +1492,8 @@ def assignPacketsToChannels(
 
         # iterate through all past events/channels, and find all
         # that are active and have a pitch bend
-        for key in uniqueChannelEvents:
-            start, stop, usedChannel = key
+        for key_tuple in uniqueChannelEvents:
+            start, stop, usedChannel = key_tuple
             # if offset (start time) is in this range of a found event
             # or if any start or stop is within this span
             # if o >= start and o < stop:  # found an offset that is used
@@ -1503,7 +1504,7 @@ def assignPacketsToChannels(
                     or (start < oEnd < stop)):
                 # if there is a cent shift active in the already used channel
                 # environLocal.printDebug(['matchedOffset overlap'])
-                centShiftList = uniqueChannelEvents[key]
+                centShiftList = uniqueChannelEvents[key_tuple]
                 if centShiftList:
                     # only add if unique
                     if usedChannel not in channelExclude:
@@ -1572,14 +1573,14 @@ def assignPacketsToChannels(
             # removal of pitch bend will happen above with note off
 
         # key includes channel, so that durations can span once in each channel
-        key = (p['offset'], p['offset'] + p['duration'], ch)
-        if key not in uniqueChannelEvents:
+        key_tuple = (p['offset'], p['offset'] + p['duration'], ch)
+        if key_tuple not in uniqueChannelEvents:
             # need to count multiple instances of events on the same
             # span and in the same channel (fine if all have the same pitch bend
-            uniqueChannelEvents[key] = []
+            uniqueChannelEvents[key_tuple] = []
         # always add the cent shift if it is not None
         if centShift:
-            uniqueChannelEvents[key].append(centShift)
+            uniqueChannelEvents[key_tuple].append(centShift)
         post.append(p)  # add packet/ done after ch change or bend addition
         # environLocal.printDebug(['uniqueChannelEvents', uniqueChannelEvents])
 
@@ -2455,7 +2456,7 @@ def packetStorageFromSubstreamList(
 
 def updatePacketStorageWithChannelInfo(
         packetStorage: Dict[int, Dict[str, Any]],
-        channelByInstrument: Dict[Union[int, None], int],
+        channelByInstrument: Dict[Union[int, None], Union[int, None]],
 ) -> None:
     '''
     Take the packetStorage dictionary and using information
@@ -2575,7 +2576,7 @@ def midiTracksToStreams(
     midiTracks: List['music21.midi.MidiTrack'],
     ticksPerQuarter=None,
     quantizePost=True,
-    inputM21: stream.Score = None,
+    inputM21: Optional[stream.Score] = None,
     **keywords
 ) -> stream.Score:
     '''
@@ -2993,7 +2994,7 @@ class Test(unittest.TestCase):
 
     def testKeySignature(self):
         from music21 import meter
-        from music21 import key
+
         n = note.Note()
         n.quarterLength = 0.5
         s = stream.Stream()
@@ -3284,7 +3285,6 @@ class Test(unittest.TestCase):
 
     def testOverlappedEventsC(self):
         from music21 import meter
-        from music21 import key
 
         s = stream.Stream()
         s.insert(key.KeySignature(3))
@@ -3689,7 +3689,6 @@ class Test(unittest.TestCase):
         '''The conductor only gets the first element at an offset.'''
         from music21 import converter
         from music21 import tempo
-        from music21 import key
 
         s = stream.Stream()
         p1 = converter.parse('tinynotation: c1')
