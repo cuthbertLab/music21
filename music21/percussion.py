@@ -86,7 +86,7 @@ class PercussionChord(chord.ChordBase):
             else:
                 allNotes.append(f'unpitched[{thisNote.displayName}]')
 
-        return ' '.join(allNotes)
+        return '[' + ' '.join(allNotes) + ']'
 
 
 class Test(unittest.TestCase):

@@ -609,7 +609,7 @@ def midiEventsToChord(
 
     >>> me2.channel = 10
     >>> midi.translate.midiEventsToChord([dt1, me1, dt2, me2, dt3, me3, dt4, me4])
-    <music21.percussion.PercussionChord Tom-Tom Hi-Hat Cymbal>
+    <music21.percussion.PercussionChord [Tom-Tom Hi-Hat Cymbal]>
     '''
     tOn: int = 0  # ticks
     tOff: int = 0  # ticks
