@@ -2549,7 +2549,7 @@ def realizeChordSymbolDurations(piece):
                 lastChord = cs
         return pf
     elif len(onlyChords) == 1:
-        onlyChords[0].duration.quarterLength = pf.highestOffset - pf.elementOffset(onlyChords[0])
+        onlyChords[0].duration.quarterLength = pf.highestTime - pf.elementOffset(onlyChords[0])
         return pf
     else:
         return piece
@@ -3130,6 +3130,22 @@ class Test(unittest.TestCase):
         figure = 'Apower/E'
 
         self.runTestOnChord(xmlString, figure, pitches)
+
+    def testSingleChordSymbol(self):
+        """
+        Test an edge case where a Stream contains only one ChordSymbol
+        at the highest offset: should still have a nonzero duration
+        if there is a subsequent highest time.
+        """
+        from music21 import note
+        from music21 import stream
+
+        m = stream.Measure()  # NB: no barline!
+        cs = ChordSymbol('A7')
+        m.insert(0, note.Note(type='whole'))
+        m.insert(1.0, cs)
+        realizeChordSymbolDurations(m)
+        self.assertEqual(cs.quarterLength, 3.0)
 
 
 class TestExternal(unittest.TestCase):
