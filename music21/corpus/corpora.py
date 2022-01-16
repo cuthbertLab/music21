@@ -376,7 +376,7 @@ class Corpus(prebase.ProtoM21Object):
     @property
     def directoryInformation(self):
         '''
-        Returns a tuple of DirectoryInformation objects for a
+        Returns a tuple of DirectoryInformation objects for
         each directory in self._directoryInformation.
 
         >>> core = corpus.corpora.CoreCorpus()

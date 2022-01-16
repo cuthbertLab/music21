@@ -32,7 +32,7 @@ import sys
 from collections import namedtuple
 from fractions import Fraction
 from math import isclose
-from typing import Dict, Union, List, Optional, Set, Tuple, Sequence, TypeVar
+from typing import Dict, Iterable, List, Optional, Set, Tuple, TypeVar, Union
 
 from music21 import base
 
@@ -704,7 +704,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return tuple(self._cache['elements'])
 
     @elements.setter
-    def elements(self, value: Union['Stream', Sequence[base.Music21Object]]):
+    def elements(self, value: Union['Stream', Iterable[base.Music21Object]]):
         '''
         Sets this stream's elements to the elements in another stream (just give
         the stream, not the stream's .elements), or to a list of elements.

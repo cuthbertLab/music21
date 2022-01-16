@@ -12,7 +12,7 @@
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
-from typing import Any, Sequence, Tuple, List, Iterable, Optional, Callable
+from typing import Any, Tuple, List, Iterable, Optional, Callable
 import platform
 import re
 
@@ -165,7 +165,7 @@ def macOSVersion() -> Tuple[int, int, int]:  # pragma: no cover
     return (major, minor, maintenance)
 
 
-def sortModules(moduleList: Sequence[Any]) -> List[object]:
+def sortModules(moduleList: Iterable[Any]) -> List[object]:
     '''
     Sort a list of imported module names such that most recently modified is
     first.  In ties, last access time is used then module name
