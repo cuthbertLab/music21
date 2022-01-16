@@ -611,7 +611,8 @@ def midiEventsToChord(
             tOn, eOn = onPair
             if firstOn is None:
                 firstOn = eOn
-            any_channel_10 |= eOn.channel == 10
+            if eOn.channel == 10:
+                any_channel_10 = True
             tOff, unused_eOff = offPair
             p = pitch.Pitch()
             p.midi = eOn.pitch
@@ -634,7 +635,8 @@ def midiEventsToChord(
         for i in range(1, len(onEvents), 2):
             p = pitch.Pitch()
             on_event = onEvents[i]
-            any_channel_10 |= on_event.channel == 10
+            if on_event.channel == 10:
+                any_channel_10 = True
             p.midi = on_event.pitch
             pitches.append(p)
             v = volume.Volume(velocity=onEvents[i].velocity)
