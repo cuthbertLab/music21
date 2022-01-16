@@ -435,10 +435,9 @@ def midiEventsToNote(
             i = PERCUSSION_MAPPER.midiPitchToInstrument(eOn.pitch)
         except MIDIPercussionException:
             # warnings.warn(str(mpe), TranslateWarning)
-            nr.storedInstrument = instrument.UnpitchedPercussion()
-        else:
-            nr.storedInstrument = i
-            # TODO: set reasonable displayPitch?
+            i = instrument.UnpitchedPercussion()
+        nr.storedInstrument = i
+        # TODO: set reasonable displayPitch?
 
     nr.volume.velocity = eOn.velocity
     nr.volume.velocityIsRelative = False  # not relative coming from MIDI
