@@ -3059,7 +3059,10 @@ class MeasureExporter(XMLExporterBase):
             root.append(sp)
 
         classes = obj.classes
-        if 'GeneralNote' in classes and 'Harmony' not in classes:
+        if 'GeneralNote' in classes and (
+            # Ignore writeAsChord = False
+            not isinstance(obj, harmony.Harmony) or obj.writeAsChord
+        ):
             self.offsetInMeasure += obj.duration.quarterLength
 
         # turn inexpressible durations into complex durations (unless unlinked)
@@ -6973,6 +6976,13 @@ class Test(unittest.TestCase):
         # One chord symbol at beginning of measure coinciding with whole note
         m.remove(cs2)
         m.insert(0, cs1)
+        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
+
+        # One chord symbol at beginning of measure with writeAsChord=True
+        # followed by a half note
+        cs1.writeAsChord = True
+        n1.offset = 2
+        n1.quarterLength = 2
         realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
 
 
