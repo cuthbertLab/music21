@@ -25,15 +25,18 @@ from music21 import defaults
 from music21 import duration
 from music21 import exceptions21
 from music21 import environment
+from music21 import instrument
 from music21 import note
 from music21 import percussion
 from music21 import pitch
 from music21 import stream
 
 from music21.instrument import Conductor, deduplicate
+from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
 _MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
+PERCUSSION_MAPPER = PercussionMapper()
 
 
 # ------------------------------------------------------------------------------
@@ -386,8 +389,22 @@ def midiEventsToNote(
     is on Channel 10.
 
     >>> me1.channel = 10
-    >>> midi.translate.midiEventsToNote([dt1, me1, dt2, me2])
+    >>> unp = midi.translate.midiEventsToNote([dt1, me1, dt2, me2])
+    >>> unp
     <music21.note.Unpitched object at 0x...>
+
+    Access the `storedInstrument`:
+
+    >>> unp.storedInstrument
+    <music21.instrument.TomTom 'Tom-Tom'>
+
+    And with values that cannot be translated, a generic
+    :class:`~music21.instrument.UnpitchedPercussion` instance is given:
+
+    >>> me1.pitch = 1
+    >>> unp = midi.translate.midiEventsToNote([dt1, me1, dt2, me2])
+    >>> unp.storedInstrument
+    <music21.instrument.UnpitchedPercussion 'Percussion'>
     '''
     if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
@@ -413,9 +430,15 @@ def midiEventsToNote(
     if isinstance(nr, note.Note):
         nr.pitch.midi = eOn.pitch
     elif isinstance(nr, note.Unpitched):
-        display_pitch = pitch.Pitch(eOn.pitch)
-        nr.displayStep = display_pitch.step
-        nr.displayOctave = display_pitch.octave
+        try:
+            i = PERCUSSION_MAPPER.midiPitchToInstrument(eOn.pitch)
+        except MIDIPercussionException:
+            # warnings.warn(str(mpe), TranslateWarning)
+            nr.storedInstrument = instrument.UnpitchedPercussion()
+        else:
+            nr.storedInstrument = i
+            # TODO: set reasonable displayPitch?
+
     nr.volume.velocity = eOn.velocity
     nr.volume.velocityIsRelative = False  # not relative coming from MIDI
     # n._midiVelocity = eOn.velocity
@@ -584,7 +607,7 @@ def midiEventsToChord(
 
     >>> me2.channel = 10
     >>> midi.translate.midiEventsToChord([dt1, me1, dt2, me2, dt3, me3, dt4, me4])
-    <music21.percussion.PercussionChord unpitched[A2] unpitched[B2]>
+    <music21.percussion.PercussionChord Tom-Tom Hi-Hat Cymbal>
     '''
     tOn: int = 0  # ticks
     tOff: int = 0  # ticks
@@ -650,10 +673,14 @@ def midiEventsToChord(
 
     if isinstance(c, percussion.PercussionChord):
         # Construct note.Unpitched objects
-        for display_pitch in pitches:
+        for midi_pitch in pitches:
             unp = note.Unpitched()
-            unp.displayStep = display_pitch.step
-            unp.displayOctave = display_pitch.octave
+            try:
+                i = PERCUSSION_MAPPER.midiPitchToInstrument(midi_pitch)
+            except MIDIPercussionException:
+                # warnings.warn(str(mpe), TranslateWarning)
+                i = instrument.UnpitchedPercussion()
+            unp.storedInstrument = i
             c.add(unp)
     else:
         c.pitches = pitches

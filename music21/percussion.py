@@ -81,6 +81,8 @@ class PercussionChord(chord.ChordBase):
         for thisNote in self.notes:
             if hasattr(thisNote, 'nameWithOctave'):
                 allNotes.append(thisNote.nameWithOctave)
+            elif thisNote.storedInstrument:
+                allNotes.append(str(thisNote.storedInstrument.instrumentName))
             else:
                 allNotes.append(f'unpitched[{thisNote.displayName}]')
 
