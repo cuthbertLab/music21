@@ -310,6 +310,11 @@ class TextExpression(Expression):
     >>> te = expressions.TextExpression('Con fuoco')
     >>> te.content
     'Con fuoco'
+
+    Most configuration of style is done
+    on the `.style` :class:`~music21.style.TextStyle` object
+    itself.
+
     >>> te.style.fontSize = 24.0
     >>> te.style.fontSize
     24
@@ -336,8 +341,6 @@ class TextExpression(Expression):
         else:
             self._content = content
 
-        self._enclosure = None
-
         # this does not do anything if default y is defined
         self.placement = None
 
@@ -349,6 +352,38 @@ class TextExpression(Expression):
             return repr(self._content)
         else:
             return ''
+
+    @property
+    def enclosure(self) -> Optional[style.Enclosure]:
+        '''
+        Returns or sets the enclosure on the Style object
+        stored on .style.
+
+        Exposed directly on the expression for backwards
+        compatibility.  Does not create a .style object if
+        one does not exist and the value is None.
+
+        >>> te = expressions.TextExpression('Bridge')
+        >>> te.enclosure is None
+        True
+        >>> te.enclosure = style.Enclosure.RECTANGLE
+        >>> te.enclosure
+        <Enclosure.RECTANGLE>
+
+        Note that this is also set on `.style`.
+
+        >>> te.style.enclosure
+        <Enclosure.RECTANGLE>
+        '''
+        if not self.hasStyleInformation:
+            return None
+        return self.style.enclosure
+
+    @enclosure.setter
+    def enclosure(self, value: Optional[style.Enclosure]):
+        if not self.hasStyleInformation and value is None:
+            return
+        self.style.enclosure = value
 
     def _getContent(self):
         return self._content

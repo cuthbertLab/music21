@@ -106,10 +106,19 @@ def isIterable(usrData: Any) -> bool:
 
     >>> common.isIterable(range(20))
     True
+
+    Classes are not iterable even if their instances are:
+
+    >>> common.isIterable(stream.Stream)
+    False
+
+    Changed in v7.3 -- Classes (not instances) are not iterable
     '''
     if isinstance(usrData, (str, bytes)):
         return False
     if hasattr(usrData, '__iter__'):
+        if usrData.__class__ is type:
+            return False
         return True
     return False
 
