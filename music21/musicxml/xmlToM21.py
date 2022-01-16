@@ -2720,7 +2720,7 @@ class MeasureParser(XMLParserBase):
         ...        + qnDuration
         ...        + '<notehead>diamond</notehead></note>')
         >>> MP.xmlToChord([a, b])
-        <music21.percussion.PercussionChord unpitched[A3] B3>
+        <music21.percussion.PercussionChord [unpitched[A3] B3]>
         '''
         notes = []
         for mxNote in mxNoteList:
