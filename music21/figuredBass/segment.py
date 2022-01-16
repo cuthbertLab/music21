@@ -907,6 +907,12 @@ def getPitches(pitchNames=('C', 'E', 'G'),
     >>> pitches = segment.getPitches(['F##', 'A#', 'C#'], bassPitch=pitch.Pitch('A#3'))
     >>> print(', '.join([p.nameWithOctave for p in pitches]))
     A#3, C#4, F##4, A#4, C#5, F##5, A#5, C#6, F##6, A#6, C#7, F##7, A#7
+
+    The maxPitch must have an octave:
+
+    >>> segment.getPitches(maxPitch=pitch.Pitch('E'))
+    Traceback (most recent call last):
+    ValueError: maxPitch must be given an octave
     '''
     if isinstance(bassPitch, str):
         bassPitch = pitch.Pitch(bassPitch)
