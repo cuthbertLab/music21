@@ -23,11 +23,10 @@ from music21 import chord
 from music21 import common
 from music21 import defaults
 from music21 import duration
-from music21 import key
-from music21 import note
 from music21 import exceptions21
 from music21 import environment
 from music21 import instrument
+from music21 import key
 from music21 import note
 from music21 import percussion
 from music21 import pitch
@@ -865,7 +864,6 @@ def midiEventsToInstrument(eventList):
     else:  # get the second event; first is delta time
         event = eventList[1]
 
-    from music21 import instrument
     decoded: str = ''
     try:
         if isinstance(event.data, bytes):
@@ -3016,8 +3014,6 @@ class Test(unittest.TestCase):
 
     def testChannelAllocation(self):
         # test instrument assignments
-        from music21 import instrument
-
         iList = [instrument.Harpsichord,
                  instrument.Viola,
                  instrument.ElectricGuitar,
@@ -3074,8 +3070,6 @@ class Test(unittest.TestCase):
 
     def testPacketStorage(self):
         # test instrument assignments
-        from music21 import instrument
-
         iList = [None,  # conductor track
                  instrument.Harpsichord,
                  instrument.Viola,
@@ -3181,7 +3175,6 @@ class Test(unittest.TestCase):
         self.assertTrue(common.whitespaceEqual(found, match), found)
 
     def testMidiProgramChangeA(self):
-        from music21 import instrument
         p1 = stream.Part()
         p1.append(instrument.Dulcimer())
         p1.repeatAppend(note.Note('g6', quarterLength=1.5), 4)
@@ -3204,7 +3197,6 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testMidiProgramChangeB(self):
-        from music21 import instrument
         from music21 import scale
         import random
 
@@ -3307,7 +3299,6 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testExternalMidiProgramChangeB(self):
-        from music21 import instrument
         from music21 import scale
 
         iList = [instrument.Harpsichord, instrument.Clavichord, instrument.Accordion,
@@ -3384,8 +3375,6 @@ class Test(unittest.TestCase):
 
     def testInstrumentAssignments(self):
         # test instrument assignments
-        from music21 import instrument
-
         iList = [instrument.Harpsichord,
                  instrument.Viola,
                  instrument.ElectricGuitar,
@@ -3418,7 +3407,6 @@ class Test(unittest.TestCase):
 
     def testMicrotonalOutputD(self):
         # test instrument assignments with microtones
-        from music21 import instrument
         from music21.midi import translate
 
         iList = [instrument.Harpsichord,
@@ -3515,7 +3503,6 @@ class Test(unittest.TestCase):
     def testMicrotonalOutputG(self):
         from music21 import corpus
         from music21 import interval
-        from music21 import instrument
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
         p1.remove(p1.getElementsByClass('Instrument').first())
@@ -3869,7 +3856,6 @@ class Test(unittest.TestCase):
 
     def testMidiInstrumentToStream(self):
         from music21 import converter
-        from music21 import instrument
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.transposing01)
@@ -3915,7 +3901,6 @@ class Test(unittest.TestCase):
         MuseScore currently writes null bytes at the end of instrument names.
         https://musescore.org/en/node/310158
         '''
-        from music21 import instrument
         from music21 import midi as midiModule
 
         event = midiModule.MidiEvent()
@@ -3929,7 +3914,6 @@ class Test(unittest.TestCase):
         self.assertIsInstance(i, instrument.Flute)
 
     def testLousyInstrumentData(self):
-        from music21 import instrument
         from music21 import midi as midiModule
 
         lousyNames = ('    ', 'Instrument 20', 'Instrument', 'Inst 2', 'instrument')
@@ -3994,8 +3978,6 @@ class Test(unittest.TestCase):
                 )
 
     def testEmptyExport(self):
-        from music21 import instrument
-
         p = stream.Part()
         p.insert(instrument.Instrument())
         # Previously, this errored when we assumed streams lacking notes
