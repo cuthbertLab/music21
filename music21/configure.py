@@ -1594,7 +1594,7 @@ class ConfigurationAssistant:
 #         print('got: %s' % post)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[object] = []
+_DOC_ORDER: List[type] = []
 
 
 class TestUserInput(unittest.TestCase):  # pragma: no cover

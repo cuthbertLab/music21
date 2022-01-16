@@ -2195,7 +2195,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[object] = []
+_DOC_ORDER: List[type] = []
 
 if __name__ == '__main__':
     import music21
