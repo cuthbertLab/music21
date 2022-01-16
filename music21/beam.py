@@ -72,7 +72,7 @@ To get rid of beams on a note do:
 
 >>> n2.beams.beamsList = []
 '''
-from typing import List, Union
+from typing import List, Optional, Union
 import unittest
 
 from music21 import exceptions21
@@ -258,7 +258,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
                      2/None>/<music21.beam.Beam 3/None>>,
          None]
         '''
-        beamsList = []
+        beamsList: List[Optional[Beams]] = []
         for el in srcList:
             # if a dur cannot be beamable under any circumstance, replace
             # it with None; this includes Rests

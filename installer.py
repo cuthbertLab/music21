@@ -10,7 +10,8 @@
 # License:       BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-import os, sys
+import os
+import sys
 
 
 def main():
@@ -40,6 +41,7 @@ def main():
     if run:
         ca = configure.ConfigurationAssistant()
         ca.run()
+
 
 if __name__ == '__main__':
     main()

@@ -2144,10 +2144,12 @@ class RomanNumeral(harmony.Harmony):
         else:
             return self.figure
 
-    def __eq__(self, other: 'RomanNumeral') -> bool:
+    def __eq__(self, other) -> bool:
         '''
         Compare equality, just based on NotRest and on figure and key
         '''
+        if not isinstance(other, RomanNumeral):
+            return NotImplemented
         if note.NotRest.__eq__(self, other) is NotImplemented:
             return NotImplemented
         if not note.NotRest.__eq__(self, other):

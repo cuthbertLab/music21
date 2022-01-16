@@ -12,13 +12,12 @@
 import copy
 import collections
 import difflib
-import inspect
 import math
 import os
 
 from music21 import note
 
-pathName = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+pathName = os.path.dirname(__file__)
 
 K525omrFilePath = pathName + os.sep + 'k525OMRMvt1.xml'
 K525groundTruthFilePath = pathName + os.sep + 'k525GTMvt1.xml'

@@ -19,7 +19,7 @@ from music21.test import commonTest
 
 try:
     # noinspection PyPackageRequirements
-    from pylint.lint import Run as pylintRun
+    from pylint.lint import Run as pylintRun  # type: ignore
 except ImportError:
     pylintRun = None
 

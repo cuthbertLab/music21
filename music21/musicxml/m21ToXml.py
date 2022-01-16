@@ -42,6 +42,7 @@ from music21 import chord
 from music21 import duration
 from music21 import harmony
 from music21 import instrument
+from music21 import layout
 from music21 import metadata
 from music21 import note
 from music21 import meter
@@ -1407,7 +1408,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.partExporterList: List['PartExporter'] = []
 
-        self.groupsToJoin: List['StaffGroup'] = []
+        self.groupsToJoin: List[layout.StaffGroup] = []
         # key = id(stream) (NB: not stream.id); value = .instrumentStream
         self.instrumentsByStream: Dict[int, stream.Stream] = {}
 
@@ -1860,7 +1861,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         # get score defaults if any:
         if self.firstScoreLayout is None:
-            from music21 import layout
             scoreLayout = layout.ScoreLayout()
             scoreLayout.scalingMillimeters = defaults.scalingMillimeters
             scoreLayout.scalingTenths = defaults.scalingTenths
@@ -2055,7 +2055,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxPartList = SubElement(self.xmlRoot, 'part-list')
         # mxComponents is just a list
         # returns a spanner bundle
-        staffGroups = spannerBundle.getByClass('StaffGroup')
+        staffGroups = spannerBundle.getByClass(layout.StaffGroup)
         # environLocal.printDebug(['got staff groups', staffGroups])
 
         # first, find which parts are start/end of partGroups
@@ -2106,7 +2106,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         >>> b = corpus.parse('bwv66.6')
         >>> SX = musicxml.m21ToXml.ScoreExporter(b)
-        >>> firstStaffGroup = b.spannerBundle.getByClass('StaffGroup')[0]
+        >>> firstStaffGroup = b.spannerBundle.getByClass(layout.StaffGroup)[0]
         >>> mxPartGroup = SX.staffGroupToXmlPartGroup(firstStaffGroup)
         >>> SX.dump(mxPartGroup)
         <part-group type="start">
@@ -6585,7 +6585,6 @@ class Test(unittest.TestCase):
         import re
         from music21 import converter
         from music21 import dynamics
-        from music21 import layout
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         s = converter.parse(xmlDir / '43e-Multistaff-ClefDynamics.xml')
 
@@ -6810,8 +6809,6 @@ class Test(unittest.TestCase):
                             tree.findall('.//measure/note/instrument')[-1].get('id'))
 
     def testMultipleInstrumentsPiano(self):
-        from music21 import layout
-
         ps1 = stream.PartStaff([
             stream.Measure([instrument.ElectricPiano(), note.Note(type='whole')]),
             stream.Measure([instrument.ElectricOrgan(), note.Note(type='whole')]),
