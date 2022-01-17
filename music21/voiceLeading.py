@@ -518,7 +518,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.parallelMotion(gi, allowOctaveDisplacement=True)
         True
         '''
-
+        assert (self.vIntervals[0].generic is not None and self.vIntervals[1].generic is not None)
         if not self.similarMotion():
             return False
 
@@ -1111,6 +1111,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             n1degree = None
             n2degree = None
 
+        assert self.vIntervals[1].generic is not None
         firstHarmony = self.vIntervals[0].simpleName
         secondHarmony = self.vIntervals[1].generic.simpleUndirected
 
@@ -1176,6 +1177,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         if self.noMotion():
             return False
 
+        assert (self.hIntervals[0].generic is not None and self.hIntervals[1].generic is not None)
         if (self.hIntervals[0].generic.undirected == 3
                 and self.hIntervals[1].generic.undirected == 3
                 and self.contraryMotion()):
@@ -1230,6 +1232,8 @@ class VoiceLeadingQuartet(base.Music21Object):
         c2 = chord.Chord([self.vIntervals[1].noteStart, self.vIntervals[1].noteEnd])
         r1 = roman.identifyAsTonicOrDominant(c1, self.key)
         r2 = roman.identifyAsTonicOrDominant(c2, self.key)
+        # TODO in Py3.8+, remove when identifyAsTonicOrDominant returns Union[str | Literal[False]]
+        assert r1 is not True and r2 is not True
         openings = ['P1', 'P5', 'I', 'V']
         return not ((self.vIntervals[0].simpleName in openings
                         or self.vIntervals[1].simpleName in openings)
@@ -1275,6 +1279,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             raisedMinorCorrectly = True
         preClosings = (6, 3)
         closingPitches = [self.v1n2.pitch.name, self.v2n2.name]
+        assert (self.vIntervals[0].generic is not None and self.vIntervals[1].generic is not None)
         return not (self.vIntervals[0].generic.simpleUndirected in preClosings
                      and self.vIntervals[1].generic.simpleUndirected == 1
                      and raisedMinorCorrectly
