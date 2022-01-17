@@ -1933,10 +1933,10 @@ class Chord(ChordBase):
 
     def inversion(
         self,
-        newInversion: Union[int, None] = None,
+        newInversion: Optional[int] = None,
         *,
         find: bool = True,
-        testRoot: Union[None, pitch.Pitch] = None,
+        testRoot: Optional[pitch.Pitch] = None,
         transposeOnSet: bool = True
     ) -> Union[int, None]:
         '''
@@ -2063,7 +2063,7 @@ class Chord(ChordBase):
                 try:
                     newInversion = int(newInversion)
                 except:
-                    raise ChordException("Inversion must be an integer")
+                    raise ChordException(f"Inversion must be an integer, got: {type(newInversion)}")
             return self._setInversion(newInversion, rootPitch, transposeOnSet)
         elif ('inversion' not in self._overrides and find) or testRoot is not None:
             try:

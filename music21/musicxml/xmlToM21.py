@@ -4724,7 +4724,7 @@ class MeasureParser(XMLParserBase):
         # staff is covered by insertCoreAndReference
         b: Optional[pitch.Pitch] = None
         r: Optional[pitch.Pitch] = None
-        inversion: str = ''
+        inversion: Optional[int] = None
         chordKind: str = ''
         chordKindStr: str = ''
 
@@ -4746,7 +4746,7 @@ class MeasureParser(XMLParserBase):
 
         mxInversion = mxHarmony.find('inversion')
         if textStripValid(mxInversion):
-            inversion = mxInversion.text.strip()
+            inversion = int(mxInversion.text.strip())
         # TODO: print-style
 
         if chordKind:  # two ways of doing it...
@@ -4772,17 +4772,20 @@ class MeasureParser(XMLParserBase):
                 # can provide integer or float to create accidental on pitch
                 r.accidental = pitch.Accidental(float(mxRootAlter.text))
 
-        # environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
         if mxFrame is not None:
-            cs = tablature.ChordWithFretBoard()
+            cs_class = tablature.ChordWithFretBoard
         elif chordKind == 'none':
-            cs = harmony.NoChord(kindStr=chordKindStr)
+            cs_class = harmony.NoChord
         else:
-            cs = harmony.ChordSymbol(bass=b,
-                                     root=r,
-                                     inversion=inversion,
-                                     kind=chordKind,
-                                     kindStr=chordKindStr)
+            cs_class = harmony.ChordSymbol
+
+        cs = cs_class(
+            bass=b,
+            root=r,
+            inversion=inversion,
+            kind=chordKind,
+            kindStr=chordKindStr
+        )
 
         seta = _setAttributeFromTagText
         if mxRoot is None:

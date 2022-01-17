@@ -186,7 +186,14 @@ class Harmony(chord.Chord):
 
     # INITIALIZER #
 
-    def __init__(self, figure=None, **keywords):
+    def __init__(self,
+                 figure: Optional[str] = None,
+                 root: Optional[pitch.Pitch] = None,
+                 bass: Optional[pitch.Pitch] = None,
+                 inversion: Optional[pitch.Pitch] = None,
+                 updatePitches: bool = True,
+                 **keywords
+                 ):
         super().__init__()
         self._writeAsChord = False
         # TODO: Deal with the roman numeral property of harmonies.
@@ -203,9 +210,7 @@ class Harmony(chord.Chord):
         self._degreesList = []
         self._key = None
         # senseless to parse inversion until chord members are populated
-        keywords_without_inversion = keywords.copy()
-        keywords_without_inversion.pop('inversion', None)
-        self._updateBasedOnXMLInput(keywords_without_inversion)
+        self._updateFromParameters(root=root, bass=bass)
         # figure is the string representation of a Harmony object
         # for example, for Chord Symbols the figure might be 'Cm7'
         # for roman numerals, the figure might be 'I7'
@@ -218,13 +223,19 @@ class Harmony(chord.Chord):
         if 'bass' not in self._overrides and 'root' in self._overrides:
             self.bass(self._overrides['root'])
 
-        updatePitches = keywords.get('updatePitches', True)
         if (updatePitches
                 and self._figure  # == '' or is not None
                 or 'root' in self._overrides
                 or 'bass' in self._overrides):
             self._updatePitches()
-        self._updateBasedOnXMLInput(keywords)
+        self._updateFromParameters(root=root, bass=bass, inversion=inversion)
+
+        # TODO(jtw): make these kwargs explicit somehow
+        # once there is a general solution for this with GeneralNote
+        ql = keywords.get('duration', None)
+        ql = keywords.get('quarterLength', ql)
+        if ql:
+            self.duration = duration.Duration(ql)
 
     # SPECIAL METHODS #
 
@@ -248,34 +259,25 @@ class Harmony(chord.Chord):
         '''
         return
 
-    def _updateBasedOnXMLInput(self, keywords):
+    def _updateFromParameters(self, root, bass, inversion: Optional[int] = None):
         '''
         This method must be called twice, once before the pitches
         are rendered, and once after. This is because after the pitches
         are rendered, the root() and bass() becomes reset by the chord class
-        but we want the objects to retain their initial root, bass, and inversion
+        but we want the objects to retain their initial root, bass, and inversion.
         '''
-        for kw in keywords:
-            if not keywords[kw]:
-                continue
-            if kw == 'root':
-                if isinstance(keywords[kw], str):
-                    keywords[kw] = common.cleanedFlatNotation(keywords[kw])
-                    self.root(pitch.Pitch(keywords[kw], octave=3))
-                else:
-                    self.root(keywords[kw])
-            elif kw == 'bass':
-                if isinstance(keywords[kw], str):
-                    keywords[kw] = common.cleanedFlatNotation(keywords[kw])
-                    self.bass(pitch.Pitch(keywords[kw], octave=3))
-                else:
-                    self.bass(keywords[kw])
-            elif kw == 'inversion':
-                self.inversion(int(keywords[kw]), transposeOnSet=True)
-            elif kw in ('duration', 'quarterLength'):
-                self.duration = duration.Duration(keywords[kw])
-            else:
-                pass
+        if root and isinstance(root, str):
+            root = common.cleanedFlatNotation(root)
+            self.root(pitch.Pitch(root, octave=3))
+        elif root is not None:
+            self.root(root)
+        if bass and isinstance(bass, str):
+            bass = common.cleanedFlatNotation(bass)
+            self.bass(pitch.Pitch(bass, octave=3))
+        elif bass is not None:
+            self.bass(bass)
+        if inversion is not None:
+            self.inversion(inversion, transposeOnSet=True)
 
     # PUBLIC PROPERTIES #
 
@@ -1556,17 +1558,19 @@ class ChordSymbol(Harmony):
 
     # INITIALIZER #
 
-    def __init__(self, figure=None, **keywords):
-        self.chordKind = ''  # a string from defined list of chord symbol harmonies
-        self.chordKindStr = ''  # the presentation of the kind or label of symbol
+    def __init__(self,
+                 figure=None,
+                 root: Optional[pitch.Pitch] = None,
+                 bass: Optional[pitch.Pitch] = None,
+                 inversion: Optional[int] = None,
+                 kind='', 
+                 kindStr='',
+                 **keywords
+                 ):
+        self.chordKind = kind  # a string from defined list of chord symbol harmonies
+        self.chordKindStr = kindStr  # the presentation of the kind or label of symbol
 
-        for kw in keywords:
-            if kw == 'kind':
-                self.chordKind = keywords[kw]
-            if kw == 'kindStr':
-                self.chordKindStr = keywords[kw]
-
-        super().__init__(figure, **keywords)
+        super().__init__(figure, root=root, bass=bass, inversion=inversion, **keywords)
         if 'duration' not in keywords and 'quarterLength' not in keywords:
             self.duration = duration.Duration(0)
         if self.chordKind or self.chordKindStr:
