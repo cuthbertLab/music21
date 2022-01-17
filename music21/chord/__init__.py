@@ -2024,7 +2024,7 @@ class Chord(ChordBase):
         6
         >>> dim7.inversion('six-four')
         Traceback (most recent call last):
-        music21.chord.ChordException: Inversion must be an integer
+        music21.chord.ChordException: Inversion must be an integer, got: <class 'str'>
 
         Chords without pitches return None:
 
