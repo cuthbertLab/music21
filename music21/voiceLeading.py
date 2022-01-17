@@ -518,7 +518,9 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.parallelMotion(gi, allowOctaveDisplacement=True)
         True
         '''
-        assert (self.vIntervals[0].generic is not None and self.vIntervals[1].generic is not None)
+        # .generic could only be None if intervals were constructed without diatonic components
+        assert self.vIntervals[0].generic is not None
+        assert self.vIntervals[1].generic is not None
         if not self.similarMotion():
             return False
 
@@ -1111,6 +1113,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             n1degree = None
             n2degree = None
 
+        # .generic could only be None if intervals were constructed without diatonic components
         assert self.vIntervals[1].generic is not None
         firstHarmony = self.vIntervals[0].simpleName
         secondHarmony = self.vIntervals[1].generic.simpleUndirected
@@ -1177,7 +1180,9 @@ class VoiceLeadingQuartet(base.Music21Object):
         if self.noMotion():
             return False
 
-        assert (self.hIntervals[0].generic is not None and self.hIntervals[1].generic is not None)
+        # .generic could only be None if intervals were constructed without diatonic components
+        assert self.hIntervals[0].generic is not None
+        assert self.hIntervals[1].generic is not None
         if (self.hIntervals[0].generic.undirected == 3
                 and self.hIntervals[1].generic.undirected == 3
                 and self.contraryMotion()):
@@ -1279,7 +1284,9 @@ class VoiceLeadingQuartet(base.Music21Object):
             raisedMinorCorrectly = True
         preClosings = (6, 3)
         closingPitches = [self.v1n2.pitch.name, self.v2n2.name]
-        assert (self.vIntervals[0].generic is not None and self.vIntervals[1].generic is not None)
+        # .generic could only be None if intervals were constructed without diatonic components
+        assert self.vIntervals[0].generic is not None
+        assert self.vIntervals[1].generic is not None
         return not (self.vIntervals[0].generic.simpleUndirected in preClosings
                      and self.vIntervals[1].generic.simpleUndirected == 1
                      and raisedMinorCorrectly
