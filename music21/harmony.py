@@ -1563,7 +1563,7 @@ class ChordSymbol(Harmony):
                  root: Optional[pitch.Pitch] = None,
                  bass: Optional[pitch.Pitch] = None,
                  inversion: Optional[int] = None,
-                 kind='', 
+                 kind='',
                  kindStr='',
                  **keywords
                  ):
