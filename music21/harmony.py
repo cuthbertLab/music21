@@ -19,7 +19,7 @@ import copy
 import re
 import unittest
 
-from typing import Optional, TypeVar
+from typing import Dict, Optional, Tuple, TypeVar
 
 from music21 import base
 from music21 import chord
@@ -37,7 +37,8 @@ from music21.figuredBass import realizerScale
 from music21 import environment
 environLocal = environment.Environment('harmony')
 
-T = TypeVar('T')
+T = TypeVar('T', bound='ChordSymbol')
+NCT = TypeVar('NCT', bound='NoChord')
 
 # --------------------------------------------------------------------------
 
@@ -1361,7 +1362,7 @@ def removeChordSymbols(chordType):
 
 
 # --------------------------------------------------------------------------
-realizerScaleCache = {}
+realizerScaleCache: Dict[Tuple[str, str], realizerScale.FiguredBassScale] = {}
 
 # --------------------------------------------------------------------------
 
@@ -2436,7 +2437,7 @@ class NoChord(ChordSymbol):
     def writeAsChord(self, val):
         pass
 
-    def transpose(self: T, _value, *, inPlace=False) -> Optional[T]:
+    def transpose(self: NCT, _value, *, inPlace=False) -> Optional[NCT]:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
 
