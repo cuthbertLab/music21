@@ -77,15 +77,13 @@ class ProtoM21Object:
     ]
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {}
+    _DOC_ATTR: Dict[str, str] = {}
 
     # this dictionary stores as a tuple of strings for each Class so that
     # it only needs to be made once (11 microseconds per call, can be
     # a big part of iteration; from cache just 1 microsecond)
-    _classTupleCacheDict = {}
+    _classTupleCacheDict: Dict[type, Tuple[str, ...]] = {}
     _classSetCacheDict: Dict[type, FrozenSet[Union[str, type]]] = {}
-    # same with fully qualified names
-    _classListFullyQualifiedCacheDict = {}
 
     __slots__ = ()
 
@@ -120,7 +118,7 @@ class ProtoM21Object:
         return not self.classSet.isdisjoint(classFilterList)
 
     @property
-    def classes(self) -> Tuple[str]:
+    def classes(self) -> Tuple[str, ...]:
         '''
         Returns a tuple containing the names (strings, not objects) of classes that this
         object belongs to -- starting with the object's class name and going up the mro()
@@ -264,26 +262,8 @@ class ProtoM21Object:
         >>> p = prebase.ProtoM21Object()
         >>> p._reprInternal()
         'object at 0x112590380'
-
-        If an object has `.id` defined and `x.id` is not the same as `id(x)`
-        then that id is used instead:
-
-        >>> b = base.Music21Object()
-        >>> b._reprInternal()
-        'object at 0x129a903b1'
-        >>> b.id = 'hi'
-        >>> b._reprInternal()
-        'id=hi'
         '''
-        if not hasattr(self, 'id') or self.id == id(self):
-            return f'object at {hex(id(self))}'
-        else:
-            reprId = self.id
-            try:
-                reprId = hex(reprId)
-            except (ValueError, TypeError):
-                pass
-            return f'id={reprId}'
+        return f'object at {hex(id(self))}'
 
 
 del (
