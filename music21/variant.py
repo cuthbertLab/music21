@@ -2100,6 +2100,8 @@ class Variant(base.Music21Object):
     def __len__(self):
         return len(self._stream)
 
+    def __iter__(self):
+        return self._stream.__iter__()
 
     def getElementIds(self):
         if 'elementIds' not in self._cache or self._cache['elementIds'] is None:

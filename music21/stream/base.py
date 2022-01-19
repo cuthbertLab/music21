@@ -215,7 +215,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # forms of checking class
     isStream = True
     isMeasure = False
-    classSortOrder = -20
+    classSortOrder: Union[int, float] = -20
     recursionType = 'elementsFirst'
 
     _styleClass = style.StreamStyle
