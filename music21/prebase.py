@@ -21,6 +21,7 @@ from typing import (
     Dict,
     FrozenSet,
     List,
+    Mapping,
     Sequence,
     Union,
     Tuple,
@@ -77,7 +78,7 @@ class ProtoM21Object:
     ]
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: Dict[str, str] = {}
+    _DOC_ATTR: Mapping[str, str] = {}
 
     # this dictionary stores as a tuple of strings for each Class so that
     # it only needs to be made once (11 microseconds per call, can be
