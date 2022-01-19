@@ -287,6 +287,14 @@ class PitchClef(Clef):
     @property
     def octaveChange(self) -> int:
         '''
+        The number of octaves that the clef "transposes", generally 0.
+
+        >>> tc = clef.TrebleClef()
+        >>> tc.octaveChange
+        0
+        >>> clef.Treble8vbClef().octaveChange
+        -1
+
         Changing octaveChange changes lowestLine (but not vice-versa)
 
         >>> tc.lowestLine
