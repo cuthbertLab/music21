@@ -80,8 +80,7 @@ from music21._version import __version__, __version_info__
 from music21.test.testRunner import mainTest
 
 
-# This should actually be bound to Music21Object, but cannot import here.
-_M21T = TypeVar('_M21T', bound=prebase.ProtoM21Object)
+_M21T = TypeVar('_M21T', bound='music21.base.Music21Object')
 
 # all other music21 modules below...
 
@@ -1188,7 +1187,7 @@ class Music21Object(prebase.ProtoM21Object):
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> Optional['Music21Object']:
+    ) -> Optional[_M21T]:
         # noinspection PyShadowingNames
         '''
         A very powerful method in music21 of fundamental importance: Returns

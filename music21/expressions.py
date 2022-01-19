@@ -530,7 +530,7 @@ class GeneralMordent(Ornament):
             transposeInterval = self.size.reverse()
         else:
             transposeInterval = self.size
-        mordNotes = []
+        mordNotes: List['music21.note.Note'] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
@@ -843,7 +843,7 @@ class Trill(Ornament):
         if self.nachschlag:
             numberOfTrillNotes -= 2
 
-        trillNotes = []
+        trillNotes: List['music21.note.Note'] = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval)
 
@@ -870,6 +870,7 @@ class Trill(Ornament):
                                            inPlace=True)
 
             if self._setAccidentalFromKeySig:
+                assert currentKeySig is not None
                 firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
                     firstNoteNachschlag.step)
                 secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(

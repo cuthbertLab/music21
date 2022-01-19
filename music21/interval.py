@@ -720,6 +720,14 @@ class IntervalBase(base.Music21Object):
         '''
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def reverse(self):
+        '''
+        IntervalBase does not know how to do this, so it must be overridden in
+        derived classes.
+        '''
+        raise NotImplementedError
+
 
 class GenericInterval(IntervalBase):
     '''
