@@ -13,7 +13,7 @@
 The style module represents information about the style of a Note, Accidental,
 etc. such that precise positioning information, layout, size, etc. can be specified.
 '''
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 import unittest
 
 from music21 import common
@@ -498,7 +498,7 @@ class StyleMixin(common.SlottedObjectMixin):
     '''
     _styleClass = Style
 
-    __slots__ = ('_style', '_editorial')
+    __slots__: Tuple[str, ...] = ('_style', '_editorial')
 
     def __init__(self):
         #  no need to call super().__init__() on SlottedObjectMixin

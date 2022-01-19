@@ -86,7 +86,7 @@ class ProtoM21Object:
     _classTupleCacheDict: Dict[type, Tuple[str, ...]] = {}
     _classSetCacheDict: Dict[type, FrozenSet[Union[str, type]]] = {}
 
-    __slots__ = ()
+    __slots__: Tuple[str, ...] = ()
 
     @deprecated('v7', 'v8', 'use `someClass in .classSet`'
         'or for intersection: `not classSet.isdisjoint(classList)`')
