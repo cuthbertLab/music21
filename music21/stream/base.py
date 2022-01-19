@@ -13993,6 +13993,7 @@ class Score(Stream):
             permitOneVoicePerPart=permitOneVoicePerPart
         )
 
+    @common.deprecated('v7', 'v8', 'call .flatten() for p in sc.parts')
     def flattenParts(self, classFilterList=('Note', 'Chord')):
         # noinspection PyShadowingNames
         '''
