@@ -237,10 +237,9 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
         else:
             return ts2
 
-    # environLocal.printDebug(['n/d', numerator, denominator])
     else:
         ts = TimeSignature()
-        ts.loadRatio(numerator, denominator)
+        ts.load(f'{numerator}/{denominator}')
         return ts
 
 
@@ -562,6 +561,7 @@ class TimeSignature(base.Music21Object):
             except MeterException:
                 environLocal.printDebug(['cannot set default accents for:', self])
 
+    @common.deprecated('v7', 'v8', 'call .ratioString or .load()')
     def loadRatio(self, numerator, denominator, divisions=None):
         '''
         Change the numerator and denominator, like ratioString, but with
