@@ -2084,10 +2084,15 @@ def midiTrackToStream(
     if conductorPart is not None:
         insertConductorEvents(conductorPart, s, isFirst=isFirst)
 
+    meterStream: Optional[stream.Stream] = None
+    if conductorPart is not None:
+        insertConductorEvents(conductorPart, s, isFirst=isFirst)
+        ts_iter = conductorPart['TimeSignature']
+        if ts_iter:
+            meterStream = ts_iter.stream()
+
     # Only make measures once time signatures have been inserted
-    s.makeMeasures(
-        meterStream=conductorPart['TimeSignature'].stream() if conductorPart else None,
-        inPlace=True)
+    s.makeMeasures(meterStream=meterStream, inPlace=True)
     if voicesRequired:
         for m in s.getElementsByClass(stream.Measure):
             # Gaps will be filled by makeRests, below, which now recurses
@@ -3591,6 +3596,29 @@ class Test(unittest.TestCase):
             m = p.getElementsByClass('Measure').first()
             ts = m.timeSignature
             self.assertEqual(ts.ratioString, '3/4')
+            self.assertIn(ts, m)
+
+    def testMidiImportImplicitMeter(self):
+        from music21 import midi as midiModule
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test10.mid'
+
+        # Not the normal way to read a midi file, but we're altering it
+        mf = midiModule.MidiFile()
+        mf.open(fp)
+        mf.read()
+        mf.close()
+
+        # Simulate a file with a conductor track
+        new_track = midiModule.MidiTrack()
+        # Include some events, like part name, but NOT meter
+        new_track.events = mf.tracks[0].events[:4]
+        mf.tracks.insert(0, new_track)
+
+        s = midiFileToStream(mf)
+        for p in s.parts:
+            m = p.getElementsByClass('Measure').first()
+            ts = m.timeSignature
+            self.assertEqual(ts.ratioString, '4/4')
             self.assertIn(ts, m)
 
     def testMidiExportConductorA(self):
