@@ -2086,10 +2086,13 @@ def midiTrackToStream(
 
     meterStream: Optional[stream.Stream] = None
     if conductorPart is not None:
-        insertConductorEvents(conductorPart, s, isFirst=isFirst)
         ts_iter = conductorPart['TimeSignature']
         if ts_iter:
             meterStream = ts_iter.stream()
+            # Supply any missing time signature at the start
+            if not meterStream.getElementsByOffset(0):
+                from music21 import meter
+                meterStream.insert(0, meter.TimeSignature())
 
     # Only make measures once time signatures have been inserted
     s.makeMeasures(meterStream=meterStream, inPlace=True)
