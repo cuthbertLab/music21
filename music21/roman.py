@@ -2957,6 +2957,12 @@ class RomanNumeral(harmony.Harmony):
         >>> rn = roman.RomanNumeral('--II/V')
         >>> rn.romanNumeral
         'bbII'
+
+        OMIT_FROM_DOCS
+
+        >>> rn.romanNumeral = None
+        Traceback (most recent call last):
+        ValueError: Cannot set romanNumeral property of RomanNumeral objects
         '''
         if self.romanNumeralAlone in ('Ger', 'Sw', 'It', 'Fr'):
             return self.romanNumeralAlone
