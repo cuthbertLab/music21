@@ -5670,7 +5670,7 @@ class MeasureExporter(XMLExporterBase):
         corresponding measure by number in the previous PartStaff, retrieve
         the `attr` value there, and compare it to `obj` by `comparison`.
         '''
-        if self.parent is None:
+        if self.parent is None:  # pragma: no cover
             return False
         if self.parent.higher_sibling_in_group is None:
             return False
@@ -5678,7 +5678,7 @@ class MeasureExporter(XMLExporterBase):
         # matching algorithm in PartStaffExporterMixin.processSubsequentPartStaff().
         # getElementsByOffset() would not be a perfect solution either,
         # see https://groups.google.com/g/music21list/c/ObNOanMQjJU/m/2LMPz5NAAwAJ
-        if obj.measureNumber is None:
+        if obj.measureNumber is None:  # pragma: no cover
             return False
         maybe_measure = self.parent.higher_sibling_in_group.measure(obj.measureNumber)
         if maybe_measure is None:

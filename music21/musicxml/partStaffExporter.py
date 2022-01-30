@@ -1008,6 +1008,11 @@ class Test(unittest.TestCase):
         # Just two <attributes> tags, a 3/1 in measure 1 and a 4/1 in measure 2
         self.assertEqual(len(root.findall('part/measure/attributes/time')), 2)
 
+        # Edge cases -- no expectation of correctness, just don't crash
+        ps1[stream.Measure].last().number = 0  # was measure 2
+        root = self.getET(s)
+        self.assertEqual(len(root.findall('part/measure/attributes/time')), 3)
+
 
 if __name__ == '__main__':
     import music21
