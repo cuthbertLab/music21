@@ -2447,7 +2447,9 @@ class PartExporter(XMLExporterBase):
     Object to convert one Part stream to a <part> tag on .parse()
     '''
 
-    def __init__(self, partObj: Union[stream.Part, stream.Score, None] = None, parent=None):
+    def __init__(self,
+                 partObj: Union[stream.Part, stream.Score, None] = None,
+                 parent: Optional[ScoreExporter] = None):
         super().__init__()
         # partObj can be a Score IF it has no parts within it.  But better to
         # always have it be a Part
@@ -2468,6 +2470,8 @@ class PartExporter(XMLExporterBase):
             self.refStreamOrTimeRange = parent.refStreamOrTimeRange
             self.midiChannelList = parent.midiChannelList  # shared list
             self.makeNotation = parent.makeNotation
+
+        self.higher_sibling_in_group: Optional[stream.PartStaff] = None
 
         self.instrumentStream = None
         self.firstInstrumentObject = None
@@ -2923,14 +2927,16 @@ class MeasureExporter(XMLExporterBase):
 
     ignoreOnParseClasses = {'LayoutBase', 'Barline'}
 
-    def __init__(self, measureObj=None, parent=None):
+    def __init__(self,
+                 measureObj: Optional[stream.Measure] = None,
+                 parent: Optional[PartExporter] = None):
         super().__init__()
-        if measureObj is not None:
-            self.stream = measureObj
-        else:  # no point, but...
+        if measureObj is None:  # no point, but...
             self.stream = stream.Measure()
+        else:
+            self.stream = measureObj
 
-        self.parent = parent  # PartExporter
+        self.parent = parent
         self.xmlRoot = Element('measure')
         self.currentDivisions = defaults.divisionsPerQuarter
 
@@ -5654,6 +5660,26 @@ class MeasureExporter(XMLExporterBase):
 
         return mxAttributes
 
+    def _matches_sibling(self,
+                         obj: base.Music21Object,
+                         attr='keySignature',
+                         comparison='__eq__') -> bool:
+        if self.parent is None:
+            return False
+        if self.parent.higher_sibling_in_group is None:
+            return False
+        # Not a foolproof measure lookup: see more robust measure
+        # matching algorithm in PartStaffExporterMixin.processSubsequentPartStaff().
+        # getElementsByOffset() would not be a perfect solution either,
+        # see https://groups.google.com/g/music21list/c/ObNOanMQjJU/m/2LMPz5NAAwAJ
+        if obj.measureNumber is None:
+            return False
+        maybe_measure = self.parent.higher_sibling_in_group.measure(obj.measureNumber)
+        if maybe_measure is None:
+            return False
+        comparison_wrapper = getattr(obj, comparison)
+        return comparison_wrapper(getattr(maybe_measure, attr))
+
     # -----------------------------
     # note helpers...
 
@@ -5977,20 +6003,21 @@ class MeasureExporter(XMLExporterBase):
             mxDivisions.text = str(self.currentDivisions)
             self.parent.lastDivisions = self.currentDivisions
 
-        if isinstance(m, stream.Measure):
-            if m.keySignature is not None:
-                mxAttributes.append(self.keySignatureToXml(m.keySignature))
-            if m.timeSignature is not None:
-                mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
-            smts = list(m.getElementsByClass('SenzaMisuraTimeSignature'))
-            if smts:
-                mxAttributes.append(self.timeSignatureToXml(smts[0]))
+        if m.keySignature is not None and not self._matches_sibling(
+                m.keySignature, 'keySignature'):
+            mxAttributes.append(self.keySignatureToXml(m.keySignature))
+        if m.timeSignature is not None and not self._matches_sibling(
+                m.timeSignature, 'timeSignature', comparison='ratioEqual'):
+            mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
+        smts = list(m.getElementsByClass('SenzaMisuraTimeSignature'))
+        if smts:
+            mxAttributes.append(self.timeSignatureToXml(smts[0]))
 
-            # For staves, see joinPartStaffs()
-            # TODO: part-symbol
-            # TODO: instruments
-            if m.clef is not None:
-                mxAttributes.append(self.clefToXml(m.clef))
+        # For staves, see joinPartStaffs()
+        # TODO: part-symbol
+        # TODO: instruments
+        if m.clef is not None:
+            mxAttributes.append(self.clefToXml(m.clef))
 
         found = m.getElementsByClass('StaffLayout')
         if found:

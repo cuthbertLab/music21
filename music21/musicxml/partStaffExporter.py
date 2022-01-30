@@ -254,6 +254,17 @@ class PartStaffExporterMixin:
                 MusicXMLWarning('Got overlapping StaffGroups; will not merge ANY groups.'))
             return []
 
+        # Finally, store a reference to earlier siblings (if any) on PartExporters
+        for group in deduplicatedGroups:
+            prior_part_staff = None
+            for part_staff in group:
+                for part_exporter in self.partExporterList:
+                    if part_exporter.stream is not part_staff:
+                        continue
+                    part_exporter.higher_sibling_in_group = prior_part_staff
+                    prior_part_staff = part_staff
+                    break
+
         return deduplicatedGroups
 
     def addStaffTagsMultiStaffParts(self, group: StaffGroup):
@@ -621,8 +632,9 @@ class PartStaffExporterMixin:
             partStaffRoot: Element = self.getRootForPartStaff(ps)
             # Remove PartStaff from export list
             # noinspection PyAttributeOutsideInit
-            self.partExporterList = [pex for pex in self.partExporterList
-                                        if pex.xmlRoot != partStaffRoot]
+            self.partExporterList: List[music21.musicxml.m21ToXml.PartExporter] = [
+                pex for pex in self.partExporterList if pex.xmlRoot != partStaffRoot
+            ]
 
     @staticmethod
     def moveMeasureContents(measure: Element, otherMeasure: Element, staffNumber: int):
@@ -976,6 +988,25 @@ class Test(unittest.TestCase):
         SX = ScoreExporter(b)
         SX.parse()
         SX.parse()
+
+    def testMeterChanges(self):
+        from music21 import layout
+        from music21 import meter
+        from music21 import note
+
+        ps1 = stream.PartStaff()
+        ps2 = stream.PartStaff()
+        sg = layout.StaffGroup([ps1, ps2])
+        s = stream.Score([ps1, ps2, sg])
+        for ps in ps1, ps2:
+            ps.insert(0, meter.TimeSignature('3/1'))
+            ps.repeatAppend(note.Note(type='whole'), 6)
+            ps.makeNotation(inPlace=True)  # makes measures
+            ps[stream.Measure][1].insert(meter.TimeSignature('4/1'))
+
+        root = self.getET(s)
+        # Just two <attributes> tags, a 3/1 in measure 1 and a 4/1 in measure 2
+        self.assertEqual(len(root.findall('part/measure/attributes/time')), 2)
 
 
 if __name__ == '__main__':
