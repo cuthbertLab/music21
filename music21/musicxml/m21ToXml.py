@@ -5660,10 +5660,16 @@ class MeasureExporter(XMLExporterBase):
 
         return mxAttributes
 
-    def _matches_sibling(self,
-                         obj: base.Music21Object,
-                         attr='keySignature',
-                         comparison='__eq__') -> bool:
+    def _matches_earlier_sibling_in_group(self,
+                                          obj: base.Music21Object,
+                                          attr='keySignature',
+                                          comparison='__eq__') -> bool:
+        '''
+        If this measure is part of a subsequent PartStaff in a joinable staff
+        group (e.g. the left hand of a keyboard part), then look up the
+        corresponding measure by number in the previous PartStaff, retrieve
+        the `attr` value there, and compare it to `obj` by `comparison`.
+        '''
         if self.parent is None:
             return False
         if self.parent.higher_sibling_in_group is None:
@@ -6003,10 +6009,10 @@ class MeasureExporter(XMLExporterBase):
             mxDivisions.text = str(self.currentDivisions)
             self.parent.lastDivisions = self.currentDivisions
 
-        if m.keySignature is not None and not self._matches_sibling(
+        if m.keySignature is not None and not self._matches_earlier_sibling_in_group(
                 m.keySignature, 'keySignature'):
             mxAttributes.append(self.keySignatureToXml(m.keySignature))
-        if m.timeSignature is not None and not self._matches_sibling(
+        if m.timeSignature is not None and not self._matches_earlier_sibling_in_group(
                 m.timeSignature, 'timeSignature', comparison='ratioEqual'):
             mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
         smts = list(m.getElementsByClass('SenzaMisuraTimeSignature'))
