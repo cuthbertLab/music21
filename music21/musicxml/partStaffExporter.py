@@ -261,7 +261,7 @@ class PartStaffExporterMixin:
                 for part_exporter in self.partExporterList:
                     if part_exporter.stream is not part_staff:
                         continue
-                    part_exporter.higher_sibling_in_group = prior_part_staff
+                    part_exporter.previous_sibling_in_group = prior_part_staff
                     prior_part_staff = part_staff
                     break
 

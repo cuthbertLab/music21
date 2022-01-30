@@ -2471,7 +2471,7 @@ class PartExporter(XMLExporterBase):
             self.midiChannelList = parent.midiChannelList  # shared list
             self.makeNotation = parent.makeNotation
 
-        self.higher_sibling_in_group: Optional[stream.PartStaff] = None
+        self.previous_sibling_in_group: Optional[stream.PartStaff] = None
 
         self.instrumentStream = None
         self.firstInstrumentObject = None
@@ -5660,7 +5660,7 @@ class MeasureExporter(XMLExporterBase):
 
         return mxAttributes
 
-    def _matches_earlier_sibling_in_group(self,
+    def _matches_previous_sibling_in_group(self,
                                           obj: base.Music21Object,
                                           attr='keySignature',
                                           comparison='__eq__') -> bool:
@@ -5672,7 +5672,7 @@ class MeasureExporter(XMLExporterBase):
         '''
         if self.parent is None:  # pragma: no cover
             return False
-        if self.parent.higher_sibling_in_group is None:
+        if self.parent.previous_sibling_in_group is None:
             return False
         # Not a foolproof measure lookup: see more robust measure
         # matching algorithm in PartStaffExporterMixin.processSubsequentPartStaff().
@@ -5680,7 +5680,7 @@ class MeasureExporter(XMLExporterBase):
         # see https://groups.google.com/g/music21list/c/ObNOanMQjJU/m/2LMPz5NAAwAJ
         if obj.measureNumber is None:  # pragma: no cover
             return False
-        maybe_measure = self.parent.higher_sibling_in_group.measure(obj.measureNumber)
+        maybe_measure = self.parent.previous_sibling_in_group.measure(obj.measureNumber)
         if maybe_measure is None:
             return False
         comparison_wrapper = getattr(obj, comparison)
@@ -6009,10 +6009,10 @@ class MeasureExporter(XMLExporterBase):
             mxDivisions.text = str(self.currentDivisions)
             self.parent.lastDivisions = self.currentDivisions
 
-        if m.keySignature is not None and not self._matches_earlier_sibling_in_group(
+        if m.keySignature is not None and not self._matches_previous_sibling_in_group(
                 m.keySignature, 'keySignature'):
             mxAttributes.append(self.keySignatureToXml(m.keySignature))
-        if m.timeSignature is not None and not self._matches_earlier_sibling_in_group(
+        if m.timeSignature is not None and not self._matches_previous_sibling_in_group(
                 m.timeSignature, 'timeSignature', comparison='ratioEqual'):
             mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
         smts = list(m.getElementsByClass('SenzaMisuraTimeSignature'))
