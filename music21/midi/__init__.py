@@ -350,7 +350,7 @@ class _ContainsEnum(IntEnum):
 
     @classmethod
     def hasValue(cls, val):
-        return val in cls.__members__.values()
+        return val in cls._value2member_map_
 
 
 class ChannelVoiceMessages(_ContainsEnum):
