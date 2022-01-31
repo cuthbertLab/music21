@@ -4942,9 +4942,10 @@ class MeasureExporter(XMLExporterBase):
         elif harm.pitchType == 'touching':
             SubElement(mxh, 'touching-pitch')
 
-    def noChordToXml(self, cs):
+    def noChordToXml(self, cs: harmony.NoChord):
         '''
-        Convert a NoChord object to an mxHarmony object.
+        Convert a NoChord object to an mxHarmony object (or a rest
+        if .writeAsChord = True).
 
         Expected attributes of the NoChord object:
 
@@ -4969,9 +4970,22 @@ class MeasureExporter(XMLExporterBase):
         music21.musicxml.xmlObjects.MusicXMLExportException:
              In part (None), measure (1): NoChord object's chordKind must be 'none'
 
+        To realize the NoChord as a rest:
+
+        >>> nc2 = harmony.NoChord()
+        >>> nc2.writeAsChord = True
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxNote = MEX.noChordToXml(nc2)
+        >>> MEX.dump(mxNote)
+        <note>
+            <rest />
+            <duration>10080</duration>
+            <type>quarter</type>
+        </note>
         '''
         if cs.writeAsChord is True:
-            return self.chordToXml(cs)
+            r = note.Rest(duration=cs.duration)
+            return self.restToXml(r)
 
         mxHarmony = Element('harmony')
         _synchronizeIds(mxHarmony, cs)

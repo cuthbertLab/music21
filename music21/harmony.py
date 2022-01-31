@@ -438,6 +438,7 @@ class Harmony(chord.Chord):
         object will be written to the rendered output (such as musicxml). If `True`
         (default for romanNumerals), the chord with pitches is written. If
         False (default for ChordSymbols) the harmony symbol is written.
+        For `NoChord` objects, writeAsChord means to write as a rest.
         '''
         return self._writeAsChord
 
@@ -2426,15 +2427,6 @@ class NoChord(ChordSymbol):
     def _parseFigure(self):
         # do nothing, everything is already set.
         return
-
-    @property
-    def writeAsChord(self):
-        # Never write NoChords.
-        return False
-
-    @writeAsChord.setter
-    def writeAsChord(self, val):
-        pass
 
     def transpose(self: T, _value, *, inPlace=False) -> Optional[T]:
         '''
