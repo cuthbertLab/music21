@@ -905,7 +905,7 @@ class SpannerBundle(prebase.ProtoM21Object):
     def setIdLocalByClass(self, className, maxId=6):
         # noinspection PyShadowingNames
         '''
-        (See `setIdLocals()` for an explanation of what an idLocal is.)
+        (See :meth:`setIdLocals` for an explanation of what an idLocal is.)
 
         Automatically set idLocal values for all members of the provided class.
         This is necessary in cases where spanners are newly created in
@@ -954,7 +954,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         part, only up to 6 slurs can happen simultaneously.  But as soon as a slur stops, its
         idLocal can be reused.
 
-        This method set all idLocals for all classes in this SpannerBundle.
+        This method sets all idLocals for all classes in this SpannerBundle.
         This will assure that each class has a unique idLocal number.
 
         Calling this method is destructive: existing idLocal values will be lost.
@@ -974,11 +974,30 @@ class SpannerBundle(prebase.ProtoM21Object):
         [(<music21.spanner.Slur>, 1),
          (<music21.layout.StaffGroup>, 1),
          (<music21.spanner.Slur>, 2)]
+
+        :class:`~music21.dynamics.DynamicWedge` objects are commingled. That is,
+        :class:`~music21.dynamics.Crescendo` and :class:`~music21.dynamics.Diminuendo`
+        are not numbered separately:
+
+        >>> sb2 = spanner.SpannerBundle()
+        >>> c = dynamics.Crescendo()
+        >>> d = dynamics.Diminuendo()
+        >>> sb2.append(c)
+        >>> sb2.append(d)
+        >>> sb2.setIdLocals()
+        >>> [(sp, sp.idLocal) for sp in sb2]
+        [(<music21.dynamics.Crescendo>, 1),
+         (<music21.dynamics.Diminuendo>, 2)]
         '''
-        classes = []
+        # Crescendo and Diminuendo share the same numbering
+        # So number by DynamicWedge instead (next parent class)
+        skip_classes = ('Crescendo', 'Diminuendo')
+        classes = set()
         for sp in self._storage:
-            if sp.classes[0] not in classes:
-                classes.append(sp.classes[0])
+            for klass in sp.classes:
+                if klass not in skip_classes:
+                    classes.add(klass)
+                    break
         for className in classes:
             self.setIdLocalByClass(className)
 
