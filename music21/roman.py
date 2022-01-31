@@ -2977,6 +2977,7 @@ class RomanNumeral(harmony.Harmony):
     def figure(self, newFigure):
         self._figure = newFigure
         if self._parsingComplete:
+            self.bracketedAlterations = []
             self._parseFigure()
             self._updatePitches()
 
