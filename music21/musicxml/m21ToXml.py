@@ -2448,11 +2448,10 @@ class PartExporter(XMLExporterBase):
     '''
     _DOC_ATTR: Mapping[str, str] = {
         'previousPartStaffInGroup': '''
-        If the part being exported is a :class:`~music21.stream.base.PartStaff`,
-        this attribute will be used to store the immediately previous `PartStaff`
-        in the :class:`~music21.layout.StaffGroup`, if any. (E.g. if this is
-        the left hand, store a reference to the right hand.)
-        '''
+            If the part being exported is a :class:`~music21.stream.base.PartStaff`,
+            this attribute will be used to store the immediately previous `PartStaff`
+            in the :class:`~music21.layout.StaffGroup`, if any. (E.g. if this is
+            the left hand, store a reference to the right hand.)''',
     }
 
     def __init__(self,
