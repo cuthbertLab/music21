@@ -23,7 +23,7 @@ import warnings
 from xml.etree.ElementTree import (
     Element, SubElement, ElementTree, Comment, fromstring as et_fromstring
 )
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Mapping, Optional, Union
 
 # external dependencies
 import webcolors
@@ -2446,6 +2446,14 @@ class PartExporter(XMLExporterBase):
     '''
     Object to convert one Part stream to a <part> tag on .parse()
     '''
+    _DOC_ATTR: Mapping[str, str] = {
+        'previousPartStaffInGroup': '''
+        If the part being exported is a :class:`~music21.stream.base.PartStaff`,
+        this attribute will be used to store the immediately previous `PartStaff`
+        in the :class:`~music21.layout.StaffGroup`, if any. (E.g. if this is
+        the left hand, store a reference to the right hand.)
+        '''
+    }
 
     def __init__(self,
                  partObj: Union[stream.Part, stream.Score, None] = None,
@@ -2471,7 +2479,7 @@ class PartExporter(XMLExporterBase):
             self.midiChannelList = parent.midiChannelList  # shared list
             self.makeNotation = parent.makeNotation
 
-        self.previous_sibling_in_group: Optional[stream.PartStaff] = None
+        self.previousPartStaffInGroup: Optional[stream.PartStaff] = None
 
         self.instrumentStream = None
         self.firstInstrumentObject = None
@@ -5660,7 +5668,7 @@ class MeasureExporter(XMLExporterBase):
 
         return mxAttributes
 
-    def _matches_previous_sibling_in_group(self,
+    def _matchesPreviousPartStaffInGroup(self,
                                           obj: base.Music21Object,
                                           attr='keySignature',
                                           comparison='__eq__') -> bool:
@@ -5672,7 +5680,7 @@ class MeasureExporter(XMLExporterBase):
         '''
         if self.parent is None:  # pragma: no cover
             return False
-        if self.parent.previous_sibling_in_group is None:
+        if self.parent.previousPartStaffInGroup is None:
             return False
         # Not a foolproof measure lookup: see more robust measure
         # matching algorithm in PartStaffExporterMixin.processSubsequentPartStaff().
@@ -5680,7 +5688,7 @@ class MeasureExporter(XMLExporterBase):
         # see https://groups.google.com/g/music21list/c/ObNOanMQjJU/m/2LMPz5NAAwAJ
         if obj.measureNumber is None:  # pragma: no cover
             return False
-        maybe_measure = self.parent.previous_sibling_in_group.measure(obj.measureNumber)
+        maybe_measure = self.parent.previousPartStaffInGroup.measure(obj.measureNumber)
         if maybe_measure is None:
             return False
         comparison_wrapper = getattr(obj, comparison)
@@ -6009,11 +6017,15 @@ class MeasureExporter(XMLExporterBase):
             mxDivisions.text = str(self.currentDivisions)
             self.parent.lastDivisions = self.currentDivisions
 
-        if m.keySignature is not None and not self._matches_previous_sibling_in_group(
-                m.keySignature, 'keySignature'):
+        if (m.keySignature is not None
+                and not self._matchesPreviousPartStaffInGroup(
+                    m.keySignature, 'keySignature'
+                )):
             mxAttributes.append(self.keySignatureToXml(m.keySignature))
-        if m.timeSignature is not None and not self._matches_previous_sibling_in_group(
-                m.timeSignature, 'timeSignature', comparison='ratioEqual'):
+        if (m.timeSignature is not None
+                and not self._matchesPreviousPartStaffInGroup(
+                    m.timeSignature, 'timeSignature', comparison='ratioEqual'
+                )):
             mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
         smts = list(m.getElementsByClass('SenzaMisuraTimeSignature'))
         if smts:

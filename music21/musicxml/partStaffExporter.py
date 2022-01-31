@@ -145,9 +145,11 @@ class PartStaffExporterMixin:
     def joinableGroups(self) -> List[StaffGroup]:
         '''
         Returns a list of :class:`~music21.layout.StaffGroup` objects that
-        represent :class:`~music21.stream.PartStaff` objects that can be
+        represent :class:`~music21.stream.base.PartStaff` objects that can be
         joined into a single MusicXML `<part>`, so long as there exists a
-        `PartExporter` for it in `ScoreExporter.partExporterList`:
+        `PartExporter` for it in `ScoreExporter.partExporterList`.
+
+        Sets :attr:`~music21.musicxml.m21ToXml.PartExporter.previousPartStaffInGroup`.
 
         >>> s = stream.Score()
 
@@ -261,7 +263,7 @@ class PartStaffExporterMixin:
                 for part_exporter in self.partExporterList:
                     if part_exporter.stream is not part_staff:
                         continue
-                    part_exporter.previous_sibling_in_group = prior_part_staff
+                    part_exporter.previousPartStaffInGroup = prior_part_staff
                     prior_part_staff = part_staff
                     break
 
