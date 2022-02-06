@@ -13,7 +13,7 @@
 The style module represents information about the style of a Note, Accidental,
 etc. such that precise positioning information, layout, size, etc. can be specified.
 '''
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 import unittest
 
 from music21 import common
