@@ -999,7 +999,7 @@ class Chord(ChordBase):
 
         Can also be used in rare occasions to set the bass note to a new Pitch.
 
-        Note that overridding the bass currently will add the bass to the
+        Note that overriding the bass currently will add the bass to the
         chord itself.  This behavior differs from root() and
         may change in subsequent versions without a deprecation cycle.  It is
         better to explicitly add the bass to the chord.
@@ -1074,7 +1074,7 @@ class Chord(ChordBase):
 
             if not foundBassInChord:  # it's not there, needs to be added
                 self.pitches = (newbass, *(p for p in self.pitches))
-            # to be changed in v8 -- do not add this bass to the chord itself.
+            # raise exception in v8 -- do not add this bass to the chord itself.
 
             self._overrides['bass'] = newbass
             self._cache['bass'] = newbass
