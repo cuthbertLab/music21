@@ -191,7 +191,7 @@ class Harmony(chord.Chord):
                  figure: Optional[str] = None,
                  root: Optional[pitch.Pitch] = None,
                  bass: Optional[pitch.Pitch] = None,
-                 inversion: Optional[pitch.Pitch] = None,
+                 inversion: Optional[int] = None,
                  updatePitches: bool = True,
                  **keywords
                  ):
