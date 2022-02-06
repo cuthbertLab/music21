@@ -36,7 +36,7 @@ The list of objects included here are:
 '''
 import enum
 import unittest
-from typing import List
+from typing import List, no_type_check
 
 from music21 import base
 from music21 import exceptions21
@@ -445,6 +445,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             else:
                 return False
 
+    @no_type_check
     def parallelMotion(
         self,
         requiredInterval=None,
@@ -518,9 +519,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.parallelMotion(gi, allowOctaveDisplacement=True)
         True
         '''
-        # .generic could only be None if intervals were constructed without diatonic components
-        assert self.vIntervals[0].generic is not None
-        assert self.vIntervals[1].generic is not None
         if not self.similarMotion():
             return False
 
@@ -990,6 +988,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return False
 
+    @no_type_check
     def isProperResolution(self) -> bool:
         '''
         Checks whether the voice-leading quartet resolves correctly according to standard
@@ -1113,8 +1112,6 @@ class VoiceLeadingQuartet(base.Music21Object):
             n1degree = None
             n2degree = None
 
-        # .generic could only be None if intervals were constructed without diatonic components
-        assert self.vIntervals[1].generic is not None
         firstHarmony = self.vIntervals[0].simpleName
         secondHarmony = self.vIntervals[1].generic.simpleUndirected
 
@@ -1150,6 +1147,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return True
 
+    @no_type_check
     def leapNotSetWithStep(self) -> bool:
         '''
         Returns True if there is a leap or skip in once voice then the other voice must
@@ -1180,9 +1178,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         if self.noMotion():
             return False
 
-        # .generic could only be None if intervals were constructed without diatonic components
-        assert self.hIntervals[0].generic is not None
-        assert self.hIntervals[1].generic is not None
         if (self.hIntervals[0].generic.undirected == 3
                 and self.hIntervals[1].generic.undirected == 3
                 and self.contraryMotion()):
@@ -1238,13 +1233,16 @@ class VoiceLeadingQuartet(base.Music21Object):
         r1 = roman.identifyAsTonicOrDominant(c1, self.key)
         r2 = roman.identifyAsTonicOrDominant(c2, self.key)
         # TODO in Py3.8+, remove when identifyAsTonicOrDominant returns Union[str | Literal[False]]
-        assert r1 is not True and r2 is not True
+        if r1 is True or r2 is True:
+            raise VoiceLeadingQuartetException(
+                'identifyAsTonicOrDominant() returned True unexpectedly, please report a bug')
         openings = ['P1', 'P5', 'I', 'V']
         return not ((self.vIntervals[0].simpleName in openings
                         or self.vIntervals[1].simpleName in openings)
                       and (r1[0].upper() in openings if r1 is not False else False
                            or r2[0].upper() in openings if r2 is not False else False))
 
+    @no_type_check
     def closesIncorrectly(self) -> bool:
         '''
         TODO(msc): will be renamed to be less dogmatic
@@ -1284,9 +1282,6 @@ class VoiceLeadingQuartet(base.Music21Object):
             raisedMinorCorrectly = True
         preClosings = (6, 3)
         closingPitches = [self.v1n2.pitch.name, self.v2n2.name]
-        # .generic could only be None if intervals were constructed without diatonic components
-        assert self.vIntervals[0].generic is not None
-        assert self.vIntervals[1].generic is not None
         return not (self.vIntervals[0].generic.simpleUndirected in preClosings
                      and self.vIntervals[1].generic.simpleUndirected == 1
                      and raisedMinorCorrectly

@@ -498,7 +498,7 @@ class StyleMixin(common.SlottedObjectMixin):
     '''
     _styleClass = Style
 
-    __slots__: Tuple[str, ...] = ('_style', '_editorial')
+    __slots__ = ('_style', '_editorial')
 
     def __init__(self):
         #  no need to call super().__init__() on SlottedObjectMixin

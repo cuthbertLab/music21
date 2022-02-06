@@ -78,8 +78,6 @@ def unbundleInstruments(streamIn: stream.Stream, *, inPlace=False) -> Optional[s
 
     if inPlace is False:
         return s
-    else:
-        return None
 
 
 def bundleInstruments(streamIn: stream.Stream, *, inPlace=False) -> Optional[stream.Stream]:
@@ -120,8 +118,6 @@ def bundleInstruments(streamIn: stream.Stream, *, inPlace=False) -> Optional[str
 
     if inPlace is False:
         return s
-    else:
-        return None
 
 
 class Instrument(base.Music21Object):

@@ -266,8 +266,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
                 if isinstance(useArticulations, articulations.Articulation):
                     am = [useArticulations]  # place in a list
                 elif common.isIterable(useArticulations):
-                    assert useArticulations is not True
-                    am = useArticulations
+                    am = useArticulations  # type: ignore[assignment]
                 elif self.client is not None:
                     am = self.client.articulations
                 else:

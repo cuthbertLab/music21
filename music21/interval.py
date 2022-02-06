@@ -318,7 +318,10 @@ def _extractPitch(nOrP: Union['music21.note.Note', 'music21.pitch.Pitch']):
     True
 
     '''
-    return getattr(nOrP, 'pitch', nOrP)
+    from music21 import note
+    if isinstance(nOrP, note.Note):
+        return nOrP.pitch
+    return nOrP
 
 
 def convertStaffDistanceToInterval(staffDist):

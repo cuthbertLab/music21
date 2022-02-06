@@ -200,6 +200,7 @@ class SortTuple(namedtuple('SortTuple', (
 
         Changing offset, but nothing else, helps in creating .flatten() positions.
         '''
+        # _fields are the namedtuple attributes
         outList = [kw.get(attr, getattr(self, attr)) for attr in self._fields]
         return self.__class__(*outList)
 
@@ -228,7 +229,7 @@ class SortTuple(namedtuple('SortTuple', (
         outList = [max(getattr(self, attr), getattr(other, attr))
                     if attr in ('atEnd', 'isNotGrace')
                     else (getattr(self, attr) + getattr(other, attr))
-                    for attr in self._fields]
+                    for attr in self._fields]  # _fields are the namedtuple attributes
 
         return self.__class__(*outList)
 
@@ -255,7 +256,7 @@ class SortTuple(namedtuple('SortTuple', (
         outList = [min(getattr(self, attr), getattr(other, attr))
                     if attr in ('atEnd', 'isNotGrace')
                     else (getattr(self, attr) - getattr(other, attr))
-                    for attr in self._fields]
+                    for attr in self._fields]  # _fields are the namedtuple attributes
 
         return self.__class__(*outList)
 

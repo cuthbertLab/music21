@@ -135,7 +135,7 @@ class Editorial(prebase.ProtoM21Object, dict):
 
 
 # -----------------------------------------------------------------------------
-class Comment(prebase.ProtoM21Object, style.StyleMixin):
+class Comment(prebase.ProtoM21Object, style.StyleMixin):  # type: ignore
     '''
     A comment or footnote or something else attached to a note.
 

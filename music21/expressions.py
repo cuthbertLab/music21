@@ -848,7 +848,8 @@ class Trill(Ornament):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval)
 
         currentKeySig = None
-        if self._setAccidentalFromKeySig:
+        setAccidentalFromKeySig = self._setAccidentalFromKeySig
+        if setAccidentalFromKeySig:
             currentKeySig = srcObj.getContextByClass(key.KeySignature)
             if currentKeySig is None:
                 currentKeySig = key.KeySignature(0)
@@ -869,8 +870,7 @@ class Trill(Ornament):
             secondNoteNachschlag.transpose(transposeIntervalReverse,
                                            inPlace=True)
 
-            if self._setAccidentalFromKeySig:
-                assert currentKeySig is not None
+            if setAccidentalFromKeySig and currentKeySig:
                 firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
                     firstNoteNachschlag.step)
                 secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(

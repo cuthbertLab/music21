@@ -20,7 +20,7 @@ can be found in modules such as :ref:`moduleDynamics` (for things such as cresce
 '''
 import unittest
 import copy
-from typing import Any, Dict, Union, List, Optional
+from typing import Any, Dict, Sequence, Union, List, Optional
 
 from music21 import exceptions21
 from music21 import base
@@ -404,8 +404,8 @@ class Spanner(base.Music21Object):
         return [id(n) for n in self.spannerStorage._elements]
 
     def addSpannedElements(self,
-                           spannedElements: Union[base.Music21Object,
-                                                  List[base.Music21Object]],
+                           spannedElements: Union[Sequence[base.Music21Object],
+                                                  base.Music21Object],
                            *arguments,
                            **keywords):
         '''
@@ -429,16 +429,15 @@ class Spanner(base.Music21Object):
         True
         '''
         # presently, this does not look for redundancies
-        if isinstance(spannedElements, base.Music21Object):
-            spannedEls = [spannedElements]
-        else:
-            spannedEls = spannedElements
+        # add mypy disables because isListLike() performs type-narrowing
+        if not common.isListLike(spannedElements):
+            spannedElements = [spannedElements]  # type: ignore[list-item]
         if arguments:
-            spannedEls = spannedEls[:]  # copy
+            # copy
+            spannedElements = spannedElements[:]  # type: ignore[index]
             # assume all other arguments
-            spannedEls += arguments
-        # environLocal.printDebug(['addSpannedElements():', spannedElements])
-        for c in spannedEls:
+            spannedElements += arguments  # type: ignore[operator]
+        for c in spannedElements:  # type: ignore[union-attr]
             if c is None:
                 continue
             if not self.hasSpannedElement(c):  # not already in storage

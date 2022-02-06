@@ -2938,7 +2938,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         0.25
         '''
         if self.linked is False:
-            assert self._unlinkedType is not None, 'linked setter failed to set _unlinkedType'
+            if self._unlinkedType is None:  # pragma: no cover
+                raise DurationException(
+                    'linked property setter failed to set _unlinkedType, please open a bug report'
+                )
             return self._unlinkedType
         elif len(self.components) == 1:
             return self.components[0].type

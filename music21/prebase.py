@@ -263,6 +263,9 @@ class ProtoM21Object:
         >>> p = prebase.ProtoM21Object()
         >>> p._reprInternal()
         'object at 0x112590380'
+
+        A more complex `_reprInternal` that handles the case of objects
+        with `.id` defined is found in Music21Object.
         '''
         return f'object at {hex(id(self))}'
 
