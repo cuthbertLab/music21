@@ -23,7 +23,7 @@ import warnings
 from xml.etree.ElementTree import (
     Element, SubElement, ElementTree, Comment, fromstring as et_fromstring
 )
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Mapping, Optional, Union
 
 # external dependencies
 import webcolors
@@ -2446,8 +2446,17 @@ class PartExporter(XMLExporterBase):
     '''
     Object to convert one Part stream to a <part> tag on .parse()
     '''
+    _DOC_ATTR: Mapping[str, str] = {
+        'previousPartStaffInGroup': '''
+            If the part being exported is a :class:`~music21.stream.base.PartStaff`,
+            this attribute will be used to store the immediately previous `PartStaff`
+            in the :class:`~music21.layout.StaffGroup`, if any. (E.g. if this is
+            the left hand, store a reference to the right hand.)''',
+    }
 
-    def __init__(self, partObj: Union[stream.Part, stream.Score, None] = None, parent=None):
+    def __init__(self,
+                 partObj: Union[stream.Part, stream.Score, None] = None,
+                 parent: Optional[ScoreExporter] = None):
         super().__init__()
         # partObj can be a Score IF it has no parts within it.  But better to
         # always have it be a Part
@@ -2468,6 +2477,8 @@ class PartExporter(XMLExporterBase):
             self.refStreamOrTimeRange = parent.refStreamOrTimeRange
             self.midiChannelList = parent.midiChannelList  # shared list
             self.makeNotation = parent.makeNotation
+
+        self.previousPartStaffInGroup: Optional[stream.PartStaff] = None
 
         self.instrumentStream = None
         self.firstInstrumentObject = None
@@ -2923,14 +2934,16 @@ class MeasureExporter(XMLExporterBase):
 
     ignoreOnParseClasses = {'LayoutBase', 'Barline'}
 
-    def __init__(self, measureObj=None, parent=None):
+    def __init__(self,
+                 measureObj: Optional[stream.Measure] = None,
+                 parent: Optional[PartExporter] = None):
         super().__init__()
-        if measureObj is not None:
-            self.stream = measureObj
-        else:  # no point, but...
+        if measureObj is None:  # no point, but...
             self.stream = stream.Measure()
+        else:
+            self.stream = measureObj
 
-        self.parent = parent  # PartExporter
+        self.parent = parent
         self.xmlRoot = Element('measure')
         self.currentDivisions = defaults.divisionsPerQuarter
 
@@ -4929,9 +4942,10 @@ class MeasureExporter(XMLExporterBase):
         elif harm.pitchType == 'touching':
             SubElement(mxh, 'touching-pitch')
 
-    def noChordToXml(self, cs):
+    def noChordToXml(self, cs: harmony.NoChord):
         '''
-        Convert a NoChord object to an mxHarmony object.
+        Convert a NoChord object to an mxHarmony object (or a rest
+        if .writeAsChord = True).
 
         Expected attributes of the NoChord object:
 
@@ -4956,9 +4970,22 @@ class MeasureExporter(XMLExporterBase):
         music21.musicxml.xmlObjects.MusicXMLExportException:
              In part (None), measure (1): NoChord object's chordKind must be 'none'
 
+        To realize the NoChord as a rest:
+
+        >>> nc2 = harmony.NoChord()
+        >>> nc2.writeAsChord = True
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxNote = MEX.noChordToXml(nc2)
+        >>> MEX.dump(mxNote)
+        <note>
+            <rest />
+            <duration>10080</duration>
+            <type>quarter</type>
+        </note>
         '''
         if cs.writeAsChord is True:
-            return self.chordToXml(cs)
+            r = note.Rest(duration=cs.duration)
+            return self.restToXml(r)
 
         mxHarmony = Element('harmony')
         _synchronizeIds(mxHarmony, cs)
@@ -5654,6 +5681,32 @@ class MeasureExporter(XMLExporterBase):
 
         return mxAttributes
 
+    def _matchesPreviousPartStaffInGroup(self,
+                                          obj: base.Music21Object,
+                                          attr='keySignature',
+                                          comparison='__eq__') -> bool:
+        '''
+        If this measure is part of a subsequent PartStaff in a joinable staff
+        group (e.g. the left hand of a keyboard part), then look up the
+        corresponding measure by number in the previous PartStaff, retrieve
+        the `attr` value there, and compare it to `obj` by `comparison`.
+        '''
+        if self.parent is None:  # pragma: no cover
+            return False
+        if self.parent.previousPartStaffInGroup is None:
+            return False
+        # Not a foolproof measure lookup: see more robust measure
+        # matching algorithm in PartStaffExporterMixin.processSubsequentPartStaff().
+        # getElementsByOffset() would not be a perfect solution either,
+        # see https://groups.google.com/g/music21list/c/ObNOanMQjJU/m/2LMPz5NAAwAJ
+        if obj.measureNumber is None:  # pragma: no cover
+            return False
+        maybe_measure = self.parent.previousPartStaffInGroup.measure(obj.measureNumber)
+        if maybe_measure is None:
+            return False
+        comparison_wrapper = getattr(obj, comparison)
+        return comparison_wrapper(getattr(maybe_measure, attr))
+
     # -----------------------------
     # note helpers...
 
@@ -5977,20 +6030,25 @@ class MeasureExporter(XMLExporterBase):
             mxDivisions.text = str(self.currentDivisions)
             self.parent.lastDivisions = self.currentDivisions
 
-        if isinstance(m, stream.Measure):
-            if m.keySignature is not None:
-                mxAttributes.append(self.keySignatureToXml(m.keySignature))
-            if m.timeSignature is not None:
-                mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
-            smts = list(m.getElementsByClass('SenzaMisuraTimeSignature'))
-            if smts:
-                mxAttributes.append(self.timeSignatureToXml(smts[0]))
+        if (m.keySignature is not None
+                and not self._matchesPreviousPartStaffInGroup(
+                    m.keySignature, 'keySignature'
+                )):
+            mxAttributes.append(self.keySignatureToXml(m.keySignature))
+        if (m.timeSignature is not None
+                and not self._matchesPreviousPartStaffInGroup(
+                    m.timeSignature, 'timeSignature', comparison='ratioEqual'
+                )):
+            mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
+        smts = list(m.getElementsByClass('SenzaMisuraTimeSignature'))
+        if smts:
+            mxAttributes.append(self.timeSignatureToXml(smts[0]))
 
-            # For staves, see joinPartStaffs()
-            # TODO: part-symbol
-            # TODO: instruments
-            if m.clef is not None:
-                mxAttributes.append(self.clefToXml(m.clef))
+        # For staves, see joinPartStaffs()
+        # TODO: part-symbol
+        # TODO: instruments
+        if m.clef is not None:
+            mxAttributes.append(self.clefToXml(m.clef))
 
         found = m.getElementsByClass('StaffLayout')
         if found:
