@@ -2405,22 +2405,8 @@ class NoChord(ChordSymbol):
     >>> nc2.pitches
     ()
     '''
-    def __init__(self, figure=None, **keywords):
-
-        # override keywords to default values
-        keywords['kind'] = 'none'
-        for kw in keywords:
-            if kw == 'root':
-                keywords[kw] = None
-            if kw == 'bass':
-                keywords[kw] = None
-
-        super().__init__(figure, **keywords)
-
-        if self.chordKindStr is None or self.chordKindStr == '':
-            if self._figure is None:
-                self._figure = 'N.C.'
-            self.chordKindStr = self._figure
+    def __init__(self, figure=None, kind='none', kindStr=None, **keywords):
+        super().__init__(figure, kind=kind, kindStr=kindStr or figure or 'N.C.', **keywords)
 
         if self._figure is None:
             self._figure = self.chordKindStr
