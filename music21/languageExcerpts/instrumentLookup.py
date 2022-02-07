@@ -483,7 +483,6 @@ frenchToBestName = {
     'cymbales digitales': 'finger cymbals',
     'c\xe9lesta': 'celesta',
     'droite': 'recorder',
-    'enregistreur': 'recorder',
     'eoliphone': 'wind machine',
     'fl\xfbte': 'flute',
     'fl\xfbte de pan': 'pan flute',
