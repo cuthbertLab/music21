@@ -1,7 +1,7 @@
-"chord"	"altchord"	"measure"	"beat"	"totbeat"	"timesig"	"op"	"no"	"mov"	"length"	"global_key"	"local_key"	"pedal"	"numeral"	"form"	"figbass"	"changes"	"relativeroot"	"phraseend"
-".C.I6"	""	"1"	"1.0"	"1.0"	"2/4"	"1"	"2"	"3"	2.0	"C"	"I"	""	"I"	""	""	""	""	false
-"#viio6/ii"	""	"2"	"1.0"	"3.0"	"2/4"	"1"	"2"	"3"	2.0	"C"	"I"	""	"#vii"	"o"	"6"	""	"ii"	false
-"ii"	""	"3"	"1.0"	"5.0"	"2/4"	"1"	"2"	"3"	2.0	"C"	"I"	""	"ii"	""	""	""	""	false
-"V"	""	"4"	"1.0"	"7.0"	"3/4"	"1"	"2"	"3"	2.0	"C"	"I"	""	"V"	""	""	""	""	false
-"@none"	""	"5"	"1.0"	"10.0"	"3/4"	"1"	"2"	"3"	2.0	"C"	"I"	""	"V"	""	""	""	""	false
-"I"	""	"6"	"1.0"	"13.0"	"2/4"	"1"	"2"	"3"	2.0	"C"	"I"	""	"I"	""	""	""	""	false
+mc	mn	mc_onset	mn_onset	timesig	staff	voice	volta	label	globalkey	localkey	pedal	chord	special	numeral	form	figbass	changes	relativeroot	cadence	phraseend	chord_type	globalkey_is_minor	localkey_is_minor	chord_tones	added_tones	root	bass_note
+1	1	0	0	2/4					C	I		.C.I6		I						FALSE							
+2	2	0	0	2/4					C	I		#viio6/ii		#vii	o	6		ii		FALSE							
+3	3	0	0	2/4					C	I		ii		ii						FALSE							
+4	4	0	0	3/4					C	I		V		V						FALSE							
+5	5	0	0	3/4					C	I		@none		V						FALSE							
+6	6	0	0	2/4					C	I		I		I						FALSE							
