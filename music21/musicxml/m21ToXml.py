@@ -3089,7 +3089,8 @@ class MeasureExporter(XMLExporterBase):
             root.append(sp)
 
         classes = obj.classes
-        if 'GeneralNote' in classes:
+        # Ignore Harmony objects having writeAsChord = False
+        if 'GeneralNote' in classes and getattr(obj, 'writeAsChord', True):
             self.offsetInMeasure += obj.duration.quarterLength
 
         # turn inexpressible durations into complex durations (unless unlinked)
@@ -7006,6 +7007,53 @@ class Test(unittest.TestCase):
         tree = self.getET(newAltoFixed)
         self.assertTrue(tree.findall('.//note'))
         self.assertFalse(tree.findall('.//forward'))
+
+    def testExportChordSymbolsWithRealizedDurations(self):
+        gex = GeneralObjectExporter()
+
+        def realizeDurationsAndAssertTags(m: stream.Measure, forwardTag=False, offsetTag=False):
+            m = copy.deepcopy(m)
+            harmony.realizeChordSymbolDurations(m)
+            obj = gex.fromGeneralObject(m)
+            tree = self.getET(obj)
+            self.assertIs(bool(tree.findall('.//forward')), forwardTag)
+            self.assertIs(bool(tree.findall('.//offset')), offsetTag)
+
+        # Two consecutive chord symbols, no rests
+        cs1 = harmony.ChordSymbol('C7')
+        cs2 = harmony.ChordSymbol('F7')
+        m = stream.Measure()
+        m.insert(0, cs1)
+        m.insert(2, cs2)
+        realizeDurationsAndAssertTags(m, forwardTag=True, offsetTag=False)
+
+        # Two consecutive chord symbols, rest coinciding with first one
+        r1 = note.Rest(type='half')
+        m.insert(0, r1)
+        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
+
+        # One chord symbol midmeasure, no rests
+        m.remove(cs1)
+        m.remove(r1)
+        realizeDurationsAndAssertTags(m, forwardTag=True, offsetTag=False)
+
+        # One chord symbol midmeasure coinciding with whole note
+        n1 = note.Note(type='whole')
+        m.insert(0, n1)
+        # Need an offset tag to show the -2.0 offset to get from end to midmeasure
+        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=True)
+
+        # One chord symbol at beginning of measure coinciding with whole note
+        m.remove(cs2)
+        m.insert(0, cs1)
+        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
+
+        # One chord symbol at beginning of measure with writeAsChord=True
+        # followed by a half note
+        cs1.writeAsChord = True
+        n1.offset = 2
+        n1.quarterLength = 2
+        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
 
 
 class TestExternal(unittest.TestCase):
