@@ -19,7 +19,7 @@ and used to configure, :class:`~music21.note.Note` objects.
 import copy
 import unittest
 
-from typing import Optional, List, Union, Tuple, Iterable, cast
+from typing import Optional, List, Type, Union, Tuple, Iterable, cast
 
 from music21 import base
 from music21 import beam
@@ -506,7 +506,7 @@ class GeneralNote(base.Music21Object):
     isNote = False
     isRest = False
     isChord = False
-    _styleClass = style.NoteStyle
+    _styleClass: Type[style.Style] = style.NoteStyle
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']

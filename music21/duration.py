@@ -295,8 +295,9 @@ def quarterLengthToClosestType(qLen: OffsetQLIn):
     else:
         noteLengthType = opFrac(4 / qLen)
 
-    if noteLengthType in typeFromNumDict:
-        return (typeFromNumDict[noteLengthType], True)
+    # noteLengthType could be a Fraction, but not a problem
+    if noteLengthType in typeFromNumDict:  # type: ignore[index]
+        return (typeFromNumDict[noteLengthType], True)  # type: ignore[index]
     else:
         lowerBound = 4 / qLen
         upperBound = 8 / qLen
@@ -334,8 +335,8 @@ def convertQuarterLengthToType(qLen: OffsetQLIn) -> str:
             f'cannot convert quarterLength {qLen} exactly to type')
     return durationType
 
-
-def dottedMatch(qLen: OffsetQLIn, maxDots=4) -> Tuple[Union[int, bool], Union[str, bool]]:
+# TODO: in Py3.8+ Union[Tuple[int, str], Tuple[Literal[False], Literal[False]]]
+def dottedMatch(qLen: OffsetQLIn, maxDots=4) -> Union[Tuple[int, str], Tuple[bool, bool]]:
     '''
     Given a quarterLength, determine if there is a dotted
     (or non-dotted) type that exactly matches. Returns a pair of
@@ -637,13 +638,15 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
         else:
             qLenDict = 0
         # hashes are awesome. will catch Fraction(1, 1), 1, 1.0 etc.
-        durType = typeFromNumDict[qLenDict]
+        durType = typeFromNumDict[qLenDict]  # type: ignore[index]
         dt = durationTupleFromTypeDots(durType, 0)
         return QuarterLengthConversion((dt,), None)
     except KeyError:
         pass
 
-    dots, durType = dottedMatch(qLen)
+    # Trying to quickly check is not (False, False)
+    # mypy wonders if maybe durType could be True
+    dots, durType = dottedMatch(qLen)  # type: ignore[assignment]
     if durType is not False:
         dt = durationTupleFromTypeDots(durType, dots)
         return QuarterLengthConversion((dt,), None)
@@ -810,7 +813,7 @@ def _augmentOrDiminishTuple(self, amountToScale):
     return durationTupleFromQuarterLength(self.quarterLength * amountToScale)
 
 
-DurationTuple.augmentOrDiminish = _augmentOrDiminishTuple
+DurationTuple.augmentOrDiminish = _augmentOrDiminishTuple  # type: ignore[attr-defined]
 
 
 del _augmentOrDiminishTuple
@@ -844,11 +847,11 @@ def _durationTupleOrdinal(self):
     return ordinalFound
 
 
-DurationTuple.ordinal = property(_durationTupleOrdinal)
+DurationTuple.ordinal = property(_durationTupleOrdinal)  # type: ignore[attr-defined]
 
 
-_durationTupleCacheTypeDots = {}
-_durationTupleCacheQuarterLength = {}
+_durationTupleCacheTypeDots: Dict[Tuple[str, int], DurationTuple] = {}
+_durationTupleCacheQuarterLength: Dict[OffsetQL, DurationTuple] = {}
 
 
 def durationTupleFromQuarterLength(ql=1.0) -> DurationTuple:
@@ -1188,9 +1191,15 @@ class Tuplet(prebase.ProtoM21Object):
 
         # duration units scale
         if post.durationActual is not None:
-            post.durationActual = post.durationActual.augmentOrDiminish(amountToScale)
+            post.durationActual = (
+                post.durationActual.augmentOrDiminish(  # type: ignore[attr-defined]
+                    amountToScale)
+            )
         if post.durationNormal is not None:
-            post.durationNormal = post.durationNormal.augmentOrDiminish(amountToScale)
+            post.durationNormal = (
+                post.durationNormal.augmentOrDiminish(  # type: ignore[attr-defined]
+                    amountToScale)
+            )
 
         # ratios stay the same
         # self.numberNotesActual = actual
@@ -1234,7 +1243,7 @@ class Tuplet(prebase.ProtoM21Object):
 
         '''
         self._checkFrozen()
-        if common.isNum(durType):
+        if common.isNum(durType) and not isinstance(durType, str):
             durType = convertQuarterLengthToType(durType)
 
         self.durationActual = durationTupleFromTypeDots(durType, dots)
@@ -2929,6 +2938,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         0.25
         '''
         if self.linked is False:
+            if self._unlinkedType is None:  # pragma: no cover
+                raise DurationException(
+                    'linked property setter failed to set _unlinkedType, please open a bug report'
+                )
             return self._unlinkedType
         elif len(self.components) == 1:
             return self.components[0].type

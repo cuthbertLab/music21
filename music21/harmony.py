@@ -19,7 +19,7 @@ import copy
 import re
 import unittest
 
-from typing import Optional, TypeVar
+from typing import Dict, List, Optional, Tuple, TypeVar
 
 from music21 import base
 from music21 import chord
@@ -37,7 +37,8 @@ from music21.figuredBass import realizerScale
 from music21 import environment
 environLocal = environment.Environment('harmony')
 
-T = TypeVar('T')
+T = TypeVar('T', bound='ChordSymbol')
+NCT = TypeVar('NCT', bound='NoChord')
 
 # --------------------------------------------------------------------------
 
@@ -190,7 +191,7 @@ class Harmony(chord.Chord):
                  figure: Optional[str] = None,
                  root: Optional[pitch.Pitch] = None,
                  bass: Optional[pitch.Pitch] = None,
-                 inversion: Optional[pitch.Pitch] = None,
+                 inversion: Optional[int] = None,
                  updatePitches: bool = True,
                  **keywords
                  ):
@@ -206,8 +207,8 @@ class Harmony(chord.Chord):
         # called <function> which might conflict with the Harmony...
         self._roman = None
         # specify an array of degree alteration objects
-        self.chordStepModifications = []
-        self._degreesList = []
+        self.chordStepModifications: List[ChordStepModification] = []
+        self._degreesList: List[str] = []
         self._key = None
         # senseless to parse inversion until chord members are populated
         self._updateFromParameters(root=root, bass=bass)
@@ -1369,7 +1370,7 @@ def removeChordSymbols(chordType):
 
 
 # --------------------------------------------------------------------------
-realizerScaleCache = {}
+realizerScaleCache: Dict[Tuple[str, str], realizerScale.FiguredBassScale] = {}
 
 # --------------------------------------------------------------------------
 
@@ -2424,7 +2425,7 @@ class NoChord(ChordSymbol):
         # do nothing, everything is already set.
         return
 
-    def transpose(self: T, _value, *, inPlace=False) -> Optional[T]:
+    def transpose(self: NCT, _value, *, inPlace=False) -> Optional[NCT]:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
 

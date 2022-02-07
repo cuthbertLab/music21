@@ -789,14 +789,11 @@ class _EnvironmentCore:
 # -----------------------------------------------------------------------------
 
 
-# store one instance of _EnvironmentCore within this module
+# store one singleton instance of _EnvironmentCore within this module
 # this is a module-level implementation of the singleton pattern
 # reloading the module will force a recreation of the module
 # noinspection PyDictCreation
-_environStorage = {'instance': None, 'forcePlatform': None}
-
-# create singleton instance
-_environStorage['instance'] = _EnvironmentCore()
+_environStorage = {'instance': _EnvironmentCore(), 'forcePlatform': None}
 
 
 def envSingleton():

@@ -26,7 +26,7 @@ import importlib
 import unittest
 import sys
 from collections import OrderedDict
-from typing import Optional
+from typing import Iterable, Optional
 
 from music21 import base
 from music21 import common
@@ -41,10 +41,9 @@ from music21.exceptions21 import InstrumentException
 from music21 import environment
 _MOD = 'instrument'
 environLocal = environment.Environment(_MOD)
-StreamType = stream.StreamType
 
 
-def unbundleInstruments(streamIn: StreamType, *, inPlace=False) -> Optional[StreamType]:
+def unbundleInstruments(streamIn: stream.Stream, *, inPlace=False) -> Optional[stream.Stream]:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -1858,7 +1857,7 @@ def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
         returnObj = s.coreCopyAsDerivation('instrument.deduplicate')
 
     if not returnObj.hasPartLikeStreams():
-        substreams = [returnObj]
+        substreams: Iterable[stream.Stream] = [returnObj]
     else:
         substreams = returnObj.getElementsByClass('Stream')
 

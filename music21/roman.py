@@ -17,7 +17,7 @@ import enum
 import unittest
 import copy
 import re
-from typing import Union, Optional, List, Tuple
+from typing import Dict, Union, Optional, List, Tuple
 
 # when python 3.7 is removed from support:
 # from typing import Literal
@@ -53,8 +53,8 @@ ENDWITHFLAT_RE = re.compile(r'[b\-]$')
 
 # cache all Key/Scale objects created or passed in; re-use
 # permits using internally scored pitch segments
-_scaleCache = {}
-_keyCache = {}
+_scaleCache: Dict[str, scale.Scale] = {}
+_keyCache: Dict[str, key.Key] = {}
 
 # create a single notation object for RN initialization, for type-checking,
 # but it will always be replaced.
@@ -103,7 +103,7 @@ figureShorthands = {
     'b7b53': 'ø7',
 }
 
-figureShorthandsMode = {
+figureShorthandsMode: Dict[str, Dict] = {
     'major': {
     },
     'minor': {
@@ -2074,7 +2074,7 @@ class RomanNumeral(harmony.Harmony):
     def __init__(
         self,
         figure: Union[str, int] = '',
-        keyOrScale=None,
+        keyOrScale: Optional[Union[key.Key, scale.Scale]] = None,
         *,
         caseMatters=True,
         updatePitches=True,
@@ -2957,6 +2957,12 @@ class RomanNumeral(harmony.Harmony):
         >>> rn = roman.RomanNumeral('--II/V')
         >>> rn.romanNumeral
         'bbII'
+
+        OMIT_FROM_DOCS
+
+        >>> rn.romanNumeral = None
+        Traceback (most recent call last):
+        ValueError: Cannot set romanNumeral property of RomanNumeral objects
         '''
         if self.romanNumeralAlone in ('Ger', 'Sw', 'It', 'Fr'):
             return self.romanNumeralAlone
@@ -2965,6 +2971,10 @@ class RomanNumeral(harmony.Harmony):
 
         return (self.frontAlterationAccidental.modifier.replace('-', 'b')
                 + self.romanNumeralAlone)
+
+    @romanNumeral.setter
+    def romanNumeral(self, value):
+        raise ValueError('Cannot set romanNumeral property of RomanNumeral objects')
 
     @property
     def figure(self):

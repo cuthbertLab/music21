@@ -20,7 +20,7 @@ can be found in modules such as :ref:`moduleDynamics` (for things such as cresce
 '''
 import unittest
 import copy
-from typing import Union, List, Optional
+from typing import Any, Dict, Sequence, Union, List, Optional
 
 from music21 import exceptions21
 from music21 import base
@@ -404,8 +404,8 @@ class Spanner(base.Music21Object):
         return [id(n) for n in self.spannerStorage._elements]
 
     def addSpannedElements(self,
-                           spannedElements: Union['music21.base.Music21Object',
-                                                   List['music21.base.Music21Object']],
+                           spannedElements: Union[Sequence[base.Music21Object],
+                                                  base.Music21Object],
                            *arguments,
                            **keywords):
         '''
@@ -429,14 +429,15 @@ class Spanner(base.Music21Object):
         True
         '''
         # presently, this does not look for redundancies
+        # add mypy disables because isListLike() performs type-narrowing
         if not common.isListLike(spannedElements):
-            spannedElements = [spannedElements]
+            spannedElements = [spannedElements]  # type: ignore[list-item]
         if arguments:
-            spannedElements = spannedElements[:]  # copy
+            # copy
+            spannedElements = spannedElements[:]  # type: ignore[index]
             # assume all other arguments
-            spannedElements += arguments
-        # environLocal.printDebug(['addSpannedElements():', spannedElements])
-        for c in spannedElements:
+            spannedElements += arguments  # type: ignore[operator]
+        for c in spannedElements:  # type: ignore[union-attr]
             if c is None:
                 continue
             if not self.hasSpannedElement(c):  # not already in storage
@@ -625,7 +626,7 @@ class SpannerBundle(prebase.ProtoM21Object):
     '''
 
     def __init__(self, spanners: Optional[List[Spanner]] = None):
-        self._cache = {}  # cache is defined on Music21Object not ProtoM21Object
+        self._cache: Dict[str, Any] = {}  # cache is defined on Music21Object not ProtoM21Object
 
         self._storage: List[Spanner]
         if spanners:
@@ -637,7 +638,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         # SpannerBundle as missing a spannedElement; the next obj that meets
         # the class expectation will then be assigned and the spannedElement
         # cleared
-        self._pendingSpannedElementAssignment = []
+        self._pendingSpannedElementAssignment: List[Dict[Spanner, str]] = []
 
     def append(self, other):
         '''
@@ -2706,7 +2707,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Spanner]
+_DOC_ORDER: List[type] = [Spanner]
 
 
 if __name__ == '__main__':

@@ -80,8 +80,7 @@ from music21._version import __version__, __version_info__
 from music21.test.testRunner import mainTest
 
 
-# This should actually be bound to Music21Object, but cannot import here.
-_M21T = TypeVar('_M21T', bound=prebase.ProtoM21Object)
+_M21T = TypeVar('_M21T', bound='music21.base.Music21Object')
 
 # all other music21 modules below...
 
@@ -607,6 +606,26 @@ class Music21Object(prebase.ProtoM21Object):
     def __setstate__(self, state: Dict[str, Any]):
         # defining self.__dict__ upon initialization currently breaks everything
         self.__dict__ = state  # pylint: disable=attribute-defined-outside-init
+
+    def _reprInternal(self) -> str:
+        '''
+        If `x.id` is not the same as `id(x)`, then that id is used instead:
+
+        >>> b = base.Music21Object()
+        >>> b._reprInternal()
+        'object at 0x129a903b1'
+        >>> b.id = 'hi'
+        >>> b._reprInternal()
+        'id=hi'
+        '''
+        if self.id == id(self):
+            return super()._reprInternal()
+        reprId = self.id
+        try:
+            reprId = hex(reprId)
+        except (ValueError, TypeError):
+            pass
+        return f'id={reprId}'
 
     # --------------------------------------------------------------------------
 
@@ -1168,7 +1187,7 @@ class Music21Object(prebase.ProtoM21Object):
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> Optional['Music21Object']:
+    ) -> Optional[_M21T]:
         # noinspection PyShadowingNames
         '''
         A very powerful method in music21 of fundamental importance: Returns
