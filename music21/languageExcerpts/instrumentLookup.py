@@ -1131,7 +1131,7 @@ transliteration = {
     'crecelle': 'cr\xe9celle',
     'crotalos': 'cr\xf3talos',
     'cuerno ingles': 'cuerno ingl\xe9s',
-    'echelettes': '\xc8chelettes',
+    'echelettes': '\xe9chelettes',
     'el viento de la maquina': 'el viento de la m\xe1quina',
     'eoliphone': '\xe9oliphone',
     'flautin': 'flaut\xedn',
