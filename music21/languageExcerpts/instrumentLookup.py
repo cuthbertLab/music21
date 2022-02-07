@@ -220,7 +220,7 @@ bestNameToInstrumentClass = {
     'piano': 'Piano',
     'piccolo': 'Piccolo',
     'pipe organ': 'PipeOrgan',
-    'pitched percussion': 'Pitched Percussion',
+    'pitched percussion': 'PitchedPercussion',
     'ratchet': 'Ratchet',
     'recorder': 'Recorder',
     'reed organ': 'ReedOrgan',
