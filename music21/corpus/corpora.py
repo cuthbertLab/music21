@@ -846,16 +846,30 @@ class LocalCorpus(Corpus):
 
         If that path is included in the list of persisted paths for the given
         corpus, it will be removed permanently.
+
+        >>> testCorpus = corpus.corpora.LocalCorpus(name='test')
+        >>> testCorpus.addPath('~/Desktop')
+        >>> len(testCorpus.directoryPaths)
+        1
+        >>> testCorpus.removePath('~/Desktop')
+        >>> testCorpus.directoryPaths
+        ()
+
+        TODO: test for corpus persisted to disk without actually reindexing
+        files on user's Desktop.
         '''
         temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
             self.name, [])
-        directoryPath = common.cleanpath(directoryPath)
-        if directoryPath in temporaryPaths:
-            temporaryPaths.remove(directoryPath)
+        directoryPathObj: pathlib.Path = common.cleanpath(directoryPath, returnPathlib=True)
+        if directoryPathObj in temporaryPaths:
+            temporaryPaths.remove(directoryPathObj)
+        # Also need string version because LocalCorpusSettings is a list-like
+        # container of strings (see comments in environment.py)
+        directoryPathStr = str(directoryPathObj)
         if self.existsInSettings:
             settings = self._getSettings()
-            if settings is not None and directoryPath in settings:
-                settings.remove(directoryPath)
+            if settings is not None and directoryPathStr in settings:
+                settings.remove(directoryPathStr)
             self.save()
         self._removeNameFromCache(self.name)
 
