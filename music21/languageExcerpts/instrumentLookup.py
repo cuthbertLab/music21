@@ -1125,7 +1125,7 @@ transliteration = {
     'clavicembalo': 'clavic\xe9mbalo',
     'clavicimbalo': 'clavic\xedmbalo',
     'cloches a vache': 'cloches \xe0 vache',
-    'clochettes ++ main': 'clochettes \u2021 main',
+    'clochettes a main': 'clochettes \xe0 main',
     'corno frances': 'corno franc\xe9s',
     'corno ingles': 'corno ingl\xe9s',
     'crecelle': 'cr\xe9celle',
