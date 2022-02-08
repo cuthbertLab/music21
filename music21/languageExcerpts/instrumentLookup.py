@@ -926,7 +926,7 @@ italianToClassName = {
     'tamburo grosso': 'BassDrum',
     'tamburo militare': 'SnareDrum',
     'tamburo rullante': 'TenorDrum',
-    'tamtam': 'TomTom',
+    'tamtam': 'TamTam',
     'tempio di blocco': 'TempleBlock',
     'tenore': 'Tenor',
     'timbales latinoamericani': 'Timbales',
