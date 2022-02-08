@@ -1294,7 +1294,6 @@ allToClassName = {
     **russianToClassName,
     **spanishToClassName,
     **abbreviationToClassName,
-    **bestNameToInstrumentClass,
     **englishToClassName,  # leave at end since should overwrite any others.
 }
 
