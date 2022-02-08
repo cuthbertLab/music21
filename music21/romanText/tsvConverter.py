@@ -37,21 +37,10 @@ class TsvException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 
-# Changes:
-# - renamed 'combinedChord' to 'chord'; that name was not otherwise being used
-#   and it simplifies reading/writing headers
-# - measure -> mc (however, there is also 'mn': I'm not sure what the difference
-#   is) TODO
-# - beat -> mc_onset (agains, there is also 'mn_onset)
-# - deleted 'totbeat', 'altchord', 'no', 'op', 'mov', 'length' 
-#       (all these seem to be gone in the new version) # TODO which of these are
-#       important?
-# - global_key -> globalkey
-# - local_key -> localkey
 HEADERS = (
     'chord',
-    'mc',
-    'mc_onset',
+    'mn',
+    'mn_onset',
     'timesig',
     'globalkey',
     'localkey',
@@ -107,17 +96,17 @@ class TabChord:
     @property
     def beat(self):
         try:
-            return float(self.mc_onset)
+            return float(self.mn_onset)
         except ValueError:
             m = re.match(
                 r'(?P<numer>\d+(?:\.\d+)?)/(?P<denom>\d+(?:\.\d+)?)',
-                self.mc_onset,
+                self.mn_onset,
             )
             return float(m.group('numer')) / float(m.group('denom'))
 
     @property
     def measure(self):
-        return int(self.mc)
+        return int(self.mn)
     
     @property
     def local_key(self):
@@ -392,7 +381,7 @@ class TsvHandler:
 
         for thisChord in self.chordList:
             offsetInMeasure = thisChord.beat  # beats always measured in quarter notes
-            measureNumber = thisChord.mc
+            measureNumber = thisChord.mn
             m21Measure = p.measure(measureNumber)
 
             if thisChord.representationType == 'DCML':
@@ -513,8 +502,8 @@ class M21toTSV:
             thisEntry = TabChord()
 
             thisEntry.chord = thisRN.figure  # NB: slightly different from DCML: no key.
-            thisEntry.mc = thisRN.measureNumber
-            thisEntry.mc_onset = thisRN.beat
+            thisEntry.mn = thisRN.measureNumber
+            thisEntry.mn_onset = thisRN.beat
             thisEntry.timesig = thisRN.getContextByClass('TimeSignature').ratioString
 
             # TODO how important is the fact that length has been removed?
