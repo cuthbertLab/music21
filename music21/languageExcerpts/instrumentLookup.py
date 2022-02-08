@@ -1330,26 +1330,16 @@ class Test(unittest.TestCase):
         '''
         Test an example from each constituent dict that makes up allToClassName.
         '''
-        abbreviationTest = 'a sax'
-        self.assertEqual(allToClassName[abbreviationTest], abbreviationToClassName[abbreviationTest])
 
-        englishTest = 'accordion'
-        self.assertEqual(allToClassName[englishTest], englishToClassName[englishTest])
-
-        frenchTest = 'accord\xe9on'
-        self.assertEqual(allToClassName[frenchTest], frenchToClassName[frenchTest])
-
-        germanTest = 'aeolophon'
-        self.assertEqual(allToClassName[germanTest], germanToClassName[germanTest])
-
-        italianTest = 'a becco'
-        self.assertEqual(allToClassName[italianTest], italianToClassName[italianTest])
-
-        russianTest = "al't"
-        self.assertEqual(allToClassName[russianTest], russianToClassName[russianTest])
-
-        spanishTest = 'acorde\xf3n'
-        self.assertEqual(allToClassName[spanishTest], spanishToClassName[spanishTest])
+        for testString, langDict in [('a sax', abbreviationToClassName),
+                                     ('accordion', englishToClassName),
+                                     ('accord\xe9on', frenchToClassName),
+                                     ('aeolophon', germanToClassName),
+                                     ('a becco', italianToClassName),
+                                     ("al't", russianToClassName),
+                                     ('acorde\xf3n', spanishToClassName)
+                                     ]:
+            self.assertEqual(allToClassName[testString], langDict[testString])
 
     def testAllClassNames(self):
         '''
