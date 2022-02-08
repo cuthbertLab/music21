@@ -1452,6 +1452,14 @@ class Test(unittest.TestCase):
         spanishTest = 'acorde\xf3n'
         self.assertEqual(allToClassName[spanishTest], spanishToClassName[spanishTest])
 
+    def testAllClassNames(self):
+        '''
+        Test that all class names are real.
+        '''
+        from music21 import instrument as instr
+        for v in allToClassName.values():
+            getattr(instr, v)
+
 
 # ------------------------------------------------------------------------------
 
