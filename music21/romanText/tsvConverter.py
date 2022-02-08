@@ -14,6 +14,7 @@ DCMLab's Annotated Beethoven Corpus (Neuwirth et al. 2018).
 '''
 
 import csv
+import re
 import unittest
 
 from music21 import common
@@ -63,6 +64,37 @@ HEADERS = (
     'phraseend',
 )
 
+DCML_V2_HEADERS = (
+    'mc',
+    'mn',
+    'mc_onset',
+    'mn_onset',
+    'timesig',
+    'staff',
+    'voice',
+    'volta',
+    'label',
+    'globalkey',
+    'localkey',
+    'pedal',
+    'chord',
+    'special',
+    'numeral',
+    'form',
+    'figbass',
+    'changes',
+    'relativeroot',
+    'cadence',
+    'phraseend',
+    'chord_type',
+    'globalkey_is_minor',
+    'localkey_is_minor',
+    'chord_tones',
+    'added_tones',
+    'root',
+    'bass_note',
+)
+
 class TabChord:
     '''
     An intermediate representation format for moving between tabular data and music21 chords.
@@ -74,7 +106,14 @@ class TabChord:
     
     @property
     def beat(self):
-        return float(self.mc_onset)
+        try:
+            return float(self.mc_onset)
+        except ValueError:
+            m = re.match(
+                r'(?P<numer>\d+(?:\.\d+)?)/(?P<denom>\d+(?:\.\d+)?)',
+                self.mc_onset,
+            )
+            return float(m.group('numer')) / float(m.group('denom'))
 
     @property
     def measure(self):
@@ -213,8 +252,12 @@ class TabChord:
 
             localKeyNonRoman = getLocalKey(self.local_key, self.global_key)
 
-            thisEntry = roman.RomanNumeral(combined, localKeyNonRoman)
-            # thisEntry.quarterLength = self.length # TODO?
+            try:
+                thisEntry = roman.RomanNumeral(combined, localKeyNonRoman)
+            except music21.roman.RomanException:
+                assert combined == '@none'
+                # TODO what is the appropriate way of handling '@none'?
+                return None
 
             thisEntry.pedal = self.pedal
 
@@ -234,7 +277,7 @@ class TsvHandler:
 
     First we need to get a score. (Don't worry about this bit.)
 
-    >>> name = 'tsvEg2.tsv'
+    >>> name = 'tsvEg.tsv'
     >>> path = common.getSourceFilePath() / 'romanText' / name
     >>> handler = romanText.tsvConverter.TsvHandler(path)
     >>> handler.tsvToChords()
@@ -339,13 +382,14 @@ class TsvHandler:
         and populates that stream with the new RomanNumerals.
         '''
 
+        if self.chordList is None:
+            self.tsvToChords()
+
         self.prepStream()
 
         s = self.preparedStream
         p = s.parts.first()  # Just to get to the part, not that there are several.
 
-        if self.chordList is None:
-            self.tsvToChords()
         for thisChord in self.chordList:
             offsetInMeasure = thisChord.beat  # beats always measured in quarter notes
             measureNumber = thisChord.mc
@@ -356,7 +400,9 @@ class TsvHandler:
 
             thisM21Chord = thisChord.tabToM21()  # In either case.
 
-            m21Measure.insert(offsetInMeasure, thisM21Chord)
+            if thisM21Chord is not None:
+                # TODO remove this condition after handling '@none'?
+                m21Measure.insert(offsetInMeasure, thisM21Chord)
 
         self.m21stream = s
 
@@ -383,7 +429,10 @@ class TsvHandler:
         # s.metadata.title = 'Op' + firstEntry.op + '_No' + firstEntry.no + '_Mov' + firstEntry.mov
 
         startingKeySig = str(self.chordList[0].global_key)
-        ks = key.Key(startingKeySig)
+        try:
+            ks = key.Key(startingKeySig)
+        except music21.pitch.PitchException:
+            ks = key.Key(self.chordList[0].local_key)
         p.insert(0, ks)
 
         currentTimeSig = str(self.chordList[0].timesig)
@@ -399,7 +448,7 @@ class TsvHandler:
             if entry.measure == previousMeasure:
                 continue
             elif entry.measure != previousMeasure + 1:  # Not every measure has a chord change.
-                for mNo in range(previousMeasure + 1, entry.measure):
+                for mNo in range(previousMeasure + 1, entry.measure + 1):
                     m = stream.Measure(number=mNo)
                     m.offset = currentOffset + currentMeasureLength
                     p.insert(m)
@@ -418,7 +467,6 @@ class TsvHandler:
                     currentMeasureLength = newTS.barDuration.quarterLength
 
                 previousMeasure = entry.measure
-
         s.append(p)
 
         self.preparedStream = s
@@ -440,7 +488,7 @@ class M21toTSV:
 
     >>> initial = romanText.tsvConverter.M21toTSV(bachHarmony)
     >>> tsvData = initial.tsvData
-    >>> tsvData[1][0]
+    >>> tsvData[1][14]
     'I'
     '''
 
@@ -472,8 +520,12 @@ class M21toTSV:
             # TODO how important is the fact that length has been removed?
             #   Do we need to calculate this ourselves?
             # thisEntry.length = thisRN.quarterLength
+
+            # NB "global_key" and "local_key" in DCML_V2 are pitch names
+            #   and roman numerals respectively. If we want to reproduce that
+            #   we will need to write appropriate logic here.
             thisEntry.global_key = None
-            thisEntry.local_key = thisRN.key
+            thisEntry.local_key = thisRN.key.tonicPitchNameWithCase
             thisEntry.pedal = None
             thisEntry.numeral = thisRN.romanNumeralAlone
             thisEntry.form = None
@@ -482,21 +534,9 @@ class M21toTSV:
             thisEntry.relativeroot = relativeroot
             thisEntry.phraseend = None
 
-            # TODO I think we need to get the order of attributes dynamically
-            thisInfo = [thisEntry.chord,
-                        thisEntry.mc,
-                        thisEntry.mc_onset,
-                        thisEntry.timesig,
-                        thisEntry.global_key,
-                        thisEntry.local_key,
-                        thisEntry.pedal,
-                        thisEntry.numeral,
-                        thisEntry.form,
-                        thisEntry.figbass,
-                        thisEntry.changes,
-                        thisEntry.relativeroot,
-                        thisEntry.phraseend
-                        ]
+            thisInfo = [
+                getattr(thisEntry, name, '') for name in DCML_V2_HEADERS
+            ]
 
             tsvData.append(thisInfo)
 
@@ -506,13 +546,12 @@ class M21toTSV:
         '''
         Writes a list of lists (e.g. from m21ToTsv()) to a tsv file.
         '''
-        with open(filePathAndName, 'a', newline='', encoding='utf-8') as csvFile:
+        with open(filePathAndName, 'w', newline='', encoding='utf-8') as csvFile:
             csvOut = csv.writer(csvFile,
                                 delimiter='\t',
                                 quotechar='"',
                                 quoting=csv.QUOTE_MINIMAL)
-
-            csvOut.writerow(HEADERS)
+            csvOut.writerow(DCML_V2_HEADERS)
 
             for thisEntry in self.tsvData:
                 csvOut.writerow(thisEntry)
@@ -658,7 +697,7 @@ def getSecondaryKey(rn, local_key):
 class Test(unittest.TestCase):
 
     def testTsvHandler(self):
-        name = 'tsvEg2.tsv'
+        name = 'tsvEg.tsv'
         # A short and improbably complicated test case complete with:
         # '@none' (rest entry), '/' relative root, and time signature changes.
         path = common.getSourceFilePath() / 'romanText' / name
@@ -666,10 +705,9 @@ class Test(unittest.TestCase):
         handler = TsvHandler(path)
 
         # Raw
-        # This test can't be guaranteed to work with new approach; we can just
-        # remove it TODO
-        # self.assertEqual(handler.tsvData[0][0], '.C.I6')
-        # self.assertEqual(handler.tsvData[1][0], '#viio6/ii')
+        chord_i = DCML_V2_HEADERS.index('chord')
+        self.assertEqual(handler.tsvData[0][chord_i], '.C.I6')
+        self.assertEqual(handler.tsvData[1][chord_i], '#viio6/ii')
 
         # Chords
         handler.tsvToChords()
@@ -700,6 +738,24 @@ class Test(unittest.TestCase):
         out_stream = handler.toM21Stream()
         self.assertEqual(out_stream.parts[0].measure(1)[0].figure, 'I')  # First item in measure 1
 
+
+        # Ultimately, to verify that the conversion is working well both
+        # ways, it would be nice to convert forward and backwards and
+        # compare the results. But we won't be able to do so until writing 
+        # "globalkey" and "localkey" is implemented
+        # name = 'n01op18-1_01.tsv'
+        # path = common.getSourceFilePath() / 'romanText' / name
+        # forward1 = TsvHandler(path)
+        # stream1 = forward1.toM21Stream()
+
+        # envLocal = environment.Environment()
+        # tempF = envLocal.getTempFile()
+        # M21toTSV(stream1).write(tempF)
+        # forward2 = TsvHandler(tempF)
+        # stream2 = forward2.toM21Stream()
+
+        
+
     def testM21ToTsv(self):
         import os
         from music21 import corpus
@@ -707,15 +763,16 @@ class Test(unittest.TestCase):
         bachHarmony = corpus.parse('bach/choraleAnalyses/riemenschneider001.rntxt')
         initial = M21toTSV(bachHarmony)
         tsvData = initial.tsvData
+        numeral_i = DCML_V2_HEADERS.index("numeral")
         self.assertEqual(bachHarmony.parts[0].measure(1)[0].figure, 'I')  # NB pickup measure 0.
-        self.assertEqual(tsvData[1][0], 'I')
+        self.assertEqual(tsvData[1][numeral_i], 'I')
 
         # Test .write
         envLocal = environment.Environment()
         tempF = envLocal.getTempFile()
         initial.write(tempF)
         handler = TsvHandler(tempF)
-        self.assertEqual(handler.tsvData[0][0], 'I')
+        self.assertEqual(handler.tsvData[0][numeral_i], 'I')
         os.remove(tempF)
 
     def testIsMinor(self):
