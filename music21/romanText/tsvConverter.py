@@ -243,7 +243,7 @@ class TabChord:
 
             try:
                 thisEntry = roman.RomanNumeral(combined, localKeyNonRoman)
-            except music21.roman.RomanException:
+            except roman.RomanException:
                 assert combined == '@none'
                 # TODO what is the appropriate way of handling '@none'?
                 return None
@@ -299,13 +299,20 @@ class TsvHandler:
         self.m21stream = None
         self.preparedStream = None
         self._head_indices = None
+        self._extra_indices = None
         self.tsvData = self._importTsv()
     
     def _get_heading_indices(self, header_row):
-        self._head_indices = {
-            i: item for i, item in enumerate(header_row) 
-            if item in self._heading_names
-        }
+        self._head_indices, self._extra_indices = {}, {}
+        for i, item in enumerate(header_row):
+            if item in self._heading_names:
+                self._head_indices[i] = item
+            else:
+                self._extra_indices[i] = item
+        # self._head_indices = {
+        #     i: item for i, item in enumerate(header_row) 
+        #     if item in self._heading_names
+        # }
 
 
     def _importTsv(self):
@@ -341,6 +348,9 @@ class TsvHandler:
         thisEntry = TabChord()
         for i, name in self._head_indices.items():
             setattr(thisEntry, name, row[i])
+        thisEntry.extra = {
+            name: row[i] for i, name in self._extra_indices.items() if row[i]
+        }
         thisEntry.representationType = 'DCML'  # Added
 
         return thisEntry
@@ -389,8 +399,9 @@ class TsvHandler:
 
             thisM21Chord = thisChord.tabToM21()  # In either case.
 
+            # TODO remove this condition after handling '@none'?
             if thisM21Chord is not None:
-                # TODO remove this condition after handling '@none'?
+                thisM21Chord.editorial.update(thisChord.extra)
                 m21Measure.insert(offsetInMeasure, thisM21Chord)
 
         self.m21stream = s
@@ -493,6 +504,9 @@ class M21toTSV:
 
         tsvData = []
 
+        # take the global_key from the first item
+        global_key = next(self.m21Stream.recurse().getElementsByClass(
+            'RomanNumeral')).key.tonicPitchNameWithCase
         for thisRN in self.m21Stream.recurse().getElementsByClass('RomanNumeral'):
 
             relativeroot = None
@@ -510,10 +524,8 @@ class M21toTSV:
             #   Do we need to calculate this ourselves?
             # thisEntry.length = thisRN.quarterLength
 
-            # NB "global_key" and "local_key" in DCML_V2 are pitch names
-            #   and roman numerals respectively. If we want to reproduce that
-            #   we will need to write appropriate logic here.
-            thisEntry.global_key = None
+            thisEntry.global_key = global_key
+            # TODO convert "local_key" to a roman numeral as in DCML?
             thisEntry.local_key = thisRN.key.tonicPitchNameWithCase
             thisEntry.pedal = None
             thisEntry.numeral = thisRN.romanNumeralAlone
@@ -523,8 +535,10 @@ class M21toTSV:
             thisEntry.relativeroot = relativeroot
             thisEntry.phraseend = None
 
+            thisInfo = []
             thisInfo = [
-                getattr(thisEntry, name, '') for name in DCML_V2_HEADERS
+                getattr(thisEntry, name, thisRN.editorial.get(name, '')) 
+                for name in DCML_V2_HEADERS
             ]
 
             tsvData.append(thisInfo)
@@ -684,8 +698,10 @@ def getSecondaryKey(rn, local_key):
 
 
 class Test(unittest.TestCase):
+    
 
     def testTsvHandler(self):
+        import os
         name = 'tsvEg.tsv'
         # A short and improbably complicated test case complete with:
         # '@none' (rest entry), '/' relative root, and time signature changes.
@@ -732,16 +748,20 @@ class Test(unittest.TestCase):
         # ways, it would be nice to convert forward and backwards and
         # compare the results. But we won't be able to do so until writing 
         # "globalkey" and "localkey" is implemented
-        # name = 'n01op18-1_01.tsv'
-        # path = common.getSourceFilePath() / 'romanText' / name
-        # forward1 = TsvHandler(path)
-        # stream1 = forward1.toM21Stream()
+        name = 'n01op18-1_01.tsv'
+        path = common.getSourceFilePath() / 'romanText' / name
+        forward1 = TsvHandler(path)
+        stream1 = forward1.toM21Stream()
 
-        # envLocal = environment.Environment()
-        # tempF = envLocal.getTempFile()
-        # M21toTSV(stream1).write(tempF)
-        # forward2 = TsvHandler(tempF)
+        envLocal = environment.Environment()
+        tempF = envLocal.getTempFile()
+        # tempF = common.getSourceFilePath() / 'romanText' / "temp.tsv"
+        M21toTSV(stream1).write(tempF)
+        forward2 = TsvHandler(tempF)
+        # TODO complete test by comparing stream1 to stream2 after implementing
+        #   localkey as roman numerals
         # stream2 = forward2.toM21Stream()
+        os.remove(tempF)
 
         
 
