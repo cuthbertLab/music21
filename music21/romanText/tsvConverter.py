@@ -17,7 +17,7 @@ import csv
 import re
 import unittest
 
-from music21 import common
+from music21 import chord, common, harmony
 from music21 import key
 from music21 import meter
 from music21 import note
@@ -227,7 +227,9 @@ class TabChord:
         'vii'
         '''
 
-        if self.numeral:
+        if self.numeral == '@none':
+            thisEntry = harmony.NoChord()
+        else:
             if self.form:
                 if self.figbass:
                     combined = ''.join([self.numeral, self.form, self.figbass])
@@ -240,21 +242,9 @@ class TabChord:
                 combined = ''.join([combined, '/', self.relativeroot])
 
             localKeyNonRoman = getLocalKey(self.local_key, self.global_key)
-
-            try:
-                thisEntry = roman.RomanNumeral(combined, localKeyNonRoman)
-            except roman.RomanException:
-                assert combined == '@none'
-                # TODO what is the appropriate way of handling '@none'?
-                return None
-
+            thisEntry = roman.RomanNumeral(combined, localKeyNonRoman)
             thisEntry.pedal = self.pedal
-
             thisEntry.phraseend = None
-
-        else:  # handling case of '@none'
-            thisEntry = note.Rest()
-            # thisEntry.quarterLength = self.length # TODO?
 
         return thisEntry
 
@@ -309,10 +299,6 @@ class TsvHandler:
                 self._head_indices[i] = item
             else:
                 self._extra_indices[i] = item
-        # self._head_indices = {
-        #     i: item for i, item in enumerate(header_row) 
-        #     if item in self._heading_names
-        # }
 
 
     def _importTsv(self):
@@ -328,21 +314,6 @@ class TsvHandler:
         '''
         Makes a TabChord out of a list imported from TSV data
         (a row of the original tabular format -- see TsvHandler.importTsv()).
-
-        This is how to make the TabChord:
-
-        # TODO there's no straightforward way to run a test like this
-        #   now that we are getting heading names from the first row of
-        #   TSV files; at the same time, this is now a private method, so
-        #   we can probably just delete the doctests
-        # >>> tabRowAsString1 = ['.C.I6', '', '1', '1.0', '1.0', '2/4', '1', '2', '3', '2.0',
-        # ...                                        'C', 'I', '', 'I', '', '', '', '', 'false']
-        # >>> testTabChord1 = romanText.tsvConverter.makeTabChord(tabRowAsString1)
-
-        And now let's check that it really is a TabChord:
-
-        # >>> testTabChord1.numeral
-        'I'
         '''
 
         thisEntry = TabChord()
@@ -399,10 +370,8 @@ class TsvHandler:
 
             thisM21Chord = thisChord.tabToM21()  # In either case.
 
-            # TODO remove this condition after handling '@none'?
-            if thisM21Chord is not None:
-                thisM21Chord.editorial.update(thisChord.extra)
-                m21Measure.insert(offsetInMeasure, thisM21Chord)
+            thisM21Chord.editorial.update(thisChord.extra)
+            m21Measure.insert(offsetInMeasure, thisM21Chord)
 
         self.m21stream = s
 
@@ -505,35 +474,37 @@ class M21toTSV:
         tsvData = []
 
         # take the global_key from the first item
+        global_key_obj = next(
+            self.m21Stream.recurse().getElementsByClass('RomanNumeral')
+        ).key
         global_key = next(self.m21Stream.recurse().getElementsByClass(
             'RomanNumeral')).key.tonicPitchNameWithCase
-        for thisRN in self.m21Stream.recurse().getElementsByClass('RomanNumeral'):
-
-            relativeroot = None
-            if thisRN.secondaryRomanNumeral:
-                relativeroot = thisRN.secondaryRomanNumeral.figure
-
+        for thisRN in self.m21Stream.recurse().getElementsByClass(
+            ['RomanNumeral', 'NoChord']
+        ):
             thisEntry = TabChord()
-
-            thisEntry.chord = thisRN.figure  # NB: slightly different from DCML: no key.
             thisEntry.mn = thisRN.measureNumber
             thisEntry.mn_onset = thisRN.beat
-            thisEntry.timesig = thisRN.getContextByClass('TimeSignature').ratioString
-
-            # TODO how important is the fact that length has been removed?
-            #   Do we need to calculate this ourselves?
-            # thisEntry.length = thisRN.quarterLength
-
+            thisEntry.timesig = thisRN.getContextByClass(
+                'TimeSignature').ratioString
             thisEntry.global_key = global_key
-            # TODO convert "local_key" to a roman numeral as in DCML?
-            thisEntry.local_key = thisRN.key.tonicPitchNameWithCase
-            thisEntry.pedal = None
-            thisEntry.numeral = thisRN.romanNumeralAlone
-            thisEntry.form = None
-            thisEntry.figbass = thisRN.figuresWritten
-            thisEntry.changes = None  # TODO
-            thisEntry.relativeroot = relativeroot
-            thisEntry.phraseend = None
+            if isinstance(thisRN, harmony.NoChord):
+                thisEntry.numeral = thisEntry.chord = "@none"
+            else:
+                relativeroot = None
+                if thisRN.secondaryRomanNumeral:
+                    relativeroot = thisRN.secondaryRomanNumeral.figure
+                thisEntry.chord = thisRN.figure  # NB: slightly different from DCML: no key.
+                thisEntry.pedal = None
+                thisEntry.numeral = thisRN.romanNumeralAlone
+                thisEntry.form = None
+                thisEntry.figbass = thisRN.figuresWritten
+                thisEntry.changes = None  # TODO
+                thisEntry.relativeroot = relativeroot
+                thisEntry.phraseend = None
+                local_key = local_key_as_rn(thisRN.key, global_key_obj)
+                thisEntry.local_key = local_key
+
 
             thisInfo = []
             thisInfo = [
@@ -560,6 +531,28 @@ class M21toTSV:
                 csvOut.writerow(thisEntry)
 
 # ------------------------------------------------------------------------------
+
+def local_key_as_rn(local_key, global_key):
+    '''
+    Takes two music21.key.Key objects and returns the roman numeral for
+    `local_key` in `global_key`.
+
+    >>> k1 = key.Key('C')
+    >>> k2 = key.Key('e-')
+    >>> romanText.tsvConverter.local_key_as_rn(k1, k2)
+    'VI'
+
+    >>> romanText.tsvConverter.local_key_as_rn(k2, k1)
+    'biii'
+    '''
+    letter = local_key.tonicPitchNameWithCase
+    rn = roman.RomanNumeral(
+        'i' if letter.islower() else 'I', keyOrScale=local_key
+    )
+    r = roman.romanNumeralFromChord(chord.Chord(rn.pitches), keyObj=global_key)
+    return r.romanNumeral
+
+
 def is_minor(test_key):
     '''
     Checks whether a key is minor or not simply by upper vs lower case.
@@ -748,20 +741,27 @@ class Test(unittest.TestCase):
         # ways, it would be nice to convert forward and backwards and
         # compare the results. But we won't be able to do so until writing 
         # "globalkey" and "localkey" is implemented
-        name = 'n01op18-1_01.tsv'
+        # name = 'n01op18-1_01.tsv'
         path = common.getSourceFilePath() / 'romanText' / name
         forward1 = TsvHandler(path)
         stream1 = forward1.toM21Stream()
 
         envLocal = environment.Environment()
         tempF = envLocal.getTempFile()
-        # tempF = common.getSourceFilePath() / 'romanText' / "temp.tsv"
         M21toTSV(stream1).write(tempF)
         forward2 = TsvHandler(tempF)
-        # TODO complete test by comparing stream1 to stream2 after implementing
-        #   localkey as roman numerals
-        # stream2 = forward2.toM21Stream()
+        stream2 = forward2.toM21Stream()
         os.remove(tempF)
+        assert len(stream1.recurse()) == len(stream2.recurse())
+        # presently the commented-out test fails because vii seems to be notated
+        # differently between music21 and DCML. E.g., '#viio7/vi' in the
+        # DCML file becomes 'viio7/vi' when we write it out, which then
+        # becomes 'bvii/vi' when read anew
+        # for i, (item1, item2) in enumerate(zip(
+        #     stream1.recurse().getElementsByClass('RomanNumeral'), 
+        #     stream2.recurse().getElementsByClass('RomanNumeral')
+        # )):
+        #     assert item1 == item2
 
         
 
