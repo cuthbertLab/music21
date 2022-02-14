@@ -1324,9 +1324,9 @@ class MusicXMLImporter(XMLParserBase):
                 try:
                     setattr(md, miscFieldName, miscFieldValue)
                 except Exception as e:  # pylint: disable=broad-except
-                    environLocal.warn('Could not set metadata: {} to {}: {}'.format(
+                    warnings.warn('Could not set metadata: {} to {}: {}'.format(
                         miscFieldName, miscFieldValue, e
-                    ))
+                    ), MusicXMLWarning)
 
         if inputM21 is None:
             return md
@@ -1870,7 +1870,8 @@ class PartParser(XMLParserBase):
         except Exception as e:  # pylint: disable=broad-except
             warnings.warn(
                 f'The following exception took place in m. {measureParser.measureNumber} in '
-                + f'part {self.stream.partName}.'
+                + f'part {self.stream.partName}.',
+                MusicXMLWarning
             )
             raise e
 
@@ -1931,21 +1932,23 @@ class PartParser(XMLParserBase):
                 # PartInfo. We haven't done anything with it yet, so
                 # no need for a change of instrument
                 pass
-                # environLocal.warn('Put trans on active instrument')
+                # warnings.warn('Put trans on active instrument', MusicXMLWarning)
             elif self.activeInstrument.transposition != newTransposition:
                 # We have an activeInstrument with a transposition that does
                 # not match, so this change of transposition
                 # requires us to create a new one (think of physical instruments
                 # such as Bb clarinet to A clarinet.
                 newInst = copy.deepcopy(self.activeInstrument)
-                # environLocal.warn('Put trans on new instrument')
+                # warnings.warn('Put trans on new instrument', MusicXMLWarning)
                 self.activeInstrument = newInst
                 self.stream.coreInsert(self.lastMeasureOffset, newInst)
         else:
             # There is no activeInstrument and we're not at the beginning
             # of the piece... this shouldn't happen, but let's send a warning
             # and create a Generic Instrument object rather than dying.
-            environLocal.warn('Received a transposition tag, but instrument to put it on!')
+            warnings.warn(
+                'Received a transposition tag, but no instrument to put it on!',
+                MusicXMLWarning)
             fakeInst = instrument.Instrument()
             self.activeInstrument = fakeInst
             self.stream.coreInsert(self.lastMeasureOffset, fakeInst)
@@ -2079,8 +2082,8 @@ class PartParser(XMLParserBase):
         # use this as the next offset
 
         mHighestTime = m.highestTime
-        # environLocal.warn([self.lastTimeSignature])
-        # environLocal.warn([self.lastTimeSignature.barDuration])
+        # warnings.warn([self.lastTimeSignature], MusicXMLWarning)
+        # warnings.warn([self.lastTimeSignature.barDuration], MusicXMLWarning)
 
         lastTimeSignatureQuarterLength = self.lastTimeSignature.barDuration.quarterLength
 
@@ -3911,7 +3914,7 @@ class MeasureParser(XMLParserBase):
                         'Line', idFound, False)[0]
                     # get first
                 except IndexError:
-                    environLocal.warn('Line <' + mxObj.tag + '> stop without start')
+                    warnings.warn('Line <' + mxObj.tag + '> stop without start', MusicXMLWarning)
                     return []
                 sp.completeStatus = True
 
@@ -3978,7 +3981,7 @@ class MeasureParser(XMLParserBase):
         try:
             numMarks = int(mxTremolo.text.strip())
         except (ValueError, AttributeError):
-            # environLocal.warn('could not convert ', dir(mxObj))
+            # warnings.warn('could not convert ', dir(mxObj), MusicXMLWarning)
             numMarks = 3
         if isSingle is True:
             ts = expressions.Tremolo()
@@ -4470,9 +4473,9 @@ class MeasureParser(XMLParserBase):
         if not textStripValid(mxVoice):
             useVoice = self.lastVoice
             if useVoice is None:  # pragma: no cover
-                environLocal.warn(
-                    'Cannot put in an element with a missing voice tag when '
-                    + 'no previous voice tag was given.  Assuming voice 1... ')
+                warnings.warn('Cannot put in an element with a missing voice tag when '
+                    + 'no previous voice tag was given.  Assuming voice 1... ',
+                    MusicXMLWarning)
                 useVoice = 1
         else:
             useVoice = mxVoice.text.strip()
@@ -4489,9 +4492,15 @@ class MeasureParser(XMLParserBase):
         elif str(useVoice) in self.voicesById:
             thisVoice = self.voicesById[str(useVoice)]
         else:
-            environLocal.warn(f'Cannot find voice {useVoice!r}; putting outside of voices.')
-            environLocal.warn(f'Current voiceIds: {list(self.voicesById)}')
-            environLocal.warn(f'Current voices: {list(m.voices)} in m. {m.number}')
+            warnings.warn(
+                f'Cannot find voice {useVoice!r}; putting outside of voices.',
+                MusicXMLWarning)
+            warnings.warn(
+                f'Current voiceIds: {list(self.voicesById)}',
+                MusicXMLWarning)
+            warnings.warn(
+                f'Current voices: {list(m.voices)} in m. {m.number}',
+                MusicXMLWarning)
 
         return thisVoice
 
@@ -4876,7 +4885,7 @@ class MeasureParser(XMLParserBase):
             try:
                 spannerList = self.xmlDirectionTypeToSpanners(mxDir)
             except MusicXMLImportException as excep:
-                environLocal.warn(f'Could not import {tag}: {excep}')
+                warnings.warn(f'Could not import {tag}: {excep}', MusicXMLWarning)
                 spannerList = []
 
             for sp in spannerList:
@@ -5126,7 +5135,7 @@ class MeasureParser(XMLParserBase):
                 self.staves = int(mxSub.text)
             elif tag == 'transpose':
                 self.transposition = self.xmlTransposeToInterval(mxSub)
-                # environLocal.warn('Got a transposition of ', str(self.transposition) )
+                # warnings.warn(f'Got a transposition of {self.transposition}', MusicXMLWarning)
 
         # footnote, level
         self.setEditorial(mxAttributes, self.stream)
@@ -5297,7 +5306,7 @@ class MeasureParser(XMLParserBase):
         for i in range(len(numerators)):
             msg.append(f'{numerators[i]}/{denominators[i]}')
 
-        # environLocal.warn(['loading meter string:', '+'.join(msg)])
+        # warnings.warn(f"loading meter string: {'+'.join(msg)}", MusicXMLWarning)
         if len(msg) == 1:  # normal
             try:
                 ts = meter.TimeSignature(msg[0])
@@ -5682,7 +5691,8 @@ class MeasureParser(XMLParserBase):
                 # noinspection PyArgumentList
                 stl.staffType = stream.enums.StaffType(xmlText)
             except ValueError:
-                environLocal.warn(f'Got an incorrect staff-type in details: {mxStaffType}')
+                warnings.warn(
+                    f'Got an incorrect staff-type in details: {mxStaffType}', MusicXMLWarning)
         # TODO: staff-tuning*
         # TODO: capo
         # TODO: show-frets
