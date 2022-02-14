@@ -1710,6 +1710,12 @@ class RomanNumeral(harmony.Harmony):
     >>> cp(r)
     ['G4']
 
+    Was setting a root of D5:
+
+    >>> r = roman.RomanNumeral('V754', key.Key('C'))
+    >>> cp(r)
+    ['G4', 'C5', 'D5', 'F5']
+
     (NOTE: all this is omitted -- look at OMIT_FROM_DOCS above)
     '''
     # TODO: document better! what is inherited and what is new?
@@ -2902,6 +2908,10 @@ class RomanNumeral(harmony.Harmony):
             self.pitches = newPitches
         else:
             self.pitches = pitches
+
+        if self.figuresNotationObj.numbers not in FIGURES_IMPLYING_BASS:
+            # Avoid deriving a nonsense root later
+            self.root(self.bass())
 
         self._matchAccidentalsToQuality(self.impliedQuality)
 
