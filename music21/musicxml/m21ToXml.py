@@ -3063,6 +3063,10 @@ class MeasureExporter(XMLExporterBase):
                     self.parseOneElement(obj)
 
             for n in notesForLater:
+                if n.isRest and n.style.hideObjectOnPrint and n.duration.type == 'inexpressible':
+                    # Prefer a gap in stream, to be filled with a <forward> tag by
+                    # fill_gap_with_forward_tag() rather than raising exceptions
+                    continue
                 self.parseOneElement(n)
 
         if backupAfterwards:
@@ -7054,6 +7058,30 @@ class Test(unittest.TestCase):
         n1.offset = 2
         n1.quarterLength = 2
         realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
+
+    def test_inexpressible_hidden_rests_become_forward_tags(self):
+        """Express hidden rests with inexpressible durations as <forward> tags."""
+        m = stream.Measure()
+        # 7 eighths in the space of 4 eighths, imported as 137/480
+        # (137/480) * 7 = 1.9979, not 2.0
+        # music21 filled gap with an inexpressible 0.0021 rest and couldn't export
+        septuplet = note.Note(type='eighth')
+        tuplet_obj = duration.Tuplet(7, 4, 'eighth')
+        septuplet.duration.appendTuplet(tuplet_obj)
+        septuplet.duration.linked = False
+        septuplet.quarterLength = fractions.Fraction(137, 480)
+        m.repeatAppend(septuplet, 7)
+        # leave 0.0021 gap and do the same thing from 2.0 -> 3.9979
+        m.repeatInsert(septuplet, [2.0])
+        m.repeatAppend(septuplet, 6)
+        m.insert(0, meter.TimeSignature('4/4'))
+        m.makeRests(inPlace=True, fillGaps=True, hideRests=True, timeRangeFromBarDuration=True)
+        self.assertLess(m[note.Rest].first().quarterLength, 0.0025)
+        gex = GeneralObjectExporter()
+        tree = self.getET(gex.fromGeneralObject(m))
+        # Only one <forward> tag to get from 1.9979 -> 2.0
+        # No <forward> tag is necessary to finish the incomplete measure (3.9979 -> 4.0)
+        self.assertEqual(len(tree.findall('.//forward')), 1)
 
 
 class TestExternal(unittest.TestCase):
