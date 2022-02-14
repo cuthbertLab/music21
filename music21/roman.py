@@ -62,11 +62,11 @@ _NOTATION_SINGLETON = fbNotation.Notation()
 
 
 # only some figures imply bass (e.g. "54" does not)
-FIGURES_IMPLYING_BASS: Tuple[Tuple[int, ...]] = (
+FIGURES_IMPLYING_BASS: Tuple[Tuple[int, ...], ...] = (
     # triads
     (6,), (6, 3), (6, 4),
     # seventh chords
-    (6, 5, 3), (6, 5), (6, 4, 3), (4, 3), (6, 4, 2), (4, 2), (2),
+    (6, 5, 3), (6, 5), (6, 4, 3), (4, 3), (6, 4, 2), (4, 2), (2,),
     # ninth chords
     (7, 6, 5, 3), (6, 5, 4, 3), (6, 4, 3, 2), (7, 5, 3, 2),
     # eleventh chords
