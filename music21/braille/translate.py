@@ -160,27 +160,23 @@ def objectToBraille(music21Obj,
     >>> print(translate.objectToBraille(sampleDynamic))
     ⠜⠋⠋⠋
 
+    >>> sample_voice = stream.Voice([note.Note()])
+    >>> sample_measure = stream.Measure([sample_voice])
+    >>> print(translate.objectToBraille(sample_measure))
+    ⠀⠼⠁⠲⠀
+    ⠼⠚⠀⠐⠹
+
+    >>> empty_measure = stream.Measure()
+    >>> print(translate.objectToBraille(empty_measure))
+    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+    ⠼⠚
+
     Not currently supported: generic `stream.Stream` objects:
 
     >>> sample_generic_stream = stream.Stream([note.Note()])
     >>> translate.objectToBraille(sample_generic_stream)
     Traceback (most recent call last):
     music21.braille.translate.BrailleTranslateException: Stream cannot be translated to Braille.
-
-    OMIT_FROM_DOCS
-
-    Not currently working: extracting music from voices
-
-    >>> sample_voice = stream.Voice([note.Note()])
-    >>> sample_measure = stream.Measure([sample_voice])
-    >>> print(translate.objectToBraille(sample_measure))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠚
-    >>> empty_measure = stream.Measure()
-    >>> print(translate.objectToBraille(empty_measure))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠚
-
     '''
     if isinstance(music21Obj, stream.Stream) and not isinstance(music21Obj, stream.Voice):
         return streamToBraille(music21Obj,
