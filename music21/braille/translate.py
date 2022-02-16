@@ -781,6 +781,12 @@ class Test(unittest.TestCase):
         x = objectToBraille(s, maxLineLength=10)
         self.assertEqual([len(line) for line in x.splitlines()], [10, 10, 7, 10])
 
+    def testFullScoreWithPiano(self):
+        from music21 import corpus
+        s = corpus.parse('beach')
+        full_score_measure_1 = s.measure(1)
+        _ = objectToBraille(full_score_measure_1)
+
 
 if __name__ == '__main__':
     import music21
