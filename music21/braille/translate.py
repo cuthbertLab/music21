@@ -273,7 +273,7 @@ def streamToBraille(music21Stream: Union[stream.Measure, stream.Part, stream.Sco
                             slurLongPhraseWithBrackets=slurLongPhraseWithBrackets,
                             suppressOctaveMarks=suppressOctaveMarks,
                             upperFirstInNoteFingering=upperFirstInNoteFingering,
-                            )
+                             )
     elif isinstance(music21Stream, stream.Measure):
         return measureToBraille(music21Stream,
                                 inPlace=inPlace,
@@ -385,6 +385,7 @@ def scoreToBraille(music21Score,
         allBrailleLines.append(metadataToString(music21Metadata, returnBrailleUnicode=True))
 
     unprocessed_partStaff: Optional[stream.PartStaff] = None
+
     def process_unmatched_part_staff_as_single_part():
         nonlocal unprocessed_partStaff
         if unprocessed_partStaff is None:
@@ -431,7 +432,7 @@ def scoreToBraille(music21Score,
                     slurLongPhraseWithBrackets=slurLongPhraseWithBrackets,
                     suppressOctaveMarks=suppressOctaveMarks,
                     upperFirstInNoteFingering=upperFirstInNoteFingering,
-                    )
+                )
                 allBrailleLines.append(keyboard_parts)
                 unprocessed_partStaff = None
             else:
