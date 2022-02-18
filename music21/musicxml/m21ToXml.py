@@ -489,11 +489,18 @@ class GeneralObjectExporter:
         solutions in Part or Stream production.
         '''
         mCopy = m.makeNotation()
+        if mCopy.style.measureNumbering is None:
+            # Provide a default
+            mCopy.style.measureNumbering = 'measure'
         if not m.recurse().getElementsByClass('Clef').getElementsByOffset(0.0):
             mCopy.clef = clef.bestClef(mCopy, recurse=True)
         p = stream.Part()
         p.append(mCopy)
         p.metadata = copy.deepcopy(getMetadataFromContext(m))
+        context_part = m.getContextByClass(stream.Part)
+        if context_part is not None:
+            p.partName = context_part.partName
+            p.partAbbreviation = context_part.partAbbreviation
         return self.fromPart(p)
 
     def fromVoice(self, v):
@@ -6493,7 +6500,7 @@ class MeasureExporter(XMLExporterBase):
                 mxPrint = Element('print')
             mxMeasureNumbering = SubElement(mxPrint, 'measure-numbering')
             mxMeasureNumbering.text = m.style.measureNumbering
-            mnStyle = m.style.measureNumberingStyle
+            mnStyle = m.style.measureNumberStyle
             if mnStyle is not None:
                 self.setPrintStyleAlign(mxMeasureNumbering, mnStyle)
         # TODO: part-name-display
