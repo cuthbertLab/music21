@@ -2221,11 +2221,13 @@ def conductorStream(s: stream.Stream) -> stream.Part:
     for klass in ('MetronomeMark', 'TimeSignature', 'KeySignature'):
         lastOffset = -1
         for el in s[klass]:
+            offset_in_s = el.getOffsetInHierarchy(s)
             # Don't overwrite an event of the same class at this offset
-            if el.offset > lastOffset:
-                conductorPart.coreInsert(el.offset, el)
-            lastOffset = el.offset
-            s.remove(el, recurse=True)
+            if offset_in_s > lastOffset:
+                conductorPart.insert(offset_in_s, el)
+            lastOffset = offset_in_s
+        for s_or_inner_stream in s.recurse(streamsOnly=True, includeSelf=True):
+            s_or_inner_stream.removeByClass(klass)
 
     conductorPart.coreElementsChanged()
 
@@ -3722,6 +3724,21 @@ class Test(unittest.TestCase):
         self.assertEqual(len(tempos), 1)
         self.assertEqual(tempos[0].number, 44)
         self.assertEqual(len(keySignatures), 1)
+
+    def testMidiExportConductorF(self):
+        '''Multiple meter changes'''
+        from music21 import converter
+        from music21 import midi as midiModule
+
+        source_dir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        s = converter.parse(source_dir / '11a-TimeSignatures.xml')
+        self.assertEqual(len(s['TimeSignature']), 11)
+
+        mf = streamToMidiFile(s)
+        conductor = mf.tracks[0]
+        meter_events = [
+            e for e in conductor.events if e.type is midiModule.MetaEvents.TIME_SIGNATURE]
+        self.assertEqual(len(meter_events), 11)
 
     def testMidiExportVelocityA(self):
         s = stream.Stream()
