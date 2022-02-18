@@ -492,8 +492,14 @@ class GeneralObjectExporter:
         if mCopy.style.measureNumbering is None:
             # Provide a default
             mCopy.style.measureNumbering = 'measure'
-        if not m.recurse().getElementsByClass('Clef').getElementsByOffset(0.0):
+        clef_from_measure_start_or_context = m.getContextByClass(
+            clef.Clef,
+            getElementMethod=common.enums.ElementSearch.AT_OR_BEFORE_OFFSET
+        )
+        if clef_from_measure_start_or_context is None:
             mCopy.clef = clef.bestClef(mCopy, recurse=True)
+        else:
+            mCopy.clef = clef_from_measure_start_or_context
         p = stream.Part()
         p.append(mCopy)
         p.metadata = copy.deepcopy(getMetadataFromContext(m))
