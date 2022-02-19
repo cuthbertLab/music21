@@ -1,4 +1,4 @@
-name: Linting and type-checking
+name: PyLint
 
 on:
     push:
