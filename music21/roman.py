@@ -1086,7 +1086,8 @@ def romanNumeralFromChord(
             keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
 
     try:
-        rn = RomanNumeral(rnString, keyObj, updatePitches=False, 
+        rn = RomanNumeral(rnString, keyObj, updatePitches=False,
+            # correctRNAlterationForMinor() adds cautionary
             sixthMinor=Minor67Default.CAUTIONARY, seventhMinor=Minor67Default.CAUTIONARY)
     except fbNotation.ModifierException as strerror:
         raise RomanNumeralException(
