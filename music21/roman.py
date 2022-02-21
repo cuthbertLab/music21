@@ -3936,6 +3936,17 @@ class Test(unittest.TestCase):
             rn_out = romanNumeralFromChord(ch, c_major)
             self.assertEqual(rn.figure, rn_out.figure, f'{aug6}: {rn_out}')
 
+    def testSetFigureAgain(self):
+        """Setting the figure again doesn't double the alterations"""
+        ger = RomanNumeral('Ger7')
+        pitches_before = ger.pitches
+        ger.figure = 'Ger7'
+        self.assertEqual(ger.pitches, pitches_before)
+
+        sharp_four = RomanNumeral('#IV')
+        pitches_before = sharp_four.pitches
+        sharp_four.figure = '#IV'
+        self.assertEqual(sharp_four.pitches, pitches_before)
 
     def testZeroForDiminished(self):
         from music21 import roman
