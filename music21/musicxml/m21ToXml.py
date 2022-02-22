@@ -488,6 +488,7 @@ class GeneralObjectExporter:
         representation of a Measure, not for partial
         solutions in Part or Stream production.
         '''
+        m.coreGatherMissingSpanners()
         mCopy = m.makeNotation()
         if mCopy.style.measureNumbering is None:
             # Provide a default
