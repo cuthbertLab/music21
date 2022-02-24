@@ -3819,7 +3819,7 @@ class MeasureParser(XMLParserBase):
     def xmlDirectionTypeToSpanners(self, mxObj):
         # noinspection PyShadowingNames
         '''
-        Some spanners, such as MusicXML wedge, bracket, and dashes,
+        Some spanners, such as MusicXML wedge, bracket, dashes, and ottava
         are encoded as MusicXML directions.
 
         >>> from xml.etree.ElementTree import fromstring as EL
@@ -3899,7 +3899,7 @@ class MeasureParser(XMLParserBase):
                     if height is not None:
                         sp.startHeight = float(height)
                     sp.startTick = mxObj.get('line-end')
-                    sp.lineType = mxObj.get('line-type')
+                    sp.lineType = mxObj.get('line-type')  # redundant with setLineStyle()
 
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
@@ -3933,6 +3933,46 @@ class MeasureParser(XMLParserBase):
                     sp.addSpannedElements(targetLast)
             else:
                 raise MusicXMLImportException(f'unidentified mxType of mxBracket: {mxType}')
+
+        if mxObj.tag == 'octave-shift':
+            mxType = mxObj.get('type')
+            mxSize = mxObj.get('size')
+            idFound = mxObj.get('number')
+            if mxType in ('up', 'down'):
+                sp = spanner.Ottava()
+                # MusicXML pitches are encoded at sounding octaves
+                # Thus, set non-transposing
+                sp.transposing = False
+                if mxType == 'up':
+                    # musicxml and m21 have reversed types
+                    m21Type = 'down'
+                    # Provide default. If encoded, will be overwritten in setPlacement()
+                    sp.placement = 'below'
+                else:
+                    m21Type = 'up'
+                    sp.placement = 'above'
+                sp.idLocal = idFound
+                sp.type = (mxSize or 8, m21Type)
+                self.spannerBundle.append(sp)
+                returnList.append(sp)
+                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+            elif mxType in ('continue', 'stop'):
+                spb = self.spannerBundle.getByClassIdLocalComplete(
+                    'Ottava', idFound, False  # get first
+                )
+                try:
+                    sp = spb[0]
+                except IndexError:
+                    raise MusicXMLImportException('Error in getting Ottava')
+                if mxType == 'continue':
+                    self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+                else:  # if mxType == 'stop':
+                    sp.completeStatus = True
+                    if targetLast is not None:
+                        sp.addSpannedElements(targetLast)
+            else:
+                raise MusicXMLImportException(f'unidentified mxType of octave-shift: {mxType}')
+
         return returnList
 
     def xmlNotationsToSpanners(self, mxNotations, n):
@@ -4008,7 +4048,7 @@ class MeasureParser(XMLParserBase):
             # if we already have a spanner matching
             # environLocal.printDebug(['found a match in SpannerBundle'])
             su = sb[0]  # get the first
-        else:  # create a new slur
+        else:  # create a new spanner
             su = spannerClass()
             su.idLocal = idFound
             placement = mxObj.get('placement')
@@ -4836,7 +4876,7 @@ class MeasureParser(XMLParserBase):
     def xmlDirection(self, mxDirection):
         '''
         convert a <direction> tag to one or more expressions, metronome marks, etc.
-        and them to the core and staffReference.
+        and add them to the core and staffReference.
         '''
         offsetDirection = self.xmlToOffset(mxDirection)
         totalOffset = offsetDirection + self.offsetMeasureNote
@@ -4851,7 +4891,6 @@ class MeasureParser(XMLParserBase):
 
     def setDirectionInDirectionType(self, mxDir, mxDirection, staffKey, totalOffset):
         # TODO: pedal
-        # TODO: octave-shift
         # TODO: harp-pedals
         # TODO: damp
         # TODO: damp-all
@@ -4881,7 +4920,7 @@ class MeasureParser(XMLParserBase):
                 self.setPosition(mxDir, d)
                 self.setEditorial(mxDirection, d)
 
-        elif tag in ('wedge', 'bracket', 'dashes'):
+        elif tag in ('wedge', 'bracket', 'dashes', 'octave-shift'):
             try:
                 spannerList = self.xmlDirectionTypeToSpanners(mxDir)
             except MusicXMLImportException as excep:
@@ -4890,6 +4929,8 @@ class MeasureParser(XMLParserBase):
 
             for sp in spannerList:
                 self.setPosition(mxDir, sp)
+                self.setPlacement(mxDir, sp)
+                self.setLineStyle(mxDir, sp)
                 self.setEditorial(mxDirection, sp)
 
         elif tag in ('coda', 'segno'):
@@ -7125,6 +7166,42 @@ class Test(unittest.TestCase):
         metro = s.recurse().getElementsByClass('MetronomeMark').first()
         self.assertEqual(metro.style.absoluteY, 40)
         self.assertEqual(metro.placement, 'above')
+
+    def testImportOttava(self):
+        from music21 import converter
+
+        xml_dir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        s = converter.parse(xml_dir / '33d-Spanners-OctaveShifts.xml')
+
+        m = s[stream.Measure].first()
+        self.assertEqual(
+            [p.nameWithOctave for p in m.pitches],
+            #      'C7' <---- TODO(bug): not reading <offset>-4</offset>
+            ['A4', 'C5', 'A6', 'C3', 'B2', 'A5', 'A5', 'B3', 'C4']
+        )
+        self.assertEqual(
+            [p.nameWithOctave for p in m.pitches],
+            [p.nameWithOctave for p in m.toSoundingPitch().flatten().pitches],
+        )
+        ottava_objs = s[spanner.Ottava]
+        self.assertEqual(
+            [o.transposing for o in ottava_objs],
+            [False, False, False, False]
+        )
+        self.assertEqual(
+            [o.type for o in ottava_objs],
+            ['15ma', '15mb', '8va', '8vb']
+        )
+        self.assertEqual(
+            [o.placement for o in ottava_objs],
+            ['above', 'below', 'above', 'below']
+        )
+        self.assertEqual(
+            [[p.nameWithOctave for p in o.getSpannedElements()] for o in ottava_objs],
+            # TODO(bug): first element should be ['C7', 'A6']
+            # not reading <offset>-4</offset>
+            [['A6'], ['C3', 'B2'], ['A5', 'A5'], ['B3', 'C4']]
+        )
 
     def testClearingTuplets(self):
         from xml.etree.ElementTree import fromstring as EL
