@@ -21,7 +21,7 @@ import copy
 import enum
 import unittest
 
-from typing import Optional
+from typing import Optional, Union
 
 from music21 import bar
 from music21 import chord
@@ -1342,6 +1342,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                 inaccords = self._groupingDict.get(rightOrLeftKey)
                 voice_trans = []
                 for music21Voice in inaccords:
+                    if not isinstance(music21Voice, stream.Voice):
+                        continue  # could be clef preceding empty voice? untranslated at present.
                     noteGrouping = extractBrailleElements(music21Voice)
                     noteGrouping.descendingChords = inaccords.descendingChords
                     noteGrouping.showClefSigns = inaccords.showClefSigns
@@ -1967,10 +1969,10 @@ def getRawSegments(music21Part,
     return allSegments
 
 
-def extractBrailleElements(music21Measure):
+def extractBrailleElements(music21MeasureOrVoice: Union[stream.Measure, stream.Voice]):
     '''
-    Takes in a :class:`~music21.stream.Measure` and returns a
-    :class:`~music21.braille.segment.BrailleElementGrouping` of correctly ordered
+    Takes in a :class:`~music21.stream.Measure` or :class:`~music21.stream.Voice`
+    and returns a :class:`~music21.braille.segment.BrailleElementGrouping` of correctly ordered
     :class:`~music21.base.Music21Object` instances which can be directly transcribed to
     braille.
 
@@ -2012,7 +2014,7 @@ def extractBrailleElements(music21Measure):
     '''
     allElements = BrailleElementGrouping()
     last_clef: Optional[clef.Clef] = None
-    for music21Object in music21Measure:
+    for music21Object in music21MeasureOrVoice:
         # Hold the clef in memory in case the next object is a voice
         if isinstance(music21Object, clef.Clef):
             last_clef = music21Object
