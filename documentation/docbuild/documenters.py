@@ -419,6 +419,9 @@ class ClassDocumenter(ObjectDocumenter):
         self._readonlyProperties = []
         self._inheritedReadonlyPropertiesMapping = {}
 
+        # Special (dunder) methods to document, if overridden in music21
+        self._allowedSpecialMethods = ['__eq__', '__getitem__']
+
         self.findAttributes()
 
         if self.referent not in self._identityMap:
@@ -453,11 +456,11 @@ class ClassDocumenter(ObjectDocumenter):
 
 
     def findOneAttribute(self, attr):
-        # Ignore definitions derived directly from object
-        if attr.defining_class is object:
+        # Ignore definitions derived directly from builtins (object, list, etc.)
+        if attr.defining_class in __builtins__.values():
             return
         # Ignore private members ('_') and special members ('__')
-        elif attr.name.startswith('_'):
+        elif attr.name.startswith('_') and attr.name not in self._allowedSpecialMethods:
             return
 
         definingClass = attr.defining_class
