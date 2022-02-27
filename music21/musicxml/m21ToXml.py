@@ -3038,15 +3038,19 @@ class MeasureExporter(XMLExporterBase):
 
         self.currentVoiceId = voiceId
 
-        # group all objects by offsets and then do a different order than normal sort.
-        # that way chord symbols and other 0-width objects appear before notes as much as
-        # possible.
-        for objGroup in OffsetIterator(m):
-            groupOffset = m.elementOffset(objGroup[0])
+        # Group just notes and rests (GeneralNote) by their offsets so that
+        # <forward> tags (which become hidden rests) only bridge gaps between
+        # notes and rests, and not gaps formed with expressions that can
+        # be represented instead with <offset> tags.
+        # See m. 1 of Weber piece in core corpus
+        general_note_offsets = []
+        for objGroup in OffsetIterator(m, filterList=[lambda n: isinstance(n, note.GeneralNote)]):
+            general_note_offsets.append(m.elementOffset(objGroup[0]))
+        for i, groupOffset in enumerate(general_note_offsets):
             amountToMoveForward = int(round(divisions * (groupOffset
                                                              - self.offsetInMeasure)))
             if amountToMoveForward > 0:
-                # gap in stream!
+                # gap in stream between GeneralNote objects: create <forward>
                 mxForward = Element('forward')
                 mxDuration = SubElement(mxForward, 'duration')
                 mxDuration.text = str(amountToMoveForward)
@@ -3054,9 +3058,23 @@ class MeasureExporter(XMLExporterBase):
                 self.offsetInMeasure = groupOffset
 
             notesForLater = []
-            for obj in objGroup:
+            is_last_gn_offset = i + 1 == len(general_note_offsets)
+            if is_last_gn_offset:
+                nextGroupOffset = m.highestTime
+            else:
+                nextGroupOffset = general_note_offsets[i + 1]
+            for obj in m.getElementsByOffset(
+                offsetStart=groupOffset,
+                offsetEnd=nextGroupOffset,
+                includeEndBoundary=is_last_gn_offset,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True,
+                includeElementsThatEndAtStart=True,
+            ):
                 # we do all non-note elements (including ChordSymbols)
-                # first before note elements, in musicxml
+                # first before note elements, in musicxml;
+                # that way chord symbols and other 0-width objects appear before
+                # notes as much as possible.
                 if isinstance(obj, note.GeneralNote) and not isinstance(obj, harmony.Harmony):
                     notesForLater.append(obj)
                 else:
@@ -5255,17 +5273,20 @@ class MeasureExporter(XMLExporterBase):
             mxOffset.set('sound', 'yes')  # always affects sound at location in measure.
         return mxOffset
 
-    def placeInDirection(self, mxObj, m21Obj=None):
+    def placeInDirection(self, mxObj, m21Obj=None, *, setSound=True):
         '''
-        places the mxObj <element> inside <direction><direction-type>
+        Places the mxObj <element> inside <direction><direction-type>
+        and sets <offset> if needed.
+
+        Changed in v7.3 -- added `setSound` keyword (see :meth:`setOffsetOptional`).
         '''
         mxDirection = Element('direction')
         mxDirectionType = SubElement(mxDirection, 'direction-type')
         mxDirectionType.append(mxObj)
-        if (m21Obj is not None
-                and hasattr(m21Obj, 'placement')
-                and m21Obj.placement is not None):
-            mxDirection.set('placement', m21Obj.placement)
+        if m21Obj is not None:
+            if hasattr(m21Obj, 'placement') and m21Obj.placement is not None:
+                mxDirection.set('placement', m21Obj.placement)
+            self.setOffsetOptional(m21Obj, mxDirection, setSound=setSound)
 
         return mxDirection
 
@@ -5326,9 +5347,8 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attrGroup: text-decoration
         # TODO: attrGroup: enclosure
 
-        mxDirection = self.placeInDirection(mxDynamics, d)
+        mxDirection = self.placeInDirection(mxDynamics, d)  # also handles offset
         # direction todos
-        self.setOffsetOptional(d, mxDirection)
         self.setEditorial(mxDirection, d)
         # TODO: voice
         # staff: see joinPartStaffs()
@@ -5637,8 +5657,7 @@ class MeasureExporter(XMLExporterBase):
 
         self.setTextFormatting(mxWords, te)
 
-        mxDirection = self.placeInDirection(mxWords, te)
-        self.setOffsetOptional(te, mxDirection, setSound=False)
+        mxDirection = self.placeInDirection(mxWords, te, setSound=False)  # handles offset
         self.xmlRoot.append(mxDirection)
         return mxDirection
 
@@ -6949,8 +6968,8 @@ class Test(unittest.TestCase):
         s.measure(1).storeAtEnd([c, f, mm])
 
         tree = self.getET(s)
-        for direction in tree.findall('.//direction'):
-            self.assertIsNone(direction.find('offset'))
+        for offset in tree.findall('.//direction/offset'):
+            self.assertGreater(int(offset.text), 0)
 
         # Also check position
         mxDirection = tree.find('part/measure/direction')
@@ -7011,6 +7030,23 @@ class Test(unittest.TestCase):
         tree = self.getET(newAltoFixed)
         self.assertTrue(tree.findall('.//note'))
         self.assertFalse(tree.findall('.//forward'))
+
+    def testOutOfBoundsExpressionDoesNotCreateForward(self):
+        '''
+        A metronome mark at an offset exceeding the bar duration was causing
+        <forward> tags, i.e. hidden rests. Prefer <offset> instead.
+        '''
+        m = stream.Measure()
+        m.append(meter.TimeSignature('1/4'))
+        m.append(note.Rest())
+        m.insert(2, tempo.MetronomeMark('slow', 40))
+
+        gex = GeneralObjectExporter()
+        tree = self.getET(gex.fromGeneralObject(m))
+        self.assertFalse(tree.findall('.//forward'))
+        self.assertEqual(
+            int(tree.findall('.//direction/offset')[0].text),
+            2 * defaults.divisionsPerQuarter)
 
     def testExportChordSymbolsWithRealizedDurations(self):
         gex = GeneralObjectExporter()
