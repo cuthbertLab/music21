@@ -488,12 +488,26 @@ class GeneralObjectExporter:
         representation of a Measure, not for partial
         solutions in Part or Stream production.
         '''
+        m.coreGatherMissingSpanners()
         mCopy = m.makeNotation()
-        if not m.recurse().getElementsByClass('Clef').getElementsByOffset(0.0):
+        if mCopy.style.measureNumbering is None:
+            # Provide a default
+            mCopy.style.measureNumbering = 'measure'
+        clef_from_measure_start_or_context = m.getContextByClass(
+            clef.Clef,
+            getElementMethod=common.enums.ElementSearch.AT_OR_BEFORE_OFFSET
+        )
+        if clef_from_measure_start_or_context is None:
             mCopy.clef = clef.bestClef(mCopy, recurse=True)
+        else:
+            mCopy.clef = clef_from_measure_start_or_context
         p = stream.Part()
         p.append(mCopy)
         p.metadata = copy.deepcopy(getMetadataFromContext(m))
+        context_part = m.getContextByClass(stream.Part)
+        if context_part is not None:
+            p.partName = context_part.partName
+            p.partAbbreviation = context_part.partAbbreviation
         return self.fromPart(p)
 
     def fromVoice(self, v):
@@ -6493,7 +6507,7 @@ class MeasureExporter(XMLExporterBase):
                 mxPrint = Element('print')
             mxMeasureNumbering = SubElement(mxPrint, 'measure-numbering')
             mxMeasureNumbering.text = m.style.measureNumbering
-            mnStyle = m.style.measureNumberingStyle
+            mnStyle = m.style.measureNumberStyle
             if mnStyle is not None:
                 self.setPrintStyleAlign(mxMeasureNumbering, mnStyle)
         # TODO: part-name-display
