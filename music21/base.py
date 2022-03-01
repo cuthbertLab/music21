@@ -1884,6 +1884,8 @@ class Music21Object(prebase.ProtoM21Object):
                 returnSortTuples=True,  # ALWAYS
                 sortByCreationTime=sortByCreationTime
             ):
+                if priorityTargetOnly and topLevel is not priorityTarget:
+                    break
                 # get activeSite unless sortByCreationTime
                 inStreamOffset = inStreamPos.offset
                 # now take that offset and use it to modify the positionInStream
@@ -5101,6 +5103,21 @@ class Test(unittest.TestCase):
                                     '<music21.stream.Part p1>',
                                     '<music21.stream.Measure 2 offset=0.0>',
                                     '<music21.stream.Part p2>'])
+
+    def testContextSitesVoices(self):
+        from music21 import note
+        from music21 import stream
+
+        v1_n1 = note.Note('D')
+        v2_n1 = note.Note('E')
+        v1 = stream.Voice()
+        v1.insert(0, v1_n1)
+        v2 = stream.Voice()
+        v2.insert(1, v2_n1)
+        _m = stream.Measure([v1, v2])
+        self.assertIs(v1_n1.activeSite, v1)
+        # This was finding the E in voice 2
+        self.assertIsNone(v1_n1.next(note.GeneralNote, activeSiteOnly=True))
 
 # great isolation test, but no asserts for now...
 #     def testPreviousA(self):
