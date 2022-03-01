@@ -6979,6 +6979,14 @@ class Test(unittest.TestCase):
         mxDirection = tree.find('part/measure/direction')
         self.assertEqual(mxDirection.get('placement'), 'above')
 
+    def testTupletBracketsMadeOnComponents(self):
+        s = stream.Stream()
+        s.insert(0, note.Note(quarterLength=(5 / 6)))
+        tree = self.getET(s)
+        # 3 sixteenth-triplets + 2 sixteenth-triplets
+        # tuplet start, tuplet stop, tuplet start, tuplet stop
+        self.assertEqual(len(tree.findall('.//tuplet')), 4)
+
     def testFullMeasureRest(self):
         from music21 import converter
         s = converter.parse('tinynotation: 9/8 r1')

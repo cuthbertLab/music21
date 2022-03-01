@@ -603,13 +603,29 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
                             tuplet=None)
 
 
-    Since tuplets now apply to the entire Duration, expect some odder tuplets for unusual
-    values that should probably be split generally...
+    Since tuplets now apply to the entire Duration, multiple small components may be needed:
+
+    Duration > 1.0 QL:
 
     >>> duration.quarterConversion(7/3)
-    QuarterLengthConversion(components=(DurationTuple(type='whole', dots=0, quarterLength=4.0),),
-        tuplet=<music21.duration.Tuplet 12/7/16th>)
+    QuarterLengthConversion(components=(DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5)),
+                            tuplet=<music21.duration.Tuplet 3/2/eighth>)
 
+    Duration < 1.0 QL:
+
+    >>> duration.quarterConversion(5/6)
+    QuarterLengthConversion(components=(DurationTuple(type='16th', dots=0, quarterLength=0.25),
+                                        DurationTuple(type='16th', dots=0, quarterLength=0.25),
+                                        DurationTuple(type='16th', dots=0, quarterLength=0.25),
+                                        DurationTuple(type='16th', dots=0, quarterLength=0.25),
+                                        DurationTuple(type='16th', dots=0, quarterLength=0.25)),
+                            tuplet=<music21.duration.Tuplet 3/2/16th>)
 
     This is a very close approximation:
 
@@ -667,7 +683,7 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
                                                       dots=0,
                                                       quarterLength=qLen),), None)
 
-    tupleCandidates = quarterLengthToTuplet(qLen, 1)
+    tupleCandidates = quarterLengthToTuplet(qLen, maxToReturn=1)
     if tupleCandidates:
         # assume that the first tuplet candidate, using the smallest type, is best
         return QuarterLengthConversion(
@@ -681,6 +697,29 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
     # remove the largest type out there and keep going.
 
     qLenRemainder = opFrac(qLen - typeToDuration[closestSmallerType])
+
+    # one opportunity to define a tuplet if remainder can be expressed as one
+    # by expressing the largest type (components[0]) in terms of the same tuplet
+    if isinstance(qLenRemainder, fractions.Fraction):
+        largestType = components[0]
+        divisor = 1
+        if largestType.quarterLength < 1:
+            # Subdivide by one level (divide by 2)
+            divisor = 2
+        solutions = quarterLengthToTuplet((qLenRemainder / divisor), maxToReturn=1)
+        if solutions:
+            tup = solutions[0]
+            if largestType.quarterLength % tup.totalTupletLength() == 0:
+                multiples = int(largestType.quarterLength // tup.totalTupletLength())
+                numComponentsLargestType = multiples * tup.numberNotesActual
+                numComponentsRemainder = int(
+                    (qLenRemainder / tup.totalTupletLength())
+                    * tup.numberNotesActual
+                )
+                numComponentsTotal = numComponentsLargestType + numComponentsRemainder
+                components = [tup.durationActual for i in range(0, numComponentsTotal)]
+                return QuarterLengthConversion(tuple(components), tup)
+
     # cannot recursively call, because tuplets are not possible at this stage.
     # environLocal.warn(['starting remainder search for qLen:', qLen,
     #    'remainder: ', qLenRemainder, 'components: ', components])
@@ -3739,6 +3778,18 @@ class Test(unittest.TestCase):
         self.assertEqual(
             'Dotted Quarter Septuplet (6/7 QL)',
             Duration(fractions.Fraction(6 / 7)).fullName
+        )
+
+    def testDeriveComponentsForTuplet(self):
+        self.assertEqual(
+            ('16th Triplet (5/6 QL) tied to ' * 4)
+            + '16th Triplet (5/6 QL) (5/6 total QL)',
+            Duration(fractions.Fraction(5 / 6)).fullName
+        )
+        self.assertEqual(
+            ('32nd Triplet (5/12 QL) tied to ' * 4)
+            + '32nd Triplet (5/12 QL) (5/12 total QL)',
+            Duration(fractions.Fraction(5 / 12)).fullName
         )
 
     def testTinyDuration(self):
