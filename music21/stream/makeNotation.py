@@ -1459,10 +1459,8 @@ def makeTupletBrackets(s: 'music21.stream.Stream', *, inPlace=False):
 
             # if tuplet next and previous not None, increment
             elif tupletPrevious is not None and tupletNext is not None:
-                # do not need to change tuplet type; should be None
-                pass
-                # environLocal.printDebug(['completion count, target:',
-                #                          completionCount, completionTarget])
+                # clear any previous type from prior calls
+                tupletObj.type = None
 
     returnObj.streamStatus.tuplets = True
 
@@ -1864,6 +1862,197 @@ def setStemDirectionOneGroup(
         elif noteDirection in ('up', 'down', 'unspecified'):
             n.stemDirection = groupStemDirection
 
+
+def splitElementsToCompleteTuplets(
+    s: 'music21.stream.Stream',
+    *,
+    recurse: bool = False,
+    addTies: bool = True
+) -> None:
+    '''
+    Split notes or rests if doing so will complete any incomplete tuplets.
+    The element being split must have a duration that equals or exceeds the
+    remainder of the incomplete tuplet.
+
+    The first note is edited; the additional notes are inserted in place.
+    (Destructive edit, so make a copy first if desired.)
+    Relies on :meth:`~music21.stream.base.splitAtQuarterLength`.
+
+    New in v7.3.
+
+    >>> from music21.stream.makeNotation import splitElementsToCompleteTuplets
+    >>> s = stream.Stream([note.Note(quarterLength=1/3), note.Note(quarterLength=1), note.Note(quarterLength=2/3)])
+    >>> splitElementsToCompleteTuplets(s)
+    >>> [el.quarterLength for el in s.notes]
+    [Fraction(1, 3), Fraction(2, 3), Fraction(1, 3), Fraction(2, 3)]
+
+    With `recurse`:
+
+    >>> m = stream.Measure([note.Note(quarterLength=1/6)])
+    >>> m.insert(5/6, note.Note(quarterLength=1/6))
+    >>> m.makeRests(inPlace=True, fillGaps=True)
+    >>> p = stream.Part([m])
+    >>> splitElementsToCompleteTuplets(p, recurse=True)
+    >>> [el.quarterLength for el in p.recurse().notesAndRests]
+    [Fraction(1, 6), Fraction(1, 3), Fraction(1, 3), Fraction(1, 6)]
+    '''
+    if recurse:
+        iter = s.recurse(streamsOnly=True, includeSelf=True)
+    else:
+        iter = [s]
+    for container in iter:
+        general_notes = list(container.notesAndRests)
+        last_tuplet: Optional['music21.duration.Tuplet'] = None
+        partial_tuplet_sum = 0.0
+        for gn in general_notes:
+            if (
+                gn.duration.tuplets
+                and gn.duration.expressionIsInferred
+                and (last_tuplet is None or last_tuplet == gn.duration.tuplets[0])
+            ):
+                last_tuplet = gn.duration.tuplets[0]
+                partial_tuplet_sum = opFrac(gn.quarterLength + partial_tuplet_sum)
+            else:
+                last_tuplet = None
+                partial_tuplet_sum = 0.0
+                continue
+            ql_to_complete = opFrac(
+                gn.duration.tuplets[0].totalTupletLength() - partial_tuplet_sum)
+            if ql_to_complete == 0.0:
+                last_tuplet = None
+                partial_tuplet_sum = 0.0
+                continue
+            next_gn = gn.next(note.GeneralNote, activeSiteOnly=True)
+            if next_gn and next_gn.offset != opFrac(gn.offset + gn.quarterLength):
+                continue
+            if next_gn and next_gn.duration.expressionIsInferred:
+                if ql_to_complete > 0 and next_gn.quarterLength > ql_to_complete:
+                    unused_left_edited_in_place, right = next_gn.splitAtQuarterLength(
+                        ql_to_complete, addTies=addTies)
+                    container.insert(next_gn.offset + ql_to_complete, right)
+
+
+def consolidateCompletedTuplets(
+    s: 'music21.stream.Stream',
+    *,
+    recurse: bool = False,
+    onlyIfTied: bool = True,
+) -> None:
+    '''
+    Locate consecutive notes or rests in `s` (or its substreams if `recurse` is True)
+    that are unnecessarily expressed as tuplets and replace them with a single
+    element. These groups must:
+
+        - be consecutive (with respect to the sequence of :class:`~music21.note.GeneralNote` objects)
+        - be all rests, or all :class:`~music21.note.NotRest`s with equal `.pitches`
+        - all have :attr:`~music21.duration.Duration.expressionIsInferred` = `True`.
+        - sum to the tuplet's total length
+        - if `NotRest`, all must be tied (if `onlyIfTied` is True)
+
+    The groups are consolidated by prolonging the first note or rest in the group
+    and removing the subsequent elements from the stream. (Destructive edit,
+    so make a copy first if desired.)
+
+    New in v7.3.
+
+    >>> s = stream.Stream()
+    >>> r = note.Rest(quarterLength=1/6)
+    >>> s.repeatAppend(r, 5)
+    >>> s.insert(5/6, note.Note(duration=r.duration))
+    >>> from music21.stream.makeNotation import consolidateCompletedTuplets
+    >>> consolidateCompletedTuplets(s)
+    >>> [el.quarterLength for el in s.notesAndRests]
+    [0.5, Fraction(1, 6), Fraction(1, 6), Fraction(1, 6)]
+
+    `mustBeTied` is `True` by default:
+
+    >>> s2 = stream.Stream()
+    >>> n = note.Note(quarterLength=1/3)
+    >>> s2.repeatAppend(n, 3)
+    >>> consolidateCompletedTuplets(s)
+    >>> [el.quarterLength for el in s2.notesAndRests]
+    [Fraction(1, 3), Fraction(1, 3), Fraction(1, 3)]
+
+    >>> consolidateCompletedTuplets(s2, onlyIfTied=False)
+    >>> [el.quarterLength for el in s2.notesAndRests]
+    [1.0]
+
+    Does nothing if tuplet definitions are not the same. (In which case, see
+    :class:`~music21.duration.TupletFixer` instead).
+
+    >>> s3 = stream.Stream([note.Rest(quarterLength=1/3), note.Rest(quarterLength=1/6)])
+    >>> for my_rest in s3.notesAndRests:
+    ...   print(my_rest.duration.tuplets)
+    (<music21.duration.Tuplet 3/2/eighth>,)
+    (<music21.duration.Tuplet 3/2/16th>,)
+    >>> consolidateCompletedTuplets(s)
+    >>> [el.quarterLength for el in s3.notesAndRests]
+    [Fraction(1, 3), Fraction(1, 6)]
+
+    Does nothing if there are multiple (nested) tuplets.
+    '''
+    def is_reexpressible(gn: note.GeneralNote) -> bool:
+        return (
+            gn.duration.expressionIsInferred
+            and len(gn.duration.tuplets) < 2
+            and (gn.isRest or gn.tie is not None or not onlyIfTied)
+        )
+
+    if recurse:
+        iter = s.recurse(streamsOnly=True, includeSelf=True)
+    else:
+        iter = [s]
+    for container in iter:
+        reexpressible = [gn for gn in container.notesAndRests if is_reexpressible(gn)]
+        to_consolidate: List['music21.note.GeneralNote'] = []
+        partial_tuplet_sum = 0.0
+        last_tuplet: Optional['music21.duration.Tuplet'] = None
+        completion_target: Optional[common.types.OffsetQL] = None
+        for gn in reexpressible:
+            prev_gn = gn.previous(note.GeneralNote, activeSiteOnly=True)
+            if (
+                prev_gn in to_consolidate
+                and (
+                    (isinstance(gn, note.Rest) and isinstance(prev_gn, note.Rest))
+                    or (
+                        isinstance(gn, note.NotRest)
+                        and isinstance(prev_gn, note.NotRest)
+                        and gn.pitches == prev_gn.pitches
+                    )
+                )
+                and opFrac(prev_gn.offset + prev_gn.quarterLength) == gn.offset
+                and len(gn.duration.tuplets) == 1 and gn.duration.tuplets[0] == last_tuplet
+            ):
+                partial_tuplet_sum = opFrac(partial_tuplet_sum + gn.quarterLength)
+                to_consolidate.append(gn)
+
+                if partial_tuplet_sum == completion_target:
+                    # set flag to remake tuplet brackets
+                    container.streamStatus.tuplets = False
+                    first_note_in_group = to_consolidate[0]
+                    for other_note in to_consolidate[1:]:
+                        container.remove(other_note)
+                    first_note_in_group.duration.clear()
+                    first_note_in_group.duration.tuplets = ()
+                    first_note_in_group.quarterLength = completion_target
+
+                    # reset search values
+                    to_consolidate = []
+                    partial_tuplet_sum = 0.0
+                    last_tuplet = None
+                    completion_target = None
+            else:
+                # reset to current values
+                if gn.duration.tuplets:
+                    partial_tuplet_sum = gn.quarterLength
+                    last_tuplet = gn.duration.tuplets[0]
+                    completion_target = last_tuplet.totalTupletLength()
+                    to_consolidate = [gn]
+                else:
+                    to_consolidate = []
+                    partial_tuplet_sum = 0.0
+                    last_tuplet = None
+                    completion_target = None
 
 
 # -----------------------------------------------------------------------------

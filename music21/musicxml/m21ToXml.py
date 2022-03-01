@@ -1635,16 +1635,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         self.firstScoreLayout = scoreLayout
 
     def _populatePartExporterList(self):
-        if self.makeNotation:
-            # hide any rests created at this late stage, because we are
-            # merely trying to fill up MusicXML display, not impose things on users
-            for p in self.parts:
-                p.makeRests(refStreamOrTimeRange=self.refStreamOrTimeRange,
-                            inPlace=True,
-                            hideRests=True,
-                            timeRangeFromBarDuration=True,
-                            )
-
         count = 0
         sp = list(self.parts)
         for innerStream in sp:
@@ -1661,9 +1651,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
     def parsePartlikeScore(self):
         '''
         Called by .parse() if the score has individual parts.
-
-        Calls makeRests() for the part (if `ScoreExporter.makeNotation` is True),
-        then creates a `PartExporter` for each part, and runs .parse() on that part.
+        Creates a `PartExporter` for each part, and runs .parse() on that part.
         Appends the PartExporter to `self.partExporterList`
         and runs .parse() on that part. Appends the PartExporter to self.
 
@@ -2542,10 +2530,18 @@ class PartExporter(XMLExporterBase):
         self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
         # Suppose that everything below this is a measure
-        if self.makeNotation and not self.stream.getElementsByClass(stream.Measure):
-            self.fixupNotationFlat()
-        elif self.makeNotation:
-            self.fixupNotationMeasured()
+        if self.makeNotation:
+            # hide any rests created at this late stage, because we are
+            # merely trying to fill up MusicXML display, not impose things on users
+            self.stream.makeRests(refStreamOrTimeRange=self.refStreamOrTimeRange,
+                                  inPlace=True,
+                                  hideRests=True,
+                                  timeRangeFromBarDuration=True,
+                                  )
+            if not self.stream.getElementsByClass(stream.Measure):
+                self.fixupNotationFlat()
+            elif self.makeNotation:
+                self.fixupNotationMeasured()
         elif not self.stream.getElementsByClass(stream.Measure):
             raise MusicXMLExportException(
                 'Cannot export with makeNotation=False if there are no measures')
@@ -2721,8 +2717,8 @@ class PartExporter(XMLExporterBase):
         Checks to see if there are any attributes in the part stream and moves
         them into the first measure if necessary.
 
-        Checks if makeAccidentals is run, and haveBeamsBeenMade is done, and
-        haveTupletBracketsBeenMade is done.
+        Checks if makeAccidentals is run, and remakes beams and tuplet brackets
+        on the assumption they may have changed since makeRests() was called.
 
         Changed in v7 -- no longer accepts `measureStream` argument.
         '''
@@ -2752,16 +2748,21 @@ class PartExporter(XMLExporterBase):
             if outerTimeSignatures:
                 first_measure.timeSignature = outerTimeSignatures.first()
 
-        # see if accidentals/beams/tuplets should be processed
+        # see if accidentals/beams should be processed
         if not part.streamStatus.haveAccidentalsBeenMade():
             part.makeAccidentals(inPlace=True)
+        # beams and tuplets should be processed anyway (affected by earlier makeRests)
         if not part.streamStatus.beams:
             try:
                 part.makeBeams(inPlace=True)
-            except exceptions21.StreamException:  # no measures or no time sig?
-                pass
-        if part.streamStatus.haveTupletBracketsBeenMade() is False:
-            stream.makeNotation.makeTupletBrackets(part, inPlace=True)
+            except exceptions21.StreamException as se:  # no measures or no time sig?
+                warnings.warn(MusicXMLWarning, str(se))
+        # tuplets should be processed anyway (affected by earlier makeRests)
+        # technically, beams could be affected also, but we don't want to destroy
+        # existing beam information (e.g. single-syllable vocal flags)
+        for m in measures:
+            for m_or_v in [m, *m.voices]:
+                stream.makeNotation.makeTupletBrackets(m_or_v, inPlace=True)
 
         if not self.spannerBundle:
             self.spannerBundle = part.spannerBundle

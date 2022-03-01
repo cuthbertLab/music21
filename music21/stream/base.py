@@ -28,6 +28,7 @@ import os
 import pathlib
 import unittest
 import sys
+import warnings
 
 from collections import namedtuple
 from fractions import Fraction
@@ -6839,20 +6840,22 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         measureStream.makeTies(meterStream, inPlace=True)
 
-        # measureStream.makeBeams(inPlace=True)
+        for m in measureStream:
+            makeNotation.splitElementsToCompleteTuplets(m, recurse=True, addTies=True)
+            makeNotation.consolidateCompletedTuplets(m, recurse=True, onlyIfTied=True)
+
         if not measureStream.streamStatus.beams:
             try:
                 measureStream.makeBeams(inPlace=True)
             except meter.MeterException as me:
-                environLocal.warn(['skipping makeBeams exception', me])
+                warnings.warn(['skipping makeBeams exception', me])
 
         # note: this needs to be after makeBeams, as placing this before
         # makeBeams was causing the duration's tuplet to lose its type setting
         # check for tuplet brackets one measure at a time
         # this means that they will never extend beyond one measure
         for m in measureStream:
-            if not m.streamStatus.tuplets:
-                makeNotation.makeTupletBrackets(m, inPlace=True)
+            makeNotation.makeTupletBrackets(m, inPlace=True)
 
         if not inPlace:
             return returnStream
@@ -12944,11 +12947,12 @@ class Measure(Stream):
                     ts = defaultMeters[0]
             m.timeSignature = ts  # a Stream; get the first element
 
-        # environLocal.printDebug(['have time signature', m.timeSignature])
-        if not m.streamStatus.beams:
-            m.makeBeams(inPlace=True)
-        if not m.streamStatus.tuplets:
-            makeNotation.makeTupletBrackets(m, inPlace=True)
+        makeNotation.splitElementsToCompleteTuplets(m, recurse=True, addTies=True)
+        makeNotation.consolidateCompletedTuplets(m, recurse=True, onlyIfTied=True)
+
+        m.makeBeams(inPlace=True)
+        for m_or_v in [m, *m.voices]:
+            makeNotation.makeTupletBrackets(m_or_v, inPlace=True)
 
         if not inPlace:
             return m
