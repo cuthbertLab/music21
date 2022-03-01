@@ -5114,7 +5114,7 @@ class Test(unittest.TestCase):
         v1.insert(0, v1_n1)
         v2 = stream.Voice()
         v2.insert(1, v2_n1)
-        _m = stream.Measure([v1, v2])
+        _ = stream.Measure([v1, v2])
         self.assertIs(v1_n1.activeSite, v1)
         # This was finding the E in voice 2
         self.assertIsNone(v1_n1.next(note.GeneralNote, activeSiteOnly=True))
