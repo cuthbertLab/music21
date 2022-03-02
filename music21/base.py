@@ -926,7 +926,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def setOffsetBySite(self,
                         site: Optional['music21.stream.Stream'],
-                        value: Union[int, float, fractions.Fraction]):
+                        value: OffsetQLIn):
         '''
         Change the offset for a site.  These are equivalent:
 

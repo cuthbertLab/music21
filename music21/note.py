@@ -764,7 +764,11 @@ class GeneralNote(base.Music21Object):
                                         applyRaw=applyRaw, identifier=identifier))
 
     # --------------------------------------------------------------------------
-    # properties common to Notes, Rests,
+    # properties common to Notes, Rests, etc.
+
+    @property
+    def fullName(self) -> str:
+        return self.classes[0]  # override in subclasses
 
     # --------------------------------------------------------------------------
     def augmentOrDiminish(self, scalar, *, inPlace=False):
