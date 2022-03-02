@@ -712,7 +712,7 @@ class Chord(ChordBase):
 
     def __getitem__(self, key: Union[int, str, note.Note, pitch.Pitch]):
         '''
-        Get item makes access pitch components for the Chord easier
+        Get item makes accessing pitch components for the Chord easier
 
         >>> c = chord.Chord('C#4 D-4')
         >>> cSharp = c[0]
