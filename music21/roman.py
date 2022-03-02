@@ -756,6 +756,8 @@ def romanNumeralFromChord(
     ...     )
     >>> romanNumeral4
     <music21.roman.RomanNumeral bVI in c minor>
+    >>> romanNumeral4.sixthMinor
+    <Minor67Default.CAUTIONARY: 2>
 
     >>> romanNumeral5 = roman.romanNumeralFromChord(
     ...     chord.Chord(['B4', 'D5', 'F5']),
@@ -1084,7 +1086,9 @@ def romanNumeralFromChord(
             keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
 
     try:
-        rn = RomanNumeral(rnString, keyObj, updatePitches=False)
+        rn = RomanNumeral(rnString, keyObj, updatePitches=False,
+            # correctRNAlterationForMinor() adds cautionary
+            sixthMinor=Minor67Default.CAUTIONARY, seventhMinor=Minor67Default.CAUTIONARY)
     except fbNotation.ModifierException as strerror:
         raise RomanNumeralException(
             'Could not parse {0} from chord {1} as an RN '
