@@ -643,6 +643,24 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
                                                       dots=0,
                                                       quarterLength=99.0),),
                             tuplet=None)
+
+    OMIT_FROM_DOCS
+
+    Another > 1.0 QL case, but over 3.0QL to catch "closest smaller type" being dotted:
+
+    >>> duration.quarterConversion(11/3)
+    QuarterLengthConversion(components=(DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5),
+                                        DurationTuple(type='eighth', dots=0, quarterLength=0.5)),
+                            tuplet=<music21.duration.Tuplet 3/2/eighth>)
     '''
     # this is a performance-critical operation that has been highly optimized for speed
     # rather than legibility or logic.  Most commonly anticipated events appear first
@@ -701,24 +719,26 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
     # one opportunity to define a tuplet if remainder can be expressed as one
     # by expressing the largest type (components[0]) in terms of the same tuplet
     if isinstance(qLenRemainder, fractions.Fraction):
-        largestType = components[0]
-        divisor = 1
-        if largestType.quarterLength < 1:
-            # Subdivide by one level (divide by 2)
-            divisor = 2
-        solutions = quarterLengthToTuplet((qLenRemainder / divisor), maxToReturn=1)
-        if solutions:
-            tup = solutions[0]
-            if largestType.quarterLength % tup.totalTupletLength() == 0:
-                multiples = int(largestType.quarterLength // tup.totalTupletLength())
-                numComponentsLargestType = multiples * tup.numberNotesActual
-                numComponentsRemainder = int(
-                    (qLenRemainder / tup.totalTupletLength())
-                    * tup.numberNotesActual
-                )
-                numComponentsTotal = numComponentsLargestType + numComponentsRemainder
-                components = [tup.durationActual for i in range(0, numComponentsTotal)]
-                return QuarterLengthConversion(tuple(components), tup)
+        # Allow dotted type as "closest larger type" if > 1.0 QL
+        if qLenRemainder >= 1 and qLenRemainder > opFrac(typeToDuration[closestSmallerType] * 0.5):
+            components = [durationTupleFromTypeDots(closestSmallerType, 1)]
+            qLenRemainder = opFrac(qLen - components[0].quarterLength)
+
+        for divisor in range(1, 4):
+            largestType = components[0]
+            solutions = quarterLengthToTuplet((qLenRemainder / divisor), maxToReturn=1)
+            if solutions:
+                tup = solutions[0]
+                if largestType.quarterLength % tup.totalTupletLength() == 0:
+                    multiples = int(largestType.quarterLength // tup.totalTupletLength())
+                    numComponentsLargestType = multiples * tup.numberNotesActual
+                    numComponentsRemainder = int(
+                        (qLenRemainder / tup.totalTupletLength())
+                        * tup.numberNotesActual
+                    )
+                    numComponentsTotal = numComponentsLargestType + numComponentsRemainder
+                    components = [tup.durationActual for i in range(0, numComponentsTotal)]
+                    return QuarterLengthConversion(tuple(components), tup)
 
     # cannot recursively call, because tuplets are not possible at this stage.
     # environLocal.warn(['starting remainder search for qLen:', qLen,
