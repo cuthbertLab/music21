@@ -6848,7 +6848,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             try:
                 measureStream.makeBeams(inPlace=True)
             except meter.MeterException as me:
-                warnings.warn(['skipping makeBeams exception', me])
+                warnings.warn(str(me))
 
         # note: this needs to be after makeBeams, as placing this before
         # makeBeams was causing the duration's tuplet to lose its type setting
