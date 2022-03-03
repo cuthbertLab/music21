@@ -2540,10 +2540,10 @@ class PartExporter(XMLExporterBase):
             # Do this after makeRests since makeRests might create complex durations
             self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
-            if not self.stream.getElementsByClass(stream.Measure):
-                self.fixupNotationFlat()
-            elif self.makeNotation:
+            if self.stream.getElementsByClass(stream.Measure):
                 self.fixupNotationMeasured()
+            else:
+                self.fixupNotationFlat()
         elif not self.stream.getElementsByClass(stream.Measure):
             raise MusicXMLExportException(
                 'Cannot export with makeNotation=False if there are no measures')
