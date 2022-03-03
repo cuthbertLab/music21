@@ -2388,6 +2388,7 @@ def fromString(instrumentString):
 
     instrumentStringOrig = instrumentString
     instrumentString = instrumentString.replace('.', ' ')  # sic, before removePunctuation
+    instrumentString = instrumentString.lower()  # previously run on each substring separately
     instrumentString = common.removePunctuation(instrumentString)
     allCombinations = _combinations(instrumentString)
     # First task: Find the best instrument.
@@ -2397,13 +2398,8 @@ def fromString(instrumentString):
 
     this_module = importlib.import_module('music21.instrument')
     for substring in allCombinations:
-        substring = substring.lower()
         try:
-            if substring in instrumentLookup.bestNameToInstrumentClass:
-                englishName = substring
-            else:
-                englishName = instrumentLookup.allToBestName[substring]
-            className = instrumentLookup.bestNameToInstrumentClass[englishName]
+            className = instrumentLookup.allToClassName[substring]
             thisInstClass = getattr(this_module, className)
             # In case users have overridden the module and imported more things
             if base.Music21Object not in thisInstClass.__mro__:  # pragma: no cover
