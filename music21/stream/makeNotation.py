@@ -1881,7 +1881,9 @@ def splitElementsToCompleteTuplets(
     New in v7.3.
 
     >>> from music21.stream.makeNotation import splitElementsToCompleteTuplets
-    >>> s = stream.Stream([note.Note(quarterLength=1/3), note.Note(quarterLength=1), note.Note(quarterLength=2/3)])
+    >>> s = stream.Stream(
+    ...    [note.Note(quarterLength=1/3), note.Note(quarterLength=1), note.Note(quarterLength=2/3)]
+    ... )
     >>> splitElementsToCompleteTuplets(s)
     >>> [el.quarterLength for el in s.notes]
     [Fraction(1, 3), Fraction(2, 3), Fraction(1, 3), Fraction(2, 3)]
@@ -1897,10 +1899,10 @@ def splitElementsToCompleteTuplets(
     [Fraction(1, 6), Fraction(1, 3), Fraction(1, 3), Fraction(1, 6)]
     '''
     if recurse:
-        iter = s.recurse(streamsOnly=True, includeSelf=True)
+        iterator = s.recurse(streamsOnly=True, includeSelf=True)
     else:
-        iter = [s]
-    for container in iter:
+        iterator = [s]
+    for container in iterator:
         general_notes = list(container.notesAndRests)
         last_tuplet: Optional['music21.duration.Tuplet'] = None
         partial_tuplet_sum = 0.0
@@ -1943,7 +1945,7 @@ def consolidateCompletedTuplets(
     that are unnecessarily expressed as tuplets and replace them with a single
     element. These groups must:
 
-        - be consecutive (with respect to the sequence of :class:`~music21.note.GeneralNote` objects)
+        - be consecutive (with respect to :class:`~music21.note.GeneralNote` objects)
         - be all rests, or all :class:`~music21.note.NotRest`s with equal `.pitches`
         - all have :attr:`~music21.duration.Duration.expressionIsInferred` = `True`.
         - sum to the tuplet's total length
@@ -1999,10 +2001,10 @@ def consolidateCompletedTuplets(
         )
 
     if recurse:
-        iter = s.recurse(streamsOnly=True, includeSelf=True)
+        iterator = s.recurse(streamsOnly=True, includeSelf=True)
     else:
-        iter = [s]
-    for container in iter:
+        iterator = [s]
+    for container in iterator:
         reexpressible = [gn for gn in container.notesAndRests if is_reexpressible(gn)]
         to_consolidate: List['music21.note.GeneralNote'] = []
         partial_tuplet_sum = 0.0
