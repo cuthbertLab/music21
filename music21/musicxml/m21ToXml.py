@@ -2753,7 +2753,6 @@ class PartExporter(XMLExporterBase):
         # see if accidentals/beams should be processed
         if not part.streamStatus.haveAccidentalsBeenMade():
             part.makeAccidentals(inPlace=True)
-        # beams and tuplets should be processed anyway (affected by earlier makeRests)
         if not part.streamStatus.beams:
             try:
                 part.makeBeams(inPlace=True)
