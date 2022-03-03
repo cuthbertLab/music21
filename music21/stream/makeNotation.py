@@ -1871,7 +1871,7 @@ def splitElementsToCompleteTuplets(
 ) -> None:
     '''
     Split notes or rests if doing so will complete any incomplete tuplets.
-    The element being split must have a duration that equals or exceeds the
+    The element being split must have a duration that exceeds the
     remainder of the incomplete tuplet.
 
     The first note is edited; the additional notes are inserted in place.
