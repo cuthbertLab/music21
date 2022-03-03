@@ -1347,7 +1347,8 @@ class Test(unittest.TestCase):
         '''
         from music21 import instrument as instr
         for v in allToClassName.values():
-            getattr(instr, v)
+            with self.subTest(name=v):
+                getattr(instr, v)
 
 
 # ------------------------------------------------------------------------------
