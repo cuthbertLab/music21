@@ -2719,8 +2719,8 @@ class PartExporter(XMLExporterBase):
         Checks to see if there are any attributes in the part stream and moves
         them into the first measure if necessary.
 
-        Checks if makeAccidentals is run, and remakes beams and tuplet brackets
-        on the assumption they may have changed since makeRests() was called.
+        Checks if makeAccidentals is run, and haveBeamsBeenMade is done, and
+        remake tuplets on the assumption that makeRests() may necessitate changes.
 
         Changed in v7 -- no longer accepts `measureStream` argument.
         '''
