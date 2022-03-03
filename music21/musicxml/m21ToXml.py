@@ -2526,9 +2526,6 @@ class PartExporter(XMLExporterBase):
         if self.stream.atSoundingPitch is True:
             self.stream.toWrittenPitch(inPlace=True)
 
-        # Split complex durations in place (fast if none found)
-        self.stream = self.stream.splitAtDurations(recurse=True)[0]
-
         # Suppose that everything below this is a measure
         if self.makeNotation:
             # hide any rests created at this late stage, because we are
@@ -2538,6 +2535,11 @@ class PartExporter(XMLExporterBase):
                                   hideRests=True,
                                   timeRangeFromBarDuration=True,
                                   )
+
+            # Split complex durations in place (fast if none found)
+            # Do this after makeRests since makeRests might create complex durations
+            self.stream = self.stream.splitAtDurations(recurse=True)[0]
+
             if not self.stream.getElementsByClass(stream.Measure):
                 self.fixupNotationFlat()
             elif self.makeNotation:
