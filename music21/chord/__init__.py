@@ -3381,6 +3381,12 @@ class Chord(ChordBase):
 
         >>> chord.Chord().isNinth()
         False
+
+        >>> chord.Chord('C C# C## C### C###').isNinth()
+        False
+
+        >>> chord.Chord('C C# E B D').isNinth()
+        False
         '''
         uniquePitchNames = set(self.pitchNames)
         if len(uniquePitchNames) != 5:
