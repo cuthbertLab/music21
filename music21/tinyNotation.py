@@ -58,7 +58,7 @@ Here is an example of TinyNotation in action.
     {0.0} <music21.clef.TrebleClef>
     {0.0} <music21.meter.TimeSignature 3/4>
     {0.0} <music21.note.Note E>
-    {1.0} <music21.note.Rest rest>
+    {1.0} <music21.note.Rest quarter>
     {2.0} <music21.note.Note F#>
 {3.0} <music21.stream.Measure 2 offset=3.0>
     {0.0} <music21.note.Note G>
@@ -69,15 +69,15 @@ Here is an example of TinyNotation in action.
 {6.0} <music21.stream.Measure 3 offset=6.0>
     {0.0} <music21.note.Note C>
     {1.0} <music21.bar.Barline type=final>
->>> stream1.flat.getElementById('lastG').step
+>>> stream1.recurse().getElementById('lastG').step
 'G'
->>> stream1.flat.notesAndRests[1].isRest
+>>> stream1.flatten().notesAndRests[1].isRest
 True
->>> stream1.flat.notesAndRests[0].octave
+>>> stream1.flatten().notesAndRests[0].octave
 3
->>> stream1.flat.notes[-2].tie.type
+>>> stream1.flatten().notes[-2].tie.type
 'start'
->>> stream1.flat.notes[-1].tie.type
+>>> stream1.flatten().notes[-1].tie.type
 'stop'
 
 Changing time signatures are supported:
@@ -230,6 +230,7 @@ import collections
 import copy
 import re
 import sre_parse
+import typing
 import unittest
 
 from music21 import note
@@ -266,7 +267,8 @@ class State:
     >>> ts.autoExpires
     2
     '''
-    autoExpires = False  # expires after N tokens or never.
+    # TODO in Python 3.8+: typing.Union[typing.Literal[False], int]
+    autoExpires: typing.Union[bool, int] = False  # expires after N tokens or never.
 
     def __init__(self, parent=None, stateInfo=None):
         self.affectedTokens = []
@@ -751,6 +753,120 @@ class NoteToken(NoteOrRestToken):
         return t
 
 
+def _getDefaultTokenMap() -> typing.List[
+        typing.Tuple[
+            str,
+            typing.Type[Token]
+        ]
+]:
+    """
+    Returns the default tokenMap for TinyNotation.
+
+    Based on the following grammar (in Extended Backus-Naur form)
+    (https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)
+
+    (* Items in parentheses are grouped *)
+    (* Items in curly braces appear zero or more times *)
+    (* Items in square brackets may appear exactly zero or one time *)
+    (* Items in double quotes are literal strings *)
+    (* Items between question marks should be interpreted as English *)
+    (* Each rule is ended by a semicolon *)
+
+    TINY-NOTATION = TOKEN, { WHITESPACE, TOKEN } ;
+    WHITESPACE = ( " " | ? Carriage return ? ) , { " " | ? Carriage return ? } ;
+    TOKEN = ( TIME-SIGNATURE | TUPLET | REST | NOTE );
+    TIME-SIGNATURE = INTEGER, "/", INTEGER ;
+    INTEGER = DIGIT, { DIGIT } ;
+    DIGIT = ( "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ) ;
+    TUPLET = ( "trip" | "quad" | ALPHANUMERIC ), "{",
+        [ WHITESPACE ],
+        ( REST | NOTE ),
+        { WHITESPACE, ( REST | NOTE ) },
+        [ WHITESPACE ],
+    "}" ;
+    REST = "r", [ DURATION ], [ MODIFIER ] ;
+    DURATION = ( EVEN-NUMBER, { "." } | { "." }, EVEN-NUMBER | ".", { "." } ) ;
+    EVEN-NUMBER = { INTEGER }, ( "0" | "2" | "4" | "6" | "8" ) ;
+    NOTE = PITCH, [ DURATION ], [ TIE ], { MODIFIER } ;
+    PITCH = (
+        ( LOW-A | LOW-B | LOW-C | LOW-D | LOW-E | LOW-F | LOW-G ), [ ACCIDENTAL ] |
+        ( "a" | "b" | "c" | "d" | "e" | "f" | "g" ), [ ACCIDENTAL ], { "'" } |
+        ( "a" | "b" | "c" | "d" | "e" | "f" | "g" ), { "'" }, [ ACCIDENTAL ]
+    ) ;
+    LOW-A = "A", { "A" } ;
+    LOW-B = "B", { "B" } ;
+    LOW-C = "C", { "C" } ;
+    LOW-D = "D", { "D" } ;
+    LOW-E = "E", { "E" } ;
+    LOW-F = "F", { "F" } ;
+    LOW-G = "G", { "G" } ;
+    ACCIDENTAL = ( EDITORIAL | SHARPS | FLATS | NATURAL ) ;
+    EDITORIAL = "(", ( SHARPS | FLATS | NATURAL ), ")" ;
+    SHARPS = "#", { "#" } ;
+    FLATS = "-", { "-" } ;
+    NATURAL = "n" ;
+    TIE = "~" ;
+    MODIFIER = (
+        EQUALS-MODIFIER |
+        UNDERSCORE-MODIFIER |
+        SQUARE-MODIFIER |
+        ANGLE-MODIFIER |
+        PARENS-MODIFIER |
+        STAR-MODIFIER
+    ) ;
+    EQUALS-MODIFIER = "=", EQUALS-DATA ;
+    UNDERSCORE-MODIFIER = "_", UNDERSCORE-DATA ;
+    SQUARE-MODIFIER = "[", ALPHANUMERIC, "]" ;
+    ANGLE-MODIFIER = "<", ALPHANUMERIC, ">" ;
+    PARENS-MODIFIER = "(", ALPHANUMERIC, ")" ;
+    STAR-MODIFIER = "*", ALPHANUMERIC, "*" ;
+    (* The following is just shorthand. *)
+    ALPHANUMERIC = ? At least one alphanumeric character. So "a-z", "A-Z", or "0-9" ? ;
+    EQUALS-DATA = ? At least one non-whitespace, non-"_" character. ? ;
+    UNDERSCORE-DATA = ? At least one non-whitespace, non-"=" character. ? ;
+    """
+    sharpsFlatsOrNaturalRegex = r'#+|-+|n'
+    editorialRegex = fr'\((?:{sharpsFlatsOrNaturalRegex})\)'
+    accidentalRegex = fr'{editorialRegex}|(?:{sharpsFlatsOrNaturalRegex})'
+
+    lowNoteRegex = fr'(?:A+|B+|C+|D+|E+|F+|G+)(?:{accidentalRegex})?'
+    highNoteRegex = (
+        r'(?:a|b|c|d|e|f|g)'
+        + fr"(?:(?:{accidentalRegex})?'*|'*(?:{accidentalRegex})?)"
+    )
+    noteNameRegex = fr'{lowNoteRegex}|{highNoteRegex}'
+
+    durationRegex = r'\d+\.*|\.*\d+|\.+'
+
+    tieStateRegex = r'~'
+
+    equalsRegex = r'=[^\s_]*'
+    starRegex = r'\*.*?\*'
+    angleRegex = r'<.*?>'
+    parensRegex = r'\(.*?\)'
+    squareRegex = r'\[.*?]'
+    underscoreRegex = r'_[^\s=]'
+    modifierRegex = (
+        fr'{equalsRegex}|{starRegex}|{angleRegex}|'
+        + fr'{parensRegex}|{squareRegex}|{underscoreRegex}'
+    )
+
+    return [
+        (r'^(\d+\/\d+)$', TimeSignatureToken),
+        (
+            fr'^r((?:{durationRegex})?(?:{modifierRegex})*)$',
+            RestToken
+        ),
+        (
+            (
+                fr'^((?:{noteNameRegex})(?:{durationRegex})?'
+                + fr'(?:{tieStateRegex})?(?:{modifierRegex})*)$'
+            ),
+            NoteToken
+        ),  # last
+    ]
+
+
 class Converter:
     '''
     Main conversion object for TinyNotation.
@@ -942,11 +1058,7 @@ class Converter:
         self.generalBracketStateRe = re.compile(r'(\w+){')
         self.tieStateRe = re.compile(r'~')
 
-        self.tokenMap = [
-            (r'(\d+\/\d+)', TimeSignatureToken),
-            (r'r(\S*)', RestToken),
-            (r'([a-gA-G]\S*)', NoteToken),  # last
-        ]
+        self.tokenMap = _getDefaultTokenMap()
         self.modifierEquals = IdModifier
         self.modifierStar = None
         self.modifierAngle = None
@@ -977,7 +1089,7 @@ class Converter:
         >>> s = tnc.parse().stream
         >>> tnc.load('4/4 f e d c')
         >>> s2 = tnc.parse().stream
-        >>> ns2 = s2.flat.notes
+        >>> ns2 = s2.flatten().notes
 
         Check that the duration of 2.0 from the first load did not carry over.
 
@@ -1238,11 +1350,11 @@ class Converter:
 class Test(unittest.TestCase):
     parseTest = '1/4 trip{C8~ C~_hello C=mine} F~ F~ 2/8 F F# quad{g--16 a## FF(n) g#} g16 F0'
 
-    def testOne(self):
+    def testOne(self) -> None:
         c = Converter(self.parseTest)
         c.parse()
         s = c.stream
-        sfn = s.flat.notes
+        sfn = s.flatten().notes
         self.assertEqual(sfn[0].tie.type, 'start')
         self.assertEqual(sfn[1].tie.type, 'continue')
         self.assertEqual(sfn[2].tie.type, 'stop')
@@ -1256,13 +1368,106 @@ class Test(unittest.TestCase):
         self.assertEqual(sfn[12].duration.quarterLength, 1.0)
         self.assertEqual(sfn[12].expressions[0].classes, expressions.Fermata().classes)
 
+    def testRaiseExceptions(self) -> None:
+        error_states = [
+            {
+                'string': 'h',
+                'reason': 'h is not a valid note',
+            },
+            {
+                'string': 'a;',
+                'reason': 'a semicolon is not a valid character or modifier',
+            },
+            {
+                'string': 'r;',
+                'reason': 'a semicolon is not a valid character or modifier',
+            },
+            {
+                'string': '4/4;',
+                'reason': 'a semicolon is not a valid character or modifier',
+            },
+            {
+                'string': 'ABC',
+                'reason': (
+                    'only the same upper-cased letter may be repeated to '
+                    + 'indicate lower octaves'
+                ),
+            },
+            {
+                'string': 'aaa',
+                'reason': (
+                    'the same lower-cased letter may not be repeated to '
+                    + 'indicate higher octaves. Instead use apostrophes.'
+                ),
+            },
+        ]
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+        for error_state in error_states:
+            with self.assertRaises(TinyNotationException, msg=(
+                    'Should have raised a TinyNotationException for input '
+                    + f"'{error_state['string']}' because {error_state['reason']}."
+            )):
+                converter = Converter(error_state['string'], raiseExceptions=True)
+                converter.parse()
+
+    def testGetDefaultTokenMap(self) -> None:
+        defaultTokenMap = _getDefaultTokenMap()
+
+        self.assertEqual(
+            len(defaultTokenMap),
+            3,
+            (
+                'There should be three valid token types by default: Time '
+                + 'signatures, Notes, and Rests'
+            )
+        )
+
+        validTokenTypeCounts = {
+            NoteToken: 0,
+            RestToken: 0,
+            TimeSignatureToken: 0,
+        }
+
+        for regex, tokenType in defaultTokenMap:
+            self.assertIn(
+                tokenType,
+                validTokenTypeCounts,
+                (
+                    'Found unexpected token type in default token map:'
+                    + f'{tokenType.__class__.__name__}.'
+                )
+            )
+            validTokenTypeCounts[tokenType] += 1
+            self.assertGreater(
+                len(regex),
+                0,
+                (
+                    'Should provide a non-empty string for the regular '
+                    + 'expression in the default token map for tokens of type '
+                    + f'{tokenType.__class__.__name__}.'
+                )
+            )
+
+        for tokenType in validTokenTypeCounts:
+            self.assertEqual(
+                validTokenTypeCounts[tokenType],
+                1,
+                (
+                    'Should have found each valid token type exactly once in '
+                    + 'the default token map.'
+                )
+            )
+
+
+
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testOne(self):
         c = Converter(Test.parseTest)
         c.parse()
-        c.stream.show('musicxml.png')
+        if self.show:
+            c.stream.show('musicxml.png')
 
 
 # TODO: Chords

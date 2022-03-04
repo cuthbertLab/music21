@@ -12,7 +12,7 @@
 import datetime
 import os
 import unittest
-from typing import Optional, Iterable, Any
+from typing import List, Optional, Iterable, Any
 
 from music21 import common
 from music21 import exceptions21
@@ -251,15 +251,20 @@ class Date(prebase.ProtoM21Object):
         r'''
         Load values based on another Date object:
 
-        >>> a = metadata.Date(year=1843, month=3, day=3)
+        >>> a = metadata.Date(year=1843, month=3, day=3, yearError='approximate')
         >>> b = metadata.Date()
         >>> b.loadOther(a)
         >>> b.year
         1843
+        >>> b.yearError
+        'approximate'
         '''
         for attr in self.attrNames:
             if getattr(other, attr) is not None:
                 setattr(self, attr, getattr(other, attr))
+                errorAttr = attr + 'Error'
+                if getattr(other, errorAttr) is not None:
+                    setattr(self, errorAttr, getattr(other, errorAttr))
 
     def loadStr(self, dateStr):
         r'''
@@ -423,13 +428,13 @@ class DateSingle(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self, data: Any = '', relevance='certain'):
-        self._data = []  # store a list of one or more Date objects
+        self._data: List[Date] = []
         self._relevance = None  # managed by property
         # not yet implemented
         # store an array of values marking if date data itself
         # is certain, approximate, or uncertain
         # here, dataError is relevance
-        self._dataError = []  # store a list of one or more strings
+        self._dataError: List[str] = []
         self._prepareData(data)
         self.relevance = relevance  # will use property
 
@@ -1040,7 +1045,7 @@ class Contributor(prebase.ProtoM21Object):
     def role(self, value):
         if value is None or value in self.roleAbbreviationsDict.values():
             self._role = value
-        elif value in self.roleAbbreviationsDict.keys():
+        elif value in self.roleAbbreviationsDict:
             self._role = self.roleAbbreviationsDict[value]
         else:
             self._role = value

@@ -21,7 +21,7 @@ with open(path, 'r') as f:
     lines = f.read()
     exec(lines)
 
-m21version = __version__ # @UndefinedVariable
+m21version = __version__
 
 DESCRIPTION = 'A Toolkit for Computer-Aided Musical Analysis.'
 DESCRIPTION_LONG = """A Toolkit for Computer-Aided Musical Analysis.
@@ -31,13 +31,11 @@ DESCRIPTION_LONG = """A Toolkit for Computer-Aided Musical Analysis.
                         The development of music21 is supported by the
                         generosity of the Seaver Institute and the NEH."""
 
-INSTALL_REQUIRES = [
-    "chardet",
-    "joblib",
-    "more-itertools",
-    "webcolors",
-]
-
+requirements_path = os.path.join(
+    os.path.dirname(__file__), "requirements.txt"
+)
+with open(requirements_path, 'r') as f:
+    INSTALL_REQUIRES = f.read().splitlines()
 
 classifiers = [
     'Development Status :: 5 - Production/Stable',

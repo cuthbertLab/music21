@@ -22,6 +22,7 @@ from music21 import duration
 from music21 import exceptions21
 from music21 import expressions
 from music21 import note
+from music21 import spanner
 from music21 import style
 
 from music21 import environment
@@ -140,9 +141,9 @@ class TempoIndication(base.Music21Object):
         if found is None:
             found = self
 
-        if 'MetricModulation' in found.classes:
+        if isinstance(found, MetricModulation):
             return found.newMetronome
-        elif 'MetronomeMark' in found.classes:
+        elif isinstance(found, MetronomeMark):
             return found
         elif 'TempoText' in found.classes:
             return found.getMetronomeMark()
@@ -167,7 +168,7 @@ class TempoIndication(base.Music21Object):
         # search for TempoIndication objects, not just MetronomeMark objects
         # must provide getElementBefore, as will otherwise return self
         obj = self.getContextByClass('TempoIndication',
-                                     getElementMethod='getElementBeforeOffset')
+                                     getElementMethod=common.enums.ElementSearch.BEFORE_OFFSET)
         if obj is None:
             return None  # nothing to do
         return self.getSoundingMetronomeMark(obj)
@@ -376,6 +377,9 @@ class MetronomeMark(TempoIndication):
     >>> tm2.number
     144
     '''
+    _DOC_ATTR = {
+        'placement': "Staff placement: 'above', 'below', or None.",
+    }
 
     def __init__(self, text=None, number=None, referent=None, parentheses=False):
         super().__init__()
@@ -396,6 +400,8 @@ class MetronomeMark(TempoIndication):
 
         # TODO: style??
         self.parentheses = parentheses
+
+        self.placement = None
 
         self._referent = None  # set with property
         if referent is None:
@@ -447,7 +453,7 @@ class MetronomeMark(TempoIndication):
         # assume ql value or a type string
         elif common.isNum(value) or isinstance(value, str):
             self._referent = duration.Duration(value)
-        elif 'Duration' not in value.classes:
+        elif not isinstance(value, duration.Duration):
             # try get duration object, like from Note
             self._referent = value.duration
         elif 'Duration' in value.classes:
@@ -729,12 +735,12 @@ class MetronomeMark(TempoIndication):
         return MetronomeMark(text=self.text, number=newNumber,
                              referent=duration.Duration(quarterLength))
 
-#     def getEquivalentByNumber(self, number):
-#         '''
-#         Return a new MetronomeMark object that has an equivalent speed but different number and
-#         referent values based on a supplied tempo number.
-#         '''
-#         pass
+    # def getEquivalentByNumber(self, number):
+    #     '''
+    #     Return a new MetronomeMark object that has an equivalent speed but different number and
+    #     referent values based on a supplied tempo number.
+    #     '''
+    #     pass
 
     def getMaintainedNumberWithReferent(self, referent):
         '''
@@ -1062,11 +1068,11 @@ class MetricModulation(TempoIndication):
         if self._newMetronome is not None:
             return self._newMetronome.number
 
-#     def _setNumber(self, value, updateTextFromNumber=True):
-#         if not common.isNum(value):
-#             raise MetricModulationException('cannot set number to a string')
-#         self._newMetronome.number = value
-#         self._oldMetronome.number = value
+    # def _setNumber(self, value, updateTextFromNumber=True):
+    #     if not common.isNum(value):
+    #         raise MetricModulationException('cannot set number to a string')
+    #     self._newMetronome.number = value
+    #     self._oldMetronome.number = value
 
     # --------------------------------------------------------------------------
     # high-level configuration methods
@@ -1244,7 +1250,7 @@ def interpolateElements(element1, element2, sourceStream,
 
     scaleAmount = ((endOffsetDest - startOffsetDest) / (endOffsetSrc - startOffsetSrc))
 
-    interpolatedElements = sourceStream.iter.getElementsByOffset(
+    interpolatedElements = sourceStream.getElementsByOffset(
         offsetStart=startOffsetSrc,
         offsetEnd=endOffsetSrc
     )
@@ -1267,8 +1273,29 @@ def interpolateElements(element1, element2, sourceStream,
 
 
 # ------------------------------------------------------------------------------
-class Test(unittest.TestCase):
+class TempoChangeSpanner(spanner.Spanner):
+    '''
+    Spanners showing tempo-change.  They do nothing right now.
+    '''
+    pass
 
+
+class RitardandoSpanner(TempoChangeSpanner):
+    '''
+    Spanner representing a slowing down.
+    '''
+    pass
+
+
+class AccelerandoSpanner(TempoChangeSpanner):
+    '''
+    Spanner representing a speeding up.
+    '''
+    pass
+
+
+# ------------------------------------------------------------------------------
+class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
@@ -1636,10 +1663,11 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [MetronomeMark, TempoText, MetricModulation, interpolateElements]
+_DOC_ORDER = [MetronomeMark, TempoText, MetricModulation, TempoIndication,
+              AccelerandoSpanner, RitardandoSpanner, TempoChangeSpanner,
+              interpolateElements]
 
 
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testStylesAreShared')
-

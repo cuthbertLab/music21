@@ -136,7 +136,8 @@ def exampleD():
     .. image:: images/figuredBass/fbExamples_sol3D.*
             :width: 700
     '''
-    from music21 import converter, key
+    from music21 import converter
+    from music21 import key
     s = converter.parse("tinynotation: 3/4 BB4 C#4_#6 D4_6 E2 E#4_7,5,#3 F#2_6,4 "
                         "F#4_5,#3 G2 E4_6 F#2_6,4 E4_#4,2 D2_6 EE4_7,5,#3 AA2.",
                         makeNotation=False)
@@ -182,7 +183,8 @@ def exampleB():
     .. image:: images/figuredBass/fbExamples_sol2B.*
         :width: 700
     '''
-    from music21 import converter, key
+    from music21 import converter
+    from music21 import key
     s = converter.parse("tinynotation: 4/4 D4 A4_7,5,#3 B-4 F4_6 G4_6 AA4_7,5,#3 D2",
                         makeNotation=False)
     s.insert(0, key.Key('d'))
@@ -227,7 +229,8 @@ def exampleC():
     .. image:: images/figuredBass/fbExamples_sol2C.*
         :width: 700
     '''
-    from music21 import converter, key
+    from music21 import converter
+    from music21 import key
     s = converter.parse("tinynotation: 4/4 FF#4 GG#4_#6 AA4_6 FF#4 BB4_6,5 C#4_7,5,#3 F#2",
                         makeNotation=False)
     s.insert(0, key.Key('f#'))
@@ -248,7 +251,8 @@ def V43ResolutionExample():
     .. image:: images/figuredBass/fbExamples_V43.*
         :width: 350
     '''
-    from music21 import converter, key
+    from music21 import converter
+    from music21 import key
     s = converter.parse("tinynotation: 4/4 D2 E2_4,3 D2_5,3 E2_4,3 F#1_6,3", makeNotation=False)
     s.insert(0, key.Key('D'))
     return realizer.figuredBassFromStream(s)
@@ -278,7 +282,8 @@ def viio65ResolutionExample():
     .. image:: images/figuredBass/fbExamples_vii65.*
         :width: 700
     '''
-    from music21 import converter, key
+    from music21 import converter
+    from music21 import key
     s = converter.parse("tinyNotation: 4/4 D2 E2_6,b5 D2 E2_6,b5 F#1_6", makeNotation=False)
     s.insert(0, key.Key('D'))
     return realizer.figuredBassFromStream(s)
@@ -288,7 +293,6 @@ def augmentedSixthResolutionExample():
     '''
     This example was retrieved from page 61 of *The Music Theory Handbook* by Marjorie Merryman.
 
-
     Italian (8,#6,3), French (#6,4,3), German (#6,5,3), and Swiss (#6,#4,3)
     augmented sixth resolutions to
     either the major dominant or the major/minor tonic 6,4 are supported.
@@ -296,6 +300,7 @@ def augmentedSixthResolutionExample():
     resolutions to the dominant in the order above, while the last bar
     shows the German augmented sixth
     resolving to the tonic.
+
     >>> from music21.figuredBass import examples
     >>> fbLine = examples.augmentedSixthResolutionExample()
     >>> fbRealization = fbLine.realize()
@@ -304,7 +309,8 @@ def augmentedSixthResolutionExample():
     .. image:: images/figuredBass/fbExamples_a6.*
         :width: 700
     '''
-    from music21 import converter, key
+    from music21 import converter
+    from music21 import key
     s = converter.parse("tinynotation: 4/4 D4 BB-4_8,#6,3 AA2_# D4 BB-4_#6,4,3 "
                         "AA2_# D4 BB-4_#6,5,3 AA2_# D4 BB-4_#6,#4,3 AA2_# D4 "
                         "BB-4_#6,5,3 AA2_6,4",
@@ -350,7 +356,8 @@ def italianA6ResolutionExample():
     .. image:: images/figuredBass/fbExamples_it+6.*
         :width: 700
     '''
-    from music21 import converter, key
+    from music21 import converter
+    from music21 import key
     s = converter.parse(
         "tinynotation: D4 BB-4_#6,3 AA2_# D4 BB-4_#6,3 AA2_6,4 D4 BB-4_#6,3 AA2_#6,4",
         makeNotation=False)
@@ -391,7 +398,8 @@ def twelveBarBlues():
     .. image:: images/figuredBass/fbExamples_twelveBarBlues.*
         :width: 700
     '''
-    from music21 import converter, key
+    from music21 import converter
+    from music21 import key
     s = converter.parse(
         "tinynotation: BB-1 E-1 BB-1 BB-1_7 E-1 E-1 BB-1 BB-1_7 F1_7 G1_6 BB-1 BB-1",
         makeNotation=False)
@@ -417,7 +425,9 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
     .. image:: images/figuredBass/fbExamples_boogieVamp.*
         :width: 700
     '''
-    from music21 import converter, stream, interval
+    from music21 import converter
+    from music21 import stream
+    from music21 import interval
     if blRealization is None:
         bluesLine = twelveBarBlues()
         fbRules = rules.Rules()
@@ -463,7 +473,10 @@ def generateTripletBlues(blRealization=None, numRepeats=5):  # 12/8
     .. image:: images/figuredBass/fbExamples_tripletBlues.*
         :width: 700
     '''
-    from music21 import converter, stream, interval, meter
+    from music21 import converter
+    from music21 import stream
+    from music21 import interval
+    from music21 import meter
     if blRealization is None:
         bluesLine = twelveBarBlues()
         fbRules = rules.Rules()

@@ -9,15 +9,15 @@
 # Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-import math
-import difflib
 import copy
 import collections
-
+import difflib
+import math
 import os
-import inspect
 
-pathName = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+from music21 import note
+
+pathName = os.path.dirname(__file__)
 
 K525omrFilePath = pathName + os.sep + 'k525OMRMvt1.xml'
 K525groundTruthFilePath = pathName + os.sep + 'k525GTMvt1.xml'
@@ -321,7 +321,7 @@ class ScoreCorrector:
         for el in correctMeasure:
             newEl = copy.deepcopy(el)
             try:
-                if 'Note' in newEl.classes:
+                if isinstance(newEl, note.Note):
                     oldPitch = oldNotePitches[pitchIndex]
                     newEl.pitch.octave = oldPitch.octave
                     newEl.pitch.name = oldPitch.name
@@ -898,9 +898,9 @@ class MeasureHash:
 
         Example of Violin II vs. Viola and Cello in K525 I, m. 17
 
-        >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flat.notes.stream()
-        >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flat.notes.stream()
-        >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flat.notes.stream()
+        >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flatten().notes.stream()
+        >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flatten().notes.stream()
+        >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flatten().notes.stream()
         >>> vlnII_MH = omr.correctors.MeasureHash(vlnII)
         >>> viola_MH = omr.correctors.MeasureHash(viola)
         >>> cello_MH = omr.correctors.MeasureHash(cello)
@@ -930,9 +930,9 @@ class MeasureHash:
 
         Example of Violin II vs. Viola and Cello in K525 I, m. 17
 
-        >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flat.notes.stream()
-        >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flat.notes.stream()
-        >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flat.notes.stream()
+        >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flatten().notes.stream()
+        >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flatten().notes.stream()
+        >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flatten().notes.stream()
         >>> vlnII_MH = omr.correctors.MeasureHash(vlnII)
         >>> viola_MH = omr.correctors.MeasureHash(viola)
         >>> cello_MH = omr.correctors.MeasureHash(cello)
@@ -991,8 +991,8 @@ class MeasureHash:
 
         Example of Violin II vs. Viola in K525 I, m. 17
 
-        >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flat.notes.stream()
-        >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flat.notes.stream()
+        >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flatten().notes.stream()
+        >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flatten().notes.stream()
         >>> vlnIIMH = omr.correctors.MeasureHash(vlnII)
         >>> violaMH = omr.correctors.MeasureHash(viola)
         >>> vlnIIMH.hashString

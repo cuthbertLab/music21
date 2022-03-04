@@ -12,7 +12,7 @@
 
 import abc
 import pathlib
-from typing import List
+from typing import Dict, List, Sequence, Tuple, Union, cast
 
 from music21 import common
 # from music21.corpus import virtual
@@ -43,9 +43,9 @@ class Corpus(prebase.ProtoM21Object):
     _allExtensions = tuple(common.flattenList([common.findInputExtension(x)
                                                for x in _acceptableExtensions]))
 
-    _pathsCache = {}
+    _pathsCache: Dict[Tuple[str, Tuple[str]], pathlib.Path] = {}
 
-    _directoryInformation = ()  # a tuple of triples -- see coreCorpus
+    _directoryInformation: Union[Tuple[()], Sequence[Tuple[str, str, bool]]] = ()
 
     parseUsingCorpus = True
 
@@ -81,7 +81,7 @@ class Corpus(prebase.ProtoM21Object):
 
         Generally cached.
         '''
-        rdp = common.cleanpath(rootDirectoryPath, returnPathlib=True)
+        rdp = cast(pathlib.Path, common.cleanpath(rootDirectoryPath, returnPathlib=True))
         matched = []
 
         for filename in sorted(rdp.rglob('*')):
@@ -120,7 +120,6 @@ class Corpus(prebase.ProtoM21Object):
         '.midi'
         '.xml'
         '.mxl'
-        '.mx'
         '.musicxml'
         '.md'
         '.musedata'
@@ -142,10 +141,10 @@ class Corpus(prebase.ProtoM21Object):
         It does not matter if you choose a canonical name or not, the output is the same:
 
         >>> coreCorpus._translateExtensions('.musicxml', True)
-        ['.xml', '.mxl', '.mx', '.musicxml']
+        ['.xml', '.mxl', '.musicxml']
 
         >>> coreCorpus._translateExtensions('.xml', True)
-        ['.xml', '.mxl', '.mx', '.musicxml']
+        ['.xml', '.mxl', '.musicxml']
         '''
         if not common.isListLike(fileExtensions):
             fileExtensions = [fileExtensions]
@@ -377,7 +376,7 @@ class Corpus(prebase.ProtoM21Object):
     @property
     def directoryInformation(self):
         '''
-        Returns a tuple of DirectoryInformation objects for a
+        Returns a tuple of DirectoryInformation objects for
         each directory in self._directoryInformation.
 
         >>> core = corpus.corpora.CoreCorpus()
@@ -570,7 +569,7 @@ class CoreCorpus(Corpus):
         extension provided by an argument.
 
         If `expandExtensions` is True, a format for an extension, and related
-        extensions, will replaced by all known input extensions.
+        extensions, will be replaced by all known input extensions.
 
         This is convenient when an input format might match for multiple
         extensions.
@@ -689,7 +688,7 @@ class LocalCorpus(Corpus):
 
     # CLASS VARIABLES #
 
-    _temporaryLocalPaths = {}
+    _temporaryLocalPaths: Dict[str, set] = {}
 
     parseUsingCorpus = False
     # INITIALIZER #
@@ -847,16 +846,30 @@ class LocalCorpus(Corpus):
 
         If that path is included in the list of persisted paths for the given
         corpus, it will be removed permanently.
+
+        >>> testCorpus = corpus.corpora.LocalCorpus(name='test')
+        >>> testCorpus.addPath('~/Desktop')
+        >>> len(testCorpus.directoryPaths)
+        1
+        >>> testCorpus.removePath('~/Desktop')
+        >>> testCorpus.directoryPaths
+        ()
+
+        TODO: test for corpus persisted to disk without actually reindexing
+        files on user's Desktop.
         '''
         temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
             self.name, [])
-        directoryPath = common.cleanpath(directoryPath)
-        if directoryPath in temporaryPaths:
-            temporaryPaths.remove(directoryPath)
+        directoryPathObj: pathlib.Path = common.cleanpath(directoryPath, returnPathlib=True)
+        if directoryPathObj in temporaryPaths:
+            temporaryPaths.remove(directoryPathObj)
+        # Also need string version because LocalCorpusSettings is a list-like
+        # container of strings (see comments in environment.py)
+        directoryPathStr = str(directoryPathObj)
         if self.existsInSettings:
             settings = self._getSettings()
-            if settings is not None and directoryPath in settings:
-                settings.remove(directoryPath)
+            if settings is not None and directoryPathStr in settings:
+                settings.remove(directoryPathStr)
             self.save()
         self._removeNameFromCache(self.name)
 
@@ -946,7 +959,7 @@ class LocalCorpus(Corpus):
 #         className = getattr(virtual, corpusName)
 #         if callable(className):
 #             obj = className()
-#             if isinstance(obj, virtual.VirtualWork):  # @UndefinedVariable
+#             if isinstance(obj, virtual.VirtualWork):
 #                 if obj.corpusPath is not None:
 #                     _virtualWorks.append(obj)
 #     del corpusName

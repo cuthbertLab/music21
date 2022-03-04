@@ -44,7 +44,7 @@ JSON was originally created to pass
 JavaScript objects from a web server to a web browser, but its utility
 (combining the power of XML with the ease of use of objects) has made it a
 growing standard for other languages.  (see
-http://docs.python.org/library/json.html).
+https://docs.python.org/3/library/json.html).
 Music21 has two implementations of JSON (confusing, no?)
 because we weren't sure and are still not sure which will be best in the long-run:
 the first approach
@@ -82,6 +82,8 @@ from music21 import common
 from music21 import defaults
 from music21 import derivation
 from music21 import exceptions21
+from music21 import spanner
+from music21 import variant
 # from music21.tree.trees import ElementTree
 
 from music21 import environment
@@ -198,6 +200,10 @@ class StreamFreezer(StreamFreezeThawBase):
     >>> len(s3.parts[0].measure(7).notes) == 6
     True
 
+    OMIT_FROM_DOCS
+
+    >>> import os
+    >>> os.remove(fp2)
     '''
 
     def __init__(self, streamObj=None, fastButUnsafe=False, topLevel=True, streamIds=None):
@@ -271,7 +277,7 @@ class StreamFreezer(StreamFreezeThawBase):
             self.findActiveStreamIdsInHierarchy(streamObj)
 
         for el in allEls:
-            if 'Variant' in el.classes:
+            if isinstance(el, variant.Variant):
                 # works like a whole new hierarchy...  # no need for deepcopy
                 subSF = StreamFreezer(
                     el._stream,
@@ -280,7 +286,7 @@ class StreamFreezer(StreamFreezeThawBase):
                     topLevel=False,
                 )
                 subSF.setupSerializationScaffold()
-            elif 'Spanner' in el.classes:
+            elif isinstance(el, spanner.Spanner):
                 # works like a whole new hierarchy...  # no need for deepcopy
                 subSF = StreamFreezer(
                     el.spannerStorage,
@@ -376,9 +382,9 @@ class StreamFreezer(StreamFreezeThawBase):
             for el, unused_offset in storedElementOffsetTuples:
                 if el.isStream:
                     self.recursiveClearSites(el)
-                if 'Spanner' in el.classes:
+                if isinstance(el, spanner.Spanner):
                     self.recursiveClearSites(el.spannerStorage)
-                if 'Variant' in el.classes:
+                if isinstance(el, variant.Variant):
                     self.recursiveClearSites(el._stream)
                 if hasattr(el, '_derivation'):
                     el._derivation = derivation.Derivation()  # reset
@@ -553,7 +559,7 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> n2.duration.type = 'whole'
         >>> m2.append(n2)
         >>> s2.append(m2)
-        >>> v = variant.Variant(s2)
+        >>> v = variant.Variant(s2.elements)
         >>> s.insert(0, v)
         >>> sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
         >>> allIds = sf.findActiveStreamIdsInHierarchy()
@@ -673,12 +679,12 @@ class StreamFreezer(StreamFreezeThawBase):
             else:
                 fp.write(pickleString)
         elif fmt == 'jsonpickle':
-            import jsonpickle
+            import jsonpickle  # type: ignore
             data = jsonpickle.encode(storage, **keywords)
             if zipType == 'zlib':
-                data = zlib.compress(data)
+                data = zlib.compress(data.encode())
 
-            with open(fp, 'w') as f:
+            with open(fp, 'w', encoding='utf-8') as f:
                 f.write(data)
 
         else:  # pragma: no cover
@@ -785,7 +791,7 @@ class StreamThawer(StreamFreezeThawBase):
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e._stream)
                 e._cache = {}
-                # for el in e._stream.flat:
+                # for el in e._stream.flatten():
                 #    print(el, el.offset, el.sites.siteDict)
             elif 'Spanner' in eClasses:
                 subSF = StreamThawer()
@@ -918,9 +924,8 @@ class StreamThawer(StreamFreezeThawBase):
             directory = environLocal.getRootTempDir()
             fp = directory / fp
 
-        f = open(fp, 'rb')
-        fileData = f.read()  # TODO: do not read entire file
-        f.close()
+        with open(fp, 'rb') as f:
+            fileData = f.read()  # TODO: do not read entire file
 
         fmt = self.parseOpenFmt(fileData)
         if fmt == 'pickle':
@@ -946,9 +951,8 @@ class StreamThawer(StreamFreezeThawBase):
             common.restorePathClassesAfterUnpickling()
         elif fmt == 'jsonpickle':
             import jsonpickle
-            f = open(fp, 'r')
-            data = f.read()
-            f.close()
+            with open(fp, 'r', encoding='utf-8') as f:
+                data = f.read()
             storage = jsonpickle.decode(data)
             self.stream = self.unpackStream(storage)
         else:  # pragma: no cover
@@ -989,7 +993,8 @@ class StreamThawer(StreamFreezeThawBase):
 class Test(unittest.TestCase):
 
     def testSimpleFreezeThaw(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         s = stream.Stream()
         sDummy = stream.Stream()
         n = note.Note()
@@ -1010,7 +1015,8 @@ class Test(unittest.TestCase):
         self.assertEqual(outStream[0].offset, 2.0)
 
     def testFreezeThawWithSpanner(self):
-        from music21 import stream, note, spanner
+        from music21 import stream
+        from music21 import note
         s = stream.Stream()
         sDummy = stream.Stream()
         n = note.Note()
@@ -1119,7 +1125,6 @@ class Test(unittest.TestCase):
 
     def testFreezeThawSimpleVariant(self):
         from music21 import freezeThaw
-        from music21 import variant
         from music21 import stream
         from music21 import note
 
@@ -1148,7 +1153,6 @@ class Test(unittest.TestCase):
     def testFreezeThawVariant(self):
         from music21 import freezeThaw
         from music21 import corpus
-        from music21 import variant
         from music21 import stream
         from music21 import note
 
@@ -1187,7 +1191,8 @@ class Test(unittest.TestCase):
         # v2.show('t')
 
     def testSerializationScaffoldA(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         from music21 import freezeThaw
 
         n1 = note.Note()
@@ -1206,7 +1211,9 @@ class Test(unittest.TestCase):
         self.assertTrue(s1.hasElement(n1))
 
     def testJSONPickleSpanner(self):
-        from music21 import converter, note, stream, spanner
+        from music21 import converter
+        from music21 import note
+        from music21 import stream
         n1 = note.Note('C')
         n2 = note.Note('D')
         s1 = stream.Stream()
@@ -1229,7 +1236,8 @@ class Test(unittest.TestCase):
         c = converter.parse(a)
         f = converter.freezeStr(c)
         d = converter.thawStr(f)
-        self.assertEqual(d[1][20].volume._client.__class__.__name__, 'weakref')
+        self.assertEqual(d.parts[1].flatten().notes[20].volume._client.__class__.__name__,
+                         'weakref')
 
 
 # -----------------------------------------------------------------------------

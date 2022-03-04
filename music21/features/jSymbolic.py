@@ -19,11 +19,12 @@ import math
 import statistics
 import unittest
 from collections import OrderedDict
+from math import isclose
 
-from music21 import common
 from music21 import base
 from music21 import exceptions21
 from music21.features import base as featuresModule
+from music21.instrument import Instrument
 
 from music21 import environment
 _MOD = 'features.jSymbolic'
@@ -1788,7 +1789,7 @@ class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     ...     p.insert(0, tempo.MetronomeMark('Langsam', 70))
     >>> fe = features.jSymbolic.StrengthOfStrongestRhythmicPulseFeature(sch)
     >>> fe.extract().vector[0]
-    0.853...
+    0.857...
     '''
     id = 'R4'
 
@@ -1815,7 +1816,7 @@ class StrengthOfSecondStrongestRhythmicPulseFeature(
     ...     p.insert(0, tempo.MetronomeMark('Langsam', 70))
     >>> fe = features.jSymbolic.StrengthOfSecondStrongestRhythmicPulseFeature(sch)
     >>> fe.extract().vector[0]
-    0.12...
+    0.119...
     '''
     id = 'R5'
 
@@ -1851,7 +1852,7 @@ class StrengthRatioOfTwoStrongestRhythmicPulsesFeature(
     ...     p.insert(0, tempo.MetronomeMark('Langsam', 70))
     >>> fe = features.jSymbolic.StrengthRatioOfTwoStrongestRhythmicPulsesFeature(sch)
     >>> fe.extract().vector[0]
-    7.0
+    7.2
 
     '''
     id = 'R6'
@@ -1887,7 +1888,7 @@ class CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(
     ...     p.insert(0, tempo.MetronomeMark('Langsam', 70))
     >>> fe = features.jSymbolic.CombinedStrengthOfTwoStrongestRhythmicPulsesFeature(sch)
     >>> fe.extract().vector[0]
-    0.975...
+    0.976...
     '''
     id = 'R7'
 
@@ -2332,7 +2333,7 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
             oNext = onsets[i + 1]
             # Don't include simultaneous attacks
             dif = oNext - o
-            if not common.almostEquals(dif, 0.0):
+            if not isclose(dif, 0.0, abs_tol=1e-7):
                 differences.append(dif)
         self.feature.vector[0] = sum(differences) / len(differences)
 
@@ -2373,7 +2374,7 @@ class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
             oNext = onsets[i + 1]
             # Don't include simultaneous attacks
             dif = oNext - o
-            if not common.almostEquals(dif, 0.0):
+            if not isclose(dif, 0.0, abs_tol=1e-7):
                 differences.append(dif)
         self.feature.vector[0] = statistics.pstdev(differences)
 
@@ -2426,7 +2427,7 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
                 oNext = onsets[i + 1]
                 # Don't include simultaneous attacks
                 dif = oNext - o
-                if not common.almostEquals(dif, 0.0):
+                if not isclose(dif, 0.0, abs_tol=1e-7):
                     differences.append(dif)
             if not differences:
                 raise JSymbolicFeatureException('at least one part lacks notes')
@@ -2486,7 +2487,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
                 oNext = onsets[i + 1]
                 dif = oNext - o
                 # Don't include simultaneous attacks
-                if not common.almostEquals(dif, 0.0):
+                if not isclose(dif, 0.0, abs_tol=1e-7):
                     differences.append(dif)
             if not differences:
                 raise JSymbolicFeatureException('at least one part lacks notes')
@@ -3322,6 +3323,20 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
      1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+    Default instruments will lack a `.midiProgram`, so they raise exceptions:
+
+    >>> i = instrument.Instrument()
+    >>> i.midiProgram is None
+    True
+    >>> s2 = stream.Stream()
+    >>> s2.append(i)
+    >>> s2.append(note.Note())
+    >>> fe2 = features.jSymbolic.PitchedInstrumentsPresentFeature(s2)
+    >>> fe2.extract()
+    Traceback (most recent call last):
+    music21.features.jSymbolic.JSymbolicFeatureException:
+    <music21.instrument.Instrument ''> lacks a midiProgram
     '''
     id = 'I1'
 
@@ -3342,18 +3357,16 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
         s = self.data['partitionByInstrument']
         # each part has content for each instrument
         # count = 0
-        if s is not None:
-            for p in s.parts:
-                # always one instrument
-                x = p.getElementsByClass('Instrument')
-                if x:
-                    i = x[0]
-                    if p.recurse().notes:
-                        self.feature.vector[i.midiProgram] = 1
-                else:
-                    pass
-        else:
+        if not s:
             raise JSymbolicFeatureException('input lacks instruments')
+        for p in s.parts:
+            # always one instrument
+            i = p.getElementsByClass(Instrument).first()
+            if p.recurse().notes:
+                if i.midiProgram is None:
+                    iStr = str(i) or repr(i)
+                    raise JSymbolicFeatureException(f'{iStr} lacks a midiProgram')
+                self.feature.vector[i.midiProgram] = 1
 
 
 class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
@@ -3408,6 +3421,13 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+    `.midiProgram` cannot be None:
+
+    >>> s1.getInstruments().first().midiProgram = None
+    >>> fe2 = features.jSymbolic.NotePrevalenceOfPitchedInstrumentsFeature(s1)
+    >>> fe2.extract()
+    Traceback (most recent call last):
+    music21.features.jSymbolic.JSymbolicFeatureException: Acoustic Guitar lacks a midiProgram
     '''
     id = 'I3'
 
@@ -3434,9 +3454,12 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
             raise JSymbolicFeatureException('input lacks notes')
         for p in s.parts:
             # always one instrument
-            i = p.getElementsByClass('Instrument').first()
+            i = p.getElementsByClass(Instrument).first()
             pNotes = p.recurse().notes
             if pNotes:
+                if i.midiProgram is None:
+                    iStr = str(i) or repr(i)
+                    raise JSymbolicFeatureException(f'{iStr} lacks a midiProgram')
                 self.feature.vector[i.midiProgram] = len(pNotes) / total
 
 
@@ -3539,7 +3562,7 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
         coll = []
         for p in s.parts:
             # always one instrument
-            i = p.getElementsByClass('Instrument').first()
+            i = p.getElementsByClass(Instrument).first()
             pNotes = p.recurse().notes
             if pNotes:
                 coll.append(len(pNotes) / total)
@@ -3689,9 +3712,9 @@ class InstrumentFractionFeature(featuresModule.FeatureExtractor):
         if not total:
             raise JSymbolicFeatureException('input lacks notes')
         for p in s.parts:
-            i = p.getElementsByClass('Instrument').first()
+            i = p.getElementsByClass(Instrument).first()
             if i.midiProgram in self._targetPrograms:
-                count += len(p.flat.notes)
+                count += len(p.recurse().notes)
         self.feature.vector[0] = count / total
 
 
@@ -4437,7 +4460,10 @@ def getCompletionStats():
 class Test(unittest.TestCase):
 
     def testAverageMelodicIntervalFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4452,7 +4478,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [6.0])
 
     def testMostCommonMelodicIntervalFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4467,7 +4496,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [5])
 
     def testDistanceBetweenMostCommonMelodicIntervalsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4481,7 +4513,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [2])
 
     def testMostCommonMelodicIntervalPrevalenceFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4495,7 +4530,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [0.5])
 
     def testRelativeStrengthOfMostCommonIntervalsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4509,7 +4547,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [0.75])
 
     def testNumberOfCommonMelodicIntervalsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4523,7 +4564,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [1])
 
     def testAmountOfArpeggiationFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4537,7 +4581,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [0.5])
 
     def testRepeatedNotesFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4551,7 +4598,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [0.5])
 
     def testChromaticMotionFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4565,7 +4615,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [0.5])
 
     def testStepwiseMotionFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4579,7 +4632,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [2 / 3])
 
     def testMelodicThirdsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4593,7 +4649,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [1 / 6])
 
     def testMelodicFifthsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4607,7 +4666,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [2 / 6])
 
     def testMelodicTritonesFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4621,7 +4683,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [1 / 6])
 
     def testMelodicOctavesFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         s = stream.Stream()
         p = pitch.Pitch('c2')
         s.append(note.Note(copy.deepcopy(p)))
@@ -4635,7 +4700,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [1 / 6])
 
     def testDirectionOfMotionFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         # all up
         s = stream.Stream()
         p = pitch.Pitch('c2')
@@ -4670,7 +4738,10 @@ class Test(unittest.TestCase):
         self.assertEqual(f.vector, [0.0])
 
     def testDurationOfMelodicArcsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         # all up
         # in jSymbolic implementation, all up means there
         # is no melodic arc and thus the average duration
@@ -4696,7 +4767,10 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(f.vector[0], 8 / 5)
 
     def testSizeOfMelodicArcsFeature(self):
-        from music21 import stream, pitch, note, features
+        from music21 import stream
+        from music21 import pitch
+        from music21 import note
+        from music21 import features
         # all up
         s = stream.Stream()
         p = pitch.Pitch('c2')
@@ -4719,7 +4793,10 @@ class Test(unittest.TestCase):
         # self.assertAlmostEqual(f.vector[0], 1 + 2/3)
 
     def testNoteDensityFeatureA(self):
-        from music21 import stream, note, tempo, features
+        from music21 import stream
+        from music21 import note
+        from music21 import tempo
+        from music21 import features
         s = stream.Stream()
         s.insert(0, tempo.MetronomeMark(number=60))
         s.insert(0, note.Note(quarterLength=8))
@@ -4767,7 +4844,8 @@ class Test(unittest.TestCase):
                                  feImplemented, 'percent', feImplemented / feTotal])
 
     def testBeatHistogram(self):
-        from music21 import corpus, tempo
+        from music21 import corpus
+        from music21 import tempo
         sch = corpus.parse('schoenberg/opus19', 2)
         for p in sch.parts:
             p.insert(0, tempo.MetronomeMark('Langsam', 70))

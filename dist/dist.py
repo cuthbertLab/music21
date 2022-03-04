@@ -26,36 +26,41 @@ To do a release,
      but should be done before making a release).
 6. IMPORTANT: run python documentation/testDocumentation.py and afterwards fix errors [*]
 
-[*] you will need pytest and nbval installed (along with ipython and jupyter), you cannot fix tests
-while it is running.  This takes a while and runs single core, so allocate time.  Start working on
+[*] you will need pytest and nbval installed (along with ipython and jupyter), you cannot check
+to see if fixed tests work while it is running.
+This takes a while and runs single core, so allocate time.  Start working on
 the announcement while it's running.
 
 7. run documentation/make.py clean  (skip on minor version changes)
-8. run documentation/make.py   [*]
+8. run documentation/make.py linkcheck  [*]
+9. run documentation/make.py   [*]
 
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 
-9. ssh to MIT, cd music21/doc and rm -rf *  (skip on minor version changes)
+10. ssh to athena.dialup.mit.edu (yes, dialup!), cd music21/doc and rm -rf *  (skip on minor version changes)
 
-10. run documentation/upload.py or upload via ssh.
-   -- you will need an MIT username and password
+11. run documentation/upload.py or upload via ssh.
+   -- you will need an MIT username and password + a dual authentication passcode
 
-11. zip up documentation/build/html and get ready to upload/delete it. (skip for Alpha/Beta)
+12. zip up documentation/build/html and get ready to upload/delete it.
+    Rename to music21.v.7.1.0-docs.zip (skip for Alpha/Beta)
 
-12. And finally this file. (from the command line; not as python -m... Catalina needs sudo)
+12b. If any new file extensions have been added, be sure to add them to MANIFEST.in
 
-13. COMMIT to Github at this point w/ commit comment of the new version,
+13. And finally this file. (from the command line; not as python -m... OS 11+ needs sudo)
+
+14. COMMIT to Github at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
     (.gitignore will avoid uploading the large files created here...)
 
-14. Create a new release on GitHub and upload the TWO files created here and docs.
-    Use tag v6.0.1 (etc.).
+15. Create a new release on GitHub and upload the TWO files created here and docs.
+    Use tag v7.0.1 (etc.).
     Don't forget the "v" in the release tag.
     Drag in this order: .tar.gz, documentation, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-15. Upload the new file to PyPI with "twine upload music21-6.0.5a2.tar.gz" [*]
+16. Upload the new file to PyPI with "twine upload music21-6.0.5a2.tar.gz" [*]
 
     [*] Requires twine to be installed
 
@@ -69,14 +74,14 @@ the announcement while it's running.
         username:your_username
         password:your_password
 
-16. Delete the two .tar.gz files in dist...
+17. Delete the two .tar.gz files in dist...
 
-17a. For starting a new major release create a GitHub branch for the old one.
+18. For starting a new major release create a GitHub branch for the old one.
 
-17b. Immediately increment the number in _version.py and run tests on it here
+19. Immediately increment the number in _version.py and run tests on it here
     to prepare for next release.
 
-18. Announce on the blog, to the list, and twitter.
+20. Announce on the blog, to the list, and twitter.
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''
@@ -179,7 +184,7 @@ class Distributor:
         '''
         TAR = 'TAR'
         # EGG = 'EGG'
-        if fp.endswith('.tar.gz'):
+        if fp and fp.endswith('.tar.gz'):
             mode = TAR
             modeExt = '.tar.gz'
         else:

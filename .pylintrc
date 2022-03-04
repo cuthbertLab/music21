@@ -62,7 +62,6 @@ disable=
     unnecessary-pass,  #  not really a problem..
     locally-disabled,  # test for this later, but hopefully will know what we're doing
     duplicate-code,   # needs to ignore strings -- keeps getting doctests...
-    abstract-class-instantiated,  # this trips on the fractions.Fraction() class.
     fixme,  # obviously known
     superfluous-parens,  # nope -- if they make things clearer...
     too-many-statements,  # someday
@@ -75,7 +74,6 @@ disable=
     bad-whitespace,  # maybe later, but "bad" isn't something I necessarily agree with
     bad-continuation,  # never remove -- this is a good thing many times.
     too-many-return-statements,  # we'll see
-    unpacking-non-sequence,  # gets it wrong too often.
     too-many-instance-attributes,  # maybe later
     invalid-name,  # these are good music21 names; fix the regexp instead...
     no-self-use,  # maybe later
@@ -98,12 +96,15 @@ disable=
     no-else-continue,  # not so bad...
     no-else-break,  # same...
     consider-using-enumerate,  # sometimes parallelism is better than enumerate.
+    consider-using-dict-items,  # readability improvement depends on excellent variable names
     arguments-differ,  # we are not purists.
+    arguments-renamed,  # same
     simplifiable-if-statement,  # simpler to a computer maybe...
     unsubscriptable-object,  # too many errors
     import-outside-toplevel,  # allow for import music21, etc.
     not-callable,  # false positives, for instance on x.next()
     raise-missing-from,  # want to do this eventually, but adding 1000 msgs not helpful
+    consider-using-f-string,  # future?
 
 #       'protected-access', # this is an important one, but for now we do a lot of
 #                           # x = copy.deepcopy(self); x._volume = ... which is not a problem...

@@ -43,10 +43,7 @@ def cd(targetDir):
 
     will switch temporarily, and then switch back when leaving.
     '''
-    try:
-        cwd = os.getcwdu()  # unicode # @UndefinedVariable
-    except AttributeError:
-        cwd = os.getcwd()  # non unicode
+    cwd = os.getcwd()
 
     try:
         os.chdir(targetDir)
@@ -116,7 +113,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
             data = thisFile.read()
             return data
     except UnicodeDecodeError:
-        import chardet
+        import chardet  # type: ignore
         with io.open(filePath, 'rb') as thisFileBinary:
             dataBinary = thisFileBinary.read()
             encoding = chardet.detect(dataBinary)['encoding']

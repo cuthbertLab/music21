@@ -24,7 +24,7 @@ TODO: replace .size with a string representing interval and then
 import copy
 import string
 import unittest
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from music21 import base
 from music21 import common
@@ -76,6 +76,7 @@ def realizeOrnaments(srcObject):
                     postExpandList.append(i)
                 if newSrcObject is None:
                     # some ornaments eat up the entire source object. Trills for instance
+                    srcObject = newSrcObject
                     break
                 newSrcObject.expressions = srcObject.expressions[1:]
                 srcObject = newSrcObject
@@ -87,9 +88,11 @@ def realizeOrnaments(srcObject):
                     break
 
         retList = []
+        # TODO: use extend...
         for i in preExpandList:
             retList.append(i)
-        retList.append(srcObject)
+        if srcObject is not None:
+            retList.append(srcObject)
         for i in postExpandList:
             retList.append(i)
         return retList
@@ -307,6 +310,11 @@ class TextExpression(Expression):
     >>> te = expressions.TextExpression('Con fuoco')
     >>> te.content
     'Con fuoco'
+
+    Most configuration of style is done
+    on the `.style` :class:`~music21.style.TextStyle` object
+    itself.
+
     >>> te.style.fontSize = 24.0
     >>> te.style.fontSize
     24
@@ -319,6 +327,10 @@ class TextExpression(Expression):
     classSortOrder = -30
     _styleClass = style.TextStyle
 
+    _DOC_ATTR = {
+        'placement': "Staff placement: 'above', 'below', or None.",
+    }
+
     def __init__(self, content=None):
         super().__init__()
         # numerous properties are inherited from TextFormat
@@ -329,10 +341,8 @@ class TextExpression(Expression):
         else:
             self._content = content
 
-        self._enclosure = None
-
         # this does not do anything if default y is defined
-        self.positionPlacement = None
+        self.placement = None
 
     def _reprInternal(self):
         if len(self._content) >= 13:
@@ -342,6 +352,38 @@ class TextExpression(Expression):
             return repr(self._content)
         else:
             return ''
+
+    @property
+    def enclosure(self) -> Optional[style.Enclosure]:
+        '''
+        Returns or sets the enclosure on the Style object
+        stored on .style.
+
+        Exposed directly on the expression for backwards
+        compatibility.  Does not create a .style object if
+        one does not exist and the value is None.
+
+        >>> te = expressions.TextExpression('Bridge')
+        >>> te.enclosure is None
+        True
+        >>> te.enclosure = style.Enclosure.RECTANGLE
+        >>> te.enclosure
+        <Enclosure.RECTANGLE>
+
+        Note that this is also set on `.style`.
+
+        >>> te.style.enclosure
+        <Enclosure.RECTANGLE>
+        '''
+        if not self.hasStyleInformation:
+            return None
+        return self.style.enclosure
+
+    @enclosure.setter
+    def enclosure(self, value: Optional[style.Enclosure]):
+        if not self.hasStyleInformation and value is None:
+            return
+        self.style.enclosure = value
 
     def _getContent(self):
         return self._content
@@ -414,8 +456,11 @@ class Ornament(Expression):
         transposeInterval
     ):
         '''
-        Used by trills and mordants to fill out their realization
+        Used by trills and mordents to fill out their realization.
         '''
+        if not hasattr(srcObj, 'transpose'):
+            raise TypeError(f'Expected note; got {type(srcObj)}')
+
         firstNote = copy.deepcopy(srcObj)
         # TODO: remove expressions
         # firstNote.expressions = None
@@ -441,7 +486,7 @@ class GeneralMordent(Ornament):
         self.direction = ''  # up or down
         self.size = None  # interval.Interval (General, etc.) class
         self.quarterLength = 0.125  # 32nd note default
-        self.size = interval.Interval(2)
+        self.size = interval.GenericInterval(2)
 
     def realize(self, srcObj: 'music21.note.Note'):
         '''
@@ -471,7 +516,7 @@ class GeneralMordent(Ornament):
         '''
         from music21 import key
 
-        if self.direction != 'up' and self.direction != 'down':
+        if self.direction not in ('up', 'down'):
             raise ExpressionException('Cannot realize a mordent if I do not know its direction')
         if self.size == '':
             raise ExpressionException('Cannot realize a mordent if there is no size given')
@@ -485,7 +530,7 @@ class GeneralMordent(Ornament):
             transposeInterval = self.size.reverse()
         else:
             transposeInterval = self.size
-        mordNotes = []
+        mordNotes: List['music21.note.Note'] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
@@ -504,15 +549,24 @@ class GeneralMordent(Ornament):
 
 class Mordent(GeneralMordent):
     '''
-    A normal Mordent.
+    A normal Mordent -- goes downwards and has a line through it.
+
+    Note that some computer terminology calls this one an inverted mordent, but this
+    is a modern term.  See Apel, *Harvard Dictionary of Music*, "Mordent"::
+
+        A musical ornament consisting of the alternation of the written note
+        with the note immediately below it.
+
 
     >>> m = expressions.Mordent()
     >>> m.direction
     'down'
     >>> m.size
-    <music21.interval.Interval M2>
-    '''
+    <music21.interval.GenericInterval 2>
 
+    Changed in v7: Mordent sizes are GenericIntervals -- as was originally
+    intended but programmed incorrectly.
+    '''
     def __init__(self):
         super().__init__()
         self.direction = 'down'  # up or down
@@ -553,13 +607,25 @@ class WholeStepMordent(Mordent):
 # ------------------------------------------------------------------------------
 class InvertedMordent(GeneralMordent):
     '''
-    An inverted Mordent.
+    An inverted Mordent -- goes upwards and has no line through it.
+
+    Note that some computer terminology calls this one a (normal) mordent, but this
+    is a modern term.    See Apel, *Harvard Dictionary of Music*,
+    "Inverted Mordent"::
+
+        An 18th-century ornament involving alternation of the
+        written note with the note immediately above it.
+
+    An inverted mordent has the size of a generic second, of some form.
 
     >>> m = expressions.InvertedMordent()
     >>> m.direction
     'up'
     >>> m.size
-    <music21.interval.Interval M2>
+    <music21.interval.GenericInterval 2>
+
+    Changed in v7: InvertedMordent sizes are GenericIntervals -- as was originally
+    intended but programmed incorrectly.
     '''
 
     def __init__(self):
@@ -601,23 +667,41 @@ class WholeStepInvertedMordent(InvertedMordent):
 
 # ------------------------------------------------------------------------------
 class Trill(Ornament):
-    '''A basic trill marker.
-
-    >>> m = expressions.Trill()
-    >>> m.placement
-    'above'
-    >>> m.size
-    <music21.interval.Interval M2>
     '''
+    A basic trill marker without the trill extension
 
+    >>> tr = expressions.Trill()
+    >>> tr.placement
+    'above'
+    >>> tr.size
+    <music21.interval.GenericInterval 2>
+
+    Trills have a `.nachschlag` attribute which determines whether there
+    should be extra gracenotes at the end of the trill.
+
+    >>> tr.nachschlag
+    False
+    >>> tr.nachschlag = True
+
+    The Trill also has a "quarterLength" attribute that sets how long
+    each trill note should be.  Defaults to 32nd note:
+
+    >>> tr.quarterLength
+    0.125
+    >>> tr.quarterLength == duration.Duration('32nd').quarterLength
+    True
+
+    Changed in v.7 -- the size should be a generic second.
+    '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval('M2')
+        self.size: interval.IntervalBase = interval.GenericInterval(2)
 
         self.placement = 'above'
         self.nachschlag = False  # play little notes at the end of the trill?
         self.tieAttach = 'all'
         self.quarterLength = 0.125
+        self._setAccidentalFromKeySig = True
 
     def splitClient(self, noteList):
         '''
@@ -641,38 +725,110 @@ class Trill(Ornament):
 
         return returnSpanners
 
-    def realize(self, srcObj: 'music21.note.Note'):
+    def realize(
+        self,
+        srcObj: 'music21.note.Note'
+    ) -> Tuple[List['music21.note.Note'], None, List['music21.note.Note']]:
         '''
         realize a trill.
 
-        returns a three-element tuple.
-        The first is a list of the notes that the note was converted to.
-        The second is None because the trill "eats up" the whole note.
-        The third is a list of the notes at the end if nachschlag is True, and empty list if False.
+        Returns a three-element tuple:
 
+        * The first is a list of the notes that the note was converted to.
+        * The second is None because the trill "eats up" the whole note.
+        * The third is a list of the notes at the end if nachschlag is True,
+          and empty list if False.
 
         >>> n1 = note.Note('C4')
-        >>> n1.quarterLength = 0.5
+        >>> n1.duration.type = 'eighth'
         >>> t1 = expressions.Trill()
+        >>> n1.expressions.append(t1)
+        >>> realization = t1.realize(n1)
+        >>> realization
+        ([<music21.note.Note C>,
+          <music21.note.Note D>,
+          <music21.note.Note C>,
+          <music21.note.Note D>], None, [])
+        >>> realization[0][0].quarterLength
+        0.125
+        >>> realization[0][0].pitch.octave
+        4
+
+
+        When inside a stream, the realizations will consult the current key to see
+        if it should be a whole-step or half-step trill:
+
+        >>> m = stream.Measure()
+        >>> k1 = key.Key('D-')
+        >>> m.insert(0, k1)
+        >>> m.append(n1)
+        >>> t1.realize(n1)
+        ([<music21.note.Note C>,
+          <music21.note.Note D->,
+          <music21.note.Note C>,
+          <music21.note.Note D->], None, [])
+
+
+        Note that if the key contradicts the note of the trill, for instance, here
+        having a C-natural rather than a C-sharp, we do not correct the C to C#.
+
+        >>> k2 = key.Key('A')
+        >>> m.replace(k1, k2)
         >>> t1.realize(n1)
         ([<music21.note.Note C>,
           <music21.note.Note D>,
           <music21.note.Note C>,
           <music21.note.Note D>], None, [])
 
+        This can lead to certain unusual circumstances such as augmented second trills
+        which are technically correct, but probably not what a performer exprects.
+
+        >>> k3 = key.Key('E')
+        >>> m.replace(k2, k3)
+        >>> t1.realize(n1)
+        ([<music21.note.Note C>,
+          <music21.note.Note D#>,
+          <music21.note.Note C>,
+          <music21.note.Note D#>], None, [])
+
+
+        To avoid this case, create a :class:`~music21.expressions.HalfStepTrill` or
+        :class:`~music21.expressions.WholeStepTrill`.
+
+
+        If there is a nachschlag, it will appear in the third element of the list.
+
+        >>> n1.duration.type = 'quarter'
+        >>> m.replace(k3, k1)  # back to D-flat major
+        >>> t1.nachschlag = True
+        >>> t1.realize(n1)
+        ([<music21.note.Note C>,
+          <music21.note.Note D->,
+          <music21.note.Note C>,
+          <music21.note.Note D->,
+          <music21.note.Note C>,
+          <music21.note.Note D->], None, [<music21.note.Note C>, <music21.note.Note B->])
+
+        Some notes can be too short to realize.
 
         >>> n2 = note.Note('D4')
-        >>> n2.quarterLength = 0.125
+        >>> n2.duration.type = '32nd'
         >>> t2 = expressions.Trill()
         >>> t2.realize(n2)
         Traceback (most recent call last):
         music21.expressions.ExpressionException: The note is not long enough to realize a trill
 
-        :type srcObj: base.Music21Object
+        A quicker trill makes it possible:
+
+        >>> t2.quarterLength = duration.Duration('64th').quarterLength
+        >>> t2.realize(n2)
+        ([<music21.note.Note D>,
+          <music21.note.Note E>], None, [])
         '''
+        # TODO -- if the trill duration is too short, do not raise an error, simple make the
+        #    quarterLength even shorter.
+
         from music21 import key
-        if self.size == '':
-            raise ExpressionException('Cannot realize a trill if there is no size given')
         if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
         if srcObj.duration.quarterLength < 2 * self.quarterLength:
@@ -683,36 +839,42 @@ class Trill(Ornament):
         transposeInterval = self.size
         transposeIntervalReverse = self.size.reverse()
 
+        numberOfTrillNotes = int(srcObj.duration.quarterLength / self.quarterLength)
         if self.nachschlag:
-            numberOfTrillNotes = int(srcObj.duration.quarterLength / (self.quarterLength - 2))
-        else:
-            numberOfTrillNotes = int(srcObj.duration.quarterLength / self.quarterLength)
+            numberOfTrillNotes -= 2
 
-        trillNotes = []
+        trillNotes: List['music21.note.Note'] = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval)
 
-        currentKeySig = srcObj.getContextByClass(key.KeySignature)
-        if currentKeySig is None:
-            currentKeySig = key.KeySignature(0)
+        currentKeySig = None
+        setAccidentalFromKeySig = self._setAccidentalFromKeySig
+        if setAccidentalFromKeySig:
+            currentKeySig = srcObj.getContextByClass(key.KeySignature)
+            if currentKeySig is None:
+                currentKeySig = key.KeySignature(0)
 
-        for n in trillNotes:
-            n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
+            for n in trillNotes:
+                if n.pitch.nameWithOctave != srcObj.pitch.nameWithOctave:
+                    # do not correct original note, no matter what.
+                    n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
 
         if self.nachschlag:
             firstNoteNachschlag = copy.deepcopy(srcObj)
-            # TODO: remove expressions
+            firstNoteNachschlag.expressions = []
             firstNoteNachschlag.duration.quarterLength = self.quarterLength
-            firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
-                firstNoteNachschlag.step)
 
             secondNoteNachschlag = copy.deepcopy(srcObj)
-            # TODO: remove expressions
+            secondNoteNachschlag.expressions = []
             secondNoteNachschlag.duration.quarterLength = self.quarterLength
             secondNoteNachschlag.transpose(transposeIntervalReverse,
                                            inPlace=True)
-            secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
-                secondNoteNachschlag.step)
+
+            if setAccidentalFromKeySig and currentKeySig:
+                firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
+                    firstNoteNachschlag.step)
+                secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
+                    secondNoteNachschlag.step)
 
             nachschlag = [firstNoteNachschlag, secondNoteNachschlag]
 
@@ -723,62 +885,103 @@ class Trill(Ornament):
 
 
 class HalfStepTrill(Trill):
-    '''A basic trill marker.
+    '''
+    A trill confined to half steps.
 
-
-    >>> m = expressions.HalfStepTrill()
-    >>> m.placement
+    >>> halfTrill = expressions.HalfStepTrill()
+    >>> halfTrill.placement
     'above'
-    >>> m.size
+    >>> halfTrill.size
     <music21.interval.Interval m2>
+
+    Here the key signature of 2 sharps will not affect the trill:
+
+    >>> n = note.Note('B4', type='eighth')
+    >>> m = stream.Measure()
+    >>> m.insert(0, key.KeySignature(2))
+    >>> m.append(n)
+    >>> halfTrill.realize(n)
+    ([<music21.note.Note B>,
+      <music21.note.Note C>,
+      <music21.note.Note B>,
+      <music21.note.Note C>], None, [])
     '''
 
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('m2')
+        self._setAccidentalFromKeySig = False
 
 
 class WholeStepTrill(Trill):
-    '''A basic trill marker.
+    '''
+    A trill that yields whole steps no matter what.
 
-
-    >>> m = expressions.WholeStepTrill()
-    >>> m.placement
+    >>> wholeTrill = expressions.WholeStepTrill()
+    >>> wholeTrill.placement
     'above'
-    >>> m.size
+    >>> wholeTrill.size
     <music21.interval.Interval M2>
+
+    Here the key signature of one sharp will not affect the trill:
+
+    >>> n = note.Note('B4', type='eighth')
+    >>> m = stream.Measure()
+    >>> m.insert(0, key.KeySignature(1))
+    >>> m.append(n)
+    >>> wholeTrill.realize(n)
+    ([<music21.note.Note B>,
+      <music21.note.Note C#>,
+      <music21.note.Note B>,
+      <music21.note.Note C#>], None, [])
     '''
 
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('M2')
+        self._setAccidentalFromKeySig = False
 
 
 class Shake(Trill):
+    '''
+    A slower trill.
+
+    >>> shake = expressions.Shake()
+    >>> shake.quarterLength
+    0.25
+    '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval('M2')
         self.quarterLength = 0.25
 
 
 # ------------------------------------------------------------------------------
 
 # TODO: BaroqueSlide
-# this is a slide or culee
+
 class Schleifer(Ornament):
+    '''
+    A slide or culee
+
+    Changed in v.7 -- size is a Generic second.  removed unused nachschlag component.
+    '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval('M2')
+        self.size = interval.GenericInterval(2)
         self.quarterLength = 0.25
 
 
 # ------------------------------------------------------------------------------
 class Turn(Ornament):
+    '''
+    A turn or Gruppetto.
+
+    Changed in v.7 -- size is a Generic second.  removed unused nachschlag component.
+    '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval('M2')
+        self.size = interval.GenericInterval(2)
         self.placement = 'above'
-        self.nachschlag = False  # play little notes at the end of the trill?
         self.tieAttach = 'all'
         self.quarterLength = 0.25
 
@@ -804,7 +1007,6 @@ class Turn(Ornament):
                                      <music21.note.Note B->,
                                      <music21.note.Note C>])
 
-
         >>> m2 = stream.Measure()
         >>> m2.append(key.KeySignature(5))
         >>> n2 = note.Note('B4')
@@ -815,8 +1017,6 @@ class Turn(Ornament):
                                      <music21.note.Note B>,
                                      <music21.note.Note C#>,
                                      <music21.note.Note B>])
-
-
 
         >>> n2 = note.Note('C4')
         >>> n2.quarterLength = 0.125
@@ -839,24 +1039,22 @@ class Turn(Ornament):
         transposeIntervalDown = self.size.reverse()
         turnNotes = []
 
-        # TODO: if nachschlag...
-
         firstNote = copy.deepcopy(srcObject)
-        # TODO: remove expressions
+        firstNote.expressions = []
         firstNote.duration.quarterLength = self.quarterLength
         firstNote.transpose(transposeIntervalUp, inPlace=True)
 
         secondNote = copy.deepcopy(srcObject)
-        # TODO: remove expressions
+        secondNote.expressions = []
         secondNote.duration.quarterLength = self.quarterLength
 
         thirdNote = copy.deepcopy(srcObject)
-        # TODO: remove expressions
+        thirdNote.expressions = []
         thirdNote.duration.quarterLength = self.quarterLength
         thirdNote.transpose(transposeIntervalDown, inPlace=True)
 
         fourthNote = copy.deepcopy(srcObject)
-        # TODO: remove expressions
+        fourthNote.expressions = []
         fourthNote.duration.quarterLength = self.quarterLength
 
         turnNotes.append(firstNote)
@@ -869,6 +1067,7 @@ class Turn(Ornament):
             currentKeySig = key.KeySignature(0)
 
         for n in turnNotes:
+            # TODO: like in trill, do not affect original note.
             n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
 
         remainderNote = copy.deepcopy(srcObject)
@@ -887,7 +1086,6 @@ class InvertedTurn(Turn):
 class GeneralAppoggiatura(Ornament):
     # up or down -- up means the grace note is below and goes up to the actual note
     direction = ''
-    size = None  # interval.Interval (General, etc.) class
 
     def __init__(self):
         super().__init__()
@@ -918,7 +1116,7 @@ class GeneralAppoggiatura(Ornament):
         :type srcObj: base.Music21Object
         '''
         from music21 import key
-        if self.direction != 'up' and self.direction != 'down':
+        if self.direction not in ('up', 'down'):
             raise ExpressionException(
                 'Cannot realize an Appoggiatura if I do not know its direction')
         if self.size == '':
@@ -1219,7 +1417,7 @@ class TremoloSpanner(spanner.Spanner):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def x_testRealize(self):
+    def testRealize(self):
         from music21 import note
         from music21 import stream
         n1 = note.Note('D4')
@@ -1273,8 +1471,12 @@ class Test(unittest.TestCase):
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'd.s. al fine')
 
-    def x_testExpandTurns(self):
-        from music21 import note, stream, clef, key, meter
+    def testExpandTurns(self):
+        from music21 import note
+        from music21 import stream
+        from music21 import clef
+        from music21 import key
+        from music21 import meter
         p1 = stream.Part()
         m1 = stream.Measure()
         m2 = stream.Measure()
@@ -1282,41 +1484,64 @@ class Test(unittest.TestCase):
         p1.append(key.Key('F', 'major'))
         p1.append(meter.TimeSignature('2/4'))
         n1 = note.Note('C5', type='half')
-        n1.expressions.append(Turn())
-        n2 = note.Note('B4', type='half')
+        turn0 = Turn()
+        n1.expressions.append(turn0)
+        n2 = note.Note('B4', type='quarter')
+        n2.duration.dots = 1
+
         n2.expressions.append(InvertedTurn())
         m1.append(n1)
         m2.append(key.KeySignature(5))
         m2.append(n2)
+        m2.append(note.Rest('eighth'))
         p1.append(m1)
         p1.append(m2)
-        # print(realizeOrnaments(n1))
-        # print(realizeOrnaments(n2))
+        realized1 = realizeOrnaments(n1)
+        realized2 = realizeOrnaments(n2)
+        self.assertEqual('C5 D5 C5 B-4 C5', ' '.join(n.pitch.nameWithOctave for n in realized1))
+        self.assertEqual('B4 A#4 B4 C#5 B4', ' '.join(n.pitch.nameWithOctave for n in realized2))
+        self.assertEqual(realized1[0].quarterLength, 1.0)
+        self.assertEqual(realized1[1].quarterLength, 0.25)
+        self.assertEqual(realized2[0].quarterLength, 0.5)
+        self.assertEqual(realized2[1].quarterLength, 0.25)
 
-    def x_testExpandTrills(self):
-        from music21 import note, stream, clef, key, meter
+        turn0.quarterLength = 0.125
+        realized1b = realizeOrnaments(n1)
+        self.assertEqual(realized1b[0].quarterLength, 1.5)
+        self.assertEqual(realized1b[1].quarterLength, 0.125)
+
+
+    def testExpandTrills(self):
+        from music21 import note
+        from music21 import stream
+        from music21 import clef
+        from music21 import key
+        from music21 import meter
         p1 = stream.Part()
         m1 = stream.Measure()
         p1.append(clef.TrebleClef())
         p1.append(key.Key('D', 'major'))
-        p1.append(meter.TimeSignature('2/4'))
+        p1.append(meter.TimeSignature('1/4'))
         n1 = note.Note('E4', type='eighth')
         n1.expressions.append(Trill())
         m1.append(n1)
         p1.append(m1)
-        # print(realizeOrnaments(n1))
+        realized = realizeOrnaments(n1)
+        self.assertIsInstance(realized, list)
+        self.assertEqual(len(realized), 4)
+        self.assertIsInstance(realized[0], note.Note)
+        self.assertEqual(realized[0].quarterLength, 0.125)
+        self.assertEqual('E4 F#4 E4 F#4', ' '.join(n.pitch.nameWithOctave for n in realized))
 
-    # def testCPEBachRealizeOrnaments(self):
-    #     from music21 import corpus
-    #     cpe = corpus.parse('cpebach/h186').parts[0].measures(1, 4)
-    #     cpe2 = cpe.realizeOrnaments()
-    #     cpe2.show()
 
     def testTrillExtensionA(self):
         '''Test basic wave line creation and output, as well as passing
         objects through make measure calls.
         '''
-        from music21 import stream, note, chord, expressions
+        from music21 import stream
+        from music21 import note
+        from music21 import chord
+        from music21 import expressions
         from music21.musicxml import m21ToXml
         s = stream.Stream()
         s.repeatAppend(note.Note(), 12)
@@ -1336,6 +1561,22 @@ class Test(unittest.TestCase):
         raw = m21ToXml.GeneralObjectExporter().parse(s)
         # s.show()
         self.assertEqual(raw.count(b'wavy-line'), 2)
+
+    def testUnpitchedUnsupported(self):
+        from music21 import note
+
+        unp = note.Unpitched()
+        mord = Mordent()
+        with self.assertRaises(TypeError):
+            mord.realize(unp)
+
+
+# class TestExternal(unittest.TestCase):
+#     def testCPEBachRealizeOrnaments(self):
+#         from music21 import corpus
+#         cpe = corpus.parse('cpebach/h186').parts[0].measures(1, 4)
+#         cpe2 = cpe.realizeOrnaments()
+#         cpe2.show()
 
 
 # ------------------------------------------------------------------------------

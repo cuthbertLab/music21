@@ -32,6 +32,7 @@ from music21 import dynamics
 from music21 import features
 from music21 import note
 from music21 import prebase
+from music21 import stream  # circular, but okay, because not used at top level.
 
 from music21.graph import axis
 from music21.graph import primitives
@@ -48,7 +49,7 @@ environLocal = environment.Environment(_MOD)
 
 
 def _mergeDicts(a, b):
-    '''utility method to merge two dictionaries'''
+    '''utility function to merge two dictionaries'''
     c = a.copy()
     c.update(b)
     return c
@@ -195,7 +196,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         if self.recurse:
             sIter = self.streamObj.recurse()
         else:
-            sIter = self.streamObj.iter
+            sIter = self.streamObj.iter()
 
         if self.classFilterList:
             sIter = sIter.getElementsByClass(self.classFilterList)
@@ -233,7 +234,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         formatDict = {}
         # should be two for most things...
 
-        if 'Chord' not in el.classes:
+        if not isinstance(el, chord.Chord):
             for i, thisAxis in enumerate(self.allAxes):
                 axisValue = thisAxis.extractOneElement(el, formatDict)
                 # use isinstance(List) not isiterable, since
@@ -916,7 +917,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
 
     def write(self, fp=None):  # pragma: no cover
         '''
-        Process method here overridden to provide legend.
+        Overrides the normal write method here to add a legend.
         '''
         # call the process routine in the base graph
         super().write(fp)
@@ -1107,7 +1108,7 @@ class HorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMix
         '''
         Extract the data from the Stream.
         '''
-        if 'Score' not in self.streamObj.classes:
+        if not isinstance(self.streamObj, stream.Score):
             raise GraphException('provided Stream must be Score')
         # parameters: x, span, heightScalar, color, alpha, yShift
         pr = reduction.PartReduction(
@@ -1201,7 +1202,7 @@ class Dolan(HorizontalBarWeighted):
             return  # keep what the user set
         if self.streamObj:
             return None
-        instStream = self.streamObj.flat.getElementsByClass('Instrument')
+        instStream = self.streamObj.flatten().getElementsByClass('Instrument')
         if not instStream:
             return  # do not set anything
 
@@ -1441,7 +1442,7 @@ class Features(MultiStream):
 # -----------------------------------------------------------------------------------
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternalManual(unittest.TestCase):  # pragma: no cover
 
     def testHorizontalBarPitchSpaceOffset(self):
         a = corpus.parse('bach/bwv57.8')
@@ -1463,7 +1464,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         b.run()
 
     def testScatterWeightedPitchSpaceQuarterLength(self):
-        a = corpus.parse('bach/bwv57.8').parts[0].flat
+        a = corpus.parse('bach/bwv57.8').parts[0].flatten()
         for xLog in [True, False]:
             b = ScatterWeightedPitchSpaceQuarterLength(
                 a, title='Pitch Space Bach (soprano voice)',
@@ -1479,50 +1480,51 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testPitchSpace(self):
         a = corpus.parse('bach/bwv57.8')
-        b = HistogramPitchSpace(a.parts[0].flat, title='Bach (soprano voice)')
+        b = HistogramPitchSpace(a.parts[0].flatten(), title='Bach (soprano voice)')
         b.run()
 
     def testPitchClass(self):
         a = corpus.parse('bach/bwv57.8')
-        b = HistogramPitchClass(a.parts[0].flat, title='Bach (soprano voice)')
+        b = HistogramPitchClass(a.parts[0].flatten(), title='Bach (soprano voice)')
         b.run()
 
     def testQuarterLength(self):
         a = corpus.parse('bach/bwv57.8')
-        b = HistogramQuarterLength(a.parts[0].flat, title='Bach (soprano voice)')
+        b = HistogramQuarterLength(a.parts[0].flatten(), title='Bach (soprano voice)')
         b.run()
 
     def testScatterPitchSpaceQuarterLength(self):
         for xLog in [True, False]:
 
             a = corpus.parse('bach/bwv57.8')
-            b = ScatterPitchSpaceQuarterLength(a.parts[0].flat, title='Bach (soprano voice)',
+            b = ScatterPitchSpaceQuarterLength(a.parts[0].flatten(), title='Bach (soprano voice)',
                                                )
             b.axisX.useLogScale = xLog
             b.run()
 
-            b = ScatterPitchClassQuarterLength(a.parts[0].flat, title='Bach (soprano voice)',
+            b = ScatterPitchClassQuarterLength(a.parts[0].flatten(), title='Bach (soprano voice)',
                                                )
             b.axisX.useLogScale = xLog
             b.run()
 
     def testScatterPitchClassOffset(self):
         a = corpus.parse('bach/bwv57.8')
-        b = ScatterPitchClassOffset(a.parts[0].flat, title='Bach (soprano voice)')
+        b = ScatterPitchClassOffset(a.parts[0].flatten(), title='Bach (soprano voice)')
         b.run()
 
     def testScatterPitchSpaceDynamicSymbol(self):
         a = corpus.parse('schumann/opus41no1', 2)
-        b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flat, title='Schumann (soprano voice)')
+        b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flatten(), title='Schumann (soprano voice)')
         b.run()
 
-        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat,
+        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flatten(),
                                                        title='Schumann (soprano voice)')
         b.run()
 
     def testPlot3DPitchSpaceQuarterLengthCount(self):
         a = corpus.parse('schoenberg/opus19', 6)  # also tests Tuplets
-        b = Plot3DBarsPitchSpaceQuarterLength(a.flat.stripTies(), title='Schoenberg pitch space')
+        b = Plot3DBarsPitchSpaceQuarterLength(a.flatten().stripTies(),
+                                              title='Schoenberg pitch space')
         b.run()
 
     def writeAllPlots(self):
@@ -1543,7 +1545,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             (ScatterPitchClassQuarterLength, None, None),
             (ScatterPitchClassOffset, None, None),
             (ScatterPitchSpaceDynamicSymbol,
-             corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
+             corpus.getWork('schumann/opus41no1', 2),
+             'Schumann Opus 41 No 1'),
 
             # offset based horizontal
             (HorizontalBarPitchSpaceOffset, None, None),
@@ -1552,12 +1555,14 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             (ScatterWeightedPitchSpaceQuarterLength, None, None),
             (ScatterWeightedPitchClassQuarterLength, None, None),
             (ScatterWeightedPitchSpaceDynamicSymbol,
-             corpus.getWork('schumann/opus41no1', 2), 'Schumann Opus 41 No 1'),
+             corpus.getWork('schumann/opus41no1', 2),
+             'Schumann Opus 41 No 1'),
 
 
             # 3d graphs
             (Plot3DBarsPitchSpaceQuarterLength,
-             testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'),  # @UndefinedVariable
+             testFiles.mozartTrioK581Excerpt,
+             'Mozart Trio K581 Excerpt'),
 
             (WindowedKey, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
             (WindowedAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
@@ -1613,37 +1618,37 @@ class Test(unittest.TestCase):
 
     def testPitchSpaceDurationCount(self):
         a = corpus.parse('bach/bwv57.8')
-        b = ScatterWeightedPitchSpaceQuarterLength(a.parts[0].flat, doneAction=None,
+        b = ScatterWeightedPitchSpaceQuarterLength(a.parts[0].flatten(), doneAction=None,
                                                    title='Bach (soprano voice)')
         b.run()
 
     def testPitchSpace(self):
         a = corpus.parse('bach')
-        b = HistogramPitchSpace(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
+        b = HistogramPitchSpace(a.parts[0].flatten(), doneAction=None, title='Bach (soprano voice)')
         b.run()
 
     def testPitchClass(self):
         a = corpus.parse('bach/bwv57.8')
-        b = HistogramPitchClass(a.parts[0].flat,
+        b = HistogramPitchClass(a.parts[0].flatten(),
                                 doneAction=None,
                                 title='Bach (soprano voice)')
         b.run()
 
     def testQuarterLength(self):
         a = corpus.parse('bach/bwv57.8')
-        b = HistogramQuarterLength(a.parts[0].flat,
+        b = HistogramQuarterLength(a.parts[0].flatten(),
                                    doneAction=None,
                                    title='Bach (soprano voice)')
         b.run()
 
     def testPitchDuration(self):
         a = corpus.parse('schoenberg/opus19', 2)
-        b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flat,
+        b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flatten(),
                                            doneAction=None,
                                            title='Schoenberg (piano)')
         b.run()
 
-        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat,
+        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flatten(),
                                                    doneAction=None,
                                                    title='Schoenberg (piano)')
         b.run()
@@ -1658,10 +1663,24 @@ class Test(unittest.TestCase):
 #             doneAction=doneAction)
 #         b.run()
 
-        b = WindowedKey(a.flat, title=fn,
+        b = WindowedKey(a.flatten(), title=fn,
                         minWindow=1, windowStep=windowStep,
                         doneAction=doneAction, dpi=300)
         b.run()
+        self.assertEqual(b.graphLegend.data,
+            [
+                ['Major',
+                    [('C#', '#f0727a'), ('D', '#ffd752'), ('E', '#eeff9a'),
+                     ('F#', '#b9f0ff'), ('A', '#bb9aff'), ('B', '#ffb5ff')
+                     ]
+                 ],
+                ['Minor',
+                    [('c#', '#8c0e16'), ('', '#ffffff'), ('', '#ffffff'),
+                     ('f#', '#558caa'), ('', '#ffffff'), ('b', '#9b519b')
+                     ]
+                 ]
+            ]
+        )
 
     def testFeatures(self):
         streamList = ['bach/bwv66.6', 'schoenberg/opus19/movement2', 'corelli/opus3no1/1grave']
@@ -1678,7 +1697,7 @@ class Test(unittest.TestCase):
         b.run()
 
     def testChordsA(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         b = Histogram(stream.Stream(), doneAction=None)
@@ -1731,7 +1750,7 @@ class Test(unittest.TestCase):
         # matching the number of pitches for each data point may be needed
 
     def testChordsA2(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1752,7 +1771,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsA3(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1771,7 +1790,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsA4(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1793,7 +1812,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsA5(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1815,7 +1834,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsB(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1909,7 +1928,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsB2(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -1946,7 +1965,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testChordsB3(self):
-        from music21 import stream, scale
+        from music21 import scale
         sc = scale.MajorScale('c4')
 
         s = stream.Stream()
@@ -2003,4 +2022,4 @@ _DOC_ORDER = [
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='test3DPitchSpaceQuarterLengthCount')
+    music21.mainTest(TestExternalManual)  # , runTest='test3DPitchSpaceQuarterLengthCount')

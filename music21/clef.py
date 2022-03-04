@@ -19,7 +19,7 @@ commonly used clefs. Clef objects are often found
 within :class:`~music21.stream.Measure` objects.
 '''
 import unittest
-from typing import Mapping, Optional, Iterable, Union
+from typing import Mapping, Optional, Iterable, Sequence, Union
 
 from music21 import base
 from music21 import exceptions21
@@ -60,7 +60,7 @@ class Clef(base.Music21Object):
     >>> tc.lowestLine
     31
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: Mapping[str, str] = {
         'sign': '''
             The sign of the clef, generally, 'C', 'G', 'F', 'percussion', 'none' or None.
 
@@ -92,7 +92,7 @@ class Clef(base.Music21Object):
             >>> print(clef.NoClef().line)
             None
             ''',
-    }  # type: Mapping[str, str]
+    }
 
     _styleClass = style.TextStyle
     classSortOrder = 0
@@ -148,26 +148,12 @@ class Clef(base.Music21Object):
         0
         >>> clef.Treble8vbClef().octaveChange
         -1
-
-        Changing octaveChange changes lowestLine (but not vice-versa)
-
-        >>> tc.lowestLine
-        31
-        >>> tc.octaveChange = 1
-        >>> tc.lowestLine
-        38
-        >>> tc.octaveChange = -1
-        >>> tc.lowestLine
-        24
         '''
         return self._octaveChange
 
     @octaveChange.setter
     def octaveChange(self, newValue: int):
-        oldOctaveChange = self._octaveChange
         self._octaveChange = newValue
-        if hasattr(self, 'lowestLine') and self.lowestLine is not None:
-            self.lowestLine += (newValue - oldOctaveChange) * 7
 
     @property
     def name(self) -> str:
@@ -199,7 +185,7 @@ class Clef(base.Music21Object):
 
     def getStemDirectionForPitches(
         self,
-        pitchList: Union[pitch.Pitch, Iterable[pitch.Pitch]],
+        pitchList: Union[pitch.Pitch, Sequence[pitch.Pitch]],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -244,6 +230,8 @@ class Clef(base.Music21Object):
         '''
         if isinstance(pitchList, pitch.Pitch):
             pitchList = [pitchList]
+        pitchList: Sequence[pitch.Pitch]
+        relevantPitches: Sequence[pitch.Pitch]
 
         if not pitchList:
             raise ValueError('getStemDirectionForPitches cannot operate on an empty list')
@@ -258,7 +246,7 @@ class Clef(base.Music21Object):
             relevantPitches = pitchList
 
         differenceSum = 0
-        if hasattr(self, 'lowestLine'):
+        if isinstance(self, (PercussionClef, PitchClef)) and self.lowestLine is not None:
             midLine = self.lowestLine + 4
         else:
             midLine = 35  # assume TrebleClef-like.
@@ -296,6 +284,37 @@ class PitchClef(Clef):
         super().__init__()
         self.lowestLine: Optional[int] = None
 
+    @property
+    def octaveChange(self) -> int:
+        '''
+        The number of octaves that the clef "transposes", generally 0.
+
+        >>> tc = clef.TrebleClef()
+        >>> tc.octaveChange
+        0
+        >>> clef.Treble8vbClef().octaveChange
+        -1
+
+        Changing octaveChange changes lowestLine (but not vice-versa)
+
+        >>> tc.lowestLine
+        31
+        >>> tc.octaveChange = 1
+        >>> tc.lowestLine
+        38
+        >>> tc.octaveChange = -1
+        >>> tc.lowestLine
+        24
+        '''
+        return super().octaveChange
+
+    @octaveChange.setter
+    def octaveChange(self, newValue: int):
+        oldOctaveChange = self._octaveChange
+        self._octaveChange = newValue
+        if self.lowestLine is not None:
+            self.lowestLine += (newValue - oldOctaveChange) * 7
+
 
 class PercussionClef(Clef):
     '''
@@ -314,8 +333,10 @@ class PercussionClef(Clef):
 
     >>> pc.lowestLine == clef.TrebleClef().lowestLine
     True
+
+    Changed in v7.3 -- setting octaveChange no longer affects lowestLine
     '''
-    _DOC_ATTR = {}
+    _DOC_ATTR: Mapping[str, str] = {}
 
     def __init__(self):
         super().__init__()
@@ -336,7 +357,7 @@ class NoClef(Clef):
     >>> nc.sign is None
     False
     '''
-    _DOC_ATTR = {}
+    _DOC_ATTR: Mapping[str, str] = {}
 
     def __init__(self):
         super().__init__()
@@ -371,6 +392,18 @@ class TabClef(PitchClef):
         super().__init__()
         self.sign = 'TAB'
         self.line = 5
+
+    def getStemDirectionForPitches(
+        self,
+        pitchList: Union[pitch.Pitch, Iterable[pitch.Pitch]],
+        *,
+        firstLastOnly: bool = True,
+        extremePitchOnly: bool = False,
+    ) -> str:
+        '''
+        Overridden to simply return 'down' for guitar tabs.
+        '''
+        return 'down'
 
 # ------------------------------------------------------------------------------
 
@@ -821,9 +854,11 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
         raise ClefException('line number (second character) must be 1-5; do not use this '
                             + f"function for clefs on special staves such as {xnStr!r}")
 
-    clefObj = None
+    clefObj: Clef
     if thisType in CLASS_FROM_TYPE:
-        if CLASS_FROM_TYPE[thisType][lineNum] is None:
+        line_list = CLASS_FROM_TYPE[thisType]
+        assert isinstance(line_list, list)
+        if line_list[lineNum] is None:
             if thisType == 'G':
                 clefObj = GClef()
             elif thisType == 'F':
@@ -834,7 +869,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
                 clefObj = TabClef()
             clefObj.line = lineNum
         else:
-            clefObj = CLASS_FROM_TYPE[thisType][lineNum]()
+            clefObj = line_list[lineNum]()
     else:
         clefObj = PitchClef()
         clefObj.sign = thisType
@@ -922,7 +957,7 @@ def bestClef(streamObj: 'music21.stream.Stream',
     totalNotes = 0
     totalHeight = 0
 
-    sIter = streamObj.recurse() if recurse else streamObj.iter
+    sIter = streamObj.recurse() if recurse else streamObj.iter()
 
     notes = sIter.getElementsByClass('GeneralNote')
 
@@ -937,7 +972,7 @@ def bestClef(streamObj: 'music21.stream.Stream',
                 totalNotes += 1
                 totalHeight += findHeight(p)
     if totalNotes == 0:
-        averageHeight = 29
+        averageHeight = 29.0
     else:
         averageHeight = totalHeight / totalNotes
 
@@ -1085,6 +1120,26 @@ class Test(unittest.TestCase):
         self.assertIs(n5.getContextByClass(Clef), tc1)
         self.assertIs(n6.getContextByClass(Clef), tc1)
 
+    def testTabClefBeamDirections(self):
+
+        from music21 import stream
+        from music21 import clef
+        from music21 import meter
+        from music21 import note
+
+        m = stream.Measure()
+
+        n1 = note.Note(64, quarterLength=0.25)
+        n2 = note.Note(67, quarterLength=0.25)
+
+        m.append(clef.TabClef())
+        m.append(meter.TimeSignature('4/4'))
+        m.append(n1)
+        m.append(n2)
+        m.makeBeams(inPlace=True)
+
+        self.assertEqual(m.notes[0].stemDirection, 'down')
+
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1094,4 +1149,3 @@ _DOC_ORDER = [Clef, TrebleClef, BassClef]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

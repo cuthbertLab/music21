@@ -23,13 +23,12 @@ class MIDIPercussionException(exceptions21.Music21Exception):
 
 class PercussionMapper:
     '''
-    PercussionMapper provides tools to convert between MIDI notes and music21 instruments,
-    based on the official General MIDI Level 1 Percussion Key Map.
+    PercussionMapper provides tools to convert between 0-indexed MIDI pitches
+    and music21 instruments, based on the official General MIDI Level 1 Percussion Key Map.
     This mapping is conventionally applied to MIDI channel 10;
-    see http://www.midi.org/techspecs/gm1sound.php for more info.
+    see https://www.midi.org/specifications/item/gm-level-1-sound-set for more info.
 
     Give me the instrument that corresponds to MIDI note 58!
-
 
     >>> pm = midi.percussion.PercussionMapper()
     >>> pm.reverseInstrumentMapping[58]
@@ -38,7 +37,6 @@ class PercussionMapper:
     That's right, vibraslap.
 
     But you're better off using the midiPitchToInstrument() method below!
-
     '''
 
     i = instrument
@@ -91,13 +89,12 @@ class PercussionMapper:
                                 81: i.Triangle,  # Open Triangle
                                 }
 
-    # MIDI percussion mappings from http://www.midi.org/techspecs/gm1sound.php
+    # MIDI percussion mappings from https://www.midi.org/specifications/item/gm-level-1-sound-set
 
     def midiPitchToInstrument(self, midiPitch):
         '''
-        Takes a pitch.Pitch object or int and returns the corresponding
-        instrument in the GM Percussion Map.
-
+        Takes a pitch.Pitch object or int ranging from 0-127 and returns
+        the corresponding instrument in the GM Percussion Map.
 
         >>> pm = midi.percussion.PercussionMapper()
         >>> cowPitch = pitch.Pitch(56)
@@ -167,7 +164,7 @@ class PercussionMapper:
     def midiInstrumentToPitch(self, midiInstrument):
         '''
         Takes an instrument.Instrument object and returns a pitch object
-        with the corresponding MIDI note, according to the GM Percussion Map.
+        with the corresponding 1-indexed MIDI note, according to the GM Percussion Map.
 
 
         >>> pm = midi.percussion.PercussionMapper()

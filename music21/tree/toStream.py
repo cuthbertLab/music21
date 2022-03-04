@@ -15,11 +15,13 @@ Tools for generating new Streams from trees (fast, manipulable objects)
 
 None of these things work acceptably yet.  This is super beta.
 '''
+from music21 import common
 from music21.exceptions21 import TreeException
 from music21.tree import timespanTree
 
 
-def chordified(timespans, templateStream=None):
+@common.deprecated('v7', 'v8', 'use chordify() instead')
+def chordified(timespans, templateStream=None):  # pragma: no cover
     r'''
     DEPRECATED -- DO NOT USE.  Use stream.chordify() instead.
 
@@ -31,9 +33,8 @@ def chordified(timespans, templateStream=None):
 
     >>> score = corpus.parse('bwv66.6')
     >>> scoreTree = score.asTimespans()
-    >>> chordifiedScore = tree.toStream.chordified(
-    ...     scoreTree, templateStream=score)
-    >>> chordifiedScore.show('text')
+    >>> #_DOCS_SHOW chordifiedScore = tree.toStream.chordified(scoreTree, templateStream=score)
+    >>> #_DOCS_SHOW chordifiedScore.show('text')
     {0.0} <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
@@ -115,10 +116,10 @@ def chordified(timespans, templateStream=None):
             outputStream.append(element)
         return outputStream
 
-
-def partwise(tsTree, templateStream=None):
+@common.deprecated('v7', 'v8', 'use chordify() instead')
+def partwise(tsTree, templateStream=None):  # pragma: no cover
     '''
-    todo docs
+    DEPRECATED in v7 -- use chordify()
     '''
     from music21 import stream
     treeMapping = tsTree.toPartwiseTimespanTrees()

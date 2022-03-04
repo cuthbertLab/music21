@@ -20,6 +20,7 @@ Serial searching methods that were previously here have been moved to `alpha.sea
 import unittest
 import copy
 from typing import Union, List, Any
+import warnings
 
 from music21 import exceptions21
 
@@ -49,7 +50,7 @@ class TwelveToneMatrix(stream.Stream):
 
     This object is commonly used by calling the
     :meth:`~music21.stream.TwelveToneRow.matrix` method of
-    :meth:`~music21.stream.TwelveToneRow` (or a subclass).
+    :class:`~music21.stream.TwelveToneRow` (or a subclass).
 
     >>> ttr = serial.TwelveToneRow([0, 2, 11, 7, 8, 3, 9, 1, 4, 10, 6, 5])
     >>> aMatrix = ttr.matrix()
@@ -563,7 +564,7 @@ class ToneRow(stream.Stream):
         to another, the second specified in the argument. Each transformation is given as a
         tuple of the transformation type and index.
 
-        See :meth:`~music21.serial.zeroCenteredTransformation` for
+        See :meth:`~music21.serial.ToneRow.zeroCenteredTransformation` for
         an explanation of this convention.
 
 
@@ -610,7 +611,7 @@ class ToneRow(stream.Stream):
         to another, the second specified in the argument. Each transformation is given as a tuple
         of the transformation type and index.
 
-        See :meth:`~music21.serial.originalCenteredTransformation` for an
+        See :meth:`~music21.serial.ToneRow.originalCenteredTransformation` for an
         explanation of this convention.
 
         >>> chromatic = serial.pcToToneRow(       [2, 3, 4, 5, 6, 7, 8, 9, 'A', 'B',   0, 1])
@@ -766,8 +767,8 @@ class TwelveToneRow(ToneRow):
 
         The convention for serial transformations must also be specified as 'zero' or
         'original', as explained
-        in :meth:`~music21.serial.findZeroCenteredTransformations` and
-        :meth:`~music21.serial.findOriginalCenteredTransformations`.
+        in :meth:`~music21.serial.ToneRow.findZeroCenteredTransformations` and
+        :meth:`~music21.serial.ToneRow.findOriginalCenteredTransformations`.
 
         >>> row = serial.pcToToneRow([5, 9, 11, 3, 6, 7, 4, 10, 0, 8, 2, 1])
         >>> row.findTransformedHistorical('original')
@@ -1038,51 +1039,60 @@ class TwelveToneRow(ToneRow):
         else:
             return True
 
-    def areCombinatorial(self, transType1, index1, transType2, index2, convention):
+    def areCombinatorial(self, transType1, index1, transType2, index2, unused_convention=None):
         '''
         Describes whether or not two transformations of a twelve-tone row are combinatorial.
 
         The first and second arguments describe one transformation, while the third and fourth
-        describe another. One of the zero-centered or original-centered conventions for tone row
-        transformations must be specified in the last argument; see
-        :meth:`~music21.serial.zeroCenteredTransformation` and
-        :meth:`~music21.serial.originalCenteredTransformation` explanations of these conventions.
+        describe another.
+
+        First, let's take a row we know to have a combinatoriality pair:
 
         >>> moses = serial.getHistoricalRowByName('SchoenbergMosesAron')
         >>> moses.pitchClasses()
         [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]
-        >>> moses.areCombinatorial('P', 1, 'I', 4, 'zero')
+
+        Combinatoriality holds here between P0 and I3
+
+        >>> moses.areCombinatorial('P', 0, 'I', 3)
         True
-        >>> moses.areCombinatorial('R', 5, 'RI', 6, 'original')
+
+        And a combinatorial pair like this between P0 and I3 will also hold
+        if you modify both rows in the same way, e.g.
+        if you transpose both by the same amount
+
+        >>> moses.areCombinatorial('P', 1, 'I', 4)
+        True
+
+        or if you retrograde both
+
+        >>> moses.areCombinatorial('R', 1, 'RI', 4)
+        True
+
+        Any modification made to one row form and not the other means all bets are off
+
+        >>> moses.areCombinatorial('R', 6, 'RI', 4)
         False
+
+        Changed in v.7 -- `convention` is no longer necessary and no longer used.
+        Renamed to `unused_convention` and defaults None; to be removed in v.8.
         '''
         if self.isTwelveToneRow() is False:
             raise SerialException('Combinatoriality applies only to twelve-tone rows.')
 
-        if convention == 'zero':
-            testRow = []
-            trans1 = self.zeroCenteredTransformation(transType1, index1)
-            pitches1 = trans1.pitchClasses()
-            trans2 = self.zeroCenteredTransformation(transType2, index2)
-            pitches2 = trans2.pitchClasses()
-            for i in range(6):
-                testRow.append(pitches1[i])
-            for i in range(6):
-                testRow.append(pitches2[i])
-            return pcToToneRow(testRow).isTwelveToneRow()
-        elif convention == 'original':
-            testRow = []
-            trans1 = self.originalCenteredTransformation(transType1, index1)
-            pitches1 = trans1.pitchClasses()
-            trans2 = self.originalCenteredTransformation(transType2, index2)
-            pitches2 = trans2.pitchClasses()
-            for i in range(6):
-                testRow.append(pitches1[i])
-            for i in range(6):
-                testRow.append(pitches2[6 + i])
-            return pcToToneRow(testRow).isTwelveToneRow()
-        else:
-            raise SerialException("Invalid convention - choose 'zero' or 'original'.")
+        if unused_convention is not None:
+            # TODO: remove in v.8
+            warnings.warn('convention is unnecessary and will be removed in v.8')
+
+        # choice of convention does not matter
+        trans1 = self.zeroCenteredTransformation(transType1, index1)
+        trans2 = self.zeroCenteredTransformation(transType2, index2)
+
+        pitches1 = trans1.pitchClasses()
+        pitches2 = trans2.pitchClasses()
+        testRow = pitches1[:6] + pitches2[:6]
+
+        return pcToToneRow(testRow).isTwelveToneRow()
 
 
 class HistoricalTwelveToneRow(TwelveToneRow):
@@ -1370,12 +1380,12 @@ class Test(unittest.TestCase):
                   'f': 5, 'e-': 6, 'e': 7, 'd': 8,
                   'c': 9, 'c#': 10, 'b-': 11, 'b': 12}
         s = corpus.parse('bwv66.6')
-        for n in s.flat.notes:
+        for n in s.flatten().notes:
             for key in series:
                 if n.pitch.pitchClass == pitch.Pitch(key).pitchClass:
                     n.addLyric(series[key])
         match = []
-        for n in s.parts[0].flat.notes:
+        for n in s.parts[0].flatten().notes:
             match.append(n.lyric)
         self.assertEqual(match, ['10', '12', '1', '12', '10', '7', '10', '12', '1', '10', '1',
                                  '12', '4', '2', '1', '12', '12', '2', '7', '1', '12', '10',
@@ -1452,9 +1462,8 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'HistoricalTwelveToneRow', 'ContiguousSegmentOfNotes',
-              'historicalDict',
-              'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 'getHistoricalRowByName',
+_DOC_ORDER = [ToneRow, TwelveToneRow, HistoricalTwelveToneRow,
+              pcToToneRow, TwelveToneMatrix, rowToMatrix, getHistoricalRowByName,
               ]
 
 if __name__ == '__main__':

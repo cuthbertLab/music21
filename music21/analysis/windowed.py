@@ -56,10 +56,10 @@ class WindowedAnalysis:
     def __init__(self, streamObj, analysisProcessor):
         self.processor = analysisProcessor
         # environLocal.printDebug(self.processor)
-        if 'Stream' not in streamObj.classes:
+        if not isinstance(streamObj, stream.Stream):
             raise WindowedAnalysisException('non-stream provided as argument')
         if streamObj.hasPartLikeStreams():
-            raise WindowedAnalysisException('part-like substreams are not supported; use .flat')
+            streamObj = streamObj.flatten()  # part-like substreams not supported.
         self._srcStream = streamObj
         # store a windowed Stream, partitioned into bars of 1/4
         self._windowedStream = self.getMinimumWindowStream()
@@ -91,16 +91,11 @@ class WindowedAnalysis:
         >>> len(post.getElementsByClass('Measure')[1].notes)
         1
 
-        Placing a score with parts into analysis is not yet supported.
+        Placing a score with parts into analysis will automatically flatten
+        the stream.  So these two calls are equivalent:
 
         >>> wa = analysis.windowed.WindowedAnalysis(s, p)
-        Traceback (most recent call last):
-        music21.analysis.windowed.WindowedAnalysisException:
-        part-like substreams are not supported; use .flat
-
-        But, flattening a score works fine:
-
-        >>> wa = analysis.windowed.WindowedAnalysis(s.flat, p)
+        >>> wa = analysis.windowed.WindowedAnalysis(s.flatten(), p)
 
         '''
         # create a stream that contains just a 1/4 time signature; this is
@@ -137,7 +132,7 @@ class WindowedAnalysis:
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
-        >>> wa = analysis.windowed.WindowedAnalysis(s.flat, p)
+        >>> wa = analysis.windowed.WindowedAnalysis(s.flatten(), p)
         >>> len(wa._windowedStream)
         36
         >>> a, b = wa.analyze(1)
@@ -354,7 +349,7 @@ class WindowedAnalysis:
 
 
 # -----------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     pass
 
 
@@ -363,7 +358,7 @@ class TestMockProcessor:
     def process(self, subStream):
         '''Simply count the number of notes found
         '''
-        return len(subStream.flat.notesAndRests), None
+        return len(subStream.flatten().notesAndRests), None
 
 
 class Test(unittest.TestCase):
@@ -380,7 +375,7 @@ class Test(unittest.TestCase):
 
             # get windowing object, provide a stream for analysis as well as
             # the processor
-            wa = WindowedAnalysis(s.flat, p)
+            wa = WindowedAnalysis(s.flatten(), p)
             # do smallest and larges
             for i in list(range(1, 4)) + [None]:
                 unused_x, unused_y, unused_z = wa.process(i, i)
@@ -445,14 +440,15 @@ class Test(unittest.TestCase):
 
     def testVariableWindowing(self):
         from music21.analysis import discrete
-        from music21 import corpus, graph
+        from music21 import corpus
+        from music21 import graph
 
         p = discrete.KrumhanslSchmuckler()
         s = corpus.parse('bach/bwv66.6')
 
-        unused_wa = WindowedAnalysis(s.flat, p)
+        unused_wa = WindowedAnalysis(s.flatten(), p)
 
-        plot = graph.plot.WindowedKey(s.flat, doneAction=None,
+        plot = graph.plot.WindowedKey(s.flatten(), doneAction=None,
                                       windowStep=4, windowType='overlap')
         plot.run()
         # plot.write()

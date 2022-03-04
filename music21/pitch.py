@@ -48,6 +48,16 @@ STEPREF = {
     'A': 9,
     'B': 11,
 }
+NATURAL_PCS = (0, 2, 4, 5, 7, 9, 11)
+STEPREF_REVERSED = {
+    0: 'C',
+    2: 'D',
+    4: 'E',
+    5: 'F',
+    7: 'G',
+    9: 'A',
+    11: 'B',
+}
 STEPNAMES = {'C', 'D', 'E', 'F', 'G', 'A', 'B'}  # set
 STEP_TO_DNN_OFFSET = {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6}
 
@@ -231,50 +241,52 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
     >>> pitch._convertPsToStep(42.999739)
     ('G', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (-0c)>, 0)
     '''
-    name = ''
-
-    # rounding here is essential
-    ps = round(ps, PITCH_SPACE_SIG_DIGITS)
-    pcReal = ps % 12
-    # micro here will be between 0 and 1
-    pc, micro = divmod(pcReal, 1)
-
-    # environLocal.printDebug(['_convertPsToStep(): post divmod',  'ps', repr(ps),
-    #    'pcReal', repr(pcReal), 'pc', repr(pc), 'micro', repr(micro)])
-
-    # if close enough to a quarter tone
-    if round(micro, 1) == 0.5:
-        # if can round to 0.5, than this is a quarter-tone accidental
-        alter = 0.5
-        # need to find microtonal alteration around this value
-        # of alter is 0.5 and micro is 0.7 than  micro should be 0.2
-        # of alter is 0.5 and micro is 0.4 than  micro should be -0.1
-        micro = micro - alter
-
-    # if greater than 0.5
-    elif 0.25 < micro < 0.75:
-        alter = 0.5
-        micro = micro - alter
-    # if closer to 1, than go to the higher alter and get negative micro
-    elif 0.75 <= micro < 1:
-        alter = 1
-        micro = micro - alter
-    # not greater than 0.25
-    elif micro > 0:
-        alter = 0
-        # micro = micro  # no change necessary
-    else:
+    if isinstance(ps, int):
+        pc = ps % 12
         alter = 0
         micro = 0
+    elif ps == int(ps):
+        pc = int(ps) % 12
+        alter = 0
+        micro = 0
+    else:
+        # rounding here is essential
+        ps = round(ps, PITCH_SPACE_SIG_DIGITS)
+        # micro here will be between 0 and 1
+        pcReal = ps % 12
+        pc, micro = divmod(pcReal, 1)
+        pc = int(pc)
 
-    pc = int(pc)
+        # if close enough to a quarter tone
+        if round(micro, 1) == 0.5:
+            # if can round to 0.5, than this is a quarter-tone accidental
+            alter = 0.5
+            # need to find microtonal alteration around this value
+            # of alter is 0.5 and micro is 0.7 than  micro should be 0.2
+            # of alter is 0.5 and micro is 0.4 than  micro should be -0.1
+            micro = micro - alter
+        # if greater than 0.5
+        elif 0.25 < micro < 0.75:
+            alter = 0.5
+            micro = micro - alter
+        # if closer to 1, than go to the higher alter and get negative micro
+        elif 0.75 <= micro < 1:
+            alter = 1
+            micro = micro - alter
+        # not greater than 0.25
+        elif micro > 0:
+            alter = 0
+            # micro = micro  # no change necessary
+        else:
+            alter = 0
+            micro = 0
 
     # environLocal.printDebug(['_convertPsToStep(): post', 'alter', alter,
     #    'micro', micro, 'pc', pc])
 
     octShift = 0
     # check for unnecessary enharmonics
-    if pc in (4, 11) and alter == 1:
+    if alter == 1 and pc in (4, 11):
         acc = Accidental(0)
         pcName = (pc + 1) % 12
         # if a B, we are shifting out of this octave, and need to get
@@ -282,10 +294,9 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
         if pc == 11:
             octShift = 1
     # its a natural; nothing to do
-    elif pc in STEPREF.values():
-        acc = Accidental(0 + alter)
+    elif pc in NATURAL_PCS:  # 0, 2, 4, 5, 7, 9, 11
+        acc = Accidental(0 + alter)  # alter is usually 0 unless half-sharp.
         pcName = pc
-
     elif (pc - 1) in (0, 5, 7) and alter >= 1:  # is this going to be a C##, F##, G##?
         acc = Accidental(alter - 1)
         pcName = pc + 1
@@ -306,10 +317,7 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
     else:  # pragma: no cover
         raise PitchException(f'cannot match condition for pc: {pc}')
 
-    for key, value in STEPREF.items():
-        if pcName == value:
-            name = key
-            break
+    name = STEPREF_REVERSED.get(pcName, '')
 
     # create a micro object always
     if micro != 0:
@@ -446,19 +454,14 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
 
     if triadAward:
         # score_triad = number of thirds per pitch (avoid double-base-thirds)
-        triad_bases = []
         for p1, p2 in itertools.combinations(pitches, 2):
             this_interval = interval.Interval(noteStart=p1, noteEnd=p2)
-            generic_interval_value = abs(this_interval.generic.value) % 8
+            simple_directed = this_interval.generic.simpleDirected
             interval_semitones = this_interval.chromatic.semitones % 12
-            if generic_interval_value == 3 and interval_semitones in (3, 4):
-                triad_steps = (p1.step, p2.step)
-                if triad_steps not in triad_bases:
-                    score_triad -= 1.0
-            elif generic_interval_value == 6 and interval_semitones in (8, 9):
-                triad_steps = (p2.step, p1.step)
-                if triad_steps not in triad_bases:
-                    score_triad -= 1.0
+            if simple_directed == 3 and interval_semitones in (3, 4):
+                score_triad -= 1.0
+            elif simple_directed == 6 and interval_semitones in (8, 9):
+                score_triad -= 1.0
         score_triad /= len(pitches)
 
     return (score_accidentals + score_ratio + score_triad) / int(smallPythagoreanRatio
@@ -532,6 +535,12 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
     ...                                    pitch.Pitch('A--3')],
     ...                                    keyContext=key.Key('C'))
     [<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G3>]
+
+    Changed in v7.3 -- fixed a bug with compound intervals (such as formed against
+    the tonic of a KeySignature defaulting to octave 4):
+
+    >>> pitch.simplifyMultipleEnharmonics([pitch.Pitch('B5')], keyContext=key.Key('D'))
+    [<music21.pitch.Pitch B5>]
     '''
 
     oldPitches = [p if isinstance(p, Pitch) else Pitch(p) for p in pitches]
@@ -546,6 +555,10 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
         simplifiedPitches = _bruteForceEnharmonicsSearch(oldPitches, criterion)
     else:
         simplifiedPitches = _greedyEnharmonicsSearch(oldPitches, criterion)
+
+    # Preserve value of spellingIsInferred
+    for oldP, newP in zip(oldPitches, simplifiedPitches):
+        newP.spellingIsInferred = oldP.spellingIsInferred
 
     if remove_first:
         simplifiedPitches = simplifiedPitches[1:]
@@ -2909,10 +2922,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> a
         <music21.pitch.Pitch C#3(+20c)>
         '''
-        pc = round(self.ps) % 12
-        if pc == 12:
-            pc = 0
-        return pc
+        return round(self.ps) % 12
 
     @pitchClass.setter
     def pitchClass(self, value: Union[str, int]):
@@ -3064,7 +3074,7 @@ class Pitch(prebase.ProtoM21Object):
             if tempStep in ('C', 'D', 'F', 'G', 'H'):
                 firstFlatName = 'es'
             else:  # A, E.  Bs should never occur...
-                firstFlatName = u's'
+                firstFlatName = 's'
             multipleFlats = abs(tempAlter) - 1
             tempName = tempStep + firstFlatName + (multipleFlats * 'es')
             return tempName
@@ -3170,13 +3180,13 @@ class Pitch(prebase.ProtoM21Object):
         (Microtones and Quarter tones raise an error).
 
         >>> print(pitch.Pitch('B-').spanish)
-        si bèmol
+        si bemol
         >>> print(pitch.Pitch('E-').spanish)
-        mi bèmol
+        mi bemol
         >>> print(pitch.Pitch('C#').spanish)
         do sostenido
         >>> print(pitch.Pitch('A--').spanish)
-        la doble bèmol
+        la doble bemol
         >>> p1 = pitch.Pitch('C')
         >>> p1.accidental = pitch.Accidental('half-sharp')
         >>> p1.spanish
@@ -3186,7 +3196,7 @@ class Pitch(prebase.ProtoM21Object):
         Note these rarely used pitches:
 
         >>> print(pitch.Pitch('B--').spanish)
-        si doble bèmol
+        si doble bemol
         >>> print(pitch.Pitch('B#').spanish)
         si sostenido
         '''
@@ -3203,7 +3213,7 @@ class Pitch(prebase.ProtoM21Object):
         elif abs(tempAlter) > 4:
             raise PitchException('Unsupported accidental type.')
         elif tempAlter in {-4, -3, -2, -1}:
-            return solfege + self._getSpanishCardinal() + ' bèmol'
+            return solfege + self._getSpanishCardinal() + ' bemol'
         elif tempAlter in {1, 2, 3, 4}:
             return solfege + self._getSpanishCardinal() + ' sostenido'
 
@@ -4325,6 +4335,12 @@ class Pitch(prebase.ProtoM21Object):
         >>> otherPitch.transpose('m-23', inPlace=True)
         >>> print(otherPitch)
         C#-1
+
+        Test an issue with inPlace not setting spellingIsInferred
+
+        >>> pc6.transpose(10, inPlace=True)
+        >>> pc6.spellingIsInferred
+        True
         '''
         # environLocal.printDebug(['Pitch.transpose()', value])
         if 'IntervalBase' in getattr(value, 'classes', []):
@@ -4352,6 +4368,7 @@ class Pitch(prebase.ProtoM21Object):
             self.accidental = p.accidental
             # set fundamental
             self.fundamental = p.fundamental
+            self.spellingIsInferred = p.spellingIsInferred
             return None
 
     # --------------------------------------------------------------------------
@@ -4580,7 +4597,7 @@ class Pitch(prebase.ProtoM21Object):
         different octave.  The sharp must always be displayed.
 
         If `overrideStatus` is True, this method will ignore any current
-        `displayStatus` stetting found on the Accidental. By default this does
+        `displayStatus` setting found on the Accidental. By default this does
         not happen. If `displayStatus` is set to None, the Accidental's
         `displayStatus` is set.
 
@@ -4642,6 +4659,10 @@ class Pitch(prebase.ProtoM21Object):
             elif self.accidental.displayStatus in (True, False):
                 return  # exit: already set, do not override
 
+        if self.accidental is not None and self.accidental.displayType == 'never':
+            self.accidental.displayStatus = False
+            return
+
         if lastNoteWasTied is True:
             if self.accidental is not None:
                 if self.accidental.displayType != 'even-tied':
@@ -4654,14 +4675,15 @@ class Pitch(prebase.ProtoM21Object):
 
         # no pitches in past...
         if not pitchPastAll:
-            # if we have no past, we always need to show the accidental,
-            # unless this accidental is in the alteredPitches list
+            # if we have no past, we show the accidental if this pitch name
+            # is not in the alteredPitches list, or for naturals: if the
+            # step is IN the altered pitches
             if (self.accidental is not None
-                    and self.accidental.displayStatus in (False, None)):
-                if not self._nameInKeySignature(alteredPitches):
-                    self.accidental.displayStatus = True
+                    and (overrideStatus or self.accidental.displayStatus in (False, None))):
+                if self.accidental.name == 'natural':
+                    self.accidental.displayStatus = self._stepInKeySignature(alteredPitches)
                 else:
-                    self.accidental.displayStatus = False
+                    self.accidental.displayStatus = not self._nameInKeySignature(alteredPitches)
 
             # in case display set to True and in alteredPitches, makeFalse
             elif (self.accidental is not None
@@ -4691,7 +4713,7 @@ class Pitch(prebase.ProtoM21Object):
                     return
                 else:  # names are the same, skip this line of questioning
                     break
-        # nope, no previous pitches in this octave and register, now more complex things...
+        # nope, no conflicting accidentals at this name and octave in past...
 
         # here tied and always are treated the same; we assume that
         # making ties sets the displayStatus, and thus we would not be
@@ -4709,7 +4731,7 @@ class Pitch(prebase.ProtoM21Object):
         # store if a match was found and display set from past pitches
         setFromPitchPast = False
 
-        if cautionaryPitchClass is True:  # warn no mater what octave; thus create new without oct
+        if cautionaryPitchClass is True:  # warn no matter what octave; thus create new without oct
             pSelf = Pitch(self.name)
             pSelf.accidental = self.accidental
         else:
@@ -4787,7 +4809,7 @@ class Pitch(prebase.ProtoM21Object):
                     self.accidental.displayStatus = False
                 return
 
-            # repeats of the same accidentally immediately following
+            # repeats of the same accidental immediately following
             # if An to An or A# to A#: do not need unless repeats requested,
             # regardless of if 'unless-repeated' is set, this will catch
             # a repeated case
@@ -4857,6 +4879,7 @@ class Pitch(prebase.ProtoM21Object):
             # if A# to A, or A- to A, but not A# to A#
             # we use step and octave though not necessarily a ps comparison
             elif (pPast.accidental is not None
+                  and pPast.name != pSelf.name
                   and pPast.accidental.name != 'natural'
                   and (pSelf.accidental is None
                        or pSelf.accidental.displayStatus is False)):
@@ -4887,9 +4910,12 @@ class Pitch(prebase.ProtoM21Object):
 
             # going from a natural to an accidental, we should already be
             # showing the accidental, but just to check
-            # if A to A#, or A to A-, but not A# to A
+            # if A to A#, or A to A-, but not A# to A, nor A (implicit) to An (explicit)
             elif pPast.accidental is None and pSelf.accidental is not None:
-                self.accidental.displayStatus = True
+                if pSelf.accidental.name == 'natural':
+                    self.accidental.displayStatus = self._stepInKeySignature(alteredPitches)
+                else:
+                    self.accidental.displayStatus = True
                 # environLocal.printDebug(['match previous no mark'])
                 setFromPitchPast = True
                 break
@@ -4939,10 +4965,10 @@ class Pitch(prebase.ProtoM21Object):
                 self.accidental.displayStatus = False
             # displayAccidentalIfNoPreviousAccidentals = False  # just to be sure
         elif not setFromPitchPast and self.accidental is not None:
-            if not self._nameInKeySignature(alteredPitches):
-                self.accidental.displayStatus = True
+            if self.accidental.name == 'natural':
+                self.accidental.displayStatus = self._stepInKeySignature(alteredPitches)
             else:
-                self.accidental.displayStatus = False
+                self.accidental.displayStatus = not self._nameInKeySignature(alteredPitches)
 
         # if we have natural that alters the key sig, create a natural
         elif not setFromPitchPast and self.accidental is None:
@@ -4974,7 +5000,8 @@ class Pitch(prebase.ProtoM21Object):
 
         '''
         # Takes in a chord, finds the interval between the notes
-        from music21 import note, chord
+        from music21 import note
+        from music21 import chord
 
         pitchList = chordIn.pitches
         isStringHarmonic = False
@@ -5086,15 +5113,15 @@ class Test(unittest.TestCase):
 
         a = Pitch('c')
         a.accidental = Accidental('natural')
-        a.accidental.displayStatus = False  # hide
+        a.accidental.displayStatus = True
         self.assertEqual(a.name, 'C')
-        self.assertFalse(a.accidental.displayStatus)
-
-        a.updateAccidentalDisplay(past, overrideStatus=True)
         self.assertTrue(a.accidental.displayStatus)
 
+        a.updateAccidentalDisplay(past, overrideStatus=True)
+        self.assertFalse(a.accidental.displayStatus)
+
         b = copy.deepcopy(a)
-        self.assertTrue(b.accidental.displayStatus)
+        self.assertFalse(b.accidental.displayStatus)
         self.assertEqual(b.accidental.name, 'natural')
 
     def testUpdateAccidentalDisplaySeries(self):
@@ -5379,26 +5406,80 @@ class Test(unittest.TestCase):
         cautionaryNotImmediateRepeat=False
         and key signature conflicts.
         '''
-        from music21 import converter, key
-        bm = converter.parse("tinynotation: 4/4 fn1 fn1 e-8 e'-8 fn4 en4 e'n4").flat
+        from music21 import converter
+        from music21 import note
+        from music21 import key
+        bm = converter.parse("tinynotation: 4/4 fn1 fn1 e-8 e'-8 fn4 en4 e'n4").flatten()
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-        assert(bm.flat.notes[0].pitch.accidental.name == 'natural')     # Fn
-        assert(bm.flat.notes[0].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[1].pitch.accidental.name == 'natural')     # Fn
-        assert(bm.flat.notes[1].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[2].pitch.accidental.name == 'flat')        # E-4
-        assert(bm.flat.notes[2].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[3].pitch.accidental.name == 'flat')        # E-5
-        assert(bm.flat.notes[3].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[4].pitch.accidental.name == 'natural')     # En4
-        assert(bm.flat.notes[4].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[5].pitch.accidental.name == 'natural')     # En4
-        assert(bm.flat.notes[5].pitch.accidental.displayStatus is True)
+        notes = bm[note.Note]
+        self.assertEqual(notes[0].pitch.accidental.name, 'natural')     # Fn
+        self.assertEqual(notes[0].pitch.accidental.displayStatus, True)
+        self.assertEqual(notes[1].pitch.accidental.name, 'natural')     # Fn
+        self.assertEqual(notes[1].pitch.accidental.displayStatus, True)
+        self.assertEqual(notes[2].pitch.accidental.name, 'flat')        # E-4
+        self.assertEqual(notes[2].pitch.accidental.displayStatus, True)
+        self.assertEqual(notes[3].pitch.accidental.name, 'flat')        # E-5
+        self.assertEqual(notes[3].pitch.accidental.displayStatus, True)
+        self.assertEqual(notes[4].pitch.accidental.name, 'natural')     # En4
+        self.assertEqual(notes[4].pitch.accidental.displayStatus, True)
+        self.assertEqual(notes[5].pitch.accidental.name, 'natural')     # En4
+        self.assertEqual(notes[5].pitch.accidental.displayStatus, True)
 
-        assert(bm.flat.notes[6].pitch.accidental is not None)  # En5
-        assert(bm.flat.notes[6].pitch.accidental.name == 'natural')
-        assert(bm.flat.notes[6].pitch.accidental.displayStatus is True)
+        self.assertIsNotNone(notes[6].pitch.accidental)  # En5
+        self.assertEqual(notes[6].pitch.accidental.name, 'natural')
+        self.assertEqual(notes[6].pitch.accidental.displayStatus, True)
+
+    def testOverrideDisplayStatus(self):
+        from music21 import key
+        from music21 import note
+
+        n = note.Note('Cn')
+        n.pitch.accidental.displayStatus = True
+        k = key.Key('C')
+        n.pitch.updateAccidentalDisplay(overrideStatus=True, alteredPitches=k.alteredPitches)
+        self.assertIs(n.pitch.accidental.displayStatus, False)
+
+    def testImplicitToExplicitNatural(self):
+        from music21 import converter
+        from music21 import key
+
+        p = converter.parse('tinyNotation: 2/4 f4 fn4')
+        last_note = p.recurse().notes.last()
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+        last_note.pitch.accidental.displayStatus = None
+        p['Measure'].first().insert(0, key.Key('C-'))
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+    def testNaturalOutsideAlteredPitches(self):
+        from music21 import converter
+        from music21 import key
+        from music21 import note
+
+        p = converter.parse('tinyNotation: 2/4 f4 dn4')
+        p.makeAccidentals(inPlace=True)
+        last_note = p[note.Note].last()
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+        # Rerun test with C-flat major
+        last_note.pitch.accidental.displayStatus = None
+        p['Measure'].first().insert(0, key.Key('C-'))
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, True)
+
+    def testInterveningNoteBetweenIdenticalChromaticPitches(self):
+        from music21 import converter
+        from music21 import key
+
+        p = converter.parse('tinyNotation: f#4 e f#')
+        p.measure(1).insert(0, key.Key('G'))
+        p.recurse().notes.last().pitch.accidental.displayStatus = False
+        p.makeAccidentals(inPlace=True, overrideStatus=True)
+        self.assertIs(p.measure(1).notes.first().pitch.accidental.displayStatus, False)
+        self.assertIs(p.measure(1).notes.last().pitch.accidental.displayStatus, False)
 
     def testPitchEquality(self):
         '''
@@ -5432,7 +5513,9 @@ class Test(unittest.TestCase):
         self.assertEqual(lowC.octave, -1)
 
     def testQuarterToneA(self):
-        from music21 import stream, note, scale
+        from music21 import stream
+        from music21 import note
+        from music21 import scale
         from music21.musicxml import m21ToXml
 
         p1 = Pitch('D#~')

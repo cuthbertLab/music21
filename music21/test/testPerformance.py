@@ -35,7 +35,8 @@ class Test(unittest.TestCase):
     def runStreamIterationByIterator(self):
         '''Stream iteration by iterator
         '''
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         # create a stream with 750 notes, 250 rests
         s = stream.Stream()
         for i in range(1000):
@@ -52,7 +53,8 @@ class Test(unittest.TestCase):
     def runStreamIterationByElements(self):
         '''Stream iteration by .elements access
         '''
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         # create a stream with 750 notes, 250 rests
         s = stream.Stream()
         for i in range(1000):
@@ -69,7 +71,8 @@ class Test(unittest.TestCase):
     def runGetElementsByClassType(self):
         '''Getting elements by class type
         '''
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
 
         # create a stream with 750 notes, 250 rests
         s = stream.Stream()
@@ -81,13 +84,14 @@ class Test(unittest.TestCase):
             s.append(r)
 
         for i in range(2):
-            post = s.flat.getElementsByClass([note.Rest, note.Note])
+            post = s.recurse().getElementsByClass([note.Rest, note.Note])
             self.assertEqual(len(post), 1500)
 
     def runGetElementsByClassString(self):
         '''Getting elements by string
         '''
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
 
         # create a stream with 750 notes, 250 rests
         s = stream.Stream()
@@ -99,7 +103,7 @@ class Test(unittest.TestCase):
             s.append(r)
 
         for i in range(2):
-            post = s.flat.getElementsByClass(['Rest', 'Note'])
+            post = s.recurse().getElementsByClass(['Rest', 'Note'])
             self.assertEqual(len(post), 1500)
 
     def runParseBeethoven(self):
@@ -191,8 +195,8 @@ class Test(unittest.TestCase):
         '''
         s = corpus.parse('bwv66.6')
         # create a few secondary streams to add more sites
-        unused_flat = s.flat
-        unused_notes = s.flat.notes
+        unused_flat = s.flatten()
+        unused_notes = s.flatten().notes
 
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
@@ -218,8 +222,8 @@ class Test(unittest.TestCase):
         '''
         s = corpus.parse('bwv66.6')
         # create a few secondary streams to add more sites
-        unused_flat = s.flat
-        unused_notes = s.flat.notes
+        unused_flat = s.flatten()
+        unused_notes = s.flatten().notes
 
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):

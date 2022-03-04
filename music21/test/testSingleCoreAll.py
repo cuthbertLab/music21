@@ -17,6 +17,7 @@ Runs great, but slowly on multiprocessor systems.
 
 import doctest
 import sys
+from typing import Sequence
 import unittest
 import warnings
 
@@ -36,13 +37,19 @@ environLocal = environment.Environment(_MOD)
 cov = coverageM21.getCoverage()
 
 
-def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verbosity=2):
+def main(testGroup: Sequence[str] = ('test',),
+         restoreEnvironmentDefaults=False,
+         limit=None,
+         verbosity=2,
+         show: bool = True,
+         ):
     '''
-    Run all tests. Group can be test and external
-
-    >>> print(None)
-    None
+    Run all tests. Group can be 'test' and/or 'external'.
+    External will not run doctests.
     '''
+    for group in testGroup:
+        if group not in ('test', 'external'):
+            raise ValueError(f"Valid test groups are 'test' and 'external'; got {group}")
     commonTest.testImports()
     s1 = commonTest.defaultDoctestSuite(__name__)
 
@@ -66,18 +73,23 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
             environLocal.printDebug(f'{moduleObject} has no Test class')
         else:
             if 'test' in testGroup:
-                unitTestCases.append(moduleObject.Test)
+                unitTestCases.append(moduleObject.Test)  # type: ignore
         if not hasattr(moduleObject, 'TestExternal'):
             pass
             # environLocal.printDebug(f'{module} has no TestExternal class\n')
         else:
-            if 'external' in testGroup or 'testExternal' in testGroup:
-                unitTestCases.append(moduleObject.TestExternal)
+            if 'external' in testGroup:
+                if not show:
+                    moduleObject.TestExternal.show = False  # type: ignore
+                unitTestCases.append(moduleObject.TestExternal)  # type: ignore
 
         # for each Test class, load this into a suite
         for testCase in unitTestCases:
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(testCase)
             s1.addTests(s2)
+        if testGroup == ('external',):
+            # don't load doctests for runs consisting solely of TestExternal
+            continue
         try:
             s3 = commonTest.defaultDoctestSuite(moduleObject)
             s1.addTests(s3)
@@ -91,7 +103,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
         docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
         testRunner.addDocAttrTestsToSuite(s1,
                                           allLocals,
-                                          outerFilename=moduleObject.__file__,
+                                          outerFilename=moduleObject.__file__,  # type: ignore
                                           globs=globs,
                                           optionflags=docTestOptions,
                                           # no checker here
@@ -121,9 +133,14 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
 
 def ciMain():
     # the main call for ci tests.
-    # exits with the returnCode
-    returnCode = main(verbosity=1)
-    sys.exit(returnCode)
+    # runs Test classes (including doctests)
+    # and TestExternal (without doctests) with show=False
+    # exits with the aggregated returnCode
+    returnCodeTest = main(testGroup=('test',), verbosity=1)
+    # restart coverage if running main() twice
+    coverageM21.startCoverage(cov)
+    returnCodeExternal = main(testGroup=('external',), verbosity=1, show=False)
+    sys.exit(returnCodeTest + returnCodeExternal)
 
 
 # ------------------------------------------------------------------------------

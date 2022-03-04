@@ -31,6 +31,10 @@ __all__ = [
     'misc',
     'numberTools',
     'objects',
+    'pathTools',
+    'parallel',
+    'types',
+    'weakrefTools',
 ]
 
 from music21 import defaults
@@ -47,8 +51,8 @@ from music21.common.objects import *
 from music21.common.pathTools import *
 from music21.common.parallel import *
 from music21.common.stringTools import *
+from music21.common.types import *
 from music21.common.weakrefTools import *  # including wrapWeakref
-
 
 DEBUG_OFF = 0
 DEBUG_USER = 1

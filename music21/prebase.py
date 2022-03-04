@@ -21,11 +21,13 @@ from typing import (
     Dict,
     FrozenSet,
     List,
+    Mapping,
     Sequence,
     Union,
     Tuple,
 )
 
+from music21.common import deprecated
 
 class ProtoM21Object:
     '''
@@ -42,8 +44,14 @@ class ProtoM21Object:
     ('PitchCounter', 'ProtoM21Object', 'object')
     >>> PitchCounter in pc.classSet
     True
-    >>> pc.isClassOrSubclass(('music21.note.Note',))
+    >>> 'Note' in pc.classSet
     False
+
+    For a True/False intersection check against an iterable, use `classSet.isdisjoint`:
+
+    >>> classList = ('music21.note.Note', 'music21.note.Rest')
+    >>> pc.classSet.isdisjoint(classList)
+    True
     >>> repr(pc)
     '<music21.PitchCounter no pitches>'
 
@@ -70,18 +78,18 @@ class ProtoM21Object:
     ]
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {}
+    _DOC_ATTR: Mapping[str, str] = {}
 
     # this dictionary stores as a tuple of strings for each Class so that
     # it only needs to be made once (11 microseconds per call, can be
     # a big part of iteration; from cache just 1 microsecond)
-    _classTupleCacheDict = {}
+    _classTupleCacheDict: Dict[type, Tuple[str, ...]] = {}
     _classSetCacheDict: Dict[type, FrozenSet[Union[str, type]]] = {}
-    # same with fully qualified names
-    _classListFullyQualifiedCacheDict = {}
 
-    __slots__ = ()
+    __slots__: Tuple[str, ...] = ()
 
+    @deprecated('v7', 'v8', 'use `someClass in .classSet`'
+        'or for intersection: `not classSet.isdisjoint(classList)`')
     def isClassOrSubclass(self, classFilterList: Sequence) -> bool:
         '''
         Given a class filter list (a list or tuple must be submitted),
@@ -91,24 +99,27 @@ class ProtoM21Object:
         NOTE: this is a performance critical operation
         for performance, only accept lists or tuples
 
+        DEPRECATED in v7 -- prefer `someClass in el.classSet` or
+        `not el.classSet.isdisjoint(classList)` instead.
+
         >>> n = note.Note()
-        >>> n.isClassOrSubclass(('Note',))
+        >>> #_DOCS_SHOW n.isClassOrSubclass(('Note',))
         True
-        >>> n.isClassOrSubclass(('GeneralNote',))
+        >>> #_DOCS_SHOW n.isClassOrSubclass(('GeneralNote',))
         True
-        >>> n.isClassOrSubclass((note.Note,))
+        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Note,))
         True
-        >>> n.isClassOrSubclass((note.Rest,))
+        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Rest,))
         False
-        >>> n.isClassOrSubclass((note.Note, note.Rest))
+        >>> #_DOCS_SHOW n.isClassOrSubclass((note.Note, note.Rest))
         True
-        >>> n.isClassOrSubclass(('Rest', 'Note'))
+        >>> #_DOCS_SHOW n.isClassOrSubclass(('Rest', 'Note'))
         True
         '''
         return not self.classSet.isdisjoint(classFilterList)
 
     @property
-    def classes(self) -> Tuple[str]:
+    def classes(self) -> Tuple[str, ...]:
         '''
         Returns a tuple containing the names (strings, not objects) of classes that this
         object belongs to -- starting with the object's class name and going up the mro()
@@ -139,7 +150,7 @@ class ProtoM21Object:
         >>> s.insert(50, clef.BassClef())
         >>> s2 = stream.Stream()
         >>> for t in s:
-        ...    if 'GClef' in t.classes and 'TrebleClef' not in t.classes:
+        ...    if isinstance(t, clef.GClef) and not isinstance(t, clef.TrebleClef):
         ...        s2.insert(t)
         >>> s2.show('text')
         {10.0} <music21.clef.GClef>
@@ -150,7 +161,7 @@ class ProtoM21Object:
         try:
             return self._classTupleCacheDict[self.__class__]
         except KeyError:
-            classTuple = tuple([x.__name__ for x in self.__class__.mro()])
+            classTuple = tuple(x.__name__ for x in self.__class__.mro())
             self._classTupleCacheDict[self.__class__] = classTuple
             return classTuple
 
@@ -231,6 +242,8 @@ class ProtoM21Object:
         if self.__module__ != '__main__':
             reprHead += self.__module__ + '.'
         reprHead += self.__class__.__qualname__
+        if '.base.' in reprHead and 'music21.base' not in reprHead:
+            reprHead = reprHead.replace('.base', '')
         strRepr = self._reprInternal()
         if strRepr and not strRepr.startswith(':'):
             reprHead += ' '
@@ -251,25 +264,10 @@ class ProtoM21Object:
         >>> p._reprInternal()
         'object at 0x112590380'
 
-        If an object has `.id` defined and `x.id` is not the same as `id(x)`
-        then that id is used instead:
-
-        >>> b = base.Music21Object()
-        >>> b._reprInternal()
-        'object at 0x129a903b1'
-        >>> b.id = 'hi'
-        >>> b._reprInternal()
-        'id=hi'
+        A more complex `_reprInternal` that handles the case of objects
+        with `.id` defined is found in Music21Object.
         '''
-        if not hasattr(self, 'id') or self.id == id(self):
-            return f'object at {hex(id(self))}'
-        else:
-            reprId = self.id
-            try:
-                reprId = hex(reprId)
-            except (ValueError, TypeError):
-                pass
-            return f'id={reprId}'
+        return f'object at {hex(id(self))}'
 
 
 del (

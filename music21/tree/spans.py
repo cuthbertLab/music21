@@ -506,7 +506,11 @@ class ElementTimespan(Timespan):
             return None
 
         if makeCopy:
-            el = copy.deepcopy(el)
+            el: 'music21.base.Music21Object'
+            el_old = el
+            el = copy.deepcopy(el_old)
+            el.derivation.origin = el_old
+            el.derivation.method = 'spans.makeElement'
 
         el.duration.quarterLength = self.quarterLength
         return el

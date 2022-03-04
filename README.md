@@ -5,13 +5,13 @@ music21 -- A Toolkit for Computational Musicology
 Copyright © 2006-2021, Michael Scott Cuthbert and cuthbertLab
 
 For more information, visit:
-http://web.mit.edu/music21 or http://music21.readthedocs.org/en/latest/index.html
+https://web.mit.edu/music21
 
 And to install, see:
-http://web.mit.edu/music21/doc/usersGuide/usersGuide_01_installing.html
+https://web.mit.edu/music21/doc/usersGuide/usersGuide_01_installing.html
 
-Music21 runs on Python 3.6+.  User version 4 on Python 2 or Py3.4, version 5 
-on Py3.5.
+Music21 runs on Python 3.7+.  Use version 4 on Python 2 or Py3.4, version 5
+on Py3.5, version 6 on Py3.6.
 
 Released under the BSD (3-clause) license. Music21 may also be used
 under the LGPL license.  See LICENSE.
@@ -23,9 +23,19 @@ is available also on GitHub.
 [![Lint Status](https://github.com/cuthbertLab/music21/workflows/PyLint/badge.svg)](https://github.com/cuthbertLab/music21)
 [![Coverage Status](https://coveralls.io/repos/github/cuthbertLab/music21/badge.svg?branch=master)](https://coveralls.io/github/cuthbertLab/music21?branch=master)
 
+## Documentation ##
+
+[User's Guide](https://web.mit.edu/music21/doc/usersGuide/index.html)
+
+[Module Documentation](https://web.mit.edu/music21/doc/moduleReference/index.html)
+
 ## Mailing list ##
 
 See: https://groups.google.com/forum/#!forum/music21list
+
+## Contributing Guide ##
+
+[Contributing Guide](CONTRIBUTING.md)
 
 ## Community Code of Conduct ##
 

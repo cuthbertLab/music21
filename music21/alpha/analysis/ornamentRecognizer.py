@@ -143,7 +143,7 @@ class TrillRecognizer(OrnamentRecognizer):
         simpleNote = simpleNotes[0]
 
         # enharmonic invariant checker
-        if not(simpleNote.pitch.midi == n1.pitch.midi or simpleNote.pitch.midi == n2.pitch.midi):
+        if simpleNote.pitch.midi not in (n1.pitch.midi, n2.pitch.midi):
             return False
 
         endNote = n2

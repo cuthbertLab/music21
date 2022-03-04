@@ -14,14 +14,17 @@
 This module defines the object model of Volume, covering all representation of
 amplitude, volume, velocity, and related parameters.
 '''
-from typing import Union
+from typing import Iterable, List, Union
 import unittest
 
 
+from music21 import articulations
 from music21 import exceptions21
 from music21 import common
 from music21.common.objects import SlottedObjectMixin
+from music21 import dynamics
 from music21 import prebase
+from music21 import note  # circular but acceptable, because not used at highest level.
 
 from music21 import environment
 _MOD = 'volume'
@@ -130,9 +133,12 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             self.velocityIsRelative = other.velocityIsRelative
 
     def getRealizedStr(self,
-                       useDynamicContext: Union['music21.dynamics.Dynamic', bool] = True,
+                       useDynamicContext: Union[dynamics.Dynamic, bool] = True,
                        useVelocity=True,
-                       useArticulations: Union[bool, 'music21.articulations.Articulation'] = True,
+                       useArticulations: Union[bool,
+                                               articulations.Articulation,
+                                               Iterable[articulations.Articulation]
+                                               ] = True,
                        baseLevel=0.5,
                        clip=True):
         '''Return the realized as rounded and formatted string value. Useful for testing.
@@ -151,9 +157,11 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def getRealized(
         self,
-        useDynamicContext: Union[bool, 'music21.dynamics.Dynamic'] = True,
+        useDynamicContext: Union[bool, dynamics.Dynamic] = True,
         useVelocity=True,
-        useArticulations: Union[bool, 'music21.articulations.Articulation'] = True,
+        useArticulations: Union[
+            bool, articulations.Articulation, Iterable[articulations.Articulation]
+        ] = True,
         baseLevel=0.5,
         clip=True,
     ):
@@ -178,7 +186,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
         If `useArticulations` is True and client is not None, any articulations
         found on that client will be used to adjust the volume. Alternatively,
-        the `useArticulations` parameter may supply a list of articulations
+        the `useArticulations` parameter may supply an iterable of articulations
         that will be used instead of that available on a client.
 
         The `velocityIsRelative` tag determines if the velocity value includes
@@ -240,8 +248,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         # only change the val from here if velocity is relative
         if self.velocityIsRelative:
             if useDynamicContext is not False:
-                if (hasattr(useDynamicContext, 'classes')
-                        and 'Dynamic' in useDynamicContext.classes):
+                if isinstance(useDynamicContext, dynamics.Dynamic):
                     dm = useDynamicContext  # it is a dynamic
                 elif self.client is not None:
                     dm = self.getDynamicContext()  # dm may be None
@@ -252,14 +259,14 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
                     # double scalar (so range is between 0 and 1) and scale
                     # the current val (around the base)
                     val = val * (dm.volumeScalar * 2.0)
-            # userArticulations can be a list of 1 or more articulation objects
+            # useArticulations can be a list of 1 or more articulation objects
             # as well as True/False
             if useArticulations is not False:
-                if common.isIterable(useArticulations):
-                    am = useArticulations
-                elif (hasattr(useArticulations, 'classes')
-                       and 'Articulation' in useArticulations.classes):
+                am: Iterable[articulations.Articulation]
+                if isinstance(useArticulations, articulations.Articulation):
                     am = [useArticulations]  # place in a list
+                elif common.isIterable(useArticulations):
+                    am = useArticulations  # type: ignore[assignment]
                 elif self.client is not None:
                     am = self.client.articulations
                 else:
@@ -323,7 +330,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     @client.setter
     def client(self, client):
         if client is not None:
-            if hasattr(client, 'classes') and 'NotRest' in client.classes:
+            if isinstance(client, note.NotRest):
                 self._client = common.wrapWeakref(client)
         else:
             self._client = None
@@ -443,11 +450,11 @@ def realizeVolume(srcStream,
     bKeys = []
     boundaries = {}
     # get dynamic map
-    flatSrc = srcStream.flat  # assuming sorted
+    flatSrc = srcStream.flatten()  # assuming sorted
 
     # check for any dynamics
     dynamicsAvailable = False
-    if flatSrc.iter.getElementsByClass('Dynamic'):
+    if flatSrc.getElementsByClass(dynamics.Dynamic):
         dynamicsAvailable = True
     else:  # no dynamics available
         if useDynamicContext is True:  # only if True, and non avail, override
@@ -456,7 +463,12 @@ def realizeVolume(srcStream,
     if dynamicsAvailable:
         # extend durations of all dynamics
         # doing this in place as this is a destructive operation
-        boundaries = flatSrc.extendDurationAndGetBoundaries('Dynamic')
+        flatSrc.extendDuration(dynamics.Dynamic, inPlace=True)
+        elements = flatSrc.getElementsByClass(dynamics.Dynamic)
+        for e in elements:
+            start = flatSrc.elementOffset(e)
+            end = start + e.duration.quarterLength
+            boundaries[(start, end)] = e
         bKeys = list(boundaries.keys())
         bKeys.sort()  # sort
 
@@ -465,7 +477,7 @@ def realizeVolume(srcStream,
     # key, avoiding searching through entire list every time
     lastRelevantKeyIndex = 0
     for e in flatSrc:  # iterate over all elements
-        if hasattr(e, 'volume') and 'NotRest' in e.classes:
+        if hasattr(e, 'volume') and isinstance(e, note.NotRest):
             # try to find a dynamic
             eStart = e.getOffsetBySite(flatSrc)
 
@@ -498,7 +510,7 @@ class Test(unittest.TestCase):
 
     def testBasic(self):
         import gc
-        from music21 import volume, note
+        from music21 import volume
 
         n1 = note.Note()
         v = volume.Volume(client=n1)
@@ -510,7 +522,8 @@ class Test(unittest.TestCase):
 
 
     def testGetContextSearchA(self):
-        from music21 import stream, note, volume, dynamics
+        from music21 import stream
+        from music21 import volume
 
         s = stream.Stream()
         d1 = dynamics.Dynamic('mf')
@@ -528,7 +541,7 @@ class Test(unittest.TestCase):
 
 
     def testGetContextSearchB(self):
-        from music21 import stream, note, dynamics
+        from music21 import stream
 
         s = stream.Stream()
         d1 = dynamics.Dynamic('mf')
@@ -545,7 +558,7 @@ class Test(unittest.TestCase):
 
     def testDeepCopyA(self):
         import copy
-        from music21 import volume, note
+        from music21 import volume
         n1 = note.Note()
 
         v1 = volume.Volume()
@@ -561,7 +574,7 @@ class Test(unittest.TestCase):
 
 
     def testGetRealizedA(self):
-        from music21 import volume, dynamics
+        from music21 import volume
 
         v1 = volume.Volume(velocity=64)
         self.assertEqual(v1.getRealizedStr(), '0.5')
@@ -591,8 +604,6 @@ class Test(unittest.TestCase):
 
 
     def testGetRealizedB(self):
-        from music21 import articulations
-
         v1 = Volume(velocity=64)
         self.assertEqual(v1.getRealizedStr(), '0.5')
 
@@ -610,7 +621,8 @@ class Test(unittest.TestCase):
 
 
     def testRealizeVolumeA(self):
-        from music21 import stream, dynamics, note, volume
+        from music21 import stream
+        from music21 import volume
 
         s = stream.Stream()
         s.repeatAppend(note.Note('g3'), 16)
@@ -664,7 +676,7 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testRealizeVolumeB(self):
-        from music21 import corpus, dynamics
+        from music21 import corpus
         s = corpus.parse('bwv66.6')
 
         durUnit = s.highestTime // 8  # let floor
@@ -686,7 +698,7 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
         # TODO: BUG -- one note too loud.
-        match = [n.volume.cachedRealizedStr for n in s.parts[0].flat.notes]
+        match = [n.volume.cachedRealizedStr for n in s.parts[0].flatten().notes]
         self.assertEqual(match, ['0.35', '0.35', '0.35', '0.35', '0.35',
                                  '0.5', '0.5', '0.5', '0.5',
                                  '0.64', '0.64', '0.64', '0.64', '0.64',
@@ -696,7 +708,7 @@ class Test(unittest.TestCase):
                                  '0.99', '0.99', '0.99', '0.99',
                                  '0.78', '0.78', '0.78', '0.78', '0.78', '0.78', '0.78'])
 
-        match = [n.volume.cachedRealizedStr for n in s.parts[1].flat.notes]
+        match = [n.volume.cachedRealizedStr for n in s.parts[1].flatten().notes]
 
         self.assertEqual(match, ['0.64', '0.64', '0.64', '0.64',
                                  '0.99', '0.99', '0.99', '0.99', '0.99',
@@ -707,7 +719,7 @@ class Test(unittest.TestCase):
                                  '0.35', '0.35', '0.35', '0.35', '0.35', '0.35',
                                  '0.5', '0.5', '0.5', '0.5', '0.5', '0.5', '0.5', '0.5', '0.5'])
 
-        match = [n.volume.cachedRealizedStr for n in s.parts[3].flat.notes]
+        match = [n.volume.cachedRealizedStr for n in s.parts[3].flatten().notes]
 
         self.assertEqual(match, ['0.99', '0.99', '0.99', '0.99', '0.99',
                                  '0.78', '0.78', '0.78', '0.78', '0.78',
@@ -720,7 +732,7 @@ class Test(unittest.TestCase):
 
 
     def testRealizeVolumeC(self):
-        from music21 import stream, note, articulations
+        from music21 import stream
 
         s = stream.Stream()
         s.repeatAppend(note.Note('g3'), 16)
@@ -738,7 +750,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 
 if __name__ == '__main__':

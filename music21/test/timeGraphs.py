@@ -182,11 +182,18 @@ class TestGetContextByClassA(Test):
 
     def __init__(self):
         from music21 import corpus
+        from music21 import meter
+        from music21 import clef
+        from music21 import key
         self.s = corpus.parse('bwv66.6')
-
+        self.m = meter
+        self.c = clef
+        self.k = key
 
     def testFocus(self):
-        from music21 import clef, meter, key
+        meter = self.m
+        clef = self.c
+        key = self.k
         for p in self.s.parts:
             for m in p.getElementsByClass('Measure'):
                 m.getContextByClass(clef.Clef)
@@ -212,7 +219,8 @@ class TestParseRNText(Test):
 class TestMusicXMLMultiPartOutput(Test):
 
     def __init__(self):
-        from music21 import note, stream
+        from music21 import note
+        from music21 import stream
         self.s = stream.Score()
         for i in range(10):  # parts
             p = stream.Part()
@@ -260,14 +268,18 @@ class TestGetElementsByClassA(Test):
         self.s = corpus.parse('bwv66.6')
 
     def testFocus(self):
-        len(self.s.flat.notes)
+        len(self.s.flatten().notes)
 
 
 
 class TestGetElementsByClassB(Test):
 
     def __init__(self):
-        from music21 import stream, note, clef, meter, chord
+        from music21 import stream
+        from music21 import note
+        from music21 import clef
+        from music21 import meter
+        from music21 import chord
         self.s = stream.Stream()
         self.s.repeatAppend(note.Note(), 300)
         self.s.repeatAppend(note.Rest(), 300)
@@ -288,7 +300,9 @@ class TestGetElementsByClassB(Test):
 
 class TestGetContextByClassB(Test):
     def __init__(self):
-        from music21 import stream, note, meter
+        from music21 import meter
+        from music21 import note
+        from music21 import stream
 
         self.s = stream.Score()
 
@@ -356,7 +370,9 @@ class TestMeasuresA(Test):
 
 class TestMeasuresB(Test):
     def __init__(self):
-        from music21 import stream, note, meter
+        from music21 import stream
+        from music21 import note
+        from music21 import meter
 
         self.s = stream.Score()
         for j in [1]:

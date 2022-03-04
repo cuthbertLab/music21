@@ -14,13 +14,11 @@ Automatically reduce a MeasureStack to a single chord or group of chords.
 import unittest
 import copy
 
+from music21 import chord
 from music21 import clef
 from music21 import meter
 from music21 import stream
 from music21 import tie
-
-
-
 
 def testMeasureStream1():
     '''
@@ -33,7 +31,6 @@ def testMeasureStream1():
     {2.0} <music21.chord.Chord C4 E4 F4 B4>
     {3.0} <music21.chord.Chord C4 E4 G4 C5>
     '''
-    from music21 import chord
     s = stream.Measure()
     t = meter.TimeSignature('4/4')
     c1 = chord.Chord('C4 E4 G4 C5')
@@ -79,7 +76,7 @@ class ChordReducer:
         '''
         from music21 import note
         if measureObj.isFlat is False:
-            mObj = measureObj.flat.notes.stream()
+            mObj = measureObj.flatten().notes.stream()
         else:
             mObj = measureObj.notes.stream()
 
@@ -147,7 +144,10 @@ class ChordReducer:
                 c.offset = int(cOffsetCurrent)
                 c.quarterLength += cOffsetSyncop
 
-
+        # Remove zero-duration chords
+        for c in list(mObj):
+            if not c.quarterLength:
+                mObj.remove(c)
 
         return mObj
         # closed position
@@ -278,7 +278,7 @@ class ChordReducer:
         cLastEnd = 0.0
         for cEl in newPart:
             cElCopy = copy.deepcopy(cEl)
-            if 'Chord' in cEl.classes and closedPosition is not False:
+            if isinstance(cEl, chord.Chord) and closedPosition is not False:
                 if forceOctave is not False:
                     cElCopy.closedPosition(forceOctave=forceOctave, inPlace=True)
                 else:
@@ -292,7 +292,7 @@ class ChordReducer:
                     cLast.quarterLength += newOffset - cLastEnd
             cLast = cElCopy
             cLastEnd = newOffset + cElCopy.quarterLength
-            m.coreInsert(newOffset, cElCopy)
+            m.coreInsert(newOffset, cElCopy, ignoreSort=True)
 
         tsContext = mI.parts.first().getContextByClass('TimeSignature')
         if tsContext is not None:
@@ -328,7 +328,6 @@ class ChordReducer:
 class Test(unittest.TestCase):
 
     def testSimpleMeasure(self):
-        from music21 import chord
         s = stream.Measure()
         c1 = chord.Chord('C4 E4 G4 C5')
         c1.quarterLength = 2.0
@@ -337,7 +336,8 @@ class Test(unittest.TestCase):
         for c in [c1, c2, c3]:
             s.append(c)
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
+    show = True
 
     def testTrecentoMadrigal(self):
         from music21 import corpus
@@ -365,7 +365,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         # cr.printDebug = True
         p = cr.multiPartReduction(c, maxChords=3)
         # p = cr.multiPartReduction(c, closedPosition=True)
-        from music21 import key, roman
+        from music21 import key
+        from music21 import roman
         cm = key.Key('G')
         for thisChord in p.recurse().getElementsByClass('Chord'):
             thisChord.lyric = roman.romanNumeralFromChord(thisChord,
@@ -374,7 +375,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
         c.insert(0, p)
-        c.show()
+        if self.show:
+            c.show()
 
 
 # ------------------------------------------------------------------------------

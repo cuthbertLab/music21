@@ -15,7 +15,7 @@ sites.py -- Objects for keeping track of relationships among Music21Objects
 import collections
 import unittest
 import weakref
-from typing import Union
+from typing import Any, MutableMapping, Optional, Union
 
 from music21 import common
 from music21 import exceptions21
@@ -34,7 +34,7 @@ WEAKREF_ACTIVE = True
 # that still exists, then restore it from the dictionary; otherwise, do not
 # sweat it.  Should make pickle deepcopies of music21 objects in Streams still
 # possible without needing to recreate the whole stream.
-GLOBAL_SITE_STATE_DICT = weakref.WeakValueDictionary()
+GLOBAL_SITE_STATE_DICT: MutableMapping[str, Optional[Any]] = weakref.WeakValueDictionary()
 
 
 class SitesException(exceptions21.Music21Exception):
@@ -571,7 +571,7 @@ class Sites(common.SlottedObjectMixin):
         callerFirst=None,
         sortByCreationTime=False,
         priorityTarget=None,
-        getElementMethod='getElementAtOrBefore',
+        getElementMethod=common.enums.ElementSearch.AT_OR_BEFORE,
         memo=None
     ):
         '''
@@ -703,7 +703,7 @@ class Sites(common.SlottedObjectMixin):
         >>> s.append(a)
         >>> a.sites.getSiteCount()
         1
-        >>> sf = s.flat
+        >>> sf = s.flatten()
         >>> a.sites.getSiteCount()
         2
         '''
@@ -733,7 +733,8 @@ class Sites(common.SlottedObjectMixin):
 
     def getSitesByClass(self, className):
         '''
-        Return a list of unwrapped site from siteDict.site [SiteRef.site] (generally a Stream)
+        Return a list of unwrapped site from siteDict.site [SiteRef.site]
+        (generally a Stream)
         that matches the provided class.
 
         Input can be either a Class object or a string
@@ -977,7 +978,10 @@ class Sites(common.SlottedObjectMixin):
 
 class Test(unittest.TestCase):
     def testSites(self):
-        from music21 import note, stream, corpus, clef
+        from music21 import note
+        from music21 import stream
+        from music21 import corpus
+        from music21 import clef
 
         m = stream.Measure()
         m.number = 34
@@ -1002,7 +1006,7 @@ class Test(unittest.TestCase):
             3,
             fileExtensions='xml',
         ).getElementById('Violin I')
-        lastNote = violin1.flat.notes[-1]
+        lastNote = violin1.flatten().notes[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)
         self.assertIsInstance(lastNoteClef, clef.TrebleClef)
 

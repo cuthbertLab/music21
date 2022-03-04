@@ -12,10 +12,13 @@
 import math
 import random
 import unittest
-from typing import List, Tuple, Union, Sequence
+from typing import List, Tuple, Union, Sequence, Iterable
 
 from fractions import Fraction
+from math import isclose
+
 from music21 import defaults
+from music21.common import deprecated
 
 __all__ = [
     'ordinals', 'musicOrdinals', 'ordinalsToNumbers',
@@ -133,7 +136,7 @@ def numToIntOrFloat(value: Union[int, float]) -> Union[int, float]:
         value = float(value)
         intVal = round(value)
 
-    if almostEquals(intVal, value, 1e-6):
+    if isclose(intVal, value, abs_tol=1e-6):
         return intVal
     else:  # source
         return value
@@ -424,7 +427,7 @@ def roundToHalfInteger(num: Union[float, int]) -> Union[float, int]:
         floatVal = 1
     return intVal + floatVal
 
-
+@deprecated('v.7', 'any time', 'just call math.isclose(x, y, abs_tol=1e-7)')
 def almostEquals(x, y=0.0, grain=1e-7) -> bool:
     # noinspection PyShadowingNames
     '''
@@ -433,34 +436,20 @@ def almostEquals(x, y=0.0, grain=1e-7) -> bool:
 
     Allows comparisons between floats that are normally inconsistent.
 
-    >>> common.almostEquals(1.000000001, 1)
+    DEPRECATED in v.7 -- just call `isclose` with `abs_tol`:
+
+    >>> from math import isclose
+    >>> isclose(1.000000001, 1, abs_tol=1e-7)
     True
-    >>> common.almostEquals(1.001, 1)
+    >>> isclose(1.001, 1, abs_tol=1e-7)
     False
-    >>> common.almostEquals(1.001, 1, grain=0.1)
-    True
-
-    OMIT_FROM_DOCS
-
-    For very small grains, just compare Fractions without converting:
-
-    >>> from fractions import Fraction
-    >>> x = Fraction(1e-10)
-    >>> y = Fraction(1e-10)
-    >>> common.almostEquals(x, y)
+    >>> isclose(1.001, 1, abs_tol=0.1)
     True
     '''
-    # for very small grains, just compare Fractions without converting...
-    if isinstance(x, Fraction) and isinstance(y, Fraction) and grain <= 5e-6:
-        if x == y:
-            return True
-
-    if abs(x - y) < grain:
-        return True
-    return False
+    return isclose(x, y, abs_tol=grain)
 
 
-def addFloatPrecision(x, grain=1e-2) -> Union[float, 'fractions.Fraction']:
+def addFloatPrecision(x, grain=1e-2) -> Union[float, Fraction]:
     '''
     Given a value that suggests a floating point fraction, like 0.33,
     return a Fraction or float that provides greater specification, such as Fraction(1, 3)
@@ -485,7 +474,7 @@ def addFloatPrecision(x, grain=1e-2) -> Union[float, 'fractions.Fraction']:
     values = (1 / 3, 2 / 3,
               1 / 6, 5 / 6)
     for v in values:
-        if almostEquals(x, v, grain=grain):
+        if isclose(x, v, abs_tol=grain):
             return opFrac(v)
     return x
 
@@ -551,13 +540,14 @@ def nearestMultiple(n: float, unit: float) -> Tuple[float, float, float]:
     >>> common.nearestMultiple(0.001, 0.125)[0]
     0.0
 
-    >>> common.almostEquals(common.nearestMultiple(0.25, 1 / 3)[0], 0.33333333)
+    >>> from math import isclose
+    >>> isclose(common.nearestMultiple(0.25, 1 / 3)[0], 0.33333333, abs_tol=1e-7)
     True
-    >>> common.almostEquals(common.nearestMultiple(0.55, 1 / 3)[0], 0.66666666)
+    >>> isclose(common.nearestMultiple(0.55, 1 / 3)[0], 0.66666666, abs_tol=1e-7)
     True
-    >>> common.almostEquals(common.nearestMultiple(234.69, 1 / 3)[0], 234.6666666)
+    >>> isclose(common.nearestMultiple(234.69, 1 / 3)[0], 234.6666666, abs_tol=1e-7)
     True
-    >>> common.almostEquals(common.nearestMultiple(18.123, 1 / 6)[0], 18.16666666)
+    >>> isclose(common.nearestMultiple(18.123, 1 / 6)[0], 18.16666666, abs_tol=1e-7)
     True
 
     >>> common.nearestMultiple(-0.5, 0.125)
@@ -643,7 +633,7 @@ def decimalToTuplet(decNum: float) -> Tuple[int, int]:
         'Utility function.'
         for index in range(1, 1000):
             for j in range(index, index * 2):
-                if almostEquals(inner_working, j / index):
+                if isclose(inner_working, j / index, abs_tol=1e-7):
                     return (int(j), int(index))
         return (0, 0)
 
@@ -713,13 +703,13 @@ def unitBoundaryProportion(series: Sequence[int]) -> List[Tuple[Union[int, float
     unit-interval boundaries proportional to the series components.
 
     >>> common.unitBoundaryProportion([1, 1, 2])
-    [(0, 0.25), (0.25, 0.5), (0.5, 1.0)]
-    >>> common.unitBoundaryProportion([8, 1, 1])
-    [(0, 0.8...), (0.8..., 0.9...), (0.9..., 1.0)]
+    [(0.0, 0.25), (0.25, 0.5), (0.5, 1.0)]
+    >>> common.unitBoundaryProportion([9, 1, 1])
+    [(0.0, 0.8...), (0.8..., 0.9...), (0.9..., 1.0)]
     '''
     unit = unitNormalizeProportion(series)
     bounds = []
-    summation = 0
+    summation = 0.0
     for index in range(len(unit)):
         if index != len(unit) - 1:  # not last
             bounds.append((summation, summation + unit[index]))
@@ -805,7 +795,7 @@ def approximateGCD(values: List[Union[int, float]], grain: float = 1e-4) -> floa
         # lowest is already a float
         unused_int, floatingValue = divmod(x / lowest, 1.0)
         # if almost an even division
-        if almostEquals(floatingValue, 0.0, grain=grain):
+        if isclose(floatingValue, 0.0, abs_tol=grain):
             count += 1
     if count == len(values):
         return lowest
@@ -829,7 +819,7 @@ def approximateGCD(values: List[Union[int, float]], grain: float = 1e-4) -> floa
         for coll in divisions:
             for x in coll:
                 # grain here is set low, mostly to catch triplets
-                if almostEquals(x, v, grain=grain):
+                if isclose(x, v, abs_tol=grain):
                     count += 1
                     break  # exit the iteration of coll; only 1 match possible
         # store any division that is found in all values
@@ -840,7 +830,7 @@ def approximateGCD(values: List[Union[int, float]], grain: float = 1e-4) -> floa
     return max(commonUniqueDivisions)
 
 
-def lcm(filterList: List[int]) -> int:
+def lcm(filterList: Iterable[int]) -> int:
     '''
     Find the least common multiple of a list of values
 
@@ -852,6 +842,12 @@ def lcm(filterList: List[int]) -> int:
     2
     >>> common.lcm([3, 6])
     6
+
+    Works with any iterable, like this set
+
+    >>> common.lcm({3, 5, 6})
+    30
+
     '''
     def _lcm(a, b):
         '''find lowest common multiple of a, b'''
@@ -861,8 +857,8 @@ def lcm(filterList: List[int]) -> int:
     # derived from
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022
     lcmVal = 1
-    for index in range(len(filterList)):
-        lcmVal = _lcm(lcmVal, filterList[index])
+    for flValue in filterList:
+        lcmVal = _lcm(lcmVal, flValue)
     return lcmVal
 
 
@@ -949,7 +945,7 @@ def fromRoman(num: str, *, strictModern=False) -> int:
 
     Convert a Roman numeral (upper or lower) to an int
 
-    http://code.activestate.com/recipes/81611-roman-numerals/
+    https://code.activestate.com/recipes/81611-roman-numerals/
 
 
     >>> common.fromRoman('ii')

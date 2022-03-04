@@ -15,6 +15,7 @@ import os
 import pathlib
 import pickle
 import traceback
+from typing import List
 import unittest
 
 from music21 import common
@@ -327,18 +328,17 @@ class JobProcessor:
         jobs is a list of :class:`~music21.metadata.MetadataCachingJob` objects.
 
         '''
-        processCount = processCount or common.cpus()  # @UndefinedVariable
-        if processCount < 1:
-            processCount = 1
+        processCount = processCount or common.cpus()
+        processCount = max(processCount, 1)
+        # do not start more processes than jobs...
         remainingJobs = len(jobs)
-        if processCount > remainingJobs:  # do not start more processes than jobs...
-            processCount = remainingJobs
+        processCount = min(processCount, remainingJobs)
 
         environLocal.printDebug(
             f'Processing {remainingJobs} jobs in parallel, with {processCount} processes.')
         results = []
-        job_queue = multiprocessing.JoinableQueue()  # @UndefinedVariable
-        result_queue = multiprocessing.Queue()  # @UndefinedVariable
+        job_queue = multiprocessing.JoinableQueue()
+        result_queue = multiprocessing.Queue()
         workers = [WorkerProcess(job_queue, result_queue)
                    for _ in range(processCount)]
         for worker in workers:
@@ -424,7 +424,7 @@ class Test(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 if __name__ == '__main__':
     import music21

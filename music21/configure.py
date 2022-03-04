@@ -45,10 +45,10 @@ reFinaleReaderApp = re.compile(r'Finale Reader\.app', IGNORECASE)
 reMuseScoreApp = re.compile(r'MuseScore.*\.app', IGNORECASE)
 reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.*\.exe', IGNORECASE)
 
-urlMusic21 = 'http://web.mit.edu/music21'
+urlMusic21 = 'https://web.mit.edu/music21'
 urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'http://web.mit.edu/music21/doc/'
-urlMusic21List = 'http://groups.google.com/group/music21list'
+urlGettingStarted = 'https://web.mit.edu/music21/doc/'
+urlMusic21List = 'https://groups.google.com/g/music21list'
 
 LINE_WIDTH = 78
 
@@ -1218,7 +1218,8 @@ class SelectFilePath(SelectFromList):
         This looks at everything in Applications, as well as every directory in Applications
         '''
         post: List[str] = []
-        for path0 in ('/Applications', common.cleanpath('~/Applications')):
+        for path0 in ('/Applications', common.cleanpath('~/Applications', returnPathlib=False)):
+            assert isinstance(path0, str)
             self._getAppOSIndependent(comparisonFunction, path0, post, glob='*')
         return post
 
@@ -1479,8 +1480,8 @@ class ConfigurationAssistant:
 
     def _introduction(self):
         msg = []
-        msg.append('Welcome the music21 Configuration Assistant. You will be guided '
-                   + 'through a number of questions to install and setup music21. '
+        msg.append('Welcome to the music21 Configuration Assistant. You will be guided '
+                   + 'through a number of questions to install and set up music21. '
                    + 'Simply pressing return at a prompt will select a default, if available.')
         msg.append('')  # will cause a line break
         msg.append('You may run this configuration again at a later time '
@@ -1537,7 +1538,7 @@ class ConfigurationAssistant:
 
 # ------------------------------------------------------------------------------
 # for time-out gather of arguments: possibly look at:
-# http://code.activestate.com/recipes/576780/
+# https://code.activestate.com/recipes/576780/
 # http://www.garyrobinson.net/2009/10/non-blocking-raw_input-for-python.html
 # class Prompt(threading.Thread):
 #     def __init__ (self, prompt, timeOutTime):
@@ -1593,10 +1594,10 @@ class ConfigurationAssistant:
 #         print('got: %s' % post)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestUserInput(unittest.TestCase):  # pragma: no cover
 
     def testYesOrNo(self):
         print()
@@ -1762,7 +1763,7 @@ if __name__ == '__main__':
     else:
         # only if running tests
         t = Test()
-        te = TestExternal()
+        te = TestUserInput()
 
         if len(sys.argv) < 2 or sys.argv[1] in ['all', 'test']:
             import music21
@@ -1770,7 +1771,7 @@ if __name__ == '__main__':
 
         # arg[1] is test to launch
         elif sys.argv[1] == 'te':
-            # run test external
+            # run test user input
             getattr(te, sys.argv[2])()
         # just run named Test
         elif hasattr(t, sys.argv[1]):

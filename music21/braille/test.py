@@ -37,7 +37,7 @@ def example11_2():
     bm = converter.parse('''tinynotation: 4/4 r2. b-4 g e- d e- g2 f4
         e- a- g c'4. c'8 b-2. b-4 e'-4 b- a-4. g8
         g2 f4 c' c' f a-4. d8 e-2. g4 g4. f8 f4 f a-2 g4 b- b- an an c'
-        b-2. b-4 e'- b- a- g g2 f4 c' c' r f r a-2. d4 e-2.''').flat
+        b-2. b-4 e'- b- a- g g2 f4 c' c' r f r a-2. d4 e-2.''').flatten()
     bm.insert(0, key.KeySignature(-3))
     bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     m = bm.getElementsByClass('Measure')
@@ -229,7 +229,7 @@ class Test(unittest.TestCase):
         bm = converter.parse('tinynotation: 6/8 G8 G8 G8 G8 E8 F8 A8 G8 G8 G8 r8 '
                              'G8 A8 A8 A8 c8 B8 A8 A8 G8 G8 G8 r8 r8 '
                              'G8 F8 F8 F8 r8 r8 F8 E8 E8 E8 r8 r8 D8 E8 '
-                             'D8 G8 F8 D8 C8 E8 D8 C8 r8 r8').flat
+                             'D8 G8 F8 D8 C8 E8 D8 C8 r8 r8').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -243,7 +243,7 @@ class Test(unittest.TestCase):
         bm = converter.parse('tinynotation: 6/8 e8 r8 e8 f8 r8 f8 d8 r8 d8 e8 '
                              'r8 e8 c8 d8 e8 g8 f8 e8 e8 d8 d8 d8 r8 r8 '
                              'c8 r8 c8 e8 r8 e8 f8 r8 f8 a8 r8 a8 g8 r8 '
-                             "g8 g8 a8 b8 d'8 c'8 c'8 c'8 r8 r8").flat
+                             "g8 g8 a8 b8 d'8 c'8 c'8 c'8 r8 r8").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -284,7 +284,7 @@ class Test(unittest.TestCase):
     def test_example03_3(self):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse("tinynotation: 2/4 g4 e4 a4 g4 f4 r4 d4 r4 c4. c8 d4. d8 e4 "
-                             "r4 c4 r4 g4 g4 a4 b4 c'4 r4 a4 r4 g4. g8 f4 d4 c4 e4 c4 r4").flat
+                             "r4 c4 r4 g4 g4 a4 b4 c'4 r4 a4 r4 g4. g8 f4 d4 c4 e4 c4 r4").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -325,7 +325,8 @@ class Test(unittest.TestCase):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse("tinynotation: 3/4 g4 g8 d4 d8 g4 b8 d'8 b8 "
                              "g8 a4 a8 a8 b8 c'8 b4 b8 "
-                             "g4 r8 a4 a8 d4 d8 g4 b8 a4 c'8 b8 c'8 d'8 c'4 a8 g4 g8 g4 r8").flat
+                             "g4 r8 a4 a8 d4 d8 g4 b8 a4 c'8 b8 c'8 d'8 c'4 a8 g4 g8 g4 r8"
+                             ).flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -340,7 +341,7 @@ class Test(unittest.TestCase):
     def test_example04_1(self):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse(
-            "tinynotation: 4/4 c2 e2 d2 f2 e2 g2 f2 a2 g2 b2 a2 c'2 b2 d'2 c'2 r2").flat
+            "tinynotation: 4/4 c2 e2 d2 f2 e2 g2 f2 a2 g2 b2 a2 c'2 b2 d'2 c'2 r2").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -351,7 +352,8 @@ class Test(unittest.TestCase):
     def test_example04_2(self):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse(
-            'tinynotation: 4/4 F2 A2 G2 C2 D4 C4 D4 E4 F2 r2 D2 F2 C2 F2 E4 F4 G4 A4 F2 r2').flat
+            'tinynotation: 4/4 F2 A2 G2 C2 D4 C4 D4 E4 F2 r2 D2 F2 C2 F2 E4 F4 G4 A4 F2 r2'
+        ).flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -364,7 +366,7 @@ class Test(unittest.TestCase):
         bm = converter.parse("tinynotation: 3/4 c2 c4 d8 c8 B8 c8 d4 e2 e4 f8 e8 d8 "
                              "e8 f4 g2 g4 a8 g8 f8 g8 a4 b8 a8 g8 a8 b8 d'8 c'4 r2 e'2 "
                              "e'4 d'8 c'8 b8 c'8 d'4 c'2 c'4 b8 a8 g8 a8 b4 a2 a4 g8 f8 e8 f8 g4 "
-                             "f8 e8 d8 e8 f8 d8 c4 r2").flat
+                             "f8 e8 d8 e8 f8 d8 c4 r2").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -376,7 +378,7 @@ class Test(unittest.TestCase):
     def test_example04_4(self):
         self.method = measureToBraille
         self.methodArgs = {'suppressOctaveMarks': True}
-        bm = converter.parse('tinynotation: 4/4 f2~ f4. f8').flat
+        bm = converter.parse('tinynotation: 4/4 f2~ f4. f8').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].pop(1)
@@ -389,7 +391,7 @@ class Test(unittest.TestCase):
     def test_example04_5(self):
         self.method = measureToBraille
         self.methodArgs = {'suppressOctaveMarks': True}
-        bm = converter.parse('tinynotation: 3/4 g4.~ g8 a8 g8').flat
+        bm = converter.parse('tinynotation: 3/4 g4.~ g8 a8 g8').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].pop(1)
@@ -402,7 +404,7 @@ class Test(unittest.TestCase):
     def test_example04_6(self):
         self.method = measureToBraille
         self.methodArgs = {'suppressOctaveMarks': True}
-        bm = converter.parse('tinynotation: 3/4 g2 g4~ g2 r4').flat
+        bm = converter.parse('tinynotation: 3/4 g2 g4~ g2 r4').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].pop(0)
@@ -419,7 +421,7 @@ class Test(unittest.TestCase):
     def test_example04_7(self):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse('tinynotation: 3/4 g2. e2. c2. e2. c4 d4 e4 g4 f4 e4 d2.~ d2. '
-                             'e2 e4 e4 f4 g4 a2 a4 a4 g4 f4 e2 f4 d2 e4 c2.~ c2.').flat
+                             'e2 e4 e4 f4 g4 a2 a4 a4 g4 f4 e2 f4 d2 e4 c2.~ c2.').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -435,7 +437,7 @@ class Test(unittest.TestCase):
     def test_example05_1(self):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse("tinynotation: 4/4 c'1 a1 f1 a1 c'1 d'1 c'1~ c'1 "
-                             "d'1 e'1 f'1 d'1 c'1 g'1 f'1~ f'1").flat
+                             "d'1 e'1 f'1 d'1 c'1 g'1 f'1~ f'1").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -446,7 +448,7 @@ class Test(unittest.TestCase):
     def test_example05_2(self):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse('tinynotation: 4/4 C1 E1 G1 A1 B1 A1 G1~ G1 A1 c1 A1 '
-                             'F1 G1 B1 G1 E1 F1 A1 F1 D1 BB1 D1 C1~ C1').flat
+                             'F1 G1 B1 G1 E1 F1 A1 F1 D1 BB1 D1 C1~ C1').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -457,7 +459,7 @@ class Test(unittest.TestCase):
 
     def test_example05_3(self):
         self.methodArgs = {'suppressOctaveMarks': True}
-        bm = converter.parse('tinynotation: 3/2 r1 g2 g2 g2 g2 g4 g4 r1').flat
+        bm = converter.parse('tinynotation: 3/2 r1 g2 g2 g2 g2 g4 g4 r1').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -546,7 +548,7 @@ class Test(unittest.TestCase):
     def test_example05_5(self):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse('tinynotation: 3/4 F2. r2. A2. r2. F4 G4 A4 c4 A4 F4 G4 r2 r2. '
-                             'E2. r2. G2. r2. C4 D4 E4 G4 E4 C4 F4 r2 r2.').flat
+                             'E2. r2. G2. r2. C4 D4 E4 G4 E4 C4 F4 r2 r2.').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -636,9 +638,9 @@ class Test(unittest.TestCase):
         bm2 = converter.parse('tinynotation: g1 b1 a2 g2', makeNotation=False)
         bm2.append(note.Note('A4', quarterLength=8.0))
         bm2.append(note.Rest(quarterLength=4.0))
-        bm.append(bm2.flat)
+        bm.append(bm2.flatten())
         bm.insert(0, meter.TimeSignature('6/2'))
-        bm = bm.flat
+        bm = bm.flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -650,7 +652,7 @@ class Test(unittest.TestCase):
     # don't work correctly yet.
     #
     def xtest_example05_7a(self):
-        bm = converter.parse('tinynotation: 4/4 r1 r1 r1 r1 r1').flat
+        bm = converter.parse('tinynotation: 4/4 r1 r1 r1 r1 r1').flatten()
         bm.makeNotation(inPlace=True)
         m = bm.getElementsByClass('Measure')
         m[0].pop(0)
@@ -658,7 +660,7 @@ class Test(unittest.TestCase):
         self.s = bm
 
     def xtest_example05_7b(self):
-        bm = converter.parse('tinynotation: r1 r1 r1 r1').flat
+        bm = converter.parse('tinynotation: r1 r1 r1 r1').flatten()
         bm.makeNotation(inPlace=True)
         m = bm.getElementsByClass('Measure')
         m[0].pop(0)
@@ -666,7 +668,7 @@ class Test(unittest.TestCase):
         self.s = bm
 
     def xtest_example05_7c(self):
-        bm = converter.parse('tinynotation: r1 r1').flat
+        bm = converter.parse('tinynotation: r1 r1').flatten()
         bm.makeNotation(inPlace=True)
         m = bm.getElementsByClass('Measure')
         m[0].pop(0)
@@ -690,7 +692,7 @@ class Test(unittest.TestCase):
     def test_example06_2(self):
         self.method = measureToBraille
         self.methodArgs = {'suppressOctaveMarks': True}
-        bm = converter.parse('tinynotation: g#4 f##4 g#2').flat
+        bm = converter.parse('tinynotation: g#4 f##4 g#2').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].pop(1)
@@ -702,7 +704,7 @@ class Test(unittest.TestCase):
         self.method = measureToBraille
         self.methodArgs = {'suppressOctaveMarks': True}
 
-        bm = converter.parse("tinynotation: 4/4 c'2 b-2~ b-4 c'4 a4 f4").flat
+        bm = converter.parse("tinynotation: 4/4 c'2 b-2~ b-4 c'4 a4 f4").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].pop(0)
@@ -718,7 +720,9 @@ class Test(unittest.TestCase):
 
         bm = converter.parse("tinynotation: 3/4 e4 e8 a8 c'8 e'8 f'2.", makeNotation=False)
         bm.notes[0].pitch.accidental = pitch.Accidental()
+        bm.notes[0].pitch.accidental.displayStatus = True
         bm.notes[4].pitch.accidental = pitch.Accidental()
+        bm.notes[4].pitch.accidental.displayStatus = True
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[-1].rightBarline = None
@@ -735,7 +739,7 @@ class Test(unittest.TestCase):
         self.method = measureToBraille
         self.methodArgs = {'suppressOctaveMarks': True}
 
-        bm = converter.parse("tinynotation: 3/4 c'8 b-8 a8 g8 f4 g8 bn8 c'4 d'4").flat
+        bm = converter.parse("tinynotation: 3/4 c'8 b-8 a8 g8 f4 g8 bn8 c'4 d'4").flatten()
         bm.notes[-3].pitch.accidental = pitch.Accidental()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
@@ -830,7 +834,7 @@ class Test(unittest.TestCase):
     def test_example06_12(self):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse("tinynotation: e'8 e'-8 d'8 d'-8 c'8 a8 a-8 g8 b--8 a-8 g8 g-8 "
-                             "f8 e8 d8 c8 d8 B8 B-8 Bn8 c8 d8 e8 f8 g8 g#8 a8 b8 c'4 r4").flat
+                             "f8 e8 d8 c8 d8 B8 B-8 Bn8 c8 d8 e8 f8 g8 g#8 a8 b8 c'4 r4").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.measure(2).notes[5].pitch.accidental.displayStatus = False
         bm.measure(2).notes[6].pitch.accidental.displayStatus = False
@@ -881,7 +885,7 @@ class Test(unittest.TestCase):
 
     def test_example07_3a(self):
         self.method = measureToBraille
-        bm = converter.parse('tinynotation: c4 e4').flat
+        bm = converter.parse('tinynotation: c4 e4').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].pop(1)
@@ -891,7 +895,7 @@ class Test(unittest.TestCase):
 
     def test_example07_3b(self):
         self.method = measureToBraille
-        bm = converter.parse("tinynotation: c'2. a4").flat
+        bm = converter.parse("tinynotation: c'2. a4").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].pop(1)
@@ -901,7 +905,7 @@ class Test(unittest.TestCase):
 
     def test_example07_4a(self):
         self.method = measureToBraille
-        bm = converter.parse('tinynotation: 4/4 c2 a2').flat
+        bm = converter.parse('tinynotation: 4/4 c2 a2').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].pop(1)
@@ -911,7 +915,7 @@ class Test(unittest.TestCase):
 
     def test_example07_4b(self):
         self.method = measureToBraille
-        bm = converter.parse("tinynotation: 4/4 c'2 e2").flat
+        bm = converter.parse("tinynotation: 4/4 c'2 e2").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].pop(1)
@@ -921,7 +925,7 @@ class Test(unittest.TestCase):
 
     def test_example07_5a(self):
         self.method = measureToBraille
-        bm = converter.parse('tinynotation: C2 F2').flat
+        bm = converter.parse('tinynotation: C2 F2').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].pop(1)
@@ -931,7 +935,7 @@ class Test(unittest.TestCase):
 
     def test_example07_5b(self):
         self.method = measureToBraille
-        bm = converter.parse("tinynotation: f2 c'2").flat
+        bm = converter.parse("tinynotation: f2 c'2").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].pop(1)
@@ -942,7 +946,7 @@ class Test(unittest.TestCase):
     def test_example07_6(self):
         bm = converter.parse("tinynotation: 4/8 e'-8 e'-8 e'-8 e'-8 d'8 d'8 b-4 c'8 "
                              "c'8 c'8 c'8 e-8 c'8 b-4 "
-                             "f8 f8 c'4 b-8 b-8 f'4 e'-8 d'8 c'8 b-8 e'-4 e-4").flat
+                             "f8 f8 c'4 b-8 b-8 f'4 e'-8 d'8 c'8 b-8 e'-4 e-4").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -1030,7 +1034,7 @@ class Test(unittest.TestCase):
         TODO: Replace with actual 8va spanner.
         '''
         bm = converter.parse("tinynotation: 4/8 a8 c'8 f'8 c'8 a8 c'8 f'8 c'8 a'8 "
-                             "f'8 c'8 d'8 a'8 f'8 e'8 c'8 f'2").flat
+                             "f'8 c'8 d'8 a'8 f'8 e'8 c'8 f'2").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].pop(0)
@@ -1250,7 +1254,7 @@ class Test(unittest.TestCase):
         bm = converter.parse(
             'tinynotation: 3/4 E-8 r8 BB-8 r8 E-8 r8 En4 F4 F#4 G8 r8 D8 r8 G8 r8 A-4 G4 F4 '
             'E-8 r8 C8 r8 AA-8 r8 AAn4 BB-4 BBn4 C8 D8 r8 E-8 r8 BB-8 E-8 En8 r8 F8 r8 F#8 '
-            'G8 D8 r8 G8 r8 A-8 A-8 G8 r8 F8 r8 E-8 D8 C8 BB-4 BB-4 EE-2.').flat
+            'G8 D8 r8 G8 r8 A-8 A-8 G8 r8 F8 r8 E-8 D8 C8 BB-4 BB-4 EE-2.').flatten()
         bm.insert(0, key.KeySignature(-3))
         bm.insert(0, tempo.TempoText('In strict time'))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1271,7 +1275,7 @@ class Test(unittest.TestCase):
                              "e'4.~ e'8 d'#8 g#8 d'#4 c'#8 d'#4 r8 a#8 g#8 a#8 b8 a#8 b8 "
                              "c'#8 d'#8 e'8 f'#8 g'#8 a'#8 b'8 f'#8 d'#8 g'#8 e'8 b8 f'#4 d'#8 "
                              "e'8 d'#8 c'#8 b8 f#8 d'#8 b4 f#8 d#8 f#8 b8 c'#4 a#8 b2.~ b4. r8"
-                             ).flat
+                             ).flatten()
         bm.insert(0, key.KeySignature(5))
         bm.insert(0, tempo.TempoText('Con delicatezza'))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1290,7 +1294,7 @@ class Test(unittest.TestCase):
     def test_drill08_4(self):
         bm = converter.parse(
             'tinynotation: 4/4 A2.. G8 F2 E4 D4 E4. F8 G4 E4 C#2 D4 r4 '
-            'AA2.. BBn8 C#4. D8 E4 G4 F4 G4 A4 F4 D2.. r8').flat
+            'AA2.. BBn8 C#4. D8 E4 G4 F4 G4 A4 F4 D2.. r8').flatten()
         bm.insert(0, key.KeySignature(-1))
         bm.insert(0, tempo.TempoText('Grazioso'))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1329,7 +1333,7 @@ class Test(unittest.TestCase):
 
     def test_example09_1(self):
         self.methodArgs = {'showFirstMeasureNumber': False}
-        bm = converter.parse('tinynotation: 2/4 a4 g f4. c8').flat
+        bm = converter.parse('tinynotation: 2/4 a4 g f4. c8').flatten()
         bm.insert(0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
@@ -1366,7 +1370,7 @@ class Test(unittest.TestCase):
 
     def test_example09_2(self):
         self.methodArgs = {'showFirstMeasureNumber': False}
-        bm = converter.parse("tinynotation: 3/4 f'4 e'-8 d' c' b-~ b-4 r8 a c' b-").flat
+        bm = converter.parse("tinynotation: 3/4 f'4 e'-8 d' c' b-~ b-4 r8 a c' b-").flatten()
         bm.insert(0, key.KeySignature(-2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
@@ -1384,7 +1388,7 @@ class Test(unittest.TestCase):
 
     def test_example09_3(self):
         self.methodArgs = {'showFirstMeasureNumber': False}
-        bm = converter.parse('tinynotation: 6/8 c2.~ c4. f4 g8').flat
+        bm = converter.parse('tinynotation: 6/8 c2.~ c4. f4 g8').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[-1].rightBarline = None
@@ -1398,7 +1402,7 @@ class Test(unittest.TestCase):
 
     def test_example09_4a(self):
         self.methodArgs = {'showFirstMeasureNumber': False}
-        bm = converter.parse('tinynotation: 3/4 d2 F#4').flat
+        bm = converter.parse('tinynotation: 3/4 d2 F#4').flatten()
         bm.insert(0, key.KeySignature(2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
@@ -1412,7 +1416,7 @@ class Test(unittest.TestCase):
 
     def test_example09_4b(self):
         self.methodArgs = {'showFirstMeasureNumber': False}
-        bm = converter.parse('tinynotation: 3/4 c2 g4').flat
+        bm = converter.parse('tinynotation: 3/4 c2 g4').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[-1].rightBarline = None
@@ -1425,7 +1429,7 @@ class Test(unittest.TestCase):
 
     def test_example09_5a(self):
         self.methodArgs = {'showFirstMeasureNumber': False}
-        bm = converter.parse("tinynotation: 2/4 c8 e g c'").flat
+        bm = converter.parse("tinynotation: 2/4 c8 e g c'").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[-1].rightBarline = None
@@ -1439,7 +1443,7 @@ class Test(unittest.TestCase):
     def test_example09_5b(self):
         self.methodArgs = {'showFirstMeasureNumber': False,
                            'upperFirstInNoteFingering': False}
-        bm = converter.parse('tinynotation: 6/8 d8 c d e4.').flat
+        bm = converter.parse('tinynotation: 6/8 d8 c d e4.').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[-1].rightBarline = None
@@ -1456,7 +1460,7 @@ class Test(unittest.TestCase):
     def test_example09_6(self):
         self.methodArgs = {'showFirstMeasureNumber': False,
                            'upperFirstInNoteFingering': True}
-        bm = converter.parse("tinynotation: 2/4 f#4 a d' f'# f'# e'").flat
+        bm = converter.parse("tinynotation: 2/4 f#4 a d' f'# f'# e'").flatten()
         bm.insert(0, key.KeySignature(2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
@@ -1507,7 +1511,8 @@ class Test(unittest.TestCase):
     def test_drill09_1(self):
         bm = converter.parse("tinynotation: 6/8 r2 g8 a- b-4.~ b-8 g b- d'4.~ d'8 c' "
                              "b- a-4 g8 e-4 f8 g4. r8 a- b- "
-                             "c'4.~ c'8 a- c' e'-4.~ e'-8 d' f' e'- d' c' b- a- f e-4.~ e-8").flat
+                             "c'4.~ c'8 a- c' e'-4.~ e'-8 d' f' e'- d' c' b- a- f e-4.~ e-8"
+                             ).flatten()
         bm.insert(0.0, tempo.TempoText('Allegretto'))
         bm.insert(0.0, key.KeySignature(-3))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1593,7 +1598,7 @@ class Test(unittest.TestCase):
 
     def test_drill09_3(self):
         bm = converter.parse('tinynotation: 2/4 BB4 C#8 D E F# G A B4 c#8 d e f# g f# e4 d8 c# '
-                             'B A G F# E4 D8 C# D C# BB AA# BB2').flat
+                             'B A G F# E4 D8 C# D C# BB AA# BB2').flatten()
         bm.insert(0, key.KeySignature(2))
         bm.insert(0, tempo.TempoText('Moderato'))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1652,7 +1657,7 @@ class Test(unittest.TestCase):
         bm = converter.parse('tinynotation: 5/8 E8 D# E F# D# BB4 E G8 G F# G A B '
                              'B4 BB BB8 DD GG BB GG BB E4 G F#8 '
                              'E BB G E BB E4 EE EE8 EE4 r8 EE8 EE DD '
-                             'EE EE EE EE EE EE EE4 EE8 EE4~ EE8 r8 r').flat
+                             'EE EE EE EE EE EE EE4 EE8 EE4~ EE8 r8 r').flatten()
         bm.insert(0, key.KeySignature(1))
         bm.insert(0, tempo.MetronomeMark(number=100, referent=note.Note(type='quarter')))
         bm.insert(0, tempo.TempoText('Not too fast'))
@@ -1715,7 +1720,7 @@ class Test(unittest.TestCase):
         '''
         bm = converter.parse(
             "tinynotation: 3/4 f8 A G# A c A g B- A B- d B- g c Bn c a c b- c Bn c B- c "
-            "A c a c Bn d c a g# a c' a c b- a b- c' b- a d' c' a g c f2.").flat
+            "A c a c Bn d c a g# a c' a c b- a b- c' b- a d' c' a g c f2.").flatten()
         bm.insert(0, key.KeySignature(-1))
         bm.insert(0, tempo.TempoText('Lightly, almost in one'))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1843,7 +1848,7 @@ class Test(unittest.TestCase):
 
     def test_example10_2(self):
         self.methodArgs = {'dummyRestLength': 5, 'maxLineLength': 20}
-        bm = converter.parse('tinynotation: 4/4 e8 f# g# a b- gn e c f a g c a2').flat
+        bm = converter.parse('tinynotation: 4/4 e8 f# g# a b- gn e c f a g c a2').flatten()
         bm.insert(0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
@@ -1859,7 +1864,7 @@ class Test(unittest.TestCase):
 
     def test_example10_3(self):
         self.methodArgs = {'dummyRestLength': 10, 'maxLineLength': 21}
-        bm = converter.parse('tinynotation: 6/8 e8 f# g# a b- g e c f a g c a2.').flat
+        bm = converter.parse('tinynotation: 6/8 e8 f# g# a b- g e c f a g c a2.').flatten()
         bm.insert(0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
@@ -1877,11 +1882,11 @@ class Test(unittest.TestCase):
     def test_example10_4(self):
         self.methodArgs = {'dummyRestLength': 10}
         bm = converter.parse(
-            'tinynotation: 12/8 e2.~ e8 f# g# a b- gn c d e f4.~ f8 e f g f e f2.').flat
+            'tinynotation: 12/8 e2.~ e8 f# g# a b- gn c d e f4.~ f8 e f g f e f2.').flatten()
         bm.insert(0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-        # m = bm.getElementsByClass('Measure')
-        # m[1].notesAndRests[3].pitch.accidental.displayStatus = False
+        m = bm.getElementsByClass('Measure')
+        m[1].notesAndRests[3].pitch.accidental.displayStatus = False
         self.s = bm
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠁⠃⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -1892,7 +1897,7 @@ class Test(unittest.TestCase):
     def test_example10_5(self):
         bm = converter.parse("tinynotation: 3/4 g4. f8 e-4 B-4 b-4 g4 f2 g4 "
                              "e'-4. d'8 c'4 d'4 g4 bn4 "
-                             "d'4 c'4 c'4 a-4. g8 f4 c4 c'4 en4 f2.").flat
+                             "d'4 c'4 c'4 a-4. g8 f4 c4 c'4 en4 f2.").flatten()
         bm.insert(0, key.KeySignature(-3))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
@@ -2114,7 +2119,7 @@ class Test(unittest.TestCase):
         bm = converter.parse('''tinynotation: 4/4 r2. AA4 DD r d2~ d8 f e d c#4
             A B-2~ B-8 d cn B- A4 F D E
             F G8 A B-4 c#8 Bn c# d d e f a a4 g8 e c# g f d Bn f e c# A e d cn B- d
-            c4 B-8 A G4 F8 E D4 AA DD''').flat
+            c4 B-8 A G4 F8 E D4 AA DD''').flatten()
         bm.insert(0, key.KeySignature(-1))
         bm.insert(0, tempo.TempoText('Con brio'))
         bm.insert(25.0, clef.TrebleClef())
@@ -2264,7 +2269,7 @@ Barline final ⠣⠅
         bm = converter.parse('''tinynotation: 3/4 D4 E8 F#8 G8 A8 B4 A4 G8 F#8
             E8 D8 C#8 D8 E8 F#8 G4 A4 r4 B4 c#8 d8 e8 f#8 e4 d4 c#8 B8
             c#8 e8 d8 c#8 B8 A#8 B2 r4 f#4 d8 c#8 B4 e4 c#8 B8 A#4 d4 B8 An8 G#4 A2 r4
-            A4 G8 F#8 E8 D8 C#4 D4 E8 F#8 G8 A8 B8 A8 G8 F#8 E4 D4 r4''').flat
+            A4 G8 F#8 E8 D8 C#4 D4 E8 F#8 G8 A8 B8 A8 G8 F#8 E4 D4 r4''').flatten()
         bm.insert(0, key.KeySignature(2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.measure(9).insert(0, BrailleSegmentDivision())
@@ -2424,7 +2429,7 @@ Barline final ⠣⠅
 
     def test_example12_1(self):
         bm = converter.parse(
-            "tinynotation: 4/4 g4. f8 e4 d4 g4 f4 e4 r4 f4 g4 a4 b4 c'4 d'4 c'4 r4").flat
+            "tinynotation: 4/4 g4. f8 e4 d4 g4 f4 e4 r4 f4 g4 a4 b4 c'4 d'4 c'4 r4").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].notes[0].articulations.append(Fingering('5'))
@@ -2444,7 +2449,7 @@ Barline final ⠣⠅
         '''
 
     def test_example12_2(self):
-        bm = converter.parse("tinynotation: 4/4 g4. f8 e4 d g f e r f g a b c' d' c' r").flat
+        bm = converter.parse("tinynotation: 4/4 g4. f8 e4 d g f e r f g a b c' d' c' r").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[2]))
@@ -2461,7 +2466,7 @@ Barline final ⠣⠅
         '''
 
     def test_example12_3(self):
-        bm = converter.parse("tinynotation: 4/4 e-4. f8 g4 e- f g a- r g g e'- d' c'2. r4").flat
+        bm = converter.parse("tinynotation: 4/4 e-4. f8 g4 e- f g a- r g g e'- d' c'2. r4").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[2]))
@@ -2478,7 +2483,7 @@ Barline final ⠣⠅
         '''
 
     def test_example12_4(self):
-        bm = converter.parse("tinynotation: 12/8 e'4. c'4 g'8 g'4. f'4 e'8").flat
+        bm = converter.parse("tinynotation: 12/8 e'4. c'4 g'8 g'4. f'4 e'8").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[2]))
@@ -2494,24 +2499,19 @@ Barline final ⠣⠅
 
     def test_example12_5(self):
         bm = converter.parse("tinynotation: 3/4 a2 b4 a8 f'# e' d' c'# b a4 b8 c'# d' e' f'#2."
-                             ).flat
+                             ).flatten()
         bm.insert(0, key.KeySignature(2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[2].append(spanner.Slur(m[0].notes[0], m[2].notes[0]))
         m[3].append(spanner.Slur(m[2].notes[0], m[3].notes[0]))
         m[3].rightBarline = None
-
-        # need two copies because of a bug...
-        import copy
-        bmm = copy.deepcopy(bm)
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠰⠃⠐⠎⠺⠀⠊⠨⠛⠋⠑⠙⠚⠀⠰⠃⠘⠆⠪⠚⠙⠑⠋⠀⠟⠄⠘⠆
         '''
-        self.s = bmm
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -2519,7 +2519,7 @@ Barline final ⠣⠅
         '''
 
     def test_example12_6(self):
-        bm = converter.parse("tinynotation: 3/4 c'2~ c'8 d' d'2~ d'8 e'").flat
+        bm = converter.parse("tinynotation: 3/4 c'2~ c'8 d' d'2~ d'8 e'").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[2]))
@@ -2538,21 +2538,18 @@ Barline final ⠣⠅
         '''
 
     def test_example12_7(self):
-        bm = converter.parse("tinynotation: 3/4 f'2.~ f'8 c' d' c' b- a").flat
+        bm = converter.parse("tinynotation: 3/4 f'2.~ f'8 c' d' c' b- a").flatten()
         bm.insert(0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[-1].append(spanner.Slur(m[0].notes[0], m[-1].notes[-1]))
         m[-1].rightBarline = None
-        import copy
-        bmm = copy.deepcopy(bm)
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
         ⠰⠃⠨⠟⠄⠈⠉⠀⠛⠙⠑⠙⠚⠊⠘⠆
         '''
-        self.s = bmm
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
@@ -2560,21 +2557,18 @@ Barline final ⠣⠅
         '''
 
     def test_example12_8(self):
-        bm = converter.parse("tinynotation: 3/4 f'2.~ f'8 c' d' c' b- a").flat
+        bm = converter.parse("tinynotation: 3/4 f'2.~ f'8 c' d' c' b- a").flatten()
         bm.insert(0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass('Measure').last()
         ml.append(spanner.Slur(ml.notes.first(), ml.notes.last()))
         ml.rightBarline = None
-        import copy
-        bmm = copy.deepcopy(bm)
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀⠀
         ⠨⠟⠄⠈⠉⠀⠰⠃⠛⠙⠑⠙⠚⠊⠘⠆
         '''
-        self.s = bmm
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠣⠼⠉⠲⠀⠀⠀⠀⠀
@@ -2582,20 +2576,17 @@ Barline final ⠣⠅
         '''
 
     def test_example12_9(self):
-        bm = converter.parse("tinynotation: 3/4 e'8 f' g' f' e' d' c'2.~ c'4 r r").flat
+        bm = converter.parse("tinynotation: 3/4 e'8 f' g' f' e' d' c'2.~ c'4 r r").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[-1].append(spanner.Slur(m[0].notes[0], m[-1].notes[-1]))
         m[-1].rightBarline = None
-        import copy
-        bmm = copy.deepcopy(bm)
         self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠈⠉⠀⠹⠘⠆⠧⠧
         '''
-        self.s = bmm
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
@@ -2603,20 +2594,16 @@ Barline final ⠣⠅
         '''
 
     def test_example12_10(self):
-        bm = converter.parse("tinynotation: 3/4 e'8 f' g' f' e' d' c'2.~ c'4 r r").flat
+        bm = converter.parse("tinynotation: 3/4 e'8 f' g' f' e' d' c'2.~ c'4 r r").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[0]))
         m[-1].rightBarline = None
-        import copy
-        bmm = copy.deepcopy(bm)
-        self.s = bm
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠰⠃⠨⠋⠛⠓⠛⠋⠑⠀⠝⠄⠘⠆⠈⠉⠀⠹⠧⠧
         '''
-        self.s = bmm
         self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀
@@ -2624,7 +2611,7 @@ Barline final ⠣⠅
         '''
 
     def test_example12_11(self):
-        bm = converter.parse("tinynotation: 4/4 c4 c c c").flat
+        bm = converter.parse("tinynotation: 4/4 c4 c c c").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[0].append(spanner.Slur(m[0].notes[0], m[0].notes[1]))
@@ -2647,7 +2634,7 @@ Barline final ⠣⠅
 
     def test_example13_1(self):
         bm = converter.parse(
-            "tinynotation: 3/4 f2 e4 e4 d4 c4 a4. b-8 a4 g4 c8 d8 e8 f8 g4 f4 e4 f2.").flat
+            "tinynotation: 3/4 f2 e4 e4 d4 c4 a4. b-8 a4 g4 c8 d8 e8 f8 g4 f4 e4 f2.").flatten()
         bm.insert(0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
@@ -2664,7 +2651,7 @@ Barline final ⠣⠅
 
     def test_example13_2(self):
         bm = converter.parse(
-            "tinynotation: 4/4 d'#4 e'8 r b4 g a f# g fn8 e d e fn e f# g f# g# a#1").flat
+            "tinynotation: 4/4 d'#4 e'8 r b4 g a f# g fn8 e d e fn e f# g f# g# a#1").flatten()
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass('Measure')
@@ -2688,7 +2675,7 @@ Barline final ⠣⠅
 
     def xtest_example13_3(self):
         # Problem: How to plug in wedges into music21?
-        bm = converter.parse('tinynotation: a1 a1 a1 a1', 'c').flat
+        bm = converter.parse('tinynotation: a1 a1 a1 a1', 'c').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass('Measure')
         ml[-1].rightBarline = None
@@ -2702,7 +2689,7 @@ Barline final ⠣⠅
         # '''
 
     def test_example13_9(self):
-        bm = converter.parse("tinynotation: 4/4 g8 a b c' d' e' f' g'").flat
+        bm = converter.parse("tinynotation: 4/4 g8 a b c' d' e' f' g'").flatten()
         bm.insert(0.0, dynamics.Dynamic('f'))
         bm.insert(0.0, expressions.TextExpression('rush!'))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2716,7 +2703,7 @@ Barline final ⠣⠅
         '''
 
     def test_example13_10(self):
-        bm = converter.parse('tinynotation: 4/4 c4 c e c').flat
+        bm = converter.parse('tinynotation: 4/4 c4 c e c').flatten()
         bm.insert(0.0, dynamics.Dynamic('f'))
         bm.insert(0.0, expressions.TextExpression('(marc.)'))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2731,7 +2718,7 @@ Barline final ⠣⠅
 
     def xtest_example13_11(self):
         # Problem: How to braille the pp properly?
-        bm = converter.parse('tinynotation: 4/4 b-2 r f e- d1 r B-').flat
+        bm = converter.parse('tinynotation: 4/4 b-2 r f e- d1 r B-').flatten()
         bm.insert(0.0, key.KeySignature(-2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass('Measure')
@@ -2744,7 +2731,7 @@ Barline final ⠣⠅
 #         '''
 
     def test_example13_14(self):
-        bm = converter.parse("tinynotation: 3/4 e'4 e' f'# g'2. f'#8 d' a d' e' c'# d'2.").flat
+        bm = converter.parse("tinynotation: 3/4 e'4 e' f'# g'2. f'#8 d' a d' e' c'# d'2.").flatten()
         bm.insert(0.0, key.KeySignature(2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass('Measure')
@@ -2758,7 +2745,7 @@ Barline final ⠣⠅
         '''
 
     def test_example13_15(self):
-        bm = converter.parse("tinynotation: 2/4 d'8 c' b- a g2 b-4. a8 g4. b-8 a4. g8 f2").flat
+        bm = converter.parse("tinynotation: 2/4 d'8 c' b- a g2 b-4. a8 g4. b-8 a4. g8 f2").flatten()
         bm.insert(0.0, key.KeySignature(-2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass('Measure')
@@ -2772,7 +2759,7 @@ Barline final ⠣⠅
         '''
 
     def test_example13_16(self):
-        bm = converter.parse("tinynotation: 2/4 d'8 c' b- a g2 b-4. a8 g4. b-8 a4. g8 f2").flat
+        bm = converter.parse("tinynotation: 2/4 d'8 c' b- a g2 b-4. a8 g4. b-8 a4. g8 f2").flatten()
         bm.insert(0.0, key.KeySignature(-2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass('Measure')
@@ -2787,7 +2774,7 @@ Barline final ⠣⠅
         '''
 
     def test_example13_17(self):
-        bm = converter.parse("tinynotation: 3/4 g4 r g' g' e' c' f' d' b c'2.").flat
+        bm = converter.parse("tinynotation: 3/4 g4 r g' g' e' c' f' d' b c'2.").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass('Measure')
         ml[0].insert(2.0, expressions.TextExpression('rit. e dim.'))
@@ -2802,7 +2789,7 @@ Barline final ⠣⠅
 
     def test_example13_18(self):
         bm = converter.parse('tinynotation: 3/4 FF4 GG8 AA BB- C    '
-                             'D4 BB-8 C D E    F4 E8 D C4').flat
+                             'D4 BB-8 C D E    F4 E8 D C4').flatten()
         bm.insert(0.0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass('Measure')
@@ -2864,7 +2851,7 @@ Barline final ⠣⠅
         '''
 
     def xtest_example13_19(self):
-        bm = converter.parse("tinynotation: 3/4 c'8 d' c' b- a g a2.").flat
+        bm = converter.parse("tinynotation: 3/4 c'8 d' c' b- a g a2.").flatten()
         bm.insert(0.0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass('Measure')
@@ -2904,7 +2891,7 @@ Barline final ⠣⠅
 # Chapter 14: Symbols of Expression and Execution
 
     def test_example14_1(self):
-        bm = converter.parse("tinynotation: 4/4 f8 a c' a g c' e g").flat
+        bm = converter.parse("tinynotation: 4/4 f8 a c' a g c' e g").flatten()
         bm.notes[0].articulations.append(articulations.Accent())
         bm.notes[2].articulations.append(articulations.Accent())
         bm.notes[4].articulations.append(articulations.Accent())
@@ -2925,7 +2912,7 @@ Barline final ⠣⠅
         Reversed Accent because music21
         doesn't support the latter.
         '''
-        bm = converter.parse("tinynotation: 3/4 e'2. d'4 f' b c' e g c' d' d'# e'2.").flat
+        bm = converter.parse("tinynotation: 3/4 e'2. d'4 f' b c' e g c' d' d'# e'2.").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass('Measure')
         ml[2].append(spanner.Slur(bm[0].notes[0], bm[2].notes[0]))
@@ -2946,7 +2933,7 @@ Barline final ⠣⠅
     def test_example14_3(self):
         bm = converter.parse(
             "tinynotation: 4/4 d'8 e'- c' d' b- a- g f g4 e- e-2 "
-            "e-4~ e-8 r g4~ g8 r f4~ f e-~ e-8 r").flat
+            "e-4~ e-8 r g4~ g8 r f4~ f e-~ e-8 r").flatten()
         bm.insert(0, key.KeySignature(-3))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m0 = bm.getElementsByClass('Measure')[0]
@@ -2994,9 +2981,9 @@ Barline final ⠣⠅
         '''
 
     def test_example14_6(self):
-        bm = converter.parse('tinynotation: 3/4 F4 D8 F C E BB AA BB C D4 D8 E F4 r').flat
+        bm = converter.parse('tinynotation: 3/4 F4 D8 F C E BB AA BB C D4 D8 E F4 r').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-        for n in bm.flat.notes[1:-1]:
+        for n in bm.flatten().notes[1:-1]:
             n.articulations.append(articulations.Staccato())
         for n in bm[1].notes:
             n.articulations.append(articulations.Accent())
@@ -3048,7 +3035,7 @@ Barline final ⠣⠅
         '''
 
     def test_example14_7(self):
-        bm = converter.parse('tinynotation: 3/4 C4 E F').flat
+        bm = converter.parse('tinynotation: 3/4 C4 E F').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         for n in bm.getElementsByClass('Measure').first().notes:
             n.articulations.append(articulations.Accent())
@@ -3062,7 +3049,7 @@ Barline final ⠣⠅
         '''
 
     def test_example14_8(self):
-        bm = converter.parse('tinynotation: 3/4 G4 B c').flat
+        bm = converter.parse('tinynotation: 3/4 G4 B c').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         for n in bm.getElementsByClass('Measure').first().notes:
             # pass
@@ -3077,7 +3064,7 @@ Barline final ⠣⠅
         '''
 
     def test_example_14_14(self):
-        bm = converter.parse('tinynotation: 3/4 G4~ G8 F D BB C2.').flat
+        bm = converter.parse('tinynotation: 3/4 G4~ G8 F D BB C2.').flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.measure(1).notes[0].articulations.append(articulations.Fingering(2))
         bm.measure(1).notes[2].articulations.append(articulations.Fingering(1))
@@ -3092,7 +3079,7 @@ Barline final ⠣⠅
 
     def test_example_14_15(self):
         bm = converter.parse("tinynotation: 4/4 d'8 f' f'4 e'8 c' r4 "
-                             "d'2 r4 d'8 f'     e' c' d'2 r4").flat
+                             "d'2 r4 d'8 f'     e' c' d'2 r4").flatten()
         bm.insert(0, key.KeySignature(-1))
         sl = spanner.Slur(bm.notes[-5], bm.notes[-1])
         bm.insert(0, sl)
@@ -3132,7 +3119,7 @@ Barline final ⠣⠅
         bm = converter.parse(
             "tinynotation: 2/4 d'8 r16 e'16 d'8 r16 c'#16 "
             "d'4 b8 r8 b8 r16 c'16 b8 r16 a#16 b4 g8 r8"
-        ).flat
+        ).flatten()
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
@@ -3157,7 +3144,7 @@ Barline final ⠣⠅
 
     def test_example15_4(self):
         bm = converter.parse("tinynotation: 3/4 e'4~ e'8. f'16 d'8. e'16 c'4 c''4 c''4 "
-                             "g'#16 a'16 r8 e'16 f'16 r8 d'16 b16 r8 c'4 r4 r4").flat
+                             "g'#16 a'16 r8 e'16 f'16 r8 d'16 b16 r8 c'4 r4 r4").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
@@ -3170,11 +3157,11 @@ Barline final ⠣⠅
     def test_example15_5(self):
         bm = converter.parse("tinynotation: 3/8 r4 e16. b32 b8 a8 b8 b#8 c'#16 r16 e16. "
                              "c'#32 c'#8 b8 c'#8 c'#8 d'16 r16 d'8 d'4 e'16 f'#16 f'#16 "
-                             "b8. c'#8 e'8. d'16 c'#16 b16 a4").flat
+                             "b8. c'#8 e'8. d'16 c'#16 b16 a4").flatten()
         bm.insert(0, key.KeySignature(3))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure').first().padAsAnacrusis(useInitialRests=True)
-        # bm.getElementsByClass('Measure')[3][1].pitch.accidental.displayStatus = False
+        bm.getElementsByClass('Measure')[3][1].pitch.accidental.displayStatus = False
         # remove cautionary accidental display
         for m in bm:
             m.number -= 1
@@ -3188,7 +3175,7 @@ Barline final ⠣⠅
 
     def test_example15_6a(self):
         # beamed 16th notes
-        bm = converter.parse("tinynotation: 4/4 c16 B c d e d e f g g a b c' d' e' e'").flat
+        bm = converter.parse("tinynotation: 4/4 c16 B c d e d e f g g a b c' d' e' e'").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
@@ -3200,7 +3187,7 @@ Barline final ⠣⠅
 
     def test_example15_6b(self):
         # unbeamed 16th notes
-        bm = converter.parse("tinynotation: 4/4 c16 B c d e d e f g g a b c' d' e' e'").flat
+        bm = converter.parse("tinynotation: 4/4 c16 B c d e d e f g g a b c' d' e' e'").flatten()
         # not calling makeNotation because it calls makeBeams
         bm.makeMeasures(inPlace=True)
         bm.makeAccidentals(cautionaryNotImmediateRepeat=False, inPlace=True)
@@ -3213,7 +3200,7 @@ Barline final ⠣⠅
         '''
 
     def test_example15_7(self):
-        bm = converter.parse("tinynotation: 2/4 g16 d' c' b c'4 g16. f32 e16 d e4").flat
+        bm = converter.parse("tinynotation: 2/4 g16 d' c' b c'4 g16. f32 e16 d e4").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
@@ -3224,7 +3211,7 @@ Barline final ⠣⠅
         '''
 
     def test_example15_8(self):
-        bm = converter.parse("tinynotation: 2/4 G16 E F E G F r8 F16 D E D F E r8").flat
+        bm = converter.parse("tinynotation: 2/4 G16 E F E G F r8 F16 D E D F E r8").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
@@ -3236,7 +3223,7 @@ Barline final ⠣⠅
 
     def test_example15_9(self):
         bm = converter.parse("tinynotation: 2/4 r16 d' c' b c' d' e' c' b c' b a g "
-                             "f# g r g' f'# e' d' c' r b a g2").flat
+                             "f# g r g' f'# e' d' c' r b a g2").flatten()
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
@@ -3253,7 +3240,7 @@ Barline final ⠣⠅
         # Division of measure at end of line of "4/4" bar occurs
         #  in middle of measure, when in reality
         # it could occur 3/4 into the bar. Hypothetical example that might not be worth attacking.
-        bm = converter.parse("tinynotation: 4/4 g16 a g f e8 c d16 e f d e8 c").flat
+        bm = converter.parse("tinynotation: 4/4 g16 a g f e8 c d16 e f d e8 c").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         self.s = bm
@@ -3262,7 +3249,7 @@ Barline final ⠣⠅
 
     def test_example15_11(self):
         bm = converter.parse("tinynotation: 12/8 r1 r4 r8 b-8 e-16 e'- g- g'- b- b'- bn b'n "
-                             "b- b'- bn b'n b- b'- a'- f' d' b- e'-4.").flat
+                             "b- b'- bn b'n b- b'- a'- f' d' b- e'-4.").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         lastMeasure = bm.getElementsByClass('Measure').last()
         lastMeasure.rightBarline = None
@@ -3286,7 +3273,7 @@ Barline final ⠣⠅
 # Triplets
 # --------
     def test_example16_1(self):
-        bm = converter.parse("tinynotation: 2/4 trip{c8 e a} g4 trip{B8 d a} g4").flat
+        bm = converter.parse("tinynotation: 2/4 trip{c8 e a} g4 trip{B8 d a} g4").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         for i in (0, 1):
@@ -3301,7 +3288,7 @@ Barline final ⠣⠅
 
     def test_example16_2(self):
         bm = converter.parse("tinynotation: 3/4 b-4~ trip{b-8 c' f} trip{b- d' f} "
-                             "b-4~ trip{b-8 c' d'} trip{d' c' b-}").flat
+                             "b-4~ trip{b-8 c' d'} trip{d' c' b-}").flatten()
         bm.insert(0, key.KeySignature(-2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
@@ -3314,7 +3301,7 @@ Barline final ⠣⠅
 
     def test_example16_4(self):
         bm = converter.parse("tinynotation: 4/4 trip{c'8 b- a-} trip{a- b- c'} "
-                             "trip{b- c' b-} e-4").flat
+                             "trip{b- c' b-} e-4").flatten()
         bm.insert(0, key.KeySignature(-4))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m0 = bm.getElementsByClass('Measure').first()
@@ -3331,7 +3318,7 @@ Barline final ⠣⠅
 
     def xtest_example16_6(self):
         bm = converter.parse("tinynotation: 2/4 trip{b'-8 f' d'} trip{b- d' e'-} "
-                             "trip{f' d' b-} trip{f b- d'}").flat
+                             "trip{f' d' b-} trip{f b- d'}").flatten()
         bm.insert(0, key.KeySignature(-2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
@@ -3341,7 +3328,7 @@ Barline final ⠣⠅
 
     def test_example16_15(self):
         bm = converter.parse("tinynotation: 6/8 f#4 a8 d' c'# b quad{a g f# a} quad{g f# e g} "
-                             + "f# g b a f# e d2.").flat
+                             + "f# g b a f# e d2.").flatten()
         bm.insert(0, key.KeySignature(2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
@@ -3356,7 +3343,7 @@ Barline final ⠣⠅
     # Chapter 17: Measure Repeats, Full-Measure In-Accords
 
     def test_example17_1(self):
-        bm = converter.parse("tinynotation: 4/4 c4 e a g c e a g B d a g g1").flat
+        bm = converter.parse("tinynotation: 4/4 c4 e a g c e a g B d a g g1").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
@@ -3367,7 +3354,7 @@ Barline final ⠣⠅
         '''
 
     def test_example17_2(self):
-        bm = converter.parse("tinynotation: 4/4 g4 f# fn2 g4 f# fn2 e2 g2 e1").flat
+        bm = converter.parse("tinynotation: 4/4 g4 f# fn2 g4 f# fn2 e2 g2 e1").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         m0 = bm.getElementsByClass('Measure')[0]
@@ -3386,7 +3373,7 @@ Barline final ⠣⠅
         '''
 
     def test_example17_3(self):
-        bm = converter.parse("tinynotation: 3/4 c4 e g c e g c e g c'2.").flat
+        bm = converter.parse("tinynotation: 3/4 c4 e g c e g c e g c'2.").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
@@ -3397,7 +3384,7 @@ Barline final ⠣⠅
         '''
 
     def test_example17_4(self):
-        bm = converter.parse("tinynotation: 3/4 c4 e g c e g c e g a2.").flat
+        bm = converter.parse("tinynotation: 3/4 c4 e g c e g c e g a2.").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
@@ -3436,7 +3423,7 @@ Barline final ⠣⠅
 
     def test_example24_1a(self):
         self.method = measureToBraille
-        rightHand = converter.parse('tinynotation: 4/4 c2 e2').flat
+        rightHand = converter.parse('tinynotation: 4/4 c2 e2').flatten()
         rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = rightHand.getElementsByClass('Measure').first()
         m.rightBarline = None
@@ -3450,7 +3437,7 @@ Barline final ⠣⠅
 
     def test_example24_1b(self):
         self.method = measureToBraille
-        leftHand = converter.parse('tinynotation: 2/4 C8 r8 E8 r8').flat
+        leftHand = converter.parse('tinynotation: 2/4 C8 r8 E8 r8').flatten()
         leftHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
 
         m = leftHand.getElementsByClass('Measure').first()
@@ -3465,9 +3452,9 @@ Barline final ⠣⠅
     def test_example24_2(self):
         self.method = keyboardPartsToBraille
         rightHand = converter.parse("tinynotation: 2/4 c'8 g e g f g e a g "
-                                    "f e d e e d r e d e g f g a f e g g f e2").flat
+                                    "f e d e e d r e d e g f g a f e g g f e2").flatten()
         leftHand = converter.parse("tinynotation: 2/4 C8 G c B A B c c B A G B "
-                                   "c c B G c r B-4 A8 r c r c r B G c2").flat
+                                   "c c B G c r B-4 A8 r c r c r B G c2").flatten()
         rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         leftHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         keyboardPart = stream.Score()
@@ -3484,9 +3471,9 @@ Barline final ⠣⠅
 
     def test_example24_3(self):
         self.method = keyboardPartsToBraille
-        rightHand = converter.parse("tinynotation: 3/4 r2 d'4 d'8 e'-8 d'8 c'8 b-8 a8 g2 b-4").flat
+        rightHand = converter.parse("tinynotation: 3/4 r2 d'4 d'8 e'-8 d'8 c'8 b-8 a8 g2 b-4").flatten()
         leftHand = converter.parse("tinynotation: 3/4 r2 B-8 A G r B- r d "
-                                   "r G A B- c d4").flat
+                                   "r G A B- c d4").flatten()
         rightHand.insert(0, key.KeySignature(-2))
         leftHand.insert(0, key.KeySignature(-2))
         rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -3521,10 +3508,11 @@ Barline final ⠣⠅
         self.method = keyboardPartsToBraille
         rightHand = converter.parse("tinynotation: 4/4 d'16 b16 a16 f#16 e4~ e16 d16 A16 d16 e4 "
                                     "c#16 B16 c#16 d16 e16 g16 f#16 e16 f#16 e16 f#16 g16 a16 "
-                                    "b16 c'#16 d'16 e'16 d'16 c'#16 b16 a16 g16 f#16 e16 d2").flat
+                                    "b16 c'#16 d'16 e'16 d'16 c'#16 b16 a16 g16 f#16 e16 d2"
+                                    ).flatten()
         leftHand = converter.parse("tinynotation: 4/4 d'4~ d'16 c'#16 b16 g16 f#4~ f#16 g16 "
                                    "b16 g16 a4 c'#4 d'8 d'16 e'16 f'#16 g'16 e'16 f'#16 g'4 "
-                                   "c'#4 r16 a16 f#16 e16 d4").flat
+                                   "c'#4 r16 a16 f#16 e16 d4").flatten()
         rightHand.transpose('P8', inPlace=True)
         rightHand.insert(0, key.KeySignature(2))
         leftHand.insert(0, key.KeySignature(2))
@@ -3548,8 +3536,8 @@ Barline final ⠣⠅
 
     def xtest_example24_5(self):
         rightHand = converter.parse("tinynotation: 2/4 trip{d'-8 c' b-} trip{f8 b- d'-} "
-                                    "trip{c'8 an f} trip{c'8 d'- e'-} d'-4").flat
-        leftHand = converter.parse("tinynotation: 2/4 B-4 B- An F B-2").flat
+                                    "trip{c'8 an f} trip{c'8 d'- e'-} d'-4").flatten()
+        leftHand = converter.parse("tinynotation: 2/4 B-4 B- An F B-2").flatten()
         rightHand.insert(0, key.KeySignature(-5))
         leftHand.insert(0, key.KeySignature(-5))
         rightHand.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)

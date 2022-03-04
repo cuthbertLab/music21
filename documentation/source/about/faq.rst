@@ -9,7 +9,7 @@ General
 How do I ask a question so that it becomes frequently asked?
 
     Don't you hate FAQs that are not based on anything anyone's ever asked?  
-    To ask, post to http://groups.google.com/group/music21list.  
+    To ask, post to https://groups.google.com/g/music21list.  
     But first read what we've already come up with below.
 
 Why is it called `music21`?
@@ -37,7 +37,7 @@ Why is it called `music21`?
     and music.  
     
     I'm pretty tickled that the new naming convention is getting an hommage
-    in Anas Ghrab's music22 package: https://pypi.python.org/pypi/music22
+    in Anas Ghrab's music22 package: https://pypi.org/project/music22
     
     
 What is the native `music21` data format?
@@ -79,8 +79,8 @@ What is the native `music21` data format?
     * For data that cannot easily be recreated but needs long-term storage and sharing, 
       try saving the relevant 
       parts of the data in an XML, json, or even CSV(!) format. 
-      See plistlib http://docs.python.org/dev/library/plistlib.html 
-      or http://code.activestate.com/recipes/440595. You cannot store every 
+      See plistlib https://docs.python.org/dev/library/plistlib.html 
+      or https://code.activestate.com:443/recipes/440595. You cannot store every 
       element of python's object structure, 
       but you should easily be able to store the parts that are difficult to recreate. 
       `Music21` has some facility for a JSON storage of Streams, but it is not complete.
@@ -95,7 +95,7 @@ Can I synthesize new sounds with `music21`?
 
     Yes, and no.  `Music21` is primarily built for manipulating symbolic 
     musical data not sound waves.  There are lots of great programs for
-    doing that.  But the symbolic data, however, be used as data within 
+    doing that.  But the symbolic data, however, can be used as data within 
     a large variety of synthesis packages. So you could create new
     `music21` objects that control the synthesis package of your choosing.   
     
@@ -168,7 +168,7 @@ What is MusicXML?
     It was created by Recordare (Michael Good, CEO) and now run by the W3C. More 
     information about the project can be found at:
 
-    * http://www.musicxml.com/
+    * https://www.musicxml.com/
 
 And this Humdrum about which you speak?
 
@@ -180,7 +180,7 @@ And this Humdrum about which you speak?
 
     Information on Humdrum can be found here at the following links:
 
-    * http://www.humdrum.org
+    * https://www.humdrum.org
     * http://kern.humdrum.org
 
 

@@ -13,7 +13,9 @@ import unittest
 from typing import List
 
 # from music21 import articulations
+from music21 import articulations
 from music21 import clef
+from music21 import duration
 from music21 import environment
 from music21 import exceptions21
 from music21 import interval
@@ -32,6 +34,17 @@ symbols = lookup.symbols
 environRules = environment.Environment('basic.py')
 
 beamStatus = {}
+
+# Attributes that the translator currently sets on Music21Objects
+# that should be cleaned up after transcription
+TEMPORARY_ATTRIBUTES = ['beginLongBracketSlur',
+                        'endLongBracketSlur',
+                        'beginLongDoubleSlur',
+                        'endLongDoubleSlur',
+                        'shortSlur',
+                        'beamStart',
+                        'beamContinue']
+
 # ------------------------------------------------------------------------------
 # music21Object to braille unicode methods
 
@@ -517,7 +530,11 @@ def yieldBrailleArticulations(noteEl):
     "When a staccato or staccatissimo is shown with any of the other
     [before note expressions], it is brailled first."
 
-    Beyond that, we yield in alphabetical order
+    "The up-bow and down-bow marks for bowed string instruments are brailled before any other
+    signs from Column A and before an ornament." (BMTM, 114)
+
+    Beyond that, we yield in alphabetical order, which happens to satisfy this:
+    "When an accent is shown with a tenuto, the accent is brailled first." (BMTM, 113)
 
     For reference:
 
@@ -529,31 +546,46 @@ def yieldBrailleArticulations(noteEl):
     >>> print(brailleArt['accent'])
     ⠨⠦
 
+    >>> brailleBowings = braille.lookup.bowingSymbols
+    >>> print(brailleBowings['down bow'])
+    ⠣⠃
+    >>> print(brailleBowings['up bow'])
+    ⠣⠄
+
     >>> n = note.Note()
+    >>> n.articulations.append(articulations.DownBow())
     >>> n.articulations.append(articulations.Tenuto())
     >>> n.articulations.append(articulations.Staccato())
     >>> n.articulations.append(articulations.Accent())
+    >>> n.articulations.append(articulations.Scoop())  # example unsupported articulation
 
-    This will yield in order: Staccato, Accent, Tenuto.
+    This will yield in order: DownBow, Staccato, Accent, Tenuto.
 
     >>> for brailleArt in braille.basic.yieldBrailleArticulations(n):
     ...     print(brailleArt)
+    ⠣⠃
     ⠦
     ⠨⠦
     ⠸⠦
 
     '''
     def _brailleArticulationsSortKey(inner_articulation):
-        isStaccato = (inner_articulation.name not in ('staccato', 'staccatissimo'))
-        return (isStaccato, inner_articulation.name)
+        isBowing = isinstance(inner_articulation, articulations.Bowing)
+        isStaccato = isinstance(inner_articulation, articulations.Staccato)
+        # need True to sort before False (reverse alphabetical)
+        return (not isBowing, not isStaccato, inner_articulation.name)
 
     if hasattr(noteEl, 'articulations'):  # should be True, but safe side.
         for art in sorted(noteEl.articulations, key=_brailleArticulationsSortKey):
-            if art.name in lookup.beforeNoteExpr:
+            if art.name in lookup.bowingSymbols:
+                brailleArt = lookup.bowingSymbols[art.name]
+            elif art.name in lookup.beforeNoteExpr:
                 brailleArt = lookup.beforeNoteExpr[art.name]
-                if 'brailleEnglish' in noteEl.editorial:
-                    noteEl.editorial.brailleEnglish.append(f'Articulation {art.name} {brailleArt}')
-                yield brailleArt
+            else:
+                continue
+            if 'brailleEnglish' in noteEl.editorial:
+                noteEl.editorial.brailleEnglish.append(f'Articulation {art.name} {brailleArt}')
+            yield brailleArt
 
 
 def noteToBraille(
@@ -647,15 +679,8 @@ def noteToBraille(
     # Note: beamStatus is a helper that I hope to remove
     # when moving all the translation features to a separate class.
     music21Note.editorial.brailleEnglish = []
-    falseKeywords = ['beginLongBracketSlur',
-                     'endLongBracketSlur',
-                     'beginLongDoubleSlur',
-                     'endLongDoubleSlur',
-                     'shortSlur',
-                     'beamStart',
-                     'beamContinue']
 
-    for keyword in falseKeywords:
+    for keyword in TEMPORARY_ATTRIBUTES:
         try:
             beamStatus[keyword] = getattr(music21Note, keyword)
         except AttributeError:
@@ -704,7 +729,7 @@ def noteToBraille(
             beamStatus['beamContinue'] = False
 
     # signs of expression or execution that precede a note
-    # articulations
+    # articulations and bowings
     # -------------
     for brailleArticulation in yieldBrailleArticulations(music21Note):
         noteTrans.append(brailleArticulation)
@@ -743,7 +768,7 @@ def noteToBraille(
 
     # note duration
     # -------------
-    if 'GraceDuration' in music21Note.duration.classes:
+    if isinstance(music21Note.duration, duration.GraceDuration):
         # TODO: Short Appoggiatura mark...
         nameWithDuration = notesInStep['eighth']
         noteTrans.append(nameWithDuration)
@@ -1093,7 +1118,7 @@ def showOctaveWithNote(previousNote, currentNote):
 
 
     Of course, these rules cease to apply in quite a few cases, which are not directly reflected
-    in the results of this method:
+    in the results of this function:
 
 
     1) If a braille measure goes to a new line, the first note in the measure carries an
@@ -1109,7 +1134,7 @@ def showOctaveWithNote(previousNote, currentNote):
        those cases needs an octave marking.
 
 
-    If any special case happens, previousNote can be set to None and the method will return
+    If any special case happens, previousNote can be set to None and the function will return
     True.
 
 
@@ -1132,7 +1157,7 @@ def showOctaveWithNote(previousNote, currentNote):
         return True
     i = interval.notesToInterval(previousNote, currentNote)
     isSixthOrGreater = i.generic.undirected >= 6
-    isFourthOrFifth = i.generic.undirected == 4 or i.generic.undirected == 5
+    isFourthOrFifth = i.generic.undirected in (4, 5)
     sameOctaveAsPrevious = previousNote.octave == currentNote.octave
     doShowOctave = False
     if isSixthOrGreater or (isFourthOrFifth and not sameOctaveAsPrevious):
@@ -1268,10 +1293,7 @@ def transcribeHeading(
 
 def transcribeNoteFingering(sampleNoteFingering='1', upperFirstInFingering=True):
     '''
-    Takes in a note fingering, an attribute :attr:`~music21.note.Note.editorial.fingering`, and
-    returns its correct transcription to braille. Fingering is not officially supported
-    by music21, but it is described in Chapter 9 of the "Introduction to Braille Music
-    Transcription" manual.
+    Takes in a note fingering and returns its correct transcription to braille.
 
     >>> from music21.braille import basic
     >>> print(basic.transcribeNoteFingering('4'))
@@ -1422,10 +1444,10 @@ def brailleUnicodeToBrailleAscii(brailleUnicode):
     which is the format compatible with most braille embossers.
 
 
-    .. note:: The method works by corresponding braille symbols to ASCII symbols.
-        The table which corresponds said values can be found
-        `here <http://en.wikipedia.org/wiki/Braille_ASCII#Braille_ASCII_values>`_.
-        Because of the way in which the braille symbols translate2, the resulting
+    .. note:: The function works by corresponding braille symbols to ASCII symbols.
+        The table which corresponds to said values can be found
+        `here <https://en.wikipedia.org/wiki/Braille_ASCII#Braille_ASCII_values>`_.
+        Because of the way in which the braille symbols translate, the resulting
         ASCII string will look to a non-reader as gibberish. Also, the eighth-note notes
         in braille
         music are one-off their corresponding letters in both ASCII and written braille.
@@ -1463,7 +1485,7 @@ def brailleAsciiToBrailleUnicode(brailleAscii):
     can then be displayed on-screen in braille on compatible systems.
 
 
-    .. note:: The method works by corresponding ASCII symbols to braille
+    .. note:: The function works by corresponding ASCII symbols to braille
         symbols in a very direct fashion. It is not a translator from plain
         text to braille, because ASCII symbols may not correspond to their
         equivalents in braille. For example, a literal period is a 4 in

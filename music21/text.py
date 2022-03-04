@@ -31,7 +31,7 @@ environLocal = environment.Environment(_MOD)
 # using ISO 639-1 Code from here:
 # http://www.loc.gov/standards/iso639-2/php/code_list.php
 # nice article reference here:
-# http://en.wikipedia.org/wiki/Article_(grammar)
+# https://en.wikipedia.org/wiki/Article_(grammar)
 # noinspection SpellCheckingInspection
 articleReference = {
     # arabic
@@ -87,7 +87,7 @@ def assembleLyrics(streamIn, lineNumber=1):
     '''
     word = []
     words = []
-    noteStream = streamIn.flat.notesAndRests
+    noteStream = streamIn.flatten().notesAndRests
     # need to find maximum number of lyrics on each note
     for n in noteStream:
         try:
@@ -361,7 +361,7 @@ class LanguageDetector:
     Attempts to detect language on the basis of trigrams
 
     uses code from
-    http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
+    https://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
     unknown author.  No license given.
 
     See Trigram docs below.
@@ -385,7 +385,7 @@ class LanguageDetector:
     def readExcerpts(self):
         for languageCode in self.languageCodes:
             thisExcerpt = (common.getSourceFilePath() / 'languageExcerpts'
-                            / (languageCode + '.txt'))
+                            / 'trainingData' / (languageCode + '.txt'))
 
             with thisExcerpt.open(encoding='utf-8') as f:
                 excerptWords = f.read().split()
@@ -465,7 +465,7 @@ class Trigram:
     # noinspection SpellCheckingInspection
     '''
     See LanguageDetector above.
-    From http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
+    From https://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
 
     The frequency of three character
     sequences is calculated.  When treated as a vector, this information
@@ -610,7 +610,8 @@ class Trigram:
 class Test(unittest.TestCase):
 
     def testBasic(self):
-        from music21 import converter, corpus
+        from music21 import converter
+        from music21 import corpus
 
         a = converter.parse(corpus.getWork('haydn/opus1no1/movement4.xml'))
         post = assembleLyrics(a)
@@ -622,7 +623,8 @@ class Test(unittest.TestCase):
 
 
     def testAssembleLyricsA(self):
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         s = stream.Stream()
         for syl in ['hel-', '-lo', 'a-', '-gain']:
             n = note.Note()

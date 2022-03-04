@@ -9,10 +9,14 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-from typing import Any, Type
+import contextlib
+from typing import Any, Type, Dict
 
 # from music21 import exceptions21
-__all__ = ['isNum', 'isListLike', 'isIterable', 'classToClassStr', 'getClassSet']
+__all__ = [
+    'isNum', 'isListLike', 'isIterable', 'classToClassStr', 'getClassSet',
+    'tempAttribute', 'saveAttributes',
+]
 
 
 def isNum(usrData: Any) -> bool:
@@ -102,13 +106,21 @@ def isIterable(usrData: Any) -> bool:
 
     >>> common.isIterable(range(20))
     True
+
+    Classes are not iterable even if their instances are:
+
+    >>> common.isIterable(stream.Stream)
+    False
+
+    Changed in v7.3 -- Classes (not instances) are not iterable
     '''
-    if hasattr(usrData, "__iter__"):
-        if isinstance(usrData, (str, bytes)):
+    if isinstance(usrData, (str, bytes)):
+        return False
+    if hasattr(usrData, '__iter__'):
+        if usrData.__class__ is type:
             return False
         return True
-    else:
-        return False
+    return False
 
 
 def classToClassStr(classObj: Type) -> str:
@@ -120,7 +132,7 @@ def classToClassStr(classObj: Type) -> str:
     'Chord'
     '''
     # remove closing quotes
-    return str(classObj).split('.')[-1][:-2]
+    return str(classObj).rsplit('.', maxsplit=1)[-1][:-2]
 
 
 def getClassSet(instance, classNameTuple=None):
@@ -165,6 +177,67 @@ def getClassSet(instance, classNameTuple=None):
     classList = classNameList + classObjList + classListFQ
     classSet = frozenset(classList)
     return classSet
+
+
+TEMP_ATTRIBUTE_SENTINEL = object()
+
+
+@contextlib.contextmanager
+def tempAttribute(obj, attribute: str, new_val=TEMP_ATTRIBUTE_SENTINEL):
+    '''
+    Temporarily set an attribute in an object to another value
+    and then restore it afterwards.
+
+    >>> p = pitch.Pitch('C4')
+    >>> p.midi
+    60
+    >>> with common.classTools.tempAttribute(p, 'nameWithOctave', 'D#5'):
+    ...     p.midi
+    75
+    >>> p.nameWithOctave
+    'C4'
+
+    Setting to a new value is optional.
+
+    For working with multiple attributes see :func:`~music21.classTools.saveAttributes`.
+
+    New in v7.
+    '''
+    tempStorage = getattr(obj, attribute)
+    if new_val is not TEMP_ATTRIBUTE_SENTINEL:
+        setattr(obj, attribute, new_val)
+    try:
+        yield
+    finally:
+        setattr(obj, attribute, tempStorage)
+
+@contextlib.contextmanager
+def saveAttributes(obj, *attributeList):
+    '''
+    Save a number of attributes in an object and then restore them afterwards.
+
+    >>> p = pitch.Pitch('C#2')
+    >>> with common.classTools.saveAttributes(p, 'name', 'accidental'):
+    ...     p.step = 'E'
+    ...     p.accidental = pitch.Accidental('flat')
+    ...     p.nameWithOctave
+    'E-2'
+    >>> p.nameWithOctave
+    'C#2'
+
+    For storing and setting a value on a single attribute see
+    :func:`~music21.classTools.tempAttribute`.
+
+    New in v7.
+    '''
+    tempStorage: Dict[str, Any] = {}
+    for attribute in attributeList:
+        tempStorage[attribute] = getattr(obj, attribute)
+    try:
+        yield
+    finally:
+        for k, v in tempStorage.items():  # dicts are ordered in 3.7
+            setattr(obj, k, v)
 
 
 # ------------------------------------------------------------------------------

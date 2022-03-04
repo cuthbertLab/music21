@@ -25,7 +25,7 @@ import enum
 import math
 import re
 import unittest
-from typing import Union, Tuple, Optional
+from typing import Dict, Union, Tuple, Optional
 
 from music21 import base
 from music21 import common
@@ -63,7 +63,7 @@ niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished'
                  'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented',
                  'Triply-Diminished', 'Quadruply-Augmented', 'Quadruply-Diminished']
 
-prefixSpecs = [None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd', 'AAAA', 'dddd']
+prefixSpecs = (None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd', 'AAAA', 'dddd')
 
 class Specifier(enum.IntEnum):
     '''
@@ -305,7 +305,7 @@ class IntervalException(exceptions21.Music21Exception):
 # some utility functions
 
 
-def _extractPitch(nOrP):
+def _extractPitch(nOrP: Union['music21.note.Note', 'music21.pitch.Pitch']):
     '''
     utility function to return either the object itself
     or the `.pitch` if it's a Note.
@@ -318,10 +318,10 @@ def _extractPitch(nOrP):
     True
 
     '''
-    if 'Pitch' in nOrP.classes:
-        return nOrP
-    else:
+    from music21 import note
+    if isinstance(nOrP, note.Note):
         return nOrP.pitch
+    return nOrP
 
 
 def convertStaffDistanceToInterval(staffDist):
@@ -461,8 +461,10 @@ def parseSpecifier(value: Union[str, int, Specifier]) -> Specifier:
     # permit specifiers as prefixes without case; this will not distinguish
     # between m and M, but was taken care of in the line above
     if value.lower() in [x.lower() for x in prefixSpecs[1:]]:
-        for i in range(1, len(prefixSpecs)):
-            if value.lower() == prefixSpecs[i].lower():
+        for i, prefix in enumerate(prefixSpecs):
+            if prefix is None:
+                continue
+            if value.lower() == prefix.lower():
                 return Specifier(i)
 
     if value.lower() in [x.lower() for x in niceSpecNames[1:]]:
@@ -620,7 +622,7 @@ def convertSemitoneToSpecifierGeneric(count: int) -> Tuple[Specifier, int]:
     return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
 
 
-_pythagorean_cache = {}
+_pythagorean_cache: Dict[str, Fraction] = {}
 
 
 def intervalToPythagoreanRatio(intervalObj):
@@ -715,6 +717,14 @@ class IntervalBase(base.Music21Object):
 
     @abc.abstractmethod
     def transposePitch(self, pitch1, *, inPlace=False):
+        '''
+        IntervalBase does not know how to do this, so it must be overridden in
+        derived classes.
+        '''
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def reverse(self):
         '''
         IntervalBase does not know how to do this, so it must be overridden in
         derived classes.
@@ -1622,16 +1632,16 @@ class DiatonicInterval(IntervalBase):
 
     def __init__(self,
                  specifier: Union[str, int] = 'P',
-                 generic: Union[int, GenericInterval] = 1):
+                 generic: Union[int, GenericInterval, str] = 1):
         super().__init__()
 
         self.generic: GenericInterval
         self.specifier: Specifier
 
-        if common.isNum(generic) or isinstance(generic, str):
-            self.generic = GenericInterval(generic)
-        elif isinstance(generic, GenericInterval):
+        if isinstance(generic, GenericInterval):
             self.generic = generic
+        elif common.isNum(generic) or isinstance(generic, str):
+            self.generic = GenericInterval(generic)
         else:  # pragma: no cover
             # too rare to cover.
             raise IntervalException(f'incorrect generic argument: {generic!r}')
@@ -4137,7 +4147,7 @@ class Test(unittest.TestCase):
 
         def collectAccidentalDisplayStatus(s_inner):
             post = []
-            for e in s_inner.flat.notes:
+            for e in s_inner.flatten().notes:
                 if e.pitch.accidental is not None:
                     post.append(e.pitch.accidental.displayStatus)
                 else:  # mark as not having an accidental
@@ -4154,7 +4164,7 @@ class Test(unittest.TestCase):
                           False, False, False, 'x', 'x', 'x', False, False, False,
                           'x', 'x', 'x', 'x', True, False])
 
-        sTransposed = sSub.flat.transpose('p5')
+        sTransposed = sSub.flatten().transpose('p5')
         # sTransposed.show()
 
         self.assertEqual(collectAccidentalDisplayStatus(sTransposed),
@@ -4163,7 +4173,8 @@ class Test(unittest.TestCase):
                           None, 'x', 'x', 'x', None, None, None])
 
     def testIntervalMicrotonesA(self):
-        from music21 import interval, pitch
+        from music21 import interval
+        from music21 import pitch
 
         i = interval.Interval('m3')
         self.assertEqual(i.chromatic.cents, 300)
@@ -4266,7 +4277,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(p2), 'E`5(+15c)')
 
     def testIntervalMicrotonesB(self):
-        from music21 import interval, note
+        from music21 import interval
+        from music21 import note
         i = interval.Interval(note.Note('c4'), note.Note('c#4'))
         self.assertEqual(str(i), '<music21.interval.Interval A1>')
 
@@ -4274,7 +4286,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(i), '<music21.interval.Interval A1 (-50c)>')
 
     def testDescendingAugmentedUnison(self):
-        from music21 import interval, note
+        from music21 import interval
+        from music21 import note
         ns = note.Note('C4')
         ne = note.Note('C-4')
         i = interval.Interval(noteStart=ns, noteEnd=ne)
@@ -4282,7 +4295,8 @@ class Test(unittest.TestCase):
         self.assertEqual(directedNiceName, 'Descending Diminished Unison')
 
     def testTransposeWithChromaticInterval(self):
-        from music21 import interval, note
+        from music21 import interval
+        from music21 import note
         ns = note.Note('C4')
         i = interval.ChromaticInterval(5)
         n2 = ns.transpose(i)
@@ -4294,7 +4308,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n2.nameWithOctave, 'F4')
 
     def testIntervalWithOneNoteGiven(self):
-        from music21 import interval, note
+        from music21 import interval
+        from music21 import note
         noteC = note.Note('C4')
         i = interval.Interval(name='P4', noteStart=noteC)
         self.assertEqual(i.noteEnd.nameWithOctave, 'F4')

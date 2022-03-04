@@ -30,6 +30,7 @@ import tempfile
 import unittest
 
 from typing import Union
+from typing import Optional
 
 import xml.etree.ElementTree as ET
 from xml.sax import saxutils
@@ -407,6 +408,7 @@ class _EnvironmentCore:
             for name, value in [
                 ('lilypondPath', '/usr/bin/lilypond'),
                 ('musicxmlPath', '/usr/bin/mscore3'),
+                ('musescoreDirectPNGPath', '/usr/bin/mscore3'),
                 ('graphicsPath', '/usr/bin/xdg-open'),
                 ('pdfPath', '/usr/bin/xdg-open')
             ]:
@@ -426,11 +428,23 @@ class _EnvironmentCore:
                 ('graphicsPath', previewLocation),
                 ('vectorPath', previewLocation),
                 ('pdfPath', previewLocation),
-                ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
+                ('midiPath', '/Applications/GarageBand.app'),
                 ('musescoreDirectPNGPath',
                  '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
             ]:
                 self.__setitem__(name, value)  # use for key checking
+
+    def _checkAccessibility(self, path: Optional[Union[str, pathlib.Path]]) -> bool:
+        '''
+        Return True if the path exists, is readable and writable.
+        '''
+        if isinstance(path, (pathlib.Path, str)):
+            exists = os.path.exists(path)
+            readable = os.access(path, os.R_OK)
+            writable = os.access(path, os.W_OK)
+            return (exists and readable and writable)
+        else:
+            return False
 
     def toSettingsXML(self, ref=None):
         '''
@@ -506,26 +520,46 @@ class _EnvironmentCore:
         True
 
         If failed to create the subdirectory (OSError is raised), this function
-        will return a temporary directory which is created by
+        will return (1), for Linux and Mac platforms, a subdirectory under the
+        system temp directory which is named with 'music21-userid-$UID' or (2),
+        for other platforms, a temporary directory which is created by
         tempfile.mkdtemp(prefix="music21-"), which is named with 'music21-'
-        plus 8 hashed codes. The location of this directory depends on OS.
+        plus 8 hashed codes, and (3) if failing for both above, it will return
+        the directory from tempfile.gettempdir(). The location of this directory
+        depends on OS.
 
-        Note the temporary dirctory will be different in each python session.
+        Note the temporary directory may be different in each python session.
         '''
-        if self.defaultRootTempDir is not None and self.defaultRootTempDir.exists():
+        if self._checkAccessibility(self.defaultRootTempDir):
             return self.defaultRootTempDir
 
         # this returns the root temp dir; this does not create a new dir
         self.defaultRootTempDir = pathlib.Path(tempfile.gettempdir()) / 'music21'
-        # if this path already exists, we have nothing more to do
-        if self.defaultRootTempDir.exists():
+
+        # if this path already exists, readable and writable, we have nothing more to do
+        if self._checkAccessibility(self.defaultRootTempDir):
             return self.defaultRootTempDir
         else:
             # make this directory as a temp directory
             try:
                 self.defaultRootTempDir.mkdir()
-            except OSError:
-                self.defaultRootTempDir = pathlib.Path(tempfile.mkdtemp(prefix="music21-"))
+            except OSError:  # directory already exists or permission denied
+                if common.getPlatform() in ['nix', 'darwin']:
+                    uid = os.getuid()
+                    dir_path = pathlib.Path(tempfile.gettempdir()) / f'music21-userid-{uid}'
+                else:
+                    dir_path = pathlib.Path(tempfile.mkdtemp(prefix="music21-"))
+
+                if self._checkAccessibility(dir_path):
+                    self.defaultRootTempDir = dir_path
+                else:
+                    try:
+                        dir_path.mkdir()
+                        self.defaultRootTempDir = dir_path
+                    except OSError:  # pragma: no cover
+                        # Give up and use /tmp
+                        self.defaultRootTempDir = pathlib.Path(tempfile.gettempdir())
+
             return self.defaultRootTempDir
 
     def getKeysToPaths(self):
@@ -622,34 +656,24 @@ class _EnvironmentCore:
 
         OMIT_FROM_DOCS
         >>> e = environment.Environment()
-        >>> isinstance(e.getTempFile(returnPathlib=False), str)
+        >>> tmp1 = e.getTempFile(returnPathlib=False)
+        >>> isinstance(tmp1, str)
         True
         >>> import pathlib
-        >>> isinstance(e.getTempFile(), pathlib.Path)
+        >>> tmp2 = e.getTempFile()
+        >>> isinstance(tmp2, pathlib.Path)
         True
+        >>> import os
+        >>> os.remove(tmp1)
+        >>> os.remove(tmp2)
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
         if suffix and not suffix.startswith('.'):
             suffix = '.' + suffix
 
-        try:
-            with tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix, delete=False) as ntf:
-                ntf_name = ntf.name
-        except PermissionError:
-            # On Linux, only the user who created /tmp/music21 has write access by default
-            # So create a new user-specific directory
-            import getpass
-            newDir = rootDir.parent / f'music21-{getpass.getuser()}'
-            if not newDir.exists():
-                try:
-                    newDir.mkdir()
-                except OSError:  # pragma: no cover
-                    # Give up and use /tmp
-                    newDir = rootDir.parent
-
-            with tempfile.NamedTemporaryFile(dir=newDir, suffix=suffix, delete=False) as ntf:
-                ntf_name = ntf.name
+        with tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix, delete=False) as ntf:
+            ntf_name = ntf.name
 
         if returnPathlib:
             return pathlib.Path(ntf_name)
@@ -765,14 +789,11 @@ class _EnvironmentCore:
 # -----------------------------------------------------------------------------
 
 
-# store one instance of _EnvironmentCore within this module
+# store one singleton instance of _EnvironmentCore within this module
 # this is a module-level implementation of the singleton pattern
 # reloading the module will force a recreation of the module
 # noinspection PyDictCreation
-_environStorage = {'instance': None, 'forcePlatform': None}
-
-# create singleton instance
-_environStorage['instance'] = _EnvironmentCore()
+_environStorage = {'instance': _EnvironmentCore(), 'forcePlatform': None}
 
 
 def envSingleton():
@@ -1105,6 +1126,7 @@ class Environment:
         Returns an xmlReaderType depending on the 'musicxmlPath'
 
         >>> a = environment.Environment()
+        >>> original = a['musicxmlPath']  #_DOCS_HIDE
         >>> a['musicxmlPath'] = '/Applications/Musescore.app'
         >>> a.xmlReaderType()
         'Musescore'
@@ -1124,6 +1146,8 @@ class Environment:
         >>> a['musicxmlPath'] = None
         >>> a.xmlReaderType() is None
         True
+
+        >>> a['musicxmlPath'] = original  #_DOCS_HIDE
         '''
         xp = self['musicxmlPath']
         if common.runningUnderIPython():
@@ -1420,7 +1444,7 @@ class Test(unittest.TestCase):
   <localCorporaSettings />
   <localCorpusSettings />
   <preference name="manualCoreCorpusPath" />
-  <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
+  <preference name="midiPath" value="/Applications/GarageBand.app" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
@@ -1475,7 +1499,7 @@ class Test(unittest.TestCase):
     <localCorpusPath>c</localCorpusPath>
   </localCorpusSettings>
   <preference name="manualCoreCorpusPath" />
-  <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
+  <preference name="midiPath" value="/Applications/GarageBand.app" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
@@ -1561,30 +1585,51 @@ class Test(unittest.TestCase):
         self.assertEqual(list(env['localCorpusSettings']), ['/a', '/b'])
 
     @unittest.skipUnless(
-        os.access(Environment().getDefaultRootTempDir(), stat.S_IRWXU),
-        'test will programmatically set read/write/exec permissions on this dir'
+        common.getPlatform() in ['nix', 'darwin'],
+        'os.getuid can be called only on Unix platforms'
     )
-    @unittest.skipIf(
-        common.getPlatform() == 'win',
-        'os.chmod does not have the intended effect on Windows'
-    )
-    def testGetTempFile(self):
-        import getpass
+    def testGetDefaultRootTempDir(self):
         import stat
 
         e = Environment()
         oldScratchDir = e['directoryScratch']
+        oldTempDir = None
+        oldPermission = None
+        newTempDir = None
         try:
             e['directoryScratch'] = None
+            oldTempDir = e.getDefaultRootTempDir()
+            oldPermission = oldTempDir.stat()[stat.ST_MODE]
             # Wipe out write, exec permissions on the default root dir
-            os.chmod(e.getDefaultRootTempDir(), stat.S_IREAD)
-            # Was the PermissionError caught and a new "music21-{user}" dir created?
-            self.assertIn('music21-' + getpass.getuser(), e.getTempFile(returnPathlib=False))
+            os.chmod(oldTempDir, stat.S_IREAD)
+            newTempDir = e.getDefaultRootTempDir()
+            self.assertIn(f'music21-userid-{os.getuid()}', str(newTempDir))
         finally:
-            # Restore owner read/write/exec permissions and original path
-            os.chmod(e.getDefaultRootTempDir(), stat.S_IRWXU)
-            e['directoryScratch'] = oldScratchDir
+            # Make sure oldTempDir and oldPermission is set in 'try' block
+            if oldTempDir is not None and oldPermission is not None:
+                # Restore original permissions and original path
+                os.chmod(oldTempDir, oldPermission)
+                e['directoryScratch'] = oldScratchDir
 
+            # Make sure newTempDir is set in 'try' block
+            if newTempDir is not None:
+                # If getting OSError while trying to create the directory on the first fallback,
+                # the default temp directory from tempfile.gettempdir() will be return on the second
+                # fallback. We don't want to delete the default temp directory. Therefore we check
+                # it before deleting.
+                #
+                # For security concerns, we are not sure that newTempDir is always a directory
+                # which can be removed safely. For example, if newTempDir is "/" for unknown reason,
+                # remove newTempDir could potentially destroy an entire hard drive. To avoid this
+                # situation, we check newTempDir first, making sure that newTempDir is an empty
+                # directory which means (1) it's a directory we create in this test or (2) we won't
+                # destroy anything if we delete it, and then delete it with os.rmdir, which could
+                # only delete a empty directory. We don't set an exception-catching block here
+                # because we have checked this directory is empty.
+                tmp = newTempDir.samefile(tempfile.gettempdir())
+                empty = len(os.listdir(newTempDir)) == 0
+                if not tmp and empty:
+                    os.rmdir(newTempDir)
 
 # -----------------------------------------------------------------------------
 

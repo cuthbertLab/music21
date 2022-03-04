@@ -12657,7 +12657,7 @@ repeatExpressionsA = '''<?xml version="1.0" encoding="UTF-8"?>
     <measure number="2" width="268">
       <direction placement="above">
         <direction-type>
-          <segno default-x="-2" default-y="18"/>
+          <segno default-x="-2" default-y="18" relative-x="10"/>
         </direction-type>
         <sound divisions="1" segno="2"/>
       </direction>
@@ -18170,7 +18170,12 @@ class Test(unittest.TestCase):
         '''
         Tests if there are mid-measure clefs clefs: single staff
         '''
-        from music21 import stream, note, clef, musicxml, converter, meter
+        from music21 import stream
+        from music21 import note
+        from music21 import clef
+        from music21 import musicxml
+        from music21 import converter
+        from music21 import meter
 
         orig_stream = stream.Stream()
         orig_stream.append(meter.TimeSignature('4/4'))
@@ -18178,14 +18183,14 @@ class Test(unittest.TestCase):
         orig_stream.repeatAppend(note.Note('C4'), 2)
         orig_stream.append(clef.BassClef())
         orig_stream.repeatAppend(note.Note('C4'), 2)
-        orig_clefs = orig_stream.flat.getElementsByClass('Clef')
+        orig_clefs = orig_stream.flatten().getElementsByClass('Clef')
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
         self.assertEqual(xml.count(b'<clef>'), 2)  # clefs got out
         self.assertEqual(xml.count(b'<measure'), 1)  # in one measure
 
         new_stream = converter.parse(xml)
-        new_clefs = new_stream.flat.getElementsByClass('Clef')
+        new_clefs = new_stream.flatten().getElementsByClass('Clef')
 
         self.assertEqual(len(new_clefs), len(orig_clefs))
         self.assertEqual([c.offset for c in new_clefs], [c.offset for c in orig_clefs])
@@ -18195,7 +18200,12 @@ class Test(unittest.TestCase):
         '''
         Tests if there are mid-measure clefs clefs: multiple staves.
         '''
-        from music21 import stream, note, clef, musicxml, converter, meter
+        from music21 import clef
+        from music21 import converter
+        from music21 import meter
+        from music21 import musicxml
+        from music21 import note
+        from music21 import stream
 
         orig_stream = stream.Stream()
         orig_stream.append(stream.Part())
@@ -18210,13 +18220,13 @@ class Test(unittest.TestCase):
                      clef.TrebleClef(), note.Note('C4')]:
             orig_stream[1].append(item)
 
-        orig_clefs = [staff.flat.getElementsByClass('Clef').stream() for staff in
+        orig_clefs = [staff.flatten().getElementsByClass('Clef').stream() for staff in
                       orig_stream.getElementsByClass('Part')]
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
 
         new_stream = converter.parse(xml.decode('utf-8'))
-        new_clefs = [staff.flat.getElementsByClass('Clef').stream() for staff in
+        new_clefs = [staff.flatten().getElementsByClass('Clef').stream() for staff in
                      new_stream.getElementsByClass('Part')]
 
         self.assertEqual([len(clefs) for clefs in new_clefs],

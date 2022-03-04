@@ -20,6 +20,7 @@ TURNED OFF in 2017 -- to be recreated with a bigger test set.
 TODO: Demonstrate with JRP.
 '''
 
+from typing import List
 import unittest
 
 from music21 import common
@@ -183,7 +184,7 @@ class PachelbelCanonD(VirtualWork):
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     # interpreter loading
     pass
 
@@ -208,7 +209,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 if __name__ == '__main__':
     import music21

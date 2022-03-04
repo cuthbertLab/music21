@@ -239,7 +239,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             if mdr.isBack():
                 # the current use of back assumes tt back assumes tt we always
                 # return to the start of the measure; this may not be the case
-                if pendingRecords != []:
+                if pendingRecords:
                     eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
                     pendingRecords = []
 
@@ -251,7 +251,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             if mdr.isRest():
                 # environLocal.printDebug(['got mdr rest, parent:', mdr.parent])
                 # check for pending records first
-                if pendingRecords != []:
+                if pendingRecords:
                     eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
                     pendingRecords = []
                 # create rest after clearing pending records
@@ -273,7 +273,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 # either this is a note alone, or this is the first
                 # note found that is not a chord; if first not a chord
                 # need to append immediately
-                if pendingRecords != []:
+                if pendingRecords:
                     # this could be a Chord or Note
                     eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
                     pendingRecords = []
@@ -281,7 +281,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 pendingRecords.append(mdr)
 
         # check for any remaining single notes (if last) or chords
-        if pendingRecords != []:
+        if pendingRecords:
             eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
 
         # may be bending elements in a voice to append to a measure
@@ -305,9 +305,9 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
     tInterval = museDataPart.getTranspositionIntervalObject()
     # environLocal.printDebug(['got transposition interval', p.id, tInterval])
     if tInterval is not None:
-        p.flat.transpose(tInterval,
-                         classFilterList=['Note', 'Chord', 'KeySignature'],
-                         inPlace=True)
+        p.flatten().transpose(tInterval,
+                              classFilterList=['Note', 'Chord', 'KeySignature'],
+                              inPlace=True)
         # need to call make accidentals to correct new issues
         p.makeAccidentals(inPlace=True)
 
@@ -384,7 +384,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(s.parts[0].id, 'Clarinet in A')
 
-        self.assertEqual(len(s.parts[0].flat.notesAndRests), 54)
+        self.assertEqual(len(s.parts[0].recurse().notesAndRests), 54)
 
 
         # # try stage 1
@@ -393,8 +393,8 @@ class Test(unittest.TestCase):
         # mdw.addString(testFiles.bachContrapunctus1_part2)
         #
         # s = museDataWorkToStreamScore(mdw)
-        # self.assertEqual(len(s.parts[0].flat.notesAndRests), 291)
-        # self.assertEqual(len(s.parts[1].flat.notesAndRests), 293)
+        # self.assertEqual(len(s.parts[0].recurse().notesAndRests), 291)
+        # self.assertEqual(len(s.parts[1].recurse().notesAndRests), 293)
 
 
 
@@ -412,12 +412,12 @@ class Test(unittest.TestCase):
     #     self.assertEqual(s.parts[0].id, 'Contr\'alto')
     #     self.assertEqual(s.parts[1].id, 'Bassi')
     #
-    #     self.assertEqual(len(s.parts[0].flat.notesAndRests), 34)
-    #     self.assertEqual(len(s.parts[1].flat.notesAndRests), 9)
+    #     self.assertEqual(len(s.parts[0].recurse().notesAndRests), 34)
+    #     self.assertEqual(len(s.parts[1].recurse().notesAndRests), 9)
     #
     #     # note that hyphens are stripped on import
-    #     self.assertEqual(s.parts[0].flat.notesAndRests[2].lyric, 'Be')
-    #     self.assertEqual(s.parts[0].flat.notesAndRests[3].lyric, 'hold,')
+    #     self.assertEqual(s.parts[0].flatten().notesAndRests[2].lyric, 'Be')
+    #     self.assertEqual(s.parts[0].flatten().notesAndRests[3].lyric, 'hold,')
     #     s.show()
 
 
@@ -489,7 +489,7 @@ class Test(unittest.TestCase):
         # self.assertEqual(str(s.parts[0].getKeySignatures()[0]),
         #        '<music21.key.KeySignature of 1 flat>')
         #
-        # notes = s.parts[0].flat.notesAndRests
+        # notes = s.parts[0].flatten().notesAndRests
         # self.assertEqual(str(notes[2].accidental), '<music21.pitch.Accidental sharp>')
         # self.assertTrue(notes[2].accidental.displayStatus)
         #
@@ -499,7 +499,7 @@ class Test(unittest.TestCase):
         # self.assertFalse(notes[16].accidental.displayStatus)
         #
         # # cautionary from within measure, the C follows a C#
-        # notes = s.parts[1].measure(13).flat.notesAndRests
+        # notes = s.parts[1].measure(13).flatten().notesAndRests
         # self.assertEqual(str(notes[8].accidental), '<music21.pitch.Accidental natural>')
         # self.assertTrue(notes[8].accidental.displayStatus)
 
@@ -507,17 +507,18 @@ class Test(unittest.TestCase):
 
 
     def testBackBasic(self):
-        from music21 import converter, common
+        from music21 import converter
+        from music21 import common
         fpDir = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01'
         s = converter.parse(fpDir)
         # note: this is a multi-staff work, but presently gets encoded
         # as multiple voices
         measures = s.parts[0].measures(1, 5)
-        self.assertEqual(len(measures[0].flat.notesAndRests), 2)
-        self.assertEqual(len(measures[1].flat.notesAndRests), 5)
-        self.assertEqual(len(measures[2].flat.notesAndRests), 5)
-        self.assertEqual(len(measures[3].flat.notesAndRests), 6)
-        self.assertEqual(len(measures[4].flat.notesAndRests), 4)
+        self.assertEqual(len(measures[0].recurse().notesAndRests), 2)
+        self.assertEqual(len(measures[1].recurse().notesAndRests), 5)
+        self.assertEqual(len(measures[2].recurse().notesAndRests), 5)
+        self.assertEqual(len(measures[3].recurse().notesAndRests), 6)
+        self.assertEqual(len(measures[4].recurse().notesAndRests), 4)
 
         # s.show()
 
@@ -529,7 +530,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('k168', 1)
 #
 #         self.assertEqual(len(s.parts), 4)
-#         self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature').first()),
+#         self.assertEqual(str(s.parts[0][meter.TimeSignature].first()),
 #                '<music21.meter.TimeSignature 4/4>')
 #
 #         self.assertEqual([n.offset for
@@ -546,7 +547,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('k169', 3)
 #
 #         self.assertEqual(len(s.parts), 4)
-#         self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]),
+#         self.assertEqual(str(s.parts[0][meter.TimeSignature].first()),
 #             '<music21.meter.TimeSignature 3/4>')
 #
 #         self.assertEqual([n.offset for n in s.parts[0].getElementsByClass('Measure')[0].notes],
@@ -566,13 +567,13 @@ class Test(unittest.TestCase):
 #         self.assertEqual(len(s.parts), 5)
 #         # the tempo is found in the 4th part here
 #         self.assertEqual(str(
-#             s.parts[3].flat.getElementsByClass('TempoIndication')[0]),
+#             s.parts[3][tempo.TempoIndication].first()),
 #             '<music21.tempo.MetronomeMark Largo e piano Quarter=46>')
 #         # s.show()
 #
 #         s = corpus.parse('movement2-07.md')
 #         self.assertEqual(str(
-#             s.flat.getElementsByClass('TempoIndication')[0]),
+#             s[tempo.TempoIndication].first()),
 #             '<music21.tempo.MetronomeMark Largo Quarter=46>')
 
 #     def testMuseDataImportDynamicsA(self):
@@ -582,7 +583,7 @@ class Test(unittest.TestCase):
 #         # TODO: Turn back on when a smaller work is found...
 #         from music21 import corpus
 #         s = corpus.parse('symphony94', 3)
-#         sFlat = s.flat
+#         sFlat = s.flatten()
 #         # s.show()
 #         self.assertEqual(len(sFlat.getElementsByClass('Dynamic')), 79)
 #
@@ -591,7 +592,7 @@ class Test(unittest.TestCase):
 #         from music21 import corpus
 #         # this files was crashing in the handling of an error in beam notation
 #         s = corpus.parse('haydn/opus55no1/movement2.md')
-#         self.assertEqual(len(s.flat.getElementsByClass('Note')), 1735)
+#         self.assertEqual(len(s[note.Note]), 1735)
 #
 #         # s.show('t')
 #
@@ -599,7 +600,7 @@ class Test(unittest.TestCase):
 #         # this file has a malformed END repeated twice
 #         from music21 import corpus
 #         s = corpus.parse('haydn/opus71no1/movement1.zip')
-#         self.assertEqual(len(s.flat.getElementsByClass('Note')), 2792)
+#         self.assertEqual(len(s[note.Note]), 2792)
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation

@@ -24,7 +24,7 @@ the `converter` module:
 
 For users who will be editing ABC extensively or need a way to have music21 output ABC
 (which it doesn't do natively), we suggest using the open source EasyABC package:
-http://www.nilsliberg.se/ksp/easyabc/ .  You can set it up as a MusicXML reader through:
+https://www.nilsliberg.se/ksp/easyabc/ .  You can set it up as a MusicXML reader through:
 
 >>> #_DOCS_SHOW us = environment.UserSettings()
 >>> #_DOCS_SHOW us['musicxmlPath'] = '/Applications/EasyABC.app'
@@ -54,9 +54,7 @@ __all__ = [
     'ABCFile',
 ]
 
-import copy
 import io
-import pathlib
 import re
 import unittest
 from typing import Union, Optional, List, Tuple, Any
@@ -720,7 +718,7 @@ class ABCMetadata(ABCToken):
 
         >>> x = 'L:1/4\nM:3/4\n\nf'
         >>> sc = converter.parse(x, format='abc')
-        >>> sc.flat.notes[0].duration.type
+        >>> sc.recurse().notes.first().duration.type
         'quarter'
         '''
         # environLocal.printDebug(['getDefaultQuarterLength', self.data])
@@ -1558,7 +1556,7 @@ class ABCNote(ABCToken):
             ql = activeDefaultQuarterLength / int(numStr.split('/')[1])
         # uncommon usage: 3/ short for 3/2
         elif numStr.endswith('/'):
-            n = int(numStr.split('/')[0].strip())
+            n = int(numStr.split('/', maxsplit=1)[0].strip())
             d = 2
             ql = activeDefaultQuarterLength * n / d
         # if we have two, this is usually an error
@@ -1577,7 +1575,7 @@ class ABCNote(ABCToken):
             ql = activeDefaultQuarterLength * int(numStr)
 
         if self.brokenRhythmMarker is not None:
-            symbol, direction = self.brokenRhythmMarker
+            symbol, direction = self.brokenRhythmMarker  # pylint: disable=unpacking-non-sequence
             if symbol == '>':
                 modPair = (1.5, 0.5)
             elif symbol == '<':
@@ -2776,7 +2774,6 @@ class ABCHandler:
         Returns True if this token structure defines Measures in a normal Measure form.
         Otherwise False
 
-
         >>> abcStr = ('M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" ' +
         ...     'snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" ' +
         ...     'snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" ' +
@@ -3235,7 +3232,7 @@ class ABCFile(prebase.ProtoM21Object):
         Open a file for reading
         '''
         # try:
-        self.file = io.open(filename, encoding='utf-8')
+        self.file = io.open(filename, encoding='utf-8')  # pylint: disable=consider-using-with
         # except
         # self.file = io.open(filename, encoding='latin-1')
         self.filename = filename

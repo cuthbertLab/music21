@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
-# Name:         vexflow/toM21p.py
+# Name:         vexflow/toMusic21j.py
 # Purpose:      music21 classes for converting music21 objects to music21j
 #
 # Authors:      Michael Scott Cuthbert
@@ -278,13 +278,14 @@ class Test(unittest.TestCase):
     pass
 
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestCuthbert(unittest.TestCase):  # pragma: no cover
 
     def testCuthbertLocal(self):
         '''
         test a local version of this mess...
         '''
-        from music21 import corpus, environment
+        from music21 import corpus
+        from music21 import environment
         environLocal = environment.Environment()
 
         s = corpus.parse('luca/gloria').measures(1, 19)
@@ -295,7 +296,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         vfp.defaults['requireURI'] = 'file:///Users/Cuthbert/git/music21j/ext/require/require.js'
         data = vfp.fromObject(s)
         fp = environLocal.getTempFile('.html')
-        with open(fp, 'w') as f:
+        with open(fp, 'w', encoding='utf-8') as f:
             f.write(data)
         # environLocal.launch('vexflow', fp)
 

@@ -21,6 +21,7 @@ import copy
 import re
 import unittest
 from typing import Union, Optional
+import warnings
 
 from music21 import base
 from music21 import exceptions21
@@ -72,7 +73,7 @@ def convertKeyStringToMusic21KeyString(textString):
 
 def sharpsToPitch(sharpCount):
     '''
-    Given a number a positive/negative number of sharps, return a Pitch
+    Given a positive/negative number of sharps, return a Pitch
     object set to the appropriate major key value.
 
     >>> key.sharpsToPitch(1)
@@ -222,9 +223,9 @@ def pitchToSharps(value, mode=None):
     '''
     if isinstance(value, str):
         value = pitch.Pitch(value)
-    elif 'Pitch' in value.classes:
+    elif isinstance(value, pitch.Pitch):
         pass
-    elif 'Note' in value.classes:
+    elif isinstance(value, note.Note):
         value = value.pitch
     else:
         raise KeyException('Cannot get a sharp number from value')
@@ -248,6 +249,10 @@ class KeySignatureException(exceptions21.Music21Exception):
 
 
 class KeyException(exceptions21.Music21Exception):
+    pass
+
+
+class KeyWarning(Warning):
     pass
 
 
@@ -281,10 +286,10 @@ class KeySignature(base.Music21Object):
     >>> legal
     <music21.key.Key of c# minor>
 
-    To set a non-traditional Key Signature, create a KeySignature object and then
-    set the alteredPitches list:
+    To set a non-traditional Key Signature, create a KeySignature object
+    with `sharps=None`, and then set the `alteredPitches` list:
 
-    >>> unusual = key.KeySignature()
+    >>> unusual = key.KeySignature(sharps=None)
     >>> unusual.alteredPitches = ['E-', 'G#']
     >>> unusual
     <music21.key.KeySignature of pitches: [E-, G#]>
@@ -294,7 +299,7 @@ class KeySignature(base.Music21Object):
     To set a pitch as displayed in a particular octave, create a non-traditional
     KeySignature and then set pitches with octaves:
 
-    >>> unusual = key.KeySignature()
+    >>> unusual = key.KeySignature(sharps=None)
     >>> unusual.alteredPitches = ['F#4']
     >>> unusual
     <music21.key.KeySignature of pitches: [F#4]>
@@ -306,6 +311,9 @@ class KeySignature(base.Music21Object):
     >>> unusual.accidentalsApplyOnlyToOctave
     False
     >>> unusual.accidentalsApplyOnlyToOctave = True
+
+    Changed in v.7 -- `sharps` defaults to 0 (key of no flats/sharps)
+    rather than `None` for nontraditional keys.
     '''
     _styleClass = style.TextStyle
 
@@ -315,7 +323,7 @@ class KeySignature(base.Music21Object):
 
     classSortOrder = 2
 
-    def __init__(self, sharps=None):
+    def __init__(self, sharps: Optional[int] = 0):
         super().__init__()
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
@@ -377,16 +385,59 @@ class KeySignature(base.Music21Object):
     def _reprInternal(self):
         return 'of ' + self._strDescription()
 
-    def asKey(self, mode='major'):
+    def asKey(self, mode: Optional[str] = None, tonic: Optional[str] = None):
         '''
-        return a `key.Key` object representing this KeySignature object as a key in the
-        given mode (default = major)
+        Return a `key.Key` object representing this KeySignature object as a key in the
+        given mode or in the given tonic. If `mode` is None, and `tonic` is not provided,
+        major is assumed. If both mode and tonic are provided, the tonic is ignored.
+
+        >>> ks = key.KeySignature(2)
+        >>> ks.asKey()
+        <music21.key.Key of D major>
+        >>> ks.asKey(mode='minor')
+        <music21.key.Key of b minor>
+
+        If `mode` is None, an attempt is made to solve for the mode:
+
+        >>> ks.asKey(tonic='A')
+        <music21.key.Key of A mixolydian>
+
+        But will raise `KeyException` if an impossible solution is requested:
+
+        >>> ks.asKey(tonic='D#')
+        Traceback (most recent call last):
+        music21.key.KeyException: Could not solve for mode from sharps=2, tonic=D#
+
+        Ionian and Aeolian are supplied instead of major or minor when deriving mode in this way:
+
+        >>> ks2 = key.KeySignature()
+        >>> ks2.asKey()
+        <music21.key.Key of C major>
+        >>> ks2.asKey(tonic='C')
+        <music21.key.Key of C ionian>
+
+        New in v7 -- `tonic` argument to solve for mode.
         '''
+        our_sharps = self.sharps or 0  # || 0 in case of None -- non-standard key-signature
+        if mode is not None and tonic is not None:
+            warnings.warn(f'ignoring provided tonic: {tonic}', KeyWarning)
+        if mode is None and tonic is None:
+            mode = 'major'
+        if mode is None and tonic is not None:
+            majorSharpsToMode = {v: k for k, v in modeSharpsAlter.items()}
+            majorSharps = pitchToSharps(tonic)
+            try:
+                mode = majorSharpsToMode[our_sharps - majorSharps]
+            except KeyError as ke:
+                raise KeyException(
+                    f'Could not solve for mode from sharps={self.sharps}, tonic={tonic}') from ke
         mode = mode.lower()
         if mode not in modeSharpsAlter:
             raise KeyException(f'Mode {mode} is unknown')
         sharpAlterationFromMajor = modeSharpsAlter[mode]
-        pitchObj = sharpsToPitch(self.sharps - sharpAlterationFromMajor)
+
+        pitchObj = sharpsToPitch(our_sharps - sharpAlterationFromMajor)
+
         return Key(pitchObj.name, mode)
 
     @property
@@ -428,18 +479,30 @@ class KeySignature(base.Music21Object):
         Non-standard, non-traditional key signatures can set their own
         altered pitches cache.
 
-        >>> nonTrad = key.KeySignature()
+        >>> nonTrad = key.KeySignature(sharps=None)
         >>> nonTrad.alteredPitches = ['B-', 'F#', 'E-', 'G#']
         >>> nonTrad.alteredPitches
         [<music21.pitch.Pitch B->,
          <music21.pitch.Pitch F#>,
          <music21.pitch.Pitch E->,
          <music21.pitch.Pitch G#>]
+
+        OMIT_FROM_DOCS
+
+        Ensure at least something is provided when the user hasn't provided enough info:
+
+        >>> nonTrad2 = key.KeySignature(sharps=None)
+        >>> nonTrad2.alteredPitches
+        []
+
         '''
         if self._alteredPitches is not None:
             return self._alteredPitches
 
         post = []
+        if self.sharps is None:
+            return post
+
         if self.sharps > 0:
             pKeep = pitch.Pitch('B')
             if self.sharps > 8:
@@ -467,9 +530,9 @@ class KeySignature(base.Music21Object):
         for p in newAlteredPitches:
             if not hasattr(p, 'classes'):
                 newList.append(pitch.Pitch(p))
-            elif 'Pitch' in p.classes:
+            elif isinstance(p, pitch.Pitch):
                 newList.append(p)
-            elif 'Note' in p.classes:
+            elif isinstance(p, note.Note):
                 newList.append(copy.deepcopy(p.pitch))
         self._alteredPitches = newList
 
@@ -482,7 +545,7 @@ class KeySignature(base.Music21Object):
         >>> g.isNonTraditional
         False
 
-        >>> g = key.KeySignature()
+        >>> g = key.KeySignature(sharps=None)
         >>> g.alteredPitches = [pitch.Pitch('E`')]
         >>> g.isNonTraditional
         True
@@ -751,10 +814,10 @@ class KeySignature(base.Music21Object):
     # --------------------------------------------------------------------------
     # properties
 
-    def _getSharps(self):
+    def _getSharps(self) -> Optional[int]:
         return self._sharps
 
-    def _setSharps(self, value):
+    def _setSharps(self, value: Optional[int]):
         if value != self._sharps:
             self._sharps = value
             self.clearCache()
@@ -771,6 +834,8 @@ class KeySignature(base.Music21Object):
         >>> ks1.sharps = -4
         >>> ks1
         <music21.key.KeySignature of 4 flats>
+
+        Can be set to None for a non-traditional key signature
         ''')
 
 
@@ -835,8 +900,7 @@ class Key(KeySignature, scale.DiatonicScale):
     def __init__(self,
                  tonic: Union[str, pitch.Pitch, note.Note] = 'C',
                  mode=None):
-        if hasattr(tonic, 'classes') and ('Music21Object' in tonic.classes
-                                          or 'Pitch' in tonic.classes):
+        if isinstance(tonic, (base.Music21Object, pitch.Pitch)):
             if hasattr(tonic, 'name'):
                 tonic = tonic.name
             elif hasattr(tonic, 'pitches') and tonic.pitches:  # chord w/ >= 1 pitch
@@ -865,13 +929,13 @@ class Key(KeySignature, scale.DiatonicScale):
         KeySignature.__init__(self, sharps)
         scale.DiatonicScale.__init__(self, tonic=tonic)
 
-        if hasattr(tonic, 'classes') and 'Pitch' in tonic.classes:
-            self.tonic = tonic
+        if isinstance(tonic, pitch.Pitch):
+            self.tonic: pitch.Pitch = tonic
         else:
             self.tonic = pitch.Pitch(tonic)
 
-        self.type = mode
-        self.mode = mode
+        self.type: str = mode
+        self.mode: str = mode
 
         # build the network for the appropriate scale
         self._abstract.buildNetwork(self.type)
@@ -1080,7 +1144,7 @@ class Key(KeySignature, scale.DiatonicScale):
         alternateInterpretations list has
         been filled from the use of a KeyWeightKeyAnalysis subclass.
 
-        >>> littlePiece = converter.parse('tinyNotation: 4/4 c4 d e f g a b cc ee gg ee cc')
+        >>> littlePiece = converter.parse("tinyNotation: 4/4 c4 d e f g a b c' e' g' e' c'")
         >>> k = littlePiece.analyze('key')
         >>> k
         <music21.key.Key of C major>
@@ -1212,10 +1276,25 @@ class Test(unittest.TestCase):
 
     def testBasic(self):
         a = KeySignature()
-        self.assertEqual(a.sharps, None)
+        self.assertEqual(a.sharps, 0)
+
+    def testSetTonic(self):
+        from music21 import chord
+        k = Key()
+
+        # Set tonic attribute from single pitch
+        b = pitch.Pitch('B')
+        k.tonic = b
+        self.assertIs(k.tonic, b)
+
+        # Initialize with tonic from chord (i.e., the root)
+        b_flat_maj = chord.Chord('Bb4 D5 F5')
+        k = Key(tonic=b_flat_maj)
+        self.assertEqual(k.tonic.name, 'B-')
 
     def testTonalAmbiguityA(self):
-        from music21 import corpus, stream
+        from music21 import corpus
+        from music21 import stream
         # s = corpus.parse('bwv64.2')
         # k = s.analyze('KrumhanslSchmuckler')
         # k.tonalCertainty(method='correlationCoefficient')
@@ -1267,6 +1346,30 @@ class Test(unittest.TestCase):
         # k = s.analyze('KrumhanslSchmuckler')
         # k.tonalCertainty(method='correlationCoefficient')
         # s = corpus.parse('bwv48.3')
+
+    def testAsKey(self):
+        ks = KeySignature(2)
+
+        k = ks.asKey(mode=None, tonic=None)
+        self.assertEqual(k.mode, 'major')
+        self.assertEqual(k.tonicPitchNameWithCase, 'D')
+
+        k = ks.asKey(tonic='E')
+        self.assertEqual(k.mode, 'dorian')
+        self.assertEqual(k.tonicPitchNameWithCase, 'E')
+
+        expected = 'ignoring provided tonic: E'
+        with self.assertWarnsRegex(KeyWarning, expected) as cm:
+            # warn user we ignored their tonic
+            k = ks.asKey(mode='minor', tonic='E')
+        self.assertEqual(k.mode, 'minor')
+        self.assertEqual(k.tonicPitchNameWithCase, 'b')
+
+        expected = 'Could not solve for mode from sharps=2, tonic=A-'
+        with self.assertRaisesRegex(KeyException, expected) as cm:
+            k = ks.asKey(mode=None, tonic='A-')
+        # test exception chained from KeyError
+        self.assertIsInstance(cm.exception.__cause__, KeyError)
 
 
 # ------------------------------------------------------------------------------

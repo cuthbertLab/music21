@@ -18,19 +18,22 @@ import pathlib
 import re
 import subprocess
 import sys
+from typing import Dict
 import unittest
 
 from collections import OrderedDict
 from importlib.util import find_spec
 
 from music21 import common
+from music21.converter.subConverters import SubConverter
 from music21 import corpus
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
-from music21 import variant
+from music21 import key
 from music21 import note
-from music21.converter.subConverters import SubConverter
+from music21 import stream
+from music21 import variant
 from music21.lily import lilyObjects as lyo
 
 _MOD = 'lily.translate'
@@ -49,7 +52,7 @@ del find_spec
 # TODO: speed up tests everywhere! move these to music21 base...
 
 class _sharedCorpusTestObject:
-    sharedCache = {}
+    sharedCache: Dict[str, stream.Stream] = {}
 
 
 sharedCacheObject = _sharedCorpusTestObject()
@@ -198,16 +201,16 @@ class LilypondConverter:
         LILYEXEC = self.findLilyExec()
         command = [LILYEXEC, '--version']
         try:
-            proc = subprocess.Popen(command, stdout=subprocess.PIPE)
-        except OSError:  # pragma: no cover
+            with subprocess.Popen(command, stdout=subprocess.PIPE) as proc:
+                stdout, unused = proc.communicate()
+                stdout = stdout.decode(encoding='utf-8')
+                versionString = stdout.split()[2]
+                versionPieces = versionString.split('.')
+        except OSError as exc:  # pragma: no cover
             raise LilyTranslateException(
                 'Cannot find a copy of Lilypond installed on your system. '
                 + 'Please be sure it is installed. And that your '
-                + "environment.UserSettings()['lilypondPath'] is set to find it.")
-        stdout, unused = proc.communicate()
-        stdout = stdout.decode(encoding='utf-8')
-        versionString = stdout.split()[2]
-        versionPieces = versionString.split('.')
+                + "environment.UserSettings()['lilypondPath'] is set to find it.") from exc
 
         self.majorVersion = versionPieces[0]
         self.minorVersion = versionPieces[1]
@@ -281,7 +284,6 @@ class LilypondConverter:
         TODO: make lilypond automatically run makeNotation.makeTupletBrackets(s)
         TODO: Add tests...
         '''
-        from music21 import stream
         c = m21ObjectIn.classes
         if 'Stream' in c:
             if m21ObjectIn.recurse().variants:
@@ -396,7 +398,7 @@ class LilypondConverter:
 
         # Also get the variants, and the total number of measures here and make start each
         # staff context with { \stopStaff s1*n} where n is the number of measures.
-        if hasattr(scoreIn, 'parts') and scoreIn.iter.parts:  # or has variants
+        if hasattr(scoreIn, 'parts') and scoreIn.iter().parts:  # or has variants
             if scoreIn.recurse().variants:
                 lpPartsAndOssiaInit = self.lyPartsAndOssiaInitFromScore(scoreIn)
                 lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(
@@ -582,7 +584,7 @@ class LilypondConverter:
         # mostRecentDur = ''
         # recentDurCount = 0
         for el in streamIn:
-            if 'Measure' not in el.classes:
+            if not isinstance(el, stream.Measure):
                 continue
             if el.duration.quarterLength == 0.0:
                 continue
@@ -791,13 +793,15 @@ class LilypondConverter:
             text = ' _ '
         elif el.text == '':
             text = ' _ '
+        elif el.text is None:
+            text = ''
         else:
             text = '"' + el.text + '"'
             # TODO: composite
             if el.syllabic == 'end':
                 text = text + '__'
                 inWord = False
-            elif el.syllabic == 'begin' or el.syllabic == 'middle':
+            elif el.syllabic in ('begin', 'middle'):
                 text = text + ' --'
                 inWord = True
             # else: pass
@@ -989,9 +993,9 @@ class LilypondConverter:
                 variantList = []
                 otherList = []
                 for el in groupedElements:
-                    if 'Voice' in el.classes:
+                    if isinstance(el, stream.Voice):
                         voiceList.append(el)
-                    elif 'Variant' in el.classes:
+                    elif isinstance(el, variant.Variant):
                         variantList.append(el)
                     else:
                         el.activeSite = streamObject
@@ -1167,7 +1171,7 @@ class LilypondConverter:
         # commented out until complete
 #         if self.variantMode is True:
 #             # TODO: attach \noBeam to note if it is the last note
-#             if 'NotRest' in noteOrRest.classes:
+#             if isinstance(noteOrRest, note.NotRest):
 #                 n = noteOrRest
 #                 activeSite = n.activeSite
 #                 offset = n.offset
@@ -1263,7 +1267,9 @@ class LilypondConverter:
         >>> n0.style.color = 'blue'
         >>> sm = conv.lySimpleMusicFromNoteOrRest(n0)
         >>> print(sm)
-        \color "blue" dis'' ! ? 4
+        \override NoteHead.color = "blue"
+        \override Stem.color = "blue"
+        dis'' ! ? 4
 
         Now make the note disappear...
 
@@ -1275,10 +1281,15 @@ class LilypondConverter:
         c = noteOrRest.classes
 
         simpleElementParts = []
+
+        # https://lilypond.org/doc/v2.22/Documentation/notation/inside-the-staff#coloring-objects
         if noteOrRest.hasStyleInformation:
             if noteOrRest.style.color and noteOrRest.style.hideObjectOnPrint is False:
-                colorLily = r'\color "' + noteOrRest.style.color + '" '
-                simpleElementParts.append(colorLily)
+                # LilyPond 2.22 (January 2021) supports hex values
+                noteheadColor = rf'\override NoteHead.color = "{noteOrRest.style.color}"' + '\n'
+                stemColor = rf'\override Stem.color = "{noteOrRest.style.color}"' + '\n'
+                simpleElementParts.append(noteheadColor)
+                simpleElementParts.append(stemColor)
 
         if 'Note' in c:
             if not noteOrRest.hasStyleInformation or noteOrRest.style.hideObjectOnPrint is False:
@@ -1291,9 +1302,6 @@ class LilypondConverter:
                         simpleElementParts.append('? ')
             else:
                 simpleElementParts.append('s ')
-
-        elif 'SpacerRest' in c:
-            simpleElementParts.append('s ')
         elif 'Rest' in c:
             if noteOrRest.hasStyleInformation and noteOrRest.style.hideObjectOnPrint:
                 simpleElementParts.append('s ')
@@ -1651,7 +1659,7 @@ class LilypondConverter:
         \key fis \major
 
         '''
-        if 'music21.key.Key' not in keyObj.classSet:
+        if not isinstance(keyObj, key.Key):
             keyObj = keyObj.asKey('major')
 
         p = keyObj.tonic
@@ -1807,8 +1815,8 @@ class LilypondConverter:
                 else:
                     variantDict[variantName] = [variantObject]
 
-            for key in variantDict:
-                variantList = variantDict[key]
+            for variant_key in variantDict:
+                variantList = variantDict[variant_key]
                 if len(variantList) == 1:
                     variantObject = variantList[0]
                     replacedElements = variantObject.replacedElements(activeSite)
@@ -1860,7 +1868,7 @@ class LilypondConverter:
         >>> for s in [ s1, s2, s3, s4, s5]:
         ...     s.makeMeasures(inPlace=True)
 
-        >>> activeSite = stream.Part(s5)
+        >>> activeSite = stream.Part(s5.elements)
 
         >>> v1 = variant.Variant()
         >>> for el in s1:
@@ -1868,7 +1876,8 @@ class LilypondConverter:
         >>> v1.replacementDuration = 4.0
 
         >>> v2 = variant.Variant()
-        >>> sp2 = note.SpacerRest()
+        >>> sp2 = note.Rest()
+        >>> sp2.style.hideObjectOnPrint = True
         >>> sp2.duration.quarterLength = 4.0
         >>> v2.replacementDuration = 4.0
         >>> v2.append(sp2)
@@ -1876,7 +1885,8 @@ class LilypondConverter:
         ...     v2.append(el)
 
         >>> v3 = variant.Variant()
-        >>> sp3 = note.SpacerRest()
+        >>> sp3 = note.Rest()
+        >>> sp3.style.hideObjectOnPrint = True
         >>> sp3.duration.quarterLength = 8.0
         >>> v3.replacementDuration = 4.0
         >>> v3.append(sp3)
@@ -1884,7 +1894,8 @@ class LilypondConverter:
         ...     v3.append(el)
 
         >>> v4 = variant.Variant()
-        >>> sp4 = note.SpacerRest()
+        >>> sp4 = note.Rest()
+        >>> sp4.style.hideObjectOnPrint = True
         >>> sp4.duration.quarterLength = 16.0
         >>> v4.replacementDuration = 4.0
         >>> v4.append(sp4)
@@ -1947,7 +1958,7 @@ class LilypondConverter:
 
         def findOffsetOfFirstNonSpacerElement(inputStream):
             for el in inputStream:
-                if 'SpacerRest' in el.classes:
+                if isinstance(el, note.Rest) and el.style.hideObjectOnPrint:
                     pass
                 else:
                     return inputStream.elementOffset(el)
@@ -2004,7 +2015,8 @@ class LilypondConverter:
 
             # make spacer with spacerDuration and append
             if spacerDuration > 0.0:
-                spacer = note.SpacerRest()
+                spacer = note.Rest()
+                spacer.style.hideObjectOnPrint = True
                 spacer.duration.quarterLength = spacerDuration
                 # noinspection PyTypeChecker
                 lySpacer = self.lySimpleMusicFromNoteOrRest(spacer)
@@ -2069,11 +2081,11 @@ class LilypondConverter:
 
         >>> pStream = converter.parse('tinynotation: 4/4 a4 b c d   e4 f g a')
         >>> pStream.makeMeasures(inPlace=True)
-        >>> p = stream.Part(pStream)
+        >>> p = stream.Part(pStream.elements)
         >>> p.id = 'p1'
         >>> vStream = converter.parse('tinynotation: 4/4 a4. b8 c4 d')
         >>> vStream.makeMeasures(inPlace=True)
-        >>> v = variant.Variant(vStream)
+        >>> v = variant.Variant(vStream.elements)
         >>> v.groups = ['london']
         >>> p.insert(0.0, v)
         >>> lpc = lily.translate.LilypondConverter()
@@ -2133,7 +2145,9 @@ class LilypondConverter:
 
         musicList = []
 
-        varFilter = variantObject.getElementsByClass('SpacerRest')
+        varFilter = [r for r in variantObject.getElementsByClass('Rest')
+                     if r.style.hideObjectOnPrint]
+
         if varFilter:
             spacer = varFilter[0]
             spacerDur = spacer.duration.quarterLength
@@ -2218,7 +2232,7 @@ class LilypondConverter:
 
 
         >>> c = converter.parse('tinynotation: 3/4 C4 D E F2.')
-        >>> v = variant.Variant(c)
+        >>> v = variant.Variant(c.elements)
         >>> lpc = lily.translate.LilypondConverter()
         >>> lySequentialMusicOut = lpc.lySequentialMusicFromStream(v)
         >>> lySequentialMusicOut
@@ -2444,9 +2458,9 @@ class LilypondConverter:
             # cannot find full path; try current directory
             fileEnd = os.path.basename(fileForm)
             if not os.path.exists(fileEnd):
-                raise LilyTranslateException('cannot find ' + fileEnd
-                                             + ' or the full path ' + fileForm
-                                             + ' original file was ' + fileName)
+                raise LilyTranslateException('cannot find ' + str(fileEnd)
+                                             + ' or the full path ' + str(fileForm)
+                                             + ' original file was ' + str(fileName))
             fileForm = fileEnd
         return pathlib.Path(fileForm)
 
@@ -2491,10 +2505,10 @@ class LilypondConverter:
         lilyFile = self.runThroughLily(backend='eps', format='png', fileName=fileName)
         if noPIL is False:
             # noinspection PyPackageRequirements
-            from PIL import Image, ImageOps
+            from PIL import Image, ImageOps  # type: ignore
             # noinspection PyBroadException
             try:
-                lilyImage = Image.open(str(lilyFile))  # @UndefinedVariable
+                lilyImage = Image.open(str(lilyFile))
                 lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')
                 lilyImage2.save(str(lilyFile))
             except Exception:  # pylint: disable=broad-except
@@ -2552,7 +2566,7 @@ class Test(unittest.TestCase):
         # print(lpc.topLevelObject)
 
     def testComplexDuration(self):
-        from music21 import stream, meter
+        from music21 import meter
         s = stream.Stream()
         n1 = note.Note('C')  # test no octave also!
         n1.duration.quarterLength = 2.5  # BUG 2.3333333333 doesn't work right
@@ -2569,24 +2583,55 @@ class Test(unittest.TestCase):
         # lpc.showPNG()
         # s.show('lily.png')
 
+    def testCompositeLyrics(self):
+        s = corpus.parse('theoryExercises/checker_demo.xml')
+        lpc = LilypondConverter()
+        # previously this choked where .text is None on Lyric object
+        lpc.loadObjectFromScore(s)
 
-class TestExternal(unittest.TestCase):  # pragma: no cover
+    def testColors(self):
+        red_note = note.Note()
+        red_note.style.color = '#FF0000'
+        sm = LilypondConverter().lySimpleMusicFromNoteOrRest(red_note)
+        self.assertEqual(
+            sm.stringOutput(),
+            r'\override NoteHead.color = "#FF0000"' '\n'
+            r'\override Stem.color = "#FF0000"' '\n'
+            "c' 4  "
+        )
+
+        dark_green_note = note.Note()
+        dark_green_note.style.color = 'darkgreen'
+        sm = LilypondConverter().lySimpleMusicFromNoteOrRest(dark_green_note)
+        self.assertEqual(
+            sm.stringOutput(),
+            r'\override NoteHead.color = "darkgreen"' '\n'
+            r'\override Stem.color = "darkgreen"' '\n'
+            "c' 4  "
+        )
+
+class TestExternal(unittest.TestCase):
+    show = True
+
     def xtestConvertNote(self):
         n = note.Note('C5')
-        n.show('lily.png')
+        if self.show:
+            n.show('lily.png')
 
     def xtestConvertChorale(self):
         b = _getCachedCorpusFile('bach/bwv66.6')
-        for n in b.flat:
+        for n in b.flatten():
             n.beams = None
-        b.parts[0].show('lily.svg')
+        if self.show:
+            b.parts[0].show('lily.svg')
 
     def xtestSlowConvertOpus(self):
         fifeOpus = corpus.parse('miscFolk/americanfifeopus.abc')
-        fifeOpus.show('lily.png')
+        if self.show:
+            fifeOpus.show('lily.png')
 
     def xtestBreve(self):
-        from music21 import stream, meter
+        from music21 import meter
         n = note.Note('C5')
         n.duration.quarterLength = 8.0
         m = stream.Measure()
@@ -2596,10 +2641,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         p.append(m)
         s = stream.Score()
         s.append(p)
-        s.show('lily.png')
+        if self.show:
+            s.show('lily.png')
 
     def testStaffLines(self):
-        from music21 import stream
         s = stream.Score()
         p = stream.Part()
         p.append(note.Note('B4', type='whole'))
@@ -2609,7 +2654,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         p2.append(note.Note('B4', type='whole'))
         p2.staffLines = 7
         s.insert(0, p2)
-        s.show('lily.png')
+        if self.show:
+            s.show('lily.png')
 
 
 # ------------------------------------------------------------------------------

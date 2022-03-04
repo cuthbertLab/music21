@@ -12,10 +12,10 @@
 
 '''
 Classes for representing and processing articulations.
-Specific articulations are modeled as :class:`~music21.articulation.Articulation` subclasses.
+Specific articulations are modeled as :class:`~music21.articulations.Articulation` subclasses.
 
 A :class:`~music21.note.Note` object has a :attr:`~music21.note.Note.articulations` attribute.
-This list can be used to store one or more :class:`music21.articulation.Articulation` subclasses.
+This list can be used to store one or more :class:`music21.articulations.Articulation` subclasses.
 
 As much as possible, MusicXML names are used for Articulation classes,
 with xxx-yyy changed to XxxYyy.  For instance, "strong-accent" in
@@ -78,11 +78,12 @@ A longer test showing the utility of the module:
     :width: 628
 
 '''
-from typing import Optional
+from typing import Optional, Type
 import unittest
 
 from music21 import base
 from music21 import common
+from music21.common.classTools import tempAttribute
 from music21 import exceptions21
 from music21 import environment
 from music21 import style
@@ -106,7 +107,7 @@ class Articulation(base.Music21Object):
     >>> x.displayText = '>'
 
     '''
-    _styleClass = style.TextStyle
+    _styleClass: Type[style.Style] = style.TextStyle
 
     def __init__(self):
         super().__init__()
@@ -295,9 +296,8 @@ class Spiccato(Staccato, Accent):
     '''
     def __init__(self):
         Staccato.__init__(self)
-        storedLengthShift = self.lengthShift
-        Accent.__init__(self)  # order matters...
-        self.lengthShift = storedLengthShift
+        with tempAttribute(self, 'lengthShift'):
+            Accent.__init__(self)  # order matters...
 
 
 class Tenuto(LengthArticulation):

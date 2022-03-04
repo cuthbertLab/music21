@@ -9,7 +9,8 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Instrument translations from http://www.music-cog.ohio-state.edu/Humdrum/guide.append2.html
+Instrument translations from
+https://web.archive.org/web/20100115001258/http://www.music-cog.ohio-state.edu/Humdrum/guide.append2.html
 '''
 import unittest
 from music21 import exceptions21
@@ -264,14 +265,14 @@ def fromHumdrumInstrument(hdInst):
 class Test(unittest.TestCase):
 
     def testClasses(self):
-        from music21 import instrument  # @UnusedImport  # wrong -- is used
+        from music21 import instrument
 
         for x in humdrumInstrumentClassToInstrument:
             i = humdrumInstrumentClassToInstrument[x]
             self.assertNotEqual(getattr(instrument, i)().instrumentName, None)
 
     def testIndividuals(self):
-        from music21 import instrument  # @UnusedImport  # wrong -- is used
+        from music21 import instrument
 
         for x in humdrumInstruments:
             i = humdrumInstruments[x]
@@ -286,7 +287,7 @@ class Test(unittest.TestCase):
                 foundInstruments.append(str(x))
         self.assertEqual(foundInstruments,
                          ['Soprano', 'Alto', 'Tenor', 'Tenor', 'Bass'])
-        alto = c.parts[1].flat.getInstrument()
+        alto = c.parts[1].flatten().getInstrument()
         self.assertIn('Alto', alto.classes)
 
 

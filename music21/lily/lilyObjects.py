@@ -20,6 +20,7 @@ this replaces (April 2012) the old LilyString() conversion methods.
 The Grammar for Lilypond comes from
 http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
 '''
+from typing import Any, Dict, List
 import unittest
 from music21 import common
 from music21 import exceptions21
@@ -39,9 +40,9 @@ class LyObject(prebase.ProtoM21Object):
     ''
 
     '''
-    supportedClasses = []  # ordered list of classes to support
-    m21toLy = {}
-    defaultAttributes = {}
+    supportedClasses: List[object] = []  # ordered list of classes to support
+    m21toLy: Dict[str, dict] = {}
+    defaultAttributes: Dict[str, Any] = {}
     backslash = '\\'
 
     def __init__(self):
@@ -1283,7 +1284,6 @@ class LyPrefixCompositeMusic(LyObject):
                        | re_rhythmed_music
     '''
     # pylint: disable=redefined-builtin
-
     def __init__(self, type=None, genericPrefixMusicScm=None,  # @ReservedAssignment
                  simpleString=None, optionalId=None, optionalContextMod=None,
                  music=None, fraction=None, repeatedMusic=None,
@@ -2044,7 +2044,7 @@ class LyNumberTerm(LyObject):
 
 
 class LyLyricMarkup(LyObject):
-    def __init_(self, lyricMarkupOrIdentifier=None, markupTop=None):
+    def __init__(self, lyricMarkupOrIdentifier=None, markupTop=None):
         super().__init__()
         self.lyricMarkupOrIdentifier = lyricMarkupOrIdentifier
         self.markupTop = markupTop
@@ -2057,7 +2057,7 @@ class LyLyricMarkup(LyObject):
 
 
 class LyFullMarkupList(LyObject):
-    def __init_(self, markupListOrIdentifier=None):
+    def __init__(self, markupListOrIdentifier=None):
         super().__init__()
         self.markupListOrIdentifier = markupListOrIdentifier
 
@@ -2070,7 +2070,7 @@ class LyFullMarkupList(LyObject):
 
 
 class LyFullMarkup(LyObject):
-    def __init_(self, markupTopOrIdentifier=None):
+    def __init__(self, markupTopOrIdentifier=None):
         super().__init__()
         self.markupTopOrIdentifier = markupTopOrIdentifier
 

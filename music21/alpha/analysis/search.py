@@ -13,6 +13,9 @@ import unittest
 
 from music21 import exceptions21
 
+from music21 import chord
+from music21 import note
+from music21 import pitch
 from music21 import scale
 from music21 import stream
 
@@ -76,13 +79,13 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
     # strip them out of a copy of the source
     sourceClean = stream.Stream()
     for e in source:
-        if 'Chord' in e.classes:
+        if isinstance(e, chord.Chord):
             continue  # do not insert for now
-        if 'Rest' in e.classes and restsAllowed:
+        if isinstance(e, note.Rest) and restsAllowed:
             continue  # do not insert if allowed
 
         # just takes notes or pitches
-        if 'Note' in e.classes or 'Pitch' in e.classes:
+        if isinstance(e, (pitch.Pitch, note.Note)):
             sourceClean.insert(source.elementOffset(e), e)
 
     # not taking flat
@@ -247,8 +250,6 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 class Test(unittest.TestCase):
 
     def testFindConsecutiveScaleA(self):
-        from music21 import note
-
         sc = scale.MajorScale('a4')
 
         # fixed collection
@@ -393,7 +394,7 @@ class Test(unittest.TestCase):
         for sc in [scGMajor, scDMajor, scAMajor]:
             for part in s.parts:  # just first part
                 # must provide flat version
-                post = findConsecutiveScale(part.flat, sc, degreesRequired=5,
+                post = findConsecutiveScale(part.flatten(), sc, degreesRequired=5,
                                             comparisonAttribute='name')
                 for g, group in enumerate(post):
                     for n in group:

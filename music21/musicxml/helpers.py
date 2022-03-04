@@ -10,11 +10,11 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy
-import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import tostring as et_tostring
 
 def dumpString(obj, *, noCopy=False) -> str:
     r'''
-    wrapper around xml.etree.ElementTree as ET that returns a string
+    wrapper around xml.etree.ElementTree that returns a string
     in every case and indents tags and sorts attributes.
 
     >>> from music21.musicxml.m21ToXml import Element
@@ -43,14 +43,14 @@ def dumpString(obj, *, noCopy=False) -> str:
             attribs = sorted(attrib.items())
             attrib.clear()
             attrib.update(attribs)
-    xStr = ET.tostring(xmlEl, encoding='unicode')
+    xStr = et_tostring(xmlEl, encoding='unicode')
     xStr = xStr.rstrip()
     return xStr
 
 
 def dump(obj):
     r'''
-    wrapper around xml.etree.ElementTree as ET that prints a string
+    wrapper around xml.etree.ElementTree that prints a string
     in every case and indents tags and sorts attributes.  (Prints, does not return)
 
     >>> from music21.musicxml.helpers import dump

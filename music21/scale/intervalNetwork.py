@@ -33,16 +33,11 @@ import copy
 import unittest
 
 from collections import OrderedDict
-try:
-    import networkx
-except ImportError:
-    # lacking this does nothing
-    networkx = None
-    # _missingImport.append('networkx')
 
+from music21 import common
 from music21 import exceptions21
 from music21 import interval
-from music21 import common
+from music21 import note
 from music21 import pitch
 from music21 import prebase
 
@@ -1035,7 +1030,7 @@ class IntervalNetwork:
                 if nodeId == nStep:
                     post.append(self.nodes[nId])
             # if no matches, and moduli comparisons are permitted
-            if post == [] and permitDegreeModuli:
+            if not post and permitDegreeModuli:
                 for nId, nStep in nodeStep.items():
                     if self.degreeModulus(nodeId) == nStep:
                         post.append(self.nodes[nId])
@@ -2189,6 +2184,8 @@ class IntervalNetwork:
         of this IntervalNetwork if networkx is installed
 
         '''
+        # noinspection PyPackageRequirements
+        import networkx  # pylint: disable=import-error
         weight = 1
         style = 'solid'
 
@@ -2244,14 +2241,14 @@ class IntervalNetwork:
 
         Requires networkx to be installed.
         '''
-#
-#         >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
-#         >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
-#         >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
-#         >>> #_DOCS_SHOW s.plot('pianoroll')
-
-#         .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
-#             :width: 600
+        #
+        # >>> s = corpus.parse('bach/bwv324.xml') #_DOCS_HIDE
+        # >>> s.plot('pianoroll', doneAction=None) #_DOCS_HIDE
+        # >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
+        # >>> #_DOCS_SHOW s.plot('pianoroll')
+        #
+        # .. image:: images/PlotHorizontalBarPitchSpaceOffset.*
+        #     :width: 600
         if pitchObj is None:
             pitchObj = pitch.Pitch('C4')
 
@@ -2314,7 +2311,7 @@ class IntervalNetwork:
 
         if isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
-        elif 'Note' in pitchTarget.classes:
+        elif isinstance(pitchTarget, note.Note):
             pitchTarget = pitchTarget.pitch
 
         saveOctave = pitchTarget.octave

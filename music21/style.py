@@ -18,13 +18,31 @@ import unittest
 
 from music21 import common
 from music21 import exceptions21
+from music21.prebase import ProtoM21Object
 
 
 class TextFormatException(exceptions21.Music21Exception):
     pass
 
 
-class Style:
+class Enclosure(common.StrEnum):
+    RECTANGLE = 'rectangle'
+    SQUARE = 'square'
+    OVAL = 'oval'
+    CIRCLE = 'circle'
+    BRACKET = 'bracket'
+    TRIANGLE = 'triangle'
+    DIAMOND = 'diamond'
+    PENTAGON = 'pentagon'
+    HEXAGON = 'hexagon'
+    HEPTAGON = 'heptagon'
+    OCTAGON = 'octagon'
+    NONAGON = 'nonagon'
+    DECAGON = 'decagon'
+    NONE = 'none'  # special -- sets to None.
+
+
+class Style(ProtoM21Object):
     '''
     A style object is a lightweight object that
     keeps track of information about the look of an object.
@@ -56,7 +74,7 @@ class Style:
         # managed by property below.
         self._absoluteY: Optional[Union[float, int]] = None
 
-        self._enclosure: Optional[str] = None
+        self._enclosure: Optional[Enclosure] = None
 
         # how should this symbol be represented in the font?
         # SMuFL characters are allowed.
@@ -67,37 +85,49 @@ class Style:
         self.units: str = 'tenths'
         self.hideObjectOnPrint: bool = False
 
-    def _getEnclosure(self):
+    def _getEnclosure(self) -> Optional[Enclosure]:
         return self._enclosure
 
-    def _setEnclosure(self, value):
+    def _setEnclosure(self, value: Optional[Enclosure]):
         if value is None:
             self._enclosure = value
-        elif value == 'none':
+        elif value == Enclosure.NONE:
             self._enclosure = None
-        elif value.lower() in ('rectangle', 'square', 'oval', 'circle',
-                               'bracket', 'triangle', 'diamond',
-                               'pentagon', 'hexagon', 'heptagon', 'octagon',
-                               'nonagon', 'decagon'):
-            self._enclosure = value.lower()
+        elif isinstance(value, Enclosure):
+            self._enclosure = value
+        elif isinstance(value, str):
+            try:
+                enc_value = Enclosure(value.lower())
+            except ValueError as ve:
+                raise TextFormatException(f'Not a supported enclosure: {value}') from ve
+
+            self._enclosure = enc_value
+
         else:
             raise TextFormatException(f'Not a supported enclosure: {value}')
 
     enclosure = property(_getEnclosure,
                          _setEnclosure,
                          doc='''
-        Get or set the enclosure.  Valid names are
+        Get or set the enclosure as a style.Enclosure enum or None.
+
+        Valid names are
         rectangle, square, oval, circle, bracket, triangle, diamond,
         pentagon, hexagon, heptagon, octagon,
         nonagon, decagon or None.
 
-
         >>> tst = style.TextStyle()
         >>> tst.enclosure = None
-        >>> tst.enclosure = 'rectangle'
+        >>> tst.enclosure = style.Enclosure.RECTANGLE
         >>> tst.enclosure
-        'rectangle'
+        <Enclosure.RECTANGLE>
 
+        Setting as a string is still supported, but is converted to
+        an enum.
+
+        >>> tst.enclosure = 'octagon'
+        >>> tst.enclosure
+        <Enclosure.OCTAGON>
         ''')
 
     def _getAbsoluteY(self):
@@ -106,18 +136,17 @@ class Style:
     def _setAbsoluteY(self, value):
         if value is None:
             self._absoluteY = None
+        elif value == 'above':
+            self._absoluteY = 10
+        elif value == 'below':
+            self._absoluteY = -70
         else:
-            if value == 'above':
-                value = 10
-            elif value == 'below':
-                value = -70
             try:
-                value = common.numToIntOrFloat(value)
+                self._absoluteY = common.numToIntOrFloat(value)
             except ValueError as ve:
                 raise TextFormatException(
                     f'Not a supported absoluteY position: {value!r}'
                 ) from ve
-            self._absoluteY = value
 
     absoluteY = property(_getAbsoluteY,
                          _setAbsoluteY,
@@ -158,6 +187,10 @@ class NoteStyle(Style):
 class TextStyle(Style):
     '''
     A Style object that also includes text formatting.
+
+    >>> ts = style.TextStyle()
+    >>> ts.classes
+    ('TextStyle', 'Style', 'ProtoM21Object', 'object')
     '''
 
     def __init__(self):
@@ -214,7 +247,6 @@ class TextStyle(Style):
                                doc='''
         Get or set the horizontal alignment.  Valid values are left, right, center,
         or None
-
 
         >>> te = style.TextStyle()
         >>> te.alignHorizontal = 'right'

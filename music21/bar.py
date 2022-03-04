@@ -22,7 +22,6 @@ from music21 import expressions
 from music21 import repeat
 
 from music21 import environment
-from music21 import style
 
 _MOD = 'bar'
 environLocal = environment.Environment(_MOD)
@@ -93,7 +92,7 @@ def standardizeBarType(value):
 
 
 # ------------------------------------------------------------------------------
-class Barline(base.Music21Object, style.StyleMixin):
+class Barline(base.Music21Object):
     '''A representation of a barline.
     Barlines are conventionally assigned to Measure objects
     using the leftBarline and rightBarline attributes.
@@ -294,6 +293,8 @@ class Repeat(repeat.RepeatMark, Barline):
 
         TODO: show how changing direction changes type.
         '''
+        if self._direction is None:  # pragma: no cover
+            raise BarException('_direction unexpectedly None after initialization')
         return self._direction
 
     @direction.setter
@@ -376,7 +377,10 @@ class Repeat(repeat.RepeatMark, Barline):
 class Test(unittest.TestCase):
 
     def testSortOrder(self):
-        from music21 import stream, clef, note, metadata
+        from music21 import stream
+        from music21 import clef
+        from music21 import note
+        from music21 import metadata
         m = stream.Measure()
         b = Repeat()
         m.leftBarline = b
@@ -396,6 +400,19 @@ class Test(unittest.TestCase):
 
         self.assertEqual(m[0], md)
         self.assertEqual(m[1], b)
+
+    def testFreezeThaw(self):
+        from music21 import converter
+        from music21 import stream
+
+        b = Barline()
+        self.assertNotIn('StyleMixin', b.classes)
+        s = stream.Stream([b])
+        data = converter.freezeStr(s, fmt='pickle')
+        s2 = converter.thawStr(data)
+        thawedBarline = s2[0]
+        # Previously, raised AttributeError
+        self.assertEqual(thawedBarline.hasStyleInformation, False)
 
 
 if __name__ == '__main__':

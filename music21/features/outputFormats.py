@@ -33,7 +33,7 @@ class OutputFormat:
             fp = environLocal.getTempFile(suffix=self.ext)
         if not str(fp).endswith(self.ext):
             raise OutputFormatException('Could not get a temp file with the right extension')
-        with open(fp, 'w') as f:
+        with open(fp, 'w', encoding='utf-8') as f:
             f.write(self.getString(includeClassLabel=includeClassLabel,
                                    includeId=includeId))
         return fp
@@ -45,7 +45,7 @@ class OutputTabOrange(OutputFormat):
 
     For more information, see:
 
-    http://docs.orange.biolab.si/3/data-mining-library/tutorial/data.html#saving-the-data
+    https://orange3.readthedocs.io/projects/orange-data-mining-library/en/latest/tutorial/data.html#saving-the-data
     '''
 
     def __init__(self, dataSet=None):
@@ -164,7 +164,9 @@ class OutputCSV(OutputFormat):
 class OutputARFF(OutputFormat):
     '''An ARFF (Attribute-Relation File Format) file.
 
-    See http://weka.wikispaces.com/ARFF+%28stable+version%29 for more details
+    See
+    https://web.archive.org/web/20160212022757/http://weka.wikispaces.com/ARFF+%28stable+version%29
+    for more details
 
 
     >>> oa = features.outputFormats.OutputARFF()

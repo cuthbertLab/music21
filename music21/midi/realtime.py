@@ -14,14 +14,13 @@ Objects for realtime playback of Music21 Streams as MIDI.
 
 From an idea of Joe "Codeswell":
 
-http://joecodeswell.wordpress.com/2012/06/13/
-how-to-produce-python-controlled-audio-output-from-music-made-with-music21
+https://joecodeswell.wordpress.com/2012/06/13/how-to-produce-python-controlled-audio-output-from-music-made-with-music21
 
-http://stackoverflow.com/questions/10983462/
-how-can-i-produce-real-time-audio-output-from-music-made-with-music21
+https://stackoverflow.com/questions/10983462/how-can-i-produce-real-time-audio-output-from-music-made-with-music21
 
 Requires pygame: http://www.pygame.org/download.shtml
 '''
+from importlib.util import find_spec
 import unittest
 from io import BytesIO
 
@@ -50,7 +49,7 @@ class StreamPlayer:  # pragma: no cover
     ...    keyDetune.append(random.randint(-30, 30))
 
     >>> #_DOCS_SHOW b = corpus.parse('bwv66.6')
-    >>> #_DOCS_SHOW for n in b.flat.notes:
+    >>> #_DOCS_SHOW for n in b.flatten().notes:
     >>> class PitchMock: midi = 20  #_DOCS_HIDE
     >>> class Mock: pitch = PitchMock()  #_DOCS_HIDE
     >>> #_DOCS_HIDE -- should not playback in doctests, see TestExternal
@@ -178,7 +177,13 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
+    loader = find_spec('pygame')
+    if loader is not None:  # pragma: no cover
+        pygame_installed = True
+    else:
+        pygame_installed = False
 
+    @unittest.skipUnless(pygame_installed, 'pygame is not installed')
     def testBachDetune(self):
         from music21 import corpus
         import random
@@ -186,7 +191,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         keyDetune = []
         for i in range(127):
             keyDetune.append(random.randint(-30, 30))
-        for n in b.flat.notes:
+        for n in b.recurse().notes:
             n.pitch.microtone = keyDetune[n.pitch.midi]
         sp = StreamPlayer(b)
         sp.play()
@@ -224,7 +229,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         keyDetune = []
         for i in range(127):
             keyDetune.append(random.randint(-30, 30))
-        for n in b.flat.notes:
+        for n in b.recurse().notes:
             n.pitch.microtone = keyDetune[n.pitch.midi]
         sp = StreamPlayer(b)
         sp.play(busyFunction=busyCounter, busyArgs=[timeCounter], busyWaitMilliseconds=500)
@@ -248,7 +253,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         doesn't work -- no matter what there's always at least a small lag, even with queues
         '''
         # pylint: disable=attribute-defined-outside-init
-        from music21 import stream, note
+        from music21 import stream
+        from music21 import note
         import random
 
         def getRandomStream():

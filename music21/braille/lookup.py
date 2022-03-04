@@ -261,7 +261,9 @@ clefs = {'prefix': _B[345],
          'suffix': {False: _B[123],
                     True: _B[13]}
          }
-bowingSymbols = {}
+
+bowingSymbols = {'down bow': _B[126] + _B[12],
+                 'up bow': _B[126] + _B[3]}
 
 beforeNoteExpr = {'staccato': _B[236],
                   'accent': _B[46] + _B[236],

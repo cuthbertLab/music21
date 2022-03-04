@@ -20,8 +20,8 @@ Further conversion to-and-from MidiEvent/MidiTrack/MidiFile and music21 Stream,
 Note, etc., objects takes place in :ref:`moduleMidiTranslate`.
 
 This module originally used routines from Will Ware's public domain midi.py
-library from 2001 see
-http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
+library from 2001 which was once posted at (http link)
+groups.google.com/g/alt.sources/msg/0c5fc523e050c35e
 '''
 __all__ = [
     'realtime', 'percussion',
@@ -29,18 +29,15 @@ __all__ = [
     'DeltaTime',
     'MetaEvents', 'ChannelVoiceMessages', 'ChannelModeMessages',
     'SysExEvents',
-    'EnumerationException',
 ]
 
 import io
 import re
-import os
-import string
 import struct
 import sys
-import unicodedata  # @UnresolvedImport
+import unicodedata
 import unittest
-from typing import Optional, Union, Tuple
+from typing import List, Optional, Union, Tuple
 
 from enum import IntEnum
 
@@ -59,10 +56,6 @@ environLocal = environment.Environment(_MOD)
 # good midi reference:
 # http://www.sonicspot.com/guide/midifiles.html
 # ------------------------------------------------------------------------------
-class EnumerationException(exceptions21.Music21Exception):
-    pass
-
-
 class MidiException(exceptions21.Music21Exception):
     pass
 
@@ -357,7 +350,7 @@ class _ContainsEnum(IntEnum):
 
     @classmethod
     def hasValue(cls, val):
-        return val in cls.__members__.values()
+        return val in cls._value2member_map_
 
 
 class ChannelVoiceMessages(_ContainsEnum):
@@ -446,6 +439,12 @@ class MidiEvent(prebase.ProtoM21Object):
     The `data` attribute is used for storing other messages,
     such as SEQUENCE_TRACK_NAME string values.
 
+    .. warning::
+
+        The attributes `.midiProgram` and `.midiChannel` on :class:`~music21.instrument.Instrument`
+        objects are 0-indexed, just as they need to be in the written binary .mid.
+        However, as a convenience, :attr:`MidiEvent.channel` is 1-indexed. No
+        analogous convenience is provided for program change data.
 
     >>> mt = midi.MidiTrack(1)
     >>> me1 = midi.MidiEvent(mt)
@@ -469,7 +468,7 @@ class MidiEvent(prebase.ProtoM21Object):
                  track: Optional['music21.midi.MidiTrack'] = None,
                  type=None,  # @ReservedAssignment
                  time: int = 0,
-                 channel=None):
+                 channel: Optional[int] = None):
         self.track: Optional['music21.midi.MidiTrack'] = track  # a MidiTrack object
         self.type = type
         self.time: int = time
@@ -1538,6 +1537,7 @@ class MidiFile(prebase.ProtoM21Object):
         '''
         if attrib not in ['rb', 'wb']:
             raise MidiException('cannot read or write unless in binary mode, not:', attrib)
+        # pylint: disable-next=consider-using-with, unspecified-encoding
         self.file = open(filename, attrib)
 
     def openFileLike(self, fileLike):
@@ -1652,7 +1652,7 @@ class MidiFile(prebase.ProtoM21Object):
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
+class TestExternal(unittest.TestCase):
     '''
     These are tests that open windows and rely on external software
     '''
@@ -1946,8 +1946,8 @@ class Test(unittest.TestCase):
         # dealing with midi files that use running status compression
         s = converter.parse(fp)
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.parts[0].flat.notes), 704)
-        self.assertEqual(len(s.parts[1].flat.notes), 856)
+        self.assertEqual(len(s.parts[0].recurse().notes), 704)
+        self.assertEqual(len(s.parts[1].recurse().notes), 856)
 
         # for n in s.parts[0].notes:
         #    print(n, n.quarterLength)
@@ -1983,7 +1983,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 if __name__ == '__main__':
     import music21
