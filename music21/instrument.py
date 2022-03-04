@@ -2300,7 +2300,17 @@ def _combinations(instrumentString):
     return allComb
 
 
-def fromString(instrumentString):
+_currentlySupportedLanguages = ('english',
+                                'french',
+                                'german',
+                                'italian',
+                                'russian',
+                                'spanish',
+                                'abbreviation')
+
+
+def fromString(instrumentString: str,
+               language: str = 'all'):
     '''
     Given a string with instrument content (from an orchestral score
     for example), attempts to return an appropriate
@@ -2369,7 +2379,7 @@ def fromString(instrumentString):
     and I'll change this back!
 
 
-    Finally, standard abbreviations are acceptable:
+    Standard abbreviations are acceptable:
 
     >>> t10 = instrument.fromString('Cl in B-flat')
     >>> t10
@@ -2394,9 +2404,39 @@ def fromString(instrumentString):
     >>> instrument.fromString('Choir (Aahs)')
     <music21.instrument.Choir 'Choir (Aahs)'>
 
+
+    By default, this function searches over all stored instrument names.
+    This includes multiple languages as well as the abbreviations
+    (an honorary 'language' for these purposes).
+
+    Alternatively, you can specify the language to search using the 'language' argument.
+
+    >>> t12 = instrument.fromString('Klarinette', language='german')
+    >>> t12
+    <music21.instrument.Clarinet 'Klarinette'>
+
+
+    This case works because the name 'Klarinette' is a recognised instrument name in German
+    and appears in the German language list.
+    If you search for a German name like 'Klarinette' on the French list (language='french'),
+    then it won't be found and an error will be raised.
+    An error is also raised if the specified langauge is not one of those currently supported:
+    'English', 'French', 'German', 'Italian', 'Russian', 'Spanish', and 'Abbreviation'.
+
+    Note that the language string is not case-sensitive, so 'french' and 'French' are equivalent.
+
     '''
     # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
+
+    if language == 'all':
+        sourceDict = instrumentLookup.allToClassName
+    else:
+        lang = language.lower()
+        if lang not in _currentlySupportedLanguages:
+            raise InstrumentException(f'Chosen language {language} not currently supported.')
+        else:
+            sourceDict = getattr(instrumentLookup, lang + 'ToClassName')
 
     instrumentStringOrig = instrumentString
     instrumentString = instrumentString.replace('.', ' ')  # sic, before removePunctuation
@@ -2411,7 +2451,7 @@ def fromString(instrumentString):
     this_module = importlib.import_module('music21.instrument')
     for substring in allCombinations:
         try:
-            className = instrumentLookup.allToClassName[substring]
+            className = sourceDict[substring]
             thisInstClass = getattr(this_module, className)
             # In case users have overridden the module and imported more things
             if base.Music21Object not in thisInstClass.__mro__:  # pragma: no cover
@@ -2692,6 +2732,31 @@ class Test(unittest.TestCase):
     #     s2 = instrument.partitionByInstrument(s)
     #     for p in s2.parts:
     #         p.makeRests(fillGaps=True, inPlace=True)
+
+    def testLanguageChoice(self):
+        from music21 import instrument
+
+        testString = 'Klarinette'  # German name
+
+        # Works when language not specified
+        self.assertEqual(instrument.fromString(testString).instrumentName,
+                         'Klarinette')
+
+        # Works with correct language for the term
+        self.assertEqual(instrument.fromString(testString, language='german').instrumentName,
+                         testString)
+
+        # Error for incorrect language
+        self.assertRaises(InstrumentException,
+                          instrument.fromString,
+                          testString,
+                          language='french')
+
+        # Error for unsupported language
+        self.assertRaises(InstrumentException,
+                          instrument.fromString,
+                          testString,
+                          language='finnish')
 
 
 # ------------------------------------------------------------------------------
