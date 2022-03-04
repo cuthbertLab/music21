@@ -1724,11 +1724,19 @@ class Chord(ChordBase):
 
         >>> cmaj.getChordStep(6) is None
         True
+
+        OMIT_FROM_DOCS
+
+        If `root` has been explicitly overridden as `None`, calling this raises `ChordException`:
+
+        >>> cmaj._overrides['root'] = None
+        >>> cmaj.getChordStep(6)
+        Traceback (most recent call last):
+        music21.chord.ChordException: Cannot run getChordStep without a root
         '''
         if testRoot is None:
-            testRoot = self.root()
-            if testRoot is None:
-                # can this be tested?
+            testRoot = self.root()  # raises ChordException if no pitches
+            if testRoot is None:  # if root was overridden to be None
                 raise ChordException('Cannot run getChordStep without a root')
         elif isinstance(testRoot, note.Note):
             testRoot = testRoot.pitch
@@ -3406,7 +3414,9 @@ class Chord(ChordBase):
 
         try:
             return bool(self.getChordStep(2))
-        except ChordException:
+        except ChordException:  # pragma: no cover
+            # probably not reachable, since self.third would have caught the same
+            # exception and returned False...
             return False
 
     def isSwissAugmentedSixth(self, *, permitAnyInversion=False):
@@ -3708,8 +3718,7 @@ class Chord(ChordBase):
 
         If for some reason you do not want the root-finding algorithm to be
         run (for instance, checking to see if an overridden root has been
-        specified) set find=False.  "None" may be returned if
-        will be returned if no root has been specified.
+        specified) set find=False.  "None" will be returned if no root has been specified.
 
         >>> c = chord.Chord(['E3', 'G3', 'B4'])
         >>> print(c.root(find=False))
