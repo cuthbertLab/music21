@@ -3387,6 +3387,9 @@ class Chord(ChordBase):
 
         >>> chord.Chord('C C# E B D').isNinth()
         False
+
+        >>> chord.Chord('C E G C- D').isNinth()
+        False
         '''
         uniquePitchNames = set(self.pitchNames)
         if len(uniquePitchNames) != 5:
@@ -4580,6 +4583,11 @@ class Chord(ChordBase):
         Changed in v6.5: better handling of 0-, 1-, and 2-pitchClass and microtonal chords.
         Changed in v7: Inversions of augmented sixth-chords are specified.
         Changed in v7.3: Enharmonic equivalents to common seventh and ninth chords are specified.
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord('C E G C-').commonName
+        'enharmonic equivalent to major seventh chord'
         '''
         if any(not p.isTwelveTone() for p in self.pitches):
             return 'microtonal chord'
