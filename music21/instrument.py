@@ -2435,8 +2435,7 @@ def fromString(instrumentString: str,
         lang = language.lower()
         if lang not in _currentlySupportedLanguages:
             raise InstrumentException(f'Chosen language {language} not currently supported.')
-        else:
-            sourceDict = getattr(instrumentLookup, lang + 'ToClassName')
+        sourceDict = getattr(instrumentLookup, lang + 'ToClassName')
 
     instrumentStringOrig = instrumentString
     instrumentString = instrumentString.replace('.', ' ')  # sic, before removePunctuation
