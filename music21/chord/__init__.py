@@ -3361,6 +3361,45 @@ class Chord(ChordBase):
 
         return True
 
+    @cacheMethod
+    def isNinth(self):
+        '''
+        Returns True if chord contains at least one of each of Third, Fifth, Seventh, and Ninth
+        and every note in the chord is a Third, Fifth, Seventh, or Ninth, such that there are no
+        repeated scale degrees (ex: E and E-). Else return false.
+
+        Example:
+
+        >>> cChord = chord.Chord(['C', 'E', 'G', 'B', 'D'])
+        >>> cChord.isNinth()
+        True
+        >>> other = chord.Chord(['C', 'E', 'F', 'G', 'B'])
+        >>> other.isNinth()
+        False
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().isNinth()
+        False
+        '''
+        uniquePitchNames = set(self.pitchNames)
+        if len(uniquePitchNames) != 5:
+            return False
+
+        if self.third is None:
+            return False
+
+        if self.fifth is None:
+            return False
+
+        if self.seventh is None:
+            return False
+
+        try:
+            return bool(self.getChordStep(2))
+        except ChordException:
+            return False
+
     def isSwissAugmentedSixth(self, *, permitAnyInversion=False):
         '''
         Returns true is it is a respelled German augmented 6th chord with
@@ -3403,7 +3442,7 @@ class Chord(ChordBase):
         '''
         Returns True if this Chord is a triad of some sort.  It could even be a rather
         exotic triad so long as the chord contains at least one Third and one Fifth and
-        all notes have the same name as one of the htree notes.
+        all notes have the same name as one of the three notes.
 
         Note: only returns True if triad is spelled correctly.
 
@@ -4523,9 +4562,18 @@ class Chord(ChordBase):
         >>> chord.Chord('C`4 D~4').commonName
         'microtonal chord'
 
+        Enharmonic equivalents to common sevenths and ninths are clarified:
+
+        >>> chord.Chord('C4 E4 G4 A##4').commonName
+        'enharmonic equivalent to major seventh chord'
+
+        >>> chord.Chord('C4 E-4 G4 A#4 D4').commonName
+        'enharmonic equivalent to minor-ninth chord'
+
         Changed in v5.5: special cases for checking enharmonics in some cases
         Changed in v6.5: better handling of 0-, 1-, and 2-pitchClass and microtonal chords.
         Changed in v7: Inversions of augmented sixth-chords are specified.
+        Changed in v7.3: Enharmonic equivalents to common seventh and ninth chords are specified.
         '''
         if any(not p.isTwelveTone() for p in self.pitches):
             return 'microtonal chord'
@@ -4582,11 +4630,24 @@ class Chord(ChordBase):
 
         forteClass = self.forteClass
         # forteClassTn = self.forteClassTn
+
+        def _isSeventhWithPerfectFifthAboveRoot(c: Chord) -> bool:
+            '''For testing minor-minor sevenths and major-major sevenths'''
+            if not c.isSeventh():
+                return False
+            hypothetical_fifth = c.root().transpose('P5')
+            return hypothetical_fifth.name in c.pitchNames
+
         enharmonicTests = {
             '3-11A': self.isMinorTriad,
             '3-11B': self.isMajorTriad,
             '3-10': self.isDiminishedTriad,
             '3-12': self.isAugmentedTriad,
+            '4-27A': self.isHalfDiminishedSeventh,
+            '4-28': self.isDiminishedSeventh,
+            '5-27A': self.isNinth,  # major-ninth
+            '5-27B': self.isNinth,  # minor-ninth
+            '5-34': self.isNinth,  # dominant-ninth
         }
 
         # special cases
@@ -4618,6 +4679,14 @@ class Chord(ChordBase):
                 return ctn[1] + ' in ' + self.inversionText().lower()
             else:
                 return ctn[0]
+        elif forteClass in ('4-20', '4-26'):
+            # minor seventh or major seventh chords,
+            # but cannot just test isSeventh, as
+            # that would permit C E G A## (A## as root)
+            if _isSeventhWithPerfectFifthAboveRoot(self):
+                return ctn[0]
+            else:
+                return 'enharmonic equivalent to ' + ctn[0]
 
         elif forteClass in enharmonicTests:
             out = ctn[0]
