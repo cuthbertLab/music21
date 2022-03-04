@@ -488,12 +488,26 @@ class GeneralObjectExporter:
         representation of a Measure, not for partial
         solutions in Part or Stream production.
         '''
+        m.coreGatherMissingSpanners()
         mCopy = m.makeNotation()
-        if not m.recurse().getElementsByClass('Clef').getElementsByOffset(0.0):
+        if mCopy.style.measureNumbering is None:
+            # Provide a default
+            mCopy.style.measureNumbering = 'measure'
+        clef_from_measure_start_or_context = m.getContextByClass(
+            clef.Clef,
+            getElementMethod=common.enums.ElementSearch.AT_OR_BEFORE_OFFSET
+        )
+        if clef_from_measure_start_or_context is None:
             mCopy.clef = clef.bestClef(mCopy, recurse=True)
+        else:
+            mCopy.clef = clef_from_measure_start_or_context
         p = stream.Part()
         p.append(mCopy)
         p.metadata = copy.deepcopy(getMetadataFromContext(m))
+        context_part = m.getContextByClass(stream.Part)
+        if context_part is not None:
+            p.partName = context_part.partName
+            p.partAbbreviation = context_part.partAbbreviation
         return self.fromPart(p)
 
     def fromVoice(self, v):
@@ -3063,6 +3077,10 @@ class MeasureExporter(XMLExporterBase):
                     self.parseOneElement(obj)
 
             for n in notesForLater:
+                if n.isRest and n.style.hideObjectOnPrint and n.duration.type == 'inexpressible':
+                    # Prefer a gap in stream, to be filled with a <forward> tag by
+                    # fill_gap_with_forward_tag() rather than raising exceptions
+                    continue
                 self.parseOneElement(n)
 
         if backupAfterwards:
@@ -6489,7 +6507,7 @@ class MeasureExporter(XMLExporterBase):
                 mxPrint = Element('print')
             mxMeasureNumbering = SubElement(mxPrint, 'measure-numbering')
             mxMeasureNumbering.text = m.style.measureNumbering
-            mnStyle = m.style.measureNumberingStyle
+            mnStyle = m.style.measureNumberStyle
             if mnStyle is not None:
                 self.setPrintStyleAlign(mxMeasureNumbering, mnStyle)
         # TODO: part-name-display
@@ -7054,6 +7072,30 @@ class Test(unittest.TestCase):
         n1.offset = 2
         n1.quarterLength = 2
         realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
+
+    def test_inexpressible_hidden_rests_become_forward_tags(self):
+        """Express hidden rests with inexpressible durations as <forward> tags."""
+        m = stream.Measure()
+        # 7 eighths in the space of 4 eighths, imported as 137/480
+        # (137/480) * 7 = 1.9979, not 2.0
+        # music21 filled gap with an inexpressible 0.0021 rest and couldn't export
+        septuplet = note.Note(type='eighth')
+        tuplet_obj = duration.Tuplet(7, 4, 'eighth')
+        septuplet.duration.appendTuplet(tuplet_obj)
+        septuplet.duration.linked = False
+        septuplet.quarterLength = fractions.Fraction(137, 480)
+        m.repeatAppend(septuplet, 7)
+        # leave 0.0021 gap and do the same thing from 2.0 -> 3.9979
+        m.repeatInsert(septuplet, [2.0])
+        m.repeatAppend(septuplet, 6)
+        m.insert(0, meter.TimeSignature('4/4'))
+        m.makeRests(inPlace=True, fillGaps=True, hideRests=True, timeRangeFromBarDuration=True)
+        self.assertLess(m[note.Rest].first().quarterLength, 0.0025)
+        gex = GeneralObjectExporter()
+        tree = self.getET(gex.fromGeneralObject(m))
+        # Only one <forward> tag to get from 1.9979 -> 2.0
+        # No <forward> tag is necessary to finish the incomplete measure (3.9979 -> 4.0)
+        self.assertEqual(len(tree.findall('.//forward')), 1)
 
 
 class TestExternal(unittest.TestCase):

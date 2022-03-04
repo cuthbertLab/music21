@@ -428,7 +428,7 @@ class _EnvironmentCore:
                 ('graphicsPath', previewLocation),
                 ('vectorPath', previewLocation),
                 ('pdfPath', previewLocation),
-                ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
+                ('midiPath', '/Applications/GarageBand.app'),
                 ('musescoreDirectPNGPath',
                  '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
             ]:
@@ -1444,7 +1444,7 @@ class Test(unittest.TestCase):
   <localCorporaSettings />
   <localCorpusSettings />
   <preference name="manualCoreCorpusPath" />
-  <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
+  <preference name="midiPath" value="/Applications/GarageBand.app" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
@@ -1499,7 +1499,7 @@ class Test(unittest.TestCase):
     <localCorpusPath>c</localCorpusPath>
   </localCorpusSettings>
   <preference name="manualCoreCorpusPath" />
-  <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
+  <preference name="midiPath" value="/Applications/GarageBand.app" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />

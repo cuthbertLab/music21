@@ -61,6 +61,19 @@ _keyCache: Dict[str, key.Key] = {}
 _NOTATION_SINGLETON = fbNotation.Notation()
 
 
+# only some figures imply bass (e.g. "54" does not)
+FIGURES_IMPLYING_BASS: Tuple[Tuple[int, ...], ...] = (
+    # triads
+    (6,), (6, 3), (6, 4),
+    # seventh chords
+    (6, 5, 3), (6, 5), (6, 4, 3), (4, 3), (6, 4, 2), (4, 2), (2,),
+    # ninth chords
+    (7, 6, 5, 3), (6, 5, 4, 3), (6, 4, 3, 2), (7, 5, 3, 2),
+    # eleventh chords
+    (9, 7, 6, 5, 3), (7, 6, 5, 4, 3), (9, 6, 5, 4, 3), (9, 7, 6, 4, 3), (7, 6, 5, 4, 2),
+)
+
+
 def _getKeyFromCache(keyStr: str) -> key.Key:
     '''
     get a key from the cache if it is there; otherwise
@@ -756,6 +769,8 @@ def romanNumeralFromChord(
     ...     )
     >>> romanNumeral4
     <music21.roman.RomanNumeral bVI in c minor>
+    >>> romanNumeral4.sixthMinor
+    <Minor67Default.CAUTIONARY: 2>
 
     >>> romanNumeral5 = roman.romanNumeralFromChord(
     ...     chord.Chord(['B4', 'D5', 'F5']),
@@ -1084,7 +1099,9 @@ def romanNumeralFromChord(
             keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
 
     try:
-        rn = RomanNumeral(rnString, keyObj, updatePitches=False)
+        rn = RomanNumeral(rnString, keyObj, updatePitches=False,
+            # correctRNAlterationForMinor() adds cautionary
+            sixthMinor=Minor67Default.CAUTIONARY, seventhMinor=Minor67Default.CAUTIONARY)
     except fbNotation.ModifierException as strerror:
         raise RomanNumeralException(
             'Could not parse {0} from chord {1} as an RN '
@@ -1459,6 +1476,12 @@ class RomanNumeral(harmony.Harmony):
     >>> susChord.root()
     <music21.pitch.Pitch C4>
 
+    Changed in v.7.3 -- figures such as 'V54' now yield the same result:
+
+    >>> anotherSus = roman.RomanNumeral('V54', key.Key('C'))
+    >>> anotherSus.pitches
+    (<music21.pitch.Pitch G4>, <music21.pitch.Pitch C5>, <music21.pitch.Pitch D5>)
+
     Putting it all together:
 
     >>> weirdChord = roman.RomanNumeral('V65[no5][add#6][b3]', key.Key('C'))
@@ -1690,6 +1713,12 @@ class RomanNumeral(harmony.Harmony):
     >>> r = roman.RomanNumeral('Vd7[no3no5no7]', key.Key('C'))
     >>> cp(r)
     ['G4']
+
+    Was setting a root of D5:
+
+    >>> r = roman.RomanNumeral('V754', key.Key('C'))
+    >>> cp(r)
+    ['G4', 'C5', 'D5', 'F5']
 
     (NOTE: all this is omitted -- look at OMIT_FROM_DOCS above)
     '''
@@ -2884,6 +2913,10 @@ class RomanNumeral(harmony.Harmony):
         else:
             self.pitches = pitches
 
+        if self.figuresNotationObj.numbers not in FIGURES_IMPLYING_BASS:
+            # Avoid deriving a nonsense root later
+            self.root(self.bass())
+
         self._matchAccidentalsToQuality(self.impliedQuality)
 
         # run this before omittedSteps and added steps so that
@@ -2987,6 +3020,7 @@ class RomanNumeral(harmony.Harmony):
     def figure(self, newFigure):
         self._figure = newFigure
         if self._parsingComplete:
+            self.bracketedAlterations = []
             self._parseFigure()
             self._updatePitches()
 
@@ -3180,6 +3214,12 @@ class RomanNumeral(harmony.Harmony):
         >>> I.bassScaleDegreeFromNotation()
         1
 
+        Figures that do not imply a bass like 54 just return the instance
+        :attr:`scaleDegree`:
+
+        >>> V = roman.RomanNumeral('V54')
+        >>> V.bassScaleDegreeFromNotation()
+        5
 
         A bit slow (6 seconds for 1000 operations, but not the bottleneck)
         '''
@@ -3188,6 +3228,8 @@ class RomanNumeral(harmony.Harmony):
         c = pitch.Pitch('C3')
         cDNN = 22  # cDNN = c.diatonicNoteNum  # always 22
         pitches = [c]
+        if notationObject.numbers not in FIGURES_IMPLYING_BASS:
+            return self.scaleDegree
         for i in notationObject.numbers:
             distanceToMove = i - 1
             newDiatonicNumber = (cDNN + distanceToMove)
@@ -3935,6 +3977,17 @@ class Test(unittest.TestCase):
             rn_out = romanNumeralFromChord(ch, c_major)
             self.assertEqual(rn.figure, rn_out.figure, f'{aug6}: {rn_out}')
 
+    def testSetFigureAgain(self):
+        """Setting the figure again doesn't double the alterations"""
+        ger = RomanNumeral('Ger7')
+        pitches_before = ger.pitches
+        ger.figure = 'Ger7'
+        self.assertEqual(ger.pitches, pitches_before)
+
+        sharp_four = RomanNumeral('#IV')
+        pitches_before = sharp_four.pitches
+        sharp_four.figure = '#IV'
+        self.assertEqual(sharp_four.pitches, pitches_before)
 
     def testZeroForDiminished(self):
         from music21 import roman
