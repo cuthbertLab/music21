@@ -2480,7 +2480,7 @@ def fromString(instrumentString: str,
         try:
             bestPitch = instrumentLookup.pitchFullNameToName[substring.lower()]
             bestInterval = instrumentLookup.transposition[bestName][bestPitch]
-            if bestInstrument.transposition:
+            if bestInstrument and bestInterval:
                 bestInstrument.transposition = interval.Interval(bestInterval)
             break
         except KeyError:
