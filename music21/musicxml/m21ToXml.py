@@ -2547,9 +2547,6 @@ class PartExporter(XMLExporterBase):
         elif not self.stream.getElementsByClass(stream.Measure):
             raise MusicXMLExportException(
                 'Cannot export with makeNotation=False if there are no measures')
-        else:
-            # QUESTION: destructive edit OK with makeNotation=False?
-            self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
         # make sure that all instances of the same class have unique ids
         self.spannerBundle.setIdLocals()
