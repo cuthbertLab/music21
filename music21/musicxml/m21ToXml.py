@@ -2560,7 +2560,8 @@ class PartExporter(XMLExporterBase):
 
         # Split complex durations in place (fast if none found)
         # must do after fixupNotationFlat(), which may create complex durations
-        self.stream = self.stream.splitAtDurations(recurse=True)[0]
+        if self.makeNotation:
+            self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
         # make sure that all instances of the same class have unique ids
         self.spannerBundle.setIdLocals()
