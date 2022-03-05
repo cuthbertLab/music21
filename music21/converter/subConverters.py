@@ -1576,7 +1576,7 @@ class Test(unittest.TestCase):
 
         with self.assertRaises(MusicXMLExportException):
             # must splitAtDurations()!
-            out2 = s.write(makeNotation=False)
+            s.write(makeNotation=False)
 
         s = s.splitAtDurations(recurse=True)[0]
         out2 = s.write(makeNotation=False)
