@@ -2576,7 +2576,9 @@ class PartExporter(XMLExporterBase):
                 mxMeasure = measureExporter.parse()
             except MusicXMLExportException as e:
                 e.measureNumber = str(m.number)
-                e.partName = self.stream.partName
+                if isinstance(self.stream, stream.Part):
+                    e.partName = self.stream.partName
+                # else: could be a Score without parts (flat)
                 raise e
             self.xmlRoot.append(mxMeasure)
 
