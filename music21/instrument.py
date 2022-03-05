@@ -2421,7 +2421,7 @@ def fromString(instrumentString: str,
     and appears in the German language list.
     If you search for a German name like 'Klarinette' on the French list (language='french'),
     then it won't be found and an InstrumentException will be raised.
-    An InstrumentException is also raised if the specified language is not 
+    An InstrumentException is also raised if the specified language is not
     one of those currently supported:
     'english', 'french', 'german', 'italian', 'russian', 'spanish', and 'abbreviation'.
 
