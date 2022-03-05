@@ -2549,9 +2549,6 @@ class PartExporter(XMLExporterBase):
         if self.stream.atSoundingPitch is True:
             self.stream.toWrittenPitch(inPlace=True)
 
-        # Split complex durations in place (fast if none found)
-        self.stream = self.stream.splitAtDurations(recurse=True)[0]
-
         # Suppose that everything below this is a measure
         if self.makeNotation and not self.stream.getElementsByClass(stream.Measure):
             self.fixupNotationFlat()
@@ -2560,6 +2557,11 @@ class PartExporter(XMLExporterBase):
         elif not self.stream.getElementsByClass(stream.Measure):
             raise MusicXMLExportException(
                 'Cannot export with makeNotation=False if there are no measures')
+
+        # Split complex durations in place (fast if none found)
+        # must do after fixupNotationFlat(), which may create complex durations
+        self.stream = self.stream.splitAtDurations(recurse=True)[0]
+
         # make sure that all instances of the same class have unique ids
         self.spannerBundle.setIdLocals()
 
