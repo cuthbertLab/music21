@@ -2300,17 +2300,18 @@ def _combinations(instrumentString):
     return allComb
 
 
-_currentlySupportedLanguages = ('english',
-                                'french',
-                                'german',
-                                'italian',
-                                'russian',
-                                'spanish',
-                                'abbreviation')
+class SupportedLanguages(common.enums.StrEnum):
+    ENGLISH = 'english'
+    FRENCH = 'french'
+    GERMAN = 'german'
+    ITALIAN = 'italian'
+    RUSSIAN = 'russian'
+    SPANISH = 'spanish'
+    ABBREVIATION = 'abbreviation'
 
 
 def fromString(instrumentString: str,
-               language: str = 'all'):
+               language: Optional[SupportedLanguages] = None):
     '''
     Given a string with instrument content (from an orchestral score
     for example), attempts to return an appropriate
@@ -2419,23 +2420,23 @@ def fromString(instrumentString: str,
     This case works because the name 'Klarinette' is a recognised instrument name in German
     and appears in the German language list.
     If you search for a German name like 'Klarinette' on the French list (language='french'),
-    then it won't be found and an error will be raised.
-    An error is also raised if the specified langauge is not one of those currently supported:
-    'English', 'French', 'German', 'Italian', 'Russian', 'Spanish', and 'Abbreviation'.
+    then it won't be found and an InstrumentException will be raised.
+    An InstrumentException is also raised if the specified language is not 
+    one of those currently supported:
+    'english', 'french', 'german', 'italian', 'russian', 'spanish', and 'abbreviation'.
 
-    Note that the language string is not case-sensitive, so 'french' and 'French' are equivalent.
+    Note that the language string is case-sensitive, so use 'french', not 'French'.
 
     '''
     # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
 
-    if language == 'all':
+    if not language:
         sourceDict = instrumentLookup.allToClassName
     else:
-        lang = language.lower()
-        if lang not in _currentlySupportedLanguages:
+        if language not in SupportedLanguages:
             raise InstrumentException(f'Chosen language {language} not currently supported.')
-        sourceDict = getattr(instrumentLookup, lang + 'ToClassName')
+        sourceDict = getattr(instrumentLookup, language + 'ToClassName')
 
     instrumentStringOrig = instrumentString
     instrumentString = instrumentString.replace('.', ' ')  # sic, before removePunctuation
@@ -2443,7 +2444,6 @@ def fromString(instrumentString: str,
     instrumentString = common.removePunctuation(instrumentString)
     allCombinations = _combinations(instrumentString)
     # First task: Find the best instrument.
-    bestInstClass = None
     bestInstrument = None
     bestName = None
 
@@ -2457,18 +2457,17 @@ def fromString(instrumentString: str,
                 raise KeyError
             thisInstrument = thisInstClass()
             thisBestName = thisInstrument.bestName().lower()
-            if (bestInstClass is None
+            if (bestInstrument is None
                     or len(thisBestName.split()) >= len(bestName.split())
-                    and not issubclass(bestInstClass, thisInstClass)):
+                    and not isinstance(bestInstrument, thisInstClass)):
                 # priority is also given to same length instruments which fall later
                 # on in the string (i.e. Bb Piccolo Trumpet)
-                bestInstClass = thisInstClass
                 bestInstrument = thisInstrument
                 bestInstrument.instrumentName = instrumentStringOrig
                 bestName = thisBestName
         except KeyError:
             pass
-    if bestInstClass is None:
+    if bestInstrument is None:
         raise InstrumentException(
             f'Could not match string with instrument: {instrumentStringOrig}')
     if bestName not in instrumentLookup.transposition:
@@ -2480,8 +2479,7 @@ def fromString(instrumentString: str,
         try:
             bestPitch = instrumentLookup.pitchFullNameToName[substring.lower()]
             bestInterval = instrumentLookup.transposition[bestName][bestPitch]
-            if bestInstrument and bestInterval:
-                bestInstrument.transposition = interval.Interval(bestInterval)
+            bestInstrument.transposition = interval.Interval(bestInterval)
             break
         except KeyError:
             pass
