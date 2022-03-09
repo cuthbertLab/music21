@@ -2225,6 +2225,21 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
           </encoding>
         </identification>
 
+
+        Overriding the default:
+
+        >>> defaults.author = "Batch Conversion March 2022"
+        >>> SX = musicxml.m21ToXml.ScoreExporter()
+        >>> mxIdentification = SX.setIdentification()
+        >>> SX.dump(mxIdentification)
+        <identification>
+          <creator type="composer">Batch Conversion March 2022</creator>
+          <encoding>
+            <encoding-date>20...-...-...</encoding-date>
+            <software>music21 v...</software>
+          </encoding>
+        </identification>
+
         '''
         if self.mxIdentification is not None:
             mxId = self.mxIdentification
