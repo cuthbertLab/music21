@@ -2300,7 +2300,8 @@ def _combinations(instrumentString):
     return allComb
 
 
-class SupportedLanguages(common.enums.StrEnum):
+class SearchLanguage(common.enums.StrEnum):
+    ALL = 'all'
     ENGLISH = 'english'
     FRENCH = 'french'
     GERMAN = 'german'
@@ -2311,7 +2312,7 @@ class SupportedLanguages(common.enums.StrEnum):
 
 
 def fromString(instrumentString: str,
-               language: Optional[SupportedLanguages] = None):
+               language: SearchLanguage = SearchLanguage.ALL):
     '''
     Given a string with instrument content (from an orchestral score
     for example), attempts to return an appropriate
@@ -2425,18 +2426,16 @@ def fromString(instrumentString: str,
     one of those currently supported:
     'english', 'french', 'german', 'italian', 'russian', 'spanish', and 'abbreviation'.
 
-    Note that the language string is case-sensitive, so use 'french', not 'French'.
+    Note that the language string is not case-sensitive, so 'French' is also fine.
 
     '''
     # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
 
-    if not language:
-        sourceDict = instrumentLookup.allToClassName
-    else:
-        if language not in SupportedLanguages:
-            raise InstrumentException(f'Chosen language {language} not currently supported.')
-        sourceDict = getattr(instrumentLookup, language + 'ToClassName')
+    language = language.lower()
+    if language not in SearchLanguage:
+        raise InstrumentException(f'Chosen language {language} not currently supported.')
+    sourceDict = getattr(instrumentLookup, language + 'ToClassName')
 
     instrumentStringOrig = instrumentString
     instrumentString = instrumentString.replace('.', ' ')  # sic, before removePunctuation
@@ -2738,10 +2737,14 @@ class Test(unittest.TestCase):
 
         # Works when language not specified
         self.assertEqual(instrument.fromString(testString).instrumentName,
-                         'Klarinette')
+                         testString)
 
         # Works with correct language for the term
         self.assertEqual(instrument.fromString(testString, language='german').instrumentName,
+                         testString)
+
+        # Not case-sensitive, so 'German' is also fine
+        self.assertEqual(instrument.fromString(testString, language='German').instrumentName,
                          testString)
 
         # Error for incorrect language
