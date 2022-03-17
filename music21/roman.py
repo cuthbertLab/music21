@@ -1247,7 +1247,7 @@ class RomanNumeral(harmony.Harmony):
     <music21.pitch.Pitch B4>
     <music21.pitch.Pitch D5>
 
-    >>> neapolitan = roman.RomanNumeral('N6', 'c#')  # could also use 'bII6'
+    >>> neapolitan = roman.RomanNumeral('N6', 'c#')  # could also use 'bII6' or 'N'
     >>> neapolitan.key
     <music21.key.Key of c# minor>
 
@@ -2221,7 +2221,8 @@ class RomanNumeral(harmony.Harmony):
 
         # Replace Neapolitan indication.
         workingFigure = re.sub('^N6', 'bII6', workingFigure)
-        workingFigure = re.sub('^N', 'bII6', workingFigure)
+        workingFigure = re.sub('^N53', 'bII', workingFigure)  # Root position must be explicit
+        workingFigure = re.sub('^N', 'bII6', workingFigure)  # First inversion assumed otherwise
 
         workingFigure = self._parseFrontAlterations(workingFigure)
         workingFigure, useScale = self._parseRNAloneAmidstAug6(workingFigure, useScale)
@@ -3331,7 +3332,11 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.isNeapolitan()
         False
 
-        The 'N6' shorthand is accepted.
+        The 'N', 'N6' and 'N53' shorthand forms are accepted.
+
+        >>> rn = roman.RomanNumeral('N')
+        >>> rn.isNeapolitan()
+        True
 
         >>> rn = roman.RomanNumeral('N6')
         >>> rn.isNeapolitan()
@@ -3342,6 +3347,11 @@ class RomanNumeral(harmony.Harmony):
         >>> rn = roman.RomanNumeral('bII')
         >>> rn.isNeapolitan(require1stInversion=False)
         True
+
+        >>> rn = roman.RomanNumeral('N53')
+        >>> rn.isNeapolitan(require1stInversion=False)
+        True
+
         '''
         if self.scaleDegree != 2:
             return False
@@ -4040,24 +4050,35 @@ class Test(unittest.TestCase):
 
     def testNeapolitan(self):
         # False:
-        rn = RomanNumeral('III', 'a')  # Not II
-        self.assertFalse(rn.isNeapolitan())
-        rn = RomanNumeral('II', 'a')  # II but not bII (no frontAlterationAccidental)
-        self.assertFalse(rn.isNeapolitan())
-        rn = RomanNumeral('#II', 'a')  # rn.frontAlterationAccidental != flat
-        self.assertFalse(rn.isNeapolitan())
-        rn = RomanNumeral('bII', 'a')  # bII but not bII6 and default requires first inv
-        self.assertFalse(rn.isNeapolitan())
-        rn = RomanNumeral('bii6', 'a')  # quality != major
-        self.assertFalse(rn.isNeapolitan())
-        rn = RomanNumeral('#I', 'a')  # Enharmonics do not count
-        self.assertFalse(rn.isNeapolitan())
+        falseFigures = ('III',  # Not II
+                        'II',  # II but not bII (no frontAlterationAccidental)
+                        '#II',  # rn.frontAlterationAccidental != flat
+                        'bII',  # bII but not bII6 and default requires first inv
+                        'bii6',  # quality != major
+                        '#I',  # Enharmonics do not count
+                        )
+        for fig in falseFigures:
+            rn = RomanNumeral(fig, 'a')
+            self.assertFalse(rn.isNeapolitan())
 
         # True:
-        rn = RomanNumeral('bII', 'a')  # bII but not bII6 and set requirement for first inv
-        self.assertTrue(rn.isNeapolitan(require1stInversion=False))
-        rn = RomanNumeral('bII6', 'a')
-        self.assertTrue(rn.isNeapolitan())
+        trueFigures = ('bII6',
+                       'N6',  # Maps to bII6
+                       'N'  # NB: also maps to bII6
+                       )
+        for fig in trueFigures:
+            rn = RomanNumeral(fig, 'a')
+            self.assertTrue(rn.isNeapolitan())
+
+        # Root position (conditionally true)
+        rootPosition = ('N53',  # NB: explicit 53 required
+                        'bII',
+                        )
+
+        for fig in rootPosition:
+            rn = RomanNumeral(fig, 'a')
+            self.assertFalse(rn.isNeapolitan())
+            self.assertTrue(rn.isNeapolitan(require1stInversion=False))
 
     def testMixture(self):
         for fig in ['i', 'iio', 'bIII', 'iv', 'v', 'bVI', 'bVII', 'viio7']:
