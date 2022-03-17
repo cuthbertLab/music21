@@ -4058,8 +4058,9 @@ class Test(unittest.TestCase):
                         '#I',  # Enharmonics do not count
                         )
         for fig in falseFigures:
-            rn = RomanNumeral(fig, 'a')
-            self.assertFalse(rn.isNeapolitan())
+            with self.subTest(figure=fig):
+                rn = RomanNumeral(fig, 'a')
+                self.assertFalse(rn.isNeapolitan())
 
         # True:
         trueFigures = ('bII6',
@@ -4067,8 +4068,9 @@ class Test(unittest.TestCase):
                        'N'  # NB: also maps to bII6
                        )
         for fig in trueFigures:
-            rn = RomanNumeral(fig, 'a')
-            self.assertTrue(rn.isNeapolitan())
+            with self.subTest(figure=fig):
+                rn = RomanNumeral(fig, 'a')
+                self.assertTrue(rn.isNeapolitan())
 
         # Root position (conditionally true)
         rootPosition = ('N53',  # NB: explicit 53 required
@@ -4076,9 +4078,10 @@ class Test(unittest.TestCase):
                         )
 
         for fig in rootPosition:
-            rn = RomanNumeral(fig, 'a')
-            self.assertFalse(rn.isNeapolitan())
-            self.assertTrue(rn.isNeapolitan(require1stInversion=False))
+            with self.subTest(figure=fig):
+                rn = RomanNumeral(fig, 'a')
+                self.assertFalse(rn.isNeapolitan())
+                self.assertTrue(rn.isNeapolitan(require1stInversion=False))
 
     def testMixture(self):
         for fig in ['i', 'iio', 'bIII', 'iv', 'v', 'bVI', 'bVII', 'viio7']:
