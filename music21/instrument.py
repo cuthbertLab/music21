@@ -2411,7 +2411,8 @@ def fromString(instrumentString: str,
     This includes multiple languages as well as the abbreviations
     (an honorary 'language' for these purposes).
 
-    Alternatively, you can specify the language to search using the 'language' argument.
+    Alternatively, you can specify the language to search using the `language`
+    argument. (New in v7.3.)
 
     >>> t12 = instrument.fromString('Klarinette', language='german')
     >>> t12
@@ -2429,7 +2430,6 @@ def fromString(instrumentString: str,
     Note that the language string is not case-sensitive, so 'French' is also fine.
 
     '''
-    # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
 
     language = language.lower()
