@@ -213,8 +213,9 @@ class TempoText(TempoIndication):
             if self.hasStyleInformation:
                 self._textExpression.style = self.style  # link styles
             else:
+                # link the styles and set default style
                 self.style = self._textExpression.style
-            self.applyTextFormatting()
+                self.applyTextFormatting()
         else:
             self._textExpression.content = value
 
@@ -255,7 +256,6 @@ class TempoText(TempoIndication):
         if self._textExpression is None:
             return None
         else:
-            self.applyTextFormatting(numberImplicit=numberImplicit)
             return copy.deepcopy(self._textExpression)
 
     def setTextExpression(self, value):
@@ -263,7 +263,16 @@ class TempoText(TempoIndication):
         Given a TextExpression, set it in this object.
         '''
         self._textExpression = value
-        self.applyTextFormatting()
+        if self._textExpression.hasStyleInformation:
+            # link styles (use the new _textExpression's style)
+            self.style = self._textExpression.style
+        elif self.hasStyleInformation:
+            # link styles (use self.style)
+            self._textExpression.style = self.style
+        else:
+            # no styles at all: link the styles and set default style
+            self.style = self._textExpression.style
+            self.applyTextFormatting()
 
     def applyTextFormatting(self, te=None, numberImplicit=False):
         '''
