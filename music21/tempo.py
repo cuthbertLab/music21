@@ -183,6 +183,29 @@ class TempoText(TempoIndication):
     <music21.tempo.TempoText 'adagio'>
     >>> print(tm.text)
     adagio
+    >>> print(tm.style.absoluteY)
+    45
+    >>> tm.style.absoluteY = 33
+    >>> print(tm.style.absoluteY)
+    33
+    >>> print(tm.getTextExpression())
+    <music21.expressions.TextExpression 'adagio'>
+    >>> print(tm.style.absoluteY)
+    33
+    >>> te = music21.expressions.TextExpression('andante')
+    >>> te.style.absoluteY = 38
+    >>> print(te)
+    <music21.expressions.TextExpression 'andante'>
+    >>> print(te.style.absoluteY)
+    38
+    >>> tm.setTextExpression(te)
+    >>> print(tm.getTextExpression())
+    <music21.expressions.TextExpression 'adagio'>
+    >>> print(tm.text)
+    andante
+    >>> print(tm.style.absoluteY)
+    38
+    >>>
     '''
 
     def __init__(self, text=None):
