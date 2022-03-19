@@ -1359,7 +1359,8 @@ class Test(unittest.TestCase):
         tm.style.fontWeight = None
 
         # check that tm.getTextExpression()/tm.text does not modify style
-        tm.text
+        tx = tm.text
+        self.assertEqual(tx, 'adagio')
         te1 = tm.getTextExpression()
         self.assertEqual(te1.content, 'adagio')
         self.assertEqual(tm.style.absoluteY, 33)
@@ -1375,27 +1376,29 @@ class Test(unittest.TestCase):
         tm.setTextExpression(te2)
         self.assertEqual(tm.style.absoluteY, 38)
         self.assertEqual(tm.style.fontStyle, 'bolditalic')
-        self.assertIs(tm.style, te2.style) # check for linked styles
+        self.assertIs(tm.style, te2.style)      # check for linked styles
 
         # check again that calling tm.getTextExpression/tm.text doesn't modify style
         tm.getTextExpression()
-        tm.text
+        tx = tm.text
+        self.assertEqual(tx, 'andante')
         self.assertEqual(tm.style.absoluteY, 38)
         self.assertEqual(tm.style.fontStyle, 'bolditalic')
 
-        # check that tm.setTextExpression (to a textExpression with no style) leaves tm.style in place
-        # and links the two styles.
+        # check that tm.setTextExpression (to a textExpression with no
+        # style) leaves tm.style in place and links the two styles.
         te3 = music21.expressions.TextExpression('andante with no style')
         self.assertFalse(te3.hasStyleInformation)
         self.assertTrue(tm.hasStyleInformation)
         tm.setTextExpression(te3)
-        self.assertEqual(tm.style.absoluteY, 38) # same as before
-        self.assertEqual(tm.style.fontStyle, 'bolditalic') # same as before
-        self.assertIs(tm.style, te2.style) # check for linked styles
+        self.assertEqual(tm.style.absoluteY, 38)            # same as before
+        self.assertEqual(tm.style.fontStyle, 'bolditalic')  # same as before
+        self.assertIs(tm.style, te2.style)      # check for linked styles
 
         # check again that calling tm.getTextExpression/tm.text doesn't modify style
         tm.getTextExpression()
-        tm.text
+        tx = tm.text
+        self.assertEqual(tx, 'andante with no style')
         self.assertEqual(tm.style.absoluteY, 38)
         self.assertEqual(tm.style.fontStyle, 'bolditalic')
 
@@ -1406,9 +1409,9 @@ class Test(unittest.TestCase):
         self.assertFalse(te4.hasStyleInformation)
         self.assertFalse(tm.hasStyleInformation)
         tm.setTextExpression(te4)
-        self.assertEqual(tm.style.absoluteY, 45) # default
-        self.assertEqual(tm.style.fontStyle, 'bold') # default
-        self.assertIs(tm.style, te4.style) # check for linked styles
+        self.assertEqual(tm.style.absoluteY, 45)        # default
+        self.assertEqual(tm.style.fontStyle, 'bold')    # default
+        self.assertIs(tm.style, te4.style)      # check for linked styles
 
 
 
