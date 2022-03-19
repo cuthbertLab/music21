@@ -1350,7 +1350,6 @@ class Test(unittest.TestCase):
 
     def testTempoTextStyle(self):
         from music21 import tempo
-        from music21 import expressions
         tm = tempo.TempoText('adagio')
         self.assertEqual(tm.style.absoluteY, 45)
         self.assertEqual(tm.style.fontStyle, 'bold')
