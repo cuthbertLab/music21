@@ -200,7 +200,7 @@ class TempoText(TempoIndication):
     38
     >>> tm.setTextExpression(te)
     >>> print(tm.getTextExpression())
-    <music21.expressions.TextExpression 'adagio'>
+    <music21.expressions.TextExpression 'andante'>
     >>> print(tm.text)
     andante
     >>> print(tm.style.absoluteY)
