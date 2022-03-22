@@ -1657,7 +1657,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
                  number rather than a type and thus can be reexpressed.''',
                  'forceSingleComponent':
                  '''If True, configure a single component (with an idiosyncratic tuplet)
-                  instead of attempting a solution with mulitiple components. If False,
+                  instead of attempting a solution with multiple components. If False,
                   (default) an attempt is made at a multiple-component solution but will
                   still create an idiosyncratic tuplet if no solution is found.''',
                  }
