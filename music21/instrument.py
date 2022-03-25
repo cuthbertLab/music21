@@ -2485,6 +2485,80 @@ def fromString(instrumentString: str,
     return bestInstrument
 
 
+def _getKeys(classNameString: str,
+             language: SearchLanguage = SearchLanguage.ALL):
+    '''
+    Retrieve the key or keys (variant instrument names)
+    from an instrumentLookup dict, given
+    the language (which instrumentLookup dict) and
+    value (classNameString).
+
+    Returns all relevant keys as a list of strings (empty if no matches).
+    '''
+
+    from music21.languageExcerpts import instrumentLookup
+    sourceDict = getattr(instrumentLookup, language + 'ToClassName')
+
+    returns = []
+    for key, value in sourceDict.items():
+        if classNameString == value:
+            returns.append(key)
+    return returns
+
+
+def getAllNamesForInstrument(instrumentClass: Instrument,
+                             language: SearchLanguage = SearchLanguage.ALL):
+    '''
+    Retrieves all currently stored names for a given instrument.
+
+    The instrumentClass should be a valid music21
+    :class:`~music21.instrument.Instrument`.
+
+    By default, this function searches over all supported languages
+    including instrument name abbreviations (an honorary 'language' for these purposes),
+    and returns a dict with keys for the language tested and values as a list of
+    strings for any names in that language.
+
+    >>> instrument.getAllNamesForInstrument(instrument.Flute())
+    {'english': ['flute', 'flutes', 'transverse flute'],
+    'french': ['flûte', 'flûte traversière', 'flûtes', 'grande flûte'],
+    'german': ['flöte', 'flöten', 'querflöte'],
+    'italian': ['flauti', 'flauto', 'flauto traverso'],
+    'russian': ['fleita'],
+    'spanish': ['flauta', 'flauta de boehm', 'flauta de concierto',
+                'flauta traversa', 'flauta travesera', 'flautas'],
+    'abbreviation': ['fl']}
+
+    Alternatively, you can specify the language to search using the `language`
+    argument.
+
+    >>> instrument.getAllNamesForInstrument(instrument.Flute(), language='german')
+    {'german': ['flöte', 'flöten', 'querflöte']}
+
+    An InstrumentException is raised if the specified language is not
+    one of those currently supported:
+    'english', 'french', 'german', 'italian', 'russian', 'spanish', and 'abbreviation'.
+
+    Note that the language string is not case-sensitive, so 'German' is also fine.
+
+    '''
+
+    language = language.lower()
+    instrumentNameDict = {}
+
+    instrumentClassName = instrumentClass.instrumentName
+
+    if language == 'all':
+        for l in ['english', 'french', 'german', 'italian', 'russian', 'spanish', 'abbreviation']:
+            instrumentNameDict[str(l)] = _getKeys(instrumentClassName, l)
+    elif language not in SearchLanguage:
+        raise InstrumentException(f'Chosen language {language} not currently supported.')
+    else:  # one, valid language
+        instrumentNameDict[language] = _getKeys(instrumentClassName, language)
+
+    return instrumentNameDict
+
+
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
     pass
