@@ -1574,6 +1574,11 @@ class Test(unittest.TestCase):
         self.assertEqual(
             len(round_trip_back.parts.first().getElementsByClass(stream.Measure)[1].notes), 1)
 
+        with self.assertRaises(MusicXMLExportException):
+            # must splitAtDurations()!
+            s.write(makeNotation=False)
+
+        s = s.splitAtDurations(recurse=True)[0]
         out2 = s.write(makeNotation=False)
         round_trip_back = converter.parse(out2)
         # 4/4 will not be assumed; quarter note will still be split out from 5.0QL
