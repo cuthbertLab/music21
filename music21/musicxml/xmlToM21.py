@@ -1589,6 +1589,28 @@ class PartParser(XMLParserBase):
         >>> i = PP.getDefaultInstrument(mxScorePart)
         >>> i.instrumentName
         'Instrument 4'
+
+        Non-default transpositions captured as of v7.3:
+
+        >>> scorePart = ('<score-part id="P5"><part-name>C Trumpet</part-name>'
+        ...     + '<part-abbreviation>C Tpt.</part-abbreviation>'
+        ...     + '<score-instrument id="P5-I5">'
+        ...     + '    <instrument-name>C Trumpet</instrument-name>'
+        ...     + '</score-instrument>'
+        ...     + '<midi-instrument id="P5-I5">'
+        ...     + '   <midi-channel>2</midi-channel>'
+        ...     + '<midi-program>57</midi-program>'
+        ...     + '</midi-instrument>'
+        ...     + '</score-part>')
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> PP = musicxml.xmlToM21.PartParser()
+
+        >>> mxScorePart = EL(scorePart)
+        >>> i = PP.getDefaultInstrument(mxScorePart)
+        >>> i.instrumentName
+        'C Trumpet'
+        >>> i.transposition
+        <music21.interval.Interval P1>
         '''
         if mxScorePart is None:
             mxScorePart = self.mxScorePart
@@ -1639,8 +1661,14 @@ class PartParser(XMLParserBase):
         # for now, just get first instrument
         # TODO: get all instruments!
         mxScoreInstrument = mxScorePart.find('score-instrument')
-        if isinstance(i, instrument.Piano) and mxScoreInstrument is not None:
-            i = self.reclassifyInstrumentFromName(i, mxScoreInstrument)
+        if mxScoreInstrument is not None and not isinstance(i, instrument.UnpitchedPercussion):
+            # Retains original midiChannel from `i`
+            inst_from_name = self.reclassifyInstrumentFromName(i, mxScoreInstrument)
+            # Two cases where we use the instrument constructed from the name instead
+            # 1. midiProgram matches (this will catch non-default transpositions in name)
+            # 2. midiProgram is Piano (often this is encoded only as piano for convenience)
+            if inst_from_name.midiProgram == i.midiProgram or isinstance(i, instrument.Piano):
+                i = inst_from_name
 
         i.partId = self.partId
         i.groups.append(self.partId)
