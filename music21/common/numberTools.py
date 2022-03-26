@@ -9,6 +9,9 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+# type: ignore
+# mypy is choking on private access on
+
 import math
 import random
 import unittest
