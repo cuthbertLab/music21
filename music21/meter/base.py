@@ -562,7 +562,7 @@ class TimeSignature(base.Music21Object):
                 environLocal.printDebug(['cannot set default accents for:', self])
 
     @common.deprecated('v7', 'v8', 'call .ratioString or .load()')
-    def loadRatio(self, numerator, denominator, divisions=None):
+    def loadRatio(self, numerator, denominator, divisions=None):  # pragma: no cover
         '''
         Change the numerator and denominator, like ratioString, but with
         optional divisions and without resetting other parameters.

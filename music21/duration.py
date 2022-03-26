@@ -2148,7 +2148,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self.components = [dur]
 
     @common.deprecated('v7', 'v8', 'Was intended for testing only')
-    def fill(self, quarterLengthList=('quarter', 'half', 'quarter')):
+    def fill(self, quarterLengthList=('quarter', 'half', 'quarter')):  # pragma: no cover
         '''
         Utility method for testing; a quick way to fill components. This will
         remove any existing values.
