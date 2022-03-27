@@ -597,7 +597,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Return the last element of a Stream.  (Added for compatibility with StreamIterator)
         Or None if the Stream is empty.
 
-        s.first() is the same speed as s[-1], except for not raising an IndexError.
+        s.last() is the same speed as s[-1], except for not raising an IndexError.
 
         >>> nC = note.Note('C4')
         >>> nD = note.Note('D4')
@@ -13993,6 +13993,7 @@ class Score(Stream):
             permitOneVoicePerPart=permitOneVoicePerPart
         )
 
+    @common.deprecated('v7', 'v8', 'call .flatten() for p in sc.parts')
     def flattenParts(self, classFilterList=('Note', 'Chord')):
         # noinspection PyShadowingNames
         '''
