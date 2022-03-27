@@ -5093,8 +5093,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         written pitch. The atSoundingPitch property is used to
         determine if transposition is necessary.
 
-        music21 v.3 changes -- inPlace=False, v. 5 -- returns None if inPlace=True
-
         >>> sc = stream.Score()
         >>> p = stream.Part(id='baritoneSax')
         >>> p.append(instrument.BaritoneSaxophone())
@@ -5115,6 +5113,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         False
         >>> scWritten.recurse().notes[0].nameWithOctave
         'A4'
+
+        v.3 -- inPlace defaults to False
+        v.5 -- returns None if inPlace=True
         '''
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('toWrittenPitch')

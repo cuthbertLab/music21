@@ -2459,14 +2459,16 @@ Barline final ⠣⠅
         m[3].notes[0].articulations.append(Fingering('1'))
         m[3].rightBarline = None
         self.s = bm
-        self.methodArgs = {'showFirstMeasureNumber': False, 'slurLongPhraseWithBrackets': False}
+        self.methodArgs = {'showFirstMeasureNumber': False,
+                           'slurLongPhraseWithBrackets': False}
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠐⠳⠄⠅⠉⠉⠛⠫⠱⠀⠳⠻⠉⠫⠧⠀⠻⠁⠉⠉⠳⠪⠺⠀⠹⠁⠱⠉⠹⠧
         '''
 
     def test_example12_3(self):
-        bm = converter.parse("tinynotation: 4/4 e-4. f8 g4 e- f g a- r g g e'- d' c'2. r4").flatten()
+        bm = converter.parse(
+                "tinynotation: 4/4 e-4. f8 g4 e- f g a- r g g e'- d' c'2. r4").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[2]))
@@ -3471,7 +3473,8 @@ Barline final ⠣⠅
 
     def test_example24_3(self):
         self.method = keyboardPartsToBraille
-        rightHand = converter.parse("tinynotation: 3/4 r2 d'4 d'8 e'-8 d'8 c'8 b-8 a8 g2 b-4").flatten()
+        rightHand = converter.parse(
+            "tinynotation: 3/4 r2 d'4 d'8 e'-8 d'8 c'8 b-8 a8 g2 b-4").flatten()
         leftHand = converter.parse("tinynotation: 3/4 r2 B-8 A G r B- r d "
                                    "r G A B- c d4").flatten()
         rightHand.insert(0, key.KeySignature(-2))

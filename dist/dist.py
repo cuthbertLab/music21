@@ -26,7 +26,7 @@ To do a release,
      but should be done before making a release).
 6. IMPORTANT: run python documentation/testDocumentation.py and afterwards fix errors [*]
 
-[*] you will need pytest and nbval installed (along with ipython and jupyter), you cannot check
+[*] you will need pytest, docutils, nbval installed (along with ipython and jupyter), you cannot check
 to see if fixed tests work while it is running.
 This takes a while and runs single core, so allocate time.  Start working on
 the announcement while it's running.
