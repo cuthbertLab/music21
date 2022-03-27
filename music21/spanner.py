@@ -1511,7 +1511,7 @@ class Ottava(Spanner):
         elif self._type.startswith('22'):
             return 22
         else:
-            raise SpannerException(f'Cannot get shift magnitude from {self._type}')
+            raise SpannerException(f'Cannot get shift magnitude from {self._type!r}')
 
     def shiftDirection(self, reverse=False):
         '''
