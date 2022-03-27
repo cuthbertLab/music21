@@ -78,7 +78,7 @@ stemDirectionNames = (
 
 def __dir__():
     out = [n for n in globals() if not n.startswith('__') and not n.startswith('Test')]
-    for n in ('Optional', 'List', 'Union', 'Tuple', 'Iterable'):
+    for n in ('Optional', 'List', 'Union', 'Tuple', 'Iterable', 'Type', 'cast'):
         out.remove(n)
     out.remove('unittest')
     out.remove('copy')

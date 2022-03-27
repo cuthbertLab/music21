@@ -597,7 +597,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Return the last element of a Stream.  (Added for compatibility with StreamIterator)
         Or None if the Stream is empty.
 
-        s.first() is the same speed as s[-1], except for not raising an IndexError.
+        s.last() is the same speed as s[-1], except for not raising an IndexError.
 
         >>> nC = note.Note('C4')
         >>> nD = note.Note('D4')
@@ -1993,14 +1993,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         advanced Stream manipulation would you not change
         the activeSite after inserting an element.
 
-        Has three forms: in the two argument form, inserts an element at the given offset:
+        Has three forms: in the two argument form, inserts an
+        element at the given offset:
 
         >>> st1 = stream.Stream()
         >>> st1.insert(32, note.Note('B-'))
         >>> st1.highestOffset
         32.0
 
-        In the single argument form with an object, inserts the element at its stored offset:
+        In the single argument form with an object, inserts the element at its
+        stored offset:
 
         >>> n1 = note.Note('C#')
         >>> n1.offset = 30.0
@@ -2011,9 +2013,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> n1.getOffsetBySite(st1)
         30.0
 
-        In single argument form with a list, the list should contain pairs that alternate
+        In single argument form with a list, the list should
+        contain pairs that alternate
         offsets and items; the method then, obviously, inserts the items
-        at the specified offsets:
+        at the specified offsets.
+
+        Note: This functionality will be deprecated in v.8 and replaced
+        with a list of tuples of [(offset, element), (offset, element)]
+        and removed in v.9
 
         >>> n1 = note.Note('G')
         >>> n2 = note.Note('F#')
@@ -2036,8 +2043,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> stream.Stream().insert(3.3, 'hello')
         Traceback (most recent call last):
-        music21.exceptions21.StreamException: to put a non Music21Object in a stream,
-            create a music21.ElementWrapper for the item
+        music21.exceptions21.StreamException: The object you tried to add
+            to the Stream, 'hello', is not a Music21Object.
+            Use an ElementWrapper object if this is what you intend.
 
         The error message is slightly different in the one-element form:
 
@@ -2086,8 +2094,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self.coreGuardBeforeAddElement(element)
         # main insert procedure here
 
-        storeSorted = self.coreInsert(offset, element,
-                                      ignoreSort=ignoreSort, setActiveSite=setActiveSite)
+        storeSorted = self.coreInsert(offset,
+                                      element,
+                                      ignoreSort=ignoreSort,
+                                      setActiveSite=setActiveSite)
         updateIsFlat = False
         if element.isStream:
             updateIsFlat = True
@@ -2381,15 +2391,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         updateIsFlat = False
         for e in others:
-            try:
-                if e.isStream:  # any on that is a Stream req update
-                    updateIsFlat = True
-            except AttributeError:
-                raise StreamException(
-                    f'The object you tried to add to the Stream, {e!r}, '
-                    + 'is not a Music21Object.  Use an ElementWrapper object '
-                    + 'if this is what you intend')
             self.coreGuardBeforeAddElement(e)
+            if e.isStream:  # any on that is a Stream req update
+                updateIsFlat = True
             # add this Stream as a location for the new elements, with the
             # the offset set to the current highestTime
             self.coreSetElementOffset(e, highestTime, addElement=True)
@@ -5089,8 +5093,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         written pitch. The atSoundingPitch property is used to
         determine if transposition is necessary.
 
-        music21 v.3 changes -- inPlace=False, v. 5 -- returns None if inPlace=True
-
         >>> sc = stream.Score()
         >>> p = stream.Part(id='baritoneSax')
         >>> p.append(instrument.BaritoneSaxophone())
@@ -5111,6 +5113,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         False
         >>> scWritten.recurse().notes[0].nameWithOctave
         'A4'
+
+        v.3 -- inPlace defaults to False
+        v.5 -- returns None if inPlace=True
         '''
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('toWrittenPitch')
@@ -6411,7 +6416,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Needed for makeMeasures and a few other places
 
         The Stream source of elements is self by default,
-        unless a `srcObj` is provided.
+        unless a `srcObj` is provided.  (this will be removed in v.8)
 
 
         >>> s = stream.Stream()
@@ -6436,8 +6441,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for i, v in enumerate(srcObj.voices):
                 groups.append((v.flatten(), i))
             elsNotOfVoice = srcObj.getElementsNotOfClass('Voice')
-            if len(elsNotOfVoice) > 0:
-                groups.insert(0, (elsNotOfVoice, None))
+            if elsNotOfVoice:
+                groups.insert(0, (elsNotOfVoice.stream(), None))
         else:  # create a single collection
             groups = [(srcObj, None)]
         # environLocal.printDebug(['offsetMap', groups])
@@ -9497,7 +9502,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj  # exit
 
         # list of start, start+dur, element, all in abs offset time
-        offsetMap = self.offsetMap(returnObj)
+        offsetMap = returnObj.offsetMap()
 
         offsetList = [opFrac(o) for o in offsetList]
 
@@ -13993,6 +13998,7 @@ class Score(Stream):
             permitOneVoicePerPart=permitOneVoicePerPart
         )
 
+    @common.deprecated('v7', 'v8', 'call .flatten() for p in sc.parts')
     def flattenParts(self, classFilterList=('Note', 'Chord')):
         # noinspection PyShadowingNames
         '''

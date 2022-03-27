@@ -26,7 +26,7 @@ To do a release,
      but should be done before making a release).
 6. IMPORTANT: run python documentation/testDocumentation.py and afterwards fix errors [*]
 
-[*] you will need pytest and nbval installed (along with ipython and jupyter), you cannot check
+[*] you will need pytest, docutils, nbval installed (along with ipython and jupyter), you cannot check
 to see if fixed tests work while it is running.
 This takes a while and runs single core, so allocate time.  Start working on
 the announcement while it's running.
@@ -54,13 +54,13 @@ the announcement while it's running.
     (.gitignore will avoid uploading the large files created here...)
 
 15. Create a new release on GitHub and upload the TWO files created here and docs.
-    Use tag v7.0.1 (etc.).
+    Use tag v7.3.1 (etc.).
     Don't forget the "v" in the release tag.
     Drag in this order: .tar.gz, documentation, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-16. Upload the new file to PyPI with "twine upload music21-6.0.5a2.tar.gz" [*]
+16. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz" [*]
 
     [*] Requires twine to be installed
 

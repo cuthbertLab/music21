@@ -496,9 +496,10 @@ class ChoraleListRKBWV:
     Note that multiple chorales share the same title, so it's best to
     iterate over one of the other lists to get them all.
 
-    The list of chorales comes from http://www.jsbchorales.net/ which contains
-    all chorales in the corpus, but which only has numbers for the kalmus,
-    riemenschneider, and bwv numbering systems.
+    The list of chorales comes from Margaret Greentree (formerly at
+    jsbchorales.net) who compiled
+    all chorales in the corpus, but only had numbers for the `kalmus`,
+    `riemenschneider`, and `bwv` numbering systems.
 
 
     >>> from music21 import corpus
