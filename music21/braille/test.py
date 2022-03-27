@@ -2468,7 +2468,7 @@ Barline final ⠣⠅
 
     def test_example12_3(self):
         bm = converter.parse(
-                "tinynotation: 4/4 e-4. f8 g4 e- f g a- r g g e'- d' c'2. r4").flatten()
+            "tinynotation: 4/4 e-4. f8 g4 e- f g a- r g g e'- d' c'2. r4").flatten()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[1].append(spanner.Slur(m[0].notes[0], m[1].notes[2]))
