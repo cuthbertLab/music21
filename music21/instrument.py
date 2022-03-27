@@ -2549,8 +2549,8 @@ def getAllNamesForInstrument(instrumentClass: Instrument,
     instrumentClassName = instrumentClass.instrumentName
 
     if language == 'all':
-        for l in ['english', 'french', 'german', 'italian', 'russian', 'spanish', 'abbreviation']:
-            instrumentNameDict[str(l)] = _getKeys(instrumentClassName, l)
+        for lang in [str(x) for x in SearchLanguage][1:]:  # skip 'all' here
+            instrumentNameDict[lang] = _getKeys(instrumentClassName, lang)
     elif language not in SearchLanguage:
         raise InstrumentException(f'Chosen language {language} not currently supported.')
     else:  # one, valid language
