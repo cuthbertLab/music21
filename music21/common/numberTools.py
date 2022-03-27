@@ -9,8 +9,6 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-# type: ignore
-# mypy is choking on private access on
 
 import math
 import random
@@ -19,6 +17,7 @@ from typing import List, Tuple, Union, Sequence, Iterable
 
 from fractions import Fraction
 from math import isclose
+from typing import no_type_check
 
 from music21 import defaults
 from music21.common import deprecated
@@ -229,6 +228,8 @@ def _preFracLimitDenominator(n, d):
         return (p0 + k * p1, q0 + k * q1)
 
 
+# no type checking due to accessing protected attributes (for speed)
+@no_type_check
 def opFrac(num: Union[OffsetQLIn, None]) -> Union[OffsetQL, None]:
     '''
     opFrac -> optionally convert a number to a fraction or back.
