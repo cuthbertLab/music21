@@ -9,15 +9,13 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
 import math
 import random
 import unittest
-from typing import List, Tuple, Union, Sequence, Iterable
+from typing import List, no_type_check, Tuple, Union, Sequence, Iterable
 
 from fractions import Fraction
 from math import isclose
-from typing import no_type_check
 
 from music21 import defaults
 from music21.common import deprecated
