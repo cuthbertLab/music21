@@ -213,8 +213,9 @@ class TempoText(TempoIndication):
             if self.hasStyleInformation:
                 self._textExpression.style = self.style  # link styles
             else:
+                # link the styles and set default style
                 self.style = self._textExpression.style
-            self.applyTextFormatting()
+                self.applyTextFormatting()
         else:
             self._textExpression.content = value
 
@@ -255,7 +256,6 @@ class TempoText(TempoIndication):
         if self._textExpression is None:
             return None
         else:
-            self.applyTextFormatting(numberImplicit=numberImplicit)
             return copy.deepcopy(self._textExpression)
 
     def setTextExpression(self, value):
@@ -263,7 +263,16 @@ class TempoText(TempoIndication):
         Given a TextExpression, set it in this object.
         '''
         self._textExpression = value
-        self.applyTextFormatting()
+        if self._textExpression.hasStyleInformation:
+            # link styles (use the new _textExpression's style)
+            self.style = self._textExpression.style
+        elif self.hasStyleInformation:
+            # link styles (use self.style)
+            self._textExpression.style = self.style
+        else:
+            # no styles at all: link the styles and set default style
+            self.style = self._textExpression.style
+            self.applyTextFormatting()
 
     def applyTextFormatting(self, te=None, numberImplicit=False):
         '''
@@ -1338,6 +1347,71 @@ class Test(unittest.TestCase):
         self.assertEqual(tm2.text, 'très vite')
         mm = tm2.getMetronomeMark()
         self.assertEqual(mm.number, 144)
+
+    def testTempoTextStyle(self):
+        from music21 import tempo
+        tm = tempo.TempoText('adagio')
+        self.assertEqual(tm.style.absoluteY, 45)
+        self.assertEqual(tm.style.fontStyle, 'bold')
+        tm.style.absoluteY = 33
+        self.assertEqual(tm.style.absoluteY, 33)
+        tm.style.fontStyle = 'italic'
+        tm.style.fontWeight = None
+
+        # check that tm.getTextExpression()/tm.text does not modify style
+        tx = tm.text
+        self.assertEqual(tx, 'adagio')
+        te1 = tm.getTextExpression()
+        self.assertEqual(te1.content, 'adagio')
+        self.assertEqual(tm.style.absoluteY, 33)
+        self.assertEqual(tm.style.fontStyle, 'italic')
+
+        # check that tm.setTextExpression sets tm.style to the te's style (if there is one),
+        # and links the two styles
+        te2 = expressions.TextExpression('andante')
+        te2.style.absoluteY = 38
+        te2.style.fontStyle = 'bolditalic'
+        self.assertEqual(te2.style.absoluteY, 38)
+        self.assertEqual(te2.style.fontStyle, 'bolditalic')
+        tm.setTextExpression(te2)
+        self.assertEqual(tm.style.absoluteY, 38)
+        self.assertEqual(tm.style.fontStyle, 'bolditalic')
+        self.assertIs(tm.style, te2.style)      # check for linked styles
+
+        # check again that calling tm.getTextExpression/tm.text doesn't modify style
+        tm.getTextExpression()
+        tx = tm.text
+        self.assertEqual(tx, 'andante')
+        self.assertEqual(tm.style.absoluteY, 38)
+        self.assertEqual(tm.style.fontStyle, 'bolditalic')
+
+        # check that tm.setTextExpression (to a textExpression with no
+        # style) leaves tm.style in place and links the two styles.
+        te3 = expressions.TextExpression('andante with no style')
+        self.assertFalse(te3.hasStyleInformation)
+        self.assertTrue(tm.hasStyleInformation)
+        tm.setTextExpression(te3)
+        self.assertEqual(tm.style.absoluteY, 38)            # same as before
+        self.assertEqual(tm.style.fontStyle, 'bolditalic')  # same as before
+        self.assertIs(tm.style, te2.style)      # check for linked styles
+
+        # check again that calling tm.getTextExpression/tm.text doesn't modify style
+        tm.getTextExpression()
+        tx = tm.text
+        self.assertEqual(tx, 'andante with no style')
+        self.assertEqual(tm.style.absoluteY, 38)
+        self.assertEqual(tm.style.fontStyle, 'bolditalic')
+
+        # check that tm.setTextExpression(te4) (with tm and te4 with no style) links the
+        # two styles, with default style set in place.
+        tm.style = None
+        te4 = expressions.TextExpression('andante with no style')
+        self.assertFalse(te4.hasStyleInformation)
+        self.assertFalse(tm.hasStyleInformation)
+        tm.setTextExpression(te4)
+        self.assertEqual(tm.style.absoluteY, 45)        # default
+        self.assertEqual(tm.style.fontStyle, 'bold')    # default
+        self.assertIs(tm.style, te4.style)      # check for linked styles
 
     def testMetronomeMarkA(self):
         from music21 import tempo

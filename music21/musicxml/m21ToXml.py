@@ -72,6 +72,10 @@ def typeToMusicXMLType(value):
     'long'
     >>> musicxml.m21ToXml.typeToMusicXMLType('quarter')
     'quarter'
+    >>> musicxml.m21ToXml.typeToMusicXMLType('duplex-maxima')
+    Traceback (most recent call last):
+    music21.musicxml.xmlObjects.MusicXMLExportException:
+    Cannot convert "duplex-maxima" duration to MusicXML (too long).
     >>> musicxml.m21ToXml.typeToMusicXMLType('inexpressible')
     Traceback (most recent call last):
     music21.musicxml.xmlObjects.MusicXMLExportException:
@@ -86,8 +90,15 @@ def typeToMusicXMLType(value):
         return 'long'
     elif value == '2048th':
         raise MusicXMLExportException('Cannot convert "2048th" duration to MusicXML (too short).')
+    elif value == 'duplex-maxima':
+        raise MusicXMLExportException(
+            'Cannot convert "duplex-maxima" duration to MusicXML (too long).')
     elif value == 'inexpressible':
         raise MusicXMLExportException('Cannot convert inexpressible durations to MusicXML.')
+    elif value == 'complex':
+        raise MusicXMLExportException(
+            'Cannot convert complex durations to MusicXML. '
+            + 'Try exporting with makeNotation=True or manually running splitAtDurations()')
     elif value == 'zero':
         raise MusicXMLExportException('Cannot convert durations without types to MusicXML.')
     else:
@@ -2564,7 +2575,9 @@ class PartExporter(XMLExporterBase):
                 mxMeasure = measureExporter.parse()
             except MusicXMLExportException as e:
                 e.measureNumber = str(m.number)
-                e.partName = self.stream.partName
+                if isinstance(self.stream, stream.Part):
+                    e.partName = self.stream.partName
+                # else: could be a Score without parts (flat)
                 raise e
             self.xmlRoot.append(mxMeasure)
 
@@ -3533,20 +3546,15 @@ class MeasureExporter(XMLExporterBase):
         </note>
 
         Notes with complex durations need to be simplified before coming here
-        otherwise they create an impossible musicxml type of "complex"
+        otherwise they raise :class:`MusicXMLExportException`:
 
         >>> nComplex = note.Note()
         >>> nComplex.duration.quarterLength = 5.0
         >>> mxComplex = MEX.noteToXml(nComplex)
-        >>> MEX.dump(mxComplex)
-        <note>
-          <pitch>
-            <step>C</step>
-            <octave>4</octave>
-          </pitch>
-          <duration>50400</duration>
-          <type>complex</type>
-        </note>
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+        Cannot convert complex durations to MusicXML.
+        Try exporting with makeNotation=True or manually running splitAtDurations()
 
         TODO: Test with spanners...
 
@@ -3644,7 +3652,14 @@ class MeasureExporter(XMLExporterBase):
             # Default type-less grace durations to eighths
             mxType.text = 'eighth'
         else:
-            mxType.text = typeToMusicXMLType(d.type)
+            try:
+                mxType.text = typeToMusicXMLType(d.type)
+            except MusicXMLExportException:
+                if n.isRest and helpers.isFullMeasureRest(n):
+                    # type will be removed in xmlToRest()
+                    pass
+                else:
+                    raise
 
         self.setStyleAttributes(mxType, n, 'size', 'noteSize')
         mxNote.append(mxType)
@@ -3865,16 +3880,7 @@ class MeasureExporter(XMLExporterBase):
         if mxRestTag is None:
             raise MusicXMLExportException('Something went wrong -- converted rest w/o rest tag')
 
-        isFullMeasure = False
-        if r.fullMeasure in (True, 'always'):
-            isFullMeasure = True
-            mxRestTag.set('measure', 'yes')
-        elif r.fullMeasure == 'auto':
-            tsContext = r.getContextByClass('TimeSignature')
-            if tsContext and tsContext.barDuration.quarterLength == r.duration.quarterLength:
-                isFullMeasure = True
-
-        if isFullMeasure:
+        if helpers.isFullMeasureRest(r):
             mxRestTag.set('measure', 'yes')
             mxType = mxNote.find('type')
             if mxType is not None:
@@ -6986,6 +6992,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(tree.findall('.//rest')), 1)
         rest = tree.find('.//rest')
         self.assertEqual(rest.get('measure'), 'yes')
+        self.assertIsNone(tree.find('.//note/type'))
 
     def testArticulationSpecialCases(self):
         n = note.Note()

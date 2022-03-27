@@ -2092,8 +2092,9 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         This cannot be done for all Durations, as DurationTuples cannot express all durations
 
-        >>> a = duration.Duration()
-        >>> a.fill(['quarter', 'half', 'quarter'])
+        >>> a = duration.Duration(1)
+        >>> a.addDurationTuple(duration.DurationTuple('half', 0, 2.0))
+        >>> a.addDurationTuple(duration.DurationTuple('quarter', 0, 1.0))
         >>> a.quarterLength
         4.0
         >>> len(a.components)
@@ -2116,8 +2117,9 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         If the type cannot be expressed then the type is inexpressible
 
-        >>> a = duration.Duration()
-        >>> a.fill(['quarter', 'half', 'half'])
+        >>> a = duration.Duration(1)
+        >>> a.addDurationTuple(duration.DurationTuple('half', 0, 2.0))
+        >>> a.addDurationTuple(duration.DurationTuple('half', 0, 2.0))
         >>> a.quarterLength
         5.0
         >>> len(a.components)
@@ -2160,7 +2162,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             # some notations will not properly unlink, and raise an error
             self.components = [dur]
 
-    def fill(self, quarterLengthList=('quarter', 'half', 'quarter')):
+    @common.deprecated('v7', 'v8', 'Was intended for testing only')
+    def fill(self, quarterLengthList=('quarter', 'half', 'quarter')):  # pragma: no cover
         '''
         Utility method for testing; a quick way to fill components. This will
         remove any existing values.

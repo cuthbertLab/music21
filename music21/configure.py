@@ -13,6 +13,7 @@ import pathlib
 import re
 import time
 import sys
+import sysconfig
 import unittest
 import textwrap
 import webbrowser
@@ -119,8 +120,8 @@ def writeToUser(msg, wrapLines=True, linesPerPage=20):
 
 
 def getSitePackages():
-    import distutils.sysconfig
-    return distutils.sysconfig.get_python_lib()
+    # Good enough for all but Red Hat (uses "platlib" but unsupported by us)
+    return sysconfig.get_path('purelib')
 
 
 def findInstallations():

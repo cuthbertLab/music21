@@ -92,7 +92,7 @@ class DocBuilder:
             import sphinx
         except ImportError:
             message = 'Sphinx is required to build documentation; '
-            message += 'download from http://sphinx-doc.org'
+            message += 'run pip install Sphinx'
             raise ImportError(message)
 
         target = self.command

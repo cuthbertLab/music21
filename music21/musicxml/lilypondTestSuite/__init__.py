@@ -9,10 +9,8 @@ The test suite is licensed under the MIT license
 (https://opensource.org/licenses/mit-license.php)
 and copyrighted by the Lilypond project.
 '''
-import os
 import unittest
 
-import warnings
 from music21 import converter
 from music21 import common
 
