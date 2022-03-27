@@ -938,7 +938,13 @@ class Test(unittest.TestCase):
         from music21 import musicxml
         sch = corpus.parse('schoenberg/opus19', 2)
 
-        SX = musicxml.m21ToXml.ScoreExporter(sch.flatten())
+        # NB: Using ScoreExporter directly is an advanced use case:
+        # does not run makeNotation(), so here GeneralObjectExporter is used first
+        gex = musicxml.m21ToXml.GeneralObjectExporter()
+        with self.assertWarnsRegex(Warning, 'not well-formed'):
+            # No part layer. Measure directly under Score.
+            obj = gex.fromGeneralObject(sch.flatten())
+        SX = musicxml.m21ToXml.ScoreExporter(obj)
         SX.scorePreliminaries()
         SX.parseFlatScore()
         # Previously, an exception was raised by getRootForPartStaff()
