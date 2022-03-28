@@ -2815,25 +2815,23 @@ class Test(unittest.TestCase):
         self.assertEqual(instrument.fromString(testString).instrumentName,
                          testString)
 
-        # Works with correct language for the term
-        self.assertEqual(instrument.fromString(testString, language='german').instrumentName,
-                         testString)
+        workingExamples = ['german',  # Works with correct language for the term
+                           'German'  # Not case-sensitive, so 'German' is also fine
+                           ]
 
-        # Not case-sensitive, so 'German' is also fine
-        self.assertEqual(instrument.fromString(testString, language='German').instrumentName,
-                         testString)
+        for langStr in workingExamples:
+            instrName = instrument.fromString(testString, language=langStr).instrumentName
+            self.assertEqual(instrName, testString)
 
-        # Error for incorrect language
-        self.assertRaises(InstrumentException,
-                          instrument.fromString,
-                          testString,
-                          language='french')
+        failingExamples = ['french',  # Error when the language doesn't match the term
+                           'finnish'  # Error for unsupported language
+                           ]
 
-        # Error for unsupported language
-        self.assertRaises(InstrumentException,
-                          instrument.fromString,
-                          testString,
-                          language='finnish')
+        for langStr in failingExamples:
+            self.assertRaises(InstrumentException,
+                              instrument.fromString,
+                              testString,
+                              language=langStr)
 
 
 # ------------------------------------------------------------------------------
