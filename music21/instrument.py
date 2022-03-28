@@ -2809,6 +2809,8 @@ class Test(unittest.TestCase):
     def testLanguageChoice(self):
         from music21 import instrument
 
+        # fromString
+
         testString = 'Klarinette'  # German name
 
         # Works when language not specified
@@ -2833,6 +2835,17 @@ class Test(unittest.TestCase):
                               testString,
                               language=langStr)
 
+        # getAllNamesForInstrument
+
+        inst = instrument.Flute()
+        # Working example
+        self.assertEqual(instrument.getAllNamesForInstrument(inst, language='abbreviation'),
+                         {'abbreviation': ['fl']})
+        # Error for unsupported language
+        self.assertRaises(InstrumentException,
+                          instrument.getAllNamesForInstrument,
+                          inst,
+                          language='finnish')
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
