@@ -2847,6 +2847,7 @@ class Test(unittest.TestCase):
                           inst,
                           language='finnish')
 
+
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Instrument]
