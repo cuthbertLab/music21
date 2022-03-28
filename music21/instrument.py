@@ -2556,7 +2556,7 @@ def getAllNamesForInstrument(instrumentClass: Instrument,
     elif language not in SearchLanguage:
         raise InstrumentException(f'Chosen language {language} not currently supported.')
     else:  # one, valid language
-        instrumentNameDict[language] = _getKeys(instrumentClassName, language)
+        instrumentNameDict[language] = _getKeys(instrumentClassName, SearchLanguage(language))
 
     return instrumentNameDict
 
