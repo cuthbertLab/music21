@@ -26,6 +26,9 @@ from music21 import expressions
 from music21 import spanner
 from music21 import style
 
+from music21 import converter
+from music21 import bar
+
 from music21 import environment
 _MOD = 'repeat'
 environLocal = environment.Environment(_MOD)
@@ -4363,6 +4366,16 @@ class Test(unittest.TestCase):
 #         s = converter.parse(testFiles.hectorTheHero)
 #         s.show()
 #         post = s.expandRepeats()
+
+    def test_expand_repeats(self):
+        # Test case provided by jacobtylerwalls on issue #1165
+        # https://github.com/cuthbertLab/music21/issues/1165#issuecomment-967293691
+        p = converter.parse('tinyNotation: c1 d e f')
+        p.measure(2).storeAtEnd(bar.Repeat(direction='end', times=1))
+        p.partName = 'mypartname'
+        exp = p.expandRepeats()
+        self.assertEqual(exp.partName, 'mypartname')
+
 
 
 # ------------------------------------------------------------------------------
