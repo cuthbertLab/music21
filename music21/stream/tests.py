@@ -37,6 +37,7 @@ from music21 import metadata
 from music21 import meter
 from music21 import note
 from music21 import pitch
+from music21 import converter
 
 from music21.musicxml import m21ToXml
 
@@ -8587,6 +8588,15 @@ class Test(unittest.TestCase):
         self.assertIs(n.activeSite, s2)
         self.assertTrue(s1.notes)
         self.assertIs(n.activeSite, s2)
+
+    def test_expand_repeats(self):
+        # Test case provided by jacobtylerwalls on issue #1165
+        # https://github.com/cuthbertLab/music21/issues/1165#issuecomment-967293691
+        p = converter.parse('tinyNotation: c1 d e f')
+        p.measure(2).storeAtEnd(bar.Repeat(direction='end', times=1))
+        p.partName = 'mypartname'
+        exp = p.expandRepeats()
+        self.assertEqual(exp.partName, 'mypartname')
 
 # -----------------------------------------------------------------------------
 
