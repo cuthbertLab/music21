@@ -29,7 +29,7 @@ def loadNoMagic():
     '''
     if common.runningUnderIPython():
         # noinspection PyPackageRequirements
-        from IPython.core.interactiveshell import InteractiveShell
+        from IPython.core.interactiveshell import InteractiveShell  # type: ignore
         if InteractiveShell.initialized():
             localIP = InteractiveShell.instance()
             load_ipython_extension(localIP)

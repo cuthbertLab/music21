@@ -19,7 +19,7 @@ and used to configure, :class:`~music21.note.Note` objects.
 import copy
 import unittest
 
-from typing import Optional, List, Union, Tuple, Iterable
+from typing import Optional, List, Type, Union, Tuple, Iterable, cast
 
 from music21 import base
 from music21 import beam
@@ -78,7 +78,7 @@ stemDirectionNames = (
 
 def __dir__():
     out = [n for n in globals() if not n.startswith('__') and not n.startswith('Test')]
-    for n in ('Optional', 'List', 'Union', 'Tuple', 'Iterable'):
+    for n in ('Optional', 'List', 'Union', 'Tuple', 'Iterable', 'Type', 'cast'):
         out.remove(n)
     out.remove('unittest')
     out.remove('copy')
@@ -296,7 +296,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._syllabic = newSyllabic
 
     @property
-    def identifier(self) -> str:
+    def identifier(self) -> Union[str, int]:
         '''
         By default, this is the same as self.number. However, if there is a
         descriptive identifier like 'part2verse1', it is stored here and
@@ -506,7 +506,7 @@ class GeneralNote(base.Music21Object):
     isNote = False
     isRest = False
     isChord = False
-    _styleClass = style.NoteStyle
+    _styleClass: Type[style.Style] = style.NoteStyle
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']
@@ -1131,7 +1131,7 @@ class NotRest(GeneralNote):
             return True
 
     @property
-    def pitches(self) -> Tuple[pitch.Pitch]:
+    def pitches(self) -> Tuple[pitch.Pitch, ...]:
         '''
         Returns an empty tuple.  (Useful for iterating over NotRests since they
         include Notes and Chords.)
@@ -1230,9 +1230,9 @@ class NotRest(GeneralNote):
         >>> m = stream.Measure([n])
         >>> n.getInstrument(returnDefault=False) is None
         True
-        >>> dulc = instrument.Dulcimer()
-        >>> m.insert(0, dulc)
-        >>> n.getInstrument() is dulc
+        >>> dulcimer = instrument.Dulcimer()
+        >>> m.insert(0, dulcimer)
+        >>> n.getInstrument() is dulcimer
         True
 
         Overridden `.storedInstrument` is privileged:
@@ -1245,16 +1245,16 @@ class NotRest(GeneralNote):
         Instruments in containing streams ARE found:
 
         >>> n.storedInstrument = None
-        >>> m.remove(dulc)
+        >>> m.remove(dulcimer)
         >>> p = stream.Part([m])
-        >>> p.insert(0, dulc)
-        >>> n.getInstrument() is dulc
+        >>> p.insert(0, dulcimer)
+        >>> n.getInstrument() is dulcimer
         True
 
         But not if the instrument is only found in a derived stream:
 
         >>> derived = p.stripTies()
-        >>> p.remove(dulc)
+        >>> p.remove(dulcimer)
         >>> derived.getInstruments().first()
         <music21.instrument.Dulcimer 'Dulcimer'>
         >>> n.getInstrument(returnDefault=False) is None
@@ -1272,7 +1272,9 @@ class NotRest(GeneralNote):
             instrument.Instrument, followDerivation=False)
         if returnDefault and instrument_or_none is None:
             return instrument.Instrument()
-        return instrument_or_none
+        elif instrument_or_none is None:
+            return None
+        return cast(instrument.Instrument, instrument_or_none)
 
 
 # ------------------------------------------------------------------------------
@@ -1893,12 +1895,14 @@ class TestExternal(unittest.TestCase):
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
         '''
-        a = Note('d-3')
+        from music21 import note
+        a = note.Note('D-3')
         a.quarterLength = 2.25
         if self.show:
             a.show()
 
     def testBasic(self):
+        from music21 import note
         from music21 import stream
         a = stream.Stream()
 
@@ -1907,7 +1911,7 @@ class TestExternal(unittest.TestCase):
                                 ('d-3', 2.5), ('c#6', 3.25), ('a--5', 0.5),
                                 ('f#2', 1.75), ('g-3', (4 / 3)), ('d#6', (2 / 3))
                                 ]:
-            b = Note()
+            b = note.Note()
             b.quarterLength = qLen
             b.name = pitchName
             b.style.color = '#FF00FF'
@@ -1986,23 +1990,25 @@ class Test(unittest.TestCase):
             i += 1
 
     def testNote(self):
-        note2 = Rest()
+        from music21 import note
+        note2 = note.Rest()
         self.assertTrue(note2.isRest)
-        note3 = Note()
+        note3 = note.Note()
         note3.pitch.name = 'B-'
         # not sure how to test not None
         # self.assertFalse (note3.pitch.accidental, None)
         self.assertEqual(note3.pitch.accidental.name, 'flat')
         self.assertEqual(note3.pitch.pitchClass, 10)
 
-        a5 = Note()
+        a5 = note.Note()
         a5.name = 'A'
         a5.octave = 5
         self.assertAlmostEqual(a5.pitch.frequency, 880.0)
         self.assertEqual(a5.pitch.pitchClass, 9)
 
     def testCopyNote(self):
-        a = Note()
+        from music21 import note
+        a = note.Note()
         a.quarterLength = 3.5
         a.name = 'D'
         b = copy.deepcopy(a)
@@ -2019,8 +2025,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(found), 24)
 
     def testNoteBeatProperty(self):
-        from music21 import stream
         from music21 import meter
+        from music21 import note
+        from music21 import stream
 
         data = [
             ['3/4', 0.5, 6, [1.0, 1.5, 2.0, 2.5, 3.0, 3.5],
@@ -2050,7 +2057,7 @@ class Test(unittest.TestCase):
 
         # one measure case
         for tsStr, nQL, nCount, matchBeat, matchBeatDur in data:
-            n = Note()  # need fully qualified name
+            n = note.Note()  # need fully qualified name
             n.quarterLength = nQL
             m = stream.Measure()
             m.timeSignature = meter.TimeSignature(tsStr)
@@ -2072,7 +2079,7 @@ class Test(unittest.TestCase):
         # two measure case
         for tsStr, nQL, nCount, matchBeat, matchBeatDur in data:
             p = stream.Part()
-            n = Note()
+            n = note.Note()
             n.quarterLength = nQL
 
             # m1 has time signature
@@ -2118,11 +2125,12 @@ class Test(unittest.TestCase):
 
     def testNoteEquality(self):
         from music21 import articulations
+        from music21 import note
 
-        n1 = Note('a#')
-        n2 = Note('g')
-        n3 = Note('a-')
-        n4 = Note('a#')
+        n1 = note.Note('A#')
+        n2 = note.Note('G')
+        n3 = note.Note('A-')
+        n4 = note.Note('A#')
 
         self.assertNotEqual(n1, n2)
         self.assertNotEqual(n1, n3)
@@ -2197,6 +2205,7 @@ class Test(unittest.TestCase):
 
     def testMetricalAccent(self):
         from music21 import meter
+        from music21 import note
         from music21 import stream
         data = [
             ('4/4', 8, 0.5, [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
@@ -2218,27 +2227,27 @@ class Test(unittest.TestCase):
         ]
 
         for tsStr, nCount, dur, match in data:
-
             m = stream.Measure()
             m.timeSignature = meter.TimeSignature(tsStr)
-            n = Note()
+            n = note.Note()
             n.quarterLength = dur
             m.repeatAppend(n, nCount)
 
             self.assertEqual([n.beatStrength for n in m.notesAndRests], match)
 
     def testTieContinue(self):
+        from music21 import note
         from music21 import stream
 
-        n1 = Note()
+        n1 = note.Note()
         n1.tie = tie.Tie()
         n1.tie.type = 'start'
 
-        n2 = Note()
+        n2 = note.Note()
         n2.tie = tie.Tie()
         n2.tie.type = 'continue'
 
-        n3 = Note()
+        n3 = note.Note()
         n3.tie = tie.Tie()
         n3.tie.type = 'stop'
 

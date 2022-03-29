@@ -18,6 +18,7 @@ import pathlib
 import re
 import subprocess
 import sys
+from typing import Dict
 import unittest
 
 from collections import OrderedDict
@@ -51,7 +52,7 @@ del find_spec
 # TODO: speed up tests everywhere! move these to music21 base...
 
 class _sharedCorpusTestObject:
-    sharedCache = {}
+    sharedCache: Dict[str, stream.Stream] = {}
 
 
 sharedCacheObject = _sharedCorpusTestObject()
@@ -800,7 +801,7 @@ class LilypondConverter:
             if el.syllabic == 'end':
                 text = text + '__'
                 inWord = False
-            elif el.syllabic == 'begin' or el.syllabic == 'middle':
+            elif el.syllabic in ('begin', 'middle'):
                 text = text + ' --'
                 inWord = True
             # else: pass
@@ -2504,7 +2505,7 @@ class LilypondConverter:
         lilyFile = self.runThroughLily(backend='eps', format='png', fileName=fileName)
         if noPIL is False:
             # noinspection PyPackageRequirements
-            from PIL import Image, ImageOps
+            from PIL import Image, ImageOps  # type: ignore
             # noinspection PyBroadException
             try:
                 lilyImage = Image.open(str(lilyFile))

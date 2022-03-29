@@ -80,7 +80,7 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
     provided by an argument.
 
     If `expandExtensions` is True, a format for an extension, and related
-    extensions, will replaced by all known input extensions.
+    extensions, will be replaced by all known input extensions.
 
     This is convenient when an input format might match for multiple
     extensions.

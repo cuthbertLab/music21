@@ -71,7 +71,7 @@ class PercussionChord(chord.ChordBase):
         if not all(isinstance(n, (note.Unpitched, note.Note)) for n in newNotes):
             raise TypeError('every element of notes must be a note.Note or note.Unpitched object')
         self._notes.clear()
-        self.add(newNotes, runSort=False)
+        self.add(newNotes)
 
     def _reprInternal(self) -> str:
         if not self.notes:
@@ -81,10 +81,12 @@ class PercussionChord(chord.ChordBase):
         for thisNote in self.notes:
             if hasattr(thisNote, 'nameWithOctave'):
                 allNotes.append(thisNote.nameWithOctave)
+            elif thisNote.storedInstrument:
+                allNotes.append(str(thisNote.storedInstrument.instrumentName))
             else:
                 allNotes.append(f'unpitched[{thisNote.displayName}]')
 
-        return ' '.join(allNotes)
+        return '[' + ' '.join(allNotes) + ']'
 
 
 class Test(unittest.TestCase):

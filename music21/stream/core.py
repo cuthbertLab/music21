@@ -406,17 +406,22 @@ class StreamCoreMixin:
 
         >>> s.insert(4, 3.14159)
         Traceback (most recent call last):
-        music21.exceptions21.StreamException: to put a non Music21Object in a stream,
-        create a music21.ElementWrapper for the item
+        music21.exceptions21.StreamException: The object you tried to add to
+        the Stream, 3.14159, is not a Music21Object.  Use an ElementWrapper
+        object if this is what you intend.
+
         '''
         if element is self:  # cannot add this Stream into itself
             raise StreamException('this Stream cannot be contained within itself')
         if not isinstance(element, Music21Object):
             if isinstance(element, StreamIterator):
-                raise StreamException('cannot insert StreamIterator into a Stream\n'
+                raise StreamException(
+                    'cannot insert StreamIterator into a Stream\n'
                     "Iterate over it instead (User's Guide chs. 6 and 26)")
-            raise StreamException('to put a non Music21Object in a stream, '
-                                  'create a music21.ElementWrapper for the item')
+            raise StreamException(
+                f'The object you tried to add to the Stream, {element!r}, '
+                + 'is not a Music21Object.  Use an ElementWrapper object '
+                + 'if this is what you intend.')
         if checkRedundancy:
             # using id() here b/c we do not want to get __eq__ comparisons
             idElement = id(element)
@@ -465,7 +470,7 @@ class StreamCoreMixin:
             self._cache['spannerBundle'] = spanner.SpannerBundle(list(spanners))
         return self._cache['spannerBundle']
 
-    def asTimespans(self, classList=None, flatten=True):
+    def asTimespans(self, *, flatten=True, classList=None):
         r'''
         Convert stream to a :class:`~music21.tree.trees.TimespanTree` instance, a
         highly optimized data structure for searching through elements and
@@ -514,7 +519,7 @@ class StreamCoreMixin:
         '''
         el.activeSite = self
 
-    def asTree(self, flatten=False, classList=None, useTimespans=False, groupOffsets=False):
+    def asTree(self, *, flatten=False, classList=None, useTimespans=False, groupOffsets=False):
         '''
         Returns an elementTree of the score, using exact positioning.
 

@@ -13,6 +13,7 @@ import pathlib
 import re
 import time
 import sys
+import sysconfig
 import unittest
 import textwrap
 import webbrowser
@@ -119,8 +120,8 @@ def writeToUser(msg, wrapLines=True, linesPerPage=20):
 
 
 def getSitePackages():
-    import distutils.sysconfig
-    return distutils.sysconfig.get_python_lib()
+    # Good enough for all but Red Hat (uses "platlib" but unsupported by us)
+    return sysconfig.get_path('purelib')
 
 
 def findInstallations():
@@ -1218,7 +1219,8 @@ class SelectFilePath(SelectFromList):
         This looks at everything in Applications, as well as every directory in Applications
         '''
         post: List[str] = []
-        for path0 in ('/Applications', common.cleanpath('~/Applications')):
+        for path0 in ('/Applications', common.cleanpath('~/Applications', returnPathlib=False)):
+            assert isinstance(path0, str)
             self._getAppOSIndependent(comparisonFunction, path0, post, glob='*')
         return post
 
@@ -1479,8 +1481,8 @@ class ConfigurationAssistant:
 
     def _introduction(self):
         msg = []
-        msg.append('Welcome the music21 Configuration Assistant. You will be guided '
-                   + 'through a number of questions to install and setup music21. '
+        msg.append('Welcome to the music21 Configuration Assistant. You will be guided '
+                   + 'through a number of questions to install and set up music21. '
                    + 'Simply pressing return at a prompt will select a default, if available.')
         msg.append('')  # will cause a line break
         msg.append('You may run this configuration again at a later time '
@@ -1593,7 +1595,7 @@ class ConfigurationAssistant:
 #         print('got: %s' % post)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 
 class TestUserInput(unittest.TestCase):  # pragma: no cover

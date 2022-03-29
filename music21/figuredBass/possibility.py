@@ -68,6 +68,7 @@ The application of these methods is controlled by corresponding instance variabl
 .. note:: The number of parts and maxPitch are universal for a
     :class:`~music21.figuredBass.realizer.FiguredBassLine`.
 '''
+from typing import Dict, Tuple
 import unittest
 
 from music21 import chord
@@ -275,10 +276,11 @@ def limitPartToPitch(possibA, partPitchLimits=None):
 # CONSECUTIVE POSSIBILITY RULE-CHECKING METHODS
 # ---------------------------------------------
 # Speedup tables
-parallelFifthsTable = {}
-parallelOctavesTable = {}
-hiddenFifthsTable = {}
-hiddenOctavesTable = {}
+PITCH_QUARTET_TO_BOOL_TYPE = Dict[Tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch], bool]
+parallelFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+parallelOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+hiddenFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+hiddenOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
 
 
 def parallelFifths(possibA, possibB):
@@ -875,7 +877,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             if not (pitchA.ps - pitchB.ps) == 1.0:
                 return False
             i = interval.Interval(pitchA, pitchB)
-            if not i.directedName == 'm-2':
+            if i.directedName != 'm-2':
                 return False
         elif pitchA.name == root.name:
             if rootResolved and restrictDoublings:
@@ -884,7 +886,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             if not (pitchB.ps - pitchA.ps) == 1.0:
                 return False
             i = interval.Interval(pitchA, pitchB)
-            if not i.directedName == 'm2':
+            if i.directedName != 'm2':
                 return False
             rootResolved = True
         elif pitchA.name == third.name:
@@ -894,7 +896,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             if not (pitchA.ps - pitchB.ps) == 1.0:
                 return False
             i = interval.Interval(pitchA, pitchB)
-            if not i.directedName == 'm-2':
+            if i.directedName != 'm-2':
                 return False
 
 #     # Part 1: Check if possibA is A6 chord, and if it is properly formed.

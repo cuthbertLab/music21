@@ -237,10 +237,9 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
         else:
             return ts2
 
-    # environLocal.printDebug(['n/d', numerator, denominator])
     else:
         ts = TimeSignature()
-        ts.loadRatio(numerator, denominator)
+        ts.load(f'{numerator}/{denominator}')
         return ts
 
 
@@ -562,7 +561,8 @@ class TimeSignature(base.Music21Object):
             except MeterException:
                 environLocal.printDebug(['cannot set default accents for:', self])
 
-    def loadRatio(self, numerator, denominator, divisions=None):
+    @common.deprecated('v7', 'v8', 'call .ratioString or .load()')
+    def loadRatio(self, numerator, denominator, divisions=None):  # pragma: no cover
         '''
         Change the numerator and denominator, like ratioString, but with
         optional divisions and without resetting other parameters.
@@ -1178,7 +1178,10 @@ class TimeSignature(base.Music21Object):
         # create a scratch MeterSequence for structure
         tsStr = f'{self.numerator}/{self.denominator}'
         if self.beatSequence.isUniformPartition():
-            firstPartitionForm = len(self.beatSequence)
+            if len(self.beatSequence) > 1:
+                firstPartitionForm = len(self.beatSequence)
+            else:
+                firstPartitionForm = None
             cacheKey = (tsStr, firstPartitionForm, depth)
         else:  # derive from meter sequence
             firstPartitionForm = self.beatSequence

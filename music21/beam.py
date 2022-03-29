@@ -72,7 +72,7 @@ To get rid of beams on a note do:
 
 >>> n2.beams.beamsList = []
 '''
-
+from typing import Iterable, List, Optional, Union
 import unittest
 
 from music21 import exceptions21
@@ -94,8 +94,9 @@ beamableDurationTypes = (
     duration.typeFromNumDict[8],
     duration.typeFromNumDict[16], duration.typeFromNumDict[32],
     duration.typeFromNumDict[64], duration.typeFromNumDict[128],
-    duration.typeFromNumDict[256],
-)
+    duration.typeFromNumDict[256], duration.typeFromNumDict[512],
+    duration.typeFromNumDict[1024], duration.typeFromNumDict[2048],
+)  # be sure to add to .fill if extended...
 
 
 class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
@@ -236,7 +237,8 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     # STATIC METHODS #
 
     @staticmethod
-    def naiveBeams(srcList):
+    def naiveBeams(srcList: Iterable['music21.base.Music21Object']):
+        # noinspection PyShadowingNames
         '''
         Given a list or iterator of elements, return a list of None or Beams for
         each element: None if the element is a quarter or larger or
@@ -256,13 +258,13 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
                      2/None>/<music21.beam.Beam 3/None>>,
          None]
         '''
-        beamsList = []
+        beamsList: List[Optional[Beams]] = []
         for el in srcList:
             # if a dur cannot be beamable under any circumstance, replace
             # it with None; this includes Rests
             if el.duration.type not in beamableDurationTypes:
                 beamsList.append(None)  # placeholder
-            elif el.isRest is True:
+            elif 'NotRest' not in el.classSet:
                 beamsList.append(None)  # placeholder
             else:
                 # we have a beamable duration
@@ -275,7 +277,8 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         return beamsList
 
     @staticmethod
-    def removeSandwichedUnbeamables(beamsList):
+    def removeSandwichedUnbeamables(beamsList: List[Union['Beams', None]]):
+        # noinspection PyShadowingNames
         '''
         Go through the naiveBeamsList and remove beams from objects surrounded
         by None objects -- you can't beam to nothing!
@@ -478,8 +481,8 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         or by default.  Either set type here or call `setAll()` on the Beams
         object afterwards.
 
-        Both "eighth" and "8th" work.  Adding more than six beams (i.e. things
-        like 512th notes) raises an error.
+        Both "eighth" and "8th" work.  Adding more than nine beams (i.e. things
+        like 4096th notes) raises an error.
 
         >>> a = beam.Beams()
         >>> a.fill('16th')
@@ -516,30 +519,34 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         >>> len(a)
         6
 
-        >>> a.fill(7)
+        >>> a.fill(12)
         Traceback (most recent call last):
-        music21.beam.BeamException: cannot fill beams for level 7
+        music21.beam.BeamException: cannot fill beams for level 12
         '''
-        # TODO -- why not to 2048th?
         self.beamsList = []
         # 8th, 16th, etc represented as 1, 2, ...
-        if level in [1, '8th', duration.typeFromNumDict[8]]:  # eighth
+        if level in (1, '8th', duration.typeFromNumDict[8]):  # eighth
             count = 1
-        elif level in [2, duration.typeFromNumDict[16]]:
+        elif level in (2, duration.typeFromNumDict[16]):
             count = 2
-        elif level in [3, duration.typeFromNumDict[32]]:
+        elif level in (3, duration.typeFromNumDict[32]):
             count = 3
-        elif level in [4, duration.typeFromNumDict[64]]:
+        elif level in (4, duration.typeFromNumDict[64]):
             count = 4
-        elif level in [5, duration.typeFromNumDict[128]]:
+        elif level in (5, duration.typeFromNumDict[128]):
             count = 5
-        elif level in [6, duration.typeFromNumDict[256]]:
+        elif level in (6, duration.typeFromNumDict[256]):
             count = 6
+        elif level in (7, duration.typeFromNumDict[512]):
+            count = 7
+        elif level in (8, duration.typeFromNumDict[1024]):
+            count = 8
+        elif level in (9, duration.typeFromNumDict[2048]):
+            count = 9
         else:
             raise BeamException(f'cannot fill beams for level {level}')
+
         for i in range(1, count + 1):
-            if i == 0:
-                raise BeamException('level zero does not exist for this range')
             obj = Beam()
             obj.number = i
             self.beamsList.append(obj)

@@ -36,7 +36,7 @@ The list of objects included here are:
 '''
 import enum
 import unittest
-from typing import List
+from typing import List, no_type_check
 
 from music21 import base
 from music21 import exceptions21
@@ -445,6 +445,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             else:
                 return False
 
+    @no_type_check
     def parallelMotion(
         self,
         requiredInterval=None,
@@ -518,7 +519,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.parallelMotion(gi, allowOctaveDisplacement=True)
         True
         '''
-
         if not self.similarMotion():
             return False
 
@@ -988,6 +988,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return False
 
+    @no_type_check
     def isProperResolution(self) -> bool:
         '''
         Checks whether the voice-leading quartet resolves correctly according to standard
@@ -1146,6 +1147,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return True
 
+    @no_type_check
     def leapNotSetWithStep(self) -> bool:
         '''
         Returns True if there is a leap or skip in once voice then the other voice must
@@ -1230,12 +1232,17 @@ class VoiceLeadingQuartet(base.Music21Object):
         c2 = chord.Chord([self.vIntervals[1].noteStart, self.vIntervals[1].noteEnd])
         r1 = roman.identifyAsTonicOrDominant(c1, self.key)
         r2 = roman.identifyAsTonicOrDominant(c2, self.key)
+        # TODO in Py3.8+, remove when identifyAsTonicOrDominant returns Union[str | Literal[False]]
+        if r1 is True or r2 is True:
+            raise VoiceLeadingQuartetException(
+                'identifyAsTonicOrDominant() returned True unexpectedly, please report a bug')
         openings = ['P1', 'P5', 'I', 'V']
         return not ((self.vIntervals[0].simpleName in openings
                         or self.vIntervals[1].simpleName in openings)
                       and (r1[0].upper() in openings if r1 is not False else False
                            or r2[0].upper() in openings if r2 is not False else False))
 
+    @no_type_check
     def closesIncorrectly(self) -> bool:
         '''
         TODO(msc): will be renamed to be less dogmatic
@@ -2199,10 +2206,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         '''
 
         return (self._isComplete()
-                and ((self.iLeft.generic.undirected == 2
-                            or self.iLeft.generic.undirected == 1)
-                     and (self.iRight.generic.undirected == 2
-                            or self.iRight.generic.undirected == 1)
+                and (self.iLeft.generic.undirected in (1, 2)
+                     and self.iRight.generic.undirected in (1, 2)
                      and self.iLeft.generic.undirected * self.iRight.generic.undirected == 2
                      and self.iLeft.isChromaticStep
                      and self.iRight.isChromaticStep

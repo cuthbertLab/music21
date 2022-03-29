@@ -1596,7 +1596,11 @@ def getTiePitchSet(prior: 'music21.note.NotRest'):
     >>> stream.makeNotation.getTiePitchSet(n)
     set()
 
-    Rest return None
+    >>> pChord = percussion.PercussionChord([note.Unpitched('D4'), note.Note('E5')])
+    >>> stream.makeNotation.getTiePitchSet(pChord)
+    set()
+
+    Rest returns None
 
     >>> r = note.Rest()
     >>> stream.makeNotation.getTiePitchSet(r) is None
@@ -1606,7 +1610,7 @@ def getTiePitchSet(prior: 'music21.note.NotRest'):
         return None
 
     tiePitchSet = set()
-    if isinstance(prior, chord.Chord):
+    if isinstance(prior, chord.ChordBase):
         previousNotes = list(prior)
     else:
         previousNotes = [prior]

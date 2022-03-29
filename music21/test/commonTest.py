@@ -39,13 +39,14 @@ def testImports():
     '''
     Test that all optional packages needed for test suites are installed
     '''
+    # pylint: disable=unused-import
     try:
-        import scipy  # pylint: disable=unused-import
+        import scipy  # type: ignore
     except ImportError as e:
         raise ImportError('pip install scipy : needed for running test suites') from e
 
     try:
-        from Levenshtein import StringMatcher  # pylint: disable=unused-import
+        from Levenshtein import StringMatcher  # type: ignore
     except ImportError as e:
         raise ImportError('pip install python-Levenshtein : needed for running test suites') from e
 

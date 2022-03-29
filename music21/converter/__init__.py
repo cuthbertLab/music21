@@ -1631,7 +1631,7 @@ class Test(unittest.TestCase):
             for n in p.recurse().notes:
                 if n.tie is not None:
                     countTies += 1
-                    if n.tie.type == 'start' or n.tie.type == 'continue':
+                    if n.tie.type in ('start', 'continue'):
                         countStartTies += 1
 
         self.assertEqual(countTies, 57)

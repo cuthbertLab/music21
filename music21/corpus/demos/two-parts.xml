@@ -146,6 +146,16 @@
     <voice>1</voice>
     <staff>1</staff>
    </direction>
+   <direction placement="above">
+    <direction-type>
+     <metronome parentheses="no">
+      <beat-unit>eighth</beat-unit>
+      <per-minute>82</per-minute>
+     </metronome>
+    </direction-type>
+    <staff>1</staff>
+    <sound tempo="41" />
+   </direction>
    <note default-x="88">
     <rest />
     <duration>128</duration>

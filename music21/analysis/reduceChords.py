@@ -93,9 +93,10 @@ class ChordReducer:
                 intervalClassSets.append(intervalClassSet)
             forbiddenChords = frozenset(intervalClassSets)
 
-        scoreTree = tree.fromStream.asTimespans(inputScore,
-                                              flatten=True,
-                                              classList=(note.Note, chord.Chord))
+        scoreTree = tree.fromStream.asTimespans(
+            inputScore,
+            flatten=True,
+            classList=(note.Note, chord.Chord))
 
         self.removeZeroDurationTimespans(scoreTree)
         self.splitByBass(scoreTree)

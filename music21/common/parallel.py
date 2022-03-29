@@ -142,7 +142,7 @@ def runParallel(iterable, parallelFunction, *,
                     updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
 
     callUpdate(0)
-    from joblib import Parallel, delayed
+    from joblib import Parallel, delayed  # type: ignore
 
     with Parallel(n_jobs=numCpus) as para:
         delayFunction = delayed(parallelFunction)

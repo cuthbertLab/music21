@@ -19,7 +19,7 @@ from music21.test import commonTest
 
 try:
     # noinspection PyPackageRequirements
-    from pylint.lint import Run as pylintRun
+    from pylint.lint import Run as pylintRun  # type: ignore
 except ImportError:
     pylintRun = None
 
@@ -107,13 +107,11 @@ def main(fnAccept=None, strict=False):
         'too-many-locals',   # no
         'bad-whitespace',  # maybe later, but "bad" isn't something I necessarily agree with
         'bad-continuation',  # never remove -- this is a good thing many times.
-        'unpacking-non-sequence',  # gets it wrong too often.
 
         # AbstractDiatonicScale.__eq__ shows how this
         # can be fine...
         'too-many-boolean-expressions',
 
-        'misplaced-comparison-constant',  # sometimes 2 < x is what we want
         'unsubscriptable-object',  # unfortunately, thinks that Streams are unsubscriptable.
 
         # sometimes .keys() is a good test against

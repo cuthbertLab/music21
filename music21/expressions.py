@@ -310,6 +310,11 @@ class TextExpression(Expression):
     >>> te = expressions.TextExpression('Con fuoco')
     >>> te.content
     'Con fuoco'
+
+    Most configuration of style is done
+    on the `.style` :class:`~music21.style.TextStyle` object
+    itself.
+
     >>> te.style.fontSize = 24.0
     >>> te.style.fontSize
     24
@@ -336,8 +341,6 @@ class TextExpression(Expression):
         else:
             self._content = content
 
-        self._enclosure = None
-
         # this does not do anything if default y is defined
         self.placement = None
 
@@ -349,6 +352,38 @@ class TextExpression(Expression):
             return repr(self._content)
         else:
             return ''
+
+    @property
+    def enclosure(self) -> Optional[style.Enclosure]:
+        '''
+        Returns or sets the enclosure on the Style object
+        stored on .style.
+
+        Exposed directly on the expression for backwards
+        compatibility.  Does not create a .style object if
+        one does not exist and the value is None.
+
+        >>> te = expressions.TextExpression('Bridge')
+        >>> te.enclosure is None
+        True
+        >>> te.enclosure = style.Enclosure.RECTANGLE
+        >>> te.enclosure
+        <Enclosure.RECTANGLE>
+
+        Note that this is also set on `.style`.
+
+        >>> te.style.enclosure
+        <Enclosure.RECTANGLE>
+        '''
+        if not self.hasStyleInformation:
+            return None
+        return self.style.enclosure
+
+    @enclosure.setter
+    def enclosure(self, value: Optional[style.Enclosure]):
+        if not self.hasStyleInformation and value is None:
+            return
+        self.style.enclosure = value
 
     def _getContent(self):
         return self._content
@@ -481,7 +516,7 @@ class GeneralMordent(Ornament):
         '''
         from music21 import key
 
-        if self.direction != 'up' and self.direction != 'down':
+        if self.direction not in ('up', 'down'):
             raise ExpressionException('Cannot realize a mordent if I do not know its direction')
         if self.size == '':
             raise ExpressionException('Cannot realize a mordent if there is no size given')
@@ -495,7 +530,7 @@ class GeneralMordent(Ornament):
             transposeInterval = self.size.reverse()
         else:
             transposeInterval = self.size
-        mordNotes = []
+        mordNotes: List['music21.note.Note'] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
@@ -808,12 +843,13 @@ class Trill(Ornament):
         if self.nachschlag:
             numberOfTrillNotes -= 2
 
-        trillNotes = []
+        trillNotes: List['music21.note.Note'] = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval)
 
         currentKeySig = None
-        if self._setAccidentalFromKeySig:
+        setAccidentalFromKeySig = self._setAccidentalFromKeySig
+        if setAccidentalFromKeySig:
             currentKeySig = srcObj.getContextByClass(key.KeySignature)
             if currentKeySig is None:
                 currentKeySig = key.KeySignature(0)
@@ -834,7 +870,7 @@ class Trill(Ornament):
             secondNoteNachschlag.transpose(transposeIntervalReverse,
                                            inPlace=True)
 
-            if self._setAccidentalFromKeySig:
+            if setAccidentalFromKeySig and currentKeySig:
                 firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
                     firstNoteNachschlag.step)
                 secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
@@ -1080,7 +1116,7 @@ class GeneralAppoggiatura(Ornament):
         :type srcObj: base.Music21Object
         '''
         from music21 import key
-        if self.direction != 'up' and self.direction != 'down':
+        if self.direction not in ('up', 'down'):
             raise ExpressionException(
                 'Cannot realize an Appoggiatura if I do not know its direction')
         if self.size == '':
