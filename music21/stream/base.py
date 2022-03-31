@@ -1213,7 +1213,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         super().mergeAttributes(other)
 
         for attr in ('autoSort', 'isSorted', 'definesExplicitSystemBreaks',
-                     'definesExplicitPageBreaks', '_atSoundingPitch', '_mutable'):
+                     'definesExplicitPageBreaks', '_atSoundingPitch', '_mutable', '_partName', '_partAbbreviation'):
             if hasattr(other, attr):
                 setattr(self, attr, getattr(other, attr))
 
