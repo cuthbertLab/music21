@@ -802,6 +802,8 @@ class Expander:
         # TODO: need to copy spanners from each sub-group into their newest connects;
         #   must be done here as more than one connection is made
 
+        post.mergeAttributes(srcStream)
+
         return post
 
     def measureMap(self, returnType='index'):
