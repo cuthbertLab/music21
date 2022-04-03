@@ -3215,9 +3215,6 @@ class Test(unittest.TestCase):
         # now, reconverted from the musicxml, we have a RepeatExpression
         self.assertEqual(len(s2.flatten().getElementsByClass(repeat.DaCapo)), 1)
 
-        # s2.show('t')
-        # s2.show()
-
     def testExpandDaCapoA(self):
 
         # test one back repeat at end of a measure

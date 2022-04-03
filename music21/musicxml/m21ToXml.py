@@ -3046,6 +3046,9 @@ class MeasureExporter(XMLExporterBase):
         general_note_offsets = []
         for objGroup in OffsetIterator(m, filterList=[lambda n: isinstance(n, note.GeneralNote)]):
             general_note_offsets.append(m.elementOffset(objGroup[0]))
+        if not general_note_offsets:
+            # fallback if there are no notes or rests: this will capture DaCapo signs, etc
+            general_note_offsets = [0.0]
         for i, groupOffset in enumerate(general_note_offsets):
             amountToMoveForward = int(round(divisions * (groupOffset
                                                              - self.offsetInMeasure)))
