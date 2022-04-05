@@ -4378,6 +4378,7 @@ class Test(unittest.TestCase):
         p.partName = 'mypartname'
         p.partAbbreviation = 'mypartabbreviation'
         exp = p.expandRepeats()
+        self.assertEqual(exp.partName, 'mypartname')
         self.assertEqual(exp.partAbbreviation, 'mypartabbreviation')
 
 
