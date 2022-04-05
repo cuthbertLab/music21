@@ -13516,6 +13516,19 @@ class Part(Stream):
         else:  # in place
             return None
 
+    def mergeAttributes(self, other: 'Part'):
+        '''
+        Merge relevant attributes from the Other part
+        into this one. Key attributes of difference: partName and partAbbreviation.
+
+        TODO: doc test
+        '''
+
+        super().mergeAttributes(other)
+
+        for attr in ('_partName', '_partAbbreviation'):
+            if hasattr(other, attr):
+                setattr(self, attr, getattr(other, attr))
 
 class PartStaff(Part):
     '''
