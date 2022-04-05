@@ -4366,7 +4366,7 @@ class Test(unittest.TestCase):
 #         s.show()
 #         post = s.expandRepeats()
 
-    def test_expand_repeats(self):
+    def test_expand_repeats_preserves_name(self):
         # Test case provided by jacobtylerwalls on issue #1165
         # https://github.com/cuthbertLab/music21/issues/1165#issuecomment-967293691
 
@@ -4376,8 +4376,9 @@ class Test(unittest.TestCase):
         p = converter.parse('tinyNotation: c1 d e f')
         p.measure(2).storeAtEnd(bar.Repeat(direction='end', times=1))
         p.partName = 'mypartname'
+        p.partAbbreviation = 'mypartabbreviation'
         exp = p.expandRepeats()
-        self.assertEqual(exp.partName, 'mypartname')
+        self.assertEqual(exp.partAbbreviation, 'mypartabbreviation')
 
 
 # ------------------------------------------------------------------------------
