@@ -13520,7 +13520,7 @@ class Part(Stream):
         '''
         Merge relevant attributes from the Other part
         into this one. Key attributes of difference: partName and partAbbreviation.
-        
+
         TODO: doc test
         '''
 

@@ -4380,7 +4380,6 @@ class Test(unittest.TestCase):
         self.assertEqual(exp.partName, 'mypartname')
 
 
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine,
