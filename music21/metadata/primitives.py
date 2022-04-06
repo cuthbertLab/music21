@@ -34,6 +34,7 @@ __all__ = [
     'DateSingle',
     'Imprint',
     'Text',
+    'TextLiteral'
 ]
 
 
@@ -1175,6 +1176,27 @@ class Imprint(prebase.ProtoM21Object):
 
 
 # -----------------------------------------------------------------------------
+
+# We'll keep the old Date type, but TextLiteral is an enhanced version of the old
+# Text type that adds an optional encoding scheme (e.g. URI, DCMIPoint, etc) as well as
+# whether this is the original (un-translated) language.
+class TextLiteral(prebase.ProtoM21Object):
+    def __init__(self,
+                 text: Union[str, 'TextLiteral'],
+                 language: Optional[str] = None,
+                 isTranslated: Optional[bool] = None, # True, False, or None (unknown)
+                 encodingScheme: Optional[str] = None):
+        if isinstance(text, type(self)):
+            # just copy all the fields
+            self.text: str = text.text
+            self.language: Optional[str] = text.language
+            self.isTranslated: Optional[bool] = text.isTranslated
+            self.encodingScheme: Optional[str] = text.encodingScheme
+        else:
+            self.text = text
+            self.language = language
+            self.isTranslated = isTranslated
+            self.encodingScheme = encodingScheme
 
 
 class Test(unittest.TestCase):
