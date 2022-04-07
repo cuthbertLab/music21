@@ -6875,7 +6875,8 @@ class Test(unittest.TestCase):
         self.assertEqual(
             # https://github.com/cuthbertLab/music21/issues/1263
             # First element was (None, None)
-            tuplet_pairs_per_note, [(None, 'start'), (None, None), (None, None), (None, None), ('stop', 'stop')]
+            tuplet_pairs_per_note,
+            [(None, 'start'), (None, None), (None, None), (None, None), ('stop', 'stop')]
         )
 
     def testImpliedTuplet(self):
