@@ -350,7 +350,8 @@ class Repeat(repeat.RepeatMark, Barline):
                     f'cannot set repeat times to a value less than zero: {value}'
                 )
             if self.direction == 'start':
-                raise BarException('cannot set repeat times on a start Repeat')
+                # don't set repeat times on a start Repeat
+                return
 
             self._times = candidate
 
