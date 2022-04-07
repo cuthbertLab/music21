@@ -40,6 +40,67 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 .. image:: images/moduleMetadata-01.*
     :width: 600
 '''
+
+'''
+    A guide to this initial new implementation:
+
+    - class OldMetadata is where I'm keeping the old Metadata implementation.
+        Metadata is the new implementation.
+
+    - The old metadata had a list of supported workIds, and also a list of supported
+        contributor roles.  You could have more than one of each role, but only one
+        of each workId.
+        In the new implementation, I don't really treat contributor roles differently
+        from other metadata.  I have a list of supported property terms, which are
+        pulled from Dublin Core (namespace = 'dcterm'), MARC Relator codes (a.k.a.
+        contributor roles, namespace = 'marcrel'), and several music21-specific things
+        that I have to continue supporting even though I can't find any official List
+        of terms that support them (namespace = 'music21').  An example is 'popularTitle'.
+        You can have more than one of any of these.  That implies that I need two APIs
+        for adding a new piece of metadata.  One that does "this is the new (only) value
+        for this metadata property term", and one that does "this is a new value to add in to any
+        other values you might have for this metadata property term".  They are:
+        addItem() and replaceItem().  addItem adds the new item to the (possibly empty)
+        set of values, and replaceItem removes any current list of values before adding
+        the item.
+
+    - Primitives: Old code had DateXxxx and Text.  DateXxxx still works for Dublin Core
+        et al (it's a superset of what is needed), but Text needs to add the ability to
+        know whether or not the text has been translated, as well as a specified encoding
+        scheme (a.k.a. what standard should I use to parse this string) so I have a new
+        class TextLiteral (which is Dublin Core terminology) that replaces Text.
+
+    - I have not yet tried to support client-specified namespaces, but I do have a couple
+        APIs (getPersonalItem, addPersonalItem, replacePersonalItem) that have no namespace
+        at all, so clients can set anything they want and (hopefully) get it passed through.
+        The first client-specified namespace I will try is 'humdrum' for all the crazy humdrum
+        metadata that music21 doesn't really need to add as officially supported.
+
+    - Copyright stuff: Everybody does this differently, so there's no straightforward mapping
+        from (say) humdrum copyright stuff to Dublin Core copyright stuff. Dublin Core has
+        'rights', 'accessRights', 'rightsHolder', 'dateCopyrighted', and 'license'.
+        This will require, I think, some special code/data structure in music21, and then
+        parsers and writers will need to deal specially with it.  For now I don't handle it
+        well.  It might even be represented as a new 'copyright' property term with
+        namespace='music21'.
+
+    - A new type that drives a lot of the implementation: Property
+        A Property is a namedtuple with (currently) four fields that describe a property
+            code is a (possibly abbreviated) code for the property
+            name is the official name of the property (tail of the property term URI)
+            label is the human readable name of the Property
+            namespace is the namespace in which the property is named (e.g. 'dcterm' for
+                Dublin Core terms, 'marcrel' for MARC Relator terms, etc)
+        The list of supported properties is STDPROPERTIES, and various lists and dicts are
+        created from that for later use.
+
+    - Data structure for all the metadata:
+        Metadata contains a _metadata attribute which is a dict, where the keys are
+        f'{namespace}:{name}', and the value is one of TextLiteral, DateXxxx, or a
+        List of values of those types (for properties that have more than one value).
+
+
+'''
 from collections import OrderedDict, namedtuple
 from dataclasses import dataclass
 import os
@@ -921,7 +982,8 @@ class Metadata(base.Music21Object):
             return None
         return Metadata.NSKEY2STDPROPERTY.get(nsKey, None)
 
-#     # Here are some old APIs, implemented in terms of the new data structures
+#     # Here are some examples of old APIs, implemented in terms of the new data structures
+#     # for backward compatibility
 #     @ property
 #     def alternativeTitle(self):
 #         r'''
@@ -941,7 +1003,7 @@ class Metadata(base.Music21Object):
 #     def alternativeTitle(self, value):
 #         self._metadata[OLDWORKID2NSKEY['alternativeTitle']] = Text(value)
 
-    # New better APIs
+    # New APIs
     def getItem(self,
                 key: str, # can be name, code, or namespace:name (if namespace is None)
                 namespace: Optional[str] = None) -> Optional[Union[TextLiteral, Date, dict]]:

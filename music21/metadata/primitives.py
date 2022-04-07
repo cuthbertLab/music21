@@ -1177,7 +1177,7 @@ class Imprint(prebase.ProtoM21Object):
 
 # -----------------------------------------------------------------------------
 
-# We'll keep the old Date type, but TextLiteral is an enhanced version of the old
+# We'll keep the old DateXxxx types, but TextLiteral is an enhanced version of the old
 # Text type that adds an optional encoding scheme (e.g. URI, DCMIPoint, etc) as well as
 # whether this is the original (un-translated) language.
 class TextLiteral(prebase.ProtoM21Object):
