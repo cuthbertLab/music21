@@ -322,7 +322,8 @@ class Repeat(repeat.RepeatMark, Barline):
         Only end expressions can have times:
 
         >>> lb.times = 3
-        >>> lb.times
+        >>> lb.times is None
+        True
 
         >>> rb.times = 3
         >>> rb.times = -3
