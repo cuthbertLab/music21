@@ -322,8 +322,7 @@ class Repeat(repeat.RepeatMark, Barline):
         Only end expressions can have times:
 
         >>> lb.times = 3
-        Traceback (most recent call last):
-        music21.bar.BarException: cannot set repeat times on a start Repeat
+        >>> lb.times
 
         >>> rb.times = 3
         >>> rb.times = -3
