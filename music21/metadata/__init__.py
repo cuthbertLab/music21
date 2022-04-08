@@ -39,9 +39,7 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 
 .. image:: images/moduleMetadata-01.*
     :width: 600
-'''
 
-'''
     A guide to this initial new implementation:
 
     - class OldMetadata is where I'm keeping the old Metadata implementation.
@@ -98,7 +96,6 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
         Metadata contains a _metadata attribute which is a dict, where the keys are
         f'{namespace}:{name}', and the value is one of TextLiteral, DateXxxx, or a
         List of values of those types (for properties that have more than one value).
-
 
 '''
 from collections import OrderedDict, namedtuple
@@ -970,6 +967,7 @@ class Metadata(base.Music21Object):
         if key in Metadata.STDPROPERTY_CODES:
             return Metadata.CODE2NSKEY[key]
 
+        # it might already be of the form 'namespace:name', so just return it.
         return key
 
     @staticmethod
@@ -1003,25 +1001,52 @@ class Metadata(base.Music21Object):
 #     def alternativeTitle(self, value):
 #         self._metadata[OLDWORKID2NSKEY['alternativeTitle']] = Text(value)
 
+    def all(self) -> List[Tuple[str, Union[TextLiteral, Date]]]:
+        '''
+        Returns all values stored in this metadata as a list of tuples
+            [(nsKey, value), ...].
+        Items in the metadata that have a list of values are flattened into the output
+        list as multiple tuples with the same nsKey.
+        '''
+        allOut: List[Tuple[str, Union[TextLiteral, DateSingle]]] = []
+
+        for nsKey, value in self._metadata.items():
+            if not value:
+                continue
+
+            if isinstance(value, list):
+                for v in value:
+                    allOut.append( (nsKey, v) )
+            else:
+                allOut.append( (nsKey, value) )
+
+        # The previous version of Metadata sorted here, but when I'm doing passthru export,
+        # I rather like having it sorted like it was in the input file (like it was in
+        # self._metadata).  If it needs to be sorted by default, for backward compatibility,
+        # I will add a sorted param that defaults to True (and set it to False in my
+        # exporter).  I will say that with all our new nsKeys, the sort will be quite
+        # different now than it used to be...
+        return allOut
+
     # New APIs
     def getItem(self,
                 key: str, # can be name, code, or namespace:name (if namespace is None)
-                namespace: Optional[str] = None) -> Optional[Union[TextLiteral, Date, dict]]:
+                namespace: Optional[str] = None) -> Optional[Union[TextLiteral, DateSingle, dict]]:
         nsKey: str = self.nsKey(key, namespace)
         return self._metadata.get(nsKey, None)
 
-    # Values can be of type TextLiteral or Date (pass in a str, and we'll do a crappy
+    # Values can be of type TextLiteral or DateXxxx (pass in a str, and we'll do a crappy
     # job of turning it into a TextLiteral)
     def addItem(self,
                 key: str, # can be name, code, or namespace:name (if namespace is None)
-                value: Union[TextLiteral, Date, str, dict],
+                value: Union[TextLiteral, DateSingle, str, dict],
                 namespace: Optional[str] = None):
         if isinstance(value, str):
             value = TextLiteral(value)
 
         nsKey: str = self.nsKey(key, namespace)
 
-        prevValue: Union[List, TextLiteral, Date, str, dict]
+        prevValue: Union[List, TextLiteral, DateSingle, str, dict]
         prevValue = self._metadata.get(nsKey, None)
         if prevValue is None:
             # set a single value
@@ -1035,19 +1060,19 @@ class Metadata(base.Music21Object):
 
     def replaceItem(self,
                     key: str,
-                    value: Union[TextLiteral, Date, str, dict],
+                    value: Union[TextLiteral, DateSingle, str, dict],
                     namespace: Optional[str] = None):
         nsKey: str = self.nsKey(key, namespace)
         self._metadata.pop(nsKey)
         self.addItem(key, value, namespace)
 
-    def getPersonalItem(self, key: str) -> Union[TextLiteral, Date, dict]:
+    def getPersonalItem(self, key: str) -> Union[TextLiteral, DateSingle, dict]:
         return self.getItem(key, namespace=None)
 
-    def addPersonalItem(self, key: str, value: Union[TextLiteral, Date, str, dict]):
+    def addPersonalItem(self, key: str, value: Union[TextLiteral, DateSingle, str, dict]):
         self.addItem(key, value, namespace=None)
 
-    def replacePersonalItem(self, key: str, value: Union[TextLiteral, Date, str, dict]):
+    def replacePersonalItem(self, key: str, value: Union[TextLiteral, DateSingle, str, dict]):
         self.replaceItem(key, value, namespace=None)
 
 

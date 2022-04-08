@@ -1188,15 +1188,23 @@ class TextLiteral(prebase.ProtoM21Object):
                  encodingScheme: Optional[str] = None):
         if isinstance(text, type(self)):
             # just copy all the fields
-            self.text: str = text.text
+            self._data: str = text.text
             self.language: Optional[str] = text.language
             self.isTranslated: Optional[bool] = text.isTranslated
             self.encodingScheme: Optional[str] = text.encodingScheme
         else:
-            self.text = text
+            self._data = text
             self.language = language
             self.isTranslated = isTranslated
             self.encodingScheme = encodingScheme
+
+    def __str__(self):
+        if isinstance(self._data, bytes):
+            return self._data.decode('UTF-8')
+        elif not isinstance(self._data, str):
+            return str(self._data)
+        else:
+            return self._data
 
 
 class Test(unittest.TestCase):
