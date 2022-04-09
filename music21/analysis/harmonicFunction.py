@@ -185,7 +185,7 @@ def functionToRoman(harmonicFunction: FUNKTION,
     'Tp'
 
     '''
-    if type(keyOrScale) == str:
+    if isinstance(keyOrScale, str):
         keyOrScale = key.Key(keyOrScale)
 
     referenceTuples = functionFigureTuplesMajor
