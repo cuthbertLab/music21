@@ -67,9 +67,9 @@ _functionFigureTuplesKeyNeutral = (
     ('Tp', 'vi'),  # Note first: Tp generally preferred over Sg
     ('Sg', 'vi'),
 
-    ('Dg', 'bvii')
+    ('Dg', 'bvii'),
 
-    )
+)
 
 functionFigureTuplesMajor = (
 
@@ -84,7 +84,7 @@ functionFigureTuplesMajor = (
 
     ('dP', 'bVII'),
 
-    )
+)
 
 functionFigureTuplesMajor += _functionFigureTuplesKeyNeutral
 
@@ -101,7 +101,7 @@ functionFigureTuplesMinor = (
 
     ('dP', 'VII'),
 
-    )
+)
 
 functionFigureTuplesMinor += _functionFigureTuplesKeyNeutral
 
