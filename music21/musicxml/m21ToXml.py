@@ -2281,7 +2281,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # creators
         foundOne = False
         if self.scoreMetadata is not None:
-            for c in self.scoreMetadata.contributors:
+            for c in self.scoreMetadata.contributors():
                 mxCreator = self.contributorToXmlCreator(c)
                 mxId.append(mxCreator)
                 foundOne = True
@@ -2291,12 +2291,13 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             mxCreator.set('type', 'composer')
             mxCreator.text = defaults.author
 
-        if self.scoreMetadata is not None and self.scoreMetadata.copyright is not None:
-            c = self.scoreMetadata.copyright
-            mxRights = SubElement(mxId, 'rights')
-            if c.role is not None:
-                mxRights.set('type', c.role)
-            mxRights.text = str(c)
+        # TODO: figure out copyright
+        # if self.scoreMetadata is not None and self.scoreMetadata.copyright is not None:
+        #     c = self.scoreMetadata.copyright
+        #     mxRights = SubElement(mxId, 'rights')
+        #     if c.role is not None:
+        #         mxRights.set('type', c.role)
+        #     mxRights.text = str(c)
 
         # Encoding does its own append...
         self.setEncoding()
@@ -2334,12 +2335,13 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxMiscellaneous = Element('miscellaneous')
 
         foundOne = False
-        for name, value in md.all(skipContributors=True):
-            if name in ('movementName', 'movementNumber', 'title', 'copyright'):
+        for nsKey, value in md.all(skipContributors=True):
+            if nsKey in ('music21:movementName', 'music21:movementNumber', 'dcterm:title'):
+                # TODO: figure out copyright      , 'copyright'):
                 continue
             mxMiscField = SubElement(mxMiscellaneous, 'miscellaneous-field')
-            mxMiscField.set('name', name)
-            mxMiscField.text = value
+            mxMiscField.set('name', nsKey)
+            mxMiscField.text = str(value)
             foundOne = True
 
         if self.mxIdentification is not None and foundOne:
@@ -2476,27 +2478,38 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxMovementTitle = SubElement(mxScoreHeader, 'movement-title')
         mxMovementTitle.text = movement_title
 
+    # TODO: expand creator creation to try to put in all the marcrel contributors, not
+    # TODO:     just the backward-compatible list here.  What do the other musicxml
+    # TODO:     encoders put in as creator types?
+    m21MetadataNSKeyToXMLCreatorType: Dict = {
+        'marcrel:CMP': 'composer',
+        'music21:attributedComposer': 'attributedComposer',
+        'music21:suspectedComposer': 'suspectedComposer',
+        'music21:composerAlias': 'composerAlias',
+        'music21:composerCorporate': 'composerCorporate',
+        'marcrel:LYR': 'lyricist',
+        'marcrel:LBT': 'librettist',
+        'marcrel:ARR': 'arranger',
+        'music21:orchestrator': 'orchestrator',
+        'marcrel:TRL': 'translator',
+    }
+
     def contributorToXmlCreator(self, c):
         # noinspection SpellCheckingInspection, PyShadowingNames
         '''
-        Return a <creator> tag from a :class:`~music21.metadata.Contributor` object.
-
-        >>> md = metadata.Metadata()
-        >>> md.composer = 'Oliveros, Pauline'
-        >>> contrib = md.contributors[0]
-        >>> contrib
-        <music21.metadata.primitives.Contributor composer:Oliveros, Pauline>
-
-        >>> SX = musicxml.m21ToXml.ScoreExporter()
-        >>> mxCreator = SX.contributorToXmlCreator(contrib)
-        >>> SX.dump(mxCreator)
-        <creator type="composer">Oliveros, Pauline</creator>
+        Return a <creator> tag from a contributor tuple c = (nsKey, value).
         '''
         mxCreator = Element('creator')
-        if c.role is not None:
-            mxCreator.set('type', str(c.role))
-        if c.name is not None:
-            mxCreator.text = c.name
+
+        # c is a contributor tuple(nskey, value)
+        nsKey: str = None
+        value: metadata.TextLiteral = None
+        nsKey, value = c
+        role: str = ScoreExporter.m21MetadataNSKeyToXMLCreatorType.get(nsKey, None)
+        if role is not None:
+            mxCreator.set('type', role)
+        if value is not None:
+            mxCreator.text = str(value)
         return mxCreator
 
 # ------------------------------------------------------------------------------

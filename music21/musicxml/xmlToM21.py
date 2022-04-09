@@ -292,6 +292,20 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, *, transform
 
     setattr(m21El, attributeName, value)
 
+def _setMetadataItemFromTagText(m21Md: metadata.Metadata, xmlEl, tag,
+                                mdNamespace, mdKey, *, transform=None):
+    matchEl = xmlEl.find(tag)  # find first
+    if matchEl is None:
+        return
+
+    value = matchEl.text
+    if value in (None, ''):
+        return
+
+    if transform is not None:
+        value = transform(value)
+
+    m21Md.addItem(mdKey, value, mdNamespace)
 
 def _synchronizeIds(element, m21Object):
     '''
@@ -1265,16 +1279,16 @@ class MusicXMLImporter(XMLParserBase):
         else:
             md = inputM21
 
-        seta = _setAttributeFromTagText
+        setm = _setMetadataItemFromTagText
         # work
         work = el.find('work')
         if work is not None:
-            seta(md, work, 'work-title', 'title')
-            seta(md, work, 'work-number', 'number')
-            seta(md, work, 'opus', 'opusNumber')
+            setm(md, work, 'work-title', 'dcterm', 'title')
+            setm(md, work, 'work-number', 'music21', 'number')
+            setm(md, work, 'opus', 'music21', 'opusNumber')
 
-        seta(md, el, 'movement-number')
-        seta(md, el, 'movement-title', 'movementName')
+        setm(md, el, 'movement-number', 'music21', 'movementNumber')
+        setm(md, el, 'movement-title', 'music21', 'movementName')
 
         identification = el.find('identification')
         if identification is not None:
@@ -1304,13 +1318,15 @@ class MusicXMLImporter(XMLParserBase):
             md = metadata.Metadata()
 
         for creator in identification.findall('creator'):
-            c = self.creatorToContributor(creator)
-            md.addContributor(c)
+            mdKey, value, mdNamespace = self.creatorToMetadataKeyValueNamespace(creator)
+            if mdKey and mdNamespace and value:
+                md.addItem(mdKey, value, mdNamespace)
 
-        for rights in identification.findall('rights'):
-            c = self.rightsToCopyright(rights)
-            md.copyright = c
-            break
+# TODO: figure out copyright
+#         for rights in identification.findall('rights'):
+#             c = self.rightsToCopyright(rights)
+#             md.copyright = c
+#             break
 
         encoding = identification.find('encoding')
         if encoding is not None:
@@ -1327,12 +1343,8 @@ class MusicXMLImporter(XMLParserBase):
                 miscFieldValue = mxMiscField.text
                 if miscFieldValue is None:
                     continue  # it is required, so technically can raise an exception
-                try:
-                    setattr(md, miscFieldName, miscFieldValue)
-                except Exception as e:  # pylint: disable=broad-except
-                    warnings.warn('Could not set metadata: {} to {}: {}'.format(
-                        miscFieldName, miscFieldValue, e
-                    ), MusicXMLWarning)
+
+                md.addPersonalItem(miscFieldName, miscFieldValue)
 
         if inputM21 is None:
             return md
@@ -1365,9 +1377,24 @@ class MusicXMLImporter(XMLParserBase):
             elif (attr, value) == ('new-page', 'yes'):
                 self.definesExplicitPageBreaks = True
 
-    def creatorToContributor(self,
-                             creator: ET.Element,
-                             inputM21: t.Optional[metadata.primitives.Contributor] = None):
+    # TODO: expand creator parsing to try to get all the marcrel contributors, not
+    # TODO:     just the backward-compatible list here.  What do the various musicxml
+    # TODO:     encoders put in as creator types?
+    xmlCreatorTypeToM21MetadataKeyAndNamespace: Dict = {
+        'composer': ('CMP', 'marcrel'),
+        'attributedComposer': ('attributedComposer', 'music21'),
+        'suspectedComposer': ('suspectedComposer', 'music21'),
+        'composerAlias': ('composerAlias', 'music21'),
+        'composerCorporate': ('composerCorporate', 'music21'),
+        'lyricist': ('LYR', 'marcrel'),
+        'librettist': ('LBT', 'marcrel'),
+        'arranger': ('ARR', 'marcrel'),
+        'orchestrator': ('orchestrator', 'music21'),
+        'translator': ('TRL', 'marcrel'),
+    }
+
+    def creatorToMetadataKeyValueNamespace(self,
+                             creator: ET.Element) -> Tuple[str, str, str]:
         # noinspection PyShadowingNames
         '''
         Given a <creator> tag, fill the necessary parameters of a Contributor.
@@ -1391,21 +1418,21 @@ class MusicXMLImporter(XMLParserBase):
         >>> c2.role
         'composer'
         '''
-        if inputM21 is None:
-            c = metadata.Contributor()
-        else:
-            c = inputM21
+        mdKey: str = ''
+        value: str = ''
+        mdNamespace: str = ''
 
-        creatorType = creator.get('type')
-        if (creatorType is not None
-                and creatorType in metadata.Contributor.roleNames):
-            c.role = creatorType
+        creatorType: str = creator.get('type')
+        mdKey, mdNamespace = MusicXMLImporter.xmlCreatorTypeToM21MetadataKeyAndNamespace.get(
+                                                    creatorType, ('', ''))
 
-        creatorText = creator.text
+        creatorText: str = creator.text
         if creatorText is not None:
-            c.name = creatorText.strip()
-        if inputM21 is None:
-            return c
+            value = creatorText.strip()
+
+        if mdKey and mdNamespace: # value == '' is OK
+            return mdKey, value, mdNamespace
+        return None, None, None
 
     def rightsToCopyright(self, rights):
         # noinspection PyShadowingNames

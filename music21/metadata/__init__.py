@@ -135,7 +135,7 @@ environLocal = environment.Environment(os.path.basename(__file__))
 
 AmbitusShort = namedtuple('AmbitusShort',
                           ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
-Property = namedtuple('Property', 'code name label namespace')
+Property = namedtuple('Property', 'code name label namespace isContributor')
 
 @dataclass
 class FileInfo:
@@ -165,35 +165,45 @@ class Metadata(base.Music21Object):
         # found at http://purl.org/dc/terms/
 
         # abstract: A summary of the resource.
-        Property('AB', 'abstract', 'Abstract', 'dcterm'),
+        Property('AB', 'abstract', 'Abstract', 'dcterm',
+                    isContributor=False),
 
         # accessRights: Information about who access the resource or an indication of
         #   its security status.
-        Property('AR', 'accessRights', 'Access Rights', 'dcterm'),
+        Property('AR', 'accessRights', 'Access Rights', 'dcterm',
+                    isContributor=False),
 
         # accrualMethod: The method by which items are added to a collection.
-        Property('AM', 'accrualMethod', 'Accrual Method', 'dcterm'),
+        Property('AM', 'accrualMethod', 'Accrual Method', 'dcterm',
+                    isContributor=False),
 
         # accrualPeriodicity: The frequency with which items are added to a collection.
-        Property('AP', 'accrualPeriodicity', 'Accrual Periodicity', 'dcterm'),
+        Property('AP', 'accrualPeriodicity', 'Accrual Periodicity', 'dcterm',
+                    isContributor=False),
 
         # accrualPolicy: The policy governing the addition of items to a collection.
-        Property('APL', 'accrualPolicy', 'Accrual Policy', 'dcterm'),
+        Property('APL', 'accrualPolicy', 'Accrual Policy', 'dcterm',
+                    isContributor=False),
 
         # alternative: An alternative name for the resource.
-        Property('ALT', 'alternative', 'Alternative Title', 'dcterm'),
+        Property('ALT', 'alternative', 'Alternative Title', 'dcterm',
+                    isContributor=False),
 
         # audience: A class of agents for whom the resource is intended or useful.
-        Property('AUD', 'audience', 'Audience', 'dcterm'),
+        Property('AUD', 'audience', 'Audience', 'dcterm',
+                    isContributor=False),
 
         # available: Date that the resource became or will become available.
-        Property('AVL', 'available', 'Date Available', 'dcterm'),
+        Property('AVL', 'available', 'Date Available', 'dcterm',
+                    isContributor=False),
 
         # bibliographicCitation: A bibliographic reference for the resource.
-        Property('BIB', 'bibliographicCitation', 'Bibliographic Citation', 'dcterm'),
+        Property('BIB', 'bibliographicCitation', 'Bibliographic Citation', 'dcterm',
+                    isContributor=False),
 
         # conformsTo: An established standard to which the described resource conforms.
-        Property('COT', 'conformsTo', 'Conforms To', 'dcterm'),
+        Property('COT', 'conformsTo', 'Conforms To', 'dcterm',
+                    isContributor=False),
 
         # contributor: An entity responsible for making contributions to the resource.
         # NOTE: You should use one of the 'marcrel' properties below instead, since
@@ -201,161 +211,206 @@ class Metadata(base.Music21Object):
         # refinements of dcterm:contributor (this property), so if someone asks for
         # everything as Dublin Core metadata, those will all be translated into
         # dcterm:contributor properties.
-        Property('CN', 'contributor', 'Contributor', 'dcterm'),
+        Property('CN', 'contributor', 'Contributor', 'dcterm',
+                    isContributor=True),
 
         # coverage: The spatial or temporal topic of the resource, spatial applicability
         #   of the resource, or jurisdiction under which the resource is relevant.
-        Property('CVR', 'coverage', 'Coverage', 'dcterm'),
+        Property('CVR', 'coverage', 'Coverage', 'dcterm',
+                    isContributor=False),
 
         # created: Date of creation of the resource.
-        Property('CRD', 'created', 'Date Created', 'dcterm'),
+        Property('CRD', 'created', 'Date Created', 'dcterm',
+                    isContributor=False),
 
         # creator: An entity responsible for making the resource.
-        Property('CR', 'creator', 'Creator', 'dcterm'),
+        Property('CR', 'creator', 'Creator', 'dcterm',
+                    isContributor=True),
 
         # date: A point or period of time associated with an event in the lifecycle
         #   of the resource.
-        Property('DT', 'date', 'Date', 'dcterm'),
+        Property('DT', 'date', 'Date', 'dcterm',
+                    isContributor=False),
 
         # dateAccepted: Date of acceptance of the resource.
-        Property('DTA', 'dateAccepted', 'Date Accepted', 'dcterm'),
+        Property('DTA', 'dateAccepted', 'Date Accepted', 'dcterm',
+                    isContributor=False),
 
         # dateCopyrighted: Date of copyright of the resource.
-        Property('DTC', 'dateCopyrighted', 'Date Copyrighted', 'dcterm'),
+        Property('DTC', 'dateCopyrighted', 'Date Copyrighted', 'dcterm',
+                    isContributor=False),
 
         # dateSubmitted: Date of submission of the resource.
-        Property('DTS', 'dateSubmitted', 'Date Submitted', 'dcterm'),
+        Property('DTS', 'dateSubmitted', 'Date Submitted', 'dcterm',
+                    isContributor=False),
 
         # description: An account of the resource.
-        Property('DSC', 'description', 'Description', 'dcterm'),
+        Property('DSC', 'description', 'Description', 'dcterm',
+                    isContributor=False),
 
         # educationLevel: A class of agents, defined in terms of progression
         #   through an educational or training context, for which the described
         #   resource is intended.
-        Property('EL', 'educationLevel', 'Audience Education Level', 'dcterm'),
+        Property('EL', 'educationLevel', 'Audience Education Level', 'dcterm',
+                    isContributor=False),
 
         # extent: The size or duration of the resource.
-        Property('EXT', 'extent', 'Extent', 'dcterm'),
+        Property('EXT', 'extent', 'Extent', 'dcterm',
+                    isContributor=False),
 
         # format: The file format, physical medium, or dimensions of the resource.
-        Property('FMT', 'format', 'Format', 'dcterm'),
+        Property('FMT', 'format', 'Format', 'dcterm',
+                    isContributor=False),
 
         # hasFormat: A related resource that is substantially the same as the
         #   pre-existing described resource, but in another format.
-        Property('HFMT', 'hasFormat', 'Has Format', 'dcterm'),
+        Property('HFMT', 'hasFormat', 'Has Format', 'dcterm',
+                    isContributor=False),
 
         # hasPart: A related resource that is included either physically or
         #   logically in the described resource.
-        Property('HPT', 'hasPart', 'Has Part', 'dcterm'),
+        Property('HPT', 'hasPart', 'Has Part', 'dcterm',
+                    isContributor=False),
 
         # hasVersion: A related resource that is a version, edition, or adaptation
         #   of the described resource.
-        Property('HVS', 'hasVersion', 'Has Version', 'dcterm'),
+        Property('HVS', 'hasVersion', 'Has Version', 'dcterm',
+                    isContributor=False),
 
         # identifier: An unambiguous reference to the resource within a given context.
-        Property('ID', 'identifier', 'Identifier', 'dcterm'),
+        Property('ID', 'identifier', 'Identifier', 'dcterm',
+                    isContributor=False),
 
         # instructionalMethod: A process, used to engender knowledge, attitudes and
         #   skills, that the described resource is designed to support.
-        Property('IM', 'instructionalMethod', 'Instructional Method', 'dcterm'),
+        Property('IM', 'instructionalMethod', 'Instructional Method', 'dcterm',
+                    isContributor=False),
 
         # isFormatOf: A pre-existing related resource that is substantially the same
         #   as the described resource, but in another format.
-        Property('IFMT', 'isFormatOf', 'Is Format Of', 'dcterm'),
+        Property('IFMT', 'isFormatOf', 'Is Format Of', 'dcterm',
+                    isContributor=False),
 
         # isPartOf: A related resource in which the described resource is physically
         #   or logically included.
-        Property('IPT', 'isPartOf', 'Is Part Of', 'dcterm'),
+        Property('IPT', 'isPartOf', 'Is Part Of', 'dcterm',
+                    isContributor=False),
 
         # isReferencedBy: A related resource that references, cites, or otherwise
         #   points to the described resource.
-        Property('IREF', 'isReferencedBy', 'Is Referenced By', 'dcterm'),
+        Property('IREF', 'isReferencedBy', 'Is Referenced By', 'dcterm',
+                    isContributor=False),
 
         # isReplacedBy: A related resource that supplants, displaces, or supersedes
         #   the described resource.
-        Property('IREP', 'isReplacedBy', 'Is Replaced By', 'dcterm'),
+        Property('IREP', 'isReplacedBy', 'Is Replaced By', 'dcterm',
+                    isContributor=False),
 
         # isRequiredBy: A related resource that requires the described resource
         #   to support its function, delivery, or coherence.
-        Property('IREQ', 'isRequiredBy', 'Is Required By', 'dcterm'),
+        Property('IREQ', 'isRequiredBy', 'Is Required By', 'dcterm',
+                    isContributor=False),
 
         # issued: Date of formal issuance of the resource.
-        Property('IS', 'issued', 'Date Issued', 'dcterm'),
+        Property('IS', 'issued', 'Date Issued', 'dcterm',
+                    isContributor=False),
 
         # isVersionOf: A related resource of which the described resource is a
         #   version, edition, or adaptation.
-        Property('IVSN', 'isVersionOf', 'Is Version Of', 'dcterm'),
+        Property('IVSN', 'isVersionOf', 'Is Version Of', 'dcterm',
+                    isContributor=False),
 
         # language: A language of the resource.
-        Property('LG', 'language', 'Language', 'dcterm'),
+        Property('LG', 'language', 'Language', 'dcterm',
+                    isContributor=False),
 
         # license: A legal document giving official permission to do something
         #   with the resource.
-        Property('LI', 'license', 'License', 'dcterm'),
+        Property('LI', 'license', 'License', 'dcterm',
+                    isContributor=False),
 
         # mediator: An entity that mediates access to the resource.
-        Property('ME', 'mediator', 'Mediator', 'dcterm'),
+        Property('ME', 'mediator', 'Mediator', 'dcterm',
+                    isContributor=False),
 
         # medium: The material or physical carrier of the resource.
-        Property('MED', 'medium', 'Medium', 'dcterm'),
+        Property('MED', 'medium', 'Medium', 'dcterm',
+                    isContributor=False),
 
         # modified: Date on which the resource was changed.
-        Property('MOD', 'modified', 'Date Modified', 'dcterm'),
+        Property('MOD', 'modified', 'Date Modified', 'dcterm',
+                    isContributor=False),
 
         # provenance: A statement of any changes in ownership and custody of
         #   the resource since its creation that are significant for its
         #   authenticity, integrity, and interpretation.
-        Property('PRV', 'provenance', 'Provenance', 'dcterm'),
+        Property('PRV', 'provenance', 'Provenance', 'dcterm',
+                    isContributor=False),
 
         # publisher: An entity responsible for making the resource available.
-        Property('PBL', 'publisher', 'Publisher', 'dcterm'),
+        Property('PBL', 'publisher', 'Publisher', 'dcterm',
+                    isContributor=True),
 
         # references: A related resource that is referenced, cited, or
         #   otherwise pointed to by the described resource.
-        Property('REF', 'references', 'References', 'dcterm'),
+        Property('REF', 'references', 'References', 'dcterm',
+                    isContributor=False),
 
         # relation: A related resource.
-        Property('REL', 'relation', 'Relation', 'dcterm'),
+        Property('REL', 'relation', 'Relation', 'dcterm',
+                    isContributor=False),
 
         # replaces: A related resource that is supplanted, displaced, or
         #   superseded by the described resource.
-        Property('REP', 'replaces', 'Replaces', 'dcterm'),
+        Property('REP', 'replaces', 'Replaces', 'dcterm',
+                    isContributor=False),
 
         # requires: A related resource that is required by the described
         #   resource to support its function, delivery, or coherence.
-        Property('REQ', 'requires', 'Requires', 'dcterm'),
+        Property('REQ', 'requires', 'Requires', 'dcterm',
+                    isContributor=False),
 
         # rights: Information about rights held in and over the resource.
-        Property('RT', 'rights', 'Rights', 'dcterm'),
+        Property('RT', 'rights', 'Rights', 'dcterm',
+                    isContributor=False),
 
         # rightsHolder: A person or organization owning or managing rights
         #   over the resource.
-        Property('RH', 'rightsHolder', 'Rights Holder', 'dcterm'),
+        Property('RH', 'rightsHolder', 'Rights Holder', 'dcterm',
+                    isContributor=True),
 
         # source: A related resource from which the described resource
         #   is derived.
-        Property('SRC', 'source', 'Source', 'dcterm'),
+        Property('SRC', 'source', 'Source', 'dcterm',
+                    isContributor=False),
 
         # spatial: Spatial characteristics of the resource.
-        Property('SP', 'spatial', 'Spatial Coverage', 'dcterm'),
+        Property('SP', 'spatial', 'Spatial Coverage', 'dcterm',
+                    isContributor=False),
 
         # subject: A topic of the resource.
-        Property('SUB', 'subject', 'Subject', 'dcterm'),
+        Property('SUB', 'subject', 'Subject', 'dcterm',
+                    isContributor=False),
 
         # tableOfContents: A list of subunits of the resource.
-        Property('TOC', 'tableOfContents', 'Table Of Contents', 'dcterm'),
+        Property('TOC', 'tableOfContents', 'Table Of Contents', 'dcterm',
+                    isContributor=False),
 
         # temporal: Temporal characteristics of the resource.
-        Property('TE', 'temporal', 'Temporal Coverage', 'dcterm'),
+        Property('TE', 'temporal', 'Temporal Coverage', 'dcterm',
+                    isContributor=False),
 
         # title: A name given to the resource.
-        Property('T', 'title', 'Title', 'dcterm'),
+        Property('T', 'title', 'Title', 'dcterm',
+                    isContributor=False),
 
         # type : The nature or genre of the resource.
-        Property('TYP', 'type', 'Type', 'dcterm'),
+        Property('TYP', 'type', 'Type', 'dcterm',
+                    isContributor=False),
 
         # valid: Date (often a range) of validity of a resource.
-        Property('VA', 'valid', 'Date Valid', 'dcterm'),
+        Property('VA', 'valid', 'Date Valid', 'dcterm',
+                    isContributor=False),
 
         # The following 'marcrel' property terms are the MARC Relator terms
         # that are refinements of dcterm:contributor, and can be used anywhere
@@ -367,139 +422,167 @@ class Metadata(base.Music21Object):
 
         # ACT/Actor: a person or organization who principally exhibits acting
         #   skills in a musical or dramatic presentation or entertainment.
-        Property('act', 'ACT', 'Actor', 'marcrel'),
+        Property('act', 'ACT', 'Actor', 'marcrel',
+                    isContributor=True),
 
         # ADP/Adapter: a person or organization who 1) reworks a musical composition,
         #   usually for a different medium, or 2) rewrites novels or stories
         #   for motion pictures or other audiovisual medium.
-        Property('adp', 'ADP', 'Adapter', 'marcrel'),
+        Property('adp', 'ADP', 'Adapter', 'marcrel',
+                    isContributor=True),
 
         # ANM/Animator: a person or organization who draws the two-dimensional
         #   figures, manipulates the three dimensional objects and/or also
         #   programs the computer to move objects and images for the purpose
         #   of animated film processing.
-        Property('anm', 'ANM', 'Animator', 'marcrel'),
+        Property('anm', 'ANM', 'Animator', 'marcrel',
+                    isContributor=True),
 
         # ANN/Annotator: a person who writes manuscript annotations on a printed item.
-        Property('ann', 'ANN', 'Annotator', 'marcrel'),
+        Property('ann', 'ANN', 'Annotator', 'marcrel',
+                    isContributor=True),
 
         # ARC/Architect: a person or organization who designs structures or oversees
         #   their construction.
-        Property('arc', 'ARC', 'Architect', 'marcrel'),
+        Property('arc', 'ARC', 'Architect', 'marcrel',
+                    isContributor=True),
 
         # ARR/Arranger: a person or organization who transcribes a musical
         #   composition, usually for a different medium from that of the original;
         #   in an arrangement the musical substance remains essentially unchanged.
-        Property('arr', 'ARR', 'Arranger', 'marcrel'),
+        Property('arr', 'ARR', 'Arranger', 'marcrel',
+                    isContributor=True),
 
         # ART/Artist: a person (e.g., a painter) or organization who conceives, and
         #   perhaps also implements, an original graphic design or work of art, if
         #   specific codes (e.g., [egr], [etr]) are not desired. For book illustrators,
         #   prefer Illustrator [ill].
-        Property('art', 'ART', 'Artist', 'marcrel'),
+        Property('art', 'ART', 'Artist', 'marcrel',
+                    isContributor=True),
 
         # AUT/Author: a person or organization chiefly responsible for the
         #   intellectual or artistic content of a work, usually printed text.
-        Property('aut', 'AUT', 'Author', 'marcrel'),
+        Property('aut', 'AUT', 'Author', 'marcrel',
+                    isContributor=True),
 
         # AQT/Author in quotations or text extracts: a person or organization
         #   whose work is largely quoted or extracted in works to which he or
         #   she did not contribute directly.
-        Property('aqt', 'AQT', 'Author in quotations or text extracts', 'marcrel'),
+        Property('aqt', 'AQT', 'Author in quotations or text extracts', 'marcrel',
+                    isContributor=True),
 
         # AFT/Author of afterword, colophon, etc.: a person or organization
         #   responsible for an afterword, postface, colophon, etc. but who
         #   is not the chief author of a work.
-        Property('aft', 'AFT', 'Author of afterword, colophon, etc.', 'marcrel'),
+        Property('aft', 'AFT', 'Author of afterword, colophon, etc.', 'marcrel',
+                    isContributor=True),
 
         # AUD/Author of dialog: a person or organization responsible for
         #   the dialog or spoken commentary for a screenplay or sound
         #   recording.
-        Property('aud', 'AUD', 'Author of dialog', 'marcrel'),
+        Property('aud', 'AUD', 'Author of dialog', 'marcrel',
+                    isContributor=True),
 
         # AUI/Author of introduction, etc.:  a person or organization
         #   responsible for an introduction, preface, foreword, or other
         #   critical introductory matter, but who is not the chief author.
-        Property('aui', 'AUI', 'Author of introduction, etc.', 'marcrel'),
+        Property('aui', 'AUI', 'Author of introduction, etc.', 'marcrel',
+                    isContributor=True),
 
         # AUS/Author of screenplay, etc.:  a person or organization responsible
         #   for a motion picture screenplay, dialog, spoken commentary, etc.
-        Property('aus', 'AUS', 'Author of screenplay, etc.', 'marcrel'),
+        Property('aus', 'AUS', 'Author of screenplay, etc.', 'marcrel',
+                    isContributor=True),
 
         # CLL/Calligrapher: a person or organization who writes in an artistic
         #   hand, usually as a copyist and or engrosser.
-        Property('cll', 'CLL', 'Calligrapher', 'marcrel'),
+        Property('cll', 'CLL', 'Calligrapher', 'marcrel',
+                    isContributor=True),
 
         # CTG/Cartographer: a person or organization responsible for the
         #   creation of maps and other cartographic materials.
-        Property('ctg', 'CTG', 'Cartographer', 'marcrel'),
+        Property('ctg', 'CTG', 'Cartographer', 'marcrel',
+                    isContributor=True),
 
         # CHR/Choreographer: a person or organization who composes or arranges
         #   dances or other movements (e.g., "master of swords") for a musical
         #   or dramatic presentation or entertainment.
-        Property('chr', 'CHR', 'Choreographer', 'marcrel'),
+        Property('chr', 'CHR', 'Choreographer', 'marcrel',
+                    isContributor=True),
 
         # CNG/Cinematographer: a person or organization who is in charge of
         #   the images captured for a motion picture film. The cinematographer
         #   works under the supervision of a director, and may also be referred
         #   to as director of photography. Do not confuse with videographer.
-        Property('cng', 'CNG', 'Cinematographer', 'marcrel'),
+        Property('cng', 'CNG', 'Cinematographer', 'marcrel',
+                    isContributor=True),
 
         # CLB/Collaborator: a person or organization that takes a limited part
         #   in the elaboration of a work of another person or organization that
         #   brings complements (e.g., appendices, notes) to the work.
-        Property('clb', 'CLB', 'Collaborator', 'marcrel'),
+        Property('clb', 'CLB', 'Collaborator', 'marcrel',
+                    isContributor=True),
 
         # CLT/Collotyper: a person or organization responsible for the production
         #   of photographic prints from film or other colloid that has ink-receptive
         #   and ink-repellent surfaces.
-        Property('clt', 'CLT', 'Collotyper', 'marcrel'),
+        Property('clt', 'CLT', 'Collotyper', 'marcrel',
+                    isContributor=True),
 
         # CMM/Commentator: a person or organization who provides interpretation,
         #   analysis, or a discussion of the subject matter on a recording,
         #   motion picture, or other audiovisual medium.
-        Property('cmm', 'CMM', 'Commentator', 'marcrel'),
+        Property('cmm', 'CMM', 'Commentator', 'marcrel',
+                    isContributor=True),
 
         # CWT/Commentator for written text: a person or organization responsible
         #   for the commentary or explanatory notes about a text. For the writer
         #   of manuscript annotations in a printed book, use Annotator [ann].
-        Property('cwt', 'CWT', 'Commentator for written text', 'marcrel'),
+        Property('cwt', 'CWT', 'Commentator for written text', 'marcrel',
+                    isContributor=True),
 
         # COM/Compiler: a person or organization who produces a work or
         #   publication by selecting and putting together material from the
         #   works of various persons or bodies.
-        Property('com', 'COM', 'Compiler', 'marcrel'),
+        Property('com', 'COM', 'Compiler', 'marcrel',
+                    isContributor=True),
 
         # CMP/Composer: a person or organization who creates a musical work,
         #   usually a piece of music in manuscript or printed form.
-        Property('cmp', 'CMP', 'Composer', 'marcrel'),
+        Property('cmp', 'CMP', 'Composer', 'marcrel',
+                    isContributor=True),
 
         # CCP/Conceptor: a person or organization responsible for the original
         #   idea on which a work is based, this includes the scientific author
         #   of an audio-visual item and the conceptor of an advertisement.
-        Property('ccp', 'CCP', 'Conceptor', 'marcrel'),
+        Property('ccp', 'CCP', 'Conceptor', 'marcrel',
+                    isContributor=True),
 
         # CND/Conductor: a person who directs a performing group (orchestra,
         #   chorus, opera, etc.) in a musical or dramatic presentation or
         #   entertainment.
-        Property('cnd', 'CND', 'Conductor', 'marcrel'),
+        Property('cnd', 'CND', 'Conductor', 'marcrel',
+                    isContributor=True),
 
         # CSL/Consultant: a person or organization relevant to a resource, who
         #   is called upon for professional advice or services in a specialized
         #   field of knowledge or training.
-        Property('csl', 'CSL', 'Consultant', 'marcrel'),
+        Property('csl', 'CSL', 'Consultant', 'marcrel',
+                    isContributor=True),
 
         # CSP/Consultant to a project: a person or organization relevant to a
         #   resource, who is engaged specifically to provide an intellectual
         #   overview of a strategic or operational task and by analysis,
         #   specification, or instruction, to create or propose a cost-effective
         #   course of action or solution.
-        Property('csp', 'CSP', 'Consultant to a project', 'marcrel'),
+        Property('csp', 'CSP', 'Consultant to a project', 'marcrel',
+                    isContributor=True),
 
         # CTR/Contractor: a person or organization relevant to a resource, who
         #   enters into a contract with another person or organization to
         #   perform a specific task.
-        Property('ctr', 'CTR', 'Contractor', 'marcrel'),
+        Property('ctr', 'CTR', 'Contractor', 'marcrel',
+                    isContributor=True),
 
         # CTB/Contributor: a person or organization one whose work has been
         #   contributed to a larger work, such as an anthology, serial
@@ -508,179 +591,216 @@ class Metadata(base.Music21Object):
         #   editor, compiler or translator.
         # Note: this is in fact a refinement of dcterm:contributor, since
         # it is more specific than that one.
-        Property('ctb', 'CTB', 'Contributor', 'marcrel'),
+        Property('ctb', 'CTB', 'Contributor', 'marcrel',
+                    isContributor=True),
 
         # CRP/Correspondent: a person or organization who was either
         #   the writer or recipient of a letter or other communication.
-        Property('crp', 'CRP', 'Correspondent', 'marcrel'),
+        Property('crp', 'CRP', 'Correspondent', 'marcrel',
+                    isContributor=True),
 
         # CST/Costume designer: a person or organization who designs
         #   or makes costumes, fixes hair, etc., for a musical or
         #   dramatic presentation or entertainment.
-        Property('cst', 'CST', 'Costume designer', 'marcrel'),
+        Property('cst', 'CST', 'Costume designer', 'marcrel',
+                    isContributor=True),
 
         # CRE/Creator: a person or organization responsible for the
         #   intellectual or artistic content of a work.
-        Property('cre', 'CRE', 'Creator', 'marcrel'),
+        Property('cre', 'CRE', 'Creator', 'marcrel',
+                    isContributor=True),
 
         # CUR/Curator of an exhibition: a person or organization
         #   responsible for conceiving and organizing an exhibition.
-        Property('cur', 'CUR', 'Curator of an exhibition', 'marcrel'),
+        Property('cur', 'CUR', 'Curator of an exhibition', 'marcrel',
+                    isContributor=True),
 
         # DNC/Dancer: a person or organization who principally
         #   exhibits dancing skills in a musical or dramatic
         #   presentation or entertainment.
-        Property('dnc', 'DNC', 'Dancer', 'marcrel'),
+        Property('dnc', 'DNC', 'Dancer', 'marcrel',
+                    isContributor=True),
 
         # DLN/Delineator: a person or organization executing technical
         #   drawings from others' designs.
-        Property('dln', 'DLN', 'Delineator', 'marcrel'),
+        Property('dln', 'DLN', 'Delineator', 'marcrel',
+                    isContributor=True),
 
         # DSR/Designer: a person or organization responsible for the design
         #   if more specific codes (e.g., [bkd], [tyd]) are not desired.
-        Property('dsr', 'DSR', 'Designer', 'marcrel'),
+        Property('dsr', 'DSR', 'Designer', 'marcrel',
+                    isContributor=True),
 
         # DRT/Director: a person or organization who is responsible for the
         #   general management of a work or who supervises the production of
         #   a performance for stage, screen, or sound recording.
-        Property('drt', 'DRT', 'Director', 'marcrel'),
+        Property('drt', 'DRT', 'Director', 'marcrel',
+                    isContributor=True),
 
         # DIS/Dissertant: a person who presents a thesis for a university or
         #   higher-level educational degree.
-        Property('dis', 'DIS', 'Dissertant', 'marcrel'),
+        Property('dis', 'DIS', 'Dissertant', 'marcrel',
+                    isContributor=True),
 
         # DRM/Draftsman: a person or organization who prepares artistic or
         #   technical drawings.
-        Property('drm', 'DRM', 'Draftsman', 'marcrel'),
+        Property('drm', 'DRM', 'Draftsman', 'marcrel',
+                    isContributor=True),
 
         # EDT/Editor: a person or organization who prepares for publication
         #   a work not primarily his/her own, such as by elucidating text,
         #   adding introductory or other critical matter, or technically
         #   directing an editorial staff.
-        Property('edt', 'EDT', 'Editor', 'marcrel'),
+        Property('edt', 'EDT', 'Editor', 'marcrel',
+                    isContributor=True),
 
         # ENG/Engineer: a person or organization that is responsible for
         #   technical planning and design, particularly with construction.
-        Property('eng', 'ENG', 'Engineer', 'marcrel'),
+        Property('eng', 'ENG', 'Engineer', 'marcrel',
+                    isContributor=True),
 
         # EGR/Engraver: a person or organization who cuts letters, figures,
         #   etc. on a surface, such as a wooden or metal plate, for printing.
-        Property('egr', 'EGR', 'Engraver', 'marcrel'),
+        Property('egr', 'EGR', 'Engraver', 'marcrel',
+                    isContributor=True),
 
         # ETR/Etcher: a person or organization who produces text or images
         #   for printing by subjecting metal, glass, or some other surface
         #   to acid or the corrosive action of some other substance.
-        Property('etr', 'ETR', 'Etcher', 'marcrel'),
+        Property('etr', 'ETR', 'Etcher', 'marcrel',
+                    isContributor=True),
 
         # FAC/Facsimilist: a person or organization that executed the facsimile.
-        Property('fac', 'FAC', 'Facsimilist', 'marcrel'),
+        Property('fac', 'FAC', 'Facsimilist', 'marcrel',
+                    isContributor=True),
 
         # FLM/Film editor: a person or organization who is an editor of a
         #   motion picture film. This term is used regardless of the medium
         #   upon which the motion picture is produced or manufactured (e.g.,
         #   acetate film, video tape).
-        Property('flm', 'FLM', 'Film editor', 'marcrel'),
+        Property('flm', 'FLM', 'Film editor', 'marcrel',
+                    isContributor=True),
 
         # FRG/Forger: a person or organization who makes or imitates something
         #   of value or importance, especially with the intent to defraud.
-        Property('frg', 'FRG', 'Forger', 'marcrel'),
+        Property('frg', 'FRG', 'Forger', 'marcrel',
+                    isContributor=True),
 
         # HST/Host: a person who is invited or regularly leads a program
         #   (often broadcast) that includes other guests, performers, etc.
         #   (e.g., talk show host).
-        Property('hst', 'HST', 'Host', 'marcrel'),
+        Property('hst', 'HST', 'Host', 'marcrel',
+                    isContributor=True),
 
         # ILU/Illuminator: a person or organization responsible for the
         #   decoration of a work (especially manuscript material) with
         #   precious metals or color, usually with elaborate designs and
         #   motifs.
-        Property('ilu', 'ILU', 'Illuminator', 'marcrel'),
+        Property('ilu', 'ILU', 'Illuminator', 'marcrel',
+                    isContributor=True),
 
         # ILL/Illustrator: a person or organization who conceives, and
         #   perhaps also implements, a design or illustration, usually
         #   to accompany a written text.
-        Property('ill', 'ILL', 'Illustrator', 'marcrel'),
+        Property('ill', 'ILL', 'Illustrator', 'marcrel',
+                    isContributor=True),
 
         # ITR/Instrumentalist: a person or organization who principally
         #   plays an instrument in a musical or dramatic presentation
         #   or entertainment.
-        Property('itr', 'ITR', 'Instrumentalist', 'marcrel'),
+        Property('itr', 'ITR', 'Instrumentalist', 'marcrel',
+                    isContributor=True),
 
         # IVE/Interviewee: a person or organization who is interviewed
         #   at a consultation or meeting, usually by a reporter, pollster,
         #   or some other information gathering agent.
-        Property('ive', 'IVE', 'Interviewee', 'marcrel'),
+        Property('ive', 'IVE', 'Interviewee', 'marcrel',
+                    isContributor=True),
 
         # IVR/Interviewer: a person or organization who acts as a reporter,
         #   pollster, or other information gathering agent in a consultation
         #   or meeting involving one or more individuals.
-        Property('ivr', 'IVR', 'Interviewer', 'marcrel'),
+        Property('ivr', 'IVR', 'Interviewer', 'marcrel',
+                    isContributor=True),
 
         # INV/Inventor: a person or organization who first produces a
         #   particular useful item, or develops a new process for
         #   obtaining a known item or result.
-        Property('inv', 'INV', 'Inventor', 'marcrel'),
+        Property('inv', 'INV', 'Inventor', 'marcrel',
+                    isContributor=True),
 
         # LSA/Landscape architect: a person or organization whose work
         #   involves coordinating the arrangement of existing and
         #   proposed land features and structures.
-        Property('lsa', 'LSA', 'Landscape architect', 'marcrel'),
+        Property('lsa', 'LSA', 'Landscape architect', 'marcrel',
+                    isContributor=True),
 
         # LBT/Librettist: a person or organization who is a writer of
         #   the text of an opera, oratorio, etc.
-        Property('lbt', 'LBT', 'Librettist', 'marcrel'),
+        Property('lbt', 'LBT', 'Librettist', 'marcrel',
+                    isContributor=True),
 
         # LGD/Lighting designer: a person or organization who designs the
         #   lighting scheme for a theatrical presentation, entertainment,
         #   motion picture, etc.
-        Property('lgd', 'LGD', 'Lighting designer', 'marcrel'),
+        Property('lgd', 'LGD', 'Lighting designer', 'marcrel',
+                    isContributor=True),
 
         # LTG/Lithographer: a person or organization who prepares the stone
         #   or plate for lithographic printing, including a graphic artist
         #   creating a design directly on the surface from which printing
         #   will be done.
-        Property('ltg', 'LTG', 'Lithographer', 'marcrel'),
+        Property('ltg', 'LTG', 'Lithographer', 'marcrel',
+                    isContributor=True),
 
         # LYR/Lyricist: a person or organization who is the a writer of the
         #   text of a song.
-        Property('lyr', 'LYR', 'Lyricist', 'marcrel'),
+        Property('lyr', 'LYR', 'Lyricist', 'marcrel',
+                    isContributor=True),
 
         # MFR/Manufacturer: a person or organization that makes an
         #   artifactual work (an object made or modified by one or
         #   more persons). Examples of artifactual works include vases,
         #   cannons or pieces of furniture.
-        Property('mfr', 'MFR', 'Manufacturer', 'marcrel'),
+        Property('mfr', 'MFR', 'Manufacturer', 'marcrel',
+                    isContributor=True),
 
         # MTE/Metal-engraver: a person or organization responsible for
         #   decorations, illustrations, letters, etc. cut on a metal
         #   surface for printing or decoration.
-        Property('mte', 'MTE', 'Metal-engraver', 'marcrel'),
+        Property('mte', 'MTE', 'Metal-engraver', 'marcrel',
+                    isContributor=True),
 
         # MOD/Moderator: a person who leads a program (often broadcast)
         #   where topics are discussed, usually with participation of
         #   experts in fields related to the discussion.
-        Property('mod', 'MOD', 'Moderator', 'marcrel'),
+        Property('mod', 'MOD', 'Moderator', 'marcrel',
+                    isContributor=True),
 
         # MUS/Musician: a person or organization who performs music or
         #   contributes to the musical content of a work when it is not
         #   possible or desirable to identify the function more precisely.
-        Property('mus', 'MUS', 'Musician', 'marcrel'),
+        Property('mus', 'MUS', 'Musician', 'marcrel',
+                    isContributor=True),
 
         # NRT/Narrator: a person who is a speaker relating the particulars
         #   of an act, occurrence, or course of events.
-        Property('nrt', 'NRT', 'Narrator', 'marcrel'),
+        Property('nrt', 'NRT', 'Narrator', 'marcrel',
+                    isContributor=True),
 
         # ORM/Organizer of meeting: a person or organization responsible
         #   for organizing a meeting for which an item is the report or
         #   proceedings.
-        Property('orm', 'ORM', 'Organizer of meeting', 'marcrel'),
+        Property('orm', 'ORM', 'Organizer of meeting', 'marcrel',
+                    isContributor=True),
 
         # ORG/Originator: a person or organization performing the work,
         #   i.e., the name of a person or organization associated with
         #   the intellectual content of the work. This category does not
         #   include the publisher or personal affiliation, or sponsor
         #   except where it is also the corporate author.
-        Property('org', 'ORG', 'Originator', 'marcrel'),
+        Property('org', 'ORG', 'Originator', 'marcrel',
+                    isContributor=True),
 
         # PRF/Performer: a person or organization who exhibits musical
         #   or acting skills in a musical or dramatic presentation or
@@ -688,235 +808,309 @@ class Metadata(base.Music21Object):
         #   [dnc], [itr], [voc], etc.) are not used. If specific codes
         #   are used, [prf] is used for a person whose principal skill
         #   is not known or specified.
-        Property('prf', 'PRF', 'Performer', 'marcrel'),
+        Property('prf', 'PRF', 'Performer', 'marcrel',
+                    isContributor=True),
 
         # PHT/Photographer: a person or organization responsible for
         #   taking photographs, whether they are used in their original
         #   form or as reproductions.
-        Property('pht', 'PHT', 'Photographer', 'marcrel'),
+        Property('pht', 'PHT', 'Photographer', 'marcrel',
+                    isContributor=True),
 
         # PLT/Platemaker: a person or organization responsible for the
         #   production of plates, usually for the production of printed
         #   images and/or text.
-        Property('plt', 'PLT', 'Platemaker', 'marcrel'),
+        Property('plt', 'PLT', 'Platemaker', 'marcrel',
+                    isContributor=True),
 
         # PRM/Printmaker: a person or organization who makes a relief,
         #   intaglio, or planographic printing surface.
-        Property('prm', 'PRM', 'Printmaker', 'marcrel'),
+        Property('prm', 'PRM', 'Printmaker', 'marcrel',
+                    isContributor=True),
 
         # PRO/Producer: a person or organization responsible for the
         #   making of a motion picture, including business aspects,
         #   management of the productions, and the commercial success
         #   of the work.
-        Property('pro', 'PRO', 'Producer', 'marcrel'),
+        Property('pro', 'PRO', 'Producer', 'marcrel',
+                    isContributor=True),
 
         # PRD/Production personnel: a person or organization associated
         #   with the production (props, lighting, special effects, etc.)
         #   of a musical or dramatic presentation or entertainment.
-        Property('prd', 'PRD', 'Production personnel', 'marcrel'),
+        Property('prd', 'PRD', 'Production personnel', 'marcrel',
+                    isContributor=True),
 
         # PRG/Programmer: a person or organization responsible for the
         #   creation and/or maintenance of computer program design
         #   documents, source code, and machine-executable digital files
         #   and supporting documentation.
-        Property('prg', 'PRG', 'Programmer', 'marcrel'),
+        Property('prg', 'PRG', 'Programmer', 'marcrel',
+                    isContributor=True),
 
         # PPT/Puppeteer: a person or organization who manipulates, controls,
         #   or directs puppets or marionettes in a musical or dramatic
         #   presentation or entertainment.
-        Property('ppt', 'PPT', 'Puppeteer', 'marcrel'),
+        Property('ppt', 'PPT', 'Puppeteer', 'marcrel',
+                    isContributor=True),
 
         # RCE/Recording engineer: a person or organization who supervises
         #   the technical aspects of a sound or video recording session.
-        Property('rce', 'RCE', 'Recording engineer', 'marcrel'),
+        Property('rce', 'RCE', 'Recording engineer', 'marcrel',
+                    isContributor=True),
 
         # REN/Renderer: a person or organization who prepares drawings
         #   of architectural designs (i.e., renderings) in accurate,
         #   representational perspective to show what the project will
         #   look like when completed.
-        Property('ren', 'REN', 'Renderer', 'marcrel'),
+        Property('ren', 'REN', 'Renderer', 'marcrel',
+                    isContributor=True),
 
         # RPT/Reporter: a person or organization who writes or presents
         #   reports of news or current events on air or in print.
-        Property('rpt', 'RPT', 'Reporter', 'marcrel'),
+        Property('rpt', 'RPT', 'Reporter', 'marcrel',
+                    isContributor=True),
 
         # RTH/Research team head: a person who directed or managed a
         #   research project.
-        Property('rth', 'RTH', 'Research team head', 'marcrel'),
+        Property('rth', 'RTH', 'Research team head', 'marcrel',
+                    isContributor=True),
 
         # RTM/Research team member:  a person who participated in a
         #   research project but whose role did not involve direction
         #   or management of it.
-        Property('rtm', 'RTM', 'Research team member', 'marcrel'),
+        Property('rtm', 'RTM', 'Research team member', 'marcrel',
+                    isContributor=True),
 
         # RES/Researcher: a person or organization responsible for
         #   performing research.
-        Property('res', 'RES', 'Researcher', 'marcrel'),
+        Property('res', 'RES', 'Researcher', 'marcrel',
+                    isContributor=True),
 
         # RPY/Responsible party: a person or organization legally
         #   responsible for the content of the published material.
-        Property('rpy', 'RPY', 'Responsible party', 'marcrel'),
+        Property('rpy', 'RPY', 'Responsible party', 'marcrel',
+                    isContributor=True),
 
         # RSG/Restager: a person or organization, other than the
         #   original choreographer or director, responsible for
         #   restaging a choreographic or dramatic work and who
         #   contributes minimal new content.
-        Property('rsg', 'RSG', 'Restager', 'marcrel'),
+        Property('rsg', 'RSG', 'Restager', 'marcrel',
+                    isContributor=True),
 
         # REV/Reviewer:  a person or organization responsible for
         #   the review of a book, motion picture, performance, etc.
-        Property('rev', 'REV', 'Reviewer', 'marcrel'),
+        Property('rev', 'REV', 'Reviewer', 'marcrel',
+                    isContributor=True),
 
         # SCE/Scenarist: a person or organization who is the author
         #   of a motion picture screenplay.
-        Property('sce', 'SCE', 'Scenarist', 'marcrel'),
+        Property('sce', 'SCE', 'Scenarist', 'marcrel',
+                    isContributor=True),
 
         # SAD/Scientific advisor: a person or organization who brings
         #   scientific, pedagogical, or historical competence to the
         #   conception and realization on a work, particularly in the
         #   case of audio-visual items.
-        Property('sad', 'SAD', 'Scientific advisor', 'marcrel'),
+        Property('sad', 'SAD', 'Scientific advisor', 'marcrel',
+                    isContributor=True),
 
         # SCR/Scribe: a person who is an amanuensis and for a writer of
         #   manuscripts proper. For a person who makes pen-facsimiles,
         #   use Facsimilist [fac].
-        Property('scr', 'SCR', 'Scribe', 'marcrel'),
+        Property('scr', 'SCR', 'Scribe', 'marcrel',
+                    isContributor=True),
 
         # SCL/Sculptor: a person or organization who models or carves
         #   figures that are three-dimensional representations.
-        Property('scl', 'SCL', 'Sculptor', 'marcrel'),
+        Property('scl', 'SCL', 'Sculptor', 'marcrel',
+                    isContributor=True),
 
         # SEC/Secretary: a person or organization who is a recorder,
         #   redactor, or other person responsible for expressing the
         #   views of a organization.
-        Property('sec', 'SEC', 'Secretary', 'marcrel'),
+        Property('sec', 'SEC', 'Secretary', 'marcrel',
+                    isContributor=True),
 
         # STD/Set designer:  a person or organization who translates the
         #   rough sketches of the art director into actual architectural
         #   structures for a theatrical presentation, entertainment, motion
         #   picture, etc. Set designers draw the detailed guides and
         #   specifications for building the set.
-        Property('std', 'STD', 'Set designer', 'marcrel'),
+        Property('std', 'STD', 'Set designer', 'marcrel',
+                    isContributor=True),
 
         # SNG/Singer: a person or organization who uses his/her/their voice
         #   with or without instrumental accompaniment to produce music.
         #   A performance may or may not include actual words.
-        Property('sng', 'SNG', 'Singer', 'marcrel'),
+        Property('sng', 'SNG', 'Singer', 'marcrel',
+                    isContributor=True),
 
         # SPK/Speaker: a person who participates in a program (often broadcast)
         #   and makes a formalized contribution or presentation generally
         #   prepared in advance.
-        Property('spk', 'SPK', 'Speaker', 'marcrel'),
+        Property('spk', 'SPK', 'Speaker', 'marcrel',
+                    isContributor=True),
 
         # STN/Standards body: an organization responsible for the development
         #   or enforcement of a standard.
-        Property('stn', 'STN', 'Standards body', 'marcrel'),
+        Property('stn', 'STN', 'Standards body', 'marcrel',
+                    isContributor=True),
 
         # STL/Storyteller: a person relaying a story with creative and/or
         #   theatrical interpretation.
-        Property('stl', 'STL', 'Storyteller', 'marcrel'),
+        Property('stl', 'STL', 'Storyteller', 'marcrel',
+                    isContributor=True),
 
         # SRV/Surveyor: a person or organization who does measurements of
         #   tracts of land, etc. to determine location, forms, and boundaries.
-        Property('srv', 'SRV', 'Surveyor', 'marcrel'),
+        Property('srv', 'SRV', 'Surveyor', 'marcrel',
+                    isContributor=True),
 
         # TCH/Teacher: a person who, in the context of a resource, gives
         #   instruction in an intellectual subject or demonstrates while
         #   teaching physical skills.
-        Property('tch', 'TCH', 'Teacher', 'marcrel'),
+        Property('tch', 'TCH', 'Teacher', 'marcrel',
+                    isContributor=True),
 
         # TRC/Transcriber: a person who prepares a handwritten or typewritten copy
         #   from original material, including from dictated or orally recorded
         #   material. For makers of pen-facsimiles, use Facsimilist [fac].
-        Property('trc', 'TRC', 'Transcriber', 'marcrel'),
+        Property('trc', 'TRC', 'Transcriber', 'marcrel',
+                    isContributor=True),
 
         # TRL/Translator: a person or organization who renders a text from one
         #   language into another, or from an older form of a language into the
         #   modern form.
-        Property('trl', 'TRL', 'Translator', 'marcrel'),
+        Property('trl', 'TRL', 'Translator', 'marcrel',
+                    isContributor=True),
 
         # VDG/Videographer: a person or organization in charge of a video production,
         #   e.g. the video recording of a stage production as opposed to a commercial
         #   motion picture. The videographer may be the camera operator or may
         #   supervise one or more camera operators. Do not confuse with cinematographer.
-        Property('vdg', 'VDG', 'Videographer', 'marcrel'),
+        Property('vdg', 'VDG', 'Videographer', 'marcrel',
+                    isContributor=True),
 
         # VOC/Vocalist: a person or organization who principally exhibits singing
         #   skills in a musical or dramatic presentation or entertainment.
-        Property('voc', 'VOC', 'Vocalist', 'marcrel'),
+        Property('voc', 'VOC', 'Vocalist', 'marcrel',
+                    isContributor=True),
 
         # WDE/Wood-engraver: a person or organization who makes prints by cutting
         #   the image in relief on the end-grain of a wood block.
-        Property('wde', 'WDE', 'Wood-engraver', 'marcrel'),
+        Property('wde', 'WDE', 'Wood-engraver', 'marcrel',
+                    isContributor=True),
 
         # WDC/Woodcutter: a person or organization who makes prints by cutting the
         #   image in relief on the plank side of a wood block.
-        Property('wdc', 'WDC', 'Woodcutter', 'marcrel'),
+        Property('wdc', 'WDC', 'Woodcutter', 'marcrel',
+                    isContributor=True),
 
         # WAM/Writer of accompanying material: a person or organization who writes
         #   significant material which accompanies a sound recording or other
         #   audiovisual material.
-        Property('wam', 'WAM', 'Writer of accompanying material', 'marcrel'),
+        Property('wam', 'WAM', 'Writer of accompanying material', 'marcrel',
+                    isContributor=True),
 
         # The following marcrel property term refines dcterm:publisher
 
         # DST/Distributor: a person or organization that has exclusive or shared
         #   marketing rights for an item.
-        Property('dst', 'DST', 'Distributor', 'marcrel'),
+        Property('dst', 'DST', 'Distributor', 'marcrel',
+                    isContributor=True),
 
-        # The following 17 music21 property terms have historically been supported
+        # The following music21 property terms have historically been supported
         # by music21, so we must add them as standard property terms here:
 
         # textOriginalLanguage: original language of vocal/choral text
-        Property('TXO', 'textOriginalLanguage', 'Original Text Language', 'music21'),
+        Property('TXO', 'textOriginalLanguage', 'Original Text Language', 'music21',
+                    isContributor=False),
 
         # textLanguage: language of the encoded vocal/choral text
-        Property('TXL', 'textLanguage', 'Text Language', 'music21'),
+        Property('TXL', 'textLanguage', 'Text Language', 'music21',
+                    isContributor=False),
 
         # popularTitle: popular title
-        Property('OTP', 'popularTitle', 'Popular Title', 'music21'),
+        Property('OTP', 'popularTitle', 'Popular Title', 'music21',
+                    isContributor=False),
 
         # parentTitle: parent title
-        Property('OPR', 'parentTitle', 'Parent Title', 'music21'),
+        Property('OPR', 'parentTitle', 'Parent Title', 'music21',
+                    isContributor=False),
 
         # actNumber: act number (e.g. '2' or 'Act 2')
-        Property('OAC', 'actNumber', 'Act Number', 'music21'),
+        Property('OAC', 'actNumber', 'Act Number', 'music21',
+                    isContributor=False),
 
         # sceneNumber: scene number (e.g. '3' or 'Scene 3')
-        Property('OSC', 'sceneNumber', 'Scene Number', 'music21'),
+        Property('OSC', 'sceneNumber', 'Scene Number', 'music21',
+                    isContributor=False),
 
         # movementNumber: movement number (e.g. '4', or 'mov. 4', or...)
-        Property('OMV', 'movementNumber', 'Movement Number', 'music21'),
+        Property('OMV', 'movementNumber', 'Movement Number', 'music21',
+                    isContributor=False),
 
         # movementName: movement name (often a tempo description)
-        Property('OMD', 'movementName', 'Movement Name', 'music21'),
+        Property('OMD', 'movementName', 'Movement Name', 'music21',
+                    isContributor=False),
 
         # opusNumber: opus number (e.g. '23', or 'Opus 23')
-        Property('OPS', 'opusNumber', 'Opus Number', 'music21'),
+        Property('OPS', 'opusNumber', 'Opus Number', 'music21',
+                    isContributor=False),
 
         # number: number (e.g. '5', or 'No. 5')
-        Property('ONM', 'number', 'Number', 'music21'),
+        Property('ONM', 'number', 'Number', 'music21',
+                    isContributor=False),
 
         # volume: volume number (e.g. '6' or 'Vol. 6')
-        Property('OVM', 'volume', 'Volume Number', 'music21'),
+        Property('OVM', 'volume', 'Volume Number', 'music21',
+                    isContributor=False),
 
         # dedication: dedicated to
-        Property('ODE', 'dedication', 'Dedicated To', 'music21'),
+        Property('ODE', 'dedication', 'Dedicated To', 'music21',
+                    isContributor=False),
 
         # commission: commissioned by
-        Property('OCO', 'commission', 'Commissioned By', 'music21'),
+        Property('OCO', 'commission', 'Commissioned By', 'music21',
+                    isContributor=False),
 
         # countryOfComposition: country of composition
-        Property('OCY', 'countryOfComposition', 'Country of Composition', 'music21'),
+        Property('OCY', 'countryOfComposition', 'Country of Composition', 'music21',
+                    isContributor=False),
 
         # localeOfComposition: city, town, or village of composition
-        Property('OPC', 'localeOfComposition', 'Locale of Composition', 'music21'),
+        Property('OPC', 'localeOfComposition', 'Locale of Composition', 'music21',
+                    isContributor=False),
 
         # groupTitle: group title (e.g. 'The Seasons')
-        Property('GTL', 'groupTitle', 'Group Title', 'music21'),
+        Property('GTL', 'groupTitle', 'Group Title', 'music21',
+                    isContributor=False),
 
         # associatedWork: associated work, such as a play or film
-        Property('GAW', 'associatedWork', 'Associated Work', 'music21'),
+        Property('GAW', 'associatedWork', 'Associated Work', 'music21',
+                    isContributor=False),
+
+        # attributedComposer: attributed composer
+        Property('COA', 'attributedComposer', 'Attributed Composer', 'music21',
+                    isContributor=True),
+
+        # suspectedComposer: suspected composer
+        Property('COS', 'suspectedComposer', 'Suspected Composer', 'music21',
+                    isContributor=True),
+
+        # composerAlias: composer's abbreviated, alias, or stage name
+        Property('COL', 'composerAlias', 'Composer Alias', 'music21',
+                    isContributor=True),
+
+        # composerCorporate: composer's corporate name
+        Property('COL', 'composerCorporate', 'Composer Corporate Name', 'music21',
+                    isContributor=True),
+
+        # orchestrator: orchestrator
+        Property('LOR', 'orchestrator', 'Orchestrator', 'music21',
+                    isContributor=True),
     )
 
     NSKEY2STDPROPERTY: dict = {f'{x.namespace}:{x.name}':x for x in STDPROPERTIES}
@@ -952,6 +1146,7 @@ class Metadata(base.Music21Object):
         # example, for contributor roles).
         super().__init__()
         self._metadata: Dict = {}
+        self.software: List[str] = [defaults.software]
 
         # TODO: for backward compatibility, allow **keywords to specify keys that are
         # the old abbreviations and/or workIds.
@@ -980,28 +1175,14 @@ class Metadata(base.Music21Object):
             return None
         return Metadata.NSKEY2STDPROPERTY.get(nsKey, None)
 
-#     # Here are some examples of old APIs, implemented in terms of the new data structures
-#     # for backward compatibility
-#     @ property
-#     def alternativeTitle(self):
-#         r'''
-#         Get or set the alternative title.
-#
-#         >>> md = metadata.Metadata(popularTitle='Eroica')
-#         >>> md.alternativeTitle = 'Heroic Symphony'
-#         >>> md.alternativeTitle
-#         'Heroic Symphony'
-#         '''
-#         result = self._metadata.get(OLDWORKID2NSKEY['alternativeTitle'], None)
-#         if result is not None:
-#             return str(result)
-#         return None
-#
-#     @alternativeTitle.setter
-#     def alternativeTitle(self, value):
-#         self._metadata[OLDWORKID2NSKEY['alternativeTitle']] = Text(value)
+    @staticmethod
+    def isContributorNSKey(nsKey: str) -> bool:
+        prop: Property = Metadata.NSKEY2STDPROPERTY.get(nsKey, None)
+        if prop is None:
+            return False
+        return prop.isContributor
 
-    def all(self) -> List[Tuple[str, Union[TextLiteral, Date]]]:
+    def all(self, skipContributors=False) -> List[Tuple[str, Union[TextLiteral, Date]]]:
         '''
         Returns all values stored in this metadata as a list of tuples
             [(nsKey, value), ...].
@@ -1011,6 +1192,9 @@ class Metadata(base.Music21Object):
         allOut: List[Tuple[str, Union[TextLiteral, DateSingle]]] = []
 
         for nsKey, value in self._metadata.items():
+            if skipContributors and self.isContributorNSKey(nsKey):
+                continue
+
             if not value:
                 continue
 
@@ -1026,6 +1210,24 @@ class Metadata(base.Music21Object):
         # I will add a sorted param that defaults to True (and set it to False in my
         # exporter).  I will say that with all our new nsKeys, the sort will be quite
         # different now than it used to be...
+        return allOut
+
+    def contributors(self) -> List[Tuple[str, Union[TextLiteral, Date]]]:
+        allOut: List[Tuple[str, Union[TextLiteral, DateSingle]]] = []
+
+        for nsKey, value in self._metadata.items():
+            if not self.isContributorNSKey(nsKey):
+                continue
+
+            if not value:
+                continue
+
+            if isinstance(value, list):
+                for v in value:
+                    allOut.append( (nsKey, v) )
+            else:
+                allOut.append( (nsKey, value) )
+
         return allOut
 
     # New APIs
@@ -1074,6 +1276,43 @@ class Metadata(base.Music21Object):
 
     def replacePersonalItem(self, key: str, value: Union[TextLiteral, DateSingle, str, dict]):
         self.replaceItem(key, value, namespace=None)
+
+    # Here are some old APIs, implemented in terms of the new data structures
+    # for backward compatibility
+
+    def _getBackwardCompatibleItem(self, key: str, namespace: str) -> str:
+        result = self.getItem(key, namespace)
+        if result is None:
+            return None
+        if isinstance(result, list):
+            if not result:
+                return None
+            return str(result[0])
+        return str(result)
+
+    @property
+    def title(self):
+        r'''
+        Get the title.
+        '''
+        output = self._getBackwardCompatibleItem('title', 'dcterm')
+        return output
+
+    @property
+    def movementName(self):
+        r'''
+        Get the movementName.
+        '''
+        output = self._getBackwardCompatibleItem('movementName', 'music21')
+        return output
+
+    @property
+    def movementNumber(self):
+        r'''
+        Get the movementName.
+        '''
+        output = self._getBackwardCompatibleItem('movementNumber', 'music21')
+        return output
 
 
 class OldMetadata(base.Music21Object):
