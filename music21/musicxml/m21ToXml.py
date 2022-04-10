@@ -5281,7 +5281,7 @@ class MeasureExporter(XMLExporterBase):
         Places the mxObj <element> inside <direction><direction-type>
         and sets <offset> if needed.
 
-        Changed in v7.3 -- added `setSound` keyword (see :meth:`setOffsetOptional`).
+        Changed in v8 -- added `setSound` keyword (see :meth:`setOffsetOptional`).
         '''
         mxDirection = Element('direction')
         mxDirectionType = SubElement(mxDirection, 'direction-type')
