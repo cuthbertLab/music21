@@ -315,7 +315,10 @@ class TabChord:
                 localKeyNonRoman = getLocalKey(self.local_key, self.global_key)
             else:
                 localKeyNonRoman = self.local_key
-            thisEntry = roman.RomanNumeral(combined, localKeyNonRoman)
+            thisEntry = roman.RomanNumeral(
+                combined,
+                localKeyNonRoman, 
+            )
             thisEntry.pedal = self.pedal
             thisEntry.phraseend = None
 
@@ -557,6 +560,8 @@ class M21toTSV:
     'I'
     '''
 
+    NUMERAL_REGEX = re.compile(r'^(?P<numeral>\D*)(?:\d+(?:/\d+)*)?$')
+
     def __init__(self, m21Stream, dcml_version=2):
         self.version = dcml_version
         self.m21Stream = m21Stream
@@ -602,7 +607,9 @@ class M21toTSV:
                     thisRN.figure
                 )  # NB: slightly different from DCML: no key.
                 thisEntry.pedal = None
-                thisEntry.numeral = thisRN.romanNumeralAlone
+                thisEntry.numeral = re.match(
+                    self.NUMERAL_REGEX, thisRN.primaryFigure
+                ).group('numeral')
                 thisEntry.form = None
                 thisEntry.figbass = thisRN.figuresWritten
                 thisEntry.changes = None
@@ -659,7 +666,9 @@ class M21toTSV:
                 local_key = local_key.lower()
             thisEntry.local_key = local_key
             thisEntry.pedal = None
-            thisEntry.numeral = thisRN.romanNumeralAlone
+            thisEntry.numeral = re.match(
+                self.NUMERAL_REGEX, thisRN.primaryFigure
+            ).group('numeral')
             thisEntry.form = None
             thisEntry.figbass = thisRN.figuresWritten
             thisEntry.changes = None 
