@@ -34,7 +34,6 @@ __all__ = [
     'DateSingle',
     'Imprint',
     'Text',
-    'TextLiteral'
 ]
 
 
@@ -714,6 +713,9 @@ class DateSelection(DateSingle):
 # -----------------------------------------------------------------------------
 
 
+# This is an enhanced version of the old Text type that adds an optional encoding
+# scheme (e.g. URI, DCMIPoint, etc) as well as whether this is the original
+# (un-translated) language.
 class Text(prebase.ProtoM21Object):
     r'''
     One unit of text data: a title, a name, or some other text data. Store the
@@ -729,14 +731,22 @@ class Text(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, data='', language=None):
-        if isinstance(data, type(self)):  # if this is a Text obj, get data
+    def __init__(self,
+                 data: Union[str, 'Text'] = '',
+                 language: Optional[str] = None,
+                 isTranslated: Optional[bool] = None, # True, False, or None (unknown)
+                 encodingScheme: Optional[str] = None):
+        if isinstance(data, type(self)):
             # accessing private attributes here; not desirable
-            self._data = data._data
-            self._language = data._language
+            self._data: str = data._data
+            self._language: Optional[str] = data._language
+            self.isTranslated: Optional[bool] = data.isTranslated
+            self.encodingScheme: Optional[str] = data.encodingScheme
         else:
             self._data = data
             self._language = language
+            self.isTranslated = isTranslated
+            self.encodingScheme = encodingScheme
 
     # SPECIAL METHODS #
 
@@ -1176,35 +1186,6 @@ class Imprint(prebase.ProtoM21Object):
 
 
 # -----------------------------------------------------------------------------
-
-# We'll keep the old DateXxxx types, but TextLiteral is an enhanced version of the old
-# Text type that adds an optional encoding scheme (e.g. URI, DCMIPoint, etc) as well as
-# whether this is the original (un-translated) language.
-class TextLiteral(prebase.ProtoM21Object):
-    def __init__(self,
-                 text: Union[str, 'TextLiteral'],
-                 language: Optional[str] = None,
-                 isTranslated: Optional[bool] = None, # True, False, or None (unknown)
-                 encodingScheme: Optional[str] = None):
-        if isinstance(text, type(self)):
-            # just copy all the fields
-            self._data: str = text.text
-            self.language: Optional[str] = text.language
-            self.isTranslated: Optional[bool] = text.isTranslated
-            self.encodingScheme: Optional[str] = text.encodingScheme
-        else:
-            self._data = text
-            self.language = language
-            self.isTranslated = isTranslated
-            self.encodingScheme = encodingScheme
-
-    def __str__(self):
-        if isinstance(self._data, bytes):
-            return self._data.decode('UTF-8')
-        elif not isinstance(self._data, str):
-            return str(self._data)
-        else:
-            return self._data
 
 
 class Test(unittest.TestCase):
