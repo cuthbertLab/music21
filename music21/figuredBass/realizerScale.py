@@ -36,7 +36,7 @@ class FiguredBassScale:
 
 
     Accepted scale types: major, minor, dorian, phrygian, and hypophrygian.
-    A FiguredBassScale is raised if an invalid scale type is provided.
+    A FiguredBassScaleException is raised if an invalid scale type is provided.
 
     >>> from music21.figuredBass import realizerScale
     >>> fbScale = realizerScale.FiguredBassScale()
@@ -206,7 +206,6 @@ class Test(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # pylint: disable=ungrouped-imports
     import music21
     music21.mainTest(Test)
 

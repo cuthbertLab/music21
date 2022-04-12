@@ -877,7 +877,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             if not (pitchA.ps - pitchB.ps) == 1.0:
                 return False
             i = interval.Interval(pitchA, pitchB)
-            if not i.directedName == 'm-2':
+            if i.directedName != 'm-2':
                 return False
         elif pitchA.name == root.name:
             if rootResolved and restrictDoublings:
@@ -886,7 +886,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             if not (pitchB.ps - pitchA.ps) == 1.0:
                 return False
             i = interval.Interval(pitchA, pitchB)
-            if not i.directedName == 'm2':
+            if i.directedName != 'm2':
                 return False
             rootResolved = True
         elif pitchA.name == third.name:
@@ -896,7 +896,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             if not (pitchA.ps - pitchB.ps) == 1.0:
                 return False
             i = interval.Interval(pitchA, pitchB)
-            if not i.directedName == 'm-2':
+            if i.directedName != 'm-2':
                 return False
 
 #     # Part 1: Check if possibA is A6 chord, and if it is properly formed.

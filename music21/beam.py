@@ -72,7 +72,7 @@ To get rid of beams on a note do:
 
 >>> n2.beams.beamsList = []
 '''
-from typing import List, Optional, Union
+from typing import Iterable, List, Optional, Union
 import unittest
 
 from music21 import exceptions21
@@ -237,7 +237,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     # STATIC METHODS #
 
     @staticmethod
-    def naiveBeams(srcList: List['music21.base.Music21Object']):
+    def naiveBeams(srcList: Iterable['music21.base.Music21Object']):
         # noinspection PyShadowingNames
         '''
         Given a list or iterator of elements, return a list of None or Beams for
@@ -264,7 +264,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
             # it with None; this includes Rests
             if el.duration.type not in beamableDurationTypes:
                 beamsList.append(None)  # placeholder
-            elif el.isRest is True:
+            elif 'NotRest' not in el.classSet:
                 beamsList.append(None)  # placeholder
             else:
                 # we have a beamable duration

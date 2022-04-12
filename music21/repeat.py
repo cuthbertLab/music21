@@ -802,6 +802,8 @@ class Expander:
         # TODO: need to copy spanners from each sub-group into their newest connects;
         #   must be done here as more than one connection is made
 
+        post.mergeAttributes(srcStream)
+
         return post
 
     def measureMap(self, returnType='index'):
@@ -4363,6 +4365,21 @@ class Test(unittest.TestCase):
 #         s = converter.parse(testFiles.hectorTheHero)
 #         s.show()
 #         post = s.expandRepeats()
+
+    def test_expand_repeats_preserves_name(self):
+        # Test case provided by jacobtylerwalls on issue #1165
+        # https://github.com/cuthbertLab/music21/issues/1165#issuecomment-967293691
+
+        from music21 import converter
+        from music21 import bar
+
+        p = converter.parse('tinyNotation: c1 d e f')
+        p.measure(2).storeAtEnd(bar.Repeat(direction='end', times=1))
+        p.partName = 'mypartname'
+        p.partAbbreviation = 'mypartabbreviation'
+        exp = p.expandRepeats()
+        self.assertEqual(exp.partName, 'mypartname')
+        self.assertEqual(exp.partAbbreviation, 'mypartabbreviation')
 
 
 # ------------------------------------------------------------------------------

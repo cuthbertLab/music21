@@ -151,6 +151,7 @@ Ascending Chord:
 F eighth ⠛
 Interval 3 ⠬
 Interval 7 ⠒
+full inaccord ⠣⠜
 Octave 2 ⠘
 F quarter ⠻
 Dot ⠄
@@ -265,7 +266,8 @@ Barline final ⠣⠅
         from music21.braille.translate import objectToBraille
         verdi = corpus.parse('verdi/laDonnaEMobile')
         x = objectToBraille(verdi, debug=True)
-        y = '''---begin grand segment---
+        y = '''Movement Name: laDonnaEMobile.mxl
+---begin grand segment---
 <music21.braille.segment BrailleGrandSegment>
 ===
 Measure 1 Right, Signature Grouping 1:
@@ -331,6 +333,7 @@ Ascending Chord:
 F eighth ⠛
 Interval 3 ⠬
 Interval 7 ⠒
+full inaccord ⠣⠜
 Octave 2 ⠘
 F quarter ⠻
 Dot ⠄
@@ -375,6 +378,7 @@ Ascending Chord:
 F eighth ⠛
 Interval 4 ⠼
 Interval 6 ⠴
+full inaccord ⠣⠜
 Octave 2 ⠘
 F quarter ⠻
 Dot ⠄
@@ -421,6 +425,7 @@ Ascending Chord:
 F eighth ⠛
 Interval 5 ⠔
 Interval 7 ⠒
+full inaccord ⠣⠜
 Octave 2 ⠘
 F quarter ⠻
 Dot ⠄
@@ -466,6 +471,7 @@ Ascending Chord:
 F eighth ⠛
 Interval 4 ⠼
 Interval 6 ⠴
+full inaccord ⠣⠜
 Octave 2 ⠘
 B quarter ⠺
 Dot ⠄
@@ -518,6 +524,7 @@ Ascending Chord:
 A 16th ⠮
 Interval 5 ⠔
 F 16th ⠿
+full inaccord ⠣⠜
 Octave 2 ⠘
 F quarter ⠻
 Dot ⠄
@@ -564,6 +571,7 @@ Ascending Chord:
 B 16th ⠾
 Interval 3 ⠬
 F 16th ⠿
+full inaccord ⠣⠜
 Octave 2 ⠘
 B quarter ⠺
 Dot ⠄
@@ -614,6 +622,7 @@ Ascending Chord:
 A 16th ⠮
 Interval 5 ⠔
 F 16th ⠿
+full inaccord ⠣⠜
 Octave 2 ⠘
 F quarter ⠻
 Dot ⠄
@@ -661,6 +670,7 @@ Ascending Chord:
 B 16th ⠾
 Interval 3 ⠬
 F 16th ⠿
+full inaccord ⠣⠜
 Octave 2 ⠘
 B quarter ⠺
 Dot ⠄
@@ -711,6 +721,7 @@ Interval 3 ⠬
 Ascending Chord:
 A eighth ⠊
 Interval 3 ⠬
+full inaccord ⠣⠜
 Octave 3 ⠸
 F quarter ⠻
 Dot ⠄
@@ -761,6 +772,7 @@ Interval 3 ⠬
 Ascending Chord:
 B eighth ⠚
 Interval 3 ⠬
+full inaccord ⠣⠜
 Octave 3 ⠸
 G quarter ⠳
 Dot ⠄
@@ -866,6 +878,7 @@ Dot ⠄
 Opening single slur ⠉
 Octave 6 ⠰
 F 32nd ⠟
+full inaccord ⠣⠜
 Rest quarter ⠧
 Dot ⠄
 
@@ -877,6 +890,7 @@ F eighth ⠛
 Interval 3 ⠬
 Interval 5 ⠔
 Rest eighth ⠭
+full inaccord ⠣⠜
 Ascending Chord:
 Octave 3 ⠸
 F quarter ⠻
@@ -901,6 +915,7 @@ Octave 3 ⠸
 B eighth ⠚
 Interval 3 ⠬
 Rest eighth ⠭
+full inaccord ⠣⠜
 Ascending Chord:
 Octave 3 ⠸
 B quarter ⠺
@@ -984,6 +999,7 @@ Dot ⠄
 Opening single slur ⠉
 Octave 6 ⠰
 F 32nd ⠟
+full inaccord ⠣⠜
 Rest quarter ⠧
 Dot ⠄
 
@@ -998,6 +1014,7 @@ Ascending Chord:
 F eighth ⠛
 Interval 3 ⠬
 Interval 7 ⠒
+full inaccord ⠣⠜
 Octave 2 ⠘
 F quarter ⠻
 Dot ⠄
@@ -1031,6 +1048,7 @@ Ascending Chord:
 F eighth ⠛
 Interval 4 ⠼
 Interval 6 ⠴
+full inaccord ⠣⠜
 Octave 2 ⠘
 F quarter ⠻
 Dot ⠄
@@ -1108,6 +1126,7 @@ Octave 3 ⠸
 F eighth ⠛
 Interval 3 ⠬
 Interval 7 ⠒
+full inaccord ⠣⠜
 Ascending Chord:
 Octave 3 ⠸
 E quarter ⠫
@@ -1151,7 +1170,88 @@ Barline final ⠣⠅
         self.assertEqual(x.splitlines(), y.splitlines())
 
 
+    def testVoices(self):
+        from music21 import corpus
+        from music21.braille.translate import objectToBraille
+
+        demo = corpus.parse('demos/two-voices')
+        x = objectToBraille(demo, debug=True)
+        y = '''Movement Name: two-voices.xml
+Title: Music21 Fragment
+---begin segment---
+<music21.braille.segment BrailleSegment>
+Measure 1, Signature Grouping 1:
+Key Signature 2 sharp(s) ⠩⠩
+Time Signature 4/4 ⠼⠙⠲
+===
+Measure 1, Inaccord Grouping 1:
+<music21.clef.BassClef>
+Octave 4 ⠐
+E eighth ⠋
+Accidental sharp ⠩
+D eighth ⠑
+D eighth ⠑
+E eighth ⠋
+F eighth ⠛
+Rest eighth ⠭
+Rest quarter ⠧
+full inaccord ⠣⠜
+Octave 2 ⠘
+F eighth ⠛
+Octave 3 ⠸
+F eighth ⠛
+E eighth ⠋
+Octave 2 ⠘
+E eighth ⠋
+Accidental sharp ⠩
+D eighth ⠑
+Accidental sharp ⠩
+Octave 3 ⠸
+D eighth ⠑
+B eighth ⠚
+Octave 3 ⠸
+B eighth ⠚
+===
+Measure 2, Inaccord Grouping 1:
+Octave 4 ⠐
+E eighth ⠋
+Octave 3 ⠸
+B eighth ⠚
+Tie ⠈⠉
+B eighth ⠚
+Octave 4 ⠐
+E eighth ⠋
+E eighth ⠋
+Rest eighth ⠭
+Rest quarter ⠧
+full inaccord ⠣⠜
+Octave 2 ⠘
+E eighth ⠋
+Octave 3 ⠸
+E eighth ⠋
+Accidental natural ⠡
+D eighth ⠑
+Accidental natural ⠡
+Octave 2 ⠘
+D eighth ⠑
+C eighth ⠙
+Octave 3 ⠸
+C eighth ⠙
+A eighth ⠊
+Octave 3 ⠸
+A eighth ⠊
+===
+Measure 3, Note Grouping 1:
+Rest whole ⠍
+Barline final ⠣⠅
+===
+---end segment---
+'''
+        self.maxDiff = None
+        self.assertEqual(x.splitlines(), y.splitlines())
+
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testVerdiDebug')
+    music21.mainTest(Test)  # , runTest='testVoices')
 

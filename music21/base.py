@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'7.2.1'
+'7.3.2'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -80,8 +80,7 @@ from music21._version import __version__, __version_info__
 from music21.test.testRunner import mainTest
 
 
-# This should actually be bound to Music21Object, but cannot import here.
-_M21T = TypeVar('_M21T', bound=prebase.ProtoM21Object)
+_M21T = TypeVar('_M21T', bound='music21.base.Music21Object')
 
 # all other music21 modules below...
 
@@ -607,6 +606,26 @@ class Music21Object(prebase.ProtoM21Object):
     def __setstate__(self, state: Dict[str, Any]):
         # defining self.__dict__ upon initialization currently breaks everything
         self.__dict__ = state  # pylint: disable=attribute-defined-outside-init
+
+    def _reprInternal(self) -> str:
+        '''
+        If `x.id` is not the same as `id(x)`, then that id is used instead:
+
+        >>> b = base.Music21Object()
+        >>> b._reprInternal()
+        'object at 0x129a903b1'
+        >>> b.id = 'hi'
+        >>> b._reprInternal()
+        'id=hi'
+        '''
+        if self.id == id(self):
+            return super()._reprInternal()
+        reprId = self.id
+        try:
+            reprId = hex(reprId)
+        except (ValueError, TypeError):
+            pass
+        return f'id={reprId}'
 
     # --------------------------------------------------------------------------
 
@@ -1168,13 +1187,13 @@ class Music21Object(prebase.ProtoM21Object):
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> Optional['Music21Object']:
+    ) -> Optional[_M21T]:
         # noinspection PyShadowingNames
         '''
         A very powerful method in music21 of fundamental importance: Returns
         the element matching the className that is closest to this element in
         its current hierarchy (or the hierarchy of the derivation origin unless
-        `followDerivation` is False.  For instance, take this stream of changing time
+        `followDerivation` is False).  For instance, take this stream of changing time
         signatures:
 
         >>> p = converter.parse('tinynotation: 3/4 C4 D E 2/4 F G A B 1/4 c')
@@ -1369,6 +1388,9 @@ class Music21Object(prebase.ProtoM21Object):
         Traceback (most recent call last):
         ValueError: Invalid getElementMethod: invalid
 
+        Raises `ValueError` for incompatible values `followDerivation=True`
+        and `priorityTargetOnly=True`.
+
         OMIT_FROM_DOCS
 
         Testing that this works:
@@ -1552,6 +1574,9 @@ class Music21Object(prebase.ProtoM21Object):
 
         if getElementMethod not in ElementSearch:
             raise ValueError(f'Invalid getElementMethod: {getElementMethod}')
+
+        if priorityTargetOnly and followDerivation:
+            raise ValueError('priorityTargetOnly and followDerivation cannot both be True')
 
         if className and not common.isListLike(className):
             className = (className,)
@@ -1865,6 +1890,8 @@ class Music21Object(prebase.ProtoM21Object):
                 returnSortTuples=True,  # ALWAYS
                 sortByCreationTime=sortByCreationTime
             ):
+                if priorityTargetOnly and topLevel is not priorityTarget:
+                    break
                 # get activeSite unless sortByCreationTime
                 inStreamOffset = inStreamPos.offset
                 # now take that offset and use it to modify the positionInStream
@@ -2037,6 +2064,7 @@ class Music21Object(prebase.ProtoM21Object):
             nextEl = thisElForNext.getContextByClass(
                 className=className,
                 getElementMethod='getElementAfterNotSelf',
+                followDerivation=not activeSiteOnly,
                 priorityTargetOnly=activeSiteOnly,
             )
 
@@ -2112,6 +2140,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         prevEl = self.getContextByClass(className=className,
                                         getElementMethod='getElementBeforeNotSelf',
+                                        followDerivation=not activeSiteOnly,
                                         priorityTargetOnly=activeSiteOnly,
                                         )
 
@@ -5082,6 +5111,36 @@ class Test(unittest.TestCase):
                                     '<music21.stream.Part p1>',
                                     '<music21.stream.Measure 2 offset=0.0>',
                                     '<music21.stream.Part p2>'])
+
+    def testContextSitesVoices(self):
+        from music21 import note
+        from music21 import stream
+
+        v1_n1 = note.Note('D')
+        v2_n1 = note.Note('E')
+        v1 = stream.Voice()
+        v1.insert(0, v1_n1)
+        v2 = stream.Voice()
+        v2.insert(1, v2_n1)
+        _ = stream.Measure([v1, v2])
+        self.assertIs(v1_n1.activeSite, v1)
+        # This was finding the E in voice 2
+        self.assertIsNone(v1_n1.next(note.GeneralNote, activeSiteOnly=True))
+
+    def testContextSitesDerivations(self):
+        from music21 import note
+        from music21 import stream
+
+        m = stream.Measure([note.Note(), note.Note()])
+        mCopy = m.makeNotation()
+        mCopy.remove(mCopy.notes.last())
+        self.assertIsNone(mCopy.notes.first().next(activeSiteOnly=True))
+
+    def testContextInconsistentArguments(self):
+        obj = Music21Object()
+        with self.assertRaises(ValueError):
+            obj.getContextByClass(
+                editorial.Editorial, priorityTargetOnly=True, followDerivation=True)
 
 # great isolation test, but no asserts for now...
 #     def testPreviousA(self):

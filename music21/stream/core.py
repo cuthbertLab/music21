@@ -406,17 +406,22 @@ class StreamCoreMixin:
 
         >>> s.insert(4, 3.14159)
         Traceback (most recent call last):
-        music21.exceptions21.StreamException: to put a non Music21Object in a stream,
-        create a music21.ElementWrapper for the item
+        music21.exceptions21.StreamException: The object you tried to add to
+        the Stream, 3.14159, is not a Music21Object.  Use an ElementWrapper
+        object if this is what you intend.
+
         '''
         if element is self:  # cannot add this Stream into itself
             raise StreamException('this Stream cannot be contained within itself')
         if not isinstance(element, Music21Object):
             if isinstance(element, StreamIterator):
-                raise StreamException('cannot insert StreamIterator into a Stream\n'
+                raise StreamException(
+                    'cannot insert StreamIterator into a Stream\n'
                     "Iterate over it instead (User's Guide chs. 6 and 26)")
-            raise StreamException('to put a non Music21Object in a stream, '
-                                  'create a music21.ElementWrapper for the item')
+            raise StreamException(
+                f'The object you tried to add to the Stream, {element!r}, '
+                + 'is not a Music21Object.  Use an ElementWrapper object '
+                + 'if this is what you intend.')
         if checkRedundancy:
             # using id() here b/c we do not want to get __eq__ comparisons
             idElement = id(element)
