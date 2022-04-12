@@ -560,8 +560,6 @@ class M21toTSV:
     'I'
     '''
 
-    NUMERAL_REGEX = re.compile(r'^(?P<numeral>\D*)(?:\d+(?:/\d+)*)?$')
-
     def __init__(self, m21Stream, dcml_version=2):
         self.version = dcml_version
         self.m21Stream = m21Stream
@@ -607,9 +605,7 @@ class M21toTSV:
                     thisRN.figure
                 )  # NB: slightly different from DCML: no key.
                 thisEntry.pedal = None
-                thisEntry.numeral = re.match(
-                    self.NUMERAL_REGEX, thisRN.primaryFigure
-                ).group('numeral')
+                thisEntry.numeral = thisRN.romanNumeral
                 thisEntry.form = None
                 thisEntry.figbass = thisRN.figuresWritten
                 thisEntry.changes = None
@@ -666,9 +662,7 @@ class M21toTSV:
                 local_key = local_key.lower()
             thisEntry.local_key = local_key
             thisEntry.pedal = None
-            thisEntry.numeral = re.match(
-                self.NUMERAL_REGEX, thisRN.primaryFigure
-            ).group('numeral')
+            thisEntry.numeral = thisRN.romanNumeral
             thisEntry.form = None
             thisEntry.figbass = thisRN.figuresWritten
             thisEntry.changes = None 
@@ -977,7 +971,7 @@ class Test(unittest.TestCase):
             #         stream1.recurse().getElementsByClass('RomanNumeral'),
             #         stream2.recurse().getElementsByClass('RomanNumeral')
             #     )):
-            #         assert item1 == item2
+            #         assert item1 == item2, f"{item1} != {item2}"
 
     def testM21ToTsv(self):
         import os
