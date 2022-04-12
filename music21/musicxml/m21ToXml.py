@@ -2702,7 +2702,9 @@ class PartExporter(XMLExporterBase):
         '''
         Runs makeNotation on a flatStream, such as one lacking measures.
         '''
+        # Do this before makeNotation so that measures are filled correctly
         self.stream = self.stream.splitAtDurations(recurse=True)[0]
+
         part = self.stream
         part.makeMutable()  # must mutate
         # try to add measures if none defined
@@ -2710,8 +2712,9 @@ class PartExporter(XMLExporterBase):
         part.makeNotation(meterStream=self.meterStream,
                           refStreamOrTimeRange=self.refStreamOrTimeRange,
                           inPlace=True)
-        # environLocal.printDebug(['fixupNotationFlat: post makeNotation, length',
-        #                    len(measureStream)])
+
+        # Do this again, since makeNotation() might create complex rests
+        self.stream = self.stream.splitAtDurations(recurse=True)[0]
 
         # after calling measuresStream, need to update Spanners, as a deepcopy
         # has been made
