@@ -21,7 +21,6 @@ from music21 import chord, common, harmony
 from music21 import key
 from music21 import metadata
 from music21 import meter
-from music21 import note
 from music21 import pitch
 from music21 import roman
 from music21 import stream
@@ -141,6 +140,10 @@ class TabChord:
     '''
     An intermediate representation format for moving between tabular data and music21 chords.
     '''
+    # Because the attributes of this class vary depending on the dcml_version,
+    # we assign them dynamically with setattr in the __init__ function. Pylint
+    # mistakenly then thinks they are defined outside of init.
+    # pylint: disable=attribute-defined-outside-init
 
     BEAT_REGEX = re.compile(
         r'(?P<numer>\d+(?:\.\d+)?)/(?P<denom>\d+(?:\.\d+)?)'
@@ -155,7 +158,7 @@ class TabChord:
             elif name == 'beat':
                 name = 'mn_onset'
             setattr(self, name, None)
-        self.representationType = None  # Added (not in DCML)
+        self.representationType = self.extra = None  # Added (not in DCML)
 
     @property
     def beat(self):
@@ -317,7 +320,7 @@ class TabChord:
                 localKeyNonRoman = self.local_key
             thisEntry = roman.RomanNumeral(
                 combined,
-                localKeyNonRoman, 
+                localKeyNonRoman,
             )
             thisEntry.pedal = self.pedal
             thisEntry.phraseend = None
@@ -560,6 +563,11 @@ class M21toTSV:
     'I'
     '''
 
+    # Because the attributes of the TabChord class vary depending on the
+    # dcml_version, we assign them dynamically with setattr in the __init__
+    # function of that class. Pylint mistakenly then thinks that, when we
+    # assign to them in m21toTsv, they are defined outside init.
+    # pylint: disable=attribute-defined-outside-init
     def __init__(self, m21Stream, dcml_version=2):
         self.version = dcml_version
         self.m21Stream = m21Stream
@@ -665,7 +673,7 @@ class M21toTSV:
             thisEntry.numeral = thisRN.romanNumeral
             thisEntry.form = None
             thisEntry.figbass = thisRN.figuresWritten
-            thisEntry.changes = None 
+            thisEntry.changes = None
             thisEntry.relativeroot = relativeroot
             thisEntry.phraseend = None
 
@@ -875,7 +883,7 @@ def getSecondaryKey(rn, local_key):
         very_local_as_key = local_key
     else:
         position = rn.index('/')
-        very_local_as_roman = rn[position + 1 :]
+        very_local_as_roman = rn[position + 1:]
         very_local_as_key = getLocalKey(very_local_as_roman, local_key)
 
     return very_local_as_key
@@ -934,22 +942,23 @@ class Test(unittest.TestCase):
                 out_stream.parts[0].measure(1)[0].figure, 'I'
             )  # First item in measure 1
 
-            # Below, we download a couple real tsv files, in each version, to 
+            # Below, we download a couple real tsv files, in each version, to
             # test the conversion on.
 
             urls = [
+                # pylint: disable=line-too-long
                 'https://raw.githubusercontent.com/DCMLab/ABC/master/data/tsv/op.%2018%20No.%201/op18_no1_mov1.tsv',
                 'https://raw.githubusercontent.com/DCMLab/ABC/v2/harmonies/n01op18-1_01.tsv',
-                ]
+            ]
             url = urls[version - 1]
-            
+
             envLocal = environment.Environment()
             temp_tsv1 = envLocal.getTempFile()
             with urllib.request.urlopen(url) as f:
                 tsv_contents = f.read().decode('utf-8')
-            with open(temp_tsv1, "w") as outf:
+            with open(temp_tsv1, 'w', encoding='utf-8') as outf:
                 outf.write(tsv_contents)
-            
+
             forward1 = TsvHandler(temp_tsv1, dcml_version=version)
             stream1 = forward1.toM21Stream()
             temp_tsv2 = envLocal.getTempFile()
@@ -959,13 +968,10 @@ class Test(unittest.TestCase):
             os.remove(temp_tsv1)
             os.remove(temp_tsv2)
             assert len(stream1.recurse()) == len(stream2.recurse())
-            
-            # presently, in version 2, the commented-out test fails because 
-            # vii seems to be notated
-            # differently between music21 and DCML. E.g., '#viio7/vi' in the
-            # DCML file becomes 'viio7/vi' when we write it out, which then
-            # becomes 'bvii/vi' when read anew
-            # It seems to fail altogether in version 1.
+
+            # Presently, in version 2, the commented-out test fails because
+            # viio7 becomes vii. It also fails in version 1, possibly for a
+            # different reason.
             # if version == 2:
             #     for i, (item1, item2) in enumerate(zip(
             #         stream1.recurse().getElementsByClass('RomanNumeral'),
