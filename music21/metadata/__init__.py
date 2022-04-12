@@ -1925,37 +1925,6 @@ class MetadataBase(base.Music21Object):
         # TODO: here is where I will add everything in c.names.
         self._addItem(nsKey, c.names[0])
 
-    def _getAllNSKeysAndValues(self,
-                              skipContributors=False
-                             ) -> List[Tuple[str, Union[Text, Date]]]:
-        '''
-        Returns all values stored in this metadata as a list of (nsKey, value) tuples.
-        Items in the metadata that have a list of values are flattened into the output
-        list as multiple tuples with the same nsKey.
-        '''
-        allOut: List[Tuple[str, Union[Text, DateSingle]]] = []
-
-        for nsKey, value in self._metadata.items():
-            if skipContributors and self.isContributorNSKey(nsKey):
-                continue
-
-            if not value:
-                continue
-
-            if isinstance(value, list):
-                for v in value:
-                    allOut.append( (nsKey, v) )
-            else:
-                allOut.append( (nsKey, value) )
-
-        # The previous version of Metadata sorted here, but when I'm doing passthru export,
-        # I rather like having it sorted like it was in the input file (like it was in
-        # self._metadata).  If it needs to be sorted by default, for backward compatibility,
-        # I will add a sorted param that defaults to True (and set it to False in my
-        # exporter).  I will say that with all our new nsKeys, the sort will be quite
-        # different now than it used to be...
-        return allOut
-
     def _getAllContributorsAsNSKeysAndValues(self) -> List[Tuple[str, Union[Text, Date]]]:
         allOut: List[Tuple[str, Union[Text, DateSingle]]] = []
 
@@ -2960,10 +2929,11 @@ class Metadata(MetadataBase):
 
 class ExtendedMetadata(Metadata):
     # TODO: Should we allow **keywords initialization of ExtendedMetadata?
-    # TODO: We could allow keys that are uniqueName or 'namespace:name', or personalName.
-    # TODO: (if we allow personalName, that would be any name at all)
+    # TODO: We could allow keys that are uniqueName or 'namespace:name', but
+    # TODO: not personalName (if we allow personalName, that would be any name
+    # TODO: at all)
     def __init__(self, metadata=None):
-        super().__init__()
+        super().__init__() # sets up default software and empty _metadata
 
         if metadata is not None:
             # This is a conversion (from Metadata or from ExtendedMetadata).
@@ -2976,14 +2946,14 @@ class ExtendedMetadata(Metadata):
     # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
     def getItem(self,
                 key: str,
-                namespace: Optional[str] = None) -> Optional[Union[Text, DateSingle, dict]]:
+                namespace: Optional[str] = None) -> Optional[Any]:
         return self._getItem(key, namespace)
 
     # if namespace is provided, key should be name or abbrevCode (within that namespace)
     # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
     def addItem(self,
                 key: str,
-                value: Union[Text, DateSingle, str, dict],
+                value: Any,
                 namespace: Optional[str] = None):
         self._addItem(key, value, namespace)
 
@@ -2991,24 +2961,79 @@ class ExtendedMetadata(Metadata):
     # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
     def setItem(self,
                 key: str,
-                value: Union[Text, DateSingle, str, dict],
+                value: Any,
                 namespace: Optional[str] = None):
         self._setItem(key, value, namespace)
 
-    def getPersonalItem(self, key: str) -> Union[Text, DateSingle, dict]:
+    def getPersonalItem(self, key: str) -> Any:
+        # uniqueNames and standard property nsKeys are reserved.
+        # You can use nonstandard nsKeys like 'humdrum:XXX' though.
+        if key in MetadataBase.NSKEY2STDPROPERTY:
+            return None
+# TODO: implement uniqueNames for all std properties
+#         if key in MetadataBase.UNIQUENAME2STDPROPERTY:
+#             return None
         return self._getItem(key, namespace=None)
 
     def addPersonalItem(self, key: str, value: Union[Text, DateSingle, str, dict]):
+        # uniqueNames and standard property nsKeys are reserved.
+        # You can use nonstandard nsKeys like 'humdrum:XXX' though.
+        if key in MetadataBase.NSKEY2STDPROPERTY:
+            raise KeyError
+# TODO: implement uniqueNames for all std properties
+#         if key in MetadataBase.UNIQUENAME2STDPROPERTY:
+#             raise KeyError
         self._addItem(key, value, namespace=None)
 
     def setPersonalItem(self, key: str, value: Union[Text, DateSingle, str, dict]):
+        # uniqueNames and standard property nsKeys are reserved.
+        # You can use nonstandard nsKeys like 'humdrum:XXX' though.
+        if key in MetadataBase.NSKEY2STDPROPERTY:
+            raise KeyError
+# TODO: implement uniqueNames for all std properties
+#         if key in MetadataBase.UNIQUENAME2STDPROPERTY:
+#             raise KeyError
         self._setItem(key, value, namespace=None)
+
+    # This is the extended version of all().  The tuple's key is an nsKey (but of course
+    # there may be no namespace for personal metadata items).
+    def getAllItems(self, skipContributors=False) -> List[Tuple[str, Any]]:
+        '''
+        Returns all values stored in this metadata as a list of (nsKey, value) tuples.
+        Items in the metadata that have a list of values are flattened into the output
+        list as multiple tuples with the same nsKey.
+        '''
+        allOut: List[Tuple[str, Union[Text, DateSingle]]] = []
+
+        for nsKey, value in self._metadata.items():
+            if skipContributors and self.isContributorNSKey(nsKey):
+                continue
+
+            if not value:
+                continue
+
+            if isinstance(value, list):
+                for v in value:
+                    allOut.append( (nsKey, v) )
+            else:
+                allOut.append( (nsKey, value) )
+
+        # Metadata sorts here, but when I'm doing passthru export, it's nice to
+        # have the order in the output file be the same as the order in the input
+        # file. If sorting is intereresting, though, I can add a sorted param that
+        # defaults to False.  Not sure what to sort by: by namespace and then by name
+        # within that namespace?  By uniqueName?
+        return allOut
 
 # -----------------------------------------------------------------------------
 
-# TODO: Not sure what I need to do here.  Either make this always derive from
-# TODO: ExtendedMetadata, or have two: RichMetadata and RichExtendedMetadata?
-class RichMetadata(Metadata):
+# TODO: RichMetadata hasn't been modified beyond deriving it from ExtendedMetadata
+# TODO: in anticipation of enhancing the rich metadata.  For now it depends on
+# TODO: backward compatibility, and doesn't do anything that non-extended metadata
+# TODO: APIs can't do.
+# TODO: Well, crap, RichMetadata looks inside Metadata's internals (e.g. _workIds),
+# TODO: so it will need to be re-implemented a bit.
+class RichMetadata(ExtendedMetadata):
     r'''
     RichMetadata adds to Metadata information about the contents of the Score
     it is attached to. TimeSignature, KeySignature and related analytical is
