@@ -2558,11 +2558,6 @@ class PartExporter(XMLExporterBase):
             raise MusicXMLExportException(
                 'Cannot export with makeNotation=False if there are no measures')
 
-        # Split complex durations in place (fast if none found)
-        # must do after fixupNotationFlat(), which may create complex durations
-        if self.makeNotation:
-            self.stream = self.stream.splitAtDurations(recurse=True)[0]
-
         # make sure that all instances of the same class have unique ids
         self.spannerBundle.setIdLocals()
 
@@ -2707,6 +2702,7 @@ class PartExporter(XMLExporterBase):
         '''
         Runs makeNotation on a flatStream, such as one lacking measures.
         '''
+        self.stream = self.stream.splitAtDurations(recurse=True)[0]
         part = self.stream
         part.makeMutable()  # must mutate
         # try to add measures if none defined
@@ -2742,6 +2738,9 @@ class PartExporter(XMLExporterBase):
 
         Changed in v7 -- no longer accepts `measureStream` argument.
         '''
+        # Split complex durations in place (fast if none found)
+        self.stream = self.stream.splitAtDurations(recurse=True)[0]
+
         part = self.stream
         measures = part.getElementsByClass(stream.Measure)
         first_measure = measures.first()
@@ -2776,8 +2775,9 @@ class PartExporter(XMLExporterBase):
                 part.makeBeams(inPlace=True)
             except exceptions21.StreamException:  # no measures or no time sig?
                 pass
-        if part.streamStatus.haveTupletBracketsBeenMade() is False:
-            stream.makeNotation.makeTupletBrackets(part, inPlace=True)
+        # Always make tuplet brackets, since splitAtDurations() may have created some
+        for m in measures:
+            stream.makeNotation.makeTupletBrackets(m, inPlace=True)
 
         if not self.spannerBundle:
             self.spannerBundle = part.spannerBundle
