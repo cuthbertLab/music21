@@ -72,6 +72,10 @@ def typeToMusicXMLType(value):
     'long'
     >>> musicxml.m21ToXml.typeToMusicXMLType('quarter')
     'quarter'
+    >>> musicxml.m21ToXml.typeToMusicXMLType('duplex-maxima')
+    Traceback (most recent call last):
+    music21.musicxml.xmlObjects.MusicXMLExportException:
+    Cannot convert "duplex-maxima" duration to MusicXML (too long).
     >>> musicxml.m21ToXml.typeToMusicXMLType('inexpressible')
     Traceback (most recent call last):
     music21.musicxml.xmlObjects.MusicXMLExportException:
@@ -86,8 +90,15 @@ def typeToMusicXMLType(value):
         return 'long'
     elif value == '2048th':
         raise MusicXMLExportException('Cannot convert "2048th" duration to MusicXML (too short).')
+    elif value == 'duplex-maxima':
+        raise MusicXMLExportException(
+            'Cannot convert "duplex-maxima" duration to MusicXML (too long).')
     elif value == 'inexpressible':
         raise MusicXMLExportException('Cannot convert inexpressible durations to MusicXML.')
+    elif value == 'complex':
+        raise MusicXMLExportException(
+            'Cannot convert complex durations to MusicXML. '
+            + 'Try exporting with makeNotation=True or manually running splitAtDurations()')
     elif value == 'zero':
         raise MusicXMLExportException('Cannot convert durations without types to MusicXML.')
     else:
@@ -488,12 +499,26 @@ class GeneralObjectExporter:
         representation of a Measure, not for partial
         solutions in Part or Stream production.
         '''
+        m.coreGatherMissingSpanners()
         mCopy = m.makeNotation()
-        if not m.recurse().getElementsByClass('Clef').getElementsByOffset(0.0):
+        if mCopy.style.measureNumbering is None:
+            # Provide a default
+            mCopy.style.measureNumbering = 'measure'
+        clef_from_measure_start_or_context = m.getContextByClass(
+            clef.Clef,
+            getElementMethod=common.enums.ElementSearch.AT_OR_BEFORE_OFFSET
+        )
+        if clef_from_measure_start_or_context is None:
             mCopy.clef = clef.bestClef(mCopy, recurse=True)
+        else:
+            mCopy.clef = clef_from_measure_start_or_context
         p = stream.Part()
         p.append(mCopy)
         p.metadata = copy.deepcopy(getMetadataFromContext(m))
+        context_part = m.getContextByClass(stream.Part)
+        if context_part is not None:
+            p.partName = context_part.partName
+            p.partAbbreviation = context_part.partAbbreviation
         return self.fromPart(p)
 
     def fromVoice(self, v):
@@ -2524,9 +2549,6 @@ class PartExporter(XMLExporterBase):
         if self.stream.atSoundingPitch is True:
             self.stream.toWrittenPitch(inPlace=True)
 
-        # Split complex durations in place (fast if none found)
-        self.stream = self.stream.splitAtDurations(recurse=True)[0]
-
         # Suppose that everything below this is a measure
         if self.makeNotation and not self.stream.getElementsByClass(stream.Measure):
             self.fixupNotationFlat()
@@ -2535,6 +2557,12 @@ class PartExporter(XMLExporterBase):
         elif not self.stream.getElementsByClass(stream.Measure):
             raise MusicXMLExportException(
                 'Cannot export with makeNotation=False if there are no measures')
+
+        # Split complex durations in place (fast if none found)
+        # must do after fixupNotationFlat(), which may create complex durations
+        if self.makeNotation:
+            self.stream = self.stream.splitAtDurations(recurse=True)[0]
+
         # make sure that all instances of the same class have unique ids
         self.spannerBundle.setIdLocals()
 
@@ -2551,7 +2579,9 @@ class PartExporter(XMLExporterBase):
                 mxMeasure = measureExporter.parse()
             except MusicXMLExportException as e:
                 e.measureNumber = str(m.number)
-                e.partName = self.stream.partName
+                if isinstance(self.stream, stream.Part):
+                    e.partName = self.stream.partName
+                # else: could be a Score without parts (flat)
                 raise e
             self.xmlRoot.append(mxMeasure)
 
@@ -3063,6 +3093,10 @@ class MeasureExporter(XMLExporterBase):
                     self.parseOneElement(obj)
 
             for n in notesForLater:
+                if n.isRest and n.style.hideObjectOnPrint and n.duration.type == 'inexpressible':
+                    # Prefer a gap in stream, to be filled with a <forward> tag by
+                    # fill_gap_with_forward_tag() rather than raising exceptions
+                    continue
                 self.parseOneElement(n)
 
         if backupAfterwards:
@@ -3089,7 +3123,8 @@ class MeasureExporter(XMLExporterBase):
             root.append(sp)
 
         classes = obj.classes
-        if 'GeneralNote' in classes:
+        # Ignore Harmony objects having writeAsChord = False
+        if 'GeneralNote' in classes and getattr(obj, 'writeAsChord', True):
             self.offsetInMeasure += obj.duration.quarterLength
 
         # turn inexpressible durations into complex durations (unless unlinked)
@@ -3511,20 +3546,15 @@ class MeasureExporter(XMLExporterBase):
         </note>
 
         Notes with complex durations need to be simplified before coming here
-        otherwise they create an impossible musicxml type of "complex"
+        otherwise they raise :class:`MusicXMLExportException`:
 
         >>> nComplex = note.Note()
         >>> nComplex.duration.quarterLength = 5.0
         >>> mxComplex = MEX.noteToXml(nComplex)
-        >>> MEX.dump(mxComplex)
-        <note>
-          <pitch>
-            <step>C</step>
-            <octave>4</octave>
-          </pitch>
-          <duration>50400</duration>
-          <type>complex</type>
-        </note>
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+        Cannot convert complex durations to MusicXML.
+        Try exporting with makeNotation=True or manually running splitAtDurations()
 
         TODO: Test with spanners...
 
@@ -3622,7 +3652,14 @@ class MeasureExporter(XMLExporterBase):
             # Default type-less grace durations to eighths
             mxType.text = 'eighth'
         else:
-            mxType.text = typeToMusicXMLType(d.type)
+            try:
+                mxType.text = typeToMusicXMLType(d.type)
+            except MusicXMLExportException:
+                if n.isRest and helpers.isFullMeasureRest(n):
+                    # type will be removed in xmlToRest()
+                    pass
+                else:
+                    raise
 
         self.setStyleAttributes(mxType, n, 'size', 'noteSize')
         mxNote.append(mxType)
@@ -3843,16 +3880,7 @@ class MeasureExporter(XMLExporterBase):
         if mxRestTag is None:
             raise MusicXMLExportException('Something went wrong -- converted rest w/o rest tag')
 
-        isFullMeasure = False
-        if r.fullMeasure in (True, 'always'):
-            isFullMeasure = True
-            mxRestTag.set('measure', 'yes')
-        elif r.fullMeasure == 'auto':
-            tsContext = r.getContextByClass('TimeSignature')
-            if tsContext and tsContext.barDuration.quarterLength == r.duration.quarterLength:
-                isFullMeasure = True
-
-        if isFullMeasure:
+        if helpers.isFullMeasureRest(r):
             mxRestTag.set('measure', 'yes')
             mxType = mxNote.find('type')
             if mxType is not None:
@@ -6488,7 +6516,7 @@ class MeasureExporter(XMLExporterBase):
                 mxPrint = Element('print')
             mxMeasureNumbering = SubElement(mxPrint, 'measure-numbering')
             mxMeasureNumbering.text = m.style.measureNumbering
-            mnStyle = m.style.measureNumberingStyle
+            mnStyle = m.style.measureNumberStyle
             if mnStyle is not None:
                 self.setPrintStyleAlign(mxMeasureNumbering, mnStyle)
         # TODO: part-name-display
@@ -6963,6 +6991,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(tree.findall('.//rest')), 1)
         rest = tree.find('.//rest')
         self.assertEqual(rest.get('measure'), 'yes')
+        self.assertIsNone(tree.find('.//note/type'))
 
     def testArticulationSpecialCases(self):
         n = note.Note()
@@ -7006,6 +7035,77 @@ class Test(unittest.TestCase):
         tree = self.getET(newAltoFixed)
         self.assertTrue(tree.findall('.//note'))
         self.assertFalse(tree.findall('.//forward'))
+
+    def testExportChordSymbolsWithRealizedDurations(self):
+        gex = GeneralObjectExporter()
+
+        def realizeDurationsAndAssertTags(m: stream.Measure, forwardTag=False, offsetTag=False):
+            m = copy.deepcopy(m)
+            harmony.realizeChordSymbolDurations(m)
+            obj = gex.fromGeneralObject(m)
+            tree = self.getET(obj)
+            self.assertIs(bool(tree.findall('.//forward')), forwardTag)
+            self.assertIs(bool(tree.findall('.//offset')), offsetTag)
+
+        # Two consecutive chord symbols, no rests
+        cs1 = harmony.ChordSymbol('C7')
+        cs2 = harmony.ChordSymbol('F7')
+        m = stream.Measure()
+        m.insert(0, cs1)
+        m.insert(2, cs2)
+        realizeDurationsAndAssertTags(m, forwardTag=True, offsetTag=False)
+
+        # Two consecutive chord symbols, rest coinciding with first one
+        r1 = note.Rest(type='half')
+        m.insert(0, r1)
+        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
+
+        # One chord symbol midmeasure, no rests
+        m.remove(cs1)
+        m.remove(r1)
+        realizeDurationsAndAssertTags(m, forwardTag=True, offsetTag=False)
+
+        # One chord symbol midmeasure coinciding with whole note
+        n1 = note.Note(type='whole')
+        m.insert(0, n1)
+        # Need an offset tag to show the -2.0 offset to get from end to midmeasure
+        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=True)
+
+        # One chord symbol at beginning of measure coinciding with whole note
+        m.remove(cs2)
+        m.insert(0, cs1)
+        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
+
+        # One chord symbol at beginning of measure with writeAsChord=True
+        # followed by a half note
+        cs1.writeAsChord = True
+        n1.offset = 2
+        n1.quarterLength = 2
+        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
+
+    def test_inexpressible_hidden_rests_become_forward_tags(self):
+        """Express hidden rests with inexpressible durations as <forward> tags."""
+        m = stream.Measure()
+        # 7 eighths in the space of 4 eighths, imported as 137/480
+        # (137/480) * 7 = 1.9979, not 2.0
+        # music21 filled gap with an inexpressible 0.0021 rest and couldn't export
+        septuplet = note.Note(type='eighth')
+        tuplet_obj = duration.Tuplet(7, 4, 'eighth')
+        septuplet.duration.appendTuplet(tuplet_obj)
+        septuplet.duration.linked = False
+        septuplet.quarterLength = fractions.Fraction(137, 480)
+        m.repeatAppend(septuplet, 7)
+        # leave 0.0021 gap and do the same thing from 2.0 -> 3.9979
+        m.repeatInsert(septuplet, [2.0])
+        m.repeatAppend(septuplet, 6)
+        m.insert(0, meter.TimeSignature('4/4'))
+        m.makeRests(inPlace=True, fillGaps=True, hideRests=True, timeRangeFromBarDuration=True)
+        self.assertLess(m[note.Rest].first().quarterLength, 0.0025)
+        gex = GeneralObjectExporter()
+        tree = self.getET(gex.fromGeneralObject(m))
+        # Only one <forward> tag to get from 1.9979 -> 2.0
+        # No <forward> tag is necessary to finish the incomplete measure (3.9979 -> 4.0)
+        self.assertEqual(len(tree.findall('.//forward')), 1)
 
 
 class TestExternal(unittest.TestCase):

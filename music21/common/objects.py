@@ -21,6 +21,7 @@ __all__ = [
 
 import collections
 import time
+from typing import Tuple
 import weakref
 from music21.common.decorators import deprecated
 
@@ -185,7 +186,7 @@ class SlottedObjectMixin:
 
     # CLASS VARIABLES #
 
-    __slots__ = ()
+    __slots__: Tuple[str, ...] = ()
 
     # SPECIAL METHODS #
 

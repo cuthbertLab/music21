@@ -428,7 +428,7 @@ class _EnvironmentCore:
                 ('graphicsPath', previewLocation),
                 ('vectorPath', previewLocation),
                 ('pdfPath', previewLocation),
-                ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
+                ('midiPath', '/Applications/GarageBand.app'),
                 ('musescoreDirectPNGPath',
                  '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
             ]:
@@ -789,14 +789,11 @@ class _EnvironmentCore:
 # -----------------------------------------------------------------------------
 
 
-# store one instance of _EnvironmentCore within this module
+# store one singleton instance of _EnvironmentCore within this module
 # this is a module-level implementation of the singleton pattern
 # reloading the module will force a recreation of the module
 # noinspection PyDictCreation
-_environStorage = {'instance': None, 'forcePlatform': None}
-
-# create singleton instance
-_environStorage['instance'] = _EnvironmentCore()
+_environStorage = {'instance': _EnvironmentCore(), 'forcePlatform': None}
 
 
 def envSingleton():
@@ -1447,7 +1444,7 @@ class Test(unittest.TestCase):
   <localCorporaSettings />
   <localCorpusSettings />
   <preference name="manualCoreCorpusPath" />
-  <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
+  <preference name="midiPath" value="/Applications/GarageBand.app" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
@@ -1502,7 +1499,7 @@ class Test(unittest.TestCase):
     <localCorpusPath>c</localCorpusPath>
   </localCorpusSettings>
   <preference name="manualCoreCorpusPath" />
-  <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
+  <preference name="midiPath" value="/Applications/GarageBand.app" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />

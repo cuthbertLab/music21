@@ -930,12 +930,12 @@ class Key(KeySignature, scale.DiatonicScale):
         scale.DiatonicScale.__init__(self, tonic=tonic)
 
         if isinstance(tonic, pitch.Pitch):
-            self.tonic = tonic
+            self.tonic: pitch.Pitch = tonic
         else:
             self.tonic = pitch.Pitch(tonic)
 
-        self.type = mode
-        self.mode = mode
+        self.type: str = mode
+        self.mode: str = mode
 
         # build the network for the appropriate scale
         self._abstract.buildNetwork(self.type)
@@ -1277,6 +1277,20 @@ class Test(unittest.TestCase):
     def testBasic(self):
         a = KeySignature()
         self.assertEqual(a.sharps, 0)
+
+    def testSetTonic(self):
+        from music21 import chord
+        k = Key()
+
+        # Set tonic attribute from single pitch
+        b = pitch.Pitch('B')
+        k.tonic = b
+        self.assertIs(k.tonic, b)
+
+        # Initialize with tonic from chord (i.e., the root)
+        b_flat_maj = chord.Chord('Bb4 D5 F5')
+        k = Key(tonic=b_flat_maj)
+        self.assertEqual(k.tonic.name, 'B-')
 
     def testTonalAmbiguityA(self):
         from music21 import corpus

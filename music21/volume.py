@@ -14,10 +14,11 @@
 This module defines the object model of Volume, covering all representation of
 amplitude, volume, velocity, and related parameters.
 '''
-from typing import Union
+from typing import Iterable, List, Union
 import unittest
 
 
+from music21 import articulations
 from music21 import exceptions21
 from music21 import common
 from music21.common.objects import SlottedObjectMixin
@@ -134,7 +135,10 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     def getRealizedStr(self,
                        useDynamicContext: Union[dynamics.Dynamic, bool] = True,
                        useVelocity=True,
-                       useArticulations: Union[bool, 'music21.articulations.Articulation'] = True,
+                       useArticulations: Union[bool,
+                                               articulations.Articulation,
+                                               Iterable[articulations.Articulation]
+                                               ] = True,
                        baseLevel=0.5,
                        clip=True):
         '''Return the realized as rounded and formatted string value. Useful for testing.
@@ -155,7 +159,9 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         self,
         useDynamicContext: Union[bool, dynamics.Dynamic] = True,
         useVelocity=True,
-        useArticulations: Union[bool, 'music21.articulations.Articulation'] = True,
+        useArticulations: Union[
+            bool, articulations.Articulation, Iterable[articulations.Articulation]
+        ] = True,
         baseLevel=0.5,
         clip=True,
     ):
@@ -180,7 +186,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
         If `useArticulations` is True and client is not None, any articulations
         found on that client will be used to adjust the volume. Alternatively,
-        the `useArticulations` parameter may supply a list of articulations
+        the `useArticulations` parameter may supply an iterable of articulations
         that will be used instead of that available on a client.
 
         The `velocityIsRelative` tag determines if the velocity value includes
@@ -242,8 +248,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         # only change the val from here if velocity is relative
         if self.velocityIsRelative:
             if useDynamicContext is not False:
-                if (hasattr(useDynamicContext, 'classes')
-                        and isinstance(useDynamicContext, dynamics.Dynamic)):
+                if isinstance(useDynamicContext, dynamics.Dynamic):
                     dm = useDynamicContext  # it is a dynamic
                 elif self.client is not None:
                     dm = self.getDynamicContext()  # dm may be None
@@ -254,14 +259,14 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
                     # double scalar (so range is between 0 and 1) and scale
                     # the current val (around the base)
                     val = val * (dm.volumeScalar * 2.0)
-            # userArticulations can be a list of 1 or more articulation objects
+            # useArticulations can be a list of 1 or more articulation objects
             # as well as True/False
             if useArticulations is not False:
-                if common.isIterable(useArticulations):
-                    am = useArticulations
-                elif (hasattr(useArticulations, 'classes')
-                       and 'Articulation' in useArticulations.classes):
+                am: Iterable[articulations.Articulation]
+                if isinstance(useArticulations, articulations.Articulation):
                     am = [useArticulations]  # place in a list
+                elif common.isIterable(useArticulations):
+                    am = useArticulations  # type: ignore[assignment]
                 elif self.client is not None:
                     am = self.client.articulations
                 else:
@@ -599,8 +604,6 @@ class Test(unittest.TestCase):
 
 
     def testGetRealizedB(self):
-        from music21 import articulations
-
         v1 = Volume(velocity=64)
         self.assertEqual(v1.getRealizedStr(), '0.5')
 
@@ -730,7 +733,6 @@ class Test(unittest.TestCase):
 
     def testRealizeVolumeC(self):
         from music21 import stream
-        from music21 import articulations
 
         s = stream.Stream()
         s.repeatAppend(note.Note('g3'), 16)
@@ -748,7 +750,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 
 if __name__ == '__main__':

@@ -1324,9 +1324,9 @@ class MusicXMLImporter(XMLParserBase):
                 try:
                     setattr(md, miscFieldName, miscFieldValue)
                 except Exception as e:  # pylint: disable=broad-except
-                    environLocal.warn('Could not set metadata: {} to {}: {}'.format(
+                    warnings.warn('Could not set metadata: {} to {}: {}'.format(
                         miscFieldName, miscFieldValue, e
-                    ))
+                    ), MusicXMLWarning)
 
         if inputM21 is None:
             return md
@@ -1589,6 +1589,28 @@ class PartParser(XMLParserBase):
         >>> i = PP.getDefaultInstrument(mxScorePart)
         >>> i.instrumentName
         'Instrument 4'
+
+        Non-default transpositions captured as of v7.3:
+
+        >>> scorePart = ('<score-part id="P5"><part-name>C Trumpet</part-name>'
+        ...     + '<part-abbreviation>C Tpt.</part-abbreviation>'
+        ...     + '<score-instrument id="P5-I5">'
+        ...     + '    <instrument-name>C Trumpet</instrument-name>'
+        ...     + '</score-instrument>'
+        ...     + '<midi-instrument id="P5-I5">'
+        ...     + '   <midi-channel>2</midi-channel>'
+        ...     + '<midi-program>57</midi-program>'
+        ...     + '</midi-instrument>'
+        ...     + '</score-part>')
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> PP = musicxml.xmlToM21.PartParser()
+
+        >>> mxScorePart = EL(scorePart)
+        >>> i = PP.getDefaultInstrument(mxScorePart)
+        >>> i.instrumentName
+        'C Trumpet'
+        >>> i.transposition
+        <music21.interval.Interval P1>
         '''
         if mxScorePart is None:
             mxScorePart = self.mxScorePart
@@ -1639,8 +1661,14 @@ class PartParser(XMLParserBase):
         # for now, just get first instrument
         # TODO: get all instruments!
         mxScoreInstrument = mxScorePart.find('score-instrument')
-        if isinstance(i, instrument.Piano) and mxScoreInstrument is not None:
-            i = self.reclassifyInstrumentFromName(i, mxScoreInstrument)
+        if mxScoreInstrument is not None and not isinstance(i, instrument.UnpitchedPercussion):
+            # Retains original midiChannel from `i`
+            inst_from_name = self.reclassifyInstrumentFromName(i, mxScoreInstrument)
+            # Two cases where we use the instrument constructed from the name instead
+            # 1. midiProgram matches (this will catch non-default transpositions in name)
+            # 2. midiProgram is Piano (often this is encoded only as piano for convenience)
+            if inst_from_name.midiProgram == i.midiProgram or isinstance(i, instrument.Piano):
+                i = inst_from_name
 
         i.partId = self.partId
         i.groups.append(self.partId)
@@ -1870,7 +1898,8 @@ class PartParser(XMLParserBase):
         except Exception as e:  # pylint: disable=broad-except
             warnings.warn(
                 f'The following exception took place in m. {measureParser.measureNumber} in '
-                + f'part {self.stream.partName}.'
+                + f'part {self.stream.partName}.',
+                MusicXMLWarning
             )
             raise e
 
@@ -1931,21 +1960,23 @@ class PartParser(XMLParserBase):
                 # PartInfo. We haven't done anything with it yet, so
                 # no need for a change of instrument
                 pass
-                # environLocal.warn('Put trans on active instrument')
+                # warnings.warn('Put trans on active instrument', MusicXMLWarning)
             elif self.activeInstrument.transposition != newTransposition:
                 # We have an activeInstrument with a transposition that does
                 # not match, so this change of transposition
                 # requires us to create a new one (think of physical instruments
                 # such as Bb clarinet to A clarinet.
                 newInst = copy.deepcopy(self.activeInstrument)
-                # environLocal.warn('Put trans on new instrument')
+                # warnings.warn('Put trans on new instrument', MusicXMLWarning)
                 self.activeInstrument = newInst
                 self.stream.coreInsert(self.lastMeasureOffset, newInst)
         else:
             # There is no activeInstrument and we're not at the beginning
             # of the piece... this shouldn't happen, but let's send a warning
             # and create a Generic Instrument object rather than dying.
-            environLocal.warn('Received a transposition tag, but instrument to put it on!')
+            warnings.warn(
+                'Received a transposition tag, but no instrument to put it on!',
+                MusicXMLWarning)
             fakeInst = instrument.Instrument()
             self.activeInstrument = fakeInst
             self.stream.coreInsert(self.lastMeasureOffset, fakeInst)
@@ -2079,8 +2110,8 @@ class PartParser(XMLParserBase):
         # use this as the next offset
 
         mHighestTime = m.highestTime
-        # environLocal.warn([self.lastTimeSignature])
-        # environLocal.warn([self.lastTimeSignature.barDuration])
+        # warnings.warn([self.lastTimeSignature], MusicXMLWarning)
+        # warnings.warn([self.lastTimeSignature.barDuration], MusicXMLWarning)
 
         lastTimeSignatureQuarterLength = self.lastTimeSignature.barDuration.quarterLength
 
@@ -3816,7 +3847,7 @@ class MeasureParser(XMLParserBase):
     def xmlDirectionTypeToSpanners(self, mxObj):
         # noinspection PyShadowingNames
         '''
-        Some spanners, such as MusicXML wedge, bracket, and dashes,
+        Some spanners, such as MusicXML wedge, bracket, dashes, and ottava
         are encoded as MusicXML directions.
 
         >>> from xml.etree.ElementTree import fromstring as EL
@@ -3896,7 +3927,7 @@ class MeasureParser(XMLParserBase):
                     if height is not None:
                         sp.startHeight = float(height)
                     sp.startTick = mxObj.get('line-end')
-                    sp.lineType = mxObj.get('line-type')
+                    sp.lineType = mxObj.get('line-type')  # redundant with setLineStyle()
 
                 self.spannerBundle.append(sp)
                 returnList.append(sp)
@@ -3911,7 +3942,7 @@ class MeasureParser(XMLParserBase):
                         'Line', idFound, False)[0]
                     # get first
                 except IndexError:
-                    environLocal.warn('Line <' + mxObj.tag + '> stop without start')
+                    warnings.warn('Line <' + mxObj.tag + '> stop without start', MusicXMLWarning)
                     return []
                 sp.completeStatus = True
 
@@ -3930,6 +3961,46 @@ class MeasureParser(XMLParserBase):
                     sp.addSpannedElements(targetLast)
             else:
                 raise MusicXMLImportException(f'unidentified mxType of mxBracket: {mxType}')
+
+        if mxObj.tag == 'octave-shift':
+            mxType = mxObj.get('type')
+            mxSize = mxObj.get('size')
+            idFound = mxObj.get('number')
+            if mxType in ('up', 'down'):
+                sp = spanner.Ottava()
+                # MusicXML pitches are encoded at sounding octaves
+                # Thus, set non-transposing
+                sp.transposing = False
+                if mxType == 'up':
+                    # musicxml and m21 have reversed types
+                    m21Type = 'down'
+                    # Provide default. If encoded, will be overwritten in setPlacement()
+                    sp.placement = 'below'
+                else:
+                    m21Type = 'up'
+                    sp.placement = 'above'
+                sp.idLocal = idFound
+                sp.type = (mxSize or 8, m21Type)
+                self.spannerBundle.append(sp)
+                returnList.append(sp)
+                self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+            elif mxType in ('continue', 'stop'):
+                spb = self.spannerBundle.getByClassIdLocalComplete(
+                    'Ottava', idFound, False  # get first
+                )
+                try:
+                    sp = spb[0]
+                except IndexError:
+                    raise MusicXMLImportException('Error in getting Ottava')
+                if mxType == 'continue':
+                    self.spannerBundle.setPendingSpannedElementAssignment(sp, 'GeneralNote')
+                else:  # if mxType == 'stop':
+                    sp.completeStatus = True
+                    if targetLast is not None:
+                        sp.addSpannedElements(targetLast)
+            else:
+                raise MusicXMLImportException(f'unidentified mxType of octave-shift: {mxType}')
+
         return returnList
 
     def xmlNotationsToSpanners(self, mxNotations, n):
@@ -3978,7 +4049,7 @@ class MeasureParser(XMLParserBase):
         try:
             numMarks = int(mxTremolo.text.strip())
         except (ValueError, AttributeError):
-            # environLocal.warn('could not convert ', dir(mxObj))
+            # warnings.warn('could not convert ', dir(mxObj), MusicXMLWarning)
             numMarks = 3
         if isSingle is True:
             ts = expressions.Tremolo()
@@ -4005,7 +4076,7 @@ class MeasureParser(XMLParserBase):
             # if we already have a spanner matching
             # environLocal.printDebug(['found a match in SpannerBundle'])
             su = sb[0]  # get the first
-        else:  # create a new slur
+        else:  # create a new spanner
             su = spannerClass()
             su.idLocal = idFound
             placement = mxObj.get('placement')
@@ -4470,9 +4541,9 @@ class MeasureParser(XMLParserBase):
         if not textStripValid(mxVoice):
             useVoice = self.lastVoice
             if useVoice is None:  # pragma: no cover
-                environLocal.warn(
-                    'Cannot put in an element with a missing voice tag when '
-                    + 'no previous voice tag was given.  Assuming voice 1... ')
+                warnings.warn('Cannot put in an element with a missing voice tag when '
+                    + 'no previous voice tag was given.  Assuming voice 1... ',
+                    MusicXMLWarning)
                 useVoice = 1
         else:
             useVoice = mxVoice.text.strip()
@@ -4489,9 +4560,15 @@ class MeasureParser(XMLParserBase):
         elif str(useVoice) in self.voicesById:
             thisVoice = self.voicesById[str(useVoice)]
         else:
-            environLocal.warn(f'Cannot find voice {useVoice!r}; putting outside of voices.')
-            environLocal.warn(f'Current voiceIds: {list(self.voicesById)}')
-            environLocal.warn(f'Current voices: {list(m.voices)} in m. {m.number}')
+            warnings.warn(
+                f'Cannot find voice {useVoice!r}; putting outside of voices.',
+                MusicXMLWarning)
+            warnings.warn(
+                f'Current voiceIds: {list(self.voicesById)}',
+                MusicXMLWarning)
+            warnings.warn(
+                f'Current voices: {list(m.voices)} in m. {m.number}',
+                MusicXMLWarning)
 
         return thisVoice
 
@@ -4721,30 +4798,41 @@ class MeasureParser(XMLParserBase):
         '''
         # TODO: offset
         # staff is covered by insertCoreAndReference
-        r = None  # protect against undefined.
+        b: Optional[pitch.Pitch] = None
+        r: Optional[pitch.Pitch] = None
+        inversion: Optional[int] = None
+        chordKind: str = ''
+        chordKindStr: str = ''
 
         mxKind = mxHarmony.find('kind')
         if textStripValid(mxKind):
-            kindText = mxKind.text.strip()
-        else:
-            kindText = None
+            chordKind = mxKind.text.strip()
+
         mxFrame = mxHarmony.find('frame')
 
-        # environLocal.printDebug(['mxToChordSymbol():', mxHarmony])
-        if mxFrame is not None:
-            cs = tablature.ChordWithFretBoard()
-        elif kindText == 'none':
-            cs = harmony.NoChord()
-        else:
-            cs = harmony.ChordSymbol()
+        mxBass = mxHarmony.find('bass')
+        if mxBass is not None:
+            # required
+            b = pitch.Pitch(mxBass.find('bass-step').text)
+            # optional
+            mxBassAlter = mxBass.find('bass-alter')
+            if mxBassAlter is not None:
+                # can provide integer or float to create accidental on pitch
+                b.accidental = pitch.Accidental(float(mxBassAlter.text))
 
-        self.setEditorial(mxHarmony, cs)
-        self.setPrintStyle(mxHarmony, cs)
-        self.setPrintObject(mxHarmony, cs)
-        # TODO: attr: print-frame
-        # TODO: attrGroup: placement
+        mxInversion = mxHarmony.find('inversion')
+        if textStripValid(mxInversion):
+            inversion = int(mxInversion.text.strip())
+        # TODO: print-style
 
-        seta = _setAttributeFromTagText
+        if chordKind:  # two ways of doing it...
+            # Get m21 chord kind from dict of musicxml aliases ("dominant" -> "dominant-seventh")
+            if chordKind in harmony.CHORD_ALIASES:
+                chordKind = harmony.CHORD_ALIASES[chordKind]
+            mxKindText = mxKind.get('text')  # attribute
+            if mxKindText is not None:
+                if not (mxKindText == '' and chordKind != 'none'):
+                    chordKindStr = mxKindText
 
         # TODO: root vs. function;  see group "harmony-chord")
         mxRoot = mxHarmony.find('root')
@@ -4759,59 +4847,28 @@ class MeasureParser(XMLParserBase):
             if mxRootAlter is not None:
                 # can provide integer or float to create accidental on pitch
                 r.accidental = pitch.Accidental(float(mxRootAlter.text))
-            # set Pitch object on Harmony
-            cs.root(r)
+
+        if mxFrame is not None:
+            cs_class = tablature.ChordWithFretBoard
+        elif chordKind == 'none':
+            cs_class = harmony.NoChord
         else:
+            cs_class = harmony.ChordSymbol
+
+        cs = cs_class(
+            bass=b,
+            root=r,
+            inversion=inversion,
+            kind=chordKind,
+            kindStr=chordKindStr
+        )
+
+        seta = _setAttributeFromTagText
+        if mxRoot is None:
             # function instead
             seta(cs, mxHarmony, 'function', 'romanNumeral')
 
-        if kindText is not None:  # two ways of doing it...
-            cs.chordKind = mxKind.text.strip()
-            # Get m21 chord kind from dict of musicxml aliases ("dominant" -> "dominant-seventh")
-            if cs.chordKind in harmony.CHORD_ALIASES:
-                cs.chordKind = harmony.CHORD_ALIASES[cs.chordKind]
-            mxKindText = mxKind.get('text')  # attribute
-            if mxKindText is not None:
-                if not ('NoChord' in cs.classes and mxKindText == ''):
-                    cs.chordKindStr = mxKindText
-        # TODO: attr: use-symbols
-        # TODO: attr: stack-degrees
-        # TODO: attr: parentheses-degrees
-        # TODO: attr: bracket-degrees
-        # TODO: attrGroup: print-style
-        # TODO: attrGroup: halign
-        # TODO: attrGroup: valign
-
-        mxInversion = mxHarmony.find('inversion')
-        if textStripValid(mxInversion):
-            try:
-                # must be an int
-                cs.inversion(int(mxInversion.text.strip()), transposeOnSet=False)
-            except ValueError:
-                pass
-        # TODO: print-style
-
-        clearBassOverride: bool = False
-        mxBass = mxHarmony.find('bass')
-        if mxBass is not None:
-            # required
-            b = pitch.Pitch(mxBass.find('bass-step').text)
-            # optional
-            mxBassAlter = mxBass.find('bass-alter')
-            if mxBassAlter is not None:
-                # can provide integer or float to create accidental on pitch
-                b.accidental = pitch.Accidental(float(mxBassAlter.text))
-            # set Pitch object on Harmony
-            cs.bass(b)
-        else:
-            cs.bass(r)  # set the bass to the root if root is none
-            # only for the purpose of getting _updatePitches() to run
-            # then, we will need to get rid of this untruthful override
-            # since there may be an inversion!
-            clearBassOverride = True
-
         mxDegrees = mxHarmony.findall('degree')
-
         for mxDegree in mxDegrees:  # a list of components
             hd = harmony.ChordStepModification()
             seta(hd, mxDegree, 'degree-value', 'degree', transform=int)
@@ -4820,19 +4877,21 @@ class MeasureParser(XMLParserBase):
             # TODO: - should allow float, but meaningless to allow microtones in this context.
             seta(hd, mxDegree, 'degree-alter', 'interval', transform=int)
             seta(hd, mxDegree, 'degree-type', 'modType')
-            cs.addChordStepModification(hd, updatePitches=False)
+            cs.addChordStepModification(hd, updatePitches=True)
 
-        if cs.chordKind != 'none':
-            cs._updatePitches()
-            # environLocal.printDebug(['xmlToChordSymbol(): Harmony object', h])
-            if cs.root().name != r.name:
-                cs.root(r)
+        self.setEditorial(mxHarmony, cs)
+        self.setPrintStyle(mxHarmony, cs)
+        self.setPrintObject(mxHarmony, cs)
 
-        if clearBassOverride and cs.inversion() is not None:
-            # 0 inversion = step 1; 2nd inversion = step 5; 4th inversion = step 9, etc.
-            wantedStep = (cs.inversion() * 2) + 1
-            cs.bass(cs.getChordStep(wantedStep))
-            cs._updatePitches()
+        # TODO: attr: print-frame
+        # TODO: attrGroup: placement
+        # TODO: attr: use-symbols
+        # TODO: attr: stack-degrees
+        # TODO: attr: parentheses-degrees
+        # TODO: attr: bracket-degrees
+        # TODO: attrGroup: print-style
+        # TODO: attrGroup: halign
+        # TODO: attrGroup: valign
 
         # TODO: frame
         if mxFrame is not None:
@@ -4845,7 +4904,7 @@ class MeasureParser(XMLParserBase):
     def xmlDirection(self, mxDirection):
         '''
         convert a <direction> tag to one or more expressions, metronome marks, etc.
-        and them to the core and staffReference.
+        and add them to the core and staffReference.
         '''
         offsetDirection = self.xmlToOffset(mxDirection)
         totalOffset = offsetDirection + self.offsetMeasureNote
@@ -4860,7 +4919,6 @@ class MeasureParser(XMLParserBase):
 
     def setDirectionInDirectionType(self, mxDir, mxDirection, staffKey, totalOffset):
         # TODO: pedal
-        # TODO: octave-shift
         # TODO: harp-pedals
         # TODO: damp
         # TODO: damp-all
@@ -4890,15 +4948,17 @@ class MeasureParser(XMLParserBase):
                 self.setPosition(mxDir, d)
                 self.setEditorial(mxDirection, d)
 
-        elif tag in ('wedge', 'bracket', 'dashes'):
+        elif tag in ('wedge', 'bracket', 'dashes', 'octave-shift'):
             try:
                 spannerList = self.xmlDirectionTypeToSpanners(mxDir)
             except MusicXMLImportException as excep:
-                environLocal.warn(f'Could not import {tag}: {excep}')
+                warnings.warn(f'Could not import {tag}: {excep}', MusicXMLWarning)
                 spannerList = []
 
             for sp in spannerList:
                 self.setPosition(mxDir, sp)
+                self.setPlacement(mxDir, sp)
+                self.setLineStyle(mxDir, sp)
                 self.setEditorial(mxDirection, sp)
 
         elif tag in ('coda', 'segno'):
@@ -5144,7 +5204,7 @@ class MeasureParser(XMLParserBase):
                 self.staves = int(mxSub.text)
             elif tag == 'transpose':
                 self.transposition = self.xmlTransposeToInterval(mxSub)
-                # environLocal.warn('Got a transposition of ', str(self.transposition) )
+                # warnings.warn(f'Got a transposition of {self.transposition}', MusicXMLWarning)
 
         # footnote, level
         self.setEditorial(mxAttributes, self.stream)
@@ -5315,7 +5375,7 @@ class MeasureParser(XMLParserBase):
         for i in range(len(numerators)):
             msg.append(f'{numerators[i]}/{denominators[i]}')
 
-        # environLocal.warn(['loading meter string:', '+'.join(msg)])
+        # warnings.warn(f"loading meter string: {'+'.join(msg)}", MusicXMLWarning)
         if len(msg) == 1:  # normal
             try:
                 ts = meter.TimeSignature(msg[0])
@@ -5700,7 +5760,8 @@ class MeasureParser(XMLParserBase):
                 # noinspection PyArgumentList
                 stl.staffType = stream.enums.StaffType(xmlText)
             except ValueError:
-                environLocal.warn(f'Got an incorrect staff-type in details: {mxStaffType}')
+                warnings.warn(
+                    f'Got an incorrect staff-type in details: {mxStaffType}', MusicXMLWarning)
         # TODO: staff-tuning*
         # TODO: capo
         # TODO: show-frets
@@ -7133,6 +7194,42 @@ class Test(unittest.TestCase):
         metro = s.recurse().getElementsByClass('MetronomeMark').first()
         self.assertEqual(metro.style.absoluteY, 40)
         self.assertEqual(metro.placement, 'above')
+
+    def testImportOttava(self):
+        from music21 import converter
+
+        xml_dir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        s = converter.parse(xml_dir / '33d-Spanners-OctaveShifts.xml')
+
+        m = s[stream.Measure].first()
+        self.assertEqual(
+            [p.nameWithOctave for p in m.pitches],
+            #      'C7' <---- TODO(bug): not reading <offset>-4</offset>
+            ['A4', 'C5', 'A6', 'C3', 'B2', 'A5', 'A5', 'B3', 'C4']
+        )
+        self.assertEqual(
+            [p.nameWithOctave for p in m.pitches],
+            [p.nameWithOctave for p in m.toSoundingPitch().flatten().pitches],
+        )
+        ottava_objs = s[spanner.Ottava]
+        self.assertEqual(
+            [o.transposing for o in ottava_objs],
+            [False, False, False, False]
+        )
+        self.assertEqual(
+            [o.type for o in ottava_objs],
+            ['15ma', '15mb', '8va', '8vb']
+        )
+        self.assertEqual(
+            [o.placement for o in ottava_objs],
+            ['above', 'below', 'above', 'below']
+        )
+        self.assertEqual(
+            [[p.nameWithOctave for p in o.getSpannedElements()] for o in ottava_objs],
+            # TODO(bug): first element should be ['C7', 'A6']
+            # not reading <offset>-4</offset>
+            [['A6'], ['C3', 'B2'], ['A5', 'A5'], ['B3', 'C4']]
+        )
 
     def testClearingTuplets(self):
         from xml.etree.ElementTree import fromstring as EL
