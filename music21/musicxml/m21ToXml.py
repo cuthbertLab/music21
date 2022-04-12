@@ -2515,7 +2515,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         'marcrel:TRL': 'translator',
     }
 
-    def m21MetadataNSKeyValueToXmlCreator(self, nsKey: str, value: metadata.TextLiteral):
+    def m21MetadataNSKeyValueToXmlCreator(self, nsKey: str, value: metadata.Text):
         '''
         Return a <creator> tag from a contributor tuple c = (nsKey, value).
         '''

@@ -125,8 +125,8 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     - Primitives: Old code had DateXxxx and Text.  DateXxxx still works for Dublin Core
         et al (it's a superset of what is needed), but Text needs to add the ability to
         know whether or not the text has been translated, as well as a specified encoding
-        scheme (a.k.a. what standard should I use to parse this string) so I have a new
-        class TextLiteral (which is Dublin Core terminology) that replaces Text.
+        scheme (a.k.a. what standard should I use to parse this string) so I have added
+        new fields to Text in a backward-compatible way.
 
     - I have not yet tried to support client-specified namespaces, but I do have a few
         APIs (getPersonalItem, addPersonalItem, setPersonalItem) that have no namespace
@@ -154,7 +154,7 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 
     - Data structure for all the metadata:
         Metadata contains a _metadata attribute which is a dict, where the keys are
-        f'{namespace}:{name}', and the value is one of TextLiteral, DateXxxx, or a
+        f'{namespace}:{name}', and the value is one of Text, DateXxxx, or a
         List of values of those types (for properties that have more than one value).
 
 '''
@@ -163,6 +163,7 @@ from dataclasses import dataclass
 import os
 import pathlib
 import re
+import copy
 import unittest
 import typing as t
 
@@ -177,14 +178,14 @@ from music21.metadata import caching
 from music21.metadata import primitives
 from music21.metadata.primitives import (Date, DateSingle, DateRelative, DateBetween,
                                          DateSelection, Text, Contributor, Creator,
-                                         Imprint, Copyright, TextLiteral)
+                                         Imprint, Copyright)
 
 from music21.metadata import testMetadata
 # -----------------------------------------------------------------------------
 
 __all__ = [
-    'Metadata',     # the new implementation
-    'OldMetadata',  # the old implementation
+    'Metadata',         # the old API
+    'ExtendedMetadata', # the new API (but derived from Metadata)
     'RichMetadata',
     'AmbitusShort',
     'Property'
@@ -193,8 +194,6 @@ __all__ = [
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
 
-AmbitusShort = namedtuple('AmbitusShort',
-                          ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
 _propertyFields = ('abbrevCode', 'name', 'label', 'namespace',
                    'isContributor', 'm21Abbrev', 'm21WorkId')
 Property = namedtuple('Property', _propertyFields, defaults=(None,) * len(_propertyFields))
@@ -205,120 +204,16 @@ class FileInfo:
     number: t.Optional[int] = None
     format: t.Optional[Text] = None
 
+AmbitusShort = namedtuple('AmbitusShort',
+                          ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
+
 # -----------------------------------------------------------------------------
 
-class Metadata(base.Music21Object):
-    r'''
-    Metadata represent data for a work or fragment, including title, composer,
-    dates, and other relevant information.
-
-    Metadata is a :class:`~music21.base.Music21Object` subclass, meaning that it
-    can be positioned on a Stream by offset and have a
-    :class:`~music21.duration.Duration`.
-
-    In many cases, each Stream will have a single Metadata object at the zero
-    offset position.
-
-    >>> md = metadata.Metadata(title='Concerto in F')
-    >>> md.title
-    'Concerto in F'
-
-    Or by three-letter abbreviation:
-
-    >>> md = metadata.Metadata(otl='Concerto in F')
-    >>> md.otl
-    'Concerto in F'
-    >>> md.title
-    'Concerto in F'
-
-    Or by setWorkId
-
-    >>> md.setWorkId('title', 'Rhapsody in Blue')
-    >>> md.title
-    'Rhapsody in Blue'
-
-    >>> md.otl
-    'Rhapsody in Blue'
-
-    >>> md.composer = 'Gershwin, George'
-
-    These are used by .search() methods to determine what attributes are
-    made available by default.
-
-    >>> md.searchAttributes
-    ('actNumber', 'alternativeTitle', 'associatedWork', 'collectionDesignation',
-     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication',
-     'groupTitle', 'localeOfComposition', 'movementName', 'movementNumber', 'number',
-     'opusNumber', 'parentTitle', 'popularTitle', 'sceneNumber', 'textLanguage',
-     'textOriginalLanguage', 'title', 'volume')
-
-    Plus anything that is in contributors...
-
-
-    All contributors are stored in a .contributors list:
-
-    >>> md.contributors
-    [<music21.metadata.primitives.Contributor composer:Gershwin, George>]
-    '''
+class MetadataBase(base.Music21Object):
 
     # CLASS VARIABLES #
 
     classSortOrder = -30
-
-    # !!!OTL: Title.
-    # !!!OTP: Popular Title.
-    # !!!OTA: Alternative title.
-    # !!!OPR: Title of larger (or parent) work
-    # !!!OAC: Act number.
-    # !!!OSC: Scene number.
-    # !!!OMV: Movement number.
-    # !!!OMD: Movement designation or movement name.
-    # !!!OPS: Opus number.
-    # !!!ONM: Number.
-    # !!!OVM: Volume.
-    # !!!ODE: Dedication.
-    # !!!OCO: Commission
-    # !!!GTL: Group Title.
-    # !!!GAW: Associated Work.
-    # !!!GCO: Collection designation.
-    # !!!TXO: Original language of vocal/choral text.
-    # !!!TXL: Language of the encoded vocal/choral text.
-    # !!!OCY: Country of composition.
-    # !!!OPC: City, town or village of composition.
-
-    workIdAbbreviationDict = {
-        'gaw': 'associatedWork',
-        'gco': 'collectionDesignation',
-        'gtl': 'groupTitle',
-        'oac': 'actNumber',
-        'oco': 'commission',
-        'ocy': 'countryOfComposition',
-        'ode': 'dedication',
-        'omd': 'movementName',
-        'omv': 'movementNumber',
-        'onm': 'number',
-        'opc': 'localeOfComposition',  # origin in abc
-        'opr': 'parentTitle',
-        'ops': 'opusNumber',
-        'osc': 'sceneNumber',
-        'ota': 'alternativeTitle',
-        'otl': 'title',
-        'otp': 'popularTitle',
-        'ovm': 'volume',
-        'txl': 'textLanguage',
-        'txo': 'textOriginalLanguage',
-    }
-
-    # add more as properties/import exists
-    searchAttributes = tuple(sorted([
-        'composer',
-        'copyright',
-        'date',
-    ] + list(workIdAbbreviationDict.values())))
-
-    workIdLookupDict = {}
-    for key, value in workIdAbbreviationDict.items():
-        workIdLookupDict[value.lower()] = key
 
     # STDPROPERTIES: each Tuple in this list is
     # abbrevCode, name, label, namespace, m21Abbrev, m21WorkId, isContributor
@@ -696,7 +591,7 @@ class Metadata(base.Music21Object):
                  name='rights',
                  label='Rights',
                  namespace='dcterm',
-                 m21WorkId='copyright', # needed for searchAttributes (no abbrev)
+                 m21WorkId='copyright', # no abbrev
                  isContributor=False),
 
         # rightsHolder: A person or organization owning or managing rights
@@ -823,6 +718,8 @@ class Metadata(base.Music21Object):
                  name='ARR',
                  label='Arranger',
                  namespace='marcrel',
+                 m21WorkId='arranger',
+                 m21Abbrev='lar',
                  isContributor=True),
 
         # ART/Artist: a person (e.g., a painter) or organization who conceives, and
@@ -973,7 +870,8 @@ class Metadata(base.Music21Object):
                  name='CMP',
                  label='Composer',
                  namespace='marcrel',
-                 m21WorkId='composer', # needed for searchAttributes (no abbrev)
+                 m21WorkId='composer',
+                 m21Abbrev='com',
                  isContributor=True),
 
         # CCP/Conceptor: a person or organization responsible for the original
@@ -1258,6 +1156,8 @@ class Metadata(base.Music21Object):
                  name='LBT',
                  label='Librettist',
                  namespace='marcrel',
+                 m21WorkId='librettist',
+                 m21Abbrev='lib',
                  isContributor=True),
 
         # LGD/Lighting designer: a person or organization who designs the
@@ -1285,6 +1185,8 @@ class Metadata(base.Music21Object):
                  name='LYR',
                  label='Lyricist',
                  namespace='marcrel',
+                 m21WorkId='lyricist',
+                 m21Abbrev='lyr',
                  isContributor=True),
 
         # MFR/Manufacturer: a person or organization that makes an
@@ -1627,6 +1529,8 @@ class Metadata(base.Music21Object):
                  name='TRL',
                  label='Translator',
                  namespace='marcrel',
+                 m21WorkId='translator',
+                 m21Abbrev='trn',
                  isContributor=True),
 
         # VDG/Videographer: a person or organization in charge of a video production,
@@ -1883,8 +1787,7 @@ class Metadata(base.Music21Object):
     # lost during translation to Dublin Core").
 
     # INITIALIZER #
-
-    def __init__(self, **keywords):
+    def __init__(self):
         # for now (experimental) use 'namespace:name' for key, and either a single value
         # or a list (for more than one value).
 
@@ -1901,69 +1804,136 @@ class Metadata(base.Music21Object):
         self._metadata: Dict = {}
         self.software: List[str] = [defaults.software]
 
-        # Copyright can be None or a copyright object
-        # TODO: Change to property to prevent setting as a plain string
-        #     (but need to regenerate CoreCorpus() after doing so.)
-#         self.copyright = None
-
-        # For backward compatibility, we allow the setting of workIds or
-        # abbreviations via **keywords
-        for abbreviation, workId in self.workIdAbbreviationDict.items():
-            # abbreviation = workIdToAbbreviation(id)
-            if workId in keywords:
-                nsKey: str = Metadata.M21WORKID2NSKEY[workId]
-                self._metadata[nsKey] = Text(keywords[workId])
-            elif abbreviation in keywords:
-                nsKey: str = Metadata.M21ABBREV2NSKEY[abbreviation]
-                self._metadata[nsKey] = Text(keywords[abbreviation])
-
-        # search for any keywords that match attributes
-        # these are for direct Contributor access, must have defined
-        # properties
-        for attr in ['composer', 'date', 'title']:
-            if attr in keywords:
-                setattr(self, attr, keywords[attr])
-
     @staticmethod
     def nsKey(key: str, namespace: Optional[str] = None) -> str:
         if namespace:
             return f'{namespace}:{key}'
 
-        if key in Metadata.STDPROPERTY_NAMES:
-            return Metadata.NAME2NSKEY[key]
+        if key in MetadataBase.NAME2NSKEY:
+            return MetadataBase.NAME2NSKEY[key]
 
-        if key in Metadata.STDPROPERTY_CODES:
-            return Metadata.CODE2NSKEY[key]
+        if key in MetadataBase.CODE2NSKEY:
+            return MetadataBase.CODE2NSKEY[key]
 
-        # it might already be of the form 'namespace:name', so just return it.
+#         if key in MetadataBase.UNIQUENAME2NSKEY:
+#             return MetadataBase.UNIQUENAME2NSKEY[key]
+
+        # it might already be of the form 'namespace:name', or it might
+        # be a personal name, so just return it.
         return key
 
     @staticmethod
-    def propertyToNSKey(prop: Property) -> str:
-        return Metadata.nsKey(prop.name, prop.namespace)
+    def propertyDefinitionToNSKey(prop: Property) -> str:
+        return MetadataBase.nsKey(prop.name, prop.namespace)
 
     @staticmethod
-    def getPropertyDefinitionByNSKey(nsKey: str) -> Property:
+    def nsKeyToPropertyDefinition(nsKey: str) -> Property:
         if not nsKey:
             return None
-        return Metadata.NSKEY2STDPROPERTY.get(nsKey, None)
+        return MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
 
     @staticmethod
     def isContributorNSKey(nsKey: str) -> bool:
-        prop: Property = Metadata.NSKEY2STDPROPERTY.get(nsKey, None)
+        prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
         if prop is None:
             return False
-        return prop.isContributor
+        return prop.isContributor and (prop.namespace == 'music21' or prop.m21WorkId is not None)
 
-    def getAllNSKeysAndValues(self,
+    @staticmethod
+    def nsKeyToContributorRole(nsKey: str) -> str:
+        prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
+        if prop is None:
+            return None
+        if not prop.isContributor:
+            return None
+
+        # it's a small-c contributor
+        if prop.namespace == 'music21':
+            # it's in the music21 namespace, so it's a big-C Contributor,
+            # and Contributor.role can be found in prop.name
+            return prop.name
+
+        # it's a small-c contributor that's not in the music21 namespace
+        if prop.m21WorkId:
+            # it maps to a big-C Contributor role, which can be found in prop.m21WorkId.
+            return prop.m21WorkId
+
+        # it's a small-c contributor that doesn't map to a big-C Contributor role
+        return None
+
+    @staticmethod
+    def contributorRoleToNSKey(role: str) -> str:
+        nsKey: str = MetadataBase.M21WORKID2NSKEY.get(role, None)
+        if nsKey is None:
+            return None
+
+        prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
+        if prop is None:
+            return None
+
+        if not prop.isContributor:
+            return None
+
+        return nsKey
+
+    # if namespace is provided, key should be name or abbrevCode (within that namespace)
+    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
+    def _getItem(self,
+                 key: str,
+                 namespace: Optional[str] = None) -> Optional[Union[Text, DateSingle, dict]]:
+        nsKey: str = self.nsKey(key, namespace)
+        return self._metadata.get(nsKey, None)
+
+    # if namespace is provided, key should be name or abbrevCode (within that namespace)
+    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
+    def _addItem(self,
+                 key: str,
+                 value: Union[Text, DateSingle, str, dict],
+                 namespace: Optional[str] = None):
+        if isinstance(value, str):
+            value = Text(value)
+
+        nsKey: str = self.nsKey(key, namespace)
+
+        prevValue: Union[List, Text, DateSingle, str, dict]
+        prevValue = self._metadata.get(nsKey, None)
+        if prevValue is None:
+            # set a single value
+            self._metadata[nsKey] = value
+        elif isinstance(prevValue, list):
+            # add value to the list
+            prevValue.append(value)
+        else:
+            # overwrite prevValue with a list containing prevValue and value
+            self._metadata[nsKey] = [prevValue, value]
+
+    # if namespace is provided, key should be name or abbrevCode (within that namespace)
+    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
+    def _setItem(self,
+                 key: str,
+                 value: Union[Text, DateSingle, str, dict],
+                 namespace: Optional[str] = None):
+        nsKey: str = self.nsKey(key, namespace)
+        self._metadata.pop(nsKey, None)
+        self._addItem(key, value, namespace)
+
+    def _addContributor(self, c: Contributor):
+        nsKey: str = self.contributorRoleToNSKey(c.role)
+        if not nsKey:
+            return
+        # TODO: when I support multiple names for one contributor,
+        # TODO: here is where I will add everything in c.names.
+        self._addItem(nsKey, c.names[0])
+
+    def _getAllNSKeysAndValues(self,
                               skipContributors=False
-                             ) -> List[Tuple[str, Union[TextLiteral, Date]]]:
+                             ) -> List[Tuple[str, Union[Text, Date]]]:
         '''
         Returns all values stored in this metadata as a list of (nsKey, value) tuples.
         Items in the metadata that have a list of values are flattened into the output
         list as multiple tuples with the same nsKey.
         '''
-        allOut: List[Tuple[str, Union[TextLiteral, DateSingle]]] = []
+        allOut: List[Tuple[str, Union[Text, DateSingle]]] = []
 
         for nsKey, value in self._metadata.items():
             if skipContributors and self.isContributorNSKey(nsKey):
@@ -1986,8 +1956,8 @@ class Metadata(base.Music21Object):
         # different now than it used to be...
         return allOut
 
-    def getAllContributorsAsNSKeysAndValues(self) -> List[Tuple[str, Union[TextLiteral, Date]]]:
-        allOut: List[Tuple[str, Union[TextLiteral, DateSingle]]] = []
+    def _getAllContributorsAsNSKeysAndValues(self) -> List[Tuple[str, Union[Text, Date]]]:
+        allOut: List[Tuple[str, Union[Text, DateSingle]]] = []
 
         for nsKey, value in self._metadata.items():
             if not self.isContributorNSKey(nsKey):
@@ -2004,86 +1974,239 @@ class Metadata(base.Music21Object):
 
         return allOut
 
-    def getItem(self,
-                key: str, # can be name, code, or namespace:name (if namespace is None)
-                namespace: Optional[str] = None) -> Optional[Union[TextLiteral, DateSingle, dict]]:
-        nsKey: str = self.nsKey(key, namespace)
-        return self._metadata.get(nsKey, None)
+# -----------------------------------------------------------------------------
 
-    def addItem(self,
-                key: str, # can be name, code, or namespace:name (if namespace is None)
-                value: Union[TextLiteral, DateSingle, str, dict],
-                namespace: Optional[str] = None):
-        if isinstance(value, str):
-            value = TextLiteral(value)
+# Metadata is the backward-compatible interface for metadata
+class Metadata(MetadataBase):
+    r'''
+    Metadata represent data for a work or fragment, including title, composer,
+    dates, and other relevant information.
 
-        nsKey: str = self.nsKey(key, namespace)
+    Metadata is a :class:`~music21.base.Music21Object` subclass, meaning that it
+    can be positioned on a Stream by offset and have a
+    :class:`~music21.duration.Duration`.
 
-        prevValue: Union[List, TextLiteral, DateSingle, str, dict]
-        prevValue = self._metadata.get(nsKey, None)
-        if prevValue is None:
-            # set a single value
-            self._metadata[nsKey] = value
-        elif isinstance(prevValue, list):
-            # add value to the list
-            prevValue.append(value)
-        else:
-            # overwrite prevValue with a list containing prevValue and value
-            self._metadata[nsKey] = [prevValue, value]
+    In many cases, each Stream will have a single Metadata object at the zero
+    offset position.
 
-    def setItem(self,
-                key: str,
-                value: Union[TextLiteral, DateSingle, str, dict],
-                namespace: Optional[str] = None):
-        nsKey: str = self.nsKey(key, namespace)
-        self._metadata.pop(nsKey)
-        self.addItem(key, value, namespace)
+    >>> md = metadata.Metadata(title='Concerto in F')
+    >>> md.title
+    'Concerto in F'
 
-    def getPersonalItem(self, key: str) -> Union[TextLiteral, DateSingle, dict]:
-        return self.getItem(key, namespace=None)
+    Or by three-letter abbreviation:
 
-    def addPersonalItem(self, key: str, value: Union[TextLiteral, DateSingle, str, dict]):
-        self.addItem(key, value, namespace=None)
+    >>> md = metadata.Metadata(otl='Concerto in F')
+    >>> md.otl
+    'Concerto in F'
+    >>> md.title
+    'Concerto in F'
 
-    def setPersonalItem(self, key: str, value: Union[TextLiteral, DateSingle, str, dict]):
-        self.setItem(key, value, namespace=None)
+    Or by setWorkId
+
+    >>> md.setWorkId('title', 'Rhapsody in Blue')
+    >>> md.title
+    'Rhapsody in Blue'
+
+    >>> md.otl
+    'Rhapsody in Blue'
+
+    >>> md.composer = 'Gershwin, George'
+
+    These are used by .search() methods to determine what attributes are
+    made available by default.
+
+    >>> md.searchAttributes
+    ('actNumber', 'alternativeTitle', 'associatedWork', 'collectionDesignation',
+     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication',
+     'groupTitle', 'localeOfComposition', 'movementName', 'movementNumber', 'number',
+     'opusNumber', 'parentTitle', 'popularTitle', 'sceneNumber', 'textLanguage',
+     'textOriginalLanguage', 'title', 'volume')
+
+    Plus anything that is in contributors...
+
+
+    All contributors are stored in a .contributors list:
+
+    >>> md.contributors
+    [<music21.metadata.primitives.Contributor composer:Gershwin, George>]
+    '''
+
+    # !!!OTL: Title.
+    # !!!OTP: Popular Title.
+    # !!!OTA: Alternative title.
+    # !!!OPR: Title of larger (or parent) work
+    # !!!OAC: Act number.
+    # !!!OSC: Scene number.
+    # !!!OMV: Movement number.
+    # !!!OMD: Movement designation or movement name.
+    # !!!OPS: Opus number.
+    # !!!ONM: Number.
+    # !!!OVM: Volume.
+    # !!!ODE: Dedication.
+    # !!!OCO: Commission
+    # !!!GTL: Group Title.
+    # !!!GAW: Associated Work.
+    # !!!GCO: Collection designation.
+    # !!!TXO: Original language of vocal/choral text.
+    # !!!TXL: Language of the encoded vocal/choral text.
+    # !!!OCY: Country of composition.
+    # !!!OPC: City, town or village of composition.
+
+    workIdAbbreviationDict = {
+        'gaw': 'associatedWork',
+        'gco': 'collectionDesignation',
+        'gtl': 'groupTitle',
+        'oac': 'actNumber',
+        'oco': 'commission',
+        'ocy': 'countryOfComposition',
+        'ode': 'dedication',
+        'omd': 'movementName',
+        'omv': 'movementNumber',
+        'onm': 'number',
+        'opc': 'localeOfComposition',  # origin in abc
+        'opr': 'parentTitle',
+        'ops': 'opusNumber',
+        'osc': 'sceneNumber',
+        'ota': 'alternativeTitle',
+        'otl': 'title',
+        'otp': 'popularTitle',
+        'ovm': 'volume',
+        'txl': 'textLanguage',
+        'txo': 'textOriginalLanguage',
+    }
+
+    # add more as properties/import exists
+    searchAttributes = tuple(sorted([
+        'composer',
+        'copyright',
+        'date',
+    ] + list(workIdAbbreviationDict.values())))
+
+    workIdLookupDict = {}
+    for key, value in workIdAbbreviationDict.items():
+        workIdLookupDict[value.lower()] = key
+
+    def __init__(self, **keywords):
+        # for now (experimental) use 'namespace:name' for key, and either a single value
+        # or a list (for more than one value).
+
+        # Where original metadata could contain multiples of various contributor roles,
+        # this new metadata will be able to store multiple of any property.
+
+        # Values (whether in a list or not) can also be dictionaries, where the keys
+        # are either DublinCore property keys, or our own ('music21') keys, (for
+        # example, for contributor roles).
+        # TODO: I do not yet have a way to differentiate between two composers vs two
+        # TODO: translations of one composer's name (same for all other properties)
+
+        super().__init__()
+
+        # For backward compatibility, we allow the setting of workIds or
+        # abbreviations via **keywords
+        for abbreviation, workId in self.workIdAbbreviationDict.items():
+            # abbreviation = workIdToAbbreviation(id)
+            if workId in keywords:
+                nsKey: str = MetadataBase.M21WORKID2NSKEY[workId]
+                self._metadata[nsKey] = Text(keywords[workId])
+            elif abbreviation in keywords:
+                nsKey: str = MetadataBase.M21ABBREV2NSKEY[abbreviation]
+                self._metadata[nsKey] = Text(keywords[abbreviation])
+
+        # search for any keywords that match attributes
+        # these are for direct Contributor access, must have defined
+        # properties
+        for attr in ['composer', 'date', 'title']:
+            if attr in keywords:
+                setattr(self, attr, keywords[attr])
+
 
     # Here are some old APIs, implemented in terms of the new data structures
     # for backward compatibility
 
+    def _getBackwardCompatibleItemNoConversion(self, workId: str) -> str:
+        result: List[Any] = self._getBackwardCompatibleItemsNoConversion(workId)
+        if not result: # None or empty list
+            return None
+        return result[0]
+
     def _getBackwardCompatibleItem(self, workId: str) -> str:
-        nsKey: str = Metadata.M21WORKID2NSKEY.get(workId, None)
+        return str(self._getBackwardCompatibleItemNoConversion(workId))
+
+    def _addBackwardCompatibleItem(self, workId: str, value: Union[str, Text, DateSingle]):
+        nsKey: str = MetadataBase.M21WORKID2NSKEY.get(workId, None)
+        if nsKey is not None:
+            self._addItem(nsKey, value)
+
+    def _setBackwardCompatibleItem(self, workId: str, value: Union[str, Text, DateSingle]):
+        nsKey: str = MetadataBase.M21WORKID2NSKEY.get(workId, None)
+        if nsKey is not None:
+            self._setItem(nsKey, value)
+
+    def _getBackwardCompatibleItemsNoConversion(self, workId: str) -> List[Any]:
+        nsKey: str = MetadataBase.M21WORKID2NSKEY.get(workId, None)
         if nsKey is None:
             return None
 
-        result = self.getItem(nsKey)
+        result = self._getItem(nsKey)
         if result is None:
             return None
-        if isinstance(result, list):
-            if not result:
-                return None
-            return str(result[0])
-        return str(result)
 
-    def _setBackwardCompatibleItem(self, workId: str, value: Union[str, Text, DateSingle]) -> str:
-        nsKey: str = Metadata.M21WORKID2NSKEY.get(workId, None)
-        if nsKey is not None:
-            self.setItem(nsKey, value)
+        if not isinstance(result, list):
+            result = [result]
 
-    def _getBackwardCompatibleContributorName(self, role: str) -> str:
-        pass # @@@ NEEDS WORK
+        return result
 
-    def _addBackwardCompatibleContributorName(self, role: str, name: str):
-        pass # @@@ NEEDS WORK
+    def _getBackwardCompatibleItems(self, workId: str) -> List[str]:
+        output: List[str] = []
+        values: List[Any] = self._getBackwardCompatibleItemsNoConversion(workId)
+        for v in values:
+            output.append(str(v))
+        return output
 
-    def _getBackwardCompatibleContributorNames(self, role: str) -> List[str]:
-        pass # @@@ NEEDS WORK
+    def _setBackwardCompatibleItems(self, workId: str, names: List[str]):
+        values: List[Text] = []
+        for name in names:
+            values.append(Text(name))
+        self._setBackwardCompatibleItem(workId, values)
 
-    def _addBackwardCompatibleContributorNames(self, role: str, names: List[str]):
-        pass # @@@ NEEDS WORK
+    @property
+    def contributors(self) -> List[Contributor]:
+        # This was just a data attribute before.  Hopefully no-one is calling
+        # md.contributors.append(c).  I did a global search on github for
+        # 'music21' 'contributors', and all code that modified it that I found
+        # were in music21 forks.  So I think we're OK making this a read-only
+        # property that we generate on the fly.
+        output: List[Contributor] = []
+        for nsKey, value in self._metadata.items():
+            role: str = MetadataBase.nsKeyToContributorRole(nsKey)
+            if role is None:
+                # That nsKey wasn't a Contributor (in the backward compatibility sense)
+                continue
 
-    def _removeBackwardCompatibleContributors(self, role: str):
-        pass # @@@ NEEDS WORK
+            # TODO: Once we start storing multiple names per _metadata item (and maybe
+            # TODO: even birth and death dates for contributor _metadata items), we
+            # TODO: should set them here via:
+            # TODO:     Contributor(names=[name1, name2], birth='1855', death=DateSingle('1923'))
+
+            # for now we assume the value is something like Text('Ludwig von Beethoven')
+            contrib: Contributor = Contributor(role=role, name=value)
+            output.append(contrib)
+        return output
+
+    # This was just a data attribute before that could be set/get directly to anything.
+    # There was hope of changing that to convert to Copyright during set, but I won't
+    # do that yet, so I don't trigger any backward compatibility issues.  Here's the
+    # original comment:
+    # copyright can be None or a Copyright object
+    # TODO: Change to property to prevent setting as a plain string
+    #     (but need to regenerate CoreCorpus() after doing so.)
+    @property
+    def copyright(self) -> Copyright:
+        return self._getBackwardCompatibleItemNoConversion('copyright')
+
+    @copyright.setter
+    def copyright(self, newCopyright: Union[str, Copyright]):
+        self._setBackwardCompatibleItem('copyright', newCopyright)
 
     # SPECIAL METHODS #
     def all(self, skipContributors=False):
@@ -2108,7 +2231,6 @@ class Metadata(base.Music21Object):
          ('date', '1689/--/-- or earlier'),
          ('localeOfComposition', 'Rome'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
-        @@@ NEEDS WORK
         '''
         # pylint: disable=undefined-variable
         allOut = {}
@@ -2156,21 +2278,22 @@ class Metadata(base.Music21Object):
         just lose this altogether and just define uniquenames that can be used
         without namespaces via getItem, setItem, addItem.
         '''
-        match = None
-        for abbreviation, workId in self.workIdAbbreviationDict.items():
-            # for id in WORK_IDS:
-            # abbreviation = workIdToAbbreviation(id)
-            if name == workId:
-                match = workId
-                break
-            elif name == abbreviation:
-                match = workId
-                break
-        if match is None:
-            raise AttributeError(f'object has no attribute: {name}')
-        result = self._workIds[match]
-        # always return string representation for now
-        return str(result)
+        raise AttributeError(f'why are you calling __getattr__?: {name}')
+#         match = None
+#         for abbreviation, workId in self.workIdAbbreviationDict.items():
+#             # for id in WORK_IDS:
+#             # abbreviation = workIdToAbbreviation(id)
+#             if name == workId:
+#                 match = workId
+#                 break
+#             elif name == abbreviation:
+#                 match = workId
+#                 break
+#         if match is None:
+#             raise AttributeError(f'object has no attribute: {name}')
+#         result = self._workIds[match]
+#         # always return string representation for now
+#         return str(result)
 
     # PUBLIC METHODS #
 
@@ -2229,12 +2352,11 @@ class Metadata(base.Music21Object):
         >>> md.addContributor(dancer)
         >>> md.search('Cunningham')
         (True, 'interpretive dancer')
-        @@@ NEEDS WORK
         '''
         if not isinstance(c, Contributor):
             raise exceptions21.MetadataException(
                 f'supplied object is not a Contributor: {c}')
-        self.contributors.append(c)
+        self._addContributor(c)
 
     def getContributorsByRole(self, value):
         r'''
@@ -2270,7 +2392,6 @@ class Metadata(base.Music21Object):
         >>> noRoleList[0].role
         >>> noRoleList[0].name
         'Baron van Swieten'
-        @@@ NEEDS WORK
         '''
         result = []  # there may be more than one per role
         for c in self.contributors:
@@ -2344,7 +2465,6 @@ class Metadata(base.Music21Object):
         >>> md.search(composer='Joplin')
         (True, 'composer')
 
-        @@@ NEEDS WORK
         '''
         # TODO: Change to a namedtuple and add as a third element
         #    during a successful search, the full value of the retrieved
@@ -2475,19 +2595,16 @@ class Metadata(base.Music21Object):
         >>> md.setWorkId('sdf', None)
         Traceback (most recent call last):
         music21.exceptions21.MetadataException: no work id available with id: sdf
-        @@@ NEEDS WORK
         '''
         idStr = idStr.lower()
         match = False
         for abbreviation, workId in self.workIdAbbreviationDict.items():
-            # for id in WORK_IDS:
-            # abbreviation = workIdToAbbreviation(id)
             if workId.lower() == idStr:
-                self._workIds[workId] = Text(value)
+                self._setBackwardCompatibleItem(workId, Text(value))
                 match = True
                 break
             elif abbreviation == idStr:
-                self._workIds[workId] = Text(value)
+                self._setBackwardCompatibleItem(workId, Text(value))
                 match = True
                 break
         if not match:
@@ -2502,7 +2619,6 @@ class Metadata(base.Music21Object):
         'opc'
 
         Static method.
-        @@@ NEEDS WORK?
         '''
         # NOTE: this is a performance critical function
         try:
@@ -2538,45 +2654,6 @@ class Metadata(base.Music21Object):
     def alternativeTitle(self, value):
         self._setBackwardCompatibleItem('alternativeTitle', Text(value))
 
-    def _contributor_role_getter(self, role: str) -> Optional[str]:
-        '''
-        get the name of the first contributor with this role, or None
-
-        see composer property for an example
-        '''
-        return self._getBackwardCompatibleContributorName(role)
-
-    def _contributor_role_setter(self, role: str, name: str) -> None:
-        '''
-        set the name for a particular role, adding a new contributor
-        in the process if none exists for that role.
-
-        see composer.setter property for an example
-        '''
-        self._addBackwardCompatibleContributorName(role, name)
-
-    def _contributor_multiple_role_getter(self, role: str) -> List[str]:
-        '''
-        get a list of the names of contributors with a certain role.
-
-        see composers (plural) property for an example.
-        '''
-        return self._getBackwardCompatibleContributorNames(role)
-
-    def _contributor_multiple_role_setter(self, role: str, value: List[str]) -> None:
-        '''
-        set multiple names for a particular role, replacing the people
-        already in those roles.
-
-        see composers.setter (plural) property for an example.
-        '''
-        # remove any contributors of this role
-        self._removeBackwardCompatibleContributors(role)
-
-        # add all the new ones
-        for name in value:
-            self._addBackwardCompatibleContributorName(role, name)
-
     @property
     def composer(self):
         r'''
@@ -2599,11 +2676,11 @@ class Metadata(base.Music21Object):
         >>> md.composer
         'Beach, Amy Marcy Cheney'
         '''
-        return self._contributor_role_getter('composer')
+        return self._getBackwardCompatibleItem('composer')
 
     @composer.setter
     def composer(self, value):
-        self._contributor_role_setter('composer', value)
+        self._setBackwardCompatibleItem('composer', value)
 
     @property
     def composers(self) -> List[str]:
@@ -2633,11 +2710,11 @@ class Metadata(base.Music21Object):
         >>> md.composers
         []
         '''
-        return self._contributor_multiple_role_getter('composer')
+        return self._getBackwardCompatibleItems('composer')
 
     @composers.setter
     def composers(self, value: List[str]) -> None:
-        self._contributor_multiple_role_setter('composer', value)
+        self._setBackwardCompatibleItems('composer', value)
 
 
     @property
@@ -2706,7 +2783,7 @@ class Metadata(base.Music21Object):
 
     @librettist.setter
     def librettist(self, value):
-        self._contributor_role_setter('librettist', value)
+        self._addBackwardCompatibleItem('librettist', value)
 
     @property
     def librettists(self) -> List[str]:
@@ -2720,11 +2797,11 @@ class Metadata(base.Music21Object):
 
         Should be distinguished from lyricists etc.
         '''
-        return self._contributor_multiple_role_getter('librettist')
+        return self._getBackwardCompatibleContributorNames('librettist')
 
     @librettists.setter
     def librettists(self, value: List[str]) -> None:
-        self._contributor_multiple_role_setter('librettist', value)
+        self._setBackwardCompatibleContributorNames('librettist', value)
 
 
 
@@ -2743,11 +2820,11 @@ class Metadata(base.Music21Object):
         >>> md = metadata.Metadata(title='West Side Story')
         >>> md.lyricist = 'Sondheim, Stephen'
         '''
-        return self._contributor_role_getter('lyricist')
+        return self._getBackwardCompatibleContributorName('lyricist')
 
     @lyricist.setter
     def lyricist(self, value):
-        self._contributor_role_setter('lyricist', value)
+        self._addBackwardCompatibleItem('lyricist', value)
 
     @property
     def lyricists(self) -> List[str]:
@@ -2761,11 +2838,11 @@ class Metadata(base.Music21Object):
 
         Should be distinguished from librettists etc.
         '''
-        return self._contributor_multiple_role_getter('lyricist')
+        return self._getBackwardCompatibleContributorNames('lyricist')
 
     @lyricists.setter
     def lyricists(self, value: List[str]) -> None:
-        self._contributor_multiple_role_setter('lyricist', value)
+        self._setBackwardCompatibleContributorNames('lyricist', value)
 
 
     @property
@@ -2777,13 +2854,13 @@ class Metadata(base.Music21Object):
         the piece title as the movement title. For instance, the Bach
         Chorales, since they are technically movements of larger cantatas.
         '''
-        result = self._workIds['movementName']
+        result = self._getBackwardCompatibleItem('movementName')
         if result is not None:
             return str(result)
 
     @movementName.setter
     def movementName(self, value):
-        self._workIds['movementName'] = Text(value)
+        self._setBackwardCompatibleItem('movementName', Text(value))
 
     @property
     def movementNumber(self) -> Optional[str]:
@@ -2799,11 +2876,11 @@ class Metadata(base.Music21Object):
         >>> md.movementNumber
         '3'
         '''
-        return self._getBackwardCompatibleItem('localeOfComposition')
+        return self._getBackwardCompatibleItem('movementNumber')
 
     @movementNumber.setter
     def movementNumber(self, value):
-        self._setBackwardCompatibleItem('localeOfComposition', value)
+        self._setBackwardCompatibleItem('movementNumber', value)
 
     @property
     def number(self):
@@ -2867,1039 +2944,70 @@ class Metadata(base.Music21Object):
             'alternativeTitle',
             'movementName',
         )
-        result = None
+        result: Text = None
         for key in searchId:
-            nsKey: str = Metadata.M21WORKID2NSKEY.get(key, None)
-            if nsKey is not None:
-                result = self._metadata.get(nsKey, None)
-                if result is not None:  # get first matched
-                    # get a string from this Text object
-                    # get with normalized articles
-                    return result.getNormalizedArticle()
+            result = self._getBackwardCompatibleItemNoConversion(key)
+            if result is not None:  # get first matched
+                # get a string from this Text object
+                # get with normalized articles
+                return result.getNormalizedArticle()
 
     @title.setter
     def title(self, value):
         self._setBackwardCompatibleItem('title', value)
 
+# -----------------------------------------------------------------------------
 
-class OldMetadata(base.Music21Object):
-    r'''
-    Metadata represent data for a work or fragment, including title, composer,
-    dates, and other relevant information.
-
-    Metadata is a :class:`~music21.base.Music21Object` subclass, meaning that it
-    can be positioned on a Stream by offset and have a
-    :class:`~music21.duration.Duration`.
-
-    In many cases, each Stream will have a single Metadata object at the zero
-    offset position.
-
-    >>> md = metadata.Metadata(title='Concerto in F')
-    >>> md.title
-    'Concerto in F'
-
-    Or by three-letter abbreviation:
-
-    >>> md = metadata.Metadata(otl='Concerto in F')
-    >>> md.otl
-    'Concerto in F'
-    >>> md.title
-    'Concerto in F'
-
-    Or by setWorkId
-
-    >>> md.setWorkId('title', 'Rhapsody in Blue')
-    >>> md.title
-    'Rhapsody in Blue'
-
-    >>> md.otl
-    'Rhapsody in Blue'
-
-    >>> md.composer = 'Gershwin, George'
-
-    These are used by .search() methods to determine what attributes are
-    made available by default.
-
-    >>> md.searchAttributes
-    ('actNumber', 'alternativeTitle', 'associatedWork', 'collectionDesignation',
-     'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication',
-     'fileFormat', 'fileNumber', 'filePath',
-     'groupTitle', 'localeOfComposition', 'movementName', 'movementNumber', 'number',
-     'opusNumber', 'parentTitle', 'popularTitle', 'sceneNumber', 'textLanguage',
-     'textOriginalLanguage', 'title', 'volume')
-
-    Plus anything that is in contributors...
-
-    All contributors are stored in a .contributors list:
-
-    >>> md.contributors
-    [<music21.metadata.primitives.Contributor composer:Gershwin, George>]
-    '''
-
-    # CLASS VARIABLES #
-
-    classSortOrder = -30
-
-    # !!!OTL: Title.
-    # !!!OTP: Popular Title.
-    # !!!OTA: Alternative title.
-    # !!!OPR: Title of larger (or parent) work
-    # !!!OAC: Act number.
-    # !!!OSC: Scene number.
-    # !!!OMV: Movement number.
-    # !!!OMD: Movement designation or movement name.
-    # !!!OPS: Opus number.
-    # !!!ONM: Number.
-    # !!!OVM: Volume.
-    # !!!ODE: Dedication.
-    # !!!OCO: Commission
-    # !!!GTL: Group Title.
-    # !!!GAW: Associated Work.
-    # !!!GCO: Collection designation.
-    # !!!TXO: Original language of vocal/choral text.
-    # !!!TXL: Language of the encoded vocal/choral text.
-    # !!!OCY: Country of composition.
-    # !!!OPC: City, town or village of composition.
-
-    workIdAbbreviationDict = {
-        'gaw': 'associatedWork',
-        'gco': 'collectionDesignation',
-        'gtl': 'groupTitle',
-        'oac': 'actNumber',
-        'oco': 'commission',
-        'ocy': 'countryOfComposition',
-        'ode': 'dedication',
-        'omd': 'movementName',
-        'omv': 'movementNumber',
-        'onm': 'number',
-        'opc': 'localeOfComposition',  # origin in abc
-        'opr': 'parentTitle',
-        'ops': 'opusNumber',
-        'osc': 'sceneNumber',
-        'ota': 'alternativeTitle',
-        'otl': 'title',
-        'otp': 'popularTitle',
-        'ovm': 'volume',
-        'txl': 'textLanguage',
-        'txo': 'textOriginalLanguage',
-    }
-
-    # add more as properties/import exists
-    searchAttributes = tuple(sorted([
-        'composer',
-        'copyright',
-        'date',
-        'fileFormat',
-        'fileNumber',
-        'filePath',
-    ] + list(workIdAbbreviationDict.values())))
-
-    workIdLookupDict = {}
-    for key, value in workIdAbbreviationDict.items():
-        workIdLookupDict[value.lower()] = key
-
-    # INITIALIZER #
-
-    def __init__(self, *args, **keywords):
+class ExtendedMetadata(Metadata):
+    # TODO: Should we allow **keywords initialization of ExtendedMetadata?
+    # TODO: We could allow keys that are uniqueName or 'namespace:name', or personalName.
+    # TODO: (if we allow personalName, that would be any name at all)
+    def __init__(self, metadata=None):
         super().__init__()
 
-        # a list of Contributor objects
-        # there can be more than one composer, or any other combination
-        self.contributors = []  # use addContributor to add.
-        self._date = None
-
-        # store one or more URLs from which this work came; this could
-        # be local file paths or otherwise
-        self._urls = []
-
-        # TODO: need a specific object for imprint
-        self._imprint = None
-
-        self.software = [defaults.software]
-
-        # Copyright can be None or a copyright object
-        # TODO: Change to property to prevent setting as a plain string
-        #     (but need to regenerate CoreCorpus() after doing so.)
-        self.copyright = None
-
-        # TODO: check pickling, etc.
-        self.fileInfo = FileInfo()
-
-        # a dictionary of Text elements, where keys are work id strings
-        # all are loaded with None by default
-        self._workIds = OrderedDict()
-        for abbreviation, workId in self.workIdAbbreviationDict.items():
-            # abbreviation = workIdToAbbreviation(id)
-            if workId in keywords:
-                self._workIds[workId] = Text(keywords[workId])
-            elif abbreviation in keywords:
-                self._workIds[workId] = Text(keywords[abbreviation])
-            else:
-                self._workIds[workId] = None
-
-        # search for any keywords that match attributes
-        # these are for direct Contributor access, must have defined
-        # properties
-        for attr in ['composer', 'date', 'title']:
-            if attr in keywords:
-                setattr(self, attr, keywords[attr])
-
-    # SPECIAL METHODS #
-    def all(self, skipContributors=False):
-        # noinspection SpellCheckingInspection, PyShadowingNames
-        '''
-        Returns all values (as strings) stored in this metadata as a sorted list of tuples.
-
-        >>> c = corpus.parse('corelli/opus3no1/1grave')
-        >>> c.metadata.all()
-        [('arranger', 'Michael Scott Cuthbert'),
-         ('composer', 'Arcangelo Corelli'),
-         ('copyright', '© 2014, Creative Commons License (CC-BY)'),
-         ('fileFormat', 'musicxml'),
-         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
-         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
-
-        Skip contributors is there to help with musicxml parsing -- there's no reason for it
-        except that we haven't exposed enough functionality yet:
-
-        >>> c.metadata.date = metadata.DateRelative('1689', 'onOrBefore')
-        >>> c.metadata.localeOfComposition = 'Rome'
-        >>> c.metadata.all(skipContributors=True)
-        [('copyright', '© 2014, Creative Commons License (CC-BY)'),
-         ('date', '1689/--/-- or earlier'),
-         ('fileFormat', 'musicxml'),
-         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
-         ('localeOfComposition', 'Rome'),
-         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
-        '''
-        # pylint: disable=undefined-variable
-        allOut = {}
-
-        searchAttributes = self.searchAttributes
-
-        for thisAttribute in sorted(set(searchAttributes)):
-            try:
-                val = getattr(self, thisAttribute)
-            except AttributeError:
-                continue
-
-            if skipContributors:
-                if isinstance(val, Contributor):
-                    continue
-                if thisAttribute == 'composer':
-                    continue
-            if val == 'None' or not val:
-                continue
-            allOut[str(thisAttribute)] = str(val)
-
-        if not skipContributors:
-            for c in self.contributors:
-                if c.role in allOut:
-                    continue
-                if not c.name or c.name == 'None':
-                    continue
-                allOut[str(c.role)] = str(c.name)
-
-        if 'title' in allOut and 'movementName' in allOut:
-            if allOut['movementName'] == allOut['title']:
-                del allOut['title']
-
-        return list(sorted(allOut.items()))
-
-    def __getattr__(self, name):
-        r'''
-        Utility attribute access for attributes that do not yet have property
-        definitions.
-        '''
-        match = None
-        for abbreviation, workId in self.workIdAbbreviationDict.items():
-            # for id in WORK_IDS:
-            # abbreviation = workIdToAbbreviation(id)
-            if name == workId:
-                match = workId
-                break
-            elif name == abbreviation:
-                match = workId
-                break
-        if match is None:
-            raise AttributeError(f'object has no attribute: {name}')
-        result = self._workIds[match]
-        # always return string representation for now
-        return str(result)
-
-    # PUBLIC METHODS #
-
-    @staticmethod
-    def abbreviationToWorkId(abbreviation):
-        '''Get work id abbreviations.
-
-        >>> metadata.Metadata.abbreviationToWorkId('otl')
-        'title'
-
-        >>> for work_id in metadata.Metadata.workIdAbbreviationDict:
-        ...    result = metadata.Metadata.abbreviationToWorkId(work_id)
-
-        '''
-        abbreviation = abbreviation.lower()
-        if abbreviation not in Metadata.workIdAbbreviationDict:
-            raise exceptions21.MetadataException(
-                f'no such work id: {abbreviation}')
-        return Metadata.workIdAbbreviationDict[abbreviation]
-
-    def addContributor(self, c):
-        # noinspection PyShadowingNames
-        r'''
-        Assign a :class:`~music21.metadata.Contributor` object to this
-        Metadata.
-
-        >>> md = metadata.Metadata(title='Gaelic Symphony')
-        >>> c = metadata.Contributor()
-        >>> c.name = 'Beach, Amy'
-        >>> c.role = 'composer'
-        >>> md.addContributor(c)
-        >>> md.composer
-        'Beach, Amy'
-
-        Add maiden name as an alternative composer name:
-
-        >>> c_alt = metadata.Contributor()
-        >>> c_alt.name = 'Cheney, Amy Marcy'
-        >>> c_alt.role = 'composer'
-        >>> md.addContributor(c_alt)
-        >>> md.composers
-        ['Beach, Amy', 'Cheney, Amy Marcy']
-
-        >>> md.search('Beach')
-        (True, 'composer')
-        >>> md.search('Cheney')
-        (True, 'composer')
-
-        Note that in this case, a "composerAlias" would probably be a more
-        appropriate role than a second composer.
-
-        All contributor roles are searchable, even if they are not standard roles:
-
-        >>> dancer = metadata.Contributor()
-        >>> dancer.names = ['Merce Cunningham', 'Martha Graham']
-        >>> dancer.role = 'interpretive dancer'
-        >>> md.addContributor(dancer)
-        >>> md.search('Cunningham')
-        (True, 'interpretive dancer')
-        '''
-        if not isinstance(c, Contributor):
-            raise exceptions21.MetadataException(
-                f'supplied object is not a Contributor: {c}')
-        self.contributors.append(c)
-
-    def getContributorsByRole(self, value):
-        # noinspection PyShadowingNames
-        r'''
-        Return a :class:`~music21.metadata.Contributor` if defined for a
-        provided role.
-
-        >>> md = metadata.Metadata(title='Violin Concerto')
-
-        >>> c = metadata.Contributor()
-        >>> c.name = 'Price, Florence'
-        >>> c.role = 'composer'
-        >>> md.addContributor(c)
-        >>> cList = md.getContributorsByRole('composer')
-        >>> cList
-        [<music21.metadata.primitives.Contributor composer:Price, Florence>]
-
-        >>> cList[0].name
-        'Price, Florence'
-
-        Some musicxml files have contributors with no role defined.  To get
-        these contributors, search for getContributorsByRole(None).  N.B. upon
-        output to MusicXML, music21 gives these contributors the generic role
-        of "creator"
-
-        >>> c2 = metadata.Contributor()
-        >>> c2.name = 'Baron van Swieten'
-        >>> md.addContributor(c2)
-        >>> noRoleList = md.getContributorsByRole(None)
-        >>> len(noRoleList)
-        1
-
-        >>> noRoleList[0].role
-        >>> noRoleList[0].name
-        'Baron van Swieten'
-        '''
-        result = []  # there may be more than one per role
-        for c in self.contributors:
-            if c.role == value:
-                result.append(c)
-        if result:
-            return result
-        else:
-            return None
-
-    def search(self, query=None, field=None, **kwargs):
-        r'''
-        Search one or all fields with a query, given either as a string or a
-        regular expression match.
-
-        >>> md = metadata.Metadata()
-        >>> md.composer = 'Joplin, Scott'
-        >>> md.title = 'Maple Leaf Rag'
-
-        >>> md.search(
-        ...     'joplin',
-        ...     field='composer',
-        ...     )
-        (True, 'composer')
-
-        Note how the incomplete field name in the following example is still
-        matched:
-
-        >>> md.search(
-        ...     'joplin',
-        ...     field='compos',
-        ...     )
-        (True, 'composer')
-
-        These don't work (Richard didn't have the sense of rhythm to write this...)
-
-        >>> md.search(
-        ...     'Wagner',
-        ...     field='composer',
-        ...     )
-        (False, None)
-
-        >>> md.search('Wagner')
-        (False, None)
-
-        >>> md.search('leaf')
-        (True, 'title')
-
-        >>> md.search(
-        ...     'leaf',
-        ...     field='composer',
-        ...     )
-        (False, None)
-
-        >>> md.search(
-        ...     'leaf',
-        ...     field='title',
-        ...     )
-        (True, 'title')
-
-        >>> md.search('leaf|entertainer')
-        (True, 'title')
-
-        >>> md.search('opl(.*)cott')
-        (True, 'composer')
-
-
-        New in v.4 -- use a keyword argument to search
-        that field directly:
-
-        >>> md.search(composer='Joplin')
-        (True, 'composer')
-        '''
-        # TODO: Change to a namedtuple and add as a third element
-        #    during a successful search, the full value of the retrieved
-        #    field (so that 'Joplin' would return 'Joplin, Scott')
-        reQuery = None
-        valueFieldPairs = []
-        if query is None and field is None and not kwargs:
-            return (False, None)
-        elif query is None and field is None and kwargs:
-            field, query = kwargs.popitem()
-
-        if field is not None:
-            field = field.lower()
-            match = False
-            try:
-                value = getattr(self, field)
-                valueFieldPairs.append((value, field))
-                match = True
-            except AttributeError:
-                pass
-            if not match:
-                for searchAttribute in self.searchAttributes:
-                    # environLocal.printDebug(['comparing fields:', f, field])
-                    # look for partial match in all fields
-                    if field.lower() in searchAttribute.lower():
-                        value = getattr(self, searchAttribute)
-                        valueFieldPairs.append((value, searchAttribute))
-                        match = True
-                        break
-        else:  # get all fields
-            for innerField in self.searchAttributes:
-                value = getattr(self, innerField)
-                valueFieldPairs.append((value, innerField))
-
-        # now search all contributors.
-        for contrib in self.contributors:
-            if field is not None:
-                if contrib.role is None and field.lower() != 'contributor':
-                    continue
-                if contrib.role is not None and field.lower() not in contrib.role:
-                    continue
-            for name in contrib.names:
-                valueFieldPairs.append((name, contrib.role))
-
-        # for now, make all queries strings
-        # ultimately, can look for regular expressions by checking for
-        # .search
-        useRegex = False
-        if hasattr(query, 'search'):
-            useRegex = True
-            reQuery = query  # already compiled
-        # look for regex characters
-        elif (isinstance(query, str)
-              and any(character in query for character in '*.|+?{}')):
-            useRegex = True
-            reQuery = re.compile(query, flags=re.IGNORECASE)
-
-        if useRegex:
-            for value, innerField in valueFieldPairs:
-                # "re.I" makes case-insensitive search
-                if isinstance(value, str):
-                    match = reQuery.search(value)
-                    if match is not None:
-                        return True, innerField
-        elif callable(query):
-            for value, innerField in valueFieldPairs:
-                if query(value):
-                    return True, innerField
-        else:
-            for value, innerField in valueFieldPairs:
-                if isinstance(value, str):
-                    query = str(query)
-                    if query.lower() in value.lower():
-                        return True, innerField
-                if (isinstance(value, int)
-                        and hasattr(query, 'sharps')
-                        and query.sharps == value):
-                    return True, innerField
-
-                elif query == value:
-                    return True, innerField
-        return False, None
-
-    def setWorkId(self, idStr, value):
-        r'''
-        Directly set a work id, given either as a full string name or as a
-        three-character abbreviation. The following work id abbreviations and
-        their full id string are given as follows. In many cases the Metadata
-        object support properties for convenient access to these work ids.
-
-        Abbreviations and strings::
-            * otl / title
-            * otp / popularTitle
-            * ota / alternativeTitle
-            * opr / parentTitle
-            * oac / actNumber
-            * osc / sceneNumber
-            * omv / movementNumber
-            * omd / movementName
-            * ops / opusNumber
-            * onm / number
-            * ovm / volume
-            * ode / dedication
-            * oco / commission
-            * gtl / groupTitle
-            * gaw / associatedWork
-            * gco / collectionDesignation
-            * txo / textOriginalLanguage
-            * txl / textLanguage
-            * ocy / countryOfComposition
-            * opc / localeOfComposition.
-
-        >>> md = metadata.Metadata(title='Quartet')
-        >>> md.title
-        'Quartet'
-
-        >>> md.setWorkId('otl', 'Trio')
-        >>> md.title
-        'Trio'
-
-        >>> md.setWorkId('ocy', 'Latvia')
-        >>> md.ocy
-        'Latvia'
-        >>> md.countryOfComposition
-        'Latvia'
-
-        >>> md.setWorkId('sdf', None)
-        Traceback (most recent call last):
-        music21.exceptions21.MetadataException: no work id available with id: sdf
-        '''
-        idStr = idStr.lower()
-        match = False
-        for abbreviation, workId in self.workIdAbbreviationDict.items():
-            # for id in WORK_IDS:
-            # abbreviation = workIdToAbbreviation(id)
-            if workId.lower() == idStr:
-                self._workIds[workId] = Text(value)
-                match = True
-                break
-            elif abbreviation == idStr:
-                self._workIds[workId] = Text(value)
-                match = True
-                break
-        if not match:
-            raise exceptions21.MetadataException(
-                f'no work id available with id: {idStr}')
-
-    @staticmethod
-    def workIdToAbbreviation(value):
-        '''Get a work abbreviation from a string representation.
-
-        >>> metadata.Metadata.workIdToAbbreviation('localeOfComposition')
-        'opc'
-
-        Static method.
-        '''
-        # NOTE: this is a performance critical function
-        try:
-            # try direct access, where keys are already lower case
-            return Metadata.workIdLookupDict[value]
-        except KeyError:
-            pass
-
-        vl = value.lower()
-
-        # slow approach
-        for workId in Metadata.workIdAbbreviationDict:
-            if vl == Metadata.workIdAbbreviationDict[workId].lower():
-                return workId
-        raise exceptions21.MetadataException(
-            f'no such work id: {value}')
-
-    # PUBLIC PROPERTIES #
-
-    @property
-    def alternativeTitle(self):
-        r'''
-        Get or set the alternative title.
-
-        >>> md = metadata.Metadata(popularTitle='Eroica')
-        >>> md.alternativeTitle = 'Heroic Symphony'
-        >>> md.alternativeTitle
-        'Heroic Symphony'
-        '''
-        result = self._workIds['alternativeTitle']
-        if result is not None:
-            return str(result)
-
-    @alternativeTitle.setter
-    def alternativeTitle(self, value):
-        self._workIds['alternativeTitle'] = Text(value)
-
-    def _contributor_role_getter(self, role: str) -> t.Optional[str]:
-        '''
-        get the name of the first contributor with this role, or None
-
-        see composer property for an example
-        '''
-        result = self.getContributorsByRole(role)
-        if result is not None:
-            # get just the name of the first contributor
-            return str(result[0].name)
-        return None
-
-    def _contributor_role_setter(self, role: str, name: str) -> None:
-        '''
-        set the name for a particular role, adding a new contributor
-        in the process if none exists for that role.
-
-        see composer.setter property for an example
-        '''
-        c = None
-
-        result = self.getContributorsByRole(role)
-        if result is not None:
-            c = result[0]
-        else:
-            c = Contributor()
-            c.role = role
-            self.contributors.append(c)
-
-        c.name = name
-
-    def _contributor_multiple_role_getter(self, role: str) -> t.List[str]:
-        '''
-        get a list of the names of contributors with a certain role.
-
-        see composers (plural) property for an example.
-        '''
-        result = self.getContributorsByRole(role)
-        if result is not None:
-            # get just the name of each composer/role
-            return [x.name for x in result]
-        else:
-            return []
-
-    def _contributor_multiple_role_setter(self, role: str, value: t.List[str]) -> None:
-        '''
-        set multiple names for a particular role, replacing the people
-        already in those roles.
-
-        see composers.setter (plural) property for an example.
-        '''
-        existing_contributors = self.getContributorsByRole(role)
-        if existing_contributors:
-            for existing in existing_contributors:
-                self.contributors.remove(existing)
-
-        for v in value:
-            contrib = Contributor(role=role, name=v)
-            self.addContributor(contrib)
-
-    @property
-    def composer(self):
-        r'''
-        Get or set the composer of this work. Only the first composer can be
-        got or set via properties.  Instead add Composer roles to the .contributors
-        list.
-
-        The composer attribute does not live in Metadata, but creates a
-        :class:`~music21.metadata.Contributor` object in the .contributors
-        object.
-
-        >>> md = metadata.Metadata(
-        ...     title='Symphony in e minor',
-        ...     popularTitle='Gaelic',
-        ...     composer='Beach, Mrs. H.H.A.',
-        ...     )
-        >>> md.composer
-        'Beach, Mrs. H.H.A.'
-        >>> md.composer = 'Beach, Amy Marcy Cheney'
-        >>> md.composer
-        'Beach, Amy Marcy Cheney'
-        '''
-        return self._contributor_role_getter('composer')
-
-    @composer.setter
-    def composer(self, value):
-        self._contributor_role_setter('composer', value)
-
-    @property
-    def composers(self) -> t.List[str]:
-        r'''
-        Get or set a list of strings of all composer roles.
-
-        >>> md = metadata.Metadata(title='Yellow River Concerto')
-        >>> md.composers = ['Xian Xinghai', 'Yin Chengzong']
-
-        (Yin Chengzong might be better called "Arranger" but this is for
-        illustrative purposes)
-
-        >>> md.composers
-        ['Xian Xinghai', 'Yin Chengzong']
-
-
-        Might as well add a third composer to the concerto committee?
-
-        >>> contrib3 = metadata.Contributor(role='composer', name='Chu Wanghua')
-        >>> md.addContributor(contrib3)
-        >>> md.composers
-        ['Xian Xinghai', 'Yin Chengzong', 'Chu Wanghua']
-
-        If there are no composers, returns an empty list:
-
-        >>> md = metadata.Metadata(title='Sentient Algorithmic Composition')
-        >>> md.composers
-        []
-        '''
-        return self._contributor_multiple_role_getter('composer')
-
-    @composers.setter
-    def composers(self, value: t.List[str]) -> None:
-        self._contributor_multiple_role_setter('composer', value)
-
-
-    @property
-    def date(self):
-        r'''
-        Get or set the date of this work as one of the following date
-        objects:
-
-        :class:`~music21.metadata.DateSingle`,
-        :class:`~music21.metadata.DateRelative`,
-        :class:`~music21.metadata.DateBetween`,
-        :class:`~music21.metadata.DateSelection`,
-
-        >>> md = metadata.Metadata(
-        ...     title='Third Symphony',
-        ...     popularTitle='Eroica',
-        ...     composer='Beethoven, Ludwig van',
-        ...     )
-        >>> md.date = '1805'
-        >>> md.date
-        '1805/--/--'
-
-        >>> md.date = metadata.DateBetween(['1803/01/01', '1805/04/07'])
-        >>> md.date
-        '1803/01/01 to 1805/04/07'
-        '''
-        return str(self._date)
-
-    @date.setter
-    def date(self, value):
-        # all inherit date single
-        if isinstance(value, DateSingle):
-            self._date = value
-        else:
-            # assume date single; could be other subclass
-            ds = DateSingle(value)
-            self._date = ds
-
-    @property
-    def fileFormat(self) -> t.Optional[str]:
-        '''
-        Get or set the file format that was parsed.
-        '''
-        if self.fileInfo.format:
-            return str(self.fileInfo.format)
-
-    @fileFormat.setter
-    def fileFormat(self, value: t.Union[str, Text]) -> None:
-        self.fileInfo.format = Text(value)
-
-    @property
-    def filePath(self) -> t.Optional[str]:
-        '''
-        Get or set the file path that was parsed.
-        '''
-        if self.fileInfo.path:
-            return str(self.fileInfo.path)
-
-    @filePath.setter
-    def filePath(self, value: t.Union[str, Text]) -> None:
-        self.fileInfo.path = Text(value)
-
-    @property
-    def fileNumber(self) -> t.Optional[int]:
-        '''
-        Get or set the file path that was parsed.
-        '''
-        if self.fileInfo.number:
-            return self.fileInfo.number
-
-    @fileNumber.setter
-    def fileNumber(self, value: t.Union[int, None]) -> None:
-        self.fileInfo.number = value
-
-    @property
-    def localeOfComposition(self):
-        r'''
-        Get or set the locale of composition, or origin, of the work.
-        '''
-        result = self._workIds['localeOfComposition']
-        if result is not None:
-            return str(result)
-
-    @localeOfComposition.setter
-    def localeOfComposition(self, value):
-        self._workIds['localeOfComposition'] = Text(value)
-
-
-    @property
-    def librettist(self):
-        r'''
-        Gets or sets a single librettist for this work:
-
-        >>> md = metadata.Metadata(title='Death of Klinghoffer, The')
-        >>> md.librettist = 'Goodman, Alice'
-        >>> md.librettist
-        'Goodman, Alice'
-
-        To preserve continuity with Humdrum, library catalogues, etc.,
-        librettists should be distinguished from lyricists etc., but sometimes
-        the line is not 100% clear.
-        '''
-        return self._contributor_role_getter('librettist')
-
-    @librettist.setter
-    def librettist(self, value):
-        self._contributor_role_setter('librettist', value)
-
-    @property
-    def librettists(self) -> t.List[str]:
-        r'''
-        Gets or sets a list of librettists for this work:
-
-        >>> md = metadata.Metadata(title='Madama Butterfly')
-        >>> md.librettists = ['Illica, Luigi', 'Giacosa, Giuseppe']
-        >>> md.librettists
-        ['Illica, Luigi', 'Giacosa, Giuseppe']
-
-        Should be distinguished from lyricists etc.
-        '''
-        return self._contributor_multiple_role_getter('librettist')
-
-    @librettists.setter
-    def librettists(self, value: t.List[str]) -> None:
-        self._contributor_multiple_role_setter('librettist', value)
-
-
-
-    @property
-    def lyricist(self):
-        r'''
-        Gets or sets a single lyricist for this work:
-
-        >>> md = metadata.Metadata(title='Girlfriend')
-        >>> md.lyricist = 'Keys, Alicia'
-
-        To preserve continuity with Humdrum, library catalogues, etc.,
-        lyricists should be distinguished from librettists etc., but sometimes
-        the line is not 100% clear:
-
-        >>> md = metadata.Metadata(title='West Side Story')
-        >>> md.lyricist = 'Sondheim, Stephen'
-        '''
-        return self._contributor_role_getter('lyricist')
-
-    @lyricist.setter
-    def lyricist(self, value):
-        self._contributor_role_setter('lyricist', value)
-
-    @property
-    def lyricists(self) -> t.List[str]:
-        r'''
-        Gets or sets a list of lyricists for this work:
-
-        >>> md = metadata.Metadata(title='Rumors')
-        >>> md.lyricists = ['Buckingham, Lindsey', 'McVie, Christine', 'Nicks, Stevie']
-        >>> md.lyricists
-        ['Buckingham, Lindsey', 'McVie, Christine', 'Nicks, Stevie']
-
-        Should be distinguished from librettists etc.
-        '''
-        return self._contributor_multiple_role_getter('lyricist')
-
-    @lyricists.setter
-    def lyricists(self, value: t.List[str]) -> None:
-        self._contributor_multiple_role_setter('lyricist', value)
-
-
-    @property
-    def movementName(self):
-        r'''
-        Get or set the movement title.
-
-        Note that a number of pieces from various MusicXML datasets have
-        the piece title as the movement title. For instance, the Bach
-        Chorales, since they are technically movements of larger cantatas.
-        '''
-        result = self._workIds['movementName']
-        if result is not None:
-            return str(result)
-
-    @movementName.setter
-    def movementName(self, value):
-        self._workIds['movementName'] = Text(value)
-
-    @property
-    def movementNumber(self) -> t.Optional[str]:
-        r'''
-        Get or set the movement number.
-
-        >>> md = metadata.Metadata(title='Ode to Joy')
-        >>> md.movementNumber = 3
-
-        Note that movement numbers are always returned as strings!  This may
-        change in the future.
-
-        >>> md.movementNumber
-        '3'
-        '''
-        result = self._workIds['movementNumber']
-        if result is not None:
-            return str(result)
-        return None
-
-    @movementNumber.setter
-    def movementNumber(self, value):
-        self._workIds['movementNumber'] = Text(value)
-
-    @property
-    def number(self):
-        r'''
-        Get or set the number of the work within a collection of pieces.
-        (for instance, the number within a collection of ABC files)
-
-        Note that numbers are always returned as strings!  This may
-        change in the future.
-        '''
-        result = self._workIds['number']
-        if result is not None:
-            return str(result)
-
-    @number.setter
-    def number(self, value):
-        self._workIds['number'] = Text(value)
-
-    @property
-    def opusNumber(self):
-        r'''
-        Get or set the opus number.
-
-        Note that opusNumbers are always returned as strings!  This may
-        change in the future.
-        '''
-        result = self._workIds['opusNumber']
-        if result is not None:
-            return str(result)
-
-    @opusNumber.setter
-    def opusNumber(self, value):
-        self._workIds['opusNumber'] = Text(value)
-
-    @property
-    def title(self):
-        r'''
-        Get the title of the work, or the next-matched title string
-        available from a related parameter fields.
-
-        >>> md = metadata.Metadata(title='Third Symphony')
-        >>> md.title
-        'Third Symphony'
-
-        >>> md = metadata.Metadata(popularTitle='Eroica')
-        >>> md.title
-        'Eroica'
-
-        >>> md = metadata.Metadata(
-        ...     title='Third Symphony',
-        ...     popularTitle='Eroica',
-        ...     )
-        >>> md.title
-        'Third Symphony'
-
-        >>> md.popularTitle
-        'Eroica'
-
-        >>> md.otp
-        'Eroica'
-        '''
-        searchId = (
-            'title',
-            'popularTitle',
-            'alternativeTitle',
-            'movementName',
-        )
-        result = None
-        for key in searchId:
-            result = self._workIds[key]
-            if result is not None:  # get first matched
-                # get a string from this Text object
-                # get with normalized articles
-                return self._workIds[key].getNormalizedArticle()
-
-    @title.setter
-    def title(self, value):
-        self._workIds['title'] = Text(value)
-
+        if metadata is not None:
+            # This is a conversion (from Metadata or from ExtendedMetadata).
+            # In all cases it must be a copy operation. We can't have two
+            # metadata objects that share instance data!
+            self.software = copy.deepcopy(metadata.software)
+            self._metadata = copy.deepcopy(metadata._metadata)
+
+    # if namespace is provided, key should be name or abbrevCode (within that namespace)
+    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
+    def getItem(self,
+                key: str,
+                namespace: Optional[str] = None) -> Optional[Union[Text, DateSingle, dict]]:
+        return self._getItem(key, namespace)
+
+    # if namespace is provided, key should be name or abbrevCode (within that namespace)
+    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
+    def addItem(self,
+                key: str,
+                value: Union[Text, DateSingle, str, dict],
+                namespace: Optional[str] = None):
+        self._addItem(key, value, namespace)
+
+    # if namespace is provided, key should be name or abbrevCode (within that namespace)
+    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
+    def setItem(self,
+                key: str,
+                value: Union[Text, DateSingle, str, dict],
+                namespace: Optional[str] = None):
+        self._setItem(key, value, namespace)
+
+    def getPersonalItem(self, key: str) -> Union[Text, DateSingle, dict]:
+        return self._getItem(key, namespace=None)
+
+    def addPersonalItem(self, key: str, value: Union[Text, DateSingle, str, dict]):
+        self._addItem(key, value, namespace=None)
+
+    def setPersonalItem(self, key: str, value: Union[Text, DateSingle, str, dict]):
+        self._setItem(key, value, namespace=None)
 
 # -----------------------------------------------------------------------------
 
-
+# TODO: Not sure what I need to do here.  Either make this always derive from
+# TODO: ExtendedMetadata, or have two: RichMetadata and RichExtendedMetadata?
 class RichMetadata(Metadata):
     r'''
     RichMetadata adds to Metadata information about the contents of the Score
@@ -3929,7 +3037,7 @@ class RichMetadata(Metadata):
     # CLASS VARIABLES #
 
     # When changing this, be sure to update freezeThaw.py
-    searchAttributes = tuple(sorted(OldMetadata.searchAttributes + (
+    searchAttributes = tuple(sorted(Metadata.searchAttributes + (
         'ambitus',
         'keySignatureFirst',
         'keySignatures',
