@@ -132,15 +132,8 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
         APIs (getPersonalItem, addPersonalItem, setPersonalItem) that have no namespace
         at all, so clients can set anything they want and (hopefully) get it passed through.
         The first client-specified namespace I will try is 'humdrum' for all the crazy humdrum
-        metadata that music21 doesn't really need to add as officially supported.
-
-    - Copyright stuff: Everybody does this differently, so there's no straightforward mapping
-        from (say) humdrum copyright stuff to Dublin Core copyright stuff. Dublin Core has
-        'rights', 'accessRights', 'rightsHolder', 'dateCopyrighted', and 'license'.
-        This will require, I think, some special code/data structure in music21, and then
-        parsers and writers will need to deal specially with it.  For now I don't handle it
-        well.  It might even be represented as a new 'copyright' property term with
-        namespace='music21'.
+        metadata that music21 doesn't really need to add as officially supported, but should
+        be passed through to the humdrum writer so it isn't lost.
 
     - A new type that drives a lot of the implementation: Property
         A Property is a namedtuple with (currently) four fields that describe a property
@@ -154,8 +147,8 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 
     - Data structure for all the metadata:
         Metadata contains a _metadata attribute which is a dict, where the keys are
-        f'{namespace}:{name}', and the value is one of Text, DateXxxx, or a
-        List of values of those types (for properties that have more than one value).
+        f'{namespace}:{name}', and the value is either Any, or a List[Any] (for properties
+        that have more than one value).
 
 '''
 from collections import OrderedDict, namedtuple
@@ -164,6 +157,7 @@ import os
 import pathlib
 import re
 import copy
+import datetime
 import unittest
 import typing as t
 
@@ -195,8 +189,11 @@ from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
 
 _propertyFields = ('abbrevCode', 'name', 'label', 'namespace', 'isContributor',
-                   'm21Abbrev', 'm21WorkId', 'uniqueName')
-Property = namedtuple('Property', _propertyFields, defaults=(None,) * len(_propertyFields))
+                   'm21Abbrev', 'm21WorkId', 'uniqueName', 'valueType')
+# default Property fields are all None except valueType which defaults to Text
+Property = namedtuple('Property',
+                      _propertyFields,
+                      defaults=((None,) * (len(_propertyFields)-1)) + (Text,))
 
 @dataclass
 class FileInfo:
@@ -300,6 +297,7 @@ class MetadataBase(base.Music21Object):
                  label='Date Available',
                  namespace='dcterm',
                  uniqueName='dateAvailable',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
                  isContributor=False),
 
         # bibliographicCitation: A bibliographic reference for the resource.
@@ -327,6 +325,7 @@ class MetadataBase(base.Music21Object):
                  label='Contributor',
                  namespace='dcterm',
                  uniqueName='genericContributor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # coverage: The spatial or temporal topic of the resource, spatial applicability
@@ -344,6 +343,7 @@ class MetadataBase(base.Music21Object):
                  namespace='dcterm',
                  m21WorkId='date',  # no abbrev
                  uniqueName='dateCreated',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
                  isContributor=False),
 
         # creator: An entity responsible for making the resource.
@@ -351,6 +351,7 @@ class MetadataBase(base.Music21Object):
                  name='creator',
                  label='Creator',
                  namespace='dcterm',
+                 valueType=Contributor,
                  isContributor=True),
 
         # date: A point or period of time associated with an event in the lifecycle
@@ -359,6 +360,7 @@ class MetadataBase(base.Music21Object):
                  name='date',
                  label='Date',
                  namespace='dcterm',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
                  isContributor=False),
 
         # dateAccepted: Date of acceptance of the resource.
@@ -366,6 +368,7 @@ class MetadataBase(base.Music21Object):
                  name='dateAccepted',
                  label='Date Accepted',
                  namespace='dcterm',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
                  isContributor=False),
 
         # dateCopyrighted: Date of copyright of the resource.
@@ -373,6 +376,7 @@ class MetadataBase(base.Music21Object):
                  name='dateCopyrighted',
                  label='Date Copyrighted',
                  namespace='dcterm',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
                  isContributor=False),
 
         # dateSubmitted: Date of submission of the resource.
@@ -380,6 +384,7 @@ class MetadataBase(base.Music21Object):
                  name='dateSubmitted',
                  label='Date Submitted',
                  namespace='dcterm',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
                  isContributor=False),
 
         # description: An account of the resource.
@@ -497,6 +502,7 @@ class MetadataBase(base.Music21Object):
                  label='Date Issued',
                  namespace='dcterm',
                  uniqueName='dateIssued',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
                  isContributor=False),
 
         # isVersionOf: A related resource of which the described resource is a
@@ -542,6 +548,7 @@ class MetadataBase(base.Music21Object):
                  label='Date Modified',
                  namespace='dcterm',
                  uniqueName='dateModified',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
                  isContributor=False),
 
         # provenance: A statement of any changes in ownership and custody of
@@ -558,6 +565,7 @@ class MetadataBase(base.Music21Object):
                  name='publisher',
                  label='Publisher',
                  namespace='dcterm',
+                 valueType=Contributor,
                  isContributor=True),
 
         # references: A related resource that is referenced, cited, or
@@ -605,6 +613,7 @@ class MetadataBase(base.Music21Object):
                  name='rightsHolder',
                  label='Rights Holder',
                  namespace='dcterm',
+                 valueType=Contributor,
                  isContributor=True),
 
         # source: A related resource from which the described resource
@@ -667,6 +676,7 @@ class MetadataBase(base.Music21Object):
                  label='Date Valid',
                  namespace='dcterm',
                  uniqueName='dateValid',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
                  isContributor=False),
 
         # The following 'marcrel' property terms are the MARC Relator terms
@@ -684,6 +694,7 @@ class MetadataBase(base.Music21Object):
                  label='Actor',
                  namespace='marcrel',
                  uniqueName='actor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ADP/Adapter: a person or organization who 1) reworks a musical composition,
@@ -694,6 +705,7 @@ class MetadataBase(base.Music21Object):
                  label='Adapter',
                  namespace='marcrel',
                  uniqueName='adapter',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ANM/Animator: a person or organization who draws the two-dimensional
@@ -705,6 +717,7 @@ class MetadataBase(base.Music21Object):
                  label='Animator',
                  namespace='marcrel',
                  uniqueName='animator',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ANN/Annotator: a person who writes manuscript annotations on a printed item.
@@ -713,6 +726,7 @@ class MetadataBase(base.Music21Object):
                  label='Annotator',
                  namespace='marcrel',
                  uniqueName='annotator',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ARC/Architect: a person or organization who designs structures or oversees
@@ -722,6 +736,7 @@ class MetadataBase(base.Music21Object):
                  label='Architect',
                  namespace='marcrel',
                  uniqueName='architect',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ARR/Arranger: a person or organization who transcribes a musical
@@ -733,6 +748,7 @@ class MetadataBase(base.Music21Object):
                  namespace='marcrel',
                  m21WorkId='arranger',
                  m21Abbrev='lar',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ART/Artist: a person (e.g., a painter) or organization who conceives, and
@@ -744,6 +760,7 @@ class MetadataBase(base.Music21Object):
                  label='Artist',
                  namespace='marcrel',
                  uniqueName='artist',
+                 valueType=Contributor,
                  isContributor=True),
 
         # AUT/Author: a person or organization chiefly responsible for the
@@ -753,6 +770,7 @@ class MetadataBase(base.Music21Object):
                  label='Author',
                  namespace='marcrel',
                  uniqueName='author',
+                 valueType=Contributor,
                  isContributor=True),
 
         # AQT/Author in quotations or text extracts: a person or organization
@@ -763,6 +781,7 @@ class MetadataBase(base.Music21Object):
                  label='Author in quotations or text extracts',
                  namespace='marcrel',
                  uniqueName='quotationsAuthor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # AFT/Author of afterword, colophon, etc.: a person or organization
@@ -773,6 +792,7 @@ class MetadataBase(base.Music21Object):
                  label='Author of afterword, colophon, etc.',
                  namespace='marcrel',
                  uniqueName='afterwordAuthor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # AUD/Author of dialog: a person or organization responsible for
@@ -783,6 +803,7 @@ class MetadataBase(base.Music21Object):
                  label='Author of dialog',
                  namespace='marcrel',
                  uniqueName='dialogAuthor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # AUI/Author of introduction, etc.:  a person or organization
@@ -793,6 +814,7 @@ class MetadataBase(base.Music21Object):
                  label='Author of introduction, etc.',
                  namespace='marcrel',
                  uniqueName='introductionAuthor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # AUS/Author of screenplay, etc.:  a person or organization responsible
@@ -802,6 +824,7 @@ class MetadataBase(base.Music21Object):
                  label='Author of screenplay, etc.',
                  namespace='marcrel',
                  uniqueName='screenplayAuthor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CLL/Calligrapher: a person or organization who writes in an artistic
@@ -811,6 +834,7 @@ class MetadataBase(base.Music21Object):
                  label='Calligrapher',
                  namespace='marcrel',
                  uniqueName='calligrapher',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CTG/Cartographer: a person or organization responsible for the
@@ -820,6 +844,7 @@ class MetadataBase(base.Music21Object):
                  label='Cartographer',
                  namespace='marcrel',
                  uniqueName='cartographer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CHR/Choreographer: a person or organization who composes or arranges
@@ -830,6 +855,7 @@ class MetadataBase(base.Music21Object):
                  label='Choreographer',
                  namespace='marcrel',
                  uniqueName='choreographer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CNG/Cinematographer: a person or organization who is in charge of
@@ -841,6 +867,7 @@ class MetadataBase(base.Music21Object):
                  label='Cinematographer',
                  namespace='marcrel',
                  uniqueName='cinematographer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CLB/Collaborator: a person or organization that takes a limited part
@@ -851,6 +878,7 @@ class MetadataBase(base.Music21Object):
                  label='Collaborator',
                  namespace='marcrel',
                  uniqueName='collaborator',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CLT/Collotyper: a person or organization responsible for the production
@@ -861,6 +889,7 @@ class MetadataBase(base.Music21Object):
                  label='Collotyper',
                  namespace='marcrel',
                  uniqueName='collotyper',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CMM/Commentator: a person or organization who provides interpretation,
@@ -871,6 +900,7 @@ class MetadataBase(base.Music21Object):
                  label='Commentator',
                  namespace='marcrel',
                  uniqueName='commentator',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CWT/Commentator for written text: a person or organization responsible
@@ -881,6 +911,7 @@ class MetadataBase(base.Music21Object):
                  label='Commentator for written text',
                  namespace='marcrel',
                  uniqueName='writtenCommentator',
+                 valueType=Contributor,
                  isContributor=True),
 
         # COM/Compiler: a person or organization who produces a work or
@@ -891,6 +922,7 @@ class MetadataBase(base.Music21Object):
                  label='Compiler',
                  namespace='marcrel',
                  uniqueName='compiler',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CMP/Composer: a person or organization who creates a musical work,
@@ -901,6 +933,7 @@ class MetadataBase(base.Music21Object):
                  namespace='marcrel',
                  m21WorkId='composer',
                  m21Abbrev='com',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CCP/Conceptor: a person or organization responsible for the original
@@ -911,6 +944,7 @@ class MetadataBase(base.Music21Object):
                  label='Conceptor',
                  namespace='marcrel',
                  uniqueName='conceptor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CND/Conductor: a person who directs a performing group (orchestra,
@@ -921,6 +955,7 @@ class MetadataBase(base.Music21Object):
                  label='Conductor',
                  namespace='marcrel',
                  uniqueName='conductor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CSL/Consultant: a person or organization relevant to a resource, who
@@ -931,6 +966,7 @@ class MetadataBase(base.Music21Object):
                  label='Consultant',
                  namespace='marcrel',
                  uniqueName='consultant',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CSP/Consultant to a project: a person or organization relevant to a
@@ -943,6 +979,7 @@ class MetadataBase(base.Music21Object):
                  label='Consultant to a project',
                  namespace='marcrel',
                  uniqueName='projectConsultant',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CTR/Contractor: a person or organization relevant to a resource, who
@@ -953,6 +990,7 @@ class MetadataBase(base.Music21Object):
                  label='Contractor',
                  namespace='marcrel',
                  uniqueName='contractor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CTB/Contributor: a person or organization one whose work has been
@@ -967,6 +1005,7 @@ class MetadataBase(base.Music21Object):
                  label='Contributor',
                  namespace='marcrel',
                  uniqueName='contributor', # more specific than 'genericContributor'
+                 valueType=Contributor,
                  isContributor=True),
 
         # CRP/Correspondent: a person or organization who was either
@@ -976,6 +1015,7 @@ class MetadataBase(base.Music21Object):
                  label='Correspondent',
                  namespace='marcrel',
                  uniqueName='correspondent',
+                 valueType=Contributor,
                  isContributor=True),
 
         # CST/Costume designer: a person or organization who designs
@@ -986,6 +1026,7 @@ class MetadataBase(base.Music21Object):
                  label='Costume designer',
                  namespace='marcrel',
                  uniqueName='costumeDesigner',
+                 valueType=Contributor,
                  isContributor=True),
 
 # We already have 'dcterm:creator', so we won't use the marcrel equivalent
@@ -996,8 +1037,9 @@ class MetadataBase(base.Music21Object):
 #                  label='Creator',
 #                  namespace='marcrel',
 #                  uniqueName='creator',
+#                  valueType=Contributor,
 #                  isContributor=True),
-#
+
         # CUR/Curator of an exhibition: a person or organization
         #   responsible for conceiving and organizing an exhibition.
         Property(abbrevCode='cur',
@@ -1005,6 +1047,7 @@ class MetadataBase(base.Music21Object):
                  label='Curator of an exhibition',
                  namespace='marcrel',
                  uniqueName='curator',
+                 valueType=Contributor,
                  isContributor=True),
 
         # DNC/Dancer: a person or organization who principally
@@ -1015,6 +1058,7 @@ class MetadataBase(base.Music21Object):
                  label='Dancer',
                  namespace='marcrel',
                  uniqueName='dancer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # DLN/Delineator: a person or organization executing technical
@@ -1024,6 +1068,7 @@ class MetadataBase(base.Music21Object):
                  label='Delineator',
                  namespace='marcrel',
                  uniqueName='delineator',
+                 valueType=Contributor,
                  isContributor=True),
 
         # DSR/Designer: a person or organization responsible for the design
@@ -1033,6 +1078,7 @@ class MetadataBase(base.Music21Object):
                  label='Designer',
                  namespace='marcrel',
                  uniqueName='designer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # DRT/Director: a person or organization who is responsible for the
@@ -1043,6 +1089,7 @@ class MetadataBase(base.Music21Object):
                  label='Director',
                  namespace='marcrel',
                  uniqueName='director',
+                 valueType=Contributor,
                  isContributor=True),
 
         # DIS/Dissertant: a person who presents a thesis for a university or
@@ -1052,6 +1099,7 @@ class MetadataBase(base.Music21Object):
                  label='Dissertant',
                  namespace='marcrel',
                  uniqueName='dissertant',
+                 valueType=Contributor,
                  isContributor=True),
 
         # DRM/Draftsman: a person or organization who prepares artistic or
@@ -1061,6 +1109,7 @@ class MetadataBase(base.Music21Object):
                  label='Draftsman',
                  namespace='marcrel',
                  uniqueName='draftsman',
+                 valueType=Contributor,
                  isContributor=True),
 
         # EDT/Editor: a person or organization who prepares for publication
@@ -1072,6 +1121,7 @@ class MetadataBase(base.Music21Object):
                  label='Editor',
                  namespace='marcrel',
                  uniqueName='editor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ENG/Engineer: a person or organization that is responsible for
@@ -1081,6 +1131,7 @@ class MetadataBase(base.Music21Object):
                  label='Engineer',
                  namespace='marcrel',
                  uniqueName='engineer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # EGR/Engraver: a person or organization who cuts letters, figures,
@@ -1090,6 +1141,7 @@ class MetadataBase(base.Music21Object):
                  label='Engraver',
                  namespace='marcrel',
                  uniqueName='engraver',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ETR/Etcher: a person or organization who produces text or images
@@ -1100,6 +1152,7 @@ class MetadataBase(base.Music21Object):
                  label='Etcher',
                  namespace='marcrel',
                  uniqueName='etcher',
+                 valueType=Contributor,
                  isContributor=True),
 
         # FAC/Facsimilist: a person or organization that executed the facsimile.
@@ -1108,6 +1161,7 @@ class MetadataBase(base.Music21Object):
                  label='Facsimilist',
                  namespace='marcrel',
                  uniqueName='facsimilist',
+                 valueType=Contributor,
                  isContributor=True),
 
         # FLM/Film editor: a person or organization who is an editor of a
@@ -1119,6 +1173,7 @@ class MetadataBase(base.Music21Object):
                  label='Film editor',
                  namespace='marcrel',
                  uniqueName='filmEditor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # FRG/Forger: a person or organization who makes or imitates something
@@ -1128,6 +1183,7 @@ class MetadataBase(base.Music21Object):
                  label='Forger',
                  namespace='marcrel',
                  uniqueName='forger',
+                 valueType=Contributor,
                  isContributor=True),
 
         # HST/Host: a person who is invited or regularly leads a program
@@ -1138,6 +1194,7 @@ class MetadataBase(base.Music21Object):
                  label='Host',
                  namespace='marcrel',
                  uniqueName='host',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ILU/Illuminator: a person or organization responsible for the
@@ -1149,6 +1206,7 @@ class MetadataBase(base.Music21Object):
                  label='Illuminator',
                  namespace='marcrel',
                  uniqueName='illuminator',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ILL/Illustrator: a person or organization who conceives, and
@@ -1159,6 +1217,7 @@ class MetadataBase(base.Music21Object):
                  label='Illustrator',
                  namespace='marcrel',
                  uniqueName='illustrator',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ITR/Instrumentalist: a person or organization who principally
@@ -1169,6 +1228,7 @@ class MetadataBase(base.Music21Object):
                  label='Instrumentalist',
                  namespace='marcrel',
                  uniqueName='instrumentalist',
+                 valueType=Contributor,
                  isContributor=True),
 
         # IVE/Interviewee: a person or organization who is interviewed
@@ -1179,6 +1239,7 @@ class MetadataBase(base.Music21Object):
                  label='Interviewee',
                  namespace='marcrel',
                  uniqueName='interviewee',
+                 valueType=Contributor,
                  isContributor=True),
 
         # IVR/Interviewer: a person or organization who acts as a reporter,
@@ -1189,6 +1250,7 @@ class MetadataBase(base.Music21Object):
                  label='Interviewer',
                  namespace='marcrel',
                  uniqueName='interviewer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # INV/Inventor: a person or organization who first produces a
@@ -1199,6 +1261,7 @@ class MetadataBase(base.Music21Object):
                  label='Inventor',
                  namespace='marcrel',
                  uniqueName='inventor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # LSA/Landscape architect: a person or organization whose work
@@ -1209,6 +1272,7 @@ class MetadataBase(base.Music21Object):
                  label='Landscape architect',
                  namespace='marcrel',
                  uniqueName='landscapeArchitect',
+                 valueType=Contributor,
                  isContributor=True),
 
         # LBT/Librettist: a person or organization who is a writer of
@@ -1219,6 +1283,7 @@ class MetadataBase(base.Music21Object):
                  namespace='marcrel',
                  m21WorkId='librettist',
                  m21Abbrev='lib',
+                 valueType=Contributor,
                  isContributor=True),
 
         # LGD/Lighting designer: a person or organization who designs the
@@ -1229,6 +1294,7 @@ class MetadataBase(base.Music21Object):
                  label='Lighting designer',
                  namespace='marcrel',
                  uniqueName='lightingDesigner',
+                 valueType=Contributor,
                  isContributor=True),
 
         # LTG/Lithographer: a person or organization who prepares the stone
@@ -1240,6 +1306,7 @@ class MetadataBase(base.Music21Object):
                  label='Lithographer',
                  namespace='marcrel',
                  uniqueName='lithographer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # LYR/Lyricist: a person or organization who is the a writer of the
@@ -1250,6 +1317,7 @@ class MetadataBase(base.Music21Object):
                  namespace='marcrel',
                  m21WorkId='lyricist',
                  m21Abbrev='lyr',
+                 valueType=Contributor,
                  isContributor=True),
 
         # MFR/Manufacturer: a person or organization that makes an
@@ -1261,6 +1329,7 @@ class MetadataBase(base.Music21Object):
                  label='Manufacturer',
                  namespace='marcrel',
                  uniqueName='manufacturer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # MTE/Metal-engraver: a person or organization responsible for
@@ -1271,6 +1340,7 @@ class MetadataBase(base.Music21Object):
                  label='Metal-engraver',
                  namespace='marcrel',
                  uniqueName='metalEngraver',
+                 valueType=Contributor,
                  isContributor=True),
 
         # MOD/Moderator: a person who leads a program (often broadcast)
@@ -1281,6 +1351,7 @@ class MetadataBase(base.Music21Object):
                  label='Moderator',
                  namespace='marcrel',
                  uniqueName='moderator',
+                 valueType=Contributor,
                  isContributor=True),
 
         # MUS/Musician: a person or organization who performs music or
@@ -1291,6 +1362,7 @@ class MetadataBase(base.Music21Object):
                  label='Musician',
                  namespace='marcrel',
                  uniqueName='musician',
+                 valueType=Contributor,
                  isContributor=True),
 
         # NRT/Narrator: a person who is a speaker relating the particulars
@@ -1300,6 +1372,7 @@ class MetadataBase(base.Music21Object):
                  label='Narrator',
                  namespace='marcrel',
                  uniqueName='narrator',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ORM/Organizer of meeting: a person or organization responsible
@@ -1310,6 +1383,7 @@ class MetadataBase(base.Music21Object):
                  label='Organizer of meeting',
                  namespace='marcrel',
                  uniqueName='meetingOrganizer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # ORG/Originator: a person or organization performing the work,
@@ -1322,6 +1396,7 @@ class MetadataBase(base.Music21Object):
                  label='Originator',
                  namespace='marcrel',
                  uniqueName='originator',
+                 valueType=Contributor,
                  isContributor=True),
 
         # PRF/Performer: a person or organization who exhibits musical
@@ -1335,6 +1410,7 @@ class MetadataBase(base.Music21Object):
                  label='Performer',
                  namespace='marcrel',
                  uniqueName='performer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # PHT/Photographer: a person or organization responsible for
@@ -1345,6 +1421,7 @@ class MetadataBase(base.Music21Object):
                  label='Photographer',
                  namespace='marcrel',
                  uniqueName='photographer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # PLT/Platemaker: a person or organization responsible for the
@@ -1355,6 +1432,7 @@ class MetadataBase(base.Music21Object):
                  label='Platemaker',
                  namespace='marcrel',
                  uniqueName='platemaker',
+                 valueType=Contributor,
                  isContributor=True),
 
         # PRM/Printmaker: a person or organization who makes a relief,
@@ -1364,6 +1442,7 @@ class MetadataBase(base.Music21Object):
                  label='Printmaker',
                  namespace='marcrel',
                  uniqueName='printmaker',
+                 valueType=Contributor,
                  isContributor=True),
 
         # PRO/Producer: a person or organization responsible for the
@@ -1375,6 +1454,7 @@ class MetadataBase(base.Music21Object):
                  label='Producer',
                  namespace='marcrel',
                  uniqueName='producer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # PRD/Production personnel: a person or organization associated
@@ -1385,6 +1465,7 @@ class MetadataBase(base.Music21Object):
                  label='Production personnel',
                  namespace='marcrel',
                  uniqueName='productionPersonnel',
+                 valueType=Contributor,
                  isContributor=True),
 
         # PRG/Programmer: a person or organization responsible for the
@@ -1396,6 +1477,7 @@ class MetadataBase(base.Music21Object):
                  label='Programmer',
                  namespace='marcrel',
                  uniqueName='programmer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # PPT/Puppeteer: a person or organization who manipulates, controls,
@@ -1406,6 +1488,7 @@ class MetadataBase(base.Music21Object):
                  label='Puppeteer',
                  namespace='marcrel',
                  uniqueName='puppeteer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # RCE/Recording engineer: a person or organization who supervises
@@ -1415,6 +1498,7 @@ class MetadataBase(base.Music21Object):
                  label='Recording engineer',
                  namespace='marcrel',
                  uniqueName='recordingEngineer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # REN/Renderer: a person or organization who prepares drawings
@@ -1426,6 +1510,7 @@ class MetadataBase(base.Music21Object):
                  label='Renderer',
                  namespace='marcrel',
                  uniqueName='renderer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # RPT/Reporter: a person or organization who writes or presents
@@ -1435,6 +1520,7 @@ class MetadataBase(base.Music21Object):
                  label='Reporter',
                  namespace='marcrel',
                  uniqueName='reporter',
+                 valueType=Contributor,
                  isContributor=True),
 
         # RTH/Research team head: a person who directed or managed a
@@ -1444,6 +1530,7 @@ class MetadataBase(base.Music21Object):
                  label='Research team head',
                  namespace='marcrel',
                  uniqueName='researchTeamHead',
+                 valueType=Contributor,
                  isContributor=True),
 
         # RTM/Research team member:  a person who participated in a
@@ -1454,6 +1541,7 @@ class MetadataBase(base.Music21Object):
                  label='Research team member',
                  namespace='marcrel',
                  uniqueName='researchTeamMember',
+                 valueType=Contributor,
                  isContributor=True),
 
         # RES/Researcher: a person or organization responsible for
@@ -1463,6 +1551,7 @@ class MetadataBase(base.Music21Object):
                  label='Researcher',
                  namespace='marcrel',
                  uniqueName='researcher',
+                 valueType=Contributor,
                  isContributor=True),
 
         # RPY/Responsible party: a person or organization legally
@@ -1472,6 +1561,7 @@ class MetadataBase(base.Music21Object):
                  label='Responsible party',
                  namespace='marcrel',
                  uniqueName='responsibleParty',
+                 valueType=Contributor,
                  isContributor=True),
 
         # RSG/Restager: a person or organization, other than the
@@ -1483,6 +1573,7 @@ class MetadataBase(base.Music21Object):
                  label='Restager',
                  namespace='marcrel',
                  uniqueName='restager',
+                 valueType=Contributor,
                  isContributor=True),
 
         # REV/Reviewer:  a person or organization responsible for
@@ -1492,6 +1583,7 @@ class MetadataBase(base.Music21Object):
                  label='Reviewer',
                  namespace='marcrel',
                  uniqueName='reviewer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # SCE/Scenarist: a person or organization who is the author
@@ -1501,6 +1593,7 @@ class MetadataBase(base.Music21Object):
                  label='Scenarist',
                  namespace='marcrel',
                  uniqueName='scenarist',
+                 valueType=Contributor,
                  isContributor=True),
 
         # SAD/Scientific advisor: a person or organization who brings
@@ -1512,6 +1605,7 @@ class MetadataBase(base.Music21Object):
                  label='Scientific advisor',
                  namespace='marcrel',
                  uniqueName='scientificAdvisor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # SCR/Scribe: a person who is an amanuensis and for a writer of
@@ -1522,6 +1616,7 @@ class MetadataBase(base.Music21Object):
                  label='Scribe',
                  namespace='marcrel',
                  uniqueName='scribe',
+                 valueType=Contributor,
                  isContributor=True),
 
         # SCL/Sculptor: a person or organization who models or carves
@@ -1531,6 +1626,7 @@ class MetadataBase(base.Music21Object):
                  label='Sculptor',
                  namespace='marcrel',
                  uniqueName='sculptor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # SEC/Secretary: a person or organization who is a recorder,
@@ -1541,6 +1637,7 @@ class MetadataBase(base.Music21Object):
                  label='Secretary',
                  namespace='marcrel',
                  uniqueName='secretary',
+                 valueType=Contributor,
                  isContributor=True),
 
         # STD/Set designer:  a person or organization who translates the
@@ -1553,6 +1650,7 @@ class MetadataBase(base.Music21Object):
                  label='Set designer',
                  namespace='marcrel',
                  uniqueName='setDesigner',
+                 valueType=Contributor,
                  isContributor=True),
 
         # SNG/Singer: a person or organization who uses his/her/their voice
@@ -1563,6 +1661,7 @@ class MetadataBase(base.Music21Object):
                  label='Singer',
                  namespace='marcrel',
                  uniqueName='singer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # SPK/Speaker: a person who participates in a program (often broadcast)
@@ -1573,6 +1672,7 @@ class MetadataBase(base.Music21Object):
                  label='Speaker',
                  namespace='marcrel',
                  uniqueName='speaker',
+                 valueType=Contributor,
                  isContributor=True),
 
         # STN/Standards body: an organization responsible for the development
@@ -1582,6 +1682,7 @@ class MetadataBase(base.Music21Object):
                  label='Standards body',
                  namespace='marcrel',
                  uniqueName='standardsBody',
+                 valueType=Contributor,
                  isContributor=True),
 
         # STL/Storyteller: a person relaying a story with creative and/or
@@ -1591,6 +1692,7 @@ class MetadataBase(base.Music21Object):
                  label='Storyteller',
                  namespace='marcrel',
                  uniqueName='storyteller',
+                 valueType=Contributor,
                  isContributor=True),
 
         # SRV/Surveyor: a person or organization who does measurements of
@@ -1600,6 +1702,7 @@ class MetadataBase(base.Music21Object):
                  label='Surveyor',
                  namespace='marcrel',
                  uniqueName='surveyor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # TCH/Teacher: a person who, in the context of a resource, gives
@@ -1610,6 +1713,7 @@ class MetadataBase(base.Music21Object):
                  label='Teacher',
                  namespace='marcrel',
                  uniqueName='teacher',
+                 valueType=Contributor,
                  isContributor=True),
 
         # TRC/Transcriber: a person who prepares a handwritten or typewritten copy
@@ -1620,6 +1724,7 @@ class MetadataBase(base.Music21Object):
                  label='Transcriber',
                  namespace='marcrel',
                  uniqueName='transcriber',
+                 valueType=Contributor,
                  isContributor=True),
 
         # TRL/Translator: a person or organization who renders a text from one
@@ -1631,6 +1736,7 @@ class MetadataBase(base.Music21Object):
                  namespace='marcrel',
                  m21WorkId='translator',
                  m21Abbrev='trn',
+                 valueType=Contributor,
                  isContributor=True),
 
         # VDG/Videographer: a person or organization in charge of a video production,
@@ -1642,6 +1748,7 @@ class MetadataBase(base.Music21Object):
                  label='Videographer',
                  namespace='marcrel',
                  uniqueName='videographer',
+                 valueType=Contributor,
                  isContributor=True),
 
         # VOC/Vocalist: a person or organization who principally exhibits singing
@@ -1651,6 +1758,7 @@ class MetadataBase(base.Music21Object):
                  label='Vocalist',
                  namespace='marcrel',
                  uniqueName='vocalist',
+                 valueType=Contributor,
                  isContributor=True),
 
         # WDE/Wood-engraver: a person or organization who makes prints by cutting
@@ -1660,6 +1768,7 @@ class MetadataBase(base.Music21Object):
                  label='Wood-engraver',
                  namespace='marcrel',
                  uniqueName='woodEngraver',
+                 valueType=Contributor,
                  isContributor=True),
 
         # WDC/Woodcutter: a person or organization who makes prints by cutting the
@@ -1669,6 +1778,7 @@ class MetadataBase(base.Music21Object):
                  label='Woodcutter',
                  namespace='marcrel',
                  uniqueName='woodCutter',
+                 valueType=Contributor,
                  isContributor=True),
 
         # WAM/Writer of accompanying material: a person or organization who writes
@@ -1679,6 +1789,7 @@ class MetadataBase(base.Music21Object):
                  label='Writer of accompanying material',
                  namespace='marcrel',
                  uniqueName='accompanyingMaterialWriter',
+                 valueType=Contributor,
                  isContributor=True),
 
         # The following marcrel property term refines dcterm:publisher
@@ -1690,6 +1801,7 @@ class MetadataBase(base.Music21Object):
                  label='Distributor',
                  namespace='marcrel',
                  uniqueName='distributor',
+                 valueType=Contributor,
                  isContributor=True),
 
         # The following music21 property terms have historically been supported
@@ -1831,6 +1943,7 @@ class MetadataBase(base.Music21Object):
                  name='attributedComposer',
                  label='Attributed Composer',
                  namespace='music21',
+                 valueType=Contributor,
                  isContributor=True),
 
         # suspectedComposer: suspected composer
@@ -1838,6 +1951,7 @@ class MetadataBase(base.Music21Object):
                  name='suspectedComposer',
                  label='Suspected Composer',
                  namespace='music21',
+                 valueType=Contributor,
                  isContributor=True),
 
         # composerAlias: composer's abbreviated, alias, or stage name
@@ -1845,6 +1959,7 @@ class MetadataBase(base.Music21Object):
                  name='composerAlias',
                  label='Composer Alias',
                  namespace='music21',
+                 valueType=Contributor,
                  isContributor=True),
 
         # composerCorporate: composer's corporate name
@@ -1853,6 +1968,7 @@ class MetadataBase(base.Music21Object):
                  label='Composer Corporate Name',
                  uniqueName='composerCorporateName',
                  namespace='music21',
+                 valueType=Contributor,
                  isContributor=True),
 
         # orchestrator: orchestrator
@@ -1860,10 +1976,12 @@ class MetadataBase(base.Music21Object):
                  name='orchestrator',
                  label='Orchestrator',
                  namespace='music21',
+                 valueType=Contributor,
                  isContributor=True),
     )
 
     NSKEY2STDPROPERTY: dict = {f'{x.namespace}:{x.name}':x for x in STDPROPERTIES}
+    NSKEY2VALUETYPE: dict = {f'{x.namespace}:{x.name}':x.valueType for x in STDPROPERTIES}
 
     M21ABBREV2NSKEY: dict = {x.m21Abbrev if x.m21Abbrev
                                 else x.abbrevCode if x.namespace=='music21'
@@ -1906,8 +2024,13 @@ class MetadataBase(base.Music21Object):
 
     # if namespace is provided, key should be name or abbrevCode (within that namespace)
     # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
+    # Caller is required to check backward compatibility (either before or after); this
+    # routine is general.
     @staticmethod
-    def nsKey(key: str, namespace: Optional[str] = None) -> str:
+    def nsKey(key: str, namespace: Optional[str] = None, personal: bool = False) -> str:
+        if personal:
+            return key
+
         if namespace:
             # check if key is an abbreviation in this namespace
             nsKeyForAbbrev: str = MetadataBase.NAMESPACEABBREV2NSKEY.get((namespace, key), None)
@@ -1921,8 +2044,7 @@ class MetadataBase(base.Music21Object):
         if nsKeyForUniqueName:
             return nsKeyForUniqueName
 
-        # Key might already be of the form 'namespace:name',
-        # or it might be a personal name, so just return it.
+        # Key might already be of the form 'namespace:name', just return it
         return key
 
     @staticmethod
@@ -1936,14 +2058,31 @@ class MetadataBase(base.Music21Object):
         return MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
 
     @staticmethod
-    def isContributorNSKey(nsKey: str) -> bool:
+    def _isContributorNSKey(nsKey: str) -> bool:
         prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
         if prop is None:
             return False
+
+        return prop.isContributor
+
+    @staticmethod
+    def _isBackwardCompatibleContributorNSKey(nsKey: str) -> bool:
+        prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
+        if prop is None:
+            return False
+
         return prop.isContributor and (prop.namespace == 'music21' or prop.m21WorkId is not None)
 
     @staticmethod
-    def nsKeyToContributorRole(nsKey: str) -> str:
+    def _isBackwardCompatibleNSKey(nsKey: str) -> bool:
+        prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
+        if prop is None:
+            return False
+
+        return prop.namespace == 'music21' or prop.m21WorkId is not None
+
+    @staticmethod
+    def _nsKeyToContributorRole(nsKey: str) -> str:
         prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
         if prop is None:
             return None
@@ -1958,14 +2097,39 @@ class MetadataBase(base.Music21Object):
 
         # it's a small-c contributor that's not in the music21 namespace
         if prop.m21WorkId:
-            # it maps to a big-C Contributor role, which can be found in prop.m21WorkId.
+            # it maps to a backward compatible big-C Contributor role, which can be
+            # found in prop.m21WorkId.
             return prop.m21WorkId
 
-        # it's a small-c contributor that doesn't map to a big-C Contributor role
+        # it's a small-c contributor that doesn't map to a backward compatible
+        # big-C Contributor role, but since we're not trying to be backward
+        # compatible, we'll take these, too.
+        return prop.uniqueName
+
+    @staticmethod
+    def _nsKeyToBackwardCompatibleContributorRole(nsKey: str) -> str:
+        prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
+        if prop is None:
+            return None
+        if not prop.isContributor:
+            return None
+
+        # it's a small-c contributor
+        if prop.namespace == 'music21':
+            # it's in the music21 namespace, so it's a big-C Contributor,
+            # and Contributor.role can be found in prop.name
+            return prop.name
+
+        # it's a small-c contributor that's not in the music21 namespace
+        if prop.m21WorkId:
+            # it maps to a backward compatible big-C Contributor role, which can be
+            # found in prop.m21WorkId.
+            return prop.m21WorkId
+
         return None
 
     @staticmethod
-    def contributorRoleToNSKey(role: str) -> str:
+    def _backwardCompatibleContributorRoleToNSKey(role: str) -> str:
         nsKey: str = MetadataBase.M21WORKID2NSKEY.get(role, None)
         if nsKey is None:
             return None
@@ -1983,20 +2147,56 @@ class MetadataBase(base.Music21Object):
     # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
     def _getItem(self,
                  key: str,
-                 namespace: Optional[str] = None) -> Optional[Union[Text, DateSingle, dict]]:
-        nsKey: str = self.nsKey(key, namespace)
+                 namespace: Optional[str] = None,
+                 personal: bool = False) -> Optional[Any]:
+        nsKey: str = self.nsKey(key, namespace, personal)
         return self._metadata.get(nsKey, None)
+
+    def _convertValue(self, nsKey: str, value: Any) -> Any:
+        # convert to the appropriate valueType
+        valueType: Type = self.NSKEY2VALUETYPE.get(nsKey, None)
+        if valueType is None:
+            # not a standard property, convert to Text by default
+            valueType = Text
+
+        if isinstance(value, valueType):
+            # already of appropriate type, no conversion necessary
+            return value
+
+        if valueType is Text:
+            if isinstance(value, str):
+                return Text(value)
+            return Text(str(value))
+        elif valueType is DateSingle:
+            if isinstance(value, Text):
+                value = str(value)
+            if isinstance(value, (str, datetime.datetime, Date)):
+                # If you want other DateSingle-derived types (DateRelative,
+                # DateBetween, or DateSelection), you have to create those
+                # yourself before adding/setting them.
+                return DateSingle(value)
+            raise exceptions21.MetadataException(
+                    f'invalid type for DateSingle: {type(value).__name__}')
+        elif valueType is Contributor:
+            if isinstance(value, str):
+                value = Text(value)
+            if isinstance(value, Text):
+                return Contributor(role=self._nsKeyToContributorRole(nsKey), name=value)
+            raise exceptions21.MetadataException(
+                    f'invalid type for Contributor: {type(value).__name__}')
+
+        raise exceptions21.MetadataException(
+                'internal error: invalid valueType')
 
     # if namespace is provided, key should be name or abbrevCode (within that namespace)
     # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
     def _addItem(self,
                  key: str,
                  value: Any,
-                 namespace: Optional[str] = None):
-        if isinstance(value, str):
-            value = Text(value)
-
-        nsKey: str = self.nsKey(key, namespace)
+                 namespace: Optional[str] = None,
+                 personal: bool = False):
+        nsKey: str = self.nsKey(key, namespace, personal)
+        value = self._convertValue(nsKey, value)
 
         prevValue: Optional[Any] = self._metadata.get(nsKey, None)
         if prevValue is None:
@@ -2014,13 +2214,14 @@ class MetadataBase(base.Music21Object):
     def _setItem(self,
                  key: str,
                  value: Any,
-                 namespace: Optional[str] = None):
-        nsKey: str = self.nsKey(key, namespace)
+                 namespace: Optional[str] = None,
+                 personal: bool = False):
+        nsKey: str = self.nsKey(key, namespace, personal)
         self._metadata.pop(nsKey, None)
-        self._addItem(key, value, namespace)
+        self._addItem(nsKey, value)
 
-    def _addContributor(self, c: Contributor):
-        nsKey: str = self.contributorRoleToNSKey(c.role)
+    def _addBackwardCompatibleContributor(self, c: Contributor):
+        nsKey: str = self._backwardCompatibleContributorRoleToNSKey(c.role)
         if not nsKey:
             return
         self._addItem(nsKey, c)
@@ -2030,6 +2231,24 @@ class MetadataBase(base.Music21Object):
 
         for nsKey, value in self._metadata.items():
             if not self.isContributorNSKey(nsKey):
+                continue
+
+            if not value:
+                continue
+
+            if isinstance(value, list):
+                for v in value:
+                    allOut.append( (nsKey, v) )
+            else:
+                allOut.append( (nsKey, value) )
+
+        return allOut
+
+    def _getBackwardCompatibleContributorItems(self) -> List[Tuple[str, Contributor]]:
+        allOut: List[Tuple[str, Contributor]] = []
+
+        for nsKey, value in self._metadata.items():
+            if not self._isBackwardCompatibleContributorNSKey(nsKey):
                 continue
 
             if not value:
@@ -2204,12 +2423,12 @@ class Metadata(MetadataBase):
             return None
         return str(item)
 
-    def _addBackwardCompatibleItem(self, workId: str, value: Union[str, Text, DateSingle]):
+    def _addBackwardCompatibleItem(self, workId: str, value: Any):
         nsKey: str = MetadataBase.M21WORKID2NSKEY.get(workId, None)
         if nsKey is not None:
             self._addItem(nsKey, value)
 
-    def _setBackwardCompatibleItem(self, workId: str, value: Union[str, Text, DateSingle]):
+    def _setBackwardCompatibleItem(self, workId: str, value: Any):
         nsKey: str = MetadataBase.M21WORKID2NSKEY.get(workId, None)
         if nsKey is not None:
             self._setItem(nsKey, value)
@@ -2249,8 +2468,8 @@ class Metadata(MetadataBase):
         # were in music21 forks.  So I think we're OK making this a read-only
         # property that we generate on the fly.
         output: List[Contributor] = []
-        for nsKey, value in self._getAllContributorItems():
-            assert(MetadataBase.nsKeyToContributorRole(nsKey) == value.role)
+        for nsKey, value in self._getBackwardCompatibleContributorItems():
+            assert(self._nsKeyToBackwardCompatibleContributorRole(nsKey) == value.role)
             output.append(value)
         return output
 
@@ -2331,30 +2550,21 @@ class Metadata(MetadataBase):
         r'''
         Utility attribute access for attributes that do not yet have property
         definitions.
-        @@@ NEEDS WORK (not needed for backward compatibility, as long as we
-        we have all the property definitions, but maybe this is where we give
-        uniqueNames to all the STDPROPERTIES, and instead of adding 100 new
-        properties, just implement this properly)  Do we also need __setattr__?
-        I think I remember some big issues trying to implement that.  Maybe we
-        just lose this altogether and just define uniquenames that can be used
-        without namespaces via getItem, setItem, addItem.
         '''
-        raise AttributeError(f'why are you calling __getattr__?: {name}')
-#         match = None
-#         for abbreviation, workId in self.workIdAbbreviationDict.items():
-#             # for id in WORK_IDS:
-#             # abbreviation = workIdToAbbreviation(id)
-#             if name == workId:
-#                 match = workId
-#                 break
-#             elif name == abbreviation:
-#                 match = workId
-#                 break
-#         if match is None:
-#             raise AttributeError(f'object has no attribute: {name}')
-#         result = self._workIds[match]
-#         # always return string representation for now
-#         return str(result)
+        match = None
+        for abbreviation, workId in self.workIdAbbreviationDict.items():
+            if name == workId:
+                match = workId
+                break
+            elif name == abbreviation:
+                match = workId
+                break
+        if match is None:
+            raise AttributeError(f'object has no attribute: {name}')
+
+        result = self._getBackwardCompatibleItem(match)
+        # always return string representation for now
+        return str(result) # yes, clients are expecting a lot of 'None' strings
 
     # PUBLIC METHODS #
 
@@ -2417,7 +2627,7 @@ class Metadata(MetadataBase):
         if not isinstance(c, Contributor):
             raise exceptions21.MetadataException(
                 f'supplied object is not a Contributor: {c}')
-        self._addContributor(c)
+        self._addBackwardCompatibleContributor(c)
 
     def getContributorsByRole(self, value):
         r'''
@@ -3058,34 +3268,25 @@ class ExtendedMetadata(Metadata):
         self._setItem(key, value, namespace)
 
     def getPersonalItem(self, key: str) -> Any:
-        # uniqueNames and standard property nsKeys are reserved.
+        # Standard property nsKeys are reserved.
         # You can use nonstandard nsKeys like 'humdrum:XXX' though.
         if key in MetadataBase.NSKEY2STDPROPERTY:
             return None
-# TODO: implement uniqueNames for all std properties
-#         if key in MetadataBase.UNIQUENAME2STDPROPERTY:
-#             return None
-        return self._getItem(key, namespace=None)
+        return self._getItem(key, namespace=None, personal=True)
 
     def addPersonalItem(self, key: str, value: Union[Text, DateSingle, str, dict]):
-        # uniqueNames and standard property nsKeys are reserved.
+        # Standard property nsKeys are reserved.
         # You can use nonstandard nsKeys like 'humdrum:XXX' though.
         if key in MetadataBase.NSKEY2STDPROPERTY:
             raise KeyError
-# TODO: implement uniqueNames for all std properties
-#         if key in MetadataBase.UNIQUENAME2STDPROPERTY:
-#             raise KeyError
-        self._addItem(key, value, namespace=None)
+        self._addItem(key, value, namespace=None, personal=True)
 
     def setPersonalItem(self, key: str, value: Union[Text, DateSingle, str, dict]):
-        # uniqueNames and standard property nsKeys are reserved.
+        # Standard property nsKeys are reserved.
         # You can use nonstandard nsKeys like 'humdrum:XXX' though.
         if key in MetadataBase.NSKEY2STDPROPERTY:
             raise KeyError
-# TODO: implement uniqueNames for all std properties
-#         if key in MetadataBase.UNIQUENAME2STDPROPERTY:
-#             raise KeyError
-        self._setItem(key, value, namespace=None)
+        self._setItem(key, value, namespace=None, personal=True)
 
     # This is the extended version of all().  The tuple's key is an nsKey (but of course
     # there may be no namespace for personal metadata items).
