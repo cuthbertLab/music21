@@ -4243,13 +4243,12 @@ class MeasureParser(XMLParserBase):
         if mxNotations is not None:
             mxTuplets = mxNotations.findall('tuplet')
             for mxTuplet in mxTuplets:
-                # TODO: combine start + stop into startStop.
-                t.type = mxTuplet.get('type')  # required
+                this_tuplet_type = mxTuplet.get('type')  # required
                 tupletNumberStr = mxTuplet.get('number')  # str '1' to '6' or None
                 # no tuplet number is equal to 1
                 tupletIndex = int(tupletNumberStr) if tupletNumberStr is not None else 1
 
-                if t.type == 'stop':
+                if this_tuplet_type == 'stop':
                     if self.activeTuplets[tupletIndex] is not None:
                         activeT = self.activeTuplets[tupletIndex]
                         if activeT in returnTuplets:
@@ -4285,6 +4284,9 @@ class MeasureParser(XMLParserBase):
                         durType = musicXMLTypeToType(xmlNormalType)
                         dots = len(mxNormalType.findall('tuplet-dot'))
                         t.durationNormal = duration.durationTupleFromTypeDots(durType, dots)
+
+                # TODO: combine start + stop into startStop.
+                t.type = this_tuplet_type
 
                 bracketMaybe = mxTuplet.get('bracket')
                 if bracketMaybe is not None:
@@ -6866,6 +6868,16 @@ class Test(unittest.TestCase):
                              expected_tuplet_repr_7_to_12)
         self.assertEqual(repr(nList[12].duration.tuplets),
                          '(<music21.duration.Tuplet 3/2/eighth>,)')
+
+        tuplet_pairs_per_note = []
+        for n in nList[1:6]:
+            tuplet_pairs_per_note.append((n.duration.tuplets[0].type, n.duration.tuplets[1].type))
+        self.assertEqual(
+            # https://github.com/cuthbertLab/music21/issues/1263
+            # First element was (None, None)
+            tuplet_pairs_per_note,
+            [(None, 'start'), (None, None), (None, None), (None, None), ('stop', 'stop')]
+        )
 
     def testImpliedTuplet(self):
         from music21 import converter
