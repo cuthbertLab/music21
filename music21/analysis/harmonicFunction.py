@@ -272,12 +272,19 @@ class Test(unittest.TestCase):
         '''
         Test that all the entries in the functionFigureTuples
         (both major and minor) are represented in the HarmonicFunction enum.
+
+        Also tests one fake (invalid) function label.
         '''
 
+        # All and only valid
         for thisHarmonicFunction in functionFigureTuplesMajor:
             HarmonicFunction(thisHarmonicFunction)
         for thisHarmonicFunction in functionFigureTuplesMinor:
             HarmonicFunction(thisHarmonicFunction)
+
+        # Invalid
+        fakeExample = 'TPG'
+        self.assertRaises(ValueError, HarmonicFunction, fakeExample)
 
     def testFunctionToRoman(self):
         self.assertEqual(functionToRoman('T').figure, 'I')
