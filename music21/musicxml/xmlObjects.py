@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import re
@@ -43,7 +43,7 @@ ARTICULATION_MARKS = OrderedDict(
      ('other-articulation', articulations.Articulation),
      ])
 
-# A reversed dictionary mapping classes to names, excepting Articulation
+# A reversed dictionary mapping class to name, excepting Articulation
 # which does not get mapped, and Staccato which must come after Staccatissimo,
 # and Accent which must come after StrongAccent
 ARTICULATION_MARKS_REV = OrderedDict([(v, k) for k, v in ARTICULATION_MARKS.items()])
@@ -67,7 +67,7 @@ TECHNICAL_MARKS = OrderedDict([('up-bow', articulations.UpBow),
                                ('string', articulations.StringIndication),
                                ('hammer-on', articulations.HammerOn),
                                ('pull-off', articulations.PullOff),
-                               # bend not implemented because it needs many sub components
+                               # bend not implemented because it needs many subcomponents
                                # ('bend', articulations.FretBend),
                                ('tap', articulations.FretTap),
                                ('fret', articulations.FretIndication),
