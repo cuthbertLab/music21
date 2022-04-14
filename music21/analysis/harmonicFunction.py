@@ -22,91 +22,97 @@ _MOD = 'analysis.harmonicFunction'
 environLocal = environment.Environment(_MOD)
 
 
-class FUNKTION(common.enums.StrEnum):
+class HarmonicFunction(common.enums.StrEnum):
 
-    TONIKA_DUR = 'T'
-    TONIKA_DUR_PARALLELKLANG_MOLL = 'Tp'
-    TONIKA_DUR_GEGENKLANG_MOLL = 'Tg'
+    TONIC_MAJOR = 'T'
+    TONIC_MAJOR_PARALLELKLANG_MINOR = 'Tp'
+    TONIC_MAJOR_GEGENKLANG_MINOR = 'Tg'
 
-    TONIKA_MOLL = 't'
-    TONIKA_MOLL_PARALLELKLANG_DUR = 'tP'
-    TONIKA_MOLL_GEGENKLANG_DUR = 'tG'
+    TONIC_MINOR = 't'
+    TONIC_MINOR_PARALLELKLANG_MAJOR = 'tP'
+    TONIC_MINOR_GEGENKLANG_MAJOR = 'tG'
 
-    SUBDOMINANT_DUR = 'S'
-    SUBDOMINANT_DUR_PARALLELKLANG_MOLL = 'Sp'
-    SUBDOMINANT_DUR_GEGENKLANG_MOLL = 'Sg'
+    SUBDOMINANT_MAJOR = 'S'
+    SUBDOMINANT_MAJOR_PARALLELKLANG_MINOR = 'Sp'
+    SUBDOMINANT_MAJOR_GEGENKLANG_MINOR = 'Sg'
 
-    SUBDOMINANT_MOLL = 's'
-    SUBDOMINANT_MOLL_PARALLELKLANG_DUR = 'sP'
-    SUBDOMINANT_MOLL_GEGENKLANG_DUR = 'sG'
+    SUBDOMINANT_MINOR = 's'
+    SUBDOMINANT_MINOR_PARALLELKLANG_MAJOR = 'sP'
+    SUBDOMINANT_MINOR_GEGENKLANG_MAJOR = 'sG'
 
-    DOMINANT_DUR = 'D'
-    DOMINANT_DUR_PARALLELKLANG_MOLL = 'Dp'
-    DOMINANT_DUR_GEGENKLANG_MOLL = 'Dg'
+    DOMINANT_MAJOR = 'D'
+    DOMINANT_MAJOR_PARALLELKLANG_MINOR = 'Dp'
+    DOMINANT_MAJOR_GEGENKLANG_MINOR = 'Dg'
 
-    DOMINANT_MOLL = 'd'
-    DOMINANT_MOLL_PARALLELKLANG_DUR = 'dP'
-    DOMINANT_MOLL_GEGENKLANG_DUR = 'dG'
-
-
-_functionFigureTuplesKeyNeutral = (
-
-    ('T', 'I'),
-    ('t', 'i'),
-
-    ('sG', 'bII'),
-
-    ('Sp', 'ii'),
-
-    ('S', 'IV'),
-    ('s', 'iv'),
-
-    ('D', 'V'),
-    ('d', 'v'),
-
-    ('Tp', 'vi'),  # Note first: Tp generally preferred over Sg
-    ('Sg', 'vi'),
-
-    ('Dg', 'bvii'),
-
-)
-
-functionFigureTuplesMajor = (
-
-    ('tP', 'bIII'),  # Note first: tP generally preferred over dG
-    ('dG', 'bIII'),
-
-    ('Dp', 'iii'),  # Note first: Dp generally preferred over Tg
-    ('Tg', 'iii'),
-
-    ('sP', 'bVI'),  # Note first: sP generally preferred over tG
-    ('tG', 'bVI'),
-
-    ('dP', 'bVII'),
-
-)
-
-functionFigureTuplesMajor += _functionFigureTuplesKeyNeutral
-
-functionFigureTuplesMinor = (
-
-    ('tP', 'III'),  # Note first: tP generally preferred over dG
-    ('dG', 'III'),
-
-    ('Dp', '#iii'),  # Note first: Dp generally preferred over Tg
-    ('Tg', '#iii'),
-
-    ('sP', 'VI'),  # Note first: sP generally preferred over tG
-    ('tG', 'VI'),
-
-    ('dP', 'VII'),
-
-)
-
-functionFigureTuplesMinor += _functionFigureTuplesKeyNeutral
+    DOMINANT_MINOR = 'd'
+    DOMINANT_MINOR_PARALLELKLANG_MAJOR = 'dP'
+    DOMINANT_MINOR_GEGENKLANG_MAJOR = 'dG'
 
 
-def functionToRoman(harmonicFunction: FUNKTION,
+_functionFigureTuplesKeyNeutral = {
+
+    HarmonicFunction.TONIC_MAJOR: 'I',  # 'T'
+    HarmonicFunction.TONIC_MINOR: 'i',  # 't'
+
+    HarmonicFunction.SUBDOMINANT_MINOR_GEGENKLANG_MAJOR: 'bII',  # 'sG'
+
+    HarmonicFunction.SUBDOMINANT_MAJOR_PARALLELKLANG_MINOR: 'ii',  # 'Sp'
+
+    HarmonicFunction.SUBDOMINANT_MAJOR: 'IV',  # 'S'
+    HarmonicFunction.SUBDOMINANT_MINOR: 'iv',  # 's'
+
+    HarmonicFunction.DOMINANT_MAJOR: 'V',  # 'D'
+    HarmonicFunction.DOMINANT_MINOR: 'v',  # 'd'
+
+    HarmonicFunction.TONIC_MAJOR_PARALLELKLANG_MINOR: 'vi',  # 'Tp'
+    HarmonicFunction.SUBDOMINANT_MAJOR_GEGENKLANG_MINOR: 'vi',  # 'Sg'
+
+    HarmonicFunction.DOMINANT_MAJOR_GEGENKLANG_MINOR: 'bvii',  # 'Dg'
+
+}
+
+functionFigureTuplesMajor = {
+
+    HarmonicFunction.TONIC_MINOR_PARALLELKLANG_MAJOR: 'bIII',  # 'tP', note first
+    HarmonicFunction.DOMINANT_MINOR_GEGENKLANG_MAJOR: 'bIII',  # 'dG'
+
+    HarmonicFunction.DOMINANT_MAJOR_PARALLELKLANG_MINOR: 'iii',  # 'Dp', note first
+    HarmonicFunction.TONIC_MAJOR_GEGENKLANG_MINOR: 'iii',  # 'Tg'
+
+    HarmonicFunction.SUBDOMINANT_MINOR_PARALLELKLANG_MAJOR: 'bVI',  # 'sP', note first
+    HarmonicFunction.TONIC_MINOR_GEGENKLANG_MAJOR: 'bVI',  # 'tG'
+
+    HarmonicFunction.DOMINANT_MINOR_PARALLELKLANG_MAJOR: 'bVII',  # 'dP'
+
+}
+
+functionFigureTuplesMajor = {
+    **functionFigureTuplesMajor,
+    **_functionFigureTuplesKeyNeutral,
+}
+
+functionFigureTuplesMinor = {
+
+    HarmonicFunction.TONIC_MINOR_PARALLELKLANG_MAJOR: 'III',  # 'tP', note first
+    HarmonicFunction.DOMINANT_MINOR_GEGENKLANG_MAJOR: 'III',  # 'dG'
+
+    HarmonicFunction.DOMINANT_MAJOR_PARALLELKLANG_MINOR: '#iii',  # 'Dp', note first
+    HarmonicFunction.TONIC_MAJOR_GEGENKLANG_MINOR: '#iii',  # 'Tg'
+
+    HarmonicFunction.SUBDOMINANT_MINOR_PARALLELKLANG_MAJOR: 'VI',  # 'sP', note first
+    HarmonicFunction.TONIC_MINOR_GEGENKLANG_MAJOR: 'VI',  # 'tG'
+
+    HarmonicFunction.DOMINANT_MINOR_PARALLELKLANG_MAJOR: 'VII',  # 'dP'
+
+}
+
+functionFigureTuplesMinor = {
+    **functionFigureTuplesMinor,
+    **_functionFigureTuplesKeyNeutral,
+}
+
+
+def functionToRoman(thisHarmonicFunction: HarmonicFunction,
                     keyOrScale: Union[key.Key, scale.Scale, str] = 'C'):
     '''
     Takes an harmonic function labels (such as 'T' for major tonic)
@@ -117,9 +123,9 @@ def functionToRoman(harmonicFunction: FUNKTION,
     <music21.roman.RomanNumeral I in C major>
 
     The harmonicFunction argument can be a string (as shown),
-    though stictly speaking, it's handled through a special FUNKTION enum object.
+    though stictly speaking, it's handled through a special HarmonicFunction enum object.
 
-    >>> fn = analysis.harmonicFunction.FUNKTION.TONIKA_DUR
+    >>> fn = analysis.harmonicFunction.HarmonicFunction.TONIC_MAJOR
     >>> str(fn)
     'T'
 
@@ -143,7 +149,7 @@ def functionToRoman(harmonicFunction: FUNKTION,
     D, Dp, Dg, d, dP, dG.
 
     Note that this module uses terminology from modern German music theory
-    where Functional notation ('Funktionstheorie') is typically used
+    where Functional notation ('HarmonicFunctionstheorie') is typically used
     throughout the curriculum in preference over Roman numerals ('Stufentheorie').
 
     First, note the false friend: here 'P' for 'Parallel'
@@ -192,15 +198,15 @@ def functionToRoman(harmonicFunction: FUNKTION,
     if keyOrScale.mode == 'minor':
         referenceTuples = functionFigureTuplesMinor
 
-    for entry in referenceTuples:
-        if str(harmonicFunction) == entry[0]:
-            return roman.RomanNumeral(entry[1], keyOrScale)
+    for thisKey, thisValue in referenceTuples.items():
+        if thisHarmonicFunction == thisKey:
+            return roman.RomanNumeral(thisValue, keyOrScale)
 
     return False
 
 
 def romanToFunction(rn: roman.RomanNumeral,
-                    onlyHauptfunktion: bool = False
+                    onlyHauptHarmonicFunction: bool = False
                     ):
     '''
     Takes a Roman numeral and returns a corresponding harmonic function label.
@@ -208,20 +214,20 @@ def romanToFunction(rn: roman.RomanNumeral,
     >>> rn1 = roman.RomanNumeral('VI', 'a')
     >>> fn1 = analysis.harmonicFunction.romanToFunction(rn1)
     >>> fn1
-    <FUNKTION.SUBDOMINANT_MOLL_PARALLELKLANG_DUR>
+    <HarmonicFunction.SUBDOMINANT_MINOR_PARALLELKLANG_MAJOR>
 
     This can be converted into a string:
 
     >>> str(fn1)
     'sP'
 
-    Optionally, set onlyHauptfunktion to True to return
-    a simplified version with only the Hauptfunktion
+    Optionally, set onlyHauptHarmonicFunction to True to return
+    a simplified version with only the HauptHarmonicFunction
     (one of t, T, s, S, d, D: major and minor forms of the tonic, subdominant and dominant).
 
-    >>> fn1 = analysis.harmonicFunction.romanToFunction(rn1, onlyHauptfunktion=True)
+    >>> fn1 = analysis.harmonicFunction.romanToFunction(rn1, onlyHauptHarmonicFunction=True)
     >>> fn1
-    <FUNKTION.SUBDOMINANT_MOLL>
+    <HarmonicFunction.SUBDOMINANT_MINOR>
 
     >>> str(fn1)
     's'
@@ -234,7 +240,7 @@ def romanToFunction(rn: roman.RomanNumeral,
     >>> rn2 = roman.RomanNumeral('bII6', 'g')
     >>> fn2 = analysis.harmonicFunction.romanToFunction(rn2)
     >>> fn2
-    <FUNKTION.SUBDOMINANT_MOLL_GEGENKLANG_DUR>
+    <HarmonicFunction.SUBDOMINANT_MINOR_GEGENKLANG_MAJOR>
 
     >>> str(fn2)
     'sG'
@@ -248,12 +254,13 @@ def romanToFunction(rn: roman.RomanNumeral,
         if rn.key.mode == 'minor':
             referenceTuples = functionFigureTuplesMinor
 
-    for entry in referenceTuples:
-        if rn.romanNumeral == entry[1]:
-            if onlyHauptfunktion:
-                return FUNKTION(entry[0][0])
+    for thisKey, thisValue in referenceTuples.items():
+        if rn.romanNumeral == thisValue:
+            if onlyHauptHarmonicFunction:
+                return HarmonicFunction(str(thisKey)[0])
             else:
-                return FUNKTION(entry[0])
+                return thisKey
+
     return False
 
 
@@ -263,13 +270,14 @@ class Test(unittest.TestCase):
 
     def testAllFunctionLabelsInEnum(self):
         '''
-        Test that all the string entries in the functionFigureTuples
-        (both major and minor) are represented in the FUNKTION enum.
+        Test that all the entries in the functionFigureTuples
+        (both major and minor) are represented in the HarmonicFunction enum.
         '''
-        for func in functionFigureTuplesMajor:
-            FUNKTION(func[0])
-        for func in functionFigureTuplesMinor:
-            FUNKTION(func[0])
+
+        for thisHarmonicFunction in functionFigureTuplesMajor:
+            HarmonicFunction(thisHarmonicFunction)
+        for thisHarmonicFunction in functionFigureTuplesMinor:
+            HarmonicFunction(thisHarmonicFunction)
 
     def testFunctionToRoman(self):
         self.assertEqual(functionToRoman('T').figure, 'I')
@@ -277,7 +285,7 @@ class Test(unittest.TestCase):
     def testSimplified(self):
         rn = roman.RomanNumeral('III', 'f')
         self.assertEqual(str(romanToFunction(rn)), 'tP')
-        self.assertEqual(str(romanToFunction(rn, onlyHauptfunktion=True)), 't')
+        self.assertEqual(str(romanToFunction(rn, onlyHauptHarmonicFunction=True)), 't')
 
     def testIgnoresInversion(self):
         self.assertEqual(romanToFunction(roman.RomanNumeral('i6')), 't')
