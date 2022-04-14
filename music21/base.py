@@ -652,7 +652,7 @@ class Music21Object(prebase.ProtoM21Object):
         return not (self._editorial is None)
 
     @property
-    def editorial(self) -> editorial.Editorial:
+    def editorial(self) -> 'music21.editorial.Editorial':
         '''
         a :class:`~music21.editorial.Editorial` object that stores editorial information
         (comments, footnotes, harmonic information, ficta).
@@ -668,13 +668,18 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n.editorial
         <music21.editorial.Editorial {'ficta': <music21.pitch.Accidental sharp>}>
         '''
+        # Dev note: because property editorial shadows module editorial,
+        # typing has to be in quotes.
+
         # anytime something is changed here, change in style.StyleMixin and vice-versa
         if self._editorial is None:
             self._editorial = editorial.Editorial()
         return self._editorial
 
     @editorial.setter
-    def editorial(self, ed: editorial.Editorial):
+    def editorial(self, ed: 'music21.editorial.Editorial'):
+        # Dev note: because property editorial shadows module editorial,
+        # typing has to be in quotes.
         self._editorial = ed
 
     @property
@@ -700,7 +705,7 @@ class Music21Object(prebase.ProtoM21Object):
         return not (self._style is None)
 
     @property
-    def style(self) -> style.Style:
+    def style(self) -> 'music21.style.Style':
         '''
         Returns (or Creates and then Returns) the Style object
         associated with this object, or sets a new
@@ -722,6 +727,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n.style.absoluteX is None
         True
         '''
+        # Dev note: because property style shadows module style,
+        # typing has to be in quotes.
         # anytime something is changed here, change in style.StyleMixin and vice-versa
         if not self.hasStyleInformation:
             StyleClass = self._styleClass
@@ -729,7 +736,9 @@ class Music21Object(prebase.ProtoM21Object):
         return self._style
 
     @style.setter
-    def style(self, newStyle: Optional[style.Style]):
+    def style(self, newStyle: Optional['music21.style.Style']):
+        # Dev note: because property style shadows module style,
+        # typing has to be in quotes.
         self._style = newStyle
 
     # convenience.
@@ -3438,7 +3447,7 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         ts: Optional['music21.meter.TimeSignature'] = self.getContextByClass(
             'TimeSignature',
-            getElementMethod=ElementSearch.BEFORE_OFFSET
+            getElementMethod=ElementSearch.AT_OR_BEFORE_OFFSET
         )
         if ts is None:
             raise Music21ObjectException('this object does not have a TimeSignature in Sites')
