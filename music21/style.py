@@ -150,7 +150,6 @@ class Style(ProtoM21Object):
 
         OMIT_FROM_DOCS
 
-
         Similarly for non-strings:
 
         >>> tst.enclosure = 4
@@ -330,7 +329,7 @@ class TextStyle(Style):
 
         Invalid values raise a TextFormatException
 
-        >>> te.justify = 'hello'
+        >>> tst.justify = 'hello'
         Traceback (most recent call last):
         music21.style.TextFormatException:
             Not a supported justification: 'hello'
@@ -359,7 +358,7 @@ class TextStyle(Style):
 
         Invalid values raise a TextFormatException
 
-        >>> te.fontStyle = 'hello'
+        >>> tst.fontStyle = 'hello'
         Traceback (most recent call last):
         music21.style.TextFormatException:
             Not a supported fontStyle: 'hello'
