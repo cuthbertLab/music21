@@ -3,10 +3,11 @@
 # Name:         musicxml/m21ToXml.py
 # Purpose:      Translate from music21 objects to musicxml representation
 #
-# Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+# Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
+#               Jacob Tyler Walls
 #
-# Copyright:    Copyright © 2010-2012, 2015-19 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-22 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -228,7 +229,7 @@ def _setTagTextFromAttribute(
 
 def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=None, transform=None):
     '''
-    If m21El has a at least one element of tag==tag with some text. If
+    If m21El has at least one element of tag==tag with some text. If
     it does, set the attribute either with the same name (with "foo-bar" changed to
     "fooBar") or with attributeName to the text contents.
 
@@ -571,7 +572,7 @@ class GeneralObjectExporter:
         Translate a music21 :class:`~music21.duration.Duration` into
         a complete MusicXML representation.
 
-        Rarely rarely used.  Only if you call .show() on a duration object
+        Rarely, rarely used.  Only if you call .show() on a duration object
         '''
         # make a copy, as we this process will change tuple types
         # not needed, since fromGeneralNote does it too.  but so
@@ -2356,8 +2357,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
                 mxSoftware = SubElement(mxEncoding, 'software')
                 mxSoftware.text = software
         else:
-            # there will not be a music21 software tag if no scoreMetadata
-            # if not for this.
+            # there will not be a music21 software tag if there was no scoreMetadata
+            # if not for these lines.
             mxSoftware = SubElement(mxEncoding, 'software')
             mxSoftware.text = defaults.software
 
@@ -2659,7 +2660,7 @@ class PartExporter(XMLExporterBase):
                     and thisInstrument.instrumentId in self.parent.instrumentIdList)):
                 thisInstrument.instrumentIdRandomize()
 
-            # add to lists for checking on next part
+            # add to the lists for checking on next part
             if self.parent is not None:
                 self.parent.instrumentIdList.append(thisInstrument.instrumentId)
                 if thisInstrument is self.firstInstrumentObject:
@@ -2671,7 +2672,7 @@ class PartExporter(XMLExporterBase):
 
         Does nothing in the normal case of single staves.
 
-        Returns whether or not instrument processing should short circuit,
+        Returns whether instrument processing should short circuit,
         which is False for the general case and True for subsequent
         PartStaff objects after the first in a group.
         '''
@@ -5886,7 +5887,7 @@ class MeasureExporter(XMLExporterBase):
 
         # not to be done: repeater (deprecated)
         self.setColor(mxBeam, beamObject)
-        # again, we pass the name 'fan' twice so we don't have to run
+        # again, we pass the name 'fan' twice, so we don't have to run
         # hyphenToCamelCase on it.
         self.setStyleAttributes(mxBeam, beamObject, 'fan', 'fan')
 
@@ -7039,10 +7040,10 @@ class Test(unittest.TestCase):
     def testExportChordSymbolsWithRealizedDurations(self):
         gex = GeneralObjectExporter()
 
-        def realizeDurationsAndAssertTags(m: stream.Measure, forwardTag=False, offsetTag=False):
-            m = copy.deepcopy(m)
-            harmony.realizeChordSymbolDurations(m)
-            obj = gex.fromGeneralObject(m)
+        def realizeDurationsAndAssertTags(mm: stream.Measure, forwardTag=False, offsetTag=False):
+            mm = copy.deepcopy(mm)
+            harmony.realizeChordSymbolDurations(mm)
+            obj = gex.fromGeneralObject(mm)
             tree = self.getET(obj)
             self.assertIs(bool(tree.findall('.//forward')), forwardTag)
             self.assertIs(bool(tree.findall('.//offset')), offsetTag)

@@ -6,7 +6,7 @@
 # Authors:      Jacob Tyler Walls
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2020-22 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -135,6 +135,8 @@ class PartStaffExporterMixin:
         # starting with v.7, self.groupsToJoin is already set earlier,
         # but check to be safe
         if not self.groupsToJoin:
+            # this is done in the non-mixin class.
+            # noinspection PyAttributeOutsideInit
             self.groupsToJoin = self.joinableGroups()
         for group in self.groupsToJoin:
             self.addStaffTagsMultiStaffParts(group)
@@ -334,7 +336,7 @@ class PartStaffExporterMixin:
     def movePartStaffMeasureContents(self, group: StaffGroup):
         '''
         For every <part> after the first, find the corresponding measure in the initial
-        <part> and merge the contents by inserting all of the contained elements.
+        <part> and merge the contents by inserting all contained elements.
 
         Called by :meth:`joinPartStaffs`
 
@@ -374,8 +376,8 @@ class PartStaffExporterMixin:
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
 
-        def makeDivider(sourceNumber: int) -> Element:
-            return Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
+        def makeDivider(inner_sourceNumber: Union[int, str]) -> Element:
+            return Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, str(inner_sourceNumber)))
 
         sourceMeasures = iter(source.findall('measure'))
         sourceMeasure = None  # Set back to None when disposed of
@@ -521,7 +523,8 @@ class PartStaffExporterMixin:
             in the earliest staff where found (not necessarily the first) using `comparison`.
             '''
             initialM21Instance: Optional[m21Class] = None
-            for ps in group:
+            # noinspection PyShadowingNames
+            for ps in group:  # ps okay to reuse.
                 if initialM21Instance is None:
                     initialM21Instance = ps.recurse().getElementsByClass(m21Class).first()
                 else:
