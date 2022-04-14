@@ -985,7 +985,7 @@ class Music21Object(prebase.ProtoM21Object):
     def getOffsetInHierarchy(
         self,
         site: Optional['music21.stream.Stream']
-     ) -> Union[float, fractions.Fraction]:
+    ) -> Union[float, fractions.Fraction]:
         '''
         For an element which may not be in site, but might be in a Stream in site (or further
         in streams), find the cumulative offset of the element in that site.
@@ -1055,7 +1055,9 @@ class Music21Object(prebase.ProtoM21Object):
 
         raise SitesException(f'Element {self} is not in hierarchy of {site}')
 
-    def getSpannerSites(self, spannerClassList: Optional[Iterable] = None) -> List['music21.spanner.Spanner']:
+    def getSpannerSites(self,
+                        spannerClassList: Optional[Iterable] = None
+                        ) -> List['music21.spanner.Spanner']:
         '''
         Return a list of all :class:`~music21.spanner.Spanner` objects
         (or Spanner subclasses) that contain

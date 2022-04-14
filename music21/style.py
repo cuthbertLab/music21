@@ -572,7 +572,7 @@ class StyleMixin(common.SlottedObjectMixin):
     def __init__(self):
         #  no need to call super().__init__() on SlottedObjectMixin
         self._style: Optional[Style] = None
-        self._editorial: Optional[editorial.Editorial] = None
+        self._editorial: Optional['music21.editorial.Editorial'] = None
 
     @property
     def hasStyleInformation(self) -> bool:
@@ -655,7 +655,7 @@ class StyleMixin(common.SlottedObjectMixin):
         return not (self._editorial is None)
 
     @property
-    def editorial(self) -> editorial.Editorial:
+    def editorial(self) -> 'music21.editorial.Editorial':
         '''
         a :class:`~music21.editorial.Editorial` object that stores editorial information
         (comments, footnotes, harmonic information, ficta).
@@ -678,7 +678,7 @@ class StyleMixin(common.SlottedObjectMixin):
         return self._editorial
 
     @editorial.setter
-    def editorial(self, ed: editorial.Editorial):
+    def editorial(self, ed: 'music21.editorial.Editorial'):
         self._editorial = ed
 
 
