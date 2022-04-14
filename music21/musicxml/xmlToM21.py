@@ -4701,9 +4701,13 @@ class MeasureParser(XMLParserBase):
         else:
             raise bar.BarException('cannot handle mx direction format:', mxDirection)
 
-        if mxRepeat.get('times') is not None:
-            # make into a number
-            r.times = int(mxRepeat.get('times'))
+        try:
+            if mxRepeat.get('times') is not None:
+                # make into a number
+                r.times = int(mxRepeat.get('times'))
+        except bar.BarException:
+            # ignore BarException, just let the set of r.times fail silently
+            pass
 
         if inputM21 is None:
             return r

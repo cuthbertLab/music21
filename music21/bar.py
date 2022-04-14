@@ -322,8 +322,8 @@ class Repeat(repeat.RepeatMark, Barline):
         Only end expressions can have times:
 
         >>> lb.times = 3
-        >>> lb.times is None
-        True
+        Traceback (most recent call last):
+        music21.bar.BarException: cannot set repeat times on a start Repeat
 
         >>> rb.times = 3
         >>> rb.times = -3
@@ -350,8 +350,7 @@ class Repeat(repeat.RepeatMark, Barline):
                     f'cannot set repeat times to a value less than zero: {value}'
                 )
             if self.direction == 'start':
-                # don't set repeat times on a start Repeat
-                return
+                raise BarException('cannot set repeat times on a start Repeat')
 
             self._times = candidate
 
