@@ -80,7 +80,7 @@ def _getKeyFromCache(keyStr: str) -> key.Key:
     create a new key and put it in the cache and return it.
     '''
     if keyStr in _keyCache:
-        # adding copy.copy will at least prevent small errors at a cost of only 3 nano-seconds
+        # adding copy.copy will at least prevent small errors at a cost of only 3 nanoseconds
         # of added time.  A deepcopy, unfortunately, take 2.8ms, which is longer than not
         # caching at all.  And not caching at all really slows down things like RomanText.
         # This at least will prevent what happens if `.key.mode` is changed
@@ -277,14 +277,14 @@ def correctSuffixForChordQuality(chordObj, inversionString):
         if seventhType == 10 and qualityName == 'o':
             qualityName = 'ø'
         elif seventhType != 9:
-            pass  # do something for odd odd chords built on diminished triad.
+            pass  # do something for extremely odd chords built on diminished triad.
     # print(inversionString, fifthName)
     return qualityName + inversionString
 
 
 def postFigureFromChordAndKey(chordObj, keyObj=None):
     '''
-    Returns the post RN figure for a given chord in a given key.
+    Returns the post-RN figure for a given chord in a given key.
 
     If keyObj is none, it uses the root as a major key:
 
@@ -1628,8 +1628,8 @@ class RomanNumeral(harmony.Harmony):
 
 
     The RomanNumeral constructor accepts a keyword 'updatePitches' which is
-    passed to harmony.Harmony. By default it
-    is True, but can be set to False to initialize faster if pitches are not needed.
+    passed to harmony.Harmony. By default, it
+    is `True`, but can be set to `False` to initialize faster if pitches are not needed.
 
     >>> r = roman.RomanNumeral('vio', em, updatePitches=False)
     >>> r.pitches
@@ -2103,7 +2103,7 @@ class RomanNumeral(harmony.Harmony):
     def __init__(
         self,
         figure: Union[str, int] = '',
-        keyOrScale: Optional[Union[key.Key, scale.Scale]] = None,
+        keyOrScale: Optional[Union[key.Key, scale.Scale, str]] = None,
         *,
         caseMatters=True,
         updatePitches=True,
@@ -3129,7 +3129,6 @@ class RomanNumeral(harmony.Harmony):
                     _keyCache[keyOrScale.tonicPitchNameWithCase] = keyOrScale
             elif 'Scale' in keyClasses:
                 if keyOrScale.name in _scaleCache:
-                    # use stored scale as already has cache
                     keyOrScale = _scaleCache[keyOrScale.name]
                 else:
                     _scaleCache[keyOrScale.name] = keyOrScale
@@ -3370,11 +3369,11 @@ class RomanNumeral(harmony.Harmony):
         '''
         Checks if a RomanNumeral is an instance of 'modal mixture' in which the chord is
         not diatonic in the key specified, but
-        would be would be in the parallel (German: variant) major / minor
+        would be in the parallel (German: variant) major / minor
         and can therefore be thought of as a 'mixture' of major and minor modes, or
         as a 'borrowing' from the one to the other.
 
-        Examples include i in major or I in minor (*sic*).
+        Examples include "i" in major or "I" in minor (*sic*).
 
         Specifically, this method returns True for all and only the following cases in any
         inversion:
@@ -3395,7 +3394,7 @@ class RomanNumeral(harmony.Harmony):
 
         * scale degree b7 and triad quality major (Bb); and
 
-        * scale degree 7 and it's a diminished seventh specifically (b-d-f-ab).
+        * scale degree 7, and it is a diminished seventh (specifically b-d-f-ab).
 
         Minor context (example of c minor):
 
@@ -3409,7 +3408,7 @@ class RomanNumeral(harmony.Harmony):
 
         * scale degree #6 and triad quality minor (a); and
 
-        * scale degree 7 and it's a half diminished seventh specifically (b-d-f-a).
+        * scale degree 7, and it is a half-diminished seventh (specifically b-d-f-a).
 
         This list is broadly consistent with (and limited to) borrowing between the major and
         natural minor, except for excluding V (G-B-D) and viio (B-D-F) in minor.
@@ -3482,12 +3481,12 @@ class RomanNumeral(harmony.Harmony):
         False
 
         (That specific example of bIII+ in major is a borderline case that
-        arguably ought to be included and may be added in future.)
+        arguably ought to be included and may be added later without a deprecation cycle.)
 
         Naturally, really extended usages such as scale degrees beyond 7 (in the
         Octatonic mode, for instance) also return False.
 
-        The evaluateSecondaryNumeral parameter allows users to chose whether to consider
+        The evaluateSecondaryNumeral parameter allows users to choose whether to consider
         secondary Roman numerals (like V/vi) or to ignore them.
         When considered, exactly the same rules apply but recasting the comparison on
         the secondaryRomanNumeral.

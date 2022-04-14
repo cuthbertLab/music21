@@ -290,7 +290,7 @@ class Graph(prebase.ProtoM21Object):
         ValueRange is a two-element tuple of the lowest
         number and the highest.
 
-        By default there is a padding of 10% of the range
+        By default, there is a padding of 10% of the range
         in either direction.  Set paddingFraction = 0 to
         eliminate this shift
         '''
