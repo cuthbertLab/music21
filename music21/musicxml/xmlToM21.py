@@ -4666,6 +4666,14 @@ class MeasureParser(XMLParserBase):
         'final'
         >>> r.direction
         'end'
+
+        Test that a forward repeat with times doesn't raise an exception, and
+        that the resulting Repeat doesn't have times set.
+        >>> mxStartBarline = ET.fromstring('<barline><bar-style>light-heavy</bar-style>' +
+        ...       '<repeat direction="forward" times="2"/></barline>')
+        >>> rs = MP.xmlToRepeat(mxStartBarline)
+        >>> rs
+        <music21.bar.Repeat direction=start>
         '''
         if inputM21 is None:
             r = bar.Repeat()
