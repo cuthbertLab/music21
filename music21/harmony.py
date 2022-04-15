@@ -208,8 +208,8 @@ class Harmony(chord.Chord):
 
     def __init__(self,
                  figure: Optional[str] = None,
-                 root: Optional[pitch.Pitch] = None,
-                 bass: Optional[pitch.Pitch] = None,
+                 root: Union[str, pitch.Pitch, None] = None,
+                 bass: Union[str, pitch.Pitch, None] = None,
                  inversion: Optional[int] = None,
                  updatePitches: bool = True,
                  **keywords
