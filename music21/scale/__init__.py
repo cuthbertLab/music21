@@ -1760,8 +1760,8 @@ class ConcreteScale(Scale):
         For a given pitch, return the appropriate scale degree.
         If no scale degree is available, None is returned.
 
-        Note -- by default it will find based on note name not on
-        PitchClass because this is used so commonly by tonal functions.
+        Note: by default it will use a find algorithm that is based on the note's
+        `.name` not on `.pitchClass` because this is used so commonly by tonal functions.
         So if it's important that D# and E- are the same, set the
         comparisonAttribute to `pitchClass`
 

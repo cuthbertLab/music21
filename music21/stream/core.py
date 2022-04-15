@@ -602,8 +602,8 @@ class StreamCoreMixin:
         {1.0} <music21.note.Note D>
 
 
-        Now we'll remove the second note so not all elements of the slur
-        are present, which by default will not insert the Slur:
+        Now we'll remove the second note so not all elements of the Slur
+        are present. This, by default, will not insert the Slur:
 
         >>> s = getStream()
         >>> s.remove(s[-1])

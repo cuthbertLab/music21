@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2021 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2006-2022 Michael Scott Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'7.3.3'
+'8.0.0a1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -276,7 +276,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     All music21 objects have these pieces of information:
 
-    1.  id: identification string unique to the objects container (optional).
+    1.  id: identification string unique to the object's container (optional).
         Defaults to the `id()` of the element.
     2.  groups: a Groups object: which is a list of strings identifying
         internal sub-collections (voices, parts, selections) to which this
@@ -311,7 +311,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     _styleClass: Type[style.Style] = style.Style
 
-    # define order to present names in documentation; use strings
+    # define order for presenting names in documentation; use strings
     _DOC_ORDER = []
 
     # documentation for all attributes (not properties or methods)
@@ -375,7 +375,7 @@ class Music21Object(prebase.ProtoM21Object):
         self._derivation: Optional[Derivation] = None
 
         self._style: Optional[style.Style] = None
-        self._editorial = None
+        self._editorial: Optional[editorial.Editorial] = None
 
         # private duration storage; managed by property
         self._duration: Optional[duration.Duration] = None
@@ -630,7 +630,7 @@ class Music21Object(prebase.ProtoM21Object):
     # --------------------------------------------------------------------------
 
     @property
-    def hasEditorialInformation(self):
+    def hasEditorialInformation(self) -> bool:
         '''
         Returns True if there is a :class:`~music21.editorial.Editorial` object
         already associated with this object, False otherwise.
@@ -648,6 +648,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> mObj.hasEditorialInformation
         True
         '''
+        # anytime something is changed here, change in style.StyleMixin and vice-versa
         return not (self._editorial is None)
 
     @property
@@ -667,12 +668,18 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n.editorial
         <music21.editorial.Editorial {'ficta': <music21.pitch.Accidental sharp>}>
         '''
+        # Dev note: because property editorial shadows module editorial,
+        # typing has to be in quotes.
+
+        # anytime something is changed here, change in style.StyleMixin and vice-versa
         if self._editorial is None:
             self._editorial = editorial.Editorial()
         return self._editorial
 
     @editorial.setter
     def editorial(self, ed: 'music21.editorial.Editorial'):
+        # Dev note: because property editorial shadows module editorial,
+        # typing has to be in quotes.
         self._editorial = ed
 
     @property
@@ -694,6 +701,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> mObj.hasStyleInformation
         True
         '''
+        # anytime something is changed here, change in style.StyleMixin and vice-versa
         return not (self._style is None)
 
     @property
@@ -719,6 +727,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n.style.absoluteX is None
         True
         '''
+        # Dev note: because property style shadows module style,
+        # typing has to be in quotes.
+        # anytime something is changed here, change in style.StyleMixin and vice-versa
         if not self.hasStyleInformation:
             StyleClass = self._styleClass
             self._style = StyleClass()
@@ -726,15 +737,18 @@ class Music21Object(prebase.ProtoM21Object):
 
     @style.setter
     def style(self, newStyle: Optional['music21.style.Style']):
+        # Dev note: because property style shadows module style,
+        # typing has to be in quotes.
         self._style = newStyle
 
-    # --------------------------
-    # convenience.  used to be in note.Note, but belongs everywhere:
+    # convenience.
 
     @property
     def quarterLength(self) -> OffsetQL:
         '''
         Set or Return the Duration as represented in Quarter Length, possibly as a fraction.
+
+        Same as setting `.duration.quarterLength`.
 
         >>> n = note.Note()
         >>> n.quarterLength = 2.0
@@ -977,7 +991,10 @@ class Music21Object(prebase.ProtoM21Object):
                 value = float(value)
             self._naiveOffset = value
 
-    def getOffsetInHierarchy(self, site) -> Union[float, fractions.Fraction]:
+    def getOffsetInHierarchy(
+        self,
+        site: Optional['music21.stream.Stream']
+    ) -> Union[float, fractions.Fraction]:
         '''
         For an element which may not be in site, but might be in a Stream in site (or further
         in streams), find the cumulative offset of the element in that site.
@@ -1047,7 +1064,9 @@ class Music21Object(prebase.ProtoM21Object):
 
         raise SitesException(f'Element {self} is not in hierarchy of {site}')
 
-    def getSpannerSites(self, spannerClassList=None) -> List['music21.spanner.Spanner']:
+    def getSpannerSites(self,
+                        spannerClassList: Optional[Iterable] = None
+                        ) -> List['music21.spanner.Spanner']:
         '''
         Return a list of all :class:`~music21.spanner.Spanner` objects
         (or Spanner subclasses) that contain
@@ -1140,7 +1159,7 @@ class Music21Object(prebase.ProtoM21Object):
         A Music21Object may, due to deep copying or other reasons,
         have a site (with an offset) which
         no longer contains the Music21Object. These lingering sites
-        are called orphans. This methods gets rid of them.
+        are called orphans. This method gets rid of them.
 
         The `excludeStorageStreams` are SpannerStorage and VariantStorage.
         '''
@@ -1530,7 +1549,7 @@ class Music21Object(prebase.ProtoM21Object):
             of the last .activeSite (even if it is dead.  A lot of code depends on .offset
             still being available if .activeSite dies, so changing that is not an option for now).
             So its sortTuple is 0.0 <0.-31.3>. which has a .previous() of tb2 in s, which can
-            call previous can get tb1, etc. So with really bad timing of cache cleanups and
+            call previous can get tb1, etc. So with terrible timing of cache cleanups and
             garbage collecting, it's possible to get an infinite loop.
 
             There may be ways to set activeSite on .getContextByClass() call such that this routine
@@ -1542,7 +1561,7 @@ class Music21Object(prebase.ProtoM21Object):
             then in another stream context (a), created earlier,
             we have [tb0, tb1, tb2].  tb1 is set up with (b) as an activeSite. Finding nothing
             previous, it goes to (a) and finds tb2; it then discovers that in (a), tb2 is after
-            tb1 so it returns None for this context.  One might say, "wait a second, why
+            tb1, so it returns None for this context.  One might say, "wait a second, why
             isn't tb0 returned? It's going to be skipped." To this, I would answer, the original
             context in which .previous() or .getContextByClass() was called was (b). There is
             no absolute obligation to find what was previous in a different site context. It is
@@ -1701,7 +1720,7 @@ class Music21Object(prebase.ProtoM21Object):
         (<music21.stream.Part Alto>, '9.0 <0.-20...>', 'flatten')
         (<music21.stream.Score bach>, '9.0 <0.-20...>', 'elementsOnly')
 
-        Here we make a copy of the earlier measure and we see that its contextSites
+        Here we make a copy of the earlier measure, and we see that its contextSites
         follow the derivationChain from the original measure and still find the Part
         and Score of the original Measure 3 even though mCopy is not in any of these
         objects.
@@ -1766,7 +1785,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> p2.append(m2)
 
         The keys could have appeared in any order, but by default
-        we set set priorityTarget to activeSite.  So this is the same as omitting.
+        we set priorityTarget to activeSite.  So this is the same as omitting.
 
         >>> for y in n.contextSites(priorityTarget=n.activeSite):
         ...     print(y[0])
@@ -1871,7 +1890,7 @@ class Music21Object(prebase.ProtoM21Object):
 
                 positionInStream = st.modify(offset=newOffset)
             except SitesException:
-                continue  # not a valid site any more.  Could be caught in derivationChain
+                continue  # not a valid site anymore.  Could be caught in derivationChain
 
             recursionType = siteObj.recursionType
             if returnSortTuples:
@@ -1969,7 +1988,7 @@ class Music21Object(prebase.ProtoM21Object):
         el = self.getContextByClass(className)
         while el is not None:
             yield el
-            el = el.getContextByClass(className, getElementMethod='getElementBeforeOffset')
+            el = el.getContextByClass(className, getElementMethod=ElementSearch.BEFORE_OFFSET)
 
     # -------------------------------------------------------------------------
 
@@ -2139,15 +2158,16 @@ class Music21Object(prebase.ProtoM21Object):
         # maxRecurse = 20
 
         prevEl = self.getContextByClass(className=className,
-                                        getElementMethod='getElementBeforeNotSelf',
+                                        getElementMethod=ElementSearch.BEFORE_NOT_SELF,
                                         followDerivation=not activeSiteOnly,
                                         priorityTargetOnly=activeSiteOnly,
                                         )
 
         # for singleSiteContext, unused_positionInContext, unused_recurseType in allSiteContexts:
         #     if prevEl is singleSiteContext:
-        #         prevElPrev = prevEl.getContextByClass(prevEl.__class__,
-        #                                             getElementMethod='getElementBeforeNotSelf')
+        #         prevElPrev = prevEl.getContextByClass(
+        #                          prevEl.__class__,
+        #                          getElementMethod=ElementSearch.BEFORE_NOT_SELF)
         #         if prevElPrev and prevElPrev is not self:
         #             return prevElPrev
         isInPart = False
@@ -2445,7 +2465,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         5) isNotGrace = {0, 1}; 0 = grace, 1 = normal. Grace notes sort before normal notes
 
-        6) The last tie breaker is the creation time (insertIndex) of the site object
+        6) The last tie-breaker is the creation time (insertIndex) of the site object
         represented by the activeSite.
 
         >>> n = note.Note()
@@ -2701,7 +2721,7 @@ class Music21Object(prebase.ProtoM21Object):
     def _reprText(self, **keywords):
         '''
         Return a text representation possible with line
-        breaks. This methods can be overridden by subclasses
+        breaks. This method can be overridden by subclasses
         to provide alternative text representations.
         '''
         return repr(self)
@@ -2709,7 +2729,7 @@ class Music21Object(prebase.ProtoM21Object):
     def _reprTextLine(self):
         '''
         Return a text representation without line breaks. This
-        methods can be overridden by subclasses to provide
+        method can be overridden by subclasses to provide
         alternative text representations.
         '''
         return repr(self)
@@ -2784,7 +2804,7 @@ class Music21Object(prebase.ProtoM21Object):
         Return a list of Stream subclasses that this object
         is contained within or (if followDerivation is set) is derived from.
 
-        This gives access to the hierarchy that contained or
+        This method gives access to the hierarchy that contained or
         created this object.
 
         >>> s = corpus.parse('bach/bwv66.6')
@@ -3057,7 +3077,7 @@ class Music21Object(prebase.ProtoM21Object):
                     # keep start  if already set
                     forceEndTieType = 'continue'
                 # a stop was ending a previous tie; we know that
-                # the first is now a continue
+                # the first is now a "continue" type
                 elif e.tie.type == 'stop':
                     forceEndTieType = 'stop'
                     e.tie.type = 'continue'
@@ -3084,7 +3104,7 @@ class Music21Object(prebase.ProtoM21Object):
                         # keep start  if already set
                         forceEndTieType = 'continue'
                     # a stop was ending a previous tie; we know that
-                    # the first is now a continue
+                    # the first is now a "continue" type
                     elif component.tie.type == 'stop':
                         forceEndTieType = 'stop'
                         component.tie.type = 'continue'
@@ -3320,7 +3340,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n2.measureNumber
         0
 
-        This updates live if the measure number changes:
+        The property updates if the object's surrounding measure's number changes:
 
         >>> m2.number = 11
         >>> n2.measureNumber
@@ -3426,7 +3446,9 @@ class Music21Object(prebase.ProtoM21Object):
         extracted to make sure that all three of the routines use the same one.
         '''
         ts: Optional['music21.meter.TimeSignature'] = self.getContextByClass(
-            'TimeSignature', getElementMethod='getElementAtOrBeforeOffset')
+            'TimeSignature',
+            getElementMethod=ElementSearch.AT_OR_BEFORE_OFFSET
+        )
         if ts is None:
             raise Music21ObjectException('this object does not have a TimeSignature in Sites')
         return ts
@@ -4477,7 +4499,7 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.beat, 1.0)
 
         # the Measure.padAsAnacrusis() method looks at the barDuration and,
-        # if the Measure is incomplete, assumes its an anacrusis and adds
+        # if the Measure is incomplete, assumes it is an anacrusis and adds
         # the appropriate padding
         m1.padAsAnacrusis()
         # app values are the same except _getMeasureOffset()
@@ -4659,9 +4681,14 @@ class Test(unittest.TestCase):
                          '<music21.tempo.MetronomeMark Eighth=150>')
         # if we provide the getElementMethod parameter, we can use
         # getElementBeforeOffset
-        self.assertEqual(str(mm2.getContextByClass('MetronomeMark',
-                                                   getElementMethod='getElementBeforeOffset')),
-                         '<music21.tempo.MetronomeMark lento 16th=50>')
+        self.assertEqual(
+            str(
+                mm2.getContextByClass(
+                    'MetronomeMark',
+                    getElementMethod=ElementSearch.BEFORE_OFFSET
+                )
+            ),
+            '<music21.tempo.MetronomeMark lento 16th=50>')
 
     def testElementWrapperOffsetAccess(self):
         from music21 import stream
@@ -5006,7 +5033,7 @@ class Test(unittest.TestCase):
         self.assertEqual(set(n2.getSpannerSites(['Slur', 'Diminuendo'])), {sp1, sp3})
 
         # The order spanners are returned is generally the order that they were
-        # added, but that is not guaranteed, so for safety sake, use set comparisons:
+        # added, but that is not guaranteed, so for safety's sake, use set comparisons:
 
         self.assertEqual(set(n2.getSpannerSites(['Slur', 'Diminuendo'])), {sp3, sp1})
 

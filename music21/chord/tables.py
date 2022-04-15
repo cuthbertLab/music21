@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
-# Name:          chord.tables.py
-# Purpose:       data and tables for chord and set class processing.
+# Name:         chord.tables.py
+# Purpose:      data and tables for chord and set class processing.
 #
-# Authors:       Christopher Ariza
+# Authors:      Christopher Ariza
+#               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2001-2011 Christopher Ariza
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-22 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -335,11 +336,11 @@ FORTE = (None, monad, diad, trichord, tetrachord, pentachord,
          hexachord, septachord, octachord,
          nonachord, decachord, undecachord, dodecachord)
 
-# this defines the pitch classes to return for the inversion of a given
+# This dictionary defines the pitch classes to return for the inversion of a given
 # forte number.  For instance (3, 11): (0, 4, 7) indicates that for the
 # inverted form of Forte class 3-11 (minor/major triad) return 0, 2, 3
-# (the zero could be assumed, but it makes my brain easier to have it there.
-# faster to store this than recompute every time.
+# (the zero could be assumed, but it makes my brain easier to have it there).
+# It is faster to store this than to recompute it every time.
 inversionDefaultPitchClasses = {
     (3, 2): (0, 2, 3),
     (3, 3): (0, 3, 4),
@@ -913,7 +914,7 @@ forteNumberWithInversionToTnIndex = {
 # some changes:
 # unison preferred to monad
 # v7.3 -- Roma preferred.  Gypsy only in parentheses.
-#      TODO: more removing and/or deemphasizing of ethnic-stereotype names.
+#      TODO: more removing and/or de-emphasizing of ethnic-stereotype names.
 
 tnIndexToChordInfo = {
     (1,  1,  0): {'name': ('unison',
@@ -1175,9 +1176,8 @@ tnIndexToChordInfo = {
                            'combinatorial I (I1, I7)')},
     (6, 31,  1): {'name': ('combinatorial I (I7)',)},
     (6, 31, -1): {'name': ('combinatorial I (I11)',)},
-    (6, 32,  0): {'name': ('C all combinatorial (P6, I3, RI9)',
-                           'Guidon/Arezzo',
-                           'Arezzo major diatonic',
+    (6, 32,  0): {'name': ('Guidonian hexachord',
+                           'C all combinatorial (P6, I3, RI9)',
                            'major hexamirror',
                            'quartal hexamirror',
                            'first-order all combinatorial')},
@@ -1292,10 +1292,11 @@ tnIndexToChordInfo = {
     (7, 31, -1): {'name': ('diminished scale',
                            'alternating heptachord')},
     (7, 32,  1): {'name': ('harmonic minor scale',
+                           'harmonic minor collection',
                            'Spanish Roma (Gypsy)',
                            'mela Kiravani')},
-    (7, 32, -1): {'name': ('harmonic major scale',
-                           'harmonic minor inverse',
+    (7, 32, -1): {'name': ('harmonic major scale (inverted)',
+                           'harmonic minor collection (inverted)',
                            'mela Cakravana',
                            'quasi raga Ahir Bhairav')},
     (7, 33,  0): {'name': ('Neapolitan-major mode',
@@ -1560,7 +1561,7 @@ def addressToIntervalVector(address):
     (0, 0, 1, 1, 1, 0)
 
     Inversion can be omitted or None without causing an error (or, of course,
-    changing the output
+    changing the output)
 
     >>> chord.tables.addressToIntervalVector((4, 29))
     (1, 1, 1, 1, 1, 1)
@@ -1614,7 +1615,7 @@ def intervalVectorToAddress(vector):
         for num, sc in enumerate(FORTE[card]):
             if sc is None:
                 continue  # first, used for spacing
-            # index 1 is vector
+            # index 1 is the vector
             if sc[1] == vector:
                 post.append(ChordTableAddress(card, num, None, None))
     return post
@@ -1680,7 +1681,7 @@ def addressToCommonNames(address):
 
 def addressToForteName(address, classification='tn'):
     '''
-    Given an address, return the set-class name as a string.  By default
+    Given an address, return the set-class name as a string.  By default,
     A and B are appended to chords without inversional equivalence:
 
     >>> octachord_address = chord.tables.ChordTableAddress(8, 15, -1, 10)
@@ -1689,7 +1690,7 @@ def addressToForteName(address, classification='tn'):
     >>> chord.tables.addressToForteName((8, 15))
     '8-15A'
 
-    The augmented triad is invariant under inversion so it gets no designation:
+    The augmented triad is invariant under inversion, so it gets no designation:
 
     >>> chord.tables.addressToForteName((3, 12))
     '3-12'
@@ -1723,7 +1724,7 @@ def seekChordTablesAddress(c):
 
     Table addresses are a ChordTableAddress named-tuple giving
     the cardinality, the Forte-index-number, the inversion, and the original
-    pitch class that matched (may be arbitrary for a symmetrical chord like
+    pitch class that matched (it may be arbitrary for a symmetrical chord like
     the diminished seventh chord).
 
     Inversion is either 0 (for symmetrical under inversion) or -1, 1
@@ -1768,7 +1769,7 @@ def seekChordTablesAddress(c):
     music21.chord.tables.ChordTablesException: cannot access chord tables address
         for Chord with 0 pitches
 
-    NOTE: this was once a time consuming operation, though it is
+    NOTE: this was once a time-consuming operation, though it is
     now quite a bit faster than before (order of 100 microseconds).  Nonetheless
     should only be run when necessary.  Methods that call this should
     try (as chord.Chord does) to cache the result.
@@ -1793,7 +1794,7 @@ def seekChordTablesAddress(c):
     card = len(pcSet)
     if card == 1:  # it is a singleton: return it
         return ChordTableAddress(1, 1, 0, pcSet[0])
-    elif card == 12:  # its the aggregate
+    elif card == 12:  # it is the aggregate
         return ChordTableAddress(12, 1, 0, 0)
 
     # go through each rotation of pcSet
