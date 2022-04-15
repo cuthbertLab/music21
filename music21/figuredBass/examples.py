@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         examples.py
-# Purpose:      music21 class which allows running of test cases
+# Purpose:      Figured bass test cases
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
@@ -94,7 +94,6 @@ def exampleD():
     The following is a realization of fbLine in four parts using the default rules set.
     The soprano part is limited to stepwise motion, and the alto and tenor parts are
     limited to motions within a perfect octave.
-
 
     >>> from music21.figuredBass import rules
     >>> fbRules = rules.Rules()
@@ -367,17 +366,11 @@ def italianA6ResolutionExample():
 
 def twelveBarBlues():
     '''
-    This is an progression in Bb major based on the twelve bar blues. The progression used is:
+    This is a progression in Bb major based on the twelve bar blues. The progression used is:
 
-
-    I  |  IV  |  I  |  I7
-
-
-    IV |  IV  |  I  |  I7
-
-
-    V7 |  IV6 |  I  |  I
-
+        I  |  IV  |  I  |  I7
+        IV |  IV  |  I  |  I7
+        V7 |  IV6 |  I  |  I
 
     >>> from music21.figuredBass import examples
     >>> from music21.figuredBass import rules

@@ -5050,7 +5050,7 @@ class MeasureExporter(XMLExporterBase):
 
         >>> cs = harmony.ChordSymbol()
         >>> cs.root('E-')
-        >>> cs.bass('B-')
+        >>> cs.bass('B-', allow_add=True)
         >>> cs.inversion(2, transposeOnSet=False)
         >>> cs.chordKind = 'major'
         >>> cs.chordKindStr = 'M'

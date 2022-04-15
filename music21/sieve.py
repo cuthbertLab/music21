@@ -362,7 +362,7 @@ def unitNormStep(step, a=0, b=1, normalized=True):
     to fill step through inclusive a,b, then return a unit interval list of values
     necessary to cover region.
 
-    Note that returned values are by default normalized within the unit interval.
+    Note that returned values are, by default, normalized within the unit interval.
 
 
     >>> sieve.unitNormStep(0.5, 0, 1)
