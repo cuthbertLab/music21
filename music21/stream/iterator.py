@@ -211,6 +211,7 @@ class StreamIterator(prebase.ProtoM21Object):
         self.cleanup()
         raise StopIteration
 
+    @common.deprecated('v8', 'v9', 'Call .stream() before attribute access for efficiency.')
     def __getattr__(self, attr):
         '''
         In case an attribute is defined on Stream but not on a StreamIterator,
@@ -218,6 +219,9 @@ class StreamIterator(prebase.ProtoM21Object):
         optimized -- calling this repeatedly will mean creating a lot of different
         streams.  However, it will prevent most code that worked on v.2. from breaking
         on v.3 and onwards.
+
+        Deprecated in v.8. The upgrade path is to just call `.stream()` on the iterator
+        before accessing the attribute.
 
         >>> s = stream.Measure()
         >>> s.insert(0, note.Rest())
@@ -230,9 +234,8 @@ class StreamIterator(prebase.ProtoM21Object):
         <music21.stream.iterator.StreamIterator for Measure:0x101c1a208 @:0>
 
         >>> import warnings  #_DOCS_HIDE
-        >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
-        ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
+        ...      warnings.simplefilter('ignore') #_DOCS_HIDE
         ...      explicit = s.notes.definesExplicitSystemBreaks #_DOCS_HIDE
         >>> #_DOCS_SHOW explicit = s.notes.definesExplicitSystemBreaks
         >>> explicit
@@ -241,7 +244,7 @@ class StreamIterator(prebase.ProtoM21Object):
         Works with methods as well:
 
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
-        ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
+        ...      warnings.simplefilter('ignore') #_DOCS_HIDE
         ...      popC = s.notes.pop(0) #_DOCS_HIDE
         >>> #_DOCS_SHOW popC = s.notes.pop(0)
         >>> popC
@@ -252,19 +255,19 @@ class StreamIterator(prebase.ProtoM21Object):
         always getting the same element.
 
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
-        ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
+        ...      warnings.simplefilter('ignore') #_DOCS_HIDE
         ...      popC = s.notes.pop(0) #_DOCS_HIDE
         >>> #_DOCS_SHOW popC = s.notes.pop(0)
         >>> popC
         <music21.note.Note C>
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
-        ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
+        ...      warnings.simplefilter('ignore') #_DOCS_HIDE
         ...      popC = s.notes.pop(0) #_DOCS_HIDE
         >>> #_DOCS_SHOW popC = s.notes.pop(0)
         >>> popC
         <music21.note.Note C>
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
-        ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
+        ...      warnings.simplefilter('ignore') #_DOCS_HIDE
         ...      popC = s.notes.pop(0) #_DOCS_HIDE
         >>> #_DOCS_SHOW popC = s.notes.pop(0)
         >>> popC
