@@ -4669,6 +4669,7 @@ class MeasureParser(XMLParserBase):
 
         Test that a forward repeat with times doesn't raise an exception, and
         that the resulting Repeat doesn't have times set.
+
         >>> mxStartBarline = ET.fromstring('<barline><bar-style>light-heavy</bar-style>' +
         ...       '<repeat direction="forward" times="2"/></barline>')
         >>> rs = MP.xmlToRepeat(mxStartBarline)
@@ -4709,13 +4710,13 @@ class MeasureParser(XMLParserBase):
         else:
             raise bar.BarException('cannot handle mx direction format:', mxDirection)
 
-        try:
-            if mxRepeat.get('times') is not None:
+        if mxRepeat.get('times') is not None:
+            try:
                 # make into a number
                 r.times = int(mxRepeat.get('times'))
-        except bar.BarException:
-            # ignore BarException, just let the set of r.times fail silently
-            pass
+            except bar.BarException:
+                # ignore BarException, just let the set of r.times fail silently
+                pass
 
         if inputM21 is None:
             return r
