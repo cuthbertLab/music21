@@ -1188,7 +1188,7 @@ class Chord(ChordBase):
              *,
              find: Union[bool, None] = None,
              allow_add: bool = False,
-             ):
+             ) -> Optional[pitch.Pitch]:
         '''
         Generally used to find and return the bass Pitch:
 
@@ -1305,8 +1305,8 @@ class Chord(ChordBase):
             if not foundBassInChord:  # it's not there, needs to be added
                 if not allow_add:
                     raise ChordException(f'Pitch {newbass} not found in chord')
-                else:
-                    self.pitches = (newbass, *(p for p in self.pitches))
+
+                self.pitches = (newbass, *(p for p in self.pitches))
 
             self._overrides['bass'] = newbass
             self._cache['bass'] = newbass
@@ -3646,7 +3646,8 @@ class Chord(ChordBase):
     def root(self,
              newroot: Union[None, str, pitch.Pitch, note.Note] = None,
              *,
-             find: Union[bool, None] = None):
+             find: Union[bool, None] = None
+             ) -> Optional[pitch.Pitch]:
         # noinspection PyShadowingNames
         '''
         Returns the root of the chord.  Or if given a Pitch as the
