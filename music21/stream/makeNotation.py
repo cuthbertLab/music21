@@ -1878,7 +1878,7 @@ def splitElementsToCompleteTuplets(
     (Destructive edit, so make a copy first if desired.)
     Relies on :meth:`~music21.stream.base.splitAtQuarterLength`.
 
-    New in v7.3.
+    New in v8.
 
     >>> from music21.stream.makeNotation import splitElementsToCompleteTuplets
     >>> s = stream.Stream(
@@ -1955,7 +1955,7 @@ def consolidateCompletedTuplets(
     and removing the subsequent elements from the stream. (Destructive edit,
     so make a copy first if desired.)
 
-    New in v7.3.
+    New in v8.
 
     >>> s = stream.Stream()
     >>> r = note.Rest(quarterLength=1/6)
