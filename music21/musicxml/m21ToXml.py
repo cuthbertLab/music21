@@ -2215,6 +2215,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # environLocal.printDebug(['configureMxPartGroupFromStaffGroup: mxPartGroup', mxPartGroup])
         return mxPartGroup
 
+    # temporary for testing: set ScoreExporter.USE_BACKWARD_COMPATIBLE_METADATA_APIS to True
+    # if you want to test those APIs.
+    USE_BACKWARD_COMPATIBLE_METADATA_APIS: bool = False
     def setIdentification(self):
         # noinspection SpellCheckingInspection, PyShadowingNames
         '''
@@ -2281,22 +2284,40 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # creators
         foundOne = False
         if self.scoreMetadata is not None:
-            for c in self.scoreMetadata.contributors:
-                mxCreator = self.contributorToXmlCreator(c)
-                mxId.append(mxCreator)
-                foundOne = True
+            if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
+                for contrib in self.scoreMetadata.contributors:
+                    mxCreator = self.contributorToXmlCreator(contrib)
+                    mxId.append(mxCreator)
+                    foundOne = True
+            else:
+                for contribItem in self.scoreMetadata.getAllContributorItems():
+                    mxCreator = self.contributorItemToXmlCreator(contribItem)
+                    mxId.append(mxCreator)
+                    foundOne = True
 
         if foundOne is False and defaults.author:
             mxCreator = SubElement(mxId, 'creator')
             mxCreator.set('type', 'composer')
             mxCreator.text = defaults.author
 
-        if self.scoreMetadata is not None and self.scoreMetadata.copyright is not None:
-            c = self.scoreMetadata.copyright
-            mxRights = SubElement(mxId, 'rights')
-            if c.role is not None:
-                mxRights.set('type', c.role)
-            mxRights.text = str(c)
+        if self.scoreMetadata is not None:
+            copyrights: List[metadata.Copyright] = []
+            if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
+                c = self.scoreMetadata.copyright
+                if c:
+                    copyrights = [c]
+            else:
+                copyrights = self.scoreMetadata.getItem('copyright')
+                if copyrights is None:
+                    copyrights = []
+                if not isinstance(copyrights, list):
+                    copyrights = [copyrights]
+
+            for c in copyrights:
+                mxRights = SubElement(mxId, 'rights')
+                if c.role is not None:
+                    mxRights.set('type', c.role)
+                mxRights.text = str(c)
 
         # Encoding does its own append...
         self.setEncoding()
@@ -2334,12 +2355,27 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxMiscellaneous = Element('miscellaneous')
 
         foundOne = False
-        for name, value in md.all(skipContributors=True):
-            if name in ('movementName', 'movementNumber', 'title', 'copyright'):
-                continue
+        allItems: Dict[Any] = []
+
+        if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
+            allItems = md.all(skipContributors=True)
+        else:
+            allItems = md.getAllItems(skipContributors=True)
+
+        for name, value in allItems:
+            if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
+                if name in ('movementName', 'movementNumber', 'title', 'copyright'):
+                    continue
+            else:
+                if name in (md.uniqueNameToNSKey('movementName'),
+                            md.uniqueNameToNSKey('movementNumber'),
+                            md.uniqueNameToNSKey('title'),
+                            md.uniqueNameToNSKey('copyright')):
+                    continue
+
             mxMiscField = SubElement(mxMiscellaneous, 'miscellaneous-field')
             mxMiscField.set('name', name)
-            mxMiscField.text = value
+            mxMiscField.text = str(value)
             foundOne = True
 
         if self.mxIdentification is not None and foundOne:
@@ -2499,33 +2535,23 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             mxCreator.text = c.name
         return mxCreator
 
-    # TODO: expand creator creation to try to put in all the marcrel contributors, not
-    # TODO:     just the backward-compatible list here.  What do the other musicxml
-    # TODO:     encoders put in as creator types?
-    m21MetadataNSKeyToXMLCreatorType: Dict = {
-        'marcrel:CMP': 'composer',
-        'music21:attributedComposer': 'attributedComposer',
-        'music21:suspectedComposer': 'suspectedComposer',
-        'music21:composerAlias': 'composerAlias',
-        'music21:composerCorporate': 'composerCorporate',
-        'marcrel:LYR': 'lyricist',
-        'marcrel:LBT': 'librettist',
-        'marcrel:ARR': 'arranger',
-        'music21:orchestrator': 'orchestrator',
-        'marcrel:TRL': 'translator',
-    }
-
-    def m21MetadataNSKeyValueToXmlCreator(self, nsKey: str, value: metadata.Text):
+    def contributorItemToXmlCreator(self, c):
+        # noinspection SpellCheckingInspection, PyShadowingNames
         '''
         Return a <creator> tag from a contributor tuple c = (nsKey, value).
         '''
         mxCreator = Element('creator')
 
-        role: str = ScoreExporter.m21MetadataNSKeyToXMLCreatorType.get(nsKey, None)
+        # c is a contributor item tuple(nskey, value)
+        nsKey: str = None
+        value: metadata.Contributor = None
+        nsKey, value = c
+        role: str = metadata.Metadata.nsKeyToContributorUniqueName(nsKey)
         if role is not None:
             mxCreator.set('type', role)
         if value is not None:
-            mxCreator.text = str(value)
+            # TODO: Add m21ToXml.py support for contributors with multiple names
+            mxCreator.text = str(value.names[0])
         return mxCreator
 
 # ------------------------------------------------------------------------------

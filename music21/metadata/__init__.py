@@ -42,85 +42,26 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 
     A guide to this initial new implementation:
 
-    - class Metadata is the class to use for backward compatibility. The guts are
-        completely rewritten to support the new extensions, but Metadata's APIs
-        are all backward compatible. ExtendedMetadata has the same underlying
-        implementation, and is allowed to redefine existing APIs to behave in a
-        new way.  For example, if you use Metadata directly, then the various
-        properties like md.alternateTitle cast to str, as before. If you use
-        ExtendedMetadata, md.alternateTitle will return the underlying Text
-        type. (Note: Text is enhanced with a few new fields, but in a backward
-        compatible way, so no new Text class is defined.)
+    - The guts of class Metadata are completely rewritten to support the new
+        extensions, but all of Metadata's old APIs are still in place and
+        are all backward compatible. There are new APIs (getItem, addItem
+        et al) to access the new metadata extensions.
 
-        This class structure introduces a problem: if you get the metadata from a
-        stream, you will get unpredictable behavior based on whether the parser
-        placed a Metadata or ExtendedMetadata in the stream.  Solution: have a
-        new Stream property (s.extendedMetadata) that always returns an
-        ExtendedMetadata object. We will need to have one underlying ground
-        truth object, with a conversion taking place if necessary.  Conversion
-        should be straightforward, since there is only one underlying
-        implementation.  There are other ways to get metadata from a stream
-        (via the usual get-an-object-from-a-stream APIs), but in those, you are
-        searching by type.  Old clients will need to always be able to find type
-        Metadata, so Metadata must be in the class hierarchy of ExtendedMetadata.
-        New clients will want to be able to get ExtendedMetadata, but we can't
-        have both backward and forward compatibility here, so new clients will
-        need to know to look for Metadata, and then if the result is not
-        actually ExtendedMetadata, to do a conversion to ExtendedMetadata:
-
-            metadata: [ExtendedMetadata] = stream.getElementsByClass(Metadata)
-            for md in metadata:
-                if not isinstance(metadata, ExtendedMetadata):
-                    md = ExtendedMetadata(md)
-                processExtendedMetadata(md)
-
-        This implies that ExtendedMetadata.__init__ needs to have a way to
-        initialize from a Metadata, or better from any MetadataBase, so
-        clients don't actually need to check the type:
-
-            metadata: [ExtendedMetadata] = stream.getElementsByClass(Metadata)
-            for md in metadata:
-                processExtendedMetadata(ExtendedMetadata(md))
-
-        The class hierarchy to manage all this will be:
-        MetadataBase (new implementation, has new "support" APIs)
-            Metadata (uses MetadataBase's new "support" APIs, but has
-                        only old client APIs with old behavior)
-                ExtendedMetadata (uses MetadataBase's new "support" APIs,
-                                    has only new behavior)
-        I thought about doing:
-        Metadata
-            ExtendedMetadata
-
-        or even just:
-        Metadata (with both new and old APIs)
-
-        but trying to combine new implementation with backward compatibility APIs
-        (and new client APIs) gave me a headache.
-
-        I also considered:
-        MetadataBase (implementation)
-            Metadata (thin compatible API)
-            ExtendedMetadata (thin new API)
-
-        but I needed ExtendedMetadata to be derived from Metadata, so old clients can
-        find it via getElementsByClass(Metadata)
-
-    - The old metadata had a list of supported workIds, and also a list of supported
-        contributor roles.  You could have more than one of each role, but only one
-        of each workId.
+    - The old metadata implementation had a list of supported workIds, and also a
+        list of supported contributor roles.  You could have more than one of each
+        role, but only one of each workId.
         In the new implementation, I don't really treat contributor roles differently
         from other metadata.  I have a list of supported property terms, which are
-        pulled from Dublin Core (namespace = 'dcterm'), MARC Relator codes (a.k.a.
+        pulled from Dublin Core (namespace = 'dcterms'), MARC Relator codes (a.k.a.
         contributor roles, namespace = 'marcrel'), and several music21-specific things
-        that I have to continue supporting even though I can't find any official List
+        that I have to continue supporting even though I can't find any official list
         of terms that support them (namespace = 'music21').  An example is 'popularTitle'.
         You can have more than one of any of these.  That implies that I need two APIs
         for adding a new piece of metadata.  One that does "this is the new (only) value
         for this metadata property term", and one that does "this is a new value to add in to any
         other values you might have for this metadata property term".  They are:
         addItem() and setItem().  addItem adds the new item to the (possibly empty)
-        set of values, and setItem removes any current value(s) before adding the item.
+        list of values, and setItem removes any current value(s) before adding the item.
 
     - Primitives: Old code had DateXxxx and Text.  DateXxxx still works for Dublin Core
         et al (it's a superset of what is needed), but Text needs to add the ability to
@@ -128,27 +69,59 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
         scheme (a.k.a. what standard should I use to parse this string) so I have added
         new fields to Text in a backward-compatible way.
 
-    - I have not yet tried to support client-specified namespaces, but I do have a few
-        APIs (getPersonalItem, addPersonalItem, setPersonalItem) that have no namespace
-        at all, so clients can set anything they want and (hopefully) get it passed through.
-        The first client-specified namespace I will try is 'humdrum' for all the crazy humdrum
-        metadata that music21 doesn't really need to add as officially supported, but should
-        be passed through to the humdrum writer so it isn't lost.
+    - Metadata does not (yet) explicitly support client-specified namespaces, but there
+        are a few APIs (getPersonalItem, addPersonalItem, setPersonalItem) that have no
+        namespace at all, so clients can set anything they want and get it passed through.
+        A parser could use this to set (say) 'humdrum:XXX' metadata that doesn't map to
+        any standard metadata property, and a writer that understood 'humdrum' metadata
+        could then write it back to a file.  Personal metadata can also include things
+        that are specific to a particular person who is in the process of editing files,
+        e.g. setPersonalItem('I have reached staff number', 1000). This can also be passed
+        through to various file formats as long as there is a place for such a thing (e.g.
+        'miscellaneous' in MusicXML).
 
-    - A new type that drives a lot of the implementation: Property
-        A Property is a namedtuple with (currently) four fields that describe a property
-            code is a (possibly abbreviated) code for the property
-            name is the official name of the property (tail of the property term URI)
-            label is the human readable name of the Property
-            namespace is the namespace in which the property is named (e.g. 'dcterm' for
-                Dublin Core terms, 'marcrel' for MARC Relator terms, etc)
-        The list of supported properties is STDPROPERTIES, and various lists and dicts are
-        created from that for later use.
+    - A new type that drives a lot of the implementation: PropertyDescription
+        A PropertyDescription is a namedtuple with multiple fields that describe
+            a metadata property:
+            abbrevCode is a (usually abbreviated) code for the property
+            name is the official name of the property (the tail of the property term URI)
+            label is the human readable name of the property
+            namespace is a shortened form of the URI for the set of terms
+                e.g. 'dcterms' means the property term is from the Dublin Core terms.
+                'dcterms' is the shortened form of <http://purl.org/dc/terms/>
+                e.g. 'marcrel' means the property term is from the MARC Relator terms.
+                'marcrel' is the shortened form of <http://www.loc.gov/loc.terms/relators/>
+            isContributor is whether or not the property describes a contributor.
+            m21WorkId is the backward compatible music21 name for this property (this
+                is not necessary if we are using the 'music21' namespace for a
+                particular backward compatible property, when the workId can be found
+                in the name field). Note that we use m21WorkId for music21 contributor
+                roles when necessary, as well.
+            m21Abbrev is the backward compatible music21 abbreviation for this property
+                (again, not necessary if we are using the 'music21' namespace, when
+                the abbreviation can be found in the code field)
+            uniqueName is the official music21 name for this property, that is unique
+                within the list of properties. There is always a unique name, but the
+                uniqueName field is only set if m21WorkId or name is not unique enough.
+                To get the unique name from a particular PropertyDescription, we do:
+                    (desc.uniqueName if desc.uniqueName
+                        else desc.m21WorkId if desc.m21WorkId
+                        else desc.name)
+            valueType is the actual type of the value that will be stored in the metadata.
+                This allows auto-conversion to take place inside setItem/addItem, and is
+                the type clients will always receive from getItem.
+
+        The list of supported properties is Metadata.STDPROPERTYDESCS, and various lookup dicts
+        are created from that in the class for later use.
 
     - Data structure for all the metadata:
         Metadata contains a _metadata attribute which is a dict, where the keys are
         f'{namespace}:{name}', and the value is either Any, or a List[Any] (for properties
-        that have more than one value).
+        that have more than one value).  The old attributes copyright and date have been
+        moved into the _metadata dict ('dcterms:rights' and 'dcterms:created'). Those are
+        good PropertyDescription examples to look at to see the relationship between
+        name, m21WorkId, and uniqueName.  We have maintained the old software attribute as
+        a list of strings that is accessed directly, as before.
 
 '''
 from collections import OrderedDict, namedtuple
@@ -179,21 +152,20 @@ from music21.metadata import testMetadata
 
 __all__ = [
     'Metadata',         # the old API
-    'ExtendedMetadata', # the new API (but derived from Metadata)
     'RichMetadata',
     'AmbitusShort',
-    'Property'
+    'PropertyDescription'
 ]
 
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
 
-_propertyFields = ('abbrevCode', 'name', 'label', 'namespace', 'isContributor',
+_propertyDescFields = ('abbrevCode', 'name', 'label', 'namespace', 'isContributor',
                    'm21Abbrev', 'm21WorkId', 'uniqueName', 'valueType')
-# default Property fields are all None except valueType which defaults to Text
-Property = namedtuple('Property',
-                      _propertyFields,
-                      defaults=((None,) * (len(_propertyFields)-1)) + (Text,))
+# default PropertyDescription fields are all None except valueType which defaults to Text
+PropertyDescription = namedtuple('PropertyDescription',
+                                 _propertyDescFields,
+                      defaults=((None,) * (len(_propertyDescFields)-1)) + (Text,))
 
 @dataclass
 class FileInfo:
@@ -206,2066 +178,7 @@ AmbitusShort = namedtuple('AmbitusShort',
 
 # -----------------------------------------------------------------------------
 
-class MetadataBase(base.Music21Object):
-
-    # CLASS VARIABLES #
-
-    classSortOrder = -30
-
-    # STDPROPERTIES: each Tuple in this list is
-    # abbrevCode, name, label, namespace, m21Abbrev, m21WorkId, isContributor
-    # where:
-    # code is an abbreviation for the name
-    # name is the tail of the property term URI
-    # label is the human-readable name of the property term
-    # namespace is a shortened form of the URI for the set of terms
-    #   e.g. 'dcterm' means the property term is from the Dublin Core property terms.
-    #   'dcterm' is the shortened form of <http://purl.org/dc/terms/>
-    #   e.g. 'marcrel' means the property term is from the MARC Relator terms (a.k.a. 'roles').
-    #   'marcrel' is the shortened form of <http://www.loc.gov/loc.terms/relators/>
-    # isContributor: bool describes whether or not this property is a contributor role
-    #   The following two are optional...
-    # m21Abbrev is the old abbreviation (from Metadata.workIdAbbreviationDict)
-    #       Note that this is None if namespace is 'music21' (abbrevCode is used in
-    #       that case), and this is also None if the property doesn't map into the
-    #       workId list at all.
-    # m21WorkId is the old workID (from Metadata.workIdAbbreviationDict)
-    #       Note that this is None if namespace is 'music21' (name is used in
-    #       that case), and this is also None if the property doesn't map into the
-    #       workId list at all, unless it is 'composer', 'copyright' or 'date',
-    #       which are used in searchAttributes as (a sort of) workId with no abbrev.
-
-    STDPROPERTIES: Tuple[Property] = (
-        # The following 'dcterm' properties are the standard Dublin Core property terms
-        # found at http://purl.org/dc/terms/
-
-        # abstract: A summary of the resource.
-        Property(abbrevCode='AB',
-                 name='abstract',
-                 label='Abstract',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # accessRights: Information about who access the resource or an indication of
-        #   its security status.
-        Property(abbrevCode='AR',
-                 name='accessRights',
-                 label='Access Rights',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # accrualMethod: The method by which items are added to a collection.
-        Property(abbrevCode='AM',
-                 name='accrualMethod',
-                 label='Accrual Method',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # accrualPeriodicity: The frequency with which items are added to a collection.
-        Property(abbrevCode='AP',
-                 name='accrualPeriodicity',
-                 label='Accrual Periodicity',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # accrualPolicy: The policy governing the addition of items to a collection.
-        Property(abbrevCode='APL',
-                 name='accrualPolicy',
-                 label='Accrual Policy',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # alternative: An alternative name for the resource.
-        Property(abbrevCode='ALT',
-                 name='alternative',
-                 label='Alternative Title',
-                 namespace='dcterm',
-                 m21Abbrev='ota',
-                 m21WorkId='alternativeTitle',
-                 isContributor=False),
-
-        # audience: A class of agents for whom the resource is intended or useful.
-        Property(abbrevCode='AUD',
-                 name='audience',
-                 label='Audience',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # available: Date that the resource became or will become available.
-        Property(abbrevCode='AVL',
-                 name='available',
-                 label='Date Available',
-                 namespace='dcterm',
-                 uniqueName='dateAvailable',
-                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
-                 isContributor=False),
-
-        # bibliographicCitation: A bibliographic reference for the resource.
-        Property(abbrevCode='BIB',
-                 name='bibliographicCitation',
-                 label='Bibliographic Citation',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # conformsTo: An established standard to which the described resource conforms.
-        Property(abbrevCode='COT',
-                 name='conformsTo',
-                 label='Conforms To',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # contributor: An entity responsible for making contributions to the resource.
-        # NOTE: You should use one of the 'marcrel' properties below instead, since
-        # this property is very vague. The 'marcrel' properties are considered to be
-        # refinements of dcterm:contributor (this property), so if someone asks for
-        # everything as Dublin Core metadata, those will all be translated into
-        # dcterm:contributor properties.
-        Property(abbrevCode='CN',
-                 name='contributor',
-                 label='Contributor',
-                 namespace='dcterm',
-                 uniqueName='genericContributor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # coverage: The spatial or temporal topic of the resource, spatial applicability
-        #   of the resource, or jurisdiction under which the resource is relevant.
-        Property(abbrevCode='CVR',
-                 name='coverage',
-                 label='Coverage',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # created: Date of creation of the resource.
-        Property(abbrevCode='CRD',
-                 name='created',
-                 label='Date Created',
-                 namespace='dcterm',
-                 m21WorkId='date',  # no abbrev
-                 uniqueName='dateCreated',
-                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
-                 isContributor=False),
-
-        # creator: An entity responsible for making the resource.
-        Property(abbrevCode='CR',
-                 name='creator',
-                 label='Creator',
-                 namespace='dcterm',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # date: A point or period of time associated with an event in the lifecycle
-        #   of the resource.
-        Property(abbrevCode='DT',
-                 name='date',
-                 label='Date',
-                 namespace='dcterm',
-                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
-                 isContributor=False),
-
-        # dateAccepted: Date of acceptance of the resource.
-        Property(abbrevCode='DTA',
-                 name='dateAccepted',
-                 label='Date Accepted',
-                 namespace='dcterm',
-                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
-                 isContributor=False),
-
-        # dateCopyrighted: Date of copyright of the resource.
-        Property(abbrevCode='DTC',
-                 name='dateCopyrighted',
-                 label='Date Copyrighted',
-                 namespace='dcterm',
-                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
-                 isContributor=False),
-
-        # dateSubmitted: Date of submission of the resource.
-        Property(abbrevCode='DTS',
-                 name='dateSubmitted',
-                 label='Date Submitted',
-                 namespace='dcterm',
-                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
-                 isContributor=False),
-
-        # description: An account of the resource.
-        Property(abbrevCode='DSC',
-                 name='description',
-                 label='Description',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # educationLevel: A class of agents, defined in terms of progression
-        #   through an educational or training context, for which the described
-        #   resource is intended.
-        Property(abbrevCode='EL',
-                 name='educationLevel',
-                 label='Audience Education Level',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # extent: The size or duration of the resource.
-        Property(abbrevCode='EXT',
-                 name='extent',
-                 label='Extent',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # format: The file format, physical medium, or dimensions of the resource.
-        Property(abbrevCode='FMT',
-                 name='format',
-                 label='Format',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # hasFormat: A related resource that is substantially the same as the
-        #   pre-existing described resource, but in another format.
-        Property(abbrevCode='HFMT',
-                 name='hasFormat',
-                 label='Has Format',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # hasPart: A related resource that is included either physically or
-        #   logically in the described resource.
-        Property(abbrevCode='HPT',
-                 name='hasPart',
-                 label='Has Part',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # hasVersion: A related resource that is a version, edition, or adaptation
-        #   of the described resource.
-        Property(abbrevCode='HVS',
-                 name='hasVersion',
-                 label='Has Version',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # identifier: An unambiguous reference to the resource within a given context.
-        Property(abbrevCode='ID',
-                 name='identifier',
-                 label='Identifier',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # instructionalMethod: A process, used to engender knowledge, attitudes and
-        #   skills, that the described resource is designed to support.
-        Property(abbrevCode='IM',
-                 name='instructionalMethod',
-                 label='Instructional Method',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # isFormatOf: A pre-existing related resource that is substantially the same
-        #   as the described resource, but in another format.
-        Property(abbrevCode='IFMT',
-                 name='isFormatOf',
-                 label='Is Format Of',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # isPartOf: A related resource in which the described resource is physically
-        #   or logically included.
-        Property(abbrevCode='IPT',
-                 name='isPartOf',
-                 label='Is Part Of',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # isReferencedBy: A related resource that references, cites, or otherwise
-        #   points to the described resource.
-        Property(abbrevCode='IREF',
-                 name='isReferencedBy',
-                 label='Is Referenced By',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # isReplacedBy: A related resource that supplants, displaces, or supersedes
-        #   the described resource.
-        Property(abbrevCode='IREP',
-                 name='isReplacedBy',
-                 label='Is Replaced By',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # isRequiredBy: A related resource that requires the described resource
-        #   to support its function, delivery, or coherence.
-        Property(abbrevCode='IREQ',
-                 name='isRequiredBy',
-                 label='Is Required By',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # issued: Date of formal issuance of the resource.
-        Property(abbrevCode='IS',
-                 name='issued',
-                 label='Date Issued',
-                 namespace='dcterm',
-                 uniqueName='dateIssued',
-                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
-                 isContributor=False),
-
-        # isVersionOf: A related resource of which the described resource is a
-        #   version, edition, or adaptation.
-        Property(abbrevCode='IVSN',
-                 name='isVersionOf',
-                 label='Is Version Of',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # language: A language of the resource.
-        Property(abbrevCode='LG',
-                 name='language',
-                 label='Language',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # license: A legal document giving official permission to do something
-        #   with the resource.
-        Property(abbrevCode='LI',
-                 name='license',
-                 label='License',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # mediator: An entity that mediates access to the resource.
-        Property(abbrevCode='ME',
-                 name='mediator',
-                 label='Mediator',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # medium: The material or physical carrier of the resource.
-        Property(abbrevCode='MED',
-                 name='medium',
-                 label='Medium',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # modified: Date on which the resource was changed.
-        Property(abbrevCode='MOD',
-                 name='modified',
-                 label='Date Modified',
-                 namespace='dcterm',
-                 uniqueName='dateModified',
-                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
-                 isContributor=False),
-
-        # provenance: A statement of any changes in ownership and custody of
-        #   the resource since its creation that are significant for its
-        #   authenticity, integrity, and interpretation.
-        Property(abbrevCode='PRV',
-                 name='provenance',
-                 label='Provenance',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # publisher: An entity responsible for making the resource available.
-        Property(abbrevCode='PBL',
-                 name='publisher',
-                 label='Publisher',
-                 namespace='dcterm',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # references: A related resource that is referenced, cited, or
-        #   otherwise pointed to by the described resource.
-        Property(abbrevCode='REF',
-                 name='references',
-                 label='References',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # relation: A related resource.
-        Property(abbrevCode='REL',
-                 name='relation',
-                 label='Relation',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # replaces: A related resource that is supplanted, displaced, or
-        #   superseded by the described resource.
-        Property(abbrevCode='REP',
-                 name='replaces',
-                 label='Replaces',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # requires: A related resource that is required by the described
-        #   resource to support its function, delivery, or coherence.
-        Property(abbrevCode='REQ',
-                 name='requires',
-                 label='Requires',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # rights: Information about rights held in and over the resource.
-        Property(abbrevCode='RT',
-                 name='rights',
-                 label='Rights',
-                 namespace='dcterm',
-                 m21WorkId='copyright', # no abbrev
-                 isContributor=False),
-
-        # rightsHolder: A person or organization owning or managing rights
-        #   over the resource.
-        Property(abbrevCode='RH',
-                 name='rightsHolder',
-                 label='Rights Holder',
-                 namespace='dcterm',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # source: A related resource from which the described resource
-        #   is derived.
-        Property(abbrevCode='SRC',
-                 name='source',
-                 label='Source',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # spatial: Spatial characteristics of the resource.
-        Property(abbrevCode='SP',
-                 name='spatial',
-                 label='Spatial Coverage',
-                 namespace='dcterm',
-                 uniqueName='spatialCoverage',
-                 isContributor=False),
-
-        # subject: A topic of the resource.
-        Property(abbrevCode='SUB',
-                 name='subject',
-                 label='Subject',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # tableOfContents: A list of subunits of the resource.
-        Property(abbrevCode='TOC',
-                 name='tableOfContents',
-                 label='Table Of Contents',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # temporal: Temporal characteristics of the resource.
-        Property(abbrevCode='TE',
-                 name='temporal',
-                 label='Temporal Coverage',
-                 namespace='dcterm',
-                 uniqueName='temporalCoverage',
-                 isContributor=False),
-
-        # title: A name given to the resource.
-        Property(abbrevCode='T',
-                 name='title',
-                 label='Title',
-                 namespace='dcterm',
-                 m21Abbrev='otl',
-                 m21WorkId='title',
-                 isContributor=False),
-
-        # type : The nature or genre of the resource.
-        Property(abbrevCode='TYP',
-                 name='type',
-                 label='Type',
-                 namespace='dcterm',
-                 isContributor=False),
-
-        # valid: Date (often a range) of validity of a resource.
-        Property(abbrevCode='VA',
-                 name='valid',
-                 label='Date Valid',
-                 namespace='dcterm',
-                 uniqueName='dateValid',
-                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
-                 isContributor=False),
-
-        # The following 'marcrel' property terms are the MARC Relator terms
-        # that are refinements of dcterm:contributor, and can be used anywhere
-        # dcterm:contributor can be used if you want to be more specific (and
-        # you will want to). The MARC Relator terms are defined at:
-        # http://www.loc.gov/loc.terms/relators/
-        # and this particular sublist can be found at:
-        # https://memory.loc.gov/diglib/loc.terms/relators/dc-contributor.html
-
-        # ACT/Actor: a person or organization who principally exhibits acting
-        #   skills in a musical or dramatic presentation or entertainment.
-        Property(abbrevCode='act',
-                 name='ACT',
-                 label='Actor',
-                 namespace='marcrel',
-                 uniqueName='actor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ADP/Adapter: a person or organization who 1) reworks a musical composition,
-        #   usually for a different medium, or 2) rewrites novels or stories
-        #   for motion pictures or other audiovisual medium.
-        Property(abbrevCode='adp',
-                 name='ADP',
-                 label='Adapter',
-                 namespace='marcrel',
-                 uniqueName='adapter',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ANM/Animator: a person or organization who draws the two-dimensional
-        #   figures, manipulates the three dimensional objects and/or also
-        #   programs the computer to move objects and images for the purpose
-        #   of animated film processing.
-        Property(abbrevCode='anm',
-                 name='ANM',
-                 label='Animator',
-                 namespace='marcrel',
-                 uniqueName='animator',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ANN/Annotator: a person who writes manuscript annotations on a printed item.
-        Property(abbrevCode='ann',
-                 name='ANN',
-                 label='Annotator',
-                 namespace='marcrel',
-                 uniqueName='annotator',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ARC/Architect: a person or organization who designs structures or oversees
-        #   their construction.
-        Property(abbrevCode='arc',
-                 name='ARC',
-                 label='Architect',
-                 namespace='marcrel',
-                 uniqueName='architect',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ARR/Arranger: a person or organization who transcribes a musical
-        #   composition, usually for a different medium from that of the original;
-        #   in an arrangement the musical substance remains essentially unchanged.
-        Property(abbrevCode='arr',
-                 name='ARR',
-                 label='Arranger',
-                 namespace='marcrel',
-                 m21WorkId='arranger',
-                 m21Abbrev='lar',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ART/Artist: a person (e.g., a painter) or organization who conceives, and
-        #   perhaps also implements, an original graphic design or work of art, if
-        #   specific codes (e.g., [egr], [etr]) are not desired. For book illustrators,
-        #   prefer Illustrator [ill].
-        Property(abbrevCode='art',
-                 name='ART',
-                 label='Artist',
-                 namespace='marcrel',
-                 uniqueName='artist',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # AUT/Author: a person or organization chiefly responsible for the
-        #   intellectual or artistic content of a work, usually printed text.
-        Property(abbrevCode='aut',
-                 name='AUT',
-                 label='Author',
-                 namespace='marcrel',
-                 uniqueName='author',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # AQT/Author in quotations or text extracts: a person or organization
-        #   whose work is largely quoted or extracted in works to which he or
-        #   she did not contribute directly.
-        Property(abbrevCode='aqt',
-                 name='AQT',
-                 label='Author in quotations or text extracts',
-                 namespace='marcrel',
-                 uniqueName='quotationsAuthor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # AFT/Author of afterword, colophon, etc.: a person or organization
-        #   responsible for an afterword, postface, colophon, etc. but who
-        #   is not the chief author of a work.
-        Property(abbrevCode='aft',
-                 name='AFT',
-                 label='Author of afterword, colophon, etc.',
-                 namespace='marcrel',
-                 uniqueName='afterwordAuthor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # AUD/Author of dialog: a person or organization responsible for
-        #   the dialog or spoken commentary for a screenplay or sound
-        #   recording.
-        Property(abbrevCode='aud',
-                 name='AUD',
-                 label='Author of dialog',
-                 namespace='marcrel',
-                 uniqueName='dialogAuthor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # AUI/Author of introduction, etc.:  a person or organization
-        #   responsible for an introduction, preface, foreword, or other
-        #   critical introductory matter, but who is not the chief author.
-        Property(abbrevCode='aui',
-                 name='AUI',
-                 label='Author of introduction, etc.',
-                 namespace='marcrel',
-                 uniqueName='introductionAuthor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # AUS/Author of screenplay, etc.:  a person or organization responsible
-        #   for a motion picture screenplay, dialog, spoken commentary, etc.
-        Property(abbrevCode='aus',
-                 name='AUS',
-                 label='Author of screenplay, etc.',
-                 namespace='marcrel',
-                 uniqueName='screenplayAuthor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CLL/Calligrapher: a person or organization who writes in an artistic
-        #   hand, usually as a copyist and or engrosser.
-        Property(abbrevCode='cll',
-                 name='CLL',
-                 label='Calligrapher',
-                 namespace='marcrel',
-                 uniqueName='calligrapher',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CTG/Cartographer: a person or organization responsible for the
-        #   creation of maps and other cartographic materials.
-        Property(abbrevCode='ctg',
-                 name='CTG',
-                 label='Cartographer',
-                 namespace='marcrel',
-                 uniqueName='cartographer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CHR/Choreographer: a person or organization who composes or arranges
-        #   dances or other movements (e.g., "master of swords") for a musical
-        #   or dramatic presentation or entertainment.
-        Property(abbrevCode='chr',
-                 name='CHR',
-                 label='Choreographer',
-                 namespace='marcrel',
-                 uniqueName='choreographer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CNG/Cinematographer: a person or organization who is in charge of
-        #   the images captured for a motion picture film. The cinematographer
-        #   works under the supervision of a director, and may also be referred
-        #   to as director of photography. Do not confuse with videographer.
-        Property(abbrevCode='cng',
-                 name='CNG',
-                 label='Cinematographer',
-                 namespace='marcrel',
-                 uniqueName='cinematographer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CLB/Collaborator: a person or organization that takes a limited part
-        #   in the elaboration of a work of another person or organization that
-        #   brings complements (e.g., appendices, notes) to the work.
-        Property(abbrevCode='clb',
-                 name='CLB',
-                 label='Collaborator',
-                 namespace='marcrel',
-                 uniqueName='collaborator',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CLT/Collotyper: a person or organization responsible for the production
-        #   of photographic prints from film or other colloid that has ink-receptive
-        #   and ink-repellent surfaces.
-        Property(abbrevCode='clt',
-                 name='CLT',
-                 label='Collotyper',
-                 namespace='marcrel',
-                 uniqueName='collotyper',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CMM/Commentator: a person or organization who provides interpretation,
-        #   analysis, or a discussion of the subject matter on a recording,
-        #   motion picture, or other audiovisual medium.
-        Property(abbrevCode='cmm',
-                 name='CMM',
-                 label='Commentator',
-                 namespace='marcrel',
-                 uniqueName='commentator',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CWT/Commentator for written text: a person or organization responsible
-        #   for the commentary or explanatory notes about a text. For the writer
-        #   of manuscript annotations in a printed book, use Annotator [ann].
-        Property(abbrevCode='cwt',
-                 name='CWT',
-                 label='Commentator for written text',
-                 namespace='marcrel',
-                 uniqueName='writtenCommentator',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # COM/Compiler: a person or organization who produces a work or
-        #   publication by selecting and putting together material from the
-        #   works of various persons or bodies.
-        Property(abbrevCode='com',
-                 name='COM',
-                 label='Compiler',
-                 namespace='marcrel',
-                 uniqueName='compiler',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CMP/Composer: a person or organization who creates a musical work,
-        #   usually a piece of music in manuscript or printed form.
-        Property(abbrevCode='cmp',
-                 name='CMP',
-                 label='Composer',
-                 namespace='marcrel',
-                 m21WorkId='composer',
-                 m21Abbrev='com',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CCP/Conceptor: a person or organization responsible for the original
-        #   idea on which a work is based, this includes the scientific author
-        #   of an audio-visual item and the conceptor of an advertisement.
-        Property(abbrevCode='ccp',
-                 name='CCP',
-                 label='Conceptor',
-                 namespace='marcrel',
-                 uniqueName='conceptor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CND/Conductor: a person who directs a performing group (orchestra,
-        #   chorus, opera, etc.) in a musical or dramatic presentation or
-        #   entertainment.
-        Property(abbrevCode='cnd',
-                 name='CND',
-                 label='Conductor',
-                 namespace='marcrel',
-                 uniqueName='conductor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CSL/Consultant: a person or organization relevant to a resource, who
-        #   is called upon for professional advice or services in a specialized
-        #   field of knowledge or training.
-        Property(abbrevCode='csl',
-                 name='CSL',
-                 label='Consultant',
-                 namespace='marcrel',
-                 uniqueName='consultant',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CSP/Consultant to a project: a person or organization relevant to a
-        #   resource, who is engaged specifically to provide an intellectual
-        #   overview of a strategic or operational task and by analysis,
-        #   specification, or instruction, to create or propose a cost-effective
-        #   course of action or solution.
-        Property(abbrevCode='csp',
-                 name='CSP',
-                 label='Consultant to a project',
-                 namespace='marcrel',
-                 uniqueName='projectConsultant',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CTR/Contractor: a person or organization relevant to a resource, who
-        #   enters into a contract with another person or organization to
-        #   perform a specific task.
-        Property(abbrevCode='ctr',
-                 name='CTR',
-                 label='Contractor',
-                 namespace='marcrel',
-                 uniqueName='contractor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CTB/Contributor: a person or organization one whose work has been
-        #   contributed to a larger work, such as an anthology, serial
-        #   publication, or other compilation of individual works. Do not
-        #   use if the sole function in relation to a work is as author,
-        #   editor, compiler or translator.
-        # Note: this is in fact a refinement of dcterm:contributor, since
-        # it is more specific than that one.
-        Property(abbrevCode='ctb',
-                 name='CTB',
-                 label='Contributor',
-                 namespace='marcrel',
-                 uniqueName='contributor', # more specific than 'genericContributor'
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CRP/Correspondent: a person or organization who was either
-        #   the writer or recipient of a letter or other communication.
-        Property(abbrevCode='crp',
-                 name='CRP',
-                 label='Correspondent',
-                 namespace='marcrel',
-                 uniqueName='correspondent',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # CST/Costume designer: a person or organization who designs
-        #   or makes costumes, fixes hair, etc., for a musical or
-        #   dramatic presentation or entertainment.
-        Property(abbrevCode='cst',
-                 name='CST',
-                 label='Costume designer',
-                 namespace='marcrel',
-                 uniqueName='costumeDesigner',
-                 valueType=Contributor,
-                 isContributor=True),
-
-# We already have 'dcterm:creator', so we won't use the marcrel equivalent
-#         # CRE/Creator: a person or organization responsible for the
-#         #   intellectual or artistic content of a work.
-#         Property(abbrevCode='cre',
-#                  name='CRE',
-#                  label='Creator',
-#                  namespace='marcrel',
-#                  uniqueName='creator',
-#                  valueType=Contributor,
-#                  isContributor=True),
-
-        # CUR/Curator of an exhibition: a person or organization
-        #   responsible for conceiving and organizing an exhibition.
-        Property(abbrevCode='cur',
-                 name='CUR',
-                 label='Curator of an exhibition',
-                 namespace='marcrel',
-                 uniqueName='curator',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # DNC/Dancer: a person or organization who principally
-        #   exhibits dancing skills in a musical or dramatic
-        #   presentation or entertainment.
-        Property(abbrevCode='dnc',
-                 name='DNC',
-                 label='Dancer',
-                 namespace='marcrel',
-                 uniqueName='dancer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # DLN/Delineator: a person or organization executing technical
-        #   drawings from others' designs.
-        Property(abbrevCode='dln',
-                 name='DLN',
-                 label='Delineator',
-                 namespace='marcrel',
-                 uniqueName='delineator',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # DSR/Designer: a person or organization responsible for the design
-        #   if more specific codes (e.g., [bkd], [tyd]) are not desired.
-        Property(abbrevCode='dsr',
-                 name='DSR',
-                 label='Designer',
-                 namespace='marcrel',
-                 uniqueName='designer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # DRT/Director: a person or organization who is responsible for the
-        #   general management of a work or who supervises the production of
-        #   a performance for stage, screen, or sound recording.
-        Property(abbrevCode='drt',
-                 name='DRT',
-                 label='Director',
-                 namespace='marcrel',
-                 uniqueName='director',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # DIS/Dissertant: a person who presents a thesis for a university or
-        #   higher-level educational degree.
-        Property(abbrevCode='dis',
-                 name='DIS',
-                 label='Dissertant',
-                 namespace='marcrel',
-                 uniqueName='dissertant',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # DRM/Draftsman: a person or organization who prepares artistic or
-        #   technical drawings.
-        Property(abbrevCode='drm',
-                 name='DRM',
-                 label='Draftsman',
-                 namespace='marcrel',
-                 uniqueName='draftsman',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # EDT/Editor: a person or organization who prepares for publication
-        #   a work not primarily his/her own, such as by elucidating text,
-        #   adding introductory or other critical matter, or technically
-        #   directing an editorial staff.
-        Property(abbrevCode='edt',
-                 name='EDT',
-                 label='Editor',
-                 namespace='marcrel',
-                 uniqueName='editor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ENG/Engineer: a person or organization that is responsible for
-        #   technical planning and design, particularly with construction.
-        Property(abbrevCode='eng',
-                 name='ENG',
-                 label='Engineer',
-                 namespace='marcrel',
-                 uniqueName='engineer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # EGR/Engraver: a person or organization who cuts letters, figures,
-        #   etc. on a surface, such as a wooden or metal plate, for printing.
-        Property(abbrevCode='egr',
-                 name='EGR',
-                 label='Engraver',
-                 namespace='marcrel',
-                 uniqueName='engraver',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ETR/Etcher: a person or organization who produces text or images
-        #   for printing by subjecting metal, glass, or some other surface
-        #   to acid or the corrosive action of some other substance.
-        Property(abbrevCode='etr',
-                 name='ETR',
-                 label='Etcher',
-                 namespace='marcrel',
-                 uniqueName='etcher',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # FAC/Facsimilist: a person or organization that executed the facsimile.
-        Property(abbrevCode='fac',
-                 name='FAC',
-                 label='Facsimilist',
-                 namespace='marcrel',
-                 uniqueName='facsimilist',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # FLM/Film editor: a person or organization who is an editor of a
-        #   motion picture film. This term is used regardless of the medium
-        #   upon which the motion picture is produced or manufactured (e.g.,
-        #   acetate film, video tape).
-        Property(abbrevCode='flm',
-                 name='FLM',
-                 label='Film editor',
-                 namespace='marcrel',
-                 uniqueName='filmEditor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # FRG/Forger: a person or organization who makes or imitates something
-        #   of value or importance, especially with the intent to defraud.
-        Property(abbrevCode='frg',
-                 name='FRG',
-                 label='Forger',
-                 namespace='marcrel',
-                 uniqueName='forger',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # HST/Host: a person who is invited or regularly leads a program
-        #   (often broadcast) that includes other guests, performers, etc.
-        #   (e.g., talk show host).
-        Property(abbrevCode='hst',
-                 name='HST',
-                 label='Host',
-                 namespace='marcrel',
-                 uniqueName='host',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ILU/Illuminator: a person or organization responsible for the
-        #   decoration of a work (especially manuscript material) with
-        #   precious metals or color, usually with elaborate designs and
-        #   motifs.
-        Property(abbrevCode='ilu',
-                 name='ILU',
-                 label='Illuminator',
-                 namespace='marcrel',
-                 uniqueName='illuminator',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ILL/Illustrator: a person or organization who conceives, and
-        #   perhaps also implements, a design or illustration, usually
-        #   to accompany a written text.
-        Property(abbrevCode='ill',
-                 name='ILL',
-                 label='Illustrator',
-                 namespace='marcrel',
-                 uniqueName='illustrator',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ITR/Instrumentalist: a person or organization who principally
-        #   plays an instrument in a musical or dramatic presentation
-        #   or entertainment.
-        Property(abbrevCode='itr',
-                 name='ITR',
-                 label='Instrumentalist',
-                 namespace='marcrel',
-                 uniqueName='instrumentalist',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # IVE/Interviewee: a person or organization who is interviewed
-        #   at a consultation or meeting, usually by a reporter, pollster,
-        #   or some other information gathering agent.
-        Property(abbrevCode='ive',
-                 name='IVE',
-                 label='Interviewee',
-                 namespace='marcrel',
-                 uniqueName='interviewee',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # IVR/Interviewer: a person or organization who acts as a reporter,
-        #   pollster, or other information gathering agent in a consultation
-        #   or meeting involving one or more individuals.
-        Property(abbrevCode='ivr',
-                 name='IVR',
-                 label='Interviewer',
-                 namespace='marcrel',
-                 uniqueName='interviewer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # INV/Inventor: a person or organization who first produces a
-        #   particular useful item, or develops a new process for
-        #   obtaining a known item or result.
-        Property(abbrevCode='inv',
-                 name='INV',
-                 label='Inventor',
-                 namespace='marcrel',
-                 uniqueName='inventor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # LSA/Landscape architect: a person or organization whose work
-        #   involves coordinating the arrangement of existing and
-        #   proposed land features and structures.
-        Property(abbrevCode='lsa',
-                 name='LSA',
-                 label='Landscape architect',
-                 namespace='marcrel',
-                 uniqueName='landscapeArchitect',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # LBT/Librettist: a person or organization who is a writer of
-        #   the text of an opera, oratorio, etc.
-        Property(abbrevCode='lbt',
-                 name='LBT',
-                 label='Librettist',
-                 namespace='marcrel',
-                 m21WorkId='librettist',
-                 m21Abbrev='lib',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # LGD/Lighting designer: a person or organization who designs the
-        #   lighting scheme for a theatrical presentation, entertainment,
-        #   motion picture, etc.
-        Property(abbrevCode='lgd',
-                 name='LGD',
-                 label='Lighting designer',
-                 namespace='marcrel',
-                 uniqueName='lightingDesigner',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # LTG/Lithographer: a person or organization who prepares the stone
-        #   or plate for lithographic printing, including a graphic artist
-        #   creating a design directly on the surface from which printing
-        #   will be done.
-        Property(abbrevCode='ltg',
-                 name='LTG',
-                 label='Lithographer',
-                 namespace='marcrel',
-                 uniqueName='lithographer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # LYR/Lyricist: a person or organization who is the a writer of the
-        #   text of a song.
-        Property(abbrevCode='lyr',
-                 name='LYR',
-                 label='Lyricist',
-                 namespace='marcrel',
-                 m21WorkId='lyricist',
-                 m21Abbrev='lyr',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # MFR/Manufacturer: a person or organization that makes an
-        #   artifactual work (an object made or modified by one or
-        #   more persons). Examples of artifactual works include vases,
-        #   cannons or pieces of furniture.
-        Property(abbrevCode='mfr',
-                 name='MFR',
-                 label='Manufacturer',
-                 namespace='marcrel',
-                 uniqueName='manufacturer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # MTE/Metal-engraver: a person or organization responsible for
-        #   decorations, illustrations, letters, etc. cut on a metal
-        #   surface for printing or decoration.
-        Property(abbrevCode='mte',
-                 name='MTE',
-                 label='Metal-engraver',
-                 namespace='marcrel',
-                 uniqueName='metalEngraver',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # MOD/Moderator: a person who leads a program (often broadcast)
-        #   where topics are discussed, usually with participation of
-        #   experts in fields related to the discussion.
-        Property(abbrevCode='mod',
-                 name='MOD',
-                 label='Moderator',
-                 namespace='marcrel',
-                 uniqueName='moderator',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # MUS/Musician: a person or organization who performs music or
-        #   contributes to the musical content of a work when it is not
-        #   possible or desirable to identify the function more precisely.
-        Property(abbrevCode='mus',
-                 name='MUS',
-                 label='Musician',
-                 namespace='marcrel',
-                 uniqueName='musician',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # NRT/Narrator: a person who is a speaker relating the particulars
-        #   of an act, occurrence, or course of events.
-        Property(abbrevCode='nrt',
-                 name='NRT',
-                 label='Narrator',
-                 namespace='marcrel',
-                 uniqueName='narrator',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ORM/Organizer of meeting: a person or organization responsible
-        #   for organizing a meeting for which an item is the report or
-        #   proceedings.
-        Property(abbrevCode='orm',
-                 name='ORM',
-                 label='Organizer of meeting',
-                 namespace='marcrel',
-                 uniqueName='meetingOrganizer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # ORG/Originator: a person or organization performing the work,
-        #   i.e., the name of a person or organization associated with
-        #   the intellectual content of the work. This category does not
-        #   include the publisher or personal affiliation, or sponsor
-        #   except where it is also the corporate author.
-        Property(abbrevCode='org',
-                 name='ORG',
-                 label='Originator',
-                 namespace='marcrel',
-                 uniqueName='originator',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # PRF/Performer: a person or organization who exhibits musical
-        #   or acting skills in a musical or dramatic presentation or
-        #   entertainment, if specific codes for those functions ([act],
-        #   [dnc], [itr], [voc], etc.) are not used. If specific codes
-        #   are used, [prf] is used for a person whose principal skill
-        #   is not known or specified.
-        Property(abbrevCode='prf',
-                 name='PRF',
-                 label='Performer',
-                 namespace='marcrel',
-                 uniqueName='performer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # PHT/Photographer: a person or organization responsible for
-        #   taking photographs, whether they are used in their original
-        #   form or as reproductions.
-        Property(abbrevCode='pht',
-                 name='PHT',
-                 label='Photographer',
-                 namespace='marcrel',
-                 uniqueName='photographer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # PLT/Platemaker: a person or organization responsible for the
-        #   production of plates, usually for the production of printed
-        #   images and/or text.
-        Property(abbrevCode='plt',
-                 name='PLT',
-                 label='Platemaker',
-                 namespace='marcrel',
-                 uniqueName='platemaker',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # PRM/Printmaker: a person or organization who makes a relief,
-        #   intaglio, or planographic printing surface.
-        Property(abbrevCode='prm',
-                 name='PRM',
-                 label='Printmaker',
-                 namespace='marcrel',
-                 uniqueName='printmaker',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # PRO/Producer: a person or organization responsible for the
-        #   making of a motion picture, including business aspects,
-        #   management of the productions, and the commercial success
-        #   of the work.
-        Property(abbrevCode='pro',
-                 name='PRO',
-                 label='Producer',
-                 namespace='marcrel',
-                 uniqueName='producer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # PRD/Production personnel: a person or organization associated
-        #   with the production (props, lighting, special effects, etc.)
-        #   of a musical or dramatic presentation or entertainment.
-        Property(abbrevCode='prd',
-                 name='PRD',
-                 label='Production personnel',
-                 namespace='marcrel',
-                 uniqueName='productionPersonnel',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # PRG/Programmer: a person or organization responsible for the
-        #   creation and/or maintenance of computer program design
-        #   documents, source code, and machine-executable digital files
-        #   and supporting documentation.
-        Property(abbrevCode='prg',
-                 name='PRG',
-                 label='Programmer',
-                 namespace='marcrel',
-                 uniqueName='programmer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # PPT/Puppeteer: a person or organization who manipulates, controls,
-        #   or directs puppets or marionettes in a musical or dramatic
-        #   presentation or entertainment.
-        Property(abbrevCode='ppt',
-                 name='PPT',
-                 label='Puppeteer',
-                 namespace='marcrel',
-                 uniqueName='puppeteer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # RCE/Recording engineer: a person or organization who supervises
-        #   the technical aspects of a sound or video recording session.
-        Property(abbrevCode='rce',
-                 name='RCE',
-                 label='Recording engineer',
-                 namespace='marcrel',
-                 uniqueName='recordingEngineer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # REN/Renderer: a person or organization who prepares drawings
-        #   of architectural designs (i.e., renderings) in accurate,
-        #   representational perspective to show what the project will
-        #   look like when completed.
-        Property(abbrevCode='ren',
-                 name='REN',
-                 label='Renderer',
-                 namespace='marcrel',
-                 uniqueName='renderer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # RPT/Reporter: a person or organization who writes or presents
-        #   reports of news or current events on air or in print.
-        Property(abbrevCode='rpt',
-                 name='RPT',
-                 label='Reporter',
-                 namespace='marcrel',
-                 uniqueName='reporter',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # RTH/Research team head: a person who directed or managed a
-        #   research project.
-        Property(abbrevCode='rth',
-                 name='RTH',
-                 label='Research team head',
-                 namespace='marcrel',
-                 uniqueName='researchTeamHead',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # RTM/Research team member:  a person who participated in a
-        #   research project but whose role did not involve direction
-        #   or management of it.
-        Property(abbrevCode='rtm',
-                 name='RTM',
-                 label='Research team member',
-                 namespace='marcrel',
-                 uniqueName='researchTeamMember',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # RES/Researcher: a person or organization responsible for
-        #   performing research.
-        Property(abbrevCode='res',
-                 name='RES',
-                 label='Researcher',
-                 namespace='marcrel',
-                 uniqueName='researcher',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # RPY/Responsible party: a person or organization legally
-        #   responsible for the content of the published material.
-        Property(abbrevCode='rpy',
-                 name='RPY',
-                 label='Responsible party',
-                 namespace='marcrel',
-                 uniqueName='responsibleParty',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # RSG/Restager: a person or organization, other than the
-        #   original choreographer or director, responsible for
-        #   restaging a choreographic or dramatic work and who
-        #   contributes minimal new content.
-        Property(abbrevCode='rsg',
-                 name='RSG',
-                 label='Restager',
-                 namespace='marcrel',
-                 uniqueName='restager',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # REV/Reviewer:  a person or organization responsible for
-        #   the review of a book, motion picture, performance, etc.
-        Property(abbrevCode='rev',
-                 name='REV',
-                 label='Reviewer',
-                 namespace='marcrel',
-                 uniqueName='reviewer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # SCE/Scenarist: a person or organization who is the author
-        #   of a motion picture screenplay.
-        Property(abbrevCode='sce',
-                 name='SCE',
-                 label='Scenarist',
-                 namespace='marcrel',
-                 uniqueName='scenarist',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # SAD/Scientific advisor: a person or organization who brings
-        #   scientific, pedagogical, or historical competence to the
-        #   conception and realization on a work, particularly in the
-        #   case of audio-visual items.
-        Property(abbrevCode='sad',
-                 name='SAD',
-                 label='Scientific advisor',
-                 namespace='marcrel',
-                 uniqueName='scientificAdvisor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # SCR/Scribe: a person who is an amanuensis and for a writer of
-        #   manuscripts proper. For a person who makes pen-facsimiles,
-        #   use Facsimilist [fac].
-        Property(abbrevCode='scr',
-                 name='SCR',
-                 label='Scribe',
-                 namespace='marcrel',
-                 uniqueName='scribe',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # SCL/Sculptor: a person or organization who models or carves
-        #   figures that are three-dimensional representations.
-        Property(abbrevCode='scl',
-                 name='SCL',
-                 label='Sculptor',
-                 namespace='marcrel',
-                 uniqueName='sculptor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # SEC/Secretary: a person or organization who is a recorder,
-        #   redactor, or other person responsible for expressing the
-        #   views of a organization.
-        Property(abbrevCode='sec',
-                 name='SEC',
-                 label='Secretary',
-                 namespace='marcrel',
-                 uniqueName='secretary',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # STD/Set designer:  a person or organization who translates the
-        #   rough sketches of the art director into actual architectural
-        #   structures for a theatrical presentation, entertainment, motion
-        #   picture, etc. Set designers draw the detailed guides and
-        #   specifications for building the set.
-        Property(abbrevCode='std',
-                 name='STD',
-                 label='Set designer',
-                 namespace='marcrel',
-                 uniqueName='setDesigner',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # SNG/Singer: a person or organization who uses his/her/their voice
-        #   with or without instrumental accompaniment to produce music.
-        #   A performance may or may not include actual words.
-        Property(abbrevCode='sng',
-                 name='SNG',
-                 label='Singer',
-                 namespace='marcrel',
-                 uniqueName='singer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # SPK/Speaker: a person who participates in a program (often broadcast)
-        #   and makes a formalized contribution or presentation generally
-        #   prepared in advance.
-        Property(abbrevCode='spk',
-                 name='SPK',
-                 label='Speaker',
-                 namespace='marcrel',
-                 uniqueName='speaker',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # STN/Standards body: an organization responsible for the development
-        #   or enforcement of a standard.
-        Property(abbrevCode='stn',
-                 name='STN',
-                 label='Standards body',
-                 namespace='marcrel',
-                 uniqueName='standardsBody',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # STL/Storyteller: a person relaying a story with creative and/or
-        #   theatrical interpretation.
-        Property(abbrevCode='stl',
-                 name='STL',
-                 label='Storyteller',
-                 namespace='marcrel',
-                 uniqueName='storyteller',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # SRV/Surveyor: a person or organization who does measurements of
-        #   tracts of land, etc. to determine location, forms, and boundaries.
-        Property(abbrevCode='srv',
-                 name='SRV',
-                 label='Surveyor',
-                 namespace='marcrel',
-                 uniqueName='surveyor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # TCH/Teacher: a person who, in the context of a resource, gives
-        #   instruction in an intellectual subject or demonstrates while
-        #   teaching physical skills.
-        Property(abbrevCode='tch',
-                 name='TCH',
-                 label='Teacher',
-                 namespace='marcrel',
-                 uniqueName='teacher',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # TRC/Transcriber: a person who prepares a handwritten or typewritten copy
-        #   from original material, including from dictated or orally recorded
-        #   material. For makers of pen-facsimiles, use Facsimilist [fac].
-        Property(abbrevCode='trc',
-                 name='TRC',
-                 label='Transcriber',
-                 namespace='marcrel',
-                 uniqueName='transcriber',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # TRL/Translator: a person or organization who renders a text from one
-        #   language into another, or from an older form of a language into the
-        #   modern form.
-        Property(abbrevCode='trl',
-                 name='TRL',
-                 label='Translator',
-                 namespace='marcrel',
-                 m21WorkId='translator',
-                 m21Abbrev='trn',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # VDG/Videographer: a person or organization in charge of a video production,
-        #   e.g. the video recording of a stage production as opposed to a commercial
-        #   motion picture. The videographer may be the camera operator or may
-        #   supervise one or more camera operators. Do not confuse with cinematographer.
-        Property(abbrevCode='vdg',
-                 name='VDG',
-                 label='Videographer',
-                 namespace='marcrel',
-                 uniqueName='videographer',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # VOC/Vocalist: a person or organization who principally exhibits singing
-        #   skills in a musical or dramatic presentation or entertainment.
-        Property(abbrevCode='voc',
-                 name='VOC',
-                 label='Vocalist',
-                 namespace='marcrel',
-                 uniqueName='vocalist',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # WDE/Wood-engraver: a person or organization who makes prints by cutting
-        #   the image in relief on the end-grain of a wood block.
-        Property(abbrevCode='wde',
-                 name='WDE',
-                 label='Wood-engraver',
-                 namespace='marcrel',
-                 uniqueName='woodEngraver',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # WDC/Woodcutter: a person or organization who makes prints by cutting the
-        #   image in relief on the plank side of a wood block.
-        Property(abbrevCode='wdc',
-                 name='WDC',
-                 label='Woodcutter',
-                 namespace='marcrel',
-                 uniqueName='woodCutter',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # WAM/Writer of accompanying material: a person or organization who writes
-        #   significant material which accompanies a sound recording or other
-        #   audiovisual material.
-        Property(abbrevCode='wam',
-                 name='WAM',
-                 label='Writer of accompanying material',
-                 namespace='marcrel',
-                 uniqueName='accompanyingMaterialWriter',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # The following marcrel property term refines dcterm:publisher
-
-        # DST/Distributor: a person or organization that has exclusive or shared
-        #   marketing rights for an item.
-        Property(abbrevCode='dst',
-                 name='DST',
-                 label='Distributor',
-                 namespace='marcrel',
-                 uniqueName='distributor',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # The following music21 property terms have historically been supported
-        # by music21, so we must add them as standard property terms here:
-
-        # textOriginalLanguage: original language of vocal/choral text
-        Property(abbrevCode='txo',
-                 name='textOriginalLanguage',
-                 label='Original Text Language',
-                 namespace='music21',
-                 isContributor=False),
-
-        # textLanguage: language of the encoded vocal/choral text
-        Property(abbrevCode='txl',
-                 name='textLanguage',
-                 label='Text Language',
-                 namespace='music21',
-                 isContributor=False),
-
-        # popularTitle: popular title
-        Property(abbrevCode='otp',
-                 name='popularTitle',
-                 label='Popular Title',
-                 namespace='music21',
-                 isContributor=False),
-
-        # parentTitle: parent title
-        Property(abbrevCode='opr',
-                 name='parentTitle',
-                 label='Parent Title',
-                 namespace='music21',
-                 isContributor=False),
-
-        # actNumber: act number (e.g. '2' or 'Act 2')
-        Property(abbrevCode='oac',
-                 name='actNumber',
-                 label='Act Number',
-                 namespace='music21',
-                 isContributor=False),
-
-        # sceneNumber: scene number (e.g. '3' or 'Scene 3')
-        Property(abbrevCode='osc',
-                 name='sceneNumber',
-                 label='Scene Number',
-                 namespace='music21',
-                 isContributor=False),
-
-        # movementNumber: movement number (e.g. '4', or 'mov. 4', or...)
-        Property(abbrevCode='omv',
-                 name='movementNumber',
-                 label='Movement Number',
-                 namespace='music21',
-                 isContributor=False),
-
-        # movementName: movement name (often a tempo description)
-        Property(abbrevCode='omd',
-                 name='movementName',
-                 label='Movement Name',
-                 namespace='music21',
-                 isContributor=False),
-
-        # opusNumber: opus number (e.g. '23', or 'Opus 23')
-        Property(abbrevCode='ops',
-                 name='opusNumber',
-                 label='Opus Number',
-                 namespace='music21',
-                 isContributor=False),
-
-        # number: number (e.g. '5', or 'No. 5')
-        Property(abbrevCode='onm',
-                 name='number',
-                 label='Number',
-                 namespace='music21',
-                 isContributor=False),
-
-        # volume: volume number (e.g. '6' or 'Vol. 6')
-        Property(abbrevCode='ovm',
-                 name='volume',
-                 label='Volume Number',
-                 uniqueName='volumeNumber',
-                 namespace='music21',
-                 isContributor=False),
-
-        # dedication: dedicated to
-        Property(abbrevCode='ode',
-                 name='dedication',
-                 label='Dedicated To',
-                 uniqueName='dedicatedTo',
-                 namespace='music21',
-                 isContributor=False),
-
-        # commission: commissioned by
-        Property(abbrevCode='oco',
-                 name='commission',
-                 label='Commissioned By',
-                 uniqueName='commissionedBy',
-                 namespace='music21',
-                 isContributor=False),
-
-        # countryOfComposition: country of composition
-        Property(abbrevCode='ocy',
-                 name='countryOfComposition',
-                 label='Country of Composition',
-                 namespace='music21',
-                 isContributor=False),
-
-        # localeOfComposition: city, town, or village of composition
-        Property(abbrevCode='opc',
-                 name='localeOfComposition',
-                 label='Locale of Composition',
-                 namespace='music21',
-                 isContributor=False),
-
-        # groupTitle: group title (e.g. 'The Seasons')
-        Property(abbrevCode='gtl',
-                 name='groupTitle',
-                 label='Group Title',
-                 namespace='music21',
-                 isContributor=False),
-
-        # associatedWork: associated work, such as a play or film
-        Property(abbrevCode='gaw',
-                 name='associatedWork',
-                 label='Associated Work',
-                 namespace='music21',
-                 isContributor=False),
-
-        # collectionDesignation: This is a free-form text record that can be used to
-        #   identify a collection of pieces, such as works appearing in a compendium
-        #   or anthology. E.g. Norton Scores, Smithsonian Collection, Burkhart Anthology.
-        Property(abbrevCode='gco',
-                 name='collectionDesignation',
-                 label='Collection Designation',
-                 namespace='music21',
-                 isContributor=False),
-
-        # attributedComposer: attributed composer
-        Property(abbrevCode='coa',
-                 name='attributedComposer',
-                 label='Attributed Composer',
-                 namespace='music21',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # suspectedComposer: suspected composer
-        Property(abbrevCode='cos',
-                 name='suspectedComposer',
-                 label='Suspected Composer',
-                 namespace='music21',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # composerAlias: composer's abbreviated, alias, or stage name
-        Property(abbrevCode='col',
-                 name='composerAlias',
-                 label='Composer Alias',
-                 namespace='music21',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # composerCorporate: composer's corporate name
-        Property(abbrevCode='coc',
-                 name='composerCorporate',
-                 label='Composer Corporate Name',
-                 uniqueName='composerCorporateName',
-                 namespace='music21',
-                 valueType=Contributor,
-                 isContributor=True),
-
-        # orchestrator: orchestrator
-        Property(abbrevCode='lor',
-                 name='orchestrator',
-                 label='Orchestrator',
-                 namespace='music21',
-                 valueType=Contributor,
-                 isContributor=True),
-    )
-
-    NSKEY2STDPROPERTY: dict = {f'{x.namespace}:{x.name}':x for x in STDPROPERTIES}
-    NSKEY2VALUETYPE: dict = {f'{x.namespace}:{x.name}':x.valueType for x in STDPROPERTIES}
-
-    M21ABBREV2NSKEY: dict = {x.m21Abbrev if x.m21Abbrev
-                                else x.abbrevCode if x.namespace=='music21'
-                                else None # shouldn't ever happen due to condition below
-                             :
-                             f'{x.namespace}:{x.name}'
-                                for x in STDPROPERTIES
-                                    if x.m21Abbrev or x.namespace=='music21'}
-
-    M21WORKID2NSKEY: dict = {x.m21WorkId if x.m21WorkId
-                                else x.name if x.namespace=='music21'
-                                else None # shouldn't ever happen due to condition below
-                                :
-                                f'{x.namespace}:{x.name}'
-                                    for x in STDPROPERTIES
-                                        if x.m21WorkId or x.namespace=='music21'}
-
-    NAMESPACEABBREV2NSKEY: dict = {(x.namespace, x.abbrevCode): f'{x.namespace}:{x.name}'
-                                        for x in STDPROPERTIES}
-
-    UNIQUENAME2NSKEY: dict = {x.uniqueName if x.uniqueName
-                                else x.m21WorkId if x.m21WorkId
-                                else x.name
-                                :
-                                f'{x.namespace}:{x.name}'
-                                    for x in STDPROPERTIES}
-
-
-    # INITIALIZER #
-    def __init__(self):
-        # for now (experimental) use 'namespace:name' for key, and either a single value
-        # or a list (for more than one value).
-
-        # Where original metadata could contain multiples of various contributor roles,
-        # this new metadata will be able to store multiple of any property.
-
-        super().__init__()
-        self._metadata: Dict = {}
-        self.software: List[str] = [defaults.software]
-
-    # if namespace is provided, key should be name or abbrevCode (within that namespace)
-    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
-    # Caller is required to check backward compatibility (either before or after); this
-    # routine is general.
-    @staticmethod
-    def nsKey(key: str, namespace: Optional[str] = None, personal: bool = False) -> str:
-        if personal:
-            return key
-
-        if namespace:
-            # check if key is an abbreviation in this namespace
-            nsKeyForAbbrev: str = MetadataBase.NAMESPACEABBREV2NSKEY.get((namespace, key), None)
-            if nsKeyForAbbrev:
-                return nsKeyForAbbrev
-            # it wasn't an abbreviation, so assume it's a name
-            return f'{namespace}:{key}'
-
-        # No namespace: key might be uniqueName, from which we can look up the nsKey
-        nsKeyForUniqueName: str = MetadataBase.UNIQUENAME2NSKEY.get(key, None)
-        if nsKeyForUniqueName:
-            return nsKeyForUniqueName
-
-        # Key might already be of the form 'namespace:name', just return it
-        return key
-
-    @staticmethod
-    def propertyDefinitionToNSKey(prop: Property) -> str:
-        return MetadataBase.nsKey(prop.name, prop.namespace)
-
-    @staticmethod
-    def nsKeyToPropertyDefinition(nsKey: str) -> Property:
-        if not nsKey:
-            return None
-        return MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
-
-    @staticmethod
-    def _isContributorNSKey(nsKey: str) -> bool:
-        prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
-        if prop is None:
-            return False
-
-        return prop.isContributor
-
-    @staticmethod
-    def _isBackwardCompatibleContributorNSKey(nsKey: str) -> bool:
-        prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
-        if prop is None:
-            return False
-
-        return prop.isContributor and (prop.namespace == 'music21' or prop.m21WorkId is not None)
-
-    @staticmethod
-    def _isBackwardCompatibleNSKey(nsKey: str) -> bool:
-        prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
-        if prop is None:
-            return False
-
-        return prop.namespace == 'music21' or prop.m21WorkId is not None
-
-    @staticmethod
-    def _nsKeyToContributorRole(nsKey: str) -> str:
-        prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
-        if prop is None:
-            return None
-        if not prop.isContributor:
-            return None
-
-        # it's a small-c contributor
-        if prop.namespace == 'music21':
-            # it's in the music21 namespace, so it's a big-C Contributor,
-            # and Contributor.role can be found in prop.name
-            return prop.name
-
-        # it's a small-c contributor that's not in the music21 namespace
-        if prop.m21WorkId:
-            # it maps to a backward compatible big-C Contributor role, which can be
-            # found in prop.m21WorkId.
-            return prop.m21WorkId
-
-        # it's a small-c contributor that doesn't map to a backward compatible
-        # big-C Contributor role, but since we're not trying to be backward
-        # compatible, we'll take these, too.
-        return prop.uniqueName
-
-    @staticmethod
-    def _nsKeyToBackwardCompatibleContributorRole(nsKey: str) -> str:
-        prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
-        if prop is None:
-            return None
-        if not prop.isContributor:
-            return None
-
-        # it's a small-c contributor
-        if prop.namespace == 'music21':
-            # it's in the music21 namespace, so it's a big-C Contributor,
-            # and Contributor.role can be found in prop.name
-            return prop.name
-
-        # it's a small-c contributor that's not in the music21 namespace
-        if prop.m21WorkId:
-            # it maps to a backward compatible big-C Contributor role, which can be
-            # found in prop.m21WorkId.
-            return prop.m21WorkId
-
-        return None
-
-    @staticmethod
-    def _backwardCompatibleContributorRoleToNSKey(role: str) -> str:
-        nsKey: str = MetadataBase.M21WORKID2NSKEY.get(role, None)
-        if nsKey is None:
-            return None
-
-        prop: Property = MetadataBase.NSKEY2STDPROPERTY.get(nsKey, None)
-        if prop is None:
-            return None
-
-        if not prop.isContributor:
-            return None
-
-        return nsKey
-
-    # if namespace is provided, key should be name or abbrevCode (within that namespace)
-    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
-    def _getItem(self,
-                 key: str,
-                 namespace: Optional[str] = None,
-                 personal: bool = False) -> Optional[Any]:
-        nsKey: str = self.nsKey(key, namespace, personal)
-        return self._metadata.get(nsKey, None)
-
-    def _convertValue(self, nsKey: str, value: Any) -> Any:
-        # convert to the appropriate valueType
-        valueType: Type = self.NSKEY2VALUETYPE.get(nsKey, None)
-        if valueType is None:
-            # not a standard property, convert to Text by default
-            valueType = Text
-
-        if isinstance(value, valueType):
-            # already of appropriate type, no conversion necessary
-            return value
-
-        if valueType is Text:
-            if isinstance(value, str):
-                return Text(value)
-            return Text(str(value))
-        elif valueType is DateSingle:
-            if isinstance(value, Text):
-                value = str(value)
-            if isinstance(value, (str, datetime.datetime, Date)):
-                # If you want other DateSingle-derived types (DateRelative,
-                # DateBetween, or DateSelection), you have to create those
-                # yourself before adding/setting them.
-                return DateSingle(value)
-            raise exceptions21.MetadataException(
-                    f'invalid type for DateSingle: {type(value).__name__}')
-        elif valueType is Contributor:
-            if isinstance(value, str):
-                value = Text(value)
-            if isinstance(value, Text):
-                return Contributor(role=self._nsKeyToContributorRole(nsKey), name=value)
-            raise exceptions21.MetadataException(
-                    f'invalid type for Contributor: {type(value).__name__}')
-
-        raise exceptions21.MetadataException(
-                'internal error: invalid valueType')
-
-    # if namespace is provided, key should be name or abbrevCode (within that namespace)
-    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
-    def _addItem(self,
-                 key: str,
-                 value: Any,
-                 namespace: Optional[str] = None,
-                 personal: bool = False):
-        nsKey: str = self.nsKey(key, namespace, personal)
-        value = self._convertValue(nsKey, value)
-
-        prevValue: Optional[Any] = self._metadata.get(nsKey, None)
-        if prevValue is None:
-            # set a single value
-            self._metadata[nsKey] = value
-        elif isinstance(prevValue, list):
-            # add value to the list
-            prevValue.append(value)
-        else:
-            # overwrite prevValue with a list containing prevValue and value
-            self._metadata[nsKey] = [prevValue, value]
-
-    # if namespace is provided, key should be name or abbrevCode (within that namespace)
-    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
-    def _setItem(self,
-                 key: str,
-                 value: Any,
-                 namespace: Optional[str] = None,
-                 personal: bool = False):
-        nsKey: str = self.nsKey(key, namespace, personal)
-        self._metadata.pop(nsKey, None)
-        self._addItem(nsKey, value)
-
-    def _addBackwardCompatibleContributor(self, c: Contributor):
-        nsKey: str = self._backwardCompatibleContributorRoleToNSKey(c.role)
-        if not nsKey:
-            return
-        self._addItem(nsKey, c)
-
-    def _getAllContributorItems(self) -> List[Tuple[str, Contributor]]:
-        allOut: List[Tuple[str, Contributor]] = []
-
-        for nsKey, value in self._metadata.items():
-            if not self.isContributorNSKey(nsKey):
-                continue
-
-            if not value:
-                continue
-
-            if isinstance(value, list):
-                for v in value:
-                    allOut.append( (nsKey, v) )
-            else:
-                allOut.append( (nsKey, value) )
-
-        return allOut
-
-    def _getBackwardCompatibleContributorItems(self) -> List[Tuple[str, Contributor]]:
-        allOut: List[Tuple[str, Contributor]] = []
-
-        for nsKey, value in self._metadata.items():
-            if not self._isBackwardCompatibleContributorNSKey(nsKey):
-                continue
-
-            if not value:
-                continue
-
-            if isinstance(value, list):
-                for v in value:
-                    allOut.append( (nsKey, v) )
-            else:
-                allOut.append( (nsKey, value) )
-
-        return allOut
-
-# -----------------------------------------------------------------------------
-
-# Metadata is the backward-compatible interface for metadata
-class Metadata(MetadataBase):
+class Metadata(base.Music21Object):
     r'''
     Metadata represent data for a work or fragment, including title, composer,
     dates, and other relevant information.
@@ -2318,6 +231,1998 @@ class Metadata(MetadataBase):
     >>> md.contributors
     [<music21.metadata.primitives.Contributor composer:Gershwin, George>]
     '''
+
+    # CLASS VARIABLES #
+
+    classSortOrder = -30
+
+    # STDPROPERTYDESCS: each Tuple in this list is
+    # abbrevCode, name, label, namespace, m21Abbrev, m21WorkId, isContributor
+    # where:
+    # abbrevCode is an abbreviation for the name
+    # name is the tail of the property term URI
+    # label is the human-readable name of the property term
+    # namespace is a shortened form of the URI for the set of terms
+    #   e.g. 'dcterms' means the property term is from the Dublin Core property terms.
+    #   'dcterms' is the shortened form of <http://purl.org/dc/terms/>
+    #   e.g. 'marcrel' means the property term is from the MARC Relator terms (a.k.a. 'roles').
+    #   'marcrel' is the shortened form of <http://www.loc.gov/loc.terms/relators/>
+    # isContributor: bool describes whether or not this property is a contributor role
+    #   The following two are optional...
+    # m21Abbrev is the old abbreviation (from Metadata.workIdAbbreviationDict)
+    #       Note that this is None if namespace is 'music21' (abbrevCode is used in
+    #       that case), and this is also None if the property doesn't map into the
+    #       workId list at all.
+    # m21WorkId is the old workID (from Metadata.workIdAbbreviationDict)
+    #       Note that this is None if namespace is 'music21' (name is used in
+    #       that case), and this is also None if the property doesn't map into the
+    #       workId list at all, unless it is 'composer', 'copyright' or 'date',
+    #       which are used in searchAttributes as (a sort of) workId with no abbrev.
+
+    STDPROPERTYDESCS: Tuple[PropertyDescription] = (
+        # The following 'dcterms' properties are the standard Dublin Core property terms
+        # found at http://purl.org/dc/terms/
+
+        # abstract: A summary of the resource.
+        PropertyDescription(
+                 abbrevCode='AB',
+                 name='abstract',
+                 label='Abstract',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # accessRights: Information about who access the resource or an indication of
+        #   its security status.
+        PropertyDescription(
+                 abbrevCode='AR',
+                 name='accessRights',
+                 label='Access Rights',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # accrualMethod: The method by which items are added to a collection.
+        PropertyDescription(
+                 abbrevCode='AM',
+                 name='accrualMethod',
+                 label='Accrual Method',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # accrualPeriodicity: The frequency with which items are added to a collection.
+        PropertyDescription(
+                 abbrevCode='AP',
+                 name='accrualPeriodicity',
+                 label='Accrual Periodicity',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # accrualPolicy: The policy governing the addition of items to a collection.
+        PropertyDescription(
+                 abbrevCode='APL',
+                 name='accrualPolicy',
+                 label='Accrual Policy',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # alternative: An alternative name for the resource.
+        PropertyDescription(
+                 abbrevCode='ALT',
+                 name='alternative',
+                 label='Alternative Title',
+                 namespace='dcterms',
+                 m21Abbrev='ota',
+                 m21WorkId='alternativeTitle',
+                 isContributor=False),
+
+        # audience: A class of agents for whom the resource is intended or useful.
+        PropertyDescription(
+                 abbrevCode='AUD',
+                 name='audience',
+                 label='Audience',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # available: Date that the resource became or will become available.
+        PropertyDescription(
+                 abbrevCode='AVL',
+                 name='available',
+                 label='Date Available',
+                 namespace='dcterms',
+                 uniqueName='dateAvailable',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
+                 isContributor=False),
+
+        # bibliographicCitation: A bibliographic reference for the resource.
+        PropertyDescription(
+                 abbrevCode='BIB',
+                 name='bibliographicCitation',
+                 label='Bibliographic Citation',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # conformsTo: An established standard to which the described resource conforms.
+        PropertyDescription(
+                 abbrevCode='COT',
+                 name='conformsTo',
+                 label='Conforms To',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # contributor: An entity responsible for making contributions to the resource.
+        # NOTE: You should use one of the 'marcrel' properties below instead, since
+        # this property is very vague. The 'marcrel' properties are considered to be
+        # refinements of dcterms:contributor (this property), so if someone asks for
+        # everything as Dublin Core metadata, those will all be translated into
+        # dcterms:contributor properties.
+        PropertyDescription(
+                 abbrevCode='CN',
+                 name='contributor',
+                 label='Contributor',
+                 namespace='dcterms',
+                 uniqueName='genericContributor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # coverage: The spatial or temporal topic of the resource, spatial applicability
+        #   of the resource, or jurisdiction under which the resource is relevant.
+        PropertyDescription(
+                 abbrevCode='CVR',
+                 name='coverage',
+                 label='Coverage',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # created: Date of creation of the resource.
+        PropertyDescription(
+                 abbrevCode='CRD',
+                 name='created',
+                 label='Date Created',
+                 namespace='dcterms',
+                 m21WorkId='date',  # no abbrev
+                 uniqueName='dateCreated',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
+                 isContributor=False),
+
+        # creator: An entity responsible for making the resource.
+        PropertyDescription(
+                 abbrevCode='CR',
+                 name='creator',
+                 label='Creator',
+                 namespace='dcterms',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # date: A point or period of time associated with an event in the lifecycle
+        #   of the resource.
+        PropertyDescription(
+                 abbrevCode='DT',
+                 name='date',
+                 label='Date',
+                 namespace='dcterms',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
+                 isContributor=False),
+
+        # dateAccepted: Date of acceptance of the resource.
+        PropertyDescription(
+                 abbrevCode='DTA',
+                 name='dateAccepted',
+                 label='Date Accepted',
+                 namespace='dcterms',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
+                 isContributor=False),
+
+        # dateCopyrighted: Date of copyright of the resource.
+        PropertyDescription(
+                 abbrevCode='DTC',
+                 name='dateCopyrighted',
+                 label='Date Copyrighted',
+                 namespace='dcterms',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
+                 isContributor=False),
+
+        # dateSubmitted: Date of submission of the resource.
+        PropertyDescription(
+                 abbrevCode='DTS',
+                 name='dateSubmitted',
+                 label='Date Submitted',
+                 namespace='dcterms',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
+                 isContributor=False),
+
+        # description: An account of the resource.
+        PropertyDescription(
+                 abbrevCode='DSC',
+                 name='description',
+                 label='Description',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # educationLevel: A class of agents, defined in terms of progression
+        #   through an educational or training context, for which the described
+        #   resource is intended.
+        PropertyDescription(
+                 abbrevCode='EL',
+                 name='educationLevel',
+                 label='Audience Education Level',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # extent: The size or duration of the resource.
+        PropertyDescription(
+                 abbrevCode='EXT',
+                 name='extent',
+                 label='Extent',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # format: The file format, physical medium, or dimensions of the resource.
+        PropertyDescription(
+                 abbrevCode='FMT',
+                 name='format',
+                 label='Format',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # hasFormat: A related resource that is substantially the same as the
+        #   pre-existing described resource, but in another format.
+        PropertyDescription(
+                 abbrevCode='HFMT',
+                 name='hasFormat',
+                 label='Has Format',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # hasPart: A related resource that is included either physically or
+        #   logically in the described resource.
+        PropertyDescription(
+                 abbrevCode='HPT',
+                 name='hasPart',
+                 label='Has Part',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # hasVersion: A related resource that is a version, edition, or adaptation
+        #   of the described resource.
+        PropertyDescription(
+                 abbrevCode='HVS',
+                 name='hasVersion',
+                 label='Has Version',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # identifier: An unambiguous reference to the resource within a given context.
+        PropertyDescription(
+                 abbrevCode='ID',
+                 name='identifier',
+                 label='Identifier',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # instructionalMethod: A process, used to engender knowledge, attitudes and
+        #   skills, that the described resource is designed to support.
+        PropertyDescription(
+                 abbrevCode='IM',
+                 name='instructionalMethod',
+                 label='Instructional Method',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # isFormatOf: A pre-existing related resource that is substantially the same
+        #   as the described resource, but in another format.
+        PropertyDescription(
+                 abbrevCode='IFMT',
+                 name='isFormatOf',
+                 label='Is Format Of',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # isPartOf: A related resource in which the described resource is physically
+        #   or logically included.
+        PropertyDescription(
+                 abbrevCode='IPT',
+                 name='isPartOf',
+                 label='Is Part Of',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # isReferencedBy: A related resource that references, cites, or otherwise
+        #   points to the described resource.
+        PropertyDescription(
+                 abbrevCode='IREF',
+                 name='isReferencedBy',
+                 label='Is Referenced By',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # isReplacedBy: A related resource that supplants, displaces, or supersedes
+        #   the described resource.
+        PropertyDescription(
+                 abbrevCode='IREP',
+                 name='isReplacedBy',
+                 label='Is Replaced By',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # isRequiredBy: A related resource that requires the described resource
+        #   to support its function, delivery, or coherence.
+        PropertyDescription(
+                 abbrevCode='IREQ',
+                 name='isRequiredBy',
+                 label='Is Required By',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # issued: Date of formal issuance of the resource.
+        PropertyDescription(
+                 abbrevCode='IS',
+                 name='issued',
+                 label='Date Issued',
+                 namespace='dcterms',
+                 uniqueName='dateIssued',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
+                 isContributor=False),
+
+        # isVersionOf: A related resource of which the described resource is a
+        #   version, edition, or adaptation.
+        PropertyDescription(
+                 abbrevCode='IVSN',
+                 name='isVersionOf',
+                 label='Is Version Of',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # language: A language of the resource.
+        PropertyDescription(
+                 abbrevCode='LG',
+                 name='language',
+                 label='Language',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # license: A legal document giving official permission to do something
+        #   with the resource.
+        PropertyDescription(
+                 abbrevCode='LI',
+                 name='license',
+                 label='License',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # mediator: An entity that mediates access to the resource.
+        PropertyDescription(
+                 abbrevCode='ME',
+                 name='mediator',
+                 label='Mediator',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # medium: The material or physical carrier of the resource.
+        PropertyDescription(
+                 abbrevCode='MED',
+                 name='medium',
+                 label='Medium',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # modified: Date on which the resource was changed.
+        PropertyDescription(
+                 abbrevCode='MOD',
+                 name='modified',
+                 label='Date Modified',
+                 namespace='dcterms',
+                 uniqueName='dateModified',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
+                 isContributor=False),
+
+        # provenance: A statement of any changes in ownership and custody of
+        #   the resource since its creation that are significant for its
+        #   authenticity, integrity, and interpretation.
+        PropertyDescription(
+                 abbrevCode='PRV',
+                 name='provenance',
+                 label='Provenance',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # publisher: An entity responsible for making the resource available.
+        PropertyDescription(
+                 abbrevCode='PBL',
+                 name='publisher',
+                 label='Publisher',
+                 namespace='dcterms',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # references: A related resource that is referenced, cited, or
+        #   otherwise pointed to by the described resource.
+        PropertyDescription(
+                 abbrevCode='REF',
+                 name='references',
+                 label='References',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # relation: A related resource.
+        PropertyDescription(
+                 abbrevCode='REL',
+                 name='relation',
+                 label='Relation',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # replaces: A related resource that is supplanted, displaced, or
+        #   superseded by the described resource.
+        PropertyDescription(
+                 abbrevCode='REP',
+                 name='replaces',
+                 label='Replaces',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # requires: A related resource that is required by the described
+        #   resource to support its function, delivery, or coherence.
+        PropertyDescription(
+                 abbrevCode='REQ',
+                 name='requires',
+                 label='Requires',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # rights: Information about rights held in and over the resource.
+        PropertyDescription(
+                 abbrevCode='RT',
+                 name='rights',
+                 label='Rights',
+                 namespace='dcterms',
+                 m21WorkId='copyright', # no abbrev
+                 isContributor=False),
+
+        # rightsHolder: A person or organization owning or managing rights
+        #   over the resource.
+        PropertyDescription(
+                 abbrevCode='RH',
+                 name='rightsHolder',
+                 label='Rights Holder',
+                 namespace='dcterms',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # source: A related resource from which the described resource
+        #   is derived.
+        PropertyDescription(
+                 abbrevCode='SRC',
+                 name='source',
+                 label='Source',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # spatial: Spatial characteristics of the resource.
+        PropertyDescription(
+                 abbrevCode='SP',
+                 name='spatial',
+                 label='Spatial Coverage',
+                 namespace='dcterms',
+                 uniqueName='spatialCoverage',
+                 isContributor=False),
+
+        # subject: A topic of the resource.
+        PropertyDescription(
+                 abbrevCode='SUB',
+                 name='subject',
+                 label='Subject',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # tableOfContents: A list of subunits of the resource.
+        PropertyDescription(
+                 abbrevCode='TOC',
+                 name='tableOfContents',
+                 label='Table Of Contents',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # temporal: Temporal characteristics of the resource.
+        PropertyDescription(
+                 abbrevCode='TE',
+                 name='temporal',
+                 label='Temporal Coverage',
+                 namespace='dcterms',
+                 uniqueName='temporalCoverage',
+                 isContributor=False),
+
+        # title: A name given to the resource.
+        PropertyDescription(
+                 abbrevCode='T',
+                 name='title',
+                 label='Title',
+                 namespace='dcterms',
+                 m21Abbrev='otl',
+                 m21WorkId='title',
+                 isContributor=False),
+
+        # type : The nature or genre of the resource.
+        PropertyDescription(
+                 abbrevCode='TYP',
+                 name='type',
+                 label='Type',
+                 namespace='dcterms',
+                 isContributor=False),
+
+        # valid: Date (often a range) of validity of a resource.
+        PropertyDescription(
+                 abbrevCode='VA',
+                 name='valid',
+                 label='Date Valid',
+                 namespace='dcterms',
+                 uniqueName='dateValid',
+                 valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
+                 isContributor=False),
+
+        # The following 'marcrel' property terms are the MARC Relator terms
+        # that are refinements of dcterms:contributor, and can be used anywhere
+        # dcterms:contributor can be used if you want to be more specific (and
+        # you will want to). The MARC Relator terms are defined at:
+        # http://www.loc.gov/loc.terms/relators/
+        # and this particular sublist can be found at:
+        # https://memory.loc.gov/diglib/loc.terms/relators/dc-contributor.html
+
+        # ACT/Actor: a person or organization who principally exhibits acting
+        #   skills in a musical or dramatic presentation or entertainment.
+        PropertyDescription(
+                 abbrevCode='act',
+                 name='ACT',
+                 label='Actor',
+                 namespace='marcrel',
+                 uniqueName='actor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ADP/Adapter: a person or organization who 1) reworks a musical composition,
+        #   usually for a different medium, or 2) rewrites novels or stories
+        #   for motion pictures or other audiovisual medium.
+        PropertyDescription(
+                 abbrevCode='adp',
+                 name='ADP',
+                 label='Adapter',
+                 namespace='marcrel',
+                 uniqueName='adapter',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ANM/Animator: a person or organization who draws the two-dimensional
+        #   figures, manipulates the three dimensional objects and/or also
+        #   programs the computer to move objects and images for the purpose
+        #   of animated film processing.
+        PropertyDescription(
+                 abbrevCode='anm',
+                 name='ANM',
+                 label='Animator',
+                 namespace='marcrel',
+                 uniqueName='animator',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ANN/Annotator: a person who writes manuscript annotations on a printed item.
+        PropertyDescription(
+                 abbrevCode='ann',
+                 name='ANN',
+                 label='Annotator',
+                 namespace='marcrel',
+                 uniqueName='annotator',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ARC/Architect: a person or organization who designs structures or oversees
+        #   their construction.
+        PropertyDescription(
+                 abbrevCode='arc',
+                 name='ARC',
+                 label='Architect',
+                 namespace='marcrel',
+                 uniqueName='architect',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ARR/Arranger: a person or organization who transcribes a musical
+        #   composition, usually for a different medium from that of the original;
+        #   in an arrangement the musical substance remains essentially unchanged.
+        PropertyDescription(
+                 abbrevCode='arr',
+                 name='ARR',
+                 label='Arranger',
+                 namespace='marcrel',
+                 m21WorkId='arranger',
+                 m21Abbrev='lar',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ART/Artist: a person (e.g., a painter) or organization who conceives, and
+        #   perhaps also implements, an original graphic design or work of art, if
+        #   specific codes (e.g., [egr], [etr]) are not desired. For book illustrators,
+        #   prefer Illustrator [ill].
+        PropertyDescription(
+                 abbrevCode='art',
+                 name='ART',
+                 label='Artist',
+                 namespace='marcrel',
+                 uniqueName='artist',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # AUT/Author: a person or organization chiefly responsible for the
+        #   intellectual or artistic content of a work, usually printed text.
+        PropertyDescription(
+                 abbrevCode='aut',
+                 name='AUT',
+                 label='Author',
+                 namespace='marcrel',
+                 uniqueName='author',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # AQT/Author in quotations or text extracts: a person or organization
+        #   whose work is largely quoted or extracted in works to which he or
+        #   she did not contribute directly.
+        PropertyDescription(
+                 abbrevCode='aqt',
+                 name='AQT',
+                 label='Author in quotations or text extracts',
+                 namespace='marcrel',
+                 uniqueName='quotationsAuthor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # AFT/Author of afterword, colophon, etc.: a person or organization
+        #   responsible for an afterword, postface, colophon, etc. but who
+        #   is not the chief author of a work.
+        PropertyDescription(
+                 abbrevCode='aft',
+                 name='AFT',
+                 label='Author of afterword, colophon, etc.',
+                 namespace='marcrel',
+                 uniqueName='afterwordAuthor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # AUD/Author of dialog: a person or organization responsible for
+        #   the dialog or spoken commentary for a screenplay or sound
+        #   recording.
+        PropertyDescription(
+                 abbrevCode='aud',
+                 name='AUD',
+                 label='Author of dialog',
+                 namespace='marcrel',
+                 uniqueName='dialogAuthor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # AUI/Author of introduction, etc.:  a person or organization
+        #   responsible for an introduction, preface, foreword, or other
+        #   critical introductory matter, but who is not the chief author.
+        PropertyDescription(
+                 abbrevCode='aui',
+                 name='AUI',
+                 label='Author of introduction, etc.',
+                 namespace='marcrel',
+                 uniqueName='introductionAuthor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # AUS/Author of screenplay, etc.:  a person or organization responsible
+        #   for a motion picture screenplay, dialog, spoken commentary, etc.
+        PropertyDescription(
+                 abbrevCode='aus',
+                 name='AUS',
+                 label='Author of screenplay, etc.',
+                 namespace='marcrel',
+                 uniqueName='screenplayAuthor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CLL/Calligrapher: a person or organization who writes in an artistic
+        #   hand, usually as a copyist and or engrosser.
+        PropertyDescription(
+                 abbrevCode='cll',
+                 name='CLL',
+                 label='Calligrapher',
+                 namespace='marcrel',
+                 uniqueName='calligrapher',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CTG/Cartographer: a person or organization responsible for the
+        #   creation of maps and other cartographic materials.
+        PropertyDescription(
+                 abbrevCode='ctg',
+                 name='CTG',
+                 label='Cartographer',
+                 namespace='marcrel',
+                 uniqueName='cartographer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CHR/Choreographer: a person or organization who composes or arranges
+        #   dances or other movements (e.g., "master of swords") for a musical
+        #   or dramatic presentation or entertainment.
+        PropertyDescription(
+                 abbrevCode='chr',
+                 name='CHR',
+                 label='Choreographer',
+                 namespace='marcrel',
+                 uniqueName='choreographer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CNG/Cinematographer: a person or organization who is in charge of
+        #   the images captured for a motion picture film. The cinematographer
+        #   works under the supervision of a director, and may also be referred
+        #   to as director of photography. Do not confuse with videographer.
+        PropertyDescription(
+                 abbrevCode='cng',
+                 name='CNG',
+                 label='Cinematographer',
+                 namespace='marcrel',
+                 uniqueName='cinematographer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CLB/Collaborator: a person or organization that takes a limited part
+        #   in the elaboration of a work of another person or organization that
+        #   brings complements (e.g., appendices, notes) to the work.
+        PropertyDescription(
+                 abbrevCode='clb',
+                 name='CLB',
+                 label='Collaborator',
+                 namespace='marcrel',
+                 uniqueName='collaborator',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CLT/Collotyper: a person or organization responsible for the production
+        #   of photographic prints from film or other colloid that has ink-receptive
+        #   and ink-repellent surfaces.
+        PropertyDescription(
+                 abbrevCode='clt',
+                 name='CLT',
+                 label='Collotyper',
+                 namespace='marcrel',
+                 uniqueName='collotyper',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CMM/Commentator: a person or organization who provides interpretation,
+        #   analysis, or a discussion of the subject matter on a recording,
+        #   motion picture, or other audiovisual medium.
+        PropertyDescription(
+                 abbrevCode='cmm',
+                 name='CMM',
+                 label='Commentator',
+                 namespace='marcrel',
+                 uniqueName='commentator',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CWT/Commentator for written text: a person or organization responsible
+        #   for the commentary or explanatory notes about a text. For the writer
+        #   of manuscript annotations in a printed book, use Annotator [ann].
+        PropertyDescription(
+                 abbrevCode='cwt',
+                 name='CWT',
+                 label='Commentator for written text',
+                 namespace='marcrel',
+                 uniqueName='writtenCommentator',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # COM/Compiler: a person or organization who produces a work or
+        #   publication by selecting and putting together material from the
+        #   works of various persons or bodies.
+        PropertyDescription(
+                 abbrevCode='com',
+                 name='COM',
+                 label='Compiler',
+                 namespace='marcrel',
+                 uniqueName='compiler',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CMP/Composer: a person or organization who creates a musical work,
+        #   usually a piece of music in manuscript or printed form.
+        PropertyDescription(
+                 abbrevCode='cmp',
+                 name='CMP',
+                 label='Composer',
+                 namespace='marcrel',
+                 m21WorkId='composer',
+                 m21Abbrev='com',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CCP/Conceptor: a person or organization responsible for the original
+        #   idea on which a work is based, this includes the scientific author
+        #   of an audio-visual item and the conceptor of an advertisement.
+        PropertyDescription(
+                 abbrevCode='ccp',
+                 name='CCP',
+                 label='Conceptor',
+                 namespace='marcrel',
+                 uniqueName='conceptor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CND/Conductor: a person who directs a performing group (orchestra,
+        #   chorus, opera, etc.) in a musical or dramatic presentation or
+        #   entertainment.
+        PropertyDescription(
+                 abbrevCode='cnd',
+                 name='CND',
+                 label='Conductor',
+                 namespace='marcrel',
+                 uniqueName='conductor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CSL/Consultant: a person or organization relevant to a resource, who
+        #   is called upon for professional advice or services in a specialized
+        #   field of knowledge or training.
+        PropertyDescription(
+                 abbrevCode='csl',
+                 name='CSL',
+                 label='Consultant',
+                 namespace='marcrel',
+                 uniqueName='consultant',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CSP/Consultant to a project: a person or organization relevant to a
+        #   resource, who is engaged specifically to provide an intellectual
+        #   overview of a strategic or operational task and by analysis,
+        #   specification, or instruction, to create or propose a cost-effective
+        #   course of action or solution.
+        PropertyDescription(
+                 abbrevCode='csp',
+                 name='CSP',
+                 label='Consultant to a project',
+                 namespace='marcrel',
+                 uniqueName='projectConsultant',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CTR/Contractor: a person or organization relevant to a resource, who
+        #   enters into a contract with another person or organization to
+        #   perform a specific task.
+        PropertyDescription(
+                 abbrevCode='ctr',
+                 name='CTR',
+                 label='Contractor',
+                 namespace='marcrel',
+                 uniqueName='contractor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CTB/Contributor: a person or organization one whose work has been
+        #   contributed to a larger work, such as an anthology, serial
+        #   publication, or other compilation of individual works. Do not
+        #   use if the sole function in relation to a work is as author,
+        #   editor, compiler or translator.
+        # Note: this is in fact a refinement of dcterms:contributor, since
+        # it is more specific than that one.
+        PropertyDescription(
+                 abbrevCode='ctb',
+                 name='CTB',
+                 label='Contributor',
+                 namespace='marcrel',
+                 uniqueName='contributor', # more specific than 'genericContributor'
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CRP/Correspondent: a person or organization who was either
+        #   the writer or recipient of a letter or other communication.
+        PropertyDescription(
+                 abbrevCode='crp',
+                 name='CRP',
+                 label='Correspondent',
+                 namespace='marcrel',
+                 uniqueName='correspondent',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # CST/Costume designer: a person or organization who designs
+        #   or makes costumes, fixes hair, etc., for a musical or
+        #   dramatic presentation or entertainment.
+        PropertyDescription(
+                 abbrevCode='cst',
+                 name='CST',
+                 label='Costume designer',
+                 namespace='marcrel',
+                 uniqueName='costumeDesigner',
+                 valueType=Contributor,
+                 isContributor=True),
+
+# We already have 'dcterms:creator', so we won't use the marcrel equivalent
+#         # CRE/Creator: a person or organization responsible for the
+#         #   intellectual or artistic content of a work.
+#         PropertyDescription(
+#                  abbrevCode='cre',
+#                  name='CRE',
+#                  label='Creator',
+#                  namespace='marcrel',
+#                  uniqueName='creator',
+#                  valueType=Contributor,
+#                  isContributor=True),
+
+        # CUR/Curator of an exhibition: a person or organization
+        #   responsible for conceiving and organizing an exhibition.
+        PropertyDescription(
+                 abbrevCode='cur',
+                 name='CUR',
+                 label='Curator of an exhibition',
+                 namespace='marcrel',
+                 uniqueName='curator',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # DNC/Dancer: a person or organization who principally
+        #   exhibits dancing skills in a musical or dramatic
+        #   presentation or entertainment.
+        PropertyDescription(
+                 abbrevCode='dnc',
+                 name='DNC',
+                 label='Dancer',
+                 namespace='marcrel',
+                 uniqueName='dancer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # DLN/Delineator: a person or organization executing technical
+        #   drawings from others' designs.
+        PropertyDescription(
+                 abbrevCode='dln',
+                 name='DLN',
+                 label='Delineator',
+                 namespace='marcrel',
+                 uniqueName='delineator',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # DSR/Designer: a person or organization responsible for the design
+        #   if more specific codes (e.g., [bkd], [tyd]) are not desired.
+        PropertyDescription(
+                 abbrevCode='dsr',
+                 name='DSR',
+                 label='Designer',
+                 namespace='marcrel',
+                 uniqueName='designer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # DRT/Director: a person or organization who is responsible for the
+        #   general management of a work or who supervises the production of
+        #   a performance for stage, screen, or sound recording.
+        PropertyDescription(
+                 abbrevCode='drt',
+                 name='DRT',
+                 label='Director',
+                 namespace='marcrel',
+                 uniqueName='director',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # DIS/Dissertant: a person who presents a thesis for a university or
+        #   higher-level educational degree.
+        PropertyDescription(
+                 abbrevCode='dis',
+                 name='DIS',
+                 label='Dissertant',
+                 namespace='marcrel',
+                 uniqueName='dissertant',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # DRM/Draftsman: a person or organization who prepares artistic or
+        #   technical drawings.
+        PropertyDescription(
+                 abbrevCode='drm',
+                 name='DRM',
+                 label='Draftsman',
+                 namespace='marcrel',
+                 uniqueName='draftsman',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # EDT/Editor: a person or organization who prepares for publication
+        #   a work not primarily his/her own, such as by elucidating text,
+        #   adding introductory or other critical matter, or technically
+        #   directing an editorial staff.
+        PropertyDescription(
+                 abbrevCode='edt',
+                 name='EDT',
+                 label='Editor',
+                 namespace='marcrel',
+                 uniqueName='editor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ENG/Engineer: a person or organization that is responsible for
+        #   technical planning and design, particularly with construction.
+        PropertyDescription(
+                 abbrevCode='eng',
+                 name='ENG',
+                 label='Engineer',
+                 namespace='marcrel',
+                 uniqueName='engineer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # EGR/Engraver: a person or organization who cuts letters, figures,
+        #   etc. on a surface, such as a wooden or metal plate, for printing.
+        PropertyDescription(
+                 abbrevCode='egr',
+                 name='EGR',
+                 label='Engraver',
+                 namespace='marcrel',
+                 uniqueName='engraver',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ETR/Etcher: a person or organization who produces text or images
+        #   for printing by subjecting metal, glass, or some other surface
+        #   to acid or the corrosive action of some other substance.
+        PropertyDescription(
+                 abbrevCode='etr',
+                 name='ETR',
+                 label='Etcher',
+                 namespace='marcrel',
+                 uniqueName='etcher',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # FAC/Facsimilist: a person or organization that executed the facsimile.
+        PropertyDescription(
+                 abbrevCode='fac',
+                 name='FAC',
+                 label='Facsimilist',
+                 namespace='marcrel',
+                 uniqueName='facsimilist',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # FLM/Film editor: a person or organization who is an editor of a
+        #   motion picture film. This term is used regardless of the medium
+        #   upon which the motion picture is produced or manufactured (e.g.,
+        #   acetate film, video tape).
+        PropertyDescription(
+                 abbrevCode='flm',
+                 name='FLM',
+                 label='Film editor',
+                 namespace='marcrel',
+                 uniqueName='filmEditor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # FRG/Forger: a person or organization who makes or imitates something
+        #   of value or importance, especially with the intent to defraud.
+        PropertyDescription(
+                 abbrevCode='frg',
+                 name='FRG',
+                 label='Forger',
+                 namespace='marcrel',
+                 uniqueName='forger',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # HST/Host: a person who is invited or regularly leads a program
+        #   (often broadcast) that includes other guests, performers, etc.
+        #   (e.g., talk show host).
+        PropertyDescription(
+                 abbrevCode='hst',
+                 name='HST',
+                 label='Host',
+                 namespace='marcrel',
+                 uniqueName='host',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ILU/Illuminator: a person or organization responsible for the
+        #   decoration of a work (especially manuscript material) with
+        #   precious metals or color, usually with elaborate designs and
+        #   motifs.
+        PropertyDescription(
+                 abbrevCode='ilu',
+                 name='ILU',
+                 label='Illuminator',
+                 namespace='marcrel',
+                 uniqueName='illuminator',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ILL/Illustrator: a person or organization who conceives, and
+        #   perhaps also implements, a design or illustration, usually
+        #   to accompany a written text.
+        PropertyDescription(
+                 abbrevCode='ill',
+                 name='ILL',
+                 label='Illustrator',
+                 namespace='marcrel',
+                 uniqueName='illustrator',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ITR/Instrumentalist: a person or organization who principally
+        #   plays an instrument in a musical or dramatic presentation
+        #   or entertainment.
+        PropertyDescription(
+                 abbrevCode='itr',
+                 name='ITR',
+                 label='Instrumentalist',
+                 namespace='marcrel',
+                 uniqueName='instrumentalist',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # IVE/Interviewee: a person or organization who is interviewed
+        #   at a consultation or meeting, usually by a reporter, pollster,
+        #   or some other information gathering agent.
+        PropertyDescription(
+                 abbrevCode='ive',
+                 name='IVE',
+                 label='Interviewee',
+                 namespace='marcrel',
+                 uniqueName='interviewee',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # IVR/Interviewer: a person or organization who acts as a reporter,
+        #   pollster, or other information gathering agent in a consultation
+        #   or meeting involving one or more individuals.
+        PropertyDescription(
+                 abbrevCode='ivr',
+                 name='IVR',
+                 label='Interviewer',
+                 namespace='marcrel',
+                 uniqueName='interviewer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # INV/Inventor: a person or organization who first produces a
+        #   particular useful item, or develops a new process for
+        #   obtaining a known item or result.
+        PropertyDescription(
+                 abbrevCode='inv',
+                 name='INV',
+                 label='Inventor',
+                 namespace='marcrel',
+                 uniqueName='inventor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # LSA/Landscape architect: a person or organization whose work
+        #   involves coordinating the arrangement of existing and
+        #   proposed land features and structures.
+        PropertyDescription(
+                 abbrevCode='lsa',
+                 name='LSA',
+                 label='Landscape architect',
+                 namespace='marcrel',
+                 uniqueName='landscapeArchitect',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # LBT/Librettist: a person or organization who is a writer of
+        #   the text of an opera, oratorio, etc.
+        PropertyDescription(
+                 abbrevCode='lbt',
+                 name='LBT',
+                 label='Librettist',
+                 namespace='marcrel',
+                 m21WorkId='librettist',
+                 m21Abbrev='lib',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # LGD/Lighting designer: a person or organization who designs the
+        #   lighting scheme for a theatrical presentation, entertainment,
+        #   motion picture, etc.
+        PropertyDescription(
+                 abbrevCode='lgd',
+                 name='LGD',
+                 label='Lighting designer',
+                 namespace='marcrel',
+                 uniqueName='lightingDesigner',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # LTG/Lithographer: a person or organization who prepares the stone
+        #   or plate for lithographic printing, including a graphic artist
+        #   creating a design directly on the surface from which printing
+        #   will be done.
+        PropertyDescription(
+                 abbrevCode='ltg',
+                 name='LTG',
+                 label='Lithographer',
+                 namespace='marcrel',
+                 uniqueName='lithographer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # LYR/Lyricist: a person or organization who is the a writer of the
+        #   text of a song.
+        PropertyDescription(
+                 abbrevCode='lyr',
+                 name='LYR',
+                 label='Lyricist',
+                 namespace='marcrel',
+                 m21WorkId='lyricist',
+                 m21Abbrev='lyr',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # MFR/Manufacturer: a person or organization that makes an
+        #   artifactual work (an object made or modified by one or
+        #   more persons). Examples of artifactual works include vases,
+        #   cannons or pieces of furniture.
+        PropertyDescription(
+                 abbrevCode='mfr',
+                 name='MFR',
+                 label='Manufacturer',
+                 namespace='marcrel',
+                 uniqueName='manufacturer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # MTE/Metal-engraver: a person or organization responsible for
+        #   decorations, illustrations, letters, etc. cut on a metal
+        #   surface for printing or decoration.
+        PropertyDescription(
+                 abbrevCode='mte',
+                 name='MTE',
+                 label='Metal-engraver',
+                 namespace='marcrel',
+                 uniqueName='metalEngraver',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # MOD/Moderator: a person who leads a program (often broadcast)
+        #   where topics are discussed, usually with participation of
+        #   experts in fields related to the discussion.
+        PropertyDescription(
+                 abbrevCode='mod',
+                 name='MOD',
+                 label='Moderator',
+                 namespace='marcrel',
+                 uniqueName='moderator',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # MUS/Musician: a person or organization who performs music or
+        #   contributes to the musical content of a work when it is not
+        #   possible or desirable to identify the function more precisely.
+        PropertyDescription(
+                 abbrevCode='mus',
+                 name='MUS',
+                 label='Musician',
+                 namespace='marcrel',
+                 uniqueName='musician',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # NRT/Narrator: a person who is a speaker relating the particulars
+        #   of an act, occurrence, or course of events.
+        PropertyDescription(
+                 abbrevCode='nrt',
+                 name='NRT',
+                 label='Narrator',
+                 namespace='marcrel',
+                 uniqueName='narrator',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ORM/Organizer of meeting: a person or organization responsible
+        #   for organizing a meeting for which an item is the report or
+        #   proceedings.
+        PropertyDescription(
+                 abbrevCode='orm',
+                 name='ORM',
+                 label='Organizer of meeting',
+                 namespace='marcrel',
+                 uniqueName='meetingOrganizer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # ORG/Originator: a person or organization performing the work,
+        #   i.e., the name of a person or organization associated with
+        #   the intellectual content of the work. This category does not
+        #   include the publisher or personal affiliation, or sponsor
+        #   except where it is also the corporate author.
+        PropertyDescription(
+                 abbrevCode='org',
+                 name='ORG',
+                 label='Originator',
+                 namespace='marcrel',
+                 uniqueName='originator',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # PRF/Performer: a person or organization who exhibits musical
+        #   or acting skills in a musical or dramatic presentation or
+        #   entertainment, if specific codes for those functions ([act],
+        #   [dnc], [itr], [voc], etc.) are not used. If specific codes
+        #   are used, [prf] is used for a person whose principal skill
+        #   is not known or specified.
+        PropertyDescription(
+                 abbrevCode='prf',
+                 name='PRF',
+                 label='Performer',
+                 namespace='marcrel',
+                 uniqueName='performer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # PHT/Photographer: a person or organization responsible for
+        #   taking photographs, whether they are used in their original
+        #   form or as reproductions.
+        PropertyDescription(
+                 abbrevCode='pht',
+                 name='PHT',
+                 label='Photographer',
+                 namespace='marcrel',
+                 uniqueName='photographer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # PLT/Platemaker: a person or organization responsible for the
+        #   production of plates, usually for the production of printed
+        #   images and/or text.
+        PropertyDescription(
+                 abbrevCode='plt',
+                 name='PLT',
+                 label='Platemaker',
+                 namespace='marcrel',
+                 uniqueName='platemaker',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # PRM/Printmaker: a person or organization who makes a relief,
+        #   intaglio, or planographic printing surface.
+        PropertyDescription(
+                 abbrevCode='prm',
+                 name='PRM',
+                 label='Printmaker',
+                 namespace='marcrel',
+                 uniqueName='printmaker',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # PRO/Producer: a person or organization responsible for the
+        #   making of a motion picture, including business aspects,
+        #   management of the productions, and the commercial success
+        #   of the work.
+        PropertyDescription(
+                 abbrevCode='pro',
+                 name='PRO',
+                 label='Producer',
+                 namespace='marcrel',
+                 uniqueName='producer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # PRD/Production personnel: a person or organization associated
+        #   with the production (props, lighting, special effects, etc.)
+        #   of a musical or dramatic presentation or entertainment.
+        PropertyDescription(
+                 abbrevCode='prd',
+                 name='PRD',
+                 label='Production personnel',
+                 namespace='marcrel',
+                 uniqueName='productionPersonnel',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # PRG/Programmer: a person or organization responsible for the
+        #   creation and/or maintenance of computer program design
+        #   documents, source code, and machine-executable digital files
+        #   and supporting documentation.
+        PropertyDescription(
+                 abbrevCode='prg',
+                 name='PRG',
+                 label='Programmer',
+                 namespace='marcrel',
+                 uniqueName='programmer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # PPT/Puppeteer: a person or organization who manipulates, controls,
+        #   or directs puppets or marionettes in a musical or dramatic
+        #   presentation or entertainment.
+        PropertyDescription(
+                 abbrevCode='ppt',
+                 name='PPT',
+                 label='Puppeteer',
+                 namespace='marcrel',
+                 uniqueName='puppeteer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # RCE/Recording engineer: a person or organization who supervises
+        #   the technical aspects of a sound or video recording session.
+        PropertyDescription(
+                 abbrevCode='rce',
+                 name='RCE',
+                 label='Recording engineer',
+                 namespace='marcrel',
+                 uniqueName='recordingEngineer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # REN/Renderer: a person or organization who prepares drawings
+        #   of architectural designs (i.e., renderings) in accurate,
+        #   representational perspective to show what the project will
+        #   look like when completed.
+        PropertyDescription(
+                 abbrevCode='ren',
+                 name='REN',
+                 label='Renderer',
+                 namespace='marcrel',
+                 uniqueName='renderer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # RPT/Reporter: a person or organization who writes or presents
+        #   reports of news or current events on air or in print.
+        PropertyDescription(
+                 abbrevCode='rpt',
+                 name='RPT',
+                 label='Reporter',
+                 namespace='marcrel',
+                 uniqueName='reporter',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # RTH/Research team head: a person who directed or managed a
+        #   research project.
+        PropertyDescription(
+                 abbrevCode='rth',
+                 name='RTH',
+                 label='Research team head',
+                 namespace='marcrel',
+                 uniqueName='researchTeamHead',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # RTM/Research team member:  a person who participated in a
+        #   research project but whose role did not involve direction
+        #   or management of it.
+        PropertyDescription(
+                 abbrevCode='rtm',
+                 name='RTM',
+                 label='Research team member',
+                 namespace='marcrel',
+                 uniqueName='researchTeamMember',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # RES/Researcher: a person or organization responsible for
+        #   performing research.
+        PropertyDescription(
+                 abbrevCode='res',
+                 name='RES',
+                 label='Researcher',
+                 namespace='marcrel',
+                 uniqueName='researcher',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # RPY/Responsible party: a person or organization legally
+        #   responsible for the content of the published material.
+        PropertyDescription(
+                 abbrevCode='rpy',
+                 name='RPY',
+                 label='Responsible party',
+                 namespace='marcrel',
+                 uniqueName='responsibleParty',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # RSG/Restager: a person or organization, other than the
+        #   original choreographer or director, responsible for
+        #   restaging a choreographic or dramatic work and who
+        #   contributes minimal new content.
+        PropertyDescription(
+                 abbrevCode='rsg',
+                 name='RSG',
+                 label='Restager',
+                 namespace='marcrel',
+                 uniqueName='restager',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # REV/Reviewer:  a person or organization responsible for
+        #   the review of a book, motion picture, performance, etc.
+        PropertyDescription(
+                 abbrevCode='rev',
+                 name='REV',
+                 label='Reviewer',
+                 namespace='marcrel',
+                 uniqueName='reviewer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # SCE/Scenarist: a person or organization who is the author
+        #   of a motion picture screenplay.
+        PropertyDescription(
+                 abbrevCode='sce',
+                 name='SCE',
+                 label='Scenarist',
+                 namespace='marcrel',
+                 uniqueName='scenarist',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # SAD/Scientific advisor: a person or organization who brings
+        #   scientific, pedagogical, or historical competence to the
+        #   conception and realization on a work, particularly in the
+        #   case of audio-visual items.
+        PropertyDescription(
+                 abbrevCode='sad',
+                 name='SAD',
+                 label='Scientific advisor',
+                 namespace='marcrel',
+                 uniqueName='scientificAdvisor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # SCR/Scribe: a person who is an amanuensis and for a writer of
+        #   manuscripts proper. For a person who makes pen-facsimiles,
+        #   use Facsimilist [fac].
+        PropertyDescription(
+                 abbrevCode='scr',
+                 name='SCR',
+                 label='Scribe',
+                 namespace='marcrel',
+                 uniqueName='scribe',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # SCL/Sculptor: a person or organization who models or carves
+        #   figures that are three-dimensional representations.
+        PropertyDescription(
+                 abbrevCode='scl',
+                 name='SCL',
+                 label='Sculptor',
+                 namespace='marcrel',
+                 uniqueName='sculptor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # SEC/Secretary: a person or organization who is a recorder,
+        #   redactor, or other person responsible for expressing the
+        #   views of a organization.
+        PropertyDescription(
+                 abbrevCode='sec',
+                 name='SEC',
+                 label='Secretary',
+                 namespace='marcrel',
+                 uniqueName='secretary',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # STD/Set designer:  a person or organization who translates the
+        #   rough sketches of the art director into actual architectural
+        #   structures for a theatrical presentation, entertainment, motion
+        #   picture, etc. Set designers draw the detailed guides and
+        #   specifications for building the set.
+        PropertyDescription(
+                 abbrevCode='std',
+                 name='STD',
+                 label='Set designer',
+                 namespace='marcrel',
+                 uniqueName='setDesigner',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # SNG/Singer: a person or organization who uses his/her/their voice
+        #   with or without instrumental accompaniment to produce music.
+        #   A performance may or may not include actual words.
+        PropertyDescription(
+                 abbrevCode='sng',
+                 name='SNG',
+                 label='Singer',
+                 namespace='marcrel',
+                 uniqueName='singer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # SPK/Speaker: a person who participates in a program (often broadcast)
+        #   and makes a formalized contribution or presentation generally
+        #   prepared in advance.
+        PropertyDescription(
+                 abbrevCode='spk',
+                 name='SPK',
+                 label='Speaker',
+                 namespace='marcrel',
+                 uniqueName='speaker',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # STN/Standards body: an organization responsible for the development
+        #   or enforcement of a standard.
+        PropertyDescription(
+                 abbrevCode='stn',
+                 name='STN',
+                 label='Standards body',
+                 namespace='marcrel',
+                 uniqueName='standardsBody',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # STL/Storyteller: a person relaying a story with creative and/or
+        #   theatrical interpretation.
+        PropertyDescription(
+                 abbrevCode='stl',
+                 name='STL',
+                 label='Storyteller',
+                 namespace='marcrel',
+                 uniqueName='storyteller',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # SRV/Surveyor: a person or organization who does measurements of
+        #   tracts of land, etc. to determine location, forms, and boundaries.
+        PropertyDescription(
+                 abbrevCode='srv',
+                 name='SRV',
+                 label='Surveyor',
+                 namespace='marcrel',
+                 uniqueName='surveyor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # TCH/Teacher: a person who, in the context of a resource, gives
+        #   instruction in an intellectual subject or demonstrates while
+        #   teaching physical skills.
+        PropertyDescription(
+                 abbrevCode='tch',
+                 name='TCH',
+                 label='Teacher',
+                 namespace='marcrel',
+                 uniqueName='teacher',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # TRC/Transcriber: a person who prepares a handwritten or typewritten copy
+        #   from original material, including from dictated or orally recorded
+        #   material. For makers of pen-facsimiles, use Facsimilist [fac].
+        PropertyDescription(
+                 abbrevCode='trc',
+                 name='TRC',
+                 label='Transcriber',
+                 namespace='marcrel',
+                 uniqueName='transcriber',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # TRL/Translator: a person or organization who renders a text from one
+        #   language into another, or from an older form of a language into the
+        #   modern form.
+        PropertyDescription(
+                 abbrevCode='trl',
+                 name='TRL',
+                 label='Translator',
+                 namespace='marcrel',
+                 m21WorkId='translator',
+                 m21Abbrev='trn',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # VDG/Videographer: a person or organization in charge of a video production,
+        #   e.g. the video recording of a stage production as opposed to a commercial
+        #   motion picture. The videographer may be the camera operator or may
+        #   supervise one or more camera operators. Do not confuse with cinematographer.
+        PropertyDescription(
+                 abbrevCode='vdg',
+                 name='VDG',
+                 label='Videographer',
+                 namespace='marcrel',
+                 uniqueName='videographer',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # VOC/Vocalist: a person or organization who principally exhibits singing
+        #   skills in a musical or dramatic presentation or entertainment.
+        PropertyDescription(
+                 abbrevCode='voc',
+                 name='VOC',
+                 label='Vocalist',
+                 namespace='marcrel',
+                 uniqueName='vocalist',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # WDE/Wood-engraver: a person or organization who makes prints by cutting
+        #   the image in relief on the end-grain of a wood block.
+        PropertyDescription(
+                 abbrevCode='wde',
+                 name='WDE',
+                 label='Wood-engraver',
+                 namespace='marcrel',
+                 uniqueName='woodEngraver',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # WDC/Woodcutter: a person or organization who makes prints by cutting the
+        #   image in relief on the plank side of a wood block.
+        PropertyDescription(
+                 abbrevCode='wdc',
+                 name='WDC',
+                 label='Woodcutter',
+                 namespace='marcrel',
+                 uniqueName='woodCutter',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # WAM/Writer of accompanying material: a person or organization who writes
+        #   significant material which accompanies a sound recording or other
+        #   audiovisual material.
+        PropertyDescription(
+                 abbrevCode='wam',
+                 name='WAM',
+                 label='Writer of accompanying material',
+                 namespace='marcrel',
+                 uniqueName='accompanyingMaterialWriter',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # The following marcrel property term refines dcterms:publisher
+
+        # DST/Distributor: a person or organization that has exclusive or shared
+        #   marketing rights for an item.
+        PropertyDescription(
+                 abbrevCode='dst',
+                 name='DST',
+                 label='Distributor',
+                 namespace='marcrel',
+                 uniqueName='distributor',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # The following music21 property terms have historically been supported
+        # by music21, so we must add them as standard property terms here:
+
+        # textOriginalLanguage: original language of vocal/choral text
+        PropertyDescription(
+                 abbrevCode='txo',
+                 name='textOriginalLanguage',
+                 label='Original Text Language',
+                 namespace='music21',
+                 isContributor=False),
+
+        # textLanguage: language of the encoded vocal/choral text
+        PropertyDescription(
+                 abbrevCode='txl',
+                 name='textLanguage',
+                 label='Text Language',
+                 namespace='music21',
+                 isContributor=False),
+
+        # popularTitle: popular title
+        PropertyDescription(
+                 abbrevCode='otp',
+                 name='popularTitle',
+                 label='Popular Title',
+                 namespace='music21',
+                 isContributor=False),
+
+        # parentTitle: parent title
+        PropertyDescription(
+                 abbrevCode='opr',
+                 name='parentTitle',
+                 label='Parent Title',
+                 namespace='music21',
+                 isContributor=False),
+
+        # actNumber: act number (e.g. '2' or 'Act 2')
+        PropertyDescription(
+                 abbrevCode='oac',
+                 name='actNumber',
+                 label='Act Number',
+                 namespace='music21',
+                 isContributor=False),
+
+        # sceneNumber: scene number (e.g. '3' or 'Scene 3')
+        PropertyDescription(
+                 abbrevCode='osc',
+                 name='sceneNumber',
+                 label='Scene Number',
+                 namespace='music21',
+                 isContributor=False),
+
+        # movementNumber: movement number (e.g. '4', or 'mov. 4', or...)
+        PropertyDescription(
+                 abbrevCode='omv',
+                 name='movementNumber',
+                 label='Movement Number',
+                 namespace='music21',
+                 isContributor=False),
+
+        # movementName: movement name (often a tempo description)
+        PropertyDescription(
+                 abbrevCode='omd',
+                 name='movementName',
+                 label='Movement Name',
+                 namespace='music21',
+                 isContributor=False),
+
+        # opusNumber: opus number (e.g. '23', or 'Opus 23')
+        PropertyDescription(
+                 abbrevCode='ops',
+                 name='opusNumber',
+                 label='Opus Number',
+                 namespace='music21',
+                 isContributor=False),
+
+        # number: number (e.g. '5', or 'No. 5')
+        PropertyDescription(
+                 abbrevCode='onm',
+                 name='number',
+                 label='Number',
+                 namespace='music21',
+                 uniqueName='workNumber',
+                 isContributor=False),
+
+        # volume: volume number (e.g. '6' or 'Vol. 6')
+        PropertyDescription(
+                 abbrevCode='ovm',
+                 name='volume',
+                 label='Volume Number',
+                 uniqueName='volumeNumber',
+                 namespace='music21',
+                 isContributor=False),
+
+        # dedication: dedicated to
+        PropertyDescription(
+                 abbrevCode='ode',
+                 name='dedication',
+                 label='Dedicated To',
+                 uniqueName='dedicatedTo',
+                 namespace='music21',
+                 isContributor=False),
+
+        # commission: commissioned by
+        PropertyDescription(
+                 abbrevCode='oco',
+                 name='commission',
+                 label='Commissioned By',
+                 uniqueName='commissionedBy',
+                 namespace='music21',
+                 isContributor=False),
+
+        # countryOfComposition: country of composition
+        PropertyDescription(
+                 abbrevCode='ocy',
+                 name='countryOfComposition',
+                 label='Country of Composition',
+                 namespace='music21',
+                 isContributor=False),
+
+        # localeOfComposition: city, town, or village of composition
+        PropertyDescription(
+                 abbrevCode='opc',
+                 name='localeOfComposition',
+                 label='Locale of Composition',
+                 namespace='music21',
+                 isContributor=False),
+
+        # groupTitle: group title (e.g. 'The Seasons')
+        PropertyDescription(
+                 abbrevCode='gtl',
+                 name='groupTitle',
+                 label='Group Title',
+                 namespace='music21',
+                 isContributor=False),
+
+        # associatedWork: associated work, such as a play or film
+        PropertyDescription(
+                 abbrevCode='gaw',
+                 name='associatedWork',
+                 label='Associated Work',
+                 namespace='music21',
+                 isContributor=False),
+
+        # collectionDesignation: This is a free-form text record that can be used to
+        #   identify a collection of pieces, such as works appearing in a compendium
+        #   or anthology. E.g. Norton Scores, Smithsonian Collection, Burkhart Anthology.
+        PropertyDescription(
+                 abbrevCode='gco',
+                 name='collectionDesignation',
+                 label='Collection Designation',
+                 namespace='music21',
+                 isContributor=False),
+
+        # attributedComposer: attributed composer
+        PropertyDescription(
+                 abbrevCode='coa',
+                 name='attributedComposer',
+                 label='Attributed Composer',
+                 namespace='music21',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # suspectedComposer: suspected composer
+        PropertyDescription(
+                 abbrevCode='cos',
+                 name='suspectedComposer',
+                 label='Suspected Composer',
+                 namespace='music21',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # composerAlias: composer's abbreviated, alias, or stage name
+        PropertyDescription(
+                 abbrevCode='col',
+                 name='composerAlias',
+                 label='Composer Alias',
+                 namespace='music21',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # composerCorporate: composer's corporate name
+        PropertyDescription(
+                 abbrevCode='coc',
+                 name='composerCorporate',
+                 label='Composer Corporate Name',
+                 namespace='music21',
+                 valueType=Contributor,
+                 isContributor=True),
+
+        # orchestrator: orchestrator
+        PropertyDescription(
+                 abbrevCode='lor',
+                 name='orchestrator',
+                 label='Orchestrator',
+                 namespace='music21',
+                 valueType=Contributor,
+                 isContributor=True),
+    )
+
+    NSKEY2STDPROPERTYDESC: dict = {f'{x.namespace}:{x.name}':x for x in STDPROPERTYDESCS}
+    NSKEY2VALUETYPE: dict = {f'{x.namespace}:{x.name}':x.valueType for x in STDPROPERTYDESCS}
+    NSKEY2CONTRIBUTORUNIQUENAME: dict = {
+                                    f'{x.namespace}:{x.name}'
+                                    :
+                                    x.uniqueName if x.uniqueName
+                                        else x.m21WorkId if x.m21WorkId
+                                        else x.name
+                                    for x in STDPROPERTYDESCS if x.isContributor}
+    UNIQUENAME2NSKEY: dict = {x.uniqueName if x.uniqueName
+                                else x.m21WorkId if x.m21WorkId
+                                else x.name
+                                :
+                                f'{x.namespace}:{x.name}'
+                                    for x in STDPROPERTYDESCS}
+    UNIQUENAME2STDPROPERTYDESC: dict = {x.uniqueName if x.uniqueName
+                                            else x.m21WorkId if x.m21WorkId
+                                            else x.name
+                                        :
+                                        x for x in STDPROPERTYDESCS}
+
+    M21ABBREV2NSKEY: dict = {x.m21Abbrev if x.m21Abbrev
+                                else x.abbrevCode if x.namespace=='music21'
+                                else None # shouldn't ever happen due to condition below
+                             :
+                             f'{x.namespace}:{x.name}'
+                                for x in STDPROPERTYDESCS
+                                    if x.m21Abbrev or x.namespace=='music21'}
+
+    M21WORKID2NSKEY: dict = {x.m21WorkId if x.m21WorkId
+                                else x.name if x.namespace=='music21'
+                                else None # shouldn't ever happen due to condition below
+                                :
+                                f'{x.namespace}:{x.name}'
+                                    for x in STDPROPERTYDESCS
+                                        if x.m21WorkId or x.namespace=='music21'}
+
+    NAMESPACEABBREV2NSKEY: dict = {(x.namespace, x.abbrevCode): f'{x.namespace}:{x.name}'
+                                        for x in STDPROPERTYDESCS}
 
     # !!!OTL: Title.
     # !!!OTP: Popular Title.
@@ -2374,30 +2279,29 @@ class Metadata(MetadataBase):
     for key, value in workIdAbbreviationDict.items():
         workIdLookupDict[value.lower()] = key
 
+
+    # INITIALIZER #
     def __init__(self, **keywords):
+        super().__init__()
+
         # for now (experimental) use 'namespace:name' for key, and either a single value
         # or a list (for more than one value).
 
         # Where original metadata could contain multiples of various contributor roles,
         # this new metadata will be able to store multiple of any property.
 
-        # Values (whether in a list or not) can also be dictionaries, where the keys
-        # are either DublinCore property keys, or our own ('music21') keys, (for
-        # example, for contributor roles).
-        # TODO: I do not yet have a way to differentiate between two composers vs two
-        # TODO: translations of one composer's name (same for all other properties)
-
-        super().__init__()
+        self._metadata: Dict = {}
+        self.software: List[str] = [defaults.software]
 
         # For backward compatibility, we allow the setting of workIds or
         # abbreviations via **keywords
         for abbreviation, workId in self.workIdAbbreviationDict.items():
             # abbreviation = workIdToAbbreviation(id)
             if workId in keywords:
-                nsKey: str = MetadataBase.M21WORKID2NSKEY[workId]
+                nsKey: str = self.M21WORKID2NSKEY[workId]
                 self._metadata[nsKey] = Text(keywords[workId])
             elif abbreviation in keywords:
-                nsKey: str = MetadataBase.M21ABBREV2NSKEY[abbreviation]
+                nsKey: str = self.M21ABBREV2NSKEY[abbreviation]
                 self._metadata[nsKey] = Text(keywords[abbreviation])
 
         # search for any keywords that match attributes
@@ -2407,6 +2311,250 @@ class Metadata(MetadataBase):
             if attr in keywords:
                 setattr(self, attr, keywords[attr])
 
+    # Support routines (many of them static).  For use internally, and some of them
+    # externally.
+
+    @staticmethod
+    def _nsKey(key: str, namespace: Optional[str] = None, personal: bool = False) -> str:
+        # if namespace is provided, key should be name or abbrevCode (within that namespace)
+        # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
+        # Caller is required to check backward compatibility (either before or after); this
+        # routine is general.
+        if not key:
+            return ''
+
+        if personal:
+            return key
+
+        if namespace:
+            # check if key is an abbreviation in this namespace
+            nsKeyForAbbrev: str = Metadata.NAMESPACEABBREV2NSKEY.get((namespace, key), None)
+            if nsKeyForAbbrev:
+                return nsKeyForAbbrev
+            # it wasn't an abbreviation, so assume it's a name
+            return f'{namespace}:{key}'
+
+        # No namespace: key might be uniqueName, from which we can look up the nsKey
+        nsKeyForUniqueName: str = Metadata.UNIQUENAME2NSKEY.get(key, None)
+        if nsKeyForUniqueName:
+            return nsKeyForUniqueName
+
+        # Key might already be of the form 'namespace:name', just return it
+        return key
+
+    @staticmethod
+    def uniqueNameToNSKey(uniqueName: str) -> Optional[str]:
+        if not uniqueName:
+            return None
+        return Metadata.UNIQUENAME2NSKEY.get(uniqueName, None)
+
+    @staticmethod
+    def isContributorUniqueName(uniqueName: str) -> bool:
+        if not uniqueName:
+            return False
+        prop: PropertyDescription = Metadata.UNIQUENAME2STDPROPERTYDESC.get(uniqueName, None)
+        if prop is None:
+            return False
+
+        return prop.isContributor
+
+    @staticmethod
+    def isContributorNSKey(nsKey: str) -> bool:
+        if not nsKey:
+            return False
+        prop: PropertyDescription = Metadata.NSKEY2STDPROPERTYDESC.get(nsKey, None)
+        if prop is None:
+            return False
+
+        return prop.isContributor
+
+    @staticmethod
+    def nsKeyToContributorUniqueName(nsKey: str) -> Optional[str]:
+        if not nsKey:
+            return None
+        uniqueName: Optional[str] = Metadata.NSKEY2CONTRIBUTORUNIQUENAME.get(nsKey, None)
+        return uniqueName
+
+    @staticmethod
+    def _isBackwardCompatibleContributorNSKey(nsKey: str) -> bool:
+        prop: PropertyDescription = Metadata.NSKEY2STDPROPERTYDESC.get(nsKey, None)
+        if prop is None:
+            return False
+
+        return prop.isContributor and (prop.namespace == 'music21' or prop.m21WorkId is not None)
+
+#     @staticmethod
+#     def _isBackwardCompatibleNSKey(nsKey: str) -> bool:
+#         prop: PropertyDescription = Metadata.NSKEY2STDPROPERTYDESC.get(nsKey, None)
+#         if prop is None:
+#             return False
+#
+#         return prop.namespace == 'music21' or prop.m21WorkId is not None
+
+    @staticmethod
+    def _nsKeyToContributorRole(nsKey: str) -> str:
+        prop: PropertyDescription = Metadata.NSKEY2STDPROPERTYDESC.get(nsKey, None)
+        if prop is None:
+            return None
+        if not prop.isContributor:
+            return None
+
+        # it's a small-c contributor
+        if prop.namespace == 'music21':
+            # it's in the music21 namespace, so it's a big-C Contributor,
+            # and Contributor.role can be found in prop.name
+            return prop.name
+
+        # it's a small-c contributor that's not in the music21 namespace
+        if prop.m21WorkId:
+            # it maps to a backward compatible big-C Contributor role, which can be
+            # found in prop.m21WorkId.
+            return prop.m21WorkId
+
+        # it's a small-c contributor that doesn't map to a backward compatible
+        # big-C Contributor role, but since we're not trying to be backward
+        # compatible, we'll take these, too.
+        return prop.uniqueName
+
+    @staticmethod
+    def _nsKeyToBackwardCompatibleContributorRole(nsKey: str) -> str:
+        prop: PropertyDescription = Metadata.NSKEY2STDPROPERTYDESC.get(nsKey, None)
+        if prop is None:
+            return None
+        if not prop.isContributor:
+            return None
+
+        # it's a small-c contributor
+        if prop.namespace == 'music21':
+            # it's in the music21 namespace, so it's a big-C Contributor,
+            # and Contributor.role can be found in prop.name
+            return prop.name
+
+        # it's a small-c contributor that's not in the music21 namespace
+        if prop.m21WorkId:
+            # it maps to a backward compatible big-C Contributor role, which can be
+            # found in prop.m21WorkId.
+            return prop.m21WorkId
+
+        return None
+
+    @staticmethod
+    def _backwardCompatibleContributorRoleToNSKey(role: str) -> str:
+        nsKey: str = Metadata.M21WORKID2NSKEY.get(role, None)
+        if nsKey is None:
+            return None
+
+        prop: PropertyDescription = Metadata.NSKEY2STDPROPERTYDESC.get(nsKey, None)
+        if prop is None:
+            return None
+
+        if not prop.isContributor:
+            return None
+
+        return nsKey
+
+    # if namespace is provided, key should be name or abbrevCode (within that namespace)
+    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
+    def _getItem(self,
+                 key: str,
+                 namespace: Optional[str] = None,
+                 personal: bool = False) -> Optional[Any]:
+        nsKey: str = self._nsKey(key, namespace, personal)
+        return self._metadata.get(nsKey, None)
+
+    def _convertValue(self, nsKey: str, value: Any) -> Any:
+        # convert to the appropriate valueType
+        valueType: Type = self.NSKEY2VALUETYPE.get(nsKey, None)
+        if valueType is None:
+            # not a standard property, convert to Text by default
+            valueType = Text
+
+        if isinstance(value, valueType):
+            # already of appropriate type, no conversion necessary
+            return value
+
+        if valueType is Text:
+            if isinstance(value, str):
+                return Text(value)
+            return Text(str(value))
+        elif valueType is DateSingle:
+            if isinstance(value, Text):
+                value = str(value)
+            if isinstance(value, (str, datetime.datetime, Date)):
+                # If you want other DateSingle-derived types (DateRelative,
+                # DateBetween, or DateSelection), you have to create those
+                # yourself before adding/setting them.
+                return DateSingle(value)
+            raise exceptions21.MetadataException(
+                    f'invalid type for DateSingle: {type(value).__name__}')
+        elif valueType is Contributor:
+            if isinstance(value, str):
+                value = Text(value)
+            if isinstance(value, Text):
+                return Contributor(role=self._nsKeyToContributorRole(nsKey), name=value)
+            raise exceptions21.MetadataException(
+                    f'invalid type for Contributor: {type(value).__name__}')
+
+        raise exceptions21.MetadataException(
+                'internal error: invalid valueType')
+
+    # if namespace is provided, key should be name or abbrevCode (within that namespace)
+    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
+    def _addItem(self,
+                 key: str,
+                 value: Any,
+                 namespace: Optional[str] = None,
+                 personal: bool = False):
+        nsKey: str = self._nsKey(key, namespace, personal)
+        value = self._convertValue(nsKey, value)
+
+        prevValue: Optional[Any] = self._metadata.get(nsKey, None)
+        if prevValue is None:
+            # set a single value
+            self._metadata[nsKey] = value
+        elif isinstance(prevValue, list):
+            # add value to the list
+            prevValue.append(value)
+        else:
+            # overwrite prevValue with a list containing prevValue and value
+            self._metadata[nsKey] = [prevValue, value]
+
+    # if namespace is provided, key should be name or abbrevCode (within that namespace)
+    # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
+    def _setItem(self,
+                 key: str,
+                 value: Any,
+                 namespace: Optional[str] = None,
+                 personal: bool = False):
+        nsKey: str = self._nsKey(key, namespace, personal)
+        self._metadata.pop(nsKey, None)
+        self._addItem(nsKey, value)
+
+    def _addBackwardCompatibleContributor(self, c: Contributor):
+        nsKey: str = self._backwardCompatibleContributorRoleToNSKey(c.role)
+        if not nsKey:
+            return
+        self._addItem(nsKey, c)
+
+    def _getBackwardCompatibleContributorItems(self) -> List[Tuple[str, Contributor]]:
+        allOut: List[Tuple[str, Contributor]] = []
+
+        for nsKey, value in self._metadata.items():
+            if not self._isBackwardCompatibleContributorNSKey(nsKey):
+                continue
+
+            if not value:
+                continue
+
+            if isinstance(value, list):
+                for v in value:
+                    allOut.append( (nsKey, v) )
+            else:
+                allOut.append( (nsKey, value) )
+
+        return allOut
+
+# -----------------------------------------------------------------------------
 
     # Here are some old APIs, implemented in terms of the new data structures
     # for backward compatibility
@@ -2424,17 +2572,17 @@ class Metadata(MetadataBase):
         return str(item)
 
     def _addBackwardCompatibleItem(self, workId: str, value: Any):
-        nsKey: str = MetadataBase.M21WORKID2NSKEY.get(workId, None)
+        nsKey: str = Metadata.M21WORKID2NSKEY.get(workId, None)
         if nsKey is not None:
             self._addItem(nsKey, value)
 
     def _setBackwardCompatibleItem(self, workId: str, value: Any):
-        nsKey: str = MetadataBase.M21WORKID2NSKEY.get(workId, None)
+        nsKey: str = Metadata.M21WORKID2NSKEY.get(workId, None)
         if nsKey is not None:
             self._setItem(nsKey, value)
 
     def _getBackwardCompatibleItemsNoConversion(self, workId: str) -> List[Any]:
-        nsKey: str = MetadataBase.M21WORKID2NSKEY.get(workId, None)
+        nsKey: str = Metadata.M21WORKID2NSKEY.get(workId, None)
         if nsKey is None:
             return None
 
@@ -2951,7 +3099,9 @@ class Metadata(MetadataBase):
 
     @composer.setter
     def composer(self, value):
-        self._setBackwardCompatibleItem('composer', value)
+        # yes, for backward compatibility, all the contributor property setters actually append
+        # so we call _add instead of _set.
+        self._addBackwardCompatibleItem('composer', value)
 
     @property
     def composers(self) -> List[str]:
@@ -3054,6 +3204,8 @@ class Metadata(MetadataBase):
 
     @librettist.setter
     def librettist(self, value):
+        # yes, for backward compatibility, all the contributor property setters actually append
+        # so we call _add instead of _set.
         self._addBackwardCompatibleItem('librettist', value)
 
     @property
@@ -3074,8 +3226,6 @@ class Metadata(MetadataBase):
     def librettists(self, value: List[str]) -> None:
         self._setBackwardCompatibleContributorNames('librettist', value)
 
-
-
     @property
     def lyricist(self):
         r'''
@@ -3095,6 +3245,8 @@ class Metadata(MetadataBase):
 
     @lyricist.setter
     def lyricist(self, value):
+        # yes, for backward compatibility, all the contributor property setters actually append
+        # so we call _add instead of _set.
         self._addBackwardCompatibleItem('lyricist', value)
 
     @property
@@ -3228,21 +3380,7 @@ class Metadata(MetadataBase):
         self._setBackwardCompatibleItem('title', value)
 
 # -----------------------------------------------------------------------------
-
-class ExtendedMetadata(Metadata):
-    # TODO: Should we allow **keywords initialization of ExtendedMetadata?
-    # TODO: We could allow keys that are uniqueName or 'namespace:name', but
-    # TODO: not personalName (if we allow personalName, that would be any name
-    # TODO: at all)
-    def __init__(self, metadata=None):
-        super().__init__() # sets up default software and empty _metadata
-
-        if metadata is not None:
-            # This is a conversion (from Metadata or from ExtendedMetadata).
-            # In all cases it must be a copy operation. We can't have two
-            # metadata objects that share instance data!
-            self.software = copy.deepcopy(metadata.software)
-            self._metadata = copy.deepcopy(metadata._metadata)
+# NEW APIs
 
     # if namespace is provided, key should be name or abbrevCode (within that namespace)
     # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
@@ -3270,21 +3408,21 @@ class ExtendedMetadata(Metadata):
     def getPersonalItem(self, key: str) -> Any:
         # Standard property nsKeys are reserved.
         # You can use nonstandard nsKeys like 'humdrum:XXX' though.
-        if key in MetadataBase.NSKEY2STDPROPERTY:
+        if key in self.NSKEY2STDPROPERTYDESC:
             return None
         return self._getItem(key, namespace=None, personal=True)
 
     def addPersonalItem(self, key: str, value: Union[Text, DateSingle, str, dict]):
         # Standard property nsKeys are reserved.
         # You can use nonstandard nsKeys like 'humdrum:XXX' though.
-        if key in MetadataBase.NSKEY2STDPROPERTY:
+        if key in self.NSKEY2STDPROPERTYDESC:
             raise KeyError
         self._addItem(key, value, namespace=None, personal=True)
 
     def setPersonalItem(self, key: str, value: Union[Text, DateSingle, str, dict]):
         # Standard property nsKeys are reserved.
         # You can use nonstandard nsKeys like 'humdrum:XXX' though.
-        if key in MetadataBase.NSKEY2STDPROPERTY:
+        if key in self.NSKEY2STDPROPERTYDESC:
             raise KeyError
         self._setItem(key, value, namespace=None, personal=True)
 
@@ -3296,7 +3434,7 @@ class ExtendedMetadata(Metadata):
         Items in the metadata that have a list of values are flattened into the output
         list as multiple tuples with the same nsKey.
         '''
-        allOut: List[Tuple[str, Union[Text, DateSingle]]] = []
+        allOut: List[Tuple[str, Any]] = []
 
         for nsKey, value in self._metadata.items():
             if skipContributors and self.isContributorNSKey(nsKey):
@@ -3311,22 +3449,39 @@ class ExtendedMetadata(Metadata):
             else:
                 allOut.append( (nsKey, value) )
 
-        # Metadata sorts here, but when I'm doing passthru export, it's nice to
-        # have the order in the output file be the same as the order in the input
-        # file. If sorting is intereresting, though, I can add a sorted param that
-        # defaults to False.  Not sure what to sort by: by namespace and then by name
-        # within that namespace?  By uniqueName?
+        # unlike backward compatible API Metadata.all, getAllItems does not sort.
         return allOut
+
+    def getAllContributorItems(self) -> List[Tuple[str, Any]]:
+        '''
+        Returns all contributors stored in this metadata as a list of (nsKey, value) tuples.
+        Items in the metadata that have a list of values are flattened into the output
+        list as multiple tuples with the same nsKey.
+        '''
+        allOut: List[Tuple[str, Contributor]] = []
+
+        for nsKey, value in self._metadata.items():
+            if not self.isContributorNSKey(nsKey):
+                continue
+
+            if not value:
+                continue
+
+            if isinstance(value, list):
+                for v in value:
+                    allOut.append( (nsKey, v) )
+            else:
+                allOut.append( (nsKey, value) )
+
+        # unlike backward compatible API Metadata.all, getAllContributorItems does not sort.
+        return allOut
+
 
 # -----------------------------------------------------------------------------
 
-# TODO: RichMetadata hasn't been modified beyond deriving it from ExtendedMetadata
-# TODO: in anticipation of enhancing the rich metadata.  For now it depends on
-# TODO: backward compatibility, and doesn't do anything that non-extended metadata
-# TODO: APIs can't do.
-# TODO: Well, crap, RichMetadata looks inside Metadata's internals (e.g. _workIds),
+# TODO: RichMetadata looks inside Metadata's internals (e.g. _workIds),
 # TODO: so it will need to be re-implemented a bit.
-class RichMetadata(ExtendedMetadata):
+class RichMetadata(Metadata):
     r'''
     RichMetadata adds to Metadata information about the contents of the Score
     it is attached to. TimeSignature, KeySignature and related analytical is
