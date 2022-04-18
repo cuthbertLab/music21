@@ -739,11 +739,11 @@ class Text(prebase.ProtoM21Object):
     def __init__(self,
                  data: Union[str, 'Text'] = '',
                  language: Optional[str] = None,
-                 isTranslated: Optional[bool] = None, # True, False, or None (unknown)
+                 isTranslated: Optional[bool] = None,   # True, False, or None (unknown)
                  encodingScheme: Optional[str] = None):
         if isinstance(data, type(self)):
             # accessing private attributes here; not desirable
-            self._data: str = data._data
+            self._data: Union[str, 'Text'] = data._data
             self._language: Optional[str] = data._language
             self.isTranslated: Optional[bool] = data.isTranslated
             self.encodingScheme: Optional[str] = data.encodingScheme

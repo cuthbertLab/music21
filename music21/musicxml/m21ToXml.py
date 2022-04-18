@@ -2548,7 +2548,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             movementNameText: metadata.Text = mdObj.getItem('movementName')
             if movementNameText:
                 mxMovementTitle.text = str(movementNameText)
-            else: # there is no movementName, use title instead
+            else:
+                # there is no movementName, use title instead
                 if firstTitleFound is not None:
                     mxMovementTitle.text = str(firstTitleFound)
                 elif defaults.title:
