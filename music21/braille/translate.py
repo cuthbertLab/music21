@@ -479,10 +479,12 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
     ⠠⠞⠊⠞⠇⠑⠒⠀⠠⠇⠁⠀⠠⠛⠊⠕⠧⠊⠝⠑⠞⠞⠁⠀⠠⠏⠊⠁⠝⠞⠁
     '''
     allBrailleLines = []
-    for key in music21Metadata._workIds:
-        value = music21Metadata._workIds[key]
+    for nsKey, value in music21Metadata.getAllItems(skipContributors=True):
         if value is not None:
-            n = ' '.join(re.findall(r'([A-Z]*[a-z]+)', key))
+            uniqueName: str = music21Metadata.nsKeyToUniqueName(nsKey)
+            if not uniqueName:
+                uniqueName = nsKey
+            n = ' '.join(re.findall(r'([A-Z]*[a-z]+)', uniqueName))
             outString = f'{n.title()}: {value}'
             if returnBrailleUnicode:
                 outTemp = []

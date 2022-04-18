@@ -292,6 +292,11 @@ class Date(prebase.ProtoM21Object):
         >>> d.minute, d.second
         (50, 32)
         '''
+        def intOrNone(value: str) -> Optional[int]:
+            if not value or value == '--':
+                return None
+            return int(value)
+
         post = []
         postError = []
         dateStr = dateStr.replace(':', '/')
@@ -302,7 +307,7 @@ class Date(prebase.ProtoM21Object):
             postError.append(error)
         # as error is stripped, we can now convert to numbers
         if post and post[0] != '':
-            post = [int(x) for x in post]
+            post = [intOrNone(x) for x in post]
         # assume in order in post list
         for i in range(len(self.attrNames)):
             if len(post) > i:  # only assign for those specified

@@ -1355,7 +1355,12 @@ class MusicXMLImporter(XMLParserBase):
                     continue  # it is required, so technically can raise an exception
                 miscFieldValue = mxMiscField.text
                 if miscFieldValue is None:
-                    continue  # it is required, so technically can raise an exception
+                    if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
+                        continue  # it is required, so technically can raise an exception
+                    else:
+                        # new metadata is happy to take an empty value
+                        miscFieldValue = ''
+
                 if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
                     try:
                         setattr(md, miscFieldName, miscFieldValue)
