@@ -352,7 +352,9 @@ class GeneralObjectExporter:
           PUBLIC "-//Recordare//DTD MusicXML ... Partwise//EN"
           "http://www.musicxml.org/dtds/partwise.dtd">
         <score-partwise version="...">
+          <movement-title>Music21 Fragment</movement-title>
           <identification>
+            <creator type="composer">Music21</creator>
             <encoding>
               <encoding-date>...</encoding-date>
               <software>music21 v...</software>
@@ -2196,6 +2198,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         >>> mxIdentification = SX.setIdentification()
         >>> SX.dump(mxIdentification)
         <identification>
+          <creator type="composer">Music21</creator>
           <encoding>
             <encoding-date>20...-...-...</encoding-date>
             <software>music21 v...</software>

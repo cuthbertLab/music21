@@ -31,8 +31,8 @@ class DefaultsException(Exception):
     pass
 
 
-title = ''
-author = ''
+title = 'Music21 Fragment'
+author = 'Music21'
 software = 'music21 v.' + _version.__version__  # used in xml encoding source software
 musicxmlVersion = '3.1'
 
