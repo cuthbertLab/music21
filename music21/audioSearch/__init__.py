@@ -70,7 +70,7 @@ def histogram(data, bins):
     # noinspection PyShadowingNames
     '''
     Partition the list in `data` into a number of bins defined by `bins`
-    and return the number of elements in each bins and a set of `bins` + 1
+    and return the number of elements in each bin and a set of `bins` + 1
     elements where the first element (0) is the start of the first bin,
     the last element (-1) is the end of the last bin, and every remaining element (i)
     is the dividing point between one bin and another.
@@ -552,7 +552,7 @@ def smoothFrequencies(
     220
 
     Different levels of smoothing have different effects.  At smoothLevel=2,
-    the isolated 220hz sample is pulling down the samples around it:
+    the isolated 220hz sample is pulling down the surrounding samples:
 
     >>> audioSearch.smoothFrequencies(inputPitches, smoothLevels=2)[:5]
     [330, 275, 358, 399, 420]
@@ -813,7 +813,7 @@ def notesAndDurationsToStream(
     '''
     take a list of :class:`~music21.note.Note` objects or rests
     and an equally long list of how long
-    each ones lasts in terms of samples and returns a
+    each one lasts in terms of samples and returns a
     Stream using the information from quarterLengthEstimation
     and quantizeDurations.
 
@@ -969,11 +969,11 @@ def decisionProcess(
         countdown = countdown + 1
     elif dist > 20 and countdown == 0:
         countdown += 1
-        environLocal.printDebug(f'Excessive distance....? dist={dist}')  # 3.8 replace {dist=}
+        environLocal.printDebug(f'Excessive distance....? {dist=}')
 
     elif dist > 30 and countdown == 1:
         countdown += 1
-        environLocal.printDebug(f'Excessive distance....? dist={dist}')  # 3.8 replace {dist=}
+        environLocal.printDebug(f'Excessive distance....? {dist=}')
 
     elif ((firstNotePage is not None and lastNotePage is not None)
           and ((positionBeginningData < firstNotePage

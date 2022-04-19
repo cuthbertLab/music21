@@ -52,7 +52,7 @@ import fractions
 import io
 import unittest
 from math import inf, isnan
-from typing import Union, Tuple, Dict, List, Optional, Iterable
+from typing import Union, Tuple, Dict, List, Optional, Iterable, Literal
 
 from collections import namedtuple
 
@@ -268,7 +268,7 @@ def quarterLengthToClosestType(qLen: OffsetQLIn):
     >>> duration.quarterLengthToClosestType(1.8)
     ('quarter', False)
 
-    Some very very close types will return True for exact conversion...
+    Some extremely close types will return True for exact conversion...
 
     >>> duration.quarterLengthToClosestType(2.0000000000000001)
     ('half', True)
@@ -335,8 +335,9 @@ def convertQuarterLengthToType(qLen: OffsetQLIn) -> str:
             f'cannot convert quarterLength {qLen} exactly to type')
     return durationType
 
-# TODO: in Py3.8+ Union[Tuple[int, str], Tuple[Literal[False], Literal[False]]]
-def dottedMatch(qLen: OffsetQLIn, maxDots=4) -> Union[Tuple[int, str], Tuple[bool, bool]]:
+def dottedMatch(qLen: OffsetQLIn,
+                maxDots=4
+                ) -> Union[Tuple[int, str], Tuple[Literal[False], Literal[False]]]:
     '''
     Given a quarterLength, determine if there is a dotted
     (or non-dotted) type that exactly matches. Returns a pair of
@@ -385,7 +386,7 @@ def quarterLengthToNonPowerOf2Tuplet(
     power of 2 denominator (such as 7:6) that represents the quarterLength and the
     DurationTuple that should be used to express the note.
 
-    This could be a double dotted note, but also a tuplet...
+    This could be a double-dotted note, but also a tuplet...
 
     >>> duration.quarterLengthToNonPowerOf2Tuplet(7)
     (<music21.duration.Tuplet 8/7/quarter>, DurationTuple(type='breve', dots=0, quarterLength=8.0))
@@ -410,7 +411,7 @@ def quarterLengthToNonPowerOf2Tuplet(
     elif qFrac.numerator > qFrac.denominator * 2:
         while qFrac.numerator > qFrac.denominator * 2:
             qFrac = qFrac / 2
-    # qFrac will always be in lowest terms
+    # qFrac will always be expressed in lowest terms
 
     closestSmallerType, unused_match = quarterLengthToClosestType(qLen / qFrac.denominator)
 
@@ -452,7 +453,7 @@ def quarterLengthToTuplet(
      <music21.duration.Tuplet 5/1/quarter>]
 
 
-    By specifying only 1 `maxToReturn`, the a single-length list containing the
+    By specifying only 1 `maxToReturn`, a single-length list containing the
     Tuplet with the smallest type will be returned.
 
     >>> duration.quarterLengthToTuplet(0.3333333, 1)
@@ -504,7 +505,7 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
     Components is a tuple of DurationTuples (normally one) that
     add up to the qLen when multiplied by...
 
-    Tuplet is a single :class:`~music21.duration.Tuplet` that adjusts all of the components.
+    Tuplet is a single :class:`~music21.duration.Tuplet` that adjusts all components.
 
     (All quarterLengths can, technically, be notated as a single unit
     given a complex enough tuplet, as a last resort will look up to 199 as a tuplet type).
@@ -587,7 +588,7 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
         tuplet=<music21.duration.Tuplet 7/4/16th>)
 
     A 4/7ths of a whole note, or
-    A quarter that is 4/7th of of a quarter
+    A quarter that is 4/7th of a quarter
 
     >>> duration.quarterConversion(4/7)
     QuarterLengthConversion(components=(DurationTuple(type='quarter', dots=0, quarterLength=1.0),),
@@ -1408,7 +1409,7 @@ class Tuplet(prebase.ProtoM21Object):
     @property
     def durationNormal(self) -> DurationTuple:
         '''
-        durationNormal is a DurationTuple that represents the notes that are
+        durationNormal is a DurationTuple that represents the notes that
         would be present in the space normally (if there were no tuplets).  For instance, in a 7
         dotted-eighth in the place of 2 double-dotted quarter notes tuplet,
         the durationNormal would be...
@@ -2435,7 +2436,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             return
 
         if self._dotGroups == (0,) and not self.tuplets and len(self.components) == 1:
-            # do common tasks fast:
+            # make sure to do common tasks fast:
             self._qtrLength = self.components[0].quarterLength
         else:
             self._qtrLength = opFrac(self.quarterLengthNoTuplets * self.aggregateTupletMultiplier())
@@ -2943,7 +2944,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         Fraction(8, 15)
         '''
         if not self.tuplets:
-            # do common cases fast.
+            # common cases should be fast.
             return 1.0
 
         currentMultiplier = 1.0
@@ -3072,7 +3073,7 @@ class GraceDuration(Duration):
         self.components = newComponents  # set new components
 
         # make time is encoded in musicxml as divisions; here it can
-        # by a duration; but should it be the duration suggested by the grace?
+        # be encoded as a duration; but should it be the duration suggested by the grace?
         self._makeTime = False
         self._slash = None
         self.slash = True  # can be True, False, or None; make None go to True?

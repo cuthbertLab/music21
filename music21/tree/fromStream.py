@@ -14,7 +14,7 @@
 Tools for creating timespans (fast, manipulable objects) from Streams
 '''
 import unittest
-from typing import Optional, Sequence, List, Type, Union, Tuple
+from typing import Optional, Sequence, List, Type, Union, Tuple, Literal
 
 from music21.base import Music21Object
 from music21 import common
@@ -147,11 +147,10 @@ def listOfTreesByClass(
     return outputTrees
 
 
-# TODO(msc) -- after 3.7 is gone, make flatten string be the literal "semiFlat"
 def asTree(
     inputStream: 'music21.stream.Stream',
     *,
-    flatten: Union[str, bool] = False,
+    flatten: Union[Literal['semiFlat'], bool] = False,
     classList: Optional[Sequence[Type]] = None,
     useTimespans: bool = False,
     groupOffsets: bool = False
