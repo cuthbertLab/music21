@@ -1252,7 +1252,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.hasElementOfClass('Measure')
         False
 
-        To be deprecated in v.7 -- to be removed in version 8, use:
+        To be deprecated in v.8 -- to be removed in version 9, use:
 
         >>> bool(s.getElementsByClass('TimeSignature'))
         True
@@ -5297,84 +5297,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                    recurse=recurse)
         return post.first()
 
-    @common.deprecated('v7', 'v8', 'use getElementsByClass() or getContextByClass() or bestClef()')
-    def getClefs(self, searchActiveSite=False, searchContext=True,
-                 returnDefault=True):  # pragma: no cover
-        '''
-        DEPRECATED in v7.
-
-        Collect all :class:`~music21.clef.Clef` objects in
-        this Stream in a list. Optionally search the
-        activeSite Stream and/or contexts.
-
-        If no Clef objects are defined, get a default
-        using :meth:`~music21.clef.bestClef`
-
-
-        >>> a = stream.Stream()
-        >>> b = clef.AltoClef()
-        >>> a.insert(0, b)
-        >>> a.repeatInsert(note.Note('C#'), list(range(10)))
-        >>> #_DOCS_SHOW c = a.getClefs()
-        >>> #_DOCS_SHOW len(c) == 1
-        True
-        '''
-        # TODO: activeSite searching is not yet implemented
-        # this may not be useful unless a stream is flat
-        post = list(self.getElementsByClass('Clef'))
-
-        # environLocal.printDebug(['getClefs(); count of local', len(post), post])
-        if not post and searchActiveSite and self.activeSite is not None:
-            # environLocal.printDebug(['getClefs(): search activeSite'])
-            post = list(self.activeSite.getElementsByClass('Clef'))
-
-        if not post and searchContext:
-            # returns a single element match
-            # post = self.__class__()
-            obj = self.getContextByClass('Clef')
-            if obj is not None:
-                post.append(obj)
-
-        # get a default and/or place default at zero if nothing at zero
-        if returnDefault and (not post or post[0].offset > 0):
-            # environLocal.printDebug(['getClefs(): using bestClef()'])
-            post.insert(0, clef.bestClef(self))
-        return post
-
-    @common.deprecated('v7', 'v8', 'use getElementsByClass() or getContextByClass()')
-    def getKeySignatures(self, searchActiveSite=True, searchContext=True):  # pragma: no cover
-        '''
-        Collect all :class:`~music21.key.KeySignature` objects in this
-        Stream in a new Stream. Optionally search the activeSite
-        stream and/or contexts.
-
-        If no KeySignature objects are defined, returns an empty Stream
-
-        DEPRECATED in v7.
-
-        >>> a = stream.Stream()
-        >>> b = key.KeySignature(3)
-        >>> a.insert(0, b)
-        >>> a.repeatInsert(note.Note('C#'), list(range(10)))
-        >>> #_DOCS_SHOW c = a.getKeySignatures()
-        >>> #_DOCS_SHOW len(c) == 1
-        True
-        '''
-        # TODO: activeSite searching is not yet implemented
-        # this may not be useful unless a stream is flat
-        post = self.getElementsByClass('KeySignature')
-        if not post and searchContext:
-            # returns a single value
-            post = self.cloneEmpty(derivationMethod='getKeySignatures')
-            obj = self.getContextByClass(key.KeySignature)
-            if obj is not None:
-                post.append(obj)
-
-        # do nothing if empty
-        if not post or post[0].offset > 0:
-            pass
-        return post
-
     def invertDiatonic(self, inversionNote=note.Note('C4'), *, inPlace=False):
         '''
         inverts a stream diatonically around the given note (by default, middle C)
@@ -6659,45 +6581,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # print(elements[-1], elements[-1].duration)
         if not inPlace:
             return returnObj
-
-    @common.deprecated('v7', 'v8', 'call extendDurations() and getElementsByClass() separately')
-    def extendDurationAndGetBoundaries(self, objName, *, inPlace=False):  # pragma: no cover
-        '''
-        DEPRECATED in v.7 -- to be removed in v.8
-
-        Extend the Duration of elements specified by objName;
-        then, collect a dictionary for every matched element of objName class,
-        where the matched element is the value and the key is the (start, end) offset value.
-
-        >>> from pprint import pprint as pp
-        >>> s = stream.Stream()
-        >>> s.insert(3, dynamics.Dynamic('mf'))
-        >>> s.insert(7, dynamics.Dynamic('f'))
-        >>> s.insert(12, dynamics.Dynamic('ff'))
-        >>> #_DOCS_SHOW pp(s.extendDurationAndGetBoundaries('Dynamic'))
-        {(3.0, 7.0): <music21.dynamics.Dynamic mf>,
-         (7.0, 12.0): <music21.dynamics.Dynamic f>,
-         (12.0, 12.0): <music21.dynamics.Dynamic ff>}
-
-
-        TODO: only allow inPlace=True or delete or something, can't return two different things
-        '''
-        if not inPlace:  # make a copy
-            returnObj = copy.deepcopy(self)
-        else:
-            returnObj = self
-        returnObj.extendDuration(objName, inPlace=True)
-        # TODO: use iteration.
-        elements = returnObj.getElementsByClass(objName)
-        boundaries = {}
-        if not elements:
-            raise StreamException('no elements of this class defined in this Stream')
-
-        for e in elements:
-            start = returnObj.elementOffset(e)
-            end = start + e.duration.quarterLength
-            boundaries[(start, end)] = e
-        return boundaries
 
     def stripTies(
         self,
