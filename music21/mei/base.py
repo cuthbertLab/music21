@@ -1332,7 +1332,7 @@ def metaSetComposer(work, meta):
     if len(composers) == 1:
         meta.composer = composers[0]
     elif len(composers) > 1:
-        meta.composer = composers
+        meta.composers = composers
 
     return meta
 

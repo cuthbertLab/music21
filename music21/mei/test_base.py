@@ -495,14 +495,14 @@ class Test(unittest.TestCase):
             </titleStmt>
         </work>"""
         work = ETree.fromstring(work)
-        expComposer1 = "['Jean Sibelius', 'Sibelius, Jean']"
-        expComposer2 = "['Sibelius, Jean', 'Jean Sibelius']"
+        expComposer1 = ['Jean Sibelius', 'Sibelius, Jean']
+        expComposer2 = ['Sibelius, Jean', 'Jean Sibelius']
         meta = metadata.Metadata()
 
         actual = base.metaSetComposer(work, meta)
 
         self.assertIs(meta, actual)
-        if actual.composer not in (expComposer1, expComposer2):
+        if actual.composers not in (expComposer1, expComposer2):
             self.fail('composer names do not match in either order')
 
     def testMetaDate1(self):

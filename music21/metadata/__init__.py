@@ -134,7 +134,6 @@ import datetime
 import unittest
 import typing as t
 
-from music21 import prebase
 from music21 import base
 from music21 import common
 from music21 import defaults
@@ -177,6 +176,7 @@ AmbitusShort = namedtuple('AmbitusShort',
                           ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
 
 # -----------------------------------------------------------------------------
+
 
 class Metadata(base.Music21Object):
     r'''
@@ -400,7 +400,7 @@ class Metadata(base.Music21Object):
 
     # INITIALIZER #
 
-    def __init__(self, **keywords):
+    def __init__(self, *args, **keywords):
         super().__init__()
 
         self._metadata: Dict = {}
@@ -428,7 +428,7 @@ class Metadata(base.Music21Object):
 # -----------------------------------------------------------------------------
 # PUBLIC APIs:
 #   {get,add,set}{Item,Items}
-#   {get,add,set}{FirstPersonalItem,PersonalItem,PersonalItems}
+#   {get,add,set}Personal{Item,Items}
 #   getAllItems(skipContributors=False)
 #   getAllContributorItems
 
@@ -601,9 +601,7 @@ class Metadata(base.Music21Object):
         # 'music21' 'contributors', and all code that modified it that I found
         # were in music21 forks.  So I think we're OK making this a read-only
         # property that we generate on the fly.
-        output: List[Contributor] = []
-        for value in self._getAllBackwardCompatibleContributors():
-            output.append(value)
+        output: List[Contributor] = self._getAllBackwardCompatibleContributors()
         return output
 
     # copyright can be None or a Copyright object
@@ -697,9 +695,12 @@ class Metadata(base.Music21Object):
                 break
         if match is None:
             raise AttributeError(f'object has no attribute: {name}')
+        # _getBackwardCompatibleItem returns None or str(value)
+        # For backward compatibility reasons, we need to return 'None' instead of None
         result = self._getBackwardCompatibleItem(match)
-        # always return string representation for now
-        return str(result)
+        if result is not None:
+            return result
+        return 'None'
 
     # PUBLIC METHODS #
 
@@ -1149,7 +1150,12 @@ class Metadata(base.Music21Object):
         >>> md.date
         '1803/01/01 to 1805/04/07'
         '''
-        return self._getBackwardCompatibleItem('date')
+        # _getBackwardCompatibleItem returns None or str(value)
+        # For backward compatibility reasons, we need to return 'None' instead of None
+        output = self._getBackwardCompatibleItem('date')
+        if output is not None:
+            return output
+        return 'None'
 
     @date.setter
     def date(self, value):
