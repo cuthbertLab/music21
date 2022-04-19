@@ -12,13 +12,14 @@
 import math
 import random
 import unittest
-from typing import List, Tuple, Union, Sequence, Iterable
+from typing import List, no_type_check, Tuple, Union, Sequence, Iterable
 
 from fractions import Fraction
 from math import isclose
 
 from music21 import defaults
 from music21.common import deprecated
+from music21.common.types import OffsetQLIn, OffsetQL
 
 __all__ = [
     'ordinals', 'musicOrdinals', 'ordinalsToNumbers',
@@ -61,6 +62,7 @@ musicOrdinals[15] = 'Double-octave'
 musicOrdinals[22] = 'Triple-octave'
 
 
+@deprecated('v7.3', 'v9', 'Use common.opFrac(num) instead')
 def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
     '''
     Cleans up a floating point number by converting
@@ -148,6 +150,8 @@ DENOM_LIMIT = defaults.limitOffsetDenominator
 def _preFracLimitDenominator(n, d):
     # noinspection PyShadowingNames
     '''
+    Used in opFrac
+
     Copied from fractions.limit_denominator.  Their method
     requires creating three new Fraction instances to get one back. this doesn't create any
     call before Fraction...
@@ -222,7 +226,9 @@ def _preFracLimitDenominator(n, d):
         return (p0 + k * p1, q0 + k * q1)
 
 
-def opFrac(num):
+# no type checking due to accessing protected attributes (for speed)
+@no_type_check
+def opFrac(num: Union[OffsetQLIn, None]) -> Union[OffsetQL, None]:
     '''
     opFrac -> optionally convert a number to a fraction or back.
 
@@ -261,8 +267,6 @@ def opFrac(num):
     Fraction(10, 81)
     >>> common.opFrac(None) is None
     True
-
-    :type num: float
     '''
     # This is a performance critical operation, tuned to go as fast as possible.
     # hence redundancy -- first we check for type (no inheritance) and then we
@@ -427,7 +431,7 @@ def roundToHalfInteger(num: Union[float, int]) -> Union[float, int]:
         floatVal = 1
     return intVal + floatVal
 
-@deprecated('v.7', 'any time', 'just call math.isclose(x, y, abs_tol=1e-7)')
+@deprecated('v.7', 'v.8', 'just call math.isclose(x, y, abs_tol=1e-7)')
 def almostEquals(x, y=0.0, grain=1e-7) -> bool:
     # noinspection PyShadowingNames
     '''
