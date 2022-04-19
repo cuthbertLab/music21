@@ -631,7 +631,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> b._reprInternal()
         'id=hi'
         '''
-        if self.id == id(self):
+        # hasattr is here because of Metadata.__getattr__()
+        if not hasattr(self, 'id') or self.id == id(self):
             return super()._reprInternal()
         reprId = self.id
         try:
