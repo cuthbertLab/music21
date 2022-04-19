@@ -16,7 +16,7 @@ StreamIterators are explicitly allowed to access private methods on streams.
 '''
 import copy
 from typing import (TypeVar, List, Union, Callable, Optional, Literal,
-                    Dict, TypedDict, TYPE_CHECKING)
+                    TypedDict)
 import unittest
 import warnings
 
@@ -29,9 +29,6 @@ from music21 import prebase
 from music21 import base   # just for typing.
 
 from music21.sites import SitesException
-
-if TYPE_CHECKING:
-    import music21.stream
 
 
 _SIter = TypeVar('_SIter')

@@ -110,8 +110,9 @@ excludeFromBrailleElements = [spanner.Slur,
                               layout.StaffLayout]
 
 class GroupingGlobals(TypedDict):
-   keySignature: Optional[key.KeySignature]
-   timeSignature: Optional[meter.TimeSignature]
+    keySignature: Optional[key.KeySignature]
+    timeSignature: Optional[meter.TimeSignature]
+
 
 GROUPING_GLOBALS: GroupingGlobals = {
     'keySignature': None,  # will be key.KeySignature(0) on first call
