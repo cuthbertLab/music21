@@ -5985,6 +5985,7 @@ class MeasureParser(XMLParserBase):
 
             self.stream.coreElementsChanged()
 
+
 # -----------------------------------------------------------------------------
 # unittests now in test_xmlToM21
 

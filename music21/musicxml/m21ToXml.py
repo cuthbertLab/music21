@@ -6590,6 +6590,7 @@ class MeasureExporter(XMLExporterBase):
         # self.mxTranspose = self.intervalToMXTranspose()
         return None
 
+
 # unittests moved to test_m21ToXml
 
 if __name__ == '__main__':
