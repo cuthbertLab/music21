@@ -79,7 +79,6 @@ from typing import Union, List
 
 from music21 import base
 from music21 import common
-from music21 import defaults
 from music21 import derivation
 from music21 import exceptions21
 from music21 import spanner
@@ -764,12 +763,6 @@ class StreamThawer(StreamFreezeThawBase):
         >>> st = freezeThaw.StreamThawer()
         >>> st.teardownSerializationScaffold(a)
         '''
-        def _fixId(innerEl):
-            if (innerEl.id is not None
-                    and common.isNum(innerEl.id)
-                    and innerEl.id > defaults.minIdNumberToConsiderMemoryLocation):
-                innerEl.id = id(innerEl)
-
         if streamObj is None:  # pragma: no cover
             streamObj = self.stream
             if streamObj is None:
@@ -801,12 +794,10 @@ class StreamThawer(StreamFreezeThawBase):
                 self.restoreStreamStatusClient(e)
                 # removing seems to create problems for jsonPickle with Spanners
 
-            _fixId(e)
             # e.wrapWeakref()
 
         # restore to whatever it was
         streamObj.autoSort = storedAutoSort
-        _fixId(streamObj)
 
     def restoreElementsFromTuples(self, streamObj):
         '''

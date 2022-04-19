@@ -1762,7 +1762,7 @@ class PartParser(XMLParserBase):
 
         uniqueStaffKeys: List[int] = self._getUniqueStaffKeys()
         partStaffs: List[stream.PartStaff] = []
-        appendedElementIds: Set[int] = set()  # id = id(el) not el.id
+        appendedElementIds: Set[int] = set()  # id is id(el) not el.id
 
         def copy_into_partStaff(source, target, omitTheseElementIds):
             for sourceElem in source.getElementsByClass(STAFF_SPECIFIC_CLASSES):

@@ -40,6 +40,7 @@ import copy
 import sys
 import types
 import unittest
+import warnings
 
 from collections import namedtuple
 from importlib.util import find_spec
@@ -316,9 +317,6 @@ class Music21Object(prebase.ProtoM21Object):
 
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-        'id': '''A unique identification string; not to be confused with the
-            default `.id()` method. However, if not set, will return
-            the `id()` number''',
         'groups': '''An instance of a :class:`~music21.base.Group`
             object which describes
             arbitrary `Groups` that this object belongs to.''',
@@ -360,6 +358,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def __init__(self, *arguments, **keywords):
         # do not call super().__init__() since it just wastes time
+        self._id = None
         # None is stored as the internal location of an obj w/o any sites
         self._activeSite: Optional['music21.stream.Stream'] = None
         # offset when no activeSite is available
@@ -385,9 +384,7 @@ class Music21Object(prebase.ProtoM21Object):
         self._cache: Dict[str, Any] = {}
 
         if 'id' in keywords:
-            self.id = keywords['id']
-        else:
-            self.id = id(self)
+            self._id = keywords['id']
 
         if 'groups' in keywords and keywords['groups'] is not None:
             self.groups = keywords['groups']
@@ -409,6 +406,30 @@ class Music21Object(prebase.ProtoM21Object):
             self.style = keywords['style']
         if 'editorial' in keywords:
             self.editorial = keywords['editorial']
+
+    @property
+    def id(self):
+        '''
+        A unique identification string or int; not to be confused with Python's
+        built-in `id()` method. However, if not set, will return
+        Python's `id()` number.
+
+        "Unique" is intended with respect to the stream hierarchy one is likely
+        to query with :meth:`~music21.stream.Stream.getElementById`. For
+        instance, the `.id` of a Voice should be unique in any single Measure,
+        but the id's may reset from measure to measure across a Part.
+        '''
+        if self._id is not None:
+            return self._id
+        return id(self)
+
+    @id.setter
+    def id(self, new_id):
+        if isinstance(new_id, int) and new_id > defaults.minIdNumberToConsiderMemoryLocation:
+            msg = 'Setting an ID that could be mistaken for a memory location '
+            msg += f'is discouraged: got {new_id}'
+            warnings.warn(msg)
+        self._id = new_id
 
     def mergeAttributes(self, other: 'Music21Object') -> None:
         '''
@@ -450,7 +471,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         TODO: move to class attributes to cache.
         '''
-        defaultIgnoreSet = {'_derivation', '_activeSite', 'id',
+        defaultIgnoreSet = {'_derivation', '_activeSite',
                             'sites', '_duration', '_style', '_cache'}
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
@@ -492,14 +513,6 @@ class Music21Object(prebase.ProtoM21Object):
             #            setattr(new, '_activeSite', None)
             setattr(new, '_activeSite', self._activeSite)
 
-        if 'id' in ignoreAttributes:
-            value = getattr(self, 'id')
-            if value != id(self) or (
-                common.isNum(value)
-                and value < defaults.minIdNumberToConsiderMemoryLocation
-            ):
-                newValue = value
-                setattr(new, 'id', newValue)
         if 'sites' in ignoreAttributes:
             # we make a copy of the sites value even though it is obsolete because
             # the spanners will need to be preserved and then set to the new value
@@ -3916,7 +3929,6 @@ class ElementWrapper(Music21Object):
     <music21.base.ElementWrapper id=1_wrapper offset=1.0 obj='<...Wave_read object...'>
     <music21.base.ElementWrapper offset=2.0 obj='<...Wave_read object...>'>
     '''
-    _id = None
     obj = None
 
     _DOC_ORDER = ['obj']
@@ -3927,9 +3939,6 @@ class ElementWrapper(Music21Object):
     def __init__(self, obj=None):
         super().__init__()
         self.obj = obj  # object stored here
-        # the unlinkedDuration is the duration that is inherited from
-        # Music21Object
-        # self._unlinkedDuration = None
 
     # -------------------------------------------------------------------------
 
@@ -3940,7 +3949,7 @@ class ElementWrapper(Music21Object):
             if shortObj[0] == '<':
                 shortObj += '>'
 
-        if self.id is not None:
+        if self._id is not None:
             return f'id={self.id} offset={self.offset} obj={shortObj!r}'
         else:
             return f'offset={self.offset} obj={shortObj!r}'
@@ -3965,6 +3974,7 @@ class ElementWrapper(Music21Object):
         >>> a == c
         False
         '''
+        # TODO: call super on eq.
         for other_prop in ('obj', 'offset', 'priority', 'groups', 'activeSite', 'duration'):
             if not hasattr(other, other_prop):
                 return False
@@ -4010,6 +4020,10 @@ class ElementWrapper(Music21Object):
 
     def isTwin(self, other: 'ElementWrapper') -> bool:
         '''
+        DEPRECATED:  Just run::
+
+            (wrapper1.obj == wrapper2.obj)
+
         A weaker form of equality.  a.isTwin(b) is true if
         a and b store either the same object OR objects that are equal.
         In other words, it is essentially the same object in a different context
@@ -5241,6 +5255,18 @@ class Test(unittest.TestCase):
         self.assertEqual(eCopy2.pitch.name, 'F#')
         prev = eCopy2.previous('Note')
         self.assertIs(prev, eCopy1)
+
+    def testWarnCopyingIds(self):
+        '''
+        It is not recommended to copy .id values between objects without being
+        sure the original .id value is not a memory location.
+        '''
+        obj = Music21Object()
+        obj2 = Music21Object()
+        msg = 'Setting an ID that could be mistaken for a memory location '
+        msg += f'is discouraged: got {obj.id}'
+        with self.assertWarnsRegex(Warning, msg):
+            obj2.id = obj.id
 
 
 # ------------------------------------------------------------------------------
