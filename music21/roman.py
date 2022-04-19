@@ -17,10 +17,7 @@ import enum
 import unittest
 import copy
 import re
-from typing import Dict, Union, Optional, List, Tuple
-
-# when python 3.7 is removed from support:
-# from typing import Literal
+from typing import Dict, Union, Optional, List, Tuple, Literal
 
 from collections import namedtuple
 
@@ -534,7 +531,7 @@ def figureTupleSolo(
 def identifyAsTonicOrDominant(
     inChord: Union[list, tuple, chord.Chord],
     inKey: key.Key
-) -> Union[str, bool]:
+) -> Union[str, Literal[False]]:
     '''
     Returns the roman numeral string expression (either tonic or dominant) that
     best matches the inChord. Useful when you know inChord is either tonic or
@@ -2693,9 +2690,7 @@ class RomanNumeral(harmony.Harmony):
                     secondary_tonic = self.secondaryRomanNumeralKey.tonic
                     self.secondaryRomanNumeralKey = key.Key(secondary_tonic, 'minor')
 
-            # when Python 3.7 support is removed
-            # aug6type: Literal['It', 'Ger', 'Fr', 'Sw'] = aug6Match.group(1)
-            aug6type = aug6Match.group(1)
+            aug6type: Literal['It', 'Ger', 'Fr', 'Sw'] = aug6Match.group(1)
 
             if aug6type in ('It', 'Ger'):
                 self.scaleDegree = 4

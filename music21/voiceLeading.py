@@ -1232,10 +1232,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         c2 = chord.Chord([self.vIntervals[1].noteStart, self.vIntervals[1].noteEnd])
         r1 = roman.identifyAsTonicOrDominant(c1, self.key)
         r2 = roman.identifyAsTonicOrDominant(c2, self.key)
-        # TODO in Py3.8+, remove when identifyAsTonicOrDominant returns Union[str | Literal[False]]
-        if r1 is True or r2 is True:
-            raise VoiceLeadingQuartetException(
-                'identifyAsTonicOrDominant() returned True unexpectedly, please report a bug')
         openings = ['P1', 'P5', 'I', 'V']
         return not ((self.vIntervals[0].simpleName in openings
                         or self.vIntervals[1].simpleName in openings)

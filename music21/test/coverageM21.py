@@ -34,8 +34,9 @@ exclude_lines = [
 
 
 def getCoverage(overrideVersion=False):
-    if overrideVersion or sys.version_info.minor == 7:
-        # run on Py 3.7 -- to get Py 3.8/3.9 timing...
+    # Note the .minor == 8 -- that makes it only run on 3.8
+    # run on Py 3.8 -- to get Py 3.9/3.10 timing...
+    if overrideVersion or sys.version_info.minor == 8:
         try:
             import coverage  # type: ignore
             cov = coverage.Coverage(omit=omit_modules)

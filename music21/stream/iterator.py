@@ -15,7 +15,8 @@ this class contains iterators and filters for walking through streams
 StreamIterators are explicitly allowed to access private methods on streams.
 '''
 import copy
-from typing import TypeVar, List, Union, Callable, Optional, Dict
+from typing import (TypeVar, List, Union, Callable, Optional, Literal,
+                    TypedDict)
 import unittest
 import warnings
 
@@ -42,6 +43,17 @@ class StreamIteratorException(StreamException):
 
 class StreamIteratorInefficientWarning(PendingDeprecationWarning):
     pass
+
+
+class ActiveInformation(TypedDict, total=False):
+    # noinspection PyTypedDict
+    stream: Optional['music21.stream.Stream']  # https://youtrack.jetbrains.com/issue/PY-43689
+    index: int
+    iterSection: Literal['_elements', '_endElements']
+    sectionIndex: int
+    # noinspection PyTypedDict
+    lastYielded: Optional['music21.stream.Stream']
+
 
 # -----------------------------------------------------------------------------
 
@@ -70,10 +82,16 @@ class StreamIterator(prebase.ProtoM21Object):
       False
     * StreamIterator.activeInformation -- a dict that contains information
       about where we are in the parse.  Especially useful for recursive
-      streams. 'stream' = the stream that is currently active, 'index'
-      where in `.elements` we are, `iterSection` is `_elements` or `_endElements`,
-      and `sectionIndex` is where we are in the iterSection, or -1 if
-      we have not started. This dict is shared among all sub iterators.
+      streams:
+
+          * `stream` = the stream that is currently active,
+          * `index` = where in `.elements` we are,
+          * `iterSection` is `_elements` or `_endElements`,
+          * `sectionIndex` is where we are in the iterSection, or -1 if
+            we have not started.
+          * `lastYielded` the stream that last yielded the element (present in
+            recursiveIterators only).
+          * (This dict is shared among all sub iterators.)
 
     Constructor keyword only arguments:
 
@@ -105,7 +123,7 @@ class StreamIterator(prebase.ProtoM21Object):
                  *,
                  filterList: Union[List[FilterType], FilterType, None] = None,
                  restoreActiveSites: bool = True,
-                 activeInformation: Optional[Dict] = None,
+                 activeInformation: Optional[ActiveInformation] = None,
                  ignoreSorting: bool = False):
         if not ignoreSorting and srcStream.isSorted is False and srcStream.autoSort:
             srcStream.sort()
@@ -119,7 +137,7 @@ class StreamIterator(prebase.ProtoM21Object):
         # this information can help in speed later
         self.elementsLength = len(self.srcStream._elements)
         self.sectionIndex = -1  # where we are within a given section (_elements or _endElements)
-        self.iterSection = '_elements'
+        self.iterSection: Literal['_elements', '_endElements'] = '_elements'
 
         self.cleanupOnStop = False
         self.restoreActiveSites: bool = restoreActiveSites
@@ -148,7 +166,7 @@ class StreamIterator(prebase.ProtoM21Object):
         if activeInformation is not None:
             self.activeInformation = activeInformation
         else:
-            self.activeInformation = {}  # in Py3.8 make a TypedDict
+            self.activeInformation: ActiveInformation = {}
             self.updateActiveInformation()
 
     def _reprInternal(self):
@@ -174,7 +192,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         Returns `self` without any changes.
 
-        TODO: manage and emit DeprecationWarnings in v.8
+        TODO: manage and emit DeprecationWarnings in v.8 (probably impossible...)
         TODO: remove in v.9
         '''
         return self
@@ -920,7 +938,7 @@ class StreamIterator(prebase.ProtoM21Object):
         Add a filter to the Iterator to remove all elements
         except those that match one
         or more classes in the `classFilterList`. A single class
-        can also used for the `classFilterList` parameter instead of a List.
+        can also be used for the `classFilterList` parameter instead of a List.
 
         >>> s = stream.Stream(id='s1')
         >>> s.append(note.Note('C'))
@@ -1120,7 +1138,7 @@ class StreamIterator(prebase.ProtoM21Object):
         playing before the search but that end just before the end of the search type.
         See the code for allPlayingWhileSounding for a demonstration.
 
-        This chart, and the examples below, demonstrate the various
+        This chart, like the examples below, demonstrates the various
         features of getElementsByOffset.  It is one of the most complex
         methods of music21 but also one of the most powerful, so it
         is worth learning at least the basics.
