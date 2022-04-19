@@ -163,8 +163,9 @@ environLocal = environment.Environment(os.path.basename(__file__))
 PropertyDescription = namedtuple('PropertyDescription',
     ('abbrevCode', 'name', 'label', 'namespace', 'isContributor',
     'm21Abbrev', 'm21WorkId', 'uniqueName', 'valueType'),
+    # All fields default to None, except for valueType, which defaults to Text
     defaults=(None, None, None, None, None,
-    None, None, None, Type))
+    None, None, None, Text))
 
 @dataclass
 class FileInfo:
@@ -601,8 +602,7 @@ class Metadata(base.Music21Object):
         # were in music21 forks.  So I think we're OK making this a read-only
         # property that we generate on the fly.
         output: List[Contributor] = []
-        for nsKey, value in self._getBackwardCompatibleContributorItems():
-            assert(self._nsKeyToBackwardCompatibleContributorRole(nsKey) == value.role)
+        for nsKey, value in self._getAllBackwardCompatibleContributorItems():
             output.append(value)
         return output
 
@@ -614,7 +614,7 @@ class Metadata(base.Music21Object):
     @property
     def copyright(self) -> Copyright:
         output: Optional[Any] = self._getBackwardCompatibleItemNoConversion('copyright')
-        if not isinstance(output, Copyright):
+        if output and not isinstance(output, Copyright):
             raise exceptions21.MetadataException('internal error: invalid copyright value type')
         return output
 
@@ -1088,9 +1088,7 @@ class Metadata(base.Music21Object):
 
     @composer.setter
     def composer(self, value):
-        # yes, for backward compatibility, all the contributor property setters actually append
-        # so we call _add instead of _set.
-        self._addBackwardCompatibleItem('composer', value)
+        self._setBackwardCompatibleItem('composer', value)
 
     @property
     def composers(self) -> List[str]:
@@ -1182,13 +1180,11 @@ class Metadata(base.Music21Object):
         librettists should be distinguished from lyricists etc., but sometimes
         the line is not 100% clear.
         '''
-        return self._contributor_role_getter('librettist')
+        return self._getBackwardCompatibleItem('librettist')
 
     @librettist.setter
     def librettist(self, value):
-        # yes, for backward compatibility, all the contributor property setters actually append
-        # so we call _add instead of _set.
-        self._addBackwardCompatibleItem('librettist', value)
+        self._setBackwardCompatibleItem('librettist', value)
 
     @property
     def librettists(self) -> List[str]:
@@ -1202,11 +1198,11 @@ class Metadata(base.Music21Object):
 
         Should be distinguished from lyricists etc.
         '''
-        return self._getBackwardCompatibleContributorNames('librettist')
+        return self._getBackwardCompatibleItems('librettist')
 
     @librettists.setter
     def librettists(self, value: List[str]) -> None:
-        self._setBackwardCompatibleContributorNames('librettist', value)
+        self._setBackwardCompatibleItems('librettist', value)
 
     @property
     def lyricist(self):
@@ -1223,13 +1219,11 @@ class Metadata(base.Music21Object):
         >>> md = metadata.Metadata(title='West Side Story')
         >>> md.lyricist = 'Sondheim, Stephen'
         '''
-        return self._getBackwardCompatibleContributorName('lyricist')
+        return self._getBackwardCompatibleItem('lyricist')
 
     @lyricist.setter
     def lyricist(self, value):
-        # yes, for backward compatibility, all the contributor property setters actually append
-        # so we call _add instead of _set.
-        self._addBackwardCompatibleItem('lyricist', value)
+        self._setBackwardCompatibleItem('lyricist', value)
 
     @property
     def lyricists(self) -> List[str]:
@@ -1243,11 +1237,11 @@ class Metadata(base.Music21Object):
 
         Should be distinguished from librettists etc.
         '''
-        return self._getBackwardCompatibleContributorNames('lyricist')
+        return self._getBackwardCompatibleItems('lyricist')
 
     @lyricists.setter
     def lyricists(self, value: List[str]) -> None:
-        self._setBackwardCompatibleContributorNames('lyricist', value)
+        self._setBackwardCompatibleItems('lyricist', value)
 
 
     @property
@@ -1485,6 +1479,7 @@ class Metadata(base.Music21Object):
         if valueType is Contributor:
             if isinstance(value, str):
                 value = Text(value)
+
             if isinstance(value, Text):
                 return Contributor(role=self._nsKeyToContributorRole(nsKey), name=value)
             raise exceptions21.MetadataException(
@@ -1578,7 +1573,8 @@ class Metadata(base.Music21Object):
         if prop is None:
             return False
 
-        return prop.isContributor and (prop.namespace == 'music21' or prop.m21WorkId is not None)
+        return prop.isContributor and (
+            prop.namespace == 'music21' or prop.m21WorkId is not None or prop.uniqueName == 'otherContributor')
 
 #     @staticmethod
 #     def _isBackwardCompatibleNSKey(nsKey: str) -> bool:
@@ -1613,8 +1609,9 @@ class Metadata(base.Music21Object):
     @staticmethod
     def _backwardCompatibleContributorRoleToNSKey(role: str) -> Optional[str]:
         nsKey: str = Metadata._M21WORKID2NSKEY.get(role, None)
-        if nsKey is None:
-            return None
+        if not nsKey:
+            # it's a non-standard role, so add this contributor with uniqueName='otherContributor'
+            nsKey = Metadata.uniqueNameToNSKey('otherContributor')
 
         prop: PropertyDescription = Metadata._NSKEY2STDPROPERTYDESC.get(nsKey, None)
         if prop is None:
@@ -1631,7 +1628,7 @@ class Metadata(base.Music21Object):
             return
         self._addItem(nsKey, c)
 
-    def _getBackwardCompatibleContributorItems(self) -> List[Tuple[str, Contributor]]:
+    def _getAllBackwardCompatibleContributorItems(self) -> List[Tuple[str, Contributor]]:
         allOut: List[Tuple[str, Contributor]] = []
 
         for nsKey, value in self._metadata.items():
@@ -1643,9 +1640,9 @@ class Metadata(base.Music21Object):
 
             if isinstance(value, list):
                 for v in value:
-                    allOut.append((nsKey, v))
+                    allOut.append((v.role, v))
             else:
-                allOut.append((nsKey, value))
+                allOut.append((value.role, value))
 
         return allOut
 
@@ -1659,13 +1656,15 @@ class Metadata(base.Music21Object):
         item = self._getBackwardCompatibleItemNoConversion(workId)
         if item is None:
             return None
+        if isinstance(item, Contributor):
+            return item.names[0]
         return str(item)
 
-    def _addBackwardCompatibleItem(self, workId: str, value: Any):
-        nsKey: str = Metadata._M21WORKID2NSKEY.get(workId, None)
-        if nsKey is not None:
-            self._addItem(nsKey, value)
-
+#     def _addBackwardCompatibleItem(self, workId: str, value: Any):
+#         nsKey: str = Metadata._M21WORKID2NSKEY.get(workId, None)
+#         if nsKey is not None:
+#             self._addItem(nsKey, value)
+#
     def _setBackwardCompatibleItem(self, workId: str, value: Any):
         nsKey: str = Metadata._M21WORKID2NSKEY.get(workId, None)
         if nsKey is not None:
@@ -1688,7 +1687,10 @@ class Metadata(base.Music21Object):
 
         # convert them all to str
         for v in values:
-            output.append(str(v))
+            if isinstance(v, Contributor):
+                output.append(v.names[0])
+            else:
+                output.append(str(v))
         return output
 
     def _setBackwardCompatibleItems(self, workId: str, names: List[str]):
@@ -3677,8 +3679,6 @@ class Metadata(base.Music21Object):
 
 # -----------------------------------------------------------------------------
 
-# TODO: RichMetadata looks inside Metadata's internals (e.g. _workIds),
-# TODO: so it will need to be re-implemented a bit.
 class RichMetadata(Metadata):
     r'''
     RichMetadata adds to Metadata information about the contents of the Score
@@ -3762,8 +3762,7 @@ class RichMetadata(Metadata):
         # specifically name attributes to copy, as do not want to get all
         # Metadata is a m21 object
         localNames = [
-            'contributors', '_date', '_urls', '_imprint', 'copyright',
-            '_workIds',
+            '_metadata',
         ]
         environLocal.printDebug(['RichMetadata: calling merge()'])
         for name in localNames:
