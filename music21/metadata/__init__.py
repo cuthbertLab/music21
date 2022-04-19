@@ -602,7 +602,7 @@ class Metadata(base.Music21Object):
         # were in music21 forks.  So I think we're OK making this a read-only
         # property that we generate on the fly.
         output: List[Contributor] = []
-        for nsKey, value in self._getAllBackwardCompatibleContributorItems():
+        for _nsKey, value in self._getAllBackwardCompatibleContributorItems():
             output.append(value)
         return output
 
@@ -612,9 +612,9 @@ class Metadata(base.Music21Object):
     # TODO: We are converting to Copyright in the setter now,
     # TODO: so regenerating CoreCorpus sounds like a good idea.
     @property
-    def copyright(self) -> Copyright:
+    def copyright(self) -> Optional[Copyright]:
         output: Optional[Any] = self._getBackwardCompatibleItemNoConversion('copyright')
-        if output and not isinstance(output, Copyright):
+        if output is not None and not isinstance(output, Copyright):
             raise exceptions21.MetadataException('internal error: invalid copyright value type')
         return output
 
@@ -1574,7 +1574,9 @@ class Metadata(base.Music21Object):
             return False
 
         return prop.isContributor and (
-            prop.namespace == 'music21' or prop.m21WorkId is not None or prop.uniqueName == 'otherContributor')
+            prop.namespace == 'music21' or
+            prop.m21WorkId is not None or
+            prop.uniqueName == 'otherContributor')
 
 #     @staticmethod
 #     def _isBackwardCompatibleNSKey(nsKey: str) -> bool:
@@ -1608,12 +1610,12 @@ class Metadata(base.Music21Object):
 
     @staticmethod
     def _backwardCompatibleContributorRoleToNSKey(role: str) -> Optional[str]:
-        nsKey: str = Metadata._M21WORKID2NSKEY.get(role, None)
+        nsKey: Optional[str] = Metadata._M21WORKID2NSKEY.get(role, None)
         if not nsKey:
             # it's a non-standard role, so add this contributor with uniqueName='otherContributor'
             nsKey = Metadata.uniqueNameToNSKey('otherContributor')
 
-        prop: PropertyDescription = Metadata._NSKEY2STDPROPERTYDESC.get(nsKey, None)
+        prop: Optional[PropertyDescription] = Metadata._NSKEY2STDPROPERTYDESC.get(nsKey, None)
         if prop is None:
             return None
 
