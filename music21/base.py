@@ -837,7 +837,6 @@ class Music21Object(prebase.ProtoM21Object):
         site: 'music21.stream.Stream',
         *,
         returnSpecial=False,
-        stringReturns=False,
     ) -> Union[float, fractions.Fraction, str]:
         '''
         If this class has been registered in a container such as a Stream,
@@ -913,10 +912,6 @@ class Music21Object(prebase.ProtoM21Object):
 
         Changed in v7. -- stringReturns renamed to returnSpecial.  Returns an OffsetSpecial Enum.
         '''
-        if stringReturns and not returnSpecial:  # pragma: no cover
-            returnSpecial = stringReturns
-            environLocal.warn('stringReturns is deprecated: use returnSpecial instead')
-
         if site is None:
             return self._naiveOffset
 
@@ -4019,48 +4014,8 @@ class ElementWrapper(Music21Object):
             raise AttributeError(f'Could not get attribute {name!r} in an object-less element')
         return object.__getattribute__(storedObj, name)
 
-    def isTwin(self, other: 'ElementWrapper') -> bool:
-        '''
-        DEPRECATED:  Just run::
-
-            (wrapper1.obj == wrapper2.obj)
-
-        A weaker form of equality.  a.isTwin(b) is true if
-        a and b store either the same object OR objects that are equal.
-        In other words, it is essentially the same object in a different context
-
-        >>> import copy
-        >>> import music21
-
-        >>> aE = music21.ElementWrapper(obj='hello')
-
-        >>> bE = copy.copy(aE)
-        >>> aE is bE
-        False
-        >>> aE == bE
-        True
-        >>> aE.isTwin(bE)
-        True
-
-        >>> bE.offset = 14.0
-        >>> bE.priority = -4
-        >>> aE == bE
-        False
-        >>> aE.isTwin(bE)
-        True
-        '''
-        if not hasattr(other, 'obj'):
-            return False
-
-        if self.obj is other.obj or self.obj == other.obj:
-            return True
-        else:
-            return False
-
 
 # -----------------------------------------------------------------------------
-
-
 class TestMock(Music21Object):
     pass
 

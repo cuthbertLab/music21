@@ -2183,19 +2183,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             # some notations will not properly unlink, and raise an error
             self.components = [dur]
 
-    @common.deprecated('v7', 'v8', 'Was intended for testing only')
-    def fill(self, quarterLengthList=('quarter', 'half', 'quarter')):  # pragma: no cover
-        '''
-        Utility method for testing; a quick way to fill components. This will
-        remove any existing values.
-
-        Deprecated in v7.
-        '''
-        self.components = []
-        for x in quarterLengthList:
-            self.addDurationTuple(Duration(x))
-        self.informClient()
-
     def getGraceDuration(
         self,
         appoggiatura=False

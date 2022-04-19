@@ -431,27 +431,6 @@ def roundToHalfInteger(num: Union[float, int]) -> Union[float, int]:
         floatVal = 1
     return intVal + floatVal
 
-@deprecated('v.7', 'v.8', 'just call math.isclose(x, y, abs_tol=1e-7)')
-def almostEquals(x, y=0.0, grain=1e-7) -> bool:
-    # noinspection PyShadowingNames
-    '''
-    almostEquals(x, y) -- returns True if x and y are
-    within grain (default  0.0000001) of each other
-
-    Allows comparisons between floats that are normally inconsistent.
-
-    DEPRECATED in v.7 -- just call `isclose` with `abs_tol`:
-
-    >>> from math import isclose
-    >>> isclose(1.000000001, 1, abs_tol=1e-7)
-    True
-    >>> isclose(1.001, 1, abs_tol=1e-7)
-    False
-    >>> isclose(1.001, 1, abs_tol=0.1)
-    True
-    '''
-    return isclose(x, y, abs_tol=grain)
-
 
 def addFloatPrecision(x, grain=1e-2) -> Union[float, Fraction]:
     '''
