@@ -602,7 +602,7 @@ class Metadata(base.Music21Object):
         # were in music21 forks.  So I think we're OK making this a read-only
         # property that we generate on the fly.
         output: List[Contributor] = []
-        for _nsKey, value in self._getAllBackwardCompatibleContributorItems():
+        for value in self._getAllBackwardCompatibleContributors():
             output.append(value)
         return output
 
@@ -1574,9 +1574,9 @@ class Metadata(base.Music21Object):
             return False
 
         return prop.isContributor and (
-            prop.namespace == 'music21' or
-            prop.m21WorkId is not None or
-            prop.uniqueName == 'otherContributor')
+            prop.namespace == 'music21'
+            or prop.m21WorkId is not None
+            or prop.uniqueName == 'otherContributor')
 
 #     @staticmethod
 #     def _isBackwardCompatibleNSKey(nsKey: str) -> bool:
@@ -1630,8 +1630,8 @@ class Metadata(base.Music21Object):
             return
         self._addItem(nsKey, c)
 
-    def _getAllBackwardCompatibleContributorItems(self) -> List[Tuple[str, Contributor]]:
-        allOut: List[Tuple[str, Contributor]] = []
+    def _getAllBackwardCompatibleContributors(self) -> List[Contributor]:
+        allOut: List[Contributor] = []
 
         for nsKey, value in self._metadata.items():
             if not self._isBackwardCompatibleContributorNSKey(nsKey):
@@ -1641,10 +1641,9 @@ class Metadata(base.Music21Object):
                 continue
 
             if isinstance(value, list):
-                for v in value:
-                    allOut.append((v.role, v))
+                allOut += value
             else:
-                allOut.append((value.role, value))
+                allOut.append(value)
 
         return allOut
 
