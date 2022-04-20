@@ -9,9 +9,12 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from fractions import Fraction
-from typing import Union, TypeVar
+from typing import Union, TypeVar, TYPE_CHECKING
 
 from music21.common.enums import OffsetSpecial
+
+if TYPE_CHECKING:
+    import music21
 
 OffsetQL = Union[float, Fraction]
 OffsetQLSpecial = Union[float, Fraction, OffsetSpecial]

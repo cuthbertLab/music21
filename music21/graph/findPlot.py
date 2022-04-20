@@ -15,7 +15,7 @@ Methods for finding appropriate plots for plotStream.
 import collections
 import types
 import unittest
-from typing import List
+from typing import List, Tuple
 
 from music21.graph import axis
 from music21.graph import plot
