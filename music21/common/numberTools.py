@@ -147,7 +147,7 @@ def numToIntOrFloat(value: Union[int, float]) -> Union[int, float]:
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
-
+@lru_cache(1024)
 def _preFracLimitDenominator(n: int, d: int) -> Tuple[int, int]:
     # noinspection PyShadowingNames
     '''
@@ -229,7 +229,6 @@ def _preFracLimitDenominator(n: int, d: int) -> Tuple[int, int]:
 
 # no type checking due to accessing protected attributes (for speed)
 @no_type_check
-@lru_cache(1024)  # speeds up x2!  but all fractions will be the same object...
 def opFrac(num: Union[OffsetQLIn, None]) -> Union[OffsetQL, None]:
     '''
     opFrac -> optionally convert a number to a fraction or back.
@@ -565,7 +564,7 @@ def nearestMultiple(n: float, unit: float) -> Tuple[float, float, float]:
         return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
 
-_DOT_LOOKUP = (1, 1.5, 1.75, 1.875, 1.9375,
+_DOT_LOOKUP = (1.0, 1.5, 1.75, 1.875, 1.9375,
                1.96875, 1.984375, 1.9921875, 1.99609375)
 
 def dotMultiplier(dots: int) -> float:

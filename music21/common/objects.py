@@ -22,7 +22,6 @@ import collections
 import time
 from typing import Tuple
 import weakref
-from music21.common.decorators import deprecated
 
 
 class RelativeCounter(collections.Counter):

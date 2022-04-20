@@ -53,7 +53,8 @@ import fractions
 from functools import lru_cache
 import io
 from math import inf, isnan
-from typing import Union, Tuple, Dict, List, Optional, Iterable, Literal
+from typing import (Union, Tuple, Dict, List, Optional,
+                    Iterable, Literal, Type, Callable)
 import unittest
 
 
@@ -3822,7 +3823,7 @@ class Test(unittest.TestCase):
 
 # -------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = [Duration, Tuplet, convertQuarterLengthToType, TupletFixer]
+_DOC_ORDER: List[Union[Type, Callable]] = [Duration, Tuplet, convertQuarterLengthToType, TupletFixer]
 
 
 if __name__ == '__main__':
