@@ -22,7 +22,7 @@ function. Simply provide a filename, URL, or text string and, if the format
 is supported, a :class:`~music21.stream.Score` will be returned.
 
 
-This is the most general public interface for all formats.  Programmers
+This is the most general, public interface for all formats.  Programmers
 adding their own formats to the system should provide an interface here to
 their own parsers (such as humdrum, musicxml, etc.)
 
@@ -95,7 +95,7 @@ class ConverterFileException(exceptions21.Music21Exception):
 class ArchiveManager:
     r'''
     Before opening a file path, this class can check if this is an
-    archived file collection, such as a .zip or or .mxl file. This will return the
+    archived file collection, such as a .zip or .mxl file. This will return the
     data from the archive.
 
     >>> fnCorpus = corpus.getWork('bwv66.6', fileExtensions=('.xml',))
@@ -413,7 +413,7 @@ def unregisterSubconverter(removeSubconverter):
     >>> mxlConverter in c.subconvertersList()
     False
 
-    if there is no such subConverter registered and it is not a default subconverter,
+    If there is no such subConverter registered, and it is not a default subconverter,
     then a converter.ConverterException is raised:
 
     >>> class ConverterSonix(converter.subConverters.SubConverter):
@@ -480,7 +480,7 @@ class Converter:
     # pylint: disable=redefined-builtin
     # noinspection PyShadowingBuiltins
     def parseFileNoPickle(self, fp, number=None,
-                          format=None, forceSource=False, **keywords):  # @ReservedAssignment
+                          format=None, forceSource=False, **keywords):
         '''
         Given a file path, parse and store a music21 Stream.
 
@@ -584,7 +584,7 @@ class Converter:
                 self.stream.fileFormat = useFormat
 
     def parseData(self, dataStr, number=None,
-                  format=None, forceSource=False, **keywords):  # @ReservedAssignment
+                  format=None, forceSource=False, **keywords):
         '''
         Given raw data, determine format and parse into a music21 Stream.
         '''
@@ -635,29 +635,36 @@ class Converter:
         self.subConverter.keywords = keywords
         self.subConverter.parseData(dataStr, number=number)
 
-    def parseURL(self, url, *, format=None, number=None,
-                 forceSource=False, **keywords):  # @ReservedAssignment
-        '''Given a url, download and parse the file
+    def parseURL(self,
+                 url,
+                 *,
+                 format=None,
+                 number=None,
+                 forceSource=False,
+                 **keywords):
+        '''
+        Given a url, download and parse the file
         into a music21 Stream stored in the `stream`
         property of the converter object.
 
         Note that this checks the user Environment
         `autoDownload` setting before downloading.
 
-        Use `forceSource=True` to download every time rather than read from a cached file.
+        Use `forceSource=True` to download every time rather than
+        re-reading from a cached file.
 
-        >>> jeanieLightBrownURL = ('https://github.com/cuthbertLab/music21/raw/master' +
-        ...        '/music21/corpus/leadSheet/fosterBrownHair.mxl')
+        >>> joplinURL = ('https://github.com/cuthbertLab/music21/raw/master' +
+        ...        '/music21/corpus/joplin/maple_leaf_rag.mxl')
         >>> c = converter.Converter()
-        >>> #_DOCS_SHOW c.parseURL(jeanieLightBrownURL)
-        >>> #_DOCS_SHOW jeanieStream = c.stream
+        >>> #_DOCS_SHOW c.parseURL(joplinURL)
+        >>> #_DOCS_SHOW joplinStream = c.stream
 
         Changed in v.7 -- made keyword-only and added `forceSource` option.
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload in ('deny', 'ask'):
-            message = 'Automatic downloading of URLs is presently set to {!r};'
-            message += ' configure your Environment "autoDownload" setting to '
+            message = 'Automatic downloading of URLs is presently set to {!r}; '
+            message += 'configure your Environment "autoDownload" setting to '
             message += '"allow" to permit automatic downloading: '
             message += "environment.set('autoDownload', 'allow')"
             message = message.format(autoDownload)
@@ -700,6 +707,7 @@ class Converter:
         self.stream.filePath = fp  # These are attributes defined outside of
         self.stream.fileNumber = number  # __init__ and will be moved to
         self.stream.fileFormat = useFormat  # Metadata in v8.
+        # TODO: v8 -- move to Metadata
 
     # -----------------------------------------------------------------------#
     # Subconverters
@@ -1028,7 +1036,7 @@ class Converter:
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  # @ReservedAssignment
+def parseFile(fp, number=None, format=None, forceSource=False, **keywords):
     '''
     Given a file path, attempt to parse the file into a Stream.
     '''
@@ -1039,7 +1047,7 @@ def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  # @
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-def parseData(dataStr, number=None, format=None, **keywords):  # @ReservedAssignment
+def parseData(dataStr, number=None, format=None, **keywords):
     '''
     Given musical data represented within a Python string, attempt to parse the
     data into a Stream.
@@ -1051,7 +1059,7 @@ def parseData(dataStr, number=None, format=None, **keywords):  # @ReservedAssign
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
 def parseURL(url, *, format=None, number=None,
-             forceSource=False, **keywords):  # @ReservedAssignment
+             forceSource=False, **keywords):
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
     URL downloading will not happen automatically unless the user has set their
@@ -1097,7 +1105,7 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
 
     URL:
 
-    >>> #_DOCS_SHOW s = converter.parse('http://midirepository.org/file220/file.mid')
+    >>> #_DOCS_SHOW s = converter.parse('https://midirepository.org/file220/file.mid')
 
 
     Data is preceded by an identifier such as "tinynotation:"
@@ -1178,7 +1186,7 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
                         forceSource=forceSource, **keywords)
     elif isinstance(value, pathlib.Path):
         raise FileNotFoundError(f'Cannot find file in {str(value)}')
-    elif (isinstance(value, str) and common.findFormatFile(value) is not None):
+    elif isinstance(value, str) and common.findFormatFile(value) is not None:
         # assume mistyped file path
         raise FileNotFoundError(f'Cannot find file in {str(value)}')
     else:
@@ -1967,7 +1975,7 @@ class Test(unittest.TestCase):
 
         # This file should have been written, above
         destFp = Converter()._getDownloadFp(e.getRootTempDir(), '.krn', url)
-        # Hack garbage into it so that we can test whether or not forceSource works
+        # Hack garbage into it so that we can test whether forceSource works
         with open(destFp, 'a', encoding='utf-8') as fp:
             fp.write('all sorts of garbage that Humdrum cannot parse')
 

@@ -463,10 +463,9 @@ class MidiEvent(prebase.ProtoM21Object):
     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=1, channel=None, data=b'guitar'>
     '''
     # pylint: disable=redefined-builtin
-
     def __init__(self,
                  track: Optional['music21.midi.MidiTrack'] = None,
-                 type=None,  # @ReservedAssignment
+                 type=None,
                  time: int = 0,
                  channel: Optional[int] = None):
         self.track: Optional['music21.midi.MidiTrack'] = track  # a MidiTrack object

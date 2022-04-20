@@ -307,7 +307,7 @@ def findFormatExtURL(url):
     >>> urlA = 'http://somesite.com/?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
     >>> urlB = 'http://somesite.com/cgi-bin/ksdata?l=cc/schubert/d0576&file=d0576-06.krn&f=kern'
     >>> urlC = 'http://somesite.com/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
-    >>> urlF = 'http://junk'
+    >>> urlF = 'https://junk'
     >>> urlM = 'http://somesite.com/files/mid001.mid'
 
     >>> common.findFormatExtURL(urlA)

@@ -9,9 +9,9 @@ Created on May 24, 2017
 import sys
 import subprocess
 # noinspection PyPackageRequirements
-import pytest  # @UnusedImport  # pylint: disable=unused-import,import-error
+import pytest  # pylint: disable=unused-import,import-error
 # noinspection PyPackageRequirements
-import nbval  # @UnusedImport  # pylint: disable=unused-import,import-error
+import nbval  ## pylint: disable=unused-import,import-error
 
 from music21 import environment
 from music21 import common

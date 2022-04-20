@@ -289,7 +289,7 @@ def parse(workName,
             number=None,
             fileExtensions=None,
             forceSource=False,
-            format=None  # @ReservedAssignment
+            format=None
           ):
     '''
     The most important method call for corpus.
@@ -332,7 +332,7 @@ def parse(workName,
         number=number,
         fileExtensions=fileExtensions,
         forceSource=forceSource,
-        format=format  # @ReservedAssignment
+        format=format
     )
 
 

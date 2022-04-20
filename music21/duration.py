@@ -46,15 +46,16 @@ Example usage:
 2
 '''
 
+from collections import namedtuple
 import contextlib
 import copy
 import fractions
+from functools import lru_cache
 import io
-import unittest
 from math import inf, isnan
 from typing import Union, Tuple, Dict, List, Optional, Iterable, Literal
+import unittest
 
-from collections import namedtuple
 
 from music21 import prebase
 
@@ -478,8 +479,8 @@ def quarterLengthToTuplet(
             # try multiples of the tuplet division, from 1 to max - 1
             for m in range(1, i):
                 for numberOfDots in POSSIBLE_DOTS_IN_TUPLETS:
-                    tupletMultiplier = fractions.Fraction(common.dotMultiplier(numberOfDots))
-                    qLenCandidate = qLenBase * m * tupletMultiplier
+                    tupletMultiplier = common.dotMultiplier(numberOfDots)
+                    qLenCandidate = opFrac(qLenBase * m * tupletMultiplier)
                     if qLenCandidate == qLen:
                         tupletDuration = durationTupleFromTypeDots(typeKey, numberOfDots)
                         newTuplet = Tuplet(numberNotesActual=i,
@@ -488,8 +489,8 @@ def quarterLengthToTuplet(
                                            durationNormal=tupletDuration,)
                         post.append(newTuplet)
                         break
-        # not looking for these matches will add tuple alternative
-        # representations; this could be useful
+            # not looking for these matches will add tuple alternative
+            # representations; this could be useful
             if len(post) >= maxToReturn:
                 break
         if len(post) >= maxToReturn:
@@ -891,6 +892,7 @@ def durationTupleFromQuarterLength(ql=1.0) -> DurationTuple:
             return DurationTuple('inexpressible', 0, ql)
 
 
+@lru_cache(1024)
 def durationTupleFromTypeDots(durType='quarter', dots=0):
     '''
     Returns a DurationTuple (which knows its quarterLength) for
@@ -2435,7 +2437,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     # PUBLIC PROPERTIES #
     @property
-    def components(self):
+    def components(self) -> Tuple[DurationTuple, ...]:
         '''
         Returns or sets a tuple of the component DurationTuples of this
         Duration object
@@ -3081,7 +3083,7 @@ class GraceDuration(Duration):
         return self._makeTime
 
     @makeTime.setter
-    def makeTime(self, expr):
+    def makeTime(self, expr: Literal[True, False, None]):
         if expr not in (True, False, None):
             raise ValueError('expr must be True, False, or None')
         self._makeTime = bool(expr)

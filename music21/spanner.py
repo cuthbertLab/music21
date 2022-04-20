@@ -455,7 +455,7 @@ class Spanner(base.Music21Object):
 
         self.spannerStorage.coreElementsChanged()
 
-    def hasSpannedElement(self, spannedElement: Music21Object) -> bool:
+    def hasSpannedElement(self, spannedElement: base.Music21Object) -> bool:
         '''
         Return True if this Spanner has the spannedElement.
 
@@ -804,9 +804,9 @@ class SpannerBundle(prebase.ProtoM21Object):
 
     def replaceSpannedElement(
         self,
-        old: Music21Object,
-        new: Music21Object
-    ) -> List['Spanner']:
+        old: base.Music21Object,
+        new: base.Music21Object
+    ) -> List[Spanner]:
         # noinspection PyShadowingNames
         '''
         Given a spanner spannedElement (an object), replace all old spannedElements

@@ -81,7 +81,7 @@ def getNumFromStr(usrStr: str, numbers: str = '0123456789') -> Tuple[str, str]:
             found.append(char)
         else:
             remain.append(char)
-    # returns numbers, and then characters
+    # returns numbers and then characters
     return ''.join(found), ''.join(remain)
 
 

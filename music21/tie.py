@@ -102,7 +102,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring')
 
     # pylint: disable=redefined-builtin
-    def __init__(self, type='start'):  # @ReservedAssignment
+    def __init__(self, type='start'):
         # super().__init__()  # no need for ProtoM21Object or SlottedObjectMixin
         if type not in self.VALID_TIE_TYPES:
             raise TieException(
