@@ -15,7 +15,7 @@ Methods for finding appropriate plots for plotStream.
 import collections
 import types
 import unittest
-
+from typing import List
 
 from music21.graph import axis
 from music21.graph import plot
@@ -32,14 +32,15 @@ PLOTCLASS_SHORTCUTS = {
 
 
 # all formats need to be here, and first for each row must match a graphType.
-FORMAT_SYNONYMS = [('horizontalbar', 'bar', 'horizontal', 'pianoroll', 'piano'),
-                   ('histogram', 'histo', 'count'),
-                   ('scatter', 'point'),
-                   ('scatterweighted', 'weightedscatter', 'weighted'),
-                   ('3dbars', '3d'),
-                   ('colorgrid', 'grid', 'window', 'windowed'),
-                   ('horizontalbarweighted', 'barweighted', 'weightedbar')
-                   ]  # type: List[Tuple[str]]
+FORMAT_SYNONYMS: List[Tuple[str, ...]] = [
+    ('horizontalbar', 'bar', 'horizontal', 'pianoroll', 'piano'),
+    ('histogram', 'histo', 'count'),
+    ('scatter', 'point'),
+    ('scatterweighted', 'weightedscatter', 'weighted'),
+    ('3dbars', '3d'),
+    ('colorgrid', 'grid', 'window', 'windowed'),
+    ('horizontalbarweighted', 'barweighted', 'weightedbar')
+]
 
 # define co format strings
 FORMATS = [syn[0] for syn in FORMAT_SYNONYMS]

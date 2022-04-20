@@ -3,13 +3,13 @@
 # Name:         makeNotation.py
 # Purpose:      functionality for manipulating streams
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #               Jacob Walls
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2021 Michael Scott Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+#               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ from music21 import note
 from music21 import pitch
 
 from music21.common.numberTools import opFrac
-
+from music21.common.types import StreamType
 from music21.exceptions21 import StreamException
 
 environLocal = environment.Environment(__file__)
@@ -40,12 +40,12 @@ environLocal = environment.Environment(__file__)
 
 
 def makeBeams(
-    s: 'music21.stream.Stream',
+    s: StreamType,
     *,
     inPlace=False,
     setStemDirections=True,
     failOnNoTimeSignature=False,
-):
+) -> Optional[StreamType]:
     # noinspection PyShadowingNames
     '''
     Return a new Measure, or Stream of Measures, with beams applied to all
@@ -122,7 +122,7 @@ def makeBeams(
     if not inPlace:  # make a copy
         returnObj: stream.Stream = s.coreCopyAsDerivation('makeBeams')
     else:
-        returnObj: stream.Stream = s
+        returnObj = s
 
     # if s.isClass(Measure):
     mColl: List[stream.Measure]
@@ -221,7 +221,7 @@ def makeBeams(
 
 
 def makeMeasures(
-    s,
+    s: StreamType,
     *,
     meterStream=None,
     refStreamOrTimeRange=None,
@@ -230,7 +230,7 @@ def makeMeasures(
     finalBarline='final',
     bestClef=False,
     inPlace=False,
-):
+) -> Optional[StreamType]:
     '''
     Takes a stream and places all of its elements into
     measures (:class:`~music21.stream.Measure` objects)
@@ -702,14 +702,14 @@ def makeMeasures(
 
 
 def makeRests(
-    s,
+    s: StreamType,
     *,
     refStreamOrTimeRange=None,
     fillGaps=False,
     timeRangeFromBarDuration=False,
     inPlace=False,
     hideRests=False,
-):
+) -> Optional[StreamType]:
     '''
     Given a Stream with an offset not equal to zero,
     fill with one Rest preceding this offset.
@@ -972,13 +972,13 @@ def makeRests(
         return returnObj
 
 def makeTies(
-    s,
+    s: StreamType,
     *,
     meterStream=None,
     inPlace=False,
     displayTiedAccidentals=False,
     classFilterList=(note.GeneralNote,),
-):
+) -> Optional[StreamType]:
     # noinspection PyShadowingNames
     '''
     Given a stream containing measures, examine each element in the
@@ -1347,7 +1347,7 @@ def makeTies(
         return None
 
 
-def makeTupletBrackets(s: 'music21.stream.Stream', *, inPlace=False):
+def makeTupletBrackets(s: StreamType, *, inPlace=False) -> Optional[StreamType]:
     # noinspection PyShadowingNames
     '''
     Given a flat Stream of mixed durations, designates the first and last tuplet of any group
@@ -1470,7 +1470,7 @@ def makeTupletBrackets(s: 'music21.stream.Stream', *, inPlace=False):
         return returnObj
 
 
-def realizeOrnaments(s: 'music21.stream.Stream'):
+def realizeOrnaments(s: StreamType) -> StreamType:
     '''
     Realize all ornaments on a stream
 
@@ -1548,7 +1548,8 @@ def realizeOrnaments(s: 'music21.stream.Stream'):
     return newStream
 
 
-def moveNotesToVoices(source: 'music21.stream.Stream', classFilterList=('GeneralNote',)):
+def moveNotesToVoices(source: StreamType,
+                      classFilterList=('GeneralNote',)) -> None:
     '''
     Move notes into voices.  Happens inplace always.  Returns None
     '''
@@ -1564,7 +1565,7 @@ def moveNotesToVoices(source: 'music21.stream.Stream', classFilterList=('General
     source.insert(0, dst)
 
 
-def getTiePitchSet(prior: 'music21.note.NotRest'):
+def getTiePitchSet(prior: 'music21.note.NotRest') -> Optional[Set[str]]:
     # noinspection PyShadowingNames
     '''
     helper method for makeAccidentals to get the tie pitch set (or None)
@@ -1622,7 +1623,7 @@ def getTiePitchSet(prior: 'music21.note.NotRest'):
     return tiePitchSet
 
 def makeAccidentalsInMeasureStream(
-    s: 'music21.stream.Stream',
+    s: StreamType,
     *,
     pitchPast: Optional[List[pitch.Pitch]] = None,
     pitchPastMeasure: Optional[List[pitch.Pitch]] = None,
@@ -1633,7 +1634,7 @@ def makeAccidentalsInMeasureStream(
     overrideStatus: bool = False,
     cautionaryNotImmediateRepeat: bool = True,
     tiePitchSet: Optional[Set[str]] = None
-):
+) -> None:
     '''
     Makes accidentals in place on a stream consisting of only Measures.
     Helper for Stream.makeNotation and Part.makeAccidentals.
@@ -1710,7 +1711,7 @@ def makeAccidentalsInMeasureStream(
         )
 
 def iterateBeamGroups(
-    s: 'music21.stream.Stream',
+    s: StreamType,
     skipNoBeams=True,
     recurse=True
 ) -> Generator[List[note.NotRest], None, None]:
@@ -1781,7 +1782,7 @@ def iterateBeamGroups(
 
 
 def setStemDirectionForBeamGroups(
-    s: 'music21.stream.Stream',
+    s: StreamType,
     *,
     setNewStems=True,
     overrideConsistentStemDirections=False,

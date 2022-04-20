@@ -63,7 +63,7 @@ class DeleteFixer(OMRMidiFixer):
         for (midiRef, omrRef, op) in self.changes:
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
-            # if the are the same, don't bother to try changing it
+            # if they are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
             if isinstance(op, aligner.ChangeOps) and op == aligner.ChangeOps.NoChange:
                 continue
@@ -246,7 +246,7 @@ class EnharmonicFixer(OMRMidiFixer):
             # if they're not notes, don't bother with rest
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
-            # if the are the same, don't bother to try changing it
+            # if they are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
             if isinstance(op, aligner.ChangeOps) and op == aligner.ChangeOps.NoChange:
                 continue
@@ -394,7 +394,7 @@ class OrnamentFixer(OMRMidiFixer):
 
     def fix(self: _T, *, show=False, inPlace=True) -> Optional[_T]:
         '''
-        Corrects missed ornaments in omr stream according to mid stream
+        Corrects missed ornaments in omrStream according to midiStream
         :param show: Whether to show results
         :param inPlace: Whether to make changes to own omr stream or
         return a new OrnamentFixer with changes

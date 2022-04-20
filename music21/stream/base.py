@@ -86,7 +86,7 @@ class StreamDeprecationWarning(UserWarning):
 
 # -----------------------------------------------------------------------------
 # Metaclass
-_OffsetMap = collections.namedtuple('OffsetMap', ['element', 'offset', 'endTime', 'voiceIndex'])
+OffsetMap = collections.namedtuple('OffsetMap', ['element', 'offset', 'endTime', 'voiceIndex'])
 
 
 # -----------------------------------------------------------------------------
@@ -6105,7 +6105,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 endTime = opFrac(offset + dur)
                 # NOTE: used to make a copy.copy of elements here;
                 # this is not necessary b/c making deepcopy of entire Stream
-                thisOffsetMap = _OffsetMap(e, offset, endTime, voiceIndex)
+                thisOffsetMap = OffsetMap(e, offset, endTime, voiceIndex)
                 # environLocal.printDebug(['offsetMap: thisOffsetMap', thisOffsetMap])
                 offsetMap.append(thisOffsetMap)
                 # offsetMap.append((offset, offset + dur, e, voiceIndex))
@@ -14026,7 +14026,8 @@ class Test(unittest.TestCase):
 
 # -----------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Stream, Measure, Part, Score, Opus, Voice]
+_DOC_ORDER = [Stream, Measure, Part, Score, Opus, Voice,
+              SpannerStorage, VariantStorage, OffsetMap]
 
 
 if __name__ == '__main__':

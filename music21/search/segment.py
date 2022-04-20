@@ -33,6 +33,7 @@ import random
 
 from collections import OrderedDict
 from functools import partial
+from typing import List
 
 from music21 import common
 from music21 import converter
@@ -172,6 +173,7 @@ def indexScoreFilePaths(scoreFilePaths,
                         *args,
                         runMulticore=True,
                         **keywords):
+    # noinspection PyShadowingNames
     '''
     Returns a dictionary of the lists from indexScoreParts for each score in
     scoreFilePaths
@@ -290,6 +292,7 @@ def getDifflibOrPyLev(
         smObject = difflib.SequenceMatcher(junk, '', seq2)
     else:
         try:
+            # noinspection PyPackageRequirements
             from Levenshtein import StringMatcher as pyLevenshtein
             smObject = pyLevenshtein.StringMatcher(junk, '', seq2)
         except ImportError:
@@ -304,6 +307,7 @@ def scoreSimilarity(
     includeReverse=False,
     forceDifflib=False,
 ):
+    # noinspection PyShadowingNames
     r'''
     Find the level of similarity between each pair of segments in a scoreDict.
 
@@ -400,7 +404,7 @@ def scoreSimilarity(
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 
 if __name__ == '__main__':

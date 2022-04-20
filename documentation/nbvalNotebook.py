@@ -11,7 +11,7 @@ import subprocess
 # noinspection PyPackageRequirements
 import pytest  # pylint: disable=unused-import,import-error
 # noinspection PyPackageRequirements
-import nbval  ## pylint: disable=unused-import,import-error
+import nbval  # pylint: disable=unused-import,import-error
 
 from music21 import environment
 from music21 import common

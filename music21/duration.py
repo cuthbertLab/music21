@@ -814,48 +814,37 @@ def convertTypeToNumber(dType: str) -> float:
 
 
 # -----------------------------------------------------------------------------------
-DurationTuple = namedtuple('DurationTuple', 'type dots quarterLength')
+class DurationTuple(namedtuple('DurationTuple', 'type dots quarterLength')):
+    def augmentOrDiminish(self, amountToScale):
+        return durationTupleFromQuarterLength(self.quarterLength * amountToScale)
 
+    @property
+    def ordinal(self):
+        '''
+        Converts type to an ordinal number where maxima = 1 and 1024th = 14;
+        whole = 4 and quarter = 6.  Based on duration.ordinalTypeFromNum
 
-def _augmentOrDiminishTuple(self, amountToScale):
-    return durationTupleFromQuarterLength(self.quarterLength * amountToScale)
+        >>> a = duration.DurationTuple('whole', 0, 4.0)
+        >>> a.ordinal
+        4
 
+        >>> b = duration.DurationTuple('maxima', 0, 32.0)
+        >>> b.ordinal
+        1
 
-DurationTuple.augmentOrDiminish = _augmentOrDiminishTuple  # type: ignore[attr-defined]
-
-
-del _augmentOrDiminishTuple
-
-
-def _durationTupleOrdinal(self):
-    '''
-    Converts type to an ordinal number where maxima = 1 and 1024th = 14;
-    whole = 4 and quarter = 6.  Based on duration.ordinalTypeFromNum
-
-    >>> a = duration.DurationTuple('whole', 0, 4.0)
-    >>> a.ordinal
-    4
-
-    >>> b = duration.DurationTuple('maxima', 0, 32.0)
-    >>> b.ordinal
-    1
-
-    >>> c = duration.DurationTuple('1024th', 0, 1/256)
-    >>> c.ordinal
-    14
-    '''
-    ordinalFound = None
-    for i in range(len(ordinalTypeFromNum)):
-        if self.type == ordinalTypeFromNum[i]:
-            ordinalFound = i
-            break
-    if ordinalFound is None:
-        raise DurationException(
-            f'Could not determine durationNumber from {ordinalFound}')
-    return ordinalFound
-
-
-DurationTuple.ordinal = property(_durationTupleOrdinal)  # type: ignore[attr-defined]
+        >>> c = duration.DurationTuple('1024th', 0, 1/256)
+        >>> c.ordinal
+        14
+        '''
+        ordinalFound = None
+        for i in range(len(ordinalTypeFromNum)):
+            if self.type == ordinalTypeFromNum[i]:
+                ordinalFound = i
+                break
+        if ordinalFound is None:
+            raise DurationException(
+                f'Could not determine durationNumber from {ordinalFound}')
+        return ordinalFound
 
 
 _durationTupleCacheTypeDots: Dict[Tuple[str, int], DurationTuple] = {}
@@ -2234,7 +2223,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             if c_type == 'zero':
                 c_type = 'eighth'
             newComponents.append(DurationTuple(c.type, c.dots, 0.0))
-        gd.components = newComponents  # set new components
+        gd.components = tuple(newComponents)  # set new components
         gd.linked = False
         gd.type = new_type
         gd.quarterLength = 0.0
@@ -2977,7 +2966,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         if self.linked is True:
             nt = durationTupleFromTypeDots(value, self.dots)
-            self.components = [nt]
+            self.components = (nt,)
             self._quarterLengthNeedsUpdating = True
             self.expressionIsInferred = False
             self.informClient()
@@ -3833,7 +3822,7 @@ class Test(unittest.TestCase):
 
 # -------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Duration, Tuplet, convertQuarterLengthToType, TupletFixer]
+_DOC_ORDER: List[type] = [Duration, Tuplet, convertQuarterLengthToType, TupletFixer]
 
 
 if __name__ == '__main__':

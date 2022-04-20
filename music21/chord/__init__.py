@@ -4469,7 +4469,8 @@ class Chord(ChordBase):
 
     # PUBLIC PROPERTIES #
 
-    @property
+    # see https://github.com/python/mypy/issues/1362
+    @property  # type: ignore
     @cacheMethod
     def chordTablesAddress(self):
         '''
@@ -4503,7 +4504,7 @@ class Chord(ChordBase):
             return tables.ChordTableAddress(0, 0, 0, 0)
 
 
-    @property
+    @property    # type: ignore
     @cacheMethod
     def commonName(self):
         '''
@@ -4797,7 +4798,7 @@ class Chord(ChordBase):
             # need to permit Duration object assignment here
             raise ChordException(f'this must be a Duration object, not {durationObj}')
 
-    @property
+    @property  # type: ignore
     @cacheMethod
     def fifth(self) -> Optional[pitch.Pitch]:
         '''
@@ -5110,7 +5111,7 @@ class Chord(ChordBase):
         self._notes.clear()
         self.add(newNotes, runSort=False)
 
-    @property
+    @property  # type: ignore
     @cacheMethod
     def normalOrder(self):
         '''
@@ -5504,7 +5505,7 @@ class Chord(ChordBase):
         return Chord.formatVectorString(self.primeForm)
 
 
-    @property
+    @property  # type: ignore
     @cacheMethod
     def quality(self):
         '''
@@ -5690,7 +5691,7 @@ class Chord(ChordBase):
                     degrees.append(tupleKey)
         return degrees
 
-    @property
+    @property  # type: ignore
     @cacheMethod
     def seventh(self):
         '''
@@ -5717,7 +5718,7 @@ class Chord(ChordBase):
         except ChordException:
             return None
 
-    @property
+    @property  # type: ignore
     @cacheMethod
     def third(self) -> Optional[pitch.Pitch]:
         '''
