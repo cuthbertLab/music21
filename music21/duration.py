@@ -3823,7 +3823,9 @@ class Test(unittest.TestCase):
 
 # -------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[Union[Type, Callable]] = [Duration, Tuplet, convertQuarterLengthToType, TupletFixer]
+_DOC_ORDER: List[Union[Type, Callable]] = [
+    Duration, Tuplet, GraceDuration, convertQuarterLengthToType, TupletFixer,
+]
 
 
 if __name__ == '__main__':
