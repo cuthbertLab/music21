@@ -551,10 +551,14 @@ class Metadata(base.Music21Object):
         >>> md.addItems('title', [metadata.Text('Caveat Emptor', language='la'),
         ...                       metadata.Text('Buyer Beware',  language='en')])
         >>> titles = md.getItems('title')
-        >>> titles
-        [<music21.metadata.primitives.Text Caveat Emptor>, <music21.metadata.primitives.Text Buyer Beware>]
+        >>> len(titles)
+        2
+        >>> titles[0]
+        <music21.metadata.primitives.Text Caveat Emptor>
         >>> titles[0].language
         'la'
+        >>> titles[1]
+        <music21.metadata.primitives.Text Buyer Beware>
         >>> titles[1].language
         'en'
         >>> md.getItem('title')
@@ -608,20 +612,48 @@ class Metadata(base.Music21Object):
         >>> md = metadata.Metadata()
         >>> md.setItems('librettist', [metadata.Text('Joe Libretto'),
         ...                            metadata.Text('John Smith')])
-        >>> md.getItems('librettist') # uniqueName
-        [<music21.metadata.primitives.Contributor librettist:Joe Libretto>, <music21.metadata.primitives.Contributor librettist:John Smith>]
-        >>> md.getItems('LBT', namespace='marcrel') # name, namespace
-        [<music21.metadata.primitives.Contributor librettist:Joe Libretto>, <music21.metadata.primitives.Contributor librettist:John Smith>]
-        >>> md.getItems('lbt', namespace='marcrel') # abbrevCode, namespace
-        [<music21.metadata.primitives.Contributor librettist:Joe Libretto>, <music21.metadata.primitives.Contributor librettist:John Smith>]
-        >>> md.getItems('marcrel:LBT') # 'namespace:name'
-        [<music21.metadata.primitives.Contributor librettist:Joe Libretto>, <music21.metadata.primitives.Contributor librettist:John Smith>]
+
+        >>> items = md.getItems('librettist') # uniqueName
+        >>> len(items)
+        2
+        >>> items[0]
+        <music21.metadata.primitives.Contributor librettist:Joe Libretto>
+        >>> items[1]
+        <music21.metadata.primitives.Contributor librettist:John Smith>
+
+        >>> items = md.getItems('LBT', namespace='marcrel') # name, namespace
+        >>> len(items)
+        2
+        >>> items[0]
+        <music21.metadata.primitives.Contributor librettist:Joe Libretto>
+        >>> items[1]
+
+        >>> items = md.getItems('lbt', namespace='marcrel') # abbrevCode, namespace
+        >>> len(items)
+        2
+        >>> items[0]
+        <music21.metadata.primitives.Contributor librettist:Joe Libretto>
+        >>> items[1]
+
+        >>> items = md.getItems('marcrel:LBT') # 'namespace:name'
+        >>> len(items)
+        2
+        >>> items[0]
+        <music21.metadata.primitives.Contributor librettist:Joe Libretto>
+        >>> items[1]
+
         >>> md.librettists # backward compatible access
         ['Joe Libretto', 'John Smith']
+
         >>> md.librettist # backward compatible access
         'Joe Libretto'
-        >>> md.contributors # backward compatible access
-        [<music21.metadata.primitives.Contributor librettist:Joe Libretto>, <music21.metadata.primitives.Contributor librettist:John Smith>]
+
+        >>> items = md.contributors # backward compatible access
+        >>> len(items)
+        2
+        >>> items[0]
+        <music21.metadata.primitives.Contributor librettist:Joe Libretto>
+        >>> items[1]
         '''
         self._setItems(key, valueList, namespace)
 
