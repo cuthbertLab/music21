@@ -1451,11 +1451,11 @@ class Metadata(base.Music21Object):
         >>> md.composers
         []
         '''
-        return self._getBackwardCompatibleItems('composer')
+        return self._getBackwardCompatibleContributorNames('composer')
 
     @composers.setter
     def composers(self, value: List[str]) -> None:
-        self._setBackwardCompatibleItems('composer', value)
+        self._setBackwardCompatibleContributorNames('composer', value)
 
 
     @property
@@ -1536,11 +1536,11 @@ class Metadata(base.Music21Object):
 
         Should be distinguished from lyricists etc.
         '''
-        return self._getBackwardCompatibleItems('librettist')
+        return self._getBackwardCompatibleContributorNames('librettist')
 
     @librettists.setter
     def librettists(self, value: List[str]) -> None:
-        self._setBackwardCompatibleItems('librettist', value)
+        self._setBackwardCompatibleContributorNames('librettist', value)
 
     @property
     def lyricist(self):
@@ -1575,11 +1575,11 @@ class Metadata(base.Music21Object):
 
         Should be distinguished from librettists etc.
         '''
-        return self._getBackwardCompatibleItems('lyricist')
+        return self._getBackwardCompatibleContributorNames('lyricist')
 
     @lyricists.setter
     def lyricists(self, value: List[str]) -> None:
-        self._setBackwardCompatibleItems('lyricist', value)
+        self._setBackwardCompatibleContributorNames('lyricist', value)
 
 
     @property
@@ -1698,10 +1698,12 @@ class Metadata(base.Music21Object):
 
     @staticmethod
     def _nsKey(key: str, namespace: Optional[str] = None, personal: bool = False) -> str:
-        # if namespace is provided, key should be name or abbrevCode (within that namespace)
-        # if namespace is None, key should be uniqueName or 'namespace:name', or personalName
         # Caller is required to check backward compatibility (either before or after); this
         # routine is general.
+        # If namespace is provided, the key will be interpreted as name or
+        # abbrevCode (within that namespace). Either will work. If namespace is
+        # None, the key will be interpreted as uniqueName or assumed to be of the
+        # form 'namespace:name'.
         if not key:
             return ''
 
@@ -1759,13 +1761,16 @@ class Metadata(base.Music21Object):
         # compatible, we'll take these, too.
         return prop.uniqueName
 
-    # if namespace is provided, key should be name or abbrevCode (within that namespace)
-    # if namespace is None, key should be uniqueName or 'namespace:name',
-    # or (only if personal is True) personalName
     def _getItem(self,
                  key: str,
                  namespace: Optional[str] = None,
                  personal: bool = False) -> Optional[Any]:
+        '''
+        If namespace is provided, the key will be interpreted as name or
+        abbrevCode (within that namespace). Either will work. If namespace is
+        None, the key will be interpreted as uniqueName or assumed to be of the
+        form 'namespace:name'.
+        '''
         nsKey: str = self._nsKey(key, namespace, personal)
         output: Any = self._metadata.get(nsKey, None)
         if not output:
@@ -1875,14 +1880,17 @@ class Metadata(base.Music21Object):
 
         raise exceptions21.MetadataException('internal error: invalid valueType')
 
-    # if namespace is provided, key should be name or abbrevCode (within that namespace)
-    # if namespace is None, key should be uniqueName or 'namespace:name',
-    # or (only if personal is True) personalName
     def _addItem(self,
                  key: str,
                  value: Any,
                  namespace: Optional[str] = None,
                  personal: bool = False):
+        '''
+        If namespace is provided, the key will be interpreted as name or
+        abbrevCode (within that namespace). Either will work. If namespace is
+        None, the key will be interpreted as uniqueName or assumed to be of the
+        form 'namespace:name'.
+        '''
         if isinstance(value, list):
             raise ValueError
 
@@ -1905,6 +1913,32 @@ class Metadata(base.Music21Object):
                   valueList: List[Any],
                   namespace: Optional[str] = None,
                   personal: bool = False):
+        '''
+        Adds a list of items to metadata with key and namespace.
+
+        If namespace is provided, the key will be interpreted as name or
+        abbrevCode (within that namespace). Either will work. If namespace is
+        None, the key will be interpreted as uniqueName or assumed to be of the
+        form 'namespace:name'.
+
+        >>> md = metadata.Metadata()
+        >>> md._addItems('title', ['value0']) # add list as first value
+        >>> md._addItems('title', ['value1', 'value2']) # add list to single element
+        >>> md._addItems('title', ['value3', 'value4']) # add list to list
+        >>> titles = md.getItems('title')
+        >>> len(titles)
+        5
+        >>> titles[0]
+        <music21.metadata.primitives.Text value0>
+        >>> titles[1]
+        <music21.metadata.primitives.Text value1>
+        >>> titles[2]
+        <music21.metadata.primitives.Text value2>
+        >>> titles[3]
+        <music21.metadata.primitives.Text value3>
+        >>> titles[4]
+        <music21.metadata.primitives.Text value4>
+        '''
         if not isinstance(valueList, list):
             raise ValueError
         if not valueList:
@@ -1931,14 +1965,17 @@ class Metadata(base.Music21Object):
             # overwrite prevValue with a list containing prevValue followed by newValueList
             self._metadata[nsKey] = [prevValue] + newValueList
 
-    # if namespace is provided, key should be name or abbrevCode (within that namespace)
-    # if namespace is None, key should be uniqueName or 'namespace:name',
-    # or (only if personal is True) personalName
     def _setItem(self,
                  key: str,
                  value: Any,
                  namespace: Optional[str] = None,
                  personal: bool = False):
+        '''
+        If namespace is provided, the key will be interpreted as name or
+        abbrevCode (within that namespace). Either will work. If namespace is
+        None, the key will be interpreted as uniqueName or assumed to be of the
+        form 'namespace:name'.
+        '''
         nsKey: str = self._nsKey(key, namespace, personal)
         self._metadata.pop(nsKey, None)
         self._addItem(nsKey, value)
@@ -1948,6 +1985,12 @@ class Metadata(base.Music21Object):
                   valueList: List[Any],
                   namespace: Optional[str] = None,
                   personal: bool = False):
+        '''
+        If namespace is provided, the key will be interpreted as name or
+        abbrevCode (within that namespace). Either will work. If namespace is
+        None, the key will be interpreted as uniqueName or assumed to be of the
+        form 'namespace:name'.
+        '''
         nsKey: str = self._nsKey(key, namespace, personal)
         self._metadata.pop(nsKey, None)
         self._addItems(nsKey, valueList)
@@ -1957,6 +2000,29 @@ class Metadata(base.Music21Object):
 
     @staticmethod
     def _isBackwardCompatibleContributorNSKey(nsKey: str) -> bool:
+        '''
+        Determines if nsKey is the 'namespace:name' of a backward-compatible contributor.
+
+        Test backward-compatible contributor (lyricist) (should return True)
+        Test non-backward-compatible contributor (architect) (should return False)
+        Test standard non-contributor (should return False)
+        Test non-standard nsKey (should return False)
+        Test empty string (should return False)
+        Test None (should return False)
+
+        >>> metadata.Metadata._isBackwardCompatibleContributorNSKey('marcrel:LYR')
+        True
+        >>> metadata.Metadata._isBackwardCompatibleContributorNSKey('marcrel:ARC')
+        False
+        >>> metadata.Metadata._isBackwardCompatibleContributorNSKey('dcterms:title')
+        False
+        >>> metadata.Metadata._isBackwardCompatibleContributorNSKey('humdrum:XXX')
+        False
+        >>> metadata.Metadata._isBackwardCompatibleContributorNSKey('')
+        False
+        >>> metadata.Metadata._isBackwardCompatibleContributorNSKey(None)
+        False
+        '''
         prop: PropertyDescription = Metadata._NSKEY2STDPROPERTYDESC.get(nsKey, None)
         if prop is None:
             return False
@@ -1997,25 +2063,67 @@ class Metadata(base.Music21Object):
 #         return None
 
     @staticmethod
-    def _backwardCompatibleContributorRoleToNSKey(role: str) -> Optional[str]:
+    def _backwardCompatibleContributorRoleToNSKey(role: str) -> str:
+        '''
+        Translates a backward-compatible contributor role to a standard
+        'namespace:name' nsKey.  Returns 'marcrel:CTB' (a.k.a. 'otherContributor')
+        if the role is a non-standard role (which is allowed during backward
+        compatibility).
+
+        >>> metadata.Metadata._backwardCompatibleContributorRoleToNSKey('lyricist')
+        'marcrel:LYR'
+        >>> metadata.Metadata._backwardCompatibleContributorRoleToNSKey('composer')
+        'marcrel:CMP'
+        >>> metadata.Metadata._backwardCompatibleContributorRoleToNSKey('architect')
+        'marcrel:CTB'
+        >>> metadata.Metadata._backwardCompatibleContributorRoleToNSKey('alternativeTitle')
+        'marcrel:CTB'
+        >>> metadata.Metadata._backwardCompatibleContributorRoleToNSKey('humdrum:XXX')
+        'marcrel:CTB'
+        >>> metadata.Metadata._backwardCompatibleContributorRoleToNSKey('')
+        'marcrel:CTB'
+        >>> metadata.Metadata._backwardCompatibleContributorRoleToNSKey(None)
+        'marcrel:CTB'
+        '''
         nsKey: Optional[str] = Metadata._M21WORKID2NSKEY.get(role, None)
-        if not nsKey:
+        if nsKey is None:
             # it's a non-standard role, so add this contributor with uniqueName='otherContributor'
-            nsKey = Metadata.uniqueNameToNSKey('otherContributor')
+            # return Metadata.uniqueNameToNSKey('otherContributor')
+            return 'marcrel:CTB'
 
         prop: Optional[PropertyDescription] = Metadata._NSKEY2STDPROPERTYDESC.get(nsKey, None)
-        if prop is None:
-            return None
-
-        if not prop.isContributor:
-            return None
+        if prop is None or not prop.isContributor:
+            # return Metadata.uniqueNameToNSKey('otherContributor')
+            return 'marcrel:CTB'
 
         return nsKey
 
     def _addBackwardCompatibleContributor(self, c: Contributor):
-        nsKey: Optional[str] = self._backwardCompatibleContributorRoleToNSKey(c.role)
-        if not nsKey:
-            return
+        '''
+        Adds a backward-compatible contributor role to the metadata.
+
+        >>> md = metadata.Metadata()
+        >>> ly0 = metadata.Contributor(role='lyricist', name='Joe0')
+        >>> ly1 = metadata.Contributor(role='lyricist', name='Joe1')
+        >>> bf0 = metadata.Contributor(role='best friend', name='John0')
+        >>> bf1 = metadata.Contributor(role='best friend', name='John1')
+        >>> md._addBackwardCompatibleContributor(ly0)
+        >>> md._addBackwardCompatibleContributor(ly1)
+        >>> md._addBackwardCompatibleContributor(bf0)
+        >>> md._addBackwardCompatibleContributor(bf1)
+        >>> all = md.getAllItems()
+        >>> len(all)
+        4
+        >>> all[0]
+        ('marcrel:LYR', <music21.metadata.primitives.Contributor lyricist:Joe0>)
+        >>> all[1]
+        ('marcrel:LYR', <music21.metadata.primitives.Contributor lyricist:Joe1>)
+        >>> all[2]
+        ('marcrel:CTB', <music21.metadata.primitives.Contributor best friend:John0>)
+        >>> all[3]
+        ('marcrel:CTB', <music21.metadata.primitives.Contributor best friend:John1>)
+        '''
+        nsKey: str = self._backwardCompatibleContributorRoleToNSKey(c.role)
         self._addItem(nsKey, c)
 
     def _getAllBackwardCompatibleContributors(self) -> List[Contributor]:
@@ -2023,9 +2131,6 @@ class Metadata(base.Music21Object):
 
         for nsKey, value in self._metadata.items():
             if not self._isBackwardCompatibleContributorNSKey(nsKey):
-                continue
-
-            if not value:
                 continue
 
             if isinstance(value, list):
@@ -2070,23 +2175,18 @@ class Metadata(base.Music21Object):
 
         return resultList
 
-    def _getBackwardCompatibleItems(self, workId: str) -> List[str]:
+    def _getBackwardCompatibleContributorNames(self, workId: str) -> List[str]:
         output: List[str] = []
         values: List[Any] = self._getBackwardCompatibleItemsNoConversion(workId)
 
-        # convert them all to str
+        # return only one name of each contributor (backward compatible behavior)
         for v in values:
-            if isinstance(v, Contributor):
-                output.append(v.names[0])
-            else:
-                output.append(str(v))
+            output.append(v.names[0])
         return output
 
-    def _setBackwardCompatibleItems(self, workId: str, names: List[str]):
-        valueList: List[Text] = []
-        for name in names:
-            valueList.append(Text(name))
-        self._setItems(workId, valueList)
+    def _setBackwardCompatibleContributorNames(self, workId: str, names: List[str]):
+        # Auto-conversion from str to standard Contributor happens behind the scenes
+        self._setItems(workId, names)
 
 
 # -----------------------------------------------------------------------------
