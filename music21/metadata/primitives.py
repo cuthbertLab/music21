@@ -766,6 +766,19 @@ class Text(prebase.ProtoM21Object):
     def _reprInternal(self):
         return str(self)
 
+    def __eq__(self, other) -> bool:
+        if type(other) is not type(self):
+            return False
+        if self._data != other._data:
+            return False
+        if self.language != other.language:
+            return False
+        if self.isTranslated != other.isTranslated:
+            return False
+        if self.encodingScheme != other.encodingScheme:
+            return False
+        return True
+
     # PUBLIC PROPERTIES #
 
     @property
@@ -826,6 +839,21 @@ class Copyright(Text):
     def __init__(self, data='', language=None, *, role=None):
         super().__init__(data, language)
         self.role = role
+
+    def __eq__(self, other) -> bool:
+        if type(other) is not type(self):
+            return False
+        if self._data != other._data:
+            return False
+        if self.language != other.language:
+            return False
+        if self.isTranslated != other.isTranslated:
+            return False
+        if self.encodingScheme != other.encodingScheme:
+            return False
+        if self.role != other.role:
+            return False
+        return True
 
 
 # -----------------------------------------------------------------------------
@@ -920,6 +948,20 @@ class Contributor(prebase.ProtoM21Object):
 
     def _reprInternal(self):
         return f'{self.role}:{self.name}'
+
+    def __eq__(self, other) -> bool:
+        if self._role != other._role:
+            return False
+        if len(self._names) != len(other._names):
+            return False
+        for name, otherName in zip(sorted(self._names), sorted(other._names)):
+            if name != otherName:
+                return False
+        if self.birth != other.birth:
+            return False
+        if self.death != other.death:
+            return False
+        return True
 
     # PUBLIC METHODS #
 

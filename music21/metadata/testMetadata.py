@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import re
 import unittest
+from typing import Type
+from music21 import metadata
+
 
 
 class Test(unittest.TestCase):
@@ -9,6 +12,27 @@ class Test(unittest.TestCase):
     maxDiff = None
 
     def testMetadataLoadCorpus(self):
+        from music21 import converter
+        from music21.musicxml import testFiles as mTF
+
+        c = converter.parse(mTF.mozartTrioK581Excerpt)
+        md = c.metadata
+
+        self.assertEqual(md.getItem('movementNumber'), metadata.Text('3'))
+        self.assertEqual(md.getItem('movementName'),
+            metadata.Text('Menuetto (Excerpt from Second Trio)'))
+        self.assertEqual(md.getItem('title'),
+            metadata.Text('Quintet for Clarinet and Strings'))
+        self.assertEqual(md.getItem('workNumber'), metadata.Text('K. 581'))
+        self.assertEqual(md.getItem('composer'),
+            metadata.Contributor(role='composer', name='Wolfgang Amadeus Mozart'))
+
+        c = converter.parse(mTF.binchoisMagnificat)
+        md = c.metadata
+        self.assertEqual(md.getItem('composer'),
+            metadata.Contributor(role='composer', name='Gilles Binchois'))
+
+    def testMetadataLoadCorpusBackwardCompatible(self):
         from music21 import converter
         from music21.musicxml import testFiles as mTF
 
@@ -30,7 +54,6 @@ class Test(unittest.TestCase):
     def testJSONSerializationMetadata(self):
         from music21 import converter
         from music21.musicxml import testFiles as mTF
-        from music21 import metadata
 
         md = metadata.Metadata(
             title='Concerto in F',
@@ -56,7 +79,6 @@ class Test(unittest.TestCase):
 
     def testRichMetadata01(self):
         from music21 import corpus
-        from music21 import metadata
 
         score = corpus.parse('jactatur')
         self.assertEqual(score.metadata.composer, 'Johannes Ciconia')
@@ -88,7 +110,6 @@ class Test(unittest.TestCase):
 
     def testWorkIds(self):
         from music21 import corpus
-        from music21 import metadata
 
         opus = corpus.parse('essenFolksong/teste')
         self.assertEqual(len(opus.scores), 8)
@@ -130,7 +151,6 @@ class Test(unittest.TestCase):
 
     def testRichMetadata02(self):
         from music21 import corpus
-        from music21 import metadata
 
         score = corpus.parse('bwv66.6')
         richMetadata = metadata.RichMetadata()
@@ -138,6 +158,266 @@ class Test(unittest.TestCase):
         richMetadata.update(score)
         self.assertEqual(richMetadata.noteCount, 165)
         self.assertEqual(richMetadata.quarterLength, 36.0)
+
+    def checkUniqueNamedItem(
+            self,
+            uniqueName: str,
+            nsKey: str,
+            contributorRole: str = None,
+            valueType: Type = metadata.Text):
+
+        if ':' not in nsKey:
+            # It's just the namespace because name == uniqueName
+            # and I didn't want to spend the time to type it twice...
+            nsKey += ':' + uniqueName
+
+        if nsKey.startswith('marcrel'):
+            # The marcrel namespace is all Contributors (more typing saved)
+            valueType = metadata.Contributor
+
+        md = metadata.Metadata()
+
+        item = md.getItem(uniqueName)
+        self.assertIsNone(item)
+
+        if valueType is metadata.DateSingle:
+            md.addItem(uniqueName, '1979/6/11')
+            md.addItems(nsKey, [metadata.DateBetween(['1978', '1980']),
+                metadata.DateSingle('1979/6/11/4:50:32')])
+        elif valueType is metadata.Copyright:
+            md.addItem(uniqueName, 'Copyright © 1979 Joe Smith')
+            md.addItem(nsKey, metadata.Text('Lyrics copyright © 1979 John Jones'))
+            md.addItems(uniqueName,
+                [metadata.Copyright('Other content copyright © 1979 Jenni Johnson',
+                    role='other'),
+                metadata.Copyright(
+                    metadata.Text('Even more content copyright © 1979 Sarah Michaels'),
+                    role='even more')])
+        elif valueType is metadata.Contributor:
+            md.addItem(uniqueName, f'The {uniqueName}')
+            md.addItems(nsKey, [metadata.Text(f'The 2nd {uniqueName}'),
+                metadata.Contributor(
+                    role=contributorRole if contributorRole else uniqueName,
+                    name=f'The 3rd {uniqueName}')])
+        elif valueType is metadata.Text:
+            md.addItem(uniqueName, f'The {uniqueName}')
+            md.addItems(nsKey, [metadata.Text(f'The 2nd {uniqueName}'),
+                metadata.Text(f'The 3rd {uniqueName}')])
+        else:
+            self.fail('internal test error: invalid valueType')
+
+        mdItemsUnique = md.getItems(uniqueName)
+        mdItemsNSKey = md.getItems(nsKey)
+        self.assertEqual(len(mdItemsUnique), len(mdItemsNSKey))
+
+        for itemUnique, itemNSKey in zip(mdItemsUnique, mdItemsNSKey):
+            self.assertIsInstance(itemUnique, valueType)
+            self.assertIsInstance(itemNSKey, valueType)
+            self.assertEqual(itemUnique, itemNSKey)
+
+        if valueType is metadata.Contributor:
+            for itemNSKey in mdItemsNSKey:
+                self.assertEqual(itemNSKey.role, contributorRole if contributorRole else uniqueName)
+
+    def testUniqueNameAccess(self):
+        self.checkUniqueNamedItem('abstract', 'dcterms')
+        self.checkUniqueNamedItem('accessRights', 'dcterms')
+        self.checkUniqueNamedItem('accrualMethod', 'dcterms')
+        self.checkUniqueNamedItem('accrualPeriodicity', 'dcterms')
+        self.checkUniqueNamedItem('accrualPolicy', 'dcterms')
+        self.checkUniqueNamedItem('alternativeTitle', 'dcterms:alternative')
+        self.checkUniqueNamedItem('audience', 'dcterms')
+        self.checkUniqueNamedItem('dateAvailable', 'dcterms:available',
+            valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('bibliographicCitation', 'dcterms')
+        self.checkUniqueNamedItem('conformsTo', 'dcterms')
+
+        self.checkUniqueNamedItem('genericContributor', 'dcterms:contributor',
+            valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('coverage', 'dcterms')
+        self.checkUniqueNamedItem('dateCreated', 'dcterms:created', valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('creator', 'dcterms', valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('otherDate', 'dcterms:date', valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('dateAccepted', 'dcterms', valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('dateCopyrighted', 'dcterms', valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('dateSubmitted', 'dcterms', valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('description', 'dcterms')
+        self.checkUniqueNamedItem('educationLevel', 'dcterms')
+
+        self.checkUniqueNamedItem('extent', 'dcterms')
+        self.checkUniqueNamedItem('format', 'dcterms')
+        self.checkUniqueNamedItem('hasFormat', 'dcterms')
+        self.checkUniqueNamedItem('hasPart', 'dcterms')
+        self.checkUniqueNamedItem('hasVersion', 'dcterms')
+        self.checkUniqueNamedItem('identifier', 'dcterms')
+        self.checkUniqueNamedItem('instructionalMethod', 'dcterms')
+        self.checkUniqueNamedItem('isFormatOf', 'dcterms')
+        self.checkUniqueNamedItem('isPartOf', 'dcterms')
+        self.checkUniqueNamedItem('isReferencedBy', 'dcterms')
+
+        self.checkUniqueNamedItem('isReplacedBy', 'dcterms')
+        self.checkUniqueNamedItem('isRequiredBy', 'dcterms')
+        self.checkUniqueNamedItem('dateIssued', 'dcterms:issued', valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('isVersionOf', 'dcterms')
+        self.checkUniqueNamedItem('language', 'dcterms')
+        self.checkUniqueNamedItem('license', 'dcterms')
+        self.checkUniqueNamedItem('mediator', 'dcterms')
+        self.checkUniqueNamedItem('medium', 'dcterms')
+        self.checkUniqueNamedItem('dateModified', 'dcterms:modified', valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('provenance', 'dcterms')
+
+        self.checkUniqueNamedItem('publisher', 'dcterms', valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('references', 'dcterms')
+        self.checkUniqueNamedItem('relation', 'dcterms')
+        self.checkUniqueNamedItem('replaces', 'dcterms')
+        self.checkUniqueNamedItem('requires', 'dcterms')
+        self.checkUniqueNamedItem('copyright', 'dcterms:rights', valueType=metadata.Copyright)
+        self.checkUniqueNamedItem('rightsHolder', 'dcterms', valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('source', 'dcterms')
+        self.checkUniqueNamedItem('spatialCoverage', 'dcterms:spatial')
+        self.checkUniqueNamedItem('subject', 'dcterms')
+
+        self.checkUniqueNamedItem('tableOfContents', 'dcterms')
+        self.checkUniqueNamedItem('temporalCoverage', 'dcterms:temporal')
+        self.checkUniqueNamedItem('title', 'dcterms')
+        self.checkUniqueNamedItem('type', 'dcterms')
+        self.checkUniqueNamedItem('dateValid', 'dcterms:valid', valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('actor', 'marcrel:ACT')
+        self.checkUniqueNamedItem('adapter', 'marcrel:ADP')
+        self.checkUniqueNamedItem('animator', 'marcrel:ANM')
+        self.checkUniqueNamedItem('annotator', 'marcrel:ANN')
+        self.checkUniqueNamedItem('architect', 'marcrel:ARC')
+
+        self.checkUniqueNamedItem('arranger', 'marcrel:ARR')
+        self.checkUniqueNamedItem('artist', 'marcrel:ART')
+        self.checkUniqueNamedItem('author', 'marcrel:AUT')
+        self.checkUniqueNamedItem('quotationsAuthor', 'marcrel:AQT')
+        self.checkUniqueNamedItem('afterwordAuthor', 'marcrel:AFT')
+        self.checkUniqueNamedItem('dialogAuthor', 'marcrel:AUD')
+        self.checkUniqueNamedItem('introductionAuthor', 'marcrel:AUI')
+        self.checkUniqueNamedItem('screenplayAuthor', 'marcrel:AUS')
+        self.checkUniqueNamedItem('calligrapher', 'marcrel:CLL')
+        self.checkUniqueNamedItem('cartographer', 'marcrel:CTG')
+
+        self.checkUniqueNamedItem('choreographer', 'marcrel:CHR')
+        self.checkUniqueNamedItem('cinematographer', 'marcrel:CNG')
+        self.checkUniqueNamedItem('collaborator', 'marcrel:CLB')
+        self.checkUniqueNamedItem('collotyper', 'marcrel:CLT')
+        self.checkUniqueNamedItem('commentator', 'marcrel:CMM')
+        self.checkUniqueNamedItem('writtenCommentator', 'marcrel:CWT')
+        self.checkUniqueNamedItem('compiler', 'marcrel:COM')
+        self.checkUniqueNamedItem('composer', 'marcrel:CMP')
+        self.checkUniqueNamedItem('conceptor', 'marcrel:CCP')
+        self.checkUniqueNamedItem('conductor', 'marcrel:CND')
+
+        self.checkUniqueNamedItem('consultant', 'marcrel:CSL')
+        self.checkUniqueNamedItem('projectConsultant', 'marcrel:CSP')
+        self.checkUniqueNamedItem('contractor', 'marcrel:CTR')
+        self.checkUniqueNamedItem('otherContributor', 'marcrel:CTB')
+        self.checkUniqueNamedItem('correspondent', 'marcrel:CRP')
+        self.checkUniqueNamedItem('costumeDesigner', 'marcrel:CST')
+        self.checkUniqueNamedItem('curator', 'marcrel:CUR')
+        self.checkUniqueNamedItem('dancer', 'marcrel:DNC')
+        self.checkUniqueNamedItem('delineator', 'marcrel:DLN')
+        self.checkUniqueNamedItem('designer', 'marcrel:DSR')
+
+        self.checkUniqueNamedItem('director', 'marcrel:DRT')
+        self.checkUniqueNamedItem('dissertant', 'marcrel:DIS')
+        self.checkUniqueNamedItem('draftsman', 'marcrel:DRM')
+        self.checkUniqueNamedItem('editor', 'marcrel:EDT')
+        self.checkUniqueNamedItem('engineer', 'marcrel:ENG')
+        self.checkUniqueNamedItem('engraver', 'marcrel:EGR')
+        self.checkUniqueNamedItem('etcher', 'marcrel:ETR')
+        self.checkUniqueNamedItem('facsimilist', 'marcrel:FAC')
+        self.checkUniqueNamedItem('filmEditor', 'marcrel:FLM')
+        self.checkUniqueNamedItem('forger', 'marcrel:FRG')
+
+        self.checkUniqueNamedItem('host', 'marcrel:HST')
+        self.checkUniqueNamedItem('illuminator', 'marcrel:ILU')
+        self.checkUniqueNamedItem('illustrator', 'marcrel:ILL')
+        self.checkUniqueNamedItem('instrumentalist', 'marcrel:ITR')
+        self.checkUniqueNamedItem('interviewee', 'marcrel:IVE')
+        self.checkUniqueNamedItem('interviewer', 'marcrel:IVR')
+        self.checkUniqueNamedItem('inventor', 'marcrel:INV')
+        self.checkUniqueNamedItem('landscapeArchitect', 'marcrel:LSA')
+        self.checkUniqueNamedItem('librettist', 'marcrel:LBT')
+        self.checkUniqueNamedItem('lightingDesigner', 'marcrel:LGD')
+
+        self.checkUniqueNamedItem('lithographer', 'marcrel:LTG')
+        self.checkUniqueNamedItem('lyricist', 'marcrel:LYR')
+        self.checkUniqueNamedItem('manufacturer', 'marcrel:MFR')
+        self.checkUniqueNamedItem('metalEngraver', 'marcrel:MTE')
+        self.checkUniqueNamedItem('moderator', 'marcrel:MOD')
+        self.checkUniqueNamedItem('musician', 'marcrel:MUS')
+        self.checkUniqueNamedItem('narrator', 'marcrel:NRT')
+        self.checkUniqueNamedItem('meetingOrganizer', 'marcrel:ORM')
+        self.checkUniqueNamedItem('originator', 'marcrel:ORG')
+        self.checkUniqueNamedItem('performer', 'marcrel:PRF')
+
+        self.checkUniqueNamedItem('photographer', 'marcrel:PHT')
+        self.checkUniqueNamedItem('platemaker', 'marcrel:PLT')
+        self.checkUniqueNamedItem('printmaker', 'marcrel:PRM')
+        self.checkUniqueNamedItem('producer', 'marcrel:PRO')
+        self.checkUniqueNamedItem('productionPersonnel', 'marcrel:PRD')
+        self.checkUniqueNamedItem('programmer', 'marcrel:PRG')
+        self.checkUniqueNamedItem('puppeteer', 'marcrel:PPT')
+        self.checkUniqueNamedItem('recordingEngineer', 'marcrel:RCE')
+        self.checkUniqueNamedItem('renderer', 'marcrel:REN')
+        self.checkUniqueNamedItem('reporter', 'marcrel:RPT')
+
+        self.checkUniqueNamedItem('researchTeamHead', 'marcrel:RTH')
+        self.checkUniqueNamedItem('researchTeamMember', 'marcrel:RTM')
+        self.checkUniqueNamedItem('researcher', 'marcrel:RES')
+        self.checkUniqueNamedItem('responsibleParty', 'marcrel:RPY')
+        self.checkUniqueNamedItem('restager', 'marcrel:RSG')
+        self.checkUniqueNamedItem('reviewer', 'marcrel:REV')
+        self.checkUniqueNamedItem('scenarist', 'marcrel:SCE')
+        self.checkUniqueNamedItem('scientificAdvisor', 'marcrel:SAD')
+        self.checkUniqueNamedItem('scribe', 'marcrel:SCR')
+        self.checkUniqueNamedItem('sculptor', 'marcrel:SCL')
+
+        self.checkUniqueNamedItem('secretary', 'marcrel:SEC')
+        self.checkUniqueNamedItem('setDesigner', 'marcrel:STD')
+        self.checkUniqueNamedItem('singer', 'marcrel:SNG')
+        self.checkUniqueNamedItem('speaker', 'marcrel:SPK')
+        self.checkUniqueNamedItem('standardsBody', 'marcrel:STN')
+        self.checkUniqueNamedItem('storyteller', 'marcrel:STL')
+        self.checkUniqueNamedItem('surveyor', 'marcrel:SRV')
+        self.checkUniqueNamedItem('teacher', 'marcrel:TCH')
+        self.checkUniqueNamedItem('transcriber', 'marcrel:TRC')
+        self.checkUniqueNamedItem('translator', 'marcrel:TRL')
+
+        self.checkUniqueNamedItem('videographer', 'marcrel:VDG')
+        self.checkUniqueNamedItem('vocalist', 'marcrel:VOC')
+        self.checkUniqueNamedItem('woodEngraver', 'marcrel:WDE')
+        self.checkUniqueNamedItem('woodCutter', 'marcrel:WDC')
+        self.checkUniqueNamedItem('accompanyingMaterialWriter', 'marcrel:WAM')
+        self.checkUniqueNamedItem('distributor', 'marcrel:DST')
+        self.checkUniqueNamedItem('textOriginalLanguage', 'music21')
+        self.checkUniqueNamedItem('textLanguage', 'music21')
+        self.checkUniqueNamedItem('popularTitle', 'music21')
+        self.checkUniqueNamedItem('parentTitle', 'music21')
+
+        self.checkUniqueNamedItem('actNumber', 'music21')
+        self.checkUniqueNamedItem('sceneNumber', 'music21')
+        self.checkUniqueNamedItem('movementNumber', 'music21')
+        self.checkUniqueNamedItem('movementName', 'music21')
+        self.checkUniqueNamedItem('opusNumber', 'music21')
+        self.checkUniqueNamedItem('workNumber', 'music21:number')
+        self.checkUniqueNamedItem('volumeNumber', 'music21:volume')
+        self.checkUniqueNamedItem('dedicatedTo', 'music21:dedication')
+        self.checkUniqueNamedItem('commissionedBy', 'music21:commission')
+        self.checkUniqueNamedItem('countryOfComposition', 'music21')
+
+        self.checkUniqueNamedItem('localeOfComposition', 'music21')
+        self.checkUniqueNamedItem('groupTitle', 'music21')
+        self.checkUniqueNamedItem('associatedWork', 'music21')
+        self.checkUniqueNamedItem('collectionDesignation', 'music21')
+        self.checkUniqueNamedItem('attributedComposer', 'music21', valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('suspectedComposer', 'music21', valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('composerAlias', 'music21', valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('composerCorporate', 'music21', valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('orchestrator', 'music21', valueType=metadata.Contributor)
 
 # -----------------------------------------------------------------------------
 

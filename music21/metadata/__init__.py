@@ -308,7 +308,7 @@ class Metadata(base.Music21Object):
                  name='rights',
                  label='Rights',
                  namespace='dcterms',
-                 m21WorkId='copyright', # no abbrev
+                 m21WorkId='copyright',
                  isContributor=False),
 
         # created: Date of creation of the resource.
@@ -321,7 +321,7 @@ class Metadata(base.Music21Object):
                  name='created',
                  label='Date Created',
                  namespace='dcterms',
-                 m21WorkId='date',  # no abbrev
+                 m21WorkId='date',
                  uniqueName='dateCreated',
                  valueType=DateSingle, # including DateRelative, DateBetween, DateSelection
                  isContributor=False),
@@ -338,7 +338,6 @@ class Metadata(base.Music21Object):
                  label='Composer',
                  namespace='marcrel',
                  m21WorkId='composer',
-                 m21Abbrev='com',
                  valueType=Contributor,
                  isContributor=True),
     '''
@@ -1497,6 +1496,11 @@ class Metadata(base.Music21Object):
     def localeOfComposition(self):
         r'''
         Get or set the locale of composition, or origin, of the work.
+
+        >>> md = metadata.Metadata(popularTitle='Eroica')
+        >>> md.localeOfComposition = 'Paris, France'
+        >>> md.localeOfComposition
+        'Paris, France'
         '''
         return self._getBackwardCompatibleItem('localeOfComposition')
 
@@ -1556,6 +1560,8 @@ class Metadata(base.Music21Object):
 
         >>> md = metadata.Metadata(title='West Side Story')
         >>> md.lyricist = 'Sondheim, Stephen'
+        >>> md.lyricist
+        'Sondheim, Stephen'
         '''
         return self._getBackwardCompatibleItem('lyricist')
 
@@ -1586,6 +1592,11 @@ class Metadata(base.Music21Object):
     def movementName(self):
         r'''
         Get or set the movement title.
+
+        >>> md = metadata.Metadata()
+        >>> md.movementName = 'Vivace'
+        >>> md.movementName
+        'Vivace'
 
         Note that a number of pieces from various MusicXML datasets have
         the piece title as the movement title. For instance, the Bach
@@ -1623,8 +1634,14 @@ class Metadata(base.Music21Object):
         Get or set the number of the work within a collection of pieces.
         (for instance, the number within a collection of ABC files)
 
+        >>> md = metadata.Metadata()
+        >>> md.number = 4
+
         Note that numbers are always returned as strings!  This may
         change in the future.
+
+        >>> md.number
+        '4'
         '''
         return self._getBackwardCompatibleItem('number')
 
@@ -1637,8 +1654,13 @@ class Metadata(base.Music21Object):
         r'''
         Get or set the opus number.
 
+        >>> md = metadata.Metadata()
+        >>> md.opusNumber = 56
+
         Note that opusNumbers are always returned as strings!  This may
         change in the future.
+        >>> md.opusNumber
+        '56'
         '''
         return self._getBackwardCompatibleItem('opusNumber')
 
@@ -1759,7 +1781,9 @@ class Metadata(base.Music21Object):
         # it's a small-c contributor that doesn't map to a backward compatible
         # big-C Contributor role, but since we're not trying to be backward
         # compatible, we'll take these, too.
-        return prop.uniqueName
+        if prop.uniqueName:
+            return prop.uniqueName
+        return prop.name
 
     def _getItem(self,
                  key: str,
@@ -2311,7 +2335,7 @@ class Metadata(base.Music21Object):
             name='created',
             label='Date Created',
             namespace='dcterms',
-            m21WorkId='date',  # no abbrev
+            m21WorkId='date',
             uniqueName='dateCreated',
             valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
             isContributor=False),
@@ -2332,6 +2356,7 @@ class Metadata(base.Music21Object):
             name='date',
             label='Date',
             namespace='dcterms',
+            uniqueName='otherDate',
             valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
             isContributor=False),
 
