@@ -1262,7 +1262,7 @@ class MusicXMLImporter(XMLParserBase):
 
     # temporary for testing: set MusicXMLImporter.USE_BACKWARD_COMPATIBLE_METADATA_APIS to True
     # if you want to test those APIs.
-    USE_BACKWARD_COMPATIBLE_METADATA_APIS: bool = False
+    # USE_BACKWARD_COMPATIBLE_METADATA_APIS: bool = False
     def xmlMetadata(self, el=None, inputM21=None):
         '''
         Converts part of the root element into a metadata object
@@ -1278,29 +1278,29 @@ class MusicXMLImporter(XMLParserBase):
         else:
             md = inputM21
 
-        if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-            seta = _setAttributeFromTagText
-        else:
-            setm = _setMetadataItemFromTagText
+        # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
+        #     seta = _setAttributeFromTagText
+        # else:
+        setm = _setMetadataItemFromTagText
 
         # work
         work = el.find('work')
         if work is not None:
-            if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-                seta(md, work, 'work-title', 'title')
-                seta(md, work, 'work-number', 'number')
-                seta(md, work, 'opus', 'opusNumber')
-            else:
-                setm(md, work, 'work-title', 'title')
-                setm(md, work, 'work-number', 'workNumber')
-                setm(md, work, 'opus', 'opusNumber')
+            # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
+            #     seta(md, work, 'work-title', 'title')
+            #     seta(md, work, 'work-number', 'number')
+            #     seta(md, work, 'opus', 'opusNumber')
+            # else:
+            setm(md, work, 'work-title', 'title')
+            setm(md, work, 'work-number', 'workNumber')
+            setm(md, work, 'opus', 'opusNumber')
 
-        if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-            seta(md, el, 'movement-number')
-            seta(md, el, 'movement-title', 'movementName')
-        else:
-            setm(md, el, 'movement-number', 'movementNumber')
-            setm(md, el, 'movement-title', 'movementName')
+        # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
+        #     seta(md, el, 'movement-number')
+        #     seta(md, el, 'movement-title', 'movementName')
+        # else:
+        setm(md, el, 'movement-number', 'movementNumber')
+        setm(md, el, 'movement-title', 'movementName')
 
         identification = el.find('identification')
         if identification is not None:
@@ -1331,10 +1331,10 @@ class MusicXMLImporter(XMLParserBase):
 
         for creator in identification.findall('creator'):
             c = self.creatorToContributor(creator)
-            if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-                md.addContributor(c)
-            else:
-                md.addItem(c.role, c)
+            # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
+            #     md.addContributor(c)
+            # else:
+            md.addItem(c.role, c)
 
         for rights in identification.findall('rights'):
             c = self.rightsToCopyright(rights)
@@ -1355,23 +1355,23 @@ class MusicXMLImporter(XMLParserBase):
                     continue  # it is required, so technically can raise an exception
                 miscFieldValue = mxMiscField.text
                 if miscFieldValue is None:
-                    if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-                        continue  # it is required, so technically can raise an exception
-                    else:
-                        # new metadata is happy to take an empty value
-                        miscFieldValue = ''
+                    # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
+                    #     continue  # it is required, so technically can raise an exception
+                    # else:
+                    # new metadata is happy to take an empty value
+                    miscFieldValue = ''
 
-                if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-                    try:
-                        setattr(md, miscFieldName, miscFieldValue)
-                    except Exception as e:  # pylint: disable=broad-except
-                        warnings.warn('Could not set metadata: {} to {}: {}'.format(
-                            miscFieldName, miscFieldValue, e
-                        ), MusicXMLWarning)
-                else:
-                    # This will treat it as a uniqueName (if recognized),
-                    # or as a personalName (if it isn't recognized)
-                    md.addItem(miscFieldName, miscFieldValue)
+                # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
+                #     try:
+                #         setattr(md, miscFieldName, miscFieldValue)
+                #     except Exception as e:  # pylint: disable=broad-except
+                #         warnings.warn('Could not set metadata: {} to {}: {}'.format(
+                #             miscFieldName, miscFieldValue, e
+                #         ), MusicXMLWarning)
+                # else:
+                # This will treat it as a uniqueName (if recognized),
+                # or as a personalName (if it isn't recognized)
+                md.addItem(miscFieldName, miscFieldValue)
 
         if inputM21 is None:
             return md
@@ -1437,14 +1437,14 @@ class MusicXMLImporter(XMLParserBase):
 
         creatorType = creator.get('type')
 
-        if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-            if (creatorType is not None
-                    and creatorType in metadata.Contributor.roleNames):
-                c.role = creatorType
-        else:
-            if (creatorType is not None
-                    and metadata.Metadata.isContributorUniqueName(creatorType)):
-                c.role = creatorType
+        # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
+        #     if (creatorType is not None
+        #             and creatorType in metadata.Contributor.roleNames):
+        #         c.role = creatorType
+        # else:
+        if (creatorType is not None
+                and metadata.Metadata.isContributorUniqueName(creatorType)):
+            c.role = creatorType
 
         creatorText = creator.text
         if creatorText is not None:
