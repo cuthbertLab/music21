@@ -111,7 +111,7 @@ multiMeasureRestUseSymbols = True
 multiMeasureRestMaxSymbols = 11
 
 # id numbers above this number will be considered memory locations
-# and rewritten on thaw.
+# and rewritten on thaw, etc.
 minIdNumberToConsiderMemoryLocation = 100_000_001
 
 # ----------------------------------------------------------------||||||||||||--

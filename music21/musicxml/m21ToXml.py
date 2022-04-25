@@ -3,10 +3,11 @@
 # Name:         musicxml/m21ToXml.py
 # Purpose:      Translate from music21 objects to musicxml representation
 #
-# Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+# Authors:      Michael Scott Cuthbert
+#               Christopher Ariza
+#               Jacob Tyler Walls
 #
-# Copyright:    Copyright © 2010-2012, 2015-19 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-22 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -18,10 +19,9 @@ import datetime
 import fractions
 import io
 import math
-import unittest
 import warnings
 from xml.etree.ElementTree import (
-    Element, SubElement, ElementTree, Comment, fromstring as et_fromstring
+    Element, SubElement, Comment
 )
 from typing import Dict, List, Mapping, Optional, Union
 
@@ -72,6 +72,10 @@ def typeToMusicXMLType(value):
     'long'
     >>> musicxml.m21ToXml.typeToMusicXMLType('quarter')
     'quarter'
+    >>> musicxml.m21ToXml.typeToMusicXMLType('duplex-maxima')
+    Traceback (most recent call last):
+    music21.musicxml.xmlObjects.MusicXMLExportException:
+    Cannot convert "duplex-maxima" duration to MusicXML (too long).
     >>> musicxml.m21ToXml.typeToMusicXMLType('inexpressible')
     Traceback (most recent call last):
     music21.musicxml.xmlObjects.MusicXMLExportException:
@@ -86,8 +90,15 @@ def typeToMusicXMLType(value):
         return 'long'
     elif value == '2048th':
         raise MusicXMLExportException('Cannot convert "2048th" duration to MusicXML (too short).')
+    elif value == 'duplex-maxima':
+        raise MusicXMLExportException(
+            'Cannot convert "duplex-maxima" duration to MusicXML (too long).')
     elif value == 'inexpressible':
         raise MusicXMLExportException('Cannot convert inexpressible durations to MusicXML.')
+    elif value == 'complex':
+        raise MusicXMLExportException(
+            'Cannot convert complex durations to MusicXML. '
+            + 'Try exporting with makeNotation=True or manually running splitAtDurations()')
     elif value == 'zero':
         raise MusicXMLExportException('Cannot convert durations without types to MusicXML.')
     else:
@@ -217,7 +228,7 @@ def _setTagTextFromAttribute(
 
 def _setAttributeFromAttribute(m21El, xmlEl, xmlAttributeName, attributeName=None, transform=None):
     '''
-    If m21El has a at least one element of tag==tag with some text. If
+    If m21El has at least one element of tag==tag with some text. If
     it does, set the attribute either with the same name (with "foo-bar" changed to
     "fooBar") or with attributeName to the text contents.
 
@@ -488,12 +499,26 @@ class GeneralObjectExporter:
         representation of a Measure, not for partial
         solutions in Part or Stream production.
         '''
+        m.coreGatherMissingSpanners()
         mCopy = m.makeNotation()
-        if not m.recurse().getElementsByClass('Clef').getElementsByOffset(0.0):
+        if mCopy.style.measureNumbering is None:
+            # Provide a default
+            mCopy.style.measureNumbering = 'measure'
+        clef_from_measure_start_or_context = m.getContextByClass(
+            clef.Clef,
+            getElementMethod=common.enums.ElementSearch.AT_OR_BEFORE_OFFSET
+        )
+        if clef_from_measure_start_or_context is None:
             mCopy.clef = clef.bestClef(mCopy, recurse=True)
+        else:
+            mCopy.clef = clef_from_measure_start_or_context
         p = stream.Part()
         p.append(mCopy)
         p.metadata = copy.deepcopy(getMetadataFromContext(m))
+        context_part = m.getContextByClass(stream.Part)
+        if context_part is not None:
+            p.partName = context_part.partName
+            p.partAbbreviation = context_part.partAbbreviation
         return self.fromPart(p)
 
     def fromVoice(self, v):
@@ -546,7 +571,7 @@ class GeneralObjectExporter:
         Translate a music21 :class:`~music21.duration.Duration` into
         a complete MusicXML representation.
 
-        Rarely rarely used.  Only if you call .show() on a duration object
+        Rarely, rarely used.  Only if you call .show() on a duration object
         '''
         # make a copy, as we this process will change tuple types
         # not needed, since fromGeneralNote does it too.  but so
@@ -2331,8 +2356,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
                 mxSoftware = SubElement(mxEncoding, 'software')
                 mxSoftware.text = software
         else:
-            # there will not be a music21 software tag if no scoreMetadata
-            # if not for this.
+            # there will not be a music21 software tag if there was no scoreMetadata
+            # if not for these lines.
             mxSoftware = SubElement(mxEncoding, 'software')
             mxSoftware.text = defaults.software
 
@@ -2524,9 +2549,6 @@ class PartExporter(XMLExporterBase):
         if self.stream.atSoundingPitch is True:
             self.stream.toWrittenPitch(inPlace=True)
 
-        # Split complex durations in place (fast if none found)
-        self.stream = self.stream.splitAtDurations(recurse=True)[0]
-
         # Suppose that everything below this is a measure
         if self.makeNotation and not self.stream.getElementsByClass(stream.Measure):
             self.fixupNotationFlat()
@@ -2535,6 +2557,12 @@ class PartExporter(XMLExporterBase):
         elif not self.stream.getElementsByClass(stream.Measure):
             raise MusicXMLExportException(
                 'Cannot export with makeNotation=False if there are no measures')
+
+        # Split complex durations in place (fast if none found)
+        # must do after fixupNotationFlat(), which may create complex durations
+        if self.makeNotation:
+            self.stream = self.stream.splitAtDurations(recurse=True)[0]
+
         # make sure that all instances of the same class have unique ids
         self.spannerBundle.setIdLocals()
 
@@ -2551,7 +2579,9 @@ class PartExporter(XMLExporterBase):
                 mxMeasure = measureExporter.parse()
             except MusicXMLExportException as e:
                 e.measureNumber = str(m.number)
-                e.partName = self.stream.partName
+                if isinstance(self.stream, stream.Part):
+                    e.partName = self.stream.partName
+                # else: could be a Score without parts (flat)
                 raise e
             self.xmlRoot.append(mxMeasure)
 
@@ -2629,7 +2659,7 @@ class PartExporter(XMLExporterBase):
                     and thisInstrument.instrumentId in self.parent.instrumentIdList)):
                 thisInstrument.instrumentIdRandomize()
 
-            # add to lists for checking on next part
+            # add to the lists for checking on next part
             if self.parent is not None:
                 self.parent.instrumentIdList.append(thisInstrument.instrumentId)
                 if thisInstrument is self.firstInstrumentObject:
@@ -2641,7 +2671,7 @@ class PartExporter(XMLExporterBase):
 
         Does nothing in the normal case of single staves.
 
-        Returns whether or not instrument processing should short circuit,
+        Returns whether instrument processing should short circuit,
         which is False for the general case and True for subsequent
         PartStaff objects after the first in a group.
         '''
@@ -3537,20 +3567,15 @@ class MeasureExporter(XMLExporterBase):
         </note>
 
         Notes with complex durations need to be simplified before coming here
-        otherwise they create an impossible musicxml type of "complex"
+        otherwise they raise :class:`MusicXMLExportException`:
 
         >>> nComplex = note.Note()
         >>> nComplex.duration.quarterLength = 5.0
         >>> mxComplex = MEX.noteToXml(nComplex)
-        >>> MEX.dump(mxComplex)
-        <note>
-          <pitch>
-            <step>C</step>
-            <octave>4</octave>
-          </pitch>
-          <duration>50400</duration>
-          <type>complex</type>
-        </note>
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+        Cannot convert complex durations to MusicXML.
+        Try exporting with makeNotation=True or manually running splitAtDurations()
 
         TODO: Test with spanners...
 
@@ -3648,7 +3673,14 @@ class MeasureExporter(XMLExporterBase):
             # Default type-less grace durations to eighths
             mxType.text = 'eighth'
         else:
-            mxType.text = typeToMusicXMLType(d.type)
+            try:
+                mxType.text = typeToMusicXMLType(d.type)
+            except MusicXMLExportException:
+                if n.isRest and helpers.isFullMeasureRest(n):
+                    # type will be removed in xmlToRest()
+                    pass
+                else:
+                    raise
 
         self.setStyleAttributes(mxType, n, 'size', 'noteSize')
         mxNote.append(mxType)
@@ -3869,16 +3901,7 @@ class MeasureExporter(XMLExporterBase):
         if mxRestTag is None:
             raise MusicXMLExportException('Something went wrong -- converted rest w/o rest tag')
 
-        isFullMeasure = False
-        if r.fullMeasure in (True, 'always'):
-            isFullMeasure = True
-            mxRestTag.set('measure', 'yes')
-        elif r.fullMeasure == 'auto':
-            tsContext = r.getContextByClass('TimeSignature')
-            if tsContext and tsContext.barDuration.quarterLength == r.duration.quarterLength:
-                isFullMeasure = True
-
-        if isFullMeasure:
+        if helpers.isFullMeasureRest(r):
             mxRestTag.set('measure', 'yes')
             mxType = mxNote.find('type')
             if mxType is not None:
@@ -5047,7 +5070,7 @@ class MeasureExporter(XMLExporterBase):
 
         >>> cs = harmony.ChordSymbol()
         >>> cs.root('E-')
-        >>> cs.bass('B-')
+        >>> cs.bass('B-', allow_add=True)
         >>> cs.inversion(2, transposeOnSet=False)
         >>> cs.chordKind = 'major'
         >>> cs.chordKindStr = 'M'
@@ -5885,7 +5908,7 @@ class MeasureExporter(XMLExporterBase):
 
         # not to be done: repeater (deprecated)
         self.setColor(mxBeam, beamObject)
-        # again, we pass the name 'fan' twice so we don't have to run
+        # again, we pass the name 'fan' twice, so we don't have to run
         # hyphenToCamelCase on it.
         self.setStyleAttributes(mxBeam, beamObject, 'fan', 'fan')
 
@@ -6515,7 +6538,7 @@ class MeasureExporter(XMLExporterBase):
                 mxPrint = Element('print')
             mxMeasureNumbering = SubElement(mxPrint, 'measure-numbering')
             mxMeasureNumbering.text = m.style.measureNumbering
-            mnStyle = m.style.measureNumberingStyle
+            mnStyle = m.style.measureNumberStyle
             if mnStyle is not None:
                 self.setPrintStyleAlign(mxMeasureNumbering, mnStyle)
         # TODO: part-name-display
@@ -6590,592 +6613,8 @@ class MeasureExporter(XMLExporterBase):
         return None
 
 
-# ------------------------------------------------------------------------------
-def indent(elem, level=0):
-    i = '\n' + level * '  '
-    # pylint: disable=len-as-condition
-    if len(elem):
-        if not elem.text or not elem.text.strip():
-            elem.text = i + '  '
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-        for subEl in elem:
-            indent(subEl, level + 1)
-        if not elem.tail or not elem.tail.strip():
-            elem.tail = i
-    else:
-        if level and (not elem.tail or not elem.tail.strip()):
-            elem.tail = i
-
-
-class Test(unittest.TestCase):
-
-    def getXml(self, obj):
-        gex = GeneralObjectExporter()
-        bytesOut = gex.parse(obj)
-        bytesOutUnicode = bytesOut.decode('utf-8')
-        return bytesOutUnicode
-
-    def getET(self, obj):
-        '''
-        Return a <score-partwise> ElementTree.
-        Does NOT call makeNotation() like most calls to show() and write().
-        '''
-        SX = ScoreExporter(obj)
-        mxScore = SX.parse()
-        helpers.indent(mxScore)
-        return mxScore
-
-    def testExceptionMessage(self):
-        s = stream.Score()
-        p = stream.Part()
-        p.partName = 'Offstage Trumpet'
-        p.insert(note.Note(quarterLength=(4 / 2048)))
-        s.insert(p)
-
-        msg = 'In part (Offstage Trumpet), measure (1): '
-        msg += 'Cannot convert "2048th" duration to MusicXML (too short).'
-        with self.assertRaises(MusicXMLExportException) as error:
-            s.write()
-        self.assertEqual(str(error.exception), msg)
-
-    def testSpannersWrite(self):
-        from music21 import converter
-        p = converter.parse("tinynotation: 4/4 c4 d e f g a b c' b a g2")
-        listNotes = list(p.recurse().notes)
-        c = listNotes[0]
-        d = listNotes[1]
-        sl1 = spanner.Slur([c, d])
-        p.insert(0.0, sl1)
-
-        f = listNotes[3]
-        g = listNotes[4]
-        a = listNotes[5]
-        sl2 = spanner.Slur([f, g, a])
-        p.insert(0.0, sl2)
-
-        c2 = listNotes[6]
-        g2 = listNotes[-1]
-        sl3 = spanner.Slur([c2, g2])
-        p.insert(0.0, sl3)
-        self.assertEqual(self.getXml(p).count('<slur '), 6)
-
-    def testSpannersWritePartStaffs(self):
-        '''
-        Test that spanners are gathered on the PartStaffs that need them.
-
-        Multi-staff instruments are separated on import into distinct PartStaff
-        objects, where usually all the spanners will remain on the first object.
-        '''
-        import re
-        from music21 import converter
-        from music21 import dynamics
-        xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
-        s = converter.parse(xmlDir / '43e-Multistaff-ClefDynamics.xml')
-
-        # StaffGroup spanner stored on the score
-        self.assertEqual(len(s.spanners), 1)
-        self.assertIsInstance(s.spanners[0], layout.StaffGroup)
-
-        # Crescendo in LH actually stored in first PartStaff object
-        self.assertEqual(len(s.parts[0].spanners), 1)
-        self.assertEqual(len(s.parts[1].spanners), 0)
-        self.assertIsInstance(s.parts[0].spanners[0], dynamics.Crescendo)
-
-        # Will it be found by coreGatherMissingSpanners without being inserted?
-        s.makeNotation(inPlace=True)
-        self.assertEqual(len(s.parts[1].spanners), 0)
-
-        # and written after the backup tag, i.e. on the LH?
-        xmlOut = self.getXml(s)
-        xmlAfterFirstBackup = xmlOut.split('</backup>\n')[1]
-
-        def stripInnerSpaces(txt):
-            return re.sub(r'\s+', ' ', txt)
-
-        self.assertIn(
-            stripInnerSpaces(
-                ''' <direction placement="below">
-                        <direction-type>
-                            <wedge number="1" spread="0" type="crescendo" />
-                        </direction-type>
-                        <staff>2</staff>
-                    </direction>'''),
-            stripInnerSpaces(xmlAfterFirstBackup)
-        )
-
-    def testLowVoiceNumbers(self):
-        n = note.Note()
-        v1 = stream.Voice([n])
-        m = stream.Measure([v1])
-        # Unnecessary voice is removed by makeNotation
-        xmlOut = self.getXml(m)
-        self.assertNotIn('<voice>1</voice>', xmlOut)
-        n2 = note.Note()
-        v2 = stream.Voice([n2])
-        m.insert(0, v2)
-        xmlOut = self.getXml(m)
-        self.assertIn('<voice>1</voice>', xmlOut)
-        self.assertIn('<voice>2</voice>', xmlOut)
-        v1.id = 234
-        xmlOut = self.getXml(m)
-        self.assertIn('<voice>234</voice>', xmlOut)
-        self.assertIn('<voice>1</voice>', xmlOut)  # is v2 now!
-        v2.id = 'hello'
-        xmlOut = self.getXml(m)
-        self.assertIn('<voice>hello</voice>', xmlOut)
-
-    def testCompositeLyrics(self):
-        from music21 import converter
-
-        xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
-        fp = xmlDir / '61l-Lyrics-Elisions-Syllables.xml'
-        s = converter.parse(fp)
-        n1 = s[note.NotRest].first()
-        xmlOut = self.getXml(n1)
-        self.assertIn('<lyric name="1" number="1">', xmlOut)
-        self.assertIn('<syllabic>begin</syllabic>', xmlOut)
-        self.assertIn('<text>a</text>', xmlOut)
-
-        tree = self.getET(s)
-        mxLyrics = tree.findall('part/measure/note/lyric')
-        ly0 = mxLyrics[0]
-        self.assertEqual(ly0.get('number'), '1')
-        self.assertEqual(len(ly0), 2)
-        self.assertEqual(ly0[0].tag, 'syllabic')
-        self.assertEqual(ly0[1].tag, 'text')
-        # contents already checked above
-
-        ly1 = mxLyrics[1]
-        self.assertEqual(len(ly1), 5)
-        tags = [child.tag for child in ly1]
-        self.assertEqual(tags, ['syllabic', 'text', 'elision', 'syllabic', 'text'])
-        self.assertEqual(ly1.find('elision').text, ' ')
-        self.assertEqual(ly1.findall('syllabic')[0].text, 'middle')
-        self.assertEqual(ly1.findall('text')[0].text, 'b')
-        self.assertEqual(ly1.findall('syllabic')[1].text, 'middle')
-        self.assertEqual(ly1.findall('text')[1].text, 'c')
-
-        ly2 = mxLyrics[2]
-        self.assertEqual(len(ly2), 5)
-        tags = [child.tag for child in ly2]
-        self.assertEqual(tags, ['syllabic', 'text', 'elision', 'syllabic', 'text'])
-        self.assertIsNone(ly2.find('elision').text)
-        self.assertEqual(ly2.findall('syllabic')[0].text, 'middle')
-        self.assertEqual(ly2.findall('text')[0].text, 'd')
-        self.assertEqual(ly2.findall('syllabic')[1].text, 'end')
-        self.assertEqual(ly2.findall('text')[1].text, 'e')
-
-    def testExportNC(self):
-        s = stream.Score()
-        p = stream.Part()
-        m = stream.Measure()
-        m.append(harmony.ChordSymbol('C'))
-        m.repeatAppend(note.Note('C'), 4)
-        p.append(m)
-        m = stream.Measure()
-        m.append(harmony.NoChord())
-        m.repeatAppend(note.Note('C'), 2)
-        m.append(harmony.ChordSymbol('C'))
-        m.repeatAppend(note.Note('C'), 2)
-        p.append(m)
-        s.append(p)
-
-        self.assertEqual(3, self.getXml(s).count('<harmony'))
-        self.assertEqual(1, self.getXml(s).count('<kind text="N.C.">none</kind>'))
-        self.assertEqual(1, self.getXml(s).count('<root-step text="">'))
-
-        s = stream.Score()
-        p = stream.Part()
-        m = stream.Measure()
-        m.append(harmony.NoChord())
-        m.repeatAppend(note.Note('C'), 2)
-        m.append(harmony.ChordSymbol('C'))
-        m.repeatAppend(note.Note('C'), 2)
-        p.append(m)
-        m = stream.Measure()
-        m.append(harmony.NoChord('No Chord'))
-        m.repeatAppend(note.Note('C'), 2)
-        m.append(harmony.ChordSymbol('C'))
-        m.repeatAppend(note.Note('C'), 2)
-        p.append(m)
-        s.append(p)
-
-        self.assertEqual(1, self.getXml(s).count('<kind text="N.C.">none</kind>'))
-        self.assertEqual(1, self.getXml(s).count('<kind text="No Chord">none</kind>'))
-
-    def testSetPartsAndRefStreamMeasure(self):
-        from music21 import converter
-        p = converter.parse("tinynotation: 4/4 c1 d1")
-        sx = ScoreExporter(p)  # substreams are measures
-        sx.setPartsAndRefStream()
-        measuresAtOffsetZero = [m for m in p if m.offset == 0]
-        self.assertSequenceEqual(measuresAtOffsetZero, p.elements[:1])
-
-    def testFromScoreNoParts(self):
-        '''
-        Badly nested streams should warn but output no gaps.
-        '''
-        s = stream.Score()
-        s.append(meter.TimeSignature('1/4'))
-        s.append(note.Note())
-        s.append(note.Note())
-        gex = GeneralObjectExporter(s)
-
-        with self.assertWarns(MusicXMLWarning) as cm:
-            tree = et_fromstring(gex.parse().decode('utf-8'))
-        self.assertIn(repr(s).split(' 0x')[0], str(cm.warning))
-        self.assertIn(' is not well-formed; see isWellFormedNotation()', str(cm.warning))
-        # The original score with its original address should not
-        # be found in the message because makeNotation=True makes a copy
-        self.assertNotIn(repr(s), str(cm.warning))
-
-        # Assert no gaps in stream
-        self.assertSequenceEqual(tree.findall('.//forward'), [])
-
-    def testFromScoreNoMeasures(self):
-        s = stream.Score()
-        s.append(note.Note())
-        scExporter = ScoreExporter(s)
-        tree = scExporter.parse()
-        # Measures should have been made
-        self.assertIsNotNone(tree.find('.//measure'))
-
-    def testFromSoundingPitch(self):
-        '''
-        A score with mixed sounding and written parts.
-        '''
-        from music21.instrument import Clarinet, Bassoon
-
-        m = stream.Measure([Clarinet(), note.Note('C')])
-        p1 = stream.Part(m)
-        p1.atSoundingPitch = True
-        p2 = stream.Part(stream.Measure([Bassoon(), note.Note()]))
-        s = stream.Score([p1, p2])
-        self.assertEqual(s.atSoundingPitch, 'unknown')
-        gex = GeneralObjectExporter(s)
-        root = et_fromstring(gex.parse().decode('utf-8'))
-        self.assertEqual(len(root.findall('.//transpose')), 1)
-        self.assertEqual(root.find('.//step').text, 'D')
-
-        s.atSoundingPitch = True
-        gex = GeneralObjectExporter(s)
-        root = et_fromstring(gex.parse().decode('utf-8'))
-        self.assertEqual(len(root.findall('.//transpose')), 1)
-        self.assertEqual(root.find('.//step').text, 'D')
-
-    def testMultipleInstruments(self):
-        '''
-        This is a score for two woodwind players both doubling on
-        flute and oboe. They both switch to flute and then back to oboe.
-        There are six m21 instruments to represent this, but the
-        <score-instrument> tags need just four, since no
-        musicXML <part> needs two oboes in it, etc., unless
-        there is a patch change/MIDI instrument change.
-        '''
-        p1 = stream.Part([
-            stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
-            stream.Measure([instrument.Flute(), note.Note(type='whole')]),
-            stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
-        ])
-        p2 = stream.Part([
-            stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
-            stream.Measure([instrument.Flute(), note.Note(type='whole')]),
-            stream.Measure([instrument.Oboe(), note.Note(type='whole')]),
-        ])
-        s = stream.Score([p1, p2])
-        scEx = ScoreExporter(s)
-        tree = scEx.parse()
-        self.assertEqual(len(tree.findall('.//score-instrument')), 4)
-        self.assertEqual(len(tree.findall('.//measure/note/instrument')), 6)
-        self.assertEqual(tree.find('.//score-instrument').get('id'),
-                         tree.find('.//measure/note/instrument').get('id'))
-        self.assertNotEqual(tree.find('.//score-instrument').get('id'),
-                            tree.findall('.//measure/note/instrument')[-1].get('id'))
-
-    def testMultipleInstrumentsPiano(self):
-        ps1 = stream.PartStaff([
-            stream.Measure([instrument.ElectricPiano(), note.Note(type='whole')]),
-            stream.Measure([instrument.ElectricOrgan(), note.Note(type='whole')]),
-            stream.Measure([instrument.Piano(), note.Note(type='whole')]),
-        ])
-        ps2 = stream.PartStaff([
-            stream.Measure([instrument.Vocalist(), note.Note(type='whole')]),
-            stream.Measure([note.Note(type='whole')]),
-            stream.Measure([note.Note(type='whole')]),
-        ])
-        sg = layout.StaffGroup([ps1, ps2])
-        s = stream.Score([ps1, ps2, sg])
-        scEx = ScoreExporter(s)
-        tree = scEx.parse()
-
-        self.assertEqual(
-            [el.text for el in tree.findall('.//instrument-name')],
-            ['Electric Piano', 'Voice', 'Electric Organ', 'Piano']
-        )
-        self.assertEqual(len(tree.findall('.//measure/note/instrument')), 6)
-
-    def testMidiInstrumentNoName(self):
-        from music21 import converter
-
-        i = instrument.Instrument()
-        i.midiProgram = 42
-        s = converter.parse('tinyNotation: c1')
-        s.measure(1).insert(i)
-        scExporter = ScoreExporter(s)
-
-        tree = scExporter.parse()
-        mxScoreInstrument = tree.findall('.//score-instrument')[0]
-        mxMidiInstrument = tree.findall('.//midi-instrument')[0]
-        self.assertEqual(mxScoreInstrument.get('id'), mxMidiInstrument.get('id'))
-
-    def testMultiDigitEndingsWrite(self):
-        from music21 import converter
-        from music21.musicxml import testPrimitive
-
-        # Relevant barlines:
-        # Measure 2, left barline: <ending number="1,2" type="start"/>
-        # Measure 2, right barline: <ending number="1,2" type="stop"/>
-        # Measure 3, left barline: <ending number="3" type="start"/>
-        # Measure 3, right barline: <ending number="3" type="stop"/>
-        s = converter.parse(testPrimitive.multiDigitEnding)
-        x = self.getET(s)
-        endings = x.findall('.//ending')
-        self.assertEqual([e.get('number') for e in endings], ['1,2', '1,2', '3', '3'])
-
-        # Check templates also
-        template = s.template()
-        template.makeNotation(inPlace=True)  # not essential, but since getET() skips this
-        x = self.getET(template)
-        endings = x.findall('.//ending')
-        self.assertEqual([e.get('number') for e in endings], ['1,2', '1,2', '3', '3'])
-
-        # m21 represents lack of bracket numbers as 0; musicxml uses ''
-        s.parts[0].getElementsByClass('RepeatBracket').first().number = 0
-        x = self.getET(s)
-        endings = x.findall('.//ending')
-        self.assertEqual([e.get('number') for e in endings], ['', '', '3', '3'])
-
-    def testTextExpressionOffset(self):
-        '''Transfer element offset after calling getTextExpression().'''
-        # https://github.com/cuthbertLab/music21/issues/624
-        from music21 import converter
-        from music21 import repeat
-
-        s = converter.parse('tinynotation: 4/4 c1')
-        c = repeat.Coda()
-        c.useSymbol = False
-        f = repeat.Fine()
-        mm = tempo.MetronomeMark(text='Langsam')
-        mm.placement = 'above'
-        s.measure(1).storeAtEnd([c, f, mm])
-
-        tree = self.getET(s)
-        for offset in tree.findall('.//direction/offset'):
-            self.assertGreater(int(offset.text), 0)
-
-        # Also check position
-        mxDirection = tree.find('part/measure/direction')
-        self.assertEqual(mxDirection.get('placement'), 'above')
-
-    def testFullMeasureRest(self):
-        from music21 import converter
-        s = converter.parse('tinynotation: 9/8 r1')
-        r = s[note.Rest].first()
-        r.quarterLength = 4.5
-        self.assertEqual(r.fullMeasure, 'auto')
-        tree = self.getET(s)
-        # Previously, this 4.5QL rest with a duration.type 'complex'
-        # was split on export into 4.0QL and 0.5QL
-        self.assertEqual(len(tree.findall('.//rest')), 1)
-        rest = tree.find('.//rest')
-        self.assertEqual(rest.get('measure'), 'yes')
-
-    def testArticulationSpecialCases(self):
-        n = note.Note()
-        a = articulations.StringIndication()
-        n.articulations.append(a)
-
-        # Legal values for StringIndication begin at 1
-        self.assertEqual(a.number, 0)
-        # Use GEX to go through wellformed object conversion
-        gex = GeneralObjectExporter(n)
-        tree = et_fromstring(gex.parse().decode('utf-8'))
-        self.assertIsNone(tree.find('.//string'))
-
-    def testMeasurePadding(self):
-        from music21 import converter
-        s = stream.Score([converter.parse('tinyNotation: 4/4 c4')])
-        s[stream.Measure].first().paddingLeft = 2.0
-        s[stream.Measure].first().paddingRight = 1.0
-        tree = self.getET(s)
-        self.assertEqual(len(tree.findall('.//rest')), 0)
-        s[stream.Measure].first().paddingLeft = 1.0
-        tree = self.getET(s)
-        self.assertEqual(len(tree.findall('.//rest')), 1)
-
-    def test_instrumentDoesNotCreateForward(self):
-        '''
-        Instrument tags were causing forward motion in some cases.
-        From Chapter 14, Key Signatures
-
-        This is a transposed score.  Instruments were being extended in duration
-        in the toSoundingPitch and not having their durations restored afterwards
-        leading to Instrument objects being split if the duration was complex
-        '''
-        from music21 import corpus
-        alto = corpus.parse('bach/bwv57.8').parts['Alto']
-        alto.measure(7).timeSignature = meter.TimeSignature('6/8')
-        newAlto = alto.flat.getElementsNotOfClass(meter.TimeSignature).stream()
-        newAlto.insert(0, meter.TimeSignature('2/4'))
-        newAlto.makeMeasures(inPlace=True)
-        newAltoFixed = newAlto.makeNotation()
-        tree = self.getET(newAltoFixed)
-        self.assertTrue(tree.findall('.//note'))
-        self.assertFalse(tree.findall('.//forward'))
-
-    def testOutOfBoundsExpressionDoesNotCreateForward(self):
-        '''
-        A metronome mark at an offset exceeding the bar duration was causing
-        <forward> tags, i.e. hidden rests. Prefer <offset> instead.
-        '''
-        m = stream.Measure()
-        m.append(meter.TimeSignature('1/4'))
-        m.append(note.Rest())
-        m.insert(2, tempo.MetronomeMark('slow', 40))
-
-        gex = GeneralObjectExporter()
-        tree = self.getET(gex.fromGeneralObject(m))
-        self.assertFalse(tree.findall('.//forward'))
-        self.assertEqual(
-            int(tree.findall('.//direction/offset')[0].text),
-            2 * defaults.divisionsPerQuarter)
-
-    def testExportChordSymbolsWithRealizedDurations(self):
-        gex = GeneralObjectExporter()
-
-        def realizeDurationsAndAssertTags(m: stream.Measure, forwardTag=False, offsetTag=False):
-            m = copy.deepcopy(m)
-            harmony.realizeChordSymbolDurations(m)
-            obj = gex.fromGeneralObject(m)
-            tree = self.getET(obj)
-            self.assertIs(bool(tree.findall('.//forward')), forwardTag)
-            self.assertIs(bool(tree.findall('.//offset')), offsetTag)
-
-        # Two consecutive chord symbols, no rests
-        cs1 = harmony.ChordSymbol('C7')
-        cs2 = harmony.ChordSymbol('F7')
-        m = stream.Measure()
-        m.insert(0, cs1)
-        m.insert(2, cs2)
-        realizeDurationsAndAssertTags(m, forwardTag=True, offsetTag=False)
-
-        # Two consecutive chord symbols, rest coinciding with first one
-        r1 = note.Rest(type='half')
-        m.insert(0, r1)
-        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
-
-        # One chord symbol midmeasure, no rests
-        m.remove(cs1)
-        m.remove(r1)
-        realizeDurationsAndAssertTags(m, forwardTag=True, offsetTag=False)
-
-        # One chord symbol midmeasure coinciding with whole note
-        n1 = note.Note(type='whole')
-        m.insert(0, n1)
-        # Need an offset tag to show the -2.0 offset to get from end to midmeasure
-        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=True)
-
-        # One chord symbol at beginning of measure coinciding with whole note
-        m.remove(cs2)
-        m.insert(0, cs1)
-        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
-
-        # One chord symbol at beginning of measure with writeAsChord=True
-        # followed by a half note
-        cs1.writeAsChord = True
-        n1.offset = 2
-        n1.quarterLength = 2
-        realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
-
-    def test_inexpressible_hidden_rests_become_forward_tags(self):
-        """Express hidden rests with inexpressible durations as <forward> tags."""
-        m = stream.Measure()
-        # 7 eighths in the space of 4 eighths, imported as 137/480
-        # (137/480) * 7 = 1.9979, not 2.0
-        # music21 filled gap with an inexpressible 0.0021 rest and couldn't export
-        septuplet = note.Note(type='eighth')
-        tuplet_obj = duration.Tuplet(7, 4, 'eighth')
-        septuplet.duration.appendTuplet(tuplet_obj)
-        septuplet.duration.linked = False
-        septuplet.quarterLength = fractions.Fraction(137, 480)
-        m.repeatAppend(septuplet, 7)
-        # leave 0.0021 gap and do the same thing from 2.0 -> 3.9979
-        m.repeatInsert(septuplet, [2.0])
-        m.repeatAppend(septuplet, 6)
-        m.insert(0, meter.TimeSignature('4/4'))
-        m.makeRests(inPlace=True, fillGaps=True, hideRests=True, timeRangeFromBarDuration=True)
-        self.assertLess(m[note.Rest].first().quarterLength, 0.0025)
-        gex = GeneralObjectExporter()
-        tree = self.getET(gex.fromGeneralObject(m))
-        # Only one <forward> tag to get from 1.9979 -> 2.0
-        # No <forward> tag is necessary to finish the incomplete measure (3.9979 -> 4.0)
-        self.assertEqual(len(tree.findall('.//forward')), 1)
-
-
-class TestExternal(unittest.TestCase):
-    show = True
-
-    def testSimple(self):
-        from music21 import corpus
-        import difflib
-
-        # b = converter.parse(corpus.corpora.CoreCorpus().getWorkList('cpebach')[0],
-        #    format='musicxml', forceSource=True)
-        b = corpus.parse('cpebach')
-        # b.show('text')
-        # n = b[note.NotRest].first()
-        # print(n.expressions)
-        # return
-
-        SX = ScoreExporter(b)
-        mxScore = SX.parse()
-
-        helpers.indent(mxScore)
-
-        sio = io.BytesIO()
-
-        sio.write(SX.xmlHeader())
-
-        et = ElementTree(mxScore)
-        et.write(sio, encoding='utf-8', xml_declaration=False)
-        v = sio.getvalue()
-        sio.close()
-
-        v = v.decode('utf-8')
-        # v = v.replace(' />', '/>')  # normalize
-
-        # b2 = converter.parse(v)
-        fp = b.write('musicxml')
-        if self.show:
-            print(fp)
-
-        with io.open(fp, encoding='utf-8') as f:
-            v2 = f.read()
-        differ = list(difflib.ndiff(v.splitlines(), v2.splitlines()))
-        for i, l in enumerate(differ):
-            if l.startswith('-') or l.startswith('?') or l.startswith('+'):
-                if 'id=' in l:
-                    continue
-                if self.show:
-                    print(l)
-                    # for j in range(i - 1,i + 1):
-                    #    print(differ[j])
-                    # print('------------------')
-        import os
-        os.remove(fp)
-
+# unittests moved to test_m21ToXml
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testExceptionMessage')
+    music21.mainTest()  # doctests only

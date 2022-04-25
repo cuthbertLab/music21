@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         possibility.py
-# Purpose:      music21 class to define rule checking methods for a possibility
-#                represented as a tuple.
+# Purpose:      rule checking methods for a possibility represented as a tuple.
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
@@ -12,7 +11,7 @@
 A possibility is a tuple with pitches, and is intended to encapsulate a possible
 solution to a :class:`~music21.figuredBass.segment.Segment`. Unlike a :class:`~music21.chord.Chord`,
 the ordering of a possibility does matter. The assumption throughout fbRealizer
-is that a possibility is always in order from highest part to lowest part, and
+is that a possibility is always in order from the highest part to the lowest part, and
 the last element of each possibility is the bass.
 
 
@@ -83,7 +82,7 @@ from music21 import voiceLeading
 def voiceCrossing(possibA):
     '''
     Returns True if there is voice crossing present between any two parts
-    in possibA. The parts from lowest part to highest part (right to left)
+    in possibA. The parts from the lowest part to the highest part (right to left)
     must correspond to increasingly higher pitches in order for there to
     be no voice crossing. Comparisons between pitches are done using pitch
     comparison methods, which are based on pitch space values
@@ -662,18 +661,17 @@ def voiceOverlap(possibA, possibB):
 
 
 def partMovementsWithinLimits(possibA, possibB, partMovementLimits=None):
+    # noinspection PyShadowingNames
     '''
     Returns True if all movements between shared parts of possibA and possibB
     are within limits, as specified by list partMovementLimits, which consists of
     (partNumber, maxSeparation) tuples.
-
 
     * partNumber: Specified from 1 to n, where 1 is the soprano or
       highest part and n is the bass or lowest part.
 
     * maxSeparation: For a given part, the maximum separation to allow
       between a pitch in possibA and a corresponding pitch in possibB, in semitones.
-
 
     >>> from music21 import pitch
     >>> from music21.figuredBass import possibility
@@ -686,13 +684,11 @@ def partMovementsWithinLimits(possibA, possibB, partMovementLimits=None):
     >>> B4 = pitch.Pitch('B4')
     >>> C5 = pitch.Pitch('C5')
 
-
     Here, we limit the soprano part to motion of two semitones,
     enharmonically equivalent to a major second.
     Moving from C5 to B4 is allowed because it constitutes stepwise
     motion, but moving to A4 is not allowed
     because the distance between A4 and C5 is three semitones.
-
 
     >>> partMovementLimits = [(1, 2)]
     >>> possibA1 = (C5, G4, E4, C4)
@@ -813,7 +809,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
 
 
     A PossibilityException is raised if possibA is not an Italian A6 chord, but this only
-    applies only if threePartChordInfo = None, because otherwise the chord information is
+    applies if `threePartChordInfo=None`, because otherwise the chord information is
     coming from :class:`~music21.figuredBass.segment.Segment` and the fact that possibA is
     an It+6 chord is assumed.
 
@@ -877,7 +873,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             if not (pitchA.ps - pitchB.ps) == 1.0:
                 return False
             i = interval.Interval(pitchA, pitchB)
-            if not i.directedName == 'm-2':
+            if i.directedName != 'm-2':
                 return False
         elif pitchA.name == root.name:
             if rootResolved and restrictDoublings:
@@ -886,7 +882,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             if not (pitchB.ps - pitchA.ps) == 1.0:
                 return False
             i = interval.Interval(pitchA, pitchB)
-            if not i.directedName == 'm2':
+            if i.directedName != 'm2':
                 return False
             rootResolved = True
         elif pitchA.name == third.name:
@@ -896,7 +892,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             if not (pitchA.ps - pitchB.ps) == 1.0:
                 return False
             i = interval.Interval(pitchA, pitchB)
-            if not i.directedName == 'm-2':
+            if i.directedName != 'm-2':
                 return False
 
 #     # Part 1: Check if possibA is A6 chord, and if it is properly formed.
@@ -992,7 +988,7 @@ consequentPossibilityMethods = [parallelFifths, parallelOctaves,
                                 couldBeItalianA6Resolution]
 # consequentPossibilityMethods.sort(None, lambda x: x.__name__)
 
-_DOC_ORDER = singlePossibilityMethods + [partPairs] + consequentPossibilityMethods
+_DOC_ORDER = [*singlePossibilityMethods, partPairs, *consequentPossibilityMethods]
 
 
 class PossibilityException(exceptions21.Music21Exception):

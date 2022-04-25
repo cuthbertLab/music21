@@ -180,7 +180,17 @@ def measureNumberComesBefore(mNum1: str, mNum2: str) -> bool:
         return m1Suffix is sortedSuffixes[0]
 
 
+def isFullMeasureRest(r: 'music21.note.Rest') -> bool:
+    isFullMeasure = False
+    if r.fullMeasure in (True, 'always'):
+        isFullMeasure = True
+    elif r.fullMeasure == 'auto':
+        tsContext = r.getContextByClass('TimeSignature')
+        if tsContext and tsContext.barDuration.quarterLength == r.duration.quarterLength:
+            isFullMeasure = True
+    return isFullMeasure
+
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
-
+    music21.mainTest()  # doc tests only

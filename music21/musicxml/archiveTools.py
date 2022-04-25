@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009, 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009, 2017, 2022 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -116,7 +116,7 @@ def uncompressMXL(filename: Union[str, pathlib.Path],
     '''
     filename = str(filename)
     if not filename.endswith('.mxl') and strictMxlCheck:
-        return  # not a compressed musicXML file
+        return False  # not a compressed musicXML file
 
     fp: pathlib.Path = common.pathTools.cleanpath(filename, returnPathlib=True)
     environLocal.warn(f"Updating file: {fp}")
@@ -144,10 +144,10 @@ def uncompressMXL(filename: Union[str, pathlib.Path],
                         wrongName.rename(correctName)
                         found_one_file = True
 
-
     # Delete uncompressed xml file from system
     if deleteOriginal:
         fp.unlink()
+    return True
 
 
 if __name__ == '__main__':

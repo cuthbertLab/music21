@@ -496,9 +496,10 @@ class ChoraleListRKBWV:
     Note that multiple chorales share the same title, so it's best to
     iterate over one of the other lists to get them all.
 
-    The list of chorales comes from http://www.jsbchorales.net/ which contains
-    all chorales in the corpus, but which only has numbers for the kalmus,
-    riemenschneider, and bwv numbering systems.
+    The list of chorales comes from Margaret Greentree (formerly at
+    jsbchorales.net) who compiled
+    all chorales in the corpus, but only had numbers for the `kalmus`,
+    `riemenschneider`, and `bwv` numbering systems.
 
 
     >>> from music21 import corpus
@@ -1014,7 +1015,7 @@ class Iterator:
     bach/bwv358
     bach/bwv319
 
-    The numberList, which by default includes all chorales in the chosen numberingSystem,
+    The numberList, which, by default, includes all chorales in the chosen numberingSystem,
     can be set like the titleList. In the following example,
     note that the first chorale in the given
     numberList will not be part of the iteration because the

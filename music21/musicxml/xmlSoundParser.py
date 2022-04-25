@@ -5,11 +5,11 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2016-22 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Methods for converting <sound> tag to the many different music21
+Methods for converting <sound> tag to the many music21
 objects that this tag might represent.
 
 Pulled out because xmlToM21 is getting way too big.
@@ -26,5 +26,9 @@ class SoundTagMixin:
         # pylint: disable=unused-variable
         tempoNum = mxSound.get('tempo')  # @UnusedVariable
         dynamicsNum = mxSound.get('dynamics')  # @UnusedVariable
+
+        # TODO: musicxml4: swing: straight or first/second/swing-type, swing-style
+        # TODO: musicxml4: instrument-change: instrument-sound, solo or ensemble or none
+        #                                     virtual-instrument
 
         return soundObjs

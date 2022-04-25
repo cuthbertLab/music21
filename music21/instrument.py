@@ -39,6 +39,7 @@ from music21.tree.trees import OffsetTree
 from music21.exceptions21 import InstrumentException
 
 from music21 import environment
+
 _MOD = 'instrument'
 environLocal = environment.Environment(_MOD)
 
@@ -398,6 +399,7 @@ class ElectricPiano(Piano):
     >>> p.midiProgram
     2
     '''
+
     def __init__(self):
         super().__init__()
 
@@ -758,6 +760,7 @@ class Koto(StringInstrument):
         self.instrumentSound = 'pluck.koto'
         self.midiProgram = 107
 
+
 # ------------------------------------------------------------------------------
 
 
@@ -1011,6 +1014,7 @@ class Shehnai(WoodwindInstrument):
         # another spelling is 'Shehnai'
         self.instrumentSound = 'wind.reed.shenai'
         self.midiProgram = 111
+
 
 # ------------------------------------------------------------------------------
 
@@ -1336,6 +1340,7 @@ class Vibraslap(UnpitchedPercussion):
         self.inGMPercMap = True
         self.percMapPitch = 58
 
+
 # BEN: Standardize Cymbals as plural
 
 
@@ -1547,9 +1552,9 @@ class TomTom(UnpitchedPercussion):
         self.inGMPercMap = True
         self._modifier = 'low floor'
         self._modifierToPercMapPitch = {'low floor': 41, 'high floor': 43, 'low': 45,
-                                         'low-mid': 47, 'high-mid': 48, 'high': 50}
+                                        'low-mid': 47, 'high-mid': 48, 'high': 50}
         self._percMapPitchToModifier = {41: 'low floor', 43: 'high floor', 45: 'low',
-                                         47: 'low-mid', 48: 'high-mid', 50: 'high'}
+                                        47: 'low-mid', 48: 'high-mid', 50: 'high'}
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 
@@ -1660,6 +1665,7 @@ class WindMachine(UnpitchedPercussion):
         # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'effect.wind'
 
+
 # -----------------------------------------------------
 
 
@@ -1739,14 +1745,17 @@ class Choir(Vocalist):
         self.instrumentSound = 'voice.choir'
         self.midiProgram = 52
 
+
 # -----------------------------------------------------
 
 
 class Conductor(Instrument):
     '''Presently used only for tracking the MIDI track containing tempo,
     key signature, and related metadata.'''
+
     def __init__(self):
         super().__init__(instrumentName='Conductor')
+
 
 # -----------------------------------------------------------------------------
 
@@ -1801,6 +1810,7 @@ def ensembleNameBySize(number):
         raise InstrumentException('okay, you are on your own for this one buddy')
     else:
         return ensembleNamesBySize[int(number)]
+
 
 def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
     '''
@@ -2042,6 +2052,7 @@ MIDI_PROGRAM_TO_INSTRUMENT = {
     127: Sampler
 }
 
+
 def instrumentFromMidiProgram(number: int) -> Instrument:
     '''
     Return the instrument with "number" as its assigned MIDI program.
@@ -2072,6 +2083,7 @@ def instrumentFromMidiProgram(number: int) -> Instrument:
             raise TypeError(f'Expected int, got {type(number)}') from e
         raise InstrumentException(f'No instrument found for MIDI program {number}') from e
     return inst
+
 
 def partitionByInstrument(streamObj):
     # noinspection PyShadowingNames
@@ -2288,7 +2300,19 @@ def _combinations(instrumentString):
     return allComb
 
 
-def fromString(instrumentString):
+class SearchLanguage(common.enums.StrEnum):
+    ALL = 'all'
+    ENGLISH = 'english'
+    FRENCH = 'french'
+    GERMAN = 'german'
+    ITALIAN = 'italian'
+    RUSSIAN = 'russian'
+    SPANISH = 'spanish'
+    ABBREVIATION = 'abbreviation'
+
+
+def fromString(instrumentString: str,
+               language: SearchLanguage = SearchLanguage.ALL):
     '''
     Given a string with instrument content (from an orchestral score
     for example), attempts to return an appropriate
@@ -2357,7 +2381,7 @@ def fromString(instrumentString):
     and I'll change this back!
 
 
-    Finally, standard abbreviations are acceptable:
+    Standard abbreviations are acceptable:
 
     >>> t10 = instrument.fromString('Cl in B-flat')
     >>> t10
@@ -2382,46 +2406,67 @@ def fromString(instrumentString):
     >>> instrument.fromString('Choir (Aahs)')
     <music21.instrument.Choir 'Choir (Aahs)'>
 
+
+    By default, this function searches over all stored instrument names.
+    This includes multiple languages as well as the abbreviations
+    (an honorary 'language' for these purposes).
+
+    Alternatively, you can specify the language to search using the `language`
+    argument. (New in v7.3.)
+
+    >>> t12 = instrument.fromString('Klarinette', language='german')
+    >>> t12
+    <music21.instrument.Clarinet 'Klarinette'>
+
+
+    This case works because the name 'Klarinette' is a recognised instrument name in German
+    and appears in the German language list.
+    If you search for a German name like 'Klarinette' on the French list (language='french'),
+    then it won't be found and an InstrumentException will be raised.
+    An InstrumentException is also raised if the specified language is not
+    one of those currently supported:
+    'english', 'french', 'german', 'italian', 'russian', 'spanish', and 'abbreviation'.
+
+    Note that the language string is not case-sensitive, so 'French' is also fine.
+
     '''
-    # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
+
+    language = language.lower()
+    if language not in SearchLanguage:
+        raise InstrumentException(f'Chosen language {language} not currently supported.')
+    sourceDict = getattr(instrumentLookup, language + 'ToClassName')
 
     instrumentStringOrig = instrumentString
     instrumentString = instrumentString.replace('.', ' ')  # sic, before removePunctuation
+    instrumentString = instrumentString.lower()  # previously run on each substring separately
     instrumentString = common.removePunctuation(instrumentString)
     allCombinations = _combinations(instrumentString)
     # First task: Find the best instrument.
-    bestInstClass = None
     bestInstrument = None
     bestName = None
 
     this_module = importlib.import_module('music21.instrument')
     for substring in allCombinations:
-        substring = substring.lower()
         try:
-            if substring in instrumentLookup.bestNameToInstrumentClass:
-                englishName = substring
-            else:
-                englishName = instrumentLookup.allToBestName[substring]
-            className = instrumentLookup.bestNameToInstrumentClass[englishName]
+            className = sourceDict[substring]
             thisInstClass = getattr(this_module, className)
             # In case users have overridden the module and imported more things
             if base.Music21Object not in thisInstClass.__mro__:  # pragma: no cover
                 raise KeyError
             thisInstrument = thisInstClass()
             thisBestName = thisInstrument.bestName().lower()
-            if (bestInstClass is None
+            if (bestInstrument is None
                     or len(thisBestName.split()) >= len(bestName.split())
-                    and not issubclass(bestInstClass, thisInstClass)):
+                    and not isinstance(bestInstrument, thisInstClass)):
                 # priority is also given to same length instruments which fall later
                 # on in the string (i.e. Bb Piccolo Trumpet)
-                bestInstClass = thisInstClass
                 bestInstrument = thisInstrument
                 bestInstrument.instrumentName = instrumentStringOrig
                 bestName = thisBestName
         except KeyError:
             pass
-    if bestInstClass is None:
+    if bestInstrument is None:
         raise InstrumentException(
             f'Could not match string with instrument: {instrumentStringOrig}')
     if bestName not in instrumentLookup.transposition:
@@ -2438,6 +2483,82 @@ def fromString(instrumentString):
         except KeyError:
             pass
     return bestInstrument
+
+
+def _getKeys(classNameString: str,
+             language: SearchLanguage = SearchLanguage.ALL):
+    '''
+    Retrieve the key or keys (variant instrument names)
+    from an instrumentLookup dict, given
+    the language (which instrumentLookup dict) and
+    value (classNameString).
+
+    Returns all relevant keys as a list of strings (empty if no matches).
+    '''
+
+    from music21.languageExcerpts import instrumentLookup
+    sourceDict = getattr(instrumentLookup, language + 'ToClassName')
+
+    returns = []
+    for key, value in sourceDict.items():
+        if classNameString == value:
+            returns.append(key)
+    return returns
+
+
+def getAllNamesForInstrument(instrumentClass: Instrument,
+                             language: SearchLanguage = SearchLanguage.ALL):
+    '''
+    Retrieves all currently stored names for a given instrument.
+
+    The instrumentClass should be a valid music21
+    :class:`~music21.instrument.Instrument`.
+
+    By default, this function searches over all supported languages
+    including instrument name abbreviations (an honorary 'language' for these purposes),
+    and returns a dict with keys for the language tested and values as a list of
+    strings for any names in that language.
+
+    >>> instrument.getAllNamesForInstrument(instrument.Flute())
+    {'english': ['flute', 'flutes', 'transverse flute'],
+    'french': ['flûte', 'flûte traversière', 'flûtes', 'grande flûte'],
+    'german': ['flöte', 'flöten', 'querflöte'],
+    'italian': ['flauti', 'flauto', 'flauto traverso'],
+    'russian': ['fleita'],
+    'spanish': ['flauta', 'flauta de boehm', 'flauta de concierto',
+                'flauta traversa', 'flauta travesera', 'flautas'],
+    'abbreviation': ['fl']}
+
+    Alternatively, you can specify the language to search using the `language`
+    argument.
+
+    >>> instrument.getAllNamesForInstrument(instrument.Flute(), language='german')
+    {'german': ['flöte', 'flöten', 'querflöte']}
+
+    An InstrumentException is raised if the specified language is not
+    one of those currently supported:
+    'english', 'french', 'german', 'italian', 'russian', 'spanish', and 'abbreviation'.
+
+    Note that the language string is not case-sensitive, so 'German' is also fine.
+
+    '''
+
+    language = language.lower()
+    instrumentNameDict = {}
+
+    instrumentClassName = instrumentClass.instrumentName
+
+    if language == SearchLanguage.ALL:
+        for lang in SearchLanguage:
+            if lang is SearchLanguage.ALL:
+                continue  # skip the 'all' combination, handle the languages separately.
+            instrumentNameDict[str(lang)] = _getKeys(instrumentClassName, lang)
+    elif language not in SearchLanguage:
+        raise InstrumentException(f'Chosen language {language} not currently supported.')
+    else:  # one, valid language
+        instrumentNameDict[language] = _getKeys(instrumentClassName, SearchLanguage(language))
+
+    return instrumentNameDict
 
 
 # ------------------------------------------------------------------------------
@@ -2685,13 +2806,54 @@ class Test(unittest.TestCase):
     #     for p in s2.parts:
     #         p.makeRests(fillGaps=True, inPlace=True)
 
+    def testLanguageChoice(self):
+        from music21 import instrument
+
+        # fromString
+
+        testString = 'Klarinette'  # German name
+
+        # Works when language not specified
+        self.assertEqual(instrument.fromString(testString).instrumentName,
+                         testString)
+
+        workingExamples = ['german',  # Works with correct language for the term
+                           'German'  # Not case-sensitive, so 'German' is also fine
+                           ]
+
+        for langStr in workingExamples:
+            instrName = instrument.fromString(testString, language=langStr).instrumentName
+            self.assertEqual(instrName, testString)
+
+        failingExamples = ['french',  # Error when the language doesn't match the term
+                           'finnish'  # Error for unsupported language
+                           ]
+
+        for langStr in failingExamples:
+            self.assertRaises(InstrumentException,
+                              instrument.fromString,
+                              testString,
+                              language=langStr)
+
+        # getAllNamesForInstrument
+
+        inst = instrument.Flute()
+        # Working example
+        self.assertEqual(instrument.getAllNamesForInstrument(inst, language='abbreviation'),
+                         {'abbreviation': ['fl']})
+        # Error for unsupported language
+        self.assertRaises(InstrumentException,
+                          instrument.getAllNamesForInstrument,
+                          inst,
+                          language='finnish')
+
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Instrument]
 
-
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
+
     music21.mainTest(Test)

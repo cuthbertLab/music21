@@ -177,6 +177,7 @@ from typing import Optional, Union, List, Tuple
 from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
 
 from collections import defaultdict
+from copy import deepcopy
 from fractions import Fraction  # for typing
 from uuid import uuid4
 
@@ -3043,7 +3044,7 @@ def _makeBarlines(elem, staves):
             bars = bars[1]
         for eachMeasure in staves.values():
             if isinstance(eachMeasure, stream.Measure):
-                eachMeasure.leftBarline = bars
+                eachMeasure.leftBarline = deepcopy(bars)
 
     if elem.get('right') is not None:
         bars = _barlineFromAttr(elem.get('right'))
@@ -3053,7 +3054,7 @@ def _makeBarlines(elem, staves):
             bars = bars[0]
         for eachMeasure in staves.values():
             if isinstance(eachMeasure, stream.Measure):
-                eachMeasure.rightBarline = bars
+                eachMeasure.rightBarline = deepcopy(bars)
 
     return staves
 
@@ -3289,7 +3290,7 @@ def sectionScoreCore(elem, allPartNs, slurBundle, *,
                 inNextThing[eachN] = []
                 # if we got a left-side barline from the previous measure, use it
                 if nextMeasureLeft is not None:
-                    measureResult[eachN].leftBarline = nextMeasureLeft
+                    measureResult[eachN].leftBarline = deepcopy(nextMeasureLeft)
                 # add this Measure to the Part
                 parsed[eachN].append(measureResult[eachN])
             # if we got a barline for the next <measure>
@@ -3303,8 +3304,13 @@ def sectionScoreCore(elem, allPartNs, slurBundle, *,
             for allPartObject in localResult['all-part objects']:
                 if isinstance(allPartObject, meter.TimeSignature):
                     activeMeter = allPartObject
-                for eachN in allPartNs:
-                    inNextThing[eachN].append(allPartObject)
+                for i, eachN in enumerate(allPartNs):
+                    if i == 0:
+                        to_insert = allPartObject
+                    else:
+                        # a single Music21Object should not exist in multiple parts
+                        to_insert = deepcopy(allPartObject)
+                    inNextThing[eachN].append(to_insert)
             for eachN in allPartNs:
                 if eachN in localResult:
                     for eachObj in localResult[eachN].values():

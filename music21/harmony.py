@@ -3,11 +3,12 @@
 # Name:         harmony.py
 # Purpose:      music21 classes for representing harmonies and chord symbols
 #
-# Authors:      Beth Hadley
+# Authors:      Michael Scott Cuthbert
+#               Beth Hadley
 #               Christopher Ariza
-#               Michael Scott Cuthbert
+#               Jacob Tyler Walls
 #
-# Copyright:    Copyright © 2011-2012, 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2022, Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,7 +20,7 @@ import copy
 import re
 import unittest
 
-from typing import Dict, List, Optional, Tuple, TypeVar
+from typing import Dict, List, Optional, Tuple, TypeVar, Union
 
 from music21 import base
 from music21 import chord
@@ -46,7 +47,7 @@ NCT = TypeVar('NCT', bound='NoChord')
 # Y indicates this chord_type is an official XML chord type
 # N indicates XML does not support this chord type
 # Y : 'some string' indicates XML supports the chord type, but
-#      uses a name different than what I use in this dictionary
+#      uses a name different from what I use in this dictionary
 #      I mostly used XML's nomenclature, but for a few of the sevenths
 #      I just couldn't stand to adopt their names because they aren't consistent
 # sorry, you can't use '-' for minor, cause that's a flat in music21
@@ -143,20 +144,38 @@ class Harmony(chord.Chord):
     score as a chord (with pitches realized) or with just the
     figure (as in Chord Symbols).
 
+    Most users should start with the ChordSymbol class or the RomanNumeral
+    class.  The Harmony object is primarily a base object for defining other
+    sorts of objects:
+
+    >>> c6 = harmony.ChordSymbol('C/E')
+    >>> c6
+    <music21.harmony.ChordSymbol C/E>
+
+    By default, Harmony objects just float above the score and are a sort of
+    analytical object.  To make them also count as pitches in a score, use
+    `writeAsChord=True`
+
+    >>> c6.writeAsChord = True
+    >>> c6
+    <music21.harmony.ChordSymbol C/E: E G C>
+
+    Or individual components can be specified:
+
+    >>> c6_again = harmony.ChordSymbol(root='C', bass='E', kind='major')
+    >>> c6_again
+    <music21.harmony.ChordSymbol C/E>
+
+    It is also possible to instantiate an empty Harmony object and
+    then set components later, but this is an advanced and delicate operation:
+
     >>> h = harmony.ChordSymbol()
     >>> h.root('B-3')
-    >>> h.bass('D')
+    >>> h.bass('D', allow_add=True)
     >>> h.inversion(1, transposeOnSet=False)
     >>> h.addChordStepModification(harmony.ChordStepModification('add', 4))
     >>> h
     <music21.harmony.ChordSymbol B-/D add 4>
-
-    >>> c6 = harmony.ChordSymbol(root='C', bass='E', kind = 'major')
-    >>> c6
-    <music21.harmony.ChordSymbol C/E>
-    >>> c6.writeAsChord = True
-    >>> c6
-    <music21.harmony.ChordSymbol C/E: E G C>
 
     >>> h = harmony.ChordSymbol('C7/E')
     >>> h.root()
@@ -178,8 +197,8 @@ class Harmony(chord.Chord):
     >>> sus.root()
     <music21.pitch.Pitch D3>
 
-    Accepts a keyword 'updatePitches'. By default it
-    is True, but can be set to False to initialize faster if pitches are not needed.
+    Accepts a keyword 'updatePitches'. By default, it
+    is `True`, but can be set to `False` to initialize faster if pitches are not needed.
     '''
     # sort harmony just before notes and chords and other default objects
     classSortOrder = base.Music21Object.classSortOrder - 1
@@ -189,8 +208,8 @@ class Harmony(chord.Chord):
 
     def __init__(self,
                  figure: Optional[str] = None,
-                 root: Optional[pitch.Pitch] = None,
-                 bass: Optional[pitch.Pitch] = None,
+                 root: Union[str, pitch.Pitch, None] = None,
+                 bass: Union[str, pitch.Pitch, None] = None,
                  inversion: Optional[int] = None,
                  updatePitches: bool = True,
                  **keywords
@@ -222,7 +241,7 @@ class Harmony(chord.Chord):
         # assume the bass and root are identical and
         # assign the values accordingly
         if 'bass' not in self._overrides and 'root' in self._overrides:
-            self.bass(self._overrides['root'])
+            self.bass(self._overrides['root'], allow_add=True)
 
         if (updatePitches
                 and self._figure  # == '' or is not None
@@ -264,7 +283,7 @@ class Harmony(chord.Chord):
         '''
         This method must be called twice, once before the pitches
         are rendered, and once after. This is because after the pitches
-        are rendered, the root() and bass() becomes reset by the chord class
+        are rendered, the root() and bass() becomes reset by the chord class,
         but we want the objects to retain their initial root, bass, and inversion.
         '''
         if root and isinstance(root, str):
@@ -274,9 +293,9 @@ class Harmony(chord.Chord):
             self.root(root)
         if bass and isinstance(bass, str):
             bass = common.cleanedFlatNotation(bass)
-            self.bass(pitch.Pitch(bass, octave=3))
+            self.bass(pitch.Pitch(bass, octave=3), allow_add=True)
         elif bass is not None:
-            self.bass(bass)
+            self.bass(bass, allow_add=True)
         if inversion is not None:
             self.inversion(inversion, transposeOnSet=True)
 
@@ -526,9 +545,9 @@ class ChordStepModification(prebase.ProtoM21Object):
     - degree-alter: indicates semitone alteration of degree, positive and
       negative integers only
     - degree-type: add, alter, or subtract
-        - if add: degree-alter is relative to a dominant chord (major and
+        - if `add`: degree-alter is relative to a dominant chord (major and
           perfect intervals except for a minor seventh)
-        - if alter or subtract: degree-alter is relative to degree already in
+        - if `alter` or `subtract`: degree-alter is relative to degree already in
           the chord based on its kind element
 
     >>> hd = harmony.ChordStepModification('add', 4)
@@ -546,11 +565,11 @@ class ChordStepModification(prebase.ProtoM21Object):
     # is a number indicating the degree of the chord (1 for
     # the root, 3 for third, etc). The degree-alter element
     # is like the alter element in notes: 1 for sharp, -1 for
-    # flat, etc. The degree-type element can be add, alter, or
-    # subtract. If the degree-type is alter or subtract, the
+    # flat, etc. The degree-type element can be `add`, `alter`, or
+    # `subtract`. If the degree-type is alter or subtract, the
     # degree-alter is relative to the degree already in the
     # chord based on its kind element. If the degree-type is
-    # add, the degree-alter is relative to a dominant chord
+    # `add`, the degree-alter is relative to a dominant chord
     # (major and perfect intervals except for a minor
     # seventh). The print-object attribute can be used to
     # keep the degree from printing separately when it has
@@ -558,7 +577,7 @@ class ChordStepModification(prebase.ProtoM21Object):
     # the kind element. The plus-minus attribute is used to
     # indicate if plus and minus symbols should be used
     # instead of sharp and flat symbols to display the degree
-    # alteration; it is no by default. The degree-value and
+    # alteration; it is `no` by default. The degree-value and
     # degree-type text attributes specify how the value and
     # type of the degree should be displayed.
     #
@@ -993,7 +1012,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 
     if the algorithm matches the chord, but omissions or subtractions are present,
     the chord symbol attempts to indicate this (although there is no standard way of doing
-    this so the notation might be different than what you're familiar with.
+    this so the notation might be different from what you're familiar with).
 
     An example of using this algorithm for identifying chords "in the wild":
 
@@ -1097,11 +1116,13 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         a '/' if the chord is in an inversion, and the chord's bass
 
     The chord symbol nomenclature is not entirely standardized. There are several
-    different ways to write each Abbreviation
-    For example, an augmented triad might be symbolized with '+' or 'aug'
-    Thus, by default the returned symbol is the first (element 0) in the CHORD_TYPES list
-    For example (Eb minor eleventh chord, second inversion)
-    root + chord-type-str + '/' + bass = 'Ebmin11/Bb'
+    ways to write each abbreviation.
+
+    For example, an augmented triad might be symbolized with '+' or 'aug'.
+    Thus, by default the returned symbol is the first (element 0) in the CHORD_TYPES list.
+    For example (Eb minor eleventh chord, second inversion):
+
+        root + chord-type-str + '/' + bass = 'Ebmin11/Bb'
 
     Users who wish to change these defaults can simply change that
     entry in the CHORD_TYPES dictionary.
@@ -1150,7 +1171,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         to determine if it could be a match for inChord
 
         the corresponding semitones are compared, and if they do not match it is determined
-        whether or not this is a permitted omission, etc.
+        whether this is a permitted omission, etc.
 
         '''
         m = len(givenChordNums)
@@ -1544,7 +1565,7 @@ class ChordSymbol(Harmony):
     >>> cs
     <music21.harmony.ChordSymbol>
     >>> cs.root('E-')
-    >>> cs.bass('B-')
+    >>> cs.bass('B-', allow_add=True)
 
     important: we are not asking for transposition, merely specifying the inversion that
     the chord should be read in (transposeOnSet = False)
@@ -1562,8 +1583,8 @@ class ChordSymbol(Harmony):
 
     def __init__(self,
                  figure=None,
-                 root: Optional[pitch.Pitch] = None,
-                 bass: Optional[pitch.Pitch] = None,
+                 root: Union[pitch.Pitch, str, None] = None,
+                 bass: Union[pitch.Pitch, str, None] = None,
                  inversion: Optional[int] = None,
                  kind='',
                  kindStr='',
@@ -1612,12 +1633,14 @@ class ChordSymbol(Harmony):
     def _adjustPitchesForChordStepModifications(self, pitches):
         '''
         degree-value element: indicates degree in chord, positive integers only
+
         degree-alter: indicates semitone alteration of degree, positive and negative integers only
-        degree-type: add, alter, or subtract
-            if add:
+
+        degree-type: `add`, `alter`, or `subtract`:
+            if `add`:
                 degree-alter is relative to a dominant chord (major and perfect
                 intervals except for a minor seventh)
-            if alter or subtract:
+            if `alter` or `subtract`:
                 degree-alter is relative to degree already in the chord based on its kind element
 
 
@@ -1628,11 +1651,11 @@ class ChordSymbol(Harmony):
         is a number indicating the degree of the chord (1 for
         the root, 3 for third, etc). The degree-alter element
         is like the alter element in notes: 1 for sharp, -1 for
-        flat, etc. The degree-type element can be add, alter, or
-        subtract. If the degree-type is alter or subtract, the
+        flat, etc. The degree-type element can be `add`, `alter`, or
+        `subtract`. If the degree-type is `alter` or `subtract`, the
         degree-alter is relative to the degree already in the
         chord based on its kind element. If the degree-type is
-        add, the degree-alter is relative to a dominant chord
+        `add`, the degree-alter is relative to a dominant chord
         (major and perfect intervals except for a minor
         seventh). The print-object attribute can be used to
         keep the degree from printing separately when it has
@@ -1640,7 +1663,7 @@ class ChordSymbol(Harmony):
         the kind element. The plus-minus attribute is used to
         indicate if plus and minus symbols should be used
         instead of sharp and flat symbols to display the degree
-        alteration; it is no by default. The degree-value and
+        alteration; it is `no` by default. The degree-value and
         degree-type text attributes specify how the value and
         type of the degree should be displayed.
 
@@ -1890,7 +1913,7 @@ class ChordSymbol(Harmony):
             st = st.replace(root, '')
             prelimFigure = prelimFigure.replace(',', '')
         else:
-            m1 = re.match(r'[A-Ga-g][#-]*', prelimFigure)  # match not case sensitive,
+            m1 = re.match(r'[A-Ga-g][#-]*', prelimFigure)  # match not case-sensitive,
             if m1:
                 root = m1.group()
                 # remove the root and bass from the string and any additions/omissions/alterations/
@@ -1903,12 +1926,12 @@ class ChordSymbol(Harmony):
             self.root(pitch.Pitch(root))
 
         # Get optional Bass:
-        m2 = re.search(r'/[A-Ga-g][#-]*', prelimFigure)  # match not case sensitive
+        m2 = re.search(r'/[A-Ga-g][#-]*', prelimFigure)  # match not case-sensitive
         remaining = st
         if m2:
             bass = m2.group()
             bass = bass.replace('/', '')
-            self.bass(bass)
+            self.bass(bass, allow_add=True)
             # remove the root and bass from the string
             remaining = st.replace(m2.group(), '')
 
@@ -2127,7 +2150,7 @@ class ChordSymbol(Harmony):
 
         # set overrides to be pitches in the harmony
         # self._overrides = {}  # JTW: was wiping legit overrides such as root=C from 'C6'
-        self.bass(self.bass())
+        self.bass(self.bass(), allow_add=True)
         self.root(self.root())
 
     # PUBLIC METHODS #
@@ -2414,11 +2437,11 @@ class NoChord(ChordSymbol):
             self._figure = self.chordKindStr
 
     def root(self, newroot=None, *, find=None):
-        # Ignore newroot, and set find to False to always return None
+        # Ignore newroot, and set find to "False" to always return None
         return None
 
-    def bass(self, newbass=None, *, find=None):
-        # Ignore newbass, and set find to False to always return None
+    def bass(self, newbass=None, *, find=None, allow_add=False):
+        # Ignore newbass, and set find to "False" to always return None
         return None
 
     def _parseFigure(self):
@@ -2492,7 +2515,7 @@ def realizeChordSymbolDurations(piece):
 
     If a ChordSymbol object exists followed by many notes, duration represents
     all those notes (how else can the computer know to end the chord? if
-    there's not chord following it other than end the chord at the end of the
+    there's no chord following it other than end the chord at the end of the
     piece?).
 
     >>> s = stream.Score()
@@ -2570,7 +2593,7 @@ class Test(unittest.TestCase):
         from music21 import harmony
         cs = harmony.ChordSymbol()
         cs.root('E-')
-        cs.bass('B-')
+        cs.bass('B-', allow_add=True)
         cs.inversion(2, transposeOnSet=False)
         cs.romanNumeral = 'I64'
         cs.chordKind = 'major'
@@ -2697,13 +2720,15 @@ class Test(unittest.TestCase):
 
 
     def runTestOnChord(self, xmlString, figure, pitches):
-        """
+        '''
         Run a series of tests on the given chord.
 
-        :param xmlString: an XML harmony object
-        :param figure: the equivalent figure representation
-        :param pitches: the list of pitches of the chord
-        """
+        xmlString: an XML harmony object
+
+        figure: the equivalent figure representation
+
+        pitches: the list of pitches of the chord
+        '''
         from xml.etree.ElementTree import fromstring as EL
         from music21 import musicxml
 
