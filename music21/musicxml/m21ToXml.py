@@ -3068,21 +3068,14 @@ class MeasureExporter(XMLExporterBase):
 
         self.currentVoiceId = voiceId
 
-        # Group just notes and rests (GeneralNote) by their offsets so that
-        # <forward> tags (which become hidden rests) only bridge gaps between
-        # notes and rests, and not gaps formed with expressions that can
-        # be represented instead with <offset> tags.
-        # See m. 1 of Weber piece in core corpus
-        general_note_offsets = []
-        for objGroup in OffsetIterator(m, filterList=[lambda n: isinstance(n, note.GeneralNote)]):
-            general_note_offsets.append(m.elementOffset(objGroup[0]))
-        if not general_note_offsets:
-            # fallback if there are no notes or rests: this will capture DaCapo signs, etc
-            general_note_offsets = [0.0]
-        for i, groupOffset in enumerate(general_note_offsets):
+        # group all objects by offsets and then do a different order than normal sort.
+        # that way chord symbols and other 0-width objects appear before notes as much as
+        # possible.
+        for objGroup in OffsetIterator(m):
+            groupOffset = m.elementOffset(objGroup[0])
             amountToMoveForward = int(round(divisions * (groupOffset
                                                              - self.offsetInMeasure)))
-            if amountToMoveForward > 0:
+            if amountToMoveForward > 0 and any(isinstance(obj, note.GeneralNote) for obj in objGroup):
                 # gap in stream between GeneralNote objects: create <forward>
                 mxForward = Element('forward')
                 mxDuration = SubElement(mxForward, 'duration')
@@ -3091,19 +3084,7 @@ class MeasureExporter(XMLExporterBase):
                 self.offsetInMeasure = groupOffset
 
             notesForLater = []
-            is_last_gn_offset = i + 1 == len(general_note_offsets)
-            if is_last_gn_offset:
-                nextGroupOffset = m.highestTime
-            else:
-                nextGroupOffset = general_note_offsets[i + 1]
-            for obj in m.getElementsByOffset(
-                offsetStart=groupOffset,
-                offsetEnd=nextGroupOffset,
-                includeEndBoundary=is_last_gn_offset,
-                mustFinishInSpan=False,
-                mustBeginInSpan=True,
-                includeElementsThatEndAtStart=True,
-            ):
+            for obj in objGroup:
                 # we do all non-note elements (including ChordSymbols)
                 # first before note elements, in musicxml;
                 # that way chord symbols and other 0-width objects appear before

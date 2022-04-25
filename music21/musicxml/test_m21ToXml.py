@@ -456,7 +456,7 @@ class Test(unittest.TestCase):
         self.assertFalse(tree.findall('.//forward'))
         self.assertEqual(
             int(tree.findall('.//direction/offset')[0].text),
-            2 * defaults.divisionsPerQuarter)
+            defaults.divisionsPerQuarter)
 
     def testExportChordSymbolsWithRealizedDurations(self):
         gex = GeneralObjectExporter()
