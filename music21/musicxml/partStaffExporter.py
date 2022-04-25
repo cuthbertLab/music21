@@ -19,6 +19,7 @@ import warnings
 from xml.etree.ElementTree import Element, SubElement, Comment
 
 from music21.common.misc import flattenList
+from music21.common.types import M21ObjType
 from music21.key import KeySignature
 from music21.layout import StaffGroup
 from music21.meter import TimeSignature
@@ -516,13 +517,14 @@ class PartStaffExporterMixin:
         </measure>
         '''
 
-        def isMultiAttribute(m21Class, comparison: str = '__eq__') -> bool:
+        def isMultiAttribute(m21Class: M21ObjType,
+                             comparison: str = '__eq__') -> bool:
             '''
             Return True if any first instance of m21Class in any subsequent staff
             in this StaffGroup does not compare to the first instance of that class
             in the earliest staff where found (not necessarily the first) using `comparison`.
             '''
-            initialM21Instance: Optional[m21Class] = None
+            initialM21Instance: Optional[M21ObjType] = None
             # noinspection PyShadowingNames
             for ps in group:  # ps okay to reuse.
                 if initialM21Instance is None:
@@ -548,7 +550,7 @@ class PartStaffExporterMixin:
             # Initial PartStaff in group: find earliest mxAttributes, set clef #1 and <staves>
             if initialPartStaffRoot is None:
                 initialPartStaffRoot = self.getRootForPartStaff(ps)
-                mxAttributes: Element = initialPartStaffRoot.find('measure/attributes')
+                mxAttributes = initialPartStaffRoot.find('measure/attributes')
                 clef1: Optional[Element] = mxAttributes.find('clef')
                 if clef1 is not None:
                     clef1.set('number', '1')

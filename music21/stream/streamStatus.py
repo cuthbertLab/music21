@@ -150,11 +150,11 @@ class StreamStatus(SlottedObjectMixin):
         >>> s.append(note.Note())
         >>> s.streamStatus.haveTupletBracketsBeenMade() is None
         True
-        >>> n = note.Note(quarterLength=1/3)
-        >>> s.append(n)
+        >>> nTuplet = note.Note(quarterLength=1/3)
+        >>> s.append(nTuplet)
         >>> s.streamStatus.haveTupletBracketsBeenMade()
         False
-        >>> n.duration.tuplets[0].type = 'start'
+        >>> nTuplet.duration.tuplets[0].type = 'start'
         >>> s.streamStatus.haveTupletBracketsBeenMade()
         True
 

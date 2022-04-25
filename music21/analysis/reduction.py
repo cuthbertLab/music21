@@ -22,7 +22,6 @@ import copy
 from music21 import exceptions21
 
 from music21 import chord
-from music21 import clef
 from music21 import common
 from music21 import expressions
 from music21 import instrument
@@ -952,42 +951,42 @@ class Test(unittest.TestCase):
         self.assertEqual(len(match), 3)
         # post.show()
 
-    def testExtractionC(self):
-        from music21 import analysis
-        from music21 import corpus
-        # http://solomonsmusic.net/schenker.htm
-        # shows extracting an Ursatz line
-
-        # BACH pre;ide !, WTC
-
-        src = corpus.parse('bwv846')
-        import warnings
-        with warnings.catch_warnings():  # catch deprecation warning
-            warnings.simplefilter('ignore', category=exceptions21.Music21DeprecationWarning)
-            chords = src.flattenParts().makeChords(minimumWindowSize=4,
-                                        makeRests=False)
-        for c in chords.flatten().notes:
-            c.quarterLength = 4
-        for m in chords.getElementsByClass('Measure'):
-            m.clef = clef.bestClef(m, recurse=True)
-
-        chords.measure(1).notes[0].addLyric('::/p:e/o:5/nf:no/ta:3/g:Ursatz')
-        chords.measure(1).notes[0].addLyric('::/p:c/o:4/nf:no/tb:I')
-
-        chords.measure(24).notes[0].addLyric('::/p:d/o:5/nf:no/ta:2')
-        chords.measure(24).notes[0].addLyric('::/p:g/o:3/nf:no/tb:V')
-
-        chords.measure(30).notes[0].addLyric('::/p:f/o:4/tb:7')
-
-        chords.measure(34).notes[0].addLyric('::/p:c/o:5/nf:no/v:1/ta:1')
-        chords.measure(34).notes[0].addLyric('::/p:g/o:4/nf:no/v:2')
-        chords.measure(34).notes[0].addLyric('::/p:c/o:4/nf:no/v:1/tb:I')
-
-        sr = analysis.reduction.ScoreReduction()
-        sr.chordReduction = chords
-        # sr.score = src
-        unused_post = sr.reduce()
-        # unused_post.show()
+    # def testExtractionC(self):
+    #     from music21 import analysis
+    #     from music21 import corpus
+    #     # http://solomonsmusic.net/schenker.htm
+    #     # shows extracting an Ursatz line
+    #
+    #     # BACH pre;ide !, WTC
+    #
+    #     src = corpus.parse('bwv846')
+    #     import warnings
+    #     with warnings.catch_warnings():  # catch deprecation warning
+    #         warnings.simplefilter('ignore', category=exceptions21.Music21DeprecationWarning)
+    #         chords = src.flattenParts().makeChords(minimumWindowSize=4,
+    #                                     makeRests=False)
+    #     for c in chords.flatten().notes:
+    #         c.quarterLength = 4
+    #     for m in chords.getElementsByClass('Measure'):
+    #         m.clef = clef.bestClef(m, recurse=True)
+    #
+    #     chords.measure(1).notes[0].addLyric('::/p:e/o:5/nf:no/ta:3/g:Ursatz')
+    #     chords.measure(1).notes[0].addLyric('::/p:c/o:4/nf:no/tb:I')
+    #
+    #     chords.measure(24).notes[0].addLyric('::/p:d/o:5/nf:no/ta:2')
+    #     chords.measure(24).notes[0].addLyric('::/p:g/o:3/nf:no/tb:V')
+    #
+    #     chords.measure(30).notes[0].addLyric('::/p:f/o:4/tb:7')
+    #
+    #     chords.measure(34).notes[0].addLyric('::/p:c/o:5/nf:no/v:1/ta:1')
+    #     chords.measure(34).notes[0].addLyric('::/p:g/o:4/nf:no/v:2')
+    #     chords.measure(34).notes[0].addLyric('::/p:c/o:4/nf:no/v:1/tb:I')
+    #
+    #     sr = analysis.reduction.ScoreReduction()
+    #     sr.chordReduction = chords
+    #     # sr.score = src
+    #     unused_post = sr.reduce()
+    #     # unused_post.show()
 
 
     def testExtractionD(self):

@@ -160,11 +160,10 @@ class StreamIterator(prebase.ProtoM21Object):
         self.filters: List[FilterType] = filterList
         self._len = None
         self._matchingElements = None
-
         # keep track of where we are in the parse.
         # esp important for recursive streams...
         if activeInformation is not None:
-            self.activeInformation = activeInformation
+            self.activeInformation: ActiveInformation = activeInformation
         else:
             self.activeInformation: ActiveInformation = {}
             self.updateActiveInformation()

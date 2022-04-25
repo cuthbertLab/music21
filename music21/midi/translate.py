@@ -16,7 +16,7 @@ notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here
 import unittest
 import math
 import copy
-from typing import Optional, List, Tuple, Dict, Union, Any
+from typing import Optional, List, Tuple, Dict, Union, Any, TypeVar, Type
 import warnings
 
 from music21 import chord
@@ -39,6 +39,8 @@ _MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
 PERCUSSION_MAPPER = PercussionMapper()
 
+
+NotRestType = TypeVar('NotRestType', bound=note.NotRest)
 
 # ------------------------------------------------------------------------------
 class TranslateException(exceptions21.Music21Exception):
@@ -208,7 +210,7 @@ def getStartEvents(mt=None, channel=1, instrumentObj=None):
 
     # additional allocation of instruments may happen elsewhere
     # this may lead to two program changes happening at time zero
-    # however, this assures that the program change happens before the
+    # however, this assures that the program change happens before
     # the clearing of the pitch bend data
     if instrumentObj is not None and instrumentObj.midiProgram is not None:
         sub = instrumentToMidiEvents(instrumentObj, includeDeltaTime=True,
@@ -273,15 +275,15 @@ def music21ObjectToMidiFile(
 # ------------------------------------------------------------------------------
 # Notes
 
-def _constructOrUpdateNotRest(
+def _constructOrUpdateNotRestSubclass(
     eOn: 'music21.midi.MidiEvent',
     tOn: int,
     tOff: int,
     ticksPerQuarter: int,
     *,
-    inputM21: Optional[note.NotRest] = None,
-    preferredClass: type = note.Note,
-) -> note.NotRest:
+    inputM21: Optional[NotRestType] = None,
+    preferredClass: Type[NotRestType] = note.Note,
+) -> NotRestType:
     '''
     Construct (or edit the duration of) a NotRest subclass, usually
     a note.Note (or a chord.Chord if provided to `preferredClass`).
@@ -321,8 +323,8 @@ def _constructOrUpdateNotRest(
 def midiEventsToNote(
     eventList,
     ticksPerQuarter=None,
-    inputM21: Optional[note.NotRest] = None,
-) -> Optional[note.NotRest]:
+    inputM21: Optional[NotRestType] = None,
+) -> Optional[NotRestType]:
     # noinspection PyShadowingNames
     '''
     Convert from a list of midi.DeltaTime and midi.MidiEvent objects to a music21 Note.
@@ -425,8 +427,14 @@ def midiEventsToNote(
     else:
         raise TranslateException(f'cannot handle MIDI event list in the form: {eventList!r}')
 
-    nr = _constructOrUpdateNotRest(
-        eOn, tOn, tOff, ticksPerQuarter, inputM21=inputM21, preferredClass=note.Note)
+    nr = _constructOrUpdateNotRestSubclass(
+        eOn,
+        tOn,
+        tOff,
+        ticksPerQuarter,
+        inputM21=inputM21,
+        preferredClass=note.Note
+    )
 
     if isinstance(nr, note.Note):
         nr.pitch.midi = eOn.pitch
@@ -622,7 +630,7 @@ def midiEventsToChord(
     firstOn: Optional['music21.midi.MidiEvent'] = None
     any_channel_10 = False
     # this is a format provided by the Stream conversion of
-    # midi events; it pre groups events for a chord together in nested pairs
+    # midi events; it pre-groups events for a chord together in nested pairs
     # of abs start time and the event object
     if isinstance(eventList, list) and eventList and isinstance(eventList[0], tuple):
         # pairs of pairs
@@ -668,8 +676,14 @@ def midiEventsToChord(
         preferredClass = percussion.PercussionChord
     else:
         preferredClass = chord.Chord
-    c: chord.ChordBase = _constructOrUpdateNotRest(
-        firstOn, tOn, tOff, ticksPerQuarter, inputM21=inputM21, preferredClass=preferredClass)
+    c: chord.ChordBase = _constructOrUpdateNotRestSubclass(
+        firstOn,
+        tOn,
+        tOff,
+        ticksPerQuarter,
+        inputM21=inputM21,
+        preferredClass=preferredClass
+    )
 
     if isinstance(c, percussion.PercussionChord):
         # Construct note.Unpitched objects
@@ -848,12 +862,12 @@ def midiEventsToInstrument(eventList):
     The percussion map will be used if the channel is 10:
 
     >>> me.channel = 10
-    >>> i = midi.translate.midiEventsToInstrument(me)
-    >>> i
+    >>> instrumentObj = midi.translate.midiEventsToInstrument(me)
+    >>> instrumentObj
     <music21.instrument.UnpitchedPercussion 'Percussion'>
-    >>> i.midiChannel  # 0-indexed in music21
+    >>> instrumentObj.midiChannel  # 0-indexed in music21
     9
-    >>> i.midiProgram  # 0-indexed in music21
+    >>> instrumentObj.midiProgram  # 0-indexed in music21
     53
     '''
     from music21 import midi as midiModule
@@ -1135,7 +1149,7 @@ def midiEventsToTempo(eventList):
     return mm
 
 
-def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
+def tempoToMidiEvents(tempoIndication: 'music21.tempo.TempoIndication', includeDeltaTime=True):
     # noinspection PyShadowingNames
     r'''
     Given any TempoIndication, convert it to list of :class:`~music21.midi.MidiEvent`
@@ -1182,7 +1196,7 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     True
     '''
     from music21 import midi as midiModule
-    if tempoIndication.number is None:
+    if not hasattr(tempoIndication, 'number') or tempoIndication.number is None:
         return
     mt = None  # use a midi track set to None
     eventList = []
@@ -1258,7 +1272,7 @@ def getPacketFromMidiEvent(
     # allocate channel later
     # post['channel'] = None
     if midiEvent.type != midiModule.ChannelVoiceMessages.NOTE_OFF and obj is not None:
-        # store duration so as to calculate when the
+        # store duration to calculate when the
         # channel/pitch bend can be freed
         post['duration'] = durationToMidiTicks(obj.duration)
     # note offs will have the same object ref, and seem like the have a
@@ -1337,7 +1351,7 @@ def streamToPackets(
     Then, packets to events is called.
     '''
     from music21 import midi as midiModule
-    # store all events by offset by offset without delta times
+    # store all events by offset without delta times
     # as (absTime, event)
     packetsByOffset = []
     lastInstrument = None
@@ -1380,7 +1394,7 @@ def streamToPackets(
                     lastInstrument=lastInstrument,
                 )
                 elementPackets.append(p)
-            # if its a note_off, use the duration to shift offset
+            # if it is a note_off, use the duration to shift offset
             # midi events have already been created;
             else:
                 p = getPacketFromMidiEvent(
@@ -1506,7 +1520,7 @@ def assignPacketsToChannels(
                     # only add if unique
                     if usedChannel not in channelExclude:
                         channelExclude.append(usedChannel)
-                # or if this event has shift, then we can exclude
+                # or if this event has a shift, then we can exclude
                 # the channel already used without a shift
                 elif centShift:
                     if usedChannel not in channelExclude:
@@ -1595,7 +1609,7 @@ def assignPacketsToChannels(
     # environLocal.printDebug(['foundChannels', foundChannels])
     # environLocal.printDebug(['usedTracks', usedTracks])
 
-    # post processing of entire packet collection
+    # post-processing of entire packet collection
     # for all used channels, create a zero pitch bend at time zero
     # for ch in foundChannels:
     # for each track, places a pitch bend in its initChannel
@@ -1976,7 +1990,7 @@ def midiTrackToStream(
     # collect notes with similar start times into chords
     # create a composite list of both notes and chords
     # composite = []
-    chordSub = None
+    chordSub: Optional[List['music21.midi.MidiEvent']] = None
     i = 0
     iGathered = []  # store a list of indexes of gathered values put into chords
     voicesRequired = False
@@ -2034,7 +2048,7 @@ def midiTrackToStream(
                     # if we can add more elements to this chord group
                 else:  # no more matches; assuming chordSub tones are contiguous
                     break
-            # this comparison must be outside of j loop, as the case where we
+            # this comparison must be outside the j loop, as the case where we
             # have the last note in a list of notes and the j loop does not
             # execute; chordSub will be None
             if chordSub is not None:
@@ -2871,7 +2885,7 @@ def midiFileToStream(
     if 'quantizePost' in keywords:
         quantizePost = keywords.pop('quantizePost')
 
-    # create a stream for each tracks
+    # create a stream for each track
     # may need to check if tracks actually have event data
     midiTracksToStreams(mf.tracks,
                         ticksPerQuarter=mf.ticksPerQuarterNote,

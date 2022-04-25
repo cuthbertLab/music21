@@ -939,12 +939,15 @@ class ChoraleListRKBWV:
 class Iterator:
     # noinspection SpellCheckingInspection
     '''
-    This is a class for iterating over many Bach Chorales. It is designed to make it easier to use
-    one of music21's most accessible datasets. It will parse each chorale in the selected
+    This is a class for iterating over many Bach Chorales. It is designed
+    to make it easier to use
+    one of music21's most accessible datasets. It will parse each chorale
+    in the selected
     range in a lazy fashion so that a list of chorales need not be parsed up front. To select a
     range of chorales, first select a .numberingSystem
     ('riemenschneider', 'bwv', 'kalmus', 'budapest',
-    'baerenreiter', or 'title'). Then, set .currentNumber to the lowest number in the range and
+    'baerenreiter', or 'title'). Then, set .currentNumber to the lowest
+    number in the range and
     .highestNumber to the highest in the range. This can either be done by catalogue number
     (iterationType = 'number') or by index (iterationType = 'index').
 

@@ -20,7 +20,7 @@ can be found in modules such as :ref:`moduleDynamics` (for things such as cresce
 '''
 import unittest
 import copy
-from typing import Any, Dict, Sequence, Union, List, Optional
+from typing import Any, Dict, Sequence, Union, List, Optional, TypedDict
 
 from music21 import exceptions21
 from music21 import base
@@ -220,8 +220,8 @@ class Spanner(base.Music21Object):
         self.spannerStorage = stream.SpannerStorage(spannerParent=self)
 
         # we do not want to auto sort based on offset or class, as
-        # both are meaningless inside of this Stream (and only have meaning
-        # in Stream external to this
+        # both are meaningless inside this Stream (and only have meaning
+        # in Stream external to this)
         self.spannerStorage.autoSort = False
 
         # add arguments as a list or single item
@@ -278,13 +278,16 @@ class Spanner(base.Music21Object):
 
     def __deepcopy__(self, memo=None):
         '''
-        This produces a new, independent object containing references to the same spannedElements.
-        SpannedElements linked in this Spanner must be manually re-set, likely using the
+        This produces a new, independent object containing references
+        to the same spannedElements.
+        SpannedElements linked in this Spanner must be manually re-set,
+        likely using the
         replaceSpannedElement() method.
 
-        Notice that we put the references to the same object so that later we can replace them;
+        Notice that we put the references to the same object so that
+        later we can replace them;
         otherwise in a deepcopy of a stream, the notes in the stream
-        will become independent from the notes in the spanner.
+        will become independent of the notes in the spanner.
 
         >>> import copy
         >>> n1 = note.Note('g')
@@ -403,17 +406,18 @@ class Spanner(base.Music21Object):
         '''
         return [id(n) for n in self.spannerStorage._elements]
 
-    def addSpannedElements(self,
-                           spannedElements: Union[Sequence[base.Music21Object],
-                                                  base.Music21Object],
-                           *arguments,
-                           **keywords):
+    def addSpannedElements(
+        self,
+        spannedElements: Union[Sequence[base.Music21Object],
+                               base.Music21Object],
+        *arguments,
+        **keywords
+    ):
         '''
         Associate one or more elements with this Spanner.
 
         The order in which elements are added is retained and
         may or may not be significant to the spanner.
-
 
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('f#')
@@ -435,7 +439,7 @@ class Spanner(base.Music21Object):
         if arguments:
             # copy
             spannedElements = spannedElements[:]  # type: ignore[index]
-            # assume all other arguments
+            # assume all other arguments are spanners
             spannedElements += arguments  # type: ignore[operator]
         for c in spannedElements:  # type: ignore[union-attr]
             if c is None:
@@ -451,7 +455,7 @@ class Spanner(base.Music21Object):
 
         self.spannerStorage.coreElementsChanged()
 
-    def hasSpannedElement(self, spannedElement):
+    def hasSpannedElement(self, spannedElement: base.Music21Object) -> bool:
         '''
         Return True if this Spanner has the spannedElement.
 
@@ -603,12 +607,17 @@ class Spanner(base.Music21Object):
 
 
 # ------------------------------------------------------------------------------
+class _SpannerRef(TypedDict):
+    # noinspection PyTypedDict
+    spanner: 'Spanner'
+    className: str
+
 class SpannerBundle(prebase.ProtoM21Object):
     '''
     An advanced utility object for collecting and processing
     collections of Spanner objects. This is necessary because
     often processing routines that happen at many different
-    levels need access to the same collection of spanners.
+    levels still need access to the same collection of spanners.
 
     Because SpannerBundles are so commonly used with
     :class:`~music21.stream.Stream` objects, the Stream has a
@@ -621,10 +630,9 @@ class SpannerBundle(prebase.ProtoM21Object):
     Not to be confused with SpannerStorage (which is a Stream class inside
     a spanner that stores Elements that are spanned)
 
-    Changed in v7: only argument must be a List of spanners.  Creators of SpannerBundles
-    are required to check that this constraint is True
+    Changed in v7: only argument must be a List of spanners.
+    Creators of SpannerBundles are required to check that this constraint is True
     '''
-
     def __init__(self, spanners: Optional[List[Spanner]] = None):
         self._cache: Dict[str, Any] = {}  # cache is defined on Music21Object not ProtoM21Object
 
@@ -638,7 +646,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         # SpannerBundle as missing a spannedElement; the next obj that meets
         # the class expectation will then be assigned and the spannedElement
         # cleared
-        self._pendingSpannedElementAssignment: List[Dict[Spanner, str]] = []
+        self._pendingSpannedElementAssignment: List[_SpannerRef] = []
 
     def append(self, other):
         '''
@@ -794,7 +802,11 @@ class SpannerBundle(prebase.ProtoM21Object):
             self._cache[cacheKey] = post
         return self._cache[cacheKey]
 
-    def replaceSpannedElement(self, old, new):
+    def replaceSpannedElement(
+        self,
+        old: base.Music21Object,
+        new: base.Music21Object
+    ) -> List[Spanner]:
         # noinspection PyShadowingNames
         '''
         Given a spanner spannedElement (an object), replace all old spannedElements
@@ -834,13 +846,10 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         >>> sb.replaceSpannedElement(id(n1), n2)
         Traceback (most recent call last):
-        TypeError: send elements to replaceSpannedElement(), not ids (deprecated)
+        TypeError: send elements to replaceSpannedElement(), not ids.
         '''
-        # environLocal.printDebug(['SpannerBundle.replaceSpannedElement()', 'old', old,
-        #    'new', new, 'len(self._storage)', len(self._storage)])
-        # TODO: remove in v.8 for speed?
         if isinstance(old, int):
-            raise TypeError('send elements to replaceSpannedElement(), not ids (deprecated)')
+            raise TypeError('send elements to replaceSpannedElement(), not ids.')
 
         replacedSpanners = []
         # post = self.__class__()  # return a bundle of spanners that had changes
@@ -864,7 +873,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         return replacedSpanners
 
-    def getByClass(self, className):
+    def getByClass(self, className: Union[str, type]) -> 'SpannerBundle':
         '''
         Given a spanner class, return a new SpannerBundle of all Spanners of the desired class.
 
@@ -947,19 +956,21 @@ class SpannerBundle(prebase.ProtoM21Object):
     def setIdLocals(self):
         # noinspection PyShadowingNames
         '''
-        Utility method for outputting MusicXML (and potentially other formats) for spanners.
+        Utility method for outputting MusicXML (and potentially
+        other formats) for spanners.
 
-        Each Spanner type (slur, line, glissando, etc.) in MusicXML has a number assigned to it.
-        We call this number, `idLocal`.  idLocal is a number from 1 to 6.  This does not mean
-        that your piece can only have six slurs total!  But it does mean that within a single
-        part, only up to 6 slurs can happen simultaneously.  But as soon as a slur stops, its
-        idLocal can be reused.
+        Each Spanner type (slur, line, glissando, etc.) in MusicXML
+        has a number assigned to it.
+        We call this number, `idLocal`.  idLocal is a number from 1 to 6.
+        This does not mean that your piece can only have six slurs total!
+        But it does mean that within a single
+        part, only up to 6 slurs can happen simultaneously.
+        But as soon as a slur stops, its idLocal can be reused.
 
         This method sets all idLocals for all classes in this SpannerBundle.
         This will assure that each class has a unique idLocal number.
 
         Calling this method is destructive: existing idLocal values will be lost.
-
 
         >>> su1 = spanner.Slur()
         >>> su2 = layout.StaffGroup()
@@ -977,7 +988,8 @@ class SpannerBundle(prebase.ProtoM21Object):
          (<music21.spanner.Slur>, 2)]
 
         :class:`~music21.dynamics.DynamicWedge` objects are commingled. That is,
-        :class:`~music21.dynamics.Crescendo` and :class:`~music21.dynamics.Diminuendo`
+        :class:`~music21.dynamics.Crescendo` and
+        :class:`~music21.dynamics.Diminuendo`
         are not numbered separately:
 
         >>> sb2 = spanner.SpannerBundle()
@@ -1023,7 +1035,11 @@ class SpannerBundle(prebase.ProtoM21Object):
         return self.getByClass(className).getByIdLocal(
             idLocal).getByCompleteStatus(completeStatus)
 
-    def setPendingSpannedElementAssignment(self, sp, className):
+    def setPendingSpannedElementAssignment(
+        self,
+        sp: Spanner,
+        className: str,
+    ):
         '''
         A SpannerBundle can be set up so that a particular spanner (sp)
         is looking for an element of class (className) to complete it. Any future
@@ -1075,7 +1091,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         []
 
         '''
-        ref = {'spanner': sp, 'className': className}
+        ref: _SpannerRef = {'spanner': sp, 'className': className}
         self._pendingSpannedElementAssignment.append(ref)
 
     def freePendingSpannedElementAssignment(self, spannedElementCandidate):
@@ -1517,7 +1533,7 @@ class Ottava(Spanner):
         '''
         Returns up or down depending on the type of shift:
         '''
-        # an 8va means that the notes must be shifted down with the mark
+        # an 8va mark means that the notes must be shifted down with the mark
         if self._type.endswith('a'):
             if reverse:
                 return 'down'

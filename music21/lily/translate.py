@@ -851,7 +851,7 @@ class LilypondConverter:
         self,
         streamIn,
         contextType=None,
-        type=None,  # @ReservedAssignment
+        type=None,
         beforeMatter=None
     ):
         # noinspection PyShadowingNames
@@ -2421,7 +2421,7 @@ class LilypondConverter:
         return self.tempName
 
     # noinspection PyShadowingBuiltins
-    def runThroughLily(self, format=None,  # @ReservedAssignment
+    def runThroughLily(self, format=None,
                        backend=None, fileName=None, skipWriting=False):
         r'''
         creates a .ly file from self.topLevelObject via .writeLyFile

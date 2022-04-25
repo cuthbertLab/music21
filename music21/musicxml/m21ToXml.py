@@ -2389,11 +2389,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         <supports attribute="new-page" element="print" type="yes" value="yes" />
 
         '''
-        # pylint: disable=redefined-builtin
-        def getSupport(attribute, type, value, element):  # @ReservedAssignment
+        def getSupport(attribute, supports_type, value, element):
             su = Element('supports')
             su.set('attribute', attribute)
-            su.set('type', type)
+            su.set('type', supports_type)
             su.set('value', value)
             su.set('element', element)
             return su

@@ -55,7 +55,7 @@ def runParallel(iterable, parallelFunction, *,
     ...     c = corpus.parse(fn)  # this is the slow call that is good to parallelize
     ...     return len(c.recurse().notes)
     >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes)
-    >>> outputs = common.runNonParallel(files, countNotes) #_DOCS_HIDE cant pickle doctest funcs.
+    >>> outputs = common.runNonParallel(files, countNotes) #_DOCS_HIDE cannot pickle doctest funcs.
     >>> outputs
     [165, 50, 131]
 

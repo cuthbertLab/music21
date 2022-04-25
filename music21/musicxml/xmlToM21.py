@@ -4260,7 +4260,7 @@ class MeasureParser(XMLParserBase):
         remainingTupletAmountToAccountFor = t.tupletMultiplier()
         timeModTup = t
 
-        returnTuplets = [None] * 8  # type: List[Optional['music21.duration.Tuplet']]
+        returnTuplets: List[Optional[duration.Tuplet]] = [None] * 8
         removeFromActiveTuplets = set()
 
         # a set of tuplets to set to stop...

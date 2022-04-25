@@ -271,7 +271,7 @@ def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave=True):
     '''
     transcribe a group of notes, possibly excluding certain attributes.
 
-    To be DEPRECATED -- called only be BrailleGrandSegment now.
+    To be DEPRECATED -- called only by BrailleGrandSegment now.
     '''
     ngt = NoteGroupingTranscriber()
     ngt.showLeadingOctave = showLeadingOctave

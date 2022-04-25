@@ -46,15 +46,17 @@ Example usage:
 2
 '''
 
+from collections import namedtuple
 import contextlib
 import copy
 import fractions
+from functools import lru_cache
 import io
-import unittest
 from math import inf, isnan
-from typing import Union, Tuple, Dict, List, Optional, Iterable, Literal
+from typing import (Union, Tuple, Dict, List, Optional,
+                    Iterable, Literal, Type, Callable)
+import unittest
 
-from collections import namedtuple
 
 from music21 import prebase
 
@@ -478,8 +480,8 @@ def quarterLengthToTuplet(
             # try multiples of the tuplet division, from 1 to max - 1
             for m in range(1, i):
                 for numberOfDots in POSSIBLE_DOTS_IN_TUPLETS:
-                    tupletMultiplier = fractions.Fraction(common.dotMultiplier(numberOfDots))
-                    qLenCandidate = qLenBase * m * tupletMultiplier
+                    tupletMultiplier = common.dotMultiplier(numberOfDots)
+                    qLenCandidate = opFrac(qLenBase * m * tupletMultiplier)
                     if qLenCandidate == qLen:
                         tupletDuration = durationTupleFromTypeDots(typeKey, numberOfDots)
                         newTuplet = Tuplet(numberNotesActual=i,
@@ -488,8 +490,8 @@ def quarterLengthToTuplet(
                                            durationNormal=tupletDuration,)
                         post.append(newTuplet)
                         break
-        # not looking for these matches will add tuple alternative
-        # representations; this could be useful
+            # not looking for these matches will add tuple alternative
+            # representations; this could be useful
             if len(post) >= maxToReturn:
                 break
         if len(post) >= maxToReturn:
@@ -813,48 +815,37 @@ def convertTypeToNumber(dType: str) -> float:
 
 
 # -----------------------------------------------------------------------------------
-DurationTuple = namedtuple('DurationTuple', 'type dots quarterLength')
+class DurationTuple(namedtuple('DurationTuple', 'type dots quarterLength')):
+    def augmentOrDiminish(self, amountToScale):
+        return durationTupleFromQuarterLength(self.quarterLength * amountToScale)
 
+    @property
+    def ordinal(self):
+        '''
+        Converts type to an ordinal number where maxima = 1 and 1024th = 14;
+        whole = 4 and quarter = 6.  Based on duration.ordinalTypeFromNum
 
-def _augmentOrDiminishTuple(self, amountToScale):
-    return durationTupleFromQuarterLength(self.quarterLength * amountToScale)
+        >>> a = duration.DurationTuple('whole', 0, 4.0)
+        >>> a.ordinal
+        4
 
+        >>> b = duration.DurationTuple('maxima', 0, 32.0)
+        >>> b.ordinal
+        1
 
-DurationTuple.augmentOrDiminish = _augmentOrDiminishTuple  # type: ignore[attr-defined]
-
-
-del _augmentOrDiminishTuple
-
-
-def _durationTupleOrdinal(self):
-    '''
-    Converts type to an ordinal number where maxima = 1 and 1024th = 14;
-    whole = 4 and quarter = 6.  Based on duration.ordinalTypeFromNum
-
-    >>> a = duration.DurationTuple('whole', 0, 4.0)
-    >>> a.ordinal
-    4
-
-    >>> b = duration.DurationTuple('maxima', 0, 32.0)
-    >>> b.ordinal
-    1
-
-    >>> c = duration.DurationTuple('1024th', 0, 1/256)
-    >>> c.ordinal
-    14
-    '''
-    ordinalFound = None
-    for i in range(len(ordinalTypeFromNum)):
-        if self.type == ordinalTypeFromNum[i]:
-            ordinalFound = i
-            break
-    if ordinalFound is None:
-        raise DurationException(
-            f'Could not determine durationNumber from {ordinalFound}')
-    return ordinalFound
-
-
-DurationTuple.ordinal = property(_durationTupleOrdinal)  # type: ignore[attr-defined]
+        >>> c = duration.DurationTuple('1024th', 0, 1/256)
+        >>> c.ordinal
+        14
+        '''
+        ordinalFound = None
+        for i in range(len(ordinalTypeFromNum)):
+            if self.type == ordinalTypeFromNum[i]:
+                ordinalFound = i
+                break
+        if ordinalFound is None:
+            raise DurationException(
+                f'Could not determine durationNumber from {ordinalFound}')
+        return ordinalFound
 
 
 _durationTupleCacheTypeDots: Dict[Tuple[str, int], DurationTuple] = {}
@@ -891,6 +882,7 @@ def durationTupleFromQuarterLength(ql=1.0) -> DurationTuple:
             return DurationTuple('inexpressible', 0, ql)
 
 
+@lru_cache(1024)
 def durationTupleFromTypeDots(durType='quarter', dots=0):
     '''
     Returns a DurationTuple (which knows its quarterLength) for
@@ -2183,19 +2175,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             # some notations will not properly unlink, and raise an error
             self.components = [dur]
 
-    @common.deprecated('v7', 'v8', 'Was intended for testing only')
-    def fill(self, quarterLengthList=('quarter', 'half', 'quarter')):  # pragma: no cover
-        '''
-        Utility method for testing; a quick way to fill components. This will
-        remove any existing values.
-
-        Deprecated in v7.
-        '''
-        self.components = []
-        for x in quarterLengthList:
-            self.addDurationTuple(Duration(x))
-        self.informClient()
-
     def getGraceDuration(
         self,
         appoggiatura=False
@@ -2245,7 +2224,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             if c_type == 'zero':
                 c_type = 'eighth'
             newComponents.append(DurationTuple(c.type, c.dots, 0.0))
-        gd.components = newComponents  # set new components
+        gd.components = tuple(newComponents)  # set new components
         gd.linked = False
         gd.type = new_type
         gd.quarterLength = 0.0
@@ -2448,7 +2427,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     # PUBLIC PROPERTIES #
     @property
-    def components(self):
+    def components(self) -> Tuple[DurationTuple, ...]:
         '''
         Returns or sets a tuple of the component DurationTuples of this
         Duration object
@@ -2988,7 +2967,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         if self.linked is True:
             nt = durationTupleFromTypeDots(value, self.dots)
-            self.components = [nt]
+            self.components = (nt,)
             self._quarterLengthNeedsUpdating = True
             self.expressionIsInferred = False
             self.informClient()
@@ -3094,7 +3073,7 @@ class GraceDuration(Duration):
         return self._makeTime
 
     @makeTime.setter
-    def makeTime(self, expr):
+    def makeTime(self, expr: Literal[True, False, None]):
         if expr not in (True, False, None):
             raise ValueError('expr must be True, False, or None')
         self._makeTime = bool(expr)
@@ -3844,7 +3823,9 @@ class Test(unittest.TestCase):
 
 # -------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Duration, Tuplet, convertQuarterLengthToType, TupletFixer]
+_DOC_ORDER: List[Union[Type, Callable]] = [
+    Duration, Tuplet, GraceDuration, convertQuarterLengthToType, TupletFixer,
+]
 
 
 if __name__ == '__main__':
