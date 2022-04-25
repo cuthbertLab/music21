@@ -267,8 +267,8 @@ class State:
     >>> ts.autoExpires
     2
     '''
-    # TODO in Python 3.8+: typing.Union[typing.Literal[False], int]
-    autoExpires: typing.Union[bool, int] = False  # expires after N tokens or never.
+    # expires after N tokens or never.
+    autoExpires: typing.Union[typing.Literal[False], int] = False
 
     def __init__(self, parent=None, stateInfo=None):
         self.affectedTokens = []
@@ -336,7 +336,7 @@ class TieState(State):
             self.affectedTokens[0].tie = tie.Tie('start')
         else:
             self.affectedTokens[0].tie.type = 'continue'
-        if len(self.affectedTokens) > 1:  # could be end.
+        if len(self.affectedTokens) > 1:  # could be the end.
             self.affectedTokens[1].tie = tie.Tie('stop')
 
 
@@ -391,7 +391,7 @@ class QuadrupletState(TupletState):
 class Modifier:
     '''
     a modifier is something that changes the current
-    token, like setting the Id or Lyric.
+    token, like setting the `.id` or Lyric.
     '''
 
     def __init__(self, modifierData, modifierString, parent):
@@ -1437,6 +1437,8 @@ class Test(unittest.TestCase):
                     + f'{tokenType.__class__.__name__}.'
                 )
             )
+
+            # noinspection PyTypeChecker
             validTokenTypeCounts[tokenType] += 1
             self.assertGreater(
                 len(regex),

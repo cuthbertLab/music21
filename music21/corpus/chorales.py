@@ -1015,7 +1015,7 @@ class Iterator:
     bach/bwv358
     bach/bwv319
 
-    The numberList, which by default includes all chorales in the chosen numberingSystem,
+    The numberList, which, by default, includes all chorales in the chosen numberingSystem,
     can be set like the titleList. In the following example,
     note that the first chorale in the given
     numberList will not be part of the iteration because the

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         realizer.py
-# Purpose:      music21 class to define a figured bass line, consisting of notes
+# Purpose:      figured bass lines, consisting of notes
 #                and figures in a given key.
 # Authors:      Jose Cabal-Ugaz
 #
@@ -66,6 +66,7 @@ _MOD = 'figuredBass.realizer'
 
 
 def figuredBassFromStream(streamPart):
+    # noinspection PyShadowingNames
     '''
     Takes a :class:`~music21.stream.Part` (or another :class:`~music21.stream.Stream` subclass)
     and returns a :class:`~music21.figuredBass.realizer.FiguredBassLine` object whose bass notes
@@ -117,6 +118,7 @@ def figuredBassFromStream(streamPart):
         if paddingLeft != 0.0:
             fb._paddingLeft = paddingLeft
 
+    # noinspection PyShadowingNames
     def updateAnnotationString(annotationString: str, inputText: str) -> str:
         '''
         Continue building the working `annotationString` based on some `inputText`
@@ -238,7 +240,7 @@ class FiguredBassLine:
         self._fbScale = realizerScale.FiguredBassScale(inKey.pitchFromDegree(1), inKey.mode)
         self._fbList = []
 
-    def addElement(self, bassObject, notationString=None):
+    def addElement(self, bassObject: note.Note, notationString=None):
         '''
         Use this method to add (bassNote, notationString) pairs to the bass line. Elements
         are realized in the order they are added.
@@ -258,6 +260,7 @@ class FiguredBassLine:
             :width: 200
 
         OMIT_FROM_DOCS
+
         >>> fbLine = realizer.FiguredBassLine(key.Key('C'), meter.TimeSignature('4/4'))
         >>> fbLine.addElement(harmony.ChordSymbol('C'))
         >>> fbLine.addElement(harmony.ChordSymbol('G'))
@@ -266,7 +269,7 @@ class FiguredBassLine:
         >>> fbLine.addElement(roman.RomanNumeral('I'))
         >>> fbLine.addElement(roman.RomanNumeral('V'))
         '''
-        bassObject.notationString = notationString
+        bassObject.editorial.notationString = notationString
         c = bassObject.classes
         if 'Note' in c:
             self._fbList.append((bassObject, notationString))  # a bass note, and a notationString
@@ -358,7 +361,7 @@ class FiguredBassLine:
         bassNoteIndex = 0
         previousBassNote = bassLine[bassNoteIndex]
         bassNote = currentMapping[allKeys[0]][-1]
-        previousSegment = segment.OverlaidSegment(bassNote, bassNote.notationString,
+        previousSegment = segment.OverlaidSegment(bassNote, bassNote.editorial.notationString,
                                                    self._fbScale,
                                                    fbRules, numParts, maxPitch)
         previousSegment.quarterLength = previousBassNote.quarterLength
@@ -366,7 +369,7 @@ class FiguredBassLine:
         for k in allKeys[1:]:
             (startTime, unused_endTime) = k
             bassNote = currentMapping[k][-1]
-            currentSegment = segment.OverlaidSegment(bassNote, bassNote.notationString,
+            currentSegment = segment.OverlaidSegment(bassNote, bassNote.editorial.notationString,
                                                       self._fbScale,
                                                       fbRules, numParts, maxPitch)
             for partNumber in range(1, len(currentMapping[k])):
@@ -390,6 +393,7 @@ class FiguredBassLine:
         self._overlaidParts.append(music21Part)
 
     def realize(self, fbRules=None, numParts=4, maxPitch=None):
+        # noinspection PyShadowingNames
         '''
         Creates a :class:`~music21.figuredBass.segment.Segment`
         for each (bassNote, notationString) pair
@@ -401,8 +405,7 @@ class FiguredBassLine:
         likewise be controlled through maxPitch.
         Returns a :class:`~music21.figuredBass.realizer.Realization`.
 
-
-        If this methods is called without having provided any (bassNote, notationString) pairs,
+        If this method is called without having provided any (bassNote, notationString) pairs,
         a FiguredBassLineException is raised. If only one pair is provided, the Realization will
         contain :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`
         for the one note.
@@ -410,8 +413,6 @@ class FiguredBassLine:
         if `fbRules` is None, creates a new rules.Rules() object
 
         if `maxPitch` is None, uses pitch.Pitch('B5')
-
-
 
         >>> from music21.figuredBass import realizer
         >>> from music21.figuredBass import rules
@@ -836,27 +837,27 @@ class Test(unittest.TestCase):
         third_note = s[note.Note][2]
         self.assertEqual(third_note.lyric, '64')
         unused_fb = figuredBassFromStream(s)
-        self.assertEqual(third_note.notationString, '6, 4')
+        self.assertEqual(third_note.editorial.notationString, '6, 4')
 
         third_note.lyric = '#6#42'
         unused_fb = figuredBassFromStream(s)
-        self.assertEqual(third_note.notationString, '#6, #4, 2')
+        self.assertEqual(third_note.editorial.notationString, '#6, #4, 2')
 
         third_note.lyric = '#64#2'
         unused_fb = figuredBassFromStream(s)
-        self.assertEqual(third_note.notationString, '#6, 4, #2')
+        self.assertEqual(third_note.editorial.notationString, '#6, 4, #2')
 
         # original case
         third_note.lyric = '6\n4'
         unused_fb = figuredBassFromStream(s)
-        self.assertEqual(third_note.notationString, '6, 4')
+        self.assertEqual(third_note.editorial.notationString, '6, 4')
 
         # single accidental
         for single_symbol in '+#bn':
             with self.subTest(single_symbol=single_symbol):
                 third_note.lyric = single_symbol
                 unused_fb = figuredBassFromStream(s)
-                self.assertEqual(third_note.notationString, single_symbol)
+                self.assertEqual(third_note.editorial.notationString, single_symbol)
 
 
 if __name__ == '__main__':

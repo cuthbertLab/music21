@@ -4041,7 +4041,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
 
         Additionally, any number of associated classes can be gathered from the context
-        and put into the measure.  By default we collect the Clef, TimeSignature, KeySignature,
+        and put into the measure.  By default, we collect the Clef, TimeSignature, KeySignature,
         and Instrument so that there is enough context to perform.  (See getContextByClass()
         and .previous() for definitions of the context)
 
@@ -6057,10 +6057,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returned. If a flat Stream of notes, or a Score of such
         Streams is provided, no Measures will be returned.
 
-        If using chordify with chord symbols, ensure that the chord symbols
-        have durations (by default the duration of a chord symbol object is 0, unlike
-        a chord object). If harmony objects are not provided a duration, they
-        will not be included in the chordified output pitches but may appear as chord symbol
+        If using chordify with chord symbols, ensure that the ChordSymbol objects
+        have durations (by default, the duration of a ChordSymbol object is 0, unlike
+        a Chord object). If Harmony objects are not provided a duration, they
+        will not be included in the chordified output pitches but may appear as chord symbols
         in notation on the score. To realize the chord symbol durations on a score, call
         :meth:`music21.harmony.realizeChordSymbolDurations` and pass in the score.
 
@@ -13520,6 +13520,19 @@ class Part(Stream):
         else:  # in place
             return None
 
+    def mergeAttributes(self, other: 'Part'):
+        '''
+        Merge relevant attributes from the Other part
+        into this one. Key attributes of difference: partName and partAbbreviation.
+
+        TODO: doc test
+        '''
+
+        super().mergeAttributes(other)
+
+        for attr in ('_partName', '_partAbbreviation'):
+            if hasattr(other, attr):
+                setattr(self, attr, getattr(other, attr))
 
 class PartStaff(Part):
     '''

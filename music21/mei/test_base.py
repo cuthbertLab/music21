@@ -5048,6 +5048,18 @@ class Test(unittest.TestCase):
         self.assertEqual(instr.partName, 'Clarinet')
         self.assertEqual(instr.transposition.directedName, 'm-3')
 
+    def testUniqueInstances(self):
+        from music21 import common
+        from music21 import converter
+
+        fp = common.getSourceFilePath() / 'mei' / 'test' / 'test_file.mei'
+        s = converter.parse(fp)
+
+        seen_ids = set()
+        for el in s.recurse():
+            self.assertNotIn(id(el), seen_ids, el)
+            seen_ids.add(id(el))
+
 
 if __name__ == '__main__':
     import music21

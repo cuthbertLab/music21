@@ -8587,7 +8587,6 @@ class Test(unittest.TestCase):
         self.assertIs(n.activeSite, s2)
         self.assertTrue(s1.notes)
         self.assertIs(n.activeSite, s2)
-
 # -----------------------------------------------------------------------------
 
 
