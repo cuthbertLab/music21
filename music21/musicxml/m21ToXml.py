@@ -3075,7 +3075,8 @@ class MeasureExporter(XMLExporterBase):
             groupOffset = m.elementOffset(objGroup[0])
             amountToMoveForward = int(round(divisions * (groupOffset
                                                              - self.offsetInMeasure)))
-            if amountToMoveForward > 0 and any(isinstance(obj, note.GeneralNote) for obj in objGroup):
+            if amountToMoveForward > 0 and any(
+                    isinstance(obj, note.GeneralNote) for obj in objGroup):
                 # gap in stream between GeneralNote objects: create <forward>
                 mxForward = Element('forward')
                 mxDuration = SubElement(mxForward, 'duration')
