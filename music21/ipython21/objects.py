@@ -7,8 +7,9 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 class IPythonPNGObject:
     '''
-    we need to define a certain type of object that when encountered we
-    can handle. see ipExtension.
+    Given a filepath to a PNG file, have one method to read it and delete the
+    file.  This class may be removed, renamed, or otherwise altered in v8 --
+    it no longer has anything special to PNGs.
     '''
     def __init__(self, fp=None):
         self.fp = fp
