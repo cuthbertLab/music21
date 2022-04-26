@@ -46,6 +46,7 @@ def inGoogleColabNotebook():
     except NameError:
         return False
 
+
 # if we are imported in an IPython environment, then load magic after two seconds
 if common.runningUnderIPython():
     from threading import Timer
