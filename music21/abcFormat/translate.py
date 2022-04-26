@@ -4,10 +4,10 @@
 # Purpose:      Translate ABC and music21 objects
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Dylan Nagler
 #
-# Copyright:    Copyright © 2010-2013 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2010-2013 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------

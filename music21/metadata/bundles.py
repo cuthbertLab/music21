@@ -4,11 +4,11 @@
 # Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Josiah Oberholtzer
 #
 # Copyright:    Copyright © 2010, 2012-14, '17, '19-20
-#               Michael Scott Cuthbert and the music21 Project
+#               Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 import gzip

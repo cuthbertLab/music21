@@ -5,7 +5,7 @@
 # Authors:      Jose Cabal-Ugaz
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2012, 20 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012, 20 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 

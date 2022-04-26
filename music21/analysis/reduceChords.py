@@ -4,9 +4,9 @@
 # Purpose:      Tools for eliminating passing chords, etc.
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''

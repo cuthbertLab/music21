@@ -3,11 +3,11 @@
 # Name:         musicxml/m21ToXml.py
 # Purpose:      Translate from music21 objects to musicxml representation
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #               Jacob Tyler Walls
 #
-# Copyright:    Copyright © 2010-22 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-22 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

@@ -3,9 +3,9 @@
 # Name:         humdrum.spineParser.py
 # Purpose:      Conversion and Utility functions for Humdrum and kern in particular
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

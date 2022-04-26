@@ -4,9 +4,9 @@
 # Purpose:      Access to musicxml library
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 __all__ = [

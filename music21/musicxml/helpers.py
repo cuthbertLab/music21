@@ -3,10 +3,10 @@
 # Name:         musicxml/helpers.py
 # Purpose:      Helper routines for musicxml export
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Jacob Tyler Walls
 #
-# Copyright:    Copyright © 2013-2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy

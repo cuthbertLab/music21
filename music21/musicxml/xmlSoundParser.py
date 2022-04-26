@@ -3,9 +3,9 @@
 # Name:         musicxml/xmlSoundParser.py
 # Purpose:      Translate the <sound> tag to music21
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2016-22 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2016-22 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
