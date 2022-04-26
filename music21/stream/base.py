@@ -86,7 +86,7 @@ class StreamDeprecationWarning(UserWarning):
 
 # -----------------------------------------------------------------------------
 # Metaclass
-_OffsetMap = collections.namedtuple('OffsetMap', ['element', 'offset', 'endTime', 'voiceIndex'])
+OffsetMap = collections.namedtuple('OffsetMap', ['element', 'offset', 'endTime', 'voiceIndex'])
 
 
 # -----------------------------------------------------------------------------
@@ -1252,7 +1252,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.hasElementOfClass('Measure')
         False
 
-        To be deprecated in v.7 -- to be removed in version 8, use:
+        To be deprecated in v.8 -- to be removed in version 9, use:
 
         >>> bool(s.getElementsByClass('TimeSignature'))
         True
@@ -4040,7 +4040,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         That is, a request for measures 4 through 10 will return 7 Measures, numbers 4 through 10.
 
         Additionally, any number of associated classes can be gathered from the context
-        and put into the measure.  By default we collect the Clef, TimeSignature, KeySignature,
+        and put into the measure.  By default, we collect the Clef, TimeSignature, KeySignature,
         and Instrument so that there is enough context to perform.  (See getContextByClass()
         and .previous() for definitions of the context)
 
@@ -5297,84 +5297,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                    recurse=recurse)
         return post.first()
 
-    @common.deprecated('v7', 'v8', 'use getElementsByClass() or getContextByClass() or bestClef()')
-    def getClefs(self, searchActiveSite=False, searchContext=True,
-                 returnDefault=True):  # pragma: no cover
-        '''
-        DEPRECATED in v7.
-
-        Collect all :class:`~music21.clef.Clef` objects in
-        this Stream in a list. Optionally search the
-        activeSite Stream and/or contexts.
-
-        If no Clef objects are defined, get a default
-        using :meth:`~music21.clef.bestClef`
-
-
-        >>> a = stream.Stream()
-        >>> b = clef.AltoClef()
-        >>> a.insert(0, b)
-        >>> a.repeatInsert(note.Note('C#'), list(range(10)))
-        >>> #_DOCS_SHOW c = a.getClefs()
-        >>> #_DOCS_SHOW len(c) == 1
-        True
-        '''
-        # TODO: activeSite searching is not yet implemented
-        # this may not be useful unless a stream is flat
-        post = list(self.getElementsByClass('Clef'))
-
-        # environLocal.printDebug(['getClefs(); count of local', len(post), post])
-        if not post and searchActiveSite and self.activeSite is not None:
-            # environLocal.printDebug(['getClefs(): search activeSite'])
-            post = list(self.activeSite.getElementsByClass('Clef'))
-
-        if not post and searchContext:
-            # returns a single element match
-            # post = self.__class__()
-            obj = self.getContextByClass('Clef')
-            if obj is not None:
-                post.append(obj)
-
-        # get a default and/or place default at zero if nothing at zero
-        if returnDefault and (not post or post[0].offset > 0):
-            # environLocal.printDebug(['getClefs(): using bestClef()'])
-            post.insert(0, clef.bestClef(self))
-        return post
-
-    @common.deprecated('v7', 'v8', 'use getElementsByClass() or getContextByClass()')
-    def getKeySignatures(self, searchActiveSite=True, searchContext=True):  # pragma: no cover
-        '''
-        Collect all :class:`~music21.key.KeySignature` objects in this
-        Stream in a new Stream. Optionally search the activeSite
-        stream and/or contexts.
-
-        If no KeySignature objects are defined, returns an empty Stream
-
-        DEPRECATED in v7.
-
-        >>> a = stream.Stream()
-        >>> b = key.KeySignature(3)
-        >>> a.insert(0, b)
-        >>> a.repeatInsert(note.Note('C#'), list(range(10)))
-        >>> #_DOCS_SHOW c = a.getKeySignatures()
-        >>> #_DOCS_SHOW len(c) == 1
-        True
-        '''
-        # TODO: activeSite searching is not yet implemented
-        # this may not be useful unless a stream is flat
-        post = self.getElementsByClass('KeySignature')
-        if not post and searchContext:
-            # returns a single value
-            post = self.cloneEmpty(derivationMethod='getKeySignatures')
-            obj = self.getContextByClass(key.KeySignature)
-            if obj is not None:
-                post.append(obj)
-
-        # do nothing if empty
-        if not post or post[0].offset > 0:
-            pass
-        return post
-
     def invertDiatonic(self, inversionNote=note.Note('C4'), *, inPlace=False):
         '''
         inverts a stream diatonically around the given note (by default, middle C)
@@ -5766,279 +5688,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             for v in offsetDictValues}
         return sorted(offsets.union(endTimes))
 
-    @common.deprecated('v7', 'v8', 'use chordify() instead')
-    def makeChords(self,
-                   minimumWindowSize=0.125,
-                   includePostWindow=True,
-                   removeRedundantPitches=True,
-                   useExactOffsets=False,
-                   gatherArticulations=True,
-                   gatherExpressions=True,
-                   inPlace=False,
-                   transferGroupsToPitches=False,
-                   makeRests=True):  # pragma: no cover
-        '''
-        DEPRECATED in v7.  Use Chordify instead!
-
-        Gathers simultaneously sounding :class:`~music21.note.Note` objects
-        into :class:`~music21.chord.Chord` objects, each of which
-        contains all the pitches sounding together.
-
-        If useExactOffsets is True (default=False), then do an exact
-        makeChords using the offsets in the piece.
-        If this parameter is set, then minimumWindowSize is ignored.
-
-        This first example puts a part with three quarter notes (C4, D4, E4)
-        together with a part consisting of a half note (C#5) and a
-        quarter note (E#5) to make two Chords, the first containing the
-        three :class:`~music21.pitch.Pitch` objects sounding at the
-        beginning, the second consisting of the two Pitches sounding
-        on offset 2.0 (beat 3):
-
-        >>> p1 = stream.Part()
-        >>> p1.append([note.Note('C4', type='quarter'),
-        ...            note.Note('D4', type='quarter'),
-        ...            note.Note('E4', type='quarter'),
-        ...            note.Note('B2', type='quarter')])
-        >>> p2 = stream.Part()
-        >>> p2.append([note.Note('C#5', type='half'),
-        ...            note.Note('E#5', type='quarter'),
-        ...            chord.Chord(['E4', 'G5', 'C#7'])])
-        >>> sc1 = stream.Score()
-        >>> sc1.insert(0, p1)
-        >>> sc1.insert(0, p2)
-        >>> #_DOCS_SHOW scChords = sc1.flatten().makeChords()
-        >>> #_DOCS_SHOW scChords.show('text')
-        {0.0} <music21.chord.Chord C4 C#5 D4>
-        {2.0} <music21.chord.Chord E4 E#5>
-        {3.0} <music21.chord.Chord B2 E4 G5 C#7>
-
-        The gathering of elements, starting from offset 0.0, uses
-        the `minimumWindowSize`, in quarter lengths, to collect
-        all Notes that start between 0.0 and the minimum window
-        size (this permits overlaps within a minimum tolerance).
-
-        After collection, the maximum duration of collected elements
-        is found; this duration is then used to set the new
-        starting offset. A possible gap then results between the end
-        of the window and offset specified by the maximum duration;
-        these additional notes are gathered in a second pass if
-        `includePostWindow` is True.
-
-        The new start offset is shifted to the larger of either
-        the minimum window or the maximum duration found in the
-        collected group. The process is repeated until all offsets
-        are covered.
-
-        Each collection of Notes is formed into a Chord. The Chord
-        is given the longest duration of all constituents, and is
-        inserted at the start offset of the window from which it
-        was gathered.
-
-        Chords can gather both articulations and expressions from found Notes
-        using `gatherArticulations` and `gatherExpressions`.
-
-        If `transferGroupsToPitches` is True, and group defined on the source
-        elements Groups object will be transferred to the Pitch
-        objects contained in the resulting Chord.
-
-        The resulting Stream, if not in-place, can also gather
-        additional objects by placing class names in the `collect` list.
-        By default, TimeSignature and KeySignature objects are collected.
-        '''
-        if not inPlace:  # make a copy
-            # since we do not return Scores, this probably should always be
-            # a Stream
-            # returnObj = Stream()
-            # returnObj = self.__class__()  # for output
-            returnObj = self.coreCopyAsDerivation('makeChords')
-        else:
-            returnObj = self
-
-        def dealWithSubNotes(chordLength, noteList):
-            # environLocal.printDebug(['creating chord from noteList',
-            #   noteList, 'inPlace', inPlace])
-            c = chord.Chord()
-            c.duration.quarterLength = chordLength
-            # these are references, not copies, for now
-            tempComponents = []
-            for n in noteList:
-                if n.isChord:
-                    cSub = list(n)
-                else:
-                    cSub = [n]
-
-                if transferGroupsToPitches and n.groups:
-                    for comp in cSub:
-                        for g in n.groups:
-                            comp.pitch.groups.append(g)
-
-                for comp in cSub:
-                    tempComponents.append(comp)
-
-            c.pitches = [comp.pitch for comp in tempComponents]
-            for comp in tempComponents:
-                if comp.tie is not None:
-                    c.setTie(comp.tie.type, comp.pitch)
-
-            if gatherArticulations:
-                for n in noteList:
-                    c.articulations += n.articulations
-            if gatherExpressions:
-                for n in noteList:
-                    c.expressions += n.expressions
-            # always remove all the previous elements
-            for n in noteList:
-                returnObj.remove(n)
-            # remove all rests found in source
-            for r in list(returnObj.getElementsByClass('Rest')):
-                returnObj.remove(r)
-
-            if removeRedundantPitches:
-                removedPitches = c.removeRedundantPitches(inPlace=True)
-
-                if transferGroupsToPitches:
-                    for rem_p, cn in itertools.product(removedPitches, c):
-                        if cn.pitch.nameWithOctave == rem_p.nameWithOctave:
-                            # print(cn.pitch, rem_p)
-                            # print(cn.pitch.groups, rem_p.groups)
-                            cn.pitch.groups.extend(rem_p.groups)
-            return c
-        # environLocal.printDebug(['makeChords():',
-        #              'transferGroupsToPitches', transferGroupsToPitches])
-
-        if returnObj.hasMeasures():
-            # call on component measures
-            for m in returnObj.getElementsByClass('Measure'):
-                # offset values are not relative to measure; need to
-                # shift by each measure's offset
-                m.makeChords(
-                    minimumWindowSize=minimumWindowSize,
-                    includePostWindow=includePostWindow,
-                    removeRedundantPitches=removeRedundantPitches,
-                    gatherArticulations=gatherArticulations,
-                    gatherExpressions=gatherExpressions,
-                    transferGroupsToPitches=transferGroupsToPitches,
-                    inPlace=True,
-                    makeRests=makeRests
-                )
-            return returnObj  # exit
-
-        if returnObj.hasPartLikeStreams():
-            # must get Streams, not Parts here
-            for p in returnObj.getElementsByClass('Stream'):
-                p.makeChords(
-                    minimumWindowSize=minimumWindowSize,
-                    includePostWindow=includePostWindow,
-                    removeRedundantPitches=removeRedundantPitches,
-                    gatherArticulations=gatherArticulations,
-                    gatherExpressions=gatherExpressions,
-                    transferGroupsToPitches=transferGroupsToPitches,
-                    inPlace=True,
-                    makeRests=makeRests
-                )
-            return returnObj  # exit
-
-        # TODO: gather lyrics as an option
-        # define classes that are gathered; assume they have pitches
-        # matchClasses = ['Note', 'Chord', 'Rest']
-        matchClasses = ['Note', 'Chord']
-        o = 0.0  # start at zero
-        oTerminate = returnObj.highestOffset
-
-        # get temporary boundaries for making rests
-        preHighestTime = returnObj.highestTime
-        preLowestOffset = returnObj.lowestOffset
-        # environLocal.printDebug(['got preLowest, preHighest', preLowestOffset, preHighestTime])
-        if useExactOffsets is False:
-            while True:  # TODO: Remove while True always...
-                # get all notes within the start and the min window size
-                oStart = o
-                oEnd = oStart + minimumWindowSize
-                subNotes = list(returnObj.getElementsByOffset(
-                    oStart,
-                    oEnd,
-                    includeEndBoundary=False,
-                    mustFinishInSpan=False,
-                    mustBeginInSpan=True
-                ).getElementsByClass(matchClasses))  # get once for speed
-                # environLocal.printDebug(['subNotes', subNotes])
-                qlMax: Optional[float] = None
-                # get the max duration found from within the window
-                if subNotes:
-                    # get largest duration, use for duration of Chord, next span
-                    qlMax = max([n.quarterLength for n in subNotes])
-
-                # if the max duration found in the window is greater than the min
-                # window size, it is possible that there are notes that will not
-                # be gathered; those starting at the end of this window but before
-                # the max found duration (as that will become the start of the next
-                # window
-                # so: if ql > min window, gather notes between
-                # oStart + minimumWindowSize and oStart + qlMax
-                if (includePostWindow and qlMax is not None
-                        and qlMax > minimumWindowSize):
-                    subAdd = list(returnObj.getElementsByOffset(
-                        oStart + minimumWindowSize,
-                        oStart + qlMax,
-                        includeEndBoundary=False,
-                        mustFinishInSpan=False,
-                        mustBeginInSpan=True
-                    ).getElementsByClass(matchClasses))
-                    # concatenate any additional notes found
-                    subNotes += subAdd
-
-                # make subNotes into a chord
-                if subNotes:
-                    cOut = dealWithSubNotes(qlMax, subNotes)
-                    # insert chord at start location
-                    returnObj.coreInsert(o, cOut)
-                # environLocal.printDebug(['len of returnObj', len(returnObj)])
-                # shift offset to qlMax or minimumWindowSize
-                if qlMax is not None and qlMax >= minimumWindowSize:
-                    # update start offset to what was old boundary
-                    # note: this assumes that the start of the longest duration
-                    # was at oStart; it could have been between oStart and oEnd
-                    o += qlMax
-                else:
-                    o += minimumWindowSize
-                # end While loop conditions
-                if o > oTerminate:
-                    break
-        else:  # useExactOffsets is True:
-            onAndOffOffsets = self.flatten().notesAndRests.stream()._uniqueOffsetsAndEndTimes()
-            # environLocal.printDebug(['makeChords: useExactOffsets=True;
-            #   onAndOffOffsets:', onAndOffOffsets])
-
-            for i in range(len(onAndOffOffsets) - 1):
-                # get all notes within the start and the min window size
-                oStart = onAndOffOffsets[i]
-                oEnd = onAndOffOffsets[i + 1]
-                subNotes = list(returnObj.getElementsByOffset(
-                    oStart,
-                    oEnd,
-                    includeEndBoundary=False,
-                    mustFinishInSpan=False,
-                    mustBeginInSpan=True
-                ).getElementsByClass(matchClasses))
-                # environLocal.printDebug(['subNotes', subNotes])
-                # subNotes.show('t')
-
-                # make subNotes into a chord
-                if subNotes:
-                    cOut = dealWithSubNotes(oEnd - oStart, subNotes)
-                    # insert chord at start location
-                    returnObj.coreInsert(oStart, cOut)
-
-        # makeRests to fill any gaps produced by stripping
-        # environLocal.printDebug(['pre makeRests show()'])
-        returnObj.coreElementsChanged()
-        if makeRests:
-            returnObj.makeRests(
-                refStreamOrTimeRange=(preLowestOffset, preHighestTime),
-                fillGaps=True, inPlace=True)
-        return returnObj
-
     def chordify(
         self,
         *,
@@ -6056,10 +5705,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returned. If a flat Stream of notes, or a Score of such
         Streams is provided, no Measures will be returned.
 
-        If using chordify with chord symbols, ensure that the chord symbols
-        have durations (by default the duration of a chord symbol object is 0, unlike
-        a chord object). If harmony objects are not provided a duration, they
-        will not be included in the chordified output pitches but may appear as chord symbol
+        If using chordify with chord symbols, ensure that the ChordSymbol objects
+        have durations (by default, the duration of a ChordSymbol object is 0, unlike
+        a Chord object). If Harmony objects are not provided a duration, they
+        will not be included in the chordified output pitches but may appear as chord symbols
         in notation on the score. To realize the chord symbol durations on a score, call
         :meth:`music21.harmony.realizeChordSymbolDurations` and pass in the score.
 
@@ -6456,7 +6105,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 endTime = opFrac(offset + dur)
                 # NOTE: used to make a copy.copy of elements here;
                 # this is not necessary b/c making deepcopy of entire Stream
-                thisOffsetMap = _OffsetMap(e, offset, endTime, voiceIndex)
+                thisOffsetMap = OffsetMap(e, offset, endTime, voiceIndex)
                 # environLocal.printDebug(['offsetMap: thisOffsetMap', thisOffsetMap])
                 offsetMap.append(thisOffsetMap)
                 # offsetMap.append((offset, offset + dur, e, voiceIndex))
@@ -6932,45 +6581,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # print(elements[-1], elements[-1].duration)
         if not inPlace:
             return returnObj
-
-    @common.deprecated('v7', 'v8', 'call extendDurations() and getElementsByClass() separately')
-    def extendDurationAndGetBoundaries(self, objName, *, inPlace=False):  # pragma: no cover
-        '''
-        DEPRECATED in v.7 -- to be removed in v.8
-
-        Extend the Duration of elements specified by objName;
-        then, collect a dictionary for every matched element of objName class,
-        where the matched element is the value and the key is the (start, end) offset value.
-
-        >>> from pprint import pprint as pp
-        >>> s = stream.Stream()
-        >>> s.insert(3, dynamics.Dynamic('mf'))
-        >>> s.insert(7, dynamics.Dynamic('f'))
-        >>> s.insert(12, dynamics.Dynamic('ff'))
-        >>> #_DOCS_SHOW pp(s.extendDurationAndGetBoundaries('Dynamic'))
-        {(3.0, 7.0): <music21.dynamics.Dynamic mf>,
-         (7.0, 12.0): <music21.dynamics.Dynamic f>,
-         (12.0, 12.0): <music21.dynamics.Dynamic ff>}
-
-
-        TODO: only allow inPlace=True or delete or something, can't return two different things
-        '''
-        if not inPlace:  # make a copy
-            returnObj = copy.deepcopy(self)
-        else:
-            returnObj = self
-        returnObj.extendDuration(objName, inPlace=True)
-        # TODO: use iteration.
-        elements = returnObj.getElementsByClass(objName)
-        boundaries = {}
-        if not elements:
-            raise StreamException('no elements of this class defined in this Stream')
-
-        for e in elements:
-            start = returnObj.elementOffset(e)
-            end = start + e.duration.quarterLength
-            boundaries[(start, end)] = e
-        return boundaries
 
     def stripTies(
         self,
@@ -14416,7 +14026,8 @@ class Test(unittest.TestCase):
 
 # -----------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [Stream, Measure, Part, Score, Opus, Voice]
+_DOC_ORDER = [Stream, Measure, Part, Score, Opus, Voice,
+              SpannerStorage, VariantStorage, OffsetMap]
 
 
 if __name__ == '__main__':

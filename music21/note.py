@@ -764,7 +764,11 @@ class GeneralNote(base.Music21Object):
                                         applyRaw=applyRaw, identifier=identifier))
 
     # --------------------------------------------------------------------------
-    # properties common to Notes, Rests,
+    # properties common to Notes, Rests, etc.
+
+    @property
+    def fullName(self) -> str:
+        return self.classes[0]  # override in subclasses
 
     # --------------------------------------------------------------------------
     def augmentOrDiminish(self, scalar, *, inPlace=False):
@@ -982,7 +986,7 @@ class NotRest(GeneralNote):
         ('double', 'down', 'noStem', 'none', 'unspecified', 'up')
         >>> n = note.Note()
 
-        By default a Note's stemDirection is 'unspecified'
+        By default, a Note's stemDirection is 'unspecified'
         meaning that it is unknown:
 
         >>> n.stemDirection
@@ -1776,7 +1780,7 @@ class Unpitched(NotRest):
 class Rest(GeneralNote):
     '''
     Rests are represented in music21 as GeneralNote objects that do not have
-    a pitch object attached to them.  By default they have length 1.0 (Quarter Rest)
+    a pitch object attached to them.  By default, they have length 1.0 (Quarter Rest)
 
     Calling :attr:`~music21.stream.Stream.notes` on a Stream does not get rests.
     However, the property :attr:`~music21.stream.Stream.notesAndRests` of Streams

@@ -41,8 +41,8 @@ class QMConverter(converter.subConverters.SubConverter):
         >>> from music21.converter.qmConverter import QMConverter
         >>> qmc = QMConverter()
         >>> qmc.parseData('C D E G C')
-        >>> s = qmc.stream
-        >>> s.show('text')
+        >>> q_stream = qmc.stream
+        >>> q_stream.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>

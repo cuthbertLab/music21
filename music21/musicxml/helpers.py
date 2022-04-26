@@ -193,5 +193,4 @@ def isFullMeasureRest(r: 'music21.note.Rest') -> bool:
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
-
+    music21.mainTest()  # doc tests only

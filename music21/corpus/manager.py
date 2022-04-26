@@ -169,7 +169,7 @@ def parse(workName,
             number=None,
             fileExtensions=None,
             forceSource=False,
-            format=None  # @ReservedAssignment
+            format=None
           ):
     filePath = getWork(workName=workName,
                         movementNumber=movementNumber,

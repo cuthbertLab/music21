@@ -117,7 +117,7 @@ def getCorpusContentDirs() -> List[str]:
 
 def getRootFilePath() -> pathlib.Path:
     '''
-    Return the root directory for music21 -- outside of the music21 namespace
+    Return the root directory for music21 -- outside the music21 namespace
     which has directories such as "dist", "documentation", "music21"
 
     >>> fp = common.getRootFilePath()
@@ -147,9 +147,9 @@ def relativepath(path: str, start: Optional[str] = None) -> str:
 def cleanpath(path: Union[str, pathlib.Path], *, returnPathlib=None) -> Union[str, pathlib.Path]:
     '''
     Normalizes the path by expanding ~user on Unix, ${var} environmental vars
-    (is this a good idea?), expanding %name% on Windows, normalizing path names (Windows
-    turns backslashes to forward slashes, and finally if that file is not an absolute path,
-    turns it from a relative path to an absolute path.
+    (is this a good idea?), expanding %name% on Windows, normalizing path names
+    (Windows turns backslashes to forward slashes), and finally if that file
+    is not an absolute path, turns it from a relative path to an absolute path.
 
     v5 -- returnPathlib -- None (default) does not convert. False, returns a string,
     True, returns a pathlib.Path.

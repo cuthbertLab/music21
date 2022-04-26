@@ -820,7 +820,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
         else:
             lineNum = False
     elif len(xnStr) > 2:
-        from music21 import clef as myself  # @UnresolvedImport
+        from music21 import clef as myself
         xnLower = xnStr.lower()
         for x in dir(myself):
             if 'Clef' not in x:

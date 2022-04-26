@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
-# Name:          chord.tables.py
-# Purpose:       data and tables for chord and set class processing.
+# Name:         chord.tables.py
+# Purpose:      data and tables for chord and set class processing.
 #
-# Authors:       Christopher Ariza
+# Authors:      Christopher Ariza
+#               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2001-2011 Christopher Ariza
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-22 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -52,6 +53,7 @@ class ChordTablesException(exceptions21.Music21Exception):
 # is symmetrical under inversion.
 t1   = ((0,), (0,0,0,0,0,0), (1,1,1,1,11,11,11,11), 0)  # 1-1
 monad = (None, t1)
+del t1
 
 t1  = ((0,1), (1,0,0,0,0,0), (1,1,0,0,9,9,8,8),  0)  # 2-1
 t2  = ((0,2), (0,1,0,0,0,0), (1,1,1,1,9,9,9,9),  0)  # 2-2
@@ -60,6 +62,7 @@ t4  = ((0,4), (0,0,0,1,0,0), (1,1,1,1,9,9,9,9),  0)  # 2-4
 t5  = ((0,5), (0,0,0,0,1,0), (1,1,0,0,9,9,8,8),  0)  # 2-5
 t6  = ((0,6), (0,0,0,0,0,1), (2,2,2,2,10,10,10), 0)  # 2-6
 diad = (None, t1, t2, t3, t4, t5, t6)
+del t1, t2, t3, t4, t5, t6
 
 t1  = ((0,1,2), (2,1,0,0,0,0), (1,1,0,0,7,7,4,4), 0)  # 3-1
 t2  = ((0,1,3), (1,1,1,0,0,0), (1,0,0,0,5,6,5,5), 0)  # 3-2
@@ -74,6 +77,7 @@ t10 = ((0,3,6), (0,0,2,0,0,1), (1,1,1,1,8,8,8,8), 0)  # 3-10
 t11 = ((0,3,7), (0,0,1,1,1,0), (1,0,0,0,5,6,5,5), 0)  # 3-11
 t12 = ((0,4,8), (0,0,0,3,0,0), (3,3,3,3,9,9,9,9), 0)  # 3-12
 trichord = (None, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)
+del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
 
 t1  = ((0,1,2,3), (3,2,1,0,0,0), (1,1,0,0,5,5,1,1),  0)  # 4-1
 t2  = ((0,1,2,4), (2,2,1,1,0,0), (1,0,0,0,3,4,1,1),  0)  # 4-2
@@ -109,7 +113,9 @@ tetrachord = (
     t10, t11, t12, t13, t14, t15, t16, t17, t18, t19,
     t20, t21, t22, t23, t24, t25, t26, t27, t28, t29
 )
-
+del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
+del t13, t14, t15, t16, t17, t18, t19, t20, t21, t22
+del t23, t24, t25, t26, t27, t28, t29
 
 t1  = ((0,1,2,3,4), (4,3,2,1,0,0), (1,1,0,0,3,3,0,0),  0)  # 5-1
 t2  = ((0,1,2,3,5), (3,3,2,1,1,0), (1,0,0,0,1,2,1,1),  0)  # 5-2
@@ -155,6 +161,10 @@ pentachord = (
     t20, t21, t22, t23, t24, t25, t26, t27, t28, t29,
     t30, t31, t32, t33, t34, t35, t36, t37, t38
 )
+del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
+del t13, t14, t15, t16, t17, t18, t19, t20, t21, t22
+del t23, t24, t25, t26, t27, t28, t29
+del t30, t31, t32, t33, t34, t35, t36, t37, t38
 
 t1  = ((0,1,2,3,4,5), (5,4,3,2,1,0), (1,1,0,0,1,1,0,0),  0)  # 6-1  A
 t2  = ((0,1,2,3,4,6), (4,4,3,2,1,1), (1,0,0,0,0,1,0,0),  0)  # 6-2
@@ -214,6 +224,10 @@ hexachord = (
     t40, t41, t42, t43, t44, t45, t46, t47, t48, t49,
     t50,
 )
+del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
+del t13, t14, t15, t16, t17, t18, t19, t20, t21, t22
+del t23, t24, t25, t26, t27, t28, t29
+del t30, t31, t32, t33, t34, t35, t36, t37, t38
 del t39, t40, t41, t42, t43, t44, t45, t46, t47, t48, t49, t50
 
 t1  = ((0,1,2,3,4,5, 6), (6,5,4,3,2,1), (1,1,0,0,0,0,0,0),  0)  # 7-1
@@ -260,6 +274,9 @@ septachord = (
     t20, t21, t22, t23, t24, t25, t26, t27, t28, t29,
     t30, t31, t32, t33, t34, t35, t36, t37, t38
 )
+del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
+del t13, t14, t15, t16, t17, t18, t19, t20, t21, t22
+del t23, t24, t25, t26, t27, t28, t29
 del t30, t31, t32, t33, t34, t35, t36, t37, t38
 
 t1  = ((0,1,2,3,4,5,6, 7), (7,6,5,4,4,2), (1,1,0,0,0,0,0,0), 0 )  # 8-1
@@ -296,6 +313,7 @@ octachord = (
     t10, t11, t12, t13, t14, t15, t16, t17, t18, t19,
     t20, t21, t22, t23, t24, t25, t26, t27, t28, t29
 )
+del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
 del t13, t14, t15, t16, t17, t18, t19
 del t20, t21, t22, t23, t24, t25, t26, t27, t28, t29
 
@@ -312,7 +330,7 @@ t10 = ((0,1,2,3,4,6,7,9,10), (6,6,8,6,6,4), (1,1,1,1,0,0,0,0), 0)  # 9-10
 t11 = ((0,1,2,3,5,6,7,9,10), (6,6,7,7,7,3), (1,0,0,0,0,0,0,0), 0)  # 9-11
 t12 = ((0,1,2,4,5,6,8,9,10), (6,6,6,9,6,3), (3,3,3,3,0,0,0,0), 0)  # 9-12
 nonachord = (None, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)
-del t7, t8, t9, t10, t11, t12
+del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
 
 t1   = ((0,1,2,3,4,5,6,7,8, 9), (9,8,8,8,8,4), (1,1,0,0,0,0,0,0), 0)  # 10-1
 t2   = ((0,1,2,3,4,5,6,7,8,10), (8,9,8,8,8,4), (1,1,1,1,0,0,0,0), 0)  # 10-2
@@ -321,10 +339,11 @@ t4   = ((0,1,2,3,4,5,6,8,9,10), (8,8,8,9,8,4), (1,1,1,1,0,0,0,0), 0)  # 10-4
 t5   = ((0,1,2,3,4,5,7,8,9,10), (8,8,8,8,9,4), (1,1,0,0,0,0,0,0), 0)  # 10-5
 t6   = ((0,1,2,3,4,6,7,8,9,10), (8,8,8,8,8,5), (2,2,2,2,0,0,0,0), 0)  # 10-6
 decachord = (None, t1, t2, t3, t4, t5, t6)
-del t2, t3, t4, t5, t6
+del t1, t2, t3, t4, t5, t6
 
 t1 = ((0,1,2,3,4,5,6,7,8,9,10), (10,10,10,10,10,5), (1,1,1,1,0,0,0,0), 0)  # 11-1
 undecachord = (None, t1)
+del t1
 
 t1   = ((0,1,2,3,4,5,6,7,8,9,10,11), (12,12,12,12,12,6), (12,12,12,12,0,0,0,0), 0)  # 12-1
 dodecachord = (None, t1)
@@ -335,11 +354,11 @@ FORTE = (None, monad, diad, trichord, tetrachord, pentachord,
          hexachord, septachord, octachord,
          nonachord, decachord, undecachord, dodecachord)
 
-# this defines the pitch classes to return for the inversion of a given
+# This dictionary defines the pitch classes to return for the inversion of a given
 # forte number.  For instance (3, 11): (0, 4, 7) indicates that for the
 # inverted form of Forte class 3-11 (minor/major triad) return 0, 2, 3
-# (the zero could be assumed, but it makes my brain easier to have it there.
-# faster to store this than recompute every time.
+# (the zero could be assumed, but it makes my brain easier to have it there).
+# It is faster to store this than to recompute it every time.
 inversionDefaultPitchClasses = {
     (3, 2): (0, 2, 3),
     (3, 3): (0, 3, 4),
@@ -913,7 +932,7 @@ forteNumberWithInversionToTnIndex = {
 # some changes:
 # unison preferred to monad
 # v7.3 -- Roma preferred.  Gypsy only in parentheses.
-#      TODO: more removing and/or deemphasizing of ethnic-stereotype names.
+#      TODO: more removing and/or de-emphasizing of ethnic-stereotype names.
 
 tnIndexToChordInfo = {
     (1,  1,  0): {'name': ('unison',
@@ -1175,9 +1194,8 @@ tnIndexToChordInfo = {
                            'combinatorial I (I1, I7)')},
     (6, 31,  1): {'name': ('combinatorial I (I7)',)},
     (6, 31, -1): {'name': ('combinatorial I (I11)',)},
-    (6, 32,  0): {'name': ('C all combinatorial (P6, I3, RI9)',
-                           'Guidon/Arezzo',
-                           'Arezzo major diatonic',
+    (6, 32,  0): {'name': ('Guidonian hexachord',
+                           'C all combinatorial (P6, I3, RI9)',
                            'major hexamirror',
                            'quartal hexamirror',
                            'first-order all combinatorial')},
@@ -1292,10 +1310,11 @@ tnIndexToChordInfo = {
     (7, 31, -1): {'name': ('diminished scale',
                            'alternating heptachord')},
     (7, 32,  1): {'name': ('harmonic minor scale',
+                           'harmonic minor collection',
                            'Spanish Roma (Gypsy)',
                            'mela Kiravani')},
-    (7, 32, -1): {'name': ('harmonic major scale',
-                           'harmonic minor inverse',
+    (7, 32, -1): {'name': ('harmonic major scale (inverted)',
+                           'harmonic minor collection (inverted)',
                            'mela Cakravana',
                            'quasi raga Ahir Bhairav')},
     (7, 33,  0): {'name': ('Neapolitan-major mode',
@@ -1560,7 +1579,7 @@ def addressToIntervalVector(address):
     (0, 0, 1, 1, 1, 0)
 
     Inversion can be omitted or None without causing an error (or, of course,
-    changing the output
+    changing the output)
 
     >>> chord.tables.addressToIntervalVector((4, 29))
     (1, 1, 1, 1, 1, 1)
@@ -1614,7 +1633,7 @@ def intervalVectorToAddress(vector):
         for num, sc in enumerate(FORTE[card]):
             if sc is None:
                 continue  # first, used for spacing
-            # index 1 is vector
+            # index 1 is the vector
             if sc[1] == vector:
                 post.append(ChordTableAddress(card, num, None, None))
     return post
@@ -1680,7 +1699,7 @@ def addressToCommonNames(address):
 
 def addressToForteName(address, classification='tn'):
     '''
-    Given an address, return the set-class name as a string.  By default
+    Given an address, return the set-class name as a string.  By default,
     A and B are appended to chords without inversional equivalence:
 
     >>> octachord_address = chord.tables.ChordTableAddress(8, 15, -1, 10)
@@ -1689,7 +1708,7 @@ def addressToForteName(address, classification='tn'):
     >>> chord.tables.addressToForteName((8, 15))
     '8-15A'
 
-    The augmented triad is invariant under inversion so it gets no designation:
+    The augmented triad is invariant under inversion, so it gets no designation:
 
     >>> chord.tables.addressToForteName((3, 12))
     '3-12'
@@ -1723,7 +1742,7 @@ def seekChordTablesAddress(c):
 
     Table addresses are a ChordTableAddress named-tuple giving
     the cardinality, the Forte-index-number, the inversion, and the original
-    pitch class that matched (may be arbitrary for a symmetrical chord like
+    pitch class that matched (it may be arbitrary for a symmetrical chord like
     the diminished seventh chord).
 
     Inversion is either 0 (for symmetrical under inversion) or -1, 1
@@ -1768,7 +1787,7 @@ def seekChordTablesAddress(c):
     music21.chord.tables.ChordTablesException: cannot access chord tables address
         for Chord with 0 pitches
 
-    NOTE: this was once a time consuming operation, though it is
+    NOTE: this was once a time-consuming operation, though it is
     now quite a bit faster than before (order of 100 microseconds).  Nonetheless
     should only be run when necessary.  Methods that call this should
     try (as chord.Chord does) to cache the result.
@@ -1793,7 +1812,7 @@ def seekChordTablesAddress(c):
     card = len(pcSet)
     if card == 1:  # it is a singleton: return it
         return ChordTableAddress(1, 1, 0, pcSet[0])
-    elif card == 12:  # its the aggregate
+    elif card == 12:  # it is the aggregate
         return ChordTableAddress(12, 1, 0, 0)
 
     # go through each rotation of pcSet

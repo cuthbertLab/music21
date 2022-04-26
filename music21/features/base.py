@@ -538,7 +538,8 @@ class DataInstance:
     multiple commonly-used stream representations once, providing rapid processing.
     '''
     # pylint: disable=redefined-builtin
-    def __init__(self, streamOrPath=None, id=None):  # @ReservedAssignment
+    # noinspection PyShadowingBuiltins
+    def __init__(self, streamOrPath=None, id=None):
         if isinstance(streamOrPath, stream.Stream):
             self.stream = streamOrPath
             self.streamPath = None
@@ -896,7 +897,8 @@ class DataSet:
             self.addData(d, cv, thisId)
 
     # pylint: disable=redefined-builtin
-    def addData(self, dataOrStreamOrPath, classValue=None, id=None):  # @ReservedAssignment
+    # noinspection PyShadowingBuiltins
+    def addData(self, dataOrStreamOrPath, classValue=None, id=None):
         '''
         Add a Stream, DataInstance, MetadataEntry, or path (Posix or str)
         to a corpus or local file to this data set.
@@ -1069,7 +1071,7 @@ class DataSet:
         return outputFormat.getString()
 
     # pylint: disable=redefined-builtin
-    def write(self, fp=None, format=None, includeClassLabel=True):  # @ReservedAssignment
+    def write(self, fp=None, format=None, includeClassLabel=True):
         '''
         Set the output format object.
         '''
@@ -1644,7 +1646,7 @@ class Test(unittest.TestCase):
 #     def xtestOrangeBayesA(self):  # pragma: no cover
 #         '''Using an already created test file with a BayesLearner.
 #         '''
-#         import orange # @UnresolvedImport  # pylint: disable=import-error
+#         import orange  # pylint: disable=import-error
 #         data = orange.ExampleTable(
 #             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 #         classifier = orange.BayesLearner(data)
@@ -1656,7 +1658,7 @@ class Test(unittest.TestCase):
 #     def xtestClassifiersA(self):  # pragma: no cover
 #         '''Using an already created test file with a BayesLearner.
 #         '''
-#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
+#         import orange, orngTree  # pylint: disable=import-error
 #         data1 = orange.ExampleTable(
 #                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
 #
@@ -1696,7 +1698,7 @@ class Test(unittest.TestCase):
 #     def xtestClassifiersB(self):  # pragma: no cover
 #         '''Using an already created test file with a BayesLearner.
 #         '''
-#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
+#         import orange, orngTree  # pylint: disable=import-error
 #         data1 = orange.ExampleTable(
 #                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
 #
@@ -1742,7 +1744,7 @@ class Test(unittest.TestCase):
 #         This test shows how to compare four classifiers; replace the file path
 #         with a path to the .tab data file.
 #         '''
-#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
+#         import orange, orngTree  # pylint: disable=import-error
 #         data = orange.ExampleTable(
 #             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 #
@@ -1774,7 +1776,7 @@ class Test(unittest.TestCase):
 #
 #
 #     def xtestOrangeClassifierTreeLearner(self):  # pragma: no cover
-#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
+#         import orange, orngTree  # pylint: disable=import-error
 #         data = orange.ExampleTable(
 #             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 #

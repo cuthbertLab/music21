@@ -6,19 +6,22 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from functools import lru_cache
 import math
+import numbers
 import random
 import unittest
-from typing import List, Tuple, Union, Sequence, Iterable
+from typing import List, no_type_check, Tuple, Union, Sequence, Iterable
 
 from fractions import Fraction
 from math import isclose
 
 from music21 import defaults
 from music21.common import deprecated
+from music21.common.types import OffsetQLIn, OffsetQL
 
 __all__ = [
     'ordinals', 'musicOrdinals', 'ordinalsToNumbers',
@@ -28,7 +31,6 @@ __all__ = [
 
     'opFrac', 'mixedNumeral',
     'roundToHalfInteger',
-    'almostEquals',
     'addFloatPrecision', 'strTrimFloat',
     'nearestMultiple',
 
@@ -61,6 +63,7 @@ musicOrdinals[15] = 'Double-octave'
 musicOrdinals[22] = 'Triple-octave'
 
 
+@deprecated('v7.3', 'v9', 'Use common.opFrac(num) instead')
 def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
     '''
     Cleans up a floating point number by converting
@@ -144,13 +147,15 @@ def numToIntOrFloat(value: Union[int, float]) -> Union[int, float]:
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
-
-def _preFracLimitDenominator(n, d):
+@lru_cache(1024)
+def _preFracLimitDenominator(n: int, d: int) -> Tuple[int, int]:
     # noinspection PyShadowingNames
     '''
+    Used in opFrac
+
     Copied from fractions.limit_denominator.  Their method
-    requires creating three new Fraction instances to get one back. this doesn't create any
-    call before Fraction...
+    requires creating three new Fraction instances to get one back.
+    This doesn't create any call before Fraction...
 
     DENOM_LIMIT is hardcoded to defaults.limitOffsetDenominator for speed...
 
@@ -222,7 +227,9 @@ def _preFracLimitDenominator(n, d):
         return (p0 + k * p1, q0 + k * q1)
 
 
-def opFrac(num):
+# no type checking due to accessing protected attributes (for speed)
+@no_type_check
+def opFrac(num: Union[OffsetQLIn, None]) -> Union[OffsetQL, None]:
     '''
     opFrac -> optionally convert a number to a fraction or back.
 
@@ -261,12 +268,11 @@ def opFrac(num):
     Fraction(10, 81)
     >>> common.opFrac(None) is None
     True
-
-    :type num: float
     '''
     # This is a performance critical operation, tuned to go as fast as possible.
     # hence redundancy -- first we check for type (no inheritance) and then we
-    # repeat exact same test with inheritance. Note that the later examples are more verbose
+    # repeat exact same test with inheritance.
+    # Note that the later examples are more verbose
     t = type(num)
     if t is float:
         # quick test of power of whether denominator is a power
@@ -314,7 +320,8 @@ def opFrac(num):
         raise TypeError(f'Cannot convert num: {num}')
 
 
-def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
+def mixedNumeral(expr: numbers.Real,
+                 limitDenominator=defaults.limitOffsetDenominator):
     '''
     Returns a string representing a mixedNumeral form of a number
 
@@ -363,8 +370,7 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
             quotient = 0.0
             remainderFrac = remainderFrac - 1
     else:
-        # noinspection PyTypeChecker
-        quotient = int(expr)  # int seems completely supported for Fractions
+        quotient = int(float(expr))
         remainderFrac = expr - quotient
         if quotient < 0:
             remainderFrac *= -1
@@ -426,27 +432,6 @@ def roundToHalfInteger(num: Union[float, int]) -> Union[float, int]:
     else:
         floatVal = 1
     return intVal + floatVal
-
-@deprecated('v.7', 'any time', 'just call math.isclose(x, y, abs_tol=1e-7)')
-def almostEquals(x, y=0.0, grain=1e-7) -> bool:
-    # noinspection PyShadowingNames
-    '''
-    almostEquals(x, y) -- returns True if x and y are
-    within grain (default  0.0000001) of each other
-
-    Allows comparisons between floats that are normally inconsistent.
-
-    DEPRECATED in v.7 -- just call `isclose` with `abs_tol`:
-
-    >>> from math import isclose
-    >>> isclose(1.000000001, 1, abs_tol=1e-7)
-    True
-    >>> isclose(1.001, 1, abs_tol=1e-7)
-    False
-    >>> isclose(1.001, 1, abs_tol=0.1)
-    True
-    '''
-    return isclose(x, y, abs_tol=grain)
 
 
 def addFloatPrecision(x, grain=1e-2) -> Union[float, Fraction]:
@@ -521,7 +506,8 @@ def nearestMultiple(n: float, unit: float) -> Tuple[float, float, float]:
     >>> print(common.nearestMultiple(0.20, 0.25))
     (0.25, 0.05..., -0.05...)
 
-    Note that this one also has an error of 0.1 but it's a positive error off of 0.5
+    Note that this one also has an error of 0.1, but it's a positive error off of 0.5
+
     >>> print(common.nearestMultiple(0.4, 0.25))
     (0.5, 0.1..., -0.1...)
 
@@ -552,12 +538,12 @@ def nearestMultiple(n: float, unit: float) -> Tuple[float, float, float]:
 
     >>> common.nearestMultiple(-0.5, 0.125)
     Traceback (most recent call last):
-    ValueError: n (-0.5) is less than zero. Thus cannot find nearest
+    ValueError: n (-0.5) is less than zero. Thus cannot find the nearest
         multiple for a value less than the unit, 0.125
     '''
     if n < 0:
         raise ValueError(f'n ({n}) is less than zero. '
-                         + 'Thus cannot find nearest multiple for a value '
+                         + 'Thus cannot find the nearest multiple for a value '
                          + f'less than the unit, {unit}')
 
     mult = math.floor(n / unit)  # can start with the floor
@@ -578,6 +564,9 @@ def nearestMultiple(n: float, unit: float) -> Tuple[float, float, float]:
         return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
 
+_DOT_LOOKUP = (1.0, 1.5, 1.75, 1.875, 1.9375,
+               1.96875, 1.984375, 1.9921875, 1.99609375)
+
 def dotMultiplier(dots: int) -> float:
     '''
     dotMultiplier(dots) returns how long to multiply the note
@@ -597,6 +586,9 @@ def dotMultiplier(dots: int) -> float:
     >>> common.dotMultiplier(0)
     1.0
     '''
+    if dots < 9:
+        return _DOT_LOOKUP[dots]
+
     return ((2 ** (dots + 1.0)) - 1.0) / (2 ** dots)
 
 
@@ -625,10 +617,7 @@ def decimalToTuplet(decNum: float) -> Tuple[int, int]:
     >>> common.decimalToTuplet(-.02)
     Traceback (most recent call last):
     ZeroDivisionError: number must be greater than zero
-
-    TODO: replace with fractions...
     '''
-
     def findSimpleFraction(inner_working):
         'Utility function.'
         for index in range(1, 1000):
@@ -850,7 +839,7 @@ def lcm(filterList: Iterable[int]) -> int:
 
     '''
     def _lcm(a, b):
-        '''find lowest common multiple of a, b'''
+        '''find the least common multiple of a, b'''
         # // forces integer style division (no remainder)
         return abs(a * b) // euclidGCD(a, b)
 

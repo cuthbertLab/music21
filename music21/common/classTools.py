@@ -137,7 +137,7 @@ def classToClassStr(classObj: Type) -> str:
 
 def getClassSet(instance, classNameTuple=None):
     '''
-    Return the classSet for an instance (whether a Music21Object or something else.
+    Return the classSet for an instance (whether a Music21Object or something else).
     See base.Music21Object.classSet for more details.
 
     >>> p = pitch.Pitch()

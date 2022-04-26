@@ -55,7 +55,7 @@ from music21 import scale
 
 # create a module level shared cache for intervals of P1, P5, P8
 # to be populated the first time a VLQ object is created
-intervalCache = []  # type: List[interval.Interval]
+intervalCache: List[interval.Interval] = []
 
 
 class MotionType(str, enum.Enum):
@@ -1232,10 +1232,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         c2 = chord.Chord([self.vIntervals[1].noteStart, self.vIntervals[1].noteEnd])
         r1 = roman.identifyAsTonicOrDominant(c1, self.key)
         r2 = roman.identifyAsTonicOrDominant(c2, self.key)
-        # TODO in Py3.8+, remove when identifyAsTonicOrDominant returns Union[str | Literal[False]]
-        if r1 is True or r2 is True:
-            raise VoiceLeadingQuartetException(
-                'identifyAsTonicOrDominant() returned True unexpectedly, please report a bug')
         openings = ['P1', 'P5', 'I', 'V']
         return not ((self.vIntervals[0].simpleName in openings
                         or self.vIntervals[1].simpleName in openings)
@@ -1669,8 +1665,8 @@ class Verticality(base.Music21Object):
         returns the overall offset of the Verticality. Typically, this would just be the
         offset of each object in the Verticality,
         and each object would have the same offset.
-        However, if the duration of one object in the slice is different than the duration
-        of another,
+        However, if the duration of one object in the slice is different from
+        the duration of another,
         and that other starts after the first, but the first is still sounding, then the
         offsets would be
         different. In this case, specify leftAlign=True to return the lowest valued-offset
@@ -2110,7 +2106,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         are moving in the same direction. Returns True if the tone is
         identified as either a chromatic passing tone or a diatonic passing
         tone. Only major and minor diatonic passing tones are recognized (not
-        pentatonic or scales beyond twelve-notes). Does NOT check if tone is non harmonic
+        pentatonic or scales beyond twelve-notes). Does NOT check if tone is non-harmonic.
 
         Accepts pitch or note objects; method is dependent on octave information
 
@@ -2216,7 +2212,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     def couldBeNeighborTone(self):
         '''
         checks if noteToAnalyze could be a neighbor tone, either a diatonic neighbor tone
-        or a chromatic neighbor tone. Does NOT check if tone is non harmonic
+        or a chromatic neighbor tone. Does NOT check if tone is non-harmonic.
 
         >>> voiceLeading.ThreeNoteLinearSegment('E3', 'F3', 'E3').couldBeNeighborTone()
         True

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         checker.py
-# Purpose:      music21 class which can parse a stream of parts and check your homework
+# Purpose:      checks figured basses for following voice-leading rules
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
@@ -68,6 +68,7 @@ def getVoiceLeadingMoments(music21Stream):
 
 
 def extractHarmonies(music21Stream):
+    # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Stream` and returns a dictionary whose values
     are the voice leading moments of the :class:`~music21.stream.Stream` and whose
@@ -148,6 +149,7 @@ def createOffsetMapping(music21Part):
 
 
 def correlateHarmonies(currentMapping, music21Part):
+    # noinspection PyShadowingNames
     '''
     Adds a new :class:`~music21.stream.Part` to an existing offset mapping.
 
@@ -204,6 +206,7 @@ def correlateHarmonies(currentMapping, music21Part):
 
 
 def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
+    # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Score` and a functionToApply which takes in a possibility
     instance, a tuple with pitches or rests comprising a vertical sonority. Changes the color of
@@ -268,6 +271,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
 
 
 def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
+    # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Score` and a functionToApply which takes in two consecutive
     possibility instances, each a tuple with pitches or rests comprising a vertical sonority.
@@ -351,8 +355,8 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
 def voiceCrossing(possibA):
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
-    two voices which form a voice crossing. The parts from lowest part to
-    highest part (right to left) must correspond to increasingly higher
+    two voices which form a voice crossing. The parts from the lowest part to
+    the highest part (right to left) must correspond to increasingly higher
     pitches in order for there to be no voice crossing. Comparisons between
     pitches are done using pitch comparison methods, which are based on pitch
     space values (see :class:`~music21.pitch.Pitch`).

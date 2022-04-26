@@ -66,7 +66,7 @@ if __name__ == '__main__':
     setuptools.setup(
         name='music21',
         version=m21version,
-        python_requires='>=3.7',
+        python_requires='>=3.8',
         description=DESCRIPTION,
         long_description=DESCRIPTION_LONG,
         author='Michael Scott Cuthbert, the music21 project, others',
