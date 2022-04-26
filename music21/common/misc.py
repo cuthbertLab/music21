@@ -192,25 +192,26 @@ def sortModules(moduleList: Iterable[Any]) -> List[object]:
 def pitchList(pitchL):
     '''
     utility method that replicates the previous behavior of
-    lists of pitches
+    lists of pitches.
+
+    May be moved in v8 or later to a common.testing or test.X module.
     '''
     return '[' + ', '.join([x.nameWithOctave for x in pitchL]) + ']'
 
 
 def runningUnderIPython() -> bool:
     '''
-    return bool if we are running under iPython Notebook (not iPython)
+    return bool if we are running under IPython Notebook (not IPython terminal)
+    or Google Colabatory (colab).
 
-    (no tests, since will be different)
-
-    This post:
+    Methods based on:
 
     https://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
 
-    says not to do this, but really, I can't think of another way
-    to have different output as default.
+    (No tests provided here, since results will differ depending on environment)
 
-    Returns True also for Google Colab
+    May be moved in v8 or later to the ipython21 module.  Implementation may
+    change.
     '''
     if sys.stderr.__class__.__name__ == 'OutStream':
         return True

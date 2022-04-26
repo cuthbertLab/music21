@@ -299,11 +299,10 @@ class SubConverter:
 
 class ConverterIPython(SubConverter):
     '''
-    Meta-subconverter for displaying image data etc. in iPython
+    Meta-subconverter for displaying image data in a Notebook
     using either png (via MuseScore or LilyPond) or directly via
-    Vexflow/music21j
+    Vexflow/music21j, or MIDI using music21j.
     '''
-
     registerFormats = ('ipython',)
     registerOutputExtensions = ()
     registerOutputSubformatExtensions = {'lilypond': 'ly'}
@@ -336,6 +335,11 @@ class ConverterIPython(SubConverter):
         '''
         show using the appropriate subformat.
         '''
+        # noinspection PyPackageRequirements
+        from IPython.display import Image, display, HTML  # @UnresolvedImport
+        from music21 import converter
+        from music21.ipython21 import inGoogleColabNotebook
+
         if subformats is None:
             subformats = ['vexflow']
 
@@ -352,14 +356,9 @@ class ConverterIPython(SubConverter):
         if not helperSubformats:
             helperSubformats = ['png']
 
-        from music21 import converter
-
         helperConverter = converter.Converter()
         helperConverter.setSubconverterFromFormat(helperFormat)
         helperSubConverter = helperConverter.subConverter
-
-        # noinspection PyPackageRequirements
-        from IPython.display import Image, display, HTML  # @UnresolvedImport
 
         if helperFormat in ('musicxml', 'xml', 'lilypond', 'lily'):
             # hack to make musescore excerpts -- fix with a converter class in MusicXML
@@ -402,6 +401,7 @@ class ConverterIPython(SubConverter):
 
         elif helperFormat == 'midi':
             assert isinstance(helperSubConverter, ConverterMidi)
+
             fp = helperSubConverter.write(
                 obj,
                 helperFormat,
@@ -414,11 +414,22 @@ class ConverterIPython(SubConverter):
             binaryBase64 = base64.b64encode(binaryMidiData)
             s = common.SingletonCounter()
             outputId = 'midiPlayerDiv' + str(s())
+
+            # note that require is automatically loaded in Jupyter Notebook
+            # but not in Google Colab.
+            load_require_script = ''
+            if inGoogleColabNotebook():
+                load_require_script = '''
+                    <script src="//cuthbertLab.github.io/music21j/ext/require/require.js"
+                    ></script>
+                '''
+
             # noinspection PyTypeChecker
             display(HTML("""
                 <div id='""" + outputId + """'></div>
                 <link rel="stylesheet" href="//cuthbertLab.github.io/music21j/css/m21.css"
                     type="text/css" />
+                """ + load_require_script + """
                 <script>
                 require.config({
                     paths: {'music21': '//cuthbertLab.github.io/music21j/src/music21'}
