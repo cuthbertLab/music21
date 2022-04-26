@@ -3,9 +3,9 @@
 # Name:         common/enums.py
 # Purpose:      Music21 Enumerations
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2021 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2021 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from enum import Enum, EnumMeta

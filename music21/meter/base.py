@@ -4,9 +4,9 @@
 # Purpose:      Classes for meters
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2015, 2021 Michael Scott Cuthbert
+# Copyright:    Copyright © 2009-2012, 2015, 2021 Michael Scott Asato Cuthbert
 #               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------

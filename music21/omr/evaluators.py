@@ -4,9 +4,9 @@
 # Purpose:      music21 module for evaluating correcting of output from OMR software
 #
 # Authors:      Maura Church
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert,
+# Copyright:    Copyright © 2014 Maura Church, Michael Scott Asato Cuthbert,
 #               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------

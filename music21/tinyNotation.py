@@ -3,9 +3,9 @@
 # Name:         tinyNotation.py
 # Purpose:      A simple notation input format.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
 '''

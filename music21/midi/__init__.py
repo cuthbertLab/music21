@@ -4,10 +4,10 @@
 # Purpose:      Access to MIDI library / music21 classes for dealing with midi data
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               (Will Ware -- see docs)
 #
-# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Asato Cuthbert and the music21 Project
 #               Some parts of this module are in the Public Domain, see details.
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------

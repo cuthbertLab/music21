@@ -3,12 +3,12 @@
 # Name:         harmony.py
 # Purpose:      music21 classes for representing harmonies and chord symbols
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Beth Hadley
-#               Christopher Ariza
 #               Jacob Tyler Walls
+#               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2022, Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2022, Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

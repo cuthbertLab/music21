@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2003, 2010 Christopher Ariza
-#               Copyright © 2010-2012, 19 Michael Scott Cuthbert and the music21 Project
+#               Copyright © 2010-2012, 19 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

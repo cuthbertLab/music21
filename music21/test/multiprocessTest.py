@@ -3,9 +3,9 @@
 # Name:         multiprocesssTest.py
 # Purpose:      Controller for all tests in music21 run concurrently.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012-15 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-15 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

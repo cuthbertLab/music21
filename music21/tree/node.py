@@ -4,9 +4,9 @@
 # Purpose:      Internal data structures for timespan collections
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------

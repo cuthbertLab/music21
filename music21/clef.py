@@ -3,10 +3,10 @@
 # Name:         clef.py
 # Purpose:      Objects for representing clefs
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 #
 # Changes:      04 March 2014 by Michael Bodenbach

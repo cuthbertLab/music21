@@ -4,10 +4,10 @@
 # Purpose:      Neo-Riemannian Chord Transformations
 #
 # Authors:      Maura Church
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2017-19 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017-19 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

@@ -5,7 +5,7 @@
 #
 # Authors:      Janelle Sands
 #
-# Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest

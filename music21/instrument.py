@@ -3,14 +3,14 @@
 # Name:         instrument.py
 # Purpose:      Class for basic instrument information
 #
-# Authors:      Neena Parikh
+# Authors:      Michael Scott Asato Cuthbert
+#               Neena Parikh
 #               Christopher Ariza
-#               Michael Scott Cuthbert
 #               Jose Cabal-Ugaz
 #               Ben Houge
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2009-2012, 17, 20 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

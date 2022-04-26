@@ -4,9 +4,9 @@
 # Purpose:      music21 class which contains lookup tables between print and braille
 # Authors:      Jose Cabal-Ugaz
 #               Bo-cheng Jhan
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011, 2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ----------------------------------------------------------------------------------
 '''

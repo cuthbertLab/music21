@@ -4,10 +4,10 @@
 # Purpose:      Methods for storing any music21 object on disk.
 #               Uses pickle and json
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2011-2012 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------

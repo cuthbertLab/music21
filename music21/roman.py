@@ -3,10 +3,10 @@
 # Name:         roman.py
 # Purpose:      music21 classes for doing Roman Numeral / Tonal analysis
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2011-2022 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------

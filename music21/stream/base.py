@@ -3,12 +3,12 @@
 # Name:         stream/base.py
 # Purpose:      base classes for dealing with groups of positioned objects
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #               Josiah Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2021 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2021 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         variant.py
-# Purpose:      Translate MusicXML and music21 objects
+# Purpose:      Ossia and other variant reading tools
 #
 # Authors:      Christopher Ariza
 #               Evan Lynch
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 # currently the tinyNotation demos use alignment to show variation, making this necessary.

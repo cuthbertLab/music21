@@ -3,9 +3,9 @@
 # Name:         noteGrouping.py
 # Purpose:      Transcribes note groupings into Braille
 # Authors:      Jose Cabal-Ugaz
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012, 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012, 2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest

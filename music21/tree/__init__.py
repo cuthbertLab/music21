@@ -5,9 +5,9 @@
 #               organized by start and stop offsets
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-15 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------

@@ -3,9 +3,9 @@
 # Name:         style.py
 # Purpose:      Music21 classes for non-analytic display properties
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2016-22 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2016-22 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------

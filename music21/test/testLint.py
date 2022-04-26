@@ -4,9 +4,9 @@
 # Purpose:      Controller for all lint based testing.
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2010, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010, 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 

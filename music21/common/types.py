@@ -3,9 +3,9 @@
 # Name:         common/types.py
 # Purpose:      Music21 Typing aids
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2021 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2021 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from fractions import Fraction

@@ -3,10 +3,10 @@
 # Name:         graph/findPlot.py
 # Purpose:      Methods for finding appropriate plots for plotStream.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

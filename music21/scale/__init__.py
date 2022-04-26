@@ -4,10 +4,10 @@
 # Purpose:      music21 classes for representing scales
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

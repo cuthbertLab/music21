@@ -5,8 +5,9 @@
 #
 # Authors:      Christopher Ariza
 #               Josiah Oberholtzer
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2014 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------

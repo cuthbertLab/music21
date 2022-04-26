@@ -5,7 +5,7 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 

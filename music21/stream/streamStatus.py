@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         streamStatus.py
-# Purpose:      functionality for reporting on the notational status of streams
+# Purpose:      Functionality for reporting on the notational status of streams
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------

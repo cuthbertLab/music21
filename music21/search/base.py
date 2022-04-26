@@ -3,9 +3,9 @@
 # Name:         search/base.py
 # Purpose:      music21 classes for searching within files
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2013, 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013, 2017 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

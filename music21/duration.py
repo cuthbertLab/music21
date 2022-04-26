@@ -3,10 +3,10 @@
 # Name:         duration.py
 # Purpose:      music21 classes for representing durations
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2021 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

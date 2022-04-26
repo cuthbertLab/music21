@@ -3,10 +3,10 @@
 # Name:         base.py
 # Purpose:      Music21 base classes and important utilities
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2022 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2006-2022 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------

@@ -4,9 +4,9 @@
 # Purpose:      A graph of intervals, for scales and harmonies.
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2012, 2015-16 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2012, 2015-16 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

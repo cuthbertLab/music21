@@ -3,9 +3,9 @@
 # Name:         prebase.py
 # Purpose:      classes for anything in music21 to inherit from.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2019 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

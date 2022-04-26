@@ -4,9 +4,9 @@
 # Purpose:      music21 modules for improving and evaluating (not performing) OMR
 #
 # Authors:      Maura Church
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
+# Copyright:    Copyright © 2014 Maura Church, Michael Scott Asato Cuthbert, and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 

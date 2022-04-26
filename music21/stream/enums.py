@@ -3,9 +3,9 @@
 # Name:         stream/enums.py
 # Purpose:      enumerations for streams
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 import enum

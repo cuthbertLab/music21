@@ -4,9 +4,9 @@
 # Purpose:      Break up a part into its contiguous melodies.
 #
 # Authors:      Mark Gotham
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2018 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2018 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 

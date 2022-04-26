@@ -5,9 +5,10 @@
 #               parameters
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2011-2012, 2015, 2017
-#               Michael Scott Cuthbert and the music21 Project
+#               Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
