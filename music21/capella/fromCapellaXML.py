@@ -22,6 +22,7 @@ import unittest
 import zipfile
 
 from io import StringIO
+from typing import List, Optional
 
 from music21 import bar
 from music21 import chord
@@ -29,6 +30,7 @@ from music21 import clef
 from music21 import common
 from music21 import duration
 from music21 import exceptions21
+from music21 import layout
 from music21 import key
 from music21 import meter
 from music21 import note
@@ -84,7 +86,7 @@ class CapellaImportException(exceptions21.Music21Exception):
 class CapellaImporter:
     '''
     Object for importing .capx, CapellaXML files into music21 (from which they can be
-    converted to musicxml, MIDI, lilypond, etc.
+    converted to musicxml, MIDI, lilypond, etc.)
 
     Note that Capella stores files closer to their printed versions -- that is to say,
     Systems enclose all the parts for that system and have new clefs etc.
@@ -194,7 +196,7 @@ class CapellaImporter:
                 newPart.coreElementsChanged()
         newScore = stream.Score()
         # ORDERED DICT
-        parts = [None for i in range(len(partDictById))]
+        parts: List[Optional['music21.stream.Part']] = [None for i in range(len(partDictById))]
         for partId in partDictById:
             partDict = partDictById[partId]
             parts[partDict['number']] = partDict['part']

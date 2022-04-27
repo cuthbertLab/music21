@@ -332,7 +332,7 @@ class Test(unittest.TestCase):
         # has metronome marks defined, not with sound tag
         s = converter.parse(testPrimitive.metronomeMarks31c)
         # get all tempo indications
-        mms = s[meter.TempoIndication]
+        mms = s[tempo.TempoIndication]
         self.assertGreater(len(mms), 3)
 
     def testImportMetronomeMarksB(self):
@@ -392,7 +392,7 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         s = converter.parse(testPrimitive.staffGroupsNested41d)
-        staffGroups = s.getElementsByClass(spanner.StaffGroup)
+        staffGroups = s.getElementsByClass(layout.StaffGroup)
         # staffGroups.show()
         self.assertEqual(len(staffGroups), 2)
 
@@ -411,7 +411,7 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         s = converter.parse(testPrimitive.pianoStaff43a)
-        sgs = s.getElementsByClass(spanner.StaffGroup)
+        sgs = s.getElementsByClass(layout.StaffGroup)
         self.assertEqual(len(sgs), 1)
         self.assertEqual(sgs[0].symbol, 'brace')
         self.assertIs(sgs[0].barTogether, True)
