@@ -124,7 +124,7 @@ class RnWriter(prebase.ProtoM21Object):
         self.composer = 'Composer unknown'
         self.title = 'Title unknown'
         self.combinedList: List[str] = []
-        self.container: stream.Stream
+        self.container: Union[stream.Part, stream.Score]
 
         if isinstance(obj, stream.Stream):
             if isinstance(obj, stream.Opus):
@@ -136,8 +136,9 @@ class RnWriter(prebase.ProtoM21Object):
                 return
 
             elif isinstance(obj, stream.Score):
-                if obj.parts:
-                    self.container = obj.parts.first()
+                p = obj.parts.first()
+                if p is not None:
+                    self.container = p
                 else:  # score with no parts
                     self.container = obj
 

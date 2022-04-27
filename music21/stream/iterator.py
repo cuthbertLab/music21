@@ -26,7 +26,7 @@ import warnings
 from music21 import common
 from music21.common.classTools import tempAttribute, saveAttributes
 from music21.common.enums import OffsetSpecial
-from music21.common.types import M21ObjType, StreamType, ClassListType
+from music21.common.types import M21ObjType, StreamType
 from music21.exceptions21 import StreamException
 from music21 import note
 from music21.stream import filters
@@ -65,7 +65,7 @@ class ActiveInformation(TypedDict, total=False):
 # -----------------------------------------------------------------------------
 
 
-class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.abc.Collection):
+class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.abc.Sequence):
     '''
     An Iterator object used to handle getting items from Streams.
     The :meth:`~music21.stream.Stream.__iter__` method
@@ -479,6 +479,18 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
 
         return False
 
+    def __contains__(self, item):
+        '''
+        Does the iterator contain `item`?  Needed for AbstractBaseClass
+        '''
+        return item in self.matchingElements(restoreActiveSites=False)
+
+    def __reversed__(self):
+        me = self.matchingElements()
+        me.reverse()
+        for item in me:
+            yield item
+
     def clone(self: _SIter) -> _SIter:
         '''
         Returns a new copy of the same iterator.
@@ -634,7 +646,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
 
     def matchingElements(self, *, restoreActiveSites: bool = True) -> List[M21ObjType]:
         '''
-        returns a list of elements that match the filter.
+        Returns a list of elements that match the filter.
 
         This sort of defeats the point of using a generator, so only used if
         it's requested by __len__ or __getitem__ etc.
@@ -1456,16 +1468,6 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         return self.getElementsByClass(spanner.Spanner)
 
     @property
-    def variants(self):
-        '''
-        Deprecated in version 7
-
-        Adds a ClassFilter for Variant
-        '''
-        from music21 import variant
-        return self.getElementsByClass(variant.Variant)
-
-    @property
     def voices(self):
         '''
         Adds a ClassFilter for Voice objects
@@ -2031,7 +2033,6 @@ class Test(unittest.TestCase):
         self.assertIsNone(currentOffset)
 
     def testAddingFiltersMidRecursiveIteration(self):
-        from music21 import note
         from music21 import stream
         from music21.stream.iterator import RecursiveIterator as ImportedRecursiveIterator
         m = stream.Measure()
