@@ -596,7 +596,7 @@ class ContiguousSegmentSearcher:
         self.searchLength = length
         self.listOfContiguousSegments = []
         hasParts = True
-        partList = self.stream.recurse().getElementsByClass('Part')
+        partList = self.stream[stream.Part]
         if not partList:
             partList = [self.stream]
             hasParts = False

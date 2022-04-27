@@ -710,7 +710,7 @@ class Test(unittest.TestCase):
         a = converter.parse(corpus.getWork('corelli/opus3no1/1grave'))
         b = a.parts[1]
         c = b.flatten()
-        for thisNote in c.getElementsByClass('Note'):
+        for thisNote in c.getElementsByClass(note.Note):
             thisNote.lyric = thisNote.name
         textStr = text.assembleLyrics(b)
         self.assertEqual(textStr.startswith('A A G F E'),
@@ -6169,7 +6169,7 @@ class Test(unittest.TestCase):
         # for testing against
         s2 = Stream()
 
-        s3 = s1.getElementsByClass('GeneralNote').stream()
+        s3 = s1.notesAndRests.stream()
         self.assertEqual(len(s3), 20)
         # environLocal.printDebug(['s3.derivation.origin', s3.derivation.origin])
         self.assertIs(s3.derivation.origin, s1)
@@ -6260,7 +6260,7 @@ class Test(unittest.TestCase):
         self.assertIs(s1Flat.derivation.origin, s1)
         self.assertEqual(s1Flat.derivation.method, 'flat')
 
-        s1Elements = s1Flat.getElementsByClass('Note').stream()
+        s1Elements = s1Flat.getElementsByClass(note.Note).stream()
         self.assertEqual(s1Elements.derivation.method, 'getElementsByClass')
 
         s1 = converter.parse('tinyNotation: 4/4 C2 D2')
@@ -7365,7 +7365,7 @@ class Test(unittest.TestCase):
         s.append(chord.Chord(['c4', 'a5']))
         s.extendTies()
         post = []
-        for n in s.flatten().getElementsByClass('GeneralNote'):
+        for n in s.flatten().notesAndRests:
             if isinstance(n, chord.Chord):
                 post.append([repr(q.tie) for q in n])
             else:

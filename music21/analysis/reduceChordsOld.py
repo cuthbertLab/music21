@@ -369,7 +369,7 @@ class TestExternal(unittest.TestCase):
         from music21 import key
         from music21 import roman
         cm = key.Key('G')
-        for thisChord in p.recurse().getElementsByClass('Chord'):
+        for thisChord in p[chord.Chord]:
             thisChord.lyric = roman.romanNumeralFromChord(thisChord,
                                                           cm,
                                                           preferSecondaryDominants=True).figure

@@ -86,7 +86,7 @@ def thomassenMelodicAccent(streamIn):
     .. _melac: https://www.humdrum.org/Humdrum/commands/melac.html
 
     Takes in a Stream of :class:`~music21.note.Note` objects (use `.flatten().notes` to get it, or
-    better `.flatten().getElementsByClass('Note')` to filter out chords) and adds the attribute to
+    better `.flatten().getElementsByClass(note.Note)` to filter out chords) and adds the attribute to
     each.  Note that Huron and Royal's work suggests that melodic accent has a correlation
     with metrical accent only for solo works/passages; even treble passages do not have a
     strong correlation. (Gregorian chants were found to have a strong ''negative'' correlation

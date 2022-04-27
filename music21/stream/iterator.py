@@ -514,12 +514,12 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> s = converter.parse('tinyNotation: 3/4 D4 E2 F4 r2 G2 r4')
         >>> s.recurse().notes.first()
         <music21.note.Note D>
-        >>> s.recurse().getElementsByClass('Rest').first()
+        >>> s[note.Rest].first()
         <music21.note.Rest half>
 
         If no elements match, returns None:
 
-        >>> print(s.recurse().getElementsByClass('Chord').first())
+        >>> print(s[chord.Chord].first())
         None
 
         New in v7.
@@ -565,7 +565,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> s = converter.parse('tinyNotation: 3/4 D4 E2 F4 r2 G2 r4')
         >>> s.recurse().notes.last()
         <music21.note.Note G>
-        >>> s.recurse().getElementsByClass('Rest').last()
+        >>> s[note.Rest].last()
         <music21.note.Rest quarter>
 
         New in v7.
@@ -790,7 +790,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> b = bar.Barline()
         >>> s.storeAtEnd(b)
 
-        >>> s2 = s.iter().getElementsByClass('Note').stream()
+        >>> s2 = s.iter().getElementsByClass(note.Note).stream()
         >>> s2.show('t')
         {0.0} <music21.note.Note C>
         {2.0} <music21.note.Note D>
@@ -2000,7 +2000,7 @@ class Test(unittest.TestCase):
         self.assertIs(r0, r)
 
         # adding a filter gives a new StreamIterator that restarts at 0
-        sIter2 = sIter.getElementsByClass('GeneralNote')  # this filter does nothing here.
+        sIter2 = sIter.notesAndRests  # this filter does nothing here.
         obj0 = next(sIter2)
         self.assertIs(obj0, r)
 

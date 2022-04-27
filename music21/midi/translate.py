@@ -2323,7 +2323,7 @@ def channelInstrumentData(
     # Music tracks
     for subs in substreamList:
         # get a first instrument; iterate over rest
-        instrumentStream = subs.recurse().getElementsByClass('Instrument')
+        instrumentStream = subs[instrument.Instrument]
         setAnInstrument = False
         for inst in instrumentStream:
             if inst.midiChannel is not None and inst.midiProgram not in channelByInstrument:
@@ -3587,6 +3587,7 @@ class Test(unittest.TestCase):
 
     def testMidiTempoImportB(self):
         from music21 import converter
+        from music21 import tempo
 
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         # a file with three tracks and one conductor track with four tempo marks
@@ -3595,15 +3596,15 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts), 3)
         # metronome marks propagate to every staff, but are hidden on subsequent staffs
         self.assertEqual(
-            [mm.numberImplicit for mm in s.parts[0].recurse().getElementsByClass('MetronomeMark')],
+            [mm.numberImplicit for mm in s.parts[0][tempo.MetronomeMark]],
             [False, False, False, False]
         )
         self.assertEqual(
-            [mm.numberImplicit for mm in s.parts[1].recurse().getElementsByClass('MetronomeMark')],
+            [mm.numberImplicit for mm in s.parts[1][tempo.MetronomeMark]],
             [True, True, True, True]
         )
         self.assertEqual(
-            [mm.numberImplicit for mm in s.parts[2].recurse().getElementsByClass('MetronomeMark')],
+            [mm.numberImplicit for mm in s.parts[2][tempo.MetronomeMark]],
             [True, True, True, True]
         )
 

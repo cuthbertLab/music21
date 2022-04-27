@@ -23,6 +23,7 @@ from typing import Union
 
 from music21 import exceptions21
 from music21 import expressions
+from music21 import prebase
 from music21 import spanner
 from music21 import style
 
@@ -32,7 +33,7 @@ environLocal = environment.Environment(_MOD)
 
 
 # ------------------------------------------------------------------------------
-class RepeatMark:
+class RepeatMark(prebase.ProtoM21Object):
     '''
     Base class of all repeat objects, including RepeatExpression objects and
     Repeat (Barline) objects.
@@ -53,7 +54,7 @@ class RepeatMark:
     >>> s = stream.Stream()
     >>> s.append(note.Note())
     >>> s.append(PartialRepeat())
-    >>> repeats = s.getElementsByClass(repeat.RepeatMark)
+    >>> repeats = s.getElementsByClass('RepeatMark')  # not a Music21Object, so use quotes
     >>> if repeats:
     ...    print('Stream has %s repeat(s) in it' % (len(repeats)))
     Stream has 1 repeat(s) in it
@@ -124,7 +125,7 @@ class RepeatExpression(RepeatMark, expressions.Expression):
 
     def applyTextFormatting(self, te=None):
         '''
-        Apply the default text formatting to the text expression version of of this repeat
+        Apply the default text formatting to the text expression version of this repeat
         '''
         if te is None:  # use the stored version if possible
             te = self._textExpression
@@ -406,7 +407,7 @@ def insertRepeatEnding(s, start, end, endingNumber=1, *, inPlace=False):
     the method adds a second ending
     from measures 6 to 7.
 
-    Does not (yet) add a :class:`~music21.bar.RepeatMark` to the end of the first ending.
+    Does not (yet) add a :class:`~music21.repeat.RepeatMark` to the end of the first ending.
 
     Example: create first and second endings over measures 4-6 and measures 11-13 of a chorale,
     respectively.
@@ -764,7 +765,7 @@ class Expander:
         happens for Measures contained in the given Stream.
         Other objects in that Stream are neither processed nor copied.
 
-        if deepcopy is False then it will leave the stream in a unusual state, but acceptable if
+        if deepcopy is False then it will leave the stream in an unusual state, but acceptable if
         the source stream has already been deep-copied and will be discarded later
         '''
         canExpand = self.isExpandable()
@@ -783,20 +784,20 @@ class Expander:
         if canExpand is None:
             return srcStream
 
-        # these must by copied, otherwise we have the original still
+        # these must be copied, otherwise we have the original still
         self._repeatBrackets = copy.deepcopy(self._repeatBrackets)
 
         # srcStream = self._srcMeasureStream
         # after copying, update repeat brackets (as spanners)
         for m in srcStream:
-            # processes uses the spanner bundle stored on this Stream
+            # uses the spanner bundle stored on this Stream
             self._repeatBrackets.spannerBundle.replaceSpannedElement(
                 m.derivation.origin, m)
 
         # srcStream = self._srcMeasureStream
         # post = copy.deepcopy(self._srcMeasureStream)
         hasDaCapoOrSegno = self._daCapoOrSegno()
-        # will deep copy
+        # will deepcopy
         if hasDaCapoOrSegno is None:
             post = self._processRecursiveRepeatBars(srcStream)
         else:  # we have a segno or capo
@@ -911,7 +912,7 @@ class Expander:
                 if lb.direction == 'start':
                     startCount += 1
                     countBalance += 1
-                # ends may be encountered on left of bar
+                # ends of repeats may be encountered on left of bar
                 elif lb.direction == 'end':
                     if countBalance == 0:  # the first repeat found
                         startCount += 1  # simulate first
@@ -920,7 +921,7 @@ class Expander:
                     countBalance -= 1
             if rb is not None and 'music21.bar.Repeat' in rb.classSet:
                 if rb.direction == 'end':
-                    # if this is the first of all repeats found, then we
+                    # if this is the first repeat found, then we
                     # have an acceptable case where the first repeat is omitted
                     if countBalance == 0:  # the first repeat found
                         startCount += 1  # simulate first
@@ -966,7 +967,7 @@ class Expander:
     def _getRepeatExpressionCommandType(self):
         '''
         Return the class of the repeat expression command. This should
-        only be called if it has been determine that there is one
+        only be called if it has been determined that there is one
         repeat command in this Stream.
         '''
         if self._dcCount == 1:
@@ -1133,8 +1134,7 @@ class Expander:
                             # shiftedIndex = True
                             # match = True
                             break
-#                 if match:
-#                     break
+
             # if not shiftedIndex:
             i += 1
         if groupIndices:
@@ -1175,7 +1175,7 @@ class Expander:
                     environLocal.printDebug([
                         f'repeat brackets are not numbered consecutively: {match}, {target}'])
                     return False
-            # there needs to be repeat after each bracket except the last
+            # there needs to be a repeat mark after each bracket except the last
             spannedMeasureIds = []
             for rbCount, rb in enumerate(rBrackets):
                 # environLocal.printDebug(['rbCount', rbCount, rb])
@@ -1337,7 +1337,7 @@ class Expander:
         Process and return a new Stream of Measures, likely a Part.
 
         If `repeatIndices` are given, only these indices will be copied.
-        All inclusive indices must be listed, not just the start and end.
+        All the included indices must be listed, not just the start and end.
 
         If `returnExpansionOnly` is True, only the expanded portion is
         returned, the rest of the Stream is not retained.
@@ -1495,8 +1495,8 @@ class Expander:
                     # always copying from the same source
                     for j in repeatIndices:
                         mSub = copy.deepcopy(streamObj[j])
-                        # must do for each pass, b/c not changing source
-                        # stream
+                        # We must do this for each pass, b/c we are not changing
+                        # the source stream
                         # environLocal.printDebug(['got j, repeatIndices', j, repeatIndices])
                         if j in [repeatIndices[0], repeatIndices[-1]]:
                             self._stripRepeatBarlines(mSub)
@@ -1512,7 +1512,7 @@ class Expander:
                         new.append(mSub)
                         # renumber at end
                         # number += 1
-                # check if need to clear repeats from next bar
+                # check if we need to clear repeats from next bar
                 if mLast is not mEndBarline:
                     stripFirstNextMeasure = True
                 # set i to next measure after mLast
@@ -1566,13 +1566,13 @@ class Expander:
 
         # need to remove groups that are already used
         groups = self._groupRepeatBracketIndices(streamObj)
-        # if we do not groups when expected it is probably b/c spanners have
-        # been orphaned
+        # if we do not group when we are expected to do so, it is probably b/c spanners have
+        # been orphaned.
         # environLocal.printDebug(['got groups:', groups])
         if not groups:  # none found:
             return self.processInnermostRepeatBars(streamObj)
 
-        # need to find innermost repeat, and then see it it has any
+        # need to find innermost repeat, and then see if it has any
         # repeat brackets that are relevant for the span
         # this group may ultimately extend beyond the innermost, as this may
         # be the first of a few brackets
@@ -1638,7 +1638,7 @@ class Expander:
                 raise ExpanderException(
                     'failed to find start or end index of bracket expansion')
 
-            # if mLast does not have a repeat bar, its probably not a repeat
+            # if mLast does not have a repeat bar, it is probably not a repeat
             mLastRightBar = mLast.rightBarline
             if (mLastRightBar is not None
                     and 'music21.bar.Repeat' in mLastRightBar.classSet):
@@ -1694,7 +1694,7 @@ class Expander:
             for m in sub:
                 self._stripRepeatBarlines(m)
                 new.append(m)
-        # need 1 more than highest measure counted
+        # need 1 more than the highest measure counted
         streamObjPost = streamObj[highestIndexRepeated + 1:]
         for m in streamObjPost:
             new.append(m)
@@ -1740,7 +1740,7 @@ class Expander:
         Return None if there's nothing to expand (a third case...)
         '''
         match = self._daCapoOrSegno()
-        # if neither repeats nor segno/capo, than not expandable
+        # if neither repeats nor segno/capo, then not expandable
         if match is None and not self._hasRepeat(self._srcMeasureStream):
             environLocal.printDebug(
                 'no dc/segno, no repeats; is expandable but will not do anything'
@@ -1774,8 +1774,8 @@ class Expander:
         if makeDeepCopy is True, then it will make a deepcopy of the stream.  Otherwise
         assumes it has already been done.
         '''
-        # this assumes just a stream of measures
-        # assume already copied
+        # This assumes just a stream of measures.
+        # Also assumes the stream has already been copied unless makeDeepCopy is True.
         if makeDeepCopy is True:
             streamObj = copy.deepcopy(streamObj)
         repeatBracketsMemo = {}  # store completed brackets
@@ -1805,8 +1805,8 @@ class Expander:
         Process and return a new Stream of Measures, likely a Part.
         Expand any repeat expressions found within.
         '''
-        # should already be a stream of measures
-        # assume already copied
+        # Should already be a stream of measures.
+        # Assumes that the stream has already been copied.
         capoOrSegno = self._daCapoOrSegno()
         recType = self._getRepeatExpressionCommandType()  # a string form
         recObj = self._getRepeatExpressionCommand(streamObj)
@@ -2163,7 +2163,7 @@ class RepeatFinder:
             res.append([])
 
         for i in range(len(mLists) - 1, -1, -1):
-            # mHash is a the concatenation of the measure i for each part.
+            # mHash is the concatenation of the measure i for each part.
             mHash = ''.join(mLists[i])
 
             if mHash in tempDict:
@@ -2627,7 +2627,7 @@ class Test(unittest.TestCase):
         # s.show()
 
         # now have 4
-        self.assertEqual(len(s.recurse().getElementsByClass('RepeatMark')), 4)
+        self.assertEqual(len(s['RepeatMark']), 4)
 
         # check coherence
         ex = repeat.Expander(s)
@@ -2711,7 +2711,7 @@ class Test(unittest.TestCase):
                           28.0, 32.0, 36.0, 40.0, 44.0])
 
         self.assertEqual([n.nameWithOctave
-                          for n in post.flatten().getElementsByClass('Note')],
+                          for n in post.flatten().getElementsByClass(note.Note)],
                          ['G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3',
                           'D4', 'D4', 'D4', 'D4',
                           'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4',
@@ -2797,7 +2797,7 @@ class Test(unittest.TestCase):
         ex = repeat.Expander(s)
         self.assertTrue(ex.isExpandable())
 
-        # ds al fine missing fine
+        # "ds al fine" missing "fine"
         s = stream.Part()
         m1 = stream.Measure()
         m1.append(Segno())
@@ -2875,7 +2875,7 @@ class Test(unittest.TestCase):
                          [0.0, 4.0, 8.0, 12.0])
 
         self.assertEqual([n.nameWithOctave
-                          for n in post.flatten().getElementsByClass('Note')],
+                          for n in post.flatten().getElementsByClass(note.Note)],
                          ['G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3',
                           'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
         measureNumbersPost = [m.measureNumberWithSuffix()
@@ -2910,7 +2910,7 @@ class Test(unittest.TestCase):
         self.assertEqual([m.offset for m in post.getElementsByClass(stream.Measure)],
                          [0.0, 4.0, 8.0, 12.0, 16.0])
         self.assertEqual([n.nameWithOctave
-                          for n in post.flatten().getElementsByClass('Note')],
+                          for n in post.flatten().getElementsByClass(note.Note)],
                          ['G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3',
                           'G3', 'F3', 'F3', 'F3', 'F3',
                           'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
@@ -4039,7 +4039,7 @@ class Test(unittest.TestCase):
         m3.rightBarline = bar.Repeat()
         p.append(rb1)
         rb2 = spanner.RepeatBracket(m4, number=3)
-        # second ending may not have repeat
+        # The second ending might not have a repeat sign.
         p.append(rb2)
         # p.show()
 
@@ -4094,7 +4094,7 @@ class Test(unittest.TestCase):
         p.append(rb4)
         rb5 = spanner.RepeatBracket(m8, number=5)
         p.append(rb5)
-        # second ending may not have repeat
+        # The second ending might not have a repeat sign.
         # p.show()
 
         ex = Expander(p)
@@ -4242,7 +4242,7 @@ class Test(unittest.TestCase):
         p.append(rb4)
         rb5 = spanner.RepeatBracket(m8, number=5)
         p.append(rb5)
-        # second ending may not have repeat
+        # The second ending might not have a repeat sign.
         # p.show()
 
         # p.show()
@@ -4380,7 +4380,7 @@ class Test(unittest.TestCase):
 #         post = s.expandRepeats()
 
     def test_expand_repeats_preserves_name(self):
-        # Test case provided by jacobtylerwalls on issue #1165
+        # Test case provided by Jacob Tyler Walls on issue #1165
         # https://github.com/cuthbertLab/music21/issues/1165#issuecomment-967293691
 
         from music21 import converter
@@ -4388,11 +4388,11 @@ class Test(unittest.TestCase):
 
         p = converter.parse('tinyNotation: c1 d e f')
         p.measure(2).storeAtEnd(bar.Repeat(direction='end', times=1))
-        p.partName = 'mypartname'
-        p.partAbbreviation = 'mypartabbreviation'
+        p.partName = 'my_part_name'
+        p.partAbbreviation = 'my_part_abbreviation'
         exp = p.expandRepeats()
-        self.assertEqual(exp.partName, 'mypartname')
-        self.assertEqual(exp.partAbbreviation, 'mypartabbreviation')
+        self.assertEqual(exp.partName, 'my_part_name')
+        self.assertEqual(exp.partAbbreviation, 'my_part_abbreviation')
 
 
 # ------------------------------------------------------------------------------

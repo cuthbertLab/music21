@@ -167,7 +167,7 @@ class RnWriter(prebase.ProtoM21Object):
                              '']  # One blank line between metadata and analysis
         # Note: blank analyst and proofreader entries until supported within music21 metadata
 
-        if not self.container.recurse().getElementsByClass('TimeSignature'):
+        if not self.container[meter.TimeSignature]:
             self.container.insert(0, meter.TimeSignature('4/4'))  # Placeholder
 
         self.currentKeyString: str = ''

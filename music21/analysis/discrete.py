@@ -1240,7 +1240,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         for p in procList:
             # get only Notes for now, skipping rests and chords
             # flatten to reach notes contained in measures
-            noteStream = p.flatten().stripTies(inPlace=False).getElementsByClass('Note').stream()
+            noteStream = p.flatten().stripTies(inPlace=False).getElementsByClass(note.Note).stream()
             # noteStream.show()
             for i, n in enumerate(noteStream):
                 if i <= len(noteStream) - 2:

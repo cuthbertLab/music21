@@ -314,7 +314,7 @@ class ScoreCorrector:
             self.singleParts[destinationVerticalIndex].measureStream[destinationHorizontalIndex])
         # Measure object
         correctMeasure = self.singleParts[sourceVerticalIndex].measureStream[sourceHorizontalIndex]
-        oldNotePitches = [n.pitch for n in incorrectMeasure.getElementsByClass('Note')]
+        oldNotePitches = [n.pitch for n in incorrectMeasure.getElementsByClass(note.Note)]
         for el in incorrectMeasure.elements:
             incorrectMeasure.remove(el)
 

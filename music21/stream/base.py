@@ -1157,10 +1157,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         >>> m.staffLines = 2
         >>> staffLayout.staffLines
         2
-
         '''
-        staffLayouts = self.recurse().getElementsByClass('StaffLayout')
-        sl: 'music21.layout.StaffLayout'
+        from music21 import layout
+
+        staffLayouts = self[layout.StaffLayout]
+        sl: layout.StaffLayout
         for sl in staffLayouts:
             if sl.getOffsetInHierarchy(self) > 0:
                 break
@@ -5964,7 +5965,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
         def consolidateRests(templateInner):
             consecutiveRests = []
-            for el in list(templateInner.getElementsByClass('GeneralNote')):
+            for el in list(templateInner.notesAndRests):
                 if not isinstance(el, note.Rest):
                     removeConsecutiveRests(templateInner, consecutiveRests)
                     consecutiveRests = []
@@ -9444,7 +9445,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         if 'Measure' in self.classes or 'Voice' in self.classes:
             return True
         # all other Stream classes are not well-formed if they have "loose" notes
-        elif self.getElementsByClass('GeneralNote'):
+        elif self.notesAndRests:
             return False
         elif 'Part' in self.classes:
             if self.hasMeasures():
@@ -12751,7 +12752,7 @@ class Measure(Stream):
         '''
         if useInitialRests:
             removeList = []
-            for gn in self.getElementsByClass('GeneralNote'):
+            for gn in self.notesAndRests:
                 if not isinstance(gn, note.Rest):
                     break
                 removeList.append(gn)
@@ -13039,7 +13040,7 @@ class Part(Stream):
             return self._cache['_partName']
         else:
             pn = None
-            for e in self.recurse().getElementsByClass('Instrument'):
+            for e in self[instrument.Instrument]:
                 pn = e.partName
                 if pn is None:
                     pn = e.instrumentName
@@ -13093,7 +13094,7 @@ class Part(Stream):
             return self._cache['_partAbbreviation']
         else:
             pn = None
-            for e in self.recurse().getElementsByClass('Instrument'):
+            for e in self[instrument.Instrument]:
                 pn = e.partAbbreviation
                 if pn is None:
                     pn = e.instrumentAbbreviation
@@ -13388,7 +13389,7 @@ class Score(Stream):
             {0.0} <music21.chord.Chord E2 G3 B3 E4>
             {4.0} <music21.bar.Barline type=final>
 
-        >>> lastChord = excerptChords.recurse().getElementsByClass('Chord').last()
+        >>> lastChord = excerptChords[chord.Chord].last()
         >>> lastChord
         <music21.chord.Chord E2 G3 B3 E4>
 

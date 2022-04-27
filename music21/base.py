@@ -3877,14 +3877,14 @@ class ElementWrapper(Music21Object):
     ...    el = music21.ElementWrapper(soundFile)
     ...    s.insert(i, el)
 
-    >>> for j in s.getElementsByClass('ElementWrapper'):
+    >>> for j in s.getElementsByClass(base.ElementWrapper):
     ...    if j.beatStrength > 0.4:
     ...        (j.offset, j.beatStrength, j.getnchannels(), j.fileName)
     (0.0, 1.0, 2, 'thisSound_1.wav')
     (3.0, 1.0, 2, 'thisSound_16.wav')
     (6.0, 1.0, 2, 'thisSound_12.wav')
     (9.0, 1.0, 2, 'thisSound_8.wav')
-    >>> for j in s.getElementsByClass('ElementWrapper'):
+    >>> for j in s.getElementsByClass(base.ElementWrapper):
     ...    if j.beatStrength > 0.4:
     ...        (j.offset, j.beatStrength, j.getnchannels() + 1, j.fileName)
     (0.0, 1.0, 3, 'thisSound_1.wav')
@@ -3894,7 +3894,7 @@ class ElementWrapper(Music21Object):
 
     Test representation of an ElementWrapper
 
-    >>> for i, j in enumerate(s.getElementsByClass('ElementWrapper')):
+    >>> for i, j in enumerate(s.getElementsByClass(base.ElementWrapper)):
     ...     if i == 2:
     ...         j.id = None
     ...     else:
@@ -4575,15 +4575,15 @@ class Test(unittest.TestCase):
         s3.append(n3)
 
         # only get n1 here, as that is only level available
-        self.assertEqual(s1.recurse().getElementsByClass('Note').first(), n1)
-        self.assertEqual(s2.recurse().getElementsByClass('Note').first(), n2)
+        self.assertEqual(s1.recurse().getElementsByClass(note.Note).first(), n1)
+        self.assertEqual(s2.recurse().getElementsByClass(note.Note).first(), n2)
         self.assertEqual(s1.recurse().getElementsByClass('Clef').first(), c1)
         self.assertEqual(s2.recurse().getElementsByClass('Clef').first(), c2)
 
         # attach s2 to s1
         s2.append(s1)
         # stream 1 gets both notes
-        self.assertEqual(list(s2.recurse().getElementsByClass('Note')), [n2, n1])
+        self.assertEqual(list(s2.recurse().getElementsByClass(note.Note)), [n2, n1])
 
     def testSetEditorial(self):
         b2 = Music21Object()
@@ -4697,7 +4697,7 @@ class Test(unittest.TestCase):
         matchBeatStrength = []
         matchAudioChannels = []
 
-        for j in s.getElementsByClass('ElementWrapper'):
+        for j in s.getElementsByClass(ElementWrapper):
             matchOffset.append(j.offset)
             matchBeatStrength.append(j.beatStrength)
             matchAudioChannels.append(j.getnchannels())

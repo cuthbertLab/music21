@@ -1928,7 +1928,7 @@ class PartParser(XMLParserBase):
         #     because it should happen on a voice level.
         if measureParser.fullMeasureRest is True:
             # recurse is necessary because it could be in voices...
-            r1 = m.recurse().getElementsByClass('Rest').first()
+            r1 = m[note.Rest].first()
             lastTSQl = self.lastTimeSignature.barDuration.quarterLength
             if (r1.fullMeasure is True  # set by xml measure='yes'
                                     or (r1.duration.quarterLength != lastTSQl

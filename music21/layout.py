@@ -26,14 +26,14 @@ the concept of a PartStaff for a Part that is played by the same performer as an
 e.g., the left hand of the Piano is a PartStaff paired with the right hand).
 
 PageLayout and SystemLayout objects also have a property, 'isNew',
-which if set to `True` signifies that a new page
+which, if set to `True`, signifies that a new page
 or system should begin here.  In theory, one could define new dimensions for a page
 or system in the middle of the system or page without setting isNew to True, in
 which case these measurements would start applying on the next page.  In practice,
 there's really one good place to use these Layout objects and that's in the first part
 in a score at offset 0 of the first measure on a page or system
 (or for ScoreLayout, at the beginning
-of a piece outside of any parts).  But it's not an
+of a piece outside any parts).  But it's not an
 error to put them in other places, such as at offset 0 of the first measure of a page
 or system in all the other parts.  In fact, MusicXML tends to do this, and it ends up
 not being a waste if a program extracts a single part from the middle of a score.
@@ -86,11 +86,12 @@ unadjusted measure width and not their actual measure width in the MusicXML.
 SmartScore Pro tends to produce very good MusicXML layout data.
 '''
 
-# may need to have object to convert between size units
+# may need to have an object to convert between size units
 import copy
 import unittest
 
 from collections import namedtuple
+from typing import Tuple, Optional
 
 from music21 import base
 from music21 import exceptions21
@@ -103,8 +104,8 @@ _MOD = 'layout'
 environLocal = environment.Environment(_MOD)
 
 
-SystemSize = namedtuple('SystemSize', 'top left right bottom')
-PageSize = namedtuple('PageSize', 'top left right bottom width height')
+SystemSize = namedtuple('SystemSize', ['top', 'left', 'right', 'bottom'])
+PageSize = namedtuple('PageSize', ['top', 'left', 'right', 'bottom', 'width', 'height'])
 
 
 class LayoutBase(base.Music21Object):
@@ -461,7 +462,7 @@ class StaffGroup(spanner.Spanner):
 
         self.name = None  # if this group has a name
         self.abbreviation = None
-        self._symbol = None  # can be bracket, line, brace, square
+        self._symbol = None  # Choices: bracket, line, brace, square
         # determines if barlines are grouped through; this is group barline
         # in musicxml
         self._barTogether = True
@@ -702,7 +703,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
                 staffObject.elements = p
                 thisSystem.replace(p, staffObject)
-                allStaffLayouts = p.recurse().getElementsByClass('StaffLayout')
+                allStaffLayouts = p[StaffLayout]
                 if not allStaffLayouts:
                     continue
                 # else:
@@ -710,9 +711,9 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
                 # if len(allStaffLayouts) > 1:
                 #    print('Got many staffLayouts')
 
-            allSystemLayouts = thisSystem.recurse().getElementsByClass('SystemLayout')
+            allSystemLayouts = thisSystem[SystemLayout]
             if len(allSystemLayouts) >= 2:
-                thisSystem.systemLayout = getRichSystemLayout(allSystemLayouts)
+                thisSystem.systemLayout = getRichSystemLayout(list(allSystemLayouts))
             elif len(allSystemLayouts) == 1:
                 thisSystem.systemLayout = allSystemLayouts[0]
             else:
@@ -1021,7 +1022,7 @@ class LayoutScore(stream.Opus):
         This distance is specified with respect to the top of the system.
 
         Staff scaling (<staff-details> in musicxml inside an <attributes> object) is
-        taken into account, but not non 5-line staves.  Thus a normally sized staff
+        taken into account, but not non-five-line staves.  Thus a normally sized staff
         is always of height 40 (4 spaces of 10-tenths each)
 
         >>> lt = corpus.parse('demos/layoutTest.xml')
@@ -1209,12 +1210,12 @@ class LayoutScore(stream.Opus):
         positionForStaffCache[cacheKey] = staffDistanceFromPrevious
         return staffDistanceFromPrevious
 
-    def getStaffSizeFromLayout(self, pageId, systemId, staffId):
+    def getStaffSizeFromLayout(self, pageId: int, systemId: int, staffId: int) -> float:
         '''
         Get the currently active staff-size for a given pageId, systemId, and staffId.
 
-        Note that this does not take into account the hidden state of the staff, which
-        if True makes the effective size 0.0 -- see getStaffHiddenAttribute
+        Note that this does not take into account the hidden state of the staff, which,
+        if True, makes the effective size 0.0 -- see getStaffHiddenAttribute
 
         >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures=True)
@@ -1273,7 +1274,7 @@ class LayoutScore(stream.Opus):
         staffSizeCache[cacheKey] = staffSize
         return staffSize
 
-    def getStaffHiddenAttribute(self, pageId, systemId, staffId):
+    def getStaffHiddenAttribute(self, pageId: int, systemId: int, staffId: int) -> bool:
         '''
         returns the staffLayout.hidden attribute for a staffId, or if it is not
         defined, recursively search through previous staves until one is found.
@@ -1318,7 +1319,11 @@ class LayoutScore(stream.Opus):
         staffHiddenCache[cacheKey] = hiddenTag
         return hiddenTag
 
-    def getSystemBeforeThis(self, pageId, systemId):
+    def getSystemBeforeThis(
+        self,
+        pageId: int,
+        systemId: int
+    ) -> Tuple[Optional[int], Optional[int]]:
         # noinspection PyShadowingNames
         '''
         given a pageId and systemId, get the (pageId, systemId) for the previous system.

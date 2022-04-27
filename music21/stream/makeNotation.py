@@ -1762,7 +1762,7 @@ def iterateBeamGroups(
     iterator: 'music21.stream.iterator.StreamIterator' = s.recurse() if recurse else s.iter()
     current_beam_group: List[note.NotRest] = []
     in_beam_group: bool = False
-    for el in iterator.getElementsByClass('NotRest'):
+    for el in iterator.notes:
         first_el_type: Optional[str] = None
         if el.beams and el.beams.getByNumber(1):
             first_el_type = el.beams.getTypeByNumber(1)

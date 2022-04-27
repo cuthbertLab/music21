@@ -141,7 +141,7 @@ def createOffsetMapping(music21Part):
     (11.0, 12.0)   [<music21.note.Note A> ]
     '''
     currentMapping = collections.defaultdict(list)
-    for music21GeneralNote in music21Part.flatten().getElementsByClass('GeneralNote'):
+    for music21GeneralNote in music21Part.flatten().notesAndRests:
         initOffset = music21GeneralNote.offset
         endTime = initOffset + music21GeneralNote.quarterLength
         currentMapping[(initOffset, endTime)].append(music21GeneralNote)
@@ -183,7 +183,7 @@ def correlateHarmonies(currentMapping, music21Part):
 
     for offsets in sorted(currentMapping.keys()):
         (initOffset, endTime) = offsets
-        notesInRange = music21Part.flatten().getElementsByClass('GeneralNote').getElementsByOffset(
+        notesInRange = music21Part.flatten().notesAndRests.getElementsByOffset(
             initOffset, offsetEnd=endTime,
             includeEndBoundary=False, mustFinishInSpan=False,
             mustBeginInSpan=False, includeElementsThatEndAtStart=False)

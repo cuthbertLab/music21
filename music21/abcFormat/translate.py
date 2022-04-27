@@ -205,7 +205,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     if postTransposition != 0:
         p.transpose(postTransposition, inPlace=True)
 
-    if useMeasures and p.recurse().getElementsByClass('TimeSignature'):
+    if useMeasures and p[meter.TimeSignature]:
         # call make beams for now; later, import beams
         # environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
         try:
@@ -850,16 +850,16 @@ class Test(unittest.TestCase):
         p1 = o.getScoreByNumber(81).parts[0]
         self.assertEqual(p1.offset, 0.0)
         self.assertEqual(len(p1.flatten().notesAndRests), 77)
-        self.assertEqual(len(list(p1.flatten().getElementsByClass('ChordSymbol'))), 25)
+        self.assertEqual(len(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))), 25)
         # Am/C
-        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[7].root(),
+        self.assertEqual(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))[7].root(),
                          pitch.Pitch('A3'))
-        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[7].bass(),
+        self.assertEqual(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))[7].bass(),
                          pitch.Pitch('C3'))
         # G7/B
-        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[14].root(),
+        self.assertEqual(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))[14].root(),
                          pitch.Pitch('G3'))
-        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[14].bass(),
+        self.assertEqual(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))[14].bass(),
                          pitch.Pitch('B2'))
 
     def testNoChord(self):
@@ -884,9 +884,9 @@ class Test(unittest.TestCase):
 
         score = harmony.realizeChordSymbolDurations(score)
 
-        self.assertEqual(8, score.getElementsByClass('ChordSymbol')[
+        self.assertEqual(8, score.getElementsByClass(harmony.ChordSymbol)[
             -1].quarterLength)
-        self.assertEqual(4, score.getElementsByClass('ChordSymbol')[
+        self.assertEqual(4, score.getElementsByClass(harmony.ChordSymbol)[
             0].quarterLength)
 
     def testAbcKeyImport(self):
@@ -965,14 +965,14 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = converter.parse(testFiles.morrisonsJig)
         # TODO: get
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 2)
+        self.assertEqual(len(s.flatten().getElementsByClass(spanner.RepeatBracket)), 2)
         # s.show()
         # four repeat brackets here; 2 at beginning, 2 at end
         s = converter.parse(testFiles.hectorTheHero)
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 4)
+        self.assertEqual(len(s.flatten().getElementsByClass(spanner.RepeatBracket)), 4)
 
         s = corpus.parse('JollyTinkersReel')
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 4)
+        self.assertEqual(len(s.flatten().getElementsByClass(spanner.RepeatBracket)), 4)
 
     def testMetronomeMarkA(self):
         from music21.abcFormat import testFiles

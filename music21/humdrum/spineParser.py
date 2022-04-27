@@ -773,7 +773,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         s.metadata = md
         grToRemove = []
 
-        for gr in s.recurse().getElementsByClass('GlobalReference'):
+        for gr in s[GlobalReference]:
             wasParsed = gr.updateMetadata(md)
             if wasParsed:
                 grToRemove.append(gr)

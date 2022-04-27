@@ -123,7 +123,7 @@ here we will set the "modifierStar" to change the color of notes:
 >>> tnc = tinyNotation.Converter('3/4 C4*pink* D4*green* E4*blue*')
 >>> tnc.modifierStar = ColorModifier
 >>> s = tnc.parse().stream
->>> for n in s.recurse().getElementsByClass('Note'):
+>>> for n in s.recurse().getElementsByClass(note.Note):
 ...     print(n.step, n.style.color)
 C pink
 D green
@@ -147,7 +147,7 @@ Or more usefully, and often desired:
     {2.0} <music21.harmony.ChordSymbol Dm>
     {3.0} <music21.harmony.ChordSymbol E-sus4>
     {4.0} <music21.bar.Barline type=final>
->>> for cs in s.recurse().getElementsByClass('ChordSymbol'):
+>>> for cs in s.recurse().getElementsByClass(harmony.ChordSymbol):
 ...     print([p.name for p in cs.pitches])
 ['C', 'E', 'G', 'B']
 ['D', 'F', 'A']
