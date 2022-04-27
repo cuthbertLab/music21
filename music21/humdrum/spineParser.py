@@ -773,7 +773,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         s.metadata = md
         grToRemove = []
 
-        for gr in s.recurse().getElementsByClass('GlobalReference'):
+        for gr in s[GlobalReference]:
             wasParsed = gr.updateMetadata(md)
             if wasParsed:
                 grToRemove.append(gr)
@@ -1931,7 +1931,7 @@ class SpineCollection(prebase.ProtoM21Object):
 
             stavesAppliedTo = []
             prioritiesToSearch = {}
-            for tandem in thisSpine.stream.recurse().getElementsByClass('MiscTandem'):
+            for tandem in thisSpine.stream[MiscTandem]:
                 if tandem.tandem.startswith('*staff'):
                     staffInfo = tandem.tandem[6:]  # could be multiple staves
                     stavesAppliedTo = [int(x) for x in staffInfo.split('/')]

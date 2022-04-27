@@ -592,7 +592,7 @@ class StreamFreezer(StreamFreezeThawBase):
             streamIds += spannerBundle.getSpannerStorageIds()
 
         if getVariants is True:
-            for el in streamObj.recurse(includeSelf=True).getElementsByClass('Variant'):
+            for el in streamObj.recurse(includeSelf=True).getElementsByClass(variant.Variant):
                 streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
 
         # should not happen that there are duplicates, but possible with spanners...
@@ -1162,7 +1162,7 @@ class Test(unittest.TestCase):
                            variantName='rhythmic_switch', replacementDuration=3.0)
 
         # test Variant is in stream
-        unused_v1 = c.parts.first().getElementsByClass('Variant').first()
+        unused_v1 = c.parts.first().getElementsByClass(variant.Variant).first()
 
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         # sf.v = v
@@ -1176,7 +1176,7 @@ class Test(unittest.TestCase):
         s = st.stream
         # s.show('lily.pdf')
         p0 = s.parts[0]
-        variants = p0.getElementsByClass('Variant')
+        variants = p0.getElementsByClass(variant.Variant)
         v2 = variants[0]
         self.assertEqual(v2._stream[0][1].offset, 0.5)
         # v2.show('t')

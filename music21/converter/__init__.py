@@ -1947,6 +1947,8 @@ class Test(unittest.TestCase):
         Here is a filename with an incorrect extension (.txt for .rnText).  Make sure that
         it is not cached the second time...
         '''
+        from music21 import harmony
+
         fp = common.getSourceFilePath() / 'converter' / 'incorrectExtension.txt'
         pf = PickleFilter(fp)
         pf.removePickle()
@@ -1955,7 +1957,7 @@ class Test(unittest.TestCase):
             parse(fp)
 
         c = parse(fp, format='romantext')
-        self.assertEqual(len(c.recurse().getElementsByClass('Harmony')), 1)
+        self.assertEqual(len(c[harmony.Harmony]), 1)
 
     def testConverterFromPath(self):
         fp = common.getSourceFilePath() / 'corpus' / 'bach' / 'bwv66.6.mxl'

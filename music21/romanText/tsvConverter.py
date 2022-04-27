@@ -443,7 +443,7 @@ class M21toTSV:
 
         tsvData = []
 
-        for thisRN in self.m21Stream.recurse().getElementsByClass('RomanNumeral'):
+        for thisRN in self.m21Stream[roman.RomanNumeral]:
 
             relativeroot = None
             if thisRN.secondaryRomanNumeral:

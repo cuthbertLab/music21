@@ -986,7 +986,7 @@ class TestExternal(unittest.TestCase):
         #     txt = f.read()
         #
         #     s = clercqTemperley.CTSong(txt)
-        #     for chord in s.toScore().flatten().getElementsByClass('Chord'):
+        #     for chord in s.toScore().flatten().getElementsByClass(chord.Chord):
         #         try:
         #             x = chord.pitches
         #         except:

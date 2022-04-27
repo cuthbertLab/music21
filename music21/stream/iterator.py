@@ -458,14 +458,14 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> bool(iterator)
         True
 
-        >>> bool(iterator.getElementsByClass('Chord'))
+        >>> bool(iterator.getElementsByClass(chord.Chord))
         False
 
         test false cache:
 
-        >>> len(iterator.getElementsByClass('Chord'))
+        >>> len(iterator.getElementsByClass(chord.Chord))
         0
-        >>> bool(iterator.getElementsByClass('Chord'))
+        >>> bool(iterator.getElementsByClass(chord.Chord))
         False
 
         '''
@@ -514,12 +514,12 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> s = converter.parse('tinyNotation: 3/4 D4 E2 F4 r2 G2 r4')
         >>> s.recurse().notes.first()
         <music21.note.Note D>
-        >>> s.recurse().getElementsByClass('Rest').first()
+        >>> s[note.Rest].first()
         <music21.note.Rest half>
 
         If no elements match, returns None:
 
-        >>> print(s.recurse().getElementsByClass('Chord').first())
+        >>> print(s[chord.Chord].first())
         None
 
         New in v7.
@@ -565,7 +565,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> s = converter.parse('tinyNotation: 3/4 D4 E2 F4 r2 G2 r4')
         >>> s.recurse().notes.last()
         <music21.note.Note G>
-        >>> s.recurse().getElementsByClass('Rest').last()
+        >>> s[note.Rest].last()
         <music21.note.Rest quarter>
 
         New in v7.
@@ -790,7 +790,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> b = bar.Barline()
         >>> s.storeAtEnd(b)
 
-        >>> s2 = s.iter().getElementsByClass('Note').stream()
+        >>> s2 = s.iter().getElementsByClass(note.Note).stream()
         >>> s2.show('t')
         {0.0} <music21.note.Note C>
         {2.0} <music21.note.Note D>
@@ -809,7 +809,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> s3.elementOffset(b, returnSpecial=True)
         <OffsetSpecial.AT_END>
 
-        >>> s4 = s.iter().getElementsByClass('Barline').stream()
+        >>> s4 = s.iter().getElementsByClass(bar.Barline).stream()
         >>> s4.show('t')
         {0.0} <music21.bar.Barline type=regular>
 
@@ -1008,7 +1008,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> r = note.Rest()
         >>> s.append(r)
         >>> s.append(note.Note('D'))
-        >>> for el in s.iter().getElementsByClass('Rest'):
+        >>> for el in s.iter().getElementsByClass(note.Rest):
         ...     print(el)
         <music21.note.Rest quarter>
 
@@ -1020,7 +1020,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> r.activeSite.id
         's2'
 
-        >>> for el in s.iter().getElementsByClass('Rest'):
+        >>> for el in s.iter().getElementsByClass(note.Rest):
         ...     print(el.activeSite.id)
         s1
 
@@ -1515,7 +1515,7 @@ class OffsetIterator(StreamIterator[M21ObjType]):
     [<music21.note.Note E>]
     [<music21.note.Note F>, <music21.note.Note G>]
 
-    >>> for groupedElements in stream.iterator.OffsetIterator(s).getElementsByClass('Clef'):
+    >>> for groupedElements in stream.iterator.OffsetIterator(s).getElementsByClass(clef.Clef):
     ...     print(groupedElements)
     [<music21.clef.TrebleClef>]
     '''
@@ -1581,7 +1581,7 @@ class OffsetIterator(StreamIterator[M21ObjType]):
 
 
 # -----------------------------------------------------------------------------
-class RecursiveIterator(StreamIterator[M21ObjType]):
+class RecursiveIterator(StreamIterator[M21ObjType], collections.abc.Sequence):
     '''
     One of the most powerful iterators in music21.  Generally not called
     directly, but created by being invoked on a stream with `Stream.recurse()`
@@ -2000,7 +2000,7 @@ class Test(unittest.TestCase):
         self.assertIs(r0, r)
 
         # adding a filter gives a new StreamIterator that restarts at 0
-        sIter2 = sIter.getElementsByClass('GeneralNote')  # this filter does nothing here.
+        sIter2 = sIter.notesAndRests  # this filter does nothing here.
         obj0 = next(sIter2)
         self.assertIs(obj0, r)
 

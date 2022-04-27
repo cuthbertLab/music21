@@ -2165,7 +2165,7 @@ def prepareStreamForMidi(s) -> stream.Stream:
         # this assumes that dynamics in a part/stream apply to all components
         # of that part stream
         # this sets the cachedRealized value for each Volume
-        for p in s.getElementsByClass('Stream'):
+        for p in s.getElementsByClass(stream.Stream):
             volume.realizeVolume(p)
 
         s.insert(0, conductor)
@@ -2224,7 +2224,7 @@ def conductorStream(s: stream.Stream) -> stream.Part:
     '''
     from music21 import tempo
     from music21 import meter
-    partsList = list(s.getElementsByClass('Stream').getElementsByOffset(0))
+    partsList = list(s.getElementsByClass(stream.Stream).getElementsByOffset(0))
     minPriority = min(p.priority for p in partsList) if partsList else 0
     conductorPriority = minPriority - 1
 
@@ -2310,7 +2310,7 @@ def channelInstrumentData(
     # store streams in uniform list
     substreamList = []
     if s.hasPartLikeStreams():
-        for obj in s.getElementsByClass('Stream'):
+        for obj in s.getElementsByClass(stream.Stream):
             # Conductor track: don't consume a channel
             if (not obj[note.GeneralNote]) and obj[Conductor]:
                 continue
@@ -2323,7 +2323,7 @@ def channelInstrumentData(
     # Music tracks
     for subs in substreamList:
         # get a first instrument; iterate over rest
-        instrumentStream = subs.recurse().getElementsByClass('Instrument')
+        instrumentStream = subs[instrument.Instrument]
         setAnInstrument = False
         for inst in instrumentStream:
             if inst.midiChannel is not None and inst.midiProgram not in channelByInstrument:
@@ -2546,7 +2546,7 @@ def streamHierarchyToMidiTracks(
 
     # store streams in uniform list: prepareStreamForMidi() ensures there are substreams
     substreamList = []
-    for obj in s.getElementsByClass('Stream'):
+    for obj in s.getElementsByClass(stream.Stream):
         # prepareStreamForMidi() supplies defaults for these
         if obj.getElementsByClass(('MetronomeMark', 'TimeSignature')):
             # Ensure conductor track is first
@@ -3587,6 +3587,7 @@ class Test(unittest.TestCase):
 
     def testMidiTempoImportB(self):
         from music21 import converter
+        from music21 import tempo
 
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         # a file with three tracks and one conductor track with four tempo marks
@@ -3595,15 +3596,15 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts), 3)
         # metronome marks propagate to every staff, but are hidden on subsequent staffs
         self.assertEqual(
-            [mm.numberImplicit for mm in s.parts[0].recurse().getElementsByClass('MetronomeMark')],
+            [mm.numberImplicit for mm in s.parts[0][tempo.MetronomeMark]],
             [False, False, False, False]
         )
         self.assertEqual(
-            [mm.numberImplicit for mm in s.parts[1].recurse().getElementsByClass('MetronomeMark')],
+            [mm.numberImplicit for mm in s.parts[1][tempo.MetronomeMark]],
             [True, True, True, True]
         )
         self.assertEqual(
-            [mm.numberImplicit for mm in s.parts[2].recurse().getElementsByClass('MetronomeMark')],
+            [mm.numberImplicit for mm in s.parts[2][tempo.MetronomeMark]],
             [True, True, True, True]
         )
 
@@ -3848,7 +3849,7 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test14.mid'
         s = converter.parse(fp)
         # three chords will be created, as well as two voices
-        self.assertEqual(len(s.flatten().getElementsByClass('Chord')), 3)
+        self.assertEqual(len(s[chord.Chord]), 3)
         self.assertEqual(len(s.parts.first().measure(3).voices), 2)
 
     def testImportChordsA(self):
@@ -3860,7 +3861,7 @@ class Test(unittest.TestCase):
         # a simple file created in athenacl
         s = converter.parse(fp)
         # s.show('t')
-        self.assertEqual(len(s.flatten().getElementsByClass('Chord')), 5)
+        self.assertEqual(len(s[chord.Chord]), 5)
 
     def testMidiEventsImported(self):
         self.maxDiff = None
@@ -4016,7 +4017,7 @@ class Test(unittest.TestCase):
         inn = converter.parse(fp)
 
         self.assertEqual(
-            len(inn.parts[1].measure(3).voices.last().getElementsByClass('Rest')), 1)
+            len(inn.parts[1].measure(3).voices.last().getElementsByClass(note.Rest)), 1)
 
     def testRestsMadeInMeasures(self):
         from music21 import converter

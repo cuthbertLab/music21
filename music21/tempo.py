@@ -106,7 +106,7 @@ def convertTempoByReferent(
     270.0
 
     '''
-    # find duration in seconds of of quarter length
+    # find duration in seconds of quarter length
     srcDurPerBeat = 60 / numberSrc
     # convert to dur for one quarter length
     dur = srcDurPerBeat / quarterLengthBeatSrc
@@ -276,7 +276,7 @@ class TempoText(TempoIndication):
 
     def applyTextFormatting(self, te=None, numberImplicit=False):
         '''
-        Apply the default text formatting to the text expression version of of this tempo mark
+        Apply the default text formatting to the text expression version of this tempo mark
         '''
         if te is None:  # use the stored version if possible
             te = self._textExpression
@@ -422,8 +422,8 @@ class MetronomeMark(TempoIndication):
         self._updateNumberFromText()
         self._updateTextFromNumber()
 
-        # need to store a sounding value for the case where where
-        # a sounding different is different than the number given in the MM
+        # need to store a sounding value for the case where
+        # a sounding different is different from the number given in the MM
         self._numberSounding = None
 
     def _reprInternal(self):
@@ -463,7 +463,7 @@ class MetronomeMark(TempoIndication):
         elif common.isNum(value) or isinstance(value, str):
             self._referent = duration.Duration(value)
         elif not isinstance(value, duration.Duration):
-            # try get duration object, like from Note
+            # try to get duration object, like from Note
             self._referent = value.duration
         elif 'Duration' in value.classes:
             self._referent = value
@@ -595,7 +595,7 @@ class MetronomeMark(TempoIndication):
     def setQuarterBPM(self, value, setNumber=True):
         '''
         Given a value in BPM, use it to set the value of this MetronomeMark.
-        BPM values are assumed to be refer only to quarter notes; different beat values,
+        BPM values are assumed to refer only to quarter notes; different beat values,
         if defined here, will be scaled
 
 
@@ -609,7 +609,7 @@ class MetronomeMark(TempoIndication):
         if not setNumber:
             # convert this to a quarter bpm
             self._numberSounding = value
-        else:  # go through property so as to set implicit status
+        else:  # go through property to set implicit status
             self.number = value
 
     def _getDefaultNumber(self, tempoText):
@@ -661,7 +661,7 @@ class MetronomeMark(TempoIndication):
             tempoNumber = number
         else:  # try to convert
             tempoNumber = float(number)
-        # get a items and sort
+        # get items and sort
         matches = []
         for tempoStr, tempoValue in defaultTempoValues.items():
             matches.append([tempoValue, tempoStr])
@@ -831,7 +831,7 @@ class MetricModulation(TempoIndication):
     '''
     A class for representing the relationship between two MetronomeMarks.
     Generally this relationship is one of equality, where the number is maintained but
-    the referent that number is applied to changes.
+    the referent that number is applied to each change.
 
     The basic definition of a MetricModulation is given by supplying two MetronomeMarks,
     one for the oldMetronome, the other for the newMetronome. High level properties,
@@ -1105,7 +1105,7 @@ class MetricModulation(TempoIndication):
                                       number=mmLast.number)
         if mmOld is not None:
             self._oldMetronome = mmOld
-        # if we have an a new referent, then update number
+        # if we have a new referent, then update number
         if (self._newMetronome is not None
                 and self._newMetronome.referent is not None
                 and self._oldMetronome.number is not None):
@@ -1151,7 +1151,7 @@ class MetricModulation(TempoIndication):
         Set the other side of the metric modulation not based on equality,
         but on a direct translation of the tempo value.
 
-        referent can be a string type or a int/float quarter length
+        referent can be a string type or an int/float quarter length
         '''
         if side is None:
             if self._oldMetronome is None:
@@ -1469,7 +1469,7 @@ class Test(unittest.TestCase):
         mmod1.oldMetronome = mm1
         mmod1.newMetronome = mm2
 
-        # this works, and new value is updated:
+        # this works and new value is updated:
         self.assertEqual(str(mmod1),
                          '<music21.tempo.MetricModulation '
                          + '<music21.tempo.MetronomeMark animato Eighth=120>='

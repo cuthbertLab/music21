@@ -13,7 +13,7 @@
 A mixin to ScoreExporter that includes the capabilities for producing a single
 MusicXML `<part>` from multiple music21 `PartStaff` objects.
 '''
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Type
 import unittest
 import warnings
 from xml.etree.ElementTree import Element, SubElement, Comment
@@ -225,7 +225,7 @@ class PartStaffExporterMixin:
          <music21.layout.StaffGroup <... p2a><... p2b>>,
          <music21.layout.StaffGroup <... p6a><... p6b>>]
         '''
-        staffGroups = self.stream.getElementsByClass('StaffGroup')
+        staffGroups = self.stream.getElementsByClass(StaffGroup)
         joinableGroups: List[StaffGroup] = []
         # Joinable groups must consist of only PartStaffs with Measures
         # and exist in self.stream
@@ -517,7 +517,7 @@ class PartStaffExporterMixin:
         </measure>
         '''
 
-        def isMultiAttribute(m21Class: M21ObjType,
+        def isMultiAttribute(m21Class: Type[M21ObjType],
                              comparison: str = '__eq__') -> bool:
             '''
             Return True if any first instance of m21Class in any subsequent staff

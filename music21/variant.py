@@ -40,6 +40,539 @@ _MOD = 'variant'
 environLocal = environment.Environment(_MOD)
 
 
+# ------------------------------------------------------------------------------
+# classes
+
+
+class VariantException(exceptions21.Music21Exception):
+    pass
+
+
+class Variant(base.Music21Object):
+    '''
+    A Music21Object that stores elements like a Stream, but does not
+    represent itself externally to a Stream; i.e., the contents of a Variant are not flattened.
+
+    This is accomplished not by subclassing, but by object composition: similar to the Spanner,
+    the Variant contains a Stream as a private attribute. Calls to this Stream, for the Variant,
+    are automatically delegated by use of the __getattr__ method. Special cases are overridden
+    or managed as necessary: e.g., the Duration of a Variant is generally always zero.
+
+    To use Variants from a Stream, see the :func:`~music21.stream.Stream.activateVariants` method.
+
+
+    >>> v = variant.Variant()
+    >>> v.repeatAppend(note.Note(), 8)
+    >>> len(v.notes)
+    8
+    >>> v.highestTime
+    0.0
+    >>> v.containedHighestTime
+    8.0
+
+    >>> v.duration  # handled by Music21Object
+    <music21.duration.Duration 0.0>
+    >>> v.isStream
+    False
+
+    >>> s = stream.Stream()
+    >>> s.append(v)
+    >>> s.append(note.Note())
+    >>> s.highestTime
+    1.0
+    >>> s.show('t')
+    {0.0} <music21.variant.Variant object of length 8.0>
+    {0.0} <music21.note.Note C>
+    >>> s.flatten().show('t')
+    {0.0} <music21.variant.Variant object of length 8.0>
+    {0.0} <music21.note.Note C>
+    '''
+
+    classSortOrder = stream.Stream.classSortOrder - 2  # variants should always come first?
+
+    # this copies the init of Streams
+    def __init__(self, givenElements=None, *args, **keywords):
+        super().__init__()
+        self.exposeTime = False
+        self._stream = stream.VariantStorage(givenElements=givenElements,
+                                             *args, **keywords)
+
+        self._replacementDuration = None
+
+        if 'name' in keywords:
+            self.groups.append(keywords['name'])
+
+
+    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
+        '''
+        see __deepcopy__ on Spanner for tests and docs
+        '''
+        # NOTE: this is a performance critical operation
+        defaultIgnoreSet = {'_cache'}
+        if ignoreAttributes is None:
+            ignoreAttributes = defaultIgnoreSet
+        else:
+            ignoreAttributes = ignoreAttributes | defaultIgnoreSet
+
+        new = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
+
+        return new
+
+    def __deepcopy__(self, memo=None):
+        return self._deepcopySubclassable(memo)
+
+    # --------------------------------------------------------------------------
+    # as _stream is a private Stream, unwrap/wrap methods need to override
+    # Music21Object to get at these objects
+    # this is the same as with Spanners
+
+    def purgeOrphans(self, excludeStorageStreams=True):
+        self._stream.purgeOrphans(excludeStorageStreams)
+        base.Music21Object.purgeOrphans(self, excludeStorageStreams)
+
+    def purgeLocations(self, rescanIsDead=False):
+        # must override Music21Object to purge locations from the contained
+        self._stream.purgeLocations(rescanIsDead=rescanIsDead)
+        base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
+
+    def _reprInternal(self):
+        return 'object of length ' + str(self.containedHighestTime)
+
+    def __getattr__(self, attr):
+        '''
+        This defers all calls not defined in this Class to calls on the privately contained Stream.
+        '''
+        # environLocal.printDebug(['relaying unmatched attribute request '
+        #               + attr + ' to private Stream'])
+
+        # must mask pitches so as not to recurse
+        # TODO: check tt recurse does not go into this
+        if attr in ['flat', 'pitches']:
+            raise AttributeError
+
+        # needed for unpickling where ._stream doesn't exist until later...
+        if attr != '_stream' and hasattr(self, '_stream'):
+            return getattr(self._stream, attr)
+        else:
+            raise AttributeError
+
+    def __getitem__(self, key):
+        return self._stream.__getitem__(key)
+
+
+    def __len__(self):
+        return len(self._stream)
+
+    def __iter__(self):
+        return self._stream.__iter__()
+
+    def getElementIds(self):
+        if 'elementIds' not in self._cache or self._cache['elementIds'] is None:
+            self._cache['elementIds'] = [id(c) for c in self._stream._elements]
+        return self._cache['elementIds']
+
+
+    def replaceElement(self, old, new):
+        '''
+        When copying a Variant, we need to update the Variant with new
+        references for copied elements. Given the old element,
+        this method will replace the old with the new.
+
+        The `old` parameter can be either an object or object id.
+
+        This method is very similar to the replaceSpannedElement method on Spanner.
+        '''
+        if old is None:
+            return None  # do nothing
+        if common.isNum(old):
+            # this must be id(obj), not obj.id
+            e = self._stream.coreGetElementByMemoryLocation(old)
+            if e is not None:
+                self._stream.replace(e, new, allDerived=False)
+        else:
+            # do not do all Sites: only care about this one
+            self._stream.replace(old, new, allDerived=False)
+
+    # --------------------------------------------------------------------------
+    # Stream  simulation/overrides
+    @property
+    def highestTime(self):
+        '''
+        This property masks calls to Stream.highestTime. Assuming `exposeTime`
+        is False, this always returns zero, making the Variant always take zero time.
+
+        >>> v = variant.Variant()
+        >>> v.append(note.Note(quarterLength=4))
+        >>> v.highestTime
+        0.0
+        '''
+        if self.exposeTime:
+            return self._stream.highestTime
+        else:
+            return 0.0
+
+    @property
+    def highestOffset(self):
+        '''
+        This property masks calls to Stream.highestOffset. Assuming `exposeTime`
+        is False, this always returns zero, making the Variant always take zero time.
+
+        >>> v = variant.Variant()
+        >>> v.append(note.Note(quarterLength=4))
+        >>> v.highestOffset
+        0.0
+        '''
+        if self.exposeTime:
+            return self._stream.highestOffset
+        else:
+            return 0.0
+
+    def show(self, fmt=None, app=None):
+        '''
+        Call show() on the Stream contained by this Variant.
+
+        This method must be overridden, otherwise Music21Object.show() is called.
+
+
+        >>> v = variant.Variant()
+        >>> v.repeatAppend(note.Note(quarterLength=0.25), 8)
+        >>> v.show('t')
+        {0.0} <music21.note.Note C>
+        {0.25} <music21.note.Note C>
+        {0.5} <music21.note.Note C>
+        {0.75} <music21.note.Note C>
+        {1.0} <music21.note.Note C>
+        {1.25} <music21.note.Note C>
+        {1.5} <music21.note.Note C>
+        {1.75} <music21.note.Note C>
+        '''
+        self._stream.show(fmt=fmt, app=app)
+
+    # --------------------------------------------------------------------------
+    # properties particular to this class
+
+    @property
+    def containedHighestTime(self):
+        '''
+        This property calls the contained Stream.highestTime.
+
+        >>> v = variant.Variant()
+        >>> v.append(note.Note(quarterLength=4))
+        >>> v.containedHighestTime
+        4.0
+        '''
+        return self._stream.highestTime
+
+    @property
+    def containedHighestOffset(self):
+        '''
+        This property calls the contained Stream.highestOffset.
+
+        >>> v = variant.Variant()
+        >>> v.append(note.Note(quarterLength=4))
+        >>> v.append(note.Note())
+        >>> v.containedHighestOffset
+        4.0
+        '''
+        return self._stream.highestOffset
+
+    @property
+    def containedSite(self):
+        '''
+        Return the Stream contained in this Variant.
+        '''
+        return self._stream
+
+    def _getReplacementDuration(self):
+        if self._replacementDuration is None:
+            return self._stream.duration.quarterLength
+        else:
+            return self._replacementDuration
+
+    def _setReplacementDuration(self, value):
+        self._replacementDuration = value
+
+    replacementDuration = property(_getReplacementDuration, _setReplacementDuration, doc='''
+        Set or Return the quarterLength duration in the main stream which this variant
+        object replaces in the variant version of the stream. If replacementDuration is
+        not set, it is assumed to be the same length as the variant. If, it is set to 0,
+        the variant should be interpreted as an insertion. Setting replacementDuration
+        to None will return the value to the default which is the duration of the variant
+        itself.
+        ''')
+
+    @property
+    def lengthType(self):
+        '''
+        Returns 'deletion' if variant is shorter than the region it replaces, 'elongation'
+        if the variant is longer than the region it replaces, and 'replacement' if it is
+        the same length.
+        '''
+        lengthDifference = self.replacementDuration - self.containedHighestTime
+        if lengthDifference > 0.0:
+            return 'deletion'
+        elif lengthDifference < 0.0:
+            return 'elongation'
+        else:
+            return 'replacement'
+
+    def replacedElements(self, contextStream=None, classList=None,
+                         keepOriginalOffsets=False, includeSpacers=False):
+        # noinspection PyShadowingNames
+        '''
+        Returns a Stream containing the elements which this variant replaces in a
+        given context stream.
+        This Stream will have length self.replacementDuration.
+
+        In regions that are strictly replaced, only elements that share a class with
+        an element in the variant
+        are captured. Elsewhere, all elements are captured.
+
+        >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", makeNotation=False)
+        >>> s.makeMeasures(inPlace=True)
+        >>> v1stream = converter.parse("tinynotation: 4/4        a2. b-8 a8", makeNotation=False)
+        >>> v2stream1 = converter.parse("tinynotation: 4/4                                       d4 f4 a2", makeNotation=False)
+        >>> v2stream2 = converter.parse("tinynotation: 4/4                                                  d4 f4 AA2", makeNotation=False)
+
+        >>> v1 = variant.Variant()
+        >>> v1measure = stream.Measure()
+        >>> v1.insert(0.0, v1measure)
+        >>> for e in v1stream.notesAndRests:
+        ...    v1measure.insert(e.offset, e)
+
+        >>> v2 = variant.Variant()
+        >>> v2measure1 = stream.Measure()
+        >>> v2measure2 = stream.Measure()
+        >>> v2.insert(0.0, v2measure1)
+        >>> v2.insert(4.0, v2measure2)
+        >>> for e in v2stream1.notesAndRests:
+        ...    v2measure1.insert(e.offset, e)
+        >>> for e in v2stream2.notesAndRests:
+        ...    v2measure2.insert(e.offset, e)
+
+        >>> v3 = variant.Variant()
+        >>> v2.replacementDuration = 4.0
+        >>> v3.replacementDuration = 4.0
+
+        >>> s.insert(4.0, v1)    # replacement variant
+        >>> s.insert(12.0, v2)  # insertion variant (2 bars replace 1 bar)
+        >>> s.insert(20.0, v3)  # deletion variant (0 bars replace 1 bar)
+
+        >>> v1.replacedElements(s).show('text')
+        {0.0} <music21.stream.Measure 2 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {2.0} <music21.note.Note B->
+            {3.0} <music21.note.Note A>
+
+        >>> v2.replacedElements(s).show('text')
+        {0.0} <music21.stream.Measure 4 offset=0.0>
+            {0.0} <music21.note.Note D>
+            {2.0} <music21.note.Note A>
+
+        >>> v3.replacedElements(s).show('text')
+        {0.0} <music21.stream.Measure 6 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {2.0} <music21.note.Note B->
+            {3.0} <music21.note.Note A>
+
+        >>> v3.replacedElements(s, keepOriginalOffsets=True).show('text')
+        {20.0} <music21.stream.Measure 6 offset=20.0>
+            {0.0} <music21.note.Note A>
+            {2.0} <music21.note.Note B->
+            {3.0} <music21.note.Note A>
+
+
+        A second example:
+
+
+        >>> v = variant.Variant()
+        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
+        ...                  ('a', 'quarter'),('b', 'quarter')]
+        >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'),
+        ...                  ('e', 'quarter'), ('e', 'quarter')]
+        >>> variantData = [variantDataM1, variantDataM2]
+        >>> for d in variantData:
+        ...    m = stream.Measure()
+        ...    for pitchName, durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    v.append(m)
+        >>> v.groups = ['paris']
+        >>> v.replacementDuration = 4.0
+
+        >>> s = stream.Stream()
+        >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
+        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'),
+        ...                 ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
+        >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamData = [streamDataM1, streamDataM2, streamDataM3, streamDataM4]
+        >>> for d in streamData:
+        ...    m = stream.Measure()
+        ...    for pitchName, durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    s.append(m)
+        >>> s.insert(4.0, v)
+
+        >>> v.replacedElements(s).show('t')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note B>
+            {0.5} <music21.note.Note C>
+            {1.5} <music21.note.Note A>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note B>
+        '''
+        spacerFilter = lambda r: r.hasStyleInformation and r.style.hideObjectOnPrint
+
+        if contextStream is None:
+            contextStream = self.activeSite
+            if contextStream is None:
+                environLocal.printDebug(
+                    'No contextStream or activeSite, finding most recently added site (dangerous)')
+                contextStream = self.getContextByClass('Stream')
+                if contextStream is None:
+                    raise VariantException('Cannot find a Stream context for this object...')
+
+        if self not in contextStream.getElementsByClass(self.__class__):
+            raise VariantException(f'Variant not found in stream {contextStream}')
+
+        vStart = self.getOffsetBySite(contextStream)
+
+        if includeSpacers is True:
+            spacerDuration = (self
+                              .getElementsByClass(note.Rest)
+                              .addFilter(spacerFilter)
+                              .first().duration.quarterLength)
+        else:
+            spacerDuration = 0.0
+
+
+        if self.lengthType in ('replacement', 'elongation'):
+            vEnd = vStart + self.replacementDuration + spacerDuration
+            classes = []
+            for e in self.elements:
+                classes.append(e.classes[0])
+            if classList is not None:
+                classes.extend(classList)
+            returnStream = contextStream.getElementsByOffset(vStart, vEnd,
+                includeEndBoundary=False,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True,
+                classList=classes).stream()
+
+        elif self.lengthType == 'deletion':
+            vMiddle = vStart + self.containedHighestTime
+            vEnd = vStart + self.replacementDuration
+            classes = []  # collect all classes found in this variant
+            for e in self.elements:
+                classes.append(e.classes[0])
+            if classList is not None:
+                classes.extend(classList)
+            returnPart1 = contextStream.getElementsByOffset(vStart, vMiddle,
+                includeEndBoundary=False,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True,
+                classList=classes).stream()
+            returnPart2 = contextStream.getElementsByOffset(vMiddle, vEnd,
+                includeEndBoundary=False,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True).stream()
+
+            returnStream = returnPart1
+            for e in returnPart2.elements:
+                oInPart = e.getOffsetBySite(returnPart2)
+                returnStream.insert(vMiddle - vStart + oInPart, e)
+        else:
+            raise VariantException('lengthType must be replacement, elongation, or deletion')
+
+        if self in returnStream:
+            returnStream.remove(self)
+
+        # This probably makes sense to do, but activateVariants
+        #    for example only uses the offset in the original.
+        #    Also, we are not changing measure numbers and should
+        #    not as that will cause activateVariants to fail.
+        if keepOriginalOffsets is False:
+            for e in returnStream:
+                e.setOffsetBySite(returnStream, e.getOffsetBySite(returnStream) - vStart)
+
+        return returnStream
+
+    def removeReplacedElementsFromStream(self, referenceStream=None, classList=None):
+        '''
+        remove replaced elements from a referenceStream or activeSite
+
+
+        >>> v = variant.Variant()
+        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
+        ...                  ('a', 'quarter'),('b', 'quarter')]
+        >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
+        >>> variantData = [variantDataM1, variantDataM2]
+        >>> for d in variantData:
+        ...    m = stream.Measure()
+        ...    for pitchName, durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    v.append(m)
+        >>> v.groups = ['paris']
+        >>> v.replacementDuration = 4.0
+
+        >>> s = stream.Stream()
+        >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
+        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'),
+        ...                 ('a', 'quarter'), ('b', 'quarter')]
+        >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
+        >>> streamData = [streamDataM1, streamDataM2, streamDataM3, streamDataM4]
+        >>> for d in streamData:
+        ...    m = stream.Measure()
+        ...    for pitchName, durType in d:
+        ...        n = note.Note(pitchName)
+        ...        n.duration.type = durType
+        ...        m.append(n)
+        ...    s.append(m)
+        >>> s.insert(4.0, v)
+
+        >>> v.removeReplacedElementsFromStream(s)
+        >>> s.show('t')
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note A>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note G>
+        {4.0} <music21.variant.Variant object of length 8.0>
+        {8.0} <music21.stream.Measure 0 offset=8.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note A>
+        {12.0} <music21.stream.Measure 0 offset=12.0>
+            {0.0} <music21.note.Note C>
+            {1.0} <music21.note.Note B>
+            {2.0} <music21.note.Note A>
+            {3.0} <music21.note.Note A>
+        '''
+        if referenceStream is None:
+            referenceStream = self.activeSite
+            if referenceStream is None:
+                environLocal.printDebug('No referenceStream or activeSite, '
+                                        + 'finding most recently added site (dangerous)')
+                referenceStream = self.getContextByClass('Stream')
+                if referenceStream is None:
+                    raise VariantException('Cannot find a Stream context for this object...')
+        if self not in referenceStream.getElementsByClass(self.__class__):
+            raise VariantException(f'Variant not found in stream {referenceStream}')
+
+        replacedElements = self.replacedElements(referenceStream, classList)
+        for el in replacedElements:
+            referenceStream.remove(el)
+
+
+
 # ------Public Merge Functions
 def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     # noinspection PyShadowingNames
@@ -66,7 +599,7 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     {3.0} <music21.variant.Variant object of length 1.0>
     {3.0} <music21.note.Note D>
 
-    >>> v0 = mergedStream.getElementsByClass('Variant').first()
+    >>> v0 = mergedStream.getElementsByClass(variant.Variant).first()
     >>> v0
     <music21.variant.Variant object of length 1.0>
     >>> v0.first()
@@ -848,7 +1381,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
 def addVariant(
     s: stream.Stream,
     startOffset: Union[int, float],
-    sVariant: Union[stream.Stream, 'Variant'],
+    sVariant: Union[stream.Stream, Variant],
     variantName=None,
     variantGroups=None,
     replacementDuration=None
@@ -1036,17 +1569,17 @@ def refineVariant(s, sVariant, *, inPlace=False):
 
     '''
     # stream that will be returned
-    if sVariant not in s.getElementsByClass('Variant'):
+    if sVariant not in s.getElementsByClass(Variant):
         raise VariantException(f'{sVariant} not found in stream {s}.')
 
     if inPlace is True:
         returnObject = s
         variantRegion = sVariant
     else:
-        sVariantIndex = s.getElementsByClass('Variant').index(sVariant)
+        sVariantIndex = s.getElementsByClass(Variant).index(sVariant)
 
         returnObject = s.coreCopyAsDerivation('refineVariant')
-        variantRegion = returnObject.getElementsByClass('Variant')(sVariantIndex)
+        variantRegion = returnObject.getElementsByClass(Variant)(sVariantIndex)
 
 
     # useful parameters from variant and its location
@@ -1764,7 +2297,7 @@ def _doVariantFixingOnStream(s, variantNames=None):
     (4.0, 'deletion', 5.0, 1.0)
     '''
 
-    for v in s.getElementsByClass('Variant'):
+    for v in s.getElementsByClass(Variant):
         if isinstance(variantNames, list):  # If variantNames are controlled
             if set(v.groups) and not set(variantNames):
                 # and if this variant is not in the controlled list
@@ -1977,536 +2510,6 @@ def _getPreviousElement(s, v):
     return returnElement
 
 
-# ------------------------------------------------------------------------------
-# classes
-
-
-class VariantException(exceptions21.Music21Exception):
-    pass
-
-
-class Variant(base.Music21Object):
-    '''
-    A Music21Object that stores elements like a Stream, but does not
-    represent itself externally to a Stream; i.e., the contents of a Variant are not flattened.
-
-    This is accomplished not by subclassing, but by object composition: similar to the Spanner,
-    the Variant contains a Stream as a private attribute. Calls to this Stream, for the Variant,
-    are automatically delegated by use of the __getattr__ method. Special cases are overridden
-    or managed as necessary: e.g., the Duration of a Variant is generally always zero.
-
-    To use Variants from a Stream, see the :func:`~music21.stream.Stream.activateVariants` method.
-
-
-    >>> v = variant.Variant()
-    >>> v.repeatAppend(note.Note(), 8)
-    >>> len(v.notes)
-    8
-    >>> v.highestTime
-    0.0
-    >>> v.containedHighestTime
-    8.0
-
-    >>> v.duration  # handled by Music21Object
-    <music21.duration.Duration 0.0>
-    >>> v.isStream
-    False
-
-    >>> s = stream.Stream()
-    >>> s.append(v)
-    >>> s.append(note.Note())
-    >>> s.highestTime
-    1.0
-    >>> s.show('t')
-    {0.0} <music21.variant.Variant object of length 8.0>
-    {0.0} <music21.note.Note C>
-    >>> s.flatten().show('t')
-    {0.0} <music21.variant.Variant object of length 8.0>
-    {0.0} <music21.note.Note C>
-    '''
-
-    classSortOrder = stream.Stream.classSortOrder - 2  # variants should always come first?
-
-    # this copies the init of Streams
-    def __init__(self, givenElements=None, *args, **keywords):
-        super().__init__()
-        self.exposeTime = False
-        self._stream = stream.VariantStorage(givenElements=givenElements,
-                                             *args, **keywords)
-
-        self._replacementDuration = None
-
-        if 'name' in keywords:
-            self.groups.append(keywords['name'])
-
-
-    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
-        '''
-        see __deepcopy__ on Spanner for tests and docs
-        '''
-        # NOTE: this is a performance critical operation
-        defaultIgnoreSet = {'_cache'}
-        if ignoreAttributes is None:
-            ignoreAttributes = defaultIgnoreSet
-        else:
-            ignoreAttributes = ignoreAttributes | defaultIgnoreSet
-
-        new = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
-
-        return new
-
-    def __deepcopy__(self, memo=None):
-        return self._deepcopySubclassable(memo)
-
-    # --------------------------------------------------------------------------
-    # as _stream is a private Stream, unwrap/wrap methods need to override
-    # Music21Object to get at these objects
-    # this is the same as with Spanners
-
-    def purgeOrphans(self, excludeStorageStreams=True):
-        self._stream.purgeOrphans(excludeStorageStreams)
-        base.Music21Object.purgeOrphans(self, excludeStorageStreams)
-
-    def purgeLocations(self, rescanIsDead=False):
-        # must override Music21Object to purge locations from the contained
-        self._stream.purgeLocations(rescanIsDead=rescanIsDead)
-        base.Music21Object.purgeLocations(self, rescanIsDead=rescanIsDead)
-
-    def _reprInternal(self):
-        return 'object of length ' + str(self.containedHighestTime)
-
-    def __getattr__(self, attr):
-        '''
-        This defers all calls not defined in this Class to calls on the privately contained Stream.
-        '''
-        # environLocal.printDebug(['relaying unmatched attribute request '
-        #               + attr + ' to private Stream'])
-
-        # must mask pitches so as not to recurse
-        # TODO: check tt recurse does not go into this
-        if attr in ['flat', 'pitches']:
-            raise AttributeError
-
-        # needed for unpickling where ._stream doesn't exist until later...
-        if attr != '_stream' and hasattr(self, '_stream'):
-            return getattr(self._stream, attr)
-        else:
-            raise AttributeError
-
-    def __getitem__(self, key):
-        return self._stream.__getitem__(key)
-
-
-    def __len__(self):
-        return len(self._stream)
-
-    def __iter__(self):
-        return self._stream.__iter__()
-
-    def getElementIds(self):
-        if 'elementIds' not in self._cache or self._cache['elementIds'] is None:
-            self._cache['elementIds'] = [id(c) for c in self._stream._elements]
-        return self._cache['elementIds']
-
-
-    def replaceElement(self, old, new):
-        '''
-        When copying a Variant, we need to update the Variant with new
-        references for copied elements. Given the old element,
-        this method will replace the old with the new.
-
-        The `old` parameter can be either an object or object id.
-
-        This method is very similar to the replaceSpannedElement method on Spanner.
-        '''
-        if old is None:
-            return None  # do nothing
-        if common.isNum(old):
-            # this must be id(obj), not obj.id
-            e = self._stream.coreGetElementByMemoryLocation(old)
-            if e is not None:
-                self._stream.replace(e, new, allDerived=False)
-        else:
-            # do not do all Sites: only care about this one
-            self._stream.replace(old, new, allDerived=False)
-
-    # --------------------------------------------------------------------------
-    # Stream  simulation/overrides
-    @property
-    def highestTime(self):
-        '''
-        This property masks calls to Stream.highestTime. Assuming `exposeTime`
-        is False, this always returns zero, making the Variant always take zero time.
-
-        >>> v = variant.Variant()
-        >>> v.append(note.Note(quarterLength=4))
-        >>> v.highestTime
-        0.0
-        '''
-        if self.exposeTime:
-            return self._stream.highestTime
-        else:
-            return 0.0
-
-    @property
-    def highestOffset(self):
-        '''
-        This property masks calls to Stream.highestOffset. Assuming `exposeTime`
-        is False, this always returns zero, making the Variant always take zero time.
-
-        >>> v = variant.Variant()
-        >>> v.append(note.Note(quarterLength=4))
-        >>> v.highestOffset
-        0.0
-        '''
-        if self.exposeTime:
-            return self._stream.highestOffset
-        else:
-            return 0.0
-
-    def show(self, fmt=None, app=None):
-        '''
-        Call show() on the Stream contained by this Variant.
-
-        This method must be overridden, otherwise Music21Object.show() is called.
-
-
-        >>> v = variant.Variant()
-        >>> v.repeatAppend(note.Note(quarterLength=0.25), 8)
-        >>> v.show('t')
-        {0.0} <music21.note.Note C>
-        {0.25} <music21.note.Note C>
-        {0.5} <music21.note.Note C>
-        {0.75} <music21.note.Note C>
-        {1.0} <music21.note.Note C>
-        {1.25} <music21.note.Note C>
-        {1.5} <music21.note.Note C>
-        {1.75} <music21.note.Note C>
-        '''
-        self._stream.show(fmt=fmt, app=app)
-
-    # --------------------------------------------------------------------------
-    # properties particular to this class
-
-    @property
-    def containedHighestTime(self):
-        '''
-        This property calls the contained Stream.highestTime.
-
-        >>> v = variant.Variant()
-        >>> v.append(note.Note(quarterLength=4))
-        >>> v.containedHighestTime
-        4.0
-        '''
-        return self._stream.highestTime
-
-    @property
-    def containedHighestOffset(self):
-        '''
-        This property calls the contained Stream.highestOffset.
-
-        >>> v = variant.Variant()
-        >>> v.append(note.Note(quarterLength=4))
-        >>> v.append(note.Note())
-        >>> v.containedHighestOffset
-        4.0
-        '''
-        return self._stream.highestOffset
-
-    @property
-    def containedSite(self):
-        '''
-        Return the Stream contained in this Variant.
-        '''
-        return self._stream
-
-    def _getReplacementDuration(self):
-        if self._replacementDuration is None:
-            return self._stream.duration.quarterLength
-        else:
-            return self._replacementDuration
-
-    def _setReplacementDuration(self, value):
-        self._replacementDuration = value
-
-    replacementDuration = property(_getReplacementDuration, _setReplacementDuration, doc='''
-        Set or Return the quarterLength duration in the main stream which this variant
-        object replaces in the variant version of the stream. If replacementDuration is
-        not set, it is assumed to be the same length as the variant. If, it is set to 0,
-        the variant should be interpreted as an insertion. Setting replacementDuration
-        to None will return the value to the default which is the duration of the variant
-        itself.
-        ''')
-
-    @property
-    def lengthType(self):
-        '''
-        Returns 'deletion' if variant is shorter than the region it replaces, 'elongation'
-        if the variant is longer than the region it replaces, and 'replacement' if it is
-        the same length.
-        '''
-        lengthDifference = self.replacementDuration - self.containedHighestTime
-        if lengthDifference > 0.0:
-            return 'deletion'
-        elif lengthDifference < 0.0:
-            return 'elongation'
-        else:
-            return 'replacement'
-
-    def replacedElements(self, contextStream=None, classList=None,
-                         keepOriginalOffsets=False, includeSpacers=False):
-        # noinspection PyShadowingNames
-        '''
-        Returns a Stream containing the elements which this variant replaces in a
-        given context stream.
-        This Stream will have length self.replacementDuration.
-
-        In regions that are strictly replaced, only elements that share a class with
-        an element in the variant
-        are captured. Elsewhere, all elements are captured.
-
-        >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2                  d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1", makeNotation=False)
-        >>> s.makeMeasures(inPlace=True)
-        >>> v1stream = converter.parse("tinynotation: 4/4        a2. b-8 a8", makeNotation=False)
-        >>> v2stream1 = converter.parse("tinynotation: 4/4                                       d4 f4 a2", makeNotation=False)
-        >>> v2stream2 = converter.parse("tinynotation: 4/4                                                  d4 f4 AA2", makeNotation=False)
-
-        >>> v1 = variant.Variant()
-        >>> v1measure = stream.Measure()
-        >>> v1.insert(0.0, v1measure)
-        >>> for e in v1stream.notesAndRests:
-        ...    v1measure.insert(e.offset, e)
-
-        >>> v2 = variant.Variant()
-        >>> v2measure1 = stream.Measure()
-        >>> v2measure2 = stream.Measure()
-        >>> v2.insert(0.0, v2measure1)
-        >>> v2.insert(4.0, v2measure2)
-        >>> for e in v2stream1.notesAndRests:
-        ...    v2measure1.insert(e.offset, e)
-        >>> for e in v2stream2.notesAndRests:
-        ...    v2measure2.insert(e.offset, e)
-
-        >>> v3 = variant.Variant()
-        >>> v2.replacementDuration = 4.0
-        >>> v3.replacementDuration = 4.0
-
-        >>> s.insert(4.0, v1)    # replacement variant
-        >>> s.insert(12.0, v2)  # insertion variant (2 bars replace 1 bar)
-        >>> s.insert(20.0, v3)  # deletion variant (0 bars replace 1 bar)
-
-        >>> v1.replacedElements(s).show('text')
-        {0.0} <music21.stream.Measure 2 offset=0.0>
-            {0.0} <music21.note.Note A>
-            {2.0} <music21.note.Note B->
-            {3.0} <music21.note.Note A>
-
-        >>> v2.replacedElements(s).show('text')
-        {0.0} <music21.stream.Measure 4 offset=0.0>
-            {0.0} <music21.note.Note D>
-            {2.0} <music21.note.Note A>
-
-        >>> v3.replacedElements(s).show('text')
-        {0.0} <music21.stream.Measure 6 offset=0.0>
-            {0.0} <music21.note.Note A>
-            {2.0} <music21.note.Note B->
-            {3.0} <music21.note.Note A>
-
-        >>> v3.replacedElements(s, keepOriginalOffsets=True).show('text')
-        {20.0} <music21.stream.Measure 6 offset=20.0>
-            {0.0} <music21.note.Note A>
-            {2.0} <music21.note.Note B->
-            {3.0} <music21.note.Note A>
-
-
-        A second example:
-
-
-        >>> v = variant.Variant()
-        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
-        ...                  ('a', 'quarter'),('b', 'quarter')]
-        >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'),
-        ...                  ('e', 'quarter'), ('e', 'quarter')]
-        >>> variantData = [variantDataM1, variantDataM2]
-        >>> for d in variantData:
-        ...    m = stream.Measure()
-        ...    for pitchName, durType in d:
-        ...        n = note.Note(pitchName)
-        ...        n.duration.type = durType
-        ...        m.append(n)
-        ...    v.append(m)
-        >>> v.groups = ['paris']
-        >>> v.replacementDuration = 4.0
-
-        >>> s = stream.Stream()
-        >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
-        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'),
-        ...                 ('a', 'eighth'), ('a', 'quarter'), ('b', 'quarter')]
-        >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
-        >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
-        >>> streamData = [streamDataM1, streamDataM2, streamDataM3, streamDataM4]
-        >>> for d in streamData:
-        ...    m = stream.Measure()
-        ...    for pitchName, durType in d:
-        ...        n = note.Note(pitchName)
-        ...        n.duration.type = durType
-        ...        m.append(n)
-        ...    s.append(m)
-        >>> s.insert(4.0, v)
-
-        >>> v.replacedElements(s).show('t')
-        {0.0} <music21.stream.Measure 0 offset=0.0>
-            {0.0} <music21.note.Note B>
-            {0.5} <music21.note.Note C>
-            {1.5} <music21.note.Note A>
-            {2.0} <music21.note.Note A>
-            {3.0} <music21.note.Note B>
-        '''
-        spacerFilter = lambda r: r.hasStyleInformation and r.style.hideObjectOnPrint
-
-        if contextStream is None:
-            contextStream = self.activeSite
-            if contextStream is None:
-                environLocal.printDebug(
-                    'No contextStream or activeSite, finding most recently added site (dangerous)')
-                contextStream = self.getContextByClass('Stream')
-                if contextStream is None:
-                    raise VariantException('Cannot find a Stream context for this object...')
-
-        if self not in contextStream.getElementsByClass('Variant'):
-            raise VariantException(f'Variant not found in stream {contextStream}')
-
-        vStart = self.getOffsetBySite(contextStream)
-
-        if includeSpacers is True:
-            spacerDuration = (self
-                              .getElementsByClass('Rest')
-                              .addFilter(spacerFilter)
-                              .first().duration.quarterLength)
-        else:
-            spacerDuration = 0.0
-
-
-        if self.lengthType in ('replacement', 'elongation'):
-            vEnd = vStart + self.replacementDuration + spacerDuration
-            classes = []
-            for e in self.elements:
-                classes.append(e.classes[0])
-            if classList is not None:
-                classes.extend(classList)
-            returnStream = contextStream.getElementsByOffset(vStart, vEnd,
-                includeEndBoundary=False,
-                mustFinishInSpan=False,
-                mustBeginInSpan=True,
-                classList=classes).stream()
-
-        elif self.lengthType == 'deletion':
-            vMiddle = vStart + self.containedHighestTime
-            vEnd = vStart + self.replacementDuration
-            classes = []  # collect all classes found in this variant
-            for e in self.elements:
-                classes.append(e.classes[0])
-            if classList is not None:
-                classes.extend(classList)
-            returnPart1 = contextStream.getElementsByOffset(vStart, vMiddle,
-                includeEndBoundary=False,
-                mustFinishInSpan=False,
-                mustBeginInSpan=True,
-                classList=classes).stream()
-            returnPart2 = contextStream.getElementsByOffset(vMiddle, vEnd,
-                includeEndBoundary=False,
-                mustFinishInSpan=False,
-                mustBeginInSpan=True).stream()
-
-            returnStream = returnPart1
-            for e in returnPart2.elements:
-                oInPart = e.getOffsetBySite(returnPart2)
-                returnStream.insert(vMiddle - vStart + oInPart, e)
-        else:
-            raise VariantException('lengthType must be replacement, elongation, or deletion')
-
-        if self in returnStream:
-            returnStream.remove(self)
-
-        # This probably makes sense to do, but activateVariants
-        #    for example only uses the offset in the original.
-        #    Also, we are not changing measure numbers and should
-        #    not as that will cause activateVariants to fail.
-        if keepOriginalOffsets is False:
-            for e in returnStream:
-                e.setOffsetBySite(returnStream, e.getOffsetBySite(returnStream) - vStart)
-
-        return returnStream
-
-    def removeReplacedElementsFromStream(self, referenceStream=None, classList=None):
-        '''
-        remove replaced elements from a referenceStream or activeSite
-
-
-        >>> v = variant.Variant()
-        >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
-        ...                  ('a', 'quarter'),('b', 'quarter')]
-        >>> variantDataM2 = [('c', 'quarter'), ('d', 'quarter'), ('e', 'quarter'), ('e', 'quarter')]
-        >>> variantData = [variantDataM1, variantDataM2]
-        >>> for d in variantData:
-        ...    m = stream.Measure()
-        ...    for pitchName, durType in d:
-        ...        n = note.Note(pitchName)
-        ...        n.duration.type = durType
-        ...        m.append(n)
-        ...    v.append(m)
-        >>> v.groups = ['paris']
-        >>> v.replacementDuration = 4.0
-
-        >>> s = stream.Stream()
-        >>> streamDataM1 = [('a', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('g', 'quarter')]
-        >>> streamDataM2 = [('b', 'eighth'), ('c', 'quarter'), ('a', 'eighth'),
-        ...                 ('a', 'quarter'), ('b', 'quarter')]
-        >>> streamDataM3 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
-        >>> streamDataM4 = [('c', 'quarter'), ('b', 'quarter'), ('a', 'quarter'), ('a', 'quarter')]
-        >>> streamData = [streamDataM1, streamDataM2, streamDataM3, streamDataM4]
-        >>> for d in streamData:
-        ...    m = stream.Measure()
-        ...    for pitchName, durType in d:
-        ...        n = note.Note(pitchName)
-        ...        n.duration.type = durType
-        ...        m.append(n)
-        ...    s.append(m)
-        >>> s.insert(4.0, v)
-
-        >>> v.removeReplacedElementsFromStream(s)
-        >>> s.show('t')
-        {0.0} <music21.stream.Measure 0 offset=0.0>
-            {0.0} <music21.note.Note A>
-            {1.0} <music21.note.Note B>
-            {2.0} <music21.note.Note A>
-            {3.0} <music21.note.Note G>
-        {4.0} <music21.variant.Variant object of length 8.0>
-        {8.0} <music21.stream.Measure 0 offset=8.0>
-            {0.0} <music21.note.Note C>
-            {1.0} <music21.note.Note B>
-            {2.0} <music21.note.Note A>
-            {3.0} <music21.note.Note A>
-        {12.0} <music21.stream.Measure 0 offset=12.0>
-            {0.0} <music21.note.Note C>
-            {1.0} <music21.note.Note B>
-            {2.0} <music21.note.Note A>
-            {3.0} <music21.note.Note A>
-        '''
-        if referenceStream is None:
-            referenceStream = self.activeSite
-            if referenceStream is None:
-                environLocal.printDebug('No referenceStream or activeSite, '
-                                        + 'finding most recently added site (dangerous)')
-                referenceStream = self.getContextByClass('Stream')
-                if referenceStream is None:
-                    raise VariantException('Cannot find a Stream context for this object...')
-        if self not in referenceStream.getElementsByClass('Variant'):
-            raise VariantException(f'Variant not found in stream {referenceStream}')
-
-        replacedElements = self.replacedElements(referenceStream, classList)
-        for el in replacedElements:
-            referenceStream.remove(el)
 
 
 # ------------------------------------------------------------------------------
@@ -2572,8 +2575,8 @@ class Test(unittest.TestCase):
 
         self.assertIn('Variant', v1.classes)
 
-        self.assertFalse(v1.hasElementOfClass('Variant'))
-        self.assertTrue(v1.hasElementOfClass('Measure'))
+        self.assertFalse(v1.hasElementOfClass(Variant))
+        self.assertTrue(v1.hasElementOfClass(stream.Measure))
 
     def testDeepCopyVariantA(self):
         s = stream.Stream()
@@ -2601,7 +2604,7 @@ class Test(unittest.TestCase):
 
         # test functionality on a deepcopy
         sCopy = copy.deepcopy(s)
-        self.assertEqual(len(sCopy.getElementsByClass('Variant')), 1)
+        self.assertEqual(len(sCopy.getElementsByClass(Variant)), 1)
         self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sCopy.activateVariants(inPlace=True)

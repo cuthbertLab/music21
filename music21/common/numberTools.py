@@ -64,27 +64,26 @@ musicOrdinals[22] = 'Triple-octave'
 
 
 @deprecated('v7.3', 'v9', 'Use common.opFrac(num) instead')
-def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
+def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):  # pragma: no cover
     '''
     Cleans up a floating point number by converting
     it to a fractions.Fraction object limited to
     a denominator of maxDenominator
 
-    >>> common.cleanupFloat(0.33333327824)
+    common.cleanupFloat(0.33333327824)
     0.333333333333...
 
-    >>> common.cleanupFloat(0.142857)
+    common.cleanupFloat(0.142857)
     0.1428571428571...
 
-    >>> common.cleanupFloat(1.5)
+    common.cleanupFloat(1.5)
     1.5
 
     Fractions are passed through silently...
 
-    >>> import fractions
-    >>> common.cleanupFloat(fractions.Fraction(4, 3))
+    import fractions
+    common.cleanupFloat(fractions.Fraction(4, 3))
     Fraction(4, 3)
-
     '''
     if isinstance(floatNum, Fraction):
         return floatNum  # do nothing to fractions

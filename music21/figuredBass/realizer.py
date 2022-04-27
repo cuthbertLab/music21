@@ -333,7 +333,7 @@ class FiguredBassLine:
         bl2 = bassLine.makeNotation(inPlace=False, cautionaryNotImmediateRepeat=False)
         if r is not None:
             m0 = bl2.getElementsByClass(stream.Measure).first()
-            m0.remove(m0.getElementsByClass('Rest').first())
+            m0.remove(m0.getElementsByClass(note.Rest).first())
             m0.padAsAnacrusis()
         return bl2
 

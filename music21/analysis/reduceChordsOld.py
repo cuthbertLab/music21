@@ -355,7 +355,7 @@ class TestExternal(unittest.TestCase):
         fixClef = True
         if fixClef:
             startClefs = c.parts[1].getElementsByClass(stream.Measure
-                                                       ).first().getElementsByClass('Clef')
+                                                       ).first().getElementsByClass(clef.Clef)
             if startClefs:
                 clef1 = startClefs[0]
                 c.parts[1].getElementsByClass(stream.Measure).first().remove(clef1)
@@ -369,7 +369,7 @@ class TestExternal(unittest.TestCase):
         from music21 import key
         from music21 import roman
         cm = key.Key('G')
-        for thisChord in p.recurse().getElementsByClass('Chord'):
+        for thisChord in p[chord.Chord]:
             thisChord.lyric = roman.romanNumeralFromChord(thisChord,
                                                           cm,
                                                           preferSecondaryDominants=True).figure

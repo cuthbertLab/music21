@@ -142,7 +142,7 @@ class ChordReducer:
         reduction.append(chordifiedPart)
 
         if closedPosition:
-            for x in reduction.recurse().getElementsByClass('Chord'):
+            for x in reduction[chord.Chord]:
                 x.closedPosition(forceOctave=4, inPlace=True)
 
         return reduction

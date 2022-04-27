@@ -2124,7 +2124,7 @@ class Test(unittest.TestCase):
         bm.insert(0, tempo.TempoText('Con brio'))
         bm.insert(25.0, clef.TrebleClef())
         bm.insert(32.0, clef.BassClef())
-        bm.recurse().getElementsByClass('TimeSignature').first().symbol = 'common'
+        bm[meter.TimeSignature].first().symbol = 'common'
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass(stream.Measure)
         m[0].padAsAnacrusis(useInitialRests=True)

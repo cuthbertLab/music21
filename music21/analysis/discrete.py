@@ -129,7 +129,7 @@ class DiscreteAnalysis:
 
     def getColorsUsed(self):
         '''
-        Based on solutions found so far with with this processor,
+        Based on solutions found so far with this processor,
         return the colors that have been used.
         '''
         post = []
@@ -140,7 +140,7 @@ class DiscreteAnalysis:
 
     def getSolutionsUsed(self):
         '''
-        Based on solutions found so far with with this processor,
+        Based on solutions found so far with this processor,
         return the solutions that have been used.
         '''
         post = []
@@ -167,7 +167,7 @@ class DiscreteAnalysis:
 
     def solutionToColor(self, solution):
         '''
-        Given a analysis specific result, return the appropriate color.
+        Given an analysis specific result, return the appropriate color.
         Must be able to handle None in the case that there is no result.
         '''
         pass
@@ -305,7 +305,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         >>> p._getSharpFlatCount(s.flatten())
         (87, 0)
         '''
-        # pitches gets a flat representation
+        # ".pitches" gets a flat representation
         flatCount = 0
         sharpCount = 0
         for p in subStream.pitches:
@@ -496,7 +496,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 if keyPitch.name not in valid:
                     mask = True
                 if mask:
-                    # set as white so as to maintain spacing
+                    # set as white to maintain spacing
                     color = '#ffffff'
                     keyStr = ''
                 else:
@@ -583,7 +583,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         flipEnharmonic = False
 #         if pitchObj.accidental is not None:
-#             # if we have a sharp key and we need to favor flat, get enharmonic
+#             # if we have a sharp key, and we need to favor flat, get enharmonic
 #             if pitchObj.accidental.alter > 0 and favor == 'flat':
 #                 flipEnharmonic = True
 #             elif pitchObj.accidental.alter < 0 and favor == 'sharp':
@@ -635,7 +635,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         #    mode = None
         #    solution = (None, mode, 0)
 
-        # see which has a higher correlation coefficient, the first major or the
+        # see which has a higher correlation coefficient, the first major or
         # the first minor
         if likelyKeysMajor is not None:
             sortList = [(coefficient, p, 'major') for
@@ -1227,20 +1227,21 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         # note that Stream.findConsecutiveNotes() and Stream.melodicIntervals()
         # offer similar approaches, but return Streams and manage offsets and durations,
         # components not needed here
+        from music21 import stream
 
         if found is None:
             found = {}
 
         # if this has parts, need to move through each at a time
         if sStream.hasPartLikeStreams():
-            procList = list(sStream.getElementsByClass('Stream'))
+            procList = list(sStream.getElementsByClass(stream.Stream))
         else:  # assume a single list of notes, or sStream is a part
             procList = [sStream]
 
         for p in procList:
             # get only Notes for now, skipping rests and chords
             # flatten to reach notes contained in measures
-            noteStream = p.flatten().stripTies(inPlace=False).getElementsByClass('Note').stream()
+            noteStream = p.flatten().stripTies(inPlace=False).getElementsByClass(note.Note).stream()
             # noteStream.show()
             for i, n in enumerate(noteStream):
                 if i <= len(noteStream) - 2:

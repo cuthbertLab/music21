@@ -196,7 +196,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         pass
     # clefs are not typically defined, but if so, are set to the first measure
     # following the meta data, or in the open stream
-    if not clefSet and not p.recurse().getElementsByClass('Clef'):
+    if not clefSet and not p[clef.Clef]:
         if useMeasures:  # assume at start of measures
             p.getElementsByClass(stream.Measure).first().clef = clef.bestClef(p, recurse=True)
         else:
@@ -205,7 +205,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     if postTransposition != 0:
         p.transpose(postTransposition, inPlace=True)
 
-    if useMeasures and p.recurse().getElementsByClass('TimeSignature'):
+    if useMeasures and p[meter.TimeSignature]:
         # call make beams for now; later, import beams
         # environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
         try:
@@ -660,7 +660,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[1].flatten().notesAndRests), 127)
 
         # chords are defined in second part here
-        self.assertEqual(len(s.parts[1].flatten().getElementsByClass('Chord')), 32)
+        self.assertEqual(len(s.parts[1][chord.Chord]), 32)
 
         # check pitches in chords; sharps are applied due to key signature
         match = [p.nameWithOctave for p in s.parts[1].flatten().getElementsByClass(
@@ -850,16 +850,16 @@ class Test(unittest.TestCase):
         p1 = o.getScoreByNumber(81).parts[0]
         self.assertEqual(p1.offset, 0.0)
         self.assertEqual(len(p1.flatten().notesAndRests), 77)
-        self.assertEqual(len(list(p1.flatten().getElementsByClass('ChordSymbol'))), 25)
+        self.assertEqual(len(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))), 25)
         # Am/C
-        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[7].root(),
+        self.assertEqual(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))[7].root(),
                          pitch.Pitch('A3'))
-        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[7].bass(),
+        self.assertEqual(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))[7].bass(),
                          pitch.Pitch('C3'))
         # G7/B
-        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[14].root(),
+        self.assertEqual(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))[14].root(),
                          pitch.Pitch('G3'))
-        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[14].bass(),
+        self.assertEqual(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))[14].bass(),
                          pitch.Pitch('B2'))
 
     def testNoChord(self):
@@ -884,9 +884,9 @@ class Test(unittest.TestCase):
 
         score = harmony.realizeChordSymbolDurations(score)
 
-        self.assertEqual(8, score.getElementsByClass('ChordSymbol')[
+        self.assertEqual(8, score.getElementsByClass(harmony.ChordSymbol)[
             -1].quarterLength)
-        self.assertEqual(4, score.getElementsByClass('ChordSymbol')[
+        self.assertEqual(4, score.getElementsByClass(harmony.ChordSymbol)[
             0].quarterLength)
 
     def testAbcKeyImport(self):
@@ -944,13 +944,13 @@ class Test(unittest.TestCase):
         # s.show()
         # one start, one end
         # s.parts[0].show('t')
-        self.assertEqual(len(s.flatten().getElementsByClass('Repeat')), 2)
+        self.assertEqual(len(s['Repeat']), 2)
         # s.show()
 
         # this has a 1 note pickup
         # has three repeat bars; first one is implied
         s = converter.parse(testFiles.draughtOfAle)
-        self.assertEqual(len(s.flatten().getElementsByClass('Repeat')), 3)
+        self.assertEqual(len(s['Repeat']), 3)
         self.assertEqual(s.parts[0].getElementsByClass(
             'Measure')[0].notes[0].pitch.nameWithOctave, 'D4')
 
@@ -965,14 +965,14 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = converter.parse(testFiles.morrisonsJig)
         # TODO: get
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 2)
+        self.assertEqual(len(s[spanner.RepeatBracket]), 2)
         # s.show()
         # four repeat brackets here; 2 at beginning, 2 at end
         s = converter.parse(testFiles.hectorTheHero)
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 4)
+        self.assertEqual(len(s[spanner.RepeatBracket]), 4)
 
         s = corpus.parse('JollyTinkersReel')
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 4)
+        self.assertEqual(len(s[spanner.RepeatBracket]), 4)
 
     def testMetronomeMarkA(self):
         from music21.abcFormat import testFiles

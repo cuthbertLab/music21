@@ -2148,7 +2148,7 @@ class LilypondConverter:
 
         musicList = []
 
-        varFilter = [r for r in variantObject.getElementsByClass('Rest')
+        varFilter = [r for r in variantObject.getElementsByClass(note.Rest)
                      if r.style.hideObjectOnPrint]
 
         if varFilter:

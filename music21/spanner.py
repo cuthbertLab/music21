@@ -100,7 +100,7 @@ class Spanner(base.Music21Object):
     <music21.note.Note E>
 
 
-    (2) we can get a stream of spanners (equiv. to getElementsByClass('Spanner'))
+    (2) we can get a stream of spanners (equiv. to getElementsByClass(spanner.Spanner))
         by calling the .spanner property on the stream.
 
     >>> spannerCollection = s.spanners  # a stream object

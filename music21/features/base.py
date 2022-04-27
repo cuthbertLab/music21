@@ -608,7 +608,7 @@ class DataInstance:
         else:
             self.partsCount = 0
 
-        for v in self.stream.recurse().getElementsByClass('Voice'):
+        for v in self.stream[stream.Voice]:
             self.formsByPart.append(StreamForms(v))
 
     def setClassLabel(self, classLabel, classValue=None):

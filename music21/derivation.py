@@ -222,9 +222,9 @@ class Derivation(SlottedObjectMixin):
         >>> s1.id = 's1'
         >>> s1.repeatAppend(note.Note(), 10)
         >>> s1.repeatAppend(note.Rest(), 10)
-        >>> s2 = s1.getElementsByClass('GeneralNote').stream()
+        >>> s2 = s1.notesAndRests.stream()
         >>> s2.id = 's2'
-        >>> s3 = s2.getElementsByClass('Note').stream()
+        >>> s3 = s2.getElementsByClass(note.Note).stream()
         >>> s3.id = 's3'
         >>> for y in s3.derivation.chain():
         ...     print(y)
@@ -308,8 +308,8 @@ class Derivation(SlottedObjectMixin):
         >>> s1 = stream.Stream()
         >>> s1.repeatAppend(note.Note(), 10)
         >>> s1.repeatAppend(note.Rest(), 10)
-        >>> s2 = s1.getElementsByClass('GeneralNote').stream()
-        >>> s3 = s2.getElementsByClass('Note').stream()
+        >>> s2 = s1.notesAndRests.stream()
+        >>> s3 = s2.getElementsByClass(note.Note).stream()
         >>> s3.derivation.rootDerivation is s1
         True
         '''

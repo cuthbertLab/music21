@@ -3877,14 +3877,14 @@ class ElementWrapper(Music21Object):
     ...    el = music21.ElementWrapper(soundFile)
     ...    s.insert(i, el)
 
-    >>> for j in s.getElementsByClass('ElementWrapper'):
+    >>> for j in s.getElementsByClass(base.ElementWrapper):
     ...    if j.beatStrength > 0.4:
     ...        (j.offset, j.beatStrength, j.getnchannels(), j.fileName)
     (0.0, 1.0, 2, 'thisSound_1.wav')
     (3.0, 1.0, 2, 'thisSound_16.wav')
     (6.0, 1.0, 2, 'thisSound_12.wav')
     (9.0, 1.0, 2, 'thisSound_8.wav')
-    >>> for j in s.getElementsByClass('ElementWrapper'):
+    >>> for j in s.getElementsByClass(base.ElementWrapper):
     ...    if j.beatStrength > 0.4:
     ...        (j.offset, j.beatStrength, j.getnchannels() + 1, j.fileName)
     (0.0, 1.0, 3, 'thisSound_1.wav')
@@ -3894,7 +3894,7 @@ class ElementWrapper(Music21Object):
 
     Test representation of an ElementWrapper
 
-    >>> for i, j in enumerate(s.getElementsByClass('ElementWrapper')):
+    >>> for i, j in enumerate(s.getElementsByClass(base.ElementWrapper)):
     ...     if i == 2:
     ...         j.id = None
     ...     else:
@@ -4301,8 +4301,12 @@ class Test(unittest.TestCase):
     def testBeatAccess(self):
         '''Test getting beat data from various Music21Objects.
         '''
+        from music21 import clef
         from music21 import corpus
+        from music21 import key
+        from music21 import meter
         from music21 import stream
+
         s = corpus.parse('bach/bwv66.6.xml')
         p1 = s.parts['Soprano']
 
@@ -4311,18 +4315,18 @@ class Test(unittest.TestCase):
 
         # clef/ks can get its beat; these objects are in a pickup,
         # and this give their bar offset relative to the bar
-        eClef = p1.flatten().getElementsByClass('Clef').first()
+        eClef = p1.flatten().getElementsByClass(clef.Clef).first()
         self.assertEqual(eClef.beat, 4.0)
         self.assertEqual(eClef.beatDuration.quarterLength, 1.0)
         self.assertEqual(eClef.beatStrength, 0.25)
 
-        eKS = p1.flatten().getElementsByClass('KeySignature').first()
+        eKS = p1.flatten().getElementsByClass(key.KeySignature).first()
         self.assertEqual(eKS.beat, 4.0)
         self.assertEqual(eKS.beatDuration.quarterLength, 1.0)
         self.assertEqual(eKS.beatStrength, 0.25)
 
         # ts can get beatStrength, beatDuration
-        eTS = p1.flatten().getElementsByClass('TimeSignature').first()
+        eTS = p1.flatten().getElementsByClass(meter.TimeSignature).first()
         self.assertEqual(eTS.beatDuration.quarterLength, 1.0)
         self.assertEqual(eTS.beatStrength, 0.25)
 
@@ -4575,15 +4579,15 @@ class Test(unittest.TestCase):
         s3.append(n3)
 
         # only get n1 here, as that is only level available
-        self.assertEqual(s1.recurse().getElementsByClass('Note').first(), n1)
-        self.assertEqual(s2.recurse().getElementsByClass('Note').first(), n2)
-        self.assertEqual(s1.recurse().getElementsByClass('Clef').first(), c1)
-        self.assertEqual(s2.recurse().getElementsByClass('Clef').first(), c2)
+        self.assertEqual(s1.recurse().getElementsByClass(note.Note).first(), n1)
+        self.assertEqual(s2.recurse().getElementsByClass(note.Note).first(), n2)
+        self.assertEqual(s1[clef.Clef].first(), c1)
+        self.assertEqual(s2[clef.Clef].first(), c2)
 
         # attach s2 to s1
         s2.append(s1)
         # stream 1 gets both notes
-        self.assertEqual(list(s2.recurse().getElementsByClass('Note')), [n2, n1])
+        self.assertEqual(list(s2.recurse().getElementsByClass(note.Note)), [n2, n1])
 
     def testSetEditorial(self):
         b2 = Music21Object()
@@ -4697,7 +4701,7 @@ class Test(unittest.TestCase):
         matchBeatStrength = []
         matchAudioChannels = []
 
-        for j in s.getElementsByClass('ElementWrapper'):
+        for j in s.getElementsByClass(base.ElementWrapper):
             matchOffset.append(j.offset)
             matchBeatStrength.append(j.beatStrength)
             matchAudioChannels.append(j.getnchannels())

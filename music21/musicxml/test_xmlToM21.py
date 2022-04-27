@@ -66,7 +66,7 @@ class Test(unittest.TestCase):
         # this is a good example with repeats
         s = corpus.parse('k80/movement3')
         for p in s.parts:
-            post = p.recurse().getElementsByClass(bar.Repeat)
+            post = p[bar.Repeat]
             self.assertEqual(len(post), 6)
 
         # a = corpus.parse('opus41no1/movement3')
@@ -95,7 +95,7 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.spannersSlurs33c)
         # have 5 spanners
-        self.assertEqual(len(s.flatten().getElementsByClass(spanner.Spanner)), 5)
+        self.assertEqual(len(s[spanner.Spanner]), 5)
 
         # can get the same from a recurse search
         self.assertEqual(len(s.recurse().getElementsByClass(spanner.Spanner)), 5)
@@ -190,7 +190,7 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.textExpressions)
         # s.show()
-        self.assertEqual(len(s.flatten().getElementsByClass(expressions.TextExpression)), 3)
+        self.assertEqual(len(s[expressions.TextExpression]), 3)
 
         p1 = s.parts[0]
         m1 = p1.getElementsByClass(stream.Measure)[0]
@@ -262,22 +262,22 @@ class Test(unittest.TestCase):
 
         # has one segno
         s = converter.parse(testPrimitive.repeatExpressionsA)
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.Segno)), 1)
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.Fine)), 1)
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.DalSegnoAlFine)), 1)
+        self.assertEqual(len(s[repeat.Segno]), 1)
+        self.assertEqual(len(s[repeat.Fine]), 1)
+        self.assertEqual(len(s[repeat.DalSegnoAlFine]), 1)
 
         # has two codas
         s = converter.parse(testPrimitive.repeatExpressionsB)
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.Coda)), 2)
+        self.assertEqual(len(s[repeat.Coda]), 2)
         # has one d.c.al coda
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.DaCapoAlCoda)), 1)
+        self.assertEqual(len(s[repeat.DaCapoAlCoda]), 1)
 
     def testImportRepeatBracketA(self):
         from music21 import corpus
         # has repeats in it; start with single measure
         s = corpus.parse('opus74no1', 3)
         # there are 2 for each part, totaling 8
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 8)
+        self.assertEqual(len(s[spanner.RepeatBracket]), 8)
         # can get for each part as spanners are stored in Part now
 
         # TODO: need to test getting repeat brackets after measure extraction
@@ -285,7 +285,7 @@ class Test(unittest.TestCase):
         sSub = s.parts[0].measures(72, 77)
         # 2 repeat brackets are gathered b/c they are stored at the Part by
         # default
-        rbSpanners = sSub.getElementsByClass('RepeatBracket')
+        rbSpanners = sSub.getElementsByClass(spanner.RepeatBracket)
         self.assertEqual(len(rbSpanners), 2)
 
     def testImportVoicesA(self):
@@ -332,7 +332,7 @@ class Test(unittest.TestCase):
         # has metronome marks defined, not with sound tag
         s = converter.parse(testPrimitive.metronomeMarks31c)
         # get all tempo indications
-        mms = s.flatten().getElementsByClass('TempoIndication')
+        mms = s[tempo.TempoIndication]
         self.assertGreater(len(mms), 3)
 
     def testImportMetronomeMarksB(self):
@@ -392,7 +392,7 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         s = converter.parse(testPrimitive.staffGroupsNested41d)
-        staffGroups = s.getElementsByClass('StaffGroup')
+        staffGroups = s.getElementsByClass(layout.StaffGroup)
         # staffGroups.show()
         self.assertEqual(len(staffGroups), 2)
 
@@ -411,7 +411,7 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         s = converter.parse(testPrimitive.pianoStaff43a)
-        sgs = s.getElementsByClass('StaffGroup')
+        sgs = s.getElementsByClass(layout.StaffGroup)
         self.assertEqual(len(sgs), 1)
         self.assertEqual(sgs[0].symbol, 'brace')
         self.assertIs(sgs[0].barTogether, True)
@@ -513,21 +513,21 @@ class Test(unittest.TestCase):
         from music21 import corpus
 
         s = corpus.parse('leadSheet/berlinAlexandersRagtime.xml')
-        self.assertEqual(len(s.flatten().getElementsByClass('ChordSymbol')), 19)
+        self.assertEqual(len(s[harmony.ChordSymbol]), 19)
 
-        match = [h.chordKind for h in s.recurse().getElementsByClass('ChordSymbol')]
+        match = [h.chordKind for h in s[harmony.ChordSymbol]]
         self.assertEqual(match, ['major', 'dominant-seventh', 'major', 'major', 'major',
                                  'major', 'dominant-seventh', 'major', 'dominant-seventh',
                                  'major', 'dominant-seventh', 'major', 'dominant-seventh',
                                  'major', 'dominant-seventh', 'major', 'dominant-seventh',
                                  'major', 'major'])
 
-        match = [str(h.root()) for h in s.recurse().getElementsByClass('ChordSymbol')]
+        match = [str(h.root()) for h in s[harmony.ChordSymbol]]
 
         self.assertEqual(match, ['F3', 'C3', 'F3', 'B-2', 'F3', 'C3', 'G2', 'C3', 'C3',
                                  'F3', 'C3', 'F3', 'F2', 'B-2', 'F2', 'F3', 'C3', 'F3', 'C3'])
 
-        match = {str(h.figure) for h in s.recurse().getElementsByClass('ChordSymbol')}
+        match = {str(h.figure) for h in s[harmony.ChordSymbol]}
 
         self.assertEqual(match, {'F', 'F7', 'B-', 'C7', 'G7', 'C'})
 
@@ -569,7 +569,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.notations32a)
 
         # s.flatten().show('t')
-        num_tremolo_spanners = len(s.flatten().getElementsByClass('TremoloSpanner'))
+        num_tremolo_spanners = len(s['TremoloSpanner'])
         self.assertEqual(num_tremolo_spanners, 0)  # no spanned tremolos
 
         count = 0
@@ -644,8 +644,8 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.spanners33a)
-        self.assertEqual(len(s.recurse().getElementsByClass('Crescendo')), 1)
-        self.assertEqual(len(s.recurse().getElementsByClass('Diminuendo')), 1)
+        self.assertEqual(len(s[dynamics.Crescendo]), 1)
+        self.assertEqual(len(s[dynamics.Diminuendo]), 1)
 
     def testImportWedgeB(self):
         from music21 import converter
@@ -653,7 +653,7 @@ class Test(unittest.TestCase):
 
         # this produces a single component cresc
         s = converter.parse(testPrimitive.directions31a)
-        self.assertEqual(len(s.recurse().getElementsByClass('Crescendo')), 2)
+        self.assertEqual(len(s[dynamics.Crescendo]), 2)
 
     def testBracketImportB(self):
         from music21 import converter
@@ -661,21 +661,21 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.spanners33a)
         # s.show()
-        self.assertEqual(len(s.recurse().getElementsByClass('Line')), 6)
+        self.assertEqual(len(s[spanner.Line]), 6)
 
     def testTrillExtensionImportA(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
         s = converter.parse(testPrimitive.notations32a)
         # s.show()
-        self.assertEqual(len(s.recurse().getElementsByClass('TrillExtension')), 2)
+        self.assertEqual(len(s[expressions.TrillExtension]), 2)
 
     def testGlissandoImportA(self):
         from music21 import converter
         from music21.musicxml import testPrimitive
         s = converter.parse(testPrimitive.spanners33a)
         # s.show()
-        glisses = list(s.recurse().getElementsByClass('Glissando'))
+        glisses = list(s[spanner.Glissando])
         self.assertEqual(len(glisses), 2)
         self.assertEqual(glisses[0].slideType, 'chromatic')
         self.assertEqual(glisses[1].slideType, 'continuous')
@@ -686,7 +686,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.spanners33a, format='musicxml')
-        self.assertEqual(len(s.recurse().getElementsByClass('Line')), 6)
+        self.assertEqual(len(s[spanner.Line]), 6)
 
     def testImportGraceA(self):
         from music21 import converter
@@ -727,10 +727,10 @@ class Test(unittest.TestCase):
     def testStaffLayout(self):
         from music21 import corpus
         c = corpus.parse('demos/layoutTest.xml')
-        layouts = c.flatten().getElementsByClass('LayoutBase').stream()
-        systemLayouts = layouts.getElementsByClass('SystemLayout')
+        layouts = c.flatten().getElementsByClass(layout.LayoutBase).stream()
+        systemLayouts = layouts.getElementsByClass(layout.SystemLayout)
         self.assertEqual(len(systemLayouts), 42)
-        staffLayouts = layouts.getElementsByClass('StaffLayout')
+        staffLayouts = layouts.getElementsByClass(layout.StaffLayout)
         self.assertEqual(len(staffLayouts), 20)
         pageLayouts = layouts.getElementsByClass('PageLayout')
         self.assertEqual(len(pageLayouts), 10)
@@ -754,9 +754,9 @@ class Test(unittest.TestCase):
     def testStaffLayoutMore(self):
         from music21 import corpus
         c = corpus.parse('demos/layoutTestMore.xml')
-        layouts = c.flatten().getElementsByClass('LayoutBase').stream()
+        layouts = c.flatten().getElementsByClass(layout.LayoutBase).stream()
         self.assertEqual(len(layouts), 76)
-        systemLayouts = layouts.getElementsByClass('SystemLayout')
+        systemLayouts = layouts.getElementsByClass(layout.SystemLayout)
         sl0 = systemLayouts[0]
         self.assertEqual(sl0.distance, None)
         self.assertEqual(sl0.topDistance, 211.0)
@@ -781,7 +781,7 @@ class Test(unittest.TestCase):
         notesOrChords = (note.Note, chord.Chord)
         allNotesOrChords = c.flatten().getElementsByClass(notesOrChords)
         self.assertEqual(len(allNotesOrChords), 50)
-        allChords = c.flatten().getElementsByClass('Chord')
+        allChords = c[chord.Chord]
         self.assertEqual(len(allChords), 45)
         pCount = 0
         for cc in allChords:
@@ -810,7 +810,7 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         c = corpus.parse('luca/gloria')
-        r = c.parts[1].measure(99).getElementsByClass('Rest').first()
+        r = c.parts[1].measure(99).getElementsByClass(note.Rest).first()
         bracketAttachedToRest = r.getSpannerSites()[0]
         self.assertIn('Line', bracketAttachedToRest.classes)
         self.assertEqual(bracketAttachedToRest.idLocal, '1')
@@ -823,7 +823,7 @@ class Test(unittest.TestCase):
         c = corpus.parse('demos/voices_with_chords.xml')
         m1 = c.parts[0].measure(1)
         # m1.show('text')
-        firstChord = m1.voices.getElementById('2').getElementsByClass('Chord').first()
+        firstChord = m1.voices.getElementById('2').getElementsByClass(chord.Chord).first()
         self.assertEqual(repr(firstChord), '<music21.chord.Chord G4 B4>')
         self.assertEqual(firstChord.offset, 1.0)
 
@@ -1017,7 +1017,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.directions31a)
-        rmIterator = s.recurse().getElementsByClass('RehearsalMark')
+        rmIterator = s[expressions.RehearsalMark]
         self.assertEqual(len(rmIterator), 4)
         self.assertEqual(rmIterator[0].content, 'A')
         self.assertEqual(rmIterator[1].content, 'B')
@@ -1032,17 +1032,17 @@ class Test(unittest.TestCase):
         testFp = thisDir / 'testNC.xml'
         s = converter.parse(testFp)
 
-        self.assertEqual(5, len(s.recurse().getElementsByClass('ChordSymbol')))
-        self.assertEqual(2, len(s.recurse().getElementsByClass('NoChord')))
+        self.assertEqual(5, len(s[harmony.ChordSymbol]))
+        self.assertEqual(2, len(s[harmony.NoChord]))
 
         self.assertEqual('augmented-seventh',
-                         s.recurse().getElementsByClass('ChordSymbol')[0].chordKind)
+                         s[harmony.ChordSymbol][0].chordKind)
         self.assertEqual('none',
-                         s.recurse().getElementsByClass('ChordSymbol')[1].chordKind)
+                         s[harmony.ChordSymbol][1].chordKind)
 
-        self.assertEqual('random', str(s.recurse().getElementsByClass('NoChord')[
+        self.assertEqual('random', str(s[harmony.NoChord][
                                        0].chordKindStr))
-        self.assertEqual('N.C.', str(s.recurse().getElementsByClass('NoChord')[
+        self.assertEqual('N.C.', str(s[harmony.NoChord][
                                      1].chordKindStr))
 
     def testChordAlias(self):
@@ -1067,7 +1067,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testFp)
 
         offsets = [0.0, 2.0, 0.0, 2.0, 0.0, 2.0]
-        for ch, offset in zip(s.recurse().getElementsByClass('ChordSymbol'),
+        for ch, offset in zip(s[harmony.ChordSymbol],
                               offsets):
             self.assertEqual(ch.offset, offset)
 
@@ -1194,13 +1194,13 @@ class Test(unittest.TestCase):
         # Measure 3, left barline: <ending number="3" type="start"/>
         # Measure 3, right barline: <ending number="3" type="stop"/>
         score = converter.parse(testPrimitive.multiDigitEnding)
-        repeatBrackets = score.recurse().getElementsByClass('RepeatBracket')
+        repeatBrackets = score.recurse().getElementsByClass(spanner.RepeatBracket)
         self.assertListEqual(repeatBrackets[0].getNumberList(), [1, 2])
         self.assertListEqual(repeatBrackets[1].getNumberList(), [3])
 
         nonconformingInput = testPrimitive.multiDigitEnding.replace("1,2", "ad lib.")
         score2 = converter.parse(nonconformingInput)
-        repeatBracket = score2.recurse().getElementsByClass('RepeatBracket').first()
+        repeatBracket = score2.recurse().getElementsByClass(spanner.RepeatBracket).first()
         self.assertListEqual(repeatBracket.getNumberList(), [1])
 
     def testChordAlteration(self):
@@ -1269,12 +1269,12 @@ class Test(unittest.TestCase):
 
         # Dynamic
         s = converter.parse(testFiles.mozartTrioK581Excerpt)
-        dyn = s.recurse().getElementsByClass('Dynamic').first()
+        dyn = s[dynamics.Dynamic].first()
         self.assertEqual(dyn.style.relativeY, 6)
 
         # Coda/Segno
         s = converter.parse(testPrimitive.repeatExpressionsA)
-        seg = s.recurse().getElementsByClass('Segno').first()
+        seg = s[repeat.Segno].first()
         self.assertEqual(seg.style.relativeX, 10)
 
         # TextExpression
@@ -1301,7 +1301,7 @@ class Test(unittest.TestCase):
 
         # Metronome
         s = converter.parse(testFiles.tabTest)
-        metro = s.recurse().getElementsByClass('MetronomeMark').first()
+        metro = s[tempo.MetronomeMark].first()
         self.assertEqual(metro.style.absoluteY, 40)
         self.assertEqual(metro.placement, 'above')
 

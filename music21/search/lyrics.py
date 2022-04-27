@@ -187,7 +187,7 @@ class LyricSearcher:
         iTextByIdentifier = OrderedDict()
         lastSyllabicByIdentifier = OrderedDict()
 
-        for n in s.recurse().getElementsByClass('NotRest'):
+        for n in s.recurse().notes:
             ls: List[note.Lyric] = n.lyrics
             if not ls:
                 continue

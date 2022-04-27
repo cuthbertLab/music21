@@ -3685,7 +3685,7 @@ class Test(unittest.TestCase):
         s.append(p)
         targetCount = 1
         self.assertEqual(
-            len(s.flatten().getElementsByClass('KeySignature')),
+            len(s['KeySignature']),
             targetCount,
         )
         # through sequential iteration

@@ -19,7 +19,7 @@ def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.
 
     >>> from music21 import corpus
     >>> bach = corpus.parse('bach/bwv324.xml')
-    >>> bachIter = bach.parts[0].recurse().getElementsByClass('Note')
+    >>> bachIter = bach.parts[0].recurse().getElementsByClass(note.Note)
     >>> qlCount = analysis.elements.attributeCount(bachIter, 'quarterLength')
     >>> qlCount.most_common(3)
     [(1.0, 12), (2.0, 11), (4.0, 2)]
