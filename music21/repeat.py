@@ -481,7 +481,7 @@ def insertRepeat(s, start, end, *, inPlace=False):
 
     >>> len(s.parts[0].flatten().getElementsByClass(bar.Repeat))
     2
-    >>> len(s.flatten().getElementsByClass(bar.Repeat))
+    >>> len(s[bar.Repeat])
     8
     >>> s.parts[0].measure(3).leftBarline.direction
     'start'
@@ -724,6 +724,7 @@ class Expander:
         run several setup routines.
         '''
         from music21 import stream
+
         # get and store the source measure count; this is presumed to
         # be a Stream with Measures
         self._srcMeasureStream = self._src.getElementsByClass(stream.Measure).stream()
@@ -3208,7 +3209,7 @@ class Test(unittest.TestCase):
             template.append(m)
         s = copy.deepcopy(template)
         s[3].insert(0, repeat.DaCapo())
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.DaCapo)), 1)
+        self.assertEqual(len(s[repeat.DaCapo]), 1)
 
         raw = GEX.parse(s).decode('utf-8')
 
@@ -3218,7 +3219,7 @@ class Test(unittest.TestCase):
         s = copy.deepcopy(template)
         s[0].timeSignature = meter.TimeSignature('4/4')
         s[3].insert(0, expressions.TextExpression('da capo'))
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.DaCapo)), 0)
+        self.assertEqual(len(s[repeat.DaCapo]), 0)
 
         raw = GEX.parse(s).decode('utf-8')
         self.assertGreater(raw.find('da capo'), 0, raw)
@@ -3754,23 +3755,23 @@ class Test(unittest.TestCase):
 
         Also has grace notes, so it tests our importing of grace notes
         '''
-
         from music21 import corpus
         from music21 import stream
+
         s = corpus.parse('ryansMammoth/BanjoReel')
         # s.show('text')
         self.assertEqual(len(s.parts), 1)
         self.assertEqual(len(s.parts[0].getElementsByClass(stream.Measure)), 11)
         self.assertEqual(len(s.parts[0].flatten().notes), 58)
 
-        bars = s.parts[0].flatten().getElementsByClass('Barline')
+        bars = s.parts[0][bar.Barline]
         self.assertEqual(len(bars), 3)
 
         s2 = s.expandRepeats()
         # s2.show('text')
 
         self.assertEqual(len(s2.parts[0].getElementsByClass(stream.Measure)), 20)
-        self.assertEqual(len(s2.parts[0].flatten().notes), 105)
+        self.assertEqual(len(s2.parts[0].recurse().notes), 105)
 
     def testExpandRepeatsImportedB(self):
         from music21 import corpus
@@ -3795,10 +3796,10 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
         s = converter.parse(testPrimitive.repeatExpressionsA)
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatExpression')), 3)
+        self.assertEqual(len(s['RepeatExpression']), 3)
 
         s = converter.parse(testPrimitive.repeatExpressionsB)
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatExpression')), 3)
+        self.assertEqual(len(s['RepeatExpression']), 3)
 
         # s.show()
 

@@ -3849,7 +3849,7 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test14.mid'
         s = converter.parse(fp)
         # three chords will be created, as well as two voices
-        self.assertEqual(len(s.flatten().getElementsByClass('Chord')), 3)
+        self.assertEqual(len(s[chord.Chord]), 3)
         self.assertEqual(len(s.parts.first().measure(3).voices), 2)
 
     def testImportChordsA(self):
@@ -3861,7 +3861,7 @@ class Test(unittest.TestCase):
         # a simple file created in athenacl
         s = converter.parse(fp)
         # s.show('t')
-        self.assertEqual(len(s.flatten().getElementsByClass('Chord')), 5)
+        self.assertEqual(len(s[chord.Chord]), 5)
 
     def testMidiEventsImported(self):
         self.maxDiff = None
@@ -4017,7 +4017,7 @@ class Test(unittest.TestCase):
         inn = converter.parse(fp)
 
         self.assertEqual(
-            len(inn.parts[1].measure(3).voices.last().getElementsByClass('Rest')), 1)
+            len(inn.parts[1].measure(3).voices.last().getElementsByClass(note.Rest)), 1)
 
     def testRestsMadeInMeasures(self):
         from music21 import converter

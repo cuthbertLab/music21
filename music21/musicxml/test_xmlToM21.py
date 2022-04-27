@@ -95,7 +95,7 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.spannersSlurs33c)
         # have 5 spanners
-        self.assertEqual(len(s.flatten().getElementsByClass(spanner.Spanner)), 5)
+        self.assertEqual(len(s[spanner.Spanner]), 5)
 
         # can get the same from a recurse search
         self.assertEqual(len(s.recurse().getElementsByClass(spanner.Spanner)), 5)
@@ -190,7 +190,7 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.textExpressions)
         # s.show()
-        self.assertEqual(len(s.flatten().getElementsByClass(expressions.TextExpression)), 3)
+        self.assertEqual(len(s[expressions.TextExpression]), 3)
 
         p1 = s.parts[0]
         m1 = p1.getElementsByClass(stream.Measure)[0]
@@ -262,22 +262,22 @@ class Test(unittest.TestCase):
 
         # has one segno
         s = converter.parse(testPrimitive.repeatExpressionsA)
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.Segno)), 1)
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.Fine)), 1)
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.DalSegnoAlFine)), 1)
+        self.assertEqual(len(s[repeat.Segno]), 1)
+        self.assertEqual(len(s[repeat.Fine]), 1)
+        self.assertEqual(len(s[repeat.DalSegnoAlFine]), 1)
 
         # has two codas
         s = converter.parse(testPrimitive.repeatExpressionsB)
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.Coda)), 2)
+        self.assertEqual(len(s[repeat.Coda]), 2)
         # has one d.c.al coda
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.DaCapoAlCoda)), 1)
+        self.assertEqual(len(s[repeat.DaCapoAlCoda]), 1)
 
     def testImportRepeatBracketA(self):
         from music21 import corpus
         # has repeats in it; start with single measure
         s = corpus.parse('opus74no1', 3)
         # there are 2 for each part, totaling 8
-        self.assertEqual(len(s.flatten().getElementsByClass(spanner.RepeatBracket)), 8)
+        self.assertEqual(len(s[spanner.RepeatBracket]), 8)
         # can get for each part as spanners are stored in Part now
 
         # TODO: need to test getting repeat brackets after measure extraction
@@ -569,7 +569,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.notations32a)
 
         # s.flatten().show('t')
-        num_tremolo_spanners = len(s.flatten().getElementsByClass('TremoloSpanner'))
+        num_tremolo_spanners = len(s['TremoloSpanner'])
         self.assertEqual(num_tremolo_spanners, 0)  # no spanned tremolos
 
         count = 0
@@ -781,7 +781,7 @@ class Test(unittest.TestCase):
         notesOrChords = (note.Note, chord.Chord)
         allNotesOrChords = c.flatten().getElementsByClass(notesOrChords)
         self.assertEqual(len(allNotesOrChords), 50)
-        allChords = c.flatten().getElementsByClass('Chord')
+        allChords = c[chord.Chord]
         self.assertEqual(len(allChords), 45)
         pCount = 0
         for cc in allChords:
@@ -810,7 +810,7 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         c = corpus.parse('luca/gloria')
-        r = c.parts[1].measure(99).getElementsByClass('Rest').first()
+        r = c.parts[1].measure(99).getElementsByClass(note.Rest).first()
         bracketAttachedToRest = r.getSpannerSites()[0]
         self.assertIn('Line', bracketAttachedToRest.classes)
         self.assertEqual(bracketAttachedToRest.idLocal, '1')
@@ -823,7 +823,7 @@ class Test(unittest.TestCase):
         c = corpus.parse('demos/voices_with_chords.xml')
         m1 = c.parts[0].measure(1)
         # m1.show('text')
-        firstChord = m1.voices.getElementById('2').getElementsByClass('Chord').first()
+        firstChord = m1.voices.getElementById('2').getElementsByClass(chord.Chord).first()
         self.assertEqual(repr(firstChord), '<music21.chord.Chord G4 B4>')
         self.assertEqual(firstChord.offset, 1.0)
 

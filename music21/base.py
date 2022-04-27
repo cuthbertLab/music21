@@ -4301,8 +4301,12 @@ class Test(unittest.TestCase):
     def testBeatAccess(self):
         '''Test getting beat data from various Music21Objects.
         '''
+        from music21 import clef
         from music21 import corpus
+        from music21 import key
+        from music21 import meter
         from music21 import stream
+
         s = corpus.parse('bach/bwv66.6.xml')
         p1 = s.parts['Soprano']
 
@@ -4311,18 +4315,18 @@ class Test(unittest.TestCase):
 
         # clef/ks can get its beat; these objects are in a pickup,
         # and this give their bar offset relative to the bar
-        eClef = p1.flatten().getElementsByClass('Clef').first()
+        eClef = p1.flatten().getElementsByClass(clef.Clef).first()
         self.assertEqual(eClef.beat, 4.0)
         self.assertEqual(eClef.beatDuration.quarterLength, 1.0)
         self.assertEqual(eClef.beatStrength, 0.25)
 
-        eKS = p1.flatten().getElementsByClass('KeySignature').first()
+        eKS = p1.flatten().getElementsByClass(key.KeySignature).first()
         self.assertEqual(eKS.beat, 4.0)
         self.assertEqual(eKS.beatDuration.quarterLength, 1.0)
         self.assertEqual(eKS.beatStrength, 0.25)
 
         # ts can get beatStrength, beatDuration
-        eTS = p1.flatten().getElementsByClass('TimeSignature').first()
+        eTS = p1.flatten().getElementsByClass(meter.TimeSignature).first()
         self.assertEqual(eTS.beatDuration.quarterLength, 1.0)
         self.assertEqual(eTS.beatStrength, 0.25)
 

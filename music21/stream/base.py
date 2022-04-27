@@ -980,7 +980,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         {0.0} <music21.clef.BassClef>
         {0.0} <music21.note.Note D#>
         '''
-        clefList = self.getElementsByClass('Clef').getElementsByOffset(0)
+        clefList = self.getElementsByClass(clef.Clef).getElementsByOffset(0)
         # casting to list added 20microseconds...
         return clefList.first()
 
@@ -5180,6 +5180,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         v.3 -- inPlace defaults to False
         v.5 -- returns None if inPlace=True
         '''
+        from music21 import spanner
+
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('toWrittenPitch')
         else:
@@ -5200,7 +5202,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
                 container.atSoundingPitch = False
 
-        for ottava in returnObj.recurse().getElementsByClass('Ottava'):
+        for ottava in returnObj[spanner.Ottava]:
             ottava.undoTransposition()
 
         if not inPlace:
@@ -13395,7 +13397,7 @@ class Score(Stream):
         >>> lastChord
         <music21.chord.Chord E2 G3 B3 E4>
 
-        Note that we still do a .getElementsByClass('Chord') since many pieces end
+        Note that we still do a .getElementsByClass(chord.Chord) since many pieces end
         with nothing but a rest...
         '''
         if measureNumber < 0:

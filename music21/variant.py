@@ -443,7 +443,7 @@ class Variant(base.Music21Object):
 
         if includeSpacers is True:
             spacerDuration = (self
-                              .getElementsByClass('Rest')
+                              .getElementsByClass(note.Rest)
                               .addFilter(spacerFilter)
                               .first().duration.quarterLength)
         else:

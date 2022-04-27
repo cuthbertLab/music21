@@ -458,14 +458,14 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> bool(iterator)
         True
 
-        >>> bool(iterator.getElementsByClass('Chord'))
+        >>> bool(iterator.getElementsByClass(chord.Chord))
         False
 
         test false cache:
 
-        >>> len(iterator.getElementsByClass('Chord'))
+        >>> len(iterator.getElementsByClass(chord.Chord))
         0
-        >>> bool(iterator.getElementsByClass('Chord'))
+        >>> bool(iterator.getElementsByClass(chord.Chord))
         False
 
         '''
@@ -809,7 +809,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> s3.elementOffset(b, returnSpecial=True)
         <OffsetSpecial.AT_END>
 
-        >>> s4 = s.iter().getElementsByClass('Barline').stream()
+        >>> s4 = s.iter().getElementsByClass(bar.Barline).stream()
         >>> s4.show('t')
         {0.0} <music21.bar.Barline type=regular>
 
@@ -1008,7 +1008,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> r = note.Rest()
         >>> s.append(r)
         >>> s.append(note.Note('D'))
-        >>> for el in s.iter().getElementsByClass('Rest'):
+        >>> for el in s.iter().getElementsByClass(note.Rest):
         ...     print(el)
         <music21.note.Rest quarter>
 
@@ -1020,7 +1020,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
         >>> r.activeSite.id
         's2'
 
-        >>> for el in s.iter().getElementsByClass('Rest'):
+        >>> for el in s.iter().getElementsByClass(note.Rest):
         ...     print(el.activeSite.id)
         s1
 
@@ -1515,7 +1515,7 @@ class OffsetIterator(StreamIterator[M21ObjType]):
     [<music21.note.Note E>]
     [<music21.note.Note F>, <music21.note.Note G>]
 
-    >>> for groupedElements in stream.iterator.OffsetIterator(s).getElementsByClass('Clef'):
+    >>> for groupedElements in stream.iterator.OffsetIterator(s).getElementsByClass(clef.Clef):
     ...     print(groupedElements)
     [<music21.clef.TrebleClef>]
     '''

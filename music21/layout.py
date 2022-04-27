@@ -91,7 +91,7 @@ import copy
 import unittest
 
 from collections import namedtuple
-from typing import Tuple, Optional
+from typing import Tuple, Optional, List
 
 from music21 import base
 from music21 import exceptions21

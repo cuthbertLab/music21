@@ -489,7 +489,7 @@ def makeMeasures(
     # del clefList
     clefObj = srcObj.clef or srcObj.getContextByClass('Clef')
     if clefObj is None:
-        clefObj = srcObj.getElementsByClass('Clef').getElementsByOffset(0).first()
+        clefObj = srcObj.getElementsByClass(clef.Clef).getElementsByOffset(0).first()
         # only return clefs that have offset = 0.0
         if not clefObj:
             clefObj = clef.bestClef(srcObj, recurse=True)

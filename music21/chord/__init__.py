@@ -6343,9 +6343,10 @@ class Test(unittest.TestCase):
 
     def testTiesA(self):
         # test creating independent ties for each Pitch
+        from music21 import chord
         from music21.musicxml import m21ToXml
 
-        c1 = Chord(['c', 'd', 'b'])
+        c1 = chord.Chord(['c', 'd', 'b'])
         # as this is a subclass of Note, we have a .tie attribute already
         # here, it is managed by a property
         self.assertEqual(c1.tie, None)
@@ -6379,7 +6380,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
         from music21 import converter
         s = converter.parse(testPrimitive.chordIndependentTies)
-        chords = s.flatten().getElementsByClass('Chord')
+        chords = s.flatten().getElementsByClass(chord.Chord)
         # the middle pitch should have a tie
         self.assertEqual(chords[0].getTie(pitch.Pitch('a4')).type, 'start')
         self.assertEqual(chords[0].getTie(pitch.Pitch('c5')), None)

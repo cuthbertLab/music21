@@ -203,7 +203,7 @@ class CapellaImporter:
             if p is None:
                 print('part entries do not match partDict!')
                 continue
-            clefs = p.getElementsByClass('Clef')
+            clefs = p.getElementsByClass(clef.Clef)
             keySignatures = p.getElementsByClass('KeySignature')
             lastClef = None
             lastKeySignature = None
@@ -219,7 +219,7 @@ class CapellaImporter:
                     lastKeySignature = ks
             p.makeMeasures(inPlace=True)
             # for m in p.getElementsByClass(stream.Measure):
-            #    barLines = m.getElementsByClass('Barline')
+            #    barLines = m.getElementsByClass(bar.Barline)
             #    for bl in barLines:
             #        blOffset = bl.offset
             #        if blOffset == 0.0:

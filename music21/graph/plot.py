@@ -1198,11 +1198,13 @@ class Dolan(HorizontalBarWeighted):
         Examine the instruments in the Score and determine if there
         is a good match for a default configuration of parts.
         '''
+        from music21 import instrument
+
         if self.partGroups:
             return  # keep what the user set
         if self.streamObj:
             return None
-        instStream = self.streamObj.flatten().getElementsByClass('Instrument')
+        instStream = self.streamObj.flatten().getElementsByClass(instrument.Instrument)
         if not instStream:
             return  # do not set anything
 

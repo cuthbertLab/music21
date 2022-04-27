@@ -1433,7 +1433,7 @@ class Test(unittest.TestCase):
             m.append(c)
             p.append(m)
         p2 = p.stripTies(matchByPitch=True)
-        chordsOut = list(p2.flatten().getElementsByClass('Chord'))
+        chordsOut = list(p2.flatten().getElementsByClass(chord.Chord))
         self.assertEqual(len(chordsOut), 5)
         self.assertEqual(chordsOut[0].pitches, ch0.pitches)
         self.assertEqual(chordsOut[0].duration.quarterLength, 2.0)
@@ -2319,7 +2319,7 @@ class Test(unittest.TestCase):
         obj = expressions.TextExpression('FREEZE')
         s.insert(3, obj)
         s.makeMeasures(inPlace=True)
-        self.assertEqual(len(s.flatten().getElementsByClass('Expression')), 1)
+        self.assertEqual(len(s['Expression']), 1)
 
     def testRemove(self):
         '''Test removing components from a Stream.
@@ -2393,7 +2393,7 @@ class Test(unittest.TestCase):
         sBach = corpus.parse('bach/bwv324.xml')
         partSoprano = sBach.parts.first()
 
-        c1 = partSoprano.flatten().getElementsByClass('Clef').first()
+        c1 = partSoprano.flatten().getElementsByClass(clef.Clef).first()
         self.assertIsInstance(c1, clef.TrebleClef)
 
         # now, replace with a different clef
@@ -2401,7 +2401,7 @@ class Test(unittest.TestCase):
         partSoprano.flatten().replace(c1, c2, allDerived=True)
 
         # all views of the Stream have been updated
-        cTest = sBach.parts.first().flatten().getElementsByClass('Clef').first()
+        cTest = sBach.parts.first().flatten().getElementsByClass(clef.Clef).first()
         self.assertIsInstance(cTest, clef.AltoClef)
 
     def testReplaceB(self):
@@ -2650,7 +2650,7 @@ class Test(unittest.TestCase):
     def testMakeAccidentalsB(self):
         s = corpus.parse('monteverdi/madrigal.5.3.rntxt')
         m34 = s.parts[0].getElementsByClass(Measure)[33]
-        c = m34.getElementsByClass('Chord')
+        c = m34.getElementsByClass(chord.Chord)
         # assuming not showing accidental b/c of key
         self.assertEqual(str(c[1].pitches), '(<music21.pitch.Pitch B-4>, '
                             + '<music21.pitch.Pitch D5>, <music21.pitch.Pitch F5>)')
@@ -2659,7 +2659,7 @@ class Test(unittest.TestCase):
 
         s = corpus.parse('monteverdi/madrigal.5.4.rntxt')
         m74 = s.parts[0].getElementsByClass(Measure)[73]
-        c = m74.getElementsByClass('Chord')
+        c = m74.getElementsByClass(chord.Chord)
         # has correct pitches but natural not showing on C
         self.assertEqual(str(c[0].pitches),
                          '(<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>, '
@@ -4326,7 +4326,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.getElementsByClass(
             'Stream')[1].getElementsByClass(Measure)), 3)
         self.assertEqual(len(post.flatten().getElementsByClass('TimeSignature')), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass('Clef')), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass(clef.Clef)), 2)
 
     def testMakeNotationScoreB(self):
         '''Test makeNotation on Score objects
@@ -4356,7 +4356,7 @@ class Test(unittest.TestCase):
             'Stream')[1].getElementsByClass(Measure)), 4)
 
         self.assertEqual(len(post.flatten().getElementsByClass('TimeSignature')), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass('Clef')), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass(clef.Clef)), 2)
 
     def testMakeNotationScoreC(self):
         '''Test makeNotation on Score objects
@@ -4384,7 +4384,7 @@ class Test(unittest.TestCase):
             Stream)[1].getElementsByClass(Measure)), 3)
 
         self.assertEqual(len(post.flatten().getElementsByClass('TimeSignature')), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass('Clef')), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass(clef.Clef)), 2)
 
     def testMakeNotationKeySignatureOneVoice(self):
         '''
@@ -4641,17 +4641,17 @@ class Test(unittest.TestCase):
                     s.insert(o, n)
                 o += ql
             self.assertEqual(len(s), 9)
-            self.assertEqual(len(s.getElementsByClass('Chord')), 0)
+            self.assertEqual(len(s.getElementsByClass(chord.Chord)), 0)
 
             # do both in place and not in place, compare results
             sMod = s.chordify()
             s = s.chordify()
             for sEval in [s, sMod]:
-                self.assertEqual(len(sEval.getElementsByClass('Chord')), 3)
+                self.assertEqual(len(sEval.getElementsByClass(chord.Chord)), 3)
                 # make sure we have all the original pitches
                 for i in range(len(pitchCol)):
                     match = [p.nameWithOctave for p in
-                             sEval.getElementsByClass('Chord')[i].pitches]
+                             sEval.getElementsByClass(chord.Chord)[i].pitches]
                     self.assertEqual(match, list(pitchCol[i]))
         # print('post chordify')
         # s.show('t')
@@ -4682,7 +4682,7 @@ class Test(unittest.TestCase):
         s = s.chordify()
         for sEval in [s, sMod]:
             # of these 6 chords, only 2 have more than one note
-            self.assertEqual(len(sEval.getElementsByClass('Chord')), 6)
+            self.assertEqual(len(sEval.getElementsByClass(chord.Chord)), 6)
             self.assertEqual([c.offset for c in sEval], [0.0, 1.0, 1.5, 2.0, 3.0, 3.5])
 
         # do the same, but reverse the short/long duration relation
@@ -4733,19 +4733,25 @@ class Test(unittest.TestCase):
         s1.insert(0.5, n6)
 
         sMod = s1.chordify(removeRedundantPitches=True)
-        self.assertEqual([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches],
+        self.assertEqual([p.nameWithOctave
+                          for p in sMod.getElementsByClass(chord.Chord)[0].pitches],
                           ['C2', 'G2'])
 
-        self.assertEqual([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[1].pitches],
+        self.assertEqual([p.nameWithOctave
+                          for p in sMod.getElementsByClass(chord.Chord)[1].pitches],
                           ['E4', 'F#4'])
 
         # without redundant pitch gathering
         sMod = s1.chordify(removeRedundantPitches=False)
-        self.assertEqual([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches],
-                          ['C2', 'C2', 'G2'])
+        self.assertEqual(
+            [p.nameWithOctave for p in sMod.getElementsByClass(chord.Chord)[0].pitches],
+            ['C2', 'C2', 'G2']
+        )
 
-        self.assertEqual([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[1].pitches],
-                          ['E4', 'E4', 'F#4'])
+        self.assertEqual(
+            [p.nameWithOctave for p in sMod.getElementsByClass(chord.Chord)[1].pitches],
+            ['E4', 'E4', 'F#4']
+        )
 
     def testMakeChordsBuiltD(self):
         # attempt to isolate case
@@ -4776,8 +4782,8 @@ class Test(unittest.TestCase):
 
         post = s.flatten().chordify()
         # post.show('t')
-        self.assertEqual(len(post.getElementsByClass('Rest')), 1)
-        self.assertEqual(len(post.getElementsByClass('Chord')), 6)
+        self.assertEqual(len(post.getElementsByClass(note.Rest)), 1)
+        self.assertEqual(len(post.getElementsByClass(chord.Chord)), 6)
         # post.show()
 
     def testGetElementAtOrBeforeBarline(self):
@@ -4851,7 +4857,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s.getElementAfterElement(n2), b1)
 
         # try to get elements by class
-        sub1 = s.getElementsByClass('Barline').stream()
+        sub1 = s.getElementsByClass(bar.Barline).stream()
         self.assertEqual(len(sub1), 1)
         # only found item is barline
         self.assertEqual(sub1[0], b1)
@@ -5350,7 +5356,7 @@ class Test(unittest.TestCase):
                           39.0, 40.0, 40.5, 41.0, 42.0, 43.5, 45.0, 45.5, 46.0, 46.5,
                            47.0, 47.5, 48.0, 49.5, 51.0, 51.5, 52.0, 52.5, 53.0, 53.5,
                            54.0, 54.5, 55.0, 55.5, 56.0, 56.5, 57.0, 58.5, 59.5])
-        self.assertEqual(len(post.flatten().getElementsByClass('Chord')), 71)
+        self.assertEqual(len(post[chord.Chord]), 71)
         # Careful! one version of the caching is screwing up m. 20 which definitely should
         # not have rests in it -- was creating 69 notes, not 71.
 
@@ -5429,8 +5435,8 @@ class Test(unittest.TestCase):
         s.insert(0, p1)
         s.insert(0, p2)
         post = s.chordify()
-        self.assertEqual(len(post.getElementsByClass('Chord')), 12)
-        self.assertEqual(str(post.getElementsByClass('Chord').first().pitches),
+        self.assertEqual(len(post.getElementsByClass(chord.Chord)), 12)
+        self.assertEqual(str(post.getElementsByClass(chord.Chord).first().pitches),
                          '(<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>)')
 
         p1 = Part()
@@ -5445,8 +5451,8 @@ class Test(unittest.TestCase):
         s.insert(0, p1)
         s.insert(0, p2)
         post = s.chordify()
-        self.assertEqual(len(post.getElementsByClass('Chord')), 2)
-        self.assertEqual(str(post.getElementsByClass('Chord').first().pitches),
+        self.assertEqual(len(post.getElementsByClass(chord.Chord)), 2)
+        self.assertEqual(str(post.getElementsByClass(chord.Chord).first().pitches),
                          '(<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>)')
         # post.show()
 
@@ -5511,7 +5517,7 @@ class Test(unittest.TestCase):
             self.assertFalse(m.hasVoices())
             match.append(len(m.pitches))
         self.assertEqual(match, [3, 9, 9, 25, 25, 21, 12, 6, 21, 29])
-        self.assertEqual(len(post.flatten().getElementsByClass('Rest')), 4)
+        self.assertEqual(len(post.flatten().getElementsByClass(note.Rest)), 4)
 
     def testChordifyD(self):
         # test on a Stream of Streams.
@@ -5524,7 +5530,7 @@ class Test(unittest.TestCase):
         s3.insert(0, s2)
 
         post = s3.chordify()
-        self.assertEqual(len(post.getElementsByClass('Chord')), 8)
+        self.assertEqual(len(post.getElementsByClass(chord.Chord)), 8)
 
     def testChordifyE(self):
         s1 = Stream()
@@ -5541,7 +5547,7 @@ class Test(unittest.TestCase):
         # s1.show()
         post = s1.chordify()
         # post.show()
-        self.assertEqual(len(post.flatten().getElementsByClass('Chord')), 8)
+        self.assertEqual(len(post[chord.Chord]), 8)
 
     # noinspection SpellCheckingInspection
     def testOpusSearch(self):
@@ -5775,7 +5781,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s1.parts), 2)
 
         p1 = s1.parts[0]
-        self.assertEqual(len(p1.flatten().getElementsByClass('Clef')), 1)
+        self.assertEqual(len(p1.flatten().getElementsByClass(clef.Clef)), 1)
         # p1.show('t')
 
         # look at individual measure; check counts; these should not
@@ -5793,7 +5799,7 @@ class Test(unittest.TestCase):
         # NOTE: we no longer get Clef here, as we return clefs in the
         # Part outside a Measure when using measures()
         # m = p1.measure(2)
-        # self.assertEqual(len(m1.flatten().getElementsByClass('Clef')), 1)
+        # self.assertEqual(len(m1.flatten().getElementsByClass(clef.Clef)), 1)
 
         # look at individual measure; check counts; these should not
         # change after measure extraction
@@ -5808,9 +5814,9 @@ class Test(unittest.TestCase):
 
         # m2Raw.show('t')
 
-        # self.assertEqual(len(m1.flatten().getElementsByClass('Clef')), 1)
+        # self.assertEqual(len(m1.flatten().getElementsByClass(clef.Clef)), 1)
         ex1 = p1.measures(1, 3)
-        self.assertEqual(len(ex1.flatten().getElementsByClass('Clef')), 1)
+        self.assertEqual(len(ex1.flatten().getElementsByClass(clef.Clef)), 1)
 
         # ex1.show()
 
@@ -6175,7 +6181,7 @@ class Test(unittest.TestCase):
         self.assertIs(s3.derivation.origin, s1)
         self.assertIsNot(s3.derivation.origin, s2)
 
-        s4 = s3.getElementsByClass('Chord').stream()
+        s4 = s3.getElementsByClass(chord.Chord).stream()
         self.assertEqual(len(s4), 10)
         self.assertIs(s4.derivation.origin, s3)
 
@@ -6223,7 +6229,10 @@ class Test(unittest.TestCase):
         self.assertEqual(mRange.derivation.rootDerivation, p1)
         self.assertEqual(mRange.flatten().notesAndRests.stream().derivation.rootDerivation, p1)
 
-        self.assertIs(s.flatten().getElementsByClass('Rest').stream().derivation.rootDerivation, s)
+        self.assertIs(
+            s.flatten().getElementsByClass(note.Rest).stream().derivation.rootDerivation,
+            s
+        )
 
         # As of v3, we CAN use the activeSite to get the Part from the Measure, as
         # the activeSite was not set when doing the getElementsByClass operation
@@ -6412,10 +6421,10 @@ class Test(unittest.TestCase):
     def testRecurseB(self):
 
         s = corpus.parse('madrigal.5.8.rntxt')
-        self.assertEqual(len(s.flatten().getElementsByClass('KeySignature')), 1)
+        self.assertEqual(len(s['KeySignature']), 1)
         for e in s.recurse(classFilter='KeySignature'):
             e.activeSite.remove(e)
-        self.assertEqual(len(s.flatten().getElementsByClass('KeySignature')), 0)
+        self.assertEqual(len(s['KeySignature']), 0)
 
     def testTransposeScore(self):
 
@@ -7191,7 +7200,7 @@ class Test(unittest.TestCase):
         # test that each note has its original group
         idA = []
         idB = []
-        for c in post.flatten().getElementsByClass('Chord'):
+        for c in post.flatten().getElementsByClass(chord.Chord):
             for p in c.pitches:
                 if 'a' in p.groups:
                     idA.append(p.name)
@@ -7208,7 +7217,7 @@ class Test(unittest.TestCase):
         idBass = []
 
         post = s.chordify(addPartIdAsGroup=True, removeRedundantPitches=False)
-        for c in post.flatten().getElementsByClass('Chord'):
+        for c in post.flatten().getElementsByClass(chord.Chord):
             for p in c.pitches:
                 if 'Soprano' in p.groups:
                     idSoprano.append(p.name)
@@ -7389,7 +7398,7 @@ class Test(unittest.TestCase):
         sChords = s.measures(9, 9).chordify()
         sChords.extendTies()
         post = []
-        for ch in sChords.flatten().getElementsByClass('Chord'):
+        for ch in sChords.flatten().getElementsByClass(chord.Chord):
             post.append([repr(n.tie) for n in ch])
 
         self.assertEqual(post,
@@ -7550,7 +7559,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         ex = s.parts[0].measures(3, 6)
 
-        self.assertEqual(str(ex.flatten().getElementsByClass('Clef')[0]),
+        self.assertEqual(str(ex.flatten().getElementsByClass(clef.Clef)[0]),
                          '<music21.clef.TrebleClef>')
         self.assertEqual(str(ex.flatten().getElementsByClass('Instrument')[0]),
                          'P1: Soprano: Instrument 1')
@@ -7567,7 +7576,7 @@ class Test(unittest.TestCase):
                     r = note.Rest(quarterLength=n.quarterLength)
                     m.insert(o, r)
         # s.parts[0].show()
-        self.assertEqual(len(ex.flatten().getElementsByClass('Rest')), 5)
+        self.assertEqual(len(ex[note.Rest]), 5)
 
     def testMeasuresB(self):
         s = corpus.parse('luca/gloria')
@@ -7602,7 +7611,7 @@ class Test(unittest.TestCase):
                 n.activeSite.remove(n)
                 r = note.Rest(quarterLength=n.quarterLength)
                 site.insert(o, r)
-        self.assertEqual(len(ex.flatten().getElementsByClass('Rest')), 5)
+        self.assertEqual(len(ex[note.Rest]), 5)
         # ex.show()
 
     def testMeasuresSuffix(self):
@@ -7700,7 +7709,7 @@ class Test(unittest.TestCase):
         # there should only be 2 tuplet indications in the produced chords: start and stop...
         self.assertEqual(raw.count('<tuplet '), 2, raw)
         # pitch grouping in measure index 1 was not allocated properly
-        # for c in chords.getElementsByClass('Chord'):
+        # for c in chords.getElementsByClass(chord.Chord):
         #    self.assertEqual(len(c), 2)
 
     def testChordifyG(self):
@@ -7710,7 +7719,7 @@ class Test(unittest.TestCase):
         s.insert(0, note.Note('C4', quarterLength=2))
         chords = s.chordify()
         # s.chordify().show('t')
-        for c in chords.getElementsByClass('Chord'):
+        for c in chords.getElementsByClass(chord.Chord):
             self.assertEqual(len(c), 2)
 
         # try with small divisions
@@ -7719,7 +7728,7 @@ class Test(unittest.TestCase):
         s.insert(0, note.Note('C4', quarterLength=2))
         chords = s.chordify()
         # s.chordify().show('t')
-        for c in chords.getElementsByClass('Chord'):
+        for c in chords.getElementsByClass(chord.Chord):
             self.assertEqual(len(c), 2)
 
         s = Stream()
@@ -7727,7 +7736,7 @@ class Test(unittest.TestCase):
         s.insert(0, note.Note('C4', quarterLength=2))
         chords = s.chordify()
         # s.chordify().show('t')
-        for c in chords.getElementsByClass('Chord'):
+        for c in chords.getElementsByClass(chord.Chord):
             self.assertEqual(len(c), 2)
 
         s = Stream()
@@ -7735,7 +7744,7 @@ class Test(unittest.TestCase):
         s.insert(0, note.Note('C4', quarterLength=2))
         chords = s.chordify()
         # s.chordify().show('t')
-        for c in chords.getElementsByClass('Chord'):
+        for c in chords.getElementsByClass(chord.Chord):
             self.assertEqual(len(c), 2)
 
     def testMakeVoicesA(self):

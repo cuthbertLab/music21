@@ -660,7 +660,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[1].flatten().notesAndRests), 127)
 
         # chords are defined in second part here
-        self.assertEqual(len(s.parts[1].flatten().getElementsByClass('Chord')), 32)
+        self.assertEqual(len(s.parts[1][chord.Chord]), 32)
 
         # check pitches in chords; sharps are applied due to key signature
         match = [p.nameWithOctave for p in s.parts[1].flatten().getElementsByClass(
@@ -944,13 +944,13 @@ class Test(unittest.TestCase):
         # s.show()
         # one start, one end
         # s.parts[0].show('t')
-        self.assertEqual(len(s.flatten().getElementsByClass('Repeat')), 2)
+        self.assertEqual(len(s['Repeat']), 2)
         # s.show()
 
         # this has a 1 note pickup
         # has three repeat bars; first one is implied
         s = converter.parse(testFiles.draughtOfAle)
-        self.assertEqual(len(s.flatten().getElementsByClass('Repeat')), 3)
+        self.assertEqual(len(s['Repeat']), 3)
         self.assertEqual(s.parts[0].getElementsByClass(
             'Measure')[0].notes[0].pitch.nameWithOctave, 'D4')
 
@@ -965,14 +965,14 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = converter.parse(testFiles.morrisonsJig)
         # TODO: get
-        self.assertEqual(len(s.flatten().getElementsByClass(spanner.RepeatBracket)), 2)
+        self.assertEqual(len(s[spanner.RepeatBracket]), 2)
         # s.show()
         # four repeat brackets here; 2 at beginning, 2 at end
         s = converter.parse(testFiles.hectorTheHero)
-        self.assertEqual(len(s.flatten().getElementsByClass(spanner.RepeatBracket)), 4)
+        self.assertEqual(len(s[spanner.RepeatBracket]), 4)
 
         s = corpus.parse('JollyTinkersReel')
-        self.assertEqual(len(s.flatten().getElementsByClass(spanner.RepeatBracket)), 4)
+        self.assertEqual(len(s[spanner.RepeatBracket]), 4)
 
     def testMetronomeMarkA(self):
         from music21.abcFormat import testFiles

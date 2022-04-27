@@ -531,7 +531,7 @@ class GeneralObjectExporter:
             st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
-            if not st.getElementsByClass('Clef').getElementsByOffset(0.0):
+            if not st.getElementsByClass(clef.Clef).getElementsByOffset(0.0):
                 st2.clef = clef.bestClef(st2)
             st2.makeNotation(inPlace=True)
             st2.metadata = copy.deepcopy(getMetadataFromContext(st))
@@ -549,7 +549,7 @@ class GeneralObjectExporter:
             st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
-            if not st.getElementsByClass('Clef').getElementsByOffset(0.0):
+            if not st.getElementsByClass(clef.Clef).getElementsByOffset(0.0):
                 bestClef = True
             else:
                 bestClef = False
@@ -559,7 +559,7 @@ class GeneralObjectExporter:
 
         else:
             # probably a problem? or a voice...
-            if not st.getElementsByClass('Clef').getElementsByOffset(0.0):
+            if not st.getElementsByClass(clef.Clef).getElementsByOffset(0.0):
                 bestClef = True
             else:
                 bestClef = False
@@ -2751,7 +2751,7 @@ class PartExporter(XMLExporterBase):
         # that place key/clef information in the containing stream
         if hasattr(first_measure, 'clef') and first_measure.clef is None:
             first_measure.makeMutable()  # must mutate
-            outerClefs = part.getElementsByClass('Clef')
+            outerClefs = part.getElementsByClass(clef.Clef)
             if outerClefs:
                 first_measure.clef = outerClefs.first()
 
@@ -6107,7 +6107,7 @@ class MeasureExporter(XMLExporterBase):
         mxMeasureStyle = None
         mxMultipleRest = None
 
-        rests = m.getElementsByClass('Rest')
+        rests = m.getElementsByClass(note.Rest)
         if rests:
             hasMMR = rests[0].getSpannerSites('MultiMeasureRest')
             if hasMMR:
