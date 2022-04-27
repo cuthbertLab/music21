@@ -9499,7 +9499,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         return noteIterator
 
     @property
-    def notes(self): -> iterator.StreamIterator[note.NotRest]:
+    def notes(self) -> iterator.StreamIterator[note.NotRest]:
         '''
         The `.notes` property of a Stream returns an iterator
         that consists only of the notes (that is,
