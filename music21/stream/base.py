@@ -35,7 +35,7 @@ import sys
 from collections import namedtuple
 from fractions import Fraction
 from math import isclose
-from typing import (Dict, Iterable, List, Optional, Set, Tuple,
+from typing import (Dict, Iterable, List, Optional, Set, Tuple, cast,
                     TypeVar, Type, Union, Generic, overload)
 
 from music21 import base
@@ -381,17 +381,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         '''
         return len(self._elements) + len(self._endElements)
 
-    def __iter__(self) -> iterator.StreamIterator:
+    def __iter__(self) -> iterator.StreamIterator[M21ObjType]:
         '''
         The Stream iterator, used in all for
         loops and similar iteration routines. This method returns the
         specialized :class:`music21.stream.StreamIterator` class, which
         adds necessary Stream-specific features.
         '''
-        return iterator.StreamIterator(self)
+        return iterator.StreamIterator[M21ObjType](self)
 
     @property
-    def iter(self) -> iterator.StreamIterator:
+    def iter(self) -> iterator.StreamIterator[M21ObjType]:
         '''
         The Stream iterator, used in all for
         loops and similar iteration routines. This method returns the
@@ -4265,6 +4265,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         <music21.layout.StaffGroup <music21.stream.PartStaff P5-Staff1><... P5-Staff2>>
         <music21.layout.StaffGroup <music21.stream.Part Soprano I><...Alto II>>
         '''
+        startMeasure: Optional[Measure]
 
         def hasMeasureNumberInformation(measureIterator):
             '''
@@ -4992,7 +4993,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             returnObj = self
 
         instrument_stream = returnObj.getInstruments(recurse=True)
-        instrument_map: Dict['music21.instrument.Instrument', Union[float, Fraction]] = {}
+        instrument_map: Dict['music21.instrument.Instrument', OffsetQL] = {}
         for inst in instrument_stream:
             # keep track of original durations of each instrument
             instrument_map[inst] = inst.duration.quarterLength
@@ -5222,8 +5223,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         '''
         # even if this is a Measure, the TimeSignature in the Stream will be
         # found
-        # post = self.getElementsByClass(meter.TimeSignature)
-        post = self.getElementsByClass('TimeSignature').stream()
+        post = self.getElementsByClass(meter.TimeSignature).stream()
 
         # search activeSite Streams through contexts
         if not post and searchContext:
@@ -5241,13 +5241,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         if not post:
             streamsAtStart = self.getElementsByOffset(0.0).getElementsByClass('Stream')
             for s in streamsAtStart:
-                tss = s.getElementsByOffset(0.0).getElementsByClass('TimeSignature')
+                tss = s.getElementsByOffset(0.0).getElementsByClass(meter.TimeSignature)
                 for ts in tss:
                     post.append(ts)
 
         # get a default and/or place default at zero if nothing at zero
         if returnDefault:
-            if not post or post[0].offset > 0:
+            if not post or post[0].offset > 0.0:
                 ts = meter.TimeSignature('%s/%s' % (defaults.meterNumerator,
                                                     defaults.meterDenominatorBeatType))
                 post.insert(0, ts)
@@ -7228,7 +7228,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         self._cache['sorted'] = s
         return s
 
-    def flatten(self, retainContainers=False):
+    def flatten(self: StreamType, retainContainers=False) -> StreamType:
         '''
         A very important method that returns a new Stream
         that has all sub-containers "flattened" within it,
@@ -7464,7 +7464,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
         if sNew.id != id(sNew):
             sOldId = sNew.id
-            if common.isNum(sOldId) and sOldId > defaults.minIdNumberToConsiderMemoryLocation:
+            if isinstance(sOldId, int) and sOldId > defaults.minIdNumberToConsiderMemoryLocation:
                 sOldId = hex(sOldId)
 
             newId = str(sOldId) + '_' + method
@@ -9499,7 +9499,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         return noteIterator
 
     @property
-    def notes(self) -> iterator.StreamIterator[note.NotRest]:
+    def notes(self): -> iterator.StreamIterator[note.NotRest]:
         '''
         The `.notes` property of a Stream returns an iterator
         that consists only of the notes (that is,
@@ -9554,7 +9554,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         Unpitched objects, so that all elements returned by
         `.notes` have a `.pitches` attribute.
         '''
-        noteIterator = self.getElementsByClass(note.NotRest)
+        noteIterator: iterator.StreamIterator[note.NotRest] = self.getElementsByClass(note.NotRest)
         noteIterator.overrideDerivation = 'notes'
         return noteIterator
 
@@ -9954,7 +9954,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         durSpanSorted = self._getDurSpan(flatStream)
         # According to the above comment, the spans may not be sorted.
         # So we sort them to be sure, but keep track of their original indices
-        durSpanSortedIndex = list(enumerate(durSpanSorted))
+        durSpanSortedIndex: List[Tuple[int, OffsetQL]] = cast(
+            List[Tuple[int, OffsetQL]],
+            list(enumerate(durSpanSorted))
+        )
         durSpanSortedIndex.sort()
 
         # create a list with an entry for each element

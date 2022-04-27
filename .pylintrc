@@ -58,6 +58,7 @@ confidence=
 # anything changed here, also change in test/testLint.py for now
 
 disable=
+    not-an-iterable,  # TOO BAD -- this is important, but so many false positives
     cyclic-import,  # we use these inside functions when there's a deep problem.
     unnecessary-pass,  #  not really a problem..
     locally-disabled,  # test for this later, but hopefully will know what we're doing

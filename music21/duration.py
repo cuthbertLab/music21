@@ -815,7 +815,7 @@ def convertTypeToNumber(dType: str) -> float:
 
 
 # -----------------------------------------------------------------------------------
-class DurationTuple(namedtuple('DurationTuple', 'type dots quarterLength')):
+class DurationTuple(namedtuple('DurationTuple', ['type', 'dots', 'quarterLength'])):
     def augmentOrDiminish(self, amountToScale):
         return durationTupleFromQuarterLength(self.quarterLength * amountToScale)
 

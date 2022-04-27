@@ -338,9 +338,9 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
         {3.0} <music21.note.Note B>
     {16.0} <music21.variant.Variant object of length 8.0>
 
-    >>> mergedStream.variants[0].replacementDuration
+    >>> mergedStream[variant.Variant][0].replacementDuration
     4.0
-    >>> mergedStream.variants[1].replacementDuration
+    >>> mergedStream[variant.Variant]s[1].replacementDuration
     0.0
 
     >>> parisStream = mergedStream.activateVariants('paris', inPlace=False)
@@ -383,11 +383,11 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note E>
 
-    >>> parisStream.variants[0].replacementDuration
+    >>> parisStream[variant.Variant][0].replacementDuration
     0.0
-    >>> parisStream.variants[1].replacementDuration
+    >>> parisStream[variant.Variant][1].replacementDuration
     4.0
-    >>> parisStream.variants[2].replacementDuration
+    >>> parisStream[variant.Variant][2].replacementDuration
     8.0
     '''
     if inPlace is True:
@@ -1036,17 +1036,17 @@ def refineVariant(s, sVariant, *, inPlace=False):
 
     '''
     # stream that will be returned
-    if sVariant not in s.variants:
+    if sVariant not in s.getElementsByClass('Variant'):
         raise VariantException(f'{sVariant} not found in stream {s}.')
 
     if inPlace is True:
         returnObject = s
         variantRegion = sVariant
     else:
-        sVariantIndex = s.variants.index(sVariant)
+        sVariantIndex = s.getElementsByClass('Variant').index(sVariant)
 
         returnObject = s.coreCopyAsDerivation('refineVariant')
-        variantRegion = returnObject.variants(sVariantIndex)
+        variantRegion = returnObject.getElementsByClass('Variant')(sVariantIndex)
 
 
     # useful parameters from variant and its location
@@ -1659,7 +1659,7 @@ def makeAllVariantsReplacements(streamWithVariants,
     >>> newStream = stream.Score(s)
 
     >>> returnStream = variant.makeAllVariantsReplacements(newStream, recurse=False)
-    >>> for v in returnStream.parts[0].variants:
+    >>> for v in returnStream.parts[0][variant.Variant]:
     ...     (v.offset, v.lengthType, v.replacementDuration)
     (4.0, 'replacement', 4.0)
     (16.0, 'elongation', 0.0)
@@ -1667,14 +1667,14 @@ def makeAllVariantsReplacements(streamWithVariants,
 
     >>> returnStream = variant.makeAllVariantsReplacements(
     ...                            newStream, variantNames=['france'], recurse=True)
-    >>> for v in returnStream.parts[0].variants:
+    >>> for v in returnStream.parts[0][variant.Variant]:
     ...     (v.offset, v.lengthType, v.replacementDuration)
     (4.0, 'replacement', 4.0)
     (16.0, 'elongation', 0.0)
     (20.0, 'deletion', 4.0)
 
     >>> variant.makeAllVariantsReplacements(newStream, recurse=True, inPlace=True)
-    >>> for v in newStream.parts[0].variants:
+    >>> for v in newStream.parts[0][variant.Variant]:
     ...     (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
     (4.0, 'replacement', 4.0, 4.0)
     (12.0, 'elongation', 4.0, 12.0)
@@ -1733,7 +1733,7 @@ def _doVariantFixingOnStream(s, variantNames=None):
     {24.0} <music21.stream.Measure 7 offset=24.0>
     ...
 
-    >>> for v in s.variants:
+    >>> for v in s[variant.Variant]:
     ...     (v.offset, v.lengthType, v.replacementDuration)
     (0.0, 'elongation', 4.0)
     (4.0, 'replacement', 4.0)
@@ -1758,13 +1758,13 @@ def _doVariantFixingOnStream(s, variantNames=None):
     >>> s.insert(4.0, v2)
 
     >>> variant._doVariantFixingOnStream(s, 'london')
-    >>> for v in s.variants:
+    >>> for v in s[variant.Variant]:
     ...     (v.offset, v.lengthType, v.replacementDuration, v.containedHighestTime)
     (0.0, 'elongation', 1.0, 5.0)
     (4.0, 'deletion', 5.0, 1.0)
     '''
 
-    for v in s.variants:
+    for v in s.getElementsByClass('Variant'):
         if isinstance(variantNames, list):  # If variantNames are controlled
             if set(v.groups) and not set(variantNames):
                 # and if this variant is not in the controlled list
@@ -1842,7 +1842,7 @@ def _getNextElements(s, v, numberOfElements=1):
     >>> s1.makeMeasures(inPlace=True)
     >>> s2.makeMeasures(inPlace=True)
     >>> mergedStream = variant.mergeVariants(s1, s2, 'london')
-    >>> for v in mergedStream.variants:
+    >>> for v in mergedStream.getElementsByClass(variant.Variant):
     ...     returnElement = variant._getNextElements(mergedStream, v)
     ...     print(returnElement)
     <music21.stream.Measure 1 offset=0.0>
@@ -1862,7 +1862,7 @@ def _getNextElements(s, v, numberOfElements=1):
     >>> v2.replacementDuration = 4.0
     >>> v2.groups = ['london']
     >>> s.insert(4.0, v2)
-    >>> for v in s.variants:
+    >>> for v in s[variant.Variant]:
     ...     returnElement = variant._getNextElements(s, v)
     ...     print(returnElement)
     <music21.note.Note E>
@@ -1921,7 +1921,7 @@ def _getPreviousElement(s, v):
     >>> s1.makeMeasures(inPlace=True)
     >>> s2.makeMeasures(inPlace=True)
     >>> mergedStream = variant.mergeVariants(s1, s2, 'london')
-    >>> for v in mergedStream.variants:
+    >>> for v in mergedStream[variant.Variant]:
     ...     returnElement = variant._getPreviousElement(mergedStream, v)
     ...     print(returnElement)
     <music21.stream.Measure 1 offset=0.0>
@@ -1941,7 +1941,7 @@ def _getPreviousElement(s, v):
     >>> v2.replacementDuration = 4.0
     >>> v2.groups = ['london']
     >>> s.insert(8.0, v2)
-    >>> for v in s.variants:
+    >>> for v in s[variant.Variant]:
     ...     returnElement = variant._getPreviousElement(s, v)
     ...     print(returnElement)
     <music21.note.Note A>
@@ -2373,7 +2373,7 @@ class Variant(base.Music21Object):
                 if contextStream is None:
                     raise VariantException('Cannot find a Stream context for this object...')
 
-        if self not in contextStream.variants:
+        if self not in contextStream.getElementsByClass('Variant'):
             raise VariantException(f'Variant not found in stream {contextStream}')
 
         vStart = self.getOffsetBySite(contextStream)
@@ -2501,7 +2501,7 @@ class Variant(base.Music21Object):
                 referenceStream = self.getContextByClass('Stream')
                 if referenceStream is None:
                     raise VariantException('Cannot find a Stream context for this object...')
-        if self not in referenceStream.variants:
+        if self not in referenceStream.getElementsByClass('Variant'):
             raise VariantException(f'Variant not found in stream {referenceStream}')
 
         replacedElements = self.replacedElements(referenceStream, classList)
@@ -2601,7 +2601,7 @@ class Test(unittest.TestCase):
 
         # test functionality on a deepcopy
         sCopy = copy.deepcopy(s)
-        self.assertEqual(len(sCopy.variants), 1)
+        self.assertEqual(len(sCopy.getElementsByClass('Variant')), 1)
         self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sCopy.activateVariants(inPlace=True)

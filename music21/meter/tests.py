@@ -631,7 +631,6 @@ class Test(unittest.TestCase):
         self.assertEqual(str(beatSeq), '{3/8+2/8}')
 
 
-
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

@@ -124,6 +124,7 @@ class RnWriter(prebase.ProtoM21Object):
         self.composer = 'Composer unknown'
         self.title = 'Title unknown'
         self.combinedList: List[str] = []
+        self.container: stream.Stream
 
         if isinstance(obj, stream.Stream):
             if isinstance(obj, stream.Opus):
@@ -148,7 +149,7 @@ class RnWriter(prebase.ProtoM21Object):
                 self.container.insert(0, obj)
 
             else:  # A stream, but not a measure, part, or score
-                self._makeContainer(obj)
+                self.container = self._makeContainer(obj)
 
             if obj.metadata:  # Check the obj (not container) for metadata if obj is a stream
                 self.prepTitle(obj.metadata)
@@ -156,14 +157,14 @@ class RnWriter(prebase.ProtoM21Object):
                     self.composer = obj.metadata.composer
 
         else:  # Not a stream
-            self._makeContainer([obj])
+            self.container = self._makeContainer([obj])
 
         self.combinedList = [f'Composer: {self.composer}',
                              f'Title: {self.title}',
                              'Analyst: ',
                              'Proofreader: ',
                              '']  # One blank line between metadata and analysis
-        # Note: blank analyst and proof reader entries until supported within music21 metadata
+        # Note: blank analyst and proofreader entries until supported within music21 metadata
 
         if not self.container.recurse().getElementsByClass('TimeSignature'):
             self.container.insert(0, meter.TimeSignature('4/4'))  # Placeholder
@@ -182,8 +183,9 @@ class RnWriter(prebase.ProtoM21Object):
         m = stream.Measure()
         for x in obj:
             m.append(x)
-        self.container = stream.Part()
-        self.container.insert(0, m)
+        container = stream.Part()
+        container.insert(0, m)
+        return container
 
     def prepTitle(self,
                   md: metadata.Metadata):
@@ -404,7 +406,7 @@ class Test(unittest.TestCase):
     Tests for two analysis cases (the smallest rntxt files in the music21 corpus)
     along with two test by modifying those scores.
 
-    Additional tests for the stand alone functions rnString and intBeat and
+    Additional tests for the standalone functions rnString and intBeat and
     for handling the special case of opus objects.
     '''
 
@@ -489,6 +491,7 @@ class Test(unittest.TestCase):
         rnMonte = RnWriter(scoreMonte)
 
         self.assertEqual(rnMonte.composer, 'Monteverdi')
+        # noinspection SpellCheckingInspection
         self.assertEqual(rnMonte.title, "La piaga c'ho nel core")
         self.assertEqual(rnMonte.combinedList[-1], 'm57 I')
 
@@ -541,7 +544,7 @@ class Test(unittest.TestCase):
         self.assertEqual(test, 'm1 G: I')  # no beat number given for b1
 
         test = rnString(0, 4, 'b: V')
-        self.assertEqual(test, 'm0 b4 b: V')  # beat number given for all other cases
+        self.assertEqual(test, 'm0 b4 b: V')  # beat number is given for all other cases
 
         with self.assertRaises(ValueError):  # error when the measure numbers don't match
             rnString(15, 1, 'viio6', 'm14 G: I')
@@ -549,7 +552,6 @@ class Test(unittest.TestCase):
 # ------------------------------------------------------------------------------
 
     def testIntBeat(self):
-
         testInt = intBeat(1, roundValue=2)
         self.assertEqual(testInt, 1)
 
@@ -572,7 +574,7 @@ class Test(unittest.TestCase):
         self.assertEqual(testStr, 0.67)
 
         with self.assertRaises(TypeError):  # TypeError when called on an unsupported object
-            intBeat([0, 1, 2])
+            intBeat([0, 1, 2])  # type: ignore
 
         with self.assertRaises(ValueError):  # ValueError when called on a negative number
             intBeat(-1.5)

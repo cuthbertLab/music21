@@ -560,7 +560,8 @@ class Test(unittest.TestCase):
 #         self.assertEqual([n.nameWithOctave for
 #                    n in s.parts[0].getElementsByClass(stream.Measure)[0].notes], ['A4', 'B4'])
 #
-#         self.assertEqual([n.offset for n in s.parts[2].getElementsByClass(stream.Measure)[0].notes],
+#         self.assertEqual([n.offset
+#                           for n in s.parts[2].getElementsByClass(stream.Measure)[0].notes],
 #            [0.0, 1.0, 2.0])
 
 
