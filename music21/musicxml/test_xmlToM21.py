@@ -66,7 +66,7 @@ class Test(unittest.TestCase):
         # this is a good example with repeats
         s = corpus.parse('k80/movement3')
         for p in s.parts:
-            post = p.recurse().getElementsByClass(bar.Repeat)
+            post = p[bar.Repeat]
             self.assertEqual(len(post), 6)
 
         # a = corpus.parse('opus41no1/movement3')
@@ -332,7 +332,7 @@ class Test(unittest.TestCase):
         # has metronome marks defined, not with sound tag
         s = converter.parse(testPrimitive.metronomeMarks31c)
         # get all tempo indications
-        mms = s.flatten().getElementsByClass('TempoIndication')
+        mms = s[meter.TempoIndication]
         self.assertGreater(len(mms), 3)
 
     def testImportMetronomeMarksB(self):
@@ -392,7 +392,7 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         s = converter.parse(testPrimitive.staffGroupsNested41d)
-        staffGroups = s.getElementsByClass('StaffGroup')
+        staffGroups = s.getElementsByClass(spanner.StaffGroup)
         # staffGroups.show()
         self.assertEqual(len(staffGroups), 2)
 
@@ -411,7 +411,7 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         s = converter.parse(testPrimitive.pianoStaff43a)
-        sgs = s.getElementsByClass('StaffGroup')
+        sgs = s.getElementsByClass(spanner.StaffGroup)
         self.assertEqual(len(sgs), 1)
         self.assertEqual(sgs[0].symbol, 'brace')
         self.assertIs(sgs[0].barTogether, True)
@@ -727,10 +727,10 @@ class Test(unittest.TestCase):
     def testStaffLayout(self):
         from music21 import corpus
         c = corpus.parse('demos/layoutTest.xml')
-        layouts = c.flatten().getElementsByClass('LayoutBase').stream()
-        systemLayouts = layouts.getElementsByClass('SystemLayout')
+        layouts = c.flatten().getElementsByClass(layout.LayoutBase).stream()
+        systemLayouts = layouts.getElementsByClass(layout.SystemLayout)
         self.assertEqual(len(systemLayouts), 42)
-        staffLayouts = layouts.getElementsByClass('StaffLayout')
+        staffLayouts = layouts.getElementsByClass(layout.StaffLayout)
         self.assertEqual(len(staffLayouts), 20)
         pageLayouts = layouts.getElementsByClass('PageLayout')
         self.assertEqual(len(pageLayouts), 10)
@@ -754,9 +754,9 @@ class Test(unittest.TestCase):
     def testStaffLayoutMore(self):
         from music21 import corpus
         c = corpus.parse('demos/layoutTestMore.xml')
-        layouts = c.flatten().getElementsByClass('LayoutBase').stream()
+        layouts = c.flatten().getElementsByClass(layout.LayoutBase).stream()
         self.assertEqual(len(layouts), 76)
-        systemLayouts = layouts.getElementsByClass('SystemLayout')
+        systemLayouts = layouts.getElementsByClass(layout.SystemLayout)
         sl0 = systemLayouts[0]
         self.assertEqual(sl0.distance, None)
         self.assertEqual(sl0.topDistance, 211.0)

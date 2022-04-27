@@ -2165,7 +2165,7 @@ def prepareStreamForMidi(s) -> stream.Stream:
         # this assumes that dynamics in a part/stream apply to all components
         # of that part stream
         # this sets the cachedRealized value for each Volume
-        for p in s.getElementsByClass('Stream'):
+        for p in s.getElementsByClass(stream.Stream):
             volume.realizeVolume(p)
 
         s.insert(0, conductor)
@@ -2224,7 +2224,7 @@ def conductorStream(s: stream.Stream) -> stream.Part:
     '''
     from music21 import tempo
     from music21 import meter
-    partsList = list(s.getElementsByClass('Stream').getElementsByOffset(0))
+    partsList = list(s.getElementsByClass(stream.Stream).getElementsByOffset(0))
     minPriority = min(p.priority for p in partsList) if partsList else 0
     conductorPriority = minPriority - 1
 
@@ -2310,7 +2310,7 @@ def channelInstrumentData(
     # store streams in uniform list
     substreamList = []
     if s.hasPartLikeStreams():
-        for obj in s.getElementsByClass('Stream'):
+        for obj in s.getElementsByClass(stream.Stream):
             # Conductor track: don't consume a channel
             if (not obj[note.GeneralNote]) and obj[Conductor]:
                 continue
@@ -2546,7 +2546,7 @@ def streamHierarchyToMidiTracks(
 
     # store streams in uniform list: prepareStreamForMidi() ensures there are substreams
     substreamList = []
-    for obj in s.getElementsByClass('Stream'):
+    for obj in s.getElementsByClass(stream.Stream):
         # prepareStreamForMidi() supplies defaults for these
         if obj.getElementsByClass(('MetronomeMark', 'TimeSignature')):
             # Ensure conductor track is first

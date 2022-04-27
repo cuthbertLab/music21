@@ -545,7 +545,7 @@ class GeneralObjectExporter:
             st2.metadata = copy.deepcopy(getMetadataFromContext(st))
             return self.fromScore(st2)
 
-        elif st.getElementsByClass('Stream').first().isFlat:  # like a part w/ measures...
+        elif st.getElementsByClass(stream.Stream).first().isFlat:  # like a part w/ measures...
             st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
@@ -1572,7 +1572,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         '''
         s = self.stream
         # environLocal.printDebug('streamToMx(): interpreting multipart')
-        streamOfStreams = s.getElementsByClass('Stream')
+        streamOfStreams = s.getElementsByClass(stream.Stream)
         for innerStream in streamOfStreams:
             # may need to copy element here
             # apply this stream's offset to elements
@@ -6490,11 +6490,11 @@ class MeasureExporter(XMLExporterBase):
             return
 
         mxPrint = None
-        found = m.getElementsByClass('PageLayout')
+        found = m.getElementsByClass(layout.PageLayout)
         if found:
             pl = found[0]  # assume only one per measure
             mxPrint = self.pageLayoutToXmlPrint(pl)
-        found = m.getElementsByClass('SystemLayout')
+        found = m.getElementsByClass(layout.SystemLayout)
         if found:
             sl = found[0]  # assume only one per measure
             if mxPrint is None:

@@ -225,7 +225,7 @@ class PartStaffExporterMixin:
          <music21.layout.StaffGroup <... p2a><... p2b>>,
          <music21.layout.StaffGroup <... p6a><... p6b>>]
         '''
-        staffGroups = self.stream.getElementsByClass('StaffGroup')
+        staffGroups = self.stream.getElementsByClass(spanner.StaffGroup)
         joinableGroups: List[StaffGroup] = []
         # Joinable groups must consist of only PartStaffs with Measures
         # and exist in self.stream

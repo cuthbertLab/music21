@@ -1233,7 +1233,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
 
         # if this has parts, need to move through each at a time
         if sStream.hasPartLikeStreams():
-            procList = list(sStream.getElementsByClass('Stream'))
+            procList = list(sStream.getElementsByClass(stream.Stream))
         else:  # assume a single list of notes, or sStream is a part
             procList = [sStream]
 

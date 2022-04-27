@@ -175,13 +175,13 @@ class CapellaImporter:
         '''
         # this line is redundant currently, since all we have in systemScore
         # are Systems, but later there will be other things.
-        systemStream = systemScore.getElementsByClass('System')
+        systemStream = systemScore.getElementsByClass(layout.System)
         partDictById = {}
         for thisSystem in systemStream:
             # this line is redundant currently, since all we have in
             # thisSystem are Parts, but later there will be other things.
             systemOffset = systemScore.elementOffset(thisSystem)
-            partStream = thisSystem.getElementsByClass('Part')
+            partStream = thisSystem.getElementsByClass(stream.Part)
             for j, thisPart in enumerate(partStream):
                 if thisPart.id not in partDictById:
                     newPart = stream.Part()

@@ -3755,6 +3755,7 @@ class Test(unittest.TestCase):
 
         Also has grace notes, so it tests our importing of grace notes
         '''
+        from music21 import bar
         from music21 import corpus
         from music21 import stream
 

@@ -18221,13 +18221,13 @@ class Test(unittest.TestCase):
             orig_stream[1].append(item)
 
         orig_clefs = [staff.flatten().getElementsByClass(clef.Clef).stream() for staff in
-                      orig_stream.getElementsByClass('Part')]
+                      orig_stream.getElementsByClass(stream.Part)]
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
 
         new_stream = converter.parse(xml.decode('utf-8'))
         new_clefs = [staff.flatten().getElementsByClass(clef.Clef).stream() for staff in
-                     new_stream.getElementsByClass('Part')]
+                     new_stream.getElementsByClass(stream.Part)]
 
         self.assertEqual([len(clefs) for clefs in new_clefs],
                          [len(clefs) for clefs in orig_clefs])
