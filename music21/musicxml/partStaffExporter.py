@@ -26,7 +26,6 @@ from music21.meter import TimeSignature
 from music21 import stream  # for typing
 from music21.musicxml import helpers
 from music21.musicxml.xmlObjects import MusicXMLExportException, MusicXMLWarning
-from music21 import spanner
 
 def addStaffTags(measure: Element, staffNumber: int, tagList: Optional[List[str]] = None):
     '''
