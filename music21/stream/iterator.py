@@ -1581,7 +1581,7 @@ class OffsetIterator(StreamIterator[M21ObjType]):
 
 
 # -----------------------------------------------------------------------------
-class RecursiveIterator(StreamIterator[M21ObjType]):
+class RecursiveIterator(StreamIterator[M21ObjType], collections.abc.Sequence):
     '''
     One of the most powerful iterators in music21.  Generally not called
     directly, but created by being invoked on a stream with `Stream.recurse()`

@@ -1931,7 +1931,7 @@ class SpineCollection(prebase.ProtoM21Object):
 
             stavesAppliedTo = []
             prioritiesToSearch = {}
-            for tandem in thisSpine.stream.recurse().getElementsByClass('MiscTandem'):
+            for tandem in thisSpine.stream[MiscTandem]:
                 if tandem.tandem.startswith('*staff'):
                     staffInfo = tandem.tandem[6:]  # could be multiple staves
                     stavesAppliedTo = [int(x) for x in staffInfo.split('/')]

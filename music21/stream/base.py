@@ -5122,6 +5122,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         >>> sp.derivation.origin is p
         True
         '''
+        from music21 import spanner
+
         if not inPlace:  # make a copy
             returnObj = self.coreCopyAsDerivation('toSoundingPitch')
         else:
@@ -5142,7 +5144,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             for container in returnObj.recurse(streamsOnly=True, includeSelf=True):
                 container.atSoundingPitch = True
 
-        for ottava in returnObj.recurse().getElementsByClass('Ottava'):
+        for ottava in returnObj[spanner.Ottava]:
             ottava.performTransposition()
 
         if not inPlace:

@@ -196,7 +196,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         pass
     # clefs are not typically defined, but if so, are set to the first measure
     # following the meta data, or in the open stream
-    if not clefSet and not p.recurse().getElementsByClass('Clef'):
+    if not clefSet and not p[clef.Clef]:
         if useMeasures:  # assume at start of measures
             p.getElementsByClass(stream.Measure).first().clef = clef.bestClef(p, recurse=True)
         else:

@@ -1287,7 +1287,7 @@ class Test(unittest.TestCase):
     def testMinor67set(self):
         from music21.romanText import testFiles
         s = romanTextToStreamScore(testFiles.testSetMinorRootParse)
-        chords = list(s.recurse().getElementsByClass('RomanNumeral'))
+        chords = list(s[roman.RomanNumeral])
 
         def pitchEqual(index, pitchStr):
             ch = chords[index]

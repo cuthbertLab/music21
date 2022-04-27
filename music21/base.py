@@ -4577,8 +4577,8 @@ class Test(unittest.TestCase):
         # only get n1 here, as that is only level available
         self.assertEqual(s1.recurse().getElementsByClass(note.Note).first(), n1)
         self.assertEqual(s2.recurse().getElementsByClass(note.Note).first(), n2)
-        self.assertEqual(s1.recurse().getElementsByClass('Clef').first(), c1)
-        self.assertEqual(s2.recurse().getElementsByClass('Clef').first(), c2)
+        self.assertEqual(s1[clef.Clef].first(), c1)
+        self.assertEqual(s2[clef.Clef].first(), c2)
 
         # attach s2 to s1
         s2.append(s1)
@@ -4697,7 +4697,7 @@ class Test(unittest.TestCase):
         matchBeatStrength = []
         matchAudioChannels = []
 
-        for j in s.getElementsByClass(ElementWrapper):
+        for j in s.getElementsByClass(base.ElementWrapper):
             matchOffset.append(j.offset)
             matchBeatStrength.append(j.beatStrength)
             matchAudioChannels.append(j.getnchannels())

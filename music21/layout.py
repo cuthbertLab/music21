@@ -703,7 +703,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
                 staffObject.elements = p
                 thisSystem.replace(p, staffObject)
-                allStaffLayouts = p[StaffLayout]
+                allStaffLayouts: List[StaffLayout] = p.recurse().getElementsByClass('StaffLayout')
                 if not allStaffLayouts:
                     continue
                 # else:
@@ -1323,7 +1323,7 @@ class LayoutScore(stream.Opus):
         self,
         pageId: int,
         systemId: int
-    ) -> Tuple[Optional[int], Optional[int]]:
+    ) -> Tuple[Optional[int], int]:
         # noinspection PyShadowingNames
         '''
         given a pageId and systemId, get the (pageId, systemId) for the previous system.
@@ -1337,16 +1337,16 @@ class LayoutScore(stream.Opus):
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
         >>> systemId = 1
         >>> pageId = 2  # last system, last page
-        >>> while systemId is not None:
+        >>> while pageId is not None:
         ...    pageId, systemId = ls.getSystemBeforeThis(pageId, systemId)
         ...    (pageId, systemId)
-        (2, 0) (1, 2) (1, 1) (1, 0) (0, 4) (0, 3) (0, 2) (0, 1) (0, 0) (None, None)
+        (2, 0) (1, 2) (1, 1) (1, 0) (0, 4) (0, 3) (0, 2) (0, 1) (0, 0) (None, -1)
         '''
         if systemId > 0:
             return pageId, systemId - 1
         else:
             if pageId == 0:
-                return (None, None)
+                return (None, -1)
             previousPageId = pageId - 1
             numSystems = len(self.pages[previousPageId].systems)
             return previousPageId, numSystems - 1
