@@ -1659,8 +1659,7 @@ class Verticality(base.Music21Object):
             retStream.insert(p)
         return retStream
 
-
-    def offset(self, leftAlign=True):
+    def getVerticalityOffset(self, *, leftAlign=True):
         '''
         returns the overall offset of the Verticality. Typically, this would just be the
         offset of each object in the Verticality,
@@ -1687,10 +1686,13 @@ class Verticality(base.Music21Object):
         >>> vs.getObjectsByClass(note.Note)
         [<music21.note.Note A>, <music21.note.Note F>]
 
-        >>> vs.offset(leftAlign=True)
+        >>> vs.getVerticalityOffset(leftAlign=True)
         0.0
-        >>> vs.offset(leftAlign=False)
+        >>> vs.getVerticalityOffset(leftAlign=False)
         1.0
+
+        Changed in v8 -- renamed getVerticalityOffset to not conflict with
+            .offset property.  Made leftAlign keyword only
         '''
         if not self.objects:
             return 0.0

@@ -561,6 +561,8 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
     >>> len(s.parts[2]) == len(chorale3.parts[2])
     True
     '''
+    from music21 import stream
+
     if s is None:
         return None
 
@@ -589,7 +591,7 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
 
     # correct the measure numbers
     if correctMeasureNumbers:
-        measures = list(s.getElementsByClass('Measure'))
+        measures = list(s.getElementsByClass(stream.Measure))
         if measures:
             i = measures[0].number
 
@@ -720,11 +722,12 @@ class Expander:
         '''
         run several setup routines.
         '''
+        from music21 import stream
         # get and store the source measure count; this is presumed to
         # be a Stream with Measures
-        self._srcMeasureStream = self._src.getElementsByClass('Measure').stream()
+        self._srcMeasureStream = self._src.getElementsByClass(stream.Measure).stream()
         # store all top-level non Measure elements for later insertion
-        self._srcNotMeasureStream = self._src.getElementsNotOfClass('Measure').stream()
+        self._srcNotMeasureStream = self._src.getElementsNotOfClass(stream.Measure).stream()
 
         # see if there are any repeat brackets
         self._repeatBrackets = self._src.flatten().getElementsByClass(
@@ -831,13 +834,15 @@ class Expander:
         >>> e.measureMap(returnType='measureNumber')
         ['1', '2', '2a', '2b', '3', '4', '4a', '5']
         '''
+        from music21 import stream
+
         measureNumberList = []
         measureNumberNoSuffixList = []
         post = self.process()
 
         measureContainingStreams = post
 
-        for i, m in enumerate(measureContainingStreams.getElementsByClass('Measure')):
+        for i, m in enumerate(measureContainingStreams.getElementsByClass(stream.Measure)):
             measureNumberList.append(m.measureNumberWithSuffix())
             measureNumberNoSuffixList.append(m.number)
 
@@ -1712,7 +1717,7 @@ class Expander:
 
         getRepeatExpressionIndex returns the measureIndex not measure number
 
-        >>> e.getRepeatExpressionIndex(s.getElementsByClass('Measure'), 'Segno')
+        >>> e.getRepeatExpressionIndex(s.getElementsByClass(stream.Measure), 'Segno')
         [2]
         '''
         post = []
@@ -2108,6 +2113,7 @@ class RepeatFinder:
         Traceback (most recent call last):
         music21.repeat.NoInternalStreamException: RepeatFinder must be initialized with a stream
         '''
+        from music21 import stream
 
         if self.s is None:
             raise NoInternalStreamException('RepeatFinder must be initialized with a stream')
@@ -2122,9 +2128,9 @@ class RepeatFinder:
         # Check for different parts and change mLists to a list of
         # measure-streams: [<measures from part1>, <measures from part2>, ... ]
         if s.hasMeasures():
-            mLists = [s.getElementsByClass('Measure')]
+            mLists = [s.getElementsByClass(stream.Measure)]
         else:
-            mLists = [p.getElementsByClass('Measure') for p in s.parts]
+            mLists = [p.getElementsByClass(stream.Measure) for p in s.parts]
 
         # Check for unequal lengths
         for i in range(len(mLists) - 1):
@@ -2402,7 +2408,7 @@ class RepeatFinder:
         >>> m4 = search.translateStreamToString(c1p0.measure(3).notesAndRests)
         >>> m5 = search.translateStreamToString(c1p0.measure(4).notesAndRests)
         >>> m9 = search.translateStreamToString(
-        ...    c1p0.getElementsByClass('Measure')[7].notesAndRests)
+        ...    c1p0.getElementsByClass(stream.Measure)[7].notesAndRests)
         >>> resm4 = search.translateStreamToString(c1simple.measure(3).notesAndRests)
         >>> resm5 = search.translateStreamToString(c1simple.measure(4).notesAndRests)
         >>> m4 == resm4
@@ -2698,9 +2704,9 @@ class Test(unittest.TestCase):
 
         post = ex.process()
         # post.show()
-        self.assertEqual(len(post.getElementsByClass('Measure')), 12)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 12)
         self.assertEqual(len(post.recurse().notesAndRests), 48)
-        self.assertEqual([m.offset for m in post.getElementsByClass('Measure')],
+        self.assertEqual([m.offset for m in post.getElementsByClass(stream.Measure)],
                          [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0,
                           28.0, 32.0, 36.0, 40.0, 44.0])
 
@@ -2863,9 +2869,9 @@ class Test(unittest.TestCase):
         ex = repeat.Expander(p)
         post = ex.process()
 
-        self.assertEqual(len(post.getElementsByClass('Measure')), 4)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 4)
         self.assertEqual(len(post.recurse().notesAndRests), 16)
-        self.assertEqual([m.offset for m in post.getElementsByClass('Measure')],
+        self.assertEqual([m.offset for m in post.getElementsByClass(stream.Measure)],
                          [0.0, 4.0, 8.0, 12.0])
 
         self.assertEqual([n.nameWithOctave
@@ -2873,7 +2879,7 @@ class Test(unittest.TestCase):
                          ['G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3',
                           'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
         measureNumbersPost = [m.measureNumberWithSuffix()
-                              for m in post.getElementsByClass('Measure')]
+                              for m in post.getElementsByClass(stream.Measure)]
         self.assertEqual(['1', '1a', '2', '2a'], measureNumbersPost)
 
         # two repeat bars with another bar in between
@@ -2899,9 +2905,9 @@ class Test(unittest.TestCase):
         ex = repeat.Expander(s)
         post = ex.process()
 
-        self.assertEqual(len(post.getElementsByClass('Measure')), 5)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 5)
         self.assertEqual(len(post.recurse().notesAndRests), 20)
-        self.assertEqual([m.offset for m in post.getElementsByClass('Measure')],
+        self.assertEqual([m.offset for m in post.getElementsByClass(stream.Measure)],
                          [0.0, 4.0, 8.0, 12.0, 16.0])
         self.assertEqual([n.nameWithOctave
                           for n in post.flatten().getElementsByClass('Note')],
@@ -2916,10 +2922,11 @@ class Test(unittest.TestCase):
         from music21.abcFormat import testFiles
         from music21 import converter
         from music21 import repeat
+        from music21 import stream
 
         s = converter.parse(testFiles.draughtOfAle)
         # s.show()
-        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 18)
+        self.assertEqual(len(s.parts[0].getElementsByClass(stream.Measure)), 18)
         self.assertEqual(s.metadata.title, '"A Draught of Ale"    (jig)     0912')
         self.assertEqual(len(s.recurse().notesAndRests), 88)
 
@@ -2928,7 +2935,7 @@ class Test(unittest.TestCase):
         # check boundaries here
 
         post = s.expandRepeats()
-        self.assertEqual(len(post.parts[0].getElementsByClass('Measure')), 36)
+        self.assertEqual(len(post.parts[0].getElementsByClass(stream.Measure)), 36)
         # make sure metadata is copied
         self.assertEqual(post.metadata.title, '"A Draught of Ale"    (jig)     0912')
         self.assertEqual(len(post.recurse().notesAndRests), 88 * 2)
@@ -2939,22 +2946,25 @@ class Test(unittest.TestCase):
         from music21.abcFormat import testFiles
         from music21 import converter
         from music21 import repeat
+        from music21 import stream
 
         s = converter.parse(testFiles.kingOfTheFairies)
-        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')),
+        self.assertEqual(len(s.parts[0].getElementsByClass(stream.Measure)),
                          26)
         self.assertEqual(s.metadata.title, 'King of the fairies')
         self.assertEqual(len(s.recurse().notesAndRests), 145)
 
         # s.show()
         ex = repeat.Expander(s.parts[0])
-        self.assertEqual(ex.findInnermostRepeatIndices(s.parts[0].getElementsByClass('Measure')),
-                                                        [0, 1, 2, 3, 4, 5, 6, 7, 8])
+        self.assertEqual(ex.findInnermostRepeatIndices(
+            s.parts[0].getElementsByClass(stream.Measure)),
+            [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        )
         # check boundaries here
 
         # TODO: this is not yet correct, and is making too many copies
         post = s.expandRepeats()
-        self.assertEqual(len(post.parts[0].getElementsByClass('Measure')), 35)
+        self.assertEqual(len(post.parts[0].getElementsByClass(stream.Measure)), 35)
         # make sure metadata is copied
         self.assertEqual(post.metadata.title, 'King of the fairies')
         self.assertEqual(len(post.recurse().notesAndRests), 192)
@@ -2984,7 +2994,7 @@ class Test(unittest.TestCase):
         s.append([m1, m2, m3, m4])
         self.assertEqual(len(s.recurse().notes), 8)
         post = s.expandRepeats()
-        self.assertEqual(len(post.getElementsByClass('Measure')), 6)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 6)
         self.assertEqual(len(post.recurse().notes), 12)
 
     def testExpandRepeatE(self):
@@ -3008,28 +3018,28 @@ class Test(unittest.TestCase):
         s.append([m1, m2, m3])
 
         self.assertEqual(len(s.recurse().notes), 6)
-        self.assertEqual(len(s.getElementsByClass('Measure')), 3)
+        self.assertEqual(len(s.getElementsByClass(stream.Measure)), 3)
 
         # default times is 2, or 1 repeat
         post = s.expandRepeats()
         self.assertEqual(len(post.recurse().notes), 8)
-        self.assertEqual(len(post.getElementsByClass('Measure')), 4)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 4)
 
         # can change times
         rb.times = 1  # one is no repeat
         post = s.expandRepeats()
         self.assertEqual(len(post.recurse().notes), 6)
-        self.assertEqual(len(post.getElementsByClass('Measure')), 3)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 3)
 
         rb.times = 0  # removes the entire passage
         post = s.expandRepeats()
         self.assertEqual(len(post.recurse().notes), 4)
-        self.assertEqual(len(post.getElementsByClass('Measure')), 2)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 2)
 
         rb.times = 4
         post = s.expandRepeats()
         self.assertEqual(len(post.recurse().notes), 12)
-        self.assertEqual(len(post.getElementsByClass('Measure')), 6)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 6)
 
     def testExpandRepeatF(self):
         # an algorithmic generation approach
@@ -3422,12 +3432,12 @@ class Test(unittest.TestCase):
         m4.repeatAppend(note.Note('a4', type='half'), 2)
         s = stream.Part()
         s.append([m1, m2, m3, m4])
-        self.assertEqual(len(s.getElementsByClass('Measure')), 4)
+        self.assertEqual(len(s.getElementsByClass(stream.Measure)), 4)
         # s.show()
         ex = Expander(s)
         post = ex.process()
         # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 7)
         self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
                          ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4',
                           'E4', 'E4', 'G4', 'G4', 'A4', 'A4'])
@@ -3449,13 +3459,13 @@ class Test(unittest.TestCase):
         m4.repeatAppend(note.Note('a4', type='half'), 2)
         s = stream.Part()
         s.append([m1, m2, m3, m4])
-        self.assertEqual(len(s.getElementsByClass('Measure')), 4)
+        self.assertEqual(len(s.getElementsByClass(stream.Measure)), 4)
         # s.show()
         ex = Expander(s)
         post = ex.process()
         # post.show()
         # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 5)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 5)
         self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
                          ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4'])
 
@@ -3480,13 +3490,13 @@ class Test(unittest.TestCase):
 
         s = stream.Part()
         s.append([m1, m2, m3, m4, m5])
-        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
+        self.assertEqual(len(s.getElementsByClass(stream.Measure)), 5)
         # s.show()
         ex = Expander(s)
         post = ex.process()
         # post.show()
         # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 7)
         self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
                          ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4',
                           'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
@@ -3510,13 +3520,13 @@ class Test(unittest.TestCase):
         s = stream.Part()
         s.append([m1, m2, m3, m4])
         # s.show()
-        self.assertEqual(len(s.getElementsByClass('Measure')), 4)
+        self.assertEqual(len(s.getElementsByClass(stream.Measure)), 4)
         # s.show()
         ex = Expander(s)
         post = ex.process()
         # post.show()
         # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 6)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 6)
         self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
                          ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'E4', 'E4',
                           'G4', 'G4', 'A4', 'A4'])
@@ -3543,12 +3553,12 @@ class Test(unittest.TestCase):
         s = stream.Part()
         s.append([m1, m2, m3, m4, m5])
         # s.show()
-        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
+        self.assertEqual(len(s.getElementsByClass(stream.Measure)), 5)
         ex = Expander(s)
         post = ex.process()
         # post.show()
         # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 6)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 6)
         self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
                          ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4',
                           'E4', 'E4', 'G4', 'G4'])
@@ -3581,12 +3591,12 @@ class Test(unittest.TestCase):
         s = stream.Part()
         s.append([m1, m2, m3, m4, m5, m6, m7])
         # s.show()
-        self.assertEqual(len(s.getElementsByClass('Measure')), 7)
+        self.assertEqual(len(s.getElementsByClass(stream.Measure)), 7)
         ex = Expander(s)
         post = ex.process()
         # post.show()
         # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 7)
         self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
                          ['C4', 'C4', 'E4', 'E4', 'E4', 'E4', 'G4', 'G4',
                           'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
@@ -3619,13 +3629,13 @@ class Test(unittest.TestCase):
 
         s = stream.Part()
         s.append([m1, m2, m3, m4, m5])
-        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
+        self.assertEqual(len(s.getElementsByClass(stream.Measure)), 5)
         # s.show()
         ex = Expander(s)
         post = ex.process()
         # post.show()
         # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 10)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 10)
         self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
                          ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'A4',
                           'A4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4',
@@ -3637,7 +3647,7 @@ class Test(unittest.TestCase):
         post = ex.process()
         # post.show()
         # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 11)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 11)
         self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
                          ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'A4',
                           'A4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4',
@@ -3674,13 +3684,13 @@ class Test(unittest.TestCase):
 
         s = stream.Part()
         s.append([m1, m2, m3, m4, m5])
-        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
+        self.assertEqual(len(s.getElementsByClass(stream.Measure)), 5)
         # s.show()
         # s.expandRepeats().show()
         ex = Expander(s)
         post = ex.process()
         # post.show()
-        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 7)
         self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
                          ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4',
                           'C4', 'C4', 'E4', 'E4', 'B4', 'B4'])
@@ -3722,14 +3732,14 @@ class Test(unittest.TestCase):
         s.insert(0, instrument.Trumpet())
         s.insert(0, spanner.Slur(m1[1], m2[1]))
 
-        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
+        self.assertEqual(len(s.getElementsByClass(stream.Measure)), 5)
 
         # s.show()
         # ex = Expander(s)
         # post = ex.process()
         post = s.expandRepeats()
         # post.show()
-        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
+        self.assertEqual(len(post.getElementsByClass(stream.Measure)), 7)
         self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
                          ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4',
                           'C4', 'C4', 'E4', 'E4', 'B4', 'B4'])
@@ -3742,14 +3752,15 @@ class Test(unittest.TestCase):
         '''
         tests expanding repeats in a piece with repeats mid-measure
 
-        Also has grace notes so it tests our importing of grace notes
+        Also has grace notes, so it tests our importing of grace notes
         '''
 
         from music21 import corpus
+        from music21 import stream
         s = corpus.parse('ryansMammoth/BanjoReel')
         # s.show('text')
         self.assertEqual(len(s.parts), 1)
-        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 11)
+        self.assertEqual(len(s.parts[0].getElementsByClass(stream.Measure)), 11)
         self.assertEqual(len(s.parts[0].flatten().notes), 58)
 
         bars = s.parts[0].flatten().getElementsByClass('Barline')
@@ -3758,19 +3769,21 @@ class Test(unittest.TestCase):
         s2 = s.expandRepeats()
         # s2.show('text')
 
-        self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 20)
+        self.assertEqual(len(s2.parts[0].getElementsByClass(stream.Measure)), 20)
         self.assertEqual(len(s2.parts[0].flatten().notes), 105)
 
     def testExpandRepeatsImportedB(self):
         from music21 import corpus
+        from music21 import stream
+
         s = corpus.parse('GlobeHornpipe')
         self.assertEqual(len(s.parts), 1)
-        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 18)
+        self.assertEqual(len(s.parts[0].getElementsByClass(stream.Measure)), 18)
         self.assertEqual(len(s.parts[0].flatten().notes), 125)
 
         s2 = s.expandRepeats()
         # s2.show()
-        self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 36)
+        self.assertEqual(len(s2.parts[0].getElementsByClass(stream.Measure)), 36)
         self.assertEqual(len(s2.parts[0].flatten().notes), 250)
         # make sure barlines are stripped
         bars = s2.parts[0].flatten().getElementsByClass('Repeat')

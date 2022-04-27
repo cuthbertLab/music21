@@ -265,7 +265,7 @@ class ScoreReduction:
             return
         # iterate overall notes, check all lyrics
         for p in score.parts:
-            for i, m in enumerate(p.getElementsByClass('Measure')):
+            for i, m in enumerate(p.getElementsByClass(stream.Measure)):
                 for n in m.recurse().notes:
                     infoDict = {'part': p,
                                 'measure': m,
@@ -358,7 +358,7 @@ class ScoreReduction:
             inst = instrument.Instrument()
             inst.partName = gName
             g.insert(0, inst)
-            gMeasures = g.getElementsByClass('Measure')
+            gMeasures = g.getElementsByClass(stream.Measure)
 #             for m in gMeasures._elements:
 #                 print(gName, m)
 #                 m.clef = clef.TrebleClef()
@@ -392,7 +392,7 @@ class ScoreReduction:
                             gMeasure.insert(rn.measureOffset, te)
 
             # after gathering all parts, fill with rests
-            for i, m in enumerate(g.getElementsByClass('Measure')):
+            for i, m in enumerate(g.getElementsByClass(stream.Measure)):
                 # only make rests if there are notes in the measure
                 for v in m.voices:
                     if v.recurse().notes:
@@ -576,7 +576,7 @@ class PartReduction:
             if self._fillByMeasure:
                 partMeasures = []
                 for p in parts:
-                    partMeasures.append(p.getElementsByClass('Measure').stream())
+                    partMeasures.append(p.getElementsByClass(stream.Measure).stream())
                 # environLocal.printDebug(['partMeasures', partMeasures])
                 # assuming that all parts have same number of measures
                 # iterate over each measures
@@ -963,11 +963,11 @@ class Test(unittest.TestCase):
     #     import warnings
     #     with warnings.catch_warnings():  # catch deprecation warning
     #         warnings.simplefilter('ignore', category=exceptions21.Music21DeprecationWarning)
-    #         chords = src.flattenParts().makeChords(minimumWindowSize=4,
+    #         chords = src.flatten().makeChords(minimumWindowSize=4,  # make chords is gone
     #                                     makeRests=False)
     #     for c in chords.flatten().notes:
     #         c.quarterLength = 4
-    #     for m in chords.getElementsByClass('Measure'):
+    #     for m in chords.getElementsByClass(stream.Measure):
     #         m.clef = clef.bestClef(m, recurse=True)
     #
     #     chords.measure(1).notes[0].addLyric('::/p:e/o:5/nf:no/ta:3/g:Ursatz')

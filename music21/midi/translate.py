@@ -3609,16 +3609,18 @@ class Test(unittest.TestCase):
 
     def testMidiImportMeter(self):
         from music21 import converter
+
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test17.mid'
         s = converter.parse(fp)
         for p in s.parts:
-            m = p.getElementsByClass('Measure').first()
+            m = p.getElementsByClass(stream.Measure).first()
             ts = m.timeSignature
             self.assertEqual(ts.ratioString, '3/4')
             self.assertIn(ts, m)
 
     def testMidiImportImplicitMeter(self):
         from music21 import midi as midiModule
+
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test10.mid'
 
         # Not the normal way to read a midi file, but we're altering it
@@ -3635,7 +3637,7 @@ class Test(unittest.TestCase):
 
         s = midiFileToStream(mf)
         for p in s.parts:
-            m = p.getElementsByClass('Measure').first()
+            m = p.getElementsByClass(stream.Measure).first()
             ts = m.timeSignature
             self.assertEqual(ts.ratioString, '4/4')
             self.assertIn(ts, m)

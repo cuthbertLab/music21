@@ -2224,7 +2224,7 @@ class Test(unittest.TestCase):
 
         # p.show()
         # all spanners should be at the part level
-        self.assertEqual(len(p.getElementsByClass('Measure')), 12)
+        self.assertEqual(len(p.getElementsByClass(stream.Measure)), 12)
         self.assertEqual(len(p.spanners), 4)
 
         raw = self.xmlStr(p)
@@ -2286,10 +2286,10 @@ class Test(unittest.TestCase):
         # try copying once
         p1 = copy.deepcopy(p)
         self.assertEqual(len(p1.spanners), 3)
-        m5 = p1.getElementsByClass('Measure')[-2]
+        m5 = p1.getElementsByClass(stream.Measure)[-2]
         sp3 = p1.spanners[2]
         self.assertTrue(sp3.hasSpannedElement(m5))
-        # for m in p1.getElementsByClass('Measure'):
+        # for m in p1.getElementsByClass(stream.Measure):
         #     print(m, id(m))
         # for sp in p1.spanners:
         #     print(sp, id(sp), [c for c in sp.getSpannedElementIds()])
@@ -2297,13 +2297,13 @@ class Test(unittest.TestCase):
 
         p2 = copy.deepcopy(p1)
         self.assertEqual(len(p2.spanners), 3)
-        m5 = p2.getElementsByClass('Measure')[-2]
+        m5 = p2.getElementsByClass(stream.Measure)[-2]
         sp3 = p2.spanners[2]
         self.assertTrue(sp3.hasSpannedElement(m5))
 
         p3 = copy.deepcopy(p2)
         self.assertEqual(len(p3.spanners), 3)
-        m5 = p3.getElementsByClass('Measure')[-2]
+        m5 = p3.getElementsByClass(stream.Measure)[-2]
         sp3 = p3.spanners[2]
         self.assertTrue(sp3.hasSpannedElement(m5))
 

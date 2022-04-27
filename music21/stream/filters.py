@@ -12,7 +12,7 @@
 '''
 The filter module contains :class:`~music21.stream.filters.StreamFilter` objects
 which are used by :class:`~music21.stream.iterator.StreamIterator` objects to
-decide whether or not a given element matches the list of elements that are being
+decide whether a given element matches the list of elements that are being
 filtered.  Filters are used by methods on streams such as
 :meth:`~music21.stream.Stream.getElementsByClass` to filter elements by classes.
 '''
@@ -191,7 +191,7 @@ class IdFilter(StreamFilter):
     filters on ids. used by stream.getElementById.
     No corresponding iterator call.
 
-    Only a single Id can be passed in.  Always returns a single item.
+    Only a single ID can be passed in.  Always returns a single item.
 
     '''
     derivationStr = 'getElementById'
@@ -401,7 +401,7 @@ class OffsetFilter(StreamFilter):
         element is in the range, not in the range, or (if stopAfterEnd is True) is not
         and no future elements will be in the range.
 
-        Factored out from __call__ to be used by OffsetHierarchyFilter and it's just
+        Factored out from __call__ to be used by OffsetHierarchyFilter, and it's just
         a beast.  :-)
         '''
         if offset > self.offsetEnd:  # anything that begins after the span is definitely out

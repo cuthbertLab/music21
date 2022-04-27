@@ -959,7 +959,7 @@ def bestClef(streamObj: 'music21.stream.Stream',
 
     sIter = streamObj.recurse() if recurse else streamObj.iter()
 
-    notes = sIter.getElementsByClass('GeneralNote')
+    notes = sIter.notesAndRests
 
     for n in notes:
         if n.isRest:

@@ -837,9 +837,7 @@ class ClassDocumenter(ObjectDocumenter):
         <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>
         <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.sorted>
         <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.spanners>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.variants>
         <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.voices>
-
         '''
         return self._readonlyProperties
 

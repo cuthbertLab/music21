@@ -333,6 +333,7 @@ class TimespanTree(trees.OffsetTree):
         return verticality
 
     def iterateConsonanceBoundedVerticalities(self):
+        # noinspection PyShadowingNames
         r'''
         Iterates consonant-bounded verticality subsequences in this
         offset-tree.
@@ -340,50 +341,50 @@ class TimespanTree(trees.OffsetTree):
         >>> score = corpus.parse('bwv66.6')
         >>> scoreTree = score.asTimespans()
         >>> for subsequence in scoreTree.iterateConsonanceBoundedVerticalities():
-        ...     print('Subequence:')
+        ...     print('Subsequence:')
         ...     for verticality in subsequence:
         ...         verticalityChord = verticality.toChord()
         ...         print(f'\t[{verticality.measureNumber}] '
         ...               + f'{verticality}: {verticalityChord.isConsonant()}')
         ...
-        Subequence:
+        Subsequence:
             [2] <music21.tree.verticality.Verticality 6.0 {E3 E4 G#4 B4}>: True
             [2] <music21.tree.verticality.Verticality 6.5 {E3 D4 G#4 B4}>: False
             [2] <music21.tree.verticality.Verticality 7.0 {A2 C#4 E4 A4}>: True
-        Subequence:
+        Subsequence:
             [3] <music21.tree.verticality.Verticality 9.0 {F#3 C#4 F#4 A4}>: True
             [3] <music21.tree.verticality.Verticality 9.5 {B2 D4 G#4 B4}>: False
             [3] <music21.tree.verticality.Verticality 10.0 {C#3 C#4 E#4 G#4}>: True
-        Subequence:
+        Subsequence:
             [3] <music21.tree.verticality.Verticality 10.0 {C#3 C#4 E#4 G#4}>: True
             [3] <music21.tree.verticality.Verticality 10.5 {C#3 B3 E#4 G#4}>: False
             [3] <music21.tree.verticality.Verticality 11.0 {F#2 A3 C#4 F#4}>: True
-        Subequence:
+        Subsequence:
             [3] <music21.tree.verticality.Verticality 12.0 {F#3 C#4 F#4 A4}>: True
             [4] <music21.tree.verticality.Verticality 13.0 {G#3 B3 F#4 B4}>: False
             [4] <music21.tree.verticality.Verticality 13.5 {F#3 B3 F#4 B4}>: False
             [4] <music21.tree.verticality.Verticality 14.0 {G#3 B3 E4 B4}>: True
-        Subequence:
+        Subsequence:
             [4] <music21.tree.verticality.Verticality 14.0 {G#3 B3 E4 B4}>: True
             [4] <music21.tree.verticality.Verticality 14.5 {A3 B3 E4 B4}>: False
             [4] <music21.tree.verticality.Verticality 15.0 {B3 D#4 F#4}>: True
-        Subequence:
+        Subsequence:
             [4] <music21.tree.verticality.Verticality 15.0 {B3 D#4 F#4}>: True
             [4] <music21.tree.verticality.Verticality 15.5 {B2 A3 D#4 F#4}>: False
             [4] <music21.tree.verticality.Verticality 16.0 {C#3 G#3 C#4 E4}>: True
-        Subequence:
+        Subsequence:
             [5] <music21.tree.verticality.Verticality 17.5 {F#3 D4 F#4 A4}>: True
             [5] <music21.tree.verticality.Verticality 18.0 {G#3 C#4 E4 B4}>: False
             [5] <music21.tree.verticality.Verticality 18.5 {G#3 B3 E4 B4}>: True
-        Subequence:
+        Subsequence:
             [6] <music21.tree.verticality.Verticality 24.0 {F#3 C#4 F#4 A4}>: True
             [7] <music21.tree.verticality.Verticality 25.0 {B2 D4 F#4 G#4}>: False
             [7] <music21.tree.verticality.Verticality 25.5 {C#3 C#4 E#4 G#4}>: True
-        Subequence:
+        Subsequence:
             [7] <music21.tree.verticality.Verticality 25.5 {C#3 C#4 E#4 G#4}>: True
             [7] <music21.tree.verticality.Verticality 26.0 {D3 C#4 F#4}>: False
             [7] <music21.tree.verticality.Verticality 26.5 {D3 F#3 B3 F#4}>: True
-        Subequence:
+        Subsequence:
             [8] <music21.tree.verticality.Verticality 29.0 {A#2 F#3 C#4 F#4}>: True
             [8] <music21.tree.verticality.Verticality 29.5 {A#2 F#3 D4 F#4}>: False
             [8] <music21.tree.verticality.Verticality 30.0 {A#2 C#4 E4 F#4}>: False
@@ -391,11 +392,11 @@ class TimespanTree(trees.OffsetTree):
             [8] <music21.tree.verticality.Verticality 32.0 {C#3 B3 D4 F#4}>: False
             [8] <music21.tree.verticality.Verticality 32.5 {C#3 A#3 C#4 F#4}>: False
             [9] <music21.tree.verticality.Verticality 33.0 {D3 B3 F#4}>: True
-        Subequence:
+        Subsequence:
             [9] <music21.tree.verticality.Verticality 33.0 {D3 B3 F#4}>: True
             [9] <music21.tree.verticality.Verticality 33.5 {D3 B3 C#4 F#4}>: False
             [9] <music21.tree.verticality.Verticality 34.0 {B2 B3 D4 F#4}>: True
-        Subequence:
+        Subsequence:
             [9] <music21.tree.verticality.Verticality 34.0 {B2 B3 D4 F#4}>: True
             [9] <music21.tree.verticality.Verticality 34.5 {B2 B3 D4 E#4}>: False
             [9] <music21.tree.verticality.Verticality 35.0 {F#3 A#3 C#4 F#4}>: True
@@ -634,6 +635,7 @@ class TimespanTree(trees.OffsetTree):
 
     @staticmethod
     def unwrapVerticalities(verticalities):
+        # noinspection PyShadowingNames
         r'''
         Unwraps a sequence of `Verticality` objects into a dictionary of
         `Part`:`Horizontality` key/value pairs.

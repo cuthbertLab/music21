@@ -195,7 +195,7 @@ class TestGetContextByClassA(Test):
         clef = self.c
         key = self.k
         for p in self.s.parts:
-            for m in p.getElementsByClass('Measure'):
+            for m in p.getElementsByClass(music21.stream.Measure):
                 m.getContextByClass(clef.Clef)
                 m.getContextByClass(meter.TimeSignature)
                 m.getContextByClass(key.KeySignature)

@@ -546,11 +546,11 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         faulty = corpus.parse('demos/incorrect_time_signature_pv')
-        for m in faulty.recurse().getElementsByClass('Measure'):
+        for m in faulty.recurse().getElementsByClass(stream.Measure):
             m.timeSignature = m.bestTimeSignature()
         p1 = faulty.parts[1]
         tsReps = []
-        for m in p1.getElementsByClass('Measure'):
+        for m in p1.getElementsByClass(stream.Measure):
             tsReps.append(repr(m.timeSignature))
         self.assertEqual(tsReps, ['<music21.meter.TimeSignature 12/4>',
                                   '<music21.meter.TimeSignature 23/8>',
@@ -629,7 +629,6 @@ class Test(unittest.TestCase):
         ts328 = TimeSignature('3+2/8')
         beatSeq = ts328.beamSequence
         self.assertEqual(str(beatSeq), '{3/8+2/8}')
-
 
 
 if __name__ == '__main__':

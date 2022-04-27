@@ -1007,10 +1007,10 @@ class Ambitus(DiscreteAnalysis):
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
-        >>> pitchMin, pitchMax = p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[3])
+        >>> pitchMin, pitchMax = p.getPitchSpan(s.parts[0].getElementsByClass(stream.Measure)[3])
         >>> pitchMin.ps, pitchMax.ps
         (66.0, 71.0)
-        >>> p.getPitchSpan(s.parts[0].getElementsByClass('Measure')[6])
+        >>> p.getPitchSpan(s.parts[0].getElementsByClass(stream.Measure)[6])
         (<music21.pitch.Pitch A4>, <music21.pitch.Pitch C#5>)
 
         >>> s = stream.Stream()

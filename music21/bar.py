@@ -311,7 +311,7 @@ class Repeat(repeat.RepeatMark, Barline):
     @property
     def times(self) -> Optional[int]:
         '''
-        Get or set the times property of this barline. This
+        Get or set the "times" property of this barline. This
         defines how many times the repeat happens. A standard repeat
         repeats 2 times; values equal to or greater than 0 are permitted.
         A repeat of 0 skips the repeated passage.

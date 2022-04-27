@@ -16,6 +16,7 @@ import math
 import os
 
 from music21 import note
+from music21 import stream
 
 pathName = os.path.dirname(__file__)
 
@@ -427,7 +428,7 @@ class SinglePart:
             self.incorrectMeasures = None
 
     def getMeasures(self):
-        self.measureStream = self.scorePart.getElementsByClass('Measure')
+        self.measureStream = self.scorePart.getElementsByClass(stream.Measure)
 
         return self.measureStream
 
@@ -497,7 +498,7 @@ class SinglePart:
         returns an array of hashed strings
         '''
         measureStreamNotes = []
-        measureStreamMeasures = self.measureStream.getElementsByClass('Measure')
+        measureStreamMeasures = self.measureStream.getElementsByClass(stream.Measure)
 
         for i in range(len(measureStreamMeasures)):
             mh = MeasureHash(measureStreamMeasures[i])

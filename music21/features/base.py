@@ -416,10 +416,10 @@ class StreamForms:
             post = stream.Stream()
             for p in prepared.parts:
                 # insert in overlapping offset positions
-                for m in p.getElementsByClass('Measure'):
+                for m in p.getElementsByClass(stream.Measure):
                     post.insert(m.getOffsetBySite(p), m)
         else:
-            post = prepared.getElementsByClass('Measure')
+            post = prepared.getElementsByClass(stream.Measure)
         return post
 
     def formChordify(self, prepared):

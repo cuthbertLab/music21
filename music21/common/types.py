@@ -9,7 +9,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from fractions import Fraction
-from typing import Union, TypeVar, TYPE_CHECKING
+from typing import Union, TypeVar, TYPE_CHECKING, Iterable, Type
 
 from music21.common.enums import OffsetSpecial
 
@@ -22,3 +22,4 @@ OffsetQLIn = Union[int, float, Fraction]
 
 StreamType = TypeVar('StreamType', bound='music21.stream.Stream')
 M21ObjType = TypeVar('M21ObjType', bound='music21.base.Music21Object')
+ClassListType = Union[str, Iterable[str], Type[M21ObjType], Iterable[Type[M21ObjType]]]

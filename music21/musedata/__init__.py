@@ -1861,7 +1861,7 @@ class Test(unittest.TestCase):
     #     s = corpus.parse('symphony94/02')
     #     for p in s.parts:
     #         match = []
-    #         for m in p.getElementsByClass('Measure'):
+    #         for m in p.getElementsByClass(stream.Measure):
     #             match.append(m.number)
     #         self.assertEqual(len(match), 156)
     #         # make sure there are no empty strings

@@ -51,8 +51,8 @@ def makeExampleScore():
     r'''
     Makes example score for use in stream-to-tree conversion docs.
 
-    >>> score = tree.makeExampleScore()
-    >>> score.show('text')
+    >>> sc = tree.makeExampleScore()
+    >>> sc.show('text')
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.instrument.Instrument 'PartA: : '>
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -83,7 +83,6 @@ def makeExampleScore():
         {6.0} <music21.stream.Measure 4 offset=6.0>
             {0.0} <music21.note.Note D#>
             {2.0} <music21.bar.Barline type=final>
-
     '''
     from music21 import converter
     from music21 import stream

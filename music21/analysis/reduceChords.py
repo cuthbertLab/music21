@@ -131,7 +131,7 @@ class ChordReducer:
                 templateStream=inputScore,
             )
         chordifiedPart = stream.Part()
-        for measure in chordifiedReduction.getElementsByClass('Measure'):
+        for measure in chordifiedReduction.getElementsByClass(stream.Measure):
             reducedMeasure = self.reduceMeasureToNChords(
                 measure,
                 maximumNumberOfChords=maximumNumberOfChords,

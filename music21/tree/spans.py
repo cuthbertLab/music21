@@ -394,7 +394,7 @@ class ElementTimespan(Timespan):
             ):
         '''
         Create a new object that is identical to the calling object
-        but with some of the parameters overridden.
+        but with some parameters overridden.
 
         >>> n = note.Note('C#')
         >>> pts = tree.spans.PitchedTimespan(n, offset=11.0, endTime=12.0)

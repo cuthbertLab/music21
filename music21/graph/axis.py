@@ -949,7 +949,7 @@ class OffsetAxis(PositionAxis):
 
         But empty if called on a single Measure ...
 
-        >>> p = graph.plot.PlotStream(b.parts[0].getElementsByClass('Measure')[2])
+        >>> p = graph.plot.PlotStream(b.parts[0].getElementsByClass(stream.Measure)[2])
         >>> ax = graph.axis.OffsetAxis(p, 'x')
         >>> om3 = ax.getOffsetMap()
         >>> om3
@@ -1008,7 +1008,7 @@ class OffsetAxis(PositionAxis):
 
         Returns False if the offsetMap is empty
 
-        >>> p = graph.plot.PlotStream(b.parts[0].getElementsByClass('Measure')[2])
+        >>> p = graph.plot.PlotStream(b.parts[0].getElementsByClass(stream.Measure)[2])
         >>> axMeasure = graph.axis.OffsetAxis(p, 'x')
         >>> axMeasure.setUseMeasuresFromOffsetMap()
         False

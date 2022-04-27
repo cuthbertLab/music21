@@ -5082,8 +5082,10 @@ class Test(unittest.TestCase):
         '''Test that we are getting the properly set accidentals
         '''
         from music21 import corpus
+        from music21 import stream
+
         s = corpus.parse('bwv438.xml')
-        tenorMeasures = s.parts[2].getElementsByClass('Measure')
+        tenorMeasures = s.parts[2].getElementsByClass(stream.Measure)
         pAltered = tenorMeasures[0].pitches[1]
         self.assertEqual(pAltered.accidental.name, 'flat')
         self.assertEqual(pAltered.accidental.displayType, 'normal')

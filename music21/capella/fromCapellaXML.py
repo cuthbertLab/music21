@@ -218,7 +218,7 @@ class CapellaImporter:
                 else:
                     lastKeySignature = ks
             p.makeMeasures(inPlace=True)
-            # for m in p.getElementsByClass('Measure'):
+            # for m in p.getElementsByClass(stream.Measure):
             #    barLines = m.getElementsByClass('Barline')
             #    for bl in barLines:
             #        blOffset = bl.offset

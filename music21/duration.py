@@ -815,7 +815,7 @@ def convertTypeToNumber(dType: str) -> float:
 
 
 # -----------------------------------------------------------------------------------
-class DurationTuple(namedtuple('DurationTuple', 'type dots quarterLength')):
+class DurationTuple(namedtuple('DurationTuple', ['type', 'dots', 'quarterLength'])):
     def augmentOrDiminish(self, amountToScale):
         return durationTupleFromQuarterLength(self.quarterLength * amountToScale)
 
@@ -3674,8 +3674,9 @@ class Test(unittest.TestCase):
 
     def x_testStrangeMeasure(self):
         from music21 import corpus
+        from music21 import stream
         j1 = corpus.parse('trecento/PMFC_06-Jacopo-03a')
-        x = j1.parts[0].getElementsByClass('Measure')[42]
+        x = j1.parts[0].getElementsByClass(stream.Measure)[42]
         x._cache = {}
         print(x.duration)
         print(x.duration.components)

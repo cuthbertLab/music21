@@ -489,7 +489,8 @@ class Test(unittest.TestCase):
             m.append(layout.SystemLayout(isNew=True))
             m.append(note.Rest(type='whole'))
             s.append(m)
-        for m in s.getElementsByClass('Measure'):
+        stream_iterator = s.getElementsByClass(stream.Measure)
+        for m in stream_iterator:
             offsets = [x * 0.25 for x in range(16)]
             random.shuffle(offsets)
             offsets = offsets[:4]

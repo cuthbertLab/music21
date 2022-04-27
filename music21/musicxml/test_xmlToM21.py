@@ -66,7 +66,7 @@ class Test(unittest.TestCase):
         # this is a good example with repeats
         s = corpus.parse('k80/movement3')
         for p in s.parts:
-            post = p.recurse().getElementsByClass('Repeat')
+            post = p.recurse().getElementsByClass(bar.Repeat)
             self.assertEqual(len(post), 6)
 
         # a = corpus.parse('opus41no1/movement3')
@@ -77,7 +77,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.voiceDouble)
-        m1 = s.parts[0].getElementsByClass('Measure').first()
+        m1 = s.parts[0].getElementsByClass(stream.Measure).first()
         self.assertTrue(m1.hasVoices())
 
         self.assertEqual([v.id for v in m1.voices], ['1', '2'])
@@ -95,10 +95,10 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.spannersSlurs33c)
         # have 5 spanners
-        self.assertEqual(len(s.flatten().getElementsByClass('Spanner')), 5)
+        self.assertEqual(len(s.flatten().getElementsByClass(spanner.Spanner)), 5)
 
         # can get the same from a recurse search
-        self.assertEqual(len(s.recurse().getElementsByClass('Spanner')), 5)
+        self.assertEqual(len(s.recurse().getElementsByClass(spanner.Spanner)), 5)
 
         # s.show('t')
         # s.show()
@@ -142,7 +142,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('schoenberg/opus19/movement2')
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.getElementsByClass('PartStaff')), 2)
+        self.assertEqual(len(s.getElementsByClass(stream.PartStaff)), 2)
 
         # test that all elements are unique
         setElementIds = set()
@@ -155,9 +155,9 @@ class Test(unittest.TestCase):
         from music21 import converter
         from music21.musicxml import testPrimitive
         s = converter.parse(testPrimitive.mixedVoices1a)
-        self.assertEqual(len(s.getElementsByClass('PartStaff')), 2)
-        self.assertEqual(len(s.recurse().getElementsByClass('Barline')), 2)
-        lastMeasure = s.parts[0].getElementsByClass('Measure').last()
+        self.assertEqual(len(s.getElementsByClass(stream.PartStaff)), 2)
+        self.assertEqual(len(s.recurse().getElementsByClass(bar.Barline)), 2)
+        lastMeasure = s.parts[0].getElementsByClass(stream.Measure).last()
         lastElement = lastMeasure.last()
         lastOffset = lastMeasure.elementOffset(lastElement, returnSpecial=True)
         self.assertEqual(lastOffset, 'highestTime')
@@ -190,16 +190,16 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.textExpressions)
         # s.show()
-        self.assertEqual(len(s.flatten().getElementsByClass('TextExpression')), 3)
+        self.assertEqual(len(s.flatten().getElementsByClass(expressions.TextExpression)), 3)
 
         p1 = s.parts[0]
-        m1 = p1.getElementsByClass('Measure')[0]
-        self.assertEqual(len(m1.getElementsByClass('TextExpression')), 0)
+        m1 = p1.getElementsByClass(stream.Measure)[0]
+        self.assertEqual(len(m1.getElementsByClass(expressions.TextExpression)), 0)
         # all in measure 2
-        m2 = p1.getElementsByClass('Measure')[1]
-        self.assertEqual(len(m2.getElementsByClass('TextExpression')), 3)
+        m2 = p1.getElementsByClass(stream.Measure)[1]
+        self.assertEqual(len(m2.getElementsByClass(expressions.TextExpression)), 3)
 
-        teStream = m2.getElementsByClass('TextExpression')
+        teStream = m2.getElementsByClass(expressions.TextExpression)
         self.assertEqual([te.offset for te in teStream], [1.0, 1.5, 4.0])
 
         # s.show()
@@ -208,7 +208,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         p = s.parts[0]
-        for m in p.getElementsByClass('Measure'):
+        for m in p.getElementsByClass(stream.Measure):
             for n in m.flatten().notes:
                 if n.pitch.name in ['B']:
                     msg = f'{n.pitch.nameWithOctave}\n{n.duration.quarterLength}'
@@ -226,7 +226,7 @@ class Test(unittest.TestCase):
         # test placing text expression in arbitrary locations
         s = corpus.parse('bwv66.6')
         p = s.parts[-1]  # get bass
-        for m in p.getElementsByClass('Measure')[1:]:
+        for m in p.getElementsByClass(stream.Measure)[1:]:
             for pos in [1.5, 2.5]:
                 te = expressions.TextExpression(pos)
                 te.style.fontWeight = 'bold'
@@ -243,7 +243,7 @@ class Test(unittest.TestCase):
             m.append(layout.SystemLayout(isNew=True))
             m.append(note.Rest(type='whole'))
             s.append(m)
-        for m in s.getElementsByClass('Measure'):
+        for m in s.getElementsByClass(stream.Measure):
             offsets = [x * 0.25 for x in range(16)]
             random.shuffle(offsets)
             offsets = offsets[:4]

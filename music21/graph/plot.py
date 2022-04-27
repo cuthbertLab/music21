@@ -1162,7 +1162,7 @@ class Dolan(HorizontalBarWeighted):
     >>> dyn = ['p', 'mf', 'f', 'ff', 'mp', 'fff', 'ppp']
     >>> i = 0
     >>> for p in s.parts:
-    ...     for m in p.getElementsByClass('Measure'):
+    ...     for m in p.getElementsByClass(stream.Measure):
     ...         m.insert(0, dynamics.Dynamic(dyn[i % len(dyn)]))
     ...         i += 1
     ...

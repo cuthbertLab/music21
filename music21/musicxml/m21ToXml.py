@@ -2592,8 +2592,8 @@ class PartExporter(XMLExporterBase):
         checks for a unique midiChannel and then blocks it off from future use.
 
         >>> p = converter.parse('tinyNotation: 4/4 c1 d1 e1')
-        >>> p.getElementsByClass('Measure')[0].insert(0, instrument.Clarinet())
-        >>> p.getElementsByClass('Measure')[1].insert(0, instrument.BassClarinet())
+        >>> p.getElementsByClass(stream.Measure)[0].insert(0, instrument.Clarinet())
+        >>> p.getElementsByClass(stream.Measure)[1].insert(0, instrument.BassClarinet())
         >>> PEX = musicxml.m21ToXml.PartExporter(p)
         >>> PEX.instrumentStream is None
         True

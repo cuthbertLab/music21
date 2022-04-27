@@ -3691,7 +3691,7 @@ class Test(unittest.TestCase):
         # through sequential iteration
         s1 = copy.deepcopy(s)
         for p in s1.parts:
-            for m in p.getElementsByClass('Measure'):
+            for m in p.getElementsByClass(stream.Measure):
                 for e in m.getElementsByClass('KeySignature'):
                     m.remove(e)
         self.assertEqual(len(s1.flatten().getElementsByClass('KeySignature')), 0)

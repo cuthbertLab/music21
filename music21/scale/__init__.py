@@ -79,7 +79,6 @@ from music21 import note
 from music21 import pitch
 from music21 import interval
 from music21 import sieve
-from music21.converter.subConverters import SubConverter
 
 _MOD = 'scale'
 environLocal = environment.Environment(_MOD)
@@ -628,6 +627,7 @@ class AbstractScale(Scale):
         '''
         Show the scale in a format. Here, prepare scala format if requested.
         '''
+        from music21.converter.subConverters import SubConverter
         if fmt is not None:
             fileFormat, unused_ext = common.findFormat(fmt)
             if fileFormat == 'scala':

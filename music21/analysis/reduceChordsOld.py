@@ -239,7 +239,7 @@ class ChordReducer:
         if not p0:
             return p
         self._lastPitchedObject = None
-        lenMeasures = len(p0.getElementsByClass('Measure'))
+        lenMeasures = len(p0.getElementsByClass(stream.Measure))
         self._lastTs = None
         for i in range(lenMeasures):
             mI = inStream.measure(i, indicesNotNumbers=True)
@@ -257,7 +257,7 @@ class ChordReducer:
                 if i % 20 == 0 and i != 0:
                     print("")
         p.coreElementsChanged()
-        m = p.getElementsByClass('Measure').first()
+        m = p.getElementsByClass(stream.Measure).first()
         if m:
             m.insert(0, clef.bestClef(p, allowTreble8vb=True))
         p.makeNotation(inPlace=True)
@@ -318,7 +318,7 @@ class ChordReducer:
                         self._lastPitchedObject.tie = tie.Tie('start')
         self._lastPitchedObject = m[-1]
 
-        sourceMeasureTs = mI.parts.first().getElementsByClass('Measure').first().timeSignature
+        sourceMeasureTs = mI.parts.first().getElementsByClass(stream.Measure).first().timeSignature
         if sourceMeasureTs != self._lastTs:
             m.timeSignature = copy.deepcopy(sourceMeasureTs)
             self._lastTs = sourceMeasureTs
@@ -354,11 +354,12 @@ class TestExternal(unittest.TestCase):
         # fix clef
         fixClef = True
         if fixClef:
-            startClefs = c.parts[1].getElementsByClass('Measure').first().getElementsByClass('Clef')
+            startClefs = c.parts[1].getElementsByClass(stream.Measure
+                                                       ).first().getElementsByClass('Clef')
             if startClefs:
                 clef1 = startClefs[0]
-                c.parts[1].getElementsByClass('Measure').first().remove(clef1)
-            c.parts[1].getElementsByClass('Measure').first().insert(0, clef.Treble8vbClef())
+                c.parts[1].getElementsByClass(stream.Measure).first().remove(clef1)
+            c.parts[1].getElementsByClass(stream.Measure).first().insert(0, clef.Treble8vbClef())
 
 
         cr = ChordReducer()

@@ -34,6 +34,7 @@ from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
 from music21.stream.iterator import StreamIterator
 
+
 # pylint: disable=attribute-defined-outside-init
 class StreamCoreMixin:
     '''
@@ -71,7 +72,7 @@ class StreamCoreMixin:
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .insert() instead.
 
-        A faster way of inserting elements that does no checks,
+        A faster way of inserting elements that performs no checks,
         just insertion.
 
         Only be used in contexts that we know we have a proper, single Music21Object.
@@ -273,8 +274,8 @@ class StreamCoreMixin:
             self.isFlat = True
             # do not need to look in _endElements
             for e in self._elements:
-                # only need to find one case, and if so, no longer flat
-                # fastest method here is isinstance()
+                # Only need to find one case, and if so, no longer flat.
+                # The fastest method here is isinstance()
                 # if isinstance(e, Stream):
                 if e.isStream:
                     self.isFlat = False
@@ -440,14 +441,14 @@ class StreamCoreMixin:
                 # environLocal.warn('stale object')
                 del self._offsetDict[idElement]  # pragma: no cover
         # if we do not purge locations here, we may have ids() for
-        # Streams that no longer exist stored in the locations entry for element.
+        # Streams that no longer exist stored in the "locations" entry for element.
         # Note that dead locations are also purged from .sites during
         # all get() calls.
         element.purgeLocations()
 
     def coreStoreAtEnd(self, element, setActiveSite=True):
         '''
-        NB -- this is a "core" method.  Use .storeAtEnd() instead.
+        NB -- this is a "core" method.  General users should use .storeAtEnd() instead.
 
         Core method for adding end elements.
         To be called by other methods.
