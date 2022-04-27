@@ -214,11 +214,12 @@ class Test(unittest.TestCase):
     def testHorizontalInstrumentationB(self):
         from music21 import corpus
         from music21 import dynamics
+        from music21 import stream
         s = corpus.parse('bwv66.6')
         dyn = ['p', 'mf', 'f', 'ff', 'mp', 'fff', 'ppp']
         i = 0
         for p in s.parts:
-            for m in p.getElementsByClass('Measure'):
+            for m in p.getElementsByClass(stream.Measure):
                 m.insert(0, dynamics.Dynamic(dyn[i % len(dyn)]))
                 i += 1
         s.plot('dolan', fillByMeasure=True, segmentByTarget=True, doneAction=None)

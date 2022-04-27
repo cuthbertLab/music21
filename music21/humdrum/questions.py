@@ -68,12 +68,13 @@ class Test(unittest.TestCase):
         '''
         from music21 import articulations
         from music21 import converter
+        from music21 import stream
 
         partStream = converter.parse('dichterliebe1.xml')
         # for part in partStream.partData:
         # a part stream could have an iterator that partitions itself
         # into measure-length part streams
-        for measure in partStream.getElementsByClass('Measure')():  # () ?
+        for measure in partStream.getElementsByClass(stream.Measure)():  # () ?
             # measure is a partStream isolated for just the desired measure
             # assuming only one meter per measure
             meterObj = measure['meter']

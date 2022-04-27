@@ -198,7 +198,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     # following the meta data, or in the open stream
     if not clefSet and not p.recurse().getElementsByClass('Clef'):
         if useMeasures:  # assume at start of measures
-            p.getElementsByClass('Measure').first().clef = clef.bestClef(p, recurse=True)
+            p.getElementsByClass(stream.Measure).first().clef = clef.bestClef(p, recurse=True)
         else:
             p.insert(0, clef.bestClef(p, recurse=True))
 
@@ -725,7 +725,7 @@ class Test(unittest.TestCase):
         ah = abcFormat.ABCHandler()
         ah.process(testFiles.hectorTheHero)
         s = abcToStreamScore(ah)
-        m1 = s.parts[0].getElementsByClass('Measure').first()
+        m1 = s.parts[0].getElementsByClass(stream.Measure).first()
         # s.show()
         # ts is 3/4
         self.assertEqual(m1.barDuration.quarterLength, 3.0)
@@ -750,7 +750,7 @@ class Test(unittest.TestCase):
         ah = abcFormat.ABCHandler()
         ah.process(testFiles.theAleWifesDaughter)
         s = abcToStreamScore(ah)
-        m1 = s.parts[0].getElementsByClass('Measure').first()
+        m1 = s.parts[0].getElementsByClass(stream.Measure).first()
 
         # ts is 3/4
         self.assertEqual(m1.barDuration.quarterLength, 4.0)
@@ -957,7 +957,7 @@ class Test(unittest.TestCase):
         # new problem case:
         s = converter.parse(testFiles.hectorTheHero)
         # first measure has 2 pickup notes
-        self.assertEqual(len(s.parts.first().getElementsByClass('Measure').first().notes), 2)
+        self.assertEqual(len(s.parts.first().getElementsByClass(stream.Measure).first().notes), 2)
 
     def testRepeatBracketsB(self):
         from music21.abcFormat import testFiles

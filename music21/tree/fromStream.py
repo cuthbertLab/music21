@@ -33,6 +33,7 @@ def listOfTreesByClass(
     classLists: List[Sequence[Type]] = None,
     useTimespans: bool = False
 ) -> List[Union[trees.OffsetTree, timespanTree.TimespanTree]]:
+    # noinspection PyShadowingNames
     r'''
     To be DEPRECATED in v8: this is no faster than calling streamToTimespanTree
     multiple times with different classLists.

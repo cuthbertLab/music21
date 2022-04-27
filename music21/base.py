@@ -2125,8 +2125,8 @@ class Music21Object(prebase.ProtoM21Object):
         The `className` can be used to specify one or more classes to match.
 
         >>> s = corpus.parse('bwv66.6')
-        >>> m2 = s.parts[0].getElementsByClass('Measure')[2]  # pickup measure
-        >>> m3 = s.parts[0].getElementsByClass('Measure')[3]
+        >>> m2 = s.parts[0].getElementsByClass(stream.Measure)[2]  # pickup measure
+        >>> m3 = s.parts[0].getElementsByClass(stream.Measure)[3]
         >>> m3
         <music21.stream.Measure 3 offset=9.0>
         >>> m3prev = m3.previous()
@@ -2139,7 +2139,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         We'll iterate backwards from the first note of the second measure of the Alto part.
 
-        >>> o = s.parts[1].getElementsByClass('Measure')[2][0]
+        >>> o = s.parts[1].getElementsByClass(stream.Measure)[2][0]
         >>> while o:
         ...    print(o)
         ...    o = o.previous()
@@ -4258,7 +4258,7 @@ class Test(unittest.TestCase):
         from music21 import clef
         from music21 import stream
         a = corpus.parse('bach/bwv324.xml')
-        measures = a.parts[0].getElementsByClass('Measure').stream()  # measures of first part
+        measures = a.parts[0].getElementsByClass(stream.Measure).stream()  # measures of first part
 
         # the activeSite of measures[1] is set to the new output stream
         self.assertEqual(measures[1].activeSite, measures)
@@ -4322,11 +4322,12 @@ class Test(unittest.TestCase):
         '''Test getting beat data from various Music21Objects.
         '''
         from music21 import corpus
+        from music21 import stream
         s = corpus.parse('bach/bwv66.6.xml')
         p1 = s.parts['Soprano']
 
         # this does not work; cannot get these values from Measures
-        #    self.assertEqual(p1.getElementsByClass('Measure')[3].beat, 3)
+        #    self.assertEqual(p1.getElementsByClass(stream.Measure)[3].beat, 3)
 
         # clef/ks can get its beat; these objects are in a pickup,
         # and this give their bar offset relative to the bar
@@ -4372,23 +4373,23 @@ class Test(unittest.TestCase):
         # _getMeasureOffset gets the offset within the activeSite
         # this shows that measure offsets are accommodating pickup
         post = []
-        for m in p1.getElementsByClass('Measure'):
+        for m in p1.getElementsByClass(stream.Measure):
             post.append(m._getMeasureOffset())
         self.assertEqual(post, [0.0, 1.0, 5.0, 9.0, 13.0, 17.0, 21.0, 25.0, 29.0, 33.0])
 
         # all other methods define None
         post = []
-        for n in p1.getElementsByClass('Measure'):
+        for n in p1.getElementsByClass(stream.Measure):
             post.append(n.beat)
         self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None])
 
         post = []
-        for n in p1.getElementsByClass('Measure'):
+        for n in p1.getElementsByClass(stream.Measure):
             post.append(n.beatStr)
         self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None])
 
         post = []
-        for n in p1.getElementsByClass('Measure'):
+        for n in p1.getElementsByClass(stream.Measure):
             post.append(n.beatDuration)
         self.assertEqual(post, [None, None, None, None, None, None, None, None, None, None])
 
@@ -4527,11 +4528,13 @@ class Test(unittest.TestCase):
 
     def testPickupMeasuresImported(self):
         from music21 import corpus
+        from music21 import stream
+
         self.maxDiff = None
         s = corpus.parse('bach/bwv103.6')
 
         p = s.parts['soprano']
-        m1 = p.getElementsByClass('Measure').first()
+        m1 = p.getElementsByClass(stream.Measure).first()
 
         self.assertEqual([n.offset for n in m1.notesAndRests], [0.0, 0.5])
         self.assertEqual(m1.paddingLeft, 3.0)
@@ -4920,6 +4923,8 @@ class Test(unittest.TestCase):
 
     def testNextC(self):
         from music21 import corpus
+        from music21 import stream
+
         s = corpus.parse('bwv66.6')
 
         # getting time signature and key sig
@@ -4931,7 +4936,7 @@ class Test(unittest.TestCase):
                          'f# minor')
 
         # iterating at the Measure level, showing usage of flattenLocalSites
-        measures = p1.getElementsByClass('Measure').stream()
+        measures = p1.getElementsByClass(stream.Measure).stream()
         m3 = measures[3]
         m3prev = m3.previous()
         self.assertEqual(m3prev, measures[2][-1])
@@ -5143,7 +5148,7 @@ class Test(unittest.TestCase):
 #     def testPreviousA(self):
 #         from music21 import corpus
 #         s = corpus.parse('bwv66.6')
-#         o = s.parts[0].getElementsByClass('Measure')[2][1]
+#         o = s.parts[0].getElementsByClass(stream.Measure)[2][1]
 #         i = 20
 #         while o and i:
 #             print(o)

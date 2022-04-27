@@ -44,7 +44,9 @@ _MOD = 'instrument'
 environLocal = environment.Environment(_MOD)
 
 
-def unbundleInstruments(streamIn: stream.Stream, *, inPlace=False) -> Optional[stream.Stream]:
+def unbundleInstruments(streamIn: 'music21.stream.Stream',
+                        *,
+                        inPlace=False) -> Optional['music21.stream.Stream']:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -81,7 +83,9 @@ def unbundleInstruments(streamIn: stream.Stream, *, inPlace=False) -> Optional[s
         return s
 
 
-def bundleInstruments(streamIn: stream.Stream, *, inPlace=False) -> Optional[stream.Stream]:
+def bundleInstruments(streamIn: 'music21.stream.Stream',
+                      *,
+                      inPlace=False) -> Optional['music21.stream.Stream']:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
@@ -1812,7 +1816,7 @@ def ensembleNameBySize(number):
         return ensembleNamesBySize[int(number)]
 
 
-def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
+def deduplicate(s: 'music21.stream.Stream', inPlace: bool = False) -> 'music21.stream.Stream':
     '''
     Check every offset in `s` for multiple instrument instances.
     If the `.partName` can be standardized across instances,
@@ -1867,7 +1871,7 @@ def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
         returnObj = s.coreCopyAsDerivation('instrument.deduplicate')
 
     if not returnObj.hasPartLikeStreams():
-        substreams: Iterable[stream.Stream] = [returnObj]
+        substreams: Iterable['music21.stream.Stream'] = [returnObj]
     else:
         substreams = returnObj.getElementsByClass('Stream')
 
@@ -2095,13 +2099,13 @@ def partitionByInstrument(streamObj):
     >>> p1 = converter.parse("tinynotation: 4/4 c4  d  e  f  g  a  b  c'  c1")
     >>> p2 = converter.parse("tinynotation: 4/4 C#4 D# E# F# G# A# B# c#  C#1")
 
-    >>> p1.getElementsByClass('Measure')[0].insert(0.0, instrument.Piccolo())
-    >>> p1.getElementsByClass('Measure')[0].insert(2.0, instrument.AltoSaxophone())
-    >>> p1.getElementsByClass('Measure')[1].insert(3.0, instrument.Piccolo())
+    >>> p1.getElementsByClass(stream.Measure)[0].insert(0.0, instrument.Piccolo())
+    >>> p1.getElementsByClass(stream.Measure)[0].insert(2.0, instrument.AltoSaxophone())
+    >>> p1.getElementsByClass(stream.Measure)[1].insert(3.0, instrument.Piccolo())
 
-    >>> p2.getElementsByClass('Measure')[0].insert(0.0, instrument.Trombone())
-    >>> p2.getElementsByClass('Measure')[0].insert(3.0, instrument.Piccolo())  # not likely...
-    >>> p2.getElementsByClass('Measure')[1].insert(1.0, instrument.Trombone())
+    >>> p2.getElementsByClass(stream.Measure)[0].insert(0.0, instrument.Trombone())
+    >>> p2.getElementsByClass(stream.Measure)[0].insert(3.0, instrument.Piccolo())  # not likely...
+    >>> p2.getElementsByClass(stream.Measure)[1].insert(1.0, instrument.Trombone())
 
     >>> s = stream.Score()
     >>> s.insert(0, p1)
@@ -2791,13 +2795,13 @@ class Test(unittest.TestCase):
     #     p1 = converter.parse("tinynotation: 4/4 c4  d  e  f  g  a  b  c'  c1")
     #     p2 = converter.parse("tinynotation: 4/4 C#4 D# E# F# G# A# B# c#  C#1")
     #
-    #     p1.getElementsByClass('Measure')[0].insert(0.0, instrument.Piccolo())
-    #     p1.getElementsByClass('Measure')[0].insert(2.0, instrument.AltoSaxophone())
-    #     p1.getElementsByClass('Measure')[1].insert(3.0, instrument.Piccolo())
+    #     p1.getElementsByClass(stream.Measure)[0].insert(0.0, instrument.Piccolo())
+    #     p1.getElementsByClass(stream.Measure)[0].insert(2.0, instrument.AltoSaxophone())
+    #     p1.getElementsByClass(stream.Measure)[1].insert(3.0, instrument.Piccolo())
     #
-    #     p2.getElementsByClass('Measure')[0].insert(0.0, instrument.Trombone())
-    #     p2.getElementsByClass('Measure')[0].insert(3.0, instrument.Piccolo())  # not likely...
-    #     p2.getElementsByClass('Measure')[1].insert(1.0, instrument.Trombone())
+    #     p2.getElementsByClass(stream.Measure)[0].insert(0.0, instrument.Trombone())
+    #     p2.getElementsByClass(stream.Measure)[0].insert(3.0, instrument.Piccolo())  # not likely.
+    #     p2.getElementsByClass(stream.Measure)[1].insert(1.0, instrument.Trombone())
     #
     #     s = stream.Score()
     #     s.insert(0, p1)

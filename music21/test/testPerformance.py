@@ -193,13 +193,15 @@ class Test(unittest.TestCase):
     def runGetElementsByContext(self):
         '''Test getting elements by context from a Stream
         '''
+        from music21 import stream
+
         s = corpus.parse('bwv66.6')
         # create a few secondary streams to add more sites
         unused_flat = s.flatten()
         unused_notes = s.flatten().notes
 
         for p in s.parts:
-            for m in p.getElementsByClass('Measure'):
+            for m in p.getElementsByClass(stream.Measure):
                 if m.number == 0:
                     continue
                 post = m.getContextByClass('Clef')
@@ -220,13 +222,15 @@ class Test(unittest.TestCase):
     def runGetElementsByPrevious(self):
         '''Test getting elements by using the previous method
         '''
+        from music21 import stream
+
         s = corpus.parse('bwv66.6')
         # create a few secondary streams to add more sites
         unused_flat = s.flatten()
         unused_notes = s.flatten().notes
 
         for p in s.parts:
-            for m in p.getElementsByClass('Measure'):
+            for m in p.getElementsByClass(stream.Measure):
                 if m.number == 0:
                     continue
                 post = m.previous('Clef')

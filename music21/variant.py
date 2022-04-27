@@ -155,7 +155,7 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     classesX = streamX.classes
     if 'Score' in classesX:
         return mergeVariantScores(streamX, streamY, variantName, inPlace=inPlace)
-    elif streamX.getElementsByClass('Measure'):
+    elif streamX.getElementsByClass(stream.Measure):
         return mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace=inPlace)
     elif (streamX.iter().notesAndRests
             and streamX.duration.quarterLength == streamY.duration.quarterLength):
@@ -400,7 +400,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
             yRegionStartMeasure, yRegionEndMeasure) in regions:
         # Note that the 'end' measure indices are 1 greater
         # than the 0-indexed number of the measure.
-        if xRegionStartMeasure >= len(returnObj.getElementsByClass('Measure')):
+        if xRegionStartMeasure >= len(returnObj.getElementsByClass(stream.Measure)):
             startOffset = returnObj.duration.quarterLength
             # This deals with insertion at the end case where
             # returnObj.measure(xRegionStartMeasure + 1) does not exist.
@@ -587,7 +587,7 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
 
 
     >>> for p in mergedStreams.getElementsByClass('Part'):
-    ...    for m in p.getElementsByClass('Measure'):
+    ...    for m in p.getElementsByClass(stream.Measure):
     ...        m.activateVariants('paris', inPlace=True)
     >>> mergedStreams.show('t')
     {0.0} <music21.stream.Part ...>
@@ -667,21 +667,21 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
             for i, returnObjPart in enumerate(returnObjParts):
                 sPart = sParts[i]
 
-                returnObjMeasures = returnObjPart.getElementsByClass('Measure')
+                returnObjMeasures = returnObjPart.getElementsByClass(stream.Measure)
                 if returnObjMeasures:
                     # If measures exist and parts exist, iterate through them both.
                     for j, returnObjMeasure in enumerate(returnObjMeasures):
-                        sMeasure = sPart.getElementsByClass('Measure')[j]
+                        sMeasure = sPart.getElementsByClass(stream.Measure)[j]
                         _mergeVariants(
                             returnObjMeasure, sMeasure, variantName=variantName, inPlace=True)
 
                 else:  # If parts exist but no measures.
                     _mergeVariants(returnObjPart, sPart, variantName=variantName, inPlace=True)
         else:
-            returnObjMeasures = returnObj.getElementsByClass('Measure')
+            returnObjMeasures = returnObj.getElementsByClass(stream.Measure)
             if returnObjMeasures:  # If no parts, but still measures, iterate through them.
                 for j, returnObjMeasure in enumerate(returnObjMeasures):
-                    sMeasure = s.getElementsByClass('Measure')[j]
+                    sMeasure = s.getElementsByClass(stream.Measure)[j]
                     _mergeVariants(returnObjMeasure, sMeasure,
                                    variantName=variantName, inPlace=True)
             else:  # If no parts and no measures.
@@ -801,7 +801,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
         returnObj = mainPart.coreCopyAsDerivation('mergePartAsOssia')
 
     if compareByMeasureNumber is True:
-        for ossiaMeasure in ossiaPart.getElementsByClass('Measure'):
+        for ossiaMeasure in ossiaPart.getElementsByClass(stream.Measure):
             if ossiaMeasure.notes:  # If the measure is not just rests
                 ossiaNumber = ossiaMeasure.number
                 returnMeasure = returnObj.measure(ossiaNumber)
@@ -821,7 +821,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
                                replacementDuration=None
                                )
     else:
-        for ossiaMeasure in ossiaPart.getElementsByClass('Measure'):
+        for ossiaMeasure in ossiaPart.getElementsByClass(stream.Measure):
             if ossiaMeasure.notes:  # If the measure is not just rests
                 ossiaOffset = ossiaMeasure.getOffsetBySite(ossiaPart)
                 if recurseInMeasures is True:
@@ -943,7 +943,7 @@ def addVariant(
         if isinstance(sVariant, stream.Measure):  # sVariant is a measure put it in a variant and insert.
             tempVariant.append(sVariant)
         else:  # sVariant is not a measure
-            sVariantMeasures = sVariant.getElementsByClass('Measure')
+            sVariantMeasures = sVariant.getElementsByClass(stream.Measure)
             if not sVariantMeasures:  # If there are no measures, work element-wise
                 for e in sVariant:
                     offset = e.getOffsetBySite(sVariant) + startOffset
@@ -1139,12 +1139,12 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
 
     # associating measures in variantRegion to those in returnRegion ->
     #    This is done via 0 indexed lists corresponding to measures
-    returnObjectMeasureList = list(range(len(returnObject.getElementsByClass('Measure'))))
+    returnObjectMeasureList = list(range(len(returnObject.getElementsByClass(stream.Measure))))
     badnessDict = {}
     listDict = {}
     variantObjectMeasureList, unused_badness = _getBestListAndScore(
-        returnObject.getElementsByClass('Measure'),
-        variantObject.getElementsByClass('Measure'),
+        returnObject.getElementsByClass(stream.Measure),
+        variantObject.getElementsByClass(stream.Measure),
         badnessDict,
         listDict
     )
@@ -1217,7 +1217,7 @@ def getMeasureHashes(s):
             hashes.append(search.translateStreamToString(m.notesAndRests))
         return hashes
     else:
-        for m in s.getElementsByClass('Measure'):
+        for m in s.getElementsByClass(stream.Measure):
             hashes.append(search.translateStreamToString(m.notesAndRests))
         return hashes
 
@@ -1489,9 +1489,9 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
     '''
     # TODO: Add the feature for merging a stream to a stream with existing variants
     # (it has to compare against both the stream and the contained variant)
-    if (streamA.getElementsByClass('Measure')
+    if (streamA.getElementsByClass(stream.Measure)
             or streamA.getElementsByClass('Part')
-            or streamB.getElementsByClass('Measure')
+            or streamB.getElementsByClass(stream.Measure)
             or streamB.getElementsByClass('Part')):
         raise VariantException(
             '_mergeVariants cannot merge streams which contain measures or parts.'

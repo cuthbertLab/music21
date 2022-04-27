@@ -234,7 +234,7 @@ class PartStaffExporterMixin:
                 continue
             if not all(stream.PartStaff in p.classSet for p in sg):
                 continue
-            if not all(p.getElementsByClass('Measure') for p in sg):
+            if not all(p.getElementsByClass(stream.Measure) for p in sg):
                 continue
             try:
                 for p in sg:

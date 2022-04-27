@@ -1803,8 +1803,8 @@ class PartParser(XMLParserBase):
                     elementsIdsNotToGoInThisStaff.add(id(el))
 
             for sourceMeasure, copyMeasure in zip(
-                self.stream.getElementsByClass('Measure'),
-                newPartStaff.getElementsByClass('Measure')
+                self.stream.getElementsByClass(stream.Measure),
+                newPartStaff.getElementsByClass(stream.Measure)
             ):
                 copy_into_partStaff(sourceMeasure, copyMeasure, elementsIdsNotToGoInThisStaff)
                 for sourceVoice, copyVoice in zip(sourceMeasure.voices, copyMeasure.voices):

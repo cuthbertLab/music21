@@ -892,7 +892,7 @@ class Test(unittest.TestCase):
         nwt = NoteworthyTranslator()
         s = nwt.parseString(info)
         # s.show('text')
-        n1 = s.parts[1].getElementsByClass('Measure').first().notes.first()
+        n1 = s.parts[1].getElementsByClass(stream.Measure).first().notes.first()
         self.assertEqual(n1.pitch.accidental.alter, -1.0)
 
 

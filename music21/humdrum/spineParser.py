@@ -1230,7 +1230,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
             streamOut.append(currentMeasure)
 
         # move beginning stuff (Clefs, KeySig, etc.) to first measure...
-        measureElements = streamOut.getElementsByClass('Measure')
+        measureElements = streamOut.getElementsByClass(stream.Measure)
         if measureElements:
             m1 = measureElements[0]
             if not hasMeasureOne:  # pickup measure is not measure1
@@ -1896,7 +1896,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 thisSpine.stream = thisSpine.moveElementsIntoMeasures(thisSpine.stream)
 
                 # fix tuplet groups
-                for m in thisSpine.stream.getElementsByClass('Measure'):
+                for m in thisSpine.stream.getElementsByClass(stream.Measure):
                     tf.setStream(m)
                     tupletGroups = tf.findTupletGroups(incorporateGroupings=True)
                     for tg in tupletGroups:
@@ -1993,7 +1993,7 @@ class SpineCollection(prebase.ProtoM21Object):
             if thisSpine.spineType != 'kern' or thisSpine.parentSpine is not None:
                 continue
             thisStream = thisSpine.stream
-            for el in thisStream.getElementsByClass('Measure'):
+            for el in thisStream.getElementsByClass(stream.Measure):
                 hasVoices = False
                 lowestVoiceOffset = 0
                 for mEl in el:

@@ -1851,7 +1851,7 @@ class TimeSignature(base.Music21Object):
         is in a `Measure`'s :attr:`~music21.stream.Measure.paddingLeft` property.
 
         >>> c = corpus.parse('bwv1.6')
-        >>> for m in c.parts.first().getElementsByClass('Measure'):
+        >>> for m in c.parts.first().getElementsByClass(stream.Measure):
         ...     ts = m.timeSignature or m.getContextByClass('TimeSignature')
         ...     print('%s %s' % (m.number, ts.getOffsetFromBeat(4.5) - m.paddingLeft))
         0 0.5

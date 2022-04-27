@@ -190,7 +190,7 @@ def _copySingleMeasure(t, p, kCurrent):
             'a single measure cannot define a copy operation for multiple measures')
     # TODO: ignoring repeat letters
     target = targetNumber[0]
-    for mPast in p.getElementsByClass('Measure'):
+    for mPast in p.getElementsByClass(stream.Measure):
         if mPast.number == target:
             try:
                 m = copy.deepcopy(mPast)
@@ -250,7 +250,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
             'the source section cannot overlap with the destination section')
 
     measures = []
-    for mPast in p.getElementsByClass('Measure'):
+    for mPast in p.getElementsByClass(stream.Measure):
         if mPast.number in range(targetStart, targetEnd + 1):
             try:
                 m = copy.deepcopy(mPast)
@@ -1176,7 +1176,7 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
         from music21.romanText import testFiles
 
         s = romanTextToStreamScore(testFiles.swv23)
-        mStream = s.parts[0].getElementsByClass('Measure')
+        mStream = s.parts[0].getElementsByClass(stream.Measure)
         # the first four measures should all have the same content
         rn1 = mStream[1].getElementsByClass('RomanNumeral').first()
         self.assertEqual([str(x) for x in rn1.pitches], ['D5', 'F#5', 'A5'])
@@ -1197,7 +1197,7 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
 
         # test multiple measure copying
         s = romanTextToStreamScore(testFiles.monteverdi_3_13)
-        mStream = s.parts[0].getElementsByClass('Measure')
+        mStream = s.parts[0].getElementsByClass(stream.Measure)
 
         m1a = None
         m2a = None
@@ -1441,14 +1441,14 @@ m3 NC b3 G: V
 '''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        m1 = p.getElementsByClass('Measure').first()
+        m1 = p.getElementsByClass(stream.Measure).first()
         r1 = m1.notesAndRests[-1]
         self.assertIn('Rest', r1.classes)
         self.assertEqual(r1.quarterLength, 1.0)
         noChordObj = m1.getElementsByClass('Harmony').last()
         self.assertIsInstance(noChordObj, NoChord)
 
-        m2 = p.getElementsByClass('Measure')[1]
+        m2 = p.getElementsByClass(stream.Measure)[1]
         r2 = m2.notesAndRests[0]
         self.assertIn('Rest', r2.classes)
         self.assertEqual(r1.quarterLength, 1.0)
@@ -1511,7 +1511,7 @@ m1 C: I'''
         src = '''m1 G: I b3 v d: i b4 V'''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        m1 = p.getElementsByClass('Measure').first()
+        m1 = p.getElementsByClass(stream.Measure).first()
         allRNs = m1.getElementsByClass('RomanNumeral')
         notPChord = allRNs[0]
         pChord = allRNs[1]
@@ -1536,24 +1536,24 @@ m1 C: I'''
         '''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        m3 = p.getElementsByClass('Measure')[2]
+        m3 = p.getElementsByClass(stream.Measure)[2]
         self.assertEqual(m3.getOffsetBySite(p), 8.0)
-        m10 = p.getElementsByClass('Measure')[9]
+        m10 = p.getElementsByClass(stream.Measure)[9]
         self.assertEqual(m10.getOffsetBySite(p), 36.0)
-        m11 = p.getElementsByClass('Measure')[10]
+        m11 = p.getElementsByClass(stream.Measure)[10]
         self.assertEqual(m11.getOffsetBySite(p), 38.0)
-        m12 = p.getElementsByClass('Measure')[11]
+        m12 = p.getElementsByClass(stream.Measure)[11]
         self.assertEqual(m12.getOffsetBySite(p), 40.0)
-        m13 = p.getElementsByClass('Measure')[12]
+        m13 = p.getElementsByClass(stream.Measure)[12]
         self.assertEqual(m13.getOffsetBySite(p), 44.0)
 
-        m16 = p.getElementsByClass('Measure')[15]
+        m16 = p.getElementsByClass(stream.Measure)[15]
         self.assertEqual(m16.getOffsetBySite(p), 56.0)
-        m23 = p.getElementsByClass('Measure')[22]
+        m23 = p.getElementsByClass(stream.Measure)[22]
         self.assertEqual(m23.getOffsetBySite(p), 84.0)
-        m24 = p.getElementsByClass('Measure')[23]
+        m24 = p.getElementsByClass(stream.Measure)[23]
         self.assertEqual(m24.getOffsetBySite(p), 86.0)
-        m25 = p.getElementsByClass('Measure')[24]
+        m25 = p.getElementsByClass(stream.Measure)[24]
         self.assertEqual(m25.getOffsetBySite(p), 88.0)
 
     def testEndings(self):

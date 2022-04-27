@@ -1757,7 +1757,7 @@ class Test(unittest.TestCase):
         s = parse(mxString)
 
         part = s.parts[0]
-        measures = part.getElementsByClass('Measure')
+        measures = part.getElementsByClass(stream.Measure)
         self.assertEqual(measures[0].leftBarline, None)
         self.assertEqual(measures[0].rightBarline.type, 'final')
 
@@ -1769,7 +1769,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(s[bar.Barline]), 4)
         part = s.parts[0]
-        measures = part.getElementsByClass('Measure')
+        measures = part.getElementsByClass(stream.Measure)
 
         # s.show()
 

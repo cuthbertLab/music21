@@ -130,8 +130,8 @@ class Test(unittest.TestCase):
         temp = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(temp)
         self.assertEqual(len(sPost.parts), 2)
-        self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
-        self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
+        self.assertEqual(len(sPost.parts[0].getElementsByClass(stream.Measure)), 3)
+        self.assertEqual(len(sPost.parts[1].getElementsByClass(stream.Measure)), 3)
         self.assertEqual(len(sPost.recurse().notes), 24)
 
     def testBasicI(self):
@@ -153,8 +153,8 @@ class Test(unittest.TestCase):
         temp = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(temp)
         self.assertEqual(len(sPost.parts), 2)
-        self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
-        self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
+        self.assertEqual(len(sPost.parts[0].getElementsByClass(stream.Measure)), 3)
+        self.assertEqual(len(sPost.parts[1].getElementsByClass(stream.Measure)), 3)
         self.assertEqual(len(sPost.recurse().notes), 24)
 
     def testSpannerSerializationOfNotesNotInPickle(self):

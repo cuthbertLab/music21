@@ -236,7 +236,7 @@ class RnWriter(prebase.ProtoM21Object):
         'm0 G: V'
         '''
 
-        for thisMeasure in self.container.getElementsByClass('Measure'):
+        for thisMeasure in self.container.getElementsByClass(stream.Measure):
             # TimeSignatures  # TODO KeySignatures
             tsThisMeasure = thisMeasure.getElementsByClass('TimeSignature')
             if tsThisMeasure:

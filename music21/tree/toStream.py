@@ -83,7 +83,7 @@ def chordified(timespans, templateStream=None):  # pragma: no cover
         allTimePoints = timespans.allTimePoints() + tuple(templateOffsets)
         allTimePoints = sorted(set(allTimePoints))
 
-        measureList = list(outputStream.getElementsByClass('Measure'))
+        measureList = list(outputStream.getElementsByClass(stream.Measure))
 
         for offset, endTime in zip(allTimePoints, allTimePoints[1:]):
             while templateOffsets[1] <= offset:

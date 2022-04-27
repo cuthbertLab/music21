@@ -76,19 +76,19 @@ class WindowedAnalysis:
         >>> wa = analysis.windowed.WindowedAnalysis(s.parts[0], p)
 
         >>> post = wa.getMinimumWindowStream()
-        >>> len(post.getElementsByClass('Measure'))
+        >>> len(post.getElementsByClass(stream.Measure))
         42
-        >>> post.getElementsByClass('Measure').first()
+        >>> post.getElementsByClass(stream.Measure).first()
         <music21.stream.Measure 1 offset=0.0>
 
         Time signature set to 1/4 time signature
 
-        >>> post.getElementsByClass('Measure').first().timeSignature
+        >>> post.getElementsByClass(stream.Measure).first().timeSignature
         <music21.meter.TimeSignature 1/4>
 
         leaves one note in this measure
 
-        >>> len(post.getElementsByClass('Measure')[1].notes)
+        >>> len(post.getElementsByClass(stream.Measure)[1].notes)
         1
 
         Placing a score with parts into analysis will automatically flatten

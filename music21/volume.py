@@ -678,6 +678,8 @@ class Test(unittest.TestCase):
 
     def testRealizeVolumeB(self):
         from music21 import corpus
+        from music21 import stream
+
         s = corpus.parse('bwv66.6')
 
         durUnit = s.highestTime // 8  # let floor
@@ -689,7 +691,7 @@ class Test(unittest.TestCase):
                 # placing dynamics in Measure requires extra handling
                 m = p.getElementsByOffset(oTarget,
                                           mustBeginInSpan=False,
-                                          ).getElementsByClass('Measure').first()
+                                          ).getElementsByClass(stream.Measure).first()
                 oInsert = oTarget - m.getOffsetBySite(p)
                 m.insert(oInsert, dynamics.Dynamic(d))
             # shift 2 places each time

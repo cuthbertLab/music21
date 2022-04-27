@@ -552,7 +552,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     >>> lt = corpus.parse('demos/layoutTest.xml')
     >>> len(lt.parts)
     3
-    >>> len(lt.parts[0].getElementsByClass('Measure'))
+    >>> len(lt.parts[0].getElementsByClass(stream.Measure))
     80
 
 
@@ -603,7 +603,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     Each System has staves (layout.Staff objects) not parts, though Staff is a subclass of Part
 
     >>> secondStaff = firstSystem.staves[1]
-    >>> print(len(secondStaff.getElementsByClass('Measure')))
+    >>> print(len(secondStaff.getElementsByClass(stream.Measure)))
     5
     >>> secondStaff
     <music21.layout.Staff ...>
@@ -660,7 +660,8 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
         for el in thisPageAll:
             if not isinstance(el.classes and 'StaffGroup' not in el, stream.Part):
                 thisPage.insert(thisPageAll.elementOffset(el), el)
-        firstMeasureOfFirstPart = thisPageAll.parts.first().getElementsByClass('Measure').first()
+        firstMeasureOfFirstPart = thisPageAll.parts.first().getElementsByClass(
+            stream.Measure).first()
         for el in firstMeasureOfFirstPart:
             if 'PageLayout' in el.classes:
                 thisPage.pageLayout = el
@@ -748,7 +749,7 @@ def getRegionMeasureNumbers(scoreIn, region='Page'):
 
     firstPart = scoreIn.parts.first()
     # first measure could be 1 or 0 (or something else)
-    allMeasures = firstPart.getElementsByClass('Measure')
+    allMeasures = firstPart.getElementsByClass(stream.Measure)
     firstMeasureNumber = allMeasures.first().number
     lastMeasureNumber = allMeasures.last().number
     measureStartList = [firstMeasureNumber]
@@ -861,7 +862,7 @@ class LayoutScore(stream.Opus):
 
 
         >>> #_DOCS_SHOW g = corpus.parse('luca/gloria')
-        >>> #_DOCS_SHOW m22 = g.parts[0].getElementsByClass('Measure')[22]
+        >>> #_DOCS_SHOW m22 = g.parts[0].getElementsByClass(stream.Measure)[22]
         >>> #_DOCS_SHOW m22.getElementsByClass('PageLayout').first().leftMargin = 204.0
         >>> #_DOCS_SHOW gl = layout.divideByPages(g)
         >>> #_DOCS_SHOW gl.getMarginsAndSizeForPageId(1)
@@ -1189,7 +1190,7 @@ class LayoutScore(stream.Opus):
 
         # override global information with staff specific pageLayout
         thisStaff = self.pages[pageId].systems[systemId].staves[staffId]
-        firstMeasureOfStaff = thisStaff.getElementsByClass('Measure').first()
+        firstMeasureOfStaff = thisStaff.getElementsByClass(stream.Measure).first()
         if firstMeasureOfStaff is None:
             firstMeasureOfStaff = stream.Stream()
             environLocal.warn(
@@ -1238,7 +1239,7 @@ class LayoutScore(stream.Opus):
             return staffSizeCache[cacheKey]
 
         thisStaff = self.pages[pageId].systems[systemId].staves[staffId]
-        firstMeasureOfStaff = thisStaff.getElementsByClass('Measure').first()
+        firstMeasureOfStaff = thisStaff.getElementsByClass(stream.Measure).first()
         if firstMeasureOfStaff is None:
             firstMeasureOfStaff = stream.Stream()
             environLocal.warn(
@@ -1470,7 +1471,7 @@ class LayoutScore(stream.Opus):
         startOffset = 0.0
         width = None
         thisSystemStaves = thisSystem.staves
-        measureStream = thisSystemStaves[0].getElementsByClass('Measure')
+        measureStream = thisSystemStaves[0].getElementsByClass(stream.Measure)
         for i, m in enumerate(measureStream):
             currentWidth = m.layoutWidth
             if currentWidth is None:
@@ -1478,7 +1479,7 @@ class LayoutScore(stream.Opus):
                 for j in range(1, len(thisSystemStaves)):
                     searchOtherStaffForWidth = thisSystemStaves[j]
                     searchIter = searchOtherStaffForWidth.iter()
-                    searchOtherStaffMeasure = searchIter.getElementsByClass('Measure')[i]
+                    searchOtherStaffMeasure = searchIter.getElementsByClass(stream.Measure)[i]
                     if searchOtherStaffMeasure.layoutWidth is not None:
                         currentWidth = searchOtherStaffMeasure.layoutWidth
                         break
@@ -1642,32 +1643,32 @@ class Test(unittest.TestCase):
         # as this causes all subsequent margins to be distorted
         sl.leftMargin = 300
         sl.rightMargin = 300
-        s.getElementsByClass('Measure')[0].insert(0, sl)
+        s.getElementsByClass(stream.Measure)[0].insert(0, sl)
 
         sl = SystemLayout()
         sl.isNew = True
         sl.leftMargin = 200
         sl.rightMargin = 200
         sl.distance = 40
-        s.getElementsByClass('Measure')[2].insert(0, sl)
+        s.getElementsByClass(stream.Measure)[2].insert(0, sl)
 
         sl = SystemLayout()
         sl.isNew = True
         sl.leftMargin = 220
-        s.getElementsByClass('Measure')[4].insert(0, sl)
+        s.getElementsByClass(stream.Measure)[4].insert(0, sl)
 
         sl = SystemLayout()
         sl.isNew = True
         sl.leftMargin = 60
         sl.rightMargin = 300
         sl.distance = 200
-        s.getElementsByClass('Measure')[6].insert(0, sl)
+        s.getElementsByClass(stream.Measure)[6].insert(0, sl)
 
         sl = SystemLayout()
         sl.isNew = True
         sl.leftMargin = 0
         sl.rightMargin = 0
-        s.getElementsByClass('Measure')[8].insert(0, sl)
+        s.getElementsByClass(stream.Measure)[8].insert(0, sl)
 
         # systemLayoutList = s[music21.layout.SystemLayout]
         # self.assertEqual(len(systemLayoutList), 4)
