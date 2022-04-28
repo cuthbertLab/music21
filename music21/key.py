@@ -1082,7 +1082,7 @@ class Key(KeySignature, scale.DiatonicScale):
         To use the harmonic form, change `.abstract` on the key to
         another abstract scale:
 
-        >>> minorKey.abstract = scale.AbstractHarmonicMinorScale()
+        >>> minorKey.abstract = key.Key(mode='harmonic minor').abstract
         >>> minorKey.deriveByDegree(7, 'E')
         <music21.key.Key of f minor>
         >>> minorKey.deriveByDegree(6, 'G')
