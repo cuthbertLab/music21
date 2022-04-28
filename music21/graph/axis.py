@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2009-2012, 2017 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 #               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
@@ -771,8 +771,13 @@ class OffsetAxis(PositionAxis):
             If True then only the first and last values will be used to
             create ticks for measures.  Default False.
             ''',
-        'minValue': 'The lowest starting position (as an offset).  Will be set automatically',
-        'maxValue': 'The highest ending position (as an offset).  Will be set automatically',
+        'minValue': 'The lowest starting position (as an offset).  Will be set automatically.',
+        'maxValue': 'The highest ending position (as an offset).  Will be set automatically.',
+        'mostMeasureTicksToShow': '''
+            When plotting measures, will limit the number of ticks given to at most
+            this number.  Note that since all double/final/heavy bars are show, this number
+            may be exceeded if there are more that this number of double bars.  Default: 20.
+            ''',
 
     }
     labelDefault = 'Offset'
@@ -1252,7 +1257,7 @@ class OffsetEndAxis(OffsetAxis):
     _DOC_ATTR = {
         'noteSpacing': '''
             amount in QL to leave blank between untied notes.
-            (default = graceNoteQL)
+            (default = self.graceNoteQL)
             '''
     }
     quantities = ('offsetEnd', 'timespans', 'timespan')

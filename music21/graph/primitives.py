@@ -7,7 +7,8 @@
 #               Michael Scott Asato Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert,
+#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1182,17 +1183,17 @@ class GraphHorizontalBarWeighted(Graph):
         self.setAxisRange('x', (xMin, xMax), paddingFraction=0.01)
         self.setTicks('y', yTicks)
 
-        # first, see if ticks have been set externally
-#         if 'ticks' in self.axis['x'] and len(self.axis['x']['ticks']) == 0:
-#             rangeStep = int(xMin round(xRange/10))
-#             if rangeStep == 0:
-#                 rangeStep = 1
-#             for x in range(int(math.floor(xMin)),
-#                            round(math.ceil(xMax)),
-#                            rangeStep):
-#                 xTicks.append([x, '%s' % x])
-#                 self.setTicks('x', xTicks)
-#         environLocal.printDebug(['xTicks', xTicks])
+        # # first, see if ticks have been set externally
+        # if 'ticks' in self.axis['x'] and len(self.axis['x']['ticks']) == 0:
+        #     rangeStep = int(xMin round(xRange/10))
+        #     if rangeStep == 0:
+        #         rangeStep = 1
+        #     for x in range(int(math.floor(xMin)),
+        #                    round(math.ceil(xMax)),
+        #                    rangeStep):
+        #         xTicks.append([x, '%s' % x])
+        #         self.setTicks('x', xTicks)
+        # environLocal.printDebug(['xTicks', xTicks])
 
 
 class GraphScatterWeighted(Graph):
@@ -1652,7 +1653,8 @@ class Graph3DBars(Graph):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import copy
         import sys
