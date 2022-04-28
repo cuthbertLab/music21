@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/findPlot.py
-# Purpose:      Methods for finding appropriate plots for plotStream.
+# Purpose:      Functions that find appropriate plots for graph.plot
 #
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Methods for finding appropriate plots for plotStream.
+Functions that find appropriate plots for graph.plot.
 '''
 import collections
 import types

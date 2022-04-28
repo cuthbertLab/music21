@@ -225,8 +225,7 @@ class Graph(prebase.ProtoM21Object):
         Utility function that cycles through the colors of self.colors...
 
         >>> g = graph.primitives.Graph()
-        >>> g.colors
-        ['#605c7f', '#5c7f60', '#715c7f']
+        >>> g.colors = ['#605c7f', '#5c7f60', '#715c7f']
 
         >>> g.nextColor()
         '#605c7f'
@@ -1006,7 +1005,7 @@ class GraphHorizontalBar(Graph):
 
             if points:
                 uniformFormatPerRow = (len(points[0]) == 2)
-                rowFaceColor: Union[str, List[str]]
+                rowFaceColors: Union[str, List[str]]
                 if uniformFormatPerRow:
                     rowFaceColors = faceColor
                     positionPoints = points
@@ -1022,11 +1021,10 @@ class GraphHorizontalBar(Graph):
                                     facecolors=rowFaceColors,
                                     alpha=self.alpha)
                 for p in points:
-                    if len(p) == 2:
-                        xStart, xLen = p
-                        _unused_pointFormatDict = {}
+                    if len(p) >= 2:
+                        xStart, xLen = p[:2]
                     else:
-                        xStart, xLen, _unused_pointFormatDict = p
+                        raise ValueError(f'Points must be length 2 or 3, not {len(p)}: {p}')
 
                     xEnd = xStart + xLen
                     for x in [xStart, xEnd]:

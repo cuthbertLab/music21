@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/utilities.py
-# Purpose:      Methods for finding external modules, manipulating colors, etc.
+# Purpose:      Functions for finding external modules, manipulating colors, etc.
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Methods for finding external modules, converting colors to Matplotlib colors, etc.
+Functions for finding external modules, converting colors to Matplotlib colors, etc.
 '''
 import unittest
 from collections import namedtuple
@@ -180,7 +180,7 @@ def getColor(color):
             if len(color) == 1:
                 color = [color[0], color[0], color[0]]
             # convert to 0 100% values as strings with % symbol
-            colorStrList = cast(Tuple[str, str, str], tuple([str(x * 100) + '%' for x in color]))
+            colorStrList = cast(Tuple[str, str, str], tuple(str(x * 100) + '%' for x in color))
             return webcolors.rgb_percent_to_hex(colorStrList)
         else:  # assume integers
             return webcolors.rgb_to_hex(tuple(color))

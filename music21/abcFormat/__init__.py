@@ -2627,7 +2627,7 @@ class ABCHandler:
         return ah
 
     # --------------------------------------------------------------------------
-    # utility methods for post processing
+    # utility methods for post-processing
 
     def definesReferenceNumbers(self):
         '''

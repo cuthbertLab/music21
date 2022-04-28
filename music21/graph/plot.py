@@ -1035,7 +1035,7 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
         {<music21.stream.Part Soprano>: '#605c7f',
          <music21.stream.Part Alto>: '#5c7f60',
          <music21.stream.Part Tenor>: '#988969',
-         <music21.stream.Part Bass>: '#5c717f'}
+         <music21.stream.Part Bass>: '#628297'}
         '''
         s = self.streamObj
         numColors = len(self.colors)
@@ -1915,18 +1915,18 @@ class Test(unittest.TestCase):
         b = HorizontalBarPitchClassOffset(s, doneAction=None)
         b.run()
 
-        match = [['C', [(0.0, 0.9375), (1.5, 1.4375)], {}],
+        match = [['C', [(0.0, 0.9375, {}), (1.5, 1.4375, {})], {}],
                  ['', [], {}],
-                 ['D', [(1.5, 1.4375)], {}],
+                 ['D', [(1.5, 1.4375, {})], {}],
                  ['', [], {}],
-                 ['E', [(1.0, 0.4375), (1.5, 1.4375)], {}],
-                 ['F', [(1.0, 0.4375)], {}],
+                 ['E', [(1.0, 0.4375, {}), (1.5, 1.4375, {})], {}],
+                 ['F', [(1.0, 0.4375, {})], {}],
                  ['', [], {}],
-                 ['G', [(1.0, 0.4375)], {}],
+                 ['G', [(1.0, 0.4375, {})], {}],
                  ['', [], {}],
-                 ['A', [(1.0, 0.4375)], {}],
+                 ['A', [(1.0, 0.4375, {})], {}],
                  ['', [], {}],
-                 ['B', [(1.5, 1.4375)], {}]]
+                 ['B', [(1.5, 1.4375, {})], {}]]
         self.assertEqual(b.data, match)
         # b.write()
 
@@ -1938,23 +1938,23 @@ class Test(unittest.TestCase):
 
         b = HorizontalBarPitchSpaceOffset(s, doneAction=None)
         b.run()
-        match = [['C3', [(0.0, 0.9375)], {}],
+        match = [['C3', [(0.0, 0.9375, {})], {}],
                  ['', [], {}],
                  ['', [], {}],
                  ['', [], {}],
-                 ['E', [(1.0, 0.4375)], {}],
-                 ['F', [(1.0, 0.4375)], {}],
+                 ['E', [(1.0, 0.4375, {})], {}],
+                 ['F', [(1.0, 0.4375, {})], {}],
                  ['', [], {}],
-                 ['G', [(1.0, 0.4375)], {}],
+                 ['G', [(1.0, 0.4375, {})], {}],
                  ['', [], {}],
-                 ['A', [(1.0, 0.4375)], {}],
+                 ['A', [(1.0, 0.4375, {})], {}],
                  ['', [], {}],
-                 ['B', [(1.5, 1.4375)], {}],
-                 ['C4', [(1.5, 1.4375)], {}],
+                 ['B', [(1.5, 1.4375, {})], {}],
+                 ['C4', [(1.5, 1.4375, {})], {}],
                  ['', [], {}],
-                 ['D', [(1.5, 1.4375)], {}],
+                 ['D', [(1.5, 1.4375, {})], {}],
                  ['', [], {}],
-                 ['E', [(1.5, 1.4375)], {}]]
+                 ['E', [(1.5, 1.4375, {})], {}]]
 
         self.assertEqual(b.data, match)
         # b.write()
@@ -2091,4 +2091,4 @@ _DOC_ORDER = [
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , TestExternalManual)  # , runTest='test3DPitchSpaceQuarterLengthCount')
+    music21.mainTest(Test)  # , TestExternalManual)
