@@ -71,7 +71,7 @@ class ProtoM21Object:
     objects that only inherit from ProtoM21Object unless you like wasting 200ns.
     '''
 
-    # define order to present names in documentation; use strings
+    # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = [
         'classes',
         'classSet',

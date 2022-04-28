@@ -969,25 +969,25 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
     def getElementsByClass(self,
                            classFilterList: Iterable[str],
                            *,
-                           returnClone: bool = True) -> StreamIterator[base.Music21Object]:
+                           returnClone: bool = True) -> StreamIterator[M21ObjType]:
         ...
 
     @overload
-    def getElementsByClass(self: _SIter[Any],
+    def getElementsByClass(self,
                            classFilterList: Type[ChangedM21ObjType],
                            *,
                            returnClone: bool = True) -> StreamIterator[ChangedM21ObjType]:
         ...
 
     @overload
-    def getElementsByClass(self: _SIter,
+    def getElementsByClass(self,
                            classFilterList: Iterable[Type[ChangedM21ObjType]],
                            *,
-                           returnClone: bool = True) -> StreamIterator[base.Music21Object]:
+                           returnClone: bool = True) -> StreamIterator[M21ObjType]:
         ...
 
 
-    def getElementsByClass(self: _SIter,
+    def getElementsByClass(self,
                            classFilterList: Union[
                                str,
                                Type[ChangedM21ObjType],
@@ -996,7 +996,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
                            ],
                            *,
                            returnClone: bool = True
-                           ) -> Union[_SIter, StreamIterator[ChangedM21ObjType]]:
+                           ) -> Union[StreamIterator[M21ObjType], StreamIterator[ChangedM21ObjType]]:
         '''
         Add a filter to the Iterator to remove all elements
         except those that match one
@@ -1523,12 +1523,14 @@ class OffsetIterator(StreamIterator[M21ObjType]):
     def __init__(self,
                  srcStream,
                  *,
+                 # restrictClass: M21ObjType = base.Music21Object,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
                  ignoreSorting=False
                  ):
         super().__init__(srcStream,
+                         # restrictClass=restrictClass,
                          filterList=filterList,
                          restoreActiveSites=restoreActiveSites,
                          activeInformation=activeInformation,
@@ -1578,6 +1580,57 @@ class OffsetIterator(StreamIterator[M21ObjType]):
         self.nextToYield = []
         self.nextOffsetToYield = None
         self.raiseStopIterationNext = False
+
+    # NOTE: these getElementsByClass are the same as the one in StreamIterator, but
+    # for now it needs to be duplicated until changing a Generic's argument type
+    # can be done with inheritance.
+
+    @overload
+    def getElementsByClass(self,
+                           classFilterList: str,
+                           *,
+                           returnClone: bool = True) -> OffsetIterator[M21ObjType]:
+        ...
+
+    @overload
+    def getElementsByClass(self,
+                           classFilterList: Iterable[str],
+                           *,
+                           returnClone: bool = True) -> OffsetIterator[M21ObjType]:
+        ...
+
+    @overload
+    def getElementsByClass(self,
+                           classFilterList: Type[ChangedM21ObjType],
+                           *,
+                           returnClone: bool = True) -> OffsetIterator[ChangedM21ObjType]:
+        ...
+
+    @overload
+    def getElementsByClass(self,
+                           classFilterList: Iterable[Type[ChangedM21ObjType]],
+                           *,
+                           returnClone: bool = True) -> OffsetIterator[base.Music21Object]:
+        ...
+
+
+    def getElementsByClass(self,
+                           classFilterList: Union[
+                               str,
+                               Type[ChangedM21ObjType],
+                               Iterable[str],
+                               Iterable[Type[ChangedM21ObjType]],
+                           ],
+                           *,
+                           returnClone: bool = True
+                           ) -> Union[OffsetIterator[M21ObjType],
+                                      OffsetIterator[ChangedM21ObjType]]:
+        '''
+        Identical to the same method in StreamIterator, but needs to be duplicated
+        for now.
+        '''
+        return self.addFilter(filters.ClassFilter(classFilterList), returnClone=returnClone)
+
 
 
 # -----------------------------------------------------------------------------
@@ -1647,6 +1700,7 @@ class RecursiveIterator(StreamIterator[M21ObjType], collections.abc.Sequence):
     def __init__(self,
                  srcStream,
                  *,
+                 # restrictClass: M21ObjType = base.Music21Object,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
@@ -1655,6 +1709,7 @@ class RecursiveIterator(StreamIterator[M21ObjType], collections.abc.Sequence):
                  ignoreSorting=False
                  ):  # , parentIterator=None):
         super().__init__(srcStream,
+                         # restrictClass=restrictClass,
                          filterList=filterList,
                          restoreActiveSites=restoreActiveSites,
                          activeInformation=activeInformation,

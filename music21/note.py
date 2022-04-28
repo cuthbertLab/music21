@@ -508,7 +508,7 @@ class GeneralNote(base.Music21Object):
     isChord = False
     _styleClass: Type[style.Style] = style.NoteStyle
 
-    # define order to present names in documentation; use strings
+    # define order for presenting names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
@@ -552,8 +552,8 @@ class GeneralNote(base.Music21Object):
 
     def __eq__(self, other):
         '''
-        General Note objects are equal if their durations are equal and
-        they have the same articulation and expression classes (in any order)
+        General Note objects are equal if their durations are equal, and
+        they have the same articulation and expression classes (in any order),
         and their ties are equal.
         '''
 
@@ -562,10 +562,10 @@ class GeneralNote(base.Music21Object):
         # checks type, dots, tuplets, quarterLength, uses Pitch.__eq__
         if self.duration != other.duration:
             return False
-        # articulations are a list of Articulation objects
-        # converting to sets produces ordered cols that remove duplicate
-        # however, must then convert to list to match based on class ==
-        # not on class id()
+        # Articulations are a list of Articulation objects.
+        # Converting them to Set objects produces ordered cols that remove duplicates.
+        # However, we must then convert to list to match based on class ==
+        # not on class id().
         if (sorted({x.classes[0] for x in self.articulations})
                 != sorted({x.classes[0] for x in other.articulations})):
             return False
@@ -935,7 +935,7 @@ class NotRest(GeneralNote):
     def __deepcopy__(self, memo=None):
         '''
         As NotRest objects have a Volume, objects, and Volume objects
-        store weak refs to the to client object, need to specialize deep copy handling
+        store weak refs to the client object, need to specialize deep copy handling
 
         >>> import copy
         >>> n = note.NotRest()
@@ -1341,7 +1341,7 @@ class Note(NotRest):
     '''
     isNote = True
 
-    # define order to present names in documentation; use strings
+    # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
@@ -2258,7 +2258,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append([n1, n2, n3])
 
-        # need to test that this gets us a continue tie, but hard to test
+        # need to test that this gets us a "continue" tie, but hard to test
         # post musicxml processing
         # s.show()
 

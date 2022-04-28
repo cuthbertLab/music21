@@ -829,7 +829,7 @@ class Environment:
     PosixPath('/Applications/Finale Reader.app')
     '''
 
-    # define order to present names in documentation; use strings
+    # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = ['read', 'write', 'getSettingsPath']
 
     # documentation for all attributes (not properties or methods)

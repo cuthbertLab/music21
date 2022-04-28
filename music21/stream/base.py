@@ -79,6 +79,8 @@ StreamException = exceptions21.StreamException
 ImmutableStreamException = exceptions21.ImmutableStreamException
 
 T = TypeVar('T')
+# we sometimes need to return a different type.
+M21ObjType2 = TypeVar('M21ObjType2', bound=base.Music21Object)
 
 BestQuantizationMatch = namedtuple('BestQuantizationMatch',
     ['error', 'tick', 'match', 'signedError', 'divisor'])
@@ -418,7 +420,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         ...
 
     @overload
-    def __getitem__(self, k: Type[M21ObjType]) -> iterator.RecursiveIterator[M21ObjType]:
+    def __getitem__(self, k: Type[M21ObjType2]) -> iterator.RecursiveIterator[M21ObjType2]:
         ...
 
     def __getitem__(self,
@@ -1162,6 +1164,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
         staffLayouts = self[layout.StaffLayout]
         sl: layout.StaffLayout
+        # test.
         for sl in staffLayouts:
             if sl.getOffsetInHierarchy(self) > 0:
                 break
@@ -7535,7 +7538,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
                 streamsOnly=False,
                 restoreActiveSites=True,
                 classFilter=(),
-                includeSelf=None) -> iterator.RecursiveIterator:
+                includeSelf=None) -> iterator.RecursiveIterator[Any]:
         '''
         `.recurse()` is a fundamental method of music21 for getting into
         elements contained in a Score, Part, or Measure, where elements such as
@@ -7674,13 +7677,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
         Changed in v8 -- removed parameter `skipSelf`.  Use `includeSelf` instead.
         '''
-        ri = iterator.RecursiveIterator(self,
-                                        streamsOnly=streamsOnly,
-                                        restoreActiveSites=restoreActiveSites,
-                                        includeSelf=includeSelf
-                                        )
+        ri: iterator.RecursiveIterator[M21ObjType] = iterator.RecursiveIterator(
+            self,
+            streamsOnly=streamsOnly,
+            restoreActiveSites=restoreActiveSites,
+            includeSelf=includeSelf
+        )
         if classFilter:
-            ri.addFilter(filters.ClassFilter(classFilter), returnClone=False)
+            ri = ri.getElementsByClass(classFilter)
         return ri
 
     def containerInHierarchy(self, el, *, setActiveSite=True) -> Optional['music21.stream.Stream']:
@@ -14054,6 +14058,7 @@ class Test(unittest.TestCase):
                 b = copy.deepcopy(obj)
                 self.assertNotEqual(a, obj)
                 self.assertNotEqual(b, obj)
+
 
 
 # -----------------------------------------------------------------------------
