@@ -49,6 +49,8 @@ reverseBarTypeDict = {
     'final': 'light-heavy',
 }
 
+strongBarlineTypes = {'heavy', 'double', 'final', 'heavy-light', 'heavy-heavy'}  # set
+
 
 def typeToMusicXMLBarStyle(value):
     '''

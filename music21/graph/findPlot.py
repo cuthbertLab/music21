@@ -64,6 +64,7 @@ def getPlotClasses():
         # noinspection PyTypeChecker
         if (callable(name)
                 and not isinstance(name, types.FunctionType)
+                and hasattr(name, '__mro__')
                 and plot.PlotStreamMixin in name.__mro__
                 and primitives.Graph in name.__mro__):
             allPlot.append(name)
@@ -279,7 +280,7 @@ def getPlotsToMake(graphFormat=None,
     [<class 'music21.graph.plot.ScatterPitchClassQuarterLength'>,
      <class 'music21.graph.plot.ScatterPitchSpaceQuarterLength'>]
 
-    Just one value but it is in the wrong axis...
+    Just one value, but it is in the wrong axis...
 
     >>> graph.findPlot.getPlotsToMake('scatter', 'pitchClass')
     [<class 'music21.graph.plot.ScatterPitchClassOffset'>,
