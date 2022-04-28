@@ -750,13 +750,13 @@ class Converter:
          <class 'music21.converter.subConverters.ConverterLilypond'>,
          <class 'music21.converter.subConverters.ConverterMidi'>,
          <class 'music21.converter.subConverters.ConverterMusicXML'>,
+         <class 'music21.converter.subConverters.ConverterOpenSheetMusicDisplay'>,
          <class 'music21.converter.subConverters.ConverterRomanText'>,
          <class 'music21.converter.subConverters.ConverterScala'>,
          <class 'music21.converter.subConverters.ConverterText'>,
          <class 'music21.converter.subConverters.ConverterTextLine'>,
          <class 'music21.converter.subConverters.ConverterVexflow'>,
          <class 'music21.converter.subConverters.ConverterVolpiano'>]
-
 
 
         >>> class ConverterSonix(converter.subConverters.SubConverter):
@@ -819,6 +819,7 @@ class Converter:
         <class 'music21.converter.subConverters.ConverterMusicXML'>
         <class 'music21.converter.subConverters.ConverterNoteworthy'>
         <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>
+        <class 'music21.converter.subConverters.ConverterOpenSheetMusicDisplay'>
         <class 'music21.converter.subConverters.ConverterRomanText'>
         <class 'music21.converter.subConverters.ConverterScala'>
         <class 'music21.converter.subConverters.ConverterText'>
@@ -863,6 +864,7 @@ class Converter:
         ('musicxml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
         ('noteworthy', <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>)
         ('noteworthytext', <class 'music21.converter.subConverters.ConverterNoteworthy'>)
+        ('osmd', <class 'music21.converter.subConverters.ConverterOpenSheetMusicDisplay'>)
         ('rntext', <class 'music21.converter.subConverters.ConverterRomanText'>)
         ('romantext', <class 'music21.converter.subConverters.ConverterRomanText'>)
         ('scala', <class 'music21.converter.subConverters.ConverterScala'>)

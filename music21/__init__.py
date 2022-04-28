@@ -142,6 +142,7 @@ __all__ = [
     'key',
     'layout',
     'note',
+    'osmd',
     'percussion',
     'pitch',
     # prebase listed above

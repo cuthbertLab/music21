@@ -1467,6 +1467,59 @@ class ConverterMEI(SubConverter):
     #     raise NotImplementedError('MEI export is not yet implemented.')
 
 
+class ConverterOpenSheetMusicDisplay(SubConverter):
+    '''
+    Converter for displaying sheet music inline in an IPython notebook
+    using Open Sheet Music Display: https://opensheetmusicdisplay.org/
+    '''
+    registerFormats = ('osmd',)
+    registerShowFormats = ('osmd',)
+    registerOutputExtensions = ('html',)
+
+    def show(self, obj, fmt, app=None, subformats=None, *,
+             offline: bool = False, **keywords):  # pragma: no cover
+        '''
+        Displays the Stream in a notebook (or HTML page) using the
+        OpenSheetMusicDisplay.js library.
+
+        >>> import music21
+        >>> s = music21.converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c4~ c")
+        >>> #_DOCS_SHOW fig_id1 = s.show('osmd')
+
+        `offline=True` injects the OSMD .js bundle into the notebook (or HTML page)
+        for offline use. (The bundle is also cached to music21's scratch directory.)
+        When `offline` is False (default), OSMD's .js will be served from a CDN
+        instead, requiring viewers to have an internet connection.
+        '''
+        from music21.osmd import getUniqueDivId, getXml, musicXMLToScript, hasInstalledIPython
+        in_ipython = common.runningUnderIPython()
+        # create unique reference to output div in case we wish to update it
+        divId = getUniqueDivId()
+        xml = getXml(obj)
+
+        # generate script to be run on page
+        script = musicXMLToScript(xml, divId, offline=offline)
+        if in_ipython and hasInstalledIPython():
+            # pylint: disable=import-outside-toplevel
+            from IPython.core.display import display, HTML, Javascript
+            display(HTML(f'<div id="{divId}"></div>'))
+            display(Javascript(script))
+        else:
+            import webbrowser
+            # Create a file for the browser to open
+            tempFileName = self.getTemporaryFile()
+
+            with open(tempFileName, 'w', encoding='utf-8') as f:
+                f.write(f'''
+                <div id="{divId}"></div>
+                <script>{script}</script>
+                ''')
+
+            # make path absolute and add browser prefix for opening a local file
+            filename = 'file:///' + str(tempFileName.resolve())
+            webbrowser.open_new_tab(filename)
+
+
 class Test(unittest.TestCase):
 
     def testSimpleTextShow(self):
