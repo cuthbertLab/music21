@@ -400,7 +400,7 @@ def twelveBarBlues():
     return realizer.figuredBassFromStream(s)
 
 # -----------------------------------------------------------------
-# METHODS FOR GENERATION OF BLUES VAMPS
+# Functions that generate Boogie/Blues vamps.
 
 
 def generateBoogieVamp(blRealization=None, numRepeats=5):

@@ -9,7 +9,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Methods for converting <sound> tag to the many music21
+Functions that convert <sound> tag to the many music21
 objects that this tag might represent.
 
 Pulled out because xmlToM21 is getting way too big.

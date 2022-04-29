@@ -202,7 +202,7 @@ def correlateHarmonies(currentMapping, music21Part):
     return newMapping
 
 # ------------------------------------------------------------------------------
-# Generic methods for checking for composition rule violations in streams
+# Generic functions for checking for composition rule violations in streams
 
 
 def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):

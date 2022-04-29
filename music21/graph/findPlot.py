@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/findPlot.py
-# Purpose:      Methods for finding appropriate plots for plotStream.
+# Purpose:      Functions that find appropriate plots for graph.plot
 #
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017-22 Michael Scott Asato Cuthbert
+#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Methods for finding appropriate plots for plotStream.
+Functions that find appropriate plots for graph.plot.
 '''
 import collections
 import types
@@ -64,6 +65,7 @@ def getPlotClasses():
         # noinspection PyTypeChecker
         if (callable(name)
                 and not isinstance(name, types.FunctionType)
+                and hasattr(name, '__mro__')
                 and plot.PlotStreamMixin in name.__mro__
                 and primitives.Graph in name.__mro__):
             allPlot.append(name)
@@ -279,7 +281,7 @@ def getPlotsToMake(graphFormat=None,
     [<class 'music21.graph.plot.ScatterPitchClassQuarterLength'>,
      <class 'music21.graph.plot.ScatterPitchSpaceQuarterLength'>]
 
-    Just one value but it is in the wrong axis...
+    Just one value, but it is in the wrong axis...
 
     >>> graph.findPlot.getPlotsToMake('scatter', 'pitchClass')
     [<class 'music21.graph.plot.ScatterPitchClassOffset'>,

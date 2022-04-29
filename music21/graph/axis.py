@@ -7,7 +7,8 @@
 #               Michael Scott Asato Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2009-2012, 2017 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -21,6 +22,7 @@ import re
 
 from music21.graph.utilities import accidentalLabelToUnicode, GraphException
 
+from music21 import bar
 from music21 import common
 from music21 import duration
 from music21 import dynamics
@@ -30,6 +32,9 @@ from music21 import stream
 
 from music21.analysis import elements as elementAnalysis
 from music21.analysis import pitchAnalysis
+
+
+USE_GRACE_NOTE_SPACING = -1
 
 
 class Axis(prebase.ProtoM21Object):
@@ -181,6 +186,7 @@ class Axis(prebase.ProtoM21Object):
         return 1
 
     def setBoundariesFromData(self, values):
+        # noinspection PyShadowingNames
         '''
         If self.minValue is not set,
         then set self.minValue to be the minimum of these values.
@@ -313,6 +319,7 @@ class PitchAxis(Axis):
 
     @staticmethod
     def makePitchLabelsUnicode(ticks):
+        # noinspection PyShadowingNames
         '''
         Given a list of ticks, replace all labels with alternative/unicode symbols where necessary.
 
@@ -364,18 +371,19 @@ class PitchAxis(Axis):
             '''
             ensure that higher weighed weights come first, but
             then alphabetical by name, except that G comes before
-            A... since we are only comparing enharmonics...
+            A.  That's the only "out of order" item we need to be
+            concerned with since we are only comparing enharmonics.
             '''
-            weight, name = x
-            if name.startswith('A'):
-                name = 'H' + name[1:]
-            return (-1 * weight, name)
+            weight, sort_name = x
+            if sort_name.startswith('A'):
+                sort_name = 'H' + sort_name[1:]
+            return (-1 * weight, sort_name)
 
         def unweightedSortHelper(x):
-            weight, name = x
-            if name.startswith('A'):
-                name = 'H' + name[1:]
-            return (weight, name)
+            weight, sort_name = x
+            if sort_name.startswith('A'):
+                sort_name = 'H' + sort_name[1:]
+            return (weight, sort_name)
 
         for i in range(int(self.minValue), int(self.maxValue) + 1):
             p = pitch.Pitch()
@@ -763,6 +771,13 @@ class OffsetAxis(PositionAxis):
             If True then only the first and last values will be used to
             create ticks for measures.  Default False.
             ''',
+        'minValue': 'The lowest starting position (as an offset).  Will be set automatically.',
+        'maxValue': 'The highest ending position (as an offset).  Will be set automatically.',
+        'mostMeasureTicksToShow': '''
+            When plotting measures, will limit the number of ticks given to at most
+            this number.  Note that since all double/final/heavy bars are show, this number
+            may be exceeded if there are more that this number of double bars.  Default: 20.
+            ''',
 
     }
     labelDefault = 'Offset'
@@ -773,6 +788,7 @@ class OffsetAxis(PositionAxis):
         self.useMeasures = None
         # self.displayMeasureNumberZero = False  # not used...
         self.offsetStepSize = 10
+        self.mostMeasureTicksToShow = 20
         self.minMaxMeasureOnly = False
 
     def extractOneElement(self, n, formatDict):
@@ -821,26 +837,39 @@ class OffsetAxis(PositionAxis):
         '''
         Get offset or measure ticks
 
-        >>> s = corpus.parse('bach/bwv281.xml')
-        >>> plotS = graph.plot.PlotStream(s)
+        >>> bach = corpus.parse('bach/bwv281.xml')
+        >>> plotS = graph.plot.PlotStream(bach)
         >>> ax = graph.axis.OffsetAxis(plotS)
         >>> ax.setBoundariesFromData()
         >>> ax.ticks()  # on whole score, showing anacrusis spacing
         [(0.0, '0'), (1.0, '1'), (5.0, '2'), (9.0, '3'), (13.0, '4'), (17.0, '5'),
          (21.0, '6'), (25.0, '7'), (29.0, '8')]
 
-        >>> a = graph.plot.PlotStream(s.parts.first().flatten())  # on a Part
-        >>> plotS = graph.plot.PlotStream(s)
-        >>> ax = graph.axis.OffsetAxis(plotS)
+        We can reduce the number of ticks shown:
+
+        >>> ax.mostMeasureTicksToShow = 4
+        >>> ax.ticks()
+        [(0.0, '0'), (9.0, '3'), (21.0, '6'), (29.0, '8')]
+
+
+        We can also plot on a part:
+
+        >>> soprano = bach.parts.first()
+        >>> plotSoprano = graph.plot.PlotStream(soprano)
+        >>> ax = graph.axis.OffsetAxis(plotSoprano)
         >>> ax.setBoundariesFromData()
         >>> ax.ticks()  # on whole score, showing anacrusis spacing
         [(0.0, '0'), (1.0, '1'), (5.0, '2'), (9.0, '3'), (13.0, '4'), (17.0, '5'),
          (21.0, '6'), (25.0, '7'), (29.0, '8')]
+
+        Now we will show just the first and last measure:
 
         >>> ax.minMaxMeasureOnly = True
-        >>> ax.ticks()  # on whole score, showing anacrusis spacing
+        >>> ax.ticks()
         [(0.0, '0'), (29.0, '8')]
 
+
+        Only show ticks between minValue and maxValue (in offsets):
 
         >>> ax.minMaxMeasureOnly = False
         >>> ax.minValue = 8
@@ -848,7 +877,29 @@ class OffsetAxis(PositionAxis):
         >>> ax.ticks()
         [(9.0, '3')]
 
-        >>> n = note.Note('a')  # on a raw collection of notes with no measures
+
+        Double bars and other heavy bars always show up.
+        (Let's get a new axis object to see.)
+
+        >>> ax = graph.axis.OffsetAxis(plotSoprano)
+        >>> ax.setBoundariesFromData()
+        >>> ax.mostMeasureTicksToShow = 4
+        >>> ax.ticks()
+        [(0.0, '0'), (9.0, '3'), (21.0, '6'), (29.0, '8')]
+        >>> m5 = soprano.getElementsByClass('Measure')[5]
+        >>> m5.number
+        5
+        >>> m5.rightBarline = bar.Barline('double')
+        >>> ax.ticks()
+        [(0.0, '0'), (13.0, '4'), (17.0, '5'), (29.0, '8')]
+
+        Future improvements might make the spacing around the double bars
+        a bit better.  It'd be nice to see measure 2 or 3 ticked rather
+        than measure 4.
+
+        On a raw collection of notes with no measures, offsets are used:
+
+        >>> n = note.Note('a')
         >>> s = stream.Stream()
         >>> s.repeatAppend(n, 20)
         >>> plotS = graph.plot.PlotStream(s)
@@ -856,6 +907,10 @@ class OffsetAxis(PositionAxis):
         >>> ax.setBoundariesFromData()
         >>> ax.ticks()
         [(0, '0'), (10, '10'), (20, '20')]
+
+        The space between offsets is configured by `.offsetStepSize`.  At
+        present mostMeasureTicksToShow to does affect streams without measures.
+
         >>> ax.offsetStepSize = 5
         >>> ax.ticks()
         [(0, '0'), (5, '5'), (10, '10'), (15, '15'), (20, '20')]
@@ -902,23 +957,47 @@ class OffsetAxis(PositionAxis):
                 offset = mNoToUse[i]
                 mNumber = offsetMap[offset][0].number
                 tickTuple = (offset, str(mNumber))
-                ticks.append(tickTuple)
-        else:  # get all of them
-            if len(mNoToUse) > 20:
-                # get about 10 ticks
-                mNoStepSize = int(len(mNoToUse) / 10)
-            else:
-                mNoStepSize = 1
-            # for i in range(0, len(mNoToUse), mNoStepSize):
-            i = 0  # always start with first
-            while i < len(mNoToUse):
-                offset = mNoToUse[i]
+                if tickTuple not in ticks:
+                    ticks.append(tickTuple)
+        else:
+            tickIndexesUsed = set()
+
+            # noinspection PyShadowingNames
+            def add_tick_tuple(index_in_mNoToUse):
+                if index_in_mNoToUse in tickIndexesUsed:
+                    return
+                offset = mNoToUse[index_in_mNoToUse]
                 # this should be a measure object
                 foundMeasure = offsetMap[offset][0]
                 mNumber = foundMeasure.number
                 tickTuple = (offset, str(mNumber))
                 ticks.append(tickTuple)
+                tickIndexesUsed.add(index_in_mNoToUse)
+
+            # always add first
+            add_tick_tuple(0)
+            # always add last
+            add_tick_tuple(len(mNoToUse) - 1)  # do not use -1, since it is a different key.
+
+            # add all double bars -- might exceed mostMeasureTicksToShow
+            for i in range(1, len(mNoToUse) - 1):
+                mapOffset = mNoToUse[i]
+                mapMeasure = offsetMap[mapOffset][0]
+                if (mapMeasure.rightBarline is not None
+                        and mapMeasure.rightBarline.type in bar.strongBarlineTypes):
+                    add_tick_tuple(i)
+
+            # default get 10-19 ticks for long scores, or every measure for short scores
+            maxMoreTicksToAdd = min(self.mostMeasureTicksToShow - len(tickIndexesUsed) + 1,
+                                    len(mNoToUse))
+            mNoStepSize = max(len(mNoToUse) // maxMoreTicksToAdd, 1)
+            i = mNoStepSize
+            while i < len(mNoToUse) - 1:
+                add_tick_tuple(i)
                 i += mNoStepSize
+
+            ticks.sort()
+
         return ticks
 
     def getOffsetMap(self):
@@ -1060,6 +1139,7 @@ class QuarterLengthAxis(PositionAxis):
         return x
 
     def ticks(self):
+        # noinspection PyShadowingNames
         '''
         Get ticks for quarterLength.
 
@@ -1069,7 +1149,6 @@ class QuarterLengthAxis(PositionAxis):
 
         Note that mix and max do nothing, but must be included
         in order to set the tick style.
-
 
         >>> s = stream.Stream()
         >>> for t in ['32nd', '16th', 'eighth', 'quarter', 'half']:
@@ -1178,25 +1257,27 @@ class OffsetEndAxis(OffsetAxis):
     _DOC_ATTR = {
         'noteSpacing': '''
             amount in QL to leave blank between untied notes.
-            (default = graceNoteQL)
+            (default = self.graceNoteQL)
             '''
     }
     quantities = ('offsetEnd', 'timespans', 'timespan')
 
-    def __init__(self, client=None, axisName='x'):
+    def __init__(self, client=None, axisName='x', noteSpacing=USE_GRACE_NOTE_SPACING):
         super().__init__(client, axisName)
-        self.noteSpacing = self.graceNoteQL
+        self.noteSpacing = noteSpacing
+        if noteSpacing == USE_GRACE_NOTE_SPACING:
+            self.noteSpacing = self.graceNoteQL
 
     def extractOneElement(self, n, formatDict):
         off = float(n.getOffsetInHierarchy(self.stream))
         useQL = float(n.duration.quarterLength)
-        if useQL < self.graceNoteQL:
-            useQL = self.graceNoteQL
-        elif useQL > self.graceNoteQL * 2:
+        if useQL < self.noteSpacing:
+            useQL = self.noteSpacing
+        elif useQL > self.noteSpacing * 2:
             if hasattr(n, 'tie') and n.tie is not None and n.tie.type in ('start', 'continue'):
                 pass
             else:
-                useQL -= self.graceNoteQL
+                useQL -= self.noteSpacing
 
         return (off, useQL)
 
