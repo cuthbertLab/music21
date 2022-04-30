@@ -1756,7 +1756,7 @@ class SpineCollection(prebase.ProtoM21Object):
         firstStreamForEachInstrument = {}
         for thisSpine in self.spines:
             spineStream = thisSpine.stream
-            instrumentsStream = spineStream.getElementsByClass('Instrument')
+            instrumentsStream = spineStream.getElementsByClass(instrument.Instrument)
             if not instrumentsStream:
                 spineInstrument = None
             else:
@@ -1916,7 +1916,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 continue
             if thisSpine.spineType != 'kern':
                 continue
-            for tandem in thisSpine.stream.getElementsByClass('MiscTandem'):
+            for tandem in thisSpine.stream.getElementsByClass(MiscTandem):
                 if not tandem.tandem.startswith('*staff'):
                     continue
                 staffInfo = int(tandem.tandem[6:])  # single staff
@@ -2932,7 +2932,7 @@ class Test(unittest.TestCase):
         s = hf1.stream  # .show()
         p = s.parts[2]  # last part has a comment
         comments = []
-        for c in p.flatten().getElementsByClass('SpineComment'):
+        for c in p[SpineComment]:
             comments.append(c.comment)
         self.assertTrue('spine comment' in comments)
         # s.show('text')
@@ -2969,7 +2969,7 @@ class Test(unittest.TestCase):
             32.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
             33.0: ('I in c minor', [0, 4, 7], 'C', 'C', 53, False)
         }
-        for harm in s.flatten().getElementsByClass('RomanNumeral'):
+        for harm in s[roman.RomanNumeral]:
             figureAndKey = harm.figureAndKey
             pitchClasses = harm.pitchClasses
             root = harm.root().name
@@ -3024,7 +3024,7 @@ class Test(unittest.TestCase):
             42.0: ('V43 in a minor', [11, 2, 4, 8], 'E', 'B', 43, True),
             43.0: ('i in a minor', [9, 0, 4], 'A', 'A', 53, False)
         }
-        for harm in s.flatten().getElementsByClass('RomanNumeral'):
+        for harm in s[roman.RomanNumeral]:
             figureAndKey = harm.figureAndKey
             pitchClasses = harm.pitchClasses
             root = harm.root().name
@@ -3073,7 +3073,7 @@ class Test(unittest.TestCase):
             32.0: (False, False, False, False),
             33.0: (False, False, False, False)
         }
-        for harm in s.flatten().getElementsByClass('RomanNumeral'):
+        for harm in s[roman.RomanNumeral]:
             isAugmentedSixth = harm.isAugmentedSixth()
             isItalianAugmentedSixth = harm.isItalianAugmentedSixth()
             isFrenchAugmentedSixth = harm.isFrenchAugmentedSixth()

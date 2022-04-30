@@ -1259,10 +1259,10 @@ class Music21Object(prebase.ProtoM21Object):
         >>> b
         <music21.note.Note B>
 
-        Now when we run `getContextByClass('TimeSignature')` on c, we get a
+        Now when we run `getContextByClass(meter.TimeSignature)` on c, we get a
         time signature of 1/4.
 
-        >>> c.getContextByClass('TimeSignature')
+        >>> c.getContextByClass(meter.TimeSignature)
         <music21.meter.TimeSignature 1/4>
 
         Doing what we just did wouldn't be hard to do with other methods,
@@ -1272,7 +1272,7 @@ class Music21Object(prebase.ProtoM21Object):
         there's nothing there.  It goes to the previous measure and searches
         that one backwards until it gets the proper TimeSignature of 2/4:
 
-        >>> b.getContextByClass('TimeSignature')
+        >>> b.getContextByClass(meter.TimeSignature)
         <music21.meter.TimeSignature 2/4>
 
         The method is smart enough to stop when it gets to the beginning of the
@@ -1374,7 +1374,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n = note.Note('D')
         >>> m.insert(2.0, n)
         >>> try:
-        ...     n.getContextByClass('Part').elementOffset(n)
+        ...     n.getContextByClass(stream.Part).elementOffset(n)
         ... except Music21Exception:
         ...     print('not there')
         not there
@@ -1985,7 +1985,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> s.append(n)
 
 
-        >>> for ts in n.getAllContextsByClass('TimeSignature'):
+        >>> for ts in n.getAllContextsByClass(meter.TimeSignature):
         ...     print(ts, ts.offset)
         <music21.meter.TimeSignature 3/4> 1.0
         <music21.meter.TimeSignature 2/4> 0.0
@@ -2066,7 +2066,7 @@ class Music21Object(prebase.ProtoM21Object):
         print its Part for more information...
 
         >>> while o is not None:
-        ...     print(o, o.getContextByClass('Part'))
+        ...     print(o, o.getContextByClass(stream.Part))
         ...     o = o.next()
         <music21.stream.Measure 8 offset=29.0> <music21.stream.Part Soprano>
         <music21.note.Note F#> <music21.stream.Part Soprano>
@@ -4634,7 +4634,7 @@ class Test(unittest.TestCase):
         # p.show('t')
         # if done with default args, we get the same object, as we are using
         # getElementAtOrBefore
-        self.assertEqual(str(mm2.getContextByClass('MetronomeMark')),
+        self.assertEqual(str(mm2.getContextByClass(tempo.MetronomeMark)),
                          '<music21.tempo.MetronomeMark Eighth=150>')
         # if we provide the getElementMethod parameter, we can use
         # getElementBeforeOffset
@@ -4854,10 +4854,10 @@ class Test(unittest.TestCase):
         n2 = m4[-1]  # last element is a note
 
         # environLocal.printDebug(['getContextByClass()'])
-        # self.assertEqual(str(n1.getContextByClass('TimeSignature')),
+        # self.assertEqual(str(n1.getContextByClass(meter.TimeSignature)),
         #    '<music21.meter.TimeSignature 3/4>')
         environLocal.printDebug(['getContextByClass()'])
-        self.assertEqual(str(n2.getContextByClass('TimeSignature')),
+        self.assertEqual(str(n2.getContextByClass(meter.TimeSignature)),
                          '<music21.meter.TimeSignature 3/4>')
 
     def testNextA(self):
@@ -4918,9 +4918,9 @@ class Test(unittest.TestCase):
         # getting time signature and key sig
         p1 = s.parts[0]
         nLast = p1.flatten().notes[-1]
-        self.assertEqual(str(nLast.previous('TimeSignature')),
+        self.assertEqual(str(nLast.previous(meter.TimeSignature)),
                          '<music21.meter.TimeSignature 4/4>')
-        self.assertEqual(str(nLast.previous('KeySignature')),
+        self.assertEqual(str(nLast.previous(key.KeySignature)),
                          'f# minor')
 
         # iterating at the Measure level, showing usage of flattenLocalSites

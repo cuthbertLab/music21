@@ -204,19 +204,19 @@ class Test(unittest.TestCase):
             for m in p.getElementsByClass(stream.Measure):
                 if m.number == 0:
                     continue
-                post = m.getContextByClass('Clef')
+                post = m.getContextByClass(clef.Clef)
                 assert post is not None
-                post = m.getContextByClass('TimeSignature')
+                post = m.getContextByClass(meter.TimeSignature)
                 assert post is not None
-                post = m.getContextByClass('KeySignature')
+                post = m.getContextByClass(key.KeySignature)
                 assert post is not None
 
                 for n in m.notesAndRests:
-                    post = n.getContextByClass('Clef')
+                    post = n.getContextByClass(clef.Clef)
                     assert post is not None
-                    post = n.getContextByClass('TimeSignature')
+                    post = n.getContextByClass(meter.TimeSignature)
                     assert post is not None
-                    post = n.getContextByClass('KeySignature')
+                    post = n.getContextByClass(key.KeySignature)
                     assert post is not None
 
     def runGetElementsByPrevious(self):
@@ -233,19 +233,19 @@ class Test(unittest.TestCase):
             for m in p.getElementsByClass(stream.Measure):
                 if m.number == 0:
                     continue
-                post = m.previous('Clef')
+                post = m.previous(clef.Clef)
                 assert post is not None
-                post = m.previous('TimeSignature')
+                post = m.previous(meter.TimeSignature)
                 assert post is not None
-                post = m.previous('KeySignature')
+                post = m.previous(key.KeySignature)
                 assert post is not None
 
                 for n in m.notesAndRests:
-                    post = n.getContextByClass('Clef')
+                    post = n.getContextByClass(clef.Clef)
                     assert post is not None
-                    post = n.getContextByClass('TimeSignature')
+                    post = n.getContextByClass(meter.TimeSignature)
                     assert post is not None
-                    post = n.getContextByClass('KeySignature')
+                    post = n.getContextByClass(key.KeySignature)
                     assert post is not None
 
     def runParseMonteverdiRNText(self):

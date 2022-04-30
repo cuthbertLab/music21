@@ -815,7 +815,7 @@ class Verticality(prebase.ProtoM21Object):
 
             pitchGroup = None
             if addPartIdAsGroup:
-                partContext = n.getContextByClass('Part')
+                partContext = n.getContextByClass(stream.Part)
                 if partContext is not None:
                     pidStr = str(partContext.id)
                     pitchGroup = pidStr.replace(' ', '_')  # spaces are not allowed as group names

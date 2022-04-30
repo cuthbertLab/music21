@@ -1852,7 +1852,7 @@ class TimeSignature(base.Music21Object):
 
         >>> c = corpus.parse('bwv1.6')
         >>> for m in c.parts.first().getElementsByClass(stream.Measure):
-        ...     ts = m.timeSignature or m.getContextByClass('TimeSignature')
+        ...     ts = m.timeSignature or m.getContextByClass(meter.TimeSignature)
         ...     print('%s %s' % (m.number, ts.getOffsetFromBeat(4.5) - m.paddingLeft))
         0 0.5
         1 3.5

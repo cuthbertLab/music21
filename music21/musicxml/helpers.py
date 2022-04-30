@@ -185,7 +185,7 @@ def isFullMeasureRest(r: 'music21.note.Rest') -> bool:
     if r.fullMeasure in (True, 'always'):
         isFullMeasure = True
     elif r.fullMeasure == 'auto':
-        tsContext = r.getContextByClass('TimeSignature')
+        tsContext = r.getContextByClass(meter.TimeSignature)
         if tsContext and tsContext.barDuration.quarterLength == r.duration.quarterLength:
             isFullMeasure = True
     return isFullMeasure

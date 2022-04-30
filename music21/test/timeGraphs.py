@@ -248,7 +248,7 @@ class TestCommonContextSearches(Test):
 
     def testFocus(self):
         self.s.parts[0].getElementsByClass(
-            'Measure')[3].getContextByClass('TimeSignature')
+            'Measure')[3].getContextByClass(meter.TimeSignature)
 
 
 class TestBigMusicXML(Test):
@@ -353,8 +353,8 @@ class TestGetContextByClassB(Test):
         self.targetNoteB = m1._elements[-1]  # last element is a note
 
     def testFocus(self):
-        # post = self.targetNoteA.getContextByClass('TimeSignature')
-        self.targetNoteA.previous('TimeSignature')
+        # post = self.targetNoteA.getContextByClass(meter.TimeSignature)
+        self.targetNoteA.previous(meter.TimeSignature)
 
 
 

@@ -1956,7 +1956,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
         ...     print(n,
         ...           n.getOffsetInHierarchy(b),
         ...           n.measureNumber,
-        ...           n.getContextByClass('Part').id)
+        ...           n.getContextByClass(stream.Part).id)
         <music21.note.Note C#> 8.0 2 Soprano
         <music21.note.Note A> 9.0 3 Soprano
         <music21.note.Note B> 9.5 3 Soprano

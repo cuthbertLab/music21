@@ -470,7 +470,7 @@ class SinglePart:
         if runFast is True:
             try:
                 m = self.measureStream[0]
-                ts = m.timeSignature or m.getContextByClass('TimeSignature')
+                ts = m.timeSignature or m.getContextByClass(meter.TimeSignature)
             except IndexError:
                 ts = meter.TimeSignature('4/4')
             if ts is None:
@@ -481,7 +481,7 @@ class SinglePart:
         for i in range(len(self.measureStream)):
             if runFast is False:
                 m = self.measureStream[i]
-                ts = m.timeSignature or m.getContextByClass('TimeSignature')
+                ts = m.timeSignature or m.getContextByClass(meter.TimeSignature)
             tsOmr = ts.barDuration.quarterLength
             if self.measureStream[i].duration.quarterLength == tsOmr:
                 continue

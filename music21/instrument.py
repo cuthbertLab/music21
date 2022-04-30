@@ -1865,15 +1865,17 @@ def deduplicate(s: 'music21.stream.Stream', inPlace: bool = False) -> 'music21.s
     >>> list(p2.getInstruments())
     [<music21.instrument.Flute 'Flute'>]
     '''
+    from music21 import stream
+
     if inPlace:
         returnObj = s
     else:
         returnObj = s.coreCopyAsDerivation('instrument.deduplicate')
 
     if not returnObj.hasPartLikeStreams():
-        substreams: Iterable['music21.stream.Stream'] = [returnObj]
+        substreams: Iterable[stream.Stream] = [returnObj]
     else:
-        substreams = returnObj.getElementsByClass('Stream')
+        substreams = returnObj.getElementsByClass(stream.Stream)
 
     for sub in substreams:
         oTree = OffsetTree(sub[Instrument].stream())
@@ -2628,7 +2630,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass(instrument.Instrument)), 2)
 
         # post.show('t')
 
@@ -2639,7 +2641,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post[instrument.Instrument]), 2)
         # post.show('t')
 
     def testPartitionByInstrumentB(self):
@@ -2659,7 +2661,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post[instrument.Instrument]), 2)
         self.assertEqual(len(post.parts[0].notes), 6)
         self.assertEqual(len(post.parts[1].notes), 12)
 
@@ -2686,7 +2688,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 4)
+        self.assertEqual(len(post[instrument.Instrument]), 4)
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 6)
         self.assertEqual(post.parts[1].getInstrument().instrumentName, 'Acoustic Guitar')
@@ -2726,7 +2728,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 4)
+        self.assertEqual(len(post[instrument.Instrument]), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 12)
@@ -2762,7 +2764,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 4)
+        self.assertEqual(len(post[instrument.Instrument]), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
 

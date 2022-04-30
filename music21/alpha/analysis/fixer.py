@@ -23,8 +23,7 @@ from music21 import pitch
 from music21 import stream
 
 # noinspection PyShadowingBuiltins
-_T = TypeVar('_T')
-
+OMRMidiFixerType = TypeVar('OMRMidiFixerType', bound='OMRMidiFixer')
 
 class OMRMidiFixer:
     '''
@@ -392,7 +391,7 @@ class OrnamentFixer(OMRMidiFixer):
             return True
         return False
 
-    def fix(self: _T, *, show=False, inPlace=True) -> Optional[_T]:
+    def fix(self: OMRMidiFixerType, *, show=False, inPlace=True) -> Optional[OMRMidiFixerType]:
         '''
         Corrects missed ornaments in omrStream according to midiStream
         :param show: Whether to show results
@@ -443,6 +442,8 @@ class OrnamentFixer(OMRMidiFixer):
 
         if not inPlace:
             return TrillFixer(sa.changes, sa.targetStream, sa.sourceStream)
+        else:
+            return None
 
 def getNotesWithinDuration(startingGeneralNote, totalDuration, referenceStream=None):
     '''

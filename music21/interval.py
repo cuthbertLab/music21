@@ -1404,7 +1404,7 @@ class GenericInterval(IntervalBase):
         >>> bPitch
         <music21.pitch.Pitch D5>
 
-        But if a key or keySignature (such as one from .getContextByClass('KeySignature')
+        But if a key or keySignature (such as one from .getContextByClass(key.KeySignature)
         is given, then the fun begins...
 
         >>> fis = pitch.Pitch('F#4')

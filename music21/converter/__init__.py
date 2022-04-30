@@ -1645,7 +1645,7 @@ class Test(unittest.TestCase):
         countTies = 0
         countStartTies = 0
         for p in a.parts:
-            post = p.recurse().notes[0].getContextByClass('Clef')
+            post = p.recurse().notes[0].getContextByClass(clef.Clef)
             self.assertIsInstance(post, clef.TenorClef)
             for n in p.recurse().notes:
                 if n.tie is not None:

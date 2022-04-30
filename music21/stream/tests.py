@@ -4325,7 +4325,7 @@ class Test(unittest.TestCase):
             'Stream')[0].getElementsByClass(Measure)), 3)
         self.assertEqual(len(post.getElementsByClass(
             'Stream')[1].getElementsByClass(Measure)), 3)
-        self.assertEqual(len(post.flatten().getElementsByClass('TimeSignature')), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass(meter.TimeSignature)), 2)
         self.assertEqual(len(post.flatten().getElementsByClass(clef.Clef)), 2)
 
     def testMakeNotationScoreB(self):
@@ -4355,7 +4355,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.getElementsByClass(
             'Stream')[1].getElementsByClass(Measure)), 4)
 
-        self.assertEqual(len(post.flatten().getElementsByClass('TimeSignature')), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass(meter.TimeSignature)), 2)
         self.assertEqual(len(post.flatten().getElementsByClass(clef.Clef)), 2)
 
     def testMakeNotationScoreC(self):
@@ -4383,7 +4383,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.getElementsByClass(
             Stream)[1].getElementsByClass(Measure)), 3)
 
-        self.assertEqual(len(post.flatten().getElementsByClass('TimeSignature')), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass(meter.TimeSignature)), 2)
         self.assertEqual(len(post.flatten().getElementsByClass(clef.Clef)), 2)
 
     def testMakeNotationKeySignatureOneVoice(self):
@@ -5602,7 +5602,7 @@ class Test(unittest.TestCase):
         junk = inner.sites.getObjByClass(clef.Clef)
         self.assertEqual(inner.activeSite, outer)
 
-        junk = inner.getContextByClass('Clef')
+        junk = inner.getContextByClass(clef.Clef)
         self.assertEqual(inner.activeSite, outer)
 
     def testGetElementsByContextStream(self):
@@ -6305,10 +6305,10 @@ class Test(unittest.TestCase):
                          '<music21.meter.TimeSignature 4/4>')
 
         # no time signature are in the source
-        self.assertEqual(len(sSrc.flatten().getElementsByClass('TimeSignature')), 0)
+        self.assertEqual(len(sSrc.flatten().getElementsByClass(meter.TimeSignature)), 0)
         # we add one time signature
         sSrc.insert(0.0, meter.TimeSignature('2/4'))
-        self.assertEqual(len(sSrc.flatten().getElementsByClass('TimeSignature')), 1)
+        self.assertEqual(len(sSrc.flatten().getElementsByClass(meter.TimeSignature)), 1)
 
         sMeasuresTwoFour = sSrc.makeMeasures()
         self.assertEqual(str(sMeasuresTwoFour[0].timeSignature),
@@ -6318,7 +6318,7 @@ class Test(unittest.TestCase):
         # check how many TimeSignatures we have:
         # we should have 1
         self.assertEqual(len(
-            sMeasuresTwoFour.flatten().getElementsByClass('TimeSignature')), 1)
+            sMeasuresTwoFour.flatten().getElementsByClass(meter.TimeSignature)), 1)
 
     def testDeepcopyActiveSite(self):
         # test that active sites make sense after deepcopying
@@ -6670,7 +6670,7 @@ class Test(unittest.TestCase):
         self.assertEqual(id(ssf1), id(ssf2))
 
         ts = s.parts[0].getElementsByClass(
-            'Measure')[3].getContextByClass('TimeSignature')
+            'Measure')[3].getContextByClass(meter.TimeSignature)
         self.assertEqual(str(ts), '<music21.meter.TimeSignature 4/4>')
         # environLocal.printDebug(['ts', ts])
 
@@ -7583,7 +7583,7 @@ class Test(unittest.TestCase):
         y = s.measures(50, 90)
 
         self.assertEqual(len(
-            y.parts[0].flatten().getElementsByClass('TimeSignature')), 2)
+            y.parts[0].flatten().getElementsByClass(meter.TimeSignature)), 2)
         # make sure that ts is being found in musicxml score generation
         # as it is in the Part, and not the Measure, this req an extra check
         GEX = m21ToXml.GeneralObjectExporter()

@@ -745,18 +745,18 @@ class Expander:
         reStream = self._srcMeasureStream.flatten().getElementsByClass(
             'RepeatExpression'
         ).stream()
-        self._codaCount = len(reStream.getElementsByClass('Coda'))
-        self._segnoCount = len(reStream.getElementsByClass('Segno'))
-        self._fineCount = len(reStream.getElementsByClass('Fine'))
+        self._codaCount = len(reStream.getElementsByClass(Coda))
+        self._segnoCount = len(reStream.getElementsByClass(Segno))
+        self._fineCount = len(reStream.getElementsByClass(Fine))
 
-        self._dcCount = len(reStream.getElementsByClass('DaCapo'))
-        self._dcafCount = len(reStream.getElementsByClass('DaCapoAlFine'))
-        self._dcacCount = len(reStream.getElementsByClass('DaCapoAlCoda'))
+        self._dcCount = len(reStream.getElementsByClass(DaCapo))
+        self._dcafCount = len(reStream.getElementsByClass(DaCapoAlFine))
+        self._dcacCount = len(reStream.getElementsByClass(DaCapoAlCoda))
 
-        self._asCount = len(reStream.getElementsByClass('AlSegno'))
-        self._dsCount = len(reStream.getElementsByClass('DalSegno'))
-        self._dsafCount = len(reStream.getElementsByClass('DalSegnoAlFine'))
-        self._dsacCount = len(reStream.getElementsByClass('DalSegnoAlCoda'))
+        self._asCount = len(reStream.getElementsByClass(AlSegno))
+        self._dsCount = len(reStream.getElementsByClass(DalSegno))
+        self._dsafCount = len(reStream.getElementsByClass(DalSegnoAlFine))
+        self._dsacCount = len(reStream.getElementsByClass(DalSegnoAlCoda))
 
     def process(self, deepcopy=True):
         '''
@@ -890,10 +890,10 @@ class Expander:
             # it probably is a measure; place in temporary containers
             mList = [streamObj]
         else:
-            mList = streamObj.getElementsByClass('Measure')
+            mList = streamObj.getElementsByClass(stream.Measure)
         for m in mList:
             remove = []
-            for e in m.getElementsByClass('RepeatExpression'):
+            for e in m.getElementsByClass(RepeatExpression):
                 remove.append(e)
             for e in remove:
                 m.remove(e)
@@ -991,7 +991,7 @@ class Expander:
     def _getRepeatExpressionCommand(self, streamObj):
         '''Get the instance found in this stream; assumes that there is one.
         '''
-        return streamObj.flatten().getElementsByClass('RepeatExpressionCommand').first()
+        return streamObj.flatten().getElementsByClass(RepeatExpressionCommand).first()
 
     def _daCapoIsCoherent(self):
         '''Check of a DC statement is coherent.
@@ -1723,7 +1723,7 @@ class Expander:
         '''
         post = []
         for i, m in enumerate(streamObj):
-            for e in m.getElementsByClass('RepeatExpression'):
+            for e in m.getElementsByClass(RepeatExpression):
                 if (target in e.classes
                         or (not isinstance(target, str) and isinstance(e, target))):
                     post.append(i)
@@ -2615,7 +2615,7 @@ class Test(unittest.TestCase):
         m1.rightBarline = bar.Repeat(direction='end', times=2)
         m1.repeatAppend(note.Note('g3', quarterLength=1), 4)
 
-        self.assertEqual(len(m1.getElementsByClass('RepeatMark')), 2)
+        self.assertEqual(len(m1.getElementsByClass('RepeatMark')), 2)  # leave quotes
 
         m2 = stream.Measure()
         m2.leftBarline = bar.Repeat(direction='start')
@@ -3788,7 +3788,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s2.parts[0].getElementsByClass(stream.Measure)), 36)
         self.assertEqual(len(s2.parts[0].flatten().notes), 250)
         # make sure barlines are stripped
-        bars = s2.parts[0].flatten().getElementsByClass('Repeat')
+        bars = s2.parts[0].flatten().getElementsByClass(Repeat)
         self.assertEqual(len(bars), 0)
 
 #         self.assertEqual(len(s2.parts[0].flatten().notes), 111)

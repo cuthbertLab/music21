@@ -202,7 +202,7 @@ def _copySingleMeasure(t, p, kCurrent):
                     + 'instead of romanTextToStreamOpus?')
             m.number = t.number[0]
             # update all keys
-            for rnPast in m.getElementsByClass('RomanNumeral'):
+            for rnPast in m.getElementsByClass(RomanNumeral):
                 if kCurrent is None:  # pragma: no cover
                     # should not happen
                     raise RomanTextTranslateException(
@@ -265,7 +265,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
             m.number = t.number[0] + mPast.number - targetStart
             measures.append(m)
             # update all keys
-            allRNs = list(m.getElementsByClass('RomanNumeral'))
+            allRNs = list(m.getElementsByClass(RomanNumeral))
             for rnPast in allRNs:
                 if kCurrent is None:  # pragma: no cover
                     # should not happen
@@ -1082,7 +1082,7 @@ def fixPickupMeasure(partObject):
     m0 = partObject.measure(0)
     if m0 is None:
         return
-    rnObjects = m0.getElementsByClass('RomanNumeral')
+    rnObjects = m0.getElementsByClass(RomanNumeral)
     if not rnObjects:
         return
     if rnObjects[0].offset == 0:
@@ -1179,21 +1179,21 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
         s = romanTextToStreamScore(testFiles.swv23)
         mStream = s.parts[0].getElementsByClass(stream.Measure)
         # the first four measures should all have the same content
-        rn1 = mStream[1].getElementsByClass('RomanNumeral').first()
+        rn1 = mStream[1].getElementsByClass(RomanNumeral).first()
         self.assertEqual([str(x) for x in rn1.pitches], ['D5', 'F#5', 'A5'])
         self.assertEqual(str(rn1.figure), 'V')
-        rn2 = mStream[1].getElementsByClass('RomanNumeral')[1]
+        rn2 = mStream[1].getElementsByClass(RomanNumeral)[1]
         self.assertEqual(str(rn2.figure), 'i')
 
         # make sure that m2, m3, m4 have the same values
-        rn1 = mStream[2].getElementsByClass('RomanNumeral')[0]
+        rn1 = mStream[2].getElementsByClass(RomanNumeral)[0]
         self.assertEqual(str(rn1.figure), 'V')
-        rn2 = mStream[2].getElementsByClass('RomanNumeral')[1]
+        rn2 = mStream[2].getElementsByClass(RomanNumeral)[1]
         self.assertEqual(str(rn2.figure), 'i')
 
-        rn1 = mStream[3].getElementsByClass('RomanNumeral')[0]
+        rn1 = mStream[3].getElementsByClass(RomanNumeral)[0]
         self.assertEqual(str(rn1.figure), 'V')
-        rn2 = mStream[3].getElementsByClass('RomanNumeral')[1]
+        rn2 = mStream[3].getElementsByClass(RomanNumeral)[1]
         self.assertEqual(str(rn2.figure), 'i')
 
         # test multiple measure copying
@@ -1221,29 +1221,29 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
             elif m.number == 51:  # m49-51 = m41-43
                 m3b = m
 
-        rn = m1a.getElementsByClass('RomanNumeral')[0]
+        rn = m1a.getElementsByClass(RomanNumeral)[0]
         self.assertEqual(str(rn.figure), 'IV')
-        rn = m1a.getElementsByClass('RomanNumeral')[1]
+        rn = m1a.getElementsByClass(RomanNumeral)[1]
         self.assertEqual(str(rn.figure), 'I')
 
-        rn = m1b.getElementsByClass('RomanNumeral')[0]
+        rn = m1b.getElementsByClass(RomanNumeral)[0]
         self.assertEqual(str(rn.figure), 'IV')
-        rn = m1b.getElementsByClass('RomanNumeral')[1]
+        rn = m1b.getElementsByClass(RomanNumeral)[1]
         self.assertEqual(str(rn.figure), 'I')
 
-        rn = m2a.getElementsByClass('RomanNumeral')[0]
+        rn = m2a.getElementsByClass(RomanNumeral)[0]
         self.assertEqual(str(rn.figure), 'I')
-        rn = m2a.getElementsByClass('RomanNumeral')[1]
+        rn = m2a.getElementsByClass(RomanNumeral)[1]
         self.assertEqual(str(rn.figure), 'ii')
 
-        rn = m2b.getElementsByClass('RomanNumeral')[0]
+        rn = m2b.getElementsByClass(RomanNumeral)[0]
         self.assertEqual(str(rn.figure), 'I')
-        rn = m2b.getElementsByClass('RomanNumeral')[1]
+        rn = m2b.getElementsByClass(RomanNumeral)[1]
         self.assertEqual(str(rn.figure), 'ii')
 
-        rn = m3a.getElementsByClass('RomanNumeral').first()
+        rn = m3a.getElementsByClass(RomanNumeral).first()
         self.assertEqual(str(rn.figure), 'V/ii')
-        rn = m3b.getElementsByClass('RomanNumeral').first()
+        rn = m3b.getElementsByClass(RomanNumeral).first()
         self.assertEqual(str(rn.figure), 'V/ii')
 
     def testMeasureCopyingB(self):
@@ -1251,7 +1251,7 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
         from music21.romanText import testFiles
         s = converter.parse(testFiles.monteverdi_3_13)
         m25 = s.measure(25)
-        rn = m25.flatten().getElementsByClass('RomanNumeral')
+        rn = m25.flatten().getElementsByClass(RomanNumeral)
         self.assertEqual(rn[1].figure, 'III')
         self.assertEqual(str(rn[1].key), 'd minor')
 
@@ -1314,9 +1314,9 @@ m8 I
 '''
         s = converter.parse(testCase, format='romanText')
         m = s.measure(7).flatten()
-        self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'D major')
+        self.assertEqual(m.getElementsByClass(RomanNumeral).first().key.name, 'D major')
         m = s.measure(8).flatten()
-        self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'D major')
+        self.assertEqual(m.getElementsByClass(RomanNumeral).first().key.name, 'D major')
 
     def testPivotInCopyMultiple2(self):
         '''
@@ -1335,7 +1335,7 @@ m8 I
 '''
         s = converter.parse(testCase, format='romanText')
         m = s.measure(5).flatten()
-        self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'G major')
+        self.assertEqual(m.getElementsByClass(RomanNumeral).first().key.name, 'G major')
 
     def testPivotInCopySingle(self):
         from music21 import converter
@@ -1349,7 +1349,7 @@ m6 I
 '''
         s = converter.parse(testCase, format='romanText')
         m = s.measure(6).flatten()
-        self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'D major')
+        self.assertEqual(m.getElementsByClass(RomanNumeral).first().key.name, 'D major')
 
     def testSecondaryInCopyMultiple(self):
         '''
@@ -1368,10 +1368,10 @@ m7 = m3
 
         s = romanTextToStreamScore(testSecondaryInCopy)
         m = s.measure(6).flatten()
-        self.assertEqual(m.getElementsByClass('RomanNumeral').first().pitchedCommonName,
+        self.assertEqual(m.getElementsByClass(RomanNumeral).first().pitchedCommonName,
                          'E-dominant seventh chord')
         m = s.measure(7).flatten()
-        self.assertEqual(m.getElementsByClass('RomanNumeral').first().pitchedCommonName,
+        self.assertEqual(m.getElementsByClass(RomanNumeral).first().pitchedCommonName,
                          'E-dominant seventh chord')
         # s.show()
 
@@ -1387,7 +1387,7 @@ m7 = m3
                             + 'm4 KS-3 vi \n m5 a: i b3 V4/2 \n m6 I',
                             format='romantext')
 
-        rnStream = s.flatten().getElementsByClass('RomanNumeral').stream()
+        rnStream = s.flatten().getElementsByClass(RomanNumeral).stream()
         self.assertEqual(rnStream[0].figure, 'I')
         self.assertEqual(rnStream[1].figure, 'V6/5')
         self.assertEqual(rnStream[2].figure, 'I')
@@ -1397,7 +1397,7 @@ m7 = m3
         self.assertEqual(rnStream[6].figure, 'V4/2')
         self.assertEqual(rnStream[7].figure, 'I')
 
-        rnStreamKey = s.flatten().getElementsByClass('KeySignature')
+        rnStreamKey = s.flatten().getElementsByClass(key.KeySignature)
         self.assertEqual(rnStreamKey[0].sharps, 1)
         self.assertEqual(rnStreamKey[1].sharps, -3)
 
@@ -1414,7 +1414,7 @@ m4-5 = m2-3
 m6-7 = m4-5
 '''
         s = converter.parse(src, format='romantext')
-        rnStream = s.flatten().getElementsByClass('RomanNumeral')
+        rnStream = s.flatten().getElementsByClass(RomanNumeral)
 
         for elementNumber in [0, 6, 12]:
             self.assertEqual(rnStream[elementNumber + 4].figure, 'III6')
@@ -1454,7 +1454,7 @@ m3 NC b3 G: V
         self.assertIn('Rest', r2.classes)
         self.assertEqual(r1.quarterLength, 1.0)
         rn1 = m2.notesAndRests[1]
-        self.assertIn('RomanNumeral', rn1.classes)
+        self.assertIn(RomanNumeral, rn1.classes)
         # s.show()
 
     def testUnProcessed(self):
@@ -1513,7 +1513,7 @@ m1 C: I'''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
         m1 = p.getElementsByClass(stream.Measure).first()
-        allRNs = m1.getElementsByClass('RomanNumeral')
+        allRNs = m1.getElementsByClass(RomanNumeral)
         notPChord = allRNs[0]
         pChord = allRNs[1]
         self.assertEqual(pChord.key.tonic.step, 'G')

@@ -1049,7 +1049,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         True
         '''
         # there could be more than one
-        tsList = self.getElementsByClass('TimeSignature').getElementsByOffset(0)
+        tsList = self.getElementsByClass(meter.TimeSignature).getElementsByOffset(0)
         # environLocal.printDebug([
         #    'matched Measure classes of type TimeSignature', tsList, len(tsList)])
         # only return timeSignatures at offset = 0.0
@@ -1295,14 +1295,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         >>> s.append(meter.TimeSignature('5/8'))
         >>> s.append(note.Note('d-2'))
         >>> s.insert(dynamics.Dynamic('fff'))
-        >>> s.hasElementOfClass('TimeSignature')
+        >>> s.hasElementOfClass(meter.TimeSignature)
         True
         >>> s.hasElementOfClass('Measure')
         False
 
         To be deprecated in v.8 -- to be removed in version 9, use:
 
-        >>> bool(s.getElementsByClass('TimeSignature'))
+        >>> bool(s.getElementsByClass(meter.TimeSignature))
         True
         >>> bool(s.getElementsByClass(stream.Measure))
         False
@@ -1764,7 +1764,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         >>> s.repeatAppend(note.Note('C'), 8)
         >>> len(s)
         9
-        >>> s.removeByNotOfClass('TimeSignature')
+        >>> s.removeByNotOfClass(meter.TimeSignature)
         >>> len(s)
         1
         >>> len(s.notes)
@@ -3066,7 +3066,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
                 keySignatures = sLeft.getElementsByClass(key.KeySignature)
             if keySignatures:
                 sRight.keySignature = copy.deepcopy(keySignatures[0])
-            endClef = sLeft.getContextByClass('Clef')
+            endClef = sLeft.getContextByClass(clef.Clef)
             if endClef is not None:
                 sRight.clef = copy.deepcopy(endClef)
 
@@ -4776,7 +4776,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
                       (4.0, [<music21.stream.Measure 2 offset=4.0>,
                              ...])])
         >>> for measure_obj in mom[8.0]:
-        ...     print(measure_obj, measure_obj.getContextByClass('Part').id)
+        ...     print(measure_obj, measure_obj.getContextByClass(stream.Part).id)
         <music21.stream.Measure 3 offset=8.0> Soprano
         <music21.stream.Measure 3 offset=8.0> Alto
         <music21.stream.Measure 3 offset=8.0> Tenor
@@ -5255,7 +5255,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
             # sort by time to search the most recent objects
             obj = self.getContextByClass('TimeSignature', sortByCreationTime=sortByCreationTime)
-            # obj = self.previous('TimeSignature')
+            # obj = self.previous(meter.TimeSignature)
             # environLocal.printDebug(['getTimeSignatures(): searching contexts: results', obj])
             if obj is not None:
                 post.append(obj)
@@ -8418,7 +8418,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
 
         >>> bach = corpus.parse('bach/bwv1.6')
-        >>> bach.parts[0].measure(2).getContextByClass('TimeSignature')
+        >>> bach.parts[0].measure(2).getContextByClass(meter.TimeSignature)
         <music21.meter.TimeSignature 4/4>
         >>> returnTuples = []
         >>> for offset in [0.0, 1.0, 2.0, 5.0, 5.5]:
@@ -8461,7 +8461,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             raise StreamException('beatAndMeasureFromOffset: no measure at that offset.')
         ts1 = myMeas.timeSignature
         if ts1 is None:
-            ts1 = myMeas.getContextByClass('TimeSignature')
+            ts1 = myMeas.getContextByClass(meter.TimeSignature)
 
         if ts1 is None:
             raise StreamException(
@@ -8488,7 +8488,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         if numSuffix is not None or (fixZeros and foundMeasureNumber == 0):
             prevMeas = myStream.getElementBeforeOffset(myMeas.offset, classList=['Measure'])
             if prevMeas:
-                ts2 = prevMeas.getContextByClass('TimeSignature')
+                ts2 = prevMeas.getContextByClass(meter.TimeSignature)
                 if not ts2:
                     raise StreamException(
                         'beatAndMeasureFromOffset: partial measure found, '
@@ -8589,7 +8589,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
                         and 'GenericInterval' in value.classes):
                     # do not transpose KeySignatures w/ Generic Intervals
                     if not isinstance(e, key.KeySignature) and hasattr(e, 'pitches'):
-                        k = e.getContextByClass('KeySignature')
+                        k = e.getContextByClass(key.KeySignature)
                         for p in e.pitches:
                             value.transposePitchKeyAware(p, k, inPlace=True)
                 else:

@@ -19,7 +19,7 @@ __all__ = [
     'cleanpath',
 ]
 
-from typing import List, Union, Optional
+from typing import List, Union, Optional, overload, Literal
 import inspect
 import os
 import pathlib
@@ -144,7 +144,28 @@ def relativepath(path: str, start: Optional[str] = None) -> str:
     return os.path.relpath(path, start)
 
 
-def cleanpath(path: Union[str, pathlib.Path], *, returnPathlib=None) -> Union[str, pathlib.Path]:
+@overload
+def cleanpath(path: pathlib.Path, *,
+              returnPathlib: Literal[None] = None) -> pathlib.Path:
+    return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
+
+@overload
+def cleanpath(path: str, *,
+              returnPathlib: Literal[None] = None) -> str:
+    return '/'  # dummy until Astroid #1015 is fixed.
+
+@overload
+def cleanpath(path: Union[str, pathlib.Path], *,
+              returnPathlib: Literal[True] = None) -> pathlib.Path:
+    return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
+
+@overload
+def cleanpath(path: Union[str, pathlib.Path], *,
+              returnPathlib: Literal[False] = None) -> str:
+    return '/'  # dummy until Astroid #1015 is fixed.
+
+def cleanpath(path: Union[str, pathlib.Path], *,
+              returnPathlib: Union[bool, None] = None) -> Union[str, pathlib.Path]:
     '''
     Normalizes the path by expanding ~user on Unix, ${var} environmental vars
     (is this a good idea?), expanding %name% on Windows, normalizing path names

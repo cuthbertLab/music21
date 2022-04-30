@@ -886,7 +886,7 @@ class OffsetAxis(PositionAxis):
         >>> ax.mostMeasureTicksToShow = 4
         >>> ax.ticks()
         [(0.0, '0'), (9.0, '3'), (21.0, '6'), (29.0, '8')]
-        >>> m5 = soprano.getElementsByClass('Measure')[5]
+        >>> m5 = soprano.getElementsByClass(stream.Measure)[5]
         >>> m5.number
         5
         >>> m5.rightBarline = bar.Barline('double')

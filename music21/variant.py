@@ -1119,7 +1119,7 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
         :width: 600
 
 
-    >>> for p in mergedStreams.getElementsByClass('Part'):
+    >>> for p in mergedStreams.getElementsByClass(stream.Part):
     ...    for m in p.getElementsByClass(stream.Measure):
     ...        m.activateVariants('paris', inPlace=True)
     >>> mergedStreams.show('t')
@@ -1194,9 +1194,9 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
         if returnObj.highestTime != s.highestTime:
             raise VariantException('cannot merge streams of different lengths')
 
-        returnObjParts = returnObj.getElementsByClass('Part')
+        returnObjParts = returnObj.getElementsByClass(stream.Part)
         if returnObjParts:  # If parts exist, iterate through them.
-            sParts = s.getElementsByClass('Part')
+            sParts = s.getElementsByClass(stream.Part)
             for i, returnObjPart in enumerate(returnObjParts):
                 sPart = sParts[i]
 
@@ -2023,9 +2023,9 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
     # TODO: Add the feature for merging a stream to a stream with existing variants
     # (it has to compare against both the stream and the contained variant)
     if (streamA.getElementsByClass(stream.Measure)
-            or streamA.getElementsByClass('Part')
+            or streamA.getElementsByClass(stream.Part)
             or streamB.getElementsByClass(stream.Measure)
-            or streamB.getElementsByClass('Part')):
+            or streamB.getElementsByClass(stream.Part)):
         raise VariantException(
             '_mergeVariants cannot merge streams which contain measures or parts.'
         )

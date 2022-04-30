@@ -590,7 +590,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('symphony94', 3)
 #         sFlat = s.flatten()
 #         # s.show()
-#         self.assertEqual(len(sFlat.getElementsByClass('Dynamic')), 79)
+#         self.assertEqual(len(sFlat.getElementsByClass(dynamics.Dynamic)), 79)
 #
 #
 #     def testMuseDataImportErrorA(self):

@@ -422,9 +422,9 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         s = converter.parse(testPrimitive.transposingInstruments72a)
-        i1 = s.parts[0].flatten().getElementsByClass('Instrument').first()
-        i2 = s.parts[1].flatten().getElementsByClass('Instrument').first()
-        # unused_i3 = s.parts[2].flatten().getElementsByClass('Instrument').first()
+        i1 = s.parts[0].flatten().getElementsByClass(instrument.Instrument).first()
+        i2 = s.parts[1].flatten().getElementsByClass(instrument.Instrument).first()
+        # unused_i3 = s.parts[2].flatten().getElementsByClass(instrument.Instrument).first()
 
         self.assertEqual(str(i1.transposition), '<music21.interval.Interval M-2>')
         self.assertEqual(str(i2.transposition), '<music21.interval.Interval M-6>')
@@ -441,19 +441,19 @@ class Test(unittest.TestCase):
         # N.B. names don't change just transpositions.
         # all playing A4 in concert pitch.
 
-        iStream1 = s.parts[0].flatten().getElementsByClass('Instrument').stream()
+        iStream1 = s.parts[0][instrument.Instrument].stream()
         # three instruments; one initial, and then one for each transposition
         self.assertEqual(len(iStream1), 3)
         i1 = iStream1[0]
         self.assertIsInstance(i1, instrument.Oboe)
 
         # should be 3
-        iStream2 = s.parts[1].flatten().getElementsByClass('Instrument').stream()
+        iStream2 = s.parts[1][instrument.Instrument].stream()
         self.assertEqual(len(iStream2), 3)
         i2 = iStream2[0]
         self.assertIsInstance(i2, instrument.Clarinet)
 
-        iStream3 = s.parts[2].flatten().getElementsByClass('Instrument').stream()
+        iStream3 = s.parts[2][instrument.Instrument].stream()
         self.assertEqual(len(iStream3), 1)
         i3 = iStream3[0]
         self.assertIsInstance(i3, instrument.Horn)
@@ -503,7 +503,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.transposing01)
-        instStream = s.flatten().getElementsByClass('Instrument')
+        instStream = s[instrument.Instrument]
         # for i in instStream:
         #    print(i.offset, i, i.transposition)
         self.assertEqual(len(instStream), 7)
@@ -612,7 +612,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.textBoxes01)
-        tbs = s.flatten().getElementsByClass('TextBox')
+        tbs = s[expressions.TextBox]
         self.assertEqual(len(tbs), 5)
 
         msg = []
@@ -732,9 +732,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(systemLayouts), 42)
         staffLayouts = layouts.getElementsByClass(layout.StaffLayout)
         self.assertEqual(len(staffLayouts), 20)
-        pageLayouts = layouts.getElementsByClass('PageLayout')
+        pageLayouts = layouts.getElementsByClass(layout.PageLayout)
         self.assertEqual(len(pageLayouts), 10)
-        scoreLayouts = layouts.getElementsByClass('ScoreLayout')
+        scoreLayouts = layouts.getElementsByClass(layout.ScoreLayout)
         self.assertEqual(len(scoreLayouts), 1)
 
         self.assertEqual(len(layouts), 73)
@@ -763,7 +763,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sl0.leftMargin, 70.0)
         self.assertEqual(sl0.rightMargin, 0.0)
 
-        staffLayouts = layouts.getElementsByClass('StaffLayout')
+        staffLayouts = layouts.getElementsByClass(layout.StaffLayout)
         sizes = []
         for s in staffLayouts:
             if s.staffSize is not None:
@@ -776,7 +776,7 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         c = corpus.parse('schoenberg/opus19/movement2.mxl')
-        dynAll = c.flatten().getElementsByClass('Dynamic')
+        dynAll = c.flatten().getElementsByClass(dynamics.Dynamic)
         self.assertEqual(len(dynAll), 6)
         notesOrChords = (note.Note, chord.Chord)
         allNotesOrChords = c.flatten().getElementsByClass(notesOrChords)

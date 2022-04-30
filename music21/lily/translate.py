@@ -1971,9 +1971,9 @@ class LilypondConverter:
         # Stuff that can be done on the first element only (clef, new/old, id, color)
         replacedElements = variantList[0].replacedElements(activeSite)
         re0 = replacedElements[0]
-        replacedElementsClef = re0.clef or re0.getContextByClass('Clef')
+        replacedElementsClef = re0.clef or re0.getContextByClass(clef.Clef)
 
-        variantContainerStream = variantList[0].getContextByClass('Part')
+        variantContainerStream = variantList[0].getContextByClass(stream.Part)
         if variantContainerStream is None:
             variantContainerStream = variantList[0].getContextByClass('Stream')
 
@@ -2118,9 +2118,9 @@ class LilypondConverter:
         ['london']
 
         '''
-        replacedElementsClef = replacedElements[0].getContextByClass('Clef')
+        replacedElementsClef = replacedElements[0].getContextByClass(clef.Clef)
 
-        variantContainerStream = variantObject.getContextByClass('Part')
+        variantContainerStream = variantObject.getContextByClass(stream.Part)
         if variantContainerStream is None:
             variantContainerStream = variantObject.getContextByClass('Stream')
 

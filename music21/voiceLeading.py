@@ -1644,9 +1644,9 @@ class Verticality(base.Music21Object):
             p = stream.Part(id=f'part-{partNum}')
             foundObj = elementList[0]
 
-            cl = foundObj.getContextByClass('Clef')
-            ks = foundObj.getContextByClass('KeySignature')
-            ts = foundObj.getContextByClass('TimeSignature')
+            cl = foundObj.getContextByClass(clef.Clef)
+            ks = foundObj.getContextByClass(key.KeySignature)
+            ts = foundObj.getContextByClass(meter.TimeSignature)
 
             if cl:
                 p.append(cl)

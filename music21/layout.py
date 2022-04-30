@@ -703,7 +703,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
                 staffObject.elements = p
                 thisSystem.replace(p, staffObject)
-                allStaffLayouts: List[StaffLayout] = p.recurse().getElementsByClass('StaffLayout')
+                allStaffLayouts: List[StaffLayout] = list(p[StaffLayout])
                 if not allStaffLayouts:
                     continue
                 # else:
@@ -864,7 +864,7 @@ class LayoutScore(stream.Opus):
 
         >>> #_DOCS_SHOW g = corpus.parse('luca/gloria')
         >>> #_DOCS_SHOW m22 = g.parts[0].getElementsByClass(stream.Measure)[22]
-        >>> #_DOCS_SHOW m22.getElementsByClass('PageLayout').first().leftMargin = 204.0
+        >>> #_DOCS_SHOW m22.getElementsByClass(layout.PageLayout).first().leftMargin = 204.0
         >>> #_DOCS_SHOW gl = layout.divideByPages(g)
         >>> #_DOCS_SHOW gl.getMarginsAndSizeForPageId(1)
         >>> layout.PageSize(171.0, 204.0, 171.0, 171.0, 1457.0, 1886.0) #_DOCS_HIDE
