@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         mei/base.py
-# Purpose:      Public methods for the MEI module
+# Purpose:      Public interfaces for the MEI module
 #
 # Authors:      Christopher Antila
 #
@@ -9,7 +9,7 @@
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-These are the public methods for the MEI module by Christopher Antila
+These are the public interfaces for the MEI module by Christopher Antila
 
 To convert a string with MEI markup into music21 objects,
 use :meth:`~music21.mei.MeiToM21Converter.convertFromString`.

@@ -7,18 +7,37 @@
 #               Michael Scott Asato Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2009-2012, 2017 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
+#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects.
+Tools for graphing, plotting, or otherwise visualizing :class:`~music21.stream.Stream` objects.
 
-The :class:`~music21.graph.primitives.Graph` object subclasses primitive, abstract fundamental
-graphing archetypes using the matplotlib library. The :class:`~music21.graph.plot.PlotStream`
-object subclasses provide reusable approaches to graphing data and structures in
-:class:`~music21.stream.Stream` objects.
+The easiest and most common way of using plotting functions is to call
+`.plot('typeOfGraph')` on a Stream.  See :meth:`~music21.stream.Stream.plot`.
+That method uses tools from the `music21.graph.findPlot` module to map between
+names of plots and classes that can show them.
 
-The most common way of using plotting functions is to call `.plot()` on a Stream.
+The :class:`~music21.graph.plot.PlotStream`
+subclasses in the `music21.graph.plot` module give easy to use
+and configurable ways of graphing data and structures in
+:class:`~music21.stream.Stream` objects.  These Plot objects use classes from
+the `music21.graph.axis` module to automatically extract relevant data for you.
+
+At a lower level, the :class:`~music21.graph.primitives.Graph` subclasses
+in the `music21.graph.primitives` modules give abstract fundamental
+graphing archetypes using the matplotlib library.  They are to be used when
+you already have data extracted on your own but still want to take advantage
+of musically-aware axes and scaling.
+
+From highest level to lowest level usage, ways of graphing are as follows:
+
+    1. `streamObj.plot('graphName')`
+    2. `graph.plot.Class(streamObj).run()`
+    3. `plotter = graph.primitives.Class(); plotter.data = ...; plotter.process()`
+    4. Use `matplotlib` directly to create any graph, musical or non-musical.
+
 '''
 __all__ = [
     'axis', 'findPlot', 'plot', 'primitives', 'utilities',
