@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -212,7 +212,19 @@ class Dynamic(base.Music21Object):
             >>> d.englishName
             'very soft'
             ''',
-        'placement': "Staff placement: 'above', 'below', or None.",
+        'placement': '''
+            Staff placement: 'above', 'below', or None.
+
+            A setting of None implies that the placement will be determined
+            by notation software and no particular placement is demanded.
+
+            This is not placed in the `.style` property, since for some dynamics,
+            the placement above or below an object has semantic
+            meaning and is not purely presentational.  For instance, a dynamic
+            placed between two staves in a piano part implies that it applies
+            to both hands, while one placed below the lower staff would apply
+            only to the left hand.
+            ''',
     }
 
     def __init__(self, value=None):

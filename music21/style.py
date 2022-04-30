@@ -60,9 +60,16 @@ class Style(ProtoM21Object):
 
     '''
     _DOC_ATTR = {
-        'hideObjectOnPrint': '''if set to `True` will not print upon output
+        'hideObjectOnPrint': '''
+            If set to `True`, the Music21Object will not print upon output
             (only used in MusicXML output at this point and
-            Lilypond for notes, chords, and rests).''',
+            in Lilypond output for notes, chords, and rests).
+            ''',
+        'units': '''
+            What distances are measured in.  The default "tenths" is a concept
+            borrowed from MusicXML which refers to 1/10th of the distance between
+            two staff lines.  It is currently also the only supported unit.
+            ''',
     }
 
     def __init__(self):
@@ -181,7 +188,8 @@ class Style(ProtoM21Object):
                          doc='''
         Get or set the vertical position, where 0
         is the top line of the staff and units
-        are in 10ths of a staff space.
+        are whatever is defined in `.units`, generally "tenths", meaning
+        1/10th of a staff space.
 
         Other legal positions are 'above' and 'below' which
         are synonyms for 10 and -70 respectively (for 5-line
@@ -210,14 +218,54 @@ class NoteStyle(Style):
     '''
     A Style object that also includes stem and accidental style information.
 
-    Beam style is stored on the Beams object, as is lyric style
+    Beam style is stored on the Beams object.  Lyric style is stored on the Lyric
+    object.
     '''
+    _DOC_ATTR = {
+        'stemStyle': '''
+            An optional style.Style object describing what the stem looks like.
+
+            >>> n = note.Note()
+            >>> n.style.stemStyle is None
+            True
+
+            Note that stemStyle is not created automatically.  Users must
+            instantiate a :class:`~music21.style.Style` object.
+
+            >>> n.style.stemStyle = style.Style()
+            >>> n.style.stemStyle.color = 'red'
+            ''',
+        'accidentalStyle': '''
+            An optional style.Style object describing what the accidental looks like.
+
+            >>> n = note.Note()
+            >>> n.style.accidentalStyle is None
+            True
+
+            Note that accidentalStyle is not created automatically.  Users must
+            instantiate a :class:`~music21.style.Style` object.
+
+            >>> n.style.accidentalStyle = style.Style()
+            >>> n.style.accidentalStyle.relativeX = -2.0
+
+            Note: do not use .hideObjectOnPrint in accidentalStyle to hide the
+            accidental.  Set the displayType on the Accidental itself.
+
+            This object may eventually move to Note.pitch.accidental.style.
+            ''',
+        'noteSize': '''
+            An optional string representing the size of the note as a type of note.
+
+            Valid values are None (=normal), `'cue'`, `'grace'`, `'graceCue'`, and `'large'`
+            (taken from MusicXML, with "graceCue" replacing "grace-cue").
+            ''',
+    }
 
     def __init__(self):
         super().__init__()
-        self.stemStyle = None
-        self.accidentalStyle = None
-        self.noteSize = None  # can be 'cue' etc.
+        self.stemStyle: Optional[Style] = None
+        self.accidentalStyle: Optional[Style] = None
+        self.noteSize: Optional[str] = None  # can be 'cue' etc.
 
 
 class TextStyle(Style):

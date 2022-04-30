@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-11, '15 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-22 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -387,7 +387,16 @@ class MetronomeMark(TempoIndication):
     144
     '''
     _DOC_ATTR = {
-        'placement': "Staff placement: 'above', 'below', or None.",
+        'placement': '''
+            Staff placement: 'above', 'below', or None.
+
+            A setting of None implies that the placement will be determined
+            by notation software and no particular placement is demanded.
+
+            This is not placed in the `.style` property, since for some expressions,
+            the placement above or below an object has semantic
+            meaning and is not purely presentational.
+            ''',
     }
 
     def __init__(self, text=None, number=None, referent=None, parentheses=False):

@@ -36,7 +36,7 @@ except ImportError:
 #           use its bound instance, and so could be written as a function.
 # R0904:	Too many public methods (%s/%s) Used when class has too many public methods,
 #            try to reduce this to get a more simple (and so easier to use) class.
-# E1101:	%s %r has no %r member Used when a variable is accessed for an non-existent member.
+# E1101:	%s %r has no %r member Used when a variable is accessed for a non-existent member.
 # R0914:	Too many local variables (%s/%s) Used when a function or method has
 #           too many local variables.
 # many of our test use many local variables
@@ -84,8 +84,6 @@ def main(fnAccept=None, strict=False):
 
     ]
     disable = [  # These also need to be changed in MUSIC21BASE/.pylintrc
-        'not-an-iterable',  # TOO BAD -- this is important, but so many false positives
-
         'arguments-differ',  # -- no -- should be able to add additional arguments so long
         # as initial ones are the same.
         'arguments-renamed',  # not an issue
@@ -139,7 +137,7 @@ def main(fnAccept=None, strict=False):
         'simplifiable-if-statement',  # NO! NO! NO!
         #  if (x or y and z and q): return True, else: return False,
         #      is a GREAT paradigm -- over "return (x or y and z and q)" and
-        #      assuming that it returns a bool...  it's no slower than
+        #      assuming that it returns a bool...  it is not any slower than
         #      the simplification and it's so much clearer.
         'consider-using-enumerate',  # good when i used only once, but
         # x[i] = y[i] is a nice paradigm, even if one can be simplified out.
