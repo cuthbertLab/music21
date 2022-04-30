@@ -983,10 +983,10 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
     def getElementsByClass(
         self,
         classFilterList: Union[
-           str,
-           Type[ChangedM21ObjType],
-           Iterable[str],
-           Iterable[Type[ChangedM21ObjType]],
+            str,
+            Type[ChangedM21ObjType],
+            Iterable[str],
+            Iterable[Type[ChangedM21ObjType]],
         ],
         *,
         returnClone: bool = True
