@@ -69,7 +69,7 @@ from music21.stream import filters
 
 from music21.common.numberTools import opFrac
 from music21.common.enums import GatherSpanners, OffsetSpecial
-from music21.common.types import StreamType, M21ObjType, OffsetQL, ClassListType
+from music21.common.types import StreamType, M21ObjType, OffsetQL
 
 from music21 import environment
 
@@ -80,7 +80,7 @@ ImmutableStreamException = exceptions21.ImmutableStreamException
 
 T = TypeVar('T')
 # we sometimes need to return a different type.
-M21ObjType2 = TypeVar('M21ObjType2', bound=base.Music21Object)
+ChangedM21ObjType = TypeVar('ChangedM21ObjType', bound=base.Music21Object)
 
 BestQuantizationMatch = namedtuple('BestQuantizationMatch',
     ['error', 'tick', 'match', 'signedError', 'divisor'])
@@ -405,24 +405,32 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         return self.__iter__()
 
     @overload
-    def __getitem__(self, k: str) -> iterator.RecursiveIterator:
-        ...
+    def __getitem__(self, k: str) -> iterator.RecursiveIterator[M21ObjType]:
+        # Remove this code and replace with ... once Astroid #1015 is fixed.
+        x: iterator.RecursiveIterator[M21ObjType] = self.recurse()
+        return x
 
     @overload
     def __getitem__(self, k: int) -> M21ObjType:
-        ...
+        return self[k]  # dummy code
 
     @overload
     def __getitem__(self, k: slice) -> List[M21ObjType]:
-        ...
+        return list(self.elements)  # dummy code
 
     @overload
-    def __getitem__(self, k: Type[M21ObjType2]) -> iterator.RecursiveIterator[M21ObjType2]:
-        ...
+    def __getitem__(self,
+                    k: Type[ChangedM21ObjType]
+    ) -> iterator.RecursiveIterator[ChangedM21ObjType]:
+        x: iterator.RecursiveIterator[ChangedM21ObjType] = self.recurse()
+        return x  # dummy code
 
     def __getitem__(self,
-                    k: Union[str, int, slice, Type[M21ObjType]]
-                    ) -> Union[iterator.RecursiveIterator, M21ObjType, List[M21ObjType]]:
+                    k: Union[str, int, slice, Type[ChangedM21ObjType]]
+                    ) -> Union[iterator.RecursiveIterator[M21ObjType],
+                               iterator.RecursiveIterator[ChangedM21ObjType],
+                               M21ObjType,
+                               List[M21ObjType]]:
         '''
         Get a Music21Object from the Stream using a variety of keys or indices.
 
@@ -3355,23 +3363,34 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
     @overload
     def getElementsByClass(self,
                            classFilterList: Union[str, Iterable[str]]
-                           ) -> iterator.StreamIterator:
-        ...
-
-    @overload
-    def getElementsByClass(self,
-                           classFilterList: Type[M21ObjType]
                            ) -> iterator.StreamIterator[M21ObjType]:
-        ...
+        # Remove all dummy code once Astroid #1015 is fixed
+        x: iterator.StreamIterator[M21ObjType] = self.iter()
+        return x  # dummy code
 
     @overload
     def getElementsByClass(self,
-                           classFilterList: Iterable[Type[M21ObjType]]
-                           ) -> iterator.StreamIterator:
-        ...
+                           classFilterList: Type[ChangedM21ObjType]
+                           ) -> iterator.StreamIterator[ChangedM21ObjType]:
+        x: iterator.StreamIterator[ChangedM21ObjType] = self.iter()
+        return x  # dummy code
 
-    def getElementsByClass(self, classFilterList: ClassListType
-                           ) -> iterator.StreamIterator[ClassListType]:
+    @overload
+    def getElementsByClass(self,
+                           classFilterList: Iterable[Type[ChangedM21ObjType]]
+                           ) -> iterator.StreamIterator[M21ObjType]:
+        x: iterator.StreamIterator[M21ObjType] = self.iter()
+        return x  # dummy code
+
+    def getElementsByClass(self,
+                           classFilterList: Union[
+                               str,
+                               Type[ChangedM21ObjType],
+                               Iterable[str],
+                               Iterable[Type[ChangedM21ObjType]],
+                           ],
+                           ) -> Union[iterator.StreamIterator[M21ObjType],
+                                      iterator.StreamIterator[ChangedM21ObjType]]:
         '''
         Return a StreamIterator that will iterate over Elements that match one
         or more classes in the `classFilterList`. A single class
@@ -4293,7 +4312,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         returnObj = self.cloneEmpty(derivationMethod='measures')
         srcObj = self
 
-        mStreamIter = self.getElementsByClass(Measure)
+        mStreamIter: iterator.StreamIterator[Measure] = self.getElementsByClass(Measure)
 
         # FIND THE CORRECT ORIGINAL MEASURE OBJECTS
         # for indicesNotNumbers, this is simple...
@@ -7535,7 +7554,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
                 streamsOnly=False,
                 restoreActiveSites=True,
                 classFilter=(),
-                includeSelf=None) -> iterator.RecursiveIterator[Any]:
+                includeSelf=None) -> iterator.RecursiveIterator[M21ObjType]:
         '''
         `.recurse()` is a fundamental method of music21 for getting into
         elements contained in a Score, Part, or Measure, where elements such as

@@ -462,7 +462,7 @@ class Test(unittest.TestCase):
         m.timeSignature = ts
         n = note.Note(quarterLength=0.5)
         m.repeatAppend(n, 6)
-        match = [n.beatStr for n in m.notes]
+        match = [n.beatStr for n in m.iter().getElementsByClass(note.NotRest)]
         self.assertEqual(match, ['1', '2', '3', '4', '5', '6'])
         m.makeBeams(inPlace=True)
         # m.show()
