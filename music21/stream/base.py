@@ -12,16 +12,14 @@
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-The :class:`~music21.stream.Stream` and its subclasses,
-a subclass of the :class:`~music21.base.Music21Object`,
-is the fundamental container of offset-positioned notation and
+The :class:`~music21.stream.Stream` and its subclasses
+(which are themselves subclasses of the :class:`~music21.base.Music21Object`)
+are the fundamental containers of offset-positioned notation and
 musical elements in music21. Common Stream subclasses, such
-as the :class:`~music21.stream.Measure`
-and :class:`~music21.stream.Score` objects, are defined in
-this module.
+as the :class:`~music21.stream.Measure`, :class:`~music21.stream.Part`
+and :class:`~music21.stream.Score` objects, are also in this module.
 '''
 from __future__ import annotations
-
 
 import collections
 import copy
@@ -419,8 +417,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         return list(self.elements)  # dummy code
 
     @overload
-    def __getitem__(self,
-                    k: Type[ChangedM21ObjType]
+    def __getitem__(
+        self,
+        k: Type[ChangedM21ObjType]
     ) -> iterator.RecursiveIterator[ChangedM21ObjType]:
         x: iterator.RecursiveIterator[ChangedM21ObjType] = self.recurse()
         return x  # dummy code
@@ -13618,7 +13617,7 @@ class Score(Stream):
                 bundle.append(sub)
         # else, assume it is a list of groupings
         elif common.isIterable(voiceAllocation):
-            voiceAllocation: List[Union[List, int]]
+            voiceAllocation = cast(List[Union[List, int]], voiceAllocation)
             for group in voiceAllocation:
                 sub = []
                 # if a single entry
@@ -14074,7 +14073,6 @@ class Test(unittest.TestCase):
                 b = copy.deepcopy(obj)
                 self.assertNotEqual(a, obj)
                 self.assertNotEqual(b, obj)
-
 
 
 # -----------------------------------------------------------------------------

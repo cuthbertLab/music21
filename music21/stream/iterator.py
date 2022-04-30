@@ -18,7 +18,7 @@ StreamIterators are explicitly allowed to access private methods on streams.
 from __future__ import annotations
 
 import copy
-from typing import (TypeVar, List, Union, Callable, Optional, Literal, Any,
+from typing import (TypeVar, List, Union, Callable, Optional, Literal,
                     TypedDict, Generic, overload, Iterable, Type, cast)
 import unittest
 import warnings
@@ -980,16 +980,17 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
         return x
 
 
-    def getElementsByClass(self,
-                           classFilterList: Union[
-                               str,
-                               Type[ChangedM21ObjType],
-                               Iterable[str],
-                               Iterable[Type[ChangedM21ObjType]],
-                           ],
-                           *,
-                           returnClone: bool = True
-                           ) -> Union[StreamIterator[M21ObjType], StreamIterator[ChangedM21ObjType]]:
+    def getElementsByClass(
+        self,
+        classFilterList: Union[
+           str,
+           Type[ChangedM21ObjType],
+           Iterable[str],
+           Iterable[Type[ChangedM21ObjType]],
+        ],
+        *,
+        returnClone: bool = True
+    ) -> Union[StreamIterator[M21ObjType], StreamIterator[ChangedM21ObjType]]:
         '''
         Add a filter to the Iterator to remove all elements
         except those that match one
