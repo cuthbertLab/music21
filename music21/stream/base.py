@@ -392,15 +392,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         '''
         return iterator.StreamIterator[M21ObjType](self)
 
-    @property
     def iter(self) -> iterator.StreamIterator[M21ObjType]:
         '''
         The Stream iterator, used in all for
         loops and similar iteration routines. This method returns the
         specialized :class:`music21.stream.StreamIterator` class, which
         adds necessary Stream-specific features.
-
-        Call this as `.iter()`  -- the property-only access will go away in v9.
 
         Generally you don't need this, just iterate over a stream, but it is necessary
         to add custom filters to an iterative search before iterating.

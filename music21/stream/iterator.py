@@ -187,21 +187,6 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], collections.ab
 
         return f'for {streamClass}:{srcStreamId} @:{self.index}'
 
-    def __call__(self: _SIter) -> _SIter:
-        '''
-        Temporary workaround to support both prior usage of `.iter`
-        and new recommended usage of `.iter()`.
-        During the period where `.iter` is still supported, even calling `.iter()`
-        (recommended) will retrieve the property `.iter` and necessitate
-        this workaround.
-
-        Returns `self` without any changes.
-
-        TODO: manage and emit DeprecationWarnings in v.8 (probably impossible...)
-        TODO: remove in v.9
-        '''
-        return self
-
     def __iter__(self: _SIter) -> _SIter:
         self.reset()
         return self
