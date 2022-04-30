@@ -1515,14 +1515,14 @@ class OffsetIterator(StreamIterator[M21ObjType]):
     def __init__(self,
                  srcStream,
                  *,
-                 # restrictClass: M21ObjType = base.Music21Object,
+                 restrictClass: M21ObjType = base.Music21Object,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
                  ignoreSorting=False
                  ):
         super().__init__(srcStream,
-                         # restrictClass=restrictClass,
+                         restrictClass=restrictClass,
                          filterList=filterList,
                          restoreActiveSites=restoreActiveSites,
                          activeInformation=activeInformation,
@@ -1697,7 +1697,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
     def __init__(self,
                  srcStream,
                  *,
-                 # restrictClass: M21ObjType = base.Music21Object,
+                 restrictClass: M21ObjType = base.Music21Object,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
@@ -1706,7 +1706,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
                  ignoreSorting=False
                  ):  # , parentIterator=None):
         super().__init__(srcStream,
-                         # restrictClass=restrictClass,
+                         restrictClass=restrictClass,
                          filterList=filterList,
                          restoreActiveSites=restoreActiveSites,
                          activeInformation=activeInformation,

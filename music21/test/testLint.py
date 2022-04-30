@@ -83,7 +83,6 @@ def main(fnAccept=None, strict=False):
 
     ]
     disable = [  # These also need to be changed in MUSIC21BASE/.pylintrc
-        # 'not-an-iterable',  # TOO BAD -- this is important, but so many false positives
         'arguments-differ',  # -- no -- should be able to add additional arguments so long
         # as initial ones are the same.
         'arguments-renamed',  # not an issue
