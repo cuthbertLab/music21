@@ -853,6 +853,7 @@ class Music21Object(prebase.ProtoM21Object):
         returnSpecial: bool = False,
     ) -> Union[float, fractions.Fraction, str]:
         return 0.0  # dummy until Astroid #1015 is fixed.  Replace with ...
+        # using bool instead of Literal[True] because of
 
     def getOffsetBySite(
         self,
@@ -3073,7 +3074,9 @@ class Music21Object(prebase.ProtoM21Object):
 
         # clear lyrics from remaining parts
         if isinstance(eRemain, note.GeneralNote):
-            eRemain.lyrics = []
+            emptyLyrics: List['music21.note.Lyric'] = []
+            # not sure why isinstance check is not picking this up.
+            eRemain.lyrics = emptyLyrics  # pylint: disable=attribute-defined-outside-init
 
         spannerList = []
         for listType in ('expressions', 'articulations'):
@@ -3123,7 +3126,7 @@ class Music21Object(prebase.ProtoM21Object):
         # set ties
         if addTies and isinstance(e, (note.Note, note.Unpitched)):
             forceEndTieType = 'stop'
-            if hasattr(e, 'tie') and e.tie is not None:
+            if e.tie is not None:
                 # the last tie of what was formally a start should
                 # continue
                 if e.tie.type == 'start':
@@ -3137,12 +3140,14 @@ class Music21Object(prebase.ProtoM21Object):
                 elif e.tie.type == 'continue':
                     forceEndTieType = 'continue'
                     # keep continue if already set
-            elif isinstance(e, (note.Note, note.Unpitched)):
-                e.tie = tie.Tie('start')
-                # #need a tie object
+            else:
+                # not sure why this is not being picked up by isinstance check
+                e.tie = tie.Tie('start')  # pylint: disable=attribute-defined-outside-init
 
             if isinstance(eRemain, (note.Note, note.Unpitched)):
-                eRemain.tie = tie.Tie(forceEndTieType)
+                # not sure why this is not being picked up by isinstance check
+                newTie = tie.Tie(forceEndTieType)
+                eRemain.tie = newTie # pylint: disable=attribute-defined-outside-init
 
         elif addTies and isinstance(e, chord.Chord) and isinstance(eRemain, chord.Chord):
             # the last isinstance is redundant, but MyPy needs it.

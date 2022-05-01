@@ -1135,7 +1135,6 @@ def midiEventsToTempo(eventList):
     TODO: Need Tests
     '''
     from music21 import midi as midiModule
-    from music21 import tempo
 
     if not common.isListLike(eventList):
         event = eventList
@@ -2223,7 +2222,6 @@ def conductorStream(s: stream.Stream) -> stream.Part:
         {0.0} <music21.stream.Stream measureLike>
             {0.0} <music21.note.Note C>
     '''
-    from music21 import tempo
     from music21 import meter
     partsList = list(s.getElementsByClass(stream.Stream).getElementsByOffset(0))
     minPriority = min(p.priority for p in partsList) if partsList else 0
@@ -3588,7 +3586,6 @@ class Test(unittest.TestCase):
 
     def testMidiTempoImportB(self):
         from music21 import converter
-        from music21 import tempo
 
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         # a file with three tracks and one conductor track with four tempo marks
@@ -3647,7 +3644,6 @@ class Test(unittest.TestCase):
     def testMidiExportConductorA(self):
         '''Export conductor data to MIDI conductor track.'''
         from music21 import meter
-        from music21 import tempo
 
         p1 = stream.Part()
         p1.repeatAppend(note.Note('c4'), 12)
@@ -3678,7 +3674,6 @@ class Test(unittest.TestCase):
         # s.show('midi', app='Logic Express')
 
     def testMidiExportConductorB(self):
-        from music21 import tempo
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         s.insert(0, tempo.MetronomeMark(number=240))
@@ -3695,7 +3690,6 @@ class Test(unittest.TestCase):
         self.assertEqual(musicTrkRepr.count('SET_TEMPO'), 0)
 
     def testMidiExportConductorC(self):
-        from music21 import tempo
         minTempo = 60
         maxTempo = 600
         period = 50
@@ -3725,7 +3719,6 @@ class Test(unittest.TestCase):
     def testMidiExportConductorE(self):
         '''The conductor only gets the first element at an offset.'''
         from music21 import converter
-        from music21 import tempo
 
         s = stream.Stream()
         p1 = converter.parse('tinynotation: c1')

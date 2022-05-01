@@ -2111,9 +2111,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
                 # Handle last part in the StaffGroup
                 if sg.isLast(p):
                     # find the spanner in the dictionary already-assigned
-                    for key, value in partGroupIndexRef.items():
+                    for k, value in partGroupIndexRef.items():
                         if value is sg:
-                            activeIndex = key
+                            activeIndex = k
                             break
                     mxPartGroup = Element('part-group')
                     mxPartGroup.set('type', 'stop')

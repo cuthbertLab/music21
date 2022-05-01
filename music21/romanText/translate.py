@@ -680,8 +680,8 @@ class PartTranslator:
         '''
         Translate a single atom in a measure token.
 
-        a is the Atom
-        m is a `stream.Measure` object.
+        `a` is the Atom
+        `m` is a `stream.Measure` object.
 
         Uses coreInsert and coreAppend methods, so must have `m.coreElementsChanged()`
         called afterwards.
@@ -785,7 +785,7 @@ class PartTranslator:
                 else:
                     rtt = RomanTextUnprocessedToken(a)
                     m.coreInsert(self.currentOffsetInMeasure, rtt)
-            else:  # mid measure repeat signs
+            else:  # mid-measure repeat signs
                 rtt = RomanTextUnprocessedToken(a)
                 m.coreInsert(self.currentOffsetInMeasure, rtt)
 
@@ -925,7 +925,9 @@ letterToNumDict = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 
 
 
 def appendMeasureToRepeatEndingsDict(t, m, repeatEndings, measureNumber=None):
-    '''Takes an RTMeasure object (t), (which might represent one or more
+    # noinspection PyShadowingNames
+    '''
+    Takes an RTMeasure object (t), (which might represent one or more
     measures; but currently only one) and a music21 stream.Measure object and
     store it as a tuple in the repeatEndings dictionary to mark where the
     translator should later mark for adding endings.
@@ -975,6 +977,7 @@ def appendMeasureToRepeatEndingsDict(t, m, repeatEndings, measureNumber=None):
 
 
 def _consolidateRepeatEndings(repeatEndings):
+    # noinspection PyShadowingNames
     '''
     take repeatEndings, which is a dict of integers (repeat ending numbers) each
     holding a list of tuples of measure numbers and measure objects that get this ending,
@@ -985,7 +988,6 @@ def _consolidateRepeatEndings(repeatEndings):
     Assumes that the list of measure numbers in each repeatEndings array is sorted.
 
     For the sake of demo and testing, we will use strings instead of measure objects.
-
 
     >>> repeatEndings = {1: [(5, 'm5a'), (6, 'm6a'), (17, 'm17'), (18, 'm18'),
     ...                      (19, 'm19'), (23, 'm23a')],
@@ -1042,7 +1044,9 @@ def _addRepeatsFromRepeatEndings(s, repeatEndings):
 
 
 def fixPickupMeasure(partObject):
-    '''Fix a pickup measure if any.
+    # noinspection PyShadowingNames
+    '''
+    Fix a pickup measure if any.
 
     We determine a pickup measure by being measure 0 and not having an RN
     object at the beginning.
@@ -1459,8 +1463,6 @@ m3 NC b3 G: V
 
     def testUnProcessed(self):
         from music21 import converter
-        from music21.romanText.translate import RomanTextUnprocessedMetadata
-
         src = '''Note: Hello
 m1 G: IV || b3 d: III b4 NC
 varM1 I
