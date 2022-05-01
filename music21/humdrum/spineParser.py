@@ -76,8 +76,7 @@ from music21.humdrum import harmparser
 from music21.humdrum import instruments
 
 from music21 import environment
-_MOD = 'humdrum.spineParser'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('humdrum.spineParser')
 
 flavors = {'JRP': False}
 

@@ -70,8 +70,7 @@ from music21.metadata import bundles
 from music21 import _version
 from music21 import environment
 
-_MOD = 'converter'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('converter')
 
 
 # ------------------------------------------------------------------------------

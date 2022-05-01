@@ -28,8 +28,7 @@ from music21 import prebase
 from music21 import note  # circular but acceptable, because not used at highest level.
 
 from music21 import environment
-_MOD = 'volume'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('volume')
 
 
 # ------------------------------------------------------------------------------

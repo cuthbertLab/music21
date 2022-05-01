@@ -30,8 +30,7 @@ from music21 import prebase
 from music21 import style
 
 from music21 import environment
-_MOD = 'spanner'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('spanner')
 
 
 # ------------------------------------------------------------------------------

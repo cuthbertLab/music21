@@ -119,11 +119,7 @@ __all__ = [
 
 Music21Exception = exceptions21.Music21Exception
 
-
-# ?? pylint does not think that this was used...
-
-_MOD = 'base'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('base')
 
 _missingImport = []
 for modName in ('matplotlib', 'numpy'):

@@ -17,8 +17,7 @@ from music21 import pitch
 from music21 import chord
 
 from music21 import environment
-_MOD = 'analysis.transposition'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.transposition')
 
 
 class TranspositionException(exceptions21.Music21Exception):

@@ -37,8 +37,7 @@ from music21 import stream
 from music21 import variant
 from music21.lily import lilyObjects as lyo
 
-_MOD = 'lily.translate'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('lily.translate')
 
 try:
     if find_spec('PIL.Image') and find_spec('PIL.ImageOps'):

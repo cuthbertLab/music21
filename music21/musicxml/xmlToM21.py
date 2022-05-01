@@ -64,8 +64,7 @@ from music21 import tie
 
 from music21 import environment
 
-_MOD = 'musicxml.xmlToM21'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('musicxml.xmlToM21')
 
 # what goes in a `.staffReference`
 StaffReferenceType = Dict[int, List[base.Music21Object]]

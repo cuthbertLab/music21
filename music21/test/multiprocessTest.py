@@ -34,8 +34,7 @@ from music21 import common
 from music21.test import testRunner
 from music21.test import commonTest
 
-_MOD = 'test.multiprocessTest'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('test.multiprocessTest')
 
 @dataclasses.dataclass
 class ModuleResponse:

@@ -49,8 +49,7 @@ from music21 import prebase
 from music21.midi import realtime
 from music21.midi import percussion
 
-_MOD = 'midi'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('midi')
 
 
 # good midi reference:

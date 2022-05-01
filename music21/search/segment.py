@@ -40,8 +40,7 @@ from music21 import converter
 from music21 import corpus
 from music21 import environment
 
-_MOD = 'search.segment'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('search.segment')
 
 
 # noinspection SpellCheckingInspection

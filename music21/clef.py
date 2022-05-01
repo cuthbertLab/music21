@@ -27,8 +27,7 @@ from music21 import environment
 from music21 import pitch  # for typing only
 from music21 import style
 
-_MOD = 'clef'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('clef')
 
 
 class ClefException(exceptions21.Music21Exception):

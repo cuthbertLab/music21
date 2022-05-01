@@ -38,9 +38,7 @@ from music21.tree.trees import OffsetTree
 from music21.exceptions21 import InstrumentException
 
 from music21 import environment
-
-_MOD = 'instrument'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('instrument')
 
 
 def unbundleInstruments(streamIn: 'music21.stream.Stream',

@@ -57,8 +57,7 @@ from music21 import interval
 from music21.scale.scala import scl
 
 from music21 import environment
-_MOD = "scale.scala"
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('scale.scala')
 
 
 # ------------------------------------------------------------------------------

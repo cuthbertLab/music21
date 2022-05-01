@@ -26,8 +26,7 @@ from music21 import spanner
 from music21 import style
 
 from music21 import environment
-_MOD = 'tempo'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('tempo')
 
 
 # all lowercase, even german, for string comparison

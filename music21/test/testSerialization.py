@@ -17,8 +17,7 @@ import music21  # needed to do fully-qualified isinstance name checking
 from music21 import freezeThaw
 
 from music21 import environment
-_MOD = 'test.testSerialization'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('test.testSerialization')
 
 
 # ------------------------------------------------------------------------------

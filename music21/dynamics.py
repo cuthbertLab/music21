@@ -24,8 +24,7 @@ from music21 import spanner
 from music21 import style
 
 from music21 import environment
-_MOD = 'dynamics'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('dynamics')
 
 
 shortNames = ['pppppp', 'ppppp', 'pppp', 'ppp', 'pp', 'p', 'mp',

@@ -101,8 +101,7 @@ from music21.common.enums import GatherSpanners
 from music21.stream.enums import StaffType
 
 from music21 import environment
-_MOD = 'layout'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('layout')
 
 
 SystemSize = namedtuple('SystemSize', ['top', 'left', 'right', 'bottom'])
@@ -1700,8 +1699,9 @@ class Test(unittest.TestCase):
         we have had problems with attributes disappearing.
         '''
         from music21 import corpus
+        from music21 import layout
         lt = corpus.parse('demos/layoutTest.xml')
-        ls = divideByPages(lt, fastMeasures=True)
+        ls = layout.divideByPages(lt, fastMeasures=True)
 
         hiddenStaff = ls.pages[0].systems[3].staves[1]
         self.assertTrue(repr(hiddenStaff).endswith('Staff 11: p.1, sys.4, st.2>'),

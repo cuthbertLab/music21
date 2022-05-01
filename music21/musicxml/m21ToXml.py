@@ -61,8 +61,7 @@ from music21.musicxml.xmlObjects import MusicXMLExportException
 from music21.musicxml.xmlObjects import MusicXMLWarning
 
 from music21 import environment
-_MOD = "musicxml.m21ToXml"
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('musicxml.m21ToXml')
 
 # ------------------------------------------------------------------------------
 

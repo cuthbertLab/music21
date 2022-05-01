@@ -36,8 +36,7 @@ from music21 import tempo
 from music21.instrument import Conductor, deduplicate
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
-_MOD = 'midi.translate'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('midi.translate')
 PERCUSSION_MAPPER = PercussionMapper()
 
 

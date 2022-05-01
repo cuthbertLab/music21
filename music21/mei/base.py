@@ -200,8 +200,7 @@ from music21 import stream
 from music21 import spanner
 from music21 import tie
 
-_MOD = 'mei.base'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('mei.base')
 
 
 # Module-Level Constants

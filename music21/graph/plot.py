@@ -48,8 +48,7 @@ from music21.analysis import reduction
 from music21.analysis import windowed
 
 from music21 import environment
-_MOD = 'graph.plot'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('graph.plot')
 
 
 def _mergeDicts(a, b):

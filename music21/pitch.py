@@ -36,8 +36,7 @@ from music21 import environment
 
 _T = TypeVar('_T')
 
-_MOD = 'pitch'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('pitch')
 
 PitchClassString = Literal['a', 'A', 't', 'T', 'b', 'B', 'e', 'E']
 

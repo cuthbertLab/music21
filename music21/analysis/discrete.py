@@ -39,8 +39,7 @@ from music21 import pitch
 
 
 from music21 import environment
-_MOD = 'analysis.discrete'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.discrete')
 
 
 # -----------------------------------------------------------------------------

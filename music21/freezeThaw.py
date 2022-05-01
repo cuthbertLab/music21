@@ -86,8 +86,7 @@ from music21 import variant
 # from music21.tree.trees import ElementTree
 
 from music21 import environment
-_MOD = 'freezeThaw'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('freezeThaw')
 
 # -----------------------------------------------------------------------------
 

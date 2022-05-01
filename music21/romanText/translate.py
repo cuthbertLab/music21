@@ -1463,6 +1463,7 @@ m3 NC b3 G: V
 
     def testUnProcessed(self):
         from music21 import converter
+        from music21.romanText import translate
         src = '''Note: Hello
 m1 G: IV || b3 d: III b4 NC
 varM1 I
@@ -1470,7 +1471,7 @@ Note: Hi
 '''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        unprocessedElements = p[RomanTextUnprocessedMetadata]
+        unprocessedElements = p[translate.RomanTextUnprocessedMetadata]
         self.assertEqual(len(unprocessedElements), 3)
         note1, var1, note2 = unprocessedElements
         self.assertEqual(note1.tag, 'Note')

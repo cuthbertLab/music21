@@ -2596,7 +2596,6 @@ class RepeatFinder:
         return mGroups
 
 
-
 # ------------------------------------------------------------------------------
 # Tests have been moved to test/test_repeat.py in order to get better import tests.
 # define presented order in documentation

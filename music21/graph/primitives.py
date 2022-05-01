@@ -39,8 +39,7 @@ from music21 import prebase
 from music21.converter.subConverters import SubConverter
 
 from music21 import environment
-_MOD = 'graph.primitives'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('graph.primitives')
 
 
 # ------------------------------------------------------------------------------

@@ -20,8 +20,7 @@ from music21 import interval
 
 
 from music21 import environment
-_MOD = 'analysis.segmentByRests'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.segmentByRests')
 
 # ------------------------------------------------------------------------------
 

@@ -31,8 +31,7 @@ from music21 import pitch
 
 from music21 import environment
 
-_MOD = 'serial'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('serial')
 
 
 # ------------------------------------------------------------------------------

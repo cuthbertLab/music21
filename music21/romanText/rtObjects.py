@@ -24,12 +24,10 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import key
 from music21 import prebase
+environLocal = environment.Environment('romanText.rtObjects')
 
-_MOD = 'romanText.rtObjects'
-environLocal = environment.Environment(_MOD)
-
-# alternate endings might end with a, b, c for non
-# zero or more for everything after the first number
+# alternate endings might end with a, b, c for
+# nonzero or more for everything after the first number
 reMeasureTag = re.compile(r'm[0-9]+[a-b]*-*[0-9]*[a-b]*')
 reVariant = re.compile(r'var[0-9]+')
 reVariantLetter = re.compile(r'var([A-Z]+)')

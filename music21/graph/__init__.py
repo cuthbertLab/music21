@@ -55,8 +55,7 @@ from music21.graph import primitives
 from music21.graph import utilities
 
 from music21 import environment
-_MOD = 'graph'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('graph')
 
 
 def plotStream(

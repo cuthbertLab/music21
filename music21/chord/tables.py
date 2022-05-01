@@ -19,12 +19,10 @@ chord representations. All features of this module are made available through
 from collections import namedtuple
 import unittest
 
+from music21 import environment
 from music21 import exceptions21
 
-from music21 import environment
-_MOD = 'chord.tables'
-environLocal = environment.Environment(_MOD)
-
+environLocal = environment.Environment('chord.tables')
 
 ChordTableAddress = namedtuple('ChordTableAddress',
                                ['cardinality', 'forteClass', 'inversion', 'pcOriginal'])

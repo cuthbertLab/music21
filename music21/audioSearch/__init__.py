@@ -59,8 +59,7 @@ from music21.audioSearch import recording
 from music21.audioSearch import transcriber
 
 from music21 import environment
-_MOD = 'audioSearch'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('audioSearch')
 
 audioChunkLength = 1024
 recordSampleRate = 44100

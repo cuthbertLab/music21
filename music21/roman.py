@@ -38,9 +38,7 @@ from music21 import chord
 FigureTuple = namedtuple('FigureTuple', ['aboveBass', 'alter', 'prefix'])
 ChordFigureTuple = namedtuple('ChordFigureTuple', ['aboveBass', 'alter', 'prefix', 'pitch'])
 
-
-_MOD = 'roman'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('roman')
 
 # TODO: setting inversion should change the figure
 
