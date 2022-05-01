@@ -664,11 +664,11 @@ class Test(unittest.TestCase):
 
         # check pitches in chords; sharps are applied due to key signature
         match = [p.nameWithOctave for p in s.parts[1].flatten().getElementsByClass(
-            'Chord')[4].pitches]
+            chord.Chord)[4].pitches]
         self.assertEqual(match, ['F#4', 'D4', 'B3'])
 
         match = [p.nameWithOctave for p in s.parts[1].flatten().getElementsByClass(
-            'Chord')[3].pitches]
+            chord.Chord)[3].pitches]
         self.assertEqual(match, ['E4', 'C#4', 'A3'])
 
         # s.show()
@@ -877,17 +877,15 @@ class Test(unittest.TestCase):
             '''
         score = converter.parse(target_str, format='abc')
 
-        self.assertEqual(len(list(score.flatten().getElementsByClass(
-            'ChordSymbol'))), 9)
-        self.assertEqual(len(list(score.flatten().getElementsByClass(
-            'NoChord'))), 4)
+        self.assertEqual(len(score[harmony.ChordSymbol]), 9)
+        self.assertEqual(len(score[harmony.NoChord]), 4)
 
         score = harmony.realizeChordSymbolDurations(score)
 
-        self.assertEqual(8, score.getElementsByClass(harmony.ChordSymbol)[
-            -1].quarterLength)
-        self.assertEqual(4, score.getElementsByClass(harmony.ChordSymbol)[
-            0].quarterLength)
+        self.assertEqual(8, score.getElementsByClass(harmony.ChordSymbol)
+                            .last().quarterLength)
+        self.assertEqual(4, score.getElementsByClass(harmony.ChordSymbol)
+                            .first().quarterLength)
 
     def testAbcKeyImport(self):
         from music21 import abcFormat
@@ -944,15 +942,14 @@ class Test(unittest.TestCase):
         # s.show()
         # one start, one end
         # s.parts[0].show('t')
-        self.assertEqual(len(s['Repeat']), 2)
+        self.assertEqual(len(s[repeat.Repeat]), 2)
         # s.show()
 
         # this has a 1 note pickup
         # has three repeat bars; first one is implied
         s = converter.parse(testFiles.draughtOfAle)
-        self.assertEqual(len(s['Repeat']), 3)
-        self.assertEqual(s.parts[0].getElementsByClass(
-            'Measure')[0].notes[0].pitch.nameWithOctave, 'D4')
+        self.assertEqual(len(s[repeat.Repeat]), 3)
+        self.assertEqual(s[note.Note].first().pitch.nameWithOctave, 'D4')
 
         # new problem case:
         s = converter.parse(testFiles.hectorTheHero)

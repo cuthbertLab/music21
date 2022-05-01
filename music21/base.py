@@ -145,7 +145,7 @@ class ElementException(exceptions21.Music21Exception):
 
 # -----------------------------------------------------------------------------
 # for contextSites searches...
-ContextTuple = namedtuple('ContextTuple', 'site offset recurseType')
+ContextTuple = namedtuple('ContextTuple', ['site', 'offset', 'recurseType'])
 
 
 # pseudo class for returning splitAtX() type commands.

@@ -247,8 +247,7 @@ class TestCommonContextSearches(Test):
         self.s = corpus.parse('bwv66.6')
 
     def testFocus(self):
-        self.s.parts[0].getElementsByClass(
-            'Measure')[3].getContextByClass(meter.TimeSignature)
+        self.s.parts[0].getElementsByClass(Measure)[3].getContextByClass(meter.TimeSignature)
 
 
 class TestBigMusicXML(Test):

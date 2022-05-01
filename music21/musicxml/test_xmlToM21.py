@@ -300,31 +300,31 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts), 2)
         # there are voices, but they have been removed
         self.assertEqual(len(s.parts[0].getElementsByClass(
-            'Measure')[0].voices), 0)
+            stream.Measure)[0].voices), 0)
 
         # s.parts[0].show('t')
         # self.assertEqual(len(s.parts[0].voices), 2)
         s = converter.parse(testPrimitive.mixedVoices1b)
         self.assertEqual(len(s.parts), 2)
         self.assertEqual(len(s.parts[0].getElementsByClass(
-            'Measure')[0].voices), 0)
+            stream.Measure)[0].voices), 0)
         # s.parts[0].show('t')
 
         # this case, there were 4, but there should be 2
         s = converter.parse(testPrimitive.mixedVoices2)
         self.assertEqual(len(s.parts), 2)
         self.assertEqual(len(s.parts[0].getElementsByClass(
-            'Measure')[0].voices), 2)
+            stream.Measure)[0].voices), 2)
         self.assertEqual(len(s.parts[1].getElementsByClass(
-            'Measure')[0].voices), 2)
+            stream.Measure)[0].voices), 2)
 
         # s.parts[0].show('t')
 
-#         s = converter.parse(testPrimitive.mixedVoices1b)
-#         s = converter.parse(testPrimitive.mixedVoices2)
+        # s = converter.parse(testPrimitive.mixedVoices1b)
+        # s = converter.parse(testPrimitive.mixedVoices2)
 
-    #         s = converter.parse(testPrimitive.mixedVoices1b)
-    #         s = converter.parse(testPrimitive.mixedVoices2)
+        # s = converter.parse(testPrimitive.mixedVoices1b)
+        # s = converter.parse(testPrimitive.mixedVoices2)
 
     def testImportMetronomeMarksA(self):
         from music21.musicxml import testPrimitive
@@ -794,7 +794,7 @@ class Test(unittest.TestCase):
         testFp = thisDir / 'testTrillOnOneNote.xml'
         c = converter.parse(testFp)  # , forceSource=True)
 
-        trillExtension = c.parts[0].getElementsByClass('TrillExtension').first()
+        trillExtension = c.parts[0].getElementsByClass(expressions.TrillExtension).first()
         fSharpTrill = c.recurse().notes[0]
         # print(trillExtension.placement)
         self.assertEqual(fSharpTrill.name, 'F#')

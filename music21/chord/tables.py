@@ -26,7 +26,8 @@ _MOD = 'chord.tables'
 environLocal = environment.Environment(_MOD)
 
 
-ChordTableAddress = namedtuple('ChordTableAddress', 'cardinality forteClass inversion pcOriginal')
+ChordTableAddress = namedtuple('ChordTableAddress',
+                               ['cardinality', 'forteClass', 'inversion', 'pcOriginal'])
 
 
 # ------------------------------------------------------------------------------

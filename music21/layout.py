@@ -97,6 +97,7 @@ from music21 import base
 from music21 import exceptions21
 from music21 import spanner
 from music21 import stream
+from music21.common.enums import GatherSpanners
 from music21.stream.enums import StaffType
 
 from music21 import environment
@@ -654,7 +655,9 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
         thisPage.measureEnd = pageEndM
         thisPage.pageNumber = pageNumber
         if fastMeasures is True:
-            thisPageAll = scoreIn.measures(pageStartM, pageEndM, collect=[], gatherSpanners=False)
+            thisPageAll = scoreIn.measures(pageStartM, pageEndM,
+                                           collect=[],
+                                           gatherSpanners=GatherSpanners.NONE)
         else:
             thisPageAll = scoreIn.measures(pageStartM, pageEndM)
         thisPage.systemStart = systemNumber + 1
@@ -676,7 +679,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
             if fastMeasures is True:
                 measureStacks = scoreIn.measures(systemStartM, systemEndM,
                                                  collect=[],
-                                                 gatherSpanners=False)
+                                                 gatherSpanners=GatherSpanners.NONE)
             else:
                 measureStacks = scoreIn.measures(systemStartM, systemEndM)
             thisSystem = System()

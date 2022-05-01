@@ -75,7 +75,7 @@ class Wildcard(m21Base.Music21Object):
         self.duration = WildcardDuration()
 
 
-class SearchMatch(namedtuple('SearchMatch', 'elStart els index iterator')):
+class SearchMatch(namedtuple('SearchMatch', ['elStart', 'els', 'index', 'iterator'])):
     '''
     A lightweight object representing the match (if any) for a search.  Derived from namedtuple
     '''

@@ -1043,8 +1043,8 @@ class OffsetAxis(PositionAxis):
             # if we have part-like sub streams; we can assume that all parts
             # have parallel measures start times here for simplicity
             # take the top part
-            offsetMap = s.getElementsByClass(
-                'Stream')[0].measureOffsetMap([stream.Measure])
+            offsetMap = (s.getElementsByClass(stream.Stream).first()
+                         .measureOffsetMap([stream.Measure]))
         elif s.hasMeasures():
             offsetMap = s.measureOffsetMap([stream.Measure])
         else:

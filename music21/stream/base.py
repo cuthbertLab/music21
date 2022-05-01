@@ -80,8 +80,10 @@ T = TypeVar('T')
 # we sometimes need to return a different type.
 ChangedM21ObjType = TypeVar('ChangedM21ObjType', bound=base.Music21Object)
 
-BestQuantizationMatch = namedtuple('BestQuantizationMatch',
-    ['error', 'tick', 'match', 'signedError', 'divisor'])
+BestQuantizationMatch = namedtuple(
+    'BestQuantizationMatch',
+    ['error', 'tick', 'match', 'signedError', 'divisor']
+)
 
 class StreamDeprecationWarning(UserWarning):
     # Do not subclass Deprecation warning, because these
@@ -1138,7 +1140,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         {0.0} <music21.layout.StaffLayout distance None, staffNumber None,
                   staffSize None, staffLines 4>
 
-        >>> staffLayout = m.getElementsByClass('StaffLayout').first()
+        >>> staffLayout = m.getElementsByClass(layout.StaffLayout).first()
         >>> staffLayout.staffLines = 1
         >>> m.staffLines
         1
@@ -4943,7 +4945,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         return self.getElementsByClass('Voice')
 
     @property
-    def spanners(self):
+    def spanners(self) -> iterator.StreamIterator['music21.spanner.Spanner']:
         '''
         Return all :class:`~music21.spanner.Spanner` objects
         (things such as Slurs, long trills, or anything that
@@ -6019,6 +6021,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         else:
             workObj = self
 
+        templateStream: Stream
         if self.hasPartLikeStreams():
             # use the measure boundaries of the first Part as a template.
             templateStream = workObj.getElementsByClass('Stream').first()
@@ -6812,6 +6815,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             # part-like does not necessarily mean that the next level down is a stream.Part
             # object or that this is a stream.Score object, so do not substitute
             # returnObj.parts for this...
+            p: Part
             for p in returnObj.getElementsByClass('Stream'):
                 # already copied if necessary; edit in place
                 p.stripTies(inPlace=True, matchByPitch=matchByPitch)
@@ -8054,7 +8058,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         getTempoFromContext = False
         # need to find all tempo indications and the number of quarter lengths
         # under each
-        tiStream = self.getElementsByClass('TempoIndication')
+        tiStream = self.getElementsByClass(tempo.TempoIndication)
         offsetMetronomeMarkPairs = []
 
         if not tiStream:
@@ -8165,7 +8169,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         # using flat here may not always be desirable
         # may want to do a recursive upward search as well
         srcFlat = srcObj.flatten()
-        tiStream = srcFlat.getElementsByClass('TempoIndication')
+        tiStream = srcFlat.getElementsByClass(tempo.TempoIndication)
         mmBoundaries = []  # a  list of (start, end, mm)
 
         # not sure if this should be taken from the flat representation
@@ -8331,7 +8335,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         >>> a = stream.Stream()
         >>> a.metadata = metadata.Metadata()
         '''
-        mdList = self.getElementsByClass('Metadata')
+        mdList = self.getElementsByClass(metadata.Metadata)
         # only return metadata that has an offset = 0.0
         mdList = mdList.getElementsByOffset(0)
         return mdList.first()
@@ -9044,6 +9048,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
         if returnObj.hasMeasures():
             # call on component measures
+            m: Measure
             for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByQuarterLengths(quarterLengthList,
                                         target=target, addTies=addTies, inPlace=True)
@@ -9051,6 +9056,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             return returnObj  # exit
 
         if returnObj.hasPartLikeStreams():
+            p: Part
             for p in returnObj.getElementsByClass('Part'):
                 p.sliceByQuarterLengths(quarterLengthList,
                                         target=target, addTies=addTies, inPlace=True)
@@ -9182,6 +9188,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
         if returnObj.hasPartLikeStreams():
             # part-like requires getting Streams, not Parts
+            p: Stream
             for p in returnObj.getElementsByClass('Stream'):
                 offsetListLocal = [o - p.getOffsetBySite(returnObj) for o in offsetList]
                 p.sliceAtOffsets(offsetList=offsetListLocal,
@@ -9250,6 +9257,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
         if returnObj.hasMeasures():
             # call on component measures
+            m: Measure
             for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByBeat(target=target,
                               addTies=addTies,
@@ -9258,6 +9266,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             return returnObj  # exit
 
         if returnObj.hasPartLikeStreams():
+            p: Part
             for p in returnObj.getElementsByClass('Part'):
                 p.sliceByBeat(target=target,
                               addTies=addTies,
@@ -9384,7 +9393,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             multiPart = False
             if not self.isFlat:  # if flat, does not have parts!
                 # do not need to look in endElements
-                obj: base.Music21Object
+                obj: Stream
                 for obj in self.getElementsByClass('Stream'):
                     # if obj is a Part, we have multi-parts
                     if 'Part' in obj.classes:
@@ -10840,6 +10849,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         # add all parts to one Score
         if self.hasPartLikeStreams():
             # part-like does not necessarily mean .parts
+            p: Stream
             for p in self.getElementsByClass('Stream'):
                 sSub = p.voicesToParts(separateById=separateById)
                 for pSub in sSub:
@@ -11167,37 +11177,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
         return returnLists
 
-    # --------------------------------------------------------------------------
-    # Variant control
-    @property
-    def variants(self):
-        '''
-        Return a Stream containing all :class:`~music21.variant.Variant` objects in this Stream.
-
-        >>> s = stream.Stream()
-        >>> s.repeatAppend(note.Note('C4'), 8)
-        >>> v1 = variant.Variant([note.Note('D#4'), note.Note('F#4')])
-        >>> s.insert(3, v1)
-
-        >>> varStream = s.variants
-        >>> len(varStream)
-        1
-        >>> varStream[0] is v1
-        True
-        >>> len(s.variants[0])
-        2
-
-        Note that the D# and F# aren't found in the original Stream's pitches
-
-        >>> [str(p) for p in s.pitches]
-        ['C4', 'C4', 'C4', 'C4', 'C4', 'C4', 'C4', 'C4']
-
-        DEPRECATED in v7.
-        '''
-        if 'variants' not in self._cache or self._cache['variants'] is None:
-            self._cache['variants'] = self.getElementsByClass('Variant').stream(
-                returnStreamSubClass=False)
-        return self._cache['variants']
 
     # ---- Variant Activation Methods
     def activateVariants(self, group=None, *, matchBySpan=True, inPlace=False):
@@ -13352,8 +13331,8 @@ class Score(Stream):
 
     def measure(self,
                 measureNumber,
-                collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
-                gatherSpanners=True,
+                collect=(clef.Clef, meter.TimeSignature, instrument.Instrument, key.KeySignature),
+                gatherSpanners=GatherSpanners.ALL,
                 indicesNotNumbers=False):
         '''
         Given a measure number (or measure index, if indicesNotNumbers is True)
@@ -13433,6 +13412,7 @@ class Score(Stream):
         # this calls on Music21Object, transfers id, groups
         post.mergeAttributes(self)
         # note that this will strip all objects that are not Parts
+        p: Part
         for p in self.getElementsByClass('Part'):
             # insert all at zero
             mStream = p.measures(startMeasureNumber,
@@ -13470,6 +13450,7 @@ class Score(Stream):
             eNew = copy.deepcopy(e)  # assume that this is needed
             post.insert(self.elementOffset(e), eNew)
 
+        p: Part
         for p in self.getElementsByClass('Part'):
             # get spanners at highest level, not by Part
             post.insert(0, p.expandRepeats(copySpanners=False))
@@ -13538,6 +13519,7 @@ class Score(Stream):
             mCount = 1  # treat as a single measure
         for i in range(mCount):  # may be 1
             uniqueQuarterLengths = []
+            p: Part
             for p in returnObj.getElementsByClass('Part'):
                 if p.hasMeasures():
                     m = p.getElementsByClass(Measure)[i]
@@ -13555,6 +13537,7 @@ class Score(Stream):
             # environLocal.printDebug(['Score.sliceByGreatestDivisor:
             # got divisor from unique ql:', divisor, uniqueQuarterLengths])
 
+            p: Part
             for p in returnObj.getElementsByClass('Part'):
                 # in place: already have a copy if nec
                 # must do on measure at a time
@@ -13734,6 +13717,7 @@ class Score(Stream):
 
         # do not assume that we have parts here
         if self.hasPartLikeStreams():
+            s: Stream
             for s in returnStream.getElementsByClass('Stream'):
                 # process all component Streams inPlace
                 s.makeNotation(meterStream=meterStream,
@@ -13782,7 +13766,7 @@ class Opus(Stream):
         ['1', '2', '3']
         '''
         post = []
-        for s in self.getElementsByClass('Score'):
+        for s in self.getElementsByClass(Score):
             post.append(s.metadata.number)
         return post
 
@@ -13803,7 +13787,7 @@ class Opus(Stream):
         >>> s.metadata.alternativeTitle
         'Tenor'
         '''
-        for s in self.getElementsByClass('Score'):
+        for s in self.getElementsByClass(Score):
             match, unused_field = s.metadata.search(opusMatch, 'number')
             if match:
                 return s
@@ -13827,7 +13811,7 @@ class Opus(Stream):
         >>> s.metadata.title
         'Vrienden, kommt alle gaere'
         '''
-        for s in self.getElementsByClass('Score'):
+        for s in self.getElementsByClass(Score):
             match, unused_field = s.metadata.search(titleMatch, 'title')
             if match:
                 return s

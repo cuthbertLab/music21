@@ -35,8 +35,8 @@ from music21 import exceptions21
 from music21 import common
 from music21 import chord
 
-FigureTuple = namedtuple('FigureTuple', 'aboveBass alter prefix')
-ChordFigureTuple = namedtuple('ChordFigureTuple', 'aboveBass alter prefix pitch')
+FigureTuple = namedtuple('FigureTuple', ['aboveBass', 'alter', 'prefix'])
+ChordFigureTuple = namedtuple('ChordFigureTuple', ['aboveBass', 'alter', 'prefix', 'pitch'])
 
 
 _MOD = 'roman'

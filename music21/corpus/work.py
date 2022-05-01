@@ -18,9 +18,9 @@ from music21 import common
 from music21 import prebase
 
 # -----------------------------------------------------------------------------
-CorpusWork = namedtuple('CorpusWork', 'title files virtual')
-CorpusFile = namedtuple('CorpusFile', 'path title filename format ext')
-# VirtualCorpusFile = namedtuple('VirtualCorpusFile', 'path title url format')
+CorpusWork = namedtuple('CorpusWork', ['title', 'files', 'virtual'])
+CorpusFile = namedtuple('CorpusFile', ['path', 'title', 'filename', 'format', 'ext'])
+# VirtualCorpusFile = namedtuple('VirtualCorpusFile', ['path', 'title', 'url', 'format'])
 
 
 class DirectoryInformation(prebase.ProtoM21Object):

@@ -6067,7 +6067,7 @@ class MeasureExporter(XMLExporterBase):
                     m.timeSignature, 'timeSignature', comparison='ratioEqual'
                 )):
             mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
-        smts = list(m.getElementsByClass('SenzaMisuraTimeSignature'))
+        smts = list(m.getElementsByClass(meter.SenzaMisuraTimeSignature))
         if smts:
             mxAttributes.append(self.timeSignatureToXml(smts[0]))
 
@@ -6077,7 +6077,7 @@ class MeasureExporter(XMLExporterBase):
         if m.clef is not None:
             mxAttributes.append(self.clefToXml(m.clef))
 
-        found = m.getElementsByClass('StaffLayout')
+        found = m.getElementsByClass(layoput.StaffLayout)
         if found:
             sl = found[0]  # assume only one per measure
             mxAttributes.append(self.staffLayoutToXmlStaffDetails(sl))
@@ -6485,23 +6485,23 @@ class MeasureExporter(XMLExporterBase):
         #    is created in the module itself, as in a test.
 
         # do a quick search for any layout objects before searching individually...
-        foundAny = m.getElementsByClass('LayoutBase')
+        foundAny = m.getElementsByClass(layout.LayoutBase)
         if not foundAny:
             return
 
         mxPrint = None
-        found = m.getElementsByClass(layout.PageLayout)
+        found = foundAny.getElementsByClass(layout.PageLayout)
         if found:
             pl = found[0]  # assume only one per measure
             mxPrint = self.pageLayoutToXmlPrint(pl)
-        found = m.getElementsByClass(layout.SystemLayout)
+        found = foundAny.getElementsByClass(layout.SystemLayout)
         if found:
             sl = found[0]  # assume only one per measure
             if mxPrint is None:
                 mxPrint = self.systemLayoutToXmlPrint(sl)
             else:
                 self.systemLayoutToXmlPrint(sl, mxPrint)
-        found = m.getElementsByClass('StaffLayout')
+        found = foundAny.getElementsByClass(layout.StaffLayout)
         if found:
             sl = found[0]  # assume only one per measure
             if mxPrint is None:

@@ -1446,7 +1446,7 @@ m3 NC b3 G: V
         r1 = m1.notesAndRests[-1]
         self.assertIn('Rest', r1.classes)
         self.assertEqual(r1.quarterLength, 1.0)
-        noChordObj = m1.getElementsByClass('Harmony').last()
+        noChordObj = m1.getElementsByClass(harmony.Harmony).last()
         self.assertIsInstance(noChordObj, NoChord)
 
         m2 = p.getElementsByClass(stream.Measure)[1]
@@ -1459,6 +1459,7 @@ m3 NC b3 G: V
 
     def testUnProcessed(self):
         from music21 import converter
+        from music21.romanText.translate import RomanTextUnprocessedMetadata
 
         src = '''Note: Hello
 m1 G: IV || b3 d: III b4 NC
@@ -1467,7 +1468,7 @@ Note: Hi
 '''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        unprocessedElements = p.recurse().getElementsByClass('RomanTextUnprocessedMetadata')
+        unprocessedElements = p[RomanTextUnprocessedMetadata]
         self.assertEqual(len(unprocessedElements), 3)
         note1, var1, note2 = unprocessedElements
         self.assertEqual(note1.tag, 'Note')

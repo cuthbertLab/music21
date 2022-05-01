@@ -742,9 +742,7 @@ class Expander:
 
         # store counts of all non barline elements.
         # doing class matching by string as problems matching in some test cases
-        reStream = self._srcMeasureStream.flatten().getElementsByClass(
-            'RepeatExpression'
-        ).stream()
+        reStream = self._srcMeasureStream.flatten().getElementsByClass(RepeatExpression).stream()
         self._codaCount = len(reStream.getElementsByClass(Coda))
         self._segnoCount = len(reStream.getElementsByClass(Segno))
         self._fineCount = len(reStream.getElementsByClass(Fine))
@@ -3746,8 +3744,8 @@ class Test(unittest.TestCase):
                           'C4', 'C4', 'E4', 'E4', 'B4', 'B4'])
 
         # instrument is copied in Stream
-        self.assertEqual(post.getElementsByClass(
-            'Instrument')[0].instrumentName, 'Trumpet')
+        self.assertEqual(post.getElementsByClass(instrument.Instrument).first().instrumentName,
+                         'Trumpet')
 
     def testExpandRepeatsImportedA(self):
         '''

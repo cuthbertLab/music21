@@ -1633,9 +1633,11 @@ class Verticality(base.Music21Object):
         {0.0} <music21.stream.Part part-1>
             {0.0} <music21.note.Note C>
 
-        >>> len(vsStream.flatten().getElementsByClass(note.Note))
+        How many notes are there anywhere in the hierarchy?
+
+        >>> len(vsStream[note.Note])
         2
-        >>> len(vsStream.flatten().getElementsByClass('Harmony'))
+        >>> len(vsStream[harmony.Harmony])
         1
         '''
         from music21 import stream

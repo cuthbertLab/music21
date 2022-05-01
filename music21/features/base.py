@@ -347,7 +347,7 @@ class StreamForms:
             if lastKey in self.keysToMethods:
                 prepared = self.keysToMethods[lastKey](self, prepared)
             elif lastKey.startswith('getElementsByClass('):
-                classToGet = lastKey[len('getElementsByClass('):-1]
+                classToGet: str = lastKey[len('getElementsByClass('):-1]
                 prepared = prepared.getElementsByClass(classToGet)
             else:
                 raise AttributeError(f'no such attribute: {lastKey} in {key}')
