@@ -148,6 +148,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
 
     maxTimeout = 200
     pathsToRun = modGather.modulePaths  # [30:60]
+    # print(pathsToRun)
 
     # pylint: disable=not-callable
     with multiprocessing.Pool(processes=poolSize) as pool:
