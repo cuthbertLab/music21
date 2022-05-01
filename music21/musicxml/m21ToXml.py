@@ -2489,7 +2489,7 @@ class PartExporter(XMLExporterBase):
             partObj = stream.Part()
         self.stream: Union[stream.Part, stream.Score] = partObj
         self.parent = parent  # ScoreExporter
-        self.xmlRoot = Element(stream.Part)
+        self.xmlRoot = Element('part')
 
         if parent is None:
             self.meterStream = stream.Stream()
@@ -6169,7 +6169,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: staff-size
         return mxStaffDetails
 
-    def timeSignatureToXml(self, ts):
+    def timeSignatureToXml(self, ts: Union[meter.TimeSignature, meter.SenzaMisuraTimeSignature]):
         '''
         Returns a single <time> tag from a meter.TimeSignature object.
 
@@ -6231,7 +6231,7 @@ class MeasureExporter(XMLExporterBase):
         # mxTimeList = []
         mxTime = Element('time')
         _synchronizeIds(mxTime, ts)
-        if 'SenzaMisuraTimeSignature' in ts.classes:
+        if isinstance(ts, meter.SenzaMisuraTimeSignature):
             mxSenzaMisura = SubElement(mxTime, 'senza-misura')
             if ts.text is not None:
                 mxSenzaMisura.text = ts.text
