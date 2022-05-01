@@ -25,6 +25,7 @@ import unittest
 import re
 
 from music21 import articulations
+from music21 import bar
 from music21 import clef
 from music21 import chord
 from music21 import common
@@ -33,7 +34,6 @@ from music21 import exceptions21
 from music21 import harmony
 from music21 import meter
 from music21 import note
-from music21 import repeat
 from music21 import spanner
 from music21 import stream
 from music21 import tempo
@@ -943,13 +943,13 @@ class Test(unittest.TestCase):
         # s.show()
         # one start, one end
         # s.parts[0].show('t')
-        self.assertEqual(len(s[repeat.Repeat]), 2)
+        self.assertEqual(len(s[bar.Repeat]), 2)
         # s.show()
 
         # this has a 1 note pickup
         # has three repeat bars; first one is implied
         s = converter.parse(testFiles.draughtOfAle)
-        self.assertEqual(len(s[repeat.Repeat]), 3)
+        self.assertEqual(len(s[bar.Repeat]), 3)
         self.assertEqual(s[note.Note].first().pitch.nameWithOctave, 'D4')
 
         # new problem case:

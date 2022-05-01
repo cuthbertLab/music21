@@ -36,6 +36,8 @@ under the module "base":
 >>> base.Music21Object
 <class 'music21.base.Music21Object'>
 '''
+from __future__ import annotations
+
 import copy
 import sys
 import types
@@ -1539,7 +1541,8 @@ class Music21Object(prebase.ProtoM21Object):
 
             flatten can be True, 'semiFlat', or False.
             '''
-            siteTree = checkSite.asTree(flatten=flatten, classList=className)
+            classList = None if not className else (className,)
+            siteTree = checkSite.asTree(flatten=flatten, classList=classList)
             if getElementMethod in OFFSET_METHODS:
                 # these methods match only by offset.  Used in .getBeat among other places
                 if getElementMethod in (ElementSearch.BEFORE_OFFSET,
@@ -3147,7 +3150,7 @@ class Music21Object(prebase.ProtoM21Object):
             if isinstance(eRemain, (note.Note, note.Unpitched)):
                 # not sure why this is not being picked up by isinstance check
                 newTie = tie.Tie(forceEndTieType)
-                eRemain.tie = newTie # pylint: disable=attribute-defined-outside-init
+                eRemain.tie = newTie  # pylint: disable=attribute-defined-outside-init
 
         elif addTies and isinstance(e, chord.Chord) and isinstance(eRemain, chord.Chord):
             # the last isinstance is redundant, but MyPy needs it.

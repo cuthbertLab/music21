@@ -2970,7 +2970,7 @@ class Test(unittest.TestCase):
             32.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
             33.0: ('I in c minor', [0, 4, 7], 'C', 'C', 53, False)
         }
-        for harm in s[roman.RomanNumeral]:
+        for harm in s.flatten().getElementsByClass(roman.RomanNumeral):
             figureAndKey = harm.figureAndKey
             pitchClasses = harm.pitchClasses
             root = harm.root().name
@@ -3025,7 +3025,7 @@ class Test(unittest.TestCase):
             42.0: ('V43 in a minor', [11, 2, 4, 8], 'E', 'B', 43, True),
             43.0: ('i in a minor', [9, 0, 4], 'A', 'A', 53, False)
         }
-        for harm in s[roman.RomanNumeral]:
+        for harm in s.flatten().getElementsByClass(roman.RomanNumeral):
             figureAndKey = harm.figureAndKey
             pitchClasses = harm.pitchClasses
             root = harm.root().name
@@ -3047,6 +3047,7 @@ class Test(unittest.TestCase):
         hf1.parse()
         s = hf1.stream
         groundTruth = {
+            # Aug6, Italian, French, German
             0.0: (False, False, False, False),
             1.0: (False, False, False, False),
             2.0: (False, False, False, False),
@@ -3074,7 +3075,7 @@ class Test(unittest.TestCase):
             32.0: (False, False, False, False),
             33.0: (False, False, False, False)
         }
-        for harm in s[roman.RomanNumeral]:
+        for harm in s.flatten().getElementsByClass(roman.RomanNumeral):
             isAugmentedSixth = harm.isAugmentedSixth()
             isItalianAugmentedSixth = harm.isItalianAugmentedSixth()
             isFrenchAugmentedSixth = harm.isFrenchAugmentedSixth()

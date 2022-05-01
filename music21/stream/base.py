@@ -11388,6 +11388,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             {0.0} <music21.note.Note F>
             {4.0} <music21.bar.Barline type=final>
         '''
+        from music21 import variant
         if not inPlace:  # make a copy if inPlace is False
             returnObj = self.coreCopyAsDerivation('activateVariants')
         else:
@@ -11399,7 +11400,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
         # Loop through all variants, deal with replacement variants and
         # save insertion and deletion for later.
-        for v in returnObj.variants:
+        for v in returnObj.getElementsByClass(variant.Variant):
             if group is not None:
                 if group not in v.groups:
                     continue  # skip those that are not part of this group
@@ -12304,7 +12305,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         '''
         from music21 import *
         '''
-        variantsToBeDone = self.variants.elements
+        from music21 import variant
+        variantsToBeDone = self.getElementsByClass(variant.Variant)
 
         for v in variantsToBeDone:
             startOffset = self.elementOffset(v)

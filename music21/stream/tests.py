@@ -7883,7 +7883,7 @@ class Test(unittest.TestCase):
         v2 = variant.Variant()
         s.append(v1)
         s.append(v2)
-        self.assertEqual(len(s.variants), 2)
+        self.assertEqual(len(s[variant.Variant]), 2)
 
     def testActivateVariantsA(self):
         '''This tests a single-measure variant
@@ -7902,19 +7902,19 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
-        self.assertEqual(len(s.variants), 1)
+        self.assertEqual(len(s[variant.Variant]), 1)
 
         s.activateVariants(matchBySpan=False, inPlace=True)
 
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'G#', 'G#', 'G#', 'G#', 'D', 'D', 'D', 'D']")
-        self.assertEqual(len(s.variants), 1)
+        self.assertEqual(len(s[variant.Variant]), 1)
         # activating again will restore the previous
         s.activateVariants(matchBySpan=False, inPlace=True)
 
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
-        self.assertEqual(len(s.variants), 1)
+        self.assertEqual(len(s[variant.Variant]), 1)
 
     def testActivateVariantsB(self):
         '''This tests two variants with different groups, each a single measure
@@ -7941,28 +7941,28 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
-        self.assertEqual(len(s.variants), 2)
+        self.assertEqual(len(s[variant.Variant]), 2)
 
         s.activateVariants(group='m2-a', matchBySpan=False, inPlace=True)
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'A#', 'A#', 'A#', 'A#', 'D', 'D', 'D', 'D']")
-        self.assertEqual(len(s.variants), 2)
+        self.assertEqual(len(s[variant.Variant]), 2)
 
         # if we try the same group twice, it is now not active, so there is no change
         s.activateVariants(group='m2-a', matchBySpan=False, inPlace=True)
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'A#', 'A#', 'A#', 'A#', 'D', 'D', 'D', 'D']")
-        self.assertEqual(len(s.variants), 2)
+        self.assertEqual(len(s[variant.Variant]), 2)
 
         # activate a different variant
         s.activateVariants('m2-b', matchBySpan=False, inPlace=True)
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'B-', 'B-', 'B-', 'B-', 'D', 'D', 'D', 'D']")
-        self.assertEqual(len(s.variants), 2)
+        self.assertEqual(len(s[variant.Variant]), 2)
 
         # TODO: keep groups
         # we now have 2 variants that have been stripped of their groups
-        match = [e.groups for e in s.variants]
+        match = [e.groups for e in s[variant.Variant]]
         self.assertEqual(str(match), "[['default'], ['default']]")
 
     def testActivateVariantsC(self):
@@ -7985,20 +7985,20 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
-        self.assertEqual(len(s.variants), 1)
+        self.assertEqual(len(s[variant.Variant]), 1)
 
         s.activateVariants(matchBySpan=False, inPlace=True)
 
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'G#', 'G#', 'G#', 'G#', 'A#', 'A#', 'A#', 'A#']")
-        self.assertEqual(len(s.variants), 1)
+        self.assertEqual(len(s[variant.Variant]), 1)
         # s.show('t')
         # can restore the removed two measures
         s.activateVariants(matchBySpan=False, inPlace=True)
 
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
-        self.assertEqual(len(s.variants), 1)
+        self.assertEqual(len(s[variant.Variant]), 1)
 
     def testActivateVariantsD(self):
         '''This tests a note-level variant
@@ -8016,21 +8016,21 @@ class Test(unittest.TestCase):
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.notes), 12)
-        self.assertEqual(len(s.variants), 1)
+        self.assertEqual(len(s[variant.Variant]), 1)
 
         s.activateVariants(matchBySpan=False, inPlace=True)
 
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'D', 'G#', 'A#', 'C#', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.notes), 12)
-        self.assertEqual(len(s.variants), 1)
+        self.assertEqual(len(s[variant.Variant]), 1)
         # s.show('t')
         s.activateVariants(matchBySpan=False, inPlace=True)
 
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.notes), 12)
-        self.assertEqual(len(s.variants), 1)
+        self.assertEqual(len(s[variant.Variant]), 1)
 
         # note that if the start times of each component do not match, the
         # variant part will not be matched
@@ -8051,7 +8051,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.notes), 12)
-        self.assertEqual(len(s.variants), 1)
+        self.assertEqual(len(s[variant.Variant]), 1)
 
         s.activateVariants(matchBySpan=False, inPlace=True)
 
@@ -8061,9 +8061,9 @@ class Test(unittest.TestCase):
         self.assertEqual(str([p.name for p in s.pitches]),
                          "['D', 'D', 'D', 'D', 'D', 'G#', 'D', 'C#', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.notes), 12)
-        self.assertEqual(len(s.variants), 1)
+        self.assertEqual(len(s[variant.Variant]), 1)
 
-        self.assertEqual(str(list(s.variants[0].elements)),
+        self.assertEqual(str(list(s[variant.Variant].first().elements)),
                          '[<music21.note.Note D>, <music21.note.Note D>]')
 
     def testActivateVariantsBySpanA(self):
@@ -8091,7 +8091,7 @@ class Test(unittest.TestCase):
         self.assertEqual(
             str([p.name for p in s.pitches]),
             "['D', 'D', 'D', 'D', 'D', 'G#', 'A#', 'C#', 'D', 'D', 'D', 'D', 'D', 'D']")
-        self.assertEqual(len(s.getElementsByClass(dyanamics.Dynamic)), 1)
+        self.assertEqual(len(s.getElementsByClass(dynamics.Dynamic)), 1)
 
         s.activateVariants(matchBySpan=True, inPlace=True)
         self.assertEqual(len(s.flatten().notes), 12)
@@ -8428,8 +8428,6 @@ class Test(unittest.TestCase):
         self.assertEqual(beams, [no_beam, no_beam, start_beam, stop_beam])
 
     def testWrite(self):
-        import os
-
         s = Stream([note.Note()])
         tmpMusicxml = environLocal.getTempFile(suffix='musicxml')
         tmpXml = environLocal.getTempFile(suffix='xml')

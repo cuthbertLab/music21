@@ -60,7 +60,7 @@ def runOneModuleWithoutImp(args):
 
     moduleObject = modGath.getModuleWithoutImp(fp)
 
-    environLocal.printDebug(f'running {fp} \n')
+    environLocal.printDebug(f'running {fp=} {moduleObject=}\n')
     namePeriod = modGath._getNamePeriod(fp)
     if moduleObject == 'skip':
         success = f'{fp} is skipped \n'

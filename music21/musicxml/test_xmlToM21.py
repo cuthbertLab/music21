@@ -21,6 +21,7 @@ from music21 import repeat
 from music21 import spanner
 from music21 import stream
 from music21 import tempo
+from music21 import text
 
 from music21.musicxml.xmlToM21 import (
     MusicXMLImporter, MusicXMLImportException, MusicXMLWarning,
@@ -612,7 +613,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.textBoxes01)
-        tbs = s[expressions.TextBox]
+        tbs = s[text.TextBox]
         self.assertEqual(len(tbs), 5)
 
         msg = []
