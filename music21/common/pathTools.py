@@ -146,22 +146,22 @@ def relativepath(path: str, start: Optional[str] = None) -> str:
 
 @overload
 def cleanpath(path: pathlib.Path, *,
-              returnPathlib: Literal[None] = None) -> pathlib.Path:
+              returnPathlib: Literal[None]) -> pathlib.Path:
     return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
 
 @overload
 def cleanpath(path: str, *,
-              returnPathlib: Literal[None] = None) -> str:
+              returnPathlib: Literal[None]) -> str:
     return '/'  # dummy until Astroid #1015 is fixed.
 
 @overload
 def cleanpath(path: Union[str, pathlib.Path], *,
-              returnPathlib: Literal[True] = None) -> pathlib.Path:
+              returnPathlib: Literal[True]) -> pathlib.Path:
     return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
 
 @overload
 def cleanpath(path: Union[str, pathlib.Path], *,
-              returnPathlib: Literal[False] = None) -> str:
+              returnPathlib: Literal[False]) -> str:
     return '/'  # dummy until Astroid #1015 is fixed.
 
 def cleanpath(path: Union[str, pathlib.Path], *,
