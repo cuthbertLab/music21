@@ -24,6 +24,7 @@ import unittest
 from collections import OrderedDict
 from importlib.util import find_spec
 
+from music21 import clef
 from music21 import common
 from music21.converter.subConverters import SubConverter
 from music21 import corpus

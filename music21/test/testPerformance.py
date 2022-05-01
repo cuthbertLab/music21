@@ -194,6 +194,9 @@ class Test(unittest.TestCase):
         '''Test getting elements by context from a Stream
         '''
         from music21 import stream
+        from music21 import clef
+        from music21 import key
+        from music21 import meter
 
         s = corpus.parse('bwv66.6')
         # create a few secondary streams to add more sites
@@ -223,6 +226,9 @@ class Test(unittest.TestCase):
         '''Test getting elements by using the previous method
         '''
         from music21 import stream
+        from music21 import clef
+        from music21 import key
+        from music21 import meter
 
         s = corpus.parse('bwv66.6')
         # create a few secondary streams to add more sites

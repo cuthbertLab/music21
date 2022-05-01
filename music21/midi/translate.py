@@ -16,7 +16,7 @@ notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here
 import unittest
 import math
 import copy
-from typing import Optional, List, Tuple, Dict, Union, Any, TypeVar, Type, cast
+from typing import Optional, List, Tuple, Dict, Union, Any, TypeVar, Type
 import warnings
 
 from music21 import chord
@@ -31,6 +31,7 @@ from music21 import note
 from music21 import percussion
 from music21 import pitch
 from music21 import stream
+from music21 import tempo
 
 from music21.instrument import Conductor, deduplicate
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper

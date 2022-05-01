@@ -11,6 +11,7 @@
 # ------------------------------------------------------------------------------
 import copy
 from xml.etree.ElementTree import tostring as et_tostring
+from music21 import meter
 
 def dumpString(obj, *, noCopy=False) -> str:
     r'''

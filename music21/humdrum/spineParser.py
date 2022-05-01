@@ -60,6 +60,7 @@ from music21 import dynamics
 from music21 import duration
 from music21 import exceptions21
 from music21 import expressions
+from music21 import instrument
 from music21 import key
 from music21 import note
 from music21 import meter
@@ -165,7 +166,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             raise HumdrumException('Need a list of lines (dataStream) to parse!')
 
         hasOpus, dataCollections = self.determineIfDataStreamIsOpus(dataStream)
-        if hasOpus is True:  # Palestrina data collection, maybe others
+        if hasOpus is True:  # True for the Palestrina data collection, maybe others
             return self.parseOpusDataCollections(dataCollections)
         else:
             return self.parseNonOpus(dataStream)
@@ -423,7 +424,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         So self.eventCollections and self.protoSpines can each be
         thought of as a two-dimensional sheet of cells, but where
         the first index of the former is the vertical position in
-        the dataStream and the first index of the later is the
+        the dataStream and the first index of the latter is the
         horizontal position in the dataStream.  The contents of
         each cell is a SpineEvent object or None (if there's no
         data at that point).  Even '.' (continuation events) get
@@ -751,7 +752,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 #                                    '(well, maybe it is...file a bug report if you ' +
 #                                    'have doubled checked your data)')
 #         elif self.spineCollection.spines[0].stream is None:
-#             raise HumdrumException('okay, you got at least one spine, but it aint got ' +
+#             raise HumdrumException('okay, you got at least one spine, but it ain\'t got ' +
 #                                    'a stream in it; (check your data or file a bug report)')
 #         else:
 #             masterStream = stream.Score()
@@ -1536,7 +1537,7 @@ class SpineEvent(prebase.ProtoM21Object):
     '''
     A SpineEvent is an event in a HumdrumSpine or ProtoSpine.
 
-    It's .contents property contains the contents of the spine or
+    It's .contents property contains the contents of the spine, or
     it could be '.', in which case it means that a
     particular event appears after the last event in a different spine.
     It could also be "None" indicating that there is no event at all
@@ -1580,7 +1581,7 @@ class SpineEvent(prebase.ProtoM21Object):
 
     def toNote(self, convertString=None):
         r'''
-        parse the object as a \*\*kern note and return the a
+        parse the object as a \*\*kern note and return a
         :class:`~music21.note.Note` object (or Rest, or Chord)
 
 
@@ -2355,7 +2356,7 @@ def hdStringToNote(contents):
             newTup.durationActual = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
             newTup.durationNormal = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
 
-            gcd = common.euclidGCD(int(dT), baseValue)
+            gcd = common.euclidGCD(int(dT), int(baseValue))
             newTup.numberNotesActual = int(dT / gcd)
             newTup.numberNotesNormal = int(float(baseValue) / gcd)
 
@@ -2584,12 +2585,12 @@ def kernTandemToObject(tandem):
         return MiscTandem(tandem)
         # TODO: DO SOMETHING WITH TRANSPOSING INSTRUMENTS; not in hum2xml
     elif tandem.startswith('*I'):  # order has to be last
-        instrument = tandem[2:]
+        instrumentStr = tandem[2:]
         try:
-            iObj = instruments.fromHumdrumInstrument(instrument)
+            iObj = instruments.fromHumdrumInstrument(instrumentStr)
             return iObj
         except instruments.HumdrumInstrumentException:
-            return MiscTandem(instrument)
+            return MiscTandem(instrumentStr)
     elif tandem.startswith('*k'):
         numSharps = tandem.count('#')
         if numSharps == 0:

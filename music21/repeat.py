@@ -879,11 +879,13 @@ class Expander:
         if rb is not None and 'music21.bar.Repeat' in rb.classSet:
             m.rightBarline = bar.Barline(newType)
 
-    def _stripRepeatExpressions(self, streamObj):
+    def _stripRepeatExpressions(self, streamObj: 'music21.stream.Stream'):
         '''
         Given a Stream of measures or a Measure, strip all RepeatExpression
         objects in place.
         '''
+        from music21 import stream
+
         if not streamObj.hasMeasures():
             # it probably is a measure; place in temporary containers
             mList = [streamObj]
@@ -3773,6 +3775,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s2.parts[0].recurse().notes), 105)
 
     def testExpandRepeatsImportedB(self):
+        from music21 import bar
         from music21 import corpus
         from music21 import stream
 
@@ -3786,7 +3789,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s2.parts[0].getElementsByClass(stream.Measure)), 36)
         self.assertEqual(len(s2.parts[0].flatten().notes), 250)
         # make sure barlines are stripped
-        bars = s2.parts[0].flatten().getElementsByClass(Repeat)
+        bars = s2.parts[0].flatten().getElementsByClass(bar.Repeat)
         self.assertEqual(len(bars), 0)
 
 #         self.assertEqual(len(s2.parts[0].flatten().notes), 111)

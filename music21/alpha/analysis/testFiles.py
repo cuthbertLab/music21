@@ -14,6 +14,7 @@ import inspect
 def _dummy():
     pass  # something for getting our path name
 
+
 pathName = os.path.dirname(os.path.abspath(inspect.getfile(_dummy)))
 
 K525_short_dir = pathName + os.sep + 'testfiles' + os.sep + 'K525'

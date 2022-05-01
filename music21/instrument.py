@@ -33,7 +33,6 @@ from music21 import common
 from music21 import interval
 from music21 import note
 from music21 import pitch
-from music21 import stream
 from music21.tree.trees import OffsetTree
 
 from music21.exceptions21 import InstrumentException
@@ -2218,6 +2217,7 @@ def partitionByInstrument(streamObj):
     TODO: use proper recursion to make a copy of the stream.
     TODO: final barlines should be aligned.
     '''
+    from music21 import stream
     if not streamObj.hasPartLikeStreams():
         # place in a score for uniform operations
         s = stream.Score()
@@ -2596,6 +2596,8 @@ class Test(unittest.TestCase):
                 j = copy.deepcopy(obj)
 
     def testMusicXMLExport(self):
+        from music21 import stream
+
         s1 = stream.Stream()
         i1 = Violin()
         i1.partName = 'test'
@@ -2617,6 +2619,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentA(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2646,6 +2649,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentB(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2667,6 +2671,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentC(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2703,6 +2708,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentD(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2741,6 +2747,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentE(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         # s = stream.Score()
@@ -2779,6 +2786,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentF(self):
         from music21 import instrument
+        from music21 import stream
 
         s1 = stream.Stream()
         s1.append(instrument.AcousticGuitar())

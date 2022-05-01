@@ -42,6 +42,7 @@ from music21 import chord
 from music21 import duration
 from music21 import harmony
 from music21 import instrument
+from music21 import key
 from music21 import layout
 from music21 import metadata
 from music21 import note
@@ -6077,7 +6078,7 @@ class MeasureExporter(XMLExporterBase):
         if m.clef is not None:
             mxAttributes.append(self.clefToXml(m.clef))
 
-        found = m.getElementsByClass(layoput.StaffLayout)
+        found = m.getElementsByClass(layout.StaffLayout)
         if found:
             sl = found[0]  # assume only one per measure
             mxAttributes.append(self.staffLayoutToXmlStaffDetails(sl))

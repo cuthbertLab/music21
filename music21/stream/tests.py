@@ -31,12 +31,15 @@ from music21 import clef
 from music21 import common
 from music21 import corpus
 from music21 import duration
+from music21 import dynamics
+from music21 import instrument
 from music21 import interval
 from music21 import key
 from music21 import metadata
 from music21 import meter
 from music21 import note
 from music21 import pitch
+from music21 import spanner
 
 from music21.musicxml import m21ToXml
 

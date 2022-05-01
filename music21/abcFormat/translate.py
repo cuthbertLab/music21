@@ -24,18 +24,20 @@ import copy
 import unittest
 import re
 
+from music21 import articulations
 from music21 import clef
+from music21 import chord
 from music21 import common
 from music21 import environment
 from music21 import exceptions21
-from music21 import meter
-from music21 import stream
-from music21 import tie
-from music21 import articulations
-from music21 import note
-from music21 import chord
-from music21 import spanner
 from music21 import harmony
+from music21 import meter
+from music21 import note
+from music21 import repeat
+from music21 import spanner
+from music21 import stream
+from music21 import tempo
+from music21 import tie
 
 
 environLocal = environment.Environment('abcFormat.translate')
@@ -52,7 +54,7 @@ _abcArticulationsToM21 = {
 
 def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     '''
-    Handler conversion of a single Part of a multi-part score.
+    Handler conversion of a single Part of a Score with multiple Parts.
     Results are added into the provided inputM21 object
     or a newly created Part object
 
@@ -79,7 +81,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         # one measure, that means that no measures are defined
         barHandlers = abcHandler.splitByMeasure()
         # environLocal.printDebug(['barHandlers', len(barHandlers)])
-        # merge loading meta data with each bar that precedes it
+        # merge loading metadata with each bar that precedes it
         mergedHandlers = abcFormat.mergeLeadingMetaData(barHandlers)
         # environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
     else:  # simply stick in a single list
@@ -92,14 +94,14 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         useMeasures = True
 
     # each unit in merged handlers defines possible a Measure (w/ or w/o metadata),
-    # trailing meta data, or a single collection of metadata and note data
+    # trailing metadata, or a single collection of metadata and note data
 
     barCount = 0
     measureNumber = 1
     # merged handler are ABCHandlerBar objects, defining attributes for barlines
 
     for mh in mergedHandlers:
-        # if use measures and the handler has notes; otherwise add to part
+        # if "use measures" is True and the handler has notes; otherwise add to part
         # environLocal.printDebug(['abcToStreamPart', 'handler', 'left:', mh.leftBarToken,
         #    'right:', mh.rightBarToken, 'len(mh)', len(mh)])
 
@@ -121,7 +123,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     rbSpanners = spannerBundle.getByClass('RepeatBracket'
                                                           ).getByCompleteStatus(False)
                     # this indication is most likely an opening, as ABC does
-                    # not encode second ending ending boundaries
+                    # not encode second ending boundaries
                     # we can still check thought:
                     if not rbSpanners:
                         # add this measure as a component
@@ -168,7 +170,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
         postTransposition, clefSet = parseTokens(mh, dst, p, useMeasures)
 
-        # append measure to part; in the case of trailing meta data
+        # append measure to part; in the case of trailing metadata
         # dst may be part, even though useMeasures is True
         if useMeasures and isinstance(dst, stream.Measure):
             # check for incomplete bars
@@ -195,7 +197,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     except (ABCTranslateException, meter.MeterException, ZeroDivisionError):
         pass
     # clefs are not typically defined, but if so, are set to the first measure
-    # following the meta data, or in the open stream
+    # following the metadata, or in the open stream
     if not clefSet and not p[clef.Clef]:
         if useMeasures:  # assume at start of measures
             p.getElementsByClass(stream.Measure).first().clef = clef.bestClef(p, recurse=True)
@@ -390,7 +392,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
     else:
         s = inputM21
 
-    # meta data can be first
+    # metadata can be first
     md = metadata.Metadata()
     s.insert(0, md)
 
@@ -448,7 +450,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
     return s
 
 def abcToStreamOpus(abcHandler, inputM21=None, number=None):
-    '''Convert a multi-work stream into one or more complete works packed into a an Opus Stream.
+    '''Convert a multi-work stream into one or more complete works packed into an Opus Stream.
 
     If a `number` argument is given, and a work is defined by
     that number, that work is returned.
@@ -470,7 +472,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
             scoreList = []
             for key, value in sorted(abcDict.items()):
                 # do not need to set work number, as that will be gathered
-                # with meta data in abcToStreamScore
+                # with metadata in abcToStreamScore
                 try:
                     sc = abcToStreamScore(value)
                     scoreList.append(sc)
@@ -485,8 +487,8 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     return opus
 
 
-# noinspection SpellCheckingInspection
 def reBar(music21Part, *, inPlace=False):
+    # noinspection PyShadowingNames,SpellCheckingInspection
     '''
     Re-bar overflow measures using the last known time signature.
 
@@ -494,7 +496,6 @@ def reBar(music21Part, *, inPlace=False):
     >>> irl2.metadata.title
     'Aililiu na Gamhna, S.35'
     >>> music21Part = irl2[1]
-
 
     The whole part is in 2/4 time, but there are some measures expressed in 4/4 time
     without an explicit time signature change, an error in abc parsing due to the

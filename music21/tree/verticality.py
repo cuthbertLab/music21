@@ -809,6 +809,8 @@ class Verticality(prebase.ProtoM21Object):
             If it has more tie information than the previously
             added note, then remove the previously added note and add it
             '''
+            from music21 import stream
+
             nonlocal pitchBust  # love Py3!!!
             p = n.pitch
             pitchKey = p.nameWithOctave

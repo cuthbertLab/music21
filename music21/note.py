@@ -1628,6 +1628,7 @@ class Note(NotRest):
         {1.0} <music21.note.Note G->
 
         '''
+        from music21 import key
         if isinstance(value, interval.IntervalBase):
             intervalObj = value
         else:  # try to process

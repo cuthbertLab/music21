@@ -253,7 +253,7 @@ class RnWriter(prebase.ProtoM21Object):
             # RomanNumerals
             measureString = ''  # Clear for each measure
 
-            rnsThisMeasure = thisMeasure.getElementsByClass(RomanNumeral)
+            rnsThisMeasure = thisMeasure.getElementsByClass(roman.RomanNumeral)
 
             for rn in rnsThisMeasure:
                 if rn.tie is None or rn.tie.type == 'start':  # Ignore tied to Roman numerals

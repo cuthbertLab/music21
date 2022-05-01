@@ -53,11 +53,14 @@ from typing import (
     FrozenSet,
     Iterable,
     List,
+    Literal,
     Optional,
     Union,
     Tuple,
     Type,
     TypeVar,
+    cast,
+    overload,
 )
 
 from music21 import common
@@ -199,7 +202,7 @@ class Groups(list):  # no need to inherit from slotted object
     >>> g
     ['hello']
 
-    >>> g.append(5)
+    >>> g.append(5)  # type: ignore
     Traceback (most recent call last):
     music21.exceptions21.GroupException: Only strings can be used as group names, not 5
     '''
@@ -217,16 +220,16 @@ class Groups(list):  # no need to inherit from slotted object
         # if ' ' in value:
         #     raise exceptions21.GroupException('Spaces are not allowed as group names')
 
-    def append(self, value: Union[int, str]) -> None:
+    def append(self, value: str) -> None:
         self._validName(value)
         if not list.__contains__(self, value):
             list.append(self, value)
 
-    def __setitem__(self, i: int, y: Union[int, str]):
+    def __setitem__(self, i, y):
         self._validName(y)
         super().__setitem__(i, y)
 
-    def __eq__(self, other: 'Groups'):
+    def __eq__(self, other: object):
         '''
         Test Group equality. In normal lists, order matters; here it does not. More like a set.
 
@@ -313,7 +316,7 @@ class Music21Object(prebase.ProtoM21Object):
     _styleClass: Type[style.Style] = style.Style
 
     # define order for presenting names in documentation; use strings
-    _DOC_ORDER = []
+    _DOC_ORDER: List[str] = []
 
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
@@ -490,10 +493,10 @@ class Music21Object(prebase.ProtoM21Object):
             # this can be done much faster in most cases...
             d = self._duration
             if d is not None:
-                clientStore = self._duration._client
-                self._duration._client = None
-                newValue = copy.deepcopy(self._duration, memo)
-                self._duration._client = clientStore
+                clientStore = d._client
+                d._client = None
+                newValue = copy.deepcopy(d, memo)
+                d._client = clientStore
                 newValue.client = new
                 setattr(new, '_duration', newValue)
 
@@ -636,7 +639,7 @@ class Music21Object(prebase.ProtoM21Object):
             return super()._reprInternal()
         reprId = self.id
         try:
-            reprId = hex(reprId)
+            reprId = hex(int(reprId))
         except (ValueError, TypeError):
             pass
         return f'id={reprId}'
@@ -747,6 +750,7 @@ class Music21Object(prebase.ProtoM21Object):
         if not self.hasStyleInformation:
             StyleClass = self._styleClass
             self._style = StyleClass()
+        assert self._style is not None  # for mypy.
         return self._style
 
     @style.setter
@@ -832,11 +836,29 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         self._cache = {}
 
+    @overload
     def getOffsetBySite(
         self,
-        site: 'music21.stream.Stream',
+        site: Union['music21.stream.Stream', None],
         *,
-        returnSpecial=False,
+        returnSpecial: Literal[False] = False,
+    ) -> Union[float, fractions.Fraction]:
+        return 0.0  # dummy until Astroid #1015 is fixed.  Replace with ...
+
+    @overload
+    def getOffsetBySite(
+        self,
+        site: Union['music21.stream.Stream', None],
+        *,
+        returnSpecial: bool = False,
+    ) -> Union[float, fractions.Fraction, str]:
+        return 0.0  # dummy until Astroid #1015 is fixed.  Replace with ...
+
+    def getOffsetBySite(
+        self,
+        site: Union['music21.stream.Stream', None],
+        *,
+        returnSpecial: bool = False,
     ) -> Union[float, fractions.Fraction, str]:
         '''
         If this class has been registered in a container such as a Stream,
@@ -917,7 +939,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         try:
             a = None
-            tryOrigin = self
+            tryOrigin: Music21Object = self
             originMemo = set()
             maxSearch = 100
             while a is None:
@@ -934,12 +956,16 @@ class Music21Object(prebase.ProtoM21Object):
                         else:
                             return site.highestTime
 
-                    tryOrigin = self.derivation.origin
+                    possiblyNoneTryOrigin = self.derivation.origin
+                    if possiblyNoneTryOrigin is None:
+                        raise e
+                    tryOrigin = possiblyNoneTryOrigin
+
                     if id(tryOrigin) in originMemo:
                         raise e
                     originMemo.add(id(tryOrigin))
                     maxSearch -= 1  # prevent infinite recursive searches...
-                    if tryOrigin is None or maxSearch < 0:
+                    if maxSearch < 0:
                         raise e
             return a
         except SitesException as se:
@@ -1207,15 +1233,40 @@ class Music21Object(prebase.ProtoM21Object):
     # --------------------------------------------------------------------------------
     # contexts...
 
+    @overload
     def getContextByClass(
         self,
-        className,
+        className: Type[_M21T],
         *,
         getElementMethod=ElementSearch.AT_OR_BEFORE,
         sortByCreationTime=False,
         followDerivation=True,
         priorityTargetOnly=False,
-    ) -> Optional[_M21T]:
+    ) -> Union[_M21T, None]:
+        return None  # until Astroid #1015
+
+    @overload
+    def getContextByClass(
+        self,
+        className: Union[str, None],
+        *,
+        getElementMethod=ElementSearch.AT_OR_BEFORE,
+        sortByCreationTime=False,
+        followDerivation=True,
+        priorityTargetOnly=False,
+    ) -> Union[Music21Object, None]:
+        return None  # until Astroid #1015
+
+
+    def getContextByClass(
+        self,
+        className: Union[Type[_M21T], str, None],
+        *,
+        getElementMethod: ElementSearch = ElementSearch.AT_OR_BEFORE,
+        sortByCreationTime=False,
+        followDerivation=True,
+        priorityTargetOnly=False,
+    ) -> Union[_M21T, Music21Object, None]:
         # noinspection PyShadowingNames
         '''
         A very powerful method in music21 of fundamental importance: Returns
@@ -1275,6 +1326,17 @@ class Music21Object(prebase.ProtoM21Object):
         >>> b.getContextByClass(meter.TimeSignature)
         <music21.meter.TimeSignature 2/4>
 
+        For backwards compatibility you can also pass in a string of the
+        class name:
+
+        >>> b.getContextByClass('TimeSignature')
+        <music21.meter.TimeSignature 2/4>
+
+        But if you use Python typing or a typing-aware IDE, then the first call
+        (with class name) will signal that it is returning a TimeSignature object
+        and allow for error detection, autocomplete, etc.  The latter call
+        (with string) will only know that some Music21Object was returned.
+
         The method is smart enough to stop when it gets to the beginning of the
         part.  This is all you need to know for most uses.  The rest of the
         docs are for advanced uses:
@@ -1313,33 +1375,33 @@ class Music21Object(prebase.ProtoM21Object):
 
         Demonstrations of these keywords:
 
-        Because `b` is a `Note`, `.getContextByClass('Note')` will only find itself:
+        Because `b` is a `Note`, `.getContextByClass(note.Note)` will only find itself:
 
-        >>> b.getContextByClass('Note') is b
+        >>> b.getContextByClass(note.Note) is b
         True
 
         To get the previous `Note`, use `getElementMethod=ElementSearch.BEFORE`:
 
-        >>> a = b.getContextByClass('Note', getElementMethod=ElementSearch.BEFORE)
+        >>> a = b.getContextByClass(note.Note, getElementMethod=ElementSearch.BEFORE)
         >>> a
         <music21.note.Note A>
 
-        This is similar to `.previous('Note')`, though that method is a bit more
+        This is similar to `.previous(note.Note)`, though that method is a bit more
         sophisticated:
 
-        >>> b.previous('Note')
+        >>> b.previous(note.Note)
         <music21.note.Note A>
 
         To get the following `Note` use `getElementMethod=ElementSearch.AFTER`:
 
-        >>> c = b.getContextByClass('Note', getElementMethod=ElementSearch.AFTER)
+        >>> c = b.getContextByClass(note.Note, getElementMethod=ElementSearch.AFTER)
         >>> c
         <music21.note.Note C>
 
-        This is similar to `.next('Note')`, though, again, that method is a bit more
+        This is similar to `.next(note.Note)`, though, again, that method is a bit more
         sophisticated:
 
-        >>> b.next('Note')
+        >>> b.next(note.Note)
         <music21.note.Note C>
 
         A Stream might contain several elements at the same offset, leading to
@@ -1384,35 +1446,37 @@ class Music21Object(prebase.ProtoM21Object):
         >>> import copy
         >>> n2 = copy.deepcopy(n)
         >>> try:
-        ...     n2.getContextByClass('Measure').elementOffset(n2)
+        ...     n2.getContextByClass(stream.Measure).elementOffset(n2)
         ... except Music21Exception:
         ...     print('not there')
         not there
 
         A measure context is being found, but only through the derivation chain.
 
-        >>> n2.getContextByClass('Measure')
+        >>> n2.getContextByClass(stream.Measure)
         <music21.stream.Measure 1 offset=0.0>
 
         To prevent this error, use the `followDerivation=False` setting
 
-        >>> print(n2.getContextByClass('Measure', followDerivation=False))
+        >>> print(n2.getContextByClass(stream.Measure, followDerivation=False))
         None
 
         Or if you want the offset of the element following the derivation chain,
         call `getOffsetBySite()` on the object:
 
-        >>> n2.getOffsetBySite(n2.getContextByClass('Measure'))
+        >>> n2.getOffsetBySite(n2.getContextByClass(stream.Measure))
         2.0
 
         * changed in v.5.7 -- added followDerivation=False and made
             everything but the class keyword only
         * added in v.6 -- added priorityTargetOnly -- see contextSites for description.
         * added in v.7 -- added getElementMethod `all` and `ElementSearch` enum.
+        * changed in v.8 -- class-based calls return properly typed items.  Putting
+            multiple types into className (never documented) is no longer allowed.
 
         Raises `ValueError` if `getElementMethod` is not a value in `ElementSearch`.
 
-        >>> n2.getContextByClass('TextExpression', getElementMethod='invalid')
+        >>> n2.getContextByClass(expressions.TextExpression, getElementMethod='invalid')
         Traceback (most recent call last):
         ValueError: Invalid getElementMethod: invalid
 
@@ -1606,10 +1670,7 @@ class Music21Object(prebase.ProtoM21Object):
         if priorityTargetOnly and followDerivation:
             raise ValueError('priorityTargetOnly and followDerivation cannot both be True')
 
-        if className and not common.isListLike(className):
-            className = (className,)
-
-        if getElementMethod in AT_METHODS and not self.classSet.isdisjoint(className):
+        if getElementMethod in AT_METHODS and className in self.classSet:
             return self
 
         for site, positionStart, searchType in self.contextSites(
@@ -1634,7 +1695,7 @@ class Music21Object(prebase.ProtoM21Object):
             if searchType != 'elementsOnly':  # flatten or elementsFirst
                 if (getElementMethod in AFTER_METHODS
                         and (not className
-                             or not site.classSet.isdisjoint(className))):
+                             or className in site.classSet)):
                     if getElementMethod in NOT_SELF_METHODS and self is site:
                         pass
                     elif getElementMethod not in NOT_SELF_METHODS:  # for 'After' we can't do the
@@ -1653,7 +1714,7 @@ class Music21Object(prebase.ProtoM21Object):
 
                 if (getElementMethod in BEFORE_METHODS
                         and (not className
-                             or not site.classSet.isdisjoint(className))):
+                             or className in site.classSet)):
                     if getElementMethod in NOT_SELF_METHODS and self is site:
                         pass
                     else:
@@ -1859,18 +1920,19 @@ class Music21Object(prebase.ProtoM21Object):
         if callerFirst is None:
             callerFirst = self
             if self.isStream and self not in memo:
-                recursionType = self.recursionType
+                streamSelf = cast('music21.stream.Stream', self)
+                recursionType = streamSelf.recursionType
                 environLocal.printDebug(
                     f'Caller first is {callerFirst} with offsetAppend {offsetAppend}')
                 if returnSortTuples:
-                    selfSortTuple = self.sortTuple().modify(
+                    selfSortTuple = streamSelf.sortTuple().modify(
                         offset=0.0,
                         priority=float('-inf')
                     )
-                    yield ContextTuple(self, selfSortTuple, recursionType)
+                    yield ContextTuple(streamSelf, selfSortTuple, recursionType)
                 else:
-                    yield ContextTuple(self, 0.0, recursionType)
-                memo.append(self)
+                    yield ContextTuple(streamSelf, 0.0, recursionType)
+                memo.append(streamSelf)
 
         if priorityTarget is None and sortByCreationTime is False:
             priorityTarget = self.activeSite
@@ -2001,7 +2063,10 @@ class Music21Object(prebase.ProtoM21Object):
 
     # -------------------------------------------------------------------------
 
-    def next(self, className=None, *, activeSiteOnly=False):
+    def next(self,
+             className: Union[Type[Music21Object], str, None] = None,
+             *,
+             activeSiteOnly=False):
         '''
         Get the next element found in the activeSite (or other Sites)
         of this Music21Object.
@@ -2091,7 +2156,7 @@ class Music21Object(prebase.ProtoM21Object):
         while maxRecurse:
             nextEl = thisElForNext.getContextByClass(
                 className=className,
-                getElementMethod='getElementAfterNotSelf',
+                getElementMethod=ElementSearch.AFTER_NOT_SELF,
                 followDerivation=not activeSiteOnly,
                 priorityTargetOnly=activeSiteOnly,
             )
@@ -2099,6 +2164,7 @@ class Music21Object(prebase.ProtoM21Object):
             callContinue = False
             for singleSiteContext, unused_positionInContext, unused_recurseType in allSiteContexts:
                 if nextEl is singleSiteContext:
+                    nextEl = cast('music21.stream.Stream', nextEl)
                     if nextEl and nextEl[0] is not self:  # has elements
                         return nextEl[0]
 
@@ -2117,7 +2183,10 @@ class Music21Object(prebase.ProtoM21Object):
         if maxRecurse == 0:
             raise Music21Exception('Maximum recursion!')
 
-    def previous(self, className=None, *, activeSiteOnly=False):
+    def previous(self,
+                 className: Union[Type[Music21Object], str, None] = None,
+                 *,
+                 activeSiteOnly=False):
         '''
         Get the previous element found in the activeSite or other .sites of this
         Music21Object.
@@ -2194,12 +2263,10 @@ class Music21Object(prebase.ProtoM21Object):
             activeS = self.activeSite  # might be None...
             if activeS is None:
                 return None
-            if className is not None and not common.isListLike(className):
-                className = (className,)
-            asTree = activeS.asTree(classList=className, flatten=False)
+            asTree = activeS.asTree(classList=[className], flatten=False)
             prevNode = asTree.getNodeBefore(self.sortTuple())
             if prevNode is None:
-                if className is None or not activeS.classSet.isdisjoint(className):
+                if className is None or className in activeS.classSet:
                     return activeS
                 else:
                     return None
@@ -2380,6 +2447,8 @@ class Music21Object(prebase.ProtoM21Object):
 
         When in doubt, use `.getOffsetBySite(streamObj)`
         which is safer or streamObj.elementOffset(self) which is 3x faster.
+
+        Changed in v.8 -- using a Duration object as an offset is not allowed.
         '''
         # There is a branch that does slow searches.
         # See test/testSerialization to have it active.
@@ -2417,10 +2486,6 @@ class Music21Object(prebase.ProtoM21Object):
             offset = opFrac(value)
         except TypeError:
             offset = value
-
-        if hasattr(value, 'quarterLength'):
-            # probably a Duration object, but could be something else -- in any case, we'll take it.
-            offset = value.quarterLength
 
         if self.activeSite is not None:
             self.activeSite.setElementOffset(self, offset)
@@ -3007,9 +3072,8 @@ class Music21Object(prebase.ProtoM21Object):
         eRemain = copy.deepcopy(self)
 
         # clear lyrics from remaining parts
-        if hasattr(eRemain, 'lyrics') and not callable(eRemain.lyrics):
-            # lyrics is a function on Streams...
-            eRemain.lyrics = []  # pylint: disable=attribute-defined-outside-init
+        if isinstance(eRemain, note.GeneralNote):
+            eRemain.lyrics = []
 
         spannerList = []
         for listType in ('expressions', 'articulations'):
@@ -3073,15 +3137,15 @@ class Music21Object(prebase.ProtoM21Object):
                 elif e.tie.type == 'continue':
                     forceEndTieType = 'continue'
                     # keep continue if already set
-            elif hasattr(e, 'tie'):
-                e.tie = tie.Tie('start')  # pylint: disable=attribute-defined-outside-init
+            elif isinstance(e, (note.Note, note.Unpitched)):
+                e.tie = tie.Tie('start')
                 # #need a tie object
 
-            if hasattr(eRemain, 'tie'):
-                # pylint: disable=attribute-defined-outside-init
+            if isinstance(eRemain, (note.Note, note.Unpitched)):
                 eRemain.tie = tie.Tie(forceEndTieType)
 
-        elif addTies and isinstance(e, chord.Chord):
+        elif addTies and isinstance(e, chord.Chord) and isinstance(eRemain, chord.Chord):
+            # the last isinstance is redundant, but MyPy needs it.
             for i in range(len(e.notes)):
                 component = e.notes[i]
                 remainComponent = eRemain.notes[i]
@@ -3106,10 +3170,12 @@ class Music21Object(prebase.ProtoM21Object):
 
         # hide accidentals on tied notes where previous note
         # had an accidental that was shown
-        if addTies and hasattr(e, 'pitches'):
+        if addTies and isinstance(e, note.NotRest) and isinstance(eRemain, note.NotRest):
+            # again -- second isinstance check is redundant
             for i, p in enumerate(e.pitches):
                 remainP = eRemain.pitches[i]
-                if hasattr(p, 'accidental') and p.accidental is not None:
+                if p.accidental is not None and remainP.accidental is not None:
+                    # again -- second remainP.accidental is not None check is redundant
                     if not displayTiedAccidentals:  # if False
                         if p.accidental.displayType != 'even-tied':
                             remainP.accidental.displayStatus = False
@@ -3181,7 +3247,7 @@ class Music21Object(prebase.ProtoM21Object):
         stOut.spannerList = spannerList
         return stOut
 
-    def splitAtDurations(self: _M21T) -> _SplitTuple:
+    def splitAtDurations(self) -> _SplitTuple:
         '''
         Takes a Music21Object (e.g., a note.Note) and returns a list of similar
         objects with only a single duration.DurationTuple in each.
@@ -3397,7 +3463,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> [n._getMeasureOffset(includeMeasurePadding=False) for n in m.notes]
         [0.0, 0.5, 1.0, 1.5]
         '''
-        # TODO: v7 -- expose as public.
+        from music21 import stream
+
+        # TODO: v8 -- expose as public.
         activeS = self.activeSite
         if activeS is not None and activeS.isMeasure:
             # environLocal.printDebug(['found activeSite as Measure, using for offset'])
@@ -3409,7 +3477,7 @@ class Music21Object(prebase.ProtoM21Object):
             #    doing context search', 'self.activeSite', self.activeSite])
             # testing sortByCreationTime == true; this may be necessary
             # as we often want the most recent measure
-            m = self.getContextByClass('Measure', sortByCreationTime=True)
+            m = self.getContextByClass(stream.Measure, sortByCreationTime=True)
             if m is not None:
                 # environLocal.printDebug(['using found Measure for offset access'])
                 try:
@@ -3434,8 +3502,9 @@ class Music21Object(prebase.ProtoM21Object):
 
         extracted to make sure that all three of the routines use the same one.
         '''
-        ts: Optional['music21.meter.TimeSignature'] = self.getContextByClass(
-            'TimeSignature',
+        from music21 import meter
+        ts: Optional[meter.TimeSignature] = self.getContextByClass(
+            meter.TimeSignature,
             getElementMethod=ElementSearch.AT_OR_BEFORE_OFFSET
         )
         if ts is None:
@@ -3735,11 +3804,12 @@ class Music21Object(prebase.ProtoM21Object):
             return float('nan')
 
     def _getSeconds(self) -> float:
+        from music21 import tempo
         # do not search of duration is zero
         if self.duration.quarterLength == 0.0:
             return 0.0
 
-        ti = self.getContextByClass('TempoIndication')
+        ti = self.getContextByClass(tempo.TempoIndication)
         if ti is None:
             return float('nan')
         mm = ti.getSoundingMetronomeMark()
@@ -3747,7 +3817,8 @@ class Music21Object(prebase.ProtoM21Object):
         return mm.durationToSeconds(self.duration)
 
     def _setSeconds(self, value: Union[int, float]) -> None:
-        ti = self.getContextByClass('TempoIndication')
+        from music21 import tempo
+        ti = self.getContextByClass(tempo.TempoIndication)
         if ti is None:
             raise Music21ObjectException('this object does not have a TempoIndication in Sites')
         mm = ti.getSoundingMetronomeMark()
@@ -4907,11 +4978,13 @@ class Test(unittest.TestCase):
         p1.append(m2)
         n1next = n1.next()
         self.assertEqual(n1next, m2)
-        self.assertEqual(n1.next('Note'), n2)
+        self.assertEqual(n1.next(note.Note), n2)
 
     def testNextC(self):
         from music21 import corpus
         from music21 import stream
+        from music21 import meter
+        from music21 import key
 
         s = corpus.parse('bwv66.6')
 
@@ -5130,7 +5203,10 @@ class Test(unittest.TestCase):
         obj = Music21Object()
         with self.assertRaises(ValueError):
             obj.getContextByClass(
-                editorial.Editorial, priorityTargetOnly=True, followDerivation=True)
+                ElementWrapper,
+                priorityTargetOnly=True,
+                followDerivation=True
+            )
 
 # great isolation test, but no asserts for now...
 #     def testPreviousA(self):
