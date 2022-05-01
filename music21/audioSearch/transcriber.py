@@ -17,8 +17,7 @@ import unittest
 
 from music21 import scale
 from music21 import environment
-_MOD = 'audioSearch.transcriber'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('audioSearch.transcriber')
 
 
 def runTranscribe(show=True, plot=True, useMic=True,

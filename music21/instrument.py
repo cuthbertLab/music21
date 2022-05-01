@@ -33,15 +33,12 @@ from music21 import common
 from music21 import interval
 from music21 import note
 from music21 import pitch
-from music21 import stream
 from music21.tree.trees import OffsetTree
 
 from music21.exceptions21 import InstrumentException
 
 from music21 import environment
-
-_MOD = 'instrument'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('instrument')
 
 
 def unbundleInstruments(streamIn: 'music21.stream.Stream',
@@ -1865,15 +1862,17 @@ def deduplicate(s: 'music21.stream.Stream', inPlace: bool = False) -> 'music21.s
     >>> list(p2.getInstruments())
     [<music21.instrument.Flute 'Flute'>]
     '''
+    from music21 import stream
+
     if inPlace:
         returnObj = s
     else:
         returnObj = s.coreCopyAsDerivation('instrument.deduplicate')
 
     if not returnObj.hasPartLikeStreams():
-        substreams: Iterable['music21.stream.Stream'] = [returnObj]
+        substreams: Iterable[stream.Stream] = [returnObj]
     else:
-        substreams = returnObj.getElementsByClass('Stream')
+        substreams = returnObj.getElementsByClass(stream.Stream)
 
     for sub in substreams:
         oTree = OffsetTree(sub[Instrument].stream())
@@ -2216,6 +2215,7 @@ def partitionByInstrument(streamObj):
     TODO: use proper recursion to make a copy of the stream.
     TODO: final barlines should be aligned.
     '''
+    from music21 import stream
     if not streamObj.hasPartLikeStreams():
         # place in a score for uniform operations
         s = stream.Score()
@@ -2594,6 +2594,8 @@ class Test(unittest.TestCase):
                 j = copy.deepcopy(obj)
 
     def testMusicXMLExport(self):
+        from music21 import stream
+
         s1 = stream.Stream()
         i1 = Violin()
         i1.partName = 'test'
@@ -2615,6 +2617,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentA(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2628,7 +2631,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass(instrument.Instrument)), 2)
 
         # post.show('t')
 
@@ -2639,11 +2642,12 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post[instrument.Instrument]), 2)
         # post.show('t')
 
     def testPartitionByInstrumentB(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2659,12 +2663,13 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post[instrument.Instrument]), 2)
         self.assertEqual(len(post.parts[0].notes), 6)
         self.assertEqual(len(post.parts[1].notes), 12)
 
     def testPartitionByInstrumentC(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2686,7 +2691,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 4)
+        self.assertEqual(len(post[instrument.Instrument]), 4)
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 6)
         self.assertEqual(post.parts[1].getInstrument().instrumentName, 'Acoustic Guitar')
@@ -2701,6 +2706,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentD(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2726,7 +2732,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 4)
+        self.assertEqual(len(post[instrument.Instrument]), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 12)
@@ -2739,6 +2745,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentE(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         # s = stream.Score()
@@ -2762,7 +2769,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 4)
+        self.assertEqual(len(post[instrument.Instrument]), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
 
@@ -2777,6 +2784,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentF(self):
         from music21 import instrument
+        from music21 import stream
 
         s1 = stream.Stream()
         s1.append(instrument.AcousticGuitar())

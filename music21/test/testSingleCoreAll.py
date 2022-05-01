@@ -28,8 +28,7 @@ from music21.test import commonTest
 from music21.test import coverageM21
 from music21.test import testRunner
 
-_MOD = 'test.testSingleCoreAll'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('test.testSingleCoreAll')
 
 
 # this is designed to be None for all but one system and a Coverage() object

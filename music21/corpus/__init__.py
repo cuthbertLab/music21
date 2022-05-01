@@ -67,8 +67,7 @@ from music21.corpus.manager import search
 from music21.exceptions21 import CorpusException
 
 from music21 import environment
-_MOD = 'corpus'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('corpus')
 
 
 # -----------------------------------------------------------------------------

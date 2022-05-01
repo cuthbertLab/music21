@@ -38,8 +38,7 @@ from music21 import common
 from music21 import prebase
 
 from music21 import environment
-_MOD = 'musedata'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('musedata')
 
 # for implementation
 # see http://www.ccarh.org/publications/books/beyondmidi/online/musedata/

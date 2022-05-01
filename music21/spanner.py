@@ -30,8 +30,7 @@ from music21 import prebase
 from music21 import style
 
 from music21 import environment
-_MOD = 'spanner'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('spanner')
 
 
 # ------------------------------------------------------------------------------
@@ -389,7 +388,7 @@ class Spanner(base.Music21Object):
         >>> sl.addSpannedElements([n1, n2, c1])
         >>> sl.getSpannedElementsByClass('Note') == [n1, n2]
         True
-        >>> sl.getSpannedElementsByClass('Clef') == [c1]
+        >>> sl.getSpannedElementsByClass(clef.Clef) == [c1]
         True
         '''
         # returns an iterator

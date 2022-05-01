@@ -42,11 +42,10 @@ from music21 import pitch
 from music21 import prebase
 
 from music21 import environment
-_MOD = 'scale.intervalNetwork'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('scale.intervalNetwork')
 
 
-# these are just symbols/place holders; values do not matter as long
+# these are just symbols/placeholders; values do not matter as long
 # as they are not positive ints
 TERMINUS_LOW = 'terminusLow'
 TERMINUS_HIGH = 'terminusHigh'

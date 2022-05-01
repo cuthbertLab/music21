@@ -206,7 +206,7 @@ class CapellaImporter:
                 print('part entries do not match partDict!')
                 continue
             clefs = p.getElementsByClass(clef.Clef)
-            keySignatures = p.getElementsByClass('KeySignature')
+            keySignatures = p.getElementsByClass(key.KeySignature)
             lastClef = None
             lastKeySignature = None
             for c in clefs:

@@ -35,8 +35,7 @@ from music21 import exceptions21
 from music21.common.decorators import cacheMethod
 
 from music21 import environment
-_MOD = 'interval'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('interval')
 
 # ------------------------------------------------------------------------------
 # constants
@@ -1404,7 +1403,7 @@ class GenericInterval(IntervalBase):
         >>> bPitch
         <music21.pitch.Pitch D5>
 
-        But if a key or keySignature (such as one from .getContextByClass('KeySignature')
+        But if a key or keySignature (such as one from .getContextByClass(key.KeySignature)
         is given, then the fun begins...
 
         >>> fis = pitch.Pitch('F#4')

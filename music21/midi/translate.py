@@ -31,12 +31,12 @@ from music21 import note
 from music21 import percussion
 from music21 import pitch
 from music21 import stream
+from music21 import tempo
 
 from music21.instrument import Conductor, deduplicate
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
-_MOD = 'midi.translate'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('midi.translate')
 PERCUSSION_MAPPER = PercussionMapper()
 
 
@@ -1134,7 +1134,6 @@ def midiEventsToTempo(eventList):
     TODO: Need Tests
     '''
     from music21 import midi as midiModule
-    from music21 import tempo
 
     if not common.isListLike(eventList):
         event = eventList
@@ -2222,7 +2221,6 @@ def conductorStream(s: stream.Stream) -> stream.Part:
         {0.0} <music21.stream.Stream measureLike>
             {0.0} <music21.note.Note C>
     '''
-    from music21 import tempo
     from music21 import meter
     partsList = list(s.getElementsByClass(stream.Stream).getElementsByOffset(0))
     minPriority = min(p.priority for p in partsList) if partsList else 0
@@ -2246,9 +2244,9 @@ def conductorStream(s: stream.Stream) -> stream.Part:
     conductorPart.coreElementsChanged()
 
     # Defaults
-    if not conductorPart.getElementsByClass('MetronomeMark'):
+    if not conductorPart.getElementsByClass(tempo.MetronomeMark):
         conductorPart.insert(tempo.MetronomeMark(number=120))
-    if not conductorPart.getElementsByClass('TimeSignature'):
+    if not conductorPart.getElementsByClass(meter.TimeSignature):
         conductorPart.insert(meter.TimeSignature('4/4'))
 
     return conductorPart
@@ -2454,7 +2452,7 @@ def packetStorageFromSubstreamList(
         subs = subs.flatten()
 
         # get a first instrument; iterate over rest
-        instrumentStream = subs.getElementsByClass('Instrument')
+        instrumentStream = subs.getElementsByClass(instrument.Instrument)
 
         # if there is an Instrument object at the start, make instObj that instrument
         # this may be a Conductor object if prepareStreamForMidi() was run
@@ -2994,7 +2992,7 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
         # get and compare just the conductor tracks
-        # mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature').stream())[0]
+        # mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass(meter.TimeSignature).stream())[0]
         conductorEvents = repr(mt.events)
 
         match = '''[<music21.midi.DeltaTime (empty) track=0, channel=None>,
@@ -3528,14 +3526,14 @@ class Test(unittest.TestCase):
         from music21 import interval
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
-        p1.remove(p1.getElementsByClass('Instrument').first())
+        p1.remove(p1.getElementsByClass(instrument.Instrument).first())
         p2 = copy.deepcopy(p1)
         p3 = copy.deepcopy(p1)
 
         t1 = interval.Interval(12.5)  # a sharp p4
         t2 = interval.Interval(-7.25)  # a sharp p4
-        p2.transpose(t1, inPlace=True, classFilterList=('Note', 'Chord'))
-        p3.transpose(t2, inPlace=True, classFilterList=('Note', 'Chord'))
+        p2.transpose(t1, inPlace=True, classFilterList=(note.Note, chord.Chord))
+        p3.transpose(t2, inPlace=True, classFilterList=(note.Note, chord.Chord))
         post = stream.Score()
         p1.insert(0, instrument.Dulcimer())
         post.insert(0, p1)
@@ -3566,7 +3564,7 @@ class Test(unittest.TestCase):
         # a simple file created in athenacl
         fp = dirLib / 'test10.mid'
         s = converter.parse(fp)
-        mmStream = s.flatten().getElementsByClass('MetronomeMark')
+        mmStream = s.flatten().getElementsByClass(tempo.MetronomeMark)
         self.assertEqual(len(mmStream), 4)
         self.assertEqual(mmStream[0].number, 120.0)
         self.assertEqual(mmStream[1].number, 110.0)
@@ -3575,19 +3573,18 @@ class Test(unittest.TestCase):
 
         fp = dirLib / 'test06.mid'
         s = converter.parse(fp)
-        mmStream = s.flatten().getElementsByClass('MetronomeMark')
+        mmStream = s.flatten().getElementsByClass(tempo.MetronomeMark)
         self.assertEqual(len(mmStream), 1)
         self.assertEqual(mmStream[0].number, 120.0)
 
         fp = dirLib / 'test07.mid'
         s = converter.parse(fp)
-        mmStream = s.flatten().getElementsByClass('MetronomeMark')
+        mmStream = s.flatten().getElementsByClass(tempo.MetronomeMark)
         self.assertEqual(len(mmStream), 1)
         self.assertEqual(mmStream[0].number, 180.0)
 
     def testMidiTempoImportB(self):
         from music21 import converter
-        from music21 import tempo
 
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         # a file with three tracks and one conductor track with four tempo marks
@@ -3646,7 +3643,6 @@ class Test(unittest.TestCase):
     def testMidiExportConductorA(self):
         '''Export conductor data to MIDI conductor track.'''
         from music21 import meter
-        from music21 import tempo
 
         p1 = stream.Part()
         p1.repeatAppend(note.Note('c4'), 12)
@@ -3677,7 +3673,6 @@ class Test(unittest.TestCase):
         # s.show('midi', app='Logic Express')
 
     def testMidiExportConductorB(self):
-        from music21 import tempo
         from music21 import corpus
         s = corpus.parse('bwv66.6')
         s.insert(0, tempo.MetronomeMark(number=240))
@@ -3694,7 +3689,6 @@ class Test(unittest.TestCase):
         self.assertEqual(musicTrkRepr.count('SET_TEMPO'), 0)
 
     def testMidiExportConductorC(self):
-        from music21 import tempo
         minTempo = 60
         maxTempo = 600
         period = 50
@@ -3724,7 +3718,6 @@ class Test(unittest.TestCase):
     def testMidiExportConductorE(self):
         '''The conductor only gets the first element at an offset.'''
         from music21 import converter
-        from music21 import tempo
 
         s = stream.Stream()
         p1 = converter.parse('tinynotation: c1')
@@ -3736,8 +3729,8 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
 
         conductor = conductorStream(s)
-        tempos = conductor.getElementsByClass('MetronomeMark')
-        keySignatures = conductor.getElementsByClass('KeySignature')
+        tempos = conductor.getElementsByClass(tempo.MetronomeMark)
+        keySignatures = conductor.getElementsByClass(key.KeySignature)
         self.assertEqual(len(tempos), 1)
         self.assertEqual(tempos[0].number, 44)
         self.assertEqual(len(keySignatures), 1)
@@ -3925,7 +3918,8 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.transposing01)
         mf = streamToMidiFile(s)
         out = midiFileToStream(mf)
-        first_instrument = out.parts.first().measure(1).getElementsByClass('Instrument').first()
+        first_instrument = out.parts.first().measure(1).getElementsByClass(
+            instrument.Instrument).first()
         self.assertIsInstance(first_instrument, instrument.Oboe)
         self.assertEqual(first_instrument.quarterLength, 0)
 

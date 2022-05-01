@@ -27,8 +27,7 @@ import unittest
 from music21 import clef
 from music21 import environment
 from music21 import exceptions21
-_MOD = 'musedata.translate'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('musedata.translate')
 
 
 # ------------------------------------------------------------------------------
@@ -590,7 +589,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('symphony94', 3)
 #         sFlat = s.flatten()
 #         # s.show()
-#         self.assertEqual(len(sFlat.getElementsByClass('Dynamic')), 79)
+#         self.assertEqual(len(sFlat.getElementsByClass(dynamics.Dynamic)), 79)
 #
 #
 #     def testMuseDataImportErrorA(self):

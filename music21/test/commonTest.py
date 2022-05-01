@@ -12,6 +12,7 @@
 '''
 Things that are common to testing...
 '''
+import importlib
 from unittest.signals import registerResult
 
 import doctest
@@ -412,6 +413,15 @@ class ModuleGather:
                 currentModule = object.__getattribute__(currentModule, thisName)
                 if not isinstance(currentModule, types.ModuleType):
                     return 'notInTree'
+            elif 'test' in thisName:
+                # import '*test*' automatically.
+                packageName = currentModule.__name__
+                newMod = importlib.import_module('.' + thisName, packageName)
+                setattr(currentModule, thisName, newMod)
+                environLocal.printDebug(
+                    f'Imported {thisName=} from {currentModule=}, {fp=}, {packageName=}'
+                )
+                currentModule = newMod
             else:
                 return 'notInTree'
         mod = currentModule

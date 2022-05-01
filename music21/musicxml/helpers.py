@@ -11,6 +11,7 @@
 # ------------------------------------------------------------------------------
 import copy
 from xml.etree.ElementTree import tostring as et_tostring
+from music21 import meter
 
 def dumpString(obj, *, noCopy=False) -> str:
     r'''
@@ -185,7 +186,7 @@ def isFullMeasureRest(r: 'music21.note.Rest') -> bool:
     if r.fullMeasure in (True, 'always'):
         isFullMeasure = True
     elif r.fullMeasure == 'auto':
-        tsContext = r.getContextByClass('TimeSignature')
+        tsContext = r.getContextByClass(meter.TimeSignature)
         if tsContext and tsContext.barDuration.quarterLength == r.duration.quarterLength:
             isFullMeasure = True
     return isFullMeasure

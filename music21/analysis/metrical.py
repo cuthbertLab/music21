@@ -22,8 +22,8 @@ import unittest
 from music21 import stream
 
 from music21 import environment
-_MOD = "analysis.metrical"
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.metrical')
+
 
 def labelBeatDepth(streamIn):
     r'''

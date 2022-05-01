@@ -30,8 +30,7 @@ from music21 import common
 from music21 import environment
 from music21 import exceptions21
 
-_MOD = 'configure'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('configure')
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 IGNORECASE = re.RegexFlag.IGNORECASE

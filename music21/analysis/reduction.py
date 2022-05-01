@@ -31,9 +31,7 @@ from music21 import prebase
 from music21 import stream
 
 from music21 import environment
-_MOD = "analysis.reduction"
-environLocal = environment.Environment(_MOD)
-
+environLocal = environment.Environment('analysis.reduction')
 
 
 # ------------------------------------------------------------------------------

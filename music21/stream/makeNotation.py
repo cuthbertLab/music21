@@ -15,7 +15,7 @@
 
 import copy
 import unittest
-from typing import List, Generator, Optional, Set, Union
+from typing import List, Generator, Optional, Set, Union, cast
 from fractions import Fraction  # typing only
 
 from music21 import beam
@@ -129,7 +129,7 @@ def makeBeams(
     # if s.isClass(Measure):
     mColl: List[stream.Measure]
     if isinstance(s, stream.Measure):
-        returnObj: stream.Measure
+        returnObj = cast(stream.Measure, returnObj)
         mColl = [returnObj]  # store a list of measures for processing
     else:
         mColl = list(returnObj.getElementsByClass(stream.Measure))  # a list of measures
@@ -487,7 +487,7 @@ def makeMeasures(
     #                returnDefault=True)
     # clefObj = clefList[0]
     # del clefList
-    clefObj = srcObj.clef or srcObj.getContextByClass('Clef')
+    clefObj = srcObj.clef or srcObj.getContextByClass(clef.Clef)
     if clefObj is None:
         clefObj = srcObj.getElementsByClass(clef.Clef).getElementsByOffset(0).first()
         # only return clefs that have offset = 0.0
@@ -1259,7 +1259,7 @@ def makeTies(
         try:
             mEnd = lastTimeSignature.barDuration.quarterLength
         except AttributeError:
-            ts = m.getContextByClass('TimeSignature')
+            ts = m.getContextByClass(meter.TimeSignature)
             if ts is not None:
                 lastTimeSignature = ts
                 mEnd = lastTimeSignature.barDuration.quarterLength

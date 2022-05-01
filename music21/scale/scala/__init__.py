@@ -42,7 +42,7 @@ For most people you'll want to do something like this:
 ['A4', 'B4(-15c)', 'C#5(-11c)', 'E-5(-7c)', 'E~5(+6c)', 'F#5(+14c)', 'G~5(+1c)', 'B-5(+2c)']
 
 '''
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Callable
 
 import io
 import math
@@ -57,8 +57,7 @@ from music21 import interval
 from music21.scale.scala import scl
 
 from music21 import environment
-_MOD = "scale.scala"
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('scale.scala')
 
 
 # ------------------------------------------------------------------------------
@@ -722,7 +721,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[Callable] = []
 
 
 if __name__ == '__main__':

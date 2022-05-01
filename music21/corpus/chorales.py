@@ -21,8 +21,7 @@ import copy
 from music21 import exceptions21
 from music21 import environment
 from music21 import metadata
-_MOD = 'corpus.chorales'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('corpus.chorales')
 
 
 class ChoraleList:

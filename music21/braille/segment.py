@@ -135,9 +135,10 @@ SEGMENT_MAXNOTESFORSHORTSLUR = 4
 
 MAX_ELEMENTS_IN_SEGMENT = 48  # 8 measures of 6 notes, etc. each
 
-_ThreeDigitNumber = collections.namedtuple('_ThreeDigitNumber', 'hundreds tens ones')
+_ThreeDigitNumber = collections.namedtuple('_ThreeDigitNumber', ['hundreds', 'tens', 'ones'])
 
-SegmentKey = collections.namedtuple('SegmentKey', 'measure ordinal affinity hand')
+SegmentKey = collections.namedtuple('SegmentKey',
+                                    ['measure', 'ordinal', 'affinity', 'hand'])
 SegmentKey.__new__.__defaults__ = (0, 0, None, None)
 
 

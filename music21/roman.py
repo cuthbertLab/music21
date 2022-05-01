@@ -13,6 +13,8 @@
 '''
 Music21 class for dealing with Roman Numeral analysis
 '''
+from __future__ import annotations
+
 import enum
 import unittest
 import copy
@@ -33,12 +35,10 @@ from music21 import exceptions21
 from music21 import common
 from music21 import chord
 
-FigureTuple = namedtuple('FigureTuple', 'aboveBass alter prefix')
-ChordFigureTuple = namedtuple('ChordFigureTuple', 'aboveBass alter prefix pitch')
+FigureTuple = namedtuple('FigureTuple', ['aboveBass', 'alter', 'prefix'])
+ChordFigureTuple = namedtuple('ChordFigureTuple', ['aboveBass', 'alter', 'prefix', 'pitch'])
 
-
-_MOD = 'roman'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('roman')
 
 # TODO: setting inversion should change the figure
 
@@ -2108,10 +2108,10 @@ class RomanNumeral(harmony.Harmony):
         seventhMinor=Minor67Default.QUALITY,
     ):
         self.primaryFigure: str = ''
-        self.secondaryRomanNumeral: Optional['RomanNumeral'] = None
+        self.secondaryRomanNumeral: Optional[RomanNumeral] = None
         self.secondaryRomanNumeralKey: Optional['key.Key'] = None
 
-        self.pivotChord: Optional['RomanNumeral'] = None
+        self.pivotChord: Optional[RomanNumeral] = None
         self.caseMatters: bool = caseMatters
         self.scaleCardinality: int = 7
 
@@ -3692,15 +3692,15 @@ class Test(unittest.TestCase):
         s1 = copy.deepcopy(s)
         for p in s1.parts:
             for m in p.getElementsByClass(stream.Measure):
-                for e in m.getElementsByClass('KeySignature'):
+                for e in m.getElementsByClass(key.KeySignature):
                     m.remove(e)
-        self.assertEqual(len(s1.flatten().getElementsByClass('KeySignature')), 0)
+        self.assertEqual(len(s1.flatten().getElementsByClass(key.KeySignature)), 0)
         s2 = copy.deepcopy(s)
         self.assertEqual(
-            len(s2.flatten().getElementsByClass('KeySignature')),
+            len(s2.flatten().getElementsByClass(key.KeySignature)),
             targetCount,
         )
-        for e in s2.flatten().getElementsByClass('KeySignature'):
+        for e in s2.flatten().getElementsByClass(key.KeySignature):
             for site in e.sites.get():
                 if site is not None:
                     site.remove(e)
@@ -3708,7 +3708,7 @@ class Test(unittest.TestCase):
         # yield elements and containers
         s3 = copy.deepcopy(s)
         self.assertEqual(
-            len(s3.flatten().getElementsByClass('KeySignature')),
+            len(s3.flatten().getElementsByClass(key.KeySignature)),
             targetCount,
         )
         for e in s3.recurse(streamsOnly=True):
@@ -3720,13 +3720,13 @@ class Test(unittest.TestCase):
         # yield containers
         s4 = copy.deepcopy(s)
         self.assertEqual(
-            len(s4.flatten().getElementsByClass('KeySignature')),
+            len(s4.flatten().getElementsByClass(key.KeySignature)),
             targetCount,
         )
         # do not remove in iteration.
         for c in list(s4.recurse(streamsOnly=False)):
             if isinstance(c, stream.Stream):
-                for e in c.getElementsByClass('KeySignature'):
+                for e in c.getElementsByClass(key.KeySignature):
                     c.remove(e)
 
     def testScaleDegreesA(self):

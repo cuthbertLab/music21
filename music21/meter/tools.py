@@ -24,7 +24,7 @@ from music21.exceptions21 import MeterException, Music21Exception, TimeSignature
 environLocal = environment.Environment('meter.tools')
 
 MeterTerminalTuple = collections.namedtuple('MeterTerminalTuple',
-                                            'numerator denominator division')
+                                            ['numerator', 'denominator', 'division'])
 NumDenom = Tuple[int, int]
 NumDenomTuple = Tuple[NumDenom, ...]
 MeterOptions = Tuple[Tuple[str, ...], ...]

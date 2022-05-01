@@ -27,8 +27,7 @@ from music21.features import base as featuresModule
 from music21.instrument import Instrument
 
 from music21 import environment
-_MOD = 'features.jSymbolic'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('features.jSymbolic')
 
 
 # ------------------------------------------------------------------------------

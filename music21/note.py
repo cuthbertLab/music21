@@ -1628,6 +1628,7 @@ class Note(NotRest):
         {1.0} <music21.note.Note G->
 
         '''
+        from music21 import key
         if isinstance(value, interval.IntervalBase):
             intervalObj = value
         else:  # try to process
@@ -1643,7 +1644,7 @@ class Note(NotRest):
         post.pitch.transpose(intervalObj, inPlace=True)
         if (post.pitch.accidental is not None
                 and isinstance(value, (int, interval.ChromaticInterval))):
-            ksContext = self.getContextByClass('KeySignature')
+            ksContext = self.getContextByClass(key.KeySignature)
             if ksContext is not None:
                 for alteredPitch in ksContext.alteredPitches:
                     if (post.pitch.pitchClass == alteredPitch.pitchClass

@@ -28,8 +28,7 @@ import wave
 from music21 import exceptions21
 
 from music21 import environment
-_MOD = "audioSearch.recording"
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('audioSearch.recording')
 
 
 ###

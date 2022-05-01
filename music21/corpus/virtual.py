@@ -25,8 +25,7 @@ import unittest
 
 from music21 import common
 from music21 import environment
-_MOD = 'converter.virtual'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('corpus.virtual')
 
 
 class VirtualWork:

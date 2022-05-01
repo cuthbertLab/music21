@@ -14,9 +14,10 @@
 Tools for creating timespans (fast, manipulable objects) from Streams
 '''
 import unittest
-from typing import Optional, Sequence, List, Type, Union, Tuple, Literal
+from typing import Optional, Sequence, List, Type, Union, Tuple, Literal, cast
 
 from music21.base import Music21Object
+from music21.common.types import M21ObjType
 from music21 import common
 from music21 import key
 from music21.tree import spans
@@ -27,10 +28,10 @@ from music21.tree import trees
 def listOfTreesByClass(
     inputStream: 'music21.stream.Stream',
     *,
+    classLists: Optional[List[Sequence[Type[M21ObjType]]]] = None,
     currentParentage: Optional[Tuple['music21.stream.Stream', ...]] = None,
     initialOffset: float = 0.0,
     flatten: Union[bool, str] = False,
-    classLists: List[Sequence[Type]] = None,
     useTimespans: bool = False
 ) -> List[Union[trees.OffsetTree, timespanTree.TimespanTree]]:
     # noinspection PyShadowingNames
@@ -107,7 +108,7 @@ def listOfTreesByClass(
         wasStream = False
 
         if element.isStream:
-            element: 'music21.stream.Stream'
+            element = cast('music21.stream.Stream', element)
             localParentage = currentParentage + (element,)
             containedTrees = listOfTreesByClass(element,
                                                 currentParentage=localParentage,
@@ -394,12 +395,6 @@ class Test(unittest.TestCase):
         t = asTree(sc)
         self.assertEqual(t.endTime, 8.0)
         # print(repr(t))
-
-    # def x_testExampleScoreAsTimespans(self):
-    #     from music21 import tree
-    #     score = tree.makeExampleScore()
-    #     treeList = tree.fromStream.listOfTreesByClass(score, useTimespans=True)
-    #     tl0 = treeList[0]
 
 
 # --------------------

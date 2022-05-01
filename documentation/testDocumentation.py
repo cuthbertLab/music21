@@ -30,7 +30,8 @@ from music21.exceptions21 import Music21Exception
 from music21.test import testRunner
 
 
-ModTuple = namedtuple('ModTuple', 'module fullModulePath moduleNoExtension autoGen')
+ModTuple = namedtuple('ModTuple',
+                      ['module', 'fullModulePath', 'moduleNoExtension', 'autoGen'])
 
 
 class Unbuffered:

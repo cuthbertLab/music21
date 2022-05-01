@@ -82,8 +82,7 @@ from music21 import prebase
 from music21 import style
 from music21.common.objects import EqualSlottedObjectMixin
 
-_MOD = 'meter'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('beam')
 
 
 class BeamException(exceptions21.Music21Exception):

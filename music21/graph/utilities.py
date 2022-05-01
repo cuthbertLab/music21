@@ -27,8 +27,7 @@ from music21 import exceptions21
 from music21 import pitch
 
 from music21 import environment
-_MOD = 'graph.utilities'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('graph.utilities')
 
 
 ExtendedModules = namedtuple('ExtendedModules',

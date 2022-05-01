@@ -294,7 +294,7 @@ class ChordReducer:
             cLastEnd = newOffset + cElCopy.quarterLength
             m.coreInsert(newOffset, cElCopy, ignoreSort=True)
 
-        tsContext = mI.parts.first().getContextByClass('TimeSignature')
+        tsContext = mI.parts.first().getContextByClass(meter.TimeSignature)
         if tsContext is not None:
             if round(tsContext.barDuration.quarterLength - cLastEnd, 6) != 0.0:
                 cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd

@@ -70,8 +70,7 @@ from music21.metadata import bundles
 from music21 import _version
 from music21 import environment
 
-_MOD = 'converter'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('converter')
 
 
 # ------------------------------------------------------------------------------
@@ -1645,7 +1644,7 @@ class Test(unittest.TestCase):
         countTies = 0
         countStartTies = 0
         for p in a.parts:
-            post = p.recurse().notes[0].getContextByClass('Clef')
+            post = p.recurse().notes[0].getContextByClass(clef.Clef)
             self.assertIsInstance(post, clef.TenorClef)
             for n in p.recurse().notes:
                 if n.tie is not None:

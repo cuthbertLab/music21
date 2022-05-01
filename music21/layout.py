@@ -97,11 +97,11 @@ from music21 import base
 from music21 import exceptions21
 from music21 import spanner
 from music21 import stream
+from music21.common.enums import GatherSpanners
 from music21.stream.enums import StaffType
 
 from music21 import environment
-_MOD = 'layout'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('layout')
 
 
 SystemSize = namedtuple('SystemSize', ['top', 'left', 'right', 'bottom'])
@@ -654,7 +654,9 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
         thisPage.measureEnd = pageEndM
         thisPage.pageNumber = pageNumber
         if fastMeasures is True:
-            thisPageAll = scoreIn.measures(pageStartM, pageEndM, collect=[], gatherSpanners=False)
+            thisPageAll = scoreIn.measures(pageStartM, pageEndM,
+                                           collect=[],
+                                           gatherSpanners=GatherSpanners.NONE)
         else:
             thisPageAll = scoreIn.measures(pageStartM, pageEndM)
         thisPage.systemStart = systemNumber + 1
@@ -676,7 +678,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
             if fastMeasures is True:
                 measureStacks = scoreIn.measures(systemStartM, systemEndM,
                                                  collect=[],
-                                                 gatherSpanners=False)
+                                                 gatherSpanners=GatherSpanners.NONE)
             else:
                 measureStacks = scoreIn.measures(systemStartM, systemEndM)
             thisSystem = System()
@@ -703,7 +705,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
                 staffObject.elements = p
                 thisSystem.replace(p, staffObject)
-                allStaffLayouts: List[StaffLayout] = p.recurse().getElementsByClass('StaffLayout')
+                allStaffLayouts: List[StaffLayout] = list(p[StaffLayout])
                 if not allStaffLayouts:
                     continue
                 # else:
@@ -864,7 +866,7 @@ class LayoutScore(stream.Opus):
 
         >>> #_DOCS_SHOW g = corpus.parse('luca/gloria')
         >>> #_DOCS_SHOW m22 = g.parts[0].getElementsByClass(stream.Measure)[22]
-        >>> #_DOCS_SHOW m22.getElementsByClass('PageLayout').first().leftMargin = 204.0
+        >>> #_DOCS_SHOW m22.getElementsByClass(layout.PageLayout).first().leftMargin = 204.0
         >>> #_DOCS_SHOW gl = layout.divideByPages(g)
         >>> #_DOCS_SHOW gl.getMarginsAndSizeForPageId(1)
         >>> layout.PageSize(171.0, 204.0, 171.0, 171.0, 1457.0, 1886.0) #_DOCS_HIDE
@@ -1697,8 +1699,9 @@ class Test(unittest.TestCase):
         we have had problems with attributes disappearing.
         '''
         from music21 import corpus
+        from music21 import layout
         lt = corpus.parse('demos/layoutTest.xml')
-        ls = divideByPages(lt, fastMeasures=True)
+        ls = layout.divideByPages(lt, fastMeasures=True)
 
         hiddenStaff = ls.pages[0].systems[3].staves[1]
         self.assertTrue(repr(hiddenStaff).endswith('Staff 11: p.1, sys.4, st.2>'),

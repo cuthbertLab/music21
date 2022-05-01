@@ -39,13 +39,15 @@ import unittest
 from typing import List, no_type_check
 
 from music21 import base
+from music21 import chord
+from music21 import clef
+from music21 import common
 from music21 import exceptions21
 from music21 import interval
-from music21 import common
-from music21 import pitch
 from music21 import key
+from music21 import meter
 from music21 import note
-from music21 import chord
+from music21 import pitch
 from music21 import scale
 
 
@@ -1633,9 +1635,11 @@ class Verticality(base.Music21Object):
         {0.0} <music21.stream.Part part-1>
             {0.0} <music21.note.Note C>
 
-        >>> len(vsStream.flatten().getElementsByClass(note.Note))
+        How many notes are there anywhere in the hierarchy?
+
+        >>> len(vsStream[note.Note])
         2
-        >>> len(vsStream.flatten().getElementsByClass('Harmony'))
+        >>> len(vsStream[harmony.Harmony])
         1
         '''
         from music21 import stream
@@ -1644,9 +1648,9 @@ class Verticality(base.Music21Object):
             p = stream.Part(id=f'part-{partNum}')
             foundObj = elementList[0]
 
-            cl = foundObj.getContextByClass('Clef')
-            ks = foundObj.getContextByClass('KeySignature')
-            ts = foundObj.getContextByClass('TimeSignature')
+            cl = foundObj.getContextByClass(clef.Clef)
+            ks = foundObj.getContextByClass(key.KeySignature)
+            ts = foundObj.getContextByClass(meter.TimeSignature)
 
             if cl:
                 p.append(cl)

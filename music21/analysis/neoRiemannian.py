@@ -23,8 +23,7 @@ from music21 import chord
 from music21.analysis import enharmonics
 
 from music21 import environment
-_MOD = 'analysis.neoRiemannian'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.neoRiemannian')
 
 # TODO: change doctests from passing on exceptions to raising them and trapping them.
 

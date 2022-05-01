@@ -158,7 +158,7 @@ extendedTupletNumerators: Tuple[int, ...] = (
 )
 
 
-QuarterLengthConversion = namedtuple('QuarterLengthConversion', 'components tuplet')
+QuarterLengthConversion = namedtuple('QuarterLengthConversion', ['components', 'tuplet'])
 
 
 def unitSpec(durationObjectOrObjects):

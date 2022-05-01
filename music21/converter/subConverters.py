@@ -34,8 +34,7 @@ from music21 import stream
 from music21 import exceptions21
 
 from music21 import environment
-_MOD = 'converter.subConverters'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('converter.subConverters')
 
 # pylint complains when abstract methods are not overwritten, but that's okay.
 # pylint: disable=abstract-method

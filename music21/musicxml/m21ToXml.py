@@ -23,7 +23,7 @@ import warnings
 from xml.etree.ElementTree import (
     Element, SubElement, Comment
 )
-from typing import Dict, List, Mapping, Optional, Union
+from typing import Dict, List, Mapping, Optional, Union, cast
 
 # external dependencies
 import webcolors
@@ -42,6 +42,7 @@ from music21 import chord
 from music21 import duration
 from music21 import harmony
 from music21 import instrument
+from music21 import key
 from music21 import layout
 from music21 import metadata
 from music21 import note
@@ -60,8 +61,7 @@ from music21.musicxml.xmlObjects import MusicXMLExportException
 from music21.musicxml.xmlObjects import MusicXMLWarning
 
 from music21 import environment
-_MOD = "musicxml.m21ToXml"
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('musicxml.m21ToXml')
 
 # ------------------------------------------------------------------------------
 
@@ -1637,7 +1637,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         <music21.layout.ScoreLayout>
         '''
         s = self.stream
-        scoreLayouts = s.getElementsByClass('ScoreLayout').stream()
+        scoreLayouts = s.getElementsByClass(layout.ScoreLayout).stream()
         if scoreLayouts:
             scoreLayout = scoreLayouts[0]
         else:
@@ -2110,9 +2110,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
                 # Handle last part in the StaffGroup
                 if sg.isLast(p):
                     # find the spanner in the dictionary already-assigned
-                    for key, value in partGroupIndexRef.items():
+                    for k, value in partGroupIndexRef.items():
                         if value is sg:
-                            activeIndex = key
+                            activeIndex = k
                             break
                     mxPartGroup = Element('part-group')
                     mxPartGroup.set('type', 'stop')
@@ -2757,13 +2757,13 @@ class PartExporter(XMLExporterBase):
 
         if hasattr(first_measure, 'keySignature') and first_measure.keySignature is None:
             first_measure.makeMutable()  # must mutate
-            outerKeySignatures = part.getElementsByClass('KeySignature')
+            outerKeySignatures = part.getElementsByClass(key.KeySignature)
             if outerKeySignatures:
                 first_measure.keySignature = outerKeySignatures.first()
 
         if hasattr(first_measure, 'timeSignature') and first_measure.timeSignature is None:
             first_measure.makeMutable()  # must mutate
-            outerTimeSignatures = part.getElementsByClass('TimeSignature')
+            outerTimeSignatures = part.getElementsByClass(meter.TimeSignature)
             if outerTimeSignatures:
                 first_measure.timeSignature = outerTimeSignatures.first()
 
@@ -3025,7 +3025,7 @@ class MeasureExporter(XMLExporterBase):
             self.parseFlatElements(m, backupAfterwards=False)
             return
 
-        nonVoiceMeasureItems = m.getElementsNotOfClass('Voice').stream()
+        nonVoiceMeasureItems = m.getElementsNotOfClass(stream.Voice).stream()
         self.parseFlatElements(nonVoiceMeasureItems, backupAfterwards=True)
 
         allVoices = list(m.voices)
@@ -3624,7 +3624,7 @@ class MeasureExporter(XMLExporterBase):
             SubElement(mxNote, 'chord')
 
         if hasattr(n, 'pitch'):
-            n: note.Note
+            n = cast(note.Note, n)
             mxPitch = self.pitchToXml(n.pitch)
             mxNote.append(mxPitch)
         elif n.isRest:
@@ -3694,14 +3694,14 @@ class MeasureExporter(XMLExporterBase):
         if (addChordTag is False
                 and hasattr(chordOrN, 'stemDirection')
                 and chordOrN.stemDirection != 'unspecified'):
-            chordOrN: note.NotRest
+            chordOrN = cast(note.NotRest, chordOrN)
             stemDirection = chordOrN.stemDirection
         # or if we are in a chord, but the sub-note has its own stem direction,
         # record that.
         elif (chordOrN is not n
                 and hasattr(n, 'stemDirection')
                 and n.stemDirection != 'unspecified'):
-            n: note.NotRest
+            n = cast(note.NotRest, n)
             stemDirection = n.stemDirection
 
         if stemDirection is not None:
@@ -3724,7 +3724,7 @@ class MeasureExporter(XMLExporterBase):
         # beam
         if addChordTag is False:
             if hasattr(chordOrN, 'beams') and chordOrN.beams is not None:
-                chordOrN: note.NotRest
+                chordOrN = cast(note.NotRest, chordOrN)
                 nBeamsList = self.beamsToXml(chordOrN.beams)
                 for mxB in nBeamsList:
                     mxNote.append(mxB)
@@ -3892,7 +3892,7 @@ class MeasureExporter(XMLExporterBase):
         if r.stepShift != 0:
             mxDisplayStep = SubElement(mxRestTag, 'display-step')
             mxDisplayOctave = SubElement(mxRestTag, 'display-octave')
-            currentClef = r.getContextByClass('Clef')
+            currentClef = r.getContextByClass(clef.Clef)
             if currentClef is None or not hasattr(currentClef, 'lowestLine'):
                 currentClef = clef.TrebleClef()  # this should not be common enough to
                 # worry about the overhead
@@ -4296,7 +4296,7 @@ class MeasureExporter(XMLExporterBase):
                  or n.noteheadParenthesis
                  or n.noteheadFill is not None
                  or (n.hasStyleInformation and n.style.color not in (None, '')))):
-            n: note.NotRest
+            n = cast(note.NotRest, n)
             foundANotehead = True
             mxNotehead = self.noteheadToXml(n)
             mxNote.append(mxNotehead)
@@ -6067,7 +6067,7 @@ class MeasureExporter(XMLExporterBase):
                     m.timeSignature, 'timeSignature', comparison='ratioEqual'
                 )):
             mxAttributes.append(self.timeSignatureToXml(m.timeSignature))
-        smts = list(m.getElementsByClass('SenzaMisuraTimeSignature'))
+        smts = list(m.getElementsByClass(meter.SenzaMisuraTimeSignature))
         if smts:
             mxAttributes.append(self.timeSignatureToXml(smts[0]))
 
@@ -6077,7 +6077,7 @@ class MeasureExporter(XMLExporterBase):
         if m.clef is not None:
             mxAttributes.append(self.clefToXml(m.clef))
 
-        found = m.getElementsByClass('StaffLayout')
+        found = m.getElementsByClass(layout.StaffLayout)
         if found:
             sl = found[0]  # assume only one per measure
             mxAttributes.append(self.staffLayoutToXmlStaffDetails(sl))
@@ -6169,7 +6169,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: staff-size
         return mxStaffDetails
 
-    def timeSignatureToXml(self, ts):
+    def timeSignatureToXml(self, ts: Union[meter.TimeSignature, meter.SenzaMisuraTimeSignature]):
         '''
         Returns a single <time> tag from a meter.TimeSignature object.
 
@@ -6231,7 +6231,7 @@ class MeasureExporter(XMLExporterBase):
         # mxTimeList = []
         mxTime = Element('time')
         _synchronizeIds(mxTime, ts)
-        if 'SenzaMisuraTimeSignature' in ts.classes:
+        if isinstance(ts, meter.SenzaMisuraTimeSignature):
             mxSenzaMisura = SubElement(mxTime, 'senza-misura')
             if ts.text is not None:
                 mxSenzaMisura.text = ts.text
@@ -6485,23 +6485,23 @@ class MeasureExporter(XMLExporterBase):
         #    is created in the module itself, as in a test.
 
         # do a quick search for any layout objects before searching individually...
-        foundAny = m.getElementsByClass('LayoutBase')
+        foundAny = m.getElementsByClass(layout.LayoutBase)
         if not foundAny:
             return
 
         mxPrint = None
-        found = m.getElementsByClass(layout.PageLayout)
+        found = foundAny.getElementsByClass(layout.PageLayout)
         if found:
             pl = found[0]  # assume only one per measure
             mxPrint = self.pageLayoutToXmlPrint(pl)
-        found = m.getElementsByClass(layout.SystemLayout)
+        found = foundAny.getElementsByClass(layout.SystemLayout)
         if found:
             sl = found[0]  # assume only one per measure
             if mxPrint is None:
                 mxPrint = self.systemLayoutToXmlPrint(sl)
             else:
                 self.systemLayoutToXmlPrint(sl, mxPrint)
-        found = m.getElementsByClass('StaffLayout')
+        found = foundAny.getElementsByClass(layout.StaffLayout)
         if found:
             sl = found[0]  # assume only one per measure
             if mxPrint is None:

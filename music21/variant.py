@@ -36,8 +36,7 @@ from music21 import note
 from music21 import search
 from music21 import stream
 
-_MOD = 'variant'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('variant')
 
 
 # ------------------------------------------------------------------------------
@@ -1119,7 +1118,7 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
         :width: 600
 
 
-    >>> for p in mergedStreams.getElementsByClass('Part'):
+    >>> for p in mergedStreams.getElementsByClass(stream.Part):
     ...    for m in p.getElementsByClass(stream.Measure):
     ...        m.activateVariants('paris', inPlace=True)
     >>> mergedStreams.show('t')
@@ -1194,9 +1193,9 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
         if returnObj.highestTime != s.highestTime:
             raise VariantException('cannot merge streams of different lengths')
 
-        returnObjParts = returnObj.getElementsByClass('Part')
+        returnObjParts = returnObj.getElementsByClass(stream.Part)
         if returnObjParts:  # If parts exist, iterate through them.
-            sParts = s.getElementsByClass('Part')
+            sParts = s.getElementsByClass(stream.Part)
             for i, returnObjPart in enumerate(returnObjParts):
                 sPart = sParts[i]
 
@@ -2023,9 +2022,9 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
     # TODO: Add the feature for merging a stream to a stream with existing variants
     # (it has to compare against both the stream and the contained variant)
     if (streamA.getElementsByClass(stream.Measure)
-            or streamA.getElementsByClass('Part')
+            or streamA.getElementsByClass(stream.Part)
             or streamB.getElementsByClass(stream.Measure)
-            or streamB.getElementsByClass('Part')):
+            or streamB.getElementsByClass(stream.Part)):
         raise VariantException(
             '_mergeVariants cannot merge streams which contain measures or parts.'
         )
@@ -2579,12 +2578,14 @@ class Test(unittest.TestCase):
         self.assertTrue(v1.hasElementOfClass(stream.Measure))
 
     def testDeepCopyVariantA(self):
+        from music21 import variant
+
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
         vn2 = note.Note('A-4')
 
-        v1 = Variant()
+        v1 = variant.Variant()
         v1.insert(0, vn1)
         v1.insert(0, vn2)
         v1Copy = copy.deepcopy(v1)
@@ -2604,7 +2605,7 @@ class Test(unittest.TestCase):
 
         # test functionality on a deepcopy
         sCopy = copy.deepcopy(s)
-        self.assertEqual(len(sCopy.getElementsByClass(Variant)), 1)
+        self.assertEqual(len(sCopy.getElementsByClass(variant.Variant)), 1)
         self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sCopy.activateVariants(inPlace=True)
@@ -2612,11 +2613,13 @@ class Test(unittest.TestCase):
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
     def testDeepCopyVariantB(self):
+        from music21 import variant
+
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
         vn2 = note.Note('A-4')
-        v1 = Variant()
+        v1 = variant.Variant()
         v1.insert(0, vn1)
         v1.insert(0, vn2)
         s.insert(5, v1)

@@ -12,8 +12,6 @@
 '''
 Simple storage for data defaults used throughout music21.
 '''
-
-
 import unittest
 from music21 import _version
 

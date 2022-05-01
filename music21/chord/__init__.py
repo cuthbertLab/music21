@@ -34,8 +34,7 @@ from music21 import environment
 from music21.chord import tables
 from music21.common.decorators import cacheMethod
 
-_MOD = 'chord'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('chord')
 
 _ChordType = TypeVar('_ChordType')
 

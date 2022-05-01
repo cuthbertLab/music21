@@ -20,8 +20,7 @@ from music21 import pitch
 from music21 import musedata
 
 from music21 import environment
-_MOD = 'analysis.enharmonics'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.enharmonics')
 
 
 class EnharmonicsException(exceptions21.Music21Exception):

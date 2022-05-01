@@ -461,7 +461,7 @@ class M21toTSV:
             thisEntry.measure = thisRN.measureNumber
             thisEntry.beat = thisRN.beat
             thisEntry.totbeat = None
-            thisEntry.timesig = thisRN.getContextByClass('TimeSignature').ratioString
+            thisEntry.timesig = thisRN.getContextByClass(meter.TimeSignature).ratioString
             thisEntry.op = self.m21Stream.metadata.opusNumber
             thisEntry.no = self.m21Stream.metadata.number
             thisEntry.mov = self.m21Stream.metadata.movementNumber

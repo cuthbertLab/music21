@@ -25,8 +25,7 @@ from music21.common.objects import SlottedObjectMixin
 # imported by stream
 
 from music21 import environment
-_MOD = 'derivation'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('derivation')
 
 
 def derivationMethod(function):

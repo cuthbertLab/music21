@@ -1239,7 +1239,7 @@ class Test(unittest.TestCase):
             "tinynotation: 4/4 a2 g8 f8 e4 d4 e4 f8 g8 a4 g4 c'8 b8 a4 g4 f4. e8 d2 "
             "c4 e4 a4 e'4 e'4 d'4 c'8 b8 a4 a'4 g'8 f'8 e'4 d'4 c'4 a8 b8 c'2",
             makeNotation=False)
-        bm.replace(bm.getElementsByClass('TimeSignature').first(), meter.TimeSignature('c'))
+        bm.replace(bm.getElementsByClass(meter.TimeSignature).first(), meter.TimeSignature('c'))
         bm.insert(0, tempo.TempoText('Andante maestoso'))
         bm.insert(0, tempo.MetronomeMark(number=92, referent=note.Note(type='quarter')))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1311,7 +1311,7 @@ class Test(unittest.TestCase):
                              "a2 d'4 c'4 b-4 a4 b-4 c'4 d'2 e'-4 f'4 "
                              "g'2 e'-4 c'4 f'2 d'4 b-4 e'-2 c'4 f4 d'2 b-4 b-4 c'2 "
                              "b-4 c'4 d'4 b-4 c'4 d'4 b-4 c'4 b-4 a4 b-2", makeNotation=False)
-        bm.replace(bm.getElementsByClass('TimeSignature').first(), meter.TimeSignature('cut'))
+        bm.replace(bm.getElementsByClass(meter.TimeSignature).first(), meter.TimeSignature('cut'))
         bm.insert(0, key.KeySignature(-2))
         bm.insert(0, tempo.TempoText('Ben marcato'))
         bm.insert(0, tempo.MetronomeMark(number=112, referent=note.Note(type='half')))
@@ -1549,7 +1549,7 @@ class Test(unittest.TestCase):
                              "e'4~ e'8 f' e' b c' d' a b c' g a2~ a8 f "
                              "g c' b a d' c' b e' d'2~ d'8 g' f' c' d' e' b c' d'4 a8 g a2.~ a8 r",
                              makeNotation=False)
-        bm.replace(bm.getElementsByClass('TimeSignature').first(), meter.TimeSignature('c'))
+        bm.replace(bm.getElementsByClass(meter.TimeSignature).first(), meter.TimeSignature('c'))
 
         bm.insert(0, tempo.TempoText('Adagio e molto legato'))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -2963,7 +2963,7 @@ Barline final ⠣⠅
 
     def test_example14_5(self):
         bm = converter.parse("tinynotation: 2/2 D8 r F r A r d r B-2 A4 r", makeNotation=False)
-        bm.getElementsByClass('TimeSignature').first().symbol = 'cut'
+        bm.getElementsByClass(meter.TimeSignature).first().symbol = 'cut'
         bm.insert(0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m0 = bm.getElementsByClass(stream.Measure).first()

@@ -22,4 +22,3 @@ from music21.stream import filters
 from music21.stream import iterator
 from music21.stream import makeNotation
 from music21.stream import streamStatus
-from music21.stream import tests
