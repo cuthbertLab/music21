@@ -1252,6 +1252,12 @@ class ConcreteScale(Scale):
 
     >>> [str(p) for p in complexScale.getPitches('C7', 'C5')]
     ['A6', 'F#6', 'D~6', 'B5', 'G5', 'F5', 'E-5', 'C#5']
+
+    OMIT_FROM_DOCS
+
+    >>> scale.ConcreteScale(tonic=4)
+    Traceback (most recent call last):
+    ValueError: Tonic must be a Pitch, Note, or str, not <class 'int'>
     '''
     usePitchDegreeCache = False
 
@@ -1263,7 +1269,7 @@ class ConcreteScale(Scale):
         self.type = 'Concrete'
         # store an instance of an abstract scale
         # subclasses might use multiple abstract scales?
-        self._abstract = None
+        self._abstract: Optional[AbstractScale] = None
 
         # determine whether this is a limited range
         self.boundRange = False
@@ -1282,10 +1288,12 @@ class ConcreteScale(Scale):
             self.tonic = None  # pitch.Pitch()
         elif isinstance(tonic, str):
             self.tonic = pitch.Pitch(tonic)
-        elif isinstance(tonic, note.GeneralNote):
+        elif isinstance(tonic, note.Note):
             self.tonic = tonic.pitch
-        else:  # assume this is a pitch object
+        elif isinstance(tonic, pitch.Pitch):  # assume this is a pitch object
             self.tonic = tonic
+        else:
+            raise ValueError(f'Tonic must be a Pitch, Note, or str, not {type(tonic)}')
 
         if (pitches is not None
                 and common.isListLike(pitches)
@@ -2462,7 +2470,7 @@ class DiatonicScale(ConcreteScale):
 
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self._abstract = AbstractDiatonicScale()
+        self._abstract: AbstractDiatonicScale = AbstractDiatonicScale()
         self.type = 'diatonic'
 
     def getTonic(self):

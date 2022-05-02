@@ -369,7 +369,7 @@ class Harmony(chord.Chord):
         >>> [str(p) for p in h1.pitches]
         ['D-2', 'F-2', 'A-2', 'C-3', 'E-3', 'G-3']
 
-        >>> h1.key = 'CM'
+        >>> h1.key = 'CM'  # = C-Major
         >>> [str(p) for p in h1.pitches]
         ['D-2', 'F-2', 'A-2', 'C-3', 'E-3', 'G-3']
 
