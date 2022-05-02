@@ -4932,8 +4932,7 @@ class Pitch(prebase.ProtoM21Object):
                   and pPast.name != pSelf.name
                   and pPast.accidental.name != 'natural'
                   and (pSelf.accidental is None
-                       or pSelf.accidental.displayStatus is False)
-            ):
+                       or pSelf.accidental.displayStatus is False)):
                 if octaveMatch is False and cautionaryPitchClass is False:
                     continue
 
@@ -4960,8 +4959,7 @@ class Pitch(prebase.ProtoM21Object):
             elif (pPast.accidental is not None
                   and pSelf.accidental is not None
                   and pPast.accidental.name != pSelf.accidental.name
-                  and (octaveMatch or pSelf.accidental.displayType != 'if-absolutely-necessary')
-            ):
+                  and (octaveMatch or pSelf.accidental.displayType != 'if-absolutely-necessary')):
                 acc.displayStatus = True
                 setFromPitchPast = True
                 break
