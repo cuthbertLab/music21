@@ -4708,6 +4708,7 @@ class Pitch(prebase.ProtoM21Object):
             elif acc.displayStatus in (True, False):
                 return  # exit: already set, do not override
 
+        # remove the never possibilities.
         if acc is not None and acc.displayType == 'never':
             acc.displayStatus = False
             return
@@ -4740,18 +4741,20 @@ class Pitch(prebase.ProtoM21Object):
                   and self._nameInKeySignature(alteredPitches)):
                 acc.displayStatus = False
 
-            # if no accidental or natural but matches step in key sig
-            # we need to show or add or an accidental
+            # if we have no accidental or a natural accidental,
+            # but our step matches a step in the key sig
+            # we need to show or add or an accidental.
             elif ((acc is None or acc.name == 'natural')
                   and self._stepInKeySignature(alteredPitches)):
                 none_to_natural()
                 acc.displayStatus = True
             return  # do not search past
 
-        # pitches in past... first search if last pitch in measure
-        # at this octave contradicts this pitch.  if so then no matter what
-        # we need an accidental.
-        for i in reversed(range(len(pitchPast))):
+        # pitches in the past list (this measure):
+        # first search if the last pitch in our measure
+        # with the same step and at this octave contradicts this pitch.
+        # if so then no matter what we need an accidental.
+        for i in range(len(pitchPast) - 1, -1, -1):
             # check previous in measure.
             thisPPast = pitchPast[i]
             if thisPPast.step == self.step and thisPPast.octave == self.octave:
@@ -4764,10 +4767,6 @@ class Pitch(prebase.ProtoM21Object):
                     break
 
         # nope, no previous pitches in this octave and register, now more complex things...
-        # but first handle 'if-absolutely-necessary' case.
-        if acc and acc.displayType == 'if-absolutely-necessary':
-            acc.displayStatus = False
-            return
 
         # here tied and always are treated the same; we assume that
         # making ties sets the displayStatus, and thus we would not be
@@ -4784,13 +4783,16 @@ class Pitch(prebase.ProtoM21Object):
         # store if a match was found and display set from past pitches
         setFromPitchPast = False
 
-        if cautionaryPitchClass is True:  # warn no matter what octave; thus create new without oct
+        if (cautionaryPitchClass is True
+                and (acc is None
+                     or acc.displayType != 'if-absolutely-necessary')):
+            # warn no matter what octave; thus create new pSelf without octave
             pSelf = Pitch(self.name)
             pSelf.accidental = acc
         else:
             pSelf = self
 
-        # where does the line divide between in measure and out of measure
+        # where does the line divide between in measure and out of measure?
         outOfMeasureLength = len(pitchPastMeasure)
 
         # need to step through pitchPast in reverse
@@ -4804,18 +4806,26 @@ class Pitch(prebase.ProtoM21Object):
         continuousRepeatsInMeasure: bool
 
         # figure out if this pitch is in the measure (pPastInMeasure = True)
-        # or not.
-        for i in reversed(range(len(pitchPastAll))):
-
+        # or not.  Walk backwards
+        for i in range(len(pitchPastAll) - 1, -1, -1):
             # is the past pitch in the measure or out of the measure?
             pPastInMeasure: bool
 
             if i < outOfMeasureLength:
                 pPastInMeasure = False
                 continuousRepeatsInMeasure = False
+                if acc is not None and acc.displayType == 'if-absolutely-necessary':
+                    # pitches outside the measure do not affect
+                    # "if-absolutely-necessary" accidentals
+                    break
+
             else:
                 pPastInMeasure = True
                 for j in range(i, len(pitchPastAll)):
+                    # this could be optimized to only walk to last space, in case
+                    # of enormous measure of all same, leading to O(n^2) operation
+                    # but fine for the size of n we see.
+
                     # do we have a continuous stream of the same note leading up to this one...
                     if pitchPastAll[j].nameWithOctave != self.nameWithOctave:
                         continuousRepeatsInMeasure = False
@@ -4833,7 +4843,9 @@ class Pitch(prebase.ProtoM21Object):
 
             # create Pitch objects for comparison; remove pitch space
             # information if we are only doing a pitch class comparison
-            if cautionaryPitchClass is True:  # no octave; create new without oct
+            if (cautionaryPitchClass is True
+                    and (acc is None or acc.displayType != 'if-absolutely-necessary')):
+                # no octave; create new without oct
                 pPast = Pitch(pitchPastAll[i].name)
                 # must manually assign reference to the same accidentals
                 # as name alone will not transfer display status
@@ -4931,9 +4943,16 @@ class Pitch(prebase.ProtoM21Object):
             elif (pPast.accidental is not None
                   and pPast.accidental.name != 'natural'
                   and (pSelf.accidental is None
-                       or pSelf.accidental.displayStatus is False)):
+                       or pSelf.accidental.displayStatus is False)
+            ):
                 if octaveMatch is False and cautionaryPitchClass is False:
                     continue
+
+                if (octaveMatch is False
+                        and acc is not None
+                        and acc.displayType == 'if-absolutely-necessary'):
+                    continue
+
                 none_to_natural()
                 acc.displayStatus = True
                 setFromPitchPast = True
@@ -4942,8 +4961,8 @@ class Pitch(prebase.ProtoM21Object):
             # if An or A to A#: need to make sure display is set
             elif ((pPast.accidental is None
                    or pPast.accidental.name == 'natural')
-                  and pSelf.accidental is not None
-                  and pSelf.accidental.name != 'natural'):
+                   and pSelf.accidental is not None
+                   and pSelf.accidental.name != 'natural'):
                 acc.displayStatus = True
                 setFromPitchPast = True
                 break
@@ -4951,7 +4970,9 @@ class Pitch(prebase.ProtoM21Object):
             # if A- or An to A#: need to make sure display is set
             elif (pPast.accidental is not None
                   and pSelf.accidental is not None
-                  and pPast.accidental.name != pSelf.accidental.name):
+                  and pPast.accidental.name != pSelf.accidental.name
+                  and (octaveMatch or pSelf.accidental.displayType != 'if-absolutely-necessary')
+            ):
                 acc.displayStatus = True
                 setFromPitchPast = True
                 break
@@ -5000,7 +5021,7 @@ class Pitch(prebase.ProtoM21Object):
                 pass
 
         # if we have no previous matches for this pitch and there is
-        # an accidental: show, unless in alteredPitches
+        # an accidental: show, unless in alteredPitches.
         # cases of displayAlways and related are matched above
         if displayAccidentalIfNoPreviousAccidentals is True:
             # not the first pitch of this nameWithOctave in the measure
@@ -5490,6 +5511,42 @@ class Test(unittest.TestCase):
         p['Measure'].first().insert(0, key.Key('C-'))
         p.makeAccidentals(inPlace=True)
         self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+    def testIfAbsolutelyNecessary(self):
+        '''
+        Beginning of test cases for if-absolutely-necessary.
+        '''
+        from music21 import converter
+        from music21 import key
+        from music21 import stream
+
+        p = converter.parse('tinyNotation: 2/4 f#2 f2')
+        last_note = p.recurse().notes.last()
+        last_note.pitch.accidental = Accidental('natural')
+        last_note.pitch.accidental.displayType = 'if-absolutely-necessary'
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+        p[stream.Measure].first().insert(0, key.KeySignature(-7))  # F-flat!
+        p.makeAccidentals(inPlace=True, overrideStatus=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, True)
+
+        p[key.KeySignature].first().sharps = -5  # No effect on us.
+        p.makeAccidentals(inPlace=True, overrideStatus=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+        p = converter.parse('tinyNotation: 2/4 F#4 f4')
+        last_note = p.recurse().notes.last()
+        last_note.pitch.accidental = Accidental('natural')
+        last_note.pitch.accidental.displayType = 'if-absolutely-necessary'
+        p.makeAccidentals(inPlace=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, False)
+
+        # F# in different octaves -- need one.
+        last_note.pitch.accidental.set('sharp')
+        p.makeAccidentals(inPlace=True, overrideStatus=True)
+        self.assertIs(last_note.pitch.accidental.displayStatus, True)
+
 
     def testNaturalOutsideAlteredPitches(self):
         from music21 import converter
