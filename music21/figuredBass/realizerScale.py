@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         realizerScale.py
-# Purpose:      music21 class for conveniently representing the concept of
-#                a figured bass scale
+# Purpose:      a figured bass scale
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy
@@ -36,7 +35,7 @@ class FiguredBassScale:
 
 
     Accepted scale types: major, minor, dorian, phrygian, and hypophrygian.
-    A FiguredBassScale is raised if an invalid scale type is provided.
+    A FiguredBassScaleException is raised if an invalid scale type is provided.
 
     >>> from music21.figuredBass import realizerScale
     >>> fbScale = realizerScale.FiguredBassScale()
@@ -206,7 +205,6 @@ class Test(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    # pylint: disable=ungrouped-imports
     import music21
     music21.mainTest(Test)
 

@@ -4,9 +4,10 @@
 # Purpose:      Translation routines for roman numeral analysis text files
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2012, 2016, 2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012, 2016, 2019 Michael Scott Asato Cuthbert
+#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -123,6 +124,7 @@ OMIT_FROM_DOCS
 '''
 import copy
 import traceback
+from typing import Dict, List, Tuple
 import unittest
 
 from music21 import bar
@@ -189,7 +191,7 @@ def _copySingleMeasure(t, p, kCurrent):
             'a single measure cannot define a copy operation for multiple measures')
     # TODO: ignoring repeat letters
     target = targetNumber[0]
-    for mPast in p.getElementsByClass('Measure'):
+    for mPast in p.getElementsByClass(stream.Measure):
         if mPast.number == target:
             try:
                 m = copy.deepcopy(mPast)
@@ -200,7 +202,7 @@ def _copySingleMeasure(t, p, kCurrent):
                     + 'instead of romanTextToStreamOpus?')
             m.number = t.number[0]
             # update all keys
-            for rnPast in m.getElementsByClass('RomanNumeral'):
+            for rnPast in m.getElementsByClass(roman.RomanNumeral):
                 if kCurrent is None:  # pragma: no cover
                     # should not happen
                     raise RomanTextTranslateException(
@@ -249,7 +251,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
             'the source section cannot overlap with the destination section')
 
     measures = []
-    for mPast in p.getElementsByClass('Measure'):
+    for mPast in p.getElementsByClass(stream.Measure):
         if mPast.number in range(targetStart, targetEnd + 1):
             try:
                 m = copy.deepcopy(mPast)
@@ -263,7 +265,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
             m.number = t.number[0] + mPast.number - targetStart
             measures.append(m)
             # update all keys
-            allRNs = list(m.getElementsByClass('RomanNumeral'))
+            allRNs = list(m.getElementsByClass(roman.RomanNumeral))
             for rnPast in allRNs:
                 if kCurrent is None:  # pragma: no cover
                     # should not happen
@@ -316,7 +318,7 @@ def _getKeyAndPrefix(rtKeyOrString):
 
 
 # Cache each of the created keys so that we don't recreate them.
-_rnKeyCache = {}
+_rnKeyCache: Dict[Tuple[str, str], roman.RomanNumeral] = {}
 
 
 class PartTranslator:
@@ -678,8 +680,8 @@ class PartTranslator:
         '''
         Translate a single atom in a measure token.
 
-        a is the Atom
-        m is a `stream.Measure` object.
+        `a` is the Atom
+        `m` is a `stream.Measure` object.
 
         Uses coreInsert and coreAppend methods, so must have `m.coreElementsChanged()`
         called afterwards.
@@ -783,7 +785,7 @@ class PartTranslator:
                 else:
                     rtt = RomanTextUnprocessedToken(a)
                     m.coreInsert(self.currentOffsetInMeasure, rtt)
-            else:  # mid measure repeat signs
+            else:  # mid-measure repeat signs
                 rtt = RomanTextUnprocessedToken(a)
                 m.coreInsert(self.currentOffsetInMeasure, rtt)
 
@@ -923,7 +925,9 @@ letterToNumDict = {'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 
 
 
 def appendMeasureToRepeatEndingsDict(t, m, repeatEndings, measureNumber=None):
-    '''Takes an RTMeasure object (t), (which might represent one or more
+    # noinspection PyShadowingNames
+    '''
+    Takes an RTMeasure object (t), (which might represent one or more
     measures; but currently only one) and a music21 stream.Measure object and
     store it as a tuple in the repeatEndings dictionary to mark where the
     translator should later mark for adding endings.
@@ -973,6 +977,7 @@ def appendMeasureToRepeatEndingsDict(t, m, repeatEndings, measureNumber=None):
 
 
 def _consolidateRepeatEndings(repeatEndings):
+    # noinspection PyShadowingNames
     '''
     take repeatEndings, which is a dict of integers (repeat ending numbers) each
     holding a list of tuples of measure numbers and measure objects that get this ending,
@@ -983,7 +988,6 @@ def _consolidateRepeatEndings(repeatEndings):
     Assumes that the list of measure numbers in each repeatEndings array is sorted.
 
     For the sake of demo and testing, we will use strings instead of measure objects.
-
 
     >>> repeatEndings = {1: [(5, 'm5a'), (6, 'm6a'), (17, 'm17'), (18, 'm18'),
     ...                      (19, 'm19'), (23, 'm23a')],
@@ -1040,7 +1044,9 @@ def _addRepeatsFromRepeatEndings(s, repeatEndings):
 
 
 def fixPickupMeasure(partObject):
-    '''Fix a pickup measure if any.
+    # noinspection PyShadowingNames
+    '''
+    Fix a pickup measure if any.
 
     We determine a pickup measure by being measure 0 and not having an RN
     object at the beginning.
@@ -1080,7 +1086,7 @@ def fixPickupMeasure(partObject):
     m0 = partObject.measure(0)
     if m0 is None:
         return
-    rnObjects = m0.getElementsByClass('RomanNumeral')
+    rnObjects = m0.getElementsByClass(roman.RomanNumeral)
     if not rnObjects:
         return
     if rnObjects[0].offset == 0:
@@ -1175,28 +1181,28 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
         from music21.romanText import testFiles
 
         s = romanTextToStreamScore(testFiles.swv23)
-        mStream = s.parts[0].getElementsByClass('Measure')
+        mStream = s.parts[0].getElementsByClass(stream.Measure)
         # the first four measures should all have the same content
-        rn1 = mStream[1].getElementsByClass('RomanNumeral').first()
+        rn1 = mStream[1].getElementsByClass(roman.RomanNumeral).first()
         self.assertEqual([str(x) for x in rn1.pitches], ['D5', 'F#5', 'A5'])
         self.assertEqual(str(rn1.figure), 'V')
-        rn2 = mStream[1].getElementsByClass('RomanNumeral')[1]
+        rn2 = mStream[1].getElementsByClass(roman.RomanNumeral)[1]
         self.assertEqual(str(rn2.figure), 'i')
 
         # make sure that m2, m3, m4 have the same values
-        rn1 = mStream[2].getElementsByClass('RomanNumeral')[0]
+        rn1 = mStream[2].getElementsByClass(roman.RomanNumeral)[0]
         self.assertEqual(str(rn1.figure), 'V')
-        rn2 = mStream[2].getElementsByClass('RomanNumeral')[1]
+        rn2 = mStream[2].getElementsByClass(roman.RomanNumeral)[1]
         self.assertEqual(str(rn2.figure), 'i')
 
-        rn1 = mStream[3].getElementsByClass('RomanNumeral')[0]
+        rn1 = mStream[3].getElementsByClass(roman.RomanNumeral)[0]
         self.assertEqual(str(rn1.figure), 'V')
-        rn2 = mStream[3].getElementsByClass('RomanNumeral')[1]
+        rn2 = mStream[3].getElementsByClass(roman.RomanNumeral)[1]
         self.assertEqual(str(rn2.figure), 'i')
 
         # test multiple measure copying
         s = romanTextToStreamScore(testFiles.monteverdi_3_13)
-        mStream = s.parts[0].getElementsByClass('Measure')
+        mStream = s.parts[0].getElementsByClass(stream.Measure)
 
         m1a = None
         m2a = None
@@ -1219,29 +1225,29 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
             elif m.number == 51:  # m49-51 = m41-43
                 m3b = m
 
-        rn = m1a.getElementsByClass('RomanNumeral')[0]
+        rn = m1a.getElementsByClass(roman.RomanNumeral)[0]
         self.assertEqual(str(rn.figure), 'IV')
-        rn = m1a.getElementsByClass('RomanNumeral')[1]
+        rn = m1a.getElementsByClass(roman.RomanNumeral)[1]
         self.assertEqual(str(rn.figure), 'I')
 
-        rn = m1b.getElementsByClass('RomanNumeral')[0]
+        rn = m1b.getElementsByClass(roman.RomanNumeral)[0]
         self.assertEqual(str(rn.figure), 'IV')
-        rn = m1b.getElementsByClass('RomanNumeral')[1]
+        rn = m1b.getElementsByClass(roman.RomanNumeral)[1]
         self.assertEqual(str(rn.figure), 'I')
 
-        rn = m2a.getElementsByClass('RomanNumeral')[0]
+        rn = m2a.getElementsByClass(roman.RomanNumeral)[0]
         self.assertEqual(str(rn.figure), 'I')
-        rn = m2a.getElementsByClass('RomanNumeral')[1]
+        rn = m2a.getElementsByClass(roman.RomanNumeral)[1]
         self.assertEqual(str(rn.figure), 'ii')
 
-        rn = m2b.getElementsByClass('RomanNumeral')[0]
+        rn = m2b.getElementsByClass(roman.RomanNumeral)[0]
         self.assertEqual(str(rn.figure), 'I')
-        rn = m2b.getElementsByClass('RomanNumeral')[1]
+        rn = m2b.getElementsByClass(roman.RomanNumeral)[1]
         self.assertEqual(str(rn.figure), 'ii')
 
-        rn = m3a.getElementsByClass('RomanNumeral').first()
+        rn = m3a.getElementsByClass(roman.RomanNumeral).first()
         self.assertEqual(str(rn.figure), 'V/ii')
-        rn = m3b.getElementsByClass('RomanNumeral').first()
+        rn = m3b.getElementsByClass(roman.RomanNumeral).first()
         self.assertEqual(str(rn.figure), 'V/ii')
 
     def testMeasureCopyingB(self):
@@ -1249,7 +1255,7 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
         from music21.romanText import testFiles
         s = converter.parse(testFiles.monteverdi_3_13)
         m25 = s.measure(25)
-        rn = m25.flatten().getElementsByClass('RomanNumeral')
+        rn = m25.flatten().getElementsByClass(roman.RomanNumeral)
         self.assertEqual(rn[1].figure, 'III')
         self.assertEqual(str(rn[1].key), 'd minor')
 
@@ -1285,7 +1291,7 @@ class Test(unittest.TestCase):
     def testMinor67set(self):
         from music21.romanText import testFiles
         s = romanTextToStreamScore(testFiles.testSetMinorRootParse)
-        chords = list(s.recurse().getElementsByClass('RomanNumeral'))
+        chords = list(s[roman.RomanNumeral])
 
         def pitchEqual(index, pitchStr):
             ch = chords[index]
@@ -1312,9 +1318,9 @@ m8 I
 '''
         s = converter.parse(testCase, format='romanText')
         m = s.measure(7).flatten()
-        self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'D major')
+        self.assertEqual(m.getElementsByClass(roman.RomanNumeral).first().key.name, 'D major')
         m = s.measure(8).flatten()
-        self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'D major')
+        self.assertEqual(m.getElementsByClass(roman.RomanNumeral).first().key.name, 'D major')
 
     def testPivotInCopyMultiple2(self):
         '''
@@ -1333,7 +1339,7 @@ m8 I
 '''
         s = converter.parse(testCase, format='romanText')
         m = s.measure(5).flatten()
-        self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'G major')
+        self.assertEqual(m.getElementsByClass(roman.RomanNumeral).first().key.name, 'G major')
 
     def testPivotInCopySingle(self):
         from music21 import converter
@@ -1347,7 +1353,7 @@ m6 I
 '''
         s = converter.parse(testCase, format='romanText')
         m = s.measure(6).flatten()
-        self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'D major')
+        self.assertEqual(m.getElementsByClass(roman.RomanNumeral).first().key.name, 'D major')
 
     def testSecondaryInCopyMultiple(self):
         '''
@@ -1366,10 +1372,10 @@ m7 = m3
 
         s = romanTextToStreamScore(testSecondaryInCopy)
         m = s.measure(6).flatten()
-        self.assertEqual(m.getElementsByClass('RomanNumeral').first().pitchedCommonName,
+        self.assertEqual(m.getElementsByClass(roman.RomanNumeral).first().pitchedCommonName,
                          'E-dominant seventh chord')
         m = s.measure(7).flatten()
-        self.assertEqual(m.getElementsByClass('RomanNumeral').first().pitchedCommonName,
+        self.assertEqual(m.getElementsByClass(roman.RomanNumeral).first().pitchedCommonName,
                          'E-dominant seventh chord')
         # s.show()
 
@@ -1385,7 +1391,7 @@ m7 = m3
                             + 'm4 KS-3 vi \n m5 a: i b3 V4/2 \n m6 I',
                             format='romantext')
 
-        rnStream = s.flatten().getElementsByClass('RomanNumeral').stream()
+        rnStream = s.flatten().getElementsByClass(roman.RomanNumeral).stream()
         self.assertEqual(rnStream[0].figure, 'I')
         self.assertEqual(rnStream[1].figure, 'V6/5')
         self.assertEqual(rnStream[2].figure, 'I')
@@ -1395,7 +1401,7 @@ m7 = m3
         self.assertEqual(rnStream[6].figure, 'V4/2')
         self.assertEqual(rnStream[7].figure, 'I')
 
-        rnStreamKey = s.flatten().getElementsByClass('KeySignature')
+        rnStreamKey = s.flatten().getElementsByClass(key.KeySignature)
         self.assertEqual(rnStreamKey[0].sharps, 1)
         self.assertEqual(rnStreamKey[1].sharps, -3)
 
@@ -1412,7 +1418,7 @@ m4-5 = m2-3
 m6-7 = m4-5
 '''
         s = converter.parse(src, format='romantext')
-        rnStream = s.flatten().getElementsByClass('RomanNumeral')
+        rnStream = s.flatten().getElementsByClass(roman.RomanNumeral)
 
         for elementNumber in [0, 6, 12]:
             self.assertEqual(rnStream[elementNumber + 4].figure, 'III6')
@@ -1440,24 +1446,24 @@ m3 NC b3 G: V
 '''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        m1 = p.getElementsByClass('Measure').first()
+        m1 = p.getElementsByClass(stream.Measure).first()
         r1 = m1.notesAndRests[-1]
         self.assertIn('Rest', r1.classes)
         self.assertEqual(r1.quarterLength, 1.0)
-        noChordObj = m1.getElementsByClass('Harmony').last()
+        noChordObj = m1.getElementsByClass(harmony.Harmony).last()
         self.assertIsInstance(noChordObj, NoChord)
 
-        m2 = p.getElementsByClass('Measure')[1]
+        m2 = p.getElementsByClass(stream.Measure)[1]
         r2 = m2.notesAndRests[0]
         self.assertIn('Rest', r2.classes)
         self.assertEqual(r1.quarterLength, 1.0)
         rn1 = m2.notesAndRests[1]
-        self.assertIn('RomanNumeral', rn1.classes)
+        self.assertIn(roman.RomanNumeral, rn1.classSet)
         # s.show()
 
     def testUnProcessed(self):
         from music21 import converter
-
+        from music21.romanText import translate
         src = '''Note: Hello
 m1 G: IV || b3 d: III b4 NC
 varM1 I
@@ -1465,7 +1471,7 @@ Note: Hi
 '''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        unprocessedElements = p.recurse().getElementsByClass('RomanTextUnprocessedMetadata')
+        unprocessedElements = p[translate.RomanTextUnprocessedMetadata]
         self.assertEqual(len(unprocessedElements), 3)
         note1, var1, note2 = unprocessedElements
         self.assertEqual(note1.tag, 'Note')
@@ -1510,8 +1516,8 @@ m1 C: I'''
         src = '''m1 G: I b3 v d: i b4 V'''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        m1 = p.getElementsByClass('Measure').first()
-        allRNs = m1.getElementsByClass('RomanNumeral')
+        m1 = p.getElementsByClass(stream.Measure).first()
+        allRNs = m1.getElementsByClass(roman.RomanNumeral)
         notPChord = allRNs[0]
         pChord = allRNs[1]
         self.assertEqual(pChord.key.tonic.step, 'G')
@@ -1535,24 +1541,24 @@ m1 C: I'''
         '''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        m3 = p.getElementsByClass('Measure')[2]
+        m3 = p.getElementsByClass(stream.Measure)[2]
         self.assertEqual(m3.getOffsetBySite(p), 8.0)
-        m10 = p.getElementsByClass('Measure')[9]
+        m10 = p.getElementsByClass(stream.Measure)[9]
         self.assertEqual(m10.getOffsetBySite(p), 36.0)
-        m11 = p.getElementsByClass('Measure')[10]
+        m11 = p.getElementsByClass(stream.Measure)[10]
         self.assertEqual(m11.getOffsetBySite(p), 38.0)
-        m12 = p.getElementsByClass('Measure')[11]
+        m12 = p.getElementsByClass(stream.Measure)[11]
         self.assertEqual(m12.getOffsetBySite(p), 40.0)
-        m13 = p.getElementsByClass('Measure')[12]
+        m13 = p.getElementsByClass(stream.Measure)[12]
         self.assertEqual(m13.getOffsetBySite(p), 44.0)
 
-        m16 = p.getElementsByClass('Measure')[15]
+        m16 = p.getElementsByClass(stream.Measure)[15]
         self.assertEqual(m16.getOffsetBySite(p), 56.0)
-        m23 = p.getElementsByClass('Measure')[22]
+        m23 = p.getElementsByClass(stream.Measure)[22]
         self.assertEqual(m23.getOffsetBySite(p), 84.0)
-        m24 = p.getElementsByClass('Measure')[23]
+        m24 = p.getElementsByClass(stream.Measure)[23]
         self.assertEqual(m24.getOffsetBySite(p), 86.0)
-        m25 = p.getElementsByClass('Measure')[24]
+        m25 = p.getElementsByClass(stream.Measure)[24]
         self.assertEqual(m25.getOffsetBySite(p), 88.0)
 
     def testEndings(self):
@@ -1590,7 +1596,7 @@ m1 C: I'''
 # ------------------------------------------------------------------------------
 
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 
 if __name__ == '__main__':

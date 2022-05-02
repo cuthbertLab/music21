@@ -4,10 +4,10 @@
 # Purpose:      music21 classes for processing roman numeral analysis files
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2011-2012, 2019-20 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012, 2019-20 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 

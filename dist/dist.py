@@ -4,9 +4,9 @@
 # Purpose:      Distribution and uploading script
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2021 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -26,7 +26,7 @@ To do a release,
      but should be done before making a release).
 6. IMPORTANT: run python documentation/testDocumentation.py and afterwards fix errors [*]
 
-[*] you will need pytest and nbval installed (along with ipython and jupyter), you cannot check
+[*] you will need pytest, docutils, nbval installed (along with ipython and jupyter), you cannot check
 to see if fixed tests work while it is running.
 This takes a while and runs single core, so allocate time.  Start working on
 the announcement while it's running.
@@ -47,20 +47,23 @@ the announcement while it's running.
 
 12b. If any new file extensions have been added, be sure to add them to MANIFEST.in
 
-13. And finally this file. (from the command line; not as python -m... OS 11+ needs sudo)
+13. And finally this file. (from the command line; not as python -m...)
+    There are major problems in SetupTools -- v8 (or even a 7.3.1) needs to
+    fix them -- creating a dir music21.egg-info in the main dir with a
+    requires.txt file created as root.
 
 14. COMMIT to Github at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
     (.gitignore will avoid uploading the large files created here...)
 
 15. Create a new release on GitHub and upload the TWO files created here and docs.
-    Use tag v7.0.1 (etc.).
+    Use tag v7.3.1 (etc.).
     Don't forget the "v" in the release tag.
     Drag in this order: .tar.gz, documentation, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-16. Upload the new file to PyPI with "twine upload music21-6.0.5a2.tar.gz" [*]
+16. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz" [*]
 
     [*] Requires twine to be installed
 
@@ -283,7 +286,7 @@ class Distributor:
         '''
         # call setup.py
         # import setup  # -- for some reason does not work unless called from command line
-        for buildType in ['sdist --formats=gztar']:
+        for buildType in ['sdist --formats=gztar', 'bdist_wheel']:
             environLocal.warn(f'making {buildType}')
 
             savePath = os.getcwd()

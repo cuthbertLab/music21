@@ -3,16 +3,16 @@
 # Name:         common/misc.py
 # Purpose:      Everything that doesn't fit into anything else.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
-from typing import Tuple, List, Iterable, Optional, Callable
+from typing import Any, Tuple, List, Iterable, Optional, Callable
 import platform
 import re
 
@@ -165,9 +165,9 @@ def macOSVersion() -> Tuple[int, int, int]:  # pragma: no cover
     return (major, minor, maintenance)
 
 
-def sortModules(moduleList) -> List[str]:
+def sortModules(moduleList: Iterable[Any]) -> List[object]:
     '''
-    Sort a lost of imported module names such that most recently modified is
+    Sort a list of imported module names such that most recently modified is
     first.  In ties, last access time is used then module name
 
     Will return a different order each time depending on the last mod time
@@ -192,25 +192,26 @@ def sortModules(moduleList) -> List[str]:
 def pitchList(pitchL):
     '''
     utility method that replicates the previous behavior of
-    lists of pitches
+    lists of pitches.
+
+    May be moved in v8 or later to a common.testing or test.X module.
     '''
     return '[' + ', '.join([x.nameWithOctave for x in pitchL]) + ']'
 
 
 def runningUnderIPython() -> bool:
     '''
-    return bool if we are running under iPython Notebook (not iPython)
+    return bool if we are running under IPython Notebook (not IPython terminal)
+    or Google Colabatory (colab).
 
-    (no tests, since will be different)
-
-    This post:
+    Methods based on:
 
     https://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
 
-    says not to do this, but really, I can't think of another way
-    to have different output as default.
+    (No tests provided here, since results will differ depending on environment)
 
-    Returns True also for Google Colab
+    May be moved in v8 or later to the ipython21 module.  Implementation may
+    change.
     '''
     if sys.stderr.__class__.__name__ == 'OutStream':
         return True

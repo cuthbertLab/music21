@@ -4,9 +4,9 @@
 # Purpose:      routines for making recordings from microphone input
 #
 # Authors:      Jordi Bartolome
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -28,8 +28,7 @@ import wave
 from music21 import exceptions21
 
 from music21 import environment
-_MOD = "audioSearch.recording"
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('audioSearch.recording')
 
 
 ###
@@ -55,7 +54,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     Returns a list of samples.
     '''
     # noinspection PyPackageRequirements
-    import pyaudio  # @UnresolvedImport  # pylint: disable=import-error
+    import pyaudio  # pylint: disable=import-error
     recordFormatDefault = pyaudio.paInt16
 
     if recordFormat is None:

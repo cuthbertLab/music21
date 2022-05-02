@@ -4,16 +4,14 @@
 # Purpose:      Storage for user environment settings and defaults
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Simple storage for data defaults used throughout music21.
 '''
-
-
 import unittest
 from music21 import _version
 
@@ -111,7 +109,7 @@ multiMeasureRestUseSymbols = True
 multiMeasureRestMaxSymbols = 11
 
 # id numbers above this number will be considered memory locations
-# and rewritten on thaw.
+# and rewritten on thaw, etc.
 minIdNumberToConsiderMemoryLocation = 100_000_001
 
 # ----------------------------------------------------------------||||||||||||--

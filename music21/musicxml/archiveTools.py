@@ -4,9 +4,9 @@
 # Purpose:      Tools for compressing and decompressing MusicXML files
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009, 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009, 2017, 2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -19,8 +19,7 @@ from typing import Union
 
 from music21 import common
 from music21 import environment
-_MOD = 'musicxml.archiveTools'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('musicxml.archiveTools')
 
 
 # -----------------------------------------------------------------------------
@@ -116,7 +115,7 @@ def uncompressMXL(filename: Union[str, pathlib.Path],
     '''
     filename = str(filename)
     if not filename.endswith('.mxl') and strictMxlCheck:
-        return  # not a compressed musicXML file
+        return False  # not a compressed musicXML file
 
     fp: pathlib.Path = common.pathTools.cleanpath(filename, returnPathlib=True)
     environLocal.warn(f"Updating file: {fp}")
@@ -144,10 +143,10 @@ def uncompressMXL(filename: Union[str, pathlib.Path],
                         wrongName.rename(correctName)
                         found_one_file = True
 
-
     # Delete uncompressed xml file from system
     if deleteOriginal:
         fp.unlink()
+    return True
 
 
 if __name__ == '__main__':

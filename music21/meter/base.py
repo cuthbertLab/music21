@@ -4,9 +4,9 @@
 # Purpose:      Classes for meters
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2015, 2021 Michael Scott Cuthbert
+# Copyright:    Copyright © 2009-2012, 2015, 2021 Michael Scott Asato Cuthbert
 #               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -237,10 +237,9 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
         else:
             return ts2
 
-    # environLocal.printDebug(['n/d', numerator, denominator])
     else:
         ts = TimeSignature()
-        ts.loadRatio(numerator, denominator)
+        ts.load(f'{numerator}/{denominator}')
         return ts
 
 
@@ -561,17 +560,6 @@ class TimeSignature(base.Music21Object):
                 self._setDefaultAccentWeights(3)  # set partitions based on beat
             except MeterException:
                 environLocal.printDebug(['cannot set default accents for:', self])
-
-    def loadRatio(self, numerator, denominator, divisions=None):
-        '''
-        Change the numerator and denominator, like ratioString, but with
-        optional divisions and without resetting other parameters.
-
-        DEPRECATED in v7. -- call .ratioString or .load with
-        value = f'{numerator}/{denominator}'
-        '''
-        value = f'{numerator}/{denominator}'
-        self.load(value, divisions)
 
     @property
     def ratioString(self):
@@ -1863,8 +1851,8 @@ class TimeSignature(base.Music21Object):
         is in a `Measure`'s :attr:`~music21.stream.Measure.paddingLeft` property.
 
         >>> c = corpus.parse('bwv1.6')
-        >>> for m in c.parts.first().getElementsByClass('Measure'):
-        ...     ts = m.timeSignature or m.getContextByClass('TimeSignature')
+        >>> for m in c.parts.first().getElementsByClass(stream.Measure):
+        ...     ts = m.timeSignature or m.getContextByClass(meter.TimeSignature)
         ...     print('%s %s' % (m.number, ts.getOffsetFromBeat(4.5) - m.paddingLeft))
         0 0.5
         1 3.5

@@ -4,9 +4,9 @@
 # Purpose:      translates Noteworthy Composer's NWCTXT format
 #
 # Authors:      Jordi Bartolome
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -77,8 +77,7 @@ from music21 import tie
 from music21.exceptions21 import Music21Exception
 
 from music21 import environment
-_MOD = 'noteworthy.translate'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('noteworthy.translate')
 
 
 # initializations
@@ -892,7 +891,7 @@ class Test(unittest.TestCase):
         nwt = NoteworthyTranslator()
         s = nwt.parseString(info)
         # s.show('text')
-        n1 = s.parts[1].getElementsByClass('Measure').first().notes.first()
+        n1 = s.parts[1].getElementsByClass(stream.Measure).first().notes.first()
         self.assertEqual(n1.pitch.accidental.alter, -1.0)
 
 

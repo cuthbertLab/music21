@@ -4,10 +4,10 @@
 # Purpose:      Neo-Riemannian Chord Transformations
 #
 # Authors:      Maura Church
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2017-19 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017-19 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -23,8 +23,7 @@ from music21 import chord
 from music21.analysis import enharmonics
 
 from music21 import environment
-_MOD = 'analysis.neoRiemannian'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.neoRiemannian')
 
 # TODO: change doctests from passing on exceptions to raising them and trapping them.
 

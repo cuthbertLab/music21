@@ -3,9 +3,9 @@
 # Name:         lily/translate.py
 # Purpose:      music21 classes for translating to Lilypond
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2007-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2007-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -18,11 +18,13 @@ import pathlib
 import re
 import subprocess
 import sys
+from typing import Dict, Union
 import unittest
 
 from collections import OrderedDict
 from importlib.util import find_spec
 
+from music21 import clef
 from music21 import common
 from music21.converter.subConverters import SubConverter
 from music21 import corpus
@@ -35,8 +37,7 @@ from music21 import stream
 from music21 import variant
 from music21.lily import lilyObjects as lyo
 
-_MOD = 'lily.translate'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('lily.translate')
 
 try:
     if find_spec('PIL.Image') and find_spec('PIL.ImageOps'):
@@ -51,7 +52,7 @@ del find_spec
 # TODO: speed up tests everywhere! move these to music21 base...
 
 class _sharedCorpusTestObject:
-    sharedCache = {}
+    sharedCache: Dict[str, stream.Stream] = {}
 
 
 sharedCacheObject = _sharedCorpusTestObject()
@@ -285,8 +286,8 @@ class LilypondConverter:
         '''
         c = m21ObjectIn.classes
         if 'Stream' in c:
-            if m21ObjectIn.recurse().variants:
-                # has variants so we need to make a deepcopy...
+            if m21ObjectIn[variant.Variant]:
+                # has variants. so we need to make a deepcopy...
                 m21ObjectIn = variant.makeAllVariantsReplacements(m21ObjectIn, recurse=True)
                 m21ObjectIn.makeVariantBlocks()
 
@@ -398,7 +399,7 @@ class LilypondConverter:
         # Also get the variants, and the total number of measures here and make start each
         # staff context with { \stopStaff s1*n} where n is the number of measures.
         if hasattr(scoreIn, 'parts') and scoreIn.iter().parts:  # or has variants
-            if scoreIn.recurse().variants:
+            if scoreIn[variant.Variant]:
                 lpPartsAndOssiaInit = self.lyPartsAndOssiaInitFromScore(scoreIn)
                 lpGroupedMusicList = self.lyGroupedMusicListFromScoreWithParts(
                     scoreIn,
@@ -527,7 +528,7 @@ class LilypondConverter:
             musicList.append(lpPrefixCompositeMusicPart)
 
             variantsAddedForPart = []
-            for v in p.variants:
+            for v in p.getElementsByClass(variant.Variant):
                 variantName = v.groups[0]
                 if variantName not in variantsAddedForPart:
                     self.addedVariants.append(variantName)
@@ -609,7 +610,7 @@ class LilypondConverter:
         return returnString
 
     def lyGroupedMusicListFromScoreWithParts(self, scoreIn, scoreInit=None):
-        # noinspection PyShadowingNames
+        # noinspection PyShadowingNames,GrazieInspection
         r'''
         More complex example showing how the score can be set up with ossia parts...
 
@@ -705,7 +706,7 @@ class LilypondConverter:
         r'''
         returns a LyNewLyrics object
 
-        This is a little bit of a hack. This should be switched over to using a
+        This is a bit of a hack. This should be switched over to using a
         prefixed context thing with \new Lyric = "id" \with { } {}
 
         >>> s = converter.parse('tinyNotation: 4/4 c4_hel- d4_-lo r4 e4_world')
@@ -758,7 +759,7 @@ class LilypondConverter:
         Returns a :class:`~music21.lily.lilyObjects.LyLyricElement` object
         from a :class:`~music21.note.Lyric` object.
 
-        Uses self.inWord to keep track of whether or not we're in the middle of
+        Uses self.inWord to keep track of whether we're in the middle of
         a word.
 
         >>> s = converter.parse('tinyNotation: 4/4 c4_hel- d4_-lo r2 e2 f2_world')
@@ -850,7 +851,7 @@ class LilypondConverter:
         self,
         streamIn,
         contextType=None,
-        type=None,  # @ReservedAssignment
+        type=None,
         beforeMatter=None
     ):
         # noinspection PyShadowingNames
@@ -1523,11 +1524,13 @@ class LilypondConverter:
             octaveModChars = '\'' * correctedOctave  # C4 = c', C5 = c''  etc.
         return octaveModChars
 
-    def lyMultipliedDurationFromDuration(self, durationObj):
+    def lyMultipliedDurationFromDuration(
+        self,
+        durationObj: Union[duration.Duration, duration.DurationTuple],
+    ):
         r'''
-        take a simple Duration (that is one with one DurationTuple
+        take a simple Duration (that is, one with one DurationTuple)
         object and return a LyMultipliedDuration object:
-
 
         >>> d = duration.Duration(3)
         >>> lpc = lily.translate.LilypondConverter()
@@ -1563,6 +1566,7 @@ class LilypondConverter:
         >>> [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
         ['1 ', '4 ']
         '''
+        number_type: Union[float, int, str]
         try:
             number_type = duration.convertTypeToNumber(durationObj.type)  # module call
         except duration.DurationException as de:
@@ -1698,16 +1702,16 @@ class LilypondConverter:
         if the inObj has tuplets then we set a new context
         for the tuplets and anything up till a tuplet stop.
 
-        Note that a broken tuplet (a la Michael Gordon)
+        Note that a broken tuplet (à la Michael Gordon)
         will not work.
 
         If there are no tuplets, this routine does
-        nothing.  If there are tuplets and they have type start then
+        nothing.  If there are tuplets, and they have type "start", then
         it returns an lpMusicList object, which is the new context
 
-        For now, no nested tuplets.  They're an
+        For now, no support for nested tuplets.  They're an
         easy extension, but there's too much
-        else missing to do it now...
+        else that is missing to do it now...
         '''
         if not inObj.duration.tuplets:
             return None
@@ -1967,9 +1971,9 @@ class LilypondConverter:
         # Stuff that can be done on the first element only (clef, new/old, id, color)
         replacedElements = variantList[0].replacedElements(activeSite)
         re0 = replacedElements[0]
-        replacedElementsClef = re0.clef or re0.getContextByClass('Clef')
+        replacedElementsClef = re0.clef or re0.getContextByClass(clef.Clef)
 
-        variantContainerStream = variantList[0].getContextByClass('Part')
+        variantContainerStream = variantList[0].getContextByClass(stream.Part)
         if variantContainerStream is None:
             variantContainerStream = variantList[0].getContextByClass('Stream')
 
@@ -2114,9 +2118,9 @@ class LilypondConverter:
         ['london']
 
         '''
-        replacedElementsClef = replacedElements[0].getContextByClass('Clef')
+        replacedElementsClef = replacedElements[0].getContextByClass(clef.Clef)
 
-        variantContainerStream = variantObject.getContextByClass('Part')
+        variantContainerStream = variantObject.getContextByClass(stream.Part)
         if variantContainerStream is None:
             variantContainerStream = variantObject.getContextByClass('Stream')
 
@@ -2144,7 +2148,7 @@ class LilypondConverter:
 
         musicList = []
 
-        varFilter = [r for r in variantObject.getElementsByClass('Rest')
+        varFilter = [r for r in variantObject.getElementsByClass(note.Rest)
                      if r.style.hideObjectOnPrint]
 
         if varFilter:
@@ -2420,7 +2424,7 @@ class LilypondConverter:
         return self.tempName
 
     # noinspection PyShadowingBuiltins
-    def runThroughLily(self, format=None,  # @ReservedAssignment
+    def runThroughLily(self, format=None,
                        backend=None, fileName=None, skipWriting=False):
         r'''
         creates a .ly file from self.topLevelObject via .writeLyFile
@@ -2475,7 +2479,7 @@ class LilypondConverter:
 
     def showPDF(self):
         r'''
-        create a SVG file from self.topLevelObject, show it with your pdf reader
+        create an SVG file from self.topLevelObject, show it with your pdf reader
         (often Adobe Acrobat/Adobe Reader or Apple Preview)
         and return the filepath of the file.
 
@@ -2504,11 +2508,11 @@ class LilypondConverter:
         lilyFile = self.runThroughLily(backend='eps', format='png', fileName=fileName)
         if noPIL is False:
             # noinspection PyPackageRequirements
-            from PIL import Image, ImageOps
+            from PIL import Image, ImageOps  # type: ignore
             # noinspection PyBroadException
             try:
                 lilyImage = Image.open(str(lilyFile))
-                lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')
+                lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')  # type: ignore
                 lilyImage2.save(str(lilyFile))
             except Exception:  # pylint: disable=broad-except
                 pass  # no big deal probably...
@@ -2541,7 +2545,7 @@ class LilypondConverter:
 
     def showSVG(self, fileName=None):
         r'''
-        create a SVG file from self.topLevelObject, show it with your
+        create an SVG file from self.topLevelObject, show it with your
         svg reader (often Internet Explorer on PC)
         and return the filepath of the file.
 

@@ -4,9 +4,9 @@
 # Purpose:      Storage for user environment settings and defaults
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2017 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2009-2017 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -428,7 +428,7 @@ class _EnvironmentCore:
                 ('graphicsPath', previewLocation),
                 ('vectorPath', previewLocation),
                 ('pdfPath', previewLocation),
-                ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
+                ('midiPath', '/Applications/GarageBand.app'),
                 ('musescoreDirectPNGPath',
                  '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
             ]:
@@ -789,14 +789,11 @@ class _EnvironmentCore:
 # -----------------------------------------------------------------------------
 
 
-# store one instance of _EnvironmentCore within this module
+# store one singleton instance of _EnvironmentCore within this module
 # this is a module-level implementation of the singleton pattern
 # reloading the module will force a recreation of the module
 # noinspection PyDictCreation
-_environStorage = {'instance': None, 'forcePlatform': None}
-
-# create singleton instance
-_environStorage['instance'] = _EnvironmentCore()
+_environStorage = {'instance': _EnvironmentCore(), 'forcePlatform': None}
 
 
 def envSingleton():
@@ -832,7 +829,7 @@ class Environment:
     PosixPath('/Applications/Finale Reader.app')
     '''
 
-    # define order to present names in documentation; use strings
+    # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = ['read', 'write', 'getSettingsPath']
 
     # documentation for all attributes (not properties or methods)
@@ -1447,7 +1444,7 @@ class Test(unittest.TestCase):
   <localCorporaSettings />
   <localCorpusSettings />
   <preference name="manualCoreCorpusPath" />
-  <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
+  <preference name="midiPath" value="/Applications/GarageBand.app" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
@@ -1502,7 +1499,7 @@ class Test(unittest.TestCase):
     <localCorpusPath>c</localCorpusPath>
   </localCorpusSettings>
   <preference name="manualCoreCorpusPath" />
-  <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
+  <preference name="midiPath" value="/Applications/GarageBand.app" />
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />

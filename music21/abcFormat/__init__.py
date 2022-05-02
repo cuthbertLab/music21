@@ -5,9 +5,9 @@
 #
 # Authors:      Christopher Ariza
 #               Dylan J. Nagler
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 2013 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -2627,7 +2627,7 @@ class ABCHandler:
         return ah
 
     # --------------------------------------------------------------------------
-    # utility methods for post processing
+    # utility methods for post-processing
 
     def definesReferenceNumbers(self):
         '''

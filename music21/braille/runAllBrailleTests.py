@@ -3,9 +3,9 @@
 # Name:         braille/runAllBrailleTests.py
 # Purpose:      Test runner for Bo-Cheng Jhan and others who would prefer
 #               to debug braille output with a minimum of screen reader output
-# Author:       Michael Scott Cuthbert
+# Author:       Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

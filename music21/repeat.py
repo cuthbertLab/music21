@@ -5,9 +5,9 @@
 #
 # Authors:      Christopher Ariza
 #               Daniel Manesh
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2012, 16, 19 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012, 16, 19 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -18,21 +18,20 @@ the :class:`~music21.bar.Repeat` which represents a normal barline repeat.
 '''
 import copy
 import string
-import unittest
 from typing import Union
 
 from music21 import exceptions21
 from music21 import expressions
+from music21 import prebase
 from music21 import spanner
 from music21 import style
 
 from music21 import environment
-_MOD = 'repeat'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('repeat')
 
 
 # ------------------------------------------------------------------------------
-class RepeatMark:
+class RepeatMark(prebase.ProtoM21Object):
     '''
     Base class of all repeat objects, including RepeatExpression objects and
     Repeat (Barline) objects.
@@ -53,7 +52,7 @@ class RepeatMark:
     >>> s = stream.Stream()
     >>> s.append(note.Note())
     >>> s.append(PartialRepeat())
-    >>> repeats = s.getElementsByClass(repeat.RepeatMark)
+    >>> repeats = s.getElementsByClass('RepeatMark')  # not a Music21Object, so use quotes
     >>> if repeats:
     ...    print('Stream has %s repeat(s) in it' % (len(repeats)))
     Stream has 1 repeat(s) in it
@@ -124,7 +123,7 @@ class RepeatExpression(RepeatMark, expressions.Expression):
 
     def applyTextFormatting(self, te=None):
         '''
-        Apply the default text formatting to the text expression version of of this repeat
+        Apply the default text formatting to the text expression version of this repeat
         '''
         if te is None:  # use the stored version if possible
             te = self._textExpression
@@ -406,7 +405,7 @@ def insertRepeatEnding(s, start, end, endingNumber=1, *, inPlace=False):
     the method adds a second ending
     from measures 6 to 7.
 
-    Does not (yet) add a :class:`~music21.bar.RepeatMark` to the end of the first ending.
+    Does not (yet) add a :class:`~music21.repeat.RepeatMark` to the end of the first ending.
 
     Example: create first and second endings over measures 4-6 and measures 11-13 of a chorale,
     respectively.
@@ -480,7 +479,7 @@ def insertRepeat(s, start, end, *, inPlace=False):
 
     >>> len(s.parts[0].flatten().getElementsByClass(bar.Repeat))
     2
-    >>> len(s.flatten().getElementsByClass(bar.Repeat))
+    >>> len(s[bar.Repeat])
     8
     >>> s.parts[0].measure(3).leftBarline.direction
     'start'
@@ -561,6 +560,8 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
     >>> len(s.parts[2]) == len(chorale3.parts[2])
     True
     '''
+    from music21 import stream
+
     if s is None:
         return None
 
@@ -589,7 +590,7 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
 
     # correct the measure numbers
     if correctMeasureNumbers:
-        measures = list(s.getElementsByClass('Measure'))
+        measures = list(s.getElementsByClass(stream.Measure))
         if measures:
             i = measures[0].number
 
@@ -720,11 +721,13 @@ class Expander:
         '''
         run several setup routines.
         '''
+        from music21 import stream
+
         # get and store the source measure count; this is presumed to
         # be a Stream with Measures
-        self._srcMeasureStream = self._src.getElementsByClass('Measure').stream()
+        self._srcMeasureStream = self._src.getElementsByClass(stream.Measure).stream()
         # store all top-level non Measure elements for later insertion
-        self._srcNotMeasureStream = self._src.getElementsNotOfClass('Measure').stream()
+        self._srcNotMeasureStream = self._src.getElementsNotOfClass(stream.Measure).stream()
 
         # see if there are any repeat brackets
         self._repeatBrackets = self._src.flatten().getElementsByClass(
@@ -737,21 +740,19 @@ class Expander:
 
         # store counts of all non barline elements.
         # doing class matching by string as problems matching in some test cases
-        reStream = self._srcMeasureStream.flatten().getElementsByClass(
-            'RepeatExpression'
-        ).stream()
-        self._codaCount = len(reStream.getElementsByClass('Coda'))
-        self._segnoCount = len(reStream.getElementsByClass('Segno'))
-        self._fineCount = len(reStream.getElementsByClass('Fine'))
+        reStream = self._srcMeasureStream.flatten().getElementsByClass(RepeatExpression).stream()
+        self._codaCount = len(reStream.getElementsByClass(Coda))
+        self._segnoCount = len(reStream.getElementsByClass(Segno))
+        self._fineCount = len(reStream.getElementsByClass(Fine))
 
-        self._dcCount = len(reStream.getElementsByClass('DaCapo'))
-        self._dcafCount = len(reStream.getElementsByClass('DaCapoAlFine'))
-        self._dcacCount = len(reStream.getElementsByClass('DaCapoAlCoda'))
+        self._dcCount = len(reStream.getElementsByClass(DaCapo))
+        self._dcafCount = len(reStream.getElementsByClass(DaCapoAlFine))
+        self._dcacCount = len(reStream.getElementsByClass(DaCapoAlCoda))
 
-        self._asCount = len(reStream.getElementsByClass('AlSegno'))
-        self._dsCount = len(reStream.getElementsByClass('DalSegno'))
-        self._dsafCount = len(reStream.getElementsByClass('DalSegnoAlFine'))
-        self._dsacCount = len(reStream.getElementsByClass('DalSegnoAlCoda'))
+        self._asCount = len(reStream.getElementsByClass(AlSegno))
+        self._dsCount = len(reStream.getElementsByClass(DalSegno))
+        self._dsafCount = len(reStream.getElementsByClass(DalSegnoAlFine))
+        self._dsacCount = len(reStream.getElementsByClass(DalSegnoAlCoda))
 
     def process(self, deepcopy=True):
         '''
@@ -761,7 +762,7 @@ class Expander:
         happens for Measures contained in the given Stream.
         Other objects in that Stream are neither processed nor copied.
 
-        if deepcopy is False then it will leave the stream in a unusual state, but acceptable if
+        if deepcopy is False then it will leave the stream in an unusual state, but acceptable if
         the source stream has already been deep-copied and will be discarded later
         '''
         canExpand = self.isExpandable()
@@ -780,20 +781,20 @@ class Expander:
         if canExpand is None:
             return srcStream
 
-        # these must by copied, otherwise we have the original still
+        # these must be copied, otherwise we have the original still
         self._repeatBrackets = copy.deepcopy(self._repeatBrackets)
 
         # srcStream = self._srcMeasureStream
         # after copying, update repeat brackets (as spanners)
         for m in srcStream:
-            # processes uses the spanner bundle stored on this Stream
+            # uses the spanner bundle stored on this Stream
             self._repeatBrackets.spannerBundle.replaceSpannedElement(
                 m.derivation.origin, m)
 
         # srcStream = self._srcMeasureStream
         # post = copy.deepcopy(self._srcMeasureStream)
         hasDaCapoOrSegno = self._daCapoOrSegno()
-        # will deep copy
+        # will deepcopy
         if hasDaCapoOrSegno is None:
             post = self._processRecursiveRepeatBars(srcStream)
         else:  # we have a segno or capo
@@ -801,6 +802,8 @@ class Expander:
 
         # TODO: need to copy spanners from each sub-group into their newest connects;
         #   must be done here as more than one connection is made
+
+        post.mergeAttributes(srcStream)
 
         return post
 
@@ -829,13 +832,15 @@ class Expander:
         >>> e.measureMap(returnType='measureNumber')
         ['1', '2', '2a', '2b', '3', '4', '4a', '5']
         '''
+        from music21 import stream
+
         measureNumberList = []
         measureNumberNoSuffixList = []
         post = self.process()
 
         measureContainingStreams = post
 
-        for i, m in enumerate(measureContainingStreams.getElementsByClass('Measure')):
+        for i, m in enumerate(measureContainingStreams.getElementsByClass(stream.Measure)):
             measureNumberList.append(m.measureNumberWithSuffix())
             measureNumberNoSuffixList.append(m.number)
 
@@ -872,19 +877,21 @@ class Expander:
         if rb is not None and 'music21.bar.Repeat' in rb.classSet:
             m.rightBarline = bar.Barline(newType)
 
-    def _stripRepeatExpressions(self, streamObj):
+    def _stripRepeatExpressions(self, streamObj: 'music21.stream.Stream'):
         '''
         Given a Stream of measures or a Measure, strip all RepeatExpression
         objects in place.
         '''
+        from music21 import stream
+
         if not streamObj.hasMeasures():
             # it probably is a measure; place in temporary containers
             mList = [streamObj]
         else:
-            mList = streamObj.getElementsByClass('Measure')
+            mList = list(streamObj.getElementsByClass(stream.Measure))
         for m in mList:
             remove = []
-            for e in m.getElementsByClass('RepeatExpression'):
+            for e in m.getElementsByClass(RepeatExpression):
                 remove.append(e)
             for e in remove:
                 m.remove(e)
@@ -904,7 +911,7 @@ class Expander:
                 if lb.direction == 'start':
                     startCount += 1
                     countBalance += 1
-                # ends may be encountered on left of bar
+                # ends of repeats may be encountered on left of bar
                 elif lb.direction == 'end':
                     if countBalance == 0:  # the first repeat found
                         startCount += 1  # simulate first
@@ -913,7 +920,7 @@ class Expander:
                     countBalance -= 1
             if rb is not None and 'music21.bar.Repeat' in rb.classSet:
                 if rb.direction == 'end':
-                    # if this is the first of all repeats found, then we
+                    # if this is the first repeat found, then we
                     # have an acceptable case where the first repeat is omitted
                     if countBalance == 0:  # the first repeat found
                         startCount += 1  # simulate first
@@ -959,7 +966,7 @@ class Expander:
     def _getRepeatExpressionCommandType(self):
         '''
         Return the class of the repeat expression command. This should
-        only be called if it has been determine that there is one
+        only be called if it has been determined that there is one
         repeat command in this Stream.
         '''
         if self._dcCount == 1:
@@ -982,7 +989,7 @@ class Expander:
     def _getRepeatExpressionCommand(self, streamObj):
         '''Get the instance found in this stream; assumes that there is one.
         '''
-        return streamObj.flatten().getElementsByClass('RepeatExpressionCommand').first()
+        return streamObj.flatten().getElementsByClass(RepeatExpressionCommand).first()
 
     def _daCapoIsCoherent(self):
         '''Check of a DC statement is coherent.
@@ -1126,8 +1133,7 @@ class Expander:
                             # shiftedIndex = True
                             # match = True
                             break
-#                 if match:
-#                     break
+
             # if not shiftedIndex:
             i += 1
         if groupIndices:
@@ -1168,7 +1174,7 @@ class Expander:
                     environLocal.printDebug([
                         f'repeat brackets are not numbered consecutively: {match}, {target}'])
                     return False
-            # there needs to be repeat after each bracket except the last
+            # there needs to be a repeat mark after each bracket except the last
             spannedMeasureIds = []
             for rbCount, rb in enumerate(rBrackets):
                 # environLocal.printDebug(['rbCount', rbCount, rb])
@@ -1330,7 +1336,7 @@ class Expander:
         Process and return a new Stream of Measures, likely a Part.
 
         If `repeatIndices` are given, only these indices will be copied.
-        All inclusive indices must be listed, not just the start and end.
+        All the included indices must be listed, not just the start and end.
 
         If `returnExpansionOnly` is True, only the expanded portion is
         returned, the rest of the Stream is not retained.
@@ -1488,8 +1494,8 @@ class Expander:
                     # always copying from the same source
                     for j in repeatIndices:
                         mSub = copy.deepcopy(streamObj[j])
-                        # must do for each pass, b/c not changing source
-                        # stream
+                        # We must do this for each pass, b/c we are not changing
+                        # the source stream
                         # environLocal.printDebug(['got j, repeatIndices', j, repeatIndices])
                         if j in [repeatIndices[0], repeatIndices[-1]]:
                             self._stripRepeatBarlines(mSub)
@@ -1505,7 +1511,7 @@ class Expander:
                         new.append(mSub)
                         # renumber at end
                         # number += 1
-                # check if need to clear repeats from next bar
+                # check if we need to clear repeats from next bar
                 if mLast is not mEndBarline:
                     stripFirstNextMeasure = True
                 # set i to next measure after mLast
@@ -1559,13 +1565,13 @@ class Expander:
 
         # need to remove groups that are already used
         groups = self._groupRepeatBracketIndices(streamObj)
-        # if we do not groups when expected it is probably b/c spanners have
-        # been orphaned
+        # if we do not group when we are expected to do so, it is probably b/c spanners have
+        # been orphaned.
         # environLocal.printDebug(['got groups:', groups])
         if not groups:  # none found:
             return self.processInnermostRepeatBars(streamObj)
 
-        # need to find innermost repeat, and then see it it has any
+        # need to find innermost repeat, and then see if it has any
         # repeat brackets that are relevant for the span
         # this group may ultimately extend beyond the innermost, as this may
         # be the first of a few brackets
@@ -1631,7 +1637,7 @@ class Expander:
                 raise ExpanderException(
                     'failed to find start or end index of bracket expansion')
 
-            # if mLast does not have a repeat bar, its probably not a repeat
+            # if mLast does not have a repeat bar, it is probably not a repeat
             mLastRightBar = mLast.rightBarline
             if (mLastRightBar is not None
                     and 'music21.bar.Repeat' in mLastRightBar.classSet):
@@ -1687,7 +1693,7 @@ class Expander:
             for m in sub:
                 self._stripRepeatBarlines(m)
                 new.append(m)
-        # need 1 more than highest measure counted
+        # need 1 more than the highest measure counted
         streamObjPost = streamObj[highestIndexRepeated + 1:]
         for m in streamObjPost:
             new.append(m)
@@ -1710,12 +1716,12 @@ class Expander:
 
         getRepeatExpressionIndex returns the measureIndex not measure number
 
-        >>> e.getRepeatExpressionIndex(s.getElementsByClass('Measure'), 'Segno')
+        >>> e.getRepeatExpressionIndex(s.getElementsByClass(stream.Measure), 'Segno')
         [2]
         '''
         post = []
         for i, m in enumerate(streamObj):
-            for e in m.getElementsByClass('RepeatExpression'):
+            for e in m.getElementsByClass(RepeatExpression):
                 if (target in e.classes
                         or (not isinstance(target, str) and isinstance(e, target))):
                     post.append(i)
@@ -1733,7 +1739,7 @@ class Expander:
         Return None if there's nothing to expand (a third case...)
         '''
         match = self._daCapoOrSegno()
-        # if neither repeats nor segno/capo, than not expandable
+        # if neither repeats nor segno/capo, then not expandable
         if match is None and not self._hasRepeat(self._srcMeasureStream):
             environLocal.printDebug(
                 'no dc/segno, no repeats; is expandable but will not do anything'
@@ -1767,8 +1773,8 @@ class Expander:
         if makeDeepCopy is True, then it will make a deepcopy of the stream.  Otherwise
         assumes it has already been done.
         '''
-        # this assumes just a stream of measures
-        # assume already copied
+        # This assumes just a stream of measures.
+        # Also assumes the stream has already been copied unless makeDeepCopy is True.
         if makeDeepCopy is True:
             streamObj = copy.deepcopy(streamObj)
         repeatBracketsMemo = {}  # store completed brackets
@@ -1798,8 +1804,8 @@ class Expander:
         Process and return a new Stream of Measures, likely a Part.
         Expand any repeat expressions found within.
         '''
-        # should already be a stream of measures
-        # assume already copied
+        # Should already be a stream of measures.
+        # Assumes that the stream has already been copied.
         capoOrSegno = self._daCapoOrSegno()
         recType = self._getRepeatExpressionCommandType()  # a string form
         recObj = self._getRepeatExpressionCommand(streamObj)
@@ -2106,6 +2112,7 @@ class RepeatFinder:
         Traceback (most recent call last):
         music21.repeat.NoInternalStreamException: RepeatFinder must be initialized with a stream
         '''
+        from music21 import stream
 
         if self.s is None:
             raise NoInternalStreamException('RepeatFinder must be initialized with a stream')
@@ -2120,9 +2127,9 @@ class RepeatFinder:
         # Check for different parts and change mLists to a list of
         # measure-streams: [<measures from part1>, <measures from part2>, ... ]
         if s.hasMeasures():
-            mLists = [s.getElementsByClass('Measure')]
+            mLists = [s.getElementsByClass(stream.Measure)]
         else:
-            mLists = [p.getElementsByClass('Measure') for p in s.parts]
+            mLists = [p.getElementsByClass(stream.Measure) for p in s.parts]
 
         # Check for unequal lengths
         for i in range(len(mLists) - 1):
@@ -2155,7 +2162,7 @@ class RepeatFinder:
             res.append([])
 
         for i in range(len(mLists) - 1, -1, -1):
-            # mHash is a the concatenation of the measure i for each part.
+            # mHash is the concatenation of the measure i for each part.
             mHash = ''.join(mLists[i])
 
             if mHash in tempDict:
@@ -2400,7 +2407,7 @@ class RepeatFinder:
         >>> m4 = search.translateStreamToString(c1p0.measure(3).notesAndRests)
         >>> m5 = search.translateStreamToString(c1p0.measure(4).notesAndRests)
         >>> m9 = search.translateStreamToString(
-        ...    c1p0.getElementsByClass('Measure')[7].notesAndRests)
+        ...    c1p0.getElementsByClass(stream.Measure)[7].notesAndRests)
         >>> resm4 = search.translateStreamToString(c1simple.measure(3).notesAndRests)
         >>> resm5 = search.translateStreamToString(c1simple.measure(4).notesAndRests)
         >>> m4 == resm4
@@ -2590,1782 +2597,7 @@ class RepeatFinder:
 
 
 # ------------------------------------------------------------------------------
-
-
-class Test(unittest.TestCase):
-
-    def testFilterByRepeatMark(self):
-        from music21 import stream
-        from music21 import bar
-        from music21 import repeat
-        from music21 import note
-
-        s = stream.Part()
-        m1 = stream.Measure()
-        m1.leftBarline = bar.Repeat(direction='start')
-        m1.rightBarline = bar.Repeat(direction='end', times=2)
-        m1.repeatAppend(note.Note('g3', quarterLength=1), 4)
-
-        self.assertEqual(len(m1.getElementsByClass('RepeatMark')), 2)
-
-        m2 = stream.Measure()
-        m2.leftBarline = bar.Repeat(direction='start')
-        m2.rightBarline = bar.Repeat(direction='end', times=2)
-        m2.repeatAppend(note.Note('d4', quarterLength=1), 4)
-
-        s.append(m1)
-        s.append(m2)
-
-        # s.show()
-
-        # now have 4
-        self.assertEqual(len(s.recurse().getElementsByClass('RepeatMark')), 4)
-
-        # check coherence
-        ex = repeat.Expander(s)
-        self.assertTrue(ex.repeatBarsAreCoherent())
-        self.assertEqual(ex.findInnermostRepeatIndices(s), [0])
-
-    def testRepeatCoherenceB(self):
-        from music21 import stream
-        from music21 import bar
-        from music21 import repeat
-        from music21 import note
-
-        s = stream.Part()
-        m1 = stream.Measure()
-        m1.leftBarline = bar.Repeat(direction='start')
-        m1.rightBarline = bar.Repeat(direction='end', times=2)
-        m1.repeatAppend(note.Note('g3', quarterLength=1), 4)
-
-        m2 = stream.Measure()
-
-        m3 = stream.Measure()
-        m3.leftBarline = bar.Repeat(direction='start')
-        # m3.rightBarline = bar.Repeat(direction='end', times=2)
-        m3.repeatAppend(note.Note('d4', quarterLength=1), 4)
-
-        s.append(m1)
-        s.append(m2)
-        s.append(m3)
-
-        # check coherence: will raise
-        ex = repeat.Expander(s)
-        self.assertFalse(ex.isExpandable())
-        self.assertEqual(ex.findInnermostRepeatIndices(s), [0])
-
-    def testRepeatCoherenceB2(self):
-        from music21 import stream
-        from music21 import bar
-        from music21 import repeat
-        from music21 import note
-
-        # a nested repeat; acceptable
-        s = stream.Part()
-        m1 = stream.Measure()
-        m1.leftBarline = bar.Repeat(direction='start')
-        # m1.rightBarline = bar.Repeat(direction='end', times=2)
-        m1.repeatAppend(note.Note('g3', quarterLength=1), 4)
-
-        m2 = stream.Measure()
-        m2.leftBarline = bar.Repeat(direction='start')
-        # m2.rightBarline = bar.Repeat(direction='end', times=2)
-        m2.repeatAppend(note.Note('b3', quarterLength=1), 4)
-
-        m3 = stream.Measure()
-        # m3.leftBarline = bar.Repeat(direction='start')
-        m3.rightBarline = bar.Repeat(direction='end', times=2)
-        m3.repeatAppend(note.Note('d4', quarterLength=1), 4)
-
-        m4 = stream.Measure()
-        # m4.leftBarline = bar.Repeat(direction='start')
-        m4.rightBarline = bar.Repeat(direction='end', times=2)
-        m4.repeatAppend(note.Note('f4', quarterLength=1), 4)
-
-        s.append(m1)
-        s.append(m2)
-        s.append(m3)
-        s.append(m4)
-
-        # s.show()
-
-        # check coherence
-        ex = repeat.Expander(s)
-        self.assertTrue(ex.repeatBarsAreCoherent())
-        self.assertEqual(ex.findInnermostRepeatIndices(s), [1, 2])
-
-        post = ex.process()
-        # post.show()
-        self.assertEqual(len(post.getElementsByClass('Measure')), 12)
-        self.assertEqual(len(post.recurse().notesAndRests), 48)
-        self.assertEqual([m.offset for m in post.getElementsByClass('Measure')],
-                         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0,
-                          28.0, 32.0, 36.0, 40.0, 44.0])
-
-        self.assertEqual([n.nameWithOctave
-                          for n in post.flatten().getElementsByClass('Note')],
-                         ['G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3',
-                          'D4', 'D4', 'D4', 'D4',
-                          'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4',
-                          'F4', 'F4', 'F4', 'F4', 'G3', 'G3', 'G3', 'G3',
-                          'B3', 'B3', 'B3', 'B3',
-                          'D4', 'D4', 'D4', 'D4', 'B3', 'B3', 'B3', 'B3',
-                          'D4', 'D4', 'D4', 'D4', 'F4', 'F4', 'F4', 'F4'])
-
-    def testRepeatCoherenceC(self):
-        '''Using da capo/dal segno
-        '''
-        from music21 import stream
-        from music21 import repeat
-
-        # no repeats
-        s = stream.Part()
-        m1 = stream.Measure()
-        m2 = stream.Measure()
-        m3 = stream.Measure()
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertFalse(ex.isExpandable())
-
-        s = stream.Part()
-        m1 = stream.Measure()
-        m2 = stream.Measure()
-        m3 = stream.Measure()
-        m3.append(DaCapo())
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertTrue(ex.isExpandable())
-
-        # missing segno
-        s = stream.Part()
-        m1 = stream.Measure()
-        m2 = stream.Measure()
-        m3 = stream.Measure()
-        m3.append(DalSegno())
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertFalse(ex.isExpandable())
-
-        s = stream.Part()
-        m1 = stream.Measure()
-        m2 = stream.Measure()
-        m2.append(Segno())
-        m3 = stream.Measure()
-        m3.append(DalSegno())
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertTrue(ex.isExpandable())
-
-        # dc al fine
-        s = stream.Part()
-        m1 = stream.Measure()
-        m2 = stream.Measure()
-        m2.append(Fine())
-        m3 = stream.Measure()
-        m3.append(DaCapoAlFine())
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertTrue(ex.isExpandable())
-
-        # dc al fine but missing fine
-        s = stream.Part()
-        m1 = stream.Measure()
-        m2 = stream.Measure()
-        m3 = stream.Measure()
-        m3.append(DaCapoAlFine())
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertFalse(ex.isExpandable())
-
-        # ds al fine
-        s = stream.Part()
-        m1 = stream.Measure()
-        m1.append(Segno())
-        m2 = stream.Measure()
-        m2.append(Fine())
-        m3 = stream.Measure()
-        m3.append(DalSegnoAlFine())
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertTrue(ex.isExpandable())
-
-        # ds al fine missing fine
-        s = stream.Part()
-        m1 = stream.Measure()
-        m1.append(Segno())
-        m2 = stream.Measure()
-        m3 = stream.Measure()
-        m3.append(DalSegnoAlFine())
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertFalse(ex.isExpandable())
-
-        # dc al coda
-        s = stream.Part()
-        m1 = stream.Measure()
-        m1.append(Coda())
-        m2 = stream.Measure()
-        m3 = stream.Measure()
-        m3.append(Coda())
-        m3.append(DaCapoAlCoda())
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertTrue(ex.isExpandable())
-
-        # dc al coda missing one of two codas
-        s = stream.Part()
-        m1 = stream.Measure()
-        m2 = stream.Measure()
-        m3 = stream.Measure()
-        m3.append(Coda())
-        m3.append(DaCapoAlCoda())
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertFalse(ex.isExpandable())
-
-        # ds al coda
-        s = stream.Part()
-        m1 = stream.Measure()
-        m1.append(Segno())
-        m1.append(Coda())
-        m2 = stream.Measure()
-        m3 = stream.Measure()
-        m3.append(Coda())
-        m3.append(DaCapoAlCoda())
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertTrue(ex.isExpandable())
-        # ex._processRepeatExpression(s, s)
-
-    def testExpandRepeatA(self):
-        from music21 import stream
-        from music21 import bar
-        from music21 import repeat
-        from music21 import note
-
-        # two repeat bars in a row
-        p = stream.Part()
-        m1 = stream.Measure(number=1)
-        m1.leftBarline = bar.Repeat(direction='start')
-        m1.rightBarline = bar.Repeat(direction='end')
-        m1.repeatAppend(note.Note('g3', quarterLength=1), 4)
-
-        m2 = stream.Measure(number=2)
-        m2.leftBarline = bar.Repeat(direction='start')
-        m2.rightBarline = bar.Repeat(direction='end')
-        m2.repeatAppend(note.Note('d4', quarterLength=1), 4)
-
-        p.append(m1)
-        p.append(m2)
-
-        ex = repeat.Expander(p)
-        post = ex.process()
-
-        self.assertEqual(len(post.getElementsByClass('Measure')), 4)
-        self.assertEqual(len(post.recurse().notesAndRests), 16)
-        self.assertEqual([m.offset for m in post.getElementsByClass('Measure')],
-                         [0.0, 4.0, 8.0, 12.0])
-
-        self.assertEqual([n.nameWithOctave
-                          for n in post.flatten().getElementsByClass('Note')],
-                         ['G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3',
-                          'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
-        measureNumbersPost = [m.measureNumberWithSuffix()
-                              for m in post.getElementsByClass('Measure')]
-        self.assertEqual(['1', '1a', '2', '2a'], measureNumbersPost)
-
-        # two repeat bars with another bar in between
-        s = stream.Part()
-        m1 = stream.Measure()
-        m1.leftBarline = bar.Repeat(direction='start')
-        m1.rightBarline = bar.Repeat(direction='end')
-        m1.repeatAppend(note.Note('g3', quarterLength=1), 4)
-
-        m2 = stream.Measure()
-        m2.repeatAppend(note.Note('f3', quarterLength=1), 4)
-
-        m3 = stream.Measure()
-        m3.leftBarline = bar.Repeat(direction='start')
-        m3.rightBarline = bar.Repeat(direction='end')
-        m3.repeatAppend(note.Note('d4', quarterLength=1), 4)
-
-        s.append(m1)
-        s.append(m2)
-        s.append(m3)
-        # s.show('t')
-
-        ex = repeat.Expander(s)
-        post = ex.process()
-
-        self.assertEqual(len(post.getElementsByClass('Measure')), 5)
-        self.assertEqual(len(post.recurse().notesAndRests), 20)
-        self.assertEqual([m.offset for m in post.getElementsByClass('Measure')],
-                         [0.0, 4.0, 8.0, 12.0, 16.0])
-        self.assertEqual([n.nameWithOctave
-                          for n in post.flatten().getElementsByClass('Note')],
-                         ['G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3',
-                          'G3', 'F3', 'F3', 'F3', 'F3',
-                          'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
-
-        # post.show('t')
-        # post.show()
-
-    def testExpandRepeatB(self):
-        from music21.abcFormat import testFiles
-        from music21 import converter
-        from music21 import repeat
-
-        s = converter.parse(testFiles.draughtOfAle)
-        # s.show()
-        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 18)
-        self.assertEqual(s.metadata.title, '"A Draught of Ale"    (jig)     0912')
-        self.assertEqual(len(s.recurse().notesAndRests), 88)
-
-        # s.show()
-        unused_ex = repeat.Expander(s.parts[0])
-        # check boundaries here
-
-        post = s.expandRepeats()
-        self.assertEqual(len(post.parts[0].getElementsByClass('Measure')), 36)
-        # make sure metadata is copied
-        self.assertEqual(post.metadata.title, '"A Draught of Ale"    (jig)     0912')
-        self.assertEqual(len(post.recurse().notesAndRests), 88 * 2)
-
-        # post.show()
-
-    def testExpandRepeatC(self):
-        from music21.abcFormat import testFiles
-        from music21 import converter
-        from music21 import repeat
-
-        s = converter.parse(testFiles.kingOfTheFairies)
-        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')),
-                         26)
-        self.assertEqual(s.metadata.title, 'King of the fairies')
-        self.assertEqual(len(s.recurse().notesAndRests), 145)
-
-        # s.show()
-        ex = repeat.Expander(s.parts[0])
-        self.assertEqual(ex.findInnermostRepeatIndices(s.parts[0].getElementsByClass('Measure')),
-                                                        [0, 1, 2, 3, 4, 5, 6, 7, 8])
-        # check boundaries here
-
-        # TODO: this is not yet correct, and is making too many copies
-        post = s.expandRepeats()
-        self.assertEqual(len(post.parts[0].getElementsByClass('Measure')), 35)
-        # make sure metadata is copied
-        self.assertEqual(post.metadata.title, 'King of the fairies')
-        self.assertEqual(len(post.recurse().notesAndRests), 192)
-
-        # post.show()
-
-    def testExpandRepeatD(self):
-
-        # test one back repeat at end of a measure
-        from music21 import stream
-        from music21 import bar
-        from music21 import note
-
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m2.rightBarline = bar.Repeat(direction='end')
-        self.assertEqual(m2.rightBarline.location, 'right')
-
-        m3 = stream.Measure()
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m4 = stream.Measure()
-        m4.repeatAppend(note.Note('b-4', type='half'), 2)
-
-        s = stream.Part()
-        s.append([m1, m2, m3, m4])
-        self.assertEqual(len(s.recurse().notes), 8)
-        post = s.expandRepeats()
-        self.assertEqual(len(post.getElementsByClass('Measure')), 6)
-        self.assertEqual(len(post.recurse().notes), 12)
-
-    def testExpandRepeatE(self):
-
-        # test one back repeat at end of a measure
-        from music21 import stream
-        from music21 import bar
-        from music21 import note
-
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m2.leftBarline = bar.Repeat(direction='start')
-        rb = bar.Repeat(direction='end')
-        m2.rightBarline = rb
-        m3 = stream.Measure()
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-
-        s = stream.Part()
-        s.append([m1, m2, m3])
-
-        self.assertEqual(len(s.recurse().notes), 6)
-        self.assertEqual(len(s.getElementsByClass('Measure')), 3)
-
-        # default times is 2, or 1 repeat
-        post = s.expandRepeats()
-        self.assertEqual(len(post.recurse().notes), 8)
-        self.assertEqual(len(post.getElementsByClass('Measure')), 4)
-
-        # can change times
-        rb.times = 1  # one is no repeat
-        post = s.expandRepeats()
-        self.assertEqual(len(post.recurse().notes), 6)
-        self.assertEqual(len(post.getElementsByClass('Measure')), 3)
-
-        rb.times = 0  # removes the entire passage
-        post = s.expandRepeats()
-        self.assertEqual(len(post.recurse().notes), 4)
-        self.assertEqual(len(post.getElementsByClass('Measure')), 2)
-
-        rb.times = 4
-        post = s.expandRepeats()
-        self.assertEqual(len(post.recurse().notes), 12)
-        self.assertEqual(len(post.getElementsByClass('Measure')), 6)
-
-    def testExpandRepeatF(self):
-        # an algorithmic generation approach
-        import random
-        from music21 import bar
-        from music21 import note
-        from music21 import stream
-        from music21 import meter
-
-        dur = [0.125, 0.25, 0.5, 0.125]
-        durA = dur
-        durB = dur[1:] + dur[:1]
-        durC = dur[2:] + dur[:2]
-        durD = dur[3:] + dur[:3]
-
-        s = stream.Stream()
-        repeatHandles = []
-        for dur in [durA, durB, durC, durD]:
-            m = stream.Measure()
-            m.timeSignature = meter.TimeSignature('1/4')
-            for d in dur:
-                m.append(note.Note(quarterLength=d))
-                m.leftBarline = bar.Repeat(direction='start')
-                rb = bar.Repeat(direction='end')
-                m.rightBarline = rb
-                m.makeBeams(inPlace=True)
-                repeatHandles.append(rb)
-            s.append(m)
-
-        final = stream.Stream()
-        # alter all repeatTimes values, expand, and append to final
-        for i in range(6):
-            for rb in repeatHandles:
-                rb.times = random.choice([0, 1, 3])
-            expanded = s.expandRepeats()
-            for m in expanded:
-                final.append(m)
-        # final.show()
-
-    def testExpandRepeatG(self):
-        from music21.abcFormat import testFiles
-        from music21 import converter
-
-        unused_s = converter.parse(testFiles.hectorTheHero)
-        # TODO: this file does not import correctly due to first/second
-        # ending issues
-        # s.show()
-
-    def testExpandRepeatH(self):
-        # an algorithmic generation approach
-        from music21 import bar
-        from music21 import features
-        from music21 import meter
-        from music21 import note
-        from music21 import pitch
-        from music21 import stream
-
-        dur = [0.125, 0.25, 0.5, 0.125]
-        repeatTimesCycle = [0, 1, 3, 5]
-        pitches = [pitch.Pitch(p) for p in ['a2', 'b-3', 'a2', 'a2']]
-
-        s = stream.Stream()
-        repeatHandles = []
-        for i in range(8):
-            m = stream.Measure()
-            m.timeSignature = meter.TimeSignature('1/4')
-            for j, p in enumerate(pitches):
-                m.append(note.Note(p.transpose(i * 3), quarterLength=dur[j]))
-            m.leftBarline = bar.Repeat(direction='start')
-            rb = bar.Repeat(direction='end')
-            rb.times = repeatTimesCycle[i % len(repeatTimesCycle)]
-            te = rb.getTextExpression()
-            m.rightBarline = rb
-            m.append(te)
-            m.makeBeams(inPlace=True)
-            repeatHandles.append(rb)  # store for annotation
-            s.append(m)
-
-        self.assertEqual(len(s), 8)
-        self.assertEqual(str(s.flatten().pitches[0]), 'A2')
-
-        self.assertEqual(features.vectorById(s, 'p20'),
-                         [3 / 16, 1 / 16, 0.0, 3 / 16, 1 / 16,
-                          0.0, 3 / 16, 1 / 16, 0.0, 3 / 16, 1 / 16, 0.0])
-        self.assertEqual([x.nameWithOctave for x in s.flatten().pitches],
-                         ['A2', 'B-3', 'A2', 'A2', 'C3', 'C#4', 'C3', 'C3', 'E-3',
-                          'E4', 'E-3', 'E-3', 'F#3', 'G4', 'F#3', 'F#3', 'A3',
-                          'B-4', 'A3', 'A3', 'C4', 'C#5', 'C4', 'C4', 'E-4', 'E5',
-                          'E-4', 'E-4', 'F#4', 'G5', 'F#4', 'F#4'])
-        # s.show()
-
-        s1 = s.expandRepeats()
-        # s1.show()
-
-        self.assertEqual(len(s1), 18)
-        # first bar is an A, but repeat is zero, will be removed
-        self.assertEqual(str(s1.flatten().pitches[0]), 'C3')
-
-        self.assertEqual(features.vectorById(s1, 'p20'),
-                         [15 * (1 / 36), 5 / 36, 0.0, 0.0, 0.0, 0.0,
-                          1 / 12, 1 / 36, 0.0, 1 / 4, 1 / 12, 0.0])
-
-        self.assertEqual([x.nameWithOctave for x in s1.flatten().pitches],
-                         ['C3', 'C#4', 'C3', 'C3', 'E-3', 'E4', 'E-3',
-                          'E-3', 'E-3', 'E4', 'E-3', 'E-3', 'E-3', 'E4',
-                          'E-3', 'E-3', 'F#3', 'G4', 'F#3', 'F#3', 'F#3',
-                          'G4', 'F#3', 'F#3', 'F#3', 'G4', 'F#3', 'F#3',
-                          'F#3', 'G4', 'F#3', 'F#3', 'F#3', 'G4', 'F#3', 'F#3',
-                          'C4', 'C#5', 'C4', 'C4', 'E-4', 'E5', 'E-4', 'E-4', 'E-4',
-                          'E5', 'E-4', 'E-4', 'E-4', 'E5', 'E-4', 'E-4', 'F#4', 'G5',
-                          'F#4', 'F#4', 'F#4', 'G5', 'F#4', 'F#4', 'F#4', 'G5', 'F#4',
-                          'F#4', 'F#4', 'G5', 'F#4', 'F#4', 'F#4', 'G5', 'F#4', 'F#4'])
-
-        # s1.show()
-
-    def testRepeatExpressionValidText(self):
-        from music21 import repeat
-        rm = repeat.Coda()
-        self.assertTrue(rm.isValidText('coda'))
-        self.assertTrue(rm.isValidText('Coda'))
-        self.assertTrue(rm.isValidText('TO Coda'))
-        self.assertFalse(rm.isValidText('D.C.'))
-
-        rm = repeat.Segno()
-        self.assertTrue(rm.isValidText('segno  '))
-        self.assertTrue(rm.isValidText('segNO  '))
-
-        rm = repeat.Fine()
-        self.assertTrue(rm.isValidText('FINE'))
-        self.assertTrue(rm.isValidText('fine'))
-        self.assertFalse(rm.isValidText('segno'))
-
-        rm = repeat.DaCapo()
-        self.assertTrue(rm.isValidText('DC'))
-        self.assertTrue(rm.isValidText('d.c.'))
-        self.assertTrue(rm.isValidText('d. c.   '))
-        self.assertFalse(rm.isValidText('d. c. al capo'))
-
-        rm = repeat.DaCapoAlFine()
-        self.assertTrue(rm.isValidText('d.c. al fine'))
-        self.assertTrue(rm.isValidText('da capo al fine'))
-
-        rm = repeat.DaCapoAlCoda()
-        self.assertTrue(rm.isValidText('da capo al coda'))
-
-        rm = repeat.DalSegnoAlFine()
-        self.assertTrue(rm.isValidText('d.s. al fine'))
-        self.assertTrue(rm.isValidText('dal segno al fine'))
-
-        rm = repeat.DalSegnoAlCoda()
-        self.assertTrue(rm.isValidText('d.s. al coda'))
-        self.assertTrue(rm.isValidText('dal segno al coda'))
-
-    def testRepeatExpressionOnStream(self):
-        from music21 import stream
-        from music21 import repeat
-        from music21 import meter
-        from music21 import converter
-        from music21.musicxml import m21ToXml
-
-        GEX = m21ToXml.GeneralObjectExporter()
-
-        template = stream.Stream()
-        for i in range(5):
-            m = stream.Measure()
-            template.append(m)
-        s = copy.deepcopy(template)
-        s[3].insert(0, repeat.DaCapo())
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.DaCapo)), 1)
-
-        raw = GEX.parse(s).decode('utf-8')
-
-        self.assertGreater(raw.find('Da Capo'), 0, raw)
-
-        # can do the same thing starting form a text expression
-        s = copy.deepcopy(template)
-        s[0].timeSignature = meter.TimeSignature('4/4')
-        s[3].insert(0, expressions.TextExpression('da capo'))
-        self.assertEqual(len(s.flatten().getElementsByClass(repeat.DaCapo)), 0)
-
-        raw = GEX.parse(s).decode('utf-8')
-        self.assertGreater(raw.find('da capo'), 0, raw)
-
-        s2 = converter.parse(raw)
-        # now, reconverted from the musicxml, we have a RepeatExpression
-        self.assertEqual(len(s2.flatten().getElementsByClass(repeat.DaCapo)), 1)
-
-        # s2.show('t')
-        # s2.show()
-
-    def testExpandDaCapoA(self):
-
-        # test one back repeat at end of a measure
-        from music21 import stream
-        from music21 import bar
-        from music21 import note
-
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m2.leftBarline = bar.Repeat(direction='start')
-        rb = bar.Repeat(direction='end')
-        m2.rightBarline = rb
-        m3 = stream.Measure()
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m3.append(DaCapo())
-        m4 = stream.Measure()
-        m4.repeatAppend(note.Note('a4', type='half'), 2)
-
-        s = stream.Part()
-        s.append([m1, m2, m3, m4])
-        ex = Expander(s)
-        self.assertTrue(ex._daCapoIsCoherent())
-        self.assertEqual(ex._daCapoOrSegno(), DaCapo)
-
-        # test incorrect da capo
-        sAlt1 = copy.deepcopy(s)
-        sAlt1[1].append(DaCapoAlFine())
-        ex = Expander(sAlt1)
-        self.assertFalse(ex._daCapoIsCoherent())
-        # rejected here b/c there is more than one
-        self.assertEqual(ex._daCapoOrSegno(), None)
-
-        # a da capo with a coda is not valid
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m2.append(Coda())
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m3 = stream.Measure()
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m3.append(DaCapo())
-        m4 = stream.Measure()
-        m4.repeatAppend(note.Note('a4', type='half'), 2)
-
-        s = stream.Part()
-        s.append([m1, m2, m3, m4])
-        ex = Expander(s)
-        self.assertFalse(ex._daCapoIsCoherent())
-        self.assertEqual(ex._daCapoOrSegno(), DaCapo)
-
-    def testRemoveRepeatExpressions(self):
-        from music21 import stream
-        from music21 import repeat
-        from music21 import bar
-
-        s = stream.Part()
-        m1 = stream.Measure()
-        m2 = stream.Measure()
-        m3 = stream.Measure()
-        m3.append(DaCapo())
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertTrue(ex.isExpandable())
-        self.assertEqual(ex.getRepeatExpressionIndex(s, 'DaCapo'), [2])
-
-        ex._stripRepeatExpressions(m3)
-        ex = repeat.Expander(s)
-        self.assertFalse(ex.isExpandable())
-
-        s = stream.Part()
-        m1 = stream.Measure()
-        m1.append(Segno())
-        m1.append(Coda())
-        m2 = stream.Measure()
-        m3 = stream.Measure()
-        m3.append(Coda())
-        m3.append(DaCapoAlCoda())
-        s.append([m1, m2, m3])
-        ex = repeat.Expander(s)
-        self.assertEqual(ex.getRepeatExpressionIndex(s, Segno), [0])
-        self.assertEqual(ex.getRepeatExpressionIndex(s, 'Segno'), [0])
-        self.assertEqual(ex.getRepeatExpressionIndex(s, 'Coda'), [0, 2])
-        self.assertEqual(ex.getRepeatExpressionIndex(s, 'DaCapoAlCoda'), [2])
-
-        ex._stripRepeatExpressions(s)  # entire part works too
-        ex = repeat.Expander(s)
-        self.assertFalse(ex.isExpandable())
-
-        # case where a d.c. statement is placed at the end of bar that is repeated
-        m1 = stream.Measure()
-        m1.insert(4, Coda('To Coda'))
-        m2 = stream.Measure()
-        m3 = stream.Measure()
-        m3.leftBarline = bar.Repeat(direction='start')
-        m3.rightBarline = bar.Repeat(direction='end')
-        m3.insert(4, DaCapoAlCoda())
-        m4 = stream.Measure()
-        m5 = stream.Measure()
-        m5.append(Coda('Coda'))
-        s = stream.Part()
-        s.append([m1, m2, m3, m4, m5])
-        ex = repeat.Expander(s)
-        self.assertEqual(ex.getRepeatExpressionIndex(s, Coda), [0, 4])
-        self.assertEqual(ex.getRepeatExpressionIndex(s, DaCapoAlCoda), [2])
-
-        dummy = ex.process()
-        # dummy.show()
-
-    def testExpandSimplestPart(self):
-        from music21 import stream
-        p = stream.Part()
-        m = stream.Measure(number=1)
-        p.append(m)
-        p1 = p.expandRepeats()
-        self.assertIsInstance(p1, stream.Part)
-        self.assertEqual(len(p1), 1)
-        self.assertIsInstance(p1[0], stream.Measure)
-        self.assertEqual(p1[0].number, 1)
-
-        s = stream.Score()
-        s.insert(0, p)
-        s1 = s.expandRepeats()
-        self.assertIsInstance(s1, stream.Score)
-        self.assertIsInstance(s1[0], stream.Part)
-
-    def testExpandRepeatExpressionA(self):
-
-        # test one back repeat at end of a measure
-        from music21 import stream
-        from music21 import note
-
-        # a da capo al fine without a fine is not valid
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m3 = stream.Measure()
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m3.append(DaCapoAlFine())
-        m4 = stream.Measure()
-        m4.repeatAppend(note.Note('a4', type='half'), 2)
-
-        s = stream.Part()
-        s.append([m1, m2, m3, m4])
-        ex = Expander(s)
-        self.assertFalse(ex._daCapoIsCoherent())
-        self.assertEqual(ex._daCapoOrSegno(), DaCapo)
-
-        # has both da capo and da segno
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m1.append(DaCapoAlFine())
-        m2 = stream.Measure()
-        m1.append(DalSegnoAlCoda())
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        s = stream.Part()
-        s.append([m1, m2])
-        ex = Expander(s)
-        self.assertFalse(ex._daCapoIsCoherent())
-        self.assertEqual(ex._daCapoOrSegno(), None)
-
-        # segno alone
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m1.append(DalSegnoAlCoda())
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        s = stream.Part()
-        s.append([m1, m2])
-        ex = Expander(s)
-        self.assertFalse(ex._daCapoIsCoherent())
-        self.assertEqual(ex._daCapoOrSegno(), Segno)
-        self.assertFalse(ex._dalSegnoIsCoherent())
-
-        # if nothing, will return None
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        s = stream.Part()
-        s.append([m1])
-        ex = Expander(s)
-        self.assertEqual(ex._daCapoOrSegno(), None)
-
-    def testExpandRepeatExpressionB(self):
-
-        # test one back repeat at end of a measure
-        from music21 import stream
-        from music21 import note
-
-        # simple da capo alone
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m3 = stream.Measure()
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m3.append(DaCapo())
-        m4 = stream.Measure()
-        m4.repeatAppend(note.Note('a4', type='half'), 2)
-        s = stream.Part()
-        s.append([m1, m2, m3, m4])
-        self.assertEqual(len(s.getElementsByClass('Measure')), 4)
-        # s.show()
-        ex = Expander(s)
-        post = ex.process()
-        # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
-        self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
-                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4',
-                          'E4', 'E4', 'G4', 'G4', 'A4', 'A4'])
-
-    def testExpandRepeatExpressionC(self):
-        from music21 import stream
-        from music21 import note
-
-        # da capo al fine
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m2.append(Fine())
-        m3 = stream.Measure()
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m3.append(DaCapoAlFine())
-        m4 = stream.Measure()
-        m4.repeatAppend(note.Note('a4', type='half'), 2)
-        s = stream.Part()
-        s.append([m1, m2, m3, m4])
-        self.assertEqual(len(s.getElementsByClass('Measure')), 4)
-        # s.show()
-        ex = Expander(s)
-        post = ex.process()
-        # post.show()
-        # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 5)
-        self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
-                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4', 'E4', 'E4'])
-
-    def testExpandRepeatExpressionD(self):
-        from music21 import stream
-        from music21 import note
-
-        # da capo al coda
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m2.append(Coda('to coda'))
-        m3 = stream.Measure()
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m3.append(DaCapoAlCoda())
-        m4 = stream.Measure()
-        m4.append(Coda())
-        m4.repeatAppend(note.Note('a4', type='half'), 2)
-        m5 = stream.Measure()
-        m5.repeatAppend(note.Note('b4', type='half'), 2)
-
-        s = stream.Part()
-        s.append([m1, m2, m3, m4, m5])
-        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
-        # s.show()
-        ex = Expander(s)
-        post = ex.process()
-        # post.show()
-        # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
-        self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
-                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'C4', 'C4',
-                          'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
-
-    def testExpandRepeatExpressionE(self):
-        from music21 import repeat
-        from music21 import stream
-        from music21 import note
-        # dal segno simple
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m2.append(repeat.Segno())
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m3 = stream.Measure()
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m4 = stream.Measure()
-        m4.repeatAppend(note.Note('a4', type='half'), 2)
-        m3.append(repeat.DalSegno())
-
-        s = stream.Part()
-        s.append([m1, m2, m3, m4])
-        # s.show()
-        self.assertEqual(len(s.getElementsByClass('Measure')), 4)
-        # s.show()
-        ex = Expander(s)
-        post = ex.process()
-        # post.show()
-        # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 6)
-        self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
-                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'E4', 'E4',
-                          'G4', 'G4', 'A4', 'A4'])
-
-    def testExpandRepeatExpressionF(self):
-        from music21 import stream
-        from music21 import note
-        from music21 import repeat
-        # dal segno al fine
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m2.append(repeat.Segno())
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m3 = stream.Measure()
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m3.append(repeat.Fine())
-        m4 = stream.Measure()
-        m4.repeatAppend(note.Note('a4', type='half'), 2)
-        m4.append(repeat.DalSegnoAlFine())
-        m5 = stream.Measure()
-        m5.repeatAppend(note.Note('b4', type='half'), 2)
-
-        s = stream.Part()
-        s.append([m1, m2, m3, m4, m5])
-        # s.show()
-        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
-        ex = Expander(s)
-        post = ex.process()
-        # post.show()
-        # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 6)
-        self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
-                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4',
-                          'E4', 'E4', 'G4', 'G4'])
-
-    def testExpandRepeatExpressionG(self):
-        from music21 import stream
-        from music21 import note
-        from music21 import repeat
-        # dal segno al coda
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-        m2 = stream.Measure()
-        m2.append(repeat.Segno())
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m2.append(repeat.Coda('to coda'))
-        m3 = stream.Measure()
-        m3.repeatAppend(note.Note('e4', type='half'), 2)
-
-        m4 = stream.Measure()
-        m4.repeatAppend(note.Note('g4', type='half'), 2)
-        m4.append(repeat.DalSegnoAlCoda())
-        m5 = stream.Measure()
-        m5.repeatAppend(note.Note('g4', type='half'), 2)
-        m6 = stream.Measure()
-        m6.append(repeat.Coda('CODA'))
-        m6.repeatAppend(note.Note('a4', type='half'), 2)
-        m7 = stream.Measure()
-        m7.repeatAppend(note.Note('b4', type='half'), 2)
-
-        s = stream.Part()
-        s.append([m1, m2, m3, m4, m5, m6, m7])
-        # s.show()
-        self.assertEqual(len(s.getElementsByClass('Measure')), 7)
-        ex = Expander(s)
-        post = ex.process()
-        # post.show()
-        # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
-        self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
-                         ['C4', 'C4', 'E4', 'E4', 'E4', 'E4', 'G4', 'G4',
-                          'E4', 'E4', 'A4', 'A4', 'B4', 'B4'])
-
-    def testExpandRepeatExpressionH(self):
-        # test one back repeat at end of a measure
-        from music21 import stream
-        from music21 import bar
-        from music21 import note
-
-        # simple da capo alone
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-
-        m2 = stream.Measure()
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-
-        m3 = stream.Measure()
-        m3.leftBarline = bar.Repeat(direction='start')
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        m3.rightBarline = bar.Repeat(direction='end')
-
-        m4 = stream.Measure()
-        m4.repeatAppend(note.Note('a4', type='half'), 2)
-        dcHandle = DaCapo('D.C.')
-        m4.append(dcHandle)
-
-        m5 = stream.Measure()
-        m5.repeatAppend(note.Note('b4', type='half'), 2)
-
-        s = stream.Part()
-        s.append([m1, m2, m3, m4, m5])
-        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
-        # s.show()
-        ex = Expander(s)
-        post = ex.process()
-        # post.show()
-        # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 10)
-        self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
-                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'A4',
-                          'A4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'A4', 'A4',
-                          'B4', 'B4'])
-
-        # test changing repeat after jump
-        dcHandle.repeatAfterJump = True
-        ex = Expander(s)
-        post = ex.process()
-        # post.show()
-        # three measure repeat
-        self.assertEqual(len(post.getElementsByClass('Measure')), 11)
-        self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
-                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4', 'A4',
-                          'A4', 'C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4',
-                          'A4', 'A4', 'B4', 'B4'])
-
-    def testExpandRepeatExpressionI(self):
-        # test one back repeat at end of a measure
-        from music21 import stream
-        from music21 import bar
-        from music21 import note
-        from music21 import repeat
-
-        # simple da capo alone
-        m1 = stream.Measure()
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-
-        m2 = stream.Measure()
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m2.append(repeat.Coda('to coda'))
-
-        m3 = stream.Measure()
-        m3.leftBarline = bar.Repeat(direction='start')
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        dcHandle = repeat.DaCapoAlCoda()
-        m3.append(dcHandle)
-        m3.rightBarline = bar.Repeat(direction='end')
-
-        m4 = stream.Measure()
-        m4.repeatAppend(note.Note('a4', type='half'), 2)
-
-        m5 = stream.Measure()
-        m5.append(repeat.Coda())
-        m5.repeatAppend(note.Note('b4', type='half'), 2)
-
-        s = stream.Part()
-        s.append([m1, m2, m3, m4, m5])
-        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
-        # s.show()
-        # s.expandRepeats().show()
-        ex = Expander(s)
-        post = ex.process()
-        # post.show()
-        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
-        self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
-                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4',
-                          'C4', 'C4', 'E4', 'E4', 'B4', 'B4'])
-
-    def testExpandRepeatExpressionJ(self):
-        # test one back repeat at end of a measure
-        from music21 import stream
-        from music21 import bar
-        from music21 import note
-        from music21 import repeat
-        from music21 import instrument
-
-        # simple da capo alone
-        m1 = stream.Measure()
-        m1.append(repeat.Segno())
-        m1.repeatAppend(note.Note('c4', type='half'), 2)
-
-        m2 = stream.Measure()
-        m2.repeatAppend(note.Note('e4', type='half'), 2)
-        m2.append(repeat.Coda('to coda'))
-
-        m3 = stream.Measure()
-        m3.leftBarline = bar.Repeat(direction='start')
-        m3.repeatAppend(note.Note('g4', type='half'), 2)
-        dsHandle = repeat.DalSegnoAlCoda()
-        m3.append(dsHandle)
-        m3.rightBarline = bar.Repeat(direction='end')
-
-        m4 = stream.Measure()
-        m4.repeatAppend(note.Note('a4', type='half'), 2)
-
-        m5 = stream.Measure()
-        m5.append(repeat.Coda())
-        m5.repeatAppend(note.Note('b4', type='half'), 2)
-
-        s = stream.Part()
-        s.append([m1, m2, m3, m4, m5])
-        # add an instrument
-        s.insert(0, instrument.Trumpet())
-        s.insert(0, spanner.Slur(m1[1], m2[1]))
-
-        self.assertEqual(len(s.getElementsByClass('Measure')), 5)
-
-        # s.show()
-        # ex = Expander(s)
-        # post = ex.process()
-        post = s.expandRepeats()
-        # post.show()
-        self.assertEqual(len(post.getElementsByClass('Measure')), 7)
-        self.assertEqual([x.nameWithOctave for x in post.flatten().pitches],
-                         ['C4', 'C4', 'E4', 'E4', 'G4', 'G4', 'G4', 'G4',
-                          'C4', 'C4', 'E4', 'E4', 'B4', 'B4'])
-
-        # instrument is copied in Stream
-        self.assertEqual(post.getElementsByClass(
-            'Instrument')[0].instrumentName, 'Trumpet')
-
-    def testExpandRepeatsImportedA(self):
-        '''
-        tests expanding repeats in a piece with repeats mid-measure
-
-        Also has grace notes so it tests our importing of grace notes
-        '''
-
-        from music21 import corpus
-        s = corpus.parse('ryansMammoth/BanjoReel')
-        # s.show('text')
-        self.assertEqual(len(s.parts), 1)
-        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 11)
-        self.assertEqual(len(s.parts[0].flatten().notes), 58)
-
-        bars = s.parts[0].flatten().getElementsByClass('Barline')
-        self.assertEqual(len(bars), 3)
-
-        s2 = s.expandRepeats()
-        # s2.show('text')
-
-        self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 20)
-        self.assertEqual(len(s2.parts[0].flatten().notes), 105)
-
-    def testExpandRepeatsImportedB(self):
-        from music21 import corpus
-        s = corpus.parse('GlobeHornpipe')
-        self.assertEqual(len(s.parts), 1)
-        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 18)
-        self.assertEqual(len(s.parts[0].flatten().notes), 125)
-
-        s2 = s.expandRepeats()
-        # s2.show()
-        self.assertEqual(len(s2.parts[0].getElementsByClass('Measure')), 36)
-        self.assertEqual(len(s2.parts[0].flatten().notes), 250)
-        # make sure barlines are stripped
-        bars = s2.parts[0].flatten().getElementsByClass('Repeat')
-        self.assertEqual(len(bars), 0)
-
-#         self.assertEqual(len(s2.parts[0].flatten().notes), 111)
-
-    def testExpandRepeatsImportedC(self):
-        from music21 import converter
-        from music21.musicxml import testPrimitive
-        s = converter.parse(testPrimitive.repeatExpressionsA)
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatExpression')), 3)
-
-        s = converter.parse(testPrimitive.repeatExpressionsB)
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatExpression')), 3)
-
-        # s.show()
-
-    def testRepeatsEndingsA(self):
-        from music21 import converter
-        from music21.musicxml import testPrimitive
-        from music21.musicxml import m21ToXml
-        # from music21.musicxml import testPrimitive
-
-        # this has repeat brackets
-        # these are stored in bar objects as ending tags,
-        # given at start and end
-        #         <ending number="2" type="discontinue"/>
-
-        s = converter.parse(testPrimitive.repeatBracketsA)
-        GEX = m21ToXml.GeneralObjectExporter()
-
-        raw = GEX.parse(s)
-
-        self.assertGreater(raw.find(b'<repeat direction='), 1)
-        self.assertGreater(raw.find(b'<ending number="1" type="start"'), 1)
-        self.assertGreater(raw.find(b'<ending number="1" type="stop"'), 1)
-        self.assertGreater(raw.find(b'<ending number="2" type="start"'), 1)
-        self.assertGreater(raw.find(b'<ending number="2" type="stop"'), 1)
-
-        # TODO: after calling .musicxml, repeat brackets are getting lost
-        # s.show()
-        raw = GEX.parse(s)
-
-        self.assertGreater(raw.find(b'<repeat direction='), 1)
-        self.assertGreater(raw.find(b'<ending number="1" type="start"'), 1)
-        self.assertGreater(raw.find(b'<ending number="1" type="stop"'), 1)
-        self.assertGreater(raw.find(b'<ending number="2" type="start"'), 1)
-        self.assertGreater(raw.find(b'<ending number="2" type="stop"'), 1)
-
-        s1 = copy.deepcopy(s)
-        # s.show()
-
-        # s1.show()
-        ex = Expander(s1.parts[0])
-        self.assertEqual(len(ex._repeatBrackets), 2)
-
-    def testRepeatEndingsB(self):
-        from music21 import stream
-        from music21 import note
-        from music21 import bar
-
-        p = stream.Part()
-        m1 = stream.Measure()
-        m1.append(note.Note('c4', type='whole'))
-        m2 = stream.Measure()
-        m2.append(note.Note('d4', type='whole'))
-        m3 = stream.Measure()
-        m3.append(note.Note('e4', type='whole'))
-        m4 = stream.Measure()
-        m4.append(note.Note('f4', type='whole'))
-        m5 = stream.Measure()
-        m5.append(note.Note('g4', type='whole'))
-
-        p.append([m1, m2, m3, m4, m5])
-        rb1 = spanner.RepeatBracket([m2, m3], number=1)
-        m3.rightBarline = bar.Repeat()
-        self.assertTrue(rb1.hasSpannedElement(m2))
-        self.assertTrue(rb1.hasSpannedElement(m3))
-        p.append(rb1)
-
-        rb2 = spanner.RepeatBracket(m4, number=2)
-        self.assertTrue(rb2.hasSpannedElement(m4))
-        m4.rightBarline = bar.Repeat()
-        p.append(rb2)
-
-        ex = Expander(p)
-        self.assertTrue(ex._repeatBracketsAreCoherent())
-
-        # if we change the numbers no longer coherent
-        rb2.number = 30
-        self.assertFalse(ex._repeatBracketsAreCoherent())
-        rb2.number = 2
-        self.assertTrue(ex._repeatBracketsAreCoherent())
-        rb1.number = 2
-        rb2.number = 1
-        self.assertFalse(ex._repeatBracketsAreCoherent())
-
-        rb1.number = 1
-        rb2.number = 2
-        self.assertTrue(ex._repeatBracketsAreCoherent())
-
-        self.assertTrue(ex.repeatBarsAreCoherent())
-
-        # p.show()
-
-    def testRepeatEndingsB2(self):
-        from music21 import stream
-        from music21 import note
-        from music21 import bar
-
-        p = stream.Part()
-        m1 = stream.Measure()
-        m1.append(note.Note('c4', type='whole'))
-        m2 = stream.Measure()
-        m2.append(note.Note('d4', type='whole'))
-        m3 = stream.Measure()
-        m3.append(note.Note('e4', type='whole'))
-        m4 = stream.Measure()
-        m4.append(note.Note('f4', type='whole'))
-        m5 = stream.Measure()
-        m5.append(note.Note('g4', type='whole'))
-
-        p.append([m1, m2, m3, m4, m5])
-        rb1 = spanner.RepeatBracket([m2, m3], number=1)
-        m3.rightBarline = bar.Repeat()
-        self.assertTrue(rb1.hasSpannedElement(m2))
-        self.assertTrue(rb1.hasSpannedElement(m3))
-        p.append(rb1)
-
-        rb2 = spanner.RepeatBracket(m4, number=2)
-        self.assertTrue(rb2.hasSpannedElement(m4))
-        m4.rightBarline = bar.Repeat()
-        p.append(rb2)
-
-        ex = Expander(p)
-        self.assertTrue(ex._repeatBracketsAreCoherent())
-
-        # if we change the numbers no longer coherent
-        rb2.number = 30
-        self.assertFalse(ex._repeatBracketsAreCoherent())
-        rb2.number = 2
-        self.assertTrue(ex._repeatBracketsAreCoherent())
-        rb1.number = 2
-        rb2.number = 1
-        self.assertFalse(ex._repeatBracketsAreCoherent())
-
-        rb1.number = 1
-        rb2.number = 2
-        self.assertTrue(ex._repeatBracketsAreCoherent())
-
-        self.assertTrue(ex.repeatBarsAreCoherent())
-
-        # p.show()
-
-    def testRepeatEndingsC(self):
-        from music21 import stream
-        from music21 import note
-        from music21 import bar
-
-        p = stream.Part()
-        m1 = stream.Measure()
-        m1.append(note.Note('c4', type='whole'))
-        m2 = stream.Measure()
-        m2.append(note.Note('d4', type='whole'))
-        m3 = stream.Measure()
-        m3.append(note.Note('e4', type='whole'))
-        m4 = stream.Measure()
-        m4.append(note.Note('f4', type='whole'))
-        m5 = stream.Measure()
-        m5.append(note.Note('g4', type='whole'))
-
-        p.append([m1, m2, m3, m4, m5])
-        rb1 = spanner.RepeatBracket([m2, m3], number=1)
-        p.append(rb1)
-        # one repeat bracket w/o a repeat bar; makes no sense, should be
-        # rejected
-        ex = Expander(p)
-        self.assertFalse(ex._repeatBracketsAreCoherent())
-
-        m3.rightBarline = bar.Repeat()
-        # coherent after setting the barline
-        ex = Expander(p)
-        self.assertTrue(ex._repeatBracketsAreCoherent())
-
-        # a second repeat bracket need not have a repeat ending
-        rb2 = spanner.RepeatBracket(m4, number=2)
-        p.append(rb2)
-        ex = Expander(p)
-        self.assertTrue(ex._repeatBracketsAreCoherent())
-
-        m4.rightBarline = bar.Repeat()
-        ex = Expander(p)
-        self.assertTrue(ex._repeatBracketsAreCoherent())
-
-    def testRepeatEndingsD(self):
-        from music21 import stream
-        from music21 import note
-        from music21 import bar
-
-        p = stream.Part()
-        m1 = stream.Measure(number=1)
-        m1.append(note.Note('c4', type='whole'))
-        m2 = stream.Measure(number=2)
-        m2.append(note.Note('d4', type='whole'))
-        m3 = stream.Measure(number=3)
-        m3.append(note.Note('e4', type='whole'))
-        m4 = stream.Measure(number=4)
-        m4.append(note.Note('f4', type='whole'))
-        m5 = stream.Measure(number=5)
-        m5.append(note.Note('g4', type='whole'))
-
-        p.append([m1, m2, m3, m4, m5])
-        rb1 = spanner.RepeatBracket([m2, m3], number=1)
-        p.append(rb1)
-        m3.rightBarline = bar.Repeat()
-
-        unused_ex = Expander(p)
-        # self.assertTrue(ex._repeatBracketsAreCoherent())
-        # overlapping at m3
-        rb2 = spanner.RepeatBracket([m3, m4], number=2)
-        p.append(rb2)
-        m4.rightBarline = bar.Repeat()
-        # p.show()
-        # even with the right repeat, these are overlapping and should fail
-        ex = Expander(p)
-        self.assertFalse(ex._repeatBracketsAreCoherent())
-        # can fix overlap even after insertion
-#         rb2.replaceSpannedElement(m3, m5)
-#         self.assertTrue(ex._repeatBracketsAreCoherent())
-
-    def testRepeatEndingsE(self):
-        '''Expanding two endings (1, 2, then 3) without a start repeat
-        '''
-        from music21 import stream
-        from music21 import note
-        from music21 import bar
-
-        p = stream.Part()
-        m1 = stream.Measure()
-        m1.append(note.Note('c4', type='whole'))
-        m2 = stream.Measure()
-        m2.append(note.Note('d4', type='whole'))
-        m3 = stream.Measure()
-        m3.append(note.Note('e4', type='whole'))
-        m4 = stream.Measure()
-        m4.append(note.Note('f4', type='whole'))
-        m5 = stream.Measure()
-        m5.append(note.Note('g4', type='whole'))
-
-        p.append([m1, m2, m3, m4, m5])
-        rb1 = spanner.RepeatBracket([m2, m3], number='1,2')
-        m3.rightBarline = bar.Repeat()
-        p.append(rb1)
-        rb2 = spanner.RepeatBracket(m4, number=3)
-        # second ending may not have repeat
-        p.append(rb2)
-        # p.show()
-
-        ex = Expander(p)
-        self.assertTrue(ex._repeatBracketsAreCoherent())
-        self.assertTrue(ex.isExpandable())
-
-        self.assertEqual(ex.findInnermostRepeatIndices(p), [0, 1, 2])
-        # get groups of brackets; note that this does not get the end
-        post = ex._groupRepeatBracketIndices(p)
-        self.assertEqual(post[0]['measureIndices'], [1, 2, 3])
-
-    def testRepeatEndingsF(self):
-        '''Two sets of two endings (1, 2, then 3) without a start repeat
-        '''
-        from music21 import stream
-        from music21 import note
-        from music21 import bar
-
-        p = stream.Part()
-        m1 = stream.Measure()
-        m1.append(note.Note('c4', type='whole'))
-        m2 = stream.Measure()
-        m2.append(note.Note('d4', type='whole'))
-        m3 = stream.Measure()
-        m3.append(note.Note('e4', type='whole'))
-        m4 = stream.Measure()
-        m4.append(note.Note('f4', type='whole'))
-        m5 = stream.Measure()
-        m5.append(note.Note('g4', type='whole'))
-        m6 = stream.Measure()
-        m6.append(note.Note('a4', type='whole'))
-        m7 = stream.Measure()
-        m7.append(note.Note('b4', type='whole'))
-        m8 = stream.Measure()
-        m8.append(note.Note('c5', type='whole'))
-
-        p.append([m1, m2, m3, m4, m5, m6, m7, m8])
-        rb1 = spanner.RepeatBracket([m2, m3], number='1,2')
-        m3.rightBarline = bar.Repeat()
-        p.append(rb1)
-        rb2 = spanner.RepeatBracket(m4, number=3)
-        p.append(rb2)
-
-        # second group
-        m5.leftBarline = bar.Repeat()
-        m6.rightBarline = bar.Repeat()
-        rb3 = spanner.RepeatBracket(m6, number='1-3')
-        p.append(rb3)
-        m7.rightBarline = bar.Repeat()
-        rb4 = spanner.RepeatBracket(m7, number=4)
-        p.append(rb4)
-        rb5 = spanner.RepeatBracket(m8, number=5)
-        p.append(rb5)
-        # second ending may not have repeat
-        # p.show()
-
-        ex = Expander(p)
-        self.assertTrue(ex._repeatBracketsAreCoherent())
-        self.assertTrue(ex.isExpandable())
-
-        self.assertEqual(ex.findInnermostRepeatIndices(p[3:]), [1, 2])
-#         # get groups of brackets
-        # returns a list of dictionaries
-        post = ex._groupRepeatBracketIndices(p)
-        self.assertEqual(post[0]['measureIndices'], [1, 2, 3])
-        self.assertEqual(post[1]['measureIndices'], [5, 6, 7])
-
-    def testRepeatEndingsG(self):
-        '''Two sets of two endings (1, 2, then 3) without a start repeat
-        '''
-        from music21 import stream
-        from music21 import note
-        from music21 import bar
-
-        p = stream.Part()
-        m1 = stream.Measure()
-        m1.append(note.Note('c4', type='whole'))
-        m2 = stream.Measure()
-        m2.append(note.Note('d4', type='whole'))
-        m3 = stream.Measure()
-        m3.append(note.Note('e4', type='whole'))
-        m4 = stream.Measure()
-        m4.append(note.Note('f4', type='whole'))
-        m5 = stream.Measure()
-        m5.append(note.Note('g4', type='whole'))
-        m6 = stream.Measure()
-        m6.append(note.Note('a4', type='whole'))
-        m7 = stream.Measure()
-        m7.append(note.Note('b4', type='whole'))
-        m8 = stream.Measure()
-        m8.append(note.Note('c5', type='whole'))
-
-        p.append([m1, m2, m3, m4, m5])
-        # p.append([m1, m2, m3, m4, m5, m6, m7, m8])
-        rb1 = spanner.RepeatBracket([m2, m3], number='1,2')
-        m3.rightBarline = bar.Repeat()
-        p.append(rb1)
-        rb2 = spanner.RepeatBracket(m4, number=3)
-        p.append(rb2)
-        # p.show()
-
-        ex = Expander(p)
-        self.assertTrue(ex.isExpandable())
-        post = ex.process()
-        # post.show()
-        self.assertEqual(len(post), 9)
-        self.assertEqual([n.name for n in post.flatten().notes],
-                         ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'G'])
-        # post.show()
-
-    def testRepeatEndingsH(self):
-        '''Two sets of two endings (1, 2, then 3) without a start repeat
-        '''
-        from music21 import stream
-        from music21 import note
-        from music21 import bar
-
-        p = stream.Part()
-        m1 = stream.Measure(number=1)
-        m1.append(note.Note('c4', type='whole'))
-        m2 = stream.Measure(number=2)
-        m2.append(note.Note('d4', type='whole'))
-        m3 = stream.Measure(number=3)
-        m3.append(note.Note('e4', type='whole'))
-        m4 = stream.Measure(number=4)
-        m4.append(note.Note('f4', type='whole'))
-        m5 = stream.Measure(number=5)
-        m5.append(note.Note('g4', type='whole'))
-        m6 = stream.Measure(number=6)
-        m6.append(note.Note('a4', type='whole'))
-        m7 = stream.Measure(number=7)
-        m7.append(note.Note('b4', type='whole'))
-        m8 = stream.Measure(number=8)
-        m8.append(note.Note('c5', type='whole'))
-
-        p.append([m1, m2, m3, m4, m5, m6, m7, m8])
-        rb1 = spanner.RepeatBracket([m2, m3], number='1,2')
-        m3.rightBarline = bar.Repeat()
-        p.append(rb1)
-
-        rb2 = spanner.RepeatBracket(m4, number=3)
-        p.append(rb2)
-        m4.rightBarline = bar.Repeat()
-
-        rb3 = spanner.RepeatBracket(m5, number=4)
-        p.append(rb3)
-
-        # p.show()
-        ex = Expander(p)
-        self.assertTrue(ex.isExpandable())
-        post = ex.process()
-        environLocal.printDebug(['post process', [n.name for n in post.flatten().notes]])
-        # post.show()
-        self.assertEqual(len(post), 13)
-        self.assertEqual([n.name for n in post.flatten().notes],
-                         ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'C', 'G', 'A', 'B', 'C'])
-
-    def testRepeatEndingsI(self):
-        '''Two sets of two endings (1, 2, then 3) without a start repeat
-        '''
-        from music21 import stream
-        from music21 import note
-        from music21 import bar
-
-        p = stream.Part()
-        m1 = stream.Measure(number=1)
-        m1.append(note.Note('c4', type='whole'))
-        m2 = stream.Measure(number=2)
-        m2.append(note.Note('d4', type='whole'))
-        m3 = stream.Measure(number=3)
-        m3.append(note.Note('e4', type='whole'))
-        m4 = stream.Measure(number=4)
-        m4.append(note.Note('f4', type='whole'))
-        m5 = stream.Measure(number=5)
-        m5.append(note.Note('g4', type='whole'))
-        m6 = stream.Measure(number=6)
-        m6.append(note.Note('a4', type='whole'))
-        m7 = stream.Measure(number=7)
-        m7.append(note.Note('b4', type='whole'))
-        m8 = stream.Measure(number=8)
-        m8.append(note.Note('c5', type='whole'))
-
-        p.append([m1, m2, m3, m4, m5, m6, m7, m8])
-        rb1 = spanner.RepeatBracket([m2, m3], number='1,2')
-        m3.rightBarline = bar.Repeat()
-        p.append(rb1)
-
-        rb2 = spanner.RepeatBracket(m4, number=3)
-        p.append(rb2)
-        m4.rightBarline = bar.Repeat()
-
-        # second group
-        m5.leftBarline = bar.Repeat()
-        m6.rightBarline = bar.Repeat()
-        rb3 = spanner.RepeatBracket(m6, number='1-3')
-        p.append(rb3)
-        m7.rightBarline = bar.Repeat()
-        rb4 = spanner.RepeatBracket(m7, number=4)
-        p.append(rb4)
-        rb5 = spanner.RepeatBracket(m8, number=5)
-        p.append(rb5)
-        # second ending may not have repeat
-        # p.show()
-
-        # p.show()
-        ex = Expander(p)
-        self.assertTrue(ex.isExpandable())
-        post = ex.process()
-        # post.show()
-#
-        self.assertEqual(len(post), 18)
-        self.assertEqual([n.name for n in post.flatten().notes],
-                         ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'G', 'A',
-                          'G', 'A', 'G', 'A', 'G', 'B', 'G', 'C'])
-
-    def testRepeatEndingsJ(self):
-        '''Two sets of two endings (1, 2, then 3) without a start repeat
-        '''
-        from music21 import stream
-        from music21 import note
-        from music21 import bar
-
-        p = stream.Part()
-        m1 = stream.Measure(number=1)
-        m1.append(note.Note('c4', type='whole'))
-        m2 = stream.Measure(number=2)
-        m2.append(note.Note('d4', type='whole'))
-        m3 = stream.Measure(number=3)
-        m3.append(note.Note('e4', type='whole'))
-        m4 = stream.Measure(number=4)
-        m4.append(note.Note('f4', type='whole'))
-        m5 = stream.Measure(number=5)
-        m5.append(note.Note('g4', type='whole'))
-        m6 = stream.Measure(number=6)
-        n1 = note.Note('a4', type='half')
-        n2 = note.Note('a4', type='half')
-        m6.append([n1, n2])
-        m7 = stream.Measure(number=7)
-        m7.append(note.Note('b4', type='whole'))
-        m8 = stream.Measure(number=8)
-        m8.append(note.Note('c5', type='whole'))
-
-        m9 = stream.Measure(number=9)
-        m9.append(note.Note('d5', type='whole'))
-        m10 = stream.Measure(number=10)
-        m10.append(note.Note('e5', type='whole'))
-        m11 = stream.Measure(number=11)
-        m11.append(note.Note('f5', type='whole'))
-        m12 = stream.Measure(number=12)
-        m12.append(note.Note('g5', type='whole'))
-
-        p.append([m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12])
-
-        rb1 = spanner.RepeatBracket([m2, m3], number='1,2')
-        p.append(rb1)
-        m3.rightBarline = bar.Repeat()
-
-        rb2 = spanner.RepeatBracket(m4, number=3)
-        p.append(rb2)
-
-        # second group
-        m5.leftBarline = bar.Repeat()
-        m6.leftBarline = bar.Repeat()  # nested repeat
-        m6.rightBarline = bar.Repeat()
-
-        rb3 = spanner.RepeatBracket(m7, number='1-3')
-        p.append(rb3)
-        m7.rightBarline = bar.Repeat()
-
-        rb4 = spanner.RepeatBracket([m8, m10], number='4,5')
-        p.append(rb4)
-        m10.rightBarline = bar.Repeat()
-
-        rb5 = spanner.RepeatBracket([m11], number='6')
-        p.append(rb5)  # not a repeat per se
-
-        # p.show()
-
-        #         ex = Expander(p)
-        #         self.assertTrue(ex.isExpandable())
-        #         post = ex.process()
-        #         post.show()
-
-        post = p.expandRepeats()
-        self.assertEqual(len(post), 37)
-        # post.show()
-        # self.assertEqual(len(post), 18)
-        # self.assertEqual([n.name for n in post.flatten().notes],
-        #     ['C', 'D', 'E', 'C', 'D', 'E', 'C', 'F', 'G', 'A', 'G', 'A', 'G',
-        #      'A', 'G', 'B', 'G', 'C'])
-
-    def testRepeatEndingsImportedA(self):
-        from music21 import corpus
-        s = corpus.parse('ryansMammoth/BanjoReel')
-        # s.show()
-        firstNotesList = list(s.flatten().notes)
-        # [0:16][16:22][0:16][22:27][27:58][27:58]
-        expandedByHandList = (firstNotesList[0:16] + firstNotesList[16:22]
-                              + firstNotesList[0:16] + firstNotesList[22:27]
-                              + firstNotesList[27:58] + firstNotesList[27:58])
-        expandedByHandNoteNames = [n.nameWithOctave for n in expandedByHandList]
-        ex = Expander(s.parts[0])
-        post = ex.process()
-        # post.show()
-        # print([n.nameWithOctave for n in post.flatten().notes])
-        # post.show()
-        secondNotesList = list(post.flatten().notes)
-        secondNotesNoteNames = [n.nameWithOctave for n in secondNotesList]
-        self.assertEqual(expandedByHandNoteNames, secondNotesNoteNames)
-
-    def testRepeatEndingsImportedB(self):
-        from music21 import corpus
-        # last alternate endings in last bars
-        # need to add import from abc
-        s = corpus.parse('ryansMammoth/SmugglersReel')
-        # s.parts[0].show()
-        ex = Expander(s.parts[0])
-        # this is a Stream resulting form getElements
-        self.assertEqual(len(ex._repeatBrackets), 2)
-        # s.show()
-        unused_post = ex.process()
-        # post.show()
-
-    def testRepeatEndingsImportedC(self):
-
-        from music21 import converter
-        from music21.abcFormat import testFiles
-
-        s = converter.parse(testFiles.mysteryReel)
-        # s.show()
-        post = s.expandRepeats()
-        # post.show()
-        self.assertEqual(len(post.parts[0]), 32)
-
-#         s = converter.parse(testFiles.hectorTheHero)
-#         s.show()
-#         post = s.expandRepeats()
-
-
-# ------------------------------------------------------------------------------
+# Tests have been moved to test/test_repeat.py in order to get better import tests.
 # define presented order in documentation
 _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine,
               RepeatExpressionCommand, DaCapo, DaCapoAlFine,
@@ -4373,5 +2605,5 @@ _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine,
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testExpandSimplestPart')
+    music21.mainTest()
 

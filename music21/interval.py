@@ -3,12 +3,12 @@
 # Name:         interval.py
 # Purpose:      music21 classes for representing intervals
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Jackie Rogoff
 #               Amy Hailes
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -25,7 +25,7 @@ import enum
 import math
 import re
 import unittest
-from typing import Union, Tuple, Optional
+from typing import Dict, Union, Tuple, Optional
 
 from music21 import base
 from music21 import common
@@ -35,8 +35,7 @@ from music21 import exceptions21
 from music21.common.decorators import cacheMethod
 
 from music21 import environment
-_MOD = 'interval'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('interval')
 
 # ------------------------------------------------------------------------------
 # constants
@@ -63,7 +62,7 @@ niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished'
                  'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented',
                  'Triply-Diminished', 'Quadruply-Augmented', 'Quadruply-Diminished']
 
-prefixSpecs = [None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd', 'AAAA', 'dddd']
+prefixSpecs = (None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd', 'AAAA', 'dddd')
 
 class Specifier(enum.IntEnum):
     '''
@@ -318,10 +317,10 @@ def _extractPitch(nOrP: Union['music21.note.Note', 'music21.pitch.Pitch']):
     True
 
     '''
-    if hasattr(nOrP, 'pitch'):
+    from music21 import note
+    if isinstance(nOrP, note.Note):
         return nOrP.pitch
-    else:
-        return nOrP
+    return nOrP
 
 
 def convertStaffDistanceToInterval(staffDist):
@@ -461,8 +460,10 @@ def parseSpecifier(value: Union[str, int, Specifier]) -> Specifier:
     # permit specifiers as prefixes without case; this will not distinguish
     # between m and M, but was taken care of in the line above
     if value.lower() in [x.lower() for x in prefixSpecs[1:]]:
-        for i in range(1, len(prefixSpecs)):
-            if value.lower() == prefixSpecs[i].lower():
+        for i, prefix in enumerate(prefixSpecs):
+            if prefix is None:
+                continue
+            if value.lower() == prefix.lower():
                 return Specifier(i)
 
     if value.lower() in [x.lower() for x in niceSpecNames[1:]]:
@@ -620,7 +621,7 @@ def convertSemitoneToSpecifierGeneric(count: int) -> Tuple[Specifier, int]:
     return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
 
 
-_pythagorean_cache = {}
+_pythagorean_cache: Dict[str, Fraction] = {}
 
 
 def intervalToPythagoreanRatio(intervalObj):
@@ -715,6 +716,14 @@ class IntervalBase(base.Music21Object):
 
     @abc.abstractmethod
     def transposePitch(self, pitch1, *, inPlace=False):
+        '''
+        IntervalBase does not know how to do this, so it must be overridden in
+        derived classes.
+        '''
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def reverse(self):
         '''
         IntervalBase does not know how to do this, so it must be overridden in
         derived classes.
@@ -1394,7 +1403,7 @@ class GenericInterval(IntervalBase):
         >>> bPitch
         <music21.pitch.Pitch D5>
 
-        But if a key or keySignature (such as one from .getContextByClass('KeySignature')
+        But if a key or keySignature (such as one from .getContextByClass(key.KeySignature)
         is given, then the fun begins...
 
         >>> fis = pitch.Pitch('F#4')
@@ -1622,16 +1631,16 @@ class DiatonicInterval(IntervalBase):
 
     def __init__(self,
                  specifier: Union[str, int] = 'P',
-                 generic: Union[int, GenericInterval] = 1):
+                 generic: Union[int, GenericInterval, str] = 1):
         super().__init__()
 
         self.generic: GenericInterval
         self.specifier: Specifier
 
-        if common.isNum(generic) or isinstance(generic, str):
-            self.generic = GenericInterval(generic)
-        elif isinstance(generic, GenericInterval):
+        if isinstance(generic, GenericInterval):
             self.generic = generic
+        elif common.isNum(generic) or isinstance(generic, str):
+            self.generic = GenericInterval(generic)
         else:  # pragma: no cover
             # too rare to cover.
             raise IntervalException(f'incorrect generic argument: {generic!r}')

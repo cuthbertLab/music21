@@ -4,21 +4,22 @@
 # Purpose:      Change music21 PartStaff objects to single musicxml parts
 #
 # Authors:      Jacob Tyler Walls
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2020-22 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 A mixin to ScoreExporter that includes the capabilities for producing a single
 MusicXML `<part>` from multiple music21 `PartStaff` objects.
 '''
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union, Type
 import unittest
 import warnings
 from xml.etree.ElementTree import Element, SubElement, Comment
 
 from music21.common.misc import flattenList
+from music21.common.types import M21ObjType
 from music21.key import KeySignature
 from music21.layout import StaffGroup
 from music21.meter import TimeSignature
@@ -135,6 +136,8 @@ class PartStaffExporterMixin:
         # starting with v.7, self.groupsToJoin is already set earlier,
         # but check to be safe
         if not self.groupsToJoin:
+            # this is done in the non-mixin class.
+            # noinspection PyAttributeOutsideInit
             self.groupsToJoin = self.joinableGroups()
         for group in self.groupsToJoin:
             self.addStaffTagsMultiStaffParts(group)
@@ -145,9 +148,11 @@ class PartStaffExporterMixin:
     def joinableGroups(self) -> List[StaffGroup]:
         '''
         Returns a list of :class:`~music21.layout.StaffGroup` objects that
-        represent :class:`~music21.stream.PartStaff` objects that can be
+        represent :class:`~music21.stream.base.PartStaff` objects that can be
         joined into a single MusicXML `<part>`, so long as there exists a
-        `PartExporter` for it in `ScoreExporter.partExporterList`:
+        `PartExporter` for it in `ScoreExporter.partExporterList`.
+
+        Sets :attr:`~music21.musicxml.m21ToXml.PartExporter.previousPartStaffInGroup`.
 
         >>> s = stream.Score()
 
@@ -220,7 +225,7 @@ class PartStaffExporterMixin:
          <music21.layout.StaffGroup <... p2a><... p2b>>,
          <music21.layout.StaffGroup <... p6a><... p6b>>]
         '''
-        staffGroups = self.stream.getElementsByClass('StaffGroup')
+        staffGroups = self.stream.getElementsByClass(StaffGroup)
         joinableGroups: List[StaffGroup] = []
         # Joinable groups must consist of only PartStaffs with Measures
         # and exist in self.stream
@@ -229,7 +234,7 @@ class PartStaffExporterMixin:
                 continue
             if not all(stream.PartStaff in p.classSet for p in sg):
                 continue
-            if not all(p.getElementsByClass('Measure') for p in sg):
+            if not all(p.getElementsByClass(stream.Measure) for p in sg):
                 continue
             try:
                 for p in sg:
@@ -253,6 +258,17 @@ class PartStaffExporterMixin:
             warnings.warn(
                 MusicXMLWarning('Got overlapping StaffGroups; will not merge ANY groups.'))
             return []
+
+        # Finally, store a reference to earlier siblings (if any) on PartExporters
+        for group in deduplicatedGroups:
+            prior_part_staff = None
+            for part_staff in group:
+                for part_exporter in self.partExporterList:
+                    if part_exporter.stream is not part_staff:
+                        continue
+                    part_exporter.previousPartStaffInGroup = prior_part_staff
+                    prior_part_staff = part_staff
+                    break
 
         return deduplicatedGroups
 
@@ -321,7 +337,7 @@ class PartStaffExporterMixin:
     def movePartStaffMeasureContents(self, group: StaffGroup):
         '''
         For every <part> after the first, find the corresponding measure in the initial
-        <part> and merge the contents by inserting all of the contained elements.
+        <part> and merge the contents by inserting all contained elements.
 
         Called by :meth:`joinPartStaffs`
 
@@ -344,7 +360,11 @@ class PartStaffExporterMixin:
                     target.insert(originalIdx + insertionCounter, element)
                     insertionCounter += 1
 
-    def processSubsequentPartStaff(self, target: Element, source: Element, staffNum: int) -> Dict:
+    def processSubsequentPartStaff(self,
+                                   target: Element,
+                                   source: Element,
+                                   staffNum: int
+                                   ) -> Dict[int, List[Element]]:
         '''
         Move elements from subsequent PartStaff's measures into `target`: the <part>
         element representing the initial PartStaff that will soon represent the merged whole.
@@ -357,9 +377,12 @@ class PartStaffExporterMixin:
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
 
+        def makeDivider(inner_sourceNumber: Union[int, str]) -> Element:
+            return Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, str(inner_sourceNumber)))
+
         sourceMeasures = iter(source.findall('measure'))
         sourceMeasure = None  # Set back to None when disposed of
-        insertions = {}
+        insertions: Dict[int, List[Element]] = {}
 
         # Walk through <measures> of the target <part>, compare measure numbers
         for i, targetMeasure in enumerate(target):
@@ -388,11 +411,9 @@ class PartStaffExporterMixin:
 
             # Or, gap in measure numbers in target: record necessary insertions until gap is closed
             while helpers.measureNumberComesBefore(sourceNumber, targetNumber):
-                divider: Element = Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
-                try:
-                    insertions[i] += [divider, sourceMeasure]
-                except KeyError:
-                    insertions[i] = [divider, sourceMeasure]
+                if i not in insertions:
+                    insertions[i] = []
+                insertions[i] += [makeDivider(sourceNumber), sourceMeasure]
                 try:
                     sourceMeasure = next(sourceMeasures)
                 except StopIteration:
@@ -407,11 +428,10 @@ class PartStaffExporterMixin:
             remainingMeasures.insert(0, sourceMeasure)
         for remaining in remainingMeasures:
             sourceNumber = remaining.get('number')
-            divider: Element = Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
-            try:
-                insertions[len(target)] += [divider, remaining]
-            except KeyError:
-                insertions[len(target)] = [divider, remaining]
+            idx = len(target)
+            if idx not in insertions:
+                insertions[idx] = []
+            insertions[idx] += [makeDivider(sourceNumber), remaining]
         return insertions
 
     def setEarliestAttributesAndClefsPartStaff(self, group: StaffGroup):
@@ -497,14 +517,16 @@ class PartStaffExporterMixin:
         </measure>
         '''
 
-        def isMultiAttribute(m21Class, comparison: str = '__eq__') -> bool:
+        def isMultiAttribute(m21Class: Type[M21ObjType],
+                             comparison: str = '__eq__') -> bool:
             '''
             Return True if any first instance of m21Class in any subsequent staff
             in this StaffGroup does not compare to the first instance of that class
             in the earliest staff where found (not necessarily the first) using `comparison`.
             '''
-            initialM21Instance: Optional[m21Class] = None
-            for ps in group:
+            initialM21Instance: Optional[M21ObjType] = None
+            # noinspection PyShadowingNames
+            for ps in group:  # ps okay to reuse.
                 if initialM21Instance is None:
                     initialM21Instance = ps.recurse().getElementsByClass(m21Class).first()
                 else:
@@ -528,7 +550,7 @@ class PartStaffExporterMixin:
             # Initial PartStaff in group: find earliest mxAttributes, set clef #1 and <staves>
             if initialPartStaffRoot is None:
                 initialPartStaffRoot = self.getRootForPartStaff(ps)
-                mxAttributes: Element = initialPartStaffRoot.find('measure/attributes')
+                mxAttributes = initialPartStaffRoot.find('measure/attributes')
                 clef1: Optional[Element] = mxAttributes.find('clef')
                 if clef1 is not None:
                     clef1.set('number', '1')
@@ -617,8 +639,9 @@ class PartStaffExporterMixin:
             partStaffRoot: Element = self.getRootForPartStaff(ps)
             # Remove PartStaff from export list
             # noinspection PyAttributeOutsideInit
-            self.partExporterList = [pex for pex in self.partExporterList
-                                        if pex.xmlRoot != partStaffRoot]
+            self.partExporterList: List[music21.musicxml.m21ToXml.PartExporter] = [
+                pex for pex in self.partExporterList if pex.xmlRoot != partStaffRoot
+            ]
 
     @staticmethod
     def moveMeasureContents(measure: Element, otherMeasure: Element, staffNumber: int):
@@ -667,17 +690,17 @@ class PartStaffExporterMixin:
         maxVoices: int = 0
         otherMeasureLackedVoice: bool = False
 
-        for voice in otherMeasure.findall('*/voice'):
-            maxVoices = max(maxVoices, int(voice.text))
+        for other_voice in otherMeasure.findall('*/voice'):
+            maxVoices = max(maxVoices, int(other_voice.text))
 
         if maxVoices == 0:
             otherMeasureLackedVoice = True
             for elem in otherMeasure.findall('note'):
-                voice = Element('voice')
-                voice.text = '1'
+                new_voice = Element('voice')
+                new_voice.text = '1'
                 helpers.insertBeforeElements(
                     elem,
-                    voice,
+                    new_voice,
                     tagList=[
                         'type', 'dot', 'accidental', 'time-modification',
                         'stem', 'notehead', 'notehead-text', 'staff',
@@ -972,6 +995,30 @@ class Test(unittest.TestCase):
         SX = ScoreExporter(b)
         SX.parse()
         SX.parse()
+
+    def testMeterChanges(self):
+        from music21 import layout
+        from music21 import meter
+        from music21 import note
+
+        ps1 = stream.PartStaff()
+        ps2 = stream.PartStaff()
+        sg = layout.StaffGroup([ps1, ps2])
+        s = stream.Score([ps1, ps2, sg])
+        for ps in ps1, ps2:
+            ps.insert(0, meter.TimeSignature('3/1'))
+            ps.repeatAppend(note.Note(type='whole'), 6)
+            ps.makeNotation(inPlace=True)  # makes measures
+            ps[stream.Measure][1].insert(meter.TimeSignature('4/1'))
+
+        root = self.getET(s)
+        # Just two <attributes> tags, a 3/1 in measure 1 and a 4/1 in measure 2
+        self.assertEqual(len(root.findall('part/measure/attributes/time')), 2)
+
+        # Edge cases -- no expectation of correctness, just don't crash
+        ps1[stream.Measure].last().number = 0  # was measure 2
+        root = self.getET(s)
+        self.assertEqual(len(root.findall('part/measure/attributes/time')), 3)
 
 
 if __name__ == '__main__':

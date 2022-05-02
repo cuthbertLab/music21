@@ -4,10 +4,10 @@
 # Purpose:      Provide a common way to create Streams from any data music21
 #               handles
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -22,7 +22,7 @@ function. Simply provide a filename, URL, or text string and, if the format
 is supported, a :class:`~music21.stream.Score` will be returned.
 
 
-This is the most general public interface for all formats.  Programmers
+This is the most general, public interface for all formats.  Programmers
 adding their own formats to the system should provide an interface here to
 their own parsers (such as humdrum, musicxml, etc.)
 
@@ -48,7 +48,7 @@ import urllib
 import zipfile
 
 from math import isclose
-from typing import Union, Tuple
+from typing import Union, Tuple, List, Callable, Optional
 
 __all__ = [
     'subConverters', 'ArchiveManagerException', 'PickleFilterException',
@@ -70,8 +70,7 @@ from music21.metadata import bundles
 from music21 import _version
 from music21 import environment
 
-_MOD = 'converter'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('converter')
 
 
 # ------------------------------------------------------------------------------
@@ -95,7 +94,7 @@ class ConverterFileException(exceptions21.Music21Exception):
 class ArchiveManager:
     r'''
     Before opening a file path, this class can check if this is an
-    archived file collection, such as a .zip or or .mxl file. This will return the
+    archived file collection, such as a .zip or .mxl file. This will return the
     data from the archive.
 
     >>> fnCorpus = corpus.getWork('bwv66.6', fileExtensions=('.xml',))
@@ -124,7 +123,7 @@ class ArchiveManager:
         self.fp = common.cleanpath(fp, returnPathlib=True)
         self.archiveType = archiveType
 
-    def isArchive(self):
+    def isArchive(self) -> bool:
         '''
         Return True or False if the filepath is an
         archive of the supplied archiveType.
@@ -145,7 +144,7 @@ class ArchiveManager:
             raise ArchiveManagerException(f'no support for archiveType: {self.archiveType}')
         return False
 
-    def getNames(self):
+    def getNames(self) -> List[str]:
         '''
         Return a list of all names contained in this archive.
         '''
@@ -371,7 +370,7 @@ def resetSubconverters():
     _deregisteredSubconverters = []
 
 
-def registerSubconverter(newSubConverter):
+def registerSubconverter(newSubConverter) -> None:
     '''
     Add a Subconverter to the list of registered subconverters.
 
@@ -398,7 +397,7 @@ def registerSubconverter(newSubConverter):
     _registeredSubconverters.append(newSubConverter)
 
 
-def unregisterSubconverter(removeSubconverter):
+def unregisterSubconverter(removeSubconverter) -> None:
     # noinspection PyShadowingNames
     '''
     Remove a Subconverter from the list of registered subconverters.
@@ -413,7 +412,7 @@ def unregisterSubconverter(removeSubconverter):
     >>> mxlConverter in c.subconvertersList()
     False
 
-    if there is no such subConverter registered and it is not a default subconverter,
+    If there is no such subConverter registered, and it is not a default subconverter,
     then a converter.ConverterException is raised:
 
     >>> class ConverterSonix(converter.subConverters.SubConverter):
@@ -453,8 +452,6 @@ def unregisterSubconverter(removeSubconverter):
 
 
 # ------------------------------------------------------------------------------
-
-
 class Converter:
     '''
     A class used for converting all supported data formats into music21 objects.
@@ -465,7 +462,8 @@ class Converter:
 
     def __init__(self):
         self.subConverter = None
-        self._thawedStream = None  # a stream object unthawed
+        # a stream object unthawed
+        self._thawedStream: Union[stream.Score, stream.Part, stream.Opus, None] = None
 
     def _getDownloadFp(self, directory, ext, url):
         if directory is None:
@@ -480,7 +478,7 @@ class Converter:
     # pylint: disable=redefined-builtin
     # noinspection PyShadowingBuiltins
     def parseFileNoPickle(self, fp, number=None,
-                          format=None, forceSource=False, **keywords):  # @ReservedAssignment
+                          format=None, forceSource=False, **keywords):
         '''
         Given a file path, parse and store a music21 Stream.
 
@@ -535,7 +533,7 @@ class Converter:
     def parseFile(self, fp, number=None,
                   format=None, forceSource=False, storePickle=True, **keywords):
         '''
-        Given a file path, parse and store a music21 Stream.
+        Given a file path, parse and store a music21 Stream, set as self.stream.
 
         If format is None then look up the format from the file
         extension using `common.findFormatFile`.
@@ -584,9 +582,10 @@ class Converter:
                 self.stream.fileFormat = useFormat
 
     def parseData(self, dataStr, number=None,
-                  format=None, forceSource=False, **keywords):  # @ReservedAssignment
+                  format=None, forceSource=False, **keywords) -> None:
         '''
-        Given raw data, determine format and parse into a music21 Stream.
+        Given raw data, determine format and parse into a music21 Stream,
+        set as self.stream.
         '''
         useFormat = format
         # get from data in string if not specified
@@ -635,29 +634,36 @@ class Converter:
         self.subConverter.keywords = keywords
         self.subConverter.parseData(dataStr, number=number)
 
-    def parseURL(self, url, *, format=None, number=None,
-                 forceSource=False, **keywords):  # @ReservedAssignment
-        '''Given a url, download and parse the file
+    def parseURL(self,
+                 url,
+                 *,
+                 format=None,
+                 number=None,
+                 forceSource=False,
+                 **keywords) -> None:
+        '''
+        Given a url, download and parse the file
         into a music21 Stream stored in the `stream`
         property of the converter object.
 
         Note that this checks the user Environment
         `autoDownload` setting before downloading.
 
-        Use `forceSource=True` to download every time rather than read from a cached file.
+        Use `forceSource=True` to download every time rather than
+        re-reading from a cached file.
 
-        >>> jeanieLightBrownURL = ('https://github.com/cuthbertLab/music21/raw/master' +
-        ...        '/music21/corpus/leadSheet/fosterBrownHair.mxl')
+        >>> joplinURL = ('https://github.com/cuthbertLab/music21/raw/master' +
+        ...        '/music21/corpus/joplin/maple_leaf_rag.mxl')
         >>> c = converter.Converter()
-        >>> #_DOCS_SHOW c.parseURL(jeanieLightBrownURL)
-        >>> #_DOCS_SHOW jeanieStream = c.stream
+        >>> #_DOCS_SHOW c.parseURL(joplinURL)
+        >>> #_DOCS_SHOW joplinStream = c.stream
 
         Changed in v.7 -- made keyword-only and added `forceSource` option.
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload in ('deny', 'ask'):
-            message = 'Automatic downloading of URLs is presently set to {!r};'
-            message += ' configure your Environment "autoDownload" setting to '
+            message = 'Automatic downloading of URLs is presently set to {!r}; '
+            message += 'configure your Environment "autoDownload" setting to '
             message += '"allow" to permit automatic downloading: '
             message += "environment.set('autoDownload', 'allow')"
             message = message.format(autoDownload)
@@ -700,10 +706,11 @@ class Converter:
         self.stream.filePath = fp  # These are attributes defined outside of
         self.stream.fileNumber = number  # __init__ and will be moved to
         self.stream.fileFormat = useFormat  # Metadata in v8.
+        # TODO: v8 -- move to Metadata
 
     # -----------------------------------------------------------------------#
     # Subconverters
-    def subconvertersList(self, converterType='any'):
+    def subconvertersList(self, converterType='any') -> List[Callable]:
         '''
         Gives a list of all the subconverters that are registered.
 
@@ -788,7 +795,7 @@ class Converter:
 
         return filteredSubConvertersList
 
-    def defaultSubconverters(self):
+    def defaultSubconverters(self) -> List[Callable]:
         '''
         return an alphabetical list of the default subconverters: those in converter.subConverters
         with the class Subconverter.
@@ -875,7 +882,7 @@ class Converter:
                     converterFormats[f.lower()] = name
         return converterFormats
 
-    def setSubconverterFromFormat(self, converterFormat):
+    def setSubconverterFromFormat(self, converterFormat: str):
         '''
         sets the .subConverter according to the format of `converterFormat`:
 
@@ -893,7 +900,7 @@ class Converter:
         subConverterClass = scf[converterFormat]
         self.subConverter = subConverterClass()
 
-    def formatFromHeader(self, dataStr):
+    def formatFromHeader(self, dataStr: str) -> Tuple[str, str]:
         '''
         if dataStr begins with a text header such as  "tinyNotation:" then
         return that format plus the dataStr with the head removed.
@@ -937,7 +944,7 @@ class Converter:
                     break
         return (foundFormat, dataStr)
 
-    def regularizeFormat(self, fmt):
+    def regularizeFormat(self, fmt: str) -> Optional[str]:
         '''
         Take in a string representing a format, a file extension (w/ or without leading dot)
         etc. and find the format string that best represents the format that should be used.
@@ -1009,7 +1016,7 @@ class Converter:
     # --------------------------------------------------------------------------
     # properties
     @property
-    def stream(self):
+    def stream(self) -> Union[stream.Score, stream.Part, stream.Opus, None]:
         '''
         Returns the .subConverter.stream object.
         '''
@@ -1028,7 +1035,11 @@ class Converter:
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  # @ReservedAssignment
+def parseFile(fp,
+              number=None,
+              format=None,
+              forceSource=False,
+              **keywords) -> Union[stream.Score, stream.Part, stream.Opus]:
     '''
     Given a file path, attempt to parse the file into a Stream.
     '''
@@ -1039,7 +1050,10 @@ def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  # @
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-def parseData(dataStr, number=None, format=None, **keywords):  # @ReservedAssignment
+def parseData(dataStr,
+              number=None,
+              format=None,
+              **keywords) -> Union[stream.Score, stream.Part, stream.Opus]:
     '''
     Given musical data represented within a Python string, attempt to parse the
     data into a Stream.
@@ -1050,8 +1064,12 @@ def parseData(dataStr, number=None, format=None, **keywords):  # @ReservedAssign
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-def parseURL(url, *, format=None, number=None,
-             forceSource=False, **keywords):  # @ReservedAssignment
+def parseURL(url,
+             *,
+             format=None,
+             number=None,
+             forceSource=False,
+             **keywords) -> Union[stream.Score, stream.Part, stream.Opus]:
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
     URL downloading will not happen automatically unless the user has set their
@@ -1066,7 +1084,7 @@ def parseURL(url, *, format=None, number=None,
 
 def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
           *args,
-          **keywords) -> 'music21.stream.Stream':
+          **keywords) -> Union[stream.Score, stream.Part, stream.Opus]:
     r'''
     Given a file path, encoded data in a Python string, or a URL, attempt to
     parse the item into a Stream.  Note: URL downloading will not happen
@@ -1097,7 +1115,7 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
 
     URL:
 
-    >>> #_DOCS_SHOW s = converter.parse('http://midirepository.org/file220/file.mid')
+    >>> #_DOCS_SHOW s = converter.parse('https://midirepository.org/file220/file.mid')
 
 
     Data is preceded by an identifier such as "tinynotation:"
@@ -1178,7 +1196,7 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
                         forceSource=forceSource, **keywords)
     elif isinstance(value, pathlib.Path):
         raise FileNotFoundError(f'Cannot find file in {str(value)}')
-    elif (isinstance(value, str) and common.findFormatFile(value) is not None):
+    elif isinstance(value, str) and common.findFormatFile(value) is not None:
         # assume mistyped file path
         raise FileNotFoundError(f'Cannot find file in {str(value)}')
     else:
@@ -1626,7 +1644,7 @@ class Test(unittest.TestCase):
         countTies = 0
         countStartTies = 0
         for p in a.parts:
-            post = p.recurse().notes[0].getContextByClass('Clef')
+            post = p.recurse().notes[0].getContextByClass(clef.Clef)
             self.assertIsInstance(post, clef.TenorClef)
             for n in p.recurse().notes:
                 if n.tie is not None:
@@ -1749,7 +1767,7 @@ class Test(unittest.TestCase):
         s = parse(mxString)
 
         part = s.parts[0]
-        measures = part.getElementsByClass('Measure')
+        measures = part.getElementsByClass(stream.Measure)
         self.assertEqual(measures[0].leftBarline, None)
         self.assertEqual(measures[0].rightBarline.type, 'final')
 
@@ -1761,7 +1779,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(s[bar.Barline]), 4)
         part = s.parts[0]
-        measures = part.getElementsByClass('Measure')
+        measures = part.getElementsByClass(stream.Measure)
 
         # s.show()
 
@@ -1928,6 +1946,8 @@ class Test(unittest.TestCase):
         Here is a filename with an incorrect extension (.txt for .rnText).  Make sure that
         it is not cached the second time...
         '''
+        from music21 import harmony
+
         fp = common.getSourceFilePath() / 'converter' / 'incorrectExtension.txt'
         pf = PickleFilter(fp)
         pf.removePickle()
@@ -1936,7 +1956,7 @@ class Test(unittest.TestCase):
             parse(fp)
 
         c = parse(fp, format='romantext')
-        self.assertEqual(len(c.recurse().getElementsByClass('Harmony')), 1)
+        self.assertEqual(len(c[harmony.Harmony]), 1)
 
     def testConverterFromPath(self):
         fp = common.getSourceFilePath() / 'corpus' / 'bach' / 'bwv66.6.mxl'
@@ -1967,7 +1987,7 @@ class Test(unittest.TestCase):
 
         # This file should have been written, above
         destFp = Converter()._getDownloadFp(e.getRootTempDir(), '.krn', url)
-        # Hack garbage into it so that we can test whether or not forceSource works
+        # Hack garbage into it so that we can test whether forceSource works
         with open(destFp, 'a', encoding='utf-8') as fp:
             fp.write('all sorts of garbage that Humdrum cannot parse')
 

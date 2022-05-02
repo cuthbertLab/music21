@@ -5,7 +5,7 @@
 # Authors:      Jose Cabal-Ugaz
 #               Bo-cheng (Sponge) Jhan (Clef routines)
 #
-# Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011, 2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -34,6 +34,17 @@ symbols = lookup.symbols
 environRules = environment.Environment('basic.py')
 
 beamStatus = {}
+
+# Attributes that the translator currently sets on Music21Objects
+# that should be cleaned up after transcription
+TEMPORARY_ATTRIBUTES = ['beginLongBracketSlur',
+                        'endLongBracketSlur',
+                        'beginLongDoubleSlur',
+                        'endLongDoubleSlur',
+                        'shortSlur',
+                        'beamStart',
+                        'beamContinue']
+
 # ------------------------------------------------------------------------------
 # music21Object to braille unicode methods
 
@@ -668,15 +679,8 @@ def noteToBraille(
     # Note: beamStatus is a helper that I hope to remove
     # when moving all the translation features to a separate class.
     music21Note.editorial.brailleEnglish = []
-    falseKeywords = ['beginLongBracketSlur',
-                     'endLongBracketSlur',
-                     'beginLongDoubleSlur',
-                     'endLongDoubleSlur',
-                     'shortSlur',
-                     'beamStart',
-                     'beamContinue']
 
-    for keyword in falseKeywords:
+    for keyword in TEMPORARY_ATTRIBUTES:
         try:
             beamStatus[keyword] = getattr(music21Note, keyword)
         except AttributeError:

@@ -4,9 +4,10 @@
 # Purpose:      music21 module for evaluating correcting of output from OMR software
 #
 # Authors:      Maura Church
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
+# Copyright:    Copyright © 2014 Maura Church, Michael Scott Asato Cuthbert,
+#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -193,8 +194,7 @@ class OmrGroundTruthPair:
         Returns the total edit distance as an Int between
         the two scores
 
-        This function is based on James H. Martin's minimum edit distance,
-        https://web.archive.org/web/20121219013556/http://www.cs.colorado.edu/~martin/csci5832/edit-dist-blurb.html
+        This function is based on James H. Martin's minimum edit distance.
 
         >>> omrPath = omr.correctors.K525omrShortPath
         >>> ground = omr.correctors.K525groundTruthShortPath

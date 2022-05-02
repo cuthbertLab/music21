@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -17,8 +17,7 @@ from typing import Optional
 from music21.features import base as featuresModule
 from music21 import text
 from music21 import environment
-_MOD = 'features.native'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('features.native')
 
 # ------------------------------------------------------------------------------
 # ideas for other music21 features extractors

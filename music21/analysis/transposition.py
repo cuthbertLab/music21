@@ -5,7 +5,7 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -17,8 +17,7 @@ from music21 import pitch
 from music21 import chord
 
 from music21 import environment
-_MOD = 'analysis.transposition'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.transposition')
 
 
 class TranspositionException(exceptions21.Music21Exception):

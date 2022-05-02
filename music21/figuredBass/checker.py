@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         checker.py
-# Purpose:      music21 class which can parse a stream of parts and check your homework
+# Purpose:      checks figured basses for following voice-leading rules
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import collections
 import copy
+from typing import Dict, Tuple
 import unittest
 
+from music21 import pitch
 from music21 import stream
 from music21 import voiceLeading
 from music21.common.numberTools import opFrac
@@ -43,10 +45,10 @@ def getVoiceLeadingMoments(music21Stream):
             :width: 700
     '''
     allHarmonies = extractHarmonies(music21Stream)
-    allParts = music21Stream.getElementsByClass('Part').stream()
+    allParts = music21Stream.getElementsByClass(stream.Part).stream()
     newParts = [allParts[i].flatten().getElementsNotOfClass('GeneralNote').stream()
                 for i in range(len(allParts))]
-    paddingLeft = allParts[0].getElementsByClass('Measure').first().paddingLeft
+    paddingLeft = allParts[0].getElementsByClass(stream.Measure).first().paddingLeft
     for (offsets, notes) in sorted(allHarmonies.items()):
         (initOffset, endTime) = offsets
         for genNoteIndex in range(len(notes)):
@@ -66,6 +68,7 @@ def getVoiceLeadingMoments(music21Stream):
 
 
 def extractHarmonies(music21Stream):
+    # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Stream` and returns a dictionary whose values
     are the voice leading moments of the :class:`~music21.stream.Stream` and whose
@@ -104,7 +107,7 @@ def extractHarmonies(music21Stream):
     (11.0, 11.5)   [<music21.note.Note A>  <music21.note.Note F>  <music21.note.Note D> ]
     (11.5, 12.0)   [<music21.note.Note A>  <music21.note.Note F>  <music21.note.Note A> ]
     '''
-    allParts = music21Stream.getElementsByClass('Part')
+    allParts = music21Stream.getElementsByClass(stream.Part)
     if len(allParts) < 2:
         raise Music21Exception('There must be at least two parts to extract harmonies')
     allHarmonies = createOffsetMapping(allParts[0])
@@ -138,7 +141,7 @@ def createOffsetMapping(music21Part):
     (11.0, 12.0)   [<music21.note.Note A> ]
     '''
     currentMapping = collections.defaultdict(list)
-    for music21GeneralNote in music21Part.flatten().getElementsByClass('GeneralNote'):
+    for music21GeneralNote in music21Part.flatten().notesAndRests:
         initOffset = music21GeneralNote.offset
         endTime = initOffset + music21GeneralNote.quarterLength
         currentMapping[(initOffset, endTime)].append(music21GeneralNote)
@@ -146,6 +149,7 @@ def createOffsetMapping(music21Part):
 
 
 def correlateHarmonies(currentMapping, music21Part):
+    # noinspection PyShadowingNames
     '''
     Adds a new :class:`~music21.stream.Part` to an existing offset mapping.
 
@@ -179,7 +183,7 @@ def correlateHarmonies(currentMapping, music21Part):
 
     for offsets in sorted(currentMapping.keys()):
         (initOffset, endTime) = offsets
-        notesInRange = music21Part.flatten().getElementsByClass('GeneralNote').getElementsByOffset(
+        notesInRange = music21Part.flatten().notesAndRests.getElementsByOffset(
             initOffset, offsetEnd=endTime,
             includeEndBoundary=False, mustFinishInSpan=False,
             mustBeginInSpan=False, includeElementsThatEndAtStart=False)
@@ -198,10 +202,11 @@ def correlateHarmonies(currentMapping, music21Part):
     return newMapping
 
 # ------------------------------------------------------------------------------
-# Generic methods for checking for composition rule violations in streams
+# Generic functions for checking for composition rule violations in streams
 
 
 def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
+    # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Score` and a functionToApply which takes in a possibility
     instance, a tuple with pitches or rests comprising a vertical sonority. Changes the color of
@@ -242,7 +247,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
         debugInfo.append(f"{'(Offset, End Time):'!s:25}Part Numbers:")
 
     allHarmonies = sorted(list(extractHarmonies(music21Stream).items()))
-    allParts = [p.flatten() for p in music21Stream.getElementsByClass('Part')]
+    allParts = [p.flatten() for p in music21Stream.getElementsByClass(stream.Part)]
     for (offsets, notes) in allHarmonies:
         vlm = [generalNoteToPitch(n) for n in notes]
         vlm_violations = functionToApply(vlm)
@@ -266,6 +271,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
 
 
 def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
+    # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Score` and a functionToApply which takes in two consecutive
     possibility instances, each a tuple with pitches or rests comprising a vertical sonority.
@@ -308,7 +314,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
         debugInfo.append('(Offset A, End Time A):  (Offset B, End Time B): Part Numbers:')
 
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
-    allParts = [p.flatten() for p in music21Stream.getElementsByClass('Part')]
+    allParts = [p.flatten() for p in music21Stream.getElementsByClass(stream.Part)]
     (previousOffsets, previousNotes) = allHarmonies[0]
     vlmA = [generalNoteToPitch(n) for n in previousNotes]
     initOffsetA = previousOffsets[0]
@@ -349,8 +355,8 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
 def voiceCrossing(possibA):
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
-    two voices which form a voice crossing. The parts from lowest part to
-    highest part (right to left) must correspond to increasingly higher
+    two voices which form a voice crossing. The parts from the lowest part to
+    the highest part (right to left) must correspond to increasingly higher
     pitches in order for there to be no voice crossing. Comparisons between
     pitches are done using pitch comparison methods, which are based on pitch
     space values (see :class:`~music21.pitch.Pitch`).
@@ -391,10 +397,11 @@ def voiceCrossing(possibA):
 # Consecutive Possibility Rule-Checking Methods
 
 
-parallelFifthsTable = {}
-hiddenFifthsTable = {}
-parallelOctavesTable = {}
-hiddenOctavesTable = {}
+PITCH_QUARTET_TO_BOOL_TYPE = Dict[Tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch], bool]
+parallelFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+parallelOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+hiddenFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
+hiddenOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
 
 
 def parallelFifths(possibA, possibB):

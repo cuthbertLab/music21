@@ -3,19 +3,19 @@
 # Name:         makeNotation.py
 # Purpose:      functionality for manipulating streams
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #               Jacob Walls
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2021 Michael Scott Cuthbert and the music21
-#               Project
+# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert
+#               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 
 import copy
 import unittest
-from typing import List, Generator, Optional, Set, Union
+from typing import List, Generator, Optional, Set, Union, cast
 from fractions import Fraction  # typing only
 
 from music21 import beam
@@ -30,8 +30,10 @@ from music21 import note
 from music21 import pitch
 
 from music21.common.numberTools import opFrac
-
+from music21.common.types import StreamType
 from music21.exceptions21 import StreamException
+
+from music21.stream.iterator import StreamIterator  # type-checking only
 
 environLocal = environment.Environment(__file__)
 
@@ -40,12 +42,12 @@ environLocal = environment.Environment(__file__)
 
 
 def makeBeams(
-    s: 'music21.stream.Stream',
+    s: StreamType,
     *,
     inPlace=False,
     setStemDirections=True,
     failOnNoTimeSignature=False,
-):
+) -> Optional[StreamType]:
     # noinspection PyShadowingNames
     '''
     Return a new Measure, or Stream of Measures, with beams applied to all
@@ -122,15 +124,15 @@ def makeBeams(
     if not inPlace:  # make a copy
         returnObj: stream.Stream = s.coreCopyAsDerivation('makeBeams')
     else:
-        returnObj: stream.Stream = s
+        returnObj = s
 
     # if s.isClass(Measure):
     mColl: List[stream.Measure]
     if isinstance(s, stream.Measure):
-        returnObj: stream.Measure
+        returnObj = cast(stream.Measure, returnObj)
         mColl = [returnObj]  # store a list of measures for processing
     else:
-        mColl = list(returnObj.getElementsByClass('Measure'))  # a list of measures
+        mColl = list(returnObj.getElementsByClass(stream.Measure))  # a list of measures
         if not mColl:
             raise stream.StreamException(
                 'cannot process a stream that is neither a Measure nor has no Measures')
@@ -221,7 +223,7 @@ def makeBeams(
 
 
 def makeMeasures(
-    s,
+    s: StreamType,
     *,
     meterStream=None,
     refStreamOrTimeRange=None,
@@ -230,7 +232,7 @@ def makeMeasures(
     finalBarline='final',
     bestClef=False,
     inPlace=False,
-):
+) -> Optional[StreamType]:
     '''
     Takes a stream and places all of its elements into
     measures (:class:`~music21.stream.Measure` objects)
@@ -267,7 +269,7 @@ def makeMeasures(
     string-specification of Barline style will be used to create a Barline
     objects at the end of the last Measure. The default is 'final'.
 
-    The `searchContext` parameter determines whether or not context
+    The `searchContext` parameter determines whether context
     searches are used to find Clef and other notation objects.
 
     Here is a simple example of makeMeasures:
@@ -328,7 +330,7 @@ def makeMeasures(
     change the type of Stream you are using:
 
     >>> sMeasures = sSrc.makeMeasures()
-    >>> len(sMeasures.getElementsByClass('Measure'))
+    >>> len(sMeasures.getElementsByClass(stream.Measure))
     3
     >>> sMeasures.__class__.__name__
     'Part'
@@ -485,9 +487,9 @@ def makeMeasures(
     #                returnDefault=True)
     # clefObj = clefList[0]
     # del clefList
-    clefObj = srcObj.clef or srcObj.getContextByClass('Clef')
+    clefObj = srcObj.clef or srcObj.getContextByClass(clef.Clef)
     if clefObj is None:
-        clefObj = srcObj.getElementsByClass('Clef').getElementsByOffset(0).first()
+        clefObj = srcObj.getElementsByClass(clef.Clef).getElementsByOffset(0).first()
         # only return clefs that have offset = 0.0
         if not clefObj:
             clefObj = clef.bestClef(srcObj, recurse=True)
@@ -507,7 +509,7 @@ def makeMeasures(
     else:
         oMax = 0
 
-    # if a ref stream is provided, get highest time from there
+    # if a ref stream is provided, get the highest time from there
     # only if it is greater than the highest time yet encountered
     if refStreamOrTimeRange is not None:
         if isinstance(refStreamOrTimeRange, stream.Stream):
@@ -583,7 +585,7 @@ def makeMeasures(
 
     post.coreElementsChanged()
 
-    # cache information about each measure (we used to do this once per element...
+    # cache information about each measure (we used to do this once per element)
     postLen = len(post)
     postMeasureList = []
     lastTimeSignature = None
@@ -672,8 +674,8 @@ def makeMeasures(
     del srcObj
 
     # set barlines if necessary
-    lastIndex = len(post.getElementsByClass('Measure')) - 1
-    for i, m in enumerate(post.getElementsByClass('Measure')):
+    lastIndex = len(post.getElementsByClass(stream.Measure)) - 1
+    for i, m in enumerate(post.getElementsByClass(stream.Measure)):
         if i != lastIndex:
             if innerBarline not in ['regular', None]:
                 m.rightBarline = innerBarline
@@ -702,22 +704,21 @@ def makeMeasures(
 
 
 def makeRests(
-    s,
+    s: StreamType,
     *,
     refStreamOrTimeRange=None,
     fillGaps=False,
     timeRangeFromBarDuration=False,
     inPlace=False,
     hideRests=False,
-):
+) -> Optional[StreamType]:
     '''
     Given a Stream with an offset not equal to zero,
     fill with one Rest preceding this offset.
     This can be called on any Stream,
     a Measure alone, or a Measure that contains
     Voices. This method recurses into Parts, Measures, and Voices,
-    since users are unlikely to want "loose" rests outside
-    of sub-containers.
+    since users are unlikely to want "loose" rests outside sub-containers.
 
     If `refStreamOrTimeRange` is provided as a Stream, this
     Stream is used to get min and max offsets. If a list is provided,
@@ -902,7 +903,7 @@ def makeRests(
     if returnObj.hasVoices():
         bundle = list(returnObj.voices)
     elif returnObj.hasMeasures():
-        bundle = returnObj.getElementsByClass('Measure')
+        bundle = returnObj.getElementsByClass(stream.Measure)
     else:
         bundle = [returnObj]
 
@@ -972,13 +973,13 @@ def makeRests(
         return returnObj
 
 def makeTies(
-    s,
+    s: StreamType,
     *,
     meterStream=None,
     inPlace=False,
     displayTiedAccidentals=False,
     classFilterList=(note.GeneralNote,),
-):
+) -> Optional[StreamType]:
     # noinspection PyShadowingNames
     '''
     Given a stream containing measures, examine each element in the
@@ -1167,7 +1168,7 @@ def makeTies(
     >>> m.insert(0, meter.TimeSignature('4/4'))
     >>> p = stream.Part([m])
     >>> p.makeTies(inPlace=True, classFilterList='Note')
-    >>> len(p.getElementsByClass('Measure'))
+    >>> len(p.getElementsByClass(stream.Measure))
     2
     >>> p.recurse().last().tie
     <music21.tie.Tie stop>
@@ -1187,7 +1188,7 @@ def makeTies(
         classFilterList = [classFilterList]
 
     # get measures from this stream
-    measureStream = returnObj.getElementsByClass('Measure')
+    measureStream = returnObj.getElementsByClass(stream.Measure)
     if not measureStream:
         raise stream.StreamException(
             'cannot process a stream without measures')
@@ -1208,7 +1209,7 @@ def makeTies(
     while True:  # TODO: find a way to avoid 'while True'
         # update measureStream on each iteration,
         # as new measure may have been added to the returnObj stream
-        measureStream = returnObj.getElementsByClass('Measure').stream()
+        measureStream = returnObj.getElementsByClass(stream.Measure).stream()
         if mCount >= len(measureStream):
             break  # reached the end of all measures available or added
         # get the current measure to look for notes that need ties
@@ -1258,7 +1259,7 @@ def makeTies(
         try:
             mEnd = lastTimeSignature.barDuration.quarterLength
         except AttributeError:
-            ts = m.getContextByClass('TimeSignature')
+            ts = m.getContextByClass(meter.TimeSignature)
             if ts is not None:
                 lastTimeSignature = ts
                 mEnd = lastTimeSignature.barDuration.quarterLength
@@ -1347,7 +1348,7 @@ def makeTies(
         return None
 
 
-def makeTupletBrackets(s: 'music21.stream.Stream', *, inPlace=False):
+def makeTupletBrackets(s: StreamType, *, inPlace=False) -> Optional[StreamType]:
     # noinspection PyShadowingNames
     '''
     Given a flat Stream of mixed durations, designates the first and last tuplet of any group
@@ -1427,8 +1428,8 @@ def makeTupletBrackets(s: 'music21.stream.Stream', *, inPlace=False):
         if tupletObj is not None:
             # thisNormalType = tuplet.durationNormal.type
             completionCount = opFrac(completionCount + dur.quarterLength)
-            # if previous tuplet is None, always start
-            # always reset completion target
+            # if previous tuplet is None, it is always start,
+            # and we always reset completion target
             if tupletPrevious is None or completionTarget is None:
                 if tupletNext is None:  # single tuplet w/o tuplets either side
                     tupletObj.type = 'startStop'
@@ -1470,7 +1471,7 @@ def makeTupletBrackets(s: 'music21.stream.Stream', *, inPlace=False):
         return returnObj
 
 
-def realizeOrnaments(s: 'music21.stream.Stream'):
+def realizeOrnaments(s: StreamType) -> StreamType:
     '''
     Realize all ornaments on a stream
 
@@ -1548,7 +1549,8 @@ def realizeOrnaments(s: 'music21.stream.Stream'):
     return newStream
 
 
-def moveNotesToVoices(source: 'music21.stream.Stream', classFilterList=('GeneralNote',)):
+def moveNotesToVoices(source: StreamType,
+                      classFilterList=('GeneralNote',)) -> None:
     '''
     Move notes into voices.  Happens inplace always.  Returns None
     '''
@@ -1564,7 +1566,7 @@ def moveNotesToVoices(source: 'music21.stream.Stream', classFilterList=('General
     source.insert(0, dst)
 
 
-def getTiePitchSet(prior: 'music21.note.NotRest'):
+def getTiePitchSet(prior: 'music21.note.NotRest') -> Optional[Set[str]]:
     # noinspection PyShadowingNames
     '''
     helper method for makeAccidentals to get the tie pitch set (or None)
@@ -1596,7 +1598,11 @@ def getTiePitchSet(prior: 'music21.note.NotRest'):
     >>> stream.makeNotation.getTiePitchSet(n)
     set()
 
-    Rest return None
+    >>> pChord = percussion.PercussionChord([note.Unpitched('D4'), note.Note('E5')])
+    >>> stream.makeNotation.getTiePitchSet(pChord)
+    set()
+
+    Rest returns None
 
     >>> r = note.Rest()
     >>> stream.makeNotation.getTiePitchSet(r) is None
@@ -1606,7 +1612,7 @@ def getTiePitchSet(prior: 'music21.note.NotRest'):
         return None
 
     tiePitchSet = set()
-    if isinstance(prior, chord.Chord):
+    if isinstance(prior, chord.ChordBase):
         previousNotes = list(prior)
     else:
         previousNotes = [prior]
@@ -1618,7 +1624,7 @@ def getTiePitchSet(prior: 'music21.note.NotRest'):
     return tiePitchSet
 
 def makeAccidentalsInMeasureStream(
-    s: 'music21.stream.Stream',
+    s: Union[StreamType, StreamIterator],
     *,
     pitchPast: Optional[List[pitch.Pitch]] = None,
     pitchPastMeasure: Optional[List[pitch.Pitch]] = None,
@@ -1629,12 +1635,12 @@ def makeAccidentalsInMeasureStream(
     overrideStatus: bool = False,
     cautionaryNotImmediateRepeat: bool = True,
     tiePitchSet: Optional[Set[str]] = None
-):
+) -> None:
     '''
     Makes accidentals in place on a stream consisting of only Measures.
     Helper for Stream.makeNotation and Part.makeAccidentals.
 
-    Walks measures in order to update the values for the following keyword
+    The function walks measures in order to update the values for the following keyword
     arguments of :meth:`~music21.stream.base.makeAccidentals` and calls
     that method on each Measure. (For this reason, the values supplied
     for these arguments in the method signature will be used on the first
@@ -1706,7 +1712,7 @@ def makeAccidentalsInMeasureStream(
         )
 
 def iterateBeamGroups(
-    s: 'music21.stream.Stream',
+    s: StreamType,
     skipNoBeams=True,
     recurse=True
 ) -> Generator[List[note.NotRest], None, None]:
@@ -1756,7 +1762,7 @@ def iterateBeamGroups(
     iterator: 'music21.stream.iterator.StreamIterator' = s.recurse() if recurse else s.iter()
     current_beam_group: List[note.NotRest] = []
     in_beam_group: bool = False
-    for el in iterator.getElementsByClass('NotRest'):
+    for el in iterator.notes:
         first_el_type: Optional[str] = None
         if el.beams and el.beams.getByNumber(1):
             first_el_type = el.beams.getTypeByNumber(1)
@@ -1777,7 +1783,7 @@ def iterateBeamGroups(
 
 
 def setStemDirectionForBeamGroups(
-    s: 'music21.stream.Stream',
+    s: StreamType,
     *,
     setNewStems=True,
     overrideConsistentStemDirections=False,
@@ -1939,7 +1945,7 @@ class Test(unittest.TestCase):
 
     def testSetStemDirectionConsistency(self):
         """
-        Stems that would all be up starting from scratch,
+        Stems that would all be up, starting from scratch,
         but because of overrideConsistentStemDirections=False,
         we only change the first group with an "unspecified" direction
         """

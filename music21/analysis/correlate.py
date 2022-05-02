@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -21,8 +21,7 @@ from music21 import chord
 from music21 import dynamics
 
 from music21 import environment
-_MOD = 'analysis.correlate'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.correlate')
 
 
 # ------------------------------------------------------------------------------
@@ -82,7 +81,6 @@ class ActivityMatch:
         # dst object is within the source objects boundaries
         # if so, append it to the source object's dictionary
         for element in streamFlat.getElementsByClass(objNameDst):
-            # print(_MOD, 'dst', element)
             dstStart = element.offset
             dstEnd = dstStart + element.duration.quarterLength
 

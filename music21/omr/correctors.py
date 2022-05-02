@@ -4,21 +4,21 @@
 # Purpose:      music21 modules for correcting the output from OMR software
 #
 # Authors:      Maura Church
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
+# Copyright:    Copyright © 2014 Maura Church, Michael Scott Asato Cuthbert, and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy
 import collections
 import difflib
-import inspect
 import math
 import os
 
 from music21 import note
+from music21 import stream
 
-pathName = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+pathName = os.path.dirname(__file__)
 
 K525omrFilePath = pathName + os.sep + 'k525OMRMvt1.xml'
 K525groundTruthFilePath = pathName + os.sep + 'k525GTMvt1.xml'
@@ -314,7 +314,7 @@ class ScoreCorrector:
             self.singleParts[destinationVerticalIndex].measureStream[destinationHorizontalIndex])
         # Measure object
         correctMeasure = self.singleParts[sourceVerticalIndex].measureStream[sourceHorizontalIndex]
-        oldNotePitches = [n.pitch for n in incorrectMeasure.getElementsByClass('Note')]
+        oldNotePitches = [n.pitch for n in incorrectMeasure.getElementsByClass(note.Note)]
         for el in incorrectMeasure.elements:
             incorrectMeasure.remove(el)
 
@@ -428,7 +428,7 @@ class SinglePart:
             self.incorrectMeasures = None
 
     def getMeasures(self):
-        self.measureStream = self.scorePart.getElementsByClass('Measure')
+        self.measureStream = self.scorePart.getElementsByClass(stream.Measure)
 
         return self.measureStream
 
@@ -470,7 +470,7 @@ class SinglePart:
         if runFast is True:
             try:
                 m = self.measureStream[0]
-                ts = m.timeSignature or m.getContextByClass('TimeSignature')
+                ts = m.timeSignature or m.getContextByClass(meter.TimeSignature)
             except IndexError:
                 ts = meter.TimeSignature('4/4')
             if ts is None:
@@ -481,7 +481,7 @@ class SinglePart:
         for i in range(len(self.measureStream)):
             if runFast is False:
                 m = self.measureStream[i]
-                ts = m.timeSignature or m.getContextByClass('TimeSignature')
+                ts = m.timeSignature or m.getContextByClass(meter.TimeSignature)
             tsOmr = ts.barDuration.quarterLength
             if self.measureStream[i].duration.quarterLength == tsOmr:
                 continue
@@ -498,7 +498,7 @@ class SinglePart:
         returns an array of hashed strings
         '''
         measureStreamNotes = []
-        measureStreamMeasures = self.measureStream.getElementsByClass('Measure')
+        measureStreamMeasures = self.measureStream.getElementsByClass(stream.Measure)
 
         for i in range(len(measureStreamMeasures)):
             mh = MeasureHash(measureStreamMeasures[i])

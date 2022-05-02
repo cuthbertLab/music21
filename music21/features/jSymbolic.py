@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -27,8 +27,7 @@ from music21.features import base as featuresModule
 from music21.instrument import Instrument
 
 from music21 import environment
-_MOD = 'features.jSymbolic'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('features.jSymbolic')
 
 
 # ------------------------------------------------------------------------------

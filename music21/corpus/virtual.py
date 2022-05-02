@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -20,12 +20,12 @@ TURNED OFF in 2017 -- to be recreated with a bigger test set.
 TODO: Demonstrate with JRP.
 '''
 
+from typing import List
 import unittest
 
 from music21 import common
 from music21 import environment
-_MOD = 'converter.virtual'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('corpus.virtual')
 
 
 class VirtualWork:
@@ -208,7 +208,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 if __name__ == '__main__':
     import music21

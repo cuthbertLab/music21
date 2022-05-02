@@ -42,15 +42,14 @@ When changing, update the single test case in base.py.
 Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''
 
-__version_info__ = (7, 2, 0)  # can be 4-tuple: (7, 0, 5, 'a2')
+__version_info__ = (8, 0, 0, 'a1')  # can be 4-tuple: (7, 0, 5, 'a2')
 
 v = '.'.join(str(x) for x in __version_info__[0:3])
-if len(__version_info__) > 3 and __version_info__[3]:
-    v += __version_info__[3]
+if len(__version_info__) > 3 and __version_info__[3]:  # type: ignore
+    v += __version_info__[3]  # type: ignore
 if len(__version_info__) > 4:
     v += '.' + '.'.join(__version_info__[4:])
 
 __version__ = v
 
 del v
-

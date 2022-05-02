@@ -4,9 +4,9 @@
 # Purpose:      parses NWCTXT Notation
 #
 # Authors:      Jordi Bartolome
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2006-2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 __all__ = ['translate', 'binaryTranslate']

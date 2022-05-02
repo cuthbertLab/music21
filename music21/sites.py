@@ -3,10 +3,10 @@
 # Name:         sites.py
 # Purpose:      Objects for keeping track of relationships among Music21Objects
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2007-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2007-2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,7 +15,7 @@ sites.py -- Objects for keeping track of relationships among Music21Objects
 import collections
 import unittest
 import weakref
-from typing import Union
+from typing import Any, MutableMapping, Optional, Union
 
 from music21 import common
 from music21 import exceptions21
@@ -34,7 +34,7 @@ WEAKREF_ACTIVE = True
 # that still exists, then restore it from the dictionary; otherwise, do not
 # sweat it.  Should make pickle deepcopies of music21 objects in Streams still
 # possible without needing to recreate the whole stream.
-GLOBAL_SITE_STATE_DICT = weakref.WeakValueDictionary()
+GLOBAL_SITE_STATE_DICT: MutableMapping[str, Optional[Any]] = weakref.WeakValueDictionary()
 
 
 class SitesException(exceptions21.Music21Exception):
@@ -733,7 +733,8 @@ class Sites(common.SlottedObjectMixin):
 
     def getSitesByClass(self, className):
         '''
-        Return a list of unwrapped site from siteDict.site [SiteRef.site] (generally a Stream)
+        Return a list of unwrapped site from siteDict.site [SiteRef.site]
+        (generally a Stream)
         that matches the provided class.
 
         Input can be either a Class object or a string

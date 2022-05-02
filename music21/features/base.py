@@ -4,9 +4,9 @@
 # Purpose:      Feature extractors base classes.
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2017 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import os
@@ -27,9 +27,7 @@ from music21 import text
 from music21.metadata.bundles import MetadataEntry
 
 from music21 import environment
-_MOD = 'features.base'
-environLocal = environment.Environment(_MOD)
-
+environLocal = environment.Environment('features.base')
 # ------------------------------------------------------------------------------
 
 
@@ -347,7 +345,7 @@ class StreamForms:
             if lastKey in self.keysToMethods:
                 prepared = self.keysToMethods[lastKey](self, prepared)
             elif lastKey.startswith('getElementsByClass('):
-                classToGet = lastKey[len('getElementsByClass('):-1]
+                classToGet: str = lastKey[len('getElementsByClass('):-1]
                 prepared = prepared.getElementsByClass(classToGet)
             else:
                 raise AttributeError(f'no such attribute: {lastKey} in {key}')
@@ -416,10 +414,10 @@ class StreamForms:
             post = stream.Stream()
             for p in prepared.parts:
                 # insert in overlapping offset positions
-                for m in p.getElementsByClass('Measure'):
+                for m in p.getElementsByClass(stream.Measure):
                     post.insert(m.getOffsetBySite(p), m)
         else:
-            post = prepared.getElementsByClass('Measure')
+            post = prepared.getElementsByClass(stream.Measure)
         return post
 
     def formChordify(self, prepared):
@@ -538,7 +536,8 @@ class DataInstance:
     multiple commonly-used stream representations once, providing rapid processing.
     '''
     # pylint: disable=redefined-builtin
-    def __init__(self, streamOrPath=None, id=None):  # @ReservedAssignment
+    # noinspection PyShadowingBuiltins
+    def __init__(self, streamOrPath=None, id=None):
         if isinstance(streamOrPath, stream.Stream):
             self.stream = streamOrPath
             self.streamPath = None
@@ -607,7 +606,7 @@ class DataInstance:
         else:
             self.partsCount = 0
 
-        for v in self.stream.recurse().getElementsByClass('Voice'):
+        for v in self.stream[stream.Voice]:
             self.formsByPart.append(StreamForms(v))
 
     def setClassLabel(self, classLabel, classValue=None):
@@ -896,7 +895,8 @@ class DataSet:
             self.addData(d, cv, thisId)
 
     # pylint: disable=redefined-builtin
-    def addData(self, dataOrStreamOrPath, classValue=None, id=None):  # @ReservedAssignment
+    # noinspection PyShadowingBuiltins
+    def addData(self, dataOrStreamOrPath, classValue=None, id=None):
         '''
         Add a Stream, DataInstance, MetadataEntry, or path (Posix or str)
         to a corpus or local file to this data set.
@@ -1069,7 +1069,7 @@ class DataSet:
         return outputFormat.getString()
 
     # pylint: disable=redefined-builtin
-    def write(self, fp=None, format=None, includeClassLabel=True):  # @ReservedAssignment
+    def write(self, fp=None, format=None, includeClassLabel=True):
         '''
         Set the output format object.
         '''
@@ -1644,7 +1644,7 @@ class Test(unittest.TestCase):
 #     def xtestOrangeBayesA(self):  # pragma: no cover
 #         '''Using an already created test file with a BayesLearner.
 #         '''
-#         import orange # @UnresolvedImport  # pylint: disable=import-error
+#         import orange  # pylint: disable=import-error
 #         data = orange.ExampleTable(
 #             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 #         classifier = orange.BayesLearner(data)
@@ -1656,7 +1656,7 @@ class Test(unittest.TestCase):
 #     def xtestClassifiersA(self):  # pragma: no cover
 #         '''Using an already created test file with a BayesLearner.
 #         '''
-#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
+#         import orange, orngTree  # pylint: disable=import-error
 #         data1 = orange.ExampleTable(
 #                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
 #
@@ -1696,7 +1696,7 @@ class Test(unittest.TestCase):
 #     def xtestClassifiersB(self):  # pragma: no cover
 #         '''Using an already created test file with a BayesLearner.
 #         '''
-#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
+#         import orange, orngTree  # pylint: disable=import-error
 #         data1 = orange.ExampleTable(
 #                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
 #
@@ -1742,7 +1742,7 @@ class Test(unittest.TestCase):
 #         This test shows how to compare four classifiers; replace the file path
 #         with a path to the .tab data file.
 #         '''
-#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
+#         import orange, orngTree  # pylint: disable=import-error
 #         data = orange.ExampleTable(
 #             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 #
@@ -1774,7 +1774,7 @@ class Test(unittest.TestCase):
 #
 #
 #     def xtestOrangeClassifierTreeLearner(self):  # pragma: no cover
-#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
+#         import orange, orngTree  # pylint: disable=import-error
 #         data = orange.ExampleTable(
 #             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 #

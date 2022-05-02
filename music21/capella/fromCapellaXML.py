@@ -3,9 +3,9 @@
 # Name:         fromCapellaXML.py
 # Purpose:      Module for importing capellaXML (.capx) files.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -22,6 +22,7 @@ import unittest
 import zipfile
 
 from io import StringIO
+from typing import List, Optional
 
 from music21 import bar
 from music21 import chord
@@ -29,6 +30,7 @@ from music21 import clef
 from music21 import common
 from music21 import duration
 from music21 import exceptions21
+from music21 import layout
 from music21 import key
 from music21 import meter
 from music21 import note
@@ -84,7 +86,7 @@ class CapellaImportException(exceptions21.Music21Exception):
 class CapellaImporter:
     '''
     Object for importing .capx, CapellaXML files into music21 (from which they can be
-    converted to musicxml, MIDI, lilypond, etc.
+    converted to musicxml, MIDI, lilypond, etc.)
 
     Note that Capella stores files closer to their printed versions -- that is to say,
     Systems enclose all the parts for that system and have new clefs etc.
@@ -175,13 +177,13 @@ class CapellaImporter:
         '''
         # this line is redundant currently, since all we have in systemScore
         # are Systems, but later there will be other things.
-        systemStream = systemScore.getElementsByClass('System')
+        systemStream = systemScore.getElementsByClass(layout.System)
         partDictById = {}
         for thisSystem in systemStream:
             # this line is redundant currently, since all we have in
             # thisSystem are Parts, but later there will be other things.
             systemOffset = systemScore.elementOffset(thisSystem)
-            partStream = thisSystem.getElementsByClass('Part')
+            partStream = thisSystem.getElementsByClass(stream.Part)
             for j, thisPart in enumerate(partStream):
                 if thisPart.id not in partDictById:
                     newPart = stream.Part()
@@ -194,7 +196,7 @@ class CapellaImporter:
                 newPart.coreElementsChanged()
         newScore = stream.Score()
         # ORDERED DICT
-        parts = [None for i in range(len(partDictById))]
+        parts: List[Optional['music21.stream.Part']] = [None for i in range(len(partDictById))]
         for partId in partDictById:
             partDict = partDictById[partId]
             parts[partDict['number']] = partDict['part']
@@ -203,8 +205,8 @@ class CapellaImporter:
             if p is None:
                 print('part entries do not match partDict!')
                 continue
-            clefs = p.getElementsByClass('Clef')
-            keySignatures = p.getElementsByClass('KeySignature')
+            clefs = p.getElementsByClass(clef.Clef)
+            keySignatures = p.getElementsByClass(key.KeySignature)
             lastClef = None
             lastKeySignature = None
             for c in clefs:
@@ -218,8 +220,8 @@ class CapellaImporter:
                 else:
                     lastKeySignature = ks
             p.makeMeasures(inPlace=True)
-            # for m in p.getElementsByClass('Measure'):
-            #    barLines = m.getElementsByClass('Barline')
+            # for m in p.getElementsByClass(stream.Measure):
+            #    barLines = m.getElementsByClass(bar.Barline)
             #    for bl in barLines:
             #        blOffset = bl.offset
             #        if blOffset == 0.0:

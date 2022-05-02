@@ -3,9 +3,9 @@
 # Name:         common/parallel.py
 # Purpose:      Utilities for parallel computing
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2015-16 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015-16 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 __all__ = [
@@ -55,7 +55,7 @@ def runParallel(iterable, parallelFunction, *,
     ...     c = corpus.parse(fn)  # this is the slow call that is good to parallelize
     ...     return len(c.recurse().notes)
     >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes)
-    >>> outputs = common.runNonParallel(files, countNotes) #_DOCS_HIDE cant pickle doctest funcs.
+    >>> outputs = common.runNonParallel(files, countNotes) #_DOCS_HIDE cannot pickle doctest funcs.
     >>> outputs
     [165, 50, 131]
 
@@ -142,7 +142,7 @@ def runParallel(iterable, parallelFunction, *,
                     updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
 
     callUpdate(0)
-    from joblib import Parallel, delayed
+    from joblib import Parallel, delayed  # type: ignore
 
     with Parallel(n_jobs=numCpus) as para:
         delayFunction = delayed(parallelFunction)

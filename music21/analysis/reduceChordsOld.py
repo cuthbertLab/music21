@@ -3,9 +3,9 @@
 # Name:         reduceChords.py
 # Purpose:      Tools for eliminating passing chords, etc.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-14 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -239,7 +239,7 @@ class ChordReducer:
         if not p0:
             return p
         self._lastPitchedObject = None
-        lenMeasures = len(p0.getElementsByClass('Measure'))
+        lenMeasures = len(p0.getElementsByClass(stream.Measure))
         self._lastTs = None
         for i in range(lenMeasures):
             mI = inStream.measure(i, indicesNotNumbers=True)
@@ -257,7 +257,7 @@ class ChordReducer:
                 if i % 20 == 0 and i != 0:
                     print("")
         p.coreElementsChanged()
-        m = p.getElementsByClass('Measure').first()
+        m = p.getElementsByClass(stream.Measure).first()
         if m:
             m.insert(0, clef.bestClef(p, allowTreble8vb=True))
         p.makeNotation(inPlace=True)
@@ -294,7 +294,7 @@ class ChordReducer:
             cLastEnd = newOffset + cElCopy.quarterLength
             m.coreInsert(newOffset, cElCopy, ignoreSort=True)
 
-        tsContext = mI.parts.first().getContextByClass('TimeSignature')
+        tsContext = mI.parts.first().getContextByClass(meter.TimeSignature)
         if tsContext is not None:
             if round(tsContext.barDuration.quarterLength - cLastEnd, 6) != 0.0:
                 cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd
@@ -318,7 +318,7 @@ class ChordReducer:
                         self._lastPitchedObject.tie = tie.Tie('start')
         self._lastPitchedObject = m[-1]
 
-        sourceMeasureTs = mI.parts.first().getElementsByClass('Measure').first().timeSignature
+        sourceMeasureTs = mI.parts.first().getElementsByClass(stream.Measure).first().timeSignature
         if sourceMeasureTs != self._lastTs:
             m.timeSignature = copy.deepcopy(sourceMeasureTs)
             self._lastTs = sourceMeasureTs
@@ -354,11 +354,12 @@ class TestExternal(unittest.TestCase):
         # fix clef
         fixClef = True
         if fixClef:
-            startClefs = c.parts[1].getElementsByClass('Measure').first().getElementsByClass('Clef')
+            startClefs = c.parts[1].getElementsByClass(stream.Measure
+                                                       ).first().getElementsByClass(clef.Clef)
             if startClefs:
                 clef1 = startClefs[0]
-                c.parts[1].getElementsByClass('Measure').first().remove(clef1)
-            c.parts[1].getElementsByClass('Measure').first().insert(0, clef.Treble8vbClef())
+                c.parts[1].getElementsByClass(stream.Measure).first().remove(clef1)
+            c.parts[1].getElementsByClass(stream.Measure).first().insert(0, clef.Treble8vbClef())
 
 
         cr = ChordReducer()
@@ -368,7 +369,7 @@ class TestExternal(unittest.TestCase):
         from music21 import key
         from music21 import roman
         cm = key.Key('G')
-        for thisChord in p.recurse().getElementsByClass('Chord'):
+        for thisChord in p[chord.Chord]:
             thisChord.lyric = roman.romanNumeralFromChord(thisChord,
                                                           cm,
                                                           preferSecondaryDominants=True).figure

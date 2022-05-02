@@ -5,7 +5,7 @@
 #
 # Authors:      Luke Poeppel
 #
-# Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2016 Michael Scott Asato Cuthbert and the music21 Project
 # Licence:      BSD, see licence.txt
 # ------------------------------------------------------------------------------
 '''

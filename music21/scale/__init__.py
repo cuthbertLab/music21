@@ -4,10 +4,10 @@
 # Purpose:      music21 classes for representing scales
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -79,10 +79,8 @@ from music21 import note
 from music21 import pitch
 from music21 import interval
 from music21 import sieve
-from music21.converter.subConverters import SubConverter
 
-_MOD = 'scale'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('scale')
 
 DIRECTION_BI = intervalNetwork.DIRECTION_BI
 DIRECTION_ASCENDING = intervalNetwork.DIRECTION_ASCENDING
@@ -628,6 +626,7 @@ class AbstractScale(Scale):
         '''
         Show the scale in a format. Here, prepare scala format if requested.
         '''
+        from music21.converter.subConverters import SubConverter
         if fmt is not None:
             fileFormat, unused_ext = common.findFormat(fmt)
             if fileFormat == 'scala':
@@ -1760,8 +1759,8 @@ class ConcreteScale(Scale):
         For a given pitch, return the appropriate scale degree.
         If no scale degree is available, None is returned.
 
-        Note -- by default it will find based on note name not on
-        PitchClass because this is used so commonly by tonal functions.
+        Note: by default it will use a find algorithm that is based on the note's
+        `.name` not on `.pitchClass` because this is used so commonly by tonal functions.
         So if it's important that D# and E- are the same, set the
         comparisonAttribute to `pitchClass`
 

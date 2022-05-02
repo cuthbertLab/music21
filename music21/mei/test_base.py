@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Antila
 #
-# Copyright:    Copyright © 2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2014 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -5047,6 +5047,18 @@ class Test(unittest.TestCase):
         self.assertIsInstance(instr, instrument.Instrument)
         self.assertEqual(instr.partName, 'Clarinet')
         self.assertEqual(instr.transposition.directedName, 'm-3')
+
+    def testUniqueInstances(self):
+        from music21 import common
+        from music21 import converter
+
+        fp = common.getSourceFilePath() / 'mei' / 'test' / 'test_file.mei'
+        s = converter.parse(fp)
+
+        seen_ids = set()
+        for el in s.recurse():
+            self.assertNotIn(id(el), seen_ids, el)
+            seen_ids.add(id(el))
 
 
 if __name__ == '__main__':

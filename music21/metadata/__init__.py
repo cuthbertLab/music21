@@ -4,9 +4,9 @@
 # Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -71,7 +71,8 @@ __all__ = [
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
 
-AmbitusShort = namedtuple('AmbitusShort', 'semitones diatonic pitchLowest pitchHighest')
+AmbitusShort = namedtuple('AmbitusShort',
+                          ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
 
 # -----------------------------------------------------------------------------
 
@@ -684,6 +685,7 @@ class Metadata(base.Music21Object):
         if result is not None:
             # get just the name of the first contributor
             return str(result[0].name)
+        return None
 
     def _contributor_role_setter(self, role: str, name: str) -> None:
         '''
@@ -960,6 +962,7 @@ class Metadata(base.Music21Object):
         result = self._workIds['movementNumber']
         if result is not None:
             return str(result)
+        return None
 
     @movementNumber.setter
     def movementNumber(self, value):
@@ -1284,7 +1287,7 @@ class Test(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 
 if __name__ == '__main__':

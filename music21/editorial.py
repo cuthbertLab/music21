@@ -3,10 +3,10 @@
 # Name:         editorial.py
 # Purpose:      music21 classes for representing editorial information
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2008-2015 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -135,7 +135,7 @@ class Editorial(prebase.ProtoM21Object, dict):
 
 
 # -----------------------------------------------------------------------------
-class Comment(prebase.ProtoM21Object, style.StyleMixin):
+class Comment(prebase.ProtoM21Object, style.StyleMixin):  # type: ignore
     '''
     A comment or footnote or something else attached to a note.
 

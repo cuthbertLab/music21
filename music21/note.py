@@ -3,10 +3,11 @@
 # Name:         note.py
 # Purpose:      music21 classes for representing notes
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2022 Michael Scott Asato Cuthbert
+#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -19,7 +20,7 @@ and used to configure, :class:`~music21.note.Note` objects.
 import copy
 import unittest
 
-from typing import Optional, List, Union, Tuple, Iterable, cast
+from typing import Optional, List, Type, Union, Tuple, Iterable, cast
 
 from music21 import base
 from music21 import beam
@@ -78,7 +79,7 @@ stemDirectionNames = (
 
 def __dir__():
     out = [n for n in globals() if not n.startswith('__') and not n.startswith('Test')]
-    for n in ('Optional', 'List', 'Union', 'Tuple', 'Iterable'):
+    for n in ('Optional', 'List', 'Union', 'Tuple', 'Iterable', 'Type', 'cast'):
         out.remove(n)
     out.remove('unittest')
     out.remove('copy')
@@ -506,9 +507,9 @@ class GeneralNote(base.Music21Object):
     isNote = False
     isRest = False
     isChord = False
-    _styleClass = style.NoteStyle
+    _styleClass: Type[style.Style] = style.NoteStyle
 
-    # define order to present names in documentation; use strings
+    # define order for presenting names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
@@ -552,8 +553,8 @@ class GeneralNote(base.Music21Object):
 
     def __eq__(self, other):
         '''
-        General Note objects are equal if their durations are equal and
-        they have the same articulation and expression classes (in any order)
+        General Note objects are equal if their durations are equal, and
+        they have the same articulation and expression classes (in any order),
         and their ties are equal.
         '''
 
@@ -562,10 +563,10 @@ class GeneralNote(base.Music21Object):
         # checks type, dots, tuplets, quarterLength, uses Pitch.__eq__
         if self.duration != other.duration:
             return False
-        # articulations are a list of Articulation objects
-        # converting to sets produces ordered cols that remove duplicate
-        # however, must then convert to list to match based on class ==
-        # not on class id()
+        # Articulations are a list of Articulation objects.
+        # Converting them to Set objects produces ordered cols that remove duplicates.
+        # However, we must then convert to list to match based on class ==
+        # not on class id().
         if (sorted({x.classes[0] for x in self.articulations})
                 != sorted({x.classes[0] for x in other.articulations})):
             return False
@@ -764,7 +765,11 @@ class GeneralNote(base.Music21Object):
                                         applyRaw=applyRaw, identifier=identifier))
 
     # --------------------------------------------------------------------------
-    # properties common to Notes, Rests,
+    # properties common to Notes, Rests, etc.
+
+    @property
+    def fullName(self) -> str:
+        return self.classes[0]  # override in subclasses
 
     # --------------------------------------------------------------------------
     def augmentOrDiminish(self, scalar, *, inPlace=False):
@@ -931,7 +936,7 @@ class NotRest(GeneralNote):
     def __deepcopy__(self, memo=None):
         '''
         As NotRest objects have a Volume, objects, and Volume objects
-        store weak refs to the to client object, need to specialize deep copy handling
+        store weak refs to the client object, need to specialize deep copy handling
 
         >>> import copy
         >>> n = note.NotRest()
@@ -982,7 +987,7 @@ class NotRest(GeneralNote):
         ('double', 'down', 'noStem', 'none', 'unspecified', 'up')
         >>> n = note.Note()
 
-        By default a Note's stemDirection is 'unspecified'
+        By default, a Note's stemDirection is 'unspecified'
         meaning that it is unknown:
 
         >>> n.stemDirection
@@ -1337,7 +1342,7 @@ class Note(NotRest):
     '''
     isNote = True
 
-    # define order to present names in documentation; use strings
+    # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
@@ -1623,6 +1628,7 @@ class Note(NotRest):
         {1.0} <music21.note.Note G->
 
         '''
+        from music21 import key
         if isinstance(value, interval.IntervalBase):
             intervalObj = value
         else:  # try to process
@@ -1638,7 +1644,7 @@ class Note(NotRest):
         post.pitch.transpose(intervalObj, inPlace=True)
         if (post.pitch.accidental is not None
                 and isinstance(value, (int, interval.ChromaticInterval))):
-            ksContext = self.getContextByClass('KeySignature')
+            ksContext = self.getContextByClass(key.KeySignature)
             if ksContext is not None:
                 for alteredPitch in ksContext.alteredPitches:
                     if (post.pitch.pitchClass == alteredPitch.pitchClass
@@ -1776,7 +1782,7 @@ class Unpitched(NotRest):
 class Rest(GeneralNote):
     '''
     Rests are represented in music21 as GeneralNote objects that do not have
-    a pitch object attached to them.  By default they have length 1.0 (Quarter Rest)
+    a pitch object attached to them.  By default, they have length 1.0 (Quarter Rest)
 
     Calling :attr:`~music21.stream.Stream.notes` on a Stream does not get rests.
     However, the property :attr:`~music21.stream.Stream.notesAndRests` of Streams
@@ -2254,7 +2260,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append([n1, n2, n3])
 
-        # need to test that this gets us a continue tie, but hard to test
+        # need to test that this gets us a "continue" tie, but hard to test
         # post musicxml processing
         # s.show()
 

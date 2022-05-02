@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -24,8 +24,7 @@ from music21 import common, corpus
 from music21.musicxml.m21ToXml import GeneralObjectExporter as GEX
 
 from music21 import environment
-_MOD = 'test.testPerformance'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('test.testPerformance')
 
 # ------------------------------------------------------------------------------
 
@@ -193,55 +192,65 @@ class Test(unittest.TestCase):
     def runGetElementsByContext(self):
         '''Test getting elements by context from a Stream
         '''
+        from music21 import stream
+        from music21 import clef
+        from music21 import key
+        from music21 import meter
+
         s = corpus.parse('bwv66.6')
         # create a few secondary streams to add more sites
         unused_flat = s.flatten()
         unused_notes = s.flatten().notes
 
         for p in s.parts:
-            for m in p.getElementsByClass('Measure'):
+            for m in p.getElementsByClass(stream.Measure):
                 if m.number == 0:
                     continue
-                post = m.getContextByClass('Clef')
+                post = m.getContextByClass(clef.Clef)
                 assert post is not None
-                post = m.getContextByClass('TimeSignature')
+                post = m.getContextByClass(meter.TimeSignature)
                 assert post is not None
-                post = m.getContextByClass('KeySignature')
+                post = m.getContextByClass(key.KeySignature)
                 assert post is not None
 
                 for n in m.notesAndRests:
-                    post = n.getContextByClass('Clef')
+                    post = n.getContextByClass(clef.Clef)
                     assert post is not None
-                    post = n.getContextByClass('TimeSignature')
+                    post = n.getContextByClass(meter.TimeSignature)
                     assert post is not None
-                    post = n.getContextByClass('KeySignature')
+                    post = n.getContextByClass(key.KeySignature)
                     assert post is not None
 
     def runGetElementsByPrevious(self):
         '''Test getting elements by using the previous method
         '''
+        from music21 import stream
+        from music21 import clef
+        from music21 import key
+        from music21 import meter
+
         s = corpus.parse('bwv66.6')
         # create a few secondary streams to add more sites
         unused_flat = s.flatten()
         unused_notes = s.flatten().notes
 
         for p in s.parts:
-            for m in p.getElementsByClass('Measure'):
+            for m in p.getElementsByClass(stream.Measure):
                 if m.number == 0:
                     continue
-                post = m.previous('Clef')
+                post = m.previous(clef.Clef)
                 assert post is not None
-                post = m.previous('TimeSignature')
+                post = m.previous(meter.TimeSignature)
                 assert post is not None
-                post = m.previous('KeySignature')
+                post = m.previous(key.KeySignature)
                 assert post is not None
 
                 for n in m.notesAndRests:
-                    post = n.getContextByClass('Clef')
+                    post = n.getContextByClass(clef.Clef)
                     assert post is not None
-                    post = n.getContextByClass('TimeSignature')
+                    post = n.getContextByClass(meter.TimeSignature)
                     assert post is not None
-                    post = n.getContextByClass('KeySignature')
+                    post = n.getContextByClass(key.KeySignature)
                     assert post is not None
 
     def runParseMonteverdiRNText(self):

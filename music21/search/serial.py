@@ -4,9 +4,9 @@
 # Purpose:      music21 classes for serial searching
 #
 # Authors:      Carl Lian
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -------------------------------------------------
 import copy
@@ -596,7 +596,7 @@ class ContiguousSegmentSearcher:
         self.searchLength = length
         self.listOfContiguousSegments = []
         hasParts = True
-        partList = self.stream.recurse().getElementsByClass('Part')
+        partList = self.stream[stream.Part]
         if not partList:
             partList = [self.stream]
             hasParts = False

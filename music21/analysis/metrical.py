@@ -4,9 +4,9 @@
 # Purpose:      Tools for metrical analysis
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -22,8 +22,8 @@ import unittest
 from music21 import stream
 
 from music21 import environment
-_MOD = "analysis.metrical"
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.metrical')
+
 
 def labelBeatDepth(streamIn):
     r'''
@@ -86,7 +86,8 @@ def thomassenMelodicAccent(streamIn):
     .. _melac: https://www.humdrum.org/Humdrum/commands/melac.html
 
     Takes in a Stream of :class:`~music21.note.Note` objects (use `.flatten().notes` to get it, or
-    better `.flatten().getElementsByClass('Note')` to filter out chords) and adds the attribute to
+    better `.flatten().getElementsByClass(note.Note)` to filter out chords)
+    and adds the attribute to
     each.  Note that Huron and Royal's work suggests that melodic accent has a correlation
     with metrical accent only for solo works/passages; even treble passages do not have a
     strong correlation. (Gregorian chants were found to have a strong ''negative'' correlation

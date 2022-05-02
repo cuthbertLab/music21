@@ -3,9 +3,9 @@
 # Name:         search/lyrics.py
 # Purpose:      music21 classes for searching lyrics
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -26,7 +26,8 @@ _attrList = 'el start end measure lyric text identifier absoluteStart absoluteEn
 
 class IndexedLyric(namedtuple(
     'IndexedLyric',
-    'el start end measure lyric text identifier absoluteStart absoluteEnd',
+    ['el', 'start', 'end', 'measure', 'lyric', 'text',
+     'identifier', 'absoluteStart', 'absoluteEnd'],
 )):
     '''
     A Lyric that has been indexed to its attached element and position in a Stream.
@@ -63,7 +64,8 @@ class IndexedLyric(namedtuple(
 
 
 
-class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices identifier')):
+class SearchMatch(namedtuple('SearchMatch',
+                             ['mStart', 'mEnd', 'matchText', 'els', 'indices', 'identifier'])):
     '''
     A lightweight object representing the match (if any) for a search.
     '''
@@ -187,7 +189,7 @@ class LyricSearcher:
         iTextByIdentifier = OrderedDict()
         lastSyllabicByIdentifier = OrderedDict()
 
-        for n in s.recurse().getElementsByClass('NotRest'):
+        for n in s.recurse().notes:
             ls: List[note.Lyric] = n.lyrics
             if not ls:
                 continue

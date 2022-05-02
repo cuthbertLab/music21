@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         expressions.py
-# Purpose:      notation mods
+# Purpose:      Expressions such as Fermatas, etc.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #               Neena Parikh
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module provides object representations of expressions, that is
 notational symbols such as Fermatas, Mordents, Trills, Turns, etc.
-which are stored under a Music21Object's .expressions attribute
+which are stored under a Music21Object's .expressions attribute.
 
-It also includes representations of things such as TextExpressions which
-are better attached to the Stream itself.
+A sub-category of Expressions are Ornaments.
 
-TODO: replace .size with a string representing interval and then
-    create interval.Interval objects only when necessary.
+Unlike articulations, expressions can be attached to the Stream itself.
+For instance, TextExpressions.
 '''
+# TODO: replace .size with a string representing interval and then
+#     create interval.Interval objects only when necessary.
+
 import copy
 import string
 import unittest
@@ -41,7 +43,6 @@ def realizeOrnaments(srcObject):
     given a Music21Object with Ornament expressions,
     convert them into a list of objects that represents
     the performed version of the object:
-
 
     >>> n1 = note.Note('D5')
     >>> n1.quarterLength = 1
@@ -310,6 +311,11 @@ class TextExpression(Expression):
     >>> te = expressions.TextExpression('Con fuoco')
     >>> te.content
     'Con fuoco'
+
+    Most configuration of style is done
+    on the `.style` :class:`~music21.style.TextStyle` object
+    itself.
+
     >>> te.style.fontSize = 24.0
     >>> te.style.fontSize
     24
@@ -323,7 +329,16 @@ class TextExpression(Expression):
     _styleClass = style.TextStyle
 
     _DOC_ATTR = {
-        'placement': "Staff placement: 'above', 'below', or None.",
+        'placement': '''
+            Staff placement: 'above', 'below', or None.
+
+            A setting of None implies that the placement will be determined
+            by notation software and no particular placement is demanded.
+
+            This is not placed in the `.style` property, since for some
+            expressions, the placement above or below an object has semantic
+            meaning and is not purely presentational.
+            ''',
     }
 
     def __init__(self, content=None):
@@ -336,8 +351,6 @@ class TextExpression(Expression):
         else:
             self._content = content
 
-        self._enclosure = None
-
         # this does not do anything if default y is defined
         self.placement = None
 
@@ -349,6 +362,38 @@ class TextExpression(Expression):
             return repr(self._content)
         else:
             return ''
+
+    @property
+    def enclosure(self) -> Optional[style.Enclosure]:
+        '''
+        Returns or sets the enclosure on the Style object
+        stored on .style.
+
+        Exposed directly on the expression for backwards
+        compatibility.  Does not create a .style object if
+        one does not exist and the value is None.
+
+        >>> te = expressions.TextExpression('Bridge')
+        >>> te.enclosure is None
+        True
+        >>> te.enclosure = style.Enclosure.RECTANGLE
+        >>> te.enclosure
+        <Enclosure.RECTANGLE>
+
+        Note that this is also set on `.style`.
+
+        >>> te.style.enclosure
+        <Enclosure.RECTANGLE>
+        '''
+        if not self.hasStyleInformation:
+            return None
+        return self.style.enclosure
+
+    @enclosure.setter
+    def enclosure(self, value: Optional[style.Enclosure]):
+        if not self.hasStyleInformation and value is None:
+            return
+        self.style.enclosure = value
 
     def _getContent(self):
         return self._content
@@ -387,7 +432,7 @@ class TextExpression(Expression):
                 # this will transfer all positional/formatting settings
                 re.setTextExpression(copy.deepcopy(self))
                 return re
-        # if cannot be expressed as a repeat expression
+        # Return None if it cannot be expressed as a repeat expression
         return None
 
     def getTempoText(self):
@@ -495,7 +540,7 @@ class GeneralMordent(Ornament):
             transposeInterval = self.size.reverse()
         else:
             transposeInterval = self.size
-        mordNotes = []
+        mordNotes: List['music21.note.Note'] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
@@ -808,12 +853,13 @@ class Trill(Ornament):
         if self.nachschlag:
             numberOfTrillNotes -= 2
 
-        trillNotes = []
+        trillNotes: List['music21.note.Note'] = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval)
 
         currentKeySig = None
-        if self._setAccidentalFromKeySig:
+        setAccidentalFromKeySig = self._setAccidentalFromKeySig
+        if setAccidentalFromKeySig:
             currentKeySig = srcObj.getContextByClass(key.KeySignature)
             if currentKeySig is None:
                 currentKeySig = key.KeySignature(0)
@@ -834,7 +880,7 @@ class Trill(Ornament):
             secondNoteNachschlag.transpose(transposeIntervalReverse,
                                            inPlace=True)
 
-            if self._setAccidentalFromKeySig:
+            if setAccidentalFromKeySig and currentKeySig:
                 firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
                     firstNoteNachschlag.step)
                 secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
@@ -1308,8 +1354,9 @@ class TrillExtension(spanner.Spanner):
     >>> print(te)
     <music21.expressions.TrillExtension <music21.note.Note C><music21.note.Note C>>
     '''
-    # musicxml defines a start, stop, and a continue; will try to avoid continue
-    # note that this always includes a trill symbol
+    # musicxml defines a "start", "stop", and a "continue" type;
+    # We will try to avoid "continue".
+    # N.B. this extension always includes a trill symbol
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
@@ -1333,6 +1380,9 @@ class TrillExtension(spanner.Spanner):
         >>> te.placement = 'above'
         >>> te.placement
         'above'
+
+        A setting of None implies that the placement will be determined
+        by notation software and no particular placement is demanded.
         ''')
 
 
@@ -1352,7 +1402,8 @@ class TremoloSpanner(spanner.Spanner):
     Traceback (most recent call last):
     music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
     '''
-    # musicxml defines a start, stop, and a continue; will try to avoid continue
+    # musicxml defines a "start", "stop", and a "continue" type.
+    # We will try to avoid using the "continue" type.
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
@@ -1532,7 +1583,7 @@ class Test(unittest.TestCase):
         unp = note.Unpitched()
         mord = Mordent()
         with self.assertRaises(TypeError):
-            mord.realize(unp)
+            mord.realize(unp)  # type: ignore
 
 
 # class TestExternal(unittest.TestCase):

@@ -4,9 +4,9 @@
 # Purpose:      Subclasses of tree.core.AVLTree for different purposes
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -1267,11 +1267,11 @@ class OffsetTree(ElementTree):
         Removes `elements` which can be Music21Objects or Timespans
         (a single one or a list) from this Tree.
 
-        Much safer (for non-timespans) if a list of offsets is used but it is optional
+        Much safer (for non-timespans) if a list of offsets is used, but it is optional.
 
         If runUpdate is False then the tree will be left with incorrect indices and
         endTimes; but it can speed up operations where an element is going to be removed
-        and then immediately replaced: i.e., where the position of an element has changed
+        and then immediately replaced: i.e., where the position of an element has changed.
         '''
         initialPosition = self.lowestPosition()
         initialEndTime = self.endTime
@@ -1363,7 +1363,7 @@ class OffsetTree(ElementTree):
 
     def overlapTimePoints(self, includeStopPoints=False, returnVerticality=False):
         '''
-        Gets all time points where some element is starting
+        Gets all time-points where some element is starting
         (or if includeStopPoints is True, where some element is starting or stopping)
         while some other element is still continuing onward.
 

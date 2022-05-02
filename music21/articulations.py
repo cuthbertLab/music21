@@ -3,10 +3,10 @@
 # Name:         articulations.py
 # Purpose:      music21 classes for representing articulations
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2013 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -78,7 +78,7 @@ A longer test showing the utility of the module:
     :width: 628
 
 '''
-from typing import Optional
+from typing import Optional, Type
 import unittest
 
 from music21 import base
@@ -88,8 +88,7 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import style
 
-_MOD = 'articulations'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('articulations')
 
 
 
@@ -107,7 +106,7 @@ class Articulation(base.Music21Object):
     >>> x.displayText = '>'
 
     '''
-    _styleClass = style.TextStyle
+    _styleClass: Type[style.Style] = style.TextStyle
 
     def __init__(self):
         super().__init__()

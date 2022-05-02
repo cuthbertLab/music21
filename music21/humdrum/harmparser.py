@@ -5,7 +5,7 @@
 #
 # Authors:      Nestor Napoles Lopez
 #
-# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -203,6 +203,7 @@ class HarmParser:
 
     def parse(self, harmExpression) -> Dict[str, Any]:
         # Check for implied harmony
+        m: Dict[str, Any]
         impliedMatch = self.impliedRegExp.match(harmExpression)
         if impliedMatch:
             # This is implied harmony
@@ -216,7 +217,7 @@ class HarmParser:
             # Normal expression
             matchHarmRegExp = self.harmRegExp.match(harmExpression)
             if matchHarmRegExp:
-                m: Dict[str, Any] = matchHarmRegExp.groupdict()
+                m = matchHarmRegExp.groupdict()
                 m['implied'] = False
                 # Finding alternative harmony
                 if m['alternative'] is not None:

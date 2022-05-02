@@ -5,8 +5,9 @@
 #
 # Authors:      Christopher Ariza
 #               Josiah Oberholtzer
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2014 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2011-2014 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -24,8 +25,7 @@ from music21.common.objects import SlottedObjectMixin
 # imported by stream
 
 from music21 import environment
-_MOD = 'derivation'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('derivation')
 
 
 def derivationMethod(function):
@@ -221,9 +221,9 @@ class Derivation(SlottedObjectMixin):
         >>> s1.id = 's1'
         >>> s1.repeatAppend(note.Note(), 10)
         >>> s1.repeatAppend(note.Rest(), 10)
-        >>> s2 = s1.getElementsByClass('GeneralNote').stream()
+        >>> s2 = s1.notesAndRests.stream()
         >>> s2.id = 's2'
-        >>> s3 = s2.getElementsByClass('Note').stream()
+        >>> s3 = s2.getElementsByClass(note.Note).stream()
         >>> s3.id = 's3'
         >>> for y in s3.derivation.chain():
         ...     print(y)
@@ -307,8 +307,8 @@ class Derivation(SlottedObjectMixin):
         >>> s1 = stream.Stream()
         >>> s1.repeatAppend(note.Note(), 10)
         >>> s1.repeatAppend(note.Rest(), 10)
-        >>> s2 = s1.getElementsByClass('GeneralNote').stream()
-        >>> s3 = s2.getElementsByClass('Note').stream()
+        >>> s2 = s1.notesAndRests.stream()
+        >>> s3 = s2.getElementsByClass(note.Note).stream()
         >>> s3.derivation.rootDerivation is s1
         True
         '''

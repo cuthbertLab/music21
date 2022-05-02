@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2003, 2010 Christopher Ariza
-#               Copyright © 2010-2012, 19 Michael Scott Cuthbert and the music21 Project
+#               Copyright © 2010-2012, 19 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -60,7 +60,7 @@ import copy
 import random
 import string
 import unittest
-from typing import Union
+from typing import List, Union
 
 from music21 import exceptions21
 from music21 import pitch
@@ -68,8 +68,7 @@ from music21 import common
 from music21 import interval
 
 from music21 import environment
-_MOD = 'sieve'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('sieve')
 
 
 # ------------------------------------------------------------------------------
@@ -362,7 +361,7 @@ def unitNormStep(step, a=0, b=1, normalized=True):
     to fill step through inclusive a,b, then return a unit interval list of values
     necessary to cover region.
 
-    Note that returned values are by default normalized within the unit interval.
+    Note that returned values are, by default, normalized within the unit interval.
 
 
     >>> sieve.unitNormStep(0.5, 0, 1)
@@ -2195,7 +2194,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 if __name__ == '__main__':
     import music21

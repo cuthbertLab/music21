@@ -3,10 +3,10 @@
 # Name:         common/classTools.py
 # Purpose:      Utilities for classes
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import contextlib
@@ -106,10 +106,19 @@ def isIterable(usrData: Any) -> bool:
 
     >>> common.isIterable(range(20))
     True
+
+    Classes are not iterable even if their instances are:
+
+    >>> common.isIterable(stream.Stream)
+    False
+
+    Changed in v7.3 -- Classes (not instances) are not iterable
     '''
     if isinstance(usrData, (str, bytes)):
         return False
     if hasattr(usrData, '__iter__'):
+        if usrData.__class__ is type:
+            return False
         return True
     return False
 
@@ -128,7 +137,7 @@ def classToClassStr(classObj: Type) -> str:
 
 def getClassSet(instance, classNameTuple=None):
     '''
-    Return the classSet for an instance (whether a Music21Object or something else.
+    Return the classSet for an instance (whether a Music21Object or something else).
     See base.Music21Object.classSet for more details.
 
     >>> p = pitch.Pitch()

@@ -3,12 +3,12 @@
 # Name:         voiceLeading.py
 # Purpose:      music21 classes for voice leading
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #               Jackie Rogoff
 #               Beth Hadley
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -36,16 +36,18 @@ The list of objects included here are:
 '''
 import enum
 import unittest
-from typing import List
+from typing import List, no_type_check
 
 from music21 import base
+from music21 import chord
+from music21 import clef
+from music21 import common
 from music21 import exceptions21
 from music21 import interval
-from music21 import common
-from music21 import pitch
 from music21 import key
+from music21 import meter
 from music21 import note
-from music21 import chord
+from music21 import pitch
 from music21 import scale
 
 
@@ -55,7 +57,7 @@ from music21 import scale
 
 # create a module level shared cache for intervals of P1, P5, P8
 # to be populated the first time a VLQ object is created
-intervalCache = []  # type: List[interval.Interval]
+intervalCache: List[interval.Interval] = []
 
 
 class MotionType(str, enum.Enum):
@@ -445,6 +447,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             else:
                 return False
 
+    @no_type_check
     def parallelMotion(
         self,
         requiredInterval=None,
@@ -518,7 +521,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.parallelMotion(gi, allowOctaveDisplacement=True)
         True
         '''
-
         if not self.similarMotion():
             return False
 
@@ -988,6 +990,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return False
 
+    @no_type_check
     def isProperResolution(self) -> bool:
         '''
         Checks whether the voice-leading quartet resolves correctly according to standard
@@ -1146,6 +1149,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return True
 
+    @no_type_check
     def leapNotSetWithStep(self) -> bool:
         '''
         Returns True if there is a leap or skip in once voice then the other voice must
@@ -1236,6 +1240,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                       and (r1[0].upper() in openings if r1 is not False else False
                            or r2[0].upper() in openings if r2 is not False else False))
 
+    @no_type_check
     def closesIncorrectly(self) -> bool:
         '''
         TODO(msc): will be renamed to be less dogmatic
@@ -1630,9 +1635,11 @@ class Verticality(base.Music21Object):
         {0.0} <music21.stream.Part part-1>
             {0.0} <music21.note.Note C>
 
-        >>> len(vsStream.flatten().getElementsByClass(note.Note))
+        How many notes are there anywhere in the hierarchy?
+
+        >>> len(vsStream[note.Note])
         2
-        >>> len(vsStream.flatten().getElementsByClass('Harmony'))
+        >>> len(vsStream[harmony.Harmony])
         1
         '''
         from music21 import stream
@@ -1641,9 +1648,9 @@ class Verticality(base.Music21Object):
             p = stream.Part(id=f'part-{partNum}')
             foundObj = elementList[0]
 
-            cl = foundObj.getContextByClass('Clef')
-            ks = foundObj.getContextByClass('KeySignature')
-            ts = foundObj.getContextByClass('TimeSignature')
+            cl = foundObj.getContextByClass(clef.Clef)
+            ks = foundObj.getContextByClass(key.KeySignature)
+            ts = foundObj.getContextByClass(meter.TimeSignature)
 
             if cl:
                 p.append(cl)
@@ -1656,14 +1663,13 @@ class Verticality(base.Music21Object):
             retStream.insert(p)
         return retStream
 
-
-    def offset(self, leftAlign=True):
+    def getVerticalityOffset(self, *, leftAlign=True):
         '''
         returns the overall offset of the Verticality. Typically, this would just be the
         offset of each object in the Verticality,
         and each object would have the same offset.
-        However, if the duration of one object in the slice is different than the duration
-        of another,
+        However, if the duration of one object in the slice is different from
+        the duration of another,
         and that other starts after the first, but the first is still sounding, then the
         offsets would be
         different. In this case, specify leftAlign=True to return the lowest valued-offset
@@ -1684,10 +1690,13 @@ class Verticality(base.Music21Object):
         >>> vs.getObjectsByClass(note.Note)
         [<music21.note.Note A>, <music21.note.Note F>]
 
-        >>> vs.offset(leftAlign=True)
+        >>> vs.getVerticalityOffset(leftAlign=True)
         0.0
-        >>> vs.offset(leftAlign=False)
+        >>> vs.getVerticalityOffset(leftAlign=False)
         1.0
+
+        Changed in v8 -- renamed getVerticalityOffset to not conflict with
+            .offset property.  Made leftAlign keyword only
         '''
         if not self.objects:
             return 0.0
@@ -2103,7 +2112,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         are moving in the same direction. Returns True if the tone is
         identified as either a chromatic passing tone or a diatonic passing
         tone. Only major and minor diatonic passing tones are recognized (not
-        pentatonic or scales beyond twelve-notes). Does NOT check if tone is non harmonic
+        pentatonic or scales beyond twelve-notes). Does NOT check if tone is non-harmonic.
 
         Accepts pitch or note objects; method is dependent on octave information
 
@@ -2209,7 +2218,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     def couldBeNeighborTone(self):
         '''
         checks if noteToAnalyze could be a neighbor tone, either a diatonic neighbor tone
-        or a chromatic neighbor tone. Does NOT check if tone is non harmonic
+        or a chromatic neighbor tone. Does NOT check if tone is non-harmonic.
 
         >>> voiceLeading.ThreeNoteLinearSegment('E3', 'F3', 'E3').couldBeNeighborTone()
         True

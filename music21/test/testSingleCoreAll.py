@@ -4,9 +4,9 @@
 # Purpose:      Controller for all module tests in music21.
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -17,6 +17,7 @@ Runs great, but slowly on multiprocessor systems.
 
 import doctest
 import sys
+from typing import Sequence
 import unittest
 import warnings
 
@@ -27,8 +28,7 @@ from music21.test import commonTest
 from music21.test import coverageM21
 from music21.test import testRunner
 
-_MOD = 'test.testSingleCoreAll'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('test.testSingleCoreAll')
 
 
 # this is designed to be None for all but one system and a Coverage() object
@@ -36,7 +36,7 @@ environLocal = environment.Environment(_MOD)
 cov = coverageM21.getCoverage()
 
 
-def main(testGroup=('test',),
+def main(testGroup: Sequence[str] = ('test',),
          restoreEnvironmentDefaults=False,
          limit=None,
          verbosity=2,
@@ -72,15 +72,15 @@ def main(testGroup=('test',),
             environLocal.printDebug(f'{moduleObject} has no Test class')
         else:
             if 'test' in testGroup:
-                unitTestCases.append(moduleObject.Test)
+                unitTestCases.append(moduleObject.Test)  # type: ignore
         if not hasattr(moduleObject, 'TestExternal'):
             pass
             # environLocal.printDebug(f'{module} has no TestExternal class\n')
         else:
             if 'external' in testGroup:
                 if not show:
-                    moduleObject.TestExternal.show = False
-                unitTestCases.append(moduleObject.TestExternal)
+                    moduleObject.TestExternal.show = False  # type: ignore
+                unitTestCases.append(moduleObject.TestExternal)  # type: ignore
 
         # for each Test class, load this into a suite
         for testCase in unitTestCases:
@@ -102,7 +102,7 @@ def main(testGroup=('test',),
         docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
         testRunner.addDocAttrTestsToSuite(s1,
                                           allLocals,
-                                          outerFilename=moduleObject.__file__,
+                                          outerFilename=moduleObject.__file__,  # type: ignore
                                           globs=globs,
                                           optionflags=docTestOptions,
                                           # no checker here

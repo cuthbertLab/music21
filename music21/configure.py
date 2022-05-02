@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2019 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import os
@@ -13,6 +13,7 @@ import pathlib
 import re
 import time
 import sys
+import sysconfig
 import unittest
 import textwrap
 import webbrowser
@@ -29,8 +30,7 @@ from music21 import common
 from music21 import environment
 from music21 import exceptions21
 
-_MOD = 'configure'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('configure')
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 IGNORECASE = re.RegexFlag.IGNORECASE
@@ -119,8 +119,8 @@ def writeToUser(msg, wrapLines=True, linesPerPage=20):
 
 
 def getSitePackages():
-    import distutils.sysconfig
-    return distutils.sysconfig.get_python_lib()
+    # Good enough for all but Red Hat (uses "platlib" but unsupported by us)
+    return sysconfig.get_path('purelib')
 
 
 def findInstallations():
@@ -1218,7 +1218,8 @@ class SelectFilePath(SelectFromList):
         This looks at everything in Applications, as well as every directory in Applications
         '''
         post: List[str] = []
-        for path0 in ('/Applications', common.cleanpath('~/Applications')):
+        for path0 in ('/Applications', common.cleanpath('~/Applications', returnPathlib=False)):
+            assert isinstance(path0, str)
             self._getAppOSIndependent(comparisonFunction, path0, post, glob='*')
         return post
 
@@ -1593,7 +1594,7 @@ class ConfigurationAssistant:
 #         print('got: %s' % post)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: List[type] = []
 
 
 class TestUserInput(unittest.TestCase):  # pragma: no cover

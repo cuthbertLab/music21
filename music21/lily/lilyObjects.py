@@ -3,9 +3,9 @@
 # Name:         lily/objects.py
 # Purpose:      python objects representing lilypond
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2007-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2007-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 # pylint: disable=too-many-function-args
@@ -20,6 +20,7 @@ this replaces (April 2012) the old LilyString() conversion methods.
 The Grammar for Lilypond comes from
 http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
 '''
+from typing import Any, Dict, List
 import unittest
 from music21 import common
 from music21 import exceptions21
@@ -39,9 +40,9 @@ class LyObject(prebase.ProtoM21Object):
     ''
 
     '''
-    supportedClasses = []  # ordered list of classes to support
-    m21toLy = {}
-    defaultAttributes = {}
+    supportedClasses: List[object] = []  # ordered list of classes to support
+    m21toLy: Dict[str, dict] = {}
+    defaultAttributes: Dict[str, Any] = {}
     backslash = '\\'
 
     def __init__(self):
@@ -1283,7 +1284,7 @@ class LyPrefixCompositeMusic(LyObject):
                        | re_rhythmed_music
     '''
     # pylint: disable=redefined-builtin
-    def __init__(self, type=None, genericPrefixMusicScm=None,  # @ReservedAssignment
+    def __init__(self, type=None, genericPrefixMusicScm=None,
                  simpleString=None, optionalId=None, optionalContextMod=None,
                  music=None, fraction=None, repeatedMusic=None,
                  pitchAlsoInChords1=None, pitchAlsoInChords2=None,

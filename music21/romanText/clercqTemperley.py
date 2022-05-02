@@ -5,9 +5,9 @@
 #               Roman Numeral encoding system used by Clercq-Temperley
 #
 # Authors:      Beth Hadley
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-12, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-12, 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -596,7 +596,7 @@ class CTRule(prebase.ProtoM21Object):
                 for i in range(numReps):
                     returnedMeasures = rule.expand(ts, ks)
                     self.insertKsTs(returnedMeasures[0], ts, ks)
-                    for returnedTs in [m.getElementsByClass('TimeSignature')
+                    for returnedTs in [m.getElementsByClass(meter.TimeSignature)
                                         for m in returnedMeasures]:
                         if returnedTs is not ts:
                             # the TS changed mid-rule; create a new one for return.
@@ -986,7 +986,7 @@ class TestExternal(unittest.TestCase):
         #     txt = f.read()
         #
         #     s = clercqTemperley.CTSong(txt)
-        #     for chord in s.toScore().flatten().getElementsByClass('Chord'):
+        #     for chord in s.toScore().flatten().getElementsByClass(chord.Chord):
         #         try:
         #             x = chord.pitches
         #         except:

@@ -3,12 +3,12 @@
 # Name:         stream/__init__.py
 # Purpose:      base classes for dealing with groups of positioned objects
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #               Josiah Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from music21.exceptions21 import StreamException, ImmutableStreamException
@@ -22,4 +22,3 @@ from music21.stream import filters
 from music21.stream import iterator
 from music21.stream import makeNotation
 from music21.stream import streamStatus
-from music21.stream import tests

@@ -4,14 +4,15 @@
 # Purpose:      Things common to testing
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-15 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-15 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Things that are common to testing...
 '''
+import importlib
 from unittest.signals import registerResult
 
 import doctest
@@ -39,13 +40,14 @@ def testImports():
     '''
     Test that all optional packages needed for test suites are installed
     '''
+    # pylint: disable=unused-import
     try:
-        import scipy  # pylint: disable=unused-import
+        import scipy  # type: ignore
     except ImportError as e:
         raise ImportError('pip install scipy : needed for running test suites') from e
 
     try:
-        from Levenshtein import StringMatcher  # pylint: disable=unused-import
+        from Levenshtein import StringMatcher  # type: ignore
     except ImportError as e:
         raise ImportError('pip install python-Levenshtein : needed for running test suites') from e
 
@@ -411,6 +413,15 @@ class ModuleGather:
                 currentModule = object.__getattribute__(currentModule, thisName)
                 if not isinstance(currentModule, types.ModuleType):
                     return 'notInTree'
+            elif 'test' in thisName:
+                # import '*test*' automatically.
+                packageName = currentModule.__name__
+                newMod = importlib.import_module('.' + thisName, packageName)
+                setattr(currentModule, thisName, newMod)
+                environLocal.printDebug(
+                    f'Imported {thisName=} from {currentModule=}, {fp=}, {packageName=}'
+                )
+                currentModule = newMod
             else:
                 return 'notInTree'
         mod = currentModule

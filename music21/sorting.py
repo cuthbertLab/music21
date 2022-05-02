@@ -3,9 +3,9 @@
 # Name:         sorting.py
 # Purpose:      Music21 class for sorting
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014-2015 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2014-2015 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -15,7 +15,7 @@ sort against bare offsets and other SortTuples.
 
 This is a performance-critical object.
 
-It also defines three singleton instance of the SortTupleLow class as ZeroSortTupleDefault,
+It also defines three singleton instances of the SortTupleLow class as ZeroSortTupleDefault,
 ZeroSortTupleLow and
 ZeroSortTupleHigh which are sortTuple at
 offset 0.0, priority [0, -inf, inf] respectively:
@@ -31,14 +31,14 @@ from collections import namedtuple
 from math import inf as INFINITY
 from music21 import exceptions21
 
-_attrList = ['atEnd', 'offset', 'priority', 'classSortOrder', 'isNotGrace', 'insertIndex']
-
 
 class SortingException(exceptions21.Music21Exception):
     pass
 
 
-class SortTuple(namedtuple('SortTuple', _attrList)):
+class SortTuple(namedtuple('SortTuple', (
+    'atEnd', 'offset', 'priority', 'classSortOrder', 'isNotGrace', 'insertIndex'
+))):
     '''
     Derived class of namedTuple which allows for comparisons with pure ints/fractions.
 
@@ -200,7 +200,8 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
 
         Changing offset, but nothing else, helps in creating .flatten() positions.
         '''
-        outList = [kw.get(attr, getattr(self, attr)) for attr in _attrList]
+        # _fields are the namedtuple attributes
+        outList = [kw.get(attr, getattr(self, attr)) for attr in self._fields]
         return self.__class__(*outList)
 
     def add(self, other):
@@ -228,7 +229,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         outList = [max(getattr(self, attr), getattr(other, attr))
                     if attr in ('atEnd', 'isNotGrace')
                     else (getattr(self, attr) + getattr(other, attr))
-                    for attr in _attrList]
+                    for attr in self._fields]  # _fields are the namedtuple attributes
 
         return self.__class__(*outList)
 
@@ -255,7 +256,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         outList = [min(getattr(self, attr), getattr(other, attr))
                     if attr in ('atEnd', 'isNotGrace')
                     else (getattr(self, attr) - getattr(other, attr))
-                    for attr in _attrList]
+                    for attr in self._fields]  # _fields are the namedtuple attributes
 
         return self.__class__(*outList)
 

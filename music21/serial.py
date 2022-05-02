@@ -3,10 +3,10 @@
 # Name:         serial.py
 # Purpose:      music21 classes for serial transformations
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -31,8 +31,7 @@ from music21 import pitch
 
 from music21 import environment
 
-_MOD = 'serial'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('serial')
 
 
 # ------------------------------------------------------------------------------
@@ -710,7 +709,7 @@ class TwelveToneRow(ToneRow):
         '''
         # note: do not want to return a TwelveToneRow() type, as this will
         # add again the same pitches to the elements list twice.
-        noteList = self.getElementsByClass('Note')
+        noteList = self.getElementsByClass(note.Note)
 
         i = [(12 - x.pitch.pitchClass) % 12 for x in noteList]
         matrix = [[(x.pitch.pitchClass + t) % 12 for x in noteList] for t in i]

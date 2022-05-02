@@ -4,9 +4,9 @@
 # Purpose:      Shortcuts to the corpus collection
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009, 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -67,8 +67,7 @@ from music21.corpus.manager import search
 from music21.exceptions21 import CorpusException
 
 from music21 import environment
-_MOD = 'corpus'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('corpus')
 
 
 # -----------------------------------------------------------------------------
@@ -80,7 +79,7 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
     provided by an argument.
 
     If `expandExtensions` is True, a format for an extension, and related
-    extensions, will replaced by all known input extensions.
+    extensions, will be replaced by all known input extensions.
 
     This is convenient when an input format might match for multiple
     extensions.
@@ -289,7 +288,7 @@ def parse(workName,
             number=None,
             fileExtensions=None,
             forceSource=False,
-            format=None  # @ReservedAssignment
+            format=None
           ):
     '''
     The most important method call for corpus.
@@ -332,7 +331,7 @@ def parse(workName,
         number=number,
         fileExtensions=fileExtensions,
         forceSource=forceSource,
-        format=format  # @ReservedAssignment
+        format=format
     )
 
 

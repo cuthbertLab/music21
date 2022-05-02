@@ -4,7 +4,7 @@
 # Purpose:      Defines standard resolutions for possibility instances
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

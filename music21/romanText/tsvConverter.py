@@ -5,7 +5,7 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2019 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -443,7 +443,7 @@ class M21toTSV:
 
         tsvData = []
 
-        for thisRN in self.m21Stream.recurse().getElementsByClass('RomanNumeral'):
+        for thisRN in self.m21Stream[roman.RomanNumeral]:
 
             relativeroot = None
             if thisRN.secondaryRomanNumeral:
@@ -461,7 +461,7 @@ class M21toTSV:
             thisEntry.measure = thisRN.measureNumber
             thisEntry.beat = thisRN.beat
             thisEntry.totbeat = None
-            thisEntry.timesig = thisRN.getContextByClass('TimeSignature').ratioString
+            thisEntry.timesig = thisRN.getContextByClass(meter.TimeSignature).ratioString
             thisEntry.op = self.m21Stream.metadata.opusNumber
             thisEntry.no = self.m21Stream.metadata.number
             thisEntry.mov = self.m21Stream.metadata.movementNumber
