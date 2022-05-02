@@ -21,7 +21,7 @@ import math
 import itertools
 import unittest
 from collections import OrderedDict
-from typing import List, Optional, Union, TypeVar, Tuple, Dict, Literal
+from typing import List, Optional, Union, TypeVar, Tuple, Dict, Literal, Set
 
 from music21 import base
 from music21 import common
@@ -32,6 +32,7 @@ from music21 import style
 from music21 import prebase
 
 from music21.common.objects import SlottedObjectMixin
+from music21.common.types import StepName
 from music21 import environment
 
 _T = TypeVar('_T')
@@ -40,7 +41,7 @@ environLocal = environment.Environment('pitch')
 
 PitchClassString = Literal['a', 'A', 't', 'T', 'b', 'B', 'e', 'E']
 
-STEPREF = {
+STEPREF: Dict[StepName, int] = {
     'C': 0,
     'D': 2,
     'E': 4,
@@ -50,7 +51,7 @@ STEPREF = {
     'B': 11,
 }
 NATURAL_PCS = (0, 2, 4, 5, 7, 9, 11)
-STEPREF_REVERSED = {
+STEPREF_REVERSED: Dict[int, StepName] = {
     0: 'C',
     2: 'D',
     4: 'E',
@@ -59,8 +60,14 @@ STEPREF_REVERSED = {
     9: 'A',
     11: 'B',
 }
-STEPNAMES = {'C', 'D', 'E', 'F', 'G', 'A', 'B'}  # set
-STEP_TO_DNN_OFFSET = {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6}
+STEPNAMES: Set[StepName] = {'C', 'D', 'E', 'F', 'G', 'A', 'B'}  # set
+STEP_TO_DNN_OFFSET: Dict[StepName, int] = {'C': 0,
+                                           'D': 1,
+                                           'E': 2,
+                                           'F': 3,
+                                           'G': 4,
+                                           'A': 5,
+                                           'B': 6}
 
 
 TWELFTH_ROOT_OF_TWO = 2.0 ** (1 / 12)
@@ -152,7 +159,7 @@ def _convertPitchClassToNumber(
         return int(ps)
 
 
-def convertPitchClassToStr(pc) -> str:
+def convertPitchClassToStr(pc: int) -> str:
     '''
     Given a pitch class number, return a string.
 
@@ -195,7 +202,12 @@ def _convertPsToOct(ps: Union[int, float]) -> int:
     return int(math.floor(ps / 12.)) - 1
 
 
-def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
+def _convertPsToStep(
+    ps: Union[int, float]
+) -> Tuple[Union[StepName, Literal['']],
+          'Accidental',
+          'Microtone',
+          int]:
     '''
     Utility conversion; does not process internal representations.
 
@@ -2743,7 +2755,7 @@ class Pitch(prebase.ProtoM21Object):
         return name
 
     @property
-    def step(self) -> str:
+    def step(self) -> StepName:
         '''
         The diatonic name of the note; i.e. does not give the
         accidental or octave.
@@ -2798,7 +2810,7 @@ class Pitch(prebase.ProtoM21Object):
         return self._step
 
     @step.setter
-    def step(self, usrStr: str) -> None:
+    def step(self, usrStr: StepName) -> None:
         '''
         This does not change octave or accidental, only step
         '''
@@ -2913,7 +2925,7 @@ class Pitch(prebase.ProtoM21Object):
         return round(self.ps) % 12
 
     @pitchClass.setter
-    def pitchClass(self, value: Union[str, int]):
+    def pitchClass(self, value: Union[int, PitchClassString]):
         # permit the submission of strings, like "A" and "B"
         value = _convertPitchClassToNumber(value)
         # get step and accidental w/o octave
