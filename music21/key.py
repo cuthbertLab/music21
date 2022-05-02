@@ -775,15 +775,12 @@ class KeySignature(base.Music21Object):
         'B--4'
 
         If inPlace is True then the original pitch is
-        modified.
+        modified and nothing is returned.
 
         >>> p5 = pitch.Pitch('C5')
         >>> ks.transposePitchFromC(p5, inPlace=True)
-        <music21.pitch.Pitch E-5>
         >>> p5.nameWithOctave
         'E-5'
-
-        Changed in v8: original pitch returned if inPlace=True
         '''
         transInterval = None
         transTimes = 0
@@ -920,6 +917,13 @@ class Key(KeySignature, scale.DiatonicScale):
      <music21.pitch.Pitch D5>,
      <music21.pitch.Pitch E5>]
 
+    If you prefer not to use uppercase and lowercase to distinguish major and minor,
+    the shorthand of CM or Cm can also be used:
+
+    >>> key.Key('EM')
+    <music21.key.Key of E major>
+    >>> key.Key('F#m')
+    <music21.key.Key of f# minor>
     '''
     _sharps = 0
     _mode = None
@@ -955,7 +959,7 @@ class Key(KeySignature, scale.DiatonicScale):
         elif isinstance(tonic, note.Note):
             tonicPitch = tonic.pitch
         else:
-            tonicPitch = pitch.Pitch(tonic)
+            tonicPitch = pitch.Pitch(tonicStr)
 
         KeySignature.__init__(self, sharps)
         scale.DiatonicScale.__init__(self, tonic=tonicPitch)
