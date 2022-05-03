@@ -268,7 +268,6 @@ class Edge(prebase.ProtoM21Object):
         # if bi and we get an ascending/descending request
         if (direction in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]
                 and self.direction == DIRECTION_BI):
-
             # assume that in a bi-representation, the first is ascending
             # the second is descending
             # NOTE: this may not mean that we are actually ascending, we may
@@ -2811,12 +2810,12 @@ class IntervalNetwork:
 
 
     _SCALE_STARTS: Tuple[str, ...] = (
-         'C', 'C#', 'D-',
-         'D', 'D#', 'E-',
-         'E', 'F',
-         'F#', 'G',
-         'G#', 'A', 'B-',
-         'B', 'C-',
+        'C', 'C#', 'D-',
+        'D', 'D#', 'E-',
+        'E', 'F',
+        'F#', 'G',
+        'G#', 'A', 'B-',
+        'B', 'C-',
     )
 
     def find(self,
