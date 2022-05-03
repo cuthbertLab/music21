@@ -7553,7 +7553,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         return self.flatten(retainContainers=True)
 
     @overload
-    def recurse(self,
+    def recurse(self: StreamType,
                 *,
                 streamsOnly: Literal[True],
                 restoreActiveSites=True,
@@ -7570,7 +7570,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
                 includeSelf=None) -> iterator.RecursiveIterator[M21ObjType]:
         return iterator.RecursiveIterator(self)
 
-    def recurse(self,
+    def recurse(self: StreamType,
                 *,
                 streamsOnly=False,
                 restoreActiveSites=True,
@@ -9671,7 +9671,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
                 continue  # has .pitches but should not be added
             if hasattr(e, 'pitch'):
                 post.append(e.pitch)
-            # both Chords and Stream have a pitches properties; this just
+            # both GeneralNotes and Stream have a pitches properties; this just
             # causes a recursive pitch gathering
             elif hasattr(e, 'pitches'):
                 post.extend(list(e.pitches))
@@ -9756,7 +9756,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         if skipOctaves is True:
             skipUnisons = True  # implied
 
-        container: Stream
         for container in self.recurse(streamsOnly=True, includeSelf=True):
             if (container.offset < lastContainerEnd
                     and container.getElementsByClass(note.GeneralNote)

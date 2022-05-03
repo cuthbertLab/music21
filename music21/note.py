@@ -800,6 +800,19 @@ class GeneralNote(base.Music21Object):
     def fullName(self) -> str:
         return self.classes[0]  # override in subclasses
 
+    @property
+    def pitches(self) -> Tuple[pitch.Pitch, ...]:
+        '''
+        Returns an empty tuple.  (Useful for iterating over NotRests since they
+        include Notes and Chords.)
+        '''
+        return ()
+
+    @pitches.setter
+    def pitches(self, _value: Iterable[pitch.Pitch]):
+        pass
+
+
     # --------------------------------------------------------------------------
     def augmentOrDiminish(self, scalar, *, inPlace=False):
         '''
@@ -1163,19 +1176,6 @@ class NotRest(GeneralNote):
             return False
         else:
             return True
-
-    @property
-    def pitches(self) -> Tuple[pitch.Pitch, ...]:
-        '''
-        Returns an empty tuple.  (Useful for iterating over NotRests since they
-        include Notes and Chords.)
-        '''
-        return ()
-
-    @pitches.setter
-    def pitches(self, _value: Iterable[pitch.Pitch]):
-        pass
-
 
     def _getVolume(self, forceClient: Optional[base.Music21Object] = None) -> volume.Volume:
         # DO NOT CHANGE TO @property because of optional attributes

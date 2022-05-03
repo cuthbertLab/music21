@@ -132,7 +132,7 @@ def listOfTreesByClass(
                 if classList and element.classSet.isdisjoint(classList):
                     continue
                 if useTimespans:
-                    if hasattr(element, 'pitches') and not isinstance(element, key.Key):
+                    if hasattr(element, 'pitches') and not isinstance(element, (key.Key, note.Rest)):
                         spanClass = spans.PitchedTimespan
                     else:
                         spanClass = spans.ElementTimespan
