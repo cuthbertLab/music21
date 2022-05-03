@@ -23,7 +23,7 @@ from music21 import pitch
 from music21 import scale
 from music21 import stream
 from music21.musicxml import m21ToXml
-from music21.pitch import Pitch, Accidental, Microtone
+from music21.pitch import Pitch, Accidental
 
 
 class Test(unittest.TestCase):

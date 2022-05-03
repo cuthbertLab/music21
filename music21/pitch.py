@@ -21,9 +21,8 @@ from __future__ import annotations
 import copy
 import math
 import itertools
-import unittest
 from collections import OrderedDict
-from typing import List, Optional, Union, TypeVar, Tuple, Dict, Literal, Set
+from typing import List, Optional, Union, TypeVar, Tuple, Dict, Literal, Set, overload
 
 from music21 import base
 from music21 import common
@@ -134,12 +133,12 @@ accidentalModifiersSorted = _sortModifiers()
 # utility functions
 
 def _convertPitchClassToNumber(
-    ps: Union[int, PitchClassString]
-) -> int:
+    ps: Union[int, float, PitchClassString]
+) -> Union[int, float]:
     '''
     Given a pitch class string
     return the pitch class representation.
-    Ints are returned unchanged;
+    Ints and floats are returned unchanged;
 
     >>> pitch._convertPitchClassToNumber(3)
     3
@@ -149,8 +148,10 @@ def _convertPitchClassToNumber(
     11
     >>> pitch._convertPitchClassToNumber('3')
     3
+    >>> pitch._convertPitchClassToNumber(3.5)
+    3.5
     '''
-    if isinstance(ps, int):
+    if isinstance(ps, (int, float)):
         return ps
     else:  # assume it is a string
         if ps in ('a', 'A', 't', 'T'):
@@ -216,7 +217,8 @@ def _convertPsToStep(
     C4 middle C, so 60 returns 4).
 
     Returns a tuple of Step, an Accidental object, a Microtone object or
-    None, and an int representing octave shift.
+    None, and an int representing octave shift (which is nearly always zero, but can be 1
+    for a B with very high microtones.
 
     >>> pitch._convertPsToStep(60)
     ('C', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
@@ -231,8 +233,6 @@ def _convertPsToStep(
 
     >>> pitch._convertPsToStep(60.5)
     ('C', <music21.pitch.Accidental half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
-    >>> pitch._convertPsToStep(61.5)
-    ('C', <music21.pitch.Accidental one-and-a-half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(62)
     ('D', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(62.5)
@@ -246,16 +246,30 @@ def _convertPsToStep(
     >>> pitch._convertPsToStep(70.5)
     ('B', <music21.pitch.Accidental half-flat>, <music21.pitch.Microtone (+0c)>, 0)
 
-    >>> pitch._convertPsToStep(72.0)
-    ('C', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
-    >>> pitch._convertPsToStep(71.9999999)
-    ('C', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
+    Here is a case where perhaps D half-flat would be better:
+
+    >>> pitch._convertPsToStep(61.5)
+    ('C', <music21.pitch.Accidental one-and-a-half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
 
 
-    >>> pitch._convertPsToStep(43.0)
+    Note that Microtones can have negative and positive zeros.
+
+    >>> pitch._convertPsToStep(43.00001)
     ('G', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(42.999739)
     ('G', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (-0c)>, 0)
+
+    A case where octave shift is not zero.  Here the ps of 59.8 would normally
+    imply octave 3, but because it is being represented by a C, it must appear
+    in the octave above what is implied by the ps.
+
+    >>> pitch._convertPsToStep(59.8)
+    ('C', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (-20c)>, 1)
+
+    A number very close to 60, however, is rounded, and gets no octave shift.
+
+    >>> pitch._convertPsToStep(59.9999999)
+    ('C', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     '''
     if isinstance(ps, int):
         pc = ps % 12
@@ -1779,7 +1793,7 @@ class Pitch(prebase.ProtoM21Object):
     }
 
     def __init__(self,
-                 name: Optional[Union[str, int]] = None,
+                 name: Optional[Union[str, int, float]] = None,
                  **keywords):
         # No need for super().__init__() on protoM21Object
         self._groups: Optional[base.Groups] = None
@@ -1821,10 +1835,11 @@ class Pitch(prebase.ProtoM21Object):
             if isinstance(name, str):
                 self.name = name  # set based on string
             else:  # is a number
-                if name < 12:  # is a pitchClass
-                    self.pitchClass = name
-                else:  # is a midiNumber
-                    self.pitchClass = name
+                # is a midiNumber or a ps -- a float midiNumber
+                # get step and accidental w/o octave
+                self.step, self._accidental = _convertPsToStep(name)[0:2]
+                self.spellingIsInferred = True
+                if name >= 12:  # is not a pitchClass
                     self._octave = int(name / 12) - 1
 
         # override just about everything with keywords
@@ -2468,6 +2483,7 @@ class Pitch(prebase.ProtoM21Object):
     def ps(self, value):
         # can assign microtone here; will be either None or a Microtone object
         self.step, acc, self._microtone, octShift = _convertPsToStep(value)
+
         # replace a natural with a None
         if acc.name == 'natural':
             self.accidental = None
@@ -3818,6 +3834,18 @@ class Pitch(prebase.ProtoM21Object):
     # a cache so that interval objects can be reused...
     _transpositionIntervals: Dict[Literal['d2', '-d2'], interval.Interval] = {}
 
+    @overload
+    def _getEnharmonicHelper(self: PitchType,
+                             inPlace: Literal[True],
+                             intervalString: Literal['d2', '-d2']) -> None:
+        return None  # astroid 1015
+
+    @overload
+    def _getEnharmonicHelper(self: PitchType,
+                             inPlace: Literal[False],
+                             intervalString: Literal['d2', '-d2']) -> PitchType:
+        return self  # astroid 1015
+
     def _getEnharmonicHelper(self: PitchType,
                              inPlace: bool,
                              intervalString: Literal['d2', '-d2']) -> Optional[PitchType]:
@@ -3875,7 +3903,7 @@ class Pitch(prebase.ProtoM21Object):
         Traceback (most recent call last):
         music21.pitch.AccidentalException: -5.0 is not a supported accidental type
 
-        Note that half accidentals (~ = half-sharp, \` = half-flat)
+        Note that half accidentals (~ = half-sharp, ` = half-flat)
         get converted to microtones:
 
         >>> pHalfSharp = pitch.Pitch('D~4')
