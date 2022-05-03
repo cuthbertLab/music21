@@ -22,21 +22,43 @@ remain stable.
 All functions here will eventually begin with `.core`.
 '''
 import copy
-from typing import List, Dict, Union, Tuple, Optional
+from typing import List, Dict, Union, Tuple, Optional, Protocol
 from fractions import Fraction
 import unittest
 
 from music21.base import Music21Object
 from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
+from music21.common.types import OffsetQL, M21ObjType
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
-from music21.stream.iterator import StreamIterator
+from music21.stream.iterator import StreamIterator, RecursiveIterator
+
+class StreamBaseProtocol(Protocol):
+    def iter(self) -> StreamIterator: ...
+    def recurse(self,
+                *,
+                streamsOnly=False,
+                restoreActiveSites=True,
+                classFilter=(),
+                includeSelf=None) -> RecursiveIterator[M21ObjType]: ...
+    def setDerivationMethod(self, derivationMethod, recurse=False): ...
+    def _setHighestTime(self, value): ...
+
+    # noinspection PyPropertyDefinition
+    @property
+    def derivation(self) -> 'music21.derivation.Derivation': ...
+
+    # noinspection PyPropertyDefinition
+    @property
+    def highestTime(self) -> OffsetQL: ...
+
+
 
 
 # pylint: disable=attribute-defined-outside-init
-class StreamCoreMixin:
+class StreamCoreMixin(StreamBaseProtocol):
     '''
     Core aspects of a Stream's behavior.  Any of these can change at any time.
     '''
@@ -104,9 +126,7 @@ class StreamCoreMixin:
                         storeSorted = True
                     else:
                         highestSortTuple = self._elements[-1].sortTuple()
-                        thisSortTuple = list(element.sortTuple())
-                        thisSortTuple[1] = offset
-                        thisSortTuple = tuple(thisSortTuple)
+                        thisSortTuple = element.sortTuple().modify(offset=offset)
 
                         if highestSortTuple < thisSortTuple:
                             storeSorted = True
@@ -697,6 +717,7 @@ class StreamCoreMixin:
         {1.0} <music21.note.Note D>
         '''
         sb = self.spannerBundle
+        sIter: Union[StreamIterator, RecursiveIterator]
         if recurse is True:
             sIter = self.recurse()
         else:
@@ -723,10 +744,12 @@ class StreamCoreMixin:
 
         if insert is False:
             return collectList
-        elif collectList:  # do not run elementsChanged if nothing here.
+
+        if collectList:  # do not run elementsChanged if nothing here.
             for sp in collectList:
                 self.coreInsert(0, sp)
             self.coreElementsChanged(updateIsFlat=False)
+        return None
 
 # timing before: Macbook Air 2012, i7
 # In [3]: timeit('s = stream.Stream()', setup='from music21 import stream', number=100000)
