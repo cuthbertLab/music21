@@ -150,7 +150,7 @@ def _convertPitchClassToNumber(
     >>> pitch._convertPitchClassToNumber('3')
     3
     '''
-    if common.isNum(ps):
+    if isinstance(ps, int):
         return ps
     else:  # assume it is a string
         if ps in ('a', 'A', 't', 'T'):
@@ -259,19 +259,19 @@ def _convertPsToStep(
     '''
     if isinstance(ps, int):
         pc = ps % 12
-        alter = 0
-        micro = 0
+        alter = 0.0
+        micro = 0.0
     elif ps == int(ps):
         pc = int(ps) % 12
-        alter = 0
-        micro = 0
+        alter = 0.0
+        micro = 0.0
     else:
         # rounding here is essential
         ps = round(ps, PITCH_SPACE_SIG_DIGITS)
         # micro here will be between 0 and 1
         pcReal = ps % 12
-        pc, micro = divmod(pcReal, 1)
-        pc = int(pc)
+        pc_float, micro = divmod(pcReal, 1)
+        pc = int(pc_float)
 
         # if close enough to a quarter tone
         if round(micro, 1) == 0.5:
@@ -287,15 +287,15 @@ def _convertPsToStep(
             micro = micro - alter
         # if closer to 1, than go to the higher alter and get negative micro
         elif 0.75 <= micro < 1:
-            alter = 1
+            alter = 1.0
             micro = micro - alter
         # not greater than 0.25
         elif micro > 0:
-            alter = 0
+            alter = 0.0
             # micro = micro  # no change necessary
         else:
-            alter = 0
-            micro = 0
+            alter = 0.0
+            micro = 0.0
 
     # environLocal.printDebug(['_convertPsToStep(): post', 'alter', alter,
     #    'micro', micro, 'pc', pc])
@@ -338,11 +338,11 @@ def _convertPsToStep(
     # create a micro object always
     if micro != 0:
         # provide cents value; these are alter values
-        micro = Microtone(micro * 100)
+        microObj = Microtone(micro * 100)
     else:
-        micro = Microtone(0)
+        microObj = Microtone(0)
 
-    return name, acc, micro, octShift
+    return name, acc, microObj, octShift
 
 
 def _convertCentsToAlterAndCents(shift) -> Tuple[float, float]:
@@ -666,8 +666,8 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
     def __init__(self,
                  centsOrString: Union[str, int, float] = 0,
                  harmonicShift=1):
-        self._centShift = 0
-        self._harmonicShift = harmonicShift  # the first harmonic is the start
+        self._centShift: Union[int, float] = 0
+        self._harmonicShift: int = harmonicShift  # the first harmonic is the start
 
         if isinstance(centsOrString, (int, float)):
             self._centShift = centsOrString  # specify harmonic in cents
@@ -1782,7 +1782,7 @@ class Pitch(prebase.ProtoM21Object):
                  name: Optional[Union[str, int]] = None,
                  **keywords):
         # No need for super().__init__() on protoM21Object
-        self._groups = None
+        self._groups: Optional[base.Groups] = None
 
         if isinstance(name, type(self)):
             name = name.nameWithOctave
@@ -1790,21 +1790,21 @@ class Pitch(prebase.ProtoM21Object):
         # this should not be set, as will be updated when needed
         self._step: StepName = defaults.pitchStep  # this is only the pitch step
 
-        # keep an accidental object based on self._alter
-        self._overridden_freq440 = None
+        self._overridden_freq440: Optional[float] = None
 
         # store an Accidental and Microtone objects
         # note that creating an Accidental object is much more time-consuming
         # than a microtone
-        self._accidental = None
-        self._microtone = None  # 5% of pitch creation time; it'll be created in a sec anyhow
+        self._accidental: Optional[Accidental] = None
+        # 5% of pitch creation time; it'll be created in a sec anyhow
+        self._microtone: Optional[Microtone] = None
 
         # CA, Q: should this remain an attribute or only refer to value in defaults?
         # MSC A: no, it's a useful attribute for cases such as scales where if there are
         #        no octaves we give a defaultOctave higher than the previous
         #        (MSC 12 years later: maybe Chris was right...)
-        self.defaultOctave = defaults.pitchOctave
-        self._octave = None
+        self.defaultOctave: int = defaults.pitchOctave
+        self._octave: Optional[int] = None
 
         # if True, accidental is not known; is determined algorithmically
         # likely due to pitch data from midi or pitch space/class numbers
@@ -2077,7 +2077,7 @@ class Pitch(prebase.ProtoM21Object):
             alter, cents = _convertCentsToAlterAndCents(value * 100.0)
             self._accidental = Accidental(alter)
             if abs(cents) > 0.01:
-                self.microtone = cents
+                self.microtone = Microtone(cents)
         else:
             raise ValueError(f'Accidental should be an Accidental object, not {value!r}')
 
@@ -4071,7 +4071,7 @@ class Pitch(prebase.ProtoM21Object):
         <music21.pitch.Pitch C>
 
 
-        Works with half-sharps:
+        Works with half-sharps, but converts them to microtones:
 
         >>> dHalfSharp = pitch.Pitch('D~')
         >>> print(dHalfSharp.getEnharmonic())
@@ -4093,7 +4093,6 @@ class Pitch(prebase.ProtoM21Object):
                     post.getLowerEnharmonic(inPlace=True)
                 else:
                     post.getHigherEnharmonic(inPlace=True)
-
         else:
             if self.step in ('C', 'D', 'G'):
                 post.getLowerEnharmonic(inPlace=True)

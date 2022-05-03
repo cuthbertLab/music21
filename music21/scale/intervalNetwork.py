@@ -2860,7 +2860,7 @@ class IntervalNetwork:
                 pitchTarget,
                 comparisonAttribute=comparisonAttribute,
                 alteredDegrees=alteredDegrees)
-            sortList.append((len(matched), p))
+            sortList.append((len(matched), pitch.Pitch(p)))
 
         sortList.sort()
         sortList.reverse()  # want most matches first
