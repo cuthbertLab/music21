@@ -148,7 +148,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
         self.cleanupOnStop = False
         self.restoreActiveSites: bool = restoreActiveSites
 
-        self.overrideDerivation = None
+        self.overrideDerivation: Optional[str] = None
 
         if filterList is None:
             filterList = []

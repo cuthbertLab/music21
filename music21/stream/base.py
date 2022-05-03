@@ -34,7 +34,7 @@ from collections import namedtuple
 from fractions import Fraction
 from math import isclose
 from typing import (Dict, Iterable, List, Optional, Set, Tuple, cast,
-                    TypeVar, Type, Union, Generic, overload)
+                    TypeVar, Type, Union, Generic, Literal, overload)
 
 from music21 import base
 
@@ -2712,7 +2712,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
     # --------------------------------------------------------------------------
     # searching and replacing routines
 
-    def setDerivationMethod(self, derivationMethod, recurse=False):
+    def setDerivationMethod(self, derivationMethod, recurse=False) -> None:
         '''
         Sets the .derivation.method for each element in the Stream
         if it has a .derivation object.
@@ -7552,12 +7552,31 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         '''
         return self.flatten(retainContainers=True)
 
+    @overload
+    def recurse(self,
+                *,
+                streamsOnly: Literal[True],
+                restoreActiveSites=True,
+                classFilter=(),
+                includeSelf=None) -> iterator.RecursiveIterator[StreamType]:
+        return iterator.RecursiveIterator(self).getElementsByClass(Stream)
+
+    @overload
+    def recurse(self,
+                *,
+                streamsOnly: Literal[False] = False,
+                restoreActiveSites=True,
+                classFilter=(),
+                includeSelf=None) -> iterator.RecursiveIterator[M21ObjType]:
+        return iterator.RecursiveIterator(self)
+
     def recurse(self,
                 *,
                 streamsOnly=False,
                 restoreActiveSites=True,
                 classFilter=(),
-                includeSelf=None) -> iterator.RecursiveIterator[M21ObjType]:
+                includeSelf=None) -> Union[iterator.RecursiveIterator[M21ObjType],
+                                           iterator.RecursiveIterator[StreamType]]:
         '''
         `.recurse()` is a fundamental method of music21 for getting into
         elements contained in a Score, Part, or Measure, where elements such as
@@ -9728,7 +9747,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         '''
         if self.isSorted is False and self.autoSort:
             self.sort()
-        returnList = []
+        returnList: List[Union[note.Note, None]] = []
         lastStart = 0.0
         lastEnd = 0.0
         lastContainerEnd = 0.0
@@ -9737,6 +9756,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         if skipOctaves is True:
             skipUnisons = True  # implied
 
+        container: Stream
         for container in self.recurse(streamsOnly=True, includeSelf=True):
             if (container.offset < lastContainerEnd
                     and container.getElementsByClass(note.GeneralNote)
@@ -13197,14 +13217,13 @@ class Part(Stream):
         else:  # in place
             return None
 
-    def mergeAttributes(self, other: 'Part'):
+    def mergeAttributes(self, other):
         '''
         Merge relevant attributes from the Other part
         into this one. Key attributes of difference: partName and partAbbreviation.
 
         TODO: doc test
         '''
-
         super().mergeAttributes(other)
 
         for attr in ('_partName', '_partAbbreviation'):
@@ -13585,9 +13604,9 @@ class Score(Stream):
         165
 
         '''
-        sub = []
+        sub: List[Part] = []
         bundle = []
-        if common.isNum(voiceAllocation):
+        if isinstance(voiceAllocation, int):
             voicesPerPart = voiceAllocation
             for pIndex, p in enumerate(self.parts):
                 if pIndex % voicesPerPart == 0:
@@ -13606,7 +13625,7 @@ class Score(Stream):
             for group in voiceAllocation:
                 sub = []
                 # if a single entry
-                if not common.isListLike(group):
+                if not isinstance(group, list):
                     # group is a single index
                     sub.append(self.parts[group])
                 else:
@@ -13621,6 +13640,7 @@ class Score(Stream):
         s = self.cloneEmpty(derivationMethod='partsToVoices')
         s.metadata = self.metadata
 
+        pActive: Optional[Part]
         for sub in bundle:  # each sub contains parts
             if len(sub) == 1 and not permitOneVoicePerPart:
                 # probably need to create a new part and measure
@@ -13664,7 +13684,7 @@ class Score(Stream):
                     v.id = pIndex
                     # for now, just take notes, including rests
                     for e in m.notesAndRests:  # m.getElementsByClass():
-                        if setStems and hasattr(e, 'stemDirection'):
+                        if setStems and isinstance(e, note.Note):
                             e.stemDirection = 'up' if pIndex % 2 == 0 else 'down'
                         v.insert(e.getOffsetBySite(m), e)
                     # insert voice in new measure
