@@ -13,9 +13,11 @@
 Simple storage for data defaults used throughout music21.
 '''
 import unittest
+from typing import Literal
 from music21 import _version
 
 # note: this module should not import any higher level modules
+StepName = Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']  # restating so as not to import.
 
 _MOD = 'defaults'
 
@@ -43,7 +45,7 @@ limitOffsetDenominator = 65535  # > CD track level precision.
 # not allowing more can be construed as a feature.
 
 
-pitchStep = 'C'
+pitchStep: StepName = 'C'
 pitchOctave = 4
 
 partGroup = 'Part Group'
