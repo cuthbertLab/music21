@@ -31,6 +31,7 @@ finals, or other attributes of the network.
 '''
 import copy
 import unittest
+from typing import Tuple, Union
 
 from collections import OrderedDict
 
@@ -1386,7 +1387,7 @@ class IntervalNetwork:
         else:
             ck = None
 
-        # if this network is octaveDuplicating, than we can shift
+        # if this network is octaveDuplicating, then we can shift
         # reference up octaves to just below minPitch
         if self.octaveDuplicating and minPitch is not None:
             pitchReference.transposeBelowTarget(minPitch, minimize=True, inPlace=True)
@@ -1661,7 +1662,7 @@ class IntervalNetwork:
         return pre, preNodeId
 
     def realize(self,
-                pitchReference,
+                pitchReference: Union[str, pitch.Pitch],
                 nodeId=None,
                 minPitch=None,
                 maxPitch=None,
@@ -1710,6 +1711,7 @@ class IntervalNetwork:
             pitchReference = pitch.Pitch(pitchReference)
         else:  # make a copy b/c may manipulate
             pitchReference = copy.deepcopy(pitchReference)
+
         if pitchReference is None:
             raise IntervalNetworkException('pitchReference cannot be None')
         # must set an octave for pitch reference, even if not given
@@ -2686,9 +2688,10 @@ class IntervalNetwork:
               pitchTarget,
               comparisonAttribute='pitchClass',
               alteredDegrees=None):
-        '''Given one or more pitches in `pitchTarget`, return a
+        # noinspection PyShadowingNames
+        '''
+        Given one or more pitches in `pitchTarget`, return a
         tuple of a list of matched pitches, and a list of unmatched pitches.
-
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
@@ -2806,6 +2809,16 @@ class IntervalNetwork:
                 post.append(target)
         return post
 
+
+    _SCALE_STARTS: Tuple[str, ...] = (
+         'C', 'C#', 'D-',
+         'D', 'D#', 'E-',
+         'E', 'F',
+         'F#', 'G',
+         'G#', 'A', 'B-',
+         'B', 'C-',
+    )
+
     def find(self,
              pitchTarget,
              resultsReturned=4,
@@ -2835,25 +2848,12 @@ class IntervalNetwork:
         nodeId = self.terminusLowNodes[0]
         sortList = []
 
-        # for now, searching 12 pitches; this may be more than necessary
-#         for p in [pitch.Pitch('c'), pitch.Pitch('c#'),
-#                   pitch.Pitch('d'), pitch.Pitch('d#'),
-#                   pitch.Pitch('e'), pitch.Pitch('f'),
-#                   pitch.Pitch('f#'), pitch.Pitch('g'),
-#                   pitch.Pitch('g#'), pitch.Pitch('a'),
-#                   pitch.Pitch('a#'), pitch.Pitch('b'),
-#                 ]:
-
-        for p in [pitch.Pitch('c'), pitch.Pitch('c#'), pitch.Pitch('d-'),
-                  pitch.Pitch('d'), pitch.Pitch('d#'), pitch.Pitch('e-'),
-                  pitch.Pitch('e'), pitch.Pitch('f'),
-                  pitch.Pitch('f#'), pitch.Pitch('g'),
-                  pitch.Pitch('g#'), pitch.Pitch('a'), pitch.Pitch('b-'),
-                  pitch.Pitch('b'), pitch.Pitch('c-'),
-                  ]:  # TODO: Study this: can it be sped up with cached Pitch objects?
-
-            # realize scales from each pitch, and then compare to pitchTarget
-            # pitchTarget may be a list of pitches
+        # pitch strings in _SCALE_STARTS are converted to actual pitches in .realize,
+        # and then manipulated.  If they were Pitch objects already, they would get
+        # deepcopied which is very slow.
+        for p in self._SCALE_STARTS:
+            # Realize scales from each pitch, and then compare to pitchTarget.
+            # PitchTarget may be a list of pitches
             matched, unused_noMatch = self.match(
                 p,
                 nodeId,
