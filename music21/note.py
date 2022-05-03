@@ -20,7 +20,7 @@ and used to configure, :class:`~music21.note.Note` objects.
 import copy
 import unittest
 
-from typing import Optional, List, Type, Union, Tuple, Iterable, cast
+from typing import Optional, List, Type, Union, Tuple, Iterable, Sequence, cast
 
 from music21 import base
 from music21 import beam
@@ -34,7 +34,7 @@ from music21 import prebase
 from music21 import style
 from music21 import tie
 from music21 import volume
-
+from music21.common.types import StepName
 from music21 import environment
 environLocal = environment.Environment('note')
 
@@ -79,7 +79,7 @@ stemDirectionNames = (
 
 def __dir__():
     out = [n for n in globals() if not n.startswith('__') and not n.startswith('Test')]
-    for n in ('Optional', 'List', 'Union', 'Tuple', 'Iterable', 'Type', 'cast'):
+    for n in ('Optional', 'List', 'Union', 'Tuple', 'Sequence', 'Iterable', 'Type', 'cast'):
         out.remove(n)
     out.remove('unittest')
     out.remove('copy')
@@ -174,6 +174,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     Custom elision elements for composite components will be supported later.
 
     New in v6.7 -- composite components, elisionBefore
+    Changed in v8 -- lyric text can be an empty string, but not None.
     '''
     _styleClass = style.TextStylePlacement
     # CLASS VARIABLES #
@@ -189,11 +190,11 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
 
     # INITIALIZER #
 
-    def __init__(self, text=None, number=1, **kwargs):
+    def __init__(self, text='', number=1, **kwargs):
         super().__init__()
         self._identifier: Optional[str] = None
-        self._number: Optional[int] = None
-        self._text: Optional[str] = None
+        self._number: int = 1
+        self._text: str = ''
         self._syllabic = None
         self.components: Optional[List['music21.note.Lyric']] = None
         self.elisionBefore = ' '
@@ -201,7 +202,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         applyRaw = kwargs.get('applyRaw', False)
 
         # these are set by setTextAndSyllabic
-        if text is not None:
+        if text:
             self.setTextAndSyllabic(text, applyRaw)
 
         # given as begin, middle, end, or single
@@ -235,16 +236,37 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         return bool(self.components)
 
     @property
-    def text(self) -> Optional[str]:
+    def text(self) -> str:
         '''
         Gets or sets the text of the lyric.  For composite lyrics, set
         the text of individual components instead of setting the text here.
 
-        Setting the text of a composite lyric wipes out the components
+        >>> l = note.Lyric()
+        >>> l.text
+        ''
+        >>> l.text = 'hi'
+        >>> l.text
+        'hi'
+
+        Setting the text of a composite lyric wipes out the components:
+
+        >>> bianco = note.Lyric()
+        >>> co = note.Lyric('co', syllabic='end')
+        >>> e = note.Lyric('e', syllabic='single')
+        >>> bianco.components = [co, e]
+        >>> bianco.isComposite
+        True
+        >>> bianco.text
+        'co e'
+        >>> bianco.text = 'co_e'
+        >>> bianco.isComposite
+        False
         '''
         if not self.isComposite:
             return self._text
         else:
+            assert isinstance(self.components, Sequence), \
+                'Programming error: isComposite implies that components exists'  # mypy
             text_out = self.components[0].text
             if text_out is None:
                 text_out = ''
@@ -254,7 +276,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             return text_out
 
     @text.setter
-    def text(self, newText: Optional[str]):
+    def text(self, newText: str):
         if self.isComposite:
             self.components = None
         self._text = newText
@@ -371,6 +393,8 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             else:
                 return text
         else:
+            assert isinstance(self.components, Sequence), \
+                'Programming error: isComposite should assert components exists'  # for mypy
             firstSyllabic = self.components[0].syllabic
             lastSyllabic = self.components[-1].syllabic
             if firstSyllabic in ['middle', 'end']:
@@ -394,7 +418,12 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         identifiers like 'part2verse1' which can be found in the musicXML
         lyric number attribute should be stored in self.identifier.
 
+        Default is 1
+
         >>> l = note.Lyric('Hi')
+        >>> l.number
+        1
+
         >>> l.number = 5
         >>> l.number
         5
@@ -1575,7 +1604,7 @@ class Note(NotRest):
         return (self.pitch,)
 
     @pitches.setter
-    def pitches(self, value: Iterable[pitch.Pitch]):
+    def pitches(self, value: Sequence[pitch.Pitch]):
         if common.isListLike(value) and value:
             self.pitch = value[0]
         else:
@@ -1721,7 +1750,7 @@ class Unpitched(NotRest):
     def __init__(self, displayName=None, **keywords):
         super().__init__(**keywords)
 
-        self.displayStep: str = 'B'
+        self.displayStep: StepName = 'B'
         self.displayOctave: int = 4
         if displayName:
             display_pitch = pitch.Pitch(displayName)
