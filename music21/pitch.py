@@ -2855,7 +2855,7 @@ class Pitch(prebase.ProtoM21Object):
         '''
         usrStr = usrStr.strip().upper()  # type: ignore
         if len(usrStr) == 1 and usrStr in STEPNAMES:
-            self._step = usrStr
+            self._step = usrStr  # type: ignore
             # when setting by step, we assume that the accidental intended
             self.spellingIsInferred = False
         else:
@@ -2966,9 +2966,9 @@ class Pitch(prebase.ProtoM21Object):
     @pitchClass.setter
     def pitchClass(self, value: Union[int, PitchClassString]):
         # permit the submission of strings, like "A" and "B"
-        value = _convertPitchClassToNumber(value)
+        valueOut: Union[int, float] = _convertPitchClassToNumber(value)
         # get step and accidental w/o octave
-        self.step, self._accidental = _convertPsToStep(value)[0:2]
+        self.step, self._accidental = _convertPsToStep(valueOut)[0:2]
 
         # do not know what accidental is
         self.spellingIsInferred = True
@@ -3837,21 +3837,25 @@ class Pitch(prebase.ProtoM21Object):
     @overload
     def _getEnharmonicHelper(self: PitchType,
                              inPlace: Literal[True],
-                             intervalString: Literal['d2', '-d2']) -> None:
+                             up: bool) -> None:
         return None  # astroid 1015
 
     @overload
     def _getEnharmonicHelper(self: PitchType,
                              inPlace: Literal[False],
-                             intervalString: Literal['d2', '-d2']) -> PitchType:
+                             up: bool) -> PitchType:
         return self  # astroid 1015
 
     def _getEnharmonicHelper(self: PitchType,
                              inPlace: bool,
-                             intervalString: Literal['d2', '-d2']) -> Optional[PitchType]:
+                             up: bool) -> Optional[PitchType]:
         '''
         abstracts the code from `getHigherEnharmonic` and `getLowerEnharmonic`
         '''
+        intervalString: Literal['d2', '-d2'] = 'd2'
+        if not up:
+            intervalString = '-d2'
+
         if intervalString not in self._transpositionIntervals:
             self._transpositionIntervals[intervalString] = interval.Interval(intervalString)
         intervalObj = self._transpositionIntervals[intervalString]
@@ -3872,7 +3876,15 @@ class Pitch(prebase.ProtoM21Object):
                 self.octave = p.octave
             return None
 
-    def getHigherEnharmonic(self: PitchType, *, inPlace=False) -> Optional[PitchType]:
+    @overload
+    def getHigherEnharmonic(self: PitchType, *, inPlace: Literal[False]) -> PitchType:
+        return self
+
+    @overload
+    def getHigherEnharmonic(self: PitchType, *, inPlace: Literal[True]) -> None:
+        return None
+
+    def getHigherEnharmonic(self: PitchType, *, inPlace: bool = False) -> Optional[PitchType]:
         '''
         Returns an enharmonic `Pitch` object that is a higher
         enharmonic.  That is, the `Pitch` a diminished-second above
@@ -3920,9 +3932,23 @@ class Pitch(prebase.ProtoM21Object):
         >>> print(pHalfSharp)
         E-4(-50c)
         '''
-        return self._getEnharmonicHelper(inPlace, 'd2')
+        # sigh...mypy
+        if inPlace:
+            self._getEnharmonicHelper(inPlace=True, up=True)
+            return None
+        else:
+            return self._getEnharmonicHelper(inPlace=False, up=True)
 
-    def getLowerEnharmonic(self: PitchType, *, inPlace=False) -> Optional[PitchType]:
+
+    @overload
+    def getLowerEnharmonic(self: PitchType, *, inPlace: Literal[False]) -> PitchType:
+        return self
+
+    @overload
+    def getLowerEnharmonic(self: PitchType, *, inPlace: Literal[True]) -> None:
+        return None
+
+    def getLowerEnharmonic(self: PitchType, *, inPlace: bool = False) -> Optional[PitchType]:
         '''
         returns a Pitch enharmonic that is a diminished second
         below the current note
@@ -3948,7 +3974,12 @@ class Pitch(prebase.ProtoM21Object):
         >>> print(p1)
         B##2
         '''
-        return self._getEnharmonicHelper(inPlace, '-d2')
+        # sigh...mypy
+        if inPlace:
+            self._getEnharmonicHelper(inPlace=True, up=False)
+            return None
+        else:
+            return self._getEnharmonicHelper(inPlace=False, up=False)
 
     def simplifyEnharmonic(
         self: PitchType,
