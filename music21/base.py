@@ -1780,7 +1780,7 @@ class Music21Object(prebase.ProtoM21Object):
         This example shows the context sites for Measure 3 of the
         Alto part. We will get the measure object using direct access to
         indices to ensure that no other temporary
-        streams are created; normally, we would do `c.parts['Alto'].measure(3)`.
+        streams are created; normally, we would do `c.parts['#Alto'].measure(3)`.
 
         >>> m = c[2][4]
         >>> m
@@ -4385,7 +4385,7 @@ class Test(unittest.TestCase):
         from music21 import stream
 
         s = corpus.parse('bach/bwv66.6.xml')
-        p1 = s.parts['Soprano']
+        p1 = s.parts['#Soprano']
 
         # this does not work; cannot get these values from Measures
         #    self.assertEqual(p1.getElementsByClass(stream.Measure)[3].beat, 3)
@@ -4483,7 +4483,7 @@ class Test(unittest.TestCase):
         from music21 import note
 
         s = corpus.parse('bach/bwv66.6.xml')
-        p1 = s.parts['Soprano']
+        p1 = s.parts['#Soprano']
         for classStr in ['Clef', 'KeySignature', 'TimeSignature']:
             self.assertEqual(p1.flatten().getElementsByClass(
                 classStr)[0].measureNumber, 0)
@@ -4594,7 +4594,7 @@ class Test(unittest.TestCase):
         self.maxDiff = None
         s = corpus.parse('bach/bwv103.6')
 
-        p = s.parts['soprano']
+        p = s.parts['#soprano']
         m1 = p.getElementsByClass(stream.Measure).first()
 
         self.assertEqual([n.offset for n in m1.notesAndRests], [0.0, 0.5])

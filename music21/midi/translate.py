@@ -3143,7 +3143,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('bach/bwv103.6')
 
         # get just the soprano part
-        soprano = s.parts['soprano']
+        soprano = s.parts['#soprano']
         mts = streamHierarchyToMidiTracks(soprano)[1]  # get one
 
         # first note-on is not delayed, even w anacrusis
@@ -3169,7 +3169,7 @@ class Test(unittest.TestCase):
         <music21.midi.DeltaTime (empty) track=1, channel=1>,
         <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=62, velocity=90>]'''
 
-        alto = s.parts['alto']
+        alto = s.parts['#alto']
         mta = streamHierarchyToMidiTracks(alto)[1]
 
         found = str(mta.events[:8])
@@ -3177,7 +3177,7 @@ class Test(unittest.TestCase):
 
         # try streams to midi tracks
         # get just the soprano part
-        soprano = s.parts['soprano']
+        soprano = s.parts['#soprano']
         mtList = streamHierarchyToMidiTracks(soprano)
         self.assertEqual(len(mtList), 2)
 

@@ -3373,13 +3373,13 @@ class Test(unittest.TestCase):
         sc1 = scale.MajorScale()
         # deriving a new scale from the pitches found in a collection
         s = corpus.parse('bwv66.6')
-        sc3 = sc1.derive(s.parts['soprano'])
+        sc3 = sc1.derive(s.parts['#soprano'])
         self.assertEqual(str(sc3), '<music21.scale.MajorScale A major>')
 
-        sc3 = sc1.derive(s.parts['tenor'])
+        sc3 = sc1.derive(s.parts['#tenor'])
         self.assertEqual(str(sc3), '<music21.scale.MajorScale A major>')
 
-        sc3 = sc2.derive(s.parts['bass'])
+        sc3 = sc2.derive(s.parts['#bass'])
         self.assertEqual(str(sc3), '<music21.scale.MinorScale F# minor>')
 
         # composing with a scale

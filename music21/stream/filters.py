@@ -70,9 +70,8 @@ class StreamFilter(prebase.ProtoM21Object):
     # def __init__(self):
     #     pass  # store streamIterator?
 
-    # commented out to make faster, but will be called if exists.
-    # def reset(self):
-    #    pass
+    def reset(self):
+        pass
 
     def __call__(self, item, iterator: Optional[StreamIteratorType] = None):
         return True

@@ -6106,7 +6106,7 @@ class Test(unittest.TestCase):
 
         # this file was imported by sibelius and does not have completed ties
         sMonte = corpus.parse('monteverdi/madrigal.4.2.xml')
-        s1 = sMonte.parts['Alto']
+        s1 = sMonte.parts['#Alto']
         mStream = s1.getElementsByClass(Measure)
         self.assertEqual([n.offset for n in mStream[3].notesAndRests], [0.0])
         self.assertEqual(str([n.tie for n in mStream[3].notesAndRests]),
@@ -6216,7 +6216,7 @@ class Test(unittest.TestCase):
 
     def testDerivationC(self):
         s = corpus.parse('bach/bwv66.6')
-        p1 = s.parts['Soprano']
+        p1 = s.parts['#Soprano']
         pMeasures = p1.measures(3, 10)
         pMeasuresFlat = pMeasures.flatten()
         pMeasuresFlatNotes = pMeasuresFlat.notesAndRests.stream()

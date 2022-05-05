@@ -98,9 +98,7 @@ OffsetMap = collections.namedtuple('OffsetMap', ['element', 'offset', 'endTime',
 
 
 # -----------------------------------------------------------------------------
-
-
-class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
+class Stream(core.StreamCore, Generic[M21ObjType]):
     '''
     This is the fundamental container for Music21Objects;
     objects may be ordered and/or placed in time based on
@@ -281,8 +279,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
                  *args,
                  # restrictClass: Type[M21ObjType] = base.Music21Object,
                  **keywords):
-        base.Music21Object.__init__(self, **keywords)
-        core.StreamCoreMixin.__init__(self)
+        super().__init__(self, *args, **keywords)
 
         self.streamStatus = streamStatus.StreamStatus(self)
         self._unlinkedDuration = None

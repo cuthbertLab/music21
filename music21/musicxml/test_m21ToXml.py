@@ -430,7 +430,7 @@ class Test(unittest.TestCase):
         in the toSoundingPitch and not having their durations restored afterwards
         leading to Instrument objects being split if the duration was complex
         '''
-        alto = corpus.parse('bach/bwv57.8').parts['Alto']
+        alto = corpus.parse('bach/bwv57.8').parts['#Alto']
         alto.measure(7).timeSignature = meter.TimeSignature('6/8')
         newAlto = alto.flat.getElementsNotOfClass(meter.TimeSignature).stream()
         newAlto.insert(0, meter.TimeSignature('2/4'))
