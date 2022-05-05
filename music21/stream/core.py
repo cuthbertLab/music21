@@ -37,6 +37,9 @@ from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
 from music21.stream.iterator import StreamIterator, RecursiveIterator
 
+if TYPE_CHECKING:
+    from typing import Any
+
 
 # pylint: disable=attribute-defined-outside-init
 class StreamCoreMixin:
@@ -320,6 +323,7 @@ class StreamCoreMixin:
             post = copy.copy(self)
 
         if TYPE_CHECKING:
+            from music21 import stream
             assert isinstance(post, stream.Stream)
 
         post.derivation.method = methodName
