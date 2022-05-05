@@ -22,13 +22,14 @@ remain stable.
 All functions here will eventually begin with `.core`.
 '''
 import copy
-from typing import List, Dict, Union, Tuple, Optional
+from typing import List, Dict, Union, Tuple, Optional, TYPE_CHECKING
 from fractions import Fraction
 import unittest
 
 from music21.base import Music21Object
 from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
+from music21.common.types import StreamType
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
@@ -291,7 +292,10 @@ class StreamCoreMixin:
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
 
-    def coreCopyAsDerivation(self, methodName: str, *, recurse=True, deep=True):
+    def coreCopyAsDerivation(self: StreamType,
+                             methodName: str, *,
+                             recurse=True,
+                             deep=True) -> StreamType:
         '''
         Make a copy of this stream with the proper derivation set.
 
@@ -529,6 +533,9 @@ class StreamCoreMixin:
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
         '''
+        if TYPE_CHECKING:
+            from music21 import stream
+            assert isinstance(self, stream.Stream)
         hashedAttributes = hash((tuple(classList or ()),
                                   flatten,
                                   useTimespans,

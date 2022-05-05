@@ -122,13 +122,13 @@ def makeBeams(
 
     # environLocal.printDebug(['calling Stream.makeBeams()'])
     if not inPlace:  # make a copy
-        returnObj: stream.Stream = s.coreCopyAsDerivation('makeBeams')
+        returnObj = s.coreCopyAsDerivation('makeBeams')
     else:
         returnObj = s
 
     # if s.isClass(Measure):
     mColl: List[stream.Measure]
-    if isinstance(s, stream.Measure):
+    if isinstance(returnObj, stream.Measure):
         returnObj = cast(stream.Measure, returnObj)
         mColl = [returnObj]  # store a list of measures for processing
     else:
@@ -1608,7 +1608,7 @@ def getTiePitchSet(prior: 'music21.note.NotRest') -> Optional[Set[str]]:
     >>> stream.makeNotation.getTiePitchSet(r) is None
     True
     '''
-    if not hasattr(prior, 'tie') or not hasattr(prior, 'pitches'):
+    if not isinstance(prior, note.NotRest):
         return None
 
     tiePitchSet = set()
