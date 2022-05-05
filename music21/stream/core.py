@@ -24,14 +24,14 @@ All functions here will eventually begin with `.core`.
 from __future__ import annotations
 
 import copy
-from typing import List, Dict, Union, Tuple, Optional, TYPE_CHECKING, Any
+from typing import List, Dict, Union, Tuple, Optional, TYPE_CHECKING
 from fractions import Fraction
 import unittest
 
 from music21.base import Music21Object
 from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
-from music21.common.types import StreamType, OffsetQLSpecial
+from music21.common.types import OffsetQLSpecial
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
