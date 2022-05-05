@@ -24,7 +24,7 @@ All functions here will eventually begin with `.core`.
 from __future__ import annotations
 
 import copy
-from typing import List, Dict, Union, Tuple, Optional, TYPE_CHECKING
+from typing import List, Dict, Union, Tuple, Optional, TYPE_CHECKING, TypeVar
 from fractions import Fraction
 import unittest
 
@@ -37,9 +37,7 @@ from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
 from music21.stream.iterator import StreamIterator, RecursiveIterator
 
-if TYPE_CHECKING:
-    from typing import Any
-
+_T = TypeVar('_T')
 
 # pylint: disable=attribute-defined-outside-init
 class StreamCoreMixin:
@@ -296,40 +294,6 @@ class StreamCoreMixin:
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
 
-    def coreCopyAsDerivation(self,
-                             methodName: str, *,
-                             recurse=True,
-                             deep=True) -> 'music21.stream.Stream[Any]':
-        '''
-        Make a copy of this stream with the proper derivation set.
-
-        >>> s = stream.Stream()
-        >>> n = note.Note()
-        >>> s.append(n)
-        >>> s2 = s.coreCopyAsDerivation('exampleCopy')
-        >>> s2.derivation.method
-        'exampleCopy'
-        >>> s2.derivation.origin is s
-        True
-        >>> s2[0].derivation.method
-        'exampleCopy'
-        '''
-        if TYPE_CHECKING:
-            from music21 import stream
-            assert isinstance(self, stream.Stream)
-        if deep:
-            post = copy.deepcopy(self)
-        else:  # pragma: no cover
-            post = copy.copy(self)
-
-        if TYPE_CHECKING:
-            from music21 import stream
-            assert isinstance(post, stream.Stream)
-
-        post.derivation.method = methodName
-        if recurse and deep:
-            post.setDerivationMethod(methodName, recurse=True)
-        return post
 
     def coreHasElementByMemoryLocation(self, objId: int) -> bool:
         '''

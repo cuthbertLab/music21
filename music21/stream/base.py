@@ -527,21 +527,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         >>> c.groups.append('ghost')
         >>> e.groups.append('ghost')
 
-        'Note' is treated as a class name and returns a `RecursiveIterator`:
-
-        >>> for n in s['Note']:
-        ...     print(n.name, end=' ')
-        C C# D E F G A
-
         '.ghost', because it begins with `.`, is treated as a class name and
         returns a `RecursiveIterator`:
-
 
         >>> for n in s['.ghost']:
         ...     print(n.name, end=' ')
         C E
 
-        A query selector with a `#`:
+        A query selector with a `#` returns the single element matching that
+        element or returns None if there is no match:
 
         >>> s['#last_a']
         <music21.note.Note A>
@@ -556,15 +550,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         Traceback (most recent call last):
         TypeError: Streams can get items by int, slice, class, or string query; got <class 'float'>
 
-
         Changed in v7:
-
           - out of range indexes now raise an IndexError, not StreamException
-          - strings ('Note', '#id', '.group') are now treated like a query selector.
+          - strings ('music21.note.Note', '#id', '.group') are now treated like a query selector.
           - slices with negative indices now supported
           - Unsupported types now raise TypeError
           - Class and Group searches now return a recursive `StreamIterator` rather than a `Stream`
           - Slice searches now return a list of elements rather than a `Stream`
+
+        Changed in v8:
+          - for strings: only fully-qualified names such as "music21.note.Note" or
+            partially-qualified names such as "note.Note" are
+            supported as class names.  Better to use a literal type or explicitly call
+            .recurse().getElementsByClass to get the earlier behavior.  Old behavior
+            still works until v9.  This is an attempt to unify __getitem__ behavior in
+            StreamIterators and Streams.
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
@@ -4756,7 +4756,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
 
         >>> chorale = corpus.parse('bach/bwv324.xml')
-        >>> alto = chorale.parts['alto']
+        >>> alto = chorale.parts['#alto']
         >>> altoMeasures = alto.measureOffsetMap()
         >>> altoMeasures
         OrderedDict([(0.0, [<music21.stream.Measure 1 offset=0.0>]),
@@ -7880,7 +7880,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         in quarter lengths. This value usually represents the last
         "release" in the Stream.
 
-        Stream.duration is usually equal to the highestTime
+        Stream.duration is normally equal to the highestTime
         expressed as a Duration object, but it can be set separately
         for advanced operations.
 
@@ -13759,6 +13759,7 @@ class Score(Stream):
         If `inPlace` is True, this is done in-place;
         if `inPlace` is False, this returns a modified deep copy.
         '''
+        returnStream: Score
         if inPlace:
             returnStream = self
         else:
@@ -13784,8 +13785,6 @@ class Score(Stream):
             # no matter, let's just be extra cautious and run this here (Feb 2021 - JTW)
             returnStream.coreElementsChanged()
         else:  # call the base method
-            if TYPE_CHECKING:
-                assert isinstance(returnStream, Score)
             super(Score, returnStream).makeNotation(meterStream=meterStream,
                                                     refStreamOrTimeRange=refStreamOrTimeRange,
                                                     inPlace=True,
