@@ -21,6 +21,8 @@ remain stable.
 
 All functions here will eventually begin with `.core`.
 '''
+from __future__ import annotations
+
 import copy
 from typing import List, Dict, Union, Tuple, Optional, TYPE_CHECKING
 from fractions import Fraction
@@ -29,11 +31,14 @@ import unittest
 from music21.base import Music21Object
 from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
-from music21.common.types import StreamType
+from music21.common.types import OffsetQLSpecial
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
 from music21.stream.iterator import StreamIterator, RecursiveIterator
+
+if TYPE_CHECKING:
+    from typing import Any
 
 
 # pylint: disable=attribute-defined-outside-init
@@ -46,7 +51,7 @@ class StreamCoreMixin:
         # the _offsetDict is a dictionary where id(element) is the
         # index and the value is a tuple of offset and element.
         # offsets can be floats, Fractions, or a member of the enum OffsetSpecial
-        self._offsetDict: Dict[int, Tuple[Union[float, Fraction, str], Music21Object]] = {}
+        self._offsetDict: Dict[int, Tuple[OffsetQLSpecial, Music21Object]] = {}
 
         # self._elements stores Music21Object objects.
         self._elements: List[Music21Object] = []
@@ -159,7 +164,7 @@ class StreamCoreMixin:
     def coreSetElementOffset(
         self,
         element: Music21Object,
-        offset: Union[int, float, Fraction, str],
+        offset: Union[int, float, Fraction, OffsetSpecial],
         *,
         addElement=False,
         setActiveSite=True
@@ -287,15 +292,14 @@ class StreamCoreMixin:
                 indexCache = self._cache['index']
             # always clear cache when elements have changed
             # for instance, Duration will change.
-            # noinspection PyAttributeOutsideInit
-            self._cache = {}  # cannot call clearCache() because defined on Stream via Music21Object
+            self.clearCache()
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
 
-    def coreCopyAsDerivation(self: StreamType,
+    def coreCopyAsDerivation(self,
                              methodName: str, *,
                              recurse=True,
-                             deep=True) -> StreamType:
+                             deep=True) -> 'music21.stream.Stream[Any]':
         '''
         Make a copy of this stream with the proper derivation set.
 
@@ -310,13 +314,21 @@ class StreamCoreMixin:
         >>> s2[0].derivation.method
         'exampleCopy'
         '''
+        if TYPE_CHECKING:
+            from music21 import stream
+            assert isinstance(self, stream.Stream)
         if deep:
             post = copy.deepcopy(self)
         else:  # pragma: no cover
             post = copy.copy(self)
-        post.derivation.method = methodName    # type: ignore
+
+        if TYPE_CHECKING:
+            from music21 import stream
+            assert isinstance(post, stream.Stream)
+
+        post.derivation.method = methodName
         if recurse and deep:
-            post.setDerivationMethod(methodName, recurse=True)  # type: ignore
+            post.setDerivationMethod(methodName, recurse=True)
         return post
 
     def coreHasElementByMemoryLocation(self, objId: int) -> bool:

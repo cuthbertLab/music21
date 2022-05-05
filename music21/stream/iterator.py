@@ -1788,6 +1788,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
                 )
                 newStartOffset = (self.iteratorStartOffsetInHierarchy
                                   + self.srcStream.elementOffset(e))
+
                 self.childRecursiveIterator.iteratorStartOffsetInHierarchy = newStartOffset
             if self.matchesFilters(e) is False:
                 continue
@@ -2002,7 +2003,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
                            classFilterList: Type[ChangedM21ObjType],
                            *,
                            returnClone: bool = True) -> RecursiveIterator[ChangedM21ObjType]:
-        x: RecursiveIterator[ChangedM21ObjType] = self.__class__(self.streamObj)
+        x = cast(RecursiveIterator[ChangedM21ObjType], self.__class__(self.streamObj))
         return x  # dummy code
 
     @overload
@@ -2014,7 +2015,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
         return x  # dummy code
 
 
-    def getElementsByClass(self: _SIter,
+    def getElementsByClass(self,
                            classFilterList: Union[
                                str,
                                Type[ChangedM21ObjType],
@@ -2029,7 +2030,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
         if isinstance(classFilterList, type) and issubclass(classFilterList, base.Music21Object):
             return cast(RecursiveIterator[ChangedM21ObjType], out)
         else:
-            return cast(RecursiveIterator[base.Music21Object], out)
+            return cast(RecursiveIterator[M21ObjType], out)
 
 
 class Test(unittest.TestCase):

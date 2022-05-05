@@ -832,7 +832,9 @@ class Music21Object(prebase.ProtoM21Object):
 
         New in v.6 -- exposes previously hidden functionality.
         '''
-        self._cache = {}
+        # do not replace with self._cache.clear() -- leaves terrible
+        # state for shallow copies.
+        self._cache: Dict[str, Any] = {}
 
     @overload
     def getOffsetBySite(

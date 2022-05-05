@@ -704,8 +704,6 @@ class TwelveToneRow(ToneRow):
         ...
         >>> [str(e.pitch) for e in s37[0]]
         ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-', 'F#', 'F', 'E', 'A']
-
-
         '''
         # note: do not want to return a TwelveToneRow() type, as this will
         # add again the same pitches to the elements list twice.
@@ -718,8 +716,8 @@ class TwelveToneRow(ToneRow):
         i = 0
         for row in matrix:
             i += 1
-            rowObject = copy.copy(self)
-            rowObject.elements = []
+            rowObject = self.__class__()
+            rowObject.mergeAttributes(self)
             rowObject.id = 'row-' + str(i)
             for p in row:  # iterate over pitch class values
                 n = note.Note()
@@ -1114,6 +1112,14 @@ class HistoricalTwelveToneRow(TwelveToneRow):
         self.composer = composer
         self.opus = opus
         self.title = title
+
+    def mergeAttributes(self, other):
+        super().mergeAttributes(other)
+        if not isinstance(other, HistoricalTwelveToneRow):
+            return
+        self.composer = other.composer
+        self.opus = other.opus
+        self.title = other.title
 
     def _reprInternal(self):
         return f'{self.composer} {self.opus} {self.title}'
