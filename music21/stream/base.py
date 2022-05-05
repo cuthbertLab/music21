@@ -34,7 +34,9 @@ from collections import namedtuple
 from fractions import Fraction
 from math import isclose
 from typing import (Dict, Iterable, List, Optional, Set, Tuple, cast,
-                    TypeVar, Type, Union, Generic, Literal, overload)
+                    TypeVar, Type, Union, Generic, Literal, overload,
+                    Sequence, Sized,
+                    TYPE_CHECKING)
 
 from music21 import base
 
@@ -67,7 +69,7 @@ from music21.stream import filters
 
 from music21.common.numberTools import opFrac
 from music21.common.enums import GatherSpanners, OffsetSpecial
-from music21.common.types import StreamType, M21ObjType, OffsetQL
+from music21.common.types import StreamType, M21ObjType, OffsetQL, OffsetQLSpecial
 
 from music21 import environment
 
@@ -269,15 +271,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             musicxml <supports attribute="new-page"> tag) and only if this is
             the outermost Stream being shown.
             ''',
-        'restrictClass': '''
-            All elements in the stream are required to be of this class
-            or a subclass of that class.  Currently not enforced.  Used
-            for type-checking.
-            ''',
+        # 'restrictClass': '''
+        #     All elements in the stream are required to be of this class
+        #     or a subclass of that class.  Currently not enforced.  Used
+        #     for type-checking.
+        #     ''',
     }
-
-    def __init__(self, givenElements=None, *args,
-                 restrictClass: Type[M21ObjType] = base.Music21Object,
+    def __init__(self,
+                 givenElements=None,
+                 *args,
+                 # restrictClass: Type[M21ObjType] = base.Music21Object,
                  **keywords):
         base.Music21Object.__init__(self, **keywords)
         core.StreamCoreMixin.__init__(self)
@@ -287,8 +290,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
 
         self.autoSort = True
 
-        # all elements in the stream need to be of this class.
-        self.restrictClass = restrictClass
+        # # all elements in the stream need to be of this class.
+        # self.restrictClass = restrictClass
 
         # these should become part of style or something else...
         self.definesExplicitSystemBreaks = False
@@ -333,8 +336,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         if self.id is not None:
             if self.id != id(self) and str(self.id) != str(id(self)):
                 return str(self.id)
-            else:
+            elif isinstance(self.id, int):
                 return hex(self.id)
+            else:  # pragma: no cover
+                return ''
         else:  # pragma: no cover
             return ''
 
@@ -390,7 +395,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         specialized :class:`music21.stream.StreamIterator` class, which
         adds necessary Stream-specific features.
         '''
-        return iterator.StreamIterator[M21ObjType](self)
+        return cast(iterator.StreamIterator[M21ObjType],
+                    iterator.StreamIterator(self))
 
     def iter(self) -> iterator.StreamIterator[M21ObjType]:
         '''
@@ -423,7 +429,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         self,
         k: Type[ChangedM21ObjType]
     ) -> iterator.RecursiveIterator[ChangedM21ObjType]:
-        x: iterator.RecursiveIterator[ChangedM21ObjType] = self.recurse()
+        x = cast(iterator.RecursiveIterator[ChangedM21ObjType], self.recurse())
         return x  # dummy code
 
     def __getitem__(self,
@@ -582,17 +588,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
                     )
             # setting active site as cautionary measure
             self.coreSelfActiveSite(match)
-            return match
+            return cast(M21ObjType, match)
 
         elif isinstance(k, slice):  # get a slice of index values
             # manually inserting elements is critical to setting the element
             # locations
-            searchElements = self._elements
+            searchElements: List[base.Music21Object] = self._elements
             if (k.start is not None and k.start < 0) or (k.stop is not None and k.stop < 0):
                 # Must use .elements property to incorporate end elements
-                searchElements = self.elements
+                searchElements = list(self.elements)
 
-            return searchElements[k]
+            return cast(M21ObjType, searchElements[k])
 
         elif isinstance(k, type) and issubclass(k, base.Music21Object):
             return self.recurse().getElementsByClass(k)
@@ -694,7 +700,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         return False
 
     @property
-    def elements(self) -> Tuple[base.Music21Object]:
+    def elements(self) -> Tuple[M21ObjType, ...]:
         '''
         .elements is a Tuple representing the elements contained in the Stream.
 
@@ -743,11 +749,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             # coreElementsChanged has been called
             if not self.isSorted and self.autoSort:
                 self.sort()  # will set isSorted to True
-            self._cache['elements'] = self._elements + self._endElements
+            self._cache['elements'] = cast(List[M21ObjType], self._elements + self._endElements)
         return tuple(self._cache['elements'])
 
     @elements.setter
-    def elements(self, value: Union['Stream', Iterable[base.Music21Object]]):
+    def elements(self, value: Union[Stream, Iterable[base.Music21Object]]):
         '''
         Sets this stream's elements to the elements in another stream (just give
         the stream, not the stream's .elements), or to a list of elements.
@@ -767,17 +773,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         are we going to get the new stream's elements' offsets from? why
         from their active sites! So don't do this!
         '''
-        if (not common.isListLike(value)
-                and hasattr(value, 'isStream')
-                and value.isStream):
+        self._offsetDict: Dict[int, Tuple[OffsetQLSpecial, base.Music21Object]] = {}
+        if isinstance(value, Stream):
             # set from a Stream. Best way to do it
-            self._offsetDict = {}
-            self._elements = list(value._elements)  # copy list.
+            self._elements: List[base.Music21Object] = list(value._elements)  # copy list.
             for e in self._elements:
                 self.coreSetElementOffset(e, value.elementOffset(e), addElement=True)
                 e.sites.add(self)
                 self.coreSelfActiveSite(e)
-            self._endElements = list(value._endElements)
+            self._endElements: List[base.Music21Object] = list(value._endElements)
             for e in self._endElements:
                 self.coreSetElementOffset(e,
                                       value.elementOffset(e, returnSpecial=True),
@@ -788,7 +792,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             # replace the complete elements list
             self._elements = list(value)
             self._endElements = []
-            self._offsetDict = {}
             for e in self._elements:
                 self.coreSetElementOffset(e, e.offset, addElement=True)
                 e.sites.add(self)
@@ -851,7 +854,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         del self._elements[k]
         self.coreElementsChanged()
 
-    def __add__(self: T, other: 'Stream') -> T:
+    def __add__(self: StreamType, other: 'Stream') -> StreamType:
         '''
         Add, or concatenate, two Streams.
 
@@ -1187,11 +1190,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             .getElementsByOffset(0.0)
             .getElementsByClass(layout.StaffLayout)
         )
-        if not staffLayouts:
+        firstLayout = staffLayouts.first()
+        if not firstLayout:
             sl: layout.StaffLayout = layout.StaffLayout(staffLines=newStaffLines)
             self.insert(0.0, sl)
         else:
-            firstLayout = staffLayouts.first()
             firstLayout.staffLines = newStaffLines
 
     def clear(self) -> None:
@@ -1212,7 +1215,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         >>> m.number
         3
         '''
-        self.elements = []
+        self.elements = ()
 
     def cloneEmpty(self: StreamType, derivationMethod: Optional[str] = None) -> StreamType:
         '''
@@ -1243,7 +1246,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         returnObj.mergeAttributes(self)  # get groups, optional id
         return returnObj
 
-    def mergeAttributes(self, other: 'Stream'):
+    def mergeAttributes(self, other):
         '''
         Merge relevant attributes from the Other stream into this one.
 
@@ -1261,6 +1264,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         0
         '''
         super().mergeAttributes(other)
+        if not isinstance(other, Stream):
+            return
 
         for attr in ('autoSort', 'isSorted', 'definesExplicitSystemBreaks',
                      'definesExplicitPageBreaks', '_atSoundingPitch', '_mutable'):
@@ -1391,7 +1396,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             #     self.storeAtEnd(e)
         self.coreElementsChanged()
 
-    def index(self, el: M21ObjType) -> int:
+    def index(self, el: base.Music21Object) -> int:
         '''
         Return the first matched index for
         the specified object.
@@ -1445,7 +1450,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         raise StreamException(f'cannot find object ({el}) in Stream')
 
     def remove(self,
-               targetOrList: Union[base.Music21Object, List[base.Music21Object]],
+               targetOrList: Union[base.Music21Object, Sequence[base.Music21Object]],
                *,
                shiftOffsets=False,
                recurse=False):
@@ -1587,16 +1592,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             raise StreamException(
                 'Cannot do both shiftOffsets and recurse search at the same time...yet')
 
+        targetList: List[base.Music21Object]
         if not common.isListLike(targetOrList):
+            if TYPE_CHECKING:
+                assert isinstance(targetOrList, base.Music21Object)
             targetList = [targetOrList]
-        elif len(targetOrList) > 1:
+        elif isinstance(targetOrList, Sized) and len(targetOrList) > 1:
+            if TYPE_CHECKING:
+                assert not isinstance(targetOrList, base.Music21Object)
             try:
-                targetList = sorted(targetOrList, key=self.elementOffset)
+                targetList = list(sorted(targetOrList, key=self.elementOffset))
             except sites.SitesException:
                 # will not be found if recursing, it's not such a big deal...
-                targetList = targetOrList
+                targetList = list(targetOrList)
         else:
-            targetList = targetOrList
+            if TYPE_CHECKING:
+                assert not isinstance(targetOrList, base.Music21Object)
+            targetList = list(targetOrList)
 
         shiftDur = 0.0  # for shiftOffsets
 
@@ -2712,7 +2724,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
     # --------------------------------------------------------------------------
     # searching and replacing routines
 
-    def setDerivationMethod(self, derivationMethod, recurse=False) -> None:
+    def setDerivationMethod(self,
+                            derivationMethod: str,
+                            recurse=False) -> None:
         '''
         Sets the .derivation.method for each element in the Stream
         if it has a .derivation object.
@@ -2734,10 +2748,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         >>> s2.recurse().notes[-1].derivation
         <Derivation of <music21.note.Note F> from <music21.note.Note F> via '__deepcopy__'>
         '''
-        if recurse:
-            sIter = self.recurse()
-        else:
+        if not recurse:
             sIter = self.iter()
+        else:
+            sIter = self.recurse()
 
         for el in sIter:
             if el.derivation is not None:
@@ -2991,7 +3005,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
                 if isinstance(complexObj, note.Rest) and complexObj.fullMeasure in (True, 'always'):
                     continue
                 if isinstance(complexObj, note.Rest) and complexObj.fullMeasure == 'auto':
-                    if container.isMeasure and (complexObj.duration == container.barDuration):
+                    if (isinstance(container, Measure)
+                            and (complexObj.duration == container.barDuration)):
                         continue
                     elif ('Voice' in container.classes
                           and container.activeSite

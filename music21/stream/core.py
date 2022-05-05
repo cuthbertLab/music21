@@ -46,7 +46,7 @@ class StreamCoreMixin:
         # the _offsetDict is a dictionary where id(element) is the
         # index and the value is a tuple of offset and element.
         # offsets can be floats, Fractions, or a member of the enum OffsetSpecial
-        self._offsetDict: Dict[int, Tuple[Union[float, Fraction, str], Music21Object]] = {}
+        self._offsetDict: Dict[int, Tuple[OffsetQLSpecial, Music21Object]] = {}
 
         # self._elements stores Music21Object objects.
         self._elements: List[Music21Object] = []
@@ -287,8 +287,7 @@ class StreamCoreMixin:
                 indexCache = self._cache['index']
             # always clear cache when elements have changed
             # for instance, Duration will change.
-            # noinspection PyAttributeOutsideInit
-            self._cache = {}  # cannot call clearCache() because defined on Stream via Music21Object
+            self.clearCache()
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
 

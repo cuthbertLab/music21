@@ -22,5 +22,7 @@ OffsetQLIn = Union[int, float, Fraction]
 
 StreamType = TypeVar('StreamType', bound='music21.stream.Stream')
 M21ObjType = TypeVar('M21ObjType', bound='music21.base.Music21Object')
+M21ObjType2 = TypeVar('M21ObjType2', bound='music21.base.Music21Object')  # when you need another
+
 ClassListType = Union[str, Iterable[str], Type[M21ObjType], Iterable[Type[M21ObjType]]]
 StepName = Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']
