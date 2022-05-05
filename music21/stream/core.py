@@ -29,8 +29,6 @@ import unittest
 from music21.base import Music21Object
 from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
-from music21.common.types import OffsetQL, M21ObjType, StreamType
-from music21 import derivation
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException

@@ -222,7 +222,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             out += f'identifier={self.identifier!r} '
         if self.syllabic is not None:
             out += f'syllabic={self.syllabic} '
-        if self.text is not None:
+        if self.text:
             out += f'text={self.text!r} '
         return out
 
