@@ -1597,7 +1597,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             if TYPE_CHECKING:
                 assert isinstance(targetOrList, base.Music21Object)
             targetList = [targetOrList]
-        elif isinstance(targetOrList, Sized) and len(targetOrList) > 1:
+        elif isinstance(targetOrList, Sequence) and len(targetOrList) > 1:
             if TYPE_CHECKING:
                 assert not isinstance(targetOrList, base.Music21Object)
             try:
