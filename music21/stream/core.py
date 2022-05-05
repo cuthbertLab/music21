@@ -467,6 +467,7 @@ class StreamCoreMixin:
         Core method for adding end elements.
         To be called by other methods.
         '''
+        # noinspection PyTypeChecker
         self.coreSetElementOffset(element, OffsetSpecial.AT_END, addElement=True)
         element.sites.add(self)
         # need to explicitly set the activeSite of the element

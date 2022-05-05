@@ -19,11 +19,15 @@ filtered.  Filters are used by methods on streams such as
 # import inspect
 import unittest
 from math import inf
+from typing import Optional, TypeVar
 
 from music21 import common
 from music21.common.numberTools import opFrac
 from music21.exceptions21 import Music21Exception
 from music21 import prebase
+
+
+StreamIteratorType = TypeVar('StreamIteratorType', bound='music21.stream.iterator.StreamIterator')
 
 class FilterException(Music21Exception):
     pass
@@ -70,7 +74,7 @@ class StreamFilter(prebase.ProtoM21Object):
     # def reset(self):
     #    pass
 
-    def __call__(self, item, iterator):
+    def __call__(self, item, iterator: Optional[StreamIteratorType] = None):
         return True
 
 class IsFilter(StreamFilter):
@@ -128,7 +132,7 @@ class IsFilter(StreamFilter):
     def reset(self):
         self.numToFind = len(self.target)
 
-    def __call__(self, item, iterator):
+    def __call__(self, item, iterator=None):
         if self.numToFind == 0:  # short circuit -- we already have
             raise StopIteration
 
@@ -182,7 +186,7 @@ class IsNotFilter(IsFilter):
     def reset(self):
         pass  # do nothing: inf - 1 = inf
 
-    def __call__(self, item, iterator):
+    def __call__(self, item, iterator=None):
         return not super().__call__(item, iterator)
 
 
@@ -204,7 +208,7 @@ class IdFilter(StreamFilter):
             searchIdLower = searchId
         self.searchId = searchIdLower
 
-    def __call__(self, item, iterator):
+    def __call__(self, item, iterator=None):
         if item.id == self.searchId:
             return True
         else:
@@ -259,7 +263,7 @@ class ClassFilter(StreamFilter):
             return False
         return True
 
-    def __call__(self, item, iterator):
+    def __call__(self, item, iterator=None):
         return not item.classSet.isdisjoint(self.classList)
 
     def _reprInternal(self):
@@ -289,7 +293,7 @@ class ClassNotFilter(ClassFilter):
     '''
     derivationStr = 'getElementsNotOfClass'
 
-    def __call__(self, item, iterator):
+    def __call__(self, item, iterator=None):
         return item.classSet.isdisjoint(self.classList)
 
 
@@ -328,7 +332,7 @@ class GroupFilter(StreamFilter):
             groupFilterList = [groupFilterList]
         self.groupFilterList = groupFilterList
 
-    def __call__(self, item, iterator):
+    def __call__(self, item, iterator=None):
         eGroups = item.groups
         for groupName in self.groupFilterList:
             if groupName in eGroups:
@@ -383,15 +387,19 @@ class OffsetFilter(StreamFilter):
             return str(self.offsetStart) + '-' + str(self.offsetEnd)
 
 
-    def __call__(self, e, iterator):
-        s = iterator.srcStream
-        if s is e:
-            return False
-        offset = s.elementOffset(e)
-        if s.isSorted:
-            stopAfterEnd = self.stopAfterEnd
+    def __call__(self, e, iterator=None):
+        if iterator is None:
+            offset = e.offset
+            stopAfterEnd = False
         else:
-            stopAfterEnd = False  # never stop after end on unsorted stream
+            s = iterator.srcStream
+            if s is e:
+                return False
+            offset = s.elementOffset(e)
+            if s.isSorted:
+                stopAfterEnd = self.stopAfterEnd
+            else:
+                stopAfterEnd = False  # never stop after end on unsorted stream
         return self.isElementOffsetInRange(e, offset, stopAfterEnd=stopAfterEnd)
 
     def isElementOffsetInRange(self, e, offset, *, stopAfterEnd=False) -> bool:
@@ -472,7 +480,10 @@ class OffsetHierarchyFilter(OffsetFilter):
     '''
     derivationStr = 'getElementsByOffsetInHierarchy'
 
-    def __call__(self, e, iterator):
+    def __call__(self, e, iterator=None):
+        if iterator is None:
+            raise TypeError('Cannot call OffsetHierarchyFilter without an iterator')
+
         s = iterator.srcStream
         if s is e:
             return False

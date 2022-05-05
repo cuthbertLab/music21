@@ -19,7 +19,8 @@ from __future__ import annotations
 
 import copy
 from typing import (TypeVar, List, Union, Callable, Optional, Literal,
-                    TypedDict, Generic, overload, Iterable, Type, cast)
+                    TypedDict, Generic, overload, Iterable, Type, cast,
+                    Any, TYPE_CHECKING)
 import unittest
 import warnings
 
@@ -126,7 +127,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
     def __init__(self,
                  srcStream: StreamType,
                  *,
-                 restrictClass: M21ObjType = base.Music21Object,
+                 # restrictClass: Type[M21ObjType] = base.Music21Object,
                  filterList: Union[List[FilterType], FilterType, None] = None,
                  restoreActiveSites: bool = True,
                  activeInformation: Optional[ActiveInformation] = None,
@@ -697,14 +698,15 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
         '''
         returns False if any filter returns False, True otherwise.
         '''
+        f: Union[Callable[[Any, Optional[Any]], Any], filters.StreamFilter]
         for f in self.filters:
-            f: Union[Callable, filters.StreamFilter]
             try:
                 try:
                     if f(e, self) is False:
                         return False
                 except TypeError:  # one element filters are acceptable.
-                    f: Callable
+                    if TYPE_CHECKING:
+                        assert isinstance(f, filters.StreamFilter)
                     if f(e) is False:
                         return False
             except StopIteration:  # pylint: disable=try-except-raise
@@ -717,10 +719,6 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
 
         >>> s = stream.Stream()
 
-        So why does this exist?  Since we can't import "music21.stream" here,
-        we will look in `srcStream.__class__.mro()` for the Stream
-        object to import.
-
         This is used in places where returnStreamSubclass is False, so we
         cannot just call `type(StreamIterator.srcStream)()`
 
@@ -729,26 +727,12 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
         >>> s = pi._newBaseStream()
         >>> s
         <music21.stream.Stream 0x1047eb2e8>
-
-        >>> pi.srcStream = note.Note()
-        >>> pi._newBaseStream()
-        Traceback (most recent call last):
-        music21.stream.iterator.StreamIteratorException: ...
         '''
-        StreamBase = None
-        for x in self.srcStream.__class__.mro():
-            if x.__name__ == 'Stream':
-                StreamBase = x
-                break
-
-        try:
-            return StreamBase()
-        except TypeError:  # 'NoneType' object is not callable.
-            raise StreamIteratorException(
-                f"You've given a 'stream' that is not a stream! {self.srcStream}")
+        from music21 import stream
+        return stream.Stream()
 
     @overload
-    def stream(self, returnStreamSubClass: Literal[False] = True) -> 'music21.stream.Stream':
+    def stream(self, returnStreamSubClass: Literal[False]) -> 'music21.stream.Stream':
         # ignore this code -- just here until Astroid bug #1015 is fixed
         x: 'music21.stream.Stream' = self.streamObj
         return x
@@ -843,7 +827,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
         else:
             derivationMethods = []
             for f in self.filters:
-                if hasattr(f, 'derivationStr'):
+                if isinstance(f, filters.StreamFilter):
                     dStr = f.derivationStr
                 else:
                     dStr = f.__name__  # function; lambda returns <lambda>
@@ -968,7 +952,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
                            classFilterList: Type[ChangedM21ObjType],
                            *,
                            returnClone: bool = True) -> StreamIterator[ChangedM21ObjType]:
-        x: StreamIterator[ChangedM21ObjType] = self.__class__(self.streamObj)
+        x = cast(StreamIterator[ChangedM21ObjType], self.__class__(self.streamObj))
         return x
 
     @overload
@@ -1517,24 +1501,24 @@ class OffsetIterator(StreamIterator[M21ObjType]):
     def __init__(self,
                  srcStream,
                  *,
-                 restrictClass: M21ObjType = base.Music21Object,
+                 # restrictClass: Type[M21ObjType] = base.Music21Object,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
                  ignoreSorting=False
                  ):
         super().__init__(srcStream,
-                         restrictClass=restrictClass,
+                         # restrictClass=restrictClass,
                          filterList=filterList,
                          restoreActiveSites=restoreActiveSites,
                          activeInformation=activeInformation,
                          ignoreSorting=ignoreSorting,
                          )
         self.raiseStopIterationNext = False
-        self.nextToYield = []
+        self.nextToYield: List[M21ObjType] = []
         self.nextOffsetToYield = None
 
-    def __next__(self) -> List[M21ObjType]:
+    def __next__(self) -> List[M21ObjType]:  # type: ignore
         if self.raiseStopIterationNext:
             raise StopIteration
 
@@ -1601,7 +1585,7 @@ class OffsetIterator(StreamIterator[M21ObjType]):
                            classFilterList: Type[ChangedM21ObjType],
                            *,
                            returnClone: bool = True) -> OffsetIterator[ChangedM21ObjType]:
-        x: OffsetIterator[ChangedM21ObjType] = self.__class__(self.streamObj)
+        x = cast(OffsetIterator[ChangedM21ObjType], self.__class__(self.streamObj))
         return x
 
     @overload
@@ -1699,7 +1683,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
     def __init__(self,
                  srcStream,
                  *,
-                 restrictClass: M21ObjType = base.Music21Object,
+                 # restrictClass: Type[M21ObjType] = base.Music21Object,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
@@ -1708,7 +1692,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
                  ignoreSorting=False
                  ):  # , parentIterator=None):
         super().__init__(srcStream,
-                         restrictClass=restrictClass,
+                         # restrictClass=restrictClass,
                          filterList=filterList,
                          restoreActiveSites=restoreActiveSites,
                          activeInformation=activeInformation,
@@ -1726,7 +1710,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
 
         if streamsOnly is True:
             self.filters.append(filters.ClassFilter('Stream'))
-        self.childRecursiveIterator = None
+        self.childRecursiveIterator: Optional[RecursiveIterator[Any]] = None
         # not yet used.
         # self.parentIterator = None
 
@@ -1754,7 +1738,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
                 self.activeInformation['index'] = -1
                 self.activeInformation['lastYielded'] = self.srcStream
                 self.returnSelf = False
-                return self.srcStream
+                return cast(M21ObjType, self.srcStream)
 
             elif self.returnSelf is True:
                 self.returnSelf = False
@@ -1777,7 +1761,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
             # in a recursive filter, the stream does not need to match the filter,
             # only the internal elements.
             if e.isStream:
-                self.childRecursiveIterator = RecursiveIterator(
+                childRecursiveIterator: RecursiveIterator[M21ObjType] = RecursiveIterator(
                     srcStream=e,
                     restoreActiveSites=self.restoreActiveSites,
                     filterList=self.filters,  # shared list...
@@ -1789,7 +1773,8 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
                 newStartOffset = (self.iteratorStartOffsetInHierarchy
                                   + self.srcStream.elementOffset(e))
 
-                self.childRecursiveIterator.iteratorStartOffsetInHierarchy = newStartOffset
+                childRecursiveIterator.iteratorStartOffsetInHierarchy = newStartOffset
+                self.childRecursiveIterator = childRecursiveIterator
             if self.matchesFilters(e) is False:
                 continue
 
