@@ -20,6 +20,7 @@ from music21.base import Music21Object
 from music21.common.types import M21ObjType
 from music21 import common
 from music21 import key
+from music21 import note
 from music21.tree import spans
 from music21.tree import timespanTree
 from music21.tree import trees
@@ -132,7 +133,8 @@ def listOfTreesByClass(
                 if classList and element.classSet.isdisjoint(classList):
                     continue
                 if useTimespans:
-                    if hasattr(element, 'pitches') and not isinstance(element, (key.Key, note.Rest)):
+                    if hasattr(element, 'pitches') and not isinstance(element,
+                                                                      (key.Key, note.Rest)):
                         spanClass = spans.PitchedTimespan
                     else:
                         spanClass = spans.ElementTimespan
