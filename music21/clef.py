@@ -20,7 +20,7 @@ within :class:`~music21.stream.Measure` objects.
 '''
 import unittest
 from typing import (Mapping, Optional, Iterable, Sequence, Union, Dict,
-                    Optional, Type, List, TYPE_CHECKING)
+                    Type, List, TYPE_CHECKING)
 
 from music21 import base
 from music21 import exceptions21
