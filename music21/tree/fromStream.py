@@ -17,16 +17,17 @@ import unittest
 from typing import Optional, Sequence, List, Type, Union, Tuple, Literal, cast
 
 from music21.base import Music21Object
-from music21.common.types import M21ObjType
+from music21.common.types import M21ObjType, StreamType
 from music21 import common
 from music21 import key
+from music21 import note
 from music21.tree import spans
 from music21.tree import timespanTree
 from music21.tree import trees
 
 
 def listOfTreesByClass(
-    inputStream: 'music21.stream.Stream',
+    inputStream: StreamType,
     *,
     classLists: Optional[List[Sequence[Type[M21ObjType]]]] = None,
     currentParentage: Optional[Tuple['music21.stream.Stream', ...]] = None,
@@ -132,7 +133,8 @@ def listOfTreesByClass(
                 if classList and element.classSet.isdisjoint(classList):
                     continue
                 if useTimespans:
-                    if hasattr(element, 'pitches') and not isinstance(element, key.Key):
+                    if hasattr(element, 'pitches') and not isinstance(element,
+                                                                      (key.Key, note.Rest)):
                         spanClass = spans.PitchedTimespan
                     else:
                         spanClass = spans.ElementTimespan
@@ -150,7 +152,7 @@ def listOfTreesByClass(
 
 
 def asTree(
-    inputStream: 'music21.stream.Stream',
+    inputStream: StreamType,
     *,
     flatten: Union[Literal['semiFlat'], bool] = False,
     classList: Optional[Sequence[Type]] = None,
