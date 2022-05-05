@@ -35,8 +35,7 @@ from fractions import Fraction
 from math import isclose
 from typing import (Dict, Iterable, List, Optional, Set, Tuple, cast,
                     TypeVar, Type, Union, Generic, Literal, overload,
-                    Sequence, Sized,
-                    TYPE_CHECKING)
+                    Sequence, TYPE_CHECKING)
 
 from music21 import base
 
@@ -1906,7 +1905,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
     def setElementOffset(
         self,
         element: base.Music21Object,
-        offset: Union[int, float, Fraction, str],
+        offset: Union[int, float, Fraction, OffsetSpecial],
     ):
         '''
         Sets the Offset for an element that is already in a given stream.

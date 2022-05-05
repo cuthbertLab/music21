@@ -21,6 +21,7 @@ OffsetQLSpecial = Union[float, Fraction, OffsetSpecial]
 OffsetQLIn = Union[int, float, Fraction]
 
 StreamType = TypeVar('StreamType', bound='music21.stream.Stream')
+StreamType2 = TypeVar('StreamType2', bound='music21.stream.Stream')
 M21ObjType = TypeVar('M21ObjType', bound='music21.base.Music21Object')
 M21ObjType2 = TypeVar('M21ObjType2', bound='music21.base.Music21Object')  # when you need another
 

@@ -21,15 +21,17 @@ remain stable.
 
 All functions here will eventually begin with `.core`.
 '''
+from __future__ import annotations
+
 import copy
-from typing import List, Dict, Union, Tuple, Optional, TYPE_CHECKING
+from typing import List, Dict, Union, Tuple, Optional, TYPE_CHECKING, Any
 from fractions import Fraction
 import unittest
 
 from music21.base import Music21Object
 from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
-from music21.common.types import StreamType
+from music21.common.types import StreamType, OffsetQLSpecial
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
@@ -159,7 +161,7 @@ class StreamCoreMixin:
     def coreSetElementOffset(
         self,
         element: Music21Object,
-        offset: Union[int, float, Fraction, str],
+        offset: Union[int, float, Fraction, OffsetSpecial],
         *,
         addElement=False,
         setActiveSite=True
@@ -291,10 +293,10 @@ class StreamCoreMixin:
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
 
-    def coreCopyAsDerivation(self: StreamType,
+    def coreCopyAsDerivation(self,
                              methodName: str, *,
                              recurse=True,
-                             deep=True) -> StreamType:
+                             deep=True) -> 'music21.stream.Stream[Any]':
         '''
         Make a copy of this stream with the proper derivation set.
 
@@ -309,13 +311,20 @@ class StreamCoreMixin:
         >>> s2[0].derivation.method
         'exampleCopy'
         '''
+        if TYPE_CHECKING:
+            from music21 import stream
+            assert isinstance(self, stream.Stream)
         if deep:
             post = copy.deepcopy(self)
         else:  # pragma: no cover
             post = copy.copy(self)
-        post.derivation.method = methodName    # type: ignore
+
+        if TYPE_CHECKING:
+            assert isinstance(post, stream.Stream)
+
+        post.derivation.method = methodName
         if recurse and deep:
-            post.setDerivationMethod(methodName, recurse=True)  # type: ignore
+            post.setDerivationMethod(methodName, recurse=True)
         return post
 
     def coreHasElementByMemoryLocation(self, objId: int) -> bool:
