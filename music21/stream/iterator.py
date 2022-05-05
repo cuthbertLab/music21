@@ -727,11 +727,6 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
         >>> s = pi._newBaseStream()
         >>> s
         <music21.stream.Stream 0x1047eb2e8>
-
-        >>> pi.srcStream = note.Note()
-        >>> pi._newBaseStream()
-        Traceback (most recent call last):
-        music21.stream.iterator.StreamIteratorException: ...
         '''
         from music21 import stream
         return stream.Stream()

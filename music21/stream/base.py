@@ -35,7 +35,7 @@ from fractions import Fraction
 from math import isclose
 from typing import (Dict, Iterable, List, Optional, Set, Tuple, cast,
                     TypeVar, Type, Union, Generic, Literal, overload,
-                    Sequence, TYPE_CHECKING)
+                    Sequence, TYPE_CHECKING, Any)
 
 from music21 import base
 
@@ -2882,6 +2882,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
             target = self._endElements[i - eLen]
             self._endElements[i - eLen] = replacement
 
+            # noinspection PyTypeChecker
             self.coreSetElementOffset(replacement, OffsetSpecial.AT_END, addElement=True)
             replacement.sites.add(self)
 
@@ -6501,7 +6502,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         '''
         return self.streamStatus.accidentals
 
-    def makeNotation(self,
+    def makeNotation(self: StreamType,
                      *,
                      meterStream=None,
                      refStreamOrTimeRange=None,
@@ -6550,6 +6551,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
         'final'
         '''
         # determine what is the object to work on first
+        returnStream: Union[StreamType, Stream[Any]]
         if inPlace:
             returnStream = self
         else:
@@ -6578,7 +6580,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object, Generic[M21ObjType]):
                 inPlace=True,
                 bestClef=bestClef)
 
-        measureStream = returnStream.getElementsByClass(Measure).stream()
+        measureStream: Stream[Measure] = returnStream.getElementsByClass(Measure).stream()
         # environLocal.printDebug(['Stream.makeNotation(): post makeMeasures,
         #   length', len(returnStream)])
         if not measureStream:
@@ -13782,6 +13784,8 @@ class Score(Stream):
             # no matter, let's just be extra cautious and run this here (Feb 2021 - JTW)
             returnStream.coreElementsChanged()
         else:  # call the base method
+            if TYPE_CHECKING:
+                assert isinstance(returnStream, Score)
             super(Score, returnStream).makeNotation(meterStream=meterStream,
                                                     refStreamOrTimeRange=refStreamOrTimeRange,
                                                     inPlace=True,
