@@ -830,6 +830,8 @@ def makeRests(
       - `inPlace` defaults False
       - Recurses into parts, measures, voices
       - Gave priority to `timeRangeFromBarDuration` over `refStreamOrTimeRange`
+
+    Changed in v8: scores (or other streams having parts) edited `inPlace` return `None`.
     '''
     from music21 import stream
 
@@ -847,7 +849,10 @@ def makeRests(
                 refStreamOrTimeRange=refStreamOrTimeRange,
                 timeRangeFromBarDuration=timeRangeFromBarDuration,
             )
-        return returnObj
+        if inPlace:
+            return
+        else:
+            return returnObj
 
     def oHighTargetForMeasure(
         m: Optional[stream.Measure] = None,
