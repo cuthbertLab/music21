@@ -78,7 +78,7 @@ class OutputTabOrange(OutputFormat):
         post.append(self._dataSet.getAttributeLabels(
             includeClassLabel=includeClassLabel, includeId=includeId))
 
-        # second row meta data
+        # second row metadata
         row = []
         for x in self._dataSet.getDiscreteLabels(
                 includeClassLabel=includeClassLabel, includeId=includeId):

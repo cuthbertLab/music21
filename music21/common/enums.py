@@ -139,6 +139,8 @@ class OffsetSpecial(StrEnum):
 
     The enum `AT_END` is equal to the string 'highestTime'
 
+    In version 9, the string comparisons will be removed.
+
     >>> from music21.common.enums import OffsetSpecial
     >>> OffsetSpecial.AT_END
     <OffsetSpecial.AT_END>

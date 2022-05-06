@@ -13898,7 +13898,7 @@ class Opus(Stream):
             md = s.metadata
             # presently just getting the first of attributes encountered
             if md is not None:
-                # environLocal.printDebug(['sub-score meta data', md,
+                # environLocal.printDebug(['sub-score metadata', md,
                 #   'md.composer', md.composer, 'md.title', md.title])
                 if md.title is not None and mdNew.title is None:
                     mdNew.title = md.title

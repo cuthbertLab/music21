@@ -277,7 +277,7 @@ def parseTokens(mh, dst, p, useMeasures):
             # add the attached chord symbol
             if t.chordSymbols:
                 cs_name = t.chordSymbols[0]
-                cs_name = re.sub('["]', '', cs_name).lstrip().rstrip()
+                cs_name = re.sub('"', '', cs_name).lstrip().rstrip()
                 cs_name = re.sub('[()]', '', cs_name)
                 cs_name = common.cleanedFlatNotation(cs_name)
                 try:

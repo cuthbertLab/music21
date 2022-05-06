@@ -1201,7 +1201,7 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         # environLocal.printDebug(['purging orphans'])
         orphans = []
-        # TODO: how can this be optimized to not use getSites, so as to
+        # TODO: how can this be optimized to not use getSites, to
         # not unwrap weakrefs?
         for s in self.sites.yieldSites(excludeNone=True):
             # of the site does not actually have this Music21Object in
@@ -3031,18 +3031,18 @@ class Music21Object(prebase.ProtoM21Object):
 
         >>> n = note.Note()
         >>> n.quarterLength = 0.5
-        >>> a, b = n.splitAtQuarterLength(0.5)
-        >>> b is None
+        >>> firstPart, secondPart = n.splitAtQuarterLength(0.5)
+        >>> secondPart is None
         True
-        >>> a is n
+        >>> firstPart is n
         True
 
         (same with retainOrigin off)
 
         >>> n = note.Note()
         >>> n.quarterLength = 0.5
-        >>> a, b = n.splitAtQuarterLength(0.5, retainOrigin=False)
-        >>> a is n
+        >>> firstPart, secondPart = n.splitAtQuarterLength(0.5, retainOrigin=False)
+        >>> firstPart is n
         False
 
 
@@ -3050,7 +3050,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         >>> n = note.Note()
         >>> n.quarterLength = 0.5
-        >>> a, b = n.splitAtQuarterLength(0.7)
+        >>> first, second = n.splitAtQuarterLength(0.7)
         Traceback (most recent call last):
         music21.duration.DurationException: cannot split a duration (0.5)
             at this quarterLength (7/10)
@@ -4623,6 +4623,7 @@ class Test(unittest.TestCase):
         b1 = bar.Barline()
         s.append(n1)
         self.assertEqual(s.highestTime, 30.0)
+        # noinspection PyTypeChecker
         s.coreSetElementOffset(b1, OffsetSpecial.AT_END, addElement=True)
 
         self.assertEqual(b1.getOffsetBySite(s), 30.0)
