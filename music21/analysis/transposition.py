@@ -69,6 +69,7 @@ class TranspositionChecker:
         self.distinctNormalOrders = None
 
     def getTranspositions(self):
+        # noinspection PyShadowingNames
         '''
         Gets all 12 transpositions (distinct or otherwise)
 

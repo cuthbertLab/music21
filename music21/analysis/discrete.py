@@ -5,8 +5,9 @@
 #
 # Authors:      Jared Sadoian
 #               Christopher Ariza
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -25,7 +26,7 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 #     range and key modules in analysis
 
 import unittest
-from typing import Union, List, Any, Tuple, Iterable, Optional
+from typing import Union, List, Any, Tuple, Iterable, Optional, Sequence
 
 from collections import OrderedDict
 from music21 import exceptions21
@@ -59,7 +60,7 @@ class DiscreteAnalysis:
     '''
     # define in subclass
     name = ''
-    identifiers = []
+    identifiers: List[str] = []
 
     def __init__(self, referenceStream=None):
         # store a reference stream if needed
@@ -74,7 +75,7 @@ class DiscreteAnalysis:
         # store alternative solutions, which may be sorted or not
         self.alternativeSolutions = []
 
-    def _rgbToHex(self, rgb: Iterable[Union[float, int]]) -> str:
+    def _rgbToHex(self, rgb: Sequence[Union[float, int]]) -> str:
         '''
         Utility conversion method
 
@@ -1042,15 +1043,13 @@ class Ambitus(DiscreteAnalysis):
             return None
 
         # find the min and max pitch space value for all pitches
-        psFound = []
-        pitchesFound = []
+        psFound: List[float] = []
+        pitchesFound: List[pitch.Pitch] = []
         for n in justNotes:
             # environLocal.printDebug([n])
-            pitches = []
-            if isinstance(n, chord.Chord) and not isinstance(n, harmony.ChordSymbol):
+            pitches: Iterable[pitch.Pitch] = ()
+            if isinstance(n, note.GeneralNote) and not isinstance(n, harmony.ChordSymbol):
                 pitches = n.pitches
-            elif isinstance(n, note.Note):
-                pitches = [n.pitch]
             psFound += [p.ps for p in pitches]
             pitchesFound.extend(pitches)
         # in some cases there is still nothing -- perhaps only ChordSymbols

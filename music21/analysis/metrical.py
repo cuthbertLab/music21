@@ -26,6 +26,7 @@ environLocal = environment.Environment('analysis.metrical')
 
 
 def labelBeatDepth(streamIn):
+    # noinspection PyShadowingNames
     r'''
     Modify a Stream in place by annotating metrical analysis symbols.
 
@@ -71,9 +72,11 @@ def labelBeatDepth(streamIn):
 
     return streamIn
 
-def thomassenMelodicAccent(streamIn):
+def thomassenMelodicAccent(streamIn: stream.Stream):
+    # noinspection PyShadowingNames
     '''
-    adds a attribute melodicAccent to each note of a :class:`~music21.stream.Stream` object
+    Adds an attribute, 'melodicAccent' to each note's `.editorial`
+    within a :class:`~music21.stream.Stream` object
     according to the method postulated in Joseph M. Thomassen, "Melodic accent: Experiments and
     a tentative model," ''Journal of the Acoustical Society of America'', Vol. 71, No. 6 (1982) pp.
     1598-1605; with, Erratum, ''Journal of the Acoustical Society of America'', Vol. 73,
@@ -99,11 +102,10 @@ def thomassenMelodicAccent(streamIn):
 
     Example from Thomassen, figure 5:
 
-
     >>> s = converter.parse('tinynotation: 7/4 c4 c c d e d d')
     >>> analysis.metrical.thomassenMelodicAccent(s.flatten().notes)
     >>> for n in s.flatten().notes:
-    ...    (n.pitch.nameWithOctave, n.melodicAccent)
+    ...    (n.pitch.nameWithOctave, n.editorial.melodicAccent)
     ('C4', 1.0)
     ('C4', 0.0)
     ('C4', 0.0)
@@ -119,10 +121,10 @@ def thomassenMelodicAccent(streamIn):
     p2Accent = 1.0
     for i, n in enumerate(streamIn):
         if i == 0:
-            n.melodicAccent = 1.0
+            n.editorial.melodicAccent = 1.0
             continue
         elif i == maxNotes:
-            n.melodicAccent = p2Accent
+            n.editorial.melodicAccent = p2Accent
             continue
 
         lastPs = streamIn[i - 1].pitch.ps
@@ -154,7 +156,7 @@ def thomassenMelodicAccent(streamIn):
             thisAccent = 0.0
             nextAccent = 0.0
 
-        n.melodicAccent = thisAccent * p2Accent
+        n.editorial.melodicAccent = thisAccent * p2Accent
         p2Accent = nextAccent
 
 

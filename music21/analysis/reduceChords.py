@@ -16,6 +16,7 @@ import collections
 import itertools
 import unittest
 from music21 import chord
+from music21.common.types import DocOrder
 from music21 import exceptions21
 from music21 import environment
 from music21 import meter
@@ -764,7 +765,7 @@ class TestExternal(unittest.TestCase):
 
 # -----------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: DocOrder = []
 
 
 if __name__ == '__main__':

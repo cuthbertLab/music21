@@ -5,14 +5,15 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2017 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017-22 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import collections
+from typing import Any
 
 _MOD = 'analysis.elements'
 
-def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.Counter:
+def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.Counter[Any]:
     '''
     Return a collections.Counter of attribute usage for elements in a stream
     or StreamIterator
@@ -24,9 +25,9 @@ def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.
     >>> qlCount.most_common(3)
     [(1.0, 12), (2.0, 11), (4.0, 2)]
 
-    Changed in 4.0: Returns a collections.Counter object.
+    Changed in v4: Returns a collections.Counter object.
     '''
-    post = collections.Counter()
+    post: collections.Counter[Any] = collections.Counter()
     for e in streamOrStreamIter:
         if hasattr(e, attrName):
             k = getattr(e, attrName)
