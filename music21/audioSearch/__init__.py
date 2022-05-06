@@ -143,7 +143,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
             # numpy warns scipy that oldnumeric will be dropped soon.
             warnings.simplefilter('ignore', DeprecationWarning)
             # noinspection PyPackageRequirements
-            from scipy.signal import fftconvolve as convolve
+            from scipy.signal import fftconvolve as convolve  # type: ignore
     except ImportError:  # pragma: no cover
         warnings.warn('Running convolve without scipy -- will be slower')
         convolve = numpy.convolve
@@ -605,10 +605,11 @@ def smoothFrequencies(
         )
 
     dpf = frequencyList
+    detectedPitchesFreq: List[int]
     if inPlace:
-        detectedPitchesFreq = dpf
+        detectedPitchesFreq = [int(f) for f in dpf]
     else:
-        detectedPitchesFreq = copy.copy(dpf)
+        detectedPitchesFreq = [int(f) for f in copy.copy(dpf)]
 
     # smoothing
     beginning = 0.0
@@ -622,14 +623,14 @@ def smoothFrequencies(
 
     for i in range(numFreqs):
         if i < int(math.floor(smoothLevels / 2.0)):
-            detectedPitchesFreq[i] = beginning
+            detectedPitchesFreq[i] = int(beginning)
         elif i > numFreqs - int(math.ceil(smoothLevels / 2.0)) - 1:
-            detectedPitchesFreq[i] = ends
+            detectedPitchesFreq[i] = int(ends)
         else:
-            t = 0
+            t = 0.0
             for j in range(smoothLevels):
-                t = t + detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
-            detectedPitchesFreq[i] = t / smoothLevels
+                t += detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
+            detectedPitchesFreq[i] = int(t / smoothLevels)
 
     for i in range(numFreqs):
         detectedPitchesFreq[i] = int(round(detectedPitchesFreq[i]))

@@ -30,8 +30,6 @@ from typing import Union, List, Any, Tuple, Iterable, Optional, Sequence
 
 from collections import OrderedDict
 from music21 import exceptions21
-
-from music21 import chord
 from music21 import harmony
 from music21 import interval
 from music21 import note

@@ -63,4 +63,4 @@ jobs:
                   python -m pip install mypy
             - name: Type-check certain modules with mypy
               run: |
-                  mypy --follow-imports=silent music21/*.py music21/abcFormat music21/analysis music21/capella music21/common music21/corpus music21/features music21/figuredBass music21/humdrum music21/ipython21 music21/languageExcerpts music21/lily music21/mei music21/metadata music21/musedata music21/noteworthy music21/omr music21/romanText music21/stream music21/test music21/vexflow
+                  mypy --follow-imports=silent music21/*.py music21/abcFormat music21/analysis music21/audioSearch music21/capella music21/common music21/corpus music21/features music21/figuredBass music21/humdrum music21/ipython21 music21/languageExcerpts music21/lily music21/mei music21/metadata music21/musedata music21/noteworthy music21/omr music21/romanText music21/stream music21/test music21/vexflow
