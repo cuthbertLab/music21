@@ -318,7 +318,7 @@ class WindowedAnalysis:
         # store metadata about each row as a dictionary
         metaMatrix = []
 
-        if common.isNum(windowStepSize):
+        if isinstance(windowStepSize, int):
             windowSizes = list(range(minLength, maxLength + 1, windowStepSize))
         else:
             num, junk = common.getNumFromStr(windowStepSize)
