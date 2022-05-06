@@ -1582,7 +1582,7 @@ class Stream(core.StreamCore, Generic[M21ObjType]):
             raise ImmutableStreamException('Cannot remove from an immutable stream')
         # TODO: Next to clean up... a doozy -- filter out all the different options.
 
-        # TODO: Add a renumber measures option
+        # TODO: Add an option to renumber measures
         # TODO: Shift offsets if recurse is True
         if shiftOffsets is True and recurse is True:  # pragma: no cover
             raise StreamException(
@@ -13995,7 +13995,7 @@ class Opus(Stream):
 class SpannerStorage(Stream):
     '''
     For advanced use. This Stream subclass is only used
-    inside of a Spanner object to provide object storage
+    inside a Spanner object to provide object storage
     of connected elements (things the Spanner spans).
 
     This subclass name can be used to search in an
@@ -14055,7 +14055,7 @@ class SpannerStorage(Stream):
 class VariantStorage(Stream):
     '''
     For advanced use. This Stream subclass is only
-    used inside of a Variant object to provide object
+    used inside a Variant object to provide object
     storage of connected elements (things the Variant
     defines).
 
@@ -14063,19 +14063,17 @@ class VariantStorage(Stream):
     object's .sites and find any and all
     locations that are VariantStorage objects.
 
-    A `variantParent` keyword argument must be provided
+    A `client` keyword argument must be provided
     by the Variant in creation.
 
-    # TODO v7: rename variantParent to client
+    Changed in v.8 -- client replaces variantParent
     '''
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
         # must provide a keyword argument with a reference to the variant
         # parent
-        self.variantParent = None
-        if 'variantParent' in keywords:
-            self.variantParent = keywords['variantParent']
+        self.client = keywords.get('client', None)
 
 
 # -----------------------------------------------------------------------------

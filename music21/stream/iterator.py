@@ -20,6 +20,7 @@ from __future__ import annotations
 import copy
 from typing import (TypeVar, List, Union, Callable, Optional, Literal,
                     TypedDict, Generic, overload, Iterable, Type, cast,
+                    Sequence,
                     Tuple, Any, TYPE_CHECKING)
 import unittest
 import warnings
@@ -63,7 +64,7 @@ class ActiveInformation(TypedDict, total=False):
 
 
 # -----------------------------------------------------------------------------
-class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
+class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], Sequence):
     '''
     An Iterator object used to handle getting items from Streams.
     The :meth:`~music21.stream.Stream.__iter__` method
@@ -78,7 +79,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
     Sets:
 
     * StreamIterator.srcStream -- the Stream iterated over
-    * StreamIterator.index -- current index item
+    * StreamIterator.elementIndex -- current index item
     * StreamIterator.streamLength -- length of elements.
 
     * StreamIterator.srcStreamElements -- srcStream._elements
@@ -136,7 +137,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
         if not ignoreSorting and srcStream.isSorted is False and srcStream.autoSort:
             srcStream.sort()
         self.srcStream: StreamType = srcStream
-        self.index: int = 0
+        self.elementIndex: int = 0
 
         # use .elements instead of ._elements/etc. so that it is sorted...
         self.srcStreamElements = cast(Tuple[M21ObjType, ...], srcStream.elements)
@@ -165,7 +166,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
         # whether it should be yielded.
         self.filters: List[FilterType] = filterList
         self._len: Optional[int] = None
-        self._matchingElements: Optional[List[M21ObjType]]  = None
+        self._matchingElements: Optional[List[M21ObjType]] = None
         # keep track of where we are in the parse.
         # esp important for recursive streams...
         if activeInformation is not None:
@@ -183,28 +184,28 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
         if streamClass == 'Measure' and self.srcStream.number != 0:
             srcStreamId = 'm.' + str(self.srcStream.number)
 
-        return f'for {streamClass}:{srcStreamId} @:{self.index}'
+        return f'for {streamClass}:{srcStreamId} @:{self.elementIndex}'
 
     def __iter__(self: _SIter) -> _SIter:
         self.reset()
         return self
 
     def __next__(self) -> M21ObjType:
-        while self.index < self.streamLength:
-            if self.index >= self.elementsLength:
+        while self.elementIndex < self.streamLength:
+            if self.elementIndex >= self.elementsLength:
                 self.iterSection = '_endElements'
-                self.sectionIndex = self.index - self.elementsLength
+                self.sectionIndex = self.elementIndex - self.elementsLength
             else:
-                self.sectionIndex = self.index
+                self.sectionIndex = self.elementIndex
 
             try:
-                e = self.srcStreamElements[self.index]
+                e = self.srcStreamElements[self.elementIndex]
             except IndexError:
                 # this may happen if the number of elements has changed
-                self.index += 1
+                self.elementIndex += 1
                 continue
 
-            self.index += 1
+            self.elementIndex += 1
             if self.matchesFilters(e) is False:
                 continue
 
@@ -320,16 +321,16 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
         return getattr(sOut, attr)
 
     @overload
-    def __getitem__(self, k: str) -> Optional[M21ObjType]:
-        return None
-
-    @overload
     def __getitem__(self, k: int) -> M21ObjType:
         return self.matchingElements()[k]
 
     @overload
     def __getitem__(self, k: slice) -> List[M21ObjType]:
-        return self.matchingElements()[k]
+        return self.matchingElements()
+
+    @overload
+    def __getitem__(self, k: str) -> Optional[M21ObjType]:
+        return None
 
     def __getitem__(self, k: Union[int, slice, str]) -> Union[M21ObjType,
                                                               List[M21ObjType],
@@ -618,22 +619,22 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType]):
     def updateActiveInformation(self) -> None:
         '''
         Updates the (shared) activeInformation dictionary
-        with information about
-        where we are.
+        with information about where we are.
 
-        Call before any element return
+        Call before any element return.
         '''
         ai = self.activeInformation
         ai['stream'] = self.srcStream
-        ai['index'] = self.index - 1
+        ai['index'] = self.elementIndex - 1
         ai['iterSection'] = self.iterSection
         ai['sectionIndex'] = self.sectionIndex
+        ai['lastYielded'] = None
 
     def reset(self) -> None:
         '''
         reset prior to iteration
         '''
-        self.index = 0
+        self.elementIndex = 0
         self.iterSection = '_elements'
         self.updateActiveInformation()
         self.activeInformation['lastYielded'] = None
@@ -1577,7 +1578,7 @@ class OffsetIterator(StreamIterator[M21ObjType]):
                 retElOffset = self.srcStream.elementOffset(retEl)
                 retElementList = [retEl]
 
-            while self.index <= self.streamLength:
+            while self.elementIndex <= self.streamLength:
                 nextEl = super().__next__()
                 nextElOffset = self.srcStream.elementOffset(nextEl)
                 if nextElOffset == retElOffset:
@@ -1763,7 +1764,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
 
         The same __iter__ as the superclass is used.
         '''
-        while self.index < self.streamLength:
+        while self.elementIndex < self.streamLength:
             # wrap this in a while loop instead of
             # returning self.__next__() because
             # in a long score with a miserly filter
@@ -1786,20 +1787,20 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
             elif self.returnSelf is True:
                 self.returnSelf = False
 
-            if self.index >= self.elementsLength:
+            if self.elementIndex >= self.elementsLength:
                 self.iterSection = '_endElements'
-                self.sectionIndex = self.index - self.elementsLength
+                self.sectionIndex = self.elementIndex - self.elementsLength
             else:
-                self.sectionIndex = self.index
+                self.sectionIndex = self.elementIndex
 
             try:
-                e = self.srcStreamElements[self.index]
+                e = self.srcStreamElements[self.elementIndex]
             except IndexError:
-                self.index += 1
+                self.elementIndex += 1
                 # this may happen if the number of elements has changed
                 continue
 
-            self.index += 1
+            self.elementIndex += 1
 
             # in a recursive filter, the stream does not need to match the filter,
             # only the internal elements.

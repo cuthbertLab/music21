@@ -24,7 +24,7 @@ All functions here will eventually begin with `.core`.
 from __future__ import annotations
 
 import copy
-from typing import List, Dict, Union, Tuple, Optional, TYPE_CHECKING, TypeVar, Generic
+from typing import List, Dict, Union, Tuple, Optional, TYPE_CHECKING
 from fractions import Fraction
 import unittest
 

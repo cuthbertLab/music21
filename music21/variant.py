@@ -94,6 +94,7 @@ class Variant(base.Music21Object):
         super().__init__()
         self.exposeTime = False
         self._stream = stream.VariantStorage(givenElements=givenElements,
+                                             client=self,
                                              *args, **keywords)
 
         self._replacementDuration = None
