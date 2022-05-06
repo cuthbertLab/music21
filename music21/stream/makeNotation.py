@@ -15,7 +15,7 @@
 
 import copy
 import unittest
-from typing import List, Generator, Optional, Set, Union, cast
+from typing import List, Generator, Optional, Set, Union
 from fractions import Fraction  # typing only
 
 from music21 import beam
@@ -1211,7 +1211,8 @@ def makeTies(
     mCount = 0
     lastTimeSignature = None
 
-    while True:  # TODO: find a way to avoid 'while True'
+    while True:  # pylint: disable=too-many-nested-blocks
+        # TODO: find a way to avoid 'while True'
         # update measureIterator on each iteration,
         # as new measure may have been added to the returnObj stream
         measureIterator = returnObj.getElementsByClass(stream.Measure)
@@ -1236,8 +1237,9 @@ def makeTies(
             else:
                 mNext.offset = mOffset
             if not meterStream:  # in case no meters are defined
-                ts = meter.TimeSignature()
-                ts.load(f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}')
+                ts = meter.TimeSignature(
+                    f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
+                )
             else:  # get the last encountered meter
                 ts = meterStream.getElementAtOrBefore(mNext.offset)
             # only copy and assign if not the same as the last
