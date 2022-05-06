@@ -56,7 +56,7 @@ class StreamIteratorInefficientWarning(PendingDeprecationWarning):
 
 class ActiveInformation(TypedDict, total=False):
     stream: Optional['music21.stream.Stream']
-    index: int
+    elementIndex: int
     iterSection: Literal['_elements', '_endElements']
     sectionIndex: int
     lastYielded: Optional[base.Music21Object]
@@ -91,7 +91,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], Sequence):
       streams:
 
           * `stream` = the stream that is currently active,
-          * `index` = where in `.elements` we are,
+          * `elementIndex` = where in `.elements` we are,
           * `iterSection` is `_elements` or `_endElements`,
           * `sectionIndex` is where we are in the iterSection, or -1 if
             we have not started.
@@ -113,6 +113,9 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], Sequence):
     * For `activeInformation` see above.
 
     Changed in v.5.2 -- all arguments except srcStream are keyword only.
+    Changed in v.8 -- filterList must be a list or None, not a single filter.
+                      StreamIterator inherits from Sequence, hence index
+                      was moved to elementIndex
 
     OMIT_FROM_DOCS
 
@@ -124,7 +127,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], Sequence):
     TypeError: filterList expects Filters or callables,
     not types themselves; got <class 'music21.note.Note'>
 
-    Changed in v.8 -- filterList must be a list or None, not a single filter.
+    THIS IS IN OMIT -- Add info above.
     '''
     def __init__(self,
                  srcStream: StreamType,
@@ -625,7 +628,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], Sequence):
         '''
         ai = self.activeInformation
         ai['stream'] = self.srcStream
-        ai['index'] = self.elementIndex - 1
+        ai['elementIndex'] = self.elementIndex - 1
         ai['iterSection'] = self.iterSection
         ai['sectionIndex'] = self.sectionIndex
         ai['lastYielded'] = None
@@ -727,7 +730,7 @@ class StreamIterator(prebase.ProtoM21Object, Generic[M21ObjType], Sequence):
         if self._matchingElements is not None:
             return self._matchingElements
 
-        with saveAttributes(self, 'restoreActiveSites', 'index'):
+        with saveAttributes(self, 'restoreActiveSites', 'elementIndex'):
             self.restoreActiveSites = restoreActiveSites
             # we iterate to set all activeSites
             me = [x for x in self]  # pylint: disable=unnecessary-comprehension
@@ -1779,7 +1782,7 @@ class RecursiveIterator(StreamIterator[M21ObjType]):
 
             if self.returnSelf is True and self.matchesFilters(self.srcStream):
                 self.activeInformation['stream'] = None
-                self.activeInformation['index'] = -1
+                self.activeInformation['elementIndex'] = -1
                 self.activeInformation['lastYielded'] = self.srcStream
                 self.returnSelf = False
                 return cast(M21ObjType, self.srcStream)
