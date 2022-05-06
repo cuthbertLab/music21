@@ -117,7 +117,7 @@ class Test(unittest.TestCase):
 #            # titles and other tex annotations
 #            # here, we get these only from the first page
 #            titleCandidates += pageStream[0].getElementsByClass(TextAnnotation)
-#            # an additional slot might be used to store meta data, also
+#            # an additional slot might be used to store metadata, also
 #            # as a stream
 #            metaStream = partStream['meta']
 #            titleCandidates += metaStream.getElementsByClass(TextAnnotation)

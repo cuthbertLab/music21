@@ -314,7 +314,7 @@ class WindowedAnalysis:
         # of all windows of a single size across the entire Stream
         solutionMatrix = []
         colorMatrix = []
-        # store meta data about each row as a dictionary
+        # store metadata about each row as a dictionary
         metaMatrix = []
 
         if common.isNum(windowStepSize):

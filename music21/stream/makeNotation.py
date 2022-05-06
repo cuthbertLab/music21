@@ -30,7 +30,7 @@ from music21 import note
 from music21 import pitch
 
 from music21.common.numberTools import opFrac
-from music21.common.types import StreamType
+from music21.common.types import StreamType, OffsetQL
 from music21.exceptions21 import StreamException
 
 from music21.stream.iterator import StreamIterator  # type-checking only
@@ -129,7 +129,6 @@ def makeBeams(
     # if s.isClass(Measure):
     mColl: List[stream.Measure]
     if isinstance(returnObj, stream.Measure):
-        returnObj = cast(stream.Measure, returnObj)
         mColl = [returnObj]  # store a list of measures for processing
     else:
         mColl = list(returnObj.getElementsByClass(stream.Measure))  # a list of measures
@@ -426,7 +425,7 @@ def makeMeasures(
                                    inPlace=True,  # copy already made
                                    )
         if inPlace:
-            return
+            return None
         else:
             return returnObj
     else:
@@ -529,6 +528,7 @@ def makeMeasures(
     measureCount = 0
     lastTimeSignature = None
     while True:
+        # TODO: avoid while True
         m = stream.Measure()
         m.number = measureCount + 1
         # environLocal.printDebug([
@@ -588,7 +588,8 @@ def makeMeasures(
     # cache information about each measure (we used to do this once per element)
     postLen = len(post)
     postMeasureList = []
-    lastTimeSignature = None
+    lastTimeSignature = meter.TimeSignature('4/4')  # default.
+
     for i in range(postLen):
         m = post[i]
         if m.timeSignature is not None:
@@ -617,9 +618,7 @@ def makeMeasures(
             continue
 
         match = False
-        lastTimeSignature = None
 
-        m = None
         for i in range(postLen):
             postMeasureInfo = postMeasureList[i]
             mStart = postMeasureInfo['mStart']
@@ -850,7 +849,7 @@ def makeRests(
                 timeRangeFromBarDuration=timeRangeFromBarDuration,
             )
         if inPlace:
-            return
+            return None
         else:
             return returnObj
 
@@ -873,8 +872,8 @@ def makeRests(
             post -= m.paddingRight
         return max(post, 0.0)
 
-    oLowTarget = 0.0
-    oHighTarget = 0.0
+    oLowTarget: OffsetQL = 0.0
+    oHighTarget: OffsetQL = 0.0
     if timeRangeFromBarDuration:
         if isinstance(returnObj, stream.Measure):
             oHighTarget = oHighTargetForMeasure(m=returnObj)
@@ -905,10 +904,11 @@ def makeRests(
             oLowTarget = min(refStreamOrTimeRange)
             oHighTarget = max(refStreamOrTimeRange)
 
+    bundle: List[StreamType]
     if returnObj.hasVoices():
         bundle = list(returnObj.voices)
     elif returnObj.hasMeasures():
-        bundle = returnObj.getElementsByClass(stream.Measure)
+        bundle = list(returnObj.getElementsByClass(stream.Measure))
     else:
         bundle = [returnObj]
 
@@ -1212,24 +1212,24 @@ def makeTies(
     lastTimeSignature = None
 
     while True:  # TODO: find a way to avoid 'while True'
-        # update measureStream on each iteration,
+        # update measureIterator on each iteration,
         # as new measure may have been added to the returnObj stream
-        measureStream = returnObj.getElementsByClass(stream.Measure).stream()
-        if mCount >= len(measureStream):
+        measureIterator = returnObj.getElementsByClass(stream.Measure)
+        if mCount >= len(measureIterator):
             break  # reached the end of all measures available or added
         # get the current measure to look for notes that need ties
-        m = measureStream[mCount]
+        m = measureIterator[mCount]
         if m.timeSignature is not None:
             lastTimeSignature = m.timeSignature
 
         # get next measure; we may not need it, but have it ready
-        if mCount + 1 < len(measureStream):
-            mNext = measureStream[mCount + 1]
+        if mCount + 1 < len(measureIterator):
+            mNext = measureIterator[mCount + 1]
             mNextAdd = False  # already present; do not append
         else:  # create a new measure
             mNext = stream.Measure()
             # set offset to last offset plus total length
-            mOffset = measureStream.elementOffset(m)
+            mOffset = m.offset
             if lastTimeSignature is not None:
                 mNext.offset = (mOffset
                                 + lastTimeSignature.barDuration.quarterLength)
@@ -1261,12 +1261,12 @@ def makeTies(
         # if there are voices, we must look at voice id values to only
         # connect ties to components in the same voice, assuming there
         # are voices in the next measure
-        try:
+        if lastTimeSignature is not None:
             mEnd = lastTimeSignature.barDuration.quarterLength
-        except AttributeError:
-            ts = m.getContextByClass(meter.TimeSignature)
-            if ts is not None:
-                lastTimeSignature = ts
+        else:
+            possible_ts = m.getContextByClass(meter.TimeSignature)
+            if possible_ts is not None:
+                lastTimeSignature = possible_ts
                 mEnd = lastTimeSignature.barDuration.quarterLength
             else:
                 mEnd = 4.0  # Default
@@ -1343,9 +1343,9 @@ def makeTies(
                     #    mNext])
                     returnObj.insert(mNext.offset, mNext)
         mCount += 1
-    for measure in measureStream:
+
+    for measure in returnObj.getElementsByClass(stream.Measure):
         measure.flattenUnnecessaryVoices(inPlace=True)
-    del measureStream  # clean up unused streams
 
     if not inPlace:
         return returnObj
@@ -1848,9 +1848,10 @@ def setStemDirectionOneGroup(
         has_consistent_stem_directions = False
 
     # noinspection PyTypeChecker
-    clef_context: clef.Clef = group[0].getContextByClass(clef.Clef)
-    if not clef_context:
+    optional_clef_context: Optional[clef.Clef] = group[0].getContextByClass(clef.Clef)
+    if optional_clef_context is None:
         return
+    clef_context: clef.Clef = optional_clef_context
 
     pitchList: List[pitch.Pitch] = []
     for n in group:
