@@ -31,22 +31,20 @@ import unittest
 from music21.base import Music21Object
 from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
-from music21.common.types import OffsetQLSpecial
+from music21.common.types import OffsetQLSpecial, M21ObjType
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
 from music21.stream.iterator import StreamIterator, RecursiveIterator
 
-if TYPE_CHECKING:
-    from typing import Any
 
-
-# pylint: disable=attribute-defined-outside-init
-class StreamCoreMixin:
+class StreamCore(Music21Object):
     '''
     Core aspects of a Stream's behavior.  Any of these can change at any time.
+    Users are encouraged only to create stream.Stream objects.
     '''
-    def __init__(self):
+    def __init__(self, *arguments, **keywords):
+        super().__init__(*arguments, **keywords)
         # hugely important -- keeps track of where the _elements are
         # the _offsetDict is a dictionary where id(element) is the
         # index and the value is a tuple of offset and element.
@@ -296,11 +294,14 @@ class StreamCoreMixin:
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
 
-    def coreCopyAsDerivation(self,
+    # core method that has to live in Stream itself for typing purposes.
+    def coreCopyAsDerivation(self: M21ObjType,
                              methodName: str, *,
                              recurse=True,
-                             deep=True) -> 'music21.stream.Stream[Any]':
+                             deep=True) -> M21ObjType:
         '''
+        *This is a Core method that most users will not need to use.*
+
         Make a copy of this stream with the proper derivation set.
 
         >>> s = stream.Stream()
@@ -314,20 +315,15 @@ class StreamCoreMixin:
         >>> s2[0].derivation.method
         'exampleCopy'
         '''
-        if TYPE_CHECKING:
-            from music21 import stream
-            assert isinstance(self, stream.Stream)
+        from music21 import stream
+
         if deep:
             post = copy.deepcopy(self)
         else:  # pragma: no cover
             post = copy.copy(self)
 
-        if TYPE_CHECKING:
-            from music21 import stream
-            assert isinstance(post, stream.Stream)
-
         post.derivation.method = methodName
-        if recurse and deep:
+        if recurse and deep and isinstance(post, stream.Stream):
             post.setDerivationMethod(methodName, recurse=True)
         return post
 

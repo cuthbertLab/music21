@@ -90,7 +90,7 @@ class TimespanTree(trees.OffsetTree):
 
     Here in Alto, measure 7, there's a neighbor tone E#.
 
-    >>> bach.parts['Alto'].measure(7).show('text')
+    >>> bach.parts['#Alto'].measure(7).show('text')
     {0.0} <music21.note.Note F#>
     {0.5} <music21.note.Note E#>
     {1.0} <music21.note.Note F#>
@@ -113,7 +113,7 @@ class TimespanTree(trees.OffsetTree):
 
 
     >>> #_DOCS_SHOW newBach = tree.toStream.partwise(scoreTree, templateStream=bach)
-    >>> #_DOCS_SHOW newBach.parts['Alto'].measure(7).show('text')
+    >>> #_DOCS_SHOW newBach.parts['#Alto'].measure(7).show('text')
     {0.0} <music21.chord.Chord F#4>
     {1.5} <music21.chord.Chord F#3>
     {2.0} <music21.chord.Chord C#4>
