@@ -14061,24 +14061,12 @@ class VariantStorage(Stream):
 
     This subclass name can be used to search in an
     object's .sites and find any and all
-    locations that are VariantStorage objects.
+    locations that are VariantStorage objects.  It also
+    ensures that they are pickled properly as Streams on a non-Stream
+    object.
 
-    A `client` keyword argument must be provided
-    by the Variant in creation.
-
-    Changed in v.8 -- client replaces variantParent
+    Changed in v.8 -- variantParent is removed.  Never used.
     '''
-
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
-        # must provide a keyword argument with a reference to the variant
-        # parent
-        self.client = keywords.get('client', None)
-
-
-# -----------------------------------------------------------------------------
-
-
 # -----------------------------------------------------------------------------
 
 
