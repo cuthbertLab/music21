@@ -5039,6 +5039,14 @@ class Pitch(prebase.ProtoM21Object):
                       and cautionaryNotImmediateRepeat is False
                       and pPastInMeasure is False):
                     set_displayStatus(True)
+
+                # Avoid making early, incorrect assumptions if this pitch is part of a chord.
+                # pPast might include this note itself, in which case we should not say
+                # "natural already in past usage". (Filtering out the current note from pPast
+                # when calling this method is not sufficient, because there could be repetitions.)
+                elif (self._client is not None and self._client._chordAttached is not None):
+                    continue
+
                 # other cases: already natural in past usage, do not need
                 # natural again (and not in key sig)
                 else:
