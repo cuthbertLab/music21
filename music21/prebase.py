@@ -3,9 +3,9 @@
 # Name:         prebase.py
 # Purpose:      classes for anything in music21 to inherit from.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2019 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -32,7 +32,7 @@ from music21.common import deprecated
 class ProtoM21Object:
     '''
     A class for pseudo-m21 objects to inherit from.  Any object can inherit from
-    ProtoM21Object and it makes sense for anything a user is likely to encounter
+    ProtoM21Object, and it makes sense for anything a user is likely to encounter
     to inherit from it.  Certain translators, etc. can choose to skip it.
 
     >>> class PitchCounter(prebase.ProtoM21Object):
@@ -71,7 +71,7 @@ class ProtoM21Object:
     objects that only inherit from ProtoM21Object unless you like wasting 200ns.
     '''
 
-    # define order to present names in documentation; use strings
+    # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = [
         'classes',
         'classSet',
@@ -168,11 +168,11 @@ class ProtoM21Object:
     @property
     def classSet(self) -> FrozenSet[Union[str, type]]:
         '''
-        Returns a set (that is, unordered, but indexed) of all of the classes that
+        Returns a set (that is, unordered, but indexed) of all classes that
         this class belongs to, including
         string names, fullyQualified string names, and objects themselves.
 
-        It's cached on a per class basis, so makes for a really fast way of checking to
+        It's cached on a per-class basis, so makes for a really fast way of checking to
         see if something belongs
         to a particular class when you don't know if the user has given a string,
         a fully qualified string name, or an object.
@@ -198,12 +198,23 @@ class ProtoM21Object:
         True
 
         >>> sorted([s for s in n.classSet if isinstance(s, str)])
-        ['GeneralNote', 'Music21Object', 'NotRest', 'Note', 'ProtoM21Object',
+        ['GeneralNote',
+         'Music21Object',
+         'NotRest',
+         'Note',
+         'ProtoM21Object',
+         'base.Music21Object',
          'builtins.object',
          'music21.base.Music21Object',
-         'music21.note.GeneralNote', 'music21.note.NotRest', 'music21.note.Note',
+         'music21.note.GeneralNote',
+         'music21.note.NotRest',
+         'music21.note.Note',
          'music21.prebase.ProtoM21Object',
-         'object']
+         'note.GeneralNote',
+         'note.NotRest',
+         'note.Note',
+         'object',
+         'prebase.ProtoM21Object']
 
         >>> sorted([s for s in n.classSet if not isinstance(s, str)], key=lambda x: x.__name__)
         [<class 'music21.note.GeneralNote'>,
@@ -212,14 +223,18 @@ class ProtoM21Object:
          <class 'music21.note.Note'>,
          <class 'music21.prebase.ProtoM21Object'>,
          <class 'object'>]
+
+        changed in v8 -- partially qualified objects such as 'note.Note' have been added.
         '''
         try:
             return self._classSetCacheDict[self.__class__]
         except KeyError:
             classList: List[Union[str, type]] = list(self.classes)
             classList.extend(self.__class__.mro())
-            classList.extend(x.__module__ + '.' + x.__name__ for x in self.__class__.mro())
-
+            fullyQualifiedStrings = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
+            classList.extend(fullyQualifiedStrings)
+            partiallyQualifiedStrings = [x.replace('music21.', '') for x in fullyQualifiedStrings]
+            classList.extend(partiallyQualifiedStrings)
             classSet = frozenset(classList)
             self._classSetCacheDict[self.__class__] = classSet
             return classSet

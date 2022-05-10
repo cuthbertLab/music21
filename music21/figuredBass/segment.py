@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         segment.py
-# Purpose:      music21 class representing a figured bass note and notation
-#                realization.
+# Purpose:      figured bass note and notational realization.
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import collections
@@ -81,7 +80,7 @@ class Segment:
         Realizations of a Segment are represented
         as possibility tuples (see :mod:`~music21.figuredBass.possibility` for more details).
 
-        Methods in Python's `itertools <http://docs.python.org/library/itertools.html>`_
+        Methods in Python's `itertools`
         module are used extensively. Methods
         which generate possibilities or possibility progressions return iterators,
         which are turned into lists in the examples
@@ -118,7 +117,7 @@ class Segment:
         if fbScale is None:
             if _defaultRealizerScale['scale'] is None:
                 _defaultRealizerScale['scale'] = realizerScale.FiguredBassScale()
-            fbScale = _defaultRealizerScale['scale']  # save making it
+            fbScale = _defaultRealizerScale['scale']  # save the time of making it
         assert fbScale is not None  # tells mypy that we have it now
 
         if fbRules is None:
@@ -151,6 +150,7 @@ class Segment:
     # EXTERNAL METHODS
 
     def singlePossibilityRules(self, fbRules=None):
+        # noinspection PyShadowingNames
         '''
         A framework for storing single possibility rules and methods to be applied
         in :meth:`~music21.figuredBass.segment.Segment.allCorrectSinglePossibilities`.
@@ -159,9 +159,7 @@ class Segment:
 
         Items are added within this method in the following form:
 
-
         (willRunOnlyIfTrue, methodToRun, keepSolutionsWhichReturn, optionalArgs)
-
 
         These items are compiled internally when
         :meth:`~music21.figuredBass.segment.Segment.allCorrectSinglePossibilities`
@@ -177,9 +175,7 @@ class Segment:
         True       upperPartsWithinLimit         True                          12
         True       voiceCrossing                 False                         None
 
-
         Here, a modified fbRules is provided, which allows for incomplete possibilities.
-
 
         >>> from music21.figuredBass import rules
         >>> fbRules = rules.Rules()
@@ -211,18 +207,16 @@ class Segment:
         return singlePossibRules
 
     def consecutivePossibilityRules(self, fbRules=None):
+        # noinspection PyShadowingNames
         '''
         A framework for storing consecutive possibility rules and methods to be applied
         in :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`.
         Takes in a :class:`~music21.figuredBass.rules.Rules` object, fbRules; if None
         then a new rules.Rules() object is created.
 
-
         Items are added within this method in the following form:
 
-
-        (willRunOnlyIfTrue, methodToRun, keepSolutionsWhichReturn, optionalArgs)
-
+            (willRunOnlyIfTrue, methodToRun, keepSolutionsWhichReturn, optionalArgs)
 
         These items are compiled internally when
         :meth:`~music21.figuredBass.segment.Segment.allCorrectConsecutivePossibilities`
@@ -248,10 +242,8 @@ class Segment:
                                                                  <music21.pitch.Pitch E3>,
                                                                  <music21.pitch.Pitch G3>], True
 
-
         Now, a modified fbRules is provided, allowing hidden octaves and
         voice overlap, and limiting the soprano line to stepwise motion.
-
 
         >>> from music21.figuredBass import rules
         >>> fbRules = rules.Rules()
@@ -328,9 +320,7 @@ class Segment:
         False      resolveDiminishedSeventhSegment  False
         False      resolveAugmentedSixthSegment     None
 
-
         Dominant Seventh Segment:
-
 
         >>> from music21 import note
         >>> segmentA = segment.Segment(bassNote=note.Note('B2'), notationString='6,5')
@@ -341,9 +331,7 @@ class Segment:
         False      resolveDiminishedSeventhSegment  False
         False      resolveAugmentedSixthSegment     None
 
-
         Fully-Diminished Seventh Segment:
-
 
         >>> segmentA = segment.Segment(bassNote=note.Note('B2'), notationString='-7')
         >>> allSpecialResRules = segmentA.specialResolutionRules()
@@ -353,9 +341,7 @@ class Segment:
         True       resolveDiminishedSeventhSegment  False
         False      resolveAugmentedSixthSegment     None
 
-
         Augmented Sixth Segment:
-
 
         >>> segmentA = segment.Segment(bassNote=note.Note('A-2'), notationString='#6,b5')
         >>> allSpecialResRules = segmentA.specialResolutionRules()
@@ -385,12 +371,12 @@ class Segment:
         return specialResRules
 
     def resolveDominantSeventhSegment(self, segmentB):
+        # noinspection PyShadowingNames
         '''
         Can resolve a Segment whose :attr:`~music21.figuredBass.segment.Segment.segmentChord`
         spells out a dominant seventh chord. If no applicable method in
         :mod:`~music21.figuredBass.resolution` can be used, the Segment is resolved
         as an ordinary Segment.
-
 
         >>> from music21.figuredBass import segment
         >>> from music21 import note
@@ -411,7 +397,6 @@ class Segment:
 
         >>> [p.nameWithOctave for p in allDomPossibList[7]]
         ['B5', 'F5', 'D5', 'G2']
-
 
         >>> segmentB = segment.Segment(bassNote=note.Note('C3'), notationString='')
         >>> domResPairs = segmentA.resolveDominantSeventhSegment(segmentB)
@@ -445,7 +430,7 @@ class Segment:
         if (domChord.inversion() == 0
                 and resChord.root().name == tonic.name
                 and (resChord.isMajorTriad() or resChord.isMinorTriad())):
-            # V7 to I resolutions are always incomplete, with a missing fifth.
+            # "V7 to I" resolutions are always incomplete, with a missing fifth.
             segmentB.fbRules.forbidIncompletePossibilities = False
 
         dominantResolutionMethods = [
@@ -486,6 +471,7 @@ class Segment:
             return self._resolveOrdinarySegment(segmentB)
 
     def resolveDiminishedSeventhSegment(self, segmentB, doubledRoot=False):
+        # noinspection PyShadowingNames
         '''
         Can resolve a Segment whose :attr:`~music21.figuredBass.segment.Segment.segmentChord`
         spells out a diminished seventh chord. If no applicable method in
@@ -503,7 +489,6 @@ class Segment:
         ['D5', 'A-4', 'F4', 'B2']
         >>> [p.nameWithOctave for p in allDimPossibList[6]]
         ['A-5', 'F5', 'D5', 'B2']
-
 
         >>> segmentB = segment.Segment(bassNote=note.Note('C3'), notationString='')
         >>> dimResPairs = segmentA.resolveDiminishedSeventhSegment(segmentB)
@@ -558,6 +543,7 @@ class Segment:
             return self._resolveOrdinarySegment(segmentB)
 
     def resolveAugmentedSixthSegment(self, segmentB):
+        # noinspection PyShadowingNames
         '''
         Can resolve a Segment whose :attr:`~music21.figuredBass.segment.Segment.segmentChord`
         spells out a
@@ -584,7 +570,6 @@ class Segment:
         (<music21.pitch.Pitch C4>, <music21.pitch.Pitch F#3>, <...E-3>, <...A-2>)
         >>> allAugSixthPossibList[4]
         (<music21.pitch.Pitch C5>, <music21.pitch.Pitch F#4>, <...E-4>, <...A-2>)
-
 
         >>> segmentB = segment.Segment(bassNote=note.Note('G2'), notationString='')
         >>> allAugResPossibPairs = segmentA.resolveAugmentedSixthSegment(segmentB)
@@ -722,30 +707,26 @@ class Segment:
         return [possibA for possibA in allA if self._isCorrectSinglePossibility(possibA)]
 
     def allCorrectConsecutivePossibilities(self, segmentB):
+        # noinspection PyShadowingNames
         '''
         Returns an iterator through correct (possibA, possibB) pairs.
-
 
         * If segmentA (self) is a special Segment, meaning that one of the Segment
           resolution methods in :meth:`~music21.figuredBass.segment.Segment.specialResolutionRules`
           needs to be applied, then this method returns every correct possibility of segmentA
           matched up with exactly one resolution possibility.
 
-
         * If segmentA is an ordinary, non-special Segment, then this method returns every
           combination of correct possibilities of segmentA and correct possibilities of segmentB
           which passes all filters
           in :meth:`~music21.figuredBass.segment.Segment.consecutivePossibilityRules`.
 
-
         Two notes on segmentA being a special Segment:
 
-
-        1. By default resolution possibilities are not filtered
+        1. By default, resolution possibilities are not filtered
            using :meth:`~music21.figuredBass.segment.Segment.singlePossibilityRules`
            rules of segmentB. Filter by setting
            :attr:`~music21.figuredBass.rules.Rules.applySinglePossibRulesToResolution` to True.
-
 
         2. By default, (possibA, possibB) pairs are not filtered
            using :meth:`~music21.figuredBass.segment.Segment.consecutivePossibilityRules`
@@ -758,9 +739,7 @@ class Segment:
         >>> segmentA = segment.Segment(bassNote=note.Note('C3'), notationString='')
         >>> segmentB = segment.Segment(bassNote=note.Note('D3'), notationString='4,3')
 
-
         Here, an ordinary resolution is being executed, because segmentA is an ordinary Segment.
-
 
         >>> consecutivePairs1 = segmentA.allCorrectConsecutivePossibilities(segmentB)
         >>> consecutivePairsList1 = list(consecutivePairs1)
@@ -769,10 +748,8 @@ class Segment:
         >>> consecutivePairsList1[29]
         ((<...G5>, <...G5>, <...E5>, <...C3>), (<...G5>, <...F5>, <...B4>, <...D3>))
 
-
         Here, a special resolution is being executed, because segmentA below is a
         special Segment.
-
 
         >>> segmentA = segment.Segment(bassNote=note.Note('D3'), notationString='4,3')
         >>> segmentB = segment.Segment(bassNote=note.Note('C3'), notationString='')

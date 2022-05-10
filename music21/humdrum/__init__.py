@@ -3,9 +3,9 @@
 # Name:         humdrum.__init__.py
 # Purpose:      base module for emulating Humdrum functionality in music21
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 # pylint: disable=line-too-long

@@ -4,10 +4,10 @@
 # Purpose:      Access to MIDI library / music21 classes for dealing with midi data
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               (Will Ware -- see docs)
 #
-# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Asato Cuthbert and the music21 Project
 #               Some parts of this module are in the Public Domain, see details.
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
@@ -49,8 +49,7 @@ from music21 import prebase
 from music21.midi import realtime
 from music21.midi import percussion
 
-_MOD = 'midi'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('midi')
 
 
 # good midi reference:
@@ -463,10 +462,9 @@ class MidiEvent(prebase.ProtoM21Object):
     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=1, channel=None, data=b'guitar'>
     '''
     # pylint: disable=redefined-builtin
-
     def __init__(self,
                  track: Optional['music21.midi.MidiTrack'] = None,
-                 type=None,  # @ReservedAssignment
+                 type=None,
                  time: int = 0,
                  channel: Optional[int] = None):
         self.track: Optional['music21.midi.MidiTrack'] = track  # a MidiTrack object

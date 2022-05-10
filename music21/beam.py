@@ -3,10 +3,10 @@
 # Name:         beam.py
 # Purpose:      music21 classes for representing notes
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012, 19 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2009-2012, 19 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -82,8 +82,7 @@ from music21 import prebase
 from music21 import style
 from music21.common.objects import EqualSlottedObjectMixin
 
-_MOD = 'meter'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('beam')
 
 
 class BeamException(exceptions21.Music21Exception):
@@ -159,6 +158,8 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
         # represents which beam line referred to
         # 8th, 16th, etc represented as 1, 2, ...
         self.number = number
+
+        # this should be called something else.
         self.id = id(self)
 
     # PRIVATE METHODS #
@@ -215,6 +216,8 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         # no need for super() call w/ ProtoM21 and EqualSlottedObject
         self.beamsList = []
         self.feathered = False
+
+        # this should not be called .id.
         self.id = id(self)
 
     # SPECIAL METHODS #

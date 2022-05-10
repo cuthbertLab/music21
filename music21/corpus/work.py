@@ -3,9 +3,9 @@
 # Name:         corpus/work.py
 # Purpose:      Manage one work
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -18,9 +18,9 @@ from music21 import common
 from music21 import prebase
 
 # -----------------------------------------------------------------------------
-CorpusWork = namedtuple('CorpusWork', 'title files virtual')
-CorpusFile = namedtuple('CorpusFile', 'path title filename format ext')
-# VirtualCorpusFile = namedtuple('VirtualCorpusFile', 'path title url format')
+CorpusWork = namedtuple('CorpusWork', ['title', 'files', 'virtual'])
+CorpusFile = namedtuple('CorpusFile', ['path', 'title', 'filename', 'format', 'ext'])
+# VirtualCorpusFile = namedtuple('VirtualCorpusFile', ['path', 'title', 'url', 'format'])
 
 
 class DirectoryInformation(prebase.ProtoM21Object):

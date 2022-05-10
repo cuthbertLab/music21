@@ -3,9 +3,9 @@
 # Name:         testDocumentation.py
 # Purpose:      tests from or derived from the Documentation
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -30,7 +30,8 @@ from music21.exceptions21 import Music21Exception
 from music21.test import testRunner
 
 
-ModTuple = namedtuple('ModTuple', 'module fullModulePath moduleNoExtension autoGen')
+ModTuple = namedtuple('ModTuple',
+                      ['module', 'fullModulePath', 'moduleNoExtension', 'autoGen'])
 
 
 class Unbuffered:

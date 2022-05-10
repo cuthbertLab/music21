@@ -4,9 +4,9 @@
 # Purpose:      Tools for eliminating passing chords, etc.
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -131,7 +131,7 @@ class ChordReducer:
                 templateStream=inputScore,
             )
         chordifiedPart = stream.Part()
-        for measure in chordifiedReduction.getElementsByClass('Measure'):
+        for measure in chordifiedReduction.getElementsByClass(stream.Measure):
             reducedMeasure = self.reduceMeasureToNChords(
                 measure,
                 maximumNumberOfChords=maximumNumberOfChords,
@@ -142,7 +142,7 @@ class ChordReducer:
         reduction.append(chordifiedPart)
 
         if closedPosition:
-            for x in reduction.recurse().getElementsByClass('Chord'):
+            for x in reduction[chord.Chord]:
                 x.closedPosition(forceOctave=4, inPlace=True)
 
         return reduction

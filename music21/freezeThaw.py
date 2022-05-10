@@ -4,10 +4,10 @@
 # Purpose:      Methods for storing any music21 object on disk.
 #               Uses pickle and json
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2011-2012 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -79,7 +79,6 @@ from typing import Union, List
 
 from music21 import base
 from music21 import common
-from music21 import defaults
 from music21 import derivation
 from music21 import exceptions21
 from music21 import spanner
@@ -87,8 +86,7 @@ from music21 import variant
 # from music21.tree.trees import ElementTree
 
 from music21 import environment
-_MOD = 'freezeThaw'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('freezeThaw')
 
 # -----------------------------------------------------------------------------
 
@@ -593,7 +591,7 @@ class StreamFreezer(StreamFreezeThawBase):
             streamIds += spannerBundle.getSpannerStorageIds()
 
         if getVariants is True:
-            for el in streamObj.recurse(includeSelf=True).getElementsByClass('Variant'):
+            for el in streamObj.recurse(includeSelf=True).getElementsByClass(variant.Variant):
                 streamIds += self.findActiveStreamIdsInHierarchy(el._stream)
 
         # should not happen that there are duplicates, but possible with spanners...
@@ -764,12 +762,6 @@ class StreamThawer(StreamFreezeThawBase):
         >>> st = freezeThaw.StreamThawer()
         >>> st.teardownSerializationScaffold(a)
         '''
-        def _fixId(innerEl):
-            if (innerEl.id is not None
-                    and common.isNum(innerEl.id)
-                    and innerEl.id > defaults.minIdNumberToConsiderMemoryLocation):
-                innerEl.id = id(innerEl)
-
         if streamObj is None:  # pragma: no cover
             streamObj = self.stream
             if streamObj is None:
@@ -801,12 +793,10 @@ class StreamThawer(StreamFreezeThawBase):
                 self.restoreStreamStatusClient(e)
                 # removing seems to create problems for jsonPickle with Spanners
 
-            _fixId(e)
             # e.wrapWeakref()
 
         # restore to whatever it was
         streamObj.autoSort = storedAutoSort
-        _fixId(streamObj)
 
     def restoreElementsFromTuples(self, streamObj):
         '''
@@ -1171,7 +1161,7 @@ class Test(unittest.TestCase):
                            variantName='rhythmic_switch', replacementDuration=3.0)
 
         # test Variant is in stream
-        unused_v1 = c.parts.first().getElementsByClass('Variant').first()
+        unused_v1 = c.parts.first().getElementsByClass(variant.Variant).first()
 
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         # sf.v = v
@@ -1185,7 +1175,7 @@ class Test(unittest.TestCase):
         s = st.stream
         # s.show('lily.pdf')
         p0 = s.parts[0]
-        variants = p0.getElementsByClass('Variant')
+        variants = p0.getElementsByClass(variant.Variant)
         v2 = variants[0]
         self.assertEqual(v2._stream[0][1].offset, 0.5)
         # v2.show('t')

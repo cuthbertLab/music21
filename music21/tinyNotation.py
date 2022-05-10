@@ -3,9 +3,9 @@
 # Name:         tinyNotation.py
 # Purpose:      A simple notation input format.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
 '''
@@ -123,7 +123,7 @@ here we will set the "modifierStar" to change the color of notes:
 >>> tnc = tinyNotation.Converter('3/4 C4*pink* D4*green* E4*blue*')
 >>> tnc.modifierStar = ColorModifier
 >>> s = tnc.parse().stream
->>> for n in s.recurse().getElementsByClass('Note'):
+>>> for n in s.recurse().getElementsByClass(note.Note):
 ...     print(n.step, n.style.color)
 C pink
 D green
@@ -147,7 +147,7 @@ Or more usefully, and often desired:
     {2.0} <music21.harmony.ChordSymbol Dm>
     {3.0} <music21.harmony.ChordSymbol E-sus4>
     {4.0} <music21.bar.Barline type=final>
->>> for cs in s.recurse().getElementsByClass('ChordSymbol'):
+>>> for cs in s.recurse().getElementsByClass(harmony.ChordSymbol):
 ...     print([p.name for p in cs.pitches])
 ['C', 'E', 'G', 'B']
 ['D', 'F', 'A']
@@ -244,8 +244,7 @@ from music21 import meter
 from music21 import pitch
 
 from music21 import environment
-_MOD = 'tinyNotation'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('tinyNotation')
 
 
 class TinyNotationException(exceptions21.Music21Exception):
@@ -267,8 +266,8 @@ class State:
     >>> ts.autoExpires
     2
     '''
-    # TODO in Python 3.8+: typing.Union[typing.Literal[False], int]
-    autoExpires: typing.Union[bool, int] = False  # expires after N tokens or never.
+    # expires after N tokens or never.
+    autoExpires: typing.Union[typing.Literal[False], int] = False
 
     def __init__(self, parent=None, stateInfo=None):
         self.affectedTokens = []
@@ -336,7 +335,7 @@ class TieState(State):
             self.affectedTokens[0].tie = tie.Tie('start')
         else:
             self.affectedTokens[0].tie.type = 'continue'
-        if len(self.affectedTokens) > 1:  # could be end.
+        if len(self.affectedTokens) > 1:  # could be the end.
             self.affectedTokens[1].tie = tie.Tie('stop')
 
 
@@ -391,7 +390,7 @@ class QuadrupletState(TupletState):
 class Modifier:
     '''
     a modifier is something that changes the current
-    token, like setting the Id or Lyric.
+    token, like setting the `.id` or Lyric.
     '''
 
     def __init__(self, modifierData, modifierString, parent):
@@ -1437,6 +1436,8 @@ class Test(unittest.TestCase):
                     + f'{tokenType.__class__.__name__}.'
                 )
             )
+
+            # noinspection PyTypeChecker
             validTokenTypeCounts[tokenType] += 1
             self.assertGreater(
                 len(regex),

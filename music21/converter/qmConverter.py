@@ -3,9 +3,9 @@
 # Name:         converter/qmConverter.py
 # Purpose:      Example of subclassing Subconverter to parse a new format
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -41,8 +41,8 @@ class QMConverter(converter.subConverters.SubConverter):
         >>> from music21.converter.qmConverter import QMConverter
         >>> qmc = QMConverter()
         >>> qmc.parseData('C D E G C')
-        >>> s = qmc.stream
-        >>> s.show('text')
+        >>> q_stream = qmc.stream
+        >>> q_stream.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.meter.TimeSignature 4/4>

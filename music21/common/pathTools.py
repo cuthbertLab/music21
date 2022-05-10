@@ -3,10 +3,10 @@
 # Name:         common/pathTools.py
 # Purpose:      Utilities for paths
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 __all__ = [
@@ -19,7 +19,7 @@ __all__ = [
     'cleanpath',
 ]
 
-from typing import List, Union, Optional
+from typing import List, Union, Optional, overload, Literal
 import inspect
 import os
 import pathlib
@@ -117,7 +117,7 @@ def getCorpusContentDirs() -> List[str]:
 
 def getRootFilePath() -> pathlib.Path:
     '''
-    Return the root directory for music21 -- outside of the music21 namespace
+    Return the root directory for music21 -- outside the music21 namespace
     which has directories such as "dist", "documentation", "music21"
 
     >>> fp = common.getRootFilePath()
@@ -144,12 +144,33 @@ def relativepath(path: str, start: Optional[str] = None) -> str:
     return os.path.relpath(path, start)
 
 
-def cleanpath(path: Union[str, pathlib.Path], *, returnPathlib=None) -> Union[str, pathlib.Path]:
+@overload
+def cleanpath(path: pathlib.Path, *,
+              returnPathlib: Literal[None]) -> pathlib.Path:
+    return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
+
+@overload
+def cleanpath(path: str, *,
+              returnPathlib: Literal[None]) -> str:
+    return '/'  # dummy until Astroid #1015 is fixed.
+
+@overload
+def cleanpath(path: Union[str, pathlib.Path], *,
+              returnPathlib: Literal[True]) -> pathlib.Path:
+    return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
+
+@overload
+def cleanpath(path: Union[str, pathlib.Path], *,
+              returnPathlib: Literal[False]) -> str:
+    return '/'  # dummy until Astroid #1015 is fixed.
+
+def cleanpath(path: Union[str, pathlib.Path], *,
+              returnPathlib: Union[bool, None] = None) -> Union[str, pathlib.Path]:
     '''
     Normalizes the path by expanding ~user on Unix, ${var} environmental vars
-    (is this a good idea?), expanding %name% on Windows, normalizing path names (Windows
-    turns backslashes to forward slashes, and finally if that file is not an absolute path,
-    turns it from a relative path to an absolute path.
+    (is this a good idea?), expanding %name% on Windows, normalizing path names
+    (Windows turns backslashes to forward slashes), and finally if that file
+    is not an absolute path, turns it from a relative path to an absolute path.
 
     v5 -- returnPathlib -- None (default) does not convert. False, returns a string,
     True, returns a pathlib.Path.

@@ -18183,14 +18183,14 @@ class Test(unittest.TestCase):
         orig_stream.repeatAppend(note.Note('C4'), 2)
         orig_stream.append(clef.BassClef())
         orig_stream.repeatAppend(note.Note('C4'), 2)
-        orig_clefs = orig_stream.flatten().getElementsByClass('Clef')
+        orig_clefs = orig_stream.flatten().getElementsByClass(clef.Clef)
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
         self.assertEqual(xml.count(b'<clef>'), 2)  # clefs got out
         self.assertEqual(xml.count(b'<measure'), 1)  # in one measure
 
         new_stream = converter.parse(xml)
-        new_clefs = new_stream.flatten().getElementsByClass('Clef')
+        new_clefs = new_stream.flatten().getElementsByClass(clef.Clef)
 
         self.assertEqual(len(new_clefs), len(orig_clefs))
         self.assertEqual([c.offset for c in new_clefs], [c.offset for c in orig_clefs])
@@ -18220,14 +18220,14 @@ class Test(unittest.TestCase):
                      clef.TrebleClef(), note.Note('C4')]:
             orig_stream[1].append(item)
 
-        orig_clefs = [staff.flatten().getElementsByClass('Clef').stream() for staff in
-                      orig_stream.getElementsByClass('Part')]
+        orig_clefs = [staff.flatten().getElementsByClass(clef.Clef).stream() for staff in
+                      orig_stream.getElementsByClass(stream.Part)]
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
 
         new_stream = converter.parse(xml.decode('utf-8'))
-        new_clefs = [staff.flatten().getElementsByClass('Clef').stream() for staff in
-                     new_stream.getElementsByClass('Part')]
+        new_clefs = [staff.flatten().getElementsByClass(clef.Clef).stream() for staff in
+                     new_stream.getElementsByClass(stream.Part)]
 
         self.assertEqual([len(clefs) for clefs in new_clefs],
                          [len(clefs) for clefs in orig_clefs])

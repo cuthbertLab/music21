@@ -4,9 +4,9 @@
 # Purpose:      Distribution and uploading script
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2021 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -47,7 +47,10 @@ the announcement while it's running.
 
 12b. If any new file extensions have been added, be sure to add them to MANIFEST.in
 
-13. And finally this file. (from the command line; not as python -m... OS 11+ needs sudo)
+13. And finally this file. (from the command line; not as python -m...)
+    There are major problems in SetupTools -- v8 (or even a 7.3.1) needs to
+    fix them -- creating a dir music21.egg-info in the main dir with a
+    requires.txt file created as root.
 
 14. COMMIT to Github at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
@@ -283,7 +286,7 @@ class Distributor:
         '''
         # call setup.py
         # import setup  # -- for some reason does not work unless called from command line
-        for buildType in ['sdist --formats=gztar']:
+        for buildType in ['sdist --formats=gztar', 'bdist_wheel']:
             environLocal.warn(f'making {buildType}')
 
             savePath = os.getcwd()

@@ -4,9 +4,9 @@
 # Purpose:      music21 class which contains lookup tables between print and braille
 # Authors:      Jose Cabal-Ugaz
 #               Bo-cheng Jhan
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011, 2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ----------------------------------------------------------------------------------
 '''
@@ -24,7 +24,7 @@ A place where other signs are found generally is
 New International Manual of Braille Music Notation (by Bettye Krolick), which we will cite as
 "Krolick" or "krolick".
 '''
-
+from typing import Dict, Union
 import itertools
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
@@ -280,48 +280,49 @@ textExpressions = {'crescendo': _B[345] + _B[14] + _B[1235] + _B[3],
                    'decresc.': _B[345] + _B[145] + _B[15] + _B[14] + _B[1235] + _B[3],
                    'decr.': _B[345] + _B[145] + _B[15] + _B[14] + _B[1235] + _B[3]}
 
-alphabet = {'a': _B[1],
-            'b': _B[12],
-            'c': _B[14],
-            'd': _B[145],
-            'e': _B[15],
-            'f': _B[124],
-            'g': _B[1245],
-            'h': _B[125],
-            'i': _B[24],
-            'j': _B[245],
-            'k': _B[13],
-            'l': _B[123],
-            'm': _B[134],
-            'n': _B[1345],
-            'o': _B[135],
-            'p': _B[1234],
-            'q': _B[12345],
-            'r': _B[1235],
-            's': _B[234],
-            't': _B[2345],
-            'u': _B[136],
-            'v': _B[1236],
-            'w': _B[2456],
-            'x': _B[1346],
-            'y': _B[13456],
-            'z': _B[1356],
-            ' ': _B[0],
-            '!': _B[235],
-            "'": _B[3],
-            ',': _B[2],
-            '-': _B[356],
-            '.': _B[256],
-            '/': _B[34],
-            ':': _B[25],
-            '?': _B[236],
-            '(': _B[2356],
-            ')': _B[2356],
-            '^': _B[4],  # substitute for accent mark
-            '[': _B[6] + _B[2356],
-            ']': _B[2356] + _B[3],
-            '*': _B[35] + _B[35],
-            }
+alphabet: Dict[Union[str, int], str] = {
+    'a': _B[1],
+    'b': _B[12],
+    'c': _B[14],
+    'd': _B[145],
+    'e': _B[15],
+    'f': _B[124],
+    'g': _B[1245],
+    'h': _B[125],
+    'i': _B[24],
+    'j': _B[245],
+    'k': _B[13],
+    'l': _B[123],
+    'm': _B[134],
+    'n': _B[1345],
+    'o': _B[135],
+    'p': _B[1234],
+    'q': _B[12345],
+    'r': _B[1235],
+    's': _B[234],
+    't': _B[2345],
+    'u': _B[136],
+    'v': _B[1236],
+    'w': _B[2456],
+    'x': _B[1346],
+    'y': _B[13456],
+    'z': _B[1356],
+    ' ': _B[0],
+    '!': _B[235],
+    "'": _B[3],
+    ',': _B[2],
+    '-': _B[356],
+    '.': _B[256],
+    '/': _B[34],
+    ':': _B[25],
+    '?': _B[236],
+    '(': _B[2356],
+    ')': _B[2356],
+    '^': _B[4],  # substitute for accent mark
+    '[': _B[6] + _B[2356],
+    ']': _B[2356] + _B[3],
+    '*': _B[35] + _B[35],
+}
 alphabet.update(numbersUpper)
 
 chordSymbols = {

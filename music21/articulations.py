@@ -3,10 +3,10 @@
 # Name:         articulations.py
 # Purpose:      music21 classes for representing articulations
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2013 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -88,8 +88,7 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import style
 
-_MOD = 'articulations'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('articulations')
 
 
 

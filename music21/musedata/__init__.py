@@ -4,9 +4,9 @@
 # Purpose:      parses Walter Hewlett's MuseData format
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 2014 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -38,8 +38,7 @@ from music21 import common
 from music21 import prebase
 
 from music21 import environment
-_MOD = 'musedata'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('musedata')
 
 # for implementation
 # see http://www.ccarh.org/publications/books/beyondmidi/online/musedata/
@@ -1861,7 +1860,7 @@ class Test(unittest.TestCase):
     #     s = corpus.parse('symphony94/02')
     #     for p in s.parts:
     #         match = []
-    #         for m in p.getElementsByClass('Measure'):
+    #         for m in p.getElementsByClass(stream.Measure):
     #             match.append(m.number)
     #         self.assertEqual(len(match), 156)
     #         # make sure there are no empty strings

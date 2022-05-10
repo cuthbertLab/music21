@@ -4,10 +4,10 @@
 # Purpose:      Translate ABC and music21 objects
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Dylan Nagler
 #
-# Copyright:    Copyright © 2010-2013 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2010-2013 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -24,18 +24,20 @@ import copy
 import unittest
 import re
 
+from music21 import articulations
+from music21 import bar
 from music21 import clef
+from music21 import chord
 from music21 import common
 from music21 import environment
 from music21 import exceptions21
-from music21 import meter
-from music21 import stream
-from music21 import tie
-from music21 import articulations
-from music21 import note
-from music21 import chord
-from music21 import spanner
 from music21 import harmony
+from music21 import meter
+from music21 import note
+from music21 import spanner
+from music21 import stream
+from music21 import tempo
+from music21 import tie
 
 
 environLocal = environment.Environment('abcFormat.translate')
@@ -52,7 +54,7 @@ _abcArticulationsToM21 = {
 
 def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     '''
-    Handler conversion of a single Part of a multi-part score.
+    Handler conversion of a single Part of a Score with multiple Parts.
     Results are added into the provided inputM21 object
     or a newly created Part object
 
@@ -79,7 +81,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         # one measure, that means that no measures are defined
         barHandlers = abcHandler.splitByMeasure()
         # environLocal.printDebug(['barHandlers', len(barHandlers)])
-        # merge loading meta data with each bar that precedes it
+        # merge loading metadata with each bar that precedes it
         mergedHandlers = abcFormat.mergeLeadingMetaData(barHandlers)
         # environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
     else:  # simply stick in a single list
@@ -92,14 +94,14 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         useMeasures = True
 
     # each unit in merged handlers defines possible a Measure (w/ or w/o metadata),
-    # trailing meta data, or a single collection of metadata and note data
+    # trailing metadata, or a single collection of metadata and note data
 
     barCount = 0
     measureNumber = 1
     # merged handler are ABCHandlerBar objects, defining attributes for barlines
 
     for mh in mergedHandlers:
-        # if use measures and the handler has notes; otherwise add to part
+        # if "use measures" is True and the handler has notes; otherwise add to part
         # environLocal.printDebug(['abcToStreamPart', 'handler', 'left:', mh.leftBarToken,
         #    'right:', mh.rightBarToken, 'len(mh)', len(mh)])
 
@@ -121,7 +123,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     rbSpanners = spannerBundle.getByClass('RepeatBracket'
                                                           ).getByCompleteStatus(False)
                     # this indication is most likely an opening, as ABC does
-                    # not encode second ending ending boundaries
+                    # not encode second ending boundaries
                     # we can still check thought:
                     if not rbSpanners:
                         # add this measure as a component
@@ -168,7 +170,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
 
         postTransposition, clefSet = parseTokens(mh, dst, p, useMeasures)
 
-        # append measure to part; in the case of trailing meta data
+        # append measure to part; in the case of trailing metadata
         # dst may be part, even though useMeasures is True
         if useMeasures and isinstance(dst, stream.Measure):
             # check for incomplete bars
@@ -195,17 +197,17 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     except (ABCTranslateException, meter.MeterException, ZeroDivisionError):
         pass
     # clefs are not typically defined, but if so, are set to the first measure
-    # following the meta data, or in the open stream
-    if not clefSet and not p.recurse().getElementsByClass('Clef'):
+    # following the metadata, or in the open stream
+    if not clefSet and not p[clef.Clef]:
         if useMeasures:  # assume at start of measures
-            p.getElementsByClass('Measure').first().clef = clef.bestClef(p, recurse=True)
+            p.getElementsByClass(stream.Measure).first().clef = clef.bestClef(p, recurse=True)
         else:
             p.insert(0, clef.bestClef(p, recurse=True))
 
     if postTransposition != 0:
         p.transpose(postTransposition, inPlace=True)
 
-    if useMeasures and p.recurse().getElementsByClass('TimeSignature'):
+    if useMeasures and p[meter.TimeSignature]:
         # call make beams for now; later, import beams
         # environLocal.printDebug(['abcToStreamPart: calling makeBeams'])
         try:
@@ -275,7 +277,7 @@ def parseTokens(mh, dst, p, useMeasures):
             # add the attached chord symbol
             if t.chordSymbols:
                 cs_name = t.chordSymbols[0]
-                cs_name = re.sub('["]', '', cs_name).lstrip().rstrip()
+                cs_name = re.sub('"', '', cs_name).lstrip().rstrip()
                 cs_name = re.sub('[()]', '', cs_name)
                 cs_name = common.cleanedFlatNotation(cs_name)
                 try:
@@ -390,7 +392,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
     else:
         s = inputM21
 
-    # meta data can be first
+    # metadata can be first
     md = metadata.Metadata()
     s.insert(0, md)
 
@@ -448,7 +450,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
     return s
 
 def abcToStreamOpus(abcHandler, inputM21=None, number=None):
-    '''Convert a multi-work stream into one or more complete works packed into a an Opus Stream.
+    '''Convert a multi-work stream into one or more complete works packed into an Opus Stream.
 
     If a `number` argument is given, and a work is defined by
     that number, that work is returned.
@@ -470,7 +472,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
             scoreList = []
             for key, value in sorted(abcDict.items()):
                 # do not need to set work number, as that will be gathered
-                # with meta data in abcToStreamScore
+                # with metadata in abcToStreamScore
                 try:
                     sc = abcToStreamScore(value)
                     scoreList.append(sc)
@@ -485,8 +487,8 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
     return opus
 
 
-# noinspection SpellCheckingInspection
 def reBar(music21Part, *, inPlace=False):
+    # noinspection PyShadowingNames,SpellCheckingInspection
     '''
     Re-bar overflow measures using the last known time signature.
 
@@ -494,7 +496,6 @@ def reBar(music21Part, *, inPlace=False):
     >>> irl2.metadata.title
     'Aililiu na Gamhna, S.35'
     >>> music21Part = irl2[1]
-
 
     The whole part is in 2/4 time, but there are some measures expressed in 4/4 time
     without an explicit time signature change, an error in abc parsing due to the
@@ -660,15 +661,15 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[1].flatten().notesAndRests), 127)
 
         # chords are defined in second part here
-        self.assertEqual(len(s.parts[1].flatten().getElementsByClass('Chord')), 32)
+        self.assertEqual(len(s.parts[1][chord.Chord]), 32)
 
         # check pitches in chords; sharps are applied due to key signature
         match = [p.nameWithOctave for p in s.parts[1].flatten().getElementsByClass(
-            'Chord')[4].pitches]
+            chord.Chord)[4].pitches]
         self.assertEqual(match, ['F#4', 'D4', 'B3'])
 
         match = [p.nameWithOctave for p in s.parts[1].flatten().getElementsByClass(
-            'Chord')[3].pitches]
+            chord.Chord)[3].pitches]
         self.assertEqual(match, ['E4', 'C#4', 'A3'])
 
         # s.show()
@@ -725,7 +726,7 @@ class Test(unittest.TestCase):
         ah = abcFormat.ABCHandler()
         ah.process(testFiles.hectorTheHero)
         s = abcToStreamScore(ah)
-        m1 = s.parts[0].getElementsByClass('Measure').first()
+        m1 = s.parts[0].getElementsByClass(stream.Measure).first()
         # s.show()
         # ts is 3/4
         self.assertEqual(m1.barDuration.quarterLength, 3.0)
@@ -750,7 +751,7 @@ class Test(unittest.TestCase):
         ah = abcFormat.ABCHandler()
         ah.process(testFiles.theAleWifesDaughter)
         s = abcToStreamScore(ah)
-        m1 = s.parts[0].getElementsByClass('Measure').first()
+        m1 = s.parts[0].getElementsByClass(stream.Measure).first()
 
         # ts is 3/4
         self.assertEqual(m1.barDuration.quarterLength, 4.0)
@@ -850,16 +851,16 @@ class Test(unittest.TestCase):
         p1 = o.getScoreByNumber(81).parts[0]
         self.assertEqual(p1.offset, 0.0)
         self.assertEqual(len(p1.flatten().notesAndRests), 77)
-        self.assertEqual(len(list(p1.flatten().getElementsByClass('ChordSymbol'))), 25)
+        self.assertEqual(len(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))), 25)
         # Am/C
-        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[7].root(),
+        self.assertEqual(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))[7].root(),
                          pitch.Pitch('A3'))
-        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[7].bass(),
+        self.assertEqual(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))[7].bass(),
                          pitch.Pitch('C3'))
         # G7/B
-        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[14].root(),
+        self.assertEqual(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))[14].root(),
                          pitch.Pitch('G3'))
-        self.assertEqual(list(p1.flatten().getElementsByClass('ChordSymbol'))[14].bass(),
+        self.assertEqual(list(p1.flatten().getElementsByClass(harmony.ChordSymbol))[14].bass(),
                          pitch.Pitch('B2'))
 
     def testNoChord(self):
@@ -877,17 +878,15 @@ class Test(unittest.TestCase):
             '''
         score = converter.parse(target_str, format='abc')
 
-        self.assertEqual(len(list(score.flatten().getElementsByClass(
-            'ChordSymbol'))), 9)
-        self.assertEqual(len(list(score.flatten().getElementsByClass(
-            'NoChord'))), 4)
+        self.assertEqual(len(score[harmony.ChordSymbol]), 9)
+        self.assertEqual(len(score[harmony.NoChord]), 4)
 
         score = harmony.realizeChordSymbolDurations(score)
 
-        self.assertEqual(8, score.getElementsByClass('ChordSymbol')[
-            -1].quarterLength)
-        self.assertEqual(4, score.getElementsByClass('ChordSymbol')[
-            0].quarterLength)
+        self.assertEqual(8, score.getElementsByClass(harmony.ChordSymbol)
+                            .last().quarterLength)
+        self.assertEqual(4, score.getElementsByClass(harmony.ChordSymbol)
+                            .first().quarterLength)
 
     def testAbcKeyImport(self):
         from music21 import abcFormat
@@ -944,20 +943,19 @@ class Test(unittest.TestCase):
         # s.show()
         # one start, one end
         # s.parts[0].show('t')
-        self.assertEqual(len(s.flatten().getElementsByClass('Repeat')), 2)
+        self.assertEqual(len(s[bar.Repeat]), 2)
         # s.show()
 
         # this has a 1 note pickup
         # has three repeat bars; first one is implied
         s = converter.parse(testFiles.draughtOfAle)
-        self.assertEqual(len(s.flatten().getElementsByClass('Repeat')), 3)
-        self.assertEqual(s.parts[0].getElementsByClass(
-            'Measure')[0].notes[0].pitch.nameWithOctave, 'D4')
+        self.assertEqual(len(s[bar.Repeat]), 3)
+        self.assertEqual(s[note.Note].first().pitch.nameWithOctave, 'D4')
 
         # new problem case:
         s = converter.parse(testFiles.hectorTheHero)
         # first measure has 2 pickup notes
-        self.assertEqual(len(s.parts.first().getElementsByClass('Measure').first().notes), 2)
+        self.assertEqual(len(s.parts.first().getElementsByClass(stream.Measure).first().notes), 2)
 
     def testRepeatBracketsB(self):
         from music21.abcFormat import testFiles
@@ -965,32 +963,32 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = converter.parse(testFiles.morrisonsJig)
         # TODO: get
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 2)
+        self.assertEqual(len(s[spanner.RepeatBracket]), 2)
         # s.show()
         # four repeat brackets here; 2 at beginning, 2 at end
         s = converter.parse(testFiles.hectorTheHero)
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 4)
+        self.assertEqual(len(s[spanner.RepeatBracket]), 4)
 
         s = corpus.parse('JollyTinkersReel')
-        self.assertEqual(len(s.flatten().getElementsByClass('RepeatBracket')), 4)
+        self.assertEqual(len(s[spanner.RepeatBracket]), 4)
 
     def testMetronomeMarkA(self):
         from music21.abcFormat import testFiles
         from music21 import converter
         s = converter.parse(testFiles.fullRiggedShip)
-        mmStream = s.flatten().getElementsByClass('TempoIndication')
+        mmStream = s.flatten().getElementsByClass(tempo.TempoIndication)
         self.assertEqual(len(mmStream), 1)
         self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark Quarter=100.0>')
 
         s = converter.parse(testFiles.aleIsDear)
-        mmStream = s.flatten().getElementsByClass('TempoIndication')
+        mmStream = s.flatten().getElementsByClass(tempo.TempoIndication)
         # this is a two-part pieces, and this is being added for each part
         # not sure if this is a problem
         self.assertEqual(len(mmStream), 2)
         self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark Quarter=211.0>')
 
         s = converter.parse(testFiles.theBeggerBoy)
-        mmStream = s.flatten().getElementsByClass('TempoIndication')
+        mmStream = s[tempo.TempoIndication]
         # this is a two-part pieces, and this is being added for each part
         # not sure if this is a problem
         self.assertEqual(len(mmStream), 1)

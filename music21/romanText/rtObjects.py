@@ -4,9 +4,9 @@
 # Purpose:      music21 objects for processing roman numeral analysis text files
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2012, 2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012, 2019 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -24,12 +24,10 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import key
 from music21 import prebase
+environLocal = environment.Environment('romanText.rtObjects')
 
-_MOD = 'romanText.rtObjects'
-environLocal = environment.Environment(_MOD)
-
-# alternate endings might end with a, b, c for non
-# zero or more for everything after the first number
+# alternate endings might end with a, b, c for
+# nonzero or more for everything after the first number
 reMeasureTag = re.compile(r'm[0-9]+[a-b]*-*[0-9]*[a-b]*')
 reVariant = re.compile(r'var[0-9]+')
 reVariantLetter = re.compile(r'var([A-Z]+)')

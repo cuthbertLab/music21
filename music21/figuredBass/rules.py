@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         rules.py
-# Purpose:      music21 class to define rules used in realization
+# Purpose:      Define rules used in realization
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 

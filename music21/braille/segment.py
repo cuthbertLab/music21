@@ -4,7 +4,7 @@
 # Purpose:      Division of stream.Part into segments for individual handling
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -20,8 +20,7 @@ import collections
 import copy
 import enum
 import unittest
-
-from typing import Optional, Union
+from typing import Optional, Union, TypedDict
 
 from music21 import bar
 from music21 import chord
@@ -110,15 +109,12 @@ excludeFromBrailleElements = [spanner.Slur,
                               layout.PageLayout,
                               layout.StaffLayout]
 
-# Uncomment when Python 3.8 is the minimum version
-# from typing import TypedDict, Optional
-# class GroupingGlobals(TypedDict):
-#    keySignature: Optional[key.KeySignature]
-#    timeSignature: Optional[meter.TimeSignature]
-# GROUPING_GLOBALS: GroupingGlobals = {...}
+class GroupingGlobals(TypedDict):
+    keySignature: Optional[key.KeySignature]
+    timeSignature: Optional[meter.TimeSignature]
 
 
-GROUPING_GLOBALS = {
+GROUPING_GLOBALS: GroupingGlobals = {
     'keySignature': None,  # will be key.KeySignature(0) on first call
     'timeSignature': None,  # will be meter.TimeSignature('4/4') on first call
 }
@@ -130,12 +126,8 @@ def setGroupingGlobals():
     in Braille is run, but saves creating two expensive objects if never run
     '''
     if GROUPING_GLOBALS['keySignature'] is None:
-        # remove noinspection when Python 3.8 is the minimum
-        # noinspection PyTypeChecker
         GROUPING_GLOBALS['keySignature'] = key.KeySignature(0)
     if GROUPING_GLOBALS['timeSignature'] is None:
-        # remove noinspection when Python 3.8 is the minimum
-        # noinspection PyTypeChecker
         GROUPING_GLOBALS['timeSignature'] = meter.TimeSignature('4/4')
 
 
@@ -143,9 +135,10 @@ SEGMENT_MAXNOTESFORSHORTSLUR = 4
 
 MAX_ELEMENTS_IN_SEGMENT = 48  # 8 measures of 6 notes, etc. each
 
-_ThreeDigitNumber = collections.namedtuple('_ThreeDigitNumber', 'hundreds tens ones')
+_ThreeDigitNumber = collections.namedtuple('_ThreeDigitNumber', ['hundreds', 'tens', 'ones'])
 
-SegmentKey = collections.namedtuple('SegmentKey', 'measure ordinal affinity hand')
+SegmentKey = collections.namedtuple('SegmentKey',
+                                    ['measure', 'ordinal', 'affinity', 'hand'])
 SegmentKey.__new__.__defaults__ = (0, 0, None, None)
 
 
@@ -186,7 +179,7 @@ class BrailleElementGrouping(ProtoM21Object):
         <music21.note.Rest quarter>
         <music21.note.Note F>
 
-        These are the defaults and they are shared across all objects...
+        These are the defaults, and they are shared across all objects...
 
         >>> bg.keySignature
         <music21.key.KeySignature of no sharps or flats>
@@ -236,7 +229,7 @@ class BrailleElementGrouping(ProtoM21Object):
 
     def __str__(self):
         '''
-        Return an unicode braille representation
+        Return a unicode braille representation
         of each object in the BrailleElementGrouping.
         '''
         allObjects = []
@@ -300,7 +293,7 @@ class BrailleSegment(text.BrailleText):
     def __init__(self, lineLength: int = 40):
         '''
         A segment is "a group of measures occupying more than one braille line."
-        Music is divided into segments so as to "present the music to the reader
+        Music is divided into segments in order to "present the music to the reader
         in a meaningful manner and to give him convenient reference points to
         use in memorization" (BMTM, 71).
 
@@ -441,14 +434,14 @@ class BrailleSegment(text.BrailleText):
 
     def transcribe(self):
         '''
-        transcribes all of the noteGroupings in this dict by:
+        Transcribes all noteGroupings in this dict by:
 
-        first transcribing the Heading (if applicable)
-        then the Measure Number
-        then adds appropriate numbers of dummyRests
-        then adds the Rest of the Note Groupings
+        *    First transcribes the Heading (if applicable)
+        *    then the Measure Number
+        *    then adds appropriate numbers of dummyRests
+        *    then adds the Rest of the Note Groupings
 
-        returns brailleText
+        Returns brailleText
         '''
         # noinspection PyAttributeOutsideInit
         self.groupingKeysToProcess = list(sorted(self.keys()))
@@ -922,6 +915,7 @@ class BrailleSegment(text.BrailleText):
         self.extractMeasureNumber()
 
     def consolidate(self):
+        # noinspection PyShadowingNames
         '''
         Puts together certain types of elements according to the last digit of their key
         (if it is the same as Affinity.NOTEGROUP or not.
@@ -1126,6 +1120,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         return out
 
     def yieldCombinedGroupingKeys(self):
+        # noinspection PyShadowingNames
         '''
         yields all the keys in order as a tuple of (rightKey, leftKey) where
         two keys are grouped if they have the same segmentKey except for the hand.
@@ -1174,7 +1169,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                         yield(thisKey, storedLeft)
                     elif (thisKey.affinity == Affinity.NOTEGROUP
                           and matchOther(thisKey._replace(affinity=Affinity.INACCORD), storedLeft)):
-                        # r.h. notegroup goes before an lh inaccord, despite this being out of order
+                        # r.h. notegroup goes before an l.h. inaccord,
+                        # despite this being out of order
                         yield(thisKey, storedLeft)
                     else:
                         yield(None, storedLeft)
@@ -1400,6 +1396,7 @@ def findSegments(music21Part,
                  suppressOctaveMarks=False,
                  upperFirstInNoteFingering=True,
                  ):
+    # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Part`.
 
@@ -1745,6 +1742,7 @@ def getRawSegments(music21Part,
                    setHand=None,
                    maxLineLength: int = 40,
                    ):
+    # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Part`, divides it up into segments (i.e. instances of
     :class:`~music21.braille.segment.BrailleSegment`). This function assumes

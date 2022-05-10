@@ -4,9 +4,9 @@
 # Purpose:      Storage for user environment settings and defaults
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2017 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2009-2017 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -829,7 +829,7 @@ class Environment:
     PosixPath('/Applications/Finale Reader.app')
     '''
 
-    # define order to present names in documentation; use strings
+    # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = ['read', 'write', 'getSettingsPath']
 
     # documentation for all attributes (not properties or methods)

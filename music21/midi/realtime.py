@@ -3,10 +3,10 @@
 # Name:         midi.realtime.py
 # Purpose:      music21 classes for playing midi data in realtime
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               (from an idea by Joe "Codeswell")
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -28,6 +28,7 @@ from music21 import defaults
 
 from music21.exceptions21 import Music21Exception
 from music21.midi import translate as midiTranslate
+from music21 import stream
 
 
 class StreamPlayerException(Music21Exception):
@@ -239,7 +240,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         defaults.ticksAtStart = 0
         b = corpus.parse('bwv66.6')
         measures = []  # store for later
-        maxMeasure = len(b.parts[0].getElementsByClass('Measure'))
+        maxMeasure = len(b.parts[0].getElementsByClass(stream.Measure))
         for i in range(maxMeasure):
             measures.append(b.measure(i))
         sp = StreamPlayer(b)
@@ -253,7 +254,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         doesn't work -- no matter what there's always at least a small lag, even with queues
         '''
         # pylint: disable=attribute-defined-outside-init
-        from music21 import stream
         from music21 import note
         import random
 

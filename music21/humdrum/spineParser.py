@@ -3,9 +3,9 @@
 # Name:         humdrum.spineParser.py
 # Purpose:      Conversion and Utility functions for Humdrum and kern in particular
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -60,6 +60,7 @@ from music21 import dynamics
 from music21 import duration
 from music21 import exceptions21
 from music21 import expressions
+from music21 import instrument
 from music21 import key
 from music21 import note
 from music21 import meter
@@ -75,8 +76,7 @@ from music21.humdrum import harmparser
 from music21.humdrum import instruments
 
 from music21 import environment
-_MOD = 'humdrum.spineParser'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('humdrum.spineParser')
 
 flavors = {'JRP': False}
 
@@ -165,7 +165,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             raise HumdrumException('Need a list of lines (dataStream) to parse!')
 
         hasOpus, dataCollections = self.determineIfDataStreamIsOpus(dataStream)
-        if hasOpus is True:  # Palestrina data collection, maybe others
+        if hasOpus is True:  # True for the Palestrina data collection, maybe others
             return self.parseOpusDataCollections(dataCollections)
         else:
             return self.parseNonOpus(dataStream)
@@ -423,7 +423,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         So self.eventCollections and self.protoSpines can each be
         thought of as a two-dimensional sheet of cells, but where
         the first index of the former is the vertical position in
-        the dataStream and the first index of the later is the
+        the dataStream and the first index of the latter is the
         horizontal position in the dataStream.  The contents of
         each cell is a SpineEvent object or None (if there's no
         data at that point).  Even '.' (continuation events) get
@@ -751,7 +751,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 #                                    '(well, maybe it is...file a bug report if you ' +
 #                                    'have doubled checked your data)')
 #         elif self.spineCollection.spines[0].stream is None:
-#             raise HumdrumException('okay, you got at least one spine, but it aint got ' +
+#             raise HumdrumException('okay, you got at least one spine, but it ain\'t got ' +
 #                                    'a stream in it; (check your data or file a bug report)')
 #         else:
 #             masterStream = stream.Score()
@@ -773,7 +773,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         s.metadata = md
         grToRemove = []
 
-        for gr in s.recurse().getElementsByClass('GlobalReference'):
+        for gr in s[GlobalReference]:
             wasParsed = gr.updateMetadata(md)
             if wasParsed:
                 grToRemove.append(gr)
@@ -1230,7 +1230,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
             streamOut.append(currentMeasure)
 
         # move beginning stuff (Clefs, KeySig, etc.) to first measure...
-        measureElements = streamOut.getElementsByClass('Measure')
+        measureElements = streamOut.getElementsByClass(stream.Measure)
         if measureElements:
             m1 = measureElements[0]
             if not hasMeasureOne:  # pickup measure is not measure1
@@ -1536,7 +1536,7 @@ class SpineEvent(prebase.ProtoM21Object):
     '''
     A SpineEvent is an event in a HumdrumSpine or ProtoSpine.
 
-    It's .contents property contains the contents of the spine or
+    It's .contents property contains the contents of the spine, or
     it could be '.', in which case it means that a
     particular event appears after the last event in a different spine.
     It could also be "None" indicating that there is no event at all
@@ -1580,7 +1580,7 @@ class SpineEvent(prebase.ProtoM21Object):
 
     def toNote(self, convertString=None):
         r'''
-        parse the object as a \*\*kern note and return the a
+        parse the object as a \*\*kern note and return a
         :class:`~music21.note.Note` object (or Rest, or Chord)
 
 
@@ -1756,7 +1756,7 @@ class SpineCollection(prebase.ProtoM21Object):
         firstStreamForEachInstrument = {}
         for thisSpine in self.spines:
             spineStream = thisSpine.stream
-            instrumentsStream = spineStream.getElementsByClass('Instrument')
+            instrumentsStream = spineStream.getElementsByClass(instrument.Instrument)
             if not instrumentsStream:
                 spineInstrument = None
             else:
@@ -1896,7 +1896,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 thisSpine.stream = thisSpine.moveElementsIntoMeasures(thisSpine.stream)
 
                 # fix tuplet groups
-                for m in thisSpine.stream.getElementsByClass('Measure'):
+                for m in thisSpine.stream.getElementsByClass(stream.Measure):
                     tf.setStream(m)
                     tupletGroups = tf.findTupletGroups(incorporateGroupings=True)
                     for tg in tupletGroups:
@@ -1916,7 +1916,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 continue
             if thisSpine.spineType != 'kern':
                 continue
-            for tandem in thisSpine.stream.getElementsByClass('MiscTandem'):
+            for tandem in thisSpine.stream.getElementsByClass(MiscTandem):
                 if not tandem.tandem.startswith('*staff'):
                     continue
                 staffInfo = int(tandem.tandem[6:])  # single staff
@@ -1931,7 +1931,7 @@ class SpineCollection(prebase.ProtoM21Object):
 
             stavesAppliedTo = []
             prioritiesToSearch = {}
-            for tandem in thisSpine.stream.recurse().getElementsByClass('MiscTandem'):
+            for tandem in thisSpine.stream[MiscTandem]:
                 if tandem.tandem.startswith('*staff'):
                     staffInfo = tandem.tandem[6:]  # could be multiple staves
                     stavesAppliedTo = [int(x) for x in staffInfo.split('/')]
@@ -1993,7 +1993,7 @@ class SpineCollection(prebase.ProtoM21Object):
             if thisSpine.spineType != 'kern' or thisSpine.parentSpine is not None:
                 continue
             thisStream = thisSpine.stream
-            for el in thisStream.getElementsByClass('Measure'):
+            for el in thisStream.getElementsByClass(stream.Measure):
                 hasVoices = False
                 lowestVoiceOffset = 0
                 for mEl in el:
@@ -2355,7 +2355,7 @@ def hdStringToNote(contents):
             newTup.durationActual = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
             newTup.durationNormal = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
 
-            gcd = common.euclidGCD(int(dT), baseValue)
+            gcd = common.euclidGCD(int(dT), int(baseValue))
             newTup.numberNotesActual = int(dT / gcd)
             newTup.numberNotesNormal = int(float(baseValue) / gcd)
 
@@ -2584,12 +2584,12 @@ def kernTandemToObject(tandem):
         return MiscTandem(tandem)
         # TODO: DO SOMETHING WITH TRANSPOSING INSTRUMENTS; not in hum2xml
     elif tandem.startswith('*I'):  # order has to be last
-        instrument = tandem[2:]
+        instrumentStr = tandem[2:]
         try:
-            iObj = instruments.fromHumdrumInstrument(instrument)
+            iObj = instruments.fromHumdrumInstrument(instrumentStr)
             return iObj
         except instruments.HumdrumInstrumentException:
-            return MiscTandem(instrument)
+            return MiscTandem(instrumentStr)
     elif tandem.startswith('*k'):
         numSharps = tandem.count('#')
         if numSharps == 0:
@@ -2932,7 +2932,7 @@ class Test(unittest.TestCase):
         s = hf1.stream  # .show()
         p = s.parts[2]  # last part has a comment
         comments = []
-        for c in p.flatten().getElementsByClass('SpineComment'):
+        for c in p[SpineComment]:
             comments.append(c.comment)
         self.assertTrue('spine comment' in comments)
         # s.show('text')
@@ -2969,7 +2969,7 @@ class Test(unittest.TestCase):
             32.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
             33.0: ('I in c minor', [0, 4, 7], 'C', 'C', 53, False)
         }
-        for harm in s.flatten().getElementsByClass('RomanNumeral'):
+        for harm in s.flatten().getElementsByClass(roman.RomanNumeral):
             figureAndKey = harm.figureAndKey
             pitchClasses = harm.pitchClasses
             root = harm.root().name
@@ -3024,7 +3024,7 @@ class Test(unittest.TestCase):
             42.0: ('V43 in a minor', [11, 2, 4, 8], 'E', 'B', 43, True),
             43.0: ('i in a minor', [9, 0, 4], 'A', 'A', 53, False)
         }
-        for harm in s.flatten().getElementsByClass('RomanNumeral'):
+        for harm in s.flatten().getElementsByClass(roman.RomanNumeral):
             figureAndKey = harm.figureAndKey
             pitchClasses = harm.pitchClasses
             root = harm.root().name
@@ -3046,6 +3046,7 @@ class Test(unittest.TestCase):
         hf1.parse()
         s = hf1.stream
         groundTruth = {
+            # Aug6, Italian, French, German
             0.0: (False, False, False, False),
             1.0: (False, False, False, False),
             2.0: (False, False, False, False),
@@ -3073,7 +3074,7 @@ class Test(unittest.TestCase):
             32.0: (False, False, False, False),
             33.0: (False, False, False, False)
         }
-        for harm in s.flatten().getElementsByClass('RomanNumeral'):
+        for harm in s.flatten().getElementsByClass(roman.RomanNumeral):
             isAugmentedSixth = harm.isAugmentedSixth()
             isItalianAugmentedSixth = harm.isItalianAugmentedSixth()
             isFrenchAugmentedSixth = harm.isFrenchAugmentedSixth()

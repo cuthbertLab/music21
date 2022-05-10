@@ -3,10 +3,10 @@
 # Name:         common/objects.py
 # Purpose:      Commonly used Objects and Mixins
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 __all__ = [
@@ -15,7 +15,6 @@ __all__ = [
     'RelativeCounter',
     'SlottedObjectMixin',
     'EqualSlottedObjectMixin',
-    'Iterator',
     'Timer',
 ]
 
@@ -23,7 +22,6 @@ import collections
 import time
 from typing import Tuple
 import weakref
-from music21.common.decorators import deprecated
 
 
 class RelativeCounter(collections.Counter):
@@ -248,7 +246,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
     Slots are the only things compared, so do not mix with a __dict__ based object.
 
-    Ignores differences in .id
+    The equal comparison ignores differences in .id
     '''
     def __eq__(self, other):
         if type(self) is not type(other):
@@ -268,34 +266,6 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
 
 # ------------------------------------------------------------------------------
-class Iterator(collections.abc.Iterator):  # pragma: no cover
-    '''
-    A simple Iterator object used to handle iteration of Streams and other
-    list-like objects.
-
-    Deprecated in v7 -- not needed since Python 2.6 became music21 minimum!
-    '''
-    # TODO: remove in v.8
-    def __init__(self, data):
-        self.data = data
-        self.index = 0
-
-    @deprecated('2021 Jan v7', '2022 Jan',
-                'common.Iterator is deprecated.  use `iter(X)` instead.')
-    def __iter__(self):
-        self.index = 0
-        return self
-
-    def __next__(self):
-        if self.index >= len(self.data):
-            raise StopIteration
-        post = self.data[self.index]
-        self.index += 1
-        return post
-
-# ------------------------------------------------------------------------------
-
-
 class Timer:
     '''
     An object for timing. Call it to get the current time since starting.

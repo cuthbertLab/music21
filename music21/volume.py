@@ -5,9 +5,10 @@
 #               parameters
 #
 # Authors:      Christopher Ariza
+#               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2011-2012, 2015, 2017
-#               Michael Scott Cuthbert and the music21 Project
+#               Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -27,8 +28,7 @@ from music21 import prebase
 from music21 import note  # circular but acceptable, because not used at highest level.
 
 from music21 import environment
-_MOD = 'volume'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('volume')
 
 
 # ------------------------------------------------------------------------------
@@ -677,6 +677,8 @@ class Test(unittest.TestCase):
 
     def testRealizeVolumeB(self):
         from music21 import corpus
+        from music21 import stream
+
         s = corpus.parse('bwv66.6')
 
         durUnit = s.highestTime // 8  # let floor
@@ -688,7 +690,7 @@ class Test(unittest.TestCase):
                 # placing dynamics in Measure requires extra handling
                 m = p.getElementsByOffset(oTarget,
                                           mustBeginInSpan=False,
-                                          ).getElementsByClass('Measure').first()
+                                          ).getElementsByClass(stream.Measure).first()
                 oInsert = oTarget - m.getOffsetBySite(p)
                 m.insert(oInsert, dynamics.Dynamic(d))
             # shift 2 places each time

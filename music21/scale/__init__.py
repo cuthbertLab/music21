@@ -4,10 +4,10 @@
 # Purpose:      music21 classes for representing scales
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -73,16 +73,15 @@ from music21.scale import scala
 # -------------------------
 from music21 import base
 from music21 import common
+from music21 import defaults
 from music21 import environment
 from music21 import exceptions21
 from music21 import note
 from music21 import pitch
 from music21 import interval
 from music21 import sieve
-from music21.converter.subConverters import SubConverter
 
-_MOD = 'scale'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('scale')
 
 DIRECTION_BI = intervalNetwork.DIRECTION_BI
 DIRECTION_ASCENDING = intervalNetwork.DIRECTION_ASCENDING
@@ -128,6 +127,7 @@ class Scale(base.Music21Object):
 
     @staticmethod
     def extractPitchList(other, comparisonAttribute='nameWithOctave', removeDuplicates=True):
+        # noinspection PyShadowingNames
         '''
         Utility function and staticmethod
 
@@ -145,7 +145,10 @@ class Scale(base.Music21Object):
         Here we only remove the second 'D4' because the default comparison is `nameWithOctave`
 
         >>> [str(p) for p in scale.Scale.extractPitchList(pList)]
-        ['A4', 'D4', 'E4', 'F-4', 'D5', 'A', 'D#4']
+        ['A4', 'D4', 'E4', 'F-4', 'D5', 'A4', 'D#4']
+
+        Note that octaveless notes like the 'A' get a default octave.  In general,
+        it is better to work with octave-possessing pitches.
 
         Now we remove the F-4, D5, and A also because we are working with
         `comparisonAttribute=pitchClass`.
@@ -167,7 +170,7 @@ class Scale(base.Music21Object):
         pre = []
         # if a ConcreteScale, Chord or Stream
         if hasattr(other, 'pitches'):
-            pre = other.pitches
+            pre = list(other.pitches)
         # if a list
         elif common.isIterable(other):
             # assume a list of pitches; possible permit conversions?
@@ -194,6 +197,9 @@ class Scale(base.Music21Object):
             if hashValue not in uniquePitches:
                 uniquePitches[hashValue] = True
                 post.append(p)
+        for p in post:
+            if p.octave is None:
+                p.octave = defaults.pitchOctave
 
         return post
 
@@ -628,6 +634,7 @@ class AbstractScale(Scale):
         '''
         Show the scale in a format. Here, prepare scala format if requested.
         '''
+        from music21.converter.subConverters import SubConverter
         if fmt is not None:
             fileFormat, unused_ext = common.findFormat(fmt)
             if fileFormat == 'scala':
@@ -1253,6 +1260,12 @@ class ConcreteScale(Scale):
 
     >>> [str(p) for p in complexScale.getPitches('C7', 'C5')]
     ['A6', 'F#6', 'D~6', 'B5', 'G5', 'F5', 'E-5', 'C#5']
+
+    OMIT_FROM_DOCS
+
+    >>> scale.ConcreteScale(tonic=4)
+    Traceback (most recent call last):
+    ValueError: Tonic must be a Pitch, Note, or str, not <class 'int'>
     '''
     usePitchDegreeCache = False
 
@@ -1264,7 +1277,7 @@ class ConcreteScale(Scale):
         self.type = 'Concrete'
         # store an instance of an abstract scale
         # subclasses might use multiple abstract scales?
-        self._abstract = None
+        self._abstract: Optional[AbstractScale] = None
 
         # determine whether this is a limited range
         self.boundRange = False
@@ -1283,10 +1296,12 @@ class ConcreteScale(Scale):
             self.tonic = None  # pitch.Pitch()
         elif isinstance(tonic, str):
             self.tonic = pitch.Pitch(tonic)
-        elif isinstance(tonic, note.GeneralNote):
+        elif isinstance(tonic, note.Note):
             self.tonic = tonic.pitch
-        else:  # assume this is a pitch object
+        elif isinstance(tonic, pitch.Pitch):  # assume this is a pitch object
             self.tonic = tonic
+        else:
+            raise ValueError(f'Tonic must be a Pitch, Note, or str, not {type(tonic)}')
 
         if (pitches is not None
                 and common.isListLike(pitches)
@@ -1760,8 +1775,8 @@ class ConcreteScale(Scale):
         For a given pitch, return the appropriate scale degree.
         If no scale degree is available, None is returned.
 
-        Note -- by default it will find based on note name not on
-        PitchClass because this is used so commonly by tonal functions.
+        Note: by default it will use a find algorithm that is based on the note's
+        `.name` not on `.pitchClass` because this is used so commonly by tonal functions.
         So if it's important that D# and E- are the same, set the
         comparisonAttribute to `pitchClass`
 
@@ -2222,6 +2237,7 @@ class ConcreteScale(Scale):
                      resultsReturned=4,
                      comparisonAttribute='pitchClass',
                      removeDuplicates=False):
+        # noinspection PyShadowingNames
         '''
         Return a list of closest-matching :class:`~music21.scale.ConcreteScale` objects
         based on this :class:`~music21.scale.AbstractScale`,
@@ -2233,53 +2249,77 @@ class ConcreteScale(Scale):
         want to change the `comparisonAttribute` to `name`.
 
         >>> sc1 = scale.MajorScale()
-        >>> sc1.deriveRanked(['c', 'e', 'b'])
+        >>> sc1.deriveRanked(['C', 'E', 'B'])
         [(3, <music21.scale.MajorScale G major>),
          (3, <music21.scale.MajorScale C major>),
          (2, <music21.scale.MajorScale B major>),
          (2, <music21.scale.MajorScale A major>)]
 
-        >>> sc1.deriveRanked(['d-', 'e', 'b'])
+        With the default of comparing by pitchClass, D- is fine for B major
+        because C# is in the B major scale.
+
+        >>> sc1.deriveRanked(['D-', 'E', 'B'])
         [(3, <music21.scale.MajorScale B major>),
          (3, <music21.scale.MajorScale A major>),
          (3, <music21.scale.MajorScale E major>),
          (3, <music21.scale.MajorScale D major>)]
 
-        >>> sc1.deriveRanked(['d-', 'e', 'b'], comparisonAttribute='name')
+        Comparing based on enharmonic-sensitive spelling, has fewer hits
+        for all of these scales:
+
+        >>> sc1.deriveRanked(['D-', 'E', 'B'], comparisonAttribute='name')
         [(2, <music21.scale.MajorScale B major>),
          (2, <music21.scale.MajorScale A major>),
          (2, <music21.scale.MajorScale G major>),
          (2, <music21.scale.MajorScale E major>)]
 
-        >>> sc1.deriveRanked(['c', 'e', 'e', 'e', 'b'])
+        Notice that we check how many of the pitches are in the scale
+        and do not de-duplicate pitches.
+
+        >>> sc1.deriveRanked(['C', 'E', 'E', 'E', 'B'])
         [(5, <music21.scale.MajorScale G major>),
          (5, <music21.scale.MajorScale C major>),
          (4, <music21.scale.MajorScale B major>),
          (4, <music21.scale.MajorScale A major>)]
 
-        >>> sc1.deriveRanked(['c#', 'e', 'g#'])
+        If removeDuplicates is given, the E's will get less weight:
+
+        >>> sc1.deriveRanked(['C', 'E', 'E', 'E', 'B'], removeDuplicates=True)
+        [(3, <music21.scale.MajorScale G major>),
+         (3, <music21.scale.MajorScale C major>),
+         (2, <music21.scale.MajorScale B major>),
+         (2, <music21.scale.MajorScale A major>)]
+
+        >>> sc1.deriveRanked(['C#', 'E', 'G#'])
         [(3, <music21.scale.MajorScale B major>),
          (3, <music21.scale.MajorScale A major>),
          (3, <music21.scale.MajorScale E major>),
          (3, <music21.scale.MajorScale C- major>)]
 
-        Test that a Concrete Scale (that is, with no _abstract defined) still has similar
+        A Concrete Scale created from pitches still has similar
         characteristics to the original.
 
-        Create a scale like a Harmonic minor but with flat 2 and sharp 4
+        Here we create a scale like a Harmonic minor but with flat 2 and sharp 4.
 
         >>> e = scale.ConcreteScale(pitches=['A4', 'B-4', 'C5', 'D#5', 'E5', 'F5', 'G#5', 'A5'])
-        >>> f = e.deriveRanked(['C', 'E', 'G'])
-        >>> f
+
+        Notice the G# is allowed to be chosen even though we are specifically looking for
+        scales with a G natural in them.  Once no scale matched all three pitches,
+        which scale that matches two pitches is arbitrary.
+
+        >>> bestScales = e.deriveRanked(['C', 'E', 'G'], resultsReturned=6)
+        >>> bestScales
         [(3, <music21.scale.ConcreteScale E Concrete>),
          (3, <music21.scale.ConcreteScale D- Concrete>),
          (3, <music21.scale.ConcreteScale C# Concrete>),
-         (2, <music21.scale.ConcreteScale B Concrete>)]
+         (2, <music21.scale.ConcreteScale B Concrete>),
+         (2, <music21.scale.ConcreteScale A Concrete>),
+         (2, <music21.scale.ConcreteScale G# Concrete>)]
 
-        >>> ' '.join([str(p) for p in f[0][1].pitches])
+
+        >>> eConcrete = bestScales[0][1]
+        >>> ' '.join([str(p) for p in eConcrete.pitches])
         'E4 F4 G4 A#4 B4 C5 D#5 E5'
-
-
         '''
         # possibly return dictionary with named parameters
         # default return all scales that match all provided pitches
@@ -2309,13 +2349,13 @@ class ConcreteScale(Scale):
         or a list of :class:`~music21.pitch.Pitch` objects.
 
         How the "closest-matching" scale is defined still needs to be
-        refined and will probably change in the future.
+        refined and has changed in the past and will probably change in the future.
 
         >>> sc1 = scale.MajorScale()
-        >>> sc1.derive(['c#', 'e', 'g#'])
+        >>> sc1.derive(['C#', 'E', 'G#'])
         <music21.scale.MajorScale B major>
 
-        >>> sc1.derive(['e-', 'b-', 'd'], comparisonAttribute='name')
+        >>> sc1.derive(['E-', 'B-', 'D'], comparisonAttribute='name')
         <music21.scale.MajorScale B- major>
         '''
         otherPitches = self.extractPitchList(other,
@@ -2344,18 +2384,18 @@ class ConcreteScale(Scale):
         probably want to change the `comparisonAttribute` to `name`.
 
         >>> sc1 = scale.MajorScale()
-        >>> sc1.deriveAll(['c', 'e', 'b'])
+        >>> sc1.deriveAll(['C', 'E', 'B'])
         [<music21.scale.MajorScale G major>, <music21.scale.MajorScale C major>]
 
-        >>> [sc.name for sc in sc1.deriveAll(['d-', 'e', 'b'])]
+        >>> [sc.name for sc in sc1.deriveAll(['D-', 'E', 'B'])]
         ['B major', 'A major', 'E major', 'D major', 'C- major']
 
-        >>> sc1.deriveAll(['d-', 'e', 'b'], comparisonAttribute='name')
+        >>> sc1.deriveAll(['D-', 'E', 'B'], comparisonAttribute='name')
         []
 
         Find all instances of this pentatonic scale in major scales:
 
-        >>> scList = sc1.deriveAll(['c#', 'd#', 'f#', 'g#', 'a#'], comparisonAttribute='name')
+        >>> scList = sc1.deriveAll(['C#', 'D#', 'F#', 'G#', 'A#'], comparisonAttribute='name')
         >>> [sc.name for sc in scList]
         ['B major', 'F# major', 'C# major']
         '''
@@ -2463,7 +2503,7 @@ class DiatonicScale(ConcreteScale):
 
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self._abstract = AbstractDiatonicScale()
+        self._abstract: AbstractDiatonicScale = AbstractDiatonicScale()
         self.type = 'diatonic'
 
     def getTonic(self):
@@ -2853,6 +2893,9 @@ class HarmonicMinorScale(DiatonicScale):
      (3, <music21.scale.HarmonicMinorScale E harmonic minor>),
      (2, <music21.scale.HarmonicMinorScale B harmonic minor>),
      (2, <music21.scale.HarmonicMinorScale A harmonic minor>)]
+
+    Note that G and D are also equally good as B and A, but the system arbitrarily
+    chooses among ties.
     '''
 
     def __init__(self, tonic=None):
@@ -3330,13 +3373,13 @@ class Test(unittest.TestCase):
         sc1 = scale.MajorScale()
         # deriving a new scale from the pitches found in a collection
         s = corpus.parse('bwv66.6')
-        sc3 = sc1.derive(s.parts['soprano'])
+        sc3 = sc1.derive(s.parts['#soprano'])
         self.assertEqual(str(sc3), '<music21.scale.MajorScale A major>')
 
-        sc3 = sc1.derive(s.parts['tenor'])
+        sc3 = sc1.derive(s.parts['#tenor'])
         self.assertEqual(str(sc3), '<music21.scale.MajorScale A major>')
 
-        sc3 = sc2.derive(s.parts['bass'])
+        sc3 = sc2.derive(s.parts['#bass'])
         self.assertEqual(str(sc3), '<music21.scale.MinorScale F# minor>')
 
         # composing with a scale
@@ -4045,12 +4088,15 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
     def testDerivedScaleNoOctaves(self):
         from music21 import scale
-        d = scale.ConcreteScale(pitches=['a', 'b', 'c', 'd', 'e', 'f', 'g#', 'a'])
+        d = scale.ConcreteScale(pitches=['A', 'B', 'C', 'D', 'E', 'F', 'G#', 'A'])
         e = d.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
-        self.assertEqual(str(e), ''.join(['[(3, <music21.scale.ConcreteScale F Concrete>), ',
-                                          '(3, <music21.scale.ConcreteScale E Concrete>), ',
-                                          '(2, <music21.scale.ConcreteScale B Concrete>), ',
-                                          '(2, <music21.scale.ConcreteScale A Concrete>)]']))
+        self.assertEqual(str(e),
+                         ''.join(['[(3, <music21.scale.ConcreteScale F Concrete>), ',
+                                   '(3, <music21.scale.ConcreteScale E Concrete>), ',
+                                   '(2, <music21.scale.ConcreteScale B Concrete>), ',
+                                   '(2, <music21.scale.ConcreteScale A Concrete>)]']),
+                         str(e)
+                         )
 
     def testDerivedScaleAbsurdOctaves(self):
         e = ConcreteScale(pitches=['A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4'])

@@ -4,21 +4,30 @@
 # Purpose:      Classes for graphing in matplotlib and/or other graphing tools.
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert,
+#               and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects.
 
-The :class:`~music21.graph.primitives.Graph` object subclasses primitive, abstract fundamental
-graphing archetypes using the matplotlib library.
+The :class:`~music21.graph.primitives.Graph` object subclasses primitive,
+abstract fundamental graphing archetypes using the matplotlib library.
+
+From highest level to lowest level usage, ways of graphing are as follows:
+
+    1. streamObj.plot('graphName')
+    2. graph.plot.Class(streamObj).run()
+    3. plotter = graph.primitives.Class(); plotter.data = ...; plotter.process()
+    4. Use matplotlib directly to create your graph.
 '''
 import math
 import random
 import unittest
+from typing import Union, List
 
 from music21 import common
 from music21.graph.utilities import (getExtendedModules,
@@ -30,8 +39,7 @@ from music21 import prebase
 from music21.converter.subConverters import SubConverter
 
 from music21 import environment
-_MOD = 'graph.primitives'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('graph.primitives')
 
 
 # ------------------------------------------------------------------------------
@@ -94,13 +102,27 @@ class Graph(prebase.ProtoM21Object):
     figureSizeDefault = (6, 6)
 
     keywordConfigurables = (
-        'alpha', 'dpi', 'colorBackgroundData', 'colorBackgroundFigure',
-        'colorGrid', 'title', 'figureSize', 'marker', 'markersize',
-        'colors', 'tickFontSize', 'tickColors', 'titleFontSize', 'labelFontSize',
-        'fontFamily', 'hideXGrid', 'hideYGrid',
-        'xTickLabelRotation',
-        'xTickLabelHorizontalAlignment', 'xTickLabelVerticalAlignment',
+        'alpha',
+        'colorBackgroundData',
+        'colorBackgroundFigure',
+        'colorGrid',
+        'colors',
         'doneAction',
+        'dpi',
+        'figureSize',
+        'fontFamily',
+        'hideXGrid',
+        'hideYGrid',
+        'labelFontSize',
+        'marker',
+        'markersize',
+        'tickColors',
+        'tickFontSize',
+        'title',
+        'titleFontSize',
+        'xTickLabelHorizontalAlignment',
+        'xTickLabelRotation',
+        'xTickLabelVerticalAlignment',
     )
 
     def __init__(self, *args, **keywords):
@@ -132,7 +154,15 @@ class Graph(prebase.ProtoM21Object):
         self.figureSize = self.figureSizeDefault
         self.marker = 'o'
         self.markersize = 6  # lowercase as in matplotlib
-        self.colors = ['#605c7f', '#5c7f60', '#715c7f']
+
+        # all default colors are on the slate-side of colors.
+        self.colors = ['#605c7f',  # purple
+                       '#5c7f60',  # green
+                       '#988969',  # khaki
+                       '#628297',  # cyan
+                       '#ad776d',  # pink,
+                       '#80a364',  # lime,
+                       ]
 
         self.tickFontSize = 7
         self.tickColors = {'x': '#000000', 'y': '#000000'}
@@ -195,8 +225,7 @@ class Graph(prebase.ProtoM21Object):
         Utility function that cycles through the colors of self.colors...
 
         >>> g = graph.primitives.Graph()
-        >>> g.colors
-        ['#605c7f', '#5c7f60', '#715c7f']
+        >>> g.colors = ['#605c7f', '#5c7f60', '#715c7f']
 
         >>> g.nextColor()
         '#605c7f'
@@ -290,7 +319,7 @@ class Graph(prebase.ProtoM21Object):
         ValueRange is a two-element tuple of the lowest
         number and the highest.
 
-        By default there is a padding of 10% of the range
+        By default, there is a padding of 10% of the range
         in either direction.  Set paddingFraction = 0 to
         eliminate this shift
         '''
@@ -500,8 +529,8 @@ class Graph(prebase.ProtoM21Object):
         self.hideAxisSpines(self.subplot, leftBottom=self.hideLeftBottomSpines)
         self.applyFormatting(self.subplot)
         self.callDoneAction()
-#         if self.doneAction is None:
-#             extm.matplotlib.interactive(False)
+        # if self.doneAction is None:
+        #     extm.matplotlib.interactive(False)
 
     def renderSubplot(self, subplot):
         '''
@@ -670,7 +699,7 @@ class GraphColorGrid(Graph):
         self.hideLeftBottomSpines = True
         super().__init__(*args, **kwargs)
 
-    def renderSubplot(self, subplot):        # do not need grid for outer container
+    def renderSubplot(self, subplot):  # do not need a grid for the outer container
 
         # these approaches do not work:
         # adjust face color of axTop independently
@@ -892,6 +921,11 @@ class GraphHorizontalBar(Graph):
     Data provided is a list of pairs, where the first value becomes the key,
     the second value is a list of x-start, x-length values.
 
+    Note how the second element in each data point is the length, so
+    subtracting death year from birth year gives the appropriate length.
+
+    Example: Plot the life-span of four composers whose lives were entertwined:
+    Chopin, Robert and Clara Schumann, and Brahms.
 
     >>> a = graph.primitives.GraphHorizontalBar()
     >>> a.doneAction = None #_DOCS_HIDE
@@ -904,16 +938,35 @@ class GraphHorizontalBar(Graph):
     .. image:: images/GraphHorizontalBar.*
         :width: 600
 
+    Data is a list of tuples in the form, where each entry represents a space on the
+    Y axis:
+
+        * Label
+        * List of tuples of numeric data where each tuple has two or three elements:
+            * Start x-position
+            * Length of bar
+            * Optional: dictionary of format information about this point.
+        * Optional: dictionary of format informmation for all points at this level.
+          (this will be overridden by any information for the particular point)
+
+    To make an equally spaced plot, like in a Pitch Space plot, leave empty data in the form:
+
+        `('', [], {})`
+
     '''
     _DOC_ATTR = {
         'barSpace': 'Amount of vertical space each bar takes; default 8',
-        'margin': 'Space around the bars, default 2',
+        'margin': '''
+            Vertical space above and below the bars, default 2 (= total4 space between bars)
+            ''',
     }
 
     graphType = 'horizontalBar'
     figureSizeDefault = (10, 4)
     keywordConfigurables = Graph.keywordConfigurables + (
-        'barSpace', 'margin')
+        'barSpace',
+        'margin',
+    )
 
     def __init__(self, *args, **keywords):
         self.barSpace = 8
@@ -942,22 +995,37 @@ class GraphHorizontalBar(Graph):
         for info in self.data:
             if len(info) == 2:
                 key, points = info
-                unused_formatDict = {}
+                fullRowFormatDict = {}
             else:
-                key, points, unused_formatDict = info
+                key, points, fullRowFormatDict = info
             keys.append(key)
             # provide a list of start, end points;
             # then start y position, bar height
-            faceColor = self.nextColor()
+            faceColor = fullRowFormatDict.get('color', self.nextColor())
 
             if points:
+                uniformFormatPerRow = (len(points[0]) == 2)
+                rowFaceColors: Union[str, List[str]]
+                if uniformFormatPerRow:
+                    rowFaceColors = faceColor
+                    positionPoints = points
+                else:
+                    rowFaceColors = [p[2].get('color', faceColor) for p in points]
+                    positionPoints = [p[:2] for p in points]
+
                 yRange = (yPos + self.margin,
                           self.barHeight)
-                subplot.broken_barh(points,
+
+                subplot.broken_barh(positionPoints,
                                     yRange,
-                                    facecolors=faceColor,
+                                    facecolors=rowFaceColors,
                                     alpha=self.alpha)
-                for xStart, xLen in points:
+                for p in points:
+                    if len(p) >= 2:
+                        xStart, xLen = p[:2]
+                    else:
+                        raise ValueError(f'Points must be length 2 or 3, not {len(p)}: {p}')
+
                     xEnd = xStart + xLen
                     for x in [xStart, xEnd]:
                         if x not in xPoints:
@@ -1005,7 +1073,9 @@ class GraphHorizontalBarWeighted(Graph):
     figureSizeDefault = (10, 4)
 
     keywordConfigurables = Graph.keywordConfigurables + (
-        'barSpace', 'margin')
+        'barSpace',
+        'margin',
+    )
 
     def __init__(self, *args, **keywords):
         self.barSpace = 8
@@ -1017,13 +1087,14 @@ class GraphHorizontalBarWeighted(Graph):
         if 'alpha' not in keywords:
             self.alpha = 1
 
-# example data
-#         data =  [
-#         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, 0.2, '#3ff203')]  ),
-#         ('Celli',    [(2, 7, 0.2, '#0ff302'), (10, 3, 0.6, '#ff0000', 1)]  ),
-#         ('Clarinet', [(5, 1, 0.5, '#3ff203')]  ),
-#         ('Flute',    [(5, 1, 0.1, '#00ff00'), (7, 20, 0.3, '#00ff88')]  ),
-#                 ]
+    # example data
+    #         data =  [
+    #         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, 0.2, '#3ff203')]  ),
+    #         ('Celli',    [(2, 7, 0.2, '#0ff302'), (10, 3, 0.6, '#ff0000', 1)]  ),
+    #         ('Clarinet', [(5, 1, 0.5, '#3ff203')]  ),
+    #         ('Flute',    [(5, 1, 0.1, '#00ff00'), (7, 20, 0.3, '#00ff88')]  ),
+    #                 ]
+
     @property
     def barHeight(self):
         return self.barSpace - (self.margin * 2)
@@ -1086,7 +1157,7 @@ class GraphHorizontalBarWeighted(Graph):
                 yRanges.append((adjustedY, h))
 
             for i, xRange in enumerate(xRanges):
-                # note: can get ride of bounding lines by providing
+                # note: can get rid of bounding lines by providing
                 # linewidth=0, however, this may leave gaps in adjacent regions
                 subplot.broken_barh([xRange],
                                     yRanges[i],
@@ -1111,17 +1182,17 @@ class GraphHorizontalBarWeighted(Graph):
         self.setAxisRange('x', (xMin, xMax), paddingFraction=0.01)
         self.setTicks('y', yTicks)
 
-        # first, see if ticks have been set externally
-#         if 'ticks' in self.axis['x'] and len(self.axis['x']['ticks']) == 0:
-#             rangeStep = int(xMin round(xRange/10))
-#             if rangeStep == 0:
-#                 rangeStep = 1
-#             for x in range(int(math.floor(xMin)),
-#                            round(math.ceil(xMax)),
-#                            rangeStep):
-#                 xTicks.append([x, '%s' % x])
-#                 self.setTicks('x', xTicks)
-#         environLocal.printDebug(['xTicks', xTicks])
+        # # first, see if ticks have been set externally
+        # if 'ticks' in self.axis['x'] and len(self.axis['x']['ticks']) == 0:
+        #     rangeStep = int(xMin round(xRange/10))
+        #     if rangeStep == 0:
+        #         rangeStep = 1
+        #     for x in range(int(math.floor(xMin)),
+        #                    round(math.ceil(xMax)),
+        #                    rangeStep):
+        #         xTicks.append([x, '%s' % x])
+        #         self.setTicks('x', xTicks)
+        # environLocal.printDebug(['xTicks', xTicks])
 
 
 class GraphScatterWeighted(Graph):
@@ -1237,7 +1308,7 @@ class GraphScatterWeighted(Graph):
             # # can do this here
             # environLocal.printDebug([e])
 
-            # only show label if min if greater than zNorm min
+            # only show label if min is greater than zNorm min
             if zList[i] > 1:
                 # xdistort does not seem to
                 # width shift can be between 0.1 and 0.25
@@ -1260,7 +1331,8 @@ class GraphScatterWeighted(Graph):
 
 class GraphScatter(Graph):
     '''
-    Graph two parameters in a scatter plot. Data representation is a list of points of values.
+    Graph two parameters in a scatter plot.
+    Data representation is a list of points of values.
 
     >>> g = graph.primitives.GraphScatter()
     >>> g.doneAction = None #_DOCS_HIDE
@@ -1580,7 +1652,8 @@ class Graph3DBars(Graph):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import copy
         import sys

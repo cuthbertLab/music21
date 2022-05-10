@@ -3,14 +3,14 @@
 # Name:         instrument.py
 # Purpose:      Class for basic instrument information
 #
-# Authors:      Neena Parikh
+# Authors:      Michael Scott Asato Cuthbert
+#               Neena Parikh
 #               Christopher Ariza
-#               Michael Scott Cuthbert
 #               Jose Cabal-Ugaz
 #               Ben Houge
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2009-2012, 17, 20 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -33,18 +33,17 @@ from music21 import common
 from music21 import interval
 from music21 import note
 from music21 import pitch
-from music21 import stream
 from music21.tree.trees import OffsetTree
 
 from music21.exceptions21 import InstrumentException
 
 from music21 import environment
-
-_MOD = 'instrument'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('instrument')
 
 
-def unbundleInstruments(streamIn: stream.Stream, *, inPlace=False) -> Optional[stream.Stream]:
+def unbundleInstruments(streamIn: 'music21.stream.Stream',
+                        *,
+                        inPlace=False) -> Optional['music21.stream.Stream']:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -81,7 +80,9 @@ def unbundleInstruments(streamIn: stream.Stream, *, inPlace=False) -> Optional[s
         return s
 
 
-def bundleInstruments(streamIn: stream.Stream, *, inPlace=False) -> Optional[stream.Stream]:
+def bundleInstruments(streamIn: 'music21.stream.Stream',
+                      *,
+                      inPlace=False) -> Optional['music21.stream.Stream']:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
@@ -1812,7 +1813,7 @@ def ensembleNameBySize(number):
         return ensembleNamesBySize[int(number)]
 
 
-def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
+def deduplicate(s: 'music21.stream.Stream', inPlace: bool = False) -> 'music21.stream.Stream':
     '''
     Check every offset in `s` for multiple instrument instances.
     If the `.partName` can be standardized across instances,
@@ -1861,6 +1862,8 @@ def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
     >>> list(p2.getInstruments())
     [<music21.instrument.Flute 'Flute'>]
     '''
+    from music21 import stream
+
     if inPlace:
         returnObj = s
     else:
@@ -1869,7 +1872,7 @@ def deduplicate(s: stream.Stream, inPlace: bool = False) -> stream.Stream:
     if not returnObj.hasPartLikeStreams():
         substreams: Iterable[stream.Stream] = [returnObj]
     else:
-        substreams = returnObj.getElementsByClass('Stream')
+        substreams = returnObj.getElementsByClass(stream.Stream)
 
     for sub in substreams:
         oTree = OffsetTree(sub[Instrument].stream())
@@ -2095,13 +2098,13 @@ def partitionByInstrument(streamObj):
     >>> p1 = converter.parse("tinynotation: 4/4 c4  d  e  f  g  a  b  c'  c1")
     >>> p2 = converter.parse("tinynotation: 4/4 C#4 D# E# F# G# A# B# c#  C#1")
 
-    >>> p1.getElementsByClass('Measure')[0].insert(0.0, instrument.Piccolo())
-    >>> p1.getElementsByClass('Measure')[0].insert(2.0, instrument.AltoSaxophone())
-    >>> p1.getElementsByClass('Measure')[1].insert(3.0, instrument.Piccolo())
+    >>> p1.getElementsByClass(stream.Measure)[0].insert(0.0, instrument.Piccolo())
+    >>> p1.getElementsByClass(stream.Measure)[0].insert(2.0, instrument.AltoSaxophone())
+    >>> p1.getElementsByClass(stream.Measure)[1].insert(3.0, instrument.Piccolo())
 
-    >>> p2.getElementsByClass('Measure')[0].insert(0.0, instrument.Trombone())
-    >>> p2.getElementsByClass('Measure')[0].insert(3.0, instrument.Piccolo())  # not likely...
-    >>> p2.getElementsByClass('Measure')[1].insert(1.0, instrument.Trombone())
+    >>> p2.getElementsByClass(stream.Measure)[0].insert(0.0, instrument.Trombone())
+    >>> p2.getElementsByClass(stream.Measure)[0].insert(3.0, instrument.Piccolo())  # not likely...
+    >>> p2.getElementsByClass(stream.Measure)[1].insert(1.0, instrument.Trombone())
 
     >>> s = stream.Score()
     >>> s.insert(0, p1)
@@ -2212,6 +2215,7 @@ def partitionByInstrument(streamObj):
     TODO: use proper recursion to make a copy of the stream.
     TODO: final barlines should be aligned.
     '''
+    from music21 import stream
     if not streamObj.hasPartLikeStreams():
         # place in a score for uniform operations
         s = stream.Score()
@@ -2485,6 +2489,82 @@ def fromString(instrumentString: str,
     return bestInstrument
 
 
+def _getKeys(classNameString: str,
+             language: SearchLanguage = SearchLanguage.ALL):
+    '''
+    Retrieve the key or keys (variant instrument names)
+    from an instrumentLookup dict, given
+    the language (which instrumentLookup dict) and
+    value (classNameString).
+
+    Returns all relevant keys as a list of strings (empty if no matches).
+    '''
+
+    from music21.languageExcerpts import instrumentLookup
+    sourceDict = getattr(instrumentLookup, language + 'ToClassName')
+
+    returns = []
+    for key, value in sourceDict.items():
+        if classNameString == value:
+            returns.append(key)
+    return returns
+
+
+def getAllNamesForInstrument(instrumentClass: Instrument,
+                             language: SearchLanguage = SearchLanguage.ALL):
+    '''
+    Retrieves all currently stored names for a given instrument.
+
+    The instrumentClass should be a valid music21
+    :class:`~music21.instrument.Instrument`.
+
+    By default, this function searches over all supported languages
+    including instrument name abbreviations (an honorary 'language' for these purposes),
+    and returns a dict with keys for the language tested and values as a list of
+    strings for any names in that language.
+
+    >>> instrument.getAllNamesForInstrument(instrument.Flute())
+    {'english': ['flute', 'flutes', 'transverse flute'],
+    'french': ['flûte', 'flûte traversière', 'flûtes', 'grande flûte'],
+    'german': ['flöte', 'flöten', 'querflöte'],
+    'italian': ['flauti', 'flauto', 'flauto traverso'],
+    'russian': ['fleita'],
+    'spanish': ['flauta', 'flauta de boehm', 'flauta de concierto',
+                'flauta traversa', 'flauta travesera', 'flautas'],
+    'abbreviation': ['fl']}
+
+    Alternatively, you can specify the language to search using the `language`
+    argument.
+
+    >>> instrument.getAllNamesForInstrument(instrument.Flute(), language='german')
+    {'german': ['flöte', 'flöten', 'querflöte']}
+
+    An InstrumentException is raised if the specified language is not
+    one of those currently supported:
+    'english', 'french', 'german', 'italian', 'russian', 'spanish', and 'abbreviation'.
+
+    Note that the language string is not case-sensitive, so 'German' is also fine.
+
+    '''
+
+    language = language.lower()
+    instrumentNameDict = {}
+
+    instrumentClassName = instrumentClass.instrumentName
+
+    if language == SearchLanguage.ALL:
+        for lang in SearchLanguage:
+            if lang is SearchLanguage.ALL:
+                continue  # skip the 'all' combination, handle the languages separately.
+            instrumentNameDict[str(lang)] = _getKeys(instrumentClassName, lang)
+    elif language not in SearchLanguage:
+        raise InstrumentException(f'Chosen language {language} not currently supported.')
+    else:  # one, valid language
+        instrumentNameDict[language] = _getKeys(instrumentClassName, SearchLanguage(language))
+
+    return instrumentNameDict
+
+
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):
     pass
@@ -2514,6 +2594,8 @@ class Test(unittest.TestCase):
                 j = copy.deepcopy(obj)
 
     def testMusicXMLExport(self):
+        from music21 import stream
+
         s1 = stream.Stream()
         i1 = Violin()
         i1.partName = 'test'
@@ -2535,6 +2617,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentA(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2548,7 +2631,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post.flatten().getElementsByClass(instrument.Instrument)), 2)
 
         # post.show('t')
 
@@ -2559,11 +2642,12 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post[instrument.Instrument]), 2)
         # post.show('t')
 
     def testPartitionByInstrumentB(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2579,12 +2663,13 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 2)
+        self.assertEqual(len(post[instrument.Instrument]), 2)
         self.assertEqual(len(post.parts[0].notes), 6)
         self.assertEqual(len(post.parts[1].notes), 12)
 
     def testPartitionByInstrumentC(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2606,7 +2691,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 4)
+        self.assertEqual(len(post[instrument.Instrument]), 4)
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 6)
         self.assertEqual(post.parts[1].getInstrument().instrumentName, 'Acoustic Guitar')
@@ -2621,6 +2706,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentD(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         s = stream.Score()
@@ -2646,7 +2732,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 4)
+        self.assertEqual(len(post[instrument.Instrument]), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 12)
@@ -2659,6 +2745,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentE(self):
         from music21 import instrument
+        from music21 import stream
 
         # basic case of instruments in Parts
         # s = stream.Score()
@@ -2682,7 +2769,7 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 4)  # 4 instruments
-        self.assertEqual(len(post.flatten().getElementsByClass('Instrument')), 4)
+        self.assertEqual(len(post[instrument.Instrument]), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
 
@@ -2697,6 +2784,7 @@ class Test(unittest.TestCase):
 
     def testPartitionByInstrumentF(self):
         from music21 import instrument
+        from music21 import stream
 
         s1 = stream.Stream()
         s1.append(instrument.AcousticGuitar())
@@ -2715,13 +2803,13 @@ class Test(unittest.TestCase):
     #     p1 = converter.parse("tinynotation: 4/4 c4  d  e  f  g  a  b  c'  c1")
     #     p2 = converter.parse("tinynotation: 4/4 C#4 D# E# F# G# A# B# c#  C#1")
     #
-    #     p1.getElementsByClass('Measure')[0].insert(0.0, instrument.Piccolo())
-    #     p1.getElementsByClass('Measure')[0].insert(2.0, instrument.AltoSaxophone())
-    #     p1.getElementsByClass('Measure')[1].insert(3.0, instrument.Piccolo())
+    #     p1.getElementsByClass(stream.Measure)[0].insert(0.0, instrument.Piccolo())
+    #     p1.getElementsByClass(stream.Measure)[0].insert(2.0, instrument.AltoSaxophone())
+    #     p1.getElementsByClass(stream.Measure)[1].insert(3.0, instrument.Piccolo())
     #
-    #     p2.getElementsByClass('Measure')[0].insert(0.0, instrument.Trombone())
-    #     p2.getElementsByClass('Measure')[0].insert(3.0, instrument.Piccolo())  # not likely...
-    #     p2.getElementsByClass('Measure')[1].insert(1.0, instrument.Trombone())
+    #     p2.getElementsByClass(stream.Measure)[0].insert(0.0, instrument.Trombone())
+    #     p2.getElementsByClass(stream.Measure)[0].insert(3.0, instrument.Piccolo())  # not likely.
+    #     p2.getElementsByClass(stream.Measure)[1].insert(1.0, instrument.Trombone())
     #
     #     s = stream.Score()
     #     s.insert(0, p1)
@@ -2733,30 +2821,42 @@ class Test(unittest.TestCase):
     def testLanguageChoice(self):
         from music21 import instrument
 
+        # fromString
+
         testString = 'Klarinette'  # German name
 
         # Works when language not specified
         self.assertEqual(instrument.fromString(testString).instrumentName,
                          testString)
 
-        # Works with correct language for the term
-        self.assertEqual(instrument.fromString(testString, language='german').instrumentName,
-                         testString)
+        workingExamples = ['german',  # Works with correct language for the term
+                           'German'  # Not case-sensitive, so 'German' is also fine
+                           ]
 
-        # Not case-sensitive, so 'German' is also fine
-        self.assertEqual(instrument.fromString(testString, language='German').instrumentName,
-                         testString)
+        for langStr in workingExamples:
+            instrName = instrument.fromString(testString, language=langStr).instrumentName
+            self.assertEqual(instrName, testString)
 
-        # Error for incorrect language
-        self.assertRaises(InstrumentException,
-                          instrument.fromString,
-                          testString,
-                          language='french')
+        failingExamples = ['french',  # Error when the language doesn't match the term
+                           'finnish'  # Error for unsupported language
+                           ]
 
+        for langStr in failingExamples:
+            self.assertRaises(InstrumentException,
+                              instrument.fromString,
+                              testString,
+                              language=langStr)
+
+        # getAllNamesForInstrument
+
+        inst = instrument.Flute()
+        # Working example
+        self.assertEqual(instrument.getAllNamesForInstrument(inst, language='abbreviation'),
+                         {'abbreviation': ['fl']})
         # Error for unsupported language
         self.assertRaises(InstrumentException,
-                          instrument.fromString,
-                          testString,
+                          instrument.getAllNamesForInstrument,
+                          inst,
                           language='finnish')
 
 

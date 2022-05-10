@@ -4,9 +4,9 @@
 # Purpose:      Internal data structures for timespan collections
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -30,7 +30,7 @@ class ElementNode(core.AVLNode):
     endTime and index within a stream, as well as the endTimes and indices of the
     elements to the left and right of it.
 
-    Here's an element node that is at first is no different than an AVL node, except in
+    Here's an element node that is at first is no different from an AVL node, except in
     representation:
 
     >>> n = note.Note('C4')

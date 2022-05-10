@@ -4,9 +4,9 @@
 # Purpose:      Tools for recreating streams from trees
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-15 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -83,7 +83,7 @@ def chordified(timespans, templateStream=None):  # pragma: no cover
         allTimePoints = timespans.allTimePoints() + tuple(templateOffsets)
         allTimePoints = sorted(set(allTimePoints))
 
-        measureList = list(outputStream.getElementsByClass('Measure'))
+        measureList = list(outputStream.getElementsByClass(stream.Measure))
 
         for offset, endTime in zip(allTimePoints, allTimePoints[1:]):
             while templateOffsets[1] <= offset:

@@ -4,20 +4,20 @@
 # Purpose:      Storage for user environment settings and defaults
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Simple storage for data defaults used throughout music21.
 '''
-
-
 import unittest
+from typing import Literal
 from music21 import _version
 
 # note: this module should not import any higher level modules
+StepName = Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']  # restating so as not to import.
 
 _MOD = 'defaults'
 
@@ -45,7 +45,7 @@ limitOffsetDenominator = 65535  # > CD track level precision.
 # not allowing more can be construed as a feature.
 
 
-pitchStep = 'C'
+pitchStep: StepName = 'C'
 pitchOctave = 4
 
 partGroup = 'Part Group'
@@ -111,7 +111,7 @@ multiMeasureRestUseSymbols = True
 multiMeasureRestMaxSymbols = 11
 
 # id numbers above this number will be considered memory locations
-# and rewritten on thaw.
+# and rewritten on thaw, etc.
 minIdNumberToConsiderMemoryLocation = 100_000_001
 
 # ----------------------------------------------------------------||||||||||||--

@@ -4,7 +4,7 @@
 # Purpose:      music21 class which allows transcription of music21 data to braille
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -465,7 +465,7 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
     '''
     >>> from music21.braille import translate
     >>> corelli = corpus.parse('monteverdi/madrigal.3.1.rntxt')
-    >>> mdObject = corelli.getElementsByClass('Metadata').first()
+    >>> mdObject = corelli.getElementsByClass(metadata.Metadata).first()
     >>> mdObject.__class__
     <class 'music21.metadata.Metadata'>
     >>> print(translate.metadataToString(mdObject))

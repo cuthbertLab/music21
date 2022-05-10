@@ -1,26 +1,28 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         expressions.py
-# Purpose:      notation mods
+# Purpose:      Expressions such as Fermatas, etc.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #               Neena Parikh
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module provides object representations of expressions, that is
 notational symbols such as Fermatas, Mordents, Trills, Turns, etc.
-which are stored under a Music21Object's .expressions attribute
+which are stored under a Music21Object's .expressions attribute.
 
-It also includes representations of things such as TextExpressions which
-are better attached to the Stream itself.
+A sub-category of Expressions are Ornaments.
 
-TODO: replace .size with a string representing interval and then
-    create interval.Interval objects only when necessary.
+Unlike articulations, expressions can be attached to the Stream itself.
+For instance, TextExpressions.
 '''
+# TODO: replace .size with a string representing interval and then
+#     create interval.Interval objects only when necessary.
+
 import copy
 import string
 import unittest
@@ -41,7 +43,6 @@ def realizeOrnaments(srcObject):
     given a Music21Object with Ornament expressions,
     convert them into a list of objects that represents
     the performed version of the object:
-
 
     >>> n1 = note.Note('D5')
     >>> n1.quarterLength = 1
@@ -328,7 +329,16 @@ class TextExpression(Expression):
     _styleClass = style.TextStyle
 
     _DOC_ATTR = {
-        'placement': "Staff placement: 'above', 'below', or None.",
+        'placement': '''
+            Staff placement: 'above', 'below', or None.
+
+            A setting of None implies that the placement will be determined
+            by notation software and no particular placement is demanded.
+
+            This is not placed in the `.style` property, since for some
+            expressions, the placement above or below an object has semantic
+            meaning and is not purely presentational.
+            ''',
     }
 
     def __init__(self, content=None):
@@ -422,7 +432,7 @@ class TextExpression(Expression):
                 # this will transfer all positional/formatting settings
                 re.setTextExpression(copy.deepcopy(self))
                 return re
-        # if cannot be expressed as a repeat expression
+        # Return None if it cannot be expressed as a repeat expression
         return None
 
     def getTempoText(self):
@@ -1344,8 +1354,9 @@ class TrillExtension(spanner.Spanner):
     >>> print(te)
     <music21.expressions.TrillExtension <music21.note.Note C><music21.note.Note C>>
     '''
-    # musicxml defines a start, stop, and a continue; will try to avoid continue
-    # note that this always includes a trill symbol
+    # musicxml defines a "start", "stop", and a "continue" type;
+    # We will try to avoid "continue".
+    # N.B. this extension always includes a trill symbol
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
@@ -1369,6 +1380,9 @@ class TrillExtension(spanner.Spanner):
         >>> te.placement = 'above'
         >>> te.placement
         'above'
+
+        A setting of None implies that the placement will be determined
+        by notation software and no particular placement is demanded.
         ''')
 
 
@@ -1388,7 +1402,8 @@ class TremoloSpanner(spanner.Spanner):
     Traceback (most recent call last):
     music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
     '''
-    # musicxml defines a start, stop, and a continue; will try to avoid continue
+    # musicxml defines a "start", "stop", and a "continue" type.
+    # We will try to avoid using the "continue" type.
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
@@ -1568,7 +1583,7 @@ class Test(unittest.TestCase):
         unp = note.Unpitched()
         mord = Mordent()
         with self.assertRaises(TypeError):
-            mord.realize(unp)
+            mord.realize(unp)  # type: ignore
 
 
 # class TestExternal(unittest.TestCase):

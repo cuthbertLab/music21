@@ -3,10 +3,10 @@
 # Name:         clef.py
 # Purpose:      Objects for representing clefs
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 #
 # Changes:      04 March 2014 by Michael Bodenbach
@@ -19,7 +19,8 @@ commonly used clefs. Clef objects are often found
 within :class:`~music21.stream.Measure` objects.
 '''
 import unittest
-from typing import Mapping, Optional, Iterable, Sequence, Union
+from typing import (Mapping, Optional, Iterable, Sequence, Union, Dict,
+                    Type, List, TYPE_CHECKING)
 
 from music21 import base
 from music21 import exceptions21
@@ -27,8 +28,7 @@ from music21 import environment
 from music21 import pitch  # for typing only
 from music21 import style
 
-_MOD = 'clef'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('clef')
 
 
 class ClefException(exceptions21.Music21Exception):
@@ -185,7 +185,7 @@ class Clef(base.Music21Object):
 
     def getStemDirectionForPitches(
         self,
-        pitchList: Union[pitch.Pitch, Sequence[pitch.Pitch]],
+        pitches: Union[pitch.Pitch, Sequence[pitch.Pitch]],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -219,7 +219,7 @@ class Clef(base.Music21Object):
         >>> bc.getStemDirectionForPitches(pitchList, firstLastOnly=False)
         'down'
 
-        If extremePitchOnly if True, then whatever pitch is farthest from the center line
+        If extremePitchOnly is True, then whatever pitch is farthest from the center line
         determines the direction, regardless of order.  (default False).
 
         >>> bc.getStemDirectionForPitches(pitchList, extremePitchOnly=True)
@@ -228,9 +228,11 @@ class Clef(base.Music21Object):
         >>> bc.getStemDirectionForPitches(pitchList, extremePitchOnly=True)
         'up'
         '''
-        if isinstance(pitchList, pitch.Pitch):
-            pitchList = [pitchList]
         pitchList: Sequence[pitch.Pitch]
+        if isinstance(pitches, pitch.Pitch):
+            pitchList = [pitches]
+        else:
+            pitchList = pitches
         relevantPitches: Sequence[pitch.Pitch]
 
         if not pitchList:
@@ -723,7 +725,7 @@ class SubBassClef(FClef):
 
 
 # ------------------------------------------------------------------------------
-CLASS_FROM_TYPE = {
+CLASS_FROM_TYPE: Dict[str, List[Optional[Type[Clef]]]] = {
     'G': [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
     'C': [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
     'F': [None, None, None, FBaritoneClef, BassClef, SubBassClef],
@@ -820,7 +822,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
         else:
             lineNum = False
     elif len(xnStr) > 2:
-        from music21 import clef as myself  # @UnresolvedImport
+        from music21 import clef as myself
         xnLower = xnStr.lower()
         for x in dir(myself):
             if 'Clef' not in x:
@@ -867,9 +869,15 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
                 clefObj = CClef()
             elif thisType == 'TAB':
                 clefObj = TabClef()
+            else:  # pragma: no cover
+                clefObj = PitchClef()
             clefObj.line = lineNum
         else:
-            clefObj = line_list[lineNum]()
+            ClefType = line_list[lineNum]
+            if TYPE_CHECKING:
+                assert ClefType is not None
+                assert issubclass(ClefType, PitchClef)
+            clefObj = ClefType()
     else:
         clefObj = PitchClef()
         clefObj.sign = thisType
@@ -937,7 +945,7 @@ def bestClef(streamObj: 'music21.stream.Stream',
     >>> clef.bestClef(stream.Stream([note.Note('D4')]), allowTreble8vb=True)
     <music21.clef.Treble8vbClef>
 
-    Streams of very very high notes or very very low notes can get
+    Streams of extremely high notes or extremely low notes can get
     Treble8va or Bass8vb clefs:
 
     >>> clef.bestClef(stream.Stream([note.Note('D7')]))
@@ -959,7 +967,7 @@ def bestClef(streamObj: 'music21.stream.Stream',
 
     sIter = streamObj.recurse() if recurse else streamObj.iter()
 
-    notes = sIter.getElementsByClass('GeneralNote')
+    notes = sIter.notesAndRests
 
     for n in notes:
         if n.isRest:

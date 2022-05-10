@@ -4,21 +4,22 @@
 # Purpose:      Change music21 PartStaff objects to single musicxml parts
 #
 # Authors:      Jacob Tyler Walls
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2020-22 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 A mixin to ScoreExporter that includes the capabilities for producing a single
 MusicXML `<part>` from multiple music21 `PartStaff` objects.
 '''
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union, Type
 import unittest
 import warnings
 from xml.etree.ElementTree import Element, SubElement, Comment
 
 from music21.common.misc import flattenList
+from music21.common.types import M21ObjType
 from music21.key import KeySignature
 from music21.layout import StaffGroup
 from music21.meter import TimeSignature
@@ -135,6 +136,8 @@ class PartStaffExporterMixin:
         # starting with v.7, self.groupsToJoin is already set earlier,
         # but check to be safe
         if not self.groupsToJoin:
+            # this is done in the non-mixin class.
+            # noinspection PyAttributeOutsideInit
             self.groupsToJoin = self.joinableGroups()
         for group in self.groupsToJoin:
             self.addStaffTagsMultiStaffParts(group)
@@ -222,7 +225,7 @@ class PartStaffExporterMixin:
          <music21.layout.StaffGroup <... p2a><... p2b>>,
          <music21.layout.StaffGroup <... p6a><... p6b>>]
         '''
-        staffGroups = self.stream.getElementsByClass('StaffGroup')
+        staffGroups = self.stream.getElementsByClass(StaffGroup)
         joinableGroups: List[StaffGroup] = []
         # Joinable groups must consist of only PartStaffs with Measures
         # and exist in self.stream
@@ -231,7 +234,7 @@ class PartStaffExporterMixin:
                 continue
             if not all(stream.PartStaff in p.classSet for p in sg):
                 continue
-            if not all(p.getElementsByClass('Measure') for p in sg):
+            if not all(p.getElementsByClass(stream.Measure) for p in sg):
                 continue
             try:
                 for p in sg:
@@ -334,7 +337,7 @@ class PartStaffExporterMixin:
     def movePartStaffMeasureContents(self, group: StaffGroup):
         '''
         For every <part> after the first, find the corresponding measure in the initial
-        <part> and merge the contents by inserting all of the contained elements.
+        <part> and merge the contents by inserting all contained elements.
 
         Called by :meth:`joinPartStaffs`
 
@@ -374,8 +377,8 @@ class PartStaffExporterMixin:
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
 
-        def makeDivider(sourceNumber: int) -> Element:
-            return Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
+        def makeDivider(inner_sourceNumber: Union[int, str]) -> Element:
+            return Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, str(inner_sourceNumber)))
 
         sourceMeasures = iter(source.findall('measure'))
         sourceMeasure = None  # Set back to None when disposed of
@@ -514,14 +517,16 @@ class PartStaffExporterMixin:
         </measure>
         '''
 
-        def isMultiAttribute(m21Class, comparison: str = '__eq__') -> bool:
+        def isMultiAttribute(m21Class: Type[M21ObjType],
+                             comparison: str = '__eq__') -> bool:
             '''
             Return True if any first instance of m21Class in any subsequent staff
             in this StaffGroup does not compare to the first instance of that class
             in the earliest staff where found (not necessarily the first) using `comparison`.
             '''
-            initialM21Instance: Optional[m21Class] = None
-            for ps in group:
+            initialM21Instance: Optional[M21ObjType] = None
+            # noinspection PyShadowingNames
+            for ps in group:  # ps okay to reuse.
                 if initialM21Instance is None:
                     initialM21Instance = ps.recurse().getElementsByClass(m21Class).first()
                 else:
@@ -545,7 +550,7 @@ class PartStaffExporterMixin:
             # Initial PartStaff in group: find earliest mxAttributes, set clef #1 and <staves>
             if initialPartStaffRoot is None:
                 initialPartStaffRoot = self.getRootForPartStaff(ps)
-                mxAttributes: Element = initialPartStaffRoot.find('measure/attributes')
+                mxAttributes = initialPartStaffRoot.find('measure/attributes')
                 clef1: Optional[Element] = mxAttributes.find('clef')
                 if clef1 is not None:
                     clef1.set('number', '1')

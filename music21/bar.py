@@ -3,10 +3,10 @@
 # Name:         bar.py
 # Purpose:      music21 classes for representing bars, repeats, and related
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -23,8 +23,7 @@ from music21 import repeat
 
 from music21 import environment
 
-_MOD = 'bar'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('bar')
 
 # ------------------------------------------------------------------------------
 
@@ -48,6 +47,8 @@ reverseBarTypeDict = {
     'double': 'light-light',
     'final': 'light-heavy',
 }
+
+strongBarlineTypes = {'heavy', 'double', 'final', 'heavy-light', 'heavy-heavy'}  # set
 
 
 def typeToMusicXMLBarStyle(value):
@@ -129,7 +130,7 @@ class Barline(base.Music21Object):
     classSortOrder = -5
 
     def __init__(self,
-                 type=None,  # @ReservedAssignment  # pylint: disable=redefined-builtin
+                 type=None,  # pylint: disable=redefined-builtin
                  location=None):
         super().__init__()
 
@@ -311,7 +312,7 @@ class Repeat(repeat.RepeatMark, Barline):
     @property
     def times(self) -> Optional[int]:
         '''
-        Get or set the times property of this barline. This
+        Get or set the "times" property of this barline. This
         defines how many times the repeat happens. A standard repeat
         repeats 2 times; values equal to or greater than 0 are permitted.
         A repeat of 0 skips the repeated passage.

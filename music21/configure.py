@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2019 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import os
@@ -30,8 +30,7 @@ from music21 import common
 from music21 import environment
 from music21 import exceptions21
 
-_MOD = 'configure'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('configure')
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 IGNORECASE = re.RegexFlag.IGNORECASE

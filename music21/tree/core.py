@@ -4,9 +4,9 @@
 # Purpose:      Core AVLTree object.  To be optimized the hell out of.
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -513,7 +513,7 @@ class AVLTree(prebase.ProtoM21Object):
         <AVLNode: Start:12 Height:0 L:None R:None>
 
         Note: for this example to be stable, we can't shuffle the nodes, since there are
-        numerous different possible configurations that meet the AVLTree constraints, some
+        numerous possible configurations that meet the AVLTree constraints, some
         of height 2 and some of height 3
         '''
         def recurse(node):
@@ -528,6 +528,7 @@ class AVLTree(prebase.ProtoM21Object):
         return recurse(self.rootNode)
 
     def populateFromSortedList(self, listOfTuples):
+        # noinspection PyShadowingNames
         '''
         Populate this tree from a sorted list of two-tuples of (position, payload).
 
@@ -787,7 +788,7 @@ class AVLTree(prebase.ProtoM21Object):
         >>> score = corpus.parse('bwv66.6')
         >>> scoreTree = score.asTimespans()
 
-        100 is beyond the end so it will get the last node in piece
+        100 is beyond the end, so it will get the last node in piece.
 
         >>> scoreTree.getNodeBefore(100)
         <OffsetNode 36.0 Indices:191,191,195,195 Length:4>

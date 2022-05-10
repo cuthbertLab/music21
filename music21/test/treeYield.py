@@ -4,9 +4,9 @@
 # Purpose:      traverse a complex datastructure and yield elements
 #               that fit a given criteria
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert
 # License:      CC-BY (see StackOverflow link below)
 # ------------------------------------------------------------------------------
 # https://stackoverflow.com/questions/12611337/

@@ -6,7 +6,7 @@
 # Authors:      Jared Sadoian
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -33,8 +33,7 @@ from music21.analysis.discrete import DiscreteAnalysisException
 
 
 from music21 import environment
-_MOD = 'analysis.windowed'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.windowed')
 
 
 # -----------------------------------------------------------------------------
@@ -76,19 +75,19 @@ class WindowedAnalysis:
         >>> wa = analysis.windowed.WindowedAnalysis(s.parts[0], p)
 
         >>> post = wa.getMinimumWindowStream()
-        >>> len(post.getElementsByClass('Measure'))
+        >>> len(post.getElementsByClass(stream.Measure))
         42
-        >>> post.getElementsByClass('Measure').first()
+        >>> post.getElementsByClass(stream.Measure).first()
         <music21.stream.Measure 1 offset=0.0>
 
         Time signature set to 1/4 time signature
 
-        >>> post.getElementsByClass('Measure').first().timeSignature
+        >>> post.getElementsByClass(stream.Measure).first().timeSignature
         <music21.meter.TimeSignature 1/4>
 
         leaves one note in this measure
 
-        >>> len(post.getElementsByClass('Measure')[1].notes)
+        >>> len(post.getElementsByClass(stream.Measure)[1].notes)
         1
 
         Placing a score with parts into analysis will automatically flatten
@@ -315,7 +314,7 @@ class WindowedAnalysis:
         # of all windows of a single size across the entire Stream
         solutionMatrix = []
         colorMatrix = []
-        # store meta data about each row as a dictionary
+        # store metadata about each row as a dictionary
         metaMatrix = []
 
         if common.isNum(windowStepSize):

@@ -4,9 +4,9 @@
 # Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -71,7 +71,8 @@ __all__ = [
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
 
-AmbitusShort = namedtuple('AmbitusShort', 'semitones diatonic pitchLowest pitchHighest')
+AmbitusShort = namedtuple('AmbitusShort',
+                          ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
 
 # -----------------------------------------------------------------------------
 

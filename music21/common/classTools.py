@@ -3,10 +3,10 @@
 # Name:         common/classTools.py
 # Purpose:      Utilities for classes
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import contextlib
@@ -137,7 +137,7 @@ def classToClassStr(classObj: Type) -> str:
 
 def getClassSet(instance, classNameTuple=None):
     '''
-    Return the classSet for an instance (whether a Music21Object or something else.
+    Return the classSet for an instance (whether a Music21Object or something else).
     See base.Music21Object.classSet for more details.
 
     >>> p = pitch.Pitch()

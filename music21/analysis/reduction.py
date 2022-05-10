@@ -4,9 +4,9 @@
 # Purpose:      Tools for creating a score reduction.
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -22,7 +22,6 @@ import copy
 from music21 import exceptions21
 
 from music21 import chord
-from music21 import clef
 from music21 import common
 from music21 import expressions
 from music21 import instrument
@@ -32,9 +31,7 @@ from music21 import prebase
 from music21 import stream
 
 from music21 import environment
-_MOD = "analysis.reduction"
-environLocal = environment.Environment(_MOD)
-
+environLocal = environment.Environment('analysis.reduction')
 
 
 # ------------------------------------------------------------------------------
@@ -266,7 +263,7 @@ class ScoreReduction:
             return
         # iterate overall notes, check all lyrics
         for p in score.parts:
-            for i, m in enumerate(p.getElementsByClass('Measure')):
+            for i, m in enumerate(p.getElementsByClass(stream.Measure)):
                 for n in m.recurse().notes:
                     infoDict = {'part': p,
                                 'measure': m,
@@ -359,7 +356,7 @@ class ScoreReduction:
             inst = instrument.Instrument()
             inst.partName = gName
             g.insert(0, inst)
-            gMeasures = g.getElementsByClass('Measure')
+            gMeasures = g.getElementsByClass(stream.Measure)
 #             for m in gMeasures._elements:
 #                 print(gName, m)
 #                 m.clef = clef.TrebleClef()
@@ -393,14 +390,14 @@ class ScoreReduction:
                             gMeasure.insert(rn.measureOffset, te)
 
             # after gathering all parts, fill with rests
-            for i, m in enumerate(g.getElementsByClass('Measure')):
+            for i, m in enumerate(g.getElementsByClass(stream.Measure)):
                 # only make rests if there are notes in the measure
                 for v in m.voices:
                     if v.recurse().notes:
                         v.makeRests(fillGaps=True, inPlace=True)
                 m.flattenUnnecessaryVoices(inPlace=True)
                 # hide all rests in all containers
-                for r in m.recurse().getElementsByClass('Rest'):
+                for r in m[note.Rest]:
                     r.style.hideObjectOnPrint = True
                 # m.show('t')
             # add to score
@@ -577,7 +574,7 @@ class PartReduction:
             if self._fillByMeasure:
                 partMeasures = []
                 for p in parts:
-                    partMeasures.append(p.getElementsByClass('Measure').stream())
+                    partMeasures.append(p.getElementsByClass(stream.Measure).stream())
                 # environLocal.printDebug(['partMeasures', partMeasures])
                 # assuming that all parts have same number of measures
                 # iterate over each measures
@@ -952,42 +949,42 @@ class Test(unittest.TestCase):
         self.assertEqual(len(match), 3)
         # post.show()
 
-    def testExtractionC(self):
-        from music21 import analysis
-        from music21 import corpus
-        # http://solomonsmusic.net/schenker.htm
-        # shows extracting an Ursatz line
-
-        # BACH pre;ide !, WTC
-
-        src = corpus.parse('bwv846')
-        import warnings
-        with warnings.catch_warnings():  # catch deprecation warning
-            warnings.simplefilter('ignore', category=exceptions21.Music21DeprecationWarning)
-            chords = src.flattenParts().makeChords(minimumWindowSize=4,
-                                        makeRests=False)
-        for c in chords.flatten().notes:
-            c.quarterLength = 4
-        for m in chords.getElementsByClass('Measure'):
-            m.clef = clef.bestClef(m, recurse=True)
-
-        chords.measure(1).notes[0].addLyric('::/p:e/o:5/nf:no/ta:3/g:Ursatz')
-        chords.measure(1).notes[0].addLyric('::/p:c/o:4/nf:no/tb:I')
-
-        chords.measure(24).notes[0].addLyric('::/p:d/o:5/nf:no/ta:2')
-        chords.measure(24).notes[0].addLyric('::/p:g/o:3/nf:no/tb:V')
-
-        chords.measure(30).notes[0].addLyric('::/p:f/o:4/tb:7')
-
-        chords.measure(34).notes[0].addLyric('::/p:c/o:5/nf:no/v:1/ta:1')
-        chords.measure(34).notes[0].addLyric('::/p:g/o:4/nf:no/v:2')
-        chords.measure(34).notes[0].addLyric('::/p:c/o:4/nf:no/v:1/tb:I')
-
-        sr = analysis.reduction.ScoreReduction()
-        sr.chordReduction = chords
-        # sr.score = src
-        unused_post = sr.reduce()
-        # unused_post.show()
+    # def testExtractionC(self):
+    #     from music21 import analysis
+    #     from music21 import corpus
+    #     # http://solomonsmusic.net/schenker.htm
+    #     # shows extracting an Ursatz line
+    #
+    #     # BACH pre;ide !, WTC
+    #
+    #     src = corpus.parse('bwv846')
+    #     import warnings
+    #     with warnings.catch_warnings():  # catch deprecation warning
+    #         warnings.simplefilter('ignore', category=exceptions21.Music21DeprecationWarning)
+    #         chords = src.flatten().makeChords(minimumWindowSize=4,  # make chords is gone
+    #                                     makeRests=False)
+    #     for c in chords.flatten().notes:
+    #         c.quarterLength = 4
+    #     for m in chords.getElementsByClass(stream.Measure):
+    #         m.clef = clef.bestClef(m, recurse=True)
+    #
+    #     chords.measure(1).notes[0].addLyric('::/p:e/o:5/nf:no/ta:3/g:Ursatz')
+    #     chords.measure(1).notes[0].addLyric('::/p:c/o:4/nf:no/tb:I')
+    #
+    #     chords.measure(24).notes[0].addLyric('::/p:d/o:5/nf:no/ta:2')
+    #     chords.measure(24).notes[0].addLyric('::/p:g/o:3/nf:no/tb:V')
+    #
+    #     chords.measure(30).notes[0].addLyric('::/p:f/o:4/tb:7')
+    #
+    #     chords.measure(34).notes[0].addLyric('::/p:c/o:5/nf:no/v:1/ta:1')
+    #     chords.measure(34).notes[0].addLyric('::/p:g/o:4/nf:no/v:2')
+    #     chords.measure(34).notes[0].addLyric('::/p:c/o:4/nf:no/v:1/tb:I')
+    #
+    #     sr = analysis.reduction.ScoreReduction()
+    #     sr.chordReduction = chords
+    #     # sr.score = src
+    #     unused_post = sr.reduce()
+    #     # unused_post.show()
 
 
     def testExtractionD(self):

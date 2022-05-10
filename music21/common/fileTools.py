@@ -3,10 +3,10 @@
 # Name:         common/fileTools.py
 # Purpose:      Utilities for files
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -78,7 +78,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
     Slow, but will read a file of unknown encoding as safely as possible using
     the chardet package.
 
-    Let's try to load this file as ascii -- it has a copyright symbol at the top
+    Let's try to load this file as ascii -- it has a copyright symbol at the top,
     so it won't load in Python3:
 
     >>> import os
@@ -96,7 +96,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
     >>> data[0:30]
     '# -*- coding: utf-8 -*-\n# ----'
 
-    Well, that's nothing, since the first guess here is utf-8 and it's right. So let's
+    Well, that's nothing, since the first guess here is utf-8, and it's right. So let's
     give a worse first guess:
 
     >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS')  # old Japanese standard

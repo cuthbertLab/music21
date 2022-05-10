@@ -4,9 +4,9 @@
 # Purpose:      Tools for working with meter
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2015, 2021 Michael Scott Cuthbert
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 #               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -24,7 +24,7 @@ from music21.exceptions21 import MeterException, Music21Exception, TimeSignature
 environLocal = environment.Environment('meter.tools')
 
 MeterTerminalTuple = collections.namedtuple('MeterTerminalTuple',
-                                            'numerator denominator division')
+                                            ['numerator', 'denominator', 'division'])
 NumDenom = Tuple[int, int]
 NumDenomTuple = Tuple[NumDenom, ...]
 MeterOptions = Tuple[Tuple[str, ...], ...]
@@ -219,7 +219,7 @@ def fractionToSlashMixed(fList: NumDenomTuple) -> Tuple[Tuple[str, int], ...]:
 def fractionSum(numDenomTuple: NumDenomTuple) -> NumDenom:
     '''
     Given a tuple of tuples of numerator and denominator,
-    find the sum; does NOT reduce to lowest terms.
+    find the sum; does NOT reduce to its lowest terms.
 
     >>> from music21.meter.tools import fractionSum
     >>> fractionSum(((3, 8), (5, 8), (1, 8)))
@@ -234,8 +234,8 @@ def fractionSum(numDenomTuple: NumDenomTuple) -> NumDenom:
     (0, 1)
 
     This method might seem like an easy place to optimize and simplify
-    by just doing a fractions.Fraction() sum (I tried!), but not reducing to lowest
-    terms is a feature of this method. 3/8 + 3/8 = 6/8, not 3/4:
+    by just doing a fractions.Fraction() sum (I tried!), but not reducing to
+    its lowest terms is a feature of this method. 3/8 + 3/8 = 6/8, not 3/4:
 
     >>> fractionSum(((3, 8), (3, 8)))
     (6, 8)
@@ -610,7 +610,7 @@ def divisionOptionsAlgo(n, d) -> MeterOptions:
     # add src representation
     opts.append((f'{n}/{d}',))
     # additive multiples with the same denominators
-    # add to opts in-place
+    # add to "opts" in-place
     opts.extend(divisionOptionsAdditiveMultiples(n, d))
     # additive multiples with smaller denominators
     # only doing this for numerators of 1 for now

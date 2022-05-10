@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         notation.py
-# Purpose:      music21 class for conveniently representing figured bass notation
+# Purpose:      representations of figured bass notation
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -590,8 +590,8 @@ def convertToPitch(pitchString):
     Converts a pitchString to a :class:`~music21.pitch.Pitch`, only if necessary.
 
     >>> from music21.figuredBass import notation
-    >>> pitchString = 'C5'
-    >>> notation.convertToPitch(pitchString)
+    >>> pitchStr = 'C5'
+    >>> notation.convertToPitch(pitchStr)
     <music21.pitch.Pitch C5>
     >>> notation.convertToPitch(pitch.Pitch('E4'))  # does nothing
     <music21.pitch.Pitch E4>

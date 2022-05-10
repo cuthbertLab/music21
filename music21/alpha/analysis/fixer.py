@@ -5,7 +5,7 @@
 #
 # Authors:      Emily Zhang
 #
-# Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest
@@ -23,8 +23,7 @@ from music21 import pitch
 from music21 import stream
 
 # noinspection PyShadowingBuiltins
-_T = TypeVar('_T')
-
+OMRMidiFixerType = TypeVar('OMRMidiFixerType', bound='OMRMidiFixer')
 
 class OMRMidiFixer:
     '''
@@ -63,7 +62,7 @@ class DeleteFixer(OMRMidiFixer):
         for (midiRef, omrRef, op) in self.changes:
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
-            # if the are the same, don't bother to try changing it
+            # if they are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
             if isinstance(op, aligner.ChangeOps) and op == aligner.ChangeOps.NoChange:
                 continue
@@ -246,7 +245,7 @@ class EnharmonicFixer(OMRMidiFixer):
             # if they're not notes, don't bother with rest
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
-            # if the are the same, don't bother to try changing it
+            # if they are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
             if isinstance(op, aligner.ChangeOps) and op == aligner.ChangeOps.NoChange:
                 continue
@@ -392,9 +391,9 @@ class OrnamentFixer(OMRMidiFixer):
             return True
         return False
 
-    def fix(self: _T, *, show=False, inPlace=True) -> Optional[_T]:
+    def fix(self: OMRMidiFixerType, *, show=False, inPlace=True) -> Optional[OMRMidiFixerType]:
         '''
-        Corrects missed ornaments in omr stream according to mid stream
+        Corrects missed ornaments in omrStream according to midiStream
         :param show: Whether to show results
         :param inPlace: Whether to make changes to own omr stream or
         return a new OrnamentFixer with changes
@@ -443,6 +442,8 @@ class OrnamentFixer(OMRMidiFixer):
 
         if not inPlace:
             return TrillFixer(sa.changes, sa.targetStream, sa.sourceStream)
+        else:
+            return None
 
 def getNotesWithinDuration(startingGeneralNote, totalDuration, referenceStream=None):
     '''

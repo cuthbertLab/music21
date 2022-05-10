@@ -3,10 +3,10 @@
 # Name:         testSerialization.py
 # Purpose:      tests for serializing music21 objects
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2012-13 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-13 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -17,8 +17,7 @@ import music21  # needed to do fully-qualified isinstance name checking
 from music21 import freezeThaw
 
 from music21 import environment
-_MOD = 'test.testSerialization'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('test.testSerialization')
 
 
 # ------------------------------------------------------------------------------
@@ -130,8 +129,8 @@ class Test(unittest.TestCase):
         temp = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(temp)
         self.assertEqual(len(sPost.parts), 2)
-        self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
-        self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
+        self.assertEqual(len(sPost.parts[0].getElementsByClass(stream.Measure)), 3)
+        self.assertEqual(len(sPost.parts[1].getElementsByClass(stream.Measure)), 3)
         self.assertEqual(len(sPost.recurse().notes), 24)
 
     def testBasicI(self):
@@ -153,8 +152,8 @@ class Test(unittest.TestCase):
         temp = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(temp)
         self.assertEqual(len(sPost.parts), 2)
-        self.assertEqual(len(sPost.parts[0].getElementsByClass('Measure')), 3)
-        self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
+        self.assertEqual(len(sPost.parts[0].getElementsByClass(stream.Measure)), 3)
+        self.assertEqual(len(sPost.parts[1].getElementsByClass(stream.Measure)), 3)
         self.assertEqual(len(sPost.recurse().notes), 24)
 
     def testSpannerSerializationOfNotesNotInPickle(self):
