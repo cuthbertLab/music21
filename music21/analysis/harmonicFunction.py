@@ -9,7 +9,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-from typing import Union
+from typing import Optional, Union
 import unittest
 
 from music21 import common
@@ -113,9 +113,10 @@ functionFigureTuplesMinor = {
 
 
 def functionToRoman(thisHarmonicFunction: HarmonicFunction,
-                    keyOrScale: Union[key.Key, scale.Scale, str] = 'C'):
+                    keyOrScale: Union[key.Key, scale.Scale, str] = 'C'
+                    ) -> Optional[roman.RomanNumeral]:
     '''
-    Takes an harmonic function labels (such as 'T' for major tonic)
+    Takes harmonic function labels (such as 'T' for major tonic)
     with a key (keyOrScale, default = 'C') and
     returns the corresponding :class:`~music21.roman.RomanNumeral` object.
 
@@ -123,7 +124,7 @@ def functionToRoman(thisHarmonicFunction: HarmonicFunction,
     <music21.roman.RomanNumeral I in C major>
 
     The harmonicFunction argument can be a string (as shown),
-    though stictly speaking, it's handled through a special HarmonicFunction enum object.
+    though strictly speaking, it's handled through a special HarmonicFunction enum object.
 
     >>> fn = analysis.harmonicFunction.HarmonicFunction.TONIC_MAJOR
     >>> str(fn)
@@ -198,16 +199,16 @@ def functionToRoman(thisHarmonicFunction: HarmonicFunction,
     if keyOrScale.mode == 'minor':
         referenceTuples = functionFigureTuplesMinor
 
-    for thisKey, thisValue in referenceTuples.items():
-        if thisHarmonicFunction == thisKey:
-            return roman.RomanNumeral(thisValue, keyOrScale)
-
-    return False
+    try:
+        figure = referenceTuples[thisHarmonicFunction]
+    except KeyError:
+        return None
+    return roman.RomanNumeral(figure, keyOrScale)
 
 
 def romanToFunction(rn: roman.RomanNumeral,
                     onlyHauptHarmonicFunction: bool = False
-                    ):
+                    ) -> Optional[HarmonicFunction]:
     '''
     Takes a Roman numeral and returns a corresponding harmonic function label.
 
@@ -261,7 +262,7 @@ def romanToFunction(rn: roman.RomanNumeral,
             else:
                 return thisKey
 
-    return False
+    return None
 
 
 # ------------------------------------------------------------------------------
@@ -291,8 +292,14 @@ class Test(unittest.TestCase):
 
     def testSimplified(self):
         rn = roman.RomanNumeral('III', 'f')
-        self.assertEqual(str(romanToFunction(rn)), 'tP')
-        self.assertEqual(str(romanToFunction(rn, onlyHauptHarmonicFunction=True)), 't')
+
+        fn1 = romanToFunction(rn)
+        self.assertIs(fn1, HarmonicFunction.TONIC_MINOR_PARALLELKLANG_MAJOR)
+        self.assertEqual(str(fn1), 'tP')
+
+        fn2 = romanToFunction(rn, onlyHauptHarmonicFunction=True)
+        self.assertIs(fn2, HarmonicFunction.TONIC_MINOR)
+        self.assertEqual(str(fn2), 't')
 
     def testIgnoresInversion(self):
         self.assertEqual(romanToFunction(roman.RomanNumeral('i6')), 't')
