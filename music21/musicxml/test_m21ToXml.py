@@ -12,6 +12,7 @@ from music21 import articulations
 from music21 import common
 from music21 import converter
 from music21 import corpus
+from music21 import defaults
 from music21 import duration
 from music21 import dynamics
 from music21 import harmony
@@ -439,6 +440,23 @@ class Test(unittest.TestCase):
         tree = self.getET(newAltoFixed)
         self.assertTrue(tree.findall('.//note'))
         self.assertFalse(tree.findall('.//forward'))
+
+    def testOutOfBoundsExpressionDoesNotCreateForward(self):
+        '''
+        A metronome mark at an offset exceeding the bar duration was causing
+        <forward> tags, i.e. hidden rests. Prefer <offset> instead.
+        '''
+        m = stream.Measure()
+        m.append(meter.TimeSignature('1/4'))
+        m.append(note.Rest())
+        m.insert(2, tempo.MetronomeMark('slow', 40))
+
+        gex = GeneralObjectExporter()
+        tree = self.getET(gex.fromGeneralObject(m))
+        self.assertFalse(tree.findall('.//forward'))
+        self.assertEqual(
+            int(tree.findall('.//direction/offset')[0].text),
+            defaults.divisionsPerQuarter)
 
     def testExportChordSymbolsWithRealizedDurations(self):
         gex = GeneralObjectExporter()

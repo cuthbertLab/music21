@@ -3074,8 +3074,9 @@ class MeasureExporter(XMLExporterBase):
             groupOffset = m.elementOffset(objGroup[0])
             amountToMoveForward = int(round(divisions * (groupOffset
                                                              - self.offsetInMeasure)))
-            if amountToMoveForward > 0:
-                # gap in stream!
+            if amountToMoveForward > 0 and any(
+                    isinstance(obj, note.GeneralNote) for obj in objGroup):
+                # gap in stream between GeneralNote objects: create <forward>
                 mxForward = Element('forward')
                 mxDuration = SubElement(mxForward, 'duration')
                 mxDuration.text = str(amountToMoveForward)
@@ -5277,17 +5278,20 @@ class MeasureExporter(XMLExporterBase):
             mxOffset.set('sound', 'yes')  # always affects sound at location in measure.
         return mxOffset
 
-    def placeInDirection(self, mxObj, m21Obj=None):
+    def placeInDirection(self, mxObj, m21Obj=None, *, setSound=True):
         '''
-        places the mxObj <element> inside <direction><direction-type>
+        Places the mxObj <element> inside <direction><direction-type>
+        and sets <offset> if needed.
+
+        Changed in v8 -- added `setSound` keyword (see :meth:`setOffsetOptional`).
         '''
         mxDirection = Element('direction')
         mxDirectionType = SubElement(mxDirection, 'direction-type')
         mxDirectionType.append(mxObj)
-        if (m21Obj is not None
-                and hasattr(m21Obj, 'placement')
-                and m21Obj.placement is not None):
-            mxDirection.set('placement', m21Obj.placement)
+        if m21Obj is not None:
+            if hasattr(m21Obj, 'placement') and m21Obj.placement is not None:
+                mxDirection.set('placement', m21Obj.placement)
+            self.setOffsetOptional(m21Obj, mxDirection, setSound=setSound)
 
         return mxDirection
 
@@ -5348,9 +5352,8 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attrGroup: text-decoration
         # TODO: attrGroup: enclosure
 
-        mxDirection = self.placeInDirection(mxDynamics, d)
+        mxDirection = self.placeInDirection(mxDynamics, d)  # also handles offset
         # direction todos
-        self.setOffsetOptional(d, mxDirection)
         self.setEditorial(mxDirection, d)
         # TODO: voice
         # staff: see joinPartStaffs()
@@ -5659,8 +5662,7 @@ class MeasureExporter(XMLExporterBase):
 
         self.setTextFormatting(mxWords, te)
 
-        mxDirection = self.placeInDirection(mxWords, te)
-        self.setOffsetOptional(te, mxDirection, setSound=False)
+        mxDirection = self.placeInDirection(mxWords, te, setSound=False)  # handles offset
         self.xmlRoot.append(mxDirection)
         return mxDirection
 
