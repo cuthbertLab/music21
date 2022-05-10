@@ -3087,9 +3087,7 @@ class MeasureExporter(XMLExporterBase):
             notesForLater = []
             for obj in objGroup:
                 # we do all non-note elements (including ChordSymbols)
-                # first before note elements, in musicxml;
-                # that way chord symbols and other 0-width objects appear before
-                # notes as much as possible.
+                # first before note elements, in musicxml
                 if isinstance(obj, note.GeneralNote) and not isinstance(obj, harmony.Harmony):
                     notesForLater.append(obj)
                 else:
