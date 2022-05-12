@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------------
 import unittest
 from copy import deepcopy
-from typing import Optional, TypeVar
+from typing import Optional
 
 from music21.alpha.analysis import aligner
 from music21.alpha.analysis import ornamentRecognizer
@@ -22,8 +22,6 @@ from music21 import note
 from music21 import pitch
 from music21 import stream
 
-# noinspection PyShadowingBuiltins
-OMRMidiFixerType = TypeVar('OMRMidiFixerType', bound='OMRMidiFixer')
 
 class OMRMidiFixer:
     '''
@@ -391,7 +389,7 @@ class OrnamentFixer(OMRMidiFixer):
             return True
         return False
 
-    def fix(self: OMRMidiFixerType, *, show=False, inPlace=True) -> Optional[OMRMidiFixerType]:
+    def fix(self, *, show=False, inPlace=True) -> Optional[OMRMidiFixer]:
         '''
         Corrects missed ornaments in omrStream according to midiStream
         :param show: Whether to show results
@@ -399,7 +397,7 @@ class OrnamentFixer(OMRMidiFixer):
         return a new OrnamentFixer with changes
         '''
         changes = self.changes
-        sa = None
+        sa: Optional[aligner.StreamAligner] = None
         omrNotesLabeledOrnament = []
         midiNotesAlreadyFixedForOrnament = []
 
@@ -440,7 +438,8 @@ class OrnamentFixer(OMRMidiFixer):
             self.omrStream.show()
             self.midiStream.show()
 
-        if not inPlace:
+        if not inPlace and sa is not None:
+            # the "and sa is not None" is just for mypy/typing.
             return TrillFixer(sa.changes, sa.targetStream, sa.sourceStream)
         else:
             return None

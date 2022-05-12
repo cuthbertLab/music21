@@ -13,6 +13,7 @@ from copy import deepcopy
 from typing import List, Optional, Union
 
 from music21.common.numberTools import opFrac
+from music21.common.types import OffsetQL
 from music21 import duration
 from music21 import expressions
 from music21 import interval
@@ -47,7 +48,7 @@ class OrnamentRecognizer:
         self,
         busyNotes: List[note.GeneralNote],
         simpleNotes: Optional[List[note.GeneralNote]] = None
-    ):
+    ) -> OffsetQL:
         '''
         Returns total length of trill assuming busy notes are all an expanded trill.
         This is either the time of all busy notes combined or
@@ -55,7 +56,7 @@ class OrnamentRecognizer:
         '''
         if simpleNotes:
             return simpleNotes[0].duration.quarterLength
-        trillQl = 0
+        trillQl: OffsetQL = 0.0
         for n in busyNotes:
             trillQl += float(n.duration.quarterLength)
         return opFrac(trillQl)
