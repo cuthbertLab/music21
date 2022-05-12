@@ -40,7 +40,7 @@ Keywords:
 
 
 The rest of the keywords are segment keywords. A segment is "a group of measures occupying
-more than one braille line." Music is divided into segments so as to "present the music to
+more than one braille line." Music is divided into segments to "present the music to
 the reader in a meaningful manner and to give him convenient reference points to use in
 memorization" (BMTM, 71). Some of these keywords are changed automatically in context.
 
@@ -94,6 +94,7 @@ import unittest
 
 from typing import Optional, Union
 
+from music21 import base
 from music21 import exceptions21
 from music21 import metadata
 from music21 import stream
@@ -104,8 +105,7 @@ from music21.braille import segment
 
 
 # -----------------------------------------------------------------------------
-
-def objectToBraille(music21Obj,
+def objectToBraille(music21Obj: base.Music21Object,
                     *,
                     inPlace=False,
                     debug=False,
@@ -178,7 +178,7 @@ def objectToBraille(music21Obj,
     Traceback (most recent call last):
     music21.braille.translate.BrailleTranslateException: Stream cannot be translated to Braille.
     '''
-    if isinstance(music21Obj, stream.Stream) and not isinstance(music21Obj, stream.Voice):
+    if isinstance(music21Obj, (stream.Opus, stream.Score, stream.Part, stream.Measure)):
         return streamToBraille(music21Obj,
                                inPlace=inPlace,
                                debug=debug,
@@ -386,7 +386,7 @@ def scoreToBraille(music21Score,
         nonlocal unprocessed_partStaff
         if unprocessed_partStaff is None:
             return
-        braillePart = partToBraille(unprocessed_partStaff,
+        braillePrt2 = partToBraille(unprocessed_partStaff,
                                     inPlace=inPlace,
                                     debug=debug,
                                     cancelOutgoingKeySig=cancelOutgoingKeySig,
@@ -404,7 +404,7 @@ def scoreToBraille(music21Score,
                                     suppressOctaveMarks=suppressOctaveMarks,
                                     upperFirstInNoteFingering=upperFirstInNoteFingering,
                                     )
-        allBrailleLines.append(braillePart)
+        allBrailleLines.append(braillePrt2)
         unprocessed_partStaff = None
 
     for p in music21Score.getElementsByClass(stream.Part):  # also finds stream.PartStaff
