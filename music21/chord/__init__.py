@@ -13,11 +13,14 @@
 This module defines the Chord object, a subclass of :class:`~music21.note.GeneralNote`
 as well as other methods, functions, and objects related to chords.
 '''
+from __future__ import annotations
+
 __all__ = ['tables', 'Chord', 'ChordException', 'fromIntervalVector', 'fromForteClass']
 
 import copy
 import unittest
-from typing import Union, List, Optional, TypeVar, Set, Tuple, Dict
+from typing import (Union, List, Optional, TypeVar, Set, Tuple, Dict,
+                    Sequence, overload)
 
 from music21 import beam
 from music21 import common
@@ -36,7 +39,7 @@ from music21.common.decorators import cacheMethod
 
 environLocal = environment.Environment('chord')
 
-_ChordType = TypeVar('_ChordType')
+_ChordType = TypeVar('_ChordType', bound='music21.chord.Chord')
 
 
 # ------------------------------------------------------------------------------
@@ -56,7 +59,7 @@ class ChordBase(note.NotRest):
     isNote = False
     isRest = False
 
-    _DOC_ATTR = {
+    _DOC_ATTR: Dict[str, str] = {
         'isNote': '''
             Boolean read-only value describing if this
             GeneralNote object is a Note. Is False''',
@@ -75,9 +78,13 @@ class ChordBase(note.NotRest):
     # update inherited _DOC_ATTR dictionary
     _DOC_ATTR.update(note.NotRest._DOC_ATTR)
 
-    def __init__(self, notes=None, **keywords):
+    def __init__(self,
+                 notes: Union[None, str, List[str], List[note.NotRest], List[int]] = None,
+                 **keywords):
+
         if notes is None:
             notes = []
+
         if isinstance(notes, str):
             if ' ' in notes:
                 notes = notes.split()
@@ -87,14 +94,7 @@ class ChordBase(note.NotRest):
         # the list of pitch objects is managed by a property; this permits
         # only updating the _chordTablesAddress when ".pitches" has changed
 
-        # duration looks at _notes to get first duration of a pitch
-        # if no other pitches are defined
-
-        # a list of dictionaries; each storing pitch, tie, and volume objects
-        # one for each component of the chord
         self._overrides = {}
-        # self._cache is now defined on Music21Object.
-        # self._cache = {}
 
         self._notes: List[note.NotRest] = []
         # here, pitch and duration data is extracted from notes
@@ -505,10 +505,10 @@ class ChordBase(note.NotRest):
         else:
             raise ChordException(f'unhandled setting expr: {expr}')
 
+
     # --------------------------------------------------------------------------
     # volume per pitch ??
     # --------------------------------------------------------------------------
-
     def setVolume(self, vol, pitchTarget=None):
         '''
         Set the :class:`~music21.volume.Volume` object of a specific pitch
@@ -532,7 +532,6 @@ class ChordBase(note.NotRest):
 
 
 # ------------------------------------------------------------------------------
-
 class Chord(ChordBase):
     '''
     Class representing Chords
@@ -666,12 +665,15 @@ class Chord(ChordBase):
     # update inherited _DOC_ATTR dictionary
     _DOC_ATTR.update(ChordBase._DOC_ATTR)
 
-    # INITIALIZER #
 
-    def __init__(self, notes=None, **keywords):
-        if notes is not None and any(isinstance(n, note.Unpitched) for n in notes):
+    # INITIALIZER #
+    def __init__(self,
+                 notes: Union[None, List[note.Note], List[str], str, List[int]] = None,
+                 **keywords):
+        if notes is not None and any(not isinstance(n, note.Note) for n in notes):
             raise TypeError(f'Use a PercussionChord to contain Unpitched objects; got {notes}')
         super().__init__(notes=notes, **keywords)
+        self._notes: List[note.Note]
 
         if notes is not None and all(isinstance(n, int) for n in notes):
             self.simplifyEnharmonics(inPlace=True)
@@ -859,7 +861,6 @@ class Chord(ChordBase):
         >>> c[-1].style.color
         'red'
 
-
         >>> c[0] = None
         Traceback (most recent call last):
         ValueError: Chord index must be set to a valid note object
@@ -928,8 +929,7 @@ class Chord(ChordBase):
         return ''.join(msg)
 
     # PRIVATE METHODS #
-
-    def _findBass(self) -> pitch.Pitch:
+    def _findBass(self) -> Optional[pitch.Pitch]:
         '''
         Returns the lowest Pitch in the chord.
 
@@ -941,7 +941,6 @@ class Chord(ChordBase):
         >>> cmaj = chord.Chord(['C4', 'E3', 'G4'])
         >>> cmaj._findBass()
         <music21.pitch.Pitch E3>
-
         '''
         lowest = None
         for thisPitch in self.pitches:
@@ -1182,8 +1181,26 @@ class Chord(ChordBase):
             return True
         return False
 
+    @overload
     def bass(self,
-             newbass: Union[bool, str, pitch.Pitch, note.Note] = None,
+             newbass: None = None,
+             *,
+             find: Union[bool, None] = None,
+             allow_add: bool = False,
+             ) -> pitch.Pitch:
+        return self.pitches[0]  # dummy until Astroid 1015 is fixed.
+
+    @overload
+    def bass(self,
+             newbass: Union[str, pitch.Pitch, note.Note],
+             *,
+             find: Union[bool, None] = None,
+             allow_add: bool = False,
+             ) -> None:
+        return None
+
+    def bass(self,
+             newbass: Union[None, str, pitch.Pitch, note.Note] = None,
              *,
              find: Union[bool, None] = None,
              allow_add: bool = False,
@@ -1276,39 +1293,46 @@ class Chord(ChordBase):
 
         '''
         if newbass:
+            newbassPitch: pitch.Pitch
             if isinstance(newbass, str):
                 newbass = common.cleanedFlatNotation(newbass)
-                newbass = pitch.Pitch(newbass)
+                newbassPitch = pitch.Pitch(newbass)
+            elif isinstance(newbass, pitch.Pitch):
+                newbassPitch = newbass
+            elif isinstance(newbass, note.Note):
+                newbassPitch = newbass.pitch
+            else:
+                raise ChordException(f'newbass should be a Pitch, not {type(newbass)}')
 
             # try to set newbass to be a pitch in the chord if possible
             foundBassInChord: bool = False
             for p in self.pitches:  # first by identity
-                if newbass is p:
+                if newbassPitch is p:
                     foundBassInChord = True
                     break
 
             if not foundBassInChord:
                 for p in self.pitches:  # then by name with octave
-                    if p.nameWithOctave == newbass.nameWithOctave:
-                        newbass = p
+                    if p.nameWithOctave == newbassPitch.nameWithOctave:
+                        newbassPitch = p
                         foundBassInChord = True
                         break
 
             if not foundBassInChord:  # finally by name
                 for p in self.pitches:
-                    if p.name == newbass.name:
+                    if p.name == newbassPitch.name:
                         foundBassInChord = True
-                        newbass = p
+                        newbassPitch = p
                         break
 
             if not foundBassInChord:  # it's not there, needs to be added
                 if not allow_add:
                     raise ChordException(f'Pitch {newbass} not found in chord')
 
-                self.pitches = (newbass, *(p for p in self.pitches))
+                self.pitches = (newbassPitch, *(p for p in self.pitches))
 
-            self._overrides['bass'] = newbass
-            self._cache['bass'] = newbass
+            self._overrides['bass'] = newbassPitch
+            self._cache['bass'] = newbassPitch
             if 'inversion' in self._cache:
                 del self._cache['inversion']
             # reset inversion if bass changes
@@ -1758,14 +1782,19 @@ class Chord(ChordBase):
         Traceback (most recent call last):
         music21.chord.ChordException: Cannot run getChordStep without a root
         '''
+        testRootPitch: pitch.Pitch
         if testRoot is None:
-            testRoot = self.root()  # raises ChordException if no pitches
-            if testRoot is None:  # if root was overridden to be None
+            testRootPitch = self.root()  # raises ChordException if no pitches
+            if testRootPitch is None:  # if root was overridden to be None
                 raise ChordException('Cannot run getChordStep without a root')
         elif isinstance(testRoot, note.Note):
-            testRoot = testRoot.pitch
+            testRootPitch = testRoot.pitch
+        elif isinstance(testRoot, pitch.Pitch):
+            testRootPitch = testRoot
+        else:
+            raise ChordException(f'testRoot should be a Pitch, not {type(testRoot)}')
 
-        rootDNN = testRoot.diatonicNoteNum
+        rootDNN = testRootPitch.diatonicNoteNum
         for thisPitch in self.pitches:
             diatonicDistance = ((thisPitch.diatonicNoteNum - rootDNN) % 7) + 1
             if diatonicDistance == chordStep:
@@ -1985,7 +2014,7 @@ class Chord(ChordBase):
         except KeyError:
             raise ChordException(f'the given pitch is not in the Chord: {p}')
 
-    def getZRelation(self: _ChordType) -> Optional[_ChordType]:
+    def getZRelation(self) -> Optional[Chord]:
         '''
         Return a Z relation if it exists, otherwise return None.
 
@@ -2170,6 +2199,28 @@ class Chord(ChordBase):
                 return thisInterval
         return None
 
+    @overload
+    def inversion(
+        self,
+        newInversion: int,
+        *,
+        find: bool = True,
+        testRoot: Optional[pitch.Pitch] = None,
+        transposeOnSet: bool = True
+    ) -> None:
+        return None  # dummy until Astroid 1015 is fixed
+
+    @overload
+    def inversion(
+        self,
+        newInversion: None = None,
+        *,
+        find: bool = True,
+        testRoot: Optional[pitch.Pitch] = None,
+        transposeOnSet: bool = True
+    ) -> int:
+        return -1  # dummy until Astroid 1015 is fixed
+
     def inversion(
         self,
         newInversion: Optional[int] = None,
@@ -2265,10 +2316,11 @@ class Chord(ChordBase):
         Traceback (most recent call last):
         music21.chord.ChordException: Inversion must be an integer, got: <class 'str'>
 
-        Chords without pitches return None:
+        Chords without pitches or otherwise impossible chords return -1, indicating
+        no normal inversion.
 
-        >>> print(chord.Chord().inversion(testRoot=pitch.Pitch('C5')))
-        None
+        >>> chord.Chord().inversion(testRoot=pitch.Pitch('C5'))
+        -1
 
         For Harmony subclasses, this method does not check to see if
         the inversion is reasonable according to the figure provided.
@@ -2283,14 +2335,14 @@ class Chord(ChordBase):
         >>> chord.Chord('G4 C5').inversion()
         2
 
-
         If transposeOnSet is False then setting the inversion simply
         sets the value to be returned later, which might be useful for
         cases where the chords are poorly spelled, or there is an added note.
 
+        Changed in v.8 -- chords without pitches
         '''
         if not self.pitches:
-            return
+            return -1
 
         if testRoot is not None:
             rootPitch = testRoot
@@ -2298,16 +2350,16 @@ class Chord(ChordBase):
             rootPitch = self.root()
 
         if newInversion is not None:
-            if not common.isNum(newInversion):
-                try:
-                    newInversion = int(newInversion)
-                except:
-                    raise ChordException(f"Inversion must be an integer, got: {type(newInversion)}")
-            return self._setInversion(newInversion, rootPitch, transposeOnSet)
+            try:
+                int_newInversion = int(newInversion)
+            except (ValueError, TypeError):
+                raise ChordException(f"Inversion must be an integer, got: {type(newInversion)}")
+            self._setInversion(int_newInversion, rootPitch, transposeOnSet)
+            return None
         elif ('inversion' not in self._overrides and find) or testRoot is not None:
             try:
                 if rootPitch is None or self.bass() is None:
-                    return None
+                    return -1
             except ChordException:
                 raise ChordException('Not a normal inversion')  # can this be run?
 
@@ -2315,7 +2367,7 @@ class Chord(ChordBase):
         elif 'inversion' in self._overrides:
             return self._overrides['inversion']
         else:
-            return None
+            return -1
 
     def _setInversion(self,
                       newInversion: int,
@@ -2342,10 +2394,9 @@ class Chord(ChordBase):
             currentMaxMidi = max(self.pitches).ps
             tempBassPitch = self.bass()
             while tempBassPitch.ps < currentMaxMidi:
-                try:
-                    # will this work with implicit octave chords???
+                if tempBassPitch.octave is not None:
                     tempBassPitch.octave += 1
-                except TypeError:
+                else:
                     tempBassPitch.octave = tempBassPitch.implicitOctave + 1
 
             # housekeeping for next loop tests
@@ -2387,7 +2438,7 @@ class Chord(ChordBase):
         elif bassToRoot == 3:  # thirteenth
             inv = 6
         else:
-            inv = None  # no longer raise an exception if not normal inversion
+            inv = -1  # no longer raise an exception if not normal inversion
 
         # is this cache worth it? or more trouble than it's worth...
         self._cache['inversion'] = inv
@@ -3642,6 +3693,22 @@ class Chord(ChordBase):
         return self._removePitchByRedundantAttribute('name',
                                                      inPlace=inPlace)
 
+    @overload
+    def root(self,
+             newroot: None = None,
+             *,
+             find: Union[bool, None] = None
+             ) -> pitch.Pitch:
+        return self.pitches[0]  # dummy until Astroid 1015 is fixed.
+
+    @overload
+    def root(self,
+             newroot: Union[str, pitch.Pitch, note.Note],
+             *,
+             find: Union[bool, None] = None
+             ) -> None:
+        return None  # dummy until Astroid 1015 is fixed.
+
     def root(self,
              newroot: Union[None, str, pitch.Pitch, note.Note] = None,
              *,
@@ -3778,38 +3845,45 @@ class Chord(ChordBase):
         # None value for find indicates: return override if overridden, cache if cached
         # or find new value if neither is the case.
         if newroot:
+            newroot_pitch: pitch.Pitch
             if isinstance(newroot, str):
                 newroot = common.cleanedFlatNotation(newroot)
-                newroot = pitch.Pitch(newroot)
+                newroot_pitch = pitch.Pitch(newroot)
             elif isinstance(newroot, note.Note):
-                newroot = newroot.pitch
+                newroot_pitch = newroot.pitch
+            elif isinstance(newroot, pitch.Pitch):
+                newroot_pitch = newroot
+            else:
+                raise ValueError(f'Cannot find a Pitch in {newroot!r}')
 
             # try to set newroot to be a pitch in the chord if possible
             foundRootInChord = False
             for p in self.pitches:  # first by identity
-                if newroot is p:
+                if newroot_pitch is p:
                     foundRootInChord = True
                     break
 
             if not foundRootInChord:
                 for p in self.pitches:  # then by name with octave
-                    if p.nameWithOctave == newroot.nameWithOctave:
-                        newroot = p
+                    if p.nameWithOctave == newroot_pitch.nameWithOctave:
+                        newroot_pitch = p
                         foundRootInChord = True
                         break
 
             if not foundRootInChord:  # finally by name
                 for p in self.pitches:
-                    if p.name == newroot.name:
-                        newroot = p
+                    if p.name == newroot_pitch.name:
+                        newroot_pitch = p
                         break
 
-            self._overrides['root'] = newroot
-            self._cache['root'] = newroot
+            self._overrides['root'] = newroot_pitch
+            self._cache['root'] = newroot_pitch
 
             if 'inversion' in self._cache:
                 del self._cache['inversion']
                 # reset inversion if root changes
+            return None
+
         elif find is True:
             if 'root' in self._overrides:
                 del self._overrides['root']
@@ -5413,7 +5487,7 @@ class Chord(ChordBase):
             return f'{rootName}-{nameStr}'
 
     @property
-    def pitches(self) -> Tuple[pitch.Pitch]:
+    def pitches(self) -> Tuple[pitch.Pitch, ...]:
         '''
         Get or set a list or tuple of all Pitch objects in this Chord.
 
@@ -5744,7 +5818,7 @@ class Chord(ChordBase):
 
 
 
-def fromForteClass(notation):
+def fromForteClass(notation: Union[str, Sequence[int]]) -> Chord:
     '''
     Return a Chord given a Forte-class notation. The Forte class can be
     specified as string (e.g., 3-11) or as a list of cardinality and number
@@ -5772,8 +5846,8 @@ def fromForteClass(notation):
         if '-' in notation:
             notationParts = notation.split('-')
             card = int(notationParts[0])
-            num, chars = common.getNumFromStr(notationParts[1])
-            num = int(num)
+            str_num, chars = common.getNumFromStr(notationParts[1])
+            num = int(str_num)
             if 'a' in chars.lower():
                 inv = 1
             elif 'b' in chars.lower():
@@ -6615,7 +6689,8 @@ class Test(unittest.TestCase):
     def testChordCannotContainUnpitched(self):
         msg = r'Use a PercussionChord to contain Unpitched objects; got \[<music21.note.Unpitched'
         with self.assertRaisesRegex(TypeError, msg):
-            Chord([note.Unpitched()])
+            # noinspection PyTypeChecker
+            Chord([note.Unpitched()])  # type: ignore
 
 
 # ------------------------------------------------------------------------------
