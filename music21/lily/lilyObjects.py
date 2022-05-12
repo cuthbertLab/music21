@@ -129,7 +129,7 @@ class LyObject(prebase.ProtoM21Object):
 
         >>> lilyAttributes = lm.setAttributes(m)
         >>> for x in sorted(lilyAttributes.keys()):
-        ...    print('%s: %s' % (x, lilyAttributes[x]))
+        ...    print(f'{x}: {lilyAttributes[x]}')
         mock-attribute: 32
         mock-attribute-2: None
 
@@ -164,7 +164,7 @@ class LyObject(prebase.ProtoM21Object):
         to LyMock.lilyAttributes:
 
         >>> for x in sorted(lm.m21toLy['Mock'].keys()):
-        ...    print('%s: %s' % (x, lm.m21toLy['Mock'][x]))
+        ...    print(f"{x}: {lm.m21toLy['Mock'][x]}")
         mockAttribute: mock-attribute
         mockAttribute2: mock-attribute-2
 
@@ -172,22 +172,19 @@ class LyObject(prebase.ProtoM21Object):
         Some of these attributes have defaults:
 
         >>> for x in sorted(lm.defaultAttributes.keys()):
-        ...    print('%s: %s' % (x, lm.defaultAttributes[x]))
+        ...    print(f'{x}: {lm.defaultAttributes[x]}')
         mockAttribute2: 7
 
 
         >>> m.mockAttribute = 'hello'
-
-
         >>> lilyAttributes = lm.setAttributesFromClassObject('Mock', m)
         >>> for x in sorted(lilyAttributes.keys()):
-        ...    print('%s: %s' % (x, lilyAttributes[x]))
+        ...    print(f'{x}: {lilyAttributes[x]}')
         mock-attribute: hello
         mock-attribute-2: 7
 
         >>> lilyAttributes is lm.lilyAttributes
         True
-
         '''
         if classLookup not in self.m21toLy:  # pragma: no cover
             raise LilyObjectsException(

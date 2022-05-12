@@ -14,7 +14,7 @@ import collections
 import fractions
 from functools import lru_cache
 import re
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List, TYPE_CHECKING
 
 from music21 import common
 from music21 import environment
@@ -34,7 +34,7 @@ validDenominatorsSet = set(validDenominators)
 
 
 @lru_cache(512)
-def slashToTuple(value: str) -> Optional[MeterTerminalTuple]:
+def slashToTuple(value: str) -> MeterTerminalTuple:
     '''
     Returns a three-element MeterTerminalTuple of numerator, denominator, and optional
     division of the meter.
@@ -63,9 +63,8 @@ def slashToTuple(value: str) -> Optional[MeterTerminalTuple]:
         n = int(matches.group(1))
         d = int(matches.group(2))
         return MeterTerminalTuple(n, d, division)
-    else:
-        environLocal.printDebug(['slashToTuple() cannot find two part fraction', value])
-        return None
+
+    raise MeterException(f'slashToTuple() cannot find two part fraction for {value}')
 
 
 @lru_cache(512)
@@ -82,15 +81,15 @@ def slashCompoundToFraction(value: str) -> NumDenomTuple:
 
     Changed in v7 -- new location and returns a tuple.
     '''
-    post = []
+    post: List[NumDenom] = []
     value = value.strip()  # rem whitespace
-    value = value.split('+')
-    for part in value:
-        m = slashToTuple(part)
-        if m is None:
-            pass
-        else:
+    valueList = value.split('+')
+    for part in valueList:
+        try:
+            m = slashToTuple(part)
             post.append((m.numerator, m.denominator))
+        except MeterException:
+            pass
     return tuple(post)
 
 
@@ -129,17 +128,18 @@ def slashMixedToFraction(valueSrc: str) -> Tuple[NumDenomTuple, bool]:
 
     Changed in v7 -- new location and returns a tuple as first value.
     '''
-    pre = []
-    post = []
+    pre: List[Union[NumDenom, Tuple[int, None]]] = []
+    post: List[NumDenom] = []
     summedNumerator = False
     value = valueSrc.strip()  # rem whitespace
     value = value.split('+')
     for part in value:
         if '/' in part:
-            tup = slashToTuple(part)
-            if tup is None:
+            try:
+                tup = slashToTuple(part)
+            except MeterException as me:
                 raise TimeSignatureException(
-                    f'Cannot create time signature from "{valueSrc}"')
+                    f'Cannot create time signature from "{valueSrc}"') from me
             pre.append([tup.numerator, tup.denominator])
         else:  # its just a numerator
             try:
@@ -156,6 +156,8 @@ def slashMixedToFraction(valueSrc: str) -> Tuple[NumDenomTuple, bool]:
     # and apply to all previous
     for i in range(len(pre)):
         if pre[i][1] is not None:  # there is a denominator
+            if TYPE_CHECKING:
+                assert isinstance(pre[i][0], int) and isinstance(pre[i][1], int)
             post.append(tuple(pre[i]))
         else:  # search ahead for next defined denominator
             summedNumerator = True

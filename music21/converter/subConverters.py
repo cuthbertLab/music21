@@ -26,7 +26,7 @@ import pathlib
 import subprocess
 import unittest
 
-from typing import Union, Optional
+from typing import Union, Optional, Tuple, Dict
 
 from music21 import common
 from music21 import defaults
@@ -72,11 +72,11 @@ class SubConverter:
     '''
     readBinary = False
     canBePickled = True
-    registerFormats = ()
-    registerShowFormats = ()
-    registerInputExtensions = ()  # if converter supports input, put something here
-    registerOutputExtensions = ()  # if converter supports output put something here.
-    registerOutputSubformatExtensions = {}
+    registerFormats: Tuple[str, ...] = ()
+    registerShowFormats: Tuple[str, ...] = ()
+    registerInputExtensions: Tuple[str, ...] = ()  # if converter supports input
+    registerOutputExtensions: Tuple[str, ...] = ()  # if converter supports output
+    registerOutputSubformatExtensions: Dict[str, str] = {}
     launchKey = None
 
     codecWrite = False
@@ -1025,8 +1025,8 @@ class ConverterMusicXML(SubConverter):
 
         writeFlags = 'wb'
 
+        f: io.BytesIO
         with open(fp, writeFlags) as f:
-            f: io.BytesIO
             f.write(dataBytes)
 
         return fp

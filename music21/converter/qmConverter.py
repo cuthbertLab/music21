@@ -29,7 +29,6 @@ environLocal = environment.Environment()
 
 
 class QMConverter(converter.subConverters.SubConverter):
-
     registerFormats = ('qm', 'quarterMusic')
     registerInputExtensions = ('qm',)
     registerOutputExtensions = ('qm',)
