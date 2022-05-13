@@ -168,6 +168,7 @@ class FunctionDocumenter(ObjectDocumenter):
         return path.replace('.__init__', '')
 
     @property
+    def rstAutodocDirectiveFormat(self) -> t.List[str]:
         '''
         >>> function = common.opFrac
         >>> documenter = FunctionDocumenter(function)
