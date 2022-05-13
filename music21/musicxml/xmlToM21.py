@@ -4369,7 +4369,7 @@ class MeasureParser(XMLParserBase):
             # set to stop before removing
             self.activeTuplets[tupletIndexToRemove] = None
 
-        returnTuplets = [t for t in returnTuplets if t is not None]
+        returnTuplets = [tup for tup in returnTuplets if tup is not None]
 
         return returnTuplets
 
