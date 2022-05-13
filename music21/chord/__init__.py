@@ -679,7 +679,7 @@ class Chord(ChordBase):
                               Sequence[int]] = None,
                  **keywords):
         if notes is not None and any(isinstance(n, note.GeneralNote)
-                                     and not isinstance(n, note.Note)
+                                     and not isinstance(n, (note.Note, Chord))
                                      for n in notes):
             raise TypeError(f'Use a PercussionChord to contain Unpitched objects; got {notes}')
         super().__init__(notes=notes, **keywords)

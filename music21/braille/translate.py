@@ -171,7 +171,7 @@ def objectToBraille(music21Obj: base.Music21Object,
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠚
 
-    Not currently supported: generic `stream.Stream` objects:
+    Not currently supported: generic `stream.Stream` objects or `stream.Voice` objects:
 
     >>> sample_generic_stream = stream.Stream([note.Note()])
     >>> translate.objectToBraille(sample_generic_stream)
@@ -197,6 +197,8 @@ def objectToBraille(music21Obj: base.Music21Object,
                                suppressOctaveMarks=suppressOctaveMarks,
                                upperFirstInNoteFingering=upperFirstInNoteFingering,
                                )
+    elif isinstance(music21Obj, stream.Stream):
+        raise BrailleTranslateException('Stream cannot be translated to Braille.')
     else:
         music21Measure = stream.Measure()
         music21Measure.append(music21Obj)

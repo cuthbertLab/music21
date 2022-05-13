@@ -543,7 +543,7 @@ def smoothFrequencies(
     >>> result
     [409, 409, 409, 428, 435, 438, 442, 444, 441, 441, 441,
      441, 434, 433, 432, 431, 437, 438, 439, 440, 440, 440,
-     440, 440, 440, 441, 441, 441, 441, 441, 441, 441]
+     440, 440, 440, 441, 441, 441, 440, 440, 440, 440]
 
     Original list is unchanged:
 
@@ -605,11 +605,11 @@ def smoothFrequencies(
         )
 
     dpf = frequencyList
-    detectedPitchesFreq: List[int]
+    detectedPitchesFreq: List[float]
     if inPlace:
-        detectedPitchesFreq = [int(f) for f in dpf]
+        detectedPitchesFreq = [float(f) for f in dpf]
     else:
-        detectedPitchesFreq = [int(f) for f in copy.copy(dpf)]
+        detectedPitchesFreq = [float(f) for f in copy.copy(dpf)]
 
     # smoothing
     beginning = 0.0
@@ -622,6 +622,7 @@ def smoothFrequencies(
     ends = ends / smoothLevels
 
     for i in range(numFreqs):
+        # TODO: replace this O(i*smoothLevels) routine with an O(i) routine
         if i < int(math.floor(smoothLevels / 2.0)):
             detectedPitchesFreq[i] = int(beginning)
         elif i > numFreqs - int(math.ceil(smoothLevels / 2.0)) - 1:
@@ -630,13 +631,14 @@ def smoothFrequencies(
             t = 0.0
             for j in range(smoothLevels):
                 t += detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
-            detectedPitchesFreq[i] = int(t / smoothLevels)
+            detectedPitchesFreq[i] = t / smoothLevels
 
-    for i in range(numFreqs):
-        detectedPitchesFreq[i] = int(round(detectedPitchesFreq[i]))
-
+    out: List[int] = [int(round(f)) for f in detectedPitchesFreq]
     if not inPlace:
-        return detectedPitchesFreq
+        return out
+    else:
+        for i in range(len(frequencyList)):
+            frequencyList[i] = out[i]
 
 
 # ------------------------------------------------------
