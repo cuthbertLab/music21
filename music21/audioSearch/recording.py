@@ -24,8 +24,8 @@ from importlib.util import find_spec
 import unittest
 import wave
 
-
 from music21 import exceptions21
+from music21.common.types import DocOrder
 
 from music21 import environment
 environLocal = environment.Environment('audioSearch.recording')
@@ -54,7 +54,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     Returns a list of samples.
     '''
     # noinspection PyPackageRequirements
-    import pyaudio  # pylint: disable=import-error
+    import pyaudio  # type: ignore  # pylint: disable=import-error
     recordFormatDefault = pyaudio.paInt16
 
     if recordFormat is None:
@@ -131,7 +131,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: DocOrder = []
 
 
 if __name__ == '__main__':

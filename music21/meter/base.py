@@ -17,7 +17,7 @@ as well as component objects for defining nested metrical structures,
 '''
 import copy
 import fractions
-from typing import Optional
+from typing import Optional, Sequence, List, Dict, Tuple, Any
 
 from music21 import base
 from music21 import beam
@@ -43,8 +43,8 @@ MIN_DENOMINATOR_TYPE = '128th'
 
 # store a module-level dictionary of partitioned meter sequences used
 # for setting default accent weights; store as needed
-_meterSequenceAccentArchetypes = {}
-
+_meterSequenceAccentArchetypes: Dict[Tuple[str, Any, int], MeterSequence] = {}
+_meterSequenceAccentArchetypesNoneCache = ('', -1, -1)  # a cache key representing None
 
 def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSignature':
     # noinspection PyShadowingNames
@@ -102,7 +102,6 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
     >>> ts6
     <music21.meter.TimeSignature 11/32>
 
-
     Complex durations (arose in han2.abc, number 445)
 
     >>> m7 = stream.Measure()
@@ -112,11 +111,14 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
     >>> ts7
     <music21.meter.TimeSignature 9/4>
     '''
-    minDurQL = 4  # smallest denominator; start with a whole note
+    # smallest denominator; start with a whole note
+    minDurQL = 4.0
+
     # find sum of all durations in quarter length
     # find if there are any dotted durations
     minDurDots = 0
     sumDurQL = opFrac(meas.duration.quarterLength)
+
     # beatStrAvg = 0
     # beatStrAvg += e.beatStrength
     numerator = 0
@@ -171,7 +173,7 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
 
         minDurQL = minDurTest
         dType, match = duration.quarterLengthToClosestType(minDurQL)
-        if not match:  # cant find a type for a denominator
+        if not match:  # cannot find a type for a denominator
             raise MeterException(f'cannot find a type for denominator {minDurQL}')
 
         # denominator is the numerical representation of the min type
@@ -253,9 +255,10 @@ class TimeSignature(base.Music21Object):
 
     `TimeSignatures` should be present in the first `Measure` of each `Part`
     that they apply to.  Alternatively you can put the time signature at the
-    front of a `Part` or at the beginning of a `Score` and they will work
-    within music21 but they won't necessarily display properly in musicxml,
-    lilypond, etc.  So best is to create structures like this:
+    front of a `Part` or at the beginning of a `Score`, and they will work
+    within music21, but they won't necessarily display properly in MusicXML,
+    Lilypond, etc.  So best is to create structures where the TimeSignature
+    goes in the first Measure of the score, as below:
 
     >>> s = stream.Score()
     >>> p = stream.Part()
@@ -417,7 +420,7 @@ class TimeSignature(base.Music21Object):
     :attr:`~music21.meter.TimeSignature.accentSequence` properties of the
     `TimeSignature`.  Each of them is an independent
     :class:`~music21.meter.MeterSequence` element which might have nested
-    properties (e.g., a 11/16 meter might be beamed as {1/4+1/4+{1/8+1/16}}),
+    properties (e.g., an 11/16 meter might be beamed as {1/4+1/4+{1/8+1/16}}),
     so if you want to change how beats are calculated or beams are generated
     you'll want to learn more about `meter.MeterSequence` objects.
 
@@ -710,21 +713,30 @@ class TimeSignature(base.Music21Object):
         >>> ts2.barDuration = d2
         >>> ts2.barDuration
         <music21.duration.Duration 1.75>
-        '''
 
+        An uninitialized TimeSignature returns 4.0 for 4/4
+
+        >>> meter.TimeSignature().barDuration
+        <music21.duration.Duration 4.0>
+        '''
         if self._overriddenBarDuration:
             return self._overriddenBarDuration
-        else:
+
+        beamSequence = self.beamSequence
+        if beamSequence is not None:
             # could come from self.beamSequence, self.accentSequence,
             #   self.displaySequence, self.accentSequence
-            return self.beamSequence.duration
+            return beamSequence.duration
+
+        # should never happen.
+        return duration.Duration(0)  # pragma: no cover
 
     @barDuration.setter
     def barDuration(self, value: duration.Duration):
         self._overriddenBarDuration = value
 
     @property
-    def beatLengthToQuarterLengthRatio(self):
+    def beatLengthToQuarterLengthRatio(self) -> float:
         '''
         Returns 4.0 / denominator... seems a bit silly...
 
@@ -732,10 +744,10 @@ class TimeSignature(base.Music21Object):
         >>> a.beatLengthToQuarterLengthRatio
         2.0
         '''
-        return 4 / self.denominator
+        return 4.0 / self.denominator
 
     @property
-    def quarterLengthToBeatLengthRatio(self):
+    def quarterLengthToBeatLengthRatio(self) -> float:
         '''
         Returns denominator/4.0... seems a bit silly...
         '''
@@ -746,7 +758,7 @@ class TimeSignature(base.Music21Object):
     # duple triple, etc.
 
     @property
-    def beatCount(self):
+    def beatCount(self) -> int:
         '''
         Return or set the count of beat units, or the number of beats in this TimeSignature.
 
@@ -798,7 +810,7 @@ class TimeSignature(base.Music21Object):
         return len(self.beatSequence)
 
     @beatCount.setter
-    def beatCount(self, value):
+    def beatCount(self, value: int):
         try:
             self.beatSequence.partition(value)
         except MeterException:
@@ -808,7 +820,7 @@ class TimeSignature(base.Music21Object):
             self.beatSequence.subdividePartitionsEqual()
 
     @property
-    def beatCountName(self):
+    def beatCountName(self) -> str:
         '''
         Return the beat count name, or the name given for the number of beat units.
         For example, 2/4 is duple; 9/4 is triple.
@@ -868,7 +880,7 @@ class TimeSignature(base.Music21Object):
             raise TimeSignatureException(f'non-uniform beat unit: {post}')
 
     @property
-    def beatDivisionCount(self):
+    def beatDivisionCount(self) -> int:
         '''
         Return the count of background beat units found within one beat,
         or the number of subdivisions in the beat unit in this TimeSignature.
@@ -915,7 +927,7 @@ class TimeSignature(base.Music21Object):
             return 1
 
     @property
-    def beatDivisionCountName(self):
+    def beatDivisionCountName(self) -> str:
         '''
         Return the beat count name, or the name given for the number of beat units.
         For example, 2/4 is duple; 9/4 is triple.
@@ -951,7 +963,7 @@ class TimeSignature(base.Music21Object):
             return 'Other'
 
     @property
-    def beatDivisionDurations(self):
+    def beatDivisionDurations(self) -> List[duration.Duration]:
         '''
         Return the beat division, or the durations that make up one beat,
         as a list of :class:`~music21.duration.Duration` objects, if and only if
@@ -987,7 +999,7 @@ class TimeSignature(base.Music21Object):
             raise TimeSignatureException(f'non uniform beat division: {post}')
 
     @property
-    def beatSubDivisionDurations(self):
+    def beatSubDivisionDurations(self) -> List[duration.Duration]:
         '''
         Return a subdivision of the beat division, or a list
         of :class:`~music21.duration.Duration` objects representing each beat division
@@ -1013,7 +1025,7 @@ class TimeSignature(base.Music21Object):
         return post
 
     @property
-    def classification(self):
+    def classification(self) -> str:
         '''
         Return the classification of this TimeSignature,
         such as Simple Triple or Compound Quadruple.
@@ -1044,8 +1056,9 @@ class TimeSignature(base.Music21Object):
     # --------------------------------------------------------------------------
     # private methods -- most to be put into the various sequences.
 
-    def _setDefaultBeatPartitions(self, *, favorCompound=True):
-        '''Set default beat partitions based on numerator and denominator.
+    def _setDefaultBeatPartitions(self, *, favorCompound=True) -> None:
+        '''
+        Set default beat partitions based on numerator and denominator.
 
         >>> ts = meter.TimeSignature('3/4')
         >>> len(ts.beatSequence)  # first, not zeroth, level stores beat
@@ -1098,9 +1111,9 @@ class TimeSignature(base.Music21Object):
                 if self.denominator >= 128:
                     pass  # do not raise an exception for unable to subdivide smaller than 128
 
-    def _setDefaultBeamPartitions(self):
+    def _setDefaultBeamPartitions(self) -> None:
         '''
-        This sets default beam partitions when partitionRequest is None.
+        This method sets default beam partitions when partitionRequest is None.
         '''
         # beam short measures of 8ths, 16ths, or 32nds all together
         if self.beamSequence.summedNumerator:
@@ -1138,9 +1151,9 @@ class TimeSignature(base.Music21Object):
             pass  # doing nothing will beam all together
         # environLocal.printDebug('default beam partitions set to: %s' % self.beamSequence)
 
-    def _setDefaultAccentWeights(self, depth=3):
+    def _setDefaultAccentWeights(self, depth: int = 3) -> None:
         '''
-        This sets default accent weights based on common hierarchical notions for meters;
+        This method sets default accent weights based on common hierarchical notions for meters;
         each beat is given a weight, as defined by the top level count of self.beatSequence
 
         >>> ts1 = meter.TimeSignature('4/4')
@@ -1173,7 +1186,7 @@ class TimeSignature(base.Music21Object):
             cacheKey = (tsStr, firstPartitionForm, depth)
         else:  # derive from meter sequence
             firstPartitionForm = self.beatSequence
-            cacheKey = None  # cannot cache based on beat form
+            cacheKey = _meterSequenceAccentArchetypesNoneCache  # cannot cache based on beat form
 
         # environLocal.printDebug(['_setDefaultAccentWeights(): firstPartitionForm set to',
         #    firstPartitionForm, 'self.beatSequence: ', self.beatSequence, tsStr])
@@ -1215,12 +1228,12 @@ class TimeSignature(base.Music21Object):
                 # get values from weightValues dictionary
                 self.accentSequence[i].weight = weightValues[weightInts[i]]
 
-            if cacheKey is not None:
+            if cacheKey != _meterSequenceAccentArchetypesNoneCache:
                 _meterSequenceAccentArchetypes[cacheKey] = copy.deepcopy(self.accentSequence)
 
     # --------------------------------------------------------------------------
     # access data for other processing
-    def getBeams(self, srcList, measureStartOffset=0.0):
+    def getBeams(self, srcList, measureStartOffset=0.0) -> List[Optional[beam.Beams]]:
         '''
         Given a qLen position and an iterable of Music21Objects, return a list of Beams objects.
 
@@ -1234,7 +1247,6 @@ class TimeSignature(base.Music21Object):
 
         Must process a list/Stream at time, because we cannot tell when a beam ends
         unless we see the context of adjoining durations.
-
 
         >>> a = meter.TimeSignature('2/4', 2)
         >>> a.beamSequence[0] = a.beamSequence[0].subdivide(2)
@@ -1345,8 +1357,8 @@ class TimeSignature(base.Music21Object):
             beamNext = beamsList[i + 1] if not isLast else None
             beamPrevious = beamsList[i - 1] if not isFirst else None
 
-            # get an archetype of the MeterSequence for this level
-            # level is depth, starting at zero
+            # get an archetype of the MeterSequence for this level.
+            # level is the depth, starting at zero
             archetype = self.beamSequence.getLevel(depth)
             # span is the quarter note duration points for each partition
             # at this level
@@ -1402,8 +1414,8 @@ class TimeSignature(base.Music21Object):
 
                 elif startNext >= archetypeSpanEnd:
                     # case of where we need a partial left:
-                    # if the next start value is outside of this span (or at the
-                    # the greater boundary of this span), and we did not have a
+                    # if the next start value is outside this span (or at the
+                    # greater boundary of this span), and we did not have a
                     # beam or beam number in the previous beam
 
                     # first note in pickup measures might also get 'partial-left'
@@ -1420,7 +1432,7 @@ class TimeSignature(base.Music21Object):
                 else:
                     beamType = 'start'
 
-            # last beams was active, last beamNumber was active,
+            # last beams (beam?) was active, last beamNumber was active,
             # and it was stopped or was a partial-left
             elif (beamPrevious is not None
                     and beamNumber in beamPrevious.getNumbers()
@@ -1445,7 +1457,7 @@ class TimeSignature(base.Music21Object):
 
             # we continue if the next beam is in the same beaming archetype
             # as this one.
-            # if endNext is outside of the archetype span,
+            # if endNext is outside the archetype span,
             # not sure what to do
             elif startNext < archetypeSpanEnd:
                 # environLocal.printDebug(['continue match: dur.type, startNext, archetypeSpan',
@@ -1476,7 +1488,7 @@ class TimeSignature(base.Music21Object):
             beams.setByNumber(beamNumber, beamType)
 
         # environLocal.printDebug(['beamsList', beamsList])
-        # iter over each beams line, from top to bottom (1 through 5)
+        # iter over each Beam in beam.Beams, from top to bottom (1 through 5)
         for outer_depth in range(len(beam.beamableDurationTypes)):
             # increment to count from 1 not 0
             # assume we are always starting at offset w/n this meter (Jose)
@@ -1488,7 +1500,7 @@ class TimeSignature(base.Music21Object):
 
         return beamsList
 
-    def setDisplay(self, value, partitionRequest=None):
+    def setDisplay(self, value, partitionRequest=None) -> None:
         '''
         Set an independent display value for a meter.
 
@@ -1536,10 +1548,12 @@ class TimeSignature(base.Music21Object):
             pos += self.accentSequence[i].duration.quarterLength
         return False
 
-    def setAccentWeight(self, weightList, level=0):
-        '''Set accent weight, or floating point scalars, for the accent MeterSequence.
-        Provide a list of values; if this list is shorter than the length of the MeterSequence,
-        it will be looped; if this list is longer, only the first relevant value will be used.
+    def setAccentWeight(self, weightList: Sequence[float], level: int = 0) -> None:
+        '''
+        Set accent weight, or floating point scalars, for the accent MeterSequence.
+        Provide a list of float values; if this list is shorter than the length
+        of the MeterSequence, it will be looped; if this list is longer,
+        only the relevant values at the beginning will be used.
 
         If the accent MeterSequence is subdivided, the level of depth to set is given by the
         optional level argument.
@@ -1847,7 +1861,7 @@ class TimeSignature(base.Music21Object):
 
 
         Let's try this on a real piece, a 4/4 chorale with a one beat pickup.  Here we get the
-        normal offset from the active TimeSignature but we subtract out the pickup length which
+        normal offset from the active TimeSignature, but we subtract out the pickup length which
         is in a `Measure`'s :attr:`~music21.stream.Measure.paddingLeft` property.
 
         >>> c = corpus.parse('bwv1.6')
@@ -1880,7 +1894,7 @@ class TimeSignature(base.Music21Object):
     def getBeatProgress(self, qLenPos):
         '''
         Given a quarterLength position, get the beat,
-        where beats count from 1, and return the the
+        where beats count from 1, and return the
         amount of qLen into this beat the supplied qLenPos
         is.
 
@@ -1907,7 +1921,7 @@ class TimeSignature(base.Music21Object):
 
     def getBeatProportion(self, qLenPos):
         '''
-        Given a quarter length position into the meter, return a numerical progress
+        Given a quarter length position into the meter, return the numerical progress
         through the beat (where beats count from one) with a floating-point or fractional value
         between 0 and 1 appended to this value that gives the proportional progress into the beat.
 

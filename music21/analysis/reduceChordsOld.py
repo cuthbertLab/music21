@@ -15,12 +15,14 @@ import unittest
 import copy
 
 from music21 import chord
+from music21.common.types import DocOrder
 from music21 import clef
 from music21 import meter
 from music21 import stream
 from music21 import tie
 
 def testMeasureStream1():
+    # noinspection PyShadowingNames
     '''
     returns a simple measure stream for testing:
 
@@ -382,7 +384,7 @@ class TestExternal(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: DocOrder = []
 
 
 

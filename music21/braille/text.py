@@ -462,7 +462,7 @@ class BrailleTextLine(prebase.ProtoM21Object):
     >>> print(str(btl))
     ⠀⠈⠉
     '''
-    def __init__(self, lineLength=40):
+    def __init__(self, lineLength: int = 40):
         self.isHeading = False
         self.containsNoteGrouping = False
         self.lineLength = lineLength
@@ -634,7 +634,7 @@ class BrailleTextLine(prebase.ProtoM21Object):
         the last appender thought it would be helpful, such as
         to put more characters into a line.  But in case it
         is not, then this method will change that last character
-        to a space and set textLocation back one character
+        to a space and set textLocation back one character,
         so it is not printed.
 
         >>> bt = braille.text.BrailleTextLine(10)

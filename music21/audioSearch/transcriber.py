@@ -79,7 +79,8 @@ def runTranscribe(show=True, plot=True, useMic=True,
 
     if plot:
         try:
-            import matplotlib.pyplot  # for find
+            # for finding
+            import matplotlib.pyplot  # type: ignore
         except ImportError:
             raise audioSearchBase.AudioSearchException(
                 'Cannot plot without matplotlib installed.')

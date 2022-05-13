@@ -93,8 +93,8 @@ class WindowedAnalysis:
         Placing a score with parts into analysis will automatically flatten
         the stream.  So these two calls are equivalent:
 
-        >>> wa = analysis.windowed.WindowedAnalysis(s, p)
-        >>> wa = analysis.windowed.WindowedAnalysis(s.flatten(), p)
+        >>> wa1 = analysis.windowed.WindowedAnalysis(s, p)
+        >>> wa2 = analysis.windowed.WindowedAnalysis(s.flatten(), p)
 
         '''
         # create a stream that contains just a 1/4 time signature; this is
@@ -246,9 +246,10 @@ class WindowedAnalysis:
     def process(self,
                 minWindow: Union[int, None] = 1,
                 maxWindow: Union[int, None] = 1,
-                windowStepSize=1,
+                windowStepSize: Union[int, str] = 1,
                 windowType='overlap',
                 includeTotalWindow=True):
+        # noinspection PyShadowingNames
         '''
         Main method for windowed analysis across one or more window sizes.
 
@@ -317,7 +318,7 @@ class WindowedAnalysis:
         # store metadata about each row as a dictionary
         metaMatrix = []
 
-        if common.isNum(windowStepSize):
+        if isinstance(windowStepSize, int):
             windowSizes = list(range(minLength, maxLength + 1, windowStepSize))
         else:
             num, junk = common.getNumFromStr(windowStepSize)

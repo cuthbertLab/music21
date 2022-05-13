@@ -17,6 +17,7 @@ chord representations. All features of this module are made available through
 :class:`~music21.chord.Chord` objects. Use of this module directly is thus not necessary.
 '''
 from collections import namedtuple
+from typing import Tuple
 import unittest
 
 from music21 import environment
@@ -50,18 +51,78 @@ class ChordTablesException(exceptions21.Music21Exception):
 # under Tn, TnI (inversion required), TnM, and TnMI respectively
 # For index 2 (python [1]), a value of 1 or higher
 # is symmetrical under inversion.
+
+TNIStructure = Tuple[
+    Tuple[int, ...],
+    Tuple[int, int, int, int, int, int],
+    Tuple[int, int, int, int, int, int, int, int],
+    int,
+]
+
+# noinspection DuplicatedCode
+t1: TNIStructure
+t2: TNIStructure
+t3: TNIStructure
+t4: TNIStructure
+t5: TNIStructure
+t6: TNIStructure
+t7: TNIStructure
+t8: TNIStructure
+t9: TNIStructure
+t10: TNIStructure
+t11: TNIStructure
+t12: TNIStructure
+t13: TNIStructure
+t14: TNIStructure
+t15: TNIStructure
+t16: TNIStructure
+t17: TNIStructure
+t18: TNIStructure
+t19: TNIStructure
+t20: TNIStructure
+t21: TNIStructure
+t22: TNIStructure
+t23: TNIStructure
+t24: TNIStructure
+t25: TNIStructure
+# noinspection DuplicatedCode
+t26: TNIStructure
+t27: TNIStructure
+t28: TNIStructure
+t29: TNIStructure
+t30: TNIStructure
+t31: TNIStructure
+t32: TNIStructure
+t33: TNIStructure
+t34: TNIStructure
+t35: TNIStructure
+t36: TNIStructure
+t37: TNIStructure
+t38: TNIStructure
+t39: TNIStructure
+t40: TNIStructure
+t41: TNIStructure
+t42: TNIStructure
+t43: TNIStructure
+t44: TNIStructure
+t45: TNIStructure
+t46: TNIStructure
+t47: TNIStructure
+t48: TNIStructure
+t49: TNIStructure
+t50: TNIStructure
+
+
 t1   = ((0,), (0,0,0,0,0,0), (1,1,1,1,11,11,11,11), 0)  # 1-1
 monad = (None, t1)
-del t1
 
 t1  = ((0,1), (1,0,0,0,0,0), (1,1,0,0,9,9,8,8),  0)  # 2-1
 t2  = ((0,2), (0,1,0,0,0,0), (1,1,1,1,9,9,9,9),  0)  # 2-2
 t3  = ((0,3), (0,0,1,0,0,0), (1,1,1,1,9,9,9,9),  0)  # 2-3
 t4  = ((0,4), (0,0,0,1,0,0), (1,1,1,1,9,9,9,9),  0)  # 2-4
 t5  = ((0,5), (0,0,0,0,1,0), (1,1,0,0,9,9,8,8),  0)  # 2-5
-t6  = ((0,6), (0,0,0,0,0,1), (2,2,2,2,10,10,10), 0)  # 2-6
+t6  = ((0,6), (0,0,0,0,0,1), (2,2,2,2,10,10,10,10), 0)  # 2-6
 diad = (None, t1, t2, t3, t4, t5, t6)
-del t1, t2, t3, t4, t5, t6
 
 t1  = ((0,1,2), (2,1,0,0,0,0), (1,1,0,0,7,7,4,4), 0)  # 3-1
 t2  = ((0,1,3), (1,1,1,0,0,0), (1,0,0,0,5,6,5,5), 0)  # 3-2
@@ -76,7 +137,6 @@ t10 = ((0,3,6), (0,0,2,0,0,1), (1,1,1,1,8,8,8,8), 0)  # 3-10
 t11 = ((0,3,7), (0,0,1,1,1,0), (1,0,0,0,5,6,5,5), 0)  # 3-11
 t12 = ((0,4,8), (0,0,0,3,0,0), (3,3,3,3,9,9,9,9), 0)  # 3-12
 trichord = (None, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)
-del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
 
 t1  = ((0,1,2,3), (3,2,1,0,0,0), (1,1,0,0,5,5,1,1),  0)  # 4-1
 t2  = ((0,1,2,4), (2,2,1,1,0,0), (1,0,0,0,3,4,1,1),  0)  # 4-2
@@ -112,9 +172,6 @@ tetrachord = (
     t10, t11, t12, t13, t14, t15, t16, t17, t18, t19,
     t20, t21, t22, t23, t24, t25, t26, t27, t28, t29
 )
-del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
-del t13, t14, t15, t16, t17, t18, t19, t20, t21, t22
-del t23, t24, t25, t26, t27, t28, t29
 
 t1  = ((0,1,2,3,4), (4,3,2,1,0,0), (1,1,0,0,3,3,0,0),  0)  # 5-1
 t2  = ((0,1,2,3,5), (3,3,2,1,1,0), (1,0,0,0,1,2,1,1),  0)  # 5-2
@@ -160,10 +217,6 @@ pentachord = (
     t20, t21, t22, t23, t24, t25, t26, t27, t28, t29,
     t30, t31, t32, t33, t34, t35, t36, t37, t38
 )
-del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
-del t13, t14, t15, t16, t17, t18, t19, t20, t21, t22
-del t23, t24, t25, t26, t27, t28, t29
-del t30, t31, t32, t33, t34, t35, t36, t37, t38
 
 t1  = ((0,1,2,3,4,5), (5,4,3,2,1,0), (1,1,0,0,1,1,0,0),  0)  # 6-1  A
 t2  = ((0,1,2,3,4,6), (4,4,3,2,1,1), (1,0,0,0,0,1,0,0),  0)  # 6-2
@@ -223,10 +276,6 @@ hexachord = (
     t40, t41, t42, t43, t44, t45, t46, t47, t48, t49,
     t50,
 )
-del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
-del t13, t14, t15, t16, t17, t18, t19, t20, t21, t22
-del t23, t24, t25, t26, t27, t28, t29
-del t30, t31, t32, t33, t34, t35, t36, t37, t38
 del t39, t40, t41, t42, t43, t44, t45, t46, t47, t48, t49, t50
 
 t1  = ((0,1,2,3,4,5, 6), (6,5,4,3,2,1), (1,1,0,0,0,0,0,0),  0)  # 7-1
@@ -273,9 +322,6 @@ septachord = (
     t20, t21, t22, t23, t24, t25, t26, t27, t28, t29,
     t30, t31, t32, t33, t34, t35, t36, t37, t38
 )
-del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
-del t13, t14, t15, t16, t17, t18, t19, t20, t21, t22
-del t23, t24, t25, t26, t27, t28, t29
 del t30, t31, t32, t33, t34, t35, t36, t37, t38
 
 t1  = ((0,1,2,3,4,5,6, 7), (7,6,5,4,4,2), (1,1,0,0,0,0,0,0), 0 )  # 8-1
@@ -312,7 +358,6 @@ octachord = (
     t10, t11, t12, t13, t14, t15, t16, t17, t18, t19,
     t20, t21, t22, t23, t24, t25, t26, t27, t28, t29
 )
-del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
 del t13, t14, t15, t16, t17, t18, t19
 del t20, t21, t22, t23, t24, t25, t26, t27, t28, t29
 
@@ -329,7 +374,7 @@ t10 = ((0,1,2,3,4,6,7,9,10), (6,6,8,6,6,4), (1,1,1,1,0,0,0,0), 0)  # 9-10
 t11 = ((0,1,2,3,5,6,7,9,10), (6,6,7,7,7,3), (1,0,0,0,0,0,0,0), 0)  # 9-11
 t12 = ((0,1,2,4,5,6,8,9,10), (6,6,6,9,6,3), (3,3,3,3,0,0,0,0), 0)  # 9-12
 nonachord = (None, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12)
-del t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12
+del t7, t8, t9, t10, t11, t12
 
 t1   = ((0,1,2,3,4,5,6,7,8, 9), (9,8,8,8,8,4), (1,1,0,0,0,0,0,0), 0)  # 10-1
 t2   = ((0,1,2,3,4,5,6,7,8,10), (8,9,8,8,8,4), (1,1,1,1,0,0,0,0), 0)  # 10-2
@@ -338,11 +383,10 @@ t4   = ((0,1,2,3,4,5,6,8,9,10), (8,8,8,9,8,4), (1,1,1,1,0,0,0,0), 0)  # 10-4
 t5   = ((0,1,2,3,4,5,7,8,9,10), (8,8,8,8,9,4), (1,1,0,0,0,0,0,0), 0)  # 10-5
 t6   = ((0,1,2,3,4,6,7,8,9,10), (8,8,8,8,8,5), (2,2,2,2,0,0,0,0), 0)  # 10-6
 decachord = (None, t1, t2, t3, t4, t5, t6)
-del t1, t2, t3, t4, t5, t6
+del t2, t3, t4, t5, t6
 
 t1 = ((0,1,2,3,4,5,6,7,8,9,10), (10,10,10,10,10,5), (1,1,1,1,0,0,0,0), 0)  # 11-1
 undecachord = (None, t1)
-del t1
 
 t1   = ((0,1,2,3,4,5,6,7,8,9,10,11), (12,12,12,12,12,6), (12,12,12,12,0,0,0,0), 0)  # 12-1
 dodecachord = (None, t1)

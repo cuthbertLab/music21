@@ -29,6 +29,7 @@ from music21 import note
 from music21 import pitch
 from music21 import prebase
 from music21 import stream
+from music21.common.types import DocOrder
 
 from music21 import environment
 environLocal = environment.Environment('analysis.reduction')
@@ -60,7 +61,7 @@ class ReductiveNote(prebase.ProtoM21Object):
     the measure number. The `measureOffset` is the position in the measure
     specified by the index.
     '''
-    _delimitValue = ':'  # store the delimit string, must start with 2
+    _delimitValue = ':'  # store the delimiter string, must start with 2
     _delimitArg = '/'
     # map the abbreviation to the data key
     _parameterKeys = {
@@ -284,7 +285,7 @@ class ScoreReduction:
         removalIndices = []
         if m.hasElement(n):
             offset = n.getOffsetBySite(m)
-        else:  # its in a Voice
+        else:  # it is in a Voice
             offset = 0.0
             for v in m.voices:
                 if v.hasElement(n):
@@ -482,7 +483,7 @@ class PartReduction:
         if 'fillByMeasure' in keywords:
             self._fillByMeasure = keywords['fillByMeasure']
 
-        # if we re-partition if spans change
+        # We re-partition if the spans change
         self._segmentByTarget = True
         if 'segmentByTarget' in keywords:
             self._segmentByTarget = keywords['segmentByTarget']
@@ -569,15 +570,15 @@ class PartReduction:
             eEnd = None
             eLast = None
 
-            # segmenting by measure if that measure contains notes
-            # note that measures are not elided of activity is contiguous
+            # segmenting by measure if that measure contains notes.
+            # Note that measures are not elided of activity is contiguous
             if self._fillByMeasure:
                 partMeasures = []
                 for p in parts:
                     partMeasures.append(p.getElementsByClass(stream.Measure).stream())
                 # environLocal.printDebug(['partMeasures', partMeasures])
-                # assuming that all parts have same number of measures
-                # iterate over each measures
+                # assuming that all parts have same the number of measures
+                # iterate over each measure
                 # iLast = len(partMeasures[0]) - 1
                 for i in range(len(partMeasures[0])):
                     active = False
@@ -609,7 +610,7 @@ class PartReduction:
                     # elif (eStart is not None and not active) or i >= iLast:
                     #     if eStart is None:  # nothing to do; just the last
                     #         continue
-                    #     # if this is the last measure and it is active
+                    #     # if this is the last measure, and it is active
                     #     if (i >= iLast and active):
                     #         eLast = partMeasures[0][i]
                     #     # use duration, not barDuration.quarterLength
@@ -651,7 +652,7 @@ class PartReduction:
                         dataEvents.append(ds)
                         eStart = None
                     elif i >= len(noteSrc) - 1:  # this is the last
-                        if eStart is None:  # the last event was was a rest
+                        if eStart is None:  # the last event was a rest
                             # this the start is the start of this event
                             eStart = e.getOffsetBySite(eSrc)
                         eEnd = e.getOffsetBySite(eSrc) + e.quarterLength
@@ -791,7 +792,7 @@ class PartReduction:
 
     def _extendSpans(self):
         '''
-        Extend a the value of a target parameter to the next boundary.
+        Extend the value of a target parameter to the next boundary.
         An undefined boundary will wave as its weight None.
         '''
         # environLocal.printDebug(['_extendSpans: pre'])
@@ -1329,7 +1330,7 @@ class TestExternal(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: DocOrder = []
 
 
 if __name__ == '__main__':

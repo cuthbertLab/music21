@@ -4330,11 +4330,29 @@ class Pitch(prebase.ProtoM21Object):
         self.octave = octave
         self.step = noteName
 
+    @overload
     def transpose(
         self: PitchType,
         value: Union['music21.interval.IntervalBase', str, int],
         *,
-        inPlace=False
+        inPlace: Literal[True]
+    ) -> None:
+        return None  # dummy until Astroid 1015
+
+    @overload
+    def transpose(
+        self: PitchType,
+        value: Union['music21.interval.IntervalBase', str, int],
+        *,
+        inPlace: Literal[False] = False
+    ) -> PitchType:
+        return self  # dummy until Astroid 1015
+
+    def transpose(
+        self: PitchType,
+        value: Union['music21.interval.IntervalBase', str, int],
+        *,
+        inPlace: bool = False
     ) -> Optional[PitchType]:
         '''
         Transpose the pitch by the user-provided value.  If the value is an

@@ -37,7 +37,7 @@ class Segmenter:
                         removeEmptyLists=True):
         # noinspection PyShadowingNames
         '''
-        Segments a part by its rests (and clefs) and returns a returns a list of lists where
+        Segments a part by its rests (and clefs) and returns a list of lists where
         each sublist is one segment of contiguous notes. NB Uses .recurse() internally.
 
         >>> example = converter.parse("tinyNotation: C4 r D E r r F r G r A B r c")

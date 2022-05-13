@@ -48,7 +48,7 @@ import urllib
 import zipfile
 
 from math import isclose
-from typing import Union, Tuple, List, Callable, Optional
+from typing import Union, Tuple, List, Optional, Literal, Type
 
 __all__ = [
     'subConverters', 'ArchiveManagerException', 'PickleFilterException',
@@ -710,9 +710,12 @@ class Converter:
 
     # -----------------------------------------------------------------------#
     # Subconverters
-    def subconvertersList(self, converterType='any') -> List[Callable]:
+    def subconvertersList(
+        self,
+        converterType: Literal['any', 'input', 'output'] = 'any'
+    ) -> List[Type[subConverters.SubConverter]]:
         '''
-        Gives a list of all the subconverters that are registered.
+        Gives a list of all the subconverter classes that are registered.
 
         If converterType is 'any' (true), then input or output
         subconverters are listed.
@@ -756,8 +759,6 @@ class Converter:
          <class 'music21.converter.subConverters.ConverterVexflow'>,
          <class 'music21.converter.subConverters.ConverterVolpiano'>]
 
-
-
         >>> class ConverterSonix(converter.subConverters.SubConverter):
         ...    registerFormats = ('sonix',)
         ...    registerInputExtensions = ('mus',)
@@ -795,12 +796,12 @@ class Converter:
 
         return filteredSubConvertersList
 
-    def defaultSubconverters(self) -> List[Callable]:
+    def defaultSubconverters(self) -> List[Type[subConverters.SubConverter]]:
         '''
         return an alphabetical list of the default subconverters: those in converter.subConverters
         with the class Subconverter.
 
-        Do not use generally.  use c.subConvertersList()
+        Do not use generally.  Use Converter.subconvertersList()
 
         >>> c = converter.Converter()
         >>> for sc in c.defaultSubconverters():
@@ -827,15 +828,15 @@ class Converter:
         <class 'music21.converter.subConverters.ConverterVolpiano'>
         <class 'music21.converter.subConverters.SubConverter'>
         '''
-        defaultSubconverters = []
+        defaultSubconverters: List[Type[subConverters.SubConverter]] = []
         for i in sorted(subConverters.__dict__):
-            name = getattr(subConverters, i)
+            possibleSubConverter = getattr(subConverters, i)
             # noinspection PyTypeChecker
-            if (callable(name)
-                    and not isinstance(name, types.FunctionType)
-                    and hasattr(name, '__mro__')   # Typing imports break this.
-                    and subConverters.SubConverter in name.__mro__):
-                defaultSubconverters.append(name)
+            if (callable(possibleSubConverter)
+                    and not isinstance(possibleSubConverter, types.FunctionType)
+                    and hasattr(possibleSubConverter, '__mro__')
+                    and issubclass(possibleSubConverter, subConverters.SubConverter)):
+                defaultSubconverters.append(possibleSubConverter)
         return defaultSubconverters
 
     def getSubConverterFormats(self):
@@ -1129,6 +1130,9 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     >>> s = converter.parse("2/16 E4 r f# g=lastG trip{b-8 a g} c", format='tinyNotation')
     >>> s[meter.TimeSignature].first()
     <music21.meter.TimeSignature 2/16>
+
+    Changed in v.8 -- passing a list of tinyNotation strings was never documented as a
+        possibility and has been removed.
     '''
     # environLocal.printDebug(['attempting to parse()', value])
     if 'forceSource' in keywords:
@@ -1150,6 +1154,7 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     else:
         m21Format = None
 
+    valueStr: str
     if isinstance(value, bytes):
         valueStr = value.decode('utf-8', 'ignore')
     if isinstance(value, pathlib.Path):
@@ -1159,8 +1164,10 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
             valueStr = str(value.sourcePath)
         else:
             valueStr = str(common.getCorpusFilePath() / value.sourcePath)
-    else:
+    elif isinstance(value, str):
         valueStr = value
+    else:
+        valueStr = ''
 
     if (common.isListLike(value)
             and len(value) == 2
@@ -1174,10 +1181,6 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
           and _osCanLoad(str(value[0]))):
         # corpus or other file with movement number
         return parseFile(value[0], format=m21Format, **keywords).getScoreByNumber(value[1])
-    elif common.isListLike(value) or args:  # tiny notation list. TODO: Remove.
-        if args:  # add additional args to a list
-            value = [value] + list(args)
-        return parseData(value, number=number, **keywords)
     # a midi string, must come before os.path.exists test
     elif not isinstance(value, bytes) and valueStr.startswith('MThd'):
         return parseData(value, number=number, format=m21Format, **keywords)
@@ -1903,11 +1906,13 @@ class Test(unittest.TestCase):
         '''
         Checks quantization when parsing a stream. Here everything snaps to the 8th note.
         '''
+        from music21 import note
         from music21 import omr
+
         midiFp = omr.correctors.pathName + os.sep + 'k525short.mid'
         midiStream = parse(midiFp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
         # midiStream.show()
-        for n in midiStream.recurse(classFilter='Note'):
+        for n in midiStream[note.Note]:
             self.assertTrue(isclose(n.quarterLength % 0.5, 0.0, abs_tol=1e-7))
 
     def testParseMidiNoQuantize(self):
