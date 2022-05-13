@@ -14,7 +14,7 @@ import collections
 import fractions
 from functools import lru_cache
 import re
-from typing import Optional, Tuple, List, TYPE_CHECKING
+from typing import Tuple, List, TYPE_CHECKING, Union
 
 from music21 import common
 from music21 import environment

@@ -24,7 +24,7 @@ A place where other signs are found generally is
 New International Manual of Braille Music Notation (by Bettye Krolick), which we will cite as
 "Krolick" or "krolick".
 '''
-from typing import Dict, Union
+from typing import Dict
 import itertools
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True

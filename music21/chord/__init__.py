@@ -79,7 +79,11 @@ class ChordBase(note.NotRest):
     _DOC_ATTR.update(note.NotRest._DOC_ATTR)
 
     def __init__(self,
-                 notes: Union[None, str, List[str], List[note.NotRest], List[int]] = None,
+                 notes: Union[None,
+                              str,
+                              Sequence[str],
+                              Sequence[note.NotRest],
+                              Sequence[int]] = None,
                  **keywords):
 
         if notes is None:
@@ -668,7 +672,11 @@ class Chord(ChordBase):
 
     # INITIALIZER #
     def __init__(self,
-                 notes: Union[None, List[note.Note], List[str], str, List[int]] = None,
+                 notes: Union[None,
+                              Sequence[note.Note],
+                              Sequence[str],
+                              str,
+                              Sequence[int]] = None,
                  **keywords):
         if notes is not None and any(not isinstance(n, note.Note) for n in notes):
             raise TypeError(f'Use a PercussionChord to contain Unpitched objects; got {notes}')
@@ -2457,9 +2465,13 @@ class Chord(ChordBase):
         43
         '''
         try:
-            inv = self.inversion()
+            inv: int = self.inversion()
         except ChordException:
             return None
+
+        if inv == -1:
+            return None
+
         seventhMapping = [7, 65, 43, 42]
         triadMapping = [53, 6, 64]
 
@@ -2494,11 +2506,11 @@ class Chord(ChordBase):
         UNKNOWN = 'Unknown Position'
 
         try:
-            inv: Union[int, None] = self.inversion()
+            inv: int = self.inversion()
         except ChordException:
             return UNKNOWN
 
-        if inv is None:
+        if inv == -1:
             return UNKNOWN
 
         if inv == 0:
