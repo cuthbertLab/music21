@@ -15,7 +15,7 @@ Tools for compressing and decompressing musicxml files.
 import os
 import pathlib
 import zipfile
-from typing import Union
+import typing as t
 
 from music21 import common
 from music21 import environment
@@ -45,7 +45,7 @@ def compressAllXMLFiles(*, deleteOriginal=False):
     )
 
 
-def compressXML(filename: Union[str, pathlib.Path],
+def compressXML(filename: t.Union[str, pathlib.Path],
                 *,
                 deleteOriginal=False,
                 silent=False,
@@ -97,7 +97,7 @@ def compressXML(filename: Union[str, pathlib.Path],
     return True
 
 
-def uncompressMXL(filename: Union[str, pathlib.Path],
+def uncompressMXL(filename: t.Union[str, pathlib.Path],
                   *,
                   deleteOriginal=False,
                   strictMxlCheck=True) -> bool:

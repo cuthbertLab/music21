@@ -118,10 +118,6 @@ class BrailleText(prebase.ProtoM21Object):
         '''
         Adds an expression long enough that it is split at
         each space symbol such that line wrapping could occur.
-
-
-        >>> bt = braille.text.BrailleText(lineLength=10)
-        >>>
         '''
         for brailleExpr in longExpr.split(symbols['space']):
             self.appendOrInsertCurrent(brailleExpr)

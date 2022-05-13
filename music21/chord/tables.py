@@ -17,7 +17,7 @@ chord representations. All features of this module are made available through
 :class:`~music21.chord.Chord` objects. Use of this module directly is thus not necessary.
 '''
 from collections import namedtuple
-from typing import Tuple
+import typing as t
 import unittest
 
 from music21 import environment
@@ -52,10 +52,10 @@ class ChordTablesException(exceptions21.Music21Exception):
 # For index 2 (python [1]), a value of 1 or higher
 # is symmetrical under inversion.
 
-TNIStructure = Tuple[
-    Tuple[int, ...],
-    Tuple[int, int, int, int, int, int],
-    Tuple[int, int, int, int, int, int, int, int],
+TNIStructure = t.Tuple[
+    t.Tuple[int, ...],
+    t.Tuple[int, int, int, int, int, int],
+    t.Tuple[int, int, int, int, int, int, int, int],
     int,
 ]
 

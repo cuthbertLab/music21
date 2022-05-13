@@ -48,7 +48,7 @@ import urllib
 import zipfile
 
 from math import isclose
-from typing import Union, Tuple, List, Optional, Literal, Type
+import typing as t
 
 __all__ = [
     'subConverters', 'ArchiveManagerException', 'PickleFilterException',
@@ -144,7 +144,7 @@ class ArchiveManager:
             raise ArchiveManagerException(f'no support for archiveType: {self.archiveType}')
         return False
 
-    def getNames(self) -> List[str]:
+    def getNames(self) -> t.List[str]:
         '''
         Return a list of all names contained in this archive.
         '''
@@ -308,7 +308,7 @@ class PickleFilter:
         if pickleFp.exists():
             os.remove(pickleFp)
 
-    def status(self) -> Tuple[pathlib.Path, bool, pathlib.Path]:
+    def status(self) -> t.Tuple[pathlib.Path, bool, pathlib.Path]:
         '''
         Given a file path specified with __init__, look for an up to date pickled
         version of this file path. If it exists, return its fp, otherwise return the
@@ -463,7 +463,7 @@ class Converter:
     def __init__(self):
         self.subConverter = None
         # a stream object unthawed
-        self._thawedStream: Union[stream.Score, stream.Part, stream.Opus, None] = None
+        self._thawedStream: t.Union[stream.Score, stream.Part, stream.Opus, None] = None
 
     def _getDownloadFp(self, directory, ext, url):
         if directory is None:
@@ -712,8 +712,8 @@ class Converter:
     # Subconverters
     def subconvertersList(
         self,
-        converterType: Literal['any', 'input', 'output'] = 'any'
-    ) -> List[Type[subConverters.SubConverter]]:
+        converterType: t.Literal['any', 'input', 'output'] = 'any'
+    ) -> t.List[t.Type[subConverters.SubConverter]]:
         '''
         Gives a list of all the subconverter classes that are registered.
 
@@ -796,7 +796,7 @@ class Converter:
 
         return filteredSubConvertersList
 
-    def defaultSubconverters(self) -> List[Type[subConverters.SubConverter]]:
+    def defaultSubconverters(self) -> t.List[t.Type[subConverters.SubConverter]]:
         '''
         return an alphabetical list of the default subconverters: those in converter.subConverters
         with the class Subconverter.
@@ -828,7 +828,7 @@ class Converter:
         <class 'music21.converter.subConverters.ConverterVolpiano'>
         <class 'music21.converter.subConverters.SubConverter'>
         '''
-        defaultSubconverters: List[Type[subConverters.SubConverter]] = []
+        defaultSubconverters: t.List[t.Type[subConverters.SubConverter]] = []
         for i in sorted(subConverters.__dict__):
             possibleSubConverter = getattr(subConverters, i)
             # noinspection PyTypeChecker
@@ -901,7 +901,7 @@ class Converter:
         subConverterClass = scf[converterFormat]
         self.subConverter = subConverterClass()
 
-    def formatFromHeader(self, dataStr: str) -> Tuple[str, str]:
+    def formatFromHeader(self, dataStr: str) -> t.Tuple[str, str]:
         '''
         if dataStr begins with a text header such as  "tinyNotation:" then
         return that format plus the dataStr with the head removed.
@@ -945,7 +945,7 @@ class Converter:
                     break
         return (foundFormat, dataStr)
 
-    def regularizeFormat(self, fmt: str) -> Optional[str]:
+    def regularizeFormat(self, fmt: str) -> t.Optional[str]:
         '''
         Take in a string representing a format, a file extension (w/ or without leading dot)
         etc. and find the format string that best represents the format that should be used.
@@ -1017,7 +1017,7 @@ class Converter:
     # --------------------------------------------------------------------------
     # properties
     @property
-    def stream(self) -> Union[stream.Score, stream.Part, stream.Opus, None]:
+    def stream(self) -> t.Union[stream.Score, stream.Part, stream.Opus, None]:
         '''
         Returns the .subConverter.stream object.
         '''
@@ -1040,7 +1040,7 @@ def parseFile(fp,
               number=None,
               format=None,
               forceSource=False,
-              **keywords) -> Union[stream.Score, stream.Part, stream.Opus]:
+              **keywords) -> t.Union[stream.Score, stream.Part, stream.Opus]:
     '''
     Given a file path, attempt to parse the file into a Stream.
     '''
@@ -1054,7 +1054,7 @@ def parseFile(fp,
 def parseData(dataStr,
               number=None,
               format=None,
-              **keywords) -> Union[stream.Score, stream.Part, stream.Opus]:
+              **keywords) -> t.Union[stream.Score, stream.Part, stream.Opus]:
     '''
     Given musical data represented within a Python string, attempt to parse the
     data into a Stream.
@@ -1070,7 +1070,7 @@ def parseURL(url,
              format=None,
              number=None,
              forceSource=False,
-             **keywords) -> Union[stream.Score, stream.Part, stream.Opus]:
+             **keywords) -> t.Union[stream.Score, stream.Part, stream.Opus]:
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
     URL downloading will not happen automatically unless the user has set their
@@ -1083,9 +1083,9 @@ def parseURL(url,
     return v.stream
 
 
-def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
+def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
           *args,
-          **keywords) -> Union[stream.Score, stream.Part, stream.Opus]:
+          **keywords) -> t.Union[stream.Score, stream.Part, stream.Opus]:
     r'''
     Given a file path, encoded data in a Python string, or a URL, attempt to
     parse the item into a Stream.  Note: URL downloading will not happen

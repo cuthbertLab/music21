@@ -18,7 +18,7 @@ import collections.abc
 import copy
 import itertools
 import unittest
-from typing import Optional, Union
+import typing as t
 
 from music21 import chord
 from music21 import common
@@ -335,7 +335,7 @@ class Verticality(prebase.ProtoM21Object):
         return self.startTimespans[0].measureNumber
 
     @property
-    def nextStartOffset(self) -> Optional[float]:
+    def nextStartOffset(self) -> t.Optional[float]:
         r'''
         Gets the next start-offset in the verticality's offset-tree.
 
@@ -534,7 +534,7 @@ class Verticality(prebase.ProtoM21Object):
         return tuple(self.startTimespans[:] + self.overlapTimespans[:])
 
     @property
-    def timeToNextEvent(self) -> Optional[OffsetQL]:
+    def timeToNextEvent(self) -> t.Optional[OffsetQL]:
         '''
         Returns a float or Fraction of the quarterLength to the next
         event (usually the next Verticality, but also to the end of the piece).
@@ -553,7 +553,7 @@ class Verticality(prebase.ProtoM21Object):
 
     def makeElement(
         self,
-        quarterLength: Union[OffsetQLIn, None] = None,
+        quarterLength: t.Union[OffsetQLIn, None] = None,
         *,
         addTies=True,
         addPartIdAsGroup=False,
@@ -561,7 +561,7 @@ class Verticality(prebase.ProtoM21Object):
         gatherArticulations='single',
         gatherExpressions='single',
         copyPitches=True,
-    ) -> Union[note.Rest, chord.Chord]:
+    ) -> t.Union[note.Rest, chord.Chord]:
         # noinspection PyDunderSlots, PyShadowingNames
         r'''
         Makes a Chord or Rest from this verticality and quarterLength.

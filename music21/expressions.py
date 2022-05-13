@@ -26,7 +26,7 @@ For instance, TextExpressions.
 import copy
 import string
 import unittest
-from typing import List, Optional, Tuple
+import typing as t
 
 from music21 import base
 from music21 import common
@@ -169,7 +169,7 @@ class RehearsalMark(Expression):
         return repr(self.content)
 
     @staticmethod
-    def _getNumberingFromContent(c) -> Optional[str]:
+    def _getNumberingFromContent(c) -> t.Optional[str]:
         '''
         if numbering was not set, get it from the content
 
@@ -364,7 +364,7 @@ class TextExpression(Expression):
             return ''
 
     @property
-    def enclosure(self) -> Optional[style.Enclosure]:
+    def enclosure(self) -> t.Optional[style.Enclosure]:
         '''
         Returns or sets the enclosure on the Style object
         stored on .style.
@@ -390,7 +390,7 @@ class TextExpression(Expression):
         return self.style.enclosure
 
     @enclosure.setter
-    def enclosure(self, value: Optional[style.Enclosure]):
+    def enclosure(self, value: t.Optional[style.Enclosure]):
         if not self.hasStyleInformation and value is None:
             return
         self.style.enclosure = value
@@ -462,7 +462,7 @@ class Ornament(Expression):
     def fillListOfRealizedNotes(
         self,
         srcObj: 'music21.note.Note',
-        fillObjects: List['music21.note.Note'],
+        fillObjects: t.List['music21.note.Note'],
         transposeInterval
     ):
         '''
@@ -540,7 +540,7 @@ class GeneralMordent(Ornament):
             transposeInterval = self.size.reverse()
         else:
             transposeInterval = self.size
-        mordNotes: List['music21.note.Note'] = []
+        mordNotes: t.List['music21.note.Note'] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
@@ -738,7 +738,7 @@ class Trill(Ornament):
     def realize(
         self,
         srcObj: 'music21.note.Note'
-    ) -> Tuple[List['music21.note.Note'], None, List['music21.note.Note']]:
+    ) -> t.Tuple[t.List['music21.note.Note'], None, t.List['music21.note.Note']]:
         '''
         realize a trill.
 
@@ -853,7 +853,7 @@ class Trill(Ornament):
         if self.nachschlag:
             numberOfTrillNotes -= 2
 
-        trillNotes: List['music21.note.Note'] = []
+        trillNotes: t.List['music21.note.Note'] = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval)
 

@@ -45,7 +45,7 @@ import os
 import pathlib
 import re
 import unittest
-from typing import Optional, List
+import typing as t
 
 from music21 import base
 from music21 import common
@@ -675,7 +675,7 @@ class Metadata(base.Music21Object):
     def alternativeTitle(self, value):
         self._workIds['alternativeTitle'] = Text(value)
 
-    def _contributor_role_getter(self, role: str) -> Optional[str]:
+    def _contributor_role_getter(self, role: str) -> t.Optional[str]:
         '''
         get the name of the first contributor with this role, or None
 
@@ -706,7 +706,7 @@ class Metadata(base.Music21Object):
 
         c.name = name
 
-    def _contributor_multiple_role_getter(self, role: str) -> List[str]:
+    def _contributor_multiple_role_getter(self, role: str) -> t.List[str]:
         '''
         get a list of the names of contributors with a certain role.
 
@@ -719,7 +719,7 @@ class Metadata(base.Music21Object):
         else:
             return []
 
-    def _contributor_multiple_role_setter(self, role: str, value: List[str]) -> None:
+    def _contributor_multiple_role_setter(self, role: str, value: t.List[str]) -> None:
         '''
         set multiple names for a particular role, replacing the people
         already in those roles.
@@ -764,7 +764,7 @@ class Metadata(base.Music21Object):
         self._contributor_role_setter('composer', value)
 
     @property
-    def composers(self) -> List[str]:
+    def composers(self) -> t.List[str]:
         r'''
         Get or set a list of strings of all composer roles.
 
@@ -794,7 +794,7 @@ class Metadata(base.Music21Object):
         return self._contributor_multiple_role_getter('composer')
 
     @composers.setter
-    def composers(self, value: List[str]) -> None:
+    def composers(self, value: t.List[str]) -> None:
         self._contributor_multiple_role_setter('composer', value)
 
 
@@ -869,7 +869,7 @@ class Metadata(base.Music21Object):
         self._contributor_role_setter('librettist', value)
 
     @property
-    def librettists(self) -> List[str]:
+    def librettists(self) -> t.List[str]:
         r'''
         Gets or sets a list of librettists for this work:
 
@@ -883,7 +883,7 @@ class Metadata(base.Music21Object):
         return self._contributor_multiple_role_getter('librettist')
 
     @librettists.setter
-    def librettists(self, value: List[str]) -> None:
+    def librettists(self, value: t.List[str]) -> None:
         self._contributor_multiple_role_setter('librettist', value)
 
 
@@ -910,7 +910,7 @@ class Metadata(base.Music21Object):
         self._contributor_role_setter('lyricist', value)
 
     @property
-    def lyricists(self) -> List[str]:
+    def lyricists(self) -> t.List[str]:
         r'''
         Gets or sets a list of lyricists for this work:
 
@@ -924,7 +924,7 @@ class Metadata(base.Music21Object):
         return self._contributor_multiple_role_getter('lyricist')
 
     @lyricists.setter
-    def lyricists(self, value: List[str]) -> None:
+    def lyricists(self, value: t.List[str]) -> None:
         self._contributor_multiple_role_setter('lyricist', value)
 
 
@@ -946,7 +946,7 @@ class Metadata(base.Music21Object):
         self._workIds['movementName'] = Text(value)
 
     @property
-    def movementNumber(self) -> Optional[str]:
+    def movementNumber(self) -> t.Optional[str]:
         r'''
         Get or set the movement number.
 
@@ -1287,7 +1287,7 @@ class Test(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: t.List[type] = []
 
 
 if __name__ == '__main__':

@@ -53,8 +53,7 @@ import fractions
 from functools import lru_cache
 import io
 from math import inf, isnan
-from typing import (Union, Tuple, Dict, List, Optional,
-                    Iterable, Literal, Type, Callable)
+import typing as t
 import unittest
 
 
@@ -88,7 +87,7 @@ class TupletException(exceptions21.Music21Exception):
 
 
 # N.B.: MusicXML uses long instead of longa
-typeToDuration: Dict[str, float] = {
+typeToDuration: t.Dict[str, float] = {
     'duplex-maxima': 64.0,
     'maxima': 32.0,
     'longa': 16.0,
@@ -108,7 +107,7 @@ typeToDuration: Dict[str, float] = {
     'zero': 0.0,
 }
 
-typeFromNumDict: Dict[float, str] = {
+typeFromNumDict: t.Dict[float, str] = {
     1.0: 'whole',
     2.0: 'half',
     4.0: 'quarter',
@@ -127,9 +126,9 @@ typeFromNumDict: Dict[float, str] = {
     0.125: 'maxima',
     0.0625: 'duplex-maxima',
 }
-typeFromNumDictKeys: List[float] = sorted(list(typeFromNumDict.keys()))
+typeFromNumDictKeys: t.List[float] = sorted(list(typeFromNumDict.keys()))
 
-ordinalTypeFromNum: List[str] = [
+ordinalTypeFromNum: t.List[str] = [
     'duplex-maxima',
     'maxima',
     'longa',
@@ -149,9 +148,9 @@ ordinalTypeFromNum: List[str] = [
 ]
 
 
-defaultTupletNumerators: Tuple[int, ...] = (3, 5, 7, 11, 13)
+defaultTupletNumerators: t.Tuple[int, ...] = (3, 5, 7, 11, 13)
 
-extendedTupletNumerators: Tuple[int, ...] = (
+extendedTupletNumerators: t.Tuple[int, ...] = (
     3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67,
     71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139,
     149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199,
@@ -339,7 +338,7 @@ def convertQuarterLengthToType(qLen: OffsetQLIn) -> str:
 
 def dottedMatch(qLen: OffsetQLIn,
                 maxDots=4
-                ) -> Union[Tuple[int, str], Tuple[Literal[False], Literal[False]]]:
+                ) -> t.Union[t.Tuple[int, str], t.Tuple[t.Literal[False], t.Literal[False]]]:
     '''
     Given a quarterLength, determine if there is a dotted
     (or non-dotted) type that exactly matches. Returns a pair of
@@ -382,7 +381,7 @@ def dottedMatch(qLen: OffsetQLIn,
 
 def quarterLengthToNonPowerOf2Tuplet(
     qLen: OffsetQLIn
-) -> Tuple['music21.duration.Tuplet', 'music21.duration.DurationTuple']:
+) -> t.Tuple['music21.duration.Tuplet', 'music21.duration.DurationTuple']:
     '''
     Slow, last chance function that returns a tuple of a single tuplet, probably with a non
     power of 2 denominator (such as 7:6) that represents the quarterLength and the
@@ -432,7 +431,7 @@ def quarterLengthToTuplet(
     qLen: OffsetQLIn,
     maxToReturn=4,
     tupletNumerators=defaultTupletNumerators
-) -> List['music21.duration.Tuplet']:
+) -> t.List['music21.duration.Tuplet']:
     '''
     Returns a list of possible Tuplet objects for a
     given `qLen` (quarterLength). As there may be more than one
@@ -547,10 +546,10 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
     >>> duration.quarterConversion(2/3)
     QuarterLengthConversion(components=(DurationTuple(type='quarter', dots=0, quarterLength=1.0),),
         tuplet=<music21.duration.Tuplet 3/2/quarter>)
-    >>> t = duration.quarterConversion(2/3).tuplet
-    >>> t
+    >>> tup = duration.quarterConversion(2/3).tuplet
+    >>> tup
     <music21.duration.Tuplet 3/2/quarter>
-    >>> t.durationActual
+    >>> tup.durationActual
     DurationTuple(type='quarter', dots=0, quarterLength=1.0)
 
 
@@ -718,7 +717,7 @@ def quarterConversion(qLen: OffsetQLIn) -> QuarterLengthConversion:
 def convertTypeToQuarterLength(
     dType: str,
     dots=0,
-    tuplets: Optional[List['music21.duration.Tuplet']] = None,
+    tuplets: t.Optional[t.List['music21.duration.Tuplet']] = None,
     dotGroups=None
 ) -> OffsetQL:
     # noinspection PyShadowingNames
@@ -848,8 +847,8 @@ class DurationTuple(namedtuple('DurationTuple', ['type', 'dots', 'quarterLength'
         return ordinalFound
 
 
-_durationTupleCacheTypeDots: Dict[Tuple[str, int], DurationTuple] = {}
-_durationTupleCacheQuarterLength: Dict[OffsetQL, DurationTuple] = {}
+_durationTupleCacheTypeDots: t.Dict[t.Tuple[str, int], DurationTuple] = {}
+_durationTupleCacheQuarterLength: t.Dict[OffsetQL, DurationTuple] = {}
 
 
 def durationTupleFromQuarterLength(ql=1.0) -> DurationTuple:
@@ -1161,7 +1160,7 @@ class Tuplet(prebase.ProtoM21Object):
                 'A frozen tuplet (or one attached to a duration) has immutable length.')
 
     # PUBLIC METHODS #
-    def augmentOrDiminish(self, amountToScale: Union[int, float]):
+    def augmentOrDiminish(self, amountToScale: t.Union[int, float]):
         '''
         Given a number greater than zero,
         multiplies the current quarterLength of the
@@ -1219,7 +1218,7 @@ class Tuplet(prebase.ProtoM21Object):
 
     def setDurationType(
         self,
-        durType: Union[str, int, float, fractions.Fraction],
+        durType: t.Union[str, int, float, fractions.Fraction],
         dots=0
     ):
         '''
@@ -1385,7 +1384,7 @@ class Tuplet(prebase.ProtoM21Object):
         return self._durationActual
 
     @durationActual.setter
-    def durationActual(self, dA: Union[DurationTuple, 'Duration']):
+    def durationActual(self, dA: t.Union[DurationTuple, 'Duration']):
         self._checkFrozen()
 
         if isinstance(dA, DurationTuple):
@@ -1439,18 +1438,17 @@ class Tuplet(prebase.ProtoM21Object):
         Return the most complete representation of this tuplet in a readable
         form.
 
-        >>> t = duration.Tuplet(numberNotesActual=5, numberNotesNormal=2)
-        >>> t.fullName
+        >>> tup = duration.Tuplet(numberNotesActual=5, numberNotesNormal=2)
+        >>> tup.fullName
         'Quintuplet'
 
-        >>> t = duration.Tuplet(numberNotesActual=3, numberNotesNormal=2)
-        >>> t.fullName
+        >>> tup = duration.Tuplet(numberNotesActual=3, numberNotesNormal=2)
+        >>> tup.fullName
         'Triplet'
 
-        >>> t = duration.Tuplet(numberNotesActual=17, numberNotesNormal=14)
-        >>> t.fullName
+        >>> tup = duration.Tuplet(numberNotesActual=17, numberNotesNormal=14)
+        >>> tup.fullName
         'Tuplet of 17/14ths'
-
         '''
         # actual is what is presented to viewer
         numActual = self.numberNotesActual
@@ -1589,13 +1587,13 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         self._quarterLengthNeedsUpdating = False
         self._typeNeedsUpdating = False
 
-        self._unlinkedType: Optional[str] = None
-        self._dotGroups: Tuple[int, ...] = (0,)
-        self._tuplets: Union[Tuple['Tuplet', ...], Tuple] = ()  # an empty tuple
+        self._unlinkedType: t.Optional[str] = None
+        self._dotGroups: t.Tuple[int, ...] = (0,)
+        self._tuplets: t.Union[t.Tuple['Tuplet', ...], t.Tuple] = ()  # an empty tuple
         self._qtrLength: OffsetQL = 0.0
 
         # DurationTuples go here
-        self._components: List[DurationTuple] = []
+        self._components: t.List[DurationTuple] = []
 
         # defer updating until necessary
         self._quarterLengthNeedsUpdating = False
@@ -1799,7 +1797,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     linked = property(_getLinked, _setLinked)
 
-    def addDurationTuple(self, dur: Union[DurationTuple, 'Duration']):
+    def addDurationTuple(self, dur: t.Union[DurationTuple, 'Duration']):
         '''
         Add a DurationTuple or a Duration's components to this Duration.
         Does not simplify the Duration.  For instance, adding two
@@ -1838,16 +1836,16 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         Adds a new Tuplet to a Duration, sets the Tuplet's .frozen state to True,
         and then informs the client (Note) that the duration has changed.
 
-        >>> t = duration.Tuplet(3, 2)
+        >>> tup = duration.Tuplet(3, 2)
         >>> d = duration.Duration(1.0)
-        >>> d.appendTuplet(t)
+        >>> d.appendTuplet(tup)
         >>> d.quarterLength
         Fraction(2, 3)
         >>> t2 = duration.Tuplet(5, 4)
         >>> d.appendTuplet(t2)
         >>> d.quarterLength
         Fraction(8, 15)
-        >>> t.frozen
+        >>> tup.frozen
         True
         '''
         newTuplet.frozen = True
@@ -2178,7 +2176,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     def getGraceDuration(
         self,
         appoggiatura=False
-    ) -> Union['GraceDuration', 'AppoggiaturaDuration']:
+    ) -> t.Union['GraceDuration', 'AppoggiaturaDuration']:
         # noinspection PyShadowingNames
         '''
         Return a deepcopy of this Duration as a GraceDuration instance with the same types.
@@ -2385,7 +2383,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         Does NOT handle tuplets etc.
         '''
-        t = self.type
+        tupleType = self.type
         dg = self.dotGroups
         if not inPlace:
             d = copy.deepcopy(self)
@@ -2394,7 +2392,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         d.clear()
 
-        d.addDurationTuple(durationTupleFromTypeDots(t, dg[0]))
+        d.addDurationTuple(durationTupleFromTypeDots(tupleType, dg[0]))
         for i in range(1, len(dg)):
             for existingComponent in list(d.components):
                 d.addDurationTuple(
@@ -2427,7 +2425,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     # PUBLIC PROPERTIES #
     @property
-    def components(self) -> Tuple[DurationTuple, ...]:
+    def components(self) -> t.Tuple[DurationTuple, ...]:
         '''
         Returns or sets a tuple of the component DurationTuples of this
         Duration object
@@ -2475,7 +2473,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         return tuple(self._components)
 
     @components.setter
-    def components(self, value: Iterable[DurationTuple]):
+    def components(self, value: t.Iterable[DurationTuple]):
         # previously, self._componentsNeedUpdating was not set here
         # this needs to be set because if _componentsNeedUpdating is True
         # new components will be derived from quarterLength
@@ -2489,7 +2487,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             # must be cleared
 
     @property
-    def dotGroups(self) -> Tuple[int, ...]:
+    def dotGroups(self) -> t.Tuple[int, ...]:
         '''
         Dot groups are medieval dotted-dotted notes (written one above another).
         For instance a half note with dotGroups = (1, 1) represents a dotted half note that
@@ -2516,7 +2514,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             return self._dotGroups
 
     @dotGroups.setter
-    def dotGroups(self, value: Tuple[int, ...]):
+    def dotGroups(self, value: t.Tuple[int, ...]):
         if not isinstance(value, tuple):
             raise TypeError('only tuple dotGroups values can be used with this method.')
         # removes dots from all components...
@@ -2757,7 +2755,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             return False
 
     @property
-    def ordinal(self) -> Union[int, str, None]:
+    def ordinal(self) -> t.Union[int, str, None]:
         '''
         Get the ordinal value of the Duration, where whole is 4,
         half is 5, etc.
@@ -2879,7 +2877,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         ''')
 
     @property
-    def tuplets(self) -> Tuple[Tuplet, ...]:
+    def tuplets(self) -> t.Tuple[Tuplet, ...]:
         '''
         Return a tuple of Tuplet objects.
         Setting tuplets will inform the client (Note) that the duration has changed.
@@ -2889,7 +2887,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         return self._tuplets
 
     @tuplets.setter
-    def tuplets(self, tupletTuple: Iterable[Tuplet]):
+    def tuplets(self, tupletTuple: t.Iterable[Tuplet]):
         # environLocal.printDebug(['assigning tuplets in Duration', tupletTuple])
         self._tuplets = tuple(tupletTuple)
         self._quarterLengthNeedsUpdating = True
@@ -3057,8 +3055,8 @@ class GraceDuration(Duration):
         self._slash = None
         self.slash = True  # can be True, False, or None; make None go to True?
         # values are unit interval percentages
-        self.stealTimePrevious: Union[float, None] = None
-        self.stealTimeFollowing: Union[float, None] = None
+        self.stealTimePrevious: t.Union[float, None] = None
+        self.stealTimeFollowing: t.Union[float, None] = None
 
 
     # PUBLIC PROPERTIES #
@@ -3073,7 +3071,7 @@ class GraceDuration(Duration):
         return self._makeTime
 
     @makeTime.setter
-    def makeTime(self, expr: Literal[True, False, None]):
+    def makeTime(self, expr: t.Literal[True, False, None]):
         if expr not in (True, False, None):
             raise ValueError('expr must be True, False, or None')
         self._makeTime = bool(expr)
@@ -3824,7 +3822,7 @@ class Test(unittest.TestCase):
 
 # -------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[Union[Type, Callable]] = [
+_DOC_ORDER: t.List[t.Union[t.Type, t.Callable]] = [
     Duration, Tuplet, GraceDuration, convertQuarterLengthToType, TupletFixer,
 ]
 

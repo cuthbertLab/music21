@@ -24,7 +24,7 @@ All functions here will eventually begin with `.core`.
 from __future__ import annotations
 
 import copy
-from typing import List, Dict, Union, Tuple, Optional, TYPE_CHECKING
+import typing as t
 from fractions import Fraction
 import unittest
 
@@ -49,14 +49,14 @@ class StreamCore(Music21Object):
         # the _offsetDict is a dictionary where id(element) is the
         # index and the value is a tuple of offset and element.
         # offsets can be floats, Fractions, or a member of the enum OffsetSpecial
-        self._offsetDict: Dict[int, Tuple[OffsetQLSpecial, Music21Object]] = {}
+        self._offsetDict: t.Dict[int, t.Tuple[OffsetQLSpecial, Music21Object]] = {}
 
         # self._elements stores Music21Object objects.
-        self._elements: List[Music21Object] = []
+        self._elements: t.List[Music21Object] = []
 
         # self._endElements stores Music21Objects found at
         # the highestTime of this Stream.
-        self._endElements: List[Music21Object] = []
+        self._endElements: t.List[Music21Object] = []
 
         self.isSorted = True
         # should isFlat become readonly?
@@ -67,7 +67,7 @@ class StreamCore(Music21Object):
 
     def coreInsert(
         self,
-        offset: Union[float, Fraction],
+        offset: t.Union[float, Fraction],
         element: Music21Object,
         *,
         ignoreSort=False,
@@ -162,7 +162,7 @@ class StreamCore(Music21Object):
     def coreSetElementOffset(
         self,
         element: Music21Object,
-        offset: Union[int, float, Fraction, OffsetSpecial],
+        offset: t.Union[int, float, Fraction, OffsetSpecial],
         *,
         addElement=False,
         setActiveSite=True
@@ -542,7 +542,7 @@ class StreamCore(Music21Object):
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
         '''
-        if TYPE_CHECKING:
+        if t.TYPE_CHECKING:
             from music21 import stream
             assert isinstance(self, stream.Stream)
         hashedAttributes = hash((tuple(classList or ()),
@@ -565,8 +565,8 @@ class StreamCore(Music21Object):
         recurse=True,
         requireAllPresent=True,
         insert=True,
-        constrainingSpannerBundle: Optional[spanner.SpannerBundle] = None
-    ) -> Optional[List[spanner.Spanner]]:
+        constrainingSpannerBundle: t.Optional[spanner.SpannerBundle] = None
+    ) -> t.Optional[t.List[spanner.Spanner]]:
         '''
         find all spanners that are referenced by elements in the
         (recursed if recurse=True) stream and either inserts them in the Stream
@@ -711,7 +711,7 @@ class StreamCore(Music21Object):
         {1.0} <music21.note.Note D>
         '''
         sb = self.spannerBundle
-        sIter: Union[StreamIterator, RecursiveIterator]
+        sIter: t.Union[StreamIterator, RecursiveIterator]
         if recurse is True:
             sIter = self.recurse()  # type: ignore
         else:

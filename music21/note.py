@@ -20,7 +20,7 @@ and used to configure, :class:`~music21.note.Note` objects.
 import copy
 import unittest
 
-from typing import Optional, List, Type, Union, Tuple, Iterable, Sequence, cast
+import typing as t
 
 from music21 import base
 from music21 import beam
@@ -79,8 +79,7 @@ stemDirectionNames = (
 
 def __dir__():
     out = [n for n in globals() if not n.startswith('__') and not n.startswith('Test')]
-    for n in ('Optional', 'List', 'Union', 'Tuple', 'Sequence', 'Iterable', 'Type', 'cast'):
-        out.remove(n)
+    out.remove('t')
     out.remove('unittest')
     out.remove('copy')
     out.remove('_DOC_ORDER')
@@ -100,7 +99,7 @@ class NotRestException(exceptions21.Music21Exception):
 
 
 # ------------------------------------------------------------------------------
-SYLLABIC_CHOICES: List[Optional[str]] = [
+SYLLABIC_CHOICES: t.List[t.Optional[str]] = [
     None, 'begin', 'single', 'end', 'middle', 'composite',
 ]
 
@@ -192,11 +191,11 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
 
     def __init__(self, text='', number=1, **kwargs):
         super().__init__()
-        self._identifier: Optional[str] = None
+        self._identifier: t.Optional[str] = None
         self._number: int = 1
         self._text: str = ''
         self._syllabic = None
-        self.components: Optional[List['music21.note.Lyric']] = None
+        self.components: t.Optional[t.List['music21.note.Lyric']] = None
         self.elisionBefore = ' '
 
         applyRaw = kwargs.get('applyRaw', False)
@@ -265,7 +264,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         if not self.isComposite:
             return self._text
         else:
-            assert isinstance(self.components, Sequence), \
+            assert isinstance(self.components, t.Sequence), \
                 'Programming error: isComposite implies that components exists'  # mypy
             text_out = self.components[0].text
             if text_out is None:
@@ -282,7 +281,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._text = newText
 
     @property
-    def syllabic(self) -> Optional[str]:
+    def syllabic(self) -> t.Optional[str]:
         '''
         Returns or sets the syllabic property of a lyric.
 
@@ -319,7 +318,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._syllabic = newSyllabic
 
     @property
-    def identifier(self) -> Union[str, int]:
+    def identifier(self) -> t.Union[str, int]:
         '''
         By default, this is the same as self.number. However, if there is a
         descriptive identifier like 'part2verse1', it is stored here and
@@ -393,7 +392,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             else:
                 return text
         else:
-            assert isinstance(self.components, Sequence), \
+            assert isinstance(self.components, t.Sequence), \
                 'Programming error: isComposite should assert components exists'  # for mypy
             firstSyllabic = self.components[0].syllabic
             lastSyllabic = self.components[-1].syllabic
@@ -405,8 +404,8 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
 
 
     @rawText.setter
-    def rawText(self, t):
-        self.setTextAndSyllabic(t, applyRaw=True)
+    def rawText(self, rawTextIn: str):
+        self.setTextAndSyllabic(rawTextIn, applyRaw=True)
 
     @property
     def number(self) -> int:
@@ -536,7 +535,7 @@ class GeneralNote(base.Music21Object):
     isNote = False
     isRest = False
     isChord = False
-    _styleClass: Type[style.Style] = style.NoteStyle
+    _styleClass: t.Type[style.Style] = style.NoteStyle
 
     # define order for presenting names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']
@@ -570,7 +569,7 @@ class GeneralNote(base.Music21Object):
         # this sets the stored duration defined in Music21Object
         super().__init__(duration=tempDuration)
 
-        self.lyrics: List[Lyric] = []  # a list of lyric objects
+        self.lyrics: t.List[Lyric] = []  # a list of lyric objects
         self.expressions = []
         self.articulations = []
 
@@ -609,14 +608,14 @@ class GeneralNote(base.Music21Object):
         return True
 
     # --------------------------------------------------------------------------
-    def _getLyric(self) -> Optional[str]:
+    def _getLyric(self) -> t.Optional[str]:
         if not self.lyrics:
             return None
 
         allText = [ly.text for ly in self.lyrics]
         return '\n'.join([t for t in allText if t is not None])
 
-    def _setLyric(self, value: Union[str, Lyric, None]) -> None:
+    def _setLyric(self, value: t.Union[str, Lyric, None]) -> None:
         self.lyrics = []
         if value is None:
             return
@@ -801,7 +800,7 @@ class GeneralNote(base.Music21Object):
         return self.classes[0]  # override in subclasses
 
     @property
-    def pitches(self) -> Tuple[pitch.Pitch, ...]:
+    def pitches(self) -> t.Tuple[pitch.Pitch, ...]:
         '''
         Returns an empty tuple.  (Useful for iterating over NotRests since they
         include Notes and Chords.)
@@ -809,7 +808,7 @@ class GeneralNote(base.Music21Object):
         return ()
 
     @pitches.setter
-    def pitches(self, _value: Iterable[pitch.Pitch]):
+    def pitches(self, _value: t.Iterable[pitch.Pitch]):
         pass
 
 
@@ -951,7 +950,7 @@ class NotRest(GeneralNote):
             self.beams = keywords['beams']
         else:
             self.beams = beam.Beams()
-        self._storedInstrument: Optional['music21.instrument.Instrument'] = None
+        self._storedInstrument: t.Optional['music21.instrument.Instrument'] = None
 
     # ==============================================================================================
     # Special functions
@@ -1177,7 +1176,7 @@ class NotRest(GeneralNote):
         else:
             return True
 
-    def _getVolume(self, forceClient: Optional[base.Music21Object] = None) -> volume.Volume:
+    def _getVolume(self, forceClient: t.Optional[base.Music21Object] = None) -> volume.Volume:
         # DO NOT CHANGE TO @property because of optional attributes
         # lazy volume creation
         if self._volume is None:
@@ -1250,7 +1249,7 @@ class NotRest(GeneralNote):
     def getInstrument(self,
                       *,
                       returnDefault: bool = True
-                      ) -> Optional['music21.instrument.Instrument']:
+                      ) -> t.Optional['music21.instrument.Instrument']:
         '''
         Retrieves the `.storedInstrument` on this `NotRest` instance, if any.
         If one is not found, executes a context search (without following
@@ -1308,7 +1307,7 @@ class NotRest(GeneralNote):
             return instrument.Instrument()
         elif instrument_or_none is None:
             return None
-        return cast(instrument.Instrument, instrument_or_none)
+        return t.cast(instrument.Instrument, instrument_or_none)
 
 
 # ------------------------------------------------------------------------------
@@ -1385,7 +1384,7 @@ class Note(NotRest):
     # Accepts an argument for pitch
     def __init__(self, pitchName=None, **keywords):
         super().__init__(**keywords)
-        self._chordAttached: Optional['music21.chord.Chord'] = None
+        self._chordAttached: t.Optional['music21.chord.Chord'] = None
 
         if 'pitch' in keywords and pitchName is None:
             pitchName = keywords['pitch']
@@ -1562,7 +1561,7 @@ class Note(NotRest):
         ''')
 
     @property
-    def pitches(self) -> Tuple[pitch.Pitch]:
+    def pitches(self) -> t.Tuple[pitch.Pitch]:
         '''
         Return the single :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
@@ -1604,7 +1603,7 @@ class Note(NotRest):
         return (self.pitch,)
 
     @pitches.setter
-    def pitches(self, value: Sequence[pitch.Pitch]):
+    def pitches(self, value: t.Sequence[pitch.Pitch]):
         if common.isListLike(value) and value:
             self.pitch = value[0]
         else:

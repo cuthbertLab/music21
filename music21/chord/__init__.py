@@ -19,8 +19,8 @@ __all__ = ['tables', 'Chord', 'ChordException', 'fromIntervalVector', 'fromForte
 
 import copy
 import unittest
-from typing import (Union, List, Optional, TypeVar, Set, Tuple, Dict,
-                    Sequence, overload)
+import typing as t
+from typing import overload
 
 from music21 import beam
 from music21 import common
@@ -39,7 +39,7 @@ from music21.common.decorators import cacheMethod
 
 environLocal = environment.Environment('chord')
 
-_ChordType = TypeVar('_ChordType', bound='music21.chord.Chord')
+_ChordType = t.TypeVar('_ChordType', bound='music21.chord.Chord')
 
 
 # ------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ class ChordBase(note.NotRest):
     isNote = False
     isRest = False
 
-    _DOC_ATTR: Dict[str, str] = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'isNote': '''
             Boolean read-only value describing if this
             GeneralNote object is a Note. Is False''',
@@ -79,11 +79,12 @@ class ChordBase(note.NotRest):
     _DOC_ATTR.update(note.NotRest._DOC_ATTR)
 
     def __init__(self,
-                 notes: Union[None,
-                              str,
-                              Sequence[str],
-                              Sequence[note.NotRest],
-                              Sequence[int]] = None,
+                 notes: t.Union[None,
+                                str,
+                                t.Sequence[str],
+                                t.Sequence[pitch.Pitch],
+                                t.Sequence[note.NotRest],
+                                t.Sequence[int]] = None,
                  **keywords):
 
         if notes is None:
@@ -100,7 +101,7 @@ class ChordBase(note.NotRest):
 
         self._overrides = {}
 
-        self._notes: List[note.NotRest] = []
+        self._notes: t.List[note.NotRest] = []
         # here, pitch and duration data is extracted from notes
         # if provided
 
@@ -672,18 +673,19 @@ class Chord(ChordBase):
 
     # INITIALIZER #
     def __init__(self,
-                 notes: Union[None,
-                              Sequence[note.Note],
-                              Sequence[str],
-                              str,
-                              Sequence[int]] = None,
+                 notes: t.Union[None,
+                                t.Sequence[pitch.Pitch],
+                                t.Sequence[note.Note],
+                                t.Sequence[str],
+                                str,
+                                t.Sequence[int]] = None,
                  **keywords):
         if notes is not None and any(isinstance(n, note.GeneralNote)
                                      and not isinstance(n, (note.Note, Chord))
                                      for n in notes):
             raise TypeError(f'Use a PercussionChord to contain Unpitched objects; got {notes}')
         super().__init__(notes=notes, **keywords)
-        self._notes: List[note.Note]
+        self._notes: t.List[note.Note]
 
         if notes is not None and all(isinstance(n, int) for n in notes):
             self.simplifyEnharmonics(inPlace=True)
@@ -721,7 +723,7 @@ class Chord(ChordBase):
             return False
         return True
 
-    def __getitem__(self, key: Union[int, str, note.Note, pitch.Pitch]):
+    def __getitem__(self, key: t.Union[int, str, note.Note, pitch.Pitch]):
         '''
         Get item makes accessing pitch components for the Chord easier
 
@@ -939,7 +941,7 @@ class Chord(ChordBase):
         return ''.join(msg)
 
     # PRIVATE METHODS #
-    def _findBass(self) -> Optional[pitch.Pitch]:
+    def _findBass(self) -> t.Optional[pitch.Pitch]:
         '''
         Returns the lowest Pitch in the chord.
 
@@ -965,7 +967,7 @@ class Chord(ChordBase):
         attribute: str,
         *,
         inPlace=False
-    ) -> Union[_ChordType, List[pitch.Pitch]]:
+    ) -> t.Union[_ChordType, t.List[pitch.Pitch]]:
         '''
         Common method for stripping pitches based on redundancy of one pitch
         attribute. The `attribute` is provided by a string.
@@ -1195,26 +1197,26 @@ class Chord(ChordBase):
     def bass(self,
              newbass: None = None,
              *,
-             find: Union[bool, None] = None,
+             find: t.Union[bool, None] = None,
              allow_add: bool = False,
              ) -> pitch.Pitch:
         return self.pitches[0]  # dummy until Astroid 1015 is fixed.
 
     @overload
     def bass(self,
-             newbass: Union[str, pitch.Pitch, note.Note],
+             newbass: t.Union[str, pitch.Pitch, note.Note],
              *,
-             find: Union[bool, None] = None,
+             find: t.Union[bool, None] = None,
              allow_add: bool = False,
              ) -> None:
         return None
 
     def bass(self,
-             newbass: Union[None, str, pitch.Pitch, note.Note] = None,
+             newbass: t.Union[None, str, pitch.Pitch, note.Note] = None,
              *,
-             find: Union[bool, None] = None,
+             find: t.Union[bool, None] = None,
              allow_add: bool = False,
-             ) -> Optional[pitch.Pitch]:
+             ) -> t.Optional[pitch.Pitch]:
         '''
         Generally used to find and return the bass Pitch:
 
@@ -1653,7 +1655,7 @@ class Chord(ChordBase):
         elif lenPitches == 7:  # 13th chord
             return self.bass()
 
-        stepNumsToPitches: Dict[int, pitch.Pitch] = {pitch.STEP_TO_DNN_OFFSET[p.step]: p
+        stepNumsToPitches: t.Dict[int, pitch.Pitch] = {pitch.STEP_TO_DNN_OFFSET[p.step]: p
                                                      for p in nonDuplicatingPitches}
         stepNums = sorted(stepNumsToPitches)
         for startIndex in range(lenPitches):
@@ -1693,7 +1695,7 @@ class Chord(ChordBase):
         mostRootyIndex = rootnessFunctionScores.index(max(rootnessFunctionScores))
         return nonDuplicatingPitches[mostRootyIndex]
 
-    def geometricNormalForm(self) -> List[int]:
+    def geometricNormalForm(self) -> t.List[int]:
         '''
         Geometric Normal Form, as first defined by Dmitri Tymoczko, orders pitch classes
         such that the spacing is prioritized with the smallest spacing between the first and
@@ -1763,8 +1765,8 @@ class Chord(ChordBase):
         self,
         chordStep: int,
         *,
-        testRoot: Optional[Union[note.Note, pitch.Pitch]] = None
-    ) -> Optional[pitch.Pitch]:
+        testRoot: t.Optional[t.Union[note.Note, pitch.Pitch]] = None
+    ) -> t.Optional[pitch.Pitch]:
         '''
         Returns the (first) pitch at the provided scaleDegree (Thus, it's
         exactly like semitonesFromChordStep, except it instead of the number of
@@ -2024,7 +2026,7 @@ class Chord(ChordBase):
         except KeyError:
             raise ChordException(f'the given pitch is not in the Chord: {p}')
 
-    def getZRelation(self) -> Optional[Chord]:
+    def getZRelation(self) -> t.Optional[Chord]:
         '''
         Return a Z relation if it exists, otherwise return None.
 
@@ -2215,7 +2217,7 @@ class Chord(ChordBase):
         newInversion: int,
         *,
         find: bool = True,
-        testRoot: Optional[pitch.Pitch] = None,
+        testRoot: t.Optional[pitch.Pitch] = None,
         transposeOnSet: bool = True
     ) -> None:
         return None  # dummy until Astroid 1015 is fixed
@@ -2226,19 +2228,19 @@ class Chord(ChordBase):
         newInversion: None = None,
         *,
         find: bool = True,
-        testRoot: Optional[pitch.Pitch] = None,
+        testRoot: t.Optional[pitch.Pitch] = None,
         transposeOnSet: bool = True
     ) -> int:
         return -1  # dummy until Astroid 1015 is fixed
 
     def inversion(
         self,
-        newInversion: Optional[int] = None,
+        newInversion: t.Optional[int] = None,
         *,
         find: bool = True,
-        testRoot: Optional[pitch.Pitch] = None,
+        testRoot: t.Optional[pitch.Pitch] = None,
         transposeOnSet: bool = True
-    ) -> Union[int, None]:
+    ) -> t.Union[int, None]:
         '''
         Find the chord's inversion or (if called with a number) set the chord to
         the new inversion.
@@ -3159,10 +3161,10 @@ class Chord(ChordBase):
 
     def _isAugmentedSixthHelper(
         self,
-        chordTableAddress: Tuple[int, int, int],
+        chordTableAddress: t.Tuple[int, int, int],
         requiredInversion: int,
         permitAnyInversion: bool,
-        intervalsCheck: List[Tuple[str, str]],
+        intervalsCheck: t.List[t.Tuple[str, str]],
     ) -> bool:
         '''
         Helper method for simplifying checking Italian, German, etc. Augmented
@@ -3714,23 +3716,23 @@ class Chord(ChordBase):
     def root(self,
              newroot: None = None,
              *,
-             find: Union[bool, None] = None
+             find: t.Union[bool, None] = None
              ) -> pitch.Pitch:
         return self.pitches[0]  # dummy until Astroid 1015 is fixed.
 
     @overload
     def root(self,
-             newroot: Union[str, pitch.Pitch, note.Note],
+             newroot: t.Union[str, pitch.Pitch, note.Note],
              *,
-             find: Union[bool, None] = None
+             find: t.Union[bool, None] = None
              ) -> None:
         return None  # dummy until Astroid 1015 is fixed.
 
     def root(self,
-             newroot: Union[None, str, pitch.Pitch, note.Note] = None,
+             newroot: t.Union[None, str, pitch.Pitch, note.Note] = None,
              *,
-             find: Union[bool, None] = None
-             ) -> Optional[pitch.Pitch]:
+             find: t.Union[bool, None] = None
+             ) -> t.Optional[pitch.Pitch]:
         # noinspection PyShadowingNames
         '''
         Returns the root of the chord.  Or if given a Pitch as the
@@ -4347,7 +4349,7 @@ class Chord(ChordBase):
             raise ChordException(
                 f'the given pitch is not in the Chord: {pitchTarget}')
 
-    def setTie(self, t, pitchTarget):
+    def setTie(self, tieObjOrStr: t.Union[tie.Tie, str], pitchTarget):
         '''
         Given a tie object (or a tie type string) and a pitch or Note in this Chord,
         set the pitch's tie attribute in this chord to that tie type.
@@ -4397,19 +4399,22 @@ class Chord(ChordBase):
         elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
 
-        if isinstance(t, str):
-            t = tie.Tie(t)
+        tieObj: tie.Tie
+        if isinstance(tieObjOrStr, str):
+            tieObj = tie.Tie(tieObjOrStr)
+        else:
+            tieObj = tieObjOrStr
 
         match = False
         for d in self._notes:
             if d.pitch is pitchTarget or d is pitchTarget:  # compare by obj id first
-                d.tie = t
+                d.tie = tieObj
                 match = True
                 break
         if not match:  # more loose comparison: by ==
             for d in self._notes:
                 if pitchTarget in (d, d.pitch):
-                    d.tie = t
+                    d.tie = tieObj
                     match = True
                     break
         if not match:
@@ -4890,7 +4895,7 @@ class Chord(ChordBase):
 
     @property  # type: ignore
     @cacheMethod
-    def fifth(self) -> Optional[pitch.Pitch]:
+    def fifth(self) -> t.Optional[pitch.Pitch]:
         '''
         Shortcut for getChordStep(5), but caches it and does not raise exceptions
 
@@ -5289,7 +5294,7 @@ class Chord(ChordBase):
         '''
         return Chord.formatVectorString(self.normalOrder)
 
-    def _unorderedPitchClasses(self) -> Set[int]:
+    def _unorderedPitchClasses(self) -> t.Set[int]:
         '''
         helper function for orderedPitchClasses but also routines
         like pitchClassCardinality which do not need sorting.
@@ -5302,7 +5307,7 @@ class Chord(ChordBase):
         return pcGroup
 
     @property
-    def orderedPitchClasses(self) -> List[int]:
+    def orderedPitchClasses(self) -> t.List[int]:
         '''
         Return a list of pitch class integers, ordered form lowest to highest.
 
@@ -5342,7 +5347,7 @@ class Chord(ChordBase):
         return len(self._unorderedPitchClasses())
 
     @property
-    def pitchClasses(self) -> List[int]:
+    def pitchClasses(self) -> t.List[int]:
         '''
         Return a list of all pitch classes in the chord as integers. Not sorted
 
@@ -5356,7 +5361,7 @@ class Chord(ChordBase):
         return pcGroup
 
     @property
-    def pitchNames(self) -> List[str]:
+    def pitchNames(self) -> t.List[str]:
         '''
         Return a list of Pitch names from each
         :class:`~music21.pitch.Pitch` object's
@@ -5504,7 +5509,7 @@ class Chord(ChordBase):
             return f'{rootName}-{nameStr}'
 
     @property
-    def pitches(self) -> Tuple[pitch.Pitch, ...]:
+    def pitches(self) -> t.Tuple[pitch.Pitch, ...]:
         '''
         Get or set a list or tuple of all Pitch objects in this Chord.
 
@@ -5543,7 +5548,7 @@ class Chord(ChordBase):
         <music21.pitch.Pitch A#4>
         '''
         # noinspection PyTypeChecker
-        pitches: Tuple[pitch.Pitch] = tuple(component.pitch for component in self._notes)
+        pitches: t.Tuple[pitch.Pitch] = tuple(component.pitch for component in self._notes)
         return pitches
 
     @pitches.setter
@@ -5556,7 +5561,7 @@ class Chord(ChordBase):
             self._notes.append(note.Note(p))
 
     @property
-    def primeForm(self) -> List[int]:
+    def primeForm(self) -> t.List[int]:
         '''
         Return a representation of the Chord as a prime-form list of pitch
         class integers:
@@ -5810,7 +5815,7 @@ class Chord(ChordBase):
 
     @property  # type: ignore
     @cacheMethod
-    def third(self) -> Optional[pitch.Pitch]:
+    def third(self) -> t.Optional[pitch.Pitch]:
         '''
         Shortcut for getChordStep(3), but caches the value, and returns
         None on errors.
@@ -5835,7 +5840,7 @@ class Chord(ChordBase):
 
 
 
-def fromForteClass(notation: Union[str, Sequence[int]]) -> Chord:
+def fromForteClass(notation: t.Union[str, t.Sequence[int]]) -> Chord:
     '''
     Return a Chord given a Forte-class notation. The Forte class can be
     specified as string (e.g., 3-11) or as a list of cardinality and number

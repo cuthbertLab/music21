@@ -13,11 +13,11 @@
 Simple storage for data defaults used throughout music21.
 '''
 import unittest
-from typing import Literal
+import typing as t
 from music21 import _version
 
 # note: this module should not import any higher level modules
-StepName = Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']  # restating so as not to import.
+StepName = t.Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']  # restating so as not to import.
 
 _MOD = 'defaults'
 

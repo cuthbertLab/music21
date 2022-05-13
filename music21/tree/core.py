@@ -16,7 +16,7 @@ These are the lowest level tools for working with self-balancing AVL trees.
 There's an overhead to creating an AVL tree, but for a large score it is
 absolutely balanced by having O(log n) search times.
 '''
-from typing import Optional
+import typing as t
 
 from music21 import prebase
 from music21.exceptions21 import TreeException
@@ -572,7 +572,7 @@ class AVLTree(prebase.ProtoM21Object):
         <AVLNode: Start:1 Height:1 L:0 R:0> '1'
         <AVLNode: Start:0 Height:0 L:None R:None> '0'
         '''
-        def recurse(subListOfTuples) -> Optional[AVLNode]:
+        def recurse(subListOfTuples) -> t.Optional[AVLNode]:
             '''
             Divide and conquer.
             '''

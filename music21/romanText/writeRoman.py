@@ -15,7 +15,7 @@ Writer for the 'RomanText' format (Tymoczko, Gotham, Cuthbert, & Ariza ISMIR 201
 import fractions
 import unittest
 
-from typing import List, Optional, Union
+import typing as t
 
 from music21 import base
 from music21 import metadata
@@ -123,8 +123,8 @@ class RnWriter(prebase.ProtoM21Object):
 
         self.composer = 'Composer unknown'
         self.title = 'Title unknown'
-        self.combinedList: List[str] = []
-        self.container: Union[stream.Part, stream.Score]
+        self.combinedList: t.List[str] = []
+        self.container: t.Union[stream.Part, stream.Score]
 
         if isinstance(obj, stream.Stream):
             if isinstance(obj, stream.Opus):
@@ -174,7 +174,7 @@ class RnWriter(prebase.ProtoM21Object):
         self.prepSequentialListOfLines()
 
     def _makeContainer(self,
-                       obj: Union[stream.Stream, List]):
+                       obj: t.Union[stream.Stream, t.List]):
         '''
         Makes a placeholder container for the unusual cases where this class is called on
         generic- or non-stream object as opposed to
@@ -299,9 +299,9 @@ class RnWriter(prebase.ProtoM21Object):
 # ------------------------------------------------------------------------------
 
 def rnString(measureNumber: int,
-             beat: Union[str, int, float, fractions.Fraction],
+             beat: t.Union[str, int, float, fractions.Fraction],
              chordString: str,
-             inString: Optional[str] = ''):
+             inString: t.Optional[str] = ''):
     '''
     Creates or extends a string of RomanText such that the output corresponds to a single
     measure line.
@@ -345,7 +345,7 @@ def rnString(measureNumber: int,
     return newString
 
 
-def intBeat(beat: Union[str, int, float, fractions.Fraction],
+def intBeat(beat: t.Union[str, int, float, fractions.Fraction],
             roundValue: int = 2):
     '''
     Converts beats to integers if possible, and otherwise to rounded decimals.

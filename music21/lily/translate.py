@@ -18,7 +18,7 @@ import pathlib
 import re
 import subprocess
 import sys
-from typing import Dict, Union
+import typing as t
 import unittest
 
 from collections import OrderedDict
@@ -52,7 +52,7 @@ del find_spec
 # TODO: speed up tests everywhere! move these to music21 base...
 
 class _sharedCorpusTestObject:
-    sharedCache: Dict[str, stream.Stream] = {}
+    sharedCache: t.Dict[str, stream.Stream] = {}
 
 
 sharedCacheObject = _sharedCorpusTestObject()
@@ -1526,7 +1526,7 @@ class LilypondConverter:
 
     def lyMultipliedDurationFromDuration(
         self,
-        durationObj: Union[duration.Duration, duration.DurationTuple],
+        durationObj: t.Union[duration.Duration, duration.DurationTuple],
     ):
         r'''
         take a simple Duration (that is, one with one DurationTuple)
@@ -1566,7 +1566,7 @@ class LilypondConverter:
         >>> [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
         ['1 ', '4 ']
         '''
-        number_type: Union[float, int, str]
+        number_type: t.Union[float, int, str]
         try:
             number_type = duration.convertTypeToNumber(durationObj.type)  # module call
         except duration.DurationException as de:

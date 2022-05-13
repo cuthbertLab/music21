@@ -14,7 +14,7 @@
 Tools for creating timespans (fast, manipulable objects) from Streams
 '''
 import unittest
-from typing import Optional, Sequence, List, Type, Union, Tuple, Literal, cast
+import typing as t
 
 from music21.base import Music21Object
 from music21.common.types import M21ObjType, StreamType
@@ -29,12 +29,12 @@ from music21.tree import trees
 def listOfTreesByClass(
     inputStream: StreamType,
     *,
-    classLists: Optional[List[Sequence[Type[M21ObjType]]]] = None,
-    currentParentage: Optional[Tuple['music21.stream.Stream', ...]] = None,
+    classLists: t.Optional[t.List[t.Sequence[t.Type[M21ObjType]]]] = None,
+    currentParentage: t.Optional[t.Tuple['music21.stream.Stream', ...]] = None,
     initialOffset: float = 0.0,
-    flatten: Union[bool, str] = False,
+    flatten: t.Union[bool, str] = False,
     useTimespans: bool = False
-) -> List[Union[trees.OffsetTree, timespanTree.TimespanTree]]:
+) -> t.List[t.Union[trees.OffsetTree, timespanTree.TimespanTree]]:
     # noinspection PyShadowingNames
     r'''
     To be DEPRECATED in v8: this is no faster than calling streamToTimespanTree
@@ -109,7 +109,7 @@ def listOfTreesByClass(
         wasStream = False
 
         if element.isStream:
-            element = cast('music21.stream.Stream', element)
+            element = t.cast('music21.stream.Stream', element)
             localParentage = currentParentage + (element,)
             containedTrees = listOfTreesByClass(element,
                                                 currentParentage=localParentage,
@@ -154,11 +154,11 @@ def listOfTreesByClass(
 def asTree(
     inputStream: StreamType,
     *,
-    flatten: Union[Literal['semiFlat'], bool] = False,
-    classList: Optional[Sequence[Type]] = None,
+    flatten: t.Union[t.Literal['semiFlat'], bool] = False,
+    classList: t.Optional[t.Sequence[t.Type]] = None,
     useTimespans: bool = False,
     groupOffsets: bool = False
-) -> Union[trees.OffsetTree, trees.ElementTree, timespanTree.TimespanTree]:
+) -> t.Union[trees.OffsetTree, trees.ElementTree, timespanTree.TimespanTree]:
     '''
     Converts a Stream and constructs an :class:`~music21.tree.trees.ElementTree` based on this.
 
@@ -274,7 +274,7 @@ def asTree(
     if (inputStream.isSorted
             and groupOffsets is False  # currently we can't populate for an OffsetTree*
             and (inputStream.isFlat or flatten is False)):
-        outputTree: Union[trees.OffsetTree, trees.ElementTree] = treeClass(source=inputStream)
+        outputTree: t.Union[trees.OffsetTree, trees.ElementTree] = treeClass(source=inputStream)
         return makeFastShallowTreeFromSortedStream(inputStream,
                                                    outputTree=outputTree,
                                                    classList=classList)
@@ -286,9 +286,9 @@ def asTree(
 def makeFastShallowTreeFromSortedStream(
     inputStream: 'music21.stream.Stream',
     *,
-    outputTree: Union[trees.OffsetTree, trees.ElementTree],
-    classList: Optional[Sequence[Type]] = None,
-) -> Union[trees.OffsetTree, trees.ElementTree]:
+    outputTree: t.Union[trees.OffsetTree, trees.ElementTree],
+    classList: t.Optional[t.Sequence[t.Type]] = None,
+) -> t.Union[trees.OffsetTree, trees.ElementTree]:
     '''
     Use populateFromSortedList to quickly make a tree from a stream.
 
@@ -313,8 +313,8 @@ def makeFastShallowTreeFromSortedStream(
 def asTimespans(
     inputStream,
     *,
-    flatten: Union[str, bool] = False,
-    classList: Optional[Sequence[Type]] = None
+    flatten: t.Union[str, bool] = False,
+    classList: t.Optional[t.Sequence[t.Type]] = None
 ) -> timespanTree.TimespanTree:
     r'''
     Recurses through a score and constructs a
@@ -394,9 +394,9 @@ class Test(unittest.TestCase):
         from music21.tree import makeExampleScore
         sc = makeExampleScore()
         sc.sort()
-        t = asTree(sc)
-        self.assertEqual(t.endTime, 8.0)
-        # print(repr(t))
+        scTree = asTree(sc)
+        self.assertEqual(scTree.endTime, 8.0)
+        # print(repr(scTree))
 
 
 # --------------------

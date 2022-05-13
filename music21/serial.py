@@ -19,7 +19,7 @@ Serial searching methods that were previously here have been moved to `alpha.sea
 
 import unittest
 import copy
-from typing import Union, List, Any
+import typing as t
 import warnings
 
 from music21 import exceptions21
@@ -556,7 +556,7 @@ class ToneRow(stream.Stream):
 
         return self.zeroCenteredTransformation(transformationType, newIndex)
 
-    def findZeroCenteredTransformations(self, otherRow) -> Union[bool, List[Any]]:
+    def findZeroCenteredTransformations(self, otherRow) -> t.Union[bool, t.List[t.Any]]:
         '''
         Gives the list of zero-centered serial transformations
         taking one :class:`~music21.serial.ToneRow`
@@ -1309,7 +1309,7 @@ def pcToToneRow(pcSet):
     return a
 
 
-def rowToMatrix(p: List[int]) -> str:
+def rowToMatrix(p: t.List[int]) -> str:
     # noinspection PyShadowingNames
     '''
     Takes a list of numbers of converts it to a string representation of a

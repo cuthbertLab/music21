@@ -27,7 +27,7 @@ From highest level to lowest level usage, ways of graphing are as follows:
 import math
 import random
 import unittest
-from typing import Union, List
+import typing as t
 
 from music21 import common
 from music21.graph.utilities import (getExtendedModules,
@@ -1005,7 +1005,7 @@ class GraphHorizontalBar(Graph):
 
             if points:
                 uniformFormatPerRow = (len(points[0]) == 2)
-                rowFaceColors: Union[str, List[str]]
+                rowFaceColors: t.Union[str, t.List[str]]
                 if uniformFormatPerRow:
                     rowFaceColors = faceColor
                     positionPoints = points

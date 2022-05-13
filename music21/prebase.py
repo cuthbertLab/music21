@@ -17,15 +17,7 @@ Concept borrowed from m21j.
 '''
 import unittest
 
-from typing import (
-    Dict,
-    FrozenSet,
-    List,
-    Mapping,
-    Sequence,
-    Union,
-    Tuple,
-)
+import typing as t
 
 from music21.common import deprecated
 
@@ -78,19 +70,19 @@ class ProtoM21Object:
     ]
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR: Mapping[str, str] = {}
+    _DOC_ATTR: t.Mapping[str, str] = {}
 
     # this dictionary stores as a tuple of strings for each Class so that
     # it only needs to be made once (11 microseconds per call, can be
     # a big part of iteration; from cache just 1 microsecond)
-    _classTupleCacheDict: Dict[type, Tuple[str, ...]] = {}
-    _classSetCacheDict: Dict[type, FrozenSet[Union[str, type]]] = {}
+    _classTupleCacheDict: t.Dict[type, t.Tuple[str, ...]] = {}
+    _classSetCacheDict: t.Dict[type, t.FrozenSet[t.Union[str, type]]] = {}
 
-    __slots__: Tuple[str, ...] = ()
+    __slots__: t.Tuple[str, ...] = ()
 
     @deprecated('v7', 'v8', 'use `someClass in .classSet`'
         'or for intersection: `not classSet.isdisjoint(classList)`')
-    def isClassOrSubclass(self, classFilterList: Sequence) -> bool:
+    def isClassOrSubclass(self, classFilterList: t.Sequence) -> bool:
         '''
         Given a class filter list (a list or tuple must be submitted),
         which may have strings or class objects, determine
@@ -119,7 +111,7 @@ class ProtoM21Object:
         return not self.classSet.isdisjoint(classFilterList)
 
     @property
-    def classes(self) -> Tuple[str, ...]:
+    def classes(self) -> t.Tuple[str, ...]:
         '''
         Returns a tuple containing the names (strings, not objects) of classes that this
         object belongs to -- starting with the object's class name and going up the mro()
@@ -149,9 +141,9 @@ class ProtoM21Object:
         >>> s.insert(40, clef.Treble8vbClef())
         >>> s.insert(50, clef.BassClef())
         >>> s2 = stream.Stream()
-        >>> for t in s:
-        ...    if isinstance(t, clef.GClef) and not isinstance(t, clef.TrebleClef):
-        ...        s2.insert(t)
+        >>> for thing in s:
+        ...    if isinstance(thing, clef.GClef) and not isinstance(thing, clef.TrebleClef):
+        ...        s2.insert(thing)
         >>> s2.show('text')
         {10.0} <music21.clef.GClef>
         {30.0} <music21.clef.FrenchViolinClef>
@@ -166,7 +158,7 @@ class ProtoM21Object:
             return classTuple
 
     @property
-    def classSet(self) -> FrozenSet[Union[str, type]]:
+    def classSet(self) -> t.FrozenSet[t.Union[str, type]]:
         '''
         Returns a set (that is, unordered, but indexed) of all classes that
         this class belongs to, including
@@ -229,7 +221,7 @@ class ProtoM21Object:
         try:
             return self._classSetCacheDict[self.__class__]
         except KeyError:
-            classList: List[Union[str, type]] = list(self.classes)
+            classList: t.List[t.Union[str, type]] = list(self.classes)
             classList.extend(self.__class__.mro())
             fullyQualifiedStrings = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
             classList.extend(fullyQualifiedStrings)
@@ -285,13 +277,7 @@ class ProtoM21Object:
         return f'object at {hex(id(self))}'
 
 
-del (
-    Dict,
-    FrozenSet,
-    Sequence,
-    Union,
-    Tuple,
-)
+del t
 
 
 class Test(unittest.TestCase):

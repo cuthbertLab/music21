@@ -72,7 +72,7 @@ To get rid of beams on a note do:
 
 >>> n2.beams.beamsList = []
 '''
-from typing import Iterable, List, Optional, Union
+import typing as t
 import unittest
 
 from music21 import exceptions21
@@ -240,7 +240,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     # STATIC METHODS #
 
     @staticmethod
-    def naiveBeams(srcList: Iterable['music21.base.Music21Object']):
+    def naiveBeams(srcList: t.Iterable['music21.base.Music21Object']):
         # noinspection PyShadowingNames
         '''
         Given a list or iterator of elements, return a list of None or Beams for
@@ -261,7 +261,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
                      2/None>/<music21.beam.Beam 3/None>>,
          None]
         '''
-        beamsList: List[Optional[Beams]] = []
+        beamsList: t.List[t.Optional[Beams]] = []
         for el in srcList:
             # if a dur cannot be beamable under any circumstance, replace
             # it with None; this includes Rests
@@ -280,7 +280,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         return beamsList
 
     @staticmethod
-    def removeSandwichedUnbeamables(beamsList: List[Union['Beams', None]]):
+    def removeSandwichedUnbeamables(beamsList: t.List[t.Union['Beams', None]]):
         # noinspection PyShadowingNames
         '''
         Go through the naiveBeamsList and remove beams from objects surrounded

@@ -26,7 +26,7 @@ import importlib
 import unittest
 import sys
 from collections import OrderedDict
-from typing import Iterable, Optional
+import typing as t
 
 from music21 import base
 from music21 import common
@@ -43,7 +43,7 @@ environLocal = environment.Environment('instrument')
 
 def unbundleInstruments(streamIn: 'music21.stream.Stream',
                         *,
-                        inPlace=False) -> Optional['music21.stream.Stream']:
+                        inPlace=False) -> t.Optional['music21.stream.Stream']:
     # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.NotRest` objects
@@ -82,7 +82,7 @@ def unbundleInstruments(streamIn: 'music21.stream.Stream',
 
 def bundleInstruments(streamIn: 'music21.stream.Stream',
                       *,
-                      inPlace=False) -> Optional['music21.stream.Stream']:
+                      inPlace=False) -> t.Optional['music21.stream.Stream']:
     # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
@@ -159,7 +159,7 @@ class Instrument(base.Music21Object):
         self.printPartName = None  # True = yes, False = no, None = let others decide
         self.printPartAbbreviation = None
 
-        self.instrumentId: Optional[str] = None  # apply to midi and instrument
+        self.instrumentId: t.Optional[str] = None  # apply to midi and instrument
         self._instrumentIdIsRandom = False
 
         self.instrumentName = instrumentName
@@ -172,7 +172,7 @@ class Instrument(base.Music21Object):
         self.highestNote = None
 
         # define interval to go from written to sounding
-        self.transposition: Optional[interval.Interval] = None
+        self.transposition: t.Optional[interval.Interval] = None
 
         self.inGMPercMap = False
         self.soundfontFn = None  # if defined...
@@ -1870,7 +1870,7 @@ def deduplicate(s: 'music21.stream.Stream', inPlace: bool = False) -> 'music21.s
         returnObj = s.coreCopyAsDerivation('instrument.deduplicate')
 
     if not returnObj.hasPartLikeStreams():
-        substreams: Iterable[stream.Stream] = [returnObj]
+        substreams: t.Iterable[stream.Stream] = [returnObj]
     else:
         substreams = returnObj.getElementsByClass(stream.Stream)
 

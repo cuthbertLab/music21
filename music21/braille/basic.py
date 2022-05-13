@@ -11,7 +11,7 @@
 # ------------------------------------------------------------------------------
 
 import unittest
-from typing import List, Dict
+import typing as t
 
 # from music21 import articulations
 from music21 import articulations
@@ -34,7 +34,7 @@ symbols = lookup.symbols
 
 environRules = environment.Environment('basic.py')
 
-beamStatus: Dict[str, bool] = {}
+beamStatus: t.Dict[str, bool] = {}
 
 # Attributes that the translator currently sets on Music21Objects
 # that should be cleaned up after transcription
@@ -689,7 +689,7 @@ def noteToBraille(
         except AttributeError:
             beamStatus[keyword] = False
 
-    noteTrans: List[str] = []
+    noteTrans: t.List[str] = []
     # opening double slur (before second note, after first note)
     # opening bracket slur
     # closing bracket slur (if also beginning of next long slur)
@@ -847,7 +847,7 @@ def handlePitchWithAccidental(music21Pitch, pitchTrans, brailleEnglish):
             brailleEnglish.append(f'Parenthesis {ps}')
 
 
-def handleArticulations(music21Note, noteTrans: List[str], upperFirstInFingering=True):
+def handleArticulations(music21Note, noteTrans: t.List[str], upperFirstInFingering=True):
     # finger mark
     # -----------
     try:
@@ -863,7 +863,7 @@ def handleArticulations(music21Note, noteTrans: List[str], upperFirstInFingering
             + 'cannot be transcribed to braille.')
 
 
-def handleExpressions(music21Note: note.GeneralNote, noteTrans: List[str]):
+def handleExpressions(music21Note: note.GeneralNote, noteTrans: t.List[str]):
     '''
     Transcribe the expressions for a note.GeneralNote.
     '''
@@ -959,13 +959,13 @@ def tempoTextToBraille(
     ⠛⠗⠁⠵⠊⠕⠎⠕⠀⠍⠁⠀
     ⠉⠁⠝⠞⠁⠃⠊⠇⠑⠲
     '''
-    newBrailleEnglish: List[str] = []
+    newBrailleEnglish: t.List[str] = []
     music21TempoText.editorial.brailleEnglish = newBrailleEnglish
     allPhrases = music21TempoText.text.split(',')
     braillePhrases = []
     for samplePhrase in allPhrases:
         allWords = samplePhrase.split()
-        phraseTrans: List[str] = []
+        phraseTrans: t.List[str] = []
         for sampleWord in allWords:
             try:
                 brailleWord = wordToBraille(sampleWord)

@@ -42,7 +42,7 @@ For most people you'll want to do something like this:
 ['A4', 'B4(-15c)', 'C#5(-11c)', 'E-5(-7c)', 'E~5(+6c)', 'F#5(+14c)', 'G~5(+1c)', 'B-5(+2c)']
 
 '''
-from typing import Dict, Optional, List, Callable
+import typing as t
 
 import io
 import math
@@ -62,7 +62,7 @@ environLocal = environment.Environment('scale.scala')
 
 # ------------------------------------------------------------------------------
 # global variable to cache the paths returned from getPaths()
-SCALA_PATHS: Dict[str, Optional[Dict[str, List[str]]]] = {'allPaths': None}
+SCALA_PATHS: t.Dict[str, t.Optional[t.Dict[str, t.List[str]]]] = {'allPaths': None}
 
 def getPaths():
     '''
@@ -721,7 +721,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[Callable] = []
+_DOC_ORDER: t.List[t.Callable] = []
 
 
 if __name__ == '__main__':

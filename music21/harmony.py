@@ -20,7 +20,7 @@ import copy
 import re
 import unittest
 
-from typing import Dict, List, Optional, Tuple, TypeVar, Union
+import typing as t
 
 from music21 import base
 from music21 import chord
@@ -38,8 +38,8 @@ from music21.figuredBass import realizerScale
 from music21 import environment
 environLocal = environment.Environment('harmony')
 
-T = TypeVar('T', bound='ChordSymbol')
-NCT = TypeVar('NCT', bound='NoChord')
+T = t.TypeVar('T', bound='ChordSymbol')
+NCT = t.TypeVar('NCT', bound='NoChord')
 
 # --------------------------------------------------------------------------
 
@@ -207,10 +207,10 @@ class Harmony(chord.Chord):
     # INITIALIZER #
 
     def __init__(self,
-                 figure: Optional[str] = None,
-                 root: Union[str, pitch.Pitch, None] = None,
-                 bass: Union[str, pitch.Pitch, None] = None,
-                 inversion: Optional[int] = None,
+                 figure: t.Optional[str] = None,
+                 root: t.Union[str, pitch.Pitch, None] = None,
+                 bass: t.Union[str, pitch.Pitch, None] = None,
+                 inversion: t.Optional[int] = None,
                  updatePitches: bool = True,
                  **keywords
                  ):
@@ -226,8 +226,8 @@ class Harmony(chord.Chord):
         # called <function> which might conflict with the Harmony...
         self._roman = None
         # specify an array of degree alteration objects
-        self.chordStepModifications: List[ChordStepModification] = []
-        self._degreesList: List[str] = []
+        self.chordStepModifications: t.List[ChordStepModification] = []
+        self._degreesList: t.List[str] = []
         self._key = None
         # senseless to parse inversion until chord members are populated
         self._updateFromParameters(root=root, bass=bass)
@@ -279,7 +279,7 @@ class Harmony(chord.Chord):
         '''
         return
 
-    def _updateFromParameters(self, root, bass, inversion: Optional[int] = None):
+    def _updateFromParameters(self, root, bass, inversion: t.Optional[int] = None):
         '''
         This method must be called twice, once before the pitches
         are rendered, and once after. This is because after the pitches
@@ -1391,7 +1391,7 @@ def removeChordSymbols(chordType):
 
 
 # --------------------------------------------------------------------------
-realizerScaleCache: Dict[Tuple[str, str], realizerScale.FiguredBassScale] = {}
+realizerScaleCache: t.Dict[t.Tuple[str, str], realizerScale.FiguredBassScale] = {}
 
 # --------------------------------------------------------------------------
 
@@ -1583,9 +1583,9 @@ class ChordSymbol(Harmony):
 
     def __init__(self,
                  figure=None,
-                 root: Union[pitch.Pitch, str, None] = None,
-                 bass: Union[pitch.Pitch, str, None] = None,
-                 inversion: Optional[int] = None,
+                 root: t.Union[pitch.Pitch, str, None] = None,
+                 bass: t.Union[pitch.Pitch, str, None] = None,
+                 inversion: t.Optional[int] = None,
                  kind='',
                  kindStr='',
                  **keywords
@@ -2341,7 +2341,7 @@ class ChordSymbol(Harmony):
         else:
             return False
 
-    def transpose(self: T, value, *, inPlace=False) -> Optional[T]:
+    def transpose(self: T, value, *, inPlace=False) -> t.Optional[T]:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` so that this ChordSymbol's
         `figure` is appropriately cleared afterward.
@@ -2448,7 +2448,7 @@ class NoChord(ChordSymbol):
         # do nothing, everything is already set.
         return
 
-    def transpose(self: NCT, _value, *, inPlace=False) -> Optional[NCT]:
+    def transpose(self: NCT, _value, *, inPlace=False) -> t.Optional[NCT]:
         '''
         Overrides :meth:`~music21.chord.Chord.transpose` to do nothing.
 

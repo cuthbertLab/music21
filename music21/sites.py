@@ -15,7 +15,7 @@ sites.py -- Objects for keeping track of relationships among Music21Objects
 import collections
 import unittest
 import weakref
-from typing import Any, MutableMapping, Optional, Union
+import typing as t
 
 from music21 import common
 from music21 import exceptions21
@@ -34,7 +34,7 @@ WEAKREF_ACTIVE = True
 # that still exists, then restore it from the dictionary; otherwise, do not
 # sweat it.  Should make pickle deepcopies of music21 objects in Streams still
 # possible without needing to recreate the whole stream.
-GLOBAL_SITE_STATE_DICT: MutableMapping[str, Optional[Any]] = weakref.WeakValueDictionary()
+GLOBAL_SITE_STATE_DICT: t.MutableMapping[str, t.Optional[t.Any]] = weakref.WeakValueDictionary()
 
 
 class SitesException(exceptions21.Music21Exception):
@@ -380,7 +380,7 @@ class Sites(common.SlottedObjectMixin):
         self._lastID = -1  # cannot be None
 
     def yieldSites(self,
-                   sortByCreationTime: Union[str, bool] = False,
+                   sortByCreationTime: t.Union[str, bool] = False,
                    priorityTarget=None,
                    excludeNone=False):
         # noinspection PyDunderSlots

@@ -27,7 +27,7 @@ import os
 import sys
 import time
 import unittest
-from typing import Optional, Any
+import typing as t
 
 from music21 import environment
 from music21 import common
@@ -38,15 +38,15 @@ environLocal = environment.Environment('test.multiprocessTest')
 
 @dataclasses.dataclass
 class ModuleResponse:
-    returnCode: Optional[str] = None
-    fp: Any = None
-    moduleName: Optional[str] = None
-    success: Any = None
-    testRunner: Any = None
-    errors: Any = None
-    failures: Any = None
-    testsRun: Any = None
-    runTime: Any = None
+    returnCode: t.Optional[str] = None
+    fp: t.Any = None
+    moduleName: t.Optional[str] = None
+    success: t.Any = None
+    testRunner: t.Any = None
+    errors: t.Any = None
+    failures: t.Any = None
+    testsRun: t.Any = None
+    runTime: t.Any = None
 
 
 # ------------------------------------------------------------------------------

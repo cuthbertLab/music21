@@ -20,7 +20,7 @@ can be found in modules such as :ref:`moduleDynamics` (for things such as cresce
 '''
 import unittest
 import copy
-from typing import Any, Dict, Sequence, Union, List, Optional, TypedDict
+import typing as t
 
 from music21 import exceptions21
 from music21 import base
@@ -407,8 +407,8 @@ class Spanner(base.Music21Object):
 
     def addSpannedElements(
         self,
-        spannedElements: Union[Sequence[base.Music21Object],
-                               base.Music21Object],
+        spannedElements: t.Union[t.Sequence[base.Music21Object],
+                                 base.Music21Object],
         *arguments,
         **keywords
     ):
@@ -606,7 +606,7 @@ class Spanner(base.Music21Object):
 
 
 # ------------------------------------------------------------------------------
-class _SpannerRef(TypedDict):
+class _SpannerRef(t.TypedDict):
     # noinspection PyTypedDict
     spanner: 'Spanner'
     className: str
@@ -632,10 +632,10 @@ class SpannerBundle(prebase.ProtoM21Object):
     Changed in v7: only argument must be a List of spanners.
     Creators of SpannerBundles are required to check that this constraint is True
     '''
-    def __init__(self, spanners: Optional[List[Spanner]] = None):
-        self._cache: Dict[str, Any] = {}  # cache is defined on Music21Object not ProtoM21Object
+    def __init__(self, spanners: t.Optional[t.List[Spanner]] = None):
+        self._cache: t.Dict[str, t.Any] = {}  # cache is defined on Music21Object not ProtoM21Object
 
-        self._storage: List[Spanner]
+        self._storage: t.List[Spanner]
         if spanners:
             self._storage = spanners[:]  # a simple List, not a Stream
         else:
@@ -645,7 +645,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         # SpannerBundle as missing a spannedElement; the next obj that meets
         # the class expectation will then be assigned and the spannedElement
         # cleared
-        self._pendingSpannedElementAssignment: List[_SpannerRef] = []
+        self._pendingSpannedElementAssignment: t.List[_SpannerRef] = []
 
     def append(self, other):
         '''
@@ -805,7 +805,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         self,
         old: base.Music21Object,
         new: base.Music21Object
-    ) -> List[Spanner]:
+    ) -> t.List[Spanner]:
         # noinspection PyShadowingNames
         '''
         Given a spanner spannedElement (an object), replace all old spannedElements
@@ -872,7 +872,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         return replacedSpanners
 
-    def getByClass(self, className: Union[str, type]) -> 'SpannerBundle':
+    def getByClass(self, className: t.Union[str, type]) -> 'SpannerBundle':
         '''
         Given a spanner class, return a new SpannerBundle of all Spanners of the desired class.
 
@@ -2722,7 +2722,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = [Spanner]
+_DOC_ORDER: t.List[type] = [Spanner]
 
 
 if __name__ == '__main__':

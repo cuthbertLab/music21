@@ -18,7 +18,7 @@ import unittest
 import textwrap
 import webbrowser
 
-from typing import List
+import typing as t
 
 from importlib import reload  # Python 3.4
 
@@ -1194,7 +1194,7 @@ class SelectFilePath(SelectFromList):
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
-    def _getAppOSIndependent(self, comparisonFunction, path0: str, post: List[str],
+    def _getAppOSIndependent(self, comparisonFunction, path0: str, post: t.List[str],
                              *,
                              glob: str = '**/*'):
         '''
@@ -1212,23 +1212,23 @@ class SelectFilePath(SelectFromList):
             if comparisonFunction(str(path1)):
                 post.append(str(path1))
 
-    def _getDarwinApp(self, comparisonFunction) -> List[str]:
+    def _getDarwinApp(self, comparisonFunction) -> t.List[str]:
         '''
         Provide a comparison function that returns True or False based on the file name.
         This looks at everything in Applications, as well as every directory in Applications
         '''
-        post: List[str] = []
+        post: t.List[str] = []
         for path0 in ('/Applications', common.cleanpath('~/Applications', returnPathlib=False)):
             assert isinstance(path0, str)
             self._getAppOSIndependent(comparisonFunction, path0, post, glob='*')
         return post
 
-    def _getWinApp(self, comparisonFunction) -> List[str]:
+    def _getWinApp(self, comparisonFunction) -> t.List[str]:
         '''
         Provide a comparison function that returns True or False based on the file name.
         '''
         # provide a similar method to _getDarwinApp
-        post: List[str] = []
+        post: t.List[str] = []
         environKeys = ('ProgramFiles', 'ProgramFiles(x86)', 'ProgramW6432')
         for possibleEnvironKey in environKeys:
             if possibleEnvironKey not in os.environ:
@@ -1594,7 +1594,7 @@ class ConfigurationAssistant:
 #         print('got: %s' % post)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: t.List[type] = []
 
 
 class TestUserInput(unittest.TestCase):  # pragma: no cover
@@ -1762,7 +1762,7 @@ if __name__ == '__main__':
 
     else:
         # only if running tests
-        t = Test()
+        testInstance = Test()
         te = TestUserInput()
 
         if len(sys.argv) < 2 or sys.argv[1] in ['all', 'test']:
@@ -1774,5 +1774,5 @@ if __name__ == '__main__':
             # run test user input
             getattr(te, sys.argv[2])()
         # just run named Test
-        elif hasattr(t, sys.argv[1]):
-            getattr(t, sys.argv[1])()
+        elif hasattr(testInstance, sys.argv[1]):
+            getattr(testInstance, sys.argv[1])()

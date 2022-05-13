@@ -36,7 +36,7 @@ The list of objects included here are:
 '''
 import enum
 import unittest
-from typing import List, no_type_check
+import typing as t
 
 from music21 import base
 from music21 import chord
@@ -57,7 +57,7 @@ from music21 import scale
 
 # create a module level shared cache for intervals of P1, P5, P8
 # to be populated the first time a VLQ object is created
-intervalCache: List[interval.Interval] = []
+intervalCache: t.List[interval.Interval] = []
 
 
 class MotionType(str, enum.Enum):
@@ -112,8 +112,8 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.v2n1 = v2n1
         self.v2n2 = v2n2
 
-        self.vIntervals: List[interval.Interval] = []  # vertical intervals (harmonic)
-        self.hIntervals: List[interval.Interval] = []  # horizontal intervals (melodic)
+        self.vIntervals: t.List[interval.Interval] = []  # vertical intervals (harmonic)
+        self.hIntervals: t.List[interval.Interval] = []  # horizontal intervals (melodic)
 
         self._key = None
         if analyticKey is not None:
@@ -447,7 +447,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             else:
                 return False
 
-    @no_type_check
+    @t.no_type_check
     def parallelMotion(
         self,
         requiredInterval=None,
@@ -990,7 +990,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return False
 
-    @no_type_check
+    @t.no_type_check
     def isProperResolution(self) -> bool:
         '''
         Checks whether the voice-leading quartet resolves correctly according to standard
@@ -1149,7 +1149,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return True
 
-    @no_type_check
+    @t.no_type_check
     def leapNotSetWithStep(self) -> bool:
         '''
         Returns True if there is a leap or skip in once voice then the other voice must
@@ -1240,7 +1240,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                       and (r1[0].upper() in openings if r1 is not False else False
                            or r2[0].upper() in openings if r2 is not False else False))
 
-    @no_type_check
+    @t.no_type_check
     def closesIncorrectly(self) -> bool:
         '''
         TODO(msc): will be renamed to be less dogmatic

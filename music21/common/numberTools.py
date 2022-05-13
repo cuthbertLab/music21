@@ -14,7 +14,7 @@ import math
 import numbers
 import random
 import unittest
-from typing import List, no_type_check, Tuple, Union, Sequence, Iterable
+import typing as t
 
 from fractions import Fraction
 from math import isclose
@@ -95,7 +95,7 @@ def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):  # p
 # Number methods...
 
 
-def numToIntOrFloat(value: Union[int, float]) -> Union[int, float]:
+def numToIntOrFloat(value: t.Union[int, float]) -> t.Union[int, float]:
     '''
     Given a number, return an integer if it is very close to an integer,
     otherwise, return a float.
@@ -147,7 +147,7 @@ def numToIntOrFloat(value: Union[int, float]) -> Union[int, float]:
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
 @lru_cache(1024)
-def _preFracLimitDenominator(n: int, d: int) -> Tuple[int, int]:
+def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
     # noinspection PyShadowingNames
     '''
     Used in opFrac
@@ -227,8 +227,8 @@ def _preFracLimitDenominator(n: int, d: int) -> Tuple[int, int]:
 
 
 # no type checking due to accessing protected attributes (for speed)
-@no_type_check
-def opFrac(num: Union[OffsetQLIn, None]) -> Union[OffsetQL, None]:
+@t.no_type_check
+def opFrac(num: t.Union[OffsetQLIn, None]) -> t.Union[OffsetQL, None]:
     '''
     opFrac -> optionally convert a number to a fraction or back.
 
@@ -272,8 +272,8 @@ def opFrac(num: Union[OffsetQLIn, None]) -> Union[OffsetQL, None]:
     # hence redundancy -- first we check for type (no inheritance) and then we
     # repeat exact same test with inheritance.
     # Note that the later examples are more verbose
-    t = type(num)
-    if t is float:
+    numType = type(num)
+    if numType is float:
         # quick test of power of whether denominator is a power
         # of two, and thus representable exactly as a float: can it be
         # represented w/ a denominator less than DENOM_LIMIT?
@@ -288,9 +288,9 @@ def opFrac(num: Union[OffsetQLIn, None]) -> Union[OffsetQL, None]:
             # internally in Fraction constructor, but is twice as fast...
         else:
             return num
-    elif t is int:  # if vs. elif is negligible time difference.
+    elif numType is int:  # if vs. elif is negligible time difference.
         return num + 0.0  # 8x faster than float(num)
-    elif t is Fraction:
+    elif numType is Fraction:
         d = num._denominator  # private access instead of property: 6x faster; may break later...
         if (d & (d - 1)) == 0:  # power of two...
             return num._numerator / (d + 0.0)  # 50% faster than float(num)
@@ -385,7 +385,7 @@ def mixedNumeral(expr: numbers.Real,
     return str(0)
 
 
-def roundToHalfInteger(num: Union[float, int]) -> Union[float, int]:
+def roundToHalfInteger(num: t.Union[float, int]) -> t.Union[float, int]:
     '''
     Given a floating-point number, round to the nearest half-integer. Returns int or float
 
@@ -433,7 +433,7 @@ def roundToHalfInteger(num: Union[float, int]) -> Union[float, int]:
     return intVal + floatVal
 
 
-def addFloatPrecision(x, grain=1e-2) -> Union[float, Fraction]:
+def addFloatPrecision(x, grain=1e-2) -> t.Union[float, Fraction]:
     '''
     Given a value that suggests a floating point fraction, like 0.33,
     return a Fraction or float that provides greater specification, such as Fraction(1, 3)
@@ -493,7 +493,7 @@ def strTrimFloat(floatNum: float, maxNum: int = 4) -> str:
     return off
 
 
-def nearestMultiple(n: float, unit: float) -> Tuple[float, float, float]:
+def nearestMultiple(n: float, unit: float) -> t.Tuple[float, float, float]:
     '''
     Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as
     the absolute difference (error) to seven significant digits and the signed difference.
@@ -591,7 +591,7 @@ def dotMultiplier(dots: int) -> float:
     return ((2 ** (dots + 1.0)) - 1.0) / (2 ** dots)
 
 
-def decimalToTuplet(decNum: float) -> Tuple[int, int]:
+def decimalToTuplet(decNum: float) -> t.Tuple[int, int]:
     '''
     For simple decimals (usually > 1), a quick way to figure out the
     fraction in lowest terms that gives a valid tuplet.
@@ -651,7 +651,7 @@ def decimalToTuplet(decNum: float) -> Tuple[int, int]:
         return (int(iy), int(jy))
 
 
-def unitNormalizeProportion(values: Sequence[int]) -> List[float]:
+def unitNormalizeProportion(values: t.Sequence[int]) -> t.List[float]:
     '''
     Normalize values within the unit interval, where max is determined by the sum of the series.
 
@@ -685,7 +685,7 @@ def unitNormalizeProportion(values: Sequence[int]) -> List[float]:
     return unit
 
 
-def unitBoundaryProportion(series: Sequence[int]) -> List[Tuple[Union[int, float], float]]:
+def unitBoundaryProportion(series: t.Sequence[int]) -> t.List[t.Tuple[t.Union[int, float], float]]:
     '''
     Take a series of parts with an implied sum, and create
     unit-interval boundaries proportional to the series components.
@@ -707,7 +707,7 @@ def unitBoundaryProportion(series: Sequence[int]) -> List[Tuple[Union[int, float
     return bounds
 
 
-def weightedSelection(values: List[int], weights: List[int], randomGenerator=None) -> int:
+def weightedSelection(values: t.List[int], weights: t.List[int], randomGenerator=None) -> int:
     '''
     Given a list of values and an equal-sized list of weights,
     return a randomly selected value using the weight.
@@ -751,7 +751,7 @@ def euclidGCD(a: int, b: int) -> int:
         return euclidGCD(b, a % b)
 
 
-def approximateGCD(values: List[Union[int, float]], grain: float = 1e-4) -> float:
+def approximateGCD(values: t.List[t.Union[int, float]], grain: float = 1e-4) -> float:
     '''Given a list of values, find the lowest common divisor of floating point values.
 
     >>> common.approximateGCD([2.5, 10, 0.25])
@@ -818,7 +818,7 @@ def approximateGCD(values: List[Union[int, float]], grain: float = 1e-4) -> floa
     return max(commonUniqueDivisions)
 
 
-def lcm(filterList: Iterable[int]) -> int:
+def lcm(filterList: t.Iterable[int]) -> int:
     '''
     Find the least common multiple of a list of values
 
@@ -882,7 +882,7 @@ def contiguousList(inputListOrTuple) -> bool:
     return True
 
 
-def groupContiguousIntegers(src: List[int]) -> List[List[int]]:
+def groupContiguousIntegers(src: t.List[int]) -> t.List[t.List[int]]:
     '''
     Given a list of integers, group contiguous values into sub lists
 

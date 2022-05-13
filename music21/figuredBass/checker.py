@@ -10,7 +10,7 @@
 
 import collections
 import copy
-from typing import Dict, Tuple
+import typing as t
 import unittest
 
 from music21 import pitch
@@ -397,7 +397,10 @@ def voiceCrossing(possibA):
 # Consecutive Possibility Rule-Checking Methods
 
 
-PITCH_QUARTET_TO_BOOL_TYPE = Dict[Tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch], bool]
+PITCH_QUARTET_TO_BOOL_TYPE = t.Dict[
+    t.Tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
+    bool
+]
 parallelFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
 parallelOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
 hiddenFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}

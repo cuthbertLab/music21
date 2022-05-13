@@ -13,7 +13,7 @@ Classes for searching for Lyric objects.
 '''
 import re
 from collections import namedtuple, OrderedDict
-from typing import Optional, List
+import typing as t
 import unittest
 
 from music21.exceptions21 import Music21Exception
@@ -125,8 +125,8 @@ class LyricSearcher:
         self.includeIntermediateElements = False  # currently does nothing
         self.includeTrailingMelisma = False  # currently does nothing
 
-        self._indexText: Optional[str] = None
-        self._indexTuples: List[IndexedLyric] = []
+        self._indexText: t.Optional[str] = None
+        self._indexTuples: t.List[IndexedLyric] = []
 
     @property
     def indexText(self) -> str:
@@ -143,12 +143,12 @@ class LyricSearcher:
         return self._indexText or ''
 
     @property
-    def indexTuples(self) -> List[IndexedLyric]:
+    def indexTuples(self) -> t.List[IndexedLyric]:
         if self._indexText is None:  # correct -- check text to see if has run.
             self.index()
         return self._indexTuples
 
-    def index(self, s=None) -> List[IndexedLyric]:
+    def index(self, s=None) -> t.List[IndexedLyric]:
         # noinspection PyShadowingNames
         '''
         A method that indexes the Stream's lyrics and returns the list
@@ -190,7 +190,7 @@ class LyricSearcher:
         lastSyllabicByIdentifier = OrderedDict()
 
         for n in s.recurse().notes:
-            ls: List[note.Lyric] = n.lyrics
+            ls: t.List[note.Lyric] = n.lyrics
             if not ls:
                 continue
             mNum = n.measureNumber
@@ -250,7 +250,7 @@ class LyricSearcher:
         self._indexText = iText
         return index
 
-    def search(self, textOrRe, s=None) -> List[SearchMatch]:
+    def search(self, textOrRe, s=None) -> t.List[SearchMatch]:
         # noinspection SpellCheckingInspection
         r'''
         Return a list of SearchMatch objects matching a string or regular expression.
@@ -325,7 +325,7 @@ class LyricSearcher:
 
         raise LyricSearcherException(f'Could not find position {pos} in text')
 
-    def _findObjsInIndexByPos(self, posStart, posEnd=999999) -> List[IndexedLyric]:
+    def _findObjsInIndexByPos(self, posStart, posEnd=999999) -> t.List[IndexedLyric]:
         '''
         Finds a list of objects in ._indexTuples by search position (inclusive)
         '''
@@ -357,7 +357,7 @@ class LyricSearcher:
     #     lineBreakStart += len(LINEBREAK_TOKEN)
     #     return lineBreakStart
 
-    def _reSearch(self, r: re.Pattern) -> List[SearchMatch]:
+    def _reSearch(self, r: re.Pattern) -> t.List[SearchMatch]:
         locations = []
         for m in r.finditer(self._indexText):
             absoluteFoundPos, absoluteEndPos = m.span()

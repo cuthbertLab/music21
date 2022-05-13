@@ -15,7 +15,7 @@
 
 import copy
 import unittest
-from typing import List, Generator, Optional, Set, Union
+import typing as t
 from fractions import Fraction  # typing only
 
 from music21 import beam
@@ -47,7 +47,7 @@ def makeBeams(
     inPlace=False,
     setStemDirections=True,
     failOnNoTimeSignature=False,
-) -> Optional[StreamType]:
+) -> t.Optional[StreamType]:
     # noinspection PyShadowingNames
     '''
     Return a new Measure, or Stream of Measures, with beams applied to all
@@ -127,7 +127,7 @@ def makeBeams(
         returnObj = s
 
     # if s.isClass(Measure):
-    mColl: List[stream.Measure]
+    mColl: t.List[stream.Measure]
     if isinstance(returnObj, stream.Measure):
         mColl = [returnObj]  # store a list of measures for processing
     else:
@@ -231,7 +231,7 @@ def makeMeasures(
     finalBarline='final',
     bestClef=False,
     inPlace=False,
-) -> Optional[StreamType]:
+) -> t.Optional[StreamType]:
     '''
     Takes a stream and places all of its elements into
     measures (:class:`~music21.stream.Measure` objects)
@@ -710,7 +710,7 @@ def makeRests(
     timeRangeFromBarDuration=False,
     inPlace=False,
     hideRests=False,
-) -> Optional[StreamType]:
+) -> t.Optional[StreamType]:
     '''
     Given a Stream with an offset not equal to zero,
     fill with one Rest preceding this offset.
@@ -854,14 +854,14 @@ def makeRests(
             return returnObj
 
     def oHighTargetForMeasure(
-        m: Optional[stream.Measure] = None,
-        ts: Optional[meter.TimeSignature] = None
-    ) -> Union[float, Fraction]:
+        m: t.Optional[stream.Measure] = None,
+        ts: t.Optional[meter.TimeSignature] = None
+    ) -> t.Union[float, Fraction]:
         """
         Needed for timeRangeFromBarDuration.
         Returns 0.0 if no meter can be found.
         """
-        post: Union[float, Fraction] = 0.0
+        post: t.Union[float, Fraction] = 0.0
         if ts is not None:
             post = ts.barDuration.quarterLength
         elif m is not None:
@@ -881,7 +881,7 @@ def makeRests(
             if isinstance(refStreamOrTimeRange, stream.Measure):
                 oHighTarget = oHighTargetForMeasure(m=refStreamOrTimeRange)
             elif isinstance(refStreamOrTimeRange, meter.TimeSignature):
-                maybe_measure: Optional[stream.Measure] = None
+                maybe_measure: t.Optional[stream.Measure] = None
                 if isinstance(returnObj.activeSite, stream.Measure):
                     maybe_measure = returnObj.activeSite
                 oHighTarget = oHighTargetForMeasure(m=maybe_measure, ts=refStreamOrTimeRange)
@@ -904,7 +904,7 @@ def makeRests(
             oLowTarget = min(refStreamOrTimeRange)
             oHighTarget = max(refStreamOrTimeRange)
 
-    bundle: List[StreamType]
+    bundle: t.List[StreamType]
     if returnObj.hasVoices():
         bundle = list(returnObj.voices)
     elif returnObj.hasMeasures():
@@ -912,7 +912,7 @@ def makeRests(
     else:
         bundle = [returnObj]
 
-    lastTimeSignature: Optional[meter.TimeSignature] = None
+    lastTimeSignature: t.Optional[meter.TimeSignature] = None
     # bundle components may be voices, measures, or a flat Stream
     for component in bundle:
         oLow = component.lowestOffset
@@ -984,7 +984,7 @@ def makeTies(
     inPlace=False,
     displayTiedAccidentals=False,
     classFilterList=(note.GeneralNote,),
-) -> Optional[StreamType]:
+) -> t.Optional[StreamType]:
     # noinspection PyShadowingNames
     '''
     Given a stream containing measures, examine each element in the
@@ -1355,7 +1355,7 @@ def makeTies(
         return None
 
 
-def makeTupletBrackets(s: StreamType, *, inPlace=False) -> Optional[StreamType]:
+def makeTupletBrackets(s: StreamType, *, inPlace=False) -> t.Optional[StreamType]:
     # noinspection PyShadowingNames
     '''
     Given a flat Stream of mixed durations, designates the first and last tuplet of any group
@@ -1409,8 +1409,8 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> Optional[StreamType]:
             tupletMap.append([tupletList[0], dur])
 
     # have a list of tuplet, Duration pairs
-    completionCount: Union[float, int, Fraction] = 0  # qLen currently filled
-    completionTarget: Union[float, int, Fraction, None] = None  # qLen necessary to fill tuplet
+    completionCount: t.Union[float, int, Fraction] = 0  # qLen currently filled
+    completionTarget: t.Union[float, int, Fraction, None] = None  # qLen necessary to fill tuplet
     for i in range(len(tupletMap)):
         tupletObj, dur = tupletMap[i]
 
@@ -1573,7 +1573,7 @@ def moveNotesToVoices(source: StreamType,
     source.insert(0, dst)
 
 
-def getTiePitchSet(prior: 'music21.note.NotRest') -> Optional[Set[str]]:
+def getTiePitchSet(prior: 'music21.note.NotRest') -> t.Optional[t.Set[str]]:
     # noinspection PyShadowingNames
     '''
     helper method for makeAccidentals to get the tie pitch set (or None)
@@ -1631,17 +1631,17 @@ def getTiePitchSet(prior: 'music21.note.NotRest') -> Optional[Set[str]]:
     return tiePitchSet
 
 def makeAccidentalsInMeasureStream(
-    s: Union[StreamType, StreamIterator],
+    s: t.Union[StreamType, StreamIterator],
     *,
-    pitchPast: Optional[List[pitch.Pitch]] = None,
-    pitchPastMeasure: Optional[List[pitch.Pitch]] = None,
-    useKeySignature: Union[bool, key.KeySignature] = True,
-    alteredPitches: Optional[List[pitch.Pitch]] = None,
+    pitchPast: t.Optional[t.List[pitch.Pitch]] = None,
+    pitchPastMeasure: t.Optional[t.List[pitch.Pitch]] = None,
+    useKeySignature: t.Union[bool, key.KeySignature] = True,
+    alteredPitches: t.Optional[t.List[pitch.Pitch]] = None,
     cautionaryPitchClass: bool = True,
     cautionaryAll: bool = False,
     overrideStatus: bool = False,
     cautionaryNotImmediateRepeat: bool = True,
-    tiePitchSet: Optional[Set[str]] = None
+    tiePitchSet: t.Optional[t.Set[str]] = None
 ) -> None:
     '''
     Makes accidentals in place on a stream consisting of only Measures.
@@ -1722,7 +1722,7 @@ def iterateBeamGroups(
     s: StreamType,
     skipNoBeams=True,
     recurse=True
-) -> Generator[List[note.NotRest], None, None]:
+) -> t.Generator[t.List[note.NotRest], None, None]:
     '''
     Generator that yields a List of NotRest objects that fall within a beam group.
 
@@ -1767,10 +1767,10 @@ def iterateBeamGroups(
     New in v6.7.
     '''
     iterator: 'music21.stream.iterator.StreamIterator' = s.recurse() if recurse else s.iter()
-    current_beam_group: List[note.NotRest] = []
+    current_beam_group: t.List[note.NotRest] = []
     in_beam_group: bool = False
     for el in iterator.notes:
-        first_el_type: Optional[str] = None
+        first_el_type: t.Optional[str] = None
         if el.beams and el.beams.getByNumber(1):
             first_el_type = el.beams.getTypeByNumber(1)
 
@@ -1815,7 +1815,7 @@ def setStemDirectionForBeamGroups(
 
     New in v6.7.
     '''
-    beamGroup: List[note.NotRest]
+    beamGroup: t.List[note.NotRest]
     for beamGroup in iterateBeamGroups(s, skipNoBeams=True, recurse=True):
         setStemDirectionOneGroup(
             beamGroup,
@@ -1825,7 +1825,7 @@ def setStemDirectionForBeamGroups(
 
 
 def setStemDirectionOneGroup(
-    group: List[note.NotRest],
+    group: t.List[note.NotRest],
     *,
     setNewStems=True,
     overrideConsistentStemDirections=False,
@@ -1850,12 +1850,12 @@ def setStemDirectionOneGroup(
         has_consistent_stem_directions = False
 
     # noinspection PyTypeChecker
-    optional_clef_context: Optional[clef.Clef] = group[0].getContextByClass(clef.Clef)
+    optional_clef_context: t.Optional[clef.Clef] = group[0].getContextByClass(clef.Clef)
     if optional_clef_context is None:
         return
     clef_context: clef.Clef = optional_clef_context
 
-    pitchList: List[pitch.Pitch] = []
+    pitchList: t.List[pitch.Pitch] = []
     for n in group:
         pitchList.extend(n.pitches)
     if not pitchList:

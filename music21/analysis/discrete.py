@@ -26,7 +26,7 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 #     range and key modules in analysis
 
 import unittest
-from typing import Union, List, Any, Tuple, Iterable, Optional, Sequence
+import typing as t
 
 from collections import OrderedDict
 from music21 import exceptions21
@@ -58,7 +58,7 @@ class DiscreteAnalysis:
     '''
     # define in subclass
     name = ''
-    identifiers: List[str] = []
+    identifiers: t.List[str] = []
 
     def __init__(self, referenceStream=None):
         # store a reference stream if needed
@@ -73,7 +73,7 @@ class DiscreteAnalysis:
         # store alternative solutions, which may be sorted or not
         self.alternativeSolutions = []
 
-    def _rgbToHex(self, rgb: Sequence[Union[float, int]]) -> str:
+    def _rgbToHex(self, rgb: t.Sequence[t.Union[float, int]]) -> str:
         '''
         Utility conversion method
 
@@ -85,7 +85,7 @@ class DiscreteAnalysis:
         rgb = round(rgb[0]), round(rgb[1]), round(rgb[2])
         return f'#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}'
 
-    def _hexToRgb(self, value: str) -> List[int]:
+    def _hexToRgb(self, value: str) -> t.List[int]:
         '''
         Utility conversion method for six-digit hex values to RGB lists.
 
@@ -293,7 +293,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 # add to dictionary
                 dst[validKey.name] = self._rgbToHex(rgbStep)
 
-    def _getSharpFlatCount(self, subStream) -> Tuple[int, int]:
+    def _getSharpFlatCount(self, subStream) -> t.Tuple[int, int]:
         # noinspection PyShadowingNames
         '''
         Determine count of sharps and flats in a Stream
@@ -314,7 +314,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                     sharpCount += 1
         return sharpCount, flatCount
 
-    def getWeights(self, weightType='major') -> List[float]:
+    def getWeights(self, weightType='major') -> t.List[float]:
         '''
         Returns the key weights. To provide different key weights,
         subclass and override this method. The defaults here are KrumhanslSchmuckler.
@@ -392,7 +392,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        likelyKeys: List[Any] = [0] * 12
+        likelyKeys: t.List[t.Any] = [0] * 12
         a = sorted((result, pc) for (pc, result) in enumerate(keyResults))
         a.reverse()
 
@@ -410,7 +410,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        solution: List[Union[int, float]] = [0.0] * 12
+        solution: t.List[t.Union[int, float]] = [0.0] * 12
         top = [0.0] * 12
         bottomRight = [0.0] * 12
         bottomLeft = [0.0] * 12
@@ -948,8 +948,8 @@ class Ambitus(DiscreteAnalysis):
         super().__init__(referenceStream=referenceStream)
         # Store the min and max Pitch instances for referenceStream
         # set by getPitchSpan(), which is called by _generateColors()
-        self.minPitchObj: Optional[pitch.Pitch] = None
-        self.maxPitchObj: Optional[pitch.Pitch] = None
+        self.minPitchObj: t.Optional[pitch.Pitch] = None
+        self.maxPitchObj: t.Optional[pitch.Pitch] = None
 
         self._pitchSpanColors = OrderedDict()
         self._generateColors()
@@ -994,7 +994,7 @@ class Ambitus(DiscreteAnalysis):
 
         # environLocal.printDebug([self._pitchSpanColors])
 
-    def getPitchSpan(self, subStream) -> Optional[Tuple[pitch.Pitch, pitch.Pitch]]:
+    def getPitchSpan(self, subStream) -> t.Optional[t.Tuple[pitch.Pitch, pitch.Pitch]]:
         '''
         For a given subStream, return a tuple consisting of the two pitches
         with the minimum and maximum pitch space value.
@@ -1041,11 +1041,11 @@ class Ambitus(DiscreteAnalysis):
             return None
 
         # find the min and max pitch space value for all pitches
-        psFound: List[float] = []
-        pitchesFound: List[pitch.Pitch] = []
+        psFound: t.List[float] = []
+        pitchesFound: t.List[pitch.Pitch] = []
         for n in justNotes:
             # environLocal.printDebug([n])
-            pitches: Iterable[pitch.Pitch] = ()
+            pitches: t.Iterable[pitch.Pitch] = ()
             if isinstance(n, note.GeneralNote) and not isinstance(n, harmony.ChordSymbol):
                 pitches = n.pitches
             psFound += [p.ps for p in pitches]

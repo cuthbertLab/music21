@@ -20,7 +20,7 @@ import io
 import pathlib
 import pickle
 import os
-from typing import Union, Any
+import typing as t
 
 from music21.exceptions21 import Music21Exception
 
@@ -52,7 +52,7 @@ def cd(targetDir):
         os.chdir(cwd)
 
 
-def readPickleGzip(filePath: Union[str, pathlib.Path]) -> Any:
+def readPickleGzip(filePath: t.Union[str, pathlib.Path]) -> t.Any:
     '''
     Read a gzip-compressed pickle file, uncompress it, unpickle it, and
     return the contents.

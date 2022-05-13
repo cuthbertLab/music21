@@ -18,7 +18,7 @@ the :class:`~music21.bar.Repeat` which represents a normal barline repeat.
 '''
 import copy
 import string
-from typing import Union
+import typing as t
 
 from music21 import exceptions21
 from music21 import expressions
@@ -1730,7 +1730,7 @@ class Expander:
             return post
         return None
 
-    def isExpandable(self) -> Union[bool, None]:
+    def isExpandable(self) -> t.Union[bool, None]:
         '''
         Return True or False if this Stream is expandable, that is,
         if it has balanced repeats or sensible Da Capo or Dal Segno

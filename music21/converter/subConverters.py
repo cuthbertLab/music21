@@ -26,7 +26,7 @@ import pathlib
 import subprocess
 import unittest
 
-from typing import Union, Optional, Tuple, Dict
+import typing as t
 
 from music21 import common
 from music21 import defaults
@@ -72,18 +72,18 @@ class SubConverter:
     '''
     readBinary = False
     canBePickled = True
-    registerFormats: Tuple[str, ...] = ()
-    registerShowFormats: Tuple[str, ...] = ()
-    registerInputExtensions: Tuple[str, ...] = ()  # if converter supports input
-    registerOutputExtensions: Tuple[str, ...] = ()  # if converter supports output
-    registerOutputSubformatExtensions: Dict[str, str] = {}
+    registerFormats: t.Tuple[str, ...] = ()
+    registerShowFormats: t.Tuple[str, ...] = ()
+    registerInputExtensions: t.Tuple[str, ...] = ()  # if converter supports input
+    registerOutputExtensions: t.Tuple[str, ...] = ()  # if converter supports output
+    registerOutputSubformatExtensions: t.Dict[str, str] = {}
     launchKey = None
 
     codecWrite = False
     stringEncoding = 'utf-8'
 
     def __init__(self, **keywords):
-        self._stream: Union[stream.Score, stream.Part, stream.Opus] = stream.Score()
+        self._stream: t.Union[stream.Score, stream.Part, stream.Opus] = stream.Score()
         self.keywords = keywords
 
     def parseData(self, dataString, number=None):
@@ -856,7 +856,7 @@ class ConverterMusicXML(SubConverter):
                                          }
 
     @staticmethod
-    def findNumberedPNGPath(inputFp: Union[str, pathlib.Path]) -> pathlib.Path:
+    def findNumberedPNGPath(inputFp: t.Union[str, pathlib.Path]) -> pathlib.Path:
         '''
         Find the first numbered file path corresponding to the provided unnumbered file path
         ending in ".png". Raises an exception if no file can be found.
@@ -890,7 +890,7 @@ class ConverterMusicXML(SubConverter):
         c.parseXMLText()
         self.stream = c.stream
 
-    def parseFile(self, fp: Union[str, pathlib.Path], number=None):
+    def parseFile(self, fp: t.Union[str, pathlib.Path], number=None):
         '''
         Open from a file path; check to see if there is a pickled
         version available and up to date; if so, open that, otherwise
@@ -1038,7 +1038,7 @@ class ConverterMusicXML(SubConverter):
               fp=None,
               subformats=None,
               makeNotation=True,
-              compress: Optional[bool] = None,
+              compress: t.Optional[bool] = None,
               **keywords):
         '''
         Write to a .musicxml file.
@@ -1419,7 +1419,7 @@ class ConverterMEI(SubConverter):
 
     def parseFile(
         self,
-        filePath: Union[str, pathlib.Path],
+        filePath: t.Union[str, pathlib.Path],
         number=None
     ) -> 'music21.stream.Stream':
         '''

@@ -18,7 +18,7 @@ import os.path
 import sys
 import doctest
 import io
-from typing import Union
+import typing as t
 
 from collections import namedtuple
 # noinspection PyPackageRequirements
@@ -187,7 +187,7 @@ def getDocumentationFiles(runOne=False):
     return allModules
 
 
-def main(runOne: Union[str, bool] = False):
+def main(runOne: t.Union[str, bool] = False):
     if runOne is False:
         nbvalNotebook.runAll()
     totalTests = 0

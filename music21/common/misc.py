@@ -12,7 +12,7 @@
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
-from typing import Any, Tuple, List, Iterable, Optional, Callable
+import typing as t
 import platform
 import re
 
@@ -38,7 +38,7 @@ import time
 # -----------------------------------------------------------------------------
 
 
-def flattenList(originalList: List) -> List:
+def flattenList(originalList: t.List) -> t.List:
     '''
     Flatten a list of lists into a flat list
 
@@ -51,7 +51,7 @@ def flattenList(originalList: List) -> List:
     return [item for sublist in originalList for item in sublist]
 
 
-def unique(originalList: Iterable, *, key: Optional[Callable] = None) -> List:
+def unique(originalList: t.Iterable, *, key: t.Optional[t.Callable] = None) -> t.List:
     '''
     Return a List of unique items from an iterable, preserving order.
     (unlike casting to a set and back)
@@ -145,7 +145,7 @@ def getPlatform() -> str:
     else:
         return os.name
 
-def macOSVersion() -> Tuple[int, int, int]:  # pragma: no cover
+def macOSVersion() -> t.Tuple[int, int, int]:  # pragma: no cover
     '''
     On a Mac returns the current version as a tuple of (currently 3) ints,
     such as: (10, 5, 6) for 10.5.6.
@@ -165,7 +165,7 @@ def macOSVersion() -> Tuple[int, int, int]:  # pragma: no cover
     return (major, minor, maintenance)
 
 
-def sortModules(moduleList: Iterable[Any]) -> List[object]:
+def sortModules(moduleList: t.Iterable[t.Any]) -> t.List[object]:
     '''
     Sort a list of imported module names such that most recently modified is
     first.  In ties, last access time is used then module name

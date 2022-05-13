@@ -21,7 +21,7 @@ import collections
 import copy
 import enum
 import unittest
-from typing import Optional, Union, TypedDict, List, Tuple, Type, Dict
+import typing as t
 
 from music21 import bar
 from music21 import base
@@ -85,7 +85,7 @@ CSO_MMARK = 4
 CSO_VOICE = 10
 
 # (music21Object, affinity code, Braille classSortOrder)
-affinityCodes: List[Tuple[Type[base.Music21Object], Affinity, int]] = [
+affinityCodes: t.List[t.Tuple[t.Type[base.Music21Object], Affinity, int]] = [
     (note.Note, Affinity.NOTEGROUP, CSO_NOTE),
     (note.Rest, Affinity.NOTEGROUP, CSO_REST),
     (chord.Chord, Affinity.NOTEGROUP, CSO_CHORD),
@@ -99,7 +99,7 @@ affinityCodes: List[Tuple[Type[base.Music21Object], Affinity, int]] = [
     (stream.Voice, Affinity.INACCORD, CSO_VOICE),
 ]
 
-affinityNames: Dict[Affinity, str] = {
+affinityNames: t.Dict[Affinity, str] = {
     Affinity.SIGNATURE: 'Signature Grouping',
     Affinity.TTEXT: 'Tempo Text Grouping',
     Affinity.MMARK: 'Metronome Mark Grouping',
@@ -110,16 +110,16 @@ affinityNames: Dict[Affinity, str] = {
     Affinity.SPLIT2_NOTEGROUP: 'Split Note Grouping B',
 }
 
-excludeFromBrailleElements: List[Type[base.Music21Object]] = [
+excludeFromBrailleElements: t.List[t.Type[base.Music21Object]] = [
     spanner.Slur,
     layout.SystemLayout,
     layout.PageLayout,
     layout.StaffLayout,
 ]
 
-class GroupingGlobals(TypedDict):
-    keySignature: Optional[key.KeySignature]
-    timeSignature: Optional[meter.TimeSignature]
+class GroupingGlobals(t.TypedDict):
+    keySignature: t.Optional[key.KeySignature]
+    timeSignature: t.Optional[meter.TimeSignature]
 
 
 GROUPING_GLOBALS: GroupingGlobals = {
@@ -355,11 +355,11 @@ class BrailleSegment(text.BrailleText):
         ---end segment---
         '''
         super().__init__(lineLength=lineLength)
-        self._groupingDict: Dict[SegmentKey, BrailleElementGrouping] = {}
+        self._groupingDict: t.Dict[SegmentKey, BrailleElementGrouping] = {}
 
-        self.groupingKeysToProcess: List[SegmentKey] = []
-        self.currentGroupingKey: Optional[SegmentKey] = None
-        self.previousGroupingKey: Optional[SegmentKey] = None
+        self.groupingKeysToProcess: t.List[SegmentKey] = []
+        self.currentGroupingKey: t.Optional[SegmentKey] = None
+        self.previousGroupingKey: t.Optional[SegmentKey] = None
         self.lastNote = None
 
         self.showClefSigns: bool = False
@@ -592,7 +592,7 @@ class BrailleSegment(text.BrailleText):
 
     def extractInaccordGrouping(self):
         inaccords = self._groupingDict.get(self.currentGroupingKey)
-        last_clef: Optional[clef.Clef] = None
+        last_clef: t.Optional[clef.Clef] = None
         seen_voice: bool = False
         for music21VoiceOrClef in inaccords:
             if isinstance(music21VoiceOrClef, clef.Clef):
@@ -1091,8 +1091,8 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
     def __init__(self, lineLength: int = 40):
         BrailleSegment.__init__(self, lineLength=lineLength)
         text.BrailleKeyboard.__init__(self, lineLength=lineLength)
-        self.allKeyPairs: List[Tuple[Optional[SegmentKey],
-                                     Optional[SegmentKey]]] = []
+        self.allKeyPairs: t.List[t.Tuple[t.Optional[SegmentKey],
+                                     t.Optional[SegmentKey]]] = []
         self.previousGroupingPair = None
         self.currentGroupingPair = None
 
@@ -1402,7 +1402,7 @@ def findSegments(music21Part,
                  showFirstMeasureNumber=True,
                  showHand=None,
                  showHeading=True,
-                 showLongSlursAndTiesTogether: Optional[bool] = None,
+                 showLongSlursAndTiesTogether: t.Optional[bool] = None,
                  showShortSlursAndTiesTogether=False,
                  slurLongPhraseWithBrackets=True,
                  suppressOctaveMarks=False,
@@ -1578,7 +1578,7 @@ def prepareSlurredNotes(music21Part,
                         *,
                         slurLongPhraseWithBrackets=True,
                         showShortSlursAndTiesTogether=False,
-                        showLongSlursAndTiesTogether: Optional[bool] = None,
+                        showLongSlursAndTiesTogether: t.Optional[bool] = None,
                         ):
     '''
     Takes in a :class:`~music21.stream.Part` and three keywords:
@@ -1979,7 +1979,7 @@ def getRawSegments(music21Part,
     return allSegments
 
 
-def extractBrailleElements(music21MeasureOrVoice: Union[stream.Measure, stream.Voice]):
+def extractBrailleElements(music21MeasureOrVoice: t.Union[stream.Measure, stream.Voice]):
     '''
     Takes in a :class:`~music21.stream.Measure` or :class:`~music21.stream.Voice`
     and returns a :class:`~music21.braille.segment.BrailleElementGrouping` of correctly ordered
@@ -2023,7 +2023,7 @@ def extractBrailleElements(music21MeasureOrVoice: Union[stream.Measure, stream.V
     <music21.bar.Barline type=final>
     '''
     allElements = BrailleElementGrouping()
-    last_clef: Optional[clef.Clef] = None
+    last_clef: t.Optional[clef.Clef] = None
     for music21Object in music21MeasureOrVoice:
         # Hold the clef in memory in case the next object is a voice
         if isinstance(music21Object, clef.Clef):

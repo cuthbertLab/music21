@@ -33,7 +33,7 @@ import random
 
 from collections import OrderedDict
 from functools import partial
-from typing import List
+import typing as t
 
 from music21 import common
 from music21 import converter
@@ -403,7 +403,7 @@ def scoreSimilarity(
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: t.List[type] = []
 
 
 if __name__ == '__main__':

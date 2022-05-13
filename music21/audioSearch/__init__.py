@@ -41,7 +41,7 @@ import wave
 import warnings
 import unittest
 
-from typing import List, Union
+import typing as t
 
 # cannot call this base, because when audioSearch.__init__.py
 # imports * from base, it overwrites audioSearch!
@@ -525,11 +525,11 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
 
 
 def smoothFrequencies(
-    frequencyList: List[Union[int, float]],
+    frequencyList: t.List[t.Union[int, float]],
     *,
     smoothLevels=7,
     inPlace=False
-) -> List[int]:
+) -> t.List[int]:
     '''
     Smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.  Takes in a list of ints or floats.
@@ -605,7 +605,7 @@ def smoothFrequencies(
         )
 
     dpf = frequencyList
-    detectedPitchesFreq: List[float]
+    detectedPitchesFreq: t.List[float]
     if inPlace:
         detectedPitchesFreq = [float(f) for f in dpf]
     else:
@@ -628,12 +628,12 @@ def smoothFrequencies(
         elif i > numFreqs - int(math.ceil(smoothLevels / 2.0)) - 1:
             detectedPitchesFreq[i] = int(ends)
         else:
-            t = 0.0
+            change = 0.0
             for j in range(smoothLevels):
-                t += detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
-            detectedPitchesFreq[i] = t / smoothLevels
+                change += detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
+            detectedPitchesFreq[i] = change / smoothLevels
 
-    out: List[int] = [int(round(f)) for f in detectedPitchesFreq]
+    out: t.List[int] = [int(round(f)) for f in detectedPitchesFreq]
     if not inPlace:
         return out
     else:
@@ -1003,7 +1003,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: t.List[type] = []
 
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@ Chord from Figure
 Chord from FretBoard Object with tuning.
 '''
 import unittest
-from typing import List, Optional
+import typing as t
 
 from music21 import common
 from music21 import exceptions21
@@ -227,7 +227,7 @@ class FretBoard(prebase.ProtoM21Object):
                     self.numStrings
                 ))
 
-        pitchList: List[Optional['music21.pitch.Pitch']] = [None] * self.numStrings
+        pitchList: t.List[t.Optional['music21.pitch.Pitch']] = [None] * self.numStrings
 
         if not self.fretNotes:
             return pitchList

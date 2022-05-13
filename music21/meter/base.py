@@ -17,7 +17,7 @@ as well as component objects for defining nested metrical structures,
 '''
 import copy
 import fractions
-from typing import Optional, Sequence, List, Dict, Tuple, Any
+import typing as t
 
 from music21 import base
 from music21 import beam
@@ -43,7 +43,7 @@ MIN_DENOMINATOR_TYPE = '128th'
 
 # store a module-level dictionary of partitioned meter sequences used
 # for setting default accent weights; store as needed
-_meterSequenceAccentArchetypes: Dict[Tuple[str, Any, int], MeterSequence] = {}
+_meterSequenceAccentArchetypes: t.Dict[t.Tuple[str, t.Any, int], MeterSequence] = {}
 _meterSequenceAccentArchetypesNoneCache = ('', -1, -1)  # a cache key representing None
 
 def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSignature':
@@ -462,10 +462,10 @@ class TimeSignature(base.Music21Object):
 
         self._overriddenBarDuration = None
         self.symbol = ''
-        self.displaySequence: Optional[MeterSequence] = None
-        self.beatSequence: Optional[MeterSequence] = None
-        self.accentSequence: Optional[MeterSequence] = None
-        self.beamSequence: Optional[MeterSequence] = None
+        self.displaySequence: t.Optional[MeterSequence] = None
+        self.beatSequence: t.Optional[MeterSequence] = None
+        self.accentSequence: t.Optional[MeterSequence] = None
+        self.beamSequence: t.Optional[MeterSequence] = None
         self.symbolizeDenominator = False
 
         self.resetValues(value, divisions)
@@ -963,7 +963,7 @@ class TimeSignature(base.Music21Object):
             return 'Other'
 
     @property
-    def beatDivisionDurations(self) -> List[duration.Duration]:
+    def beatDivisionDurations(self) -> t.List[duration.Duration]:
         '''
         Return the beat division, or the durations that make up one beat,
         as a list of :class:`~music21.duration.Duration` objects, if and only if
@@ -999,7 +999,7 @@ class TimeSignature(base.Music21Object):
             raise TimeSignatureException(f'non uniform beat division: {post}')
 
     @property
-    def beatSubDivisionDurations(self) -> List[duration.Duration]:
+    def beatSubDivisionDurations(self) -> t.List[duration.Duration]:
         '''
         Return a subdivision of the beat division, or a list
         of :class:`~music21.duration.Duration` objects representing each beat division
@@ -1233,7 +1233,7 @@ class TimeSignature(base.Music21Object):
 
     # --------------------------------------------------------------------------
     # access data for other processing
-    def getBeams(self, srcList, measureStartOffset=0.0) -> List[Optional[beam.Beams]]:
+    def getBeams(self, srcList, measureStartOffset=0.0) -> t.List[t.Optional[beam.Beams]]:
         '''
         Given a qLen position and an iterable of Music21Objects, return a list of Beams objects.
 
@@ -1548,7 +1548,7 @@ class TimeSignature(base.Music21Object):
             pos += self.accentSequence[i].duration.quarterLength
         return False
 
-    def setAccentWeight(self, weightList: Sequence[float], level: int = 0) -> None:
+    def setAccentWeight(self, weightList: t.Sequence[float], level: int = 0) -> None:
         '''
         Set accent weight, or floating point scalars, for the accent MeterSequence.
         Provide a list of float values; if this list is shorter than the length
