@@ -1762,7 +1762,7 @@ if __name__ == '__main__':
 
     else:
         # only if running tests
-        t = Test()
+        testInstance = Test()
         te = TestUserInput()
 
         if len(sys.argv) < 2 or sys.argv[1] in ['all', 'test']:
@@ -1774,5 +1774,5 @@ if __name__ == '__main__':
             # run test user input
             getattr(te, sys.argv[2])()
         # just run named Test
-        elif hasattr(t, sys.argv[1]):
-            getattr(t, sys.argv[1])()
+        elif hasattr(testInstance, sys.argv[1]):
+            getattr(testInstance, sys.argv[1])()
