@@ -678,7 +678,9 @@ class Chord(ChordBase):
                               str,
                               Sequence[int]] = None,
                  **keywords):
-        if notes is not None and any(not isinstance(n, note.Note) for n in notes):
+        if notes is not None and any(isinstance(n, note.GeneralNote)
+                                     and not isinstance(n, note.Note)
+                                     for n in notes):
             raise TypeError(f'Use a PercussionChord to contain Unpitched objects; got {notes}')
         super().__init__(notes=notes, **keywords)
         self._notes: List[note.Note]
@@ -2464,8 +2466,10 @@ class Chord(ChordBase):
         >>> a.inversionName()
         43
         '''
+        inv: int  # pylint requires this outside of the "try" to avoid "invalid-sequence-index"
+
         try:
-            inv: int = self.inversion()
+            inv = self.inversion()
         except ChordException:
             return None
 
@@ -2504,9 +2508,10 @@ class Chord(ChordBase):
         'Unknown Position'
         '''
         UNKNOWN = 'Unknown Position'
+        inv: int  # pylint requires this outside of the "try" to avoid "invalid-sequence-index"
 
         try:
-            inv: int = self.inversion()
+            inv = self.inversion()
         except ChordException:
             return UNKNOWN
 
