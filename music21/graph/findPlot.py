@@ -16,7 +16,7 @@ Functions that find appropriate plots for graph.plot.
 import collections
 import types
 import unittest
-from typing import List, Tuple
+import typing as t
 
 from music21.graph import axis
 from music21.graph import plot
@@ -33,7 +33,7 @@ PLOTCLASS_SHORTCUTS = {
 
 
 # all formats need to be here, and first for each row must match a graphType.
-FORMAT_SYNONYMS: List[Tuple[str, ...]] = [
+FORMAT_SYNONYMS: t.List[t.Tuple[str, ...]] = [
     ('horizontalbar', 'bar', 'horizontal', 'pianoroll', 'piano'),
     ('histogram', 'histo', 'count'),
     ('scatter', 'point'),

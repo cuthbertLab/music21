@@ -31,7 +31,7 @@ finals, or other attributes of the network.
 '''
 import copy
 import unittest
-from typing import Tuple, Union
+import typing as t
 
 from collections import OrderedDict
 
@@ -1661,7 +1661,7 @@ class IntervalNetwork:
         return pre, preNodeId
 
     def realize(self,
-                pitchReference: Union[str, pitch.Pitch],
+                pitchReference: t.Union[str, pitch.Pitch],
                 nodeId=None,
                 minPitch=None,
                 maxPitch=None,
@@ -2809,7 +2809,7 @@ class IntervalNetwork:
         return post
 
 
-    _SCALE_STARTS: Tuple[str, ...] = (
+    _SCALE_STARTS: t.Tuple[str, ...] = (
         'C', 'C#', 'D-',
         'D', 'D#', 'E-',
         'E', 'F',

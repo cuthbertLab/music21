@@ -29,8 +29,7 @@ import sys
 import tempfile
 import unittest
 
-from typing import Union
-from typing import Optional
+import typing as t
 
 import xml.etree.ElementTree as ET
 from xml.sax import saxutils
@@ -434,7 +433,7 @@ class _EnvironmentCore:
             ]:
                 self.__setitem__(name, value)  # use for key checking
 
-    def _checkAccessibility(self, path: Optional[Union[str, pathlib.Path]]) -> bool:
+    def _checkAccessibility(self, path: t.Optional[t.Union[str, pathlib.Path]]) -> bool:
         '''
         Return True if the path exists, is readable and writable.
         '''
@@ -647,7 +646,7 @@ class _EnvironmentCore:
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
 
-    def getTempFile(self, suffix='', returnPathlib=True) -> Union[str, pathlib.Path]:
+    def getTempFile(self, suffix='', returnPathlib=True) -> t.Union[str, pathlib.Path]:
         '''
         Gets a temporary file with a suffix that will work for a bit.
 
@@ -999,7 +998,7 @@ class Environment:
         '''
         return envSingleton().getSettingsPath()
 
-    def getTempFile(self, suffix='', returnPathlib=True) -> Union[str, pathlib.Path]:
+    def getTempFile(self, suffix='', returnPathlib=True) -> t.Union[str, pathlib.Path]:
         '''
         Return a file path to a temporary file with the specified suffix (file
         extension).

@@ -75,7 +75,7 @@ import time
 import unittest
 import zlib
 
-from typing import Union, List
+import typing as t
 
 from music21 import base
 from music21 import common
@@ -106,7 +106,7 @@ class StreamFreezeThawBase:
     def __init__(self):
         self.stream = None
 
-    def getPickleFp(self, directory: Union[str, pathlib.Path]) -> pathlib.Path:
+    def getPickleFp(self, directory: t.Union[str, pathlib.Path]) -> pathlib.Path:
         if not isinstance(directory, pathlib.Path):
             directory = pathlib.Path(directory)
 
@@ -114,7 +114,7 @@ class StreamFreezeThawBase:
         streamStr = str(time.time())
         return directory / ('m21-' + common.getMd5(streamStr) + '.p')
 
-    def getJsonFp(self, directory: Union[str, pathlib.Path]) -> pathlib.Path:
+    def getJsonFp(self, directory: t.Union[str, pathlib.Path]) -> pathlib.Path:
         return self.getPickleFp(directory).with_suffix('.p.json')
 
 
@@ -489,7 +489,7 @@ class StreamFreezer(StreamFreezeThawBase):
         hierarchyObject=None,
         getSpanners=True,
         getVariants=True
-    ) -> List[int]:
+    ) -> t.List[int]:
         '''
         Return a list of all Stream ids anywhere in the hierarchy.  By id,
         we mean `id(s)` not `s.id` -- so they are memory locations and unique.

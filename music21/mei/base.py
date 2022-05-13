@@ -173,7 +173,7 @@ tool.
 * <sb>: a system break
 
 '''
-from typing import Optional, Union, List, Tuple
+import typing as t
 from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
 
 from collections import defaultdict
@@ -341,8 +341,8 @@ class MeiToM21Converter:
 # -----------------------------------------------------------------------------
 def safePitch(
     name: str,
-    accidental: Optional[str] = None,
-    octave: Union[str, int] = ''
+    accidental: t.Optional[str] = None,
+    octave: t.Union[str, int] = ''
 ) -> pitch.Pitch:
     '''
     Safely build a :class:`~music21.pitch.Pitch` from a string.
@@ -380,7 +380,7 @@ def safePitch(
 
 
 def makeDuration(
-    base: Union[float, int, Fraction] = 0.0,
+    base: t.Union[float, int, Fraction] = 0.0,
     dots: int = 0
 ) -> 'music21.duration.Duration':
     '''
@@ -412,7 +412,7 @@ def makeDuration(
     return returnDuration
 
 
-def allPartsPresent(scoreElem) -> Tuple[str, ...]:
+def allPartsPresent(scoreElem) -> t.Tuple[str, ...]:
     # noinspection PyShadowingNames
     '''
     Find the @n values for all <staffDef> elements in a <score> element. This assumes that every
@@ -952,7 +952,7 @@ def _ppConclude(theConverter):
 # Helper Functions
 # -----------------------------------------------------------------------------
 def _processEmbeddedElements(
-    elements: List[Element],
+    elements: t.List[Element],
     mapping,
     callerTag=None,
     slurBundle=None
@@ -1032,7 +1032,7 @@ def _timeSigFromAttrs(elem):
     return meter.TimeSignature(f"{elem.get('meter.count')!s}/{elem.get('meter.unit')!s}")
 
 
-def _keySigFromAttrs(elem: Element) -> Union[key.Key, key.KeySignature]:
+def _keySigFromAttrs(elem: Element) -> t.Union[key.Key, key.KeySignature]:
     '''
     From any tag with (at minimum) either @key.pname or @key.sig attributes, make a
     :class:`KeySignature` or :class:`Key`, as possible.

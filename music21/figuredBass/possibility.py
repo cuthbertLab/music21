@@ -9,7 +9,8 @@
 # ------------------------------------------------------------------------------
 '''
 A possibility is a tuple with pitches, and is intended to encapsulate a possible
-solution to a :class:`~music21.figuredBass.segment.Segment`. Unlike a :class:`~music21.chord.Chord`,
+solution to a :class:`~music21.figuredBass.segment.Segment`.
+Unlike a :class:`~music21.chord.Chord`,
 the ordering of a possibility does matter. The assumption throughout fbRealizer
 is that a possibility is always in order from the highest part to the lowest part, and
 the last element of each possibility is the bass.
@@ -67,7 +68,7 @@ The application of these methods is controlled by corresponding instance variabl
 .. note:: The number of parts and maxPitch are universal for a
     :class:`~music21.figuredBass.realizer.FiguredBassLine`.
 '''
-from typing import Dict, Tuple
+import typing as t
 import unittest
 
 from music21 import chord
@@ -275,7 +276,10 @@ def limitPartToPitch(possibA, partPitchLimits=None):
 # CONSECUTIVE POSSIBILITY RULE-CHECKING METHODS
 # ---------------------------------------------
 # Speedup tables
-PITCH_QUARTET_TO_BOOL_TYPE = Dict[Tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch], bool]
+PITCH_QUARTET_TO_BOOL_TYPE = t.Dict[
+    t.Tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
+    bool
+]
 parallelFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
 parallelOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
 hiddenFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}

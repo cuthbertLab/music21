@@ -14,7 +14,7 @@
 import inspect
 import re
 import types
-from typing import List
+import typing as t
 import unittest
 
 from music21 import common
@@ -97,7 +97,7 @@ class ObjectDocumenter(Documenter):
         return ''
 
     @property
-    def rstAutodocDirectiveFormat(self) -> List[str]:
+    def rstAutodocDirectiveFormat(self) -> t.List[str]:
         return []
 
     @property
@@ -168,7 +168,6 @@ class FunctionDocumenter(ObjectDocumenter):
         return path.replace('.__init__', '')
 
     @property
-    def rstAutodocDirectiveFormat(self) -> List[str]:
         '''
         >>> function = common.opFrac
         >>> documenter = FunctionDocumenter(function)

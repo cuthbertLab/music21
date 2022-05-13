@@ -19,7 +19,7 @@ filtered.  Filters are used by methods on streams such as
 # import inspect
 import unittest
 from math import inf
-from typing import Optional, TypeVar
+import typing as t
 
 from music21 import common
 from music21.common.numberTools import opFrac
@@ -27,7 +27,7 @@ from music21.exceptions21 import Music21Exception
 from music21 import prebase
 
 
-StreamIteratorType = TypeVar('StreamIteratorType', bound='music21.stream.iterator.StreamIterator')
+StreamIteratorType = t.TypeVar('StreamIteratorType', bound='music21.stream.iterator.StreamIterator')
 
 class FilterException(Music21Exception):
     pass
@@ -73,7 +73,7 @@ class StreamFilter(prebase.ProtoM21Object):
     def reset(self):
         pass
 
-    def __call__(self, item, iterator: Optional[StreamIteratorType] = None):
+    def __call__(self, item, iterator: t.Optional[StreamIteratorType] = None):
         return True
 
 class IsFilter(StreamFilter):

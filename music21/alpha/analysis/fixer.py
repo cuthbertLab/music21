@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------------
 import unittest
 from copy import deepcopy
-from typing import Optional
+import typing as t
 
 from music21.alpha.analysis import aligner
 from music21.alpha.analysis import ornamentRecognizer
@@ -350,7 +350,7 @@ class OrnamentFixer(OMRMidiFixer):
             self.recognizers = recognizers
         self.markChangeColor = markChangeColor
 
-    def findOrnament(self, busyNotes, simpleNotes) -> Optional[expressions.Ornament]:
+    def findOrnament(self, busyNotes, simpleNotes) -> t.Optional[expressions.Ornament]:
         '''
         Finds an ornament in busyNotes based from simpleNote
         using provided recognizers.
@@ -389,7 +389,7 @@ class OrnamentFixer(OMRMidiFixer):
             return True
         return False
 
-    def fix(self, *, show=False, inPlace=True) -> Optional[OMRMidiFixer]:
+    def fix(self, *, show=False, inPlace=True) -> t.Optional[OMRMidiFixer]:
         '''
         Corrects missed ornaments in omrStream according to midiStream
         :param show: Whether to show results
@@ -397,7 +397,7 @@ class OrnamentFixer(OMRMidiFixer):
         return a new OrnamentFixer with changes
         '''
         changes = self.changes
-        sa: Optional[aligner.StreamAligner] = None
+        sa: t.Optional[aligner.StreamAligner] = None
         omrNotesLabeledOrnament = []
         midiNotesAlreadyFixedForOrnament = []
 

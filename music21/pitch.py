@@ -22,7 +22,7 @@ import copy
 import math
 import itertools
 from collections import OrderedDict
-from typing import List, Optional, Union, TypeVar, Tuple, Dict, Literal, Set, overload
+import typing as t
 
 from music21 import base
 from music21 import common
@@ -36,13 +36,13 @@ from music21.common.objects import SlottedObjectMixin
 from music21.common.types import StepName
 from music21 import environment
 
-PitchType = TypeVar('PitchType', bound='Pitch')
+PitchType = t.TypeVar('PitchType', bound='Pitch')
 
 environLocal = environment.Environment('pitch')
 
-PitchClassString = Literal['a', 'A', 't', 'T', 'b', 'B', 'e', 'E']
+PitchClassString = t.Literal['a', 'A', 't', 'T', 'b', 'B', 'e', 'E']
 
-STEPREF: Dict[StepName, int] = {
+STEPREF: t.Dict[StepName, int] = {
     'C': 0,
     'D': 2,
     'E': 4,
@@ -52,7 +52,7 @@ STEPREF: Dict[StepName, int] = {
     'B': 11,
 }
 NATURAL_PCS = (0, 2, 4, 5, 7, 9, 11)
-STEPREF_REVERSED: Dict[int, StepName] = {
+STEPREF_REVERSED: t.Dict[int, StepName] = {
     0: 'C',
     2: 'D',
     4: 'E',
@@ -61,8 +61,8 @@ STEPREF_REVERSED: Dict[int, StepName] = {
     9: 'A',
     11: 'B',
 }
-STEPNAMES: Set[StepName] = {'C', 'D', 'E', 'F', 'G', 'A', 'B'}  # set
-STEP_TO_DNN_OFFSET: Dict[StepName, int] = {'C': 0,
+STEPNAMES: t.Set[StepName] = {'C', 'D', 'E', 'F', 'G', 'A', 'B'}  # set
+STEP_TO_DNN_OFFSET: t.Dict[StepName, int] = {'C': 0,
                                            'D': 1,
                                            'E': 2,
                                            'F': 3,
@@ -133,8 +133,8 @@ accidentalModifiersSorted = _sortModifiers()
 # utility functions
 
 def _convertPitchClassToNumber(
-    ps: Union[int, float, PitchClassString]
-) -> Union[int, float]:
+    ps: t.Union[int, float, PitchClassString]
+) -> t.Union[int, float]:
     '''
     Given a pitch class string
     return the pitch class representation.
@@ -176,7 +176,7 @@ def convertPitchClassToStr(pc: int) -> str:
     return f'{pc:X}'  # using hex conversion, good up to 15
 
 
-def _convertPsToOct(ps: Union[int, float]) -> int:
+def _convertPsToOct(ps: t.Union[int, float]) -> int:
     '''
     Utility conversion; does not process internals.
     Converts a midiNote number to an octave number.
@@ -205,8 +205,8 @@ def _convertPsToOct(ps: Union[int, float]) -> int:
 
 
 def _convertPsToStep(
-    ps: Union[int, float]
-) -> Tuple[StepName,
+    ps: t.Union[int, float]
+) -> t.Tuple[StepName,
            Accidental,
            Microtone,
            int]:
@@ -359,7 +359,7 @@ def _convertPsToStep(
     return name, acc, microObj, octShift
 
 
-def _convertCentsToAlterAndCents(shift) -> Tuple[float, float]:
+def _convertCentsToAlterAndCents(shift) -> t.Tuple[float, float]:
     '''
     Given any floating point value, split into accidental and microtone components.
 
@@ -405,7 +405,7 @@ def _convertCentsToAlterAndCents(shift) -> Tuple[float, float]:
     return alterShift + alterAdd, float(cents)
 
 
-def _convertHarmonicToCents(value: Union[int, float]) -> int:
+def _convertHarmonicToCents(value: t.Union[int, float]) -> int:
     r'''
     Given a harmonic number, return the total number shift in cents
     assuming 12 tone equal temperament.
@@ -678,9 +678,9 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
     # INITIALIZER #
 
     def __init__(self,
-                 centsOrString: Union[str, int, float] = 0,
+                 centsOrString: t.Union[str, int, float] = 0,
                  harmonicShift=1):
-        self._centShift: Union[int, float] = 0
+        self._centShift: t.Union[int, float] = 0
         self._harmonicShift: int = harmonicShift  # the first harmonic is the start
 
         if isinstance(centsOrString, (int, float)):
@@ -878,7 +878,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
     # INITIALIZER #
 
-    def __init__(self, specifier: Union[int, str, float] = 'natural'):
+    def __init__(self, specifier: t.Union[int, str, float] = 'natural'):
         super().__init__()
         # managed by properties
         self._displayType = 'normal'
@@ -894,7 +894,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         self.displayLocation = 'normal'
 
         # store a reference to the object that has this duration object as a property
-        self._client: Optional['Pitch'] = None
+        self._client: t.Optional['Pitch'] = None
         self._name = ''
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step
@@ -1793,10 +1793,10 @@ class Pitch(prebase.ProtoM21Object):
     }
 
     def __init__(self,
-                 name: Optional[Union[str, int, float]] = None,
+                 name: t.Optional[t.Union[str, int, float]] = None,
                  **keywords):
         # No need for super().__init__() on protoM21Object
-        self._groups: Optional[base.Groups] = None
+        self._groups: t.Optional[base.Groups] = None
 
         if isinstance(name, type(self)):
             name = name.nameWithOctave
@@ -1804,31 +1804,31 @@ class Pitch(prebase.ProtoM21Object):
         # this should not be set, as will be updated when needed
         self._step: StepName = defaults.pitchStep  # this is only the pitch step
 
-        self._overridden_freq440: Optional[float] = None
+        self._overridden_freq440: t.Optional[float] = None
 
         # store an Accidental and Microtone objects
         # note that creating an Accidental object is much more time-consuming
         # than a microtone
-        self._accidental: Optional[Accidental] = None
+        self._accidental: t.Optional[Accidental] = None
         # 5% of pitch creation time; it'll be created in a sec anyhow
-        self._microtone: Optional[Microtone] = None
+        self._microtone: t.Optional[Microtone] = None
 
         # CA, Q: should this remain an attribute or only refer to value in defaults?
         # MSC A: no, it's a useful attribute for cases such as scales where if there are
         #        no octaves we give a defaultOctave higher than the previous
         #        (MSC 12 years later: maybe Chris was right...)
         self.defaultOctave: int = defaults.pitchOctave
-        self._octave: Optional[int] = None
+        self._octave: t.Optional[int] = None
 
         # if True, accidental is not known; is determined algorithmically
         # likely due to pitch data from midi or pitch space/class numbers
         self.spellingIsInferred = False
         # the fundamental attribute stores an optional pitch
         # that defines the fundamental used to create this Pitch
-        self.fundamental: Optional['Pitch'] = None
+        self.fundamental: t.Optional['Pitch'] = None
 
         # so that we can tell clients about changes in pitches.
-        self._client: Optional['music21.note.Note'] = None
+        self._client: t.Optional['music21.note.Note'] = None
 
         # name combines step, octave, and accidental
         if name is not None:
@@ -2055,7 +2055,7 @@ class Pitch(prebase.ProtoM21Object):
         self._groups = new
 
     @property
-    def accidental(self) -> Optional[Accidental]:
+    def accidental(self) -> t.Optional[Accidental]:
         '''
         Stores an optional accidental object contained within the
         Pitch object.  This might return None, which is different
@@ -2079,7 +2079,7 @@ class Pitch(prebase.ProtoM21Object):
         return self._accidental
 
     @accidental.setter
-    def accidental(self, value: Union[str, Accidental, None, int, float]):
+    def accidental(self, value: t.Union[str, Accidental, None, int, float]):
         if isinstance(value, Accidental):
             self._accidental = value
         elif value is None:
@@ -2132,7 +2132,7 @@ class Pitch(prebase.ProtoM21Object):
             return self._microtone
 
     @microtone.setter
-    def microtone(self, value: Union[float, int, str, None, Microtone]):
+    def microtone(self, value: t.Union[float, int, str, None, Microtone]):
         if isinstance(value, (str, float, int)):
             self._microtone = Microtone(value)
         elif value is None:  # set to zero
@@ -2643,8 +2643,8 @@ class Pitch(prebase.ProtoM21Object):
         '''
         usrStr = usrStr.strip()
         # extract any numbers that may be octave designations
-        octFound: List[str] = []
-        octNot: List[str] = []
+        octFound: t.List[str] = []
+        octNot: t.List[str] = []
 
         for char in usrStr:
             if char in '0123456789':
@@ -2964,9 +2964,9 @@ class Pitch(prebase.ProtoM21Object):
         return round(self.ps) % 12
 
     @pitchClass.setter
-    def pitchClass(self, value: Union[int, PitchClassString]):
+    def pitchClass(self, value: t.Union[int, PitchClassString]):
         # permit the submission of strings, like "A" and "B"
-        valueOut: Union[int, float] = _convertPitchClassToNumber(value)
+        valueOut: t.Union[int, float] = _convertPitchClassToNumber(value)
         # get step and accidental w/o octave
         self.step, self._accidental = _convertPsToStep(valueOut)[0:2]
 
@@ -3002,7 +3002,7 @@ class Pitch(prebase.ProtoM21Object):
 
 
     @property
-    def octave(self) -> Optional[int]:
+    def octave(self) -> t.Optional[int]:
         '''
         Returns or sets the octave of the note.
         Setting the octave updates the pitchSpace attribute.
@@ -3030,7 +3030,7 @@ class Pitch(prebase.ProtoM21Object):
         return self._octave
 
     @octave.setter
-    def octave(self, value: Optional[Union[int, float]]):
+    def octave(self, value: t.Optional[t.Union[int, float]]):
         if value is not None:
             self._octave = int(value)
         else:
@@ -3194,7 +3194,7 @@ class Pitch(prebase.ProtoM21Object):
                 return ' cuádruple'
             return ''
 
-    _SPANISH_DICT: Dict[StepName, str] = {
+    _SPANISH_DICT: t.Dict[StepName, str] = {
         'A': 'la',
         'B': 'si',
         'C': 'do',
@@ -3250,7 +3250,7 @@ class Pitch(prebase.ProtoM21Object):
         else:
             raise PitchException('Unsupported accidental type.')
 
-    _FRENCH_DICT: Dict[StepName, str] = {
+    _FRENCH_DICT: t.Dict[StepName, str] = {
         'A': 'la',
         'B': 'si',
         'C': 'do',
@@ -3357,7 +3357,7 @@ class Pitch(prebase.ProtoM21Object):
         return self.freq440
 
     @frequency.setter
-    def frequency(self, value: Union[int, float]):
+    def frequency(self, value: t.Union[int, float]):
         self.freq440 = value
 
     # these methods may belong in a temperament object
@@ -3385,7 +3385,7 @@ class Pitch(prebase.ProtoM21Object):
             return 440.0 * (self._twelfth_root_of_two ** A4offset)
 
     @freq440.setter
-    def freq440(self, value: Union[int, float]):
+    def freq440(self, value: t.Union[int, float]):
         post = 12 * (math.log(value / 440.0) / math.log(2)) + 69
         # environLocal.printDebug(['convertFqToPs():', 'input', fq, 'output', repr(post)])
         # rounding here is essential
@@ -3494,8 +3494,8 @@ class Pitch(prebase.ProtoM21Object):
         return final
 
     def harmonicFromFundamental(self,
-                                fundamental: Union[str, 'Pitch']
-                                ) -> Tuple[int, float]:
+                                fundamental: t.Union[str, 'Pitch']
+                                ) -> t.Tuple[int, float]:
         # noinspection PyShadowingNames
         '''
         Given another Pitch as a fundamental, find the harmonic
@@ -3612,7 +3612,7 @@ class Pitch(prebase.ProtoM21Object):
         # return harmonicMatch, fundamental
 
     def harmonicString(self,
-                       fundamental: Union[str, 'music21.pitch.Pitch', None] = None
+                       fundamental: t.Union[str, 'music21.pitch.Pitch', None] = None
                        ) -> str:
         '''
         Return a string representation of a harmonic equivalence.
@@ -3674,8 +3674,8 @@ class Pitch(prebase.ProtoM21Object):
 
     def harmonicAndFundamentalFromPitch(
             self,
-            target: Union[str, 'Pitch']
-    ) -> Tuple[int, 'Pitch']:
+            target: t.Union[str, 'Pitch']
+    ) -> t.Tuple[int, 'Pitch']:
         '''
         Given a Pitch that is a plausible target for a fundamental,
         return the harmonic number and a potentially shifted fundamental
@@ -3707,7 +3707,7 @@ class Pitch(prebase.ProtoM21Object):
 
     def harmonicAndFundamentalStringFromPitch(
             self,
-            fundamental: Union[str, 'Pitch']
+            fundamental: t.Union[str, 'Pitch']
     ) -> str:
         '''
         Given a Pitch that is a plausible target for a fundamental,
@@ -3832,27 +3832,27 @@ class Pitch(prebase.ProtoM21Object):
             return False
 
     # a cache so that interval objects can be reused...
-    _transpositionIntervals: Dict[Literal['d2', '-d2'], interval.Interval] = {}
+    _transpositionIntervals: t.Dict[t.Literal['d2', '-d2'], interval.Interval] = {}
 
-    @overload
+    @t.overload
     def _getEnharmonicHelper(self: PitchType,
-                             inPlace: Literal[True],
+                             inPlace: t.Literal[True],
                              up: bool) -> None:
         return None  # astroid 1015
 
-    @overload
+    @t.overload
     def _getEnharmonicHelper(self: PitchType,
-                             inPlace: Literal[False],
+                             inPlace: t.Literal[False],
                              up: bool) -> PitchType:
         return self  # astroid 1015
 
     def _getEnharmonicHelper(self: PitchType,
                              inPlace: bool,
-                             up: bool) -> Optional[PitchType]:
+                             up: bool) -> t.Optional[PitchType]:
         '''
         abstracts the code from `getHigherEnharmonic` and `getLowerEnharmonic`
         '''
-        intervalString: Literal['d2', '-d2'] = 'd2'
+        intervalString: t.Literal['d2', '-d2'] = 'd2'
         if not up:
             intervalString = '-d2'
 
@@ -3876,15 +3876,15 @@ class Pitch(prebase.ProtoM21Object):
                 self.octave = p.octave
             return None
 
-    @overload
-    def getHigherEnharmonic(self: PitchType, *, inPlace: Literal[False]) -> PitchType:
+    @t.overload
+    def getHigherEnharmonic(self: PitchType, *, inPlace: t.Literal[False]) -> PitchType:
         return self
 
-    @overload
-    def getHigherEnharmonic(self: PitchType, *, inPlace: Literal[True]) -> None:
+    @t.overload
+    def getHigherEnharmonic(self: PitchType, *, inPlace: t.Literal[True]) -> None:
         return None
 
-    def getHigherEnharmonic(self: PitchType, *, inPlace: bool = False) -> Optional[PitchType]:
+    def getHigherEnharmonic(self: PitchType, *, inPlace: bool = False) -> t.Optional[PitchType]:
         '''
         Returns an enharmonic `Pitch` object that is a higher
         enharmonic.  That is, the `Pitch` a diminished-second above
@@ -3940,15 +3940,15 @@ class Pitch(prebase.ProtoM21Object):
             return self._getEnharmonicHelper(inPlace=False, up=True)
 
 
-    @overload
-    def getLowerEnharmonic(self: PitchType, *, inPlace: Literal[False]) -> PitchType:
+    @t.overload
+    def getLowerEnharmonic(self: PitchType, *, inPlace: t.Literal[False]) -> PitchType:
         return self
 
-    @overload
-    def getLowerEnharmonic(self: PitchType, *, inPlace: Literal[True]) -> None:
+    @t.overload
+    def getLowerEnharmonic(self: PitchType, *, inPlace: t.Literal[True]) -> None:
         return None
 
-    def getLowerEnharmonic(self: PitchType, *, inPlace: bool = False) -> Optional[PitchType]:
+    def getLowerEnharmonic(self: PitchType, *, inPlace: bool = False) -> t.Optional[PitchType]:
         '''
         returns a Pitch enharmonic that is a diminished second
         below the current note
@@ -3986,7 +3986,7 @@ class Pitch(prebase.ProtoM21Object):
         *,
         inPlace=False,
         mostCommon=False
-    ) -> Optional[PitchType]:
+    ) -> t.Optional[PitchType]:
         '''
         Returns a new Pitch (or sets the current one if inPlace is True)
         that is either the same as the current pitch or has fewer
@@ -4075,7 +4075,7 @@ class Pitch(prebase.ProtoM21Object):
         else:
             return returnObj
 
-    def getEnharmonic(self: PitchType, *, inPlace=False) -> Optional[PitchType]:
+    def getEnharmonic(self: PitchType, *, inPlace=False) -> t.Optional[PitchType]:
         '''
         Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
         Can be thought of as flipEnharmonic or something like that.
@@ -4172,7 +4172,7 @@ class Pitch(prebase.ProtoM21Object):
             self._client.pitchChanged()
 
 
-    def getAllCommonEnharmonics(self: PitchType, alterLimit: int = 2) -> List[PitchType]:
+    def getAllCommonEnharmonics(self: PitchType, alterLimit: int = 2) -> t.List[PitchType]:
         '''
         Return all common unique enharmonics for a pitch,
         or those that do not involve more than two accidentals.
@@ -4205,7 +4205,7 @@ class Pitch(prebase.ProtoM21Object):
         Music21 does not support accidentals beyond quadruple sharp/flat, so
         `alterLimit` = 4 is the most you can use. (Thank goodness!)
         '''
-        post: List[PitchType] = []
+        post: t.List[PitchType] = []
         c = self.simplifyEnharmonic(inPlace=False)
         if c is None:  # pragma: no follow
             return post  # not going to happen...
@@ -4325,35 +4325,35 @@ class Pitch(prebase.ProtoM21Object):
     def diatonicNoteNum(self, newNum: int):
         octave = int((newNum - 1) / 7)
         noteNameNum = newNum - 1 - (7 * octave)
-        pitchList: Tuple[StepName, ...] = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
+        pitchList: t.Tuple[StepName, ...] = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
         noteName: StepName = pitchList[noteNameNum]
         self.octave = octave
         self.step = noteName
 
-    @overload
+    @t.overload
     def transpose(
         self: PitchType,
-        value: Union['music21.interval.IntervalBase', str, int],
+        value: t.Union['music21.interval.IntervalBase', str, int],
         *,
-        inPlace: Literal[True]
+        inPlace: t.Literal[True]
     ) -> None:
         return None  # dummy until Astroid 1015
 
-    @overload
+    @t.overload
     def transpose(
         self: PitchType,
-        value: Union['music21.interval.IntervalBase', str, int],
+        value: t.Union['music21.interval.IntervalBase', str, int],
         *,
-        inPlace: Literal[False] = False
+        inPlace: t.Literal[False] = False
     ) -> PitchType:
         return self  # dummy until Astroid 1015
 
     def transpose(
         self: PitchType,
-        value: Union['music21.interval.IntervalBase', str, int],
+        value: t.Union['music21.interval.IntervalBase', str, int],
         *,
         inPlace: bool = False
-    ) -> Optional[PitchType]:
+    ) -> t.Optional[PitchType]:
         '''
         Transpose the pitch by the user-provided value.  If the value is an
         integer, the transposition is treated in half steps. If the value is a
@@ -4479,7 +4479,7 @@ class Pitch(prebase.ProtoM21Object):
         *,
         minimize=False,
         inPlace=False
-    ) -> Optional[PitchType]:
+    ) -> t.Optional[PitchType]:
         # noinspection PyShadowingNames
         '''
         Given a source Pitch, shift it down some number of octaves until it is below the
@@ -4577,7 +4577,7 @@ class Pitch(prebase.ProtoM21Object):
                              target,
                              *,
                              minimize=False,
-                             inPlace=False) -> Optional[PitchType]:
+                             inPlace=False) -> t.Optional[PitchType]:
         '''
         Given a source Pitch, shift it up octaves until it is above the target.
 
@@ -4730,9 +4730,9 @@ class Pitch(prebase.ProtoM21Object):
 
     def updateAccidentalDisplay(
         self,
-        pitchPast: Optional[List['Pitch']] = None,
-        pitchPastMeasure: Optional[List['Pitch']] = None,
-        alteredPitches: Optional[List['Pitch']] = None,
+        pitchPast: t.Optional[t.List['Pitch']] = None,
+        pitchPastMeasure: t.Optional[t.List['Pitch']] = None,
+        alteredPitches: t.Optional[t.List['Pitch']] = None,
         cautionaryPitchClass: bool = True,
         cautionaryAll: bool = False,
         overrideStatus: bool = False,

@@ -12,7 +12,7 @@
 Original music21 feature extractors.
 '''
 import unittest
-from typing import Optional
+import typing as t
 
 from music21.features import base as featuresModule
 from music21 import text
@@ -109,7 +109,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
         Do processing necessary, storing result in feature.
         '''
         allKeys = self.data['flat.getElementsByClass(Key)']
-        keyFeature: Optional[int] = None
+        keyFeature: t.Optional[int] = None
         if len(allKeys) == 1:
             k0 = allKeys[0]
             if k0.mode == 'major':

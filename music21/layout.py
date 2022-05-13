@@ -91,7 +91,7 @@ import copy
 import unittest
 
 from collections import namedtuple
-from typing import Tuple, Optional, List
+import typing as t
 
 from music21 import base
 from music21 import exceptions21
@@ -705,7 +705,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
                 staffObject.elements = p
                 thisSystem.replace(p, staffObject)
-                allStaffLayouts: List[StaffLayout] = list(p[StaffLayout])
+                allStaffLayouts: t.List[StaffLayout] = list(p[StaffLayout])
                 if not allStaffLayouts:
                     continue
                 # else:
@@ -1325,7 +1325,7 @@ class LayoutScore(stream.Opus):
         self,
         pageId: int,
         systemId: int
-    ) -> Tuple[Optional[int], int]:
+    ) -> t.Tuple[t.Optional[int], int]:
         # noinspection PyShadowingNames
         '''
         given a pageId and systemId, get the (pageId, systemId) for the previous system.

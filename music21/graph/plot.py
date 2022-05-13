@@ -24,7 +24,7 @@ import os
 import pathlib
 import unittest
 import numbers
-from typing import Dict, List, Any
+import typing as t
 
 from music21 import base
 # from music21 import common
@@ -261,8 +261,8 @@ class PlotStreamMixin(prebase.ProtoM21Object):
 
     def postProcessElement(self,
                            el: base.Music21Object,
-                           formatDict: Dict[Any, Any],
-                           *values: List[numbers.Real]) -> None:
+                           formatDict: t.Dict[t.Any, t.Any],
+                           *values: t.List[numbers.Real]) -> None:
         '''
         Any processing that needs to take place for each element, independent
         of what the axis is finding can go here.  For chords, a single
@@ -1006,7 +1006,7 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
 
     def __init__(self, streamObj=None, *args, colorByPart=False, **keywords):
         self.colorByPart = colorByPart
-        self._partsToColor: Dict[stream.Part, str] = {}
+        self._partsToColor: t.Dict[stream.Part, str] = {}
 
         primitives.GraphHorizontalBar.__init__(self, *args, **keywords)
         PlotStreamMixin.__init__(self, streamObj, **keywords)
@@ -1021,7 +1021,7 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
             self.assignColorsToParts()
         super().run()
 
-    def assignColorsToParts(self) -> Dict[stream.Part, str]:
+    def assignColorsToParts(self) -> t.Dict[stream.Part, str]:
         '''
         Give a different color for each part, if self.colorByPart is True.
 
@@ -1046,8 +1046,8 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
 
     def postProcessElement(self,
                            el: base.Music21Object,
-                           formatDict: Dict[Any, Any],
-                           *values: List[numbers.Real]):
+                           formatDict: t.Dict[t.Any, t.Any],
+                           *values: t.List[numbers.Real]):
         '''
         Assign colors to each element if colorByPart is True.
         '''

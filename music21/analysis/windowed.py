@@ -21,7 +21,7 @@ and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classe
 '''
 import unittest
 import warnings
-from typing import Union
+import typing as t
 
 from music21 import exceptions21
 
@@ -244,9 +244,9 @@ class WindowedAnalysis:
 
 
     def process(self,
-                minWindow: Union[int, None] = 1,
-                maxWindow: Union[int, None] = 1,
-                windowStepSize: Union[int, str] = 1,
+                minWindow: t.Union[int, None] = 1,
+                maxWindow: t.Union[int, None] = 1,
+                windowStepSize: t.Union[int, str] = 1,
                 windowType='overlap',
                 includeTotalWindow=True):
         # noinspection PyShadowingNames

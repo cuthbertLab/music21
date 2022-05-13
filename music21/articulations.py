@@ -78,7 +78,7 @@ A longer test showing the utility of the module:
     :width: 628
 
 '''
-from typing import Optional, Type
+import typing as t
 import unittest
 
 from music21 import base
@@ -106,7 +106,7 @@ class Articulation(base.Music21Object):
     >>> x.displayText = '>'
 
     '''
-    _styleClass: Type[style.Style] = style.TextStyle
+    _styleClass: t.Type[style.Style] = style.TextStyle
 
     def __init__(self):
         super().__init__()
@@ -115,7 +115,7 @@ class Articulation(base.Music21Object):
         self._volumeShift: float = 0.0
         self.lengthShift: float = 1.0
         self.tieAttach: str = 'first'  # attach to first or last or all notes after split
-        self.displayText: Optional[str] = None
+        self.displayText: t.Optional[str] = None
 
     def _reprInternal(self):
         return ''

@@ -19,7 +19,7 @@ import enum
 import unittest
 import copy
 import re
-from typing import Dict, Union, Optional, List, Tuple, Literal
+import typing as t
 
 from collections import namedtuple
 
@@ -50,8 +50,8 @@ ENDWITHFLAT_RE = re.compile(r'[b\-]$')
 
 # cache all Key/Scale objects created or passed in; re-use
 # permits using internally scored pitch segments
-_scaleCache: Dict[str, scale.Scale] = {}
-_keyCache: Dict[str, key.Key] = {}
+_scaleCache: t.Dict[str, scale.Scale] = {}
+_keyCache: t.Dict[str, key.Key] = {}
 
 # create a single notation object for RN initialization, for type-checking,
 # but it will always be replaced.
@@ -59,7 +59,7 @@ _NOTATION_SINGLETON = fbNotation.Notation()
 
 
 # only some figures imply bass (e.g. "54" does not)
-FIGURES_IMPLYING_BASS: Tuple[Tuple[int, ...], ...] = (
+FIGURES_IMPLYING_BASS: t.Tuple[t.Tuple[int, ...], ...] = (
     # triads
     (6,), (6, 3), (6, 4),
     # seventh chords
@@ -113,7 +113,7 @@ figureShorthands = {
     'b7b53': 'ø7',
 }
 
-figureShorthandsMode: Dict[str, Dict] = {
+figureShorthandsMode: t.Dict[str, t.Dict] = {
     'major': {
     },
     'minor': {
@@ -122,7 +122,7 @@ figureShorthandsMode: Dict[str, Dict] = {
 
 
 # this is sort of a crock...  :-)  but it's very helpful.
-functionalityScores = {
+functionalityScores: t.Dict[str, int] = {
     'I': 100,
     'i': 90,
     'V7': 80,
@@ -529,9 +529,9 @@ def figureTupleSolo(
 
 
 def identifyAsTonicOrDominant(
-    inChord: Union[list, tuple, chord.Chord],
+    inChord: t.Union[list, tuple, chord.Chord],
     inKey: key.Key
-) -> Union[str, Literal[False]]:
+) -> t.Union[str, t.Literal[False]]:
     '''
     Returns the roman numeral string expression (either tonic or dominant) that
     best matches the inChord. Useful when you know inChord is either tonic or
@@ -718,7 +718,7 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
 
 def romanNumeralFromChord(
     chordObj,
-    keyObj: Union[key.Key, str] = None,
+    keyObj: t.Union[key.Key, str] = None,
     preferSecondaryDominants=False
 ):
     # noinspection PyShadowingNames
@@ -2099,8 +2099,8 @@ class RomanNumeral(harmony.Harmony):
 
     def __init__(
         self,
-        figure: Union[str, int] = '',
-        keyOrScale: Optional[Union[key.Key, scale.Scale, str]] = None,
+        figure: t.Union[str, int] = '',
+        keyOrScale: t.Optional[t.Union[key.Key, scale.Scale, str]] = None,
         *,
         caseMatters=True,
         updatePitches=True,
@@ -2108,10 +2108,10 @@ class RomanNumeral(harmony.Harmony):
         seventhMinor=Minor67Default.QUALITY,
     ):
         self.primaryFigure: str = ''
-        self.secondaryRomanNumeral: Optional[RomanNumeral] = None
-        self.secondaryRomanNumeralKey: Optional['key.Key'] = None
+        self.secondaryRomanNumeral: t.Optional[RomanNumeral] = None
+        self.secondaryRomanNumeralKey: t.Optional['key.Key'] = None
 
-        self.pivotChord: Optional[RomanNumeral] = None
+        self.pivotChord: t.Optional[RomanNumeral] = None
         self.caseMatters: bool = caseMatters
         self.scaleCardinality: int = 7
 
@@ -2136,8 +2136,8 @@ class RomanNumeral(harmony.Harmony):
         self._scale = None
         self.scaleDegree: int = 0
         self.frontAlterationString: str = ''
-        self.frontAlterationTransposeInterval: Optional[interval.Interval] = None
-        self.frontAlterationAccidental: Optional[pitch.Accidental] = None
+        self.frontAlterationTransposeInterval: t.Optional[interval.Interval] = None
+        self.frontAlterationAccidental: t.Optional[pitch.Accidental] = None
         self.romanNumeralAlone: str = ''
         self.figuresWritten: str = ''
         self.figuresNotationObj: fbNotation.Notation = _NOTATION_SINGLETON
@@ -2146,11 +2146,11 @@ class RomanNumeral(harmony.Harmony):
 
         self.impliedQuality: str = ''
 
-        self.impliedScale: Optional[scale.Scale] = None
+        self.impliedScale: t.Optional[scale.Scale] = None
         self.useImpliedScale: bool = False
-        self.bracketedAlterations: List[Tuple[str, int]] = []
-        self.omittedSteps: List[int] = []
-        self.addedSteps: List[Tuple[str, int]] = []
+        self.bracketedAlterations: t.List[t.Tuple[str, int]] = []
+        self.omittedSteps: t.List[int] = []
+        self.addedSteps: t.List[t.Tuple[str, int]] = []
         # do not update pitches.
         self._parsingComplete = False
         self.key = keyOrScale
@@ -2690,7 +2690,7 @@ class RomanNumeral(harmony.Harmony):
                     secondary_tonic = self.secondaryRomanNumeralKey.tonic
                     self.secondaryRomanNumeralKey = key.Key(secondary_tonic, 'minor')
 
-            aug6type: Literal['It', 'Ger', 'Fr', 'Sw'] = aug6Match.group(1)
+            aug6type: t.Literal['It', 'Ger', 'Fr', 'Sw'] = aug6Match.group(1)
 
             if aug6type in ('It', 'Ger'):
                 self.scaleDegree = 4

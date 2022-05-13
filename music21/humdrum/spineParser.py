@@ -48,7 +48,7 @@ import math
 import re
 import unittest
 
-from typing import List, Optional, Type
+import typing as t
 
 from music21 import articulations
 from music21 import bar
@@ -1631,7 +1631,7 @@ class SpineCollection(prebase.ProtoM21Object):
         self.iterIndex -= 1
         return thisSpine
 
-    def addSpine(self, streamClass: Type[stream.Stream] = stream.Part):
+    def addSpine(self, streamClass: t.Type[stream.Stream] = stream.Part):
         '''
         creates a new spine in the collection and returns it.
 
@@ -2004,7 +2004,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 if not hasVoices:
                     continue
 
-                voices: List[Optional[stream.Voice]] = [None for i in range(10)]
+                voices: t.List[t.Optional[stream.Voice]] = [None for i in range(10)]
                 measureElements = el.elements
                 for mEl in measureElements:
                     mElGroups = mEl.groups

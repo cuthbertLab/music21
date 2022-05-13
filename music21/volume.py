@@ -15,7 +15,7 @@
 This module defines the object model of Volume, covering all representation of
 amplitude, volume, velocity, and related parameters.
 '''
-from typing import Iterable, List, Union
+import typing as t
 import unittest
 
 
@@ -133,12 +133,12 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             self.velocityIsRelative = other.velocityIsRelative
 
     def getRealizedStr(self,
-                       useDynamicContext: Union[dynamics.Dynamic, bool] = True,
+                       useDynamicContext: t.Union[dynamics.Dynamic, bool] = True,
                        useVelocity=True,
-                       useArticulations: Union[bool,
-                                               articulations.Articulation,
-                                               Iterable[articulations.Articulation]
-                                               ] = True,
+                       useArticulations: t.Union[bool,
+                                                 articulations.Articulation,
+                                                 t.Iterable[articulations.Articulation]
+                                                 ] = True,
                        baseLevel=0.5,
                        clip=True):
         '''Return the realized as rounded and formatted string value. Useful for testing.
@@ -157,10 +157,10 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def getRealized(
         self,
-        useDynamicContext: Union[bool, dynamics.Dynamic] = True,
+        useDynamicContext: t.Union[bool, dynamics.Dynamic] = True,
         useVelocity=True,
-        useArticulations: Union[
-            bool, articulations.Articulation, Iterable[articulations.Articulation]
+        useArticulations: t.Union[
+            bool, articulations.Articulation, t.Iterable[articulations.Articulation]
         ] = True,
         baseLevel=0.5,
         clip=True,
@@ -262,7 +262,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             # useArticulations can be a list of 1 or more articulation objects
             # as well as True/False
             if useArticulations is not False:
-                am: Iterable[articulations.Articulation]
+                am: t.Iterable[articulations.Articulation]
                 if isinstance(useArticulations, articulations.Articulation):
                     am = [useArticulations]  # place in a list
                 elif common.isIterable(useArticulations):
@@ -752,7 +752,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: t.List[type] = []
 
 
 if __name__ == '__main__':

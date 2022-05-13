@@ -17,7 +17,7 @@ Runs great, but slowly on multiprocessor systems.
 
 import doctest
 import sys
-from typing import Sequence
+import typing as t
 import unittest
 import warnings
 
@@ -36,7 +36,7 @@ environLocal = environment.Environment('test.testSingleCoreAll')
 cov = coverageM21.getCoverage()
 
 
-def main(testGroup: Sequence[str] = ('test',),
+def main(testGroup: t.Sequence[str] = ('test',),
          restoreEnvironmentDefaults=False,
          limit=None,
          verbosity=2,

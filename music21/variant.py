@@ -20,7 +20,7 @@ and showing different variant streams. These functions and the variant class sho
 used when variants of a score are the same length and contain the same measure structure at
 this time.
 '''
-from typing import Union
+import typing as t
 import unittest
 
 import copy
@@ -1379,8 +1379,8 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
 
 def addVariant(
     s: stream.Stream,
-    startOffset: Union[int, float],
-    sVariant: Union[stream.Stream, Variant],
+    startOffset: t.Union[int, float],
+    sVariant: t.Union[stream.Stream, Variant],
     variantName=None,
     variantGroups=None,
     replacementDuration=None

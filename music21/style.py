@@ -13,7 +13,7 @@
 The style module represents information about the style of a Note, Accidental,
 etc. such that precise positioning information, layout, size, etc. can be specified.
 '''
-from typing import Optional, Union
+import typing as t
 import unittest
 
 from music21 import common
@@ -75,28 +75,28 @@ class Style(ProtoM21Object):
     def __init__(self):
         self.size = None
 
-        self.relativeX: Optional[Union[float, int]] = None
-        self.relativeY: Optional[Union[float, int]] = None
-        self.absoluteX: Optional[Union[float, int]] = None
+        self.relativeX: t.Optional[t.Union[float, int]] = None
+        self.relativeY: t.Optional[t.Union[float, int]] = None
+        self.absoluteX: t.Optional[t.Union[float, int]] = None
 
         # managed by property below.
-        self._absoluteY: Optional[Union[float, int]] = None
+        self._absoluteY: t.Optional[t.Union[float, int]] = None
 
-        self._enclosure: Optional[Enclosure] = None
+        self._enclosure: t.Optional[Enclosure] = None
 
         # how should this symbol be represented in the font?
         # SMuFL characters are allowed.
         self.fontRepresentation = None
 
-        self.color: Optional[str] = None
+        self.color: t.Optional[str] = None
 
         self.units: str = 'tenths'
         self.hideObjectOnPrint: bool = False
 
-    def _getEnclosure(self) -> Optional[Enclosure]:
+    def _getEnclosure(self) -> t.Optional[Enclosure]:
         return self._enclosure
 
-    def _setEnclosure(self, value: Optional[Enclosure]):
+    def _setEnclosure(self, value: t.Optional[Enclosure]):
         if value is None:
             self._enclosure = value
         elif value == Enclosure.NONE:
@@ -263,9 +263,9 @@ class NoteStyle(Style):
 
     def __init__(self):
         super().__init__()
-        self.stemStyle: Optional[Style] = None
-        self.accidentalStyle: Optional[Style] = None
-        self.noteSize: Optional[str] = None  # can be 'cue' etc.
+        self.stemStyle: t.Optional[Style] = None
+        self.accidentalStyle: t.Optional[Style] = None
+        self.noteSize: t.Optional[str] = None  # can be 'cue' etc.
 
 
 class TextStyle(Style):
@@ -618,8 +618,8 @@ class StyleMixin(common.SlottedObjectMixin):
 
     def __init__(self):
         #  no need to call super().__init__() on SlottedObjectMixin
-        self._style: Optional[Style] = None
-        self._editorial: Optional['music21.editorial.Editorial'] = None
+        self._style: t.Optional[Style] = None
+        self._editorial: t.Optional['music21.editorial.Editorial'] = None
 
     @property
     def hasStyleInformation(self) -> bool:

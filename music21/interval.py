@@ -25,7 +25,7 @@ import enum
 import math
 import re
 import unittest
-from typing import Dict, Union, Tuple, Optional
+import typing as t
 
 from music21 import base
 from music21 import common
@@ -304,7 +304,7 @@ class IntervalException(exceptions21.Music21Exception):
 # some utility functions
 
 
-def _extractPitch(nOrP: Union['music21.note.Note', 'music21.pitch.Pitch']):
+def _extractPitch(nOrP: t.Union['music21.note.Note', 'music21.pitch.Pitch']):
     '''
     utility function to return either the object itself
     or the `.pitch` if it's a Note.
@@ -400,7 +400,7 @@ def convertDiatonicNumberToStep(dn):
         stepNumber = (dn - 1) - (octave * 7)
         return STEPNAMES[stepNumber], (octave - 1)
 
-def parseSpecifier(value: Union[str, int, Specifier]) -> Specifier:
+def parseSpecifier(value: t.Union[str, int, Specifier]) -> Specifier:
     '''
     Given an integer or a string representing a "specifier" (major, minor,
     perfect, diminished, etc.), return the Specifier.
@@ -588,7 +588,7 @@ def convertSemitoneToSpecifierGenericMicrotone(count):
     return (spec, (generic + (octave * 7)) * dirScale, cents)
 
 
-def convertSemitoneToSpecifierGeneric(count: int) -> Tuple[Specifier, int]:
+def convertSemitoneToSpecifierGeneric(count: int) -> t.Tuple[Specifier, int]:
     '''
     Given a number of semitones, return a default diatonic specifier, and
     a number that can be used as a GenericInterval
@@ -621,7 +621,7 @@ def convertSemitoneToSpecifierGeneric(count: int) -> Tuple[Specifier, int]:
     return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
 
 
-_pythagorean_cache: Dict[str, Fraction] = {}
+_pythagorean_cache: t.Dict[str, Fraction] = {}
 
 
 def intervalToPythagoreanRatio(intervalObj):
@@ -857,7 +857,7 @@ class GenericInterval(IntervalBase):
     Changed in v.6 -- large intervals get abbreviations
     '''
     def __init__(self,
-                 value: Union[int, str] = 'Unison'):
+                 value: t.Union[int, str] = 'Unison'):
         super().__init__()
         self._value: int = 1
         self.value = convertGeneric(value)
@@ -1630,8 +1630,8 @@ class DiatonicInterval(IntervalBase):
     }
 
     def __init__(self,
-                 specifier: Union[str, int] = 'P',
-                 generic: Union[int, GenericInterval, str] = 1):
+                 specifier: t.Union[str, int] = 'P',
+                 generic: t.Union[int, GenericInterval, str] = 1):
         super().__init__()
 
         self.generic: GenericInterval
@@ -2885,8 +2885,8 @@ class Interval(IntervalBase):
 
         # both self.diatonic and self.chromatic can still both be None if an
         # empty Interval class is being created, such as in deepcopy
-        self.diatonic: Optional[DiatonicInterval] = None
-        self.chromatic: Optional[ChromaticInterval] = None
+        self.diatonic: t.Optional[DiatonicInterval] = None
+        self.chromatic: t.Optional[ChromaticInterval] = None
 
         # these can be accessed through noteStart and noteEnd properties
         self._noteStart = None
@@ -3002,7 +3002,7 @@ class Interval(IntervalBase):
     # properties
 
     @property
-    def generic(self) -> Optional[GenericInterval]:
+    def generic(self) -> t.Optional[GenericInterval]:
         '''
         Returns the :class:`~music21.interval.GenericInterval` object
         associated with this Interval
@@ -3090,13 +3090,13 @@ class Interval(IntervalBase):
         return ''
 
     @property
-    def semitones(self) -> Union[int, float]:
+    def semitones(self) -> t.Union[int, float]:
         if self.chromatic is not None:
             return self.chromatic.semitones
         return 0
 
     @property
-    def direction(self) -> Optional[Direction]:
+    def direction(self) -> t.Optional[Direction]:
         if self.chromatic is not None:
             return self.chromatic.direction
         elif self.diatonic is not None:
@@ -3105,7 +3105,7 @@ class Interval(IntervalBase):
             return None
 
     @property
-    def specifier(self) -> Optional[Specifier]:
+    def specifier(self) -> t.Optional[Specifier]:
         if self.diatonic is not None:
             return self.diatonic.specifier
         return None
@@ -3708,7 +3708,7 @@ def getAbsoluteLowerNote(note1, note2):
 
 def transposePitch(
     pitch1: 'music21.pitch.Pitch',
-    interval1: Union[str, Interval],
+    interval1: t.Union[str, Interval],
     *,
     inPlace=False
 ) -> 'music21.pitch.Pitch':
@@ -3759,7 +3759,7 @@ def transposePitch(
 
 def transposeNote(
         note1: 'music21.note.Note',
-        intervalString: Union[str, Interval]) -> 'music21.note.Note':
+        intervalString: t.Union[str, Interval]) -> 'music21.note.Note':
     '''
     Given a :class:`~music21.note.Note` and
     a interval string (such as 'P5') or an Interval object,

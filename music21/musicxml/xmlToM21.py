@@ -20,7 +20,7 @@ import re
 import warnings
 
 from math import isclose
-from typing import cast, List, Optional, Dict, Tuple, Set, Union
+import typing as t
 
 import xml.etree.ElementTree as ET
 
@@ -67,7 +67,7 @@ from music21 import environment
 environLocal = environment.Environment('musicxml.xmlToM21')
 
 # what goes in a `.staffReference`
-StaffReferenceType = Dict[int, List[base.Music21Object]]
+StaffReferenceType = t.Dict[int, t.List[base.Music21Object]]
 
 # const
 NO_STAFF_ASSIGNED = 0
@@ -75,7 +75,7 @@ NO_STAFF_ASSIGNED = 0
 
 # ------------------------------------------------------------------------------
 # Helpers...
-def _clean(badStr: Optional[str]) -> Optional[str]:
+def _clean(badStr: t.Optional[str]) -> t.Optional[str]:
     # need to remove badly-formed strings
     if badStr is None:
         return None
@@ -1282,7 +1282,7 @@ class MusicXMLImporter(XMLParserBase):
 
     def identificationToMetadata(self,
                                  identification: ET.Element,
-                                 inputM21: Optional[metadata.Metadata] = None):
+                                 inputM21: t.Optional[metadata.Metadata] = None):
         '''
         Convert an <identification> tag, containing <creator> tags, <rights> tags, and
         <miscellaneous> tag.
@@ -1362,7 +1362,7 @@ class MusicXMLImporter(XMLParserBase):
 
     def creatorToContributor(self,
                              creator: ET.Element,
-                             inputM21: Optional[metadata.primitives.Contributor] = None):
+                             inputM21: t.Optional[metadata.primitives.Contributor] = None):
         # noinspection PyShadowingNames
         '''
         Given a <creator> tag, fill the necessary parameters of a Contributor.
@@ -1467,15 +1467,15 @@ class PartParser(XMLParserBase):
 
         self.atSoundingPitch = True
 
-        self.staffReferenceList: List[StaffReferenceType] = []
+        self.staffReferenceList: t.List[StaffReferenceType] = []
 
         self.lastTimeSignature = None
         self.lastMeasureWasShort = False
         self.lastMeasureOffset = 0.0
 
         # a dict of clefs per staff number
-        self.lastClefs: Dict[int, Optional[clef.Clef]] = {NO_STAFF_ASSIGNED: clef.TrebleClef()}
-        self.activeTuplets: List[Optional[duration.Tuplet]] = [None] * 7
+        self.lastClefs: t.Dict[int, t.Optional[clef.Clef]] = {NO_STAFF_ASSIGNED: clef.TrebleClef()}
+        self.activeTuplets: t.List[t.Optional[duration.Tuplet]] = [None] * 7
 
         self.maxStaves = 1  # will be changed in measure parsing...
 
@@ -1640,7 +1640,7 @@ class PartParser(XMLParserBase):
         # TODO: elevation
         # TODO: store id attribute somewhere
         mxMIDIInstrument = mxScorePart.find('midi-instrument')
-        i: Optional[instrument.Instrument] = None
+        i: t.Optional[instrument.Instrument] = None
         if mxMIDIInstrument is not None:
             mxMidiProgram = mxMIDIInstrument.find('midi-program')
             mxMidiUnpitched = mxMIDIInstrument.find('midi-unpitched')
@@ -1759,9 +1759,9 @@ class PartParser(XMLParserBase):
             'TimeSignature',
         ]
 
-        uniqueStaffKeys: List[int] = self._getUniqueStaffKeys()
-        partStaffs: List[stream.PartStaff] = []
-        appendedElementIds: Set[int] = set()  # id is id(el) not el.id
+        uniqueStaffKeys: t.List[int] = self._getUniqueStaffKeys()
+        partStaffs: t.List[stream.PartStaff] = []
+        appendedElementIds: t.Set[int] = set()  # id is id(el) not el.id
 
         def copy_into_partStaff(source, target, omitTheseElementIds):
             for sourceElem in source.getElementsByClass(STAFF_SPECIFIC_CLASSES):
@@ -1792,7 +1792,7 @@ class PartParser(XMLParserBase):
             newPartStaff.groups.append(partStaffId)
             partStaffs.append(newPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = newPartStaff
-            elementsIdsNotToGoInThisStaff: Set[int] = set()
+            elementsIdsNotToGoInThisStaff: t.Set[int] = set()
             for staffReference in self.staffReferenceList:
                 excludeOneMeasure = self._getStaffExclude(
                     staffReference,
@@ -1828,7 +1828,7 @@ class PartParser(XMLParserBase):
         self,
         staffReference: StaffReferenceType,
         targetKey: int
-    ) -> List[base.Music21Object]:
+    ) -> t.List[base.Music21Object]:
         '''
         Given a staff reference dictionary, remove and combine in a list all elements that
         are NOT part of the given key. Thus, return a list of all entries to remove.
@@ -1849,7 +1849,7 @@ class PartParser(XMLParserBase):
             post += staffReference[k]
         return post
 
-    def _getUniqueStaffKeys(self) -> List[int]:
+    def _getUniqueStaffKeys(self) -> t.List[int]:
         '''
         Given a list of staffReference dictionaries,
         collect and return a list of all unique keys except NO_STAFF_ASSIGNED (0)
@@ -2278,9 +2278,9 @@ class MeasureParser(XMLParserBase):
         self.staffReference: StaffReferenceType = {}
         if parent is not None:
             # list of current tuplets or Nones
-            self.activeTuplets: List[Optional[duration.Tuplet]] = parent.activeTuplets
+            self.activeTuplets: t.List[t.Optional[duration.Tuplet]] = parent.activeTuplets
         else:
-            self.activeTuplets: List[Optional[duration.Tuplet]] = [None] * 7
+            self.activeTuplets: t.List[t.Optional[duration.Tuplet]] = [None] * 7
 
         self.useVoices = False
         self.voicesById = {}
@@ -2301,7 +2301,7 @@ class MeasureParser(XMLParserBase):
         # key is a tuple of the
         #     staff number (or None) and offsetMeasureNote, and the value is a
         #     StaffLayout object.
-        self.staffLayoutObjects: Dict[Tuple[Optional[int], float], layout.StaffLayout] = {}
+        self.staffLayoutObjects: t.Dict[t.Tuple[t.Optional[int], float], layout.StaffLayout] = {}
         self.stream = stream.Measure()
 
         self.mxNoteList = []  # for accumulating notes in chords
@@ -2321,11 +2321,11 @@ class MeasureParser(XMLParserBase):
         self.restAndNoteCount = {'rest': 0, 'note': 0}
         if parent is not None:
             # share dict
-            self.lastClefs: Dict[int, Optional[clef.Clef]] = self.parent.lastClefs
+            self.lastClefs: t.Dict[int, t.Optional[clef.Clef]] = self.parent.lastClefs
 
         else:
             # a dict of clefs for staffIndexes:
-            self.lastClefs: Dict[int, Optional[clef.Clef]] = {NO_STAFF_ASSIGNED: None}
+            self.lastClefs: t.Dict[int, t.Optional[clef.Clef]] = {NO_STAFF_ASSIGNED: None}
         self.parseIndex = 0
 
         # what is the offset in the measure of the current note position?
@@ -2336,7 +2336,7 @@ class MeasureParser(XMLParserBase):
         # older versions of Finale put a forward tag at the end, but this
         # disguises the incomplete last measure.  The PartParser will
         # pick this up from the last measure.
-        self.endedWithForwardTag: Optional[note.Rest] = None
+        self.endedWithForwardTag: t.Optional[note.Rest] = None
 
     @staticmethod
     def getStaffNumber(mxObjectOrNumber) -> int:
@@ -2658,7 +2658,7 @@ class MeasureParser(XMLParserBase):
         isRest = False
         # TODO: Unpitched
 
-        offsetIncrement: Union[float, fractions.Fraction] = 0.0
+        offsetIncrement: t.Union[float, fractions.Fraction] = 0.0
 
         if mxNote.find('rest') is not None:  # it is a Rest
             isRest = True
@@ -2724,7 +2724,7 @@ class MeasureParser(XMLParserBase):
         self.offsetMeasureNote += offsetIncrement
         self.endedWithForwardTag = None
 
-    def xmlToChord(self, mxNoteList: List[ET.Element]) -> chord.ChordBase:
+    def xmlToChord(self, mxNoteList: t.List[ET.Element]) -> chord.ChordBase:
         # noinspection PyShadowingNames
         '''
         Given an a list of mxNotes, fill the necessary parameters
@@ -2811,7 +2811,7 @@ class MeasureParser(XMLParserBase):
         self.spannerBundle.freePendingSpannedElementAssignment(c)
         return c
 
-    def xmlToSimpleNote(self, mxNote, freeSpanners=True) -> Union[note.Note, note.Unpitched]:
+    def xmlToSimpleNote(self, mxNote, freeSpanners=True) -> t.Union[note.Note, note.Unpitched]:
         # noinspection PyShadowingNames
         '''
         Translate a MusicXML <note> (without <chord/>)
@@ -2859,7 +2859,7 @@ class MeasureParser(XMLParserBase):
         '''
         d = self.xmlToDuration(mxNote)
 
-        n: Union[note.Note, note.Unpitched]
+        n: t.Union[note.Note, note.Unpitched]
 
         mxUnpitched = mxNote.find('unpitched')
         if mxUnpitched is None:
@@ -2882,7 +2882,7 @@ class MeasureParser(XMLParserBase):
                 stemStyle = style.Style()
                 self.setColor(mxStem, stemStyle)
                 self.setPosition(mxStem, stemStyle)
-                this_note_style = cast(style.NoteStyle, n.style)
+                this_note_style = t.cast(style.NoteStyle, n.style)
                 this_note_style.stemStyle = stemStyle
 
         # gets the notehead object from the mxNote and sets value of the music21 note
@@ -4153,11 +4153,11 @@ class MeasureParser(XMLParserBase):
         ...            + '<notations>'
         ...            + '<tied line-type="dotted" orientation="over" type="start" />'
         ...            + '</notations></note>')
-        >>> t = MP.xmlToTie(mxNote)
-        >>> t.placement
+        >>> tieObj = MP.xmlToTie(mxNote)
+        >>> tieObj.placement
         'above'
         '''
-        t = tie.Tie()
+        tieObj = tie.Tie()
         allTies = mxNote.findall('tie')
         if not allTies:
             return None
@@ -4171,9 +4171,9 @@ class MeasureParser(XMLParserBase):
                 environLocal.printDebug('found tie element without required type')
 
         if len(typesFound) == 1:
-            t.type = typesFound[0]
+            tieObj.type = typesFound[0]
         elif 'stop' in typesFound and 'start' in typesFound:
-            t.type = 'continue'
+            tieObj.type = 'continue'
         else:
             environLocal.printDebug(
                 ['found unexpected arrangement of multiple tie types when '
@@ -4187,21 +4187,21 @@ class MeasureParser(XMLParserBase):
             mxTiedList = mxNotations.findall('tied')
             if mxTiedList:
                 firstTied = mxTiedList[0]
-                _synchronizeIds(firstTied, t)
+                _synchronizeIds(firstTied, tieObj)
 
                 tieStyle = firstTied.get('line-type')
                 if tieStyle is not None and tieStyle != 'wavy':  # do not support wavy...
-                    t.style = tieStyle
+                    tieObj.style = tieStyle
                 placement = firstTied.get('placement')
                 if placement is not None:
-                    t.placement = placement
+                    tieObj.placement = placement
                 else:
                     orientation = mxTiedList[0].get('orientation')
                     if orientation == 'over':
-                        t.placement = 'above'
+                        tieObj.placement = 'above'
                     elif orientation == 'under':
-                        t.placement = 'below'
-        return t
+                        tieObj.placement = 'below'
+        return tieObj
 
     def xmlToTuplets(self, mxNote):
         # noinspection PyShadowingNames
@@ -4224,21 +4224,21 @@ class MeasureParser(XMLParserBase):
         ...    '<normal-notes>3</normal-notes>' +
         ...    '<normal-type>16th</normal-type><normal-dot /><normal-dot />' +
         ...    '</time-modification></note>')
-        >>> t = MP.xmlToTuplets(mxNote)
-        >>> t
+        >>> tup = MP.xmlToTuplets(mxNote)
+        >>> tup
         [<music21.duration.Tuplet 5/3/16th>]
-        >>> t[0].durationNormal
+        >>> tup[0].durationNormal
         DurationTuple(type='16th', dots=2, quarterLength=0.4375)
         '''
-        t = duration.Tuplet()
+        tup = duration.Tuplet()
         mxTimeModification = mxNote.find('time-modification')
         # environLocal.printDebug(['got mxTimeModification', mxTimeModification])
 
         # This should only be a backup in case there are no tuplet definitions
         # in the tuplet tag.
         seta = _setAttributeFromTagText
-        seta(t, mxTimeModification, 'actual-notes', 'numberNotesActual', transform=int)
-        seta(t, mxTimeModification, 'normal-notes', 'numberNotesNormal', transform=int)
+        seta(tup, mxTimeModification, 'actual-notes', 'numberNotesActual', transform=int)
+        seta(tup, mxTimeModification, 'normal-notes', 'numberNotesNormal', transform=int)
 
         mxNormalType = mxTimeModification.find('normal-type')
         if textStripValid(mxNormalType):
@@ -4249,17 +4249,17 @@ class MeasureParser(XMLParserBase):
         durationNormalType = musicXMLTypeToType(musicXMLNormalType)
         numDots = len(mxTimeModification.findall('normal-dot'))
 
-        t.setDurationType(durationNormalType, numDots)
+        tup.setDurationType(durationNormalType, numDots)
 
         mxNotations = mxNote.find('notations')
         if mxNotations is None:
-            self.activeTuplets[0] = t
+            self.activeTuplets[0] = tup
         # environLocal.printDebug(['got mxNotations', mxNotations])
 
-        remainingTupletAmountToAccountFor = t.tupletMultiplier()
-        timeModTup = t
+        remainingTupletAmountToAccountFor = tup.tupletMultiplier()
+        timeModTup = tup
 
-        returnTuplets: List[Optional[duration.Tuplet]] = [None] * 8
+        returnTuplets: t.List[t.Optional[duration.Tuplet]] = [None] * 8
         removeFromActiveTuplets = set()
 
         # a set of tuplets to set to stop...
@@ -4280,7 +4280,6 @@ class MeasureParser(XMLParserBase):
                             activeT.type = 'startStop'
                         removeFromActiveTuplets.add(tupletIndex)
                         tupletsToStop.add(tupletIndex)
-
                     continue
 
                 mxTupletActual = mxTuplet.find('tuplet-actual')
@@ -4288,12 +4287,12 @@ class MeasureParser(XMLParserBase):
                 if mxTupletActual is None or mxTupletNormal is None:
                     # in theory either can be absent, but so far I have only seen both present
                     # or both absent
-                    t = copy.deepcopy(timeModTup)
+                    tup = copy.deepcopy(timeModTup)
                 else:
-                    t = duration.Tuplet()
-                    seta(t, mxTupletActual,
+                    tup = duration.Tuplet()
+                    seta(tup, mxTupletActual,
                          'tuplet-number', 'numberNotesActual', transform=int)
-                    seta(t, mxTupletNormal,
+                    seta(tup, mxTupletNormal,
                          'tuplet-number', 'numberNotesNormal', transform=int)
 
                     mxActualType = mxTupletActual.find('tuplet-type')
@@ -4301,45 +4300,45 @@ class MeasureParser(XMLParserBase):
                         xmlActualType = mxActualType.text.strip()
                         durType = musicXMLTypeToType(xmlActualType)
                         dots = len(mxActualType.findall('tuplet-dot'))
-                        t.durationActual = duration.durationTupleFromTypeDots(durType, dots)
+                        tup.durationActual = duration.durationTupleFromTypeDots(durType, dots)
 
                     mxNormalType = mxTupletNormal.find('tuplet-type')
                     if mxNormalType is not None:
                         xmlNormalType = mxNormalType.text.strip()
                         durType = musicXMLTypeToType(xmlNormalType)
                         dots = len(mxNormalType.findall('tuplet-dot'))
-                        t.durationNormal = duration.durationTupleFromTypeDots(durType, dots)
+                        tup.durationNormal = duration.durationTupleFromTypeDots(durType, dots)
 
                 # TODO: combine start + stop into startStop.
-                t.type = this_tuplet_type
+                tup.type = this_tuplet_type
 
                 bracketMaybe = mxTuplet.get('bracket')
                 if bracketMaybe is not None:
-                    t.bracket = xmlObjects.yesNoToBoolean(bracketMaybe)
+                    tup.bracket = xmlObjects.yesNoToBoolean(bracketMaybe)
                 # environLocal.printDebug(['got bracket', self.bracket])
                 showNumber = mxTuplet.get('show-number')
                 if showNumber is not None and showNumber == 'none':
-                    t.tupletActualShow = None
+                    tup.tupletActualShow = None
                     if bracketMaybe is None:
-                        t.bracket = False
+                        tup.bracket = False
                 elif showNumber is not None and showNumber == 'both':
-                    t.tupletNormalShow = 'number'
+                    tup.tupletNormalShow = 'number'
 
                 showType = mxTuplet.get('show-type')
                 if showType is not None and showType == 'actual':
-                    t.tupletActualShow = 'both' if t.tupletActualShow is not None else 'type'
+                    tup.tupletActualShow = 'both' if tup.tupletActualShow is not None else 'type'
                 elif showNumber is not None and showNumber == 'both':
-                    t.tupletActualShow = 'both' if t.tupletActualShow is not None else 'type'
-                    t.tupletNormalShow = 'both' if t.tupletNormalShow is not None else 'type'
+                    tup.tupletActualShow = 'both' if tup.tupletActualShow is not None else 'type'
+                    tup.tupletNormalShow = 'both' if tup.tupletNormalShow is not None else 'type'
 
                 lineShape = mxTuplet.get('line-shape')
                 if lineShape is not None and lineShape == 'curved':
-                    t.bracket = 'slur'
+                    tup.bracket = 'slur'
                 # TODO: default-x, default-y, relative-x, relative-y
-                t.placement = mxTuplet.get('placement')
-                returnTuplets[tupletIndex] = t
-                remainingTupletAmountToAccountFor /= t.tupletMultiplier()
-                self.activeTuplets[tupletIndex] = t
+                tup.placement = mxTuplet.get('placement')
+                returnTuplets[tupletIndex] = tup
+                remainingTupletAmountToAccountFor /= tup.tupletMultiplier()
+                self.activeTuplets[tupletIndex] = tup
 
         # find all activeTuplets that haven't been accounted for.
         for i in range(1, len(self.activeTuplets)):
@@ -4401,7 +4400,7 @@ class MeasureParser(XMLParserBase):
             n.lyrics.append(lyricObj)
             currentLyricNumber += 1
 
-    def xmlToLyric(self, mxLyric, inputM21=None) -> Optional[note.Lyric]:
+    def xmlToLyric(self, mxLyric, inputM21=None) -> t.Optional[note.Lyric]:
         # noinspection PyShadowingNames
         '''
         Translate a MusicXML <lyric> tag to a
@@ -4843,9 +4842,9 @@ class MeasureParser(XMLParserBase):
         # TODO: musicxml 4: attr: arrangement -- C/E or C over E etc.
         # TODO: offset
         # Element staff is covered by insertCoreAndReference in xmlHarmony()
-        b: Optional[pitch.Pitch] = None
-        r: Optional[pitch.Pitch] = None
-        inversion: Optional[int] = None
+        b: t.Optional[pitch.Pitch] = None
+        r: t.Optional[pitch.Pitch] = None
+        inversion: t.Optional[int] = None
         chordKind: str = ''
         chordKindStr: str = ''
 
@@ -5774,8 +5773,8 @@ class MeasureParser(XMLParserBase):
     def xmlStaffLayoutFromStaffDetails(
         self,
         mxDetails,
-        m21staffLayout: Optional[layout.StaffLayout] = None
-    ) -> Optional[layout.StaffLayout]:
+        m21staffLayout: t.Optional[layout.StaffLayout] = None
+    ) -> t.Optional[layout.StaffLayout]:
         # noinspection PyShadowingNames
         '''
         Returns a new StaffLayout object from staff-details or sets attributes on an existing one

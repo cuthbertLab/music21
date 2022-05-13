@@ -15,7 +15,7 @@ This module defines two component objects for defining nested metrical structure
 :class:`~music21.meter.core.MeterTerminal` and :class:`~music21.meter.core.MeterSequence`.
 '''
 import copy
-from typing import Optional
+import typing as t
 
 from music21 import prebase
 from music21.common.numberTools import opFrac
@@ -56,7 +56,7 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     )
 
     # INITIALIZER #
-    def __init__(self, slashNotation: Optional[str] = None, weight=1):
+    def __init__(self, slashNotation: t.Optional[str] = None, weight=1):
         self._duration = None
         self._numerator = 0
         self._denominator = 1
@@ -1161,7 +1161,7 @@ class MeterSequence(MeterTerminal):
             #    'created MeterSequence from MeterTerminal; old weight, new weight',
             #    value.weight, self.weight])
 
-        elif common.isIterable(value):  # a list of Terminals or Sequence es
+        elif common.isIterable(value):  # a list of Terminals or t.Sequence es
             for obj in value:
                 # environLocal.printDebug('creating MeterSequence with %s' % obj)
                 self._addTerminal(obj)
@@ -1768,7 +1768,7 @@ class MeterSequence(MeterTerminal):
         iMatch = self.offsetToIndex(qLenPos)
         return opFrac(self[iMatch].weight)
 
-    def offsetToDepth(self, qLenPos, align='quantize', index: Optional[int] = None):
+    def offsetToDepth(self, qLenPos, align='quantize', index: t.Optional[int] = None):
         '''
         Given a qLenPos, return the maximum available depth at this position.
 

@@ -60,7 +60,7 @@ import copy
 import random
 import string
 import unittest
-from typing import List, Union
+import typing as t
 
 from music21 import exceptions21
 from music21 import pitch
@@ -1893,7 +1893,7 @@ class PitchSieve:
                  pitchLower=None,
                  pitchUpper=None,
                  pitchOrigin=None,
-                 eld: Union[int, float] = 1):
+                 eld: t.Union[int, float] = 1):
         self.pitchLower = None  # 'c3'
         self.pitchUpper = None  # 'c5' -- default ps Range
         self.pitchOrigin = None  # pitchLower -- default
@@ -2194,7 +2194,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: t.List[type] = []
 
 if __name__ == '__main__':
     import music21

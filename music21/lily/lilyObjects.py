@@ -20,7 +20,7 @@ this replaces (April 2012) the old LilyString() conversion methods.
 The Grammar for Lilypond comes from
 http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
 '''
-from typing import Any, Dict, List
+import typing as t
 import unittest
 from music21 import common
 from music21 import exceptions21
@@ -40,9 +40,9 @@ class LyObject(prebase.ProtoM21Object):
     ''
 
     '''
-    supportedClasses: List[object] = []  # ordered list of classes to support
-    m21toLy: Dict[str, dict] = {}
-    defaultAttributes: Dict[str, Any] = {}
+    supportedClasses: t.List[object] = []  # ordered list of classes to support
+    m21toLy: t.Dict[str, dict] = {}
+    defaultAttributes: t.Dict[str, t.Any] = {}
     backslash = '\\'
 
     def __init__(self):
@@ -100,8 +100,8 @@ class LyObject(prebase.ProtoM21Object):
     def newlineIndent(self):
         # totalIndents = self.thisIndent
         ancestors = self.ancestorList()
-        # for a in ancestors:
-        #    totalIndents += a.thisIndent
+        # for ancestor in ancestors:
+        #    totalIndents += ancestor.thisIndent
         totalIndents = len(ancestors)
         indentSpaces = ' ' * totalIndents
         return '\n' + indentSpaces
@@ -376,7 +376,7 @@ class LyEmbeddedScm(LyObject):
     r'''
     represents Scheme embedded in Lilypond code.
 
-    Can be either a SCM_TOKEN (Scheme Token) or SCM_IDENTIFIER String stored in self.content
+    Can be either an SCM_TOKEN (Scheme Token) or SCM_IDENTIFIER String stored in self.content
 
     Note that if any LyEmbeddedScm is found in an output then the output SHOULD be marked as unsafe.
     But a lot of standard lilypond functions are actually embedded scheme.
@@ -792,7 +792,7 @@ class LyLayout(LyObject):
 
 class LyOutputDef(LyObject):
     r'''
-    ugly grammar since it doesnt close curly bracket...
+    This is an ugly grammar, since it does not close the curly bracket...
     '''
 
     def __init__(self, outputDefBody=None):
@@ -1307,35 +1307,35 @@ class LyPrefixCompositeMusic(LyObject):
         self.reRhythmedMusic = reRhythmedMusic
 
     def stringOutput(self):
-        t = self.type
-        if t == 'scheme':
+        myType = self.type
+        if myType == 'scheme':
             return str(self.genericPrefixMusicScm)
-        elif t in ('context', 'new'):
-            c = self.backslash + t + ' ' + str(self.simpleString) + ' '
+        elif myType in ('context', 'new'):
+            c = self.backslash + myType + ' ' + str(self.simpleString) + ' '
             if self.optionalId is not None:
                 c += str(self.optionalId) + ' '
             if self.optionalContextMod is not None:
                 c += str(self.optionalContextMod) + ' '
             c += str(self.music) + ' '
             return c
-        elif t == 'times':
+        elif myType == 'times':
             return self.backslash + 'times ' + str(self.fraction) + ' ' + str(self.music) + ' '
-        elif t == 'repeated':
+        elif myType == 'repeated':
             return str(self.repeatedMusic)
-        elif t == 'transpose':
+        elif myType == 'transpose':
             return ''.join([self.backslash, 'transpose ', str(self.pitchAlsoInChords1), ' ',
                             str(self.pitchAlsoInChords2), ' ', str(self.music), ' '])
-        elif t == 'modeChanging':
+        elif myType == 'modeChanging':
             return str(self.modeChangingHead) + ' ' + str(self.groupedMusicList)
-        elif t == 'modeChangingWith':
+        elif myType == 'modeChangingWith':
             c = str(self.modeChangingHeadWithContext) + ' '
             if self.optionalContextMod is not None:
                 c += str(self.optionalContextMod) + ' '
             c += str(self.groupedMusicList) + ' '
             return c
-        elif t == 'relative':
+        elif myType == 'relative':
             return str(self.relativeMusic)
-        elif t == 'rhythmed':
+        elif myType == 'rhythmed':
             return str(self.reRhythmedMusic)
         else:  # pragma: no cover
             raise LilyObjectsException(f'unknown self.type or None: {self.type}')

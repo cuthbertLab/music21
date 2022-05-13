@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import contextlib
-from typing import Any, Type, Dict
+import typing as t
 
 # from music21 import exceptions21
 __all__ = [
@@ -19,7 +19,7 @@ __all__ = [
 ]
 
 
-def isNum(usrData: Any) -> bool:
+def isNum(usrData: t.Any) -> bool:
     '''
     check if usrData is a number (float, int, long, Decimal),
     return boolean
@@ -63,7 +63,7 @@ def isNum(usrData: Any) -> bool:
         return False
 
 
-def isListLike(usrData: Any) -> bool:
+def isListLike(usrData: t.Any) -> bool:
     '''
     Returns True if is a List or Tuple
 
@@ -88,7 +88,7 @@ def isListLike(usrData: Any) -> bool:
     return isinstance(usrData, (list, tuple))
 
 
-def isIterable(usrData: Any) -> bool:
+def isIterable(usrData: t.Any) -> bool:
     '''
     Returns True if is the object can be iter'd over
     and is NOT a string
@@ -123,7 +123,7 @@ def isIterable(usrData: Any) -> bool:
     return False
 
 
-def classToClassStr(classObj: Type) -> str:
+def classToClassStr(classObj: t.Type) -> str:
     '''Convert a class object to a class string.
 
     >>> common.classToClassStr(note.Note)
@@ -230,7 +230,7 @@ def saveAttributes(obj, *attributeList):
 
     New in v7.
     '''
-    tempStorage: Dict[str, Any] = {}
+    tempStorage: t.Dict[str, t.Any] = {}
     for attribute in attributeList:
         tempStorage[attribute] = getattr(obj, attribute)
     try:

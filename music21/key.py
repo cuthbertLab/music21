@@ -22,7 +22,8 @@ from __future__ import annotations
 import copy
 import re
 import unittest
-from typing import Union, Optional, Dict, List, TypeVar, overload, Literal, cast
+import typing as t
+from typing import overload
 import warnings
 
 from music21 import base
@@ -38,14 +39,14 @@ from music21.common.types import StepName
 from music21 import environment
 environLocal = environment.Environment('key')
 
-KeySignatureType = TypeVar('KeySignatureType', bound='KeySignature')
-KeyType = TypeVar('KeyType', bound='Key')
-TransposeTypes = Union[int, str, interval.Interval, interval.GenericInterval]
+KeySignatureType = t.TypeVar('KeySignatureType', bound='KeySignature')
+KeyType = t.TypeVar('KeyType', bound='Key')
+TransposeTypes = t.Union[int, str, interval.Interval, interval.GenericInterval]
 
 
 # ------------------------------------------------------------------------------
 # store a cache of already-found values
-_sharpsToPitchCache: Dict[int, pitch.Pitch] = {}
+_sharpsToPitchCache: t.Dict[int, pitch.Pitch] = {}
 
 
 def convertKeyStringToMusic21KeyString(textString):
@@ -156,7 +157,7 @@ modeSharpsAlter = {'major': 0,
                    }
 
 
-def pitchToSharps(value: Union[str, pitch.Pitch, note.Note],
+def pitchToSharps(value: t.Union[str, pitch.Pitch, note.Note],
                   mode: str = None) -> int:
     '''
     Given a pitch string or :class:`music21.pitch.Pitch` or
@@ -331,7 +332,7 @@ class KeySignature(base.Music21Object):
 
     classSortOrder = 2
 
-    def __init__(self, sharps: Optional[int] = 0):
+    def __init__(self, sharps: t.Optional[int] = 0):
         super().__init__()
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
@@ -349,7 +350,7 @@ class KeySignature(base.Music21Object):
         self._sharps = sharps
         # need to store a list of pitch objects, used for creating a
         # non-traditional key
-        self._alteredPitches: Optional[List[pitch.Pitch]] = None
+        self._alteredPitches: t.Optional[t.List[pitch.Pitch]] = None
         self.accidentalsApplyOnlyToOctave = False
 
     def __hash__(self):
@@ -390,7 +391,7 @@ class KeySignature(base.Music21Object):
     def _reprInternal(self):
         return 'of ' + self._strDescription()
 
-    def asKey(self, mode: Optional[str] = None, tonic: Optional[str] = None):
+    def asKey(self, mode: t.Optional[str] = None, tonic: t.Optional[str] = None):
         '''
         Return a `key.Key` object representing this KeySignature object as a key in the
         given mode or in the given tonic. If `mode` is None, and `tonic` is not provided,
@@ -436,7 +437,7 @@ class KeySignature(base.Music21Object):
             except KeyError as ke:
                 raise KeyException(
                     f'Could not solve for mode from sharps={self.sharps}, tonic={tonic}') from ke
-        mode = cast(str, mode)
+        mode = t.cast(str, mode)
         mode = mode.lower()
         if mode not in modeSharpsAlter:
             raise KeyException(f'Mode {mode} is unknown')
@@ -448,7 +449,7 @@ class KeySignature(base.Music21Object):
 
     @property  # type: ignore
     @cacheMethod
-    def alteredPitches(self) -> List[pitch.Pitch]:
+    def alteredPitches(self) -> t.List[pitch.Pitch]:
         # unfortunately, mypy cannot deal with @property on decorated methods.
         # noinspection PyShadowingNames
         '''
@@ -506,7 +507,7 @@ class KeySignature(base.Music21Object):
         if self._alteredPitches is not None:
             return self._alteredPitches
 
-        post: List[pitch.Pitch] = []
+        post: t.List[pitch.Pitch] = []
         if self.sharps is None:
             return post
 
@@ -531,9 +532,10 @@ class KeySignature(base.Music21Object):
         return post
 
     @alteredPitches.setter
-    def alteredPitches(self, newAlteredPitches: List[Union[str, pitch.Pitch, note.Note]]) -> None:
+    def alteredPitches(self, newAlteredPitches: t.List[t.Union[str, pitch.Pitch, note.Note]]
+                       ) -> None:
         self.clearCache()
-        newList: List[pitch.Pitch] = []
+        newList: t.List[pitch.Pitch] = []
         for p in newAlteredPitches:
             if isinstance(p, str):
                 newList.append(pitch.Pitch(p))
@@ -568,7 +570,7 @@ class KeySignature(base.Music21Object):
         else:
             return False
 
-    def accidentalByStep(self, step: StepName) -> Optional[pitch.Accidental]:
+    def accidentalByStep(self, step: StepName) -> t.Optional[pitch.Accidental]:
         '''
         Given a step (C, D, E, F, etc.) return the accidental
         for that note in this key (using the natural minor for minor)
@@ -654,20 +656,20 @@ class KeySignature(base.Music21Object):
     def transpose(self: KeySignatureType,
                   value: TransposeTypes,
                   *,
-                  inPlace: Literal[False] = False) -> KeySignatureType:
+                  inPlace: t.Literal[False] = False) -> KeySignatureType:
         return self  # astroid 1015
 
     @overload
     def transpose(self: KeySignatureType,
                   value: TransposeTypes,
                   *,
-                  inPlace: Literal[True]) -> None:
+                  inPlace: t.Literal[True]) -> None:
         return None  # astroid 1015
 
     def transpose(self: KeySignatureType,
                   value: TransposeTypes,
                   *,
-                  inPlace: bool = False) -> Optional[KeySignatureType]:
+                  inPlace: bool = False) -> t.Optional[KeySignatureType]:
         '''
         Transpose the KeySignature by the user-provided value.
         If the value is an integer, the transposition is treated
@@ -714,7 +716,7 @@ class KeySignature(base.Music21Object):
         >>> eFlat
         <music21.key.KeySignature of 3 flats>
         '''
-        intervalObj: Union[interval.Interval, interval.GenericInterval]
+        intervalObj: t.Union[interval.Interval, interval.GenericInterval]
         if isinstance(value, interval.Interval):  # it is an Interval class
             intervalObj = value
         elif isinstance(value, interval.GenericInterval):
@@ -742,7 +744,7 @@ class KeySignature(base.Music21Object):
         else:
             return None
 
-    def transposePitchFromC(self, p: pitch.Pitch, *, inPlace=False) -> Optional[pitch.Pitch]:
+    def transposePitchFromC(self, p: pitch.Pitch, *, inPlace=False) -> t.Optional[pitch.Pitch]:
         '''
         Takes a pitch in C major and transposes it so that it has
         the same step position in the current key signature.
@@ -838,10 +840,10 @@ class KeySignature(base.Music21Object):
     # --------------------------------------------------------------------------
     # properties
 
-    def _getSharps(self) -> Optional[int]:
+    def _getSharps(self) -> t.Optional[int]:
         return self._sharps
 
-    def _setSharps(self, value: Optional[int]):
+    def _setSharps(self, value: t.Optional[int]):
         if value != self._sharps:
             self._sharps = value
             self.clearCache()
@@ -930,7 +932,7 @@ class Key(KeySignature, scale.DiatonicScale):
     tonic: pitch.Pitch
 
     def __init__(self,
-                 tonic: Union[str, pitch.Pitch, note.Note] = 'C',
+                 tonic: t.Union[str, pitch.Pitch, note.Note] = 'C',
                  mode=None):
         if isinstance(tonic, (note.Note, pitch.Pitch)):
             tonicStr = tonic.name
@@ -978,7 +980,7 @@ class Key(KeySignature, scale.DiatonicScale):
         self.correlationCoefficient = None
 
         # store an ordered list of alternative Key objects
-        self.alternateInterpretations: List[Key] = []
+        self.alternateInterpretations: t.List[Key] = []
 
     def __hash__(self):
         hashTuple = (self.tonic, self.mode)
@@ -1220,7 +1222,7 @@ class Key(KeySignature, scale.DiatonicScale):
     def transpose(self: KeyType,
                   value: TransposeTypes,
                   *,
-                  inPlace: Literal[False] = False
+                  inPlace: t.Literal[False] = False
                   ) -> KeyType:
         return self  # astroid 1015
 
@@ -1228,7 +1230,7 @@ class Key(KeySignature, scale.DiatonicScale):
     def transpose(self: KeyType,
                   value: TransposeTypes,
                   *,
-                  inPlace: Literal[True]
+                  inPlace: t.Literal[True]
                   ) -> None:
         return None
 
@@ -1236,7 +1238,7 @@ class Key(KeySignature, scale.DiatonicScale):
                   value: TransposeTypes,
                   *,
                   inPlace: bool = False
-                  ) -> Optional[KeyType]:
+                  ) -> t.Optional[KeyType]:
         '''
         Transpose the Key by the user-provided value.
         If the value is an integer, the transposition is treated

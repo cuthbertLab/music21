@@ -18,7 +18,7 @@ and other positions.
 import unittest
 import weakref
 from math import inf
-from typing import Optional
+import typing as t
 
 from music21 import common
 from music21 import exceptions21
@@ -96,7 +96,7 @@ class ElementTree(core.AVLTree):
     6.0
     '''
     # TYPING #
-    rootNode: Optional[nodeModule.ElementNode]
+    rootNode: t.Optional[nodeModule.ElementNode]
 
     # CLASS VARIABLES #
     nodeClass = nodeModule.ElementNode
@@ -550,7 +550,7 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:36.0 <0.-5...> Indices:(l:193 *194* r:195)
             Payload:<music21.bar.Barline type=final>>
         '''
-        def recurse(subListOfTuples, globalStartOffset) -> Optional[core.AVLNode]:
+        def recurse(subListOfTuples, globalStartOffset) -> t.Optional[core.AVLNode]:
             '''
             Divide and conquer.
             '''
@@ -895,7 +895,7 @@ class OffsetTree(ElementTree):
     __slots__ = ()
 
     # TYPING #
-    rootNode: Optional[nodeModule.OffsetNode]
+    rootNode: t.Optional[nodeModule.OffsetNode]
 
     nodeClass = nodeModule.OffsetNode
 

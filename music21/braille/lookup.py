@@ -24,7 +24,7 @@ A place where other signs are found generally is
 New International Manual of Braille Music Notation (by Bettye Krolick), which we will cite as
 "Krolick" or "krolick".
 '''
-from typing import Dict
+import typing as t
 import itertools
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
@@ -189,7 +189,7 @@ naturals = {0: '',
             6: _B[3456] + _B[124] + _B[16],
             7: _B[3456] + _B[1245] + _B[16]}
 
-numbersUpper: Dict[int, str] = {
+numbersUpper: t.Dict[int, str] = {
     0: _B[245],
     1: _B[1],
     2: _B[12],
@@ -201,7 +201,7 @@ numbersUpper: Dict[int, str] = {
     8: _B[125],
     9: _B[24],
 }
-numbersLower: Dict[int, str] = {
+numbersLower: t.Dict[int, str] = {
     0: _B[356],
     1: _B[2],
     2: _B[23],
@@ -214,7 +214,7 @@ numbersLower: Dict[int, str] = {
     9: _B[35],
 }
 
-rests: Dict[str, str] = {
+rests: t.Dict[str, str] = {
     'dummy': _B[3],
     '128th': _B[1346],
     '64th': _B[1236],
@@ -228,21 +228,21 @@ rests: Dict[str, str] = {
     'longa': _B[134] + _B[45] + _B[14] + _B[45] + _B[14] + _B[134],
 }
 
-lengthPrefixes: Dict[str, str] = {
+lengthPrefixes: t.Dict[str, str] = {
     'larger': _B[45] + _B[126] + _B[2],  # whole to eighth inclusive + longer (degarmo 15)
     'smaller': _B[6] + _B[126] + _B[2],  # 16th to 128th inclusive
     'xsmall': _B[56] + _B[126] + _B[2],  # 256th notes + presumably shorter?
 
 }
 
-barlines: Dict[str, str] = {
+barlines: t.Dict[str, str] = {
     'final': _B[126] + _B[13],
     'double': _B[126] + _B[13] + _B[3],
     'dashed': _B[13],
     'heavy': _B[123],  # use "unusual circumstances barline
 }
 
-fingerMarks: Dict[str, str] = {
+fingerMarks: t.Dict[str, str] = {
     '1': _B[1],
     '2': _B[12],
     '3': _B[123],
@@ -302,7 +302,7 @@ textExpressions = {
     'decr.': _B[345] + _B[145] + _B[15] + _B[14] + _B[1235] + _B[3],
 }
 
-alphabet: Dict[str, str] = {
+alphabet: t.Dict[str, str] = {
     'a': _B[1],
     'b': _B[12],
     'c': _B[14],

@@ -13,7 +13,7 @@
 Object models of barlines, including repeat barlines.
 '''
 import unittest
-from typing import Optional
+import typing as t
 
 from music21 import base
 from music21 import exceptions21
@@ -273,8 +273,8 @@ class Repeat(repeat.RepeatMark, Barline):
             barType = 'final'
         Barline.__init__(self, type=barType)
 
-        self._direction: Optional[str] = None  # either start or end
-        self._times: Optional[int] = None  # if an end, how many repeats
+        self._direction: t.Optional[str] = None  # either start or end
+        self._times: t.Optional[int] = None  # if an end, how many repeats
 
         # start is forward, end is backward in musicxml
         self.direction = direction  # start, end
@@ -310,7 +310,7 @@ class Repeat(repeat.RepeatMark, Barline):
             raise BarException(f'cannot set repeat direction to: {value}')
 
     @property
-    def times(self) -> Optional[int]:
+    def times(self) -> t.Optional[int]:
         '''
         Get or set the "times" property of this barline. This
         defines how many times the repeat happens. A standard repeat

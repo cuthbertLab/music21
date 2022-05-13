@@ -12,7 +12,7 @@
 Multi-lingual conversion of pitch, etc. objects
 '''
 
-from typing import List
+import typing as t
 import unittest
 from music21 import pitch
 
@@ -268,7 +268,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 
 
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: t.List[type] = []
 
 
 if __name__ == '__main__':

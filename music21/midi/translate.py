@@ -16,7 +16,7 @@ notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here
 import unittest
 import math
 import copy
-from typing import Optional, List, Tuple, Dict, Union, Any, TypeVar, Type
+import typing as t
 import warnings
 
 from music21 import chord
@@ -40,7 +40,7 @@ environLocal = environment.Environment('midi.translate')
 PERCUSSION_MAPPER = PercussionMapper()
 
 
-NotRestType = TypeVar('NotRestType', bound=note.NotRest)
+NotRestType = t.TypeVar('NotRestType', bound=note.NotRest)
 
 # ------------------------------------------------------------------------------
 class TranslateException(exceptions21.Music21Exception):
@@ -281,8 +281,8 @@ def _constructOrUpdateNotRestSubclass(
     tOff: int,
     ticksPerQuarter: int,
     *,
-    inputM21: Optional[NotRestType] = None,
-    preferredClass: Type[NotRestType] = note.Note,
+    inputM21: t.Optional[NotRestType] = None,
+    preferredClass: t.Type[NotRestType] = note.Note,
 ) -> NotRestType:
     '''
     Construct (or edit the duration of) a NotRest subclass, usually
@@ -323,8 +323,8 @@ def _constructOrUpdateNotRestSubclass(
 def midiEventsToNote(
     eventList,
     ticksPerQuarter=None,
-    inputM21: Optional[NotRestType] = None,
-) -> Optional[NotRestType]:
+    inputM21: t.Optional[NotRestType] = None,
+) -> t.Optional[NotRestType]:
     # noinspection PyShadowingNames
     '''
     Convert from a list of midi.DeltaTime and midi.MidiEvent objects to a music21 Note.
@@ -553,10 +553,10 @@ def noteToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
 # Chords
 
 def midiEventsToChord(
-    eventList: List['music21.midi.MidiEvent'],
-    ticksPerQuarter: Optional[int] = None,
-    inputM21: Optional[chord.ChordBase] = None
-) -> Optional[chord.ChordBase]:
+    eventList: t.List['music21.midi.MidiEvent'],
+    ticksPerQuarter: t.Optional[int] = None,
+    inputM21: t.Optional[chord.ChordBase] = None
+) -> t.Optional[chord.ChordBase]:
     # noinspection PyShadowingNames
     '''
     Creates a Chord from a list of :class:`~music21.midi.DeltaTime`
@@ -624,10 +624,10 @@ def midiEventsToChord(
         ticksPerQuarter = defaults.ticksPerQuarter
 
     from music21 import volume
-    pitches: List[pitch.Pitch] = []
+    pitches: t.List[pitch.Pitch] = []
     volumes = []
 
-    firstOn: Optional['music21.midi.MidiEvent'] = None
+    firstOn: t.Optional['music21.midi.MidiEvent'] = None
     any_channel_10 = False
     # this is a format provided by the Stream conversion of
     # midi events; it pre-groups events for a chord together in nested pairs
@@ -1225,9 +1225,9 @@ def getPacketFromMidiEvent(
         trackId: int,
         offset: int,
         midiEvent: 'music21.midi.MidiEvent',
-        obj: Optional['music21.base.Music21Object'] = None,
-        lastInstrument: Optional['music21.instrument.Instrument'] = None
-) -> Dict[str, Any]:
+        obj: t.Optional['music21.base.Music21Object'] = None,
+        lastInstrument: t.Optional['music21.instrument.Instrument'] = None
+) -> t.Dict[str, t.Any]:
     '''
     Pack a dictionary of parameters for each event.
     Packets are used for sorting and configuring all note events.
@@ -1282,7 +1282,7 @@ def getPacketFromMidiEvent(
 
 def elementToMidiEventList(
     el: 'music21.base.Music21Object'
-) -> Optional[List['music21.midi.MidiEvent']]:
+) -> t.Optional[t.List['music21.midi.MidiEvent']]:
     '''
     Return a list of MidiEvents (or None) from a Music21Object,
     assuming that dynamics have already been applied, etc.
@@ -1337,7 +1337,7 @@ def streamToPackets(
     s: stream.Stream,
     trackId: int = 1,
     addStartDelay: bool = False,
-) -> List[Dict[str, Any]]:
+) -> t.List[t.Dict[str, t.Any]]:
     '''
     Convert a (flattened, sorted) Stream to packets.
 
@@ -1644,9 +1644,9 @@ def assignPacketsToChannels(
 
 
 def filterPacketsByTrackId(
-    packetsSrc: List[Dict[str, Any]],
-    trackIdFilter: Optional[int] = None,
-) -> List[Dict[str, Any]]:
+    packetsSrc: t.List[t.Dict[str, t.Any]],
+    trackIdFilter: t.Optional[int] = None,
+) -> t.List[t.Dict[str, t.Any]]:
     '''
     Given a list of Packet dictionaries, return a list of
     only those whose trackId matches the filter.
@@ -1678,9 +1678,9 @@ def filterPacketsByTrackId(
 
 
 def packetsToDeltaSeparatedEvents(
-        packets: List[Dict[str, Any]],
+        packets: t.List[t.Dict[str, t.Any]],
         midiTrack: 'music21.midi.MidiTrack'
-) -> List['music21.midi.MidiEvent']:
+) -> t.List['music21.midi.MidiEvent']:
     '''
     Given a list of packets (which already contain MidiEvent objects)
     return a list of those Events with proper delta times between them.
@@ -1697,11 +1697,11 @@ def packetsToDeltaSeparatedEvents(
     lastOffset = 0
     for packet in packets:
         midiEvent = packet['midiEvent']
-        t = packet['offset'] - lastOffset
-        if t < 0:
+        deltaTimeInt = packet['offset'] - lastOffset
+        if deltaTimeInt < 0:
             raise TranslateException('got a negative delta time')
         # set the channel from the midi event
-        dt = DeltaTime(midiTrack, time=t, channel=midiEvent.channel)
+        dt = DeltaTime(midiTrack, time=deltaTimeInt, channel=midiEvent.channel)
         # environLocal.printDebug(['packetsByOffset', packet])
         events.append(dt)
         events.append(midiEvent)
@@ -1744,7 +1744,7 @@ def packetsToMidiTrack(packets, trackId=1, channel=1, instrumentObj=None):
 
 def getTimeForEvents(
     mt: 'music21.midi.MidiTrack'
-) -> List[Tuple[int, 'music21.midi.MidiEvent']]:
+) -> t.List[t.Tuple[int, 'music21.midi.MidiEvent']]:
     '''
     Get a list of tuples of (tickTime, MidiEvent) from the events with time deltas.
     '''
@@ -1796,9 +1796,9 @@ def getTimeForEvents(
 
 
 def getNotesFromEvents(
-    events: List[Tuple[int, 'music21.midi.MidiEvent']]
-) -> List[Tuple[Tuple[int, 'music21.midi.MidiEvent'],
-                Tuple[int, 'music21.midi.MidiEvent']]]:
+    events: t.List[t.Tuple[int, 'music21.midi.MidiEvent']]
+) -> t.List[t.Tuple[t.Tuple[int, 'music21.midi.MidiEvent'],
+                t.Tuple[int, 'music21.midi.MidiEvent']]]:
     '''
     Returns a list of Tuples of MIDI events that are pairs of note-on and
     note-off events.
@@ -1841,7 +1841,7 @@ def getMetaEvents(events):
     metaEvents = []  # store pairs of abs time, m21 object
     last_program: int = -1
     for eventTuple in events:
-        t, e = eventTuple
+        timeEvent, e = eventTuple
         metaObj = None
         if e.type == MetaEvents.TIME_SIGNATURE:
             # time signature should be 4 bytes
@@ -1866,7 +1866,7 @@ def getMetaEvents(events):
         else:
             pass
         if metaObj:
-            pair = (t, metaObj)
+            pair = (timeEvent, metaObj)
             metaEvents.append(pair)
 
     return metaEvents
@@ -1897,7 +1897,7 @@ def midiTrackToStream(
     ticksPerQuarter=None,
     quantizePost=True,
     inputM21=None,
-    conductorPart: Optional[stream.Part] = None,
+    conductorPart: t.Optional[stream.Part] = None,
     isFirst: bool = False,
     **keywords
 ) -> stream.Part:
@@ -1978,9 +1978,9 @@ def midiTrackToStream(
     metaEvents = getMetaEvents(events)
 
     # first create meta events
-    for t, obj in metaEvents:
+    for tick, obj in metaEvents:
         # environLocal.printDebug(['insert midi meta event:', t, obj])
-        s.coreInsert(t / ticksPerQuarter, obj)
+        s.coreInsert(tick / ticksPerQuarter, obj)
     s.coreElementsChanged()
     deduplicate(s, inPlace=True)
     # environLocal.printDebug([
@@ -1989,7 +1989,7 @@ def midiTrackToStream(
     # collect notes with similar start times into chords
     # create a composite list of both notes and chords
     # composite = []
-    chordSub: Optional[List['music21.midi.MidiEvent']] = None
+    chordSub: t.Optional[t.List['music21.midi.MidiEvent']] = None
     i = 0
     iGathered = []  # store a list of indexes of gathered values put into chords
     voicesRequired = False
@@ -2007,7 +2007,7 @@ def midiTrackToStream(
                 continue
             # look at each note; get on time and event
             on, off = notes[i]
-            t, unused_e = on
+            timeNow, unused_e = on
             tOff, unused_eOff = off
             # environLocal.printDebug(['on, off', on, off, 'i', i, 'len(notes)', len(notes)])
 
@@ -2031,7 +2031,7 @@ def midiTrackToStream(
                     divisor = 16
                 chunkTolerance = ticksPerQuarter / divisor
                 # must be strictly less than the quantization unit
-                if abs(tSub - t) < chunkTolerance:
+                if abs(tSub - timeNow) < chunkTolerance:
                     # isolate case where end time is not w/n tolerance
                     if abs(tOffSub - tOff) > chunkTolerance:
                         # need to store this as requiring movement to a diff
@@ -2097,7 +2097,7 @@ def midiTrackToStream(
     if conductorPart is not None:
         insertConductorEvents(conductorPart, s, isFirst=isFirst)
 
-    meterStream: Optional[stream.Stream] = None
+    meterStream: t.Optional[stream.Stream] = None
     if conductorPart is not None:
         ts_iter = conductorPart['TimeSignature']
         if ts_iter:
@@ -2254,8 +2254,8 @@ def conductorStream(s: stream.Stream) -> stream.Part:
 
 def channelInstrumentData(
     s: stream.Stream,
-    acceptableChannelList: Optional[List[int]] = None,
-) -> Tuple[Dict[Union[int, None], int], List[int]]:
+    acceptableChannelList: t.Optional[t.List[int]] = None,
+) -> t.Tuple[t.Dict[t.Union[int, None], int], t.List[int]]:
     '''
     Read through Stream `s` and finding instruments in it, return a 2-tuple,
     the first a dictionary mapping MIDI program numbers to channel numbers,
@@ -2375,10 +2375,10 @@ def channelInstrumentData(
 
 
 def packetStorageFromSubstreamList(
-    substreamList: List[stream.Part],
+    substreamList: t.List[stream.Part],
     *,
     addStartDelay=False,
-) -> Dict[int, Dict[str, Any]]:
+) -> t.Dict[int, t.Dict[str, t.Any]]:
     # noinspection PyShadowingNames
     r'''
     Make a dictionary of raw packets and the initial instrument for each
@@ -2474,8 +2474,8 @@ def packetStorageFromSubstreamList(
 
 
 def updatePacketStorageWithChannelInfo(
-        packetStorage: Dict[int, Dict[str, Any]],
-        channelByInstrument: Dict[Union[int, None], Union[int, None]],
+        packetStorage: t.Dict[int, t.Dict[str, t.Any]],
+        channelByInstrument: t.Dict[t.Union[int, None], t.Union[int, None]],
 ) -> None:
     '''
     Take the packetStorage dictionary and using information
@@ -2592,10 +2592,10 @@ def streamHierarchyToMidiTracks(
 
 
 def midiTracksToStreams(
-    midiTracks: List['music21.midi.MidiTrack'],
+    midiTracks: t.List['music21.midi.MidiTrack'],
     ticksPerQuarter=None,
     quantizePost=True,
-    inputM21: Optional[stream.Score] = None,
+    inputM21: t.Optional[stream.Score] = None,
     **keywords
 ) -> stream.Score:
     '''
@@ -2640,7 +2640,7 @@ def streamToMidiFile(
     inputM21: stream.Stream,
     *,
     addStartDelay: bool = False,
-    acceptableChannelList: Optional[List[int]] = None,
+    acceptableChannelList: t.Optional[t.List[int]] = None,
 ) -> 'music21.midi.MidiFile':
     # noinspection PyShadowingNames
     '''
@@ -3476,8 +3476,8 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
         p2 = copy.deepcopy(p1)
-        t = interval.Interval(0.5)  # half sharp
-        p2.transpose(t, inPlace=True, classFilterList=('Note', 'Chord'))
+        halfSharp = interval.Interval(0.5)  # half sharp
+        p2.transpose(halfSharp, inPlace=True, classFilterList=('Note', 'Chord'))
         post = stream.Score()
         post.insert(0, p1)
         post.insert(0, p2)

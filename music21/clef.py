@@ -19,8 +19,7 @@ commonly used clefs. Clef objects are often found
 within :class:`~music21.stream.Measure` objects.
 '''
 import unittest
-from typing import (Mapping, Optional, Iterable, Sequence, Union, Dict,
-                    Type, List, TYPE_CHECKING)
+import typing as t
 
 from music21 import base
 from music21 import exceptions21
@@ -60,7 +59,7 @@ class Clef(base.Music21Object):
     >>> tc.lowestLine
     31
     '''
-    _DOC_ATTR: Mapping[str, str] = {
+    _DOC_ATTR: t.Mapping[str, str] = {
         'sign': '''
             The sign of the clef, generally, 'C', 'G', 'F', 'percussion', 'none' or None.
 
@@ -99,9 +98,9 @@ class Clef(base.Music21Object):
 
     def __init__(self):
         super().__init__()
-        self.sign: Optional[str] = None
+        self.sign: t.Optional[str] = None
         # line counts start from the bottom up, the reverse of musedata
-        self.line: Optional[int] = None
+        self.line: t.Optional[int] = None
         self._octaveChange: int = 0  # set to zero as default
         # musicxml has an attribute for clefOctaveChange,
         # an integer to show transposing clef
@@ -185,7 +184,7 @@ class Clef(base.Music21Object):
 
     def getStemDirectionForPitches(
         self,
-        pitches: Union[pitch.Pitch, Sequence[pitch.Pitch]],
+        pitches: t.Union[pitch.Pitch, t.Sequence[pitch.Pitch]],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -228,12 +227,12 @@ class Clef(base.Music21Object):
         >>> bc.getStemDirectionForPitches(pitchList, extremePitchOnly=True)
         'up'
         '''
-        pitchList: Sequence[pitch.Pitch]
+        pitchList: t.Sequence[pitch.Pitch]
         if isinstance(pitches, pitch.Pitch):
             pitchList = [pitches]
         else:
             pitchList = pitches
-        relevantPitches: Sequence[pitch.Pitch]
+        relevantPitches: t.Sequence[pitch.Pitch]
 
         if not pitchList:
             raise ValueError('getStemDirectionForPitches cannot operate on an empty list')
@@ -272,7 +271,7 @@ class PitchClef(Clef):
     '''
     superclass for all other clef subclasses that use pitches...
     '''
-    _DOC_ATTR: Mapping[str, str] = {
+    _DOC_ATTR: t.Mapping[str, str] = {
         'lowestLine': '''
             The diatonicNoteNumber of the lowest line of the clef.
             (Can be none...)
@@ -284,7 +283,7 @@ class PitchClef(Clef):
 
     def __init__(self):
         super().__init__()
-        self.lowestLine: Optional[int] = None
+        self.lowestLine: t.Optional[int] = None
 
     @property
     def octaveChange(self) -> int:
@@ -338,7 +337,7 @@ class PercussionClef(Clef):
 
     Changed in v7.3 -- setting octaveChange no longer affects lowestLine
     '''
-    _DOC_ATTR: Mapping[str, str] = {}
+    _DOC_ATTR: t.Mapping[str, str] = {}
 
     def __init__(self):
         super().__init__()
@@ -359,7 +358,7 @@ class NoClef(Clef):
     >>> nc.sign is None
     False
     '''
-    _DOC_ATTR: Mapping[str, str] = {}
+    _DOC_ATTR: t.Mapping[str, str] = {}
 
     def __init__(self):
         super().__init__()
@@ -397,7 +396,7 @@ class TabClef(PitchClef):
 
     def getStemDirectionForPitches(
         self,
-        pitchList: Union[pitch.Pitch, Iterable[pitch.Pitch]],
+        pitchList: t.Union[pitch.Pitch, t.Iterable[pitch.Pitch]],
         *,
         firstLastOnly: bool = True,
         extremePitchOnly: bool = False,
@@ -725,7 +724,7 @@ class SubBassClef(FClef):
 
 
 # ------------------------------------------------------------------------------
-CLASS_FROM_TYPE: Dict[str, List[Optional[Type[Clef]]]] = {
+CLASS_FROM_TYPE: t.Dict[str, t.List[t.Optional[t.Type[Clef]]]] = {
     'G': [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
     'C': [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
     'F': [None, None, None, FBaritoneClef, BassClef, SubBassClef],
@@ -874,7 +873,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
             clefObj.line = lineNum
         else:
             ClefType = line_list[lineNum]
-            if TYPE_CHECKING:
+            if t.TYPE_CHECKING:
                 assert ClefType is not None
                 assert issubclass(ClefType, PitchClef)
             clefObj = ClefType()

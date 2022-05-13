@@ -12,7 +12,7 @@
 import datetime
 import os
 import unittest
-from typing import List, Optional, Iterable, Any
+import typing as t
 
 from music21 import common
 from music21 import exceptions21
@@ -427,14 +427,14 @@ class DateSingle(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, data: Any = '', relevance='certain'):
-        self._data: List[Date] = []
+    def __init__(self, data: t.Any = '', relevance='certain'):
+        self._data: t.List[Date] = []
         self._relevance = None  # managed by property
         # not yet implemented
         # store an array of values marking if date data itself
         # is certain, approximate, or uncertain
         # here, dataError is relevance
-        self._dataError: List[str] = []
+        self._dataError: t.List[str] = []
         self._prepareData(data)
         self.relevance = relevance  # will use property
 
@@ -587,7 +587,7 @@ class DateBetween(DateSingle):
 
     # INITIALIZER #
 
-    def __init__(self, data: Optional[Iterable[str]] = None, relevance='between'):
+    def __init__(self, data: t.Optional[t.Iterable[str]] = None, relevance='between'):
         if data is None:
             data = []
         super().__init__(data, relevance)
@@ -664,7 +664,7 @@ class DateSelection(DateSingle):
     # INITIALIZER #
 
     def __init__(self,
-                 data: Optional[Iterable[str]] = None,
+                 data: t.Optional[t.Iterable[str]] = None,
                  relevance='or'):  # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
@@ -906,7 +906,7 @@ class Contributor(prebase.ProtoM21Object):
 
     # PUBLIC METHODS #
 
-    def age(self) -> Optional[DateSingle]:
+    def age(self) -> t.Optional[DateSingle]:
         r'''
         Calculate the age at death of the Contributor, returning a
         datetime.timedelta object.
