@@ -2239,6 +2239,21 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
           </encoding>
         </identification>
 
+
+        Overriding the default:
+
+        >>> defaults.author = "Batch Conversion March 2022"
+        >>> SX = musicxml.m21ToXml.ScoreExporter()
+        >>> mxIdentification = SX.setIdentification()
+        >>> SX.dump(mxIdentification)
+        <identification>
+          <creator type="composer">Batch Conversion March 2022</creator>
+          <encoding>
+            <encoding-date>20...-...-...</encoding-date>
+            <software>music21 v...</software>
+          </encoding>
+        </identification>
+
         '''
         if self.mxIdentification is not None:
             mxId = self.mxIdentification
@@ -2254,7 +2269,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
                 mxId.append(mxCreator)
                 foundOne = True
 
-        if foundOne is False:
+        if foundOne is False and defaults.author:
             mxCreator = SubElement(mxId, 'creator')
             mxCreator.set('type', 'composer')
             mxCreator.text = defaults.author
@@ -2431,14 +2446,18 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         # musicxml often defaults to show only movement title
         # if no movement title is found, get the .title attr
-        mxMovementTitle = SubElement(mxScoreHeader, 'movement-title')
+        movement_title = ''
         if mdObj.movementName not in (None, ''):
-            mxMovementTitle.text = str(mdObj.movementName)
+            movement_title = str(mdObj.movementName)
         else:  # it is none
             if mdObj.title is not None:
-                mxMovementTitle.text = str(mdObj.title)
+                movement_title = str(mdObj.title)
+            elif defaults.title:
+                movement_title = defaults.title
             else:
-                mxMovementTitle.text = defaults.title
+                return
+        mxMovementTitle = SubElement(mxScoreHeader, 'movement-title')
+        mxMovementTitle.text = movement_title
 
     def contributorToXmlCreator(self, c):
         # noinspection SpellCheckingInspection, PyShadowingNames
