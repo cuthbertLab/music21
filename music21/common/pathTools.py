@@ -20,6 +20,7 @@ __all__ = [
 ]
 
 import typing as t
+from typing import overload
 import inspect
 import os
 import pathlib
@@ -144,22 +145,22 @@ def relativepath(path: str, start: t.Optional[str] = None) -> str:
     return os.path.relpath(path, start)
 
 
-@t.overload
+@overload
 def cleanpath(path: pathlib.Path, *,
               returnPathlib: t.Literal[None] = None) -> pathlib.Path:
     return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
 
-@t.overload
+@overload
 def cleanpath(path: str, *,
               returnPathlib: t.Literal[None] = None) -> str:
     return '/'  # dummy until Astroid #1015 is fixed.
 
-@t.overload
+@overload
 def cleanpath(path: t.Union[str, pathlib.Path], *,
               returnPathlib: t.Literal[True]) -> pathlib.Path:
     return pathlib.Path('/')  # dummy until Astroid #1015 is fixed.
 
-@t.overload
+@overload
 def cleanpath(path: t.Union[str, pathlib.Path], *,
               returnPathlib: t.Literal[False]) -> str:
     return '/'  # dummy until Astroid #1015 is fixed.

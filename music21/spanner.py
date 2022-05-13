@@ -408,7 +408,7 @@ class Spanner(base.Music21Object):
     def addSpannedElements(
         self,
         spannedElements: t.Union[t.Sequence[base.Music21Object],
-                               base.Music21Object],
+                                 base.Music21Object],
         *arguments,
         **keywords
     ):

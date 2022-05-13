@@ -1798,7 +1798,7 @@ def getTimeForEvents(
 def getNotesFromEvents(
     events: t.List[t.Tuple[int, 'music21.midi.MidiEvent']]
 ) -> t.List[t.Tuple[t.Tuple[int, 'music21.midi.MidiEvent'],
-                t.Tuple[int, 'music21.midi.MidiEvent']]]:
+                    t.Tuple[int, 'music21.midi.MidiEvent']]]:
     '''
     Returns a list of Tuples of MIDI events that are pairs of note-on and
     note-off events.

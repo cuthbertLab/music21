@@ -34,6 +34,7 @@ from collections import namedtuple
 from fractions import Fraction
 from math import isclose
 import typing as t
+from typing import overload
 
 from music21 import base
 
@@ -390,7 +391,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         adds necessary Stream-specific features.
         '''
         return t.cast(iterator.StreamIterator[M21ObjType],
-                    iterator.StreamIterator(self))
+                      iterator.StreamIterator(self))
 
     def iter(self) -> iterator.StreamIterator[M21ObjType]:
         '''
@@ -404,21 +405,21 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         return self.__iter__()
 
-    @t.overload
+    @overload
     def __getitem__(self, k: str) -> iterator.RecursiveIterator[M21ObjType]:
         # Remove this code and replace with ... once Astroid #1015 is fixed.
         x: iterator.RecursiveIterator[M21ObjType] = self.recurse()
         return x
 
-    @t.overload
+    @overload
     def __getitem__(self, k: int) -> M21ObjType:
         return self[k]  # dummy code
 
-    @t.overload
+    @overload
     def __getitem__(self, k: slice) -> t.List[M21ObjType]:
         return list(self.elements)  # dummy code
 
-    @t.overload
+    @overload
     def __getitem__(
         self,
         k: t.Type[ChangedM21ObjType]
@@ -429,9 +430,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def __getitem__(self,
                     k: t.Union[str, int, slice, t.Type[ChangedM21ObjType]]
                     ) -> t.Union[iterator.RecursiveIterator[M21ObjType],
-                               iterator.RecursiveIterator[ChangedM21ObjType],
-                               M21ObjType,
-                               t.List[M21ObjType]]:
+                                 iterator.RecursiveIterator[ChangedM21ObjType],
+                                 M21ObjType,
+                                 t.List[M21ObjType]]:
         '''
         Get a Music21Object from the Stream using a variety of keys or indices.
 
@@ -3371,7 +3372,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # getElementsByX(self): anything that returns a collection of Elements
     #  formerly always returned a Stream; turning to Iterators in September 2015
 
-    @t.overload
+    @overload
     def getElementsByClass(self,
                            classFilterList: t.Union[str, t.Iterable[str]]
                            ) -> iterator.StreamIterator[M21ObjType]:
@@ -3379,7 +3380,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         x: iterator.StreamIterator[M21ObjType] = self.iter()
         return x  # dummy code
 
-    @t.overload
+    @overload
     def getElementsByClass(self,
                            classFilterList: t.Type[ChangedM21ObjType]
                            ) -> iterator.StreamIterator[ChangedM21ObjType]:
@@ -3388,7 +3389,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         )
         return x  # dummy code
 
-    @t.overload
+    @overload
     def getElementsByClass(self,
                            classFilterList: t.Iterable[t.Type[ChangedM21ObjType]]
                            ) -> iterator.StreamIterator[M21ObjType]:
@@ -7578,7 +7579,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         return self.flatten(retainContainers=True)
 
-    @t.overload
+    @overload
     def recurse(self,
                 *,
                 streamsOnly: t.Literal[True],
@@ -7587,7 +7588,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 includeSelf=None) -> iterator.RecursiveIterator[Stream]:
         return iterator.RecursiveIterator(self).getElementsByClass(Stream)
 
-    @t.overload
+    @overload
     def recurse(self,
                 *,
                 streamsOnly: t.Literal[False] = False,
@@ -7602,7 +7603,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 restoreActiveSites=True,
                 classFilter=(),
                 includeSelf=None) -> t.Union[iterator.RecursiveIterator[M21ObjType],
-                                           iterator.RecursiveIterator[Stream]]:
+                                             iterator.RecursiveIterator[Stream]]:
         '''
         `.recurse()` is a fundamental method of music21 for getting into
         elements contained in a Score, Part, or Measure, where elements such as

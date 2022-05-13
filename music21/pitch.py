@@ -23,6 +23,7 @@ import math
 import itertools
 from collections import OrderedDict
 import typing as t
+from typing import overload
 
 from music21 import base
 from music21 import common
@@ -62,13 +63,15 @@ STEPREF_REVERSED: t.Dict[int, StepName] = {
     11: 'B',
 }
 STEPNAMES: t.Set[StepName] = {'C', 'D', 'E', 'F', 'G', 'A', 'B'}  # set
-STEP_TO_DNN_OFFSET: t.Dict[StepName, int] = {'C': 0,
-                                           'D': 1,
-                                           'E': 2,
-                                           'F': 3,
-                                           'G': 4,
-                                           'A': 5,
-                                           'B': 6}
+STEP_TO_DNN_OFFSET: t.Dict[StepName, int] = {
+    'C': 0,
+    'D': 1,
+    'E': 2,
+    'F': 3,
+    'G': 4,
+    'A': 5,
+    'B': 6,
+}
 
 
 TWELFTH_ROOT_OF_TWO = 2.0 ** (1 / 12)
@@ -207,9 +210,9 @@ def _convertPsToOct(ps: t.Union[int, float]) -> int:
 def _convertPsToStep(
     ps: t.Union[int, float]
 ) -> t.Tuple[StepName,
-           Accidental,
-           Microtone,
-           int]:
+             Accidental,
+             Microtone,
+             int]:
     '''
     Utility conversion; does not process internal representations.
 
@@ -218,7 +221,7 @@ def _convertPsToStep(
 
     Returns a tuple of Step, an Accidental object, a Microtone object or
     None, and an int representing octave shift (which is nearly always zero, but can be 1
-    for a B with very high microtones.
+    for a B with very high microtones).
 
     >>> pitch._convertPsToStep(60)
     ('C', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
@@ -3834,13 +3837,13 @@ class Pitch(prebase.ProtoM21Object):
     # a cache so that interval objects can be reused...
     _transpositionIntervals: t.Dict[t.Literal['d2', '-d2'], interval.Interval] = {}
 
-    @t.overload
+    @overload
     def _getEnharmonicHelper(self: PitchType,
                              inPlace: t.Literal[True],
                              up: bool) -> None:
         return None  # astroid 1015
 
-    @t.overload
+    @overload
     def _getEnharmonicHelper(self: PitchType,
                              inPlace: t.Literal[False],
                              up: bool) -> PitchType:
@@ -3876,11 +3879,11 @@ class Pitch(prebase.ProtoM21Object):
                 self.octave = p.octave
             return None
 
-    @t.overload
+    @overload
     def getHigherEnharmonic(self: PitchType, *, inPlace: t.Literal[False]) -> PitchType:
         return self
 
-    @t.overload
+    @overload
     def getHigherEnharmonic(self: PitchType, *, inPlace: t.Literal[True]) -> None:
         return None
 
@@ -3940,11 +3943,11 @@ class Pitch(prebase.ProtoM21Object):
             return self._getEnharmonicHelper(inPlace=False, up=True)
 
 
-    @t.overload
+    @overload
     def getLowerEnharmonic(self: PitchType, *, inPlace: t.Literal[False]) -> PitchType:
         return self
 
-    @t.overload
+    @overload
     def getLowerEnharmonic(self: PitchType, *, inPlace: t.Literal[True]) -> None:
         return None
 
@@ -4330,7 +4333,7 @@ class Pitch(prebase.ProtoM21Object):
         self.octave = octave
         self.step = noteName
 
-    @t.overload
+    @overload
     def transpose(
         self: PitchType,
         value: t.Union['music21.interval.IntervalBase', str, int],
@@ -4339,7 +4342,7 @@ class Pitch(prebase.ProtoM21Object):
     ) -> None:
         return None  # dummy until Astroid 1015
 
-    @t.overload
+    @overload
     def transpose(
         self: PitchType,
         value: t.Union['music21.interval.IntervalBase', str, int],

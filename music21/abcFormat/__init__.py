@@ -530,8 +530,8 @@ class ABCMetadata(ABCToken):
         return key.pitchToSharps(standardKeyStr, mode), mode
 
     def getKeySignatureObject(self) -> t.Union['music21.key.Key',
-                                             'music21.key.KeySignature',
-                                             None]:
+                                               'music21.key.KeySignature',
+                                               None]:
         # noinspection SpellCheckingInspection,PyShadowingNames
         '''
         Return a music21 :class:`~music21.key.KeySignature` or :class:`~music21.key.Key`
