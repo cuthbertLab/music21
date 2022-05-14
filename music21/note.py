@@ -1104,7 +1104,7 @@ class NotRest(GeneralNote):
 
         >>> n.noteheadFill = 'jelly'
         Traceback (most recent call last):
-        music21.note.NotRestException: not a valid notehead fill value: jelly
+        music21.note.NotRestException: not a valid notehead fill value: 'jelly'
         '''
         return self._noteheadFill
 

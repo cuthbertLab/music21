@@ -998,7 +998,6 @@ def midiEventsToTimeSignature(eventList):
     # Time Signature Event should appear in the first track chunk (or all track
     # chunks in a Type 2 file) before any non-zero delta time events. If one
     # is not specified 4/4, 24, 8 should be assumed.
-    from music21 import meter
     from music21 import midi as midiModule
 
     if not common.isListLike(eventList):
@@ -2138,7 +2137,6 @@ def midiTrackToStream(
 
             # Supply any missing time signature at the start
             if not meterStream.getElementsByOffset(0):
-                from music21 import meter
                 meterStream.insert(0, meter.TimeSignature())
 
     # Only make measures once time signatures have been inserted
@@ -2255,7 +2253,6 @@ def conductorStream(s: stream.Stream) -> stream.Part:
         {0.0} <music21.stream.Stream measureLike>
             {0.0} <music21.note.Note C>
     '''
-    from music21 import meter
     partsList = list(s.getElementsByClass(stream.Stream).getElementsByOffset(0))
     minPriority = min(p.priority for p in partsList) if partsList else 0
     conductorPriority = minPriority - 1
@@ -3008,7 +3005,6 @@ class Test(unittest.TestCase):
             [ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF] * 3)
 
     def testTimeSignature(self):
-        from music21 import meter
         n = note.Note()
         n.quarterLength = 0.5
         s = stream.Stream()
@@ -3046,8 +3042,6 @@ class Test(unittest.TestCase):
         self.assertTrue(common.whitespaceEqual(conductorEvents, match), conductorEvents)
 
     def testKeySignature(self):
-        from music21 import meter
-
         n = note.Note()
         n.quarterLength = 0.5
         s = stream.Stream()
@@ -3331,8 +3325,6 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testOverlappedEventsC(self):
-        from music21 import meter
-
         s = stream.Stream()
         s.insert(key.KeySignature(3))
         s.insert(meter.TimeSignature('2/4'))
@@ -3676,8 +3668,6 @@ class Test(unittest.TestCase):
 
     def testMidiExportConductorA(self):
         '''Export conductor data to MIDI conductor track.'''
-        from music21 import meter
-
         p1 = stream.Part()
         p1.repeatAppend(note.Note('c4'), 12)
         p1.insert(0, meter.TimeSignature('3/4'))
@@ -3814,13 +3804,13 @@ class Test(unittest.TestCase):
                 c = note.Rest()
             else:
                 c = chord.Chord(['c3', 'd-4', 'g5'])
-                vChord = []
+                vChord: t.List[volume.Volume] = []
                 for i, unused_cSub in enumerate(c):
                     v = volume.Volume()
                     v.velocityScalar = amps[(j + shift[i]) % len(amps)]
                     v.velocityIsRelative = False
                     vChord.append(v)
-                c.volume = vChord  # can set to list
+                c.setVolumes(vChord)
             c.duration.quarterLength = ql
             s1.append(c)
 

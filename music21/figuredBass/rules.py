@@ -143,7 +143,11 @@ class Rules(prebase.ProtoM21Object):
     _DOC_ORDER = ([_x[0] for _x in singlePossibilityDoc]
                   + [_y[0] for _y in consecutivePossibilityDoc]
                   + [_z[0] for _z in specialResDoc])
-    _DOC_ATTR: t.Dict[str, str] = dict(singlePossibilityDoc + consecutivePossibilityDoc + specialResDoc)
+    _DOC_ATTR: t.Dict[str, str] = dict(
+        singlePossibilityDoc
+        + consecutivePossibilityDoc
+        + specialResDoc
+    )
 
     def __init__(self):
         # Single Possibility rules

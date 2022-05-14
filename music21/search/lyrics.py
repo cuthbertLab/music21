@@ -70,20 +70,30 @@ class SearchMatch(namedtuple('SearchMatch',
     A lightweight object representing the match (if any) for a search.
     '''
     __slots__ = ()
-    _DOC_ATTR: t.Dict[str, str] = {'mStart': '''The measureNumber of the measure that the first
-                                matching lyric is in''',
-                 'mEnd': '''The measureNumber of the measure that the last
-                                matching lyric is in''',
-                 'matchText': '''The text of the lyric that matched the search.  For a
-                                 plaintext search, this will be the same as the search
-                                 term, but for a regular expression
-                                 search this will be the text that matched the regular
-                                 expression''',
-                 'els': '''A list of all lyric-containing elements that matched this text.''',
-                 'indices': '''A list of IndexedLyric objects that match''',
-                 'identifier': '''The identifier of (presumably all,
-                                  but at least the first) lyric to match''',
-                 }
+    _DOC_ATTR: t.Dict[str, str] = {
+        'mStart': '''
+            The measureNumber of the measure that the first matching lyric is in.
+            ''',
+        'mEnd': '''
+            The measureNumber of the measure that the last matching lyric is in.
+            ''',
+        'matchText': '''
+            The text of the lyric that matched the search.  For a
+            plaintext search, this will be the same as the search
+            term, but for a regular expression
+            search this will be the text that matched the regular
+            expression.
+            ''',
+        'els': '''
+            A list of all lyric-containing elements that matched this text.
+            ''',
+        'indices': '''
+            A list of IndexedLyric objects that match.
+            ''',
+        'identifier': '''
+            The identifier of (presumably all, but at least the first) lyric to match.
+            ''',
+    }
 
     def __repr__(self):
         return (f'SearchMatch(mStart={self.mStart!r}, mEnd={self.mEnd!r}, '
@@ -144,7 +154,7 @@ class LyricSearcher:
 
     @property
     def indexTuples(self) -> t.List[IndexedLyric]:
-        if self._indexText is None:  # correct -- check text to see if has run.
+        if self._indexText is None:  # correct -- check text to see if it has run.
             self.index()
         return self._indexTuples
 

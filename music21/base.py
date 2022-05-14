@@ -60,7 +60,6 @@ from music21 import environment
 from music21 import editorial
 from music21 import defaults
 from music21.derivation import Derivation
-from music21 import duration
 from music21.duration import Duration, DurationException
 from music21 import prebase
 from music21 import sites

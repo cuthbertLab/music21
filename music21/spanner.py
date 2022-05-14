@@ -1145,23 +1145,26 @@ class MultiMeasureRest(Spanner):
     '''
     _styleClass = style.TextStyle
 
-    _DOC_ATTR: t.Dict[str, str] = {'useSymbols': '''boolean to indicate whether rest symbols
-                                    (breve, longa, etc.) should be used when
-                                    displaying the rest. Your music21 inventor
-                                    is a medievalist, so this defaults to True.
+    _DOC_ATTR: t.Dict[str, str] = {
+        'useSymbols': '''
+            Boolean to indicate whether rest symbols
+            (breve, longa, etc.) should be used when
+            displaying the rest. Your music21 inventor
+            is a medievalist, so this defaults to True.
 
-                                    Change defaults.multiMeasureRestUseSymbols to
-                                    change globally.
-                                    ''',
-                 'maxSymbols': '''int, specifying the maximum number of rests
-                                     to display as symbols.  Default is 11.
-                                     If useSymbols is False then this setting
-                                     does nothing.
+            Change defaults.multiMeasureRestUseSymbols to
+            change globally.
+            ''',
+        'maxSymbols': '''
+            An int, specifying the maximum number of rests
+            to display as symbols.  Default is 11.
+            If useSymbols is False then this setting
+            does nothing.
 
-                                     Change defaults.multiMeasureRestMaxSymbols to
-                                     change globally.
-                                     '''
-                 }
+            Change defaults.multiMeasureRestMaxSymbols to
+            change globally.
+            ''',
+    }
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)

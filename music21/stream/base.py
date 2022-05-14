@@ -9819,10 +9819,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         lastWasNone = True
                 if isinstance(e, note.Note):
                     if not(skipUnisons is False
-                            or not lastPitches
-                            or len(lastPitches) > 1
-                            or e.pitch.pitchClass != lastPitches[0].pitchClass
-                            or (skipOctaves is False
+                           or not lastPitches
+                           or len(lastPitches) > 1
+                           or e.pitch.pitchClass != lastPitches[0].pitchClass
+                           or (skipOctaves is False
                                 and e.pitch.ps != lastPitches[0].ps)):
                         continue
                     if getOverlaps is False and e.offset < lastEnd:

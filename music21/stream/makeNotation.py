@@ -2029,7 +2029,6 @@ class Test(unittest.TestCase):
 
     def testStreamExceptions(self):
         from music21 import converter
-        from music21 import duration
         from music21 import stream
         p = converter.parse(self.allaBreveBeamTest)
         with self.assertRaises(stream.StreamException) as cm:

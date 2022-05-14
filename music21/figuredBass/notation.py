@@ -141,24 +141,42 @@ class Notation(prebase.ProtoM21Object):
     '''
     _DOC_ORDER = ['notationColumn', 'figureStrings', 'numbers', 'modifiers',
                   'figures', 'origNumbers', 'origModStrings', 'modifierStrings']
-    _DOC_ATTR: t.Dict[str, str] = {'modifiers': 'A list of :class:`~music21.figuredBass.notation.Modifier` '
-                    'objects associated with the expanded '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'notationColumn': 'A string of figures delimited by commas, '
-                    'each associated with a number and an optional modifier.',
-                 'modifierStrings': 'The modifiers associated with the expanded '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.',
-                 'figureStrings': 'A list of figures derived from the original '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'origNumbers': 'The numbers associated with the original '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'numbers': 'The numbers associated with the expanded '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
-                 'origModStrings': 'The modifiers associated with the original '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.',
-                 'figures': 'A list of :class:`~music21.figuredBass.notation.Figure` objects '
-                    'associated with figures in the expanded '
-                    ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'modifiers': '''
+            A list of :class:`~music21.figuredBass.notation.Modifier`
+            objects associated with the expanded
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+        'notationColumn': '''
+            A string of figures delimited by commas,
+            each associated with a number and an optional modifier.
+            ''',
+        'modifierStrings': '''
+            The modifiers associated with the expanded
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.
+            ''',
+        'figureStrings': '''
+            A list of figures derived from the original
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+        'origNumbers': '''
+            The numbers associated with the original
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+        'numbers': '''
+            The numbers associated with the expanded
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+        'origModStrings': '''
+            The modifiers associated with the original
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`, as strings.
+            ''',
+        'figures': '''
+            A list of :class:`~music21.figuredBass.notation.Figure` objects
+            associated with figures in the expanded
+            :attr:`~music21.figuredBass.notation.Notation.notationColumn`.
+            ''',
+    }
 
     def __init__(self, notationColumn=None):
         # Parse notation string
