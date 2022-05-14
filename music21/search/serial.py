@@ -47,7 +47,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     <music21.search.serial.ContiguousSegmentOfNotes ['C4', 'D4']>
 
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'segment': 'The list of notes and chords in the contiguous segment.',
         'containerStream': '''
             The stream containing the contiguous segment -

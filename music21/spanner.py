@@ -1145,7 +1145,7 @@ class MultiMeasureRest(Spanner):
     '''
     _styleClass = style.TextStyle
 
-    _DOC_ATTR = {'useSymbols': '''boolean to indicate whether rest symbols
+    _DOC_ATTR: t.Dict[str, str] = {'useSymbols': '''boolean to indicate whether rest symbols
                                     (breve, longa, etc.) should be used when
                                     displaying the rest. Your music21 inventor
                                     is a medievalist, so this defaults to True.

@@ -42,7 +42,7 @@ class Segment:
                   'resolveDominantSeventhSegment',
                   'resolveDiminishedSeventhSegment',
                   'resolveAugmentedSixthSegment']
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'bassNote': '''A :class:`~music21.note.Note` whose pitch
              forms the bass of each possibility.''',
         'numParts': '''The number of parts (including the bass) that possibilities

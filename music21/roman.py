@@ -1731,7 +1731,7 @@ class RomanNumeral(harmony.Harmony):
     _aug6defaultInversions = {'It': '6', 'Fr': '43', 'Ger': '65', 'Sw': '43'}
     _slashedAug6Inv = re.compile(r'(\d)/(\d)')
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'addedSteps': '''
             Returns a list of the added steps, each as a tuple of
             modifier as a string (which might be empty) and a chord factor as an int.

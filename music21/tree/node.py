@@ -143,7 +143,7 @@ class ElementNode(core.AVLNode):
         'subtreeElementsStopIndex',
     )
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'payloadElementIndex': r'''
             The index in a stream of the element stored in the payload of this node.
             ''',
@@ -399,7 +399,7 @@ class OffsetNode(ElementNode):
         'payloadElementsStopIndex',
     )
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'payload': r'''
             The contents of the node at this point.  Usually a list of ElementTimespans
             or PitchedTimespans.

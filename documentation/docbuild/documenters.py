@@ -82,7 +82,7 @@ class ObjectDocumenter(Documenter):
     Base class for object documenting sub-classes. such as ClassDocumenter
     '''
 
-    _DOC_ATTR = {'referent': 'the object being documented'}
+    _DOC_ATTR: t.Dict[str, str] = {'referent': 'the object being documented'}
     # INITIALIZER #
 
     sphinxCrossReferenceRole = ''
@@ -187,7 +187,7 @@ class MemberDocumenter(ObjectDocumenter):
     '''
     Abstract base class for documenting class members such as Methods and Attributes and Properties
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'memberName': 'the short name of the member, for instance "mode"',
         'referent': '''the attribute or method itself, such as (no quotes)
                        key.KeySignature.mode''',

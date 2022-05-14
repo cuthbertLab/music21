@@ -3017,7 +3017,7 @@ class GraceDuration(Duration):
     # CLASS VARIABLES #
 
     # TODO: What does 'amount of time' mean here?
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'stealTimePrevious': '''
                 Float number from 0.0 to 1.0, or None (default) for the proportion
                 of the previous duration to steal from the previous note.''',

@@ -369,9 +369,8 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
 
         This behavior is often used to get an element from the Parts iterator:
 
-        >>> bach.parts['#soprano']  # notice: case insensitive
+        >>> bach.parts['#soprano']  # notice: case-insensitive retrieval
         <music21.stream.Part Soprano>
-
 
         Slices work:
 
@@ -1501,7 +1500,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
 
 
 # -----------------------------------------------------------------------------
-class OffsetIterator(StreamIterator[M21ObjType]):
+class OffsetIterator(StreamIterator, t.Generic[M21ObjType], t.Sequence):
     '''
     An iterator that with each iteration returns a list of elements
     that are at the same offset (or all at end)
@@ -1665,7 +1664,7 @@ class OffsetIterator(StreamIterator[M21ObjType]):
 
 
 # -----------------------------------------------------------------------------
-class RecursiveIterator(StreamIterator[M21ObjType]):
+class RecursiveIterator(StreamIterator, t.Generic[M21ObjType], t.Sequence):
     '''
     One of the most powerful iterators in music21.  Generally not called
     directly, but created by being invoked on a stream with `Stream.recurse()`

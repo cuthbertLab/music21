@@ -220,7 +220,7 @@ class FiguredBassLine:
     <music21.meter.TimeSignature 3/4>
     '''
     _DOC_ORDER = ['addElement', 'generateBassLine', 'realize']
-    _DOC_ATTR = {'inKey': 'A :class:`~music21.key.Key` which implies a scale value, '
+    _DOC_ATTR: t.Dict[str, str] = {'inKey': 'A :class:`~music21.key.Key` which implies a scale value, '
                     'scale mode, and key signature for a '
                     ':class:`~music21.figuredBass.realizerScale.FiguredBassScale`.',
                  'inTime': 'A :class:`~music21.meter.TimeSignature` which specifies the '
@@ -572,7 +572,7 @@ class Realization:
                   'generateRandomRealizations', 'generateAllRealizations',
                   'getAllPossibilityProgressions', 'getRandomPossibilityProgression',
                   'generateRealizationFromPossibilityProgression']
-    _DOC_ATTR = {'keyboardStyleOutput': '''True by default. If True, generated realizations
+    _DOC_ATTR: t.Dict[str, str] = {'keyboardStyleOutput': '''True by default. If True, generated realizations
                         are represented in keyboard style, with two staves. If False,
                         realizations are represented in chorale style with n staves,
                         where n is the number of parts. SATB if n = 4.'''}

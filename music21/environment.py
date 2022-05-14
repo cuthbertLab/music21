@@ -832,7 +832,7 @@ class Environment:
     _DOC_ORDER = ['read', 'write', 'getSettingsPath']
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'modNameParent': '''
             A string representation of the module that contains this
             Environment instance.

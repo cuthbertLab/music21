@@ -26,6 +26,7 @@ from music21 import beam
 from music21 import common
 from music21 import derivation
 from music21 import duration
+from music21.duration import Duration
 from music21 import exceptions21
 from music21 import interval
 from music21 import note
@@ -74,7 +75,6 @@ class ChordBase(note.NotRest):
         'beams': 'A :class:`music21.beam.Beams` object.',
     }
 
-
     # update inherited _DOC_ATTR dictionary
     _DOC_ATTR.update(note.NotRest._DOC_ATTR)
 
@@ -120,7 +120,7 @@ class ChordBase(note.NotRest):
         if durationKeyword is not None:
             self.duration = durationKeyword
         elif 'type' in keywords or 'quarterLength' in keywords:  # dots dont cut it
-            self.duration = duration.Duration(**keywords)
+            self.duration = Duration(**keywords)
 
         # elif len(notes) > 0:
         #     for thisNote in notes:
@@ -440,7 +440,7 @@ class ChordBase(note.NotRest):
         >>> chord.Chord().volume
         <music21.volume.Volume realized=0.71>
         '''
-        if self._volume is not None:
+        if isinstance(self._volume, volume.Volume):
             # if we already have a Volume, use that
             return self._volume
 
@@ -704,7 +704,7 @@ class Chord(ChordBase):
     # define order of presenting names in documentation; use strings
     _DOC_ORDER = ['pitches']
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'isChord': '''
             Boolean read-only value describing if this
             GeneralNote object is a Chord. Is True''',
@@ -4879,7 +4879,8 @@ class Chord(ChordBase):
 
 
     @property
-    def duration(self) -> 'music21.duration.Duration':
+    def duration(self) -> Duration:
+        # noinspection PyShadowingNames
         '''
         Get or set the duration of this Chord as a Duration object.
 
@@ -4901,7 +4902,8 @@ class Chord(ChordBase):
         >>> c.duration is d
         True
         '''
-        if self._duration is None and self._notes:
+        d = t.cast(t.Union[Duration, None], self._duration)
+        if d is None and self._notes:
             # pitchZeroDuration = self._notes[0]['pitch'].duration
             pitchZeroDuration = self._notes[0].duration
             self._duration = pitchZeroDuration
@@ -4912,11 +4914,11 @@ class Chord(ChordBase):
         return d_out
 
     @duration.setter
-    def duration(self, durationObj: 'music21.duration.Duration'):
+    def duration(self, durationObj: Duration):
         '''
         Set a Duration object.
         '''
-        if isinstance(durationObj, duration.Duration):
+        if isinstance(durationObj, Duration):
             self._duration = durationObj
         else:
             # need to permit Duration object assignment here

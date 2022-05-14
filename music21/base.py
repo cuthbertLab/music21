@@ -61,6 +61,7 @@ from music21 import editorial
 from music21 import defaults
 from music21.derivation import Derivation
 from music21 import duration
+from music21.duration import Duration, DurationException
 from music21 import prebase
 from music21 import sites
 from music21 import style  # pylint: disable=unused-import
@@ -304,7 +305,7 @@ class Music21Object(prebase.ProtoM21Object):
     _DOC_ORDER: t.List[str] = []
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'groups': '''An instance of a :class:`~music21.base.Group`
             object which describes
             arbitrary `Groups` that this object belongs to.''',
@@ -365,7 +366,7 @@ class Music21Object(prebase.ProtoM21Object):
         self._editorial: t.Optional[editorial.Editorial] = None
 
         # private duration storage; managed by property
-        self._duration: t.Optional[duration.Duration] = None
+        self._duration: t.Optional[Duration] = None
         self._priority = 0  # default is zero
 
         # store cached values here:
@@ -2623,13 +2624,13 @@ class Music21Object(prebase.ProtoM21Object):
 
     # -----------------------------------------------------------------
     @property
-    def duration(self) -> 'music21.duration.Duration':
+    def duration(self) -> Duration:
         '''
         Get and set the duration of this object as a Duration object.
         '''
         # lazy duration creation
         if self._duration is None:
-            self._duration = duration.Duration(0)
+            self._duration = Duration(0)
 
         d_out = self._duration
         if t.TYPE_CHECKING:
@@ -2638,7 +2639,7 @@ class Music21Object(prebase.ProtoM21Object):
         return d_out
 
     @duration.setter
-    def duration(self, durationObj: 'music21.duration.Duration'):
+    def duration(self, durationObj: Duration):
         durationObjAlreadyExists = not (self._duration is None)
 
         try:
@@ -3048,7 +3049,7 @@ class Music21Object(prebase.ProtoM21Object):
         quarterLength = opFrac(quarterLength)
 
         if quarterLength > self.duration.quarterLength:
-            raise duration.DurationException(
+            raise DurationException(
                 f'cannot split a duration ({self.duration.quarterLength}) '
                 + f'at this quarterLength ({quarterLength})'
             )
@@ -3100,10 +3101,10 @@ class Music21Object(prebase.ProtoM21Object):
         lenEnd = self.duration.quarterLength - quarterLength
         lenStart = self.duration.quarterLength - lenEnd
 
-        d1 = duration.Duration()
+        d1 = Duration()
         d1.quarterLength = lenStart
 
-        d2 = duration.Duration()
+        d2 = Duration()
         d2.quarterLength = lenEnd
 
         e.duration = d1
@@ -3639,7 +3640,7 @@ class Music21Object(prebase.ProtoM21Object):
             return 'nan'
 
     @property
-    def beatDuration(self) -> 'music21.duration.Duration':
+    def beatDuration(self) -> Duration:
         '''
         Return a :class:`~music21.duration.Duration` of the beat
         active for this object as found in the most recently
@@ -3679,7 +3680,6 @@ class Music21Object(prebase.ProtoM21Object):
         >>> [n.beatDuration.quarterLength for n in s.notes]
         [2.0, 2.0, 3.0, 3.0, 3.0, 2.0, 2.0, 3.0]
 
-
         If there is no TimeSignature object in sites then returns a duration object
         of Zero length.
 
@@ -3694,7 +3694,7 @@ class Music21Object(prebase.ProtoM21Object):
             ts = self._getTimeSignatureForBeat()
             return ts.getBeatDuration(ts.getMeasureOffsetOrMeterModulusOffset(self))
         except Music21ObjectException:
-            return duration.Duration(0)
+            return Duration(0)
 
     @property
     def beatStrength(self) -> float:
@@ -3971,7 +3971,7 @@ class ElementWrapper(Music21Object):
     obj: t.Any = None
 
     _DOC_ORDER = ['obj']
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'obj': '''
         The object this wrapper wraps. It should not be a Music21Object, since
         if so, you might as well put that directly into the Stream itself.''',

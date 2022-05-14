@@ -540,7 +540,7 @@ class GeneralNote(base.Music21Object):
     # define order for presenting names in documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength']
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'isChord': 'Boolean read-only value describing if this object is a Chord.',
         'lyrics': 'A list of :class:`~music21.note.Lyric` objects.',
         'tie': 'either None or a :class:`~music21.note.Tie` object.',
@@ -931,7 +931,7 @@ class NotRest(GeneralNote):
     # unspecified means that there may be a stem, but its orientation
     # has not been declared.
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'beams': '''
             A :class:`~music21.beam.Beams` object that contains
             information about the beaming of this note.''',
@@ -939,11 +939,11 @@ class NotRest(GeneralNote):
 
     def __init__(self, *arguments, **keywords):
         super().__init__(**keywords)
-        self._notehead = 'normal'
+        self._notehead: str = 'normal'
         self._noteheadFill = None
-        self._noteheadParenthesis = False
-        self._stemDirection = 'unspecified'
-        self._volume = None  # created on demand
+        self._noteheadParenthesis: bool = False
+        self._stemDirection: str = 'unspecified'
+        self._volume: t.Optional[volume.Volume] = None  # created on demand
         # replace
         self.linkage = 'tie'
         if 'beams' in keywords:
@@ -1088,7 +1088,7 @@ class NotRest(GeneralNote):
         self._notehead = value
 
     @property
-    def noteheadFill(self) -> str:
+    def noteheadFill(self) -> bool:
         '''
         Get or set the note head fill status of this NotRest. Valid note head fill values are
         True, False, or None (meaning default).  "yes" and "no" are converted to True
@@ -1109,16 +1109,16 @@ class NotRest(GeneralNote):
         return self._noteheadFill
 
     @noteheadFill.setter
-    def noteheadFill(self, value):
+    def noteheadFill(self, value: t.Union[bool, None, str]):
         if value in ('none', None, 'default'):
-            value = None  # allow setting to none or None
-        if value in ('filled', 'yes'):
-            value = True
-        elif value in ('notfilled', 'no'):
-            value = False
-        if value not in (True, False, None):
-            raise NotRestException(f'not a valid notehead fill value: {value}')
-        self._noteheadFill = value
+            boolValue = None  # allow setting to none or None
+        elif value in (True, 'filled', 'yes'):
+            boolValue = True
+        elif value in (False, 'notfilled', 'no'):
+            boolValue = False
+        else:
+            raise NotRestException(f'not a valid notehead fill value: {value!r}')
+        self._noteheadFill = boolValue
 
     @property
     def noteheadParenthesis(self) -> bool:
@@ -1147,14 +1147,15 @@ class NotRest(GeneralNote):
         return self._noteheadParenthesis
 
     @noteheadParenthesis.setter
-    def noteheadParenthesis(self, value):
+    def noteheadParenthesis(self, value: t.Union[bool, str, int]):
+        boolValue: bool
         if value in (True, 'yes', 1):
-            value = True
+            boolValue = True
         elif value in (False, 'no', 0):
-            value = False
+            boolValue = False
         else:
             raise NotRestException(f'notehead parentheses must be True or False, not {value!r}')
-        self._noteheadParenthesis = value
+        self._noteheadParenthesis = boolValue
 
     # --------------------------------------------------------------------------
     def hasVolumeInformation(self) -> bool:
@@ -1384,7 +1385,7 @@ class Note(NotRest):
     # Defines the order of presenting names in the documentation; use strings
     _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave']
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'isNote': 'Boolean read-only value describing if this Note is a Note (True).',
         'isRest': 'Boolean read-only value describing if this Note is a Rest (False).',
         'pitch': '''A :class:`~music21.pitch.Pitch` object containing all the
@@ -1545,10 +1546,10 @@ class Note(NotRest):
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.nameWithOctave`.
         ''')
 
-    def _getStep(self) -> str:
+    def _getStep(self) -> StepName:
         return self.pitch.step
 
-    def _setStep(self, value: str):
+    def _setStep(self, value: StepName):
         self.pitch.step = value
 
     step = property(_getStep,
@@ -1558,10 +1559,10 @@ class Note(NotRest):
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
-    def _getOctave(self) -> int:
+    def _getOctave(self) -> t.Optional[int]:
         return self.pitch.octave
 
-    def _setOctave(self, value: int):
+    def _setOctave(self, value: t.Optional[int]):
         self.pitch.octave = value
 
     octave = property(_getOctave,
@@ -1845,7 +1846,7 @@ class Rest(GeneralNote):
     isRest = True
     name = 'rest'
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'isNote': 'Boolean read-only value describing if this Rest is a Note (False).',
         'isRest': 'Boolean read-only value describing if this Rest is a Rest (True, obviously).',
         'name': '''returns "rest" always.  It is here so that you can get

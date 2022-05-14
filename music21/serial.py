@@ -282,7 +282,7 @@ class ToneRow(stream.Stream):
     >>> len(rcsRow)
     10
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'row': 'A list representing the pitch class values of the row.',
     }
 
@@ -669,7 +669,7 @@ class TwelveToneRow(ToneRow):
     '''
     # row = None
 
-    # _DOC_ATTR = {
+    # _DOC_ATTR: t.Dict[str, str] = {
     # 'row': 'A list representing the pitch class values of the row.',
     # }
 
@@ -1097,7 +1097,7 @@ class HistoricalTwelveToneRow(TwelveToneRow):
     Subclass of :class:`~music21.serial.TwelveToneRow` storing additional attributes of a
     twelve-tone row used in the historical literature.
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'composer': 'The name of the composer.',
         'opus': 'The opus of the work, or None.',
         'title': 'The title of the work.',

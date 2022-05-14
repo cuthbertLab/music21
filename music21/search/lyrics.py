@@ -34,7 +34,7 @@ class IndexedLyric(namedtuple(
 
     '''
     __slots__ = ()
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'el': 'the element that the lyric is attached to',
         'start': '''Suppose that the entire lyric for the stream were a single string:
                  this is the index of the position in the string that this
@@ -70,7 +70,7 @@ class SearchMatch(namedtuple('SearchMatch',
     A lightweight object representing the match (if any) for a search.
     '''
     __slots__ = ()
-    _DOC_ATTR = {'mStart': '''The measureNumber of the measure that the first
+    _DOC_ATTR: t.Dict[str, str] = {'mStart': '''The measureNumber of the measure that the first
                                 matching lyric is in''',
                  'mEnd': '''The measureNumber of the measure that the last
                                 matching lyric is in''',

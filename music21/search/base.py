@@ -80,7 +80,7 @@ class SearchMatch(namedtuple('SearchMatch', ['elStart', 'els', 'index', 'iterato
     A lightweight object representing the match (if any) for a search.  Derived from namedtuple
     '''
     __slots__ = ()
-    _DOC_ATTR = {'elStart': '''The first element that matches the list.''',
+    _DOC_ATTR: t.Dict[str, str] = {'elStart': '''The first element that matches the list.''',
                  'els': '''A tuple of all the matching elements.''',
                  'index': '''The index in the iterator at which the first element can be found''',
                  'iterator': '''The iterator which produced these elements.''',

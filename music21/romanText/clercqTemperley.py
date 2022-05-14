@@ -286,7 +286,7 @@ class CTSong(prebase.ProtoM21Object):
 
     """
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
-    _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined '
+    _DOC_ATTR: t.Dict[str, str] = {'year': 'the year of the CTSong; not formally defined '
                          + 'by the Clercq-Temperley format'}
 
     def __init__(self, textFile, **keywords):
@@ -545,7 +545,7 @@ class CTRule(prebase.ProtoM21Object):
     which is the stream from the entire score that the rule corresponds to.
     '''
     _DOC_ORDER = ['LHS', 'sectionName', 'musicText', 'homeTimeSig', 'homeKeySig', 'comments']
-    _DOC_ATTR = {'text': 'the full text of the CTRule, including the LHS, chords, and comments'}
+    _DOC_ATTR: t.Dict[str, str] = {'text': 'the full text of the CTRule, including the LHS, chords, and comments'}
 
     SPLITMEASURES = re.compile(r'(\|\*?\d*)')
     REPETITION = re.compile(r'\*(\d+)')

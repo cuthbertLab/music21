@@ -59,7 +59,7 @@ class AVLNode(common.SlottedObjectMixin):
         'rightChild',
     )
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'balance': '''
         Returns the current state of the difference in heights of the
         two subtrees rooted on this node.

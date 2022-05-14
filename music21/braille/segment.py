@@ -153,7 +153,7 @@ SegmentKey.__new__.__defaults__ = (0, 0, None, None)
 # ------------------------------------------------------------------------------
 
 class BrailleElementGrouping(ProtoM21Object):
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'keySignature': 'The last :class:`~music21.key.KeySignature` preceding the grouping.',
         'timeSignature': 'The last :class:`~music21.meter.TimeSignature` preceding the grouping.',
         'descendingChords': '''True if a :class:`~music21.chord.Chord` should be spelled
@@ -270,7 +270,7 @@ class BrailleElementGrouping(ProtoM21Object):
 
 
 class BrailleSegment(text.BrailleText):
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'cancelOutgoingKeySig': '''If True, the previous key signature should be
                  cancelled immediately before a new key signature is encountered.''',
         'dummyRestLength': '''For a given positive integer n, adds n "dummy rests"

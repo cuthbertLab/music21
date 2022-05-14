@@ -23,6 +23,7 @@ from music21 import clef
 from music21 import common
 from music21 import chord
 from music21 import defaults
+from music21 import duration
 from music21 import environment
 from music21 import key
 from music21 import meter
@@ -1379,7 +1380,7 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> t.Optional[StreamType
     Changed in v1.8: `inPlace` is False by default
     Changed in v7: Legacy behavior of taking in a list of durations removed.
     '''
-    durationList = []
+    durationList: t.List[duration.Duration] = []
 
     # Stream, as it should be...
     if not inPlace:  # make a copy
@@ -1393,20 +1394,22 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> t.Optional[StreamType
             continue
         durationList.append(n.duration)
 
-    tupletMap = []  # a list of [tuplet obj, Duration] pairs
+    # a list of (tuplet obj, Duration) pairs
+    tupletMap: t.List[t.Tuple[t.Optional[duration.Tuplet], duration.Duration]] = []
+
     for dur in durationList:  # all Duration objects
         tupletList = dur.tuplets
         if not tupletList:  # no tuplets
-            tupletMap.append([None, dur])
+            tupletMap.append((None, dur))
         elif len(tupletList) > 1:
             # for i in range(len(tuplets)):
             #    tupletMap.append([tuplets[i],dur])
             environLocal.warn(
                 f'got multi-tuplet duration; cannot yet handle this. {tupletList!r}'
             )
-            tupletMap.append([None, dur])
+            tupletMap.append((None, dur))
         else:
-            tupletMap.append([tupletList[0], dur])
+            tupletMap.append((tupletList[0], dur))
 
     # have a list of tuplet, Duration pairs
     completionCount: t.Union[float, int, Fraction] = 0  # qLen currently filled
