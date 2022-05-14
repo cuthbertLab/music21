@@ -7,7 +7,7 @@
 # Copyright:    Copyright © 2010 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
+import typing as t
 import unittest
 from music21 import exceptions21
 from music21 import prebase

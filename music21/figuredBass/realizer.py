@@ -41,10 +41,10 @@ See :meth:`~music21.figuredBass.realizer.figuredBassFromStream` for more details
 >>> allSols2.getNumSolutions()
 30
 '''
-
 import collections
 import copy
 import random
+import typing as t
 import unittest
 
 

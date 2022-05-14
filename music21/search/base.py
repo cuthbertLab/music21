@@ -16,6 +16,7 @@ See User's Guide, Chapter 43: Searching in and Among Scores for details.
 import copy
 import difflib
 import math
+import typing as t
 import unittest
 from collections import namedtuple
 

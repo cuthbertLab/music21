@@ -17,8 +17,9 @@ Definitions for extracting data from a Stream to place on one axis of a
 '''
 import collections
 import math
-import unittest
 import re
+import typing as t
+import unittest
 
 from music21.graph.utilities import accidentalLabelToUnicode, GraphException
 

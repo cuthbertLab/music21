@@ -7,10 +7,10 @@
 # Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
-import unittest
 import copy
 import re
+import typing as t
+import unittest
 
 from music21 import exceptions21
 from music21 import pitch

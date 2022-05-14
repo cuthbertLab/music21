@@ -14,7 +14,7 @@
 Classes and functions for creating and manipulating dynamic symbols. Rather than
 subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized by parameters.
 '''
-
+import typing as t
 import unittest
 
 from music21 import base

@@ -16,7 +16,7 @@ Internal data structures for timespan collections.
 This is an implementation detail of the TimespanTree class.  Most music21 users
 can happily ignore this module.
 '''
-
+import typing as t
 import unittest
 from music21.tree import core
 from music21.base import Music21Object
