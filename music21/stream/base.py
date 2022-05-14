@@ -1241,7 +1241,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         returnObj.mergeAttributes(self)  # get groups, optional id
         return returnObj
 
-    def mergeAttributes(self, other):
+    def mergeAttributes(self, other: base.Music21Object):
         '''
         Merge relevant attributes from the Other stream into this one.
 
@@ -1249,13 +1249,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.append(note.Note())
         >>> s.autoSort = False
         >>> s.id = 'hi'
-        >>> t = stream.Stream()
-        >>> t.mergeAttributes(s)
-        >>> t.autoSort
+        >>> s2 = stream.Stream()
+        >>> s2.mergeAttributes(s)
+        >>> s2.autoSort
         False
-        >>> t
+        >>> s2
         <music21.stream.Stream hi>
-        >>> len(t)
+        >>> len(s2)
         0
         '''
         super().mergeAttributes(other)

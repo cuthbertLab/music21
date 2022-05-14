@@ -2622,19 +2622,23 @@ class Music21Object(prebase.ProtoM21Object):
                           self.classSortOrder, isNotGrace, insertIndex)
 
     # -----------------------------------------------------------------
-    def _getDuration(self) -> t.Optional[duration.Duration]:
+    @property
+    def duration(self) -> 'music21.duration.Duration':
         '''
-        Gets the DurationObject of the object or None
+        Get and set the duration of this object as a Duration object.
         '''
         # lazy duration creation
         if self._duration is None:
             self._duration = duration.Duration(0)
-        return self._duration
 
-    def _setDuration(self, durationObj: duration.Duration):
-        '''
-        Set the duration as a quarterNote length
-        '''
+        d_out = self._duration
+        if t.TYPE_CHECKING:
+            assert d_out is not None
+
+        return d_out
+
+    @duration.setter
+    def duration(self, durationObj: 'music21.duration.Duration'):
         durationObjAlreadyExists = not (self._duration is None)
 
         try:
@@ -2649,11 +2653,6 @@ class Music21Object(prebase.ProtoM21Object):
             raise Exception(
                 f'this must be a Duration object, not {durationObj}'
             ) from ae
-
-    duration = property(_getDuration, _setDuration,
-                        doc='''
-        Get and set the duration of this object as a Duration object.
-        ''')
 
     def informSites(self, changedInformation=None):
         '''
@@ -3969,14 +3968,16 @@ class ElementWrapper(Music21Object):
     <music21.base.ElementWrapper id=1_wrapper offset=1.0 obj='<...Wave_read object...'>
     <music21.base.ElementWrapper offset=2.0 obj='<...Wave_read object...>'>
     '''
-    obj = None
+    obj: t.Any = None
 
     _DOC_ORDER = ['obj']
     _DOC_ATTR = {
-        'obj': 'The object this wrapper wraps. It should not be a Music21Object.',
+        'obj': '''
+        The object this wrapper wraps. It should not be a Music21Object, since
+        if so, you might as well put that directly into the Stream itself.''',
     }
 
-    def __init__(self, obj=None):
+    def __init__(self, obj: t.Any = None):
         super().__init__()
         self.obj = obj  # object stored here
 
@@ -3995,7 +3996,8 @@ class ElementWrapper(Music21Object):
             return f'offset={self.offset} obj={shortObj!r}'
 
     def __eq__(self, other) -> bool:
-        '''Test ElementWrapper equality
+        '''
+        Test ElementWrapper equality
 
         >>> import music21
         >>> n = note.Note('C#')

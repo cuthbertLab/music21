@@ -613,7 +613,7 @@ class GeneralNote(base.Music21Object):
             return None
 
         allText = [ly.text for ly in self.lyrics]
-        return '\n'.join([t for t in allText if t is not None])
+        return '\n'.join([textStr for textStr in allText if textStr is not None])
 
     def _setLyric(self, value: t.Union[str, Lyric, None]) -> None:
         self.lyrics = []
@@ -1176,24 +1176,30 @@ class NotRest(GeneralNote):
         else:
             return True
 
-    def _getVolume(self, forceClient: t.Optional[base.Music21Object] = None) -> volume.Volume:
+    def _getVolume(self,
+                   forceClient: t.Optional[base.Music21Object] = None
+                   ) -> volume.Volume:
         # DO NOT CHANGE TO @property because of optional attributes
-        # lazy volume creation
+        # lazy volume creation.  property is set below.
         if self._volume is None:
             if forceClient is None:
                 # when creating the volume object, set the client as self
                 self._volume = volume.Volume(client=self)
             else:
                 self._volume = volume.Volume(client=forceClient)
-        return self._volume
 
-    def _setVolume(self, value, setClient=True):
+        volume_out = self._volume
+        if t.TYPE_CHECKING:
+            assert volume_out is not None
+
+        return volume_out
+
+    def _setVolume(self, value: t.Union[None, volume.Volume, int, float], setClient=True):
         # DO NOT CHANGE TO @property because of optional attributes
-        # setParent is only False when Chords bundling Notes
-        # test by looking for method
+        # setClient is only False when Chords are bundling Notes.
         if value is None:
             self._volume = None
-        elif hasattr(value, 'getDynamicContext'):
+        elif isinstance(value, volume.Volume):
             if setClient:
                 if value.client is not None:
                     value = copy.deepcopy(value)
@@ -1211,9 +1217,9 @@ class NotRest(GeneralNote):
         else:
             raise Exception(f'this must be a Volume object, not {value}')
 
-    volume = property(_getVolume,
-                      _setVolume,
-                      doc='''
+    @property
+    def volume(self) -> 'music21.volume.Volume':
+        '''
         Get and set the :class:`~music21.volume.Volume` object of this object.
         Volume objects are created on demand.
 
@@ -1225,7 +1231,12 @@ class NotRest(GeneralNote):
         >>> s.append([n1, n2])
         >>> [n.volume.velocity for n in s.notes]
         [120, 80]
-        ''')
+        '''
+        return self._getVolume()
+
+    @volume.setter
+    def volume(self, value: t.Union[None, 'music21.volume.Volume', int, float]):
+        self._setVolume(value)
 
     def _getStoredInstrument(self):
         return self._storedInstrument
@@ -1382,7 +1393,7 @@ class Note(NotRest):
     }
 
     # Accepts an argument for pitch
-    def __init__(self, pitchName=None, **keywords):
+    def __init__(self, pitchName: t.Union[str, pitch.Pitch, int, None] = None, **keywords):
         super().__init__(**keywords)
         self._chordAttached: t.Optional['music21.chord.Chord'] = None
 

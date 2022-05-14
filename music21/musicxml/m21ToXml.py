@@ -28,7 +28,7 @@ from xml.etree.ElementTree import (
 import typing as t
 
 # external dependencies
-import webcolors
+import webcolors  # type: ignore
 
 # modules that import this include converter.py.
 # thus, cannot import these here
