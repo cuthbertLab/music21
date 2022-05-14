@@ -292,7 +292,7 @@ class Date(prebase.ProtoM21Object):
         >>> d.minute, d.second
         (50, 32)
         '''
-        def intOrNone(value: str) -> Optional[int]:
+        def intOrNone(value: str) -> t.Optional[int]:
             if not value or value == '--':
                 return None
             return int(value)
@@ -737,16 +737,16 @@ class Text(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self,
-                 data: Union[str, 'Text'] = '',
-                 language: Optional[str] = None,
-                 isTranslated: Optional[bool] = None,   # True, False, or None (unknown)
-                 encodingScheme: Optional[str] = None):
+                 data: t.Union[str, 'Text'] = '',
+                 language: t.Optional[str] = None,
+                 isTranslated: t.Optional[bool] = None,   # True, False, or None (unknown)
+                 encodingScheme: t.Optional[str] = None):
         if isinstance(data, type(self)):
             # accessing private attributes here; not desirable
-            self._data: Union[str, 'Text'] = data._data
-            self._language: Optional[str] = data._language
-            self.isTranslated: Optional[bool] = data.isTranslated
-            self.encodingScheme: Optional[str] = data.encodingScheme
+            self._data: t.Union[str, 'Text'] = data._data
+            self._language: t.Optional[str] = data._language
+            self.isTranslated: t.Optional[bool] = data.isTranslated
+            self.encodingScheme: t.Optional[str] = data.encodingScheme
         else:
             self._data = data
             self._language = language

@@ -2301,7 +2301,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             mxCreator.text = defaults.author
 
         if self.scoreMetadata is not None:
-            copyrights: List[metadata.Copyright] = []
+            copyrights: t.List[metadata.Copyright] = []
             # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
             #     c = self.scoreMetadata.copyright
             #     if c:
@@ -2355,7 +2355,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxMiscellaneous = Element('miscellaneous')
 
         foundOne = False
-        allItems: Dict[Any] = []
+        allItems: t.Dict[t.Any] = []
 
         # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
         #     allItems = md.all(skipContributors=True)

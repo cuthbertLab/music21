@@ -1406,7 +1406,7 @@ class MusicXMLImporter(XMLParserBase):
 
     def creatorToContributor(self,
                              creator: ET.Element,
-                             inputM21: Optional[metadata.primitives.Contributor] = None):
+                             inputM21: t.Optional[metadata.primitives.Contributor] = None):
         # noinspection PyShadowingNames
         '''
         Given a <creator> tag, fill the necessary parameters of a Contributor.
