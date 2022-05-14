@@ -25,7 +25,6 @@ from typing import overload
 from music21 import beam
 from music21 import common
 from music21 import derivation
-from music21 import duration
 from music21.duration import Duration
 from music21 import exceptions21
 from music21 import interval

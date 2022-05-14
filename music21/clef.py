@@ -271,7 +271,7 @@ class PitchClef(Clef):
     '''
     superclass for all other clef subclasses that use pitches...
     '''
-    _DOC_ATTR: t.Mapping[str, str] = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'lowestLine': '''
             The diatonicNoteNumber of the lowest line of the clef.
             (Can be none...)
@@ -358,7 +358,7 @@ class NoClef(Clef):
     >>> nc.sign is None
     False
     '''
-    _DOC_ATTR: t.Mapping[str, str] = {}
+    _DOC_ATTR: t.Dict[str, str] = {}
 
     def __init__(self):
         super().__init__()

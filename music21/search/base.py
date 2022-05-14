@@ -202,10 +202,8 @@ class StreamSearcher:
         self.filterNotesAndRests = False
 
         self.algorithms: t.List[
-                                t.Callable[
-                                           [Stream, m21Base.Music21Object],
-                                           t.Union[bool, None]
-                                ]
+            t.Callable[[Stream, m21Base.Music21Object],
+                       t.Union[bool, None]]
         ] = [StreamSearcher.wildcardAlgorithm]
 
         self.activeIterator = None
