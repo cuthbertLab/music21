@@ -763,7 +763,7 @@ class Converter:
         self.subConverter.parseFile(fp, number=number)
 
         if self.stream is None:
-            raise ConverterException(f'Could not create a Stream via a subConverter')
+            raise ConverterException('Could not create a Stream via a subConverter.')
         self.stream.metadata.filePath = fp
         self.stream.metadata.fileNumber = number
         self.stream.metadata.fileFormat = useFormat
@@ -1246,11 +1246,10 @@ def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
         valueStr = ''
 
     if (common.isListLike(value)
-        and isinstance(value, collections.abc.Sequence)
-        and len(value) == 2
-        and value[1] is None
-        and _osCanLoad(str(value[0]))
-    ):
+            and isinstance(value, collections.abc.Sequence)
+            and len(value) == 2
+            and value[1] is None
+            and _osCanLoad(str(value[0]))):
         # comes from corpus.search
         return parseFile(value[0], format=m21Format, **keywords)
     elif (common.isListLike(value)

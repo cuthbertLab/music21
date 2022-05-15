@@ -74,7 +74,9 @@ convert the file into .xml or .nwctxt first.
             {0.0} <music21.note.Note C>
 
 '''
+import pathlib
 import struct
+import typing as t
 from music21 import environment
 from music21 import exceptions21
 
