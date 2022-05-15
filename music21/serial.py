@@ -14,13 +14,12 @@ This module defines objects for defining and manipulating structures
 common to serial and/or twelve-tone music,
 including :class:`~music21.serial.ToneRow` subclasses.
 
-Serial searching methods that were previously here have been moved to `alpha.search.serial`
+Serial searching methods that were previously here have been moved to
+:mod:`~music21.search.serial`.
 '''
-
 import unittest
 import copy
 import typing as t
-import warnings
 
 from music21 import exceptions21
 
