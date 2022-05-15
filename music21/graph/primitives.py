@@ -98,10 +98,10 @@ class Graph(prebase.ProtoM21Object):
     'genericGraph'
     '''
     graphType = 'genericGraph'
-    axisKeys = ('x', 'y')
-    figureSizeDefault = (6, 6)
+    axisKeys: t.Tuple[str, ...] = ('x', 'y')
+    figureSizeDefault: t.Tuple[t.Union[int, float], ...] = (6, 6)
 
-    keywordConfigurables = (
+    keywordConfigurables: t.Tuple[str, ...] = (
         'alpha',
         'colorBackgroundData',
         'colorBackgroundFigure',

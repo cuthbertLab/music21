@@ -72,7 +72,7 @@ def getPlotClasses():
     return allPlot
 
 
-def getAxisClasses():
+def getAxisClasses() -> t.List[t.Type[axis.Axis]]:
     '''
     return a list of all Axis subclasses...  returns sorted list by name
 
@@ -83,13 +83,12 @@ def getAxisClasses():
      <class 'music21.graph.axis.OffsetAxis'>,
      ...]
     '''
-    allAxis = []
+    allAxis: t.List[t.Type[axis.Axis]] = []
     for i in sorted(axis.__dict__):
         name = getattr(axis, i)
-        # noinspection PyTypeChecker
         if (callable(name)
                 and not isinstance(name, types.FunctionType)
-                and axis.Axis in name.__mro__):
+                and issubclass(name, axis.Axis)):
             allAxis.append(name)
     return allAxis
 
@@ -182,7 +181,7 @@ def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
     return filteredPlots
 
 
-def getAxisClassFromValue(axisValue):
+def getAxisClassFromValue(axisValue: str) -> t.Optional[t.Type[axis.Axis]]:
     '''
     given an axis value return the single best axis for the value, or None
 
@@ -205,7 +204,7 @@ def getAxisClassFromValue(axisValue):
     return None
 
 
-def axisMatchesValue(axisClass, axisValue):
+def axisMatchesValue(axisClass: t.Union[t.Type[axis.Axis], axis.Axis], axisValue: str) -> bool:
     '''
     Returns Bool about whether axisValue.lower() is anywhere in axisClass.quantities
 
@@ -226,13 +225,9 @@ def axisMatchesValue(axisClass, axisValue):
     >>> graph.findPlot.axisMatchesValue(ax, 'flute')
     False
 
-    if axisClass is None, returns False
-
-    >>> graph.findPlot.axisMatchesValue(None, 'counting')
-    False
+    Changed in v.8 -- Must send a subclass of axis.Axis or an instance.
+        `None` is no longer supported.
     '''
-    if axisClass is None:
-        return False
     axisValue = axisValue.lower()
     for v in axisClass.quantities:
         if v.lower() == axisValue:
@@ -328,9 +323,9 @@ def getPlotsToMake(graphFormat=None,
             bestGraphType = 'scatter'
         elif numAxes == 1:
             bestGraphType = 'histogram'
-        filteredClasses = getPlotClassesFromFormat(bestGraphType, graphClassesToChooseFrom)
-        if filteredClasses:
-            return filteredClasses
+        innerFilteredClasses = getPlotClassesFromFormat(bestGraphType, graphClassesToChooseFrom)
+        if innerFilteredClasses:
+            return innerFilteredClasses
         else:
             return graphClassesToChooseFrom
 
