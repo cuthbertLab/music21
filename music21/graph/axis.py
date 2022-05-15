@@ -82,7 +82,7 @@ class Axis(prebase.ProtoM21Object):
 
     labelDefault = 'an axis'
     axisDataMap = {'x': 0, 'y': 1, 'z': 2}
-    quantities = ('generic', 'one', 'nothing', 'blank')
+    quantities: t.Tuple[str, ...] = ('generic', 'one', 'nothing', 'blank')
 
     def __init__(self, client=None, axisName='x'):
         if isinstance(client, str):
@@ -309,7 +309,7 @@ class PitchAxis(Axis):
             ''',
     }
     labelDefault = 'Pitch'
-    quantities = ('pitchGeneric', )
+    quantities: t.Tuple[str, ...] = ('pitchGeneric', )
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
@@ -444,7 +444,7 @@ class PitchClassAxis(PitchAxis):
     By default, axis is not set from data, but set to 0, 11
     '''
     labelDefault = 'Pitch Class'
-    quantities = ('pitchClass', 'pitchclass', 'pc')
+    quantities: t.Tuple[str, ...] = ('pitchClass', 'pitchclass', 'pc')
 
     def __init__(self, client=None, axisName='x'):
         self.showOctaves = False
@@ -579,7 +579,7 @@ class PitchSpaceAxis(PitchAxis):
     Axis subclass for dealing with PitchSpace (MIDI numbers...)
     '''
     labelDefault = 'Pitch'
-    quantities = ('pitchSpace', 'pitch', 'pitchspace', 'ps')
+    quantities: t.Tuple[str, ...] = ('pitchSpace', 'pitch', 'pitchspace', 'ps')
 
     def extractOneElement(self, n, formatDict):
         if hasattr(n, 'pitch'):
@@ -643,7 +643,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
     An axis similar to pitch classes, but just shows the octaves
     '''
     labelDefault = 'Octave'
-    quantities = ('octave', 'octaves')
+    quantities: t.Tuple[str, ...] = ('octave', 'octaves')
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
@@ -678,7 +678,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #     Axis subclass for dealing with Diatonic Values (.diatonicNoteNum)
 #     '''
 #     labelDefault = 'Step'
-#     quantities = ('diatonic', 'diatonicNoteNum')
+#     quantities: t.Tuple[str, ...] = ('diatonic', 'diatonicNoteNum')
 #
 #     def extractOneElement(self, n, formatDict):
 #         if hasattr(n, 'pitch'):
@@ -746,7 +746,7 @@ class PositionAxis(Axis):
     }
 
     labelDefault = 'Position'
-    quantities = ('position', 'positions')
+    quantities: t.Tuple[str, ...] = ('position', 'positions')
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
@@ -782,7 +782,7 @@ class OffsetAxis(PositionAxis):
 
     }
     labelDefault = 'Offset'
-    quantities = ('offset', 'measure', 'offsets', 'measures', 'time')
+    quantities: t.Tuple[str, ...] = ('offset', 'measure', 'offsets', 'measures', 'time')
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
@@ -1120,7 +1120,12 @@ class QuarterLengthAxis(PositionAxis):
     }
 
     labelDefault = 'Quarter Length'
-    quantities = ('quarterLength', 'ql', 'quarterlengths', 'durations', 'duration')
+    quantities: t.Tuple[str, ...] = ('quarterLength',
+                                     'ql',
+                                     'quarterlengths',
+                                     'durations',
+                                     'duration',
+                                     )
 
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
@@ -1261,7 +1266,7 @@ class OffsetEndAxis(OffsetAxis):
             (default = self.graceNoteQL)
             '''
     }
-    quantities = ('offsetEnd', 'timespans', 'timespan')
+    quantities: t.Tuple[str, ...] = ('offsetEnd', 'timespans', 'timespan')
 
     def __init__(self, client=None, axisName='x', noteSpacing=USE_GRACE_NOTE_SPACING):
         super().__init__(client, axisName)
@@ -1290,7 +1295,7 @@ class DynamicsAxis(Axis):
     Axis subclass for dealing with Dynamics
     '''
     labelDefault = 'Dynamic'
-    quantities = ('dynamic', 'dynamics', 'volume')
+    quantities: t.Tuple[str, ...] = ('dynamic', 'dynamics', 'volume')
 
     def setBoundariesFromData(self, values=None):
         if values is None:
@@ -1352,7 +1357,7 @@ class CountingAxis(Axis):
     }
 
     labelDefault = 'Count'
-    quantities = ('count', 'quantity', 'frequency', 'counting')
+    quantities: t.Tuple[str, ...] = ('count', 'quantity', 'frequency', 'counting')
 
     def __init__(self, client=None, axisName='y'):
         super().__init__(client, axisName)
