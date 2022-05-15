@@ -18,6 +18,7 @@ information may be located at http://rockcorpus.midside.com
 import copy
 import io
 import re
+import typing as t
 import unittest
 
 from collections import OrderedDict
@@ -286,7 +287,7 @@ class CTSong(prebase.ProtoM21Object):
 
     """
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
-    _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined '
+    _DOC_ATTR: t.Dict[str, str] = {'year': 'the year of the CTSong; not formally defined '
                          + 'by the Clercq-Temperley format'}
 
     def __init__(self, textFile, **keywords):
@@ -371,8 +372,8 @@ class CTSong(prebase.ProtoM21Object):
         Get the comments list of all CTRule objects.
 
         comments are stored as a list of comments, each comment on a line as a list. If the
-        comment is on a rule line, the list contains both the line's LHS (like In:) and the comment
-        if the comment is on a line of its own, only the comment is
+        comment is on a rule line, the list contains both the line's LHS (like "In:")
+        and the comment if the comment is on a line of its own, only the comment is
         appended as a list of length one.
 
         The title is not a comment. The title is stored under self.title
@@ -545,7 +546,10 @@ class CTRule(prebase.ProtoM21Object):
     which is the stream from the entire score that the rule corresponds to.
     '''
     _DOC_ORDER = ['LHS', 'sectionName', 'musicText', 'homeTimeSig', 'homeKeySig', 'comments']
-    _DOC_ATTR = {'text': 'the full text of the CTRule, including the LHS, chords, and comments'}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'text': '''
+            The full text of the CTRule, including the LHS, chords, and comments.''',
+    }
 
     SPLITMEASURES = re.compile(r'(\|\*?\d*)')
     REPETITION = re.compile(r'\*(\d+)')

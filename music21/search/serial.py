@@ -9,11 +9,11 @@
 # Copyright:    Copyright © 2009-2012, 2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -------------------------------------------------
-import copy
-import unittest
-
 from collections import Counter
+import copy
 from operator import attrgetter
+import typing as t
+import unittest
 
 from music21 import base
 from music21 import common
@@ -47,7 +47,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
     <music21.search.serial.ContiguousSegmentOfNotes ['C4', 'D4']>
 
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'segment': 'The list of notes and chords in the contiguous segment.',
         'containerStream': '''
             The stream containing the contiguous segment -

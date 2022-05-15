@@ -17,8 +17,9 @@ Definitions for extracting data from a Stream to place on one axis of a
 '''
 import collections
 import math
-import unittest
 import re
+import typing as t
+import unittest
 
 from music21.graph.utilities import accidentalLabelToUnicode, GraphException
 
@@ -44,7 +45,7 @@ class Axis(prebase.ProtoM21Object):
     Client should be a .plot.PlotStream or None.  Eventually a Stream may be allowed,
     but not yet.
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'axisName': 'the name of the axis.  One of "x" or "y" or for 3D Plots, "z"',
         'minValue': '''
             None or number representing the axis minimum.  Default None.
@@ -291,7 +292,7 @@ class PitchAxis(Axis):
     '''
     Axis subclass for dealing with Pitches
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'showEnharmonic': '''
             bool on whether to show both common enharmonics in labels, default True
             ''',
@@ -737,7 +738,7 @@ class PositionAxis(Axis):
     '''
     Axis subclass for dealing with Positions
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'graceNoteQL': '''
             length to substitute a grace note or other Zero-length element for.
             Default is the length of a 64th note (1/16 of a QL)
@@ -756,7 +757,7 @@ class OffsetAxis(PositionAxis):
     '''
     Axis subclass for dealing with Offsets
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'useMeasures': '''
             bool or None for whether offsets (False) or measure numbers (True) should be used
             in the case of an offset access.  Default, None, meaning to check whether
@@ -1106,7 +1107,7 @@ class QuarterLengthAxis(PositionAxis):
     '''
     Axis subclass for dealing with QuarterLengths
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'useLogScale': '''
             bool or int for whether to scale numbers logarithmically.  Adds (log2) to the
             axis label if used.  If True (default) then log2 is assumed.  If an int, then
@@ -1254,7 +1255,7 @@ class OffsetEndAxis(OffsetAxis):
     '''
     An Axis that gives beginning and ending values for each element
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'noteSpacing': '''
             amount in QL to leave blank between untied notes.
             (default = self.graceNoteQL)
@@ -1344,7 +1345,7 @@ class CountingAxis(Axis):
     >>> plotS.data
     [(42.0, 1, {}), (45.0, 1, {}), (46.0, 1, {}), (47.0, 5, {}), (49.0, 6, {}), ...]
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'countAxes': '''
             a string or tuple of strings representing an axis or axes to use in counting
             ''',

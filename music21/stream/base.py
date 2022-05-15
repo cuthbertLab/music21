@@ -232,7 +232,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                   'transpose',
                   'augmentOrDiminish', 'scaleOffsets', 'scaleDurations']
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'recursionType': '''
             Class variable:
 
@@ -1241,7 +1241,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         returnObj.mergeAttributes(self)  # get groups, optional id
         return returnObj
 
-    def mergeAttributes(self, other):
+    def mergeAttributes(self, other: base.Music21Object):
         '''
         Merge relevant attributes from the Other stream into this one.
 
@@ -1249,13 +1249,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.append(note.Note())
         >>> s.autoSort = False
         >>> s.id = 'hi'
-        >>> t = stream.Stream()
-        >>> t.mergeAttributes(s)
-        >>> t.autoSort
+        >>> s2 = stream.Stream()
+        >>> s2.mergeAttributes(s)
+        >>> s2.autoSort
         False
-        >>> t
+        >>> s2
         <music21.stream.Stream hi>
-        >>> len(t)
+        >>> len(s2)
         0
         '''
         super().mergeAttributes(other)
@@ -8062,7 +8062,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         else:  # need to permit Duration object assignment here
             raise StreamException(f'this must be a Duration object, not {durationObj}')
 
-    duration = property(_getDuration, _setDuration, doc='''
+    @property
+    def duration(self) -> 'music21.duration.Duration':
+        '''
         Returns the total duration of the Stream, from the beginning of the
         stream until the end of the final element.
         May be set independently by supplying a Duration object.
@@ -8078,7 +8080,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         <music21.duration.Duration 4.0>
         >>> a.duration.quarterLength
         4.0
-
 
         Advanced usage: override the duration from what is set:
 
@@ -8101,7 +8102,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         >>> a.highestTime
         4.0
-        ''')
+        '''
+        return self._getDuration()
+
+    @duration.setter
+    def duration(self, value: 'music21.duration.Duration'):
+        self._setDuration(value)
 
     def _setSeconds(self, value):
         pass
@@ -9783,7 +9789,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         lastEnd: OffsetQL = 0.0
         lastContainerEnd: OffsetQL = 0.0
         lastWasNone = False
-        lastPitch = None
+        lastPitches: t.Tuple[pitch.Pitch, ...] = ()
         if skipOctaves is True:
             skipUnisons = True  # implied
 
@@ -9793,7 +9799,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     and noNone is False):
                 returnList.append(None)
                 lastWasNone = True
-                lastPitch = None
+                lastPitches = ()
 
             lastStart = 0.0
             lastEnd = 0.0
@@ -9804,7 +9810,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if container.getElementsByClass(note.GeneralNote):
                 lastContainerEnd = container.highestTime
 
-            # Filter out all but notes and rests
+            # Filter out all but notes and rests and chords, etc.
             for e in container.getElementsByClass(note.GeneralNote):
                 if (lastWasNone is False
                         and skipGaps is False
@@ -9813,15 +9819,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         returnList.append(None)
                         lastWasNone = True
                 if isinstance(e, note.Note):
-                    # if (skipUnisons is False or isinstance(lastPitch, list)
                     if not(skipUnisons is False
-                            or isinstance(lastPitch, tuple)
-                            or lastPitch is None
-                            or (hasattr(lastPitch, 'pitchClass')
-                                and e.pitch.pitchClass != lastPitch.pitchClass)
-                            or (skipOctaves is False
-                                and hasattr(lastPitch, 'pitchClass')
-                                and e.pitch.ps != lastPitch.ps)):
+                           or len(lastPitches) != 1
+                           or e.pitch.pitchClass != lastPitches[0].pitchClass
+                           or (skipOctaves is False
+                                and e.pitch.ps != lastPitches[0].ps)):
                         continue
                     if getOverlaps is False and e.offset < lastEnd:
                         continue
@@ -9831,12 +9833,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         continue
 
                     lastStart = e.offset
-                    if hasattr(e, 'duration'):
-                        lastEnd = opFrac(lastStart + e.duration.quarterLength)
-                    else:
-                        lastEnd = lastStart
+                    lastEnd = opFrac(lastStart + e.duration.quarterLength)
                     lastWasNone = False
-                    lastPitch = e.pitch
+                    lastPitches = e.pitches
 
                 # if we have a chord
                 elif isinstance(e, chord.Chord) and len(e.pitches) > 1:
@@ -9844,24 +9843,20 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         if lastWasNone is False and not noNone:
                             returnList.append(None)
                             lastWasNone = True
-                            lastPitch = None
+                            lastPitches = ()
                     # if we have a chord
                     elif (not (skipUnisons is True
-                                and isinstance(lastPitch, (list, tuple))
-                                and e.pitches[0].ps == lastPitch[0].ps
-                               ) and (getOverlaps is True or e.offset >= lastEnd)):
+                                and len(lastPitches) == len(e.pitches)
+                                and (p.ps for p in e.pitches) == (p.ps for p in lastPitches)
+                               )
+                          and (getOverlaps is True or e.offset >= lastEnd)):
                         returnList.append(e)
                         if e.offset < lastEnd:  # is an overlap...
                             continue
 
                         lastStart = e.offset
-                        if hasattr(e, 'duration'):
-                            lastEnd = opFrac(lastStart + e.duration.quarterLength)
-                        else:
-                            lastEnd = lastStart
-                        # this is the case where the last pitch is
-                        # a list
-                        lastPitch = e.pitches
+                        lastEnd = opFrac(lastStart + e.duration.quarterLength)
+                        lastPitches = e.pitches
                         lastWasNone = False
 
                 elif (skipRests is False
@@ -9870,7 +9865,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     if noNone is False:
                         returnList.append(None)
                         lastWasNone = True
-                        lastPitch = None
+                        lastPitches = ()
                 elif skipRests is True and isinstance(e, note.Rest):
                     lastEnd = opFrac(e.offset + e.duration.quarterLength)
 
@@ -12450,7 +12445,7 @@ class Measure(Stream):
     # define order for presenting names in documentation; use strings
     _DOC_ORDER = ['']
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'timeSignatureIsNew': '''
             Boolean describing if the TimeSignature
             is different than the previous Measure.''',
@@ -13079,7 +13074,7 @@ class Part(Stream):
     '''
     recursionType = 'flatten'
 
-    # _DOC_ATTR = {
+    # _DOC_ATTR: t.Dict[str, str] = {
     # }
 
     def __init__(self, *args, **keywords):

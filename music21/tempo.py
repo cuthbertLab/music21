@@ -183,7 +183,6 @@ class TempoText(TempoIndication):
     >>> print(tm.text)
     adagio
     '''
-
     def __init__(self, text=None):
         super().__init__()
 
@@ -291,7 +290,6 @@ class TempoText(TempoIndication):
         Return True or False if the supplied text seems like a
         plausible Tempo indications be used for this TempoText.
 
-
         >>> tt = tempo.TempoText('adagio')
         >>> tt.isCommonTempoText()
         True
@@ -355,16 +353,13 @@ class MetronomeMark(TempoIndication):
 
     Some text marks will automatically suggest a number.
 
-
     >>> mm = tempo.MetronomeMark('adagio')
     >>> mm.number
     56
     >>> mm.numberImplicit
     True
 
-
     For certain numbers, a text value can be set implicitly
-
 
     >>> tm2 = tempo.MetronomeMark(number=208)
     >>> print(tm2.text)
@@ -385,7 +380,7 @@ class MetronomeMark(TempoIndication):
     >>> tm2.number
     144
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'placement': '''
             Staff placement: 'above', 'below', or None.
 

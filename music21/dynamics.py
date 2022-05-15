@@ -14,7 +14,7 @@
 Classes and functions for creating and manipulating dynamic symbols. Rather than
 subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized by parameters.
 '''
-
+import typing as t
 import unittest
 
 from music21 import base
@@ -194,7 +194,7 @@ class Dynamic(base.Music21Object):
     _styleClass = style.TextStyle
 
     _DOC_ORDER = ['longName', 'englishName']
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'longName': r'''
             the name of this dynamic in Italian.
 

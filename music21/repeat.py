@@ -1949,7 +1949,7 @@ class RepeatFinder:
                   'getQuarterLengthOfPickupMeasure',
                   'hasPickup']
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'defaultHash': r'''A function that takes a stream of notes and rests and
                                 returns a string or an
                                 integer such that two measures are equal if their

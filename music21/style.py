@@ -59,7 +59,7 @@ class Style(ProtoM21Object):
     20.4
 
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'hideObjectOnPrint': '''
             If set to `True`, the Music21Object will not print upon output
             (only used in MusicXML output at this point and
@@ -221,7 +221,7 @@ class NoteStyle(Style):
     Beam style is stored on the Beams object.  Lyric style is stored on the Lyric
     object.
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'stemStyle': '''
             An optional style.Style object describing what the stem looks like.
 

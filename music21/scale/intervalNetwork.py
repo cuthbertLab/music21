@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2012, 2015-16 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -2185,7 +2185,7 @@ class IntervalNetwork:
 
         '''
         # noinspection PyPackageRequirements
-        import networkx  # pylint: disable=import-error
+        import networkx  # type: ignore  # pylint: disable=import-error
         weight = 1
         style = 'solid'
 

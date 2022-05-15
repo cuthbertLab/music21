@@ -9,6 +9,7 @@
 # ------------------------------------------------------------------------------
 import copy
 import itertools
+import typing as t
 import unittest
 
 from music21 import exceptions21
@@ -50,7 +51,7 @@ class FiguredBassScale:
     >>> fbScale.keySig
     <music21.key.KeySignature of 1 flat>
     '''
-    _DOC_ATTR = {'realizerScale': 'A :class:`~music21.scale.Scale` based on the '
+    _DOC_ATTR: t.Dict[str, str] = {'realizerScale': 'A :class:`~music21.scale.Scale` based on the '
                     'desired value and mode.',
                  'keySig': 'A :class:`~music21.key.KeySignature` corresponding to '
                     'the scale value and mode.'}

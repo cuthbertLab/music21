@@ -204,7 +204,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         'id',
     )
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'feathered': '''
             Boolean determining if this is a feathered beam or not
             (does nothing for now).''',

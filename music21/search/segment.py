@@ -292,7 +292,7 @@ def getDifflibOrPyLev(
     else:
         try:
             # noinspection PyPackageRequirements
-            from Levenshtein import StringMatcher as pyLevenshtein
+            from Levenshtein import StringMatcher as pyLevenshtein  # type: ignore
             smObject = pyLevenshtein.StringMatcher(junk, '', seq2)
         except ImportError:
             smObject = difflib.SequenceMatcher(junk, '', seq2)

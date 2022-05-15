@@ -986,9 +986,9 @@ class Test(unittest.TestCase):
 
         n5 = note.Note('c4')
         s6 = Stream()
-        s6.insert([0.0, n1,
-                   1.0, n5,
-                   2.0, n2])
+        s6.insert([0.0, n1,  # C3
+                   1.0, n5,  # C4
+                   2.0, n2])  # Chord C4, E4, G4
         l12 = s6.findConsecutiveNotes(noNone=True)
         self.assertEqual(len(l12), 3)
         l13 = s6.findConsecutiveNotes(noNone=True, skipUnisons=True)

@@ -590,7 +590,7 @@ class GraphNetworkxGraph(Graph):
     #
     # .. image:: images/GraphNetworkxGraph.*
     #     :width: 600
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'networkxGraph': '''An instance of a networkx graph object.''',
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
     }
@@ -687,7 +687,7 @@ class GraphColorGrid(Graph):
     .. image:: images/GraphColorGrid.*
         :width: 600
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
     }
 
@@ -794,7 +794,7 @@ class GraphColorGridLegend(Graph):
         :width: 600
 
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
     }
 
@@ -954,7 +954,7 @@ class GraphHorizontalBar(Graph):
         `('', [], {})`
 
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'barSpace': 'Amount of vertical space each bar takes; default 8',
         'margin': '''
             Vertical space above and below the bars, default 2 (= total4 space between bars)
@@ -1064,7 +1064,7 @@ class GraphHorizontalBarWeighted(Graph):
     can have different heights and colors within their
     respective channel.
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'barSpace': 'Amount of vertical space each bar takes; default 8',
         'margin': 'Space around the bars, default 2',
     }
@@ -1210,7 +1210,7 @@ class GraphScatterWeighted(Graph):
         :width: 600
 
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'maxDiameter': 'the maximum diameter of any ellipse, default 1.25',
         'minDiameter': 'the minimum diameter of any ellipse, default 0.25',
     }
@@ -1411,7 +1411,7 @@ class GraphHistogram(Graph):
     .. image:: images/GraphHistogram.*
         :width: 600
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'binWidth': '''
             Size of each bin; if the bins are equally spaced at intervals of 1,
             then 0.8 is a good default to allow a little space. 1.0 will give no

@@ -928,7 +928,7 @@ class Key(KeySignature, scale.DiatonicScale):
     <music21.key.Key of f# minor>
     '''
     _sharps = 0
-    _mode = None
+    _mode: t.Optional[str] = None
     tonic: pitch.Pitch
 
     def __init__(self,

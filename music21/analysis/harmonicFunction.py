@@ -5,11 +5,10 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2022 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
-from typing import Optional, Union
+import typing as t
 import unittest
 
 from music21 import common
@@ -17,13 +16,8 @@ from music21 import key
 from music21 import roman
 from music21 import scale
 
-from music21 import environment
-_MOD = 'analysis.harmonicFunction'
-environLocal = environment.Environment(_MOD)
-
 
 class HarmonicFunction(common.enums.StrEnum):
-
     TONIC_MAJOR = 'T'
     TONIC_MAJOR_PARALLELKLANG_MINOR = 'Tp'
     TONIC_MAJOR_GEGENKLANG_MINOR = 'Tg'
@@ -50,7 +44,6 @@ class HarmonicFunction(common.enums.StrEnum):
 
 
 _functionFigureTuplesKeyNeutral = {
-
     HarmonicFunction.TONIC_MAJOR: 'I',  # 'T'
     HarmonicFunction.TONIC_MINOR: 'i',  # 't'
 
@@ -68,11 +61,9 @@ _functionFigureTuplesKeyNeutral = {
     HarmonicFunction.SUBDOMINANT_MAJOR_GEGENKLANG_MINOR: 'vi',  # 'Sg'
 
     HarmonicFunction.DOMINANT_MAJOR_GEGENKLANG_MINOR: 'bvii',  # 'Dg'
-
 }
 
 functionFigureTuplesMajor = {
-
     HarmonicFunction.TONIC_MINOR_PARALLELKLANG_MAJOR: 'bIII',  # 'tP', note first
     HarmonicFunction.DOMINANT_MINOR_GEGENKLANG_MAJOR: 'bIII',  # 'dG'
 
@@ -83,7 +74,6 @@ functionFigureTuplesMajor = {
     HarmonicFunction.TONIC_MINOR_GEGENKLANG_MAJOR: 'bVI',  # 'tG'
 
     HarmonicFunction.DOMINANT_MINOR_PARALLELKLANG_MAJOR: 'bVII',  # 'dP'
-
 }
 
 functionFigureTuplesMajor = {
@@ -92,7 +82,6 @@ functionFigureTuplesMajor = {
 }
 
 functionFigureTuplesMinor = {
-
     HarmonicFunction.TONIC_MINOR_PARALLELKLANG_MAJOR: 'III',  # 'tP', note first
     HarmonicFunction.DOMINANT_MINOR_GEGENKLANG_MAJOR: 'III',  # 'dG'
 
@@ -103,7 +92,6 @@ functionFigureTuplesMinor = {
     HarmonicFunction.TONIC_MINOR_GEGENKLANG_MAJOR: 'VI',  # 'tG'
 
     HarmonicFunction.DOMINANT_MINOR_PARALLELKLANG_MAJOR: 'VII',  # 'dP'
-
 }
 
 functionFigureTuplesMinor = {
@@ -113,8 +101,8 @@ functionFigureTuplesMinor = {
 
 
 def functionToRoman(thisHarmonicFunction: HarmonicFunction,
-                    keyOrScale: Union[key.Key, scale.Scale, str] = 'C'
-                    ) -> Optional[roman.RomanNumeral]:
+                    keyOrScale: t.Union[key.Key, scale.Scale, str] = 'C'
+                    ) -> t.Optional[roman.RomanNumeral]:
     '''
     Takes harmonic function labels (such as 'T' for major tonic)
     with a key (keyOrScale, default = 'C') and
@@ -196,7 +184,7 @@ def functionToRoman(thisHarmonicFunction: HarmonicFunction,
         keyOrScale = key.Key(keyOrScale)
 
     referenceTuples = functionFigureTuplesMajor
-    if keyOrScale.mode == 'minor':
+    if isinstance(keyOrScale, key.Key) and keyOrScale.mode == 'minor':
         referenceTuples = functionFigureTuplesMinor
 
     try:
@@ -208,7 +196,7 @@ def functionToRoman(thisHarmonicFunction: HarmonicFunction,
 
 def romanToFunction(rn: roman.RomanNumeral,
                     onlyHauptHarmonicFunction: bool = False
-                    ) -> Optional[HarmonicFunction]:
+                    ) -> t.Optional[HarmonicFunction]:
     '''
     Takes a Roman numeral and returns a corresponding harmonic function label.
 
@@ -266,9 +254,7 @@ def romanToFunction(rn: roman.RomanNumeral,
 
 
 # ------------------------------------------------------------------------------
-
 class Test(unittest.TestCase):
-
     def testAllFunctionLabelsInEnum(self):
         '''
         Test that all the entries in the functionFigureTuples
@@ -276,7 +262,6 @@ class Test(unittest.TestCase):
 
         Also tests one fake (invalid) function label.
         '''
-
         # All and only valid
         for thisHarmonicFunction in functionFigureTuplesMajor:
             HarmonicFunction(thisHarmonicFunction)
@@ -288,7 +273,7 @@ class Test(unittest.TestCase):
         self.assertRaises(ValueError, HarmonicFunction, fakeExample)
 
     def testFunctionToRoman(self):
-        self.assertEqual(functionToRoman('T').figure, 'I')
+        self.assertEqual(functionToRoman(HarmonicFunction.TONIC_MAJOR).figure, 'I')
 
     def testSimplified(self):
         rn = roman.RomanNumeral('III', 'f')
@@ -306,7 +291,6 @@ class Test(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
-
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

@@ -436,7 +436,7 @@ class TimeSignature(base.Music21Object):
     _styleClass = style.TextStyle
     classSortOrder = 4
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'beatSequence': 'A :class:`~music21.meter.MeterSequence` governing beat partitioning.',
         'beamSequence': 'A :class:`~music21.meter.MeterSequence` governing automatic beaming.',
         'accentSequence': 'A :class:`~music21.meter.MeterSequence` governing accent partitioning.',

@@ -15,7 +15,7 @@
 The `tie` module contains a single class, `Tie` that represents the visual and
 conceptual idea of tied notes.  They can be start or stop ties.
 '''
-
+import typing as t
 import unittest
 from music21 import exceptions21
 from music21.common.objects import SlottedObjectMixin
@@ -28,7 +28,7 @@ class TieException(exceptions21.Music21Exception):
 # ------------------------------------------------------------------------------
 class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     '''
-    Object added to notes that are tied to other notes. The `type` value is one
+    An object added to Notes that are tied to other notes. The `type` value is one
     of start, stop, or continue.
 
     >>> note1 = note.Note()
@@ -58,7 +58,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
 
     *  one tie with "continue" implies tied from and tied to.
 
-    The tie.style only applies to ties of type 'start' or 'continue' (and then
+    The tie.style only applies to Tie objects of type 'start' or 'continue' (and then
     only to the next part of the tie).  For instance, if there are two
     tied notes, and the first note has a 'dotted'-start tie, and the
     second note has a 'dashed'-stop tie, the graphical tie itself will be dotted.
@@ -87,7 +87,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
         'type',
     )
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'type': '''
             The tie type, can be 'start', 'stop', 'continue', 'let-ring', or 'continue-let-ring'.
             ''',

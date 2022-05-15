@@ -59,7 +59,7 @@ class Clef(base.Music21Object):
     >>> tc.lowestLine
     31
     '''
-    _DOC_ATTR: t.Mapping[str, str] = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'sign': '''
             The sign of the clef, generally, 'C', 'G', 'F', 'percussion', 'none' or None.
 
@@ -271,7 +271,7 @@ class PitchClef(Clef):
     '''
     superclass for all other clef subclasses that use pitches...
     '''
-    _DOC_ATTR: t.Mapping[str, str] = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'lowestLine': '''
             The diatonicNoteNumber of the lowest line of the clef.
             (Can be none...)
@@ -327,8 +327,8 @@ class PercussionClef(Clef):
     >>> pc.line is None
     True
 
-    Percussion clefs should not, technically. have a
-    lowest line, but it is a common usage to assume that
+    Percussion clefs should not, technically have a
+    "lowestLine," but it is a common usage to assume that
     in pitch-centric contexts to use the pitch numbers
     from treble clef for percussion clefs.  Thus:
 
@@ -337,7 +337,7 @@ class PercussionClef(Clef):
 
     Changed in v7.3 -- setting octaveChange no longer affects lowestLine
     '''
-    _DOC_ATTR: t.Mapping[str, str] = {}
+    _DOC_ATTR: t.Dict[str, str] = {}
 
     def __init__(self):
         super().__init__()
@@ -358,7 +358,7 @@ class NoClef(Clef):
     >>> nc.sign is None
     False
     '''
-    _DOC_ATTR: t.Mapping[str, str] = {}
+    _DOC_ATTR: t.Dict[str, str] = {}
 
     def __init__(self):
         super().__init__()

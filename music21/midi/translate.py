@@ -17,16 +17,19 @@ import unittest
 import math
 import copy
 import typing as t
+from typing import overload
 import warnings
 
 from music21 import chord
 from music21 import common
 from music21 import defaults
 from music21 import duration
+from music21 import dynamics
 from music21 import exceptions21
 from music21 import environment
 from music21 import instrument
 from music21 import key
+from music21 import meter
 from music21 import note
 from music21 import percussion
 from music21 import pitch
@@ -320,6 +323,22 @@ def _constructOrUpdateNotRestSubclass(
     return nr
 
 
+@overload
+def midiEventsToNote(
+    eventList,
+    ticksPerQuarter,
+    inputM21: None = None,
+) -> NotRestType:
+    return note.NotRest()
+
+@overload
+def midiEventsToNote(
+    eventList,
+    ticksPerQuarter,
+    inputM21: NotRestType,
+) -> None:
+    return None
+
 def midiEventsToNote(
     eventList,
     ticksPerQuarter=None,
@@ -551,6 +570,21 @@ def noteToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
 
 # ------------------------------------------------------------------------------
 # Chords
+@overload
+def midiEventsToChord(
+    eventList: t.List['music21.midi.MidiEvent'],
+    ticksPerQuarter: t.Optional[int] = None,
+    inputM21: None = None
+) -> chord.ChordBase:
+    return chord.Chord()
+
+@overload
+def midiEventsToChord(
+    eventList: t.List['music21.midi.MidiEvent'],
+    ticksPerQuarter: t.Optional[int],
+    inputM21: chord.ChordBase
+) -> None:
+    return None
 
 def midiEventsToChord(
     eventList: t.List['music21.midi.MidiEvent'],
@@ -698,7 +732,7 @@ def midiEventsToChord(
             c.add(unp)
     else:
         c.pitches = pitches
-    c.volume = volumes  # can set a list to volume property
+    c.setVolumes(volumes)
 
     if inputM21 is None:
         return c
@@ -964,7 +998,6 @@ def midiEventsToTimeSignature(eventList):
     # Time Signature Event should appear in the first track chunk (or all track
     # chunks in a Type 2 file) before any non-zero delta time events. If one
     # is not specified 4/4, 24, 8 should be assumed.
-    from music21 import meter
     from music21 import midi as midiModule
 
     if not common.isListLike(eventList):
@@ -1148,7 +1181,7 @@ def midiEventsToTempo(eventList):
     return mm
 
 
-def tempoToMidiEvents(tempoIndication: 'music21.tempo.TempoIndication', includeDeltaTime=True):
+def tempoToMidiEvents(tempoIndication: tempo.MetronomeMark, includeDeltaTime=True):
     # noinspection PyShadowingNames
     r'''
     Given any TempoIndication, convert it to list of :class:`~music21.midi.MidiEvent`
@@ -1297,33 +1330,31 @@ def elementToMidiEventList(
     [<music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=60, velocity=90>,
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=60, velocity=0>]
     '''
-    classes = el.classes
-    if 'Rest' in classes:
+    # TODO: this is the best use of the switch statement when minimum Python
+    #    version is 3.10
+    if isinstance(el, note.Rest):
         return None
-    elif 'Note' in classes:
+    elif isinstance(el, note.Note):
         # get a list of midi events
         # using this property here is easier than using the above conversion
         # methods, as we do not need to know what the object is
         sub = noteToMidiEvents(el, includeDeltaTime=False)
     # TODO: unpitched
-    elif 'Chord' in classes:
+    elif isinstance(el, chord.Chord):
         # TODO: skip Harmony unless showAsChord
         sub = chordToMidiEvents(el, includeDeltaTime=False)
-    elif 'Dynamic' in classes:
+    elif isinstance(el, dynamics.Dynamic):
         return None  # dynamics have already been applied to notes
-    elif 'TimeSignature' in classes:
+    elif isinstance(el, meter.TimeSignature):
         # return a pair of events
-        el: 'music21.meter.TimeSignature'
         sub = timeSignatureToMidiEvents(el, includeDeltaTime=False)
-    elif 'KeySignature' in classes:
-        el: 'music21.key.KeySignature'
+    elif isinstance(el, key.KeySignature):
         sub = keySignatureToMidiEvents(el, includeDeltaTime=False)
-    elif 'TempoIndication' in classes:
+    elif isinstance(el, tempo.MetronomeMark):
         # any tempo indication will work
         # note: tempo indications need to be in channel one for most playback
-        el: 'music21.tempo.TempoIndication'
         sub = tempoToMidiEvents(el, includeDeltaTime=False)
-    elif 'Instrument' in classes:
+    elif isinstance(el, instrument.Instrument):
         # first instrument will have been gathered above with get start elements
         sub = instrumentToMidiEvents(el, includeDeltaTime=False)
     else:
@@ -1802,7 +1833,6 @@ def getNotesFromEvents(
     '''
     Returns a list of Tuples of MIDI events that are pairs of note-on and
     note-off events.
-
     '''
     notes = []  # store pairs of pairs
     memo = set()   # store already matched note off
@@ -2054,18 +2084,18 @@ def midiTrackToStream(
                 # composite.append(chordSub)
                 c = midiEventsToChord(chordSub, ticksPerQuarter)
                 o = notes[i][0][0] / ticksPerQuarter
-                c.midiTickStart = notes[i][0][0]
+                c.editorial.midiTickStart = notes[i][0][0]
 
                 s.coreInsert(o, c)
                 # iSkip = len(chordSub)  # amount of accumulated chords
                 chordSub = None
             else:  # just append the note, chordSub is None
                 # composite.append(notes[i])
-                n = midiEventsToNote(notes[i], ticksPerQuarter)
+                n: note.NotRest = midiEventsToNote(notes[i], ticksPerQuarter)
                 # the time is the first value in the first pair
                 # need to round, as floating point error is likely
                 o = notes[i][0][0] / ticksPerQuarter
-                n.midiTickStart = notes[i][0][0]
+                n.editorial.midiTickStart = notes[i][0][0]
 
                 s.coreInsert(o, n)
                 # iSkip = 1
@@ -2073,12 +2103,12 @@ def midiTrackToStream(
             i += 1
 
     elif len(notes) == 1:  # rare case of just one note
-        n = midiEventsToNote(notes[0], ticksPerQuarter)
+        singleN: note.NotRest = midiEventsToNote(notes[0], ticksPerQuarter)
         # the time is the first value in the first pair
         # need to round, as floating point error is likely
         o = notes[0][0][0] / ticksPerQuarter
-        n.midiTickStart = notes[0][0][0]
-        s.coreInsert(o, n)
+        singleN.editorial.midiTickStart = notes[0][0][0]
+        s.coreInsert(o, singleN)
 
     s.coreElementsChanged()
     # quantize to nearest 16th
@@ -2102,9 +2132,11 @@ def midiTrackToStream(
         ts_iter = conductorPart['TimeSignature']
         if ts_iter:
             meterStream = ts_iter.stream()
+            if t.TYPE_CHECKING:
+                assert meterStream is not None
+
             # Supply any missing time signature at the start
             if not meterStream.getElementsByOffset(0):
-                from music21 import meter
                 meterStream.insert(0, meter.TimeSignature())
 
     # Only make measures once time signatures have been inserted
@@ -2221,7 +2253,6 @@ def conductorStream(s: stream.Stream) -> stream.Part:
         {0.0} <music21.stream.Stream measureLike>
             {0.0} <music21.note.Note C>
     '''
-    from music21 import meter
     partsList = list(s.getElementsByClass(stream.Stream).getElementsByOffset(0))
     minPriority = min(p.priority for p in partsList) if partsList else 0
     conductorPriority = minPriority - 1
@@ -2974,7 +3005,6 @@ class Test(unittest.TestCase):
             [ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF] * 3)
 
     def testTimeSignature(self):
-        from music21 import meter
         n = note.Note()
         n.quarterLength = 0.5
         s = stream.Stream()
@@ -3012,8 +3042,6 @@ class Test(unittest.TestCase):
         self.assertTrue(common.whitespaceEqual(conductorEvents, match), conductorEvents)
 
     def testKeySignature(self):
-        from music21 import meter
-
         n = note.Note()
         n.quarterLength = 0.5
         s = stream.Stream()
@@ -3297,8 +3325,6 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testOverlappedEventsC(self):
-        from music21 import meter
-
         s = stream.Stream()
         s.insert(key.KeySignature(3))
         s.insert(meter.TimeSignature('2/4'))
@@ -3642,8 +3668,6 @@ class Test(unittest.TestCase):
 
     def testMidiExportConductorA(self):
         '''Export conductor data to MIDI conductor track.'''
-        from music21 import meter
-
         p1 = stream.Part()
         p1.repeatAppend(note.Note('c4'), 12)
         p1.insert(0, meter.TimeSignature('3/4'))
@@ -3780,13 +3804,13 @@ class Test(unittest.TestCase):
                 c = note.Rest()
             else:
                 c = chord.Chord(['c3', 'd-4', 'g5'])
-                vChord = []
+                vChord: t.List[volume.Volume] = []
                 for i, unused_cSub in enumerate(c):
                     v = volume.Volume()
                     v.velocityScalar = amps[(j + shift[i]) % len(amps)]
                     v.velocityIsRelative = False
                     vChord.append(v)
-                c.volume = vChord  # can set to list
+                c.setVolumes(vChord)
             c.duration.quarterLength = ql
             s1.append(c)
 

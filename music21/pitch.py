@@ -873,7 +873,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
     _DOC_ORDER = ['name', 'modifier', 'alter', 'set']
 
     # documentation for all attributes (not properties or methods)
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'displaySize': 'Size in display: "cue", "large", or a percentage.',
         'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
         'displayLocation': 'Location of accidental: "normal", "above", "below".',
@@ -1737,13 +1737,13 @@ class Pitch(prebase.ProtoM21Object):
     _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'german',
                   'french', 'spanish', 'italian', 'dutch']
     # documentation for all attributes (not properties or methods)
-    # _DOC_ATTR = {
+    # _DOC_ATTR: t.Dict[str, str] = {
     # }
 
     # constants shared by all classes
     _twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'spellingIsInferred': '''
             Returns True or False about whether enharmonic spelling
             Has been inferred on pitch creation or whether it has

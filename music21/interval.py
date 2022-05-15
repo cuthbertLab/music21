@@ -1622,7 +1622,7 @@ class DiatonicInterval(IntervalBase):
     Traceback (most recent call last):
     music21.interval.IntervalException: There is no such thing as a descending Perfect Unison
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'specifier': 'A :class:`~music21.interval.Specifier` enum representing '
                      + 'the Quality of the interval.',
         'generic': 'A :class:`~music21.interval.GenericInterval` enum representing '

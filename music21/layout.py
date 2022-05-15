@@ -367,7 +367,7 @@ class StaffLayout(LayoutBase):
 
     Note: (TODO: .hidden None is not working; always gives False)
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'staffType': '''
             What kind of staff is this as a stream.enums.StaffType.
 

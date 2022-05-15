@@ -328,7 +328,7 @@ class TextExpression(Expression):
     classSortOrder = -30
     _styleClass = style.TextStyle
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'placement': '''
             Staff placement: 'above', 'below', or None.
 

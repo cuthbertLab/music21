@@ -458,7 +458,9 @@ class Converter:
 
     Not a subclass, but a wrapper for different converter objects based on format.
     '''
-    _DOC_ATTR = {'subConverter': 'a ConverterXXX object that will do the actual converting.', }
+    _DOC_ATTR: t.Dict[str, str] = {
+        'subConverter': 'a ConverterXXX object that will do the actual converting.',
+    }
 
     def __init__(self):
         self.subConverter = None

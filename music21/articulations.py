@@ -78,6 +78,8 @@ A longer test showing the utility of the module:
     :width: 628
 
 '''
+from __future__ import annotations
+
 import typing as t
 import unittest
 
@@ -90,6 +92,8 @@ from music21 import style
 
 environLocal = environment.Environment('articulations')
 
+if t.TYPE_CHECKING:
+    from music21 import interval
 
 
 class ArticulationException(exceptions21.Music21Exception):
@@ -142,7 +146,7 @@ class Articulation(base.Music21Object):
     # def __eq__(self, other):
     #     '''
     #     Equality. Based only on the class name,
-    #     as other other attributes are independent of context and deployment.
+    #     as other attributes are independent of context and deployment.
     #
     #
     #     >>> at1 = articulations.StrongAccent()
@@ -589,10 +593,10 @@ class PullOff(FretIndication):
     pass
 
 class FretBend(FretIndication):
-    bendAlter = None  # music21.interval.Interval object
-    preBend = None
-    release = None
-    withBar = None
+    bendAlter: t.Optional[interval.IntervalBase] = None
+    preBend: t.Any = None
+    release: t.Any = None
+    withBar: t.Any = None
 
 class FretTap(FretIndication):
     pass

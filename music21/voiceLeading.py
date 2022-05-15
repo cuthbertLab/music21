@@ -84,7 +84,7 @@ class VoiceLeadingQuartet(base.Music21Object):
     to make sense.  Most routines will work the other way still though.
     '''
 
-    _DOC_ATTR = {'vIntervals': '''list of the two harmonic intervals present,
+    _DOC_ATTR: t.Dict[str, str] = {'vIntervals': '''list of the two harmonic intervals present,
                      vn1n1 to v2n1 and v1n2 to v2n2''',
                  'hIntervals': '''list of the two melodic intervals present,
                      v1n1 to v1n2 and v2n1 to v2n2'''}
@@ -1375,7 +1375,7 @@ class Verticality(base.Music21Object):
     #  obsolete:     To create Verticalities out of a score, call
     #                by :meth:`~music21.theoryAnalyzer.getVerticalities`
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'contentDict': '''Dictionary representing contents of Verticalities.
             the keys of the dictionary
             are the part numbers and the element at each key is a list of

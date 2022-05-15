@@ -128,7 +128,7 @@ class Verticality(prebase.ProtoM21Object):
         'stopTimespans',
     )
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'timespanTree': r'''
             Returns the timespanTree initially set.
             ''',

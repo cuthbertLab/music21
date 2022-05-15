@@ -43,6 +43,8 @@ SpineParsing consists of several steps.
 * Stream elements are moved into their measures within a Stream
 * Measures are searched for elements with voice groups and Voice objects are created
 '''
+from __future__ import annotations
+
 import copy
 import math
 import re
@@ -1040,8 +1042,8 @@ class HumdrumSpine(prebase.ProtoM21Object):
     <music21.stream.Part ...>
     '''
 
-    def __init__(self, spineId=0, eventList=None, streamClass=stream.Stream):
-        self.id = spineId
+    def __init__(self, spineId: int = 0, eventList=None, streamClass=stream.Stream):
+        self.id: int = spineId
         if eventList is None:
             eventList = []
         for event in eventList:
@@ -1054,8 +1056,8 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self.parentSpine = None
         self.newSpine = None
         self.isLastSpine = False
-        self.childSpines = []
-        self.childSpineInsertPoints = {}
+        self.childSpines: t.List[HumdrumSpine] = []
+        self.childSpineInsertPoints: t.Dict[int, t.Tuple[HumdrumSpine, ...]] = {}
 
         self.parsed = False
         self.measuresMoved = False
@@ -1064,7 +1066,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self._spineCollection = None
         self._spineType = None
 
-        self.isFirstVoice = None
+        self.isFirstVoice: t.Union[bool, None] = None
         self.iterIndex = None
 
     def _reprInternal(self):
@@ -1291,7 +1293,7 @@ class KernSpine(HumdrumSpine):
     are kern notes
     '''
 
-    def __init__(self, spineId=0, eventList=None, streamClass=stream.Stream):
+    def __init__(self, spineId: int = 0, eventList=None, streamClass=stream.Stream):
         super().__init__(spineId, eventList, streamClass)
         self.lastContainer = None
         self.inTuplet = None
@@ -1565,12 +1567,11 @@ class SpineEvent(prebase.ProtoM21Object):
     >>> n
     <music21.note.Note E->
     '''
-    protoSpineId = 0
-    spineId = None
-
     def __init__(self, contents=None, position=0):
         self.contents = contents
         self.position = position
+        self.protoSpineId: int = 0
+        self.spineId: t.Optional[int] = None
 
     def _reprInternal(self):
         return str(self.contents)

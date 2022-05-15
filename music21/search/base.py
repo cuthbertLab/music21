@@ -16,6 +16,7 @@ See User's Guide, Chapter 43: Searching in and Among Scores for details.
 import copy
 import difflib
 import math
+import typing as t
 import unittest
 from collections import namedtuple
 
@@ -25,7 +26,7 @@ from music21 import base as m21Base
 from music21 import exceptions21
 from music21 import duration
 from music21 import note
-from music21.stream import Measure
+from music21.stream import Measure, Stream
 from music21.stream import filters
 
 __all__ = [
@@ -80,11 +81,12 @@ class SearchMatch(namedtuple('SearchMatch', ['elStart', 'els', 'index', 'iterato
     A lightweight object representing the match (if any) for a search.  Derived from namedtuple
     '''
     __slots__ = ()
-    _DOC_ATTR = {'elStart': '''The first element that matches the list.''',
-                 'els': '''A tuple of all the matching elements.''',
-                 'index': '''The index in the iterator at which the first element can be found''',
-                 'iterator': '''The iterator which produced these elements.''',
-                 }
+    _DOC_ATTR: t.Dict[str, str] = {
+        'elStart': '''The first element that matches the list.''',
+        'els': '''A tuple of all the matching elements.''',
+        'index': '''The index in the iterator at which the first element can be found''',
+        'iterator': '''The iterator which produced these elements.''',
+    }
 
     def __repr__(self):
         return 'SearchMatch(elStart={0}, els=len({1}), index={2}, iterator=[...])'.format(
@@ -199,7 +201,10 @@ class StreamSearcher:
         self.filterNotes = False
         self.filterNotesAndRests = False
 
-        self.algorithms = [StreamSearcher.wildcardAlgorithm]
+        self.algorithms: t.List[
+            t.Callable[[Stream, m21Base.Music21Object],
+                       t.Union[bool, None]]
+        ] = [StreamSearcher.wildcardAlgorithm]
 
         self.activeIterator = None
 
