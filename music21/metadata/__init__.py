@@ -40,7 +40,7 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 .. image:: images/moduleMetadata-01.*
     :width: 600
 
-    A guide to this initial new implementation:
+    A guide to the 2022 Dublin Core implementation:
 
     - The guts of class Metadata are completely rewritten to support the new
         extensions, but all of Metadata's old APIs are still in place and
@@ -449,10 +449,14 @@ class Metadata(base.Music21Object):
         Test getItem when the item isn't there.
 
         >>> md = metadata.Metadata()
-        >>> md.getItem('title') # uniqueName
-        >>> md.getItem('title', namespace='dcterms') # name, namespace
-        >>> md.getItem('T', namespace='dcterms') # abbrevCode, namespace
-        >>> md.getItem('dcterms:title') # 'namespace:name'
+        >>> md.getItem('title') is None # uniqueName
+        True
+        >>> md.getItem('title', namespace='dcterms') is None # name, namespace
+        True
+        >>> md.getItem('T', namespace='dcterms') is None # abbrevCode, namespace
+        True
+        >>> md.getItem('dcterms:title') is None # 'namespace:name'
+        True
 
         Test getItem when the item is there:
 
@@ -797,8 +801,10 @@ class Metadata(base.Music21Object):
 
         >>> metadata.Metadata.uniqueNameToNSKey('librettist')
         'marcrel:LBT'
-        >>> metadata.Metadata.uniqueNameToNSKey('not a standard property')
-        >>> metadata.Metadata.uniqueNameToNSKey(None)
+        >>> metadata.Metadata.uniqueNameToNSKey('not a standard property') is None
+        True
+        >>> metadata.Metadata.uniqueNameToNSKey(None) is None
+        True
         >>> metadata.Metadata.uniqueNameToNSKey('alternativeTitle')
         'dcterms:alternative'
         '''
@@ -839,8 +845,10 @@ class Metadata(base.Music21Object):
 
         >>> metadata.Metadata.nsKeyToUniqueName('marcrel:LBT')
         'librettist'
-        >>> metadata.Metadata.nsKeyToUniqueName('not a standard nskey')
-        >>> metadata.Metadata.nsKeyToUniqueName(None)
+        >>> metadata.Metadata.nsKeyToUniqueName('not a standard nskey') is None
+        True
+        >>> metadata.Metadata.nsKeyToUniqueName(None) is None
+        True
         >>> metadata.Metadata.nsKeyToUniqueName('dcterms:alternative')
         'alternativeTitle'
         '''
@@ -859,9 +867,12 @@ class Metadata(base.Music21Object):
 
         >>> metadata.Metadata.nsKeyToContributorUniqueName('marcrel:LBT')
         'librettist'
-        >>> metadata.Metadata.nsKeyToContributorUniqueName('not a standard nskey')
-        >>> metadata.Metadata.nsKeyToContributorUniqueName(None)
-        >>> metadata.Metadata.nsKeyToContributorUniqueName('dcterms:alternative')
+        >>> metadata.Metadata.nsKeyToContributorUniqueName('not a standard nskey') is None
+        True
+        >>> metadata.Metadata.nsKeyToContributorUniqueName(None) is None
+        True
+        >>> metadata.Metadata.nsKeyToContributorUniqueName('dcterms:alternative') is None
+        True
         '''
         if not nsKey:
             return None
@@ -921,7 +932,8 @@ class Metadata(base.Music21Object):
         <music21.metadata.primitives.Copyright Copyright © 1984 All Rights Reserved>
 
         >>> md = metadata.Metadata()
-        >>> md.copyright
+        >>> md.copyright is None
+        True
         >>> md.setItem('dcterms:rights', 'Copyright © 1984 All Rights Reserved')
         >>> md.addItem('dcterms:rights', 'Lyrics copyright © 1987 All Rights Reserved')
         >>> md.copyright = 'Copyright © 1984 from str'
