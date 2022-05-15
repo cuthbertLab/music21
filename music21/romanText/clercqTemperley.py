@@ -15,28 +15,30 @@ Parses the de Clercq-Temperley popular music flavor of RomanText.
 The Clercq-Temperley file format and additional rock corpus analysis
 information may be located at http://rockcorpus.midside.com
 '''
+from __future__ import annotations
+
 import copy
 import io
+import pathlib
 import re
 import typing as t
 import unittest
 
 from collections import OrderedDict
 
-from music21 import exceptions21
-
 from music21 import common
-from music21 import key
-from music21 import meter
-from music21 import stream
-from music21 import roman
-from music21 import tie
-from music21 import note
-from music21 import metadata
-from music21 import prebase
-
 from music21 import environment
-environLocal = environment.Environment()
+from music21 import exceptions21
+from music21 import key
+from music21 import metadata
+from music21 import meter
+from music21 import note
+from music21 import prebase
+from music21 import roman
+from music21 import stream
+from music21 import tie
+
+environLocal = environment.Environment('romanText.clercqTemperley')
 
 # clercqTemperley test files used as tests throughout this module
 BlitzkriegBopCT = '''
@@ -287,16 +289,23 @@ class CTSong(prebase.ProtoM21Object):
 
     """
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
-    _DOC_ATTR: t.Dict[str, str] = {'year': 'the year of the CTSong; not formally defined '
-                         + 'by the Clercq-Temperley format'}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'year': '''
+            The year of the CTSong; not formally defined
+            by the Clercq-Temperley format.
+            ''',
+    }
 
-    def __init__(self, textFile, **keywords):
+    def __init__(self, textFile: t.Union[str, pathlib.Path] = '', **keywords):
         self._title = None
         self.text = ''
-        self.lines = []
-        self._rules = OrderedDict()  # Dictionary of all component rules of the type CTRule
-        self.ksList = []  # keeps a list of all key signatures in the Score -- avoids duplicates
-        self.tsList = []  # same for time signatures
+        self.lines: t.List[str] = []
+        # Dictionary of all component rules of the type CTRule
+        self._rules: t.Dict[str, CTRule] = OrderedDict()
+        # keeps a list of all key signatures in the Score -- avoids duplicates
+        self.ksList: t.List[key.KeySignature] = []
+        # same for time signatures
+        self.tsList: t.List[meter.TimeSignature] = []
 
         self._scoreObj = None
         self.year = None
@@ -319,14 +328,14 @@ class CTSong(prebase.ProtoM21Object):
         return f'title={self.title!r} year={self.year}'
 
     # --------------------------------------------------------------------------
-    def parse(self, textFile: str):
+    def parse(self, textFile: t.Union[str, pathlib.Path]):
         '''
         Called when a CTSong is created by passing a string or filename;
         in the second case, it opens the file
         and removes all blank lines, and adds in new line characters
         returns pieceString that CTSong can parse.
         '''
-        if '|' in textFile and 'S:' in textFile:
+        if isinstance(textFile, str) and '|' in textFile and 'S:' in textFile:
             lines = textFile.split('\n')
         else:
             try:
@@ -811,9 +820,12 @@ class CTRule(prebase.ProtoM21Object):
             lastChord.tie.type = 'continue'
             rn.tie = tie.Tie('stop')
 
-    def insertKsTs(self, m, ts, ks):
+    def insertKsTs(self,
+                   m: stream.Measure,
+                   ts: meter.TimeSignature,
+                   ks: key.KeySignature):
         '''
-        insert a new time signature or key signature into measure m, if it's
+        Insert a new time signature or key signature into measure m, if it's
         not already in the stream somewhere.
         '''
         if self.parent is None:
@@ -1009,12 +1021,11 @@ class TestExternal(unittest.TestCase):
         # sc = s.toScore()
         # print(sc.highestOffset)
         # sc.show()
+
+
 # --------------------------------------------------------------------------
-
 # define presented class order in documentation
-
-
-_DOC_ORDER = [CTSong, CTRule]
+_DOC_ORDER: t.List[t.Type] = [CTSong, CTRule]
 
 if __name__ == '__main__':
     import music21

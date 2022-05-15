@@ -65,7 +65,7 @@ class QMConverter(converter.subConverters.SubConverter):
 
         self.stream = s.makeMeasures()
 
-    def parseFile(self, filePath, number=None):
+    def parseFile(self, filePath, number=None, **keywords):
         '''
         parse a file from disk.  If QMConverter is registered, then any
         file ending in .qm will automatically be parsed.

@@ -84,10 +84,16 @@ class VoiceLeadingQuartet(base.Music21Object):
     to make sense.  Most routines will work the other way still though.
     '''
 
-    _DOC_ATTR: t.Dict[str, str] = {'vIntervals': '''list of the two harmonic intervals present,
-                     vn1n1 to v2n1 and v1n2 to v2n2''',
-                 'hIntervals': '''list of the two melodic intervals present,
-                     v1n1 to v1n2 and v2n1 to v2n2'''}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'vIntervals': '''
+            A two-element list of the two harmonic intervals present,
+            vn1n1 to v2n1 and v1n2 to v2n2.
+            ''',
+        'hIntervals': '''
+            A two-element list of the two melodic intervals present,
+            v1n1 to v1n2 and v2n1 to v2n2.
+            ''',
+    }
 
     def __init__(self, v1n1=None, v1n2=None, v2n1=None, v2n2=None, analyticKey=None):
         super().__init__()

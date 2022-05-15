@@ -30,6 +30,7 @@ import tempfile
 import unittest
 
 import typing as t
+from typing import overload
 
 import xml.etree.ElementTree as ET
 from xml.sax import saxutils
@@ -998,7 +999,15 @@ class Environment:
         '''
         return envSingleton().getSettingsPath()
 
-    def getTempFile(self, suffix='', returnPathlib=True) -> t.Union[str, pathlib.Path]:
+    @overload
+    def getTempFile(self, suffix: str, returnPathlib: t.Literal[False]) -> str:
+        return '/'  # astroid #1015
+
+    @overload
+    def getTempFile(self, suffix: str = '', returnPathlib: t.Literal[True] = True) -> pathlib.Path:
+        return pathlib.Path('/')  # astroid #1015
+
+    def getTempFile(self, suffix: str = '', returnPathlib=True) -> t.Union[str, pathlib.Path]:
         '''
         Return a file path to a temporary file with the specified suffix (file
         extension).
