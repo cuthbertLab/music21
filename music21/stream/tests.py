@@ -2609,9 +2609,9 @@ class Test(unittest.TestCase):
         s.makeAccidentals(inPlace=True)
 
         self.assertTrue(n2.pitch.accidental.displayStatus)
-        # both a's in the chord now have naturals but are hidden
-        self.assertIsNone(c1.pitches[1].accidental)
-        # self.assertTrue(c1.pitches[2].accidental.displayStatus)
+        # Both A-naturals in the chord show accidentals
+        self.assertTrue(c1.pitches[1].accidental.displayStatus)
+        self.assertTrue(c1.pitches[2].accidental.displayStatus)
 
         # not getting a natural here because of chord tones
         # self.assertTrue(n3.pitch.accidental.displayStatus)
