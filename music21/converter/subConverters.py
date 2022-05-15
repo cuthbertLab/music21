@@ -15,6 +15,8 @@ Subconverters parse or display a single format.
 Each subconverter should inherit from the base SubConverter object and have at least a
 parseData method that sets self.stream.
 '''
+from __future__ import annotations
+
 # ------------------------------------------------------------------------------
 # Converters are associated classes; they are not subclasses,
 # but most define a parseData() method,
@@ -255,7 +257,12 @@ class SubConverter:
         fp = environLocal.getTempFile(ext, returnPathlib=True)
         return fp
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+    def write(self,
+              obj: music21.base.Music21Object,
+              fmt,
+              fp=None,
+              subformats=None,
+              **keywords):  # pragma: no cover
         '''
         Calls .writeDataStream on the repr of obj, and returns the fp returned by it.
         '''
@@ -340,7 +347,7 @@ class ConverterIPython(SubConverter):
         show using the appropriate subformat.
         '''
         # noinspection PyPackageRequirements
-        from IPython.display import Image, display, HTML
+        from IPython.display import Image, display, HTML  # type: ignore
         from music21 import converter
         from music21.ipython21 import inGoogleColabNotebook
 
@@ -974,7 +981,8 @@ class ConverterMusicXML(SubConverter):
                 import locale
                 stderr_str = stderr_bytes.decode(locale.getpreferredencoding(do_setlocale=False))
             except UnicodeDecodeError:
-                stderr_str = stderr_bytes  # not really a str, but best we can do.
+                # not really a str, but best we can do.
+                stderr_str = stderr_bytes.decode('ascii', errors='ignore')
             raise SubConverterFileIOException(stderr_str)
 
         if common.runningUnderIPython() and common.getPlatform() == 'nix':
@@ -1025,16 +1033,14 @@ class ConverterMusicXML(SubConverter):
 
         writeFlags = 'wb'
 
-        f: io.BytesIO
         with open(fp, writeFlags) as f:
-            f.write(dataBytes)
+            f.write(dataBytes)  # type: ignore
 
         return fp
 
     def write(self,
-              obj,
+              obj: music21.Music21Object,
               fmt,
-              *,
               fp=None,
               subformats=None,
               makeNotation=True,

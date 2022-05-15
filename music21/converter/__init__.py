@@ -16,16 +16,13 @@ whether from disk, from the web, or from text, into
 music21.stream.:class:`~music21.stream.Score` objects (or
 other similar stream objects).
 
-
 The most powerful and easy to use tool is the :func:`~music21.converter.parse`
 function. Simply provide a filename, URL, or text string and, if the format
 is supported, a :class:`~music21.stream.Score` will be returned.
 
-
 This is the most general, public interface for all formats.  Programmers
 adding their own formats to the system should provide an interface here to
 their own parsers (such as humdrum, musicxml, etc.)
-
 
 The second and subsequent times that a file is loaded it will likely be much
 faster since we store a parsed version of each file as a "pickle" object in
