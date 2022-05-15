@@ -1161,12 +1161,10 @@ class RichMetadata(Metadata):
         >>> rmd.getSourcePath(b)
         'bach/bwv66.6.mxl'
         '''
-        if not hasattr(streamObj, 'filePath'):
-            return ''  # for some abc files...
-        if not streamObj.filePath:
+        if not streamObj.metadata or not streamObj.metadata.filePath:
             return ''
 
-        streamFp = streamObj.filePath
+        streamFp = streamObj.metadata.filePath
         if not isinstance(streamFp, pathlib.Path):
             streamFp = pathlib.Path(streamFp)
 

@@ -26,21 +26,19 @@ import unittest
 
 from collections import OrderedDict
 
-from music21 import exceptions21
-
 from music21 import common
-from music21 import key
-from music21 import meter
-from music21 import stream
-from music21 import roman
-from music21 import tie
-from music21 import note
-from music21 import metadata
-from music21 import prebase
-from music21 import stream
-
 from music21 import environment
-environLocal = environment.Environment()
+from music21 import exceptions21
+from music21 import key
+from music21 import metadata
+from music21 import meter
+from music21 import note
+from music21 import prebase
+from music21 import roman
+from music21 import stream
+from music21 import tie
+
+environLocal = environment.Environment('romanText.clercqTemperley')
 
 # clercqTemperley test files used as tests throughout this module
 BlitzkriegBopCT = '''
@@ -1023,10 +1021,10 @@ class TestExternal(unittest.TestCase):
         # sc = s.toScore()
         # print(sc.highestOffset)
         # sc.show()
+
+
 # --------------------------------------------------------------------------
-
 # define presented class order in documentation
-
 _DOC_ORDER: t.List[t.Type] = [CTSong, CTRule]
 
 if __name__ == '__main__':

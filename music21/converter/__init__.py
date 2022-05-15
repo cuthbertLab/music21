@@ -60,13 +60,14 @@ __all__ = [
 
 from music21.converter import subConverters
 
-from music21 import exceptions21
-from music21 import common
-from music21 import stream
-from music21 import musedata as musedataModule
-from music21.metadata import bundles
 from music21 import _version
+from music21 import common
 from music21 import environment
+from music21 import exceptions21
+from music21 import metadata
+from music21 import musedata as musedataModule
+from music21 import stream
+from music21.metadata import bundles
 
 environLocal = environment.Environment('converter')
 
@@ -545,6 +546,7 @@ class Converter:
         if t.TYPE_CHECKING:
             assert isinstance(self.stream, stream.Stream)
 
+        self.stream.metadata = metadata.Metadata()
         self.stream.metadata.filePath = str(fpPathlib)
         self.stream.metadata.fileNumber = number
         self.stream.metadata.fileFormat = useFormat
@@ -603,9 +605,11 @@ class Converter:
                 os.remove(fpPickle)
                 self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
 
-            self.stream.filePath = fp
-            self.stream.fileNumber = number
-            self.stream.fileFormat = useFormat
+            if not self.stream.metadata:
+                self.stream.metadata = metadata.Metadata()
+            self.stream.metadata.filePath = fp
+            self.stream.metadata.fileNumber = number
+            self.stream.metadata.fileFormat = useFormat
         else:
             environLocal.printDebug('Loading original version')
             self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
@@ -619,9 +623,12 @@ class Converter:
                 environLocal.printDebug('Replacing self.stream')
                 # get a new stream
                 self._thawedStream = thaw(fpPickle, zipType='zlib')
-                self.stream.filePath = fp
-                self.stream.fileNumber = number
-                self.stream.fileFormat = useFormat
+
+                if not self.stream.metadata:
+                    self.stream.metadata = metadata.Metadata()
+                self.stream.metadata.filePath = fp
+                self.stream.metadata.fileNumber = number
+                self.stream.metadata.fileFormat = useFormat
 
     def parseData(
         self,
