@@ -809,7 +809,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         # defines multiple works, will return an opus
         o = corpus.parse('josquin/milleRegrets')
-        self.assertEqual(len(o), 4)
+        self.assertEqual(len(o.scores), 4)
         # each score in the opus is a Stream that contains a Part and metadata
         p1 = o.getScoreByNumber(1).parts[0]
         self.assertEqual(p1.offset, 0.0)
@@ -845,7 +845,7 @@ class Test(unittest.TestCase):
         from music21 import pitch
         # noinspection SpellCheckingInspection
         o = corpus.parse('nottingham-dataset/reelsa-c')
-        self.assertEqual(len(o), 2)
+        self.assertEqual(len(o.scores), 2)
         # each score in the opus is a Stream that contains a Part and metadata
 
         p1 = o.getScoreByNumber(81).parts[0]
@@ -928,7 +928,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         # defines multiple works, will return an opus
         o = corpus.parse('essenFolksong/teste')
-        self.assertEqual(len(o), 8)
+        self.assertEqual(len(o.scores), 8)
 
         s = o.getScoreByNumber(4)
         self.assertEqual(s.metadata.localeOfComposition, 'Asien, Ostasien, China, Sichuan')

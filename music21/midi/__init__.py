@@ -1575,7 +1575,7 @@ class MidiFile(prebase.ProtoM21Object):
         The name readstr is a carryover from Python 2.  It works on bytes objects, not strings
         '''
         if not midiBytes[:4] == b'MThd':
-            raise MidiException(f'badly formatted midi bytes, got: {midiBytes[:20]}')
+            raise MidiException(f'badly formatted midi bytes, got: {midiBytes[:20]!r}')
 
         # we step through the str src, chopping off characters as we go
         # and reassigning to str

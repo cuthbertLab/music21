@@ -48,6 +48,8 @@ import zipfile
 from math import isclose
 import typing as t
 
+_StrOrBytes = t.TypeVar('_StrOrBytes', str, bytes)
+
 __all__ = [
     'subConverters', 'ArchiveManagerException', 'PickleFilterException',
     'ConverterException', 'ConverterFileException',
@@ -546,7 +548,8 @@ class Converter:
         if t.TYPE_CHECKING:
             assert isinstance(self.stream, stream.Stream)
 
-        self.stream.metadata = metadata.Metadata()
+        if not self.stream.metadata:
+            self.stream.metadata = metadata.Metadata()
         self.stream.metadata.filePath = str(fpPathlib)
         self.stream.metadata.fileNumber = number
         self.stream.metadata.fileFormat = useFormat
@@ -973,27 +976,35 @@ class Converter:
 
     def formatFromHeader(
         self,
-        dataStr: t.Union[str, bytes]
-    ) -> t.Tuple[t.Optional[str], str]:
+        dataStr: _StrOrBytes
+    ) -> t.Tuple[t.Optional[str], _StrOrBytes]:
         '''
         if dataStr begins with a text header such as  "tinyNotation:" then
         return that format plus the dataStr with the head removed.
 
         Else, return (None, dataStr) where dataStr is the original untouched.
 
-        Not case sensitive.
+        The header is not detected case-sensitive.
 
         >>> c = converter.Converter()
         >>> c.formatFromHeader('tinynotation: C4 E2')
         ('tinynotation', 'C4 E2')
 
-        >>> c.formatFromHeader('C4 E2')
-        (None, 'C4 E2')
+        Note that the format is always returned in lower case:
 
         >>> c.formatFromHeader('romanText: m1: a: I b2 V')
         ('romantext', 'm1: a: I b2 V')
 
-        New formats can register new headers:
+        If there is no header then the format is None and the original is
+        returned unchanged:
+
+        >>> c.formatFromHeader('C4 E2')
+        (None, 'C4 E2')
+        >>> c.formatFromHeader(b'binary-data')
+        (None, b'binary-data')
+
+
+        New formats can register new headers, like this old Amiga format:
 
         >>> class ConverterSonix(converter.subConverters.SubConverter):
         ...    registerFormats = ('sonix',)
@@ -1002,6 +1013,12 @@ class Converter:
         >>> c.formatFromHeader('sonix: AIFF data')
         ('sonix', 'AIFF data')
         >>> converter.resetSubconverters() #_DOCS_HIDE
+
+        If bytes are passed in, the data is returned as bytes, but the
+        header format is still converted to a string:
+
+        >>> c.formatFromHeader(b'romanText: m1: a: I b2 V')
+        ('romantext', b'm1: a: I b2 V')
         '''
         if isinstance(dataStr, bytes):
             dataStrStartLower = dataStr[:20].decode('utf-8', 'ignore').lower()
@@ -1017,10 +1034,7 @@ class Converter:
                     dataStr = dataStr[len(foundFormat) + 1:]
                     dataStr = dataStr.lstrip()
                     break
-        if isinstance(dataStr, bytes):
-            return (foundFormat, dataStr.decode('utf-8', 'ignore'))
-        else:
-            return (foundFormat, dataStr)
+        return (foundFormat, dataStr)
 
     def regularizeFormat(self, fmt: str) -> t.Optional[str]:
         '''
@@ -1301,6 +1315,7 @@ def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
         # assume mistyped file path
         raise FileNotFoundError(f'Cannot find file in {str(value)}')
     else:
+        # all else, including MidiBytes
         return parseData(value, number=number, format=m21Format, **keywords)
 
 
@@ -1885,7 +1900,6 @@ class Test(unittest.TestCase):
         # s.show()
 
     def testConversionABCOpus(self):
-
         from music21.abcFormat import testFiles
         from music21 import corpus
 
@@ -1900,7 +1914,7 @@ class Test(unittest.TestCase):
         # get a Stream object, not an opus
         # self.assertIsInstance(op, stream.Score)
         self.assertIsInstance(op, stream.Opus)
-        self.assertEqual([len(s.recurse().notesAndRests) for s in op],
+        self.assertEqual([len(s.recurse().notesAndRests) for s in op.scores],
                          [33, 51, 59, 33, 29, 174, 67, 88])
         # op.show()
 
@@ -2033,6 +2047,7 @@ class Test(unittest.TestCase):
         # Also check raw data: https://github.com/cuthbertLab/music21/issues/546
         with fp.open('rb') as f:
             data = f.read()
+        self.assertIsInstance(data, bytes)
         streamDataNotQuantized = parse(data, quantizePost=False)
         self.assertIn(0.875, streamDataNotQuantized.flatten()._uniqueOffsetsAndEndTimes())
 
