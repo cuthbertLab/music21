@@ -8388,8 +8388,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def _getMetadata(self):
         '''
-
-
         >>> a = stream.Stream()
         >>> a.metadata = metadata.Metadata()
         '''
@@ -8400,7 +8398,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def _setMetadata(self, metadataObj):
         '''
-
         >>> a = stream.Stream()
         >>> a.metadata = metadata.Metadata()
         '''

@@ -32,6 +32,7 @@ convert the file into .xml or .nwctxt first.
     >>> p = common.getSourceFilePath() / 'noteworthy' / 'cuthbert_test1.nwc' #_DOCS_HIDE
     >>> c = converter.parse(str(p)) #_DOCS_HIDE
     >>> c.show('text')
+    {0.0} <music21.metadata.Metadata object at ...>
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.clef.TrebleClef>
@@ -72,7 +73,6 @@ convert the file into .xml or .nwctxt first.
             {3.0} <music21.note.Note G>
         {4.0} <music21.stream.Measure 0 offset=4.0>
             {0.0} <music21.note.Note C>
-
 '''
 import pathlib
 import struct
@@ -91,12 +91,9 @@ class NWCConverter:
     '''
     A converter object for binary .nwc files.  Do not normally use directly; use converter.parse.
 
-    >>> fp = '/Users/cuthbert/test.nwc'
-    >>> nwcc = noteworthy.binaryTranslate.NWCConverter(fp=fp)
+    >>> nwcc = noteworthy.binaryTranslate.NWCConverter()
     >>> nwcc
     <music21.noteworthy.binaryTranslate.NWCConverter object at 0x...>
-    >>> nwcc.fp
-    '/Users/cuthbert/test.nwc'
     >>> nwcc.fileContents is None
     True
     >>> nwcc.parsePosition
@@ -108,7 +105,6 @@ class NWCConverter:
     >>> nwcc.staves
     []
     '''
-
     def __init__(self, *args, **keywords):
         self.fileContents = None
         self.parsePosition = 0

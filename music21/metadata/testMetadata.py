@@ -91,7 +91,7 @@ class Test(unittest.TestCase):
         from music21 import metadata
 
         opus = corpus.parse('essenFolksong/teste')
-        self.assertEqual(len(opus), 8)
+        self.assertEqual(len(opus.scores), 8)
 
         score = opus.getScoreByNumber(4)
         self.assertEqual(score.metadata.localeOfComposition,
