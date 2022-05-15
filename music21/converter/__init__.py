@@ -48,8 +48,6 @@ import zipfile
 from math import isclose
 import typing as t
 
-_StrOrBytes = t.TypeVar('_StrOrBytes', str, bytes)
-
 __all__ = [
     'subConverters', 'ArchiveManagerException', 'PickleFilterException',
     'ConverterException', 'ConverterFileException',
@@ -73,6 +71,7 @@ from music21.metadata import bundles
 
 environLocal = environment.Environment('converter')
 
+_StrOrBytes = t.TypeVar('_StrOrBytes', bound=t.Union[str, bytes])
 
 # ------------------------------------------------------------------------------
 class ArchiveManagerException(exceptions21.Music21Exception):
@@ -1019,11 +1018,20 @@ class Converter:
 
         >>> c.formatFromHeader(b'romanText: m1: a: I b2 V')
         ('romantext', b'm1: a: I b2 V')
+
+        Anything except string or bytes raises a ValueError:
+
+        >>> c.formatFromHeader(23)
+        Traceback (most recent call last):
+        ValueError: Cannot parse a format from <class 'int'>.
         '''
+        dataStrStartLower: str
         if isinstance(dataStr, bytes):
             dataStrStartLower = dataStr[:20].decode('utf-8', 'ignore').lower()
-        else:
+        elif isinstance(dataStr, str):
             dataStrStartLower = dataStr[:20].lower()
+        else:
+            raise ValueError(f'Cannot parse a format from {type(dataStr)}.')
 
         foundFormat = None
         subconverterList = self.subconvertersList()
@@ -1031,8 +1039,9 @@ class Converter:
             for possibleFormat in sc.registerFormats:
                 if dataStrStartLower.startswith(possibleFormat.lower() + ':'):
                     foundFormat = possibleFormat
-                    dataStr = dataStr[len(foundFormat) + 1:]
-                    dataStr = dataStr.lstrip()
+                    dataStr = t.cast(_StrOrBytes,
+                                     dataStr[len(foundFormat) + 1:].lstrip()
+                                     )
                     break
         return (foundFormat, dataStr)
 
