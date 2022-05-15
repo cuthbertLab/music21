@@ -6367,6 +6367,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Changed in v.6: does not return anything if inPlace is True.
         Changed in v.7: default inPlace is False
+        Changed in v.8: altered unisons in Chords now supply clarifying naturals.
 
         All arguments are keyword only.
         '''
@@ -6452,6 +6453,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 # when reading a chord, this will apply an accidental
                 # if pitches in the chord suggest an accidental
                 seenPitchNames = set()
+                pitchPast += e.pitches
 
                 for n in list(e):
                     p = n.pitch
@@ -6477,7 +6479,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 for pName in seenPitchNames:
                     tiePitchSet.add(pName)
 
-                pitchPast += e.pitches
             else:
                 tiePitchSet.clear()
 
