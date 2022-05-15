@@ -287,10 +287,14 @@ class CTSong(prebase.ProtoM21Object):
 
     """
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
-    _DOC_ATTR: t.Dict[str, str] = {'year': 'the year of the CTSong; not formally defined '
-                         + 'by the Clercq-Temperley format'}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'year': '''
+            The year of the CTSong; not formally defined
+            by the Clercq-Temperley format.
+            ''',
+    }
 
-    def __init__(self, textFile, **keywords):
+    def __init__(self, textFile: t.Union[str, pathlib.Path] = '', **keywords):
         self._title = None
         self.text = ''
         self.lines = []
@@ -319,14 +323,14 @@ class CTSong(prebase.ProtoM21Object):
         return f'title={self.title!r} year={self.year}'
 
     # --------------------------------------------------------------------------
-    def parse(self, textFile: str):
+    def parse(self, textFile: t.Union[str, pathlib.Path]):
         '''
         Called when a CTSong is created by passing a string or filename;
         in the second case, it opens the file
         and removes all blank lines, and adds in new line characters
         returns pieceString that CTSong can parse.
         '''
-        if '|' in textFile and 'S:' in textFile:
+        if isinstance(textFile, str) and '|' in textFile and 'S:' in textFile:
             lines = textFile.split('\n')
         else:
             try:

@@ -82,7 +82,12 @@ class ObjectDocumenter(Documenter):
     Base class for object documenting sub-classes. such as ClassDocumenter
     '''
 
-    _DOC_ATTR: t.Dict[str, str] = {'referent': 'the object being documented'}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'referent':
+            ''''
+            The object being documented.
+            ''',
+    }
     # INITIALIZER #
 
     sphinxCrossReferenceRole = ''

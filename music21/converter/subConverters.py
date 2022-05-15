@@ -79,7 +79,7 @@ class SubConverter:
     registerInputExtensions: t.Tuple[str, ...] = ()  # if converter supports input
     registerOutputExtensions: t.Tuple[str, ...] = ()  # if converter supports output
     registerOutputSubformatExtensions: t.Dict[str, str] = {}
-    launchKey = None
+    launchKey: t.Union[str, pathlib.Path, None] = None
 
     codecWrite = False
     stringEncoding = 'utf-8'
@@ -99,7 +99,10 @@ class SubConverter:
         raise NotImplementedError
         # return self.stream
 
-    def parseFile(self, filePath, number=None):
+    def parseFile(self,
+                  filePath: t.Union[str, pathlib.Path],
+                  number: t.Optional[int] = None,
+                  **keywords):
         '''
         Called when a file is encountered. If all that needs to be done is
         loading the file and putting the data into parseData then there is no need
@@ -111,7 +114,7 @@ class SubConverter:
                 dataStream = f.read()
         else:
             with open(filePath, 'rb') as f:
-                dataStream = f.read()
+                dataStream = f.read()  # type: ignore
 
         # might raise NotImplementedError
         self.parseData(dataStream, number)
@@ -699,7 +702,10 @@ class ConverterHumdrum(SubConverter):
         self.stream = self.data.stream
         return self.data
 
-    def parseFile(self, filepath, number=None):
+    def parseFile(self,
+                  filePath: t.Union[pathlib.Path, str],
+                  number: t.Optional[int] = None,
+                  **keywords):
         '''
         Open Humdrum data from a file path.
 
@@ -708,7 +714,7 @@ class ConverterHumdrum(SubConverter):
         Number is ignored here.
         '''
         from music21.humdrum.spineParser import HumdrumFile
-        hf = HumdrumFile(filepath)
+        hf = HumdrumFile(filePath)
         hf.parseFilename()
         self.data = hf
         # self.data.stream.makeNotation()
@@ -809,7 +815,10 @@ class ConverterNoteworthy(SubConverter):
         from music21.noteworthy import translate as noteworthyTranslate
         self.stream = noteworthyTranslate.NoteworthyTranslator().parseString(nwcData)
 
-    def parseFile(self, fp, number=None):
+    def parseFile(self,
+                  filePath: t.Union[pathlib.Path, str],
+                  number: t.Optional[int] = None,
+                  **keywords):
         # noinspection SpellCheckingInspection
         '''
         Open Noteworthy data (as nwctxt) from a file path.
@@ -822,7 +831,7 @@ class ConverterNoteworthy(SubConverter):
         >>> #_DOCS_SHOW c.stream.show()
         '''
         from music21.noteworthy import translate as noteworthyTranslate
-        self.stream = noteworthyTranslate.NoteworthyTranslator().parseFile(fp)
+        self.stream = noteworthyTranslate.NoteworthyTranslator().parseFile(filePath)
 
 
 class ConverterNoteworthyBinary(SubConverter):
@@ -843,9 +852,12 @@ class ConverterNoteworthyBinary(SubConverter):
         from music21.noteworthy import binaryTranslate as noteworthyBinary
         self.stream = noteworthyBinary.NWCConverter().parseString(nwcData)
 
-    def parseFile(self, fp, number=None):
+    def parseFile(self,
+                  filePath: t.Union[pathlib.Path, str],
+                  number: t.Optional[int] = None,
+                  **keywords):
         from music21.noteworthy import binaryTranslate as noteworthyBinary
-        self.stream = noteworthyBinary.NWCConverter().parseFile(fp)
+        self.stream = noteworthyBinary.NWCConverter().parseFile(filePath)
 
 
 # ------------------------------------------------------------------------------
@@ -897,7 +909,10 @@ class ConverterMusicXML(SubConverter):
         c.parseXMLText()
         self.stream = c.stream
 
-    def parseFile(self, fp: t.Union[str, pathlib.Path], number=None):
+    def parseFile(self,
+                  filePath: t.Union[str, pathlib.Path],
+                  number: t.Optional[int] = None,
+                  **keywords):
         '''
         Open from a file path; check to see if there is a pickled
         version available and up to date; if so, open that, otherwise
@@ -912,18 +927,18 @@ class ConverterMusicXML(SubConverter):
         c = xmlToM21.MusicXMLImporter()
 
         # here, we can see if this is a mxl or similar archive
-        arch = converter.ArchiveManager(fp)
+        arch = converter.ArchiveManager(filePath)
         if arch.isArchive():
             archData = arch.getData()
             c.xmlText = archData
             c.parseXMLText()
         else:  # it is a file path or a raw musicxml string
-            c.readFile(fp)
+            c.readFile(filePath)
 
         # movement titles can be stored in more than one place in musicxml
         # manually insert file name as a movementName title if no titles are defined
         if c.stream.metadata.movementName is None:
-            junk, fn = os.path.split(fp)
+            junk, fn = os.path.split(filePath)
             c.stream.metadata.movementName = fn  # this should become a Path
         self.stream = c.stream
 
@@ -1148,7 +1163,10 @@ class ConverterMidi(SubConverter):
         from music21.midi import translate as midiTranslate
         self.stream = midiTranslate.midiStringToStream(strData, **self.keywords)
 
-    def parseFile(self, fp, number=None, **keywords):
+    def parseFile(self,
+                  filePath: t.Union[pathlib.Path, str],
+                  number: t.Optional[int] = None,
+                  **keywords):
         '''
         Get MIDI data from a file path.
 
@@ -1160,7 +1178,7 @@ class ConverterMidi(SubConverter):
         in defaults.quantizationQuarterLengthDivisors. (Default: (4, 3)).
         '''
         from music21.midi import translate as midiTranslate
-        midiTranslate.midiFilePathToStream(fp, self.stream, **keywords)
+        midiTranslate.midiFilePathToStream(filePath, self.stream, **keywords)
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
         from music21.midi import translate as midiTranslate
@@ -1207,7 +1225,10 @@ class ConverterABC(SubConverter):
         else:  # just one work
             abcFormat.translate.abcToStreamScore(abcHandler, self.stream)
 
-    def parseFile(self, fp, number=None):
+    def parseFile(self,
+                  filePath: t.Union[pathlib.Path, str],
+                  number: t.Optional[int] = None,
+                  **keywords):
         '''
         Get ABC data from a file path. If more than one work is defined in the ABC
         data, a  :class:`~music21.stream.Opus` object will be returned;
@@ -1220,7 +1241,7 @@ class ConverterABC(SubConverter):
         from music21 import abcFormat
 
         af = abcFormat.ABCFile()
-        af.open(fp)
+        af.open(filePath)
         # returns a handler instance of parse tokens
         abcHandler = af.read(number=number)
         af.close()
@@ -1255,11 +1276,14 @@ class ConverterRomanText(SubConverter):
         else:
             romanTextTranslate.romanTextToStreamScore(rtHandler, self.stream)
 
-    def parseFile(self, fp, number=None):
+    def parseFile(self,
+                  filePath: t.Union[pathlib.Path, str],
+                  number: t.Optional[int] = None,
+                  **keywords):
         from music21.romanText import rtObjects
         from music21.romanText import translate as romanTextTranslate
-        rtf = rtObjects.RTFile()  # not sure why -- @UndefinedVariable
-        rtf.open(fp)
+        rtf = rtObjects.RTFile()
+        rtf.open(filePath)
         # returns a handler instance of parse tokens
         rtHandler = rtf.read()
         rtf.close()
@@ -1294,8 +1318,11 @@ class ConverterClercqTemperley(SubConverter):
         ctSong = clercqTemperley.CTSong(strData)
         self.stream = ctSong.toScore()
 
-    def parseFile(self, fp, number=None):
-        self.parseData(fp)
+    def parseFile(self,
+                  filePath: t.Union[pathlib.Path, str],
+                  number=None,
+                  **keywords):
+        self.parseData(filePath)
 
 
 class ConverterCapella(SubConverter):
@@ -1318,13 +1345,16 @@ class ConverterCapella(SubConverter):
         partScore = ci.partScoreFromSystemScore(scoreObj)
         self.stream = partScore
 
-    def parseFile(self, fp, number=None):
+    def parseFile(self,
+                  filePath: t.Union[str, pathlib.Path],
+                  number: t.Optional[int] = None,
+                  **keywords):
         '''
         Parse a Capella file
         '''
         from music21.capella import fromCapellaXML
         ci = fromCapellaXML.CapellaImporter()
-        self.stream = ci.scoreFromFile(fp)
+        self.stream = ci.scoreFromFile(filePath)
 
 
 # ------------------------------------------------------------------------------
@@ -1353,12 +1383,18 @@ class ConverterMuseData(SubConverter):
 
         musedataTranslate.museDataWorkToStreamScore(mdw, self.stream)
 
-    def parseFile(self, fp, number=None):
+    def parseFile(self,
+                  filePath: t.Union[str, pathlib.Path],
+                  number: t.Optional[int] = None,
+                  **keywords):
         '''
         parse fp (a pathlib.Path()) and number
         '''
-        if not isinstance(fp, pathlib.Path):
-            fp = pathlib.Path(fp)
+        fp: pathlib.Path
+        if not isinstance(filePath, pathlib.Path):
+            fp = pathlib.Path(filePath)
+        else:
+            fp = filePath
 
         from music21 import converter
         from music21 import musedata as musedataModule
@@ -1398,7 +1434,6 @@ class ConverterMEI(SubConverter):
     Converter for MEI. You must use an ".mei" file extension for MEI files because music21 will
     parse ".xml" files as MusicXML.
     '''
-
     registerFormats = ('mei',)
     registerInputExtensions = ('mei',)
     # NOTE: we're only working on import for now
@@ -1426,7 +1461,8 @@ class ConverterMEI(SubConverter):
     def parseFile(
         self,
         filePath: t.Union[str, pathlib.Path],
-        number=None
+        number: t.Optional[int] = None,
+        **keywords,
     ) -> 'music21.stream.Stream':
         '''
         Convert a file with an MEI document into its corresponding music21 elements.

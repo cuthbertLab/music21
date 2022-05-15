@@ -33,6 +33,7 @@ the temp folder on the disk.
 >>> s
 <music21.stream.Score ...>
 '''
+import collections.abc
 import copy
 import io
 import os
@@ -41,7 +42,7 @@ import pathlib
 import sys
 import types
 import unittest
-import urllib
+import urllib.request
 import zipfile
 
 from math import isclose
@@ -116,9 +117,9 @@ class ArchiveManager:
     # for info on mxl files, see
     # http://www.recordare.com/xml/compressed-mxl.html
 
-    def __init__(self, fp, archiveType='zip'):
-        self.fp = common.cleanpath(fp, returnPathlib=True)
-        self.archiveType = archiveType
+    def __init__(self, fp: t.Union[str, pathlib.Path], archiveType='zip'):
+        self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
+        self.archiveType: str = archiveType
 
     def isArchive(self) -> bool:
         '''
@@ -145,33 +146,36 @@ class ArchiveManager:
         '''
         Return a list of all names contained in this archive.
         '''
-        post = []
+        post: t.List[str] = []
         if self.archiveType == 'zip':
             with zipfile.ZipFile(self.fp, 'r') as f:
                 for subFp in f.namelist():
                     post.append(subFp)
         return post
 
-    def getData(self, name=None, dataFormat='musicxml'):
+    def getData(self, dataFormat='musicxml') -> t.Any:
         '''
-        Return data from the archive by name. If no name is given,
-        a default may be available.
+        Return data from the archive.
 
         For 'musedata' format this will be a list of strings.
         For 'musicxml' this will be a single string.
+
+        Changed in v.8 -- name is not used.
         '''
         post = None
         if self.archiveType != 'zip':
             raise ArchiveManagerException(f'no support for extension: {self.archiveType}')
 
         with zipfile.ZipFile(self.fp, 'r') as f:
-            post = self._extractContents(f, name, dataFormat)
+            post = self._extractContents(f, dataFormat)
 
         return post
 
-    def _extractContents(self, f: zipfile.ZipFile, name=None, dataFormat='musicxml'):
-        post = None
-        if name is None and dataFormat == 'musicxml':  # try to auto-harvest
+    def _extractContents(self,
+                         f: zipfile.ZipFile,
+                         dataFormat: str = 'musicxml') -> t.Any:
+        post: t.Any = None
+        if dataFormat == 'musicxml':  # try to auto-harvest
             # will return data as a string
             # note that we need to read the META-INF/container.xml file
             # and get the root file full-path
@@ -203,7 +207,7 @@ class ArchiveManager:
 
                 break
 
-        elif name is None and dataFormat == 'musedata':
+        elif dataFormat == 'musedata':
             # this might concatenate all parts into a single string
             # or, return a list of strings
             # alternative, a different method might return one at a time
@@ -251,23 +255,32 @@ class PickleFilter:
     returned.
     '''
 
-    def __init__(self, fp, forceSource=False, number=None, **keywords):
-        self.fp = common.cleanpath(fp, returnPathlib=True)
-        self.forceSource = forceSource
-        self.number = number
-        self.keywords = keywords
+    def __init__(self,
+                 fp: t.Union[str, pathlib.Path],
+                 forceSource: bool = False,
+                 number: t.Optional[int] = None,
+                 **keywords):
+        self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
+        self.forceSource: bool = forceSource
+        self.number: t.Optional[int] = number
+        self.keywords: t.Dict[str, t.Any] = keywords
         # environLocal.printDebug(['creating pickle filter'])
 
-    def getPickleFp(self, directory=None, zipType=None) -> pathlib.Path:
+    def getPickleFp(self,
+                    directory: t.Union[pathlib.Path, str, None] = None,
+                    zipType: t.Optional[str] = None) -> pathlib.Path:
         '''
         Returns the file path of the pickle file for this file.
 
         Returns a pathlib.Path
         '''
+        pathLibDirectory: pathlib.Path
         if directory is None:
-            directory = environLocal.getRootTempDir()  # pathlibPath
+            pathLibDirectory = environLocal.getRootTempDir()  # pathlibPath
         elif isinstance(directory, str):
-            directory = pathlib.Path(directory)
+            pathLibDirectory = pathlib.Path(directory)
+        else:
+            pathLibDirectory = directory
 
         if zipType is None:
             extension = '.p'
@@ -292,9 +305,9 @@ class PickleFilter:
             baseName += '-' + str(self.number)
         baseName += extension
 
-        return directory / baseName
+        return pathLibDirectory / baseName
 
-    def removePickle(self):
+    def removePickle(self) -> None:
         '''
         If a compressed pickled file exists, remove it from disk.
 
@@ -305,7 +318,7 @@ class PickleFilter:
         if pickleFp.exists():
             os.remove(pickleFp)
 
-    def status(self) -> t.Tuple[pathlib.Path, bool, pathlib.Path]:
+    def status(self) -> t.Tuple[pathlib.Path, bool, t.Optional[pathlib.Path]]:
         '''
         Given a file path specified with __init__, look for an up to date pickled
         version of this file path. If it exists, return its fp, otherwise return the
@@ -353,8 +366,11 @@ class PickleFilter:
 
 
 # ------------------------------------------------------------------------------
-_registeredSubconverters = []
-_deregisteredSubconverters = []  # default subconverters to skip
+_registeredSubconverters: t.List[t.Type[subConverters.SubConverter]] = []
+# default subconverters to skip
+_deregisteredSubconverters: t.List[
+    t.Union[t.Type[subConverters.SubConverter], t.Literal['all']]
+] = []
 
 
 def resetSubconverters():
@@ -394,7 +410,9 @@ def registerSubconverter(newSubConverter) -> None:
     _registeredSubconverters.append(newSubConverter)
 
 
-def unregisterSubconverter(removeSubconverter) -> None:
+def unregisterSubconverter(
+    removeSubconverter: t.Union[t.Literal['all'], t.Type[subConverters.SubConverter]]
+) -> None:
     # noinspection PyShadowingNames
     '''
     Remove a Subconverter from the list of registered subconverters.
@@ -456,28 +474,43 @@ class Converter:
     Not a subclass, but a wrapper for different converter objects based on format.
     '''
     _DOC_ATTR: t.Dict[str, str] = {
-        'subConverter': 'a ConverterXXX object that will do the actual converting.',
+        'subConverter':
+            '''
+            a :class:`~music21.converter.subConverters.SubConverter` object
+            that will do the actual converting.
+            ''',
     }
 
     def __init__(self):
-        self.subConverter = None
+        self.subConverter: t.Optional[subConverters.SubConverter] = None
         # a stream object unthawed
         self._thawedStream: t.Union[stream.Score, stream.Part, stream.Opus, None] = None
 
-    def _getDownloadFp(self, directory, ext, url):
-        if directory is None:
-            raise ValueError('Directory must be provided')
-
+    def _getDownloadFp(
+        self,
+        directory: t.Union[pathlib.Path, str],
+        ext: str,
+        url: str,
+    ):
+        directoryPathlib: pathlib.Path
         if isinstance(directory, str):
-            directory = pathlib.Path(directory)
+            directoryPathlib = pathlib.Path(directory)
+        else:
+            directoryPathlib = directory
 
         filename = 'm21-' + _version.__version__ + '-' + common.getMd5(url) + ext
-        return directory / filename
+        return directoryPathlib / filename
 
     # pylint: disable=redefined-builtin
     # noinspection PyShadowingBuiltins
-    def parseFileNoPickle(self, fp, number=None,
-                          format=None, forceSource=False, **keywords):
+    def parseFileNoPickle(
+        self,
+        fp: t.Union[pathlib.Path, str],
+        number: t.Optional[int] = None,
+        format: t.Optional[str] = None,
+        forceSource: bool = False,
+        **keywords
+    ):
         '''
         Given a file path, parse and store a music21 Stream.
 
@@ -486,25 +519,35 @@ class Converter:
 
         Does not use or store pickles in any circumstance.
         '''
-        fp = common.cleanpath(fp, returnPathlib=True)
+        fpPathlib: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
         # environLocal.printDebug(['attempting to parseFile', fp])
-        if not fp.exists():
+        if not fpPathlib.exists():
             raise ConverterFileException(f'no such file exists: {fp}')
         useFormat = format
 
         if useFormat is None:
-            useFormat = self.getFormatFromFileExtension(fp)
+            useFormat = self.getFormatFromFileExtension(fpPathlib)
 
         self.setSubconverterFromFormat(useFormat)
+        if t.TYPE_CHECKING:
+            assert isinstance(self.subConverter, subConverters.SubConverter)
+
         self.subConverter.keywords = keywords
         try:
-            self.subConverter.parseFile(fp, number=number, **keywords)
+            self.subConverter.parseFile(
+                fp,
+                number=number,
+                **keywords
+            )
         except NotImplementedError:
             raise ConverterFileException(f'File is not in a correct format: {fp}')
 
-        self.stream.filePath = str(fp)
-        self.stream.fileNumber = number
-        self.stream.fileFormat = useFormat
+        if t.TYPE_CHECKING:
+            assert isinstance(self.stream, stream.Stream)
+
+        self.stream.metadata.filePath = str(fpPathlib)
+        self.stream.metadata.fileNumber = number
+        self.stream.metadata.fileFormat = useFormat
 
     def getFormatFromFileExtension(self, fp):
         # noinspection PyShadowingNames
@@ -580,8 +623,14 @@ class Converter:
                 self.stream.fileNumber = number
                 self.stream.fileFormat = useFormat
 
-    def parseData(self, dataStr, number=None,
-                  format=None, forceSource=False, **keywords) -> None:
+    def parseData(
+        self,
+        dataStr: t.Union[str, bytes],
+        number=None,
+        format=None,
+        forceSource=False,
+        **keywords,
+    ) -> None:
         '''
         Given raw data, determine format and parse into a music21 Stream,
         set as self.stream.
@@ -630,16 +679,20 @@ class Converter:
                                          dataStrMakeStr)
 
         self.setSubconverterFromFormat(useFormat)
+        if t.TYPE_CHECKING:
+            assert isinstance(self.subConverter, subConverters.SubConverter)
         self.subConverter.keywords = keywords
         self.subConverter.parseData(dataStr, number=number)
 
-    def parseURL(self,
-                 url,
-                 *,
-                 format=None,
-                 number=None,
-                 forceSource=False,
-                 **keywords) -> None:
+    def parseURL(
+        self,
+        url: str,
+        *,
+        format: t.Optional[str] = None,
+        number: t.Optional[int] = None,
+        forceSource: bool = False,
+        **keywords,
+    ) -> None:
         '''
         Given a url, download and parse the file
         into a music21 Stream stored in the `stream`
@@ -699,13 +752,22 @@ class Converter:
             useFormat = common.findFormatFile(fp)
         else:
             useFormat = format
+        if useFormat is None:
+            raise ConverterException(f'Cannot automatically find a format for {fp!r}')
+
         self.setSubconverterFromFormat(useFormat)
+        if t.TYPE_CHECKING:
+            assert isinstance(self.subConverter, subConverters.SubConverter)
+
         self.subConverter.keywords = keywords
         self.subConverter.parseFile(fp, number=number)
-        self.stream.filePath = fp  # These are attributes defined outside of
-        self.stream.fileNumber = number  # __init__ and will be moved to
-        self.stream.fileFormat = useFormat  # Metadata in v8.
-        # TODO: v8 -- move to Metadata
+
+        if self.stream is None:
+            raise ConverterException(f'Could not create a Stream via a subConverter')
+        self.stream.metadata.filePath = fp
+        self.stream.metadata.fileNumber = number
+        self.stream.metadata.fileFormat = useFormat
+
 
     # -----------------------------------------------------------------------#
     # Subconverters
@@ -777,6 +839,8 @@ class Converter:
         else:
             subConverterList.extend(self.defaultSubconverters())
             for unregistered in _deregisteredSubconverters:
+                if unregistered == 'all':
+                    continue
                 try:
                     subConverterList.remove(unregistered)
                 except ValueError:
@@ -900,7 +964,10 @@ class Converter:
         subConverterClass = scf[converterFormat]
         self.subConverter = subConverterClass()
 
-    def formatFromHeader(self, dataStr: str) -> t.Tuple[str, str]:
+    def formatFromHeader(
+        self,
+        dataStr: t.Union[str, bytes]
+    ) -> t.Tuple[t.Optional[str], str]:
         '''
         if dataStr begins with a text header such as  "tinyNotation:" then
         return that format plus the dataStr with the head removed.
@@ -929,9 +996,10 @@ class Converter:
         ('sonix', 'AIFF data')
         >>> converter.resetSubconverters() #_DOCS_HIDE
         '''
-        dataStrStartLower = dataStr[:20].lower()
-        if isinstance(dataStrStartLower, bytes):
-            dataStrStartLower = dataStrStartLower.decode('utf-8', 'ignore')
+        if isinstance(dataStr, bytes):
+            dataStrStartLower = dataStr[:20].decode('utf-8', 'ignore').lower()
+        else:
+            dataStrStartLower = dataStr[:20].lower()
 
         foundFormat = None
         subconverterList = self.subconvertersList()
@@ -942,7 +1010,10 @@ class Converter:
                     dataStr = dataStr[len(foundFormat) + 1:]
                     dataStr = dataStr.lstrip()
                     break
-        return (foundFormat, dataStr)
+        if isinstance(dataStr, bytes):
+            return (foundFormat, dataStr.decode('utf-8', 'ignore'))
+        else:
+            return (foundFormat, dataStr)
 
     def regularizeFormat(self, fmt: str) -> t.Optional[str]:
         '''
@@ -1046,6 +1117,8 @@ def parseFile(fp,
     v = Converter()
     fp = common.cleanpath(fp, returnPathlib=True)
     v.parseFile(fp, number=number, format=format, forceSource=forceSource, **keywords)
+    if t.TYPE_CHECKING:
+        assert isinstance(v.stream, (stream.Score, stream.Part, stream.Opus))
     return v.stream
 
 # pylint: disable=redefined-builtin
@@ -1060,6 +1133,8 @@ def parseData(dataStr,
     '''
     v = Converter()
     v.parseData(dataStr, number=number, format=format, **keywords)
+    if t.TYPE_CHECKING:
+        assert isinstance(v.stream, (stream.Score, stream.Part, stream.Opus))
     return v.stream
 
 # pylint: disable=redefined-builtin
@@ -1079,6 +1154,8 @@ def parseURL(url,
     '''
     v = Converter()
     v.parseURL(url, format=format, forceSource=forceSource, **keywords)
+    if t.TYPE_CHECKING:
+        assert isinstance(v.stream, (stream.Score, stream.Part, stream.Opus))
     return v.stream
 
 
@@ -1169,17 +1246,33 @@ def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
         valueStr = ''
 
     if (common.isListLike(value)
-            and len(value) == 2
-            and value[1] is None
-            and _osCanLoad(str(value[0]))):
+        and isinstance(value, collections.abc.Sequence)
+        and len(value) == 2
+        and value[1] is None
+        and _osCanLoad(str(value[0]))
+    ):
         # comes from corpus.search
         return parseFile(value[0], format=m21Format, **keywords)
     elif (common.isListLike(value)
+          and isinstance(value, collections.abc.Sequence)
           and len(value) == 2
           and isinstance(value[1], int)
           and _osCanLoad(str(value[0]))):
         # corpus or other file with movement number
-        return parseFile(value[0], format=m21Format, **keywords).getScoreByNumber(value[1])
+        if not isinstance(value[0], str):
+            raise ConverterException(
+                f'If using a two-element list, the first value must be a string, not {value[0]!r}'
+            )
+        if not isinstance(value[1], int):
+            raise ConverterException(
+                'If using a two-element list, the second value must be an integer number, '
+                f'not {value[1]!r}'
+            )
+        sc = parseFile(value[0], format=m21Format, **keywords)
+        if isinstance(sc, stream.Opus):
+            return sc.getScoreByNumber(value[1])
+        else:
+            return sc
     # a midi string, must come before os.path.exists test
     elif not isinstance(value, bytes) and valueStr.startswith('MThd'):
         return parseData(value, number=number, format=m21Format, **keywords)
