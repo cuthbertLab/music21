@@ -9809,7 +9809,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if container.getElementsByClass(note.GeneralNote):
                 lastContainerEnd = container.highestTime
 
-            # Filter out all but notes and rests
+            # Filter out all but notes and rests and chords, etc.
             for e in container.getElementsByClass(note.GeneralNote):
                 if (lastWasNone is False
                         and skipGaps is False
@@ -9819,8 +9819,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         lastWasNone = True
                 if isinstance(e, note.Note):
                     if not(skipUnisons is False
-                           or not lastPitches
-                           or len(lastPitches) > 1
+                           or len(lastPitches) != 1
                            or e.pitch.pitchClass != lastPitches[0].pitchClass
                            or (skipOctaves is False
                                 and e.pitch.ps != lastPitches[0].ps)):
@@ -9846,17 +9845,16 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                             lastPitches = ()
                     # if we have a chord
                     elif (not (skipUnisons is True
-                                and lastPitches
-                                and e.pitches[0].ps == lastPitches[0].ps
-                               ) and (getOverlaps is True or e.offset >= lastEnd)):
+                                and len(lastPitches) == len(e.pitches)
+                                and (p.ps for p in e.pitches) == (p.ps for p in lastPitches)
+                               )
+                          and (getOverlaps is True or e.offset >= lastEnd)):
                         returnList.append(e)
                         if e.offset < lastEnd:  # is an overlap...
                             continue
 
                         lastStart = e.offset
                         lastEnd = opFrac(lastStart + e.duration.quarterLength)
-                        # this is the case where the last pitch is
-                        # a list
                         lastPitches = e.pitches
                         lastWasNone = False
 

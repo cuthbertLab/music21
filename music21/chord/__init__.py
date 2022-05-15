@@ -1404,7 +1404,6 @@ class Chord(ChordBase):
             self._cache['bass'] = self._findBass()
             return self._cache['bass']
 
-
     def canBeDominantV(self) -> bool:
         '''
         Returns True if the chord is a Major Triad or a Dominant Seventh:
@@ -1440,13 +1439,33 @@ class Chord(ChordBase):
         else:
             return False
 
+    @overload
+    def closedPosition(
+        self: _ChordType,
+        *,
+        forceOctave,
+        inPlace: t.Literal[True],
+        leaveRedundantPitches=False
+    ) -> None:
+        return None
+
+    @overload
+    def closedPosition(
+        self: _ChordType,
+        *,
+        forceOctave=None,
+        inPlace: t.Literal[False] = False,
+        leaveRedundantPitches=False
+    ) -> _ChordType:
+        return self
+
     def closedPosition(
         self: _ChordType,
         *,
         forceOctave=None,
         inPlace=False,
         leaveRedundantPitches=False
-    ) -> _ChordType:
+    ) -> t.Optional[_ChordType]:
         '''
         Returns a new Chord object with the same pitch classes,
         but now in closed position.
@@ -4901,7 +4920,7 @@ class Chord(ChordBase):
         >>> c.duration is d
         True
         '''
-        d = t.cast(t.Union[Duration, None], self._duration)
+        d = t.cast(t.Union[Duration, None], self._duration)  # type: ignore
         if d is None and self._notes:
             # pitchZeroDuration = self._notes[0]['pitch'].duration
             pitchZeroDuration = self._notes[0].duration
@@ -4909,7 +4928,7 @@ class Chord(ChordBase):
 
         d_out = self._duration
         if t.TYPE_CHECKING:
-            assert d_out is not None
+            assert isinstance(d_out, Duration)
         return d_out
 
     @duration.setter
