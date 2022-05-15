@@ -22,7 +22,6 @@ from __future__ import annotations
 # but most define a parseData() method,
 # a parseFile() method, and a .stream attribute or property.
 import base64
-import io
 import os
 import pathlib
 import subprocess
