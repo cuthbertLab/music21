@@ -76,7 +76,7 @@ class StreamPlayer:  # pragma: no cover
     def __init__(self, streamIn, **keywords):
         try:
             # noinspection PyPackageRequirements
-            import pygame
+            import pygame  # type: ignore
             self.pygame = pygame
         except ImportError:
             raise StreamPlayerException('StreamPlayer requires pygame.  Install first')
