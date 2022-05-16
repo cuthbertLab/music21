@@ -96,9 +96,12 @@ def slashCompoundToFraction(value: str) -> NumDenomTuple:
 @lru_cache(512)
 def slashMixedToFraction(valueSrc: str) -> t.Tuple[NumDenomTuple, bool]:
     '''
-    Given a mixture if possible meter fraction representations, return a list
-    of pairs. If originally given as a summed numerator; break into separate
-    fractions and return True as the second element of the tuple
+    Given a mixture if possible meter fraction representations, return a tuple
+    of two elements: The first element is a tuple of pairs of numerator, denominators
+    that are implied by the time signature.
+
+    The second element is False if the value was a simple time signature (like 4/4)
+    or a composite meter where all numerators had their own denominators.
 
     >>> meter.tools.slashMixedToFraction('4/4')
     (((4, 4),), False)
@@ -140,10 +143,10 @@ def slashMixedToFraction(valueSrc: str) -> t.Tuple[NumDenomTuple, bool]:
             except MeterException as me:
                 raise TimeSignatureException(
                     f'Cannot create time signature from "{valueSrc}"') from me
-            pre.append([tup.numerator, tup.denominator])
+            pre.append((tup.numerator, tup.denominator))
         else:  # its just a numerator
             try:
-                pre.append([int(part), None])
+                pre.append((int(part), None))
             except ValueError:
                 raise Music21Exception(
                     'Cannot parse this file -- this error often comes '
@@ -156,21 +159,23 @@ def slashMixedToFraction(valueSrc: str) -> t.Tuple[NumDenomTuple, bool]:
     # and apply to all previous
     for i in range(len(pre)):
         if pre[i][1] is not None:  # there is a denominator
+            intNum = pre[i][0]  # this is all for type checking
+            intDenom = pre[i][1]
             if t.TYPE_CHECKING:
-                assert isinstance(pre[i][0], int) and isinstance(pre[i][1], int)
-            post.append(tuple(pre[i]))
+                assert isinstance(intNum, int) and isinstance(intDenom, int)
+            post.append((intNum, intDenom))
         else:  # search ahead for next defined denominator
             summedNumerator = True
-            match = None
-            for j in range(i, len(pre)):
+            match: t.Optional[int] = None
+            for j in range(i, len(pre)):  # this O(n^2) operation is easily simplified to O(n)
                 if pre[j][1] is not None:
                     match = pre[j][1]
                     break
             if match is None:
                 raise MeterException(f'cannot match denominator to numerator in: {valueSrc}')
 
-            pre[i][1] = match
-            post.append(tuple(pre[i]))
+            preBothAreInts = (pre[i][0], match)
+            post.append(preBothAreInts)
 
     return tuple(post), summedNumerator
 
@@ -187,8 +192,10 @@ def fractionToSlashMixed(fList: NumDenomTuple) -> t.Tuple[t.Tuple[str, int], ...
 
     Changed in v7 -- new location and returns a tuple.
     '''
-    pre = []
+    pre: t.List[t.Tuple[t.List[int], int]] = []
     for i in range(len(fList)):
+        n: int
+        d: int
         n, d = fList[i]
         # look at previous fraction and determine if denominator is the same
 
@@ -203,16 +210,17 @@ def fractionToSlashMixed(fList: NumDenomTuple) -> t.Tuple[t.Tuple[str, int], ...
                 break  # if not found in one less
 
         if match is None:
-            pre.append([[n], d])
+            pre.append(([n], d))
         else:  # append numerator
             pre[match][0].append(n)
+
     # create string representation
-    post = []
+    post: t.List[t.Tuple[str, int]] = []
     for part in pre:
-        n = [str(x) for x in part[0]]
-        n = '+'.join(n)
-        d = part[1]
-        post.append((n, d))
+        nStrList = [str(x) for x in part[0]]
+        nStr = '+'.join(nStrList)
+        dInt = part[1]
+        post.append((nStr, dInt))
 
     return tuple(post)
 
@@ -572,6 +580,7 @@ def divisionOptionsAlgo(n, d) -> MeterOptions:
     (('1/128', '1/128', '1/128'), ('3/128',))
     '''
     opts = []
+    group: t.Tuple[int, ...]
 
     # compound meters; 6, 9, 12, 15, 18
     # 9/4, 9/2, 6/2 are all considered compound without d>4
