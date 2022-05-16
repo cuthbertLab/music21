@@ -283,7 +283,7 @@ class PitchClef(Clef):
 
     def __init__(self):
         super().__init__()
-        self.lowestLine: t.Optional[int] = None
+        self.lowestLine: int = 31
 
     @property
     def octaveChange(self) -> int:
@@ -416,8 +416,11 @@ class GClef(PitchClef):
     >>> a = clef.GClef()
     >>> a.sign
     'G'
-    >>> a.lowestLine is None
-    True
+
+    If not defined, the lowestLine is set as a Treble Clef (E4 = 31)
+
+    >>> a.lowestLine
+    31
     '''
 
     def __init__(self):

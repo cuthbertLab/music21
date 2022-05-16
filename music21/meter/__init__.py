@@ -11,7 +11,9 @@
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from music21.exceptions21 import TimeSignatureException, MeterException
-from music21.meter.base import TimeSignature, bestTimeSignature, SenzaMisuraTimeSignature
+from music21.meter.base import (
+    TimeSignature, bestTimeSignature, SenzaMisuraTimeSignature, TimeSignatureBase,
+)
 from music21.meter import core
 from music21.meter import tests
 from music21.meter import tools

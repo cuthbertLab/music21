@@ -250,9 +250,14 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
 
 
 # -----------------------------------------------------------------------------
+class TimeSignatureBase(base.Music21Object):
+    '''
+    A base class for TimeSignature and SenzaMisuraTimeSignature to
+    inherit from.
+    '''
+    pass
 
-
-class TimeSignature(base.Music21Object):
+class TimeSignature(TimeSignatureBase):
     r'''
     The `TimeSignature` object represents time signatures in musical scores
     (4/4, 3/8, 2/4+5/16, Cut, etc.).
@@ -2013,7 +2018,7 @@ class TimeSignature(base.Music21Object):
 
 
 # -----------------------------------------------------------------------------
-class SenzaMisuraTimeSignature(base.Music21Object):
+class SenzaMisuraTimeSignature(TimeSignatureBase):
     '''
     A SenzaMisuraTimeSignature represents the absence of a TimeSignature
 

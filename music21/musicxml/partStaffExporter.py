@@ -27,7 +27,11 @@ from music21 import stream  # for typing
 from music21.musicxml import helpers
 from music21.musicxml.xmlObjects import MusicXMLExportException, MusicXMLWarning
 
-def addStaffTags(measure: Element, staffNumber: int, tagList: t.Optional[t.List[str]] = None):
+def addStaffTags(
+    measure: Element,
+    staffNumber: int,
+    tagList: t.List[str]
+):
     '''
     For a <measure> tag `measure`, add a <staff> grandchild to any instance of
     a child tag of a type in `tagList`.
@@ -73,7 +77,7 @@ def addStaffTags(measure: Element, staffNumber: int, tagList: t.Optional[t.List[
         for tag in measure.findall(tagName):
             if tag.find('staff') is not None:
                 e = MusicXMLExportException('Attempted to create a second <staff> tag')
-                e.measureNumber = measure.get('number')
+                e.measureNumber = m if (m := measure.get('number')) else ''
                 raise e
             mxStaff = Element('staff')
             mxStaff.text = str(staffNumber)
@@ -146,6 +150,7 @@ class PartStaffExporterMixin:
             self.cleanUpSubsequentPartStaffs(group)
 
     def joinableGroups(self) -> t.List[StaffGroup]:
+        # noinspection PyShadowingNames
         '''
         Returns a list of :class:`~music21.layout.StaffGroup` objects that
         represent :class:`~music21.stream.base.PartStaff` objects that can be
@@ -225,7 +230,10 @@ class PartStaffExporterMixin:
          <music21.layout.StaffGroup <... p2a><... p2b>>,
          <music21.layout.StaffGroup <... p6a><... p6b>>]
         '''
-        staffGroups = self.stream.getElementsByClass(StaffGroup)
+        if t.TYPE_CHECKING:
+            from music21.musicxml.m21ToXml import XMLExporterBase
+            assert isinstance(self, XMLExporterBase)
+        staffGroups = list(s.getElementsByClass(StaffGroup)) if (s := self.stream) else []
         joinableGroups: t.List[StaffGroup] = []
         # Joinable groups must consist of only PartStaffs with Measures
         # and exist in self.stream
@@ -327,7 +335,7 @@ class PartStaffExporterMixin:
                     )
                 except MusicXMLExportException as e:
                     e.partName = ps.partName
-                    e.measureNumber = mxMeasure.get('number')
+                    e.measureNumber = m_num if (m_num := mxMeasure.get('number')) else ''
                     raise e
 
             if initialPartStaffRoot is None:
@@ -406,13 +414,19 @@ class PartStaffExporterMixin:
                 continue
 
             # Or, gap in measure numbers in the subsequent part: keep iterating through target
-            if helpers.measureNumberComesBefore(targetNumber, sourceNumber):
+            if (sourceNumber is not None
+                   and targetNumber is not None
+                   and helpers.measureNumberComesBefore(targetNumber, sourceNumber)):
                 continue  # sourceMeasure is not None!
 
             # Or, gap in measure numbers in target: record necessary insertions until gap is closed
-            while helpers.measureNumberComesBefore(sourceNumber, targetNumber):
+            while (sourceNumber is not None
+                   and targetNumber is not None
+                   and helpers.measureNumberComesBefore(sourceNumber, targetNumber)):
                 if i not in insertions:
                     insertions[i] = []
+                if t.TYPE_CHECKING:
+                    assert isinstance(sourceNumber, str)
                 insertions[i] += [makeDivider(sourceNumber), sourceMeasure]
                 try:
                     sourceMeasure = next(sourceMeasures)
@@ -428,9 +442,15 @@ class PartStaffExporterMixin:
             remainingMeasures.insert(0, sourceMeasure)
         for remaining in remainingMeasures:
             sourceNumber = remaining.get('number')
+            if sourceNumber is None:
+                continue
+
             idx = len(target)
             if idx not in insertions:
                 insertions[idx] = []
+            if t.TYPE_CHECKING:
+                assert isinstance(sourceNumber, str)
+
             insertions[idx] += [makeDivider(sourceNumber), remaining]
         return insertions
 
@@ -551,7 +571,7 @@ class PartStaffExporterMixin:
             if initialPartStaffRoot is None:
                 initialPartStaffRoot = self.getRootForPartStaff(ps)
                 mxAttributes = initialPartStaffRoot.find('measure/attributes')
-                clef1: t.Optional[Element] = mxAttributes.find('clef')
+                clef1: t.Optional[Element] = mxAttributes.find('clef') if mxAttributes else None
                 if clef1 is not None:
                     clef1.set('number', '1')
 
@@ -564,11 +584,11 @@ class PartStaffExporterMixin:
                                 'transpose', 'directive', 'measure-style']
                 )
 
-                if multiKey:
+                if multiKey and mxAttributes is not None:
                     key1 = mxAttributes.find('key')
                     if key1:
                         key1.set('number', '1')
-                if multiMeter:
+                if multiMeter and mxAttributes is not None:
                     meter1 = mxAttributes.find('time')
                     if meter1:
                         meter1.set('number', '1')
@@ -588,9 +608,13 @@ class PartStaffExporterMixin:
                     newClef = Element('clef')
                     newClef.set('number', str(staffNumber))
                     newSign = SubElement(newClef, 'sign')
-                    newSign.text = oldClef.find('sign').text
+                    newSign.text = (oldClefSign.text
+                                    if (oldClefSign := oldClef.find('sign')) is not None
+                                    else None)
                     newLine = SubElement(newClef, 'line')
-                    newLine.text = oldClef.find('line').text
+                    newLine.text = (foundLine.text
+                                    if (foundLine := oldClef.find('line')) is not None
+                                    else '')
                     helpers.insertBeforeElements(
                         mxAttributes,
                         newClef,
@@ -693,7 +717,9 @@ class PartStaffExporterMixin:
         otherMeasureLackedVoice: bool = False
 
         for other_voice in otherMeasure.findall('*/voice'):
-            maxVoices = max(maxVoices, int(other_voice.text))
+            otherVoiceText = other_voice.text
+            if otherVoiceText is not None:
+                maxVoices = max(maxVoices, int(otherVoiceText))
 
         if maxVoices == 0:
             otherMeasureLackedVoice = True
@@ -713,11 +739,17 @@ class PartStaffExporterMixin:
         # Create <backup>
         amountToBackup: int = 0
         for dur in otherMeasure.findall('note/duration'):
-            amountToBackup += int(dur.text)
+            backupDurText = dur.text
+            if backupDurText is not None:
+                amountToBackup += int(backupDurText)
         for dur in otherMeasure.findall('forward/duration'):
-            amountToBackup += int(dur.text)
+            forwardDurText = dur.text
+            if forwardDurText is not None:
+                amountToBackup += int(forwardDurText)
         for backupDur in otherMeasure.findall('backup/duration'):
-            amountToBackup -= int(backupDur.text)
+            backupDurText = backupDur.text
+            if backupDurText is not None:
+                amountToBackup -= int(backupDurText)
         if amountToBackup:
             mxBackup = Element('backup')
             mxDuration = SubElement(mxBackup, 'duration')
@@ -742,7 +774,7 @@ class PartStaffExporterMixin:
             if elem.tag == 'note':
                 voice = elem.find('voice')
                 if voice is not None:
-                    if otherMeasureLackedVoice:
+                    if otherMeasureLackedVoice and voice.text:
                         # otherMeasure assigned voice 1; Bump voice number here
                         voice.text = str(int(voice.text) + 1)
                     else:
@@ -908,6 +940,8 @@ class Test(unittest.TestCase):
         root = self.getET(s)
         measures = root.findall('.//measure')
         notes = root.findall('.//note')
+        # from music21.musicxml.helpers import dump
+        # dump(root)
         self.assertEqual(len(measures), 2)
         self.assertEqual(len(notes), 12)
 
