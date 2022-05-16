@@ -484,7 +484,7 @@ class MidiEvent(prebase.ProtoM21Object):
         # store a reference to a corresponding event
         # if a noteOn, store the note off, and vice versa
         # circular ref -- but modern Python will garbage collect it.
-        self.correspondingEvent = None
+        self.correspondingEvent: t.Optional[MidiEvent] = None
 
         # store and pass on a running status if found
         self.lastStatusByte: t.Optional[int] = None
@@ -613,7 +613,6 @@ class MidiEvent(prebase.ProtoM21Object):
         >>> me1.setPitchBend(0)
         >>> me1.parameter1, me1.parameter2
         (0, 64)
-
 
         Parameter 2 is the most significant digit, not
         parameter 1.
@@ -998,8 +997,13 @@ class MidiEvent(prebase.ProtoM21Object):
                 return s + self.data
             except (UnicodeDecodeError, TypeError):
                 # environLocal.printDebug(['cannot decode data', self.data])
-                return s + unicodedata.normalize('NFKD',
-                                                 self.data).encode('ascii', 'ignore')
+
+                # normalize can take bytes.
+                # noinspection PyTypeChecker
+                return s + unicodedata.normalize(
+                    'NFKD',
+                    self.data
+                ).encode('ascii', 'ignore')
         else:
             raise MidiException(f'unknown midi event type: {self.type!r}')
 
