@@ -17,7 +17,7 @@ import unittest
 from collections import namedtuple
 import typing as t
 
-import webcolors
+import webcolors  # type: ignore
 
 # TODO: Move _missingImport to environment or common so this is unnecessary.
 from music21.base import _missingImport
@@ -44,12 +44,12 @@ def getExtendedModules():
     if 'matplotlib' in _missingImport:
         raise GraphException(
             'could not find matplotlib, graphing is not allowed')  # pragma: no cover
-    import matplotlib
+    import matplotlib  # type: ignore  # eventually: https://pypi.org/project/data-science-types/
     # backend can be configured from config file, matplotlibrc,
     # but an early test broke all processing
     # matplotlib.use('WXAgg')
     try:
-        from mpl_toolkits.mplot3d import Axes3D
+        from mpl_toolkits.mplot3d import Axes3D  # type: ignore
     except ImportError:  # pragma: no cover
         Axes3D = None
         environLocal.warn(
@@ -61,11 +61,11 @@ def getExtendedModules():
     from matplotlib import patches
 
     # from matplotlib.colors import colorConverter
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt  # type: ignore
 
     try:
         # noinspection PyPackageRequirements
-        import networkx
+        import networkx  # type: ignore
     except ImportError:  # pragma: no cover
         networkx = None  # use for testing
 
