@@ -1271,7 +1271,7 @@ class NotRest(GeneralNote):
     def getInstrument(self,
                       *,
                       returnDefault: t.Literal[False]
-                          ) -> t.Optional['music21.instrument.Instrument']:
+                      ) -> t.Optional['music21.instrument.Instrument']:
         return None  # astroid #1015
 
     def getInstrument(self,
