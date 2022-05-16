@@ -150,6 +150,7 @@ class PartStaffExporterMixin:
             self.cleanUpSubsequentPartStaffs(group)
 
     def joinableGroups(self) -> t.List[StaffGroup]:
+        # noinspection PyShadowingNames
         '''
         Returns a list of :class:`~music21.layout.StaffGroup` objects that
         represent :class:`~music21.stream.base.PartStaff` objects that can be
@@ -441,7 +442,7 @@ class PartStaffExporterMixin:
             remainingMeasures.insert(0, sourceMeasure)
         for remaining in remainingMeasures:
             sourceNumber = remaining.get('number')
-            if sourceMeasure is None:
+            if sourceNumber is None:
                 continue
 
             idx = len(target)
@@ -939,6 +940,8 @@ class Test(unittest.TestCase):
         root = self.getET(s)
         measures = root.findall('.//measure')
         notes = root.findall('.//note')
+        # from music21.musicxml.helpers import dump
+        # dump(root)
         self.assertEqual(len(measures), 2)
         self.assertEqual(len(notes), 12)
 

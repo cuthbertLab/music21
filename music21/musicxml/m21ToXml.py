@@ -2527,7 +2527,7 @@ class PartExporter(XMLExporterBase):
         self.xmlRoot = Element('part')
 
         if parent is None:
-            self.meterStream: stream.Stream[meter.TimeSignature] = stream.Stream()
+            self.meterStream: stream.Stream[meter.TimeSignatureBase] = stream.Stream()
             self.refStreamOrTimeRange = [0.0, 0.0]
             self.midiChannelList = []
             self.makeNotation = True
@@ -3751,9 +3751,8 @@ class MeasureExporter(XMLExporterBase):
                 sdText = 'none'
             mxStem.text = sdText
             if (chordOrN.hasStyleInformation
-                and isinstance(chordOrN.style, style.NoteStyle)
-                and chordOrN.style.stemStyle is not None
-            ):
+                    and isinstance(chordOrN.style, style.NoteStyle)
+                    and chordOrN.style.stemStyle is not None):
                 self.setColor(mxStem, chordOrN.style.stemStyle)
                 self.setPosition(mxStem, chordOrN.style.stemStyle)
 
