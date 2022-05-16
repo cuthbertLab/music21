@@ -17,7 +17,6 @@ import unittest
 import math
 import copy
 import typing as t
-from typing import overload
 import warnings
 
 from music21 import chord
