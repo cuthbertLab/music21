@@ -126,6 +126,9 @@ def textStripValid(mxObj: ET.Element):
     '''
     if not textNotNone(mxObj):
         return False
+    if t.TYPE_CHECKING:
+        assert mxObj.text is not None
+
     if not mxObj.text.strip():
         return False
     return True
@@ -1340,6 +1343,8 @@ class MusicXMLImporter(XMLParserBase):
         # TODO: encoding-description (string) multiple
         for software in encoding.findall('software'):
             if textStripValid(software):
+                if t.TYPE_CHECKING:
+                    assert software.text is not None
                 md.software.append(software.text.strip())
 
         for supports in encoding.findall('supports'):
@@ -1698,6 +1703,9 @@ class PartParser(XMLParserBase):
             i: instrument.Instrument, mxScoreInstrument: ET.Element) -> instrument.Instrument:
         mxInstrumentName = mxScoreInstrument.find('instrument-name')
         if mxInstrumentName is not None and textStripValid(mxInstrumentName):
+            if t.TYPE_CHECKING:
+                assert mxInstrumentName.text is not None
+
             previous_midi_channel = i.midiChannel
             try:
                 i = instrument.fromString(mxInstrumentName.text.strip())
@@ -2537,6 +2545,9 @@ class MeasureParser(XMLParserBase):
         '''
         mxDuration = mxObj.find('duration')
         if mxDuration is not None and textStripValid(mxDuration):
+            if t.TYPE_CHECKING:
+                assert mxDuration.text is not None
+
             change = common.numberTools.opFrac(
                 float(mxDuration.text.strip()) / self.divisions
             )
@@ -2552,6 +2563,8 @@ class MeasureParser(XMLParserBase):
         '''
         mxDuration = mxObj.find('duration')
         if mxDuration is not None and textStripValid(mxDuration):
+            if t.TYPE_CHECKING:
+                assert mxDuration.text is not None
             change = common.numberTools.opFrac(
                 float(mxDuration.text.strip()) / self.divisions
             )
@@ -2671,15 +2684,16 @@ class MeasureParser(XMLParserBase):
             isChord = True  # first note of chord is not identified.
             voiceOfChord = mxNote.find('voice')
             if voiceOfChord is not None:
-                vIndex = voiceOfChord.text
-                try:
-                    vIndex = int(vIndex)
-                except ValueError:
-                    pass
+                vIndex: t.Union[str, int, None] = voiceOfChord.text
+                if isinstance(vIndex, str):
+                    try:
+                        vIndex = int(vIndex)
+                    except ValueError:
+                        pass
                 self.lastVoice = vIndex
 
         if isChord is True:  # and isRest is False...?
-            n = None  # fo linting
+            n = None  # for linting
             self.mxNoteList.append(mxNote)
             # store lyrics for latter processing
             for mxLyric in mxNote.findall('lyric'):
@@ -2692,6 +2706,9 @@ class MeasureParser(XMLParserBase):
             n = self.xmlToRest(mxNote)
 
         if isChord is False:  # normal note or rest...
+            if t.TYPE_CHECKING:
+                assert isinstance(n, note.GeneralNote)
+
             self.updateLyricsFromList(n, mxNote.findall('lyric'))
             self.addToStaffReference(mxNote, n)
             self.insertInMeasureOrVoice(mxNote, n)
@@ -2772,7 +2789,7 @@ class MeasureParser(XMLParserBase):
         if any(mxNote.find('unpitched') for mxNote in mxNoteList):
             c = percussion.PercussionChord(notes)
         else:
-            c = chord.Chord(notes)
+            c = chord.Chord(notes)  # type: ignore  # they are all Notes.
 
         # move beams from first note (TODO: confirm style moved already?)
         if notes:
@@ -2950,9 +2967,9 @@ class MeasureParser(XMLParserBase):
         self.setColor(mxBeam, beamOut)
         self.setStyleAttributes(mxBeam, beamOut, 'fan', 'fan')
 
-        try:
+        if isinstance(mxBeam.text, str):
             mxType = mxBeam.text.strip()
-        except AttributeError:
+        else:
             mxType = 'begin'
 
         if mxType == 'begin':

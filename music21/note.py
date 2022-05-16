@@ -21,6 +21,7 @@ import copy
 import unittest
 
 import typing as t
+from typing import overload
 
 from music21 import base
 from music21 import beam
@@ -1257,6 +1258,21 @@ class NotRest(GeneralNote):
         if available before falling back to a context search to find
         the active instrument.)
         ''')
+
+    @overload
+    def getInstrument(self,
+                      *,
+                      returnDefault: t.Literal[True] = True
+                      ) -> 'music21.instrument.Instrument':
+        from music21 import instrument
+        return instrument.Instrument()  # astroid #1015
+
+    @overload
+    def getInstrument(self,
+                      *,
+                      returnDefault: t.Literal[False]
+                          ) -> t.Optional['music21.instrument.Instrument']:
+        return None  # astroid #1015
 
     def getInstrument(self,
                       *,

@@ -162,11 +162,11 @@ class Instrument(base.Music21Object):
         self.instrumentId: t.Optional[str] = None  # apply to midi and instrument
         self._instrumentIdIsRandom = False
 
-        self.instrumentName = instrumentName
-        self.instrumentAbbreviation = None
-        self.midiProgram = None  # 0-indexed
-        self.midiChannel = None  # 0-indexed
-        self.instrumentSound = None
+        self.instrumentName: str = instrumentName
+        self.instrumentAbbreviation: t.Optional[str] = None
+        self.midiProgram: t.Optional[int] = None  # 0-indexed
+        self.midiChannel: t.Optional[int] = None  # 0-indexed
+        self.instrumentSound: t.Optional[str] = None
 
         self.lowestNote = None
         self.highestNote = None

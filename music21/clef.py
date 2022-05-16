@@ -283,7 +283,7 @@ class PitchClef(Clef):
 
     def __init__(self):
         super().__init__()
-        self.lowestLine: t.Optional[int] = None
+        self.lowestLine: int = 62
 
     @property
     def octaveChange(self) -> int:
