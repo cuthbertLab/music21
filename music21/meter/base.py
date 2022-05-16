@@ -36,6 +36,10 @@ from music21.meter.core import MeterSequence
 environLocal = environment.Environment('meter')
 
 
+# this is just a placeholder so that .beamSequence, etc. do not need to
+# be typed as Optional.  It should never be touched or queried
+_SENTINEL_METER_SEQUENCE = MeterSequence()
+
 # -----------------------------------------------------------------------------
 
 # also [pow(2,x) for x in range(8)]
@@ -178,11 +182,10 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
 
         # denominator is the numerical representation of the min type
         # e.g., quarter is 4, whole is 1
+        floatDenominator = float(denominator)
         for num, typeName in duration.typeFromNumDict.items():
             if typeName == dType:
-                if num >= 1:
-                    num = int(num)
-                denominator = num
+                floatDenominator = num
                 break
         # numerator is the count of min parts in the sum
         multiplier = 1
@@ -194,7 +197,8 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
             i -= 1
 
         numerator = int(numerator)
-        denominator *= multiplier
+        floatDenominator *= multiplier
+        denominator = int(floatDenominator)
         # simplifies to "simplest terms," with 4 in denominator, before testing beat strengths
         gcdValue = common.euclidGCD(numerator, denominator)
         numerator = numerator // gcdValue
@@ -460,13 +464,13 @@ class TimeSignature(base.Music21Object):
         if value is None:
             value = f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
 
-        self._overriddenBarDuration = None
-        self.symbol = ''
-        self.displaySequence: t.Optional[MeterSequence] = None
-        self.beatSequence: t.Optional[MeterSequence] = None
-        self.accentSequence: t.Optional[MeterSequence] = None
-        self.beamSequence: t.Optional[MeterSequence] = None
-        self.symbolizeDenominator = False
+        self._overriddenBarDuration: t.Optional[duration.Duration] = None
+        self.symbol: str = ''
+        self.displaySequence: MeterSequence = _SENTINEL_METER_SEQUENCE
+        self.beatSequence: MeterSequence = _SENTINEL_METER_SEQUENCE
+        self.accentSequence: MeterSequence = _SENTINEL_METER_SEQUENCE
+        self.beamSequence: MeterSequence = _SENTINEL_METER_SEQUENCE
+        self.symbolizeDenominator: bool = False
 
         self.resetValues(value, divisions)
 
@@ -503,11 +507,9 @@ class TimeSignature(base.Music21Object):
         >>> ts.symbol
         'common'
 
-
         >>> ts.load('2/4+3/8')
         >>> ts
         <music21.meter.TimeSignature 2/4+3/8>
-
 
         >>> ts.load('fast 6/8')
         >>> ts.beatCount
@@ -1175,6 +1177,7 @@ class TimeSignature(base.Music21Object):
 
         '''
         # NOTE: this is a performance critical method
+        firstPartitionForm: t.Union[MeterSequence, int, None]
 
         # create a scratch MeterSequence for structure
         tsStr = f'{self.numerator}/{self.denominator}'
@@ -1548,7 +1551,7 @@ class TimeSignature(base.Music21Object):
             pos += self.accentSequence[i].duration.quarterLength
         return False
 
-    def setAccentWeight(self, weightList: t.Sequence[float], level: int = 0) -> None:
+    def setAccentWeight(self, weights: t.Union[t.Sequence[float], float], level: int = 0) -> None:
         '''
         Set accent weight, or floating point scalars, for the accent MeterSequence.
         Provide a list of float values; if this list is shorter than the length
@@ -1558,24 +1561,26 @@ class TimeSignature(base.Music21Object):
         If the accent MeterSequence is subdivided, the level of depth to set is given by the
         optional level argument.
 
-
         >>> a = meter.TimeSignature('4/4', 4)
         >>> len(a.accentSequence)
         4
         >>> a.setAccentWeight([0.8, 0.2])
-        >>> a.getAccentWeight(0)
+        >>> a.getAccentWeight(0.0)
         0.8...
         >>> a.getAccentWeight(0.5)
         0.8...
-        >>> a.getAccentWeight(1)
+        >>> a.getAccentWeight(1.0)
         0.2...
         >>> a.getAccentWeight(2.5)
         0.8...
         >>> a.getAccentWeight(3.5)
         0.2...
         '''
-        if not common.isListLike(weightList):
-            weightList = [weightList]
+        weightList: t.Sequence[float]
+        if not isinstance(weights, t.Sequence):
+            weightList = [weights]
+        else:
+            weightList = weights
 
         msLevel = self.accentSequence.getLevel(level)
         for i in range(len(msLevel)):

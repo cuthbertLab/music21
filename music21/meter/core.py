@@ -1616,7 +1616,7 @@ class MeterSequence(MeterTerminal):
             )
 
         qPos = 0
-        match = None
+        match = -1  # no match -- will not happen.
         for i in range(len(self)):
             start = qPos
             end = opFrac(qPos + self[i].duration.quarterLength)
@@ -1626,8 +1626,8 @@ class MeterSequence(MeterTerminal):
                     match = i
                     break
             else:
-                # note that this is >=, meaning that the first boundary
-                # is coincident
+                # note that this is <=, meaning that the first boundary
+                # is coincident.
                 if start <= qLenPos < end:
                     match = i
                     break
