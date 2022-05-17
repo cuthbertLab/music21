@@ -26,9 +26,9 @@ import os
 import pathlib
 import unittest
 
+StrOrPath = t.TypeVar('StrOrPath', bound=t.Union[str, pathlib.Path])
+
 # ------------------------------------------------------------------------------
-
-
 def getSourceFilePath() -> pathlib.Path:
     '''
     Get the music21 directory that contains source files such as note.py, etc..
@@ -131,7 +131,7 @@ def getRootFilePath() -> pathlib.Path:
     return fpParent
 
 
-def relativepath(path: str, start: t.Optional[str] = None) -> str:
+def relativepath(path: StrOrPath, start: t.Optional[str] = None) -> StrOrPath:
     '''
     A cross-platform wrapper for `os.path.relpath()`, which returns `path` if
     under Windows, otherwise returns the relative path of `path`.

@@ -521,7 +521,7 @@ def midiEventsToChord(
     # noinspection PyShadowingNames
     '''
     Creates a Chord from a list of :class:`~music21.midi.DeltaTime` or integers
-    and :class:`~music21.midi.MidiEvent` objects grouped as follows:
+    and :class:`~music21.midi.MidiEvent` objects grouped as follows::
 
         [((time_pitch1_on, pitch1_note_on_event),
           (time_pitch1_off, pitch1_note_off_event)
@@ -529,8 +529,8 @@ def midiEventsToChord(
          ((time_pitch2_on, pitch2_note_on_event),
           (time_pitch2_off, pitch2_note_off_event)
           ),
-          ...etc...
 
+    ...etc...
 
     :func:`~music21.midi.translate.midiEventsToNote`.
 

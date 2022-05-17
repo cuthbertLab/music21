@@ -8,7 +8,7 @@
 #               Josiah Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2021 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -8894,10 +8894,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> nShort = note.Note()
         >>> nShort.quarterLength = 0.26
         >>> s.repeatInsert(nShort, [1.49, 1.76])
-        >>> t = s.quantize(processOffsets=True, processDurations=True, inPlace=False)
-        >>> [e.offset for e in t]
+        >>> quantized = s.quantize(processOffsets=True, processDurations=True, inPlace=False)
+        >>> [e.offset for e in quantized]
         [0.0, 0.5, 1.0, 1.5, 1.75]
-        >>> [e.duration.quarterLength for e in t]
+        >>> [e.duration.quarterLength for e in quantized]
         [0.5, 0.5, 0.5, 0.25, 0.25]
 
         Set `recurse=True` to quantize elements in substreams such as parts, measures, voices:

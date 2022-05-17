@@ -45,6 +45,7 @@ Example usage:
 >>> d.tuplets[0].numberNotesNormal
 2
 '''
+from __future__ import annotations
 
 from collections import namedtuple
 import contextlib
@@ -157,7 +158,9 @@ extendedTupletNumerators: t.Tuple[int, ...] = (
 )
 
 
-QuarterLengthConversion = namedtuple('QuarterLengthConversion', ['components', 'tuplet'])
+class QuarterLengthConversion(t.NamedTuple):
+    components: t.Tuple[DurationTuple]
+    tuplet: t.Optional[Tuplet]
 
 
 def unitSpec(durationObjectOrObjects):
@@ -381,7 +384,7 @@ def dottedMatch(qLen: OffsetQLIn,
 
 def quarterLengthToNonPowerOf2Tuplet(
     qLen: OffsetQLIn
-) -> t.Tuple['music21.duration.Tuplet', 'music21.duration.DurationTuple']:
+) -> t.Tuple[Tuplet, DurationTuple]:
     '''
     Slow, last chance function that returns a tuple of a single tuplet, probably with a non
     power of 2 denominator (such as 7:6) that represents the quarterLength and the
@@ -814,7 +817,11 @@ def convertTypeToNumber(dType: str) -> float:
 
 
 # -----------------------------------------------------------------------------------
-class DurationTuple(namedtuple('DurationTuple', ['type', 'dots', 'quarterLength'])):
+class DurationTuple(t.NamedTuple):
+    type: str
+    dots: int
+    quarterLength: OffsetQL
+
     def augmentOrDiminish(self, amountToScale):
         return durationTupleFromQuarterLength(self.quarterLength * amountToScale)
 
@@ -3789,7 +3796,7 @@ class Test(unittest.TestCase):
         '''
         with self.assertRaises(TypeError):
             Duration('redundant type', type='eighth')
-        dt = DurationTuple(None, None, float('nan'))
+        dt = DurationTuple('quarter', 0, float('nan'))
         msg = 'Invalid quarterLength for DurationTuple: nan'
         with self.assertRaisesRegex(ValueError, msg):
             Duration(dt)
