@@ -175,7 +175,7 @@ class Test(unittest.TestCase):
                      (Direction.ASCENDING, 1)]:
             # use duration type instead of quarter length
             for y in (1, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25):
-                p = sc.next(p, direction=d, stepSize=x)
+                p = sc.nextPitch(p, direction=d, stepSize=x)
                 n = note.Note(p)
                 n.quarterLength = y
                 s.append(n)
@@ -195,7 +195,7 @@ class Test(unittest.TestCase):
         for d, x in [(Direction.ASCENDING, 1), (Direction.DESCENDING, 2), (Direction.ASCENDING, 3),
                      (Direction.DESCENDING, 2), (Direction.ASCENDING, 1)]:
             for y in (1, 0.5, 0.25, 0.25):
-                p1 = sc.next(p1, direction=d, stepSize=x)
+                p1 = sc.nextPitch(p1, direction=d, stepSize=x)
                 n = note.Note(p1)
                 n.quarterLength = y
                 s1.append(n)
@@ -204,7 +204,7 @@ class Test(unittest.TestCase):
             elif d == Direction.DESCENDING:
                 d = Direction.ASCENDING
             for y in [1, 0.5, 0.25, 0.25]:
-                p2 = sc.next(p2, direction=d, stepSize=x)
+                p2 = sc.nextPitch(p2, direction=d, stepSize=x)
                 n = note.Note(p2)
                 n.quarterLength = y
                 s2.append(n)
@@ -337,13 +337,13 @@ class Test(unittest.TestCase):
         self.assertEqual(mm.getScaleDegreeFromPitch('f8', direction=Direction.BI), 6)
         self.assertEqual(mm.getScaleDegreeFromPitch('f#1', direction=Direction.BI), 6)
 
-        self.assertEqual(mm.next('e5', Direction.ASCENDING).nameWithOctave, 'F#5')
-        # self.assertEqual(mm.next('f#5', Direction.ASCENDING).nameWithOctave, 'F#5')
+        self.assertEqual(mm.nextPitch('e5', Direction.ASCENDING).nameWithOctave, 'F#5')
+        # self.assertEqual(mm.nextPitch('f#5', Direction.ASCENDING).nameWithOctave, 'F#5')
 
-        self.assertEqual(mm.next('e5', Direction.DESCENDING).nameWithOctave, 'D5')
+        self.assertEqual(mm.nextPitch('e5', Direction.DESCENDING).nameWithOctave, 'D5')
 
-        self.assertEqual(mm.next('g#2', Direction.ASCENDING).nameWithOctave, 'A2')
-        # self.assertEqual(mm.next('g2', Direction.DESCENDING).nameWithOctave, 'f2')
+        self.assertEqual(mm.nextPitch('g#2', Direction.ASCENDING).nameWithOctave, 'A2')
+        # self.assertEqual(mm.nextPitch('g2', Direction.DESCENDING).nameWithOctave, 'f2')
 
     def testMelodicMinorB(self):
         '''Need to test descending form of getting pitches with no defined min and max
@@ -368,22 +368,22 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut(mm.getPitches(None, None, direction=Direction.ASCENDING)),
                          '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
 
-        self.assertEqual(str(mm.next('a3', Direction.ASCENDING)), 'B3')
+        self.assertEqual(str(mm.nextPitch('a3', Direction.ASCENDING)), 'B3')
 
-        self.assertEqual(str(mm.next('f#5', Direction.ASCENDING)), 'G#5')
-        self.assertEqual(str(mm.next('G#5', Direction.ASCENDING)), 'A5')
+        self.assertEqual(str(mm.nextPitch('f#5', Direction.ASCENDING)), 'G#5')
+        self.assertEqual(str(mm.nextPitch('G#5', Direction.ASCENDING)), 'A5')
 
-        self.assertEqual(str(mm.next('f5', Direction.DESCENDING)), 'E5')
-        self.assertEqual(str(mm.next('G5', Direction.DESCENDING)), 'F5')
-        self.assertEqual(str(mm.next('A5', Direction.DESCENDING)), 'G5')
+        self.assertEqual(str(mm.nextPitch('f5', Direction.DESCENDING)), 'E5')
+        self.assertEqual(str(mm.nextPitch('G5', Direction.DESCENDING)), 'F5')
+        self.assertEqual(str(mm.nextPitch('A5', Direction.DESCENDING)), 'G5')
 
-        self.assertEqual(str(mm.next('f#5', Direction.DESCENDING)), 'F5')
-        self.assertEqual(str(mm.next('f#5', Direction.DESCENDING,
-                                     getNeighbor=Direction.DESCENDING)), 'E5')
+        self.assertEqual(str(mm.nextPitch('f#5', Direction.DESCENDING)), 'F5')
+        self.assertEqual(str(mm.nextPitch('f#5', Direction.DESCENDING,
+                                          getNeighbor=Direction.DESCENDING)), 'E5')
 
-        self.assertEqual(str(mm.next('f5', Direction.ASCENDING)), 'F#5')
-        self.assertEqual(str(mm.next('f5', Direction.ASCENDING,
-                                     getNeighbor=Direction.DESCENDING)), 'F#5')
+        self.assertEqual(str(mm.nextPitch('f5', Direction.ASCENDING)), 'F#5')
+        self.assertEqual(str(mm.nextPitch('f5', Direction.ASCENDING,
+                                          getNeighbor=Direction.DESCENDING)), 'F#5')
 
         # composing with a scale
         s = stream.Stream()
@@ -398,7 +398,7 @@ class Test(unittest.TestCase):
                 d = Direction.DESCENDING
                 qls = [1, 0.5, 1, 0.5, 0.5]
             for y in qls:
-                p = sc.next(p, direction=d, stepSize=1)
+                p = sc.nextPitch(p, direction=d, stepSize=1)
                 n = note.Note(p)
                 n.quarterLength = y
                 s.append(n)
@@ -424,7 +424,7 @@ class Test(unittest.TestCase):
         #
         # ascending should be:  [C2, D2, F2, G2, A-2, C3]
 
-        self.assertEqual(str(sc.next('c4', Direction.ASCENDING)), 'D4')
+        self.assertEqual(str(sc.nextPitch('c4', Direction.ASCENDING)), 'D4')
         self.assertEqual(self.pitchOut(sc.pitches), '[C4, D4, F4, G4, A-4, C5]')
         # self.assertEqual(str(hs.pitchFromDegree(1)), 'G3')
 
@@ -434,13 +434,13 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4', direction=Direction.DESCENDING)),
                          '[C4, B-3, A-3, G3, F3, E-3, D3, C3, B-2, A-2, G2, F2, E-2, D2, C2]')
 
-        self.assertEqual(str(sc.next('c1', Direction.ASCENDING)), 'D1')
-        self.assertEqual(str(sc.next('d1', Direction.ASCENDING)), 'F1')
-        self.assertEqual(str(sc.next('f1', Direction.DESCENDING)), 'E-1')
+        self.assertEqual(str(sc.nextPitch('c1', Direction.ASCENDING)), 'D1')
+        self.assertEqual(str(sc.nextPitch('d1', Direction.ASCENDING)), 'F1')
+        self.assertEqual(str(sc.nextPitch('f1', Direction.DESCENDING)), 'E-1')
 
-        self.assertEqual(str(sc.next('e-1',
-                                     Direction.ASCENDING,
-                                     getNeighbor=Direction.DESCENDING)),
+        self.assertEqual(str(sc.nextPitch('e-1',
+                                          Direction.ASCENDING,
+                                          getNeighbor=Direction.DESCENDING)),
                          'F1')
 
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C1')
@@ -456,7 +456,7 @@ class Test(unittest.TestCase):
         sc = scale.RagMarwa('c4')
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
 
-        self.assertEqual(str(sc.next('c4', Direction.ASCENDING)), 'D-4')
+        self.assertEqual(str(sc.nextPitch('c4', Direction.ASCENDING)), 'D-4')
 
         self.assertEqual(self.pitchOut(sc.pitches), '[C4, D-4, E4, F#4, A4, B4, A4, C5, D-5]')
 
@@ -473,20 +473,20 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut(sc.getPitches('c3', 'c4', direction=Direction.DESCENDING)),
                          '[C4, B3, A3, F#3, E3, D-3, C3]')
 
-        self.assertEqual(str(sc.next('c1', Direction.ASCENDING)), 'D-1')
-        self.assertEqual(str(sc.next('d-1', Direction.ASCENDING)), 'E1')
-        self.assertEqual(str(sc.next('e1', Direction.ASCENDING)), 'F#1')
-        self.assertEqual(str(sc.next('f#1', Direction.ASCENDING)), 'A1')
+        self.assertEqual(str(sc.nextPitch('c1', Direction.ASCENDING)), 'D-1')
+        self.assertEqual(str(sc.nextPitch('d-1', Direction.ASCENDING)), 'E1')
+        self.assertEqual(str(sc.nextPitch('e1', Direction.ASCENDING)), 'F#1')
+        self.assertEqual(str(sc.nextPitch('f#1', Direction.ASCENDING)), 'A1')
         # this is probabilistic
-        # self.assertEqual(str(sc.next('A1', Direction.ASCENDING)), 'B1')
-        self.assertEqual(str(sc.next('B1', Direction.ASCENDING)), 'A1')
+        # self.assertEqual(str(sc.nextPitch('A1', Direction.ASCENDING)), 'B1')
+        self.assertEqual(str(sc.nextPitch('B1', Direction.ASCENDING)), 'A1')
 
-        self.assertEqual(str(sc.next('B2', Direction.DESCENDING)), 'A2')
-        self.assertEqual(str(sc.next('A2', Direction.DESCENDING)), 'F#2')
-        self.assertEqual(str(sc.next('E2', Direction.DESCENDING)), 'D-2')
+        self.assertEqual(str(sc.nextPitch('B2', Direction.DESCENDING)), 'A2')
+        self.assertEqual(str(sc.nextPitch('A2', Direction.DESCENDING)), 'F#2')
+        self.assertEqual(str(sc.nextPitch('E2', Direction.DESCENDING)), 'D-2')
         # this is correct!
-        self.assertEqual(str(sc.next('C2', Direction.DESCENDING)), 'D-2')
-        self.assertEqual(str(sc.next('D-2', Direction.ASCENDING)), 'E2')
+        self.assertEqual(str(sc.nextPitch('C2', Direction.DESCENDING)), 'D-2')
+        self.assertEqual(str(sc.nextPitch('D-2', Direction.ASCENDING)), 'E2')
 
     def testRagMarwaB(self):
         sc = scale.RagMarwa('c4')
@@ -521,7 +521,7 @@ class Test(unittest.TestCase):
         # descending from d-2, we can either go to c2 or b1
         post = []
         for unused_x in range(100):
-            post.append(str(sc.next('D-2', Direction.DESCENDING)))
+            post.append(str(sc.nextPitch('D-2', Direction.DESCENDING)))
         self.assertGreater(post.count('C2'), 30)
         self.assertGreater(post.count('B1'), 30)
 
@@ -564,7 +564,7 @@ class Test(unittest.TestCase):
         self.assertGreaterEqual(j, 1)
 
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
-        self.assertEqual(str(sc.next('c4', Direction.ASCENDING)), 'E-4')
+        self.assertEqual(str(sc.nextPitch('c4', Direction.ASCENDING)), 'E-4')
 
         # degree 4 is always the blues note in this model
         self.assertEqual(str(sc.pitchFromDegree(4)), 'F#4')
@@ -572,29 +572,29 @@ class Test(unittest.TestCase):
         # This never worked consistently and was not an important enough part of the project tp
         # continue to debug.
         # for unused_trial in range(15):
-        #     self.assertTrue(str(sc.next('f#3', Direction.ASCENDING)) in ['G3', 'F#3'])
+        #     self.assertTrue(str(sc.nextPitch('f#3', Direction.ASCENDING)) in ['G3', 'F#3'])
         #     # presently this might return the same note, if the
         #     # F# is taken as out of the scale and then found back in the Scale
         #     # in generation
-        #     self.assertTrue(str(sc.next('f#3', Direction.DESCENDING)) in ['F3', 'F#3'])
+        #     self.assertTrue(str(sc.nextPitch('f#3', Direction.DESCENDING)) in ['F3', 'F#3'])
 
     def testNextA(self):
         sc = scale.MajorScale('c4')
 
         # ascending works in pitch space
-        self.assertEqual(str(sc.next('a4', Direction.ASCENDING, 1)), 'B4')
-        self.assertEqual(str(sc.next('b4', Direction.ASCENDING, 1)), 'C5')
-        self.assertEqual(str(sc.next('b5', Direction.ASCENDING, 1)), 'C6')
-        self.assertEqual(str(sc.next('b3', Direction.ASCENDING, 1)), 'C4')
+        self.assertEqual(str(sc.nextPitch('a4', Direction.ASCENDING, 1)), 'B4')
+        self.assertEqual(str(sc.nextPitch('b4', Direction.ASCENDING, 1)), 'C5')
+        self.assertEqual(str(sc.nextPitch('b5', Direction.ASCENDING, 1)), 'C6')
+        self.assertEqual(str(sc.nextPitch('b3', Direction.ASCENDING, 1)), 'C4')
 
         # descending works in pitch space
-        self.assertEqual(str(sc.next('c3', Direction.DESCENDING, 1)), 'B2')
-        self.assertEqual(str(sc.next('c8', Direction.DESCENDING, 1)), 'B7')
+        self.assertEqual(str(sc.nextPitch('c3', Direction.DESCENDING, 1)), 'B2')
+        self.assertEqual(str(sc.nextPitch('c8', Direction.DESCENDING, 1)), 'B7')
 
         sc = scale.MajorScale('a4')
 
-        self.assertEqual(str(sc.next('g#2', Direction.ASCENDING, 1)), 'A2')
-        self.assertEqual(str(sc.next('g#4', Direction.ASCENDING, 1)), 'A4')
+        self.assertEqual(str(sc.nextPitch('g#2', Direction.ASCENDING, 1)), 'A2')
+        self.assertEqual(str(sc.nextPitch('g#4', Direction.ASCENDING, 1)), 'A4')
 
     def testIntervalBetweenDegrees(self):
         sc = scale.MajorScale('c4')

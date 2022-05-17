@@ -16,7 +16,6 @@ of octave repeating and non-octave repeating scales built by network
 of :class:`~music21.interval.Interval` objects as modeled
 in :class:`~music21.intervalNetwork.IntervalNetwork`.
 
-
 The main public interface to these resources are subclasses
 of :class:`~music21.scale.ConcreteScale`, such
 as :class:`~music21.scale.MajorScale`, :class:`~music21.scale.MinorScale`,
@@ -59,8 +58,6 @@ __all__ = [
     'WholeToneScale', 'SieveScale', 'ScalaScale', 'RagAsawari',
     'RagMarwa', 'WeightedHexatonicBlues',
 ]
-
-import abc
 import copy
 import typing as t
 
@@ -82,10 +79,18 @@ environLocal = environment.Environment('scale')
 Direction = intervalNetwork.Direction
 Terminus = intervalNetwork.Terminus
 
+_PitchDegreeCacheKey = t.Tuple[
+    t.Type,  # scale class
+    str,  # scale type
+    str,  # tonic name with octave
+    int,  # degree
+    Direction,  # direction
+    bool  # equating termini
+]
 
 # a dictionary mapping an abstract scale class, tonic.nameWithOctave,
 # and degree to a pitchNameWithOctave.
-_pitchDegreeCache = {}
+_pitchDegreeCache: t.Dict[_PitchDegreeCacheKey, str] = {}
 
 
 # ------------------------------------------------------------------------------
@@ -216,7 +221,6 @@ class AbstractScale(Scale):
 
     # TODO: make a subclass of IntervalNetwork and remove the ._net aspect.
     '''
-
     def __init__(self):
         super().__init__()
         # store interval network within abstract scale
@@ -256,7 +260,6 @@ class AbstractScale(Scale):
         else:
             return False
 
-    @abc.abstractmethod
     def buildNetwork(self):
         '''
         Calling the buildNetwork, with or without parameters,
@@ -552,9 +555,9 @@ class AbstractScale(Scale):
                   pitchReference,
                   nodeName,
                   pitchOrigin,
-                  direction=Direction.ASCENDING,
+                  direction: Direction = Direction.ASCENDING,
                   stepSize=1,
-                  getNeighbor: t.Union[str, bool] = True):
+                  getNeighbor: t.Union[Direction, bool] = True):
         '''
         Expose functionality from :class:`~music21.intervalNetwork.IntervalNetwork`,
         passing on the stored alteredDegrees dictionary.
@@ -1218,7 +1221,7 @@ class ConcreteScale(Scale):
     >>> myScale = scale.ConcreteScale(pitches=['C4', 'E-4', 'G-4', 'A4'])
     >>> myScale.getTonic()
     <music21.pitch.Pitch C4>
-    >>> myScale.next('G-2')
+    >>> myScale.nextPitch('G-2')
     <music21.pitch.Pitch A2>
     >>> [str(p) for p in myScale.getPitches('E-5', 'G-7')]
     ['E-5', 'G-5', 'A5', 'C6', 'E-6', 'G-6', 'A6', 'C7', 'E-7', 'G-7']
@@ -1226,11 +1229,12 @@ class ConcreteScale(Scale):
 
     A scale that lasts two octaves and uses quarter tones (D~)
 
-    >>> complexScale = scale.ConcreteScale(pitches=[
-    ...                         'C#3', 'E-3', 'F3', 'G3', 'B3', 'D~4', 'F#4', 'A4', 'C#5'])
+    >>> complexScale = scale.ConcreteScale(
+    ...     pitches=['C#3', 'E-3', 'F3', 'G3', 'B3', 'D~4', 'F#4', 'A4', 'C#5']
+    ... )
     >>> complexScale.getTonic()
     <music21.pitch.Pitch C#3>
-    >>> complexScale.next('G3', direction=scale.Direction.DESCENDING)
+    >>> complexScale.nextPitch('G3', direction=scale.Direction.DESCENDING)
     <music21.pitch.Pitch F3>
 
     >>> [str(p) for p in complexScale.getPitches('C3', 'C7')]
@@ -1289,8 +1293,8 @@ class ConcreteScale(Scale):
                 and pitches):
             self._abstract = AbstractScale()
             self._abstract.buildNetworkFromPitches(pitches)
-            if tonic in pitches:
-                self._abstract.tonicDegree = pitches.index(tonic) + 1
+            if self.tonic in pitches:
+                self._abstract.tonicDegree = pitches.index(self.tonic) + 1
 
     @property
     def isConcrete(self):
@@ -1479,15 +1483,20 @@ class ConcreteScale(Scale):
 
         This is always applied recursively to all sub-Streams.
         '''
+        from music21 import chord
+
         # we may use a directed or subset of the scale to tune
         # in the future, we might even match contour or direction
+
+        # bug in PyCharm
+        # noinspection PyArgumentList
         pitchColl = self.getPitches(minPitch=minPitch,
                                     maxPitch=maxPitch,
                                     direction=direction
                                     )
         pitchCollNames = [p.name for p in pitchColl]
 
-        def tuneOnePitch(p):
+        def tuneOnePitch(p, dst: t.List[pitch.Pitch]):
             # some pitches might be quarter / 3/4 tones; need to convert
             # these to microtonal representations so that we can directly
             # compare pitch names
@@ -1507,7 +1516,7 @@ class ConcreteScale(Scale):
                 pDstNew.octave = pEnh.octave  # copy octave
                 # need to adjust enharmonic
                 pDstNewEnh = pDstNew.getAllCommonEnharmonics(alterLimit=2)
-                match = None
+                match: t.Optional[pitch.Pitch] = None
                 for x in pDstNewEnh:
                     # try to match enharmonic with original alt
                     if x.name == pAlt.name:
@@ -1524,16 +1533,18 @@ class ConcreteScale(Scale):
             else:  # simulate a lost
                 elementPitches = [e.pitch]
 
-            dst = []  # store dst in a list of resetting chord pitches
+            # store a list of reset chord pitches
+            outerDestination: t.List[pitch.Pitch] = []
+
             for p in elementPitches:
-                tuneOnePitch(p)
+                tuneOnePitch(p, outerDestination)
             # reassign the changed pitch
-            if dst:
-                if e.isChord:
+            if outerDestination:
+                if isinstance(e, chord.Chord):
                     # note: we may not have matched all pitches
-                    e.pitches = dst
+                    e.pitches = tuple(outerDestination)
                 else:  # only one
-                    e.pitch = dst[0]
+                    e.pitch = outerDestination[0]
 
     def romanNumeral(self, degree):
         '''
@@ -1555,8 +1566,8 @@ class ConcreteScale(Scale):
 
     def getPitches(
         self,
-        minPitch=None,
-        maxPitch=None,
+        minPitch: t.Union[str, pitch.Pitch, None] = None,
+        maxPitch: t.Union[str, pitch.Pitch, None] = None,
         direction: t.Optional[Direction] = None
     ) -> t.List[pitch.Pitch]:
         '''
@@ -1578,17 +1589,24 @@ class ConcreteScale(Scale):
             pitchObj = self.tonic
         stepOfPitch = self._abstract.tonicDegree
 
+        minPitchObj: t.Optional[pitch.Pitch]
         if isinstance(minPitch, str):
-            minPitch = pitch.Pitch(minPitch)
-        if isinstance(maxPitch, str):
-            maxPitch = pitch.Pitch(maxPitch)
+            minPitchObj = pitch.Pitch(minPitch)
+        else:
+            minPitchObj = minPitch
 
-        if (minPitch is not None
-                and maxPitch is not None
-                and minPitch > maxPitch
+        maxPitchObj: t.Optional[pitch.Pitch]
+        if isinstance(maxPitch, str):
+            maxPitchObj = pitch.Pitch(maxPitch)
+        else:
+            maxPitchObj = maxPitch
+
+        if (minPitchObj is not None
+                and maxPitchObj is not None
+                and minPitchObj > maxPitchObj
                 and direction is None):
             reverse = True
-            (minPitch, maxPitch) = (maxPitch, minPitch)
+            (minPitchObj, maxPitchObj) = (maxPitchObj, minPitchObj)
         elif direction == Direction.DESCENDING:
             reverse = True  # reverse presentation so pitches go high to low
         else:
@@ -1600,8 +1618,8 @@ class ConcreteScale(Scale):
         # this creates new pitches on each call
         return self._abstract.getRealization(pitchObj,
                                              stepOfPitch,
-                                             minPitch=minPitch,
-                                             maxPitch=maxPitch,
+                                             minPitch=minPitchObj,
+                                             maxPitch=maxPitchObj,
                                              direction=direction,
                                              reverse=reverse)
         # raise ScaleException('Cannot generate a scale from a DiatonicScale class')
@@ -1628,9 +1646,13 @@ class ConcreteScale(Scale):
         `quarterLength` and similar parameters.
         '''
         from music21 import chord
-        return chord.Chord(self.getPitches(minPitch=minPitch,
-                                           maxPitch=maxPitch,
-                                           direction=direction), **keywords)
+
+        # bug in PyCharm
+        # noinspection PyArgumentList
+        myPitches = self.getPitches(minPitch=minPitch,
+                                    maxPitch=maxPitch,
+                                    direction=direction)
+        return chord.Chord(myPitches, **keywords)
 
     # this needs to stay separate from getChord
     chord = property(getChord,
@@ -1642,11 +1664,11 @@ class ConcreteScale(Scale):
 
     def pitchFromDegree(
             self,
-            degree,
+            degree: int,
             minPitch=None,
             maxPitch=None,
-            direction=Direction.ASCENDING,
-            equateTermini=True):
+            direction: Direction = Direction.ASCENDING,
+            equateTermini: bool = True):
         '''
         Given a scale degree, return a deepcopy of the appropriate pitch.
 
@@ -1667,11 +1689,21 @@ class ConcreteScale(Scale):
         >>> sc.pitchFromDegree(7)
         <music21.pitch.Pitch D5>
         '''
-        cacheKey = None
+        if self._abstract is None:  # pragma: no cover
+            raise ScaleException('Abstract scale underpinning this scale is not defined.')
+
+        cacheKey: t.Optional[_PitchDegreeCacheKey] = None
         if (self.usePitchDegreeCache and self.tonic
                 and not minPitch and not maxPitch and getattr(self, 'type', None)):
             tonicCacheKey = self.tonic.nameWithOctave
-            cacheKey = (self.__class__, self.type, tonicCacheKey, degree, direction, equateTermini)
+            cacheKey = (
+                self.__class__,
+                self.type,
+                tonicCacheKey,
+                degree,
+                direction,
+                equateTermini
+            )
             if cacheKey in _pitchDegreeCache:
                 return pitch.Pitch(_pitchDegreeCache[cacheKey])
 
@@ -2009,11 +2041,39 @@ class ConcreteScale(Scale):
         else:
             return syllableDict[scaleDeg][0]
 
-    def next(self,
-             pitchOrigin=None,
-             direction: t.Union[Direction, int] = Direction.ASCENDING,
-             stepSize=1,
-             getNeighbor: t.Union[Direction, bool] = True):
+    # no type checking as a deprecated call that shadows superclass.
+    @t.no_type_check
+    def next(
+        self,
+        pitchOrigin=None,
+        direction: t.Union[Direction, int] = Direction.ASCENDING,
+        stepSize=1,
+        getNeighbor: t.Union[Direction, bool] = True,
+    ):  # pragma: no cover
+        '''
+        See :meth:`~music21.scale.ConcreteScale.nextPitch`.  This function
+        is a deprecated alias for that method.
+
+        This routine was named and created before music21 aspired to have
+        full subclass substitution.  Thus is shadows the `.next()` function of
+        Music21Object without performing similar functionality.
+
+        The routine will be formally deprecated in v9 and removed in v10.
+        '''
+        return self.nextPitch(
+            pitchOrigin=pitchOrigin,
+            direction=direction,
+            stepSize=stepSize,
+            getNeighbor=getNeighbor
+        )
+
+    def nextPitch(
+        self,
+        pitchOrigin=None,
+        direction: t.Union[Direction, int] = Direction.ASCENDING,
+        stepSize=1,
+        getNeighbor: t.Union[Direction, bool] = True,
+    ):
         '''
         Get the next pitch above (or below if direction is Direction.DESCENDING)
         a `pitchOrigin` or None. If the `pitchOrigin` is None, the tonic pitch is
@@ -2024,7 +2084,7 @@ class ConcreteScale(Scale):
         may be provided as directional stepSize scalars.
 
         An optional `stepSize` argument can be used to set the number
-        of scale steps that are stepped through.  Thus, .next(stepSize=2)
+        of scale steps that are stepped through.  Thus, .nextPitch(stepSize=2)
         will give not the next pitch in the scale, but the next after this one.
 
         The `getNeighbor` will return a pitch from the scale
@@ -2032,62 +2092,68 @@ class ConcreteScale(Scale):
         True, Direction.ASCENDING, or Direction.DESCENDING.
 
         >>> sc = scale.MajorScale('e-')
-        >>> print(sc.next('e-5'))
+        >>> print(sc.nextPitch('e-5'))
         F5
-        >>> print(sc.next('e-5', stepSize=2))
+        >>> print(sc.nextPitch('e-5', stepSize=2))
         G5
-        >>> print(sc.next('e-6', stepSize=3))
+        >>> print(sc.nextPitch('e-6', stepSize=3))
         A-6
 
         This uses the getNeighbor attribute to
         find the next note above f#5 in the E-flat
         major scale:
 
-        >>> sc.next('f#5')
+        >>> sc.nextPitch('f#5')
         <music21.pitch.Pitch G5>
 
         >>> sc = scale.HarmonicMinorScale('g')
-        >>> sc.next('g4', scale.Direction.DESCENDING)
+        >>> sc.nextPitch('g4', scale.Direction.DESCENDING)
         <music21.pitch.Pitch F#4>
-        >>> sc.next('F#4', scale.Direction.DESCENDING)
+        >>> sc.nextPitch('F#4', scale.Direction.DESCENDING)
         <music21.pitch.Pitch E-4>
-        >>> sc.next('E-4', scale.Direction.DESCENDING)
+        >>> sc.nextPitch('E-4', scale.Direction.DESCENDING)
         <music21.pitch.Pitch D4>
-        >>> sc.next('E-4', scale.Direction.ASCENDING, 1)
+        >>> sc.nextPitch('E-4', scale.Direction.ASCENDING, 1)
         <music21.pitch.Pitch F#4>
-        >>> sc.next('E-4', scale.Direction.ASCENDING, 2)
+        >>> sc.nextPitch('E-4', scale.Direction.ASCENDING, 2)
         <music21.pitch.Pitch G4>
         '''
         if pitchOrigin is None:
             return self.tonic
 
+        if self._abstract is None:  # pragma: no cover
+            raise ScaleException('Abstract scale underpinning this scale is not defined.')
+
+        directionEnum: Direction
+
         # allow numerical directions
-        if common.isNum(direction):
+        if isinstance(direction, int):
             if direction != 0:
                 # treat as a positive or negative step scalar
                 if direction > 0:
                     stepScalar = direction
-                    direction = Direction.ASCENDING
+                    directionEnum = Direction.ASCENDING
                 else:  # negative non-zero
                     stepScalar = abs(direction)
-                    direction = Direction.DESCENDING
+                    directionEnum = Direction.DESCENDING
             else:
                 raise ScaleException('direction cannot be zero')
         else:  # when direction is a string, use scalar of 1
-            stepScalar = 1
+            stepScalar = 1  # stepSize is still used...
+            directionEnum = direction
 
         # pick reverse direction for neighbor
         if getNeighbor is True:
-            if direction == Direction.ASCENDING:
+            if directionEnum == Direction.ASCENDING:
                 getNeighbor = Direction.DESCENDING
-            elif direction == Direction.DESCENDING:
+            elif directionEnum == Direction.DESCENDING:
                 getNeighbor = Direction.ASCENDING
 
         post = self._abstract.nextPitch(
             pitchReference=self.tonic,
             nodeName=self._abstract.tonicDegree,
             pitchOrigin=pitchOrigin,
-            direction=direction,
+            direction=directionEnum,
             stepSize=stepSize * stepScalar,  # multiplied
             getNeighbor=getNeighbor
         )
@@ -2098,7 +2164,7 @@ class ConcreteScale(Scale):
                pitchOrigin,
                direction: Direction = Direction.ASCENDING,
                stepSize=1,
-               getNeighbor: t.Union[str, bool] = True,
+               getNeighbor: t.Union[Direction, bool] = True,
                comparisonAttribute='name'):
         '''
         Given another pitch, as well as an origin and a direction,
@@ -2115,10 +2181,10 @@ class ConcreteScale(Scale):
         elif not isinstance(other, pitch.Pitch):
             return False  # cannot compare to non-pitch
 
-        nPitch = self.next(pitchOrigin,
-                           direction=direction,
-                           stepSize=stepSize,
-                           getNeighbor=getNeighbor)
+        nPitch = self.nextPitch(pitchOrigin,
+                                direction=direction,
+                                stepSize=stepSize,
+                                getNeighbor=getNeighbor)
         if nPitch is None:
             return None
 
@@ -2317,8 +2383,8 @@ class ConcreteScale(Scale):
         post = []
         for weight, p in pairs:
             sc = self.__class__(tonic=p)
-            if sc._abstract is None:
-                sc._abstract = copy.deepcopy(self._abstract)
+            if sc.abstract is None:
+                sc.abstract = copy.deepcopy(self._abstract)
 
             post.append((weight, sc))
         return post
@@ -2348,8 +2414,8 @@ class ConcreteScale(Scale):
                                          comparisonAttribute=comparisonAttribute)
 
         newScale = self.__class__(tonic=pairs[0][1])
-        if newScale._abstract is None:
-            newScale._abstract = copy.deepcopy(self._abstract)
+        if newScale.abstract is None:
+            newScale.abstract = copy.deepcopy(self._abstract)
         return newScale
 
     def deriveAll(self, other, comparisonAttribute='pitchClass'):
@@ -2398,8 +2464,8 @@ class ConcreteScale(Scale):
         for weight, p in pairs:
             if weight == numPitches:  # only want matches where all notes match
                 sc = self.__class__(tonic=p)
-                if sc._abstract is None:
-                    sc._abstract = copy.deepcopy(self._abstract)
+                if sc.abstract is None:
+                    sc.abstract = copy.deepcopy(self._abstract)
                 post.append(sc)
         return post
 
@@ -2432,8 +2498,8 @@ class ConcreteScale(Scale):
             raise ScaleException('cannot derive new tonic')
 
         newScale = self.__class__(tonic=p)
-        if newScale._abstract is None:
-            newScale._abstract = copy.deepcopy(self._abstract)
+        if newScale.abstract is None:
+            newScale.abstract = copy.deepcopy(self._abstract)
         return newScale
 
     # --------------------------------------------------------------------------
@@ -2841,7 +2907,6 @@ class HypoaeolianScale(DiatonicScale):
     >>> [str(p) for p in sc.pitches]
     ['G3', 'A-3', 'B-3', 'C4', 'D4', 'E-4', 'F4', 'G4']
     '''
-
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypoaeolian'

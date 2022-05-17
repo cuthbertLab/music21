@@ -678,9 +678,9 @@ def unitNormalizeProportion(values: t.Sequence[t.Union[int, float]]) -> t.List[f
     Traceback (most recent call last):
     ValueError: value members must be positive
     '''
-    summation = 0
+    summation = 0.0
     for x in values:
-        if x < 0:
+        if x < 0.0:
             raise ValueError('value members must be positive')
         summation += x
     unit = []  # weights on the unit interval; sum == 1
