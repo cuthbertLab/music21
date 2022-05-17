@@ -37,7 +37,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
     See :ref:`moduleScale` for a list of allowable scales. (or a custom one can be given).
     Microtonal scales are totally accepted, as are retuned scales where A != 440hz.
 
-    if `saveFile` is False then then the recorded audio is saved to disk.  If
+    if `saveFile` is False then the recorded audio is saved to disk.  If
     set to `True` then `environLocal.getRootTempDir() / 'ex.wav'` is
     used as the filename.  If set to anything else then it will use that as the
     filename.

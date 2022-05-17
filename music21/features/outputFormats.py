@@ -53,8 +53,9 @@ class OutputTabOrange(OutputFormat):
         self.ext = '.tab'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
-        '''Get the header as a list of lines.
-
+        # noinspection PyShadowingNames
+        '''
+        Get the header as a list of lines.
 
         >>> f = [features.jSymbolic.ChangesOfMeterFeature]
         >>> ds = features.DataSet()

@@ -421,7 +421,7 @@ class CTSong(prebase.ProtoM21Object):
         objects of type CTRule. If only a text file
         provided, this goes through text file and creates the
         rule object out of each line containing
-        a LHS including the Song line, which should always be last.
+        an LHS including the Song line, which should always be last.
 
         >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
         >>> len(s.rules)
@@ -937,9 +937,9 @@ class CTRule(prebase.ProtoM21Object):
     @property
     def sectionName(self):
         '''
-        Returns the expanded version of the Left hand side (LHS) such as
+        Returns the expanded version of the Left-hand side (LHS) such as
         Introduction, Verse, etc. if
-        text present uses LHS to expand)
+        text is present (uses LHS to expand)
 
         Currently supported abbreviations:
 

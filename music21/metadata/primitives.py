@@ -227,6 +227,7 @@ class Date(prebase.ProtoM21Object):
             raise exceptions21.MetadataException(f'Cannot load data: {value}')
 
     def loadDatetime(self, dt):
+        # noinspection PyShadowingNames
         r'''
         Load time data from a datetime object:
 
@@ -756,9 +757,9 @@ class Text(prebase.ProtoM21Object):
         r'''
         Set the language of the Text stored within.
 
-        >>> t = metadata.Text('my text')
-        >>> t.language = 'en'
-        >>> t.language
+        >>> myText = metadata.Text('my text')
+        >>> myText.language = 'en'
+        >>> myText.language
         'en'
         '''
         return self._language

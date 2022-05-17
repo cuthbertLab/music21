@@ -37,7 +37,7 @@ class VirtualWork:
         # this path must be unique for each work
         self.corpusPath = None
 
-        # a list of URLs in order of best usage
+        # a list of URLs in order of their best usage
         # these probably should all be the same format
         self.urlList = []
 
@@ -52,7 +52,7 @@ class VirtualWork:
 #         return dir / ('m21-' + common.getMd5(self.title) + '.p')
 
     def getUrlByExt(self, extList=None):
-        '''Given a request for an extension, find a best match for a URL from
+        '''Given a request for an extension, find the best match for a URL from
         the list of known URLs. If ext is None, return the first URL.
         '''
         if not common.isListLike(extList):
@@ -116,7 +116,7 @@ class BachBWV773(VirtualWork):
 
 
 class ColtraneGiantSteps(VirtualWork):
-    # post operation: needs make accidentals
+    # post operation: needs to make accidentals
     def __init__(self):
         super().__init__()
 

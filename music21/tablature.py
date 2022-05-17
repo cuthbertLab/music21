@@ -292,7 +292,7 @@ class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
 
 # -------------------------------------------------------------------------------
 #
-# The following classes are some basic fretted instruments that are commonly used in
+# The following classes are some fretted instruments that are commonly used in
 # Tablature notation.
 #
 

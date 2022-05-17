@@ -1701,7 +1701,7 @@ class StrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
 
 class SecondStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
     '''
-    Bin label of the beat bin of the peak with the second highest frequency.
+    Bin label of the beat bin of the peak with the second-highest frequency.
 
     >>> sch = corpus.parse('schoenberg/opus19', 2)
     >>> for p in sch.parts:
@@ -1808,7 +1808,7 @@ class StrengthOfStrongestRhythmicPulseFeature(featuresModule.FeatureExtractor):
 class StrengthOfSecondStrongestRhythmicPulseFeature(
         featuresModule.FeatureExtractor):
     '''
-    Frequency of the beat bin of the peak with the second highest frequency.
+    Frequency of the beat bin of the peak with the second-highest frequency.
 
     >>> sch = corpus.parse('schoenberg/opus19', 2)
     >>> for p in sch.parts:
@@ -2583,7 +2583,7 @@ class InitialTempoFeature(featuresModule.FeatureExtractor):
 
     def process(self):
         triples = self.data['metronomeMarkBoundaries']
-        # the first is the a default, if necessary; also provides start/end time
+        # the first is the default, if necessary; also provides start/end time
         mm = triples[0][2]
         # assume we want quarter bpm, not bpm in other division
         self.feature.vector[0] = mm.getQuarterBPM()
@@ -3283,8 +3283,8 @@ class VoiceSeparationFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
 
-    Average separation in semi-tones between the average pitches of consecutive
-    channels (after sorting based/non average pitch) that contain at least one note.
+    Average separation in semitones between the average pitches of consecutive
+    channels (after sorting based/non-average pitch) that contain at least one note.
     '''
     id = 'T20'
 
@@ -3565,7 +3565,7 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
             pNotes = p.recurse().notes
             if pNotes:
                 coll.append(len(pNotes) / total)
-        # would be faster to use numpy
+        # Would be faster to use numpy.
         # numpy.std(coll)
         mean = sum(coll) / len(coll)
         # squared deviations from the mean

@@ -18,7 +18,7 @@ three Beam objects in its Beam object).
 
 The Beams object is stored in :class:`~music21.note.Note` and
 :class:`~music21.chord.Chord` objects as their :attr:`~music21.note.Note.beams`
-attributes.   Beams objects can largely be treated as a list.
+attributes.  Beams objects can largely be treated as a list.
 
 See `meter.TimeSignature`. :meth:`~music21.meter.TimeSignature.getBeams` for a
 way of getting beam information for a measure given the meter.  The
@@ -156,7 +156,7 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
         self.direction = direction  # left or right for partial
         self.independentAngle = None
         # represents which beam line referred to
-        # 8th, 16th, etc represented as 1, 2, ...
+        # 8th, 16th, etc. represented as 1, 2, ...
         self.number = number
 
         # this should be called something else.
@@ -444,7 +444,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
     def append(self, type=None, direction=None):  # type is okay @ReservedAssignment
         '''
-        Append a new Beam object to this Beams, automatically creating the Beam
+        Append a new Beam object to this Beams object, automatically creating the Beam
         object and incrementing the number count.
 
         >>> beams = beam.Beams()
@@ -527,7 +527,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         music21.beam.BeamException: cannot fill beams for level 12
         '''
         self.beamsList = []
-        # 8th, 16th, etc represented as 1, 2, ...
+        # 8th, 16th, etc. represented as 1, 2, ...
         if level in (1, '8th', duration.typeFromNumDict[8]):  # eighth
             count = 1
         elif level in (2, duration.typeFromNumDict[16]):

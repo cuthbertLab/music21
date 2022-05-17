@@ -83,6 +83,7 @@ class TreeYielder:
                 return
 
             for x in instance_dict:
+                # noinspection PyBroadException
                 try:
                     gotValue = object.__getattribute__(obj, x)
                 except Exception:  # pylint: disable=broad-except

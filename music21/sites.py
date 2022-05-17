@@ -254,7 +254,7 @@ class Sites(common.SlottedObjectMixin):
             #    print(idKey, id(originalObj))
             new.siteDict[newIdKey] = newSite
 
-        new._siteIndex = self._siteIndex  # keep to stay coherent
+        new._siteIndex = self._siteIndex  # keep the _siteIndex to stay coherent
         return new
 
     def __len__(self):
@@ -392,8 +392,8 @@ class Sites(common.SlottedObjectMixin):
         where most-recently assigned objects are returned first.
 
         Note that priorityTarget is searched only on id -- this could be dangerous if the
-        target has been garbage collected and the id is reused. Unlikely since you gotta
-        pass in the priorityTarget itself so therefore it still exists...
+        target has been garbage collected and the id is reused. Unlikely since you have to
+        pass in the priorityTarget itself, so therefore it still exists...
 
         This can be much faster than .get in the case where the sought-for site
         is earlier in the list.
@@ -511,7 +511,7 @@ class Sites(common.SlottedObjectMixin):
         '''
         post = list(self.yieldSites(sortByCreationTime, priorityTarget, excludeNone))
 
-        # we do this resorting again, because the priority target might not match id and we
+        # we do this resorting again, because the priority target might not match id, and we
         # want to be extra safe.  If you want fast, use .yieldSites
         if priorityTarget is not None:
             if priorityTarget in post:

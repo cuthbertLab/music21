@@ -90,6 +90,7 @@ accidentalTokens = flatTokens + naturalTokens
 
 
 def toPart(volpianoText, *, breaksToLayout=False):
+    # noinspection PyShadowingNames
     '''
     Returns a music21 Part from volpiano text.
 

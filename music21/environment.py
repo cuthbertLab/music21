@@ -142,7 +142,7 @@ class _EnvironmentCore:
     _EnvironmentCore instance that is stored in this module.
 
     The only case in which a new _EnvironmentCore is created is if the
-    forcePlatform argument is passed and is different than the stored
+    forcePlatform argument is passed and is different from the stored
     forcePlatform argument. This is only used in testing--it allows authors to
     test what the settings on a different platform (win, Mac, etc.) would be.
 
@@ -442,7 +442,7 @@ class _EnvironmentCore:
             exists = os.path.exists(path)
             readable = os.access(path, os.R_OK)
             writable = os.access(path, os.W_OK)
-            return (exists and readable and writable)
+            return exists and readable and writable
         else:
             return False
 
@@ -510,13 +510,13 @@ class _EnvironmentCore:
 
         >>> import tempfile
         >>> import pathlib
-        >>> t = tempfile.gettempdir()
-        >>> #_DOCS_SHOW t
+        >>> tempFile = tempfile.gettempdir()
+        >>> #_DOCS_SHOW tempFile
         '/var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T'
 
         >>> import os
         >>> e = environment.Environment()
-        >>> e.getDefaultRootTempDir() == pathlib.Path(t) / 'music21'
+        >>> e.getDefaultRootTempDir() == pathlib.Path(tempFile) / 'music21'
         True
 
         If failed to create the subdirectory (OSError is raised), this function
@@ -820,7 +820,7 @@ class Environment:
     efficient operation since the Environment module caches most information
     from module to module)
 
-    For more a user-friendly interface for creating and editing settings, see
+    For a more user-friendly interface for creating and editing settings, see
     the :class:`~music21.environment.UserSettings` object.
 
     >>> env = environment.Environment(forcePlatform='darwin')
@@ -953,7 +953,7 @@ class Environment:
         '''
         Get the raw keys stored in the internal reference dictionary.
 
-        These are different than the keys() method in that the
+        These are different from the keys() method in that the
         'localCorpusPath' entry is not included.
 
         >>> a = environment.Environment()
@@ -1326,7 +1326,7 @@ class UserSettings:
 
     def create(self):
         '''
-        If a environment configuration file does not exist, create one based on
+        If an environment configuration file does not exist, create one based on
         the default settings.
         '''
         if not self._environment.getSettingsPath().exists():
@@ -1632,7 +1632,7 @@ class Test(unittest.TestCase):
                 # situation, we check newTempDir first, making sure that newTempDir is an empty
                 # directory which means (1) it's a directory we create in this test or (2) we won't
                 # destroy anything if we delete it, and then delete it with os.rmdir, which could
-                # only delete a empty directory. We don't set an exception-catching block here
+                # only delete an empty directory. We don't set an exception-catching block here
                 # because we have checked this directory is empty.
                 tmp = newTempDir.samefile(tempfile.gettempdir())
                 empty = len(os.listdir(newTempDir)) == 0

@@ -226,6 +226,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return acc
 
     def getPitchObject(self):
+        # noinspection PyShadowingNames
         '''
         Get the Pitch object defined by this record. This may be a note, chord, or grace pitch.
 
@@ -247,7 +248,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> p = mdr.getPitchObject()
         >>> p.nameWithOctave
         'F##5'
-
         '''
         from music21 import pitch
         pp = self._getPitchParameters()
@@ -544,6 +544,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return post
 
     def hasCautionaryAccidental(self):
+        # noinspection GrazieInspection
         '''
         Return a boolean if this note has a cautionary accidental.
 
@@ -1245,7 +1246,7 @@ class MuseDataPart(prebase.ProtoM21Object):
                 return clef.AltoClef()
             elif charPair == '14':
                 return clef.MezzoSopranoClef()
-            elif charPair == '15':  # 5 is lowest line
+            elif charPair == '15':  # 5 is the lowest line
                 return clef.SopranoClef()
 
             elif charPair == '22':
@@ -1583,7 +1584,7 @@ class MuseDataWork(prebase.ProtoM21Object):
 class MuseDataDirectory(prebase.ProtoM21Object):
     '''
     This class manages finding musedata files stored in a directory,
-    comparing file names and examining sub directories to determine which files are parts.
+    comparing file names and examining subdirectories to determine which files are parts.
 
     Once found, a MuseDataWork, or a list of paths, can be returned
 

@@ -349,6 +349,7 @@ class Metadata(base.Music21Object):
         return Metadata.workIdAbbreviationDict[abbreviation]
 
     def addContributor(self, c):
+        # noinspection PyShadowingNames
         r'''
         Assign a :class:`~music21.metadata.Contributor` object to this
         Metadata.
@@ -393,6 +394,7 @@ class Metadata(base.Music21Object):
         self.contributors.append(c)
 
     def getContributorsByRole(self, value):
+        # noinspection PyShadowingNames
         r'''
         Return a :class:`~music21.metadata.Contributor` if defined for a
         provided role.
@@ -556,7 +558,7 @@ class Metadata(base.Music21Object):
 
         if useRegex:
             for value, innerField in valueFieldPairs:
-                # re.I makes case insensitive
+                # "re.I" makes case-insensitive search
                 if isinstance(value, str):
                     match = reQuery.search(value)
                     if match is not None:
@@ -583,11 +585,11 @@ class Metadata(base.Music21Object):
     def setWorkId(self, idStr, value):
         r'''
         Directly set a work id, given either as a full string name or as a
-        three character abbreviation. The following work id abbreviations and
+        three-character abbreviation. The following work id abbreviations and
         their full id string are given as follows. In many cases the Metadata
         object support properties for convenient access to these work ids.
 
-        Id abbreviations and strings::
+        Abbreviations and strings::
             * otl / title
             * otp / popularTitle
             * ota / alternativeTitle
@@ -1319,7 +1321,7 @@ class RichMetadata(Metadata):
         analysisObject = discrete.Ambitus(streamObj)
         if analysisObject.minPitchObj is not None and analysisObject.maxPitchObj is not None:
             # may be none if no pitches are stored
-            # presently, these are numbers; convert to pitches later
+            # presently, these are numbers; convert to a collection of pitches later
             self.pitchLowest = analysisObject.minPitchObj.nameWithOctave
             self.pitchHighest = analysisObject.maxPitchObj.nameWithOctave
         ambitusInterval = analysisObject.getSolution(streamObj)

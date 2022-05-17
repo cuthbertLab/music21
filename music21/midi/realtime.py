@@ -53,7 +53,7 @@ class StreamPlayer:  # pragma: no cover
     >>> #_DOCS_SHOW for n in b.flatten().notes:
     >>> class PitchMock: midi = 20  #_DOCS_HIDE
     >>> class Mock: pitch = PitchMock()  #_DOCS_HIDE
-    >>> #_DOCS_HIDE -- should not playback in doctests, see TestExternal
+    >>> #_DOCS_HIDE -- should not play back in doctests, see TestExternal
     >>> n = Mock()  #_DOCS_HIDE
     >>> for i in [1]:  #_DOCS_HIDE
     ...    n.pitch.microtone = keyDetune[n.pitch.midi]
@@ -116,7 +116,7 @@ class StreamPlayer:  # pragma: no cover
         endFunction is a function that is called with endArgs when the music finishes playing.
 
         playForMilliseconds is the amount of time in milliseconds after which
-        the playback will automatically stopped
+        the playback will be automatically stopped.
 
         If blocked is False, the method will finish before ending the stream, allowing
         you to completely control whether to stop it. Ignore every other arguments
@@ -142,7 +142,7 @@ class StreamPlayer:  # pragma: no cover
         endFunction is a function that is called with endArgs when the music finishes playing.
 
         playForMilliseconds is the amount of time in milliseconds after which the
-        playback will automatically stopped.
+        playback will be automatically stopped.
 
         If blocked is False, the method will finish before ending the stream, allowing you to
         completely control whether to stop it. Ignore every other arguments but for stringIOFile

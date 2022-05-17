@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         naturalLanguageObjects.py
-# Purpose:      Multi-lingual conversion of pitch, etc. objects
+# Purpose:      Multilingual conversion of pitch, etc. objects
 # Authors:      David Perez
 #               Michael Scott Asato Cuthbert
 #
@@ -9,7 +9,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Multi-lingual conversion of pitch, etc. objects
+Multilingual conversion of pitch, etc. objects
 '''
 
 import typing as t

@@ -2692,16 +2692,16 @@ class Test(unittest.TestCase):
         self.assertIs(s.spanners[0].getFirst(), n1)
         self.assertIs(s.notes[0].getSpannerSites()[0], su1)
 
-        t = copy.deepcopy(s)
-        su2 = t.spanners[0]
-        n2 = t.notes[0]
+        s2 = copy.deepcopy(s)
+        su2 = s2.spanners[0]
+        n2 = s2.notes[0]
         self.assertIsNot(su2, su1)
         self.assertIsNot(n2, n1)
-        self.assertIs(t.spanners[0].getFirst(), n2)
-        self.assertIs(t.notes[0].getSpannerSites()[0], su2)
+        self.assertIs(s2.spanners[0].getFirst(), n2)
+        self.assertIs(s2.notes[0].getSpannerSites()[0], su2)
         self.assertIsNot(s.notes[0].getSpannerSites()[0], su2)
-        self.assertEqual(len(t.spannerBundle), 1)
-        tn2 = t.spannerBundle.getBySpannedElement(n2)
+        self.assertEqual(len(s2.spannerBundle), 1)
+        tn2 = s2.spannerBundle.getBySpannedElement(n2)
         self.assertEqual(len(tn2), 1)
 
     def testGetSpannedElementIds(self):

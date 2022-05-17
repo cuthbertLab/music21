@@ -1310,7 +1310,7 @@ class Test(unittest.TestCase):
 
     def testAllToClassNamePopulated(self):
         '''
-        Test that the allToClassName dict includes all of the keys from the constituent dicts.
+        Test that the allToClassName dict includes all the keys from the constituent dicts.
 
         Note: No length test due to duplicate entries
         (i.e. allToClassName is smaller than the sum of its parts).

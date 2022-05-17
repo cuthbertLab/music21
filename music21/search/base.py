@@ -331,7 +331,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     of indices which begin a successful search.
 
     searches are made based on quarterLength.
-    thus an dotted sixteenth-note and a quadruplet (4:3) eighth
+    thus a dotted sixteenth-note and a quadruplet (4:3) eighth
     will match each other.
 
     Example 1: First we will set up a simple stream for searching:
@@ -429,6 +429,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
 
 
 def noteNameSearch(thisStreamOrIterator, searchList):
+    # noinspection PyShadowingNames
     '''
     >>> thisStream = converter.parse('tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e')
     >>> searchList = [note.Note('C'), note.Note('D'), note.Note('E')]
@@ -529,6 +530,7 @@ def approximateNoteSearch(thisStream, otherStreams):
 
 
 def approximateNoteSearchNoRhythm(thisStream, otherStreams):
+    # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
     (each stream will have a new property of matchProbability to show how
@@ -901,11 +903,11 @@ def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
 
 
 def translateNoteToByte(n):
+    # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a single byte representation.
 
     currently returns the chr() for the note's midi number. or chr(127) for rests
-
 
     >>> n = note.Note('C4')
     >>> b = search.translateNoteToByte(n)
@@ -966,11 +968,11 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
 
 
 def translateNoteTieToByte(n):
+    # noinspection PyShadowingNames
     '''
     takes a note.Note object and returns a one-byte representation
     of its tie status.
     's' if start tie, 'e' if stop tie, 'c' if continue tie, and '' if no tie
-
 
     >>> n = note.Note('E')
     >>> search.translateNoteTieToByte(n)
@@ -1001,6 +1003,7 @@ def translateNoteTieToByte(n):
 
 
 def translateDurationToBytes(n):
+    # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a two-byte representation
 
@@ -1066,7 +1069,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     {3.0} <music21.note.Note B->
     -----
 
-    Changed in v7 -- bars are ordered first by number then by part.
+    Changed in v7 -- bars are ordered first by number, then by part.
     '''
     returnDicts = []
     distanceToTranspose = 0

@@ -161,7 +161,7 @@ def base40DeltaToInterval(delta):
     would be of a very rare occurrence, and extreme intervals
     which would trigger an incorrect answer (C-- to C##, for
     instance, would return a diminished second, even though it's
-    a quadruple augmented unison) just would not occur.
+    a quadruplely augmented unison) just would not occur.
 
 
     >>> musedata.base40.base40DeltaToInterval(4)

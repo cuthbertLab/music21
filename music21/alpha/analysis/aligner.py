@@ -96,6 +96,7 @@ class StreamAligner:
         self.changesCount = None
 
     def getDefaultHasher(self):
+        # noinspection PyShadowingNames
         '''
         returns a default hasher.Hasher object
         that does not hashOffset or include the reference.
@@ -330,6 +331,7 @@ class StreamAligner:
                 self.distanceMatrix[i][j] = min(previousValues)
 
     def getPossibleMovesFromLocation(self, i, j):
+        # noinspection PyShadowingNames
         '''
         i and j are current row and column index in self.distanceMatrix
         returns all possible moves (0 up to 3)
@@ -556,7 +558,7 @@ class StreamAligner:
     def substitutionCost(self, targetTup, sourceTup):
         '''
         Finds the cost of substituting the targetTup with the sourceTup.
-        For now it's just an interpolation of how many things they have in common
+        For now, it's just an interpolation of how many things they have in common
 
         Example: equality testing, both streams made from same note
         targetA will not have the same reference as sourceA
@@ -1086,7 +1088,7 @@ class Test(unittest.TestCase):
 
         OMR is `CCCB`
 
-        Therefore there needs to be an deletion to get from OMR to MIDI.
+        Therefore there needs to be a deletion to get from OMR to MIDI.
         '''
         from music21 import stream
         from music21 import note
@@ -1120,7 +1122,7 @@ class Test(unittest.TestCase):
         MIDI is CCC
         OMR is CCB
 
-        Therefore there needs to be an substitution to get from OMR to MIDI
+        Therefore there needs to be a substitution to get from OMR to MIDI
         '''
         from music21 import stream
         from music21 import note

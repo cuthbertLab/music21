@@ -1405,7 +1405,7 @@ class Iterator:
     def _setNumberingSystem(self, value):
         if value in ['bwv', 'kalmus', 'baerenreiter', 'budapest', 'riemenschneider']:
             self._numberingSystem = value
-            # initializes the numberlist and sets current and highest numbers / indices
+            # initializes the number list and sets current and highest numbers / indices
             self._initializeNumberList()
         elif value == 'title':
             self._numberingSystem = 'title'

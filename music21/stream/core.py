@@ -638,11 +638,11 @@ class StreamCore(Music21Object):
         With `recurse=False`, then spanners are not gathered inside the inner
         stream:
 
-        >>> t = stream.Part()
+        >>> part = stream.Part()
         >>> s = getStream()
-        >>> t.insert(0, s)
-        >>> t.coreGatherMissingSpanners(recurse=False)
-        >>> t.show('text')
+        >>> part.insert(0, s)
+        >>> part.coreGatherMissingSpanners(recurse=False)
+        >>> part.show('text')
         {0.0} <music21.stream.Stream 0x104935b00>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
@@ -650,8 +650,8 @@ class StreamCore(Music21Object):
 
         But the default acts with recursion:
 
-        >>> t.coreGatherMissingSpanners()
-        >>> t.show('text')
+        >>> part.coreGatherMissingSpanners()
+        >>> part.show('text')
         {0.0} <music21.stream.Stream 0x104935b00>
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
@@ -673,13 +673,13 @@ class StreamCore(Music21Object):
 
         Also does not happen with recursion.
 
-        >>> t = stream.Part()
+        >>> part = stream.Part()
         >>> s = getStream()
         >>> sl = s.notes.first().getSpannerSites()[0]
         >>> s.insert(0, sl)
-        >>> t.insert(0, s)
-        >>> t.coreGatherMissingSpanners()
-        >>> t.show('text')
+        >>> part.insert(0, s)
+        >>> part.coreGatherMissingSpanners()
+        >>> part.show('text')
         {0.0} <music21.stream.Stream 0x104935b00>
             {0.0} <music21.note.Note C>
             {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>

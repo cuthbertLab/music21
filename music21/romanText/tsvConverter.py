@@ -66,7 +66,7 @@ class TabChord:
 
     def _changeRepresentation(self):
         '''
-        Converts the representation type of a TabChord between the music21 and DCML conventions,
+        Converts the representationType of a TabChord between the music21 and DCML conventions,
         especially for the different handling of expectations in minor.
 
         First, let's set up a TabChord().
@@ -268,7 +268,7 @@ class TsvHandler:
     >>> m21Chord1.figure
     'I'
 
-    And for our last trick, we can put the whole lot in a music21 stream.
+    And for our last trick, we can put the whole collection in a music21 stream.
 
     >>> out_stream = handler.toM21Stream()
     >>> out_stream.parts[0].measure(1)[0].figure

@@ -125,7 +125,7 @@ def getSitePackages():
 
 def findInstallations():
     '''
-    Find all music21 references found in site packages, or
+    Find all music21 references that are found in "site-packages", or
     possibly look at the running code as well.
     '''
     found = []
@@ -561,7 +561,7 @@ class Dialog:
                 self._result = rawInput
                 break
 
-            # need to not catch no NoInput nor IncompleteInput classes, as they
+            # need to not catch NoInput nor IncompleteInput classes, as they
             # will be handled in evaluation
             # pylint: disable=assignment-from-no-return
             cookedInput = self._evaluateUserInput(rawInput)
@@ -570,7 +570,7 @@ class Dialog:
             # if no default and no input, we get here (default supplied in
             # evaluate
             if isinstance(cookedInput, (NoInput, IncompleteInput)):
-                # set result to these objects whether or not try again
+                # set result to these objects even if we try again
                 self._result = cookedInput
                 if self._tryAgain:
                     # only returns True or False
@@ -1004,7 +1004,7 @@ class SelectFromList(Dialog):
 
     def _preAskUser(self, force=None):
         '''
-        Before we ask user, we need to to run _askFillEmptyList list if the list is empty.
+        Before we ask user, we need to run _askFillEmptyList list if the list is empty.
 
         >>> d = configure.SelectFromList()
         >>> d._preAskUser('no')  # force for testing
@@ -1379,7 +1379,7 @@ class SelectMusicXMLReader(SelectFilePath):
 
     def _askFillEmptyList(self, default=None, force=None):
         '''
-        If we do not have an musicxml readers, ask user if they want to download.
+        If we do not have any musicxml readers, ask user if they want to download.
         '''
         urlTarget = urlMuseScore
 
@@ -1525,7 +1525,7 @@ class ConfigurationAssistant:
 
             d.askUser(force=force)
             unused_post = d.getResult()
-            # post may be an error; no problem calling perform action anyways
+            # post may be an error; no problem calling perform action in any case.
             try:
                 d.performAction(simulate=self._simulate)
             except DialogException:

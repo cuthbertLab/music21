@@ -190,7 +190,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         that will be used instead of that available on a client.
 
         The `velocityIsRelative` tag determines if the velocity value includes
-        contextual values, such as dynamics and and accents, or not.
+        contextual values, such as dynamics and accents, or not.
 
         >>> s = stream.Stream()
         >>> s.repeatAppend(note.Note('d3', quarterLength=0.5), 8)
@@ -236,7 +236,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             if self._velocityScalar is not None:
                 if not self.velocityIsRelative:
                     # if velocity is not relative
-                    # it should fully determines output independent of anything
+                    # it should fully determine output independent of anything
                     # else
                     val = self._velocityScalar
                 else:
@@ -487,7 +487,7 @@ def realizeVolume(srcStream,
                 for k in range(lastRelevantKeyIndex, len(bKeys)):
                     start, end = bKeys[k]
                     if end > eStart >= start:
-                        # store so as to start in the same position
+                        # store to start in the same position
                         # for next element
                         lastRelevantKeyIndex = k
                         dm = boundaries[bKeys[k]]

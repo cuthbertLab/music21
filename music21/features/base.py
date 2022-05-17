@@ -48,7 +48,7 @@ class Feature:
     >>> myFeature.name = 'Random arguments'
     >>> myFeature.isSequential = True
 
-    This is a continuous Feature so we will set discrete to false.
+    This is a continuous Feature, so we will set discrete to false.
 
     >>> myFeature.discrete = False
 
@@ -72,7 +72,7 @@ class Feature:
 
     It's okay just to assign a new list to .vector itself.
 
-    There is a normalize() method which normalizes the values
+    There is a "normalize()" method which normalizes the values
     of a histogram to sum to 1.
 
     >>> myFeature.normalize()
@@ -168,8 +168,7 @@ class FeatureExtractor:
                 # environLocal.printDebug(['creating new DataInstance: this should be a Stream:',
                 #     dataOrStream])
                 # if we are passed a stream, create a DataInstance to
-                # manage the
-                # its data; this is less efficient but is good for testing
+                # manage its data; this is less efficient but is good for testing
                 self.stream = dataOrStream
                 self.data = DataInstance(self.stream)
             # if a DataInstance, do nothing
@@ -202,7 +201,9 @@ class FeatureExtractor:
         return post
 
     def fillFeatureAttributes(self, feature=None):
-        '''Fill the attributes of a Feature with the descriptors in the FeatureExtractor.
+        # noinspection GrazieInspection
+        '''
+        Fill the attributes of a Feature with the descriptors in the FeatureExtractor.
         '''
         # operate on passed-in feature or self.feature
         if feature is None:
@@ -252,7 +253,7 @@ class FeatureExtractor:
 
     def getBlankFeature(self):
         '''
-        Return a properly configured plain feature as a place holder
+        Return a properly configured plain feature as a placeholder
 
         >>> from music21 import features
         >>> fe = features.jSymbolic.InitialTimeSignatureFeature()
@@ -457,7 +458,7 @@ class StreamForms:
             parts = [prepared]  # emulate a list
 
         for p in parts:
-            # this may be unnecessary but we cannot accessed cached part data
+            # this may be unnecessary, but we cannot access cached part data
 
             # noNone means that we will see all connections, even w/ a gap
             post = p.findConsecutiveNotes(skipRests=True,
@@ -584,7 +585,7 @@ class DataInstance:
 
     def setupPostStreamParse(self):
         '''
-        Setup the StreamForms objects and other things that
+        Set up the StreamForms objects and other things that
         need to be done after a Stream is passed in but before
         feature extracting is run.
 
@@ -599,12 +600,12 @@ class DataInstance:
         # if parts exist, store a forms for each
         self.formsByPart = []
         if hasattr(self.stream, 'parts'):
-            self.partsCount = len(self.stream.parts)
+            self.data.partsCount = len(self.stream.parts)
             for p in self.stream.parts:
                 # note that this will join ties and expand rests again
                 self.formsByPart.append(StreamForms(p))
         else:
-            self.partsCount = 0
+            self.data.partsCount = 0
 
         for v in self.stream[stream.Voice]:
             self.formsByPart.append(StreamForms(v))
@@ -649,7 +650,7 @@ class DataInstance:
         If a path to a Stream has been passed in at creation,
         then this will parse it (whether it's a corpus string,
         a converter string (url or filepath), a pathlib.Path,
-        or a metadata.bundles.MetadataEntry.
+        or a metadata.bundles.MetadataEntry).
         '''
         if self.stream is not None:
             return
@@ -995,7 +996,7 @@ class DataSet:
     def getFeaturesAsList(self, includeClassLabel=True, includeId=True, concatenateLists=True):
         '''
         Get processed data as a list of lists, merging any sub-lists
-        in multi-dimensional features.
+        in multidimensional features.
         '''
         post = []
         for i, row in enumerate(self.features):
@@ -1109,6 +1110,7 @@ def _dataSetParallelSubprocess(dataInstance, failFast):
 
 
 def allFeaturesAsList(streamInput):
+    # noinspection PyShadowingNames
     '''
     returns a list containing ALL currently implemented feature extractors
 

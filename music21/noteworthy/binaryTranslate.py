@@ -136,6 +136,7 @@ class NWCConverter:
 
     # noinspection SpellCheckingInspection
     def parseFile(self, fp: t.Union[pathlib.Path, str]):
+        # noinspection PyShadowingNames
         r'''
         Parse a file (calls .toStream)
 

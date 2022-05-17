@@ -80,7 +80,7 @@ def getPaths():
         # when importing a package name (a directory) the moduleName
         # may be a list of all paths contained within the package
         # this seems to be dependent on the context of the call:
-        # from the command line is different than from the interpreter
+        # from the command line is different from calling from the interpreter
         dirListing = moduleName
     else:
         # returns a list with one or more paths
@@ -128,7 +128,7 @@ class ScalaPitch:
      600.0883..., 699.9976..., 800.9095..., 900.0260...,
      1000.0201..., 1088.2687..., 1200.0]
     '''
-    # pitch values; if has a period, is cents, otherwise a ratio
+    # pitch values; if it has a period, it is cents.  Otherwise it is a ratio
     # above the implied base ratio
     # integer values w/ no period or slash: 2 is 2/1
     def __init__(self, sourceString=None):
@@ -155,7 +155,7 @@ class ScalaPitch:
 
         if '.' in self.src:  # cents
             self.cents = float(self.src)
-        else:  # its a ratio
+        else:  # it is a ratio
             if '/' in self.src:
                 n, d = self.src.split('/')
                 n, d = float(n), float(d)
@@ -172,7 +172,7 @@ class ScalaPitch:
 class ScalaData:
     # noinspection SpellCheckingInspection
     '''
-    Object representation of data stored in a Scale scale file. This object is used to
+    Object representation of data stored in a Scala scale file. This object is used to
     access Scala information stored in a file. To create a music21 scale with a Scala file,
     use :class:`~music21.scale.ScalaScale`.
 
@@ -446,7 +446,7 @@ class ScalaFile:
 
 # ------------------------------------------------------------------------------
 def parse(target):
-    # noinspection SpellCheckingInspection
+    # noinspection SpellCheckingInspection, PyShadowingNames
     '''
     Get a :class:`~music21.scala.ScalaData` object from
     the bundled SCL archive or a file path.
