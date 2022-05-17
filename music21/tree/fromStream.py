@@ -19,7 +19,6 @@ import typing as t
 from music21.base import Music21Object
 from music21.common.types import M21ObjType, StreamType
 from music21 import common
-from music21 import key
 from music21 import note
 from music21.tree import spans
 from music21.tree import timespanTree
@@ -29,7 +28,7 @@ from music21.tree import trees
 def listOfTreesByClass(
     inputStream: StreamType,
     *,
-    classLists: t.Optional[t.List[t.Sequence[t.Type[M21ObjType]]]] = None,
+    classLists: t.Sequence[t.Sequence[t.Type[M21ObjType]]] = (),
     currentParentage: t.Optional[t.Tuple['music21.stream.Stream', ...]] = None,
     initialOffset: float = 0.0,
     flatten: t.Union[bool, str] = False,
@@ -75,31 +74,31 @@ def listOfTreesByClass(
     Now filter the Notes and the Clefs & TimeSignatures of the score
     (flattened) into a list of two TimespanTrees
 
-    >>> classLists = ['Note', ('Clef', 'TimeSignature')]
+    >>> classLists = ((note.Note,), (clef.Clef, meter.TimeSignature))
     >>> treeList = tree.fromStream.listOfTreesByClass(score, useTimespans=True,
     ...                                               classLists=classLists, flatten=True)
     >>> treeList
     [<TimespanTree {12} (0.0 to 8.0) <music21.stream.Score ...>>,
      <TimespanTree {4} (0.0 to 0.0) <music21.stream.Score ...>>]
+
+    Changed in v8: it is now a stickler that classLists must be sequences of sequences,
+        such as tuples of tuples.
     '''
+    from music21 import stream
+
     if currentParentage is None:
         currentParentage = (inputStream,)
-        # fix non-tuple classLists -- first call only...
-        if classLists:
-            for i, cl in enumerate(classLists):
-                if not common.isIterable(cl):
-                    classLists[i] = (cl,)
 
     lastParentage = currentParentage[-1]
 
+    treeClass: t.Type[trees.OffsetTree]
     if useTimespans:
         treeClass = timespanTree.TimespanTree
     else:
         treeClass = trees.OffsetTree
 
-    if classLists is None or not classLists:
+    if not classLists:  # always get at least one
         outputTrees = [treeClass(source=lastParentage)]
-        classLists = []
     else:
         outputTrees = [treeClass(source=lastParentage) for _ in classLists]
     # do this to avoid munging activeSites
@@ -133,8 +132,8 @@ def listOfTreesByClass(
                 if classList and element.classSet.isdisjoint(classList):
                     continue
                 if useTimespans:
-                    if hasattr(element, 'pitches') and not isinstance(element,
-                                                                      (key.Key, note.Rest)):
+                    spanClass: t.Type[spans.ElementTimespan]
+                    if isinstance(element, (note.NotRest, stream.Stream)):
                         spanClass = spans.PitchedTimespan
                     else:
                         spanClass = spans.ElementTimespan
@@ -258,6 +257,8 @@ def asTree(
         return inner_outputTree
 
     # first time through...
+    treeClass: t.Type[trees.ElementTree]
+
     if useTimespans:
         treeClass = timespanTree.TimespanTree
     elif groupOffsets is False:
@@ -314,7 +315,7 @@ def asTimespans(
     inputStream,
     *,
     flatten: t.Union[str, bool] = False,
-    classList: t.Optional[t.Sequence[t.Type]] = None
+    classList: t.Optional[t.Sequence[t.Type[Music21Object]]] = None
 ) -> timespanTree.TimespanTree:
     r'''
     Recurses through a score and constructs a
@@ -359,15 +360,20 @@ def asTimespans(
     >>> tenorElements.source is score[3]
     True
     '''
+    classLists: t.List[t.Sequence[t.Type[Music21Object]]]
     if classList is None:
-        classList = Music21Object
-    classLists = [classList]
+        classLists = [[Music21Object]]
+    else:
+        classLists = [classList]
     listOfTimespanTrees = listOfTreesByClass(inputStream,
                                              initialOffset=0.0,
                                              flatten=flatten,
                                              classLists=classLists,
                                              useTimespans=True)
-    return listOfTimespanTrees[0]
+    timespanTreeFirst = listOfTimespanTrees[0]
+    if t.TYPE_CHECKING:
+        assert isinstance(timespanTreeFirst, timespanTree.TimespanTree)
+    return timespanTreeFirst
 
 
 # --------------------

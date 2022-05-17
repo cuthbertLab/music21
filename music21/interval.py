@@ -17,6 +17,8 @@ Fundamental classes are :class:`~music21.interval.Interval`,
 :class:`~music21.interval.GenericInterval`,
 and :class:`~music21.interval.ChromaticInterval`.
 '''
+from __future__ import annotations
+
 from fractions import Fraction
 
 import abc
@@ -57,7 +59,7 @@ directionTerms = {Direction.DESCENDING: 'Descending',
 # perhaps the first entry, below, should be None, like in prefixSpecs?
 
 # constants provide the common numerical representation of an interval.
-# this is not the number of half tone shift.
+# This is not the number of semitone shifts.
 niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished',
                  'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented',
                  'Triply-Diminished', 'Quadruply-Augmented', 'Quadruply-Diminished']
@@ -155,7 +157,7 @@ class Specifier(enum.IntEnum):
         >>> Specifier.PERFECT.semitonesAbovePerfect()
         0
 
-        Major and minor cannot be compared to Perfect so they raise an
+        Major and minor cannot be compared to Perfect, so they raise an
         IntervalException
 
         >>> Specifier.MINOR.semitonesAbovePerfect()
@@ -212,7 +214,7 @@ class Specifier(enum.IntEnum):
         >>> Specifier.MAJOR.semitonesAboveMajor()
         0
 
-        Perfect cannot be compared to Major so it raises an
+        Perfect cannot be compared to Major, so it raises an
         IntervalException
 
         >>> Specifier.PERFECT.semitonesAboveMajor()
@@ -347,7 +349,7 @@ def convertStaffDistanceToInterval(staffDist):
 
 def convertDiatonicNumberToStep(dn):
     '''
-    Convert a diatonic number to a step name (without accidental) and a octave integer.
+    Convert a diatonic number to a step name (without accidental) and an octave integer.
     The lowest C on a Bösendorfer Imperial Grand is assigned 1 the D above it is 2,
     E is 3, etc.  See pitch.diatonicNoteNum for more details
 
@@ -621,21 +623,22 @@ def convertSemitoneToSpecifierGeneric(count: int) -> t.Tuple[Specifier, int]:
     return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
 
 
-_pythagorean_cache: t.Dict[str, Fraction] = {}
+_pythagorean_cache: t.Dict[str, t.Tuple['music21.pitch.Pitch', Fraction]] = {}
 
 
-def intervalToPythagoreanRatio(intervalObj):
+def intervalToPythagoreanRatio(intervalObj: Interval) -> Fraction:
     r'''
     Returns the interval ratio in pythagorean tuning, always as a Fraction object.
 
-    >>> iList = [interval.Interval(name) for name in ('P4', 'P5', 'M7')]
+    >>> iList = [interval.Interval(name) for name in ('P4', 'P5', 'M7', 'm23')]
     >>> iList
     [<music21.interval.Interval P4>,
      <music21.interval.Interval P5>,
-     <music21.interval.Interval M7>]
+     <music21.interval.Interval M7>,
+     <music21.interval.Interval m23>]
 
     >>> [interval.intervalToPythagoreanRatio(i) for i in iList]
-    [Fraction(4, 3), Fraction(3, 2), Fraction(243, 128)]
+    [Fraction(4, 3), Fraction(3, 2), Fraction(243, 128), Fraction(2048, 243)]
 
     Throws an exception if no ratio can be found, such as for quarter tones.
 
@@ -655,6 +658,9 @@ def intervalToPythagoreanRatio(intervalObj):
 
     start_pitch = Pitch('C1')
     end_pitch_wanted = start_pitch.transpose(intervalObj)
+
+    end_pitch: Pitch
+    ratio: Fraction
 
     if end_pitch_wanted.name in _pythagorean_cache:
         end_pitch, ratio = _pythagorean_cache[end_pitch_wanted.name]
@@ -816,7 +822,7 @@ class GenericInterval(IntervalBase):
     >>> descendingUnison.undirected
     1
 
-    This is because we don't yet know what kind of a unison this is: is it
+    This is because we don't yet know what type of unison this is: is it
     a Perfect Unison or an Augmented Unison (or Augmented Prime as some prefer)?
     Thus, the illegal check will be moved to a higher level Interval object.
 
@@ -1403,7 +1409,7 @@ class GenericInterval(IntervalBase):
         >>> bPitch
         <music21.pitch.Pitch D5>
 
-        But if a key or keySignature (such as one from .getContextByClass(key.KeySignature)
+        But if a key or keySignature (such as one from `.getContextByClass(key.KeySignature)`)
         is given, then the fun begins...
 
         >>> fis = pitch.Pitch('F#4')
@@ -2082,10 +2088,10 @@ class DiatonicInterval(IntervalBase):
         semitonesStart = semitonesGeneric[self.generic.simpleUndirected]
 
         if self.generic.perfectable:
-            # dictionary of semitones distance from perfect
+            # dictionary of semitone distances from perfect
             semitonesAdjust = self.specifier.semitonesAbovePerfect()
         else:
-            # dictionary of semitones distance from major
+            # dictionary of semitone distances from major
             semitonesAdjust = self.specifier.semitonesAboveMajor()
 
         semitones = (octaveOffset * 12) + semitonesStart + semitonesAdjust
@@ -2136,9 +2142,9 @@ class DiatonicInterval(IntervalBase):
         return prefixSpecs[self.specifier]
 
     @property
-    def cents(self):
+    def cents(self) -> float:
         '''
-        Return a cents representation of this interval as a float,
+        Return the number of cents in this interval.  Returns a float,
         always assuming an equal-tempered presentation.
 
         >>> i = interval.DiatonicInterval('minor', 'second')
@@ -2376,9 +2382,9 @@ class ChromaticInterval(IntervalBase):
         object of the same size.
 
         While there is more than one Generic Interval for any given chromatic
-        interval, this is needed to to permit easy chromatic specification of
-        Interval objects.  No augmented or diminished intervals are returned
-        except for for interval of 6 which returns a diminished fifth, not
+        interval, this is needed to permit easy chromatic specification of
+        Interval objects.  Augmented or diminished intervals are never returned
+        except for the interval of 6 which returns a diminished fifth, not
         augmented fourth.
 
         >>> aInterval = interval.ChromaticInterval(5)
@@ -3417,7 +3423,7 @@ class Interval(IntervalBase):
         pitch2.accidental = None
         pitch2.microtone = None
 
-        # have right note name but not accidental
+        # We have the right note name but not the right accidental
         interval2 = Interval(pitch1, pitch2)
         # halfStepsToFix already has any microtones
         halfStepsToFix = self.chromatic.semitones - interval2.chromatic.semitones
@@ -3499,7 +3505,7 @@ class Interval(IntervalBase):
         automatically have the end note (_noteEnd).
         '''
         # this is based on the procedure found in transposePitch() and
-        # transposeNote() but offers a more object oriented approach
+        # transposeNote() but offers a more object-oriented approach
         pitch2 = self.transposePitch(n.pitch)
         self._noteStart = n
         # prefer to copy the existing noteEnd if it exists, or noteStart if not
@@ -3549,7 +3555,7 @@ class Interval(IntervalBase):
         set a new end note (_noteEnd) and automatically have the start note (_noteStart).
         '''
         # this is based on the procedure found in transposePitch() but offers
-        # a more object oriented approach
+        # a more object-oriented approach
         pitch1 = self.transposePitch(n.pitch, reverse=True)
 
         self._noteEnd = n
@@ -3762,7 +3768,7 @@ def transposeNote(
         intervalString: t.Union[str, Interval]) -> 'music21.note.Note':
     '''
     Given a :class:`~music21.note.Note` and
-    a interval string (such as 'P5') or an Interval object,
+    an interval string (such as 'P5') or an Interval object,
     return a new Note object at the appropriate pitch level.
 
     >>> aNote = note.Note('c4')

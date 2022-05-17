@@ -5065,7 +5065,7 @@ class Pitch(prebase.ProtoM21Object):
                 # pPast might include this note itself, in which case we should not say
                 # "natural already in past usage". (Filtering out the current note from pPast
                 # when calling this method is not sufficient, because there could be repetitions.)
-                elif (self._client is not None and self._client._chordAttached is not None):
+                elif self._client is not None and self._client._chordAttached is not None:
                     continue
 
                 # other cases: already natural in past usage, do not need

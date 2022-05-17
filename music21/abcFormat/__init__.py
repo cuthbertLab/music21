@@ -137,7 +137,10 @@ class ABCToken(prebase.ProtoM21Object):
     then does contextual
     adjustments to all tokens, then calls :meth:`~music21.abcFormat.ABCToken.parse` on all tokens.
 
-    The source ABC string itself is stored in self.src
+    The source ABC string itself is stored in self.src.
+
+    Because of how copying ABCTokens works, all tokens must have default parameters in their
+    initializers
     '''
     def __init__(self, src=''):
         self.src: str = src  # store source character sequence

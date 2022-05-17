@@ -225,8 +225,8 @@ class Sites(common.SlottedObjectMixin):
         True
         '''
         # TODO: it may be a problem that sites are being transferred to deep
-        # copies; this functionality is used at times in context searches, but
-        # may be a performance hog.
+        #     copies; this functionality is used at times in context searches, but
+        #     may be a performance hog.
         new = self.__class__()
         # environLocal.printDebug(['Sites.__deepcopy__',
         #    'self.siteDict.keys()', self.siteDict.keys()])

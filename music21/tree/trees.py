@@ -967,7 +967,7 @@ class OffsetTree(ElementTree):
             elif node.rightChild and node.payloadElementsStopIndex <= index:
                 return recurseByIndex(node.rightChild, index)
 
-        def recurseBySlice(node: nodeModule.ElementNode, start, stop):
+        def recurseBySlice(node: nodeModule.OffsetNode, start, stop):
             '''
             Return a slice of the payload elements (plural) where start <= index < stop.
             '''

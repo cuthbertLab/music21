@@ -8,7 +8,7 @@
 #               Jackie Rogoff
 #               Beth Hadley
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -453,7 +453,6 @@ class VoiceLeadingQuartet(base.Music21Object):
             else:
                 return False
 
-    @t.no_type_check
     def parallelMotion(
         self,
         requiredInterval=None,
@@ -527,15 +526,24 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.parallelMotion(gi, allowOctaveDisplacement=True)
         True
         '''
+        vInt0 = self.vIntervals[0]
+        vInt0_generic = vInt0.generic
+        vInt1 = self.vIntervals[1]
+        vInt1_generic = vInt1.generic
+
+        if t.TYPE_CHECKING:
+            assert vInt0_generic is not None
+            assert vInt1_generic is not None
+
         if not self.similarMotion():
             return False
 
-        elif (self.vIntervals[0].generic.directed != self.vIntervals[1].generic.directed
+        elif (vInt0_generic.directed != vInt1_generic.directed
               and not allowOctaveDisplacement):
             return False
 
-        elif (self.vIntervals[0].generic.semiSimpleUndirected
-                != self.vIntervals[1].generic.semiSimpleUndirected):
+        elif (vInt0_generic.semiSimpleUndirected
+                != vInt1_generic.semiSimpleUndirected):
             return False
 
         elif requiredInterval is None:
@@ -545,26 +553,26 @@ class VoiceLeadingQuartet(base.Music21Object):
             intervalsAreValid = False
 
             if isinstance(requiredInterval, interval.GenericInterval):
-                intervalsAreValid = (self.vIntervals[0].generic.semiSimpleUndirected
+                intervalsAreValid = (vInt0_generic.semiSimpleUndirected
                                      == requiredInterval.semiSimpleUndirected)
 
             if isinstance(requiredInterval, int):
                 # assume the user wants a parallel generic interval
                 requiredInterval = interval.GenericInterval(requiredInterval)
-                intervalsAreValid = (self.vIntervals[0].generic.semiSimpleUndirected
+                intervalsAreValid = (vInt0_generic.semiSimpleUndirected
                                      == requiredInterval.semiSimpleUndirected)
 
             if isinstance(requiredInterval, str):
                 requiredInterval = interval.Interval(requiredInterval)
-                intervalsAreValid = (self.vIntervals[0].semiSimpleName
+                intervalsAreValid = (vInt0.semiSimpleName
                                         == requiredInterval.semiSimpleName
-                                     and self.vIntervals[1].semiSimpleName
+                                     and vInt1.semiSimpleName
                                         == requiredInterval.semiSimpleName)
 
             elif isinstance(requiredInterval, (interval.Interval, interval.DiatonicInterval)):
-                intervalsAreValid = (self.vIntervals[0].semiSimpleName
+                intervalsAreValid = (vInt0.semiSimpleName
                                         == requiredInterval.semiSimpleName
-                                     and self.vIntervals[1].semiSimpleName
+                                     and vInt1.semiSimpleName
                                         == requiredInterval.semiSimpleName)
 
             return intervalsAreValid
@@ -996,7 +1004,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return False
 
-    @t.no_type_check
     def isProperResolution(self) -> bool:
         '''
         Checks whether the voice-leading quartet resolves correctly according to standard
@@ -1113,7 +1120,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 minorScale = scale.MelodicMinorScale(self.key.tonic)
                 n1degree = minorScale.getScaleDegreeFromPitch(
                     self.v2n1,
-                    direction=scale.DIRECTION_ASCENDING)
+                    direction=scale.Direction.ASCENDING)
 
         else:
             keyScale = None
@@ -1121,7 +1128,10 @@ class VoiceLeadingQuartet(base.Music21Object):
             n2degree = None
 
         firstHarmony = self.vIntervals[0].simpleName
-        secondHarmony = self.vIntervals[1].generic.simpleUndirected
+        secondGeneric = self.vIntervals[1].generic
+        if t.TYPE_CHECKING:
+            assert secondGeneric is not None
+        secondHarmony = secondGeneric.simpleUndirected
 
         if firstHarmony == 'P4':
             if self.v1n1 >= self.v1n2:
@@ -1155,7 +1165,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return True
 
-    @t.no_type_check
     def leapNotSetWithStep(self) -> bool:
         '''
         Returns True if there is a leap or skip in once voice then the other voice must
@@ -1186,17 +1195,23 @@ class VoiceLeadingQuartet(base.Music21Object):
         if self.noMotion():
             return False
 
-        if (self.hIntervals[0].generic.undirected == 3
-                and self.hIntervals[1].generic.undirected == 3
+        hInt0_generic = self.hIntervals[0].generic
+        hInt1_generic = self.hIntervals[1].generic
+        if t.TYPE_CHECKING:
+            assert hInt0_generic is not None
+            assert hInt1_generic is not None
+
+        if (hInt0_generic.undirected == 3
+                and hInt1_generic.undirected == 3
                 and self.contraryMotion()):
             return False
 
-        if self.hIntervals[0].generic.isSkip:
-            return not (self.hIntervals[1].generic.isDiatonicStep
-                        or self.hIntervals[1].generic.isUnison)
-        elif self.hIntervals[1].generic.isSkip:
-            return not (self.hIntervals[0].generic.isDiatonicStep
-                        or self.hIntervals[0].generic.isUnison)
+        if hInt0_generic.isSkip:
+            return not (hInt1_generic.isDiatonicStep
+                        or hInt1_generic.isUnison)
+        elif hInt1_generic.isSkip:
+            return not (hInt0_generic.isDiatonicStep
+                        or hInt0_generic.isUnison)
         else:
             return False
 
@@ -1246,7 +1261,6 @@ class VoiceLeadingQuartet(base.Music21Object):
                       and (r1[0].upper() in openings if r1 is not False else False
                            or r2[0].upper() in openings if r2 is not False else False))
 
-    @t.no_type_check
     def closesIncorrectly(self) -> bool:
         '''
         TODO(msc): will be renamed to be less dogmatic
@@ -1274,7 +1288,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl = voiceLeading.VoiceLeadingQuartet('C#4', 'D4', 'A2', 'D3', analyticKey='D')
         >>> vl.closesIncorrectly()
         True
-
         '''
         raisedMinorCorrectly = False
         if self.key.mode == 'minor':
@@ -1286,8 +1299,15 @@ class VoiceLeadingQuartet(base.Music21Object):
             raisedMinorCorrectly = True
         preClosings = (6, 3)
         closingPitches = [self.v1n2.pitch.name, self.v2n2.name]
-        return not (self.vIntervals[0].generic.simpleUndirected in preClosings
-                     and self.vIntervals[1].generic.simpleUndirected == 1
+
+        vInt0_generic = self.vIntervals[0].generic
+        vInt1_generic = self.vIntervals[1].generic
+        if t.TYPE_CHECKING:
+            assert vInt0_generic is not None
+            assert vInt1_generic is not None
+
+        return not (vInt0_generic.simpleUndirected in preClosings
+                     and vInt1_generic.simpleUndirected == 1
                      and raisedMinorCorrectly
                      and self.key.pitchFromDegree(1).name in closingPitches
                      and self.contraryMotion())

@@ -57,6 +57,8 @@ class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
 
     # INITIALIZER #
     def __init__(self, slashNotation: t.Optional[str] = None, weight=1):
+        # because of how they are copied, MeterTerminals must not have any
+        # initialization parameters without defaults
         self._duration = None
         self._numerator = 0
         self._denominator = 1

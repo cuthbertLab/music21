@@ -832,7 +832,7 @@ class Verticality(prebase.ProtoM21Object):
                 notesToAdd[pitchKey + str(pitchBust)] = newNote(ts, n)
                 pitchBust += 1
                 return
-            elif addPartIdAsGroup:
+            elif addPartIdAsGroup and pitchGroup is not None:
                 notesToAdd[pitchKey].groups.append(pitchGroup)
                 notesToAdd[pitchKey].pitch.groups.append(pitchGroup)
 

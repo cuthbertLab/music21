@@ -5817,14 +5817,14 @@ class Chord(ChordBase):
             degree = sc.getScaleDegreeFromPitch(
                 thisPitch,
                 comparisonAttribute='step',
-                direction=scale.DIRECTION_DESCENDING,
+                direction=scale.Direction.DESCENDING,
             )
             if degree is None:
                 degrees.append((None, None))
             else:
                 actualPitch = sc.pitchFromDegree(
                     degree,
-                    direction=scale.DIRECTION_DESCENDING
+                    direction=scale.Direction.DESCENDING
                 )
                 if actualPitch.name == thisPitch.name:
                     degrees.append((degree, None))
