@@ -2381,7 +2381,7 @@ def fromString(instrumentString: str,
     >>> t9.transposition
     <music21.interval.Interval M-2>
 
-    Use "H" or "b-natural" to get an instrument in B-major.  Or donate one to me
+    Use "H" or "b-natural" to get an instrument in B-major.  Or donate one to me,
     and I'll change this back!
 
 
@@ -2418,7 +2418,7 @@ def fromString(instrumentString: str,
     Alternatively, you can specify the language to search using the `language`
     argument. (New in v7.3.)
 
-    >>> t12 = instrument.fromString('Klarinette', language='german')
+    >>> t12 = instrument.fromString('Klarinette', language=instrument.SearchLanguage.GERMAN)
     >>> t12
     <music21.instrument.Clarinet 'Klarinette'>
 
@@ -2851,7 +2851,8 @@ class Test(unittest.TestCase):
 
         inst = instrument.Flute()
         # Working example
-        self.assertEqual(instrument.getAllNamesForInstrument(inst, language='abbreviation'),
+        self.assertEqual(instrument.getAllNamesForInstrument(inst,
+                                                             language=SearchLanguage.ABBREVIATION),
                          {'abbreviation': ['fl']})
         # Error for unsupported language
         self.assertRaises(InstrumentException,

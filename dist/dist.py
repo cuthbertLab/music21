@@ -21,7 +21,7 @@ To do a release,
     so don't skip the next step!
 3. run test/warningMultiprocessTest.py for lowest and highest Py version -- fix all warnings!
 4. run test/testLint.py and fix any lint errors (covered now by CI)
-5. commit and then check test/testSingleCoreAll.py or wait for results on Github Actions
+5. commit and then check test/testSingleCoreAll.py or wait for results on GitHub Actions
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
 6. IMPORTANT: run python documentation/testDocumentation.py and afterwards fix errors [*]
@@ -52,7 +52,7 @@ the announcement while it's running.
     fix them -- creating a dir music21.egg-info in the main dir with a
     requires.txt file created as root.
 
-14. COMMIT to Github at this point w/ commit comment of the new version,
+14. COMMIT to GitHub at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
     (.gitignore will avoid uploading the large files created here...)
 

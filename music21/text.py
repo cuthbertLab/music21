@@ -461,7 +461,7 @@ class LanguageDetector:
 
 # ------------------------------------------------------------------------------
 class Trigram:
-    # noinspection SpellCheckingInspection
+    # noinspection SpellCheckingInspection,GrazieInspection
     '''
     See LanguageDetector above.
     From https://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/

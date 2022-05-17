@@ -92,7 +92,7 @@ class DirectoryInformation(prebase.ProtoM21Object):
             if workStub not in self.works:
                 title = common.spaceCamelCase(workStub).title()
                 self.works[workStub] = CorpusWork(title=title, files=[], virtual=False)
-            # last component is name
+            # last component is the name
             m21Format, ext = common.findFormatExtFile(fileComponents[-1])
             # all path parts after corpus
             corpusPath = os.path.join(str(self.directoryName), fileStub)

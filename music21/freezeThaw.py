@@ -50,9 +50,9 @@ because we weren't sure and are still not sure which will be best in the long-ru
 the first approach
 uses explicit lists of attributes that need to be stored and just saves those. This uses a
 homemade set of methods that are specifically tailored for music21; but it misses some things that
-may be important to you.  The second approach uses the the freely distributable
+may be important to you.  The second approach uses the freely distributable
 `jsonpickle` module. This approach probably stores more data than
-someone not using music21 or python is likely to want, but can be used to get back an entire
+a person not using music21 or python is likely to want, but can be used to get back an entire
 music21 Stream with no conversion.
 
 Both JSON and Pickle files can be huge, but `freezeThaw` can compress them with
@@ -236,7 +236,7 @@ class StreamFreezer(StreamFreezeThawBase):
         {'m21Version': (...), 'stream': <music21.stream.Stream 0x1289212>}
 
         '''
-        # do all things necessary to setup the stream
+        # do all things necessary to set up the stream
         if streamObj is None:
             streamObj = self.stream
         self.setupSerializationScaffold(streamObj)
@@ -333,15 +333,15 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> s.insert(10, n)
         >>> len(n.sites)
         2
-        >>> t = stream.Stream()
-        >>> t.insert(20, n)
-        >>> t.id = 'stream t'
+        >>> s2 = stream.Stream()
+        >>> s2.insert(20, n)
+        >>> s2.id = 'stream s2'
         >>> len(n.sites)
         3
 
         >>> n.getOffsetBySite(s)
         10.0
-        >>> n.getOffsetBySite(t)
+        >>> n.getOffsetBySite(s2)
         20.0
 
         >>> sf = freezeThaw.StreamFreezer()
@@ -355,9 +355,8 @@ class StreamFreezer(StreamFreezeThawBase):
         Traceback (most recent call last):
         music21.sites.SitesException: an entry for this object <music21.note.Note D#>
                is not stored in stream <music21.stream.Stream stream s>
-        >>> n.getOffsetBySite(t)
+        >>> n.getOffsetBySite(s2)
         20.0
-
 
         After recursiveClearSites n will be not know its location anywhere...
 
@@ -365,15 +364,13 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> len(n.sites)  # just the None site
         1
 
-        This leaves n and t in strange positions, because n is in t.elements still....
+        This leaves n and s2 in strange positions, because n is in s2.elements still....
 
-        >>> n in t.elements
+        >>> n in s2.elements
         True
 
         This predicament is why when the standard freezeThaw call is made, what is frozen is a
         deepcopy of the Stream so that nothing is left in an unusable position
-
-
         '''
         if hasattr(startObj, '_storedElementOffsetTuples'):
             storedElementOffsetTuples = startObj._storedElementOffsetTuples
@@ -655,7 +652,7 @@ class StreamFreezer(StreamFreezeThawBase):
             if isinstance(fp, str):
                 fp = pathlib.Path(fp)
 
-            if isinstance(fp, pathlib.Path) and not fp.is_absolute():  # assume its a complete path
+            if isinstance(fp, pathlib.Path) and not fp.is_absolute():  # assume it's a complete path
                 fp = environLocal.getRootTempDir() / fp
 
         storage = self.packStream(self.stream)

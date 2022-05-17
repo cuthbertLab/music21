@@ -1199,19 +1199,17 @@ class Tremolo(Ornament):
     A tremolo ornament represents a single-note tremolo, whether measured or unmeasured.
 
     >>> n = note.Note(type='quarter')
-    >>> t = expressions.Tremolo()
-    >>> t.measured = True  # default
-    >>> t.numberOfMarks = 3  # default
+    >>> trem = expressions.Tremolo()
+    >>> trem.measured = True  # default
+    >>> trem.numberOfMarks = 3  # default
 
-
-    >>> t.numberOfMarks = 'Hi'
+    >>> trem.numberOfMarks = 'Hi'
     Traceback (most recent call last):
     music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
 
-    >>> t.numberOfMarks = -1
+    >>> trem.numberOfMarks = -1
     Traceback (most recent call last):
     music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
-
 
     TODO: (someday) realize triplet Tremolos, etc. differently from other tremolos.
     TODO: deal with unmeasured tremolos.
@@ -1246,22 +1244,22 @@ class Tremolo(Ornament):
         Realize the ornament
 
         >>> n = note.Note(type='quarter')
-        >>> t = expressions.Tremolo()
-        >>> t.measured = True  # default
-        >>> t.numberOfMarks = 3  # default
-        >>> t.realize(n)
+        >>> trem = expressions.Tremolo()
+        >>> trem.measured = True  # default
+        >>> trem.numberOfMarks = 3  # default
+        >>> trem.realize(n)
         ([<music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>,
           <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>,
           <music21.note.Note C>, <music21.note.Note C>], None, [])
-        >>> c2 = t.realize(n)[0]
+        >>> c2 = trem.realize(n)[0]
         >>> [ts.quarterLength for ts in c2]
         [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
 
         Same thing with Streams:
 
         >>> n = note.Note(type='quarter')
-        >>> t = expressions.Tremolo()
-        >>> n.expressions.append(t)
+        >>> trem = expressions.Tremolo()
+        >>> n.expressions.append(trem)
         >>> s = stream.Stream()
         >>> s.append(n)
         >>> s.show('text')
@@ -1279,7 +1277,7 @@ class Tremolo(Ornament):
         {0.875} <music21.note.Note C>
 
 
-        >>> t.numberOfMarks = 1
+        >>> trem.numberOfMarks = 1
         >>> y = stream.makeNotation.realizeOrnaments(s)
         >>> y.show('text')
         {0.0} <music21.note.Note C>
@@ -1309,7 +1307,6 @@ class Fermata(Expression):
     To override this (for Fermatas or for any
     expression) set .tieAttach to 'all' or 'first'
     instead of 'last'.
-
 
     >>> p1 = stream.Part()
     >>> p1.append(meter.TimeSignature('6/8'))

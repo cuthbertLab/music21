@@ -75,7 +75,7 @@ class RTToken(prebase.ProtoM21Object):
     >>> rtt
     <music21.romanText.rtObjects.RTToken '||:'>
 
-    A standard RTToken returns `False` for all of the following.
+    A standard RTToken returns `False` for all the following.
 
     >>> rtt.isComposer() or rtt.isTitle() or rtt.isPiece()
     False
@@ -141,7 +141,8 @@ class RTToken(prebase.ProtoM21Object):
         return False
 
     def isAtom(self):
-        '''Atoms are any untagged data; generally only found inside of a
+        '''
+        Atoms are any untagged data; generally only found inside a
         measure definition.
         '''
         return False
@@ -230,7 +231,8 @@ class RTTagged(RTToken):
         return False
 
     def isAnalyst(self):
-        '''True if tag represents a analyst, otherwise False.
+        '''
+        True if tag represents an analyst, otherwise False.
 
         >>> tag = romanText.rtObjects.RTTagged('Analyst: This is an analyst.')
         >>> tag.isAnalyst()
@@ -311,7 +313,7 @@ class RTTagged(RTToken):
         False
 
 
-        N.B.: this is not the same as a key definition found inside of a
+        N.B.: this is not the same as a key definition found inside a
         Measure. These are represented by RTKey rtObjects, defined below, and are
         not RTTagged rtObjects, but RTAtom subclasses.
         '''
@@ -515,7 +517,8 @@ class RTMeasure(RTToken):
             self._parseAttributes(src)
 
     def _getMeasureNumberData(self, src):
-        '''Return the number or numbers as a list, as well as any repeat
+        '''
+        Return the number of numbers as a list, as well as any repeat
         indications.
 
         >>> rtm = romanText.rtObjects.RTMeasure()
@@ -526,7 +529,7 @@ class RTMeasure(RTToken):
         '''
         # note: this is separate procedure b/c it is used to get copy
         # boundaries
-        if '-' in src:  # its a range
+        if '-' in src:  # it is a range
             mnStart, mnEnd = src.split('-')
             proc = [mnStart, mnEnd]
         else:
@@ -1125,13 +1128,13 @@ class RTHandler:
                 if reMeasureTag.match(line) is not None:
                     rtm = RTMeasure(line)
                     rtm.lineNumber = currentLineNumber
-                    # note: could places these in-line, after post
+                    # note: could place these in-line, after post
                     rtm.atoms = self.tokenizeAtoms(rtm.data, container=rtm)
                     for a in rtm.atoms:
                         a.lineNumber = currentLineNumber
                     post.append(rtm)
                 else:
-                    # store items in a measure tag outside of the measure
+                    # store items in a measure tag outside the measure
                     rtt = RTTagged(line)
                     rtt.lineNumber = currentLineNumber
                     post.append(rtt)
@@ -1288,7 +1291,9 @@ class RTHandler:
         return self.definesMovements(countRequired=1)
 
     def splitByMovement(self, duplicateHeader=True):
-        '''If we have movements defined, return a list of RTHandler rtObjects,
+        # noinspection PyShadowingNames
+        '''
+        If we have movements defined, return a list of RTHandler rtObjects,
         representing header information and each movement, in order.
 
         >>> rth = romanText.rtObjects.RTHandler()
@@ -1387,8 +1392,9 @@ class RTFile(prebase.ProtoM21Object):
         self.filename = None
 
     def open(self, filename):
-        '''Open a file for reading, trying a variety of encodings and then
-        trying them again with an ignore if it is not possible.
+        '''
+        Open a file for reading, trying a variety of encodings and then
+        trying them again with an "ignore" flag if it is not possible.
         '''
         for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16'):
             try:

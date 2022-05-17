@@ -18168,7 +18168,7 @@ class Test(unittest.TestCase):
 
     def testMidMeasureClef1(self):
         '''
-        Tests if there are mid-measure clefs clefs: single staff
+        Tests if there are mid-measure clefs: single staff
         '''
         from music21 import stream
         from music21 import note
@@ -18198,7 +18198,7 @@ class Test(unittest.TestCase):
 
     def testMidMeasureClefs2(self):
         '''
-        Tests if there are mid-measure clefs clefs: multiple staves.
+        Tests if there are mid-measure clefs: multiple staves.
         '''
         from music21 import clef
         from music21 import converter

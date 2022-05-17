@@ -274,12 +274,12 @@ class NoteworthyTranslator:
             self.withinTie = False
 
     def getPitchFromPositionInfo(self, posInfo):
+        # noinspection PyShadowingNames
         '''
         returns a pitch object given the Pos: info
 
         removes ties and alteration signs.  Otherwise
         is same as getOnePitchFromPosition()
-
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
@@ -322,9 +322,9 @@ class NoteworthyTranslator:
         return pitchList
 
     def getOnePitchFromPosition(self, pos):
+        # noinspection PyShadowingNames
         '''
         get one pitch from a position...
-
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
@@ -365,11 +365,11 @@ class NoteworthyTranslator:
         return p
 
     def getStepAndOctaveFromPosition(self, positionNote):
+        # noinspection PyShadowingNames
         '''
         Given an int representing the position on the staff for the
         current clef,
         returns a string for the step and an int for the octave
-
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'

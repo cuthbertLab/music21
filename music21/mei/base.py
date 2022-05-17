@@ -621,7 +621,7 @@ def _makeArticList(attr):
     return articList
 
 
-def _getOctaveShift(dis, disPlace):
+def _getOctaveShift(dis: t.Union[t.Literal['8', '15', '22'], None], disPlace: str) -> int:
     '''
     Use :func:`_getOctaveShift` to calculate the :attr:`octaveShift` attribute for a
     :class:`~music21.clef.Clef` subclass. Any of the arguments may be ``None``.

@@ -211,7 +211,7 @@ class Derivation(SlottedObjectMixin):
         '''
         Iterator/Generator
 
-        Returns Streams that this Derivation's client Stream was derived
+        Yields the Streams which this Derivation's client Stream was derived
         from. This provides a way to obtain all Streams that the client passed
         through, such as those created by
         :meth:`~music21.stream.Stream.getElementsByClass` or

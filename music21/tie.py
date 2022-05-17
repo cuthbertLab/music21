@@ -71,7 +71,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring'), not hello
 
     OMIT_FROM_DOCS
-       optional (to know what notes are next:)
+       optional (to know what notes are next):
           .to = note()   # not implemented yet, b/c of garbage coll.
           .from = note()
 

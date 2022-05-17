@@ -165,7 +165,7 @@ class ScoreCorrector:
     def verticalProbabilityDist(self):
         '''
         Uses a score and returns an array of probabilities.
-        For n in the array, n is the the probability that the nth part
+        For n in the array, n is the probability that the nth part
 
         '''
         if self.distributionArray is not None:
@@ -433,6 +433,7 @@ class SinglePart:
         return self.measureStream
 
     def getIncorrectMeasureIndices(self, runFast=False):
+        # noinspection PyShadowingNames
         '''
         Returns an array of all the measures that OMR software would flag - that is,
         measures that do
@@ -510,7 +511,7 @@ class SinglePart:
     def horizontalProbabilityDist(self, regenerate=False):
         '''
         Uses (takes?) an array of hashed measures and returns an array of probabilities.
-        For n in the array, n is the the probability that the measure (n-(length of score)) away
+        For n in the array, n is the probability that the measure (n-(length of score)) away
         from a flagged measure will offer a rhythmic solution.
 
         These are the probabilities that, within a part, a measure offers a solution, given its
@@ -647,7 +648,7 @@ class MeasureSlice:
             self.sliceMeasureHashObjects.append(mh)
         return self.sliceMeasureHashObjects
         # do we want to put this method in the init, so that we call
-        # it once and it gets both measures and hashes?
+        # it once, and it would get both measures and hashes?
 
     def runSliceSearch(self, incorrectPartIndex):
         '''
@@ -767,6 +768,7 @@ class MeasureHash:
         return hashString
 
     def hashNote(self, n):
+        # noinspection PyShadowingNames
         '''
         Encodes a note
 
@@ -809,6 +811,7 @@ class MeasureHash:
         return byteEncoding
 
     def hashRest(self, r):
+        # noinspection PyShadowingNames
         '''
         Encodes a rest
 
@@ -816,7 +819,6 @@ class MeasureHash:
         >>> hasher = omr.correctors.MeasureHash()
         >>> hasher.hashRest(r)
         'Q'
-
         '''
         duration1to127 = self.hashQuarterLength(r.duration.quarterLength)
 
@@ -919,8 +921,9 @@ class MeasureHash:
 
     # noinspection SpellCheckingInspection
     def getProbabilityBasedOnChanges(self, otherHash):
+        # noinspection PyShadowingNames
         '''
-        Takes a hash string
+        Takes a hash string and gets the probability based on changes.
 
         >>> otherHash = 'e'
         >>> hashString = 'GFPGF'
@@ -955,7 +958,7 @@ class MeasureHash:
         return allProbability
 
     def differenceProbabilityForOneOpCode(self, opCodeTuple, source, destination=None):
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection,PyShadowingNames
         '''
         Given an opCodeTuple and a source, differenceProbabilityForOneOpCode
         returns the difference probability for one type of op-code

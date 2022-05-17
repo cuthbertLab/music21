@@ -110,6 +110,7 @@ class Test(unittest.TestCase):
         sc2 = scale.MinorScale()
 
         # we can get a range of pitches
+        # noinspection PyTypeChecker
         self.assertEqual(self.pitchOut(sc2.getPitches('c2', 'c5')),
                          '[C2, D2, E-2, F2, G2, A-2, B-2, C3, D3, E-3, F3, G3, A-3, B-3, '
                          + 'C4, D4, E-4, F4, G4, A-4, B-4, C5]')
@@ -234,6 +235,7 @@ class Test(unittest.TestCase):
         sc = scale.CyclicalScale('c4', ['m2', 'm2'])
 
         # we get spelling based on maxAccidental parameter
+        # noinspection PyTypeChecker
         self.assertEqual(self.pitchOut(sc.getPitches('g4', 'g6')),
                          '[G4, A-4, A4, B-4, C-5, C5, D-5, D5, E-5, F-5, F5, G-5, '
                          + 'G5, A-5, A5, B-5, C-6, C6, D-6, D6, E-6, F-6, F6, G-6, G6]')
@@ -255,6 +257,7 @@ class Test(unittest.TestCase):
         sc = scale.CyclicalScale('c4', ['P5'])  # can give one list
         self.assertEqual(self.pitchOut(sc.pitches), '[C4, G4]')
 
+        # noinspection PyTypeChecker
         self.assertEqual(self.pitchOut(sc.getPitches('g2', 'g6')), '[B-2, F3, C4, G4, D5, A5, E6]')
 
         # as single interval cycle, all are 1
@@ -332,6 +335,7 @@ class Test(unittest.TestCase):
 
         # the bidirectional representation has a version of each instance
         # merged
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(mm.getPitches('a4', 'a5', direction=Direction.BI)),
                          '[A4, B4, C5, D5, E5, F#5, F5, G#5, G5, A5]')
 
@@ -368,8 +372,10 @@ class Test(unittest.TestCase):
         # todo: this is ambiguous case
         # self.assertEqual(mm.pitchFromDegree(6, direction==Direction.BI).nameWithOctave, 'F5')
 
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(mm.getPitches(None, None, direction=Direction.DESCENDING)),
                          '[A5, G5, F5, E5, D5, C5, B4, A4]')
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(mm.getPitches(None, None, direction=Direction.ASCENDING)),
                          '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
 
@@ -765,6 +771,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         self.assertEqual(self.pitchOut(sc.getPitches('C#4', 'C#5')),
                          '[D~4, F#4, A4, C#5]')
 
+        # noinspection PyTypeChecker
         self.assertEqual(self.pitchOut(sc.getPitches('C#7', 'C#5')),
                          '[C#7, A6, F#6, D~6, B5, G5, F5, E-5, C#5]')
 
