@@ -195,9 +195,10 @@ class LyricSearcher:
         else:
             self.stream = s
 
-        indexByIdentifier = OrderedDict()
-        iTextByIdentifier = OrderedDict()
-        lastSyllabicByIdentifier = OrderedDict()
+        indexByIdentifier: t.OrderedDict[t.Union[str, int], t.List[IndexedLyric]] = OrderedDict()
+        iTextByIdentifier: t.OrderedDict[t.Union[str, int], str] = OrderedDict()
+        lastSyllabicByIdentifier: t.OrderedDict[t.Union[str, int],
+                                                t.Union[str, None]] = OrderedDict()
 
         for n in s.recurse().notes:
             ls: t.List[note.Lyric] = n.lyrics
@@ -232,6 +233,8 @@ class LyricSearcher:
                 if not ly.isComposite:
                     lastSyllabic = ly.syllabic
                 else:
+                    if t.TYPE_CHECKING:
+                        assert ly.components is not None
                     lastSyllabic = ly.components[-1].syllabic
                 lastSyllabicByIdentifier[lyIdentifier] = lastSyllabic
 

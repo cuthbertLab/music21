@@ -215,6 +215,16 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     {0.0} <music21.stream.Part 0x...>
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.chord.Chord C2 A2>
+
+    For developers of subclasses, please note that because of how Streams
+    are copied, there cannot be
+    required parameters (i.e., without defaults) in initialization.
+    For instance, this would not
+    be allowed, because craziness and givenElements are required::
+
+        class CrazyStream(Stream):
+            def __init__(self, givenElements, craziness, *args, **kwargs):
+                ...
     '''
     # this static attributes offer a performance boost over other
     # forms of checking class

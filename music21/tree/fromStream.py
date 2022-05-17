@@ -258,6 +258,8 @@ def asTree(
         return inner_outputTree
 
     # first time through...
+    treeClass: t.Type[trees.ElementTree]
+
     if useTimespans:
         treeClass = timespanTree.TimespanTree
     elif groupOffsets is False:
@@ -314,7 +316,7 @@ def asTimespans(
     inputStream,
     *,
     flatten: t.Union[str, bool] = False,
-    classList: t.Optional[t.Sequence[t.Type]] = None
+    classList: t.Optional[t.Sequence[t.Type[Music21Object]]] = None
 ) -> timespanTree.TimespanTree:
     r'''
     Recurses through a score and constructs a
@@ -360,7 +362,8 @@ def asTimespans(
     True
     '''
     if classList is None:
-        classList = Music21Object
+        classList = [Music21Object]
+
     classLists = [classList]
     listOfTimespanTrees = listOfTreesByClass(inputStream,
                                              initialOffset=0.0,

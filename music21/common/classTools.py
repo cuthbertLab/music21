@@ -65,14 +65,14 @@ def isNum(usrData: t.Any) -> bool:
 
 def isListLike(usrData: t.Any) -> bool:
     '''
-    Returns True if is a List or Tuple
+    Returns True if is a List or Tuple or their subclasses.
 
     Formerly allowed for set here, but that does not allow for
     subscripting (`set([1, 2, 3])[0]` is undefined).
 
     Differs from isinstance(collections.abc.Sequence()) in that
     we do not want Streams included even if __contains__, __reversed__,
-    and count are added.
+    and count are added, and we do not want to include str or bytes.
 
     >>> common.isListLike([])
     True

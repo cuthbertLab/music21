@@ -651,7 +651,7 @@ def decimalToTuplet(decNum: float) -> t.Tuple[int, int]:
         return (int(iy), int(jy))
 
 
-def unitNormalizeProportion(values: t.Sequence[int]) -> t.List[float]:
+def unitNormalizeProportion(values: t.Sequence[t.Union[int, float]]) -> t.List[float]:
     '''
     Normalize values within the unit interval, where max is determined by the sum of the series.
 
@@ -660,13 +660,17 @@ def unitNormalizeProportion(values: t.Sequence[int]) -> t.List[float]:
     >>> common.unitNormalizeProportion([1, 1, 1])
     [0.3333333..., 0.333333..., 0.333333...]
 
+    Works fine with a mix of ints and floats:
 
-    On 32-bit computers this number is inexact.  On 64-bit it works fine.
+    >>> common.unitNormalizeProportion([1.0, 1, 1.0])
+    [0.3333333..., 0.333333..., 0.333333...]
 
-    # >>> common.unitNormalizeProportion([0.2, 0.6, 0.2])
 
-    # [0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
+    On 32-bit computers this number may be inexact even for small floats.
+    On 64-bit it works fine.  This is the 32-bit output for this result.
 
+        common.unitNormalizeProportion([0.2, 0.6, 0.2])
+        [0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
 
     Negative values should be shifted to positive region first:
 
@@ -685,7 +689,9 @@ def unitNormalizeProportion(values: t.Sequence[int]) -> t.List[float]:
     return unit
 
 
-def unitBoundaryProportion(series: t.Sequence[int]) -> t.List[t.Tuple[t.Union[int, float], float]]:
+def unitBoundaryProportion(
+    series: t.Sequence[t.Union[int, float]]
+) -> t.List[t.Tuple[t.Union[int, float], float]]:
     '''
     Take a series of parts with an implied sum, and create
     unit-interval boundaries proportional to the series components.
@@ -707,7 +713,9 @@ def unitBoundaryProportion(series: t.Sequence[int]) -> t.List[t.Tuple[t.Union[in
     return bounds
 
 
-def weightedSelection(values: t.List[int], weights: t.List[int], randomGenerator=None) -> int:
+def weightedSelection(values: t.List[int],
+                      weights: t.List[t.Union[int, float]],
+                      randomGenerator=None) -> int:
     '''
     Given a list of values and an equal-sized list of weights,
     return a randomly selected value using the weight.

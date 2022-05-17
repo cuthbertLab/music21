@@ -2880,7 +2880,7 @@ class RomanNumeral(harmony.Harmony):
             self.scaleCardinality = useScale.getDegreeMaxUnique()
 
         bassScaleDegree = self.bassScaleDegreeFromNotation(self.figuresNotationObj)
-        bassPitch = useScale.pitchFromDegree(bassScaleDegree, direction=scale.DIRECTION_ASCENDING)
+        bassPitch = useScale.pitchFromDegree(bassScaleDegree, direction=scale.Direction.ASCENDING)
         pitches = [bassPitch]
         lastPitch = bassPitch
         numberNotes = len(self.figuresNotationObj.numbers)
@@ -2891,7 +2891,7 @@ class RomanNumeral(harmony.Harmony):
                                 + self.figuresNotationObj.numbers[i]
                                 - 1)
             newPitch = useScale.pitchFromDegree(thisScaleDegree,
-                                                direction=scale.DIRECTION_ASCENDING)
+                                                direction=scale.Direction.ASCENDING)
             pitchName = self.figuresNotationObj.modifiers[i].modifyPitchName(newPitch.name)
             newNewPitch = pitch.Pitch(pitchName)
             newNewPitch.octave = newPitch.octave
@@ -2944,7 +2944,7 @@ class RomanNumeral(harmony.Harmony):
                     alteration = addAccidental.count('#')
                 thisScaleDegree = (self.scaleDegree + stepNumber - 1)
                 addedPitch = useScale.pitchFromDegree(thisScaleDegree,
-                                                      direction=scale.DIRECTION_ASCENDING)
+                                                      direction=scale.Direction.ASCENDING)
                 if addedPitch.accidental is not None:
                     addedPitch.accidental.alter += alteration
                 else:

@@ -250,7 +250,8 @@ def defaultDeepcopy(obj, memo, callInit=True):
     of anything in each of them and returns the new object.
 
     If callInit is False, then only __new__() is called.  This is
-    much faster if you're just going to overload every instance variable.
+    much faster if you're just going to overload every instance variable
+    or is required if __init__ has required variables in initialization.
     '''
     if callInit is False:
         new = obj.__class__.__new__(obj.__class__)

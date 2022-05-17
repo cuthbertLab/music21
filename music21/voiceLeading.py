@@ -1113,7 +1113,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 minorScale = scale.MelodicMinorScale(self.key.tonic)
                 n1degree = minorScale.getScaleDegreeFromPitch(
                     self.v2n1,
-                    direction=scale.DIRECTION_ASCENDING)
+                    direction=scale.Direction.ASCENDING)
 
         else:
             keyScale = None
