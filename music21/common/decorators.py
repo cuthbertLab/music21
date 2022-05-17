@@ -131,7 +131,9 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     @wraps(method)
     def func_wrapper(*args, **kwargs):
         if len(args) > 1 and args[1] in ('_ipython_canary_method_should_not_exist_',
-                                         '_repr_mimebundle_'):
+                                         '_repr_mimebundle_',
+                                         '_is_coroutine',
+                                         ):
             # false positive from IPython for StreamIterator.__getattr__
             # can remove after v9.
             falsePositive = True

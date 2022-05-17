@@ -64,6 +64,6 @@ jobs:
             - name: Install dependencies
               run: |
                   python -m pip install -r requirements.txt
-            - name: Type-check certain modules with mypy
+            - name: Type-check all modules with mypy
               run: |
-                  mypy --follow-imports=silent music21
+                  mypy music21

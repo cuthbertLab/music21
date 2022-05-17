@@ -1288,7 +1288,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl = voiceLeading.VoiceLeadingQuartet('C#4', 'D4', 'A2', 'D3', analyticKey='D')
         >>> vl.closesIncorrectly()
         True
-
         '''
         raisedMinorCorrectly = False
         if self.key.mode == 'minor':
@@ -1301,14 +1300,14 @@ class VoiceLeadingQuartet(base.Music21Object):
         preClosings = (6, 3)
         closingPitches = [self.v1n2.pitch.name, self.v2n2.name]
 
-        hInt0_generic = self.hIntervals[0].generic
-        hInt1_generic = self.hIntervals[1].generic
+        vInt0_generic = self.vIntervals[0].generic
+        vInt1_generic = self.vIntervals[1].generic
         if t.TYPE_CHECKING:
-            assert hInt0_generic is not None
-            assert hInt1_generic is not None
+            assert vInt0_generic is not None
+            assert vInt1_generic is not None
 
-        return not (hInt0_generic.simpleUndirected in preClosings
-                     and hInt1_generic.simpleUndirected == 1
+        return not (vInt0_generic.simpleUndirected in preClosings
+                     and vInt1_generic.simpleUndirected == 1
                      and raisedMinorCorrectly
                      and self.key.pitchFromDegree(1).name in closingPitches
                      and self.contraryMotion())
