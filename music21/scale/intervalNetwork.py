@@ -71,6 +71,7 @@ class Direction(enum.Enum):
     def __str__(self):
         return 'Direction.' + self.name
 
+
 CacheKey = t.Tuple[t.Union[int, Terminus], str, t.Union[str, None], t.Union[str, None], bool]
 
 
@@ -734,34 +735,34 @@ class IntervalNetwork:
 
         edges = ({'interval': 'M2',
                   'connections': ([Terminus.LOW, 0, Direction.BI],)  # a to b
-                 },
+                  },
                  {'interval': 'm2',
                   'connections': ([0, 1, Direction.BI],)  # b to c
-                 },
+                  },
                  {'interval': 'M2',
                   'connections': ([1, 2, Direction.BI],)  # c to d
-                 },
+                  },
                  {'interval': 'M2',
                   'connections': ([2, 3, Direction.BI],)  # d to e
-                 },
+                  },
                  {'interval': 'M2',
                   'connections': ([3, 4, Direction.ASCENDING],)  # e to f#
-                 },
+                  },
                  {'interval': 'M2',
                   'connections': ([4, 6, Direction.ASCENDING],)  # f# to g#
-                 },
+                  },
                  {'interval': 'm2',
                   'connections': ([6, Terminus.HIGH, Direction.ASCENDING],)  # g# to a
-                 },
+                  },
                  {'interval': 'M2',
                   'connections': ([Terminus.HIGH, 7, Direction.DESCENDING],)  # a to g
-                 },
+                  },
                  {'interval': 'M2',
                   'connections': ([7, 5, Direction.DESCENDING],)  # g to f
-                 },
+                  },
                  {'interval': 'm2',
                   'connections': ([5, 3, Direction.DESCENDING],)  # f to e
-                 },
+                  },
                  )
 
         self.fillArbitrary(nodes, edges)
@@ -1248,8 +1249,7 @@ class IntervalNetwork:
         usedNeighbor = False
         # if no match, get the neighbor
         if (nodeId is None
-                and getNeighbor in (True, Direction.ASCENDING, Direction.DESCENDING, Direction.BI)
-        ):
+                and getNeighbor in (True, Direction.ASCENDING, Direction.DESCENDING, Direction.BI)):
             usedNeighbor = True
             lowId, highId = self.getNeighborNodeIds(pitchReference=pitchReference,
                                                     nodeName=nodeName,
@@ -1597,7 +1597,7 @@ class IntervalNetwork:
         # get first node if no node is provided
         if isinstance(nodeId, Node):
             nodeObj = nodeId
-        elif nodeId == None:  # assume low terminus by default
+        elif nodeId is None:  # assume low terminus by default
             # this is useful for appending a descending segment with an
             # ascending segment
             nodeObj = self.terminusLowNodes[0]
@@ -2048,17 +2048,17 @@ class IntervalNetwork:
         # will go up from reference, then down from reference, stopping
         # at the termini
 
-        post, postNodeId = self.realizeAscending(
+        post = self.realizeAscending(
             pitchReference=pitchReference,
             nodeId=nodeId,
             alteredDegrees=alteredDegrees,
-            fillMinMaxIfNone=False)  # avoid recursion by setting false
-        pre, preNodeId = self.realizeDescending(
+            fillMinMaxIfNone=False)[0]  # avoid recursion by setting false
+        pre = self.realizeDescending(
             pitchReference=pitchReference,
             nodeId=nodeId,
             alteredDegrees=alteredDegrees,
             includeFirst=False,
-            fillMinMaxIfNone=False)  # avoid recursion by setting false
+            fillMinMaxIfNone=False)[0]  # avoid recursion by setting false
 
         # environLocal.printDebug(['realize()', 'pre', pre, preNodeId])
         mergedPitches = pre + post

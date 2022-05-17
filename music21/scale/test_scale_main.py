@@ -295,21 +295,26 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut(mm.getPitches(direction=Direction.ASCENDING)),
                          '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
 
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction=Direction.DESCENDING)),
                          '[C3, B2, A2, G2, F2, E2, D2, C2, B1, A1, G1, F1, E1, D1, C1]')
 
         # TODO: this shows a problem with a bidirectional scale: we are
         # always starting at the tonic and moving up or down; so this is still
         # giving a descended portion, even though an ascending portion was requested
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction=Direction.ASCENDING)),
                          '[C1, D1, E1, F#1, G#1, A1, B1, C2, D2, E2, F#2, G#2, A2, B2, C3]')
 
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction=Direction.DESCENDING)),
                          '[C1, D1, E1, F1, G1, A1, B1, C2, D2, E2, F2, G2, A2, B2, C3]')
 
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(mm.getPitches('a5', 'a6', direction=Direction.ASCENDING)),
                          '[A5, B5, C6, D6, E6, F#6, G#6, A6]')
 
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(mm.getPitches('a5', 'a6', direction=Direction.DESCENDING)),
                          '[A6, G6, F6, E6, D6, C6, B5, A5]')
 
@@ -428,9 +433,11 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut(sc.pitches), '[C4, D4, F4, G4, A-4, C5]')
         # self.assertEqual(str(hs.pitchFromDegree(1)), 'G3')
 
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4', direction=Direction.ASCENDING)),
                          '[C2, D2, F2, G2, A-2, C3, D3, F3, G3, A-3, C4]')
 
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4', direction=Direction.DESCENDING)),
                          '[C4, B-3, A-3, G3, F3, E-3, D3, C3, B-2, A-2, G2, F2, E-2, D2, C2]')
 
@@ -460,16 +467,20 @@ class Test(unittest.TestCase):
 
         self.assertEqual(self.pitchOut(sc.pitches), '[C4, D-4, E4, F#4, A4, B4, A4, C5, D-5]')
 
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c3', direction=Direction.ASCENDING)),
                          '[C2, D-2, E2, F#2, A2, B2, A2, C3]')
 
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4', direction=Direction.ASCENDING)),
                          '[C2, D-2, E2, F#2, A2, B2, A2, C3, D-3, E3, F#3, A3, B3, A3, C4]')
 
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(sc.getPitches('c3', 'd-4', direction=Direction.DESCENDING)),
                          '[D-4, C4, D-4, B3, A3, F#3, E3, D-3, C3]')
 
         # is this correct: this cuts off the d-4, as it is outside the range
+        # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(sc.getPitches('c3', 'c4', direction=Direction.DESCENDING)),
                          '[C4, B3, A3, F#3, E3, D-3, C3]')
 
@@ -532,6 +543,7 @@ class Test(unittest.TestCase):
         j = 0
         for dummy in range(50):
             # over 50 iterations, it must be one of these two options
+            # noinspection PyTypeChecker
             match = self.pitchOut(sc.getPitches('c3', 'c4'))
             if match == '[C3, E-3, F3, G3, B-3, C4]':
                 i += 1
@@ -550,6 +562,7 @@ class Test(unittest.TestCase):
         j = 0
         for dummy in range(50):
             # over 50 iterations, it must be one of these two options
+            # noinspection PyArgumentList
             match = self.pitchOut(sc.getPitches('c3', 'c4', direction=Direction.DESCENDING))
             if match == '[C4, B-3, G3, F3, E-3, C3]':
                 i += 1
@@ -611,7 +624,7 @@ class Test(unittest.TestCase):
             post = None
             try:
                 post = sc.intervalBetweenDegrees(3, 4)
-            except ScaleException:
+            except scale.ScaleException:
                 exceptCount += 1
             if post is not None:
                 self.assertEqual(str(post), '<music21.interval.Interval A1>')
@@ -640,6 +653,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         # provide a raw scala string
         sc = scale.ScalaScale('c4', msg)
         self.assertEqual(str(sc), '<music21.scale.ScalaScale C Scala: fj-12tet.scl>')
+        # noinspection PyTypeChecker
         pitchesOut = self.pitchOut(sc.getPitches('c2', 'c4'))
         self.assertTrue(common.whitespaceEqual(pitchesOut,
                                                '''
@@ -737,14 +751,17 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         self.assertEqual(self.pitchOut(sc.pitches),
                          '[C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
 
+        # noinspection PyTypeChecker
         self.assertEqual(self.pitchOut(sc.getPitches('C#3', 'C#5')),
                          '[C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
 
+        # noinspection PyTypeChecker
         self.assertEqual(
             self.pitchOut(sc.getPitches('C#1', 'C#5')),
             '[C#1, E-1, F1, G1, B1, D~2, F#2, A2, C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
 
         # a portion of the scale
+        # noinspection PyTypeChecker
         self.assertEqual(self.pitchOut(sc.getPitches('C#4', 'C#5')),
                          '[D~4, F#4, A4, C#5]')
 
@@ -837,10 +854,12 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         # self.assertEqual(str(sc.getPitches('c2', 'c4')), '[D2, E#2, G#2, B2, D3, E#3, G#3, B3]')
 
         sc = scale.SieveScale('d4', '1@0', eld=2)
+        # noinspection PyTypeChecker
         self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4')),
                          '[C2, D2, F-2, G-2, A-2, B-2, C3, D3, F-3, G-3, A-3, B-3, C4]')
 
         sc = scale.SieveScale('d4', '1@0', eld=0.5)
+        # noinspection PyTypeChecker
         self.assertEqual(
             self.pitchOut(sc.getPitches('c2', 'c4')),
             '[C2, C~2, D-2, D`2, D2, D~2, E-2, E`2, F-2, F`2, F2, F~2, G-2, '
@@ -850,6 +869,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         )
 
         sc = scale.SieveScale('d4', '1@0', eld=0.25)
+        # noinspection PyTypeChecker
         self.assertEqual(
             self.pitchOut(sc.getPitches('c2', 'c3')),
             '[C2, C2(+25c), C~2, C#2(-25c), D-2, D`2(-25c), D`2, D2(-25c), D2, '

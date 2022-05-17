@@ -1089,48 +1089,48 @@ class AbstractRagMarwa(AbstractScale):
             # ascending
             {'interval': 'm2',
              'connections': ([Terminus.LOW, 0, Direction.ASCENDING],)  # c to d-
-            },
+             },
             {'interval': 'A2',
              'connections': ([0, 1, Direction.ASCENDING],)  # d- to e
-            },
+             },
             {'interval': 'M2',
              'connections': ([1, 2, Direction.ASCENDING],)  # e to f#
-            },
+             },
             {'interval': 'm3',
              'connections': ([2, 3, Direction.ASCENDING],)  # f# to a
-            },
+             },
             {'interval': 'M2',
              'connections': ([3, 4, Direction.ASCENDING],)  # a to b
-            },
+             },
             {'interval': '-M2',
              'connections': ([4, 5, Direction.ASCENDING],)  # b to a (downward)
-            },
+             },
             {'interval': 'm3',
              'connections': ([5, Terminus.HIGH, Direction.ASCENDING],)  # a to c
-            },
+             },
 
             # descending
             {'interval': '-m2',
              'connections': ([Terminus.HIGH, 6, Direction.DESCENDING],)  # c to d- (up)
-            },
+             },
             {'interval': 'd3',
              'connections': ([6, 7, Direction.DESCENDING],)  # d- to b
-            },
+             },
             {'interval': 'M2',
              'connections': ([7, 8, Direction.DESCENDING],)  # b to a
-            },
+             },
             {'interval': 'm3',
              'connections': ([8, 9, Direction.DESCENDING],)  # a to f#
-            },
+             },
             {'interval': 'M2',
              'connections': ([9, 10, Direction.DESCENDING],)  # f# to e
-            },
+             },
             {'interval': 'A2',
              'connections': ([10, 11, Direction.DESCENDING],)  # e to d-
-            },
+             },
             {'interval': 'm2',
              'connections': ([11, Terminus.LOW, Direction.DESCENDING],)  # d- to c
-            },
+             },
         )
 
         self._net = intervalNetwork.IntervalNetwork(

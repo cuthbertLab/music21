@@ -19,7 +19,6 @@ import typing as t
 from music21.base import Music21Object
 from music21.common.types import M21ObjType, StreamType
 from music21 import common
-from music21 import key
 from music21 import note
 from music21.tree import spans
 from music21.tree import timespanTree
@@ -98,7 +97,6 @@ def listOfTreesByClass(
     else:
         treeClass = trees.OffsetTree
 
-    useClassLists: t.List[t.Sequence[t.Type[M21ObjType]]]
     if not classLists:  # always get at least one
         outputTrees = [treeClass(source=lastParentage)]
     else:
