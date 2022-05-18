@@ -1919,8 +1919,10 @@ class IntervalNetwork:
             mergedPitches, mergedNodes = pre + post, preNodeId + postNodeId
 
         if reverse:
-            mergedPitches.reverse()
-            mergedNodes.reverse()
+            # Make new objects, because this value might be cached in intervalNetwork._descendingCache
+            # and mutating it would be dangerous.
+            mergedPitches = list(reversed(mergedPitches))
+            mergedNodes = list(reversed(mergedNodes))
 
         return mergedPitches, mergedNodes
 
