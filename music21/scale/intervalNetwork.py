@@ -72,7 +72,8 @@ class Direction(enum.Enum):
         return 'Direction.' + self.name
 
 
-CacheKey = t.Tuple[t.Union[int, Terminus], str, t.Union[str, None], t.Union[str, None], bool]
+CacheKey = t.Tuple[
+    t.Union[int, Terminus], str, t.Union[str, None], t.Union[str, None], bool, t.Optional[bool]]
 
 
 def _gte(a, b):
@@ -1341,6 +1342,7 @@ class IntervalNetwork:
         minPitch: t.Optional[pitch.Pitch],
         maxPitch: t.Optional[pitch.Pitch],
         includeFirst: bool,
+        reverse: t.Optional[bool] = None,  # only meaningful for descending
     ) -> CacheKey:
         '''
         Return key for caching based on critical components.
@@ -1358,7 +1360,9 @@ class IntervalNetwork:
                 pitchReference.nameWithOctave,
                 minKey,
                 maxKey,
-                includeFirst)
+                includeFirst,
+                reverse,
+                )
 
     def realizeAscending(
         self,
@@ -1635,7 +1639,9 @@ class IntervalNetwork:
                                    pitchRef,
                                    minPitchObj,
                                    maxPitchObj,
-                                   includeFirst)
+                                   includeFirst,
+                                   reverse,
+                                   )
             if ck in self._descendingCache:
                 return self._descendingCache[ck]
 
