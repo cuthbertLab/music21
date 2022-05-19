@@ -14,7 +14,6 @@
 '''
 Object for dealing with vertical simultaneities in a fast way w/o Chord's overhead.
 '''
-import collections.abc
 import copy
 import itertools
 import unittest
@@ -201,9 +200,9 @@ class Verticality(prebase.ProtoM21Object):
     def __init__(
         self,
         offset=None,
-        overlapTimespans=None,
-        startTimespans=None,
-        stopTimespans=None,
+        overlapTimespans=(),
+        startTimespans=(),
+        stopTimespans=(),
         timespanTree=None,
     ):
         from music21.tree import trees
@@ -1111,14 +1110,14 @@ class Verticality(prebase.ProtoM21Object):
 # -----------------------------------------------------------------------------
 
 
-class VerticalitySequence(prebase.ProtoM21Object, collections.abc.Sequence):
+class VerticalitySequence(prebase.ProtoM21Object, t.Sequence[Verticality]):
     r'''
     A segment of verticalities.
     '''
 
     # INITIALIZER #
 
-    def __init__(self, verticalities):
+    def __init__(self, verticalities: t.Iterable[Verticality]):
         self._verticalities = tuple(verticalities)
 
     # SPECIAL METHODS #
