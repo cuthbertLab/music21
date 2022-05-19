@@ -560,6 +560,24 @@ class TimespanTree(trees.OffsetTree):
             (33.0 {D3 B3 F#4}),
             (33.5 {D3 B3 C#4 F#4})
             ]>
+
+        When iterating with `n > 1` and `padEnd=True` will put sentinel
+        Verticalities in the last VerticalitySequences that occure at the
+        `endTime` of the tree, with no elements:
+
+        >>> iterator = scoreTree.iterateVerticalitiesNwise(n=3, padEnd=True)
+        >>> for v in iterator:
+        ...     pass
+        >>> v
+        <music21.tree.verticality.VerticalitySequence [
+            (35.0 {F#3 A#3 C#4 F#4}),
+            (36.0 {}),
+            (36.0 {})
+            ]>
+
+
+        Changed in v8 -- added padEnd.  Streams with fewer than n elements
+            return also return sentinel entry.
         '''
         from music21.tree.verticality import VerticalitySequence, Verticality
 
