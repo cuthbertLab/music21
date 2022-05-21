@@ -771,7 +771,8 @@ def _get_unpitched_pitch_value(unp: note.Unpitched) -> int:
         unpitched_instrument = unp.storedInstrument
     else:
         if unp._chordAttached is not None:
-            unpitched_instrument = unp._chordAttached.getContextByClass(instrument.UnpitchedPercussion)
+            unpitched_instrument = unp._chordAttached.getContextByClass(
+                instrument.UnpitchedPercussion)
         else:
             unpitched_instrument = unp.getContextByClass(instrument.UnpitchedPercussion)
     if unpitched_instrument is not None and unpitched_instrument.percMapPitch is not None:
