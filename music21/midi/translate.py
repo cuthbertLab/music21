@@ -4068,7 +4068,8 @@ class Test(unittest.TestCase):
         bd_trk = trks[1]
 
         self.assertTrue({ev.channel for ev in bd_trk.events}, {10})
-        note_ons = [ev for ev in bd_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
+        note_ons = [
+            ev for ev in bd_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
         self.assertEqual(len(note_ons), 3)
         self.assertEqual({ev.pitch for ev in note_ons}, {35})
 
@@ -4080,7 +4081,8 @@ class Test(unittest.TestCase):
         drum_trk = trks[1]
 
         self.assertTrue({ev.channel for ev in drum_trk.events}, {10})
-        note_ons = [ev for ev in drum_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
+        note_ons = [
+            ev for ev in drum_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
         self.assertEqual(len(note_ons), 3)
         self.assertEqual({ev.pitch for ev in note_ons}, {60})  # fallback
 
