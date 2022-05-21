@@ -687,7 +687,7 @@ def chordToMidiEvents(
     '''
     from music21 import midi as midiModule
     mt = None  # midi track
-    eventList = []
+    eventList: t.List[t.Union[midiModule.DeltaTime, midiModule.MidiEvent]] = []
     c = inputM21
 
     # temporary storage for setting correspondence
@@ -738,7 +738,7 @@ def chordToMidiEvents(
         noteOn.append(me)
 
     # must create each note on in chord before each note on
-    for noteOnEvent in noteOn:
+    for i, noteOnEvent in enumerate(noteOn):
         if includeDeltaTime:
             # add note off / velocity zero message
             dt = midiModule.DeltaTime(track=mt)
@@ -1266,6 +1266,7 @@ def elementToMidiEventList(
     '''
     # TODO: this is the best use of the switch statement when minimum Python
     #    version is 3.10
+    sub: t.Optional[t.List[t.Union['music21.midi.DeltaTime', 'music21.midi.MidiEvent']]]
     if isinstance(el, note.Rest):
         return None
     elif isinstance(el, note.Note):
@@ -2434,7 +2435,8 @@ def packetStorageFromSubstreamList(
         if (instrumentStream is None
             # lousy instrument e.g. "music21.instrument.Instrument: ch10 jazzdrums1"
             or (instObj is not None and instObj.midiProgram is None)
-            ) and subs.getElementsByClass((note.Unpitched, percussion.PercussionChord)):
+            ) and subs.getElementsByClass(
+                (note.Unpitched, percussion.PercussionChord)):
             # This dummy instance will be enough to get a channel 10 default in
             # assignPacketsToChannels(). Later, the proper instrument in the stream will be read
             instObj = UnpitchedPercussion()
