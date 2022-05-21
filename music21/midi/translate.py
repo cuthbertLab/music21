@@ -711,12 +711,12 @@ def chordToMidiEvents(
         me = midiModule.MidiEvent(track=mt)
         me.type = midiModule.ChannelVoiceMessages.NOTE_ON
         me.channel = 1
-        if isinstance(chordComponent, note.Unpitched):
-            me.pitch = _get_unpitched_pitch_value(chordComponent)
-        elif isinstance(chordComponent, note.Note):
+        if isinstance(chordComponent, note.Note):
             me.pitch = chordComponent.pitch.midi
             if not chordComponent.pitch.isTwelveTone():
                 me.centShift = chordComponent.pitch.getCentShiftFromMidi()
+        elif isinstance(chordComponent, note.Unpitched):
+            me.pitch = _get_unpitched_pitch_value(chordComponent)
         else:
             raise TypeError('ChordBase can only contain Note and Unpitched as members')
 
