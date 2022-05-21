@@ -4065,12 +4065,24 @@ class Test(unittest.TestCase):
             percussion.PercussionChord([note.Unpitched(), note.Unpitched()])]
         )
         trks = streamHierarchyToMidiTracks(m)
-        triangle_trk = trks[1]
+        bd_trk = trks[1]
 
-        self.assertTrue({ev.channel for ev in triangle_trk.events}, {10})
-        note_ons = [ev for ev in triangle_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
+        self.assertTrue({ev.channel for ev in bd_trk.events}, {10})
+        note_ons = [ev for ev in bd_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
         self.assertEqual(len(note_ons), 3)
         self.assertEqual({ev.pitch for ev in note_ons}, {35})
+
+        # Replace the BassDrum with a vague instrument (lossy import)
+        m.pop(0)
+        m.insert(0, instrument.Instrument())
+
+        trks = streamHierarchyToMidiTracks(m)
+        drum_trk = trks[1]
+
+        self.assertTrue({ev.channel for ev in drum_trk.events}, {10})
+        note_ons = [ev for ev in drum_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
+        self.assertEqual(len(note_ons), 3)
+        self.assertEqual({ev.pitch for ev in note_ons}, {60})  # fallback
 
 
 # ------------------------------------------------------------------------------
