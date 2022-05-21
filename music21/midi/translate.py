@@ -4087,6 +4087,18 @@ class Test(unittest.TestCase):
         self.assertEqual(len(note_ons), 3)
         self.assertEqual({ev.pitch for ev in note_ons}, {60})  # fallback
 
+        # Change the stored instrument: affects that note only
+        m.notes.first().storedInstrument = instrument.Agogo()
+
+        trks = streamHierarchyToMidiTracks(m)
+        mixed_trk = trks[1]
+
+        self.assertTrue({ev.channel for ev in mixed_trk.events}, {10})
+        note_ons = [
+            ev for ev in mixed_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
+        self.assertEqual(len(note_ons), 3)
+        self.assertEqual([ev.pitch for ev in note_ons], [67, 60, 60])
+
 
 # ------------------------------------------------------------------------------
 _DOC_ORDER = [streamToMidiFile, midiFileToStream]
