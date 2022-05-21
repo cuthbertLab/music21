@@ -4066,8 +4066,8 @@ class Test(unittest.TestCase):
         )
         trks = streamHierarchyToMidiTracks(m)
         triangle_trk = trks[1]
-        self.assertTrue(all(ev.channel == 10 for ev in triangle_trk.events))
 
+        self.assertTrue({ev.channel for ev in triangle_trk.events}, {10})
         note_ons = [ev for ev in triangle_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
         self.assertEqual(len(note_ons), 3)
         self.assertEqual({ev.pitch for ev in note_ons}, {35})
