@@ -717,7 +717,7 @@ def chordToMidiEvents(
                 me.centShift = chordComponent.pitch.getCentShiftFromMidi()
         elif isinstance(chordComponent, note.Unpitched):
             me.pitch = _get_unpitched_pitch_value(chordComponent)
-        else:
+        else:  # pragma: no cover
             raise TypeError('ChordBase can only contain Note and Unpitched as members')
 
         # if 'volume' in chordComponent:
@@ -770,7 +770,10 @@ def _get_unpitched_pitch_value(unp: note.Unpitched) -> int:
     if isinstance(unp.storedInstrument, instrument.UnpitchedPercussion):
         unpitched_instrument = unp.storedInstrument
     else:
-        unpitched_instrument = unp.getContextByClass(instrument.UnpitchedPercussion)
+        if unp._chordAttached is not None:
+            unpitched_instrument = unp._chordAttached.getContextByClass(instrument.UnpitchedPercussion)
+        else:
+            unpitched_instrument = unp.getContextByClass(instrument.UnpitchedPercussion)
     if unpitched_instrument is not None and unpitched_instrument.percMapPitch is not None:
         return unpitched_instrument.percMapPitch
     return 60  # e.g. lossy instrument recognition from musicxml
@@ -4052,6 +4055,22 @@ class Test(unittest.TestCase):
         # Remove the initial PROGRAM_CHANGE and get a default midiProgram
         meta_event_pairs = getMetaEvents([(DUMMY_DELTA_TIME, event2)])
         self.assertEqual(meta_event_pairs[0][1].midiProgram, 53)
+
+    def testExportUnpitched(self):
+        from music21 import midi as midiModule
+
+        m = stream.Measure(
+            [instrument.BassDrum(),
+            note.Unpitched(),
+            percussion.PercussionChord([note.Unpitched(), note.Unpitched()])]
+        )
+        trks = streamHierarchyToMidiTracks(m)
+        triangle_trk = trks[1]
+        self.assertTrue(all(ev.channel == 10 for ev in triangle_trk.events))
+
+        note_ons = [ev for ev in triangle_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
+        self.assertEqual(len(note_ons), 3)
+        self.assertEqual({ev.pitch for ev in note_ons}, {35})
 
 
 # ------------------------------------------------------------------------------
