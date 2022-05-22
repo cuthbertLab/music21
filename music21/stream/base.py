@@ -413,7 +413,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         Generally you don't need this, just iterate over a stream, but it is necessary
         to add custom filters to an iterative search before iterating.
         '''
-        return self.__iter__()
+        return iter(self)
 
     @overload
     def __getitem__(self, k: str) -> iterator.RecursiveIterator[M21ObjType]:
@@ -8645,7 +8645,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if recurse is True:
             sIterator = post.recurse()
         else:
-            sIterator = post.__iter__()
+            sIterator = iter(post)
 
         if classFilterList:
             sIterator = sIterator.addFilter(filters.ClassFilter(classFilterList))
