@@ -159,6 +159,9 @@ __all__ = [
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
 
+AmbitusShort = namedtuple('AmbitusShort',
+                          ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
+
 PropertyDescription = namedtuple('PropertyDescription',
     ('abbrevCode', 'name', 'label', 'namespace', 'isContributor',
     'm21Abbrev', 'm21WorkId', 'uniqueName', 'valueType'),
@@ -171,9 +174,6 @@ class FileInfo:
     path: t.Optional[Text] = None
     number: t.Optional[int] = None
     format: t.Optional[Text] = None
-
-AmbitusShort = namedtuple('AmbitusShort',
-                          ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
 
 # -----------------------------------------------------------------------------
 
@@ -219,12 +219,12 @@ class Metadata(base.Music21Object):
     >>> md.searchAttributes
     ('actNumber', 'alternativeTitle', 'associatedWork', 'collectionDesignation',
      'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication',
+     'fileFormat', 'fileNumber', 'filePath',
      'groupTitle', 'localeOfComposition', 'movementName', 'movementNumber', 'number',
      'opusNumber', 'parentTitle', 'popularTitle', 'sceneNumber', 'textLanguage',
      'textOriginalLanguage', 'title', 'volume')
 
     Plus anything that is in contributors...
-
 
     All contributors are stored in a .contributors list:
 
@@ -391,6 +391,9 @@ class Metadata(base.Music21Object):
         'composer',
         'copyright',
         'date',
+        'fileFormat',
+        'fileNumber',
+        'filePath',
     ] + list(workIdAbbreviationDict.values())))
 
     workIdLookupDict = {}
@@ -404,6 +407,9 @@ class Metadata(base.Music21Object):
 
         self._metadata: t.Dict = {}
         self.software: t.List[str] = [defaults.software]
+
+        # TODO: check pickling, etc.
+        self.fileInfo = FileInfo()
 
         # For backward compatibility, we allow the setting of workIds or
         # abbreviations via **keywords
@@ -973,6 +979,8 @@ class Metadata(base.Music21Object):
         [('arranger', 'Michael Scott Cuthbert'),
          ('composer', 'Arcangelo Corelli'),
          ('copyright', '© 2014, Creative Commons License (CC-BY)'),
+         ('fileFormat', 'musicxml'),
+         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
 
         Skip contributors is there to help with musicxml parsing -- there's no reason for it
@@ -983,6 +991,8 @@ class Metadata(base.Music21Object):
         >>> c.metadata.all(skipContributors=True)
         [('copyright', '© 2014, Creative Commons License (CC-BY)'),
          ('date', '1689/--/-- or earlier'),
+         ('fileFormat', 'musicxml'),
+         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
          ('localeOfComposition', 'Rome'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
         '''
@@ -1125,7 +1135,6 @@ class Metadata(base.Music21Object):
         >>> cList[0].name
         'Price, Florence'
 
-
         Some musicxml files have contributors with no role defined.  To get
         these contributors, search for getContributorsByRole(None).  N.B. upon
         output to MusicXML, music21 gives these contributors the generic role
@@ -1213,7 +1222,6 @@ class Metadata(base.Music21Object):
 
         >>> md.search(composer='Joplin')
         (True, 'composer')
-
         '''
         # TODO: Change to a namedtuple and add as a third element
         #    during a successful search, the full value of the retrieved
@@ -1273,7 +1281,7 @@ class Metadata(base.Music21Object):
 
         if useRegex:
             for value, innerField in valueFieldPairs:
-                # re.I makes case insensitive
+                # "re.I" makes case-insensitive search
                 if isinstance(value, str):
                     match = reQuery.search(value)
                     if match is not None:
@@ -1300,11 +1308,11 @@ class Metadata(base.Music21Object):
     def setWorkId(self, idStr, value):
         r'''
         Directly set a work id, given either as a full string name or as a
-        three character abbreviation. The following work id abbreviations and
+        three-character abbreviation. The following work id abbreviations and
         their full id string are given as follows. In many cases the Metadata
         object support properties for convenient access to these work ids.
 
-        Id abbreviations and strings::
+        Abbreviations and strings::
             * otl / title
             * otp / popularTitle
             * ota / alternativeTitle
@@ -1503,6 +1511,42 @@ class Metadata(base.Music21Object):
     @date.setter
     def date(self, value):
         self._setBackwardCompatibleItem('date', value)
+
+    @property
+    def fileFormat(self) -> t.Optional[str]:
+        '''
+        Get or set the file format that was parsed.
+        '''
+        if self.fileInfo.format:
+            return str(self.fileInfo.format)
+
+    @fileFormat.setter
+    def fileFormat(self, value: t.Union[str, Text]) -> None:
+        self.fileInfo.format = Text(value)
+
+    @property
+    def filePath(self) -> t.Optional[str]:
+        '''
+        Get or set the file path that was parsed.
+        '''
+        if self.fileInfo.path:
+            return str(self.fileInfo.path)
+
+    @filePath.setter
+    def filePath(self, value: t.Union[str, Text]) -> None:
+        self.fileInfo.path = Text(value)
+
+    @property
+    def fileNumber(self) -> t.Optional[int]:
+        '''
+        Get or set the file path that was parsed.
+        '''
+        if self.fileInfo.number:
+            return self.fileInfo.number
+
+    @fileNumber.setter
+    def fileNumber(self, value: t.Union[int, None]) -> None:
+        self.fileInfo.number = value
 
     @property
     def localeOfComposition(self):

@@ -2285,8 +2285,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         foundOne = False
         if self.scoreMetadata is not None:
             # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-            #      for contrib in self.scoreMetadata.contributors:
-            #         mxCreator = self.contributorToXmlCreator(contrib)
+            #      for c in self.scoreMetadata.contributors:
+            #         mxCreator = self.contributorToXmlCreator(c)
             #         mxId.append(mxCreator)
             #         foundOne = True
             # else:
