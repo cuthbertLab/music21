@@ -403,7 +403,7 @@ class _EnvironmentCore:
                  common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\MuseScore.exe')
                  ),
             ]:
-                self.__setitem__(name, value)  # use for key checking
+                self[name] = value  # use for key checking
         elif platform == 'nix':
             for name, value in [
                 ('lilypondPath', '/usr/bin/lilypond'),
@@ -412,7 +412,7 @@ class _EnvironmentCore:
                 ('graphicsPath', '/usr/bin/xdg-open'),
                 ('pdfPath', '/usr/bin/xdg-open')
             ]:
-                self.__setitem__(name, value)  # use for key checking
+                self[name] = value  # use for key checking
         elif platform == 'darwin':
             versionTuple = common.macOSVersion()
             if versionTuple[0] >= 11 or (versionTuple[0] == 10 and versionTuple[1] >= 15):
@@ -432,7 +432,7 @@ class _EnvironmentCore:
                 ('musescoreDirectPNGPath',
                  '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
             ]:
-                self.__setitem__(name, value)  # use for key checking
+                self[name] = value  # use for key checking
 
     def _checkAccessibility(self, path: t.Optional[t.Union[str, pathlib.Path]]) -> bool:
         '''
@@ -1064,7 +1064,7 @@ class Environment:
         The first arg can be a list of strings or a string; lists are
         concatenated with common.formatStr().
         '''
-        if envSingleton().__getitem__('debug') >= statusLevel:
+        if envSingleton()['debug'] >= statusLevel:
             if isinstance(msg, str):
                 msg = [msg]  # make into a list
             if msg[0] != self.modNameParent and self.modNameParent is not None:
