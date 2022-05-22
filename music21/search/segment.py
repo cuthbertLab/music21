@@ -271,7 +271,7 @@ def loadScoreDict(filePath):
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
 
-    with filePath.open('b') as f:
+    with filePath.open('rb') as f:
         scoreDict = json.load(f)
     return scoreDict
 
