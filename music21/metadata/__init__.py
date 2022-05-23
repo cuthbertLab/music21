@@ -140,6 +140,7 @@ from music21 import defaults
 from music21 import exceptions21
 
 from music21.metadata import properties
+from music21.metadata.properties import PropertyDescription
 from music21.metadata import bundles
 from music21.metadata import caching
 from music21.metadata import primitives
@@ -723,7 +724,8 @@ class Metadata(base.Music21Object):
         '''
         if not uniqueName:
             return False
-        prop: PropertyDescription = Metadata._UNIQUENAME_TO_PROPERTYDESCRIPTION.get(uniqueName, None)
+        prop: PropertyDescription = (
+            Metadata._UNIQUENAME_TO_PROPERTYDESCRIPTION.get(uniqueName, None))
         if prop is None:
             return False
 
@@ -2058,7 +2060,8 @@ class Metadata(base.Music21Object):
             # return Metadata.uniqueNameToNSKey('otherContributor')
             return 'marcrel:CTB'
 
-        prop: t.Optional[PropertyDescription] = Metadata._NSKEY_TO_PROPERTYDESCRIPTION.get(nsKey, None)
+        prop: t.Optional[PropertyDescription] = (
+            Metadata._NSKEY_TO_PROPERTYDESCRIPTION.get(nsKey, None))
         if prop is None or not prop.isContributor:
             # return Metadata.uniqueNameToNSKey('otherContributor')
             return 'marcrel:CTB'

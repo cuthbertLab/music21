@@ -14,9 +14,7 @@
 import typing as t
 from dataclasses import dataclass
 
-from music21.metadata.primitives import (Date, DateSingle, DateRelative, DateBetween,
-                                         DateSelection, Text, Contributor, Creator,
-                                         Imprint, Copyright)
+from music21.metadata.primitives import (DateSingle, Text, Contributor, Copyright)
 
 
 @dataclass
@@ -24,10 +22,10 @@ class PropertyDescription:
     '''
         Describes a single standard metadata property.
 
-        abbrevCode: str is a (usually abbreviated) code for the property
-        name: str is the namespace's name of the property (the tail of the property term URI)
-        label: str is the human readable name of the property
-        namespace: str is a shortened form of the URI for the set of terms
+        abbrevCode: str is a (usually abbreviated) code for the property.
+        name: str is the namespace's name of the property (the tail of the property term URI).
+        label: str is the human readable name of the property.
+        namespace: str is a shortened form of the URI for the set of terms.
             e.g. 'dcterms' means the property term is from the Dublin Core terms.
             'dcterms' is the shortened form of <http://purl.org/dc/terms/>
             e.g. 'marcrel' means the property term is from the MARC Relator terms.
@@ -35,7 +33,7 @@ class PropertyDescription:
         isContributor: bool is whether or not the property describes a contributor.
         m21Abbrev: str is the backward compatible music21 abbreviation for this property
             (again, not necessary if we are using the 'music21' namespace, when
-            the abbreviation can be found in the code field)
+            the abbreviation can be found in the code field).
         m21WorkId: str is the backward compatible music21 name for this property (this
             is not necessary if we are using the 'music21' namespace for a
             particular backward compatible property, when the workId can be found
@@ -51,16 +49,18 @@ class PropertyDescription:
         valueType: Type is the actual type of the value that will be stored in the metadata.
             This allows auto-conversion to take place inside setItem/addItem, and is
             the type clients will always receive from getItem.
+
     '''
     abbrevCode: t.Optional[str] = None
     name: t.Optional[str] = None
     label: t.Optional[str] = None
     namespace: t.Optional[str] = None
-    isContributor: t.Optional[bool] = None
+    isContributor: bool = False
     m21Abbrev: t.Optional[str] = None
     m21WorkId: t.Optional[str] = None
     uniqueName: t.Optional[str] = None
     valueType: t.Type = Text
+
 
 STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # The following 'dcterms' properties are the standard Dublin Core property terms
