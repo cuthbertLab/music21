@@ -47,8 +47,8 @@ class PropertyDescription:
                     else desc.m21WorkId if desc.m21WorkId
                     else desc.name)
         valueType: Type is the actual type of the value that will be stored in the metadata.
-            This allows auto-conversion to take place inside setItem/addItem, and is
-            the type clients will always receive from getItem.
+            This allows auto-conversion to take place inside set/add, and is
+            the type clients will always receive from get.
 
     '''
     abbrevCode: t.Optional[str] = None

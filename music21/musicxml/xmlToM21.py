@@ -301,7 +301,7 @@ def _setMetadataItemFromTagText(m21md: metadata.Metadata, xmlEl, tag, mdUniqueNa
     if value in (None, ''):
         return
 
-    m21md.addItem(mdUniqueName, value)
+    m21md.add(mdUniqueName, value)
 
 def _synchronizeIds(element, m21Object):
     '''
@@ -1334,11 +1334,11 @@ class MusicXMLImporter(XMLParserBase):
             # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
             #     md.addContributor(c)
             # else:
-            md.addItem(c.role, c)
+            md.add(c.role, c)
 
         for rights in identification.findall('rights'):
             c = self.rightsToCopyright(rights)
-            md.copyright = c
+            md.add('copyright', c)
             break
 
         encoding = identification.find('encoding')
@@ -1369,9 +1369,10 @@ class MusicXMLImporter(XMLParserBase):
                 #             miscFieldName, miscFieldValue, e
                 #         ), MusicXMLWarning)
                 # else:
-                # This will treat it as a uniqueName (if recognized),
-                # or as a personalName (if it isn't recognized)
-                md.addItem(miscFieldName, miscFieldValue)
+                if md.isStandardUniqueName(miscFieldName):
+                    md.add(miscFieldName, miscFieldValue)
+                else:
+                    md.addCustom(miscFieldName, miscFieldValue)
 
         if inputM21 is None:
             return md

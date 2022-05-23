@@ -43,9 +43,9 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     A guide to the 2022 Dublin Core implementation:
 
     - The guts of class Metadata are completely rewritten to support the new
-        extensions, but all of Metadata's old APIs are still in place and
-        are all backward compatible. There are new APIs (getItem, addItem
-        et al) to access the new metadata extensions.
+        Dublin Core functionality, but all of Metadata's old APIs are still in
+        place and are all backward compatible. There are new APIs (get, set, add
+        et al) to access the new functionality.
 
     - The old metadata implementation had a list of supported workIds, and also a
         list of supported contributor roles.  You could have more than one of each
@@ -60,8 +60,8 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
         for adding a new piece of metadata.  One that does "this is the new (only) value
         for this metadata property term", and one that does "this is a new value to add in to any
         other values you might have for this metadata property term".  They are:
-        addItem() and setItem().  addItem adds the new item to the (possibly empty)
-        list of values, and setItem removes any current value(s) before adding the item.
+        add() and set().  add() adds the new item to the (possibly empty)
+        list of values, and set() removes any current value(s) before adding the item.
 
     - Primitives: Old code had DateXxxx and Text.  DateXxxx still works for Dublin Core
         et al (it's a superset of what is needed), but Text needs to add the ability to
@@ -70,13 +70,13 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
         new fields to Text in a backward-compatible way.
 
     - Metadata does not (yet) explicitly support client-specified namespaces, but there
-        are a few APIs (getPersonalItem, addPersonalItem, setPersonalItem) that have no
+        are a few APIs (getCustom, addCustom, setCustom) that have no
         namespace at all, so clients can set anything they want and get it passed through.
         A parser could use this to set (say) 'humdrum:XXX' metadata that doesn't map to
         any standard metadata property, and a writer that understood 'humdrum' metadata
-        could then write it back to a file.  Personal metadata can also include things
+        could then write it back to a file.  Custom metadata can also include things
         that are specific to a particular person who is in the process of editing files,
-        e.g. setPersonalItem('I have reached staff number', 1000). This can also be passed
+        e.g. setCustom('I have reached measure number', 1000). This can also be passed
         through to various file formats as long as there is a place for such a thing (e.g.
         'miscellaneous' in MusicXML).
 
@@ -108,8 +108,8 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
                         else desc.m21WorkId if desc.m21WorkId
                         else desc.name)
             valueType is the actual type of the value that will be stored in the metadata.
-                This allows auto-conversion to take place inside setItem/addItem, and is
-                the type clients will always receive from getItem.
+                This allows auto-conversion to take place inside set/add, and is
+                the type clients will always receive from get.
 
         The list of supported properties is properties.STANDARD_PROPERTY_DESCRIPTIONS,
         and various lookup dicts are created from that in the Metadata class for later use.
@@ -319,55 +319,46 @@ class Metadata(base.Music21Object):
 
 
 # -----------------------------------------------------------------------------
-# PUBLIC APIs:
-#   {get,add,set}{Item,Items}
-#   {get,add,set}Personal{Item,Items}
-#   getAllItems(skipContributors=False)
-#   getAllContributorItems
 
-
-    # never returns a list, always returns None, or the first item
-    def getItem(self,
-                key: str,
-                namespace: t.Optional[str] = None) -> t.Optional[t.Any]:
+    def get(self,
+            key: str,
+            namespace: t.Optional[str] = None) -> t.Optional[t.Any]:
         '''
         Returns the first item stored in metadata with this key and namespace.
+        Never returns a list, always returns the first item or None.
 
         If namespace is provided, the key will be interpreted as name or
         abbrevCode (within that namespace). Either will work. If namespace is
         None, the key will be interpreted as uniqueName if possible. If the
-        key is not a uniqueName, it will be used as is, so 'namespace:name'
-        will work.  Personal item names should not be used here, since they
-        may be interpreted as uniqueNames, with unpredictable results.
-
-        Test getItem when the item isn't there.
+        key is not a standard uniqueName, it will be used as is, so 'namespace:name'
+        will work.  Custom names not of the form 'namespace:name' should not be
+        used here, since they may be interpreted as uniqueNames, with unpredictable
+        results.  Use getCustom in that case, which will bypass interpretation as
+        a uniqueName.
 
         >>> md = metadata.Metadata()
-        >>> md.getItem('title') is None # uniqueName
+        >>> md.get('title') is None # uniqueName
         True
-        >>> md.getItem('title', namespace='dcterms') is None # name, namespace
+        >>> md.get('title', namespace='dcterms') is None # name, namespace
         True
-        >>> md.getItem('T', namespace='dcterms') is None # abbrevCode, namespace
+        >>> md.get('T', namespace='dcterms') is None # abbrevCode, namespace
         True
-        >>> md.getItem('dcterms:title') is None # 'namespace:name'
+        >>> md.get('dcterms:title') is None # 'namespace:name'
         True
-
-        Test getItem when the item is there:
-
-        >>> md.setItem('title', metadata.Text('Caveat Emptor'))
-        >>> md.getItem('title') # uniqueName
+        >>> md.set('title', metadata.Text('Caveat Emptor'))
+        >>> md.get('title') # uniqueName
         <music21.metadata.primitives.Text Caveat Emptor>
-        >>> md.getItem('title', namespace='dcterms') # name, namespace
+        >>> md.get('title', namespace='dcterms') # name, namespace
         <music21.metadata.primitives.Text Caveat Emptor>
-        >>> md.getItem('T', namespace='dcterms') # abbrevCode, namespace
+        >>> md.get('T', namespace='dcterms') # abbrevCode, namespace
         <music21.metadata.primitives.Text Caveat Emptor>
-        >>> md.getItem('dcterms:title') # 'namespace:name'
+        >>> md.get('dcterms:title') # 'namespace:name'
         <music21.metadata.primitives.Text Caveat Emptor>
         '''
-        return self._getItem(key, namespace)
+        return self._get(key, namespace)
 
     # always returns a List, which might be empty, have one item, or multiple items
-    def getItems(self,
+    def getAll(self,
                  key: str,
                  namespace: t.Optional[str] = None) -> t.List[t.Any]:
         '''
@@ -379,37 +370,37 @@ class Metadata(base.Music21Object):
         abbrevCode (within that namespace). Either will work. If namespace is
         None, the key will be interpreted as uniqueName if possible. If the
         key is not a uniqueName, it will be used as is, so 'namespace:name'
-        will work.  Personal item names should not be used here, since they
+        will work.  Custom names should not be used here, since they
         may be interpreted as uniqueNames, with unpredictable results.
 
         Test when there is no title.
 
         >>> md = metadata.Metadata()
-        >>> md.getItems('title')
+        >>> md.getAll('title')
         []
 
         Test when there is one title.
 
-        >>> md.setItem('title', metadata.Text('Heroic Symphony'))
-        >>> md.getItems('title')
+        >>> md.set('title', metadata.Text('Heroic Symphony'))
+        >>> md.getAll('title')
         [<music21.metadata.primitives.Text Heroic Symphony>]
 
         Test when there are two titles.
 
-        >>> md.addItem('T', metadata.Text('The Heroic Symphony'), namespace='dcterms')
-        >>> items = md.getItems('title', namespace='dcterms')
+        >>> md.add('T', metadata.Text('The Heroic Symphony'), namespace='dcterms')
+        >>> items = md.getAll('title', namespace='dcterms')
         >>> items[0]
         <music21.metadata.primitives.Text Heroic Symphony>
         >>> items[1]
         <music21.metadata.primitives.Text The Heroic Symphony>
         '''
-        return self._getItems(key, namespace)
+        return self._getAll(key, namespace)
 
     # adds a single item
-    def addItem(self,
-                key: str,
-                value: t.Any,
-                namespace: t.Optional[str] = None):
+    def add(self,
+            key: str,
+            value: t.Any,
+            namespace: t.Optional[str] = None):
         '''
         Adds a single item with this key and namespace.
 
@@ -417,20 +408,20 @@ class Metadata(base.Music21Object):
         abbrevCode (within that namespace). Either will work. If namespace is
         None, the key will be interpreted as uniqueName if possible. If the
         key is not a uniqueName, it will be used as is, so 'namespace:name'
-        will work.  Personal item names should not be used here, since they
+        will work.  Custom names should not be used here, since they
         may be interpreted as uniqueNames, with unpredictable results.
 
         Test adding as str instead of Text (it will be auto-converted to Text)
 
         >>> md = metadata.Metadata()
-        >>> md.addItem('suspectedComposer', 'Ludwig von Beethoven')
-        >>> md.getItem('suspectedComposer')
+        >>> md.add('suspectedComposer', 'Ludwig von Beethoven')
+        >>> md.get('suspectedComposer')
         <music21.metadata.primitives.Contributor suspectedComposer:Ludwig von Beethoven>
         '''
-        self._addItem(key, value, namespace)
+        self._add(key, value, namespace)
 
     # adds a list of items
-    def addItems(self,
+    def addAll(self,
                 key: str,
                 valueList: t.List[t.Any],
                 namespace: t.Optional[str] = None):
@@ -441,13 +432,13 @@ class Metadata(base.Music21Object):
         abbrevCode (within that namespace). Either will work. If namespace is
         None, the key will be interpreted as uniqueName if possible. If the
         key is not a uniqueName, it will be used as is, so 'namespace:name'
-        will work.  Personal item names should not be used here, since they
+        will work.  Custom names should not be used here, since they
         may be interpreted as uniqueNames, with unpredictable results.
 
         >>> md = metadata.Metadata()
-        >>> md.addItems('title', [metadata.Text('Caveat Emptor', language='la'),
+        >>> md.addAll('title', [metadata.Text('Caveat Emptor', language='la'),
         ...                       metadata.Text('Buyer Beware',  language='en')])
-        >>> titles = md.getItems('title')
+        >>> titles = md.getAll('title')
         >>> len(titles)
         2
         >>> titles[0]
@@ -458,16 +449,16 @@ class Metadata(base.Music21Object):
         <music21.metadata.primitives.Text Buyer Beware>
         >>> titles[1].language
         'en'
-        >>> md.getItem('title')
+        >>> md.get('title')
         <music21.metadata.primitives.Text Caveat Emptor>
         '''
-        self._addItems(key, valueList, namespace)
+        self._addAll(key, valueList, namespace)
 
     # sets a single item (overwriting all existing items)
-    def setItem(self,
-                key: str,
-                value: t.Any,
-                namespace: t.Optional[str] = None):
+    def set(self,
+            key: str,
+            value: t.Any,
+            namespace: t.Optional[str] = None):
         '''
         Replaces any items stored in metadata with this key and namespace, with value.
         If namespace is provided, the key will be interpreted as name or
@@ -476,24 +467,24 @@ class Metadata(base.Music21Object):
         form 'namespace:name'.
 
         >>> md = metadata.Metadata()
-        >>> md.setItem('librettist', metadata.Text('Joe Libretto'))
-        >>> md.getItem('librettist') # uniqueName
+        >>> md.set('librettist', metadata.Text('Joe Libretto'))
+        >>> md.get('librettist') # uniqueName
         <music21.metadata.primitives.Contributor librettist:Joe Libretto>
-        >>> md.getItem('LBT', namespace='marcrel') # name, namespace
+        >>> md.get('LBT', namespace='marcrel') # name, namespace
         <music21.metadata.primitives.Contributor librettist:Joe Libretto>
-        >>> md.getItem('lbt', namespace='marcrel') # abbrevCode, namespace
+        >>> md.get('lbt', namespace='marcrel') # abbrevCode, namespace
         <music21.metadata.primitives.Contributor librettist:Joe Libretto>
-        >>> md.getItem('marcrel:LBT') # 'namespace:name'
+        >>> md.get('marcrel:LBT') # 'namespace:name'
         <music21.metadata.primitives.Contributor librettist:Joe Libretto>
         >>> md.librettist # backward compatible access
         'Joe Libretto'
         >>> md.contributors # backward compatible access
         [<music21.metadata.primitives.Contributor librettist:Joe Libretto>]
         '''
-        self._setItem(key, value, namespace)
+        self._set(key, value, namespace)
 
     # sets a list of items (overwriting all existing items)
-    def setItems(self,
+    def setAll(self,
                 key: str,
                 valueList: t.List[t.Any],
                 namespace: t.Optional[str] = None):
@@ -507,10 +498,10 @@ class Metadata(base.Music21Object):
         form 'namespace:name'.
 
         >>> md = metadata.Metadata()
-        >>> md.setItems('librettist', [metadata.Text('Joe Libretto'),
+        >>> md.setAll('librettist', [metadata.Text('Joe Libretto'),
         ...                            metadata.Text('John Smith')])
 
-        >>> items = md.getItems('librettist') # uniqueName
+        >>> items = md.getAll('librettist') # uniqueName
         >>> len(items)
         2
         >>> items[0]
@@ -518,7 +509,7 @@ class Metadata(base.Music21Object):
         >>> items[1]
         <music21.metadata.primitives.Contributor librettist:John Smith>
 
-        >>> items = md.getItems('LBT', namespace='marcrel') # name, namespace
+        >>> items = md.getAll('LBT', namespace='marcrel') # name, namespace
         >>> len(items)
         2
         >>> items[0]
@@ -526,7 +517,7 @@ class Metadata(base.Music21Object):
         >>> items[1]
         <music21.metadata.primitives.Contributor librettist:John Smith>
 
-        >>> items = md.getItems('lbt', namespace='marcrel') # abbrevCode, namespace
+        >>> items = md.getAll('lbt', namespace='marcrel') # abbrevCode, namespace
         >>> len(items)
         2
         >>> items[0]
@@ -534,7 +525,7 @@ class Metadata(base.Music21Object):
         >>> items[1]
         <music21.metadata.primitives.Contributor librettist:John Smith>
 
-        >>> items = md.getItems('marcrel:LBT') # 'namespace:name'
+        >>> items = md.getAll('marcrel:LBT') # 'namespace:name'
         >>> len(items)
         2
         >>> items[0]
@@ -556,62 +547,62 @@ class Metadata(base.Music21Object):
         >>> items[1]
         <music21.metadata.primitives.Contributor librettist:John Smith>
         '''
-        self._setItems(key, valueList, namespace)
+        self._setAll(key, valueList, namespace)
 
-    # Notes about personal metadata keys:
+    # Notes about custom metadata keys:
     # You can use nonstandard nsKeys like 'humdrum:XXX', or you can
     # just make up your own keys like 'excerpt-start-measure'.
     #
-    # You can use a personal name that is the same as an existing
+    # You can use a custom name that is the same as an existing
     # unique name of a standard supported property, but that is
     # not recommended:
     #
-    # md.addItems('composer', ['Ludwig', 'Wolfgang'])
-    # md.addPersonalItem('composer', 'Not a contributor')
-    # md.getAllContributorItems()
+    # md.addAll('composer', ['Ludwig', 'Wolfgang'])
+    # md.addCustom('composer', 'Not a contributor')
+    # md.getAllContributorNamedValues()
     # [
     #   ('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Ludwig>),
     #   ('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Wolfgang>),
     # ]
-    # md.getAllItems(skipContributors=True)
+    # md.getAllNamedValues(skipContributors=True)
     # [
     #   ('composer', <music21.metadata.primitives.Text Not a contributor>),
     # ]
     #
 
 
-    def getPersonalItem(self, key: str) -> t.Any:
-        return self._getItem(key, namespace=None, personal=True)
+    def getCustom(self, key: str) -> t.Any:
+        return self._get(key, namespace=None, custom=True)
 
-    def getPersonalItems(self, key: str) -> t.List[t.Any]:
-        return self._getItems(key, namespace=None, personal=True)
+    def getCustomAll(self, key: str) -> t.List[t.Any]:
+        return self._getAll(key, namespace=None, custom=True)
 
-    def addPersonalItem(self, key: str, value: t.Any):
-        self._addItem(key, value, namespace=None, personal=True)
+    def addCustom(self, key: str, value: t.Any):
+        self._add(key, value, namespace=None, custom=True)
 
-    def addPersonalItems(self, key: str, valueList: t.List[t.Any]):
-        self._addItems(key, valueList, namespace=None, personal=True)
+    def addCustomAll(self, key: str, valueList: t.List[t.Any]):
+        self._addAll(key, valueList, namespace=None, custom=True)
 
-    def setPersonalItem(self, key: str, value: t.Any):
-        self._setItem(key, value, namespace=None, personal=True)
+    def setCustom(self, key: str, value: t.Any):
+        self._set(key, value, namespace=None, custom=True)
 
-    def setPersonalItems(self, key: str, valueList: t.List[t.Any]):
-        self._setItems(key, valueList, namespace=None, personal=True)
+    def setCustomAll(self, key: str, valueList: t.List[t.Any]):
+        self._setAll(key, valueList, namespace=None, custom=True)
 
     # This is the extended version of all().  The tuple's key is an nsKey (but of course
-    # there may be no namespace for personal metadata items).
-    def getAllItems(self, skipContributors=False) -> t.List[t.Tuple[str, t.Any]]:
+    # there may be no namespace for custom metadata items).
+    def getAllNamedValues(self, skipContributors=False) -> t.List[t.Tuple[str, t.Any]]:
         '''
         Returns all values stored in this metadata as a list of (nsKey, value) tuples.
         nsKeys with multiple values will appear multiple times in the list (rather
         than appearing once, with a value that is a list of values).
 
         >>> md = metadata.Metadata()
-        >>> md.addItems('composer', ['Ludwig', 'Wolfgang'])
-        >>> md.addPersonalItem('composer', 'Not a contributor')
-        >>> md.addItem('title', '[title of show]')
-        >>> md.addPersonalItem('excerpt-start-measure', 1234)
-        >>> all = md.getAllItems()
+        >>> md.addAll('composer', ['Ludwig', 'Wolfgang'])
+        >>> md.addCustom('composer', 'Not a contributor')
+        >>> md.add('title', '[title of show]')
+        >>> md.addCustom('excerpt-start-measure', 1234)
+        >>> all = md.getAllNamedValues()
         >>> len(all)
         5
         >>> all[0]
@@ -624,7 +615,7 @@ class Metadata(base.Music21Object):
         ('dcterms:title', <music21.metadata.primitives.Text [title of show]>)
         >>> all[4]
         ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>)
-        >>> all = md.getAllItems(skipContributors=True)
+        >>> all = md.getAllNamedValues(skipContributors=True)
         >>> len(all)
         3
         >>> all[0]
@@ -646,20 +637,20 @@ class Metadata(base.Music21Object):
             else:
                 allOut.append((nsKey, value))
 
-        # unlike backward compatible API Metadata.all, getAllItems does not sort.
+        # unlike backward compatible API Metadata.all, getAllNamedValues does not sort.
         return allOut
 
-    def getAllContributorItems(self) -> t.List[t.Tuple[str, t.Any]]:
+    def getAllContributorNamedValues(self) -> t.List[t.Tuple[str, t.Any]]:
         '''
         Returns all contributors stored in this metadata as a list of (nsKey, value) tuples.
 
         >>> md = metadata.Metadata()
-        >>> md.addPersonalItem('composer', 'Not a contributor')
-        >>> md.addItem('title', '[title of show]')
-        >>> md.addPersonalItem('excerpt-start-measure', 1234)
-        >>> md.addItems('composer', ['Ludwig', 'Wolfgang'])
-        >>> md.addItem('librettist', 'Joe')
-        >>> all = md.getAllContributorItems()
+        >>> md.addCustom('composer', 'Not a contributor')
+        >>> md.add('title', '[title of show]')
+        >>> md.addCustom('excerpt-start-measure', 1234)
+        >>> md.addAll('composer', ['Ludwig', 'Wolfgang'])
+        >>> md.add('librettist', 'Joe')
+        >>> all = md.getAllContributorNamedValues()
         >>> len(all)
         3
         >>> all[0]
@@ -682,7 +673,7 @@ class Metadata(base.Music21Object):
             else:
                 allOut.append((nsKey, value))
 
-        # unlike backward compatible API Metadata.all, getAllContributorItems does not sort.
+        # unlike backward compatible API Metadata.all, getAllContributorNamedValues does not sort.
         return allOut
 
 # -----------------------------------------------------------------------------
@@ -730,6 +721,21 @@ class Metadata(base.Music21Object):
             return False
 
         return prop.isContributor
+
+    @staticmethod
+    def isStandardUniqueName(uniqueName: str) -> bool:
+        '''
+        Determines if a unique name is associated with a standard property.
+        Returns False if no such associated standard property can be found.
+        '''
+        if not uniqueName:
+            return False
+        prop: PropertyDescription = (
+            Metadata._UNIQUENAME_TO_PROPERTYDESCRIPTION.get(uniqueName, None))
+        if prop is None:
+            return False
+
+        return True
 
     @staticmethod
     def nsKeyToUniqueName(nsKey: str) -> t.Optional[str]:
@@ -786,10 +792,10 @@ class Metadata(base.Music21Object):
         Returns [] if no such backward-compatible Contributors exist.
 
         >>> md = metadata.Metadata()
-        >>> md.setItems('composer', ['Ludwig', 'Wolfgang'])
-        >>> md.setItem('librettist', 'Joe')
-        >>> md.addItem('architect', 'John')      # not backward-compatible
-        >>> md.addItem('title', 'Caveat Emptor') # not a contributor
+        >>> md.setAll('composer', ['Ludwig', 'Wolfgang'])
+        >>> md.set('librettist', 'Joe')
+        >>> md.add('architect', 'John')      # not backward-compatible
+        >>> md.add('title', 'Caveat Emptor') # not a contributor
         >>> contribs = md.contributors
         >>> len(contribs)
         3
@@ -817,30 +823,30 @@ class Metadata(base.Music21Object):
 
         >>> md = metadata.Metadata()
         >>> md.copyright
-        >>> md.setItem('dcterms:rights', 'Copyright © 1984 All Rights Reserved')
-        >>> md.addItem('dcterms:rights', 'Lyrics copyright © 1987 All Rights Reserved')
-        >>> md.setItems('composer', ['Ludwig', 'Wolfgang'])
-        >>> md.setItem('librettist', 'Joe')
-        >>> md.addItem('architect', 'John')
-        >>> md.addItem('title', 'Caveat Emptor')
+        >>> md.set('dcterms:rights', 'Copyright © 1984 All Rights Reserved')
+        >>> md.add('dcterms:rights', 'Lyrics copyright © 1987 All Rights Reserved')
+        >>> md.setAll('composer', ['Ludwig', 'Wolfgang'])
+        >>> md.set('librettist', 'Joe')
+        >>> md.add('architect', 'John')
+        >>> md.add('title', 'Caveat Emptor')
         >>> md.copyright
         <music21.metadata.primitives.Copyright Copyright © 1984 All Rights Reserved>
 
         >>> md = metadata.Metadata()
         >>> md.copyright is None
         True
-        >>> md.setItem('dcterms:rights', 'Copyright © 1984 All Rights Reserved')
-        >>> md.addItem('dcterms:rights', 'Lyrics copyright © 1987 All Rights Reserved')
+        >>> md.set('dcterms:rights', 'Copyright © 1984 All Rights Reserved')
+        >>> md.add('dcterms:rights', 'Lyrics copyright © 1987 All Rights Reserved')
         >>> md.copyright = 'Copyright © 1984 from str'
         >>> md.copyright
         <music21.metadata.primitives.Copyright Copyright © 1984 from str>
-        >>> md.getItems('dcterms:rights')
+        >>> md.getAll('dcterms:rights')
         [<music21.metadata.primitives.Copyright Copyright © 1984 from str>]
         >>> md.copyright = metadata.Text('Copyright ©    1984 from Text')
-        >>> md.getItems('dcterms:rights')
+        >>> md.getAll('dcterms:rights')
         [<music21.metadata.primitives.Copyright Copyright © 1984 from Text>]
         >>> md.copyright = metadata.Copyright('Copyright © 1984 from Copyright', role='something')
-        >>> md.getItems('dcterms:rights')
+        >>> md.getAll('dcterms:rights')
         [<music21.metadata.primitives.Copyright Copyright © 1984 from Copyright>]
         '''
         output: t.Optional[t.Any] = self._getBackwardCompatibleItemNoConversion('copyright')
@@ -1236,7 +1242,7 @@ class Metadata(base.Music21Object):
         'Latvia'
         >>> md.countryOfComposition
         'Latvia'
-        >>> md.getItem('countryOfComposition')
+        >>> md.get('countryOfComposition')
         <music21.metadata.primitives.Text Latvia>
 
         >>> md.setWorkId('sdf', None)
@@ -1664,7 +1670,7 @@ class Metadata(base.Music21Object):
     # externally.
 
     @staticmethod
-    def _nsKey(key: str, namespace: t.Optional[str] = None, personal: bool = False) -> str:
+    def _nsKey(key: str, namespace: t.Optional[str] = None, custom: bool = False) -> str:
         # Caller is required to check backward compatibility (either before or after); this
         # routine is general.
         # If namespace is provided, the key will be interpreted as name or
@@ -1674,7 +1680,7 @@ class Metadata(base.Music21Object):
         if not key:
             return ''
 
-        if personal:
+        if custom:
             return key
 
         if namespace:
@@ -1730,17 +1736,17 @@ class Metadata(base.Music21Object):
             return prop.uniqueName
         return prop.name
 
-    def _getItem(self,
-                 key: str,
-                 namespace: t.Optional[str] = None,
-                 personal: bool = False) -> t.Optional[t.Any]:
+    def _get(self,
+                key: str,
+                namespace: t.Optional[str] = None,
+                custom: bool = False) -> t.Optional[t.Any]:
         '''
         If namespace is provided, the key will be interpreted as name or
         abbrevCode (within that namespace). Either will work. If namespace is
         None, the key will be interpreted as uniqueName or assumed to be of the
         form 'namespace:name'.
         '''
-        nsKey: str = self._nsKey(key, namespace, personal)
+        nsKey: str = self._nsKey(key, namespace, custom)
         output: t.Any = self._metadata.get(nsKey, None)
         if not output:
             return None
@@ -1748,11 +1754,11 @@ class Metadata(base.Music21Object):
             return output[0]
         return output
 
-    def _getItems(self,
+    def _getAll(self,
                  key: str,
                  namespace: t.Optional[str] = None,
-                 personal: bool = False) -> t.List[t.Any]:
-        nsKey: str = self._nsKey(key, namespace, personal)
+                 custom: bool = False) -> t.List[t.Any]:
+        nsKey: str = self._nsKey(key, namespace, custom)
         output: t.Any = self._metadata.get(nsKey, None)
         if not output:
             return []
@@ -1849,11 +1855,11 @@ class Metadata(base.Music21Object):
 
         raise exceptions21.MetadataException('internal error: invalid valueType')
 
-    def _addItem(self,
-                 key: str,
-                 value: t.Any,
-                 namespace: t.Optional[str] = None,
-                 personal: bool = False):
+    def _add(self,
+                key: str,
+                value: t.Any,
+                namespace: t.Optional[str] = None,
+                custom: bool = False):
         '''
         If namespace is provided, the key will be interpreted as name or
         abbrevCode (within that namespace). Either will work. If namespace is
@@ -1863,7 +1869,7 @@ class Metadata(base.Music21Object):
         if isinstance(value, list):
             raise ValueError
 
-        nsKey: str = self._nsKey(key, namespace, personal)
+        nsKey: str = self._nsKey(key, namespace, custom)
         value = self._convertValue(nsKey, value)
 
         prevValue: t.Optional[t.Any] = self._metadata.get(nsKey, None)
@@ -1877,11 +1883,11 @@ class Metadata(base.Music21Object):
             # overwrite prevValue with a list containing prevValue and value
             self._metadata[nsKey] = [prevValue, value]
 
-    def _addItems(self,
+    def _addAll(self,
                   key: str,
                   valueList: t.List[t.Any],
                   namespace: t.Optional[str] = None,
-                  personal: bool = False):
+                  custom: bool = False):
         '''
         Adds a list of items to metadata with key and namespace.
 
@@ -1891,10 +1897,10 @@ class Metadata(base.Music21Object):
         form 'namespace:name'.
 
         >>> md = metadata.Metadata()
-        >>> md._addItems('title', ['value0']) # add list as first value
-        >>> md._addItems('title', ['value1', 'value2']) # add list to single element
-        >>> md._addItems('title', ['value3', 'value4']) # add list to list
-        >>> titles = md.getItems('title')
+        >>> md._addAll('title', ['value0']) # add list as first value
+        >>> md._addAll('title', ['value1', 'value2']) # add list to single element
+        >>> md._addAll('title', ['value3', 'value4']) # add list to list
+        >>> titles = md.getAll('title')
         >>> len(titles)
         5
         >>> titles[0]
@@ -1913,7 +1919,7 @@ class Metadata(base.Music21Object):
         if not valueList:
             raise ValueError
 
-        nsKey: str = self._nsKey(key, namespace, personal)
+        nsKey: str = self._nsKey(key, namespace, custom)
 
         newValueList: t.List[t.Any] = []
         for value in valueList:
@@ -1934,35 +1940,35 @@ class Metadata(base.Music21Object):
             # overwrite prevValue with a list containing prevValue followed by newValueList
             self._metadata[nsKey] = [prevValue] + newValueList
 
-    def _setItem(self,
-                 key: str,
-                 value: t.Any,
-                 namespace: t.Optional[str] = None,
-                 personal: bool = False):
+    def _set(self,
+                key: str,
+                value: t.Any,
+                namespace: t.Optional[str] = None,
+                custom: bool = False):
         '''
         If namespace is provided, the key will be interpreted as name or
         abbrevCode (within that namespace). Either will work. If namespace is
         None, the key will be interpreted as uniqueName or assumed to be of the
         form 'namespace:name'.
         '''
-        nsKey: str = self._nsKey(key, namespace, personal)
+        nsKey: str = self._nsKey(key, namespace, custom)
         self._metadata.pop(nsKey, None)
-        self._addItem(nsKey, value)
+        self._add(nsKey, value)
 
-    def _setItems(self,
+    def _setAll(self,
                   key: str,
                   valueList: t.List[t.Any],
                   namespace: t.Optional[str] = None,
-                  personal: bool = False):
+                  custom: bool = False):
         '''
         If namespace is provided, the key will be interpreted as name or
         abbrevCode (within that namespace). Either will work. If namespace is
         None, the key will be interpreted as uniqueName or assumed to be of the
         form 'namespace:name'.
         '''
-        nsKey: str = self._nsKey(key, namespace, personal)
+        nsKey: str = self._nsKey(key, namespace, custom)
         self._metadata.pop(nsKey, None)
-        self._addItems(nsKey, valueList)
+        self._addAll(nsKey, valueList)
 
 # -----------------------------------------------------------------------------
 #   Utilities for use by the backward compatible APIs
@@ -2081,7 +2087,7 @@ class Metadata(base.Music21Object):
         >>> md._addBackwardCompatibleContributor(ly1)
         >>> md._addBackwardCompatibleContributor(bf0)
         >>> md._addBackwardCompatibleContributor(bf1)
-        >>> all = md.getAllItems()
+        >>> all = md.getAllNamedValues()
         >>> len(all)
         4
         >>> all[0]
@@ -2094,7 +2100,7 @@ class Metadata(base.Music21Object):
         ('marcrel:CTB', <music21.metadata.primitives.Contributor best friend:John1>)
         '''
         nsKey: str = self._backwardCompatibleContributorRoleToNSKey(c.role)
-        self._addItem(nsKey, c)
+        self._add(nsKey, c)
 
     def _getAllBackwardCompatibleContributors(self) -> t.List[Contributor]:
         allOut: t.List[Contributor] = []
@@ -2127,19 +2133,19 @@ class Metadata(base.Music21Object):
 #     def _addBackwardCompatibleItem(self, workId: str, value: t.Any):
 #         nsKey: str = Metadata._M21WORKID_TO_NSKEY.get(workId, None)
 #         if nsKey is not None:
-#             self._addItem(nsKey, value)
+#             self._add(nsKey, value)
 #
     def _setBackwardCompatibleItem(self, workId: str, value: t.Any):
         nsKey: str = Metadata._M21WORKID_TO_NSKEY.get(workId, None)
         if nsKey is not None:
-            self._setItem(nsKey, value)
+            self._set(nsKey, value)
 
     def _getBackwardCompatibleItemsNoConversion(self, workId: str) -> t.List[t.Any]:
         nsKey: str = Metadata._M21WORKID_TO_NSKEY.get(workId, None)
         if nsKey is None:
             return None
 
-        resultList: t.List[t.Any] = self._getItems(nsKey)
+        resultList: t.List[t.Any] = self._getAll(nsKey)
         if not resultList:
             return []
 
@@ -2156,7 +2162,7 @@ class Metadata(base.Music21Object):
 
     def _setBackwardCompatibleContributorNames(self, workId: str, names: t.List[str]):
         # Auto-conversion from str to standard Contributor happens behind the scenes
-        self._setItems(workId, names)
+        self._setAll(workId, names)
 
 # -----------------------------------------------------------------------------
 # Dictionaries generated from properties.STANDARD_PROPERTY_DESCRIPTIONS for looking up

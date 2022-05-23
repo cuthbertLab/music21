@@ -2290,8 +2290,12 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             #         mxId.append(mxCreator)
             #         foundOne = True
             # else:
-            for contribItem in self.scoreMetadata.getAllContributorItems():
-                mxCreator = self.contributorItemToXmlCreator(contribItem)
+            # We ignore the name here, since c.role is slightly better
+            # in one case: if name is 'otherContributor' (actually
+            # 'marcrel:CTB'), c.role is likely to be a more specific
+            # custom role, which we would love to use here.
+            for _, c in self.scoreMetadata.getAllContributorNamedValues():
+                mxCreator = self.contributorToXmlCreator(c)
                 mxId.append(mxCreator)
                 foundOne = True
 
@@ -2307,7 +2311,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             #     if c:
             #         copyrights = [c]
             # else:
-            copyrights = self.scoreMetadata.getItem('copyright')
+            copyrights = self.scoreMetadata.get('copyright')
             if copyrights is None:
                 copyrights = []
             if not isinstance(copyrights, list):
@@ -2360,7 +2364,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
         #     allItems = md.all(skipContributors=True)
         # else:
-        allItems = md.getAllItems(skipContributors=True)
+        allItems = md.getAllNamedValues(skipContributors=True)
 
         skippedOneMovementName: bool = False
         skippedOneMovementNumber: bool = False
@@ -2511,7 +2515,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         #         mxWorkTitle = SubElement(mxWork, 'work-title')
         #         mxWorkTitle.text = str(mdObj.title)
         # else:
-        titleText: metadata.Text = mdObj.getItem('title')
+        titleText: metadata.Text = mdObj.get('title')
         if titleText is not None:
             if firstTitleFound is None:
                 firstTitleFound = titleText
@@ -2525,7 +2529,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         #         mxMovementNumber = SubElement(mxScoreHeader, 'movement-number')
         #         mxMovementNumber.text = str(mdObj.movementNumber)
         # else:
-        movementNumberText: metadata.Text = mdObj.getItem('movementNumber')
+        movementNumberText: metadata.Text = mdObj.get('movementNumber')
         if movementNumberText is not None:
             mxMovementNumber = SubElement(mxScoreHeader, 'movement-number')
             mxMovementNumber.text = str(movementNumberText)
@@ -2545,7 +2549,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         #        else:
         #            return
         # else:
-        movementNameText: metadata.Text = mdObj.getItem('movementName')
+        movementNameText: metadata.Text = mdObj.get('movementName')
         if movementNameText:
             mxMovementTitle.text = str(movementNameText)
         else:
@@ -2582,25 +2586,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             mxCreator.set('type', str(c.role))
         if c.name is not None:
             mxCreator.text = c.name
-        return mxCreator
-
-    def contributorItemToXmlCreator(self, c):
-        # noinspection SpellCheckingInspection, PyShadowingNames
-        '''
-        Return a <creator> tag from a contributor tuple c = (nsKey, value).
-        '''
-        mxCreator = Element('creator')
-
-        # c is a contributor item tuple(nskey, value)
-        nsKey: str = None
-        value: metadata.Contributor = None
-        nsKey, value = c
-        role: str = metadata.Metadata.nsKeyToContributorUniqueName(nsKey)
-        if role is not None:
-            mxCreator.set('type', role)
-        if value is not None:
-            # TODO: Add m21ToXml.py support for contributors with multiple names
-            mxCreator.text = str(value.names[0])
         return mxCreator
 
 # ------------------------------------------------------------------------------

@@ -479,7 +479,7 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
     ⠠⠞⠊⠞⠇⠑⠒⠀⠠⠇⠁⠀⠠⠛⠊⠕⠧⠊⠝⠑⠞⠞⠁⠀⠠⠏⠊⠁⠝⠞⠁
     '''
     allBrailleLines = []
-    for nsKey, value in music21Metadata.getAllItems(skipContributors=True):
+    for nsKey, value in music21Metadata.getAllNamedValues(skipContributors=True):
         if value is not None:
             uniqueName: str = music21Metadata.nsKeyToUniqueName(nsKey)
             if not uniqueName:
