@@ -35,7 +35,7 @@ from music21 import pitch
 from music21 import stream
 from music21 import tempo
 
-from music21.instrument import Conductor, deduplicate
+from music21.instrument import Conductor, UnpitchedPercussion, deduplicate
 from music21.midi.percussion import MIDIPercussionException, PercussionMapper
 
 environLocal = environment.Environment('midi.translate')
@@ -419,7 +419,9 @@ def midiEventsToNote(
     return t.cast(t.Union[note.Note, note.Unpitched], nr)
 
 
-def noteToMidiEvents(inputM21: note.Note, *, includeDeltaTime=True, channel=1):
+def noteToMidiEvents(
+    inputM21: t.Union[note.Note, note.Unpitched], *, includeDeltaTime=True, channel=1
+) -> t.List[t.Union['music21.midi.DeltaTime', 'music21.midi.MidiEvent']]:
     # noinspection PyShadowingNames
     '''
     Translate a music21 Note to a list of four MIDI events --
@@ -458,6 +460,7 @@ def noteToMidiEvents(inputM21: note.Note, *, includeDeltaTime=True, channel=1):
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=9, pitch=61, velocity=0>]
 
     Changed in v7 -- made keyword-only.
+    Changed in v8 -- added support for :class:`~music21.note.Unpitched`
     '''
     from music21 import midi as midiModule
 
@@ -474,9 +477,13 @@ def noteToMidiEvents(inputM21: note.Note, *, includeDeltaTime=True, channel=1):
     me1 = midiModule.MidiEvent(track=mt)
     me1.type = midiModule.ChannelVoiceMessages.NOTE_ON
     me1.channel = channel
-    me1.pitch = n.pitch.midi
-    if not n.pitch.isTwelveTone():
-        me1.centShift = n.pitch.getCentShiftFromMidi()
+
+    if isinstance(n, note.Unpitched):
+        me1.pitch = _get_unpitched_pitch_value(n)
+    else:
+        me1.pitch = n.pitch.midi
+        if not n.pitch.isTwelveTone():
+            me1.centShift = n.pitch.getCentShiftFromMidi()
 
     # TODO: not yet using dynamics or velocity
     # volScalar = n.volume.getRealized(useDynamicContext=False,
@@ -497,9 +504,8 @@ def noteToMidiEvents(inputM21: note.Note, *, includeDeltaTime=True, channel=1):
     me2 = midiModule.MidiEvent(track=mt)
     me2.type = midiModule.ChannelVoiceMessages.NOTE_OFF
     me2.channel = channel
-    me2.pitch = n.pitch.midi
-    if not n.pitch.isTwelveTone():
-        me2.centShift = n.pitch.getCentShiftFromMidi()
+    me2.pitch = me1.pitch
+    me2.centShift = me1.centShift
 
     me2.velocity = 0  # must be zero
     eventList.append(me2)
@@ -646,7 +652,9 @@ def midiEventsToChord(
     return c
 
 
-def chordToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
+def chordToMidiEvents(
+    inputM21: chord.ChordBase, *, includeDeltaTime=True, channel=1
+) -> t.List[t.Union['music21.midi.DeltaTime', 'music21.midi.MidiEvent']]:
     # noinspection PyShadowingNames
     '''
     Translates a :class:`~music21.chord.Chord` object to a
@@ -675,21 +683,21 @@ def chordToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
      <music21.midi.MidiEvent NOTE_OFF, track=None, channel=1, pitch=83, velocity=0>]
 
     Changed in v7 -- made keyword-only.
+    Changed in v8 -- added support for :class:`~music21.percussion.PercussionChord`
     '''
     from music21 import midi as midiModule
     mt = None  # midi track
-    eventList = []
+    eventList: t.List[t.Union[midiModule.DeltaTime, midiModule.MidiEvent]] = []
     c = inputM21
 
     # temporary storage for setting correspondence
-    noteOn = []
-    noteOff = []
+    noteOn: t.List[midiModule.MidiEvent] = []
+    noteOff: t.List[midiModule.MidiEvent] = []
 
     chordVolume = c.volume  # use if component volume are not defined
     hasComponentVolumes = c.hasComponentVolumes()
 
-    for i in range(len(c)):
-        chordComponent = c[i]
+    for i, chordComponent in enumerate(c):
         # pitchObj = c.pitches[i]
         # noteObj = chordComponent
         if includeDeltaTime:
@@ -703,9 +711,15 @@ def chordToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
         me = midiModule.MidiEvent(track=mt)
         me.type = midiModule.ChannelVoiceMessages.NOTE_ON
         me.channel = 1
-        me.pitch = chordComponent.pitch.midi
-        if not chordComponent.pitch.isTwelveTone():
-            me.centShift = chordComponent.pitch.getCentShiftFromMidi()
+        if isinstance(chordComponent, note.Note):
+            me.pitch = chordComponent.pitch.midi
+            if not chordComponent.pitch.isTwelveTone():
+                me.centShift = chordComponent.pitch.getCentShiftFromMidi()
+        elif isinstance(chordComponent, note.Unpitched):
+            me.pitch = _get_unpitched_pitch_value(chordComponent)
+        else:  # pragma: no cover
+            raise TypeError('ChordBase can only contain Note and Unpitched as members')
+
         # if 'volume' in chordComponent:
 
         if hasComponentVolumes:
@@ -724,9 +738,7 @@ def chordToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
         noteOn.append(me)
 
     # must create each note on in chord before each note on
-    for i in range(len(c.pitches)):
-        pitchObj = c.pitches[i]
-
+    for i, noteOnEvent in enumerate(noteOn):
         if includeDeltaTime:
             # add note off / velocity zero message
             dt = midiModule.DeltaTime(track=mt)
@@ -738,9 +750,8 @@ def chordToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
         me = midiModule.MidiEvent(track=mt)
         me.type = midiModule.ChannelVoiceMessages.NOTE_OFF
         me.channel = channel
-        me.pitch = pitchObj.midi
-        if not pitchObj.isTwelveTone():
-            me.centShift = pitchObj.getCentShiftFromMidi()
+        me.pitch = noteOnEvent.pitch
+        me.centShift = noteOnEvent.centShift
         me.velocity = 0  # must be zero
         eventList.append(me)
         noteOff.append(me)
@@ -752,6 +763,21 @@ def chordToMidiEvents(inputM21, *, includeDeltaTime=True, channel=1):
         meOff.correspondingEvent = meOn
 
     return eventList
+
+
+def _get_unpitched_pitch_value(unp: note.Unpitched) -> int:
+    unpitched_instrument = None
+    if isinstance(unp.storedInstrument, instrument.UnpitchedPercussion):
+        unpitched_instrument = unp.storedInstrument
+    else:
+        if unp._chordAttached is not None:
+            unpitched_instrument = unp._chordAttached.getContextByClass(
+                instrument.UnpitchedPercussion)
+        else:
+            unpitched_instrument = unp.getContextByClass(instrument.UnpitchedPercussion)
+    if unpitched_instrument is not None and unpitched_instrument.percMapPitch is not None:
+        return unpitched_instrument.percMapPitch
+    return 60  # e.g. lossy instrument recognition from musicxml
 
 
 # ------------------------------------------------------------------------------
@@ -1244,6 +1270,7 @@ def elementToMidiEventList(
     '''
     # TODO: this is the best use of the switch statement when minimum Python
     #    version is 3.10
+    sub: t.Optional[t.List[t.Union['music21.midi.DeltaTime', 'music21.midi.MidiEvent']]]
     if isinstance(el, note.Rest):
         return None
     elif isinstance(el, note.Note):
@@ -1251,10 +1278,13 @@ def elementToMidiEventList(
         # using this property here is easier than using the above conversion
         # methods, as we do not need to know what the object is
         sub = noteToMidiEvents(el, includeDeltaTime=False)
-    # TODO: unpitched
+    elif isinstance(el, note.Unpitched):
+        sub = noteToMidiEvents(el, includeDeltaTime=False, channel=10)
     elif isinstance(el, chord.Chord):
         # TODO: skip Harmony unless showAsChord
         sub = chordToMidiEvents(el, includeDeltaTime=False)
+    elif isinstance(el, percussion.PercussionChord):
+        sub = chordToMidiEvents(el, includeDeltaTime=False, channel=10)
     elif isinstance(el, dynamics.Dynamic):
         return None  # dynamics have already been applied to notes
     elif isinstance(el, meter.TimeSignature):
@@ -2399,15 +2429,24 @@ def packetStorageFromSubstreamList(
         # get a first instrument; iterate over rest
         instrumentStream = subs.getElementsByClass(instrument.Instrument)
 
+        instObj = None
         # if there is an Instrument object at the start, make instObj that instrument
         # this may be a Conductor object if prepareStreamForMidi() was run
         if instrumentStream and subs.elementOffset(instrumentStream[0]) == 0:
             instObj = instrumentStream[0]
+        # If there is no such instrument, or a really lousy generic one without a midiProgram,
+        # check if this stream has any Unpitched objects. Make instObj an UnpitchedPercussion.
+        if (instrumentStream is None
+            # lousy instrument e.g. "music21.instrument.Instrument: ch10 jazzdrums1"
+            or (instObj is not None and instObj.midiProgram is None)
+            ) and subs.getElementsByClass(
+                (note.Unpitched, percussion.PercussionChord)):
+            # This dummy instance will be enough to get a channel 10 default in
+            # assignPacketsToChannels(). Later, the proper instrument in the stream will be read
+            instObj = UnpitchedPercussion()
         elif trackId == 0 and not subs.notesAndRests:
             # maybe prepareStreamForMidi() wasn't run; create Conductor instance
             instObj = Conductor()
-        else:
-            instObj = None
 
         trackPackets = streamToPackets(subs, trackId=trackId, addStartDelay=addStartDelay)
         # store packets in dictionary; keys are trackIds
@@ -2436,7 +2475,9 @@ def updatePacketStorageWithChannelInfo(
                 initCh = channelByInstrument[None]
             except KeyError:  # pragma: no cover
                 initCh = 1  # fallback, should not happen.
-        elif 'Conductor' in instObj.classes:
+        elif isinstance(instObj, instrument.UnpitchedPercussion):
+            initCh = 10
+        elif isinstance(instObj, instrument.Conductor):
             initCh = None
         else:  # keys are midi program
             initCh = channelByInstrument[instObj.midiProgram]
@@ -4015,6 +4056,48 @@ class Test(unittest.TestCase):
         # Remove the initial PROGRAM_CHANGE and get a default midiProgram
         meta_event_pairs = getMetaEvents([(DUMMY_DELTA_TIME, event2)])
         self.assertEqual(meta_event_pairs[0][1].midiProgram, 53)
+
+    def testExportUnpitched(self):
+        from music21 import midi as midiModule
+
+        m = stream.Measure(
+            [instrument.BassDrum(),
+            note.Unpitched(),
+            percussion.PercussionChord([note.Unpitched(), note.Unpitched()])]
+        )
+        trks = streamHierarchyToMidiTracks(m)
+        bd_trk = trks[1]
+
+        self.assertTrue({ev.channel for ev in bd_trk.events}, {10})
+        note_ons = [
+            ev for ev in bd_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
+        self.assertEqual(len(note_ons), 3)
+        self.assertEqual({ev.pitch for ev in note_ons}, {35})
+
+        # Replace the BassDrum with a vague instrument (lossy import)
+        m.pop(0)
+        m.insert(0, instrument.Instrument())
+
+        trks = streamHierarchyToMidiTracks(m)
+        drum_trk = trks[1]
+
+        self.assertTrue({ev.channel for ev in drum_trk.events}, {10})
+        note_ons = [
+            ev for ev in drum_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
+        self.assertEqual(len(note_ons), 3)
+        self.assertEqual({ev.pitch for ev in note_ons}, {60})  # fallback
+
+        # Change the stored instrument: affects that note only
+        m.notes.first().storedInstrument = instrument.Agogo()
+
+        trks = streamHierarchyToMidiTracks(m)
+        mixed_trk = trks[1]
+
+        self.assertTrue({ev.channel for ev in mixed_trk.events}, {10})
+        note_ons = [
+            ev for ev in mixed_trk.events if ev.type is midiModule.ChannelVoiceMessages.NOTE_ON]
+        self.assertEqual(len(note_ons), 3)
+        self.assertEqual([ev.pitch for ev in note_ons], [67, 60, 60])
 
 
 # ------------------------------------------------------------------------------
