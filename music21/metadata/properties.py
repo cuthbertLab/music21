@@ -31,20 +31,17 @@ class PropertyDescription:
             e.g. 'marcrel' means the property term is from the MARC Relator terms.
             'marcrel' is the shortened form of <http://www.loc.gov/loc.terms/relators/>
         isContributor: bool is whether or not the property describes a contributor.
-        m21Abbrev: str is the backward compatible music21 abbreviation for this property
-            (again, not necessary if we are using the 'music21' namespace, when
-            the abbreviation can be found in the code field).
-        m21WorkId: str is the backward compatible music21 name for this property (this
-            is not necessary if we are using the 'music21' namespace for a
-            particular backward compatible property, when the workId can be found
-            in the name field). Note that we use m21WorkId for music21 contributor
-            roles when necessary, as well.
+        oldMusic21Abbrev: str is the backward compatible music21 abbreviation for this
+            property.
+        oldMusic21WorkId: str is the backward compatible music21 name for this property.
+            Note that we use oldMusic21WorkId for music21 contributor roles when necessary,
+            as well.
         uniqueName: str is the official music21 name for this property, that is unique
             within the list of properties. There is always a unique name, but the
-            uniqueName field is only set if m21WorkId or name is not unique enough.
+            uniqueName field is only set if oldMusic21WorkId or name is not unique enough.
             To get the unique name from a particular PropertyDescription, we do:
                 (desc.uniqueName if desc.uniqueName
-                    else desc.m21WorkId if desc.m21WorkId
+                    else desc.oldMusic21WorkId if desc.oldMusic21WorkId
                     else desc.name)
         valueType: Type is the actual type of the value that will be stored in the metadata.
             This allows auto-conversion to take place inside set/add, and is
@@ -56,8 +53,8 @@ class PropertyDescription:
     label: t.Optional[str] = None
     namespace: t.Optional[str] = None
     isContributor: bool = False
-    m21Abbrev: t.Optional[str] = None
-    m21WorkId: t.Optional[str] = None
+    oldMusic21Abbrev: t.Optional[str] = None
+    oldMusic21WorkId: t.Optional[str] = None
     uniqueName: t.Optional[str] = None
     valueType: t.Type = Text
 
@@ -113,8 +110,8 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         name='alternative',
         label='Alternative Title',
         namespace='dcterms',
-        m21Abbrev='ota',
-        m21WorkId='alternativeTitle',
+        oldMusic21Abbrev='ota',
+        oldMusic21WorkId='alternativeTitle',
         isContributor=False),
 
     # audience: A class of agents for whom the resource is intended or useful.
@@ -181,7 +178,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         name='created',
         label='Date Created',
         namespace='dcterms',
-        m21WorkId='date',
+        oldMusic21WorkId='date',
         uniqueName='dateCreated',
         valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
         isContributor=False),
@@ -478,7 +475,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         name='rights',
         label='Rights',
         namespace='dcterms',
-        m21WorkId='copyright',
+        oldMusic21WorkId='copyright',
         valueType=Copyright,
         isContributor=False),
 
@@ -541,8 +538,8 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         name='title',
         label='Title',
         namespace='dcterms',
-        m21Abbrev='otl',
-        m21WorkId='title',
+        oldMusic21Abbrev='otl',
+        oldMusic21WorkId='title',
         isContributor=False),
 
     # type : The nature or genre of the resource.
@@ -636,7 +633,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         name='ARR',
         label='Arranger',
         namespace='marcrel',
-        m21WorkId='arranger',
+        oldMusic21WorkId='arranger',
         valueType=Contributor,
         isContributor=True),
 
@@ -837,7 +834,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         name='CMP',
         label='Composer',
         namespace='marcrel',
-        m21WorkId='composer',
+        oldMusic21WorkId='composer',
         valueType=Contributor,
         isContributor=True),
 
@@ -1218,7 +1215,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         name='LBT',
         label='Librettist',
         namespace='marcrel',
-        m21WorkId='librettist',
+        oldMusic21WorkId='librettist',
         valueType=Contributor,
         isContributor=True),
 
@@ -1254,7 +1251,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         name='LYR',
         label='Lyricist',
         namespace='marcrel',
-        m21WorkId='lyricist',
+        oldMusic21WorkId='lyricist',
         valueType=Contributor,
         isContributor=True),
 
@@ -1710,7 +1707,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         name='TRL',
         label='Translator',
         namespace='marcrel',
-        m21WorkId='translator',
+        oldMusic21WorkId='translator',
         valueType=Contributor,
         isContributor=True),
 
@@ -1785,201 +1782,244 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         valueType=Contributor,
         isContributor=True),
 
-    # The following music21 property terms have historically been supported
-    # by music21, so we must add them as standard property terms here:
+    # The following humdrum property terms have historically been supported
+    # by music21, so we add them as standard property terms here.
 
-    # textOriginalLanguage: original language of vocal/choral text
+    # TXO: original language of vocal/choral text
     PropertyDescription(
         abbrevCode='txo',
-        name='textOriginalLanguage',
+        name='TXO',
         label='Original Text Language',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='txo',
+        oldMusic21WorkId='textOriginalLanguage',
         isContributor=False),
 
-    # textLanguage: language of the encoded vocal/choral text
+    # TXL: language of the encoded vocal/choral text
     PropertyDescription(
         abbrevCode='txl',
-        name='textLanguage',
+        name='TXL',
         label='Text Language',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='txl',
+        oldMusic21WorkId='textLanguage',
         isContributor=False),
 
-    # popularTitle: popular title
+    # OTP: popular title
     PropertyDescription(
         abbrevCode='otp',
-        name='popularTitle',
+        name='OTP',
         label='Popular Title',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='otp',
+        oldMusic21WorkId='popularTitle',
         isContributor=False),
 
-    # parentTitle: parent title
+    # OPR: parent title
     PropertyDescription(
         abbrevCode='opr',
-        name='parentTitle',
+        name='OPR',
         label='Parent Title',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='opr',
+        oldMusic21WorkId='parentTitle',
         isContributor=False),
 
-    # actNumber: act number (e.g. '2' or 'Act 2')
+    # OAC: act number (e.g. '2' or 'Act 2')
     PropertyDescription(
         abbrevCode='oac',
-        name='actNumber',
+        name='OAC',
         label='Act Number',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='oac',
+        oldMusic21WorkId='actNumber',
         isContributor=False),
 
-    # sceneNumber: scene number (e.g. '3' or 'Scene 3')
+    # OSC: scene number (e.g. '3' or 'Scene 3')
     PropertyDescription(
         abbrevCode='osc',
-        name='sceneNumber',
+        name='OSC',
         label='Scene Number',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='osc',
+        oldMusic21WorkId='sceneNumber',
         isContributor=False),
 
-    # movementNumber: movement number (e.g. '4', or 'mov. 4', or...)
+    # OMV: movement number (e.g. '4', or 'mov. 4', or...)
     PropertyDescription(
         abbrevCode='omv',
-        name='movementNumber',
+        name='OMV',
         label='Movement Number',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='omv',
+        oldMusic21WorkId='movementNumber',
         isContributor=False),
 
-    # movementName: movement name (often a tempo description)
+    # OMD: movement name (often a tempo description)
     PropertyDescription(
         abbrevCode='omd',
-        name='movementName',
+        name='OMD',
         label='Movement Name',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='omd',
+        oldMusic21WorkId='movementName',
         isContributor=False),
 
-    # opusNumber: opus number (e.g. '23', or 'Opus 23')
+    # OPS: opus number (e.g. '23', or 'Opus 23')
     PropertyDescription(
         abbrevCode='ops',
-        name='opusNumber',
+        name='OPS',
         label='Opus Number',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='ops',
+        oldMusic21WorkId='opusNumber',
         isContributor=False),
 
-    # number: number (e.g. '5', or 'No. 5')
+    # ONM: number (e.g. number of song within ABC multi-song file)
     PropertyDescription(
         abbrevCode='onm',
-        name='number',
+        name='ONM',
         label='Number',
-        namespace='music21',
-        uniqueName='workNumber',
+        namespace='humdrum',
+        oldMusic21Abbrev='onm',
+        oldMusic21WorkId='number',
         isContributor=False),
 
-    # volume: volume number (e.g. '6' or 'Vol. 6')
+    # OVM: volume number (e.g. '6' or 'Vol. 6')
     PropertyDescription(
         abbrevCode='ovm',
-        name='volume',
+        name='OVM',
         label='Volume Number',
         uniqueName='volumeNumber',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='ovm',
+        oldMusic21WorkId='volume',
         isContributor=False),
 
-    # dedication: dedicated to
+    # ODE: dedicated to
     PropertyDescription(
         abbrevCode='ode',
-        name='dedication',
+        name='ODE',
         label='Dedicated To',
         uniqueName='dedicatedTo',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='ode',
+        oldMusic21WorkId='dedication',
         isContributor=False),
 
-    # commission: commissioned by
+    # OCO: commissioned by
     PropertyDescription(
         abbrevCode='oco',
-        name='commission',
+        name='OCO',
         label='Commissioned By',
         uniqueName='commissionedBy',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='oco',
+        oldMusic21WorkId='commission',
         isContributor=False),
 
-    # countryOfComposition: country of composition
+    # OCY: country of composition
     PropertyDescription(
         abbrevCode='ocy',
-        name='countryOfComposition',
+        name='OCY',
         label='Country of Composition',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='ocy',
+        oldMusic21WorkId='countryOfComposition',
         isContributor=False),
 
-    # localeOfComposition: city, town, or village of composition
+    # OPC: city, town, or village of composition
     PropertyDescription(
         abbrevCode='opc',
-        name='localeOfComposition',
+        name='OPC',
         label='Locale of Composition',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='opc',
+        oldMusic21WorkId='localeOfComposition',
         isContributor=False),
 
-    # groupTitle: group title (e.g. 'The Seasons')
+    # GTL: group title (e.g. 'The Seasons')
     PropertyDescription(
         abbrevCode='gtl',
-        name='groupTitle',
+        name='GTL',
         label='Group Title',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='gtl',
+        oldMusic21WorkId='groupTitle',
         isContributor=False),
 
-    # associatedWork: associated work, such as a play or film
+    # GAW: associated work, such as a play or film
     PropertyDescription(
         abbrevCode='gaw',
-        name='associatedWork',
+        name='GAW',
         label='Associated Work',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='gaw',
+        oldMusic21WorkId='associatedWork',
         isContributor=False),
 
-    # collectionDesignation: This is a free-form text record that can be used to
-    #   identify a collection of pieces, such as works appearing in a compendium
-    #   or anthology. E.g. Norton Scores, Smithsonian Collection, Burkhart Anthology.
+    # GCO: collection designation. This is a free-form text record that can be
+    #   used to identify a collection of pieces, such as works appearing in a
+    #   compendium or anthology. E.g. Norton Scores, Smithsonian Collection,
+    #   Burkhart Anthology.
     PropertyDescription(
         abbrevCode='gco',
-        name='collectionDesignation',
+        name='GCO',
         label='Collection Designation',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21Abbrev='gco',
+        oldMusic21WorkId='collectionDesignation',
         isContributor=False),
 
-    # attributedComposer: attributed composer
+    # COA: attributed composer
     PropertyDescription(
         abbrevCode='coa',
-        name='attributedComposer',
+        name='COA',
         label='Attributed Composer',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21WorkId='attributedComposer',
         valueType=Contributor,
         isContributor=True),
 
-    # suspectedComposer: suspected composer
+    # COS: suspected composer
     PropertyDescription(
         abbrevCode='cos',
-        name='suspectedComposer',
+        name='COS',
         label='Suspected Composer',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21WorkId='suspectedComposer',
         valueType=Contributor,
         isContributor=True),
 
-    # composerAlias: composer's abbreviated, alias, or stage name
+    # COL: composer's abbreviated, alias, or stage name
     PropertyDescription(
         abbrevCode='col',
-        name='composerAlias',
+        name='COL',
         label='Composer Alias',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21WorkId='composerAlias',
         valueType=Contributor,
         isContributor=True),
 
-    # composerCorporate: composer's corporate name
+    # COC: composer's corporate name
     PropertyDescription(
         abbrevCode='coc',
-        name='composerCorporate',
+        name='COC',
         label='Composer Corporate Name',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21WorkId='composerCorporate',
         valueType=Contributor,
         isContributor=True),
 
-    # orchestrator: orchestrator
+    # LOR: orchestrator
     PropertyDescription(
         abbrevCode='lor',
-        name='orchestrator',
+        name='LOR',
         label='Orchestrator',
-        namespace='music21',
+        namespace='humdrum',
+        oldMusic21WorkId='orchestrator',
         valueType=Contributor,
         isContributor=True),
+
+    # TODO: add the rest of the humdrum namespace?
 )

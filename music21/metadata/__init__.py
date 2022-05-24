@@ -47,15 +47,13 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
         place and are all backward compatible. There are new APIs (get, set, add
         et al) to access the new functionality.
 
-    - The old metadata implementation had a list of supported workIds, and also a
-        list of supported contributor roles.  You could have more than one of each
-        role, but only one of each workId.
+    - The old metadata implementation had a list of supported workIds (drawn mostly
+        from Humdrum), and also a list of supported contributor roles.  You could
+        have more than one of each contributor role, but only one of each workId.
         In the new implementation, I don't really treat contributor roles differently
         from other metadata.  I have a list of supported property terms, which are
         pulled from Dublin Core (namespace = 'dcterms'), MARC Relator codes (a.k.a.
-        contributor roles, namespace = 'marcrel'), and several music21-specific things
-        that I have to continue supporting even though I can't find any official list
-        of terms that support them (namespace = 'music21').  An example is 'popularTitle'.
+        contributor roles, namespace = 'marcrel'), and Humdrum (namespace = 'humdrum').
         You can have more than one of any of these.  That implies that I need two APIs
         for adding a new piece of metadata.  One that does "this is the new (only) value
         for this metadata property term", and one that does "this is a new value to add in to any
@@ -92,20 +90,18 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
                 e.g. 'marcrel' means the property term is from the MARC Relator terms.
                 'marcrel' is the shortened form of <http://www.loc.gov/loc.terms/relators/>
             isContributor is whether or not the property describes a contributor.
-            m21WorkId is the backward compatible music21 name for this property (this
-                is not necessary if we are using the 'music21' namespace for a
-                particular backward compatible property, when the workId can be found
-                in the name field). Note that we use m21WorkId for music21 contributor
-                roles when necessary, as well.
-            m21Abbrev is the backward compatible music21 abbreviation for this property
-                (again, not necessary if we are using the 'music21' namespace, when
-                the abbreviation can be found in the code field)
+            oldMusic21WorkId is the backward compatible music21 name for this property.
+                Note that we also use oldMusic21WorkId for backward compatible music21
+                contributor roles.
+            oldMusic21Abbrev is the backward compatible music21 abbreviation for this
+                property.
             uniqueName is the official music21 name for this property, that is unique
                 within the list of properties. There is always a unique name, but the
-                uniqueName field is only set if m21WorkId or name is not unique enough.
-                To get the unique name from a particular PropertyDescription, we do:
+                uniqueName field is only set if oldMusic21WorkId or name is not unique
+                enough. To get the unique name from a particular PropertyDescription,
+                we do:
                     (desc.uniqueName if desc.uniqueName
-                        else desc.m21WorkId if desc.m21WorkId
+                        else desc.oldMusic21WorkId if desc.oldMusic21WorkId
                         else desc.name)
             valueType is the actual type of the value that will be stored in the metadata.
                 This allows auto-conversion to take place inside set/add, and is
@@ -120,8 +116,8 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
         that have more than one value).  The old attributes copyright and date have been
         moved into the _metadata dict ('dcterms:rights' and 'dcterms:created'). Those are
         good PropertyDescription examples to look at to see the relationship between
-        name, m21WorkId, and uniqueName.  We have maintained the old software attribute as
-        a list of strings that is accessed directly, as before.
+        name, oldMusic21WorkId, and uniqueName.  We have maintained the old software
+        attribute as a list of strings that is accessed directly, as before.
 
 '''
 from collections import OrderedDict, namedtuple
@@ -809,7 +805,7 @@ class Metadata(base.Music21Object):
 
         # This was just a data attribute before.  Hopefully no-one is calling
         # md.contributors.append(c).  I did a global search on github for
-        # 'music21' 'contributors', and all code that modified it that I found
+        # 'music21 contributors', and all code that modified it that I found
         # were in music21 forks.  So I think we're OK making this a read-only
         # property that we generate on the fly.
         output: t.List[Contributor] = self._getAllBackwardCompatibleContributors()
@@ -1718,16 +1714,10 @@ class Metadata(base.Music21Object):
             return None
 
         # it's a small-c contributor
-        if prop.namespace == 'music21':
-            # it's in the music21 namespace, so it's a big-C Contributor,
-            # and Contributor.role can be found in prop.name
-            return prop.name
-
-        # it's a small-c contributor that's not in the music21 namespace
-        if prop.m21WorkId:
+        if prop.oldMusic21WorkId:
             # it maps to a backward compatible big-C Contributor role, which can be
-            # found in prop.m21WorkId.
-            return prop.m21WorkId
+            # found in prop.oldMusic21WorkId.
+            return prop.oldMusic21WorkId
 
         # it's a small-c contributor that doesn't map to a backward compatible
         # big-C Contributor role, but since we're not trying to be backward
@@ -2003,8 +1993,7 @@ class Metadata(base.Music21Object):
             return False
 
         return prop.isContributor and (
-            prop.namespace == 'music21'
-            or prop.m21WorkId is not None
+            prop.oldMusic21WorkId is not None
             or prop.uniqueName == 'otherContributor')
 
 #     @staticmethod
@@ -2013,7 +2002,7 @@ class Metadata(base.Music21Object):
 #         if prop is None:
 #             return False
 #
-#         return prop.namespace == 'music21' or prop.m21WorkId is not None
+#         return prop.oldMusic21WorkId is not None or prop.oldMusic21Abbrev is not None
 
 #     @staticmethod
 #     def _nsKeyToBackwardCompatibleContributorRole(nsKey: str) -> Optional[str]:
@@ -2024,16 +2013,10 @@ class Metadata(base.Music21Object):
 #             return None
 #
 #         # it's a small-c contributor
-#         if prop.namespace == 'music21':
-#             # it's in the music21 namespace, so it's a big-C Contributor,
-#             # and Contributor.role can be found in prop.name
-#             return prop.name
-#
-#         # it's a small-c contributor that's not in the music21 namespace
-#         if prop.m21WorkId:
+#         if prop.oldMusic21WorkId:
 #             # it maps to a backward compatible big-C Contributor role, which can be
-#             # found in prop.m21WorkId.
-#             return prop.m21WorkId
+#             # found in prop.oldMusic21WorkId.
+#             return prop.oldMusic21WorkId
 #
 #         return None
 
@@ -2176,45 +2159,43 @@ class Metadata(base.Music21Object):
     _NSKEY_TO_CONTRIBUTORUNIQUENAME: dict = {
         f'{x.namespace}:{x.name}':
             x.uniqueName if x.uniqueName
-            else x.m21WorkId if x.m21WorkId
+            else x.oldMusic21WorkId if x.oldMusic21WorkId
             else x.name
             for x in properties.STANDARD_PROPERTY_DESCRIPTIONS if x.isContributor}
 
     _NSKEY_TO_UNIQUENAME: dict = {
         f'{x.namespace}:{x.name}':
             x.uniqueName if x.uniqueName
-            else x.m21WorkId if x.m21WorkId
+            else x.oldMusic21WorkId if x.oldMusic21WorkId
             else x.name
             for x in properties.STANDARD_PROPERTY_DESCRIPTIONS}
 
     _UNIQUENAME_TO_NSKEY: dict = {
         x.uniqueName if x.uniqueName
-        else x.m21WorkId if x.m21WorkId
+        else x.oldMusic21WorkId if x.oldMusic21WorkId
         else x.name:
             f'{x.namespace}:{x.name}'
             for x in properties.STANDARD_PROPERTY_DESCRIPTIONS}
 
     _UNIQUENAME_TO_PROPERTYDESCRIPTION: dict = {
         x.uniqueName if x.uniqueName
-        else x.m21WorkId if x.m21WorkId
+        else x.oldMusic21WorkId if x.oldMusic21WorkId
         else x.name:
             x for x in properties.STANDARD_PROPERTY_DESCRIPTIONS}
 
     _M21ABBREV_TO_NSKEY: dict = {
-        x.m21Abbrev if x.m21Abbrev
-        else x.abbrevCode if x.namespace == 'music21'
+        x.oldMusic21Abbrev if x.oldMusic21Abbrev
         else None:
             f'{x.namespace}:{x.name}'
             for x in properties.STANDARD_PROPERTY_DESCRIPTIONS
-            if x.m21Abbrev or x.namespace == 'music21'}
+            if x.oldMusic21Abbrev}
 
     _M21WORKID_TO_NSKEY: dict = {
-        x.m21WorkId if x.m21WorkId
-        else x.name if x.namespace == 'music21'
+        x.oldMusic21WorkId if x.oldMusic21WorkId
         else None:
             f'{x.namespace}:{x.name}'
             for x in properties.STANDARD_PROPERTY_DESCRIPTIONS
-            if x.m21WorkId or x.namespace == 'music21'}
+            if x.oldMusic21WorkId}
 
     _NAMESPACEABBREV_TO_NSKEY: dict = {
         (x.namespace, x.abbrevCode):

@@ -1292,7 +1292,7 @@ class MusicXMLImporter(XMLParserBase):
             #     seta(md, work, 'opus', 'opusNumber')
             # else:
             setm(md, work, 'work-title', 'title')
-            setm(md, work, 'work-number', 'workNumber')
+            setm(md, work, 'work-number', 'number')
             setm(md, work, 'opus', 'opusNumber')
 
         # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
