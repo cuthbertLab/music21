@@ -1959,7 +1959,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [addressToForteName, addressToPrimeForm, addressToForteName, seekChordTablesAddress]
+_DOC_ORDER = [addressToForteName, addressToPrimeForm, seekChordTablesAddress]
 
 
 if __name__ == '__main__':
