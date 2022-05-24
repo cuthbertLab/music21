@@ -2348,7 +2348,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         >>> SX.dump(mxMisc)
         <miscellaneous>
           <miscellaneous-field name="dcterms:created">1689/--/-- or earlier</miscellaneous-field>
-          <miscellaneous-field name="music21:localeOfComposition">Rome</miscellaneous-field>
+          <miscellaneous-field name="humdrum:OPC">Rome</miscellaneous-field>
         </miscellaneous>
         '''
         if md is None and self.scoreMetadata is None:
