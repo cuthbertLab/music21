@@ -360,7 +360,7 @@ class Metadata(base.Music21Object):
     # always returns a Tuple, which might be empty, have one item, or multiple items
     def getAll(self,
                  key: str,
-                 namespace: t.Optional[str] = None) -> t.Tuple[t.Any]:
+                 namespace: t.Optional[str] = None) -> t.Tuple[t.Any, ...]:
         '''
         Returns all the items stored in metadata with this key and namespace.
         The returned value is always a Tuple. If there are no items, an empty
@@ -574,7 +574,7 @@ class Metadata(base.Music21Object):
     def getCustom(self, key: str) -> t.Any:
         return self._get(key, namespace=None, custom=True)
 
-    def getCustomAll(self, key: str) -> t.Tuple[t.Any]:
+    def getCustomAll(self, key: str) -> t.Tuple[t.Any, ...]:
         return self._getAll(key, namespace=None, custom=True)
 
     def addCustom(self, key: str, value: t.Any):
@@ -1757,7 +1757,7 @@ class Metadata(base.Music21Object):
     def _getAll(self,
                  key: str,
                  namespace: t.Optional[str] = None,
-                 custom: bool = False) -> t.Tuple[t.Any]:
+                 custom: bool = False) -> t.Tuple[t.Any, ...]:
         nsKey: str = self._nsKey(key, namespace, custom)
         output: t.Any = self._metadata.get(nsKey, None)
         if not output:
@@ -2117,7 +2117,7 @@ class Metadata(base.Music21Object):
         return allOut
 
     def _getBackwardCompatibleItemNoConversion(self, workId: str) -> t.Optional[t.Any]:
-        result: t.Tuple[t.Any] = self._getBackwardCompatibleItemsNoConversion(workId)
+        result: t.Tuple[t.Any, ...] = self._getBackwardCompatibleItemsNoConversion(workId)
         if not result:  # None or empty list
             return None
         return result[0]
@@ -2140,17 +2140,17 @@ class Metadata(base.Music21Object):
         if nsKey is not None:
             self._set(nsKey, value)
 
-    def _getBackwardCompatibleItemsNoConversion(self, workId: str) -> t.Tuple[t.Any]:
+    def _getBackwardCompatibleItemsNoConversion(self, workId: str) -> t.Tuple[t.Any, ...]:
         nsKey: str = Metadata._M21WORKID_TO_NSKEY.get(workId, None)
         if nsKey is None:
             return tuple()
 
-        resultTuple: t.Tuple[t.Any] = self._getAll(nsKey)
+        resultTuple: t.Tuple[t.Any, ...] = self._getAll(nsKey)
         return resultTuple
 
     def _getBackwardCompatibleContributorNames(self, workId: str) -> t.List[str]:
         output: t.List[str] = []
-        values: t.Tuple[t.Any] = self._getBackwardCompatibleItemsNoConversion(workId)
+        values: t.Tuple[t.Any, ...] = self._getBackwardCompatibleItemsNoConversion(workId)
 
         # return only one name of each contributor (backward compatible behavior)
         for v in values:
