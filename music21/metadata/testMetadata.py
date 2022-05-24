@@ -217,7 +217,8 @@ class Test(unittest.TestCase):
 
         if valueType is metadata.Contributor:
             for itemNSKey in mdItemsNSKey:
-                self.assertEqual(itemNSKey.role, contributorRole if contributorRole else uniqueName)
+                self.assertEqual(itemNSKey.role,
+                    contributorRole if contributorRole else uniqueName)
 
     def testUniqueNameAccess(self):
         self.checkUniqueNamedItem('abstract', 'dcterms')
@@ -263,7 +264,8 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem('license', 'dcterms')
         self.checkUniqueNamedItem('mediator', 'dcterms')
         self.checkUniqueNamedItem('medium', 'dcterms')
-        self.checkUniqueNamedItem('dateModified', 'dcterms:modified', valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('dateModified', 'dcterms:modified',
+            valueType=metadata.DateSingle)
         self.checkUniqueNamedItem('provenance', 'dcterms')
 
         self.checkUniqueNamedItem('publisher', 'dcterms', valueType=metadata.Contributor)
@@ -413,11 +415,16 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem('groupTitle', 'humdrum:GTL')
         self.checkUniqueNamedItem('associatedWork', 'humdrum:GAW')
         self.checkUniqueNamedItem('collectionDesignation', 'humdrum:GCO')
-        self.checkUniqueNamedItem('attributedComposer', 'humdrum:COA', valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('suspectedComposer', 'humdrum:COS', valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('composerAlias', 'humdrum:COL', valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('composerCorporate', 'humdrum:COC', valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('orchestrator', 'humdrum:LOR', valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('attributedComposer', 'humdrum:COA',
+            valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('suspectedComposer', 'humdrum:COS',
+            valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('composerAlias', 'humdrum:COL',
+            valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('composerCorporate', 'humdrum:COC',
+            valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('orchestrator', 'humdrum:LOR',
+            valueType=metadata.Contributor)
 
 # -----------------------------------------------------------------------------
 
