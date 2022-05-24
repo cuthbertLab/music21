@@ -357,14 +357,14 @@ class Metadata(base.Music21Object):
         '''
         return self._get(key, namespace)
 
-    # always returns a List, which might be empty, have one item, or multiple items
+    # always returns a Tuple, which might be empty, have one item, or multiple items
     def getAll(self,
                  key: str,
-                 namespace: t.Optional[str] = None) -> t.List[t.Any]:
+                 namespace: t.Optional[str] = None) -> t.Tuple[t.Any]:
         '''
         Returns all the items stored in metadata with this key and namespace.
-        The returned value is always a list. If there are no items, [] is
-        returned.  If there is only one item, [thatItem] is returned.
+        The returned value is always a Tuple. If there are no items, an empty
+        Tuple is returned.  If there is only one item, (thatItem,) is returned.
 
         If namespace is provided, the key will be interpreted as name or
         abbrevCode (within that namespace). Either will work. If namespace is
@@ -377,13 +377,13 @@ class Metadata(base.Music21Object):
 
         >>> md = metadata.Metadata()
         >>> md.getAll('title')
-        []
+        ()
 
         Test when there is one title.
 
         >>> md.set('title', metadata.Text('Heroic Symphony'))
         >>> md.getAll('title')
-        [<music21.metadata.primitives.Text Heroic Symphony>]
+        (<music21.metadata.primitives.Text Heroic Symphony>,)
 
         Test when there are two titles.
 
@@ -574,7 +574,7 @@ class Metadata(base.Music21Object):
     def getCustom(self, key: str) -> t.Any:
         return self._get(key, namespace=None, custom=True)
 
-    def getCustomAll(self, key: str) -> t.List[t.Any]:
+    def getCustomAll(self, key: str) -> t.Tuple[t.Any]:
         return self._getAll(key, namespace=None, custom=True)
 
     def addCustom(self, key: str, value: t.Any):
@@ -841,13 +841,13 @@ class Metadata(base.Music21Object):
         >>> md.copyright
         <music21.metadata.primitives.Copyright Copyright © 1984 from str>
         >>> md.getAll('dcterms:rights')
-        [<music21.metadata.primitives.Copyright Copyright © 1984 from str>]
+        (<music21.metadata.primitives.Copyright Copyright © 1984 from str>,)
         >>> md.copyright = metadata.Text('Copyright ©    1984 from Text')
         >>> md.getAll('dcterms:rights')
-        [<music21.metadata.primitives.Copyright Copyright © 1984 from Text>]
+        (<music21.metadata.primitives.Copyright Copyright © 1984 from Text>,)
         >>> md.copyright = metadata.Copyright('Copyright © 1984 from Copyright', role='something')
         >>> md.getAll('dcterms:rights')
-        [<music21.metadata.primitives.Copyright Copyright © 1984 from Copyright>]
+        (<music21.metadata.primitives.Copyright Copyright © 1984 from Copyright>,)
         '''
         output: t.Optional[t.Any] = self._getBackwardCompatibleItemNoConversion('copyright')
         if output is not None and not isinstance(output, Copyright):
@@ -1757,14 +1757,14 @@ class Metadata(base.Music21Object):
     def _getAll(self,
                  key: str,
                  namespace: t.Optional[str] = None,
-                 custom: bool = False) -> t.List[t.Any]:
+                 custom: bool = False) -> t.Tuple[t.Any]:
         nsKey: str = self._nsKey(key, namespace, custom)
         output: t.Any = self._metadata.get(nsKey, None)
         if not output:
-            return []
+            return tuple()          # return empty tuple
         if not isinstance(output, list):
-            return [output]
-        return output
+            return (output,)        # return tuple of one element
+        return tuple(output)        # return tuple containing contents of list
 
     @staticmethod
     def _convertValue(nsKey: str, value: t.Any) -> t.Any:
@@ -2117,7 +2117,7 @@ class Metadata(base.Music21Object):
         return allOut
 
     def _getBackwardCompatibleItemNoConversion(self, workId: str) -> t.Optional[t.Any]:
-        result: t.List[t.Any] = self._getBackwardCompatibleItemsNoConversion(workId)
+        result: t.Tuple[t.Any] = self._getBackwardCompatibleItemsNoConversion(workId)
         if not result:  # None or empty list
             return None
         return result[0]
@@ -2140,20 +2140,17 @@ class Metadata(base.Music21Object):
         if nsKey is not None:
             self._set(nsKey, value)
 
-    def _getBackwardCompatibleItemsNoConversion(self, workId: str) -> t.List[t.Any]:
+    def _getBackwardCompatibleItemsNoConversion(self, workId: str) -> t.Tuple[t.Any]:
         nsKey: str = Metadata._M21WORKID_TO_NSKEY.get(workId, None)
         if nsKey is None:
-            return None
+            return tuple()
 
-        resultList: t.List[t.Any] = self._getAll(nsKey)
-        if not resultList:
-            return []
-
-        return resultList
+        resultTuple: t.Tuple[t.Any] = self._getAll(nsKey)
+        return resultTuple
 
     def _getBackwardCompatibleContributorNames(self, workId: str) -> t.List[str]:
         output: t.List[str] = []
-        values: t.List[t.Any] = self._getBackwardCompatibleItemsNoConversion(workId)
+        values: t.Tuple[t.Any] = self._getBackwardCompatibleItemsNoConversion(workId)
 
         # return only one name of each contributor (backward compatible behavior)
         for v in values:
