@@ -22,9 +22,7 @@ class PropertyDescription:
     '''
         Describes a single standard metadata property.
 
-        abbrevCode: str is a (usually abbreviated) code for the property.
         name: str is the namespace's name of the property (the tail of the property term URI).
-        label: str is the human readable name of the property.
         namespace: str is a shortened form of the URI for the set of terms.
             e.g. 'dcterms' means the property term is from the Dublin Core terms.
             'dcterms' is the shortened form of <http://purl.org/dc/terms/>
@@ -48,9 +46,7 @@ class PropertyDescription:
             the type clients will always receive from get.
 
     '''
-    abbrevCode: t.Optional[str] = None
     name: t.Optional[str] = None
-    label: t.Optional[str] = None
     namespace: t.Optional[str] = None
     isContributor: bool = False
     oldMusic21Abbrev: t.Optional[str] = None
@@ -65,50 +61,38 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # abstract: A summary of the resource.
     PropertyDescription(
-        abbrevCode='AB',
         name='abstract',
-        label='Abstract',
         namespace='dcterms',
         isContributor=False),
 
     # accessRights: Information about who access the resource or an indication of
     #   its security status.
     PropertyDescription(
-        abbrevCode='AR',
         name='accessRights',
-        label='Access Rights',
         namespace='dcterms',
         isContributor=False),
 
     # accrualMethod: The method by which items are added to a collection.
     PropertyDescription(
-        abbrevCode='AM',
         name='accrualMethod',
-        label='Accrual Method',
         namespace='dcterms',
         isContributor=False),
 
     # accrualPeriodicity: The frequency with which items are added to a collection.
     PropertyDescription(
-        abbrevCode='AP',
         name='accrualPeriodicity',
-        label='Accrual Periodicity',
         namespace='dcterms',
         isContributor=False),
 
     # accrualPolicy: The policy governing the addition of items to a collection.
     PropertyDescription(
-        abbrevCode='APL',
         name='accrualPolicy',
-        label='Accrual Policy',
         namespace='dcterms',
         isContributor=False),
 
     # alternative: An alternative name for the resource.
     PropertyDescription(
-        abbrevCode='ALT',
         name='alternative',
-        label='Alternative Title',
         namespace='dcterms',
         oldMusic21Abbrev='ota',
         oldMusic21WorkId='alternativeTitle',
@@ -116,17 +100,13 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # audience: A class of agents for whom the resource is intended or useful.
     PropertyDescription(
-        abbrevCode='AUD',
         name='audience',
-        label='Audience',
         namespace='dcterms',
         isContributor=False),
 
     # available: Date that the resource became or will become available.
     PropertyDescription(
-        abbrevCode='AVL',
         name='available',
-        label='Date Available',
         namespace='dcterms',
         uniqueName='dateAvailable',
         valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
@@ -134,30 +114,22 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # bibliographicCitation: A bibliographic reference for the resource.
     PropertyDescription(
-        abbrevCode='BIB',
         name='bibliographicCitation',
-        label='Bibliographic Citation',
         namespace='dcterms',
         isContributor=False),
 
     # conformsTo: An established standard to which the described resource conforms.
     PropertyDescription(
-        abbrevCode='COT',
         name='conformsTo',
-        label='Conforms To',
         namespace='dcterms',
         isContributor=False),
 
     # contributor: An entity responsible for making contributions to the resource.
     # NOTE: You should use one of the 'marcrel' properties below instead, since
     # this property is very vague. The 'marcrel' properties are considered to be
-    # refinements of dcterms:contributor (this property), so if someone asks for
-    # everything as Dublin Core metadata, those will all be translated into
-    # dcterms:contributor properties.
+    # refinements of dcterms:contributor (this property).
     PropertyDescription(
-        abbrevCode='CN',
         name='contributor',
-        label='Contributor',
         namespace='dcterms',
         uniqueName='genericContributor',
         valueType=Contributor,
@@ -166,17 +138,13 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # coverage: The spatial or temporal topic of the resource, spatial applicability
     #   of the resource, or jurisdiction under which the resource is relevant.
     PropertyDescription(
-        abbrevCode='CVR',
         name='coverage',
-        label='Coverage',
         namespace='dcterms',
         isContributor=False),
 
     # created: Date of creation of the resource.
     PropertyDescription(
-        abbrevCode='CRD',
         name='created',
-        label='Date Created',
         namespace='dcterms',
         oldMusic21WorkId='date',
         uniqueName='dateCreated',
@@ -185,9 +153,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # creator: An entity responsible for making the resource.
     PropertyDescription(
-        abbrevCode='CR',
         name='creator',
-        label='Creator',
         namespace='dcterms',
         valueType=Contributor,
         isContributor=True),
@@ -195,9 +161,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # date: A point or period of time associated with an event in the lifecycle
     #   of the resource.
     PropertyDescription(
-        abbrevCode='DT',
         name='date',
-        label='Date',
         namespace='dcterms',
         uniqueName='otherDate',
         valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
@@ -205,36 +169,28 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # dateAccepted: Date of acceptance of the resource.
     PropertyDescription(
-        abbrevCode='DTA',
         name='dateAccepted',
-        label='Date Accepted',
         namespace='dcterms',
         valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # dateCopyrighted: Date of copyright of the resource.
     PropertyDescription(
-        abbrevCode='DTC',
         name='dateCopyrighted',
-        label='Date Copyrighted',
         namespace='dcterms',
         valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # dateSubmitted: Date of submission of the resource.
     PropertyDescription(
-        abbrevCode='DTS',
         name='dateSubmitted',
-        label='Date Submitted',
         namespace='dcterms',
         valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # description: An account of the resource.
     PropertyDescription(
-        abbrevCode='DSC',
         name='description',
-        label='Description',
         namespace='dcterms',
         isContributor=False),
 
@@ -242,122 +198,94 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   through an educational or training context, for which the described
     #   resource is intended.
     PropertyDescription(
-        abbrevCode='EL',
         name='educationLevel',
-        label='Audience Education Level',
         namespace='dcterms',
         isContributor=False),
 
     # extent: The size or duration of the resource.
     PropertyDescription(
-        abbrevCode='EXT',
         name='extent',
-        label='Extent',
         namespace='dcterms',
         isContributor=False),
 
     # format: The file format, physical medium, or dimensions of the resource.
     PropertyDescription(
-        abbrevCode='FMT',
         name='format',
-        label='Format',
         namespace='dcterms',
         isContributor=False),
 
     # hasFormat: A related resource that is substantially the same as the
     #   pre-existing described resource, but in another format.
     PropertyDescription(
-        abbrevCode='HFMT',
         name='hasFormat',
-        label='Has Format',
         namespace='dcterms',
         isContributor=False),
 
     # hasPart: A related resource that is included either physically or
     #   logically in the described resource.
     PropertyDescription(
-        abbrevCode='HPT',
         name='hasPart',
-        label='Has Part',
         namespace='dcterms',
         isContributor=False),
 
     # hasVersion: A related resource that is a version, edition, or adaptation
     #   of the described resource.
     PropertyDescription(
-        abbrevCode='HVS',
         name='hasVersion',
-        label='Has Version',
         namespace='dcterms',
         isContributor=False),
 
     # identifier: An unambiguous reference to the resource within a given context.
     PropertyDescription(
-        abbrevCode='ID',
         name='identifier',
-        label='Identifier',
         namespace='dcterms',
         isContributor=False),
 
     # instructionalMethod: A process, used to engender knowledge, attitudes and
     #   skills, that the described resource is designed to support.
     PropertyDescription(
-        abbrevCode='IM',
         name='instructionalMethod',
-        label='Instructional Method',
         namespace='dcterms',
         isContributor=False),
 
     # isFormatOf: A pre-existing related resource that is substantially the same
     #   as the described resource, but in another format.
     PropertyDescription(
-        abbrevCode='IFMT',
         name='isFormatOf',
-        label='Is Format Of',
         namespace='dcterms',
         isContributor=False),
 
     # isPartOf: A related resource in which the described resource is physically
     #   or logically included.
     PropertyDescription(
-        abbrevCode='IPT',
         name='isPartOf',
-        label='Is Part Of',
         namespace='dcterms',
         isContributor=False),
 
     # isReferencedBy: A related resource that references, cites, or otherwise
     #   points to the described resource.
     PropertyDescription(
-        abbrevCode='IREF',
         name='isReferencedBy',
-        label='Is Referenced By',
         namespace='dcterms',
         isContributor=False),
 
     # isReplacedBy: A related resource that supplants, displaces, or supersedes
     #   the described resource.
     PropertyDescription(
-        abbrevCode='IREP',
         name='isReplacedBy',
-        label='Is Replaced By',
         namespace='dcterms',
         isContributor=False),
 
     # isRequiredBy: A related resource that requires the described resource
     #   to support its function, delivery, or coherence.
     PropertyDescription(
-        abbrevCode='IREQ',
         name='isRequiredBy',
-        label='Is Required By',
         namespace='dcterms',
         isContributor=False),
 
     # issued: Date of formal issuance of the resource.
     PropertyDescription(
-        abbrevCode='IS',
         name='issued',
-        label='Date Issued',
         namespace='dcterms',
         uniqueName='dateIssued',
         valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
@@ -366,50 +294,38 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # isVersionOf: A related resource of which the described resource is a
     #   version, edition, or adaptation.
     PropertyDescription(
-        abbrevCode='IVSN',
         name='isVersionOf',
-        label='Is Version Of',
         namespace='dcterms',
         isContributor=False),
 
     # language: A language of the resource.
     PropertyDescription(
-        abbrevCode='LG',
         name='language',
-        label='Language',
         namespace='dcterms',
         isContributor=False),
 
     # license: A legal document giving official permission to do something
     #   with the resource.
     PropertyDescription(
-        abbrevCode='LI',
         name='license',
-        label='License',
         namespace='dcterms',
         isContributor=False),
 
     # mediator: An entity that mediates access to the resource.
     PropertyDescription(
-        abbrevCode='ME',
         name='mediator',
-        label='Mediator',
         namespace='dcterms',
         isContributor=False),
 
     # medium: The material or physical carrier of the resource.
     PropertyDescription(
-        abbrevCode='MED',
         name='medium',
-        label='Medium',
         namespace='dcterms',
         isContributor=False),
 
     # modified: Date on which the resource was changed.
     PropertyDescription(
-        abbrevCode='MOD',
         name='modified',
-        label='Date Modified',
         namespace='dcterms',
         uniqueName='dateModified',
         valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
@@ -419,17 +335,13 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   the resource since its creation that are significant for its
     #   authenticity, integrity, and interpretation.
     PropertyDescription(
-        abbrevCode='PRV',
         name='provenance',
-        label='Provenance',
         namespace='dcterms',
         isContributor=False),
 
     # publisher: An entity responsible for making the resource available.
     PropertyDescription(
-        abbrevCode='PBL',
         name='publisher',
-        label='Publisher',
         namespace='dcterms',
         valueType=Contributor,
         isContributor=True),
@@ -437,43 +349,33 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # references: A related resource that is referenced, cited, or
     #   otherwise pointed to by the described resource.
     PropertyDescription(
-        abbrevCode='REF',
         name='references',
-        label='References',
         namespace='dcterms',
         isContributor=False),
 
     # relation: A related resource.
     PropertyDescription(
-        abbrevCode='REL',
         name='relation',
-        label='Relation',
         namespace='dcterms',
         isContributor=False),
 
     # replaces: A related resource that is supplanted, displaced, or
     #   superseded by the described resource.
     PropertyDescription(
-        abbrevCode='REP',
         name='replaces',
-        label='Replaces',
         namespace='dcterms',
         isContributor=False),
 
     # requires: A related resource that is required by the described
     #   resource to support its function, delivery, or coherence.
     PropertyDescription(
-        abbrevCode='REQ',
         name='requires',
-        label='Requires',
         namespace='dcterms',
         isContributor=False),
 
     # rights: Information about rights held in and over the resource.
     PropertyDescription(
-        abbrevCode='RT',
         name='rights',
-        label='Rights',
         namespace='dcterms',
         oldMusic21WorkId='copyright',
         valueType=Copyright,
@@ -482,9 +384,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # rightsHolder: A person or organization owning or managing rights
     #   over the resource.
     PropertyDescription(
-        abbrevCode='RH',
         name='rightsHolder',
-        label='Rights Holder',
         namespace='dcterms',
         valueType=Contributor,
         isContributor=True),
@@ -492,51 +392,39 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # source: A related resource from which the described resource
     #   is derived.
     PropertyDescription(
-        abbrevCode='SRC',
         name='source',
-        label='Source',
         namespace='dcterms',
         isContributor=False),
 
     # spatial: Spatial characteristics of the resource.
     PropertyDescription(
-        abbrevCode='SP',
         name='spatial',
-        label='Spatial Coverage',
         namespace='dcterms',
         uniqueName='spatialCoverage',
         isContributor=False),
 
     # subject: A topic of the resource.
     PropertyDescription(
-        abbrevCode='SUB',
         name='subject',
-        label='Subject',
         namespace='dcterms',
         isContributor=False),
 
     # tableOfContents: A list of subunits of the resource.
     PropertyDescription(
-        abbrevCode='TOC',
         name='tableOfContents',
-        label='Table Of Contents',
         namespace='dcterms',
         isContributor=False),
 
     # temporal: Temporal characteristics of the resource.
     PropertyDescription(
-        abbrevCode='TE',
         name='temporal',
-        label='Temporal Coverage',
         namespace='dcterms',
         uniqueName='temporalCoverage',
         isContributor=False),
 
     # title: A name given to the resource.
     PropertyDescription(
-        abbrevCode='T',
         name='title',
-        label='Title',
         namespace='dcterms',
         oldMusic21Abbrev='otl',
         oldMusic21WorkId='title',
@@ -544,17 +432,13 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # type : The nature or genre of the resource.
     PropertyDescription(
-        abbrevCode='TYP',
         name='type',
-        label='Type',
         namespace='dcterms',
         isContributor=False),
 
     # valid: Date (often a range) of validity of a resource.
     PropertyDescription(
-        abbrevCode='VA',
         name='valid',
-        label='Date Valid',
         namespace='dcterms',
         uniqueName='dateValid',
         valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
@@ -571,9 +455,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # ACT/Actor: a person or organization who principally exhibits acting
     #   skills in a musical or dramatic presentation or entertainment.
     PropertyDescription(
-        abbrevCode='act',
         name='ACT',
-        label='Actor',
         namespace='marcrel',
         uniqueName='actor',
         valueType=Contributor,
@@ -583,9 +465,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   usually for a different medium, or 2) rewrites novels or stories
     #   for motion pictures or other audiovisual medium.
     PropertyDescription(
-        abbrevCode='adp',
         name='ADP',
-        label='Adapter',
         namespace='marcrel',
         uniqueName='adapter',
         valueType=Contributor,
@@ -596,9 +476,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   programs the computer to move objects and images for the purpose
     #   of animated film processing.
     PropertyDescription(
-        abbrevCode='anm',
         name='ANM',
-        label='Animator',
         namespace='marcrel',
         uniqueName='animator',
         valueType=Contributor,
@@ -606,9 +484,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # ANN/Annotator: a person who writes manuscript annotations on a printed item.
     PropertyDescription(
-        abbrevCode='ann',
         name='ANN',
-        label='Annotator',
         namespace='marcrel',
         uniqueName='annotator',
         valueType=Contributor,
@@ -617,9 +493,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # ARC/Architect: a person or organization who designs structures or oversees
     #   their construction.
     PropertyDescription(
-        abbrevCode='arc',
         name='ARC',
-        label='Architect',
         namespace='marcrel',
         uniqueName='architect',
         valueType=Contributor,
@@ -629,9 +503,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   composition, usually for a different medium from that of the original;
     #   in an arrangement the musical substance remains essentially unchanged.
     PropertyDescription(
-        abbrevCode='arr',
         name='ARR',
-        label='Arranger',
         namespace='marcrel',
         oldMusic21WorkId='arranger',
         valueType=Contributor,
@@ -642,9 +514,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   specific codes (e.g., [egr], [etr]) are not desired. For book illustrators,
     #   prefer Illustrator [ill].
     PropertyDescription(
-        abbrevCode='art',
         name='ART',
-        label='Artist',
         namespace='marcrel',
         uniqueName='artist',
         valueType=Contributor,
@@ -653,9 +523,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # AUT/Author: a person or organization chiefly responsible for the
     #   intellectual or artistic content of a work, usually printed text.
     PropertyDescription(
-        abbrevCode='aut',
         name='AUT',
-        label='Author',
         namespace='marcrel',
         uniqueName='author',
         valueType=Contributor,
@@ -665,9 +533,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   whose work is largely quoted or extracted in works to which he or
     #   she did not contribute directly.
     PropertyDescription(
-        abbrevCode='aqt',
         name='AQT',
-        label='Author in quotations or text extracts',
         namespace='marcrel',
         uniqueName='quotationsAuthor',
         valueType=Contributor,
@@ -677,9 +543,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   responsible for an afterword, postface, colophon, etc. but who
     #   is not the chief author of a work.
     PropertyDescription(
-        abbrevCode='aft',
         name='AFT',
-        label='Author of afterword, colophon, etc.',
         namespace='marcrel',
         uniqueName='afterwordAuthor',
         valueType=Contributor,
@@ -689,9 +553,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   the dialog or spoken commentary for a screenplay or sound
     #   recording.
     PropertyDescription(
-        abbrevCode='aud',
         name='AUD',
-        label='Author of dialog',
         namespace='marcrel',
         uniqueName='dialogAuthor',
         valueType=Contributor,
@@ -701,9 +563,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   responsible for an introduction, preface, foreword, or other
     #   critical introductory matter, but who is not the chief author.
     PropertyDescription(
-        abbrevCode='aui',
         name='AUI',
-        label='Author of introduction, etc.',
         namespace='marcrel',
         uniqueName='introductionAuthor',
         valueType=Contributor,
@@ -712,9 +572,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # AUS/Author of screenplay, etc.:  a person or organization responsible
     #   for a motion picture screenplay, dialog, spoken commentary, etc.
     PropertyDescription(
-        abbrevCode='aus',
         name='AUS',
-        label='Author of screenplay, etc.',
         namespace='marcrel',
         uniqueName='screenplayAuthor',
         valueType=Contributor,
@@ -723,9 +581,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # CLL/Calligrapher: a person or organization who writes in an artistic
     #   hand, usually as a copyist and or engrosser.
     PropertyDescription(
-        abbrevCode='cll',
         name='CLL',
-        label='Calligrapher',
         namespace='marcrel',
         uniqueName='calligrapher',
         valueType=Contributor,
@@ -734,9 +590,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # CTG/Cartographer: a person or organization responsible for the
     #   creation of maps and other cartographic materials.
     PropertyDescription(
-        abbrevCode='ctg',
         name='CTG',
-        label='Cartographer',
         namespace='marcrel',
         uniqueName='cartographer',
         valueType=Contributor,
@@ -746,9 +600,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   dances or other movements (e.g., "master of swords") for a musical
     #   or dramatic presentation or entertainment.
     PropertyDescription(
-        abbrevCode='chr',
         name='CHR',
-        label='Choreographer',
         namespace='marcrel',
         uniqueName='choreographer',
         valueType=Contributor,
@@ -759,9 +611,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   works under the supervision of a director, and may also be referred
     #   to as director of photography. Do not confuse with videographer.
     PropertyDescription(
-        abbrevCode='cng',
         name='CNG',
-        label='Cinematographer',
         namespace='marcrel',
         uniqueName='cinematographer',
         valueType=Contributor,
@@ -771,9 +621,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   in the elaboration of a work of another person or organization that
     #   brings complements (e.g., appendices, notes) to the work.
     PropertyDescription(
-        abbrevCode='clb',
         name='CLB',
-        label='Collaborator',
         namespace='marcrel',
         uniqueName='collaborator',
         valueType=Contributor,
@@ -783,9 +631,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   of photographic prints from film or other colloid that has ink-receptive
     #   and ink-repellent surfaces.
     PropertyDescription(
-        abbrevCode='clt',
         name='CLT',
-        label='Collotyper',
         namespace='marcrel',
         uniqueName='collotyper',
         valueType=Contributor,
@@ -795,9 +641,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   analysis, or a discussion of the subject matter on a recording,
     #   motion picture, or other audiovisual medium.
     PropertyDescription(
-        abbrevCode='cmm',
         name='CMM',
-        label='Commentator',
         namespace='marcrel',
         uniqueName='commentator',
         valueType=Contributor,
@@ -807,9 +651,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   for the commentary or explanatory notes about a text. For the writer
     #   of manuscript annotations in a printed book, use Annotator [ann].
     PropertyDescription(
-        abbrevCode='cwt',
         name='CWT',
-        label='Commentator for written text',
         namespace='marcrel',
         uniqueName='writtenCommentator',
         valueType=Contributor,
@@ -819,9 +661,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   publication by selecting and putting together material from the
     #   works of various persons or bodies.
     PropertyDescription(
-        abbrevCode='com',
         name='COM',
-        label='Compiler',
         namespace='marcrel',
         uniqueName='compiler',
         valueType=Contributor,
@@ -830,9 +670,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # CMP/Composer: a person or organization who creates a musical work,
     #   usually a piece of music in manuscript or printed form.
     PropertyDescription(
-        abbrevCode='cmp',
         name='CMP',
-        label='Composer',
         namespace='marcrel',
         oldMusic21WorkId='composer',
         valueType=Contributor,
@@ -842,9 +680,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   idea on which a work is based, this includes the scientific author
     #   of an audio-visual item and the conceptor of an advertisement.
     PropertyDescription(
-        abbrevCode='ccp',
         name='CCP',
-        label='Conceptor',
         namespace='marcrel',
         uniqueName='conceptor',
         valueType=Contributor,
@@ -854,9 +690,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   chorus, opera, etc.) in a musical or dramatic presentation or
     #   entertainment.
     PropertyDescription(
-        abbrevCode='cnd',
         name='CND',
-        label='Conductor',
         namespace='marcrel',
         uniqueName='conductor',
         valueType=Contributor,
@@ -866,9 +700,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   is called upon for professional advice or services in a specialized
     #   field of knowledge or training.
     PropertyDescription(
-        abbrevCode='csl',
         name='CSL',
-        label='Consultant',
         namespace='marcrel',
         uniqueName='consultant',
         valueType=Contributor,
@@ -880,9 +712,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   specification, or instruction, to create or propose a cost-effective
     #   course of action or solution.
     PropertyDescription(
-        abbrevCode='csp',
         name='CSP',
-        label='Consultant to a project',
         namespace='marcrel',
         uniqueName='projectConsultant',
         valueType=Contributor,
@@ -892,9 +722,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   enters into a contract with another person or organization to
     #   perform a specific task.
     PropertyDescription(
-        abbrevCode='ctr',
         name='CTR',
-        label='Contractor',
         namespace='marcrel',
         uniqueName='contractor',
         valueType=Contributor,
@@ -908,9 +736,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # Note: this is in fact a refinement of dcterms:contributor, since
     # it is more specific than that one.
     PropertyDescription(
-        abbrevCode='ctb',
         name='CTB',
-        label='Contributor',
         namespace='marcrel',
         uniqueName='otherContributor',  # more specific than 'genericContributor'
         valueType=Contributor,
@@ -919,9 +745,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # CRP/Correspondent: a person or organization who was either
     #   the writer or recipient of a letter or other communication.
     PropertyDescription(
-        abbrevCode='crp',
         name='CRP',
-        label='Correspondent',
         namespace='marcrel',
         uniqueName='correspondent',
         valueType=Contributor,
@@ -931,9 +755,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   or makes costumes, fixes hair, etc., for a musical or
     #   dramatic presentation or entertainment.
     PropertyDescription(
-        abbrevCode='cst',
         name='CST',
-        label='Costume designer',
         namespace='marcrel',
         uniqueName='costumeDesigner',
         valueType=Contributor,
@@ -943,9 +765,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # CRE/Creator: a person or organization responsible for the
     #   intellectual or artistic content of a work.
     #         PropertyDescription(
-    #             abbrevCode='cre',
     #             name='CRE',
-    #             label='Creator',
     #             namespace='marcrel',
     #             uniqueName='creator',
     #             valueType=Contributor,
@@ -954,9 +774,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # CUR/Curator of an exhibition: a person or organization
     #   responsible for conceiving and organizing an exhibition.
     PropertyDescription(
-        abbrevCode='cur',
         name='CUR',
-        label='Curator of an exhibition',
         namespace='marcrel',
         uniqueName='curator',
         valueType=Contributor,
@@ -966,9 +784,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   exhibits dancing skills in a musical or dramatic
     #   presentation or entertainment.
     PropertyDescription(
-        abbrevCode='dnc',
         name='DNC',
-        label='Dancer',
         namespace='marcrel',
         uniqueName='dancer',
         valueType=Contributor,
@@ -977,9 +793,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # DLN/Delineator: a person or organization executing technical
     #   drawings from others' designs.
     PropertyDescription(
-        abbrevCode='dln',
         name='DLN',
-        label='Delineator',
         namespace='marcrel',
         uniqueName='delineator',
         valueType=Contributor,
@@ -988,9 +802,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # DSR/Designer: a person or organization responsible for the design
     #   if more specific codes (e.g., [bkd], [tyd]) are not desired.
     PropertyDescription(
-        abbrevCode='dsr',
         name='DSR',
-        label='Designer',
         namespace='marcrel',
         uniqueName='designer',
         valueType=Contributor,
@@ -1000,9 +812,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   general management of a work or who supervises the production of
     #   a performance for stage, screen, or sound recording.
     PropertyDescription(
-        abbrevCode='drt',
         name='DRT',
-        label='Director',
         namespace='marcrel',
         uniqueName='director',
         valueType=Contributor,
@@ -1011,9 +821,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # DIS/Dissertant: a person who presents a thesis for a university or
     #   higher-level educational degree.
     PropertyDescription(
-        abbrevCode='dis',
         name='DIS',
-        label='Dissertant',
         namespace='marcrel',
         uniqueName='dissertant',
         valueType=Contributor,
@@ -1022,9 +830,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # DRM/Draftsman: a person or organization who prepares artistic or
     #   technical drawings.
     PropertyDescription(
-        abbrevCode='drm',
         name='DRM',
-        label='Draftsman',
         namespace='marcrel',
         uniqueName='draftsman',
         valueType=Contributor,
@@ -1035,9 +841,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   adding introductory or other critical matter, or technically
     #   directing an editorial staff.
     PropertyDescription(
-        abbrevCode='edt',
         name='EDT',
-        label='Editor',
         namespace='marcrel',
         uniqueName='editor',
         valueType=Contributor,
@@ -1046,9 +850,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # ENG/Engineer: a person or organization that is responsible for
     #   technical planning and design, particularly with construction.
     PropertyDescription(
-        abbrevCode='eng',
         name='ENG',
-        label='Engineer',
         namespace='marcrel',
         uniqueName='engineer',
         valueType=Contributor,
@@ -1057,9 +859,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # EGR/Engraver: a person or organization who cuts letters, figures,
     #   etc. on a surface, such as a wooden or metal plate, for printing.
     PropertyDescription(
-        abbrevCode='egr',
         name='EGR',
-        label='Engraver',
         namespace='marcrel',
         uniqueName='engraver',
         valueType=Contributor,
@@ -1069,9 +869,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   for printing by subjecting metal, glass, or some other surface
     #   to acid or the corrosive action of some other substance.
     PropertyDescription(
-        abbrevCode='etr',
         name='ETR',
-        label='Etcher',
         namespace='marcrel',
         uniqueName='etcher',
         valueType=Contributor,
@@ -1079,9 +877,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # FAC/Facsimilist: a person or organization that executed the facsimile.
     PropertyDescription(
-        abbrevCode='fac',
         name='FAC',
-        label='Facsimilist',
         namespace='marcrel',
         uniqueName='facsimilist',
         valueType=Contributor,
@@ -1092,9 +888,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   upon which the motion picture is produced or manufactured (e.g.,
     #   acetate film, video tape).
     PropertyDescription(
-        abbrevCode='flm',
         name='FLM',
-        label='Film editor',
         namespace='marcrel',
         uniqueName='filmEditor',
         valueType=Contributor,
@@ -1103,9 +897,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # FRG/Forger: a person or organization who makes or imitates something
     #   of value or importance, especially with the intent to defraud.
     PropertyDescription(
-        abbrevCode='frg',
         name='FRG',
-        label='Forger',
         namespace='marcrel',
         uniqueName='forger',
         valueType=Contributor,
@@ -1115,9 +907,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   (often broadcast) that includes other guests, performers, etc.
     #   (e.g., talk show host).
     PropertyDescription(
-        abbrevCode='hst',
         name='HST',
-        label='Host',
         namespace='marcrel',
         uniqueName='host',
         valueType=Contributor,
@@ -1128,9 +918,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   precious metals or color, usually with elaborate designs and
     #   motifs.
     PropertyDescription(
-        abbrevCode='ilu',
         name='ILU',
-        label='Illuminator',
         namespace='marcrel',
         uniqueName='illuminator',
         valueType=Contributor,
@@ -1140,9 +928,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   perhaps also implements, a design or illustration, usually
     #   to accompany a written text.
     PropertyDescription(
-        abbrevCode='ill',
         name='ILL',
-        label='Illustrator',
         namespace='marcrel',
         uniqueName='illustrator',
         valueType=Contributor,
@@ -1152,9 +938,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   plays an instrument in a musical or dramatic presentation
     #   or entertainment.
     PropertyDescription(
-        abbrevCode='itr',
         name='ITR',
-        label='Instrumentalist',
         namespace='marcrel',
         uniqueName='instrumentalist',
         valueType=Contributor,
@@ -1164,9 +948,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   at a consultation or meeting, usually by a reporter, pollster,
     #   or some other information gathering agent.
     PropertyDescription(
-        abbrevCode='ive',
         name='IVE',
-        label='Interviewee',
         namespace='marcrel',
         uniqueName='interviewee',
         valueType=Contributor,
@@ -1176,9 +958,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   pollster, or other information gathering agent in a consultation
     #   or meeting involving one or more individuals.
     PropertyDescription(
-        abbrevCode='ivr',
         name='IVR',
-        label='Interviewer',
         namespace='marcrel',
         uniqueName='interviewer',
         valueType=Contributor,
@@ -1188,9 +968,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   particular useful item, or develops a new process for
     #   obtaining a known item or result.
     PropertyDescription(
-        abbrevCode='inv',
         name='INV',
-        label='Inventor',
         namespace='marcrel',
         uniqueName='inventor',
         valueType=Contributor,
@@ -1200,9 +978,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   involves coordinating the arrangement of existing and
     #   proposed land features and structures.
     PropertyDescription(
-        abbrevCode='lsa',
         name='LSA',
-        label='Landscape architect',
         namespace='marcrel',
         uniqueName='landscapeArchitect',
         valueType=Contributor,
@@ -1211,9 +987,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # LBT/Librettist: a person or organization who is a writer of
     #   the text of an opera, oratorio, etc.
     PropertyDescription(
-        abbrevCode='lbt',
         name='LBT',
-        label='Librettist',
         namespace='marcrel',
         oldMusic21WorkId='librettist',
         valueType=Contributor,
@@ -1223,9 +997,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   lighting scheme for a theatrical presentation, entertainment,
     #   motion picture, etc.
     PropertyDescription(
-        abbrevCode='lgd',
         name='LGD',
-        label='Lighting designer',
         namespace='marcrel',
         uniqueName='lightingDesigner',
         valueType=Contributor,
@@ -1236,9 +1008,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   creating a design directly on the surface from which printing
     #   will be done.
     PropertyDescription(
-        abbrevCode='ltg',
         name='LTG',
-        label='Lithographer',
         namespace='marcrel',
         uniqueName='lithographer',
         valueType=Contributor,
@@ -1247,9 +1017,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # LYR/Lyricist: a person or organization who is the a writer of the
     #   text of a song.
     PropertyDescription(
-        abbrevCode='lyr',
         name='LYR',
-        label='Lyricist',
         namespace='marcrel',
         oldMusic21WorkId='lyricist',
         valueType=Contributor,
@@ -1260,9 +1028,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   more persons). Examples of artifactual works include vases,
     #   cannons or pieces of furniture.
     PropertyDescription(
-        abbrevCode='mfr',
         name='MFR',
-        label='Manufacturer',
         namespace='marcrel',
         uniqueName='manufacturer',
         valueType=Contributor,
@@ -1272,9 +1038,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   decorations, illustrations, letters, etc. cut on a metal
     #   surface for printing or decoration.
     PropertyDescription(
-        abbrevCode='mte',
         name='MTE',
-        label='Metal-engraver',
         namespace='marcrel',
         uniqueName='metalEngraver',
         valueType=Contributor,
@@ -1284,9 +1048,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   where topics are discussed, usually with participation of
     #   experts in fields related to the discussion.
     PropertyDescription(
-        abbrevCode='mod',
         name='MOD',
-        label='Moderator',
         namespace='marcrel',
         uniqueName='moderator',
         valueType=Contributor,
@@ -1296,9 +1058,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   contributes to the musical content of a work when it is not
     #   possible or desirable to identify the function more precisely.
     PropertyDescription(
-        abbrevCode='mus',
         name='MUS',
-        label='Musician',
         namespace='marcrel',
         uniqueName='musician',
         valueType=Contributor,
@@ -1307,9 +1067,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # NRT/Narrator: a person who is a speaker relating the particulars
     #   of an act, occurrence, or course of events.
     PropertyDescription(
-        abbrevCode='nrt',
         name='NRT',
-        label='Narrator',
         namespace='marcrel',
         uniqueName='narrator',
         valueType=Contributor,
@@ -1319,9 +1077,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   for organizing a meeting for which an item is the report or
     #   proceedings.
     PropertyDescription(
-        abbrevCode='orm',
         name='ORM',
-        label='Organizer of meeting',
         namespace='marcrel',
         uniqueName='meetingOrganizer',
         valueType=Contributor,
@@ -1333,9 +1089,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   include the publisher or personal affiliation, or sponsor
     #   except where it is also the corporate author.
     PropertyDescription(
-        abbrevCode='org',
         name='ORG',
-        label='Originator',
         namespace='marcrel',
         uniqueName='originator',
         valueType=Contributor,
@@ -1348,9 +1102,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   are used, [prf] is used for a person whose principal skill
     #   is not known or specified.
     PropertyDescription(
-        abbrevCode='prf',
         name='PRF',
-        label='Performer',
         namespace='marcrel',
         uniqueName='performer',
         valueType=Contributor,
@@ -1360,9 +1112,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   taking photographs, whether they are used in their original
     #   form or as reproductions.
     PropertyDescription(
-        abbrevCode='pht',
         name='PHT',
-        label='Photographer',
         namespace='marcrel',
         uniqueName='photographer',
         valueType=Contributor,
@@ -1372,9 +1122,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   production of plates, usually for the production of printed
     #   images and/or text.
     PropertyDescription(
-        abbrevCode='plt',
         name='PLT',
-        label='Platemaker',
         namespace='marcrel',
         uniqueName='platemaker',
         valueType=Contributor,
@@ -1383,9 +1131,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # PRM/Printmaker: a person or organization who makes a relief,
     #   intaglio, or planographic printing surface.
     PropertyDescription(
-        abbrevCode='prm',
         name='PRM',
-        label='Printmaker',
         namespace='marcrel',
         uniqueName='printmaker',
         valueType=Contributor,
@@ -1396,9 +1142,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   management of the productions, and the commercial success
     #   of the work.
     PropertyDescription(
-        abbrevCode='pro',
         name='PRO',
-        label='Producer',
         namespace='marcrel',
         uniqueName='producer',
         valueType=Contributor,
@@ -1408,9 +1152,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   with the production (props, lighting, special effects, etc.)
     #   of a musical or dramatic presentation or entertainment.
     PropertyDescription(
-        abbrevCode='prd',
         name='PRD',
-        label='Production personnel',
         namespace='marcrel',
         uniqueName='productionPersonnel',
         valueType=Contributor,
@@ -1421,9 +1163,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   documents, source code, and machine-executable digital files
     #   and supporting documentation.
     PropertyDescription(
-        abbrevCode='prg',
         name='PRG',
-        label='Programmer',
         namespace='marcrel',
         uniqueName='programmer',
         valueType=Contributor,
@@ -1433,9 +1173,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   or directs puppets or marionettes in a musical or dramatic
     #   presentation or entertainment.
     PropertyDescription(
-        abbrevCode='ppt',
         name='PPT',
-        label='Puppeteer',
         namespace='marcrel',
         uniqueName='puppeteer',
         valueType=Contributor,
@@ -1444,9 +1182,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # RCE/Recording engineer: a person or organization who supervises
     #   the technical aspects of a sound or video recording session.
     PropertyDescription(
-        abbrevCode='rce',
         name='RCE',
-        label='Recording engineer',
         namespace='marcrel',
         uniqueName='recordingEngineer',
         valueType=Contributor,
@@ -1457,9 +1193,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   representational perspective to show what the project will
     #   look like when completed.
     PropertyDescription(
-        abbrevCode='ren',
         name='REN',
-        label='Renderer',
         namespace='marcrel',
         uniqueName='renderer',
         valueType=Contributor,
@@ -1468,9 +1202,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # RPT/Reporter: a person or organization who writes or presents
     #   reports of news or current events on air or in print.
     PropertyDescription(
-        abbrevCode='rpt',
         name='RPT',
-        label='Reporter',
         namespace='marcrel',
         uniqueName='reporter',
         valueType=Contributor,
@@ -1479,9 +1211,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # RTH/Research team head: a person who directed or managed a
     #   research project.
     PropertyDescription(
-        abbrevCode='rth',
         name='RTH',
-        label='Research team head',
         namespace='marcrel',
         uniqueName='researchTeamHead',
         valueType=Contributor,
@@ -1491,9 +1221,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   research project but whose role did not involve direction
     #   or management of it.
     PropertyDescription(
-        abbrevCode='rtm',
         name='RTM',
-        label='Research team member',
         namespace='marcrel',
         uniqueName='researchTeamMember',
         valueType=Contributor,
@@ -1502,9 +1230,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # RES/Researcher: a person or organization responsible for
     #   performing research.
     PropertyDescription(
-        abbrevCode='res',
         name='RES',
-        label='Researcher',
         namespace='marcrel',
         uniqueName='researcher',
         valueType=Contributor,
@@ -1513,9 +1239,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # RPY/Responsible party: a person or organization legally
     #   responsible for the content of the published material.
     PropertyDescription(
-        abbrevCode='rpy',
         name='RPY',
-        label='Responsible party',
         namespace='marcrel',
         uniqueName='responsibleParty',
         valueType=Contributor,
@@ -1526,9 +1250,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   restaging a choreographic or dramatic work and who
     #   contributes minimal new content.
     PropertyDescription(
-        abbrevCode='rsg',
         name='RSG',
-        label='Restager',
         namespace='marcrel',
         uniqueName='restager',
         valueType=Contributor,
@@ -1537,9 +1259,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # REV/Reviewer:  a person or organization responsible for
     #   the review of a book, motion picture, performance, etc.
     PropertyDescription(
-        abbrevCode='rev',
         name='REV',
-        label='Reviewer',
         namespace='marcrel',
         uniqueName='reviewer',
         valueType=Contributor,
@@ -1548,9 +1268,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # SCE/Scenarist: a person or organization who is the author
     #   of a motion picture screenplay.
     PropertyDescription(
-        abbrevCode='sce',
         name='SCE',
-        label='Scenarist',
         namespace='marcrel',
         uniqueName='scenarist',
         valueType=Contributor,
@@ -1561,9 +1279,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   conception and realization on a work, particularly in the
     #   case of audio-visual items.
     PropertyDescription(
-        abbrevCode='sad',
         name='SAD',
-        label='Scientific advisor',
         namespace='marcrel',
         uniqueName='scientificAdvisor',
         valueType=Contributor,
@@ -1573,9 +1289,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   manuscripts proper. For a person who makes pen-facsimiles,
     #   use Facsimilist [fac].
     PropertyDescription(
-        abbrevCode='scr',
         name='SCR',
-        label='Scribe',
         namespace='marcrel',
         uniqueName='scribe',
         valueType=Contributor,
@@ -1584,9 +1298,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # SCL/Sculptor: a person or organization who models or carves
     #   figures that are three-dimensional representations.
     PropertyDescription(
-        abbrevCode='scl',
         name='SCL',
-        label='Sculptor',
         namespace='marcrel',
         uniqueName='sculptor',
         valueType=Contributor,
@@ -1596,9 +1308,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   redactor, or other person responsible for expressing the
     #   views of a organization.
     PropertyDescription(
-        abbrevCode='sec',
         name='SEC',
-        label='Secretary',
         namespace='marcrel',
         uniqueName='secretary',
         valueType=Contributor,
@@ -1610,9 +1320,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   picture, etc. Set designers draw the detailed guides and
     #   specifications for building the set.
     PropertyDescription(
-        abbrevCode='std',
         name='STD',
-        label='Set designer',
         namespace='marcrel',
         uniqueName='setDesigner',
         valueType=Contributor,
@@ -1622,9 +1330,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   with or without instrumental accompaniment to produce music.
     #   A performance may or may not include actual words.
     PropertyDescription(
-        abbrevCode='sng',
         name='SNG',
-        label='Singer',
         namespace='marcrel',
         uniqueName='singer',
         valueType=Contributor,
@@ -1634,9 +1340,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   and makes a formalized contribution or presentation generally
     #   prepared in advance.
     PropertyDescription(
-        abbrevCode='spk',
         name='SPK',
-        label='Speaker',
         namespace='marcrel',
         uniqueName='speaker',
         valueType=Contributor,
@@ -1645,9 +1349,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # STN/Standards body: an organization responsible for the development
     #   or enforcement of a standard.
     PropertyDescription(
-        abbrevCode='stn',
         name='STN',
-        label='Standards body',
         namespace='marcrel',
         uniqueName='standardsBody',
         valueType=Contributor,
@@ -1656,9 +1358,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # STL/Storyteller: a person relaying a story with creative and/or
     #   theatrical interpretation.
     PropertyDescription(
-        abbrevCode='stl',
         name='STL',
-        label='Storyteller',
         namespace='marcrel',
         uniqueName='storyteller',
         valueType=Contributor,
@@ -1667,9 +1367,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # SRV/Surveyor: a person or organization who does measurements of
     #   tracts of land, etc. to determine location, forms, and boundaries.
     PropertyDescription(
-        abbrevCode='srv',
         name='SRV',
-        label='Surveyor',
         namespace='marcrel',
         uniqueName='surveyor',
         valueType=Contributor,
@@ -1679,9 +1377,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   instruction in an intellectual subject or demonstrates while
     #   teaching physical skills.
     PropertyDescription(
-        abbrevCode='tch',
         name='TCH',
-        label='Teacher',
         namespace='marcrel',
         uniqueName='teacher',
         valueType=Contributor,
@@ -1691,9 +1387,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   from original material, including from dictated or orally recorded
     #   material. For makers of pen-facsimiles, use Facsimilist [fac].
     PropertyDescription(
-        abbrevCode='trc',
         name='TRC',
-        label='Transcriber',
         namespace='marcrel',
         uniqueName='transcriber',
         valueType=Contributor,
@@ -1703,9 +1397,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   language into another, or from an older form of a language into the
     #   modern form.
     PropertyDescription(
-        abbrevCode='trl',
         name='TRL',
-        label='Translator',
         namespace='marcrel',
         oldMusic21WorkId='translator',
         valueType=Contributor,
@@ -1716,9 +1408,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   motion picture. The videographer may be the camera operator or may
     #   supervise one or more camera operators. Do not confuse with cinematographer.
     PropertyDescription(
-        abbrevCode='vdg',
         name='VDG',
-        label='Videographer',
         namespace='marcrel',
         uniqueName='videographer',
         valueType=Contributor,
@@ -1727,9 +1417,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # VOC/Vocalist: a person or organization who principally exhibits singing
     #   skills in a musical or dramatic presentation or entertainment.
     PropertyDescription(
-        abbrevCode='voc',
         name='VOC',
-        label='Vocalist',
         namespace='marcrel',
         uniqueName='vocalist',
         valueType=Contributor,
@@ -1738,9 +1426,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # WDE/Wood-engraver: a person or organization who makes prints by cutting
     #   the image in relief on the end-grain of a wood block.
     PropertyDescription(
-        abbrevCode='wde',
         name='WDE',
-        label='Wood-engraver',
         namespace='marcrel',
         uniqueName='woodEngraver',
         valueType=Contributor,
@@ -1749,9 +1435,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # WDC/Woodcutter: a person or organization who makes prints by cutting the
     #   image in relief on the plank side of a wood block.
     PropertyDescription(
-        abbrevCode='wdc',
         name='WDC',
-        label='Woodcutter',
         namespace='marcrel',
         uniqueName='woodCutter',
         valueType=Contributor,
@@ -1761,9 +1445,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   significant material which accompanies a sound recording or other
     #   audiovisual material.
     PropertyDescription(
-        abbrevCode='wam',
         name='WAM',
-        label='Writer of accompanying material',
         namespace='marcrel',
         uniqueName='accompanyingMaterialWriter',
         valueType=Contributor,
@@ -1774,9 +1456,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     # DST/Distributor: a person or organization that has exclusive or shared
     #   marketing rights for an item.
     PropertyDescription(
-        abbrevCode='dst',
         name='DST',
-        label='Distributor',
         namespace='marcrel',
         uniqueName='distributor',
         valueType=Contributor,
@@ -1787,9 +1467,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # TXO: original language of vocal/choral text
     PropertyDescription(
-        abbrevCode='txo',
         name='TXO',
-        label='Original Text Language',
         namespace='humdrum',
         oldMusic21Abbrev='txo',
         oldMusic21WorkId='textOriginalLanguage',
@@ -1797,9 +1475,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # TXL: language of the encoded vocal/choral text
     PropertyDescription(
-        abbrevCode='txl',
         name='TXL',
-        label='Text Language',
         namespace='humdrum',
         oldMusic21Abbrev='txl',
         oldMusic21WorkId='textLanguage',
@@ -1807,9 +1483,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # OTP: popular title
     PropertyDescription(
-        abbrevCode='otp',
         name='OTP',
-        label='Popular Title',
         namespace='humdrum',
         oldMusic21Abbrev='otp',
         oldMusic21WorkId='popularTitle',
@@ -1817,9 +1491,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # OPR: parent title
     PropertyDescription(
-        abbrevCode='opr',
         name='OPR',
-        label='Parent Title',
         namespace='humdrum',
         oldMusic21Abbrev='opr',
         oldMusic21WorkId='parentTitle',
@@ -1827,9 +1499,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # OAC: act number (e.g. '2' or 'Act 2')
     PropertyDescription(
-        abbrevCode='oac',
         name='OAC',
-        label='Act Number',
         namespace='humdrum',
         oldMusic21Abbrev='oac',
         oldMusic21WorkId='actNumber',
@@ -1837,9 +1507,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # OSC: scene number (e.g. '3' or 'Scene 3')
     PropertyDescription(
-        abbrevCode='osc',
         name='OSC',
-        label='Scene Number',
         namespace='humdrum',
         oldMusic21Abbrev='osc',
         oldMusic21WorkId='sceneNumber',
@@ -1847,9 +1515,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # OMV: movement number (e.g. '4', or 'mov. 4', or...)
     PropertyDescription(
-        abbrevCode='omv',
         name='OMV',
-        label='Movement Number',
         namespace='humdrum',
         oldMusic21Abbrev='omv',
         oldMusic21WorkId='movementNumber',
@@ -1857,9 +1523,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # OMD: movement name (often a tempo description)
     PropertyDescription(
-        abbrevCode='omd',
         name='OMD',
-        label='Movement Name',
         namespace='humdrum',
         oldMusic21Abbrev='omd',
         oldMusic21WorkId='movementName',
@@ -1867,9 +1531,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # OPS: opus number (e.g. '23', or 'Opus 23')
     PropertyDescription(
-        abbrevCode='ops',
         name='OPS',
-        label='Opus Number',
         namespace='humdrum',
         oldMusic21Abbrev='ops',
         oldMusic21WorkId='opusNumber',
@@ -1877,9 +1539,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # ONM: number (e.g. number of song within ABC multi-song file)
     PropertyDescription(
-        abbrevCode='onm',
         name='ONM',
-        label='Number',
         namespace='humdrum',
         oldMusic21Abbrev='onm',
         oldMusic21WorkId='number',
@@ -1887,9 +1547,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # OVM: volume number (e.g. '6' or 'Vol. 6')
     PropertyDescription(
-        abbrevCode='ovm',
         name='OVM',
-        label='Volume Number',
         uniqueName='volumeNumber',
         namespace='humdrum',
         oldMusic21Abbrev='ovm',
@@ -1898,9 +1556,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # ODE: dedicated to
     PropertyDescription(
-        abbrevCode='ode',
         name='ODE',
-        label='Dedicated To',
         uniqueName='dedicatedTo',
         namespace='humdrum',
         oldMusic21Abbrev='ode',
@@ -1909,9 +1565,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # OCO: commissioned by
     PropertyDescription(
-        abbrevCode='oco',
         name='OCO',
-        label='Commissioned By',
         uniqueName='commissionedBy',
         namespace='humdrum',
         oldMusic21Abbrev='oco',
@@ -1920,9 +1574,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # OCY: country of composition
     PropertyDescription(
-        abbrevCode='ocy',
         name='OCY',
-        label='Country of Composition',
         namespace='humdrum',
         oldMusic21Abbrev='ocy',
         oldMusic21WorkId='countryOfComposition',
@@ -1930,9 +1582,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # OPC: city, town, or village of composition
     PropertyDescription(
-        abbrevCode='opc',
         name='OPC',
-        label='Locale of Composition',
         namespace='humdrum',
         oldMusic21Abbrev='opc',
         oldMusic21WorkId='localeOfComposition',
@@ -1940,9 +1590,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # GTL: group title (e.g. 'The Seasons')
     PropertyDescription(
-        abbrevCode='gtl',
         name='GTL',
-        label='Group Title',
         namespace='humdrum',
         oldMusic21Abbrev='gtl',
         oldMusic21WorkId='groupTitle',
@@ -1950,9 +1598,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # GAW: associated work, such as a play or film
     PropertyDescription(
-        abbrevCode='gaw',
         name='GAW',
-        label='Associated Work',
         namespace='humdrum',
         oldMusic21Abbrev='gaw',
         oldMusic21WorkId='associatedWork',
@@ -1963,9 +1609,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
     #   compendium or anthology. E.g. Norton Scores, Smithsonian Collection,
     #   Burkhart Anthology.
     PropertyDescription(
-        abbrevCode='gco',
         name='GCO',
-        label='Collection Designation',
         namespace='humdrum',
         oldMusic21Abbrev='gco',
         oldMusic21WorkId='collectionDesignation',
@@ -1973,9 +1617,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # COA: attributed composer
     PropertyDescription(
-        abbrevCode='coa',
         name='COA',
-        label='Attributed Composer',
         namespace='humdrum',
         oldMusic21WorkId='attributedComposer',
         valueType=Contributor,
@@ -1983,9 +1625,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # COS: suspected composer
     PropertyDescription(
-        abbrevCode='cos',
         name='COS',
-        label='Suspected Composer',
         namespace='humdrum',
         oldMusic21WorkId='suspectedComposer',
         valueType=Contributor,
@@ -1993,9 +1633,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # COL: composer's abbreviated, alias, or stage name
     PropertyDescription(
-        abbrevCode='col',
         name='COL',
-        label='Composer Alias',
         namespace='humdrum',
         oldMusic21WorkId='composerAlias',
         valueType=Contributor,
@@ -2003,9 +1641,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # COC: composer's corporate name
     PropertyDescription(
-        abbrevCode='coc',
         name='COC',
-        label='Composer Corporate Name',
         namespace='humdrum',
         oldMusic21WorkId='composerCorporate',
         valueType=Contributor,
@@ -2013,13 +1649,9 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # LOR: orchestrator
     PropertyDescription(
-        abbrevCode='lor',
         name='LOR',
-        label='Orchestrator',
         namespace='humdrum',
         oldMusic21WorkId='orchestrator',
         valueType=Contributor,
         isContributor=True),
-
-    # TODO: add the rest of the humdrum namespace?
 )

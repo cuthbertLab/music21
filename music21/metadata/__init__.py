@@ -33,8 +33,8 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 >>> p.append(m)
 >>> s.append(p)
 >>> s.insert(0, metadata.Metadata())
->>> s.metadata.title = 'title'
->>> s.metadata.composer = 'composer'
+>>> s.metadata.set('title', 'title')
+>>> s.metadata.set('composer', 'composer')
 >>> #_DOCS_SHOW s.show()
 
 .. image:: images/moduleMetadata-01.*
@@ -42,82 +42,41 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 
     A guide to the 2022 Dublin Core implementation:
 
-    - The guts of class Metadata are completely rewritten to support the new
-        Dublin Core functionality, but all of Metadata's old APIs are still in
-        place and are all backward compatible. There are new APIs (get, set, add
-        et al) to access the new functionality.
+    The guts of class Metadata are completely rewritten to support the new
+    Dublin Core functionality, but all of Metadata's previous APIs are still in
+    place and are all backward compatible. There are new APIs (get, set, add
+    et al) to access the new functionality.
 
-    - The old metadata implementation had a list of supported workIds (drawn mostly
-        from Humdrum), and also a list of supported contributor roles.  You could
-        have more than one of each contributor role, but only one of each workId.
-        In the new implementation, I don't really treat contributor roles differently
-        from other metadata.  I have a list of supported property terms, which are
-        pulled from Dublin Core (namespace = 'dcterms'), MARC Relator codes (a.k.a.
-        contributor roles, namespace = 'marcrel'), and Humdrum (namespace = 'humdrum').
-        You can have more than one of any of these.  That implies that I need two APIs
-        for adding a new piece of metadata.  One that does "this is the new (only) value
-        for this metadata property term", and one that does "this is a new value to add in to any
-        other values you might have for this metadata property term".  They are:
-        add() and set().  add() adds the new item to the (possibly empty)
-        list of values, and set() removes any current value(s) before adding the item.
+    The previous metadata implementation had a list of supported workIds, and also
+    a list of standard contributor roles.  You could have more than one of each
+    contributor role, but only one of each workId.
+    In the new implementation, contributor roles are treated the same as other
+    non-contributor metadata.  I have a list of supported property terms, which are
+    pulled from Dublin Core (namespace = 'dcterms'), MARC Relator codes (a.k.a.
+    contributor roles, namespace = 'marcrel'), and Humdrum (namespace = 'humdrum').
+    Each metadata property can be specified by 'namespace:name' or by 'uniqueName'.
+    For example: md.get('marcrel:CMP') and md.get('composer') are equivalent, as
+    are md.get('dcterms:alternative') and md.get('alternativeTitle').
+    You can have more than one of any such item (not just contributors). That
+    implies that there must be two APIs for adding a new piece of metadata.  One
+    that overwrites any existing metadata items of that name, and one that simply
+    adds the new item(s) to the existing list.  They are: add() and set().  add()
+    adds the new item to the (possibly empty) list of values, and set() removes
+    any current value(s) before adding the item.
 
-    - Primitives: Old code had DateXxxx and Text.  DateXxxx still works for Dublin Core
-        et al (it's a superset of what is needed), but Text needs to add the ability to
-        know whether or not the text has been translated, as well as a specified encoding
-        scheme (a.k.a. what standard should I use to parse this string) so I have added
-        new fields to Text in a backward-compatible way.
+    Primitives: primitives.Text has been updated to add whether or not the text has
+    been translated, as well as a specified encoding scheme (a.k.a. what standard
+    should I use to parse this string).
 
-    - Metadata does not (yet) explicitly support client-specified namespaces, but there
-        are a few APIs (getCustom, addCustom, setCustom) that have no
-        namespace at all, so clients can set anything they want and get it passed through.
-        A parser could use this to set (say) 'humdrum:XXX' metadata that doesn't map to
-        any standard metadata property, and a writer that understood 'humdrum' metadata
-        could then write it back to a file.  Custom metadata can also include things
-        that are specific to a particular person who is in the process of editing files,
-        e.g. setCustom('I have reached measure number', 1000). This can also be passed
-        through to various file formats as long as there is a place for such a thing (e.g.
-        'miscellaneous' in MusicXML).
-
-    - A new type that drives a lot of the implementation: PropertyDescription
-        A PropertyDescription is a data class with multiple fields that describe
-            a metadata property:
-            abbrevCode is a (usually abbreviated) code for the property
-            name is the official name of the property (the tail of the property term URI)
-            label is the human readable name of the property
-            namespace is a shortened form of the URI for the set of terms
-                e.g. 'dcterms' means the property term is from the Dublin Core terms.
-                'dcterms' is the shortened form of <http://purl.org/dc/terms/>
-                e.g. 'marcrel' means the property term is from the MARC Relator terms.
-                'marcrel' is the shortened form of <http://www.loc.gov/loc.terms/relators/>
-            isContributor is whether or not the property describes a contributor.
-            oldMusic21WorkId is the backward compatible music21 name for this property.
-                Note that we also use oldMusic21WorkId for backward compatible music21
-                contributor roles.
-            oldMusic21Abbrev is the backward compatible music21 abbreviation for this
-                property.
-            uniqueName is the official music21 name for this property, that is unique
-                within the list of properties. There is always a unique name, but the
-                uniqueName field is only set if oldMusic21WorkId or name is not unique
-                enough. To get the unique name from a particular PropertyDescription,
-                we do:
-                    (desc.uniqueName if desc.uniqueName
-                        else desc.oldMusic21WorkId if desc.oldMusic21WorkId
-                        else desc.name)
-            valueType is the actual type of the value that will be stored in the metadata.
-                This allows auto-conversion to take place inside set/add, and is
-                the type clients will always receive from get.
-
-        The list of supported properties is properties.STANDARD_PROPERTY_DESCRIPTIONS,
-        and various lookup dicts are created from that in the Metadata class for later use.
-
-    - Data structure for all the metadata:
-        Metadata contains a _metadata attribute which is a dict, where the keys are
-        f'{namespace}:{name}', and the value is either Any, or a List[Any] (for properties
-        that have more than one value).  The old attributes copyright and date have been
-        moved into the _metadata dict ('dcterms:rights' and 'dcterms:created'). Those are
-        good PropertyDescription examples to look at to see the relationship between
-        name, oldMusic21WorkId, and uniqueName.  We have maintained the old software
-        attribute as a list of strings that is accessed directly, as before.
+    Metadata does not explicitly support client-specified namespaces, but there
+    are a few APIs (getCustom, addCustom, setCustom) with which clients can set
+    anything they want. A parser could use this to set (say) 'humdrum:XXX' metadata
+    that doesn't map to any standard metadata property, and a writer that understood
+    'humdrum' metadata could then write it back to a file.  Custom metadata can also
+    include things that are free-form, and very specific to a particular workflow.
+    e.g. setCustom('widget analysis complete through measure number', 1000).
+    Custom metadata like this can also be written to various file formats, as long
+    as there is a place for it (e.g. '<miscellaneous>' in MusicXML).
 
 '''
 from collections import OrderedDict, namedtuple
@@ -298,7 +257,6 @@ class Metadata(base.Music21Object):
         # For backward compatibility, we allow the setting of workIds or
         # abbreviations via **keywords
         for abbreviation, workId in self.workIdAbbreviationDict.items():
-            # abbreviation = workIdToAbbreviation(id)
             if workId in keywords:
                 nsKey: str = self._M21WORKID_TO_NSKEY[workId]
                 self._metadata[nsKey] = Text(keywords[workId])
@@ -397,7 +355,7 @@ class Metadata(base.Music21Object):
         >>> md.getFirst('title')
         <music21.metadata.primitives.Text Caveat Emptor>
         '''
-        self._add(key, value)
+        self._add(key, value, isCustom=False)
 
     def set(self,
             key: str,
@@ -425,7 +383,7 @@ class Metadata(base.Music21Object):
         >>> librettists[1]
         <music21.metadata.primitives.Contributor librettist:Kit Yan Win>
         '''
-        self._set(key, value)
+        self._set(key, value, isCustom=False)
 
 
     def getCustom(self, key: str) -> t.Tuple[t.Any, ...]:
@@ -488,6 +446,7 @@ class Metadata(base.Music21Object):
     def getAllContributorNamedValues(self) -> t.List[t.Tuple[str, t.Any]]:
         '''
         Returns all contributors stored in this metadata as a list of (nsKey, value) tuples.
+        The tuple's first element will be of the form 'namespace:name'.
 
         >>> md = metadata.Metadata()
         >>> md.addCustom('composer', 'Not a contributor')
@@ -554,6 +513,8 @@ class Metadata(base.Music21Object):
         True
         >>> metadata.Metadata.isContributorUniqueName('architect')
         True
+        >>> metadata.Metadata.isContributorUniqueName('alternativeTitle')
+        False
         >>> metadata.Metadata.isContributorUniqueName('not a standard property')
         False
         >>> metadata.Metadata.isContributorUniqueName(None)
@@ -569,10 +530,21 @@ class Metadata(base.Music21Object):
         return prop.isContributor
 
     @staticmethod
-    def isStandardUniqueName(uniqueName: str) -> bool:
+    def _isStandardUniqueName(uniqueName: str) -> bool:
         '''
         Determines if a unique name is associated with a standard property.
         Returns False if no such associated standard property can be found.
+
+        >>> metadata.Metadata._isStandardUniqueName('librettist')
+        True
+        >>> metadata.Metadata._isStandardUniqueName('architect')
+        True
+        >>> metadata.Metadata._isStandardUniqueName('alternativeTitle')
+        True
+        >>> metadata.Metadata._isStandardUniqueName('not a standard property')
+        False
+        >>> metadata.Metadata._isStandardUniqueName(None)
+        False
         '''
         if not uniqueName:
             return False
@@ -584,10 +556,21 @@ class Metadata(base.Music21Object):
         return True
 
     @staticmethod
-    def isStandardNSKey(nsKey: str) -> bool:
+    def _isStandardNSKey(nsKey: str) -> bool:
         '''
         Determines if a unique name is associated with a standard property.
         Returns False if no such associated standard property can be found.
+
+        >>> metadata.Metadata._isStandardNSKey('marcrel:LBT')
+        True
+        >>> metadata.Metadata._isStandardNSKey('librettist')
+        False
+        >>> metadata.Metadata._isStandardNSKey('nonstandardnamespace:LBT')
+        False
+        >>> metadata.Metadata._isStandardNSKey('marcrel:nonstandardname')
+        False
+        >>> metadata.Metadata._isStandardNSKey(None)
+        False
         '''
         if not nsKey:
             return False
@@ -600,13 +583,29 @@ class Metadata(base.Music21Object):
 
     @staticmethod
     def isStandardKey(key: str) -> bool:
+        '''
+        Determines if key is either a 'namespace:name' or 'uniqueName' associated
+        with a standard property.
+        Returns False if no such associated standard property can be found.
+
+        >>> metadata.Metadata.isStandardKey('marcrel:LBT')
+        True
+        >>> metadata.Metadata.isStandardKey('librettist')
+        True
+        >>> metadata.Metadata.isStandardKey('not a standard property')
+        False
+        >>> metadata.Metadata.isStandardKey('marcrel:nonstandardname')
+        False
+        >>> metadata.Metadata.isStandardKey(None)
+        False
+        '''
         if not key:
             return False
 
-        if Metadata.isStandardNSKey(key):
+        if Metadata._isStandardNSKey(key):
             return True
 
-        if Metadata.isStandardUniqueName(key):
+        if Metadata._isStandardUniqueName(key):
             return True
 
         return False
@@ -654,7 +653,7 @@ class Metadata(base.Music21Object):
         uniqueName: t.Optional[str] = Metadata._NSKEY_TO_CONTRIBUTORUNIQUENAME.get(nsKey, None)
         return uniqueName
 
-    # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #   Backward compatible public APIs
 #   TODO: Consider deprecating some of these (the ones that are too limiting)
 
@@ -1539,9 +1538,7 @@ class Metadata(base.Music21Object):
         self._setBackwardCompatibleItem('title', Text(value))
 
 # -----------------------------------------------------------------------------
-
-    # Support routines (many of them static).  For use internally, and a few of them
-    # externally.
+# Internal support routines (many of them static).
 
     @staticmethod
     def _isContributorNSKey(nsKey: str) -> bool:
@@ -1574,7 +1571,7 @@ class Metadata(base.Music21Object):
             return prop.uniqueName
         return prop.name
 
-    def _get(self, key: str, isCustom: bool = False) -> t.Tuple[t.Any, ...]:
+    def _get(self, key: str, isCustom: bool) -> t.Tuple[t.Any, ...]:
         '''
         Returns all the items stored in metadata with this key.
         If you want only one item, call getFirst().  The returned value is
@@ -1585,9 +1582,9 @@ class Metadata(base.Music21Object):
         not one of the standard metadata properties, KeyError will be raised.
         '''
         if not isCustom:
-            if self.isStandardUniqueName(key):
+            if self._isStandardUniqueName(key):
                 key = self._UNIQUENAME_TO_NSKEY.get(key, None)
-            if not self.isStandardNSKey(key):
+            if not self._isStandardNSKey(key):
                 raise KeyError
 
         value: t.Optional[t.Any] = self._metadata.get(key, None)
@@ -1616,7 +1613,7 @@ class Metadata(base.Music21Object):
             return values[0]
         return None
 
-    def _add(self, key: str, value: t.Union[t.Any, t.List[t.Any]], isCustom: bool = False):
+    def _add(self, key: str, value: t.Union[t.Any, t.List[t.Any]], isCustom: bool):
         '''
         Adds a single item or multiple items with this key, leaving any existing
         items with this key in place.
@@ -1625,9 +1622,9 @@ class Metadata(base.Music21Object):
         not one of the standard metadata properties, KeyError will be raised.
         '''
         if not isCustom:
-            if self.isStandardUniqueName(key):
+            if self._isStandardUniqueName(key):
                 key = self._UNIQUENAME_TO_NSKEY.get(key, None)
-            if not self.isStandardNSKey(key):
+            if not self._isStandardNSKey(key):
                 raise KeyError
 
         if not isinstance(value, list):
@@ -1647,7 +1644,7 @@ class Metadata(base.Music21Object):
             # set a list containing the single prevValue plus the value list
             self._metadata[key] = [prevValue] + value
 
-    def _set(self, key: str, value: t.Union[t.Any, t.List[t.Any]], isCustom: bool = False):
+    def _set(self, key: str, value: t.Union[t.Any, t.List[t.Any]], isCustom: bool):
         '''
         Sets a single item or multiple items with this key, replacing any
         existing items with this key.
@@ -1656,13 +1653,13 @@ class Metadata(base.Music21Object):
         not one of the standard metadata properties, KeyError will be raised.
         '''
         if not isCustom:
-            if self.isStandardUniqueName(key):
+            if self._isStandardUniqueName(key):
                 key = self._UNIQUENAME_TO_NSKEY.get(key, None)
-            if not self.isStandardNSKey(key):
+            if not self._isStandardNSKey(key):
                 raise KeyError
 
         self._metadata.pop(key, None)
-        self._add(key, value)
+        self._add(key, value, isCustom)
 
     @staticmethod
     def _convertValue(nsKey: str, value: t.Any) -> t.Any:
@@ -1876,7 +1873,7 @@ class Metadata(base.Music21Object):
         ('marcrel:CTB', <music21.metadata.primitives.Contributor best friend:John1>)
         '''
         nsKey: str = self._backwardCompatibleContributorRoleToNSKey(c.role)
-        self._add(nsKey, c)
+        self._add(nsKey, c, isCustom=False)
 
     def _getAllBackwardCompatibleContributors(self) -> t.List[Contributor]:
         allOut: t.List[Contributor] = []
@@ -1906,22 +1903,17 @@ class Metadata(base.Music21Object):
             return item.names[0]
         return str(item)
 
-#     def _addBackwardCompatibleItem(self, workId: str, value: t.Any):
-#         nsKey: str = Metadata._M21WORKID_TO_NSKEY.get(workId, None)
-#         if nsKey is not None:
-#             self._add(nsKey, value)
-#
     def _setBackwardCompatibleItem(self, workId: str, value: t.Any):
         nsKey: str = Metadata._M21WORKID_TO_NSKEY.get(workId, None)
         if nsKey is not None:
-            self._set(nsKey, value)
+            self._set(nsKey, value, isCustom=False)
 
     def _getBackwardCompatibleItemsNoConversion(self, workId: str) -> t.Tuple[t.Any, ...]:
         nsKey: str = Metadata._M21WORKID_TO_NSKEY.get(workId, None)
         if nsKey is None:
             return tuple()
 
-        resultTuple: t.Tuple[t.Any, ...] = self._get(nsKey)
+        resultTuple: t.Tuple[t.Any, ...] = self._get(nsKey, isCustom=False)
         return resultTuple
 
     def _getBackwardCompatibleContributorNames(self, workId: str) -> t.List[str]:
@@ -1935,7 +1927,7 @@ class Metadata(base.Music21Object):
 
     def _setBackwardCompatibleContributorNames(self, workId: str, names: t.List[str]):
         # Auto-conversion from str to standard Contributor happens behind the scenes
-        self._set(workId, names)
+        self._set(workId, names, isCustom=False)
 
 # -----------------------------------------------------------------------------
 # Dictionaries generated from properties.STANDARD_PROPERTY_DESCRIPTIONS for looking up
@@ -1989,11 +1981,6 @@ class Metadata(base.Music21Object):
             f'{x.namespace}:{x.name}'
             for x in properties.STANDARD_PROPERTY_DESCRIPTIONS
             if x.oldMusic21WorkId}
-
-    _NAMESPACEABBREV_TO_NSKEY: dict = {
-        (x.namespace, x.abbrevCode):
-            f'{x.namespace}:{x.name}'
-            for x in properties.STANDARD_PROPERTY_DESCRIPTIONS}
 
 # -----------------------------------------------------------------------------
 
