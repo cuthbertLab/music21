@@ -18,18 +18,18 @@ class Test(unittest.TestCase):
         c = converter.parse(mTF.mozartTrioK581Excerpt)
         md = c.metadata
 
-        self.assertEqual(md.get('movementNumber'), metadata.Text('3'))
-        self.assertEqual(md.get('movementName'),
+        self.assertEqual(md.get('movementNumber'), (metadata.Text('3'),))
+        self.assertEqual(md.getFirst('movementName'),
             metadata.Text('Menuetto (Excerpt from Second Trio)'))
-        self.assertEqual(md.get('title'),
+        self.assertEqual(md.getFirst('title'),
             metadata.Text('Quintet for Clarinet and Strings'))
-        self.assertEqual(md.get('number'), metadata.Text('K. 581'))
-        self.assertEqual(md.get('composer'),
+        self.assertEqual(md.getFirst('number'), metadata.Text('K. 581'))
+        self.assertEqual(md.getFirst('composer'),
             metadata.Contributor(role='composer', name='Wolfgang Amadeus Mozart'))
 
         c = converter.parse(mTF.binchoisMagnificat)
         md = c.metadata
-        self.assertEqual(md.get('composer'),
+        self.assertEqual(md.getFirst('composer'),
             metadata.Contributor(role='composer', name='Gilles Binchois'))
 
     def testMetadataLoadCorpusBackwardCompatible(self):
@@ -177,17 +177,19 @@ class Test(unittest.TestCase):
 
         md = metadata.Metadata()
 
-        item = md.get(uniqueName)
+        item = md.getFirst(uniqueName)
         self.assertIsNone(item)
+        itemtuple = md.get(uniqueName)
+        self.assertEqual(itemtuple, tuple())
 
         if valueType is metadata.DateSingle:
             md.add(uniqueName, '1979/6/11')
-            md.addAll(nsKey, [metadata.DateBetween(['1978', '1980']),
+            md.add(nsKey, [metadata.DateBetween(['1978', '1980']),
                 metadata.DateSingle('1979/6/11/4:50:32')])
         elif valueType is metadata.Copyright:
             md.add(uniqueName, 'Copyright © 1979 Joe Smith')
             md.add(nsKey, metadata.Text('Lyrics copyright © 1979 John Jones'))
-            md.addAll(uniqueName,
+            md.add(uniqueName,
                 [metadata.Copyright('Other content copyright © 1979 Jenni Johnson',
                     role='other'),
                 metadata.Copyright(
@@ -195,19 +197,19 @@ class Test(unittest.TestCase):
                     role='even more')])
         elif valueType is metadata.Contributor:
             md.add(uniqueName, f'The {uniqueName}')
-            md.addAll(nsKey, [metadata.Text(f'The 2nd {uniqueName}'),
+            md.add(nsKey, [metadata.Text(f'The 2nd {uniqueName}'),
                 metadata.Contributor(
                     role=contributorRole if contributorRole else uniqueName,
                     name=f'The 3rd {uniqueName}')])
         elif valueType is metadata.Text:
             md.add(uniqueName, f'The {uniqueName}')
-            md.addAll(nsKey, [metadata.Text(f'The 2nd {uniqueName}'),
+            md.add(nsKey, [metadata.Text(f'The 2nd {uniqueName}'),
                 metadata.Text(f'The 3rd {uniqueName}')])
         else:
             self.fail('internal test error: invalid valueType')
 
-        mdItemsUnique = md.getAll(uniqueName)
-        mdItemsNSKey = md.getAll(nsKey)
+        mdItemsUnique = md.get(uniqueName)
+        mdItemsNSKey = md.get(nsKey)
         self.assertEqual(len(mdItemsUnique), len(mdItemsNSKey))
 
         for itemUnique, itemNSKey in zip(mdItemsUnique, mdItemsNSKey):
