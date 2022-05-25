@@ -1737,11 +1737,14 @@ class Metadata(base.Music21Object):
                 # If you want other DateSingle-derived types (DateRelative,
                 # DateBetween, or DateSelection), you have to create those
                 # yourself before adding/setting them.
+
+                # pylint: disable=bare-except
                 try:
                     return DateSingle(value)
                 except:
                     # Couldn't convert; just return unconverted value
                     return originalValue
+                # pylint: enable=bare-except
 
             raise exceptions21.MetadataException(
                 f'invalid type for DateSingle: {type(value).__name__}')
