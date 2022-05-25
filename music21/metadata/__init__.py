@@ -599,6 +599,19 @@ class Metadata(base.Music21Object):
         return True
 
     @staticmethod
+    def isStandardKey(key: str) -> bool:
+        if not key:
+            return False
+
+        if Metadata.isStandardNSKey(key):
+            return True
+
+        if Metadata.isStandardUniqueName(key):
+            return True
+
+        return False
+
+    @staticmethod
     def nsKeyToUniqueName(nsKey: str) -> t.Optional[str]:
         '''
         Translates a standard property NSKey to that standard property's

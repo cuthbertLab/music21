@@ -1334,7 +1334,10 @@ class MusicXMLImporter(XMLParserBase):
             # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
             #     md.addContributor(c)
             # else:
-            md.add(c.role, c)
+            if md.isContributorUniqueName(c.role):
+                md.add(c.role, c)
+            else:
+                md.add('otherContributor', c)
 
         for rights in identification.findall('rights'):
             c = self.rightsToCopyright(rights)
@@ -1369,7 +1372,7 @@ class MusicXMLImporter(XMLParserBase):
                 #             miscFieldName, miscFieldValue, e
                 #         ), MusicXMLWarning)
                 # else:
-                if md.isStandardUniqueName(miscFieldName):
+                if md.isStandardKey(miscFieldName):
                     md.add(miscFieldName, miscFieldValue)
                 else:
                     md.addCustom(miscFieldName, miscFieldValue)
@@ -1443,9 +1446,7 @@ class MusicXMLImporter(XMLParserBase):
         #             and creatorType in metadata.Contributor.roleNames):
         #         c.role = creatorType
         # else:
-        if (creatorType is not None
-                and metadata.Metadata.isContributorUniqueName(creatorType)):
-            c.role = creatorType
+        c.role = creatorType
 
         creatorText = creator.text
         if creatorText is not None:
