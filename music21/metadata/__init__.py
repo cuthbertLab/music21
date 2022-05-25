@@ -1705,6 +1705,8 @@ class Metadata(base.Music21Object):
         <music21.metadata.primitives.DateBetween 1938/--/-- to 1939/--/-->
         '''
         valueType: t.Type = Metadata._NSKEY_TO_VALUETYPE.get(nsKey, None)
+        originalValue: t.Any = value
+
         if valueType is None:
             # not a standard property, convert to Text by default
             valueType = Text
@@ -1735,7 +1737,12 @@ class Metadata(base.Music21Object):
                 # If you want other DateSingle-derived types (DateRelative,
                 # DateBetween, or DateSelection), you have to create those
                 # yourself before adding/setting them.
-                return DateSingle(value)
+                try:
+                    return DateSingle(value)
+                except:
+                    # Couldn't convert; just return unconverted value
+                    return originalValue
+
             raise exceptions21.MetadataException(
                 f'invalid type for DateSingle: {type(value).__name__}')
 
