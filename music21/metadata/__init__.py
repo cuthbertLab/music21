@@ -333,8 +333,15 @@ class Metadata(base.Music21Object):
         >>> md.get('title')
         (<music21.metadata.primitives.Text Heroic Symphony>,)
         >>> md.add('title', metadata.Text('Eroica Symphony'))
-        >>> md.get('dcterms:title')
-        (<music21.metadata.primitives.Text Heroic Symphony>, <music21.metadata.primitives.Text Eroica Symphony>)
+        >>> titles = md.get('dcterms:title')
+        >>> isinstance(titles, tuple)
+        True
+        >>> len(titles)
+        2
+        >>> titles[0]
+        <music21.metadata.primitives.Text Heroic Symphony>
+        >>> titles[1]
+        <music21.metadata.primitives.Text Eroica Symphony>
         '''
         return self._get(key, isCustom=False)
 
@@ -408,8 +415,15 @@ class Metadata(base.Music21Object):
         (<music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>,)
         >>> md.set('librettist', [metadata.Text('Melissa Li'),
         ...                            metadata.Text('Kit Yan Win')])
-        >>> md.get('marcrel:LBT')
-        (<music21.metadata.primitives.Contributor librettist:Melissa Li>, <music21.metadata.primitives.Contributor librettist:Kit Yan Win>)
+        >>> librettists = md.get('marcrel:LBT')
+        >>> isinstance(librettists, tuple)
+        True
+        >>> len(librettists)
+        2
+        >>> librettists[0]
+        <music21.metadata.primitives.Contributor librettist:Melissa Li>
+        >>> librettists[1]
+        <music21.metadata.primitives.Contributor librettist:Kit Yan Win>
         '''
         self._set(key, value)
 
@@ -488,8 +502,10 @@ class Metadata(base.Music21Object):
         ('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Ludwig von Beethoven>)
         >>> all[1]
         ('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Wolfgang Amadeus Mozart>)
-        >>> all[2]
-        ('marcrel:LBT', <music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>)
+        >>> all[2][0]
+        'marcrel:LBT'
+        >>> all[2][1]
+        <music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>
         '''
 
         allOut: t.List[t.Tuple[str, Contributor]] = []
