@@ -614,8 +614,8 @@ class Metadata(base.Music21Object):
     @staticmethod
     def nsKeyToUniqueName(nsKey: str) -> t.Optional[str]:
         '''
-        Translates a standard property NSKey to that standard property's
-        uniqueName.
+        Translates a standard property NSKey ('namespace:name') to that
+        standard property's uniqueName.
         Returns None if no such standard property exists.
 
         >>> metadata.Metadata.nsKeyToUniqueName('marcrel:LBT')
@@ -1603,7 +1603,7 @@ class Metadata(base.Music21Object):
         # return tuple containing contents of list
         return tuple(value)
 
-    def _getFirst(self, key: str, isCustom: bool = False) -> t.Optional[t.Any]:
+    def _getFirst(self, key: str, isCustom: bool) -> t.Optional[t.Any]:
         '''
         Returns the first item stored in metadata with this key.
         Never returns a list, always returns the first item or None.
@@ -1611,16 +1611,10 @@ class Metadata(base.Music21Object):
         The key can be the item's uniqueName or 'namespace:name'.  If it is
         not one of the standard metadata properties, KeyError will be raised.
         '''
-        if not isCustom:
-            if self.isStandardUniqueName(key):
-                key = self._UNIQUENAME_TO_NSKEY.get(key, None)
-            if not self.isStandardNSKey(key):
-                raise KeyError
-
-        output: t.Optional[t.Any] = self._metadata.get(key, None)
-        if isinstance(output, list):
-            return output[0]
-        return output
+        values: t.Tuple[t.Any, ...] = self._get(key, isCustom)
+        if values:
+            return values[0]
+        return None
 
     def _add(self, key: str, value: t.Union[t.Any, t.List[t.Any]], isCustom: bool = False):
         '''

@@ -1260,9 +1260,6 @@ class MusicXMLImporter(XMLParserBase):
             self.spannerBundle.append(staffGroup)
             # self.stream.coreInsert(0, staffGroup)
 
-    # temporary for testing: set MusicXMLImporter.USE_BACKWARD_COMPATIBLE_METADATA_APIS to True
-    # if you want to test those APIs.
-    # USE_BACKWARD_COMPATIBLE_METADATA_APIS: bool = False
     def xmlMetadata(self, el=None, inputM21=None):
         '''
         Converts part of the root element into a metadata object
@@ -1278,27 +1275,15 @@ class MusicXMLImporter(XMLParserBase):
         else:
             md = inputM21
 
-        # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-        #     seta = _setAttributeFromTagText
-        # else:
         setm = _setMetadataItemFromTagText
 
         # work
         work = el.find('work')
         if work is not None:
-            # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-            #     seta(md, work, 'work-title', 'title')
-            #     seta(md, work, 'work-number', 'number')
-            #     seta(md, work, 'opus', 'opusNumber')
-            # else:
             setm(md, work, 'work-title', 'title')
             setm(md, work, 'work-number', 'number')
             setm(md, work, 'opus', 'opusNumber')
 
-        # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-        #     seta(md, el, 'movement-number')
-        #     seta(md, el, 'movement-title', 'movementName')
-        # else:
         setm(md, el, 'movement-number', 'movementNumber')
         setm(md, el, 'movement-title', 'movementName')
 
@@ -1331,9 +1316,6 @@ class MusicXMLImporter(XMLParserBase):
 
         for creator in identification.findall('creator'):
             c = self.creatorToContributor(creator)
-            # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-            #     md.addContributor(c)
-            # else:
             if md.isContributorUniqueName(c.role):
                 md.add(c.role, c)
             else:
@@ -1358,23 +1340,14 @@ class MusicXMLImporter(XMLParserBase):
                     continue  # it is required, so technically can raise an exception
                 miscFieldValue = mxMiscField.text
                 if miscFieldValue is None:
-                    # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-                    #     continue  # it is required, so technically can raise an exception
-                    # else:
-                    # new metadata is happy to take an empty value
                     miscFieldValue = ''
 
-                # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-                #     try:
-                #         setattr(md, miscFieldName, miscFieldValue)
-                #     except Exception as e:  # pylint: disable=broad-except
-                #         warnings.warn('Could not set metadata: {} to {}: {}'.format(
-                #             miscFieldName, miscFieldValue, e
-                #         ), MusicXMLWarning)
-                # else:
                 if md.isStandardKey(miscFieldName):
+                    # miscFieldName is either a standard 'namespace:name',
+                    # or a standard uniqueName.
                     md.add(miscFieldName, miscFieldValue)
                 else:
+                    # non-standard miscFieldName? Add as custom metadata.
                     md.addCustom(miscFieldName, miscFieldValue)
 
         if inputM21 is None:
@@ -1440,13 +1413,8 @@ class MusicXMLImporter(XMLParserBase):
             c = inputM21
 
         creatorType = creator.get('type')
-
-        # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-        #     if (creatorType is not None
-        #             and creatorType in metadata.Contributor.roleNames):
-        #         c.role = creatorType
-        # else:
-        c.role = creatorType
+        if creatorType is not None:
+            c.role = creatorType
 
         creatorText = creator.text
         if creatorText is not None:

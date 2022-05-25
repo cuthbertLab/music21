@@ -2215,9 +2215,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # environLocal.printDebug(['configureMxPartGroupFromStaffGroup: mxPartGroup', mxPartGroup])
         return mxPartGroup
 
-    # temporary for testing: set ScoreExporter.USE_BACKWARD_COMPATIBLE_METADATA_APIS to True
-    # if you want to test those APIs.
-    # USE_BACKWARD_COMPATIBLE_METADATA_APIS: bool = False
     def setIdentification(self):
         # noinspection SpellCheckingInspection, PyShadowingNames
         '''
@@ -2284,16 +2281,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         # creators
         foundOne = False
         if self.scoreMetadata is not None:
-            # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-            #      for c in self.scoreMetadata.contributors:
-            #         mxCreator = self.contributorToXmlCreator(c)
-            #         mxId.append(mxCreator)
-            #         foundOne = True
-            # else:
-            # We ignore the name here, since c.role is slightly better
-            # in one case: if name is 'otherContributor' (actually
-            # 'marcrel:CTB'), c.role is likely to be a more specific
-            # custom role, which we would love to use here.
+            # We ignore the name ('namespace:name') here, and use
+            # c.role instead so we can represent non-standard roles.
+            # If c.role is non-standard, the name will be very boring:
+            # 'marcrel:CTB', which means 'otherContributor'.
             for _, c in self.scoreMetadata.getAllContributorNamedValues():
                 mxCreator = self.contributorToXmlCreator(c)
                 mxId.append(mxCreator)
@@ -2305,13 +2296,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             mxCreator.text = defaults.author
 
         if self.scoreMetadata is not None:
-            copyrights: t.List[metadata.Copyright] = []
-            # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-            #     c = self.scoreMetadata.copyright
-            #     if c:
-            #         copyrights = [c]
-            # else:
-            copyrights = self.scoreMetadata.get('copyright')
+            copyrights: t.Tuple[metadata.Copyright] = self.scoreMetadata.get('copyright')
             for c in copyrights:
                 mxRights = SubElement(mxId, 'rights')
                 if c.role is not None:
@@ -2336,8 +2321,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         >>> SX = musicxml.m21ToXml.ScoreExporter()
         >>> md = metadata.Metadata()
-        >>> md.date = metadata.primitives.DateRelative('1689', 'onOrBefore')
-        >>> md.localeOfComposition = 'Rome'
+        >>> md.set('dateCreated', metadata.primitives.DateRelative('1689', 'onOrBefore'))
+        >>> md.set('localeOfComposition', 'Rome')
 
         >>> mxMisc = SX.metadataToMiscellaneous(md)
         >>> SX.dump(mxMisc)
@@ -2356,19 +2341,12 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         foundOne = False
         allItems: t.List[t.Tuple[str, t.Any]] = []
 
-        # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-        #     allItems = md.all(skipContributors=True)
-        # else:
         allItems = md.getAllNamedValues(skipContributors=True)
 
         skippedOneMovementName: bool = False
         skippedOneMovementNumber: bool = False
         skippedOneTitle: bool = False
         for name, value in allItems:
-            # if self.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-            #     if name in ('movementName', 'movementNumber', 'title', 'copyright'):
-            #         continue
-            # else:
             if name == md.uniqueNameToNSKey('movementName'):
                 # We have already emitted the first movementName in <movement-title>,
                 # but we need to emit the rest of them here in miscellaneous.
@@ -2504,12 +2482,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxWork = Element('work')
         # TODO: work-number
         firstTitleFound: metadata.Text = None
-        # if ScoreExporter.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-        #     if mdObj.title not in (None, ''):
-        #         # environLocal.printDebug(['metadataToMx, got title', mdObj.title])
-        #         mxWorkTitle = SubElement(mxWork, 'work-title')
-        #         mxWorkTitle.text = str(mdObj.title)
-        # else:
         titleText: metadata.Text = mdObj.getFirst('title')
         if titleText is not None:
             if firstTitleFound is None:
@@ -2519,31 +2491,18 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         if mxWork:
             mxScoreHeader.append(mxWork)
 
-        # if ScoreExporter.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-        #     if mdObj.movementNumber not in (None, ''):
-        #         mxMovementNumber = SubElement(mxScoreHeader, 'movement-number')
-        #         mxMovementNumber.text = str(mdObj.movementNumber)
-        # else:
         movementNumberText: metadata.Text = mdObj.getFirst('movementNumber')
         if movementNumberText is not None:
             mxMovementNumber = SubElement(mxScoreHeader, 'movement-number')
             mxMovementNumber.text = str(movementNumberText)
 
         # musicxml often defaults to show only movement title
-        # if no movement title is found, get the .title attr
+        # if no movementName is found in mdObj, set movement title to
+        # the mdObj's first title instead. Fall back to defaults.title if
+        # necessary, and if possible.
 
         mxMovementTitle = SubElement(mxScoreHeader, 'movement-title')
-        # if ScoreExporter.USE_BACKWARD_COMPATIBLE_METADATA_APIS:
-        #     if mdObj.movementName not in (None, ''):
-        #         mxMovementTitle.text = str(mdObj.movementName)
-        #     else:  # it is none
-        #        if mdObj.title is not None:
-        #            mxMovementTitle.text = str(mdObj.title)
-        #        elif defaults.title:
-        #            mxMovementTitle.text = defaults.title
-        #        else:
-        #            return
-        # else:
+
         movementNameText: metadata.Text = mdObj.getFirst('movementName')
         if movementNameText:
             mxMovementTitle.text = str(movementNameText)
