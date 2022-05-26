@@ -511,7 +511,7 @@ class Test(unittest.TestCase):
         '''
         work = """<work xmlns="http://www.music-encoding.org/ns/mei"/>"""
         work = ETree.fromstring(work)
-        expDate = 'None'  # I don't know why, but that's what it does
+        expDate = None
         meta = metadata.Metadata()
 
         actual = base.metaSetDate(work, meta)
@@ -572,7 +572,7 @@ class Test(unittest.TestCase):
             </history>
         </work>"""
         work = ETree.fromstring(work)
-        expDate = 'None'
+        expDate = None
         expWarn = base._MISSED_DATE.format('2 March 1924')
         meta = metadata.Metadata()
 

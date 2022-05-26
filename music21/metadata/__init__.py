@@ -800,10 +800,14 @@ class Metadata(base.Music21Object):
 
     def __getattr__(self, name):
         '''
-        Utility attribute access for attributes that do not have property
-        definitions.
+        Utility attribute access for all uniqueNames, grandfathered workIds,
+        and grandfathered workId abbreviations.  Many grandfathered workIds
+        have explicit property definitions, so they won't end up here.
 
         These always return str(first) or None.
+
+        If name is not a valid attribute (uniqueName, grandfathered workId,
+        or grandfathered workId abbreviation), then AttributeError is raised.
 
         >>> md = metadata.Metadata()
         >>> md.set('description',
@@ -836,6 +840,38 @@ class Metadata(base.Music21Object):
             return None
 
         raise AttributeError(f'object has no attribute: {name}')
+
+    def __getitem__(self, key: str) -> t.Tuple[t.Any, ...]:
+        '''
+        Utility "dictionary key" access for all standard uniqueNames and
+        standard keys of the form 'namespace:name'.
+
+        These always return t.Tuple[t.Any, ...], which may be empty.
+
+        If key is not a standard uniqueName or standard 'namespace:name',
+        then KeyError is raised.
+
+        >>> md = metadata.Metadata()
+        >>> md.set('description',
+        ...         [metadata.Text('A fun score!', language='en'), 'A great tune'])
+        >>> descs = md['description']
+        >>> isinstance(descs, tuple)
+        True
+        >>> len(descs)
+        2
+        >>> descs[0]
+        <music21.metadata.primitives.Text A fun score!>
+        >>> descs[0].language
+        'en'
+        >>> descs[1]
+        <music21.metadata.primitives.Text A great tune>
+        >>> descs[1].language is None
+        True
+        '''
+        if not isinstance(key, str):
+            raise KeyError('metadata key must be str')
+
+        return self._get(key, isCustom=False)
 
     # PUBLIC METHODS #
 
@@ -1284,12 +1320,7 @@ class Metadata(base.Music21Object):
         >>> md.date
         '1803/01/01 to 1805/04/07'
         '''
-        # _getBackwardCompatibleItem returns None or str(value)
-        # For backward compatibility reasons, we need to return 'None' instead of None
-        output = self._getBackwardCompatibleItem('date')
-        if output is not None:
-            return output
-        return 'None'
+        return self._getBackwardCompatibleItem('date')
 
     @date.setter
     def date(self, value):
@@ -1600,7 +1631,9 @@ class Metadata(base.Music21Object):
             if self._isStandardUniqueName(key):
                 key = self._UNIQUENAME_TO_NSKEY.get(key, None)
             if not self._isStandardNSKey(key):
-                raise KeyError
+                raise KeyError(
+                    f'Key=\'{key}\' is not a standard metadata key. ' +
+                    'Call setCustom/getCustom for custom keys.')
 
         value: t.Optional[t.Any] = self._metadata.get(key, None)
 
