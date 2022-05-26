@@ -1632,8 +1632,8 @@ class Metadata(base.Music21Object):
                 key = self._UNIQUENAME_TO_NSKEY.get(key, None)
             if not self._isStandardNSKey(key):
                 raise KeyError(
-                    f'Key=\'{key}\' is not a standard metadata key. ' +
-                    'Call setCustom/getCustom for custom keys.')
+                    f'Key=\'{key}\' is not a standard metadata key.'
+                    ' Call setCustom/getCustom for custom keys.')
 
         value: t.Optional[t.Any] = self._metadata.get(key, None)
 
