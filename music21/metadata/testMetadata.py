@@ -177,6 +177,12 @@ class Test(unittest.TestCase):
 
         md = metadata.Metadata()
 
+        self.assertTrue(md.isStandardKey(uniqueName))
+        self.assertFalse(md.isStandardKey(uniqueName + '_'))
+
+        self.assertTrue(md.isStandardKey(nsKey))
+        self.assertFalse(md.isStandardKey(nsKey + '_'))
+
         item = md.getFirst(uniqueName)
         self.assertIsNone(item)
         itemtuple = md.get(uniqueName)

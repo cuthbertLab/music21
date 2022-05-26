@@ -326,7 +326,7 @@ class Metadata(base.Music21Object):
 
     def add(self,
             key: str,
-            value: t.Union[t.Any, t.List[t.Any]]):
+            value: t.Union[t.Any, t.Iterable[t.Any]]):
         '''
         Adds a single item or multiple items with this key, leaving any existing
         items with this key in place.
@@ -359,7 +359,7 @@ class Metadata(base.Music21Object):
 
     def set(self,
             key: str,
-            value: t.Union[t.Any, t.List[t.Any]]):
+            value: t.Union[t.Any, t.Iterable[t.Any]]):
         '''
         Sets a single item or multiple items with this key, replacing any
         existing items with this key.
@@ -799,28 +799,43 @@ class Metadata(base.Music21Object):
         return list(sorted(allOut.items()))
 
     def __getattr__(self, name):
-        r'''
-        Utility attribute access for attributes that do not yet have property
-        definitions.
         '''
-        match = None
-        for abbreviation, workId in self.workIdAbbreviationDict.items():
-            # for id in WORK_IDS:
-            # abbreviation = workIdToAbbreviation(id)
-            if name == workId:
-                match = workId
-                break
-            elif name == abbreviation:
-                match = workId
-                break
-        if match is None:
-            raise AttributeError(f'object has no attribute: {name}')
-        # _getBackwardCompatibleItem returns None or str(value)
-        # For backward compatibility reasons, we need to return 'None' instead of None
-        result = self._getBackwardCompatibleItem(match)
-        if result is not None:
-            return result
-        return 'None'
+        Utility attribute access for attributes that do not have property
+        definitions.
+
+        These always return str(first) or None.
+
+        >>> md = metadata.Metadata()
+        >>> md.set('description',
+        ...         [metadata.Text('A fun score!', language='en'), 'A great tune'])
+        >>> md.description
+        'A fun score!'
+        '''
+        # Look by uniqueName
+        if name in self._UNIQUENAME_TO_NSKEY:
+            nsKey: str = self._UNIQUENAME_TO_NSKEY[name]
+            first: t.Optional[t.Any] = self._getFirst(nsKey, isCustom=False)
+            if first is not None:
+                return str(first)
+            return None
+
+        # Look by grandfathered workId.
+        if name in self._M21WORKID_TO_NSKEY:
+            nsKey: str = self._M21WORKID_TO_NSKEY[name]
+            first: t.Optional[t.Any] = self._getFirst(nsKey, isCustom=False)
+            if first is not None:
+                return str(first)
+            return None
+
+        # Look by grandfathered workId abbreviation.
+        if name in self._M21ABBREV_TO_NSKEY:
+            nsKey: str = self._M21ABBREV_TO_NSKEY[name]
+            first: t.Optional[t.Any] = self._getFirst(nsKey, isCustom=False)
+            if first is not None:
+                return str(first)
+            return None
+
+        raise AttributeError(f'object has no attribute: {name}')
 
     # PUBLIC METHODS #
 
@@ -1597,7 +1612,7 @@ class Metadata(base.Music21Object):
             # return tuple of one element
             return (value,)
 
-        # return tuple containing contents of list
+        # return a tuple containing contents of list
         return tuple(value)
 
     def _getFirst(self, key: str, isCustom: bool) -> t.Optional[t.Any]:
@@ -1613,7 +1628,7 @@ class Metadata(base.Music21Object):
             return values[0]
         return None
 
-    def _add(self, key: str, value: t.Union[t.Any, t.List[t.Any]], isCustom: bool):
+    def _add(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]], isCustom: bool):
         '''
         Adds a single item or multiple items with this key, leaving any existing
         items with this key in place.
@@ -1627,24 +1642,29 @@ class Metadata(base.Music21Object):
             if not self._isStandardNSKey(key):
                 raise KeyError
 
-        if not isinstance(value, list):
+        if not isinstance(value, t.Iterable):
             value = [value]
 
-        for i, v in enumerate(value):
-            value[i] = self._convertValue(key, v)
+        if isinstance(value, str):
+            # special case: str is iterable, but we don't want to iterate over it.
+            value = [value]
+
+        convertedValues: t.List = []
+        for v in value:
+            convertedValues.append(self._convertValue(key, v))
 
         prevValue: t.Optional[t.Any] = self._metadata.get(key, None)
         if prevValue is None:
-            # set the value list in there
-            self._metadata[key] = value
+            # set the convertedValues list in there
+            self._metadata[key] = convertedValues
         elif isinstance(prevValue, list):
-            # add the value list to the existing list
-            self._metadata[key] = prevValue + value
+            # add the convertedValues list to the existing list
+            self._metadata[key] = prevValue + convertedValues
         else:
-            # set a list containing the single prevValue plus the value list
-            self._metadata[key] = [prevValue] + value
+            # set a list containing the single prevValue plus the convertedValues list
+            self._metadata[key] = [prevValue] + convertedValues
 
-    def _set(self, key: str, value: t.Union[t.Any, t.List[t.Any]], isCustom: bool):
+    def _set(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]], isCustom: bool):
         '''
         Sets a single item or multiple items with this key, replacing any
         existing items with this key.
