@@ -2727,6 +2727,116 @@ class GlobalReference(base.Music21Object):
         if '@' in self.code:
             self.code, self.language = self.code.split('@')
 
+    humdrumKeyToUniqueName: dict = {
+        # dict value is music21's unique name or '' (if there is no supported equivalent)
+        # Authorship information:
+        'COM': 'composer',              # composer's name
+        'COA': 'attributedComposer',    # attributed composer
+        'COS': 'suspectedComposer',     # suspected composer
+        'COL': 'composerAlias',         # composer's abbreviated, alias, or stage name
+        'COC': 'composerCorporate',     # composer's corporate name
+        'CDT': '',  # composer's birth and death dates (**zeit format)
+        'CBL': '',  # composer's birth location
+        'CDL': '',  # composer's death location
+        'CNT': '',  # composer's nationality
+        'LYR': 'lyricist',  # lyricist's name
+        'LIB': 'librettist',    # librettist's name
+        'LAR': 'arranger',  # music arranger's name
+        'LOR': 'orchestrator',  # orchestrator's name
+        'TXO': 'textOriginalLanguage',  # original language of vocal/choral text
+        'TXL': 'textLanguage',  # language of the encoded vocal/choral text
+        # Recording information (if the Humdrum encodes information pertaining
+        # to an audio recording)
+        'TRN': 'translator',  # translator of the text
+        'RTL': '',  # album title
+        'RMM': 'manufacturer',  # manufacturer or sponsoring company
+        'RC#': '',  # recording company's catalog number of album
+        'RRD': 'dateIssued',  # release date (**date format)
+        'RLC': '',  # place of recording
+        'RNP': 'producer',  # producer's name
+        'RDT': '',  # date of recording (**date format)
+        'RT#': '',  # track number
+        # Performance information (if the Humdrum encodes, say, a MIDI performance)
+        'MGN': '',  # ensemble's name
+        'MPN': 'performer',  # performer's name
+        'MPS': '',  # suspected performer
+        'MRD': '',  # date of performance (**date format)
+        'MLC': '',  # place of performance
+        'MCN': 'conductor',  # conductor's name
+        'MPD': '',  # date of first performance (**date format)
+        'MDT': '',  # unknown, but I've seen 'em (another way to say date of performance?)
+        # Work identification information
+        'OTL': 'title',  # title
+        'OTP': 'popularTitle',  # popular title
+        'OTA': 'alternativeTitle',  # alternative title
+        'OPR': 'parentTitle',  # title of parent work
+        'OAC': 'actNumber',  # act number (e.g. '2' or 'Act 2')
+        'OSC': 'sceneNumber',  # scene number (e.g. '3' or 'Scene 3')
+        'OMV': 'movementNumber',  # movement number (e.g. '4', or 'mov. 4', or...)
+        'OMD': 'movementName',  # movement name
+        'OPS': 'opusNumber',  # opus number (e.g. '23', or 'Opus 23')
+        'ONM': 'number',  # number (e.g. number of song within ABC multi-song file)
+        'OVM': 'volumeNumber',  # volume number (e.g. '6' or 'Vol. 6')
+        'ODE': 'dedicatedTo',  # dedicated to
+        'OCO': 'commission',  # commissioned by
+        'OCL': 'transcriber',  # collected/transcribed by
+        'ONB': '',  # free form note (nota bene) related to title or identity of work
+        'ODT': 'dateCreated',  # date or period of composition (**date or **zeit format)
+        'OCY': 'countryOfComposition',  # country of composition
+        'OPC': 'localeOfComposition',  # city, town, or village of composition
+        # Group information
+        'GTL': 'groupTitle',  # group title (e.g. 'The Seasons')
+        'GAW': 'associatedWork',  # associated work, such as a play or film
+        'GCO': 'collectionDesignation',  # collection designation (e.g. 'Norton Scores')
+        # Imprint information
+        'PUB': '',  # publication status 'published'/'unpublished'
+        'PED': '',  # publication editor
+        'PPR': '',  # first publisher
+        'PDT': '',  # date first published (**date format)
+        'PTL': '',  # publication (volume) title
+        'PPP': '',  # place first published
+        'PC#': '',  # publisher's catalog number (NOT scholarly catalog, see below)
+        'SCT': '',  # scholarly catalog abbreviation and number (e.g. 'BWV 551')
+        'SCA': '',  # scholarly catalog (unabbreviated) (e.g. 'Koechel 117')
+        'SMS': '',  # unpublished manuscript source name
+        'SML': '',  # unpublished manuscript location
+        'SMA': '',  # acknowledgment of manuscript access
+        'YEP': '',  # publisher of electronic edition
+        'YEC': 'copyright',  # date and owner of electronic copyright
+        'YER': '',  # date electronic edition released
+        'YEM': '',  # copyright message (e.g. 'All rights reserved')
+        'YEN': '',  # country of copyright
+        'YOR': '',  # original document from which encoded document was prepared
+        'YOO': '',  # original document owner
+        'YOY': '',  # original copyright year
+        'YOE': '',  # original editor
+        'EED': '',  # electronic editor
+        'ENC': '',  # electronic encoder (person)
+        'END': '',  # encoding date
+        'EMD': '',  # electronic document modification description (one per modificiation)
+        'EEV': '',  # electronic edition version
+        'EFL': '',  # file number e.g. '1/4' for one of four
+        'EST': '',  # encoding status (free form, normally eliminated prior to distribution)
+        'VTS': '',  # checksum (excluding the VTS line itself)
+        # Analytic information
+        'ACO': '',  # collection designation
+        'AFR': '',  # form designation
+        'AGN': '',  # genre designation
+        'AST': '',  # style, period, or type of work designation
+        'AMD': '',  # mode classification e.g. '5; Lydian'
+        'AMT': '',  # metric classification, must be one of eight specific names
+        'AIN': '',  # instrumentation; alphabetically ordered list of *I abbrevs, space-delimited
+        'ARE': '',  # geographical region of origin (list of 'narrowing down' names of regions)
+        'ARL': '',  # geographical location of origin (lat/long)
+        # Historical and background information
+        'HAO': '',  # aural history (lots of text, stories about the work)
+        'HTX': '',  # freeform translation of vocal text
+        # Representation information
+        'RLN': '',  # Extended ASCII language code
+        'RNB': '',  # a note about the representation
+        'RWB': ''  # a warning about the representation
+    }
+
     def updateMetadata(self, md):
         '''
         update a metadata object according to information in this GlobalReference
@@ -2735,41 +2845,18 @@ class GlobalReference(base.Music21Object):
         '''
         c = self.code
         v = self.value
-        wasParsed = True
 
-        contributorNames = {
-            'COM': 'composer',
-            'COA': 'attributed composer',
-            'COS': 'suspected composer',
-            'COL': 'composer alias',
-            'COC': 'corporate composer',
-            'LYR': 'lyricist',
-            'LIB': 'librettist',
-            'LAR': 'arranger',
-            'LOR': 'orchestrator',
-            'TRN': 'translator',
-            'YOO': 'original document owner',
-            'YOE': 'original editor',
-            'EED': 'electronic editor',
-            'ENC': 'electronic encoder'
-        }
-
-        if c in contributorNames:
-            contrib = metadata.Contributor()
-            contrib.role = contributorNames[c]
-            contrib.name = v
-            md.addContributor(contrib)
-
-        elif c.lower() in md.workIdAbbreviationDict:
-            md.setWorkId(c, v)
-
-        elif c == 'YEC':  # electronic edition copyright.
-            md.copyright = metadata.Copyright(v)
-
+        uniqueName: str = self.humdrumKeyToUniqueName.get(c, '')
+        if uniqueName:
+            md.add(uniqueName, v)
+        elif c in self.humdrumKeyToUniqueName:
+            # it's a humdrum key, but unsupported
+            md.addCustom('humdrum:' + c, v)
         else:
-            wasParsed = False
+            # it's a free-form key
+            md.addCustom(c, v)
 
-        return wasParsed
+        return True
 
     def _reprInternal(self):
         return f'{self.code} {self.value!r}'
