@@ -2346,31 +2346,32 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         skippedOneMovementName: bool = False
         skippedOneMovementNumber: bool = False
         skippedOneTitle: bool = False
-        for name, value in allItems:
-            if name == md.uniqueNameToNSKey('movementName'):
+        for nsKey, value in allItems:
+            uniqueName: str = md.nsKeyToUniqueName(nsKey)
+            if uniqueName == 'movementName':
                 # We have already emitted the first movementName in <movement-title>,
                 # but we need to emit the rest of them here in miscellaneous.
                 if not skippedOneMovementName:
                     skippedOneMovementName = True
                     continue
-            if name == md.uniqueNameToNSKey('movementNumber'):
+            if uniqueName == 'movementNumber':
                 # We have already emitted the first movementNumber in <movement-number>,
                 # but we need to emit the rest of them here in miscellaneous.
                 if not skippedOneMovementNumber:
                     skippedOneMovementNumber = True
                     continue
-            if name == md.uniqueNameToNSKey('title'):
+            if uniqueName == 'title':
                 # We have already emitted the first title in <work-title>,
                 # but we need to emit the rest of them here in miscellaneous.
                 if not skippedOneTitle:
                     skippedOneTitle = True
                     continue
-            if name == md.uniqueNameToNSKey('copyright'):
+            if uniqueName == 'copyright':
                 # We have already emitted all the copyrights.
                 continue
 
             mxMiscField = SubElement(mxMiscellaneous, 'miscellaneous-field')
-            mxMiscField.set('name', name)
+            mxMiscField.set('name', nsKey)
             mxMiscField.text = str(value)
             foundOne = True
 

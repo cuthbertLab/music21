@@ -632,27 +632,6 @@ class Metadata(base.Music21Object):
         return uniqueName
 
 
-    @staticmethod
-    def nsKeyToContributorUniqueName(nsKey: str) -> t.Optional[str]:
-        '''
-        Translates a standard contributor property NSKey to that standard
-        contributor property's uniqueName.
-        Returns None if no such standard contributor property exists.
-
-        >>> metadata.Metadata.nsKeyToContributorUniqueName('marcrel:LBT')
-        'librettist'
-        >>> metadata.Metadata.nsKeyToContributorUniqueName('not a standard nskey') is None
-        True
-        >>> metadata.Metadata.nsKeyToContributorUniqueName(None) is None
-        True
-        >>> metadata.Metadata.nsKeyToContributorUniqueName('dcterms:alternative') is None
-        True
-        '''
-        if not nsKey:
-            return None
-        uniqueName: t.Optional[str] = Metadata._NSKEY_TO_CONTRIBUTORUNIQUENAME.get(nsKey, None)
-        return uniqueName
-
 # -----------------------------------------------------------------------------
 #   Backward compatible public APIs
 #   TODO: Consider deprecating some of these (the ones that are too limiting)
@@ -689,42 +668,38 @@ class Metadata(base.Music21Object):
         return output
 
     @property
-    def copyright(self) -> t.Optional[Copyright]:
+    def copyright(self) -> t.Optional[str]:
         '''
-        Returns the backward compatible Copyright (i.e. the first one in the metadata).
-        Returns None if no Copyright exists in the metadata.
+        Returns the copyright as a str.
+        Returns None if no copyright exists in the metadata.
+        Returns 'MULTIPLE' if multiple copyrights exist in the metadata.
+        Use md['copyright'] to get all the copyrights.
 
         >>> md = metadata.Metadata()
         >>> md.copyright
         >>> md.set('dcterms:rights', 'Copyright © 1984 All Rights Reserved')
-        >>> md.add('dcterms:rights', 'Lyrics copyright © 1987 All Rights Reserved')
-        >>> md.set('composer', ['Ludwig', 'Wolfgang'])
-        >>> md.set('librettist', 'Joe')
-        >>> md.add('architect', 'John')
-        >>> md.add('title', 'Caveat Emptor')
         >>> md.copyright
-        <music21.metadata.primitives.Copyright Copyright © 1984 All Rights Reserved>
+        'Copyright © 1984 All Rights Reserved'
+        >>> md.add('dcterms:rights', 'Lyrics copyright © 1987 All Rights Reserved')
+        >>> md.copyright
+        'MULTIPLE'
 
         >>> md = metadata.Metadata()
         >>> md.copyright is None
         True
-        >>> md.set('dcterms:rights', 'Copyright © 1984 All Rights Reserved')
-        >>> md.add('dcterms:rights', 'Lyrics copyright © 1987 All Rights Reserved')
-        >>> md.copyright = 'Copyright © 1984 from str'
+        >>> md.set('copyright', 'Copyright © 1984 All Rights Reserved')
         >>> md.copyright
-        <music21.metadata.primitives.Copyright Copyright © 1984 from str>
+        'Copyright © 1984 All Rights Reserved'
         >>> md.get('dcterms:rights')
-        (<music21.metadata.primitives.Copyright Copyright © 1984 from str>,)
+        (<music21.metadata.primitives.Copyright Copyright © 1984 All Rights Reserved>,)
         >>> md.copyright = metadata.Text('Copyright ©    1984 from Text')
-        >>> md.get('dcterms:rights')
+        >>> md['copyright']
         (<music21.metadata.primitives.Copyright Copyright © 1984 from Text>,)
         >>> md.copyright = metadata.Copyright('Copyright © 1984 from Copyright', role='something')
         >>> md.get('dcterms:rights')
         (<music21.metadata.primitives.Copyright Copyright © 1984 from Copyright>,)
         '''
-        output: t.Optional[t.Any] = self._getBackwardCompatibleItemNoConversion('copyright')
-        if output is not None and not isinstance(output, Copyright):
-            raise exceptions21.MetadataException('internal error: invalid copyright value type')
+        output: t.Optional[t.Any] = self._getBackwardCompatibleItem('copyright')
         return output
 
     @copyright.setter
@@ -1265,9 +1240,9 @@ class Metadata(base.Music21Object):
         ...     )
         >>> md.composer
         'Beach, Mrs. H.H.A.'
-        >>> md.composer = 'Beach, Amy Marcy Cheney'
+        >>> md.add('composer', 'Beach, Amy Marcy Cheney')
         >>> md.composer
-        'Beach, Amy Marcy Cheney'
+        'MULTIPLE'
         '''
         return self._getBackwardCompatibleItem('composer')
 
@@ -1913,14 +1888,12 @@ class Metadata(base.Music21Object):
         nsKey: t.Optional[str] = Metadata._M21WORKID_TO_NSKEY.get(role, None)
         if nsKey is None:
             # it's a non-standard role, so add this contributor with uniqueName='otherContributor'
-            # return Metadata.uniqueNameToNSKey('otherContributor')
-            return 'marcrel:CTB'
+            return 'marcrel:CTB'  # aka. 'otherContributor'
 
         prop: t.Optional[PropertyDescription] = (
             Metadata._NSKEY_TO_PROPERTYDESCRIPTION.get(nsKey, None))
         if prop is None or not prop.isContributor:
-            # return Metadata.uniqueNameToNSKey('otherContributor')
-            return 'marcrel:CTB'
+            return 'marcrel:CTB'  # a.k.a. 'otherContributor'
 
         return nsKey
 
@@ -1968,9 +1941,11 @@ class Metadata(base.Music21Object):
 
     def _getBackwardCompatibleItemNoConversion(self, workId: str) -> t.Optional[t.Any]:
         result: t.Tuple[t.Any, ...] = self._getBackwardCompatibleItemsNoConversion(workId)
-        if not result:  # None or empty list
+        if not result:  # None or empty tuple
             return None
-        return result[0]
+        if len(result) == 1:
+            return result[0]
+        return 'MULTIPLE'
 
     def _getBackwardCompatibleItem(self, workId: str) -> t.Optional[str]:
         item = self._getBackwardCompatibleItemNoConversion(workId)
