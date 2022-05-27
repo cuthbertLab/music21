@@ -183,17 +183,33 @@ class Test(unittest.TestCase):
         self.assertTrue(md.isStandardKey(nsKey))
         self.assertFalse(md.isStandardKey(nsKey + '_'))
 
-        item = md.getFirst(uniqueName)
+        item = getattr(md, uniqueName)
         self.assertIsNone(item)
-        itemtuple = md.get(uniqueName)
+        itemtuple = md[uniqueName]
+        self.assertEqual(itemtuple, tuple())
+        itemtuple = md[nsKey]
         self.assertEqual(itemtuple, tuple())
 
         if valueType is metadata.DateSingle:
             md.add(uniqueName, '1979/6/11')
+            self.assertEqual(getattr(md, uniqueName), '1979/06/11')
+        elif valueType is metadata.Copyright:
+            md.add(uniqueName, 'Copyright © 1979 Joe Smith')
+            self.assertEqual(getattr(md, uniqueName), 'Copyright © 1979 Joe Smith')
+        elif valueType is metadata.Contributor:
+            md.add(uniqueName, f'The {uniqueName}')
+            self.assertEqual(getattr(md, uniqueName), f'The {uniqueName}')
+        elif valueType is metadata.Text:
+            md.add(uniqueName, f'The {uniqueName}')
+            self.assertEqual(getattr(md, uniqueName), f'The {uniqueName}')
+        else:
+            self.fail('internal test error: invalid valueType')
+
+
+        if valueType is metadata.DateSingle:
             md.add(nsKey, [metadata.DateBetween(['1978', '1980']),
                 metadata.DateSingle('1979/6/11/4:50:32')])
         elif valueType is metadata.Copyright:
-            md.add(uniqueName, 'Copyright © 1979 Joe Smith')
             md.add(nsKey, metadata.Text('Lyrics copyright © 1979 John Jones'))
             md.add(uniqueName,
                 [metadata.Copyright('Other content copyright © 1979 Jenni Johnson',
@@ -202,20 +218,18 @@ class Test(unittest.TestCase):
                     metadata.Text('Even more content copyright © 1979 Sarah Michaels'),
                     role='even more')])
         elif valueType is metadata.Contributor:
-            md.add(uniqueName, f'The {uniqueName}')
             md.add(nsKey, [metadata.Text(f'The 2nd {uniqueName}'),
                 metadata.Contributor(
                     role=contributorRole if contributorRole else uniqueName,
                     name=f'The 3rd {uniqueName}')])
         elif valueType is metadata.Text:
-            md.add(uniqueName, f'The {uniqueName}')
             md.add(nsKey, [metadata.Text(f'The 2nd {uniqueName}'),
                 metadata.Text(f'The 3rd {uniqueName}')])
-        else:
-            self.fail('internal test error: invalid valueType')
 
-        mdItemsUnique = md.get(uniqueName)
-        mdItemsNSKey = md.get(nsKey)
+        self.assertEqual(getattr(md, uniqueName), 'MULTIPLE')
+
+        mdItemsUnique = md[uniqueName]
+        mdItemsNSKey = md[nsKey]
         self.assertEqual(len(mdItemsUnique), len(mdItemsNSKey))
 
         for itemUnique, itemNSKey in zip(mdItemsUnique, mdItemsNSKey):
