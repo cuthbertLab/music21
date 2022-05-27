@@ -804,40 +804,51 @@ class Metadata(base.Music21Object):
         and grandfathered workId abbreviations.  Many grandfathered workIds
         have explicit property definitions, so they won't end up here.
 
-        These always return str(first) or None.
+        These always return str or None.  Note well: if there is more than
+        one item for a particular name, we return 'MULTIPLE', to signal the
+        client to dig deeper (using an API such as md[name], which returns
+        all the items for that name).
 
         If name is not a valid attribute (uniqueName, grandfathered workId,
         or grandfathered workId abbreviation), then AttributeError is raised.
 
         >>> md = metadata.Metadata()
-        >>> md.set('description',
-        ...         [metadata.Text('A fun score!', language='en'), 'A great tune'])
+        >>> md.set('description', metadata.Text('A fun score!', language='en'))
         >>> md.description
         'A fun score!'
+        >>> md.add('description', 'Also a great tune')
+        >>> md.description
+        'MULTIPLE'
         '''
         # Look by uniqueName
         if name in self._UNIQUENAME_TO_NSKEY:
             nsKey: str = self._UNIQUENAME_TO_NSKEY[name]
-            first: t.Optional[t.Any] = self._getFirst(nsKey, isCustom=False)
-            if first is not None:
-                return str(first)
-            return None
+            values: t.Tuple[t.Any, ...] = self._get(nsKey, isCustom=False)
+            if not values:
+                return None
+            if len(values) == 1:
+                return str(values[0])
+            return 'MULTIPLE'
 
         # Look by grandfathered workId.
         if name in self._M21WORKID_TO_NSKEY:
             nsKey: str = self._M21WORKID_TO_NSKEY[name]
-            first: t.Optional[t.Any] = self._getFirst(nsKey, isCustom=False)
-            if first is not None:
-                return str(first)
-            return None
+            values: t.Tuple[t.Any, ...] = self._get(nsKey, isCustom=False)
+            if not values:
+                return None
+            if len(values) == 1:
+                return str(values[0])
+            return 'MULTIPLE'
 
         # Look by grandfathered workId abbreviation.
         if name in self._M21ABBREV_TO_NSKEY:
             nsKey: str = self._M21ABBREV_TO_NSKEY[name]
-            first: t.Optional[t.Any] = self._getFirst(nsKey, isCustom=False)
-            if first is not None:
-                return str(first)
-            return None
+            values: t.Tuple[t.Any, ...] = self._get(nsKey, isCustom=False)
+            if not values:
+                return None
+            if len(values) == 1:
+                return str(values[0])
+            return 'MULTIPLE'
 
         raise AttributeError(f'object has no attribute: {name}')
 
@@ -852,8 +863,11 @@ class Metadata(base.Music21Object):
         then KeyError is raised.
 
         >>> md = metadata.Metadata()
-        >>> md.set('description',
-        ...         [metadata.Text('A fun score!', language='en'), 'A great tune'])
+        >>> md.set('description', metadata.Text('A fun score!', language='en'))
+        >>> descs = md['description']
+        >>> descs
+        (<music21.metadata.primitives.Text A fun score!>,)
+        >>> md.add('description', 'Also a great tune')
         >>> descs = md['description']
         >>> isinstance(descs, tuple)
         True
@@ -864,7 +878,7 @@ class Metadata(base.Music21Object):
         >>> descs[0].language
         'en'
         >>> descs[1]
-        <music21.metadata.primitives.Text A great tune>
+        <music21.metadata.primitives.Text Also a great tune>
         >>> descs[1].language is None
         True
         '''
