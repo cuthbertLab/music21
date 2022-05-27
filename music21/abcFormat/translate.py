@@ -402,24 +402,26 @@ def abcToStreamScore(abcHandler, inputM21=None):
         if isinstance(t, abcFormat.ABCMetadata):
             if t.isTitle():
                 if titleCount == 0:  # first
-                    md.title = t.data
-                    # environLocal.printDebug(['got metadata title', md.title])
+                    md.add('title', t.data)
+                    # environLocal.printDebug(['got metadata title', t.data])
                     titleCount += 1
                 # all other titles go in alternative field
                 else:
-                    md.alternativeTitle = t.data
-                    # environLocal.printDebug(['got alternative title', md.alternativeTitle])
+                    md.add('alternativeTitle', t.data)
+                    # environLocal.printDebug(['got alternative title', t.data])
                     titleCount += 1
+
             elif t.isComposer():
-                md.composer = t.data
+                md.add('composer', t.data)
+                # environLocal.printDebug(['got composer', t.data])
 
             elif t.isOrigin():
-                md.localeOfComposition = t.data
-                # environLocal.printDebug(['got local of composition', md.localOfComposition])
+                md.add('localeOfComposition', t.data)
+                # environLocal.printDebug(['got locale of composition', t.data])
 
             elif t.isReferenceNumber():
-                md.number = int(t.data)  # convert to int?
-                # environLocal.printDebug(['got work number', md.number])
+                md.add('number', t.data)
+                # environLocal.printDebug(['got work number', t.data])
 
     partHandlers = []
     tokenCollections = abcHandler.splitByVoice()

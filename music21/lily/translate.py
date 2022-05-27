@@ -2302,16 +2302,21 @@ class LilypondConverter:
         lpHeaderBodyAssignments = lpHeaderBody.assignments
 
         if metadataObject is not None:
-            if metadataObject.title is not None:
+            titles = metadataObject['title']
+            if titles:
                 lyTitleAssignment = lyo.LyAssignment(assignmentId='title',
                                                      identifierInit=lyo.LyIdentifierInit(
-                                                         string=metadataObject.title))
+                                                         string=str(titles[0])))
                 lpHeaderBodyAssignments.append(lyTitleAssignment)
                 lyTitleAssignment.setParent(lpHeaderBody)
-            if metadataObject.alternativeTitle is not None:
+
+            subtitles = metadataObject['subtitle']
+            if not subtitles:
+                subtitles = metadataObject['alternativeTitle']
+            if subtitles:
                 lySubtitleAssignment = lyo.LyAssignment(assignmentId='subtitle',
                                                         identifierInit=lyo.LyIdentifierInit(
-                                                            string=metadataObject.alternativeTitle))
+                                                            string=str(subtitles[0])))
                 lpHeaderBodyAssignments.append(lySubtitleAssignment)
                 lySubtitleAssignment.setParent(lpHeaderBody)
 
