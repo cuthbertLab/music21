@@ -472,14 +472,16 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
     <class 'music21.metadata.Metadata'>
     >>> print(translate.metadataToString(mdObject))
     Alternative Title: 3.1
+    Composer: Claudio Monteverdi
     Title: La Giovinetta Pianta
 
     >>> print(translate.metadataToString(mdObject, returnBrailleUnicode=True))
     ⠠⠁⠇⠞⠑⠗⠝⠁⠞⠊⠧⠑⠀⠠⠞⠊⠞⠇⠑⠒⠀⠼⠉⠲⠁
+    ⠠⠉⠕⠍⠏⠕⠎⠑⠗⠒⠀⠠⠉⠇⠁⠥⠙⠊⠕⠀⠠⠍⠕⠝⠞⠑⠧⠑⠗⠙⠊
     ⠠⠞⠊⠞⠇⠑⠒⠀⠠⠇⠁⠀⠠⠛⠊⠕⠧⠊⠝⠑⠞⠞⠁⠀⠠⠏⠊⠁⠝⠞⠁
     '''
     allBrailleLines = []
-    for nsKey, value in music21Metadata.getAllNamedValues(skipContributors=True):
+    for nsKey, value in music21Metadata.getAllNamedValues():
         if value is not None:
             uniqueName: str = music21Metadata.nsKeyToUniqueName(nsKey)
             if not uniqueName:

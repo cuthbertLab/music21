@@ -433,6 +433,7 @@ class Test(unittest.TestCase):
             valueType=metadata.Contributor)
         self.checkUniqueNamedItem('orchestrator', 'humdrum:LOR',
             valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('subtitle', 'mei')
 
 # -----------------------------------------------------------------------------
 

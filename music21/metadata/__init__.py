@@ -1951,8 +1951,6 @@ class Metadata(base.Music21Object):
         item = self._getBackwardCompatibleItemNoConversion(workId)
         if item is None:
             return None
-        if isinstance(item, Contributor):
-            return item.names[0]
         return str(item)
 
     def _setBackwardCompatibleItem(self, workId: str, value: t.Any):
@@ -1974,7 +1972,7 @@ class Metadata(base.Music21Object):
 
         # return only one name of each contributor (backward compatible behavior)
         for v in values:
-            output.append(v.names[0])
+            output.append(str(v))
         return output
 
     def _setBackwardCompatibleContributorNames(self, workId: str, names: t.List[str]):

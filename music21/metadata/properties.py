@@ -1654,4 +1654,11 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         oldMusic21WorkId='orchestrator',
         valueType=Contributor,
         isContributor=True),
+
+    # The following mei property terms are not found in dcterms, marcrel, or humdrum.
+
+    PropertyDescription(
+        name='subtitle',
+        namespace='mei',
+        isContributor=False)
 )

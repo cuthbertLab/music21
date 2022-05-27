@@ -949,6 +949,11 @@ class Contributor(prebase.ProtoM21Object):
     def _reprInternal(self):
         return f'{self.role}:{self.name}'
 
+    def __str__(self):
+        if not self.name:
+            return ''
+        return self.name
+
     def __eq__(self, other) -> bool:
         if self._role != other._role:
             return False

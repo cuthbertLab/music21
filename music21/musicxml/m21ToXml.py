@@ -2296,7 +2296,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             mxCreator.text = defaults.author
 
         if self.scoreMetadata is not None:
-            copyrights: t.Tuple[metadata.Copyright] = self.scoreMetadata.get('copyright')
+            copyrights: t.Tuple[metadata.Copyright, ...] = self.scoreMetadata['copyright']
             for c in copyrights:
                 mxRights = SubElement(mxId, 'rights')
                 if c.role is not None:
@@ -2321,8 +2321,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         >>> SX = musicxml.m21ToXml.ScoreExporter()
         >>> md = metadata.Metadata()
-        >>> md.set('dateCreated', metadata.primitives.DateRelative('1689', 'onOrBefore'))
-        >>> md.set('localeOfComposition', 'Rome')
+        >>> md.date = metadata.primitives.DateRelative('1689', 'onOrBefore')
+        >>> md.localeOfComposition = 'Rome'
 
         >>> mxMisc = SX.metadataToMiscellaneous(md)
         >>> SX.dump(mxMisc)
@@ -2482,43 +2482,40 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxScoreHeader = self.xmlRoot
         mxWork = Element('work')
         # TODO: work-number
-        firstTitleFound: metadata.Text = None
-        titleText: metadata.Text = mdObj.getFirst('title')
-        if titleText is not None:
+        firstTitleFound: t.Optional[metadata.Text] = None
+        titles: t.Tuple[metadata.Text, ...] = mdObj['title']
+        if titles:
             if firstTitleFound is None:
-                firstTitleFound = titleText
+                firstTitleFound = titles[0]
             mxWorkTitle = SubElement(mxWork, 'work-title')
-            mxWorkTitle.text = str(titleText)
+            mxWorkTitle.text = str(titles[0])
         if mxWork:
             mxScoreHeader.append(mxWork)
 
-        movementNumberText: metadata.Text = mdObj.getFirst('movementNumber')
-        if movementNumberText is not None:
+        movementNumbers: t.Tuple[metadata.Text, ...] = mdObj['movementNumber']
+        if movementNumbers:
             mxMovementNumber = SubElement(mxScoreHeader, 'movement-number')
-            mxMovementNumber.text = str(movementNumberText)
+            mxMovementNumber.text = str(movementNumbers[0])
 
         # musicxml often defaults to show only movement title
         # if no movementName is found in mdObj, set movement title to
         # the mdObj's first title instead. Fall back to defaults.title if
-        # necessary, and if possible.
+        # necessary (and if possible).
 
-        mxMovementTitle = SubElement(mxScoreHeader, 'movement-title')
+        movement_title: str = ''
 
-        movementNameText: metadata.Text = mdObj.getFirst('movementName')
-        if movementNameText:
-            mxMovementTitle.text = str(movementNameText)
-        else:
-            # there is no movementName, use title instead
+        movementNames: t.Tuple[metadata.Text, ...] = mdObj['movementName']
+        if movementNames:
+            movement_title = str(movementNames[0])
+        else:  # it is none
             if firstTitleFound is not None:
-                mxMovementTitle.text = str(firstTitleFound)
+                movement_title = str(firstTitleFound)
+            elif defaults.title:
+                movement_title = defaults.title
             else:
-                # there is no movementName, use title instead
-                if firstTitleFound is not None:
-                    mxMovementTitle.text = str(firstTitleFound)
-                elif defaults.title:
-                    mxMovementTitle.text = defaults.title
-                else:
-                    return
+                return
+        mxMovementTitle = SubElement(mxScoreHeader, 'movement-title')
+        mxMovementTitle.text = movement_title
 
     def contributorToXmlCreator(self, c):
         # noinspection SpellCheckingInspection, PyShadowingNames

@@ -292,7 +292,7 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, *, transform
 
     setattr(m21El, attributeName, value)
 
-def _setMetadataItemFromTagText(m21md: metadata.Metadata, xmlEl, tag, mdUniqueName):
+def _addMetadataItemFromTagText(m21md: metadata.Metadata, xmlEl, tag, mdUniqueName):
     matchEl = xmlEl.find(tag)  # find first
     if matchEl is None:
         return
@@ -1275,17 +1275,17 @@ class MusicXMLImporter(XMLParserBase):
         else:
             md = inputM21
 
-        setm = _setMetadataItemFromTagText
+        addm = _addMetadataItemFromTagText
 
         # work
         work = el.find('work')
         if work is not None:
-            setm(md, work, 'work-title', 'title')
-            setm(md, work, 'work-number', 'number')
-            setm(md, work, 'opus', 'opusNumber')
+            addm(md, work, 'work-title', 'title')
+            addm(md, work, 'work-number', 'number')
+            addm(md, work, 'opus', 'opusNumber')
 
-        setm(md, el, 'movement-number', 'movementNumber')
-        setm(md, el, 'movement-title', 'movementName')
+        addm(md, el, 'movement-number', 'movementNumber')
+        addm(md, el, 'movement-title', 'movementName')
 
         identification = el.find('identification')
         if identification is not None:
@@ -1319,6 +1319,7 @@ class MusicXMLImporter(XMLParserBase):
             if md.isContributorUniqueName(c.role):
                 md.add(c.role, c)
             else:
+                # custom c.role, store under 'otherContributor' (a.k.a. 'marcrel:CTB')
                 md.add('otherContributor', c)
 
         for rights in identification.findall('rights'):
@@ -1344,7 +1345,9 @@ class MusicXMLImporter(XMLParserBase):
 
                 if md.isStandardKey(miscFieldName):
                     # miscFieldName is either a standard 'namespace:name',
-                    # or a standard uniqueName.
+                    # or a standard uniqueName. We currently write namespace:name,
+                    # but we used to write uniqueNames, so we need to be able to
+                    # read/interpret both.
                     md.add(miscFieldName, miscFieldValue)
                 else:
                     # non-standard miscFieldName? Add as custom metadata.
@@ -1414,6 +1417,10 @@ class MusicXMLImporter(XMLParserBase):
 
         creatorType = creator.get('type')
         if creatorType is not None:
+            # We don't check against metadata.Contributor.roleNames here.
+            # Custom roles/creatorTypes are allowed, and will be stored in
+            # the metadata with uniqueName 'otherContributor' (see code in
+            # identificationToMetadata that does this).
             c.role = creatorType
 
         creatorText = creator.text
