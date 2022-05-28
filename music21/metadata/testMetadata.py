@@ -18,19 +18,19 @@ class Test(unittest.TestCase):
         c = converter.parse(mTF.mozartTrioK581Excerpt)
         md = c.metadata
 
-        self.assertEqual(md.get('movementNumber'), (metadata.Text('3'),))
-        self.assertEqual(md.getFirst('movementName'),
-            metadata.Text('Menuetto (Excerpt from Second Trio)'))
-        self.assertEqual(md.getFirst('title'),
-            metadata.Text('Quintet for Clarinet and Strings'))
-        self.assertEqual(md.getFirst('number'), metadata.Text('K. 581'))
-        self.assertEqual(md.getFirst('composer'),
-            metadata.Contributor(role='composer', name='Wolfgang Amadeus Mozart'))
+        self.assertEqual(md['movementNumber'], (metadata.Text('3'),))
+        self.assertEqual(md['movementName'],
+            (metadata.Text('Menuetto (Excerpt from Second Trio)'),))
+        self.assertEqual(md['title'],
+            (metadata.Text('Quintet for Clarinet and Strings'),))
+        self.assertEqual(md['number'], (metadata.Text('K. 581'),))
+        self.assertEqual(md['composer'],
+            (metadata.Contributor(role='composer', name='Wolfgang Amadeus Mozart'),))
 
         c = converter.parse(mTF.binchoisMagnificat)
         md = c.metadata
-        self.assertEqual(md.getFirst('composer'),
-            metadata.Contributor(role='composer', name='Gilles Binchois'))
+        self.assertEqual(md['composer'],
+            (metadata.Contributor(role='composer', name='Gilles Binchois'),))
 
     def testMetadataLoadCorpusBackwardCompatible(self):
         from music21 import converter

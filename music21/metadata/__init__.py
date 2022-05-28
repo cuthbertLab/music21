@@ -44,19 +44,20 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 
     The guts of class Metadata are completely rewritten to support the new
     Dublin Core functionality, but all of Metadata's previous APIs are still in
-    place and are all backward compatible. There are new APIs (get, set, add
-    et al) to access the new functionality.
+    place and are all backward compatible. There are new APIs (md[], md.set,
+    md.add et al) to access the new functionality.
 
     The previous metadata implementation had a list of supported workIds, and also
     a list of standard contributor roles.  You could have more than one of each
     contributor role, but only one of each workId.
+
     In the new implementation, contributor roles are treated the same as other
     non-contributor metadata.  I have a list of supported property terms, which are
     pulled from Dublin Core (namespace = 'dcterms'), MARC Relator codes (a.k.a.
     contributor roles, namespace = 'marcrel'), and Humdrum (namespace = 'humdrum').
     Each metadata property can be specified by 'namespace:name' or by 'uniqueName'.
-    For example: md.get('marcrel:CMP') and md.get('composer') are equivalent, as
-    are md.get('dcterms:alternative') and md.get('alternativeTitle').
+    For example: md['marcrel:CMP'] and md['composer'] are equivalent, as
+    are md['dcterms:alternative'] and md['alternativeTitle'].
     You can have more than one of any such item (not just contributors). That
     implies that there must be two APIs for adding a new piece of metadata.  One
     that overwrites any existing metadata items of that name, and one that simply
@@ -274,56 +275,6 @@ class Metadata(base.Music21Object):
 
 # -----------------------------------------------------------------------------
 
-    def get(self, key: str) -> t.Tuple[t.Any, ...]:
-        '''
-`       Returns all the items stored in metadata with this key.
-        If you want only one item, call getFirst().  The returned value is
-        always a Tuple. If there are no items, an empty Tuple is returned.
-        If there is only one item, a Tuple containing that one item is returned.
-
-        The key can be the item's uniqueName or 'namespace:name'.  If it is
-        not one of the standard metadata properties, KeyError will be raised.
-`
-        >>> md = metadata.Metadata()
-        >>> md.getFirst('alternativeTitle') is None
-        True
-        >>> md.set('title', metadata.Text('Heroic Symphony'))
-        >>> md.get('title')
-        (<music21.metadata.primitives.Text Heroic Symphony>,)
-        >>> md.add('title', metadata.Text('Eroica Symphony'))
-        >>> titles = md.get('dcterms:title')
-        >>> isinstance(titles, tuple)
-        True
-        >>> len(titles)
-        2
-        >>> titles[0]
-        <music21.metadata.primitives.Text Heroic Symphony>
-        >>> titles[1]
-        <music21.metadata.primitives.Text Eroica Symphony>
-        '''
-        return self._get(key, isCustom=False)
-
-    def getFirst(self, key: str) -> t.Optional[t.Any]:
-        '''
-        Returns the first item stored in metadata with this key.
-        Never returns a list, always returns the first item or None.
-
-        The key can be the item's uniqueName or 'namespace:name'.  If it is
-        not one of the standard metadata properties, KeyError will be raised.
-
-        >>> md = metadata.Metadata()
-        >>> md.getFirst('alternativeTitle') is None # uniqueName
-        True
-        >>> md.getFirst('dcterms:alternative') is None # 'namespace:name'
-        True
-        >>> md.set('alternativeTitle', metadata.Text('Caveat Emptor'))
-        >>> md.getFirst('alternativeTitle') # uniqueName
-        <music21.metadata.primitives.Text Caveat Emptor>
-        >>> md.getFirst('dcterms:alternative') # 'namespace:name'
-        <music21.metadata.primitives.Text Caveat Emptor>
-        '''
-        return self._getFirst(key, isCustom=False)
-
     def add(self,
             key: str,
             value: t.Union[t.Any, t.Iterable[t.Any]]):
@@ -336,12 +287,12 @@ class Metadata(base.Music21Object):
 
         >>> md = metadata.Metadata()
         >>> md.add('suspectedComposer', 'Ludwig von Beethoven')
-        >>> md.get('suspectedComposer')
+        >>> md['suspectedComposer']
         (<music21.metadata.primitives.Contributor suspectedComposer:Ludwig von Beethoven>,)
 
         >>> md.add('title', [metadata.Text('Caveat Emptor', language='la'),
         ...                  metadata.Text('Buyer Beware',  language='en')])
-        >>> titles = md.get('title')
+        >>> titles = md['title']
         >>> len(titles)
         2
         >>> titles[0]
@@ -352,8 +303,6 @@ class Metadata(base.Music21Object):
         <music21.metadata.primitives.Text Buyer Beware>
         >>> titles[1].language
         'en'
-        >>> md.getFirst('title')
-        <music21.metadata.primitives.Text Caveat Emptor>
         '''
         self._add(key, value, isCustom=False)
 
@@ -369,11 +318,11 @@ class Metadata(base.Music21Object):
 
         >>> md = metadata.Metadata()
         >>> md.set('marcrel:LBT', metadata.Text('Marie Červinková-Riegrová'))
-        >>> md.get('librettist')
+        >>> md['librettist']
         (<music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>,)
         >>> md.set('librettist', [metadata.Text('Melissa Li'),
         ...                            metadata.Text('Kit Yan Win')])
-        >>> librettists = md.get('marcrel:LBT')
+        >>> librettists = md['marcrel:LBT']
         >>> isinstance(librettists, tuple)
         True
         >>> len(librettists)
@@ -388,9 +337,6 @@ class Metadata(base.Music21Object):
 
     def getCustom(self, key: str) -> t.Tuple[t.Any, ...]:
         return self._get(key, isCustom=True)
-
-    def getFirstCustom(self, key: str) -> t.Any:
-        return self._getFirst(key, isCustom=True)
 
     def addCustom(self, key: str, value: t.Union[t.Any, t.List[t.Any]]):
         self._add(key, value, isCustom=True)
@@ -690,13 +636,13 @@ class Metadata(base.Music21Object):
         >>> md.set('copyright', 'Copyright © 1984 All Rights Reserved')
         >>> md.copyright
         'Copyright © 1984 All Rights Reserved'
-        >>> md.get('dcterms:rights')
+        >>> md['dcterms:rights']
         (<music21.metadata.primitives.Copyright Copyright © 1984 All Rights Reserved>,)
         >>> md.copyright = metadata.Text('Copyright ©    1984 from Text')
         >>> md['copyright']
         (<music21.metadata.primitives.Copyright Copyright © 1984 from Text>,)
         >>> md.copyright = metadata.Copyright('Copyright © 1984 from Copyright', role='something')
-        >>> md.get('dcterms:rights')
+        >>> md['dcterms:rights']
         (<music21.metadata.primitives.Copyright Copyright © 1984 from Copyright>,)
         '''
         output: t.Optional[t.Any] = self._getBackwardCompatibleItem('copyright')
@@ -1155,8 +1101,8 @@ class Metadata(base.Music21Object):
         'Latvia'
         >>> md.countryOfComposition
         'Latvia'
-        >>> md.getFirst('countryOfComposition')
-        <music21.metadata.primitives.Text Latvia>
+        >>> md['countryOfComposition']
+        (<music21.metadata.primitives.Text Latvia>,)
 
         >>> md.setWorkId('sdf', None)
         Traceback (most recent call last):
@@ -1609,9 +1555,9 @@ class Metadata(base.Music21Object):
     def _get(self, key: str, isCustom: bool) -> t.Tuple[t.Any, ...]:
         '''
         Returns all the items stored in metadata with this key.
-        If you want only one item, call getFirst().  The returned value is
-        always a Tuple. If there are no items, an empty Tuple is returned.
-        If there is only one item, a Tuple containing that one item is returned.
+        The returned value is always a Tuple. If there are no items, an empty
+        Tuple is returned. If there is only one item, a Tuple containing that
+        one item is returned.
 
         The key can be the item's uniqueName or 'namespace:name'.  If it is
         not one of the standard metadata properties, KeyError will be raised.
@@ -1636,19 +1582,6 @@ class Metadata(base.Music21Object):
 
         # return a tuple containing contents of list
         return tuple(value)
-
-    def _getFirst(self, key: str, isCustom: bool) -> t.Optional[t.Any]:
-        '''
-        Returns the first item stored in metadata with this key.
-        Never returns a list, always returns the first item or None.
-
-        The key can be the item's uniqueName or 'namespace:name'.  If it is
-        not one of the standard metadata properties, KeyError will be raised.
-        '''
-        values: t.Tuple[t.Any, ...] = self._get(key, isCustom)
-        if values:
-            return values[0]
-        return None
 
     def _add(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]], isCustom: bool):
         '''
@@ -1837,30 +1770,6 @@ class Metadata(base.Music21Object):
         return prop.isContributor and (
             prop.oldMusic21WorkId is not None
             or prop.uniqueName == 'otherContributor')
-
-#     @staticmethod
-#     def _isBackwardCompatibleNSKey(nsKey: str) -> bool:
-#         prop: PropertyDescription = Metadata._NSKEY_TO_PROPERTYDESCRIPTION.get(nsKey, None)
-#         if prop is None:
-#             return False
-#
-#         return prop.oldMusic21WorkId is not None or prop.oldMusic21Abbrev is not None
-
-#     @staticmethod
-#     def _nsKeyToBackwardCompatibleContributorRole(nsKey: str) -> Optional[str]:
-#         prop: PropertyDescription = Metadata._NSKEY_TO_PROPERTYDESCRIPTION.get(nsKey, None)
-#         if prop is None:
-#             return None
-#         if not prop.isContributor:
-#             return None
-#
-#         # it's a small-c contributor
-#         if prop.oldMusic21WorkId:
-#             # it maps to a backward compatible big-C Contributor role, which can be
-#             # found in prop.oldMusic21WorkId.
-#             return prop.oldMusic21WorkId
-#
-#         return None
 
     @staticmethod
     def _backwardCompatibleContributorRoleToNSKey(role: str) -> str:
