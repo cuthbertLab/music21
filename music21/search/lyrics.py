@@ -371,7 +371,9 @@ class LyricSearcher:
     #     return lineBreakStart
 
     def _reSearch(self, r: re.Pattern) -> t.List[SearchMatch]:
-        locations = []
+        locations: t.List[SearchMatch] = []
+        if self._indexText is None:
+            return locations
         for m in r.finditer(self._indexText):
             absoluteFoundPos, absoluteEndPos = m.span()
             matchText = m.group(0)
