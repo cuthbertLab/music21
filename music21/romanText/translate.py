@@ -402,19 +402,19 @@ class PartTranslator:
             self.translateMeasureLineToken(lineToken)
 
         elif lineToken.isTitle():
-            md.title = lineToken.data
+            md.add('title', lineToken.data)
 
         elif lineToken.isWork():
-            md.alternativeTitle = lineToken.data
+            md.add('alternativeTitle', lineToken.data)
 
         elif lineToken.isPiece():
-            md.alternativeTitle = lineToken.data
+            md.add('alternativeTitle', lineToken.data)
 
         elif lineToken.isComposer():
-            md.composer = lineToken.data
+            md.add('composer', lineToken.data)
 
         elif lineToken.isMovement():
-            md.movementNumber = lineToken.data
+            md.add('movementNumber', lineToken.data)
 
         elif lineToken.isTimeSignature():
             try:
@@ -438,6 +438,8 @@ class PartTranslator:
                 environLocal.warn(f'Could not parse RTVersion tag: {lineToken.data!r}')
 
         elif isinstance(lineToken, rtObjects.RTTagged):
+            # We could add this to md as custom metadata:
+            # md.addCustom('romantext:' + lineToken.tag, lineToken.data)
             otherMetadata = RomanTextUnprocessedMetadata(lineToken.tag, lineToken.data)
             self.p.append(otherMetadata)
 

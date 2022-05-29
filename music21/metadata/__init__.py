@@ -44,8 +44,8 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 
     The guts of class Metadata are completely rewritten to support the new
     Dublin Core functionality, but all of Metadata's previous APIs are still in
-    place and are all backward compatible. There are new APIs (md[], md.set,
-    md.add et al) to access the new functionality.
+    place and are all backward compatible. There are new APIs (md[], md.add et
+    al) to access the new functionality.
 
     The previous metadata implementation had a list of supported workIds, and also
     a list of standard contributor roles.  You could have more than one of each

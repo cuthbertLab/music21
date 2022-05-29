@@ -2507,7 +2507,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         movementNames: t.Tuple[metadata.Text, ...] = mdObj['movementName']
         if movementNames:
             movement_title = str(movementNames[0])
-        else:  # it is none
+        else:  # there are no movementNames
             if firstTitleFound is not None:
                 movement_title = str(firstTitleFound)
             elif defaults.title:
