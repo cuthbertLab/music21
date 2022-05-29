@@ -33,8 +33,8 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 >>> p.append(m)
 >>> s.append(p)
 >>> s.insert(0, metadata.Metadata())
->>> s.metadata.set('title', 'title')
->>> s.metadata.set('composer', 'composer')
+>>> s.metadata['title'] = 'title'
+>>> s.metadata['composer'] = 'composer'
 >>> #_DOCS_SHOW s.show()
 
 .. image:: images/moduleMetadata-01.*
@@ -306,35 +306,6 @@ class Metadata(base.Music21Object):
         '''
         self._add(key, value, isCustom=False)
 
-    def set(self,
-            key: str,
-            value: t.Union[t.Any, t.Iterable[t.Any]]):
-        '''
-        Sets a single item or multiple items with this key, replacing any
-        existing items with this key.
-
-        The key can be the item's uniqueName or 'namespace:name'.  If it is
-        not one of the standard metadata properties, KeyError will be raised.
-
-        >>> md = metadata.Metadata()
-        >>> md.set('marcrel:LBT', metadata.Text('Marie Červinková-Riegrová'))
-        >>> md['librettist']
-        (<music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>,)
-        >>> md.set('librettist', [metadata.Text('Melissa Li'),
-        ...                            metadata.Text('Kit Yan Win')])
-        >>> librettists = md['marcrel:LBT']
-        >>> isinstance(librettists, tuple)
-        True
-        >>> len(librettists)
-        2
-        >>> librettists[0]
-        <music21.metadata.primitives.Contributor librettist:Melissa Li>
-        >>> librettists[1]
-        <music21.metadata.primitives.Contributor librettist:Kit Yan Win>
-        '''
-        self._set(key, value, isCustom=False)
-
-
     def getCustom(self, key: str) -> t.Tuple[t.Any, ...]:
         return self._get(key, isCustom=True)
 
@@ -590,8 +561,8 @@ class Metadata(base.Music21Object):
         Returns [] if no such backward-compatible Contributors exist.
 
         >>> md = metadata.Metadata()
-        >>> md.set('composer', ['Ludwig', 'Wolfgang'])
-        >>> md.set('librettist', 'Joe')
+        >>> md['composer'] = ['Ludwig', 'Wolfgang']
+        >>> md['librettist'] = 'Joe'
         >>> md.add('architect', 'John')      # not backward-compatible
         >>> md.add('title', 'Caveat Emptor') # not a contributor
         >>> contribs = md.contributors
@@ -622,8 +593,9 @@ class Metadata(base.Music21Object):
         Use md['copyright'] to get all the copyrights.
 
         >>> md = metadata.Metadata()
-        >>> md.copyright
-        >>> md.set('dcterms:rights', 'Copyright © 1984 All Rights Reserved')
+        >>> md.copyright is None
+        True
+        >>> md['dcterms:rights'] = 'Copyright © 1984 All Rights Reserved'
         >>> md.copyright
         'Copyright © 1984 All Rights Reserved'
         >>> md.add('dcterms:rights', 'Lyrics copyright © 1987 All Rights Reserved')
@@ -633,7 +605,7 @@ class Metadata(base.Music21Object):
         >>> md = metadata.Metadata()
         >>> md.copyright is None
         True
-        >>> md.set('copyright', 'Copyright © 1984 All Rights Reserved')
+        >>> md['copyright'] = 'Copyright © 1984 All Rights Reserved'
         >>> md.copyright
         'Copyright © 1984 All Rights Reserved'
         >>> md['dcterms:rights']
@@ -645,17 +617,7 @@ class Metadata(base.Music21Object):
         >>> md['dcterms:rights']
         (<music21.metadata.primitives.Copyright Copyright © 1984 from Copyright>,)
         '''
-        output: t.Optional[t.Any] = self._getBackwardCompatibleItem('copyright')
-        return output
-
-    @copyright.setter
-    def copyright(self, newCopyright: t.Optional[t.Union[str, Text, Copyright]]):
-        '''
-        Sets the Copyright in a backward-compatible way (i.e. it removes all
-        previous Copyright metadata items). newCopyright can be None or a
-        Copyright object (or str/Text, which we convert internally to Copyright)
-        '''
-        self._setBackwardCompatibleItem('copyright', newCopyright)
+        return self.__getattr__('copyright')
 
     # SPECIAL METHODS #
     def all(self, skipContributors=False):
@@ -719,6 +681,14 @@ class Metadata(base.Music21Object):
 
         return list(sorted(allOut.items()))
 
+    def _getAttributeByNSKey(self, nsKey: str) -> t.Optional[str]:
+        values: t.Tuple[t.Any, ...] = self._get(nsKey, isCustom=False)
+        if not values:
+            return None
+        if len(values) == 1:
+            return str(values[0])
+        return 'MULTIPLE'
+
     def __getattr__(self, name):
         '''
         Utility attribute access for all uniqueNames, grandfathered workIds,
@@ -734,44 +704,109 @@ class Metadata(base.Music21Object):
         or grandfathered workId abbreviation), then AttributeError is raised.
 
         >>> md = metadata.Metadata()
-        >>> md.set('description', metadata.Text('A fun score!', language='en'))
+        >>> md.description = metadata.Text('A uniqueName description', language='en')
+        >>> md.dedication = 'A workId that is not a uniqueName'
+        >>> md.otl = metadata.Text('A workId abbreviation')
         >>> md.description
-        'A fun score!'
-        >>> md.add('description', 'Also a great tune')
+        'A uniqueName description'
+        >>> md.dedicatedTo  # the uniqueName for 'dedicated' workId
+        'A workId that is not a uniqueName'
+        >>> md.title  # the workId/uniqueName for 'otl' abbreviation
+        'A workId abbreviation'
+        >>> md.add('description', 'uniqueName description #2')
         >>> md.description
         'MULTIPLE'
         '''
-        # Look by uniqueName
+        # Is name a uniqueName?
         if name in self._UNIQUENAME_TO_NSKEY:
-            nsKey: str = self._UNIQUENAME_TO_NSKEY[name]
-            values: t.Tuple[t.Any, ...] = self._get(nsKey, isCustom=False)
-            if not values:
-                return None
-            if len(values) == 1:
-                return str(values[0])
-            return 'MULTIPLE'
+            return self._getAttributeByNSKey(self._UNIQUENAME_TO_NSKEY[name])
 
-        # Look by grandfathered workId.
+        # Is name a grandfathered workId?
         if name in self._M21WORKID_TO_NSKEY:
-            nsKey: str = self._M21WORKID_TO_NSKEY[name]
-            values: t.Tuple[t.Any, ...] = self._get(nsKey, isCustom=False)
-            if not values:
-                return None
-            if len(values) == 1:
-                return str(values[0])
-            return 'MULTIPLE'
+            return self._getAttributeByNSKey(self._M21WORKID_TO_NSKEY[name])
 
-        # Look by grandfathered workId abbreviation.
+        # Is name a grandfathered workId abbreviation?
         if name in self._M21ABBREV_TO_NSKEY:
-            nsKey: str = self._M21ABBREV_TO_NSKEY[name]
-            values: t.Tuple[t.Any, ...] = self._get(nsKey, isCustom=False)
-            if not values:
-                return None
-            if len(values) == 1:
-                return str(values[0])
-            return 'MULTIPLE'
+            return self._getAttributeByNSKey(self._M21ABBREV_TO_NSKEY[name])
 
         raise AttributeError(f'object has no attribute: {name}')
+
+    def __setattr__(self, name: str, value: t.Any):
+        '''
+        Utility attribute setter for all uniqueNames, grandfathered workIds,
+        and grandfathered workId abbreviations.
+
+        These can take any single value, and will convert to the appropriate
+        internal valueType.  They will raise ValueError for iterables (other
+        than str).
+        '''
+
+        # Implementation note: __setattr__ has a very different role from
+        # __getattr__.  __getattr__ is the call of last resort after looking
+        # for bare attributes and property methods, so __getattr__ won't be
+        # called for self.software (bare attribute), or for self.composer
+        # (property).  __setattr__, on the other hand, is the _only_ call
+        # you will get.  So after checking for uniqueNames, workIds, and
+        # workId abbreviations, if we haven't done the job yet, we need to
+        # make a call to super().__setattr__ to handle all the bare attributes.
+        # Unfortunately, that doesn't handle property.setters at all, so any
+        # property.setters have to be removed, and handled explicitly here.
+
+        # Is name a uniqueName?
+        if name in self._UNIQUENAME_TO_NSKEY:
+            if (value is not None
+                    and isinstance(value, t.Iterable)
+                    and not isinstance(value, str)):
+                raise ValueError(f'md.{name} can only be set to a single value; '
+                                 f'set md[{name}] to multiple values instead.')
+            self._set(self._UNIQUENAME_TO_NSKEY[name], value, isCustom=False)
+            return
+
+        # Is name a grandfathered workId?
+        if name in self._M21WORKID_TO_NSKEY:
+            if (value is not None
+                    and isinstance(value, t.Iterable)
+                    and not isinstance(value, str)):
+                raise ValueError(f'md.{name} can only be set to a single value; '
+                                 f'set md[{name}] to multiple values instead.')
+            self._set(self._M21WORKID_TO_NSKEY[name], value, isCustom=False)
+            return
+
+        # Is name a grandfathered workId abbreviation?
+        if name in self._M21ABBREV_TO_NSKEY:
+            if (value is not None
+                    and isinstance(value, t.Iterable)
+                    and not isinstance(value, str)):
+                raise ValueError(f'md.{name} can only be set to a single value; '
+                                 f'set md[{name}] to multiple values instead.')
+            self._set(self._M21ABBREV_TO_NSKEY[name], value, isCustom=False)
+            return
+
+        # Is name one of the non-uniqueName property.setters (i.e the three
+        # plural contributors, and the three new fileInfo setters)?
+        if name in ('composers', 'librettists', 'lyricists'):
+            uniqueName = name[:-1]  # remove the trailing 's'
+            # check that value is t.Iterable (and not str)
+            if not isinstance(value, t.Iterable) or isinstance(value, str):
+                raise ValueError(f'md.{name} can only be set to multiple values.')
+            self._set(uniqueName, value, isCustom=False)
+            return
+
+        if name == 'fileFormat':
+            self.fileInfo.format = Text(value)
+            return
+
+        if name == 'filePath':
+            self.fileInfo.path = Text(value)
+            return
+
+        if name == 'fileNumber':
+            self.fileInfo.number = value
+            return
+
+        # OK, we've covered everything we know; fall back to setting bare
+        # attributes (including the ones in base classes).
+        super().__setattr__(name, value)
 
     def __getitem__(self, key: str) -> t.Tuple[t.Any, ...]:
         '''
@@ -784,7 +819,7 @@ class Metadata(base.Music21Object):
         then KeyError is raised.
 
         >>> md = metadata.Metadata()
-        >>> md.set('description', metadata.Text('A fun score!', language='en'))
+        >>> md['description'] = metadata.Text('A fun score!', language='en')
         >>> descs = md['description']
         >>> descs
         (<music21.metadata.primitives.Text A fun score!>,)
@@ -807,6 +842,29 @@ class Metadata(base.Music21Object):
             raise KeyError('metadata key must be str')
 
         return self._get(key, isCustom=False)
+
+    def __setitem__(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]]):
+        if not isinstance(key, str):
+            raise KeyError('metadata key must be str')
+
+        # Is key a uniqueName?
+        if key in self._UNIQUENAME_TO_NSKEY:
+            self._set(self._UNIQUENAME_TO_NSKEY[key], value, isCustom=False)
+            return
+
+        # Is key an nsKey ('namespace:name')?
+        if key in self._NSKEY_TO_PROPERTYDESCRIPTION:
+            self._set(key, value, isCustom=False)
+
+        # Is key a grandfathered workId?
+        if key in self._M21WORKID_TO_NSKEY:
+            self._set(self._M21WORKID_TO_NSKEY[key], value, isCustom=False)
+            return
+
+        # Is key a grandfathered workId abbreviation?
+        if key in self._M21ABBREV_TO_NSKEY:
+            self._set(self._M21ABBREV_TO_NSKEY[key], value, isCustom=False)
+            return
 
     # PUBLIC METHODS #
 
@@ -1162,11 +1220,7 @@ class Metadata(base.Music21Object):
         >>> md.alternativeTitle
         'Heroic Symphony'
         '''
-        return self._getBackwardCompatibleItem('alternativeTitle')
-
-    @alternativeTitle.setter
-    def alternativeTitle(self, value):
-        self._setBackwardCompatibleItem('alternativeTitle', Text(value))
+        return self.__getattr__('alternativeTitle')
 
     @property
     def composer(self):
@@ -1190,11 +1244,7 @@ class Metadata(base.Music21Object):
         >>> md.composer
         'MULTIPLE'
         '''
-        return self._getBackwardCompatibleItem('composer')
-
-    @composer.setter
-    def composer(self, value):
-        self._setBackwardCompatibleItem('composer', value)
+        return self.__getattr__('composer')
 
     @property
     def composers(self) -> t.List[str]:
@@ -1226,11 +1276,6 @@ class Metadata(base.Music21Object):
         '''
         return self._getBackwardCompatibleContributorNames('composer')
 
-    @composers.setter
-    def composers(self, value: t.List[str]) -> None:
-        self._setBackwardCompatibleContributorNames('composer', value)
-
-
     @property
     def date(self):
         r'''
@@ -1255,11 +1300,7 @@ class Metadata(base.Music21Object):
         >>> md.date
         '1803/01/01 to 1805/04/07'
         '''
-        return self._getBackwardCompatibleItem('date')
-
-    @date.setter
-    def date(self, value):
-        self._setBackwardCompatibleItem('date', value)
+        return self.__getattr__('date')
 
     @property
     def fileFormat(self) -> t.Optional[str]:
@@ -1269,10 +1310,6 @@ class Metadata(base.Music21Object):
         if self.fileInfo.format:
             return str(self.fileInfo.format)
 
-    @fileFormat.setter
-    def fileFormat(self, value: t.Union[str, Text]) -> None:
-        self.fileInfo.format = Text(value)
-
     @property
     def filePath(self) -> t.Optional[str]:
         '''
@@ -1281,10 +1318,6 @@ class Metadata(base.Music21Object):
         if self.fileInfo.path:
             return str(self.fileInfo.path)
 
-    @filePath.setter
-    def filePath(self, value: t.Union[str, Text]) -> None:
-        self.fileInfo.path = Text(value)
-
     @property
     def fileNumber(self) -> t.Optional[int]:
         '''
@@ -1292,10 +1325,6 @@ class Metadata(base.Music21Object):
         '''
         if self.fileInfo.number:
             return self.fileInfo.number
-
-    @fileNumber.setter
-    def fileNumber(self, value: t.Union[int, None]) -> None:
-        self.fileInfo.number = value
 
     @property
     def localeOfComposition(self):
@@ -1307,11 +1336,7 @@ class Metadata(base.Music21Object):
         >>> md.localeOfComposition
         'Paris, France'
         '''
-        return self._getBackwardCompatibleItem('localeOfComposition')
-
-    @localeOfComposition.setter
-    def localeOfComposition(self, value):
-        self._setBackwardCompatibleItem('localeOfComposition', Text(value))
+        return self.__getattr__('localeOfComposition')
 
     @property
     def librettist(self):
@@ -1327,11 +1352,7 @@ class Metadata(base.Music21Object):
         librettists should be distinguished from lyricists etc., but sometimes
         the line is not 100% clear.
         '''
-        return self._getBackwardCompatibleItem('librettist')
-
-    @librettist.setter
-    def librettist(self, value):
-        self._setBackwardCompatibleItem('librettist', value)
+        return self.__getattr__('librettist')
 
     @property
     def librettists(self) -> t.List[str]:
@@ -1346,10 +1367,6 @@ class Metadata(base.Music21Object):
         Should be distinguished from lyricists etc.
         '''
         return self._getBackwardCompatibleContributorNames('librettist')
-
-    @librettists.setter
-    def librettists(self, value: t.List[str]) -> None:
-        self._setBackwardCompatibleContributorNames('librettist', value)
 
     @property
     def lyricist(self):
@@ -1368,11 +1385,7 @@ class Metadata(base.Music21Object):
         >>> md.lyricist
         'Sondheim, Stephen'
         '''
-        return self._getBackwardCompatibleItem('lyricist')
-
-    @lyricist.setter
-    def lyricist(self, value):
-        self._setBackwardCompatibleItem('lyricist', value)
+        return self.__getattr__('lyricist')
 
     @property
     def lyricists(self) -> t.List[str]:
@@ -1388,11 +1401,6 @@ class Metadata(base.Music21Object):
         '''
         return self._getBackwardCompatibleContributorNames('lyricist')
 
-    @lyricists.setter
-    def lyricists(self, value: t.List[str]) -> None:
-        self._setBackwardCompatibleContributorNames('lyricist', value)
-
-
     @property
     def movementName(self):
         r'''
@@ -1407,11 +1415,7 @@ class Metadata(base.Music21Object):
         the piece title as the movement title. For instance, the Bach
         Chorales, since they are technically movements of larger cantatas.
         '''
-        return self._getBackwardCompatibleItem('movementName')
-
-    @movementName.setter
-    def movementName(self, value):
-        self._setBackwardCompatibleItem('movementName', Text(value))
+        return self.__getattr__('movementName')
 
     @property
     def movementNumber(self) -> t.Optional[str]:
@@ -1427,11 +1431,7 @@ class Metadata(base.Music21Object):
         >>> md.movementNumber
         '3'
         '''
-        return self._getBackwardCompatibleItem('movementNumber')
-
-    @movementNumber.setter
-    def movementNumber(self, value):
-        self._setBackwardCompatibleItem('movementNumber', Text(value))
+        return self.__getattr__('movementNumber')
 
     @property
     def number(self):
@@ -1448,11 +1448,7 @@ class Metadata(base.Music21Object):
         >>> md.number
         '4'
         '''
-        return self._getBackwardCompatibleItem('number')
-
-    @number.setter
-    def number(self, value):
-        self._setBackwardCompatibleItem('number', Text(value))
+        return self.__getattr__('number')
 
     @property
     def opusNumber(self):
@@ -1467,11 +1463,7 @@ class Metadata(base.Music21Object):
         >>> md.opusNumber
         '56'
         '''
-        return self._getBackwardCompatibleItem('opusNumber')
-
-    @opusNumber.setter
-    def opusNumber(self, value):
-        self._setBackwardCompatibleItem('opusNumber', Text(value))
+        return self.__getattr__('opusNumber')
 
     @property
     def title(self):
@@ -1513,10 +1505,6 @@ class Metadata(base.Music21Object):
                 # get a string from this Text object
                 # get with normalized articles
                 return result.getNormalizedArticle()
-
-    @title.setter
-    def title(self, value):
-        self._setBackwardCompatibleItem('title', Text(value))
 
 # -----------------------------------------------------------------------------
 # Internal support routines (many of them static).
@@ -1626,6 +1614,22 @@ class Metadata(base.Music21Object):
 
         The key can be the item's uniqueName or 'namespace:name'.  If it is
         not one of the standard metadata properties, KeyError will be raised.
+
+        >>> md = metadata.Metadata()
+        >>> md._set('marcrel:LBT', metadata.Text('Marie Červinková-Riegrová'), isCustom=False)
+        >>> md['librettist']
+        (<music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>,)
+        >>> md._set('librettist', [metadata.Text('Melissa Li'),
+        ...                            metadata.Text('Kit Yan Win')], isCustom=False)
+        >>> librettists = md['marcrel:LBT']
+        >>> isinstance(librettists, tuple)
+        True
+        >>> len(librettists)
+        2
+        >>> librettists[0]
+        <music21.metadata.primitives.Contributor librettist:Melissa Li>
+        >>> librettists[1]
+        <music21.metadata.primitives.Contributor librettist:Kit Yan Win>
         '''
         if not isCustom:
             if self._isStandardUniqueName(key):
@@ -1855,12 +1859,6 @@ class Metadata(base.Music21Object):
         if len(result) == 1:
             return result[0]
         return 'MULTIPLE'
-
-    def _getBackwardCompatibleItem(self, workId: str) -> t.Optional[str]:
-        item = self._getBackwardCompatibleItemNoConversion(workId)
-        if item is None:
-            return None
-        return str(item)
 
     def _setBackwardCompatibleItem(self, workId: str, value: t.Any):
         nsKey: str = Metadata._M21WORKID_TO_NSKEY.get(workId, None)
