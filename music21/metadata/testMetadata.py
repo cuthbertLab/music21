@@ -131,16 +131,16 @@ class Test(unittest.TestCase):
         self.assertEqual(
             score.metadata.search(
                 'quod',
-                field='title',
+                field='movementName',
             ),
-            (True, 'title'),
+            (True, 'movementName'),
         )
         self.assertEqual(
             score.metadata.search(
                 'qu.d',
-                field='title',
+                field='movementName',
             ),
-            (True, 'title'),
+            (True, 'movementName'),
         )
         self.assertEqual(
             score.metadata.search(
@@ -158,6 +158,14 @@ class Test(unittest.TestCase):
         richMetadata.update(score)
         self.assertEqual(richMetadata.noteCount, 165)
         self.assertEqual(richMetadata.quarterLength, 36.0)
+
+    def testVariousLists(self):
+        md = metadata.Metadata()
+        allWorkIds1 = sorted(list(md.workIdAbbreviationDict.values())
+                                + list(metadata.Contributor.roleAbbreviationsDict.values())
+                                + ['copyright', 'date'])
+        allWorkIds2 = sorted(metadata.properties.ALL_M21WORKIDS)
+        self.assertEqual(allWorkIds1, allWorkIds2)
 
     def checkUniqueNamedItem(
             self,

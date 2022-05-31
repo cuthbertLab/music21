@@ -1662,3 +1662,61 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         namespace='mei',
         isContributor=False)
 )
+
+# -----------------------------------------------------------------------------
+# Dictionaries generated from STANDARD_PROPERTY_DESCRIPTIONS for looking up
+# various things quickly.
+
+NSKEY_TO_PROPERTYDESCRIPTION: dict = {
+    f'{x.namespace}:{x.name}':
+        x for x in STANDARD_PROPERTY_DESCRIPTIONS}
+
+NSKEY_TO_VALUETYPE: dict = {
+    f'{x.namespace}:{x.name}':
+        x.valueType for x in STANDARD_PROPERTY_DESCRIPTIONS}
+
+NSKEY_TO_CONTRIBUTORUNIQUENAME: dict = {
+    f'{x.namespace}:{x.name}':
+        x.uniqueName if x.uniqueName
+        else x.oldMusic21WorkId if x.oldMusic21WorkId
+        else x.name
+        for x in STANDARD_PROPERTY_DESCRIPTIONS if x.isContributor}
+
+NSKEY_TO_UNIQUENAME: dict = {
+    f'{x.namespace}:{x.name}':
+        x.uniqueName if x.uniqueName
+        else x.oldMusic21WorkId if x.oldMusic21WorkId
+        else x.name
+        for x in STANDARD_PROPERTY_DESCRIPTIONS}
+
+UNIQUENAME_TO_NSKEY: dict = {
+    x.uniqueName if x.uniqueName
+    else x.oldMusic21WorkId if x.oldMusic21WorkId
+    else x.name:
+        f'{x.namespace}:{x.name}'
+        for x in STANDARD_PROPERTY_DESCRIPTIONS}
+
+UNIQUENAME_TO_PROPERTYDESCRIPTION: dict = {
+    x.uniqueName if x.uniqueName
+    else x.oldMusic21WorkId if x.oldMusic21WorkId
+    else x.name:
+        x for x in STANDARD_PROPERTY_DESCRIPTIONS}
+
+M21ABBREV_TO_NSKEY: dict = {
+    x.oldMusic21Abbrev if x.oldMusic21Abbrev
+    else None:
+        f'{x.namespace}:{x.name}'
+        for x in STANDARD_PROPERTY_DESCRIPTIONS
+        if x.oldMusic21Abbrev}
+
+M21WORKID_TO_NSKEY: dict = {
+    x.oldMusic21WorkId if x.oldMusic21WorkId
+    else None:
+        f'{x.namespace}:{x.name}'
+        for x in STANDARD_PROPERTY_DESCRIPTIONS
+        if x.oldMusic21WorkId}
+
+ALL_UNIQUENAMES: list = list(UNIQUENAME_TO_NSKEY.keys())
+ALL_M21WORKIDS: list = list(M21WORKID_TO_NSKEY.keys())
+ALL_M21ABBREVS: list = list(M21ABBREV_TO_NSKEY.keys())
+ALL_NSKEYS: list = list(NSKEY_TO_PROPERTYDESCRIPTION.keys())
