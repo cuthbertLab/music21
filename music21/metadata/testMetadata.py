@@ -159,14 +159,6 @@ class Test(unittest.TestCase):
         self.assertEqual(richMetadata.noteCount, 165)
         self.assertEqual(richMetadata.quarterLength, 36.0)
 
-    def testVariousLists(self):
-        md = metadata.Metadata()
-        allWorkIds1 = sorted(list(md.workIdAbbreviationDict.values())
-                                + list(metadata.Contributor.roleAbbreviationsDict.values())
-                                + ['copyright', 'date'])
-        allWorkIds2 = sorted(metadata.properties.ALL_M21WORKIDS)
-        self.assertEqual(allWorkIds1, allWorkIds2)
-
     def checkUniqueNamedItem(
             self,
             uniqueName: str,

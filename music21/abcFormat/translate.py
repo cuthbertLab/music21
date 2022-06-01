@@ -420,7 +420,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
                 # environLocal.printDebug(['got locale of composition', t.data])
 
             elif t.isReferenceNumber():
-                md.add('number', t.data)
+                md.add('number', int(t.data))
                 # environLocal.printDebug(['got work number', t.data])
 
     partHandlers = []
