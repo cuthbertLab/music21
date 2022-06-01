@@ -568,7 +568,7 @@ class Metadata(base.Music21Object):
         return output
 
     @property
-    def copyright(self) -> t.Optional[str]:
+    def copyright(self):
         '''
         Returns the copyright as a str.
         Returns None if no copyright exists in the metadata.
@@ -600,7 +600,7 @@ class Metadata(base.Music21Object):
         >>> md['dcterms:rights']
         (<music21.metadata.primitives.Copyright Copyright © 1984 from Copyright>,)
         '''
-        return self.__getattr__('copyright')
+        return self._getSingularAttribute('copyright')
 
     # SPECIAL METHODS #
     def all(self, skipContributors=False):
@@ -735,6 +735,20 @@ class Metadata(base.Music21Object):
 
         raise AttributeError(f'invalid attributeName: {attributeName}')
 
+    def _getSingularAttribute(self, attributeName: str) -> t.Optional[t.Union[str, int]]:
+        if attributeName in properties.UNIQUENAME_TO_NSKEY:
+            return self._getSimpleValueByNSKey(properties.UNIQUENAME_TO_NSKEY[attributeName])
+
+        # Is name a grandfathered workId?
+        if attributeName in properties.M21WORKID_TO_NSKEY:
+            return self._getSimpleValueByNSKey(properties.M21WORKID_TO_NSKEY[attributeName])
+
+        # Is name a grandfathered workId abbreviation?
+        if attributeName in properties.M21ABBREV_TO_NSKEY:
+            return self._getSimpleValueByNSKey(properties.M21ABBREV_TO_NSKEY[attributeName])
+
+        raise AttributeError(f'object has no attribute: {attributeName}')
+
     def __getattr__(self, name):
         '''
         Utility attribute access for all uniqueNames, grandfathered workIds,
@@ -772,20 +786,7 @@ class Metadata(base.Music21Object):
         # or .fileFormat/filePath/fileNumber here, like we do in __setattr__
         # (which is the only call you get if you implement it, so it has
         # to handle everything).
-
-        # Is name a uniqueName?
-        if name in properties.UNIQUENAME_TO_NSKEY:
-            return self._getSimpleValueByNSKey(properties.UNIQUENAME_TO_NSKEY[name])
-
-        # Is name a grandfathered workId?
-        if name in properties.M21WORKID_TO_NSKEY:
-            return self._getSimpleValueByNSKey(properties.M21WORKID_TO_NSKEY[name])
-
-        # Is name a grandfathered workId abbreviation?
-        if name in properties.M21ABBREV_TO_NSKEY:
-            return self._getSimpleValueByNSKey(properties.M21ABBREV_TO_NSKEY[name])
-
-        raise AttributeError(f'object has no attribute: {name}')
+        return self._getSingularAttribute(name)
 
     def __setattr__(self, name: str, value: t.Any):
         '''
@@ -1163,7 +1164,7 @@ class Metadata(base.Music21Object):
         >>> md.alternativeTitle
         'Heroic Symphony'
         '''
-        return self.__getattr__('alternativeTitle')
+        return self._getSingularAttribute('alternativeTitle')
 
     @property
     def composer(self):
@@ -1187,7 +1188,7 @@ class Metadata(base.Music21Object):
         >>> md.composer
         'MULTIPLE'
         '''
-        return self.__getattr__('composer')
+        return self._getSingularAttribute('composer')
 
     @property
     def composers(self):
@@ -1243,7 +1244,7 @@ class Metadata(base.Music21Object):
         >>> md.date
         '1803/01/01 to 1805/04/07'
         '''
-        return self.__getattr__('date')
+        return self._getSingularAttribute('date')
 
     @property
     def fileFormat(self) -> t.Optional[str]:
@@ -1279,7 +1280,7 @@ class Metadata(base.Music21Object):
         >>> md.localeOfComposition
         'Paris, France'
         '''
-        return self.__getattr__('localeOfComposition')
+        return self._getSingularAttribute('localeOfComposition')
 
     @property
     def librettist(self):
@@ -1295,7 +1296,7 @@ class Metadata(base.Music21Object):
         librettists should be distinguished from lyricists etc., but sometimes
         the line is not 100% clear.
         '''
-        return self.__getattr__('librettist')
+        return self._getSingularAttribute('librettist')
 
     @property
     def librettists(self):
@@ -1328,7 +1329,7 @@ class Metadata(base.Music21Object):
         >>> md.lyricist
         'Sondheim, Stephen'
         '''
-        return self.__getattr__('lyricist')
+        return self._getSingularAttribute('lyricist')
 
     @property
     def lyricists(self):
@@ -1358,10 +1359,10 @@ class Metadata(base.Music21Object):
         the piece title as the movement title. For instance, the Bach
         Chorales, since they are technically movements of larger cantatas.
         '''
-        return self.__getattr__('movementName')
+        return self._getSingularAttribute('movementName')
 
     @property
-    def movementNumber(self) -> t.Optional[str]:
+    def movementNumber(self):
         r'''
         Get or set the movement number.
 
@@ -1374,7 +1375,7 @@ class Metadata(base.Music21Object):
         >>> md.movementNumber
         '3'
         '''
-        return self.__getattr__('movementNumber')
+        return self._getSingularAttribute('movementNumber')
 
     @property
     def number(self):
@@ -1391,7 +1392,7 @@ class Metadata(base.Music21Object):
         >>> md.number
         '4'
         '''
-        return self.__getattr__('number')
+        return self._getSingularAttribute('number')
 
     @property
     def opusNumber(self):
@@ -1406,7 +1407,7 @@ class Metadata(base.Music21Object):
         >>> md.opusNumber
         '56'
         '''
-        return self.__getattr__('opusNumber')
+        return self._getSingularAttribute('opusNumber')
 
     @property
     def title(self):
