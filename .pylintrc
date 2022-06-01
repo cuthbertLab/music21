@@ -99,6 +99,7 @@ disable=
     raise-missing-from,  # want to do this eventually, but adding 1000 msgs not helpful
     consider-using-f-string,  # future?
     unnecessary-lambda-assignment,  # opinionated
+    consider-using-generator,  # generators are less performant for small container sizes, like most of ours
 
 #       'protected-access', # this is an important one, but for now we do a lot of
 #                           # x = copy.deepcopy(self); x._volume = ... which is not a problem...
