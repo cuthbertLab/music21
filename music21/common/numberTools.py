@@ -37,8 +37,7 @@ __all__ = [
     'dotMultiplier', 'decimalToTuplet',
     'unitNormalizeProportion', 'unitBoundaryProportion',
     'weightedSelection',
-    'euclidGCD', 'approximateGCD',
-    'lcm',
+    'approximateGCD',
 
     'contiguousList',
 
@@ -197,10 +196,12 @@ def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
 
     (n.b. -- nothing printed)
     '''
-    nOrg = n
-    dOrg = d
+    # TODO: when Python 3.9 is the minimum version, replace lru_cache with simply cache,
+    #     which is the same speed as lru_cache(None) (it simply calls it)
     if d <= DENOM_LIMIT:  # faster than hard-coding 65535
         return (n, d)
+    nOrg = n
+    dOrg = d
     p0, q0, p1, q1 = 0, 1, 1, 0
     while True:
         a = n // d
@@ -215,7 +216,6 @@ def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
     bound1d = q0 + k * q1
     bound2n = p1
     bound2d = q1
-    # s = (0.0 + n)/d
     bound1minusS = (abs((bound1n * dOrg) - (nOrg * bound1d)), (dOrg * bound1d))
     bound2minusS = (abs((bound2n * dOrg) - (nOrg * bound2d)), (dOrg * bound2d))
     difference = (bound1minusS[0] * bound2minusS[1]) - (bound2minusS[0] * bound1minusS[1])
@@ -641,9 +641,9 @@ def decimalToTuplet(decNum: float) -> t.Tuple[int, int]:
         raise Exception('No such luck')
 
     jy *= multiplier
-    gcd = euclidGCD(int(jy), int(iy))
-    jy = jy / gcd
-    iy = iy / gcd
+    my_gcd = gcd(int(jy), int(iy))
+    jy = jy / my_gcd
+    iy = iy / my_gcd
 
     if flipNumerator is False:
         return (int(jy), int(iy))
@@ -742,16 +742,20 @@ def weightedSelection(values: t.List[int],
     return values[index]
 
 
+@deprecated('v8', 'v9', 'use math.gcd(a, b) instead.')
 def euclidGCD(a: int, b: int) -> int:
     '''
     use Euclid's algorithm to find the GCD of a and b
 
+    ```
     >>> common.euclidGCD(2, 4)
     2
     >>> common.euclidGCD(20, 8)
     4
     >>> common.euclidGCD(20, 16)
     4
+    ```
+
     '''
     if b == 0:
         return a
@@ -826,10 +830,12 @@ def approximateGCD(values: t.List[t.Union[int, float]], grain: float = 1e-4) -> 
     return max(commonUniqueDivisions)
 
 
+@deprecated('v8', 'v9', 'Use math.lcm(*filterList) instead.')
 def lcm(filterList: t.Iterable[int]) -> int:
     '''
     Find the least common multiple of a list of values
 
+    ```
     >>> common.lcm([3, 4, 5])
     60
     >>> common.lcm([3, 4])
@@ -838,12 +844,16 @@ def lcm(filterList: t.Iterable[int]) -> int:
     2
     >>> common.lcm([3, 6])
     6
+    ```
 
     Works with any iterable, like this set
 
+    ```
     >>> common.lcm({3, 5, 6})
     30
+    ```
 
+    Deprecated in v8 since math.lcm works in C and is faster
     '''
     def _lcm(a, b):
         '''find the least common multiple of a, b'''
