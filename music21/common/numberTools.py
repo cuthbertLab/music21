@@ -233,8 +233,8 @@ def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
 # 2048th notes + 1-2 dots was half the speed
 
 _KNOWN_PASSES = frozenset([
- 0.0625, 0.09375, 0.125, 0.1875,
- 0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0
+    0.0625, 0.09375, 0.125, 0.1875,
+    0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0
 ])
 
 # no type checking due to accessing protected attributes (for speed)
