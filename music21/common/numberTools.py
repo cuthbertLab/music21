@@ -146,7 +146,7 @@ def numToIntOrFloat(value: t.Union[int, float]) -> t.Union[int, float]:
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
-@lru_cache(1024)
+@lru_cache(None)
 def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
     # noinspection PyShadowingNames
     '''
@@ -197,6 +197,8 @@ def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
 
     (n.b. -- nothing printed)
     '''
+    # TODO: when Python 3.9 is the minimum version, replace lru_cache with simply cache,
+    #     which is the same speed as lru_cache(None) (it simply calls it)
     nOrg = n
     dOrg = d
     if d <= DENOM_LIMIT:  # faster than hard-coding 65535
@@ -225,6 +227,15 @@ def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
     else:
         return (p0 + k * p1, q0 + k * q1)
 
+
+# _KNOWN_PASSES is all values from whole to 64th notes with 0 or 1 dot
+# the length of this set does determine the time to search.  A set with all values from maxima to
+# 2048th notes + 1-2 dots was half the speed
+
+_KNOWN_PASSES = frozenset([
+ 0.0625, 0.09375, 0.125, 0.1875,
+ 0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0
+])
 
 # no type checking due to accessing protected attributes (for speed)
 @t.no_type_check
@@ -271,6 +282,14 @@ def opFrac(num: t.Union[OffsetQLIn, None]) -> t.Union[OffsetQL, None]:
     # This is a performance critical operation, tuned to go as fast as possible.
     # hence redundancy -- first we check for type (no inheritance) and then we
     # repeat exact same test with inheritance.
+    #
+    # Cannot use functools's Caching mechanisms on this because then it will
+    # return the same Fraction object for all calls, which is a problem in case
+    # anyone sets ._numeration or ._denominator directly on that object.
+    #
+    if num in _KNOWN_PASSES:
+        return num + 0.0   # need the add, because ints and Fractions satisfy the "in"
+
     # Note that the later examples are more verbose
     numType = type(num)
     if numType is float:
@@ -283,6 +302,7 @@ def opFrac(num: t.Union[OffsetQLIn, None]) -> t.Union[OffsetQL, None]:
         # unused_numerator, denominator = num.as_integer_ratio()  # too slow
         ir = num.as_integer_ratio()
         if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
+            # _preFracLimitDenominator uses a cache
             return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
             # return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
             # internally in Fraction constructor, but is twice as fast...
@@ -299,7 +319,7 @@ def opFrac(num: t.Union[OffsetQLIn, None]) -> t.Union[OffsetQL, None]:
     elif num is None:
         return None
 
-    # class inheritance only check AFTER ifs... this is redundant but highly optimized.
+    # class inheritance only check AFTER "type is" checks... this is redundant but highly optimized.
     elif isinstance(num, int):
         return num + 0.0
     elif isinstance(num, float):
@@ -310,9 +330,9 @@ def opFrac(num: t.Union[OffsetQLIn, None]) -> t.Union[OffsetQL, None]:
             return num
 
     elif isinstance(num, Fraction):
-        d = num._denominator  # private access instead of property: 6x faster; may break later...
+        d = num.denominator  # Use properties since it is a subclass
         if (d & (d - 1)) == 0:  # power of two...
-            return num._numerator / (d + 0.0)  # 50% faster than float(num)
+            return num.numerator / (d + 0.0)  # 50% faster than float(num)
         else:
             return num  # leave fraction alone
     else:
