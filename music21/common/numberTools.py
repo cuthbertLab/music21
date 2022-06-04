@@ -218,14 +218,16 @@ def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
     bound2n = p1
     bound2d = q1
     # s = (0.0 + n)/d
-    bound1minusS = (abs((bound1n * dOrg) - (nOrg * bound1d)), (dOrg * bound1d))
-    bound2minusS = (abs((bound2n * dOrg) - (nOrg * bound2d)), (dOrg * bound2d))
-    difference = (bound1minusS[0] * bound2minusS[1]) - (bound2minusS[0] * bound1minusS[1])
-    if difference > 0:
+    bound1minusS_n = abs((bound1n * dOrg) - (nOrg * bound1d))
+    bound1minusS_d = dOrg * bound1d
+    bound2minusS_n = abs((bound2n * dOrg) - (nOrg * bound2d))
+    bound2minusS_d = dOrg * bound2d
+    difference = (bound1minusS_n * bound2minusS_d) - (bound2minusS_n * bound1minusS_d)
+    if difference >= 0:
         # bound1 is farther from zero than bound2; return bound2
-        return (p1, q1)
+        return (bound2n, bound2d)
     else:
-        return (p0 + k * p1, q0 + k * q1)
+        return (bound1n, bound1d)
 
 
 # _KNOWN_PASSES is all values from whole to 64th notes with 0 or 1 dot
