@@ -6337,7 +6337,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         `pitchPastMeasure` is a list of pitches preceding this pitch but in a previous measure.
 
-        `otherSimultaneousPitches` is a list of other pitches in this simultaneity.
+        `otherSimultaneousPitches` is a list of other pitches in this simultaneity, for use
+        when `cautionaryPitchClass` is True.
 
         If `useKeySignature` is True, a :class:`~music21.key.KeySignature` will be searched
         for in this Stream or this Stream's defined contexts. An alternative KeySignature

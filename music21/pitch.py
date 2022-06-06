@@ -4757,6 +4757,9 @@ class Pitch(prebase.ProtoM21Object):
         `pitchPastMeasure` is a list of pitches preceding this pitch but in a
         previous measure. If None, a new list will be made.
 
+        `otherSimultaneousPitches` is a list of other pitches in this simultaneity, for use
+        when `cautionaryPitchClass` is True.
+
         The `alteredPitches` list supplies pitches from a :class:`~music21.key.KeySignature`
         object using the :attr:`~music21.key.KeySignature.alteredPitches` property.
         If None, a new list will be made.
@@ -4861,11 +4864,8 @@ class Pitch(prebase.ProtoM21Object):
                 return  # exit: nothing more to do
 
         if (otherSimultaneousPitches
-            and any(
-                pSimult.step == self.step
-                and (cautionaryPitchClass or self.octave is pSimult.octave != self.octave)
-                    for pSimult in otherSimultaneousPitches
-                )
+            and cautionaryPitchClass
+            and any(pSimult.step == self.step for pSimult in otherSimultaneousPitches)
         ):
             set_displayStatus(True)
             return
