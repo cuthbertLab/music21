@@ -6473,7 +6473,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     else:
                         lastNoteWasTied = False
 
-                    otherSimultaneousPitches = [other_p for other_p in e.pitches if other_p is not p]
+                    otherSimultaneousPitches = [other for other in e.pitches if other is not p]
 
                     p.updateAccidentalDisplay(
                         pitchPast=pitchPast,
