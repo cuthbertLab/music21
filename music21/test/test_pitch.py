@@ -321,13 +321,13 @@ class Test(unittest.TestCase):
         '''
         def proc1(_pList, _past):
             for p in _pList:
-                p.updateAccidentalDisplay(_past, cautionaryPitchClass=True,
+                p.updateAccidentalDisplay(pitchPast=_past, cautionaryPitchClass=True,
                                           cautionaryNotImmediateRepeat=False)
                 _past.append(p)
 
         def proc2(_pList, _past):
             for p in _pList:
-                p.updateAccidentalDisplay(_past, cautionaryPitchClass=False,
+                p.updateAccidentalDisplay(pitchPast=_past, cautionaryPitchClass=False,
                                           cautionaryNotImmediateRepeat=False)
                 _past.append(p)
 
