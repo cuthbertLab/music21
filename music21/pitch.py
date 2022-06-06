@@ -4863,7 +4863,8 @@ class Pitch(prebase.ProtoM21Object):
             else:
                 return  # exit: nothing more to do
 
-        if (otherSimultaneousPitches
+        if (
+            otherSimultaneousPitches
             and cautionaryPitchClass
             and any(pSimult.step == self.step for pSimult in otherSimultaneousPitches)
         ):
