@@ -89,7 +89,7 @@ class Test(unittest.TestCase):
         self.assertEqual(a.name, 'C')
         self.assertTrue(a.accidental.displayStatus)
 
-        a.updateAccidentalDisplay(past, overrideStatus=True)
+        a.updateAccidentalDisplay(pitchPast=past, overrideStatus=True)
         self.assertFalse(a.accidental.displayStatus)
 
         b = copy.deepcopy(a)
@@ -101,7 +101,7 @@ class Test(unittest.TestCase):
         '''
         def proc(_pList, past):
             for p in _pList:
-                p.updateAccidentalDisplay(past)
+                p.updateAccidentalDisplay(pitchPast=past)
                 past.append(p)
 
         def compare(past, _result):
@@ -206,7 +206,7 @@ class Test(unittest.TestCase):
         '''
         def proc(_pList, past, alteredPitches):
             for p in _pList:
-                p.updateAccidentalDisplay(past, alteredPitches=alteredPitches)
+                p.updateAccidentalDisplay(pitchPast=past, alteredPitches=alteredPitches)
                 past.append(p)
 
         def compare(past, _result):
@@ -366,7 +366,7 @@ class Test(unittest.TestCase):
         a4 = Pitch('a4')
         past = [Pitch('a#3'), Pitch('c#'), Pitch('c')]
         # will not add a natural because match is pitchSpace
-        a4.updateAccidentalDisplay(past, cautionaryPitchClass=False)
+        a4.updateAccidentalDisplay(pitchPast=past, cautionaryPitchClass=False)
         self.assertEqual(a4.accidental, None)
 
     def testAccidentalsCautionary(self):
