@@ -2815,6 +2815,12 @@ class Test(unittest.TestCase):
         s2.makeAccidentals(inPlace=True)
         self.assertTrue(all(n.pitch.accidental.displayStatus for n in augmented_octave))
 
+        # Repeat the test with two F#'s in key of 1 sharp
+        two_f_sharps = chord.Chord('F#4 F#5')
+        s3 = Stream([key.KeySignature(1), two_f_sharps])
+        s3.makeAccidentals(inPlace=True)
+        self.assertTrue(all(n.pitch.accidental.displayStatus is False for n in two_f_sharps))
+
     def testMakeNotationTiesKeyless(self):
         p = converter.parse('tinynotation: 4/4 f#1~ f#1')
         # Key of no sharps/flats

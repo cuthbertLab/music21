@@ -4866,7 +4866,8 @@ class Pitch(prebase.ProtoM21Object):
         if (
             otherSimultaneousPitches
             and cautionaryPitchClass
-            and any(pSimult.step == self.step for pSimult in otherSimultaneousPitches)
+            and any(pSimult.step == self.step and pSimult.pitchClass != self.pitchClass
+                for pSimult in otherSimultaneousPitches)
         ):
             set_displayStatus(True)
             return
