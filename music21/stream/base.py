@@ -6319,6 +6319,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         pitchPast: t.Optional[t.List[pitch.Pitch]] = None,
         pitchPastMeasure: t.Optional[t.List[pitch.Pitch]] = None,
+        otherSimultaneousPitches: t.Optional[t.List[pitch.Pitch]] = None,
         useKeySignature: t.Union[bool, key.KeySignature] = True,
         alteredPitches: t.Optional[t.List[pitch.Pitch]] = None,
         searchKeySignatureByContext: bool = False,
@@ -6336,6 +6337,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         `pitchPastMeasure` is a list of pitches preceding this pitch but in a previous measure.
 
+        `otherSimultaneousPitches` is a list of other pitches in this simultaneity, for use
+        when `cautionaryPitchClass` is True.
 
         If `useKeySignature` is True, a :class:`~music21.key.KeySignature` will be searched
         for in this Stream or this Stream's defined contexts. An alternative KeySignature
@@ -6377,7 +6380,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Changed in v.6: does not return anything if inPlace is True.
         Changed in v.7: default inPlace is False
-        Changed in v.8: altered unisons in Chords now supply clarifying naturals.
+        Changed in v.8: altered unisons/octaves in Chords now supply clarifying naturals.
 
         All arguments are keyword only.
         '''
@@ -6459,11 +6462,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     tiePitchSet.add(e.pitch.nameWithOctave)
 
             elif isinstance(e, chord.Chord):
-                # add all chord elements to past first
                 # when reading a chord, this will apply an accidental
                 # if pitches in the chord suggest an accidental
                 seenPitchNames = set()
-                pitchPast += e.pitches
 
                 for n in list(e):
                     p = n.pitch
@@ -6472,9 +6473,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     else:
                         lastNoteWasTied = False
 
+                    otherSimultaneousPitches = [other for other in e.pitches if other is not p]
+
                     p.updateAccidentalDisplay(
                         pitchPast=pitchPast,
                         pitchPastMeasure=pitchPastMeasure,
+                        otherSimultaneousPitches=otherSimultaneousPitches,
                         alteredPitches=alteredPitches,
                         cautionaryPitchClass=cautionaryPitchClass,
                         cautionaryAll=cautionaryAll,
@@ -6489,6 +6493,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 for pName in seenPitchNames:
                     tiePitchSet.add(pName)
 
+                pitchPast += e.pitches
             else:
                 tiePitchSet.clear()
 
