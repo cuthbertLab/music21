@@ -4734,7 +4734,7 @@ class Pitch(prebase.ProtoM21Object):
     def updateAccidentalDisplay(
         self,
         *,
-        pitchPast: t.Optional[t.List['Pitch', t.List['Pitch']]] = None,
+        pitchPast: t.Optional[t.List['Pitch']] = None,
         pitchPastMeasure: t.Optional[t.List['Pitch']] = None,
         otherSimultaneousPitches: t.Optional[t.List['Pitch']] = None,
         alteredPitches: t.Optional[t.List['Pitch']] = None,
