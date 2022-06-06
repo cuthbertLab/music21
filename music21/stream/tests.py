@@ -2613,10 +2613,8 @@ class Test(unittest.TestCase):
         self.assertTrue(c1.pitches[1].accidental.displayStatus)
         self.assertTrue(c1.pitches[2].accidental.displayStatus)
 
-        # not getting a natural here because of chord tones
-        # self.assertTrue(n3.pitch.accidental.displayStatus)
-        # self.assertEqual(n3.pitch.accidental, None)
-        # s.show()
+        # not necessary to repeat the natural afterward
+        self.assertIsNone(n3.pitch.accidental, None)
 
         s = Stream()
         n1 = note.Note('a#')
@@ -2793,6 +2791,29 @@ class Test(unittest.TestCase):
         self.assertIs(n.pitch.accidental.displayStatus, False)
 
         # TODO: other types
+
+    def testMakeAccidentalsOnChord(self):
+        c = chord.Chord('F# A# C#')
+        s = Stream(c)
+        self.assertFalse(any(n.pitch.accidental.displayStatus for n in c))
+        s.makeAccidentals(inPlace=True)
+        self.assertTrue(all(n.pitch.accidental.displayStatus for n in c))
+
+        augmented_octave = chord.Chord('F4 F#5')
+        s2 = Stream(augmented_octave)
+        self.assertIsNone(augmented_octave[0].pitch.accidental)
+        s2.makeAccidentals(inPlace=True)
+        self.assertTrue(augmented_octave[0].pitch.accidental.displayStatus)
+
+        # Repeat the test without octaves and reset state
+        low, high = augmented_octave.pitches
+        low.octave = None
+        low.accidental = None
+        high.octave = None
+        high.accidental.displayStatus = None
+
+        s2.makeAccidentals(inPlace=True)
+        self.assertTrue(all(n.pitch.accidental.displayStatus for n in augmented_octave))
 
     def testMakeNotationTiesKeyless(self):
         p = converter.parse('tinynotation: 4/4 f#1~ f#1')

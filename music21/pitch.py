@@ -4733,8 +4733,10 @@ class Pitch(prebase.ProtoM21Object):
 
     def updateAccidentalDisplay(
         self,
-        pitchPast: t.Optional[t.List['Pitch']] = None,
+        *,
+        pitchPast: t.Optional[t.List['Pitch', t.List['Pitch']]] = None,
         pitchPastMeasure: t.Optional[t.List['Pitch']] = None,
+        otherSimultaneousPitches: t.Optional[t.List['Pitch']] = None,
         alteredPitches: t.Optional[t.List['Pitch']] = None,
         cautionaryPitchClass: bool = True,
         cautionaryAll: bool = False,
@@ -4784,13 +4786,13 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> a = pitch.Pitch('a')
         >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
-        >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
+        >>> a.updateAccidentalDisplay(pitchPast=past, cautionaryAll=True)
         >>> a.accidental, a.accidental.displayStatus
         (<music21.pitch.Accidental natural>, True)
 
         >>> b = pitch.Pitch('a')
         >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
-        >>> b.updateAccidentalDisplay(past)  # should add a natural
+        >>> b.updateAccidentalDisplay(pitchPast=past)  # should add a natural
         >>> b.accidental, b.accidental.displayStatus
         (<music21.pitch.Accidental natural>, True)
 
@@ -4799,10 +4801,11 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> a4 = pitch.Pitch('a4')
         >>> past = [pitch.Pitch('a#3'), pitch.Pitch('c#'), pitch.Pitch('c')]
-        >>> a4.updateAccidentalDisplay(past, cautionaryPitchClass=False)
+        >>> a4.updateAccidentalDisplay(pitchPast=past, cautionaryPitchClass=False)
         >>> a4.accidental is None
         True
 
+        v8 -- made keyword-only and added `otherSimultaneousPitches`.
         '''
         # N.B. -- this is a very complex method
         # do not alter it without significant testing.
@@ -4826,10 +4829,6 @@ class Pitch(prebase.ProtoM21Object):
             pitchPastMeasure = []
         if alteredPitches is None:
             alteredPitches = []
-
-        # TODO: this presently deals with chords as simply a list
-        #    we might permit pitchPast to contain a list of pitches, to represent
-        #    a simultaneity?
 
         # should we display accidental if no previous accidentals have been displayed
         # i.e. if it's the first instance of an accidental after a tie
@@ -4860,6 +4859,16 @@ class Pitch(prebase.ProtoM21Object):
                 return
             else:
                 return  # exit: nothing more to do
+
+        if (otherSimultaneousPitches
+            and any(
+                pSimult.step == self.step
+                and (cautionaryPitchClass or self.octave is pSimult.octave != self.octave)
+                    for pSimult in otherSimultaneousPitches
+                )
+        ):
+            set_displayStatus(True)
+            return
 
         # no pitches in past...
         if not pitchPastAll:
@@ -5060,13 +5069,6 @@ class Pitch(prebase.ProtoM21Object):
                       and cautionaryNotImmediateRepeat is False
                       and pPastInMeasure is False):
                     set_displayStatus(True)
-
-                # Avoid making early, incorrect assumptions if this pitch is part of a chord.
-                # pPast might include this note itself, in which case we should not say
-                # "natural already in past usage". (Filtering out the current note from pPast
-                # when calling this method is not sufficient, because there could be repetitions.)
-                elif self._client is not None and self._client._chordAttached is not None:
-                    continue
 
                 # other cases: already natural in past usage, do not need
                 # natural again (and not in key sig)
