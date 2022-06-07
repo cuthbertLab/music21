@@ -376,6 +376,8 @@ def listSearchFields():
     'ambitus'
     'animator'
     ...
+    'composer'
+    ...
     '''
     return tuple(sorted(metadata.RichMetadata.searchAttributes))
 

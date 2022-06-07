@@ -348,8 +348,8 @@ class Test(unittest.TestCase):
     # class TestMetadata(unittest.TestCase):
     # '''Tests for the metadata-fetching functions.'''
 
-    @mock.patch('music21.mei.base.metaSetTitles')
-    @mock.patch('music21.mei.base.metaSetContributors')
+    @mock.patch('music21.mei.base.metaSetTitle')
+    @mock.patch('music21.mei.base.metaSetComposer')
     @mock.patch('music21.mei.base.metaSetDate')
     def testMakeMeta1(self, mockDate, mockComposer, mockTitle):
         '''
@@ -366,8 +366,8 @@ class Test(unittest.TestCase):
         self.assertEqual(0, mockComposer.call_count)
         self.assertEqual(0, mockTitle.call_count)
 
-    @mock.patch('music21.mei.base.metaSetTitles')
-    @mock.patch('music21.mei.base.metaSetContributors')
+    @mock.patch('music21.mei.base.metaSetTitle')
+    @mock.patch('music21.mei.base.metaSetComposer')
     @mock.patch('music21.mei.base.metaSetDate')
     def testMakeMeta2(self, mockDate, mockComposer, mockTitle):
         '''
@@ -390,7 +390,7 @@ class Test(unittest.TestCase):
 
     def testMetaTitle1(self):
         '''
-        metaSetTitles() with a title and tempo but no subtitle
+        metaSetTitle() with a title and tempo but no subtitle
         '''
         work = """<work xmlns="http://www.music-encoding.org/ns/mei">
             <titleStmt>
@@ -403,77 +403,70 @@ class Test(unittest.TestCase):
         expMovementName = 'Adagio'
         meta = metadata.Metadata()
 
-        actual = base.metaSetTitles(work, meta)
+        actual = base.metaSetTitle(work, meta)
 
         self.assertIs(meta, actual)
+        self.assertFalse(hasattr(meta, 'subtitle'))
         self.assertEqual(expTitle, actual.title)
         self.assertEqual(expMovementName, actual.movementName)
 
     def testMetaTitle2(self):
         '''
-        metaSetTitles() with two titles, subtitle, but no tempo
+        metaSetTitle() with a title, subtitle, but no tempo
         '''
         work = """<work xmlns="http://www.music-encoding.org/ns/mei">
             <titleStmt>
                 <title>Symphony No. 7</title>
-                <title>Leningrad Symphony</title>
                 <title type="subtitle">in one movement</title>
             </titleStmt>
         </work>"""
         work = ETree.fromstring(work)
-        expTitles = (metadata.Text('Symphony No. 7'), metadata.Text('Leningrad Symphony'))
-        expSubtitle = 'in one movement'
+        expTitle = 'Symphony No. 7 (in one movement)'
         meta = metadata.Metadata()
 
-        actual = base.metaSetTitles(work, meta)
+        actual = base.metaSetTitle(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expTitles, actual['title'])
-        self.assertEqual(expSubtitle, actual.subtitle)
+        self.assertFalse(hasattr(meta, 'subtitle'))
+        self.assertEqual(expTitle, actual.title)
         self.assertIsNone(actual.movementName)
 
     def testMetaComposer1(self):
         '''
-        metaSetContributors() with no contributors
+        metaSetComposer() with no composers
         '''
         work = """<work xmlns="http://www.music-encoding.org/ns/mei"/>"""
         work = ETree.fromstring(work)
         meta = metadata.Metadata()
 
-        actual = base.metaSetContributors(work, meta)
+        actual = base.metaSetComposer(work, meta)
 
         self.assertIs(meta, actual)
         self.assertIsNone(actual.composer)
 
     def testMetaComposer2(self):
         '''
-        metaSetContributors() with one composer, one architect and one custom role in <respStmt>
+        metaSetComposer() with one composer in <respStmt>
         '''
         work = """<work xmlns="http://www.music-encoding.org/ns/mei">
             <titleStmt>
                 <respStmt>
                     <persName role="composer">Jean Sibelius</persName>
-                    <persName role="architect">Julia Morgan</persName>
-                    <persName role="interpretive dancer">Isadora Duncan</persName>
                 </respStmt>
             </titleStmt>
         </work>"""
         work = ETree.fromstring(work)
         expComposer = 'Jean Sibelius'
-        expArchitect = 'Julia Morgan'
         meta = metadata.Metadata()
 
-        actual = base.metaSetContributors(work, meta)
+        actual = base.metaSetComposer(work, meta)
 
         self.assertIs(meta, actual)
         self.assertEqual(expComposer, actual.composer)
-        self.assertEqual(expArchitect, actual.architect)
-        self.assertEqual('Isadora Duncan', actual.otherContributor)
-        self.assertEqual('interpretive dancer', actual['otherContributor'][0].role)
 
     def testMetaComposer3(self):
         '''
-        metaSetContributors() with one composer in <composer>
+        metaSetComposer() with one composer in <composer>
         '''
         work = """<work xmlns="http://www.music-encoding.org/ns/mei">
             <titleStmt>
@@ -484,14 +477,14 @@ class Test(unittest.TestCase):
         expComposer = 'Jean Sibelius'
         meta = metadata.Metadata()
 
-        actual = base.metaSetContributors(work, meta)
+        actual = base.metaSetComposer(work, meta)
 
         self.assertIs(meta, actual)
         self.assertEqual(expComposer, actual.composer)
 
     def testMetaComposer4(self):
         '''
-        metaSetContributors() with two composers, one specified each way
+        metaSetComposer() with two composers, one specified each way
         '''
         work = """<work xmlns="http://www.music-encoding.org/ns/mei">
             <titleStmt>
@@ -502,14 +495,14 @@ class Test(unittest.TestCase):
             </titleStmt>
         </work>"""
         work = ETree.fromstring(work)
-        expComposer1 = ['Jean Sibelius', 'Sibelius, Jean']
-        expComposer2 = ['Sibelius, Jean', 'Jean Sibelius']
+        expComposers1 = ['Jean Sibelius', 'Sibelius, Jean']
+        expComposers2 = ['Sibelius, Jean', 'Jean Sibelius']
         meta = metadata.Metadata()
 
-        actual = base.metaSetContributors(work, meta)
+        actual = base.metaSetComposer(work, meta)
 
         self.assertIs(meta, actual)
-        if actual.composers not in (expComposer1, expComposer2):
+        if actual.composers not in (expComposers1, expComposers2):
             self.fail('composer names do not match in either order')
 
     def testMetaDate1(self):

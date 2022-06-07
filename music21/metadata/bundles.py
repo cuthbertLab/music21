@@ -1235,7 +1235,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         'standardsBody'
         'storyteller'
         'subject'
-        'subtitle'
         'surveyor'
         'suspectedComposer'
         'tableOfContents'

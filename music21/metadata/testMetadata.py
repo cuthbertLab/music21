@@ -191,24 +191,24 @@ class Test(unittest.TestCase):
         self.assertEqual(itemtuple, tuple())
 
         if valueType is metadata.DateSingle:
-            md[nsKey] = '1978/6/11'
+            md[nsKey] = ['1978/6/11']
             self.assertEqual(getattr(md, uniqueName), '1978/06/11')
-            md[uniqueName] = '1979/6/11'
+            md[uniqueName] = ('1979/6/11',)
             self.assertEqual(getattr(md, uniqueName), '1979/06/11')
         elif valueType is metadata.Copyright:
-            md[nsKey] = 'Copyright © 1978 Joe Smith'
+            md[nsKey] = ['Copyright © 1978 Joe Smith']
             self.assertEqual(getattr(md, uniqueName), 'Copyright © 1978 Joe Smith')
-            md[uniqueName] = 'Copyright © 1979 Joe Smith'
+            md[uniqueName] = ('Copyright © 1979 Joe Smith',)
             self.assertEqual(getattr(md, uniqueName), 'Copyright © 1979 Joe Smith')
         elif valueType is metadata.Contributor:
-            md[nsKey] = f'The {nsKey}'
+            md[nsKey] = [f'The {nsKey}']
             self.assertEqual(getattr(md, uniqueName), f'The {nsKey}')
-            md[uniqueName] = f'The {uniqueName}'
+            md[uniqueName] = (f'The {uniqueName}',)
             self.assertEqual(getattr(md, uniqueName), f'The {uniqueName}')
         elif valueType is metadata.Text:
-            md[nsKey] = f'The {nsKey}'
+            md[nsKey] = [f'The {nsKey}']
             self.assertEqual(getattr(md, uniqueName), f'The {nsKey}')
-            md[uniqueName] = f'The {uniqueName}'
+            md[uniqueName] = (f'The {uniqueName}',)
             self.assertEqual(getattr(md, uniqueName), f'The {uniqueName}')
         else:
             self.fail('internal test error: invalid valueType')
@@ -455,7 +455,6 @@ class Test(unittest.TestCase):
             valueType=metadata.Contributor)
         self.checkUniqueNamedItem('orchestrator', 'humdrum:LOR',
             valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('subtitle', 'mei')
 
 # -----------------------------------------------------------------------------
 

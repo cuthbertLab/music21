@@ -1272,63 +1272,67 @@ def makeMetadata(documentRoot):
     work = documentRoot.find(f'.//{MEI_NS}work')
     if work is not None:
         # title, subtitle, and movement name
-        meta = metaSetTitles(work, meta)
-        # composers, etc
-        meta = metaSetContributors(work, meta)
+        meta = metaSetTitle(work, meta)
+        # composer
+        meta = metaSetComposer(work, meta)
         # date
         meta = metaSetDate(work, meta)
 
     return meta
 
 
-def metaSetTitles(work, meta):
+def metaSetTitle(work, meta):
     '''
-    From a <work> element, find the titles, subtitles, and movement name (<tempo> element) and store
+    From a <work> element, find the title, subtitle, and movement name (<tempo> element) and store
     the values in a :class:`Metadata` object.
 
     :param work: A <work> :class:`~xml.etree.ElementTree.Element` with metadata you want to find.
     :param meta: The :class:`~music21.metadata.Metadata` object in which to store the metadata.
     :return: The ``meta`` argument, having relevant metadata added.
     '''
-    # titles, subtitles, and movement name
+    # title, subtitle, and movement name
+    subtitle = None
     for title in work.findall(f'./{MEI_NS}titleStmt/{MEI_NS}title'):
-        if title.get('type', '') == 'subtitle':
-            meta.add('subtitle', title.text)
-        else:
-            meta.add('title', title.text)
+        if title.get('type', '') == 'subtitle':  # or 'subordinate', right?
+            subtitle = title.text
+        elif meta.title is None:
+            meta.title = title.text
+
+    if subtitle:
+        # Since m21.Metadata doesn't actually have a "subtitle" attribute, we'll put the subtitle
+        # in the title
+        meta.title = f'{meta.title} ({subtitle})'
 
     tempo = work.find(f'./{MEI_NS}tempo')
     if tempo is not None:
-        meta.add('movementName', tempo.text)
+        meta.movementName = tempo.text
 
     return meta
 
 
-def metaSetContributors(work, meta):
+def metaSetComposer(work, meta):
     '''
-    From a <work> element, find the contributors and store the values in a :class:`Metadata` object.
+    From a <work> element, find the composer(s) and store the values in a :class:`Metadata` object.
 
     :param work: A <work> :class:`~xml.etree.ElementTree.Element` with metadata you want to find.
     :param meta: The :class:`~music21.metadata.Metadata` object in which to store the metadata.
     :return: The ``meta`` argument, having relevant metadata added.
     '''
+    composers = []
     for persName in work.findall(f'./{MEI_NS}titleStmt/{MEI_NS}respStmt/{MEI_NS}persName'):
-        if persName.text:
-            role = persName.get('role')
-            if meta.isStandardKey(role):
-                meta.add(role, persName.text)
-            else:
-                # custom role, make a Contributor with that role and store as 'otherContributor'
-                c = metadata.Contributor(name=persName.text, role=role)
-                meta.add('otherContributor', c)
-
+        if persName.get('role') == 'composer' and persName.text:
+            composers.append(persName.text)
     for composer in work.findall(f'./{MEI_NS}titleStmt/{MEI_NS}composer'):
         if composer.text:
-            meta.add('composer', composer.text)
+            composers.append(composer.text)
         else:
             persName = composer.find(f'./{MEI_NS}persName')
             if persName.text:
-                meta.add('composer', composer.text)
+                composers.append(persName.text)
+    if len(composers) == 1:
+        meta.composer = composers[0]
+    elif len(composers) > 1:
+        meta.composers = composers
 
     return meta
 
@@ -1352,12 +1356,12 @@ def metaSetDate(work, meta):
             except ValueError:
                 environLocal.warn(_MISSED_DATE.format(dateStr))
             else:
-                meta.add('dateCreated', theDate)
+                meta.date = theDate
         else:
             dateStart = date.get('notbefore') if date.get('notbefore') else date.get('startdate')
             dateEnd = date.get('notafter') if date.get('notafter') else date.get('enddate')
             if dateStart and dateEnd:
-                meta.add('dateCreated', metadata.DateBetween((dateStart, dateEnd)))
+                meta.date = metadata.DateBetween((dateStart, dateEnd))
 
     return meta
 

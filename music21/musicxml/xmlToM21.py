@@ -1319,7 +1319,7 @@ class MusicXMLImporter(XMLParserBase):
             if md.isContributorUniqueName(c.role):
                 md.add(c.role, c)
             else:
-                # custom c.role, store under 'otherContributor' (a.k.a. 'marcrel:CTB')
+                # custom c.role, store under 'otherContributor'
                 md.add('otherContributor', c)
 
         for rights in identification.findall('rights'):

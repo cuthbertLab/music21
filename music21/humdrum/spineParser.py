@@ -776,9 +776,8 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         grToRemove = []
 
         for gr in s[GlobalReference]:
-            wasParsed = gr.updateMetadata(md)
-            if wasParsed:
-                grToRemove.append(gr)
+            gr.updateMetadata(md)
+            grToRemove.append(gr)
 
         if grToRemove:
             s.remove(grToRemove, recurse=True)
@@ -2855,8 +2854,6 @@ class GlobalReference(base.Music21Object):
         else:
             # it's a free-form key
             md.addCustom(c, v)
-
-        return True
 
     def _reprInternal(self):
         return f'{self.code} {self.value!r}'

@@ -33,8 +33,8 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 >>> p.append(m)
 >>> s.append(p)
 >>> s.insert(0, metadata.Metadata())
->>> s.metadata['title'] = 'title'
->>> s.metadata['composer'] = 'composer'
+>>> s.metadata.title = 'title'
+>>> s.metadata.composer = 'composer'
 >>> #_DOCS_SHOW s.show()
 
 .. image:: images/moduleMetadata-01.*
@@ -103,7 +103,7 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     as there is a place for it (e.g. '<miscellaneous>' in MusicXML).
 
 '''
-from collections import OrderedDict, namedtuple
+from collections import namedtuple
 from dataclasses import dataclass
 import os
 import pathlib
@@ -224,7 +224,7 @@ class Metadata(base.Music21Object):
     'responsibleParty', 'restager', 'reviewer', 'rightsHolder', 'scenarist',
     'sceneNumber', 'scientificAdvisor', 'screenplayAuthor', 'scribe', 'sculptor',
     'secretary', 'setDesigner', 'singer', 'source', 'spatialCoverage', 'speaker',
-    'standardsBody', 'storyteller', 'subject', 'subtitle', 'surveyor',
+    'standardsBody', 'storyteller', 'subject', 'surveyor',
     'suspectedComposer', 'tableOfContents', 'teacher', 'temporalCoverage',
     'textLanguage', 'textOriginalLanguage', 'title', 'transcriber', 'translator',
     'type', 'videographer', 'vocalist', 'volume', 'volumeNumber', 'woodCutter',
@@ -253,17 +253,17 @@ class Metadata(base.Music21Object):
         'fileFormat',
         'fileNumber',
         'filePath',
-    ] + properties.ALL_UNIQUENAMES))
+    ] + properties.ALL_UNIQUE_NAMES))
 
     searchAttributes: t.Tuple = tuple(sorted(set(
-        list(allUniqueNames) + properties.ALL_M21WORKIDS)))
+        list(allUniqueNames) + properties.ALL_MUSIC21_WORK_IDS)))
 
     # INITIALIZER #
 
     def __init__(self, *args, **keywords):
         super().__init__()
 
-        self._metadata: t.Dict = {}
+        self._metadata: t.Dict[str, t.Any] = {}
         self.software: t.List[str] = [defaults.software]
 
         # TODO: check pickling, etc.
@@ -273,7 +273,8 @@ class Metadata(base.Music21Object):
         # Any keywords that are uniqueNames, grandfathered workIds, or grandfathered
         # workId abbreviations can be set this way.
         for attr in keywords:
-            setattr(self, attr, keywords[attr])
+            if attr in properties.ALL_LEGAL_ATTRIBUTES:
+                setattr(self, attr, keywords[attr])
 
 # -----------------------------------------------------------------------------
 
@@ -355,22 +356,24 @@ class Metadata(base.Music21Object):
         The tuple's first element will be of the form 'namespace:name'.
 
         >>> md = metadata.Metadata()
-        >>> md.addCustom('composer', 'Not a contributor')
-        >>> md.add('title', '[title of show]')
-        >>> md.addCustom('excerpt-start-measure', 1234)
-        >>> md.add('composer', ['Ludwig von Beethoven', 'Wolfgang Amadeus Mozart'])
+        >>> md['title'] = ['Dimitrij', 'False Dmitry']
+        >>> md.composer = 'Antonín Dvořák'
+        >>> md.opusNumber = 64
         >>> md.add('librettist', 'Marie Červinková-Riegrová')
+        >>> md['otherContributor'] = (metadata.Contributor(role='based on plot by',
+        ...                               name ='Ferdinand Mikovec'),
+        ...                           metadata.Contributor(role='original incomplete plot by',
+        ...                               name='Friedrich Schiller'))
+        >>> md.addCustom('composer', 'Not a contributor')
         >>> all = md.getAllContributorNamedValues()
-        >>> len(all)
-        3
-        >>> all[0]
-        ('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Ludwig von Beethoven>)
-        >>> all[1]
-        ('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Wolfgang Amadeus Mozart>)
-        >>> all[2][0]
-        'marcrel:LBT'
-        >>> all[2][1]
-        <music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>
+        >>> all
+        [('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Antonín Dvořák>),
+        ('marcrel:LBT',
+        <music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>),
+        ('marcrel:CTB',
+        <music21.metadata.primitives.Contributor based on plot by:Ferdinand Mikovec>),
+        ('marcrel:CTB',
+        <music21.metadata.primitives.Contributor original incomplete plot by:Friedrich Schiller>)]
         '''
 
         allOut: t.List[t.Tuple[str, Contributor]] = []
@@ -397,14 +400,13 @@ class Metadata(base.Music21Object):
         'marcrel:LBT'
         >>> metadata.Metadata.uniqueNameToNSKey('not a standard property') is None
         True
-        >>> metadata.Metadata.uniqueNameToNSKey(None) is None
-        True
         >>> metadata.Metadata.uniqueNameToNSKey('alternativeTitle')
         'dcterms:alternative'
         '''
-        if not uniqueName:
-            return None
-        return properties.UNIQUENAME_TO_NSKEY.get(uniqueName, None)
+        if not isinstance(uniqueName, str):
+            raise ValueError('uniqueName must be str')
+
+        return properties.UNIQUE_NAME_TO_NSKEY.get(uniqueName, None)
 
     @staticmethod
     def isContributorUniqueName(uniqueName: str) -> bool:
@@ -415,7 +417,7 @@ class Metadata(base.Music21Object):
 
         >>> metadata.Metadata.isContributorUniqueName('librettist')
         True
-        >>> metadata.Metadata.isContributorUniqueName('architect')
+        >>> metadata.Metadata.isContributorUniqueName('otherContributor')
         True
         >>> metadata.Metadata.isContributorUniqueName('alternativeTitle')
         False
@@ -427,7 +429,7 @@ class Metadata(base.Music21Object):
         if not uniqueName:
             return False
         prop: PropertyDescription = (
-            properties.UNIQUENAME_TO_PROPERTYDESCRIPTION.get(uniqueName, None))
+            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None))
         if prop is None:
             return False
 
@@ -441,8 +443,6 @@ class Metadata(base.Music21Object):
 
         >>> metadata.Metadata._isStandardUniqueName('librettist')
         True
-        >>> metadata.Metadata._isStandardUniqueName('architect')
-        True
         >>> metadata.Metadata._isStandardUniqueName('alternativeTitle')
         True
         >>> metadata.Metadata._isStandardUniqueName('not a standard property')
@@ -453,7 +453,7 @@ class Metadata(base.Music21Object):
         if not uniqueName:
             return False
         prop: PropertyDescription = (
-            properties.UNIQUENAME_TO_PROPERTYDESCRIPTION.get(uniqueName, None))
+            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None))
         if prop is None:
             return False
 
@@ -479,7 +479,7 @@ class Metadata(base.Music21Object):
         if not nsKey:
             return False
         prop: PropertyDescription = (
-            properties.NSKEY_TO_PROPERTYDESCRIPTION.get(nsKey, None))
+            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None))
         if prop is None:
             return False
 
@@ -498,7 +498,7 @@ class Metadata(base.Music21Object):
         True
         >>> metadata.Metadata.isStandardKey('not a standard property')
         False
-        >>> metadata.Metadata.isStandardKey('marcrel:nonstandardname')
+        >>> metadata.Metadata.isStandardKey('dcterms:nonstandardname')
         False
         >>> metadata.Metadata.isStandardKey(None)
         False
@@ -532,7 +532,7 @@ class Metadata(base.Music21Object):
         '''
         if not nsKey:
             return None
-        uniqueName: t.Optional[str] = properties.NSKEY_TO_UNIQUENAME.get(nsKey, None)
+        uniqueName: t.Optional[str] = properties.NSKEY_TO_UNIQUE_NAME.get(nsKey, None)
         return uniqueName
 
 
@@ -546,26 +546,15 @@ class Metadata(base.Music21Object):
         Returns [] if no Contributors exist.
 
         >>> md = metadata.Metadata()
-        >>> md['composer'] = ['Ludwig', 'Wolfgang']
-        >>> md['librettist'] = 'Joe'
-        >>> md.add('architect', 'John')      # 'architect' is new in 2022
-        >>> md.add('title', 'Caveat Emptor') # not a contributor
+        >>> md['composer'] = ['Richard Strauss']
+        >>> md.librettist = 'Oscar Wilde'
+        >>> md.add('title', 'Salome') # not a contributor
         >>> contribs = md.contributors
         >>> contribs
-        [<music21.metadata.primitives.Contributor composer:Ludwig>,
-        <music21.metadata.primitives.Contributor composer:Wolfgang>,
-        <music21.metadata.primitives.Contributor librettist:Joe>,
-        <music21.metadata.primitives.Contributor architect:John>]
+        [<music21.metadata.primitives.Contributor composer:Richard Strauss>,
+        <music21.metadata.primitives.Contributor librettist:Oscar Wilde>]
         '''
-
-        # This was just a data attribute before.  Hopefully no-one is calling
-        # md.contributors.append(c).  I did a global search on github for
-        # 'music21 contributors', and all code that modified it that I found
-        # were in music21 forks.  So I think we're OK making this a read-only
-        # property that we generate on the fly.
-        contribNamedValues = self.getAllContributorNamedValues()
-        output = [namedValue[1] for namedValue in contribNamedValues]
-        return output
+        return [namedValue[1] for namedValue in self.getAllContributorNamedValues()]
 
     @property
     def copyright(self):
@@ -578,22 +567,19 @@ class Metadata(base.Music21Object):
         >>> md = metadata.Metadata()
         >>> md.copyright is None
         True
-        >>> md['dcterms:rights'] = 'Copyright © 1984 All Rights Reserved'
+        >>> md['dcterms:rights'] = ('Copyright © 1984 All Rights Reserved',)
         >>> md.copyright
         'Copyright © 1984 All Rights Reserved'
         >>> md.add('dcterms:rights', 'Lyrics copyright © 1987 All Rights Reserved')
         >>> md.copyright
         'MULTIPLE'
+        >>> md['copyright']
+        (<music21.metadata.primitives.Copyright Copyright © 1984 All Rights Reserved>,
+        <music21.metadata.primitives.Copyright Lyrics copyright © 1987 All Rights Reserved>)
 
-        >>> md = metadata.Metadata()
-        >>> md.copyright is None
-        True
-        >>> md['copyright'] = 'Copyright © 1984 All Rights Reserved'
-        >>> md.copyright
-        'Copyright © 1984 All Rights Reserved'
-        >>> md['dcterms:rights']
-        (<music21.metadata.primitives.Copyright Copyright © 1984 All Rights Reserved>,)
-        >>> md.copyright = metadata.Text('Copyright ©    1984 from Text')
+        You can also set Text or Copyright values.
+
+        >>> md.copyright = metadata.Text('Copyright © 1984 from Text')
         >>> md['copyright']
         (<music21.metadata.primitives.Copyright Copyright © 1984 from Text>,)
         >>> md.copyright = metadata.Copyright('Copyright © 1984 from Copyright', role='something')
@@ -618,9 +604,6 @@ class Metadata(base.Music21Object):
          ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
 
-        Skip contributors is there to help with musicxml parsing -- there's no reason for it
-        except that we haven't exposed enough functionality yet:
-
         >>> c.metadata.date = metadata.DateRelative('1689', 'onOrBefore')
         >>> c.metadata.localeOfComposition = 'Rome'
         >>> c.metadata.all(skipContributors=True)
@@ -636,8 +619,8 @@ class Metadata(base.Music21Object):
 
         for uniqueName in self.allUniqueNames:
             try:
-                values: t.List[t.Union[str, int]] = self._getSimpleValuesByNSKey(
-                    properties.UNIQUENAME_TO_NSKEY[uniqueName])
+                values: t.List[str] = self._getStringValuesByNSKey(
+                    properties.UNIQUE_NAME_TO_NSKEY[uniqueName])
                 if not values:
                     continue
                 val = values[0]
@@ -676,15 +659,15 @@ class Metadata(base.Music21Object):
 
         return list(sorted(allOut.items()))
 
-    def _getSimpleValueByNSKey(self, nsKey: str) -> t.Optional[t.Union[str, int]]:
-        values: t.List[t.Union[str, int]] = self._getSimpleValuesByNSKey(nsKey)
+    def _getStringValueByNSKey(self, nsKey: str) -> t.Optional[str]:
+        values: t.List[str] = self._getStringValuesByNSKey(nsKey)
         if not values:
             return None
         if len(values) == 1:
             return values[0]
         return 'MULTIPLE'
 
-    def _getSimpleValuesByNSKey(self, nsKey: str) -> t.List[t.Union[str, int]]:
+    def _getStringValuesByNSKey(self, nsKey: str) -> t.List[str]:
         values: t.Tuple[t.Any, ...]
         try:
             values = self._get(nsKey, isCustom=False)
@@ -694,10 +677,9 @@ class Metadata(base.Music21Object):
         if not values:
             return []
 
-        # currently only returns strings (no ints)
         return [str(value) for value in values]
 
-    def _getPluralAttribute(self, attributeName: str) -> t.List[t.Union[str, int]]:
+    def _getPluralAttribute(self, attributeName: str) -> t.List[str]:
         # This does what __getattr__ would do if we supported plural attributeNames
         # (but it takes singular attributeNames, of course).
 
@@ -705,16 +687,17 @@ class Metadata(base.Music21Object):
         # workId, or workId abbreviation.  Used in search, for example, because
         # search wants to find everything.
 
-        if attributeName in properties.UNIQUENAME_TO_NSKEY:
-            return self._getSimpleValuesByNSKey(properties.UNIQUENAME_TO_NSKEY[attributeName])
+        if attributeName in properties.UNIQUE_NAME_TO_NSKEY:
+            return self._getStringValuesByNSKey(properties.UNIQUE_NAME_TO_NSKEY[attributeName])
 
         # Is attributeName a grandfathered workId?
-        if attributeName in properties.M21WORKID_TO_NSKEY:
-            return self._getSimpleValuesByNSKey(properties.M21WORKID_TO_NSKEY[attributeName])
+        if attributeName in properties.MUSIC21_WORK_ID_TO_NSKEY:
+            return self._getStringValuesByNSKey(properties.MUSIC21_WORK_ID_TO_NSKEY[attributeName])
 
         # Is attributeName a grandfathered workId abbreviation?
-        if attributeName in properties.M21ABBREV_TO_NSKEY:
-            return self._getSimpleValuesByNSKey(properties.M21ABBREV_TO_NSKEY[attributeName])
+        if attributeName in properties.MUSIC21_ABBREVIATION_TO_NSKEY:
+            return self._getStringValuesByNSKey(
+                properties.MUSIC21_ABBREVIATION_TO_NSKEY[attributeName])
 
         # The following are in searchAttributes, and getattr will find them because
         # they are a property, but this routine needs to find them, too.
@@ -731,21 +714,22 @@ class Metadata(base.Music21Object):
         if attributeName == 'fileNumber':
             if self.fileNumber is None:
                 return []
-            return [self.fileNumber]
+            return [str(self.fileNumber)]
 
         raise AttributeError(f'invalid attributeName: {attributeName}')
 
-    def _getSingularAttribute(self, attributeName: str) -> t.Optional[t.Union[str, int]]:
-        if attributeName in properties.UNIQUENAME_TO_NSKEY:
-            return self._getSimpleValueByNSKey(properties.UNIQUENAME_TO_NSKEY[attributeName])
+    def _getSingularAttribute(self, attributeName: str) -> t.Optional[str]:
+        if attributeName in properties.UNIQUE_NAME_TO_NSKEY:
+            return self._getStringValueByNSKey(properties.UNIQUE_NAME_TO_NSKEY[attributeName])
 
         # Is name a grandfathered workId?
-        if attributeName in properties.M21WORKID_TO_NSKEY:
-            return self._getSimpleValueByNSKey(properties.M21WORKID_TO_NSKEY[attributeName])
+        if attributeName in properties.MUSIC21_WORK_ID_TO_NSKEY:
+            return self._getStringValueByNSKey(properties.MUSIC21_WORK_ID_TO_NSKEY[attributeName])
 
         # Is name a grandfathered workId abbreviation?
-        if attributeName in properties.M21ABBREV_TO_NSKEY:
-            return self._getSimpleValueByNSKey(properties.M21ABBREV_TO_NSKEY[attributeName])
+        if attributeName in properties.MUSIC21_ABBREVIATION_TO_NSKEY:
+            return self._getStringValueByNSKey(
+                properties.MUSIC21_ABBREVIATION_TO_NSKEY[attributeName])
 
         raise AttributeError(f'object has no attribute: {attributeName}')
 
@@ -810,33 +794,33 @@ class Metadata(base.Music21Object):
         # property.setters have to be removed, and handled explicitly here.
 
         # Is name a uniqueName?
-        if name in properties.UNIQUENAME_TO_NSKEY:
+        if name in properties.UNIQUE_NAME_TO_NSKEY:
             if (value is not None
                     and isinstance(value, t.Iterable)
                     and not isinstance(value, str)):
                 raise ValueError(f'md.{name} can only be set to a single value; '
                                  f'set md[{name}] to multiple values instead.')
-            self._set(properties.UNIQUENAME_TO_NSKEY[name], value, isCustom=False)
+            self._set(properties.UNIQUE_NAME_TO_NSKEY[name], value, isCustom=False)
             return
 
         # Is name a grandfathered workId?
-        if name in properties.M21WORKID_TO_NSKEY:
+        if name in properties.MUSIC21_WORK_ID_TO_NSKEY:
             if (value is not None
                     and isinstance(value, t.Iterable)
                     and not isinstance(value, str)):
                 raise ValueError(f'md.{name} can only be set to a single value; '
                                  f'set md[{name}] to multiple values instead.')
-            self._set(properties.M21WORKID_TO_NSKEY[name], value, isCustom=False)
+            self._set(properties.MUSIC21_WORK_ID_TO_NSKEY[name], value, isCustom=False)
             return
 
         # Is name a grandfathered workId abbreviation?
-        if name in properties.M21ABBREV_TO_NSKEY:
+        if name in properties.MUSIC21_ABBREVIATION_TO_NSKEY:
             if (value is not None
                     and isinstance(value, t.Iterable)
                     and not isinstance(value, str)):
                 raise ValueError(f'md.{name} can only be set to a single value; '
                                  f'set md[{name}] to multiple values instead.')
-            self._set(properties.M21ABBREV_TO_NSKEY[name], value, isCustom=False)
+            self._set(properties.MUSIC21_ABBREVIATION_TO_NSKEY[name], value, isCustom=False)
             return
 
         # Is name one of the non-uniqueName property.setters (i.e the three
@@ -850,15 +834,24 @@ class Metadata(base.Music21Object):
             return
 
         if name == 'fileFormat':
-            self.fileInfo.format = Text(value)
+            if value is None:
+                self.fileInfo.format = None
+            else:
+                self.fileInfo.format = Text(value)
             return
 
         if name == 'filePath':
-            self.fileInfo.path = Text(value)
+            if value is None:
+                self.fileInfo.path = None
+            else:
+                self.fileInfo.path = Text(value)
             return
 
         if name == 'fileNumber':
-            self.fileInfo.number = value
+            if value is None:
+                self.fileInfo.number = None
+            else:
+                self.fileInfo.number = int(value)
             return
 
         # OK, we've covered everything we know about; fall back to setting
@@ -876,7 +869,7 @@ class Metadata(base.Music21Object):
         then KeyError is raised.
 
         >>> md = metadata.Metadata()
-        >>> md['description'] = metadata.Text('A fun score!', language='en')
+        >>> md['description'] = [metadata.Text('A fun score!', language='en')]
         >>> descs = md['description']
         >>> descs
         (<music21.metadata.primitives.Text A fun score!>,)
@@ -1461,7 +1454,7 @@ class Metadata(base.Music21Object):
     def _isContributorNSKey(nsKey: str) -> bool:
         if not nsKey:
             return False
-        prop: PropertyDescription = properties.NSKEY_TO_PROPERTYDESCRIPTION.get(nsKey, None)
+        prop: PropertyDescription = properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
         if prop is None:
             return False
 
@@ -1469,7 +1462,7 @@ class Metadata(base.Music21Object):
 
     @staticmethod
     def _nsKeyToContributorRole(nsKey: str) -> t.Optional[str]:
-        prop: PropertyDescription = properties.NSKEY_TO_PROPERTYDESCRIPTION.get(nsKey, None)
+        prop: PropertyDescription = properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
         if prop is None:
             return None
         if not prop.isContributor:
@@ -1499,7 +1492,7 @@ class Metadata(base.Music21Object):
         '''
         if not isCustom:
             if self._isStandardUniqueName(key):
-                key = properties.UNIQUENAME_TO_NSKEY.get(key, None)
+                key = properties.UNIQUE_NAME_TO_NSKEY.get(key, None)
             if not self._isStandardNSKey(key):
                 raise KeyError(
                     f'Key=\'{key}\' is not a standard metadata key.'
@@ -1524,7 +1517,7 @@ class Metadata(base.Music21Object):
         '''
         if not isCustom:
             if self._isStandardUniqueName(key):
-                key = properties.UNIQUENAME_TO_NSKEY.get(key, None)
+                key = properties.UNIQUE_NAME_TO_NSKEY.get(key, None)
             if not self._isStandardNSKey(key):
                 raise KeyError(
                     f'Key=\'{key}\' is not a standard metadata key.'
@@ -1573,7 +1566,7 @@ class Metadata(base.Music21Object):
         '''
         if not isCustom:
             if self._isStandardUniqueName(key):
-                key = properties.UNIQUENAME_TO_NSKEY.get(key, None)
+                key = properties.UNIQUE_NAME_TO_NSKEY.get(key, None)
             if not self._isStandardNSKey(key):
                 raise KeyError(
                     f'Key=\'{key}\' is not a standard metadata key.'
@@ -1587,7 +1580,7 @@ class Metadata(base.Music21Object):
         '''
         Converts a value to the appropriate valueType (looked up in STDPROPERTIES by nsKey).
 
-        Test conversion to Text
+        Converts certain named values to Text
 
         >>> metadata.Metadata._convertValue('dcterms:title', 3.4)
         <music21.metadata.primitives.Text 3.4>
@@ -1596,7 +1589,7 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata._convertValue('dcterms:title', metadata.Text('3.4'))
         <music21.metadata.primitives.Text 3.4>
 
-        Test conversion to Copyright
+        Converts certain named values to Copyright
 
         >>> metadata.Metadata._convertValue('dcterms:rights', 'copyright str')
         <music21.metadata.primitives.Copyright copyright str>
@@ -1605,7 +1598,7 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata._convertValue('dcterms:rights', metadata.Copyright('copyright'))
         <music21.metadata.primitives.Copyright copyright>
 
-        Test conversion to Contributor
+        Converts certain named values to Contributor
 
         >>> metadata.Metadata._convertValue('marcrel:CMP', 'composer str')
         <music21.metadata.primitives.Contributor composer:composer str>
@@ -1615,7 +1608,7 @@ class Metadata(base.Music21Object):
         ...     metadata.Contributor(role='random', name='Joe'))
         <music21.metadata.primitives.Contributor random:Joe>
 
-        Test conversion to DateSingle
+        Converts certain named values to DateSingle
 
         >>> metadata.Metadata._convertValue('dcterms:created', '1938')
         <music21.metadata.primitives.DateSingle 1938/--/-->
@@ -1625,7 +1618,7 @@ class Metadata(base.Music21Object):
         ...     metadata.DateBetween(['1938','1939']))
         <music21.metadata.primitives.DateBetween 1938/--/-- to 1939/--/-->
         '''
-        valueType: t.Type = properties.NSKEY_TO_VALUETYPE.get(nsKey, None)
+        valueType: t.Type = properties.NSKEY_TO_VALUE_TYPE.get(nsKey, None)
         originalValue: t.Any = value
 
         if valueType is None:
@@ -1692,8 +1685,6 @@ class Metadata(base.Music21Object):
         'marcrel:LYR'
         >>> metadata.Metadata._contributorRoleToNSKey('composer')
         'marcrel:CMP'
-        >>> metadata.Metadata._contributorRoleToNSKey('architect')
-        'marcrel:ARC'
         >>> metadata.Metadata._contributorRoleToNSKey('alternativeTitle')
         'marcrel:CTB'
         >>> metadata.Metadata._contributorRoleToNSKey('humdrum:XXX')
@@ -1703,15 +1694,15 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata._contributorRoleToNSKey(None)
         'marcrel:CTB'
         '''
-        nsKey: t.Optional[str] = properties.UNIQUENAME_TO_NSKEY.get(role, None)
+        nsKey: t.Optional[str] = properties.UNIQUE_NAME_TO_NSKEY.get(role, None)
         if nsKey is None:
-            nsKey = properties.M21WORKID_TO_NSKEY.get(role, None)
+            nsKey = properties.MUSIC21_WORK_ID_TO_NSKEY.get(role, None)
         if nsKey is None:
             # it's a non-standard role, so add this contributor with uniqueName='otherContributor'
             return 'marcrel:CTB'  # aka. 'otherContributor'
 
         prop: t.Optional[PropertyDescription] = (
-            properties.NSKEY_TO_PROPERTYDESCRIPTION.get(nsKey, None))
+            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None))
 
         if prop is not None and not prop.isContributor:
             # It's not a contributor name, but it IS another metadata uniqueName, like
@@ -1773,7 +1764,7 @@ class RichMetadata(Metadata):
     'scenarist', 'sceneNumber', 'scientificAdvisor', 'screenplayAuthor', 'scribe',
     'sculptor', 'secretary', 'setDesigner', 'singer', 'source', 'sourcePath',
     'spatialCoverage', 'speaker', 'standardsBody', 'storyteller', 'subject',
-    'subtitle', 'surveyor', 'suspectedComposer', 'tableOfContents', 'teacher',
+    'surveyor', 'suspectedComposer', 'tableOfContents', 'teacher',
     'tempoFirst', 'temporalCoverage', 'tempos', 'textLanguage',
     'textOriginalLanguage', 'timeSignatureFirst', 'timeSignatures', 'title',
     'transcriber', 'translator', 'type', 'videographer', 'vocalist', 'volume',

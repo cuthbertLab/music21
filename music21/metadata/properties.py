@@ -24,10 +24,12 @@ class PropertyDescription:
 
         name: str is the namespace's name of the property (the tail of the property term URI).
         namespace: str is a shortened form of the URI for the set of terms.
-            e.g. 'dcterms' means the property term is from the Dublin Core terms.
+            'dcterms' means the property term is from the Dublin Core terms.
             'dcterms' is the shortened form of <http://purl.org/dc/terms/>
-            e.g. 'marcrel' means the property term is from the MARC Relator terms.
+            'marcrel' means the property term is from the MARC Relator terms.
             'marcrel' is the shortened form of <http://www.loc.gov/loc.terms/relators/>
+            'humdrum' means the property term is from the Humdrum reference record terms.
+            'humdrum' is the shortened form of <https://www.humdrum.org/reference-records/#>
         isContributor: bool is whether or not the property describes a contributor.
         oldMusic21Abbrev: str is the backward compatible music21 abbreviation for this
             property.
@@ -1654,69 +1656,67 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         oldMusic21WorkId='orchestrator',
         valueType=Contributor,
         isContributor=True),
-
-    # The following mei property terms are not found in dcterms, marcrel, or humdrum.
-
-    PropertyDescription(
-        name='subtitle',
-        namespace='mei',
-        isContributor=False)
 )
 
 # -----------------------------------------------------------------------------
 # Dictionaries generated from STANDARD_PROPERTY_DESCRIPTIONS for looking up
 # various things quickly.
 
-NSKEY_TO_PROPERTYDESCRIPTION: dict = {
+NSKEY_TO_PROPERTY_DESCRIPTION: dict = {
     f'{x.namespace}:{x.name}':
         x for x in STANDARD_PROPERTY_DESCRIPTIONS}
 
-NSKEY_TO_VALUETYPE: dict = {
+NSKEY_TO_VALUE_TYPE: dict = {
     f'{x.namespace}:{x.name}':
         x.valueType for x in STANDARD_PROPERTY_DESCRIPTIONS}
 
-NSKEY_TO_CONTRIBUTORUNIQUENAME: dict = {
+NSKEY_TO_CONTRIBUTOR_UNIQUE_NAME: dict = {
     f'{x.namespace}:{x.name}':
         x.uniqueName if x.uniqueName
         else x.oldMusic21WorkId if x.oldMusic21WorkId
         else x.name
         for x in STANDARD_PROPERTY_DESCRIPTIONS if x.isContributor}
 
-NSKEY_TO_UNIQUENAME: dict = {
+NSKEY_TO_UNIQUE_NAME: dict = {
     f'{x.namespace}:{x.name}':
         x.uniqueName if x.uniqueName
         else x.oldMusic21WorkId if x.oldMusic21WorkId
         else x.name
         for x in STANDARD_PROPERTY_DESCRIPTIONS}
 
-UNIQUENAME_TO_NSKEY: dict = {
+UNIQUE_NAME_TO_NSKEY: dict = {
     x.uniqueName if x.uniqueName
     else x.oldMusic21WorkId if x.oldMusic21WorkId
     else x.name:
         f'{x.namespace}:{x.name}'
         for x in STANDARD_PROPERTY_DESCRIPTIONS}
 
-UNIQUENAME_TO_PROPERTYDESCRIPTION: dict = {
+UNIQUE_NAME_TO_PROPERTY_DESCRIPTION: dict = {
     x.uniqueName if x.uniqueName
     else x.oldMusic21WorkId if x.oldMusic21WorkId
     else x.name:
         x for x in STANDARD_PROPERTY_DESCRIPTIONS}
 
-M21ABBREV_TO_NSKEY: dict = {
+MUSIC21_ABBREVIATION_TO_NSKEY: dict = {
     x.oldMusic21Abbrev if x.oldMusic21Abbrev
     else None:
         f'{x.namespace}:{x.name}'
         for x in STANDARD_PROPERTY_DESCRIPTIONS
         if x.oldMusic21Abbrev}
 
-M21WORKID_TO_NSKEY: dict = {
+MUSIC21_WORK_ID_TO_NSKEY: dict = {
     x.oldMusic21WorkId if x.oldMusic21WorkId
     else None:
         f'{x.namespace}:{x.name}'
         for x in STANDARD_PROPERTY_DESCRIPTIONS
         if x.oldMusic21WorkId}
 
-ALL_UNIQUENAMES: list = list(UNIQUENAME_TO_NSKEY.keys())
-ALL_M21WORKIDS: list = list(M21WORKID_TO_NSKEY.keys())
-ALL_M21ABBREVS: list = list(M21ABBREV_TO_NSKEY.keys())
-ALL_NSKEYS: list = list(NSKEY_TO_PROPERTYDESCRIPTION.keys())
+ALL_UNIQUE_NAMES: list = list(UNIQUE_NAME_TO_NSKEY.keys())
+ALL_MUSIC21_WORK_IDS: list = list(MUSIC21_WORK_ID_TO_NSKEY.keys())
+ALL_MUSIC21_ABBREVIATIONS: list = list(MUSIC21_ABBREVIATION_TO_NSKEY.keys())
+ALL_NSKEYS: list = list(NSKEY_TO_PROPERTY_DESCRIPTION.keys())
+
+# We use set() here to get rid of dupes (music21 workIds that are also uniqueNames).
+ALL_LEGAL_ATTRIBUTES: list = list(set(
+    ALL_UNIQUE_NAMES + ALL_MUSIC21_WORK_IDS + ALL_MUSIC21_ABBREVIATIONS
+    + ['composers', 'librettists', 'lyricists', 'fileFormat', 'filePath', 'fileNumber']))
