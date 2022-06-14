@@ -76,17 +76,17 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     (<music21.metadata.primitives.Text The Title>,
     <music21.metadata.primitives.Text A Second Title>)
     >>> md.title
-    'MULTIPLE'
+    'The Title, A Second Title'
 
     Add a third title (leaves any existing titles in place):
 
-    >>> md.add('title', 'A Third Title')
+    >>> md.add('title', 'Third Title, A')
     >>> md['title']
     (<music21.metadata.primitives.Text The Title>,
     <music21.metadata.primitives.Text A Second Title>,
-    <music21.metadata.primitives.Text A Third Title>)
+    <music21.metadata.primitives.Text Third Title, A>)
     >>> md.title
-    'MULTIPLE'
+    'The Title, A Second Title, A Third Title'
 
     Primitives: primitives.Text has been updated to add whether or not the text has
     been translated, as well as a specified encoding scheme (a.k.a. what standard
@@ -572,7 +572,7 @@ class Metadata(base.Music21Object):
         'Copyright © 1984 All Rights Reserved'
         >>> md.add('dcterms:rights', 'Lyrics copyright © 1987 All Rights Reserved')
         >>> md.copyright
-        'MULTIPLE'
+        'Copyright © 1984 All Rights Reserved, Lyrics copyright © 1987 All Rights Reserved'
         >>> md['copyright']
         (<music21.metadata.primitives.Copyright Copyright © 1984 All Rights Reserved>,
         <music21.metadata.primitives.Copyright Lyrics copyright © 1987 All Rights Reserved>)
@@ -660,12 +660,25 @@ class Metadata(base.Music21Object):
         return list(sorted(allOut.items()))
 
     def _getStringValueByNSKey(self, nsKey: str) -> t.Optional[str]:
-        values: t.List[str] = self._getStringValuesByNSKey(nsKey)
+        values: t.Tuple[t.Any, ...]
+        try:
+            values = self._get(nsKey, isCustom=False)
+        except KeyError:
+            return None
+
         if not values:
             return None
-        if len(values) == 1:
-            return values[0]
-        return 'MULTIPLE'
+        if self._isContributorNSKey(nsKey):
+            if len(values) == 1:
+                return str(values[0])
+            if len(values) == 2:
+                return str(values[0]) + ' and ' + str(values[1])
+            return str(values[0]) + f' and {len(values)-1} others'
+
+        if self._needsArticleNormalization(nsKey):
+            return ', '.join(value.getNormalizedArticle() for value in values)
+
+        return ', '.join(str(value) for value in values)
 
     def _getStringValuesByNSKey(self, nsKey: str) -> t.List[str]:
         values: t.Tuple[t.Any, ...]
@@ -676,6 +689,9 @@ class Metadata(base.Music21Object):
 
         if not values:
             return []
+
+        if self._needsArticleNormalization(nsKey):
+            return [value.getNormalizedArticle() for value in values]
 
         return [str(value) for value in values]
 
@@ -739,10 +755,9 @@ class Metadata(base.Music21Object):
         and grandfathered workId abbreviations.  Many grandfathered workIds
         have explicit property definitions, so they won't end up here.
 
-        These always return str or None.  Note well: if there is more than
-        one item for a particular name, we return 'MULTIPLE', to signal the
-        client to dig deeper (using an API such as md[name], which returns
-        all the items for that name).
+        These always return str or None.  If there is more than one item
+        for a particular name, we will try to summarize or list them all
+        in one returned string.
 
         If name is not a valid attribute (uniqueName, grandfathered workId,
         or grandfathered workId abbreviation), then AttributeError is raised.
@@ -759,7 +774,7 @@ class Metadata(base.Music21Object):
         'A workId abbreviation'
         >>> md.add('description', 'uniqueName description #2')
         >>> md.description
-        'MULTIPLE'
+        'A uniqueName description, uniqueName description #2'
         '''
 
         # __getattr__ is the call of last resort after looking for bare
@@ -1177,9 +1192,9 @@ class Metadata(base.Music21Object):
         ...     )
         >>> md.composer
         'Beach, Mrs. H.H.A.'
-        >>> md.add('composer', 'Beach, Amy Marcy Cheney')
+        >>> md.add('composer', 'Beach, Amy Marcy Cheney') # we need a better example here
         >>> md.composer
-        'MULTIPLE'
+        'Beach, Mrs. H.H.A. and Beach, Amy Marcy Cheney'
         '''
         return self._getSingularAttribute('composer')
 
@@ -1435,17 +1450,14 @@ class Metadata(base.Music21Object):
             'alternativeTitle',
             'movementName',
         )
-        for key in searchId:
-            titles = self._get(key, isCustom=False)
+        for uniqueName in searchId:
+            titles = self._get(uniqueName, isCustom=False)
             if not titles:  # get first matched
                 continue
 
-            if len(titles) > 1:
-                return 'MULTIPLE'
+            return self._getStringValueByNSKey(properties.UNIQUE_NAME_TO_NSKEY[uniqueName])
 
-            # get a string from this Text object
-            # get with normalized articles
-            return titles[0].getNormalizedArticle()
+        return None
 
 # -----------------------------------------------------------------------------
 # Internal support routines (many of them static).
@@ -1459,6 +1471,16 @@ class Metadata(base.Music21Object):
             return False
 
         return prop.isContributor
+
+    @staticmethod
+    def _needsArticleNormalization(nsKey) -> bool:
+        if not nsKey:
+            return False
+        prop: PropertyDescription = properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+        if prop is None:
+            return False
+
+        return prop.needsArticleNormalization
 
     @staticmethod
     def _nsKeyToContributorRole(nsKey: str) -> t.Optional[str]:

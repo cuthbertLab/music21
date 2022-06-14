@@ -31,6 +31,8 @@ class PropertyDescription:
             'humdrum' means the property term is from the Humdrum reference record terms.
             'humdrum' is the shortened form of <https://www.humdrum.org/reference-records/#>
         isContributor: bool is whether or not the property describes a contributor.
+        needsArticleNormalization: bool is whether or not the property values need
+            article normalization (this is generally True for various titles).
         oldMusic21Abbrev: str is the backward compatible music21 abbreviation for this
             property.
         oldMusic21WorkId: str is the backward compatible music21 name for this property.
@@ -51,6 +53,7 @@ class PropertyDescription:
     name: t.Optional[str] = None
     namespace: t.Optional[str] = None
     isContributor: bool = False
+    needsArticleNormalization: bool = False
     oldMusic21Abbrev: t.Optional[str] = None
     oldMusic21WorkId: t.Optional[str] = None
     uniqueName: t.Optional[str] = None
@@ -98,6 +101,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         namespace='dcterms',
         oldMusic21Abbrev='ota',
         oldMusic21WorkId='alternativeTitle',
+        needsArticleNormalization=True,
         isContributor=False),
 
     # audience: A class of agents for whom the resource is intended or useful.
@@ -430,6 +434,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         namespace='dcterms',
         oldMusic21Abbrev='otl',
         oldMusic21WorkId='title',
+        needsArticleNormalization=True,
         isContributor=False),
 
     # type : The nature or genre of the resource.
@@ -1489,6 +1494,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         namespace='humdrum',
         oldMusic21Abbrev='otp',
         oldMusic21WorkId='popularTitle',
+        needsArticleNormalization=True,
         isContributor=False),
 
     # OPR: parent title
@@ -1497,6 +1503,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         namespace='humdrum',
         oldMusic21Abbrev='opr',
         oldMusic21WorkId='parentTitle',
+        needsArticleNormalization=True,
         isContributor=False),
 
     # OAC: act number (e.g. '2' or 'Act 2')
@@ -1529,6 +1536,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         namespace='humdrum',
         oldMusic21Abbrev='omd',
         oldMusic21WorkId='movementName',
+        needsArticleNormalization=True,
         isContributor=False),
 
     # OPS: opus number (e.g. '23', or 'Opus 23')
@@ -1596,6 +1604,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         namespace='humdrum',
         oldMusic21Abbrev='gtl',
         oldMusic21WorkId='groupTitle',
+        needsArticleNormalization=True,
         isContributor=False),
 
     # GAW: associated work, such as a play or film

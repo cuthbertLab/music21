@@ -217,6 +217,8 @@ class Test(unittest.TestCase):
         if valueType is metadata.DateSingle:
             md.add(nsKey, [metadata.DateBetween(['1978', '1980']),
                 metadata.DateSingle('1979/6/11/4:50:32')])
+            self.assertEqual(getattr(md, uniqueName),
+                '1979/06/11, 1978/--/-- to 1980/--/--, 1979/06/11/04/50/032.00')
         elif valueType is metadata.Copyright:
             md.add(nsKey, metadata.Text('Lyrics copyright © 1979 John Jones'))
             md.add(uniqueName,
@@ -225,16 +227,23 @@ class Test(unittest.TestCase):
                 metadata.Copyright(
                     metadata.Text('Even more content copyright © 1979 Sarah Michaels'),
                     role='even more')])
+            self.assertEqual(getattr(md, uniqueName),
+                'Copyright © 1979 Joe Smith'
+                    + ', Lyrics copyright © 1979 John Jones'
+                    + ', Other content copyright © 1979 Jenni Johnson'
+                    + ', Even more content copyright © 1979 Sarah Michaels')
         elif valueType is metadata.Contributor:
             md.add(uniqueName, [metadata.Text(f'The 2nd {uniqueName}'),
                 metadata.Contributor(
                     role=contributorRole if contributorRole else uniqueName,
                     name=f'The 3rd {uniqueName}')])
+            self.assertEqual(getattr(md, uniqueName),
+                f'The {uniqueName} and 2 others')
         elif valueType is metadata.Text:
             md.add(nsKey, [metadata.Text(f'The 2nd {uniqueName}'),
                 metadata.Text(f'The 3rd {uniqueName}')])
-
-        self.assertEqual(getattr(md, uniqueName), 'MULTIPLE')
+            self.assertEqual(getattr(md, uniqueName),
+                f'The {uniqueName}, The 2nd {uniqueName}, The 3rd {uniqueName}')
 
         mdItemsUnique = md[uniqueName]
         mdItemsNSKey = md[nsKey]
