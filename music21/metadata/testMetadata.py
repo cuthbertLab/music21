@@ -256,6 +256,9 @@ class Test(unittest.TestCase):
 
         if valueType is metadata.Contributor:
             for itemNSKey in mdItemsNSKey:
+                # I'm asserting this way to keep mypy happy.
+                # self.assertIsInstance isn't sufficient, apparently.
+                assert isinstance(itemNSKey, metadata.Contributor)
                 self.assertEqual(itemNSKey.role,
                     contributorRole if contributorRole else uniqueName)
 

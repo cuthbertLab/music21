@@ -31,8 +31,9 @@ class PropertyDescription:
             'humdrum' means the property term is from the Humdrum reference record terms.
             'humdrum' is the shortened form of <https://www.humdrum.org/reference-records/#>
         isContributor: bool is whether or not the property describes a contributor.
-        needsArticleNormalization: bool is whether or not the property values need
-            article normalization (this is generally True for various titles).
+        needsArticleNormalization: bool is whether or not the property values might
+            benefit from article normalization when getting as a string (this is
+            generally True for various kinds of titles).
         oldMusic21Abbrev: str is the backward compatible music21 abbreviation for this
             property.
         oldMusic21WorkId: str is the backward compatible music21 name for this property.
@@ -46,9 +47,9 @@ class PropertyDescription:
                     else desc.oldMusic21WorkId if desc.oldMusic21WorkId
                     else desc.name)
         valueType: Type is the actual type of the value that will be stored in the metadata.
-            This allows auto-conversion to take place inside set/add, and is
-            the type clients will always receive from get.
-
+            This allows auto-conversion to take place when clients store items in the
+            metadata, and is the tuple element type clients will always receive from
+            md['uniqueName'] or md['namespace:name'].
     '''
     name: t.Optional[str] = None
     namespace: t.Optional[str] = None

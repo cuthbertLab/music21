@@ -42,14 +42,13 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 
     A guide to the 2022 Dublin Core implementation:
 
-    The guts of class Metadata are completely rewritten to support the new
-    Dublin Core functionality, but all of Metadata's previous APIs are still in
-    place and are all backward compatible. There are new APIs (md[], md.add et
-    al) to access the new functionality.
+    The class Metadata has been completely rewritten to support the new Dublin Core
+    functionality.
 
-    The previous metadata implementation had a list of supported workIds, and also
+    The previous Metadata implementation had a list of supported workIds, and also
     a list of standard contributor roles.  You could have more than one of each
-    contributor role, but only one of each workId.
+    contributor role, but only one of each workId.  And you could only have metadata
+    items that had one of those names (no custom metadata).
 
     In the new implementation, contributor roles are treated the same as other
     non-contributor metadata.  I have a list of supported property terms, which are
@@ -58,16 +57,26 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     Each metadata property can be specified by 'namespace:name' or by 'uniqueName'.
     For example: md['marcrel:CMP'] and md['composer'] are equivalent, as
     are md['dcterms:alternative'] and md['alternativeTitle']. You can have more than
-    one of any such item (not just contributors).
+    one of any such item (not just contributors).  And you can also have metadata
+    items with custom names.
+
+    If you are only interested in getting/setting a single string for a metadata item
+    (even if there is more than one item of that name), you can use an attribute-style
+    get operation (e.g. t = md.title).  If you want to see a list of metadata items in
+    their appropriate value type, you can us a dictionary-style get operation (e.g.
+    titles = md['title']).  If you set an item or list of items (via attribute-style
+    or dictionary-style), any existing items of that name are deleted.  If you want
+    to add an item or list of items without deleting existing items, you can use the
+    md.add() API.  See the examples below:
 
     Set a title (overwrites any existing titles):
 
     >>> md = metadata.Metadata()
     >>> md.title = 'A Title'
-    >>> md['title']
-    (<music21.metadata.primitives.Text A Title>,)
     >>> md.title
     'A Title'
+    >>> md['title']
+    (<music21.metadata.primitives.Text A Title>,)
 
     Set two titles (overwrites any existing titles):
 
@@ -88,19 +97,28 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     >>> md.title
     'The Title, A Second Title, A Third Title'
 
+    You can also set/add/get free-form custom metadata items:
+
+    >>> md.setCustom('modification description', 'added missing sharp in measure 27')
+    >>> md.getCustom('modification description')
+    (<music21.metadata.primitives.Text added missing sharp in measure 27>,)
+    >>> md.addCustom('modification description', 'deleted redundant natural in measure 28')
+    >>> md.getCustom('modification description')
+    (<music21.metadata.primitives.Text added missing sharp in measure 27>,
+    <music21.metadata.primitives.Text deleted redundant natural in measure 28>)
+
     Primitives: primitives.Text has been updated to add whether or not the text has
     been translated, as well as a specified encoding scheme (a.k.a. what standard
-    should I use to parse this string).
+    should be used to parse this string).
 
-    Metadata does not explicitly support client-specified namespaces, but there
-    are a few APIs (getCustom, addCustom, setCustom) with which clients can set
-    anything they want. A parser could use this to set (say) 'humdrum:XXX' metadata
-    that doesn't map to any standard metadata property, and a writer that understood
-    'humdrum' metadata could then write it back to a file.  Custom metadata can also
-    include things that are free-form, and very specific to a particular workflow.
-    e.g. setCustom('widget analysis complete through measure number', 1000).
-    Custom metadata like this can also be written to various file formats, as long
-    as there is a place for it (e.g. '<miscellaneous>' in MusicXML).
+    Metadata does not explicitly support client-specified namespaces, but by using
+    getCustom/addCustom/setCustom, clients can set anything they want. Clients could
+    use this to set (say) 'myCoolScoreFileFormat:XXX' metadata that doesn't map to
+    any standard metadata property, and a writer of myCoolScoreFileFormat files that
+    understood 'myCoolScoreFileFormat' metadata could then write it to one of
+    those files. Custom metadata (namespaced, or free form) can also be written to
+    various other file formats, as long as there is a place for it (e.g. in the
+    '<miscellaneous>' tag in MusicXML).
 
 '''
 from collections import namedtuple
@@ -139,6 +157,9 @@ __all__ = [
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
 
+ValueType = t.Union[DateSingle, DateRelative, DateBetween, DateSelection,
+                    Text, Contributor, Copyright]
+
 AmbitusShort = namedtuple('AmbitusShort',
                           ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
 
@@ -163,11 +184,17 @@ class Metadata(base.Music21Object):
     In many cases, each Stream will have a single Metadata object at the zero
     offset position.
 
+    To get a simple string, you can use attribute-style access by unique name.
+    Some workIds from music21 v7 have been renamed (e.g. 'date' has been renamed
+    to 'dateCreated').  The old music21 v7 name in these cases is still supported
+    when you use attribute-style access.
+
     >>> md = metadata.Metadata(title='Concerto in F')
     >>> md.title
     'Concerto in F'
 
-    Or by three-letter abbreviation:
+    Or by three-letter abbreviation (these are grandfathered in from music21 v7;
+    abbreviations have not been added for new-in-v8 metadata items):
 
     >>> md = metadata.Metadata(otl='Concerto in F')
     >>> md.otl
@@ -175,20 +202,28 @@ class Metadata(base.Music21Object):
     >>> md.title
     'Concerto in F'
 
-    Or set an iterable of values or get a tuple full of (richer-typed) values using md[]
+    Or set an iterable of values or get a tuple full of (richer-typed) values using
+    dictionary-style access.
 
-    >>> md['title'] = [metadata.Text('Rhapsody in Blue', language='en')]
-    >>> md.title
-    'Rhapsody in Blue'
-    >>> md.otl
-    'Rhapsody in Blue'
-    >>> md['title']
-    (<music21.metadata.primitives.Text Rhapsody in Blue>,)
+    >>> md = metadata.Metadata()
+    >>> md['composer'] = ['Billy Strayhorn', 'Duke Ellington']
+    >>> md['composer']
+    (<music21.metadata.primitives.Contributor composer:Billy Strayhorn>,
+    <music21.metadata.primitives.Contributor composer:Duke Ellington>)
+    >>> md.composer
+    'Billy Strayhorn and Duke Ellington'
+    >>> md.contributors
+    [<music21.metadata.primitives.Contributor composer:Billy Strayhorn>,
+    <music21.metadata.primitives.Contributor composer:Duke Ellington>]
 
-    >>> md.composer = 'Gershwin, George'
+    searchAttributes are used by .search() methods to determine what attributes can
+    be searched for.  There are some synonyms (like 'dateCreated' and 'date')
+    that will find the same items.  This is because some uniqueNames have been
+    updated in music21 v8 ('dateCreated'), and the old v7 name ('date') has
+    been grandfathered in as a synonym.
 
-    These are used by .search() methods to determine what attributes are
-    made available by default.
+    allUniqueNames is a list of all the unique names (without any of the
+    grandfathered-in v7 workId synonyms).
 
     >>> md.searchAttributes
     ('abstract', 'accessRights', 'accompanyingMaterialWriter', 'accrualMethod',
@@ -230,8 +265,45 @@ class Metadata(base.Music21Object):
     'type', 'videographer', 'vocalist', 'volume', 'volumeNumber', 'woodCutter',
     'woodEngraver', 'writtenCommentator')
 
-    >>> md.contributors
-    [<music21.metadata.primitives.Contributor composer:Gershwin, George>]
+    >>> md.allUniqueNames
+    ('abstract', 'accessRights', 'accompanyingMaterialWriter', 'accrualMethod',
+    'accrualPeriodicity', 'accrualPolicy', 'actNumber', 'actor', 'adapter',
+    'afterwordAuthor', 'alternativeTitle', 'animator', 'annotator', 'architect',
+    'arranger', 'artist', 'associatedWork', 'attributedComposer', 'audience',
+    'author', 'bibliographicCitation', 'calligrapher', 'cartographer',
+    'choreographer', 'cinematographer', 'collaborator', 'collectionDesignation',
+    'collotyper', 'commentator', 'commissionedBy', 'compiler',
+    'composer', 'composerAlias', 'composerCorporate', 'conceptor', 'conductor',
+    'conformsTo', 'consultant', 'contractor', 'copyright', 'correspondent',
+    'costumeDesigner', 'countryOfComposition', 'coverage', 'creator', 'curator',
+    'dancer', 'dateAccepted', 'dateAvailable', 'dateCopyrighted',
+    'dateCreated', 'dateIssued', 'dateModified', 'dateSubmitted', 'dateValid',
+    'dedicatedTo', 'delineator', 'description', 'designer',
+    'dialogAuthor', 'director', 'dissertant', 'distributor', 'draftsman',
+    'editor', 'educationLevel', 'engineer', 'engraver', 'etcher', 'extent',
+    'facsimilist', 'fileFormat', 'fileNumber', 'filePath', 'filmEditor',
+    'forger', 'format', 'genericContributor', 'groupTitle', 'hasFormat',
+    'hasPart', 'hasVersion', 'host', 'identifier', 'illuminator', 'illustrator',
+    'instructionalMethod', 'instrumentalist', 'interviewee', 'interviewer',
+    'introductionAuthor', 'inventor', 'isFormatOf', 'isPartOf', 'isReferencedBy',
+    'isReplacedBy', 'isRequiredBy', 'isVersionOf', 'landscapeArchitect', 'language',
+    'librettist', 'license', 'lightingDesigner', 'lithographer', 'localeOfComposition',
+    'lyricist', 'manufacturer', 'mediator', 'medium', 'meetingOrganizer',
+    'metalEngraver', 'moderator', 'movementName', 'movementNumber', 'musician',
+    'narrator', 'number', 'opusNumber', 'orchestrator', 'originator', 'otherContributor',
+    'otherDate', 'parentTitle', 'performer', 'photographer', 'platemaker',
+    'popularTitle', 'printmaker', 'producer', 'productionPersonnel', 'programmer',
+    'projectConsultant', 'provenance', 'publisher', 'puppeteer', 'quotationsAuthor',
+    'recordingEngineer', 'references', 'relation', 'renderer', 'replaces',
+    'reporter', 'requires', 'researchTeamHead', 'researchTeamMember', 'researcher',
+    'responsibleParty', 'restager', 'reviewer', 'rightsHolder', 'scenarist',
+    'sceneNumber', 'scientificAdvisor', 'screenplayAuthor', 'scribe', 'sculptor',
+    'secretary', 'setDesigner', 'singer', 'source', 'spatialCoverage', 'speaker',
+    'standardsBody', 'storyteller', 'subject', 'surveyor',
+    'suspectedComposer', 'tableOfContents', 'teacher', 'temporalCoverage',
+    'textLanguage', 'textOriginalLanguage', 'title', 'transcriber', 'translator',
+    'type', 'videographer', 'vocalist', 'volumeNumber', 'woodCutter',
+    'woodEngraver', 'writtenCommentator')
     '''
 
     # CLASS VARIABLES #
@@ -263,7 +335,7 @@ class Metadata(base.Music21Object):
     def __init__(self, *args, **keywords):
         super().__init__()
 
-        self._metadata: t.Dict[str, t.Any] = {}
+        self._metadata: t.Dict[str, t.List[ValueType]] = {}
         self.software: t.List[str] = [defaults.software]
 
         # TODO: check pickling, etc.
@@ -288,34 +360,37 @@ class Metadata(base.Music21Object):
         The key can be the item's uniqueName or 'namespace:name'.  If it is
         not one of the standard metadata properties, KeyError will be raised.
 
-        >>> md = metadata.Metadata()
-        >>> md.add('suspectedComposer', 'Ludwig von Beethoven')
-        >>> md['suspectedComposer']
-        (<music21.metadata.primitives.Contributor suspectedComposer:Ludwig von Beethoven>,)
+        If you do in fact want to remove any existing items with this key,
+        you can use dictionary-style or attribute-style setting instead.
 
-        >>> md.add('title', [metadata.Text('Caveat Emptor', language='la'),
-        ...                  metadata.Text('Buyer Beware',  language='en')])
+        >>> md = metadata.Metadata()
+        >>> md.add('composer', 'Houcine Slaoui')
+        >>> md['composer']
+        (<music21.metadata.primitives.Contributor composer:Houcine Slaoui>,)
+
+        >>> md.add('title', [metadata.Text('الماريكان', language='ar'),
+        ...                  metadata.Text('The Americans',  language='en')])
         >>> titles = md['title']
         >>> titles
-        (<music21.metadata.primitives.Text Caveat Emptor>,
-        <music21.metadata.primitives.Text Buyer Beware>)
+        (<music21.metadata.primitives.Text الماريكان>,
+        <music21.metadata.primitives.Text The Americans>)
         >>> titles[0].language
-        'la'
+        'ar'
         >>> titles[1].language
         'en'
         '''
         self._add(key, value, isCustom=False)
 
-    def getCustom(self, key: str) -> t.Tuple[t.Any, ...]:
+    def getCustom(self, key: str) -> t.Tuple[ValueType, ...]:
         return self._get(key, isCustom=True)
 
-    def addCustom(self, key: str, value: t.Union[t.Any, t.List[t.Any]]):
+    def addCustom(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]]):
         self._add(key, value, isCustom=True)
 
-    def setCustom(self, key: str, value: t.Union[t.Any, t.List[t.Any]]):
+    def setCustom(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]]):
         self._set(key, value, isCustom=True)
 
-    def getAllNamedValues(self, skipContributors=False) -> t.List[t.Tuple[str, t.Any]]:
+    def getAllNamedValues(self, skipContributors=False) -> t.List[t.Tuple[str, ValueType]]:
         '''
         Returns all values stored in this metadata as a list of (nsKey, value) tuples.
         nsKeys with multiple values will appear multiple times in the list (rather
@@ -326,31 +401,33 @@ class Metadata(base.Music21Object):
         >>> md = metadata.Metadata()
         >>> md.add('composer', 'Jeff Bowen')
         >>> md.add('librettist', 'Hunter Bell')
-        >>> md.add('title', '[title of show]')
+        >>> md.add('title', 'Other World')
         >>> md.addCustom('excerpt-start-measure', 1234)
         >>> all = md.getAllNamedValues()
         >>> all
         [('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Jeff Bowen>),
         ('marcrel:LBT', <music21.metadata.primitives.Contributor librettist:Hunter Bell>),
-        ('dcterms:title', <music21.metadata.primitives.Text [title of show]>),
+        ('dcterms:title', <music21.metadata.primitives.Text Other World>),
         ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>)]
-        >>> all = md.getAllNamedValues(skipContributors=True)
-        >>> all
-        [('dcterms:title', <music21.metadata.primitives.Text [title of show]>),
+        >>> allNonContributors = md.getAllNamedValues(skipContributors=True)
+        >>> allNonContributors
+        [('dcterms:title', <music21.metadata.primitives.Text Other World>),
         ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>)]
         '''
-        allOut: t.List[t.Tuple[str, t.Any]] = []
+        allOut: t.List[t.Tuple[str, ValueType]] = []
 
-        for nsKey, value in self._metadata.items():
+        valueList: t.List[ValueType]
+        for nsKey, valueList in self._metadata.items():
             if skipContributors and self._isContributorNSKey(nsKey):
                 continue
 
-            for v in value:
-                allOut.append((nsKey, v))
+            value: ValueType
+            for value in valueList:
+                allOut.append((nsKey, value))
 
         return allOut
 
-    def getAllContributorNamedValues(self) -> t.List[t.Tuple[str, t.Any]]:
+    def getAllContributorNamedValues(self) -> t.List[t.Tuple[str, ValueType]]:
         '''
         Returns all contributors stored in this metadata as a list of (nsKey, value) tuples.
         The tuple's first element will be of the form 'namespace:name'.
@@ -362,21 +439,21 @@ class Metadata(base.Music21Object):
         >>> md.add('librettist', 'Marie Červinková-Riegrová')
         >>> md['otherContributor'] = (metadata.Contributor(role='based on plot by',
         ...                               name ='Ferdinand Mikovec'),
-        ...                           metadata.Contributor(role='original incomplete plot by',
+        ...                           metadata.Contributor(role='original partial plot by',
         ...                               name='Friedrich Schiller'))
         >>> md.addCustom('composer', 'Not a contributor')
-        >>> all = md.getAllContributorNamedValues()
-        >>> all
+        >>> allContributors = md.getAllContributorNamedValues()
+        >>> allContributors
         [('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Antonín Dvořák>),
         ('marcrel:LBT',
         <music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>),
         ('marcrel:CTB',
         <music21.metadata.primitives.Contributor based on plot by:Ferdinand Mikovec>),
         ('marcrel:CTB',
-        <music21.metadata.primitives.Contributor original incomplete plot by:Friedrich Schiller>)]
+        <music21.metadata.primitives.Contributor original partial plot by:Friedrich Schiller>)]
         '''
 
-        allOut: t.List[t.Tuple[str, Contributor]] = []
+        allOut: t.List[t.Tuple[str, ValueType]] = []
 
         for nsKey, value in self._metadata.items():
             if not self._isContributorNSKey(nsKey):
@@ -548,20 +625,26 @@ class Metadata(base.Music21Object):
         >>> md = metadata.Metadata()
         >>> md['composer'] = ['Richard Strauss']
         >>> md.librettist = 'Oscar Wilde'
-        >>> md.add('title', 'Salome') # not a contributor
+        >>> md.add('title', 'Salome')
         >>> contribs = md.contributors
         >>> contribs
         [<music21.metadata.primitives.Contributor composer:Richard Strauss>,
         <music21.metadata.primitives.Contributor librettist:Oscar Wilde>]
         '''
-        return [namedValue[1] for namedValue in self.getAllContributorNamedValues()]
+        output: t.List[Contributor] = []
+        for namedValue in self.getAllContributorNamedValues():
+            assert isinstance(namedValue[1], Contributor)
+            output.append(namedValue[1])
+        return output
 
     @property
     def copyright(self):
         '''
         Returns the copyright as a str.
         Returns None if no copyright exists in the metadata.
-        Returns 'MULTIPLE' if multiple copyrights exist in the metadata.
+        Returns all the copyright values in one string (with ', ' between them)
+        if multiple copyrights exist in the metadata.
+
         Use md['copyright'] to get all the copyrights.
 
         >>> md = metadata.Metadata()
@@ -592,8 +675,8 @@ class Metadata(base.Music21Object):
     def all(self, skipContributors=False):
         # noinspection SpellCheckingInspection
         '''
-        Returns all values stored in this metadata (as simple types: strings or ints)
-        as a sorted list of tuples.  Each tuple is (uniqueName, simpleValue).
+        Returns all values stored in this metadata as a sorted list of Tuple[str, str].
+        Each tuple is (uniqueName, stringValue).
 
         >>> c = corpus.parse('corelli/opus3no1/1grave')
         >>> c.metadata.all()
@@ -628,13 +711,14 @@ class Metadata(base.Music21Object):
                 continue
             except KeyError:
                 # A uniqueName that doesn't have a PropertyDescription
-                # That's the three fileInfo properties
+                # That's the three fileInfo properties, just get them
+                # attribute-style (i.e. as string)
                 if uniqueName == 'fileFormat':
                     val = str(self.fileFormat)
                 elif uniqueName == 'filePath':
                     val = str(self.filePath)
                 elif uniqueName == 'fileNumber':
-                    val = self.fileNumber
+                    val = str(self.fileNumber)
                 else:
                     raise
 
@@ -660,7 +744,7 @@ class Metadata(base.Music21Object):
         return list(sorted(allOut.items()))
 
     def _getStringValueByNSKey(self, nsKey: str) -> t.Optional[str]:
-        values: t.Tuple[t.Any, ...]
+        values: t.Tuple[ValueType, ...]
         try:
             values = self._get(nsKey, isCustom=False)
         except KeyError:
@@ -668,6 +752,7 @@ class Metadata(base.Music21Object):
 
         if not values:
             return None
+
         if self._isContributorNSKey(nsKey):
             if len(values) == 1:
                 return str(values[0])
@@ -676,12 +761,18 @@ class Metadata(base.Music21Object):
             return str(values[0]) + f' and {len(values)-1} others'
 
         if self._needsArticleNormalization(nsKey):
-            return ', '.join(value.getNormalizedArticle() for value in values)
+            output: str = ''
+            for i, value in enumerate(values):
+                assert isinstance(value, Text)
+                if i > 0:
+                    output += ', '
+                output += value.getNormalizedArticle()
+            return output
 
         return ', '.join(str(value) for value in values)
 
     def _getStringValuesByNSKey(self, nsKey: str) -> t.List[str]:
-        values: t.Tuple[t.Any, ...]
+        values: t.Tuple[ValueType, ...]
         try:
             values = self._get(nsKey, isCustom=False)
         except KeyError:
@@ -691,7 +782,11 @@ class Metadata(base.Music21Object):
             return []
 
         if self._needsArticleNormalization(nsKey):
-            return [value.getNormalizedArticle() for value in values]
+            output: t.List[str] = []
+            for value in values:
+                assert isinstance(value, Text)
+                output.append(value.getNormalizedArticle())
+            return output
 
         return [str(value) for value in values]
 
@@ -763,26 +858,26 @@ class Metadata(base.Music21Object):
         or grandfathered workId abbreviation), then AttributeError is raised.
 
         >>> md = metadata.Metadata()
-        >>> md.description = metadata.Text('A uniqueName description', language='en')
-        >>> md.dedication = 'A workId that is not a uniqueName'
-        >>> md.otl = metadata.Text('A workId abbreviation')
+        >>> md.description = metadata.Text('A description set via uniqueName', language='en')
+        >>> md.dedication = 'A dedication set via grandfathered workId'
+        >>> md.otl = metadata.Text('A title set via grandfathered workId abbreviation')
         >>> md.description
-        'A uniqueName description'
+        'A description set via uniqueName'
         >>> md.dedicatedTo  # the uniqueName for 'dedicated' workId
-        'A workId that is not a uniqueName'
-        >>> md.title  # the workId/uniqueName for 'otl' abbreviation
-        'A workId abbreviation'
-        >>> md.add('description', 'uniqueName description #2')
+        'A dedication set via grandfathered workId'
+        >>> md.title  # the uniqueName for 'otl' abbreviation
+        'A title set via grandfathered workId abbreviation'
+        >>> md.add('description', 'A description set via md.add()')
         >>> md.description
-        'A uniqueName description, uniqueName description #2'
+        'A description set via uniqueName, A description set via md.add()'
         '''
 
         # __getattr__ is the call of last resort after looking for bare
         # attributes and property methods, so __getattr__ won't be called
-        # for self.software (bare attribute), or for self.composer (property).
-        # (property), even though we certainly could handle those here.
-        # This is why we don't have to handle .composers/librettists/lyricists
-        # or .fileFormat/filePath/fileNumber here, like we do in __setattr__
+        # for self.software (bare attribute), or for self.composer (property),
+        # even though we certainly could handle those here. This is why we
+        # don't have to handle .composers/librettists/lyricists or
+        # .fileFormat/filePath/fileNumber here, like we do in __setattr__
         # (which is the only call you get if you implement it, so it has
         # to handle everything).
         return self._getSingularAttribute(name)
@@ -873,12 +968,12 @@ class Metadata(base.Music21Object):
         # bare attributes (including the ones in base classes).
         super().__setattr__(name, value)
 
-    def __getitem__(self, key: str) -> t.Tuple[t.Any, ...]:
+    def __getitem__(self, key: str) -> t.Tuple[ValueType, ...]:
         '''
         Utility "dictionary key" access for all standard uniqueNames and
         standard keys of the form 'namespace:name'.
 
-        These always return t.Tuple[t.Any, ...], which may be empty.
+        These always return t.Tuple[ValueType, ...], which may be empty.
 
         If key is not a standard uniqueName or standard 'namespace:name',
         then KeyError is raised.
@@ -1178,8 +1273,9 @@ class Metadata(base.Music21Object):
     def composer(self):
         r'''
         Get or set the composer of this work. Only the first composer can be
-        got or set via properties.  Instead add Composer roles to the .contributors
-        list.
+        got or set via properties.  You can add multiple composers by setting
+        them dictionary-style (e.g. md['composer'] = ['composer1', 'composer2']),
+        or by using md.add('composer', ...) API.
 
         The composer attribute does not live in Metadata, but creates a
         :class:`~music21.metadata.Contributor` object in the .contributors
@@ -1192,9 +1288,12 @@ class Metadata(base.Music21Object):
         ...     )
         >>> md.composer
         'Beach, Mrs. H.H.A.'
-        >>> md.add('composer', 'Beach, Amy Marcy Cheney') # we need a better example here
+        >>> md.add('composer', 'Beach, Amy Marcy Cheney')
         >>> md.composer
         'Beach, Mrs. H.H.A. and Beach, Amy Marcy Cheney'
+
+        Note that in this case, a "composerAlias" would probably be a more
+        appropriate role than a second composer.
         '''
         return self._getSingularAttribute('composer')
 
@@ -1216,7 +1315,7 @@ class Metadata(base.Music21Object):
         Might as well add a third composer to the concerto committee?
 
         >>> contrib3 = metadata.Contributor(role='composer', name='Chu Wanghua')
-        >>> md.addContributor(contrib3)
+        >>> md.add('composer', contrib3)
         >>> md.composers
         ['Xian Xinghai', 'Yin Chengzong', 'Chu Wanghua']
 
@@ -1229,9 +1328,9 @@ class Metadata(base.Music21Object):
         return self._getPluralAttribute('composer')
 
     @property
-    def date(self):
+    def dateCreated(self):
         r'''
-        Get or set the date of this work as one of the following date
+        Get or set the creation date of this work as one of the following date
         objects:
 
         :class:`~music21.metadata.DateSingle`,
@@ -1244,15 +1343,15 @@ class Metadata(base.Music21Object):
         ...     popularTitle='Eroica',
         ...     composer='Beethoven, Ludwig van',
         ...     )
-        >>> md.date = '1805'
-        >>> md.date
+        >>> md.dateCreated = '1805'
+        >>> md.dateCreated
         '1805/--/--'
 
-        >>> md.date = metadata.DateBetween(['1803/01/01', '1805/04/07'])
-        >>> md.date
+        >>> md.dateCreated = metadata.DateBetween(['1803/01/01', '1805/04/07'])
+        >>> md.dateCreated
         '1803/01/01 to 1805/04/07'
         '''
-        return self._getSingularAttribute('date')
+        return self._getSingularAttribute('dateCreated')
 
     @property
     def fileFormat(self) -> t.Optional[str]:
@@ -1273,7 +1372,7 @@ class Metadata(base.Music21Object):
     @property
     def fileNumber(self) -> t.Optional[int]:
         '''
-        Get or set the file path that was parsed.
+        Get or set the file number that was parsed.
         '''
         if self.fileInfo.number:
             return self.fileInfo.number
@@ -1490,20 +1589,18 @@ class Metadata(base.Music21Object):
         if not prop.isContributor:
             return None
 
-        # it's a small-c contributor
-        if prop.oldMusic21WorkId:
-            # it maps to a backward compatible big-C Contributor role, which can be
-            # found in prop.oldMusic21WorkId.
-            return prop.oldMusic21WorkId
-
-        # it's a small-c contributor that doesn't map to a backward compatible
-        # big-C Contributor role, but since we're not trying to be backward
-        # compatible, we'll take these, too.
+        # Return the uniqueName, which can be found one of three places in prop.
+        # We must check them in this order:
+        # 1. prop.uniqueName
+        # 2. prop.oldMusic21WorkId
+        # 3. prop.name
         if prop.uniqueName:
             return prop.uniqueName
+        if prop.oldMusic21WorkId:
+            return prop.oldMusic21WorkId
         return prop.name
 
-    def _get(self, key: str, isCustom: bool) -> t.Tuple[t.Any, ...]:
+    def _get(self, key: str, isCustom: bool) -> t.Tuple[ValueType, ...]:
         '''
         Returns all the items stored in metadata with this key.
         The returned value is always a Tuple. If there are no items, an empty
@@ -1520,7 +1617,7 @@ class Metadata(base.Music21Object):
                     f'Key=\'{key}\' is not a standard metadata key.'
                     ' Call setCustom/getCustom for custom keys.')
 
-        valueList: t.Optional[t.List[t.Any]] = self._metadata.get(key, None)
+        valueList: t.Optional[t.List[ValueType]] = self._metadata.get(key, None)
 
         if not valueList:
             # return empty tuple
@@ -1552,11 +1649,11 @@ class Metadata(base.Music21Object):
             # special case: str is iterable, but we don't want to iterate over it.
             value = [value]
 
-        convertedValues: t.List[t.Any] = []
+        convertedValues: t.List[ValueType] = []
         for v in value:
             convertedValues.append(self._convertValue(key, v))
 
-        prevValues: t.Optional[t.List[t.Any]] = self._metadata.get(key, None)
+        prevValues: t.Optional[t.List[ValueType]] = self._metadata.get(key, None)
         if not prevValues:  # None or []
             # set the convertedValues list in there
             # it's always a list, even if there's only one value
@@ -1579,10 +1676,7 @@ class Metadata(base.Music21Object):
         (<music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>,)
         >>> md._set('librettist', [metadata.Text('Melissa Li'),
         ...                            metadata.Text('Kit Yan Win')], isCustom=False)
-        >>> librettists = md['marcrel:LBT']
-        >>> isinstance(librettists, tuple)
-        True
-        >>> librettists
+        >>> md['marcrel:LBT']
         (<music21.metadata.primitives.Contributor librettist:Melissa Li>,
         <music21.metadata.primitives.Contributor librettist:Kit Yan Win>)
         '''
@@ -1598,7 +1692,7 @@ class Metadata(base.Music21Object):
         self._add(key, value, isCustom)
 
     @staticmethod
-    def _convertValue(nsKey: str, value: t.Any) -> t.Any:
+    def _convertValue(nsKey: str, value: t.Any) -> ValueType:
         '''
         Converts a value to the appropriate valueType (looked up in STDPROPERTIES by nsKey).
 

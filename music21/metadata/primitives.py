@@ -56,7 +56,7 @@ class Date(prebase.ProtoM21Object):
     Additionally, each value can be specified as `uncertain` or `approximate`;
     if None, assumed to be certain.
 
-    Data objects are fundamental components of
+    Date objects are fundamental components of
     :class:`~music21.metadata.DateSingle` and related subclasses that represent
     single dates and date ranges.
 
@@ -1023,8 +1023,7 @@ class Contributor(prebase.ProtoM21Object):
         ...         birth='1923', death='2013')
         >>> c1 == c2
         True
-        >>> c2 = metadata.Contributor(role='lyricist', name='The Composer',
-        ...         birth='1923', death='2013')
+        >>> c2.role = 'lyricist'
         >>> c1 == c2
         False
         >>> c2 = metadata.Contributor(role='composer', name='A Composer',
