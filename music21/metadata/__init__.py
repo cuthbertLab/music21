@@ -209,12 +209,12 @@ class Metadata(base.Music21Object):
     >>> md['composer'] = ['Billy Strayhorn', 'Duke Ellington']
     >>> md['composer']
     (<music21.metadata.primitives.Contributor composer:Billy Strayhorn>,
-    <music21.metadata.primitives.Contributor composer:Duke Ellington>)
+     <music21.metadata.primitives.Contributor composer:Duke Ellington>)
     >>> md.composer
     'Billy Strayhorn and Duke Ellington'
     >>> md.contributors
-    [<music21.metadata.primitives.Contributor composer:Billy Strayhorn>,
-    <music21.metadata.primitives.Contributor composer:Duke Ellington>]
+    (<music21.metadata.primitives.Contributor composer:Billy Strayhorn>,
+     <music21.metadata.primitives.Contributor composer:Duke Ellington>)
 
     searchAttributes are used by .search() methods to determine what attributes can
     be searched for.  There are some synonyms (like 'dateCreated' and 'date')
@@ -227,83 +227,82 @@ class Metadata(base.Music21Object):
 
     >>> md.searchAttributes
     ('abstract', 'accessRights', 'accompanyingMaterialWriter', 'accrualMethod',
-    'accrualPeriodicity', 'accrualPolicy', 'actNumber', 'actor', 'adapter',
-    'afterwordAuthor', 'alternativeTitle', 'animator', 'annotator', 'architect',
-    'arranger', 'artist', 'associatedWork', 'attributedComposer', 'audience',
-    'author', 'bibliographicCitation', 'calligrapher', 'cartographer',
-    'choreographer', 'cinematographer', 'collaborator', 'collectionDesignation',
-    'collotyper', 'commentator', 'commission', 'commissionedBy', 'compiler',
-    'composer', 'composerAlias', 'composerCorporate', 'conceptor', 'conductor',
-    'conformsTo', 'consultant', 'contractor', 'copyright', 'correspondent',
-    'costumeDesigner', 'countryOfComposition', 'coverage', 'creator', 'curator',
-    'dancer', 'date', 'dateAccepted', 'dateAvailable', 'dateCopyrighted',
-    'dateCreated', 'dateIssued', 'dateModified', 'dateSubmitted', 'dateValid',
-    'dedicatedTo', 'dedication', 'delineator', 'description', 'designer',
-    'dialogAuthor', 'director', 'dissertant', 'distributor', 'draftsman',
-    'editor', 'educationLevel', 'engineer', 'engraver', 'etcher', 'extent',
-    'facsimilist', 'fileFormat', 'fileNumber', 'filePath', 'filmEditor',
-    'forger', 'format', 'genericContributor', 'groupTitle', 'hasFormat',
-    'hasPart', 'hasVersion', 'host', 'identifier', 'illuminator', 'illustrator',
-    'instructionalMethod', 'instrumentalist', 'interviewee', 'interviewer',
-    'introductionAuthor', 'inventor', 'isFormatOf', 'isPartOf', 'isReferencedBy',
-    'isReplacedBy', 'isRequiredBy', 'isVersionOf', 'landscapeArchitect', 'language',
-    'librettist', 'license', 'lightingDesigner', 'lithographer', 'localeOfComposition',
-    'lyricist', 'manufacturer', 'mediator', 'medium', 'meetingOrganizer',
-    'metalEngraver', 'moderator', 'movementName', 'movementNumber', 'musician',
-    'narrator', 'number', 'opusNumber', 'orchestrator', 'originator', 'otherContributor',
-    'otherDate', 'parentTitle', 'performer', 'photographer', 'platemaker',
-    'popularTitle', 'printmaker', 'producer', 'productionPersonnel', 'programmer',
-    'projectConsultant', 'provenance', 'publisher', 'puppeteer', 'quotationsAuthor',
-    'recordingEngineer', 'references', 'relation', 'renderer', 'replaces',
-    'reporter', 'requires', 'researchTeamHead', 'researchTeamMember', 'researcher',
-    'responsibleParty', 'restager', 'reviewer', 'rightsHolder', 'scenarist',
-    'sceneNumber', 'scientificAdvisor', 'screenplayAuthor', 'scribe', 'sculptor',
-    'secretary', 'setDesigner', 'singer', 'source', 'spatialCoverage', 'speaker',
-    'standardsBody', 'storyteller', 'subject', 'surveyor',
-    'suspectedComposer', 'tableOfContents', 'teacher', 'temporalCoverage',
-    'textLanguage', 'textOriginalLanguage', 'title', 'transcriber', 'translator',
-    'type', 'videographer', 'vocalist', 'volume', 'volumeNumber', 'woodCutter',
-    'woodEngraver', 'writtenCommentator')
+     'accrualPeriodicity', 'accrualPolicy', 'actNumber', 'actor', 'adapter',
+     'afterwordAuthor', 'alternativeTitle', 'animator', 'annotator', 'architect',
+     'arranger', 'artist', 'associatedWork', 'attributedComposer', 'audience',
+     'author', 'bibliographicCitation', 'calligrapher', 'cartographer', 'choreographer',
+     'cinematographer', 'collaborator', 'collectionDesignation', 'collotyper',
+     'commentator', 'commission', 'commissionedBy', 'compiler', 'composer',
+     'composerAlias', 'composerCorporate', 'conceptor', 'conductor', 'conformsTo',
+     'consultant', 'contractor', 'copyright', 'correspondent', 'costumeDesigner',
+     'countryOfComposition', 'coverage', 'creator', 'curator', 'dancer', 'date',
+     'dateAccepted', 'dateAvailable', 'dateCopyrighted', 'dateCreated', 'dateIssued',
+     'dateModified', 'dateSubmitted', 'dateValid', 'dedicatedTo', 'dedication',
+     'delineator', 'description', 'designer', 'dialogAuthor', 'director', 'dissertant',
+     'distributor', 'draftsman', 'editor', 'educationLevel', 'electronicEditor',
+     'electronicEncoder', 'engineer', 'engraver', 'etcher', 'extent', 'facsimilist',
+     'fileFormat', 'fileNumber', 'filePath', 'filmEditor', 'forger', 'format',
+     'genericContributor', 'groupTitle', 'hasFormat', 'hasPart', 'hasVersion', 'host',
+     'identifier', 'illuminator', 'illustrator', 'instructionalMethod', 'instrumentalist',
+     'interviewee', 'interviewer', 'introductionAuthor', 'inventor', 'isFormatOf',
+     'isPartOf', 'isReferencedBy', 'isReplacedBy', 'isRequiredBy', 'isVersionOf',
+     'landscapeArchitect', 'language', 'librettist', 'license', 'lightingDesigner',
+     'lithographer', 'localeOfComposition', 'lyricist', 'manufacturer', 'mediator',
+     'medium', 'meetingOrganizer', 'metalEngraver', 'moderator', 'movementName',
+     'movementNumber', 'musician', 'narrator', 'number', 'opusNumber', 'orchestrator',
+     'originalDocumentOwner', 'originalEditor', 'originator', 'otherContributor',
+     'otherDate', 'parentTitle', 'performer', 'photographer', 'platemaker',
+     'popularTitle', 'printmaker', 'producer', 'productionPersonnel', 'programmer',
+     'projectConsultant', 'provenance', 'publisher', 'puppeteer', 'quotationsAuthor',
+     'recordingEngineer', 'references', 'relation', 'renderer', 'replaces', 'reporter',
+     'requires', 'researchTeamHead', 'researchTeamMember', 'researcher',
+     'responsibleParty', 'restager', 'reviewer', 'rightsHolder', 'scenarist',
+     'sceneNumber', 'scientificAdvisor', 'screenplayAuthor', 'scribe', 'sculptor',
+     'secretary', 'setDesigner', 'singer', 'source', 'spatialCoverage', 'speaker',
+     'standardsBody', 'storyteller', 'subject', 'surveyor', 'suspectedComposer',
+     'tableOfContents', 'teacher', 'temporalCoverage', 'textLanguage',
+     'textOriginalLanguage', 'title', 'transcriber', 'translator', 'type',
+     'videographer', 'vocalist', 'volume', 'volumeNumber', 'woodCutter', 'woodEngraver',
+     'writtenCommentator')
 
     >>> md.allUniqueNames
     ('abstract', 'accessRights', 'accompanyingMaterialWriter', 'accrualMethod',
-    'accrualPeriodicity', 'accrualPolicy', 'actNumber', 'actor', 'adapter',
-    'afterwordAuthor', 'alternativeTitle', 'animator', 'annotator', 'architect',
-    'arranger', 'artist', 'associatedWork', 'attributedComposer', 'audience',
-    'author', 'bibliographicCitation', 'calligrapher', 'cartographer',
-    'choreographer', 'cinematographer', 'collaborator', 'collectionDesignation',
-    'collotyper', 'commentator', 'commissionedBy', 'compiler',
-    'composer', 'composerAlias', 'composerCorporate', 'conceptor', 'conductor',
-    'conformsTo', 'consultant', 'contractor', 'copyright', 'correspondent',
-    'costumeDesigner', 'countryOfComposition', 'coverage', 'creator', 'curator',
-    'dancer', 'dateAccepted', 'dateAvailable', 'dateCopyrighted',
-    'dateCreated', 'dateIssued', 'dateModified', 'dateSubmitted', 'dateValid',
-    'dedicatedTo', 'delineator', 'description', 'designer',
-    'dialogAuthor', 'director', 'dissertant', 'distributor', 'draftsman',
-    'editor', 'educationLevel', 'engineer', 'engraver', 'etcher', 'extent',
-    'facsimilist', 'fileFormat', 'fileNumber', 'filePath', 'filmEditor',
-    'forger', 'format', 'genericContributor', 'groupTitle', 'hasFormat',
-    'hasPart', 'hasVersion', 'host', 'identifier', 'illuminator', 'illustrator',
-    'instructionalMethod', 'instrumentalist', 'interviewee', 'interviewer',
-    'introductionAuthor', 'inventor', 'isFormatOf', 'isPartOf', 'isReferencedBy',
-    'isReplacedBy', 'isRequiredBy', 'isVersionOf', 'landscapeArchitect', 'language',
-    'librettist', 'license', 'lightingDesigner', 'lithographer', 'localeOfComposition',
-    'lyricist', 'manufacturer', 'mediator', 'medium', 'meetingOrganizer',
-    'metalEngraver', 'moderator', 'movementName', 'movementNumber', 'musician',
-    'narrator', 'number', 'opusNumber', 'orchestrator', 'originator', 'otherContributor',
-    'otherDate', 'parentTitle', 'performer', 'photographer', 'platemaker',
-    'popularTitle', 'printmaker', 'producer', 'productionPersonnel', 'programmer',
-    'projectConsultant', 'provenance', 'publisher', 'puppeteer', 'quotationsAuthor',
-    'recordingEngineer', 'references', 'relation', 'renderer', 'replaces',
-    'reporter', 'requires', 'researchTeamHead', 'researchTeamMember', 'researcher',
-    'responsibleParty', 'restager', 'reviewer', 'rightsHolder', 'scenarist',
-    'sceneNumber', 'scientificAdvisor', 'screenplayAuthor', 'scribe', 'sculptor',
-    'secretary', 'setDesigner', 'singer', 'source', 'spatialCoverage', 'speaker',
-    'standardsBody', 'storyteller', 'subject', 'surveyor',
-    'suspectedComposer', 'tableOfContents', 'teacher', 'temporalCoverage',
-    'textLanguage', 'textOriginalLanguage', 'title', 'transcriber', 'translator',
-    'type', 'videographer', 'vocalist', 'volumeNumber', 'woodCutter',
-    'woodEngraver', 'writtenCommentator')
+     'accrualPeriodicity', 'accrualPolicy', 'actNumber', 'actor', 'adapter',
+     'afterwordAuthor', 'alternativeTitle', 'animator', 'annotator', 'architect',
+     'arranger', 'artist', 'associatedWork', 'attributedComposer', 'audience',
+     'author', 'bibliographicCitation', 'calligrapher', 'cartographer',
+     'choreographer', 'cinematographer', 'collaborator', 'collectionDesignation',
+     'collotyper', 'commentator', 'commissionedBy', 'compiler', 'composer',
+     'composerAlias', 'composerCorporate', 'conceptor', 'conductor', 'conformsTo',
+     'consultant', 'contractor', 'copyright', 'correspondent', 'costumeDesigner',
+     'countryOfComposition', 'coverage', 'creator', 'curator', 'dancer',
+     'dateAccepted', 'dateAvailable', 'dateCopyrighted', 'dateCreated', 'dateIssued',
+     'dateModified', 'dateSubmitted', 'dateValid', 'dedicatedTo', 'delineator',
+     'description', 'designer', 'dialogAuthor', 'director', 'dissertant', 'distributor',
+     'draftsman', 'editor', 'educationLevel', 'electronicEditor', 'electronicEncoder',
+     'engineer', 'engraver', 'etcher', 'extent', 'facsimilist', 'fileFormat',
+     'fileNumber', 'filePath', 'filmEditor', 'forger', 'format', 'genericContributor',
+     'groupTitle', 'hasFormat', 'hasPart', 'hasVersion', 'host', 'identifier',
+     'illuminator', 'illustrator', 'instructionalMethod', 'instrumentalist',
+     'interviewee', 'interviewer', 'introductionAuthor', 'inventor', 'isFormatOf',
+     'isPartOf', 'isReferencedBy', 'isReplacedBy', 'isRequiredBy', 'isVersionOf',
+     'landscapeArchitect', 'language', 'librettist', 'license', 'lightingDesigner',
+     'lithographer', 'localeOfComposition', 'lyricist', 'manufacturer', 'mediator',
+     'medium', 'meetingOrganizer', 'metalEngraver', 'moderator', 'movementName',
+     'movementNumber', 'musician', 'narrator', 'number', 'opusNumber', 'orchestrator',
+     'originalDocumentOwner', 'originalEditor', 'originator', 'otherContributor',
+     'otherDate', 'parentTitle', 'performer', 'photographer', 'platemaker', 'popularTitle',
+     'printmaker', 'producer', 'productionPersonnel', 'programmer', 'projectConsultant',
+     'provenance', 'publisher', 'puppeteer', 'quotationsAuthor', 'recordingEngineer',
+     'references', 'relation', 'renderer', 'replaces', 'reporter', 'requires',
+     'researchTeamHead', 'researchTeamMember', 'researcher', 'responsibleParty',
+     'restager', 'reviewer', 'rightsHolder', 'scenarist', 'sceneNumber',
+     'scientificAdvisor', 'screenplayAuthor', 'scribe', 'sculptor', 'secretary',
+     'setDesigner', 'singer', 'source', 'spatialCoverage', 'speaker', 'standardsBody',
+     'storyteller', 'subject', 'surveyor', 'suspectedComposer', 'tableOfContents',
+     'teacher', 'temporalCoverage', 'textLanguage', 'textOriginalLanguage', 'title',
+     'transcriber', 'translator', 'type', 'videographer', 'vocalist', 'volumeNumber',
+     'woodCutter', 'woodEngraver', 'writtenCommentator')
     '''
 
     # CLASS VARIABLES #
@@ -373,7 +372,7 @@ class Metadata(base.Music21Object):
         >>> titles = md['title']
         >>> titles
         (<music21.metadata.primitives.Text الماريكان>,
-        <music21.metadata.primitives.Text The Americans>)
+         <music21.metadata.primitives.Text The Americans>)
         >>> titles[0].language
         'ar'
         >>> titles[1].language
@@ -390,9 +389,9 @@ class Metadata(base.Music21Object):
     def setCustom(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]]):
         self._set(key, value, isCustom=True)
 
-    def getAllNamedValues(self, skipContributors=False) -> t.List[t.Tuple[str, ValueType]]:
+    def getAllNamedValues(self, skipContributors=False) -> t.Tuple[t.Tuple[str, ValueType], ...]:
         '''
-        Returns all values stored in this metadata as a list of (nsKey, value) tuples.
+        Returns all values stored in this metadata as a tuple of (nsKey, value) tuples.
         nsKeys with multiple values will appear multiple times in the list (rather
         than appearing once, with a value that is a list of values).
         The tuple's first element is either of the form 'namespace:name', or a
@@ -405,14 +404,14 @@ class Metadata(base.Music21Object):
         >>> md.addCustom('excerpt-start-measure', 1234)
         >>> all = md.getAllNamedValues()
         >>> all
-        [('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Jeff Bowen>),
-        ('marcrel:LBT', <music21.metadata.primitives.Contributor librettist:Hunter Bell>),
-        ('dcterms:title', <music21.metadata.primitives.Text Other World>),
-        ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>)]
+        (('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Jeff Bowen>),
+         ('marcrel:LBT', <music21.metadata.primitives.Contributor librettist:Hunter Bell>),
+         ('dcterms:title', <music21.metadata.primitives.Text Other World>),
+         ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>))
         >>> allNonContributors = md.getAllNamedValues(skipContributors=True)
         >>> allNonContributors
-        [('dcterms:title', <music21.metadata.primitives.Text Other World>),
-        ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>)]
+        (('dcterms:title', <music21.metadata.primitives.Text Other World>),
+         ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>))
         '''
         allOut: t.List[t.Tuple[str, ValueType]] = []
 
@@ -425,12 +424,12 @@ class Metadata(base.Music21Object):
             for value in valueList:
                 allOut.append((nsKey, value))
 
-        return allOut
+        return tuple(allOut)
 
-    def getAllContributorNamedValues(self) -> t.List[t.Tuple[str, ValueType]]:
+    def getAllContributorNamedValues(self) -> t.Tuple[t.Tuple[str, ValueType], ...]:
         '''
-        Returns all contributors stored in this metadata as a list of (nsKey, value) tuples.
-        The tuple's first element will be of the form 'namespace:name'.
+        Returns all contributors stored in this metadata as a tuple of (nsKey, value) tuples.
+        The individual tuple's first element will be of the form 'namespace:name'.
 
         >>> md = metadata.Metadata()
         >>> md['title'] = ['Dimitrij', 'False Dmitry']
@@ -444,13 +443,13 @@ class Metadata(base.Music21Object):
         >>> md.addCustom('composer', 'Not a contributor')
         >>> allContributors = md.getAllContributorNamedValues()
         >>> allContributors
-        [('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Antonín Dvořák>),
-        ('marcrel:LBT',
-        <music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>),
-        ('marcrel:CTB',
-        <music21.metadata.primitives.Contributor based on plot by:Ferdinand Mikovec>),
-        ('marcrel:CTB',
-        <music21.metadata.primitives.Contributor original partial plot by:Friedrich Schiller>)]
+        (('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Antonín Dvořák>),
+         ('marcrel:LBT',
+          <music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>),
+         ('marcrel:CTB',
+          <music21.metadata.primitives.Contributor based on plot by:Ferdinand Mikovec>),
+         ('marcrel:CTB',
+          <music21.metadata.primitives.Contributor original partial plot by:Friedrich Schiller>))
         '''
 
         allOut: t.List[t.Tuple[str, ValueType]] = []
@@ -462,7 +461,7 @@ class Metadata(base.Music21Object):
             for v in value:
                 allOut.append((nsKey, v))
 
-        return allOut
+        return tuple(allOut)
 
 # -----------------------------------------------------------------------------
 #   A few static utility routines for clients calling public APIs
@@ -617,25 +616,30 @@ class Metadata(base.Music21Object):
 #   Pre-2022 public APIs
 
     @property
-    def contributors(self) -> t.List[Contributor]:
+    def contributors(self) -> t.Tuple[Contributor, ...]:
         '''
-        Returns a list of all the Contributors found in the metadata.
-        Returns [] if no Contributors exist.
+        Returns a tuple of all the Contributors found in the metadata.
+        Returns an empty tuple if no Contributors exist.
 
         >>> md = metadata.Metadata()
         >>> md['composer'] = ['Richard Strauss']
         >>> md.librettist = 'Oscar Wilde'
+
+        When we add a title (whether through `.attribute` setting, `[item]` setting,
+        or the :meth:`~music21.metadata.Metadata.add` method), it will not show up
+        in the list of contributors.
+
         >>> md.add('title', 'Salome')
         >>> contribs = md.contributors
         >>> contribs
-        [<music21.metadata.primitives.Contributor composer:Richard Strauss>,
-        <music21.metadata.primitives.Contributor librettist:Oscar Wilde>]
+        (<music21.metadata.primitives.Contributor composer:Richard Strauss>,
+         <music21.metadata.primitives.Contributor librettist:Oscar Wilde>)
         '''
         output: t.List[Contributor] = []
         for namedValue in self.getAllContributorNamedValues():
             assert isinstance(namedValue[1], Contributor)
             output.append(namedValue[1])
-        return output
+        return tuple(output)
 
     @property
     def copyright(self):
@@ -643,13 +647,20 @@ class Metadata(base.Music21Object):
         Returns the copyright as a str.
         Returns None if no copyright exists in the metadata.
         Returns all the copyright values in one string (with ', ' between them)
-        if multiple copyrights exist in the metadata.
-
-        Use md['copyright'] to get all the copyrights.
+        if multiple copyrights exist in the metadata. Use md['copyright'] to
+        get all the copyrights.
 
         >>> md = metadata.Metadata()
         >>> md.copyright is None
         True
+        >>> md.copyright = 'Copyright © 1896, Éditions Durand (expired)'
+        >>> md.copyright
+        'Copyright © 1896, Éditions Durand (expired)'
+
+        Using dictionary-style access, you can use either the uniqueName ('copyright')
+        or the nsKey ('dcterms:rights').  Here you can see how multiple copyrights
+        are handled.
+
         >>> md['dcterms:rights'] = ('Copyright © 1984 All Rights Reserved',)
         >>> md.copyright
         'Copyright © 1984 All Rights Reserved'
@@ -658,16 +669,17 @@ class Metadata(base.Music21Object):
         'Copyright © 1984 All Rights Reserved, Lyrics copyright © 1987 All Rights Reserved'
         >>> md['copyright']
         (<music21.metadata.primitives.Copyright Copyright © 1984 All Rights Reserved>,
-        <music21.metadata.primitives.Copyright Lyrics copyright © 1987 All Rights Reserved>)
+         <music21.metadata.primitives.Copyright Lyrics copyright © 1987 All Rights Reserved>)
 
-        You can also set Text or Copyright values.
+        You can set str, Text, or Copyright values, and they will be converted to
+        Copyright automatically if necessary.
 
-        >>> md.copyright = metadata.Text('Copyright © 1984 from Text')
+        >>> md.copyright = metadata.Text('Copyright © 1984')
         >>> md['copyright']
-        (<music21.metadata.primitives.Copyright Copyright © 1984 from Text>,)
-        >>> md.copyright = metadata.Copyright('Copyright © 1984 from Copyright', role='something')
+        (<music21.metadata.primitives.Copyright Copyright © 1984>,)
+        >>> md.copyright = metadata.Copyright('Copyright © 1985', role='something')
         >>> md['dcterms:rights']
-        (<music21.metadata.primitives.Copyright Copyright © 1984 from Copyright>,)
+        (<music21.metadata.primitives.Copyright Copyright © 1985>,)
         '''
         return self._getSingularAttribute('copyright')
 
@@ -675,27 +687,27 @@ class Metadata(base.Music21Object):
     def all(self, skipContributors=False):
         # noinspection SpellCheckingInspection
         '''
-        Returns all values stored in this metadata as a sorted list of Tuple[str, str].
-        Each tuple is (uniqueName, stringValue).
+        Returns all values stored in this metadata as a sorted Tuple of Tuple[str, str].
+        Each individual Tuple is (uniqueName, stringValue).
 
         >>> c = corpus.parse('corelli/opus3no1/1grave')
         >>> c.metadata.all()
-        [('arranger', 'Michael Scott Cuthbert'),
+        (('arranger', 'Michael Scott Cuthbert'),
          ('composer', 'Arcangelo Corelli'),
          ('copyright', '© 2014, Creative Commons License (CC-BY)'),
          ('fileFormat', 'musicxml'),
          ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
-         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
+         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'))
 
         >>> c.metadata.date = metadata.DateRelative('1689', 'onOrBefore')
         >>> c.metadata.localeOfComposition = 'Rome'
         >>> c.metadata.all(skipContributors=True)
-        [('copyright', '© 2014, Creative Commons License (CC-BY)'),
+        (('copyright', '© 2014, Creative Commons License (CC-BY)'),
          ('dateCreated', '1689/--/-- or earlier'),
          ('fileFormat', 'musicxml'),
          ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
          ('localeOfComposition', 'Rome'),
-         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
+         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'))
         '''
         # pylint: disable=undefined-variable
         allOut = {}
@@ -741,7 +753,7 @@ class Metadata(base.Music21Object):
             if allOut['movementName'] == allOut['title']:
                 del(allOut['title'])
 
-        return list(sorted(allOut.items()))
+        return tuple(sorted(allOut.items()))
 
     def _getStringValueByNSKey(self, nsKey: str) -> t.Optional[str]:
         values: t.Tuple[ValueType, ...]
@@ -771,26 +783,26 @@ class Metadata(base.Music21Object):
 
         return ', '.join(str(value) for value in values)
 
-    def _getStringValuesByNSKey(self, nsKey: str) -> t.List[str]:
+    def _getStringValuesByNSKey(self, nsKey: str) -> t.Tuple[str, ...]:
         values: t.Tuple[ValueType, ...]
         try:
             values = self._get(nsKey, isCustom=False)
         except KeyError:
-            return []
+            return tuple()
 
         if not values:
-            return []
+            return tuple()
 
         if self._needsArticleNormalization(nsKey):
             output: t.List[str] = []
             for value in values:
                 assert isinstance(value, Text)
                 output.append(value.getNormalizedArticle())
-            return output
+            return tuple(output)
 
-        return [str(value) for value in values]
+        return tuple(str(value) for value in values)
 
-    def _getPluralAttribute(self, attributeName: str) -> t.List[str]:
+    def _getPluralAttribute(self, attributeName: str) -> t.Tuple[str, ...]:
         # This does what __getattr__ would do if we supported plural attributeNames
         # (but it takes singular attributeNames, of course).
 
@@ -814,18 +826,18 @@ class Metadata(base.Music21Object):
         # they are a property, but this routine needs to find them, too.
         if attributeName == 'fileFormat':
             if self.fileFormat is None:
-                return []
-            return [self.fileFormat]
+                return tuple()
+            return (self.fileFormat,)
 
         if attributeName == 'filePath':
             if self.filePath is None:
-                return []
-            return [self.filePath]
+                return tuple()
+            return (self.filePath,)
 
         if attributeName == 'fileNumber':
             if self.fileNumber is None:
-                return []
-            return [str(self.fileNumber)]
+                return tuple()
+            return (str(self.fileNumber),)
 
         raise AttributeError(f'invalid attributeName: {attributeName}')
 
@@ -991,7 +1003,7 @@ class Metadata(base.Music21Object):
         2
         >>> descs
         (<music21.metadata.primitives.Text A fun score!>,
-        <music21.metadata.primitives.Text Also a great tune>)
+         <music21.metadata.primitives.Text Also a great tune>)
         >>> descs[0].language
         'en'
         >>> descs[1].language is None
@@ -1037,7 +1049,7 @@ class Metadata(base.Music21Object):
         >>> c_alt.role = 'composer'
         >>> md.addContributor(c_alt)
         >>> md.composers
-        ['Beach, Amy', 'Cheney, Amy Marcy']
+        ('Beach, Amy', 'Cheney, Amy Marcy')
 
         >>> md.search('Beach')
         (True, 'composer')
@@ -1282,25 +1294,19 @@ class Metadata(base.Music21Object):
         object.
 
         >>> md = metadata.Metadata(
-        ...     title='Symphony in e minor',
-        ...     popularTitle='Gaelic',
-        ...     composer='Beach, Mrs. H.H.A.',
+        ...     title='...(Iphigenia)',
+        ...     composer='Shorter, Wayne',
         ...     )
+        >>> md.add('composer', 'Spalding, Esperanza')
         >>> md.composer
-        'Beach, Mrs. H.H.A.'
-        >>> md.add('composer', 'Beach, Amy Marcy Cheney')
-        >>> md.composer
-        'Beach, Mrs. H.H.A. and Beach, Amy Marcy Cheney'
-
-        Note that in this case, a "composerAlias" would probably be a more
-        appropriate role than a second composer.
+        'Shorter, Wayne and Spalding, Esperanza'
         '''
         return self._getSingularAttribute('composer')
 
     @property
     def composers(self):
         r'''
-        Get or set a list of strings of all composer roles.
+        Get a tuple or set an iterable of strings of all composer roles.
 
         >>> md = metadata.Metadata(title='Yellow River Concerto')
         >>> md.composers = ['Xian Xinghai', 'Yin Chengzong']
@@ -1309,7 +1315,7 @@ class Metadata(base.Music21Object):
         illustrative purposes)
 
         >>> md.composers
-        ['Xian Xinghai', 'Yin Chengzong']
+        ('Xian Xinghai', 'Yin Chengzong')
 
 
         Might as well add a third composer to the concerto committee?
@@ -1317,13 +1323,13 @@ class Metadata(base.Music21Object):
         >>> contrib3 = metadata.Contributor(role='composer', name='Chu Wanghua')
         >>> md.add('composer', contrib3)
         >>> md.composers
-        ['Xian Xinghai', 'Yin Chengzong', 'Chu Wanghua']
+        ('Xian Xinghai', 'Yin Chengzong', 'Chu Wanghua')
 
         If there are no composers, returns an empty list:
 
         >>> md = metadata.Metadata(title='Sentient Algorithmic Composition')
         >>> md.composers
-        []
+        ()
         '''
         return self._getPluralAttribute('composer')
 
@@ -1408,12 +1414,12 @@ class Metadata(base.Music21Object):
     @property
     def librettists(self):
         r'''
-        Gets or sets a list of librettists for this work:
+        Gets a tuple or sets an iterable of librettists for this work:
 
         >>> md = metadata.Metadata(title='Madama Butterfly')
         >>> md.librettists = ['Illica, Luigi', 'Giacosa, Giuseppe']
         >>> md.librettists
-        ['Illica, Luigi', 'Giacosa, Giuseppe']
+        ('Illica, Luigi', 'Giacosa, Giuseppe')
 
         Should be distinguished from lyricists etc.
         '''
@@ -1441,12 +1447,12 @@ class Metadata(base.Music21Object):
     @property
     def lyricists(self):
         r'''
-        Gets or sets a list of lyricists for this work:
+        Gets a tuple or sets an iterable of lyricists for this work:
 
         >>> md = metadata.Metadata(title='Rumors')
         >>> md.lyricists = ['Buckingham, Lindsey', 'McVie, Christine', 'Nicks, Stevie']
         >>> md.lyricists
-        ['Buckingham, Lindsey', 'McVie, Christine', 'Nicks, Stevie']
+        ('Buckingham, Lindsey', 'McVie, Christine', 'Nicks, Stevie')
 
         Should be distinguished from librettists etc.
         '''
@@ -1572,7 +1578,7 @@ class Metadata(base.Music21Object):
         return prop.isContributor
 
     @staticmethod
-    def _needsArticleNormalization(nsKey) -> bool:
+    def _needsArticleNormalization(nsKey: str) -> bool:
         if not nsKey:
             return False
         prop: PropertyDescription = properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
@@ -1678,7 +1684,7 @@ class Metadata(base.Music21Object):
         ...                            metadata.Text('Kit Yan Win')], isCustom=False)
         >>> md['marcrel:LBT']
         (<music21.metadata.primitives.Contributor librettist:Melissa Li>,
-        <music21.metadata.primitives.Contributor librettist:Kit Yan Win>)
+         <music21.metadata.primitives.Contributor librettist:Kit Yan Win>)
         '''
         if not isCustom:
             if self._isStandardUniqueName(key):
@@ -1845,47 +1851,47 @@ class RichMetadata(Metadata):
     True
     >>> richMetadata.searchAttributes
     ('abstract', 'accessRights', 'accompanyingMaterialWriter', 'accrualMethod',
-    'accrualPeriodicity', 'accrualPolicy', 'actNumber', 'actor', 'adapter',
-    'afterwordAuthor', 'alternativeTitle', 'ambitus', 'animator', 'annotator',
-    'architect', 'arranger', 'artist', 'associatedWork', 'attributedComposer',
-    'audience', 'author', 'bibliographicCitation', 'calligrapher', 'cartographer',
-    'choreographer', 'cinematographer', 'collaborator', 'collectionDesignation',
-    'collotyper', 'commentator', 'commission', 'commissionedBy', 'compiler',
-    'composer', 'composerAlias', 'composerCorporate', 'conceptor', 'conductor',
-    'conformsTo', 'consultant', 'contractor', 'copyright', 'correspondent',
-    'costumeDesigner', 'countryOfComposition', 'coverage', 'creator', 'curator',
-    'dancer', 'date', 'dateAccepted', 'dateAvailable', 'dateCopyrighted',
-    'dateCreated', 'dateIssued', 'dateModified', 'dateSubmitted', 'dateValid',
-    'dedicatedTo', 'dedication', 'delineator', 'description', 'designer',
-    'dialogAuthor', 'director', 'dissertant', 'distributor', 'draftsman',
-    'editor', 'educationLevel', 'engineer', 'engraver', 'etcher', 'extent',
-    'facsimilist', 'fileFormat', 'fileNumber', 'filePath', 'filmEditor', 'forger',
-    'format', 'genericContributor', 'groupTitle', 'hasFormat', 'hasPart',
-    'hasVersion', 'host', 'identifier', 'illuminator', 'illustrator',
-    'instructionalMethod', 'instrumentalist', 'interviewee', 'interviewer',
-    'introductionAuthor', 'inventor', 'isFormatOf', 'isPartOf', 'isReferencedBy',
-    'isReplacedBy', 'isRequiredBy', 'isVersionOf', 'keySignatureFirst',
-    'keySignatures', 'landscapeArchitect', 'language', 'librettist', 'license',
-    'lightingDesigner', 'lithographer', 'localeOfComposition', 'lyricist',
-    'manufacturer', 'mediator', 'medium', 'meetingOrganizer', 'metalEngraver',
-    'moderator', 'movementName', 'movementNumber', 'musician', 'narrator',
-    'noteCount', 'number', 'numberOfParts', 'opusNumber', 'orchestrator',
-    'originator', 'otherContributor', 'otherDate', 'parentTitle', 'performer',
-    'photographer', 'pitchHighest', 'pitchLowest', 'platemaker', 'popularTitle',
-    'printmaker', 'producer', 'productionPersonnel', 'programmer',
-    'projectConsultant', 'provenance', 'publisher', 'puppeteer', 'quarterLength',
-    'quotationsAuthor', 'recordingEngineer', 'references', 'relation', 'renderer',
-    'replaces', 'reporter', 'requires', 'researchTeamHead', 'researchTeamMember',
-    'researcher', 'responsibleParty', 'restager', 'reviewer', 'rightsHolder',
-    'scenarist', 'sceneNumber', 'scientificAdvisor', 'screenplayAuthor', 'scribe',
-    'sculptor', 'secretary', 'setDesigner', 'singer', 'source', 'sourcePath',
-    'spatialCoverage', 'speaker', 'standardsBody', 'storyteller', 'subject',
-    'surveyor', 'suspectedComposer', 'tableOfContents', 'teacher',
-    'tempoFirst', 'temporalCoverage', 'tempos', 'textLanguage',
-    'textOriginalLanguage', 'timeSignatureFirst', 'timeSignatures', 'title',
-    'transcriber', 'translator', 'type', 'videographer', 'vocalist', 'volume',
-    'volumeNumber', 'woodCutter', 'woodEngraver', 'writtenCommentator')
-
+     'accrualPeriodicity', 'accrualPolicy', 'actNumber', 'actor', 'adapter',
+     'afterwordAuthor', 'alternativeTitle', 'ambitus', 'animator', 'annotator',
+     'architect', 'arranger', 'artist', 'associatedWork', 'attributedComposer',
+     'audience', 'author', 'bibliographicCitation', 'calligrapher', 'cartographer',
+     'choreographer', 'cinematographer', 'collaborator', 'collectionDesignation',
+     'collotyper', 'commentator', 'commission', 'commissionedBy', 'compiler',
+     'composer', 'composerAlias', 'composerCorporate', 'conceptor', 'conductor',
+     'conformsTo', 'consultant', 'contractor', 'copyright', 'correspondent',
+     'costumeDesigner', 'countryOfComposition', 'coverage', 'creator', 'curator',
+     'dancer', 'date', 'dateAccepted', 'dateAvailable', 'dateCopyrighted',
+     'dateCreated', 'dateIssued', 'dateModified', 'dateSubmitted', 'dateValid',
+     'dedicatedTo', 'dedication', 'delineator', 'description', 'designer',
+     'dialogAuthor', 'director', 'dissertant', 'distributor', 'draftsman', 'editor',
+     'educationLevel', 'electronicEditor', 'electronicEncoder', 'engineer',
+     'engraver', 'etcher', 'extent', 'facsimilist', 'fileFormat', 'fileNumber',
+     'filePath', 'filmEditor', 'forger', 'format', 'genericContributor', 'groupTitle',
+     'hasFormat', 'hasPart', 'hasVersion', 'host', 'identifier', 'illuminator',
+     'illustrator', 'instructionalMethod', 'instrumentalist', 'interviewee',
+     'interviewer', 'introductionAuthor', 'inventor', 'isFormatOf', 'isPartOf',
+     'isReferencedBy', 'isReplacedBy', 'isRequiredBy', 'isVersionOf',
+     'keySignatureFirst', 'keySignatures', 'landscapeArchitect', 'language',
+     'librettist', 'license', 'lightingDesigner', 'lithographer',
+     'localeOfComposition', 'lyricist', 'manufacturer', 'mediator', 'medium',
+     'meetingOrganizer', 'metalEngraver', 'moderator', 'movementName',
+     'movementNumber', 'musician', 'narrator', 'noteCount', 'number', 'numberOfParts',
+     'opusNumber', 'orchestrator', 'originalDocumentOwner', 'originalEditor',
+     'originator', 'otherContributor', 'otherDate', 'parentTitle', 'performer',
+     'photographer', 'pitchHighest', 'pitchLowest', 'platemaker', 'popularTitle',
+     'printmaker', 'producer', 'productionPersonnel', 'programmer',
+     'projectConsultant', 'provenance', 'publisher', 'puppeteer', 'quarterLength',
+     'quotationsAuthor', 'recordingEngineer', 'references', 'relation',
+     'renderer', 'replaces', 'reporter', 'requires', 'researchTeamHead',
+     'researchTeamMember', 'researcher', 'responsibleParty', 'restager',
+     'reviewer', 'rightsHolder', 'scenarist', 'sceneNumber', 'scientificAdvisor',
+     'screenplayAuthor', 'scribe', 'sculptor', 'secretary', 'setDesigner', 'singer',
+     'source', 'sourcePath', 'spatialCoverage', 'speaker', 'standardsBody',
+     'storyteller', 'subject', 'surveyor', 'suspectedComposer', 'tableOfContents',
+     'teacher', 'tempoFirst', 'temporalCoverage', 'tempos', 'textLanguage',
+     'textOriginalLanguage', 'timeSignatureFirst', 'timeSignatures', 'title',
+     'transcriber', 'translator', 'type', 'videographer', 'vocalist', 'volume',
+     'volumeNumber', 'woodCutter', 'woodEngraver', 'writtenCommentator')
     '''
 
     # CLASS VARIABLES #
@@ -1928,16 +1934,16 @@ class RichMetadata(Metadata):
         self.timeSignatureFirst = None
         self.timeSignatures = []
 
-    def _getPluralAttribute(self, attributeName) -> t.List:
+    def _getPluralAttribute(self, attributeName) -> t.Tuple[str, ...]:
         # we have to implement this to add the RichMetadata searchAttributes, since
         # Metadata.search calls it.
         if attributeName in self._additionalRichSearchAttributes:
             # We can treat _additionalRichSearchAttributes as singletons,
-            # so just call getattr, and put the result in a list.
+            # so just call getattr, and put the result in a tuple.
             value = getattr(self, attributeName)
             if value is None:
-                return []
-            return [value]
+                return tuple()
+            return (value,)
 
         return super()._getPluralAttribute(attributeName)
 

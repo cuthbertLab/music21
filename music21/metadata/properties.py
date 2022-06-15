@@ -1666,6 +1666,38 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         oldMusic21WorkId='orchestrator',
         valueType=Contributor,
         isContributor=True),
+
+    # YOO: original document owner
+    PropertyDescription(
+        name='YOO',
+        namespace='humdrum',
+        uniqueName='originalDocumentOwner',
+        valueType=Contributor,
+        isContributor=True),
+
+    # YOE: original editor
+    PropertyDescription(
+        name='YOE',
+        namespace='humdrum',
+        uniqueName='originalEditor',
+        valueType=Contributor,
+        isContributor=True),
+
+    # EED: original document owner
+    PropertyDescription(
+        name='EED',
+        namespace='humdrum',
+        uniqueName='electronicEditor',
+        valueType=Contributor,
+        isContributor=True),
+
+    # YOO: original document owner
+    PropertyDescription(
+        name='ENC',
+        namespace='humdrum',
+        uniqueName='electronicEncoder',
+        valueType=Contributor,
+        isContributor=True),
 )
 
 # -----------------------------------------------------------------------------

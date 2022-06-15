@@ -495,8 +495,8 @@ class Test(unittest.TestCase):
             </titleStmt>
         </work>"""
         work = ETree.fromstring(work)
-        expComposers1 = ['Jean Sibelius', 'Sibelius, Jean']
-        expComposers2 = ['Sibelius, Jean', 'Jean Sibelius']
+        expComposers1 = ('Jean Sibelius', 'Sibelius, Jean')
+        expComposers2 = ('Sibelius, Jean', 'Jean Sibelius')
         meta = metadata.Metadata()
 
         actual = base.metaSetComposer(work, meta)

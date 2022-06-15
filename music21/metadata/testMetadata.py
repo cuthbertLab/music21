@@ -467,6 +467,15 @@ class Test(unittest.TestCase):
             valueType=metadata.Contributor)
         self.checkUniqueNamedItem('orchestrator', 'humdrum:LOR',
             valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('originalDocumentOwner', 'humdrum:YOO',
+            valueType=metadata.Contributor)
+
+        self.checkUniqueNamedItem('originalEditor', 'humdrum:YOE',
+            valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('electronicEditor', 'humdrum:EED',
+            valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('electronicEncoder', 'humdrum:ENC',
+            valueType=metadata.Contributor)
 
 # -----------------------------------------------------------------------------
 

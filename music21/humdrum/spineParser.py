@@ -2806,11 +2806,11 @@ class GlobalReference(base.Music21Object):
         'YEM': '',  # copyright message (e.g. 'All rights reserved')
         'YEN': '',  # country of copyright
         'YOR': '',  # original document from which encoded document was prepared
-        'YOO': '',  # original document owner
+        'YOO': 'originalDocumentOwner',  # original document owner
         'YOY': '',  # original copyright year
-        'YOE': '',  # original editor
-        'EED': '',  # electronic editor
-        'ENC': '',  # electronic encoder (person)
+        'YOE': 'originalEditor',  # original editor
+        'EED': 'electronicEditor',  # electronic editor
+        'ENC': 'electronicEncoder',  # electronic encoder (person)
         'END': '',  # encoding date
         'EMD': '',  # electronic document modification description (one per modificiation)
         'EEV': '',  # electronic edition version
