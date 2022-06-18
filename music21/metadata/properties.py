@@ -1054,7 +1054,18 @@ ALL_MUSIC21_WORK_IDS: list = list(MUSIC21_WORK_ID_TO_NSKEY.keys())
 ALL_MUSIC21_ABBREVIATIONS: list = list(MUSIC21_ABBREVIATION_TO_NSKEY.keys())
 ALL_NSKEYS: list = list(NSKEY_TO_PROPERTY_DESCRIPTION.keys())
 
+ALL_SINGLE_ATTRIBUTE_NAMES: list = list(
+    ALL_UNIQUE_NAMES
+    + ALL_MUSIC21_WORK_IDS
+    + ALL_MUSIC21_ABBREVIATIONS
+    + ['fileFormat' + 'filePath' + 'fileNumber']
+)
+
+ALL_PLURAL_ATTRIBUTE_NAMES: list = [
+    'composers', 'librettists', 'lyricists'
+]
+
 ALL_LEGAL_ATTRIBUTES: list = list(
-    ALL_UNIQUE_NAMES + ALL_MUSIC21_WORK_IDS + ALL_MUSIC21_ABBREVIATIONS
-    + ['composers', 'librettists', 'lyricists', 'fileFormat', 'filePath', 'fileNumber']
+    ALL_SINGLE_ATTRIBUTE_NAMES
+    + ALL_PLURAL_ATTRIBUTE_NAMES
 )

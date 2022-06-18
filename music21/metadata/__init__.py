@@ -275,7 +275,7 @@ class Metadata(base.Music21Object):
     def __init__(self, *args, **keywords):
         super().__init__()
 
-        self._metadata: t.Dict[str, t.List[ValueType]] = {}
+        self._contents: t.Dict[str, t.List[ValueType]] = {}
         self.software: t.List[str] = [defaults.software]
 
         # TODO: check pickling, etc.
@@ -357,7 +357,7 @@ class Metadata(base.Music21Object):
         allOut: t.List[t.Tuple[str, ValueType]] = []
 
         valueList: t.List[ValueType]
-        for nsKey, valueList in self._metadata.items():
+        for nsKey, valueList in self._contents.items():
             if skipContributors and self._isContributorNSKey(nsKey):
                 continue
 
@@ -395,7 +395,7 @@ class Metadata(base.Music21Object):
 
         allOut: t.List[t.Tuple[str, ValueType]] = []
 
-        for nsKey, value in self._metadata.items():
+        for nsKey, value in self._contents.items():
             if not self._isContributorNSKey(nsKey):
                 continue
 
@@ -837,12 +837,14 @@ class Metadata(base.Music21Object):
 
     def __setattr__(self, name: str, value: t.Any):
         '''
-        Utility attribute setter for all uniqueNames, grandfathered workIds,
-        and grandfathered workId abbreviations.
+        Attribute setter for all uniqueNames, grandfathered workIds,
+        and grandfathered workId abbreviations, as well as the plural
+        properties ('composers', 'librettists', 'lyricists') and the
+        three new fileInfo properties.
 
-        These can take any single value, and will convert to the appropriate
-        internal valueType.  They will raise ValueError for iterables (other
-        than str).
+        These can take a single value of any type (or, if appropriate, an
+        iterable of any type of value), and will convert to the appropriate
+        internal valueType.
         '''
 
         # Implementation note: __setattr__ has a very different role from
@@ -852,50 +854,47 @@ class Metadata(base.Music21Object):
         # (property).  __setattr__, on the other hand, is the _only_ call
         # you will get.  So after checking for uniqueNames, workIds, and
         # workId abbreviations, if we haven't done the job yet, we need to
-        # make a call to super().__setattr__ to handle all the bare attributes.
-        # Unfortunately, that doesn't handle property.setters at all, so any
-        # property.setters have to be removed, and handled explicitly here.
+        # make a call to super().__setattr__ to handle all the bare attributes,
+        # including the bare attributes in base classes (e.g. Music21Object).
+        # Unfortunately, super().__setattr__ will not call property.setters
+        # at all, so all property.setters have been removed, and handled
+        # explicitly here.
 
-        # Is name a uniqueName?
-        if name in properties.UNIQUE_NAME_TO_NSKEY:
+        if name in properties.ALL_SINGLE_ATTRIBUTE_NAMES:
             if (value is not None
                     and isinstance(value, t.Iterable)
                     and not isinstance(value, str)):
                 raise ValueError(f'md.{name} can only be set to a single value; '
                                  f'set md[{name}] to multiple values instead.')
+
+        if name in properties.ALL_PLURAL_ATTRIBUTE_NAMES:
+            if not isinstance(value, t.Iterable) or isinstance(value, str):
+                raise ValueError(
+                    f'md.{name} can only be set to an iterable (e.g. a list, tuple, etc).'
+                )
+
+        # Is name a uniqueName?
+        if name in properties.UNIQUE_NAME_TO_NSKEY:
             self._set(properties.UNIQUE_NAME_TO_NSKEY[name], value, isCustom=False)
             return
 
         # Is name a grandfathered workId?
         if name in properties.MUSIC21_WORK_ID_TO_NSKEY:
-            if (value is not None
-                    and isinstance(value, t.Iterable)
-                    and not isinstance(value, str)):
-                raise ValueError(f'md.{name} can only be set to a single value; '
-                                 f'set md[{name}] to multiple values instead.')
             self._set(properties.MUSIC21_WORK_ID_TO_NSKEY[name], value, isCustom=False)
             return
 
         # Is name a grandfathered workId abbreviation?
         if name in properties.MUSIC21_ABBREVIATION_TO_NSKEY:
-            if (value is not None
-                    and isinstance(value, t.Iterable)
-                    and not isinstance(value, str)):
-                raise ValueError(f'md.{name} can only be set to a single value; '
-                                 f'set md[{name}] to multiple values instead.')
             self._set(properties.MUSIC21_ABBREVIATION_TO_NSKEY[name], value, isCustom=False)
             return
 
-        # Is name one of the non-uniqueName property.setters (i.e the three
-        # plural contributors, and the three new fileInfo setters)?
+        # Is name one of the plural attribute setters?
         if name in ('composers', 'librettists', 'lyricists'):
             uniqueName = name[:-1]  # remove the trailing 's'
-            # check that value is t.Iterable (and not str)
-            if not isinstance(value, t.Iterable) or isinstance(value, str):
-                raise ValueError(f'md.{name} can only be set to multiple values.')
             self._set(uniqueName, value, isCustom=False)
             return
 
+        # Is name one of the new fileInfo attribute setters?
         if name == 'fileFormat':
             if value is None:
                 self.fileInfo.format = None
@@ -1564,7 +1563,7 @@ class Metadata(base.Music21Object):
                     f'Key=\'{key}\' is not a standard metadata key.'
                     ' Call setCustom/getCustom for custom keys.')
 
-        valueList: t.Optional[t.List[ValueType]] = self._metadata.get(key, None)
+        valueList: t.Optional[t.List[ValueType]] = self._contents.get(key, None)
 
         if not valueList:
             # return empty tuple
@@ -1600,14 +1599,14 @@ class Metadata(base.Music21Object):
         for v in value:
             convertedValues.append(self._convertValue(key, v))
 
-        prevValues: t.Optional[t.List[ValueType]] = self._metadata.get(key, None)
+        prevValues: t.Optional[t.List[ValueType]] = self._contents.get(key, None)
         if not prevValues:  # None or []
             # set the convertedValues list in there
             # it's always a list, even if there's only one value
-            self._metadata[key] = convertedValues
+            self._contents[key] = convertedValues
         else:
             # add the convertedValues list to the existing list
-            self._metadata[key] = prevValues + convertedValues
+            self._contents[key] = prevValues + convertedValues
 
     def _set(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]], isCustom: bool):
         '''
@@ -1635,7 +1634,7 @@ class Metadata(base.Music21Object):
                     f'Key=\'{key}\' is not a standard metadata key.'
                     ' Call addCustom/setCustom/getCustom for custom keys.')
 
-        self._metadata.pop(key, None)
+        self._contents.pop(key, None)
         self._add(key, value, isCustom)
 
     @staticmethod
@@ -1874,7 +1873,7 @@ class RichMetadata(Metadata):
         # specifically name attributes to copy, as do not want to get all
         # Metadata is a m21 object
         localNames = [
-            '_metadata',
+            '_contents',
         ]
         environLocal.printDebug(['RichMetadata: calling merge()'])
         for name in localNames:
