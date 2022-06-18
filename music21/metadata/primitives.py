@@ -738,9 +738,8 @@ class DateSelection(DateSingle):
 # -----------------------------------------------------------------------------
 
 
-# This is an enhanced version of the old Text type that adds an optional encoding
-# scheme (e.g. URI, DCMIPoint, etc) as well as whether this is the original
-# (un-translated) language.
+# This was enhanced in music21 v8 to add an optional encoding scheme (e.g. URI, DCMIPoint,
+# etc) as well as whether the text is translated, or in the original language.
 class Text(prebase.ProtoM21Object):
     r'''
     One unit of text data: a title, a name, or some other text data. Store the
@@ -761,9 +760,9 @@ class Text(prebase.ProtoM21Object):
                  language: t.Optional[str] = None,
                  isTranslated: t.Optional[bool] = None,   # True, False, or None (unknown)
                  encodingScheme: t.Optional[str] = None):
-        if isinstance(data, type(self)):
+        if isinstance(data, Text):
             # accessing private attributes here; not desirable
-            self._data: t.Union[str, 'Text'] = data._data
+            self._data: t.Union[str, Text] = data._data
             self._language: t.Optional[str] = data._language
             self.isTranslated: t.Optional[bool] = data.isTranslated
             self.encodingScheme: t.Optional[str] = data.encodingScheme

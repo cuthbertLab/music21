@@ -18,19 +18,33 @@ class Test(unittest.TestCase):
         c = converter.parse(mTF.mozartTrioK581Excerpt)
         md = c.metadata
 
-        self.assertEqual(md['movementNumber'], (metadata.Text('3'),))
-        self.assertEqual(md['movementName'],
-            (metadata.Text('Menuetto (Excerpt from Second Trio)'),))
-        self.assertEqual(md['title'],
-            (metadata.Text('Quintet for Clarinet and Strings'),))
-        self.assertEqual(md['number'], (metadata.Text('K. 581'),))
-        self.assertEqual(md['composer'],
-            (metadata.Contributor(role='composer', name='Wolfgang Amadeus Mozart'),))
+        self.assertEqual(
+            md['movementNumber'],
+            (metadata.Text('3'),)
+        )
+        self.assertEqual(
+            md['movementName'],
+            (metadata.Text('Menuetto (Excerpt from Second Trio)'),)
+        )
+        self.assertEqual(
+            md['title'],
+            (metadata.Text('Quintet for Clarinet and Strings'),)
+        )
+        self.assertEqual(
+            md['number'],
+            (metadata.Text('K. 581'),)
+        )
+        self.assertEqual(
+            md['composer'],
+            (metadata.Contributor(role='composer', name='Wolfgang Amadeus Mozart'),)
+        )
 
         c = converter.parse(mTF.binchoisMagnificat)
         md = c.metadata
-        self.assertEqual(md['composer'],
-            (metadata.Contributor(role='composer', name='Gilles Binchois'),))
+        self.assertEqual(
+            md['composer'],
+            (metadata.Contributor(role='composer', name='Gilles Binchois'),)
+        )
 
     def testMetadataLoadCorpusBackwardCompatible(self):
         from music21 import converter
@@ -39,17 +53,34 @@ class Test(unittest.TestCase):
         c = converter.parse(mTF.mozartTrioK581Excerpt)
         md = c.metadata
 
-        self.assertEqual(md.movementNumber, '3')
         self.assertEqual(
-            md.movementName, 'Menuetto (Excerpt from Second Trio)')
-        self.assertEqual(md.title, 'Quintet for Clarinet and Strings')
-        self.assertEqual(md.number, 'K. 581')
+            md.movementNumber,
+            '3'
+        )
+        self.assertEqual(
+            md.movementName,
+            'Menuetto (Excerpt from Second Trio)'
+        )
+        self.assertEqual(
+            md.title,
+            'Quintet for Clarinet and Strings'
+        )
+        self.assertEqual(
+            md.number,
+            'K. 581'
+        )
         # get contributors directly from Metadata interface
-        self.assertEqual(md.composer, 'Wolfgang Amadeus Mozart')
+        self.assertEqual(
+            md.composer,
+            'Wolfgang Amadeus Mozart'
+        )
 
         c = converter.parse(mTF.binchoisMagnificat)
         md = c.metadata
-        self.assertEqual(md.composer, 'Gilles Binchois')
+        self.assertEqual(
+            md.composer,
+            'Gilles Binchois'
+        )
 
     def testJSONSerializationMetadata(self):
         from music21 import converter
@@ -70,12 +101,25 @@ class Test(unittest.TestCase):
         c = converter.parse(mTF.mozartTrioK581Excerpt)
         md = c.metadata
 
-        self.assertEqual(md.movementNumber, '3')
         self.assertEqual(
-            md.movementName, 'Menuetto (Excerpt from Second Trio)')
-        self.assertEqual(md.title, 'Quintet for Clarinet and Strings')
-        self.assertEqual(md.number, 'K. 581')
-        self.assertEqual(md.composer, 'Wolfgang Amadeus Mozart')
+            md.movementNumber, '3'
+        )
+        self.assertEqual(
+            md.movementName,
+            'Menuetto (Excerpt from Second Trio)'
+        )
+        self.assertEqual(
+            md.title,
+            'Quintet for Clarinet and Strings'
+        )
+        self.assertEqual(
+            md.number,
+            'K. 581'
+        )
+        self.assertEqual(
+            md.composer,
+            'Wolfgang Amadeus Mozart'
+        )
 
     def testRichMetadata01(self):
         from music21 import corpus
@@ -115,15 +159,19 @@ class Test(unittest.TestCase):
         self.assertEqual(len(opus.scores), 8)
 
         score = opus.getScoreByNumber(4)
-        self.assertEqual(score.metadata.localeOfComposition,
-                         'Asien, Ostasien, China, Sichuan')
+        self.assertEqual(
+            score.metadata.localeOfComposition,
+            'Asien, Ostasien, China, Sichuan'
+        )
 
         richMetadata = metadata.RichMetadata()
         richMetadata.merge(score.metadata)
         richMetadata.update(score)
 
-        self.assertEqual(richMetadata.localeOfComposition,
-                         'Asien, Ostasien, China, Sichuan')
+        self.assertEqual(
+            richMetadata.localeOfComposition,
+            'Asien, Ostasien, China, Sichuan'
+        )
 
     def testMetadataSearch(self):
         from music21 import corpus
@@ -192,24 +240,48 @@ class Test(unittest.TestCase):
 
         if valueType is metadata.DateSingle:
             md[nsKey] = ['1978/6/11']
-            self.assertEqual(getattr(md, uniqueName), '1978/06/11')
+            self.assertEqual(
+                getattr(md, uniqueName),
+                '1978/06/11'
+            )
             md[uniqueName] = ('1979/6/11',)
-            self.assertEqual(getattr(md, uniqueName), '1979/06/11')
+            self.assertEqual(
+                getattr(md, uniqueName),
+                '1979/06/11'
+            )
         elif valueType is metadata.Copyright:
-            md[nsKey] = ['Copyright © 1978 Joe Smith']
-            self.assertEqual(getattr(md, uniqueName), 'Copyright © 1978 Joe Smith')
-            md[uniqueName] = ('Copyright © 1979 Joe Smith',)
-            self.assertEqual(getattr(md, uniqueName), 'Copyright © 1979 Joe Smith')
+            md[nsKey] = [f'Copyright © 1979 {nsKey}']
+            self.assertEqual(
+                getattr(md, uniqueName),
+                f'Copyright © 1979 {nsKey}'
+            )
+            md[uniqueName] = (f'Copyright © 1979 {uniqueName}',)
+            self.assertEqual(
+                getattr(md, uniqueName),
+                f'Copyright © 1979 {uniqueName}'
+            )
         elif valueType is metadata.Contributor:
             md[nsKey] = [f'The {nsKey}']
-            self.assertEqual(getattr(md, uniqueName), f'The {nsKey}')
+            self.assertEqual(
+                getattr(md, uniqueName),
+                f'The {nsKey}'
+            )
             md[uniqueName] = (f'The {uniqueName}',)
-            self.assertEqual(getattr(md, uniqueName), f'The {uniqueName}')
+            self.assertEqual(
+                getattr(md, uniqueName),
+                f'The {uniqueName}'
+            )
         elif valueType is metadata.Text:
             md[nsKey] = [f'The {nsKey}']
-            self.assertEqual(getattr(md, uniqueName), f'The {nsKey}')
+            self.assertEqual(
+                getattr(md, uniqueName),
+                f'The {nsKey}'
+            )
             md[uniqueName] = (f'The {uniqueName}',)
-            self.assertEqual(getattr(md, uniqueName), f'The {uniqueName}')
+            self.assertEqual(
+                getattr(md, uniqueName),
+                f'The {uniqueName}'
+            )
         else:
             self.fail('internal test error: invalid valueType')
 
@@ -217,38 +289,106 @@ class Test(unittest.TestCase):
         if valueType is metadata.DateSingle:
             md.add(nsKey, [metadata.DateBetween(['1978', '1980']),
                 metadata.DateSingle('1979/6/11/4:50:32')])
-            self.assertEqual(getattr(md, uniqueName),
-                '1979/06/11, 1978/--/-- to 1980/--/--, 1979/06/11/04/50/032.00')
+            self.assertEqual(
+                getattr(md, uniqueName),
+                '1979/06/11, 1978/--/-- to 1980/--/--, 1979/06/11/04/50/032.00'
+            )
+            self.assertEqual(
+                md[uniqueName],
+                (
+                    metadata.DateSingle('1979/06/11'),
+                    metadata.DateBetween(['1978', '1980']),
+                    metadata.DateSingle('1979/6/11/4:50:32')
+                )
+            )
         elif valueType is metadata.Copyright:
-            md.add(nsKey, metadata.Text('Lyrics copyright © 1979 John Jones'))
-            md.add(uniqueName,
-                [metadata.Copyright('Other content copyright © 1979 Jenni Johnson',
-                    role='other'),
-                metadata.Copyright(
-                    metadata.Text('Even more content copyright © 1979 Sarah Michaels'),
-                    role='even more')])
-            self.assertEqual(getattr(md, uniqueName),
-                'Copyright © 1979 Joe Smith'
-                    + ', Lyrics copyright © 1979 John Jones'
-                    + ', Other content copyright © 1979 Jenni Johnson'
-                    + ', Even more content copyright © 1979 Sarah Michaels')
+            md.add(
+                nsKey,
+                metadata.Text('Lyrics copyright © 1979 John Jones')
+            )
+            md.add(
+                uniqueName,
+                (
+                    metadata.Copyright(
+                        'Other content copyright © 1979 Jenni Johnson',
+                        role='other'),
+                    metadata.Copyright(
+                        metadata.Text('Even more content copyright © 1979 Sarah Michaels'),
+                        role='even more')
+                )
+            )
+            self.assertEqual(
+                getattr(md, uniqueName),
+                'Copyright © 1979 {uniqueName}'
+                + ', Lyrics copyright © 1979 John Jones'
+                + ', Other content copyright © 1979 Jenni Johnson'
+                + ', Even more content copyright © 1979 Sarah Michaels'
+            )
+            self.assertEqual(
+                md[uniqueName],
+                (
+                    metadata.Copyright(f'Copyright © 1979 {uniqueName}'),
+                    metadata.Copyright('Lyrics copyright © 1979 John Jones'),
+                    metadata.Copyright(
+                        'Other content copyright © 1979 Jenni Johnson',
+                        role='other'
+                    ),
+                    metadata.Copyright(
+                        metadata.Text('Even more content copyright © 1979 Sarah Michaels'),
+                        role='even more'
+                    )
+                )
+            )
         elif valueType is metadata.Contributor:
-            md.add(uniqueName, [metadata.Text(f'The 2nd {uniqueName}'),
-                metadata.Contributor(
-                    role=contributorRole if contributorRole else uniqueName,
-                    name=f'The 3rd {uniqueName}')])
-            self.assertEqual(getattr(md, uniqueName),
-                f'The {uniqueName} and 2 others')
+            md.add(
+                uniqueName,
+                [
+                    metadata.Text(f'The 2nd {uniqueName}'),
+                    metadata.Contributor(
+                        role=contributorRole if contributorRole else uniqueName,
+                        name=f'The 3rd {uniqueName}')
+                ]
+            )
+            self.assertEqual(
+                getattr(md, uniqueName),
+                f'The {uniqueName} and 2 others'
+            )
+            self.assertEqual(
+                md[uniqueName],
+                (
+                    metadata.Contributor(name=f'The {uniqueName}', role=uniqueName),
+                    metadata.Contributor(name=f'The 2nd {uniqueName}', role=uniqueName),
+                    metadata.Contributor(
+                        role=contributorRole if contributorRole else uniqueName,
+                        name=f'The 3rd {uniqueName}')
+                )
+            )
         elif valueType is metadata.Text:
-            md.add(nsKey, [metadata.Text(f'The 2nd {uniqueName}'),
-                metadata.Text(f'The 3rd {uniqueName}')])
-            self.assertEqual(getattr(md, uniqueName),
-                f'The {uniqueName}, The 2nd {uniqueName}, The 3rd {uniqueName}')
+            md.add(
+                nsKey,
+                [
+                    metadata.Text(f'The 2nd {uniqueName}'),
+                    metadata.Text(f'The 3rd {uniqueName}')
+                ]
+            )
+            self.assertEqual(
+                getattr(md, uniqueName),
+                f'The {uniqueName}, The 2nd {uniqueName}, The 3rd {uniqueName}'
+            )
+            self.assertEqual(
+                md[uniqueName],
+                (
+                    metadata.Text(f'The {uniqueName}'),
+                    metadata.Text(f'The 2nd {uniqueName}'),
+                    metadata.Text(f'The 3rd {uniqueName}')
+                )
+            )
 
+        # We've tested md[uniqueName], check to make sure that md[nsKey]
+        # returns exactly the same thing.
         mdItemsUnique = md[uniqueName]
         mdItemsNSKey = md[nsKey]
         self.assertEqual(len(mdItemsUnique), len(mdItemsNSKey))
-
         for itemUnique, itemNSKey in zip(mdItemsUnique, mdItemsNSKey):
             self.assertIsInstance(itemUnique, valueType)
             self.assertIsInstance(itemNSKey, valueType)
@@ -256,7 +396,7 @@ class Test(unittest.TestCase):
 
         if valueType is metadata.Contributor:
             for itemNSKey in mdItemsNSKey:
-                # I'm asserting this way to keep mypy happy.
+                # I'm asserting this way to keep mypy happy with itemNSKey.role
                 # self.assertIsInstance isn't sufficient, apparently.
                 assert isinstance(itemNSKey, metadata.Contributor)
                 self.assertEqual(itemNSKey.role,
