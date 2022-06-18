@@ -93,7 +93,7 @@ class Test(unittest.TestCase):
         )
         # environLocal.printDebug([str(md.json)])
         self.assertEqual(md.composer, 'Frank')
-        self.assertEqual(md.date, '2010/--/--')
+        self.assertEqual(md.dateCreated, '2010/--/--')
         self.assertEqual(md.composer, 'Frank')
         self.assertEqual(md.title, 'Concerto in F')
 

@@ -135,6 +135,8 @@ from music21 import base
 from music21 import common
 from music21 import defaults
 from music21 import exceptions21
+from music21.common import deprecated
+
 
 from music21.metadata import properties
 from music21.metadata.properties import PropertyDescription
@@ -1207,6 +1209,43 @@ class Metadata(base.Music21Object):
                     return True, innerField
         return False, None
 
+
+    workIdAbbreviationDict = {
+        'gaw': 'associatedWork',
+        'gco': 'collectionDesignation',
+        'gtl': 'groupTitle',
+        'oac': 'actNumber',
+        'oco': 'commission',
+        'ocy': 'countryOfComposition',
+        'ode': 'dedication',
+        'omd': 'movementName',
+        'omv': 'movementNumber',
+        'onm': 'number',
+        'opc': 'localeOfComposition',  # origin in abc
+        'opr': 'parentTitle',
+        'ops': 'opusNumber',
+        'osc': 'sceneNumber',
+        'ota': 'alternativeTitle',
+        'otl': 'title',
+        'otp': 'popularTitle',
+        'ovm': 'volume',
+        'txl': 'textLanguage',
+        'txo': 'textOriginalLanguage',
+    }
+
+    @deprecated('v8', 'v9', 'use `md.uniqueName = value` or `md[\'uniqueName\'] = [value]`')
+    def setWorkId(self, idStr, value):
+        idStr = idStr.lower()
+        match = False
+        for abbreviation, workId in self.workIdAbbreviationDict.items():
+            if workId.lower() == idStr or abbreviation == idStr:
+                setattr(self, workId, value)
+                match = True
+                break
+        if not match:
+            raise exceptions21.MetadataException(
+                f'no work id available with id: {idStr}')
+
     # PUBLIC PROPERTIES #
 
     @property
@@ -1272,6 +1311,11 @@ class Metadata(base.Music21Object):
         ()
         '''
         return self._getPluralAttribute('composer')
+
+    @property
+    @deprecated('v8', 'v9', 'use `md.dateCreated` instead')
+    def date(self):
+        return self.dateCreated
 
     @property
     def dateCreated(self):
