@@ -438,8 +438,6 @@ class PartTranslator:
                 environLocal.warn(f'Could not parse RTVersion tag: {lineToken.data!r}')
 
         elif isinstance(lineToken, rtObjects.RTTagged):
-            # We could add this to md as custom metadata:
-            # md.addCustom('romantext:' + lineToken.tag, lineToken.data)
             otherMetadata = RomanTextUnprocessedMetadata(lineToken.tag, lineToken.data)
             self.p.append(otherMetadata)
 

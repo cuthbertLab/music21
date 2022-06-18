@@ -216,93 +216,34 @@ class Metadata(base.Music21Object):
     (<music21.metadata.primitives.Contributor composer:Billy Strayhorn>,
      <music21.metadata.primitives.Contributor composer:Duke Ellington>)
 
+    allUniqueNames is a list of all the unique names (without any of the
+    grandfathered v7 workId synonyms).
+
+    >>> md.allUniqueNames
+    ('abstract', 'accessRights', 'accompanyingMaterialWriter', 'actNumber', 'adapter',
+     ...
+     'commissionedBy', 'compiler', 'composer', 'composerAlias', 'composerCorporate',
+     ...
+     'lithographer', 'localeOfComposition', 'lyricist', 'medium', 'metalEngraver',
+     ...
+     'title', 'transcriber', 'translator', 'type', 'volumeNumber', ...)
+
+
     searchAttributes are used by .search() methods to determine what attributes can
     be searched for.  There are some synonyms (like 'dateCreated' and 'date')
     that will find the same items.  This is because some uniqueNames have been
     updated in music21 v8 ('dateCreated'), and the old v7 name ('date') has
     been grandfathered in as a synonym.
 
-    allUniqueNames is a list of all the unique names (without any of the
-    grandfathered-in v7 workId synonyms).
+    Here is the list of grandfathered v7 synonyms:
 
-    >>> md.searchAttributes
-    ('abstract', 'accessRights', 'accompanyingMaterialWriter', 'accrualMethod',
-     'accrualPeriodicity', 'accrualPolicy', 'actNumber', 'actor', 'adapter',
-     'afterwordAuthor', 'alternativeTitle', 'animator', 'annotator', 'architect',
-     'arranger', 'artist', 'associatedWork', 'attributedComposer', 'audience',
-     'author', 'bibliographicCitation', 'calligrapher', 'cartographer', 'choreographer',
-     'cinematographer', 'collaborator', 'collectionDesignation', 'collotyper',
-     'commentator', 'commission', 'commissionedBy', 'compiler', 'composer',
-     'composerAlias', 'composerCorporate', 'conceptor', 'conductor', 'conformsTo',
-     'consultant', 'contractor', 'copyright', 'correspondent', 'costumeDesigner',
-     'countryOfComposition', 'coverage', 'creator', 'curator', 'dancer', 'date',
-     'dateAccepted', 'dateAvailable', 'dateCopyrighted', 'dateCreated', 'dateIssued',
-     'dateModified', 'dateSubmitted', 'dateValid', 'dedicatedTo', 'dedication',
-     'delineator', 'description', 'designer', 'dialogAuthor', 'director', 'dissertant',
-     'distributor', 'draftsman', 'editor', 'educationLevel', 'electronicEditor',
-     'electronicEncoder', 'engineer', 'engraver', 'etcher', 'extent', 'facsimilist',
-     'fileFormat', 'fileNumber', 'filePath', 'filmEditor', 'forger', 'format',
-     'genericContributor', 'groupTitle', 'hasFormat', 'hasPart', 'hasVersion', 'host',
-     'identifier', 'illuminator', 'illustrator', 'instructionalMethod', 'instrumentalist',
-     'interviewee', 'interviewer', 'introductionAuthor', 'inventor', 'isFormatOf',
-     'isPartOf', 'isReferencedBy', 'isReplacedBy', 'isRequiredBy', 'isVersionOf',
-     'landscapeArchitect', 'language', 'librettist', 'license', 'lightingDesigner',
-     'lithographer', 'localeOfComposition', 'lyricist', 'manufacturer', 'mediator',
-     'medium', 'meetingOrganizer', 'metalEngraver', 'moderator', 'movementName',
-     'movementNumber', 'musician', 'narrator', 'number', 'opusNumber', 'orchestrator',
-     'originalDocumentOwner', 'originalEditor', 'originator', 'otherContributor',
-     'otherDate', 'parentTitle', 'performer', 'photographer', 'platemaker',
-     'popularTitle', 'printmaker', 'producer', 'productionPersonnel', 'programmer',
-     'projectConsultant', 'provenance', 'publisher', 'puppeteer', 'quotationsAuthor',
-     'recordingEngineer', 'references', 'relation', 'renderer', 'replaces', 'reporter',
-     'requires', 'researchTeamHead', 'researchTeamMember', 'researcher',
-     'responsibleParty', 'restager', 'reviewer', 'rightsHolder', 'scenarist',
-     'sceneNumber', 'scientificAdvisor', 'screenplayAuthor', 'scribe', 'sculptor',
-     'secretary', 'setDesigner', 'singer', 'source', 'spatialCoverage', 'speaker',
-     'standardsBody', 'storyteller', 'subject', 'surveyor', 'suspectedComposer',
-     'tableOfContents', 'teacher', 'temporalCoverage', 'textLanguage',
-     'textOriginalLanguage', 'title', 'transcriber', 'translator', 'type',
-     'videographer', 'vocalist', 'volume', 'volumeNumber', 'woodCutter', 'woodEngraver',
-     'writtenCommentator')
+    >>> sorted(set(md.searchAttributes) - set(md.allUniqueNames))
+    ['commission', 'date', 'dedication', 'volume']
 
-    >>> md.allUniqueNames
-    ('abstract', 'accessRights', 'accompanyingMaterialWriter', 'accrualMethod',
-     'accrualPeriodicity', 'accrualPolicy', 'actNumber', 'actor', 'adapter',
-     'afterwordAuthor', 'alternativeTitle', 'animator', 'annotator', 'architect',
-     'arranger', 'artist', 'associatedWork', 'attributedComposer', 'audience',
-     'author', 'bibliographicCitation', 'calligrapher', 'cartographer',
-     'choreographer', 'cinematographer', 'collaborator', 'collectionDesignation',
-     'collotyper', 'commentator', 'commissionedBy', 'compiler', 'composer',
-     'composerAlias', 'composerCorporate', 'conceptor', 'conductor', 'conformsTo',
-     'consultant', 'contractor', 'copyright', 'correspondent', 'costumeDesigner',
-     'countryOfComposition', 'coverage', 'creator', 'curator', 'dancer',
-     'dateAccepted', 'dateAvailable', 'dateCopyrighted', 'dateCreated', 'dateIssued',
-     'dateModified', 'dateSubmitted', 'dateValid', 'dedicatedTo', 'delineator',
-     'description', 'designer', 'dialogAuthor', 'director', 'dissertant', 'distributor',
-     'draftsman', 'editor', 'educationLevel', 'electronicEditor', 'electronicEncoder',
-     'engineer', 'engraver', 'etcher', 'extent', 'facsimilist', 'fileFormat',
-     'fileNumber', 'filePath', 'filmEditor', 'forger', 'format', 'genericContributor',
-     'groupTitle', 'hasFormat', 'hasPart', 'hasVersion', 'host', 'identifier',
-     'illuminator', 'illustrator', 'instructionalMethod', 'instrumentalist',
-     'interviewee', 'interviewer', 'introductionAuthor', 'inventor', 'isFormatOf',
-     'isPartOf', 'isReferencedBy', 'isReplacedBy', 'isRequiredBy', 'isVersionOf',
-     'landscapeArchitect', 'language', 'librettist', 'license', 'lightingDesigner',
-     'lithographer', 'localeOfComposition', 'lyricist', 'manufacturer', 'mediator',
-     'medium', 'meetingOrganizer', 'metalEngraver', 'moderator', 'movementName',
-     'movementNumber', 'musician', 'narrator', 'number', 'opusNumber', 'orchestrator',
-     'originalDocumentOwner', 'originalEditor', 'originator', 'otherContributor',
-     'otherDate', 'parentTitle', 'performer', 'photographer', 'platemaker', 'popularTitle',
-     'printmaker', 'producer', 'productionPersonnel', 'programmer', 'projectConsultant',
-     'provenance', 'publisher', 'puppeteer', 'quotationsAuthor', 'recordingEngineer',
-     'references', 'relation', 'renderer', 'replaces', 'reporter', 'requires',
-     'researchTeamHead', 'researchTeamMember', 'researcher', 'responsibleParty',
-     'restager', 'reviewer', 'rightsHolder', 'scenarist', 'sceneNumber',
-     'scientificAdvisor', 'screenplayAuthor', 'scribe', 'sculptor', 'secretary',
-     'setDesigner', 'singer', 'source', 'spatialCoverage', 'speaker', 'standardsBody',
-     'storyteller', 'subject', 'surveyor', 'suspectedComposer', 'tableOfContents',
-     'teacher', 'temporalCoverage', 'textLanguage', 'textOriginalLanguage', 'title',
-     'transcriber', 'translator', 'type', 'videographer', 'vocalist', 'volumeNumber',
-     'woodCutter', 'woodEngraver', 'writtenCommentator')
+    And their new v8 unique names:
+
+    'commissionedBy', 'dateCreated', 'dedicatedTo', 'volumeNumber'
+
     '''
 
     # CLASS VARIABLES #
@@ -1849,55 +1790,21 @@ class RichMetadata(Metadata):
     >>> richMetadata.keySignatureFirst = key.KeySignature(-1)
     >>> 'keySignatureFirst' in richMetadata.searchAttributes
     True
-    >>> richMetadata.searchAttributes
-    ('abstract', 'accessRights', 'accompanyingMaterialWriter', 'accrualMethod',
-     'accrualPeriodicity', 'accrualPolicy', 'actNumber', 'actor', 'adapter',
-     'afterwordAuthor', 'alternativeTitle', 'ambitus', 'animator', 'annotator',
-     'architect', 'arranger', 'artist', 'associatedWork', 'attributedComposer',
-     'audience', 'author', 'bibliographicCitation', 'calligrapher', 'cartographer',
-     'choreographer', 'cinematographer', 'collaborator', 'collectionDesignation',
-     'collotyper', 'commentator', 'commission', 'commissionedBy', 'compiler',
-     'composer', 'composerAlias', 'composerCorporate', 'conceptor', 'conductor',
-     'conformsTo', 'consultant', 'contractor', 'copyright', 'correspondent',
-     'costumeDesigner', 'countryOfComposition', 'coverage', 'creator', 'curator',
-     'dancer', 'date', 'dateAccepted', 'dateAvailable', 'dateCopyrighted',
-     'dateCreated', 'dateIssued', 'dateModified', 'dateSubmitted', 'dateValid',
-     'dedicatedTo', 'dedication', 'delineator', 'description', 'designer',
-     'dialogAuthor', 'director', 'dissertant', 'distributor', 'draftsman', 'editor',
-     'educationLevel', 'electronicEditor', 'electronicEncoder', 'engineer',
-     'engraver', 'etcher', 'extent', 'facsimilist', 'fileFormat', 'fileNumber',
-     'filePath', 'filmEditor', 'forger', 'format', 'genericContributor', 'groupTitle',
-     'hasFormat', 'hasPart', 'hasVersion', 'host', 'identifier', 'illuminator',
-     'illustrator', 'instructionalMethod', 'instrumentalist', 'interviewee',
-     'interviewer', 'introductionAuthor', 'inventor', 'isFormatOf', 'isPartOf',
-     'isReferencedBy', 'isReplacedBy', 'isRequiredBy', 'isVersionOf',
-     'keySignatureFirst', 'keySignatures', 'landscapeArchitect', 'language',
-     'librettist', 'license', 'lightingDesigner', 'lithographer',
-     'localeOfComposition', 'lyricist', 'manufacturer', 'mediator', 'medium',
-     'meetingOrganizer', 'metalEngraver', 'moderator', 'movementName',
-     'movementNumber', 'musician', 'narrator', 'noteCount', 'number', 'numberOfParts',
-     'opusNumber', 'orchestrator', 'originalDocumentOwner', 'originalEditor',
-     'originator', 'otherContributor', 'otherDate', 'parentTitle', 'performer',
-     'photographer', 'pitchHighest', 'pitchLowest', 'platemaker', 'popularTitle',
-     'printmaker', 'producer', 'productionPersonnel', 'programmer',
-     'projectConsultant', 'provenance', 'publisher', 'puppeteer', 'quarterLength',
-     'quotationsAuthor', 'recordingEngineer', 'references', 'relation',
-     'renderer', 'replaces', 'reporter', 'requires', 'researchTeamHead',
-     'researchTeamMember', 'researcher', 'responsibleParty', 'restager',
-     'reviewer', 'rightsHolder', 'scenarist', 'sceneNumber', 'scientificAdvisor',
-     'screenplayAuthor', 'scribe', 'sculptor', 'secretary', 'setDesigner', 'singer',
-     'source', 'sourcePath', 'spatialCoverage', 'speaker', 'standardsBody',
-     'storyteller', 'subject', 'surveyor', 'suspectedComposer', 'tableOfContents',
-     'teacher', 'tempoFirst', 'temporalCoverage', 'tempos', 'textLanguage',
-     'textOriginalLanguage', 'timeSignatureFirst', 'timeSignatures', 'title',
-     'transcriber', 'translator', 'type', 'videographer', 'vocalist', 'volume',
-     'volumeNumber', 'woodCutter', 'woodEngraver', 'writtenCommentator')
+
+    RichMetadata's allUniqueNames/searchAttributes contain all the Metadata
+    allUniqueNames/searchAttributes, plus some observed musical information
+    analyzed from the score.  Here is a list of what information is added:
+
+    >>> richMetadata.additionalRichSearchAttributes
+    ('ambitus', 'keySignatureFirst', 'keySignatures', 'noteCount', 'numberOfParts',
+     'pitchHighest', 'pitchLowest', 'quarterLength', 'sourcePath', 'tempoFirst',
+     'tempos', 'timeSignatureFirst', 'timeSignatures')
     '''
 
     # CLASS VARIABLES #
 
     # When changing this, be sure to update freezeThaw.py
-    _additionalRichSearchAttributes = (
+    additionalRichSearchAttributes = (
         'ambitus',
         'keySignatureFirst',
         'keySignatures',
@@ -1913,8 +1820,8 @@ class RichMetadata(Metadata):
         'timeSignatures',
     )
 
-    allUniqueNames = tuple(sorted(Metadata.allUniqueNames + _additionalRichSearchAttributes))
-    searchAttributes = tuple(sorted(Metadata.searchAttributes + _additionalRichSearchAttributes))
+    allUniqueNames = tuple(sorted(Metadata.allUniqueNames + additionalRichSearchAttributes))
+    searchAttributes = tuple(sorted(Metadata.searchAttributes + additionalRichSearchAttributes))
 
     # INITIALIZER #
 
@@ -1937,8 +1844,8 @@ class RichMetadata(Metadata):
     def _getPluralAttribute(self, attributeName) -> t.Tuple[str, ...]:
         # we have to implement this to add the RichMetadata searchAttributes, since
         # Metadata.search calls it.
-        if attributeName in self._additionalRichSearchAttributes:
-            # We can treat _additionalRichSearchAttributes as singletons,
+        if attributeName in self.additionalRichSearchAttributes:
+            # We can treat additionalRichSearchAttributes as singletons,
             # so just call getattr, and put the result in a tuple.
             value = getattr(self, attributeName)
             if value is None:
