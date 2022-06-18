@@ -319,7 +319,7 @@ class Test(unittest.TestCase):
             )
             self.assertEqual(
                 getattr(md, uniqueName),
-                'Copyright © 1979 {uniqueName}'
+                f'Copyright © 1979 {uniqueName}'
                 + ', Lyrics copyright © 1979 John Jones'
                 + ', Other content copyright © 1979 Jenni Johnson'
                 + ', Even more content copyright © 1979 Sarah Michaels'
