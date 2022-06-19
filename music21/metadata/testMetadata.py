@@ -225,11 +225,11 @@ class Test(unittest.TestCase):
 
         md = metadata.Metadata()
 
-        self.assertTrue(md.isStandardKey(uniqueName))
-        self.assertFalse(md.isStandardKey(uniqueName + '_'))
+        self.assertTrue(md._isStandardUniqueName(uniqueName))
+        self.assertFalse(md._isStandardNSKey(uniqueName))
 
-        self.assertTrue(md.isStandardKey(nsKey))
-        self.assertFalse(md.isStandardKey(nsKey + '_'))
+        self.assertTrue(md._isStandardNSKey(nsKey))
+        self.assertFalse(md._isStandardUniqueName(nsKey))
 
         item = getattr(md, uniqueName)
         self.assertIsNone(item)

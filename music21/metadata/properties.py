@@ -49,8 +49,8 @@ class PropertyDescription:
             md['uniqueName'] or md['namespace:name'].
     '''
     uniqueName: t.Optional[str] = None
-    name: t.Optional[str] = None
-    namespace: t.Optional[str] = None
+    name: str = ''
+    namespace: str = ''
     oldMusic21Abbrev: t.Optional[str] = None
     oldMusic21WorkId: t.Optional[str] = None
     valueType: t.Type = Text
@@ -1004,68 +1004,68 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 # Dictionaries generated from STANDARD_PROPERTY_DESCRIPTIONS for looking up
 # various things quickly.
 
-NSKEY_TO_PROPERTY_DESCRIPTION: dict = {
+NSKEY_TO_PROPERTY_DESCRIPTION: t.Dict[str, PropertyDescription] = {
     f'{x.namespace}:{x.name}':
         x for x in STANDARD_PROPERTY_DESCRIPTIONS}
 
-NSKEY_TO_VALUE_TYPE: dict = {
+NSKEY_TO_VALUE_TYPE: t.Dict[str, t.Type] = {
     f'{x.namespace}:{x.name}':
         x.valueType for x in STANDARD_PROPERTY_DESCRIPTIONS}
 
-NSKEY_TO_CONTRIBUTOR_UNIQUE_NAME: dict = {
+NSKEY_TO_CONTRIBUTOR_UNIQUE_NAME: t.Dict[str, str] = {
     f'{x.namespace}:{x.name}':
         x.uniqueName if x.uniqueName
         else x.name
         for x in STANDARD_PROPERTY_DESCRIPTIONS if x.isContributor}
 
-NSKEY_TO_UNIQUE_NAME: dict = {
+NSKEY_TO_UNIQUE_NAME: t.Dict[str, str] = {
     f'{x.namespace}:{x.name}':
         x.uniqueName if x.uniqueName
         else x.name
         for x in STANDARD_PROPERTY_DESCRIPTIONS}
 
-UNIQUE_NAME_TO_NSKEY: dict = {
+UNIQUE_NAME_TO_NSKEY: t.Dict[str, str] = {
     x.uniqueName if x.uniqueName
     else x.name:
         f'{x.namespace}:{x.name}'
         for x in STANDARD_PROPERTY_DESCRIPTIONS}
 
-UNIQUE_NAME_TO_PROPERTY_DESCRIPTION: dict = {
+UNIQUE_NAME_TO_PROPERTY_DESCRIPTION: t.Dict[str, PropertyDescription] = {
     x.uniqueName if x.uniqueName
     else x.name:
         x for x in STANDARD_PROPERTY_DESCRIPTIONS}
 
-MUSIC21_ABBREVIATION_TO_NSKEY: dict = {
+MUSIC21_ABBREVIATION_TO_NSKEY: t.Dict[str, str] = {
     x.oldMusic21Abbrev if x.oldMusic21Abbrev
-    else None:
+    else '':
         f'{x.namespace}:{x.name}'
         for x in STANDARD_PROPERTY_DESCRIPTIONS
         if x.oldMusic21Abbrev}
 
-MUSIC21_WORK_ID_TO_NSKEY: dict = {
+MUSIC21_WORK_ID_TO_NSKEY: t.Dict[str, str] = {
     x.oldMusic21WorkId if x.oldMusic21WorkId
-    else None:
+    else '':
         f'{x.namespace}:{x.name}'
         for x in STANDARD_PROPERTY_DESCRIPTIONS
         if x.oldMusic21WorkId}
 
-ALL_UNIQUE_NAMES: list = list(UNIQUE_NAME_TO_NSKEY.keys())
-ALL_MUSIC21_WORK_IDS: list = list(MUSIC21_WORK_ID_TO_NSKEY.keys())
-ALL_MUSIC21_ABBREVIATIONS: list = list(MUSIC21_ABBREVIATION_TO_NSKEY.keys())
-ALL_NSKEYS: list = list(NSKEY_TO_PROPERTY_DESCRIPTION.keys())
+ALL_UNIQUE_NAMES: t.List[str] = list(UNIQUE_NAME_TO_NSKEY.keys())
+ALL_MUSIC21_WORK_IDS: t.List[str] = list(MUSIC21_WORK_ID_TO_NSKEY.keys())
+ALL_MUSIC21_ABBREVIATIONS: t.List[str] = list(MUSIC21_ABBREVIATION_TO_NSKEY.keys())
+ALL_NSKEYS: t.List[str] = list(NSKEY_TO_PROPERTY_DESCRIPTION.keys())
 
-ALL_SINGLE_ATTRIBUTE_NAMES: list = list(
+ALL_SINGLE_ATTRIBUTE_NAMES: t.List[str] = list(
     ALL_UNIQUE_NAMES
     + ALL_MUSIC21_WORK_IDS
     + ALL_MUSIC21_ABBREVIATIONS
     + ['fileFormat' + 'filePath' + 'fileNumber']
 )
 
-ALL_PLURAL_ATTRIBUTE_NAMES: list = [
+ALL_PLURAL_ATTRIBUTE_NAMES: t.List[str] = [
     'composers', 'librettists', 'lyricists'
 ]
 
-ALL_LEGAL_ATTRIBUTES: list = list(
+ALL_LEGAL_ATTRIBUTES: t.List[str] = list(
     ALL_SINGLE_ATTRIBUTE_NAMES
     + ALL_PLURAL_ATTRIBUTE_NAMES
 )

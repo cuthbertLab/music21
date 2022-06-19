@@ -447,91 +447,13 @@ class Metadata(base.Music21Object):
         '''
         if not uniqueName:
             return False
-        prop: PropertyDescription = (
-            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None))
+        prop: t.Optional[PropertyDescription] = (
+            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
+        )
         if prop is None:
             return False
 
         return prop.isContributor
-
-    @staticmethod
-    def _isStandardUniqueName(uniqueName: str) -> bool:
-        '''
-        Determines if a unique name is associated with a standard property.
-        Returns False if no such associated standard property can be found.
-
-        >>> metadata.Metadata._isStandardUniqueName('librettist')
-        True
-        >>> metadata.Metadata._isStandardUniqueName('alternativeTitle')
-        True
-        >>> metadata.Metadata._isStandardUniqueName('not a standard property')
-        False
-        >>> metadata.Metadata._isStandardUniqueName(None)
-        False
-        '''
-        if not uniqueName:
-            return False
-        prop: PropertyDescription = (
-            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None))
-        if prop is None:
-            return False
-
-        return True
-
-    @staticmethod
-    def _isStandardNSKey(nsKey: str) -> bool:
-        '''
-        Determines if a unique name is associated with a standard property.
-        Returns False if no such associated standard property can be found.
-
-        >>> metadata.Metadata._isStandardNSKey('marcrel:LBT')
-        True
-        >>> metadata.Metadata._isStandardNSKey('librettist')
-        False
-        >>> metadata.Metadata._isStandardNSKey('nonstandardnamespace:LBT')
-        False
-        >>> metadata.Metadata._isStandardNSKey('marcrel:nonstandardname')
-        False
-        >>> metadata.Metadata._isStandardNSKey(None)
-        False
-        '''
-        if not nsKey:
-            return False
-        prop: PropertyDescription = (
-            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None))
-        if prop is None:
-            return False
-
-        return True
-
-    @staticmethod
-    def isStandardKey(key: str) -> bool:
-        '''
-        Determines if key is either a 'namespace:name' or 'uniqueName' associated
-        with a standard property.
-        Returns False if no such associated standard property can be found.
-
-        >>> metadata.Metadata.isStandardKey('marcrel:LBT')
-        True
-        >>> metadata.Metadata.isStandardKey('librettist')
-        True
-        >>> metadata.Metadata.isStandardKey('not a standard property')
-        False
-        >>> metadata.Metadata.isStandardKey('dcterms:nonstandardname')
-        False
-        >>> metadata.Metadata.isStandardKey(None)
-        False
-        '''
-        if not key:
-            return False
-
-        if Metadata._isStandardNSKey(key):
-            return True
-
-        if Metadata._isStandardUniqueName(key):
-            return True
-
-        return False
 
     @staticmethod
     def nsKeyToUniqueName(nsKey: str) -> t.Optional[str]:
@@ -697,107 +619,6 @@ class Metadata(base.Music21Object):
                 del(allOut['title'])
 
         return tuple(sorted(allOut.items()))
-
-    def _getStringValueByNSKey(self, nsKey: str) -> t.Optional[str]:
-        values: t.Tuple[ValueType, ...]
-        try:
-            values = self._get(nsKey, isCustom=False)
-        except KeyError:
-            return None
-
-        if not values:
-            return None
-
-        if self._isContributorNSKey(nsKey):
-            if len(values) == 1:
-                return str(values[0])
-            if len(values) == 2:
-                return str(values[0]) + ' and ' + str(values[1])
-            return str(values[0]) + f' and {len(values)-1} others'
-
-        if self._needsArticleNormalization(nsKey):
-            output: str = ''
-            for i, value in enumerate(values):
-                assert isinstance(value, Text)
-                if i > 0:
-                    output += ', '
-                output += value.getNormalizedArticle()
-            return output
-
-        return ', '.join(str(value) for value in values)
-
-    def _getStringValuesByNSKey(self, nsKey: str) -> t.Tuple[str, ...]:
-        values: t.Tuple[ValueType, ...]
-        try:
-            values = self._get(nsKey, isCustom=False)
-        except KeyError:
-            return tuple()
-
-        if not values:
-            return tuple()
-
-        if self._needsArticleNormalization(nsKey):
-            output: t.List[str] = []
-            for value in values:
-                assert isinstance(value, Text)
-                output.append(value.getNormalizedArticle())
-            return tuple(output)
-
-        return tuple(str(value) for value in values)
-
-    def _getPluralAttribute(self, attributeName: str) -> t.Tuple[str, ...]:
-        # This does what __getattr__ would do if we supported plural attributeNames
-        # (but it takes singular attributeNames, of course).
-
-        # It raises AttributeError if attributeName is not a valid uniqueName,
-        # workId, or workId abbreviation.  Used in search, for example, because
-        # search wants to find everything.
-
-        if attributeName in properties.UNIQUE_NAME_TO_NSKEY:
-            return self._getStringValuesByNSKey(properties.UNIQUE_NAME_TO_NSKEY[attributeName])
-
-        # Is attributeName a grandfathered workId?
-        if attributeName in properties.MUSIC21_WORK_ID_TO_NSKEY:
-            return self._getStringValuesByNSKey(properties.MUSIC21_WORK_ID_TO_NSKEY[attributeName])
-
-        # Is attributeName a grandfathered workId abbreviation?
-        if attributeName in properties.MUSIC21_ABBREVIATION_TO_NSKEY:
-            return self._getStringValuesByNSKey(
-                properties.MUSIC21_ABBREVIATION_TO_NSKEY[attributeName])
-
-        # The following are in searchAttributes, and getattr will find them because
-        # they are a property, but this routine needs to find them, too.
-        if attributeName == 'fileFormat':
-            if self.fileFormat is None:
-                return tuple()
-            return (self.fileFormat,)
-
-        if attributeName == 'filePath':
-            if self.filePath is None:
-                return tuple()
-            return (self.filePath,)
-
-        if attributeName == 'fileNumber':
-            if self.fileNumber is None:
-                return tuple()
-            return (str(self.fileNumber),)
-
-        raise AttributeError(f'invalid attributeName: {attributeName}')
-
-    def _getSingularAttribute(self, attributeName: str) -> t.Optional[str]:
-        if attributeName in properties.UNIQUE_NAME_TO_NSKEY:
-            return self._getStringValueByNSKey(properties.UNIQUE_NAME_TO_NSKEY[attributeName])
-
-        # Is name a grandfathered workId?
-        if attributeName in properties.MUSIC21_WORK_ID_TO_NSKEY:
-            return self._getStringValueByNSKey(properties.MUSIC21_WORK_ID_TO_NSKEY[attributeName])
-
-        # Is name a grandfathered workId abbreviation?
-        if attributeName in properties.MUSIC21_ABBREVIATION_TO_NSKEY:
-            return self._getStringValueByNSKey(
-                properties.MUSIC21_ABBREVIATION_TO_NSKEY[attributeName])
-
-        raise AttributeError(f'object has no attribute: {attributeName}')
 
     def __getattr__(self, name):
         '''
@@ -1312,7 +1133,9 @@ class Metadata(base.Music21Object):
         '''
         return self._getPluralAttribute('composer')
 
-    @property
+    # mypy complains about "decorated property not supported" (they're fixing it now)
+    # Adding "type: ignore" comment to the first decoration suppresses the complaint.
+    @property   # type: ignore
     @deprecated('v8', 'v9', 'use `md.dateCreated` instead')
     def date(self):
         return self.dateCreated
@@ -1551,21 +1374,178 @@ class Metadata(base.Music21Object):
 # -----------------------------------------------------------------------------
 # Internal support routines (many of them static).
 
+    def _getStringValueByNSKey(self, nsKey: str) -> t.Optional[str]:
+        values: t.Tuple[ValueType, ...]
+        try:
+            values = self._get(nsKey, isCustom=False)
+        except KeyError:
+            return None
+
+        if not values:
+            return None
+
+        if self._isContributorNSKey(nsKey):
+            if len(values) == 1:
+                return str(values[0])
+            if len(values) == 2:
+                return str(values[0]) + ' and ' + str(values[1])
+            return str(values[0]) + f' and {len(values)-1} others'
+
+        if self._needsArticleNormalization(nsKey):
+            output: str = ''
+            for i, value in enumerate(values):
+                assert isinstance(value, Text)
+                if i > 0:
+                    output += ', '
+                output += value.getNormalizedArticle()
+            return output
+
+        return ', '.join(str(value) for value in values)
+
+    def _getStringValuesByNSKey(self, nsKey: str) -> t.Tuple[str, ...]:
+        values: t.Tuple[ValueType, ...]
+        try:
+            values = self._get(nsKey, isCustom=False)
+        except KeyError:
+            return tuple()
+
+        if not values:
+            return tuple()
+
+        if self._needsArticleNormalization(nsKey):
+            output: t.List[str] = []
+            for value in values:
+                assert isinstance(value, Text)
+                output.append(value.getNormalizedArticle())
+            return tuple(output)
+
+        return tuple(str(value) for value in values)
+
+    def _getPluralAttribute(self, attributeName: str) -> t.Tuple[str, ...]:
+        # This does what __getattr__ would do if we supported plural attributeNames
+        # (but it takes singular attributeNames, of course).
+
+        # It raises AttributeError if attributeName is not a valid uniqueName,
+        # workId, or workId abbreviation.  Used in search, for example, because
+        # search wants to find everything.
+
+        if attributeName in properties.UNIQUE_NAME_TO_NSKEY:
+            return self._getStringValuesByNSKey(properties.UNIQUE_NAME_TO_NSKEY[attributeName])
+
+        # Is attributeName a grandfathered workId?
+        if attributeName in properties.MUSIC21_WORK_ID_TO_NSKEY:
+            return self._getStringValuesByNSKey(properties.MUSIC21_WORK_ID_TO_NSKEY[attributeName])
+
+        # Is attributeName a grandfathered workId abbreviation?
+        if attributeName in properties.MUSIC21_ABBREVIATION_TO_NSKEY:
+            return self._getStringValuesByNSKey(
+                properties.MUSIC21_ABBREVIATION_TO_NSKEY[attributeName])
+
+        # The following are in searchAttributes, and getattr will find them because
+        # they are a property, but this routine needs to find them, too.
+        if attributeName == 'fileFormat':
+            if self.fileFormat is None:
+                return tuple()
+            return (self.fileFormat,)
+
+        if attributeName == 'filePath':
+            if self.filePath is None:
+                return tuple()
+            return (self.filePath,)
+
+        if attributeName == 'fileNumber':
+            if self.fileNumber is None:
+                return tuple()
+            return (str(self.fileNumber),)
+
+        raise AttributeError(f'invalid attributeName: {attributeName}')
+
+    def _getSingularAttribute(self, attributeName: str) -> t.Optional[str]:
+        if attributeName in properties.UNIQUE_NAME_TO_NSKEY:
+            return self._getStringValueByNSKey(properties.UNIQUE_NAME_TO_NSKEY[attributeName])
+
+        # Is name a grandfathered workId?
+        if attributeName in properties.MUSIC21_WORK_ID_TO_NSKEY:
+            return self._getStringValueByNSKey(properties.MUSIC21_WORK_ID_TO_NSKEY[attributeName])
+
+        # Is name a grandfathered workId abbreviation?
+        if attributeName in properties.MUSIC21_ABBREVIATION_TO_NSKEY:
+            return self._getStringValueByNSKey(
+                properties.MUSIC21_ABBREVIATION_TO_NSKEY[attributeName])
+
+        raise AttributeError(f'object has no attribute: {attributeName}')
+
     @staticmethod
-    def _isContributorNSKey(nsKey: str) -> bool:
+    def _isStandardUniqueName(uniqueName: t.Optional[str]) -> bool:
+        '''
+        Determines if a unique name is associated with a standard property.
+        Returns False if no such associated standard property can be found.
+
+        >>> metadata.Metadata._isStandardUniqueName('librettist')
+        True
+        >>> metadata.Metadata._isStandardUniqueName('alternativeTitle')
+        True
+        >>> metadata.Metadata._isStandardUniqueName('not a standard property')
+        False
+        >>> metadata.Metadata._isStandardUniqueName(None)
+        False
+        '''
+        if not uniqueName:
+            return False
+        prop: t.Optional[PropertyDescription] = (
+            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
+        )
+        if prop is None:
+            return False
+
+        return True
+
+    @staticmethod
+    def _isStandardNSKey(nsKey: t.Optional[str]) -> bool:
+        '''
+        Determines if a unique name is associated with a standard property.
+        Returns False if no such associated standard property can be found.
+
+        >>> metadata.Metadata._isStandardNSKey('marcrel:LBT')
+        True
+        >>> metadata.Metadata._isStandardNSKey('librettist')
+        False
+        >>> metadata.Metadata._isStandardNSKey('nonstandardnamespace:LBT')
+        False
+        >>> metadata.Metadata._isStandardNSKey('marcrel:nonstandardname')
+        False
+        >>> metadata.Metadata._isStandardNSKey(None)
+        False
+        '''
         if not nsKey:
             return False
-        prop: PropertyDescription = properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+        prop: t.Optional[PropertyDescription] = (
+            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+        )
+        if prop is None:
+            return False
+
+        return True
+
+    @staticmethod
+    def _isContributorNSKey(nsKey: t.Optional[str]) -> bool:
+        if not nsKey:
+            return False
+        prop: t.Optional[PropertyDescription] = (
+            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+        )
         if prop is None:
             return False
 
         return prop.isContributor
 
     @staticmethod
-    def _needsArticleNormalization(nsKey: str) -> bool:
+    def _needsArticleNormalization(nsKey: t.Optional[str]) -> bool:
         if not nsKey:
             return False
-        prop: PropertyDescription = properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+        prop: t.Optional[PropertyDescription] = (
+            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+        )
         if prop is None:
             return False
 
@@ -1573,7 +1553,9 @@ class Metadata(base.Music21Object):
 
     @staticmethod
     def _nsKeyToContributorRole(nsKey: str) -> t.Optional[str]:
-        prop: PropertyDescription = properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+        prop: t.Optional[PropertyDescription] = (
+            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+        )
         if prop is None:
             return None
         if not prop.isContributor:
@@ -1590,6 +1572,44 @@ class Metadata(base.Music21Object):
             return prop.oldMusic21WorkId
         return prop.name
 
+    @staticmethod
+    def _contributorRoleToNSKey(role: str) -> str:
+        '''
+        Translates a contributor role to a standard 'namespace:name' nsKey.
+        Returns 'marcrel:CTB' (a.k.a. 'otherContributor') if the role is a
+        non-standard role.
+
+        >>> metadata.Metadata._contributorRoleToNSKey('lyricist')
+        'marcrel:LYR'
+        >>> metadata.Metadata._contributorRoleToNSKey('composer')
+        'marcrel:CMP'
+        >>> metadata.Metadata._contributorRoleToNSKey('alternativeTitle')
+        'marcrel:CTB'
+        >>> metadata.Metadata._contributorRoleToNSKey('humdrum:XXX')
+        'marcrel:CTB'
+        >>> metadata.Metadata._contributorRoleToNSKey('')
+        'marcrel:CTB'
+        >>> metadata.Metadata._contributorRoleToNSKey(None)
+        'marcrel:CTB'
+        '''
+        nsKey: t.Optional[str] = properties.UNIQUE_NAME_TO_NSKEY.get(role, None)
+        if nsKey is None:
+            nsKey = properties.MUSIC21_WORK_ID_TO_NSKEY.get(role, None)
+        if nsKey is None:
+            # it's a non-standard role, so add this contributor with uniqueName='otherContributor'
+            return 'marcrel:CTB'  # aka. 'otherContributor'
+
+        prop: t.Optional[PropertyDescription] = (
+            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+        )
+
+        if prop is not None and not prop.isContributor:
+            # It's not a contributor name, but it IS another metadata uniqueName, like
+            # 'alternativeTitle' or something.  Weird, but we'll call it 'otherContributor'.
+            return 'marcrel:CTB'  # a.k.a. 'otherContributor'
+
+        return nsKey
+
     def _get(self, key: str, isCustom: bool) -> t.Tuple[ValueType, ...]:
         '''
         Returns all the items stored in metadata with this key.
@@ -1599,15 +1619,16 @@ class Metadata(base.Music21Object):
         The key can be the item's uniqueName or 'namespace:name'.  If it is
         not one of the standard metadata properties, KeyError will be raised.
         '''
+        nsKey: str = key
         if not isCustom:
             if self._isStandardUniqueName(key):
-                key = properties.UNIQUE_NAME_TO_NSKEY.get(key, None)
-            if not self._isStandardNSKey(key):
+                nsKey = properties.UNIQUE_NAME_TO_NSKEY.get(key, '')
+            if not self._isStandardNSKey(nsKey):
                 raise KeyError(
                     f'Key=\'{key}\' is not a standard metadata key.'
-                    ' Call setCustom/getCustom for custom keys.')
+                    ' Call addCustom/setCustom/getCustom for custom keys.')
 
-        valueList: t.Optional[t.List[ValueType]] = self._contents.get(key, None)
+        valueList: t.Optional[t.List[ValueType]] = self._contents.get(nsKey, None)
 
         if not valueList:
             # return empty tuple
@@ -1624,10 +1645,11 @@ class Metadata(base.Music21Object):
         The key can be the item's uniqueName or 'namespace:name'.  If it is
         not one of the standard metadata properties, KeyError will be raised.
         '''
+        nsKey: str = key
         if not isCustom:
             if self._isStandardUniqueName(key):
-                key = properties.UNIQUE_NAME_TO_NSKEY.get(key, None)
-            if not self._isStandardNSKey(key):
+                nsKey = properties.UNIQUE_NAME_TO_NSKEY.get(key, '')
+            if not self._isStandardNSKey(nsKey):
                 raise KeyError(
                     f'Key=\'{key}\' is not a standard metadata key.'
                     ' Call addCustom/setCustom/getCustom for custom keys.')
@@ -1641,16 +1663,16 @@ class Metadata(base.Music21Object):
 
         convertedValues: t.List[ValueType] = []
         for v in value:
-            convertedValues.append(self._convertValue(key, v))
+            convertedValues.append(self._convertValue(nsKey, v))
 
-        prevValues: t.Optional[t.List[ValueType]] = self._contents.get(key, None)
+        prevValues: t.Optional[t.List[ValueType]] = self._contents.get(nsKey, None)
         if not prevValues:  # None or []
             # set the convertedValues list in there
             # it's always a list, even if there's only one value
-            self._contents[key] = convertedValues
+            self._contents[nsKey] = convertedValues
         else:
             # add the convertedValues list to the existing list
-            self._contents[key] = prevValues + convertedValues
+            self._contents[nsKey] = prevValues + convertedValues
 
     def _set(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]], isCustom: bool):
         '''
@@ -1670,16 +1692,17 @@ class Metadata(base.Music21Object):
         (<music21.metadata.primitives.Contributor librettist:Melissa Li>,
          <music21.metadata.primitives.Contributor librettist:Kit Yan Win>)
         '''
+        nsKey: str = key
         if not isCustom:
             if self._isStandardUniqueName(key):
-                key = properties.UNIQUE_NAME_TO_NSKEY.get(key, None)
-            if not self._isStandardNSKey(key):
+                nsKey = properties.UNIQUE_NAME_TO_NSKEY.get(key, '')
+            if not self._isStandardNSKey(nsKey):
                 raise KeyError(
                     f'Key=\'{key}\' is not a standard metadata key.'
                     ' Call addCustom/setCustom/getCustom for custom keys.')
 
-        self._contents.pop(key, None)
-        self._add(key, value, isCustom)
+        self._contents.pop(nsKey, None)
+        self._add(nsKey, value, isCustom)
 
     @staticmethod
     def _convertValue(nsKey: str, value: t.Any) -> ValueType:
@@ -1724,7 +1747,7 @@ class Metadata(base.Music21Object):
         ...     metadata.DateBetween(['1938','1939']))
         <music21.metadata.primitives.DateBetween 1938/--/-- to 1939/--/-->
         '''
-        valueType: t.Type = properties.NSKEY_TO_VALUE_TYPE.get(nsKey, None)
+        valueType: t.Optional[t.Type] = properties.NSKEY_TO_VALUE_TYPE.get(nsKey, None)
         originalValue: t.Any = value
 
         if valueType is None:
@@ -1779,43 +1802,6 @@ class Metadata(base.Music21Object):
                 f'invalid type for Contributor: {type(value).__name__}')
 
         raise exceptions21.MetadataException('internal error: invalid valueType')
-
-    @staticmethod
-    def _contributorRoleToNSKey(role: str) -> str:
-        '''
-        Translates a contributor role to a standard 'namespace:name' nsKey.
-        Returns 'marcrel:CTB' (a.k.a. 'otherContributor') if the role is a
-        non-standard role.
-
-        >>> metadata.Metadata._contributorRoleToNSKey('lyricist')
-        'marcrel:LYR'
-        >>> metadata.Metadata._contributorRoleToNSKey('composer')
-        'marcrel:CMP'
-        >>> metadata.Metadata._contributorRoleToNSKey('alternativeTitle')
-        'marcrel:CTB'
-        >>> metadata.Metadata._contributorRoleToNSKey('humdrum:XXX')
-        'marcrel:CTB'
-        >>> metadata.Metadata._contributorRoleToNSKey('')
-        'marcrel:CTB'
-        >>> metadata.Metadata._contributorRoleToNSKey(None)
-        'marcrel:CTB'
-        '''
-        nsKey: t.Optional[str] = properties.UNIQUE_NAME_TO_NSKEY.get(role, None)
-        if nsKey is None:
-            nsKey = properties.MUSIC21_WORK_ID_TO_NSKEY.get(role, None)
-        if nsKey is None:
-            # it's a non-standard role, so add this contributor with uniqueName='otherContributor'
-            return 'marcrel:CTB'  # aka. 'otherContributor'
-
-        prop: t.Optional[PropertyDescription] = (
-            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None))
-
-        if prop is not None and not prop.isContributor:
-            # It's not a contributor name, but it IS another metadata uniqueName, like
-            # 'alternativeTitle' or something.  Weird, but we'll call it 'otherContributor'.
-            return 'marcrel:CTB'  # a.k.a. 'otherContributor'
-
-        return nsKey
 
 # -----------------------------------------------------------------------------
 

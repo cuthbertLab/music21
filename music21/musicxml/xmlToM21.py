@@ -1343,18 +1343,29 @@ class MusicXMLImporter(XMLParserBase):
                 if miscFieldValue is None:
                     miscFieldValue = ''
 
-                if md.isStandardKey(miscFieldName):
-                    # miscFieldName is either a standard 'namespace:name',
-                    # or a standard uniqueName. We currently write namespace:name,
-                    # but we used to write uniqueNames, so we need to be able to
-                    # read/interpret both.
+                if self.isRecognizableMetadataKey(miscFieldName):
                     md.add(miscFieldName, miscFieldValue)
                 else:
-                    # non-standard miscFieldName? Add as custom metadata.
+                    # We didn't recognize miscFieldName? Add as custom metadata,
+                    # so nothing is lost.
                     md.addCustom(miscFieldName, miscFieldValue)
 
         if inputM21 is None:
             return md
+
+    # A list of names we might see in <miscellaneous>, that this parser
+    # will interpret as supported metadata keys.  Currently this is all
+    # the uniqueName keys (e.g. 'dateCreated'), the 'namespace:name'
+    # keys (e.g. 'dcterms:created'), and the grandfathered music21 v7
+    # workIds (e.g. 'date').
+    _recognizableKeys: t.List[str] = list(
+        metadata.properties.ALL_NSKEYS
+        + metadata.properties.ALL_UNIQUE_NAMES
+        + metadata.properties.ALL_MUSIC21_WORK_IDS
+    )
+
+    def isRecognizableMetadataKey(self, miscFieldName: str) -> bool:
+        return miscFieldName in self._recognizableKeys
 
     def processEncoding(self, encoding: ET.Element, md: metadata.Metadata):
         # TODO: encoder (text + type = role) multiple
