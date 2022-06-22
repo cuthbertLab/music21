@@ -1069,6 +1069,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         'conductor'
         ...
         'dateCreated'
+        'dateFirstPublished'
         'dateIssued'
         'dateModified'
         'dateSubmitted'

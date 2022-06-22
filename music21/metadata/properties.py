@@ -967,7 +967,90 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         valueType=Contributor,
         isContributor=True),
 
-    # originalDocumentOwner: original document owner
+    # Imprint information (from the humdrum namespace)
+
+    # firstPublisher: Name of the first publisher of the work, or the name
+    #   of the publisher if a specific edition is being encoded.
+    PropertyDescription(
+        uniqueName='firstPublisher',
+        name='PPR',
+        namespace='humdrum',
+        valueType=Contributor,
+        isContributor=True),
+
+    # dateFirstPublished: The date of first publication.
+    PropertyDescription(
+        uniqueName='dateFirstPublished',
+        name='PDT',
+        namespace='humdrum',
+        valueType=DateSingle,
+        isContributor=False),
+
+    # publicationTitle: Title of the publication (volume) from which the work
+    #   is encoded.  May have embedded line breaks ('\n').
+    PropertyDescription(
+        uniqueName='publicationTitle',
+        name='PTL',
+        namespace='humdrum',
+        isContributor=False),
+
+    # placeFirstPublished: The place where the source edition for the
+    #   digital encoding was first published (location of first edition).
+    PropertyDescription(
+        uniqueName='placeFirstPublished',
+        name='PPP',
+        namespace='humdrum',
+        isContributor=False),
+
+    # publishersCatalogNumber: Publisher's catalog number.  This should not be
+    #   confused with better known scholarly catalogs, such as those of Köchel,
+    #   Hoboken, etc.
+    PropertyDescription(
+        uniqueName='publishersCatalogNumber',
+        name='PC#',
+        namespace='humdrum',
+        isContributor=False),
+
+    # scholarlyCatalogName: Scholarly catalog (unabbreviated) name and number.
+    #   E.g. 'Koechel 117'.
+    PropertyDescription(
+        uniqueName='scholarlyCatalogName',
+        name='SCA',
+        namespace='humdrum',
+        isContributor=False),
+
+    # scholarlyCatalogAbbreviation: Scholarly catalog abbreviation and number.
+    #   E.g. 'BWV 551'.
+    PropertyDescription(
+        uniqueName='scholarlyCatalogAbbreviation',
+        name='SCT',
+        namespace='humdrum',
+        isContributor=False),
+
+    # manuscriptSourceName: For unpublished sources, the manuscript source name.
+    PropertyDescription(
+        uniqueName='manuscriptSourceName',
+        name='SMS',
+        namespace='humdrum',
+        isContributor=False),
+
+    # manuscriptLocation: For unpublished sources, the location of the
+    #   manuscript source.
+    PropertyDescription(
+        uniqueName='manuscriptLocation',
+        name='SML',
+        namespace='humdrum',
+        isContributor=False),
+
+    # manuscriptAccessAcknowledgement: A free format acknowledgement or note
+    #   of thanks to a given manuscript owner for scholarly or other access.
+    PropertyDescription(
+        uniqueName='manuscriptAccessAcknowledgement',
+        name='SMA',
+        namespace='humdrum',
+        isContributor=False),
+
+    # originalDocumentOwner: The owner of the original document
     PropertyDescription(
         uniqueName='originalDocumentOwner',
         name='YOO',
@@ -975,7 +1058,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         valueType=Contributor,
         isContributor=True),
 
-    # originalEditor: original editor
+    # originalEditor: The editor of the original document
     PropertyDescription(
         uniqueName='originalEditor',
         name='YOE',
@@ -983,7 +1066,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         valueType=Contributor,
         isContributor=True),
 
-    # electronicEditor: electronic editor
+    # electronicEditor: The editor of the electronic edition
     PropertyDescription(
         uniqueName='electronicEditor',
         name='EED',
@@ -991,13 +1074,29 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         valueType=Contributor,
         isContributor=True),
 
-    # electronicEncoder: electronic encoder
+    # electronicEncoder: The encoder of the electronic edition
     PropertyDescription(
         uniqueName='electronicEncoder',
         name='ENC',
         namespace='humdrum',
         valueType=Contributor,
         isContributor=True),
+
+    # electronicPublisher: The publisher of the electronic edition.
+    PropertyDescription(
+        uniqueName='electronicPublisher',
+        name='YEP',
+        namespace='humdrum',
+        valueType=Contributor,
+        isContributor=True),
+
+    # electronicReleaseDate: The date the electronic edition was released.
+    PropertyDescription(
+        uniqueName='electronicReleaseDate',
+        name='YER',
+        namespace='humdrum',
+        valueType=DateSingle,
+        isContributor=False),
 )
 
 # -----------------------------------------------------------------------------

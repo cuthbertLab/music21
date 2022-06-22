@@ -518,6 +518,18 @@ class Test(unittest.TestCase):
             valueType=metadata.Contributor)
         self.checkUniqueNamedItem('orchestrator', 'humdrum:LOR',
             valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('firstPublisher', 'humdrum:PPR',
+            valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('dateFirstPublished', 'humdrum:PDT',
+            valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('publicationTitle', 'humdrum:PTL')
+        self.checkUniqueNamedItem('placeFirstPublished', 'humdrum:PPP')
+        self.checkUniqueNamedItem('publishersCatalogNumber', 'humdrum:PC#')
+        self.checkUniqueNamedItem('scholarlyCatalogName', 'humdrum:SCA')
+        self.checkUniqueNamedItem('scholarlyCatalogAbbreviation', 'humdrum:SCT')
+        self.checkUniqueNamedItem('manuscriptSourceName', 'humdrum:SMS')
+        self.checkUniqueNamedItem('manuscriptLocation', 'humdrum:SML')
+        self.checkUniqueNamedItem('manuscriptAccessAcknowledgement', 'humdrum:SMA')
         self.checkUniqueNamedItem('originalDocumentOwner', 'humdrum:YOO',
             valueType=metadata.Contributor)
         self.checkUniqueNamedItem('originalEditor', 'humdrum:YOE',
@@ -526,6 +538,10 @@ class Test(unittest.TestCase):
             valueType=metadata.Contributor)
         self.checkUniqueNamedItem('electronicEncoder', 'humdrum:ENC',
             valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('electronicPublisher', 'humdrum:YEP',
+            valueType=metadata.Contributor)
+        self.checkUniqueNamedItem('electronicReleaseDate', 'humdrum:YER',
+            valueType=metadata.DateSingle)
 
 # -----------------------------------------------------------------------------
 

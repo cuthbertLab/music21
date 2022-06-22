@@ -373,6 +373,7 @@ def listSearchFields():
     'conductor'
     ...
     'dateCreated'
+    'dateFirstPublished'
     'dateIssued'
     'dateModified'
     'dateSubmitted'

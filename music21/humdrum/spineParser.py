@@ -2790,19 +2790,19 @@ class GlobalReference(base.Music21Object):
         # Imprint information
         'PUB': '',  # publication status 'published'/'unpublished'
         'PED': '',  # publication editor
-        'PPR': '',  # first publisher
-        'PDT': '',  # date first published (**date format)
-        'PTL': '',  # publication (volume) title
-        'PPP': '',  # place first published
-        'PC#': '',  # publisher's catalog number (NOT scholarly catalog, see below)
-        'SCT': '',  # scholarly catalog abbreviation and number (e.g. 'BWV 551')
-        'SCA': '',  # scholarly catalog (unabbreviated) (e.g. 'Koechel 117')
-        'SMS': '',  # unpublished manuscript source name
-        'SML': '',  # unpublished manuscript location
-        'SMA': '',  # acknowledgment of manuscript access
-        'YEP': '',  # publisher of electronic edition
+        'PPR': 'firstPublisher',  # first publisher
+        'PDT': 'dateFirstPublished',  # date first published (**date format)
+        'PTL': 'publicationTitle',  # publication (volume) title
+        'PPP': 'placeFirstPublished',  # place first published
+        'PC#': 'publishersCatalogNumber',  # publisher's catalog number (NOT scholarly catalog)
+        'SCT': 'scholarlyCatalogAbbreviation',  # scholarly catalog abbrev/number (e.g. 'BWV 551')
+        'SCA': 'scholarlyCatalogName',  # scholarly catalog (unabbreviated) (e.g. 'Koechel 117')
+        'SMS': 'manuscriptSourceName',  # unpublished manuscript source name
+        'SML': 'manuscriptLocation',  # unpublished manuscript location
+        'SMA': 'manuscriptAccessAcknowledgement',  # acknowledgment of manuscript access
+        'YEP': 'electronicPublisher',  # publisher of electronic edition
         'YEC': 'copyright',  # date and owner of electronic copyright
-        'YER': '',  # date electronic edition released
+        'YER': 'electronicReleaseDate',  # date electronic edition released
         'YEM': '',  # copyright message (e.g. 'All rights reserved')
         'YEN': '',  # country of copyright
         'YOR': '',  # original document from which encoded document was prepared
