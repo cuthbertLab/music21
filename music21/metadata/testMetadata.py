@@ -407,8 +407,11 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem('accessRights', 'dcterms')
         self.checkUniqueNamedItem('alternativeTitle', 'dcterms:alternative')
         self.checkUniqueNamedItem('audience', 'dcterms')
-        self.checkUniqueNamedItem('dateAvailable', 'dcterms:available',
-            valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem(
+            'dateAvailable',
+            'dcterms:available',
+            valueType=metadata.DateSingle
+        )
         self.checkUniqueNamedItem('bibliographicCitation', 'dcterms')
         self.checkUniqueNamedItem('conformsTo', 'dcterms')
         self.checkUniqueNamedItem('dateCreated', 'dcterms:created', valueType=metadata.DateSingle)
@@ -435,8 +438,11 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem('language', 'dcterms')
         self.checkUniqueNamedItem('license', 'dcterms')
         self.checkUniqueNamedItem('medium', 'dcterms')
-        self.checkUniqueNamedItem('dateModified', 'dcterms:modified',
-            valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem(
+            'dateModified',
+            'dcterms:modified',
+            valueType=metadata.DateSingle
+        )
         self.checkUniqueNamedItem('provenance', 'dcterms')
         self.checkUniqueNamedItem('publisher', 'dcterms', valueType=metadata.Contributor)
         self.checkUniqueNamedItem('references', 'dcterms')
@@ -508,20 +514,41 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem('groupTitle', 'humdrum:GTL')
         self.checkUniqueNamedItem('associatedWork', 'humdrum:GAW')
         self.checkUniqueNamedItem('collectionDesignation', 'humdrum:GCO')
-        self.checkUniqueNamedItem('attributedComposer', 'humdrum:COA',
-            valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('suspectedComposer', 'humdrum:COS',
-            valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('composerAlias', 'humdrum:COL',
-            valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('composerCorporate', 'humdrum:COC',
-            valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('orchestrator', 'humdrum:LOR',
-            valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('firstPublisher', 'humdrum:PPR',
-            valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('dateFirstPublished', 'humdrum:PDT',
-            valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem(
+            'attributedComposer',
+            'humdrum:COA',
+            valueType=metadata.Contributor
+        )
+        self.checkUniqueNamedItem(
+            'suspectedComposer',
+            'humdrum:COS',
+            valueType=metadata.Contributor
+        )
+        self.checkUniqueNamedItem(
+            'composerAlias',
+            'humdrum:COL',
+            valueType=metadata.Contributor
+        )
+        self.checkUniqueNamedItem(
+            'composerCorporate',
+            'humdrum:COC',
+            valueType=metadata.Contributor
+        )
+        self.checkUniqueNamedItem(
+            'orchestrator',
+            'humdrum:LOR',
+            valueType=metadata.Contributor
+        )
+        self.checkUniqueNamedItem(
+            'firstPublisher',
+            'humdrum:PPR',
+            valueType=metadata.Contributor
+        )
+        self.checkUniqueNamedItem(
+            'dateFirstPublished',
+            'humdrum:PDT',
+            valueType=metadata.DateSingle
+        )
         self.checkUniqueNamedItem('publicationTitle', 'humdrum:PTL')
         self.checkUniqueNamedItem('placeFirstPublished', 'humdrum:PPP')
         self.checkUniqueNamedItem('publishersCatalogNumber', 'humdrum:PC#')
@@ -530,18 +557,36 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem('manuscriptSourceName', 'humdrum:SMS')
         self.checkUniqueNamedItem('manuscriptLocation', 'humdrum:SML')
         self.checkUniqueNamedItem('manuscriptAccessAcknowledgement', 'humdrum:SMA')
-        self.checkUniqueNamedItem('originalDocumentOwner', 'humdrum:YOO',
-            valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('originalEditor', 'humdrum:YOE',
-            valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('electronicEditor', 'humdrum:EED',
-            valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('electronicEncoder', 'humdrum:ENC',
-            valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('electronicPublisher', 'humdrum:YEP',
-            valueType=metadata.Contributor)
-        self.checkUniqueNamedItem('electronicReleaseDate', 'humdrum:YER',
-            valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem(
+            'originalDocumentOwner',
+            'humdrum:YOO',
+            valueType=metadata.Contributor
+        )
+        self.checkUniqueNamedItem(
+            'originalEditor',
+            'humdrum:YOE',
+            valueType=metadata.Contributor
+        )
+        self.checkUniqueNamedItem(
+            'electronicEditor',
+            'humdrum:EED',
+            valueType=metadata.Contributor
+        )
+        self.checkUniqueNamedItem(
+            'electronicEncoder',
+            'humdrum:ENC',
+            valueType=metadata.Contributor
+        )
+        self.checkUniqueNamedItem(
+            'electronicPublisher',
+            'humdrum:YEP',
+            valueType=metadata.Contributor
+        )
+        self.checkUniqueNamedItem(
+            'electronicReleaseDate',
+            'humdrum:YER',
+            valueType=metadata.DateSingle
+        )
 
 # -----------------------------------------------------------------------------
 

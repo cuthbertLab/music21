@@ -791,6 +791,9 @@ class Text(prebase.ProtoM21Object):
         >>> t2 = metadata.Text('some text')
         >>> t1 == t2
         True
+
+        Language, isTranslated, and encodingScheme must all exactly match for equality.
+
         >>> t2 = metadata.Text('some text', language='en')
         >>> t1 == t2
         False
@@ -800,6 +803,9 @@ class Text(prebase.ProtoM21Object):
         >>> t2 = metadata.Text('some text', encodingScheme='scheme42')
         >>> t1 == t2
         False
+
+        Comparison with non-Text types will always be considered unequal.
+
         >>> t1 == 3
         False
         '''
@@ -862,35 +868,35 @@ class Copyright(Text):
     '''
     A subclass of text that can also have a role
 
-    >>> copyleft = metadata.primitives.Copyright('Copyright 1969 Cuthbert',
-    ...                role='fictitious')
-    >>> copyleft
-    <music21.metadata.primitives.Copyright Copyright 1969 Cuthbert>
-    >>> copyleft.role
-    'fictitious'
-    >>> str(copyleft)
-    'Copyright 1969 Cuthbert'
-    >>> copyleft2 = metadata.Copyright('Copyright 1969 Cuthbert',
-    ...                 role='fictitious')
-    >>> copyleft == copyleft2
+    >>> c = metadata.primitives.Copyright('Copyright 1945 Florence Price')
+    >>> c
+    <music21.metadata.primitives.Copyright Copyright 1945 Florence Price>
+    >>> c.role is None
     True
-    >>> copyleft2 = metadata.Copyright('Copyright © 1969 Cuthbert',
-    ...                 role='fictitious')
-    >>> copyleft == copyleft2
+    >>> str(c)
+    'Copyright 1945 Florence Price'
+
+    The text, language, isTranslated, role, etc must be identical for equality.
+
+    >>> c2 = metadata.Copyright('Copyright 1945 Florence Price')
+    >>> c == c2
+    True
+    >>> c2 = metadata.Copyright('Copyright © 1945 Florence Price')
+    >>> c == c2
     False
-    >>> copyleft2 = metadata.Copyright('Copyright 1969 Cuthbert', language='en',
-    ...                 role='fictitious')
-    >>> copyleft == copyleft2
+    >>> c2 = metadata.Copyright('Copyright 1945 Florence Price', language='en')
+    >>> c == c2
     False
-    >>> copyleft2 = metadata.Copyright('Copyright 1969 Cuthbert', isTranslated=True,
-    ...                 role='fictitious')
-    >>> copyleft == copyleft2
+    >>> c2 = metadata.Copyright('Copyright 1945 Florence Price', isTranslated=True)
+    >>> c == c2
     False
-    >>> copyleft2 = metadata.Copyright('Copyright 1969 Cuthbert',
-    ...                 role='facetious')
-    >>> copyleft == copyleft2
+    >>> c2 = metadata.Copyright('Copyright 1945 Florence Price', role='other')
+    >>> c == c2
     False
-    >>> copyleft == 3
+
+    Comparison against a non-Copyright object will always return False.
+
+    >>> c == 3
     False
     '''
 
@@ -1016,34 +1022,61 @@ class Contributor(prebase.ProtoM21Object):
 
     def __eq__(self, other) -> bool:
         '''
-        >>> c1 = metadata.Contributor(role='composer', name='The Composer',
-        ...         birth='1923', death='2013')
-        >>> c2 = metadata.Contributor(role='composer', name='The Composer',
-        ...         birth='1923', death='2013')
+        >>> c1 = metadata.Contributor(
+        ...         role='composer',
+        ...         name='The Composer',
+        ...         birth='1923',
+        ...         death='2013'
+        ... )
+        >>> c2 = metadata.Contributor(
+        ...         role='composer',
+        ...         name='The Composer',
+        ...         birth='1923',
+        ...         death='2013'
+        ... )
+
+        Names, role, birth, and death must all be identical for equality.
+
         >>> c1 == c2
         True
         >>> c2.role = 'lyricist'
         >>> c1 == c2
         False
-        >>> c2 = metadata.Contributor(role='composer', name='A Composer',
-        ...         birth='1923', death='2013')
+        >>> c2 = metadata.Contributor(
+        ...         role='composer',
+        ...         name='A Composer',
+        ...         birth='1923',
+        ...         death='2013'
+        ... )
         >>> c1 == c2
         False
-        >>> c2 = metadata.Contributor(role='composer', names=['A Composer',
-        ...         'The Composer'], birth='1923', death='2013')
+        >>> c2 = metadata.Contributor(
+        ...         role='composer',
+        ...         names=['A Composer', 'The Composer'],
+        ...         birth='1923',
+        ...         death='2013'
+        ... )
         >>> c1 == c2
         False
-        >>> c2 = metadata.Contributor(role='composer', name='The Composer',
-        ...         birth='1924', death='2013')
+        >>> c2 = metadata.Contributor(
+        ...         role='composer',
+        ...         name='The Composer',
+        ...         birth='1924',
+        ...         death='2013'
+        ... )
         >>> c1 == c2
         False
-        >>> c2 = metadata.Contributor(role='composer', name='The Composer',
-        ...         birth='1923', death='2012')
+        >>> c2 = metadata.Contributor(
+        ...         role='composer',
+        ...         name='The Composer',
+        ...         birth='1923',
+        ...         death='2012'
+        ... )
         >>> c1 == c2
         False
-        >>> c2.death = '2012'
-        >>> c1 == c2
-        False
+
+        Comparison with a non-Contributor object always returns False.
+
         >>> c1 == 3
         False
         '''

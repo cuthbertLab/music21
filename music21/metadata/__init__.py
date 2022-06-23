@@ -50,24 +50,28 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     contributor role, but only one of each workId.  And you could only have metadata
     items that had one of those names (no custom metadata).
 
-    In the new implementation, contributor roles are treated the same as other
-    non-contributor metadata.  I have a list of supported property terms, which are
-    pulled from Dublin Core (namespace = 'dcterms'), MARC Relator codes (a.k.a.
-    contributor roles, namespace = 'marcrel'), and Humdrum (namespace = 'humdrum').
-    Each metadata property can be specified by 'namespace:name' or by 'uniqueName'.
-    For example: md['marcrel:CMP'] and md['composer'] are equivalent, as
-    are md['dcterms:alternative'] and md['alternativeTitle']. You can have more than
+    In the 2022 implementation, contributor roles are treated the same as other
+    non-contributor metadata.  Music21 includes a list of supported property terms,
+    which are pulled from Dublin Core (namespace = 'dcterms'), MARC Relator codes
+    (a.k.a. contributor roles, namespace = 'marcrel'), and Humdrum (namespace =
+    'humdrum').  And each property term is also assigned a unique name for ease
+    of use.
+
+    Each metadata property can be specified by 'uniqueName' or by 'namespace:name'.
+    For example: `md['composer']` and `md['marcrel:CMP']` are equivalent, as
+    are `md['alternativeTitle']` and `md['dcterms:alternative']`. You can have more than
     one of any such item (not just contributors).  And you can also have metadata
     items with custom names.
 
-    If you are only interested in getting/setting a single string for a metadata item
-    (even if there is more than one item of that name), you can use an attribute-style
-    get operation (e.g. t = md.title).  If you want to see a list of metadata items in
+    For simple metadata items, like a single title, there is an easy way to get/set
+    them: use an attribute-style get operation (e.g. `t = md.title`).  This will always
+    return a single string.  If there is more than one item of that name, a summary
+    string will be returned.  If you want to see the full list of metadata items in
     their appropriate value type, you can us a dictionary-style get operation (e.g.
-    titles = md['title']).  If you set an item or list of items (via attribute-style
+    `titles = md['title']`).  If you set an item or list of items (via attribute-style
     or dictionary-style), any existing items of that name are deleted.  If you want
     to add an item or list of items without deleting existing items, you can use the
-    md.add() API.  See the examples below:
+    `md.add()` API.  See the examples below:
 
     Set a title (overwrites any existing titles):
 
@@ -108,17 +112,18 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     <music21.metadata.primitives.Text deleted redundant natural in measure 28>)
 
     Primitives: primitives.Text has been updated to add whether or not the text has
-    been translated, as well as a specified encoding scheme (a.k.a. what standard
-    should be used to parse this string).
+    been translated, as well as a specified encoding scheme, that specifies which
+    standard should be used to parse the string.  See metadata/primitives.py for
+    more information.
 
     Metadata does not explicitly support client-specified namespaces, but by using
-    getCustom/addCustom/setCustom, clients can set anything they want. Clients could
-    use this to set (say) 'myCoolScoreFileFormat:XXX' metadata that doesn't map to
-    any standard metadata property, and a writer of myCoolScoreFileFormat files that
-    understood 'myCoolScoreFileFormat' metadata could then write it to one of
-    those files. Custom metadata (namespaced, or free form) can also be written to
-    various other file formats, as long as there is a place for it (e.g. in the
-    '<miscellaneous>' tag in MusicXML).
+    getCustom/addCustom/setCustom, clients can set anything they want. For instance, to
+    embed the old SoundTracker .MOD format's sample name, a .MOD file parser could use
+    `soundtracker:SampleName`, and a .MOD file writer that understood 'soundtracker:'
+    metadata could then write it back accurately to one of those files. Custom metadata
+    (namespaced, or free form) can also be written to various other file formats without
+    interpretation, as long as there is a place for it (e.g. in the '<miscellaneous>'
+    tag in MusicXML).
 
 '''
 from collections import namedtuple
@@ -291,6 +296,7 @@ class Metadata(base.Music21Object):
                 setattr(self, attr, keywords[attr])
 
 # -----------------------------------------------------------------------------
+# Public APIs
 
     def add(self,
             key: str,
@@ -379,11 +385,21 @@ class Metadata(base.Music21Object):
         >>> md.composer = 'Antonín Dvořák'
         >>> md.opusNumber = 64
         >>> md.add('librettist', 'Marie Červinková-Riegrová')
-        >>> md['otherContributor'] = (metadata.Contributor(role='based on plot by',
-        ...                               name ='Ferdinand Mikovec'),
-        ...                           metadata.Contributor(role='original partial plot by',
-        ...                               name='Friedrich Schiller'))
-        >>> md.addCustom('composer', 'Not a contributor')
+        >>> md['otherContributor'] = (
+        ...     metadata.Contributor(
+        ...         role='based on plot by',
+        ...         name ='Ferdinand Mikovec'
+        ...     ),
+        ...     metadata.Contributor(
+        ...         role='original partial plot by',
+        ...         name='Friedrich Schiller'
+        ...     )
+        ... )
+        >>> md.addCustom('average duration', '180 minutes')
+
+        The non-contributor items (title, opusNumber, average duration) will not appear
+        in the returned list of all contributors.
+
         >>> allContributors = md.getAllContributorNamedValues()
         >>> allContributors
         (('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Antonín Dvořák>),
@@ -422,10 +438,24 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata.uniqueNameToNSKey('alternativeTitle')
         'dcterms:alternative'
         '''
-        if not isinstance(uniqueName, str):
-            raise ValueError('uniqueName must be str')
 
         return properties.UNIQUE_NAME_TO_NSKEY.get(uniqueName, None)
+
+    @staticmethod
+    def nsKeyToUniqueName(nsKey: str) -> t.Optional[str]:
+        '''
+        Translates a standard property NSKey ('namespace:name') to that
+        standard property's uniqueName.
+        Returns None if no such standard property exists.
+
+        >>> metadata.Metadata.nsKeyToUniqueName('marcrel:LBT')
+        'librettist'
+        >>> metadata.Metadata.nsKeyToUniqueName('not a standard nskey') is None
+        True
+        >>> metadata.Metadata.nsKeyToUniqueName('dcterms:alternative')
+        'alternativeTitle'
+        '''
+        return properties.NSKEY_TO_UNIQUE_NAME.get(nsKey, None)
 
     @staticmethod
     def isContributorUniqueName(uniqueName: str) -> bool:
@@ -442,11 +472,7 @@ class Metadata(base.Music21Object):
         False
         >>> metadata.Metadata.isContributorUniqueName('not a standard property')
         False
-        >>> metadata.Metadata.isContributorUniqueName(None)
-        False
         '''
-        if not uniqueName:
-            return False
         prop: t.Optional[PropertyDescription] = (
             properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
         )
@@ -455,30 +481,8 @@ class Metadata(base.Music21Object):
 
         return prop.isContributor
 
-    @staticmethod
-    def nsKeyToUniqueName(nsKey: str) -> t.Optional[str]:
-        '''
-        Translates a standard property NSKey ('namespace:name') to that
-        standard property's uniqueName.
-        Returns None if no such standard property exists.
-
-        >>> metadata.Metadata.nsKeyToUniqueName('marcrel:LBT')
-        'librettist'
-        >>> metadata.Metadata.nsKeyToUniqueName('not a standard nskey') is None
-        True
-        >>> metadata.Metadata.nsKeyToUniqueName(None) is None
-        True
-        >>> metadata.Metadata.nsKeyToUniqueName('dcterms:alternative')
-        'alternativeTitle'
-        '''
-        if not nsKey:
-            return None
-        uniqueName: t.Optional[str] = properties.NSKEY_TO_UNIQUE_NAME.get(nsKey, None)
-        return uniqueName
-
-
 # -----------------------------------------------------------------------------
-#   Pre-2022 public APIs
+#   Public APIs
 
     @property
     def contributors(self) -> t.Tuple[Contributor, ...]:
@@ -513,7 +517,7 @@ class Metadata(base.Music21Object):
         Returns None if no copyright exists in the metadata.
         Returns all the copyright values in one string (with ', ' between them)
         if multiple copyrights exist in the metadata. Use md['copyright'] to
-        get all the copyrights.
+        get all the copyrights as Copyright objects.
 
         >>> md = metadata.Metadata()
         >>> md.copyright is None
@@ -526,18 +530,29 @@ class Metadata(base.Music21Object):
         or the nsKey ('dcterms:rights').  Here you can see how multiple copyrights
         are handled.
 
-        >>> md['dcterms:rights'] = ('Copyright © 1984 All Rights Reserved',)
+        >>> md.copyright = 'Copyright © 1984 All Rights Reserved'
         >>> md.copyright
         'Copyright © 1984 All Rights Reserved'
-        >>> md.add('dcterms:rights', 'Lyrics copyright © 1987 All Rights Reserved')
+
+        To add another copyright to the list, call md.add().
+
+        >>> md.add('copyright', 'Lyrics copyright © 1987 All Rights Reserved')
+
+        md.copyright will now return both copyrights in one string
+
         >>> md.copyright
         'Copyright © 1984 All Rights Reserved, Lyrics copyright © 1987 All Rights Reserved'
+
+        md['copyright'] will return a tuple containing both Copyright objects.
+
         >>> md['copyright']
         (<music21.metadata.primitives.Copyright Copyright © 1984 All Rights Reserved>,
          <music21.metadata.primitives.Copyright Lyrics copyright © 1987 All Rights Reserved>)
 
         You can set str, Text, or Copyright values, and they will be converted to
-        Copyright automatically if necessary.
+        Copyright automatically if necessary.  Note that 'dcterms:rights'
+        is Dublin Core terminology for 'copyright', and can be used interchangeably
+        with 'copyright' as a metadata dictionary-style key.
 
         >>> md.copyright = metadata.Text('Copyright © 1984')
         >>> md['copyright']
@@ -754,19 +769,24 @@ class Metadata(base.Music21Object):
         then KeyError is raised.
 
         >>> md = metadata.Metadata()
-        >>> md['description'] = [metadata.Text('A fun score!', language='en')]
+        >>> md['description'] = [
+        ...     metadata.Text('For the coronation of Catherine the Great.', language='en')
+        ... ]
         >>> descs = md['description']
         >>> descs
-        (<music21.metadata.primitives.Text A fun score!>,)
-        >>> md.add('description', 'Also a great tune')
+        (<music21.metadata.primitives.Text For the coronation of Catherine the Great.>,)
+
+        A second description can also be added.
+
+        >>> md.add('description', 'In five sections, unique for its time.')
         >>> descs = md['description']
         >>> isinstance(descs, tuple)
         True
         >>> len(descs)
         2
         >>> descs
-        (<music21.metadata.primitives.Text A fun score!>,
-         <music21.metadata.primitives.Text Also a great tune>)
+        (<music21.metadata.primitives.Text For the coronation of Catherine the Great.>,
+         <music21.metadata.primitives.Text In five sections, unique for its time.>)
         >>> descs[0].language
         'en'
         >>> descs[1].language is None
@@ -1085,9 +1105,7 @@ class Metadata(base.Music21Object):
     def composer(self):
         r'''
         Get or set the composer of this work. Only the first composer can be
-        got or set via properties.  You can add multiple composers by setting
-        them dictionary-style (e.g. md['composer'] = ['composer1', 'composer2']),
-        or by using md.add('composer', ...) API.
+        got or set via properties.
 
         The composer attribute does not live in Metadata, but creates a
         :class:`~music21.metadata.Contributor` object in the .contributors
@@ -1095,9 +1113,16 @@ class Metadata(base.Music21Object):
 
         >>> md = metadata.Metadata(
         ...     title='...(Iphigenia)',
-        ...     composer='Shorter, Wayne',
         ...     )
+        >>> md.composer = 'Shorter, Wayne'
+
+        You can set multiple composers by setting them dictionary-style
+        or by using `md.add`.
         >>> md.add('composer', 'Spalding, Esperanza')
+
+        The md.composer attribute returns a summary string if there is
+        more than one composer.
+
         >>> md.composer
         'Shorter, Wayne and Spalding, Esperanza'
         '''
