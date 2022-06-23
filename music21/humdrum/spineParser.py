@@ -2757,7 +2757,7 @@ class GlobalReference(base.Music21Object):
         'RT#': '',  # track number
         # Performance information (if the Humdrum encodes, say, a MIDI performance)
         'MGN': '',  # ensemble's name
-        'MPN': 'performer',  # performer's name
+        'MPN': '',  # performer's name
         'MPS': '',  # suspected performer
         'MRD': '',  # date of performance (**date format)
         'MLC': '',  # place of performance
