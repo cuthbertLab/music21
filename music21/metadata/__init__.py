@@ -283,7 +283,6 @@ class Metadata(base.Music21Object):
         super().__init__()
 
         self._contents: t.Dict[str, t.List[ValueType]] = {}
-        self.software: t.List[str] = [defaults.software]
 
         # TODO: check pickling, etc.
         self.fileInfo = FileInfo()
@@ -294,6 +293,8 @@ class Metadata(base.Music21Object):
         for attr in keywords:
             if attr in properties.ALL_LEGAL_ATTRIBUTES:
                 setattr(self, attr, keywords[attr])
+
+        self['software'] = [defaults.software]
 
 # -----------------------------------------------------------------------------
 # Public APIs
@@ -353,13 +354,15 @@ class Metadata(base.Music21Object):
         >>> md.addCustom('excerpt-start-measure', 1234)
         >>> all = md.getAllNamedValues()
         >>> all
-        (('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Jeff Bowen>),
+        (('musicxml:software', <music21.metadata.primitives.Text music21 v...>),
+         ('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Jeff Bowen>),
          ('marcrel:LBT', <music21.metadata.primitives.Contributor librettist:Hunter Bell>),
          ('dcterms:title', <music21.metadata.primitives.Text Other World>),
          ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>))
         >>> allNonContributors = md.getAllNamedValues(skipContributors=True)
         >>> allNonContributors
-        (('dcterms:title', <music21.metadata.primitives.Text Other World>),
+        (('musicxml:software', <music21.metadata.primitives.Text music21 v...>),
+         ('dcterms:title', <music21.metadata.primitives.Text Other World>),
          ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>))
         '''
         allOut: t.List[t.Tuple[str, ValueType]] = []
@@ -483,6 +486,12 @@ class Metadata(base.Music21Object):
 
 # -----------------------------------------------------------------------------
 #   Public APIs
+
+    @property
+    def software(self) -> t.Tuple[str, ...]:
+        # software is a bit of an exception: it looks singular, but it's actually
+        # plural (with no singular attribute at all).
+        return self._getPluralAttribute('software')
 
     @property
     def contributors(self) -> t.Tuple[Contributor, ...]:
@@ -760,7 +769,7 @@ class Metadata(base.Music21Object):
 
     def __getitem__(self, key: str) -> t.Tuple[ValueType, ...]:
         '''
-        Utility "dictionary key" access for all standard uniqueNames and
+        "Dictionary key" access for all standard uniqueNames and
         standard keys of the form 'namespace:name'.
 
         These always return t.Tuple[ValueType, ...], which may be empty.
@@ -799,7 +808,7 @@ class Metadata(base.Music21Object):
 
     def __setitem__(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]]):
         '''
-        Utility "dictionary key" access for all standard uniqueNames and
+        "Dictionary key" access for all standard uniqueNames and
         standard keys of the form 'namespace:name'.
 
         If key is not a standard uniqueName or standard 'namespace:name',

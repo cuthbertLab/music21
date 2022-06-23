@@ -1375,7 +1375,7 @@ class MusicXMLImporter(XMLParserBase):
             if textStripValid(software):
                 if t.TYPE_CHECKING:
                     assert software.text is not None
-                md.software.append(software.text.strip())
+                md.add('software', software.text.strip())
 
         for supports in encoding.findall('supports'):
             # todo: element: required

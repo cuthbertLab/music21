@@ -2348,6 +2348,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         skippedOneTitle: bool = False
         for nsKey, value in allItems:
             uniqueName: str = md.nsKeyToUniqueName(nsKey)
+            if uniqueName == 'software':
+                # we have already emitted the software versions in <software>.
+                continue
+
             if uniqueName == 'movementName':
                 # We have already emitted the first movementName in <movement-title>,
                 # but we need to emit the rest of them here in miscellaneous.

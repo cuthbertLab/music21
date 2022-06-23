@@ -231,12 +231,16 @@ class Test(unittest.TestCase):
         self.assertTrue(md._isStandardNSKey(nsKey))
         self.assertFalse(md._isStandardUniqueName(nsKey))
 
-        item = getattr(md, uniqueName)
-        self.assertIsNone(item)
-        itemtuple = md[uniqueName]
-        self.assertEqual(itemtuple, tuple())
-        itemtuple = md[nsKey]
-        self.assertEqual(itemtuple, tuple())
+        if uniqueName != 'software':
+            # software is always auto-filled-in with the music21 version
+            # even in an empty metadata object, so we can't check that
+            # it's not there (it is).
+            item = getattr(md, uniqueName)
+            self.assertIsNone(item)
+            itemtuple = md[uniqueName]
+            self.assertEqual(itemtuple, tuple())
+            itemtuple = md[nsKey]
+            self.assertEqual(itemtuple, tuple())
 
         if valueType is metadata.DateSingle:
             md[nsKey] = ['1978/6/11']
@@ -273,15 +277,29 @@ class Test(unittest.TestCase):
             )
         elif valueType is metadata.Text:
             md[nsKey] = [f'The {nsKey}']
-            self.assertEqual(
-                getattr(md, uniqueName),
-                f'The {nsKey}'
-            )
+            if nsKey == 'musicxml:software':
+                # getattr('software') returns a tuple (it's a plural attribute)
+                self.assertEqual(
+                    getattr(md, uniqueName),
+                    (f'The {nsKey}',)
+                )
+            else:
+                self.assertEqual(
+                    getattr(md, uniqueName),
+                    f'The {nsKey}'
+                )
             md[uniqueName] = (f'The {uniqueName}',)
-            self.assertEqual(
-                getattr(md, uniqueName),
-                f'The {uniqueName}'
-            )
+            if nsKey == 'musicxml:software':
+                # getattr('software') returns a tuple (it's a plural attribute)
+                self.assertEqual(
+                    getattr(md, uniqueName),
+                    (f'The {uniqueName}',)
+                )
+            else:
+                self.assertEqual(
+                    getattr(md, uniqueName),
+                    f'The {uniqueName}'
+                )
         else:
             self.fail('internal test error: invalid valueType')
 
@@ -371,10 +389,17 @@ class Test(unittest.TestCase):
                     metadata.Text(f'The 3rd {uniqueName}')
                 ]
             )
-            self.assertEqual(
-                getattr(md, uniqueName),
-                f'The {uniqueName}, The 2nd {uniqueName}, The 3rd {uniqueName}'
-            )
+            if uniqueName == 'software':
+                # software is a plural attribute (returns a tuple)
+                self.assertEqual(
+                    getattr(md, uniqueName),
+                    (f'The {uniqueName}', f'The 2nd {uniqueName}', f'The 3rd {uniqueName}')
+                )
+            else:
+                self.assertEqual(
+                    getattr(md, uniqueName),
+                    f'The {uniqueName}, The 2nd {uniqueName}, The 3rd {uniqueName}'
+                )
             self.assertEqual(
                 md[uniqueName],
                 (
@@ -496,6 +521,7 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem('woodCutter', 'marcrel:WDC')
         self.checkUniqueNamedItem('accompanyingMaterialWriter', 'marcrel:WAM')
         self.checkUniqueNamedItem('distributor', 'marcrel:DST')
+        self.checkUniqueNamedItem('software', 'musicxml')
         self.checkUniqueNamedItem('textOriginalLanguage', 'humdrum:TXO')
         self.checkUniqueNamedItem('textLanguage', 'humdrum:TXL')
         self.checkUniqueNamedItem('popularTitle', 'humdrum:OTP')

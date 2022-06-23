@@ -772,6 +772,15 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         valueType=Contributor,
         isContributor=True),
 
+    # The following property term is from MusicXML.
+
+    # software: the software versions that were used in the construction of
+    #   this document.
+    PropertyDescription(
+        name='software',
+        namespace='musicxml',
+        isContributor=False),
+
     # The following 'humdrum' property terms are Humdrum reference record
     # terms, found at https://www.humdrum.org/reference-records/#
 
@@ -1153,15 +1162,20 @@ ALL_MUSIC21_WORK_IDS: t.List[str] = list(MUSIC21_WORK_ID_TO_NSKEY.keys())
 ALL_MUSIC21_ABBREVIATIONS: t.List[str] = list(MUSIC21_ABBREVIATION_TO_NSKEY.keys())
 ALL_NSKEYS: t.List[str] = list(NSKEY_TO_PROPERTY_DESCRIPTION.keys())
 
+# 'software' is a plural attribute name (never singular) so we have
+# to carefully leave it out of ALL_SINGLE_ATTRIBUTE_NAMES.
+_ALL_UNIQUE_NAMES_EXCEPT_SOFTWARE: t.List[str] = list(
+    name for name in ALL_UNIQUE_NAMES if name != 'software')
+
 ALL_SINGLE_ATTRIBUTE_NAMES: t.List[str] = list(
-    ALL_UNIQUE_NAMES
+    _ALL_UNIQUE_NAMES_EXCEPT_SOFTWARE
     + ALL_MUSIC21_WORK_IDS
     + ALL_MUSIC21_ABBREVIATIONS
     + ['fileFormat' + 'filePath' + 'fileNumber']
 )
 
 ALL_PLURAL_ATTRIBUTE_NAMES: t.List[str] = [
-    'composers', 'librettists', 'lyricists'
+    'composers', 'librettists', 'lyricists', 'software'
 ]
 
 ALL_LEGAL_ATTRIBUTES: t.List[str] = list(
