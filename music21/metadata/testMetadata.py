@@ -210,26 +210,26 @@ class Test(unittest.TestCase):
     def checkUniqueNamedItem(
             self,
             uniqueName: str,
-            nsKey: str,
+            namespaceName: str,
             contributorRole: str = None,
             valueType: Type = metadata.Text):
 
-        if ':' not in nsKey:
+        if ':' not in namespaceName:
             # It's just the namespace because name == uniqueName
             # and I didn't want to spend the time to type it twice...
-            nsKey += ':' + uniqueName
+            namespaceName += ':' + uniqueName
 
-        if nsKey.startswith('marcrel'):
+        if namespaceName.startswith('marcrel'):
             # The marcrel namespace is all Contributors (more typing saved)
             valueType = metadata.Contributor
 
         md = metadata.Metadata()
 
         self.assertTrue(md._isStandardUniqueName(uniqueName))
-        self.assertFalse(md._isStandardNSKey(uniqueName))
+        self.assertFalse(md._isStandardNamespaceName(uniqueName))
 
-        self.assertTrue(md._isStandardNSKey(nsKey))
-        self.assertFalse(md._isStandardUniqueName(nsKey))
+        self.assertTrue(md._isStandardNamespaceName(namespaceName))
+        self.assertFalse(md._isStandardUniqueName(namespaceName))
 
         if uniqueName != 'software':
             # software is always auto-filled-in with the music21 version
@@ -239,11 +239,11 @@ class Test(unittest.TestCase):
             self.assertIsNone(item)
             itemtuple = md[uniqueName]
             self.assertEqual(itemtuple, tuple())
-            itemtuple = md[nsKey]
+            itemtuple = md[namespaceName]
             self.assertEqual(itemtuple, tuple())
 
         if valueType is metadata.DateSingle:
-            md[nsKey] = ['1978/6/11']
+            md[namespaceName] = ['1978/6/11']
             self.assertEqual(
                 getattr(md, uniqueName),
                 '1978/06/11'
@@ -254,10 +254,10 @@ class Test(unittest.TestCase):
                 '1979/06/11'
             )
         elif valueType is metadata.Copyright:
-            md[nsKey] = [f'Copyright © 1979 {nsKey}']
+            md[namespaceName] = [f'Copyright © 1979 {namespaceName}']
             self.assertEqual(
                 getattr(md, uniqueName),
-                f'Copyright © 1979 {nsKey}'
+                f'Copyright © 1979 {namespaceName}'
             )
             md[uniqueName] = (f'Copyright © 1979 {uniqueName}',)
             self.assertEqual(
@@ -265,10 +265,10 @@ class Test(unittest.TestCase):
                 f'Copyright © 1979 {uniqueName}'
             )
         elif valueType is metadata.Contributor:
-            md[nsKey] = [f'The {nsKey}']
+            md[namespaceName] = [f'The {namespaceName}']
             self.assertEqual(
                 getattr(md, uniqueName),
-                f'The {nsKey}'
+                f'The {namespaceName}'
             )
             md[uniqueName] = (f'The {uniqueName}',)
             self.assertEqual(
@@ -276,20 +276,20 @@ class Test(unittest.TestCase):
                 f'The {uniqueName}'
             )
         elif valueType is metadata.Text:
-            md[nsKey] = [f'The {nsKey}']
-            if nsKey == 'musicxml:software':
+            md[namespaceName] = [f'The {namespaceName}']
+            if namespaceName == 'musicxml:software':
                 # getattr('software') returns a tuple (it's a plural attribute)
                 self.assertEqual(
                     getattr(md, uniqueName),
-                    (f'The {nsKey}',)
+                    (f'The {namespaceName}',)
                 )
             else:
                 self.assertEqual(
                     getattr(md, uniqueName),
-                    f'The {nsKey}'
+                    f'The {namespaceName}'
                 )
             md[uniqueName] = (f'The {uniqueName}',)
-            if nsKey == 'musicxml:software':
+            if namespaceName == 'musicxml:software':
                 # getattr('software') returns a tuple (it's a plural attribute)
                 self.assertEqual(
                     getattr(md, uniqueName),
@@ -305,7 +305,7 @@ class Test(unittest.TestCase):
 
 
         if valueType is metadata.DateSingle:
-            md.add(nsKey, [metadata.DateBetween(['1978', '1980']),
+            md.add(namespaceName, [metadata.DateBetween(['1978', '1980']),
                 metadata.DateSingle('1979/6/11/4:50:32')])
             self.assertEqual(
                 getattr(md, uniqueName),
@@ -321,7 +321,7 @@ class Test(unittest.TestCase):
             )
         elif valueType is metadata.Copyright:
             md.add(
-                nsKey,
+                namespaceName,
                 metadata.Text('Lyrics copyright © 1979 John Jones')
             )
             md.add(
@@ -383,7 +383,7 @@ class Test(unittest.TestCase):
             )
         elif valueType is metadata.Text:
             md.add(
-                nsKey,
+                namespaceName,
                 [
                     metadata.Text(f'The 2nd {uniqueName}'),
                     metadata.Text(f'The 3rd {uniqueName}')
@@ -409,22 +409,22 @@ class Test(unittest.TestCase):
                 )
             )
 
-        # We've tested md[uniqueName], check to make sure that md[nsKey]
+        # We've tested md[uniqueName], check to make sure that md[namespaceName]
         # returns exactly the same thing.
         mdItemsUnique = md[uniqueName]
-        mdItemsNSKey = md[nsKey]
-        self.assertEqual(len(mdItemsUnique), len(mdItemsNSKey))
-        for itemUnique, itemNSKey in zip(mdItemsUnique, mdItemsNSKey):
+        mdItemsNamespaceName = md[namespaceName]
+        self.assertEqual(len(mdItemsUnique), len(mdItemsNamespaceName))
+        for itemUnique, itemNamespaceName in zip(mdItemsUnique, mdItemsNamespaceName):
             self.assertIsInstance(itemUnique, valueType)
-            self.assertIsInstance(itemNSKey, valueType)
-            self.assertEqual(itemUnique, itemNSKey)
+            self.assertIsInstance(itemNamespaceName, valueType)
+            self.assertEqual(itemUnique, itemNamespaceName)
 
         if valueType is metadata.Contributor:
-            for itemNSKey in mdItemsNSKey:
-                # I'm asserting this way to keep mypy happy with itemNSKey.role
+            for itemNamespaceName in mdItemsNamespaceName:
+                # I'm asserting this way to keep mypy happy with itemNamespaceName.role
                 # self.assertIsInstance isn't sufficient, apparently.
-                assert isinstance(itemNSKey, metadata.Contributor)
-                self.assertEqual(itemNSKey.role,
+                assert isinstance(itemNamespaceName, metadata.Contributor)
+                self.assertEqual(itemNamespaceName.role,
                     contributorRole if contributorRole else uniqueName)
 
     def testUniqueNameAccess(self):

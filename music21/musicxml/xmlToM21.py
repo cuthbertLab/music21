@@ -1359,7 +1359,7 @@ class MusicXMLImporter(XMLParserBase):
     # keys (e.g. 'dcterms:created'), and the grandfathered music21 v7
     # workIds (e.g. 'date').
     _recognizableKeys: t.List[str] = list(
-        metadata.properties.ALL_NSKEYS
+        metadata.properties.ALL_NAMESPACE_NAMES
         + metadata.properties.ALL_UNIQUE_NAMES
         + metadata.properties.ALL_MUSIC21_WORK_IDS
     )

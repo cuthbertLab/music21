@@ -46,32 +46,32 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     functionality.
 
     The previous Metadata implementation had a list of supported workIds, and also
-    a list of standard contributor roles.  You could have more than one of each
-    contributor role, but only one of each workId.  And you could only have metadata
-    items that had one of those names (no custom metadata).
+    a list of standard contributor roles.  More than one of each contributor role
+    could exist, but only one of each workId.  And while there was some support for
+    custom contributor roles, there was no support for other custom metadata, only
+    the specified list of workIds.
 
     In the 2022 implementation, contributor roles are treated the same as other
     non-contributor metadata.  Music21 includes a list of supported property terms,
     which are pulled from Dublin Core (namespace = 'dcterms'), MARC Relator codes
-    (a.k.a. contributor roles, namespace = 'marcrel'), and Humdrum (namespace =
-    'humdrum').  And each property term is also assigned a unique name for ease
-    of use.
+    (namespace = 'marcrel'), and Humdrum (namespace = 'humdrum').  Each property
+    term is assigned a unique name (e.g. 'composer', 'alternativeTitle', etc).
 
     Each metadata property can be specified by 'uniqueName' or by 'namespace:name'.
     For example: `md['composer']` and `md['marcrel:CMP']` are equivalent, as
-    are `md['alternativeTitle']` and `md['dcterms:alternative']`. You can have more than
-    one of any such item (not just contributors).  And you can also have metadata
+    are `md['alternativeTitle']` and `md['dcterms:alternative']`. There can be more
+    than one of any such item (not just contributors).  And you can also have metadata
     items with custom names.
 
     For simple metadata items, like a single title, there is an easy way to get/set
     them: use an attribute-style get operation (e.g. `t = md.title`).  This will always
     return a single string.  If there is more than one item of that name, a summary
-    string will be returned.  If you want to see the full list of metadata items in
-    their appropriate value type, you can us a dictionary-style get operation (e.g.
-    `titles = md['title']`).  If you set an item or list of items (via attribute-style
-    or dictionary-style), any existing items of that name are deleted.  If you want
-    to add an item or list of items without deleting existing items, you can use the
-    `md.add()` API.  See the examples below:
+    string will be returned.  To see the full list of metadata items in their
+    appropriate value type, use a dictionary-style get operation (e.g.
+    `titles = md['title']`).  If an item or list of items is set (via attribute-style
+    or dictionary-style), any existing items of that name are deleted. To add an item
+    or list of items without deleting existing items, use the `md.add()` API.  See
+    the examples below:
 
     Set a title (overwrites any existing titles):
 
@@ -111,11 +111,6 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     (<music21.metadata.primitives.Text added missing sharp in measure 27>,
     <music21.metadata.primitives.Text deleted redundant natural in measure 28>)
 
-    Primitives: primitives.Text has been updated to add whether or not the text has
-    been translated, as well as a specified encoding scheme, that specifies which
-    standard should be used to parse the string.  See metadata/primitives.py for
-    more information.
-
     Metadata does not explicitly support client-specified namespaces, but by using
     getCustom/addCustom/setCustom, clients can set anything they want. For instance, to
     embed the old SoundTracker .MOD format's sample name, a .MOD file parser could use
@@ -124,6 +119,10 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     (namespaced, or free form) can also be written to various other file formats without
     interpretation, as long as there is a place for it (e.g. in the '<miscellaneous>'
     tag in MusicXML).
+
+    primitives.Text has been updated to add whether or not the text has been translated,
+    as well as an encoding scheme, that specifies which standard should be used to parse
+    the string.  See metadata/primitives.py for more information.
 
 '''
 from collections import namedtuple
@@ -300,17 +299,20 @@ class Metadata(base.Music21Object):
 # Public APIs
 
     def add(self,
-            key: str,
+            name: str,
             value: t.Union[t.Any, t.Iterable[t.Any]]):
         '''
-        Adds a single item or multiple items with this key, leaving any existing
-        items with this key in place.
+        Adds a single item or multiple items with this name, leaving any existing
+        items with this name in place.
 
-        The key can be the item's uniqueName or 'namespace:name'.  If it is
-        not one of the standard metadata properties, KeyError will be raised.
+        The name can be the item's uniqueName or 'namespace:name'.  If it is
+        not the uniqueName or namespaceName of one of the standard metadata
+        properties, KeyError will be raised.
 
-        If you do in fact want to remove any existing items with this key,
+        If you do in fact want to remove any existing items with this name,
         you can use dictionary-style or attribute-style setting instead.
+        See :meth:`~music21.metadata.Metadata.__setitem__` and
+        :meth:`~music21.metadata.Metadata.__setattr__` for details.
 
         >>> md = metadata.Metadata()
         >>> md.add('composer', 'Houcine Slaoui')
@@ -328,24 +330,24 @@ class Metadata(base.Music21Object):
         >>> titles[1].language
         'en'
         '''
-        self._add(key, value, isCustom=False)
+        self._add(name, value, isCustom=False)
 
-    def getCustom(self, key: str) -> t.Tuple[ValueType, ...]:
-        return self._get(key, isCustom=True)
+    def getCustom(self, name: str) -> t.Tuple[ValueType, ...]:
+        return self._get(name, isCustom=True)
 
-    def addCustom(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]]):
-        self._add(key, value, isCustom=True)
+    def addCustom(self, name: str, value: t.Union[t.Any, t.Iterable[t.Any]]):
+        self._add(name, value, isCustom=True)
 
-    def setCustom(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]]):
-        self._set(key, value, isCustom=True)
+    def setCustom(self, name: str, value: t.Union[t.Any, t.Iterable[t.Any]]):
+        self._set(name, value, isCustom=True)
 
     def getAllNamedValues(self, skipContributors=False) -> t.Tuple[t.Tuple[str, ValueType], ...]:
         '''
-        Returns all values stored in this metadata as a tuple of (nsKey, value) tuples.
-        nsKeys with multiple values will appear multiple times in the list (rather
+        Returns all values stored in this metadata as a tuple of (name, value) tuples.
+        Names with multiple values will appear multiple times in the list (rather
         than appearing once, with a value that is a list of values).
-        The tuple's first element is either of the form 'namespace:name', or a
-        custom key (with no form at all).
+        The tuple's first element (the name) is either of the form 'namespace:name', or a
+        custom name (with no form at all).
 
         >>> md = metadata.Metadata()
         >>> md.add('composer', 'Jeff Bowen')
@@ -368,20 +370,23 @@ class Metadata(base.Music21Object):
         allOut: t.List[t.Tuple[str, ValueType]] = []
 
         valueList: t.List[ValueType]
-        for nsKey, valueList in self._contents.items():
-            if skipContributors and self._isContributorNSKey(nsKey):
+        for name, valueList in self._contents.items():
+            if skipContributors and self._isContributorNamespaceName(name):
                 continue
 
             value: ValueType
             for value in valueList:
-                allOut.append((nsKey, value))
+                allOut.append((name, value))
 
         return tuple(allOut)
 
     def getAllContributorNamedValues(self) -> t.Tuple[t.Tuple[str, ValueType], ...]:
         '''
-        Returns all contributors stored in this metadata as a tuple of (nsKey, value) tuples.
-        The individual tuple's first element will be of the form 'namespace:name'.
+        Returns all contributors stored in this metadata as a tuple of (name, value) tuples.
+        The individual tuple's first element (the name) will be of the form 'namespace:name'.
+        Contributors with a custom role should have a uniqueName of 'otherContributor' (i.e.
+        a namespaceName of 'marcrel:CTB'), and have their value.role field set to the custom
+        role.
 
         >>> md = metadata.Metadata()
         >>> md['title'] = ['Dimitrij', 'False Dmitry']
@@ -416,12 +421,12 @@ class Metadata(base.Music21Object):
 
         allOut: t.List[t.Tuple[str, ValueType]] = []
 
-        for nsKey, value in self._contents.items():
-            if not self._isContributorNSKey(nsKey):
+        for name, value in self._contents.items():
+            if not self._isContributorNamespaceName(name):
                 continue
 
             for v in value:
-                allOut.append((nsKey, v))
+                allOut.append((name, v))
 
         return tuple(allOut)
 
@@ -429,51 +434,80 @@ class Metadata(base.Music21Object):
 #   A few static utility routines for clients calling public APIs
 
     @staticmethod
-    def uniqueNameToNSKey(uniqueName: str) -> t.Optional[str]:
+    def uniqueNameToNamespaceName(uniqueName: str) -> t.Optional[str]:
         '''
-        Translates a unique name to the associated standard property's NSKey.
+        Translates a unique name to the associated standard property's
+        namespace name (i.e. the property's name in the form 'namespace:name').
+
+        An example from the MARC Relators namespace: the namespace name of
+        'librettist' is 'marcrel:LBT'.
+
+        >>> metadata.Metadata.uniqueNameToNamespaceName('librettist')
+        'marcrel:LBT'
+
         Returns None if no such associated standard property can be found.
 
-        >>> metadata.Metadata.uniqueNameToNSKey('librettist')
-        'marcrel:LBT'
-        >>> metadata.Metadata.uniqueNameToNSKey('not a standard property') is None
+        >>> metadata.Metadata.uniqueNameToNamespaceName('average duration') is None
         True
-        >>> metadata.Metadata.uniqueNameToNSKey('alternativeTitle')
+
+        An example from the Dublin Core namespace: the namespace name of
+        'alternativeTitle' is 'dcterms:alternative'.
+
+        >>> metadata.Metadata.uniqueNameToNamespaceName('alternativeTitle')
         'dcterms:alternative'
         '''
 
-        return properties.UNIQUE_NAME_TO_NSKEY.get(uniqueName, None)
+        return properties.UNIQUE_NAME_TO_NAMESPACE_NAME.get(uniqueName, None)
 
     @staticmethod
-    def nsKeyToUniqueName(nsKey: str) -> t.Optional[str]:
+    def namespaceNameToUniqueName(namespaceName: str) -> t.Optional[str]:
         '''
-        Translates a standard property NSKey ('namespace:name') to that
+        Translates a standard property namespace name ('namespace:name') to that
         standard property's uniqueName.
+
+        An example from the MARC Relators namespace: the unique name of
+        'marcrel:LBT' is 'librettist'.
+
+        >>> metadata.Metadata.namespaceNameToUniqueName('marcrel:LBT')
+        'librettist'
+
         Returns None if no such standard property exists.
 
-        >>> metadata.Metadata.nsKeyToUniqueName('marcrel:LBT')
-        'librettist'
-        >>> metadata.Metadata.nsKeyToUniqueName('not a standard nskey') is None
+        >>> metadata.Metadata.namespaceNameToUniqueName('soundtracker:SampleName') is None
         True
-        >>> metadata.Metadata.nsKeyToUniqueName('dcterms:alternative')
+
+        An example from the Dublin Core namespace: the unique name of
+        'dcterms:alternative' is 'alternativeTitle'.
+
+        >>> metadata.Metadata.namespaceNameToUniqueName('dcterms:alternative')
         'alternativeTitle'
         '''
-        return properties.NSKEY_TO_UNIQUE_NAME.get(nsKey, None)
+        return properties.NAMESPACE_NAME_TO_UNIQUE_NAME.get(namespaceName, None)
 
     @staticmethod
     def isContributorUniqueName(uniqueName: str) -> bool:
         '''
         Determines if a unique name is associated with a standard contributor
-        property.  Returns False if no such associated standard property can
-        be found.
+        property.  Returns False if no such associated standard contributor
+        property can be found.
+
+        Example: 'librettist' and 'otherContributor' are unique names of standard
+        contributors.
 
         >>> metadata.Metadata.isContributorUniqueName('librettist')
         True
         >>> metadata.Metadata.isContributorUniqueName('otherContributor')
         True
+
+        Example: 'alternativeTitle' is the unique name of a standard property,
+        but it is not a contributor.
+
         >>> metadata.Metadata.isContributorUniqueName('alternativeTitle')
         False
-        >>> metadata.Metadata.isContributorUniqueName('not a standard property')
+
+        Example: 'average duration' is not the unique name of a standard property.
+
+        >>> metadata.Metadata.isContributorUniqueName('average duration')
         False
         '''
         prop: t.Optional[PropertyDescription] = (
@@ -483,6 +517,39 @@ class Metadata(base.Music21Object):
             return False
 
         return prop.isContributor
+
+    @staticmethod
+    def isStandardName(name: str) -> bool:
+        '''
+        Determines if name is either a 'namespace:name' or a 'uniqueName'
+        associated with a standard property.
+
+        Returns False if no such associated standard property can be found.
+
+        >>> metadata.Metadata.isStandardName('librettist')
+        True
+
+        'marcrel:LBT' is the namespace name of 'librettist'
+
+        >>> metadata.Metadata.isStandardName('marcrel:LBT')
+        True
+
+        Some examples of non-standard (custom) names.
+
+        >>> metadata.Metadata.isStandardName('average duration')
+        False
+        >>> metadata.Metadata.isStandardName('soundtracker:SampleName')
+        False
+        '''
+        if Metadata._isStandardNamespaceName(name):
+            return True
+
+        if Metadata._isStandardUniqueName(name):
+            return True
+
+        return False
+
+
 
 # -----------------------------------------------------------------------------
 #   Public APIs
@@ -536,8 +603,8 @@ class Metadata(base.Music21Object):
         'Copyright © 1896, Éditions Durand (expired)'
 
         Using dictionary-style access, you can use either the uniqueName ('copyright')
-        or the nsKey ('dcterms:rights').  Here you can see how multiple copyrights
-        are handled.
+        or the namespaceName ('dcterms:rights').  Here you can see how multiple
+        copyrights are handled.
 
         >>> md.copyright = 'Copyright © 1984 All Rights Reserved'
         >>> md.copyright
@@ -605,8 +672,9 @@ class Metadata(base.Music21Object):
 
         for uniqueName in self.allUniqueNames:
             try:
-                values: t.List[str] = self._getStringValuesByNSKey(
-                    properties.UNIQUE_NAME_TO_NSKEY[uniqueName])
+                values: t.List[str] = self._getStringValuesByNamespaceName(
+                    properties.UNIQUE_NAME_TO_NAMESPACE_NAME[uniqueName]
+                )
                 if not values:
                     continue
                 val = values[0]
@@ -723,21 +791,34 @@ class Metadata(base.Music21Object):
                 )
 
         # Is name a uniqueName?
-        if name in properties.UNIQUE_NAME_TO_NSKEY:
-            self._set(properties.UNIQUE_NAME_TO_NSKEY[name], value, isCustom=False)
+        if name in properties.UNIQUE_NAME_TO_NAMESPACE_NAME:
+            self._set(
+                properties.UNIQUE_NAME_TO_NAMESPACE_NAME[name],
+                value,
+                isCustom=False
+            )
             return
 
         # Is name a grandfathered workId?
-        if name in properties.MUSIC21_WORK_ID_TO_NSKEY:
-            self._set(properties.MUSIC21_WORK_ID_TO_NSKEY[name], value, isCustom=False)
+        if name in properties.MUSIC21_WORK_ID_TO_NAMESPACE_NAME:
+            self._set(
+                properties.MUSIC21_WORK_ID_TO_NAMESPACE_NAME[name],
+                value,
+                isCustom=False
+            )
             return
 
         # Is name a grandfathered workId abbreviation?
-        if name in properties.MUSIC21_ABBREVIATION_TO_NSKEY:
-            self._set(properties.MUSIC21_ABBREVIATION_TO_NSKEY[name], value, isCustom=False)
+        if name in properties.MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME:
+            self._set(
+                properties.MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME[name],
+                value,
+                isCustom=False
+            )
             return
 
-        # Is name one of the plural attribute setters?
+        # Is name one of the three grandfathered plural contributor
+        # attribute setters?
         if name in ('composers', 'librettists', 'lyricists'):
             uniqueName = name[:-1]  # remove the trailing 's'
             self._set(uniqueName, value, isCustom=False)
@@ -865,8 +946,8 @@ class Metadata(base.Music21Object):
         if not isinstance(c, Contributor):
             raise exceptions21.MetadataException(
                 f'supplied object is not a Contributor: {c}')
-        nsKey: str = self._contributorRoleToNSKey(c.role)
-        self._add(nsKey, c, isCustom=False)
+        namespaceName: str = self._contributorRoleToNamespaceName(c.role)
+        self._add(namespaceName, c, isCustom=False)
 
     def getContributorsByRole(self, value):
         r'''
@@ -1403,31 +1484,33 @@ class Metadata(base.Music21Object):
             if not titles:  # get first matched
                 continue
 
-            return self._getStringValueByNSKey(properties.UNIQUE_NAME_TO_NSKEY[uniqueName])
+            return self._getStringValueByNamespaceName(
+                properties.UNIQUE_NAME_TO_NAMESPACE_NAME[uniqueName]
+            )
 
         return None
 
 # -----------------------------------------------------------------------------
 # Internal support routines (many of them static).
 
-    def _getStringValueByNSKey(self, nsKey: str) -> t.Optional[str]:
+    def _getStringValueByNamespaceName(self, namespaceName: str) -> t.Optional[str]:
         values: t.Tuple[ValueType, ...]
         try:
-            values = self._get(nsKey, isCustom=False)
+            values = self._get(namespaceName, isCustom=False)
         except KeyError:
             return None
 
         if not values:
             return None
 
-        if self._isContributorNSKey(nsKey):
+        if self._isContributorNamespaceName(namespaceName):
             if len(values) == 1:
                 return str(values[0])
             if len(values) == 2:
                 return str(values[0]) + ' and ' + str(values[1])
             return str(values[0]) + f' and {len(values)-1} others'
 
-        if self._needsArticleNormalization(nsKey):
+        if self._namespaceNameNeedsArticleNormalization(namespaceName):
             output: str = ''
             for i, value in enumerate(values):
                 assert isinstance(value, Text)
@@ -1438,17 +1521,17 @@ class Metadata(base.Music21Object):
 
         return ', '.join(str(value) for value in values)
 
-    def _getStringValuesByNSKey(self, nsKey: str) -> t.Tuple[str, ...]:
+    def _getStringValuesByNamespaceName(self, namespaceName: str) -> t.Tuple[str, ...]:
         values: t.Tuple[ValueType, ...]
         try:
-            values = self._get(nsKey, isCustom=False)
+            values = self._get(namespaceName, isCustom=False)
         except KeyError:
             return tuple()
 
         if not values:
             return tuple()
 
-        if self._needsArticleNormalization(nsKey):
+        if self._namespaceNameNeedsArticleNormalization(namespaceName):
             output: t.List[str] = []
             for value in values:
                 assert isinstance(value, Text)
@@ -1465,17 +1548,22 @@ class Metadata(base.Music21Object):
         # workId, or workId abbreviation.  Used in search, for example, because
         # search wants to find everything.
 
-        if attributeName in properties.UNIQUE_NAME_TO_NSKEY:
-            return self._getStringValuesByNSKey(properties.UNIQUE_NAME_TO_NSKEY[attributeName])
+        if attributeName in properties.UNIQUE_NAME_TO_NAMESPACE_NAME:
+            return self._getStringValuesByNamespaceName(
+                properties.UNIQUE_NAME_TO_NAMESPACE_NAME[attributeName]
+            )
 
         # Is attributeName a grandfathered workId?
-        if attributeName in properties.MUSIC21_WORK_ID_TO_NSKEY:
-            return self._getStringValuesByNSKey(properties.MUSIC21_WORK_ID_TO_NSKEY[attributeName])
+        if attributeName in properties.MUSIC21_WORK_ID_TO_NAMESPACE_NAME:
+            return self._getStringValuesByNamespaceName(
+                properties.MUSIC21_WORK_ID_TO_NAMESPACE_NAME[attributeName]
+            )
 
         # Is attributeName a grandfathered workId abbreviation?
-        if attributeName in properties.MUSIC21_ABBREVIATION_TO_NSKEY:
-            return self._getStringValuesByNSKey(
-                properties.MUSIC21_ABBREVIATION_TO_NSKEY[attributeName])
+        if attributeName in properties.MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME:
+            return self._getStringValuesByNamespaceName(
+                properties.MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME[attributeName]
+            )
 
         # The following are in searchAttributes, and getattr will find them because
         # they are a property, but this routine needs to find them, too.
@@ -1497,37 +1585,40 @@ class Metadata(base.Music21Object):
         raise AttributeError(f'invalid attributeName: {attributeName}')
 
     def _getSingularAttribute(self, attributeName: str) -> t.Optional[str]:
-        if attributeName in properties.UNIQUE_NAME_TO_NSKEY:
-            return self._getStringValueByNSKey(properties.UNIQUE_NAME_TO_NSKEY[attributeName])
+        if attributeName in properties.UNIQUE_NAME_TO_NAMESPACE_NAME:
+            return self._getStringValueByNamespaceName(
+                properties.UNIQUE_NAME_TO_NAMESPACE_NAME[attributeName]
+            )
 
         # Is name a grandfathered workId?
-        if attributeName in properties.MUSIC21_WORK_ID_TO_NSKEY:
-            return self._getStringValueByNSKey(properties.MUSIC21_WORK_ID_TO_NSKEY[attributeName])
+        if attributeName in properties.MUSIC21_WORK_ID_TO_NAMESPACE_NAME:
+            return self._getStringValueByNamespaceName(
+                properties.MUSIC21_WORK_ID_TO_NAMESPACE_NAME[attributeName]
+            )
 
         # Is name a grandfathered workId abbreviation?
-        if attributeName in properties.MUSIC21_ABBREVIATION_TO_NSKEY:
-            return self._getStringValueByNSKey(
-                properties.MUSIC21_ABBREVIATION_TO_NSKEY[attributeName])
+        if attributeName in properties.MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME:
+            return self._getStringValueByNamespaceName(
+                properties.MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME[attributeName]
+            )
 
         raise AttributeError(f'object has no attribute: {attributeName}')
 
     @staticmethod
-    def _isStandardUniqueName(uniqueName: t.Optional[str]) -> bool:
+    def _isStandardUniqueName(uniqueName: str) -> bool:
         '''
         Determines if a unique name is associated with a standard property.
         Returns False if no such associated standard property can be found.
 
         >>> metadata.Metadata._isStandardUniqueName('librettist')
         True
+        >>> metadata.Metadata._isStandardUniqueName('marcrel:LBT')
+        False
         >>> metadata.Metadata._isStandardUniqueName('alternativeTitle')
         True
-        >>> metadata.Metadata._isStandardUniqueName('not a standard property')
-        False
-        >>> metadata.Metadata._isStandardUniqueName(None)
+        >>> metadata.Metadata._isStandardUniqueName('average duration')
         False
         '''
-        if not uniqueName:
-            return False
         prop: t.Optional[PropertyDescription] = (
             properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
         )
@@ -1537,26 +1628,22 @@ class Metadata(base.Music21Object):
         return True
 
     @staticmethod
-    def _isStandardNSKey(nsKey: t.Optional[str]) -> bool:
+    def _isStandardNamespaceName(namespaceName: str) -> bool:
         '''
         Determines if a unique name is associated with a standard property.
         Returns False if no such associated standard property can be found.
 
-        >>> metadata.Metadata._isStandardNSKey('marcrel:LBT')
+        >>> metadata.Metadata._isStandardNamespaceName('marcrel:LBT')
         True
-        >>> metadata.Metadata._isStandardNSKey('librettist')
+        >>> metadata.Metadata._isStandardNamespaceName('librettist')
         False
-        >>> metadata.Metadata._isStandardNSKey('nonstandardnamespace:LBT')
+        >>> metadata.Metadata._isStandardNamespaceName('nonstandardnamespace:LBT')
         False
-        >>> metadata.Metadata._isStandardNSKey('marcrel:nonstandardname')
-        False
-        >>> metadata.Metadata._isStandardNSKey(None)
+        >>> metadata.Metadata._isStandardNamespaceName('marcrel:nonstandardname')
         False
         '''
-        if not nsKey:
-            return False
         prop: t.Optional[PropertyDescription] = (
-            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
         )
         if prop is None:
             return False
@@ -1564,11 +1651,12 @@ class Metadata(base.Music21Object):
         return True
 
     @staticmethod
-    def _isContributorNSKey(nsKey: t.Optional[str]) -> bool:
-        if not nsKey:
+    def _isContributorNamespaceName(namespaceName: t.Optional[str]) -> bool:
+        # We allow None, since None is a valid custom contributor role.
+        if not namespaceName:
             return False
         prop: t.Optional[PropertyDescription] = (
-            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
         )
         if prop is None:
             return False
@@ -1576,11 +1664,9 @@ class Metadata(base.Music21Object):
         return prop.isContributor
 
     @staticmethod
-    def _needsArticleNormalization(nsKey: t.Optional[str]) -> bool:
-        if not nsKey:
-            return False
+    def _namespaceNameNeedsArticleNormalization(namespaceName: str) -> bool:
         prop: t.Optional[PropertyDescription] = (
-            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
         )
         if prop is None:
             return False
@@ -1588,55 +1674,55 @@ class Metadata(base.Music21Object):
         return prop.needsArticleNormalization
 
     @staticmethod
-    def _nsKeyToContributorRole(nsKey: str) -> t.Optional[str]:
+    def _namespaceNameToContributorRole(namespaceName: str) -> t.Optional[str]:
         prop: t.Optional[PropertyDescription] = (
-            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
         )
         if prop is None:
             return None
         if not prop.isContributor:
             return None
 
-        # Return the uniqueName, which can be found one of three places in prop.
+        # Return the uniqueName, which can be found one of two places in prop.
         # We must check them in this order:
         # 1. prop.uniqueName
-        # 2. prop.oldMusic21WorkId
-        # 3. prop.name
+        # 2. prop.name
         if prop.uniqueName:
             return prop.uniqueName
-        if prop.oldMusic21WorkId:
-            return prop.oldMusic21WorkId
         return prop.name
 
     @staticmethod
-    def _contributorRoleToNSKey(role: str) -> str:
+    def _contributorRoleToNamespaceName(role: t.Optional[str]) -> str:
         '''
-        Translates a contributor role to a standard 'namespace:name' nsKey.
+        Translates a contributor role to a standard 'namespace:name'.
         Returns 'marcrel:CTB' (a.k.a. 'otherContributor') if the role is a
         non-standard role.
 
-        >>> metadata.Metadata._contributorRoleToNSKey('lyricist')
+        >>> metadata.Metadata._contributorRoleToNamespaceName('lyricist')
         'marcrel:LYR'
-        >>> metadata.Metadata._contributorRoleToNSKey('composer')
+        >>> metadata.Metadata._contributorRoleToNamespaceName('composer')
         'marcrel:CMP'
-        >>> metadata.Metadata._contributorRoleToNSKey('alternativeTitle')
+        >>> metadata.Metadata._contributorRoleToNamespaceName('alternativeTitle')
         'marcrel:CTB'
-        >>> metadata.Metadata._contributorRoleToNSKey('humdrum:XXX')
+        >>> metadata.Metadata._contributorRoleToNamespaceName('humdrum:XXX')
         'marcrel:CTB'
-        >>> metadata.Metadata._contributorRoleToNSKey('')
+        >>> metadata.Metadata._contributorRoleToNamespaceName('')
         'marcrel:CTB'
-        >>> metadata.Metadata._contributorRoleToNSKey(None)
+        >>> metadata.Metadata._contributorRoleToNamespaceName(None)
         'marcrel:CTB'
         '''
-        nsKey: t.Optional[str] = properties.UNIQUE_NAME_TO_NSKEY.get(role, None)
-        if nsKey is None:
-            nsKey = properties.MUSIC21_WORK_ID_TO_NSKEY.get(role, None)
-        if nsKey is None:
+        if role is None:
+            return 'marcrel:CTB'
+
+        namespaceName: t.Optional[str] = properties.UNIQUE_NAME_TO_NAMESPACE_NAME.get(role, None)
+        if namespaceName is None:
+            namespaceName = properties.MUSIC21_WORK_ID_TO_NAMESPACE_NAME.get(role, None)
+        if namespaceName is None:
             # it's a non-standard role, so add this contributor with uniqueName='otherContributor'
             return 'marcrel:CTB'  # aka. 'otherContributor'
 
         prop: t.Optional[PropertyDescription] = (
-            properties.NSKEY_TO_PROPERTY_DESCRIPTION.get(nsKey, None)
+            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
         )
 
         if prop is not None and not prop.isContributor:
@@ -1644,27 +1730,30 @@ class Metadata(base.Music21Object):
             # 'alternativeTitle' or something.  Weird, but we'll call it 'otherContributor'.
             return 'marcrel:CTB'  # a.k.a. 'otherContributor'
 
-        return nsKey
+        return namespaceName
 
-    def _get(self, key: str, isCustom: bool) -> t.Tuple[ValueType, ...]:
+    def _get(self, name: str, isCustom: bool) -> t.Tuple[ValueType, ...]:
         '''
-        Returns all the items stored in metadata with this key.
+        Returns all the items stored in metadata with this name.
         The returned value is always a Tuple. If there are no items, an empty
         Tuple is returned.
 
-        The key can be the item's uniqueName or 'namespace:name'.  If it is
-        not one of the standard metadata properties, KeyError will be raised.
-        '''
-        nsKey: str = key
-        if not isCustom:
-            if self._isStandardUniqueName(key):
-                nsKey = properties.UNIQUE_NAME_TO_NSKEY.get(key, '')
-            if not self._isStandardNSKey(nsKey):
-                raise KeyError(
-                    f'Key=\'{key}\' is not a standard metadata key.'
-                    ' Call addCustom/setCustom/getCustom for custom keys.')
+        If isCustom is True, then the name will be used unconditionally as a custom name.
 
-        valueList: t.Optional[t.List[ValueType]] = self._contents.get(nsKey, None)
+        If isCustom is False, and the name is not a standard uniqueName or a standard
+        'namespace:name', KeyError will be raised.
+        '''
+        if not isCustom:
+            namespaceName: str = name
+            if self._isStandardUniqueName(name):
+                namespaceName = properties.UNIQUE_NAME_TO_NAMESPACE_NAME.get(name, '')
+            if not self._isStandardNamespaceName(namespaceName):
+                raise KeyError(
+                    f'Name=\'{name}\' is not a standard metadata name.'
+                    ' Call addCustom/setCustom/getCustom for custom names.')
+            name = namespaceName
+
+        valueList: t.Optional[t.List[ValueType]] = self._contents.get(name, None)
 
         if not valueList:
             # return empty tuple
@@ -1673,22 +1762,25 @@ class Metadata(base.Music21Object):
         # return a tuple containing contents of list
         return tuple(valueList)
 
-    def _add(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]], isCustom: bool):
+    def _add(self, name: str, value: t.Union[t.Any, t.Iterable[t.Any]], isCustom: bool):
         '''
-        Adds a single item or multiple items with this key, leaving any existing
-        items with this key in place.
+        Adds a single item or multiple items with this name, leaving any existing
+        items with this name in place.
 
-        The key can be the item's uniqueName or 'namespace:name'.  If it is
-        not one of the standard metadata properties, KeyError will be raised.
+        If isCustom is True, then the name will be used unconditionally as a custom name.
+
+        If isCustom is False, and the name is not a standard uniqueName or a standard
+        'namespace:name', KeyError will be raised.
         '''
-        nsKey: str = key
         if not isCustom:
-            if self._isStandardUniqueName(key):
-                nsKey = properties.UNIQUE_NAME_TO_NSKEY.get(key, '')
-            if not self._isStandardNSKey(nsKey):
+            namespaceName: str = name
+            if self._isStandardUniqueName(name):
+                namespaceName = properties.UNIQUE_NAME_TO_NAMESPACE_NAME.get(name, '')
+            if not self._isStandardNamespaceName(namespaceName):
                 raise KeyError(
-                    f'Key=\'{key}\' is not a standard metadata key.'
-                    ' Call addCustom/setCustom/getCustom for custom keys.')
+                    f'Name=\'{name}\' is not a standard metadata name.'
+                    ' Call addCustom/setCustom/getCustom for custom names.')
+            name = namespaceName
 
         if not isinstance(value, t.Iterable):
             value = [value]
@@ -1699,24 +1791,26 @@ class Metadata(base.Music21Object):
 
         convertedValues: t.List[ValueType] = []
         for v in value:
-            convertedValues.append(self._convertValue(nsKey, v))
+            convertedValues.append(self._convertValue(name, v))
 
-        prevValues: t.Optional[t.List[ValueType]] = self._contents.get(nsKey, None)
+        prevValues: t.Optional[t.List[ValueType]] = self._contents.get(name, None)
         if not prevValues:  # None or []
             # set the convertedValues list in there
             # it's always a list, even if there's only one value
-            self._contents[nsKey] = convertedValues
+            self._contents[name] = convertedValues
         else:
             # add the convertedValues list to the existing list
-            self._contents[nsKey] = prevValues + convertedValues
+            self._contents[name] = prevValues + convertedValues
 
-    def _set(self, key: str, value: t.Union[t.Any, t.Iterable[t.Any]], isCustom: bool):
+    def _set(self, name: str, value: t.Union[t.Any, t.Iterable[t.Any]], isCustom: bool):
         '''
-        Sets a single item or multiple items with this key, replacing any
-        existing items with this key.
+        Sets a single item or multiple items with this name, replacing any
+        existing items with this name.
 
-        The key can be the item's uniqueName or 'namespace:name'.  If it is
-        not one of the standard metadata properties, KeyError will be raised.
+        If isCustom is True, then the name will be used unconditionally as a custom name.
+
+        If isCustom is False, and the name is not a standard uniqueName or a standard
+        'namespace:name', KeyError will be raised.
 
         >>> md = metadata.Metadata()
         >>> md._set('marcrel:LBT', metadata.Text('Marie Červinková-Riegrová'), isCustom=False)
@@ -1728,22 +1822,24 @@ class Metadata(base.Music21Object):
         (<music21.metadata.primitives.Contributor librettist:Melissa Li>,
          <music21.metadata.primitives.Contributor librettist:Kit Yan Win>)
         '''
-        nsKey: str = key
         if not isCustom:
-            if self._isStandardUniqueName(key):
-                nsKey = properties.UNIQUE_NAME_TO_NSKEY.get(key, '')
-            if not self._isStandardNSKey(nsKey):
+            namespaceName: str = name
+            if self._isStandardUniqueName(name):
+                namespaceName = properties.UNIQUE_NAME_TO_NAMESPACE_NAME.get(name, '')
+            if not self._isStandardNamespaceName(namespaceName):
                 raise KeyError(
-                    f'Key=\'{key}\' is not a standard metadata key.'
-                    ' Call addCustom/setCustom/getCustom for custom keys.')
+                    f'Name=\'{name}\' is not a standard metadata name.'
+                    ' Call addCustom/setCustom/getCustom for custom names.')
+            name = namespaceName
 
-        self._contents.pop(nsKey, None)
-        self._add(nsKey, value, isCustom)
+        self._contents.pop(name, None)
+        self._add(name, value, isCustom)
 
     @staticmethod
-    def _convertValue(nsKey: str, value: t.Any) -> ValueType:
+    def _convertValue(namespaceName: str, value: t.Any) -> ValueType:
         '''
-        Converts a value to the appropriate valueType (looked up in STDPROPERTIES by nsKey).
+        Converts a value to the appropriate valueType (looked up in STDPROPERTIES by
+        namespaceName).
 
         Converts certain named values to Text
 
@@ -1783,7 +1879,9 @@ class Metadata(base.Music21Object):
         ...     metadata.DateBetween(['1938','1939']))
         <music21.metadata.primitives.DateBetween 1938/--/-- to 1939/--/-->
         '''
-        valueType: t.Optional[t.Type] = properties.NSKEY_TO_VALUE_TYPE.get(nsKey, None)
+        valueType: t.Optional[t.Type] = properties.NAMESPACE_NAME_TO_VALUE_TYPE.get(
+            namespaceName, None
+        )
         originalValue: t.Any = value
 
         if valueType is None:
@@ -1833,7 +1931,10 @@ class Metadata(base.Music21Object):
                 value = Text(value)
 
             if isinstance(value, Text):
-                return Contributor(role=Metadata._nsKeyToContributorRole(nsKey), name=value)
+                return Contributor(
+                    role=Metadata._namespaceNameToContributorRole(namespaceName),
+                    name=value
+                )
             raise exceptions21.MetadataException(
                 f'invalid type for Contributor: {type(value).__name__}')
 

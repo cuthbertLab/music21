@@ -481,9 +481,9 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
     ⠠⠞⠊⠞⠇⠑⠒⠀⠠⠇⠁⠀⠠⠛⠊⠕⠧⠊⠝⠑⠞⠞⠁⠀⠠⠏⠊⠁⠝⠞⠁
     '''
     allBrailleLines = []
-    for nsKey, value in music21Metadata.getAllNamedValues():
+    for namespaceName, value in music21Metadata.getAllNamedValues():
         if value is not None:
-            uniqueName: str = music21Metadata.nsKeyToUniqueName(nsKey)
+            uniqueName: t.Optional[str] = music21Metadata.namespaceNameToUniqueName(namespaceName)
             if not uniqueName:
                 # we don't put custom metadata in braille output
                 continue

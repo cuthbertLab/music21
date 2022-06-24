@@ -2346,8 +2346,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         skippedOneMovementName: bool = False
         skippedOneMovementNumber: bool = False
         skippedOneTitle: bool = False
-        for nsKey, value in allItems:
-            uniqueName: str = md.nsKeyToUniqueName(nsKey)
+        for namespaceName, value in allItems:
+            uniqueName: str = md.namespaceNameToUniqueName(namespaceName)
             if uniqueName == 'software':
                 # we have already emitted the software versions in <software>.
                 continue
@@ -2375,7 +2375,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
                 continue
 
             mxMiscField = SubElement(mxMiscellaneous, 'miscellaneous-field')
-            mxMiscField.set('name', nsKey)
+            mxMiscField.set('name', namespaceName)
             mxMiscField.text = str(value)
             foundOne = True
 
