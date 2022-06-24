@@ -485,7 +485,11 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
         if value is not None:
             uniqueName: str = music21Metadata.nsKeyToUniqueName(nsKey)
             if not uniqueName:
-                uniqueName = nsKey
+                # we don't put custom metadata in braille output
+                continue
+            if uniqueName == 'software':
+                # we don't put software versions in braille output
+                continue
             n = ' '.join(re.findall(r'([A-Z]*[a-z]+)', uniqueName))
             outString = f'{n.title()}: {value}'
             if returnBrailleUnicode:

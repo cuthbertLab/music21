@@ -1356,12 +1356,12 @@ def metaSetDate(work, meta):
             except ValueError:
                 environLocal.warn(_MISSED_DATE.format(dateStr))
             else:
-                meta.date = theDate
+                meta.dateCreated = theDate
         else:
             dateStart = date.get('notbefore') if date.get('notbefore') else date.get('startdate')
             dateEnd = date.get('notafter') if date.get('notafter') else date.get('enddate')
             if dateStart and dateEnd:
-                meta.date = metadata.DateBetween((dateStart, dateEnd))
+                meta.dateCreated = metadata.DateBetween((dateStart, dateEnd))
 
     return meta
 

@@ -586,7 +586,8 @@ class Metadata(base.Music21Object):
          ('copyright', '© 2014, Creative Commons License (CC-BY)'),
          ('fileFormat', 'musicxml'),
          ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
-         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'))
+         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'),
+         ('software', 'music21 v...'))
 
         >>> c.metadata.date = metadata.DateRelative('1689', 'onOrBefore')
         >>> c.metadata.localeOfComposition = 'Rome'
@@ -596,7 +597,8 @@ class Metadata(base.Music21Object):
          ('fileFormat', 'musicxml'),
          ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
          ('localeOfComposition', 'Rome'),
-         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'))
+         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'),
+         ('software', 'music21 v...'))
         '''
         # pylint: disable=undefined-variable
         allOut = {}
