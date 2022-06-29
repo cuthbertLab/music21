@@ -1759,13 +1759,15 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         >>> SX.dump(mxCredit)
         <credit page="1">...</credit>
 
-        Changed in v.8 -- Multi-line text now exports as one credit-words element (with new lines preserved).
+        Changed in v.8 -- Multi-line text now exports as one `<credit-words>`
+        element (preserving newlines).
 
         >>> tb = text.TextBox('Snare\nCymbals')
         >>> mxCredit = SX.textBoxToXmlCredit(tb)
         >>> SX.dump(mxCredit)
         <credit page="1">
-            <credit-words default-x="500" default-y="500" halign="center" valign="top" xml:space="preserve">Snare
+            <credit-words default-x="500" default-y="500" halign="center" valign="top"
+            xml:space="preserve">Snare
             Cymbals</credit-words>
         </credit>
         '''
