@@ -3113,8 +3113,8 @@ class MeasureExporter(XMLExporterBase):
             amountToMoveForward = int(round(divisions * (groupOffset
                                                              - self.offsetInMeasure)))
             if amountToMoveForward > 0 and any(
-                    isinstance(obj, note.GeneralNote) for obj in objGroup):
-                # gap in stream between GeneralNote objects: create <forward>
+                    isinstance(obj, (note.GeneralNote, clef.Clef)) for obj in objGroup):
+                # gap in stream between GeneralNote/Clef objects: create <forward>
                 mxForward = Element('forward')
                 mxDuration = SubElement(mxForward, 'duration')
                 mxDuration.text = str(amountToMoveForward)

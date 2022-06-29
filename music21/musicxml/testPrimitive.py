@@ -18236,6 +18236,30 @@ class Test(unittest.TestCase):
         self.assertEqual([c.classes for c in new_clefs],
                          [c.classes for c in orig_clefs])
 
+    def testMidMeasureClefs3(self):
+        '''
+        Test midmeasure clef changes outside voices
+        '''
+        from music21 import clef
+        from music21 import note
+        from music21 import musicxml
+        from music21 import stream
+
+        v1 = stream.Voice()
+        v2 = stream.Voice()
+        quarter = note.Note()
+        v1.repeatAppend(quarter, 4)
+        v2.repeatAppend(quarter, 4)
+        m = stream.Measure([v1, v2])
+        m.insert(1.0, clef.BassClef())
+        p = stream.Part(m)
+        p.makeNotation(inPlace=True)
+
+        tree = musicxml.test_m21ToXml.Test().getET(p)
+        self.assertEqual(len(tree.findall('.//clef')), 1)
+        # One backup from the clef back to voice 1, then another back to voice 2
+        self.assertEqual(len(tree.findall('.//backup')), 2)
+
 # ------------------------------------------------------------------------------
 
 
