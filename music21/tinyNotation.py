@@ -229,7 +229,6 @@ for details on how to do that.
 import collections
 import copy
 import re
-import sre_parse
 import typing
 import unittest
 
@@ -1124,7 +1123,7 @@ class Converter:
         for rePre, classCall in self.tokenMap:
             try:
                 self._tokenMapRe.append((re.compile(rePre), classCall))
-            except sre_parse.error as e:
+            except re.error as e:
                 raise TinyNotationException(
                     f'Error in compiling token, {rePre}: {e}'
                 ) from e
