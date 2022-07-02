@@ -18119,7 +18119,7 @@ pianoStaffPolymeter = '''<?xml version="1.0" encoding="ISO-8859-1" standalone="n
 #   with clef #2 changed from BassClef to Treble8vbClef.
 
 pianoStaffPolymeterWithClefOctaveChange = (
-'''<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+    '''<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6b Partwise//EN"
  "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
