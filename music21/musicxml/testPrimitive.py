@@ -18115,6 +18115,58 @@ pianoStaffPolymeter = '''<?xml version="1.0" encoding="ISO-8859-1" standalone="n
 </score-partwise>
 '''
 
+# pianoStaffPolymeterWithClefOctaveChange is a copy of pianoStaffPolymeter (above)
+#   with clef #2 changed from BassClef to Treble8vbClef.
+
+pianoStaffPolymeterWithClefOctaveChange = '''<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6b Partwise//EN"
+ "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise>
+    <identification>
+        <miscellaneous>
+            <miscellaneous-field name="description">Polymeter on a grand staff</miscellaneous-field>
+        </miscellaneous>
+    </identification>
+    <part-list>
+        <score-part id="P1">
+            <part-name>MusicXML Part</part-name>
+        </score-part>
+    </part-list>
+    <part id="P1">
+        <measure number="1">
+            <attributes>
+                <divisions>96</divisions>
+                <key><fifths>0</fifths></key>
+                <time number="1"><beats>4</beats><beat-type>4</beat-type></time>
+                <time number="2"><beats>2</beats><beat-type>2</beat-type></time>
+                <staves>2</staves>
+                <clef number="1"><sign>G</sign><line>2</line></clef>
+                <clef number="2">
+                    <sign>G</sign>
+                    <line>2</line>
+                    <clef-octave-change>-1</clef-octave-change>
+                </clef>
+            </attributes>
+            <note>
+                <pitch><step>F</step><octave>4</octave></pitch>
+                <duration>384</duration>
+                <voice>1</voice>
+                <type>whole</type>
+                <staff>1</staff>
+            </note>
+            <backup><duration>384</duration></backup>
+            <note>
+                <pitch><step>B</step><octave>2</octave></pitch>
+                <duration>384</duration>
+                <voice>2</voice>
+                <type>whole</type>
+                <staff>2</staff>
+            </note>
+        </measure>
+    </part>
+</score-partwise>
+'''
+
 
 ALL = [
     articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a,  # 0

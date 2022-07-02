@@ -504,7 +504,7 @@ class PartStaffExporterMixin:
         Multiple meters (not very well supported by MusicXML readers):
 
         >>> from music21.musicxml import testPrimitive
-        >>> s = converter.parse(testPrimitive.pianoStaffPolymeter)
+        >>> s = converter.parse(testPrimitive.pianoStaffPolymeterWithClefOctaveChange)
         >>> SX = musicxml.m21ToXml.ScoreExporter(s)
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
@@ -529,8 +529,9 @@ class PartStaffExporterMixin:
                 <line>2</line>
             </clef>
             <clef number="2">
-                <sign>F</sign>
-                <line>4</line>
+                <sign>G</sign>
+                <line>2</line>
+                <clef-octave-change>-1</clef-octave-change>
             </clef>
             </attributes>
         ...
@@ -615,6 +616,10 @@ class PartStaffExporterMixin:
                     newLine.text = (foundLine.text
                                     if (foundLine := oldClef.find('line')) is not None
                                     else '')
+                    foundOctave = oldClef.find('clef-octave-change')
+                    if foundOctave is not None:
+                        newOctave = SubElement(newClef, 'clef-octave-change')
+                        newOctave.text = foundOctave.text
                     helpers.insertBeforeElements(
                         mxAttributes,
                         newClef,
