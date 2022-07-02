@@ -714,7 +714,6 @@ class PartStaffExporterMixin:
             raise MusicXMLExportException(
                 f'moveMeasureContents() called on {measure} and {otherMeasure} (not measures).')
         maxVoices: int = 0
-        otherMeasureLackedVoice: bool = False
 
         for other_voice in otherMeasure.findall('*/voice'):
             otherVoiceText = other_voice.text
@@ -722,7 +721,6 @@ class PartStaffExporterMixin:
                 maxVoices = max(maxVoices, int(otherVoiceText))
 
         if maxVoices == 0:
-            otherMeasureLackedVoice = True
             for elem in otherMeasure.findall('note'):
                 new_voice = Element('voice')
                 new_voice.text = '1'
@@ -773,13 +771,17 @@ class PartStaffExporterMixin:
                     otherMeasure.remove(existingBarline)
             if elem.tag == 'note':
                 voice = elem.find('voice')
+                # otherMeasure is already using voice numbers 1 through maxVoices.
+                # Adjust/set this note's voice number to avoid that range.
                 if voice is not None:
-                    if otherMeasureLackedVoice and voice.text:
-                        # otherMeasure assigned voice 1; Bump voice number here
-                        voice.text = str(int(voice.text) + 1)
+                    if voice.text:
+                        # increment current voice number by maxVoices
+                        voice.text = str(maxVoices + int(voice.text))
                     else:
-                        pass  # No need to alter existing voice numbers
+                        # no voice number, set to 1 (incremented by maxVoices)
+                        voice.text = str(maxVoices + 1)
                 else:
+                    # no voice element, set voice number to 1 (incremented by maxVoices)
                     voice = Element('voice')
                     voice.text = str(maxVoices + 1)
                     helpers.insertBeforeElements(
@@ -790,6 +792,23 @@ class PartStaffExporterMixin:
                             'stem', 'notehead', 'notehead-text', 'staff'
                         ]
                     )
+#                 if voice is not None:
+#                     if maxVoices == 1 and voice.text:
+#                         # otherMeasure assigned voice 1; Bump voice number here
+#                         voice.text = str(int(voice.text) + 1)
+#                     else:
+#                         pass  # No need to alter existing voice numbers
+#                 else:
+#                     voice = Element('voice')
+#                     voice.text = str(maxVoices + 1)
+#                     helpers.insertBeforeElements(
+#                         elem,
+#                         voice,
+#                         tagList=[
+#                             'type', 'dot', 'accidental', 'time-modification',
+#                             'stem', 'notehead', 'notehead-text', 'staff'
+#                         ]
+#                     )
             # Append to otherMeasure
             otherMeasure.append(elem)
 
@@ -889,6 +908,12 @@ class Test(unittest.TestCase):
         s.insert(0, layout.StaffGroup([ps1, ps2]))
         root = self.getET(s)
         notes = root.findall('.//note')
+
+        # since there are no voices in either PartStaff, the voice number of each note
+        # should be the same as the staff number.
+        for mxNote in notes:
+            self.assertEqual(mxNote.find('voice').text, mxNote.find('staff').text)
+
         forward = root.find('.//forward')
         backup = root.find('.//backup')
         amountToBackup = (
@@ -944,6 +969,62 @@ class Test(unittest.TestCase):
         # dump(root)
         self.assertEqual(len(measures), 2)
         self.assertEqual(len(notes), 12)
+
+    def testJoinPartStaffsD2(self):
+        '''
+        Add measures and voices and check for unique voice numbers across the StaffGroup.
+        '''
+        from music21 import layout
+        from music21 import note
+        s = stream.Score()
+        ps1 = stream.PartStaff()
+        m1 = stream.Measure()
+        ps1.insert(0, m1)
+        v1 = stream.Voice()
+        v2 = stream.Voice()
+        m1.insert(0, v1)
+        m1.insert(0, v2)
+        v1.repeatAppend(note.Note('C4'), 4)
+        v2.repeatAppend(note.Note('E4'), 4)
+        ps1.makeNotation(inPlace=True)  # makeNotation to freeze notation
+
+        ps2 = stream.PartStaff()
+        m2 = stream.Measure()
+        ps2.insert(0, m2)
+        v3 = stream.Voice()
+        v4 = stream.Voice()
+        m2.insert(0, v3)
+        m2.insert(0, v4)
+        v3.repeatAppend(note.Note('C3'), 4)
+        v4.repeatAppend(note.Note('G3'), 4)
+        ps2.makeNotation(inPlace=True)  # makeNotation to freeze notation
+
+        s.insert(0, ps2)
+        s.insert(0, ps1)
+        s.insert(0, layout.StaffGroup([ps1, ps2]))
+        root = self.getET(s)
+        measures = root.findall('.//measure')
+        notes = root.findall('.//note')
+        # from music21.musicxml.helpers import dump
+        # dump(root)
+        self.assertEqual(len(measures), 1)
+        self.assertEqual(len(notes), 16)
+
+        # check those voice and staff numbers
+        for mxNote in notes:
+            mxPitch = mxNote.find('pitch')
+            if mxPitch.find('step').text == 'C' and mxPitch.find('octave').text == '4':
+                self.assertEqual(mxNote.find('voice').text, '1')
+                self.assertEqual(mxNote.find('staff').text, '1')
+            elif mxPitch.find('step').text == 'E' and mxPitch.find('octave').text == '4':
+                self.assertEqual(mxNote.find('voice').text, '2')
+                self.assertEqual(mxNote.find('staff').text, '1')
+            elif mxPitch.find('step').text == 'C' and mxPitch.find('octave').text == '3':
+                self.assertEqual(mxNote.find('voice').text, '3')
+                self.assertEqual(mxNote.find('staff').text, '2')
+            elif mxPitch.find('step').text == 'G' and mxPitch.find('octave').text == '3':
+                self.assertEqual(mxNote.find('voice').text, '4')
+                self.assertEqual(mxNote.find('staff').text, '2')
 
     def testJoinPartStaffsE(self):
         '''
