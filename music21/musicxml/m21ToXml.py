@@ -4422,6 +4422,10 @@ class MeasureExporter(XMLExporterBase):
             chordOrNote = chordParent
 
         # only apply expressions to notes or the first note of a chord...
+        # except for <arpeggiate> which goes on every note in the chord,
+        # and <non-arpeggiate> which goes as 'top' on the highest note
+        # and as 'bottom' on the lowest note in the chord. Which implies
+        # some note sorting?  Ugh.
         if isSingleNoteOrFirstInChord:
             for expObj in chordOrNote.expressions:
                 mxExpression = self.expressionToXml(expObj)

@@ -2813,12 +2813,12 @@ class MeasureParser(XMLParserBase):
                 sp.replaceSpannedElement(n, c)
             for art in n.articulations:
                 if type(art) in seenArticulations:  # pylint: disable=unidiomatic-typecheck
-                    pass
+                    continue
                 c.articulations.append(art)
                 seenArticulations.add(type(art))
             for exp in n.expressions:
                 if type(exp) in seenExpressions:  # pylint: disable=unidiomatic-typecheck
-                    pass
+                    continue
                 c.expressions.append(exp)
                 seenExpressions.add(type(exp))
 
@@ -3611,8 +3611,7 @@ class MeasureParser(XMLParserBase):
         # tuplet is handled with time-modification.
 
         # TODO: dynamics
-        # TODO: arpeggiate  incl. musicxml 4: unbroken attribute
-        # TODO: non-arpeggiate
+        # TODO: musicxml 4: arpeggiate 'unbroken' attribute
         # TODO: accidental-mark
         # TODO: other-notation
 
@@ -3644,6 +3643,19 @@ class MeasureParser(XMLParserBase):
             if textStripValid(mxObj):
                 fermata.shape = mxObj.text.strip()
             n.expressions.append(fermata)
+
+        # get any arpeggios, store in expressions.
+        for mxObj in mxNotations.findall('arpeggiate'):
+            arpeggioType: str = mxObj.get('direction')
+            if not arpeggioType:
+                arpeggioType = 'normal'
+            arpeggio = expressions.ArpeggioMark(arpeggioType)
+            n.expressions.append(arpeggio)
+
+        # get any non-arpeggio marks, store in expressions.
+        for mxObj in mxNotations.findall('non-arpeggiate'):
+            nonArpeggio = expressions.ArpeggioMark('non-arpeggio')
+            n.expressions.append(nonArpeggio)
 
         for mxObj in flatten(mxNotations, 'ornaments'):
             if mxObj.tag in xmlObjects.ORNAMENT_MARKS:

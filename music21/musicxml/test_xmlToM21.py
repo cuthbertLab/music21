@@ -1134,6 +1134,37 @@ class Test(unittest.TestCase):
         self.assertIsInstance(notes[3].articulations[1], articulations.FretIndication)
         self.assertEqual(notes[3].articulations[1].number, 3)
 
+    def testArpeggioMarks(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.arpeggio32d)
+        p = s.parts[0]
+        m = p.measure(1)
+        for i, el in enumerate(m):
+            if 2 <= i <= 8:
+                # elements 2..8 (inclusive) are chords, with an ArpeggioMark,
+                # and none of the notes in the chords have an ArpeggioMark.
+                self.assertIsInstance(el, chord.Chord)
+                self.assertIsInstance(el.expressions[0], expressions.ArpeggioMark)
+                for n in el.notes:
+                    for exp in n.expressions:
+                        self.assertNotIsInstance(exp, expressions.ArpeggioMark)
+                if i == 2:
+                    self.assertEqual(el.expressions[0].type, 'normal')
+                if i == 3:
+                    self.assertEqual(el.expressions[0].type, 'up')
+                if i == 4:
+                    self.assertEqual(el.expressions[0].type, 'normal')
+                if i == 5:
+                    self.assertEqual(el.expressions[0].type, 'down')
+                if i == 6:
+                    self.assertEqual(el.expressions[0].type, 'normal')
+                if i == 7:
+                    self.assertEqual(el.expressions[0].type, 'non-arpeggio')
+                if i == 8:
+                    self.assertEqual(el.expressions[0].type, 'normal')
+
     def testHiddenRests(self):
         from music21 import converter
         from music21 import corpus
