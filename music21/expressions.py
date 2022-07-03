@@ -1426,6 +1426,65 @@ class TremoloSpanner(spanner.Spanner):
             raise TremoloException('Number of marks must be a number from 0 to 8') from ve
 
 
+class ArpeggioException(exceptions21.Music21Exception):
+    pass
+
+
+class ArpeggioMark(Expression):
+    '''
+    ArpeggioMark must be applied to a Chord (not to a single Note).
+
+    The parameter arpeggioType can be 'normal' (a squiggly line), 'up' (a squiggly line
+    with an up arrow), 'down' (a squiggly line with a down arrow), or 'non-arpeggio' (a
+    bracket instead of a squiggly line, used to indicate a non-arpeggiated chord
+    intervening in a sequence of arpeggiated ones).
+
+    >>> am = expressions.ArpeggioMark('normal')
+    >>> am.type
+    'normal'
+
+    >>> am = expressions.ArpeggioMark('down')
+    >>> am.type
+    'down'
+    '''
+    def __init__(self, arpeggioType: str):
+        super().__init__()
+        if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
+            raise ArpeggioException(
+                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
+            )
+        self.type = arpeggioType
+
+
+class ArpeggioMarkSpanner(spanner.Spanner):
+    '''
+    ArpeggioMarkSpanner is a multi-staff or multi-voice (i.e. multi-chord) arpeggio.
+    The spanner should contain all the simultaneous Chords that are to be arpeggiated
+    together.  It should not contain individual notes.
+
+    The parameter arpeggioType can be 'normal' (a squiggly line), 'up' (a squiggly line
+    with an up arrow), 'down' (a squiggly line with a down arrow), or 'non-arpeggio' (a
+    bracket instead of a squiggly line, used to indicate a non-arpeggiated multi-chord
+    intervening in a sequence of arpeggiated ones).
+
+    >>> ams = expressions.ArpeggioMarkSpanner('non-arpeggio')
+    >>> c1 = chord.Chord('C3 E3 G3')
+    >>> c2 = chord.Chord('C4 E4 G4')
+    >>> ams.addSpannedElements([c1, c2])
+    >>> ams.type
+    'non-arpeggio'
+    >>> ams
+    <music21.expressions.ArpeggioMarkSpanner
+     <music21.chord.Chord C3 E3 G3><music21.chord.Chord C4 E4 G4>>
+    '''
+    def __init__(self, arpeggioType: str, *arguments, **keywords):
+        super().__init__(*arguments, **keywords)
+        if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
+            raise ArpeggioException(
+                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
+            )
+        self.type = arpeggioType
+
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
