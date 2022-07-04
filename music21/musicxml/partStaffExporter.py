@@ -792,23 +792,6 @@ class PartStaffExporterMixin:
                             'stem', 'notehead', 'notehead-text', 'staff'
                         ]
                     )
-#                 if voice is not None:
-#                     if maxVoices == 1 and voice.text:
-#                         # otherMeasure assigned voice 1; Bump voice number here
-#                         voice.text = str(int(voice.text) + 1)
-#                     else:
-#                         pass  # No need to alter existing voice numbers
-#                 else:
-#                     voice = Element('voice')
-#                     voice.text = str(maxVoices + 1)
-#                     helpers.insertBeforeElements(
-#                         elem,
-#                         voice,
-#                         tagList=[
-#                             'type', 'dot', 'accidental', 'time-modification',
-#                             'stem', 'notehead', 'notehead-text', 'staff'
-#                         ]
-#                     )
             # Append to otherMeasure
             otherMeasure.append(elem)
 
