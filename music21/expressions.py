@@ -1447,7 +1447,7 @@ class ArpeggioMark(Expression):
     >>> am.type
     'down'
     '''
-    def __init__(self, arpeggioType: str):
+    def __init__(self, arpeggioType: str = 'normal'):
         super().__init__()
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
             raise ArpeggioException(
@@ -1477,7 +1477,7 @@ class ArpeggioMarkSpanner(spanner.Spanner):
     <music21.expressions.ArpeggioMarkSpanner
      <music21.chord.Chord C3 E3 G3><music21.chord.Chord C4 E4 G4>>
     '''
-    def __init__(self, arpeggioType: str, *arguments, **keywords):
+    def __init__(self, arpeggioType: str = 'normal', *arguments, **keywords):
         super().__init__(*arguments, **keywords)
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
             raise ArpeggioException(

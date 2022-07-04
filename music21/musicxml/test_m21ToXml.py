@@ -458,6 +458,63 @@ class Test(unittest.TestCase):
             int(tree.findall('.//direction/offset')[0].text),
             defaults.divisionsPerQuarter)
 
+    def testArpeggios(self):
+        expectedResults = (
+            'arpeggiate',
+            'arpeggiate',
+            'arpeggiate',
+            'arpeggiate up',
+            'arpeggiate up',
+            'arpeggiate up',
+            'arpeggiate',
+            'arpeggiate',
+            'arpeggiate',
+            'arpeggiate down',
+            'arpeggiate down',
+            'arpeggiate down',
+            'arpeggiate',
+            'arpeggiate',
+            'arpeggiate',
+            'non-arpeggiate bottom',
+            '',
+            'non-arpeggiate top',
+            'arpeggiate',
+            'arpeggiate',
+            'arpeggiate',
+        )
+        s = converter.parse(testPrimitive.arpeggio32d)
+        x = self.getET(s)
+        # helpers.dump(x)
+        mxPart = x.find('part')
+        mxMeasure = mxPart.find('measure')
+        for i, mxNote in enumerate(mxMeasure.findall('note')):
+            nonarp = None
+            arp = None
+            notations = mxNote.find('notations')
+            if notations is not None:
+                nonarp = notations.find('non-arpeggiate')
+                arp = notations.find('arpeggiate')
+            if expectedResults[i].startswith('non-arpeggiate'):
+                self.assertIsNotNone(nonarp)
+                nonarpType = nonarp.get('type')
+                for whichEnd in ('top', 'bottom'):
+                    if expectedResults[i].endswith(whichEnd):
+                        self.assertEqual(nonarpType, whichEnd)
+                continue
+            if expectedResults[i].startswith('arpeggiate'):
+                self.assertIsNotNone(arp)
+                arpDirection = arp.get('direction')
+                if expectedResults[i] == 'arpeggiate':
+                    self.assertIsNone(arpDirection)
+                    continue
+                for direction in ('up', 'down'):
+                    if expectedResults[i].endswith(direction):
+                        self.assertEqual(arpDirection, direction)
+                continue
+            self.assertIsNone(arp)
+            self.assertIsNone(nonarp)
+
+
     def testExportChordSymbolsWithRealizedDurations(self):
         gex = GeneralObjectExporter()
 

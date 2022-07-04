@@ -42,6 +42,7 @@ from music21 import bar
 from music21 import clef
 from music21 import chord
 from music21 import duration
+from music21 import expressions
 from music21 import harmony
 from music21 import instrument
 from music21 import key
@@ -4409,6 +4410,25 @@ class MeasureExporter(XMLExporterBase):
         .articulations, and spanners to
         make the <notations> tag for a note.
         '''
+
+        def topAndBottomIndices(chordOrNote) -> (int, int):
+            # Use sortAscending if you can, assume ascending if you can't.
+            # If chordOrNote is a note (not expected, but possible), (0, 0) will be returned.
+            # It would be nice if PercussionChord could sortAscending (ascending on the
+            # staff, that is)...
+            notes = list(chordOrNote.notes)
+            top: int = len(notes)
+            bottom: int = 0
+
+            if isinstance(chordOrNote, chord.Chord):
+                ascendingChord = chordOrNote.sortAscending(inPlace=False)
+                topNote = ascendingChord.notes[-1]
+                bottomNote = ascendingChord.notes[0]
+                top = notes.index(topNote)
+                bottom = notes.index(bottomNote)
+
+            return top, bottom
+
         mxArticulations = None
         mxTechnicalMark = None
         mxOrnaments = None
@@ -4421,25 +4441,39 @@ class MeasureExporter(XMLExporterBase):
             # get expressions from first note of chord
             chordOrNote = chordParent
 
-        # only apply expressions to notes or the first note of a chord...
-        # except for <arpeggiate> which goes on every note in the chord,
-        # and <non-arpeggiate> which goes as 'top' on the highest note
-        # and as 'bottom' on the lowest note in the chord. Which implies
-        # some note sorting?  Ugh.
-        if isSingleNoteOrFirstInChord:
-            for expObj in chordOrNote.expressions:
-                mxExpression = self.expressionToXml(expObj)
-                if mxExpression is None:
-                    # print('Could not convert expression: ', mxExpression)
-                    # TODO: should not!
-                    continue
-                if 'Ornament' in expObj.classes:
-                    if mxOrnaments is None:
-                        mxOrnaments = Element('ornaments')
-                    mxOrnaments.append(mxExpression)
-                    # print(mxExpression)
+        # apply all expressions apart from arpeggios only to the first note of a chord.
+        foundTopAndBottom = False
+        for expObj in chordOrNote.expressions:
+            mxExpression = None
+            if isinstance(expObj, expressions.ArpeggioMark):
+                if expObj.type == 'non-arpeggio':
+                    # <non-arpeggiate> goes on top and bottom note in chord
+                    if not foundTopAndBottom:
+                        topNoteNumber, bottomNoteNumber = topAndBottomIndices(chordOrNote)
+                        foundTopAndBottom = True
+                    if bottomNoteNumber == noteIndexInChord:
+                        mxExpression = self.expressionToXml(expObj)
+                        mxExpression.set('type', 'bottom')
+                    elif topNoteNumber == noteIndexInChord:
+                        mxExpression = self.expressionToXml(expObj)
+                        mxExpression.set('type', 'top')
                 else:
-                    notations.append(mxExpression)
+                    # <arpeggiate> goes on every note in the chord
+                    mxExpression = self.expressionToXml(expObj)
+            elif isSingleNoteOrFirstInChord:
+                mxExpression = self.expressionToXml(expObj)
+
+            if mxExpression is None:
+                # no expression is applicable, or expressionToXml() didn't recognize it.
+                continue
+
+            if 'Ornament' in expObj.classes:
+                if mxOrnaments is None:
+                    mxOrnaments = Element('ornaments')
+                mxOrnaments.append(mxExpression)
+                # print(mxExpression)
+            else:
+                notations.append(mxExpression)
 
         # apply all articulations apart from fingerings only to first note of chord
         applicableArticulations = []
@@ -4734,7 +4768,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxExpression)
         <inverted-turn placement="above" />
 
-        Two special types...
+        Some special types...
 
         >>> f = expressions.Fermata()
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
@@ -4752,6 +4786,22 @@ class MeasureExporter(XMLExporterBase):
         >>> mxExpression = MEX.expressionToXml(trem)
         >>> MEX.dump(mxExpression)
         <tremolo type="single">4</tremolo>
+
+        >>> arp = expressions.ArpeggioMark()
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxExpression = MEX.expressionToXml(arp)
+        >>> MEX.dump(mxExpression)
+        <arpeggiate />
+        >>> arp.type = 'down'
+        >>> mxExpression = MEX.expressionToXml(arp)
+        >>> MEX.dump(mxExpression)
+        <arpeggiate direction="down" />
+
+        >>> nonarp = expressions.ArpeggioMark('non-arpeggio')
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxExpression = MEX.expressionToXml(nonarp)
+        >>> MEX.dump(mxExpression)
+        <non-arpeggiate />
         '''
         mapping = OrderedDict([
             ('Trill', 'trill-mark'),
@@ -4778,6 +4828,15 @@ class MeasureExporter(XMLExporterBase):
             if k in classes:
                 mx = Element(v)
                 break
+        if mx is None:
+            # 'ArpeggioMark' maps to two different elements
+            if 'ArpeggioMark' in classes:
+                if expression.type == 'non-arpeggio':
+                    mx = Element('non-arpeggiate')
+                else:
+                    mx = Element('arpeggiate')
+                    if expression.type != 'normal':
+                        mx.set('direction', expression.type)
         if mx is None:
             environLocal.printDebug(['no musicxml conversion for:', expression])
             return
