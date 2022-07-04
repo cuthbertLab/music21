@@ -18377,7 +18377,8 @@ ALL = [
     mixedVoices1a, mixedVoices1b, mixedVoices2,  # 37
     colors01, triplets01, textBoxes01, octaveShifts33d,  # 40
     unicodeStrNoNonAscii, unicodeStrWithNonAscii,  # 44
-    tremoloTest, hiddenRests, multiDigitEnding, tupletsImplied, pianoStaffPolymeter  # 46
+    tremoloTest, hiddenRests, multiDigitEnding, tupletsImplied, pianoStaffPolymeter,  # 46
+    arpeggio32d  # 51
 ]
 
 
