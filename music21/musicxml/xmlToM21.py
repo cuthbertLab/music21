@@ -3647,8 +3647,6 @@ class MeasureParser(XMLParserBase):
         # get any arpeggios, store in expressions.
         for mxObj in mxNotations.findall('arpeggiate'):
             arpeggioType: str = mxObj.get('direction')
-            if not arpeggioType:
-                arpeggioType = 'normal'
             arpeggio = expressions.ArpeggioMark(arpeggioType)
             n.expressions.append(arpeggio)
 

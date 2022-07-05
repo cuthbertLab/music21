@@ -488,31 +488,32 @@ class Test(unittest.TestCase):
         mxPart = x.find('part')
         mxMeasure = mxPart.find('measure')
         for i, mxNote in enumerate(mxMeasure.findall('note')):
-            nonarp = None
-            arp = None
-            notations = mxNote.find('notations')
-            if notations is not None:
-                nonarp = notations.find('non-arpeggiate')
-                arp = notations.find('arpeggiate')
-            if expectedResults[i].startswith('non-arpeggiate'):
-                self.assertIsNotNone(nonarp)
-                nonarpType = nonarp.get('type')
-                for whichEnd in ('top', 'bottom'):
-                    if expectedResults[i].endswith(whichEnd):
-                        self.assertEqual(nonarpType, whichEnd)
-                continue
-            if expectedResults[i].startswith('arpeggiate'):
-                self.assertIsNotNone(arp)
-                arpDirection = arp.get('direction')
-                if expectedResults[i] == 'arpeggiate':
-                    self.assertIsNone(arpDirection)
+            with self.subTest(note_index=i):
+                nonarp = None
+                arp = None
+                notations = mxNote.find('notations')
+                if notations is not None:
+                    nonarp = notations.find('non-arpeggiate')
+                    arp = notations.find('arpeggiate')
+                if expectedResults[i].startswith('non-arpeggiate'):
+                    self.assertIsNotNone(nonarp)
+                    nonarpType = nonarp.get('type')
+                    for whichEnd in ('top', 'bottom'):
+                        if expectedResults[i].endswith(whichEnd):
+                            self.assertEqual(nonarpType, whichEnd)
                     continue
-                for direction in ('up', 'down'):
-                    if expectedResults[i].endswith(direction):
-                        self.assertEqual(arpDirection, direction)
-                continue
-            self.assertIsNone(arp)
-            self.assertIsNone(nonarp)
+                if expectedResults[i].startswith('arpeggiate'):
+                    self.assertIsNotNone(arp)
+                    arpDirection = arp.get('direction')
+                    if expectedResults[i] == 'arpeggiate':
+                        self.assertIsNone(arpDirection)
+                        continue
+                    for direction in ('up', 'down'):
+                        if expectedResults[i].endswith(direction):
+                            self.assertEqual(arpDirection, direction)
+                    continue
+                self.assertIsNone(arp)
+                self.assertIsNone(nonarp)
 
 
     def testExportChordSymbolsWithRealizedDurations(self):

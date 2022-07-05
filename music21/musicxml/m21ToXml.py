@@ -4460,20 +4460,24 @@ class MeasureExporter(XMLExporterBase):
                 else:
                     # <arpeggiate> goes on every note in the chord
                     mxExpression = self.expressionToXml(expObj)
+                if mxExpression is None:
+                    # the ArpeggioMark is not applicable on this note.
+                    continue
+                notations.append(mxExpression)
+
             elif isSingleNoteOrFirstInChord:
                 mxExpression = self.expressionToXml(expObj)
-
-            if mxExpression is None:
-                # no expression is applicable, or expressionToXml() didn't recognize it.
-                continue
-
-            if 'Ornament' in expObj.classes:
-                if mxOrnaments is None:
-                    mxOrnaments = Element('ornaments')
-                mxOrnaments.append(mxExpression)
-                # print(mxExpression)
-            else:
-                notations.append(mxExpression)
+                if mxExpression is None:
+                    # print('Could not convert expression: ', mxExpression)
+                    # TODO: should not!
+                    continue
+                if 'Ornament' in expObj.classes:
+                    if mxOrnaments is None:
+                        mxOrnaments = Element('ornaments')
+                    mxOrnaments.append(mxExpression)
+                    # print(mxExpression)
+                else:
+                    notations.append(mxExpression)
 
         # apply all articulations apart from fingerings only to first note of chord
         applicableArticulations = []
@@ -4829,8 +4833,8 @@ class MeasureExporter(XMLExporterBase):
                 mx = Element(v)
                 break
         if mx is None:
-            # 'ArpeggioMark' maps to two different elements
-            if 'ArpeggioMark' in classes:
+            # ArpeggioMark maps to two different elements
+            if isinstance(expression, expressions.ArpeggioMark):
                 if expression.type == 'non-arpeggio':
                     mx = Element('non-arpeggiate')
                 else:
