@@ -1910,7 +1910,7 @@ class Music21Object(prebase.ProtoM21Object):
             callerFirst = self
             if self.isStream and self not in memo:
                 streamSelf = t.cast('music21.stream.Stream', self)
-                recursionType = streamSelf.recursionType
+                recursionType = streamSelf.recursionType  # pylint: disable=no-member
                 environLocal.printDebug(
                     f'Caller first is {callerFirst} with offsetAppend {offsetAppend}')
                 if returnSortTuples:
