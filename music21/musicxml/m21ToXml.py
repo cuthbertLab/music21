@@ -2548,6 +2548,10 @@ class PartExporter(XMLExporterBase):
         # has changed
         self.lastDivisions = None
 
+        # maxVoiceNumber is keyed by measureNumberWithSuffix, value is the maximum
+        # exported voice number used for that measure (in this Part).
+        self.maxVoiceNumbers: t.Dict[str, int] = {}
+
         self.spannerBundle = partObj.spannerBundle
 
     def parse(self):
@@ -2613,6 +2617,7 @@ class PartExporter(XMLExporterBase):
             measureExporter.spannerBundle = self.spannerBundle
             try:
                 mxMeasure = measureExporter.parse()
+                self.maxVoiceNumbers[m.measureNumberWithSuffix()] = measureExporter.maxVoiceNumber
             except MusicXMLExportException as e:
                 e.measureNumber = str(m.number)
                 if isinstance(self.stream, stream.Part):
@@ -3020,7 +3025,9 @@ class MeasureExporter(XMLExporterBase):
         self.measureOffsetStart = 0.0
         self.offsetInMeasure = 0.0
         self.currentVoiceId: t.Optional[int] = None
-        self.nextFreeVoiceNumber = 1
+        self.nextFreeVoiceNumber: int = 1
+        self.maxVoiceNumber: int = 0
+        self.voiceNumberOffset: t.Optional[int] = None
 
         self.rbSpanners: t.List[spanner.RepeatBracket] = []  # repeatBracket spanners
 
@@ -3076,6 +3083,77 @@ class MeasureExporter(XMLExporterBase):
             # Assumes voices are flat...
             self.parseFlatElements(v, backupAfterwards=backupAfterwards)
 
+    def getVoiceNumberOffset(self) -> int:
+        '''
+            Returns the offset that should be added to any voice numbers in this measure,
+            in order to avoid voice numbers in other simultaneous measures within a staff
+            group.  If this measure is not in a staff group, the offset is 0.
+            This is computed once, and cached, for performance.
+        '''
+        if self.voiceNumberOffset is not None:
+            # return the cached computed offset
+            return self.voiceNumberOffset
+
+        def getMaxVoiceNumber(
+                scoreExp: ScoreExporter,
+                partStaff: stream.Part,
+                measure: stream.Measure) -> int:
+            # find the partExporter for partStaff
+            partStaffExp: t.Optional[PartExporter] = None
+            for partx in scoreExp.partExporterList:
+                if partx.stream is partStaff:
+                    partStaffExp = partx
+                    break
+            if partStaffExp is None:
+                return 0
+
+            maxVoiceNumber: int = partStaffExp.maxVoiceNumbers.get(
+                measure.measureNumberWithSuffix(),
+                0
+            )
+            return maxVoiceNumber
+
+        voiceNumberOffset: int = 0
+
+        partExp: t.Optional[PartExporter] = self.parent
+        if partExp is None:
+            return voiceNumberOffset
+
+        scoreExp: t.Optional[ScoreExporter] = partExp.parent
+        if scoreExp is None:
+            return voiceNumberOffset
+
+        # scoreExp.groupsToJoin is a list of StaffGroups
+        if not scoreExp.groupsToJoin:
+            return voiceNumberOffset
+
+
+        assert(isinstance(self.stream, stream.Measure))
+        myMeasure: stream.Measure = self.stream
+
+        for group in scoreExp.groupsToJoin:
+            if partExp.stream not in group:
+                continue
+
+            for partStaff in group:
+                if partStaff is partExp.stream:
+                    # skip our own PartStaff
+                    continue
+
+                otherMeasure: stream.Measure = partStaff.measure(
+                    myMeasure.measureNumberWithSuffix()
+                )
+                if otherMeasure is None:
+                    # if measures don't have numbers, we can't do this
+                    continue
+
+                maxVoiceNumber: int = getMaxVoiceNumber(scoreExp, partStaff, otherMeasure)
+                voiceNumberOffset = max(voiceNumberOffset, maxVoiceNumber)
+
+        # cache and return the new computed offset
+        self.voiceNumberOffset = voiceNumberOffset
+        return voiceNumberOffset
+
     def parseFlatElements(self, m, *, backupAfterwards=False):
         '''
         Deals with parsing all the elements in .elements, assuming that .elements is flat.
@@ -3094,10 +3172,20 @@ class MeasureExporter(XMLExporterBase):
         if isinstance(m, stream.Voice):
             m: stream.Voice
             if isinstance(m.id, int) and m.id < defaults.minIdNumberToConsiderMemoryLocation:
+                # this voice id is a low number, assigned by someone for a reason.  We should
+                # not change it, but we will avoid it if we need to change some other voice id.
                 voiceId = m.id
+                self.maxVoiceNumber = max(self.maxVoiceNumber, voiceId)
             elif isinstance(m.id, int):
+                # this voice id is actually a memory location, so we need to change it
+                # to a low number so it can be used in MusicXML.  Note that we need to
+                # carefully make it unique across the entire part (i.e. if the part is
+                # actually a group of PartStaffs, it must be unique across all those
+                # PartStaffs, not just this one).
                 voiceId = self.nextFreeVoiceNumber
                 self.nextFreeVoiceNumber += 1
+                voiceId += self.getVoiceNumberOffset()
+                self.maxVoiceNumber = max(self.maxVoiceNumber, voiceId)
             else:
                 voiceId = m.id
         else:

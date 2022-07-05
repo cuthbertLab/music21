@@ -714,6 +714,7 @@ class PartStaffExporterMixin:
             raise MusicXMLExportException(
                 f'moveMeasureContents() called on {measure} and {otherMeasure} (not measures).')
         maxVoices: int = 0
+        otherMeasureLackedVoice: bool = False
 
         for other_voice in otherMeasure.findall('*/voice'):
             otherVoiceText = other_voice.text
@@ -721,6 +722,7 @@ class PartStaffExporterMixin:
                 maxVoices = max(maxVoices, int(otherVoiceText))
 
         if maxVoices == 0:
+            otherMeasureLackedVoice = True
             for elem in otherMeasure.findall('note'):
                 new_voice = Element('voice')
                 new_voice.text = '1'
@@ -771,17 +773,13 @@ class PartStaffExporterMixin:
                     otherMeasure.remove(existingBarline)
             if elem.tag == 'note':
                 voice = elem.find('voice')
-                # otherMeasure is already using voice numbers 1 through maxVoices.
-                # Adjust/set this note's voice number to avoid that range.
                 if voice is not None:
-                    if voice.text:
-                        # increment current voice number by maxVoices
-                        voice.text = str(maxVoices + int(voice.text))
+                    if otherMeasureLackedVoice and voice.text:
+                        # otherMeasure assigned voice 1; Bump voice number here
+                        voice.text = str(int(voice.text) + 1)
                     else:
-                        # no voice number, set to 1 (incremented by maxVoices)
-                        voice.text = str(maxVoices + 1)
+                        pass  # No need to alter existing voice numbers
                 else:
-                    # no voice element, set voice number to 1 (incremented by maxVoices)
                     voice = Element('voice')
                     voice.text = str(maxVoices + 1)
                     helpers.insertBeforeElements(
@@ -961,7 +959,7 @@ class Test(unittest.TestCase):
         from music21 import note
         s = stream.Score()
         ps1 = stream.PartStaff()
-        m1 = stream.Measure()
+        m1 = stream.Measure(1)
         ps1.insert(0, m1)
         v1 = stream.Voice()
         v2 = stream.Voice()
@@ -972,7 +970,7 @@ class Test(unittest.TestCase):
         ps1.makeNotation(inPlace=True)  # makeNotation to freeze notation
 
         ps2 = stream.PartStaff()
-        m2 = stream.Measure()
+        m2 = stream.Measure(1)
         ps2.insert(0, m2)
         v3 = stream.Voice()
         v4 = stream.Voice()
@@ -997,16 +995,16 @@ class Test(unittest.TestCase):
         for mxNote in notes:
             mxPitch = mxNote.find('pitch')
             if mxPitch.find('step').text == 'C' and mxPitch.find('octave').text == '4':
-                self.assertEqual(mxNote.find('voice').text, '1')
+                self.assertEqual(mxNote.find('voice').text, '3')
                 self.assertEqual(mxNote.find('staff').text, '1')
             elif mxPitch.find('step').text == 'E' and mxPitch.find('octave').text == '4':
-                self.assertEqual(mxNote.find('voice').text, '2')
+                self.assertEqual(mxNote.find('voice').text, '4')
                 self.assertEqual(mxNote.find('staff').text, '1')
             elif mxPitch.find('step').text == 'C' and mxPitch.find('octave').text == '3':
-                self.assertEqual(mxNote.find('voice').text, '3')
+                self.assertEqual(mxNote.find('voice').text, '1')
                 self.assertEqual(mxNote.find('staff').text, '2')
             elif mxPitch.find('step').text == 'G' and mxPitch.find('octave').text == '3':
-                self.assertEqual(mxNote.find('voice').text, '4')
+                self.assertEqual(mxNote.find('voice').text, '2')
                 self.assertEqual(mxNote.find('staff').text, '2')
 
     def testJoinPartStaffsE(self):
