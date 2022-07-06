@@ -1674,11 +1674,11 @@ class RomanNumeral(harmony.Harmony):
     >>> specialCharacterFigure
     <music21.roman.RomanNumeral V#°+-/[]>
 
-    Otherwise:
+    Otherwise, an invalid figure raises `RomanNumeralException`:
 
-    >>> roman.RomanNumeral('V¯\_ (ツ)_/¯')
+    >>> roman.RomanNumeral("V64==53")
     Traceback (most recent call last):
-    music21.roman.RomanNumeralException: Invalid figure: V¯\_ (ツ)_/¯
+    music21.roman.RomanNumeralException: Invalid figure: V64==53
 
     OMIT_FROM_DOCS
 
