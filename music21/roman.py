@@ -1667,6 +1667,18 @@ class RomanNumeral(harmony.Harmony):
     degree (i.e., '-II' becomes 'bII') as this is what people expect in looking at
     the figure.
 
+    Changed in v8 -- Figures are now validated as alphanumeric or containing one of
+    the following symbols (after the example "V"):
+
+    >>> specialCharacterFigure = roman.RomanNumeral('V#°+-/[]')
+    >>> specialCharacterFigure
+    <music21.roman.RomanNumeral V#°+-/[]>
+
+    Otherwise:
+
+    >>> roman.RomanNumeral('V¯\_ (ツ)_/¯')
+    Traceback (most recent call last):
+    music21.roman.RomanNumeralException: Invalid figure: V¯\_ (ツ)_/¯
 
     OMIT_FROM_DOCS
 
@@ -2122,13 +2134,16 @@ class RomanNumeral(harmony.Harmony):
         # immediately fix low-preference figures
         if isinstance(figure, str):
             figure = figure.replace('0', 'o')  # viio7
-
-        if isinstance(figure, str):
             # /o is just a shorthand for ø -- so it should not be stored.
             figure = figure.replace('/o', 'ø')
-
+            figure = figure.replace('º', '°')
+        else:
+            raise TypeError(f"Expected str or int: got {type(figure)}")
         # end immediate fixes
 
+        if not all(char.isalnum() or char in "#°+-/[]" for char in figure):
+            # V, b, ø, no, etc. already covered by isalnum()
+            raise RomanNumeralException(f"Invalid figure: {figure}")
 
         # Store raw figure before calling setKeyOrScale:
         self._figure = figure
