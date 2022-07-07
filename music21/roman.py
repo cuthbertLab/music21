@@ -2136,7 +2136,8 @@ class RomanNumeral(harmony.Harmony):
             figure = figure.replace('0', 'o')  # viio7
             # /o is just a shorthand for ø -- so it should not be stored.
             figure = figure.replace('/o', 'ø')
-            figure = figure.replace('º', '°')
+            figure = figure.replace('º', 'o')
+            figure = figure.replace('°', 'o')
         else:
             raise TypeError(f"Expected str or int: got {type(figure)}")
         # end immediate fixes
