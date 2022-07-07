@@ -1670,9 +1670,15 @@ class RomanNumeral(harmony.Harmony):
     Changed in v8 -- Figures are now validated as alphanumeric or containing one of
     the following symbols (after the example "V"):
 
-    >>> specialCharacterFigure = roman.RomanNumeral('V#°+-/[]')
+    >>> specialCharacterFigure = roman.RomanNumeral('V#+-/[]')
     >>> specialCharacterFigure
-    <music21.roman.RomanNumeral V#°+-/[]>
+    <music21.roman.RomanNumeral V#+-/[]>
+
+    And degree symbols (`°`) convert to `o`:
+
+    >>> dimSeventh = roman.RomanNumeral('vii°7', 'c')
+    >>> dimSeventh
+    <music21.roman.RomanNumeral viio7 in c minor>
 
     Otherwise, an invalid figure raises `RomanNumeralException`:
 
@@ -1728,6 +1734,11 @@ class RomanNumeral(harmony.Harmony):
     >>> r = roman.RomanNumeral('V754', key.Key('C'))
     >>> cp(r)
     ['G4', 'C5', 'D5', 'F5']
+
+    A symbol that looks like the degree symbol but isn't:
+
+    >>> roman.RomanNumeral('viiº')
+    <music21.roman.RomanNumeral viio>
 
     (NOTE: all this is omitted -- look at OMIT_FROM_DOCS above)
     '''
