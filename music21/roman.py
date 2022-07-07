@@ -2145,10 +2145,10 @@ class RomanNumeral(harmony.Harmony):
         # immediately fix low-preference figures
         if isinstance(figure, str):
             figure = figure.replace('0', 'o')  # viio7
-            # /o is just a shorthand for ø -- so it should not be stored.
-            figure = figure.replace('/o', 'ø')
             figure = figure.replace('º', 'o')
             figure = figure.replace('°', 'o')
+            # /o is just a shorthand for ø -- so it should not be stored.
+            figure = figure.replace('/o', 'ø')
         else:
             raise TypeError(f"Expected str or int: got {type(figure)}")
         # end immediate fixes
