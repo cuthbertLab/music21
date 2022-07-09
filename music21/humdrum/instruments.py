@@ -3,9 +3,9 @@
 # Name:         humdrum.instruments.py
 # Purpose:      Instrument Lists for Humdrum and kern in particular
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

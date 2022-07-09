@@ -5,12 +5,12 @@
 #
 # Authors:      Emily Zhang
 #
-# Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest
 from copy import deepcopy
-from typing import Optional, TypeVar
+import typing as t
 
 from music21.alpha.analysis import aligner
 from music21.alpha.analysis import ornamentRecognizer
@@ -21,9 +21,6 @@ from music21 import interval
 from music21 import note
 from music21 import pitch
 from music21 import stream
-
-# noinspection PyShadowingBuiltins
-_T = TypeVar('_T')
 
 
 class OMRMidiFixer:
@@ -63,7 +60,7 @@ class DeleteFixer(OMRMidiFixer):
         for (midiRef, omrRef, op) in self.changes:
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
-            # if the are the same, don't bother to try changing it
+            # if they are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
             if isinstance(op, aligner.ChangeOps) and op == aligner.ChangeOps.NoChange:
                 continue
@@ -246,7 +243,7 @@ class EnharmonicFixer(OMRMidiFixer):
             # if they're not notes, don't bother with rest
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
-            # if the are the same, don't bother to try changing it
+            # if they are the same, don't bother to try changing it
             # 3 is the number of noChange Ops
             if isinstance(op, aligner.ChangeOps) and op == aligner.ChangeOps.NoChange:
                 continue
@@ -353,7 +350,7 @@ class OrnamentFixer(OMRMidiFixer):
             self.recognizers = recognizers
         self.markChangeColor = markChangeColor
 
-    def findOrnament(self, busyNotes, simpleNotes) -> Optional[expressions.Ornament]:
+    def findOrnament(self, busyNotes, simpleNotes) -> t.Optional[expressions.Ornament]:
         '''
         Finds an ornament in busyNotes based from simpleNote
         using provided recognizers.
@@ -392,15 +389,15 @@ class OrnamentFixer(OMRMidiFixer):
             return True
         return False
 
-    def fix(self: _T, *, show=False, inPlace=True) -> Optional[_T]:
+    def fix(self, *, show=False, inPlace=True) -> t.Optional[OMRMidiFixer]:
         '''
-        Corrects missed ornaments in omr stream according to mid stream
+        Corrects missed ornaments in omrStream according to midiStream
         :param show: Whether to show results
         :param inPlace: Whether to make changes to own omr stream or
         return a new OrnamentFixer with changes
         '''
         changes = self.changes
-        sa = None
+        sa: t.Optional[aligner.StreamAligner] = None
         omrNotesLabeledOrnament = []
         midiNotesAlreadyFixedForOrnament = []
 
@@ -441,8 +438,11 @@ class OrnamentFixer(OMRMidiFixer):
             self.omrStream.show()
             self.midiStream.show()
 
-        if not inPlace:
+        if not inPlace and sa is not None:
+            # the "and sa is not None" is just for mypy/typing.
             return TrillFixer(sa.changes, sa.targetStream, sa.sourceStream)
+        else:
+            return None
 
 def getNotesWithinDuration(startingGeneralNote, totalDuration, referenceStream=None):
     '''

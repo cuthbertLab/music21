@@ -5,9 +5,9 @@
 #               organized by start and stop offsets
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-15 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -51,8 +51,8 @@ def makeExampleScore():
     r'''
     Makes example score for use in stream-to-tree conversion docs.
 
-    >>> score = tree.makeExampleScore()
-    >>> score.show('text')
+    >>> sc = tree.makeExampleScore()
+    >>> sc.show('text')
     {0.0} <music21.stream.Part ...>
         {0.0} <music21.instrument.Instrument 'PartA: : '>
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -83,7 +83,6 @@ def makeExampleScore():
         {6.0} <music21.stream.Measure 4 offset=6.0>
             {0.0} <music21.note.Note D#>
             {2.0} <music21.bar.Barline type=final>
-
     '''
     from music21 import converter
     from music21 import stream

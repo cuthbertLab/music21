@@ -3,24 +3,23 @@
 # Name:         roman.py
 # Purpose:      music21 classes for doing Roman Numeral / Tonal analysis
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2011-2022 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Music21 class for dealing with Roman Numeral analysis
 '''
+from __future__ import annotations
+
 import enum
 import unittest
 import copy
 import re
-from typing import Dict, Union, Optional, List, Tuple
-
-# when python 3.7 is removed from support:
-# from typing import Literal
+import typing as t
 
 from collections import namedtuple
 
@@ -36,12 +35,10 @@ from music21 import exceptions21
 from music21 import common
 from music21 import chord
 
-FigureTuple = namedtuple('FigureTuple', 'aboveBass alter prefix')
-ChordFigureTuple = namedtuple('ChordFigureTuple', 'aboveBass alter prefix pitch')
+FigureTuple = namedtuple('FigureTuple', ['aboveBass', 'alter', 'prefix'])
+ChordFigureTuple = namedtuple('ChordFigureTuple', ['aboveBass', 'alter', 'prefix', 'pitch'])
 
-
-_MOD = 'roman'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('roman')
 
 # TODO: setting inversion should change the figure
 
@@ -53,8 +50,8 @@ ENDWITHFLAT_RE = re.compile(r'[b\-]$')
 
 # cache all Key/Scale objects created or passed in; re-use
 # permits using internally scored pitch segments
-_scaleCache: Dict[str, scale.Scale] = {}
-_keyCache: Dict[str, key.Key] = {}
+_scaleCache: t.Dict[str, scale.Scale] = {}
+_keyCache: t.Dict[str, key.Key] = {}
 
 # create a single notation object for RN initialization, for type-checking,
 # but it will always be replaced.
@@ -62,7 +59,7 @@ _NOTATION_SINGLETON = fbNotation.Notation()
 
 
 # only some figures imply bass (e.g. "54" does not)
-FIGURES_IMPLYING_BASS: Tuple[Tuple[int, ...], ...] = (
+FIGURES_IMPLYING_BASS: t.Tuple[t.Tuple[int, ...], ...] = (
     # triads
     (6,), (6, 3), (6, 4),
     # seventh chords
@@ -116,7 +113,7 @@ figureShorthands = {
     'b7b53': 'ø7',
 }
 
-figureShorthandsMode: Dict[str, Dict] = {
+figureShorthandsMode: t.Dict[str, t.Dict] = {
     'major': {
     },
     'minor': {
@@ -125,7 +122,7 @@ figureShorthandsMode: Dict[str, Dict] = {
 
 
 # this is sort of a crock...  :-)  but it's very helpful.
-functionalityScores = {
+functionalityScores: t.Dict[str, int] = {
     'I': 100,
     'i': 90,
     'V7': 80,
@@ -532,9 +529,9 @@ def figureTupleSolo(
 
 
 def identifyAsTonicOrDominant(
-    inChord: Union[list, tuple, chord.Chord],
+    inChord: t.Union[list, tuple, chord.Chord],
     inKey: key.Key
-) -> Union[str, bool]:
+) -> t.Union[str, t.Literal[False]]:
     '''
     Returns the roman numeral string expression (either tonic or dominant) that
     best matches the inChord. Useful when you know inChord is either tonic or
@@ -721,7 +718,7 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
 
 def romanNumeralFromChord(
     chordObj,
-    keyObj: Union[key.Key, str] = None,
+    keyObj: t.Union[key.Key, str] = None,
     preferSecondaryDominants=False
 ):
     # noinspection PyShadowingNames
@@ -1734,7 +1731,7 @@ class RomanNumeral(harmony.Harmony):
     _aug6defaultInversions = {'It': '6', 'Fr': '43', 'Ger': '65', 'Sw': '43'}
     _slashedAug6Inv = re.compile(r'(\d)/(\d)')
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'addedSteps': '''
             Returns a list of the added steps, each as a tuple of
             modifier as a string (which might be empty) and a chord factor as an int.
@@ -2102,8 +2099,8 @@ class RomanNumeral(harmony.Harmony):
 
     def __init__(
         self,
-        figure: Union[str, int] = '',
-        keyOrScale: Optional[Union[key.Key, scale.Scale, str]] = None,
+        figure: t.Union[str, int] = '',
+        keyOrScale: t.Optional[t.Union[key.Key, scale.Scale, str]] = None,
         *,
         caseMatters=True,
         updatePitches=True,
@@ -2111,10 +2108,10 @@ class RomanNumeral(harmony.Harmony):
         seventhMinor=Minor67Default.QUALITY,
     ):
         self.primaryFigure: str = ''
-        self.secondaryRomanNumeral: Optional['RomanNumeral'] = None
-        self.secondaryRomanNumeralKey: Optional['key.Key'] = None
+        self.secondaryRomanNumeral: t.Optional[RomanNumeral] = None
+        self.secondaryRomanNumeralKey: t.Optional['key.Key'] = None
 
-        self.pivotChord: Optional['RomanNumeral'] = None
+        self.pivotChord: t.Optional[RomanNumeral] = None
         self.caseMatters: bool = caseMatters
         self.scaleCardinality: int = 7
 
@@ -2139,8 +2136,8 @@ class RomanNumeral(harmony.Harmony):
         self._scale = None
         self.scaleDegree: int = 0
         self.frontAlterationString: str = ''
-        self.frontAlterationTransposeInterval: Optional[interval.Interval] = None
-        self.frontAlterationAccidental: Optional[pitch.Accidental] = None
+        self.frontAlterationTransposeInterval: t.Optional[interval.Interval] = None
+        self.frontAlterationAccidental: t.Optional[pitch.Accidental] = None
         self.romanNumeralAlone: str = ''
         self.figuresWritten: str = ''
         self.figuresNotationObj: fbNotation.Notation = _NOTATION_SINGLETON
@@ -2149,11 +2146,11 @@ class RomanNumeral(harmony.Harmony):
 
         self.impliedQuality: str = ''
 
-        self.impliedScale: Optional[scale.Scale] = None
+        self.impliedScale: t.Optional[scale.Scale] = None
         self.useImpliedScale: bool = False
-        self.bracketedAlterations: List[Tuple[str, int]] = []
-        self.omittedSteps: List[int] = []
-        self.addedSteps: List[Tuple[str, int]] = []
+        self.bracketedAlterations: t.List[t.Tuple[str, int]] = []
+        self.omittedSteps: t.List[int] = []
+        self.addedSteps: t.List[t.Tuple[str, int]] = []
         # do not update pitches.
         self._parsingComplete = False
         self.key = keyOrScale
@@ -2693,9 +2690,7 @@ class RomanNumeral(harmony.Harmony):
                     secondary_tonic = self.secondaryRomanNumeralKey.tonic
                     self.secondaryRomanNumeralKey = key.Key(secondary_tonic, 'minor')
 
-            # when Python 3.7 support is removed
-            # aug6type: Literal['It', 'Ger', 'Fr', 'Sw'] = aug6Match.group(1)
-            aug6type = aug6Match.group(1)
+            aug6type: t.Literal['It', 'Ger', 'Fr', 'Sw'] = aug6Match.group(1)
 
             if aug6type in ('It', 'Ger'):
                 self.scaleDegree = 4
@@ -2885,7 +2880,7 @@ class RomanNumeral(harmony.Harmony):
             self.scaleCardinality = useScale.getDegreeMaxUnique()
 
         bassScaleDegree = self.bassScaleDegreeFromNotation(self.figuresNotationObj)
-        bassPitch = useScale.pitchFromDegree(bassScaleDegree, direction=scale.DIRECTION_ASCENDING)
+        bassPitch = useScale.pitchFromDegree(bassScaleDegree, direction=scale.Direction.ASCENDING)
         pitches = [bassPitch]
         lastPitch = bassPitch
         numberNotes = len(self.figuresNotationObj.numbers)
@@ -2896,7 +2891,7 @@ class RomanNumeral(harmony.Harmony):
                                 + self.figuresNotationObj.numbers[i]
                                 - 1)
             newPitch = useScale.pitchFromDegree(thisScaleDegree,
-                                                direction=scale.DIRECTION_ASCENDING)
+                                                direction=scale.Direction.ASCENDING)
             pitchName = self.figuresNotationObj.modifiers[i].modifyPitchName(newPitch.name)
             newNewPitch = pitch.Pitch(pitchName)
             newNewPitch.octave = newPitch.octave
@@ -2949,7 +2944,7 @@ class RomanNumeral(harmony.Harmony):
                     alteration = addAccidental.count('#')
                 thisScaleDegree = (self.scaleDegree + stepNumber - 1)
                 addedPitch = useScale.pitchFromDegree(thisScaleDegree,
-                                                      direction=scale.DIRECTION_ASCENDING)
+                                                      direction=scale.Direction.ASCENDING)
                 if addedPitch.accidental is not None:
                     addedPitch.accidental.alter += alteration
                 else:
@@ -3690,22 +3685,22 @@ class Test(unittest.TestCase):
         s.append(p)
         targetCount = 1
         self.assertEqual(
-            len(s.flatten().getElementsByClass('KeySignature')),
+            len(s['KeySignature']),
             targetCount,
         )
         # through sequential iteration
         s1 = copy.deepcopy(s)
         for p in s1.parts:
-            for m in p.getElementsByClass('Measure'):
-                for e in m.getElementsByClass('KeySignature'):
+            for m in p.getElementsByClass(stream.Measure):
+                for e in m.getElementsByClass(key.KeySignature):
                     m.remove(e)
-        self.assertEqual(len(s1.flatten().getElementsByClass('KeySignature')), 0)
+        self.assertEqual(len(s1.flatten().getElementsByClass(key.KeySignature)), 0)
         s2 = copy.deepcopy(s)
         self.assertEqual(
-            len(s2.flatten().getElementsByClass('KeySignature')),
+            len(s2.flatten().getElementsByClass(key.KeySignature)),
             targetCount,
         )
-        for e in s2.flatten().getElementsByClass('KeySignature'):
+        for e in s2.flatten().getElementsByClass(key.KeySignature):
             for site in e.sites.get():
                 if site is not None:
                     site.remove(e)
@@ -3713,7 +3708,7 @@ class Test(unittest.TestCase):
         # yield elements and containers
         s3 = copy.deepcopy(s)
         self.assertEqual(
-            len(s3.flatten().getElementsByClass('KeySignature')),
+            len(s3.flatten().getElementsByClass(key.KeySignature)),
             targetCount,
         )
         for e in s3.recurse(streamsOnly=True):
@@ -3725,13 +3720,13 @@ class Test(unittest.TestCase):
         # yield containers
         s4 = copy.deepcopy(s)
         self.assertEqual(
-            len(s4.flatten().getElementsByClass('KeySignature')),
+            len(s4.flatten().getElementsByClass(key.KeySignature)),
             targetCount,
         )
         # do not remove in iteration.
         for c in list(s4.recurse(streamsOnly=False)):
             if isinstance(c, stream.Stream):
-                for e in c.getElementsByClass('KeySignature'):
+                for e in c.getElementsByClass(key.KeySignature):
                     c.remove(e)
 
     def testScaleDegreesA(self):

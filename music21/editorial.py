@@ -3,10 +3,10 @@
 # Name:         editorial.py
 # Purpose:      music21 classes for representing editorial information
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2008-2015 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -14,8 +14,8 @@
 Editorial objects store comments and other metadata associated with specific
 :class:`~music21.base.Music21Object` elements such as Notes.
 
-Some of the aspects of :class:`~music21.editorial.Editorial` objects
-represent very early (pre-v0.1) versions of music21.  Thus some of the
+Some aspects of :class:`~music21.editorial.Editorial` objects
+represent very early (pre-v0.1) versions of music21.  Thus some
 pre-defined aspects might be removed from documentation in the future.
 
 Access an editorial object by calling `.editorial` on any music21 object:
@@ -37,6 +37,7 @@ False
 >>> n.hasEditorialInformation
 True
 '''
+import typing as t
 import unittest
 from music21 import exceptions21
 from music21 import prebase
@@ -85,7 +86,7 @@ class Editorial(prebase.ProtoM21Object, dict):
         :width: 103
 
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'comments': '''
             a list of :class:`~music21.editorial.Comment` objects that represent any comments
             about the object.

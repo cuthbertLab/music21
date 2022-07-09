@@ -5,7 +5,7 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-14 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------

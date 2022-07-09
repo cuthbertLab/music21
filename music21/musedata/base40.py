@@ -5,7 +5,7 @@
 #
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2010 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -161,7 +161,7 @@ def base40DeltaToInterval(delta):
     would be of a very rare occurrence, and extreme intervals
     which would trigger an incorrect answer (C-- to C##, for
     instance, would return a diminished second, even though it's
-    a quadruple augmented unison) just would not occur.
+    a quadruplely augmented unison) just would not occur.
 
 
     >>> musedata.base40.base40DeltaToInterval(4)

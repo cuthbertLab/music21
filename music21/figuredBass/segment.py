@@ -4,7 +4,7 @@
 # Purpose:      figured bass note and notational realization.
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import collections
@@ -12,7 +12,7 @@ import copy
 import itertools
 import unittest
 
-from typing import Dict, Optional, Union
+import typing as t
 
 from music21 import chord
 from music21 import environment
@@ -27,7 +27,7 @@ from music21.figuredBass import rules
 
 _MOD = 'figuredBass.segment'
 
-_defaultRealizerScale: Dict[str, Optional[realizerScale.FiguredBassScale]] = {
+_defaultRealizerScale: t.Dict[str, t.Optional[realizerScale.FiguredBassScale]] = {
     'scale': None,  # singleton
 }
 
@@ -42,7 +42,7 @@ class Segment:
                   'resolveDominantSeventhSegment',
                   'resolveDiminishedSeventhSegment',
                   'resolveAugmentedSixthSegment']
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'bassNote': '''A :class:`~music21.note.Note` whose pitch
              forms the bass of each possibility.''',
         'numParts': '''The number of parts (including the bass) that possibilities
@@ -64,12 +64,12 @@ class Segment:
     }
 
     def __init__(self,
-                 bassNote: Union[str, note.Note] = 'C3',
-                 notationString: Optional[str] = None,
-                 fbScale: Optional[realizerScale.FiguredBassScale] = None,
-                 fbRules: Optional[rules.Rules] = None,
+                 bassNote: t.Union[str, note.Note] = 'C3',
+                 notationString: t.Optional[str] = None,
+                 fbScale: t.Optional[realizerScale.FiguredBassScale] = None,
+                 fbRules: t.Optional[rules.Rules] = None,
                  numParts=4,
-                 maxPitch: Union[str, pitch.Pitch] = 'B5',
+                 maxPitch: t.Union[str, pitch.Pitch] = 'B5',
                  listOfPitches=None):
         '''
         A Segment corresponds to a 1:1 realization of a bassNote and notationString
@@ -864,8 +864,8 @@ class OverlaidSegment(Segment):
 # HELPER METHODS
 # --------------
 def getPitches(pitchNames=('C', 'E', 'G'),
-               bassPitch: Union[str, pitch.Pitch] = 'C3',
-               maxPitch: Union[str, pitch.Pitch] = 'C8'):
+               bassPitch: t.Union[str, pitch.Pitch] = 'C3',
+               maxPitch: t.Union[str, pitch.Pitch] = 'C8'):
     '''
     Given a list of pitchNames, a bassPitch, and a maxPitch, returns a sorted list of
     pitches between the two limits (inclusive) which correspond to items in pitchNames.

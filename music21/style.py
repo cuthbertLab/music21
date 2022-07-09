@@ -3,9 +3,9 @@
 # Name:         style.py
 # Purpose:      Music21 classes for non-analytic display properties
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2016-22 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2016-22 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -13,7 +13,7 @@
 The style module represents information about the style of a Note, Accidental,
 etc. such that precise positioning information, layout, size, etc. can be specified.
 '''
-from typing import Optional, Union
+import typing as t
 import unittest
 
 from music21 import common
@@ -59,37 +59,44 @@ class Style(ProtoM21Object):
     20.4
 
     '''
-    _DOC_ATTR = {
-        'hideObjectOnPrint': '''if set to `True` will not print upon output
+    _DOC_ATTR: t.Dict[str, str] = {
+        'hideObjectOnPrint': '''
+            If set to `True`, the Music21Object will not print upon output
             (only used in MusicXML output at this point and
-            Lilypond for notes, chords, and rests).''',
+            in Lilypond output for notes, chords, and rests).
+            ''',
+        'units': '''
+            What distances are measured in.  The default "tenths" is a concept
+            borrowed from MusicXML which refers to 1/10th of the distance between
+            two staff lines.  It is currently also the only supported unit.
+            ''',
     }
 
     def __init__(self):
         self.size = None
 
-        self.relativeX: Optional[Union[float, int]] = None
-        self.relativeY: Optional[Union[float, int]] = None
-        self.absoluteX: Optional[Union[float, int]] = None
+        self.relativeX: t.Optional[t.Union[float, int]] = None
+        self.relativeY: t.Optional[t.Union[float, int]] = None
+        self.absoluteX: t.Optional[t.Union[float, int]] = None
 
         # managed by property below.
-        self._absoluteY: Optional[Union[float, int]] = None
+        self._absoluteY: t.Optional[t.Union[float, int]] = None
 
-        self._enclosure: Optional[Enclosure] = None
+        self._enclosure: t.Optional[Enclosure] = None
 
         # how should this symbol be represented in the font?
         # SMuFL characters are allowed.
         self.fontRepresentation = None
 
-        self.color: Optional[str] = None
+        self.color: t.Optional[str] = None
 
         self.units: str = 'tenths'
         self.hideObjectOnPrint: bool = False
 
-    def _getEnclosure(self) -> Optional[Enclosure]:
+    def _getEnclosure(self) -> t.Optional[Enclosure]:
         return self._enclosure
 
-    def _setEnclosure(self, value: Optional[Enclosure]):
+    def _setEnclosure(self, value: t.Optional[Enclosure]):
         if value is None:
             self._enclosure = value
         elif value == Enclosure.NONE:
@@ -181,7 +188,8 @@ class Style(ProtoM21Object):
                          doc='''
         Get or set the vertical position, where 0
         is the top line of the staff and units
-        are in 10ths of a staff space.
+        are whatever is defined in `.units`, generally "tenths", meaning
+        1/10th of a staff space.
 
         Other legal positions are 'above' and 'below' which
         are synonyms for 10 and -70 respectively (for 5-line
@@ -210,14 +218,54 @@ class NoteStyle(Style):
     '''
     A Style object that also includes stem and accidental style information.
 
-    Beam style is stored on the Beams object, as is lyric style
+    Beam style is stored on the Beams object.  Lyric style is stored on the Lyric
+    object.
     '''
+    _DOC_ATTR: t.Dict[str, str] = {
+        'stemStyle': '''
+            An optional style.Style object describing what the stem looks like.
+
+            >>> n = note.Note()
+            >>> n.style.stemStyle is None
+            True
+
+            Note that stemStyle is not created automatically.  Users must
+            instantiate a :class:`~music21.style.Style` object.
+
+            >>> n.style.stemStyle = style.Style()
+            >>> n.style.stemStyle.color = 'red'
+            ''',
+        'accidentalStyle': '''
+            An optional style.Style object describing what the accidental looks like.
+
+            >>> n = note.Note()
+            >>> n.style.accidentalStyle is None
+            True
+
+            Note that accidentalStyle is not created automatically.  Users must
+            instantiate a :class:`~music21.style.Style` object.
+
+            >>> n.style.accidentalStyle = style.Style()
+            >>> n.style.accidentalStyle.relativeX = -2.0
+
+            Note: do not use .hideObjectOnPrint in accidentalStyle to hide the
+            accidental.  Set the displayType on the Accidental itself.
+
+            This object may eventually move to Note.pitch.accidental.style.
+            ''',
+        'noteSize': '''
+            An optional string representing the size of the note as a type of note.
+
+            Valid values are None (=normal), `'cue'`, `'grace'`, `'graceCue'`, and `'large'`
+            (taken from MusicXML, with "graceCue" replacing "grace-cue").
+            ''',
+    }
 
     def __init__(self):
         super().__init__()
-        self.stemStyle = None
-        self.accidentalStyle = None
-        self.noteSize = None  # can be 'cue' etc.
+        self.stemStyle: t.Optional[Style] = None
+        self.accidentalStyle: t.Optional[Style] = None
+        self.noteSize: t.Optional[str] = None  # can be 'cue' etc.
 
 
 class TextStyle(Style):
@@ -570,8 +618,8 @@ class StyleMixin(common.SlottedObjectMixin):
 
     def __init__(self):
         #  no need to call super().__init__() on SlottedObjectMixin
-        self._style: Optional[Style] = None
-        self._editorial: Optional['music21.editorial.Editorial'] = None
+        self._style: t.Optional[Style] = None
+        self._editorial: t.Optional['music21.editorial.Editorial'] = None
 
     @property
     def hasStyleInformation(self) -> bool:

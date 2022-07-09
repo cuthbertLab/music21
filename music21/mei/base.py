@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         mei/base.py
-# Purpose:      Public methods for the MEI module
+# Purpose:      Public interfaces for the MEI module
 #
 # Authors:      Christopher Antila
 #
-# Copyright:    Copyright © 2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2014 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-These are the public methods for the MEI module by Christopher Antila
+These are the public interfaces for the MEI module by Christopher Antila
 
 To convert a string with MEI markup into music21 objects,
 use :meth:`~music21.mei.MeiToM21Converter.convertFromString`.
@@ -173,7 +173,7 @@ tool.
 * <sb>: a system break
 
 '''
-from typing import Optional, Union, List, Tuple
+import typing as t
 from xml.etree.ElementTree import Element, ParseError, fromstring, ElementTree
 
 from collections import defaultdict
@@ -200,8 +200,7 @@ from music21 import stream
 from music21 import spanner
 from music21 import tie
 
-_MOD = 'mei.base'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('mei.base')
 
 
 # Module-Level Constants
@@ -342,8 +341,8 @@ class MeiToM21Converter:
 # -----------------------------------------------------------------------------
 def safePitch(
     name: str,
-    accidental: Optional[str] = None,
-    octave: Union[str, int] = ''
+    accidental: t.Optional[str] = None,
+    octave: t.Union[str, int] = ''
 ) -> pitch.Pitch:
     '''
     Safely build a :class:`~music21.pitch.Pitch` from a string.
@@ -381,7 +380,7 @@ def safePitch(
 
 
 def makeDuration(
-    base: Union[float, int, Fraction] = 0.0,
+    base: t.Union[float, int, Fraction] = 0.0,
     dots: int = 0
 ) -> 'music21.duration.Duration':
     '''
@@ -413,7 +412,7 @@ def makeDuration(
     return returnDuration
 
 
-def allPartsPresent(scoreElem) -> Tuple[str, ...]:
+def allPartsPresent(scoreElem) -> t.Tuple[str, ...]:
     # noinspection PyShadowingNames
     '''
     Find the @n values for all <staffDef> elements in a <score> element. This assumes that every
@@ -622,7 +621,7 @@ def _makeArticList(attr):
     return articList
 
 
-def _getOctaveShift(dis, disPlace):
+def _getOctaveShift(dis: t.Union[t.Literal['8', '15', '22'], None], disPlace: str) -> int:
     '''
     Use :func:`_getOctaveShift` to calculate the :attr:`octaveShift` attribute for a
     :class:`~music21.clef.Clef` subclass. Any of the arguments may be ``None``.
@@ -953,7 +952,7 @@ def _ppConclude(theConverter):
 # Helper Functions
 # -----------------------------------------------------------------------------
 def _processEmbeddedElements(
-    elements: List[Element],
+    elements: t.List[Element],
     mapping,
     callerTag=None,
     slurBundle=None
@@ -1033,7 +1032,7 @@ def _timeSigFromAttrs(elem):
     return meter.TimeSignature(f"{elem.get('meter.count')!s}/{elem.get('meter.unit')!s}")
 
 
-def _keySigFromAttrs(elem: Element) -> Union[key.Key, key.KeySignature]:
+def _keySigFromAttrs(elem: Element) -> t.Union[key.Key, key.KeySignature]:
     '''
     From any tag with (at minimum) either @key.pname or @key.sig attributes, make a
     :class:`KeySignature` or :class:`Key`, as possible.

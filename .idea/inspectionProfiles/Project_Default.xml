@@ -35,6 +35,9 @@
           <option value="http://tiles.apache.org/" />
           <option value="http://www.musicxml.org" />
           <option value="http://www.datypic.com" />
+          <option value="http://somesite.com" />
+          <option value="http://mit.edu" />
+          <option value="http://" />
         </list>
       </option>
     </inspection_tool>

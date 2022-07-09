@@ -5,9 +5,9 @@
 #               elements and which can be manipulated quickly in a tree
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-15 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -15,10 +15,10 @@
 Tools for grouping notes and chords into a searchable tree
 organized by start and stop offsets.
 '''
-
 import copy
-import unittest
 from math import inf
+import typing as t
+import unittest
 
 from music21 import environment
 from music21 import exceptions21
@@ -297,7 +297,7 @@ class ElementTimespan(Timespan):
     '''
 
     # CLASS VARIABLES #
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'parentage': r'''
             The Stream hierarchy above the element in a ElementTimespan.
 
@@ -394,7 +394,7 @@ class ElementTimespan(Timespan):
             ):
         '''
         Create a new object that is identical to the calling object
-        but with some of the parameters overridden.
+        but with some parameters overridden.
 
         >>> n = note.Note('C#')
         >>> pts = tree.spans.PitchedTimespan(n, offset=11.0, endTime=12.0)

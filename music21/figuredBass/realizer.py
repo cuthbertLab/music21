@@ -5,7 +5,7 @@
 #                and figures in a given key.
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -41,10 +41,10 @@ See :meth:`~music21.figuredBass.realizer.figuredBassFromStream` for more details
 >>> allSols2.getNumSolutions()
 30
 '''
-
 import collections
 import copy
 import random
+import typing as t
 import unittest
 
 
@@ -220,12 +220,18 @@ class FiguredBassLine:
     <music21.meter.TimeSignature 3/4>
     '''
     _DOC_ORDER = ['addElement', 'generateBassLine', 'realize']
-    _DOC_ATTR = {'inKey': 'A :class:`~music21.key.Key` which implies a scale value, '
-                    'scale mode, and key signature for a '
-                    ':class:`~music21.figuredBass.realizerScale.FiguredBassScale`.',
-                 'inTime': 'A :class:`~music21.meter.TimeSignature` which specifies the '
-                    'time signature of realizations outputted to a '
-                    ':class:`~music21.stream.Score`.'}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'inKey': '''
+            A :class:`~music21.key.Key` which implies a scale value,
+            scale mode, and key signature for a
+            :class:`~music21.figuredBass.realizerScale.FiguredBassScale`.
+            ''',
+        'inTime': '''
+            A :class:`~music21.meter.TimeSignature` which specifies the
+            time signature of realizations outputted to a
+            :class:`~music21.stream.Score`.
+            ''',
+    }
 
     def __init__(self, inKey=None, inTime=None):
         if inKey is None:
@@ -332,8 +338,8 @@ class FiguredBassLine:
 
         bl2 = bassLine.makeNotation(inPlace=False, cautionaryNotImmediateRepeat=False)
         if r is not None:
-            m0 = bl2.getElementsByClass('Measure').first()
-            m0.remove(m0.getElementsByClass('Rest').first())
+            m0 = bl2.getElementsByClass(stream.Measure).first()
+            m0.remove(m0.getElementsByClass(note.Rest).first())
             m0.padAsAnacrusis()
         return bl2
 
@@ -572,10 +578,13 @@ class Realization:
                   'generateRandomRealizations', 'generateAllRealizations',
                   'getAllPossibilityProgressions', 'getRandomPossibilityProgression',
                   'generateRealizationFromPossibilityProgression']
-    _DOC_ATTR = {'keyboardStyleOutput': '''True by default. If True, generated realizations
-                        are represented in keyboard style, with two staves. If False,
-                        realizations are represented in chorale style with n staves,
-                        where n is the number of parts. SATB if n = 4.'''}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'keyboardStyleOutput': '''
+            True by default. If True, generated realizations
+            are represented in keyboard style, with two staves. If False,
+            realizations are represented in chorale style with n staves,
+            where n is the number of parts. SATB if n = 4.''',
+    }
 
     def __init__(self, **fbLineOutputs):
         # fbLineOutputs always will have three elements, checks are for sphinx documentation only.

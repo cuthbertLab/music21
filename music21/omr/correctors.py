@@ -4,9 +4,9 @@
 # Purpose:      music21 modules for correcting the output from OMR software
 #
 # Authors:      Maura Church
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
+# Copyright:    Copyright © 2014 Maura Church, Michael Scott Asato Cuthbert, and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy
@@ -16,6 +16,7 @@ import math
 import os
 
 from music21 import note
+from music21 import stream
 
 pathName = os.path.dirname(__file__)
 
@@ -164,7 +165,7 @@ class ScoreCorrector:
     def verticalProbabilityDist(self):
         '''
         Uses a score and returns an array of probabilities.
-        For n in the array, n is the the probability that the nth part
+        For n in the array, n is the probability that the nth part
 
         '''
         if self.distributionArray is not None:
@@ -313,7 +314,7 @@ class ScoreCorrector:
             self.singleParts[destinationVerticalIndex].measureStream[destinationHorizontalIndex])
         # Measure object
         correctMeasure = self.singleParts[sourceVerticalIndex].measureStream[sourceHorizontalIndex]
-        oldNotePitches = [n.pitch for n in incorrectMeasure.getElementsByClass('Note')]
+        oldNotePitches = [n.pitch for n in incorrectMeasure.getElementsByClass(note.Note)]
         for el in incorrectMeasure.elements:
             incorrectMeasure.remove(el)
 
@@ -427,11 +428,12 @@ class SinglePart:
             self.incorrectMeasures = None
 
     def getMeasures(self):
-        self.measureStream = self.scorePart.getElementsByClass('Measure')
+        self.measureStream = self.scorePart.getElementsByClass(stream.Measure)
 
         return self.measureStream
 
     def getIncorrectMeasureIndices(self, runFast=False):
+        # noinspection PyShadowingNames
         '''
         Returns an array of all the measures that OMR software would flag - that is,
         measures that do
@@ -469,7 +471,7 @@ class SinglePart:
         if runFast is True:
             try:
                 m = self.measureStream[0]
-                ts = m.timeSignature or m.getContextByClass('TimeSignature')
+                ts = m.timeSignature or m.getContextByClass(meter.TimeSignature)
             except IndexError:
                 ts = meter.TimeSignature('4/4')
             if ts is None:
@@ -480,7 +482,7 @@ class SinglePart:
         for i in range(len(self.measureStream)):
             if runFast is False:
                 m = self.measureStream[i]
-                ts = m.timeSignature or m.getContextByClass('TimeSignature')
+                ts = m.timeSignature or m.getContextByClass(meter.TimeSignature)
             tsOmr = ts.barDuration.quarterLength
             if self.measureStream[i].duration.quarterLength == tsOmr:
                 continue
@@ -497,7 +499,7 @@ class SinglePart:
         returns an array of hashed strings
         '''
         measureStreamNotes = []
-        measureStreamMeasures = self.measureStream.getElementsByClass('Measure')
+        measureStreamMeasures = self.measureStream.getElementsByClass(stream.Measure)
 
         for i in range(len(measureStreamMeasures)):
             mh = MeasureHash(measureStreamMeasures[i])
@@ -509,7 +511,7 @@ class SinglePart:
     def horizontalProbabilityDist(self, regenerate=False):
         '''
         Uses (takes?) an array of hashed measures and returns an array of probabilities.
-        For n in the array, n is the the probability that the measure (n-(length of score)) away
+        For n in the array, n is the probability that the measure (n-(length of score)) away
         from a flagged measure will offer a rhythmic solution.
 
         These are the probabilities that, within a part, a measure offers a solution, given its
@@ -646,7 +648,7 @@ class MeasureSlice:
             self.sliceMeasureHashObjects.append(mh)
         return self.sliceMeasureHashObjects
         # do we want to put this method in the init, so that we call
-        # it once and it gets both measures and hashes?
+        # it once, and it would get both measures and hashes?
 
     def runSliceSearch(self, incorrectPartIndex):
         '''
@@ -766,6 +768,7 @@ class MeasureHash:
         return hashString
 
     def hashNote(self, n):
+        # noinspection PyShadowingNames
         '''
         Encodes a note
 
@@ -808,6 +811,7 @@ class MeasureHash:
         return byteEncoding
 
     def hashRest(self, r):
+        # noinspection PyShadowingNames
         '''
         Encodes a rest
 
@@ -815,7 +819,6 @@ class MeasureHash:
         >>> hasher = omr.correctors.MeasureHash()
         >>> hasher.hashRest(r)
         'Q'
-
         '''
         duration1to127 = self.hashQuarterLength(r.duration.quarterLength)
 
@@ -918,8 +921,9 @@ class MeasureHash:
 
     # noinspection SpellCheckingInspection
     def getProbabilityBasedOnChanges(self, otherHash):
+        # noinspection PyShadowingNames
         '''
-        Takes a hash string
+        Takes a hash string and gets the probability based on changes.
 
         >>> otherHash = 'e'
         >>> hashString = 'GFPGF'
@@ -954,7 +958,7 @@ class MeasureHash:
         return allProbability
 
     def differenceProbabilityForOneOpCode(self, opCodeTuple, source, destination=None):
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection,PyShadowingNames
         '''
         Given an opCodeTuple and a source, differenceProbabilityForOneOpCode
         returns the difference probability for one type of op-code

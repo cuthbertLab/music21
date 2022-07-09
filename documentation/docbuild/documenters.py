@@ -5,16 +5,16 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #               Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-17 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 
 import inspect
 import re
 import types
-from typing import List
+import typing as t
 import unittest
 
 from music21 import common
@@ -82,7 +82,12 @@ class ObjectDocumenter(Documenter):
     Base class for object documenting sub-classes. such as ClassDocumenter
     '''
 
-    _DOC_ATTR = {'referent': 'the object being documented'}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'referent':
+            ''''
+            The object being documented.
+            ''',
+    }
     # INITIALIZER #
 
     sphinxCrossReferenceRole = ''
@@ -97,7 +102,7 @@ class ObjectDocumenter(Documenter):
         return ''
 
     @property
-    def rstAutodocDirectiveFormat(self) -> List[str]:
+    def rstAutodocDirectiveFormat(self) -> t.List[str]:
         return []
 
     @property
@@ -168,7 +173,7 @@ class FunctionDocumenter(ObjectDocumenter):
         return path.replace('.__init__', '')
 
     @property
-    def rstAutodocDirectiveFormat(self) -> List[str]:
+    def rstAutodocDirectiveFormat(self) -> t.List[str]:
         '''
         >>> function = common.opFrac
         >>> documenter = FunctionDocumenter(function)
@@ -187,7 +192,7 @@ class MemberDocumenter(ObjectDocumenter):
     '''
     Abstract base class for documenting class members such as Methods and Attributes and Properties
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'memberName': 'the short name of the member, for instance "mode"',
         'referent': '''the attribute or method itself, such as (no quotes)
                        key.KeySignature.mode''',
@@ -837,9 +842,7 @@ class ClassDocumenter(ObjectDocumenter):
         <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>
         <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.sorted>
         <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.spanners>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.variants>
         <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.voices>
-
         '''
         return self._readonlyProperties
 

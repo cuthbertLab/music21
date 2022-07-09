@@ -3,10 +3,10 @@
 # Name:         serial.py
 # Purpose:      music21 classes for serial transformations
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -14,13 +14,12 @@ This module defines objects for defining and manipulating structures
 common to serial and/or twelve-tone music,
 including :class:`~music21.serial.ToneRow` subclasses.
 
-Serial searching methods that were previously here have been moved to `alpha.search.serial`
+Serial searching methods that were previously here have been moved to
+:mod:`~music21.search.serial`.
 '''
-
 import unittest
 import copy
-from typing import Union, List, Any
-import warnings
+import typing as t
 
 from music21 import exceptions21
 
@@ -31,8 +30,7 @@ from music21 import pitch
 
 from music21 import environment
 
-_MOD = 'serial'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('serial')
 
 
 # ------------------------------------------------------------------------------
@@ -261,17 +259,17 @@ class ToneRow(stream.Stream):
 
     Unlike a normal Stream, the first argument is assumed to be a ToneRow:
 
-    >>> t = serial.ToneRow([10, 9, 4, 5, 6, 3, 2, 8, 7, 11, 0, 1])
+    >>> toneRow = serial.ToneRow([10, 9, 4, 5, 6, 3, 2, 8, 7, 11, 0, 1])
 
     The representation of a ToneRow will be the contents:
 
-    >>> t
+    >>> toneRow
     <music21.serial.ToneRow A94563287B01>
 
     Unless (like a Stream), the id is set:
 
-    >>> t.id = 'retrograde_jungfrau'
-    >>> t
+    >>> toneRow.id = 'retrograde_jungfrau'
+    >>> toneRow
     <music21.serial.ToneRow retrograde_jungfrau>
 
     A ToneRow does not need to have twelve pitches, like this ten-tone row
@@ -283,7 +281,7 @@ class ToneRow(stream.Stream):
     >>> len(rcsRow)
     10
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'row': 'A list representing the pitch class values of the row.',
     }
 
@@ -358,7 +356,7 @@ class ToneRow(stream.Stream):
 
     def isTwelveToneRow(self):
         '''
-        Describes whether or not a :class:`~music21.serial.ToneRow` constitutes
+        Describes whether a :class:`~music21.serial.ToneRow` constitutes
         a twelve-tone row. Note that a
         :class:`~music21.serial.TwelveToneRow` object might not be a twelve-tone row.
 
@@ -557,7 +555,7 @@ class ToneRow(stream.Stream):
 
         return self.zeroCenteredTransformation(transformationType, newIndex)
 
-    def findZeroCenteredTransformations(self, otherRow) -> Union[bool, List[Any]]:
+    def findZeroCenteredTransformations(self, otherRow) -> t.Union[bool, t.List[t.Any]]:
         '''
         Gives the list of zero-centered serial transformations
         taking one :class:`~music21.serial.ToneRow`
@@ -670,7 +668,7 @@ class TwelveToneRow(ToneRow):
     '''
     # row = None
 
-    # _DOC_ATTR = {
+    # _DOC_ATTR: t.Dict[str, str] = {
     # 'row': 'A list representing the pitch class values of the row.',
     # }
 
@@ -705,22 +703,20 @@ class TwelveToneRow(ToneRow):
         ...
         >>> [str(e.pitch) for e in s37[0]]
         ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-', 'F#', 'F', 'E', 'A']
-
-
         '''
         # note: do not want to return a TwelveToneRow() type, as this will
         # add again the same pitches to the elements list twice.
-        noteList = self.getElementsByClass('Note')
+        noteList = self.getElementsByClass(note.Note)
 
         i = [(12 - x.pitch.pitchClass) % 12 for x in noteList]
-        matrix = [[(x.pitch.pitchClass + t) % 12 for x in noteList] for t in i]
+        matrix = [[(x.pitch.pitchClass + trans) % 12 for x in noteList] for trans in i]
 
         matrixObj = TwelveToneMatrix()
         i = 0
         for row in matrix:
             i += 1
-            rowObject = copy.copy(self)
-            rowObject.elements = []
+            rowObject = self.__class__()
+            rowObject.mergeAttributes(self)
             rowObject.id = 'row-' + str(i)
             for p in row:  # iterate over pitch class values
                 n = note.Note()
@@ -758,8 +754,8 @@ class TwelveToneRow(ToneRow):
     def findTransformedHistorical(self, convention):
         '''
         Checks if a given :class:`music21.serial.TwelveToneRow` is a transformation of
-        any of the historical
-        twelve-tone rows stored by music21: see :func:`music21.serial.getHistoricalRowByName`.
+        any historical
+        twelve-tone row stored by music21 (see :func:`music21.serial.getHistoricalRowByName`).
         Returns a list
         of tuples, the tuple consisting of the name of a historical row, and a
         list of transformations relating
@@ -791,9 +787,9 @@ class TwelveToneRow(ToneRow):
         else:
             raise SerialException("Invalid convention - choose 'zero' or 'original'.")
 
-    def isAllInterval(self):
+    def isAllInterval(self) -> bool:
         '''
-        Describes whether or not a :class:`~music21.serial.TwelveToneRow` is an all-interval row.
+        Describes whether a :class:`~music21.serial.TwelveToneRow` is an all-interval row.
 
         >>> chromatic = serial.pcToToneRow(range(12))
         >>> chromatic.pitchClasses()
@@ -1015,9 +1011,9 @@ class TwelveToneRow(ToneRow):
         else:
             return classification, specialIntervals
 
-    def isLinkChord(self):
+    def isLinkChord(self) -> bool:
         '''
-        Describes whether or not a :class:`~music21.serial.TwelveToneRow` is a Link Chord.
+        Describes whether a :class:`~music21.serial.TwelveToneRow` is a Link Chord.
 
         >>> bergLyric = serial.getHistoricalRowByName('BergLyricSuite')
         >>> bergLyric.pitchClasses()
@@ -1039,9 +1035,13 @@ class TwelveToneRow(ToneRow):
         else:
             return True
 
-    def areCombinatorial(self, transType1, index1, transType2, index2, unused_convention=None):
+    def areCombinatorial(self,
+                         transType1: str,
+                         index1: int,
+                         transType2: str,
+                         index2: int) -> bool:
         '''
-        Describes whether or not two transformations of a twelve-tone row are combinatorial.
+        Describes whether two transformations of a twelve-tone row are combinatorial.
 
         The first and second arguments describe one transformation, while the third and fourth
         describe another.
@@ -1080,10 +1080,6 @@ class TwelveToneRow(ToneRow):
         if self.isTwelveToneRow() is False:
             raise SerialException('Combinatoriality applies only to twelve-tone rows.')
 
-        if unused_convention is not None:
-            # TODO: remove in v.8
-            warnings.warn('convention is unnecessary and will be removed in v.8')
-
         # choice of convention does not matter
         trans1 = self.zeroCenteredTransformation(transType1, index1)
         trans2 = self.zeroCenteredTransformation(transType2, index2)
@@ -1100,21 +1096,33 @@ class HistoricalTwelveToneRow(TwelveToneRow):
     Subclass of :class:`~music21.serial.TwelveToneRow` storing additional attributes of a
     twelve-tone row used in the historical literature.
     '''
-    _DOC_ATTR = {
-        'composer': 'The name of the composer.',
-        'opus': 'The opus of the work, or None.',
-        'title': 'The title of the work.',
+    _DOC_ATTR: t.Dict[str, str] = {
+        'composer': 'The name of the composer, or None.  (String)',
+        'opus': 'The opus of the work, or None.  (String)',
+        'title': 'The title of the work, or None.  (String)',
     }
 
-    composer = None
-    opus = None
-    title = None
+    composer: t.Union[None, str] = None
+    opus: t.Union[None, str] = None
+    title: t.Union[None, str] = None
 
-    def __init__(self, composer=None, opus=None, title=None, row=None):
+    def __init__(self,
+                 composer: t.Union[None, str] = None,
+                 opus: t.Union[None, str] = None,
+                 title: t.Union[None, str] = None,
+                 row=None):
         super().__init__(row)
         self.composer = composer
         self.opus = opus
         self.title = title
+
+    def mergeAttributes(self, other):
+        super().mergeAttributes(other)
+        if not isinstance(other, HistoricalTwelveToneRow):
+            return
+        self.composer = other.composer
+        self.opus = other.opus
+        self.title = other.title
 
     def _reprInternal(self):
         return f'{self.composer} {self.opus} {self.title}'
@@ -1237,6 +1245,7 @@ def getHistoricalRowByName(rowName):
 
 
 def pcToToneRow(pcSet):
+    # noinspection GrazieInspection
     '''
     A convenience function that, given a list of pitch classes represented as integers
     and turns it in to a :class:`~music21.serial.ToneRow` object.
@@ -1304,7 +1313,7 @@ def pcToToneRow(pcSet):
     return a
 
 
-def rowToMatrix(p: List[int]) -> str:
+def rowToMatrix(p: t.List[int]) -> str:
     # noinspection PyShadowingNames
     '''
     Takes a list of numbers of converts it to a string representation of a
@@ -1348,7 +1357,7 @@ def rowToMatrix(p: List[int]) -> str:
     '''
 
     i = [(12 - x) % 12 for x in p]
-    matrix = [[(x + t) % 12 for x in p] for t in i]
+    matrix = [[(x + trans) % 12 for x in p] for trans in i]
 
     ret = []
     for row in matrix:
@@ -1369,10 +1378,10 @@ class Test(unittest.TestCase):
                          ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B'])
         s37 = getHistoricalRowByName('SchoenbergOp37').matrix()
         r0 = s37[0]
-        # r0 is TOO an iterable
+        # r0 is in fact an iterable object
         # pylint: disable=not-an-iterable
-        self.assertEqual([e.name for e in r0], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-',
-                                                    'F#', 'F', 'E', 'A'])
+        self.assertEqual([e.name for e in r0],
+                         ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-', 'F#', 'F', 'E', 'A'])
 
     def testLabelingA(self):
         from music21 import corpus

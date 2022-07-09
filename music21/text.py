@@ -3,10 +3,10 @@
 # Name:         text.py
 # Purpose:      music21 classes for text processing
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -23,8 +23,7 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import style
 
-_MOD = 'text'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('text')
 
 
 
@@ -462,7 +461,7 @@ class LanguageDetector:
 
 # ------------------------------------------------------------------------------
 class Trigram:
-    # noinspection SpellCheckingInspection
+    # noinspection SpellCheckingInspection,GrazieInspection
     '''
     See LanguageDetector above.
     From https://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/

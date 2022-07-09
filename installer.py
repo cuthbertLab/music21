@@ -4,9 +4,9 @@
 # Purpose:       install and configure
 #
 # Authors:       Christopher Ariza
-#                Michael Scott Cuthbert
+#                Michael Scott Asato Cuthbert
 #
-# Copyright:     (c) 2009-2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:     (c) 2009-2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:       BSD, see license.txt
 # ------------------------------------------------------------------------------
 
