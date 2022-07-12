@@ -515,6 +515,42 @@ class Test(unittest.TestCase):
                 self.assertIsNone(arp)
                 self.assertIsNone(nonarp)
 
+    def testArpeggioMarkSpanners(self):
+        expectedNumber = (
+            #  three-note chord with single-chord arpeggio
+            None,
+            None,
+            None,
+            #  three-note chord in a multi-chord (cross-voice) arpeggio (number == 1)
+            '1',
+            '1',
+            '1',
+            #  backup and do next voice
+            #  three-note chord with single-chord arpeggio
+            None,
+            None,
+            None,
+            #  three-note chord in that same multi-chord (cross-voice) arpeggio (number == 1)
+            '1',
+            '1',
+            '1',
+        )
+
+        s = converter.parse(testPrimitive.multiStaffArpeggios)
+        x = self.getET(s)
+        mxPart = x.find('part')
+        mxMeasure = mxPart.find('measure')
+        for note_index, mxNote in enumerate(mxMeasure.findall('note')):
+            with self.subTest(note_index=note_index):
+                arp = None
+                arpnum = None
+                notations = mxNote.find('notations')
+                if notations is not None:
+                    arp = notations.find('arpeggiate')
+                if arp is not None:
+                    arpnum = arp.get('number')
+                self.assertEqual(arpnum, expectedNumber[note_index])
+
 
     def testExportChordSymbolsWithRealizedDurations(self):
         gex = GeneralObjectExporter()
