@@ -920,8 +920,11 @@ class MusicXMLImporter(XMLParserBase):
 
         self.partGroups()
 
+        # Mark all ArpeggioMarkSpanners as complete (now that we've parsed all the Parts)
+        for sp in self.spannerBundle.getByClass(expressions.ArpeggioMarkSpanner):
+            sp.completeStatus = True
+
         # copy spanners that are complete into the Score.
-        # basically just the StaffGroups for now.
         rm = []
         for sp in self.spannerBundle.getByCompleteStatus(True):
             self.stream.coreInsert(0, sp)
@@ -3645,15 +3648,28 @@ class MeasureParser(XMLParserBase):
             n.expressions.append(fermata)
 
         # get any arpeggios, store in expressions.
-        for mxObj in mxNotations.findall('arpeggiate'):
-            arpeggioType: str = mxObj.get('direction')
-            arpeggio = expressions.ArpeggioMark(arpeggioType)
-            n.expressions.append(arpeggio)
-
-        # get any non-arpeggio marks, store in expressions.
-        for mxObj in mxNotations.findall('non-arpeggiate'):
-            nonArpeggio = expressions.ArpeggioMark('non-arpeggio')
-            n.expressions.append(nonArpeggio)
+        for tagSearch in ('arpeggiate', 'non-arpeggiate'):
+            for mxObj in mxNotations.findall(tagSearch):
+                arpeggioType: str = ''
+                if tagSearch == 'non-arpeggiate':
+                    arpeggioType = 'non-arpeggio'
+                else:
+                    arpeggioType = mxObj.get('direction')
+                idFound: t.Optional[str] = mxObj.get('number')
+                if idFound is None:
+                    arpeggio = expressions.ArpeggioMark(arpeggioType)
+                    n.expressions.append(arpeggio)
+                else:
+                    sb = self.spannerBundle.getByClassIdLocalComplete(
+                        expressions.ArpeggioMarkSpanner, idFound, False)
+                    if sb:
+                        # if we already have a spanner matching
+                        arpeggioSpanner = sb[0]
+                    else:
+                        arpeggioSpanner = expressions.ArpeggioMarkSpanner(arpeggioType)
+                        arpeggioSpanner.idLocal = idFound
+                        self.spannerBundle.append(arpeggioSpanner)
+                    arpeggioSpanner.addSpannedElements(n)
 
         for mxObj in flatten(mxNotations, 'ornaments'):
             if mxObj.tag in xmlObjects.ORNAMENT_MARKS:

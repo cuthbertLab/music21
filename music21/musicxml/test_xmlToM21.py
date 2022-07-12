@@ -1175,6 +1175,22 @@ class Test(unittest.TestCase):
 
                     gnote_index += 1
 
+    def testArpeggioMarkSpanners(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.multiStaffArpeggios)
+        sb = s.spannerBundle.getByClass(expressions.ArpeggioMarkSpanner)
+        self.assertIsNotNone(sb)
+        sp = sb[0]
+        # go find all the chords and check for spanner vs expressions
+        chords: [chord.Chord] = []
+        for i, p in enumerate(s.parts):
+            # ArpeggioMarkSpanner spans the second chord (index == 1) across both parts
+            chords.append(p[chord.Chord][1])
+
+        for spanned, ch in zip(sp, chords):
+            self.assertIs(spanned, ch)
 
     def testHiddenRests(self):
         from music21 import converter
