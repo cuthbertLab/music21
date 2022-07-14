@@ -435,7 +435,7 @@ def _lcmRecurse(filterList):
             environLocal.printDebug(['lcm timed out'])
             lcmVal = None
             break
-        lcmVal = lcm(lcmVal, filterList[i])
+        lcmVal = lcm([lcmVal, filterList[i]])
     return lcmVal
 
 
