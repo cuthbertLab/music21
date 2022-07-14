@@ -1579,8 +1579,10 @@ class System(stream.Score):
     '''
     Designation that all the music in this Stream
     belongs on a single notated system.
-    '''
 
+    Attribute systemNumbering says at what point the numbering of
+    systems resets.  It can be either "Score" (default), "Opus", or "Page".
+    '''
     def __init__(self, *args, **keywords):
         super().__init__(*args, **keywords)
         self.systemNumber = 0
@@ -1589,6 +1591,7 @@ class System(stream.Score):
         self.pageSystemNumber = 0
 
         self.systemLayout = None
+        self.systemNumbering = 'Score'  # or Page; when do system numbers reset?
         self.measureStart = None
         self.measureEnd = None
 
