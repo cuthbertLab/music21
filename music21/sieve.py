@@ -57,7 +57,7 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of
 '''
 from ast import literal_eval
 import copy
-from math import lcm, gcd
+from math import gcd
 import random
 import string
 import unittest
@@ -67,6 +67,7 @@ from music21 import exceptions21
 from music21 import pitch
 from music21 import common
 from music21 import interval
+from music21.common.numberTools import lcm
 
 from music21 import environment
 environLocal = environment.Environment('sieve')
