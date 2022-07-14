@@ -17,7 +17,7 @@ import unittest
 import typing as t
 
 from fractions import Fraction
-from math import isclose
+from math import isclose, gcd
 
 from music21 import defaults
 from music21.common import deprecated
@@ -37,6 +37,7 @@ __all__ = [
     'dotMultiplier', 'decimalToTuplet',
     'unitNormalizeProportion', 'unitBoundaryProportion',
     'weightedSelection',
+    'lcm',
     'approximateGCD',
 
     'contiguousList',
@@ -851,12 +852,10 @@ def approximateGCD(values: t.List[t.Union[int, float]], grain: float = 1e-4) -> 
     return max(commonUniqueDivisions)
 
 
-@deprecated('v8', 'v9', 'Use math.lcm(*filterList) instead.')
 def lcm(filterList: t.Iterable[int]) -> int:
     '''
     Find the least common multiple of a list of values
 
-    ```
     >>> common.lcm([3, 4, 5])
     60
     >>> common.lcm([3, 4])
@@ -865,21 +864,19 @@ def lcm(filterList: t.Iterable[int]) -> int:
     2
     >>> common.lcm([3, 6])
     6
-    ```
 
     Works with any iterable, like this set
 
-    ```
     >>> common.lcm({3, 5, 6})
     30
-    ```
 
-    Deprecated in v8 since math.lcm works in C and is faster
+    To be deprecated in v.8 once Python 3.9 is the minimum version
+    since math.lcm works in C and is faster
     '''
     def _lcm(a, b):
         '''find the least common multiple of a, b'''
         # // forces integer style division (no remainder)
-        return abs(a * b) // euclidGCD(a, b)
+        return abs(a * b) // gcd(a, b)
 
     # derived from
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022

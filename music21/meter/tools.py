@@ -267,7 +267,7 @@ def fractionSum(numDenomTuple: NumDenomTuple) -> NumDenom:
         return (n, d)
     else:  # there might be a better way to do this
         d = 1
-        d = math.lcm(dListUnique)
+        d = common.numberTools.lcm(dListUnique)
         # after finding d, multiply each numerator
         nShift = []
         for i in range(len(nList)):
