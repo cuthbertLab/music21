@@ -990,7 +990,7 @@ class CompressionSegment:
 # ------------------------------------------------------------------------------
 
 # http://docs.python.org/lib/set-objects.html
-# set object precedence is places & before |
+# set object precedence: & before |
 
 # >>> a = set([3, 4])
 # >>> b = set([4, 5])
