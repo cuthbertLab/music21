@@ -7050,7 +7050,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 # of all others
                 qLen = notes_and_rests[posConnected[0]].quarterLength
                 if not notes_and_rests[posConnected[0]].duration.linked:
-                        # obscure bug found from some inexact musicxml files.
+                    # obscure bug found from some inexact musicxml files.
                     notes_and_rests[posConnected[0]].duration.linked = True
                 notes_and_rests[posConnected[0]].quarterLength = qLen + durSum
 
