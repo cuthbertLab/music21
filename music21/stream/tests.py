@@ -1192,6 +1192,30 @@ class Test(unittest.TestCase):
         stripped = s.stripTies(inPlace=False)
         self.assertEqual(len(stripped.recurse().notesAndRests), 2)
 
+    def testStripTiesUnlinked(self):
+        '''
+        After stripping ties, unlinked durations become linked.
+        '''
+        m1 = Measure(number=1)
+        m2 = Measure(number=2)
+        n1 = note.Note(type='whole')
+        n2 = note.Note(type='quarter')
+        n2.duration.linked = False
+        n2.duration.quarterLength = 0.75
+        n1.tie = tie.Tie('start')
+        n2.tie = tie.Tie('stop')
+        m1.insert(0, n1)
+        m2.insert(0, n2)
+        p = Part([m1, m2])
+        p_stripped = p.stripTies()
+        n = p_stripped[note.Note].first()
+        d = n.duration
+        self.assertTrue(d.linked)
+        self.assertEqual(d.type, 'complex')
+        self.assertEqual(d.quarterLength, 4.75)
+        self.assertFalse(n2.duration.linked)
+
+
     def testStripTiesConsecutiveInVoiceNotContainer(self):
         '''
         Testing that ties are stripped from notes consecutive in a voice
