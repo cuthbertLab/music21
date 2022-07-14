@@ -1791,8 +1791,12 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             raise TypeError(f'Linked can only be True or False, not {value}')
         if self._quarterLengthNeedsUpdating:
             self._updateQuarterLength()
-        if value is False:
+        if value is False and self._linked is True:
             self._unlinkedType = self.type
+        elif value is True and self._linked is False:
+            self._quarterLengthNeedsUpdating = True
+            self._componentsNeedUpdating = True
+
         self._linked = value
 
     linked = property(_getLinked, _setLinked)
