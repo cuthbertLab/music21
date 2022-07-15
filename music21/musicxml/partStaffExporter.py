@@ -959,7 +959,7 @@ class Test(unittest.TestCase):
         from music21 import note
         s = stream.Score()
         ps1 = stream.PartStaff()
-        m1 = stream.Measure(1)
+        m1 = stream.Measure()
         ps1.insert(0, m1)
         v1 = stream.Voice()
         v2 = stream.Voice()
@@ -970,7 +970,7 @@ class Test(unittest.TestCase):
         ps1.makeNotation(inPlace=True)  # makeNotation to freeze notation
 
         ps2 = stream.PartStaff()
-        m2 = stream.Measure(1)
+        m2 = stream.Measure()
         ps2.insert(0, m2)
         v3 = stream.Voice()
         v4 = stream.Voice()
@@ -995,16 +995,16 @@ class Test(unittest.TestCase):
         for mxNote in notes:
             mxPitch = mxNote.find('pitch')
             if mxPitch.find('step').text == 'C' and mxPitch.find('octave').text == '4':
-                self.assertEqual(mxNote.find('voice').text, '3')
+                self.assertEqual(mxNote.find('voice').text, '1')
                 self.assertEqual(mxNote.find('staff').text, '1')
             elif mxPitch.find('step').text == 'E' and mxPitch.find('octave').text == '4':
-                self.assertEqual(mxNote.find('voice').text, '4')
+                self.assertEqual(mxNote.find('voice').text, '2')
                 self.assertEqual(mxNote.find('staff').text, '1')
             elif mxPitch.find('step').text == 'C' and mxPitch.find('octave').text == '3':
-                self.assertEqual(mxNote.find('voice').text, '1')
+                self.assertEqual(mxNote.find('voice').text, '3')
                 self.assertEqual(mxNote.find('staff').text, '2')
             elif mxPitch.find('step').text == 'G' and mxPitch.find('octave').text == '3':
-                self.assertEqual(mxNote.find('voice').text, '2')
+                self.assertEqual(mxNote.find('voice').text, '4')
                 self.assertEqual(mxNote.find('staff').text, '2')
 
     def testJoinPartStaffsE(self):
