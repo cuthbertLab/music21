@@ -9374,23 +9374,29 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         Return a boolean value showing if this Stream contains Measures.
 
-
-        >>> s = stream.Stream()
-        >>> s.repeatAppend(note.Note(), 8)
-        >>> s.hasMeasures()
+        >>> p = stream.Part()
+        >>> p.repeatAppend(note.Note(), 8)
+        >>> p.hasMeasures()
         False
-        >>> s.makeMeasures(inPlace=True)
-        >>> len(s.getElementsByClass(stream.Measure))
+        >>> p.makeMeasures(inPlace=True)
+        >>> len(p.getElementsByClass(stream.Measure))
         2
-        >>> s.hasMeasures()
+        >>> p.hasMeasures()
         True
+
+        Only returns True if the immediate Stream has measures, not if there are nested measures:
+
+        >>> sc = stream.Score()
+        >>> sc.append(p)
+        >>> sc.hasMeasures()
+        False
         '''
         if 'hasMeasures' not in self._cache or self._cache['hasMeasures'] is None:
             post = False
             # do not need to look in endElements
             for obj in self._elements:
                 # if obj is a Part, we have multi-parts
-                if getattr(obj, 'isMeasure', False):
+                if isinstance(obj, Measure):
                     post = True
                     break  # only need one
             self._cache['hasMeasures'] = post
