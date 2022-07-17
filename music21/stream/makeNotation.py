@@ -1671,7 +1671,7 @@ def makeAccidentalsInMeasureStream(
     # because we are definitely searching key signature contexts
     # only key.KeySignature values are interesting
     # but method arg is typed this way for backwards compatibility
-    ksLast: t.Optional[key.KeySignature] = None
+    ksLast: t.Union[bool, key.KeySignature] = False
     ksLastDiatonic: t.List[str] = []
 
     if isinstance(useKeySignature, key.KeySignature):
@@ -1684,7 +1684,6 @@ def makeAccidentalsInMeasureStream(
         # measure for context (cautionary accidentals)
         # unless this measure has a key signature object
         if i > 0:
-            pitchPastMeasure: t.Optional[t.List[pitch.Pitch]] = None
             if m.keySignature is None:
                 pitchPastMeasure = measuresOnly[i - 1].pitches
             elif ksLast:
@@ -2040,13 +2039,6 @@ class Test(unittest.TestCase):
             p.makeMeasures(meterStream=duration.Duration())
         self.assertEqual(str(cm.exception),
             'meterStream is neither a Stream nor a TimeSignature!')
-
-    def testMakeAccidentalsInMeasureStreamException(self):
-        from music21 import converter
-        p = converter.parse(self.allaBreveBeamTest)
-        with self.assertRaises(ValueError) as cm:
-            makeAccidentalsInMeasureStream(p.measure(1))
-        self.assertIn('must contain only Measures', str(cm.exception))
 
 
 # -----------------------------------------------------------------------------

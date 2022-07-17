@@ -6613,12 +6613,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
                 tiePitchSet=tiePitchSet)
 
-        returnStream.makeTies(meterStream, inPlace=True)
+        makeNotation.makeTies(returnStream, meterStream=meterStream, inPlace=True)
 
         # measureStream.makeBeams(inPlace=True)
         if not returnStream.streamStatus.beams:
             try:
-                returnStream.makeBeams(inPlace=True)
+                makeNotation.makeBeams(returnStream, inPlace=True)
             except meter.MeterException as me:
                 environLocal.warn(['skipping makeBeams exception', me])
 
