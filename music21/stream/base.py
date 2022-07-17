@@ -5330,8 +5330,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> sm.getTimeSignatures(recurse=False)[0]
         <music21.meter.TimeSignature 4/4>
 
-        Note that a measure without any time signature can still find a context TimeSignature with this
-        method so long as searchContext is True (as by default):
+        Note that a measure without any time signature can still find a context TimeSignature
+        with this method so long as searchContext is True (as by default):
 
         >>> m3 = sm.measure(3)
         >>> m3.show('text')
@@ -5360,9 +5360,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         <music21.meter.TimeSignature 4/4>
 
 
-        Changed in v.8: time signatures within recursed streams are found by default.  Added recurse.
-            Removed option for recurse=False and still getting the first time signature in the first
-            measure.  This was wholly inconsisten.
+        Changed in v.8: time signatures within recursed streams are found by default.
+            Added recurse. Removed option for recurse=False and still getting the
+            first time signature in the first measure.  This was wholly inconsisten.
         '''
         # even if this is a Measure, the TimeSignature in the Stream will be
         # found
@@ -5394,11 +5394,28 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                        *,
                        searchActiveSite=True,
                        returnDefault=True,
-                       recurse=False) -> Stream[instrument.Instrument]:
+                       recurse=True) -> Stream[instrument.Instrument]:
         '''
-        Search this stream or activeSite streams for
+        Search this stream (and, by default, its subStreams) or activeSite streams for
         :class:`~music21.instrument.Instrument` objects, and return a new stream
-        containing them. Otherwise, return a Stream containing a single default `Instrument`.
+        containing them.
+
+        >>> m1 = stream.Measure([meter.TimeSignature('4/4'),
+        ...                      instrument.Clarinet(),
+        ...                      note.Note('C5', type='whole')])
+        >>> m2 = stream.Measure([instrument.BassClarinet(),
+        ...                      note.Note('C3', type='whole')])
+        >>> p = stream.Part([m1, m2])
+        >>> instruments = p.getInstruments()
+        >>> instruments
+        <music21.stream.Part 0x112ac26e0>
+
+        >>> instruments.show('text')
+        {0.0} <music21.instrument.Clarinet 'Clarinet'>
+        {4.0} <music21.instrument.BassClarinet 'Bass clarinet'>
+
+        If there are no instruments, returns a Stream containing a single default `Instrument`,
+        unless returnDefault is False.
 
         >>> p = stream.Part()
         >>> m = stream.Measure([note.Note()])
@@ -5408,18 +5425,22 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> defaultInst
         <music21.instrument.Instrument ': '>
 
-        Insert the default instrument into the part:
+        Insert an instrument into the Part (not the Measure):
 
-        >>> p.insert(0, defaultInst)
+        >>> p.insert(0, instrument.Koto())
 
-        Searching the measure will find it only if the measure's active site is searched:
+        Searching the measure will find this instrument only if the measure's activeSite is
+        searched, as it is by default:
 
-        >>> search1 = p.measure(1).getInstruments(searchActiveSite=False, returnDefault=False)
-        >>> search1.first() is None
-        True
-        >>> search2 = p.measure(1).getInstruments(searchActiveSite=True, returnDefault=False)
-        >>> search2.first() is defaultInst
-        True
+        >>> searchActiveSite = p.measure(1).getInstruments()
+        >>> searchActiveSite.first()
+        <music21.instrument.Koto 'Koto'>
+
+        >>> searchNaive = p.measure(1).getInstruments(searchActiveSite=False, returnDefault=False)
+        >>> len(searchNaive)
+        0
+
+        Changed in v.8: recurse is True by default.
         '''
         instObj = None
 
