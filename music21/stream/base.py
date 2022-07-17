@@ -6580,7 +6580,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             # definitely do NOT put a constrainingSpannerBundle constraint
         )
         # only use inPlace arg on first usage
-        if not self.hasMeasures():
+        if not returnStream.hasMeasures():
             # only try to make voices if no Measures are defined
             returnStream.makeVoices(inPlace=True, fillGaps=True)
             # if this is not inPlace, it will return a newStream; if
@@ -6592,20 +6592,17 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 inPlace=True,
                 bestClef=bestClef)
 
-        measureStream: Stream[Measure] = returnStream.getElementsByClass(Measure).stream()
-        # environLocal.printDebug(['Stream.makeNotation(): post makeMeasures,
-        #   length', len(returnStream)])
-        if not measureStream:
-            raise StreamException(
-                f'no measures found in stream with {len(self)} elements')
+            if not returnStream.hasMeasures():
+                raise StreamException(
+                    f'no measures found in stream with {len(self)} elements')
 
         # for now, calling makeAccidentals once per measures
         # pitches from last measure are passed
         # this needs to be called before makeTies
         # note that this functionality is also placed in Part
-        if not measureStream.streamStatus.accidentals:
+        if not returnStream.streamStatus.accidentals:
             makeNotation.makeAccidentalsInMeasureStream(
-                measureStream,
+                returnStream,
                 pitchPast=pitchPast,
                 pitchPastMeasure=pitchPastMeasure,
                 useKeySignature=useKeySignature,
@@ -6616,12 +6613,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
                 tiePitchSet=tiePitchSet)
 
-        measureStream.makeTies(meterStream, inPlace=True)
+        returnStream.makeTies(meterStream, inPlace=True)
 
         # measureStream.makeBeams(inPlace=True)
-        if not measureStream.streamStatus.beams:
+        if not returnStream.streamStatus.beams:
             try:
-                measureStream.makeBeams(inPlace=True)
+                returnStream.makeBeams(inPlace=True)
             except meter.MeterException as me:
                 environLocal.warn(['skipping makeBeams exception', me])
 
@@ -6629,7 +6626,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # makeBeams was causing the duration's tuplet to lose its type setting
         # check for tuplet brackets one measure at a time
         # this means that they will never extend beyond one measure
-        for m in measureStream:
+        for m in returnStream.getElementsByClass(Measure):
             if not m.streamStatus.tuplets:
                 makeNotation.makeTupletBrackets(m, inPlace=True)
 

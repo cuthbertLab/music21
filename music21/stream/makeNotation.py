@@ -1647,7 +1647,7 @@ def makeAccidentalsInMeasureStream(
     tiePitchSet: t.Optional[t.Set[str]] = None
 ) -> None:
     '''
-    Makes accidentals in place on a stream consisting of only Measures.
+    Makes accidentals in place on a stream that contains Measures.
     Helper for Stream.makeNotation and Part.makeAccidentals.
 
     The function walks measures in order to update the values for the following keyword
@@ -1662,38 +1662,41 @@ def makeAccidentalsInMeasureStream(
         tiePitchSet
 
     Operates on the measures in place; make a copy first if this is not desired.
-    '''
-    if s.getElementsNotOfClass('Measure'):
-        raise ValueError(f'{s} must contain only Measures')
 
+    Changed in v8: the Stream may have other elements besides measures and the method
+        will still work.
+    '''
+    from music21.stream import Measure
     # bool values for useKeySignature are not helpful here
     # because we are definitely searching key signature contexts
     # only key.KeySignature values are interesting
     # but method arg is typed this way for backwards compatibility
+    ksLast: t.Optional[key.KeySignature] = None
+    ksLastDiatonic: t.List[str] = []
+
     if isinstance(useKeySignature, key.KeySignature):
         ksLast = useKeySignature
-    else:
-        ksLast = None
+        ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
 
-    for i, m in enumerate(s):
+    measuresOnly: t.List[Measure] = list(s.getElementsByClass(Measure))
+    for i, m in enumerate(measuresOnly):
         # if beyond the first measure, use the pitches from the last
         # measure for context (cautionary accidentals)
         # unless this measure has a key signature object
         if i > 0:
-            pitchPastMeasure = None
+            pitchPastMeasure: t.Optional[t.List[pitch.Pitch]] = None
             if m.keySignature is None:
-                pitchPastMeasure = s[i - 1].pitches
+                pitchPastMeasure = measuresOnly[i - 1].pitches
             elif ksLast:
                 # If there is any key signature object to the left,
                 # just get the chromatic pitches from previous measure
                 # G-naturals in C major following G-flats in F major need cautionary
                 # G-naturals in C major following G-flats in Db major don't
-                ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
-                pitchPastMeasure = [p for p in s[i - 1].pitches
-                    if p.name not in ksLastDiatonic]
+                pitchPastMeasure = [p for p in measuresOnly[i - 1].pitches
+                                    if p.name not in ksLastDiatonic]
             # Get tiePitchSet from previous measure
             try:
-                previousNoteOrChord = s[i - 1][note.NotRest][-1]
+                previousNoteOrChord = measuresOnly[i - 1][note.NotRest][-1]
                 tiePitchSet = getTiePitchSet(previousNoteOrChord)
                 if tiePitchSet is not None and m.keySignature is not None:
                     # Get the diatonic pitches in this (new) key
@@ -1706,6 +1709,7 @@ def makeAccidentalsInMeasureStream(
 
         if m.keySignature is not None:
             ksLast = m.keySignature
+            ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
 
         m.makeAccidentals(
             pitchPast=pitchPast,
@@ -1720,6 +1724,7 @@ def makeAccidentalsInMeasureStream(
             cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
             tiePitchSet=tiePitchSet,
         )
+    s.streamStatus.accidentals = True
 
 def iterateBeamGroups(
     s: StreamType,
@@ -1811,8 +1816,8 @@ def setStemDirectionForBeamGroups(
     if `setANewStems` is True (as by default), then even notes with stemDirection
     of 'unspecified' get a stemDirection.
 
-    Currently assumes that the clef does not change within a beam group.  This
-    assumption may change in the future.
+    The method currently assumes that the clef does not change within a beam group.  This
+    assumption may change in the future without notice.
 
     Operates in place.  Run `copy.deepcopy(s)` beforehand for a non-inPlace version.
 

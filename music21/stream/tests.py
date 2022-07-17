@@ -4462,8 +4462,6 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.keySignature.sharps, sharpsInKey)
 
     def testMakeTies(self):
-
-
         def collectAccidentalDisplayStatus(s_inner):
             post = []
             for e in s_inner.flatten().notesAndRests:
@@ -4532,6 +4530,30 @@ class Test(unittest.TestCase):
                           ('F#', None), ('F#', None), ('B#', None), ('B#', None),
                           ('C#', None), ('C#', None)]
                          )
+
+    def testMakeTiesAddNewMeasure(self):
+        '''
+        Test that makeTies adds a new measure when the last note is too long,
+        both when called directly and when called from makeNotation
+        '''
+        p = Part()
+        m = Measure(number=1)
+        m.append(meter.TimeSignature('4/4'))
+        m.append(note.Note(type='breve'))
+        p.append(m)
+        p_makeTies = p.makeTies()
+        self.assertEqual(len(p_makeTies[Measure]), 2)
+        n1 = p_makeTies[Measure].first().notes.first()
+        n2 = p_makeTies[Measure].last().notes.first()
+        self.assertEqual(n1.duration.quarterLength, 4.0)
+        self.assertEqual(n1.duration.quarterLength, 4.0)
+        self.assertIsNotNone(n1.tie)
+        self.assertIsNotNone(n2.tie)
+        self.assertEqual(n1.tie.type, 'start')
+        self.assertEqual(n2.tie.type, 'stop')
+
+        p_makeNotation = p.makeNotation()
+        self.assertEqual(len(p_makeNotation[Measure]), 2)
 
     def testMeasuresAndMakeMeasures(self):
         s = converter.parse('tinynotation: 2/8 g8 e f g e f g a')
@@ -6567,6 +6589,7 @@ class Test(unittest.TestCase):
         s.insert(key.Key('Gb'))
         s.insert(0, note.Note('D-5'))
         s.insert(0, note.Note('D-4'))
+        self.assertFalse(s.haveAccidentalsBeenMade())
         post = s.makeNotation()  # makes voices, makes measures, makes accidentals
         self.assertEqual(len(post.recurse().getElementsByClass(Voice)), 2)
         self.assertTrue(post.haveAccidentalsBeenMade())
