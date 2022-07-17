@@ -5362,7 +5362,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Changed in v.8: time signatures within recursed streams are found by default.
             Added recurse. Removed option for recurse=False and still getting the
-            first time signature in the first measure.  This was wholly inconsisten.
+            first time signature in the first measure.  This was wholly inconsistent.
         '''
         # even if this is a Measure, the TimeSignature in the Stream will be
         # found
@@ -5594,7 +5594,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             quickSearch = False
 
         inversionDNN = inversionNote.pitch.diatonicNoteNum
-        for n in returnStream.recurse().getElementsByClass(note.NotRest):
+        for n in returnStream[note.NotRest]:
             n.pitch.diatonicNoteNum = (2 * inversionDNN) - n.pitch.diatonicNoteNum
             if quickSearch:  # use previously found
                 n.pitch.accidental = ourKey.accidentalByStep(n.pitch.step)

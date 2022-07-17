@@ -994,8 +994,7 @@ def makeTies(
 
     Note that this method assumes that there is appropriate space in the
     next Measure: this will not shift Note objects, but instead allocate
-    them evenly over barlines. Generally, makeMeasures is called prior to
-    calling this method.
+    them evenly over barlines.
 
     If `inPlace` is True, this is done in-place;
     if `inPlace` is False, this returns a modified deep copy.
@@ -1202,9 +1201,15 @@ def makeTies(
     if meterStream is None:
         meterStream = returnObj.getTimeSignatures(sortByCreationTime=True,
                                                   searchContext=False)
+    elif not meterStream:
+        # an empty stream
+        ts = meter.TimeSignature(
+            f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
+        )
+        meterStream.insert(0, ts)
 
     mCount = 0
-    lastTimeSignature = None
+    lastTimeSignature = meterStream[0]
 
     while True:  # pylint: disable=too-many-nested-blocks
         # TODO: find a way to avoid 'while True'
@@ -1215,8 +1220,7 @@ def makeTies(
             break  # reached the end of all measures available or added
         # get the current measure to look for notes that need ties
         m = measureIterator[mCount]
-        if m.timeSignature is not None:
-            lastTimeSignature = m.timeSignature
+        activeTS = meterStream.getElementAtOrBefore(m.offset)
 
         # get next measure; we may not need it, but have it ready
         if mCount + 1 < len(measureIterator):
@@ -1226,21 +1230,8 @@ def makeTies(
             mNext = stream.Measure()
             # set offset to last offset plus total length
             mOffset = m.offset
-            if lastTimeSignature is not None:
-                mNext.offset = (mOffset
-                                + lastTimeSignature.barDuration.quarterLength)
-            else:
-                mNext.offset = mOffset
-            if not meterStream:  # in case no meters are defined
-                ts = meter.TimeSignature(
-                    f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
-                )
-            else:  # get the last encountered meter
-                ts = meterStream.getElementAtOrBefore(mNext.offset)
-            # only copy and assign if not the same as the last
-            if (lastTimeSignature is not None
-                    and not lastTimeSignature.ratioEqual(ts)):
-                mNext.timeSignature = copy.deepcopy(ts)
+            mNext.offset = (mOffset
+                            + activeTS.barDuration.quarterLength)
             # increment measure number
             mNext.number = m.number + 1
             mNextAdd = True  # new measure, needs to be appended
@@ -1255,18 +1246,10 @@ def makeTies(
         # for each measure, go through each element and see if its
         # duration fits in the bar that contains it
 
+        mEnd = activeTS.barDuration.quarterLength
         # if there are voices, we must look at voice id values to only
         # connect ties to components in the same voice, assuming there
         # are voices in the next measure
-        if lastTimeSignature is not None:
-            mEnd = lastTimeSignature.barDuration.quarterLength
-        else:
-            possible_ts = m.getContextByClass(meter.TimeSignature)
-            if possible_ts is not None:
-                lastTimeSignature = possible_ts
-                mEnd = lastTimeSignature.barDuration.quarterLength
-            else:
-                mEnd = 4.0  # Default
         if m.hasVoices():
             bundle = m.voices
             mHasVoices = True
@@ -1291,14 +1274,15 @@ def makeTies(
                 if overshot <= 0:
                     continue
                 if eOffset >= mEnd:
-                    continue  # skip elements that extend past measure boundary.
+                    continue  # skip elements that begin past measure boundary.
+                    # TODO: put them entirely in the next measure.
                     # raise stream.StreamException(
                     #     'element (%s) has offset %s within a measure '
                     #     'that ends at offset %s' % (e, eOffset, mEnd))
 
-                qLenBegin = mEnd - eOffset
+                qLenWithinMeasure = mEnd - eOffset
                 e, eRemain = e.splitAtQuarterLength(
-                    qLenBegin,
+                    qLenWithinMeasure,
                     retainOrigin=True,
                     displayTiedAccidentals=displayTiedAccidentals
                 )
