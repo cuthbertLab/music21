@@ -1758,43 +1758,105 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
             partExp.staffGroup = joinableGroup
             if partExp.staffGroup is None:
-                partExp.maxVoiceNum = 0
                 continue
 
-            # part is in a staffGroup, so we need to find the maximum number
-            # of voices used in any measure in this part.  We also find the
+            # part is in a staffGroup, so we need to find the maximum voice
+            # number used in each measure in this part.  The maxVoiceNum
+            # for a measure is the higher of the number of voices and the
             # maximum "low enough to not be considered a memory location"
-            # voice id.  The maxVoiceNum for a part is the higher of
-            # maxNumVoices-1 and maxNonMemLocationVoiceId.
-            maxNumVoices = 0
-            maxNonMemLocationVoiceId = 0
+            # voice id.
             for measure in partExp.stream[stream.Measure]:
-                voices = tuple(measure[stream.Voice])
-                maxNumVoices = max(maxNumVoices, len(voices))
+                voices = measure[stream.Voice]
+                maxNonMemLocationVoiceId: int = 0
                 for voice in voices:
                     if (isinstance(voice.id, int)
                             and voice.id < defaults.minIdNumberToConsiderMemoryLocation):
                         maxNonMemLocationVoiceId = max(maxNonMemLocationVoiceId, voice.id)
-            partExp.maxVoiceNum = max(maxNumVoices - 1, maxNonMemLocationVoiceId)
 
-        # Compute partExp.voiceNumberOffset
+                # maxVoiceNum is 1-based (voice numbers are 1-based in MusicXML)
+                partExp.maxVoiceNumForMeasure[measure] = max(len(voices), maxNonMemLocationVoiceId)
+
+        # Compute partExp.voiceNumberOffsetForMeasure from the maxVoiceNumForMeasure
+        # of each measure "above" us in the staff group.
         for partExp in self.partExporterList:
             if partExp.staffGroup is None:
-                partExp.voiceNumberOffset = 0
                 continue
 
-            staffGroup = partExp.staffGroup
-
-            staffGroupStreamList = staffGroup.getSpannedElements()
+            staffGroupStreamList = partExp.staffGroup.getSpannedElements()
             partIndexInGroup = staffGroupStreamList.index(partExp.stream)
-            voiceNumberOffset = 0
-            # add up the offsetForPart of each part before us in the group
-            for i in range(0, partIndexInGroup):
-                pex = partExporterForPart[staffGroup[i]]
-                offsetForPart = pex.maxVoiceNum + 1
-                voiceNumberOffset += offsetForPart
 
-            partExp.voiceNumberOffset = voiceNumberOffset
+            for simultaneousMeasures in self.zip_measures(staffGroupStreamList):
+                # add up the voice number offsets contributed by each measure before
+                # (above) us in the staff group
+                measure = simultaneousMeasures[partIndexInGroup]
+                if measure is None:
+                    continue
+                voiceNumberOffset = 0
+                for i in range(0, partIndexInGroup):
+                    m = simultaneousMeasures[i]
+                    if m is None:
+                        continue
+                    pex = partExporterForPart[staffGroupStreamList[i]]
+                    voiceNumberOffset += pex.maxVoiceNumForMeasure[m]
+                partExp.voiceNumberOffsetForMeasure[measure] = voiceNumberOffset
+
+    @staticmethod
+    def zip_measures(streams: t.List[stream.Stream]):
+        numStreams = len(streams)
+        if numStreams == 0:
+            return
+
+        def getSimultaneousMeasureIndices(
+                measures: t.List[t.Optional[stream.Measure]]) -> t.List[int]:
+            output: t.List[int] = []
+
+            # Note: m.measureNumberWithSuffix() returns '0' for unnumbered measures
+            minMeasureNumber: t.Optional[str] = None
+            for m in measures:
+                if m is None:
+                    continue
+                if minMeasureNumber is None:
+                    minMeasureNumber = m.measureNumberWithSuffix()
+                    continue
+                if helpers.measureNumberComesBefore(m.measureNumberWithSuffix(), minMeasureNumber):
+                    minMeasureNumber = m.measureNumberWithSuffix()
+
+            for i, m in enumerate(measures):
+                if m is None:
+                    continue
+
+                if m.measureNumberWithSuffix() == minMeasureNumber:
+                    output.append(i)
+
+            return output
+
+        streamIterators = [s[stream.Measure] for s in streams]
+
+        # load up nextForZip with the first measure in each streamIterator
+        nextForZip: t.List[t.Optional[stream.Measure]] = [None] * numStreams
+        for snum, sIter in enumerate(streamIterators):
+            try:
+                nextForZip[snum] = next(sIter)
+            except StopIteration:
+                nextForZip[snum] = None
+
+        # generate (and yield) zippedMeasures from nextForZip (and reload those slots
+        # in nextForZip), until we run out of measures
+        while True:
+            zippedMeasures: t.List[t.Optional[stream.Measure]] = [None] * numStreams
+            nextIndices: t.List[int] = getSimultaneousMeasureIndices(nextForZip)
+            for idx in nextIndices:
+                zippedMeasures[idx] = nextForZip[idx]
+                try:
+                    nextForZip[idx] = next(streamIterators[idx])
+                except StopIteration:
+                    nextForZip[idx] = None
+
+            if all(m is None for m in zippedMeasures):
+                # we have run out of measures
+                return
+
+            yield zippedMeasures
 
     def postPartProcess(self):
         '''
@@ -2609,14 +2671,15 @@ class PartExporter(XMLExporterBase):
         # has changed
         self.lastDivisions = None
 
-        # voiceNumberOffset is the offset that must be applied to any voice numbers automatically
-        # generated in this part, in order to avoid voice numbers (either explicitly set, or
-        # automatically generated) in other parts in this staffGroup.  This is computed in a
-        # pre-pass over all the voices in all the measures in all the parts (in ScoreExporter).
-        self.voiceNumberOffset: int = 0
+        # voiceNumberOffsetForMeasure is the offset that must be applied to any voice
+        # numbers automatically generated for the key measure in this part, in order
+        # to avoid voice numbers (either explicitly set, or automatically generated)
+        # in other parts in this staffGroup.  This is computed in a pre-pass over all
+        # the voices in all the measures in all the parts (in ScoreExporter).
+        self.voiceNumberOffsetForMeasure: t.Dict[stream.Measure, int] = {}
 
         # The maximum voiceNum found in the voices in all the measures in this part.
-        self.maxVoiceNum: int = 0
+        self.maxVoiceNumForMeasure: t.Dict[stream.Measure, int] = {}
 
         # The staffGroup to which this part belongs (if it belongs to one)
         self.staffGroup: t.Optional[layout.StaffGroup] = None
@@ -3159,7 +3222,9 @@ class MeasureExporter(XMLExporterBase):
         partExp: t.Optional[PartExporter] = self.parent
         if partExp is None:
             return 0
-        return partExp.voiceNumberOffset
+        if t.TYPE_CHECKING:
+            assert isinstance(self.stream, stream.Measure)
+        return partExp.voiceNumberOffsetForMeasure.get(self.stream, 0)
 
     def parseFlatElements(self, m, *, backupAfterwards=False):
         '''
