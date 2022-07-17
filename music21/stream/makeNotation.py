@@ -1209,22 +1209,16 @@ def makeTies(
         meterStream.insert(0, ts)
 
     mCount = 0
-    lastTimeSignature = meterStream[0]
+    measureList = list(returnObj.getElementsByClass(stream.Measure))
 
-    while True:  # pylint: disable=too-many-nested-blocks
-        # TODO: find a way to avoid 'while True'
-        # update measureIterator on each iteration,
-        # as new measure may have been added to the returnObj stream
-        measureIterator = returnObj.getElementsByClass(stream.Measure)
-        if mCount >= len(measureIterator):
-            break  # reached the end of all measures available or added
+    while mCount < len(measureList):  # pylint: disable=too-many-nested-blocks
         # get the current measure to look for notes that need ties
-        m = measureIterator[mCount]
+        m = measureList[mCount]
         activeTS = meterStream.getElementAtOrBefore(m.offset)
 
         # get next measure; we may not need it, but have it ready
-        if mCount + 1 < len(measureIterator):
-            mNext = measureIterator[mCount + 1]
+        if mCount + 1 < len(measureList):
+            mNext = measureList[mCount + 1]
             mNextAdd = False  # already present; do not append
         else:  # create a new measure
             mNext = stream.Measure()
@@ -1323,6 +1317,8 @@ def makeTies(
                     #    'makeTies() inserting mNext into returnObj',
                     #    mNext])
                     returnObj.insert(mNext.offset, mNext)
+                    # need to make sure that the new measure is processed.
+                    measureList.append(mNext)
         mCount += 1
 
     for measure in returnObj.getElementsByClass(stream.Measure):
