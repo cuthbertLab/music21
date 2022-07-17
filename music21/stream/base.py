@@ -5257,43 +5257,129 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def getTimeSignatures(self, *,
                           searchContext=True,
                           returnDefault=True,
+                          recurse=True,
                           sortByCreationTime=True):
         '''
         Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
         If no TimeSignature objects are defined, get a default (4/4 or whatever
         is defined in the defaults.py file).
 
-        >>> a = stream.Stream()
-        >>> b = meter.TimeSignature('3/4')
-        >>> a.insert(b)
-        >>> a.repeatInsert(note.Note('C#'), list(range(10)))
-        >>> c = a.getTimeSignatures()
-        >>> len(c) == 1
+        >>> s = stream.Part(id='changingMeter')
+        >>> s.repeatInsert(note.Note('C#'), list(range(11)))
+
+        >>> threeFour = meter.TimeSignature('3/4')
+        >>> s.insert(0.0, threeFour)
+        >>> twoTwo = meter.TimeSignature('2/2')
+        >>> s.insert(3.0, twoTwo)
+        >>> tsStream = s.getTimeSignatures()
+        >>> tsStream.derivation.method
+        'getTimeSignatures'
+
+        >>> tsStream
+        <music21.stream.Part changingMeter>
+        >>> tsStream.show('text')
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {3.0} <music21.meter.TimeSignature 2/2>
+
+        The contents of the time signature stream are the original, not copies
+        of the original:
+
+        >>> tsStream[0] is threeFour
         True
+
+        Many time signatures are found within measures, so this method will find
+        them also and place them at the appropriate point within the overall Stream.
+
+        N.B. if there are different time signatures for different parts, this method
+        will not distinguish which parts use which time signatures.
+
+        >>> sm = s.makeMeasures()
+        >>> sm.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.note.Note C#>
+            {1.0} <music21.note.Note C#>
+            {2.0} <music21.note.Note C#>
+        {3.0} <music21.stream.Measure 2 offset=3.0>
+            {0.0} <music21.meter.TimeSignature 2/2>
+            {0.0} <music21.note.Note C#>
+            {1.0} <music21.note.Note C#>
+            {2.0} <music21.note.Note C#>
+            {3.0} <music21.note.Note C#>
+        {7.0} <music21.stream.Measure 3 offset=7.0>
+            {0.0} <music21.note.Note C#>
+            {1.0} <music21.note.Note C#>
+            {2.0} <music21.note.Note C#>
+            {3.0} <music21.note.Note C#>
+            {4.0} <music21.bar.Barline type=final>
+
+        >>> tsStream2 = sm.getTimeSignatures()
+        >>> tsStream2.show('text')
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {3.0} <music21.meter.TimeSignature 2/2>
+
+        If you do not want this recursion, set recurse=False
+
+        >>> len(sm.getTimeSignatures(recurse=False, returnDefault=False))
+        0
+
+        We set returnDefault=False here, because otherwise a default time signature
+        of 4/4 is returned:
+
+        >>> sm.getTimeSignatures(recurse=False)[0]
+        <music21.meter.TimeSignature 4/4>
+
+        Note that a measure without any time signature can still find a context TimeSignature with this
+        method so long as searchContext is True (as by default):
+
+        >>> m3 = sm.measure(3)
+        >>> m3.show('text')
+        {0.0} <music21.note.Note C#>
+        {1.0} <music21.note.Note C#>
+        {2.0} <music21.note.Note C#>
+        {3.0} <music21.note.Note C#>
+        {4.0} <music21.bar.Barline type=final>
+
+        >>> m3.getTimeSignatures()[0]
+        <music21.meter.TimeSignature 2/2>
+
+        The oldest context for the measure will be used unless sortByCreationTime is False, in which
+        case the typical order of context searching will be used.
+
+        >>> p2 = stream.Part()
+        >>> p2.insert(0, meter.TimeSignature('1/1'))
+        >>> p2.append(m3)
+        >>> m3.getTimeSignatures()[0]
+        <music21.meter.TimeSignature 2/2>
+
+        If searchContext is False then the default will be returned (which is somewhat
+        acceptable here, since there are 4 quarter notes in the measure) but not generally correct:
+
+        >>> m3.getTimeSignatures(searchContext=False)[0]
+        <music21.meter.TimeSignature 4/4>
+
+
+        Changed in v.8: time signatures within recursed streams are found by default.  Added recurse.
+            Removed option for recurse=False and still getting the first time signature in the first
+            measure.  This was wholly inconsisten.
         '''
         # even if this is a Measure, the TimeSignature in the Stream will be
         # found
-        post = self.getElementsByClass(meter.TimeSignature).stream()
+        if recurse:
+            post = self[meter.TimeSignature].stream()
+        else:
+            post = self.getElementsByClass(meter.TimeSignature).stream()
+        post.derivation.method = 'getTimeSignatures'
 
         # search activeSite Streams through contexts
         if not post and searchContext:
-            # returns a single value
-            post = self.cloneEmpty(derivationMethod='getTimeSignatures')
-
             # sort by time to search the most recent objects
             obj = self.getContextByClass('TimeSignature', sortByCreationTime=sortByCreationTime)
             # obj = self.previous(meter.TimeSignature)
             # environLocal.printDebug(['getTimeSignatures(): searching contexts: results', obj])
             if obj is not None:
                 post.append(obj)
-
-        # if there is no timeSignature, we will look at any stream at offset 0:
-        if not post:
-            streamsAtStart = self.getElementsByOffset(0.0).getElementsByClass('Stream')
-            for s in streamsAtStart:
-                tss = s.getElementsByOffset(0.0).getElementsByClass(meter.TimeSignature)
-                for ts in tss:
-                    post.append(ts)
 
         # get a default and/or place default at zero if nothing at zero
         if returnDefault:

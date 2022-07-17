@@ -1634,8 +1634,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         #                meterStream, meterStream[0]])
         if not meterStream:
             # note: this will return a default if no meters are found
-            meterStream = s.flatten().getTimeSignatures(searchContext=False,
-                                                        sortByCreationTime=True, returnDefault=True)
+            meterStream = s.getTimeSignatures(searchContext=False,
+                                              sortByCreationTime=True,
+                                              returnDefault=True)
         self.meterStream = meterStream
 
     def setScoreLayouts(self):

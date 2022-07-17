@@ -449,7 +449,7 @@ def makeMeasures(
     # may need to look in activeSite if no time signatures are found
     if meterStream is None:
         # get from this Stream, or search the contexts
-        meterStream = srcObj.flatten().getTimeSignatures(
+        meterStream = srcObj.getTimeSignatures(
             returnDefault=True,
             searchContext=False,
             sortByCreationTime=False
@@ -1194,14 +1194,8 @@ def makeTies(
         classFilterList = [classFilterList]
 
     # get measures from this stream
-    measureStream = returnObj.getElementsByClass(stream.Measure)
-    if not measureStream:
-        raise stream.StreamException(
-            'cannot process a stream without measures')
-
-    # environLocal.printDebug([
-    #    'makeTies() processing measureStream, length', measureStream,
-    #    len(measureStream)])
+    if not returnObj.hasMeasures():
+        raise stream.StreamException('cannot process a stream without measures')
 
     # may need to look in activeSite if no time signatures are found
     # presently searchContext is False to save time
@@ -1666,7 +1660,7 @@ def makeAccidentalsInMeasureStream(
     Changed in v8: the Stream may have other elements besides measures and the method
         will still work.
     '''
-    from music21.stream import Measure
+    from music21.stream import Measure, Stream
     # bool values for useKeySignature are not helpful here
     # because we are definitely searching key signature contexts
     # only key.KeySignature values are interesting
@@ -1723,7 +1717,8 @@ def makeAccidentalsInMeasureStream(
             cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
             tiePitchSet=tiePitchSet,
         )
-    s.streamStatus.accidentals = True
+    if isinstance(s, Stream):
+        s.streamStatus.accidentals = True
 
 def iterateBeamGroups(
     s: StreamType,
@@ -2039,6 +2034,30 @@ class Test(unittest.TestCase):
             p.makeMeasures(meterStream=duration.Duration())
         self.assertEqual(str(cm.exception),
             'meterStream is neither a Stream nor a TimeSignature!')
+
+    def testMakeTiesChangingTimeSignatures(self):
+        '''
+        From a real-world failure.  Should not be
+        making ties in an example that starts with a short TS
+        but moves to a longer one and all is valid.
+        '''
+        from music21 import stream
+        p = stream.Part()
+        m1 = stream.Measure(number=1)
+        m1.insert(0, meter.TimeSignature('3/4'))
+        m1.insert(0, note.Note('C4', quarterLength=3.0))
+        m2 = stream.Measure(number=2)
+        m2.insert(0, meter.TimeSignature('6/1'))
+        m2.insert(0, note.Note('D4', quarterLength=24.0))
+        m3 = stream.Measure(number=3)
+        m3.insert(0, note.Note('E4', quarterLength=24.0))
+        p.append([m1, m2, m3])
+        pp = p.makeTies()
+        self.assertEqual(len(pp[stream.Measure]), 3)
+        self.assertEqual(pp[stream.Measure].first().notes.first().duration.quarterLength, 3.0)
+        self.assertEqual(pp[stream.Measure][1].notes.first().duration.quarterLength, 24.0)
+        self.assertEqual(len(pp[stream.Measure][2].notes), 1)
+        self.assertEqual(pp[stream.Measure][2].notes.first().duration.quarterLength, 24.0)
 
 
 # -----------------------------------------------------------------------------
