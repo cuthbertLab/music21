@@ -201,7 +201,7 @@ class Test(unittest.TestCase):
         p0.append([m1, m1a, m1b, m2, m2a, m2b])
         p1.append([mm1, mm1a, mm1b, mm2, mm2a, mm2b])
         expectedNums = ['1', '1a', '1b', '2', '2a', '2b']
-        for mnum, measures in enumerate(ScoreExporter.zip_measures([p0, p1])):
+        for mnum, measures in enumerate(ScoreExporter.zipMeasures([p0, p1])):
             self.assertEqual(len(measures), 2)
             for m in measures:
                 self.assertEqual(m.measureNumberWithSuffix(), expectedNums[mnum])
@@ -210,7 +210,7 @@ class Test(unittest.TestCase):
         p1.append([mm1, mm2])
         expectedNumsPart0 = ['1', '1a', '1b', '2', '2a', '2b']
         expectedNumsPart1 = ['1', None, None, '2', None, None]
-        for mnum, measures in enumerate(ScoreExporter.zip_measures([p0, p1])):
+        for mnum, measures in enumerate(ScoreExporter.zipMeasures([p0, p1])):
             self.assertEqual(len(measures), 2)
             for partIdx, m in enumerate(measures):
                 if partIdx == 0:

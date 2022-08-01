@@ -1785,7 +1785,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             staffGroupStreamList = partExp.staffGroup.getSpannedElements()
             partIndexInGroup = staffGroupStreamList.index(partExp.stream)
 
-            for simultaneousMeasures in self.zip_measures(staffGroupStreamList):
+            for simultaneousMeasures in self.zipMeasures(staffGroupStreamList):
                 # add up the voice number offsets contributed by each measure before
                 # (above) us in the staff group
                 measure = simultaneousMeasures[partIndexInGroup]
@@ -1801,13 +1801,24 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
                 partExp.voiceNumberOffsetForMeasure[measure] = voiceNumberOffset
 
     @staticmethod
-    def zip_measures(streams: t.List[stream.Stream]):
+    def zipMeasures(
+        streams: t.List[stream.Stream]
+    ) -> t.Iterator[t.List[t.Optional[stream.Measure]]]:
+        '''
+            A generator that takes a group of streams, and yields a list of one simultaneous
+            measure from each stream at a time (with None in the list when a stream doesn't
+            have a matching measure), where simultaneous means "has the same measure number".
+            If there are unnumbered measures, they are treated when encountered as if they
+            have measure number '0' (they actually do), so they are simply yielded in order
+            until they are exhausted. Then we continue with the next numbered measures as
+            before (if there are any).
+        '''
         numStreams = len(streams)
         if numStreams == 0:
             return
 
         def getSimultaneousMeasureIndices(
-                measures: t.List[t.Optional[stream.Measure]]) -> t.List[int]:
+                measures: t.Sequence[t.Optional[stream.Measure]]) -> t.List[int]:
             output: t.List[int] = []
 
             # Note: m.measureNumberWithSuffix() returns '0' for unnumbered measures
@@ -2678,7 +2689,7 @@ class PartExporter(XMLExporterBase):
         # the voices in all the measures in all the parts (in ScoreExporter).
         self.voiceNumberOffsetForMeasure: t.Dict[stream.Measure, int] = {}
 
-        # The maximum voiceNum found in the voices in all the measures in this part.
+        # The maximum voiceNum found in the measure.
         self.maxVoiceNumForMeasure: t.Dict[stream.Measure, int] = {}
 
         # The staffGroup to which this part belongs (if it belongs to one)
