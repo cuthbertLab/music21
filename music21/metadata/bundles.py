@@ -1328,7 +1328,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
             validatedPaths.add(metadataEntry.sourcePath)
         for key in invalidatedKeys:
-            del(self._metadataEntries[key])
+            del self._metadataEntries[key]
         message = f'MetadataBundle: finished validating in {timer} seconds.'
         environLocal.printDebug(message)
         return len(invalidatedKeys)

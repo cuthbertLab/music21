@@ -304,7 +304,7 @@ class Metadata(base.Music21Object):
 
         if 'title' in allOut and 'movementName' in allOut:
             if allOut['movementName'] == allOut['title']:
-                del(allOut['title'])
+                del allOut['title']
 
         return list(sorted(allOut.items()))
 
