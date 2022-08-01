@@ -2895,7 +2895,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         target.sites.remove(self)
         target.activeSite = None
         if id(target) in self._offsetDict:
-            del(self._offsetDict[id(target)])
+            del self._offsetDict[id(target)]
 
         updateIsFlat = False
         if replacement.isStream:
@@ -9834,7 +9834,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         returnList.append(None)
                         lastWasNone = True
                 if isinstance(e, note.Note):
-                    if not(skipUnisons is False
+                    if not (skipUnisons is False
                            or len(lastPitches) != 1
                            or e.pitch.pitchClass != lastPitches[0].pitchClass
                            or (skipOctaves is False
@@ -12328,7 +12328,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 eClasses = e.classes
                 if 'Variant' in eClasses:
                     elementGroups = e.groups
-                    if (not(variantGroup in elementGroups)
+                    if (not (variantGroup in elementGroups)
                             or e.lengthType in ['elongation', 'deletion']):
                         newPart.remove(e)
                     else:
@@ -12665,7 +12665,7 @@ class Measure(Stream):
 
         for illegalKey in ('meterStream', 'refStreamOrTimeRange', 'bestClef'):
             if illegalKey in srkCopy:
-                del(srkCopy[illegalKey])
+                del srkCopy[illegalKey]
 
         m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True, **srkCopy)
         # makeTies is for cross-bar associations, and cannot be used

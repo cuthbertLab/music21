@@ -377,7 +377,7 @@ class Test(unittest.TestCase):
 #            print(n4.sites.getOffsetBySite(site))
 
         self.assertEqual(len(sf1), 4)
-        assert(sf1[1] is n2)
+        assert sf1[1] is n2
 
     def testActiveSiteCopiedStreams(self):
         srcStream = Stream()
@@ -4458,7 +4458,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(sPost.getElementsByClass(Measure)), 1)
         m1 = sPost.getElementsByClass(Measure).first()
-        assert(m1.keySignature is not None)
+        assert m1.keySignature is not None
         self.assertEqual(m1.keySignature.sharps, sharpsInKey)
 
     def testMakeTies(self):

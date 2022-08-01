@@ -198,7 +198,7 @@ def unitSpec(durationObjectOrObjects):
         return ret
     else:
         dO = durationObjectOrObjects
-        if not(hasattr(dO, 'tuplets')) or dO.tuplets is None or not dO.tuplets:
+        if (not hasattr(dO, 'tuplets')) or dO.tuplets is None or not dO.tuplets:
             return (dO.quarterLength, dO.type, dO.dots, None, None, None)
         else:
             return (dO.quarterLength,
