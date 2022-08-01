@@ -1465,7 +1465,7 @@ class ArpeggioMarkSpanner(spanner.Spanner):
     bracket instead of a squiggly line, used to indicate a non-arpeggiated multi-chord
     intervening in a sequence of arpeggiated ones).
 
-    >>> ams = expressions.ArpeggioMarkSpanner('non-arpeggio')
+    >>> ams = expressions.ArpeggioMarkSpanner(arpeggioType='non-arpeggio')
     >>> c1 = chord.Chord('C3 E3 G3')
     >>> c2 = chord.Chord('C4 E4 G4')
     >>> ams.addSpannedElements([c1, c2])
@@ -1475,8 +1475,9 @@ class ArpeggioMarkSpanner(spanner.Spanner):
     <music21.expressions.ArpeggioMarkSpanner
      <music21.chord.Chord C3 E3 G3><music21.chord.Chord C4 E4 G4>>
     '''
-    def __init__(self, arpeggioType: t.Optional[str] = None, *arguments, **keywords):
+    def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
+        arpeggioType: t.Optional[str] = keywords.get('arpeggioType', None)
         if arpeggioType is None:
             arpeggioType = 'normal'
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):

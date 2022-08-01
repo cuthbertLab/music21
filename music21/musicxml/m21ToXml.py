@@ -3377,7 +3377,7 @@ class MeasureExporter(XMLExporterBase):
 
         return arpeggioNumber
 
-    def objectAttachedSpannersToNotations(self, obj, noteIndexInChord, objectSpannerBundle=None):
+    def objectAttachedSpannersToNotations(self, obj, noteIndexInChord=0, objectSpannerBundle=None):
         '''
         return a list of <notations> from spanners related to the object that should appear
         in the notations tag (slurs, slides, etc.)
@@ -3390,7 +3390,7 @@ class MeasureExporter(XMLExporterBase):
         >>> m.append(n0)
         >>> m.append(n1)
         >>> mex = musicxml.m21ToXml.MeasureExporter(m)
-        >>> out = mex.objectAttachedSpannersToNotations(n0, 0, m.spannerBundle)
+        >>> out = mex.objectAttachedSpannersToNotations(n0, objectSpannerBundle=m.spannerBundle)
         >>> out
         [<Element 'ornaments' at 0x1114d9408>]
         >>> mex.dump(out[0])
@@ -3398,7 +3398,7 @@ class MeasureExporter(XMLExporterBase):
           <tremolo type="start">3</tremolo>
         </ornaments>
 
-        >>> out = mex.objectAttachedSpannersToNotations(n1, 0, m.spannerBundle)
+        >>> out = mex.objectAttachedSpannersToNotations(n1, objectSpannerBundle=m.spannerBundle)
         >>> mex.dump(out[0])
         <ornaments>
           <tremolo type="stop">3</tremolo>
@@ -4456,16 +4456,15 @@ class MeasureExporter(XMLExporterBase):
         # If chordOrNote is a note (not expected, but possible), (0, 0) will be returned.
         # It would be nice if PercussionChord could sortAscending (ascending on the
         # staff, that is)...
-        notes = list(chordOrNote.notes)
-        top: int = len(notes)
+        top: int = len(chordOrNote.notes)
         bottom: int = 0
 
         if isinstance(chordOrNote, chord.Chord):
             ascendingChord = chordOrNote.sortAscending(inPlace=False)
             topNote = ascendingChord.notes[-1]
             bottomNote = ascendingChord.notes[0]
-            top = notes.index(topNote)
-            bottom = notes.index(bottomNote)
+            top = chordOrNote.notes.index(topNote)
+            bottom = chordOrNote.notes.index(bottomNote)
 
         return top, bottom
 
