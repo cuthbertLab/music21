@@ -1802,7 +1802,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
     @staticmethod
     def zipMeasures(
-        streams: t.List[stream.Stream]
+        streams: t.Sequence[stream.Stream]
     ) -> t.Iterator[t.List[t.Optional[stream.Measure]]]:
         '''
             A generator that takes a group of streams, and yields a list of one simultaneous
