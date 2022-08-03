@@ -1508,7 +1508,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
 
 
 # -----------------------------------------------------------------------------
-class OffsetIterator(StreamIterator):
+class OffsetIterator(StreamIterator, t.Generic[M21ObjType], t.Sequence):
     '''
     An iterator that with each iteration returns a list of elements
     that are at the same offset (or all at end)
@@ -1671,7 +1671,7 @@ class OffsetIterator(StreamIterator):
 
 
 # -----------------------------------------------------------------------------
-class RecursiveIterator(StreamIterator):
+class RecursiveIterator(StreamIterator, t.Generic[M21ObjType], t.Sequence):
     '''
     One of the most powerful iterators in music21.  Generally not called
     directly, but created by being invoked on a stream with `Stream.recurse()`
