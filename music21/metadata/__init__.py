@@ -1268,7 +1268,7 @@ class Metadata(base.Music21Object):
 
         if useRegex:
             for value, innerField in valueFieldPairs:
-                # "re.I" makes case-insensitive search
+                # "re.IGNORECASE" makes case-insensitive search
                 if isinstance(value, str):
                     match = reQuery.search(value)
                     if match is not None:
