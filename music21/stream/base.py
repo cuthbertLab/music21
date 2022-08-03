@@ -413,7 +413,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         Generally you don't need this, just iterate over a stream, but it is necessary
         to add custom filters to an iterative search before iterating.
         '''
-        return self.__iter__()
+        # Pycharm wasn't inferring typing correctly with `return iter(self)`.
+        return self.__iter__()  # pylint: disable=unnecessary-dunder-call
 
     @overload
     def __getitem__(self, k: str) -> iterator.RecursiveIterator[M21ObjType]:

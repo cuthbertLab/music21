@@ -1518,7 +1518,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
 
 
 # -----------------------------------------------------------------------------
-class OffsetIterator(StreamIterator, t.Generic[M21ObjType], t.Sequence):
+class OffsetIterator(StreamIterator, t.Sequence[t.List[M21ObjType]]):
     '''
     An iterator that with each iteration returns a list of elements
     that are at the same offset (or all at end)
