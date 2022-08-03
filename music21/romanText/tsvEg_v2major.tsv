@@ -5,3 +5,5 @@ mc	mn	mc_onset	mn_onset	timesig	staff	voice	volta	label	globalkey	localkey	pedal
 4	4	0	0	3/4					C	I		V		V						FALSE							
 5	5	0	0	3/4					C	I		@none		V						FALSE							
 6	6	0	0	2/4					C	I		I		I						FALSE							
+7	7	0	0	2/4					C	I		ii%65		ii	%	65				FALSE							
+142	141	0	0	4/4				#VII+/vi	C	I		#VII+/vi		#VII	+			vi			+	0	0				
