@@ -120,7 +120,7 @@ def chordified(timespans, templateStream=None):  # pragma: no cover
 
 @common.deprecated('v7', 'v8', 'use chordify() instead')
 def partwise(tsTree: 'music21.tree.timespanTree.TimespanTree',
-             templateStream: 'music21.stream.Score' = None):  # pragma: no cover
+             templateStream: 'music21.stream.Score'):  # pragma: no cover
     '''
     DEPRECATED in v7 -- use chordify()
     '''
