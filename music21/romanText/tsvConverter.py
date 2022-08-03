@@ -175,7 +175,7 @@ class TabChordBase(abc.ABC):
         self.representationType = None  # Added (not in DCML)
         self.extra = None
         self.dcml_version = -1
-        self.local_key = None # overwritten by a property in TabChordV2
+        self.local_key = None  # overwritten by a property in TabChordV2
 
         # shared between DCML v1 and v2
         self.chord = None
@@ -252,7 +252,7 @@ class TabChordBase(abc.ABC):
         self.local_key = characterSwaps(self.local_key,
                                         minor=isMinor(self.global_key),
                                         direction=direction)
-        
+
         # previously, '%' (indicating half-diminished) was not being parsed
         #   properly.
         if self.form == '%' and direction == 'DCML-m21':
@@ -490,8 +490,8 @@ class TsvHandler:
     def _get_heading_indices(self, header_row: List[str]) -> None:
         '''Private method to get column name/column index correspondences.
 
-        Expected column indices (those in HEADERS, which correspond to TabChord 
-        attributes) are stored in self._head_indices. Others go in 
+        Expected column indices (those in HEADERS, which correspond to TabChord
+        attributes) are stored in self._head_indices. Others go in
         self._extra_indices.
         '''
         self._head_indices = {}
@@ -757,7 +757,7 @@ class M21toTSV:
             if timesig is None:
                 thisEntry.timesig = ''
             else:
-                thisEntry.timesig = timesig.ratioString 
+                thisEntry.timesig = timesig.ratioString
             thisEntry.global_key = global_key
             if isinstance(thisRN, harmony.NoChord):
                 thisEntry.numeral = '@none'
@@ -777,9 +777,9 @@ class M21toTSV:
                 # Strip any leading non-digits from figbass (e.g., M43 -> 43)
                 figbassm = re.match(r'^\D*(\d.*|)', thisRN.figuresWritten)
                 # implementing the following check according to the review
-                # at https://github.com/cuthbertLab/music21/pull/1267/files/a1ad510356697f393bf6b636af8f45e81ad6ccc8#r936472302
+                # at https://github.com/cuthbertLab/music21/pull/1267/files/a1ad510356697f393bf6b636af8f45e81ad6ccc8#r936472302 #pylint: disable=line-too-long
                 # but the match should always exist because either:
-                #   1. there is a digit in the string, in which case it matches 
+                #   1. there is a digit in the string, in which case it matches
                 #       because of the left side of the alternation operator
                 #   2. there is no digit in the string, in which case it matches
                 #       because of the right side of the alternation operator
@@ -850,7 +850,7 @@ def getForm(rn: roman.RomanNumeral) -> str:
     return ''
 
 
-def localKeyAsRn(local_key:key.Key, global_key:key.Key) -> str:
+def localKeyAsRn(local_key: key.Key, global_key: key.Key) -> str:
     '''
     Takes two music21.key.Key objects and returns the roman numeral for
     `local_key` relative to `global_key`.
@@ -873,13 +873,13 @@ def localKeyAsRn(local_key:key.Key, global_key:key.Key) -> str:
     # Temporary hack: for some reason this gives VI and VII instead of #VI and #VII *only*
     #   when local_key is major and global_key is minor.
     # see issue at https://github.com/cuthbertLab/music21/issues/1349#issue-1327713452
-    if (local_key.mode == 'major' and global_key.mode == 'minor' 
-            and r.romanNumeral in ('VI', 'VII') 
+    if (local_key.mode == 'major' and global_key.mode == 'minor'
+            and r.romanNumeral in ('VI', 'VII')
             and (r.pitchClasses[0] - global_key.pitches[0].pitchClass) % 12 in (9, 11)):
         return '#' + r.romanNumeral
     return r.romanNumeral
 
-def isMinor(test_key:str) -> bool:
+def isMinor(test_key: str) -> bool:
     '''
     Checks whether a key is minor or not simply by upper vs lower case.
 
@@ -948,7 +948,7 @@ def characterSwaps(preString, minor=True, direction='m21-DCML'):
             if prevChar == search:
                 postString = preString[:position - 1] + preString[position:]
             else:
-                postString = preString[:position] + insert + preString[position:]        
+                postString = preString[:position] + insert + preString[position:]
         else:
             postString = preString
 
@@ -1023,9 +1023,8 @@ class Test(unittest.TestCase):
 
     def testTsvHandler(self):
         import os
-        import urllib.request
         test_files = {
-            1:('tsvEg_v1.tsv',),
+            1: ('tsvEg_v1.tsv',),
             2: ('tsvEg_v2major.tsv', 'tsvEg_v2minor.tsv'),
         }
         for version in (1, 2):  # test both versions
@@ -1110,9 +1109,14 @@ class Test(unittest.TestCase):
                         self.assertIsNotNone(m)
                         aug6_type = m.group(0)
                         self.assertTrue(item2.figure.startswith(aug6_type))
-                    # Checking for quarterLenght as per
+                    # Checking for quarterLength as per
                     #  https://github.com/cuthbertLab/music21/pull/1267#discussion_r936451907
-                    assert hasattr(item1, 'quarterLength') and isinstance(item1.quarterLength, float)
+                    # However I'm not sure that 'quarterLength' is meaningful
+                    # in the case of V2 where it is not set explicitly.
+                    assert (
+                        hasattr(item1, 'quarterLength')
+                        and isinstance(item1.quarterLength, float)
+                    )
 
     def testM21ToTsv(self):
         import os
