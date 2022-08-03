@@ -818,7 +818,7 @@ class ConverterNoteworthy(SubConverter):
                   filePath: t.Union[pathlib.Path, str],
                   number: t.Optional[int] = None,
                   **keywords):
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection,PyShadowingNames
         '''
         Open Noteworthy data (as nwctxt) from a file path.
 

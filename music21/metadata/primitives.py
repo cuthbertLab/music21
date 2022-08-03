@@ -5,10 +5,13 @@
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
+#               Greg Chapman
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21
+# Copyright:    Copyright © 2010-22 Michael Scott Asato Cuthbert and the music21
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import datetime
 import os
 import unittest
@@ -38,6 +41,7 @@ __all__ = [
 
 
 environLocal = environment.Environment(os.path.basename(__file__))
+
 
 
 # -----------------------------------------------------------------------------
@@ -295,10 +299,10 @@ class Date(prebase.ProtoM21Object):
         >>> d.minute, d.second
         (50, 32)
         '''
-        def intOrNone(value: str) -> t.Optional[int]:
-            if not value or value == '--':
+        def intOrNone(inner_value: str) -> t.Optional[int]:
+            if not inner_value or inner_value == '--':
                 return None
-            return int(value)
+            return int(inner_value)
 
         post = []
         postError = []
@@ -804,9 +808,10 @@ class Text(prebase.ProtoM21Object):
         >>> t1 == t2
         False
 
-        Comparison with non-Text types will always be considered unequal.
+        Comparison with non-Text types, including bare strings,
+        will always be considered unequal.
 
-        >>> t1 == 3
+        >>> t1 == 'some text'
         False
         '''
         if type(other) is not type(self):
@@ -820,6 +825,19 @@ class Text(prebase.ProtoM21Object):
         if self.encodingScheme != other.encodingScheme:
             return False
         return True
+
+
+    def __lt__(self, other):
+        '''
+        Allows for alphabetically sorting two elements
+        '''
+        if type(other) is not type(self):
+            return NotImplemented
+        return (
+            (self._data, self.language, self.isTranslated, self.encodingScheme)
+            < (other._data, other.language, other.isTranslated, other.encodingScheme)
+        )
+
 
     # PUBLIC PROPERTIES #
 
@@ -876,7 +894,7 @@ class Copyright(Text):
     >>> str(c)
     'Copyright 1945 Florence Price'
 
-    The text, language, isTranslated, role, etc must be identical for equality.
+    The text, language, isTranslated, role, etc. must be identical for equality.
 
     >>> c2 = metadata.Copyright('Copyright 1945 Florence Price')
     >>> c == c2
@@ -896,7 +914,7 @@ class Copyright(Text):
 
     Comparison against a non-Copyright object will always return False.
 
-    >>> c == 3
+    >>> c == 1945
     False
     '''
 
@@ -989,7 +1007,7 @@ class Contributor(prebase.ProtoM21Object):
             self.role = None
         # a list of Text objects to support various spellings or
         # language translations
-        self._names = []
+        self._names: t.List[Text] = []
         if 'name' in keywords:  # a single
             self._names.append(Text(keywords['name']))
         if 'names' in keywords:  # many
@@ -1077,7 +1095,7 @@ class Contributor(prebase.ProtoM21Object):
 
         Comparison with a non-Contributor object always returns False.
 
-        >>> c1 == 3
+        >>> c1 == 'The Composer'
         False
         '''
         if type(other) is not type(self):
@@ -1097,7 +1115,7 @@ class Contributor(prebase.ProtoM21Object):
 
     # PUBLIC METHODS #
 
-    def age(self) -> t.Optional[DateSingle]:
+    def age(self) -> t.Optional[datetime.timedelta]:
         r'''
         Calculate the age at death of the Contributor, returning a
         datetime.timedelta object.
@@ -1465,7 +1483,12 @@ _DOC_ORDER = (
     DateBetween,
     DateSelection,
     Contributor,
+    Copyright,
 )
+
+
+ValueType = t.Union[DateSingle, DateRelative, DateBetween, DateSelection,
+                    Text, Contributor, Copyright]
 
 
 if __name__ == '__main__':

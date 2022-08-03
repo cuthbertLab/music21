@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2007-2012 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2007-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1560,7 +1560,7 @@ class LilypondConverter:
         music21.lily.translate.LilyTranslateException: DurationException for durationObject
             <music21.duration.Duration 5.0>: Could not determine durationNumber from complex
 
-        Instead split by components:
+        Instead, split by components:
 
         >>> components = d.components
         >>> [str(lpc.lyMultipliedDurationFromDuration(c)) for c in components]
@@ -2277,7 +2277,6 @@ class LilypondConverter:
         Returns a lilypond.lilyObjects.LyLilypondHeader object
         set with data from the metadata object
 
-
         >>> md = metadata.Metadata()
         >>> md.title = 'My Title'
         >>> md.alternativeTitle = 'My "sub"-title'
@@ -2306,7 +2305,8 @@ class LilypondConverter:
             if title:
                 lyTitleAssignment = lyo.LyAssignment(assignmentId='title',
                                                      identifierInit=lyo.LyIdentifierInit(
-                                                         string=title))
+                                                         string=title)
+                                                     )
                 lpHeaderBodyAssignments.append(lyTitleAssignment)
                 lyTitleAssignment.setParent(lpHeaderBody)
 
@@ -2314,7 +2314,8 @@ class LilypondConverter:
             if subtitle:
                 lySubtitleAssignment = lyo.LyAssignment(assignmentId='subtitle',
                                                         identifierInit=lyo.LyIdentifierInit(
-                                                            string=subtitle))
+                                                            string=subtitle)
+                                                        )
                 lpHeaderBodyAssignments.append(lySubtitleAssignment)
                 lySubtitleAssignment.setParent(lpHeaderBody)
 
@@ -2327,7 +2328,6 @@ class LilypondConverter:
         return a LyObject or None for the end of the previous Measure
 
         uses self.currentMeasure
-
 
         >>> lpc = lily.translate.LilypondConverter()
         >>> m = stream.Measure()
@@ -2378,7 +2378,6 @@ class LilypondConverter:
         of course.
 
         returns a scheme object or None if not needed
-
 
         >>> m = stream.Measure()
         >>> m.append(meter.TimeSignature('3/4'))

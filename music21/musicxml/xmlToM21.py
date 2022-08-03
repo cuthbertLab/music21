@@ -29,8 +29,6 @@ from music21 import exceptions21
 from music21.musicxml import xmlObjects
 from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
 
-# modules that import this include converter.py.
-# thus, cannot import these here
 from music21 import articulations
 from music21 import bar
 from music21 import base  # for typing
@@ -71,6 +69,14 @@ StaffReferenceType = t.Dict[int, t.List[base.Music21Object]]
 
 # const
 NO_STAFF_ASSIGNED = 0
+
+# see docstring for isRecognizableMetadataKey for information on
+# this list.
+_recognizableKeys: t.List[str] = list(
+    metadata.properties.ALL_NAMESPACE_NAMES
+    + metadata.properties.ALL_UNIQUE_NAMES
+    + metadata.properties.ALL_MUSIC21_WORK_IDS
+)
 
 
 # ------------------------------------------------------------------------------
@@ -537,7 +543,7 @@ class XMLParserBase:
     def setPlacement(self, mxObject, m21Object):
         '''
         Sets the placement for objects that have a .placement attribute
-        (most but not all spanners) and sets the style.placement for those
+        (most but not all spanners) and sets the `style.placement` for those
         that don't.
         '''
         placement = mxObject.get('placement')
@@ -1275,17 +1281,17 @@ class MusicXMLImporter(XMLParserBase):
         else:
             md = inputM21
 
-        addm = _addMetadataItemFromTagText
+        add_m = _addMetadataItemFromTagText
 
         # work
         work = el.find('work')
         if work is not None:
-            addm(md, work, 'work-title', 'title')
-            addm(md, work, 'work-number', 'number')
-            addm(md, work, 'opus', 'opusNumber')
+            add_m(md, work, 'work-title', 'title')
+            add_m(md, work, 'work-number', 'number')
+            add_m(md, work, 'opus', 'opusNumber')
 
-        addm(md, el, 'movement-number', 'movementNumber')
-        addm(md, el, 'movement-title', 'movementName')
+        add_m(md, el, 'movement-number', 'movementNumber')
+        add_m(md, el, 'movement-title', 'movementName')
 
         identification = el.find('identification')
         if identification is not None:
@@ -1353,21 +1359,36 @@ class MusicXMLImporter(XMLParserBase):
         if inputM21 is None:
             return md
 
-    # A list of names we might see in <miscellaneous>, that this parser
-    # will interpret as supported metadata keys.  Currently this is all
-    # the uniqueName keys (e.g. 'dateCreated'), the 'namespace:name'
-    # keys (e.g. 'dcterms:created'), and the grandfathered music21 v7
-    # workIds (e.g. 'date').
-    _recognizableKeys: t.List[str] = list(
-        metadata.properties.ALL_NAMESPACE_NAMES
-        + metadata.properties.ALL_UNIQUE_NAMES
-        + metadata.properties.ALL_MUSIC21_WORK_IDS
-    )
+    @staticmethod
+    def isRecognizableMetadataKey(miscFieldName: str) -> bool:
+        '''
+        Returns bool on whether `miscFieldName` is a one of the names
+        that is among the list of names we might see in <miscellaneous>,
+        that this parser will interpret as supported metadata keys.
+        Currently, this is all the uniqueName keys (e.g. 'dateCreated'),
+        the 'namespace:name' keys (e.g. 'dcterms:created'),
+        and the pre-v8 music21 workIds (e.g. 'date').
 
-    def isRecognizableMetadataKey(self, miscFieldName: str) -> bool:
-        return miscFieldName in self._recognizableKeys
+        >>> MI = musicxml.xmlToM21.MusicXMLImporter()
+        >>> MI.isRecognizableMetadataKey('dateCreated')
+        True
+        >>> MI.isRecognizableMetadataKey('dcterms:created')
+        True
+        >>> MI.isRecognizableMetadataKey('dateDestroyed')
+        False
+        '''
+        return miscFieldName in _recognizableKeys
 
-    def processEncoding(self, encoding: ET.Element, md: metadata.Metadata):
+    def processEncoding(self, encoding: ET.Element, md: metadata.Metadata) -> None:
+        '''
+        Process all information in the <encoding> element and put it into the
+        Metadata object passed in as `md`.
+
+        Currently only processes 'software' and these `supports` attributes:
+
+            * new-system = Metadata.definesExplicitSystemBreaks
+            * new-page = Metadata.definesExplicitPageBreaks
+        '''
         # TODO: encoder (text + type = role) multiple
         # TODO: encoding date multiple
         # TODO: encoding-description (string) multiple
@@ -1988,13 +2009,12 @@ class PartParser(XMLParserBase):
 
     def updateTransposition(self, newTransposition: interval.Interval):
         '''
-        As you might expect, a measureParser that reveals a change
+        As one might expect, a measureParser that reveals a change
         in transposition is going to have an effect on the
         Part's instrument list.  This (totally undocumented) method
         deals with it.
 
-        If measureParser.transposition is None, does nothing.
-        If measureParser.transposition is not None, but
+        If `measureParser.transposition` is None, does nothing.
 
         NOTE: Need to test a change of instrument w/o a change of
         transposition such as: Bb clarinet to Bb Soprano Sax to Eb clarinet?
@@ -2509,7 +2529,7 @@ class MeasureParser(XMLParserBase):
         >>> MP.insertCoreAndRef(1.0, mxNote, note.Note('F5'))
 
         This routine leaves MP.stream in an unusable state, because
-        it runs insertCore.  Thus before querying the stream we need to run at end:
+        it runs insertCore.  Thus, before querying the stream we need to run at end:
 
         >>> MP.stream.coreElementsChanged()
         >>> MP.stream.show('text')
@@ -2621,7 +2641,7 @@ class MeasureParser(XMLParserBase):
         etc. so can generate PageLayout, SystemLayout, or StaffLayout
         objects.
 
-        Should also be able to set measure attributes on self.stream
+        Should also be able to set measure attributes on `self.stream`
         '''
         def hasPageLayout():
             if mxPrint.get('new-page') not in (None, 'no'):
@@ -5296,9 +5316,9 @@ class MeasureParser(XMLParserBase):
         and then runs the appropriate attributeTagsToMethods for
         the attribute.
 
-        Also sets self.divisions for the current divisions
+        Also sets `self.divisions` for the current divisions
         (along with self.parent.lastDivisions)
-        and self.transposition and
+        and `self.transposition` and
         to the current transpose.
         '''
         self.attributesAreInternal = False
@@ -5938,8 +5958,8 @@ class MeasureParser(XMLParserBase):
         >>> MP.stream.number
         5
 
-        Sets not only stream.number, but also MeasureParser.measureNumber and
-        MeasureParser.numberSuffix
+        Sets not only `stream.number`, but also `MeasureParser.measureNumber` and
+        `MeasureParser.numberSuffix`
 
         >>> MP.parseMeasureNumbers('44b')
         >>> MP.stream.number

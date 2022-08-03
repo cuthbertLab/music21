@@ -4,9 +4,10 @@
 # Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
+#               Greg Chapman
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21
+# Copyright:    Copyright © 2010-22 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -40,90 +41,95 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 .. image:: images/moduleMetadata-01.*
     :width: 600
 
-    A guide to the 2022 Dublin Core implementation:
+A guide to the v8+ Dublin Core implementation:
 
-    The class Metadata has been completely rewritten in music21 v8 to support
-    significant new functionality.
+The class Metadata has been completely rewritten in music21 v8 to support
+significant new functionality.
 
-    The previous Metadata implementation had a list of supported workIds, and also
-    a list of standard contributor roles.  More than one of each contributor role
-    could exist, but only one of each workId.  And while there was some support for
-    custom contributor roles, there was no support for other custom metadata, only
-    the specified list of workIds.
+The previous Metadata implementation had a list of supported workIds, and also
+a list of standard contributor roles.  More than one of each contributor role
+could exist, but only one of each workId.  And while there was some support for
+custom contributor roles, there was no support for other custom metadata, only
+the specified list of workIds.
 
-    In the 2022 implementation, contributor roles are treated the same as other
-    non-contributor metadata.  Music21 includes a list of supported property terms,
-    which are pulled from Dublin Core (namespace = 'dcterms'), MARC Relator codes
-    (namespace = 'marcrel'), and Humdrum (namespace = 'humdrum').  Each property
-    term is assigned a unique name (e.g. 'composer', 'alternativeTitle', etc).
+In the v8 implementation, contributor roles are treated the same as other
+non-contributor metadata.  Music21 includes a list of supported property terms,
+which are pulled from Dublin Core (namespace = 'dcterms'), MARC Relator codes
+(namespace = 'marcrel'), and Humdrum (namespace = 'humdrum').  Each property
+term is assigned a unique name (e.g. 'composer', 'alternativeTitle', etc).
 
-    Each metadata property can be specified by 'uniqueName' or by 'namespace:name'.
-    For example: `md['composer']` and `md['marcrel:CMP']` are equivalent, as are
-    `md['alternativeTitle']` and `md['dcterms:alternative']`. There can be more than
-    one of any such item (not just contributors).  And you can also have metadata
-    items with custom names.
+Each metadata property can be specified by 'uniqueName' or by 'namespace:name'.
+For example: `md['composer']` and `md['marcrel:CMP']` are equivalent, as are
+`md['alternativeTitle']` and `md['dcterms:alternative']`. There can be more than
+one of any such item (not just contributors).  And you can also have metadata
+items with custom names.
 
-    For simple metadata items, like a single title, there is an easy way to get/set
-    them: use an attribute-style get operation (e.g. `t = md.title`).  This will always
-    return a single string.  If there is more than one item of that name, a summary
-    string will be returned.  To see the full list of metadata items in their native
-    value type, use a dictionary-style get operation (e.g. `titles = md['title']`).
-    If an item or list of items is set (whether attribute-style or dictionary-style),
-    any existing items of that name are deleted. To add an item or list of items
-    without deleting existing items, use the `md.add()` API.  See the examples below:
+For simple metadata items, like a single title, there is an easy way to get/set
+them: use an attribute-style get operation (e.g. `t = md.title`).  This will always
+return a single string.  If there is more than one item of that name, a summary
+string will be returned.  To see the full list of metadata items in their native
+value type, use a dictionary-style get operation (e.g. `titles = md['title']`).
+If an item or list of items is set (whether attribute-style or dictionary-style),
+any existing items of that name are deleted. To add an item or list of items
+without deleting existing items, use the `md.add()` API.  See the examples below:
 
-    Set a title (overwrites any existing titles):
+Set a title (overwrites any existing titles):
 
-    >>> md = metadata.Metadata()
-    >>> md.title = 'A Title'
-    >>> md.title
-    'A Title'
-    >>> md['title']
-    (<music21.metadata.primitives.Text A Title>,)
+>>> md = metadata.Metadata()
+>>> md.title = 'A Title'
+>>> md.title
+'A Title'
+>>> md['title']
+(<music21.metadata.primitives.Text A Title>,)
 
-    Set two titles (overwrites any existing titles):
+Set two titles (overwrites any existing titles):
 
-    >>> md['title'] = ['The Title', 'A Second Title']
-    >>> md['title']
-    (<music21.metadata.primitives.Text The Title>,
-    <music21.metadata.primitives.Text A Second Title>)
-    >>> md.title
-    'The Title, A Second Title'
+>>> md['title'] = ['The Title', 'A Second Title']
+>>> md['title']
+(<music21.metadata.primitives.Text The Title>,
+<music21.metadata.primitives.Text A Second Title>)
+>>> md.title
+'The Title, A Second Title'
 
-    Add a third title (leaves any existing titles in place):
+Add a third title (leaves any existing titles in place):
 
-    >>> md.add('title', 'Third Title, A')
-    >>> md['title']
-    (<music21.metadata.primitives.Text The Title>,
-    <music21.metadata.primitives.Text A Second Title>,
-    <music21.metadata.primitives.Text Third Title, A>)
-    >>> md.title
-    'The Title, A Second Title, A Third Title'
+>>> md.add('title', 'Third Title, A')
+>>> md['title']
+(<music21.metadata.primitives.Text The Title>,
+<music21.metadata.primitives.Text A Second Title>,
+<music21.metadata.primitives.Text Third Title, A>)
+>>> md.title
+'The Title, A Second Title, A Third Title'
 
-    You can also set/add/get free-form custom metadata items:
+You can also set/add/get free-form custom metadata items:
 
-    >>> md.setCustom('modification description', 'added missing sharp in measure 27')
-    >>> md.getCustom('modification description')
-    (<music21.metadata.primitives.Text added missing sharp in measure 27>,)
-    >>> md.addCustom('modification description', 'deleted redundant natural in measure 28')
-    >>> md.getCustom('modification description')
-    (<music21.metadata.primitives.Text added missing sharp in measure 27>,
-    <music21.metadata.primitives.Text deleted redundant natural in measure 28>)
+>>> md.setCustom('modification description', 'added missing sharp in measure 27')
+>>> md.getCustom('modification description')
+(<music21.metadata.primitives.Text added missing sharp in measure 27>,)
 
-    Metadata does not explicitly support client-specified namespaces, but by using
-    getCustom/addCustom/setCustom, clients can set anything they want. For instance, to
-    embed the old SoundTracker .MOD format's sample name, a .MOD file parser could use
-    `md.addCustom('soundtracker:SampleName', 'Bassoon')`, and a .MOD file writer that
-    understood 'soundtracker:' metadata could then write it back accurately to one of
-    those files. Custom metadata (whether namespaced this way, or free form) can also
-    be written to various other file formats without interpretation, as long as there
-    is a place for it (e.g. in the '<miscellaneous>' tag in MusicXML).
+Adding another custom element for the same description creates a second
+entry.
 
-    primitives.Text has been updated to add whether or not the text has been translated,
-    as well as an encoding scheme, that specifies which standard should be used to parse
-    the string.  See metadata/primitives.py for more information.
+>>> md.addCustom('modification description', 'deleted redundant natural in measure 28')
+>>> md.getCustom('modification description')
+(<music21.metadata.primitives.Text added missing sharp in measure 27>,
+ <music21.metadata.primitives.Text deleted redundant natural in measure 28>)
 
+Metadata does not explicitly support client-specified namespaces, but by using
+getCustom/addCustom/setCustom, clients can set anything they want. For instance, to
+embed the old SoundTracker .MOD format's sample name, a .MOD file parser could use
+`md.addCustom('soundtracker:SampleName', 'Bassoon')`, and a .MOD file writer that
+understood 'soundtracker:' metadata could then write it back accurately to one of
+those files. Custom metadata (whether namespaced this way, or free form) can also
+be written to various other file formats without interpretation, as long as there
+is a place for it (e.g. in the '<miscellaneous>' tag in MusicXML).
+
+In music21 v8, primitives.Text has been updated to add `isTranslated` to keep track of
+whether the text has been translated,
+as well as an encoding scheme, that specifies which standard should be used to parse
+the string.  See metadata/primitives.py for more information.
 '''
+
 from collections import namedtuple
 from dataclasses import dataclass
 import os
@@ -148,7 +154,7 @@ from music21.metadata import caching
 from music21.metadata import primitives
 from music21.metadata.primitives import (Date, DateSingle, DateRelative, DateBetween,
                                          DateSelection, Text, Contributor, Creator,
-                                         Imprint, Copyright)
+                                         Imprint, Copyright, ValueType)
 
 from music21.metadata import testMetadata
 # -----------------------------------------------------------------------------
@@ -161,9 +167,6 @@ __all__ = [
 
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
-
-ValueType = t.Union[DateSingle, DateRelative, DateBetween, DateSelection,
-                    Text, Contributor, Copyright]
 
 AmbitusShort = namedtuple('AmbitusShort',
                           ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
@@ -241,16 +244,16 @@ class Metadata(base.Music21Object):
     updated in music21 v8 ('dateCreated'), and the old v7 name ('date') has
     been grandfathered in as a synonym.
 
-    Here is the list of grandfathered v7 synonyms:
+    Here is the list of grandfathered v7 synonyms, which may disappear in a
+    future version:
 
     >>> sorted(set(md.searchAttributes) - set(md.allUniqueNames))
     ['commission', 'date', 'dedication', 'volume']
 
-    And their new v8 unique names:
+    And here are their new v8 unique/Dublin-Core standard names:
 
     >>> sorted(metadata.properties.MUSIC21_WORK_ID_TO_UNIQUE_NAME.values())
     ['commissionedBy', 'dateCreated', 'dedicatedTo', 'volumeNumber']
-
     '''
 
     # CLASS VARIABLES #
@@ -436,8 +439,8 @@ class Metadata(base.Music21Object):
         >>> md.add('librettist', 'Hunter Bell')
         >>> md.add('title', 'Other World')
         >>> md.addCustom('excerpt-start-measure', 1234)
-        >>> all = md.getAllNamedValues()
-        >>> all
+        >>> allMd = md.getAllNamedValues()
+        >>> allMd
         (('musicxml:software', <music21.metadata.primitives.Text music21 v...>),
          ('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Jeff Bowen>),
          ('marcrel:LBT', <music21.metadata.primitives.Contributor librettist:Hunter Bell>),
@@ -467,7 +470,7 @@ class Metadata(base.Music21Object):
         Returns all contributors stored in this metadata as a tuple of (name, value) tuples.
         The individual tuple's first element (the name) will be of the form 'namespace:name'.
         Contributors with a custom role should have a uniqueName of 'otherContributor' (i.e.
-        a namespaceName of 'marcrel:CTB'), and have their value.role field set to the custom
+        a namespaceName of 'marcrel:CTB'), and have their `value.role` field set to the custom
         role.
 
         >>> md = metadata.Metadata()
@@ -647,7 +650,7 @@ class Metadata(base.Music21Object):
         Returns a tuple of software names/versions.
 
         Returns an empty tuple if no software names/versions exist,
-        but this is rare, since music21 adds it's own version when
+        but this is rare, since music21 adds its own version when
         initializing a Metadata object.
 
         >>> md = metadata.Metadata()
@@ -745,7 +748,7 @@ class Metadata(base.Music21Object):
 
     # SPECIAL METHODS #
     def all(self, skipContributors=False):
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection,PyShadowingNames
         '''
         Returns all values stored in this metadata as a sorted Tuple of Tuple[str, str].
         Each individual Tuple is (uniqueName, stringValue).
@@ -776,7 +779,7 @@ class Metadata(base.Music21Object):
 
         for uniqueName in self.allUniqueNames:
             try:
-                values: t.List[str] = self._getStringValuesByNamespaceName(
+                values: t.Tuple[str, ...] = self._getStringValuesByNamespaceName(
                     properties.UNIQUE_NAME_TO_NAMESPACE_NAME[uniqueName]
                 )
                 if not values:
@@ -1049,6 +1052,7 @@ class Metadata(base.Music21Object):
         self._set(key, value, isCustom=False)
 
     def addContributor(self, c):
+        # noinspection PyShadowingNames
         r'''
         Assign a :class:`~music21.metadata.Contributor` object to this
         Metadata.
@@ -1357,7 +1361,7 @@ class Metadata(base.Music21Object):
         or by using `md.add`.
         >>> md.add('composer', 'Spalding, Esperanza')
 
-        The md.composer attribute returns a summary string if there is
+        The `Metadata.composer` attribute returns a summary string if there is
         more than one composer.
 
         >>> md.composer
@@ -1395,11 +1399,12 @@ class Metadata(base.Music21Object):
         '''
         return self._getPluralAttribute('composer')
 
-    # mypy complains about "decorated property not supported" (they're fixing it now).
-    # Adding "type: ignore" comment to the first decoration suppresses the complaint.
-    @property   # type: ignore
-    @deprecated('v8', 'v9', 'use `md.dateCreated` instead')
+    @property
     def date(self):
+        '''
+        The `.date` property is deprecated in v8 and will be removed in v10.
+        Use `dateCreated` instead.
+        '''
         return self.dateCreated
 
     @property
@@ -1544,40 +1549,46 @@ class Metadata(base.Music21Object):
         return self._getSingularAttribute('movementName')
 
     @property
-    def movementNumber(self):
+    def movementNumber(self) -> t.Optional[str]:
         r'''
-        Get or set the movement number.
+        Get or set the movement number as a string (or None)
 
         >>> md = metadata.Metadata(title='Ode to Joy')
-        >>> md.movementNumber = 3
+        >>> md.movementNumber = 4
 
         Note that movement numbers are always returned as strings!  This may
         change in the future.
 
         >>> md.movementNumber
-        '3'
+        '4'
         '''
         return self._getSingularAttribute('movementNumber')
 
     @property
-    def number(self):
+    def number(self) -> t.Optional[str]:
         r'''
-        Get or set the number of the work within a collection of pieces.
-        (for instance, the number within a collection of ABC files)
+        Get or set the number of the work within a collection of pieces,
+        as a string. (for instance, the number within a collection of ABC files)
 
         >>> md = metadata.Metadata()
-        >>> md.number = 4
+        >>> md.number = '4'
 
         Note that numbers are always returned as strings!  This may
         change in the future.
 
         >>> md.number
         '4'
+
+        However, it is acceptable to set it as an int:
+
+        >>> md.number = 2
+        >>> md.number
+        '2'
         '''
         return self._getSingularAttribute('number')
 
     @property
-    def opusNumber(self):
+    def opusNumber(self) -> t.Optional[str]:
         r'''
         Get or set the opus number.
 
@@ -1585,9 +1596,17 @@ class Metadata(base.Music21Object):
         >>> md.opusNumber = 56
 
         Note that opusNumbers are always returned as strings!  This may
-        change in the future.
+        change in the future, however, it is less likely to change
+        than `.number` or `.movementNumber` since Opus numbers such as
+        `18a` are common.
+
         >>> md.opusNumber
         '56'
+
+        There is no enforcement that only numbers actually called "opus"
+        are used, and it could be used for other catalogue numbers.
+
+        >>> md.opusNumber = 'K.622'
         '''
         return self._getSingularAttribute('opusNumber')
 
@@ -1640,33 +1659,33 @@ class Metadata(base.Music21Object):
 
     def _getStringValueByNamespaceName(self, namespaceName: str) -> t.Optional[str]:
         '''
-            Gets a single str value (a summary if necessary) for a supported
-            'namespace:name'.
+        Gets a single str value (a summary if necessary) for a supported
+        'namespace:name'.
 
-            >>> md = metadata.Metadata()
-            >>> md['title'] = ['The Title', 'A Second Title']
-            >>> md._getStringValueByNamespaceName('dcterms:title')
-            'The Title, A Second Title'
+        >>> md = metadata.Metadata()
+        >>> md['title'] = ['The Title', 'A Second Title']
+        >>> md._getStringValueByNamespaceName('dcterms:title')
+        'The Title, A Second Title'
 
-            Returns None  (rather than raising KeyError) if namespaceName
-            is not a supported 'namespace:name'.
+        Returns None  (rather than raising KeyError) if namespaceName
+        is not a supported 'namespace:name'.
 
-            >>> md.setCustom('average duration', '180 minutes')
-            >>> md._getStringValueByNamespaceName('average duration') is None
-            True
+        >>> md.setCustom('average duration', '180 minutes')
+        >>> md._getStringValueByNamespaceName('average duration') is None
+        True
 
-            Returns None if the namespaceName is supported, but no such
-            metadata item exists.
+        Returns None if the namespaceName is supported, but no such
+        metadata item exists.
 
-            >>> md._getStringValueByNamespaceName('dcterms:alternative') is None
-            True
+        >>> md._getStringValueByNamespaceName('dcterms:alternative') is None
+        True
 
-            Performs article normalization on metadata properties that are declared
-            as needing it (generally, title-like properties).
+        Performs article normalization on metadata properties that are declared
+        as needing it (generally, title-like properties).
 
-            >>> md['alternativeTitle'] = ['Alternative Title, The', 'Second Alternative Title, A']
-            >>> md._getStringValueByNamespaceName('dcterms:alternative')
-            'The Alternative Title, A Second Alternative Title'
+        >>> md['alternativeTitle'] = ['Alternative Title, The', 'Second Alternative Title, A']
+        >>> md._getStringValueByNamespaceName('dcterms:alternative')
+        'The Alternative Title, A Second Alternative Title'
         '''
         if namespaceName not in properties.ALL_NAMESPACE_NAMES:
             return None
@@ -1695,32 +1714,32 @@ class Metadata(base.Music21Object):
 
     def _getStringValuesByNamespaceName(self, namespaceName: str) -> t.Tuple[str, ...]:
         '''
-            Gets a tuple of str values for a supported 'namespace:name'.
+        Gets a tuple of str values for a supported 'namespace:name'.
 
-            >>> md = metadata.Metadata()
-            >>> md['title'] = ['The Title', 'A Second Title']
-            >>> md._getStringValuesByNamespaceName('dcterms:title')
-            ('The Title', 'A Second Title')
+        >>> md = metadata.Metadata()
+        >>> md['title'] = ['The Title', 'A Second Title']
+        >>> md._getStringValuesByNamespaceName('dcterms:title')
+        ('The Title', 'A Second Title')
 
-            Returns an empty tuple (rather than raising KeyError) if namespaceName
-            is not a supported 'namespace:name'.
+        Returns an empty tuple (rather than raising KeyError) if namespaceName
+        is not a supported 'namespace:name'.
 
-            >>> md.setCustom('average duration', '180 minutes')
-            >>> md._getStringValuesByNamespaceName('average duration')
-            ()
+        >>> md.setCustom('average duration', '180 minutes')
+        >>> md._getStringValuesByNamespaceName('average duration')
+        ()
 
-            Returns an empty tuple if the namespaceName is supported, but no such
-            metadata item exists.
+        Returns an empty tuple if the namespaceName is supported, but no such
+        metadata item exists.
 
-            >>> md._getStringValuesByNamespaceName('dcterms:alternative')
-            ()
+        >>> md._getStringValuesByNamespaceName('dcterms:alternative')
+        ()
 
-            Performs article normalization on metadata properties that are declared
-            as needing it (generally, title-like properties).
+        Performs article normalization on metadata properties that are declared
+        as needing it (generally, title-like properties).
 
-            >>> md['alternativeTitle'] = ['Alternative Title, The', 'Second Alternative Title, A']
-            >>> md._getStringValuesByNamespaceName('dcterms:alternative')
-            ('The Alternative Title', 'A Second Alternative Title')
+        >>> md['alternativeTitle'] = ['Alternative Title, The', 'Second Alternative Title, A']
+        >>> md._getStringValuesByNamespaceName('dcterms:alternative')
+        ('The Alternative Title', 'A Second Alternative Title')
         '''
         if namespaceName not in properties.ALL_NAMESPACE_NAMES:
             return tuple()
@@ -2279,7 +2298,7 @@ class Metadata(base.Music21Object):
         ...     metadata.DateBetween(['1938','1939']))
         <music21.metadata.primitives.DateBetween 1938/--/-- to 1939/--/-->
         '''
-        valueType: t.Optional[t.Type] = properties.NAMESPACE_NAME_TO_VALUE_TYPE.get(
+        valueType: t.Optional[t.Type[ValueType]] = properties.NAMESPACE_NAME_TO_VALUE_TYPE.get(
             namespaceName, None
         )
         originalValue: t.Any = value
@@ -2315,6 +2334,7 @@ class Metadata(base.Music21Object):
                 # DateBetween, or DateSelection), you have to create those
                 # yourself before adding/setting them.
 
+                # noinspection PyBroadException
                 # pylint: disable=bare-except
                 try:
                     return DateSingle(value)

@@ -14,7 +14,7 @@
 import typing as t
 from dataclasses import dataclass
 
-from music21.metadata.primitives import (DateSingle, Text, Contributor, Copyright)
+from music21.metadata.primitives import (DateSingle, Text, Contributor, Copyright, ValueType)
 
 
 @dataclass
@@ -30,8 +30,8 @@ class PropertyDescription:
                 defined at <http://www.loc.gov/loc.terms/relators/>
             'humdrum' means the property term is from the Humdrum reference record terms,
                 defined at <https://www.humdrum.org/reference-records/#>
-        isContributor: bool is whether or not the property describes a contributor.
-        needsArticleNormalization: bool is whether or not the property values might
+        isContributor: bool is whether the property describes a contributor.
+        needsArticleNormalization: bool is whether the property values might
             benefit from article normalization when getting as a string (this is
             generally True for various kinds of titles).
         oldMusic21Abbrev: str is the backward compatible music21 abbreviation for this
@@ -53,7 +53,7 @@ class PropertyDescription:
     namespace: str = ''
     oldMusic21Abbrev: t.Optional[str] = None
     oldMusic21WorkId: t.Optional[str] = None
-    valueType: t.Type = Text
+    valueType: t.Type[ValueType] = Text
     needsArticleNormalization: bool = False
     isContributor: bool = False
 
@@ -627,7 +627,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         valueType=Contributor,
         isContributor=True),
 
-    # lyricist: a person or organization who is the a writer of the
+    # lyricist: a person or organization who is a writer of the
     #   text of a song.
     PropertyDescription(
         uniqueName='lyricist',
@@ -697,7 +697,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # scribe: a person who is an amanuensis and for a writer of
     #   manuscripts proper. For a person who makes pen-facsimiles,
-    #   use Facsimilist [fac].
+    #   use facsimilist [fac] (facsimilist is not supported in music21)
     PropertyDescription(
         uniqueName='scribe',
         name='SCR',
@@ -717,7 +717,8 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 
     # transcriber: a person who prepares a handwritten or typewritten copy
     #   from original material, including from dictated or orally recorded
-    #   material. For makers of pen-facsimiles, use Facsimilist [fac].
+    #   material. For makers of pen-facsimiles, use facsimilist [fac].
+    #   (facsimilist is not supported in music21)
     PropertyDescription(
         uniqueName='transcriber',
         name='TRC',

@@ -5,9 +5,7 @@ from typing import Type
 from music21 import metadata
 
 
-
 class Test(unittest.TestCase):
-
     # When `maxDiff` is None, `assertMultiLineEqual()` provides better errors.
     maxDiff = None
 
@@ -215,7 +213,7 @@ class Test(unittest.TestCase):
             valueType: Type = metadata.Text):
 
         if ':' not in namespaceName:
-            # It's just the namespace because name == uniqueName
+            # It's just the namespace because name == uniqueName,
             # and I didn't want to spend the time to type it twice...
             namespaceName += ':' + uniqueName
 
@@ -237,10 +235,10 @@ class Test(unittest.TestCase):
             # it's not there (it is).
             item = getattr(md, uniqueName)
             self.assertIsNone(item)
-            itemtuple = md[uniqueName]
-            self.assertEqual(itemtuple, tuple())
-            itemtuple = md[namespaceName]
-            self.assertEqual(itemtuple, tuple())
+            itemTuple = md[uniqueName]
+            self.assertEqual(itemTuple, tuple())
+            itemTuple = md[namespaceName]
+            self.assertEqual(itemTuple, tuple())
 
         if valueType is metadata.DateSingle:
             md[namespaceName] = ['1978/6/11']
