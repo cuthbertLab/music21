@@ -1457,8 +1457,12 @@ class ArpeggioMark(Expression):
 class ArpeggioMarkSpanner(spanner.Spanner):
     '''
     ArpeggioMarkSpanner is a multi-staff or multi-voice (i.e. multi-chord) arpeggio.
-    The spanner should contain all the simultaneous Chords/Notes that are to be
-    arpeggiated together.
+    The spanner should contain all the simultaneous Chords that are to be
+    arpeggiated together.  If there is only one arpeggiated note in a particular staff
+    or voice (i.e. the rest are in other staves/voices), then in that case only the
+    spanner can contain a Note.  Do not ever put a Note that is within a Chord into a
+    spanner; put the Chord in instead.  And do not ever put an ArpeggioMark in a note
+    or chord's .expressions.
 
     The parameter arpeggioType can be 'normal' (a squiggly line), 'up' (a squiggly line
     with an up arrow), 'down' (a squiggly line with a down arrow), or 'non-arpeggio' (a
