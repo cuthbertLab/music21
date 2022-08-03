@@ -160,14 +160,14 @@ class StreamPlayer:  # pragma: no cover
         start_time = self.pygame.time.get_ticks()
         while self.pygame.mixer.music.get_busy():
             if busyFunction is not None:
-                busyFunction.__call__(busyArgs)
+                busyFunction(busyArgs)
             if self.pygame.time.get_ticks() - start_time > playForMilliseconds:
                 self.pygame.mixer.music.stop()
                 break
             pygameClock.tick(framerate)
 
         if endFunction is not None:
-            endFunction.__call__(endArgs)
+            endFunction(endArgs)
 
     def stop(self):
         self.pygame.mixer.music.stop()

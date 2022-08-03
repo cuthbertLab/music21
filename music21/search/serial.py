@@ -122,7 +122,7 @@ class ContiguousSegmentOfNotes(base.Music21Object):
             matchedRow = self.matchedSegment
         else:
             matchedRow = pcToToneRow(self.matchedSegment)
-        return(activeRow, matchedRow)
+        return (activeRow, matchedRow)
 
     @property
     def zeroCenteredTransformationsFromMatched(self):

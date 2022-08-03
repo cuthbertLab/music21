@@ -413,7 +413,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         Generally you don't need this, just iterate over a stream, but it is necessary
         to add custom filters to an iterative search before iterating.
         '''
-        return self.__iter__()
+        return iter(self)
 
     @overload
     def __getitem__(self, k: str) -> iterator.RecursiveIterator[M21ObjType]:
@@ -2895,7 +2895,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         target.sites.remove(self)
         target.activeSite = None
         if id(target) in self._offsetDict:
-            del(self._offsetDict[id(target)])
+            del self._offsetDict[id(target)]
 
         updateIsFlat = False
         if replacement.isStream:
@@ -6319,6 +6319,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         *,
         pitchPast: t.Optional[t.List[pitch.Pitch]] = None,
         pitchPastMeasure: t.Optional[t.List[pitch.Pitch]] = None,
+        otherSimultaneousPitches: t.Optional[t.List[pitch.Pitch]] = None,
         useKeySignature: t.Union[bool, key.KeySignature] = True,
         alteredPitches: t.Optional[t.List[pitch.Pitch]] = None,
         searchKeySignatureByContext: bool = False,
@@ -6336,6 +6337,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         `pitchPastMeasure` is a list of pitches preceding this pitch but in a previous measure.
 
+        `otherSimultaneousPitches` is a list of other pitches in this simultaneity, for use
+        when `cautionaryPitchClass` is True.
 
         If `useKeySignature` is True, a :class:`~music21.key.KeySignature` will be searched
         for in this Stream or this Stream's defined contexts. An alternative KeySignature
@@ -6377,7 +6380,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Changed in v.6: does not return anything if inPlace is True.
         Changed in v.7: default inPlace is False
-        Changed in v.8: altered unisons in Chords now supply clarifying naturals.
+        Changed in v.8: altered unisons/octaves in Chords now supply clarifying naturals.
 
         All arguments are keyword only.
         '''
@@ -6459,11 +6462,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     tiePitchSet.add(e.pitch.nameWithOctave)
 
             elif isinstance(e, chord.Chord):
-                # add all chord elements to past first
                 # when reading a chord, this will apply an accidental
                 # if pitches in the chord suggest an accidental
                 seenPitchNames = set()
-                pitchPast += e.pitches
 
                 for n in list(e):
                     p = n.pitch
@@ -6472,9 +6473,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     else:
                         lastNoteWasTied = False
 
+                    otherSimultaneousPitches = [other for other in e.pitches if other is not p]
+
                     p.updateAccidentalDisplay(
                         pitchPast=pitchPast,
                         pitchPastMeasure=pitchPastMeasure,
+                        otherSimultaneousPitches=otherSimultaneousPitches,
                         alteredPitches=alteredPitches,
                         cautionaryPitchClass=cautionaryPitchClass,
                         cautionaryAll=cautionaryAll,
@@ -6489,6 +6493,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 for pName in seenPitchNames:
                     tiePitchSet.add(pName)
 
+                pitchPast += e.pitches
             else:
                 tiePitchSet.clear()
 
@@ -7044,6 +7049,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 # change the duration of the first note to be self + sum
                 # of all others
                 qLen = notes_and_rests[posConnected[0]].quarterLength
+                if not notes_and_rests[posConnected[0]].duration.linked:
+                    # obscure bug found from some inexact musicxml files.
+                    notes_and_rests[posConnected[0]].duration.linked = True
                 notes_and_rests[posConnected[0]].quarterLength = qLen + durSum
 
                 # set tie to None on first note
@@ -8645,7 +8653,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if recurse is True:
             sIterator = post.recurse()
         else:
-            sIterator = post.__iter__()
+            sIterator = iter(post)
 
         if classFilterList:
             sIterator = sIterator.addFilter(filters.ClassFilter(classFilterList))
@@ -9826,7 +9834,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         returnList.append(None)
                         lastWasNone = True
                 if isinstance(e, note.Note):
-                    if not(skipUnisons is False
+                    if not (skipUnisons is False
                            or len(lastPitches) != 1
                            or e.pitch.pitchClass != lastPitches[0].pitchClass
                            or (skipOctaves is False
@@ -12320,7 +12328,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 eClasses = e.classes
                 if 'Variant' in eClasses:
                     elementGroups = e.groups
-                    if (not(variantGroup in elementGroups)
+                    if (not (variantGroup in elementGroups)
                             or e.lengthType in ['elongation', 'deletion']):
                         newPart.remove(e)
                     else:
@@ -12657,7 +12665,7 @@ class Measure(Stream):
 
         for illegalKey in ('meterStream', 'refStreamOrTimeRange', 'bestClef'):
             if illegalKey in srkCopy:
-                del(srkCopy[illegalKey])
+                del srkCopy[illegalKey]
 
         m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True, **srkCopy)
         # makeTies is for cross-bar associations, and cannot be used

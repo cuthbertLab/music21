@@ -594,6 +594,20 @@ class Test(unittest.TestCase):
                 getNeighbor=Direction.DESCENDING)),
             'A-4')
 
+    def test_realize_descending_reversed_cached(self):
+        net = IntervalNetwork()
+        net.fillMelodicMinor()
+
+        descending_melodic_minor, _ = net.realizeDescending(
+            'C4', minPitch='C4', maxPitch='C5', reverse=False)
+        self.assertEqual(descending_melodic_minor[0].nameWithOctave, 'B-4')
+        self.assertEqual(descending_melodic_minor[-1].nameWithOctave, 'C4')
+
+        descending_melodic_minor_reversed, _ = net.realizeDescending(
+            'C4', minPitch='C4', maxPitch='C5', reverse=True)
+        self.assertEqual(descending_melodic_minor_reversed[0].nameWithOctave, 'C4')  # was B-4
+        self.assertEqual(descending_melodic_minor_reversed[-1].nameWithOctave, 'B-4')  # was C4
+
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
