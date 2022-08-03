@@ -2816,7 +2816,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self._updateComponents()
 
         # tested, does return 0 if no components
-        tot = 0
+        tot = 0.0
         for c in self._components:
             tot += c.quarterLength
         return tot
