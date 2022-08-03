@@ -663,7 +663,7 @@ class M21toTSV:
     >>> bachHarmony.parts[0].measure(1)[0].figure
     'I'
 
-    The initialisation includes the preparation of a list of lists, so
+    The initialization includes the preparation of a list of lists, so
 
     >>> initial = romanText.tsvConverter.M21toTSV(bachHarmony, dcml_version=2)
     >>> tsvData = initial.tsvData
