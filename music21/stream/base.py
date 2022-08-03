@@ -5619,10 +5619,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         .storeAtEnd() (such as right barlines) are
         not affected.
 
-        If startOffset is given then all elements before
-        that offset will be shifted.  If endOffset is given
-        then all elements at or after this offset will be
-        shifted
+        If startOffset is given then elements before
+        that offset will not be shifted.  If endOffset is given
+        then all elements at or after this offset will be not be shifted.
 
         >>> a = stream.Stream()
         >>> a.repeatInsert(note.Note('C'), list(range(10)))
