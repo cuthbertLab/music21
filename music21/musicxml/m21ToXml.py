@@ -746,7 +746,10 @@ class GeneralObjectExporter:
         if 0 < n.quarterLength <= 6.0:
             new_part.insert(0, meter.bestTimeSignature(new_part))
         stream.makeNotation.makeMeasures(
-            new_part, inPlace=True, refStreamOrTimeRange=[0, nCopy.quarterLength])
+            new_part,
+            inPlace=True,
+            refStreamOrTimeRange=[0, nCopy.quarterLength]
+        )
         stream.makeNotation.makeTupletBrackets(new_part, inPlace=True)
         return self.fromPart(new_part)
 
@@ -1624,18 +1627,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         <music21.meter.TimeSignature 4/4>
         '''
         s = self.stream
-        # search context probably should always be True here
-        # to search container first, we need a non-flat version
-        # searching a flattened version, we will get contained and non-container
-        # this meter  stream is passed to makeNotation()
         meterStream = s.getTimeSignatures(searchContext=False,
-                                          sortByCreationTime=False, returnDefault=False)
-        # environLocal.printDebug(['setMeterStream: post meterStream search',
-        #                meterStream, meterStream[0]])
-        if not meterStream:
-            # note: this will return a default if no meters are found
-            meterStream = s.flatten().getTimeSignatures(searchContext=False,
-                                                        sortByCreationTime=True, returnDefault=True)
+                                          sortByCreationTime=False,
+                                          returnDefault=True)
         self.meterStream = meterStream
 
     def setScoreLayouts(self):
