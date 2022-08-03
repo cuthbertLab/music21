@@ -2593,6 +2593,7 @@ class Test(unittest.TestCase):
         lpc.loadObjectFromScore(s)
 
     def testColors(self):
+        # pylint: disable=implicit-str-concat
         red_note = note.Note()
         red_note.style.color = '#FF0000'
         sm = LilypondConverter().lySimpleMusicFromNoteOrRest(red_note)

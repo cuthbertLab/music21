@@ -62,7 +62,7 @@ class Corpus(prebase.ProtoM21Object):
                 keysToRemove.append(key)
 
         for key in keysToRemove:
-            del(Corpus._pathsCache[key])
+            del Corpus._pathsCache[key]
 
     def _findPaths(
         self,

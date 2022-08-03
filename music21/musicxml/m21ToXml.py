@@ -746,7 +746,10 @@ class GeneralObjectExporter:
         if 0 < n.quarterLength <= 6.0:
             new_part.insert(0, meter.bestTimeSignature(new_part))
         stream.makeNotation.makeMeasures(
-            new_part, inPlace=True, refStreamOrTimeRange=[0, nCopy.quarterLength])
+            new_part,
+            inPlace=True,
+            refStreamOrTimeRange=[0, nCopy.quarterLength]
+        )
         stream.makeNotation.makeTupletBrackets(new_part, inPlace=True)
         return self.fromPart(new_part)
 
@@ -1624,18 +1627,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         <music21.meter.TimeSignature 4/4>
         '''
         s = self.stream
-        # search context probably should always be True here
-        # to search container first, we need a non-flat version
-        # searching a flattened version, we will get contained and non-container
-        # this meter  stream is passed to makeNotation()
         meterStream = s.getTimeSignatures(searchContext=False,
-                                          sortByCreationTime=False, returnDefault=False)
-        # environLocal.printDebug(['setMeterStream: post meterStream search',
-        #                meterStream, meterStream[0]])
-        if not meterStream:
-            # note: this will return a default if no meters are found
-            meterStream = s.flatten().getTimeSignatures(searchContext=False,
-                                                        sortByCreationTime=True, returnDefault=True)
+                                          sortByCreationTime=False,
+                                          returnDefault=True)
         self.meterStream = meterStream
 
     def setScoreLayouts(self):
@@ -1777,7 +1771,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
     def textBoxToXmlCredit(self, textBox):
         # noinspection PyShadowingNames
-        '''
+        r'''
         Convert a music21 TextBox to a MusicXML Credit.
 
         >>> tb = text.TextBox('testing')
@@ -1800,8 +1794,19 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         >>> mxCredit = SX.textBoxToXmlCredit(tb)
         >>> SX.dump(mxCredit)
         <credit page="1">...</credit>
+
+        Changed in v.8 -- Multi-line text now exports as one `<credit-words>`
+        element (preserving newlines).
+
+        >>> tb = text.TextBox('Snare\nCymbals')
+        >>> mxCredit = SX.textBoxToXmlCredit(tb)
+        >>> SX.dump(mxCredit)
+        <credit page="1">
+            <credit-words default-x="500" default-y="500" halign="center" valign="top"
+            xml:space="preserve">Snare
+            Cymbals</credit-words>
+        </credit>
         '''
-        # use line carriages to separate messages
         mxCredit = Element('credit')
         # TODO: credit-type
         # TODO: link
@@ -1813,19 +1818,15 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         else:
             mxCredit.set('page', '1')
 
-        # add all credit words to components
-        count = 0
-
-        for line in textBox.content.split('\n'):
-            mxCreditWords = Element('credit-words')
-            mxCreditWords.text = line
-            # TODO: link/bookmark in credit-words
-            if count == 0:  # on first, configure properties
-                self.setPrintStyleAlign(mxCreditWords, textBox)
-                if textBox.hasStyleInformation and textBox.style.justify is not None:
-                    mxCreditWords.set('justify', textBox.style.justify)
-            mxCredit.append(mxCreditWords)
-            count += 1
+        mxCreditWords = Element('credit-words')
+        if '\n' in textBox.content:
+            mxCreditWords.set('xml:space', 'preserve')
+        mxCreditWords.text = textBox.content
+        # TODO: link/bookmark in credit-words
+        self.setPrintStyleAlign(mxCreditWords, textBox)
+        if textBox.hasStyleInformation and textBox.style.justify is not None:
+            mxCreditWords.set('justify', textBox.style.justify)
+        mxCredit.append(mxCreditWords)
         return mxCredit
 
     def setDefaults(self):
@@ -3113,8 +3114,8 @@ class MeasureExporter(XMLExporterBase):
             amountToMoveForward = int(round(divisions * (groupOffset
                                                              - self.offsetInMeasure)))
             if amountToMoveForward > 0 and any(
-                    isinstance(obj, note.GeneralNote) for obj in objGroup):
-                # gap in stream between GeneralNote objects: create <forward>
+                    isinstance(obj, (note.GeneralNote, clef.Clef)) for obj in objGroup):
+                # gap in stream between GeneralNote/Clef objects: create <forward>
                 mxForward = Element('forward')
                 mxDuration = SubElement(mxForward, 'duration')
                 mxDuration.text = str(amountToMoveForward)
