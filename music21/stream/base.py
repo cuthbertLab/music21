@@ -67,6 +67,7 @@ from music21.stream import filters
 
 from music21.common.numberTools import opFrac
 from music21.common.enums import GatherSpanners, OffsetSpecial
+from music21.common.misc import bisect_left, bisect_right
 from music21.common.types import StreamType, M21ObjType, OffsetQL, OffsetQLSpecial
 
 from music21 import environment
@@ -255,11 +256,16 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             see :meth:`~music21.base.Music21Object.contextSites`
             ''',
         'isSorted': '''
-            Boolean describing whether the Stream is sorted or not.
+            Boolean stating whether the Stream is sorted.
+            In general, all Streams are automatically sorted, and
+            this field will always be True.
             ''',
         'autoSort': '''
             Boolean describing whether the Stream is automatically sorted by
-            offset whenever necessary.
+            offset whenever necessary.  Turning this off is for
+            the most advanced uses only, and many functions and methods
+            (such as getElementAtOrBeforeOffset) will not work on a not
+            sorted Stream.
             ''',
         'isFlat': '''
             Boolean describing whether this Stream contains embedded
@@ -710,14 +716,74 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         .elements is a Tuple representing the elements contained in the Stream.
 
         Directly getting, setting, and manipulating this Tuple is
-        reserved for advanced usage. Instead, use the
-        provided high-level methods.  The elements retrieved here may not
-        have this stream as an activeSite, therefore they might not be properly ordered.
+        reserved for advanced usage. Instead, use iterators or getting an element
+        using an index:
 
-        In other words:  Don't use unless you really know what you're doing.
-        Treat a Stream like a list!
+        >>> example = stream.Stream([note.Note('C'), note.Note('D')])
 
-        When setting .elements, a list of Music21Objects can be provided, or a complete Stream.
+        Getting everything in the Stream:
+
+        >>> example.elements
+        (<music21.note.Note C>, <music21.note.Note D>)
+
+        Better:
+
+        >>> tuple(example)
+        (<music21.note.Note C>, <music21.note.Note D>)
+
+        Getting a single element from the Stream:
+
+        >>> example.elements[0]
+        <music21.note.Note C>
+
+        Better:
+
+        >>> example[0]
+        <music21.note.Note C>
+
+        Iterating over a Stream:
+
+        >>> for n in example.elements:
+        ...     print(n.step)
+        C
+        D
+
+        Better:
+
+        >>> for n in example:
+        ...     print(n.step)
+        C
+        D
+
+
+        The elements retrieved here do not have their activeSite or offset
+        set to this Stream, therefore they might not appear to
+        be properly ordered.
+
+        Here's the one use for .elements, quickly looking at everything without
+        setting activeSites:
+
+        >>> ex2 = stream.Stream()
+        >>> n1 = example[0]
+        >>> n2 = example[1]
+        >>> ex2.insert(100.0, n1)
+        >>> ex2.insert(200.0, n2)
+        >>> n1.offset
+        100.0
+        >>> example.elements[0].offset
+        100.0
+        >>> example.elements[0].activeSite is ex2
+        True
+        >>> example[0].offset
+        0.0
+        >>> example.elements[0].activeSite is ex2
+        False
+
+        In other words:  Don't use `.elements` unless you really know what you're doing.
+        Treat a Stream like a list and access elements that way.
+
+        When setting .elements, a list of Music21Objects or a complete Stream or a
+        complete Stream can be used.
         If a complete Stream is provided, elements are extracted
         from that Stream. This has the advantage of transferring
         offset correctly and getting elements stored at the end.
@@ -726,10 +792,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> a.repeatInsert(note.Note('C'), list(range(10)))
         >>> b = stream.Stream()
         >>> b.repeatInsert(note.Note('D'), list(range(10)))
-        >>> b.offset = 6
+        >>> b.offset = 6.0
         >>> c = stream.Stream()
         >>> c.repeatInsert(note.Note('E'), list(range(10)))
-        >>> c.offset = 12
+        >>> c.offset = 12.0
         >>> b.insert(c)
         >>> b.isFlat
         False
@@ -1442,6 +1508,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         count = 0
 
+        # TODO: bisect search once _offsetDict is always fully trusted.
         for e in self._elements:
             if e is el:
                 self._cache['index'][objId] = count
@@ -2029,6 +2096,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             else:
                 raise base.SitesException(
                     f'an entry for this object 0x{id(element):x} is not stored in stream {self}')
+            print(f'fail {element} {id(element)} {self}\n{self._offsetDict}\n')
 
         # OffsetSpecial.__contains__() is more expensive, so try to fail fast
         if isinstance(o, str) and returnSpecial is False and o in OffsetSpecial:
@@ -3849,8 +3917,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         If the `classList` parameter is used, it should be a
         list of class names or strings, and only objects that
-        are instances of
-        these classes or subclasses of these classes will be returned.
+        are instances of these classes or subclasses of these classes
+        will be returned.
 
         >>> stream1 = stream.Stream()
         >>> x = note.Note('D4')
@@ -3879,7 +3947,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> b.offset, b.id
         (0.0, 'z')
 
-
         You can give a list of acceptable classes to return, and non-matching
         elements will be ignored
 
@@ -3902,7 +3969,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> x.offset
         20.0
 
-
         If no element is before the offset, returns None
 
         >>> s = stream.Stream()
@@ -3922,41 +3988,23 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> e = stream1.getElementAtOrBefore(21)
         >>> e
         <music21.note.Note D>
+
+        NOTE: this method will return inconsistent results on a non-sorted Stream.
         '''
         # NOTE: this is a performance critical method
-
-        # TODO: switch to trees
-        candidates = []
-        offset = opFrac(offset)
-        nearestTrailSpan = offset  # start with max time
-
-        sIterator = self.iter()
+        els = self.elements  # does not set activeSite on each.
         if classList:
-            sIterator = sIterator.getElementsByClass(classList)
-
-        # need both _elements and _endElements
-        for e in sIterator:
-            span = opFrac(offset - self.elementOffset(e))
-            # environLocal.printDebug(['e span check', span, 'offset', offset,
-            #   'e.offset', e.offset, 'self.elementOffset(e)', self.elementOffset(e), 'e', e])
-            if span < 0:
-                continue
-            elif span == 0:
-                candidates.append((span, e))
-                nearestTrailSpan = span
-            else:
-                # do this comparison because may be out of order
-                if span <= nearestTrailSpan:
-                    candidates.append((span, e))
-                    nearestTrailSpan = span
-        # environLocal.printDebug(['getElementAtOrBefore(), e candidates', candidates])
-        if candidates:
-            candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple()))
-            # TODO: this sort has side effects -- see ICMC2011 -- sorting clef vs. note, etc.
-            self.coreSelfActiveSite(candidates[-1][1])
-            return candidates[-1][1]
-        else:
+            els = [e for e in els if not e.classSet.isdisjoint(classList)]
+        if not els:
             return None
+
+        insertPos = bisect_right(els, offset, key=lambda el: self.elementOffset(el))
+        if insertPos == 0:
+            return None
+        else:
+            returnEl = els[insertPos - 1]
+            self.coreSelfActiveSite(returnEl)
+            return returnEl
 
     def getElementBeforeOffset(self, offset, classList=None) -> t.Optional[base.Music21Object]:
         '''
@@ -3998,7 +4046,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         >>> w = note.Note('F4')
         >>> w.id = 'w'
-        >>> stream1.insert( 0, w)
+        >>> stream1.insert(0, w)
 
         This should get w because it was inserted last.
 
@@ -4014,32 +4062,18 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         (0.0, 'z')
         '''
         # NOTE: this is a performance critical method
-        candidates = []
-        offset = opFrac(offset)
-        nearestTrailSpan = offset  # start with max time
-
-        sIterator = self.iter()
+        els = self.elements  # does not set activeSite.
         if classList:
-            sIterator = sIterator.getElementsByClass(classList)
-
-        for e in sIterator:
-            span = opFrac(offset - self.elementOffset(e))
-            # environLocal.printDebug(['e span check', span, 'offset', offset,
-            #     'e.offset', e.offset, 'self.elementOffset(e)', self.elementOffset(e), 'e', e])
-            # by forcing <= here, we are sure to get offsets not at zero
-            if span <= 0:  # the e is after this offset
-                continue
-            else:  # do this comparison because may be out of order
-                if span <= nearestTrailSpan:
-                    candidates.append((span, e))
-                    nearestTrailSpan = span
-        # environLocal.printDebug(['getElementBeforeOffset(), e candidates', candidates])
-        if candidates:
-            candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple()))
-            self.coreSelfActiveSite(candidates[-1][1])
-            return candidates[-1][1]
-        else:
+            els = [e for e in els if not e.classSet.isdisjoint(classList)]
+        if not els:
             return None
+
+        insertPos = bisect_left(els, offset, key=lambda el: self.elementOffset(el))
+        if insertPos == 0:
+            return None
+        returnEl = els[insertPos - 1]
+        self.coreSelfActiveSite(returnEl)
+        return returnEl
 
     # def getElementAfterOffset(self, offset, classList=None):
     #    '''Get element after a provided offset
