@@ -4155,12 +4155,12 @@ class MeasureParser(XMLParserBase):
         ...            + '<notations>'
         ...            + '<tied line-type="dotted" placement="below" type="start" />'
         ...            + '</notations></note>')
-        >>> t = MP.xmlToTie(mxNote)
-        >>> t.type
+        >>> m21Tie = MP.xmlToTie(mxNote)
+        >>> m21Tie.type
         'start'
-        >>> t.style
+        >>> m21Tie.style
         'dotted'
-        >>> t.placement
+        >>> m21Tie.placement
         'below'
 
         Same thing but with orientation instead of placement, which both get mapped to
@@ -4232,8 +4232,8 @@ class MeasureParser(XMLParserBase):
         >>> mxNote = ET.fromstring('<note><type>16th</type>' +
         ...    '<time-modification><actual-notes>5</actual-notes>' +
         ...    '<normal-notes>4</normal-notes></time-modification></note>')
-        >>> t = MP.xmlToTuplets(mxNote)
-        >>> t
+        >>> tups = MP.xmlToTuplets(mxNote)
+        >>> tups
         [<music21.duration.Tuplet 5/4/16th>]
 
         >>> mxNote = ET.fromstring('<note><type>eighth</type>' +

@@ -4504,9 +4504,9 @@ class MeasureExporter(XMLExporterBase):
 
         A 'continue' tie requires two <tie> tags to represent.
 
-        >>> t = tie.Tie('continue')
+        >>> tieObj = tie.Tie('continue')
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> tieList = MEX.tieToXmlTie(t)
+        >>> tieList = MEX.tieToXmlTie(tieObj)
         >>> for mxT in tieList:
         ...     MEX.dump(mxT)
         <tie type="stop" />
@@ -4537,23 +4537,21 @@ class MeasureExporter(XMLExporterBase):
         the <tied> tag in notations.  This
         creates the <tied> tag.
 
-        Returns a list since a music21
-        "continue" tie type needs two tags
-        in musicxml.  List may be empty
-        if tie.style == "hidden"
+        Returns a list since a music21 "continue" tie type needs two tags
+        in musicxml.  List may be empty if tie.style == "hidden"
 
-        >>> t = tie.Tie('continue')
-        >>> t.id = 'tied1'
+        >>> tieObj = tie.Tie('continue')
+        >>> tieObj.id = 'tied1'
 
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> tiedList = MEX.tieToXmlTied(t)
+        >>> tiedList = MEX.tieToXmlTied(tieObj)
         >>> for mxT in tiedList:
         ...     MEX.dump(mxT)
         <tied id="tied1" type="stop" />
         <tied type="start" />
 
-        >>> t.style = 'hidden'
-        >>> tiedList = MEX.tieToXmlTied(t)
+        >>> tieObj.style = 'hidden'
+        >>> tiedList = MEX.tieToXmlTied(tieObj)
         >>> len(tiedList)
         0
         '''

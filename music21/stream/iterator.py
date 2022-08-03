@@ -38,7 +38,7 @@ from music21.sites import SitesException
 T = t.TypeVar('T')
 S = t.TypeVar('S')
 ChangedM21ObjType = t.TypeVar('ChangedM21ObjType', bound=base.Music21Object)
-_SIter = t.TypeVar('_SIter', bound='StreamIterator')
+StreamIteratorType = t.TypeVar('StreamIteratorType', bound='StreamIterator')
 FilterType = t.Union[t.Callable, filters.StreamFilter]
 
 # -----------------------------------------------------------------------------
@@ -62,7 +62,7 @@ class ActiveInformation(t.TypedDict, total=False):
 
 
 # -----------------------------------------------------------------------------
-class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
+class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
     '''
     An Iterator object used to handle getting items from Streams.
     The :meth:`~music21.stream.Stream.__iter__` method
@@ -111,9 +111,10 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
     * For `activeInformation` see above.
 
     Changed in v.5.2 -- all arguments except srcStream are keyword only.
+
     Changed in v.8 -- filterList must be a list or None, not a single filter.
                       StreamIterator inherits from typing.Sequence, hence index
-                      was moved to elementIndex
+                      was moved to elementIndex.
 
     OMIT_FROM_DOCS
 
@@ -187,7 +188,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
 
         return f'for {streamClass}:{srcStreamId} @:{self.elementIndex}'
 
-    def __iter__(self: _SIter) -> _SIter:
+    def __iter__(self: StreamIteratorType) -> StreamIteratorType:
         self.reset()
         return self
 
@@ -513,12 +514,12 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
         for item in me:
             yield item
 
-    def clone(self: _SIter) -> _SIter:
+    def clone(self: StreamIteratorType) -> StreamIteratorType:
         '''
         Returns a new copy of the same iterator.
         (a shallow copy of some things except activeInformation)
         '''
-        out: _SIter = type(self)(
+        out: StreamIteratorType = type(self)(
             self.srcStream,
             filterList=copy.copy(self.filters),
             restoreActiveSites=self.restoreActiveSites,
@@ -672,7 +673,11 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
     # ---------------------------------------------------------------
     # getting items
 
-    def matchingElements(self, *, restoreActiveSites: bool = True) -> t.List[M21ObjType]:
+    def matchingElements(
+        self,
+        *,
+        restoreActiveSites: bool = True
+    ) -> t.List[M21ObjType]:
         '''
         Returns a list of elements that match the filter.
 
@@ -739,7 +744,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
 
         return me
 
-    def matchesFilters(self, e) -> bool:
+    def matchesFilters(self, e: base.Music21Object) -> bool:
         '''
         returns False if any filter returns False, True otherwise.
         '''
@@ -906,14 +911,19 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
     @property
     def activeElementList(self) -> t.Literal['_elements', '_endElements']:
         '''
-        returns the element list ('_elements' or '_endElements')
-        for the current activeInformation
+        Returns the element list (`_elements` or `_endElements`)
+        for the current activeInformation.
         '''
         return getattr(self.activeInformation['stream'], self.activeInformation['iterSection'])
 
     # ------------------------------------------------------------
 
-    def addFilter(self: _SIter, newFilter, *, returnClone=True) -> _SIter:
+    def addFilter(
+        self: StreamIteratorType,
+        newFilter,
+        *,
+        returnClone=True
+    ) -> StreamIteratorType:
         '''
         Return a new StreamIterator with an additional filter.
         Also resets caches -- so do not add filters any other way.
@@ -936,7 +946,12 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
 
         return out
 
-    def removeFilter(self: _SIter, oldFilter, *, returnClone=True) -> _SIter:
+    def removeFilter(
+        self: StreamIteratorType,
+        oldFilter,
+        *,
+        returnClone=True
+    ) -> StreamIteratorType:
         '''
         Return a new StreamIterator where oldFilter is removed.
         '''
@@ -951,7 +966,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
 
         return out
 
-    def getElementById(self, elementId) -> t.Optional[M21ObjType]:
+    def getElementById(self, elementId: str) -> t.Optional[M21ObjType]:
         '''
         Returns a single element (or None) that matches elementId.
 
@@ -1048,9 +1063,10 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
         s1
 
 
-        Classes work in addition to strings...
+        Strings work in addition to classes, but your IDE will not know that
+        `el` is a :class:`~music21.note.Rest` object.
 
-        >>> for el in s.iter().getElementsByClass(note.Rest):
+        >>> for el in s.iter().getElementsByClass('Rest'):
         ...     print(el)
         <music21.note.Rest quarter>
         '''
@@ -1064,9 +1080,10 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
         * A leading `#` indicates the id of an element, so '#hello' will find elements
           with `el.id=='hello'` (should only be one)
         * A leading `.` indicates the group of an element, so '.high' will find elements
-          with `'high' in el.groups`
+          with `'high'` in el.groups.
         * Any other string is considered to be the type/class of the element.  So `Note`
-          will find all Note elements.  Can be fully qualified like `note.Note`
+          will find all Note elements.  Can be fully qualified like `music21.note.Note`
+          or partially qualified like `note.Note`.
 
         Eventually, more complex query selectors will be implemented.  This is just a start.
 
@@ -1167,7 +1184,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
         return self.addFilter(filters.GroupFilter(groupFilterList), returnClone=returnClone)
 
     def getElementsByOffset(
-        self: _SIter,
+        self: StreamIteratorType,
         offsetStart,
         offsetEnd=None,
         *,
@@ -1177,7 +1194,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
         includeElementsThatEndAtStart=True,
         stopAfterEnd=True,
         returnClone=True,
-    ) -> _SIter:
+    ) -> StreamIteratorType:
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain
@@ -1434,7 +1451,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
     @property
     def notes(self):
         '''
-        Returns all NotRest objects
+        Returns all :class:`~music21.note.NotRest` objects
 
         (will sometime become simply Note and Chord objects...)
 
@@ -1452,7 +1469,8 @@ class StreamIterator(prebase.ProtoM21Object, t.Generic[M21ObjType], t.Sequence):
     @property
     def notesAndRests(self):
         '''
-        Returns all GeneralNote objects
+        Returns all :class:`~music21.note.GeneralNote` objects, including
+        Rests and Unpitched elements.
 
         >>> s = stream.Stream()
         >>> s.append(meter.TimeSignature('4/4'))
@@ -1542,7 +1560,6 @@ class OffsetIterator(StreamIterator, t.Generic[M21ObjType], t.Sequence):
     ...     print(groupedElements)
     [<music21.clef.TrebleClef>]
     '''
-
     def __init__(self,
                  srcStream,
                  *,
@@ -1970,14 +1987,14 @@ class RecursiveIterator(StreamIterator, t.Generic[M21ObjType], t.Sequence):
             # will still return numbers even if _endElements
 
     def getElementsByOffsetInHierarchy(
-            self: _SIter,
+            self: StreamIteratorType,
             offsetStart,
             offsetEnd=None,
             *,
             includeEndBoundary=True,
             mustFinishInSpan=False,
             mustBeginInSpan=True,
-            includeElementsThatEndAtStart=True) -> _SIter:
+            includeElementsThatEndAtStart=True) -> StreamIteratorType:
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain
