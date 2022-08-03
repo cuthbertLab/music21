@@ -909,7 +909,7 @@ def makeRests(
     if returnObj.hasVoices():
         bundle = list(returnObj.voices)
     elif returnObj.hasMeasures():
-        bundle = list(returnObj.getElementsByClass(stream.Measure))
+        bundle = list(returnObj.getElementsByClass('Measure'))
     else:
         bundle = [returnObj]
 

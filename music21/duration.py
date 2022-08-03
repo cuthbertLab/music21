@@ -47,7 +47,6 @@ Example usage:
 '''
 from __future__ import annotations
 
-from collections import namedtuple
 import contextlib
 import copy
 import fractions
@@ -2817,7 +2816,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self._updateComponents()
 
         # tested, does return 0 if no components
-        return sum([c.quarterLength for c in self._components])
+        tot = 0
+        for c in self._components:
+            tot += c.quarterLength
+        return tot
 
     def _getQuarterLength(self) -> OffsetQL:
         if self._quarterLengthNeedsUpdating:

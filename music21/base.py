@@ -3348,7 +3348,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         '''
         atm = self.duration.aggregateTupletMultiplier()
-        quarterLengthList = [c.quarterLength * atm for c in self.duration.components]
+        quarterLengthList = [opFrac(c.quarterLength * atm) for c in self.duration.components]
         splitList = self.splitByQuarterLengths(quarterLengthList)
         return splitList
     # -------------------------------------------------------------------------

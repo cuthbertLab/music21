@@ -132,7 +132,7 @@ def getRootFilePath() -> pathlib.Path:
     return fpParent
 
 
-def relativepath(path: StrOrPath, start: t.Optional[str] = None) -> StrOrPath|str:
+def relativepath(path: StrOrPath, start: t.Optional[str] = None) -> t.Union[StrOrPath, str]:
     '''
     A cross-platform wrapper for `os.path.relpath()`, which returns `path` if
     under Windows, otherwise returns the relative path of `path`.

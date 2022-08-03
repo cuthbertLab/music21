@@ -918,7 +918,12 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
 
     # ------------------------------------------------------------
 
-    def addFilter(self: StreamIteratorType, newFilter, *, returnClone=True) -> StreamIteratorType:
+    def addFilter(
+        self: StreamIteratorType,
+        newFilter,
+        *,
+        returnClone=True
+    ) -> StreamIteratorType:
         '''
         Return a new StreamIterator with an additional filter.
         Also resets caches -- so do not add filters any other way.
@@ -941,7 +946,12 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
 
         return out
 
-    def removeFilter(self: StreamIteratorType, oldFilter, *, returnClone=True) -> StreamIteratorType:
+    def removeFilter(
+        self: StreamIteratorType,
+        oldFilter,
+        *,
+        returnClone=True
+    ) -> StreamIteratorType:
         '''
         Return a new StreamIterator where oldFilter is removed.
         '''

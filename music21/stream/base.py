@@ -3409,12 +3409,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def getElementsByClass(self,
                            classFilterList: t.Union[
                                str,
-                               t.Type[ChangedM21ObjType],
                                t.Iterable[str],
+                               t.Type[ChangedM21ObjType],
                                t.Iterable[t.Type[ChangedM21ObjType]],
                            ],
                            ) -> t.Union[iterator.StreamIterator[M21ObjType],
-                                      iterator.StreamIterator[ChangedM21ObjType]]:
+                                        iterator.StreamIterator[ChangedM21ObjType]]:
         '''
         Return a StreamIterator that will iterate over Elements that match one
         or more classes in the `classFilterList`. A single class
