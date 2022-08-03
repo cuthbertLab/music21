@@ -377,7 +377,7 @@ class Test(unittest.TestCase):
 #            print(n4.sites.getOffsetBySite(site))
 
         self.assertEqual(len(sf1), 4)
-        assert(sf1[1] is n2)
+        assert sf1[1] is n2
 
     def testActiveSiteCopiedStreams(self):
         srcStream = Stream()
@@ -1191,6 +1191,30 @@ class Test(unittest.TestCase):
 
         stripped = s.stripTies(inPlace=False)
         self.assertEqual(len(stripped.recurse().notesAndRests), 2)
+
+    def testStripTiesUnlinked(self):
+        '''
+        After stripping ties, unlinked durations become linked.
+        '''
+        m1 = Measure(number=1)
+        m2 = Measure(number=2)
+        n1 = note.Note(type='whole')
+        n2 = note.Note(type='quarter')
+        n2.duration.linked = False
+        n2.duration.quarterLength = 0.75
+        n1.tie = tie.Tie('start')
+        n2.tie = tie.Tie('stop')
+        m1.insert(0, n1)
+        m2.insert(0, n2)
+        p = Part([m1, m2])
+        p_stripped = p.stripTies()
+        n = p_stripped[note.Note].first()
+        d = n.duration
+        self.assertTrue(d.linked)
+        self.assertEqual(d.type, 'complex')
+        self.assertEqual(d.quarterLength, 4.75)
+        self.assertFalse(n2.duration.linked)
+
 
     def testStripTiesConsecutiveInVoiceNotContainer(self):
         '''
@@ -2613,10 +2637,8 @@ class Test(unittest.TestCase):
         self.assertTrue(c1.pitches[1].accidental.displayStatus)
         self.assertTrue(c1.pitches[2].accidental.displayStatus)
 
-        # not getting a natural here because of chord tones
-        # self.assertTrue(n3.pitch.accidental.displayStatus)
-        # self.assertEqual(n3.pitch.accidental, None)
-        # s.show()
+        # not necessary to repeat the natural afterward
+        self.assertIsNone(n3.pitch.accidental, None)
 
         s = Stream()
         n1 = note.Note('a#')
@@ -2793,6 +2815,35 @@ class Test(unittest.TestCase):
         self.assertIs(n.pitch.accidental.displayStatus, False)
 
         # TODO: other types
+
+    def testMakeAccidentalsOnChord(self):
+        c = chord.Chord('F# A# C#')
+        s = Stream(c)
+        self.assertFalse(any(n.pitch.accidental.displayStatus for n in c))
+        s.makeAccidentals(inPlace=True)
+        self.assertTrue(all(n.pitch.accidental.displayStatus for n in c))
+
+        augmented_octave = chord.Chord('F4 F#5')
+        s2 = Stream(augmented_octave)
+        self.assertIsNone(augmented_octave[0].pitch.accidental)
+        s2.makeAccidentals(inPlace=True)
+        self.assertTrue(augmented_octave[0].pitch.accidental.displayStatus)
+
+        # Repeat the test without octaves and reset state
+        low, high = augmented_octave.pitches
+        low.octave = None
+        low.accidental = None
+        high.octave = None
+        high.accidental.displayStatus = None
+
+        s2.makeAccidentals(inPlace=True)
+        self.assertTrue(all(n.pitch.accidental.displayStatus for n in augmented_octave))
+
+        # Repeat the test with two F#'s in key of 1 sharp
+        two_f_sharps = chord.Chord('F#4 F#5')
+        s3 = Stream([key.KeySignature(1), two_f_sharps])
+        s3.makeAccidentals(inPlace=True)
+        self.assertTrue(all(n.pitch.accidental.displayStatus is False for n in two_f_sharps))
 
     def testMakeNotationTiesKeyless(self):
         p = converter.parse('tinynotation: 4/4 f#1~ f#1')
@@ -4407,12 +4458,10 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(sPost.getElementsByClass(Measure)), 1)
         m1 = sPost.getElementsByClass(Measure).first()
-        assert(m1.keySignature is not None)
+        assert m1.keySignature is not None
         self.assertEqual(m1.keySignature.sharps, sharpsInKey)
 
     def testMakeTies(self):
-
-
         def collectAccidentalDisplayStatus(s_inner):
             post = []
             for e in s_inner.flatten().notesAndRests:
@@ -4481,6 +4530,30 @@ class Test(unittest.TestCase):
                           ('F#', None), ('F#', None), ('B#', None), ('B#', None),
                           ('C#', None), ('C#', None)]
                          )
+
+    def testMakeTiesAddNewMeasure(self):
+        '''
+        Test that makeTies adds a new measure when the last note is too long,
+        both when called directly and when called from makeNotation
+        '''
+        p = Part()
+        m = Measure(number=1)
+        m.append(meter.TimeSignature('4/4'))
+        m.append(note.Note(type='breve'))
+        p.append(m)
+        p_makeTies = p.makeTies()
+        self.assertEqual(len(p_makeTies[Measure]), 2)
+        n1 = p_makeTies[Measure].first().notes.first()
+        n2 = p_makeTies[Measure].last().notes.first()
+        self.assertEqual(n1.duration.quarterLength, 4.0)
+        self.assertEqual(n1.duration.quarterLength, 4.0)
+        self.assertIsNotNone(n1.tie)
+        self.assertIsNotNone(n2.tie)
+        self.assertEqual(n1.tie.type, 'start')
+        self.assertEqual(n2.tie.type, 'stop')
+
+        p_makeNotation = p.makeNotation()
+        self.assertEqual(len(p_makeNotation[Measure]), 2)
 
     def testMeasuresAndMakeMeasures(self):
         s = converter.parse('tinynotation: 2/8 g8 e f g e f g a')
@@ -6516,6 +6589,7 @@ class Test(unittest.TestCase):
         s.insert(key.Key('Gb'))
         s.insert(0, note.Note('D-5'))
         s.insert(0, note.Note('D-4'))
+        self.assertFalse(s.haveAccidentalsBeenMade())
         post = s.makeNotation()  # makes voices, makes measures, makes accidentals
         self.assertEqual(len(post.recurse().getElementsByClass(Voice)), 2)
         self.assertTrue(post.haveAccidentalsBeenMade())

@@ -618,7 +618,7 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     (not counting unisons) divided by the number of times the melody
     changes direction.
 
-    Example: C D E D C E D C C
+    Example: C D E D C D E C C
     Intervals: [0] 2 2 -2 -2 2 2 -4 0
     Changes direction (equivalent to +/- sign) three times.
     There are seven non-unison (nonzero) intervals.

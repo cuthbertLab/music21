@@ -812,7 +812,7 @@ def noteToBraille(
         noteTrans.append(symbols['opening_single_slur'])
         music21Note.editorial.brailleEnglish.append(
             f'Opening single slur {symbols["opening_single_slur"]}')
-    if not(beamStatus['endLongBracketSlur'] and beamStatus['beginLongBracketSlur']):
+    if not (beamStatus['endLongBracketSlur'] and beamStatus['beginLongBracketSlur']):
         if beamStatus['endLongDoubleSlur']:
             noteTrans.append(symbols['closing_double_slur'])
             music21Note.editorial.brailleEnglish.append(

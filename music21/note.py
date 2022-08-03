@@ -1776,6 +1776,7 @@ class Unpitched(NotRest):
 
     def __init__(self, displayName=None, **keywords):
         super().__init__(**keywords)
+        self._chordAttached: t.Optional['music21.percussion.PercussionChord'] = None
 
         self.displayStep: StepName = 'B'
         self.displayOctave: int = 4

@@ -278,7 +278,7 @@ class CapellaImporter:
         TODO: Handle multiple <voices>
         '''
         if systemObj is None:
-            systemObj = stream.System()
+            systemObj = layout.System()
 
         stavesList = systemElement.findall('staves')
         if not stavesList:
@@ -895,8 +895,17 @@ class CapellaImporter:
 
 
 class Test(unittest.TestCase):
-    pass
+    def testComplete(self):
+        from music21 import text
 
+        ci = CapellaImporter()
+        capellaDirPath = common.getSourceFilePath() / 'capella'
+        oswaldPath = capellaDirPath / r'Nu_rue_mit_sorgen.capx'
+        partScore = ci.scoreFromFile(oswaldPath)
+        self.assertEqual(len(partScore.parts), 3)
+        self.assertGreater(len(partScore.recurse().notes), 20)
+        self.assertIn('mass!', text.assembleLyrics(partScore.parts[0], 1))
+        self.assertIn('scherz', text.assembleLyrics(partScore.parts[0], 2))
 
 class TestExternal(unittest.TestCase):
     show = True
@@ -930,4 +939,4 @@ class TestExternal(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, TestExternal)
+    music21.mainTest(Test)  # , TestExternal)

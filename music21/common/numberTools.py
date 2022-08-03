@@ -17,7 +17,7 @@ import unittest
 import typing as t
 
 from fractions import Fraction
-from math import isclose
+from math import isclose, gcd
 
 from music21 import defaults
 from music21.common import deprecated
@@ -37,8 +37,8 @@ __all__ = [
     'dotMultiplier', 'decimalToTuplet',
     'unitNormalizeProportion', 'unitBoundaryProportion',
     'weightedSelection',
-    'euclidGCD', 'approximateGCD',
     'lcm',
+    'approximateGCD',
 
     'contiguousList',
 
@@ -146,7 +146,7 @@ def numToIntOrFloat(value: t.Union[int, float]) -> t.Union[int, float]:
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
-@lru_cache(1024)
+@lru_cache(None)
 def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
     # noinspection PyShadowingNames
     '''
@@ -197,10 +197,12 @@ def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
 
     (n.b. -- nothing printed)
     '''
-    nOrg = n
-    dOrg = d
+    # TODO: when Python 3.9 is the minimum version, replace lru_cache with simply cache,
+    #     which is the same speed as lru_cache(None) (it simply calls it)
     if d <= DENOM_LIMIT:  # faster than hard-coding 65535
         return (n, d)
+    nOrg = n
+    dOrg = d
     p0, q0, p1, q1 = 0, 1, 1, 0
     while True:
         a = n // d
@@ -216,15 +218,26 @@ def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
     bound2n = p1
     bound2d = q1
     # s = (0.0 + n)/d
-    bound1minusS = (abs((bound1n * dOrg) - (nOrg * bound1d)), (dOrg * bound1d))
-    bound2minusS = (abs((bound2n * dOrg) - (nOrg * bound2d)), (dOrg * bound2d))
-    difference = (bound1minusS[0] * bound2minusS[1]) - (bound2minusS[0] * bound1minusS[1])
-    if difference > 0:
+    bound1minusS_n = abs((bound1n * dOrg) - (nOrg * bound1d))
+    bound1minusS_d = dOrg * bound1d
+    bound2minusS_n = abs((bound2n * dOrg) - (nOrg * bound2d))
+    bound2minusS_d = dOrg * bound2d
+    difference = (bound1minusS_n * bound2minusS_d) - (bound2minusS_n * bound1minusS_d)
+    if difference >= 0:
         # bound1 is farther from zero than bound2; return bound2
-        return (p1, q1)
+        return (bound2n, bound2d)
     else:
-        return (p0 + k * p1, q0 + k * q1)
+        return (bound1n, bound1d)
 
+
+# _KNOWN_PASSES is all values from whole to 64th notes with 0 or 1 dot
+# the length of this set does determine the time to search.  A set with all values from maxima to
+# 2048th notes + 1-2 dots was half the speed
+
+_KNOWN_PASSES = frozenset([
+    0.0625, 0.09375, 0.125, 0.1875,
+    0.25, 0.375, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 6.0
+])
 
 # no type checking due to accessing protected attributes (for speed)
 @t.no_type_check
@@ -271,6 +284,14 @@ def opFrac(num: t.Union[OffsetQLIn, None]) -> t.Union[OffsetQL, None]:
     # This is a performance critical operation, tuned to go as fast as possible.
     # hence redundancy -- first we check for type (no inheritance) and then we
     # repeat exact same test with inheritance.
+    #
+    # Cannot use functools's Caching mechanisms on this because then it will
+    # return the same Fraction object for all calls, which is a problem in case
+    # anyone sets ._numeration or ._denominator directly on that object.
+    #
+    if num in _KNOWN_PASSES:
+        return num + 0.0   # need the add, because ints and Fractions satisfy the "in"
+
     # Note that the later examples are more verbose
     numType = type(num)
     if numType is float:
@@ -283,6 +304,7 @@ def opFrac(num: t.Union[OffsetQLIn, None]) -> t.Union[OffsetQL, None]:
         # unused_numerator, denominator = num.as_integer_ratio()  # too slow
         ir = num.as_integer_ratio()
         if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
+            # _preFracLimitDenominator uses a cache
             return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
             # return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
             # internally in Fraction constructor, but is twice as fast...
@@ -299,7 +321,7 @@ def opFrac(num: t.Union[OffsetQLIn, None]) -> t.Union[OffsetQL, None]:
     elif num is None:
         return None
 
-    # class inheritance only check AFTER ifs... this is redundant but highly optimized.
+    # class inheritance only check AFTER "type is" checks... this is redundant but highly optimized.
     elif isinstance(num, int):
         return num + 0.0
     elif isinstance(num, float):
@@ -310,9 +332,9 @@ def opFrac(num: t.Union[OffsetQLIn, None]) -> t.Union[OffsetQL, None]:
             return num
 
     elif isinstance(num, Fraction):
-        d = num._denominator  # private access instead of property: 6x faster; may break later...
+        d = num.denominator  # Use properties since it is a subclass
         if (d & (d - 1)) == 0:  # power of two...
-            return num._numerator / (d + 0.0)  # 50% faster than float(num)
+            return num.numerator / (d + 0.0)  # 50% faster than float(num)
         else:
             return num  # leave fraction alone
     else:
@@ -641,9 +663,9 @@ def decimalToTuplet(decNum: float) -> t.Tuple[int, int]:
         raise Exception('No such luck')
 
     jy *= multiplier
-    gcd = euclidGCD(int(jy), int(iy))
-    jy = jy / gcd
-    iy = iy / gcd
+    my_gcd = gcd(int(jy), int(iy))
+    jy = jy / my_gcd
+    iy = iy / my_gcd
 
     if flipNumerator is False:
         return (int(jy), int(iy))
@@ -742,16 +764,23 @@ def weightedSelection(values: t.List[int],
     return values[index]
 
 
+@deprecated('v8', 'v9', 'use math.gcd(a, b) instead.')
 def euclidGCD(a: int, b: int) -> int:
     '''
-    use Euclid's algorithm to find the GCD of a and b
+    Deprecated: use math.gcd(a, b) instead
 
-    >>> common.euclidGCD(2, 4)
+    use Euclid's algorithm to find the GCD of a and b::
+
+    ```
+    common.euclidGCD(2, 4)
     2
-    >>> common.euclidGCD(20, 8)
+
+    common.euclidGCD(20, 8)
     4
-    >>> common.euclidGCD(20, 16)
+
+    common.euclidGCD(20, 16)
     4
+    ```
     '''
     if b == 0:
         return a
@@ -844,11 +873,13 @@ def lcm(filterList: t.Iterable[int]) -> int:
     >>> common.lcm({3, 5, 6})
     30
 
+    To be deprecated in v.8 once Python 3.9 is the minimum version
+    since math.lcm works in C and is faster
     '''
     def _lcm(a, b):
         '''find the least common multiple of a, b'''
         # // forces integer style division (no remainder)
-        return abs(a * b) // euclidGCD(a, b)
+        return abs(a * b) // gcd(a, b)
 
     # derived from
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022
@@ -1161,4 +1192,3 @@ _DOC_ORDER = [fromRoman, toRoman]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

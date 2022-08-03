@@ -997,15 +997,18 @@ class Key(KeySignature, scale.DiatonicScale):
 
     def __eq__(self, other):
         '''
-        two Keys are equal if their tonics are equal and their modes are equal
+        Two Keys are equal if their tonics are equal and their modes are equal.
+
+        Changed in v8: keys now compare equal regardless of the octave of their tonics:
+
+        >>> k = key.Key(pitch.Pitch('C4'))
+        >>> k2 = key.Key(pitch.Pitch('C5'))
+        >>> k == k2
+        True
         '''
-        try:
-            if self.tonic == other.tonic and self.mode == other.mode:
-                return True
-            else:
-                return False
-        except AttributeError:
-            return False
+        if not isinstance(other, Key):
+            return NotImplemented
+        return self.tonic.name == other.tonic.name and self.mode == other.mode
 
     @property
     def relative(self) -> Key:
