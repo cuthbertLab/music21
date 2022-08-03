@@ -413,7 +413,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         Generally you don't need this, just iterate over a stream, but it is necessary
         to add custom filters to an iterative search before iterating.
         '''
-        return iter(self)
+        # Pycharm wasn't inferring typing correctly with `return iter(self)`.
+        return self.__iter__()  # pylint: disable=unnecessary-dunder-call
 
     @overload
     def __getitem__(self, k: str) -> iterator.RecursiveIterator[M21ObjType]:
@@ -2514,7 +2515,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.elementOffset(b, returnSpecial=True)
         <OffsetSpecial.AT_END>
 
-        Only elements of zero duration can be stored.  Otherwise a
+        Only elements of zero duration can be stored.  Otherwise, a
         `StreamException` is raised.
         '''
         if isinstance(itemOrList, list):
@@ -5432,12 +5433,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         Searching the measure will find this instrument only if the measure's activeSite is
         searched, as it is by default:
 
-        >>> searchActiveSite = p.measure(1).getInstruments()
-        >>> searchActiveSite.first()
+        >>> searchedActiveSite = p.measure(1).getInstruments()
+        >>> searchedActiveSite.first()
         <music21.instrument.Koto 'Koto'>
 
-        >>> searchNaive = p.measure(1).getInstruments(searchActiveSite=False, returnDefault=False)
-        >>> len(searchNaive)
+        >>> searchedNaive = p.measure(1).getInstruments(searchActiveSite=False, returnDefault=False)
+        >>> len(searchedNaive)
         0
 
         Changed in v.8: recurse is True by default.
@@ -7776,7 +7777,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> sRecurse
         <music21.stream.iterator.RecursiveIterator for Score:mainScore @:0>
 
-        So, that's not how we use `.recurse()`.  Instead use it in a `for` loop:
+        So, that's not how we use `.recurse()`.  Instead, use it in a `for` loop:
 
         >>> for el in s.recurse():
         ...     tup = (el, el.offset, el.activeSite)
@@ -13179,7 +13180,7 @@ class Part(Stream):
     A Stream subclass for designating music that is considered a single part.
 
     When put into a Score object, Part objects are all collected in the `Score.parts`
-    call.  Otherwise they mostly work like generic Streams.
+    call.  Otherwise, they mostly work like generic Streams.
 
     Generally the hierarchy goes: Score > Part > Measure > Voice, but you are not
     required to stick to this.
