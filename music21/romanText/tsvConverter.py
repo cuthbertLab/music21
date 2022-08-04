@@ -1076,7 +1076,7 @@ class Test(unittest.TestCase):
                 #   they're equal
                 envLocal = environment.Environment()
 
-                forward1 = TsvHandler(name, dcml_version=version)
+                forward1 = TsvHandler(path, dcml_version=version)
                 stream1 = forward1.toM21Stream()
 
                 # Write back to tsv
