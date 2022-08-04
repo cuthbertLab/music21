@@ -2240,11 +2240,13 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def informClient(self) -> bool:
         '''
-        call informSites({'changedAttribute': 'duration', 'quarterLength': quarterLength})
-        on any call that changes the quarterLength
+        A method that tells the client that something has changed.
 
-        returns False if there was no need to inform or if client
-        was not set.  Otherwise returns True
+        Call `informSites({'changedAttribute': 'duration', 'quarterLength': quarterLength})`
+        on any call that changes the quarterLength, so that the client can make a change.
+
+        Returns False if there was no need to inform the client (like nothing has changed)
+        or if `.client` is None.  Otherwise returns True.
         '''
         if self._quarterLengthNeedsUpdating is True:
             old_qtrLength = self._qtrLength
