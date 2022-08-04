@@ -1030,14 +1030,14 @@ class SelectFromList(Dialog):
 
         >>> d = configure.SelectFromList()
         >>> d._rawQuery(['a', 'b', 'c'])
-        ['[1] a', '[2] b', '[3] c', ' ', 'Select a number from the preceding options: ']
+        ['[1] a', '[2] b', '[3] c', ' ', 'Choose a number from the preceding options: ']
 
         >>> d = configure.SelectFromList(default=1)
         >>> d._default
         1
         >>> d._rawQuery(['a', 'b', 'c'])
         ['[1] a', '[2] b', '[3] c', ' ',
-         'Select a number from the preceding options (default is 1): ']
+         'Choose a number from the preceding options (default is 1): ']
         '''
         head = []
         i = 1
