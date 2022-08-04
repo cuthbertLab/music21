@@ -481,22 +481,22 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
     ⠠⠞⠊⠞⠇⠑⠒⠀⠠⠇⠁⠀⠠⠛⠊⠕⠧⠊⠝⠑⠞⠞⠁⠀⠠⠏⠊⠁⠝⠞⠁
     '''
     allBrailleLines = []
-    for namespaceName, value in music21Metadata.getAllNamedValues():
+    for uniqueName, value in music21Metadata.getAllNamedValues():
         if value is None:
             # we don't put None values in braille output
             continue
 
-        if namespaceName.startswith('m21FileInfo:'):
-            # we don't put fileInfo in braille output
+        if uniqueName == 'software':
+            # we don't put software versions in braille output
             continue
 
-        uniqueName: t.Optional[str] = music21Metadata.namespaceNameToUniqueName(namespaceName)
-        if not uniqueName:
+        namespaceName: t.Optional[str] = music21Metadata.uniqueNameToNamespaceName(uniqueName)
+        if not namespaceName:
             # we don't put custom metadata in braille output
             continue
 
-        if uniqueName == 'software':
-            # we don't put software versions in braille output
+        if namespaceName.startswith('m21FileInfo:'):
+            # we don't put fileInfo in braille output
             continue
 
         n = ' '.join(re.findall(r'([A-Z]*[a-z]+)', uniqueName))

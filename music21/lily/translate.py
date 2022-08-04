@@ -2301,7 +2301,7 @@ class LilypondConverter:
         lpHeaderBodyAssignments = lpHeaderBody.assignments
 
         if metadataObject is not None:
-            title = metadataObject.title
+            title = metadataObject.bestTitle
             if title:
                 lyTitleAssignment = lyo.LyAssignment(assignmentId='title',
                                                      identifierInit=lyo.LyIdentifierInit(

@@ -225,7 +225,7 @@ class Metadata(base.Music21Object):
     >>> sorted(metadata.properties.ALL_MUSIC21_WORK_IDS)
     ['commission', 'date', 'dedication', 'volume']
 
-    And here are their new v8 unique/Dublin-Core standard names:
+    And here are their new v8 standard unique names:
 
     >>> sorted(metadata.properties.MUSIC21_WORK_ID_TO_UNIQUE_NAME.values())
     ['commissionedBy', 'dateCreated', 'dedicatedTo', 'volumeNumber']
@@ -395,27 +395,27 @@ class Metadata(base.Music21Object):
         >>> md.addCustom('excerpt-start-measure', 1234)
         >>> allMd = md.getAllNamedValues()
         >>> allMd
-        (('musicxml:software', <music21.metadata.primitives.Text music21 v...>),
-         ('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Jeff Bowen>),
-         ('marcrel:LBT', <music21.metadata.primitives.Contributor librettist:Hunter Bell>),
-         ('dcterms:title', <music21.metadata.primitives.Text Other World>),
+        (('software', <music21.metadata.primitives.Text music21 v...>),
+         ('composer', <music21.metadata.primitives.Contributor composer:Jeff Bowen>),
+         ('librettist', <music21.metadata.primitives.Contributor librettist:Hunter Bell>),
+         ('title', <music21.metadata.primitives.Text Other World>),
          ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>))
         >>> allNonContributors = md.getAllNamedValues(skipContributors=True)
         >>> allNonContributors
-        (('musicxml:software', <music21.metadata.primitives.Text music21 v...>),
-         ('dcterms:title', <music21.metadata.primitives.Text Other World>),
+        (('software', <music21.metadata.primitives.Text music21 v...>),
+         ('title', <music21.metadata.primitives.Text Other World>),
          ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>))
         '''
         allOut: t.List[t.Tuple[str, ValueType]] = []
 
         valueList: t.List[ValueType]
-        for name, valueList in self._contents.items():
-            if skipContributors and self._isContributorNamespaceName(name):
+        for uniqueName, valueList in self._contents.items():
+            if skipContributors and self._isContributorUniqueName(uniqueName):
                 continue
 
             value: ValueType
             for value in valueList:
-                allOut.append((name, value))
+                allOut.append((uniqueName, value))
 
         return tuple(allOut)
 
@@ -449,24 +449,24 @@ class Metadata(base.Music21Object):
 
         >>> allContributors = md.getAllContributorNamedValues()
         >>> allContributors
-        (('marcrel:CMP', <music21.metadata.primitives.Contributor composer:Antonín Dvořák>),
-         ('marcrel:LBT',
+        (('composer', <music21.metadata.primitives.Contributor composer:Antonín Dvořák>),
+         ('librettist',
           <music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>),
-         ('marcrel:CTB',
+         ('otherContributor',
           <music21.metadata.primitives.Contributor based on plot by:Ferdinand Mikovec>),
-         ('marcrel:CTB',
+         ('otherContributor',
           <music21.metadata.primitives.Contributor original partial plot by:Friedrich Schiller>))
         '''
 
         allOut: t.List[t.Tuple[str, Contributor]] = []
 
-        for name, value in self._contents.items():
-            if not self._isContributorNamespaceName(name):
+        for uniqueName, value in self._contents.items():
+            if not self._isContributorUniqueName(uniqueName):
                 continue
 
             for v in value:
                 assert isinstance(v, Contributor)
-                allOut.append((name, v))
+                allOut.append((uniqueName, v))
 
         return tuple(allOut)
 
@@ -735,15 +735,9 @@ class Metadata(base.Music21Object):
         allOut: t.List[t.Tuple[str, str]] = []
 
         valueList: t.List[ValueType]
-        for name, valueList in self._contents.items():
-            if skipContributors and self._isContributorNamespaceName(name):
+        for uniqueName, valueList in self._contents.items():
+            if skipContributors and self._isContributorUniqueName(uniqueName):
                 continue
-
-            uniqueName: t.Optional[str] = self.namespaceNameToUniqueName(name)
-
-            if uniqueName is None:
-                # it's a custom metadata item, use the original name verbatim
-                uniqueName = name
 
             value: ValueType
             for value in valueList:
@@ -1024,8 +1018,8 @@ class Metadata(base.Music21Object):
         if not isinstance(c, Contributor):
             raise exceptions21.MetadataException(
                 f'supplied object is not a Contributor: {c}')
-        namespaceName: str = self._contributorRoleToNamespaceName(c.role)
-        self._add(namespaceName, c, isCustom=False)
+        uniqueName: str = self._contributorRoleToUniqueName(c.role)
+        self._add(uniqueName, c, isCustom=False)
 
     def getContributorsByRole(self, role: t.Optional[str]) -> t.Tuple[Contributor, ...]:
         r'''
@@ -1906,6 +1900,45 @@ class Metadata(base.Music21Object):
         return True
 
     @staticmethod
+    def _isContributorUniqueName(uniqueName: str) -> bool:
+        '''
+        Determines if a uniqueName is associated with a standard contributor
+        property. Returns False if no such associated standard property can be found,
+        or if the associated standard property is not a contributor property.
+
+        Example: 'librettist' returns True ('librettist' is a standard contributor
+        property).
+
+        >>> metadata.Metadata._isContributorUniqueName('librettist')
+        True
+
+        Example: 'alternativeTitle' returns False (it is a standard namespaceName,
+        but it is not a contributor).
+
+        >>> metadata.Metadata._isContributorUniqueName('alternativeTitle')
+        False
+
+        Example: 'marcrel:LBT' returns False (it is a standard contributor
+        namespaceName, but not a standard contributor uniqueName)
+
+        >>> metadata.Metadata._isContributorUniqueName('marcrel:LBT')
+        False
+
+        Example: a custom (non-standard) name returns False (it is not
+        a standard name of any sort)
+
+        >>> metadata.Metadata._isContributorUniqueName('average duration')
+        False
+        '''
+        prop: t.Optional[PropertyDescription] = (
+            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
+        )
+        if prop is None:
+            return False
+
+        return prop.isContributor
+
+    @staticmethod
     def _isContributorNamespaceName(namespaceName: str) -> bool:
         '''
         Determines if a 'namespace:name' is associated with a standard contributor
@@ -1994,95 +2027,50 @@ class Metadata(base.Music21Object):
         return prop.needsArticleNormalization
 
     @staticmethod
-    def _namespaceNameToContributorRole(namespaceName: str) -> t.Optional[str]:
+    def _contributorRoleToUniqueName(role: t.Optional[str]) -> str:
         '''
-        Translates a standard 'namespace:name' to it's associated contributor role.
-        Returns None for standard non-contributors as well as for non-standard names.
-
-        Example: 'marcrel:LBT' returns 'librettist'
-
-        >>> metadata.Metadata._namespaceNameToContributorRole('marcrel:LBT')
-        'librettist'
-
-        Example: 'dcterms:title' returns None (not a contributor)
-
-        >>> metadata.Metadata._namespaceNameToContributorRole('dcterms:title') is None
-        True
-
-        Example: 'librettist' returns None ('librettist' is the uniqueName of a
-        standard contributor property, but it is not a namespaceName).
-
-        >>> metadata.Metadata._namespaceNameToContributorRole('librettist') is None
-        True
-
-        Example: 'average duration' returns None (it is a non-standard name)
-
-        >>> metadata.Metadata._namespaceNameToContributorRole('average duration') is None
-        True
-        '''
-        prop: t.Optional[PropertyDescription] = (
-            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
-        )
-        if prop is None:
-            return None
-        if not prop.isContributor:
-            return None
-
-        # Return the uniqueName, which can be found one of two places in prop.
-        # We must check them in this order:
-        # 1. prop.uniqueName
-        # 2. prop.name
-        if prop.uniqueName:
-            return prop.uniqueName
-        return prop.name
-
-    @staticmethod
-    def _contributorRoleToNamespaceName(role: t.Optional[str]) -> str:
-        '''
-        Translates a contributor role to a standard 'namespace:name' that
-        should be used to store that contributor.
+        Translates a contributor role to a standard uniqueName that
+        should be used to store that contributor.  For standard contributor
+        roles, this simply returns role, because standard roles are their
+        own standard uniqueNames. But for non-standard roles, 'otherContributor'
+        is returned. This is the standard uniqueName that should be used for
+        contributors with custom roles.
 
         Example: 'composer' and 'lyricist' are standard contributor roles whose
-        namespaceNames are 'marcrel:CMP' and 'marcrel:LYR', respectively
+        uniqueNames are 'composer' and 'lyricist', respectively.
 
-        >>> metadata.Metadata._contributorRoleToNamespaceName('composer')
-        'marcrel:CMP'
-        >>> metadata.Metadata._contributorRoleToNamespaceName('lyricist')
-        'marcrel:LYR'
-
-        Returns 'marcrel:CTB' (a.k.a. 'otherContributor') if the role is a
-        non-standard role.  We allow role=None, because None is a valid
-        non-standard contributor role.
+        >>> metadata.Metadata._contributorRoleToUniqueName('composer')
+        'composer'
+        >>> metadata.Metadata._contributorRoleToUniqueName('lyricist')
+        'lyricist'
 
         Example: 'interpretive dancer' is a non-standard contributor role, so
-        'marcrel:CTB' is returned.
+        'otherContributor' is returned.
 
-        >>> metadata.Metadata._contributorRoleToNamespaceName('interpretive dancer')
-        'marcrel:CTB'
+        >>> metadata.Metadata._contributorRoleToUniqueName('interpretive dancer')
+        'otherContributor'
 
-        Example: None is a non-standard contributor role, so 'marcrel:CTB' is returned.
+        Example: None is a non-standard contributor role, so 'otherContributor' is returned.
 
-        >>> metadata.Metadata._contributorRoleToNamespaceName(None)
-        'marcrel:CTB'
+        >>> metadata.Metadata._contributorRoleToUniqueName(None)
+        'otherContributor'
         '''
         if role is None:
-            return 'marcrel:CTB'
-
-        namespaceName: t.Optional[str] = properties.UNIQUE_NAME_TO_NAMESPACE_NAME.get(role, None)
-        if namespaceName is None:
-            # it's a non-standard role, so add this contributor with uniqueName='otherContributor'
-            return 'marcrel:CTB'  # aka. 'otherContributor'
+            return 'otherContributor'
 
         prop: t.Optional[PropertyDescription] = (
-            properties.NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION.get(namespaceName, None)
+            properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(role, None)
         )
 
-        if prop is not None and not prop.isContributor:
-            # It's not a contributor name, but it IS another metadata uniqueName, like
-            # 'alternativeTitle' or something.  Weird, but we'll call it 'otherContributor'.
-            return 'marcrel:CTB'  # a.k.a. 'otherContributor'
+        if prop is None:
+            # It's not a standard uniqueName
+            return 'otherContributor'
 
-        return namespaceName
+        if not prop.isContributor:
+            # It's not a standard contributor role
+            return 'otherContributor'
+
+        return role
 
     def _get(self, name: str, isCustom: bool) -> t.Tuple[ValueType, ...]:
         '''
@@ -2096,14 +2084,14 @@ class Metadata(base.Music21Object):
         'namespace:name', KeyError will be raised.
         '''
         if not isCustom:
-            namespaceName: str = name
-            if self._isStandardUniqueName(name):
-                namespaceName = properties.UNIQUE_NAME_TO_NAMESPACE_NAME.get(name, '')
-            if not self._isStandardNamespaceName(namespaceName):
+            uniqueName: str = name
+            if self._isStandardNamespaceName(name):
+                uniqueName = properties.NAMESPACE_NAME_TO_UNIQUE_NAME.get(name, '')
+            if not self._isStandardUniqueName(uniqueName):
                 raise KeyError(
                     f'Name=\'{name}\' is not a standard metadata name.'
                     ' Call addCustom/setCustom/getCustom for custom names.')
-            name = namespaceName
+            name = uniqueName
 
         valueList: t.Optional[t.List[ValueType]] = self._contents.get(name, None)
 
@@ -2125,14 +2113,14 @@ class Metadata(base.Music21Object):
         'namespace:name', KeyError will be raised.
         '''
         if not isCustom:
-            namespaceName: str = name
-            if self._isStandardUniqueName(name):
-                namespaceName = properties.UNIQUE_NAME_TO_NAMESPACE_NAME.get(name, '')
-            if not self._isStandardNamespaceName(namespaceName):
+            uniqueName: str = name
+            if self._isStandardNamespaceName(name):
+                uniqueName = properties.NAMESPACE_NAME_TO_UNIQUE_NAME.get(name, '')
+            if not self._isStandardUniqueName(uniqueName):
                 raise KeyError(
                     f'Name=\'{name}\' is not a standard metadata name.'
                     ' Call addCustom/setCustom/getCustom for custom names.')
-            name = namespaceName
+            name = uniqueName
 
         if not isinstance(value, t.Iterable):
             value = [value]
@@ -2190,65 +2178,65 @@ class Metadata(base.Music21Object):
         KeyError: "Name='average duration' is not a standard metadata name...
         '''
         if not isCustom:
-            namespaceName: str = name
-            if self._isStandardUniqueName(name):
-                namespaceName = properties.UNIQUE_NAME_TO_NAMESPACE_NAME.get(name, '')
-            if not self._isStandardNamespaceName(namespaceName):
+            uniqueName: str = name
+            if self._isStandardNamespaceName(name):
+                uniqueName = properties.NAMESPACE_NAME_TO_UNIQUE_NAME.get(name, '')
+            if not self._isStandardUniqueName(uniqueName):
                 raise KeyError(
                     f'Name=\'{name}\' is not a standard metadata name.'
                     ' Call addCustom/setCustom/getCustom for custom names.')
-            name = namespaceName
+            name = uniqueName
 
         self._contents.pop(name, None)
         if value is not None:
             self._add(name, value, isCustom)
 
     @staticmethod
-    def _convertValue(namespaceName: str, value: t.Any) -> ValueType:
+    def _convertValue(uniqueName: str, value: t.Any) -> ValueType:
         '''
         Converts a value to the appropriate valueType (looked up in STDPROPERTIES by
-        namespaceName).
+        uniqueName).
 
         Converts certain named values to Text
 
-        >>> metadata.Metadata._convertValue('dcterms:title', 3.4)
+        >>> metadata.Metadata._convertValue('title', 3.4)
         <music21.metadata.primitives.Text 3.4>
-        >>> metadata.Metadata._convertValue('dcterms:title', '3.4')
+        >>> metadata.Metadata._convertValue('title', '3.4')
         <music21.metadata.primitives.Text 3.4>
-        >>> metadata.Metadata._convertValue('dcterms:title', metadata.Text('3.4'))
+        >>> metadata.Metadata._convertValue('title', metadata.Text('3.4'))
         <music21.metadata.primitives.Text 3.4>
 
         Converts certain named values to Copyright
 
-        >>> metadata.Metadata._convertValue('dcterms:rights', 'copyright str')
+        >>> metadata.Metadata._convertValue('copyright', 'copyright str')
         <music21.metadata.primitives.Copyright copyright str>
-        >>> metadata.Metadata._convertValue('dcterms:rights', metadata.Text('copyright text'))
+        >>> metadata.Metadata._convertValue('copyright', metadata.Text('copyright text'))
         <music21.metadata.primitives.Copyright copyright text>
-        >>> metadata.Metadata._convertValue('dcterms:rights', metadata.Copyright('copyright'))
+        >>> metadata.Metadata._convertValue('copyright', metadata.Copyright('copyright'))
         <music21.metadata.primitives.Copyright copyright>
 
         Converts certain named values to Contributor
 
-        >>> metadata.Metadata._convertValue('marcrel:CMP', 'composer str')
+        >>> metadata.Metadata._convertValue('composer', 'composer str')
         <music21.metadata.primitives.Contributor composer:composer str>
-        >>> metadata.Metadata._convertValue('marcrel:CMP', metadata.Text('composer text'))
+        >>> metadata.Metadata._convertValue('composer', metadata.Text('composer text'))
         <music21.metadata.primitives.Contributor composer:composer text>
-        >>> metadata.Metadata._convertValue('marcrel:CMP',
+        >>> metadata.Metadata._convertValue('composer',
         ...     metadata.Contributor(role='random', name='Joe'))
         <music21.metadata.primitives.Contributor random:Joe>
 
         Converts certain named values to DateSingle
 
-        >>> metadata.Metadata._convertValue('dcterms:created', '1938')
+        >>> metadata.Metadata._convertValue('dateCreated', '1938')
         <music21.metadata.primitives.DateSingle 1938/--/-->
-        >>> metadata.Metadata._convertValue('dcterms:created', metadata.Text('1938'))
+        >>> metadata.Metadata._convertValue('dateCreated', metadata.Text('1938'))
         <music21.metadata.primitives.DateSingle 1938/--/-->
-        >>> metadata.Metadata._convertValue('dcterms:created',
+        >>> metadata.Metadata._convertValue('dateCreated',
         ...     metadata.DateBetween(['1938','1939']))
         <music21.metadata.primitives.DateBetween 1938/--/-- to 1939/--/-->
         '''
-        valueType: t.Optional[t.Type[ValueType]] = properties.NAMESPACE_NAME_TO_VALUE_TYPE.get(
-            namespaceName, None
+        valueType: t.Optional[t.Type[ValueType]] = properties.UNIQUE_NAME_TO_VALUE_TYPE.get(
+            uniqueName, None
         )
         originalValue: t.Any = value
 
@@ -2300,15 +2288,20 @@ class Metadata(base.Music21Object):
                 value = Text(value)
 
             if isinstance(value, Text):
-                return Contributor(
-                    role=Metadata._namespaceNameToContributorRole(namespaceName),
-                    name=value
-                )
+                return Contributor(role=uniqueName, name=value)
+
             raise exceptions21.MetadataException(
                 f'invalid type for Contributor: {type(value).__name__}')
 
         if valueType is int:
-            return int(value)
+            # noinspection PyBroadException
+            # pylint: disable=bare-except
+            try:
+                return int(value)
+            except:
+                raise exceptions21.MetadataException(
+                    f'invalid type for int: {type(value).__name__}')
+            # pylint: enable=bare-except
 
         raise exceptions21.MetadataException('internal error: invalid valueType')
 
@@ -2636,15 +2629,15 @@ class RichMetadata(Metadata):
         >>> rmd.update(c)
         >>> all = rmd.getAllNamedValues()
         >>> all
-        (('musicxml:software', <music21.metadata.primitives.Text music21 v.8...>),
-         ('musicxml:software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
-         ('musicxml:software', <...Text Dolet Light for Finale 2014>),
-         ('humdrum:OMD', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
-         ('marcrel:CMP', <...Contributor composer:Arcangelo Corelli>),
-         ('marcrel:ARR',  <...Contributor arranger:Michael Scott Cuthbert>),
-         ('dcterms:rights', <...Copyright © 2014, Creative Commons License (CC-BY)>),
-         ('m21FileInfo:filePath', <...Text ...corpus/corelli/opus3no1/1grave.xml>),
-         ('m21FileInfo:fileFormat', <music21.metadata.primitives.Text musicxml>),
+        (('software', <music21.metadata.primitives.Text music21 v.8...>),
+         ('software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
+         ('software', <...Text Dolet Light for Finale 2014>),
+         ('movementName', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
+         ('composer', <...Contributor composer:Arcangelo Corelli>),
+         ('arranger',  <...Contributor arranger:Michael Scott Cuthbert>),
+         ('copyright', <...Copyright © 2014, Creative Commons License (CC-BY)>),
+         ('filePath', <...Text ...corpus/corelli/opus3no1/1grave.xml>),
+         ('fileFormat', <music21.metadata.primitives.Text musicxml>),
          ('ambitus',
             AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
          ('keySignatureFirst', -1),
@@ -2662,13 +2655,13 @@ class RichMetadata(Metadata):
 
         >>> allNonContributors = rmd.getAllNamedValues(skipContributors=True)
         >>> allNonContributors
-        (('musicxml:software', <music21.metadata.primitives.Text music21 v.8...>),
-         ('musicxml:software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
-         ('musicxml:software', <...Text Dolet Light for Finale 2014>),
-         ('humdrum:OMD', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
-         ('dcterms:rights', <...Copyright © 2014, Creative Commons License (CC-BY)>),
-         ('m21FileInfo:filePath', <...Text ...corpus/corelli/opus3no1/1grave.xml>),
-         ('m21FileInfo:fileFormat', <music21.metadata.primitives.Text musicxml>),
+        (('software', <music21.metadata.primitives.Text music21 v.8...>),
+         ('software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
+         ('software', <...Text Dolet Light for Finale 2014>),
+         ('movementName', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
+         ('copyright', <...Copyright © 2014, Creative Commons License (CC-BY)>),
+         ('filePath', <...Text ...corpus/corelli/opus3no1/1grave.xml>),
+         ('fileFormat', <music21.metadata.primitives.Text musicxml>),
          ('ambitus',
             AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
          ('keySignatureFirst', -1),

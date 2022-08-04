@@ -2346,14 +2346,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         skippedOneMovementName: bool = False
         skippedOneMovementNumber: bool = False
         skippedOneTitle: bool = False
-        for namespaceName, value in allItems:
-            if namespaceName.startswith('m21FileInfo:'):
-                # We don't emit fileInfo (fileFormat, filePath, fileNumber)
-                # into MusicXML files.  It is added during parsing, and
-                # isn't accurate for the file we are writing here.
-                continue
-
-            uniqueName: str = md.namespaceNameToUniqueName(namespaceName)
+        for uniqueName, value in allItems:
             if uniqueName == 'software':
                 # we have already emitted the software versions in <software>.
                 continue
@@ -2364,20 +2357,33 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
                 if not skippedOneMovementName:
                     skippedOneMovementName = True
                     continue
+
             if uniqueName == 'movementNumber':
                 # We have already emitted the first movementNumber in <movement-number>,
                 # but we need to emit the rest of them here in miscellaneous.
                 if not skippedOneMovementNumber:
                     skippedOneMovementNumber = True
                     continue
+
             if uniqueName == 'title':
                 # We have already emitted the first title in <work-title>,
                 # but we need to emit the rest of them here in miscellaneous.
                 if not skippedOneTitle:
                     skippedOneTitle = True
                     continue
+
             if uniqueName == 'copyright':
                 # We have already emitted all the copyrights.
+                continue
+
+            namespaceName: t.Optional[str] = md.uniqueNameToNamespaceName(uniqueName)
+            if namespaceName is None:
+                namespaceName = uniqueName
+
+            if namespaceName.startswith('m21FileInfo:'):
+                # We don't emit fileInfo (fileFormat, filePath, fileNumber)
+                # into MusicXML files.  It is added during parsing, and
+                # isn't accurate for the file we are writing here.
                 continue
 
             mxMiscField = SubElement(mxMiscellaneous, 'miscellaneous-field')

@@ -1158,18 +1158,6 @@ NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION: t.Dict[str, PropertyDescription] = {
         x for x in STANDARD_PROPERTY_DESCRIPTIONS
 }
 
-NAMESPACE_NAME_TO_VALUE_TYPE: t.Dict[str, t.Type] = {
-    f'{x.namespace}:{x.name}':
-        x.valueType for x in STANDARD_PROPERTY_DESCRIPTIONS
-}
-
-NAMESPACE_NAME_TO_CONTRIBUTOR_UNIQUE_NAME: t.Dict[str, str] = {
-    f'{x.namespace}:{x.name}':
-        x.uniqueName if x.uniqueName
-        else x.name
-        for x in STANDARD_PROPERTY_DESCRIPTIONS if x.isContributor
-}
-
 NAMESPACE_NAME_TO_UNIQUE_NAME: t.Dict[str, str] = {
     f'{x.namespace}:{x.name}':
         x.uniqueName if x.uniqueName
@@ -1188,6 +1176,12 @@ UNIQUE_NAME_TO_PROPERTY_DESCRIPTION: t.Dict[str, PropertyDescription] = {
     x.uniqueName if x.uniqueName
     else x.name:
         x for x in STANDARD_PROPERTY_DESCRIPTIONS
+}
+
+UNIQUE_NAME_TO_VALUE_TYPE: t.Dict[str, t.Type] = {
+    x.uniqueName if x.uniqueName
+    else x.name:
+        x.valueType for x in STANDARD_PROPERTY_DESCRIPTIONS
 }
 
 MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME: t.Dict[str, str] = {
