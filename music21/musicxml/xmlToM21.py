@@ -1293,6 +1293,20 @@ class MusicXMLImporter(XMLParserBase):
         add_m(md, el, 'movement-number', 'movementNumber')
         add_m(md, el, 'movement-title', 'movementName')
 
+        # If there is no movementName in the metadata, music21's MusicXML writer will
+        # duplicate the title into the movementName in the written file. Apparently this
+        # is because MusicXML renderers have historically rendered 'movement-title' as
+        # the title at the top of the page, and not the actual work-title.  The code
+        # below (which used to live in Metadata.all) notices that md['title'] and
+        # md['movementName'] are the same, and deletes md['title'], undoing that
+        # MusicXML weirdness music21's writer caused.  I have moved this code from
+        # Metadata.all to here, since it is clearly MusicXML-specific, and I don't
+        # want to corrupt the actual metadata in other code paths/converters. Perhaps
+        # the world is populated entirely by better MusicXML renderers now, so we can
+        # remove both bits of code from the MusicXML converter?...
+        if md['title'] == md['movementName']:
+            md['title'] = None
+
         identification = el.find('identification')
         if identification is not None:
             self.identificationToMetadata(identification, md)

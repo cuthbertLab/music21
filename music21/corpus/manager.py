@@ -388,7 +388,7 @@ def listSearchFields():
     'title'
     ...
     '''
-    return tuple(sorted(metadata.RichMetadata.searchAttributes))
+    return metadata.bundles.MetadataBundle.listSearchFields()
 
 # -----------------------------------------------------------------------------
 

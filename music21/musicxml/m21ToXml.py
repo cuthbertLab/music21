@@ -2347,6 +2347,12 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         skippedOneMovementNumber: bool = False
         skippedOneTitle: bool = False
         for namespaceName, value in allItems:
+            if namespaceName.startswith('m21FileInfo:'):
+                # We don't emit fileInfo (fileFormat, filePath, fileNumber)
+                # into MusicXML files.  It is added during parsing, and
+                # isn't accurate for the file we are writing here.
+                continue
+
             uniqueName: str = md.namespaceNameToUniqueName(namespaceName)
             if uniqueName == 'software':
                 # we have already emitted the software versions in <software>.

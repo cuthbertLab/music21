@@ -1732,7 +1732,7 @@ class Test(unittest.TestCase):
         a = parse(testFiles.binchoisMagnificat)
         self.assertEqual(a.metadata.composer, 'Gilles Binchois')
         # this gets the best title available, even though this is movement title
-        self.assertEqual(a.metadata.title, 'Excerpt from Magnificat secundi toni')
+        self.assertEqual(a.metadata.bestTitle, 'Excerpt from Magnificat secundi toni')
 
     def testConversionMXBarlines(self):
         from music21 import bar

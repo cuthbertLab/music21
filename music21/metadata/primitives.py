@@ -1488,7 +1488,7 @@ _DOC_ORDER = (
 
 
 ValueType = t.Union[DateSingle, DateRelative, DateBetween, DateSelection,
-                    Text, Contributor, Copyright]
+                    Text, Contributor, Copyright, int]
 
 
 if __name__ == '__main__':

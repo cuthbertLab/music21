@@ -171,12 +171,6 @@ environLocal = environment.Environment(os.path.basename(__file__))
 AmbitusShort = namedtuple('AmbitusShort',
                           ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
 
-@dataclass
-class FileInfo:
-    path: t.Optional[Text] = None
-    number: t.Optional[int] = None
-    format: t.Optional[Text] = None
-
 # -----------------------------------------------------------------------------
 
 
@@ -225,29 +219,10 @@ class Metadata(base.Music21Object):
     (<music21.metadata.primitives.Contributor composer:Billy Strayhorn>,
      <music21.metadata.primitives.Contributor composer:Duke Ellington>)
 
-    allUniqueNames is a list of all the unique names (without any of the
-    grandfathered v7 workId synonyms).
-
-    >>> md.allUniqueNames
-    ('abstract', 'accessRights', 'accompanyingMaterialWriter', 'actNumber', 'adapter',
-     ...
-     'commissionedBy', 'compiler', 'composer', 'composerAlias', 'composerCorporate',
-     ...
-     'lithographer', 'localeOfComposition', 'lyricist',
-     ...
-     'title', 'transcriber', 'translator', 'type', 'volumeNumber', ...)
-
-
-    searchAttributes are used by .search() methods to determine what attributes can
-    be searched for.  There are some synonyms (like 'dateCreated' and 'date')
-    that will find the same items.  This is because some uniqueNames have been
-    updated in music21 v8 ('dateCreated'), and the old v7 name ('date') has
-    been grandfathered in as a synonym.
-
     Here is the list of grandfathered v7 synonyms, which may disappear in a
     future version:
 
-    >>> sorted(set(md.searchAttributes) - set(md.allUniqueNames))
+    >>> sorted(metadata.properties.ALL_MUSIC21_WORK_IDS)
     ['commission', 'date', 'dedication', 'volume']
 
     And here are their new v8 unique/Dublin-Core standard names:
@@ -260,26 +235,6 @@ class Metadata(base.Music21Object):
 
     classSortOrder = -30
 
-    # We differentiate between allUniqueNames, a list of all the values you can get,
-    # and searchAttributes, a list of all the names you can search for.  The difference
-    # is that searchAttributes has all the extra workIds in it that are different from
-    # the uniqueName for that same property.  For example, 'dedicatedTo' is a uniqueName
-    # for which the workId is 'dedication'.  Both will show up in searchAttributes (so
-    # you can search for either one), but only 'dedicatedTo' will show up in allUniqueNames,
-    # because you don't want to get both 'dedicatedTo' and 'dedication', since they are
-    # the same value.  Note that searchAttributes' initialization uses set() to get rid
-    # of any workIds that are the same name as the uniqueName.
-
-    # add more as properties/import exists
-    allUniqueNames = tuple(sorted([
-        'fileFormat',
-        'fileNumber',
-        'filePath',
-    ] + properties.ALL_UNIQUE_NAMES))
-
-    searchAttributes: t.Tuple = tuple(sorted(set(
-        list(allUniqueNames) + properties.ALL_MUSIC21_WORK_IDS)))
-
     # INITIALIZER #
 
     def __init__(self, *args, **keywords):
@@ -288,7 +243,6 @@ class Metadata(base.Music21Object):
         self._contents: t.Dict[str, t.List[ValueType]] = {}
 
         # TODO: check pickling, etc.
-        self.fileInfo = FileInfo()
 
         # We allow the setting of metadata values (attribute-style) via **keywords.
         # Any keywords that are uniqueNames, grandfathered workIds, or grandfathered
@@ -517,7 +471,7 @@ class Metadata(base.Music21Object):
         return tuple(allOut)
 
 # -----------------------------------------------------------------------------
-#   A few static utility routines for clients calling public APIs
+#   A few utility routines for clients calling public APIs
 
     @staticmethod
     def uniqueNameToNamespaceName(uniqueName: str) -> t.Optional[str]:
@@ -608,38 +562,36 @@ class Metadata(base.Music21Object):
 
         return prop.isContributor
 
-    @staticmethod
-    def isStandardName(name: str) -> bool:
+    def isStandardName(self, name: str) -> bool:
         '''
         Determines if name is either a 'namespace:name' or a 'uniqueName'
         associated with a standard property.
 
         Returns False if no such associated standard property can be found.
 
-        >>> metadata.Metadata.isStandardName('librettist')
+        >>> md = metadata.Metadata()
+        >>> md.isStandardName('librettist')
         True
 
         'marcrel:LBT' is the namespace name of 'librettist'
 
-        >>> metadata.Metadata.isStandardName('marcrel:LBT')
+        >>> md.isStandardName('marcrel:LBT')
         True
 
         Some examples of non-standard (custom) names.
 
-        >>> metadata.Metadata.isStandardName('average duration')
+        >>> md.isStandardName('average duration')
         False
-        >>> metadata.Metadata.isStandardName('soundtracker:SampleName')
+        >>> md.isStandardName('soundtracker:SampleName')
         False
         '''
-        if Metadata._isStandardNamespaceName(name):
+        if self._isStandardNamespaceName(name):
             return True
 
-        if Metadata._isStandardUniqueName(name):
+        if self._isStandardUniqueName(name):
             return True
 
         return False
-
-
 
 # -----------------------------------------------------------------------------
 #   Public APIs
@@ -747,11 +699,13 @@ class Metadata(base.Music21Object):
         return self._getSingularAttribute('copyright')
 
     # SPECIAL METHODS #
-    def all(self, skipContributors=False):
+    def all(self, skipContributors: bool = False) -> t.Tuple[t.Tuple[str, t.Any], ...]:
         # noinspection SpellCheckingInspection,PyShadowingNames
         '''
         Returns all values stored in this metadata as a sorted Tuple of Tuple[str, str].
-        Each individual Tuple is (uniqueName, stringValue).
+        Each individual Tuple is (uniqueName, strValue).  Note that we cannot properly
+        type-hint the return value, since derived classes (such as RichMetadata) are
+        allowed to return their own typed values that might not be str.
 
         >>> c = corpus.parse('corelli/opus3no1/1grave')
         >>> c.metadata.all()
@@ -761,6 +715,8 @@ class Metadata(base.Music21Object):
          ('fileFormat', 'musicxml'),
          ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'),
+         ('software', 'Dolet...'),
+         ('software', 'Finale...'),
          ('software', 'music21 v...'))
 
         >>> c.metadata.date = metadata.DateRelative('1689', 'onOrBefore')
@@ -772,54 +728,28 @@ class Metadata(base.Music21Object):
          ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
          ('localeOfComposition', 'Rome'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'),
+         ('software', 'Dolet...'),
+         ('software', 'Finale...'),
          ('software', 'music21 v...'))
         '''
-        # pylint: disable=undefined-variable
-        allOut = {}
+        allOut: t.List[t.Tuple[str, str]] = []
 
-        for uniqueName in self.allUniqueNames:
-            try:
-                values: t.Tuple[str, ...] = self._getStringValuesByNamespaceName(
-                    properties.UNIQUE_NAME_TO_NAMESPACE_NAME[uniqueName]
-                )
-                if not values:
-                    continue
-                val = values[0]
-            except AttributeError:
+        valueList: t.List[ValueType]
+        for name, valueList in self._contents.items():
+            if skipContributors and self._isContributorNamespaceName(name):
                 continue
-            except KeyError:
-                # A uniqueName that doesn't have a PropertyDescription
-                # That's the three fileInfo properties, just get them
-                # attribute-style (i.e. as string)
-                if uniqueName == 'fileFormat':
-                    val = str(self.fileFormat)
-                elif uniqueName == 'filePath':
-                    val = str(self.filePath)
-                elif uniqueName == 'fileNumber':
-                    val = str(self.fileNumber)
-                else:
-                    raise
 
-            if skipContributors:
-                if self.isContributorUniqueName(uniqueName):
-                    continue
-            if val == 'None' or not val:
-                continue
-            allOut[uniqueName] = val
+            uniqueName: t.Optional[str] = self.namespaceNameToUniqueName(name)
 
-        if not skipContributors:
-            for c in self.contributors:
-                if c.role in allOut:
-                    continue
-                if not c.name or c.name == 'None':
-                    continue
-                allOut[str(c.role)] = str(c.name)
+            if uniqueName is None:
+                # it's a custom metadata item, use the original name verbatim
+                uniqueName = name
 
-        if 'title' in allOut and 'movementName' in allOut:
-            if allOut['movementName'] == allOut['title']:
-                del(allOut['title'])
+            value: ValueType
+            for value in valueList:
+                allOut.append((uniqueName, str(value)))
 
-        return tuple(sorted(allOut.items()))
+        return tuple(sorted(allOut))
 
     def __getattr__(self, name):
         '''
@@ -1224,34 +1154,51 @@ class Metadata(base.Music21Object):
             except AttributeError:
                 pass
             if not match:
-                for searchAttribute in self.searchAttributes:
+                for uniqueName, value in self.all(skipContributors=True):
+                    if not self._isStandardUniqueName(uniqueName):
+                        # custom metadata, don't search it
+                        continue
+
                     # environLocal.printDebug(['comparing fields:', f, field])
                     # look for partial match in all fields
-                    if field.lower() in searchAttribute.lower():
-                        values = self._getPluralAttribute(searchAttribute)
-                        for value in values:
-                            valueFieldPairs.append((value, searchAttribute))
+                    if field.lower() in uniqueName.lower():
+                        valueFieldPairs.append((value, uniqueName))
+                        match = True
+                        break
+
+                    # see if there is an associated grandfathered workId, and if so,
+                    # search for that, too.
+                    workId: t.Optional[str] = properties.UNIQUE_NAME_TO_MUSIC21_WORK_ID.get(
+                        uniqueName, None
+                    )
+
+                    if not workId:
+                        # there is no associated grandfathered workId, don't search it
+                        continue
+
+                    # look for partial match in all fields
+                    if field.lower() in workId.lower():
+                        valueFieldPairs.append((value, workId))
                         match = True
                         break
         else:  # get all fields
-            for innerField in self.allUniqueNames:
-                if innerField == 'otherContributor':
-                    # Special name that means "use the value.role instead, it's a custom role".
-                    # We'll catch it below when we append contrib.role for all contributors
+            for uniqueName, value in self.all(skipContributors=True):
+                if not self._isStandardUniqueName(uniqueName):
+                    # custom metadata, don't search it
                     continue
-                values = self._getPluralAttribute(innerField)
-                for value in values:
-                    valueFieldPairs.append((value, innerField))
+                valueFieldPairs.append((value, uniqueName))
 
-        # now search all contributors.
+        # now get all (or field-matched) contributor names, using contrib.role
+        # as field name, so clients can search by custom contributor role.
         for _, contrib in self.getAllContributorNamedValues():
             if field is not None:
                 if contrib.role is None and field.lower() != 'contributor':
                     continue
-                if contrib.role is not None and field.lower() not in contrib.role:
+                if contrib.role is not None and field.lower() not in contrib.role.lower():
                     continue
             for name in contrib.names:
-                valueFieldPairs.append((name, contrib.role))
+                # name is Text, so convert to str
+                valueFieldPairs.append((str(name), contrib.role))
 
         # for now, make all queries strings
         # ultimately, can look for regular expressions by checking for
@@ -1438,24 +1385,21 @@ class Metadata(base.Music21Object):
         '''
         Get or set the file format that was parsed.
         '''
-        if self.fileInfo.format:
-            return str(self.fileInfo.format)
+        return self._getSingularAttribute('fileFormat')
 
     @property
     def filePath(self) -> t.Optional[str]:
         '''
         Get or set the file path that was parsed.
         '''
-        if self.fileInfo.path:
-            return str(self.fileInfo.path)
+        return self._getSingularAttribute('filePath')
 
     @property
     def fileNumber(self) -> t.Optional[str]:
         '''
         Get or set the file number that was parsed.
         '''
-        if self.fileInfo.number:
-            return str(self.fileInfo.number)
+        return self._getSingularAttribute('fileNumber')
 
     @property
     def localeOfComposition(self):
@@ -1613,22 +1557,37 @@ class Metadata(base.Music21Object):
     @property
     def title(self):
         r'''
-        Get the title of the work, or the next-matched title string
-        available from a related parameter fields.
+        Get the title of the work.
 
         >>> md = metadata.Metadata(title='Third Symphony')
         >>> md.title
         'Third Symphony'
 
         >>> md = metadata.Metadata(popularTitle='Eroica')
-        >>> md.title
+        >>> md.title is None
+        True
+        '''
+        return self._getSingularAttribute('title')
+
+    @property
+    def bestTitle(self):
+        r'''
+        Get the title of the work, or the next-matched title string
+        available from a related parameter fields.
+
+        >>> md = metadata.Metadata(title='Third Symphony')
+        >>> md.bestTitle
+        'Third Symphony'
+
+        >>> md = metadata.Metadata(popularTitle='Eroica')
+        >>> md.bestTitle
         'Eroica'
 
         >>> md = metadata.Metadata(
         ...     title='Third Symphony',
         ...     popularTitle='Eroica',
         ...     )
-        >>> md.title
+        >>> md.bestTitle
         'Third Symphony'
 
         >>> md.popularTitle
@@ -1644,13 +1603,13 @@ class Metadata(base.Music21Object):
             'movementName',
         )
         for uniqueName in searchId:
-            titles = self._get(uniqueName, isCustom=False)
-            if not titles:  # get first matched
-                continue
-
-            return self._getStringValueByNamespaceName(
+            titleSummary: t.Optional[str] = self._getStringValueByNamespaceName(
                 properties.UNIQUE_NAME_TO_NAMESPACE_NAME[uniqueName]
             )
+            if not titleSummary:  # get first matched
+                continue
+
+            return titleSummary
 
         return None
 
@@ -1809,23 +1768,6 @@ class Metadata(base.Music21Object):
                 properties.MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME[attributeName]
             )
 
-        # The following are in searchAttributes, and getattr will find them because
-        # they are a property, but this routine needs to find them, too.
-        if attributeName == 'fileFormat':
-            if self.fileFormat is None:
-                return tuple()
-            return (self.fileFormat,)
-
-        if attributeName == 'filePath':
-            if self.filePath is None:
-                return tuple()
-            return (self.filePath,)
-
-        if attributeName == 'fileNumber':
-            if self.fileNumber is None:
-                return tuple()
-            return (str(self.fileNumber),)
-
         raise AttributeError(f'invalid attributeName: {attributeName}')
 
     def _getSingularAttribute(self, attributeName: str) -> t.Optional[str]:
@@ -1879,33 +1821,39 @@ class Metadata(base.Music21Object):
 
         raise AttributeError(f'object has no attribute: {attributeName}')
 
-    @staticmethod
-    def _isStandardUniqueName(uniqueName: str) -> bool:
+    def _isStandardUniqueName(self, uniqueName: str) -> bool:
         '''
         Determines if a unique name is associated with a standard property.
         Returns False if no such associated standard property can be found.
 
         Example: a standard contributor uniqueName returns True
 
-        >>> metadata.Metadata._isStandardUniqueName('librettist')
+        >>> md = metadata.Metadata()
+        >>> md._isStandardUniqueName('librettist')
         True
 
         Example: a standard 'namespace:name' returns False (it is a standard
         namespaceName, but not a standard uniqueName)
 
-        >>> metadata.Metadata._isStandardUniqueName('marcrel:LBT')
+        >>> md._isStandardUniqueName('marcrel:LBT')
         False
 
         Example: a standard non-contributor uniqueName returns True
 
-        >>> metadata.Metadata._isStandardUniqueName('alternativeTitle')
+        >>> md._isStandardUniqueName('alternativeTitle')
         True
 
         Example: a custom (non-standard) name returns False (it is not
         a standard name of any sort)
 
-        >>> metadata.Metadata._isStandardUniqueName('average duration')
+        >>> md._isStandardUniqueName('average duration')
         False
+
+        Example: a RichMetadata additional attribute name returns False
+
+        >>> md._isStandardUniqueName('ambitus')
+        False
+
         '''
         prop: t.Optional[PropertyDescription] = (
             properties.UNIQUE_NAME_TO_PROPERTY_DESCRIPTION.get(uniqueName, None)
@@ -2252,7 +2200,8 @@ class Metadata(base.Music21Object):
             name = namespaceName
 
         self._contents.pop(name, None)
-        self._add(name, value, isCustom)
+        if value is not None:
+            self._add(name, value, isCustom)
 
     @staticmethod
     def _convertValue(namespaceName: str, value: t.Any) -> ValueType:
@@ -2358,6 +2307,9 @@ class Metadata(base.Music21Object):
             raise exceptions21.MetadataException(
                 f'invalid type for Contributor: {type(value).__name__}')
 
+        if valueType is int:
+            return int(value)
+
         raise exceptions21.MetadataException('internal error: invalid valueType')
 
 # -----------------------------------------------------------------------------
@@ -2374,14 +2326,14 @@ class RichMetadata(Metadata):
     'Concerto in F'
 
     >>> richMetadata.keySignatureFirst = key.KeySignature(-1)
-    >>> 'keySignatureFirst' in richMetadata.searchAttributes
+    >>> 'keySignatureFirst' in richMetadata.additionalRichMetadataAttributes
     True
 
-    RichMetadata's allUniqueNames/searchAttributes contain all the Metadata
-    allUniqueNames/searchAttributes, plus some observed musical information
-    analyzed from the score.  Here is a list of what information is added:
+    RichMetadata objects contain all the usual Metadata items, plus some observed
+    musical information analyzed from the score.  Here is a list of what information
+    is added:
 
-    >>> richMetadata.additionalRichSearchAttributes
+    >>> richMetadata.additionalRichMetadataAttributes
     ('ambitus', 'keySignatureFirst', 'keySignatures', 'noteCount', 'numberOfParts',
      'pitchHighest', 'pitchLowest', 'quarterLength', 'sourcePath', 'tempoFirst',
      'tempos', 'timeSignatureFirst', 'timeSignatures')
@@ -2390,7 +2342,7 @@ class RichMetadata(Metadata):
     # CLASS VARIABLES #
 
     # When changing this, be sure to update freezeThaw.py
-    additionalRichSearchAttributes = (
+    additionalRichMetadataAttributes = (
         'ambitus',
         'keySignatureFirst',
         'keySignatures',
@@ -2405,9 +2357,6 @@ class RichMetadata(Metadata):
         'timeSignatureFirst',
         'timeSignatures',
     )
-
-    allUniqueNames = tuple(sorted(Metadata.allUniqueNames + additionalRichSearchAttributes))
-    searchAttributes = tuple(sorted(Metadata.searchAttributes + additionalRichSearchAttributes))
 
     # INITIALIZER #
 
@@ -2428,10 +2377,10 @@ class RichMetadata(Metadata):
         self.timeSignatures = []
 
     def _getPluralAttribute(self, attributeName) -> t.Tuple[str, ...]:
-        # we have to implement this to add the RichMetadata searchAttributes, since
+        # we have to implement this to add the RichMetadata attributes, since
         # Metadata.search calls it.
-        if attributeName in self.additionalRichSearchAttributes:
-            # We can treat additionalRichSearchAttributes as singletons,
+        if attributeName in self.additionalRichMetadataAttributes:
+            # We can treat additionalRichMetadataAttributes as singletons,
             # so just call getattr, and put the result in a tuple.
             value = getattr(self, attributeName)
             if value is None:
@@ -2604,6 +2553,185 @@ class RichMetadata(Metadata):
                                     pitchLowest=self.pitchLowest,
                                     pitchHighest=self.pitchHighest,
                                     )
+
+    def all(self, skipContributors: bool = False) -> t.Tuple[t.Tuple[str, t.Any], ...]:
+        '''
+        Returns all values stored in this RichMetadata as a sorted Tuple of Tuples.
+        Each individual Metadata Tuple is (uniqueName, strValue) and each additional
+        RichMetadata tuple is (uniqueName, richAttributeValue).
+
+        >>> rmd = metadata.RichMetadata()
+        >>> c = corpus.parse('corelli/opus3no1/1grave')
+        >>> rmd.merge(c.metadata)
+        >>> rmd.update(c)
+        >>> rmd.all()
+        (('ambitus',
+            AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
+         ('arranger', 'Michael Scott Cuthbert'),
+         ('composer', 'Arcangelo Corelli'),
+         ('copyright', '© 2014, Creative Commons License (CC-BY)'),
+         ('fileFormat', 'musicxml'),
+         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
+         ('keySignatureFirst', -1),
+         ('keySignatures', [-1]),
+         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'),
+         ('noteCount', 259),
+         ('numberOfParts', 3),
+         ('pitchHighest', 'C6'),
+         ('pitchLowest', 'C2'),
+         ('quarterLength', 76.0),
+         ('software', 'Dolet Light for Finale 2014'),
+         ('software', 'Finale 2014 for Mac'),
+         ('software', 'music21 v.8.0.0a9'),
+         ('sourcePath', 'corelli/opus3no1/1grave.xml'),
+         ('tempoFirst', None), ('tempos', []),
+         ('timeSignatureFirst', '4/4'),
+         ('timeSignatures', ['4/4']))
+        >>> rmd.dateCreated = metadata.DateRelative('1689', 'onOrBefore')
+        >>> rmd.localeOfComposition = 'Rome'
+        >>> rmd.all(skipContributors=True)
+        (('ambitus',
+            AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
+         ('copyright', '© 2014, Creative Commons License (CC-BY)'),
+         ('dateCreated', '1689/--/-- or earlier'),
+         ('fileFormat', 'musicxml'),
+         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
+         ('keySignatureFirst', -1),
+         ('keySignatures', [-1]),
+         ('localeOfComposition', 'Rome'),
+         ('movementName',
+         'Sonata da Chiesa, No. I (opus 3, no. 1)'),
+         ('noteCount', 259),
+         ('numberOfParts', 3),
+         ('pitchHighest', 'C6'),
+         ('pitchLowest', 'C2'),
+         ('quarterLength', 76.0),
+         ('software', 'Dolet Light for Finale 2014'),
+         ('software', 'Finale 2014 for Mac'),
+         ('software', 'music21 v.8...'),
+         ('sourcePath', 'corelli/opus3no1/1grave.xml'),
+         ('tempoFirst', None),
+         ('tempos', []),
+         ('timeSignatureFirst', '4/4'),
+         ('timeSignatures', ['4/4']))
+        '''
+        allOut: t.List[t.Tuple[str, t.Any]] = list(super().all(skipContributors))
+
+        for name in self.additionalRichMetadataAttributes:
+            allOut.append((name, getattr(self, name)))
+
+        return tuple(sorted(allOut))
+
+    def getAllNamedValues(self, skipContributors=False) -> t.Tuple[t.Tuple[str, ValueType], ...]:
+        '''
+        Returns all values stored in this RichMetadata as a tuple of (name, value) tuples.
+        Names with multiple values will appear multiple times in the list (rather
+        than appearing once, with a value that is a list of values).
+        The tuple's first element (the name) is either of the form 'namespace:name', or a
+        custom name (with no form at all).
+
+        >>> rmd = metadata.RichMetadata()
+        >>> c = corpus.parse('corelli/opus3no1/1grave')
+        >>> rmd.merge(c.metadata)
+        >>> rmd.update(c)
+        >>> all = rmd.getAllNamedValues()
+        >>> all
+        (('musicxml:software', <music21.metadata.primitives.Text music21 v.8...>),
+         ('musicxml:software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
+         ('musicxml:software', <...Text Dolet Light for Finale 2014>),
+         ('humdrum:OMD', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
+         ('marcrel:CMP', <...Contributor composer:Arcangelo Corelli>),
+         ('marcrel:ARR',  <...Contributor arranger:Michael Scott Cuthbert>),
+         ('dcterms:rights', <...Copyright © 2014, Creative Commons License (CC-BY)>),
+         ('m21FileInfo:filePath', <...Text ...corpus/corelli/opus3no1/1grave.xml>),
+         ('m21FileInfo:fileFormat', <music21.metadata.primitives.Text musicxml>),
+         ('ambitus',
+            AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
+         ('keySignatureFirst', -1),
+         ('keySignatures', [-1]),
+         ('noteCount', 259),
+         ('numberOfParts', 3),
+         ('pitchHighest', 'C6'),
+         ('pitchLowest', 'C2'),
+         ('quarterLength', 76.0),
+         ('sourcePath', 'corelli/opus3no1/1grave.xml'),
+         ('tempoFirst', None),
+         ('tempos', []),
+         ('timeSignatureFirst', '4/4'),
+         ('timeSignatures', ['4/4']))
+
+        >>> allNonContributors = rmd.getAllNamedValues(skipContributors=True)
+        >>> allNonContributors
+        (('musicxml:software', <music21.metadata.primitives.Text music21 v.8...>),
+         ('musicxml:software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
+         ('musicxml:software', <...Text Dolet Light for Finale 2014>),
+         ('humdrum:OMD', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
+         ('dcterms:rights', <...Copyright © 2014, Creative Commons License (CC-BY)>),
+         ('m21FileInfo:filePath', <...Text ...corpus/corelli/opus3no1/1grave.xml>),
+         ('m21FileInfo:fileFormat', <music21.metadata.primitives.Text musicxml>),
+         ('ambitus',
+            AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
+         ('keySignatureFirst', -1),
+         ('keySignatures', [-1]),
+         ('noteCount', 259),
+         ('numberOfParts', 3),
+         ('pitchHighest', 'C6'),
+         ('pitchLowest', 'C2'),
+         ('quarterLength', 76.0),
+         ('sourcePath', 'corelli/opus3no1/1grave.xml'),
+         ('tempoFirst', None),
+         ('tempos', []),
+         ('timeSignatureFirst', '4/4'),
+         ('timeSignatures', ['4/4']))
+        '''
+        allOut: t.List[t.Tuple[str, ValueType]] = list(
+            super().getAllNamedValues(skipContributors)
+        )
+
+        for name in self.additionalRichMetadataAttributes:
+            value: ValueType = getattr(self, name)
+            allOut.append((name, value))
+
+        return tuple(allOut)
+
+    def _isStandardUniqueName(self, uniqueName: str) -> bool:
+        '''
+        Determines if a unique name is associated with a standard property.
+        Returns False if no such associated standard property can be found.
+
+        Example: a RichMetadata additional attribute name returns True
+
+        >>> rmd = metadata.RichMetadata()
+        >>> rmd._isStandardUniqueName('ambitus')
+        True
+
+        Example: a standard contributor uniqueName returns True
+
+        >>> rmd._isStandardUniqueName('librettist')
+        True
+
+        Example: a standard 'namespace:name' returns False (it is a standard
+        namespaceName, but not a standard uniqueName)
+
+        >>> rmd._isStandardUniqueName('marcrel:LBT')
+        False
+
+        Example: a standard non-contributor uniqueName returns True
+
+        >>> rmd._isStandardUniqueName('alternativeTitle')
+        True
+
+        Example: a custom (non-standard) name returns False (it is not
+        a standard name of any sort)
+
+        >>> rmd._isStandardUniqueName('average duration')
+        False
+        '''
+        if super()._isStandardUniqueName(uniqueName):
+            return True
+        if uniqueName in self.additionalRichMetadataAttributes:
+            return True
+        return False
 
 # -----------------------------------------------------------------------------
 

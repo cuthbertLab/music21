@@ -416,6 +416,12 @@ class PartTranslator:
         elif lineToken.isMovement():
             md.add('movementNumber', lineToken.data)
 
+        elif lineToken.isAnalyst():
+            md.add('analyst', lineToken.data)
+
+        elif lineToken.isProofreader():
+            md.add('proofreader', lineToken.data)
+
         elif lineToken.isTimeSignature():
             try:
                 self.tsCurrent = meter.TimeSignature(lineToken.data)
