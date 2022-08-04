@@ -141,7 +141,7 @@ class StreamStatus(SlottedObjectMixin):
         '''
         If any GeneralNote in this Stream is a tuplet, then check to
         see if any of them have a first Tuplet with type besides None
-        return True. Otherwise return False if there is a tuplet. Return None if
+        return True. Otherwise, return False if there is a tuplet. Return None if
         no Tuplets.
 
         >>> s = stream.Stream()
