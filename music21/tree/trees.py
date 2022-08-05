@@ -509,15 +509,15 @@ class ElementTree(core.AVLTree):
         (SortTuple(atEnd=0, offset=0.0, priority=0, ...),
          <music21.key.Key of f# minor>)
 
-        >>> t = tree.trees.ElementTree()
-        >>> t.rootNode is None
+        >>> et = tree.trees.ElementTree()
+        >>> et.rootNode is None
         True
-        >>> t.populateFromSortedList(listOfTuples)
-        >>> t.rootNode
+        >>> et.populateFromSortedList(listOfTuples)
+        >>> et.rootNode
         <ElementNode: Start:15.0 <0.20...> Indices:(l:0 *97* r:195)
             Payload:<music21.note.Note D#>>
 
-        >>> n = t.rootNode
+        >>> n = et.rootNode
         >>> while n is not None:
         ...    print(n)
         ...    n = n.leftChild
@@ -534,7 +534,7 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:0.0 <0.-30...> Indices:(l:0 *0* r:1)
             Payload:<music21.metadata.Metadata object at 0x104adbdd8>>
 
-        >>> n = t.rootNode
+        >>> n = et.rootNode
         >>> while n is not None:
         ...    print(n)
         ...    n = n.rightChild

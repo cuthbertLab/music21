@@ -102,7 +102,7 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
     '''
     A Beam is an object representation of one single beam, that is, one
     horizontal line connecting two notes together (or less commonly a note to a
-    rest).  Thus it takes two separate Beam objects to represent the beaming of
+    rest).  Thus, it takes two separate Beam objects to represent the beaming of
     a 16th note.
 
     The Beams object (note the plural) is the object that handles groups of
@@ -175,7 +175,7 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
 class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     '''
     The Beams object stores in it attribute beamsList (a list) all the Beam
-    objects defined above.  Thus len(beam.Beams) tells you how many beams the
+    objects defined above.  Thus, len(beam.Beams) tells you how many beams the
     note currently has on it, and iterating over a Beams object gives you each
     Beam.
 

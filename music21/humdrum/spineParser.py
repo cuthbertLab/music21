@@ -185,7 +185,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         self.parsePositionInStream = 0
         self.parseEventListFromDataStream(dataStream)  # sets self.eventList and fileLength
         try:
-            assert(self.parsePositionInStream == self.fileLength)
+            assert self.parsePositionInStream == self.fileLength
         except AssertionError:  # pragma: no cover
             raise HumdrumException('getEventListFromDataStream failed: did not parse entire file')
         self.parseProtoSpinesAndEventCollections()
@@ -2356,7 +2356,7 @@ def hdStringToNote(contents):
             newTup.durationActual = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
             newTup.durationNormal = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
 
-            gcd = common.euclidGCD(int(dT), int(baseValue))
+            gcd = math.gcd(int(dT), int(baseValue))
             newTup.numberNotesActual = int(dT / gcd)
             newTup.numberNotesNormal = int(float(baseValue) / gcd)
 

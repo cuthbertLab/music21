@@ -550,14 +550,14 @@ class AVLTree(prebase.ProtoM21Object):
         >>> listOfTuples = [(i, str(i)) for i in range(1000)]
         >>> listOfTuples[10]
         (10, '10')
-        >>> t = tree.core.AVLTree()
-        >>> t.rootNode is None
+        >>> avlTree = tree.core.AVLTree()
+        >>> avlTree.rootNode is None
         True
-        >>> t.populateFromSortedList(listOfTuples)
-        >>> t.rootNode
+        >>> avlTree.populateFromSortedList(listOfTuples)
+        >>> avlTree.rootNode
         <AVLNode: Start:500 Height:9 L:8 R:8>
 
-        >>> n = t.rootNode
+        >>> n = avlTree.rootNode
         >>> while n is not None:
         ...    print(n, repr(n.payload))
         ...    n = n.leftChild

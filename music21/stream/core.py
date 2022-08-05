@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -16,8 +16,8 @@ by advanced programmers who need the highest speed in programming.
 
 Nothing here promises to be stable.  The music21 team can make
 any changes here for efficiency reasons while being considered
-backwards compatible so long as the public methods that call this
-remain stable.
+backwards compatible so long as the public methods that call these
+methods remain stable.
 
 All functions here will eventually begin with `.core`.
 '''

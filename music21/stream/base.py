@@ -8,7 +8,7 @@
 #               Josiah Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2021 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -413,7 +413,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         Generally you don't need this, just iterate over a stream, but it is necessary
         to add custom filters to an iterative search before iterating.
         '''
-        return iter(self)
+        # Pycharm wasn't inferring typing correctly with `return iter(self)`.
+        return self.__iter__()  # pylint: disable=unnecessary-dunder-call
 
     @overload
     def __getitem__(self, k: str) -> iterator.RecursiveIterator[M21ObjType]:
@@ -2515,7 +2516,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> s.elementOffset(b, returnSpecial=True)
         <OffsetSpecial.AT_END>
 
-        Only elements of zero duration can be stored.  Otherwise a
+        Only elements of zero duration can be stored.  Otherwise, a
         `StreamException` is raised.
         '''
         if isinstance(itemOrList, list):
@@ -2896,7 +2897,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         target.sites.remove(self)
         target.activeSite = None
         if id(target) in self._offsetDict:
-            del(self._offsetDict[id(target)])
+            del self._offsetDict[id(target)]
 
         updateIsFlat = False
         if replacement.isStream:
@@ -3410,12 +3411,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def getElementsByClass(self,
                            classFilterList: t.Union[
                                str,
-                               t.Type[ChangedM21ObjType],
                                t.Iterable[str],
+                               t.Type[ChangedM21ObjType],
                                t.Iterable[t.Type[ChangedM21ObjType]],
                            ],
                            ) -> t.Union[iterator.StreamIterator[M21ObjType],
-                                      iterator.StreamIterator[ChangedM21ObjType]]:
+                                        iterator.StreamIterator[ChangedM21ObjType]]:
         '''
         Return a StreamIterator that will iterate over Elements that match one
         or more classes in the `classFilterList`. A single class
@@ -5258,43 +5259,129 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def getTimeSignatures(self, *,
                           searchContext=True,
                           returnDefault=True,
+                          recurse=True,
                           sortByCreationTime=True):
         '''
         Collect all :class:`~music21.meter.TimeSignature` objects in this stream.
         If no TimeSignature objects are defined, get a default (4/4 or whatever
         is defined in the defaults.py file).
 
-        >>> a = stream.Stream()
-        >>> b = meter.TimeSignature('3/4')
-        >>> a.insert(b)
-        >>> a.repeatInsert(note.Note('C#'), list(range(10)))
-        >>> c = a.getTimeSignatures()
-        >>> len(c) == 1
+        >>> s = stream.Part(id='changingMeter')
+        >>> s.repeatInsert(note.Note('C#'), list(range(11)))
+
+        >>> threeFour = meter.TimeSignature('3/4')
+        >>> s.insert(0.0, threeFour)
+        >>> twoTwo = meter.TimeSignature('2/2')
+        >>> s.insert(3.0, twoTwo)
+        >>> tsStream = s.getTimeSignatures()
+        >>> tsStream.derivation.method
+        'getTimeSignatures'
+
+        >>> tsStream
+        <music21.stream.Part changingMeter>
+        >>> tsStream.show('text')
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {3.0} <music21.meter.TimeSignature 2/2>
+
+        The contents of the time signature stream are the original, not copies
+        of the original:
+
+        >>> tsStream[0] is threeFour
         True
+
+        Many time signatures are found within measures, so this method will find
+        them also and place them at the appropriate point within the overall Stream.
+
+        N.B. if there are different time signatures for different parts, this method
+        will not distinguish which parts use which time signatures.
+
+        >>> sm = s.makeMeasures()
+        >>> sm.show('text')
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.note.Note C#>
+            {1.0} <music21.note.Note C#>
+            {2.0} <music21.note.Note C#>
+        {3.0} <music21.stream.Measure 2 offset=3.0>
+            {0.0} <music21.meter.TimeSignature 2/2>
+            {0.0} <music21.note.Note C#>
+            {1.0} <music21.note.Note C#>
+            {2.0} <music21.note.Note C#>
+            {3.0} <music21.note.Note C#>
+        {7.0} <music21.stream.Measure 3 offset=7.0>
+            {0.0} <music21.note.Note C#>
+            {1.0} <music21.note.Note C#>
+            {2.0} <music21.note.Note C#>
+            {3.0} <music21.note.Note C#>
+            {4.0} <music21.bar.Barline type=final>
+
+        >>> tsStream2 = sm.getTimeSignatures()
+        >>> tsStream2.show('text')
+        {0.0} <music21.meter.TimeSignature 3/4>
+        {3.0} <music21.meter.TimeSignature 2/2>
+
+        If you do not want this recursion, set recurse=False
+
+        >>> len(sm.getTimeSignatures(recurse=False, returnDefault=False))
+        0
+
+        We set returnDefault=False here, because otherwise a default time signature
+        of 4/4 is returned:
+
+        >>> sm.getTimeSignatures(recurse=False)[0]
+        <music21.meter.TimeSignature 4/4>
+
+        Note that a measure without any time signature can still find a context TimeSignature
+        with this method so long as searchContext is True (as by default):
+
+        >>> m3 = sm.measure(3)
+        >>> m3.show('text')
+        {0.0} <music21.note.Note C#>
+        {1.0} <music21.note.Note C#>
+        {2.0} <music21.note.Note C#>
+        {3.0} <music21.note.Note C#>
+        {4.0} <music21.bar.Barline type=final>
+
+        >>> m3.getTimeSignatures()[0]
+        <music21.meter.TimeSignature 2/2>
+
+        The oldest context for the measure will be used unless sortByCreationTime is False, in which
+        case the typical order of context searching will be used.
+
+        >>> p2 = stream.Part()
+        >>> p2.insert(0, meter.TimeSignature('1/1'))
+        >>> p2.append(m3)
+        >>> m3.getTimeSignatures()[0]
+        <music21.meter.TimeSignature 2/2>
+
+        If searchContext is False then the default will be returned (which is somewhat
+        acceptable here, since there are 4 quarter notes in the measure) but not generally correct:
+
+        >>> m3.getTimeSignatures(searchContext=False)[0]
+        <music21.meter.TimeSignature 4/4>
+
+
+        Changed in v.8: time signatures within recursed streams are found by default.
+            Added recurse. Removed option for recurse=False and still getting the
+            first time signature in the first measure.  This was wholly inconsistent.
         '''
         # even if this is a Measure, the TimeSignature in the Stream will be
         # found
-        post = self.getElementsByClass(meter.TimeSignature).stream()
+        if recurse:
+            post = self[meter.TimeSignature].stream()
+        else:
+            post = self.getElementsByClass(meter.TimeSignature).stream()
+        post.derivation.method = 'getTimeSignatures'
 
         # search activeSite Streams through contexts
         if not post and searchContext:
-            # returns a single value
-            post = self.cloneEmpty(derivationMethod='getTimeSignatures')
-
             # sort by time to search the most recent objects
             obj = self.getContextByClass('TimeSignature', sortByCreationTime=sortByCreationTime)
             # obj = self.previous(meter.TimeSignature)
             # environLocal.printDebug(['getTimeSignatures(): searching contexts: results', obj])
             if obj is not None:
                 post.append(obj)
-
-        # if there is no timeSignature, we will look at any stream at offset 0:
-        if not post:
-            streamsAtStart = self.getElementsByOffset(0.0).getElementsByClass('Stream')
-            for s in streamsAtStart:
-                tss = s.getElementsByOffset(0.0).getElementsByClass(meter.TimeSignature)
-                for ts in tss:
-                    post.append(ts)
 
         # get a default and/or place default at zero if nothing at zero
         if returnDefault:
@@ -5309,11 +5396,28 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                        *,
                        searchActiveSite=True,
                        returnDefault=True,
-                       recurse=False) -> Stream[instrument.Instrument]:
+                       recurse=True) -> Stream[instrument.Instrument]:
         '''
-        Search this stream or activeSite streams for
+        Search this stream (and, by default, its subStreams) or activeSite streams for
         :class:`~music21.instrument.Instrument` objects, and return a new stream
-        containing them. Otherwise, return a Stream containing a single default `Instrument`.
+        containing them.
+
+        >>> m1 = stream.Measure([meter.TimeSignature('4/4'),
+        ...                      instrument.Clarinet(),
+        ...                      note.Note('C5', type='whole')])
+        >>> m2 = stream.Measure([instrument.BassClarinet(),
+        ...                      note.Note('C3', type='whole')])
+        >>> p = stream.Part([m1, m2])
+        >>> instruments = p.getInstruments()
+        >>> instruments
+        <music21.stream.Part 0x112ac26e0>
+
+        >>> instruments.show('text')
+        {0.0} <music21.instrument.Clarinet 'Clarinet'>
+        {4.0} <music21.instrument.BassClarinet 'Bass clarinet'>
+
+        If there are no instruments, returns a Stream containing a single default `Instrument`,
+        unless returnDefault is False.
 
         >>> p = stream.Part()
         >>> m = stream.Measure([note.Note()])
@@ -5323,18 +5427,22 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> defaultInst
         <music21.instrument.Instrument ': '>
 
-        Insert the default instrument into the part:
+        Insert an instrument into the Part (not the Measure):
 
-        >>> p.insert(0, defaultInst)
+        >>> p.insert(0, instrument.Koto())
 
-        Searching the measure will find it only if the measure's active site is searched:
+        Searching the measure will find this instrument only if the measure's activeSite is
+        searched, as it is by default:
 
-        >>> search1 = p.measure(1).getInstruments(searchActiveSite=False, returnDefault=False)
-        >>> search1.first() is None
-        True
-        >>> search2 = p.measure(1).getInstruments(searchActiveSite=True, returnDefault=False)
-        >>> search2.first() is defaultInst
-        True
+        >>> searchedActiveSite = p.measure(1).getInstruments()
+        >>> searchedActiveSite.first()
+        <music21.instrument.Koto 'Koto'>
+
+        >>> searchedNaive = p.measure(1).getInstruments(searchActiveSite=False, returnDefault=False)
+        >>> len(searchedNaive)
+        0
+
+        Changed in v.8: recurse is True by default.
         '''
         instObj = None
 
@@ -5488,7 +5596,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             quickSearch = False
 
         inversionDNN = inversionNote.pitch.diatonicNoteNum
-        for n in returnStream.recurse().getElementsByClass(note.NotRest):
+        for n in returnStream[note.NotRest]:
             n.pitch.diatonicNoteNum = (2 * inversionDNN) - n.pitch.diatonicNoteNum
             if quickSearch:  # use previously found
                 n.pitch.accidental = ourKey.accidentalByStep(n.pitch.step)
@@ -5513,10 +5621,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         .storeAtEnd() (such as right barlines) are
         not affected.
 
-        If startOffset is given then all elements before
-        that offset will be shifted.  If endOffset is given
-        then all elements at or after this offset will be
-        shifted
+        If startOffset is given then elements before
+        that offset will not be shifted.  If endOffset is given
+        then all elements at or after this offset will be not be shifted.
 
         >>> a = stream.Stream()
         >>> a.repeatInsert(note.Note('C'), list(range(10)))
@@ -6581,7 +6688,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             # definitely do NOT put a constrainingSpannerBundle constraint
         )
         # only use inPlace arg on first usage
-        if not self.hasMeasures():
+        if not returnStream.hasMeasures():
             # only try to make voices if no Measures are defined
             returnStream.makeVoices(inPlace=True, fillGaps=True)
             # if this is not inPlace, it will return a newStream; if
@@ -6593,20 +6700,17 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 inPlace=True,
                 bestClef=bestClef)
 
-        measureStream: Stream[Measure] = returnStream.getElementsByClass(Measure).stream()
-        # environLocal.printDebug(['Stream.makeNotation(): post makeMeasures,
-        #   length', len(returnStream)])
-        if not measureStream:
-            raise StreamException(
-                f'no measures found in stream with {len(self)} elements')
+            if not returnStream.hasMeasures():
+                raise StreamException(
+                    f'no measures found in stream with {len(self)} elements')
 
         # for now, calling makeAccidentals once per measures
         # pitches from last measure are passed
         # this needs to be called before makeTies
         # note that this functionality is also placed in Part
-        if not measureStream.streamStatus.accidentals:
+        if not returnStream.streamStatus.accidentals:
             makeNotation.makeAccidentalsInMeasureStream(
-                measureStream,
+                returnStream,
                 pitchPast=pitchPast,
                 pitchPastMeasure=pitchPastMeasure,
                 useKeySignature=useKeySignature,
@@ -6617,12 +6721,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
                 tiePitchSet=tiePitchSet)
 
-        measureStream.makeTies(meterStream, inPlace=True)
+        makeNotation.makeTies(returnStream, meterStream=meterStream, inPlace=True)
 
         # measureStream.makeBeams(inPlace=True)
-        if not measureStream.streamStatus.beams:
+        if not returnStream.streamStatus.beams:
             try:
-                measureStream.makeBeams(inPlace=True)
+                makeNotation.makeBeams(returnStream, inPlace=True)
             except meter.MeterException as me:
                 environLocal.warn(['skipping makeBeams exception', me])
 
@@ -6630,7 +6734,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # makeBeams was causing the duration's tuplet to lose its type setting
         # check for tuplet brackets one measure at a time
         # this means that they will never extend beyond one measure
-        for m in measureStream:
+        for m in returnStream.getElementsByClass(Measure):
             if not m.streamStatus.tuplets:
                 makeNotation.makeTupletBrackets(m, inPlace=True)
 
@@ -7050,6 +7154,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 # change the duration of the first note to be self + sum
                 # of all others
                 qLen = notes_and_rests[posConnected[0]].quarterLength
+                if not notes_and_rests[posConnected[0]].duration.linked:
+                    # obscure bug found from some inexact musicxml files.
+                    notes_and_rests[posConnected[0]].duration.linked = True
                 notes_and_rests[posConnected[0]].quarterLength = qLen + durSum
 
                 # set tie to None on first note
@@ -7671,7 +7778,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> sRecurse
         <music21.stream.iterator.RecursiveIterator for Score:mainScore @:0>
 
-        So, that's not how we use `.recurse()`.  Instead use it in a `for` loop:
+        So, that's not how we use `.recurse()`.  Instead, use it in a `for` loop:
 
         >>> for el in s.recurse():
         ...     tup = (el, el.offset, el.activeSite)
@@ -8900,10 +9007,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> nShort = note.Note()
         >>> nShort.quarterLength = 0.26
         >>> s.repeatInsert(nShort, [1.49, 1.76])
-        >>> t = s.quantize(processOffsets=True, processDurations=True, inPlace=False)
-        >>> [e.offset for e in t]
+        >>> quantized = s.quantize(processOffsets=True, processDurations=True, inPlace=False)
+        >>> [e.offset for e in quantized]
         [0.0, 0.5, 1.0, 1.5, 1.75]
-        >>> [e.duration.quarterLength for e in t]
+        >>> [e.duration.quarterLength for e in quantized]
         [0.5, 0.5, 0.5, 0.25, 0.25]
 
         Set `recurse=True` to quantize elements in substreams such as parts, measures, voices:
@@ -9372,23 +9479,29 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         '''
         Return a boolean value showing if this Stream contains Measures.
 
-
-        >>> s = stream.Stream()
-        >>> s.repeatAppend(note.Note(), 8)
-        >>> s.hasMeasures()
+        >>> p = stream.Part()
+        >>> p.repeatAppend(note.Note(), 8)
+        >>> p.hasMeasures()
         False
-        >>> s.makeMeasures(inPlace=True)
-        >>> len(s.getElementsByClass(stream.Measure))
+        >>> p.makeMeasures(inPlace=True)
+        >>> len(p.getElementsByClass(stream.Measure))
         2
-        >>> s.hasMeasures()
+        >>> p.hasMeasures()
         True
+
+        Only returns True if the immediate Stream has measures, not if there are nested measures:
+
+        >>> sc = stream.Score()
+        >>> sc.append(p)
+        >>> sc.hasMeasures()
+        False
         '''
         if 'hasMeasures' not in self._cache or self._cache['hasMeasures'] is None:
             post = False
             # do not need to look in endElements
             for obj in self._elements:
                 # if obj is a Part, we have multi-parts
-                if getattr(obj, 'isMeasure', False):
+                if isinstance(obj, Measure):
                     post = True
                     break  # only need one
             self._cache['hasMeasures'] = post
@@ -9832,7 +9945,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                         returnList.append(None)
                         lastWasNone = True
                 if isinstance(e, note.Note):
-                    if not(skipUnisons is False
+                    if not (skipUnisons is False
                            or len(lastPitches) != 1
                            or e.pitch.pitchClass != lastPitches[0].pitchClass
                            or (skipOctaves is False
@@ -12326,7 +12439,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 eClasses = e.classes
                 if 'Variant' in eClasses:
                     elementGroups = e.groups
-                    if (not(variantGroup in elementGroups)
+                    if (not (variantGroup in elementGroups)
                             or e.lengthType in ['elongation', 'deletion']):
                         newPart.remove(e)
                     else:
@@ -12663,7 +12776,7 @@ class Measure(Stream):
 
         for illegalKey in ('meterStream', 'refStreamOrTimeRange', 'bestClef'):
             if illegalKey in srkCopy:
-                del(srkCopy[illegalKey])
+                del srkCopy[illegalKey]
 
         m.makeAccidentals(searchKeySignatureByContext=True, inPlace=True, **srkCopy)
         # makeTies is for cross-bar associations, and cannot be used
@@ -13068,7 +13181,7 @@ class Part(Stream):
     A Stream subclass for designating music that is considered a single part.
 
     When put into a Score object, Part objects are all collected in the `Score.parts`
-    call.  Otherwise they mostly work like generic Streams.
+    call.  Otherwise, they mostly work like generic Streams.
 
     Generally the hierarchy goes: Score > Part > Measure > Voice, but you are not
     required to stick to this.

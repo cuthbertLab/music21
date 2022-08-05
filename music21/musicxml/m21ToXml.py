@@ -746,7 +746,10 @@ class GeneralObjectExporter:
         if 0 < n.quarterLength <= 6.0:
             new_part.insert(0, meter.bestTimeSignature(new_part))
         stream.makeNotation.makeMeasures(
-            new_part, inPlace=True, refStreamOrTimeRange=[0, nCopy.quarterLength])
+            new_part,
+            inPlace=True,
+            refStreamOrTimeRange=[0, nCopy.quarterLength]
+        )
         stream.makeNotation.makeTupletBrackets(new_part, inPlace=True)
         return self.fromPart(new_part)
 
@@ -1624,18 +1627,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         <music21.meter.TimeSignature 4/4>
         '''
         s = self.stream
-        # search context probably should always be True here
-        # to search container first, we need a non-flat version
-        # searching a flattened version, we will get contained and non-container
-        # this meter  stream is passed to makeNotation()
         meterStream = s.getTimeSignatures(searchContext=False,
-                                          sortByCreationTime=False, returnDefault=False)
-        # environLocal.printDebug(['setMeterStream: post meterStream search',
-        #                meterStream, meterStream[0]])
-        if not meterStream:
-            # note: this will return a default if no meters are found
-            meterStream = s.flatten().getTimeSignatures(searchContext=False,
-                                                        sortByCreationTime=True, returnDefault=True)
+                                          sortByCreationTime=False,
+                                          returnDefault=True)
         self.meterStream = meterStream
 
     def setScoreLayouts(self):
@@ -4510,9 +4504,9 @@ class MeasureExporter(XMLExporterBase):
 
         A 'continue' tie requires two <tie> tags to represent.
 
-        >>> t = tie.Tie('continue')
+        >>> tieObj = tie.Tie('continue')
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> tieList = MEX.tieToXmlTie(t)
+        >>> tieList = MEX.tieToXmlTie(tieObj)
         >>> for mxT in tieList:
         ...     MEX.dump(mxT)
         <tie type="stop" />
@@ -4543,23 +4537,21 @@ class MeasureExporter(XMLExporterBase):
         the <tied> tag in notations.  This
         creates the <tied> tag.
 
-        Returns a list since a music21
-        "continue" tie type needs two tags
-        in musicxml.  List may be empty
-        if tie.style == "hidden"
+        Returns a list since a music21 "continue" tie type needs two tags
+        in musicxml.  List may be empty if tie.style == "hidden"
 
-        >>> t = tie.Tie('continue')
-        >>> t.id = 'tied1'
+        >>> tieObj = tie.Tie('continue')
+        >>> tieObj.id = 'tied1'
 
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> tiedList = MEX.tieToXmlTied(t)
+        >>> tiedList = MEX.tieToXmlTied(tieObj)
         >>> for mxT in tiedList:
         ...     MEX.dump(mxT)
         <tied id="tied1" type="stop" />
         <tied type="start" />
 
-        >>> t.style = 'hidden'
-        >>> tiedList = MEX.tieToXmlTied(t)
+        >>> tieObj.style = 'hidden'
+        >>> tiedList = MEX.tieToXmlTied(tieObj)
         >>> len(tiedList)
         0
         '''
