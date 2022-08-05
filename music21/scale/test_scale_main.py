@@ -302,16 +302,13 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction=Direction.DESCENDING)),
                          '[C3, B2, A2, G2, F2, E2, D2, C2, B1, A1, G1, F1, E1, D1, C1]')
 
-        # TODO: this shows a problem with a bidirectional scale: we are
-        # always starting at the tonic and moving up or down; so this is still
-        # giving a descended portion, even though an ascending portion was requested
         # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction=Direction.ASCENDING)),
                          '[C1, D1, E1, F#1, G#1, A1, B1, C2, D2, E2, F#2, G#2, A2, B2, C3]')
 
         # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction=Direction.DESCENDING)),
-                         '[C1, D1, E1, F1, G1, A1, B1, C2, D2, E2, F2, G2, A2, B2, C3]')
+                         '[C3, B2, A2, G2, F2, E2, D2, C2, B1, A1, G1, F1, E1, D1, C1]')
 
         # noinspection PyArgumentList
         self.assertEqual(self.pitchOut(mm.getPitches('a5', 'a6', direction=Direction.ASCENDING)),
@@ -902,6 +899,19 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         e = scale.ConcreteScale(pitches=['A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4'])
         with self.assertRaises(intervalNetwork.IntervalNetworkException):
             e.deriveRanked(['C4', 'E4', 'G4'], comparisonAttribute='name')
+
+    def test_getPitches_multiple_times(self):
+        """Worth testing because we found cached lists being mutated."""
+        c_maj = scale.MajorScale('C')
+
+        for i in range(3):  # catch both even and odd states
+            with self.subTest(iterations=i):
+                # due to a tight coupling of direction and reverse, this sets reverse=True
+                # when calling getRealization()
+                post = c_maj.getPitches(direction=Direction.DESCENDING)
+
+                self.assertEqual(post[0].nameWithOctave, 'C5')
+                self.assertEqual(post[-1].nameWithOctave, 'C4')
 
 
 # ------------------------------------------------------------------------------

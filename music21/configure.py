@@ -1030,14 +1030,14 @@ class SelectFromList(Dialog):
 
         >>> d = configure.SelectFromList()
         >>> d._rawQuery(['a', 'b', 'c'])
-        ['[1] a', '[2] b', '[3] c', ' ', 'Select a number from the preceding options: ']
+        ['[1] a', '[2] b', '[3] c', ' ', 'Choose a number from the preceding options: ']
 
         >>> d = configure.SelectFromList(default=1)
         >>> d._default
         1
         >>> d._rawQuery(['a', 'b', 'c'])
         ['[1] a', '[2] b', '[3] c', ' ',
-         'Select a number from the preceding options (default is 1): ']
+         'Choose a number from the preceding options (default is 1): ']
         '''
         head = []
         i = 1
@@ -1051,7 +1051,7 @@ class SelectFromList(Dialog):
             head.append(f'[{i}] {sub}')
             i += 1
 
-        tail = 'Select a number from the preceding options: '
+        tail = 'Choose a number from the preceding options: '
         tail = self._rawQueryPrepareHeader(tail)
         tail = self._rawQueryPrepareFooter(tail)
         return head + [' ', tail]
@@ -1769,7 +1769,7 @@ if __name__ == '__main__':
             import music21
             music21.mainTest(Test)
 
-        # arg[1] is test to launch
+        # arg[1] is the test to launch
         elif sys.argv[1] == 'te':
             # run test user input
             getattr(te, sys.argv[2])()

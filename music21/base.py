@@ -1639,7 +1639,7 @@ class Music21Object(prebase.ProtoM21Object):
                 # might be raised by selfSortTuple; should not be by contextSortTuple.
                 # It just means that selfSortTuple isn't in the same stream
                 # as contextSortTuple, such as
-                # when crossing measure borders.  Thus it's well-formed.
+                # when crossing measure borders.  Thus, it's well-formed.
                 return True
 
             if getElementMethod in BEFORE_METHODS and selfSortTuple < contextSortTuple:
@@ -3348,7 +3348,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         '''
         atm = self.duration.aggregateTupletMultiplier()
-        quarterLengthList = [c.quarterLength * atm for c in self.duration.components]
+        quarterLengthList = [opFrac(c.quarterLength * atm) for c in self.duration.components]
         splitList = self.splitByQuarterLengths(quarterLengthList)
         return splitList
     # -------------------------------------------------------------------------
@@ -3368,7 +3368,7 @@ class Music21Object(prebase.ProtoM21Object):
         If an object belongs to multiple measures (not in the same hierarchy...)
         then it returns the
         measure number of the :meth:`~music21.base.Music21Object.activeSite` if that is a
-        :class:`~music21.stream.Measure` object.  Otherwise it will use
+        :class:`~music21.stream.Measure` object.  Otherwise, it will use
         :meth:`~music21.base.Music21Object.getContextByClass`
         to find the number of the measure it was most recently added to.
 
@@ -3569,7 +3569,7 @@ class Music21Object(prebase.ProtoM21Object):
         7/3
 
         If there is no TimeSignature object in sites then returns the special float
-        'nan' meaning "Not a Number":
+        `nan` meaning "Not a Number":
 
         >>> isolatedNote = note.Note('E4')
         >>> isolatedNote.beat
@@ -3580,7 +3580,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> isolatedNote.beat == isolatedNote.beat
         False
 
-        Instead to test for nan, import the math module and use `isnan()`:
+        Instead, to test for `nan`, import the math module and use `isnan()`:
 
         >>> import math
         >>> math.isnan(isolatedNote.beat)

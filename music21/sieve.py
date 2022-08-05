@@ -57,6 +57,7 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of
 '''
 from ast import literal_eval
 import copy
+from math import gcd
 import random
 import string
 import unittest
@@ -66,6 +67,7 @@ from music21 import exceptions21
 from music21 import pitch
 from music21 import common
 from music21 import interval
+from music21.common.numberTools import lcm
 
 from music21 import environment
 environLocal = environment.Environment('sieve')
@@ -409,47 +411,6 @@ def unitNormStep(step, a=0, b=1, normalized=True):
 # note: some of these methods are in common, though they are slightly different algorithms;
 # need to test for compatibility
 
-def _gcd(a, b):
-    '''
-    find the greatest common divisor of a and b
-    i.e., the greatest number that is a factor of both numbers using
-    Euclid's algorithm
-
-
-    >>> sieve._gcd(20, 30)
-    10
-    '''
-    # alt implementation
-
-    # while b != 0:
-    #    a, b = b, a % b
-    # return abs(a)
-
-    # if a == 0 and b == 0:
-    #    return 1
-    # if b == 0:
-    #    return a
-    # if a == 0:
-    #    return b
-    # else:
-    #    return _gcd(b, a % b)
-
-    while b != 0:
-        a, b = b, a % b
-    return abs(a)
-
-
-def _lcm(a, b):
-    '''
-    find the lowest common multiple of a and b
-
-    >>> sieve._lcm(30, 20)
-    60
-    '''
-    # // forces integer style division (no remainder)
-    return abs(a * b) // _gcd(a, b)
-
-
 def _lcmRecurse(filterList):
     '''
     Given a list of values, find the LCM of all the values by iteratively
@@ -474,7 +435,7 @@ def _lcmRecurse(filterList):
             environLocal.printDebug(['lcm timed out'])
             lcmVal = None
             break
-        lcmVal = _lcm(lcmVal, filterList[i])
+        lcmVal = lcm([lcmVal, filterList[i]])
     return lcmVal
 
 
@@ -852,7 +813,7 @@ class Residual:
         find m,n such that the intersection of two Residuals can
         be reduced to one Residual. Xenakis p 273.
         '''
-        d = _gcd(m1, m2)
+        d = gcd(m1, m2)
         c1 = m1 // d  # not sure if we need floats here
         c2 = m2 // d
         n3 = 0
@@ -1029,7 +990,7 @@ class CompressionSegment:
 # ------------------------------------------------------------------------------
 
 # http://docs.python.org/lib/set-objects.html
-# set object precedence is places & before |
+# set object precedence: & before |
 
 # >>> a = set([3, 4])
 # >>> b = set([4, 5])
