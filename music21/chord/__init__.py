@@ -259,11 +259,11 @@ class ChordBase(note.NotRest):
         notes,
     ) -> None:
         '''
-        Add a note, pitch, the notes of another chord, or string representing a pitch,
+        Add a Note, Pitch, the `.notes` of another chord,
+        or string representing a Pitch,
         or a list of any-of-the-above types to a Chord or PercussionChord.
 
-        If runSort is True (default=True) then after appending, the
-        chord will be sorted.
+        Does no sorting.  That is on the Chord object.
 
         >>> c = chord.Chord('C4 E4 G4')
         >>> c.add('B3')
@@ -299,6 +299,7 @@ class ChordBase(note.NotRest):
         if not common.isIterable(notes):
             notes = [notes]
         self._add_core_or_init(notes, useDuration=False)
+        self.clearCache()
 
     def remove(self, removeItem):
         '''
@@ -1051,7 +1052,8 @@ class Chord(ChordBase):
         runSort=True
     ) -> None:
         '''
-        Add a note, pitch, the notes of another chord, or string representing a pitch,
+        Add a Note, Pitch, the `.notes` of another chord,
+        or string representing a pitch,
         or a list of any-of-the-above types to a Chord.
 
         If `runSort` is True (default=True) then after appending, the
@@ -4531,11 +4533,15 @@ class Chord(ChordBase):
         Changed in v.6 -- if inPlace is True do not return anything.
         '''
         if inPlace:
+            if self._cache.get('isSortedAscendingDiatonic', False):
+                return None
             returnObj = self
             self.clearCache()
         else:
+            # cache is not copied ever.
             returnObj = copy.deepcopy(self)
         returnObj._notes.sort(key=lambda x: (x.pitch.diatonicNoteNum, x.pitch.ps))
+        returnObj._cache['isSortedAscendingDiatonic'] = True
 
         if not inPlace:
             return returnObj
@@ -6763,6 +6769,13 @@ class Test(unittest.TestCase):
             # noinspection PyTypeChecker
             Chord([note.Unpitched()])  # type: ignore
 
+    def testCacheClearedOnAdd(self):
+        ch = Chord('C4 E4 G4')
+        self.assertTrue(ch.isConsonant())
+        # value is now cached.
+        ch.add('C#5', runSort=False)
+        # value should no longer be cached.
+        self.assertFalse(ch.isConsonant())
 
 # ------------------------------------------------------------------------------
 
