@@ -3378,7 +3378,12 @@ class MeasureExporter(XMLExporterBase):
 
         return arpeggioNumber
 
-    def objectAttachedSpannersToNotations(self, obj, noteIndexInChord=0, objectSpannerBundle=None):
+    def objectAttachedSpannersToNotations(
+        self,
+        obj: base.Music21Object,
+        noteIndexInChord: int = 0,
+        objectSpannerBundle: t.Optional[spanner.SpannerBundle] = None
+    ) -> t.List[Element]:
         '''
         return a list of <notations> from spanners related to the object that should appear
         in the notations tag (slurs, slides, etc.)
@@ -3404,8 +3409,6 @@ class MeasureExporter(XMLExporterBase):
         <ornaments>
           <tremolo type="stop">3</tremolo>
         </ornaments>
-
-
         '''
         notations = []
         if objectSpannerBundle is not None:
@@ -3424,25 +3427,28 @@ class MeasureExporter(XMLExporterBase):
             arpeggioNumber: int = self.getArpeggioNumber(su)
             if not su.hasSpannedElement(obj):
                 continue
+
+            mxArpeggio: t.Optional[Element] = None
             if su.type == 'non-arpeggio':
                 # <non-arpeggiate> goes only on top and bottom note in chord
                 if noteIndexInChord == 0:
                     mxArpeggio = Element('non-arpeggiate')
                     mxArpeggio.set('type', 'bottom')
-                elif noteIndexInChord == len(obj.notes):
+                elif noteIndexInChord == len(obj.notes) - 1:
                     mxArpeggio = Element('non-arpeggiate')
                     mxArpeggio.set('type', 'top')
             else:
                 mxArpeggio = Element('arpeggiate')
                 if su.type != 'normal':
                     mxArpeggio.set('direction', su.type)
-            if len(su) > 1:
+            if len(su) > 1 and mxArpeggio is not None:
                 # There is more than one GeneralNote in the arpeggio, so we must
                 # add a number attribute that will be the same for all GeneralNotes
                 # in this spanner.  In MusicXML this number must be between
                 # 1 and 16.  We just cycle through that range.
                 mxArpeggio.set('number', str(arpeggioNumber))
-            notations.append(mxArpeggio)
+            if mxArpeggio is not None:
+                notations.append(mxArpeggio)
 
         # Everything below this point is only for single note or first note in chord
         if not isSingleNoteOrFirstInChord:
@@ -4828,9 +4834,9 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxExpression)
         <arpeggiate direction="down" />
 
-        >>> nonarp = expressions.ArpeggioMark('non-arpeggio')
+        >>> nonArp = expressions.ArpeggioMark('non-arpeggio')
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-        >>> mxExpression = MEX.expressionToXml(nonarp)
+        >>> mxExpression = MEX.expressionToXml(nonArp)
         >>> MEX.dump(mxExpression)
         <non-arpeggiate />
         '''

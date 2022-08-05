@@ -3614,7 +3614,6 @@ class MeasureParser(XMLParserBase):
         # tuplet is handled with time-modification.
 
         # TODO: dynamics
-        # TODO: musicxml 4: arpeggiate 'unbroken' attribute
         # TODO: accidental-mark
         # TODO: other-notation
 
@@ -3649,6 +3648,7 @@ class MeasureParser(XMLParserBase):
 
         # get any arpeggios, store in expressions.
         for tagSearch in ('arpeggiate', 'non-arpeggiate'):
+            # TODO: musicxml 4: arpeggiate 'unbroken' attribute
             for mxObj in mxNotations.findall(tagSearch):
                 arpeggioType: str = ''
                 if tagSearch == 'non-arpeggiate':
