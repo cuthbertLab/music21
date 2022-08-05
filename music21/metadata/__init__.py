@@ -4,9 +4,9 @@
 # Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -41,11 +41,12 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
     :width: 600
 '''
 from collections import OrderedDict, namedtuple
+from dataclasses import dataclass
 import os
 import pathlib
 import re
 import unittest
-from typing import Optional, List
+import typing as t
 
 from music21 import base
 from music21 import common
@@ -71,7 +72,14 @@ __all__ = [
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
 
-AmbitusShort = namedtuple('AmbitusShort', 'semitones diatonic pitchLowest pitchHighest')
+AmbitusShort = namedtuple('AmbitusShort',
+                          ['semitones', 'diatonic', 'pitchLowest', 'pitchHighest'])
+
+@dataclass
+class FileInfo:
+    path: t.Optional[Text] = None
+    number: t.Optional[int] = None
+    format: t.Optional[Text] = None
 
 # -----------------------------------------------------------------------------
 
@@ -117,12 +125,12 @@ class Metadata(base.Music21Object):
     >>> md.searchAttributes
     ('actNumber', 'alternativeTitle', 'associatedWork', 'collectionDesignation',
      'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication',
+     'fileFormat', 'fileNumber', 'filePath',
      'groupTitle', 'localeOfComposition', 'movementName', 'movementNumber', 'number',
      'opusNumber', 'parentTitle', 'popularTitle', 'sceneNumber', 'textLanguage',
      'textOriginalLanguage', 'title', 'volume')
 
     Plus anything that is in contributors...
-
 
     All contributors are stored in a .contributors list:
 
@@ -183,6 +191,9 @@ class Metadata(base.Music21Object):
         'composer',
         'copyright',
         'date',
+        'fileFormat',
+        'fileNumber',
+        'filePath',
     ] + list(workIdAbbreviationDict.values())))
 
     workIdLookupDict = {}
@@ -213,6 +224,9 @@ class Metadata(base.Music21Object):
         #     (but need to regenerate CoreCorpus() after doing so.)
         self.copyright = None
 
+        # TODO: check pickling, etc.
+        self.fileInfo = FileInfo()
+
         # a dictionary of Text elements, where keys are work id strings
         # all are loaded with None by default
         self._workIds = OrderedDict()
@@ -234,7 +248,7 @@ class Metadata(base.Music21Object):
 
     # SPECIAL METHODS #
     def all(self, skipContributors=False):
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection, PyShadowingNames
         '''
         Returns all values (as strings) stored in this metadata as a sorted list of tuples.
 
@@ -243,6 +257,8 @@ class Metadata(base.Music21Object):
         [('arranger', 'Michael Scott Cuthbert'),
          ('composer', 'Arcangelo Corelli'),
          ('copyright', '© 2014, Creative Commons License (CC-BY)'),
+         ('fileFormat', 'musicxml'),
+         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
 
         Skip contributors is there to help with musicxml parsing -- there's no reason for it
@@ -253,6 +269,8 @@ class Metadata(base.Music21Object):
         >>> c.metadata.all(skipContributors=True)
         [('copyright', '© 2014, Creative Commons License (CC-BY)'),
          ('date', '1689/--/-- or earlier'),
+         ('fileFormat', 'musicxml'),
+         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
          ('localeOfComposition', 'Rome'),
          ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)')]
         '''
@@ -286,7 +304,7 @@ class Metadata(base.Music21Object):
 
         if 'title' in allOut and 'movementName' in allOut:
             if allOut['movementName'] == allOut['title']:
-                del(allOut['title'])
+                del allOut['title']
 
         return list(sorted(allOut.items()))
 
@@ -331,6 +349,7 @@ class Metadata(base.Music21Object):
         return Metadata.workIdAbbreviationDict[abbreviation]
 
     def addContributor(self, c):
+        # noinspection PyShadowingNames
         r'''
         Assign a :class:`~music21.metadata.Contributor` object to this
         Metadata.
@@ -375,6 +394,7 @@ class Metadata(base.Music21Object):
         self.contributors.append(c)
 
     def getContributorsByRole(self, value):
+        # noinspection PyShadowingNames
         r'''
         Return a :class:`~music21.metadata.Contributor` if defined for a
         provided role.
@@ -391,7 +411,6 @@ class Metadata(base.Music21Object):
 
         >>> cList[0].name
         'Price, Florence'
-
 
         Some musicxml files have contributors with no role defined.  To get
         these contributors, search for getContributorsByRole(None).  N.B. upon
@@ -480,7 +499,6 @@ class Metadata(base.Music21Object):
 
         >>> md.search(composer='Joplin')
         (True, 'composer')
-
         '''
         # TODO: Change to a namedtuple and add as a third element
         #    during a successful search, the full value of the retrieved
@@ -540,7 +558,7 @@ class Metadata(base.Music21Object):
 
         if useRegex:
             for value, innerField in valueFieldPairs:
-                # re.I makes case insensitive
+                # "re.I" makes case-insensitive search
                 if isinstance(value, str):
                     match = reQuery.search(value)
                     if match is not None:
@@ -567,11 +585,11 @@ class Metadata(base.Music21Object):
     def setWorkId(self, idStr, value):
         r'''
         Directly set a work id, given either as a full string name or as a
-        three character abbreviation. The following work id abbreviations and
+        three-character abbreviation. The following work id abbreviations and
         their full id string are given as follows. In many cases the Metadata
         object support properties for convenient access to these work ids.
 
-        Id abbreviations and strings::
+        Abbreviations and strings::
             * otl / title
             * otp / popularTitle
             * ota / alternativeTitle
@@ -606,7 +624,6 @@ class Metadata(base.Music21Object):
         'Latvia'
         >>> md.countryOfComposition
         'Latvia'
-
 
         >>> md.setWorkId('sdf', None)
         Traceback (most recent call last):
@@ -674,7 +691,7 @@ class Metadata(base.Music21Object):
     def alternativeTitle(self, value):
         self._workIds['alternativeTitle'] = Text(value)
 
-    def _contributor_role_getter(self, role: str) -> Optional[str]:
+    def _contributor_role_getter(self, role: str) -> t.Optional[str]:
         '''
         get the name of the first contributor with this role, or None
 
@@ -705,7 +722,7 @@ class Metadata(base.Music21Object):
 
         c.name = name
 
-    def _contributor_multiple_role_getter(self, role: str) -> List[str]:
+    def _contributor_multiple_role_getter(self, role: str) -> t.List[str]:
         '''
         get a list of the names of contributors with a certain role.
 
@@ -718,7 +735,7 @@ class Metadata(base.Music21Object):
         else:
             return []
 
-    def _contributor_multiple_role_setter(self, role: str, value: List[str]) -> None:
+    def _contributor_multiple_role_setter(self, role: str, value: t.List[str]) -> None:
         '''
         set multiple names for a particular role, replacing the people
         already in those roles.
@@ -763,7 +780,7 @@ class Metadata(base.Music21Object):
         self._contributor_role_setter('composer', value)
 
     @property
-    def composers(self) -> List[str]:
+    def composers(self) -> t.List[str]:
         r'''
         Get or set a list of strings of all composer roles.
 
@@ -793,7 +810,7 @@ class Metadata(base.Music21Object):
         return self._contributor_multiple_role_getter('composer')
 
     @composers.setter
-    def composers(self, value: List[str]) -> None:
+    def composers(self, value: t.List[str]) -> None:
         self._contributor_multiple_role_setter('composer', value)
 
 
@@ -834,6 +851,42 @@ class Metadata(base.Music21Object):
             self._date = ds
 
     @property
+    def fileFormat(self) -> t.Optional[str]:
+        '''
+        Get or set the file format that was parsed.
+        '''
+        if self.fileInfo.format:
+            return str(self.fileInfo.format)
+
+    @fileFormat.setter
+    def fileFormat(self, value: t.Union[str, Text]) -> None:
+        self.fileInfo.format = Text(value)
+
+    @property
+    def filePath(self) -> t.Optional[str]:
+        '''
+        Get or set the file path that was parsed.
+        '''
+        if self.fileInfo.path:
+            return str(self.fileInfo.path)
+
+    @filePath.setter
+    def filePath(self, value: t.Union[str, Text]) -> None:
+        self.fileInfo.path = Text(value)
+
+    @property
+    def fileNumber(self) -> t.Optional[int]:
+        '''
+        Get or set the file path that was parsed.
+        '''
+        if self.fileInfo.number:
+            return self.fileInfo.number
+
+    @fileNumber.setter
+    def fileNumber(self, value: t.Union[int, None]) -> None:
+        self.fileInfo.number = value
+
+    @property
     def localeOfComposition(self):
         r'''
         Get or set the locale of composition, or origin, of the work.
@@ -868,7 +921,7 @@ class Metadata(base.Music21Object):
         self._contributor_role_setter('librettist', value)
 
     @property
-    def librettists(self) -> List[str]:
+    def librettists(self) -> t.List[str]:
         r'''
         Gets or sets a list of librettists for this work:
 
@@ -882,7 +935,7 @@ class Metadata(base.Music21Object):
         return self._contributor_multiple_role_getter('librettist')
 
     @librettists.setter
-    def librettists(self, value: List[str]) -> None:
+    def librettists(self, value: t.List[str]) -> None:
         self._contributor_multiple_role_setter('librettist', value)
 
 
@@ -909,7 +962,7 @@ class Metadata(base.Music21Object):
         self._contributor_role_setter('lyricist', value)
 
     @property
-    def lyricists(self) -> List[str]:
+    def lyricists(self) -> t.List[str]:
         r'''
         Gets or sets a list of lyricists for this work:
 
@@ -923,7 +976,7 @@ class Metadata(base.Music21Object):
         return self._contributor_multiple_role_getter('lyricist')
 
     @lyricists.setter
-    def lyricists(self, value: List[str]) -> None:
+    def lyricists(self, value: t.List[str]) -> None:
         self._contributor_multiple_role_setter('lyricist', value)
 
 
@@ -945,7 +998,7 @@ class Metadata(base.Music21Object):
         self._workIds['movementName'] = Text(value)
 
     @property
-    def movementNumber(self) -> Optional[str]:
+    def movementNumber(self) -> t.Optional[str]:
         r'''
         Get or set the movement number.
 
@@ -1066,6 +1119,7 @@ class RichMetadata(Metadata):
     >>> richMetadata.searchAttributes
     ('actNumber', 'alternativeTitle', 'ambitus', 'associatedWork', 'collectionDesignation',
      'commission', 'composer', 'copyright', 'countryOfComposition', 'date', 'dedication',
+     'fileFormat', 'fileNumber', 'filePath',
      'groupTitle', 'keySignatureFirst', 'keySignatures', 'localeOfComposition', 'movementName',
      'movementNumber', 'noteCount', 'number', 'numberOfParts',
      'opusNumber', 'parentTitle', 'pitchHighest',
@@ -1160,12 +1214,10 @@ class RichMetadata(Metadata):
         >>> rmd.getSourcePath(b)
         'bach/bwv66.6.mxl'
         '''
-        if not hasattr(streamObj, 'filePath'):
-            return ''  # for some abc files...
-        if not streamObj.filePath:
+        if not streamObj.metadata or not streamObj.metadata.filePath:
             return ''
 
-        streamFp = streamObj.filePath
+        streamFp = streamObj.metadata.filePath
         if not isinstance(streamFp, pathlib.Path):
             streamFp = pathlib.Path(streamFp)
 
@@ -1269,7 +1321,7 @@ class RichMetadata(Metadata):
         analysisObject = discrete.Ambitus(streamObj)
         if analysisObject.minPitchObj is not None and analysisObject.maxPitchObj is not None:
             # may be none if no pitches are stored
-            # presently, these are numbers; convert to pitches later
+            # presently, these are numbers; convert to a collection of pitches later
             self.pitchLowest = analysisObject.minPitchObj.nameWithOctave
             self.pitchHighest = analysisObject.maxPitchObj.nameWithOctave
         ambitusInterval = analysisObject.getSolution(streamObj)
@@ -1286,7 +1338,7 @@ class Test(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: t.List[type] = []
 
 
 if __name__ == '__main__':

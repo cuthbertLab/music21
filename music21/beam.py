@@ -3,10 +3,10 @@
 # Name:         beam.py
 # Purpose:      music21 classes for representing notes
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012, 19 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2009-2012, 19 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -18,7 +18,7 @@ three Beam objects in its Beam object).
 
 The Beams object is stored in :class:`~music21.note.Note` and
 :class:`~music21.chord.Chord` objects as their :attr:`~music21.note.Note.beams`
-attributes.   Beams objects can largely be treated as a list.
+attributes.  Beams objects can largely be treated as a list.
 
 See `meter.TimeSignature`. :meth:`~music21.meter.TimeSignature.getBeams` for a
 way of getting beam information for a measure given the meter.  The
@@ -72,7 +72,7 @@ To get rid of beams on a note do:
 
 >>> n2.beams.beamsList = []
 '''
-from typing import Iterable, List, Optional, Union
+import typing as t
 import unittest
 
 from music21 import exceptions21
@@ -82,8 +82,7 @@ from music21 import prebase
 from music21 import style
 from music21.common.objects import EqualSlottedObjectMixin
 
-_MOD = 'meter'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('beam')
 
 
 class BeamException(exceptions21.Music21Exception):
@@ -103,7 +102,7 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
     '''
     A Beam is an object representation of one single beam, that is, one
     horizontal line connecting two notes together (or less commonly a note to a
-    rest).  Thus it takes two separate Beam objects to represent the beaming of
+    rest).  Thus, it takes two separate Beam objects to represent the beaming of
     a 16th note.
 
     The Beams object (note the plural) is the object that handles groups of
@@ -157,8 +156,10 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
         self.direction = direction  # left or right for partial
         self.independentAngle = None
         # represents which beam line referred to
-        # 8th, 16th, etc represented as 1, 2, ...
+        # 8th, 16th, etc. represented as 1, 2, ...
         self.number = number
+
+        # this should be called something else.
         self.id = id(self)
 
     # PRIVATE METHODS #
@@ -174,7 +175,7 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
 class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     '''
     The Beams object stores in it attribute beamsList (a list) all the Beam
-    objects defined above.  Thus len(beam.Beams) tells you how many beams the
+    objects defined above.  Thus, len(beam.Beams) tells you how many beams the
     note currently has on it, and iterating over a Beams object gives you each
     Beam.
 
@@ -203,7 +204,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         'id',
     )
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'feathered': '''
             Boolean determining if this is a feathered beam or not
             (does nothing for now).''',
@@ -215,6 +216,8 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         # no need for super() call w/ ProtoM21 and EqualSlottedObject
         self.beamsList = []
         self.feathered = False
+
+        # this should not be called .id.
         self.id = id(self)
 
     # SPECIAL METHODS #
@@ -237,7 +240,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     # STATIC METHODS #
 
     @staticmethod
-    def naiveBeams(srcList: Iterable['music21.base.Music21Object']):
+    def naiveBeams(srcList: t.Iterable['music21.base.Music21Object']):
         # noinspection PyShadowingNames
         '''
         Given a list or iterator of elements, return a list of None or Beams for
@@ -258,7 +261,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
                      2/None>/<music21.beam.Beam 3/None>>,
          None]
         '''
-        beamsList: List[Optional[Beams]] = []
+        beamsList: t.List[t.Optional[Beams]] = []
         for el in srcList:
             # if a dur cannot be beamable under any circumstance, replace
             # it with None; this includes Rests
@@ -277,7 +280,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         return beamsList
 
     @staticmethod
-    def removeSandwichedUnbeamables(beamsList: List[Union['Beams', None]]):
+    def removeSandwichedUnbeamables(beamsList: t.List[t.Union['Beams', None]]):
         # noinspection PyShadowingNames
         '''
         Go through the naiveBeamsList and remove beams from objects surrounded
@@ -441,7 +444,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
     def append(self, type=None, direction=None):  # type is okay @ReservedAssignment
         '''
-        Append a new Beam object to this Beams, automatically creating the Beam
+        Append a new Beam object to this Beams object, automatically creating the Beam
         object and incrementing the number count.
 
         >>> beams = beam.Beams()
@@ -524,7 +527,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         music21.beam.BeamException: cannot fill beams for level 12
         '''
         self.beamsList = []
-        # 8th, 16th, etc represented as 1, 2, ...
+        # 8th, 16th, etc. represented as 1, 2, ...
         if level in (1, '8th', duration.typeFromNumDict[8]):  # eighth
             count = 1
         elif level in (2, duration.typeFromNumDict[16]):

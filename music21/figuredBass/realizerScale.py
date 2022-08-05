@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         realizerScale.py
-# Purpose:      music21 class for conveniently representing the concept of
-#                a figured bass scale
+# Purpose:      a figured bass scale
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy
 import itertools
+import typing as t
 import unittest
 
 from music21 import exceptions21
@@ -51,10 +51,16 @@ class FiguredBassScale:
     >>> fbScale.keySig
     <music21.key.KeySignature of 1 flat>
     '''
-    _DOC_ATTR = {'realizerScale': 'A :class:`~music21.scale.Scale` based on the '
-                    'desired value and mode.',
-                 'keySig': 'A :class:`~music21.key.KeySignature` corresponding to '
-                    'the scale value and mode.'}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'realizerScale': '''
+            A :class:`~music21.scale.Scale` based on the
+            desired value and mode.
+            ''',
+        'keySig': '''
+            A :class:`~music21.key.KeySignature` corresponding to
+            the scale value and mode.
+            ''',
+    }
 
     def __init__(self, scaleValue='C', scaleMode='major'):
         try:

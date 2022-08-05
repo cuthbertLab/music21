@@ -5,9 +5,9 @@
 #               Roman Numeral encoding system used by Clercq-Temperley
 #
 # Authors:      Beth Hadley
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-12, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-12, 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,27 +15,30 @@ Parses the de Clercq-Temperley popular music flavor of RomanText.
 The Clercq-Temperley file format and additional rock corpus analysis
 information may be located at http://rockcorpus.midside.com
 '''
+from __future__ import annotations
+
 import copy
 import io
+import pathlib
 import re
+import typing as t
 import unittest
 
 from collections import OrderedDict
 
-from music21 import exceptions21
-
 from music21 import common
-from music21 import key
-from music21 import meter
-from music21 import stream
-from music21 import roman
-from music21 import tie
-from music21 import note
-from music21 import metadata
-from music21 import prebase
-
 from music21 import environment
-environLocal = environment.Environment()
+from music21 import exceptions21
+from music21 import key
+from music21 import metadata
+from music21 import meter
+from music21 import note
+from music21 import prebase
+from music21 import roman
+from music21 import stream
+from music21 import tie
+
+environLocal = environment.Environment('romanText.clercqTemperley')
 
 # clercqTemperley test files used as tests throughout this module
 BlitzkriegBopCT = '''
@@ -286,16 +289,23 @@ class CTSong(prebase.ProtoM21Object):
 
     """
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
-    _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined '
-                         + 'by the Clercq-Temperley format'}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'year': '''
+            The year of the CTSong; not formally defined
+            by the Clercq-Temperley format.
+            ''',
+    }
 
-    def __init__(self, textFile, **keywords):
+    def __init__(self, textFile: t.Union[str, pathlib.Path] = '', **keywords):
         self._title = None
         self.text = ''
-        self.lines = []
-        self._rules = OrderedDict()  # Dictionary of all component rules of the type CTRule
-        self.ksList = []  # keeps a list of all key signatures in the Score -- avoids duplicates
-        self.tsList = []  # same for time signatures
+        self.lines: t.List[str] = []
+        # Dictionary of all component rules of the type CTRule
+        self._rules: t.Dict[str, CTRule] = OrderedDict()
+        # keeps a list of all key signatures in the Score -- avoids duplicates
+        self.ksList: t.List[key.KeySignature] = []
+        # same for time signatures
+        self.tsList: t.List[meter.TimeSignature] = []
 
         self._scoreObj = None
         self.year = None
@@ -318,14 +328,14 @@ class CTSong(prebase.ProtoM21Object):
         return f'title={self.title!r} year={self.year}'
 
     # --------------------------------------------------------------------------
-    def parse(self, textFile: str):
+    def parse(self, textFile: t.Union[str, pathlib.Path]):
         '''
         Called when a CTSong is created by passing a string or filename;
         in the second case, it opens the file
         and removes all blank lines, and adds in new line characters
         returns pieceString that CTSong can parse.
         '''
-        if '|' in textFile and 'S:' in textFile:
+        if isinstance(textFile, str) and '|' in textFile and 'S:' in textFile:
             lines = textFile.split('\n')
         else:
             try:
@@ -371,8 +381,8 @@ class CTSong(prebase.ProtoM21Object):
         Get the comments list of all CTRule objects.
 
         comments are stored as a list of comments, each comment on a line as a list. If the
-        comment is on a rule line, the list contains both the line's LHS (like In:) and the comment
-        if the comment is on a line of its own, only the comment is
+        comment is on a rule line, the list contains both the line's LHS (like "In:")
+        and the comment if the comment is on a line of its own, only the comment is
         appended as a list of length one.
 
         The title is not a comment. The title is stored under self.title
@@ -411,7 +421,7 @@ class CTSong(prebase.ProtoM21Object):
         objects of type CTRule. If only a text file
         provided, this goes through text file and creates the
         rule object out of each line containing
-        a LHS including the Song line, which should always be last.
+        an LHS including the Song line, which should always be last.
 
         >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
         >>> len(s.rules)
@@ -545,7 +555,10 @@ class CTRule(prebase.ProtoM21Object):
     which is the stream from the entire score that the rule corresponds to.
     '''
     _DOC_ORDER = ['LHS', 'sectionName', 'musicText', 'homeTimeSig', 'homeKeySig', 'comments']
-    _DOC_ATTR = {'text': 'the full text of the CTRule, including the LHS, chords, and comments'}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'text': '''
+            The full text of the CTRule, including the LHS, chords, and comments.''',
+    }
 
     SPLITMEASURES = re.compile(r'(\|\*?\d*)')
     REPETITION = re.compile(r'\*(\d+)')
@@ -596,7 +609,7 @@ class CTRule(prebase.ProtoM21Object):
                 for i in range(numReps):
                     returnedMeasures = rule.expand(ts, ks)
                     self.insertKsTs(returnedMeasures[0], ts, ks)
-                    for returnedTs in [m.getElementsByClass('TimeSignature')
+                    for returnedTs in [m.getElementsByClass(meter.TimeSignature)
                                         for m in returnedMeasures]:
                         if returnedTs is not ts:
                             # the TS changed mid-rule; create a new one for return.
@@ -807,9 +820,12 @@ class CTRule(prebase.ProtoM21Object):
             lastChord.tie.type = 'continue'
             rn.tie = tie.Tie('stop')
 
-    def insertKsTs(self, m, ts, ks):
+    def insertKsTs(self,
+                   m: stream.Measure,
+                   ts: meter.TimeSignature,
+                   ks: key.KeySignature):
         '''
-        insert a new time signature or key signature into measure m, if it's
+        Insert a new time signature or key signature into measure m, if it's
         not already in the stream somewhere.
         '''
         if self.parent is None:
@@ -921,9 +937,9 @@ class CTRule(prebase.ProtoM21Object):
     @property
     def sectionName(self):
         '''
-        Returns the expanded version of the Left hand side (LHS) such as
+        Returns the expanded version of the Left-hand side (LHS) such as
         Introduction, Verse, etc. if
-        text present uses LHS to expand)
+        text is present (uses LHS to expand)
 
         Currently supported abbreviations:
 
@@ -986,7 +1002,7 @@ class TestExternal(unittest.TestCase):
         #     txt = f.read()
         #
         #     s = clercqTemperley.CTSong(txt)
-        #     for chord in s.toScore().flatten().getElementsByClass('Chord'):
+        #     for chord in s.toScore().flatten().getElementsByClass(chord.Chord):
         #         try:
         #             x = chord.pitches
         #         except:
@@ -1005,12 +1021,11 @@ class TestExternal(unittest.TestCase):
         # sc = s.toScore()
         # print(sc.highestOffset)
         # sc.show()
+
+
 # --------------------------------------------------------------------------
-
 # define presented class order in documentation
-
-
-_DOC_ORDER = [CTSong, CTRule]
+_DOC_ORDER: t.List[t.Type] = [CTSong, CTRule]
 
 if __name__ == '__main__':
     import music21

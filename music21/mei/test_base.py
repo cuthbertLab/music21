@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Antila
 #
-# Copyright:    Copyright © 2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2014 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -16,9 +16,6 @@ Tests for :mod:`music21.mei.base`.
 
 # this often happens on TestCase subclasses
 # pylint: disable=too-many-public-methods
-
-# a test that uses only assertions on the Mocks will have no-self-use
-# pylint: disable=no-self-use
 
 # if we mock many things, this may be triggered
 # pylint: disable=too-many-arguments

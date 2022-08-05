@@ -3,9 +3,9 @@
 # Name:         sorting.py
 # Purpose:      Music21 class for sorting
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014-2015 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2014-2015 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -68,8 +68,8 @@ class SortTuple(namedtuple('SortTuple', (
     True
 
     >>> ts = bar.Barline('double')
-    >>> t = stream.Stream()
-    >>> t.storeAtEnd(ts)
+    >>> s2 = stream.Stream()
+    >>> s2.storeAtEnd(ts)
     >>> ts_st = ts.sortTuple()
     >>> ts_st
     SortTuple(atEnd=1, offset=0.0, priority=0, classSortOrder=-5, isNotGrace=1, insertIndex=...)

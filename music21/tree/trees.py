@@ -4,9 +4,9 @@
 # Purpose:      Subclasses of tree.core.AVLTree for different purposes
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -18,7 +18,7 @@ and other positions.
 import unittest
 import weakref
 from math import inf
-from typing import Optional
+import typing as t
 
 from music21 import common
 from music21 import exceptions21
@@ -96,7 +96,7 @@ class ElementTree(core.AVLTree):
     6.0
     '''
     # TYPING #
-    rootNode: Optional[nodeModule.ElementNode]
+    rootNode: t.Optional[nodeModule.ElementNode]
 
     # CLASS VARIABLES #
     nodeClass = nodeModule.ElementNode
@@ -506,15 +506,15 @@ class ElementTree(core.AVLTree):
         (SortTuple(atEnd=0, offset=0.0, priority=0, ...),
          <music21.key.Key of f# minor>)
 
-        >>> t = tree.trees.ElementTree()
-        >>> t.rootNode is None
+        >>> et = tree.trees.ElementTree()
+        >>> et.rootNode is None
         True
-        >>> t.populateFromSortedList(listOfTuples)
-        >>> t.rootNode
+        >>> et.populateFromSortedList(listOfTuples)
+        >>> et.rootNode
         <ElementNode: Start:15.0 <0.20...> Indices:(l:0 *97* r:195)
             Payload:<music21.note.Note D#>>
 
-        >>> n = t.rootNode
+        >>> n = et.rootNode
         >>> while n is not None:
         ...    print(n)
         ...    n = n.leftChild
@@ -531,7 +531,7 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:0.0 <0.-30...> Indices:(l:0 *0* r:1)
             Payload:<music21.metadata.Metadata object at 0x104adbdd8>>
 
-        >>> n = t.rootNode
+        >>> n = et.rootNode
         >>> while n is not None:
         ...    print(n)
         ...    n = n.rightChild
@@ -550,7 +550,7 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:36.0 <0.-5...> Indices:(l:193 *194* r:195)
             Payload:<music21.bar.Barline type=final>>
         '''
-        def recurse(subListOfTuples, globalStartOffset) -> Optional[core.AVLNode]:
+        def recurse(subListOfTuples, globalStartOffset) -> t.Optional[core.AVLNode]:
             '''
             Divide and conquer.
             '''
@@ -895,7 +895,7 @@ class OffsetTree(ElementTree):
     __slots__ = ()
 
     # TYPING #
-    rootNode: Optional[nodeModule.OffsetNode]
+    rootNode: t.Optional[nodeModule.OffsetNode]
 
     nodeClass = nodeModule.OffsetNode
 
@@ -967,7 +967,7 @@ class OffsetTree(ElementTree):
             elif node.rightChild and node.payloadElementsStopIndex <= index:
                 return recurseByIndex(node.rightChild, index)
 
-        def recurseBySlice(node: nodeModule.ElementNode, start, stop):
+        def recurseBySlice(node: nodeModule.OffsetNode, start, stop):
             '''
             Return a slice of the payload elements (plural) where start <= index < stop.
             '''
@@ -1267,11 +1267,11 @@ class OffsetTree(ElementTree):
         Removes `elements` which can be Music21Objects or Timespans
         (a single one or a list) from this Tree.
 
-        Much safer (for non-timespans) if a list of offsets is used but it is optional
+        Much safer (for non-timespans) if a list of offsets is used, but it is optional.
 
         If runUpdate is False then the tree will be left with incorrect indices and
         endTimes; but it can speed up operations where an element is going to be removed
-        and then immediately replaced: i.e., where the position of an element has changed
+        and then immediately replaced: i.e., where the position of an element has changed.
         '''
         initialPosition = self.lowestPosition()
         initialEndTime = self.endTime
@@ -1363,7 +1363,7 @@ class OffsetTree(ElementTree):
 
     def overlapTimePoints(self, includeStopPoints=False, returnVerticality=False):
         '''
-        Gets all time points where some element is starting
+        Gets all time-points where some element is starting
         (or if includeStopPoints is True, where some element is starting or stopping)
         while some other element is still continuing onward.
 

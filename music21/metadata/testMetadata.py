@@ -43,7 +43,7 @@ class Test(unittest.TestCase):
         self.assertEqual(md.composer, 'Frank')
         self.assertEqual(md.title, 'Concerto in F')
 
-        # test getting meta data from an imported source
+        # test getting metadata from an imported source
         c = converter.parse(mTF.mozartTrioK581Excerpt)
         md = c.metadata
 
@@ -91,7 +91,7 @@ class Test(unittest.TestCase):
         from music21 import metadata
 
         opus = corpus.parse('essenFolksong/teste')
-        self.assertEqual(len(opus), 8)
+        self.assertEqual(len(opus.scores), 8)
 
         score = opus.getScoreByNumber(4)
         self.assertEqual(score.metadata.localeOfComposition,

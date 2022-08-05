@@ -3,14 +3,15 @@
 # Name:         musicxml/helpers.py
 # Purpose:      Helper routines for musicxml export
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Jacob Tyler Walls
 #
-# Copyright:    Copyright © 2013-2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy
 from xml.etree.ElementTree import tostring as et_tostring
+from music21 import meter
 
 def dumpString(obj, *, noCopy=False) -> str:
     r'''
@@ -185,7 +186,7 @@ def isFullMeasureRest(r: 'music21.note.Rest') -> bool:
     if r.fullMeasure in (True, 'always'):
         isFullMeasure = True
     elif r.fullMeasure == 'auto':
-        tsContext = r.getContextByClass('TimeSignature')
+        tsContext = r.getContextByClass(meter.TimeSignature)
         if tsContext and tsContext.barDuration.quarterLength == r.duration.quarterLength:
             isFullMeasure = True
     return isFullMeasure
@@ -193,5 +194,4 @@ def isFullMeasureRest(r: 'music21.note.Rest') -> bool:
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
-
+    music21.mainTest()  # doc tests only

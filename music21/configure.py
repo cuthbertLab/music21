@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2019 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import os
@@ -18,7 +18,7 @@ import unittest
 import textwrap
 import webbrowser
 
-from typing import List
+import typing as t
 
 from importlib import reload  # Python 3.4
 
@@ -30,8 +30,7 @@ from music21 import common
 from music21 import environment
 from music21 import exceptions21
 
-_MOD = 'configure'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('configure')
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 IGNORECASE = re.RegexFlag.IGNORECASE
@@ -126,7 +125,7 @@ def getSitePackages():
 
 def findInstallations():
     '''
-    Find all music21 references found in site packages, or
+    Find all music21 references that are found in "site-packages", or
     possibly look at the running code as well.
     '''
     found = []
@@ -562,7 +561,7 @@ class Dialog:
                 self._result = rawInput
                 break
 
-            # need to not catch no NoInput nor IncompleteInput classes, as they
+            # need to not catch NoInput nor IncompleteInput classes, as they
             # will be handled in evaluation
             # pylint: disable=assignment-from-no-return
             cookedInput = self._evaluateUserInput(rawInput)
@@ -571,7 +570,7 @@ class Dialog:
             # if no default and no input, we get here (default supplied in
             # evaluate
             if isinstance(cookedInput, (NoInput, IncompleteInput)):
-                # set result to these objects whether or not try again
+                # set result to these objects even if we try again
                 self._result = cookedInput
                 if self._tryAgain:
                     # only returns True or False
@@ -1005,7 +1004,7 @@ class SelectFromList(Dialog):
 
     def _preAskUser(self, force=None):
         '''
-        Before we ask user, we need to to run _askFillEmptyList list if the list is empty.
+        Before we ask user, we need to run _askFillEmptyList list if the list is empty.
 
         >>> d = configure.SelectFromList()
         >>> d._preAskUser('no')  # force for testing
@@ -1031,14 +1030,14 @@ class SelectFromList(Dialog):
 
         >>> d = configure.SelectFromList()
         >>> d._rawQuery(['a', 'b', 'c'])
-        ['[1] a', '[2] b', '[3] c', ' ', 'Select a number from the preceding options: ']
+        ['[1] a', '[2] b', '[3] c', ' ', 'Choose a number from the preceding options: ']
 
         >>> d = configure.SelectFromList(default=1)
         >>> d._default
         1
         >>> d._rawQuery(['a', 'b', 'c'])
         ['[1] a', '[2] b', '[3] c', ' ',
-         'Select a number from the preceding options (default is 1): ']
+         'Choose a number from the preceding options (default is 1): ']
         '''
         head = []
         i = 1
@@ -1052,7 +1051,7 @@ class SelectFromList(Dialog):
             head.append(f'[{i}] {sub}')
             i += 1
 
-        tail = 'Select a number from the preceding options: '
+        tail = 'Choose a number from the preceding options: '
         tail = self._rawQueryPrepareHeader(tail)
         tail = self._rawQueryPrepareFooter(tail)
         return head + [' ', tail]
@@ -1195,7 +1194,7 @@ class SelectFilePath(SelectFromList):
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
-    def _getAppOSIndependent(self, comparisonFunction, path0: str, post: List[str],
+    def _getAppOSIndependent(self, comparisonFunction, path0: str, post: t.List[str],
                              *,
                              glob: str = '**/*'):
         '''
@@ -1213,23 +1212,23 @@ class SelectFilePath(SelectFromList):
             if comparisonFunction(str(path1)):
                 post.append(str(path1))
 
-    def _getDarwinApp(self, comparisonFunction) -> List[str]:
+    def _getDarwinApp(self, comparisonFunction) -> t.List[str]:
         '''
         Provide a comparison function that returns True or False based on the file name.
         This looks at everything in Applications, as well as every directory in Applications
         '''
-        post: List[str] = []
+        post: t.List[str] = []
         for path0 in ('/Applications', common.cleanpath('~/Applications', returnPathlib=False)):
             assert isinstance(path0, str)
             self._getAppOSIndependent(comparisonFunction, path0, post, glob='*')
         return post
 
-    def _getWinApp(self, comparisonFunction) -> List[str]:
+    def _getWinApp(self, comparisonFunction) -> t.List[str]:
         '''
         Provide a comparison function that returns True or False based on the file name.
         '''
         # provide a similar method to _getDarwinApp
-        post: List[str] = []
+        post: t.List[str] = []
         environKeys = ('ProgramFiles', 'ProgramFiles(x86)', 'ProgramW6432')
         for possibleEnvironKey in environKeys:
             if possibleEnvironKey not in os.environ:
@@ -1380,7 +1379,7 @@ class SelectMusicXMLReader(SelectFilePath):
 
     def _askFillEmptyList(self, default=None, force=None):
         '''
-        If we do not have an musicxml readers, ask user if they want to download.
+        If we do not have any musicxml readers, ask user if they want to download.
         '''
         urlTarget = urlMuseScore
 
@@ -1526,7 +1525,7 @@ class ConfigurationAssistant:
 
             d.askUser(force=force)
             unused_post = d.getResult()
-            # post may be an error; no problem calling perform action anyways
+            # post may be an error; no problem calling perform action in any case.
             try:
                 d.performAction(simulate=self._simulate)
             except DialogException:
@@ -1595,7 +1594,7 @@ class ConfigurationAssistant:
 #         print('got: %s' % post)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: t.List[type] = []
 
 
 class TestUserInput(unittest.TestCase):  # pragma: no cover
@@ -1763,17 +1762,17 @@ if __name__ == '__main__':
 
     else:
         # only if running tests
-        t = Test()
+        testInstance = Test()
         te = TestUserInput()
 
         if len(sys.argv) < 2 or sys.argv[1] in ['all', 'test']:
             import music21
             music21.mainTest(Test)
 
-        # arg[1] is test to launch
+        # arg[1] is the test to launch
         elif sys.argv[1] == 'te':
             # run test user input
             getattr(te, sys.argv[2])()
         # just run named Test
-        elif hasattr(t, sys.argv[1]):
-            getattr(t, sys.argv[1])()
+        elif hasattr(testInstance, sys.argv[1]):
+            getattr(testInstance, sys.argv[1])()

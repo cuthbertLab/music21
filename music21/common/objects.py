@@ -3,10 +3,10 @@
 # Name:         common/objects.py
 # Purpose:      Commonly used Objects and Mixins
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 __all__ = [
@@ -15,15 +15,13 @@ __all__ = [
     'RelativeCounter',
     'SlottedObjectMixin',
     'EqualSlottedObjectMixin',
-    'Iterator',
     'Timer',
 ]
 
 import collections
 import time
-from typing import Tuple
+import typing as t
 import weakref
-from music21.common.decorators import deprecated
 
 
 class RelativeCounter(collections.Counter):
@@ -165,9 +163,9 @@ class SlottedObjectMixin:
     >>> s.time = 0.125
     >>> s.frequency = 440.0
     >>> #_DOCS_SHOW out = pickle.dumps(s)
-    >>> #_DOCS_SHOW t = pickle.loads(out)
-    >>> t = s #_DOCS_HIDE -- cannot define classes for pickling in doctests
-    >>> t.time, t.frequency
+    >>> #_DOCS_SHOW pickleLoad = pickle.loads(out)
+    >>> pickleLoad = s #_DOCS_HIDE -- cannot define classes for pickling in doctests
+    >>> pickleLoad.time, pickleLoad.frequency
     (0.125, 440.0)
 
     OMIT_FROM_DOCS
@@ -178,15 +176,15 @@ class SlottedObjectMixin:
     >>> bsc = BadSubclass()
     >>> bsc.amplitude = 2
     >>> #_DOCS_SHOW out = pickle.dumps(bsc)
-    >>> #_DOCS_SHOW t = pickle.loads(out)
-    >>> t = bsc #_DOCS_HIDE -- cannot define classes for pickling in doctests
-    >>> t.amplitude
+    >>> #_DOCS_SHOW outLoad = pickle.loads(out)
+    >>> outLoad = bsc #_DOCS_HIDE -- cannot define classes for pickling in doctests
+    >>> outLoad.amplitude
     2
     '''
 
     # CLASS VARIABLES #
 
-    __slots__: Tuple[str, ...] = ()
+    __slots__: t.Tuple[str, ...] = ()
 
     # SPECIAL METHODS #
 
@@ -248,7 +246,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
     Slots are the only things compared, so do not mix with a __dict__ based object.
 
-    Ignores differences in .id
+    The equal comparison ignores differences in .id
     '''
     def __eq__(self, other):
         if type(self) is not type(other):
@@ -268,51 +266,23 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
 
 # ------------------------------------------------------------------------------
-class Iterator(collections.abc.Iterator):  # pragma: no cover
-    '''
-    A simple Iterator object used to handle iteration of Streams and other
-    list-like objects.
-
-    Deprecated in v7 -- not needed since Python 2.6 became music21 minimum!
-    '''
-    # TODO: remove in v.8
-    def __init__(self, data):
-        self.data = data
-        self.index = 0
-
-    @deprecated('2021 Jan v7', '2022 Jan',
-                'common.Iterator is deprecated.  use `iter(X)` instead.')
-    def __iter__(self):
-        self.index = 0
-        return self
-
-    def __next__(self):
-        if self.index >= len(self.data):
-            raise StopIteration
-        post = self.data[self.index]
-        self.index += 1
-        return post
-
-# ------------------------------------------------------------------------------
-
-
 class Timer:
     '''
     An object for timing. Call it to get the current time since starting.
 
-    >>> t = common.Timer()
-    >>> now = t()
+    >>> timer = common.Timer()
+    >>> now = timer()
     >>> import time  #_DOCS_HIDE
     >>> time.sleep(0.01)  #_DOCS_HIDE  -- some systems are extremely fast or have wide deltas
-    >>> nowNow = t()
+    >>> nowNow = timer()
     >>> nowNow > now
     True
 
     Call `stop` to stop it. Calling `start` again will reset the number
 
-    >>> t.stop()
-    >>> stopTime = t()
-    >>> stopNow = t()
+    >>> timer.stop()
+    >>> stopTime = timer()
+    >>> stopNow = timer()
     >>> stopTime == stopNow
     True
 
@@ -352,17 +322,17 @@ class Timer:
         '''
         # if stopped, gets _tDif; if not stopped, gets current time
         if self._tStop is None:  # if not stopped yet
-            t = time.time() - self._tStart
+            timeDifference = time.time() - self._tStart
         else:
-            t = self._tDif
-        return t
+            timeDifference = self._tDif
+        return timeDifference
 
     def __str__(self):
         if self._tStop is None:  # if not stopped yet
-            t = time.time() - self._tStart
+            timeDifference = time.time() - self._tStart
         else:
-            t = self._tDif
-        return str(round(t, 3))
+            timeDifference = self._tDif
+        return str(round(timeDifference, 3))
 
 
 if __name__ == '__main__':

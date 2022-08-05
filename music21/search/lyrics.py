@@ -3,9 +3,9 @@
 # Name:         search/lyrics.py
 # Purpose:      music21 classes for searching lyrics
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -13,7 +13,7 @@ Classes for searching for Lyric objects.
 '''
 import re
 from collections import namedtuple, OrderedDict
-from typing import Optional, List
+import typing as t
 import unittest
 
 from music21.exceptions21 import Music21Exception
@@ -26,14 +26,15 @@ _attrList = 'el start end measure lyric text identifier absoluteStart absoluteEn
 
 class IndexedLyric(namedtuple(
     'IndexedLyric',
-    'el start end measure lyric text identifier absoluteStart absoluteEnd',
+    ['el', 'start', 'end', 'measure', 'lyric', 'text',
+     'identifier', 'absoluteStart', 'absoluteEnd'],
 )):
     '''
     A Lyric that has been indexed to its attached element and position in a Stream.
 
     '''
     __slots__ = ()
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'el': 'the element that the lyric is attached to',
         'start': '''Suppose that the entire lyric for the stream were a single string:
                  this is the index of the position in the string that this
@@ -63,25 +64,36 @@ class IndexedLyric(namedtuple(
 
 
 
-class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices identifier')):
+class SearchMatch(namedtuple('SearchMatch',
+                             ['mStart', 'mEnd', 'matchText', 'els', 'indices', 'identifier'])):
     '''
     A lightweight object representing the match (if any) for a search.
     '''
     __slots__ = ()
-    _DOC_ATTR = {'mStart': '''The measureNumber of the measure that the first
-                                matching lyric is in''',
-                 'mEnd': '''The measureNumber of the measure that the last
-                                matching lyric is in''',
-                 'matchText': '''The text of the lyric that matched the search.  For a
-                                 plaintext search, this will be the same as the search
-                                 term, but for a regular expression
-                                 search this will be the text that matched the regular
-                                 expression''',
-                 'els': '''A list of all lyric-containing elements that matched this text.''',
-                 'indices': '''A list of IndexedLyric objects that match''',
-                 'identifier': '''The identifier of (presumably all,
-                                  but at least the first) lyric to match''',
-                 }
+    _DOC_ATTR: t.Dict[str, str] = {
+        'mStart': '''
+            The measureNumber of the measure that the first matching lyric is in.
+            ''',
+        'mEnd': '''
+            The measureNumber of the measure that the last matching lyric is in.
+            ''',
+        'matchText': '''
+            The text of the lyric that matched the search.  For a
+            plaintext search, this will be the same as the search
+            term, but for a regular expression
+            search this will be the text that matched the regular
+            expression.
+            ''',
+        'els': '''
+            A list of all lyric-containing elements that matched this text.
+            ''',
+        'indices': '''
+            A list of IndexedLyric objects that match.
+            ''',
+        'identifier': '''
+            The identifier of (presumably all, but at least the first) lyric to match.
+            ''',
+    }
 
     def __repr__(self):
         return (f'SearchMatch(mStart={self.mStart!r}, mEnd={self.mEnd!r}, '
@@ -123,8 +135,8 @@ class LyricSearcher:
         self.includeIntermediateElements = False  # currently does nothing
         self.includeTrailingMelisma = False  # currently does nothing
 
-        self._indexText: Optional[str] = None
-        self._indexTuples: List[IndexedLyric] = []
+        self._indexText: t.Optional[str] = None
+        self._indexTuples: t.List[IndexedLyric] = []
 
     @property
     def indexText(self) -> str:
@@ -141,12 +153,12 @@ class LyricSearcher:
         return self._indexText or ''
 
     @property
-    def indexTuples(self) -> List[IndexedLyric]:
-        if self._indexText is None:  # correct -- check text to see if has run.
+    def indexTuples(self) -> t.List[IndexedLyric]:
+        if self._indexText is None:  # correct -- check text to see if it has run.
             self.index()
         return self._indexTuples
 
-    def index(self, s=None) -> List[IndexedLyric]:
+    def index(self, s=None) -> t.List[IndexedLyric]:
         # noinspection PyShadowingNames
         '''
         A method that indexes the Stream's lyrics and returns the list
@@ -183,12 +195,13 @@ class LyricSearcher:
         else:
             self.stream = s
 
-        indexByIdentifier = OrderedDict()
-        iTextByIdentifier = OrderedDict()
-        lastSyllabicByIdentifier = OrderedDict()
+        indexByIdentifier: t.OrderedDict[t.Union[str, int], t.List[IndexedLyric]] = OrderedDict()
+        iTextByIdentifier: t.OrderedDict[t.Union[str, int], str] = OrderedDict()
+        lastSyllabicByIdentifier: t.OrderedDict[t.Union[str, int],
+                                                t.Union[str, None]] = OrderedDict()
 
-        for n in s.recurse().getElementsByClass('NotRest'):
-            ls: List[note.Lyric] = n.lyrics
+        for n in s.recurse().notes:
+            ls: t.List[note.Lyric] = n.lyrics
             if not ls:
                 continue
             mNum = n.measureNumber
@@ -220,6 +233,8 @@ class LyricSearcher:
                 if not ly.isComposite:
                     lastSyllabic = ly.syllabic
                 else:
+                    if t.TYPE_CHECKING:
+                        assert ly.components is not None
                     lastSyllabic = ly.components[-1].syllabic
                 lastSyllabicByIdentifier[lyIdentifier] = lastSyllabic
 
@@ -248,7 +263,7 @@ class LyricSearcher:
         self._indexText = iText
         return index
 
-    def search(self, textOrRe, s=None) -> List[SearchMatch]:
+    def search(self, textOrRe, s=None) -> t.List[SearchMatch]:
         # noinspection SpellCheckingInspection
         r'''
         Return a list of SearchMatch objects matching a string or regular expression.
@@ -323,7 +338,7 @@ class LyricSearcher:
 
         raise LyricSearcherException(f'Could not find position {pos} in text')
 
-    def _findObjsInIndexByPos(self, posStart, posEnd=999999) -> List[IndexedLyric]:
+    def _findObjsInIndexByPos(self, posStart, posEnd=999999) -> t.List[IndexedLyric]:
         '''
         Finds a list of objects in ._indexTuples by search position (inclusive)
         '''
@@ -355,8 +370,10 @@ class LyricSearcher:
     #     lineBreakStart += len(LINEBREAK_TOKEN)
     #     return lineBreakStart
 
-    def _reSearch(self, r: re.Pattern) -> List[SearchMatch]:
-        locations = []
+    def _reSearch(self, r: re.Pattern) -> t.List[SearchMatch]:
+        locations: t.List[SearchMatch] = []
+        if self._indexText is None:
+            return locations
         for m in r.finditer(self._indexText):
             absoluteFoundPos, absoluteEndPos = m.span()
             matchText = m.group(0)

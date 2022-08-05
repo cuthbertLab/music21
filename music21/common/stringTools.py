@@ -3,10 +3,10 @@
 # Name:         common/stringTools.py
 # Purpose:      Utilities for strings
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -32,7 +32,7 @@ import time
 import string
 import unicodedata
 
-from typing import List, Tuple
+import typing as t
 
 # ------------------------------------------------------------------------------
 WHITESPACE = re.compile(r'\s+')
@@ -62,7 +62,7 @@ def whitespaceEqual(a: str, b: str) -> bool:
         return False
 
 
-def getNumFromStr(usrStr: str, numbers: str = '0123456789') -> Tuple[str, str]:
+def getNumFromStr(usrStr: str, numbers: str = '0123456789') -> t.Tuple[str, str]:
     '''
     Given a string, extract any numbers.
     Return two strings, the numbers (as strings) and the remaining characters.
@@ -81,7 +81,7 @@ def getNumFromStr(usrStr: str, numbers: str = '0123456789') -> Tuple[str, str]:
             found.append(char)
         else:
             remain.append(char)
-    # returns numbers, and then characters
+    # returns numbers and then characters
     return ''.join(found), ''.join(remain)
 
 
@@ -195,7 +195,7 @@ def spaceCamelCase(usrStr: str, replaceUnderscore=True, fixMeList=None) -> str:
     firstChar = False
     isNumber = False
     lastIsNum = False
-    post: List[str] = []
+    post: t.List[str] = []
 
     # do not split these...
     if fixMeList is None:

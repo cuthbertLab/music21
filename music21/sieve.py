@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2003, 2010 Christopher Ariza
-#               Copyright © 2010-2012, 19 Michael Scott Cuthbert and the music21 Project
+#               Copyright © 2010-2012, 19 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -57,19 +57,20 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of
 '''
 from ast import literal_eval
 import copy
+from math import gcd
 import random
 import string
 import unittest
-from typing import List, Union
+import typing as t
 
 from music21 import exceptions21
 from music21 import pitch
 from music21 import common
 from music21 import interval
+from music21.common.numberTools import lcm
 
 from music21 import environment
-_MOD = 'sieve'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('sieve')
 
 
 # ------------------------------------------------------------------------------
@@ -120,17 +121,17 @@ def eratosthenes(firstCandidate=2):
     their next possible candidate, thus allowing the generation of primes
     in sequence without storing a complete range (z).
 
-    create a dictionary. each entry in the dictionary is a key:item pair of
-    the largest (key) largest multiple of this prime so far found : (item)
-    the prime. the dictionary only has as many entries as found primes.
+    Create a dictionary. Each entry in the dictionary is a key:item pair of
+    (key) the largest multiple of this prime so far found and (item)
+    the prime. The dictionary only has as many entries as found primes.
 
-    if a candidate is not a key in the dictionary, it is not a multiple of
+    If a candidate is not a key in the dictionary, it is not a multiple of
     any already-found prime; it is thus a prime. a new entry is added to the
-    dictionary, with the square of the prime as the key. the square of the prime
+    dictionary, with the square of the prime as the key. The square of the prime
     is the next possible multiple to be found.
 
-    to use this generator, create an instance and then call the .next() method
-    on the instance
+    To use this generator, create an instance and then call the .next() method
+    on the instance.
 
 
     >>> a = sieve.eratosthenes()
@@ -227,7 +228,7 @@ def rabinMiller(n):
         r = r + 1
 
     for i in range(10):  # random tests
-        # calculate a^s mod n, where a is a random number
+        # calculate a^s mod n, where "a" is a random number
         y = pow(random.randint(1, n - 1), s, n)
         if y == 1:  # pragma: no cover
             continue  # n passed test, is composite
@@ -238,7 +239,7 @@ def rabinMiller(n):
             y = pow(y, 2, n)  # a^((2^j)*s) mod n
         else:  # pragma: no cover
             return False  # y never equaled n - 1, then n is composite
-    # n passed all of the tests, it is very likely prime
+    # n passed all the tests, it is very likely prime
     return True
 
 
@@ -362,7 +363,7 @@ def unitNormStep(step, a=0, b=1, normalized=True):
     to fill step through inclusive a,b, then return a unit interval list of values
     necessary to cover region.
 
-    Note that returned values are by default normalized within the unit interval.
+    Note that returned values are, by default, normalized within the unit interval.
 
 
     >>> sieve.unitNormStep(0.5, 0, 1)
@@ -410,47 +411,6 @@ def unitNormStep(step, a=0, b=1, normalized=True):
 # note: some of these methods are in common, though they are slightly different algorithms;
 # need to test for compatibility
 
-def _gcd(a, b):
-    '''
-    find the greatest common divisor of a,b
-    i.e., greatest number that is a factor of both numbers using
-    Euclid's algorithm
-
-
-    >>> sieve._gcd(20, 30)
-    10
-    '''
-    # alt implementation
-
-    # while b != 0:
-    #    a, b = b, a % b
-    # return abs(a)
-
-    # if a == 0 and b == 0:
-    #    return 1
-    # if b == 0:
-    #    return a
-    # if a == 0:
-    #    return b
-    # else:
-    #    return _gcd(b, a % b)
-
-    while b != 0:
-        a, b = b, a % b
-    return abs(a)
-
-
-def _lcm(a, b):
-    '''
-    find lowest common multiple of a,b
-
-    >>> sieve._lcm(30, 20)
-    60
-    '''
-    # // forces integer style division (no remainder)
-    return abs(a * b) // _gcd(a, b)
-
-
 def _lcmRecurse(filterList):
     '''
     Given a list of values, find the LCM of all the values by iteratively
@@ -475,7 +435,7 @@ def _lcmRecurse(filterList):
             environLocal.printDebug(['lcm timed out'])
             lcmVal = None
             break
-        lcmVal = _lcm(lcmVal, filterList[i])
+        lcmVal = lcm([lcmVal, filterList[i]])
     return lcmVal
 
 
@@ -850,10 +810,10 @@ class Residual:
     def _cmpIntersection(self, m1, m2, n1, n2):
         '''
         compression by intersection
-        find m,n such that the intersection of two Residual's can
+        find m,n such that the intersection of two Residuals can
         be reduced to one Residual. Xenakis p 273.
         '''
-        d = _gcd(m1, m2)
+        d = gcd(m1, m2)
         c1 = m1 // d  # not sure if we need floats here
         c2 = m2 // d
         n3 = 0
@@ -933,7 +893,7 @@ class CompressionSegment:
 
     def _zUpdate(self, z=None):
         # z must at least be a superset of match
-        if z is not None:  # its a list
+        if z is not None:  # it is a list
             if not self._subset(self._match, z):
                 raise CompressionSegmentException(
                     'z range must be a superset of desired segment')
@@ -1030,7 +990,7 @@ class CompressionSegment:
 # ------------------------------------------------------------------------------
 
 # http://docs.python.org/lib/set-objects.html
-# set object precedence is places & before |
+# set object precedence: & before |
 
 # >>> a = set([3, 4])
 # >>> b = set([4, 5])
@@ -1721,8 +1681,8 @@ class Sieve:
             evalStr = ''
         keys = self._resKeys(state)
 
-        # only NEG that remain are those applied to groups
-        # replace all remain NEG in the formula w/ '1@1-'
+        # The only "NEG" values that remain are those that are applied to groups.
+        # Replace all remain NEG in the formula w/ '1@1-'
         # as long as binary negation is evaluated before & and |, this will work
         # see http://docs.python.org/ref/summary.html
         # must do this before converting segments (where there will be neg numbers)
@@ -1894,7 +1854,7 @@ class PitchSieve:
                  pitchLower=None,
                  pitchUpper=None,
                  pitchOrigin=None,
-                 eld: Union[int, float] = 1):
+                 eld: t.Union[int, float] = 1):
         self.pitchLower = None  # 'c3'
         self.pitchUpper = None  # 'c5' -- default ps Range
         self.pitchOrigin = None  # pitchLower -- default
@@ -2195,7 +2155,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: t.List[type] = []
 
 if __name__ == '__main__':
     import music21

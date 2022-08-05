@@ -3,9 +3,9 @@
 # Name:         analysis/floatingKey.py
 # Purpose:      Framework for floating key analysis
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,6 +15,7 @@ measures emphasizing non-chord tones, etc.
 '''
 import copy
 from music21 import key
+from music21 import stream
 from music21.exceptions21 import AnalysisException
 
 class FloatingKeyException(AnalysisException):
@@ -89,7 +90,8 @@ class KeyAnalyzer:
             p = s.iter().parts.first()
         else:
             p = s
-        self.numMeasures = len(p.getElementsByClass('Measure'))  # could be wrong for endings, etc.
+        # could be wrong for endings, etc.
+        self.numMeasures = len(p.getElementsByClass(stream.Measure))
         if self.numMeasures == 0:
             raise FloatingKeyException("Stream must have Measures inside it")
 
