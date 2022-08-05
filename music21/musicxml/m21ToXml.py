@@ -2285,7 +2285,10 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             # c.role instead so we can represent non-standard roles.
             # If c.role is non-standard, the name will be very boring:
             # 'marcrel:CTB', which means 'otherContributor'.
-            for _, c in self.scoreMetadata.getAllContributorNamedValues():
+            for _, c in self.scoreMetadata.all(
+                    skipNonContributors=True,  # we only want contributors
+                    returnPrimitives=True,     # we want Contributor values
+                    returnSorted=False):
                 mxCreator = self.contributorToXmlCreator(c)
                 mxId.append(mxCreator)
                 foundOne = True
@@ -2341,7 +2344,11 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         foundOne = False
         allItems: t.List[t.Tuple[str, t.Any]] = []
 
-        allItems = md.getAllNamedValues(skipContributors=True)
+        allItems = md.all(
+            skipContributors=True,  # we don't want the contributors (already handled them)
+            returnPrimitives=True,  # we want ValueType values
+            returnSorted=False
+        )
 
         skippedOneMovementName: bool = False
         skippedOneMovementNumber: bool = False

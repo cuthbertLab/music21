@@ -481,7 +481,7 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
     ⠠⠞⠊⠞⠇⠑⠒⠀⠠⠇⠁⠀⠠⠛⠊⠕⠧⠊⠝⠑⠞⠞⠁⠀⠠⠏⠊⠁⠝⠞⠁
     '''
     allBrailleLines = []
-    for uniqueName, value in music21Metadata.getAllNamedValues():
+    for uniqueName, value in music21Metadata.all(returnPrimitives=True, returnSorted=False):
         if value is None:
             # we don't put None values in braille output
             continue

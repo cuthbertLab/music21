@@ -1153,70 +1153,64 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
 # Dictionaries generated from STANDARD_PROPERTY_DESCRIPTIONS for looking up
 # various things quickly.
 
-NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION: t.Dict[str, PropertyDescription] = {
-    f'{x.namespace}:{x.name}':
-        x for x in STANDARD_PROPERTY_DESCRIPTIONS
-}
+# Utility routines to help with the dictionary generation
+def _uniqueName(prop: PropertyDescription) -> str:
+    if prop.uniqueName:
+        return prop.uniqueName
+    return prop.name
 
-NAMESPACE_NAME_TO_UNIQUE_NAME: t.Dict[str, str] = {
-    f'{x.namespace}:{x.name}':
-        x.uniqueName if x.uniqueName
-        else x.name
-        for x in STANDARD_PROPERTY_DESCRIPTIONS
-}
+def _namespaceName(prop: PropertyDescription) -> str:
+    return f'{prop.namespace}:{prop.name}'
 
-UNIQUE_NAME_TO_NAMESPACE_NAME: t.Dict[str, str] = {
-    x.uniqueName if x.uniqueName
-    else x.name:
-        f'{x.namespace}:{x.name}'
-        for x in STANDARD_PROPERTY_DESCRIPTIONS
-}
 
-UNIQUE_NAME_TO_PROPERTY_DESCRIPTION: t.Dict[str, PropertyDescription] = {
-    x.uniqueName if x.uniqueName
-    else x.name:
-        x for x in STANDARD_PROPERTY_DESCRIPTIONS
-}
+# The dictionaries:
+NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION: t.Dict[str, PropertyDescription] = {}
+for _x in STANDARD_PROPERTY_DESCRIPTIONS:
+    NAMESPACE_NAME_TO_PROPERTY_DESCRIPTION[_namespaceName(_x)] = _x
 
-UNIQUE_NAME_TO_VALUE_TYPE: t.Dict[str, t.Type] = {
-    x.uniqueName if x.uniqueName
-    else x.name:
-        x.valueType for x in STANDARD_PROPERTY_DESCRIPTIONS
-}
 
-MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME: t.Dict[str, str] = {
-    x.oldMusic21Abbrev if x.oldMusic21Abbrev
-    else '':
-        f'{x.namespace}:{x.name}'
-        for x in STANDARD_PROPERTY_DESCRIPTIONS
-        if x.oldMusic21Abbrev
-}
+NAMESPACE_NAME_TO_UNIQUE_NAME: t.Dict[str, str] = {}
+for _x in STANDARD_PROPERTY_DESCRIPTIONS:
+    NAMESPACE_NAME_TO_UNIQUE_NAME[_namespaceName(_x)] = _uniqueName(_x)
 
-MUSIC21_WORK_ID_TO_NAMESPACE_NAME: t.Dict[str, str] = {
-    x.oldMusic21WorkId if x.oldMusic21WorkId
-    else '':
-        f'{x.namespace}:{x.name}'
-        for x in STANDARD_PROPERTY_DESCRIPTIONS
-        if x.oldMusic21WorkId
-}
 
-MUSIC21_WORK_ID_TO_UNIQUE_NAME: t.Dict[str, str] = {
-    x.oldMusic21WorkId if x.oldMusic21WorkId
-    else '':
-        x.uniqueName if x.uniqueName
-        else x.name
-        for x in STANDARD_PROPERTY_DESCRIPTIONS
-        if x.oldMusic21WorkId
-}
+UNIQUE_NAME_TO_NAMESPACE_NAME: t.Dict[str, str] = {}
+for _x in STANDARD_PROPERTY_DESCRIPTIONS:
+    UNIQUE_NAME_TO_NAMESPACE_NAME[_uniqueName(_x)] = _namespaceName(_x)
 
-UNIQUE_NAME_TO_MUSIC21_WORK_ID: t.Dict[str, str] = {
-    x.uniqueName if x.uniqueName
-    else x.name:
-        x.oldMusic21WorkId if x.oldMusic21WorkId
-        else ''
-        for x in STANDARD_PROPERTY_DESCRIPTIONS
-        if x.oldMusic21WorkId
-}
+
+UNIQUE_NAME_TO_PROPERTY_DESCRIPTION: t.Dict[str, PropertyDescription] = {}
+for _x in STANDARD_PROPERTY_DESCRIPTIONS:
+    UNIQUE_NAME_TO_PROPERTY_DESCRIPTION[_uniqueName(_x)] = _x
+
+
+UNIQUE_NAME_TO_VALUE_TYPE: t.Dict[str, t.Type] = {}
+for _x in STANDARD_PROPERTY_DESCRIPTIONS:
+    UNIQUE_NAME_TO_VALUE_TYPE[_uniqueName(_x)] = _x.valueType
+
+
+MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME: t.Dict[str, str] = {}
+for _x in STANDARD_PROPERTY_DESCRIPTIONS:
+    if _x.oldMusic21Abbrev:
+        MUSIC21_ABBREVIATION_TO_NAMESPACE_NAME[_x.oldMusic21Abbrev] = _namespaceName(_x)
+
+
+MUSIC21_WORK_ID_TO_NAMESPACE_NAME: t.Dict[str, str] = {}
+for _x in STANDARD_PROPERTY_DESCRIPTIONS:
+    if _x.oldMusic21WorkId:
+        MUSIC21_WORK_ID_TO_NAMESPACE_NAME[_x.oldMusic21WorkId] = _namespaceName(_x)
+
+
+MUSIC21_WORK_ID_TO_UNIQUE_NAME: t.Dict[str, str] = {}
+for _x in STANDARD_PROPERTY_DESCRIPTIONS:
+    if _x.oldMusic21WorkId:
+        MUSIC21_WORK_ID_TO_UNIQUE_NAME[_x.oldMusic21WorkId] = _uniqueName(_x)
+
+
+UNIQUE_NAME_TO_MUSIC21_WORK_ID: t.Dict[str, str] = {}
+for _x in STANDARD_PROPERTY_DESCRIPTIONS:
+    if _x.oldMusic21WorkId:
+        UNIQUE_NAME_TO_MUSIC21_WORK_ID[_uniqueName(_x)] = _x.oldMusic21WorkId
 
 ALL_UNIQUE_NAMES: t.List[str] = list(UNIQUE_NAME_TO_NAMESPACE_NAME.keys())
 ALL_MUSIC21_WORK_IDS: t.List[str] = list(MUSIC21_WORK_ID_TO_NAMESPACE_NAME.keys())

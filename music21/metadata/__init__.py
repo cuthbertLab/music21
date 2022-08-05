@@ -380,96 +380,6 @@ class Metadata(base.Music21Object):
         '''
         self._set(name, value, isCustom=True)
 
-    def getAllNamedValues(self, skipContributors=False) -> t.Tuple[t.Tuple[str, ValueType], ...]:
-        '''
-        Returns all values stored in this metadata as a tuple of (name, value) tuples.
-        Names with multiple values will appear multiple times in the list (rather
-        than appearing once, with a value that is a list of values).
-        The tuple's first element (the name) is either of the form 'namespace:name', or a
-        custom name (with no form at all).
-
-        >>> md = metadata.Metadata()
-        >>> md.add('composer', 'Jeff Bowen')
-        >>> md.add('librettist', 'Hunter Bell')
-        >>> md.add('title', 'Other World')
-        >>> md.addCustom('excerpt-start-measure', 1234)
-        >>> allMd = md.getAllNamedValues()
-        >>> allMd
-        (('software', <music21.metadata.primitives.Text music21 v...>),
-         ('composer', <music21.metadata.primitives.Contributor composer:Jeff Bowen>),
-         ('librettist', <music21.metadata.primitives.Contributor librettist:Hunter Bell>),
-         ('title', <music21.metadata.primitives.Text Other World>),
-         ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>))
-        >>> allNonContributors = md.getAllNamedValues(skipContributors=True)
-        >>> allNonContributors
-        (('software', <music21.metadata.primitives.Text music21 v...>),
-         ('title', <music21.metadata.primitives.Text Other World>),
-         ('excerpt-start-measure', <music21.metadata.primitives.Text 1234>))
-        '''
-        allOut: t.List[t.Tuple[str, ValueType]] = []
-
-        valueList: t.List[ValueType]
-        for uniqueName, valueList in self._contents.items():
-            if skipContributors and self._isContributorUniqueName(uniqueName):
-                continue
-
-            value: ValueType
-            for value in valueList:
-                allOut.append((uniqueName, value))
-
-        return tuple(allOut)
-
-    def getAllContributorNamedValues(self) -> t.Tuple[t.Tuple[str, Contributor], ...]:
-        '''
-        Returns all contributors stored in this metadata as a tuple of (name, value) tuples.
-        The individual tuple's first element (the name) will be of the form 'namespace:name'.
-        Contributors with a custom role should have a uniqueName of 'otherContributor' (i.e.
-        a namespaceName of 'marcrel:CTB'), and have their `value.role` field set to the custom
-        role.
-
-        >>> md = metadata.Metadata()
-        >>> md['title'] = ['Dimitrij', 'False Dmitry']
-        >>> md.composer = 'Antonín Dvořák'
-        >>> md.opusNumber = 64
-        >>> md.add('librettist', 'Marie Červinková-Riegrová')
-        >>> md['otherContributor'] = (
-        ...     metadata.Contributor(
-        ...         role='based on plot by',
-        ...         name ='Ferdinand Mikovec'
-        ...     ),
-        ...     metadata.Contributor(
-        ...         role='original partial plot by',
-        ...         name='Friedrich Schiller'
-        ...     )
-        ... )
-        >>> md.addCustom('average duration', '180 minutes')
-
-        The non-contributor items (title, opusNumber, average duration) will not appear
-        in the returned list of all contributors.
-
-        >>> allContributors = md.getAllContributorNamedValues()
-        >>> allContributors
-        (('composer', <music21.metadata.primitives.Contributor composer:Antonín Dvořák>),
-         ('librettist',
-          <music21.metadata.primitives.Contributor librettist:Marie Červinková-Riegrová>),
-         ('otherContributor',
-          <music21.metadata.primitives.Contributor based on plot by:Ferdinand Mikovec>),
-         ('otherContributor',
-          <music21.metadata.primitives.Contributor original partial plot by:Friedrich Schiller>))
-        '''
-
-        allOut: t.List[t.Tuple[str, Contributor]] = []
-
-        for uniqueName, value in self._contents.items():
-            if not self._isContributorUniqueName(uniqueName):
-                continue
-
-            for v in value:
-                assert isinstance(v, Contributor)
-                allOut.append((uniqueName, v))
-
-        return tuple(allOut)
-
 # -----------------------------------------------------------------------------
 #   A few utility routines for clients calling public APIs
 
@@ -641,7 +551,10 @@ class Metadata(base.Music21Object):
          <music21.metadata.primitives.Contributor librettist:Oscar Wilde>)
         '''
         output: t.List[Contributor] = []
-        for _, contrib in self.getAllContributorNamedValues():
+        for _, contrib in self.all(
+                skipNonContributors=True,  # we only want the contributors
+                returnPrimitives=True,     # we want Contributor values
+                returnSorted=False):
             output.append(contrib)
         return tuple(output)
 
@@ -699,13 +612,31 @@ class Metadata(base.Music21Object):
         return self._getSingularAttribute('copyright')
 
     # SPECIAL METHODS #
-    def all(self, skipContributors: bool = False) -> t.Tuple[t.Tuple[str, t.Any], ...]:
+    def all(
+            self,
+            *,
+            skipContributors: bool = False,
+            skipNonContributors: bool = False,
+            returnPrimitives: bool = False,
+            returnSorted: bool = True
+    ) -> t.Tuple[t.Tuple[str, t.Any], ...]:
         # noinspection SpellCheckingInspection,PyShadowingNames
         '''
-        Returns all values stored in this metadata as a sorted Tuple of Tuple[str, str].
-        Each individual Tuple is (uniqueName, strValue).  Note that we cannot properly
-        type-hint the return value, since derived classes (such as RichMetadata) are
-        allowed to return their own typed values that might not be str.
+        Returns the values stored in this metadata as a Tuple of (uniqueName, value) pairs.
+        There are four bool options. The three that are new in v8 (skipNonContributors,
+        returnPrimitives, returnSorted) are defaulted to behave like v7.
+
+        If skipContributors is True, only non-contributor metadata will be returned.  If
+        skipNonContributors is True, only contributor metadata will be returned.  If both
+        of these are True, the returned Tuple will be empty. If returnPrimitives is False
+        (default), values are all converted to str.  If returnPrimitives is True, the values
+        will retain their original ValueType (e.g. Text, Contributor, Copyright, etc).  If
+        returnSorted is False, the returned Tuple will not be sorted by uniqueName (the
+        default behavior is to sort).
+
+        Note that we cannot properly type-hint the return value, since derived classes (such
+        as RichMetadata) are allowed to return their own typed values that might not be str
+        or ValueType.
 
         >>> c = corpus.parse('corelli/opus3no1/1grave')
         >>> c.metadata.all()
@@ -731,19 +662,44 @@ class Metadata(base.Music21Object):
          ('software', 'Dolet...'),
          ('software', 'Finale...'),
          ('software', 'music21 v...'))
+
+        >>> c.metadata.all(returnPrimitives=True, returnSorted=False)
+        (('software', <music21.metadata.primitives.Text music21 v.8.0.0a9>),
+         ('software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
+         ('software', <music21.metadata.primitives.Text Dolet Light for Finale 2014>),
+         ('movementName', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
+         ('composer', <music21.metadata.primitives.Contributor composer:Arcangelo Corelli>),
+         ('arranger', <music21.metadata.primitives.Contributor arranger:Michael Scott Cuthbert>),
+         ('copyright', <...Copyright © 2014, Creative Commons License (CC-BY)>),
+         ('filePath', <...Text ...corelli/opus3no1/1grave.xml>),
+         ('fileFormat', <music21.metadata.primitives.Text musicxml>),
+         ('dateCreated', <music21.metadata.primitives.DateRelative 1689/--/-- or earlier>),
+         ('localeOfComposition', <music21.metadata.primitives.Text Rome>))
+
+        >>> c.metadata.all(skipNonContributors=True, returnPrimitives=True, returnSorted=True)
+        (('arranger', <music21.metadata.primitives.Contributor arranger:Michael Scott Cuthbert>),
+         ('composer', <music21.metadata.primitives.Contributor composer:Arcangelo Corelli>))
         '''
-        allOut: t.List[t.Tuple[str, str]] = []
+        allOut: t.List[t.Tuple[str, t.Any]] = []
 
         valueList: t.List[ValueType]
         for uniqueName, valueList in self._contents.items():
-            if skipContributors and self._isContributorUniqueName(uniqueName):
+            isContributor: bool = self._isContributorUniqueName(uniqueName)
+            if skipContributors and isContributor:
+                continue
+            if skipNonContributors and not isContributor:
                 continue
 
             value: ValueType
             for value in valueList:
-                allOut.append((uniqueName, str(value)))
+                if returnPrimitives:
+                    allOut.append((uniqueName, value))
+                else:
+                    allOut.append((uniqueName, str(value)))
 
-        return tuple(sorted(allOut))
+        if returnSorted:
+            return tuple(sorted(allOut))
+        return tuple(allOut)
 
     def __getattr__(self, name):
         '''
@@ -875,28 +831,6 @@ class Metadata(base.Music21Object):
         if name in ('composers', 'librettists', 'lyricists'):
             uniqueName = name[:-1]  # remove the trailing 's'
             self._set(uniqueName, value, isCustom=False)
-            return
-
-        # Is name one of the new fileInfo attribute setters?
-        if name == 'fileFormat':
-            if value is None:
-                self.fileInfo.format = None
-            else:
-                self.fileInfo.format = Text(value)
-            return
-
-        if name == 'filePath':
-            if value is None:
-                self.fileInfo.path = None
-            else:
-                self.fileInfo.path = Text(value)
-            return
-
-        if name == 'fileNumber':
-            if value is None:
-                self.fileInfo.number = None
-            else:
-                self.fileInfo.number = int(value)
             return
 
         # OK, we've covered everything we know about; fall back to setting
@@ -1058,7 +992,10 @@ class Metadata(base.Music21Object):
         'Baron van Swieten'
         '''
         result: t.List[Contributor] = []  # there may be more than one per role
-        for _, contrib in self.getAllContributorNamedValues():
+        for _, contrib in self.all(
+                skipNonContributors=True,  # we only want the contributors
+                returnPrimitives=True,     # we want Contributor values
+                returnSorted=False):
             if contrib.role == role:
                 result.append(contrib)
         return tuple(result)
@@ -1184,7 +1121,10 @@ class Metadata(base.Music21Object):
 
         # now get all (or field-matched) contributor names, using contrib.role
         # as field name, so clients can search by custom contributor role.
-        for _, contrib in self.getAllContributorNamedValues():
+        for _, contrib in self.all(
+                skipNonContributors=True,  # we only want the contributors
+                returnPrimitives=True,     # we want Contributor values
+                returnSorted=False):
             if field is not None:
                 if contrib.role is None and field.lower() != 'contributor':
                     continue
@@ -1600,10 +1540,8 @@ class Metadata(base.Music21Object):
             titleSummary: t.Optional[str] = self._getStringValueByNamespaceName(
                 properties.UNIQUE_NAME_TO_NAMESPACE_NAME[uniqueName]
             )
-            if not titleSummary:  # get first matched
-                continue
-
-            return titleSummary
+            if titleSummary:
+                return titleSummary  # return first matched
 
         return None
 
@@ -2547,11 +2485,18 @@ class RichMetadata(Metadata):
                                     pitchHighest=self.pitchHighest,
                                     )
 
-    def all(self, skipContributors: bool = False) -> t.Tuple[t.Tuple[str, t.Any], ...]:
+    def all(
+            self,
+            *,
+            skipContributors: bool = False,
+            skipNonContributors: bool = False,
+            returnPrimitives: bool = False,
+            returnSorted: bool = True
+    ) -> t.Tuple[t.Tuple[str, t.Any], ...]:
         '''
-        Returns all values stored in this RichMetadata as a sorted Tuple of Tuples.
-        Each individual Metadata Tuple is (uniqueName, strValue) and each additional
-        RichMetadata tuple is (uniqueName, richAttributeValue).
+        Returns all values stored in this RichMetadata as a Tuple of Tuples.
+        Each individual Metadata Tuple is (uniqueName, value) and each additional
+        RichMetadata tuple is (name, richAttributeValue).
 
         >>> rmd = metadata.RichMetadata()
         >>> c = corpus.parse('corelli/opus3no1/1grave')
@@ -2580,6 +2525,7 @@ class RichMetadata(Metadata):
          ('tempoFirst', None), ('tempos', []),
          ('timeSignatureFirst', '4/4'),
          ('timeSignatures', ['4/4']))
+
         >>> rmd.dateCreated = metadata.DateRelative('1689', 'onOrBefore')
         >>> rmd.localeOfComposition = 'Rome'
         >>> rmd.all(skipContributors=True)
@@ -2588,103 +2534,61 @@ class RichMetadata(Metadata):
          ('copyright', '© 2014, Creative Commons License (CC-BY)'),
          ('dateCreated', '1689/--/-- or earlier'),
          ('fileFormat', 'musicxml'),
-         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
-         ('keySignatureFirst', -1),
+         ...
          ('keySignatures', [-1]),
          ('localeOfComposition', 'Rome'),
-         ('movementName',
-         'Sonata da Chiesa, No. I (opus 3, no. 1)'),
+         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'),
+         ...
+         ('timeSignatures', ['4/4']))
+
+        >>> rmd.all(returnPrimitives=True, returnSorted=False)
+        (('software', <music21.metadata.primitives.Text music21 v.8.0.0a9>),
+         ('software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
+         ('software', <music21.metadata.primitives.Text Dolet Light for Finale 2014>),
+         ('movementName', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
+         ('composer', <music21.metadata.primitives.Contributor composer:Arcangelo Corelli>),
+         ('arranger', <music21.metadata.primitives.Contributor arranger:Michael Scott Cuthbert>),
+         ('copyright', <...Copyright © 2014, Creative Commons License (CC-BY)>),
+         ('filePath', <...Text ...corelli/opus3no1/1grave.xml>),
+         ('fileFormat', <music21.metadata.primitives.Text musicxml>),
+         ('dateCreated', <music21.metadata.primitives.DateRelative 1689/--/-- or earlier>),
+         ('localeOfComposition', <music21.metadata.primitives.Text Rome>),
+         ('ambitus',
+          AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
+         ('keySignatureFirst', -1),
+         ('keySignatures', [-1]),
          ('noteCount', 259),
          ('numberOfParts', 3),
          ('pitchHighest', 'C6'),
          ('pitchLowest', 'C2'),
          ('quarterLength', 76.0),
-         ('software', 'Dolet Light for Finale 2014'),
-         ('software', 'Finale 2014 for Mac'),
-         ('software', 'music21 v.8...'),
          ('sourcePath', 'corelli/opus3no1/1grave.xml'),
          ('tempoFirst', None),
          ('tempos', []),
          ('timeSignatureFirst', '4/4'),
          ('timeSignatures', ['4/4']))
-        '''
-        allOut: t.List[t.Tuple[str, t.Any]] = list(super().all(skipContributors))
 
+        >>> rmd.all(skipNonContributors=True, returnPrimitives=True, returnSorted=True)
+        (('arranger', <music21.metadata.primitives.Contributor arranger:Michael Scott Cuthbert>),
+         ('composer', <music21.metadata.primitives.Contributor composer:Arcangelo Corelli>))
+        '''
+        allOut: t.List[t.Tuple[str, t.Any]] = list(super().all(
+            skipContributors=skipContributors,
+            skipNonContributors=skipNonContributors,
+            returnPrimitives=returnPrimitives,
+            returnSorted=returnSorted))
+
+        # All RichMetadata additions are considered non-contributors
+        if skipNonContributors:
+            # it's already sorted if requested
+            return tuple(allOut)
+
+        # Note that RichMetadata values do not pay attention to returnPrimitives.
         for name in self.additionalRichMetadataAttributes:
             allOut.append((name, getattr(self, name)))
 
-        return tuple(sorted(allOut))
-
-    def getAllNamedValues(self, skipContributors=False) -> t.Tuple[t.Tuple[str, ValueType], ...]:
-        '''
-        Returns all values stored in this RichMetadata as a tuple of (name, value) tuples.
-        Names with multiple values will appear multiple times in the list (rather
-        than appearing once, with a value that is a list of values).
-        The tuple's first element (the name) is either of the form 'namespace:name', or a
-        custom name (with no form at all).
-
-        >>> rmd = metadata.RichMetadata()
-        >>> c = corpus.parse('corelli/opus3no1/1grave')
-        >>> rmd.merge(c.metadata)
-        >>> rmd.update(c)
-        >>> all = rmd.getAllNamedValues()
-        >>> all
-        (('software', <music21.metadata.primitives.Text music21 v.8...>),
-         ('software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
-         ('software', <...Text Dolet Light for Finale 2014>),
-         ('movementName', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
-         ('composer', <...Contributor composer:Arcangelo Corelli>),
-         ('arranger',  <...Contributor arranger:Michael Scott Cuthbert>),
-         ('copyright', <...Copyright © 2014, Creative Commons License (CC-BY)>),
-         ('filePath', <...Text ...corpus/corelli/opus3no1/1grave.xml>),
-         ('fileFormat', <music21.metadata.primitives.Text musicxml>),
-         ('ambitus',
-            AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
-         ('keySignatureFirst', -1),
-         ('keySignatures', [-1]),
-         ('noteCount', 259),
-         ('numberOfParts', 3),
-         ('pitchHighest', 'C6'),
-         ('pitchLowest', 'C2'),
-         ('quarterLength', 76.0),
-         ('sourcePath', 'corelli/opus3no1/1grave.xml'),
-         ('tempoFirst', None),
-         ('tempos', []),
-         ('timeSignatureFirst', '4/4'),
-         ('timeSignatures', ['4/4']))
-
-        >>> allNonContributors = rmd.getAllNamedValues(skipContributors=True)
-        >>> allNonContributors
-        (('software', <music21.metadata.primitives.Text music21 v.8...>),
-         ('software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
-         ('software', <...Text Dolet Light for Finale 2014>),
-         ('movementName', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
-         ('copyright', <...Copyright © 2014, Creative Commons License (CC-BY)>),
-         ('filePath', <...Text ...corpus/corelli/opus3no1/1grave.xml>),
-         ('fileFormat', <music21.metadata.primitives.Text musicxml>),
-         ('ambitus',
-            AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
-         ('keySignatureFirst', -1),
-         ('keySignatures', [-1]),
-         ('noteCount', 259),
-         ('numberOfParts', 3),
-         ('pitchHighest', 'C6'),
-         ('pitchLowest', 'C2'),
-         ('quarterLength', 76.0),
-         ('sourcePath', 'corelli/opus3no1/1grave.xml'),
-         ('tempoFirst', None),
-         ('tempos', []),
-         ('timeSignatureFirst', '4/4'),
-         ('timeSignatures', ['4/4']))
-        '''
-        allOut: t.List[t.Tuple[str, ValueType]] = list(
-            super().getAllNamedValues(skipContributors)
-        )
-
-        for name in self.additionalRichMetadataAttributes:
-            value: ValueType = getattr(self, name)
-            allOut.append((name, value))
-
+        if returnSorted:
+            return tuple(sorted(allOut))
         return tuple(allOut)
 
     def _isStandardUniqueName(self, uniqueName: str) -> bool:
