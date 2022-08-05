@@ -207,6 +207,8 @@ class ChordBase(note.NotRest):
         as can use it -- it's all an optimization step to create as few duration objects
         as is necessary.
 
+        Does not clear any caches.
+
         Also requires that notes be iterable.
         '''
         # quickDuration specifies whether the duration object for the chord
