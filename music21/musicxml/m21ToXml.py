@@ -3425,13 +3425,10 @@ class MeasureExporter(XMLExporterBase):
                 continue
             if su.type == 'non-arpeggio':
                 # <non-arpeggiate> goes only on top and bottom note in chord
-                if not foundTopAndBottom:
-                    topNoteIndex, bottomNoteIndex = self.topAndBottomIndices(obj)
-                    foundTopAndBottom = True
-                if bottomNoteIndex == noteIndexInChord:
+                if noteIndexInChord == 0:
                     mxArpeggio = Element('non-arpeggiate')
                     mxArpeggio.set('type', 'bottom')
-                elif topNoteIndex == noteIndexInChord:
+                elif noteIndexInChord == len(obj.notes):
                     mxArpeggio = Element('non-arpeggiate')
                     mxArpeggio.set('type', 'top')
             else:
@@ -4136,6 +4133,9 @@ class MeasureExporter(XMLExporterBase):
         </note>
         '''
         mxNoteList = []
+        if isinstance(c, chord.Chord):
+            c.sortAscending()
+
         for i, n in enumerate(c):
             if 'Unpitched' in n.classSet:
                 mxNoteList.append(self.unpitchedToXml(n, noteIndexInChord=i, chordParent=c))
@@ -4450,23 +4450,21 @@ class MeasureExporter(XMLExporterBase):
             mxNotehead.set('color', color)
         return mxNotehead
 
-    @staticmethod
-    def topAndBottomIndices(chordOrNote) -> t.Tuple[int, int]:
-        # Use sortAscending if you can, assume ascending if you can't.
-        # If chordOrNote is a note (not expected, but possible), (0, 0) will be returned.
-        # It would be nice if PercussionChord could sortAscending (ascending on the
-        # staff, that is)...
-        top: int = len(chordOrNote.notes)
-        bottom: int = 0
+    def arpeggioMarkToMxExpression(self, arpeggioMark, chordOrNote, noteIndexInChord):
+        mxExpression = None
+        if arpeggioMark.type == 'non-arpeggio':
+            # <non-arpeggiate> goes on top and bottom note in chord
+            if noteIndexInChord == 0:
+                mxExpression = self.expressionToXml(arpeggioMark)
+                mxExpression.set('type', 'bottom')
+            elif noteIndexInChord == len(chordOrNote.notes) - 1:
+                mxExpression = self.expressionToXml(arpeggioMark)
+                mxExpression.set('type', 'top')
+        else:
+            # <arpeggiate> goes on every note in the chord
+            mxExpression = self.expressionToXml(arpeggioMark)
+        return mxExpression
 
-        if isinstance(chordOrNote, chord.Chord):
-            ascendingChord = chordOrNote.sortAscending(inPlace=False)
-            topNote = ascendingChord.notes[-1]
-            bottomNote = ascendingChord.notes[0]
-            top = chordOrNote.notes.index(topNote)
-            bottom = chordOrNote.notes.index(bottomNote)
-
-        return top, bottom
 
     def noteToNotations(self, n, noteIndexInChord=0, chordParent=None):
         '''
@@ -4488,26 +4486,12 @@ class MeasureExporter(XMLExporterBase):
             chordOrNote = chordParent
 
         # apply all expressions apart from arpeggios only to the first note of a chord.
-        topNoteIndex: int
-        bottomNoteIndex: int
-        foundTopAndBottom = False
         for expObj in chordOrNote.expressions:
             mxExpression = None
             if isinstance(expObj, expressions.ArpeggioMark):
-                if expObj.type == 'non-arpeggio':
-                    # <non-arpeggiate> goes on top and bottom note in chord
-                    if not foundTopAndBottom:
-                        topNoteIndex, bottomNoteIndex = self.topAndBottomIndices(chordOrNote)
-                        foundTopAndBottom = True
-                    if bottomNoteIndex == noteIndexInChord:
-                        mxExpression = self.expressionToXml(expObj)
-                        mxExpression.set('type', 'bottom')
-                    elif topNoteIndex == noteIndexInChord:
-                        mxExpression = self.expressionToXml(expObj)
-                        mxExpression.set('type', 'top')
-                else:
-                    # <arpeggiate> goes on every note in the chord
-                    mxExpression = self.expressionToXml(expObj)
+                mxExpression = self.arpeggioMarkToMxExpression(
+                    expObj, chordOrNote, noteIndexInChord
+                )
                 if mxExpression is None:
                     # the ArpeggioMark is not applicable on this note.
                     continue
