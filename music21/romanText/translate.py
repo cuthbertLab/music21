@@ -402,19 +402,25 @@ class PartTranslator:
             self.translateMeasureLineToken(lineToken)
 
         elif lineToken.isTitle():
-            md.title = lineToken.data
+            md.add('title', lineToken.data)
 
         elif lineToken.isWork():
-            md.alternativeTitle = lineToken.data
+            md.add('alternativeTitle', lineToken.data)
 
         elif lineToken.isPiece():
-            md.alternativeTitle = lineToken.data
+            md.add('alternativeTitle', lineToken.data)
 
         elif lineToken.isComposer():
-            md.composer = lineToken.data
+            md.add('composer', lineToken.data)
 
         elif lineToken.isMovement():
-            md.movementNumber = lineToken.data
+            md.add('movementNumber', lineToken.data)
+
+        elif lineToken.isAnalyst():
+            md.add('analyst', lineToken.data)
+
+        elif lineToken.isProofreader():
+            md.add('proofreader', lineToken.data)
 
         elif lineToken.isTimeSignature():
             try:

@@ -5,10 +5,13 @@
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
+#               Greg Chapman
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21
+# Copyright:    Copyright © 2010-22 Michael Scott Asato Cuthbert and the music21
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import datetime
 import os
 import unittest
@@ -40,6 +43,7 @@ __all__ = [
 environLocal = environment.Environment(os.path.basename(__file__))
 
 
+
 # -----------------------------------------------------------------------------
 
 
@@ -56,7 +60,7 @@ class Date(prebase.ProtoM21Object):
     Additionally, each value can be specified as `uncertain` or `approximate`;
     if None, assumed to be certain.
 
-    Data objects are fundamental components of
+    Date objects are fundamental components of
     :class:`~music21.metadata.DateSingle` and related subclasses that represent
     single dates and date ranges.
 
@@ -114,6 +118,9 @@ class Date(prebase.ProtoM21Object):
                 setattr(self, attr, keywords[attr])
 
     # SPECIAL METHODS #
+    def __eq__(self, other) -> bool:
+        return str(self) == str(other)
+
     def __str__(self):
         r'''
         Return a string representation, including error if defined.
@@ -292,6 +299,11 @@ class Date(prebase.ProtoM21Object):
         >>> d.minute, d.second
         (50, 32)
         '''
+        def intOrNone(inner_value: str) -> t.Optional[int]:
+            if not inner_value or inner_value == '--':
+                return None
+            return int(inner_value)
+
         post = []
         postError = []
         dateStr = dateStr.replace(':', '/')
@@ -302,7 +314,7 @@ class Date(prebase.ProtoM21Object):
             postError.append(error)
         # as error is stripped, we can now convert to numbers
         if post and post[0] != '':
-            post = [int(x) for x in post]
+            post = [intOrNone(x) for x in post]
         # assume in order in post list
         for i in range(len(self.attrNames)):
             if len(post) > i:  # only assign for those specified
@@ -440,6 +452,23 @@ class DateSingle(prebase.ProtoM21Object):
         self.relevance = relevance  # will use property
 
     # SPECIAL METHODS #
+
+    def __eq__(self, other) -> bool:
+        '''
+        >>> dd = metadata.DateSingle('1805/3/12', 'uncertain')
+        >>> dd2 = metadata.DateSingle('1805/3/12', 'uncertain')
+        >>> str(dd)
+        '1805/03/12'
+        >>> dd == dd2
+        True
+        >>> dd2.relevance='certain'
+        >>> dd == dd2
+        False
+        '''
+        return (type(self) is type(other)
+                    and self._data == other._data
+                    and self._dataError == other._dataError
+                    and self.relevance == other.relevance)
 
     def _reprInternal(self) -> str:
         return str(self)
@@ -713,6 +742,8 @@ class DateSelection(DateSingle):
 # -----------------------------------------------------------------------------
 
 
+# This was enhanced in music21 v8 to add an optional encoding scheme (e.g. URI, DCMIPoint,
+# etc) as well as whether the text is translated, or in the original language.
 class Text(prebase.ProtoM21Object):
     r'''
     One unit of text data: a title, a name, or some other text data. Store the
@@ -728,14 +759,22 @@ class Text(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, data='', language=None):
-        if isinstance(data, type(self)):  # if this is a Text obj, get data
+    def __init__(self,
+                 data: t.Union[str, 'Text'] = '',
+                 language: t.Optional[str] = None,
+                 isTranslated: t.Optional[bool] = None,   # True, False, or None (unknown)
+                 encodingScheme: t.Optional[str] = None):
+        if isinstance(data, Text):
             # accessing private attributes here; not desirable
-            self._data = data._data
-            self._language = data._language
+            self._data: t.Union[str, Text] = data._data
+            self._language: t.Optional[str] = data._language
+            self.isTranslated: t.Optional[bool] = data.isTranslated
+            self.encodingScheme: t.Optional[str] = data.encodingScheme
         else:
             self._data = data
             self._language = language
+            self.isTranslated = isTranslated
+            self.encodingScheme = encodingScheme
 
     # SPECIAL METHODS #
 
@@ -749,6 +788,56 @@ class Text(prebase.ProtoM21Object):
 
     def _reprInternal(self):
         return str(self)
+
+    def __eq__(self, other) -> bool:
+        '''
+        >>> t1 = metadata.Text('some text')
+        >>> t2 = metadata.Text('some text')
+        >>> t1 == t2
+        True
+
+        Language, isTranslated, and encodingScheme must all exactly match for equality.
+
+        >>> t2 = metadata.Text('some text', language='en')
+        >>> t1 == t2
+        False
+        >>> t2 = metadata.Text('some text', isTranslated=True)
+        >>> t1 == t2
+        False
+        >>> t2 = metadata.Text('some text', encodingScheme='scheme42')
+        >>> t1 == t2
+        False
+
+        Comparison with non-Text types, including bare strings,
+        will always be considered unequal.
+
+        >>> t1 == 'some text'
+        False
+        '''
+        if type(other) is not type(self):
+            return False
+        if self._data != other._data:
+            return False
+        if self.language != other.language:
+            return False
+        if self.isTranslated != other.isTranslated:
+            return False
+        if self.encodingScheme != other.encodingScheme:
+            return False
+        return True
+
+
+    def __lt__(self, other):
+        '''
+        Allows for alphabetically sorting two elements
+        '''
+        if type(other) is not type(self):
+            return NotImplemented
+        return (
+            (self._data, self.language, self.isTranslated, self.encodingScheme)
+            < (other._data, other.language, other.isTranslated, other.encodingScheme)
+        )
+
 
     # PUBLIC PROPERTIES #
 
@@ -797,19 +886,58 @@ class Copyright(Text):
     '''
     A subclass of text that can also have a role
 
-    >>> copyleft = metadata.primitives.Copyright('Copyright 1969 Cuthbert',
-    ...                role='fictitious')
-    >>> copyleft
-    <music21.metadata.primitives.Copyright Copyright 1969 Cuthbert>
-    >>> copyleft.role
-    'fictitious'
-    >>> str(copyleft)
-    'Copyright 1969 Cuthbert'
+    >>> c = metadata.primitives.Copyright('Copyright 1945 Florence Price')
+    >>> c
+    <music21.metadata.primitives.Copyright Copyright 1945 Florence Price>
+    >>> c.role is None
+    True
+    >>> str(c)
+    'Copyright 1945 Florence Price'
+
+    The text, language, isTranslated, role, etc. must be identical for equality.
+
+    >>> c2 = metadata.Copyright('Copyright 1945 Florence Price')
+    >>> c == c2
+    True
+    >>> c2 = metadata.Copyright('Copyright © 1945 Florence Price')
+    >>> c == c2
+    False
+    >>> c2 = metadata.Copyright('Copyright 1945 Florence Price', language='en')
+    >>> c == c2
+    False
+    >>> c2 = metadata.Copyright('Copyright 1945 Florence Price', isTranslated=True)
+    >>> c == c2
+    False
+    >>> c2 = metadata.Copyright('Copyright 1945 Florence Price', role='other')
+    >>> c == c2
+    False
+
+    Comparison against a non-Copyright object will always return False.
+
+    >>> c == 1945
+    False
     '''
 
-    def __init__(self, data='', language=None, *, role=None):
-        super().__init__(data, language)
+    def __init__(self,
+                 data: t.Union[str, 'Text'] = '',
+                 language: t.Optional[str] = None,
+                 isTranslated: t.Optional[bool] = None,   # True, False, or None (unknown)
+                 *, role=None):
+        super().__init__(data, language, isTranslated)
         self.role = role
+
+    def __eq__(self, other) -> bool:
+        if type(other) is not type(self):
+            return False
+        if self._data != other._data:
+            return False
+        if self.language != other.language:
+            return False
+        if self.isTranslated != other.isTranslated:
+            return False
+        if self.role != other.role:
+            return False
+        return True
 
 
 # -----------------------------------------------------------------------------
@@ -879,7 +1007,7 @@ class Contributor(prebase.ProtoM21Object):
             self.role = None
         # a list of Text objects to support various spellings or
         # language translations
-        self._names = []
+        self._names: t.List[Text] = []
         if 'name' in keywords:  # a single
             self._names.append(Text(keywords['name']))
         if 'names' in keywords:  # many
@@ -905,9 +1033,89 @@ class Contributor(prebase.ProtoM21Object):
     def _reprInternal(self):
         return f'{self.role}:{self.name}'
 
+    def __str__(self):
+        if not self.name:
+            return ''
+        return self.name
+
+    def __eq__(self, other) -> bool:
+        '''
+        >>> c1 = metadata.Contributor(
+        ...         role='composer',
+        ...         name='The Composer',
+        ...         birth='1923',
+        ...         death='2013'
+        ... )
+        >>> c2 = metadata.Contributor(
+        ...         role='composer',
+        ...         name='The Composer',
+        ...         birth='1923',
+        ...         death='2013'
+        ... )
+
+        Names, role, birth, and death must all be identical for equality.
+
+        >>> c1 == c2
+        True
+        >>> c2.role = 'lyricist'
+        >>> c1 == c2
+        False
+        >>> c2 = metadata.Contributor(
+        ...         role='composer',
+        ...         name='A Composer',
+        ...         birth='1923',
+        ...         death='2013'
+        ... )
+        >>> c1 == c2
+        False
+        >>> c2 = metadata.Contributor(
+        ...         role='composer',
+        ...         names=['A Composer', 'The Composer'],
+        ...         birth='1923',
+        ...         death='2013'
+        ... )
+        >>> c1 == c2
+        False
+        >>> c2 = metadata.Contributor(
+        ...         role='composer',
+        ...         name='The Composer',
+        ...         birth='1924',
+        ...         death='2013'
+        ... )
+        >>> c1 == c2
+        False
+        >>> c2 = metadata.Contributor(
+        ...         role='composer',
+        ...         name='The Composer',
+        ...         birth='1923',
+        ...         death='2012'
+        ... )
+        >>> c1 == c2
+        False
+
+        Comparison with a non-Contributor object always returns False.
+
+        >>> c1 == 'The Composer'
+        False
+        '''
+        if type(other) is not type(self):
+            return False
+        if self._role != other._role:
+            return False
+        if len(self._names) != len(other._names):
+            return False
+        for name, otherName in zip(sorted(self._names), sorted(other._names)):
+            if name != otherName:
+                return False
+        if self.birth != other.birth:
+            return False
+        if self.death != other.death:
+            return False
+        return True
+
     # PUBLIC METHODS #
 
-    def age(self) -> t.Optional[DateSingle]:
+    def age(self) -> t.Optional[datetime.timedelta]:
         r'''
         Calculate the age at death of the Contributor, returning a
         datetime.timedelta object.
@@ -1275,7 +1483,12 @@ _DOC_ORDER = (
     DateBetween,
     DateSelection,
     Contributor,
+    Copyright,
 )
+
+
+ValueType = t.Union[DateSingle, DateRelative, DateBetween, DateSelection,
+                    Text, Contributor, Copyright, int]
 
 
 if __name__ == '__main__':

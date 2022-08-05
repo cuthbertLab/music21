@@ -362,17 +362,33 @@ def listSearchFields():
     >>> for field in corpus.manager.listSearchFields():
     ...     field
     ...
-    'actNumber'
-    'alternativeTitle'
-    'ambitus'
-    'associatedWork'
-    'collectionDesignation'
-    'commission'
+    'abstract'
+    'accessRights'
+    'accompanyingMaterialWriter'
+    ...
     'composer'
-    'copyright'
+    'composerAlias'
+    'composerCorporate'
+    'conceptor'
+    'conductor'
+    ...
+    'dateCreated'
+    'dateFirstPublished'
+    'dateIssued'
+    'dateModified'
+    'dateSubmitted'
+    'dateValid'
+    ...
+    'tempoFirst'
+    'tempos'
+    'textLanguage'
+    'textOriginalLanguage'
+    'timeSignatureFirst'
+    'timeSignatures'
+    'title'
     ...
     '''
-    return tuple(sorted(metadata.RichMetadata.searchAttributes))
+    return metadata.bundles.MetadataBundle.listSearchFields()
 
 # -----------------------------------------------------------------------------
 

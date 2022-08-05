@@ -123,6 +123,8 @@ class RnWriter(prebase.ProtoM21Object):
 
         self.composer = 'Composer unknown'
         self.title = 'Title unknown'
+        self.analyst = ''
+        self.proofreader = ''
         self.combinedList: t.List[str] = []
         self.container: t.Union[stream.Part, stream.Score]
 
@@ -156,16 +158,19 @@ class RnWriter(prebase.ProtoM21Object):
                 self.prepTitle(obj.metadata)
                 if obj.metadata.composer:
                     self.composer = obj.metadata.composer
+                if obj.metadata.analyst:
+                    self.analyst = obj.metadata.analyst
+                if obj.metadata.proofreader:
+                    self.proofreader = obj.metadata.proofreader
 
         else:  # Not a stream
             self.container = self._makeContainer([obj])
 
         self.combinedList = [f'Composer: {self.composer}',
                              f'Title: {self.title}',
-                             'Analyst: ',
-                             'Proofreader: ',
+                             f'Analyst: {self.analyst}',
+                             f'Proofreader: {self.proofreader}',
                              '']  # One blank line between metadata and analysis
-        # Note: blank analyst and proofreader entries until supported within music21 metadata
 
         if not self.container[meter.TimeSignature]:
             self.container.insert(0, meter.TimeSignature('4/4'))  # Placeholder
@@ -211,8 +216,8 @@ class RnWriter(prebase.ProtoM21Object):
 
         workingTitle = []
 
-        if md.title:
-            workingTitle.append(md.title)
+        if md.bestTitle:
+            workingTitle.append(md.bestTitle)
         if md.movementNumber:
             workingTitle.append(f'- No.{md.movementNumber}:')  # Spaces later
         if md.movementName:
