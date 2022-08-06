@@ -177,10 +177,11 @@ class ChordBase(note.NotRest):
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
         # noinspection PyProtectedMember
-        for d in new._notes:
+        for n in new._notes:
+            n._chordAttached = new
             # if .volume is called, a new Volume obj will be created
-            if d.hasVolumeInformation():
-                d.volume.client = new  # update with new instance
+            if n.hasVolumeInformation():
+                n.volume.client = new  # update with new instance
         return new
 
     # TODO: __getitem__
@@ -1447,7 +1448,7 @@ class Chord(ChordBase):
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave,
+        forceOctave: t.Optional[int],
         inPlace: t.Literal[True],
         leaveRedundantPitches=False
     ) -> None:
@@ -1457,18 +1458,18 @@ class Chord(ChordBase):
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave=None,
+        forceOctave: t.Optional[int] = None,
         inPlace: t.Literal[False] = False,
-        leaveRedundantPitches=False
+        leaveRedundantPitches: bool = False
     ) -> _ChordType:
         return self
 
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave=None,
-        inPlace=False,
-        leaveRedundantPitches=False
+        forceOctave: t.Optional[int] = None,
+        inPlace: t.Union[t.Literal[True], t.Literal[False]] = False,
+        leaveRedundantPitches: bool = False
     ) -> t.Optional[_ChordType]:
         '''
         Returns a new Chord object with the same pitch classes,
@@ -3939,7 +3940,33 @@ class Chord(ChordBase):
         else:
             return None
 
-    def semiClosedPosition(self, *, forceOctave=None, inPlace=False, leaveRedundantPitches=False):
+    @overload
+    def semiClosedPosition(
+        self: _ChordType,
+        *,
+        forceOctave,
+        inPlace: t.Literal[True],
+        leaveRedundantPitches=False
+    ) -> None:
+        return None
+
+    @overload
+    def semiClosedPosition(
+        self: _ChordType,
+        *,
+        forceOctave=None,
+        inPlace: t.Literal[False] = False,
+        leaveRedundantPitches=False
+    ) -> _ChordType:
+        return self
+
+    def semiClosedPosition(
+        self: _ChordType,
+        *,
+        forceOctave: t.Optional[int] = None,
+        inPlace: t.Union[t.Literal[True], t.Literal[False]] = False,
+        leaveRedundantPitches: bool = False
+    ) -> t.Union[None, _ChordType]:
         # noinspection PyShadowingNames
         '''
         Similar to :meth:`~music21.chord.Chord.ClosedPosition` in that it
@@ -3973,7 +4000,8 @@ class Chord(ChordBase):
 
         '''
         c2 = self.closedPosition(forceOctave=forceOctave,
-                                 inPlace=inPlace, leaveRedundantPitches=leaveRedundantPitches)
+                                 inPlace=inPlace,
+                                 leaveRedundantPitches=leaveRedundantPitches)
         if inPlace is True:
             c2 = self
         # startOctave = c2.bass().octave
@@ -3990,6 +4018,7 @@ class Chord(ChordBase):
                     newRemainingPitches.append(p)
             remainingPitches = newRemainingPitches
 
+        c2.clearCache()
         c2.sortAscending(inPlace=True)
 
         if inPlace is False:
@@ -4005,7 +4034,7 @@ class Chord(ChordBase):
         does not change the Chord.root object.  We use these methods to figure
         out what the root of the triad is.
 
-        Currently there is a bug that in the case of a triply diminished third
+        Currently, there is a bug that in the case of a triply diminished third
         (e.g., "c" => "e----"), this function will incorrectly claim no third
         exists.  Perhaps this should be construed as a feature.
 
@@ -4535,6 +4564,7 @@ class Chord(ChordBase):
         Changed in v.6 -- if inPlace is True do not return anything.
         '''
         if inPlace:
+            # not until pitches inform notes which inform chords when they change.
             if self._cache.get('isSortedAscendingDiatonic', False):
                 return None
             returnObj = self
@@ -5474,7 +5504,7 @@ class Chord(ChordBase):
         >>> c2a.pitchedCommonName
         'Cb-major triad'
 
-        Other forms might have the pitch elsewhere.  Thus this is a method for display,
+        Other forms might have the pitch elsewhere.  Thus, this is a method for display,
         not for extracting information:
 
         >>> c3 = chord.Chord('A#2 D3 F3')

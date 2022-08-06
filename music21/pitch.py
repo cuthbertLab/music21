@@ -864,7 +864,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         '_displayType',
         '_modifier',
         '_name',
-        '_client',
+        'client',
         'displayLocation',
         'displaySize',
         'displayStyle',
@@ -897,7 +897,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         self.displayLocation = 'normal'
 
         # store a reference to the object that has this duration object as a property
-        self._client: t.Optional['Pitch'] = None
+        self.client: t.Optional['Pitch'] = None
         self._name = ''
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step
@@ -1178,22 +1178,21 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
                 raise AccidentalException(f'{name} is not a supported accidental type')
 
         self._modifier = accidentalNameToModifier[self._name]
-        if self._client is not None:
-            self._client.informClient()
+        if self.client is not None:
+            self.client.informClient()
 
 
     def isTwelveTone(self):
-        '''Return a boolean if this Accidental describes a twelve-tone pitch.
+        '''
+        Return a boolean if this Accidental describes a twelve-tone, non-microtonal pitch.
 
-
-        >>> a = pitch.Accidental('~')
+        >>> a = pitch.Accidental('half-flat')
         >>> a.isTwelveTone()
         False
 
         >>> a = pitch.Accidental('###')
         >>> a.isTwelveTone()
         True
-
         '''
         if self.name in ('half-sharp', 'one-and-a-half-sharp',
                          'half-flat', 'one-and-a-half-flat'):
@@ -1239,8 +1238,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         privateAttrName = '_' + attribute
         setattr(self, privateAttrName, value)
-        if self._client is not None:
-            self._client.informClient()
+        if self.client is not None:
+            self.client.informClient()
 
     # --------------------------------------------------------------------------
     def inheritDisplay(self, other):
@@ -1831,7 +1830,7 @@ class Pitch(prebase.ProtoM21Object):
         self.fundamental: t.Optional['Pitch'] = None
 
         # so that we can tell clients about changes in pitches.
-        self._client: t.Optional['music21.note.Note'] = None
+        self.client: t.Optional['music21.note.Note'] = None
 
         # name combines step, octave, and accidental
         if name is not None:
@@ -1930,15 +1929,18 @@ class Pitch(prebase.ProtoM21Object):
         highly optimized -- it knows exactly what can only have a scalar value and
         just sets that directly, only running deepcopy on the other bits.
 
-        And _client should NOT be deepcopied.
+        And client should NOT be deepcopied.  In fact, it is cleared to nothing.
+        deepcopy of note will set it back.
         '''
         if type(self) is Pitch:  # pylint: disable=unidiomatic-typecheck
             new = Pitch.__new__(Pitch)
             for k in self.__dict__:
                 v = getattr(self, k, None)
                 if k in ('_step', '_overridden_freq440', 'defaultOctave',
-                         '_octave', 'spellingIsInferred', '_client'):
+                         '_octave', 'spellingIsInferred'):
                     setattr(new, k, v)
+                elif k == 'client':
+                    setattr(new, k, None)
                 else:
                     setattr(new, k, copy.deepcopy(v, memo))
             return new
@@ -2263,7 +2265,7 @@ class Pitch(prebase.ProtoM21Object):
     @property
     def alter(self) -> float:
         '''
-        Get or set the number of half-steps shifted
+        Get the number of half-steps shifted
         by this pitch, such as 1.0 for a sharp, -1.0 for a flat,
         0.0 for a natural, 2.0 for a double sharp,
         and -0.5 for a quarter tone flat.
@@ -2277,6 +2279,9 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.microtone = -25  # in cents
         >>> p.alter
         0.75
+
+        To change the alter value, change either the accidental
+        or the microtone.
         '''
         post = 0.0
         if self.accidental is not None:
@@ -2334,6 +2339,8 @@ class Pitch(prebase.ProtoM21Object):
 
         if not inPlace:
             return returnObj
+        else:
+            self.informClient()
 
     def convertMicrotonesToQuarterTones(self, *, inPlace=False):
         '''
@@ -2379,6 +2386,8 @@ class Pitch(prebase.ProtoM21Object):
 
         if not inPlace:
             return returnObj
+        else:
+            self.informClient()
 
     # --------------------------------------------------------------------------
 
@@ -2603,7 +2612,7 @@ class Pitch(prebase.ProtoM21Object):
                 value += 12
         elif value < 0:
             value = 0 + (value % 12)  # lowest oct plus modulus
-        self.ps = value
+        self.ps = value  # will inform client.
 
         # all midi settings must set implicit to True, as we do not know
         # what accidental this is
@@ -2863,6 +2872,7 @@ class Pitch(prebase.ProtoM21Object):
             self.spellingIsInferred = False
         else:
             raise PitchException(f'Cannot make a step out of {usrStr!r}')
+        self.informClient()
 
     @property
     def pitchClass(self) -> int:
@@ -2975,6 +2985,7 @@ class Pitch(prebase.ProtoM21Object):
 
         # do not know what accidental is
         self.spellingIsInferred = True
+        # setting step informs client
 
     @property
     def pitchClassString(self) -> str:
@@ -3038,6 +3049,7 @@ class Pitch(prebase.ProtoM21Object):
             self._octave = int(value)
         else:
             self._octave = None
+        self.informClient()
 
     @property
     def implicitOctave(self) -> int:
@@ -3052,7 +3064,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.implicitOctave
         4
 
-        Cannot be set.  Instead just change the `.octave` of the pitch
+        Cannot be set.  Instead, just change the `.octave` of the pitch
         '''
         if self.octave is None:
             return self.defaultOctave
@@ -4171,8 +4183,8 @@ class Pitch(prebase.ProtoM21Object):
         '''
         if this pitch is attached to a note, then let it know that it has changed.
         '''
-        if self._client is not None:
-            self._client.pitchChanged()
+        if self.client is not None:
+            self.client.pitchChanged()
 
 
     def getAllCommonEnharmonics(self: PitchType, alterLimit: int = 2) -> t.List[PitchType]:

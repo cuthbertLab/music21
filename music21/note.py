@@ -1434,7 +1434,7 @@ class Note(NotRest):
             self.pitch = pitch.Pitch(name, **keywords)
 
         # noinspection PyProtectedMember
-        self.pitch._client = self
+        self.pitch.client = self
 
     # --------------------------------------------------------------------------
     # operators, representations, and transformations
@@ -1532,6 +1532,14 @@ class Note(NotRest):
             return self.pitch >= other.pitch
         except AttributeError:
             return NotImplemented
+
+    def __deepcopy__(self, memo=None):
+        '''
+        After doing a deepcopy of the pitch, be sure to set the client
+        '''
+        new = super().__deepcopy__(memo=memo)
+        new.pitch.client = new
+        return new
 
     # --------------------------------------------------------------------------
     # property access
