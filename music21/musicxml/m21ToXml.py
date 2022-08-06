@@ -3410,7 +3410,7 @@ class MeasureExporter(XMLExporterBase):
           <tremolo type="stop">3</tremolo>
         </ornaments>
         '''
-        notations = []
+        notations: t.List[Element] = []
         if objectSpannerBundle is not None:
             sb = objectSpannerBundle
         else:
