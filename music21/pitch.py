@@ -4184,7 +4184,7 @@ class Pitch(prebase.ProtoM21Object):
         if this pitch is attached to a note, then let it know that it has changed.
         '''
         if self.client is not None:
-            self.client.pitchChanged()
+            self.client.pitchChanged()  # pylint: disable=no-member
 
 
     def getAllCommonEnharmonics(self: PitchType, alterLimit: int = 2) -> t.List[PitchType]:
