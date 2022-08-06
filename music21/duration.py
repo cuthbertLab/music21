@@ -1601,7 +1601,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         self._unlinkedType: t.Optional[str] = None
         self._dotGroups: t.Tuple[int, ...] = (0,)
-        self._tuplets: t.Union[t.Tuple['Tuplet', ...], t.Tuple] = ()  # an empty tuple
+        self._tuplets: t.Tuple['Tuplet', ...] = ()  # an empty tuple
         self._qtrLength: OffsetQL = 0.0
 
         # DurationTuples go here
