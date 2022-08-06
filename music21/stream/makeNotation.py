@@ -2045,6 +2045,8 @@ def consolidateCompletedTuplets(
                 if gn.duration.tuplets:
                     partial_tuplet_sum = gn.quarterLength
                     last_tuplet = gn.duration.tuplets[0]
+                    if t.TYPE_CHECKING:
+                        assert last_tuplet is not None
                     completion_target = last_tuplet.totalTupletLength()
                     to_consolidate = [gn]
                 else:
