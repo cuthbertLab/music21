@@ -59,7 +59,7 @@ class PercussionChord(chord.ChordBase):
 
 
     @property
-    def notes(self) -> t.Tuple[note.NotRest]:
+    def notes(self) -> t.Tuple[note.NotRest, ...]:
         return tuple(self._notes)
 
     @notes.setter
@@ -80,12 +80,13 @@ class PercussionChord(chord.ChordBase):
 
         allNotes = []
         for thisNote in self.notes:
-            if hasattr(thisNote, 'nameWithOctave'):
+            if isinstance(thisNote, note.Note):
                 allNotes.append(thisNote.nameWithOctave)
-            elif thisNote.storedInstrument:
-                allNotes.append(str(thisNote.storedInstrument.instrumentName))
-            else:
-                allNotes.append(f'unpitched[{thisNote.displayName}]')
+            elif isinstance(thisNote, note.Unpitched):
+                if thisNote.storedInstrument:
+                    allNotes.append(str(thisNote.storedInstrument.instrumentName))
+                else:
+                    allNotes.append(f'unpitched[{thisNote.displayName}]')
 
         return '[' + ' '.join(allNotes) + ']'
 

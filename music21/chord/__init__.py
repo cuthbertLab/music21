@@ -5185,7 +5185,7 @@ class Chord(ChordBase):
         return len(self.pitchClasses)
 
     @property
-    def notes(self) -> t.Tuple[note.Note]:
+    def notes(self) -> t.Tuple[note.Note, ...]:
         '''
         Return a tuple (immutable) of the notes contained in the chord.
 
