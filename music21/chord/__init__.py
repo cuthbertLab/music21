@@ -380,9 +380,8 @@ class ChordBase(note.NotRest):
             raise ValueError('Chord.remove(x), x not in chord')
 
     @property
-    def notes(self):
-        raise NotImplementedError
-
+    def notes(self) -> t.Tuple[note.NotRest, ...]:
+        return ()
 
     @property
     def tie(self):
@@ -5186,7 +5185,7 @@ class Chord(ChordBase):
         return len(self.pitchClasses)
 
     @property
-    def notes(self):
+    def notes(self) -> t.Tuple[note.Note]:
         '''
         Return a tuple (immutable) of the notes contained in the chord.
 
@@ -5248,7 +5247,7 @@ class Chord(ChordBase):
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes):
+    def notes(self, newNotes: t.Iterable[note.Note]) -> None:
         '''
         sets notes to an iterable of Note objects
         '''
