@@ -270,7 +270,7 @@ class Test(unittest.TestCase):
             if thisInt.name != "P1":
                 intervals2[thisInt.name] += 1
 
-        for key in intervals2.sort(key='simpleName'):
+        for key in intervals2.keys().sort(key='simpleName'):
             print(key, intervals2[key])
 
     def test016(self):

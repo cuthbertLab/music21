@@ -991,6 +991,7 @@ class NotRest(GeneralNote):
         new = super().__deepcopy__(memo=memo)
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
+        # pylint: disable=no-member
         if self._volume is not None:
             new.volume.client = new  # update with new instance
         return new

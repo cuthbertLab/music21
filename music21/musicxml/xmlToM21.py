@@ -800,6 +800,7 @@ class XMLParserBase:
             staffLayout.staffNumber = staffNumber
 
         if hasattr(self, 'staffLayoutObjects') and hasattr(self, 'offsetMeasureNote'):
+            # pylint: disable=no-member
             staffLayoutKey = ((staffNumber or 1), self.offsetMeasureNote)
             self.staffLayoutObjects[staffLayoutKey] = staffLayout
 
@@ -1277,7 +1278,7 @@ class MusicXMLImporter(XMLParserBase):
         movement-title, identification
         '''
         if el is None:
-            el = self.root
+            el = self.xmlRoot
 
         if inputM21 is None:
             md = metadata.Metadata()
