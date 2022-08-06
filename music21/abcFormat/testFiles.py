@@ -4,8 +4,6 @@
 # Purpose:      ABC test files
 #
 # Authors:      Christopher Ariza
-#
-# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import unittest

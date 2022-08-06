@@ -3,12 +3,12 @@
 # Name:         voiceLeading.py
 # Purpose:      music21 classes for voice leading
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #               Jackie Rogoff
 #               Beth Hadley
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -36,16 +36,18 @@ The list of objects included here are:
 '''
 import enum
 import unittest
-from typing import List, no_type_check
+import typing as t
 
 from music21 import base
+from music21 import chord
+from music21 import clef
+from music21 import common
 from music21 import exceptions21
 from music21 import interval
-from music21 import common
-from music21 import pitch
 from music21 import key
+from music21 import meter
 from music21 import note
-from music21 import chord
+from music21 import pitch
 from music21 import scale
 
 
@@ -55,7 +57,7 @@ from music21 import scale
 
 # create a module level shared cache for intervals of P1, P5, P8
 # to be populated the first time a VLQ object is created
-intervalCache = []  # type: List[interval.Interval]
+intervalCache: t.List[interval.Interval] = []
 
 
 class MotionType(str, enum.Enum):
@@ -82,10 +84,16 @@ class VoiceLeadingQuartet(base.Music21Object):
     to make sense.  Most routines will work the other way still though.
     '''
 
-    _DOC_ATTR = {'vIntervals': '''list of the two harmonic intervals present,
-                     vn1n1 to v2n1 and v1n2 to v2n2''',
-                 'hIntervals': '''list of the two melodic intervals present,
-                     v1n1 to v1n2 and v2n1 to v2n2'''}
+    _DOC_ATTR: t.Dict[str, str] = {
+        'vIntervals': '''
+            A two-element list of the two harmonic intervals present,
+            vn1n1 to v2n1 and v1n2 to v2n2.
+            ''',
+        'hIntervals': '''
+            A two-element list of the two melodic intervals present,
+            v1n1 to v1n2 and v2n1 to v2n2.
+            ''',
+    }
 
     def __init__(self, v1n1=None, v1n2=None, v2n1=None, v2n2=None, analyticKey=None):
         super().__init__()
@@ -110,8 +118,8 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.v2n1 = v2n1
         self.v2n2 = v2n2
 
-        self.vIntervals: List[interval.Interval] = []  # vertical intervals (harmonic)
-        self.hIntervals: List[interval.Interval] = []  # horizontal intervals (melodic)
+        self.vIntervals: t.List[interval.Interval] = []  # vertical intervals (harmonic)
+        self.hIntervals: t.List[interval.Interval] = []  # horizontal intervals (melodic)
 
         self._key = None
         if analyticKey is not None:
@@ -445,7 +453,6 @@ class VoiceLeadingQuartet(base.Music21Object):
             else:
                 return False
 
-    @no_type_check
     def parallelMotion(
         self,
         requiredInterval=None,
@@ -519,15 +526,24 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl.parallelMotion(gi, allowOctaveDisplacement=True)
         True
         '''
+        vInt0 = self.vIntervals[0]
+        vInt0_generic = vInt0.generic
+        vInt1 = self.vIntervals[1]
+        vInt1_generic = vInt1.generic
+
+        if t.TYPE_CHECKING:
+            assert vInt0_generic is not None
+            assert vInt1_generic is not None
+
         if not self.similarMotion():
             return False
 
-        elif (self.vIntervals[0].generic.directed != self.vIntervals[1].generic.directed
+        elif (vInt0_generic.directed != vInt1_generic.directed
               and not allowOctaveDisplacement):
             return False
 
-        elif (self.vIntervals[0].generic.semiSimpleUndirected
-                != self.vIntervals[1].generic.semiSimpleUndirected):
+        elif (vInt0_generic.semiSimpleUndirected
+                != vInt1_generic.semiSimpleUndirected):
             return False
 
         elif requiredInterval is None:
@@ -537,26 +553,26 @@ class VoiceLeadingQuartet(base.Music21Object):
             intervalsAreValid = False
 
             if isinstance(requiredInterval, interval.GenericInterval):
-                intervalsAreValid = (self.vIntervals[0].generic.semiSimpleUndirected
+                intervalsAreValid = (vInt0_generic.semiSimpleUndirected
                                      == requiredInterval.semiSimpleUndirected)
 
             if isinstance(requiredInterval, int):
                 # assume the user wants a parallel generic interval
                 requiredInterval = interval.GenericInterval(requiredInterval)
-                intervalsAreValid = (self.vIntervals[0].generic.semiSimpleUndirected
+                intervalsAreValid = (vInt0_generic.semiSimpleUndirected
                                      == requiredInterval.semiSimpleUndirected)
 
             if isinstance(requiredInterval, str):
                 requiredInterval = interval.Interval(requiredInterval)
-                intervalsAreValid = (self.vIntervals[0].semiSimpleName
+                intervalsAreValid = (vInt0.semiSimpleName
                                         == requiredInterval.semiSimpleName
-                                     and self.vIntervals[1].semiSimpleName
+                                     and vInt1.semiSimpleName
                                         == requiredInterval.semiSimpleName)
 
             elif isinstance(requiredInterval, (interval.Interval, interval.DiatonicInterval)):
-                intervalsAreValid = (self.vIntervals[0].semiSimpleName
+                intervalsAreValid = (vInt0.semiSimpleName
                                         == requiredInterval.semiSimpleName
-                                     and self.vIntervals[1].semiSimpleName
+                                     and vInt1.semiSimpleName
                                         == requiredInterval.semiSimpleName)
 
             return intervalsAreValid
@@ -988,7 +1004,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return False
 
-    @no_type_check
     def isProperResolution(self) -> bool:
         '''
         Checks whether the voice-leading quartet resolves correctly according to standard
@@ -1105,7 +1120,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 minorScale = scale.MelodicMinorScale(self.key.tonic)
                 n1degree = minorScale.getScaleDegreeFromPitch(
                     self.v2n1,
-                    direction=scale.DIRECTION_ASCENDING)
+                    direction=scale.Direction.ASCENDING)
 
         else:
             keyScale = None
@@ -1113,7 +1128,10 @@ class VoiceLeadingQuartet(base.Music21Object):
             n2degree = None
 
         firstHarmony = self.vIntervals[0].simpleName
-        secondHarmony = self.vIntervals[1].generic.simpleUndirected
+        secondGeneric = self.vIntervals[1].generic
+        if t.TYPE_CHECKING:
+            assert secondGeneric is not None
+        secondHarmony = secondGeneric.simpleUndirected
 
         if firstHarmony == 'P4':
             if self.v1n1 >= self.v1n2:
@@ -1147,7 +1165,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         else:
             return True
 
-    @no_type_check
     def leapNotSetWithStep(self) -> bool:
         '''
         Returns True if there is a leap or skip in once voice then the other voice must
@@ -1178,17 +1195,23 @@ class VoiceLeadingQuartet(base.Music21Object):
         if self.noMotion():
             return False
 
-        if (self.hIntervals[0].generic.undirected == 3
-                and self.hIntervals[1].generic.undirected == 3
+        hInt0_generic = self.hIntervals[0].generic
+        hInt1_generic = self.hIntervals[1].generic
+        if t.TYPE_CHECKING:
+            assert hInt0_generic is not None
+            assert hInt1_generic is not None
+
+        if (hInt0_generic.undirected == 3
+                and hInt1_generic.undirected == 3
                 and self.contraryMotion()):
             return False
 
-        if self.hIntervals[0].generic.isSkip:
-            return not (self.hIntervals[1].generic.isDiatonicStep
-                        or self.hIntervals[1].generic.isUnison)
-        elif self.hIntervals[1].generic.isSkip:
-            return not (self.hIntervals[0].generic.isDiatonicStep
-                        or self.hIntervals[0].generic.isUnison)
+        if hInt0_generic.isSkip:
+            return not (hInt1_generic.isDiatonicStep
+                        or hInt1_generic.isUnison)
+        elif hInt1_generic.isSkip:
+            return not (hInt0_generic.isDiatonicStep
+                        or hInt0_generic.isUnison)
         else:
             return False
 
@@ -1238,7 +1261,6 @@ class VoiceLeadingQuartet(base.Music21Object):
                       and (r1[0].upper() in openings if r1 is not False else False
                            or r2[0].upper() in openings if r2 is not False else False))
 
-    @no_type_check
     def closesIncorrectly(self) -> bool:
         '''
         TODO(msc): will be renamed to be less dogmatic
@@ -1266,7 +1288,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         >>> vl = voiceLeading.VoiceLeadingQuartet('C#4', 'D4', 'A2', 'D3', analyticKey='D')
         >>> vl.closesIncorrectly()
         True
-
         '''
         raisedMinorCorrectly = False
         if self.key.mode == 'minor':
@@ -1278,8 +1299,15 @@ class VoiceLeadingQuartet(base.Music21Object):
             raisedMinorCorrectly = True
         preClosings = (6, 3)
         closingPitches = [self.v1n2.pitch.name, self.v2n2.name]
-        return not (self.vIntervals[0].generic.simpleUndirected in preClosings
-                     and self.vIntervals[1].generic.simpleUndirected == 1
+
+        vInt0_generic = self.vIntervals[0].generic
+        vInt1_generic = self.vIntervals[1].generic
+        if t.TYPE_CHECKING:
+            assert vInt0_generic is not None
+            assert vInt1_generic is not None
+
+        return not (vInt0_generic.simpleUndirected in preClosings
+                     and vInt1_generic.simpleUndirected == 1
                      and raisedMinorCorrectly
                      and self.key.pitchFromDegree(1).name in closingPitches
                      and self.contraryMotion())
@@ -1373,7 +1401,7 @@ class Verticality(base.Music21Object):
     #  obsolete:     To create Verticalities out of a score, call
     #                by :meth:`~music21.theoryAnalyzer.getVerticalities`
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'contentDict': '''Dictionary representing contents of Verticalities.
             the keys of the dictionary
             are the part numbers and the element at each key is a list of
@@ -1633,9 +1661,11 @@ class Verticality(base.Music21Object):
         {0.0} <music21.stream.Part part-1>
             {0.0} <music21.note.Note C>
 
-        >>> len(vsStream.flatten().getElementsByClass(note.Note))
+        How many notes are there anywhere in the hierarchy?
+
+        >>> len(vsStream[note.Note])
         2
-        >>> len(vsStream.flatten().getElementsByClass('Harmony'))
+        >>> len(vsStream[harmony.Harmony])
         1
         '''
         from music21 import stream
@@ -1644,9 +1674,9 @@ class Verticality(base.Music21Object):
             p = stream.Part(id=f'part-{partNum}')
             foundObj = elementList[0]
 
-            cl = foundObj.getContextByClass('Clef')
-            ks = foundObj.getContextByClass('KeySignature')
-            ts = foundObj.getContextByClass('TimeSignature')
+            cl = foundObj.getContextByClass(clef.Clef)
+            ks = foundObj.getContextByClass(key.KeySignature)
+            ts = foundObj.getContextByClass(meter.TimeSignature)
 
             if cl:
                 p.append(cl)
@@ -1659,14 +1689,13 @@ class Verticality(base.Music21Object):
             retStream.insert(p)
         return retStream
 
-
-    def offset(self, leftAlign=True):
+    def getVerticalityOffset(self, *, leftAlign=True):
         '''
         returns the overall offset of the Verticality. Typically, this would just be the
         offset of each object in the Verticality,
         and each object would have the same offset.
-        However, if the duration of one object in the slice is different than the duration
-        of another,
+        However, if the duration of one object in the slice is different from
+        the duration of another,
         and that other starts after the first, but the first is still sounding, then the
         offsets would be
         different. In this case, specify leftAlign=True to return the lowest valued-offset
@@ -1687,10 +1716,13 @@ class Verticality(base.Music21Object):
         >>> vs.getObjectsByClass(note.Note)
         [<music21.note.Note A>, <music21.note.Note F>]
 
-        >>> vs.offset(leftAlign=True)
+        >>> vs.getVerticalityOffset(leftAlign=True)
         0.0
-        >>> vs.offset(leftAlign=False)
+        >>> vs.getVerticalityOffset(leftAlign=False)
         1.0
+
+        Changed in v8 -- renamed getVerticalityOffset to not conflict with
+            .offset property.  Made leftAlign keyword only
         '''
         if not self.objects:
             return 0.0
@@ -2106,7 +2138,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         are moving in the same direction. Returns True if the tone is
         identified as either a chromatic passing tone or a diatonic passing
         tone. Only major and minor diatonic passing tones are recognized (not
-        pentatonic or scales beyond twelve-notes). Does NOT check if tone is non harmonic
+        pentatonic or scales beyond twelve-notes). Does NOT check if tone is non-harmonic.
 
         Accepts pitch or note objects; method is dependent on octave information
 
@@ -2212,7 +2244,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
     def couldBeNeighborTone(self):
         '''
         checks if noteToAnalyze could be a neighbor tone, either a diatonic neighbor tone
-        or a chromatic neighbor tone. Does NOT check if tone is non harmonic
+        or a chromatic neighbor tone. Does NOT check if tone is non-harmonic.
 
         >>> voiceLeading.ThreeNoteLinearSegment('E3', 'F3', 'E3').couldBeNeighborTone()
         True

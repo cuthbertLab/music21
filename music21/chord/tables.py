@@ -6,8 +6,8 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2001-2011 Christopher Ariza
-# Copyright:    Copyright © 2011-22 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2001-11 Christopher Ariza
+# Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -17,16 +17,16 @@ chord representations. All features of this module are made available through
 :class:`~music21.chord.Chord` objects. Use of this module directly is thus not necessary.
 '''
 from collections import namedtuple
+import typing as t
 import unittest
 
+from music21 import environment
 from music21 import exceptions21
 
-from music21 import environment
-_MOD = 'chord.tables'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('chord.tables')
 
-
-ChordTableAddress = namedtuple('ChordTableAddress', 'cardinality forteClass inversion pcOriginal')
+ChordTableAddress = namedtuple('ChordTableAddress',
+                               ['cardinality', 'forteClass', 'inversion', 'pcOriginal'])
 
 
 # ------------------------------------------------------------------------------
@@ -51,6 +51,68 @@ class ChordTablesException(exceptions21.Music21Exception):
 # under Tn, TnI (inversion required), TnM, and TnMI respectively
 # For index 2 (python [1]), a value of 1 or higher
 # is symmetrical under inversion.
+
+TNIStructure = t.Tuple[
+    t.Tuple[int, ...],
+    t.Tuple[int, int, int, int, int, int],
+    t.Tuple[int, int, int, int, int, int, int, int],
+    int,
+]
+
+# noinspection DuplicatedCode
+t1: TNIStructure
+t2: TNIStructure
+t3: TNIStructure
+t4: TNIStructure
+t5: TNIStructure
+t6: TNIStructure
+t7: TNIStructure
+t8: TNIStructure
+t9: TNIStructure
+t10: TNIStructure
+t11: TNIStructure
+t12: TNIStructure
+t13: TNIStructure
+t14: TNIStructure
+t15: TNIStructure
+t16: TNIStructure
+t17: TNIStructure
+t18: TNIStructure
+t19: TNIStructure
+t20: TNIStructure
+t21: TNIStructure
+t22: TNIStructure
+t23: TNIStructure
+t24: TNIStructure
+t25: TNIStructure
+# noinspection DuplicatedCode
+t26: TNIStructure
+t27: TNIStructure
+t28: TNIStructure
+t29: TNIStructure
+t30: TNIStructure
+t31: TNIStructure
+t32: TNIStructure
+t33: TNIStructure
+t34: TNIStructure
+t35: TNIStructure
+t36: TNIStructure
+t37: TNIStructure
+t38: TNIStructure
+t39: TNIStructure
+t40: TNIStructure
+t41: TNIStructure
+t42: TNIStructure
+t43: TNIStructure
+t44: TNIStructure
+t45: TNIStructure
+t46: TNIStructure
+t47: TNIStructure
+t48: TNIStructure
+t49: TNIStructure
+t50: TNIStructure
+
+
 t1   = ((0,), (0,0,0,0,0,0), (1,1,1,1,11,11,11,11), 0)  # 1-1
 monad = (None, t1)
 
@@ -59,7 +121,7 @@ t2  = ((0,2), (0,1,0,0,0,0), (1,1,1,1,9,9,9,9),  0)  # 2-2
 t3  = ((0,3), (0,0,1,0,0,0), (1,1,1,1,9,9,9,9),  0)  # 2-3
 t4  = ((0,4), (0,0,0,1,0,0), (1,1,1,1,9,9,9,9),  0)  # 2-4
 t5  = ((0,5), (0,0,0,0,1,0), (1,1,0,0,9,9,8,8),  0)  # 2-5
-t6  = ((0,6), (0,0,0,0,0,1), (2,2,2,2,10,10,10), 0)  # 2-6
+t6  = ((0,6), (0,0,0,0,0,1), (2,2,2,2,10,10,10,10), 0)  # 2-6
 diad = (None, t1, t2, t3, t4, t5, t6)
 
 t1  = ((0,1,2), (2,1,0,0,0,0), (1,1,0,0,7,7,4,4), 0)  # 3-1
@@ -110,7 +172,6 @@ tetrachord = (
     t10, t11, t12, t13, t14, t15, t16, t17, t18, t19,
     t20, t21, t22, t23, t24, t25, t26, t27, t28, t29
 )
-
 
 t1  = ((0,1,2,3,4), (4,3,2,1,0,0), (1,1,0,0,3,3,0,0),  0)  # 5-1
 t2  = ((0,1,2,3,5), (3,3,2,1,1,0), (1,0,0,0,1,2,1,1),  0)  # 5-2
@@ -1898,7 +1959,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = [addressToForteName, addressToPrimeForm, addressToForteName, seekChordTablesAddress]
+_DOC_ORDER = [addressToForteName, addressToPrimeForm, seekChordTablesAddress]
 
 
 if __name__ == '__main__':

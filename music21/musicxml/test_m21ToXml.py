@@ -12,6 +12,7 @@ from music21 import articulations
 from music21 import common
 from music21 import converter
 from music21 import corpus
+from music21 import defaults
 from music21 import duration
 from music21 import dynamics
 from music21 import harmony
@@ -363,7 +364,7 @@ class Test(unittest.TestCase):
         self.assertEqual([e.get('number') for e in endings], ['1,2', '1,2', '3', '3'])
 
         # m21 represents lack of bracket numbers as 0; musicxml uses ''
-        s.parts[0].getElementsByClass('RepeatBracket').first().number = 0
+        s.parts[0].getElementsByClass(spanner.RepeatBracket).first().number = 0
         x = self.getET(s)
         endings = x.findall('.//ending')
         self.assertEqual([e.get('number') for e in endings], ['', '', '3', '3'])
@@ -431,7 +432,7 @@ class Test(unittest.TestCase):
         in the toSoundingPitch and not having their durations restored afterwards
         leading to Instrument objects being split if the duration was complex
         '''
-        alto = corpus.parse('bach/bwv57.8').parts['Alto']
+        alto = corpus.parse('bach/bwv57.8').parts['#Alto']
         alto.measure(7).timeSignature = meter.TimeSignature('6/8')
         newAlto = alto.flat.getElementsNotOfClass(meter.TimeSignature).stream()
         newAlto.insert(0, meter.TimeSignature('2/4'))
@@ -440,6 +441,23 @@ class Test(unittest.TestCase):
         tree = self.getET(newAltoFixed)
         self.assertTrue(tree.findall('.//note'))
         self.assertFalse(tree.findall('.//forward'))
+
+    def testOutOfBoundsExpressionDoesNotCreateForward(self):
+        '''
+        A metronome mark at an offset exceeding the bar duration was causing
+        <forward> tags, i.e. hidden rests. Prefer <offset> instead.
+        '''
+        m = stream.Measure()
+        m.append(meter.TimeSignature('1/4'))
+        m.append(note.Rest())
+        m.insert(2, tempo.MetronomeMark('slow', 40))
+
+        gex = GeneralObjectExporter()
+        tree = self.getET(gex.fromGeneralObject(m))
+        self.assertFalse(tree.findall('.//forward'))
+        self.assertEqual(
+            int(tree.findall('.//direction/offset')[0].text),
+            defaults.divisionsPerQuarter)
 
     def testExportChordSymbolsWithRealizedDurations(self):
         gex = GeneralObjectExporter()

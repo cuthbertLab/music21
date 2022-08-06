@@ -3,9 +3,9 @@
 # Name:         search/base.py
 # Purpose:      music21 classes for searching within files
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2013, 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013, 2017 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -16,6 +16,7 @@ See User's Guide, Chapter 43: Searching in and Among Scores for details.
 import copy
 import difflib
 import math
+import typing as t
 import unittest
 from collections import namedtuple
 
@@ -25,7 +26,7 @@ from music21 import base as m21Base
 from music21 import exceptions21
 from music21 import duration
 from music21 import note
-from music21.stream import Measure
+from music21.stream import Measure, Stream
 from music21.stream import filters
 
 __all__ = [
@@ -75,16 +76,17 @@ class Wildcard(m21Base.Music21Object):
         self.duration = WildcardDuration()
 
 
-class SearchMatch(namedtuple('SearchMatch', 'elStart els index iterator')):
+class SearchMatch(namedtuple('SearchMatch', ['elStart', 'els', 'index', 'iterator'])):
     '''
     A lightweight object representing the match (if any) for a search.  Derived from namedtuple
     '''
     __slots__ = ()
-    _DOC_ATTR = {'elStart': '''The first element that matches the list.''',
-                 'els': '''A tuple of all the matching elements.''',
-                 'index': '''The index in the iterator at which the first element can be found''',
-                 'iterator': '''The iterator which produced these elements.''',
-                 }
+    _DOC_ATTR: t.Dict[str, str] = {
+        'elStart': '''The first element that matches the list.''',
+        'els': '''A tuple of all the matching elements.''',
+        'index': '''The index in the iterator at which the first element can be found''',
+        'iterator': '''The iterator which produced these elements.''',
+    }
 
     def __repr__(self):
         return 'SearchMatch(elStart={0}, els=len({1}), index={2}, iterator=[...])'.format(
@@ -199,7 +201,10 @@ class StreamSearcher:
         self.filterNotes = False
         self.filterNotesAndRests = False
 
-        self.algorithms = [StreamSearcher.wildcardAlgorithm]
+        self.algorithms: t.List[
+            t.Callable[[Stream, m21Base.Music21Object],
+                       t.Union[bool, None]]
+        ] = [StreamSearcher.wildcardAlgorithm]
 
         self.activeIterator = None
 
@@ -326,7 +331,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     of indices which begin a successful search.
 
     searches are made based on quarterLength.
-    thus an dotted sixteenth-note and a quadruplet (4:3) eighth
+    thus a dotted sixteenth-note and a quadruplet (4:3) eighth
     will match each other.
 
     Example 1: First we will set up a simple stream for searching:
@@ -424,6 +429,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
 
 
 def noteNameSearch(thisStreamOrIterator, searchList):
+    # noinspection PyShadowingNames
     '''
     >>> thisStream = converter.parse('tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e')
     >>> searchList = [note.Note('C'), note.Note('D'), note.Note('E')]
@@ -524,6 +530,7 @@ def approximateNoteSearch(thisStream, otherStreams):
 
 
 def approximateNoteSearchNoRhythm(thisStream, otherStreams):
+    # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
     (each stream will have a new property of matchProbability to show how
@@ -896,11 +903,11 @@ def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
 
 
 def translateNoteToByte(n):
+    # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a single byte representation.
 
     currently returns the chr() for the note's midi number. or chr(127) for rests
-
 
     >>> n = note.Note('C4')
     >>> b = search.translateNoteToByte(n)
@@ -961,11 +968,11 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
 
 
 def translateNoteTieToByte(n):
+    # noinspection PyShadowingNames
     '''
     takes a note.Note object and returns a one-byte representation
     of its tie status.
     's' if start tie, 'e' if stop tie, 'c' if continue tie, and '' if no tie
-
 
     >>> n = note.Note('E')
     >>> search.translateNoteTieToByte(n)
@@ -996,6 +1003,7 @@ def translateNoteTieToByte(n):
 
 
 def translateDurationToBytes(n):
+    # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a two-byte representation
 
@@ -1061,7 +1069,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     {3.0} <music21.note.Note B->
     -----
 
-    Changed in v7 -- bars are ordered first by number then by part.
+    Changed in v7 -- bars are ordered first by number, then by part.
     '''
     returnDicts = []
     distanceToTranspose = 0

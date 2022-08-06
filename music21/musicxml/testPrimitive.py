@@ -18115,6 +18115,59 @@ pianoStaffPolymeter = '''<?xml version="1.0" encoding="ISO-8859-1" standalone="n
 </score-partwise>
 '''
 
+# pianoStaffPolymeterWithClefOctaveChange is a copy of pianoStaffPolymeter (above)
+#   with clef #2 changed from BassClef to Treble8vbClef.
+
+pianoStaffPolymeterWithClefOctaveChange = (
+    '''<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6b Partwise//EN"
+ "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise>
+    <identification>
+        <miscellaneous>
+            <miscellaneous-field name="description">Polymeter on a grand staff</miscellaneous-field>
+        </miscellaneous>
+    </identification>
+    <part-list>
+        <score-part id="P1">
+            <part-name>MusicXML Part</part-name>
+        </score-part>
+    </part-list>
+    <part id="P1">
+        <measure number="1">
+            <attributes>
+                <divisions>96</divisions>
+                <key><fifths>0</fifths></key>
+                <time number="1"><beats>4</beats><beat-type>4</beat-type></time>
+                <time number="2"><beats>2</beats><beat-type>2</beat-type></time>
+                <staves>2</staves>
+                <clef number="1"><sign>G</sign><line>2</line></clef>
+                <clef number="2">
+                    <sign>G</sign>
+                    <line>2</line>
+                    <clef-octave-change>-1</clef-octave-change>
+                </clef>
+            </attributes>
+            <note>
+                <pitch><step>F</step><octave>4</octave></pitch>
+                <duration>384</duration>
+                <voice>1</voice>
+                <type>whole</type>
+                <staff>1</staff>
+            </note>
+            <backup><duration>384</duration></backup>
+            <note>
+                <pitch><step>B</step><octave>2</octave></pitch>
+                <duration>384</duration>
+                <voice>2</voice>
+                <type>whole</type>
+                <staff>2</staff>
+            </note>
+        </measure>
+    </part>
+</score-partwise>
+''')
+
 
 ALL = [
     articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a,  # 0
@@ -18168,7 +18221,7 @@ class Test(unittest.TestCase):
 
     def testMidMeasureClef1(self):
         '''
-        Tests if there are mid-measure clefs clefs: single staff
+        Tests if there are mid-measure clefs: single staff
         '''
         from music21 import stream
         from music21 import note
@@ -18183,14 +18236,14 @@ class Test(unittest.TestCase):
         orig_stream.repeatAppend(note.Note('C4'), 2)
         orig_stream.append(clef.BassClef())
         orig_stream.repeatAppend(note.Note('C4'), 2)
-        orig_clefs = orig_stream.flatten().getElementsByClass('Clef')
+        orig_clefs = orig_stream.flatten().getElementsByClass(clef.Clef)
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
         self.assertEqual(xml.count(b'<clef>'), 2)  # clefs got out
         self.assertEqual(xml.count(b'<measure'), 1)  # in one measure
 
         new_stream = converter.parse(xml)
-        new_clefs = new_stream.flatten().getElementsByClass('Clef')
+        new_clefs = new_stream.flatten().getElementsByClass(clef.Clef)
 
         self.assertEqual(len(new_clefs), len(orig_clefs))
         self.assertEqual([c.offset for c in new_clefs], [c.offset for c in orig_clefs])
@@ -18198,7 +18251,7 @@ class Test(unittest.TestCase):
 
     def testMidMeasureClefs2(self):
         '''
-        Tests if there are mid-measure clefs clefs: multiple staves.
+        Tests if there are mid-measure clefs: multiple staves.
         '''
         from music21 import clef
         from music21 import converter
@@ -18220,14 +18273,14 @@ class Test(unittest.TestCase):
                      clef.TrebleClef(), note.Note('C4')]:
             orig_stream[1].append(item)
 
-        orig_clefs = [staff.flatten().getElementsByClass('Clef').stream() for staff in
-                      orig_stream.getElementsByClass('Part')]
+        orig_clefs = [staff.flatten().getElementsByClass(clef.Clef).stream() for staff in
+                      orig_stream.getElementsByClass(stream.Part)]
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
 
         new_stream = converter.parse(xml.decode('utf-8'))
-        new_clefs = [staff.flatten().getElementsByClass('Clef').stream() for staff in
-                     new_stream.getElementsByClass('Part')]
+        new_clefs = [staff.flatten().getElementsByClass(clef.Clef).stream() for staff in
+                     new_stream.getElementsByClass(stream.Part)]
 
         self.assertEqual([len(clefs) for clefs in new_clefs],
                          [len(clefs) for clefs in orig_clefs])
@@ -18235,6 +18288,30 @@ class Test(unittest.TestCase):
                          [c.offset for c in orig_clefs])
         self.assertEqual([c.classes for c in new_clefs],
                          [c.classes for c in orig_clefs])
+
+    def testMidMeasureClefs3(self):
+        '''
+        Test midmeasure clef changes outside voices
+        '''
+        from music21 import clef
+        from music21 import note
+        from music21 import musicxml
+        from music21 import stream
+
+        v1 = stream.Voice()
+        v2 = stream.Voice()
+        quarter = note.Note()
+        v1.repeatAppend(quarter, 4)
+        v2.repeatAppend(quarter, 4)
+        m = stream.Measure([v1, v2])
+        m.insert(1.0, clef.BassClef())
+        p = stream.Part(m)
+        p.makeNotation(inPlace=True)
+
+        tree = musicxml.test_m21ToXml.Test().getET(p)
+        self.assertEqual(len(tree.findall('.//clef')), 1)
+        # One backup from the clef back to voice 1, then another back to voice 2
+        self.assertEqual(len(tree.findall('.//backup')), 2)
 
 # ------------------------------------------------------------------------------
 

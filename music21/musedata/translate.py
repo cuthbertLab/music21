@@ -4,9 +4,9 @@
 # Purpose:      Translate MuseData into music21 objects
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -27,8 +27,7 @@ import unittest
 from music21 import clef
 from music21 import environment
 from music21 import exceptions21
-_MOD = 'musedata.translate'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('musedata.translate')
 
 
 # ------------------------------------------------------------------------------
@@ -100,7 +99,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
         # can supply a lost of Pitch objects at creation
         post = chord.Chord([r.getPitchObject() for r in records])
 
-    # if a chord, we are assume that all durations are the same
+    # if a chord, we are assuming that all durations are the same
     post.quarterLength = records[0].getQuarterLength()
 
     # see if there are nay lyrics; not sure what to do if lyrics are defined
@@ -132,7 +131,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
     if records[0].isTied():
         post.tie = tie.Tie('start')  # can be start or continue;
         if previousElement is not None and previousElement.tie is not None:
-            # if previous is a start or a continue; this has to be a continue
+            # if previous is a "start" or a "continue"; this has to be a "continue"
             # as musedata does not mark the end of a tie
             if previousElement.tie.type in ['start', 'continue']:
                 post.tie = tie.Tie('continue')
@@ -220,7 +219,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             directive = mdm.parent.getDirective()
             if directive is not None:
                 tt = tempo.TempoText(directive)
-                # if this appears to be a tempo indication, than get metro
+                # if this appears to be a tempo indication, then get metro
                 if tt.isCommonTempoText():
                     mm = tt.getMetronomeMark()
                     m.insert(0, mm)
@@ -313,7 +312,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
     if museDataPart.stage == 1:
         # cannot yet get stage 1 clef data
-        p.getElementsByClass('Measure').first().clef = clef.bestClef(p, recurse=True)
+        p.getElementsByClass(stream.Measure).first().clef = clef.bestClef(p, recurse=True)
         p.makeBeams(inPlace=True)
         # will call overridden method on Part
         p.makeAccidentals(inPlace=True)
@@ -466,7 +465,7 @@ class Test(unittest.TestCase):
 #         # measure two has 9/16 beamed in three beats of 16ths
 #         self.assertEqual(len(s.parts), 2)
 #
-#         # s.parts[0].getElementsByClass('Measure')[1].show()
+#         # s.parts[0].getElementsByClass(stream.Measure)[1].show()
 #
 #         self.assertEqual(str(s.parts[0].getElementsByClass(
 #             'Measure')[1].notesAndRests[0].beams),
@@ -533,14 +532,17 @@ class Test(unittest.TestCase):
 #         self.assertEqual(str(s.parts[0][meter.TimeSignature].first()),
 #                '<music21.meter.TimeSignature 4/4>')
 #
-#         self.assertEqual([n.offset for
-#            n in s.parts[0].getElementsByClass('Measure')[0].notes], [0.0, 3.0, 3.5, 3.75])
+#         self.assertEqual(
+#            [n.offset for n in s.parts[0].getElementsByClass(stream.Measure)[0].notes],
+#            [0.0, 3.0, 3.5, 3.75])
 #
 #         self.assertEqual([n.nameWithOctave for
-#                n in s.parts[0].getElementsByClass('Measure')[0].notes], ['F5', 'F5', 'E5', 'D5'])
+#                n in s.parts[0].getElementsByClass(stream.Measure)[0].notes],
+#                    ['F5', 'F5', 'E5', 'D5'])
 #
-#         self.assertEqual([n.offset for n in s.parts[1].getElementsByClass('Measure')[0].notes],
-#                [1.0, 2.0, 3.0])
+#         self.assertEqual(
+#             [n.offset for n in s.parts[1].getElementsByClass(stream.Measure)[0].notes],
+#             [1.0, 2.0, 3.0])
 
 #     def testMuseDataStage1B(self):
 #         from music21 import corpus
@@ -550,13 +552,15 @@ class Test(unittest.TestCase):
 #         self.assertEqual(str(s.parts[0][meter.TimeSignature].first()),
 #             '<music21.meter.TimeSignature 3/4>')
 #
-#         self.assertEqual([n.offset for n in s.parts[0].getElementsByClass('Measure')[0].notes],
+#         self.assertEqual(
+#             [n.offset for n in s.parts[0].getElementsByClass(stream.Measure)[0].notes],
 #                [0.0, 2.0])
 #
 #         self.assertEqual([n.nameWithOctave for
-#                    n in s.parts[0].getElementsByClass('Measure')[0].notes], ['A4', 'B4'])
+#                    n in s.parts[0].getElementsByClass(stream.Measure)[0].notes], ['A4', 'B4'])
 #
-#         self.assertEqual([n.offset for n in s.parts[2].getElementsByClass('Measure')[0].notes],
+#         self.assertEqual([n.offset
+#                           for n in s.parts[2].getElementsByClass(stream.Measure)[0].notes],
 #            [0.0, 1.0, 2.0])
 
 
@@ -585,7 +589,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('symphony94', 3)
 #         sFlat = s.flatten()
 #         # s.show()
-#         self.assertEqual(len(sFlat.getElementsByClass('Dynamic')), 79)
+#         self.assertEqual(len(sFlat.getElementsByClass(dynamics.Dynamic)), 79)
 #
 #
 #     def testMuseDataImportErrorA(self):

@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Antila
 #
-# Copyright:    Copyright © 2014 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2014 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -16,9 +16,6 @@ Tests for :mod:`music21.mei.base`.
 
 # this often happens on TestCase subclasses
 # pylint: disable=too-many-public-methods
-
-# a test that uses only assertions on the Mocks will have no-self-use
-# pylint: disable=no-self-use
 
 # if we mock many things, this may be triggered
 # pylint: disable=too-many-arguments
@@ -498,14 +495,14 @@ class Test(unittest.TestCase):
             </titleStmt>
         </work>"""
         work = ETree.fromstring(work)
-        expComposer1 = "['Jean Sibelius', 'Sibelius, Jean']"
-        expComposer2 = "['Sibelius, Jean', 'Jean Sibelius']"
+        expComposers1 = ('Jean Sibelius', 'Sibelius, Jean')
+        expComposers2 = ('Sibelius, Jean', 'Jean Sibelius')
         meta = metadata.Metadata()
 
         actual = base.metaSetComposer(work, meta)
 
         self.assertIs(meta, actual)
-        if actual.composer not in (expComposer1, expComposer2):
+        if actual.composers not in (expComposers1, expComposers2):
             self.fail('composer names do not match in either order')
 
     def testMetaDate1(self):
@@ -514,13 +511,13 @@ class Test(unittest.TestCase):
         '''
         work = """<work xmlns="http://www.music-encoding.org/ns/mei"/>"""
         work = ETree.fromstring(work)
-        expDate = 'None'  # I don't know why, but that's what it does
+        expDate = None
         meta = metadata.Metadata()
 
         actual = base.metaSetDate(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expDate, actual.date)
+        self.assertEqual(expDate, actual.dateCreated)
 
     def testMetaDate2(self):
         '''
@@ -540,7 +537,7 @@ class Test(unittest.TestCase):
         actual = base.metaSetDate(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expDate, actual.date)
+        self.assertEqual(expDate, actual.dateCreated)
 
     def testMetaDate3(self):
         '''
@@ -560,7 +557,7 @@ class Test(unittest.TestCase):
         actual = base.metaSetDate(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expDate, actual.date)
+        self.assertEqual(expDate, actual.dateCreated)
 
     @mock.patch('music21.mei.base.environLocal')
     def testMetaDate4(self, mockEnviron):
@@ -575,14 +572,14 @@ class Test(unittest.TestCase):
             </history>
         </work>"""
         work = ETree.fromstring(work)
-        expDate = 'None'
+        expDate = None
         expWarn = base._MISSED_DATE.format('2 March 1924')
         meta = metadata.Metadata()
 
         actual = base.metaSetDate(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expDate, actual.date)
+        self.assertEqual(expDate, actual.dateCreated)
         mockEnviron.warn.assert_called_once_with(expWarn)
 
     def testMetaDate5(self):
@@ -603,7 +600,7 @@ class Test(unittest.TestCase):
         actual = base.metaSetDate(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expDate, actual.date)
+        self.assertEqual(expDate, actual.dateCreated)
 
     def testMetaDate6(self):
         '''
@@ -623,7 +620,7 @@ class Test(unittest.TestCase):
         actual = base.metaSetDate(work, meta)
 
         self.assertIs(meta, actual)
-        self.assertEqual(expDate, actual.date)
+        self.assertEqual(expDate, actual.dateCreated)
 
     # -----------------------------------------------------------------------------
     # class TestAttrTranslators(unittest.TestCase):

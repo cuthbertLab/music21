@@ -5,9 +5,9 @@
 # Purpose:       install
 #
 # Authors:       Christopher Ariza
-#                Michael Scott Cuthbert
+#                Michael Scott Asato Cuthbert
 #
-# Copyright:     (c) 2009-2021 Michael Scott Cuthbert and the music21 Project
+# Copyright:     (c) 2009-2021 Michael Scott Asato Cuthbert and the music21 Project
 # License:       BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ m21version = __version__
 DESCRIPTION = 'A Toolkit for Computer-Aided Musical Analysis.'
 DESCRIPTION_LONG = """A Toolkit for Computer-Aided Musical Analysis.
                         Developed by cuthbertLab,
-                        Michael Scott Cuthbert (Associate Professor, MIT),
+                        Michael Scott Asato Cuthbert (Associate Professor, MIT),
                         Principal Investigator.
                         The development of music21 is supported by the
                         generosity of the Seaver Institute and the NEH."""
@@ -69,7 +69,7 @@ if __name__ == '__main__':
         python_requires='>=3.8',
         description=DESCRIPTION,
         long_description=DESCRIPTION_LONG,
-        author='Michael Scott Cuthbert, the music21 project, others',
+        author='Michael Scott Asato Cuthbert, the music21 project, others',
         author_email='cuthbert@mit.edu',
         license='BSD',
         url='https://github.com/cuthbertLab/music21',

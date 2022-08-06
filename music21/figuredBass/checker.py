@@ -4,13 +4,13 @@
 # Purpose:      checks figured basses for following voice-leading rules
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import collections
 import copy
-from typing import Dict, Tuple
+import typing as t
 import unittest
 
 from music21 import pitch
@@ -45,10 +45,10 @@ def getVoiceLeadingMoments(music21Stream):
             :width: 700
     '''
     allHarmonies = extractHarmonies(music21Stream)
-    allParts = music21Stream.getElementsByClass('Part').stream()
+    allParts = music21Stream.getElementsByClass(stream.Part).stream()
     newParts = [allParts[i].flatten().getElementsNotOfClass('GeneralNote').stream()
                 for i in range(len(allParts))]
-    paddingLeft = allParts[0].getElementsByClass('Measure').first().paddingLeft
+    paddingLeft = allParts[0].getElementsByClass(stream.Measure).first().paddingLeft
     for (offsets, notes) in sorted(allHarmonies.items()):
         (initOffset, endTime) = offsets
         for genNoteIndex in range(len(notes)):
@@ -107,7 +107,7 @@ def extractHarmonies(music21Stream):
     (11.0, 11.5)   [<music21.note.Note A>  <music21.note.Note F>  <music21.note.Note D> ]
     (11.5, 12.0)   [<music21.note.Note A>  <music21.note.Note F>  <music21.note.Note A> ]
     '''
-    allParts = music21Stream.getElementsByClass('Part')
+    allParts = music21Stream.getElementsByClass(stream.Part)
     if len(allParts) < 2:
         raise Music21Exception('There must be at least two parts to extract harmonies')
     allHarmonies = createOffsetMapping(allParts[0])
@@ -141,7 +141,7 @@ def createOffsetMapping(music21Part):
     (11.0, 12.0)   [<music21.note.Note A> ]
     '''
     currentMapping = collections.defaultdict(list)
-    for music21GeneralNote in music21Part.flatten().getElementsByClass('GeneralNote'):
+    for music21GeneralNote in music21Part.flatten().notesAndRests:
         initOffset = music21GeneralNote.offset
         endTime = initOffset + music21GeneralNote.quarterLength
         currentMapping[(initOffset, endTime)].append(music21GeneralNote)
@@ -183,7 +183,7 @@ def correlateHarmonies(currentMapping, music21Part):
 
     for offsets in sorted(currentMapping.keys()):
         (initOffset, endTime) = offsets
-        notesInRange = music21Part.flatten().getElementsByClass('GeneralNote').getElementsByOffset(
+        notesInRange = music21Part.flatten().notesAndRests.getElementsByOffset(
             initOffset, offsetEnd=endTime,
             includeEndBoundary=False, mustFinishInSpan=False,
             mustBeginInSpan=False, includeElementsThatEndAtStart=False)
@@ -202,7 +202,7 @@ def correlateHarmonies(currentMapping, music21Part):
     return newMapping
 
 # ------------------------------------------------------------------------------
-# Generic methods for checking for composition rule violations in streams
+# Generic functions for checking for composition rule violations in streams
 
 
 def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
@@ -247,7 +247,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
         debugInfo.append(f"{'(Offset, End Time):'!s:25}Part Numbers:")
 
     allHarmonies = sorted(list(extractHarmonies(music21Stream).items()))
-    allParts = [p.flatten() for p in music21Stream.getElementsByClass('Part')]
+    allParts = [p.flatten() for p in music21Stream.getElementsByClass(stream.Part)]
     for (offsets, notes) in allHarmonies:
         vlm = [generalNoteToPitch(n) for n in notes]
         vlm_violations = functionToApply(vlm)
@@ -314,7 +314,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
         debugInfo.append('(Offset A, End Time A):  (Offset B, End Time B): Part Numbers:')
 
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
-    allParts = [p.flatten() for p in music21Stream.getElementsByClass('Part')]
+    allParts = [p.flatten() for p in music21Stream.getElementsByClass(stream.Part)]
     (previousOffsets, previousNotes) = allHarmonies[0]
     vlmA = [generalNoteToPitch(n) for n in previousNotes]
     initOffsetA = previousOffsets[0]
@@ -397,7 +397,10 @@ def voiceCrossing(possibA):
 # Consecutive Possibility Rule-Checking Methods
 
 
-PITCH_QUARTET_TO_BOOL_TYPE = Dict[Tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch], bool]
+PITCH_QUARTET_TO_BOOL_TYPE = t.Dict[
+    t.Tuple[pitch.Pitch, pitch.Pitch, pitch.Pitch, pitch.Pitch],
+    bool
+]
 parallelFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
 parallelOctavesTable: PITCH_QUARTET_TO_BOOL_TYPE = {}
 hiddenFifthsTable: PITCH_QUARTET_TO_BOOL_TYPE = {}

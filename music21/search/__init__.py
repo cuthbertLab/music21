@@ -3,15 +3,15 @@
 # Name:         search/__init__.py
 # Purpose:      music21 classes for searching within files
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Methods and Classes useful in searching within scores.
 
-For searching a group of scores see the search functions within
+For searching a group of scores, see the search functions within
 :ref:`moduleCorpus` .
 '''
 __all__ = [

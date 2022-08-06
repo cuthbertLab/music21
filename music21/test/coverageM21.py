@@ -4,9 +4,9 @@
 # Purpose:      Starts Coverage w/ default arguments
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014-15 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2014-15 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import sys
@@ -38,6 +38,7 @@ def getCoverage(overrideVersion=False):
     # run on Py 3.8 -- to get Py 3.9/3.10 timing...
     if overrideVersion or sys.version_info.minor == 8:
         try:
+            # noinspection PyPackageRequirements
             import coverage  # type: ignore
             cov = coverage.Coverage(omit=omit_modules)
             for e in exclude_lines:

@@ -3,10 +3,10 @@
 # Name:         sites.py
 # Purpose:      Objects for keeping track of relationships among Music21Objects
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2007-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2007-2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,7 +15,7 @@ sites.py -- Objects for keeping track of relationships among Music21Objects
 import collections
 import unittest
 import weakref
-from typing import Any, MutableMapping, Optional, Union
+import typing as t
 
 from music21 import common
 from music21 import exceptions21
@@ -34,7 +34,7 @@ WEAKREF_ACTIVE = True
 # that still exists, then restore it from the dictionary; otherwise, do not
 # sweat it.  Should make pickle deepcopies of music21 objects in Streams still
 # possible without needing to recreate the whole stream.
-GLOBAL_SITE_STATE_DICT: MutableMapping[str, Optional[Any]] = weakref.WeakValueDictionary()
+GLOBAL_SITE_STATE_DICT: t.MutableMapping[str, t.Optional[t.Any]] = weakref.WeakValueDictionary()
 
 
 class SitesException(exceptions21.Music21Exception):
@@ -225,8 +225,8 @@ class Sites(common.SlottedObjectMixin):
         True
         '''
         # TODO: it may be a problem that sites are being transferred to deep
-        # copies; this functionality is used at times in context searches, but
-        # may be a performance hog.
+        #     copies; this functionality is used at times in context searches, but
+        #     may be a performance hog.
         new = self.__class__()
         # environLocal.printDebug(['Sites.__deepcopy__',
         #    'self.siteDict.keys()', self.siteDict.keys()])
@@ -254,7 +254,7 @@ class Sites(common.SlottedObjectMixin):
             #    print(idKey, id(originalObj))
             new.siteDict[newIdKey] = newSite
 
-        new._siteIndex = self._siteIndex  # keep to stay coherent
+        new._siteIndex = self._siteIndex  # keep the _siteIndex to stay coherent
         return new
 
     def __len__(self):
@@ -380,7 +380,7 @@ class Sites(common.SlottedObjectMixin):
         self._lastID = -1  # cannot be None
 
     def yieldSites(self,
-                   sortByCreationTime: Union[str, bool] = False,
+                   sortByCreationTime: t.Union[str, bool] = False,
                    priorityTarget=None,
                    excludeNone=False):
         # noinspection PyDunderSlots
@@ -392,8 +392,8 @@ class Sites(common.SlottedObjectMixin):
         where most-recently assigned objects are returned first.
 
         Note that priorityTarget is searched only on id -- this could be dangerous if the
-        target has been garbage collected and the id is reused. Unlikely since you gotta
-        pass in the priorityTarget itself so therefore it still exists...
+        target has been garbage collected and the id is reused. Unlikely since you have to
+        pass in the priorityTarget itself, so therefore it still exists...
 
         This can be much faster than .get in the case where the sought-for site
         is earlier in the list.
@@ -511,7 +511,7 @@ class Sites(common.SlottedObjectMixin):
         '''
         post = list(self.yieldSites(sortByCreationTime, priorityTarget, excludeNone))
 
-        # we do this resorting again, because the priority target might not match id and we
+        # we do this resorting again, because the priority target might not match id, and we
         # want to be extra safe.  If you want fast, use .yieldSites
         if priorityTarget is not None:
             if priorityTarget in post:

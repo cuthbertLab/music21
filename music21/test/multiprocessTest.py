@@ -3,9 +3,9 @@
 # Name:         multiprocesssTest.py
 # Purpose:      Controller for all tests in music21 run concurrently.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2012-15 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-15 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -27,27 +27,26 @@ import os
 import sys
 import time
 import unittest
-from typing import Optional, Any
+import typing as t
 
 from music21 import environment
 from music21 import common
 from music21.test import testRunner
 from music21.test import commonTest
 
-_MOD = 'test.multiprocessTest'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('test.multiprocessTest')
 
 @dataclasses.dataclass
 class ModuleResponse:
-    returnCode: Optional[str] = None
-    fp: Any = None
-    moduleName: Optional[str] = None
-    success: Any = None
-    testRunner: Any = None
-    errors: Any = None
-    failures: Any = None
-    testsRun: Any = None
-    runTime: Any = None
+    returnCode: t.Optional[str] = None
+    fp: t.Any = None
+    moduleName: t.Optional[str] = None
+    success: t.Any = None
+    testRunner: t.Any = None
+    errors: t.Any = None
+    failures: t.Any = None
+    testsRun: t.Any = None
+    runTime: t.Any = None
 
 
 # ------------------------------------------------------------------------------
@@ -60,7 +59,7 @@ def runOneModuleWithoutImp(args):
 
     moduleObject = modGath.getModuleWithoutImp(fp)
 
-    environLocal.printDebug(f'running {fp} \n')
+    environLocal.printDebug(f'running {fp=} {moduleObject=}\n')
     namePeriod = modGath._getNamePeriod(fp)
     if moduleObject == 'skip':
         success = f'{fp} is skipped \n'
@@ -148,6 +147,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
 
     maxTimeout = 200
     pathsToRun = modGather.modulePaths  # [30:60]
+    # print(pathsToRun)
 
     # pylint: disable=not-callable
     with multiprocessing.Pool(processes=poolSize) as pool:

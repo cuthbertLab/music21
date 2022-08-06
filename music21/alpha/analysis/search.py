@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
     The `targetScale` is a concrete scale instance.
 
     The `degreesRequired` specifies how many consecutive scale degrees
-    are required for grouping. Note that if more are found, the will
+    are required for grouping. Note that if more are found, they will
     continue to be gathered until a break is found.
 
     The `stepSize` determines what scale step size is examined
@@ -109,7 +109,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
             collect = False
             # first, see if this is a degreeLast
             if directionLast is None:
-                dirDegreeGet = 'bi'  # note: note sure this is always best
+                dirDegreeGet = scale.Direction.BI  # note: note sure this is always best
             else:
                 dirDegreeGet = directionLast
             d = targetScale.getScaleDegreeFromPitch(p,
@@ -125,9 +125,9 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
             else:
                 # if pLast is not None:
                 #     pScaleAscending = targetScale.next(pLast,
-                #         direction='ascending')
+                #         direction=scale.Direction.ASCENDING)
                 #     pScaleDescending = targetScale.next(pLast,
-                #         direction='descending')
+                #         direction=scale.Direction.DESCENDING)
 
                 if degreeLast is None:  # if we do not have a previous
                     collect = True
@@ -137,25 +137,25 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
                 elif repeatsAllowed and degreeLast - d == 0:
                     collect = True
                 # in this case we know have a previous pitch/degree
-                elif (targetScale.isNext(p, pLast, 'ascending',
+                elif (targetScale.isNext(p, pLast, scale.Direction.ASCENDING,
                                          stepSize=stepSize,
                                          comparisonAttribute=comparisonAttribute)
-                      and directionLast in [None, 'ascending']):
+                      and directionLast in [None, scale.Direction.ASCENDING]):
 
                     # environLocal.printDebug(['found ascending degree', 'degreeLast',
                     #    degreeLast, 'd', d])
                     collect = True
-                    directionLast = 'ascending'
+                    directionLast = scale.Direction.ASCENDING
 
-                elif (targetScale.isNext(p, pLast, 'descending',
+                elif (targetScale.isNext(p, pLast, scale.Direction.DESCENDING,
                                          stepSize=stepSize,
                                          comparisonAttribute=comparisonAttribute)
-                      and directionLast in [None, 'descending']):
+                      and directionLast in [None, scale.Direction.DESCENDING]):
 
                     # environLocal.printDebug(['found descending degree', 'degreeLast', degreeLast,
                     #    'd', d])
                     collect = True
-                    directionLast = 'descending'
+                    directionLast = scale.Direction.DESCENDING
 
                 else:
                     # if this condition is not met, then we need to test
@@ -180,9 +180,12 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 
         # test at for each new pitch; set will measure original instances
         if len(collDegrees) >= degreesRequired:
-            # if next pitch is appropriate, than do not collect
+            # if next pitch is appropriate, then do not collect
             # this makes gathering greedy
-            if targetScale.isNext(pNext, p, directionLast, stepSize=1,
+            if targetScale.isNext(pNext,
+                                  p,
+                                  directionLast,
+                                  stepSize=1,
                                   comparisonAttribute=comparisonAttribute):
                 pass
                 # environLocal.printDebug(['matched degree count but next pitch is ' +
@@ -209,10 +212,10 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
             # then we should
             if clearCollect is False and clearCollectKeepLast is False:
                 # if the next pitch is part of a directional sequence, keep
-                if ((targetScale.isNext(pNext, p, 'descending',
+                if ((targetScale.isNext(pNext, p, scale.Direction.DESCENDING,
                                         stepSize=stepSize,
                                         comparisonAttribute=comparisonAttribute)
-                        or targetScale.isNext(pNext, p, 'ascending',
+                        or targetScale.isNext(pNext, p, scale.Direction.ASCENDING,
                                               stepSize=stepSize,
                                               comparisonAttribute=comparisonAttribute))):
                     clearCollectKeepLast = True
@@ -307,7 +310,7 @@ class Test(unittest.TestCase):
         post = findConsecutiveScale(part, sc, degreesRequired=4,
                                     comparisonAttribute='nameWithOctave')
         self.assertEqual(len(post), 0)  # no match
-        # set to groups of 3
+        # set to search for groups of 3
         post = findConsecutiveScale(part, sc, degreesRequired=3,
                                     comparisonAttribute='nameWithOctave')
         self.assertEqual(len(post), 3)  # no match

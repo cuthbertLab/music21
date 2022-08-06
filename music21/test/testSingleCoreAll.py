@@ -4,9 +4,9 @@
 # Purpose:      Controller for all module tests in music21.
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -17,7 +17,7 @@ Runs great, but slowly on multiprocessor systems.
 
 import doctest
 import sys
-from typing import Sequence
+import typing as t
 import unittest
 import warnings
 
@@ -28,8 +28,7 @@ from music21.test import commonTest
 from music21.test import coverageM21
 from music21.test import testRunner
 
-_MOD = 'test.testSingleCoreAll'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('test.testSingleCoreAll')
 
 
 # this is designed to be None for all but one system and a Coverage() object
@@ -37,7 +36,7 @@ environLocal = environment.Environment(_MOD)
 cov = coverageM21.getCoverage()
 
 
-def main(testGroup: Sequence[str] = ('test',),
+def main(testGroup: t.Sequence[str] = ('test',),
          restoreEnvironmentDefaults=False,
          limit=None,
          verbosity=2,

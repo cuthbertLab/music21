@@ -3,9 +3,9 @@
 # Name:         alpha/__init__.py
 # Purpose:      music21 modules not fully ready for prime-time
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------

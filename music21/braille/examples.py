@@ -4,7 +4,7 @@
 # Purpose:      Transcribing popular music into braille music using music21.
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -1176,7 +1176,8 @@ Barline final ⠣⠅
 
         demo = corpus.parse('demos/two-voices')
         x = objectToBraille(demo, debug=True)
-        y = '''Movement Name: two-voices.xml
+        y = '''Composer: Music21
+Movement Name: two-voices.xml
 Title: Music21 Fragment
 ---begin segment---
 <music21.braille.segment BrailleSegment>

@@ -4,9 +4,9 @@
 # Purpose:      music21 documentation iterators, including IPython notebook to ReST converter
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013, 17 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013, 17 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import abc  # for @abc.abstractmethod decorator: requires a function to be defined in subclasses

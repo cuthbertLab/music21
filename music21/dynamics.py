@@ -3,10 +3,10 @@
 # Name:         dynamics.py
 # Purpose:      Module for dealing with dynamics changes.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@
 Classes and functions for creating and manipulating dynamic symbols. Rather than
 subclasses, the :class:`~music21.dynamics.Dynamic` object is often specialized by parameters.
 '''
-
+import typing as t
 import unittest
 
 from music21 import base
@@ -24,8 +24,7 @@ from music21 import spanner
 from music21 import style
 
 from music21 import environment
-_MOD = 'dynamics'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('dynamics')
 
 
 shortNames = ['pppppp', 'ppppp', 'pppp', 'ppp', 'pp', 'p', 'mp',
@@ -195,7 +194,7 @@ class Dynamic(base.Music21Object):
     _styleClass = style.TextStyle
 
     _DOC_ORDER = ['longName', 'englishName']
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'longName': r'''
             the name of this dynamic in Italian.
 
@@ -212,7 +211,19 @@ class Dynamic(base.Music21Object):
             >>> d.englishName
             'very soft'
             ''',
-        'placement': "Staff placement: 'above', 'below', or None.",
+        'placement': '''
+            Staff placement: 'above', 'below', or None.
+
+            A setting of None implies that the placement will be determined
+            by notation software and no particular placement is demanded.
+
+            This is not placed in the `.style` property, since for some dynamics,
+            the placement above or below an object has semantic
+            meaning and is not purely presentational.  For instance, a dynamic
+            placed between two staves in a piano part implies that it applies
+            to both hands, while one placed below the lower staff would apply
+            only to the left hand.
+            ''',
     }
 
     def __init__(self, value=None):
@@ -451,11 +462,13 @@ class Test(unittest.TestCase):
 
     def testCorpusDynamicsWedge(self):
         from music21 import corpus
+        from music21 import dynamics
+
         a = corpus.parse('opus41no1/movement2')  # has dynamics!
-        b = a.parts[0].flatten().getElementsByClass('Dynamic')
+        b = a.parts[0].flatten().getElementsByClass(dynamics.Dynamic)
         self.assertEqual(len(b), 35)
 
-        b = a.parts[0].flatten().getElementsByClass('DynamicWedge')
+        b = a.parts[0].flatten().getElementsByClass(dynamics.DynamicWedge)
         self.assertEqual(len(b), 2)
 
     def testMusicxmlOutput(self):
@@ -489,7 +502,8 @@ class Test(unittest.TestCase):
             m.append(layout.SystemLayout(isNew=True))
             m.append(note.Rest(type='whole'))
             s.append(m)
-        for m in s.getElementsByClass('Measure'):
+        stream_iterator = s.getElementsByClass(stream.Measure)
+        for m in stream_iterator:
             offsets = [x * 0.25 for x in range(16)]
             random.shuffle(offsets)
             offsets = offsets[:4]

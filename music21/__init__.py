@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2021 Michael Scott Cuthbert
+The music21 Framework is Copyright © 2006-2022 Michael Scott Asato Cuthbert
 and the music21 Project
 
-(Michael Scott Cuthbert, principal investigator; cuthbert@mit.edu)
+(Michael Scott Asato Cuthbert, principal investigator; cuthbert@mit.edu)
 
 Some Rights Reserved
 Released under the BSD (3-clause) license.  For historical reasons, music21
@@ -30,7 +30,7 @@ and Social Sciences.  Portions of music21 were originally part of
 the PMusic (Perl) library, developed by Cuthbert prior to arriving at MIT.
 
 music21 outputs a subset of XML data defined by the MusicXML 4.0
-standard, Copyright © 2004-2021 the Contributors to the MusicXML Specification.
+standard, Copyright © 2004-2022 the Contributors to the MusicXML Specification.
 
 The corpus files have copyrights retained by their
 owners who have allowed them to be included with music21.

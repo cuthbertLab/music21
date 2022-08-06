@@ -4,9 +4,9 @@
 # Purpose:      translates Noteworthy Composer's NWCTXT format
 #
 # Authors:      Jordi Bartolome
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -77,8 +77,7 @@ from music21 import tie
 from music21.exceptions21 import Music21Exception
 
 from music21 import environment
-_MOD = 'noteworthy.translate'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('noteworthy.translate')
 
 
 # initializations
@@ -275,12 +274,12 @@ class NoteworthyTranslator:
             self.withinTie = False
 
     def getPitchFromPositionInfo(self, posInfo):
+        # noinspection PyShadowingNames
         '''
         returns a pitch object given the Pos: info
 
         removes ties and alteration signs.  Otherwise
         is same as getOnePitchFromPosition()
-
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
@@ -323,9 +322,9 @@ class NoteworthyTranslator:
         return pitchList
 
     def getOnePitchFromPosition(self, pos):
+        # noinspection PyShadowingNames
         '''
         get one pitch from a position...
-
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
@@ -366,11 +365,11 @@ class NoteworthyTranslator:
         return p
 
     def getStepAndOctaveFromPosition(self, positionNote):
+        # noinspection PyShadowingNames
         '''
         Given an int representing the position on the staff for the
         current clef,
         returns a string for the step and an int for the octave
-
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
@@ -892,7 +891,7 @@ class Test(unittest.TestCase):
         nwt = NoteworthyTranslator()
         s = nwt.parseString(info)
         # s.show('text')
-        n1 = s.parts[1].getElementsByClass('Measure').first().notes.first()
+        n1 = s.parts[1].getElementsByClass(stream.Measure).first().notes.first()
         self.assertEqual(n1.pitch.accidental.alter, -1.0)
 
 

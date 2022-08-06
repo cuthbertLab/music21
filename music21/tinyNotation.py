@@ -3,9 +3,9 @@
 # Name:         tinyNotation.py
 # Purpose:      A simple notation input format.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
 '''
@@ -123,7 +123,7 @@ here we will set the "modifierStar" to change the color of notes:
 >>> tnc = tinyNotation.Converter('3/4 C4*pink* D4*green* E4*blue*')
 >>> tnc.modifierStar = ColorModifier
 >>> s = tnc.parse().stream
->>> for n in s.recurse().getElementsByClass('Note'):
+>>> for n in s.recurse().getElementsByClass(note.Note):
 ...     print(n.step, n.style.color)
 C pink
 D green
@@ -147,7 +147,7 @@ Or more usefully, and often desired:
     {2.0} <music21.harmony.ChordSymbol Dm>
     {3.0} <music21.harmony.ChordSymbol E-sus4>
     {4.0} <music21.bar.Barline type=final>
->>> for cs in s.recurse().getElementsByClass('ChordSymbol'):
+>>> for cs in s.recurse().getElementsByClass(harmony.ChordSymbol):
 ...     print([p.name for p in cs.pitches])
 ['C', 'E', 'G', 'B']
 ['D', 'F', 'A']
@@ -229,7 +229,6 @@ for details on how to do that.
 import collections
 import copy
 import re
-import sre_parse
 import typing
 import unittest
 
@@ -244,8 +243,7 @@ from music21 import meter
 from music21 import pitch
 
 from music21 import environment
-_MOD = 'tinyNotation'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('tinyNotation')
 
 
 class TinyNotationException(exceptions21.Music21Exception):
@@ -1125,7 +1123,7 @@ class Converter:
         for rePre, classCall in self.tokenMap:
             try:
                 self._tokenMapRe.append((re.compile(rePre), classCall))
-            except sre_parse.error as e:
+            except re.error as e:
                 raise TinyNotationException(
                     f'Error in compiling token, {rePre}: {e}'
                 ) from e

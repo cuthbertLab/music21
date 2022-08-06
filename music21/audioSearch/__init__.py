@@ -5,9 +5,9 @@
 #               routines
 #
 # Authors:      Jordi Bartolome
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011-2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -41,7 +41,7 @@ import wave
 import warnings
 import unittest
 
-from typing import List, Union
+import typing as t
 
 # cannot call this base, because when audioSearch.__init__.py
 # imports * from base, it overwrites audioSearch!
@@ -59,8 +59,7 @@ from music21.audioSearch import recording
 from music21.audioSearch import transcriber
 
 from music21 import environment
-_MOD = 'audioSearch'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('audioSearch')
 
 audioChunkLength = 1024
 recordSampleRate = 44100
@@ -144,7 +143,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
             # numpy warns scipy that oldnumeric will be dropped soon.
             warnings.simplefilter('ignore', DeprecationWarning)
             # noinspection PyPackageRequirements
-            from scipy.signal import fftconvolve as convolve
+            from scipy.signal import fftconvolve as convolve  # type: ignore
     except ImportError:  # pragma: no cover
         warnings.warn('Running convolve without scipy -- will be slower')
         convolve = numpy.convolve
@@ -526,11 +525,11 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
 
 
 def smoothFrequencies(
-    frequencyList: List[Union[int, float]],
+    frequencyList: t.List[t.Union[int, float]],
     *,
     smoothLevels=7,
     inPlace=False
-) -> List[int]:
+) -> t.List[int]:
     '''
     Smooths the shape of the signal in order to avoid false detections in the fundamental
     frequency.  Takes in a list of ints or floats.
@@ -544,7 +543,7 @@ def smoothFrequencies(
     >>> result
     [409, 409, 409, 428, 435, 438, 442, 444, 441, 441, 441,
      441, 434, 433, 432, 431, 437, 438, 439, 440, 440, 440,
-     440, 440, 440, 441, 441, 441, 441, 441, 441, 441]
+     440, 440, 440, 441, 441, 441, 440, 440, 440, 440]
 
     Original list is unchanged:
 
@@ -606,10 +605,11 @@ def smoothFrequencies(
         )
 
     dpf = frequencyList
+    detectedPitchesFreq: t.List[float]
     if inPlace:
-        detectedPitchesFreq = dpf
+        detectedPitchesFreq = [float(f) for f in dpf]
     else:
-        detectedPitchesFreq = copy.copy(dpf)
+        detectedPitchesFreq = [float(f) for f in copy.copy(dpf)]
 
     # smoothing
     beginning = 0.0
@@ -622,21 +622,23 @@ def smoothFrequencies(
     ends = ends / smoothLevels
 
     for i in range(numFreqs):
+        # TODO: replace this O(i*smoothLevels) routine with an O(i) routine
         if i < int(math.floor(smoothLevels / 2.0)):
-            detectedPitchesFreq[i] = beginning
+            detectedPitchesFreq[i] = int(beginning)
         elif i > numFreqs - int(math.ceil(smoothLevels / 2.0)) - 1:
-            detectedPitchesFreq[i] = ends
+            detectedPitchesFreq[i] = int(ends)
         else:
-            t = 0
+            change = 0.0
             for j in range(smoothLevels):
-                t = t + detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
-            detectedPitchesFreq[i] = t / smoothLevels
+                change += detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
+            detectedPitchesFreq[i] = change / smoothLevels
 
-    for i in range(numFreqs):
-        detectedPitchesFreq[i] = int(round(detectedPitchesFreq[i]))
-
+    out: t.List[int] = [int(round(f)) for f in detectedPitchesFreq]
     if not inPlace:
-        return detectedPitchesFreq
+        return out
+    else:
+        for i in range(len(frequencyList)):
+            frequencyList[i] = out[i]
 
 
 # ------------------------------------------------------
@@ -1001,7 +1003,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER: List[type] = []
+_DOC_ORDER: t.List[type] = []
 
 
 if __name__ == '__main__':

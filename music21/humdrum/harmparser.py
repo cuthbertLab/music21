@@ -5,7 +5,7 @@
 #
 # Authors:      Nestor Napoles Lopez
 #
-# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,7 +15,7 @@ The `**harm` representation is described here: https://www.humdrum.org/rep/harm/
 '''
 import re
 import unittest
-from typing import Dict, Any
+import typing as t
 
 def convertHarmToRoman(harmStr):
     # noinspection PyShadowingNames
@@ -201,9 +201,9 @@ class HarmParser:
         self.harmRegExp = re.compile(HarmParser.defs.harmExpression, re.VERBOSE)
         self.impliedRegExp = re.compile(HarmParser.defs.implied, re.VERBOSE)
 
-    def parse(self, harmExpression) -> Dict[str, Any]:
+    def parse(self, harmExpression) -> t.Dict[str, t.Any]:
         # Check for implied harmony
-        m: Dict[str, Any]
+        m: t.Dict[str, t.Any]
         impliedMatch = self.impliedRegExp.match(harmExpression)
         if impliedMatch:
             # This is implied harmony
