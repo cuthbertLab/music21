@@ -434,13 +434,17 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     @overload
     def __getitem__(
         self,
-        k: t.Type[ChangedM21ObjType]
+        k: t.Union[t.Type[ChangedM21ObjType], t.Collection[t.Type[ChangedM21ObjType]]]
     ) -> iterator.RecursiveIterator[ChangedM21ObjType]:
         x = t.cast(iterator.RecursiveIterator[ChangedM21ObjType], self.recurse())
         return x  # dummy code
 
     def __getitem__(self,
-                    k: t.Union[str, int, slice, t.Type[ChangedM21ObjType]]
+                    k: t.Union[str,
+                               int,
+                               slice,
+                               t.Type[ChangedM21ObjType],
+                               t.Collection[t.Type[ChangedM21ObjType]]]
                     ) -> t.Union[iterator.RecursiveIterator[M21ObjType],
                                  iterator.RecursiveIterator[ChangedM21ObjType],
                                  M21ObjType,
@@ -486,7 +490,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         3.0
 
 
-        If a class is given then an iterator of elements
+        If a class (or iterable of classes) is given, then an iterator of elements
         that match the requested class(es) is returned, similar
         to `Stream().recurse().getElementsByClass()`.
 
@@ -496,6 +500,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         2
         >>> len(s[note.Note])
         6
+        >>> len(s[[note.Note, note.Rest]])
+        8
 
         >>> for n in s[note.Note]:
         ...     print(n.name, end=' ')
@@ -556,7 +562,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         >>> s[0.5]
         Traceback (most recent call last):
-        TypeError: Streams can get items by int, slice, class, or string query; got <class 'float'>
+        TypeError: Streams can get items by int, slice, class, class iterable, or string query;
+         got <class 'float'>
 
         Changed in v7:
           - out of range indexes now raise an IndexError, not StreamException
@@ -573,6 +580,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             .recurse().getElementsByClass to get the earlier behavior.  Old behavior
             still works until v9.  This is an attempt to unify __getitem__ behavior in
             StreamIterators and Streams.
+          - allowed iterables of qualified class names, e.g. `[note.Note, note.Rest]`
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
@@ -607,7 +615,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
             return t.cast(M21ObjType, searchElements[k])
 
-        elif isinstance(k, type) and issubclass(k, base.Music21Object):
+        elif all(
+            isinstance(maybeType, type) and issubclass(maybeType, base.Music21Object)
+            for maybeType in (
+                k if common.isIterable(k) else [k]  # type: ignore
+            )
+        ):
             return self.recurse().getElementsByClass(k)
 
         elif isinstance(k, str):
@@ -619,7 +632,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 return querySelectorIterator
 
         raise TypeError(
-            f'Streams can get items by int, slice, class, or string query; got {type(k)}'
+            'Streams can get items by int, slice, class, class iterable, or string query; '
+            f'got {type(k)}'
         )
 
     def first(self) -> t.Optional[M21ObjType]:
