@@ -1134,6 +1134,64 @@ class Test(unittest.TestCase):
         self.assertIsInstance(notes[3].articulations[1], articulations.FretIndication)
         self.assertEqual(notes[3].articulations[1].number, 3)
 
+    def testArpeggioMarks(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.arpeggio32d)
+        p = s.parts[0]
+        m = p.measure(1)
+        gnote_index = 0
+        for el in m:
+            if isinstance(el, note.GeneralNote):
+                # There should be exactly seven GeneralNotes in this measure, all of
+                # which should be Chords with an ArpeggioMark.  The ArpeggioMarks, in
+                # order, should be 'normal', 'up', 'normal', 'down', 'normal',
+                # 'non-arpeggio', and 'normal'.
+                # None of the Notes in those Chords should have an ArpeggioMark.
+                with self.subTest(gnote_index=gnote_index):
+                    self.assertIsInstance(el, chord.Chord)
+                    self.assertIsInstance(el.expressions[0], expressions.ArpeggioMark)
+
+                    if gnote_index == 0:
+                        self.assertEqual(el.expressions[0].type, 'normal')
+                    elif gnote_index == 1:
+                        self.assertEqual(el.expressions[0].type, 'up')
+                    elif gnote_index == 2:
+                        self.assertEqual(el.expressions[0].type, 'normal')
+                    elif gnote_index == 3:
+                        self.assertEqual(el.expressions[0].type, 'down')
+                    elif gnote_index == 4:
+                        self.assertEqual(el.expressions[0].type, 'normal')
+                    elif gnote_index == 5:
+                        self.assertEqual(el.expressions[0].type, 'non-arpeggio')
+                    elif gnote_index == 6:
+                        self.assertEqual(el.expressions[0].type, 'normal')
+                    self.assertFalse(gnote_index > 6)
+
+                    for n in el.notes:
+                        for exp in n.expressions:
+                            self.assertNotIsInstance(exp, expressions.ArpeggioMark)
+
+                    gnote_index += 1
+
+    def testArpeggioMarkSpanners(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.multiStaffArpeggios)
+        sb = s.spannerBundle.getByClass(expressions.ArpeggioMarkSpanner)
+        self.assertIsNotNone(sb)
+        sp = sb[0]
+        # go find all the chords and check for spanner vs expressions
+        chords: [chord.Chord] = []
+        for i, p in enumerate(s.parts):
+            # ArpeggioMarkSpanner spans the second chord (index == 1) across both parts
+            chords.append(p[chord.Chord][1])
+
+        for spanned, ch in zip(sp, chords):
+            self.assertIs(spanned, ch)
+
     def testHiddenRests(self):
         from music21 import converter
         from music21 import corpus

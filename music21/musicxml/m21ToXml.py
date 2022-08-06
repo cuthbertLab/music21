@@ -42,6 +42,7 @@ from music21 import bar
 from music21 import clef
 from music21 import chord
 from music21 import duration
+from music21 import expressions
 from music21 import harmony
 from music21 import instrument
 from music21 import key
@@ -1439,7 +1440,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.scoreMetadata = None
 
-        self.spannerBundle = None
+        self.spannerBundle: t.Optional[spanner.SpannerBundle] = None
         self.meterStream: t.Optional[stream.Stream[meter.TimeSignatureBase]] = None
         self.scoreLayouts = None
         self.firstScoreLayout = None
@@ -3086,6 +3087,8 @@ class MeasureExporter(XMLExporterBase):
         self.offsetInMeasure = 0.0
         self.currentVoiceId: t.Optional[int] = None
         self.nextFreeVoiceNumber = 1
+        self.nextArpeggioNumber = 1
+        self.arpeggioNumbers: t.Dict[expressions.ArpeggioMarkSpanner, int] = {}
 
         self.rbSpanners: t.List[spanner.RepeatBracket] = []  # repeatBracket spanners
 
@@ -3428,7 +3431,23 @@ class MeasureExporter(XMLExporterBase):
 
         return post
 
-    def objectAttachedSpannersToNotations(self, obj, objectSpannerBundle=None):
+    def getArpeggioNumber(self, arp: expressions.ArpeggioMarkSpanner) -> int:
+        arpeggioNumber: int = self.arpeggioNumbers.get(arp, -1)
+        if arpeggioNumber == -1:
+            arpeggioNumber = self.nextArpeggioNumber
+            self.nextArpeggioNumber += 1
+            if self.nextArpeggioNumber > 16:
+                self.nextArpeggioNumber = 1
+            self.arpeggioNumbers[arp] = arpeggioNumber
+
+        return arpeggioNumber
+
+    def objectAttachedSpannersToNotations(
+        self,
+        obj: base.Music21Object,
+        noteIndexInChord: int = 0,
+        objectSpannerBundle: t.Optional[spanner.SpannerBundle] = None
+    ) -> t.List[Element]:
         '''
         return a list of <notations> from spanners related to the object that should appear
         in the notations tag (slurs, slides, etc.)
@@ -3441,7 +3460,7 @@ class MeasureExporter(XMLExporterBase):
         >>> m.append(n0)
         >>> m.append(n1)
         >>> mex = musicxml.m21ToXml.MeasureExporter(m)
-        >>> out = mex.objectAttachedSpannersToNotations(n0, m.spannerBundle)
+        >>> out = mex.objectAttachedSpannersToNotations(n0, objectSpannerBundle=m.spannerBundle)
         >>> out
         [<Element 'ornaments' at 0x1114d9408>]
         >>> mex.dump(out[0])
@@ -3449,21 +3468,27 @@ class MeasureExporter(XMLExporterBase):
           <tremolo type="start">3</tremolo>
         </ornaments>
 
-        >>> out = mex.objectAttachedSpannersToNotations(n1, m.spannerBundle)
+        >>> out = mex.objectAttachedSpannersToNotations(n1, objectSpannerBundle=m.spannerBundle)
         >>> mex.dump(out[0])
         <ornaments>
           <tremolo type="stop">3</tremolo>
         </ornaments>
-
-
         '''
-        notations = []
+        notations: t.List[Element] = []
         if objectSpannerBundle is not None:
             sb = objectSpannerBundle
         else:
             sb = self.objectSpannerBundle
 
         if not sb:
+            return notations
+
+        self.appendArpeggioMarkSpannersToNotations(obj, noteIndexInChord, notations, sb)
+
+        isSingleNoteOrFirstInChord = (noteIndexInChord == 0)
+
+        # Everything below this point is only for single note or first note in chord
+        if not isSingleNoteOrFirstInChord:
             return notations
 
         ornaments = []
@@ -3570,6 +3595,47 @@ class MeasureExporter(XMLExporterBase):
             notations.append(mxOrnGroup)
 
         return notations
+
+    def appendArpeggioMarkSpannersToNotations(
+        self,
+        obj: base.Music21Object,
+        noteIndexInChord: int,
+        notations: t.List[Element],
+        sb: spanner.SpannerBundle,
+    ) -> None:
+        for ams in sb.getByClass(expressions.ArpeggioMarkSpanner):
+            if not ams.hasSpannedElement(obj):
+                continue
+
+            # putting this check inside the loop rather than outside,
+            # because it'll run rarely.
+            sub_obj = obj
+            if isinstance(obj, chord.Chord):
+                sub_obj = obj[noteIndexInChord]
+
+            mxArpeggio: t.Optional[Element] = None
+            if ams.type == 'non-arpeggio':
+                min_note, max_note = ams.noteExtremes()
+                # <non-arpeggiate> goes only on top and bottom note in chord
+                if sub_obj is min_note:
+                    mxArpeggio = Element('non-arpeggiate')
+                    mxArpeggio.set('type', 'bottom')
+                elif sub_obj is max_note:
+                    mxArpeggio = Element('non-arpeggiate')
+                    mxArpeggio.set('type', 'top')
+            else:
+                mxArpeggio = Element('arpeggiate')
+                if ams.type != 'normal':
+                    mxArpeggio.set('direction', ams.type)
+            if mxArpeggio is not None and (len(ams) > 1 or (len(ams) == 1 and len(ams[0]) > 1)):
+                # There is more than one GeneralNote in the arpeggio, so we must
+                # add a number attribute that will be the same for all GeneralNotes
+                # in this spanner.  In MusicXML this number must be between
+                # 1 and 16.  We just cycle through that range.
+                arpeggioNumber: int = self.getArpeggioNumber(ams)
+                mxArpeggio.set('number', str(arpeggioNumber))
+            if mxArpeggio is not None:
+                notations.append(mxArpeggio)
 
     def noteToXml(self, n: note.GeneralNote, noteIndexInChord=0, chordParent=None):
         # noinspection PyShadowingNames
@@ -4154,6 +4220,9 @@ class MeasureExporter(XMLExporterBase):
         </note>
         '''
         mxNoteList = []
+        if isinstance(c, chord.Chord):
+            c.sortAscending()
+
         for i, n in enumerate(c):
             if 'Unpitched' in n.classSet:
                 mxNoteList.append(self.unpitchedToXml(n, noteIndexInChord=i, chordParent=c))
@@ -4468,12 +4537,29 @@ class MeasureExporter(XMLExporterBase):
             mxNotehead.set('color', color)
         return mxNotehead
 
+    def arpeggioMarkToMxExpression(self, arpeggioMark, chordOrNote, noteIndexInChord):
+        mxExpression = None
+        if arpeggioMark.type == 'non-arpeggio':
+            # <non-arpeggiate> goes on top and bottom note in chord
+            if noteIndexInChord == 0:
+                mxExpression = self.expressionToXml(arpeggioMark)
+                mxExpression.set('type', 'bottom')
+            elif noteIndexInChord == len(chordOrNote.notes) - 1:
+                mxExpression = self.expressionToXml(arpeggioMark)
+                mxExpression.set('type', 'top')
+        else:
+            # <arpeggiate> goes on every note in the chord
+            mxExpression = self.expressionToXml(arpeggioMark)
+        return mxExpression
+
+
     def noteToNotations(self, n, noteIndexInChord=0, chordParent=None):
         '''
         Take information from .expressions,
         .articulations, and spanners to
         make the <notations> tag for a note.
         '''
+
         mxArticulations = None
         mxTechnicalMark = None
         mxOrnaments = None
@@ -4486,9 +4572,19 @@ class MeasureExporter(XMLExporterBase):
             # get expressions from first note of chord
             chordOrNote = chordParent
 
-        # only apply expressions to notes or the first note of a chord...
-        if isSingleNoteOrFirstInChord:
-            for expObj in chordOrNote.expressions:
+        # apply all expressions apart from arpeggios only to the first note of a chord.
+        for expObj in chordOrNote.expressions:
+            mxExpression = None
+            if isinstance(expObj, expressions.ArpeggioMark):
+                mxExpression = self.arpeggioMarkToMxExpression(
+                    expObj, chordOrNote, noteIndexInChord
+                )
+                if mxExpression is None:
+                    # the ArpeggioMark is not applicable on this note.
+                    continue
+                notations.append(mxExpression)
+
+            elif isSingleNoteOrFirstInChord:
                 mxExpression = self.expressionToXml(expObj)
                 if mxExpression is None:
                     # print('Could not convert expression: ', mxExpression)
@@ -4538,12 +4634,10 @@ class MeasureExporter(XMLExporterBase):
 
         # <tuplet> handled elsewhere, because it's on the overall duration on chord...
 
-        if isSingleNoteOrFirstInChord and chordParent is not None:
-            notations.extend(self.objectAttachedSpannersToNotations(chordParent))
-        elif chordParent is not None:
-            pass
+        if chordParent is not None:
+            notations.extend(self.objectAttachedSpannersToNotations(chordParent, noteIndexInChord))
         else:
-            notations.extend(self.objectAttachedSpannersToNotations(n))
+            notations.extend(self.objectAttachedSpannersToNotations(n, noteIndexInChord))
         # TODO: slur
         # TODO: glissando
         # TODO: slide
@@ -4555,8 +4649,6 @@ class MeasureExporter(XMLExporterBase):
                 notations.append(x)
 
         # TODO: dynamics in notations
-        # TODO: arpeggiate
-        # TODO: non-arpeggiate
         # TODO: accidental-mark
         # TODO: other-notation
         return notations
@@ -4793,7 +4885,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxExpression)
         <inverted-turn placement="above" />
 
-        Two special types...
+        Some special types...
 
         >>> f = expressions.Fermata()
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
@@ -4811,6 +4903,22 @@ class MeasureExporter(XMLExporterBase):
         >>> mxExpression = MEX.expressionToXml(trem)
         >>> MEX.dump(mxExpression)
         <tremolo type="single">4</tremolo>
+
+        >>> arp = expressions.ArpeggioMark()
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxExpression = MEX.expressionToXml(arp)
+        >>> MEX.dump(mxExpression)
+        <arpeggiate />
+        >>> arp.type = 'down'
+        >>> mxExpression = MEX.expressionToXml(arp)
+        >>> MEX.dump(mxExpression)
+        <arpeggiate direction="down" />
+
+        >>> nonArp = expressions.ArpeggioMark('non-arpeggio')
+        >>> MEX = musicxml.m21ToXml.MeasureExporter()
+        >>> mxExpression = MEX.expressionToXml(nonArp)
+        >>> MEX.dump(mxExpression)
+        <non-arpeggiate />
         '''
         mapping = OrderedDict([
             ('Trill', 'trill-mark'),
@@ -4837,6 +4945,15 @@ class MeasureExporter(XMLExporterBase):
             if k in classes:
                 mx = Element(v)
                 break
+        if mx is None:
+            # ArpeggioMark maps to two different elements
+            if isinstance(expression, expressions.ArpeggioMark):
+                if expression.type == 'non-arpeggio':
+                    mx = Element('non-arpeggiate')
+                else:
+                    mx = Element('arpeggiate')
+                    if expression.type != 'normal':
+                        mx.set('direction', expression.type)
         if mx is None:
             environLocal.printDebug(['no musicxml conversion for:', expression])
             return

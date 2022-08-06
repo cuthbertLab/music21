@@ -2301,7 +2301,7 @@ class IntervalNetwork:
             n = self.nodes[nId]
             if n.degree not in degreeCount:
                 degreeCount[n.degree] = 0
-            g.node[nId]['pos'] = (degreeCount[n.degree], n.degree)
+            g.node[nId]['pos'] = (degreeCount[n.degree], n.degree)  # pylint: disable=no-member
             degreeCount[n.degree] += 1
         environLocal.printDebug(['got degree count', degreeCount])
         return g
@@ -2327,7 +2327,7 @@ class IntervalNetwork:
         # import is here to avoid import of matplotlib problems
         from music21 import graph
         # first ordered arg can be method type
-        g = graph.primitives.GraphNetworxGraph(
+        g = graph.primitives.GraphNetworkxGraph(
             networkxGraph=self.getNetworkxGraph())
         g.process()
 
