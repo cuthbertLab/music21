@@ -29,6 +29,7 @@ import os
 import pathlib
 import unittest
 import sys
+import warnings
 
 from collections import namedtuple
 from fractions import Fraction
@@ -6723,12 +6724,15 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         makeNotation.makeTies(returnStream, meterStream=meterStream, inPlace=True)
 
-        # measureStream.makeBeams(inPlace=True)
+        for m in returnStream.getElementsByClass(Measure):
+            makeNotation.splitElementsToCompleteTuplets(m, recurse=True, addTies=True)
+            makeNotation.consolidateCompletedTuplets(m, recurse=True, onlyIfTied=True)
+
         if not returnStream.streamStatus.beams:
             try:
                 makeNotation.makeBeams(returnStream, inPlace=True)
             except meter.MeterException as me:
-                environLocal.warn(['skipping makeBeams exception', me])
+                warnings.warn(str(me))
 
         # note: this needs to be after makeBeams, as placing this before
         # makeBeams was causing the duration's tuplet to lose its type setting
@@ -12801,11 +12805,12 @@ class Measure(Stream):
                     ts = defaultMeters[0]
             m.timeSignature = ts  # a Stream; get the first element
 
-        # environLocal.printDebug(['have time signature', m.timeSignature])
-        if not m.streamStatus.beams:
-            m.makeBeams(inPlace=True)
-        if not m.streamStatus.tuplets:
-            makeNotation.makeTupletBrackets(m, inPlace=True)
+        makeNotation.splitElementsToCompleteTuplets(m, recurse=True, addTies=True)
+        makeNotation.consolidateCompletedTuplets(m, recurse=True, onlyIfTied=True)
+
+        m.makeBeams(inPlace=True)
+        for m_or_v in [m, *m.voices]:
+            makeNotation.makeTupletBrackets(m_or_v, inPlace=True)
 
         if not inPlace:
             return m

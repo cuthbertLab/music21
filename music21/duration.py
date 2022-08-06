@@ -1509,11 +1509,11 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     A Duration object is made of one or more immutable DurationTuple objects stored on the
     `components` list. A Duration created by setting `quarterLength` sets the attribute
-    `expressionIsInferred` to True, which indicates that consuming functions or applications
+    :attr:`expressionIsInferred` to True, which indicates that callers
+    (such as :meth:`~music21.stream.makeNotation.splitElementsToCompleteTuplets`)
     can express this Duration using another combination of components that sums to the
     `quarterLength`. Otherwise, `expressionIsInferred` is set to False, indicating that
     components are not allowed to mutate.
-    (N.B.: `music21` does not yet implement such mutating components.)
 
     Multiple DurationTuples in a single Duration may be used to express tied
     notes, or may be used to split duration across barlines or beam groups.
@@ -1580,6 +1580,12 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '_client'
     )
 
+    _DOC_ATTR = {'expressionIsInferred':
+                 '''
+                 Boolean indicating whether this duration was created from a
+                 number rather than a type and thus can be reexpressed.
+                 '''}
+
     # INITIALIZER #
 
     def __init__(self, *arguments, **keywords):
@@ -1595,7 +1601,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         self._unlinkedType: t.Optional[str] = None
         self._dotGroups: t.Tuple[int, ...] = (0,)
-        self._tuplets: t.Union[t.Tuple['Tuplet', ...], t.Tuple] = ()  # an empty tuple
+        self._tuplets: t.Tuple['Tuplet', ...] = ()  # an empty tuple
         self._qtrLength: OffsetQL = 0.0
 
         # DurationTuples go here
