@@ -1688,8 +1688,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         Appends the PartExporter to `self.partExporterList`
         and runs .parse() on that part. Appends the PartExporter to self.
 
-        Hide rests created at this late stage.
-
         >>> v = stream.Voice(note.Note())
         >>> m = stream.Measure([meter.TimeSignature(), v])
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter(m)
