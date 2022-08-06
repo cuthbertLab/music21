@@ -1794,7 +1794,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         return self._removeIteration(elFilter)
 
     # pylint: disable=no-member
-    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
+    def _deepcopySubclassable(self: M21ObjType,
+                              memo=None,
+                              ignoreAttributes=None,
+                              removeFromIgnore=None
+                              ) -> M21ObjType:
         # NOTE: this is a performance critical operation
         defaultIgnoreSet = {'_offsetDict', 'streamStatus', '_elements', '_endElements', '_cache',
                             }
@@ -1863,7 +1867,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         return new
 
-    def __deepcopy__(self, memo=None):
+    def __deepcopy__(self: M21ObjType, memo=None) -> M21ObjType:
         '''
         Deepcopy the stream from copy.deepcopy()
         '''

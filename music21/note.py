@@ -1538,7 +1538,7 @@ class Note(NotRest):
         '''
         After doing a deepcopy of the pitch, be sure to set the client
         '''
-        new = t.cast(type(self), super().__deepcopy__(memo=memo))
+        new = super().__deepcopy__(memo=memo)
         new.pitch.client = new
         return new
 
