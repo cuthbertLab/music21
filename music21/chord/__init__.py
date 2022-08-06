@@ -4004,6 +4004,10 @@ class Chord(ChordBase):
                                  leaveRedundantPitches=leaveRedundantPitches)
         if inPlace is True:
             c2 = self
+
+        if t.TYPE_CHECKING:
+            from music21 import stream
+            assert isinstance(c2, stream.Stream)
         # startOctave = c2.bass().octave
         remainingPitches = copy.copy(c2.pitches)  # no deepcopy needed
 
