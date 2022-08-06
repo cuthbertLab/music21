@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'8.0.0a3'
+'8.0.0a9'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -1910,7 +1910,7 @@ class Music21Object(prebase.ProtoM21Object):
             callerFirst = self
             if self.isStream and self not in memo:
                 streamSelf = t.cast('music21.stream.Stream', self)
-                recursionType = streamSelf.recursionType
+                recursionType = streamSelf.recursionType  # pylint: disable=no-member
                 environLocal.printDebug(
                     f'Caller first is {callerFirst} with offsetAppend {offsetAppend}')
                 if returnSortTuples:

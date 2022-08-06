@@ -29,8 +29,6 @@ from music21 import exceptions21
 from music21.musicxml import xmlObjects
 from music21.musicxml.xmlObjects import MusicXMLImportException, MusicXMLWarning
 
-# modules that import this include converter.py.
-# thus, cannot import these here
 from music21 import articulations
 from music21 import bar
 from music21 import base  # for typing
@@ -71,6 +69,14 @@ StaffReferenceType = t.Dict[int, t.List[base.Music21Object]]
 
 # const
 NO_STAFF_ASSIGNED = 0
+
+# see docstring for isRecognizableMetadataKey for information on
+# this list.
+_recognizableKeys: t.List[str] = list(
+    metadata.properties.ALL_NAMESPACE_NAMES
+    + metadata.properties.ALL_UNIQUE_NAMES
+    + metadata.properties.ALL_MUSIC21_WORK_IDS
+)
 
 
 # ------------------------------------------------------------------------------
@@ -292,6 +298,16 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, *, transform
 
     setattr(m21El, attributeName, value)
 
+def _addMetadataItemFromTagText(m21md: metadata.Metadata, xmlEl, tag, mdUniqueName):
+    matchEl = xmlEl.find(tag)  # find first
+    if matchEl is None:
+        return
+
+    value = matchEl.text
+    if value in (None, ''):
+        return
+
+    m21md.add(mdUniqueName, value)
 
 def _synchronizeIds(element, m21Object):
     '''
@@ -527,7 +543,7 @@ class XMLParserBase:
     def setPlacement(self, mxObject, m21Object):
         '''
         Sets the placement for objects that have a .placement attribute
-        (most but not all spanners) and sets the style.placement for those
+        (most but not all spanners) and sets the `style.placement` for those
         that don't.
         '''
         placement = mxObject.get('placement')
@@ -784,6 +800,7 @@ class XMLParserBase:
             staffLayout.staffNumber = staffNumber
 
         if hasattr(self, 'staffLayoutObjects') and hasattr(self, 'offsetMeasureNote'):
+            # pylint: disable=no-member
             staffLayoutKey = ((staffNumber or 1), self.offsetMeasureNote)
             self.staffLayoutObjects[staffLayoutKey] = staffLayout
 
@@ -920,8 +937,11 @@ class MusicXMLImporter(XMLParserBase):
 
         self.partGroups()
 
+        # Mark all ArpeggioMarkSpanners as complete (now that we've parsed all the Parts)
+        for sp in self.spannerBundle.getByClass(expressions.ArpeggioMarkSpanner):
+            sp.completeStatus = True
+
         # copy spanners that are complete into the Score.
-        # basically just the StaffGroups for now.
         rm = []
         for sp in self.spannerBundle.getByCompleteStatus(True):
             self.stream.coreInsert(0, sp)
@@ -1258,23 +1278,38 @@ class MusicXMLImporter(XMLParserBase):
         movement-title, identification
         '''
         if el is None:
-            el = self.root
+            el = self.xmlRoot
 
         if inputM21 is None:
             md = metadata.Metadata()
         else:
             md = inputM21
 
-        seta = _setAttributeFromTagText
+        add_m = _addMetadataItemFromTagText
+
         # work
         work = el.find('work')
         if work is not None:
-            seta(md, work, 'work-title', 'title')
-            seta(md, work, 'work-number', 'number')
-            seta(md, work, 'opus', 'opusNumber')
+            add_m(md, work, 'work-title', 'title')
+            add_m(md, work, 'work-number', 'number')
+            add_m(md, work, 'opus', 'opusNumber')
 
-        seta(md, el, 'movement-number')
-        seta(md, el, 'movement-title', 'movementName')
+        add_m(md, el, 'movement-number', 'movementNumber')
+        add_m(md, el, 'movement-title', 'movementName')
+
+        # If there is no movementName in the metadata, music21's MusicXML writer will
+        # duplicate the title into the movementName in the written file. Apparently this
+        # is because MusicXML renderers have historically rendered 'movement-title' as
+        # the title at the top of the page, and not the actual work-title.  The code
+        # below (which used to live in Metadata.all) notices that md['title'] and
+        # md['movementName'] are the same, and deletes md['title'], undoing that
+        # MusicXML weirdness music21's writer caused.  I have moved this code from
+        # Metadata.all to here, since it is clearly MusicXML-specific, and I don't
+        # want to corrupt the actual metadata in other code paths/converters. Perhaps
+        # the world is populated entirely by better MusicXML renderers now, so we can
+        # remove both bits of code from the MusicXML converter?...
+        if md['title'] == md['movementName']:
+            md['title'] = None
 
         identification = el.find('identification')
         if identification is not None:
@@ -1305,11 +1340,15 @@ class MusicXMLImporter(XMLParserBase):
 
         for creator in identification.findall('creator'):
             c = self.creatorToContributor(creator)
-            md.addContributor(c)
+            if md.isContributorUniqueName(c.role):
+                md.add(c.role, c)
+            else:
+                # custom c.role, store under 'otherContributor'
+                md.add('otherContributor', c)
 
         for rights in identification.findall('rights'):
             c = self.rightsToCopyright(rights)
-            md.copyright = c
+            md.add('copyright', c)
             break
 
         encoding = identification.find('encoding')
@@ -1326,18 +1365,48 @@ class MusicXMLImporter(XMLParserBase):
                     continue  # it is required, so technically can raise an exception
                 miscFieldValue = mxMiscField.text
                 if miscFieldValue is None:
-                    continue  # it is required, so technically can raise an exception
-                try:
-                    setattr(md, miscFieldName, miscFieldValue)
-                except Exception as e:  # pylint: disable=broad-except
-                    warnings.warn('Could not set metadata: {} to {}: {}'.format(
-                        miscFieldName, miscFieldValue, e
-                    ), MusicXMLWarning)
+                    miscFieldValue = ''
+
+                if self.isRecognizableMetadataKey(miscFieldName):
+                    md.add(miscFieldName, miscFieldValue)
+                else:
+                    # We didn't recognize miscFieldName? Add as custom metadata,
+                    # so nothing is lost.
+                    md.addCustom(miscFieldName, miscFieldValue)
 
         if inputM21 is None:
             return md
 
-    def processEncoding(self, encoding: ET.Element, md: metadata.Metadata):
+    @staticmethod
+    def isRecognizableMetadataKey(miscFieldName: str) -> bool:
+        '''
+        Returns bool on whether `miscFieldName` is a one of the names
+        that is among the list of names we might see in <miscellaneous>,
+        that this parser will interpret as supported metadata keys.
+        Currently, this is all the uniqueName keys (e.g. 'dateCreated'),
+        the 'namespace:name' keys (e.g. 'dcterms:created'),
+        and the pre-v8 music21 workIds (e.g. 'date').
+
+        >>> MI = musicxml.xmlToM21.MusicXMLImporter()
+        >>> MI.isRecognizableMetadataKey('dateCreated')
+        True
+        >>> MI.isRecognizableMetadataKey('dcterms:created')
+        True
+        >>> MI.isRecognizableMetadataKey('dateDestroyed')
+        False
+        '''
+        return miscFieldName in _recognizableKeys
+
+    def processEncoding(self, encoding: ET.Element, md: metadata.Metadata) -> None:
+        '''
+        Process all information in the <encoding> element and put it into the
+        Metadata object passed in as `md`.
+
+        Currently only processes 'software' and these `supports` attributes:
+
+            * new-system = Metadata.definesExplicitSystemBreaks
+            * new-page = Metadata.definesExplicitPageBreaks
+        '''
         # TODO: encoder (text + type = role) multiple
         # TODO: encoding date multiple
         # TODO: encoding-description (string) multiple
@@ -1345,7 +1414,7 @@ class MusicXMLImporter(XMLParserBase):
             if textStripValid(software):
                 if t.TYPE_CHECKING:
                     assert software.text is not None
-                md.software.append(software.text.strip())
+                md.add('software', software.text.strip())
 
         for supports in encoding.findall('supports'):
             # todo: element: required
@@ -1397,8 +1466,11 @@ class MusicXMLImporter(XMLParserBase):
             c = inputM21
 
         creatorType = creator.get('type')
-        if (creatorType is not None
-                and creatorType in metadata.Contributor.roleNames):
+        if creatorType is not None:
+            # We don't check against metadata.Contributor.roleNames here.
+            # Custom roles/creatorTypes are allowed, and will be stored in
+            # the metadata with uniqueName 'otherContributor' (see code in
+            # identificationToMetadata that does this).
             c.role = creatorType
 
         creatorText = creator.text
@@ -1955,13 +2027,12 @@ class PartParser(XMLParserBase):
 
     def updateTransposition(self, newTransposition: interval.Interval):
         '''
-        As you might expect, a measureParser that reveals a change
+        As one might expect, a measureParser that reveals a change
         in transposition is going to have an effect on the
         Part's instrument list.  This (totally undocumented) method
         deals with it.
 
-        If measureParser.transposition is None, does nothing.
-        If measureParser.transposition is not None, but
+        If `measureParser.transposition` is None, does nothing.
 
         NOTE: Need to test a change of instrument w/o a change of
         transposition such as: Bb clarinet to Bb Soprano Sax to Eb clarinet?
@@ -2476,7 +2547,7 @@ class MeasureParser(XMLParserBase):
         >>> MP.insertCoreAndRef(1.0, mxNote, note.Note('F5'))
 
         This routine leaves MP.stream in an unusable state, because
-        it runs insertCore.  Thus before querying the stream we need to run at end:
+        it runs insertCore.  Thus, before querying the stream we need to run at end:
 
         >>> MP.stream.coreElementsChanged()
         >>> MP.stream.show('text')
@@ -2588,7 +2659,7 @@ class MeasureParser(XMLParserBase):
         etc. so can generate PageLayout, SystemLayout, or StaffLayout
         objects.
 
-        Should also be able to set measure attributes on self.stream
+        Should also be able to set measure attributes on `self.stream`
         '''
         def hasPageLayout():
             if mxPrint.get('new-page') not in (None, 'no'):
@@ -2813,12 +2884,12 @@ class MeasureParser(XMLParserBase):
                 sp.replaceSpannedElement(n, c)
             for art in n.articulations:
                 if type(art) in seenArticulations:  # pylint: disable=unidiomatic-typecheck
-                    pass
+                    continue
                 c.articulations.append(art)
                 seenArticulations.add(type(art))
             for exp in n.expressions:
                 if type(exp) in seenExpressions:  # pylint: disable=unidiomatic-typecheck
-                    pass
+                    continue
                 c.expressions.append(exp)
                 seenExpressions.add(type(exp))
 
@@ -3611,8 +3682,6 @@ class MeasureParser(XMLParserBase):
         # tuplet is handled with time-modification.
 
         # TODO: dynamics
-        # TODO: arpeggiate  incl. musicxml 4: unbroken attribute
-        # TODO: non-arpeggiate
         # TODO: accidental-mark
         # TODO: other-notation
 
@@ -3644,6 +3713,31 @@ class MeasureParser(XMLParserBase):
             if textStripValid(mxObj):
                 fermata.shape = mxObj.text.strip()
             n.expressions.append(fermata)
+
+        # get any arpeggios, store in expressions.
+        for tagSearch in ('arpeggiate', 'non-arpeggiate'):
+            # TODO: musicxml 4: arpeggiate 'unbroken' attribute
+            for mxObj in mxNotations.findall(tagSearch):
+                arpeggioType: str = ''
+                if tagSearch == 'non-arpeggiate':
+                    arpeggioType = 'non-arpeggio'
+                else:
+                    arpeggioType = mxObj.get('direction')
+                idFound: t.Optional[str] = mxObj.get('number')
+                if idFound is None:
+                    arpeggio = expressions.ArpeggioMark(arpeggioType)
+                    n.expressions.append(arpeggio)
+                else:
+                    sb = self.spannerBundle.getByClassIdLocalComplete(
+                        expressions.ArpeggioMarkSpanner, idFound, False)
+                    if sb:
+                        # if we already have a spanner matching
+                        arpeggioSpanner = sb[0]
+                    else:
+                        arpeggioSpanner = expressions.ArpeggioMarkSpanner(arpeggioType)
+                        arpeggioSpanner.idLocal = idFound
+                        self.spannerBundle.append(arpeggioSpanner)
+                    arpeggioSpanner.addSpannedElements(n)
 
         for mxObj in flatten(mxNotations, 'ornaments'):
             if mxObj.tag in xmlObjects.ORNAMENT_MARKS:
@@ -5263,9 +5357,9 @@ class MeasureParser(XMLParserBase):
         and then runs the appropriate attributeTagsToMethods for
         the attribute.
 
-        Also sets self.divisions for the current divisions
+        Also sets `self.divisions` for the current divisions
         (along with self.parent.lastDivisions)
-        and self.transposition and
+        and `self.transposition` and
         to the current transpose.
         '''
         self.attributesAreInternal = False
@@ -5905,8 +5999,8 @@ class MeasureParser(XMLParserBase):
         >>> MP.stream.number
         5
 
-        Sets not only stream.number, but also MeasureParser.measureNumber and
-        MeasureParser.numberSuffix
+        Sets not only `stream.number`, but also `MeasureParser.measureNumber` and
+        `MeasureParser.numberSuffix`
 
         >>> MP.parseMeasureNumbers('44b')
         >>> MP.stream.number

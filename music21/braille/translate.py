@@ -472,24 +472,41 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
     <class 'music21.metadata.Metadata'>
     >>> print(translate.metadataToString(mdObject))
     Alternative Title: 3.1
+    Composer: Claudio Monteverdi
     Title: La Giovinetta Pianta
 
     >>> print(translate.metadataToString(mdObject, returnBrailleUnicode=True))
     ⠠⠁⠇⠞⠑⠗⠝⠁⠞⠊⠧⠑⠀⠠⠞⠊⠞⠇⠑⠒⠀⠼⠉⠲⠁
+    ⠠⠉⠕⠍⠏⠕⠎⠑⠗⠒⠀⠠⠉⠇⠁⠥⠙⠊⠕⠀⠠⠍⠕⠝⠞⠑⠧⠑⠗⠙⠊
     ⠠⠞⠊⠞⠇⠑⠒⠀⠠⠇⠁⠀⠠⠛⠊⠕⠧⠊⠝⠑⠞⠞⠁⠀⠠⠏⠊⠁⠝⠞⠁
     '''
     allBrailleLines = []
-    for key in music21Metadata._workIds:
-        value = music21Metadata._workIds[key]
-        if value is not None:
-            n = ' '.join(re.findall(r'([A-Z]*[a-z]+)', key))
-            outString = f'{n.title()}: {value}'
-            if returnBrailleUnicode:
-                outTemp = []
-                for word in outString.split():
-                    outTemp.append(wordToBraille(word))
-                outString = alphabet[' '].join(outTemp)
-            allBrailleLines.append(outString)
+    for uniqueName, value in music21Metadata.all(returnPrimitives=True, returnSorted=False):
+        if value is None:
+            # we don't put None values in braille output
+            continue
+
+        if uniqueName == 'software':
+            # we don't put software versions in braille output
+            continue
+
+        namespaceName: t.Optional[str] = music21Metadata.uniqueNameToNamespaceName(uniqueName)
+        if not namespaceName:
+            # we don't put custom metadata in braille output
+            continue
+
+        if namespaceName.startswith('m21FileInfo:'):
+            # we don't put fileInfo in braille output
+            continue
+
+        n = ' '.join(re.findall(r'([A-Z]*[a-z]+)', uniqueName))
+        outString = f'{n.title()}: {value}'
+        if returnBrailleUnicode:
+            outTemp = []
+            for word in outString.split():
+                outTemp.append(wordToBraille(word))
+            outString = alphabet[' '].join(outTemp)
+        allBrailleLines.append(outString)
     return '\n'.join(sorted(allBrailleLines))
 
 

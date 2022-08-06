@@ -177,7 +177,7 @@ class ChordBase(note.NotRest):
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
         # noinspection PyProtectedMember
-        for d in new._notes:
+        for d in new._notes:  # pylint: disable=no-member
             # if .volume is called, a new Volume obj will be created
             if d.hasVolumeInformation():
                 d.volume.client = new  # update with new instance
@@ -379,6 +379,9 @@ class ChordBase(note.NotRest):
         except ValueError:
             raise ValueError('Chord.remove(x), x not in chord')
 
+    @property
+    def notes(self) -> t.Tuple[note.NotRest, ...]:
+        return ()
 
     @property
     def tie(self):
@@ -5182,7 +5185,7 @@ class Chord(ChordBase):
         return len(self.pitchClasses)
 
     @property
-    def notes(self):
+    def notes(self) -> t.Tuple[note.Note, ...]:
         '''
         Return a tuple (immutable) of the notes contained in the chord.
 
@@ -5244,7 +5247,7 @@ class Chord(ChordBase):
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes):
+    def notes(self, newNotes: t.Iterable[note.Note]) -> None:
         '''
         sets notes to an iterable of Note objects
         '''
@@ -5805,9 +5808,9 @@ class Chord(ChordBase):
         '''
         from music21 import scale
         # roman numerals have this built in as the key attribute
-        if hasattr(self, 'key') and self.key is not None:
+        if hasattr(self, 'key') and self.key is not None:  # pylint: disable=no-member
             # Key is a subclass of scale.DiatonicScale
-            sc = self.key
+            sc = self.key  # pylint: disable=no-member
         else:
             sc = self.getContextByClass(scale.Scale, sortByCreationTime=True)
             if sc is None:

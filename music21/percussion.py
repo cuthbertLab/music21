@@ -11,6 +11,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
+import typing as t
 import unittest
 
 from music21 import common
@@ -58,11 +59,11 @@ class PercussionChord(chord.ChordBase):
 
 
     @property
-    def notes(self) -> tuple:
+    def notes(self) -> t.Tuple[note.NotRest, ...]:
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes):
+    def notes(self, newNotes: t.Iterable[t.Union[note.Unpitched, note.Note]]) -> None:
         '''
         Sets notes to an iterable of Note or Unpitched objects
         '''
@@ -79,12 +80,13 @@ class PercussionChord(chord.ChordBase):
 
         allNotes = []
         for thisNote in self.notes:
-            if hasattr(thisNote, 'nameWithOctave'):
+            if isinstance(thisNote, note.Note):
                 allNotes.append(thisNote.nameWithOctave)
-            elif thisNote.storedInstrument:
-                allNotes.append(str(thisNote.storedInstrument.instrumentName))
-            else:
-                allNotes.append(f'unpitched[{thisNote.displayName}]')
+            elif isinstance(thisNote, note.Unpitched):
+                if thisNote.storedInstrument:
+                    allNotes.append(str(thisNote.storedInstrument.instrumentName))
+                else:
+                    allNotes.append(f'unpitched[{thisNote.displayName}]')
 
         return '[' + ' '.join(allNotes) + ']'
 
