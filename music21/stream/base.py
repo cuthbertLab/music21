@@ -6727,7 +6727,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             makeNotation.splitElementsToCompleteTuplets(m, recurse=True, addTies=True)
             makeNotation.consolidateCompletedTuplets(m, recurse=True, onlyIfTied=True)
 
-        if not measureStream.streamStatus.beams:
+        if not returnStream.streamStatus.beams:
             try:
                 makeNotation.makeBeams(returnStream, inPlace=True)
             except meter.MeterException as me:

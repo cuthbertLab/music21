@@ -1891,7 +1891,7 @@ def splitElementsToCompleteTuplets(
     >>> [el.quarterLength for el in p.recurse().notesAndRests]
     [Fraction(1, 6), Fraction(1, 3), Fraction(1, 3), Fraction(1, 6)]
     '''
-    iterator: t.Iterable[Stream]
+    iterator: t.Iterable['music21.stream.Stream']
     if recurse:
         iterator = s.recurse(streamsOnly=True, includeSelf=True)
     else:
