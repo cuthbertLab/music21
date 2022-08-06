@@ -466,9 +466,21 @@ class GeneralObjectExporter:
                 {3.0} <music21.bar.Barline type=final>
         >>> s[note.NotRest].first().duration
         <music21.duration.Duration 3.0>
+
+        Changed in v8 -- fills gaps with rests before calling makeNotation
+        to avoid duplicating effort with :meth:`PartExporter.fixupNotationMeasured`.
         '''
         classes = obj.classes
         outObj = None
+
+        if isinstance(obj, stream.Stream):
+            obj.makeRests(refStreamOrTimeRange=[0.0, obj.highestTime],
+                          fillGaps=True,
+                          inPlace=True,
+                          hideRests=True,  # just to fill up MusicXML display
+                          timeRangeFromBarDuration=True,
+                          )
+
         for cM, methName in self.classMapping.items():
             if cM in classes:
                 meth = getattr(self, methName)
@@ -541,17 +553,6 @@ class GeneralObjectExporter:
         return self.fromMeasure(m)
 
     def fromStream(self, st):
-        '''
-        Changed in v8 -- fills gaps with rests before calling makeNotation
-        to avoid duplicating effort with :meth:`PartExporter.fixupNotationMeasured`.
-        '''
-        st.makeRests(refStreamOrTimeRange=[0.0, st.highestTime],
-                     fillGaps=True,
-                     inPlace=True,
-                     hideRests=True,  # just to fill up MusicXML display
-                     timeRangeFromBarDuration=True,
-                     )
-
         if st.isFlat:
             st2 = stream.Part()
             st2.mergeAttributes(st)
@@ -1687,14 +1688,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         Creates a `PartExporter` for each part, and runs .parse() on that part.
         Appends the PartExporter to `self.partExporterList`
         and runs .parse() on that part. Appends the PartExporter to self.
-
-        >>> v = stream.Voice(note.Note())
-        >>> m = stream.Measure([meter.TimeSignature(), v])
-        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter(m)
-        >>> out = GEX.parse()  # out is bytes
-        >>> outStr = out.decode('utf-8')  # now is string
-        >>> '<note print-object="no" print-spacing="yes">' in outStr
-        True
         '''
         if not self.partExporterList:
             self._populatePartExporterList()
