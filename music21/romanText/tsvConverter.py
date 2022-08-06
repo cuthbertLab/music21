@@ -15,6 +15,7 @@ DCMLab's Annotated Beethoven Corpus (Neuwirth et al. 2018).
 
 import abc
 import csv
+import fractions
 import re
 import types
 import typing as t
@@ -54,9 +55,9 @@ V1_HEADERS = types.MappingProxyType({
     'beat': float,
     'totbeat': str,
     'timesig': str,
-    'op': str,
-    'no': str,
-    'mov': str,
+    # 'op': str,
+    # 'no': str,
+    # 'mov': str,
     'length': float,
     'global_key': str,
     'local_key': str,
@@ -174,9 +175,8 @@ class TabChordBase(abc.ABC):
         self.numeral = None
         self.relativeroot = None
         self.representationType = None  # Added (not in DCML)
-        self.extra = None
+        self.extra = {}
         self.dcml_version = -1
-        self.local_key = None  # overwritten by a property in TabChordV2
 
         # shared between DCML v1 and v2
         self.chord = None
@@ -186,6 +186,13 @@ class TabChordBase(abc.ABC):
         self.figbass = None
         self.changes = None
         self.phraseend = None
+
+        # the following attributes are overwritten by properties in TabChordV2
+        # because of changed column names in DCML v2
+        self.local_key = None
+        self.global_key = None
+        self.beat = None
+        self.measure = None
 
     @property
     def combinedChord(self) -> str:
@@ -290,7 +297,7 @@ class TabChordBase(abc.ABC):
                                                 minor=False,
                                                 direction=direction)
 
-    def tabToM21(self) -> None:
+    def tabToM21(self) -> harmony.Harmony:
         '''
         Creates and returns a music21.roman.RomanNumeral() object
         from a TabChord with all shared attributes.
@@ -312,7 +319,7 @@ class TabChordBase(abc.ABC):
         if self.representationType == 'DCML':
             self._changeRepresentation()
         if self.numeral in ('@none', None):
-            thisEntry = harmony.NoChord()
+            thisEntry: harmony.Harmony = harmony.NoChord() 
         else:
             if self.dcml_version == 2 and self.chord:
                 combined = self.chord
@@ -342,19 +349,18 @@ class TabChordBase(abc.ABC):
                 seventhMinor=roman.Minor67Default.FLAT
             )
 
-            if self.dcml_version == 1:
+            if isinstance(self, TabChord):
                 # following metadata attributes seem to be missing from
                 # dcml_version 2 tsv files
-                thisEntry.op = self.op
-                thisEntry.no = self.no
-                thisEntry.mov = self.mov
+                thisEntry.editorial.op = self.extra.get("op", "")
+                thisEntry.editorial.no = self.extra.get("no", "")
+                thisEntry.editorial.mov = self.extra.get("mov", "")
 
-            thisEntry.pedal = self.pedal
-
-            thisEntry.phraseend = None
+            thisEntry.editorial.pedal = self.pedal
+            thisEntry.editorial.phraseend = None
         # if dcml_version == 2, we need to calculate the quarterLength
         #   later
-        thisEntry.quarterLength = self.length if self.dcml_version == 1 else 0.0
+        thisEntry.quarterLength = 0.0 # self.length if self.dcml_version == 1 else 0.0 TODO
         return thisEntry
 
 class TabChord(TabChordBase):
@@ -366,14 +372,12 @@ class TabChord(TabChordBase):
         # self.numeral and self.relativeroot defined in super().__init__()
         super().__init__()
         self.altchord = None
-        self.measure = None
-        self.beat = None
         self.totbeat = None
-        self.op = None
-        self.no = None
-        self.mov = None
+        # self.op = None # TODO
+        # self.no = None
+        # self.mov = None
         self.length = None
-        self.global_key = None
+        # self.global_key = None # TODO
         self.dcml_version = 1
 
 
@@ -407,6 +411,10 @@ class TabChordV2(TabChordBase):
         # beat is zero-indexed in v2 but one-indexed in v1
         return self.mn_onset + 1.0
 
+    @beat.setter
+    def beat(self, beat: float):
+        self.mn_onset = beat - 1.0 if beat is not None else None
+
     @property
     def measure(self) -> int:
         '''
@@ -414,6 +422,10 @@ class TabChordV2(TabChordBase):
         is equivalent to 'measure', so this property is provided as an alias.
         '''
         return int(self.mn)
+
+    @measure.setter
+    def measure(self, measure: int):
+        self.mn = int(measure) if measure is not None else None
 
     @property
     def local_key(self) -> str:
@@ -477,20 +489,19 @@ class TsvHandler:
     def __init__(self, tsvFile: str, dcml_version: int = 1):
         if dcml_version == 1:
             self.heading_names = HEADERS[1]
-            self._tab_chord_cls = TabChord
+            self._tab_chord_cls: t.Type[TabChordBase] = TabChord 
         elif dcml_version == 2:
             self.heading_names = HEADERS[2]
             self._tab_chord_cls = TabChordV2
         else:
             raise ValueError(f'dcml_version {dcml_version} is not in (1, 2)')
         self.tsvFileName = tsvFile
-        self.chordList = []
-        self.m21stream = None
-        self.preparedStream = None
-        self._head_indices = None
-        self._extra_indices = None
+        self.chordList: t.List[TabChordBase] = [] 
+        self.m21stream: t.Optional[stream.Score] = None 
+        self._head_indices: t.Dict[str, t.Tuple[int, t.Union[t.Type, t.Any]]] = {} 
+        self._extra_indices: t.Dict[int, str] = {} 
         self.dcml_version = dcml_version
-        self.tsvData = self.importTsv()
+        self.tsvData = self._importTsv() # converted to private
 
     def _get_heading_indices(self, header_row: t.List[str]) -> None:
         '''Private method to get column name/column index correspondences.
@@ -508,7 +519,7 @@ class TsvHandler:
             else:
                 self._extra_indices[i] = col_name
 
-    def importTsv(self) -> t.List[t.List[str]]:
+    def _importTsv(self) -> t.List[t.List[str]]:
         '''
         Imports TSV file data for further processing.
         '''
@@ -565,15 +576,25 @@ class TsvHandler:
         '''
         if not self.chordList:
             self.tsvToChords()
-        self.prepStream()
 
-        s = self.preparedStream
+        s = self.prepStream()
         p = s.parts.first()  # Just to get to the part, not that there are several.
+        
+        if p is None:
+            # in case stream has no parts
+            return s
 
         for thisChord in self.chordList:
             offsetInMeasure = thisChord.beat - 1  # beats always measured in quarter notes
             measureNumber = thisChord.measure
             m21Measure = p.measure(measureNumber)
+            if m21Measure is None:
+                # TODO: m21Measure should never be None if prepStream is
+                #   correctly implemented. We need to handle None to satisfy
+                #   mypy. If it *is* None, then there is a bug in the 
+                #   implementation. What is correct behavior in this instance?
+                #   Raise a bug?
+                raise ValueError
 
             thisM21Chord = thisChord.tabToM21()  # In either case.
             # Store any otherwise unhandled attributes of the chord
@@ -583,9 +604,10 @@ class TsvHandler:
 
         s.flatten().extendDuration(harmony.Harmony, inPlace=True)
         last_harmony = s[harmony.Harmony].last()
-        last_harmony.quarterLength = (
-            s.quarterLength - last_harmony.activeSite.offset - last_harmony.offset
-        )
+        if last_harmony is not None:
+            last_harmony.quarterLength = (
+                s.quarterLength - last_harmony.activeSite.offset - last_harmony.offset
+            )
         self.m21stream = s
         return s
 
@@ -605,11 +627,13 @@ class TsvHandler:
             s.insert(0, metadata.Metadata())
 
             firstEntry = self.chordList[0]  # Any entry will do
-            s.metadata.opusNumber = firstEntry.op
-            s.metadata.number = firstEntry.no
-            s.metadata.movementNumber = firstEntry.mov
+            s.metadata.opusNumber = firstEntry.extra.get('op', '')
+            s.metadata.number = firstEntry.extra.get('no', '')
+            s.metadata.movementNumber = firstEntry.extra.get('mov', '')
             s.metadata.title = (
-                'Op' + firstEntry.op + '_No' + firstEntry.no + '_Mov' + firstEntry.mov
+                'Op' + firstEntry.extra.get('op', '') + 
+                '_No' + firstEntry.extra.get('no', '') + 
+                '_Mov' + firstEntry.extra.get('mov', '')
             )
 
         startingKeySig = str(self.chordList[0].global_key)
@@ -622,7 +646,7 @@ class TsvHandler:
 
         currentMeasureLength = ts.barDuration.quarterLength
 
-        currentOffset = 0
+        currentOffset: t.Union[float, fractions.Fraction] = 0.0 
 
         previousMeasure: int = self.chordList[0].measure - 1  # Covers pickups
         for entry in self.chordList:
@@ -633,7 +657,6 @@ class TsvHandler:
                     m = stream.Measure(number=mNo)
                     m.offset = currentOffset + currentMeasureLength
                     p.insert(m)
-
                     currentOffset = m.offset
                     previousMeasure = mNo
             else:  # entry.measure = previousMeasure + 1
@@ -646,15 +669,12 @@ class TsvHandler:
                 if entry.timesig != currentTimeSig:
                     newTS = meter.TimeSignature(entry.timesig)
                     m.insert(entry.beat - 1, newTS)
-
                     currentTimeSig = entry.timesig
                     currentMeasureLength = newTS.barDuration.quarterLength
 
                 previousMeasure = entry.measure
 
         s.append(p)
-
-        self.preparedStream = s
 
         return s
 
@@ -706,6 +726,9 @@ class M21toTSV:
         ).key.tonicPitchNameWithCase
 
         for thisRN in self.m21Stream[roman.RomanNumeral]:
+            if thisRN is None:
+                # shouldn't occur, but to satisfy mypy
+                continue
 
             relativeroot = None
             if thisRN.secondaryRomanNumeral:
@@ -723,10 +746,14 @@ class M21toTSV:
             thisEntry.measure = thisRN.measureNumber
             thisEntry.beat = thisRN.beat
             thisEntry.totbeat = None
-            thisEntry.timesig = thisRN.getContextByClass(meter.TimeSignature).ratioString
-            thisEntry.op = self.m21Stream.metadata.opusNumber
-            thisEntry.no = self.m21Stream.metadata.number
-            thisEntry.mov = self.m21Stream.metadata.movementNumber
+            ts = thisRN.getContextByClass(meter.TimeSignature)
+            if ts is None:
+                thisEntry.timesig = ''
+            else:
+                thisEntry.timesig = ts.ratioString
+            thisEntry.extra["op"] = self.m21Stream.metadata.opusNumber
+            thisEntry.extra["no"] = self.m21Stream.metadata.number
+            thisEntry.extra["mov"] = self.m21Stream.metadata.movementNumber
             thisEntry.length = thisRN.quarterLength
             thisEntry.global_key = global_key
             thisEntry.local_key = thisRN.key.tonicPitchNameWithCase
@@ -734,7 +761,11 @@ class M21toTSV:
             thisEntry.numeral = thisRN.romanNumeral
             thisEntry.form = getForm(thisRN)
             # Strip any leading non-digits from figbass (e.g., M43 -> 43)
-            thisEntry.figbass = re.match(r'^\D*(\d.*|)', thisRN.figuresWritten).group(1)
+            figbassm = re.match(r'^\D*(\d.*|)', thisRN.figuresWritten)
+            if figbassm is not None:
+                thisEntry.figbass = figbassm.group(1)
+            else:
+                thisEntry.figbass = ''
             thisEntry.changes = None  # TODO
             thisEntry.relativeroot = relativeroot
             thisEntry.phraseend = None
@@ -748,10 +779,13 @@ class M21toTSV:
         return tsvData
 
     def _m21ToTsv_v2(self) -> t.List[t.List[str]]:
-        tsvData = []
+        tsvData: t.List[t.List[str]] = [] 
 
         # take the global_key from the first item
-        global_key_obj = self.m21Stream[roman.RomanNumeral].first().key
+        first_rn = self.m21Stream[roman.RomanNumeral].first()
+        if first_rn is None:
+            return tsvData
+        global_key_obj = first_rn.key
         global_key = global_key_obj.tonicPitchNameWithCase
         for thisRN in self.m21Stream.recurse().getElementsByClass(
             [roman.RomanNumeral, harmony.NoChord]
@@ -934,6 +968,9 @@ def getLocalKey(local_key: str, global_key: str, convertDCMLToM21: bool = False)
     >>> romanText.tsvConverter.getLocalKey('ii', 'C')
     'd'
 
+    >>> romanText.tsvConverter.getLocalKey('i', 'C')
+    'c'
+
     By default, assumes an m21 input, and operates as such:
 
     >>> romanText.tsvConverter.getLocalKey('#vii', 'a')
@@ -943,6 +980,8 @@ def getLocalKey(local_key: str, global_key: str, convertDCMLToM21: bool = False)
 
     >>> romanText.tsvConverter.getLocalKey('vii', 'a', convertDCMLToM21=True)
     'g'
+
+
     '''
     if convertDCMLToM21:
         local_key = characterSwaps(local_key, minor=isMinor(global_key[0]), direction='DCML-m21')
