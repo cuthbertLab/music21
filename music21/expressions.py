@@ -1490,6 +1490,29 @@ class ArpeggioMarkSpanner(spanner.Spanner):
             )
         self.type = arpeggioType
 
+    def noteExtremes(self) -> t.Tuple[t.Optional['music21.note.Note'],
+                                      t.Optional['music21.note.Note']]:
+        '''
+        Return the lowest and highest note spanned by the element,
+        extracting them from Chords if need be.
+
+        >>> ch = chord.Chord(['C4', 'E4', 'G4'])
+        >>> n = note.Note('C#3')
+        >>> nonArp = expressions.ArpeggioMarkSpanner([ch, n])
+        >>> nonArp.noteExtremes()
+        (<music21.note.Note C#>, <music21.note.Note G>)
+        '''
+        from music21 import chord
+        from music21 import note
+        notes = []
+        for n_or_ch in self:
+            if isinstance(n_or_ch, note.Note):
+                notes.append(n_or_ch)
+            elif isinstance(n_or_ch, chord.Chord):
+                notes.extend(n_or_ch.notes)
+        return (min(notes), max(notes))
+
+
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 

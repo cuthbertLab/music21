@@ -555,7 +555,7 @@ class Test(unittest.TestCase):
 
     def testArpeggioMarkSpannersNonArpeggiate(self):
         c1 = chord.Chord(['C3', 'E3', 'G3'])
-        n2 = note.Note('C4')
+        n2 = note.Note('D4')
         am = expressions.ArpeggioMarkSpanner([c1, n2], arpeggioType='non-arpeggio')
         m1 = stream.Measure()
         m1.append(c1)
@@ -569,7 +569,6 @@ class Test(unittest.TestCase):
 
         s = stream.Score([sl, am, p1, p2])
         x = self.getET(s)
-        ScoreExporter.dump(x)
 
         mxPart = x.find('part')
         mxMeasure = mxPart.find('measure')
@@ -580,16 +579,16 @@ class Test(unittest.TestCase):
                 notations = mxNote.find('notations')
                 if notations is not None:
                     arp = notations.find('non-arpeggiate')
-                    if note_index in (1, 2) and arp:
+                    if note_index in (1, 2) and arp is not None:
                         self.fail(f'{note_index=} should not have non-arpeggiate')
-                    if note_index in (0, 3) and not arp:
+                    if note_index in (0, 3) and arp is None:
                         self.fail(f'{note_index=} should have non-arpeggiate')
                 elif note_index in (0, 3):
                     self.fail(f'{note_index=} should have notations')
 
                 if arp is not None:
                     arpNum = arp.get('number')
-                    self.assertEqual(arpNum, 1)
+                    self.assertEqual(arpNum, '1')
 
 
     def testExportChordSymbolsWithRealizedDurations(self):
