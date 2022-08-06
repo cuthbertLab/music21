@@ -16,6 +16,7 @@ Classes and functions for creating Notes, Rests, and Lyrics.
 The :class:`~music21.pitch.Pitch` object is stored within,
 and used to configure, :class:`~music21.note.Note` objects.
 '''
+from __future__ import annotations
 
 import copy
 import unittest
@@ -1534,7 +1535,7 @@ class Note(NotRest):
         except AttributeError:
             return NotImplemented
 
-    def __deepcopy__(self, memo=None):
+    def __deepcopy__(self: Note, memo=None) -> Note:
         '''
         After doing a deepcopy of the pitch, be sure to set the client
         '''
