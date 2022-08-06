@@ -9,12 +9,14 @@ from xml.etree.ElementTree import (
 )
 
 from music21 import articulations
+from music21 import chord
 from music21 import common
 from music21 import converter
 from music21 import corpus
 from music21 import defaults
 from music21 import duration
 from music21 import dynamics
+from music21 import expressions
 from music21 import harmony
 from music21 import instrument
 from music21 import layout
@@ -457,6 +459,137 @@ class Test(unittest.TestCase):
         self.assertEqual(
             int(tree.findall('.//direction/offset')[0].text),
             defaults.divisionsPerQuarter)
+
+    def testArpeggios(self):
+        expectedResults = (
+            'arpeggiate',
+            'arpeggiate',
+            'arpeggiate',
+            'arpeggiate up',
+            'arpeggiate up',
+            'arpeggiate up',
+            'arpeggiate',
+            'arpeggiate',
+            'arpeggiate',
+            'arpeggiate down',
+            'arpeggiate down',
+            'arpeggiate down',
+            'arpeggiate',
+            'arpeggiate',
+            'arpeggiate',
+            'non-arpeggiate bottom',
+            '',
+            'non-arpeggiate top',
+            'arpeggiate',
+            'arpeggiate',
+            'arpeggiate',
+        )
+        s = converter.parse(testPrimitive.arpeggio32d)
+        x = self.getET(s)
+        # helpers.dump(x)
+        mxPart = x.find('part')
+        mxMeasure = mxPart.find('measure')
+        for i, mxNote in enumerate(mxMeasure.findall('note')):
+            with self.subTest(note_index=i):
+                nonArp = None
+                arp = None
+                notations = mxNote.find('notations')
+                if notations is not None:
+                    nonArp = notations.find('non-arpeggiate')
+                    arp = notations.find('arpeggiate')
+                if expectedResults[i].startswith('non-arpeggiate'):
+                    self.assertIsNotNone(nonArp)
+                    nonArpType = nonArp.get('type')
+                    for whichEnd in ('top', 'bottom'):
+                        if expectedResults[i].endswith(whichEnd):
+                            self.assertEqual(nonArpType, whichEnd)
+                    continue
+                if expectedResults[i].startswith('arpeggiate'):
+                    self.assertIsNotNone(arp)
+                    arpDirection = arp.get('direction')
+                    if expectedResults[i] == 'arpeggiate':
+                        self.assertIsNone(arpDirection)
+                        continue
+                    for direction in ('up', 'down'):
+                        if expectedResults[i].endswith(direction):
+                            self.assertEqual(arpDirection, direction)
+                    continue
+                self.assertIsNone(arp)
+                self.assertIsNone(nonArp)
+
+    def testArpeggioMarkSpanners(self):
+        expectedNumber = (
+            #  three-note chord with single-chord arpeggio
+            None,
+            None,
+            None,
+            #  three-note chord in a multi-chord (cross-voice) arpeggio (number == 1)
+            '1',
+            '1',
+            '1',
+            #  backup and do next voice
+            #  three-note chord with single-chord arpeggio
+            None,
+            None,
+            None,
+            #  three-note chord in that same multi-chord (cross-voice) arpeggio (number == 1)
+            '1',
+            '1',
+            '1',
+        )
+
+        s = converter.parse(testPrimitive.multiStaffArpeggios)
+        x = self.getET(s)
+        mxPart = x.find('part')
+        mxMeasure = mxPart.find('measure')
+        for note_index, mxNote in enumerate(mxMeasure.findall('note')):
+            with self.subTest(note_index=note_index):
+                arp = None
+                arpNum = None
+                notations = mxNote.find('notations')
+                if notations is not None:
+                    arp = notations.find('arpeggiate')
+                if arp is not None:
+                    arpNum = arp.get('number')
+                self.assertEqual(arpNum, expectedNumber[note_index])
+
+    def testArpeggioMarkSpannersNonArpeggiate(self):
+        c1 = chord.Chord(['C3', 'E3', 'G3'])
+        n2 = note.Note('D4')
+        am = expressions.ArpeggioMarkSpanner([c1, n2], arpeggioType='non-arpeggio')
+        m1 = stream.Measure()
+        m1.append(c1)
+        p1 = stream.PartStaff([m1])
+
+        m2 = stream.Measure()
+        m2.append(n2)
+        p2 = stream.PartStaff([m2])
+
+        sl = layout.StaffGroup([p1, p2])
+
+        s = stream.Score([sl, am, p1, p2])
+        x = self.getET(s)
+
+        mxPart = x.find('part')
+        mxMeasure = mxPart.find('measure')
+        for note_index, mxNote in enumerate(mxMeasure.findall('note')):
+            with self.subTest(note_index=note_index):
+                arp = None
+                arpNum = -1
+                notations = mxNote.find('notations')
+                if notations is not None:
+                    arp = notations.find('non-arpeggiate')
+                    if note_index in (1, 2) and arp is not None:
+                        self.fail(f'{note_index=} should not have non-arpeggiate')
+                    if note_index in (0, 3) and arp is None:
+                        self.fail(f'{note_index=} should have non-arpeggiate')
+                elif note_index in (0, 3):
+                    self.fail(f'{note_index=} should have notations')
+
+                if arp is not None:
+                    arpNum = arp.get('number')
+                    self.assertEqual(arpNum, '1')
+
 
     def testExportChordSymbolsWithRealizedDurations(self):
         gex = GeneralObjectExporter()
