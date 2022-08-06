@@ -897,7 +897,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         self.displayLocation = 'normal'
 
         # store a reference to the object that has this duration object as a property
-        self.client: t.Optional['Pitch'] = None
+        self.client: t.Optional['music21.note.Note'] = None
         self._name = ''
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step

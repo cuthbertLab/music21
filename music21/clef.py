@@ -247,8 +247,9 @@ class Clef(base.Music21Object):
             relevantPitches = pitchList
 
         differenceSum = 0
+        # pylint: disable-next=no-member
         if isinstance(self, (PercussionClef, PitchClef)) and self.lowestLine is not None:
-            midLine = self.lowestLine + 4
+            midLine = self.lowestLine + 4  # pylint: disable=no-member
         else:
             midLine = 35  # assume TrebleClef-like.
 
