@@ -171,7 +171,7 @@ class MetadataCachingJob:
                 environLocal.printDebug(
                     'addFromPaths: got stream without metadata, '
                     'creating stub: {0}'.format(
-                        common.relativepath(self.cleanFilePath)))
+                        common.relativepath(str(self.cleanFilePath))))
                 metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     metadataPayload=None,
@@ -390,7 +390,7 @@ class JobProcessor:
 
 class WorkerProcess(multiprocessing.Process):  # pylint: disable=inherit-non-class
     '''
-    A worker process for use by the multi-threaded metadata-caching job
+    A worker process for use by the multithreaded metadata-caching job
     processor.
     '''
 

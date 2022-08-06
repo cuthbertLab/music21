@@ -144,7 +144,7 @@ def _indexSingleMulticore(filePath, *args, **keywords):
     '''
     keywords2 = copy.copy(keywords)
     if 'failFast' in keywords2:
-        del(keywords2['failFast'])
+        del keywords2['failFast']
 
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
@@ -159,7 +159,7 @@ def _indexSingleMulticore(filePath, *args, **keywords):
             indexOutput = ''
         else:
             raise e
-    return(shortFp, indexOutput, filePath)
+    return (shortFp, indexOutput, filePath)
 
 
 def _giveUpdatesMulticore(numRun, totalRun, latestOutput):

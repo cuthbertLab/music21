@@ -1426,6 +1426,93 @@ class TremoloSpanner(spanner.Spanner):
             raise TremoloException('Number of marks must be a number from 0 to 8') from ve
 
 
+class ArpeggioMark(Expression):
+    '''
+    ArpeggioMark must be applied to a Chord (not to a single Note).
+
+    The parameter arpeggioType can be 'normal' (a squiggly line), 'up' (a squiggly line
+    with an up arrow), 'down' (a squiggly line with a down arrow), or 'non-arpeggio' (a
+    bracket instead of a squiggly line, used to indicate a non-arpeggiated chord
+    intervening in a sequence of arpeggiated ones).
+
+    >>> am = expressions.ArpeggioMark('normal')
+    >>> am.type
+    'normal'
+
+    >>> am = expressions.ArpeggioMark('down')
+    >>> am.type
+    'down'
+    '''
+    def __init__(self, arpeggioType: t.Optional[str] = None):
+        super().__init__()
+        if arpeggioType is None:
+            arpeggioType = 'normal'
+        if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
+            raise ValueError(
+                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
+            )
+        self.type = arpeggioType
+
+
+class ArpeggioMarkSpanner(spanner.Spanner):
+    '''
+    ArpeggioMarkSpanner is a multi-staff or multi-voice (i.e. multi-chord) arpeggio.
+    The spanner should contain all the simultaneous Chords that are to be
+    arpeggiated together.  If there is only one arpeggiated note in a particular staff
+    or voice (i.e. the rest are in other staves/voices), then in that case only the
+    spanner can contain a Note.  Do not ever put a Note that is within a Chord into a
+    spanner; put the Chord in instead.  And do not ever put an ArpeggioMark in a note
+    or chord's .expressions.
+
+    The parameter arpeggioType can be 'normal' (a squiggly line), 'up' (a squiggly line
+    with an up arrow), 'down' (a squiggly line with a down arrow), or 'non-arpeggio' (a
+    bracket instead of a squiggly line, used to indicate a non-arpeggiated multi-chord
+    intervening in a sequence of arpeggiated ones).
+
+    >>> ams = expressions.ArpeggioMarkSpanner(arpeggioType='non-arpeggio')
+    >>> c1 = chord.Chord('C3 E3 G3')
+    >>> c2 = chord.Chord('C4 E4 G4')
+    >>> ams.addSpannedElements([c1, c2])
+    >>> ams.type
+    'non-arpeggio'
+    >>> ams
+    <music21.expressions.ArpeggioMarkSpanner
+     <music21.chord.Chord C3 E3 G3><music21.chord.Chord C4 E4 G4>>
+    '''
+    def __init__(self, *arguments, **keywords):
+        super().__init__(*arguments, **keywords)
+        arpeggioType: t.Optional[str] = keywords.get('arpeggioType', None)
+        if arpeggioType is None:
+            arpeggioType = 'normal'
+        if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
+            raise ValueError(
+                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
+            )
+        self.type = arpeggioType
+
+    def noteExtremes(self) -> t.Tuple[t.Optional['music21.note.Note'],
+                                      t.Optional['music21.note.Note']]:
+        '''
+        Return the lowest and highest note spanned by the element,
+        extracting them from Chords if need be.
+
+        >>> ch = chord.Chord(['C4', 'E4', 'G4'])
+        >>> n = note.Note('C#3')
+        >>> nonArp = expressions.ArpeggioMarkSpanner([ch, n])
+        >>> nonArp.noteExtremes()
+        (<music21.note.Note C#>, <music21.note.Note G>)
+        '''
+        from music21 import chord
+        from music21 import note
+        notes = []
+        for n_or_ch in self:
+            if isinstance(n_or_ch, note.Note):
+                notes.append(n_or_ch)
+            elif isinstance(n_or_ch, chord.Chord):
+                notes.extend(n_or_ch.notes)
+        return (min(notes), max(notes))
+
+
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 

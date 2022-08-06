@@ -50,8 +50,8 @@ def addDocAttrTestsToSuite(suite,
     >>> s1TestsAfter = len(s1._tests)
     >>> s1TestsAfter - s1TestsBefore
     2
-    >>> t = s1._tests[-1]
-    >>> t
+    >>> lastTest = s1._tests[-1]
+    >>> lastTest
     isRest ()
     '''
     dtp = doctest.DocTestParser()

@@ -1749,8 +1749,8 @@ def getByTitle(title):
     '''
     Return a Chorale by title (or title fragment) or None
 
-    >>> t = "Sach' Gott heimgestellt"
-    >>> c = corpus.chorales.getByTitle(t)
+    >>> germanTitle = "Sach' Gott heimgestellt"
+    >>> c = corpus.chorales.getByTitle(germanTitle)
     >>> c.metadata.title
     "Ich hab' mein' Sach' Gott heimgestellt"
     '''

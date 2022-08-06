@@ -357,7 +357,8 @@ class ConverterIPython(SubConverter):
             subformats = ['vexflow']
 
         if subformats and subformats[0] == 'vexflow':
-            return self.vfshow(obj)
+            raise NotImplementedError
+            # return self.vfshow(obj)
             # subformats = ['lilypond', 'png']
         if subformats:
             helperFormat = subformats[0]
@@ -818,7 +819,7 @@ class ConverterNoteworthy(SubConverter):
                   filePath: t.Union[pathlib.Path, str],
                   number: t.Optional[int] = None,
                   **keywords):
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection,PyShadowingNames
         '''
         Open Noteworthy data (as nwctxt) from a file path.
 
@@ -1340,7 +1341,7 @@ class ConverterCapella(SubConverter):
         from music21.capella import fromCapellaXML
         ci = fromCapellaXML.CapellaImporter()
         ci.parseXMLText(strData)
-        scoreObj = ci.systemScoreFromScore(self.mainDom.documentElement)
+        scoreObj = ci.systemScoreFromScore(ci.mainDom.documentElement)
         partScore = ci.partScoreFromSystemScore(scoreObj)
         self.stream = partScore
 

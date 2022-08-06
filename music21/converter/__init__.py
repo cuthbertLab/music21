@@ -1243,20 +1243,20 @@ def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     # environLocal.printDebug(['attempting to parse()', value])
     if 'forceSource' in keywords:
         forceSource = keywords['forceSource']
-        del(keywords['forceSource'])
+        del keywords['forceSource']
     else:
         forceSource = False
 
     # see if a work number is defined; for multi-work collections
     if 'number' in keywords:
         number = keywords['number']
-        del(keywords['number'])
+        del keywords['number']
     else:
         number = None
 
     if 'format' in keywords:
         m21Format = keywords['format']
-        del(keywords['format'])
+        del keywords['format']
     else:
         m21Format = None
 
@@ -1732,7 +1732,7 @@ class Test(unittest.TestCase):
         a = parse(testFiles.binchoisMagnificat)
         self.assertEqual(a.metadata.composer, 'Gilles Binchois')
         # this gets the best title available, even though this is movement title
-        self.assertEqual(a.metadata.title, 'Excerpt from Magnificat secundi toni')
+        self.assertEqual(a.metadata.bestTitle, 'Excerpt from Magnificat secundi toni')
 
     def testConversionMXBarlines(self):
         from music21 import bar

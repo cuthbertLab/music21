@@ -442,6 +442,9 @@ class ElementTree(core.AVLTree):
             visitedParents.add(parent)
             parentPosition = parent.offset
             parent._removeElementAtPosition(self, oldPosition)
+            # Trees don't have offsets currently
+            raise NotImplementedError
+            # pylint: disable=all
             parent._insertCore(self.offset, self)
 
             parent._updateNodes(parentPosition, visitedParents=visitedParents)
@@ -506,15 +509,15 @@ class ElementTree(core.AVLTree):
         (SortTuple(atEnd=0, offset=0.0, priority=0, ...),
          <music21.key.Key of f# minor>)
 
-        >>> t = tree.trees.ElementTree()
-        >>> t.rootNode is None
+        >>> et = tree.trees.ElementTree()
+        >>> et.rootNode is None
         True
-        >>> t.populateFromSortedList(listOfTuples)
-        >>> t.rootNode
+        >>> et.populateFromSortedList(listOfTuples)
+        >>> et.rootNode
         <ElementNode: Start:15.0 <0.20...> Indices:(l:0 *97* r:195)
             Payload:<music21.note.Note D#>>
 
-        >>> n = t.rootNode
+        >>> n = et.rootNode
         >>> while n is not None:
         ...    print(n)
         ...    n = n.leftChild
@@ -531,7 +534,7 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:0.0 <0.-30...> Indices:(l:0 *0* r:1)
             Payload:<music21.metadata.Metadata object at 0x104adbdd8>>
 
-        >>> n = t.rootNode
+        >>> n = et.rootNode
         >>> while n is not None:
         ...    print(n)
         ...    n = n.rightChild
@@ -1002,57 +1005,59 @@ class OffsetTree(ElementTree):
         else:
             raise TypeError(f'Indices must be integers or slices, got {i}')
 
-    def __setitem__(self, i, new):
-        r'''
-        Sets elements or timespans at index `i` to `new`.
+    # def __setitem__(self, i, new):
+    #     r'''
+    #     Sets elements or timespans at index `i` to `new`.
 
-        TODO: this should be a bit different for OffsetTrees, probably more like ElementTrees
-
-
-        >>> tss = [
-        ...     tree.spans.Timespan(0, 2),
-        ...     tree.spans.Timespan(0, 9),
-        ...     tree.spans.Timespan(1, 1),
-        ...     ]
-        >>> tsTree = tree.timespanTree.TimespanTree()
-        >>> tsTree.insert(tss)
-        >>> tsTree[0] = tree.spans.Timespan(-1, 6)
-        >>> for x in tsTree:
-        ...     x
-        <Timespan -1.0 6.0>
-        <Timespan 0.0 9.0>
-        <Timespan 1.0 1.0>
-
-        Note however, that calling __getitem__ after __setitem__ will not return
-        what you just set if the timing is wrong.  This is different from the
-        behavior on ElementTree which assumes that the new element wants to be
-        at the old element's offset.
-
-        >>> tsTree[2] = tree.spans.Timespan(-0.5, 4)
-        >>> tsTree[2]
-        <Timespan 0.0 9.0>
-        >>> for x in tsTree:
-        ...     x
-        <Timespan -1.0 6.0>
-        <Timespan -0.5 4.0>
-        <Timespan 0.0 9.0>
+    #     TODO: this should be a bit different for OffsetTrees, probably more like ElementTrees
 
 
-        Works with slices too.
+    #     >>> tss = [
+    #     ...     tree.spans.Timespan(0, 2),
+    #     ...     tree.spans.Timespan(0, 9),
+    #     ...     tree.spans.Timespan(1, 1),
+    #     ...     ]
+    #     >>> tsTree = tree.timespanTree.TimespanTree()
+    #     >>> tsTree.insert(tss)
+    #     >>> tsTree[0] = tree.spans.Timespan(-1, 6)
+    #     >>> for x in tsTree:
+    #     ...     x
+    #     <Timespan -1.0 6.0>
+    #     <Timespan 0.0 9.0>
+    #     <Timespan 1.0 1.0>
 
-        >>> tsTree[1:] = [tree.spans.Timespan(10, 20)]
-        >>> for x in tsTree:
-        ...     x
-        <Timespan -1.0 6.0>
-        <Timespan 10.0 20.0>
-        '''
-        if isinstance(i, (int, slice)):
-            old = self[i]
-            self.removeTimespan(old)
-            self.insert(new)
-        else:
-            message = f'Indices must be ints or slices, got {i}'
-            raise TypeError(message)
+    #     Note however, that calling __getitem__ after __setitem__ will not return
+    #     what you just set if the timing is wrong.  This is different from the
+    #     behavior on ElementTree which assumes that the new element wants to be
+    #     at the old element's offset.
+
+    #     >>> tsTree[2] = tree.spans.Timespan(-0.5, 4)
+    #     >>> tsTree[2]
+    #     <Timespan 0.0 9.0>
+    #     >>> for x in tsTree:
+    #     ...     x
+    #     <Timespan -1.0 6.0>
+    #     <Timespan -0.5 4.0>
+    #     <Timespan 0.0 9.0>
+
+
+    #     Works with slices too.
+
+    #     >>> tsTree[1:] = [tree.spans.Timespan(10, 20)]
+    #     >>> for x in tsTree:
+    #     ...     x
+    #     <Timespan -1.0 6.0>
+    #     <Timespan 10.0 20.0>
+    #     '''
+    #     raise NotImplementedError
+    #     # pylint: disable=all
+    #     if isinstance(i, (int, slice)):
+    #         old = self[i]
+    #         self.removeTimespan(old)
+    #         self.insert(new)
+    #     else:
+    #         message = f'Indices must be ints or slices, got {i}'
+    #         raise TypeError(message)
 
     def __iter__(self):
         r'''
