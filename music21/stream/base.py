@@ -1794,11 +1794,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         return self._removeIteration(elFilter)
 
     # pylint: disable=no-member
-    def _deepcopySubclassable(self: M21ObjType,
+    def _deepcopySubclassable(self: StreamType,
                               memo=None,
                               ignoreAttributes=None,
                               removeFromIgnore=None
-                              ) -> M21ObjType:
+                              ) -> StreamType:
         # NOTE: this is a performance critical operation
         defaultIgnoreSet = {'_offsetDict', 'streamStatus', '_elements', '_endElements', '_cache',
                             }
@@ -1812,21 +1812,22 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             ignoreAttributes = ignoreAttributes - removeFromIgnore
 
         if '_offsetDict' in ignoreAttributes:
-            newValue = {}
-            setattr(new, '_offsetDict', newValue)
+            newOffsetDict: t.Dict[int, t.Tuple[OffsetQLSpecial, base.Music21Object]] = {}
+            setattr(new, '_offsetDict', newOffsetDict)
         # all subclasses of Music21Object that define their own
         # __deepcopy__ methods must be sure to not try to copy activeSite
-        if '_offsetDict' in self.__dict__:
-            newValue = {}
-            setattr(new, '_offsetDict', newValue)
+        elif '_offsetDict' in self.__dict__:
+            newOffsetDict2: t.Dict[int, t.Tuple[OffsetQLSpecial, base.Music21Object]] = {}
+            setattr(new, '_offsetDict', newOffsetDict2)
+
         if 'streamStatus' in ignoreAttributes:
             # update the client
             if self.streamStatus is not None:
                 # storedClient = self.streamStatus.client  # Should be self.
                 # self.streamStatus.client = None
-                newValue = copy.deepcopy(self.streamStatus)
-                newValue.client = new
-                setattr(new, 'streamStatus', newValue)
+                newStreamStatus = copy.deepcopy(self.streamStatus)
+                newStreamStatus.client = new
+                setattr(new, 'streamStatus', newStreamStatus)
                 # self.streamStatus.client = storedClient
         if '_elements' in ignoreAttributes:
             # must manually add elements to new Stream
