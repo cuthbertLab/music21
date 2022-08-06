@@ -261,6 +261,11 @@ class TabChordBase(abc.ABC):
             self.form = self.form.replace('%', 'ø') if self.form is not None else None
             if self.dcml_version == 2:
                 self.chord = self.chord.replace('%', 'ø')
+                if (
+                    self.extra["chord_type"] == "Mm7" and self.figbass == "7"
+                    and self.numeral != 'V'
+                ):
+                    self.chord = self.chord.replace("7", "d7")
         # Local - relative and figure
         if isMinor(self.local_key):
             if self.relativeroot:  # If there's a relative root ...
@@ -319,7 +324,7 @@ class TabChordBase(abc.ABC):
         if self.representationType == 'DCML':
             self._changeRepresentation()
         if self.numeral in ('@none', None):
-            thisEntry: harmony.Harmony = harmony.NoChord() 
+            thisEntry: harmony.Harmony = harmony.NoChord()
         else:
             if self.dcml_version == 2 and self.chord:
                 combined = self.chord
@@ -360,7 +365,7 @@ class TabChordBase(abc.ABC):
             thisEntry.editorial.phraseend = None
         # if dcml_version == 2, we need to calculate the quarterLength
         #   later
-        thisEntry.quarterLength = 0.0 # self.length if self.dcml_version == 1 else 0.0 TODO
+        thisEntry.quarterLength = 0.0
         return thisEntry
 
 class TabChord(TabChordBase):
@@ -373,11 +378,7 @@ class TabChord(TabChordBase):
         super().__init__()
         self.altchord = None
         self.totbeat = None
-        # self.op = None # TODO
-        # self.no = None
-        # self.mov = None
         self.length = None
-        # self.global_key = None # TODO
         self.dcml_version = 1
 
 
@@ -489,19 +490,19 @@ class TsvHandler:
     def __init__(self, tsvFile: str, dcml_version: int = 1):
         if dcml_version == 1:
             self.heading_names = HEADERS[1]
-            self._tab_chord_cls: t.Type[TabChordBase] = TabChord 
+            self._tab_chord_cls: t.Type[TabChordBase] = TabChord
         elif dcml_version == 2:
             self.heading_names = HEADERS[2]
             self._tab_chord_cls = TabChordV2
         else:
             raise ValueError(f'dcml_version {dcml_version} is not in (1, 2)')
         self.tsvFileName = tsvFile
-        self.chordList: t.List[TabChordBase] = [] 
-        self.m21stream: t.Optional[stream.Score] = None 
-        self._head_indices: t.Dict[str, t.Tuple[int, t.Union[t.Type, t.Any]]] = {} 
-        self._extra_indices: t.Dict[int, str] = {} 
+        self.chordList: t.List[TabChordBase] = []
+        self.m21stream: t.Optional[stream.Score] = None
+        self._head_indices: t.Dict[str, t.Tuple[int, t.Union[t.Type, t.Any]]] = {}
+        self._extra_indices: t.Dict[int, str] = {}
         self.dcml_version = dcml_version
-        self.tsvData = self._importTsv() # converted to private
+        self.tsvData = self._importTsv()  # converted to private
 
     def _get_heading_indices(self, header_row: t.List[str]) -> None:
         '''Private method to get column name/column index correspondences.
@@ -579,7 +580,7 @@ class TsvHandler:
 
         s = self.prepStream()
         p = s.parts.first()  # Just to get to the part, not that there are several.
-        
+
         if p is None:
             # in case stream has no parts
             return s
@@ -591,7 +592,7 @@ class TsvHandler:
             if m21Measure is None:
                 # TODO: m21Measure should never be None if prepStream is
                 #   correctly implemented. We need to handle None to satisfy
-                #   mypy. If it *is* None, then there is a bug in the 
+                #   mypy. If it *is* None, then there is a bug in the
                 #   implementation. What is correct behavior in this instance?
                 #   Raise a bug?
                 raise ValueError
@@ -631,9 +632,9 @@ class TsvHandler:
             s.metadata.number = firstEntry.extra.get('no', '')
             s.metadata.movementNumber = firstEntry.extra.get('mov', '')
             s.metadata.title = (
-                'Op' + firstEntry.extra.get('op', '') + 
-                '_No' + firstEntry.extra.get('no', '') + 
-                '_Mov' + firstEntry.extra.get('mov', '')
+                'Op' + firstEntry.extra.get('op', '')
+                + '_No' + firstEntry.extra.get('no', '')
+                + '_Mov' + firstEntry.extra.get('mov', '')
             )
 
         startingKeySig = str(self.chordList[0].global_key)
@@ -646,7 +647,7 @@ class TsvHandler:
 
         currentMeasureLength = ts.barDuration.quarterLength
 
-        currentOffset: t.Union[float, fractions.Fraction] = 0.0 
+        currentOffset: t.Union[float, fractions.Fraction] = 0.0
 
         previousMeasure: int = self.chordList[0].measure - 1  # Covers pickups
         for entry in self.chordList:
@@ -779,7 +780,7 @@ class M21toTSV:
         return tsvData
 
     def _m21ToTsv_v2(self) -> t.List[t.List[str]]:
-        tsvData: t.List[t.List[str]] = [] 
+        tsvData: t.List[t.List[str]] = []
 
         # take the global_key from the first item
         first_rn = self.m21Stream[roman.RomanNumeral].first()
