@@ -1867,7 +1867,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         return new
 
-    def __deepcopy__(self: M21ObjType, memo=None) -> M21ObjType:
+    def __deepcopy__(self: StreamType, memo=None) -> StreamType:
         '''
         Deepcopy the stream from copy.deepcopy()
         '''
