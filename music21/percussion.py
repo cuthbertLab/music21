@@ -11,6 +11,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
+import typing as t
 import unittest
 
 from music21 import common
