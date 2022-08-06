@@ -1996,6 +1996,7 @@ def consolidateCompletedTuplets(
             and (gn.isRest or gn.tie is not None or not onlyIfTied)
         )
 
+    iterator: t.Iterable['music21.stream.Stream']
     if recurse:
         iterator = s.recurse(streamsOnly=True, includeSelf=True)
     else:
@@ -2003,9 +2004,9 @@ def consolidateCompletedTuplets(
     for container in iterator:
         reexpressible = [gn for gn in container.notesAndRests if is_reexpressible(gn)]
         to_consolidate: t.List['music21.note.GeneralNote'] = []
-        partial_tuplet_sum = 0.0
+        partial_tuplet_sum: OffsetQL = 0.0
         last_tuplet: t.Optional['music21.duration.Tuplet'] = None
-        completion_target: t.Optional[common.types.OffsetQL] = None
+        completion_target: t.Optional[OffsetQL] = None
         for gn in reexpressible:
             prev_gn = gn.previous(note.GeneralNote, activeSiteOnly=True)
             if (
