@@ -6723,7 +6723,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         makeNotation.makeTies(returnStream, meterStream=meterStream, inPlace=True)
 
-        for m in measureStream:
+        for m in returnStream.getElementsByClass(Measure):
             makeNotation.splitElementsToCompleteTuplets(m, recurse=True, addTies=True)
             makeNotation.consolidateCompletedTuplets(m, recurse=True, onlyIfTied=True)
 

@@ -1861,6 +1861,7 @@ def splitElementsToCompleteTuplets(
     recurse: bool = False,
     addTies: bool = True
 ) -> None:
+    # noinspection PyShadowingNames
     '''
     Split notes or rests if doing so will complete any incomplete tuplets.
     The element being split must have a duration that exceeds the
@@ -1890,13 +1891,15 @@ def splitElementsToCompleteTuplets(
     >>> [el.quarterLength for el in p.recurse().notesAndRests]
     [Fraction(1, 6), Fraction(1, 3), Fraction(1, 3), Fraction(1, 6)]
     '''
+    iterator: t.Iterable[Stream]
     if recurse:
         iterator = s.recurse(streamsOnly=True, includeSelf=True)
     else:
         iterator = [s]
+
     for container in iterator:
         general_notes = list(container.notesAndRests)
-        last_tuplet: Optional['music21.duration.Tuplet'] = None
+        last_tuplet: t.Optional['music21.duration.Tuplet'] = None
         partial_tuplet_sum = 0.0
         for gn in general_notes:
             if (
@@ -1920,7 +1923,7 @@ def splitElementsToCompleteTuplets(
             if next_gn and next_gn.offset != opFrac(gn.offset + gn.quarterLength):
                 continue
             if next_gn and next_gn.duration.expressionIsInferred:
-                if ql_to_complete > 0 and next_gn.quarterLength > ql_to_complete:
+                if 0 < ql_to_complete < next_gn.quarterLength:
                     unused_left_edited_in_place, right = next_gn.splitAtQuarterLength(
                         ql_to_complete, addTies=addTies)
                     container.insert(next_gn.offset + ql_to_complete, right)
@@ -1932,6 +1935,7 @@ def consolidateCompletedTuplets(
     recurse: bool = False,
     onlyIfTied: bool = True,
 ) -> None:
+    # noinspection PyShadowingNames
     '''
     Locate consecutive notes or rests in `s` (or its substreams if `recurse` is True)
     that are unnecessarily expressed as tuplets and replace them with a single
@@ -1998,10 +2002,10 @@ def consolidateCompletedTuplets(
         iterator = [s]
     for container in iterator:
         reexpressible = [gn for gn in container.notesAndRests if is_reexpressible(gn)]
-        to_consolidate: List['music21.note.GeneralNote'] = []
+        to_consolidate: t.List['music21.note.GeneralNote'] = []
         partial_tuplet_sum = 0.0
-        last_tuplet: Optional['music21.duration.Tuplet'] = None
-        completion_target: Optional[common.types.OffsetQL] = None
+        last_tuplet: t.Optional['music21.duration.Tuplet'] = None
+        completion_target: t.Optional[common.types.OffsetQL] = None
         for gn in reexpressible:
             prev_gn = gn.previous(note.GeneralNote, activeSiteOnly=True)
             if (
