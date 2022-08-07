@@ -469,6 +469,14 @@ class GeneralObjectExporter:
 
         Changed in v8 -- fills gaps with rests before calling makeNotation
         to avoid duplicating effort with :meth:`PartExporter.fixupNotationMeasured`.
+
+        >>> v = stream.Voice(note.Note())
+        >>> m = stream.Measure([meter.TimeSignature(), v])
+        >>> GEX = musicxml.m21ToXml.GeneralObjectExporter(m)
+        >>> out = GEX.parse()  # out is bytes
+        >>> outStr = out.decode('utf-8')  # now is string
+        >>> '<note print-object="no" print-spacing="yes">' in outStr
+        True
         '''
         classes = obj.classes
         outObj = None
