@@ -1880,6 +1880,8 @@ def splitElementsToCompleteTuplets(
     >>> splitElementsToCompleteTuplets(s)
     >>> [el.quarterLength for el in s.notes]
     [Fraction(1, 3), Fraction(2, 3), Fraction(1, 3), Fraction(2, 3)]
+    >>> [el.tie for el in s.notes]
+    [None, <music21.tie.Tie start>, <music21.tie.Tie stop>, None]
 
     With `recurse`:
 
