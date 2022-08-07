@@ -473,7 +473,7 @@ class GeneralObjectExporter:
         classes = obj.classes
         outObj = None
 
-        if isinstance(obj, stream.Stream):
+        if isinstance(obj, stream.Stream) and self.makeNotation:
             obj.makeRests(refStreamOrTimeRange=[0.0, obj.highestTime],
                           fillGaps=True,
                           inPlace=True,
