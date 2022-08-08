@@ -424,19 +424,26 @@ class TabChordV2(TabChordBase):
         '''
         'beat' has been removed from DCML v2 in favor of 'mn_onset' and
         'mc_onset'. 'mn_onset' is equivalent to 'beat', except that 'mn_onset'
-        is zero-indexed where 'beat' was 1-indexed. This property reproduces
-        the former 'beat' by adding 1 to 'mn_onset'.
+        is zero-indexed where 'beat' was 1-indexed, and 'mn_onset' is in
+        fractions of a whole-note rather than in quarter notes.
         >>> tabCd = romanText.tsvConverter.TabChordV2()
         >>> tabCd.mn_onset = 0.0
         >>> tabCd.beat
         1.0
+        >>> tabCd.mn_onset = 1/2
+        >>> tabCd.beat
+        3.0
+        >>> tabCd.beat = 1.5
+        >>> tabCd.beat
+        1.5
         '''
         # beat is zero-indexed in v2 but one-indexed in v1
-        return self.mn_onset + 1.0
+        # moreover, beat is in fractions of a whole-note in v2
+        return self.mn_onset * 4.0 + 1.0
 
     @beat.setter
     def beat(self, beat: float):
-        self.mn_onset = beat - 1.0 if beat is not None else None
+        self.mn_onset = (beat - 1.0) / 4.0 if beat is not None else None
 
     @property
     def measure(self) -> int:
@@ -632,6 +639,7 @@ class TsvHandler:
             last_harmony.quarterLength = (
                 s.quarterLength - last_harmony.activeSite.offset - last_harmony.offset
             )
+
         self.m21stream = s
         return s
 
@@ -816,7 +824,13 @@ class M21toTSV:
         ):
             thisEntry = TabChordV2()
             thisEntry.mn = thisRN.measureNumber
-            thisEntry.mn_onset = thisRN.beat
+            # for a reason I do not understand, thisRN.beat in V2 seems to
+            #   always be beat 1. In neither v1 is thisRN set explicitly;
+            #   the offset/beat seems to be determined by
+            #   m21Measure.insert(offsetInMeasure, thisM21Chord) above. I'm at
+            #   a loss why there is an issue here but using thisRN.offset works
+            #   just fine.
+            thisEntry.mn_onset = thisRN.offset / 4
             timesig = thisRN.getContextByClass(meter.TimeSignature)
             if timesig is None:
                 thisEntry.timesig = ''
@@ -861,7 +875,6 @@ class M21toTSV:
                 getattr(thisEntry, name, thisRN.editorial.get(name, ''))
                 for name in self.dcml_headers
             ]
-
             tsvData.append(thisInfo)
         return tsvData
 
