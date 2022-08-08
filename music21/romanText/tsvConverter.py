@@ -512,7 +512,7 @@ class TsvHandler:
     And for our last trick, we can put the whole collection in a music21 stream.
 
     >>> out_stream = handler.toM21Stream()
-    >>> out_stream.parts[0].measure(1)[0].figure
+    >>> out_stream.parts[0].measure(1)[roman.RomanNumeral][0].figure
     'I'
 
     '''
@@ -670,11 +670,9 @@ class TsvHandler:
 
         startingKeySig = str(self.chordList[0].global_key)
         ks = key.Key(startingKeySig)
-        p.insert(0, ks)
 
         currentTimeSig = str(self.chordList[0].timesig)
         ts = meter.TimeSignature(currentTimeSig)
-        p.insert(0, ts)
 
         currentMeasureLength = ts.barDuration.quarterLength
 
@@ -707,7 +705,10 @@ class TsvHandler:
                 previousMeasure = entry.measure
 
         s.append(p)
-
+        first_measure = s[stream.Measure].first()
+        if first_measure is not None:
+            first_measure.insert(0, ks)
+            first_measure.insert(0, ts)
         return s
 
 
@@ -1182,7 +1183,8 @@ class Test(unittest.TestCase):
                     # M21 stream
                     out_stream = handler.toM21Stream()
                     self.assertEqual(
-                        out_stream.parts[0].measure(1)[0].figure, 'I6' if version == 2 else 'I'
+                        out_stream.parts[0].measure(1)[roman.RomanNumeral][0].figure,
+                        'I6' if version == 2 else 'I'
                     )
 
                 # test tsv -> m21 -> tsv -> m21; compare m21 streams to make sure
