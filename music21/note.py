@@ -1436,7 +1436,7 @@ class Note(NotRest):
             self.pitch = pitch.Pitch(name, **keywords)
 
         # noinspection PyProtectedMember
-        self.pitch.client = self
+        self.pitch._client = self
 
     # --------------------------------------------------------------------------
     # operators, representations, and transformations
@@ -1540,7 +1540,8 @@ class Note(NotRest):
         After doing a deepcopy of the pitch, be sure to set the client
         '''
         new = super().__deepcopy__(memo=memo)
-        new.pitch.client = new  # pylint: disable=no-member
+        # noinspection PyProtectedMember
+        new.pitch._client = new  # pylint: disable=no-member
         return new
 
     # --------------------------------------------------------------------------

@@ -864,7 +864,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         '_displayType',
         '_modifier',
         '_name',
-        'client',
+        '_client',
         'displayLocation',
         'displaySize',
         'displayStyle',
@@ -896,8 +896,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         # above and below could also be useful for gruppetti, etc.
         self.displayLocation = 'normal'
 
-        # store a reference to the object that has this duration object as a property
-        self.client: t.Optional['music21.note.Note'] = None
+        # store a reference to the Pitch that has this Accidental object as a property
+        self._client: t.Optional['Pitch'] = None
         self._name = ''
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step
@@ -1178,8 +1178,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
                 raise AccidentalException(f'{name} is not a supported accidental type')
 
         self._modifier = accidentalNameToModifier[self._name]
-        if self.client is not None:
-            self.client.informClient()
+        if self._client:
+            self._client.informClient()
 
 
     def isTwelveTone(self):
@@ -1238,8 +1238,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         privateAttrName = '_' + attribute
         setattr(self, privateAttrName, value)
-        if self.client is not None:
-            self.client.informClient()
+        if self._client:
+            self._client.informClient()
 
     # --------------------------------------------------------------------------
     def inheritDisplay(self, other):
@@ -1830,7 +1830,7 @@ class Pitch(prebase.ProtoM21Object):
         self.fundamental: t.Optional['Pitch'] = None
 
         # so that we can tell clients about changes in pitches.
-        self.client: t.Optional['music21.note.Note'] = None
+        self_.client: t.Optional['music21.note.Note'] = None
 
         # name combines step, octave, and accidental
         if name is not None:
@@ -1929,7 +1929,7 @@ class Pitch(prebase.ProtoM21Object):
         highly optimized -- it knows exactly what can only have a scalar value and
         just sets that directly, only running deepcopy on the other bits.
 
-        And client should NOT be deepcopied.  In fact, it is cleared to nothing.
+        And _client should NOT be deepcopied.  In fact, it is cleared to nothing.
         deepcopy of note will set it back.
         '''
         if type(self) is Pitch:  # pylint: disable=unidiomatic-typecheck
@@ -1939,7 +1939,7 @@ class Pitch(prebase.ProtoM21Object):
                 if k in ('_step', '_overridden_freq440', 'defaultOctave',
                          '_octave', 'spellingIsInferred'):
                     setattr(new, k, v)
-                elif k == 'client':
+                elif k == '_client':
                     setattr(new, k, None)
                 else:
                     setattr(new, k, copy.deepcopy(v, memo))
@@ -4183,8 +4183,8 @@ class Pitch(prebase.ProtoM21Object):
         '''
         if this pitch is attached to a note, then let it know that it has changed.
         '''
-        if self.client is not None:
-            self.client.pitchChanged()  # pylint: disable=no-member
+        if self._client is not None:
+            self._client.pitchChanged()  # pylint: disable=no-member
 
 
     def getAllCommonEnharmonics(self: PitchType, alterLimit: int = 2) -> t.List[PitchType]:
