@@ -840,6 +840,9 @@ def makeRests(
     else:
         returnObj = s
 
+    # Invalidate tuplet status
+    returnObj.streamStatus.tuplets = None
+
     if returnObj.iter().parts:
         for inner_part in returnObj.iter().parts:
             inner_part.makeRests(
