@@ -261,11 +261,13 @@ class TabChordBase(abc.ABC):
             self.form = self.form.replace('%', 'ø') if self.form is not None else None
             if self.dcml_version == 2:
                 self.chord = self.chord.replace('%', 'ø')
+                self.chord = handleAddedTones(self.chord)
                 if (
-                    self.extra["chord_type"] == "Mm7" and self.figbass == "7"
+                    self.extra.get("chord_type", '') == "Mm7"
                     and self.numeral != 'V'
                 ):
-                    self.chord = self.chord.replace("7", "d7")
+                    self.chord = re.sub(r'(\d)', r'd\1', self.chord)
+
         # Local - relative and figure
         if isMinor(self.local_key):
             if self.relativeroot:  # If there's a relative root ...
@@ -368,6 +370,28 @@ class TabChordBase(abc.ABC):
         thisEntry.quarterLength = 0.0
         return thisEntry
 
+    def populate_from_row(
+        self,
+        row: t.List[str],
+        head_indices: t.Dict[str, t.Tuple[int, t.Type]],
+        extra_indices: t.Dict[int, str]
+    ) -> None:
+        # To implement without calling setattr we would need to repeat lines
+        #   similar to the following three lines for every attribute (with
+        #   attributes specific to subclasses in their own methods that would
+        #   then call __super__()).
+        # if "chord" in head_indices:
+        #     i, type_to_coerce_to = head_indices["chord"]
+        #     self.chord = type_to_coerce_to(row[i])
+        for col_name, (i, type_to_coerce_to) in head_indices.items():
+            if not hasattr(self, col_name):
+                pass  # would it be appropriate to emit a warning here?
+            else:
+                setattr(self, col_name, type_to_coerce_to(row[i]))
+        self.extra = {
+            col_name: row[i] for i, col_name in extra_indices.items() if row[i]
+        }
+
 class TabChord(TabChordBase):
     '''
     An intermediate representation format for moving between tabular data in
@@ -380,8 +404,6 @@ class TabChord(TabChordBase):
         self.totbeat = None
         self.length = None
         self.dcml_version = 1
-
-
 
 class TabChordV2(TabChordBase):
     '''
@@ -540,13 +562,14 @@ class TsvHandler:
         '''
         # this method replaces the previously stand-alone makeTabChord function
         thisEntry = self._tab_chord_cls()
-        for col_name, (i, type_to_coerce_to) in self._head_indices.items():
-            # set attributes of thisEntry according to values in row
-            setattr(thisEntry, col_name, type_to_coerce_to(row[i]))
-        thisEntry.extra = {
-            col_name: row[i] for i, col_name in self._extra_indices.items() if row[i]
-        }
-        thisEntry.representationType = 'DCML'  # Added
+        thisEntry.populate_from_row(row, self._head_indices, self._extra_indices)
+        # for col_name, (i, type_to_coerce_to) in self._head_indices.items():
+        #     # set attributes of thisEntry according to values in row
+        #     setattr(thisEntry, col_name, type_to_coerce_to(row[i]))
+        # thisEntry.extra = {
+        #     col_name: row[i] for i, col_name in self._extra_indices.items() if row[i]
+        # }
+        thisEntry.representationType = 'DCML'  # Addeds
 
         return thisEntry
 
@@ -889,6 +912,66 @@ def getForm(rn: roman.RomanNumeral) -> str:
     if 'M' in rn.figure:
         return 'M'
     return ''
+
+
+def handleAddedTones(dcml_chord: str) -> str:
+    '''
+    Converts DCML added-tone syntax to music21.
+
+    >>> romanText.tsvConverter.handleAddedTones('V(64)')
+    'Cad64'
+
+    >>> romanText.tsvConverter.handleAddedTones('i(4+2)')
+    'i[no3][add4][add2]'
+
+    >>> romanText.tsvConverter.handleAddedTones('Viio7(b4)/V')
+    'Viio7[no3][addb4]/V'
+
+    When in root position, 7 does not replace 8:
+    >>> romanText.tsvConverter.handleAddedTones('vi(#74)')
+    'vi[no3][add#7][add4]'
+
+    When not in root position, 7 does replace 8:
+    >>> romanText.tsvConverter.handleAddedTones('ii6(11#7b6)')
+    'ii6[no8][no5][add11][add#7][addb6]'
+
+
+    '''
+    m = re.match(
+        r'(?P<primary>.*?(?P<figure>\d*(?:/\d+)*))\((?P<added_tones>.*)\)(?P<secondary>/.*)?',
+        dcml_chord
+    )
+    if not m:
+        return dcml_chord
+    primary = m.group('primary')
+    added_tones = m.group('added_tones')
+    secondary = m.group('secondary') if m.group('secondary') is not None else ''
+    figure = m.group('figure')
+    if primary == 'V' and added_tones == '64':
+        return 'Cad64' + secondary
+    added_tone_tuples: t.List[t.Tuple[str, str, str, str, str]] = list(
+        # after https://github.com/johentsch/ms3/blob/main/src/ms3/utils.py
+        re.findall(r"((\+|-)?(\^|v)?(#+|b+)?(1\d|\d))", added_tones)
+    )
+    additions: t.List[str] = []
+    omissions: t.List[str] = []
+    if figure in ('', '5', '53', '5/3', '3'):
+        threshold = 7
+    else:
+        threshold = 8
+    for _, added_or_removed, above_or_below, alteration, factor in added_tone_tuples:
+        if added_or_removed == '-':
+            additions.append(f'[no{factor}]')
+            continue
+        if added_or_removed != '+' and int(factor) < threshold:
+            if above_or_below == 'v' or alteration in ('b', ''):
+                increment = -1
+            else:
+                increment = 1
+            replaced_factor = str(int(factor) + increment)
+            omissions.append(f'[no{replaced_factor}]')
+        additions.append(f'[add{alteration}{factor}]')
+    return primary + "".join(omissions) + "".join(additions) + secondary
 
 
 def localKeyAsRn(local_key: key.Key, global_key: key.Key) -> str:
