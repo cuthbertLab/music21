@@ -1830,7 +1830,7 @@ class Pitch(prebase.ProtoM21Object):
         self.fundamental: t.Optional['Pitch'] = None
 
         # so that we can tell clients about changes in pitches.
-        self_.client: t.Optional['music21.note.Note'] = None
+        self.client: t.Optional['music21.note.Note'] = None
 
         # name combines step, octave, and accidental
         if name is not None:
