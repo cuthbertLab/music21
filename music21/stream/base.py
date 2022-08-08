@@ -500,7 +500,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         2
         >>> len(s[note.Note])
         6
-        >>> len(s[[note.Note, note.Rest]])
+        >>> len(s[note.Note, note.Rest])
         8
 
         >>> for n in s[note.Note]:
