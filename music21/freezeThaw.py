@@ -1228,6 +1228,7 @@ class Test(unittest.TestCase):
             d.parts[1].flatten().notes[20].volume._client,
             weakref.ReferenceType)
 
+
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21

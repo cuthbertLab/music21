@@ -43,6 +43,7 @@ import sys
 import types
 import unittest
 import warnings
+import weakref
 
 from collections import namedtuple
 from importlib.util import find_spec
@@ -348,7 +349,7 @@ class Music21Object(prebase.ProtoM21Object):
         # do not call super().__init__() since it just wastes time
         self._id = None
         # None is stored as the internal location of an obj w/o any sites
-        self._activeSite: t.Optional['music21.stream.Stream'] = None
+        self._activeSite: t.Union['music21.stream.Stream', weakref.ReferenceType, None] = None
         # offset when no activeSite is available
         self._naiveOffset: t.Union[float, fractions.Fraction] = 0.0
 
