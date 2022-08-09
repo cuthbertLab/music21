@@ -175,7 +175,7 @@ class TabChordBase(abc.ABC):
         self.numeral = None
         self.relativeroot = None
         self.representationType = None  # Added (not in DCML)
-        self.extra = {}
+        self.extra: t.Dict[str, str] = {}
         self.dcml_version = -1
 
         # shared between DCML v1 and v2
@@ -217,27 +217,30 @@ class TabChordBase(abc.ABC):
 
     def _changeRepresentation(self) -> None:
         '''
-        Converts the representationType of a TabChord between the music21 and DCML conventions,
-        especially for the different handling of expectations in minor.
+        Converts the representationType of a TabChordBase subclass between the
+        music21 and DCML conventions.
 
-        First, let's set up a TabChord().
+        To demonstrate, let's set up a dummy TabChordV2().
 
-        >>> tabCd = romanText.tsvConverter.TabChord()
+        >>> tabCd = romanText.tsvConverter.TabChordV2()
         >>> tabCd.global_key = 'F'
         >>> tabCd.local_key = 'vi'
-        >>> tabCd.numeral = '#vii'
+        >>> tabCd.numeral = 'ii'
+        >>> tabCd.chord = 'ii%7(6)'
         >>> tabCd.representationType = 'DCML'
 
-        There's no change for a major-key context, but for a minor-key context
-        (given here by 'relativeroot') the 7th degree is handled differently.
-
-        >>> tabCd.relativeroot = 'v'
         >>> tabCd.representationType
         'DCML'
+
+        >>> tabCd.chord
+        'ii%7(6)'
 
         >>> tabCd._changeRepresentation()
         >>> tabCd.representationType
         'm21'
+
+        >>> tabCd.chord
+        'iiø7[no5][add6]'
         '''
 
         if self.representationType == 'm21':
@@ -263,7 +266,7 @@ class TabChordBase(abc.ABC):
                 self.chord = self.chord.replace('%', 'ø')
                 self.chord = handleAddedTones(self.chord)
                 if (
-                    self.extra.get("chord_type", '') == "Mm7"
+                    self.extra.get('chord_type', '') == 'Mm7'
                     and self.numeral != 'V'
                 ):
                     self.chord = re.sub(r'(\d)', r'd\1', self.chord)
@@ -334,11 +337,11 @@ class TabChordBase(abc.ABC):
                 # previously this code only included figbass in combined if form
                 # was not falsy, which seems incorrect
                 combined = ''.join(
-                    [attr for attr in (self.numeral, self.form, self.figbass) if attr]
+                    attr for attr in (self.numeral, self.form, self.figbass) if attr
                 )
 
                 if self.relativeroot:  # special case requiring '/'.
-                    combined = ''.join([combined, '/', self.relativeroot])
+                    combined += '/' + self.relativeroot
             if self.local_key is not None and re.match(
                 r'.*(i*v|v?i+).*', self.local_key, re.IGNORECASE
             ):
@@ -359,9 +362,9 @@ class TabChordBase(abc.ABC):
             if isinstance(self, TabChord):
                 # following metadata attributes seem to be missing from
                 # dcml_version 2 tsv files
-                thisEntry.editorial.op = self.extra.get("op", "")
-                thisEntry.editorial.no = self.extra.get("no", "")
-                thisEntry.editorial.mov = self.extra.get("mov", "")
+                thisEntry.editorial.op = self.extra.get('op', '')
+                thisEntry.editorial.no = self.extra.get('no', '')
+                thisEntry.editorial.mov = self.extra.get('mov', '')
 
             thisEntry.editorial.pedal = self.pedal
             thisEntry.editorial.phraseend = None
@@ -370,26 +373,26 @@ class TabChordBase(abc.ABC):
         thisEntry.quarterLength = 0.0
         return thisEntry
 
-    def populate_from_row(
+    def populateFromRow(
         self,
         row: t.List[str],
-        head_indices: t.Dict[str, t.Tuple[int, t.Type]],
-        extra_indices: t.Dict[int, str]
+        headIndices: t.Dict[str, t.Tuple[int, t.Type]],
+        extraIndices: t.Dict[int, str]
     ) -> None:
         # To implement without calling setattr we would need to repeat lines
         #   similar to the following three lines for every attribute (with
         #   attributes specific to subclasses in their own methods that would
         #   then call __super__()).
-        # if "chord" in head_indices:
-        #     i, type_to_coerce_to = head_indices["chord"]
+        # if 'chord' in head_indices:
+        #     i, type_to_coerce_to = head_indices['chord']
         #     self.chord = type_to_coerce_to(row[i])
-        for col_name, (i, type_to_coerce_to) in head_indices.items():
+        for col_name, (i, type_to_coerce_to) in headIndices.items():
             if not hasattr(self, col_name):
                 pass  # would it be appropriate to emit a warning here?
             else:
                 setattr(self, col_name, type_to_coerce_to(row[i]))
         self.extra = {
-            col_name: row[i] for i, col_name in extra_indices.items() if row[i]
+            col_name: row[i] for i, col_name in extraIndices.items() if row[i]
         }
 
 class TabChord(TabChordBase):
@@ -426,13 +429,16 @@ class TabChordV2(TabChordBase):
         'mc_onset'. 'mn_onset' is equivalent to 'beat', except that 'mn_onset'
         is zero-indexed where 'beat' was 1-indexed, and 'mn_onset' is in
         fractions of a whole-note rather than in quarter notes.
+
         >>> tabCd = romanText.tsvConverter.TabChordV2()
         >>> tabCd.mn_onset = 0.0
         >>> tabCd.beat
         1.0
-        >>> tabCd.mn_onset = 1/2
+
+        >>> tabCd.mn_onset = 0.5
         >>> tabCd.beat
         3.0
+
         >>> tabCd.beat = 1.5
         >>> tabCd.beat
         1.5
@@ -569,7 +575,7 @@ class TsvHandler:
         '''
         # this method replaces the previously stand-alone makeTabChord function
         thisEntry = self._tab_chord_cls()
-        thisEntry.populate_from_row(row, self._head_indices, self._extra_indices)
+        thisEntry.populateFromRow(row, self._head_indices, self._extra_indices)
         # for col_name, (i, type_to_coerce_to) in self._head_indices.items():
         #     # set attributes of thisEntry according to values in row
         #     setattr(thisEntry, col_name, type_to_coerce_to(row[i]))
@@ -620,12 +626,7 @@ class TsvHandler:
             measureNumber = thisChord.measure
             m21Measure = p.measure(measureNumber)
             if m21Measure is None:
-                # TODO: m21Measure should never be None if prepStream is
-                #   correctly implemented. We need to handle None to satisfy
-                #   mypy. If it *is* None, then there is a bug in the
-                #   implementation. What is correct behavior in this instance?
-                #   Raise a bug?
-                raise ValueError
+                raise ValueError('m21Measure should not be None')
 
             thisM21Chord = thisChord.tabToM21()  # In either case.
             # Store any otherwise unhandled attributes of the chord
@@ -659,14 +660,18 @@ class TsvHandler:
             s.insert(0, metadata.Metadata())
 
             firstEntry = self.chordList[0]  # Any entry will do
-            s.metadata.opusNumber = firstEntry.extra.get('op', '')
-            s.metadata.number = firstEntry.extra.get('no', '')
-            s.metadata.movementNumber = firstEntry.extra.get('mov', '')
-            s.metadata.title = (
-                'Op' + firstEntry.extra.get('op', '')
-                + '_No' + firstEntry.extra.get('no', '')
-                + '_Mov' + firstEntry.extra.get('mov', '')
-            )
+            title = []
+            if 'op' in firstEntry.extra:
+                s.metadata.opusNumber = firstEntry.extra['op']
+                title.append('Op' + s.metadata.opusNumber)
+            if 'no' in firstEntry.extra:
+                s.metadata.number = firstEntry.extra['no']
+                title.append('No' + s.metadata.number)
+            if 'mov' in firstEntry.extra:
+                s.metadata.movementNumber = firstEntry.extra['mov']
+                title.append('Mov' + s.metadata.movementNumber)
+            if title:
+                s.metadata.title = "_".join(title)
 
         startingKeySig = str(self.chordList[0].global_key)
         ks = key.Key(startingKeySig)
@@ -759,9 +764,6 @@ class M21toTSV:
         ).key.tonicPitchNameWithCase
 
         for thisRN in self.m21Stream[roman.RomanNumeral]:
-            if thisRN is None:
-                # shouldn't occur, but to satisfy mypy
-                continue
 
             relativeroot = None
             if thisRN.secondaryRomanNumeral:
@@ -784,9 +786,9 @@ class M21toTSV:
                 thisEntry.timesig = ''
             else:
                 thisEntry.timesig = ts.ratioString
-            thisEntry.extra["op"] = self.m21Stream.metadata.opusNumber
-            thisEntry.extra["no"] = self.m21Stream.metadata.number
-            thisEntry.extra["mov"] = self.m21Stream.metadata.movementNumber
+            thisEntry.extra['op'] = self.m21Stream.metadata.opusNumber or ''
+            thisEntry.extra['no'] = self.m21Stream.metadata.number or ''
+            thisEntry.extra['mov'] = self.m21Stream.metadata.movementNumber or ''
             thisEntry.length = thisRN.quarterLength
             thisEntry.global_key = global_key
             thisEntry.local_key = thisRN.key.tonicPitchNameWithCase
@@ -794,9 +796,9 @@ class M21toTSV:
             thisEntry.numeral = thisRN.romanNumeral
             thisEntry.form = getForm(thisRN)
             # Strip any leading non-digits from figbass (e.g., M43 -> 43)
-            figbassm = re.match(r'^\D*(\d.*|)', thisRN.figuresWritten)
-            if figbassm is not None:
-                thisEntry.figbass = figbassm.group(1)
+            figbassMatch = re.match(r'^\D*(\d.*|)', thisRN.figuresWritten)
+            if figbassMatch is not None:
+                thisEntry.figbass = figbassMatch.group(1)
             else:
                 thisEntry.figbass = ''
             thisEntry.changes = None  # TODO
@@ -898,7 +900,7 @@ class M21toTSV:
 def getForm(rn: roman.RomanNumeral) -> str:
     '''
     Takes a music21.roman.RomanNumeral object and returns the string indicating
-    "form" expected by the DCML standard.
+    'form' expected by the DCML standard.
 
     >>> romanText.tsvConverter.getForm(roman.RomanNumeral('V'))
     ''
@@ -928,7 +930,7 @@ def getForm(rn: roman.RomanNumeral) -> str:
     return ''
 
 
-def handleAddedTones(dcml_chord: str) -> str:
+def handleAddedTones(dcmlChord: str) -> str:
     '''
     Converts DCML added-tone syntax to music21.
 
@@ -938,8 +940,8 @@ def handleAddedTones(dcml_chord: str) -> str:
     >>> romanText.tsvConverter.handleAddedTones('i(4+2)')
     'i[no3][add4][add2]'
 
-    >>> romanText.tsvConverter.handleAddedTones('Viio7(b4)/V')
-    'Viio7[no3][addb4]/V'
+    >>> romanText.tsvConverter.handleAddedTones('Viio7(b4-5)/V')
+    'Viio7[no3][no5][addb4]/V'
 
     When in root position, 7 does not replace 8:
     >>> romanText.tsvConverter.handleAddedTones('vi(#74)')
@@ -953,10 +955,10 @@ def handleAddedTones(dcml_chord: str) -> str:
     '''
     m = re.match(
         r'(?P<primary>.*?(?P<figure>\d*(?:/\d+)*))\((?P<added_tones>.*)\)(?P<secondary>/.*)?',
-        dcml_chord
+        dcmlChord
     )
     if not m:
-        return dcml_chord
+        return dcmlChord
     primary = m.group('primary')
     added_tones = m.group('added_tones')
     secondary = m.group('secondary') if m.group('secondary') is not None else ''
@@ -965,7 +967,7 @@ def handleAddedTones(dcml_chord: str) -> str:
         return 'Cad64' + secondary
     added_tone_tuples: t.List[t.Tuple[str, str, str, str, str]] = list(
         # after https://github.com/johentsch/ms3/blob/main/src/ms3/utils.py
-        re.findall(r"((\+|-)?(\^|v)?(#+|b+)?(1\d|\d))", added_tones)
+        re.findall(r'((\+|-)?(\^|v)?(#+|b+)?(1\d|\d))', added_tones)
     )
     additions: t.List[str] = []
     omissions: t.List[str] = []
@@ -975,7 +977,7 @@ def handleAddedTones(dcml_chord: str) -> str:
         threshold = 8
     for _, added_or_removed, above_or_below, alteration, factor in added_tone_tuples:
         if added_or_removed == '-':
-            additions.append(f'[no{factor}]')
+            omissions.append(f'[no{factor}]')
             continue
         if added_or_removed != '+' and int(factor) < threshold:
             if above_or_below == 'v' or alteration in ('b', ''):
@@ -985,7 +987,7 @@ def handleAddedTones(dcml_chord: str) -> str:
             replaced_factor = str(int(factor) + increment)
             omissions.append(f'[no{replaced_factor}]')
         additions.append(f'[add{alteration}{factor}]')
-    return primary + "".join(omissions) + "".join(additions) + secondary
+    return primary + ''.join(omissions) + ''.join(additions) + secondary
 
 
 def localKeyAsRn(local_key: key.Key, global_key: key.Key) -> str:
@@ -1056,7 +1058,7 @@ def characterSwaps(preString: str, minor: bool = True, direction: str = 'm21-DCM
     return preString
 
 
-def getLocalKey(local_key: str, global_key: str, convertDCMLToM21: bool = False):
+def getLocalKey(local_key: str, global_key: str, convertDCMLToM21: bool = False) -> str:
     '''
     Re-casts comparative local key (e.g. 'V of G major') in its own terms ('D').
 
@@ -1206,33 +1208,11 @@ class Test(unittest.TestCase):
                 # Ensure that both m21 streams are the same
                 self.assertEqual(len(stream1.recurse()), len(stream2.recurse()))
                 for i, (item1, item2) in enumerate(zip(
-                    stream1.recurse().getElementsByClass(harmony.Harmony),
-                    stream2.recurse().getElementsByClass(harmony.Harmony)
+                    stream1[harmony.Harmony], stream2[harmony.Harmony]
                 )):
-                    try:
-                        self.assertEqual(
-                            item1, item2, msg=f'item {i}, version {version}: {item1} != {item2}'
-                        )
-                    except AssertionError:
-                        # Augmented sixth figures will not agree, e.g.,
-                        # - Ger6 becomes Ger65
-                        # - Fr6 becomes Fr43
-                        # This doesn't seem important, but we can at least
-                        # assert that both items are augmented sixth chords of
-                        # the same type.
-                        m = re.match('Ger|Fr', item1.figure)
-                        self.assertIsNotNone(m)
-                        aug6_type = m.group(0)
-                        self.assertTrue(item2.figure.startswith(aug6_type))
-                    # Checking for quarterLength as per
-                    #  https://github.com/cuthbertLab/music21/pull/1267#discussion_r936451907
-                    # However I'm not sure that 'quarterLength' is meaningful
-                    # in the case of V2 where it is not set explicitly.
-                    self.assertTrue(
-                        hasattr(item1, 'quarterLength')
-                        and isinstance(item1.quarterLength, float)
+                    self.assertEqual(
+                        item1, item2, msg=f'item {i}, version {version}: {item1} != {item2}'
                     )
-                # if version == 2:
                 first_harmony = stream1[harmony.Harmony].first()
                 first_offset = first_harmony.activeSite.offset + first_harmony.offset
                 self.assertEqual(
@@ -1306,6 +1286,7 @@ class Test(unittest.TestCase):
 
         self.assertIsInstance(veryLocalKey, str)
         self.assertEqual(veryLocalKey, 'b')
+
 
 # ------------------------------------------------------------------------------
 
