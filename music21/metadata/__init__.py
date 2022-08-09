@@ -620,7 +620,7 @@ class Metadata(base.Music21Object):
     @copyright.setter
     def copyright(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('copyright', value)
+        setattr(self, 'copyright', value)
 
     # SPECIAL METHODS #
     def all(
@@ -1238,7 +1238,7 @@ class Metadata(base.Music21Object):
     @alternativeTitle.setter
     def alternativeTitle(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('alternativeTitle', value)
+        setattr(self, 'alternativeTitle', value)
 
     @property
     def composer(self):
@@ -1270,7 +1270,7 @@ class Metadata(base.Music21Object):
     @composer.setter
     def composer(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('composer', value)
+        setattr(self, 'composer', value)
 
     @property
     def composers(self):
@@ -1304,7 +1304,7 @@ class Metadata(base.Music21Object):
     @composers.setter
     def composers(self, value: t.Iterable[str]) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('composers', value)
+        setattr(self, 'composers', value)
 
     @property
     def date(self):
@@ -1317,7 +1317,7 @@ class Metadata(base.Music21Object):
     @date.setter
     def date(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('date', value)
+        setattr(self, 'date', value)
 
     @property
     def dateCreated(self):
@@ -1348,7 +1348,7 @@ class Metadata(base.Music21Object):
     @dateCreated.setter
     def dateCreated(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('dateCreated', value)
+        setattr(self, 'dateCreated', value)
 
     @property
     def fileFormat(self) -> t.Optional[str]:
@@ -1360,7 +1360,7 @@ class Metadata(base.Music21Object):
     @fileFormat.setter
     def fileFormat(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('fileFormat', value)
+        setattr(self, 'fileFormat', value)
 
     @property
     def filePath(self) -> t.Optional[str]:
@@ -1372,7 +1372,7 @@ class Metadata(base.Music21Object):
     @filePath.setter
     def filePath(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('filePath', value)
+        setattr(self, 'filePath', value)
 
     @property
     def fileNumber(self) -> t.Optional[str]:
@@ -1384,7 +1384,7 @@ class Metadata(base.Music21Object):
     @fileNumber.setter
     def fileNumber(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('fileNumber', value)
+        setattr(self, 'fileNumber', value)
 
     @property
     def localeOfComposition(self):
@@ -1401,7 +1401,7 @@ class Metadata(base.Music21Object):
     @localeOfComposition.setter
     def localeOfComposition(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('localeOfComposition', value)
+        setattr(self, 'localeOfComposition', value)
 
     @property
     def librettist(self):
@@ -1422,7 +1422,7 @@ class Metadata(base.Music21Object):
     @librettist.setter
     def librettist(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('librettist', value)
+        setattr(self, 'librettist', value)
 
     @property
     def librettists(self):
@@ -1441,7 +1441,7 @@ class Metadata(base.Music21Object):
     @librettists.setter
     def librettists(self, value: t.Iterable[str]) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('librettists', value)
+        setattr(self, 'librettists', value)
 
     @property
     def lyricist(self):
@@ -1465,7 +1465,7 @@ class Metadata(base.Music21Object):
     @lyricist.setter
     def lyricist(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('lyricist', value)
+        setattr(self, 'lyricist', value)
 
     @property
     def lyricists(self):
@@ -1484,7 +1484,7 @@ class Metadata(base.Music21Object):
     @lyricists.setter
     def lyricists(self, value: t.Iterable[str]) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('lyricists', value)
+        setattr(self, 'lyricists', value)
 
     @property
     def movementName(self):
@@ -1505,7 +1505,7 @@ class Metadata(base.Music21Object):
     @movementName.setter
     def movementName(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('movementName', value)
+        setattr(self, 'movementName', value)
 
     @property
     def movementNumber(self) -> t.Optional[str]:
@@ -1526,7 +1526,7 @@ class Metadata(base.Music21Object):
     @movementNumber.setter
     def movementNumber(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('movementNumber', value)
+        setattr(self, 'movementNumber', value)
 
     @property
     def number(self) -> t.Optional[str]:
@@ -1554,7 +1554,7 @@ class Metadata(base.Music21Object):
     @number.setter
     def number(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('number', value)
+        setattr(self, 'number', value)
 
     @property
     def opusNumber(self) -> t.Optional[str]:
@@ -1582,7 +1582,7 @@ class Metadata(base.Music21Object):
     @opusNumber.setter
     def opusNumber(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('opusNumber', value)
+        setattr(self, 'opusNumber', value)
 
     @property
     def title(self):
@@ -1602,7 +1602,7 @@ class Metadata(base.Music21Object):
     @title.setter
     def title(self, value: str) -> None:
         '''For type checking only. Does not run.'''
-        self.__setattr__('title', value)
+        setattr(self, 'title', value)
 
     @property
     def bestTitle(self):
@@ -1635,8 +1635,11 @@ class Metadata(base.Music21Object):
 
         >>> md.bestTitle = 'Bonaparte'
         Traceback (most recent call last):
-        AttributeError: can't set attribute 'bestTitle'
+        AttributeError: can't set...
         '''
+        # When 3.10 is minimum version, change to:
+        # AttributeError: can't set attribute 'bestTitle'
+
         searchId = (
             'title',
             'popularTitle',
