@@ -4571,13 +4571,12 @@ class Chord(ChordBase):
         Changed in v.6 -- if inPlace is True do not return anything.
         '''
         if inPlace:
-            # not until pitches inform notes which inform chords when they change.
             if self._cache.get('isSortedAscendingDiatonic', False):
                 return None
             returnObj = self
             self.clearCache()
         else:
-            # cache is not copied ever.
+            # cache is not copied to the new item.
             returnObj = copy.deepcopy(self)
         returnObj._notes.sort(key=lambda x: (x.pitch.diatonicNoteNum, x.pitch.ps))
         returnObj._cache['isSortedAscendingDiatonic'] = True
