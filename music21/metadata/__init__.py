@@ -525,9 +525,11 @@ class Metadata(base.Music21Object):
         >>> md['software']
         (<music21.metadata.primitives.Text music21 v...>,
          <music21.metadata.primitives.Text Finale for Macintosh>)
+
+        Note that `.software` is an exception to the general rule that
+        singular looking properties return a string.  In fact, it is always
+        plural and returns a tuple of strings.  There is no singular version
         '''
-        # software is a bit of an exception: it looks singular, but it's actually
-        # plural (with no singular attribute at all).
         return self._getPluralAttribute('software')
 
     @property
@@ -537,10 +539,11 @@ class Metadata(base.Music21Object):
         Returns an empty tuple if no Contributors exist.
 
         >>> md = metadata.Metadata()
-        >>> md['composer'] = ['Richard Strauss']
+        >>> md.composer = 'Richard Strauss'
         >>> md.librettist = 'Oscar Wilde'
 
-        When we add a title (whether through `.attribute` setting, `[item]` setting,
+        When we add something that is not a person, such as a title
+        (whether through `.attribute` setting, `[item]` setting,
         or the :meth:`~music21.metadata.Metadata.add` method), it will not show up
         in the list of contributors.
 
@@ -549,6 +552,9 @@ class Metadata(base.Music21Object):
         >>> contribs
         (<music21.metadata.primitives.Contributor composer:Richard Strauss>,
          <music21.metadata.primitives.Contributor librettist:Oscar Wilde>)
+
+        Note that `.contributors` cannot be set.  Add them separately via
+        specific setters or the `.addContributor()` method.
         '''
         output: t.List[Contributor] = []
         for _, contrib in self.all(
@@ -610,6 +616,11 @@ class Metadata(base.Music21Object):
         (<music21.metadata.primitives.Copyright Copyright © 1985>,)
         '''
         return self._getSingularAttribute('copyright')
+
+    @copyright.setter
+    def copyright(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'copyright', value)
 
     # SPECIAL METHODS #
     def all(
@@ -784,7 +795,8 @@ class Metadata(base.Music21Object):
         # the job yet, we need to make a call to super().__setattr__ to handle
         # all the bare attributes, including in base classes (e.g. Music21Object).
         # Unfortunately, super().__setattr__ will not call our property.setters,
-        # so all property.setters have been removed, and handled explicitly here.
+        # so all property.setters are just to help type checkers,
+        # and are handled explicitly here.
 
         if name in properties.ALL_SINGLE_ATTRIBUTE_NAMES:
             if (value is not None
@@ -909,7 +921,7 @@ class Metadata(base.Music21Object):
 
         self._set(key, value, isCustom=False)
 
-    def addContributor(self, c):
+    def addContributor(self, c: Contributor):
         # noinspection PyShadowingNames
         r'''
         Assign a :class:`~music21.metadata.Contributor` object to this
@@ -1223,6 +1235,11 @@ class Metadata(base.Music21Object):
         '''
         return self._getSingularAttribute('alternativeTitle')
 
+    @alternativeTitle.setter
+    def alternativeTitle(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'alternativeTitle', value)
+
     @property
     def composer(self):
         r'''
@@ -1250,6 +1267,11 @@ class Metadata(base.Music21Object):
         '''
         return self._getSingularAttribute('composer')
 
+    @composer.setter
+    def composer(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'composer', value)
+
     @property
     def composers(self):
         r'''
@@ -1263,7 +1285,6 @@ class Metadata(base.Music21Object):
 
         >>> md.composers
         ('Xian Xinghai', 'Yin Chengzong')
-
 
         Might as well add a third composer to the concerto committee?
 
@@ -1280,6 +1301,11 @@ class Metadata(base.Music21Object):
         '''
         return self._getPluralAttribute('composer')
 
+    @composers.setter
+    def composers(self, value: t.Iterable[str]) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'composers', value)
+
     @property
     def date(self):
         '''
@@ -1287,6 +1313,11 @@ class Metadata(base.Music21Object):
         Use `dateCreated` instead.
         '''
         return self.dateCreated
+
+    @date.setter
+    def date(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'date', value)
 
     @property
     def dateCreated(self):
@@ -1314,12 +1345,22 @@ class Metadata(base.Music21Object):
         '''
         return self._getSingularAttribute('dateCreated')
 
+    @dateCreated.setter
+    def dateCreated(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'dateCreated', value)
+
     @property
     def fileFormat(self) -> t.Optional[str]:
         '''
         Get or set the file format that was parsed.
         '''
         return self._getSingularAttribute('fileFormat')
+
+    @fileFormat.setter
+    def fileFormat(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'fileFormat', value)
 
     @property
     def filePath(self) -> t.Optional[str]:
@@ -1328,12 +1369,22 @@ class Metadata(base.Music21Object):
         '''
         return self._getSingularAttribute('filePath')
 
+    @filePath.setter
+    def filePath(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'filePath', value)
+
     @property
     def fileNumber(self) -> t.Optional[str]:
         '''
         Get or set the file number that was parsed.
         '''
         return self._getSingularAttribute('fileNumber')
+
+    @fileNumber.setter
+    def fileNumber(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'fileNumber', value)
 
     @property
     def localeOfComposition(self):
@@ -1346,6 +1397,11 @@ class Metadata(base.Music21Object):
         'Paris, France'
         '''
         return self._getSingularAttribute('localeOfComposition')
+
+    @localeOfComposition.setter
+    def localeOfComposition(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'localeOfComposition', value)
 
     @property
     def librettist(self):
@@ -1363,6 +1419,11 @@ class Metadata(base.Music21Object):
         '''
         return self._getSingularAttribute('librettist')
 
+    @librettist.setter
+    def librettist(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'librettist', value)
+
     @property
     def librettists(self):
         r'''
@@ -1376,6 +1437,11 @@ class Metadata(base.Music21Object):
         Should be distinguished from lyricists etc.
         '''
         return self._getPluralAttribute('librettist')
+
+    @librettists.setter
+    def librettists(self, value: t.Iterable[str]) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'librettists', value)
 
     @property
     def lyricist(self):
@@ -1396,6 +1462,11 @@ class Metadata(base.Music21Object):
         '''
         return self._getSingularAttribute('lyricist')
 
+    @lyricist.setter
+    def lyricist(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'lyricist', value)
+
     @property
     def lyricists(self):
         r'''
@@ -1409,6 +1480,11 @@ class Metadata(base.Music21Object):
         Should be distinguished from librettists etc.
         '''
         return self._getPluralAttribute('lyricist')
+
+    @lyricists.setter
+    def lyricists(self, value: t.Iterable[str]) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'lyricists', value)
 
     @property
     def movementName(self):
@@ -1426,6 +1502,11 @@ class Metadata(base.Music21Object):
         '''
         return self._getSingularAttribute('movementName')
 
+    @movementName.setter
+    def movementName(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'movementName', value)
+
     @property
     def movementNumber(self) -> t.Optional[str]:
         r'''
@@ -1441,6 +1522,11 @@ class Metadata(base.Music21Object):
         '4'
         '''
         return self._getSingularAttribute('movementNumber')
+
+    @movementNumber.setter
+    def movementNumber(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'movementNumber', value)
 
     @property
     def number(self) -> t.Optional[str]:
@@ -1465,6 +1551,11 @@ class Metadata(base.Music21Object):
         '''
         return self._getSingularAttribute('number')
 
+    @number.setter
+    def number(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'number', value)
+
     @property
     def opusNumber(self) -> t.Optional[str]:
         r'''
@@ -1488,6 +1579,11 @@ class Metadata(base.Music21Object):
         '''
         return self._getSingularAttribute('opusNumber')
 
+    @opusNumber.setter
+    def opusNumber(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'opusNumber', value)
+
     @property
     def title(self):
         r'''
@@ -1502,6 +1598,11 @@ class Metadata(base.Music21Object):
         True
         '''
         return self._getSingularAttribute('title')
+
+    @title.setter
+    def title(self, value: str) -> None:
+        '''For type checking only. Does not run.'''
+        setattr(self, 'title', value)
 
     @property
     def bestTitle(self):
@@ -1529,7 +1630,16 @@ class Metadata(base.Music21Object):
 
         >>> md.otp
         'Eroica'
+
+        bestTitle cannot be set:
+
+        >>> md.bestTitle = 'Bonaparte'
+        Traceback (most recent call last):
+        AttributeError: can't set...
         '''
+        # When 3.10 is minimum version, change to:
+        # AttributeError: can't set attribute 'bestTitle'
+
         searchId = (
             'title',
             'popularTitle',
