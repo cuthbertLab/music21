@@ -125,7 +125,7 @@ def runParallel(iterable, parallelFunction, *,
     def callUpdate(ii):
         if updateFunction is True:
             tasksDone = min([ii, iterLength])
-            print(f"Done {tasksDone} tasks of {iterLength}")
+            print(f'Done {tasksDone} tasks of {iterLength}')
         elif updateFunction not in (False, None):
             for thisPosition in range(ii - (updateMultiply * numCpus), ii):
                 if thisPosition < 0:
@@ -180,7 +180,7 @@ def runNonParallel(iterable, parallelFunction, *,
 
         if updateFunction is True:
             tasksDone = min([ii, iterLength])
-            print(f"Done {tasksDone} tasks of {iterLength}")
+            print(f'Done {tasksDone} tasks of {iterLength}')
         elif updateFunction not in (False, None):
             for thisPosition in range(ii - updateMultiply, ii):
                 if thisPosition < 0:

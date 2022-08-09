@@ -33,7 +33,7 @@ def compressAllXMLFiles(*, deleteOriginal=False):
     compressed, the originals are deleted from the system.
     '''
     from music21.corpus.corpora import CoreCorpus
-    environLocal.warn("Compressing musicXML files...")
+    environLocal.warn('Compressing musicXML files...')
 
     # this gets all .xml, .musicxml, .mxl etc.
     for filename in CoreCorpus().getPaths(fileExtensions=('.xml',)):
@@ -67,7 +67,7 @@ def compressXML(filename: t.Union[str, pathlib.Path],
         return False  # not a musicXML file
     fp = common.pathTools.cleanpath(filename, returnPathlib=True)
     if not silent:  # pragma: no cover
-        environLocal.warn(f"Updating file: {fp}")
+        environLocal.warn(f'Updating file: {fp}')
     newFilename = str(fp.with_suffix('.mxl'))
 
 
@@ -118,7 +118,7 @@ def uncompressMXL(filename: t.Union[str, pathlib.Path],
         return False  # not a compressed musicXML file
 
     fp: pathlib.Path = common.pathTools.cleanpath(filename, returnPathlib=True)
-    environLocal.warn(f"Updating file: {fp}")
+    environLocal.warn(f'Updating file: {fp}')
     extractPath = str(fp.parent)
     unarchivedName = fp.with_suffix('.musicxml').name
     # Export container and original xml file to system as a compressed XML.

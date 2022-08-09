@@ -2708,7 +2708,7 @@ class Test(unittest.TestCase):
         from music21 import harmony
         c = chord.Chord(('A#', 'C', 'E'))
         cs = harmony.chordSymbolFromChord(c)
-        self.assertEqual(cs.figure, "Chord Symbol Cannot Be Identified")
+        self.assertEqual(cs.figure, 'Chord Symbol Cannot Be Identified')
 
     def testRegexEdgeCases(self):
         cs = ChordSymbol('FFr+6')
@@ -2765,7 +2765,7 @@ class Test(unittest.TestCase):
 
     def testChordWithBass(self):
 
-        xmlString = """
+        xmlString = '''
           <harmony>
             <root>
               <root-step>A</root-step>
@@ -2776,7 +2776,7 @@ class Test(unittest.TestCase):
               <bass-step>G</bass-step>
             </bass>
           </harmony>
-          """
+          '''
         figure = 'A7/G'
         pitches = ('G2', 'A2', 'C#3', 'E3')
 
@@ -2803,13 +2803,13 @@ class Test(unittest.TestCase):
         self.assertEqual(pitches, ChordSymbol('Am#7').pitches)
 
     def testRootBassParsing(self):
-        """
+        '''
         This tests a bug where the root and bass were wrongly parsed,
         since the matched root and bass were globally removed from figure,
         and not only where matched.
-        """
+        '''
 
-        xmlString = """
+        xmlString = '''
           <harmony>
             <root>
               <root-step>E</root-step>
@@ -2820,19 +2820,19 @@ class Test(unittest.TestCase):
               <bass-alter>-1</bass-alter>
             </bass>
           </harmony>
-        """
+        '''
         figure = 'E7/E-'
         pitches = ('E-2', 'E3', 'G#3', 'B3', 'D4')
         self.runTestOnChord(xmlString, figure, pitches)
 
 
     def testChordStepBass(self):
-        """
+        '''
         This tests a bug where the chord modification (add 2) was placed at a
         wrong octave, resulting in a D bass instead of the proper E.
-        """
+        '''
 
-        xmlString = """
+        xmlString = '''
           <harmony>
             <root>
               <root-step>C</root-step>
@@ -2847,25 +2847,25 @@ class Test(unittest.TestCase):
               <degree-type text="add">add</degree-type>
             </degree>
           </harmony>
-           """
+           '''
         figure = 'C/E add 2'
         pitches = ('E3', 'G3', 'C4', 'D4')
 
         self.runTestOnChord(xmlString, figure, pitches)
 
     def testSusBass(self):
-        """
+        '''
         This tests a bug where the bass addition was considered as the fifth
         inversion in suspended chords. Now, this is considered as a non-valid
         inversion, and the bass is simply added before the root.
-        """
+        '''
         from xml.etree.ElementTree import fromstring as EL
         from music21 import musicxml
 
         pitches = ('G2', 'D3', 'G3', 'A3')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
 
-        xmlString = """
+        xmlString = '''
           <harmony>
             <root>
               <root-step>D</root-step>
@@ -2875,7 +2875,7 @@ class Test(unittest.TestCase):
               <bass-step>G</bass-step>
             </bass>
           </harmony>
-         """
+         '''
 
         MP = musicxml.xmlToM21.MeasureParser()
         mxHarmony = EL(xmlString)
@@ -2895,7 +2895,7 @@ class Test(unittest.TestCase):
         pitches = ('E-3', 'E3', 'G3', 'C4')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
 
-        xmlString = """
+        xmlString = '''
           <harmony>
             <root>
               <root-step>C</root-step>
@@ -2905,7 +2905,7 @@ class Test(unittest.TestCase):
               <bass-step>E-</bass-step>
             </bass>
           </harmony>
-         """
+         '''
 
         MP = musicxml.xmlToM21.MeasureParser()
         mxHarmony = EL(xmlString)
@@ -2929,7 +2929,7 @@ class Test(unittest.TestCase):
         pitches = ('E3', 'G3', 'C4', 'D4')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
 
-        xmlString = """
+        xmlString = '''
           <harmony>
             <root>
               <root-step>C</root-step>
@@ -2939,7 +2939,7 @@ class Test(unittest.TestCase):
               <bass-step>E</bass-step>
             </bass>
           </harmony>
-       """
+       '''
 
         MP = musicxml.xmlToM21.MeasureParser()
         mxHarmony = EL(xmlString)
@@ -2955,18 +2955,18 @@ class Test(unittest.TestCase):
         self.assertEqual(pitches, cs3.pitches)
 
     def testNinth(self):
-        """
+        '''
         This tests a bug in _adjustOctaves.
-        """
+        '''
 
-        xmlString = """
+        xmlString = '''
         <harmony >
             <root>
               <root-step>D</root-step>
             </root>
             <kind text="min9">minor-ninth</kind>
         </harmony>
-           """
+           '''
         pitches = ('D2', 'F2', 'A2', 'C3', 'E3')
         figure = 'Dm9'
 
@@ -2976,7 +2976,7 @@ class Test(unittest.TestCase):
         from xml.etree.ElementTree import fromstring as EL
         from music21 import musicxml
 
-        xmlString = """
+        xmlString = '''
         <harmony>
           <root>
             <root-step>C</root-step>
@@ -2984,7 +2984,7 @@ class Test(unittest.TestCase):
           <kind>major</kind>
           <inversion>1</inversion>
         </harmony>
-        """
+        '''
 
         pitches = ('E2', 'G2', 'C3')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
@@ -3015,7 +3015,7 @@ class Test(unittest.TestCase):
 
 
     def testChordStepFromFigure(self):
-        xmlString = """
+        xmlString = '''
           <harmony>
             <root>
               <root-step>G</root-step>
@@ -3047,7 +3047,7 @@ class Test(unittest.TestCase):
               <degree-type>add</degree-type>
             </degree>
           </harmony>
-        """
+        '''
         figure = 'G7 subtract 5 add b9 add #9 add #11 add b13'
         pitches = ('G2', 'B2', 'F3', 'A-3', 'A#3', 'C#4', 'E-4')
         self.runTestOnChord(xmlString, figure, pitches)
@@ -3060,7 +3060,7 @@ class Test(unittest.TestCase):
 
         #########
 
-        xmlString = """
+        xmlString = '''
             <harmony>
             <root>
               <root-step>C</root-step>
@@ -3072,7 +3072,7 @@ class Test(unittest.TestCase):
               <degree-type>add</degree-type>
             </degree>
           </harmony>
-        """
+        '''
         figure = 'C7 b9'
         pitches = ('C3', 'E3', 'G3', 'B-3', 'D-4')
 
@@ -3089,7 +3089,7 @@ class Test(unittest.TestCase):
 
         #########
 
-        xmlString = """
+        xmlString = '''
           <harmony>
             <root>
               <root-step>A</root-step>
@@ -3111,7 +3111,7 @@ class Test(unittest.TestCase):
               <degree-type>add</degree-type>
               </degree>
             </harmony>
-        """
+        '''
         figure = 'A7 alter #5 add #9 add #11'
         pitches = ('A2', 'C#3', 'E#3', 'G3', 'B#3', 'D#4')
 
@@ -3124,13 +3124,13 @@ class Test(unittest.TestCase):
         self.assertEqual(ch1.pitches, ch2.pitches)
 
     def x_testPower(self):
-        """
+        '''
         power chords should not have inversions
-        """
+        '''
         pitches = ('E2', 'A2', 'E3')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
 
-        xmlString = """
+        xmlString = '''
           <harmony>
             <root>
               <root-step>A</root-step>
@@ -3140,17 +3140,17 @@ class Test(unittest.TestCase):
               <bass-step>E</bass-step>
             </bass>
           </harmony>
-        """
+        '''
         figure = 'Apower/E'
 
         self.runTestOnChord(xmlString, figure, pitches)
 
     def testSingleChordSymbol(self):
-        """
+        '''
         Test an edge case where a Stream contains only one ChordSymbol
         at the highest offset: should still have a nonzero duration
         if there is a subsequent highest time.
-        """
+        '''
         from music21 import note
         from music21 import stream
 

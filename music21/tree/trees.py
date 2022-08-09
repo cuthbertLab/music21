@@ -444,10 +444,10 @@ class ElementTree(core.AVLTree):
             parent._removeElementAtPosition(self, oldPosition)
             # Trees don't have offsets currently
             raise NotImplementedError
-            # pylint: disable=all
-            parent._insertCore(self.offset, self)
-
-            parent._updateNodes(parentPosition, visitedParents=visitedParents)
+            # # pylint: disable=all
+            # parent._insertCore(self.offset, self)
+            #
+            # parent._updateNodes(parentPosition, visitedParents=visitedParents)
 
     def _removeElementAtPosition(self, element, position):
         '''
@@ -494,7 +494,7 @@ class ElementTree(core.AVLTree):
 
         This is about an order of magnitude faster (3ms vs 21ms for 1000 items; 31 vs. 30ms for
         10,000 items) than running createNodeAtPosition() for each element in a list if it is
-        already sorted.  Thus it should be used when converting a
+        already sorted.  Thus, it should be used when converting a
         Stream where .isSorted is True into a tree.
 
         If any of the conditions is not true, expect to get a dangerously

@@ -1198,7 +1198,7 @@ class Metadata(base.Music21Object):
         'txo': 'textOriginalLanguage',
     }
 
-    @deprecated('v8', 'v9', 'use `md.uniqueName = value` or `md[\'uniqueName\'] = [value]`')
+    @deprecated('v8', 'v9', "use `md.uniqueName = value` or `md['uniqueName'] = [value]`")
     def setWorkId(self, idStr, value):
         idStr = idStr.lower()
         match = False
@@ -2027,7 +2027,7 @@ class Metadata(base.Music21Object):
                 uniqueName = properties.NAMESPACE_NAME_TO_UNIQUE_NAME.get(name, '')
             if not self._isStandardUniqueName(uniqueName):
                 raise KeyError(
-                    f'Name=\'{name}\' is not a standard metadata name.'
+                    f'Name={name!r} is not a standard metadata name.'
                     ' Call addCustom/setCustom/getCustom for custom names.')
             name = uniqueName
 
@@ -2056,7 +2056,7 @@ class Metadata(base.Music21Object):
                 uniqueName = properties.NAMESPACE_NAME_TO_UNIQUE_NAME.get(name, '')
             if not self._isStandardUniqueName(uniqueName):
                 raise KeyError(
-                    f'Name=\'{name}\' is not a standard metadata name.'
+                    f'Name={name!r} is not a standard metadata name.'
                     ' Call addCustom/setCustom/getCustom for custom names.')
             name = uniqueName
 
@@ -2121,7 +2121,7 @@ class Metadata(base.Music21Object):
                 uniqueName = properties.NAMESPACE_NAME_TO_UNIQUE_NAME.get(name, '')
             if not self._isStandardUniqueName(uniqueName):
                 raise KeyError(
-                    f'Name=\'{name}\' is not a standard metadata name.'
+                    f'Name={name!r} is not a standard metadata name.'
                     ' Call addCustom/setCustom/getCustom for custom names.')
             name = uniqueName
 

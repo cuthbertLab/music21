@@ -514,7 +514,7 @@ class StreamCore(Music21Object):
             <ElementTimespan (8.0 to 8.0) <music21.bar.Barline type=final>>
         '''
         hashedAttributes = hash((tuple(classList or ()), flatten))
-        cacheKey = "timespanTree" + str(hashedAttributes)
+        cacheKey = 'timespanTree' + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedTimespanTree = tree.fromStream.asTimespans(self,
                                                              flatten=flatten,
@@ -549,7 +549,7 @@ class StreamCore(Music21Object):
                                   flatten,
                                   useTimespans,
                                   groupOffsets))
-        cacheKey = "elementTree" + str(hashedAttributes)
+        cacheKey = 'elementTree' + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedElementTree = tree.fromStream.asTree(self,
                                                        flatten=flatten,

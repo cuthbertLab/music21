@@ -412,7 +412,7 @@ class ScalaFile:
         self.file = fileLike  # already 'open'
 
     def __repr__(self):
-        r = "<ScalaFile>"
+        r = '<ScalaFile>'
         return r
 
     def close(self):

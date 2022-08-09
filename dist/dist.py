@@ -216,7 +216,7 @@ class Distributor:
             shutil.rmtree(fpDstDir)
 
         if mode == TAR:
-            tf = tarfile.open(fp, "r:gz")
+            tf = tarfile.open(fp, 'r:gz')
             # the path here is the dir into which to expand,
             # not the name of that dir
             tf.extractall(path=fpDir)

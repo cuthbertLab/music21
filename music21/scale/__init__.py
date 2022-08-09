@@ -2055,7 +2055,7 @@ class ConcreteScale(Scale):
         is a deprecated alias for that method.
 
         This routine was named and created before music21 aspired to have
-        full subclass substitution.  Thus is shadows the `.next()` function of
+        full subclass substitution.  Thus, is shadows the `.next()` function of
         Music21Object without performing similar functionality.
 
         The routine will be formally deprecated in v9 and removed in v10.

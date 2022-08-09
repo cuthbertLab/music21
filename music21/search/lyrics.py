@@ -440,7 +440,8 @@ class Test(unittest.TestCase):
 
         def runSearch():
             ls = search.lyrics.LyricSearcher(s)
-            self.assertEqual(ls.indexText, "la la")
+            # there is a non-breaking space between the two la's.
+            self.assertEqual(ls.indexText, 'la la')
 
         runSearch()
         ly.components[0].syllabic = 'begin'
@@ -519,7 +520,7 @@ class Test(unittest.TestCase):
         '''
         s = converter.parse(partXML, format='MusicXML')
         ls = search.lyrics.LyricSearcher(s)
-        self.assertEqual(ls.indexText, "hi there! // bye Michael.")
+        self.assertEqual(ls.indexText, 'hi there! // bye Michael.')
         tuples = ls.indexTuples
         self.assertEqual(len(tuples), 5)
         notes = list(s.flatten().notes)

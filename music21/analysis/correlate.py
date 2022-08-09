@@ -46,7 +46,7 @@ class ActivityMatch:
 
     '''
     def __init__(self, streamObj):
-        if not hasattr(streamObj, "classes") or "Stream" not in streamObj.classes:
+        if not hasattr(streamObj, 'classes') or 'Stream' not in streamObj.classes:
             raise CorrelateException('non-stream provided as argument')
         self.streamObj = streamObj
         self.data = None
