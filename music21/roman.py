@@ -1597,7 +1597,8 @@ class RomanNumeral(harmony.Harmony):
     >>> rn_minor_64_secondary.secondaryRomanNumeral
     <music21.roman.RomanNumeral V in e minor>
 
-    Dominant 7ths can be specified by putting d7 at end:
+    Dominant 7ths can be specified by the character 'd' followed by the figure
+    indicating the inversion of the chord:
 
     >>> r = roman.RomanNumeral('bVIId7', key.Key('B-'))
     >>> r.figure
@@ -1606,9 +1607,9 @@ class RomanNumeral(harmony.Harmony):
     >>> cp(r)
     ['A-5', 'C6', 'E-6', 'G-6']
 
-    >>> r = roman.RomanNumeral('VId2')
+    >>> r = roman.RomanNumeral('VId42')
     >>> r.figure
-    'VId2'
+    'VId42'
 
     >>> r.key = key.Key('B-')
     >>> cp(r)
@@ -2346,7 +2347,12 @@ class RomanNumeral(harmony.Harmony):
             workingFigure = workingFigure[1:]
             impliedQuality = 'augmented'
             # impliedQualitySymbol = '+'
-        elif m := re.match(r'(?P<leading>.*)d(?P<figure>7|6/?5|4/?3|4/?2|2)$', workingFigure):
+        elif 'd' in workingFigure:
+            m = re.match(r'(?P<leading>.*)d(?P<figure>7|6/?5|4/?3|4/?2|2)$', workingFigure)
+            if m is None:
+                raise RomanException(
+                    f'Cannot make a dominant-seventh chord out of {workingFigure}. '
+                    "Figure should be in ('7', '65', '43', '42', '2').")
             # this one is different
             workingFigure = m.group('leading') + m.group('figure')
             impliedQuality = 'dominant-seventh'
