@@ -840,6 +840,9 @@ def makeRests(
     else:
         returnObj = s
 
+    # Invalidate tuplet status
+    returnObj.streamStatus.tuplets = None
+
     if returnObj.iter().parts:
         for inner_part in returnObj.iter().parts:
             inner_part.makeRests(
@@ -1880,6 +1883,8 @@ def splitElementsToCompleteTuplets(
     >>> splitElementsToCompleteTuplets(s)
     >>> [el.quarterLength for el in s.notes]
     [Fraction(1, 3), Fraction(2, 3), Fraction(1, 3), Fraction(2, 3)]
+    >>> [el.tie for el in s.notes]
+    [None, <music21.tie.Tie start>, <music21.tie.Tie stop>, None]
 
     With `recurse`:
 

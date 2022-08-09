@@ -57,6 +57,11 @@ class PercussionChord(chord.ChordBase):
 
     isChord = False
 
+    def __deepcopy__(self, memo=None):
+        new = super().__deepcopy__(memo=memo)
+        for n in new._notes:
+            n._chordAttached = new
+        return new
 
     @property
     def notes(self) -> t.Tuple[note.NotRest, ...]:
