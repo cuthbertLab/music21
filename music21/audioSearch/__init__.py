@@ -179,7 +179,7 @@ def prepareThresholds(useScale=None):
     A and B-flat will be 450.  Notes below 450 should be considered As and those
     above 450 should be considered B-flats.
 
-    Thus the list returned has one less element than the number of notes in the
+    Thus, the list returned has one less element than the number of notes in the
     scale + octave repetition.  If useScale is a ChromaticScale, `prepareThresholds`
     will return a 12 element list.  If it's a diatonic scale, it'll have 7 elements.
 

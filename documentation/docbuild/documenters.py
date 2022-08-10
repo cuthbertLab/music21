@@ -1394,7 +1394,7 @@ class ModuleDocumenter(ObjectDocumenter):
         for referent in self.memberOrder:
             if referent in classDocumenters:
                 result.append(classDocumenters[referent])
-                del(classDocumenters[referent])
+                del classDocumenters[referent]
         for documenter in sorted(
                 classDocumenters.values(),
                 key=lambda x: x.referentPackageSystemPath):
@@ -1427,7 +1427,7 @@ class ModuleDocumenter(ObjectDocumenter):
         for referent in self.memberOrder:
             if referent in functionDocumenters:
                 result.append(functionDocumenters[referent])
-                del(functionDocumenters[referent])
+                del functionDocumenters[referent]
         for documenter in sorted(
             functionDocumenters.values(),
             key=lambda x: x.referentPackageSystemPath

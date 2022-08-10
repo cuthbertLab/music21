@@ -45,8 +45,8 @@ Example usage:
 >>> d.tuplets[0].numberNotesNormal
 2
 '''
+from __future__ import annotations
 
-from collections import namedtuple
 import contextlib
 import copy
 import fractions
@@ -157,7 +157,9 @@ extendedTupletNumerators: t.Tuple[int, ...] = (
 )
 
 
-QuarterLengthConversion = namedtuple('QuarterLengthConversion', ['components', 'tuplet'])
+class QuarterLengthConversion(t.NamedTuple):
+    components: t.Tuple[DurationTuple]
+    tuplet: t.Optional[Tuplet]
 
 
 def unitSpec(durationObjectOrObjects):
@@ -198,7 +200,7 @@ def unitSpec(durationObjectOrObjects):
         return ret
     else:
         dO = durationObjectOrObjects
-        if not(hasattr(dO, 'tuplets')) or dO.tuplets is None or not dO.tuplets:
+        if (not hasattr(dO, 'tuplets')) or dO.tuplets is None or not dO.tuplets:
             return (dO.quarterLength, dO.type, dO.dots, None, None, None)
         else:
             return (dO.quarterLength,
@@ -381,7 +383,7 @@ def dottedMatch(qLen: OffsetQLIn,
 
 def quarterLengthToNonPowerOf2Tuplet(
     qLen: OffsetQLIn
-) -> t.Tuple['music21.duration.Tuplet', 'music21.duration.DurationTuple']:
+) -> t.Tuple[Tuplet, DurationTuple]:
     '''
     Slow, last chance function that returns a tuple of a single tuplet, probably with a non
     power of 2 denominator (such as 7:6) that represents the quarterLength and the
@@ -890,7 +892,11 @@ def convertTypeToNumber(dType: str) -> float:
 
 
 # -----------------------------------------------------------------------------------
-class DurationTuple(namedtuple('DurationTuple', ['type', 'dots', 'quarterLength'])):
+class DurationTuple(t.NamedTuple):
+    type: str
+    dots: int
+    quarterLength: OffsetQL
+
     def augmentOrDiminish(self, amountToScale):
         return durationTupleFromQuarterLength(self.quarterLength * amountToScale)
 
@@ -1579,11 +1585,11 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     A Duration object is made of one or more immutable DurationTuple objects stored on the
     `components` list. A Duration created by setting `quarterLength` sets the attribute
-    `expressionIsInferred` to True, which indicates that consuming functions or applications
+    :attr:`expressionIsInferred` to True, which indicates that callers
+    (such as :meth:`~music21.stream.makeNotation.splitElementsToCompleteTuplets`)
     can express this Duration using another combination of components that sums to the
     `quarterLength`. Otherwise, `expressionIsInferred` is set to False, indicating that
     components are not allowed to mutate.
-    (N.B.: `music21` does not yet implement such mutating components.)
 
     Multiple DurationTuples in a single Duration may be used to express tied
     notes, or may be used to split duration across barlines or beam groups.
@@ -1686,7 +1692,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         self._unlinkedType: t.Optional[str] = None
         self._dotGroups: t.Tuple[int, ...] = (0,)
-        self._tuplets: t.Union[t.Tuple['Tuplet', ...], t.Tuple] = ()  # an empty tuple
+        self._tuplets: t.Tuple['Tuplet', ...] = ()  # an empty tuple
         self._qtrLength: OffsetQL = 0.0
 
         # DurationTuples go here
@@ -1889,8 +1895,12 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             raise TypeError(f'Linked can only be True or False, not {value}')
         if self._quarterLengthNeedsUpdating:
             self._updateQuarterLength()
-        if value is False:
+        if value is False and self._linked is True:
             self._unlinkedType = self.type
+        elif value is True and self._linked is False:
+            self._quarterLengthNeedsUpdating = True
+            self._componentsNeedUpdating = True
+
         self._linked = value
 
     linked = property(_getLinked, _setLinked)
@@ -2328,11 +2338,13 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def informClient(self) -> bool:
         '''
-        call informSites({'changedAttribute': 'duration', 'quarterLength': quarterLength})
-        on any call that changes the quarterLength
+        A method that tells the client that something has changed.
 
-        returns False if there was no need to inform or if client
-        was not set.  Otherwise returns True
+        Call `informSites({'changedAttribute': 'duration', 'quarterLength': quarterLength})`
+        on any call that changes the quarterLength, so that the client can make a change.
+
+        Returns False if there was no need to inform the client (like nothing has changed)
+        or if `.client` is None.  Otherwise returns True.
         '''
         if self._quarterLengthNeedsUpdating is True:
             old_qtrLength = self._qtrLength
@@ -2904,7 +2916,10 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self._updateComponents()
 
         # tested, does return 0 if no components
-        return sum([c.quarterLength for c in self._components])
+        tot = 0.0
+        for c in self._components:
+            tot += c.quarterLength
+        return tot
 
     def _getQuarterLength(self) -> OffsetQL:
         if self._quarterLengthNeedsUpdating:
@@ -3791,11 +3806,11 @@ class Test(unittest.TestCase):
         self.assertEqual(str(unitSpec(d)), "(Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')")
 
     def testTupletDurations(self):
-        """
+        '''
         Test tuplet durations are assigned with proper duration
 
         This test was written while adding support for dotted tuplet notes
-        """
+        '''
         # Before the fix, the duration was "Quarter Tuplet of 5/3rds (3/5 QL)"
         self.assertEqual(
             'Eighth Triplet (1/3 QL)',
@@ -3899,7 +3914,7 @@ class Test(unittest.TestCase):
         '''
         with self.assertRaises(TypeError):
             Duration('redundant type', type='eighth')
-        dt = DurationTuple(None, None, float('nan'))
+        dt = DurationTuple('quarter', 0, float('nan'))
         msg = 'Invalid quarterLength for DurationTuple: nan'
         with self.assertRaisesRegex(ValueError, msg):
             Duration(dt)
@@ -3940,4 +3955,3 @@ _DOC_ORDER: t.List[t.Union[t.Type, t.Callable]] = [
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testAugmentOrDiminish')
-

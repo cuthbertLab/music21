@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2015, 2021 Michael Scott Asato Cuthbert
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
 #               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -16,6 +16,7 @@ as well as component objects for defining nested metrical structures,
 :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects.
 '''
 import copy
+from math import gcd
 import fractions
 import typing as t
 
@@ -200,7 +201,7 @@ def bestTimeSignature(meas: 'music21.stream.Stream') -> 'music21.meter.TimeSigna
         floatDenominator *= multiplier
         denominator = int(floatDenominator)
         # simplifies to "simplest terms," with 4 in denominator, before testing beat strengths
-        gcdValue = common.euclidGCD(numerator, denominator)
+        gcdValue = gcd(numerator, denominator)
         numerator = numerator // gcdValue
         denominator = denominator // gcdValue
 

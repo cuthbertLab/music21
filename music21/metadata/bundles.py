@@ -1058,37 +1058,23 @@ class MetadataBundle(prebase.ProtoM21Object):
         >>> for field in metadata.bundles.MetadataBundle.listSearchFields():
         ...     field
         ...
-        'actNumber'
-        'alternativeTitle'
-        'ambitus'
-        'associatedWork'
-        'collectionDesignation'
-        'commission'
+        'abstract'
+        'accessRights'
+        'accompanyingMaterialWriter'
+        ...
         'composer'
-        'copyright'
-        'countryOfComposition'
-        'date'
-        'dedication'
-        'fileFormat'
-        'fileNumber'
-        'filePath'
-        'groupTitle'
-        'keySignatureFirst'
-        'keySignatures'
-        'localeOfComposition'
-        'movementName'
-        'movementNumber'
-        'noteCount'
-        'number'
-        'numberOfParts'
-        'opusNumber'
-        'parentTitle'
-        'pitchHighest'
-        'pitchLowest'
-        'popularTitle'
-        'quarterLength'
-        'sceneNumber'
-        'sourcePath'
+        'composerAlias'
+        'composerCorporate'
+        'conceptor'
+        'conductor'
+        ...
+        'dateCreated'
+        'dateFirstPublished'
+        'dateIssued'
+        'dateModified'
+        'dateSubmitted'
+        'dateValid'
+        ...
         'tempoFirst'
         'tempos'
         'textLanguage'
@@ -1096,10 +1082,14 @@ class MetadataBundle(prebase.ProtoM21Object):
         'timeSignatureFirst'
         'timeSignatures'
         'title'
-        'volume'
+        ...
         '''
         from music21 import metadata
-        return tuple(sorted(metadata.RichMetadata.searchAttributes))
+        return tuple(sorted(
+            metadata.properties.ALL_UNIQUE_NAMES
+            + metadata.properties.ALL_MUSIC21_WORK_IDS
+            + list(metadata.RichMetadata.additionalRichMetadataAttributes)
+        ))
 
     def read(self, filePath=None):
         r'''
@@ -1328,7 +1318,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
             validatedPaths.add(metadataEntry.sourcePath)
         for key in invalidatedKeys:
-            del(self._metadataEntries[key])
+            del self._metadataEntries[key]
         message = f'MetadataBundle: finished validating in {timer} seconds.'
         environLocal.printDebug(message)
         return len(invalidatedKeys)

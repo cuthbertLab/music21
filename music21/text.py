@@ -40,15 +40,15 @@ articleReference = {
     # german
     'de': ['der', 'die', 'das', 'des', 'dem', 'den', 'ein', 'eine', 'einer', 'einem', 'einen'],
     # dutch
-    'nl': ['de', 'het', '\'t', 'een'],
+    'nl': ['de', 'het', "'t", 'een'],
     # spanish
     'es': ['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas'],
     # portuguese
     'pt': ['o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas'],
     # french
-    'fr': ['le', 'la', 'les', 'l\'', 'un', 'une', 'des', 'du', 'de la', 'des'],
+    'fr': ['le', 'la', 'les', "l'", 'un', 'une', 'des', 'du', 'de la', 'des'],
     # italian
-    'it': ['il', 'lo', 'la', 'l\'', 'i', 'gli', 'le', 'un\'', 'un', 'uno', 'una',
+    'it': ['il', 'lo', 'la', "l'", 'i', 'gli', 'le', "un'", 'un', 'uno', 'una',
            'del', 'dello', 'della', 'dei', 'degli', 'delle'],
 }
 
@@ -59,9 +59,9 @@ def assembleLyrics(streamIn, lineNumber=1):
     Concatenate text from a stream. The Stream is automatically flattened.
 
     The `lineNumber` parameter determines which line of text is assembled,
-    as an index in the .lyrics array.  (To be changed in v7 to go with an
-    identifier.)
-
+    as a ONE-indexed identifier in the .lyrics array.
+    (To be changed in v8 to go with an identifier.).  This means that
+    `lineNumber=0` will retrieve the last line of text.
 
     >>> s = stream.Stream()
     >>> n1 = note.Note()
@@ -83,6 +83,15 @@ def assembleLyrics(streamIn, lineNumber=1):
     >>> n1.lyrics[0] = composite
     >>> text.assembleLyrics(s)
     "He'_ya there"
+
+    To get the lyrics from another line, set the lineNumber attribute.
+    (see also :func:`~music21.text.assembleAllLyrics` to get all
+    lyrics).
+
+    >>> n1.addLyric('Bye')
+    >>> n2.addLyric('Now')
+    >>> text.assembleLyrics(s, lineNumber=2)
+    'Bye Now'
     '''
     word = []
     words = []
@@ -120,7 +129,8 @@ def assembleLyrics(streamIn, lineNumber=1):
 
 def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     r'''
-    Concatenate all Lyrics text from a stream. The Stream is automatically flattened.
+    Concatenate all Lyrics text from a stream separated by lyricSeparation.
+    The Stream is automatically recursed.
 
     uses assembleLyrics to do the heavy work.
 
@@ -130,15 +140,23 @@ def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     Here is a demo with one note and five lyrics.
 
     >>> f = corpus.parse('demos/multiple-verses.xml')
+    >>> text.assembleLyrics(f, 1)
+    '1. First'
+    >>> text.assembleLyrics(f, 2)
+    '2. Second'
     >>> l = text.assembleAllLyrics(f)
     >>> l
-    '\n1. First\n2. Second\n3. Third\n4. Fourth\n5. Fifth'
+    '1. First\n2. Second\n3. Third\n4. Fourth\n5. Fifth'
+
+    Changed in v.8: no lyric separator appears at the beginning.
     '''
     lyrics = ''
     for i in range(1, maxLyrics):
         lyr = assembleLyrics(streamIn, i)
         if lyr != '':
-            lyrics += lyricSeparation + lyr
+            if i > 1:
+                lyrics += lyricSeparation
+            lyrics += lyr
     return lyrics
 
 

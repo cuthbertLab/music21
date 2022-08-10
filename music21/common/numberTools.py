@@ -17,7 +17,7 @@ import unittest
 import typing as t
 
 from fractions import Fraction
-from math import isclose
+from math import isclose, gcd
 
 from music21 import defaults
 from music21.common import deprecated
@@ -37,8 +37,8 @@ __all__ = [
     'dotMultiplier', 'decimalToTuplet',
     'unitNormalizeProportion', 'unitBoundaryProportion',
     'weightedSelection',
-    'euclidGCD', 'approximateGCD',
     'lcm',
+    'approximateGCD',
 
     'contiguousList',
 
@@ -199,10 +199,10 @@ def _preFracLimitDenominator(n: int, d: int) -> t.Tuple[int, int]:
     '''
     # TODO: when Python 3.9 is the minimum version, replace lru_cache with simply cache,
     #     which is the same speed as lru_cache(None) (it simply calls it)
-    nOrg = n
-    dOrg = d
     if d <= DENOM_LIMIT:  # faster than hard-coding 65535
         return (n, d)
+    nOrg = n
+    dOrg = d
     p0, q0, p1, q1 = 0, 1, 1, 0
     while True:
         a = n // d
@@ -559,12 +559,12 @@ def nearestMultiple(n: float, unit: float) -> t.Tuple[float, float, float]:
 
     >>> common.nearestMultiple(-0.5, 0.125)
     Traceback (most recent call last):
-    ValueError: n (-0.5) is less than zero. Thus cannot find the nearest
+    ValueError: n (-0.5) is less than zero. Thus, cannot find the nearest
         multiple for a value less than the unit, 0.125
     '''
     if n < 0:
         raise ValueError(f'n ({n}) is less than zero. '
-                         + 'Thus cannot find the nearest multiple for a value '
+                         + 'Thus, cannot find the nearest multiple for a value '
                          + f'less than the unit, {unit}')
 
     mult = math.floor(n / unit)  # can start with the floor
@@ -640,7 +640,7 @@ def decimalToTuplet(decNum: float) -> t.Tuple[int, int]:
     ZeroDivisionError: number must be greater than zero
     '''
     def findSimpleFraction(inner_working):
-        'Utility function.'
+        '''Utility function.'''
         for index in range(1, 1000):
             for j in range(index, index * 2):
                 if isclose(inner_working, j / index, abs_tol=1e-7):
@@ -663,9 +663,9 @@ def decimalToTuplet(decNum: float) -> t.Tuple[int, int]:
         raise Exception('No such luck')
 
     jy *= multiplier
-    gcd = euclidGCD(int(jy), int(iy))
-    jy = jy / gcd
-    iy = iy / gcd
+    my_gcd = gcd(int(jy), int(iy))
+    jy = jy / my_gcd
+    iy = iy / my_gcd
 
     if flipNumerator is False:
         return (int(jy), int(iy))
@@ -764,16 +764,23 @@ def weightedSelection(values: t.List[int],
     return values[index]
 
 
+@deprecated('v8', 'v9', 'use math.gcd(a, b) instead.')
 def euclidGCD(a: int, b: int) -> int:
     '''
-    use Euclid's algorithm to find the GCD of a and b
+    Deprecated: use math.gcd(a, b) instead
 
-    >>> common.euclidGCD(2, 4)
+    use Euclid's algorithm to find the GCD of a and b::
+
+    ```
+    common.euclidGCD(2, 4)
     2
-    >>> common.euclidGCD(20, 8)
+
+    common.euclidGCD(20, 8)
     4
-    >>> common.euclidGCD(20, 16)
+
+    common.euclidGCD(20, 16)
     4
+    ```
     '''
     if b == 0:
         return a
@@ -866,11 +873,13 @@ def lcm(filterList: t.Iterable[int]) -> int:
     >>> common.lcm({3, 5, 6})
     30
 
+    To be deprecated in v.8 once Python 3.9 is the minimum version
+    since math.lcm works in C and is faster
     '''
     def _lcm(a, b):
         '''find the least common multiple of a, b'''
         # // forces integer style division (no remainder)
-        return abs(a * b) // euclidGCD(a, b)
+        return abs(a * b) // gcd(a, b)
 
     # derived from
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022
@@ -1183,4 +1192,3 @@ _DOC_ORDER = [fromRoman, toRoman]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

@@ -1178,14 +1178,14 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
             if thisKey.hand == 'right':
                 if storedLeft is not None:
                     if matchOther(thisKey, storedLeft):
-                        yield(thisKey, storedLeft)
+                        yield (thisKey, storedLeft)
                     elif (thisKey.affinity == Affinity.NOTEGROUP
                           and matchOther(thisKey._replace(affinity=Affinity.INACCORD), storedLeft)):
                         # r.h. notegroup goes before an l.h. inaccord,
                         # despite this being out of order
-                        yield(thisKey, storedLeft)
+                        yield (thisKey, storedLeft)
                     else:
-                        yield(None, storedLeft)
+                        yield (None, storedLeft)
                         storedRight = thisKey
                     storedLeft = None
                 else:
@@ -1193,12 +1193,12 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
             elif thisKey.hand == 'left':
                 if storedRight is not None:
                     if matchOther(thisKey, storedRight):
-                        yield(storedRight, thisKey)
+                        yield (storedRight, thisKey)
                     elif storedRight.affinity < Affinity.INACCORD:
-                        yield(storedRight, None)
-                        yield(None, thisKey)
+                        yield (storedRight, None)
+                        yield (None, thisKey)
                     else:
-                        yield(storedRight, None)
+                        yield (storedRight, None)
                         storedLeft = thisKey
                     storedRight = None
                 else:

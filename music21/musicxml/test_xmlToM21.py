@@ -1074,9 +1074,9 @@ class Test(unittest.TestCase):
 
     def testChordInversion(self):
         from xml.etree.ElementTree import fromstring as EL
-        h = EL("""
+        h = EL('''
         <harmony><root><root-step>C</root-step></root>
-        <kind>major</kind><inversion>1</inversion></harmony>""")
+        <kind>major</kind><inversion>1</inversion></harmony>''')
         mp = MeasureParser()
         cs = mp.xmlToChordSymbol(h)
         self.assertEqual(cs.inversion(), 1)
@@ -1133,6 +1133,64 @@ class Test(unittest.TestCase):
 
         self.assertIsInstance(notes[3].articulations[1], articulations.FretIndication)
         self.assertEqual(notes[3].articulations[1].number, 3)
+
+    def testArpeggioMarks(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.arpeggio32d)
+        p = s.parts[0]
+        m = p.measure(1)
+        gnote_index = 0
+        for el in m:
+            if isinstance(el, note.GeneralNote):
+                # There should be exactly seven GeneralNotes in this measure, all of
+                # which should be Chords with an ArpeggioMark.  The ArpeggioMarks, in
+                # order, should be 'normal', 'up', 'normal', 'down', 'normal',
+                # 'non-arpeggio', and 'normal'.
+                # None of the Notes in those Chords should have an ArpeggioMark.
+                with self.subTest(gnote_index=gnote_index):
+                    self.assertIsInstance(el, chord.Chord)
+                    self.assertIsInstance(el.expressions[0], expressions.ArpeggioMark)
+
+                    if gnote_index == 0:
+                        self.assertEqual(el.expressions[0].type, 'normal')
+                    elif gnote_index == 1:
+                        self.assertEqual(el.expressions[0].type, 'up')
+                    elif gnote_index == 2:
+                        self.assertEqual(el.expressions[0].type, 'normal')
+                    elif gnote_index == 3:
+                        self.assertEqual(el.expressions[0].type, 'down')
+                    elif gnote_index == 4:
+                        self.assertEqual(el.expressions[0].type, 'normal')
+                    elif gnote_index == 5:
+                        self.assertEqual(el.expressions[0].type, 'non-arpeggio')
+                    elif gnote_index == 6:
+                        self.assertEqual(el.expressions[0].type, 'normal')
+                    self.assertFalse(gnote_index > 6)
+
+                    for n in el.notes:
+                        for exp in n.expressions:
+                            self.assertNotIsInstance(exp, expressions.ArpeggioMark)
+
+                    gnote_index += 1
+
+    def testArpeggioMarkSpanners(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.multiStaffArpeggios)
+        sb = s.spannerBundle.getByClass(expressions.ArpeggioMarkSpanner)
+        self.assertIsNotNone(sb)
+        sp = sb[0]
+        # go find all the chords and check for spanner vs expressions
+        chords: [chord.Chord] = []
+        for i, p in enumerate(s.parts):
+            # ArpeggioMarkSpanner spans the second chord (index == 1) across both parts
+            chords.append(p[chord.Chord][1])
+
+        for spanned, ch in zip(sp, chords):
+            self.assertIs(spanned, ch)
 
     def testHiddenRests(self):
         from music21 import converter
@@ -1199,7 +1257,7 @@ class Test(unittest.TestCase):
         self.assertListEqual(repeatBrackets[0].getNumberList(), [1, 2])
         self.assertListEqual(repeatBrackets[1].getNumberList(), [3])
 
-        nonconformingInput = testPrimitive.multiDigitEnding.replace("1,2", "ad lib.")
+        nonconformingInput = testPrimitive.multiDigitEnding.replace('1,2', 'ad lib.')
         score2 = converter.parse(nonconformingInput)
         repeatBracket = score2.recurse().getElementsByClass(spanner.RepeatBracket).first()
         self.assertListEqual(repeatBracket.getNumberList(), [1])
@@ -1216,7 +1274,7 @@ class Test(unittest.TestCase):
         # Check that we parsed a modification
         self.assertTrue(len(cs.getChordStepModifications()) == 1)
         # And that it affected the correct pitch in the right way
-        self.assertTrue(pitch.Pitch("G-3") == cs.pitches[2])
+        self.assertTrue(pitch.Pitch('G-3') == cs.pitches[2])
 
     def testCompositeLyrics(self):
         '''

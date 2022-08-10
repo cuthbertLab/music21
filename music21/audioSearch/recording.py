@@ -61,7 +61,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         recordFormat = recordFormatDefault
 
     if recordFormat == pyaudio.paInt8:
-        raise RecordingException("cannot perform samplesFromRecording on 8-bit samples")
+        raise RecordingException('cannot perform samplesFromRecording on 8-bit samples')
 
     p_audio = pyaudio.PyAudio()
     st = p_audio.open(format=recordFormat,
@@ -98,7 +98,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
             wf.writeframes(data)
             wf.close()
         except IOError:
-            raise RecordingException(f"Cannot open {waveFilename} for writing.")
+            raise RecordingException(f'Cannot open {waveFilename} for writing.')
     return storedWaveSampleList
 
 

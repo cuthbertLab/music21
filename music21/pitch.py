@@ -896,7 +896,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         # above and below could also be useful for gruppetti, etc.
         self.displayLocation = 'normal'
 
-        # store a reference to the object that has this duration object as a property
+        # store a reference to the Pitch that has this Accidental object as a property
         self._client: t.Optional['Pitch'] = None
         self._name = ''
         self._modifier = ''
@@ -1178,22 +1178,21 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
                 raise AccidentalException(f'{name} is not a supported accidental type')
 
         self._modifier = accidentalNameToModifier[self._name]
-        if self._client is not None:
+        if self._client:
             self._client.informClient()
 
 
     def isTwelveTone(self):
-        '''Return a boolean if this Accidental describes a twelve-tone pitch.
+        '''
+        Return a boolean if this Accidental describes a twelve-tone, non-microtonal pitch.
 
-
-        >>> a = pitch.Accidental('~')
+        >>> a = pitch.Accidental('half-flat')
         >>> a.isTwelveTone()
         False
 
         >>> a = pitch.Accidental('###')
         >>> a.isTwelveTone()
         True
-
         '''
         if self.name in ('half-sharp', 'one-and-a-half-sharp',
                          'half-flat', 'one-and-a-half-flat'):
@@ -1239,7 +1238,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         privateAttrName = '_' + attribute
         setattr(self, privateAttrName, value)
-        if self._client is not None:
+        if self._client:
             self._client.informClient()
 
     # --------------------------------------------------------------------------
@@ -1401,7 +1400,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
     @displayType.setter
     def displayType(self, value: str):
         if value not in ('normal', 'always', 'never',
-                         'unless-repeated', 'even-tied', "if-absolutely-necessary"):
+                         'unless-repeated', 'even-tied', 'if-absolutely-necessary'):
             raise AccidentalException(f'Supplied display type is not supported: {value!r}')
         self._displayType = value
 
@@ -1689,7 +1688,7 @@ class Pitch(prebase.ProtoM21Object):
     Two Pitches are equal if they represent the same
     pitch and are spelled the same (enharmonics do not count).
     A Pitch is greater than another Pitch if its `.ps` is greater than
-    the other.  Thus C##4 > D-4.
+    the other.  Thus, C##4 > D-4.
 
     >>> pitch.Pitch('C#5') == pitch.Pitch('C#5')
     True
@@ -1930,15 +1929,18 @@ class Pitch(prebase.ProtoM21Object):
         highly optimized -- it knows exactly what can only have a scalar value and
         just sets that directly, only running deepcopy on the other bits.
 
-        And _client should NOT be deepcopied.
+        And _client should NOT be deepcopied.  In fact, it is cleared to nothing.
+        deepcopy of note will set it back.
         '''
         if type(self) is Pitch:  # pylint: disable=unidiomatic-typecheck
             new = Pitch.__new__(Pitch)
             for k in self.__dict__:
                 v = getattr(self, k, None)
                 if k in ('_step', '_overridden_freq440', 'defaultOctave',
-                         '_octave', 'spellingIsInferred', '_client'):
+                         '_octave', 'spellingIsInferred'):
                     setattr(new, k, v)
+                elif k == '_client':
+                    setattr(new, k, None)
                 else:
                     setattr(new, k, copy.deepcopy(v, memo))
             return new
@@ -2263,7 +2265,7 @@ class Pitch(prebase.ProtoM21Object):
     @property
     def alter(self) -> float:
         '''
-        Get or set the number of half-steps shifted
+        Get the number of half-steps shifted
         by this pitch, such as 1.0 for a sharp, -1.0 for a flat,
         0.0 for a natural, 2.0 for a double sharp,
         and -0.5 for a quarter tone flat.
@@ -2277,6 +2279,9 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.microtone = -25  # in cents
         >>> p.alter
         0.75
+
+        To change the alter value, change either the accidental
+        or the microtone.
         '''
         post = 0.0
         if self.accidental is not None:
@@ -2334,6 +2339,8 @@ class Pitch(prebase.ProtoM21Object):
 
         if not inPlace:
             return returnObj
+        else:
+            self.informClient()
 
     def convertMicrotonesToQuarterTones(self, *, inPlace=False):
         '''
@@ -2379,6 +2386,8 @@ class Pitch(prebase.ProtoM21Object):
 
         if not inPlace:
             return returnObj
+        else:
+            self.informClient()
 
     # --------------------------------------------------------------------------
 
@@ -2411,7 +2420,7 @@ class Pitch(prebase.ProtoM21Object):
 
 
         Notice that ps 61 represents both
-        C# and D-flat.  Thus "spellingIsInferred"
+        C# and D-flat.  Thus, "spellingIsInferred"
         will be true after setting our pitch to 61:
 
         >>> a.ps = 61
@@ -2603,7 +2612,7 @@ class Pitch(prebase.ProtoM21Object):
                 value += 12
         elif value < 0:
             value = 0 + (value % 12)  # lowest oct plus modulus
-        self.ps = value
+        self.ps = value  # will inform client.
 
         # all midi settings must set implicit to True, as we do not know
         # what accidental this is
@@ -2863,6 +2872,7 @@ class Pitch(prebase.ProtoM21Object):
             self.spellingIsInferred = False
         else:
             raise PitchException(f'Cannot make a step out of {usrStr!r}')
+        self.informClient()
 
     @property
     def pitchClass(self) -> int:
@@ -2975,6 +2985,7 @@ class Pitch(prebase.ProtoM21Object):
 
         # do not know what accidental is
         self.spellingIsInferred = True
+        # setting step informs client
 
     @property
     def pitchClassString(self) -> str:
@@ -3038,6 +3049,7 @@ class Pitch(prebase.ProtoM21Object):
             self._octave = int(value)
         else:
             self._octave = None
+        self.informClient()
 
     @property
     def implicitOctave(self) -> int:
@@ -3052,7 +3064,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.implicitOctave
         4
 
-        Cannot be set.  Instead just change the `.octave` of the pitch
+        Cannot be set.  Instead, just change the `.octave` of the pitch
         '''
         if self.octave is None:
             return self.defaultOctave
@@ -4002,7 +4014,7 @@ class Pitch(prebase.ProtoM21Object):
         If mostCommon is set to True, then the most commonly used
         enharmonic spelling is chosen (that is, the one that appears
         first in key signatures as you move away from C on the circle
-        of fifths).  Thus G-flat becomes F#, A# becomes B-flat,
+        of fifths).  Thus, G-flat becomes F#, A# becomes B-flat,
         D# becomes E-flat, D-flat becomes C#, G# and A-flat are left
         alone.
 
@@ -4172,7 +4184,7 @@ class Pitch(prebase.ProtoM21Object):
         if this pitch is attached to a note, then let it know that it has changed.
         '''
         if self._client is not None:
-            self._client.pitchChanged()
+            self._client.pitchChanged()  # pylint: disable=no-member
 
 
     def getAllCommonEnharmonics(self: PitchType, alterLimit: int = 2) -> t.List[PitchType]:

@@ -50,6 +50,10 @@ from music21.analysis import windowed
 from music21 import environment
 environLocal = environment.Environment('graph.plot')
 
+# Graph uses setattr, which PyLint can't infer from currently
+# https://github.com/PyCQA/pylint/issues/2878
+# pylint: disable=no-member
+
 
 # ------------------------------------------------------------------------------
 # graphing utilities that operate on streams

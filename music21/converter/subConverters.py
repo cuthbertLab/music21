@@ -357,7 +357,8 @@ class ConverterIPython(SubConverter):
             subformats = ['vexflow']
 
         if subformats and subformats[0] == 'vexflow':
-            return self.vfshow(obj)
+            raise NotImplementedError
+            # return self.vfshow(obj)
             # subformats = ['lilypond', 'png']
         if subformats:
             helperFormat = subformats[0]
@@ -438,22 +439,22 @@ class ConverterIPython(SubConverter):
                 '''
 
             # noinspection PyTypeChecker
-            display(HTML("""
-                <div id='""" + outputId + """'></div>
+            display(HTML('''
+                <div id="''' + outputId + '''"></div>
                 <link rel="stylesheet" href="//cuthbertLab.github.io/music21j/css/m21.css"
                     type="text/css" />
-                """ + load_require_script + """
+                ''' + load_require_script + '''
                 <script>
                 require.config({
                     paths: {'music21': '//cuthbertLab.github.io/music21j/src/music21'}
                 });
                 require(['music21'], function() {
                                mp = new music21.miditools.MidiPlayer();
-                               mp.addPlayer('#""" + outputId + """');
-                               mp.base64Load('data:audio/midi;base64,"""
-                                + binaryBase64.decode('utf-8') + """');
+                               mp.addPlayer("#''' + outputId + '''");
+                               mp.base64Load("data:audio/midi;base64,'''
+                                + binaryBase64.decode('utf-8') + '''");
                         });
-                </script>"""))
+                </script>'''))
 
 
 class ConverterLilypond(SubConverter):
@@ -818,7 +819,7 @@ class ConverterNoteworthy(SubConverter):
                   filePath: t.Union[pathlib.Path, str],
                   number: t.Optional[int] = None,
                   **keywords):
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection,PyShadowingNames
         '''
         Open Noteworthy data (as nwctxt) from a file path.
 
@@ -1340,7 +1341,7 @@ class ConverterCapella(SubConverter):
         from music21.capella import fromCapellaXML
         ci = fromCapellaXML.CapellaImporter()
         ci.parseXMLText(strData)
-        scoreObj = ci.systemScoreFromScore(self.mainDom.documentElement)
+        scoreObj = ci.systemScoreFromScore(ci.mainDom.documentElement)
         partScore = ci.partScoreFromSystemScore(scoreObj)
         self.stream = partScore
 
@@ -1696,7 +1697,7 @@ class TestExternal(unittest.TestCase):
     # def testMultiPageXMlShow2(self):
     #     '''
     #      tests whether show() works for music that is 100-999 pages long.
-    #      Currently takes way too long to run.
+    #      Currently, takes way too long to run.
     #      '''
     #     from music21 import stream, note
     #     biggerStream = stream.Stream()

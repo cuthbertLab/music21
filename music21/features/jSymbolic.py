@@ -622,7 +622,8 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     Intervals: [0] 2 2 -2 -2 2 2 -4 0
     Changes direction (equivalent to +/- sign) three times.
     There are seven non-unison (nonzero) intervals.
-    Thus the duration of arcs is 7/3 ~= 2.333...
+    Thus, the duration of arcs is 7/3 ~= 2.333...
+
     >>> s = converter.parse("tinyNotation: c' d' e' d' c' d' e'2 c'2 c'2")
     >>> fe = features.jSymbolic.DurationOfMelodicArcsFeature(s)
     >>> fe.extract().vector
@@ -711,7 +712,8 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     of direction is 12. We don't count the last interval,
     the descending major third, because it is not between
     changes of direction.
-    Thus the average size of melodic arcs is 12/3 = 4.
+    Thus, the average size of melodic arcs is 12/3 = 4.
+
     >>> s = converter.parse("tinyNotation: c' d' e' d' c' d' e'2 c'2 c'2")
     >>> fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
     >>> fe.extract().vector

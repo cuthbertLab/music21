@@ -147,7 +147,7 @@ def getNumber(midiStr, length):
 def getVariableLengthNumber(midiBytes):
     r'''
     Given a string or bytes of data, strip off the first character, or all high-byte characters
-    terminating with one whose ord() function is < 0x80.  Thus a variable number of bytes
+    terminating with one whose ord() function is < 0x80.  Thus, a variable number of bytes
     might be read.
 
     After finding the appropriate termination,
@@ -349,7 +349,8 @@ class _ContainsEnum(IntEnum):
 
     @classmethod
     def hasValue(cls, val):
-        return val in cls._value2member_map_
+        # https://github.com/PyCQA/pylint/issues/3941
+        return val in cls._value2member_map_  # pylint: disable=no-member
 
 
 class ChannelVoiceMessages(_ContainsEnum):

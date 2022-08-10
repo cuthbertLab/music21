@@ -26,12 +26,12 @@ import os
 import pathlib
 import unittest
 
+StrOrPath = t.TypeVar('StrOrPath', bound=t.Union[str, pathlib.Path])
+
 # ------------------------------------------------------------------------------
-
-
 def getSourceFilePath() -> pathlib.Path:
     '''
-    Get the music21 directory that contains source files such as note.py, etc..
+    Get the music21 directory that contains source files such as note.py, etc.
     This is not the same as the
     outermost package development directory.
     '''
@@ -105,6 +105,7 @@ def getCorpusContentDirs() -> t.List[str]:
         '_metadataCache',
         '__pycache__',
     )
+    filename: str
     for filename in sorted(os.listdir(directoryName)):
         if filename.endswith(('.py', '.pyc')):
             continue
@@ -131,7 +132,7 @@ def getRootFilePath() -> pathlib.Path:
     return fpParent
 
 
-def relativepath(path: str, start: t.Optional[str] = None) -> str:
+def relativepath(path: StrOrPath, start: t.Optional[str] = None) -> t.Union[StrOrPath, str]:
     '''
     A cross-platform wrapper for `os.path.relpath()`, which returns `path` if
     under Windows, otherwise returns the relative path of `path`.

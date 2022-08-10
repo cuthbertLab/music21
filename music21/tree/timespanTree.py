@@ -16,8 +16,12 @@ pitched elements into kinds of searchable tree organized by start and stop offse
 and other positions.
 '''
 import collections.abc
+import itertools
 import random
+import typing as t
 import unittest
+
+import more_itertools
 
 from music21 import common
 from music21 import exceptions21
@@ -25,30 +29,38 @@ from music21 import exceptions21
 from music21.tree import spans, trees
 
 from music21 import environment
-environLocal = environment.Environment("tree.timespanTree")
+environLocal = environment.Environment('tree.timespanTree')
+
 
 # -----------------------------------------------------------------------------
-
-
 class TimespanTreeException(exceptions21.TreeException):
     pass
 
+
 # -----------------------------------------------------------------------------
-
-
 class TimespanTree(trees.OffsetTree):
     r'''
-    A data structure for efficiently slicing a score for pitches.
+    A TimespanTree is a data structure for efficiently slicing a score for pitches, or,
+    like all :class:`~music21.tree.trees.OffsetTree` objects, for searching large scores
+    quickly by time.
 
     While you can construct an TimespanTree by hand, inserting timespans one at
-    a time, the common use-case is to construct the offset-tree from an entire
+    a time, the common use-case is to construct the TimespanTree from an entire
     score at once:
 
     >>> bach = corpus.parse('bwv66.6')
     >>> scoreTree = tree.fromStream.asTimespans(bach, flatten=True,
-    ...            classList=(note.Note, chord.Chord))
+    ...                                         classList=(note.Note, chord.Chord))
+
+    From this representation, we can get what is happening at any given moment as a
+    :class:`~music21.tree.verticality.Verticality` object.
+
     >>> print(scoreTree.getVerticalityAt(17.0))
     <music21.tree.verticality.Verticality 17.0 {F#3 C#4 A4}>
+
+    The equivalent call from the stream itself is:
+
+        `bach.asTrees(flatten=True, asTimespans=True, classList=(note.Note, chord.Chord))`
 
     All offsets are assumed to be relative to the score's source if flatten is True
 
@@ -68,12 +80,13 @@ class TimespanTree(trees.OffsetTree):
     accurate perception? Let's sum up the total consonant duration vs.
     dissonant duration.
 
-    Do it again pairwise to figure out the length (actually this won't include
-    the last element)
+    Since verticality objects do not know their end times, we can iterate pairwise
+    to figure out the length.  We add "padEnd=True" to include a dummy verticality
+    at the end so that it includes the last object:
 
     >>> totalConsonanceDuration = 0
     >>> totalDissonanceDuration = 0
-    >>> iterator = scoreTree.iterateVerticalitiesNwise(n=2)
+    >>> iterator = scoreTree.iterateVerticalitiesNwise(n=2, padEnd=True)
     >>> for verticality1, verticality2 in iterator:
     ...     offset1 = verticality1.offset
     ...     offset2 = verticality2.offset
@@ -83,9 +96,9 @@ class TimespanTree(trees.OffsetTree):
     ...     else:
     ...        totalDissonanceDuration += quarterLength
     >>> (totalConsonanceDuration, totalDissonanceDuration)
-    (25.5, 9.5)
+    (26.5, 9.5)
 
-    Remove neighbor tones from the Bach chorale.  (It's actually quite viscous
+    Example: Remove neighbor tones from the Bach chorale.  (It's actually quite viscous
     in its pruning...)
 
     Here in Alto, measure 7, there's a neighbor tone E#.
@@ -314,9 +327,10 @@ class TimespanTree(trees.OffsetTree):
 
     def getVerticalityAtOrBefore(self, offset):
         r'''
-        Gets the verticality in this offset-tree which starts at `offset`.
+        Gets the :class:`~music21.tree.verticality.Verticality`
+        in this TimeSpanTree which starts at `offset`.
 
-        If the found verticality has no start timespans, the function returns
+        If the found Verticality has no start timespans, the function returns
         the next previous verticality with start timespans.
 
         >>> score = corpus.parse('bwv66.6')
@@ -426,11 +440,12 @@ class TimespanTree(trees.OffsetTree):
         reverse=False,
     ):
         r'''
-        Iterates all vertical moments in this offset-tree.
+        Iterates all vertical moments in this TimespanTree, represented as
+        :class:`~music21.tree.verticality.Verticality` objects.
 
-        ..  note:: The offset-tree can be mutated while its verticalities are
+        ..  note:: The TimespanTree can be mutated while its verticalities are
             iterated over. Each verticality holds a reference back to the
-            offset-tree and will ask for the start-offset after (or before) its
+            TimespanTree and will ask for the start-offset after (or before) its
             own start offset in order to determine the next verticality to
             yield. If you mutate the tree by adding or deleting timespans, the
             next verticality will reflect those changes.
@@ -487,13 +502,14 @@ class TimespanTree(trees.OffsetTree):
                 verticality = verticality.nextVerticality
 
     def iterateVerticalitiesNwise(
-            self, n=3, reverse=False,):
+            self, n: int = 3, *, reverse: bool = False, padEnd: bool = False
+    ) -> t.Generator['music21.tree.verticality.VerticalitySequence', None, None]:
         r'''
-        Iterates verticalities in groups of length `n`.
+        Iterates :class:`~music21.tree.verticality.Verticality` objects in groups of length `n`.
 
-        ..  note:: The offset-tree can be mutated while its verticalities are
+        ..  note:: The TimespanTree can be mutated while its verticalities are
             iterated over. Each verticality holds a reference back to the
-            offset-tree and will ask for the start-offset after (or before) its
+            TimespanTree and will ask for the start-offset after (or before) its
             own start offset in order to determine the next verticality to
             yield. If you mutate the tree by adding or deleting timespans, the
             next verticality will reflect those changes.
@@ -521,7 +537,8 @@ class TimespanTree(trees.OffsetTree):
             (3.0 {A3 E4 C#5})
             ]>
 
-        Grouped verticalities can also be iterated in reverse:
+        Grouped verticalities can also be iterated in reverse, but note that the
+        groups within each iteration are still ordered from earliest to last.
 
         >>> iterator = scoreTree.iterateVerticalitiesNwise(n=2, reverse=True)
         >>> for _ in range(4):
@@ -543,37 +560,75 @@ class TimespanTree(trees.OffsetTree):
             (33.0 {D3 B3 F#4}),
             (33.5 {D3 B3 C#4 F#4})
             ]>
+
+        When iterating with `n > 1` and `padEnd=True` will put sentinel
+        Verticalities in the last VerticalitySequences that occur at the
+        `endTime` of the tree, with no elements:
+
+        >>> iterator = scoreTree.iterateVerticalitiesNwise(n=3, padEnd=True)
+        >>> for v in iterator:
+        ...     pass
+        >>> v
+        <music21.tree.verticality.VerticalitySequence [
+            (35.0 {F#3 A#3 C#4 F#4}),
+            (36.0 {}),
+            (36.0 {})
+            ]>
+
+
+        Changed in v8 -- added padEnd.  Streams with fewer than n elements
+            also return an empty sentinel entry.
         '''
-        from music21.tree.verticality import VerticalitySequence
+        from music21.tree.verticality import VerticalitySequence, Verticality
+
         n = int(n)
         if n <= 0:
-            message = "The number of verticalities in the group must be at "
-            message += f"least one. Got {n}"
+            message = 'The number of verticalities in the group must be at '
+            message += f'least one. Got {n}'
             raise TimespanTreeException(message)
-        if reverse:
-            for v in self.iterateVerticalities(reverse=True):
-                verticalities = [v]
-                while len(verticalities) < n:
-                    nextVerticality = verticalities[-1].nextVerticality
-                    if nextVerticality is None:
-                        break
-                    verticalities.append(nextVerticality)
-                if len(verticalities) == n:
-                    yield VerticalitySequence(verticalities)
+
+        sentinelVerticality = Verticality(self.endTime, timespanTree=self)
+
+        if padEnd:
+            ending = [sentinelVerticality] * (n - 1)
         else:
-            for v in self.iterateVerticalities():
-                verticalities = [v]
-                while len(verticalities) < n:
-                    previousVerticality = verticalities[-1].previousVerticality
-                    if previousVerticality is None:
-                        break
-                    verticalities.append(previousVerticality)
-                if len(verticalities) == n:
-                    yield VerticalitySequence(reversed(verticalities))
+            ending = []
+
+        for verticalities in more_itertools.windowed(
+            itertools.chain(self.iterateVerticalities(reverse=reverse), ending),
+            n,
+            sentinelVerticality
+        ):
+            if not reverse:
+                yield VerticalitySequence(verticalities)
+            else:
+                yield VerticalitySequence(reversed(verticalities))
+
+
+        # if reverse:
+        #     for v in self.iterateVerticalities(reverse=True):
+        #         verticalities = [v]
+        #         while len(verticalities) < n:
+        #             nextVerticality = verticalities[-1].nextVerticality
+        #             if nextVerticality is None:
+        #                 break
+        #             verticalities.append(nextVerticality)
+        #         if len(verticalities) == n:
+        #             yield VerticalitySequence(verticalities)
+        # else:
+        #     for v in self.iterateVerticalities():
+        #         verticalities = [v]
+        #         while len(verticalities) < n:
+        #             previousVerticality = verticalities[-1].previousVerticality
+        #             if previousVerticality is None:
+        #                 break
+        #             verticalities.append(previousVerticality)
+        #         if len(verticalities) == n:
+        #             yield VerticalitySequence(reversed(verticalities))
 
     def splitAt(self, offsets):
         r'''
-        Splits all timespans in this offset-tree at `offsets`, operating in
+        Splits all timespans in this TimespanTree at `offsets`, operating in
         place.
 
         >>> score = corpus.parse('bwv66.6')

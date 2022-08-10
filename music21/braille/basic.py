@@ -764,7 +764,7 @@ def noteToBraille(
         notesInStep = lookup.pitchNameToNotes[music21Note.pitch.step]
     except KeyError:  # pragma: no cover
         environRules.warn(
-            f"Name {music21Note.pitch.step!r} of note {music21Note} "
+            f'Name {music21Note.pitch.step!r} of note {music21Note} '
             + 'cannot be transcribed to braille.')
         music21Note.editorial.brailleEnglish.append(f'Name {music21Note.pitch.step} None')
         return symbols['basic_exception']
@@ -812,7 +812,7 @@ def noteToBraille(
         noteTrans.append(symbols['opening_single_slur'])
         music21Note.editorial.brailleEnglish.append(
             f'Opening single slur {symbols["opening_single_slur"]}')
-    if not(beamStatus['endLongBracketSlur'] and beamStatus['beginLongBracketSlur']):
+    if not (beamStatus['endLongBracketSlur'] and beamStatus['beginLongBracketSlur']):
         if beamStatus['endLongDoubleSlur']:
             noteTrans.append(symbols['closing_double_slur'])
             music21Note.editorial.brailleEnglish.append(

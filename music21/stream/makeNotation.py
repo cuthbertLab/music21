@@ -449,7 +449,7 @@ def makeMeasures(
     # may need to look in activeSite if no time signatures are found
     if meterStream is None:
         # get from this Stream, or search the contexts
-        meterStream = srcObj.flatten().getTimeSignatures(
+        meterStream = srcObj.getTimeSignatures(
             returnDefault=True,
             searchContext=False,
             sortByCreationTime=False
@@ -840,6 +840,9 @@ def makeRests(
     else:
         returnObj = s
 
+    # Invalidate tuplet status
+    returnObj.streamStatus.tuplets = None
+
     if returnObj.iter().parts:
         for inner_part in returnObj.iter().parts:
             inner_part.makeRests(
@@ -858,10 +861,10 @@ def makeRests(
         m: t.Optional[stream.Measure] = None,
         ts: t.Optional[meter.TimeSignature] = None
     ) -> t.Union[float, Fraction]:
-        """
+        '''
         Needed for timeRangeFromBarDuration.
         Returns 0.0 if no meter can be found.
-        """
+        '''
         post: t.Union[float, Fraction] = 0.0
         if ts is not None:
             post = ts.barDuration.quarterLength
@@ -909,7 +912,7 @@ def makeRests(
     if returnObj.hasVoices():
         bundle = list(returnObj.voices)
     elif returnObj.hasMeasures():
-        bundle = list(returnObj.getElementsByClass(stream.Measure))
+        bundle = list(returnObj.getElementsByClass('Measure'))
     else:
         bundle = [returnObj]
 
@@ -994,8 +997,7 @@ def makeTies(
 
     Note that this method assumes that there is appropriate space in the
     next Measure: this will not shift Note objects, but instead allocate
-    them evenly over barlines. Generally, makeMeasures is called prior to
-    calling this method.
+    them evenly over barlines.
 
     If `inPlace` is True, this is done in-place;
     if `inPlace` is False, this returns a modified deep copy.
@@ -1194,59 +1196,39 @@ def makeTies(
         classFilterList = [classFilterList]
 
     # get measures from this stream
-    measureStream = returnObj.getElementsByClass(stream.Measure)
-    if not measureStream:
-        raise stream.StreamException(
-            'cannot process a stream without measures')
-
-    # environLocal.printDebug([
-    #    'makeTies() processing measureStream, length', measureStream,
-    #    len(measureStream)])
+    if not returnObj.hasMeasures():
+        raise stream.StreamException('cannot process a stream without measures')
 
     # may need to look in activeSite if no time signatures are found
     # presently searchContext is False to save time
     if meterStream is None:
         meterStream = returnObj.getTimeSignatures(sortByCreationTime=True,
                                                   searchContext=False)
+    elif not meterStream:
+        # an empty stream
+        ts = meter.TimeSignature(
+            f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
+        )
+        meterStream.insert(0, ts)
 
     mCount = 0
-    lastTimeSignature = None
+    measureList = list(returnObj.getElementsByClass(stream.Measure))
 
-    while True:  # pylint: disable=too-many-nested-blocks
-        # TODO: find a way to avoid 'while True'
-        # update measureIterator on each iteration,
-        # as new measure may have been added to the returnObj stream
-        measureIterator = returnObj.getElementsByClass(stream.Measure)
-        if mCount >= len(measureIterator):
-            break  # reached the end of all measures available or added
+    while mCount < len(measureList):  # pylint: disable=too-many-nested-blocks
         # get the current measure to look for notes that need ties
-        m = measureIterator[mCount]
-        if m.timeSignature is not None:
-            lastTimeSignature = m.timeSignature
+        m = measureList[mCount]
+        activeTS = meterStream.getElementAtOrBefore(m.offset)
 
         # get next measure; we may not need it, but have it ready
-        if mCount + 1 < len(measureIterator):
-            mNext = measureIterator[mCount + 1]
+        if mCount + 1 < len(measureList):
+            mNext = measureList[mCount + 1]
             mNextAdd = False  # already present; do not append
         else:  # create a new measure
             mNext = stream.Measure()
             # set offset to last offset plus total length
             mOffset = m.offset
-            if lastTimeSignature is not None:
-                mNext.offset = (mOffset
-                                + lastTimeSignature.barDuration.quarterLength)
-            else:
-                mNext.offset = mOffset
-            if not meterStream:  # in case no meters are defined
-                ts = meter.TimeSignature(
-                    f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
-                )
-            else:  # get the last encountered meter
-                ts = meterStream.getElementAtOrBefore(mNext.offset)
-            # only copy and assign if not the same as the last
-            if (lastTimeSignature is not None
-                    and not lastTimeSignature.ratioEqual(ts)):
-                mNext.timeSignature = copy.deepcopy(ts)
+            mNext.offset = (mOffset
+                            + activeTS.barDuration.quarterLength)
             # increment measure number
             mNext.number = m.number + 1
             mNextAdd = True  # new measure, needs to be appended
@@ -1261,18 +1243,10 @@ def makeTies(
         # for each measure, go through each element and see if its
         # duration fits in the bar that contains it
 
+        mEnd = activeTS.barDuration.quarterLength
         # if there are voices, we must look at voice id values to only
         # connect ties to components in the same voice, assuming there
         # are voices in the next measure
-        if lastTimeSignature is not None:
-            mEnd = lastTimeSignature.barDuration.quarterLength
-        else:
-            possible_ts = m.getContextByClass(meter.TimeSignature)
-            if possible_ts is not None:
-                lastTimeSignature = possible_ts
-                mEnd = lastTimeSignature.barDuration.quarterLength
-            else:
-                mEnd = 4.0  # Default
         if m.hasVoices():
             bundle = m.voices
             mHasVoices = True
@@ -1297,14 +1271,15 @@ def makeTies(
                 if overshot <= 0:
                     continue
                 if eOffset >= mEnd:
-                    continue  # skip elements that extend past measure boundary.
+                    continue  # skip elements that begin past measure boundary.
+                    # TODO: put them entirely in the next measure.
                     # raise stream.StreamException(
                     #     'element (%s) has offset %s within a measure '
                     #     'that ends at offset %s' % (e, eOffset, mEnd))
 
-                qLenBegin = mEnd - eOffset
+                qLenWithinMeasure = mEnd - eOffset
                 e, eRemain = e.splitAtQuarterLength(
-                    qLenBegin,
+                    qLenWithinMeasure,
                     retainOrigin=True,
                     displayTiedAccidentals=displayTiedAccidentals
                 )
@@ -1345,6 +1320,8 @@ def makeTies(
                     #    'makeTies() inserting mNext into returnObj',
                     #    mNext])
                     returnObj.insert(mNext.offset, mNext)
+                    # need to make sure that the new measure is processed.
+                    measureList.append(mNext)
         mCount += 1
 
     for measure in returnObj.getElementsByClass(stream.Measure):
@@ -1472,10 +1449,8 @@ def makeTupletBrackets(s: StreamType, *, inPlace=False) -> t.Optional[StreamType
 
             # if tuplet next and previous not None, increment
             elif tupletPrevious is not None and tupletNext is not None:
-                # do not need to change tuplet type; should be None
-                pass
-                # environLocal.printDebug(['completion count, target:',
-                #                          completionCount, completionTarget])
+                # clear any previous type from prior calls
+                tupletObj.type = None
 
     returnObj.streamStatus.tuplets = True
 
@@ -1649,7 +1624,7 @@ def makeAccidentalsInMeasureStream(
     tiePitchSet: t.Optional[t.Set[str]] = None
 ) -> None:
     '''
-    Makes accidentals in place on a stream consisting of only Measures.
+    Makes accidentals in place on a stream that contains Measures.
     Helper for Stream.makeNotation and Part.makeAccidentals.
 
     The function walks measures in order to update the values for the following keyword
@@ -1664,38 +1639,40 @@ def makeAccidentalsInMeasureStream(
         tiePitchSet
 
     Operates on the measures in place; make a copy first if this is not desired.
-    '''
-    if s.getElementsNotOfClass('Measure'):
-        raise ValueError(f'{s} must contain only Measures')
 
+    Changed in v8: the Stream may have other elements besides measures and the method
+        will still work.
+    '''
+    from music21.stream import Measure, Stream
     # bool values for useKeySignature are not helpful here
     # because we are definitely searching key signature contexts
     # only key.KeySignature values are interesting
     # but method arg is typed this way for backwards compatibility
+    ksLast: t.Union[bool, key.KeySignature] = False
+    ksLastDiatonic: t.List[str] = []
+
     if isinstance(useKeySignature, key.KeySignature):
         ksLast = useKeySignature
-    else:
-        ksLast = None
+        ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
 
-    for i, m in enumerate(s):
+    measuresOnly: t.List[Measure] = list(s.getElementsByClass(Measure))
+    for i, m in enumerate(measuresOnly):
         # if beyond the first measure, use the pitches from the last
         # measure for context (cautionary accidentals)
         # unless this measure has a key signature object
         if i > 0:
-            pitchPastMeasure = None
             if m.keySignature is None:
-                pitchPastMeasure = s[i - 1].pitches
+                pitchPastMeasure = measuresOnly[i - 1].pitches
             elif ksLast:
                 # If there is any key signature object to the left,
                 # just get the chromatic pitches from previous measure
                 # G-naturals in C major following G-flats in F major need cautionary
                 # G-naturals in C major following G-flats in Db major don't
-                ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
-                pitchPastMeasure = [p for p in s[i - 1].pitches
-                    if p.name not in ksLastDiatonic]
+                pitchPastMeasure = [p for p in measuresOnly[i - 1].pitches
+                                    if p.name not in ksLastDiatonic]
             # Get tiePitchSet from previous measure
             try:
-                previousNoteOrChord = s[i - 1][note.NotRest][-1]
+                previousNoteOrChord = measuresOnly[i - 1][note.NotRest][-1]
                 tiePitchSet = getTiePitchSet(previousNoteOrChord)
                 if tiePitchSet is not None and m.keySignature is not None:
                     # Get the diatonic pitches in this (new) key
@@ -1708,6 +1685,7 @@ def makeAccidentalsInMeasureStream(
 
         if m.keySignature is not None:
             ksLast = m.keySignature
+            ksLastDiatonic = [p.name for p in ksLast.getScale().pitches]
 
         m.makeAccidentals(
             pitchPast=pitchPast,
@@ -1722,6 +1700,8 @@ def makeAccidentalsInMeasureStream(
             cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
             tiePitchSet=tiePitchSet,
         )
+    if isinstance(s, Stream):
+        s.streamStatus.accidentals = True
 
 def iterateBeamGroups(
     s: StreamType,
@@ -1813,8 +1793,8 @@ def setStemDirectionForBeamGroups(
     if `setANewStems` is True (as by default), then even notes with stemDirection
     of 'unspecified' get a stemDirection.
 
-    Currently assumes that the clef does not change within a beam group.  This
-    assumption may change in the future.
+    The method currently assumes that the clef does not change within a beam group.  This
+    assumption may change in the future without notice.
 
     Operates in place.  Run `copy.deepcopy(s)` beforehand for a non-inPlace version.
 
@@ -1879,6 +1859,208 @@ def setStemDirectionOneGroup(
         elif noteDirection in ('up', 'down', 'unspecified'):
             n.stemDirection = groupStemDirection
 
+
+def splitElementsToCompleteTuplets(
+    s: 'music21.stream.Stream',
+    *,
+    recurse: bool = False,
+    addTies: bool = True
+) -> None:
+    # noinspection PyShadowingNames
+    '''
+    Split notes or rests if doing so will complete any incomplete tuplets.
+    The element being split must have a duration that exceeds the
+    remainder of the incomplete tuplet.
+
+    The first note is edited; the additional notes are inserted in place.
+    (Destructive edit, so make a copy first if desired.)
+    Relies on :meth:`~music21.stream.base.splitAtQuarterLength`.
+
+    New in v8.
+
+    >>> from music21.stream.makeNotation import splitElementsToCompleteTuplets
+    >>> s = stream.Stream(
+    ...    [note.Note(quarterLength=1/3), note.Note(quarterLength=1), note.Note(quarterLength=2/3)]
+    ... )
+    >>> splitElementsToCompleteTuplets(s)
+    >>> [el.quarterLength for el in s.notes]
+    [Fraction(1, 3), Fraction(2, 3), Fraction(1, 3), Fraction(2, 3)]
+    >>> [el.tie for el in s.notes]
+    [None, <music21.tie.Tie start>, <music21.tie.Tie stop>, None]
+
+    With `recurse`:
+
+    >>> m = stream.Measure([note.Note(quarterLength=1/6)])
+    >>> m.insert(5/6, note.Note(quarterLength=1/6))
+    >>> m.makeRests(inPlace=True, fillGaps=True)
+    >>> p = stream.Part([m])
+    >>> splitElementsToCompleteTuplets(p, recurse=True)
+    >>> [el.quarterLength for el in p.recurse().notesAndRests]
+    [Fraction(1, 6), Fraction(1, 3), Fraction(1, 3), Fraction(1, 6)]
+    '''
+    iterator: t.Iterable['music21.stream.Stream']
+    if recurse:
+        iterator = s.recurse(streamsOnly=True, includeSelf=True)
+    else:
+        iterator = [s]
+
+    for container in iterator:
+        general_notes = list(container.notesAndRests)
+        last_tuplet: t.Optional['music21.duration.Tuplet'] = None
+        partial_tuplet_sum = 0.0
+        for gn in general_notes:
+            if (
+                gn.duration.tuplets
+                and gn.duration.expressionIsInferred
+                and (last_tuplet is None or last_tuplet == gn.duration.tuplets[0])
+            ):
+                last_tuplet = gn.duration.tuplets[0]
+                partial_tuplet_sum = opFrac(gn.quarterLength + partial_tuplet_sum)
+            else:
+                last_tuplet = None
+                partial_tuplet_sum = 0.0
+                continue
+            ql_to_complete = opFrac(
+                gn.duration.tuplets[0].totalTupletLength() - partial_tuplet_sum)
+            if ql_to_complete == 0.0:
+                last_tuplet = None
+                partial_tuplet_sum = 0.0
+                continue
+            next_gn = gn.next(note.GeneralNote, activeSiteOnly=True)
+            if next_gn and next_gn.offset != opFrac(gn.offset + gn.quarterLength):
+                continue
+            if next_gn and next_gn.duration.expressionIsInferred:
+                if 0 < ql_to_complete < next_gn.quarterLength:
+                    unused_left_edited_in_place, right = next_gn.splitAtQuarterLength(
+                        ql_to_complete, addTies=addTies)
+                    container.insert(next_gn.offset + ql_to_complete, right)
+
+
+def consolidateCompletedTuplets(
+    s: 'music21.stream.Stream',
+    *,
+    recurse: bool = False,
+    onlyIfTied: bool = True,
+) -> None:
+    # noinspection PyShadowingNames
+    '''
+    Locate consecutive notes or rests in `s` (or its substreams if `recurse` is True)
+    that are unnecessarily expressed as tuplets and replace them with a single
+    element. These groups must:
+
+        - be consecutive (with respect to :class:`~music21.note.GeneralNote` objects)
+        - be all rests, or all :class:`~music21.note.NotRest`s with equal `.pitches`
+        - all have :attr:`~music21.duration.Duration.expressionIsInferred` = `True`.
+        - sum to the tuplet's total length
+        - if `NotRest`, all must be tied (if `onlyIfTied` is True)
+
+    The groups are consolidated by prolonging the first note or rest in the group
+    and removing the subsequent elements from the stream. (Destructive edit,
+    so make a copy first if desired.)
+
+    New in v8.
+
+    >>> s = stream.Stream()
+    >>> r = note.Rest(quarterLength=1/6)
+    >>> s.repeatAppend(r, 5)
+    >>> s.insert(5/6, note.Note(duration=r.duration))
+    >>> from music21.stream.makeNotation import consolidateCompletedTuplets
+    >>> consolidateCompletedTuplets(s)
+    >>> [el.quarterLength for el in s.notesAndRests]
+    [0.5, Fraction(1, 6), Fraction(1, 6), Fraction(1, 6)]
+
+    `mustBeTied` is `True` by default:
+
+    >>> s2 = stream.Stream()
+    >>> n = note.Note(quarterLength=1/3)
+    >>> s2.repeatAppend(n, 3)
+    >>> consolidateCompletedTuplets(s)
+    >>> [el.quarterLength for el in s2.notesAndRests]
+    [Fraction(1, 3), Fraction(1, 3), Fraction(1, 3)]
+
+    >>> consolidateCompletedTuplets(s2, onlyIfTied=False)
+    >>> [el.quarterLength for el in s2.notesAndRests]
+    [1.0]
+
+    Does nothing if tuplet definitions are not the same. (In which case, see
+    :class:`~music21.duration.TupletFixer` instead).
+
+    >>> s3 = stream.Stream([note.Rest(quarterLength=1/3), note.Rest(quarterLength=1/6)])
+    >>> for my_rest in s3.notesAndRests:
+    ...   print(my_rest.duration.tuplets)
+    (<music21.duration.Tuplet 3/2/eighth>,)
+    (<music21.duration.Tuplet 3/2/16th>,)
+    >>> consolidateCompletedTuplets(s)
+    >>> [el.quarterLength for el in s3.notesAndRests]
+    [Fraction(1, 3), Fraction(1, 6)]
+
+    Does nothing if there are multiple (nested) tuplets.
+    '''
+    def is_reexpressible(gn: note.GeneralNote) -> bool:
+        return (
+            gn.duration.expressionIsInferred
+            and len(gn.duration.tuplets) < 2
+            and (gn.isRest or gn.tie is not None or not onlyIfTied)
+        )
+
+    iterator: t.Iterable['music21.stream.Stream']
+    if recurse:
+        iterator = s.recurse(streamsOnly=True, includeSelf=True)
+    else:
+        iterator = [s]
+    for container in iterator:
+        reexpressible = [gn for gn in container.notesAndRests if is_reexpressible(gn)]
+        to_consolidate: t.List['music21.note.GeneralNote'] = []
+        partial_tuplet_sum: OffsetQL = 0.0
+        last_tuplet: t.Optional['music21.duration.Tuplet'] = None
+        completion_target: t.Optional[OffsetQL] = None
+        for gn in reexpressible:
+            prev_gn = gn.previous(note.GeneralNote, activeSiteOnly=True)
+            if (
+                prev_gn in to_consolidate
+                and (
+                    (isinstance(gn, note.Rest) and isinstance(prev_gn, note.Rest))
+                    or (
+                        isinstance(gn, note.NotRest)
+                        and isinstance(prev_gn, note.NotRest)
+                        and gn.pitches == prev_gn.pitches
+                    )
+                )
+                and opFrac(prev_gn.offset + prev_gn.quarterLength) == gn.offset
+                and len(gn.duration.tuplets) == 1 and gn.duration.tuplets[0] == last_tuplet
+            ):
+                partial_tuplet_sum = opFrac(partial_tuplet_sum + gn.quarterLength)
+                to_consolidate.append(gn)
+
+                if partial_tuplet_sum == completion_target:
+                    # set flag to remake tuplet brackets
+                    container.streamStatus.tuplets = False
+                    first_note_in_group = to_consolidate[0]
+                    for other_note in to_consolidate[1:]:
+                        container.remove(other_note)
+                    first_note_in_group.duration.clear()
+                    first_note_in_group.duration.tuplets = ()
+                    first_note_in_group.quarterLength = completion_target
+
+                    # reset search values
+                    to_consolidate = []
+                    partial_tuplet_sum = 0.0
+                    last_tuplet = None
+                    completion_target = None
+            else:
+                # reset to current values
+                if gn.duration.tuplets:
+                    partial_tuplet_sum = gn.quarterLength
+                    last_tuplet = gn.duration.tuplets[0]
+                    if t.TYPE_CHECKING:
+                        assert last_tuplet is not None
+                    completion_target = last_tuplet.totalTupletLength()
+                    to_consolidate = [gn]
+                else:
+                    to_consolidate = []
+                    partial_tuplet_sum = 0.0
+                    last_tuplet = None
+                    completion_target = None
 
 
 # -----------------------------------------------------------------------------
@@ -1957,11 +2139,11 @@ class Test(unittest.TestCase):
                          )
 
     def testSetStemDirectionConsistency(self):
-        """
+        '''
         Stems that would all be up, starting from scratch,
         but because of overrideConsistentStemDirections=False,
         we only change the first group with an "unspecified" direction
-        """
+        '''
         from music21 import converter
         p = converter.parse('tinyNotation: 2/4 b8 f8 a8 b8')
         p.makeBeams(inPlace=True)
@@ -2038,12 +2220,29 @@ class Test(unittest.TestCase):
         self.assertEqual(str(cm.exception),
             'meterStream is neither a Stream nor a TimeSignature!')
 
-    def testMakeAccidentalsInMeasureStreamException(self):
-        from music21 import converter
-        p = converter.parse(self.allaBreveBeamTest)
-        with self.assertRaises(ValueError) as cm:
-            makeAccidentalsInMeasureStream(p.measure(1))
-        self.assertIn('must contain only Measures', str(cm.exception))
+    def testMakeTiesChangingTimeSignatures(self):
+        '''
+        From a real-world failure.  Should not be
+        making ties in an example that starts with a short TS
+        but moves to a longer one and all is valid.
+        '''
+        from music21 import stream
+        p = stream.Part()
+        m1 = stream.Measure(number=1)
+        m1.insert(0, meter.TimeSignature('3/4'))
+        m1.insert(0, note.Note('C4', quarterLength=3.0))
+        m2 = stream.Measure(number=2)
+        m2.insert(0, meter.TimeSignature('6/1'))
+        m2.insert(0, note.Note('D4', quarterLength=24.0))
+        m3 = stream.Measure(number=3)
+        m3.insert(0, note.Note('E4', quarterLength=24.0))
+        p.append([m1, m2, m3])
+        pp = p.makeTies()
+        self.assertEqual(len(pp[stream.Measure]), 3)
+        self.assertEqual(pp[stream.Measure].first().notes.first().duration.quarterLength, 3.0)
+        self.assertEqual(pp[stream.Measure][1].notes.first().duration.quarterLength, 24.0)
+        self.assertEqual(len(pp[stream.Measure][2].notes), 1)
+        self.assertEqual(pp[stream.Measure][2].notes.first().duration.quarterLength, 24.0)
 
 
 # -----------------------------------------------------------------------------

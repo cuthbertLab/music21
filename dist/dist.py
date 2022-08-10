@@ -56,14 +56,17 @@ the announcement while it's running.
     then don't change anything until the next step is done.
     (.gitignore will avoid uploading the large files created here...)
 
-15. Create a new release on GitHub and upload the TWO files created here and docs.
-    Use tag v7.3.1 (etc.).
+15. Tag the commit: git tag -a vX.Y.Z -m "music21 vX.Y.Z"
     Don't forget the "v" in the release tag.
+    Sanity check that the correct commit was tagged: git log
+    Push tags: git push upstream --tags
+
+16. Create a new release on GitHub and upload the TWO files created here and docs.
     Drag in this order: .tar.gz, documentation, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-16. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz" [*]
+17. Upload the new file to PyPI with "twine upload music21-7.3.5a2.tar.gz" [*]
 
     [*] Requires twine to be installed
 
@@ -77,14 +80,14 @@ the announcement while it's running.
         username:your_username
         password:your_password
 
-17. Delete the two .tar.gz files in dist...
+18. Delete the two .tar.gz files in dist...
 
-18. For starting a new major release create a GitHub branch for the old one.
+19. For starting a new major release create a GitHub branch for the old one.
 
-19. Immediately increment the number in _version.py and run tests on it here
+20. Immediately increment the number in _version.py and run tests on it here
     to prepare for next release.
 
-20. Announce on the blog, to the list, and twitter.
+21. Announce on the blog, to the list, and twitter.
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''
@@ -213,7 +216,7 @@ class Distributor:
             shutil.rmtree(fpDstDir)
 
         if mode == TAR:
-            tf = tarfile.open(fp, "r:gz")
+            tf = tarfile.open(fp, 'r:gz')
             # the path here is the dir into which to expand,
             # not the name of that dir
             tf.extractall(path=fpDir)

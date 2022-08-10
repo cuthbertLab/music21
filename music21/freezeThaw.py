@@ -73,6 +73,7 @@ import pathlib
 import pickle
 import time
 import unittest
+import weakref
 import zlib
 
 import typing as t
@@ -927,7 +928,7 @@ class StreamThawer(StreamFreezeThawBase):
                     try:
                         storage = pickle.loads(uncompressed)
                     except AttributeError as e:
-                        common.restoreWindowsAfterUnpickling()
+                        common.restorePathClassesAfterUnpickling()
                         raise FreezeThawException(
                             f'Problem in decoding: {e}'
                         ) from e
@@ -1223,8 +1224,9 @@ class Test(unittest.TestCase):
         c = converter.parse(a)
         f = converter.freezeStr(c)
         d = converter.thawStr(f)
-        self.assertEqual(d.parts[1].flatten().notes[20].volume._client.__class__.__name__,
-                         'weakref')
+        self.assertIsInstance(
+            d.parts[1].flatten().notes[20].volume._client,
+            weakref.ReferenceType)
 
 
 # -----------------------------------------------------------------------------
