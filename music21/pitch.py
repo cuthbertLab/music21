@@ -1400,7 +1400,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
     @displayType.setter
     def displayType(self, value: str):
         if value not in ('normal', 'always', 'never',
-                         'unless-repeated', 'even-tied', "if-absolutely-necessary"):
+                         'unless-repeated', 'even-tied', 'if-absolutely-necessary'):
             raise AccidentalException(f'Supplied display type is not supported: {value!r}')
         self._displayType = value
 
@@ -1688,7 +1688,7 @@ class Pitch(prebase.ProtoM21Object):
     Two Pitches are equal if they represent the same
     pitch and are spelled the same (enharmonics do not count).
     A Pitch is greater than another Pitch if its `.ps` is greater than
-    the other.  Thus C##4 > D-4.
+    the other.  Thus, C##4 > D-4.
 
     >>> pitch.Pitch('C#5') == pitch.Pitch('C#5')
     True
@@ -2420,7 +2420,7 @@ class Pitch(prebase.ProtoM21Object):
 
 
         Notice that ps 61 represents both
-        C# and D-flat.  Thus "spellingIsInferred"
+        C# and D-flat.  Thus, "spellingIsInferred"
         will be true after setting our pitch to 61:
 
         >>> a.ps = 61
@@ -4014,7 +4014,7 @@ class Pitch(prebase.ProtoM21Object):
         If mostCommon is set to True, then the most commonly used
         enharmonic spelling is chosen (that is, the one that appears
         first in key signatures as you move away from C on the circle
-        of fifths).  Thus G-flat becomes F#, A# becomes B-flat,
+        of fifths).  Thus, G-flat becomes F#, A# becomes B-flat,
         D# becomes E-flat, D-flat becomes C#, G# and A-flat are left
         alone.
 

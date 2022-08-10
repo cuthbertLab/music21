@@ -861,10 +861,10 @@ def makeRests(
         m: t.Optional[stream.Measure] = None,
         ts: t.Optional[meter.TimeSignature] = None
     ) -> t.Union[float, Fraction]:
-        """
+        '''
         Needed for timeRangeFromBarDuration.
         Returns 0.0 if no meter can be found.
-        """
+        '''
         post: t.Union[float, Fraction] = 0.0
         if ts is not None:
             post = ts.barDuration.quarterLength
@@ -2137,11 +2137,11 @@ class Test(unittest.TestCase):
                          )
 
     def testSetStemDirectionConsistency(self):
-        """
+        '''
         Stems that would all be up, starting from scratch,
         but because of overrideConsistentStemDirections=False,
         we only change the first group with an "unspecified" direction
-        """
+        '''
         from music21 import converter
         p = converter.parse('tinyNotation: 2/4 b8 f8 a8 b8')
         p.makeBeams(inPlace=True)

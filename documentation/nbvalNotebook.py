@@ -35,7 +35,7 @@ def runAll():
 
 
     for f in goodFiles:
-        print("Running: ", str(f))
+        print('Running: ', str(f))
         try:
             retVal = runOne(f)
         except KeyboardInterrupt:

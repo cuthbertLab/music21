@@ -692,9 +692,9 @@ class Residual:
         '''
         if style == 'classic':  # mathematical style
             if self._shift != 0:
-                repStr = f"{self._m}(n+{self._shift})"
+                repStr = f'{self._m}(n+{self._shift})'
             else:
-                repStr = f"{self._m}(n)"
+                repStr = f'{self._m}(n)'
             if self._neg:
                 repStr = f'-{repStr}'
         else:  # do evaluatable type

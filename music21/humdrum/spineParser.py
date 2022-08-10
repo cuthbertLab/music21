@@ -1341,8 +1341,10 @@ class KernSpine(HumdrumSpine):
             except Exception as e:  # pylint: disable=broad-except  # pragma: no cover
                 import traceback
                 environLocal.warn(
-                    "Error in parsing event (%r) at position %r for spine %r: %s" % (
-                        event.contents, event.position, event.spineId, str(e)))
+                    f'Error in parsing event ({event.contents!r}) '
+                    f'at position {event.position!r} '
+                    f'for spine {event.spineId}: {e}'
+                )
                 tb = traceback.format_exc()
                 environLocal.printDebug(f'Traceback for the exception: \n{tb}')
                 # traceback... environLocal.printDebug()
@@ -2284,7 +2286,7 @@ def hdStringToNote(contents):
         # generic ornament
 
     # 3.2.4 Articulation Marks
-    if contents.count('\''):
+    if contents.count("'"):
         thisObject.articulations.append(articulations.Staccato())
     if contents.count('"'):
         thisObject.articulations.append(articulations.Pizzicato())
@@ -2424,7 +2426,7 @@ def hdStringToMeasure(contents, previousMeasure=None):
 
     if contents.count('-'):
         barline.type = 'none'
-    elif contents.count('\''):
+    elif contents.count("'"):
         barline.type = 'short'
     elif contents.count('`'):
         barline.type = 'tick'

@@ -12,6 +12,7 @@
 # https://stackoverflow.com/questions/12611337/
 #     recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer
 
+import weakref
 
 class TreeYielder:
     def __init__(self, yieldValue=None):
@@ -77,7 +78,7 @@ class TreeYielder:
         else:  # objects or uncaught types...
             # from http://bugs.python.org/file18699/static.py
             try:
-                instance_dict = object.__getattribute__(obj, "__dict__")
+                instance_dict = object.__getattribute__(obj, '__dict__')
             except AttributeError:
                 # probably uncaught static object
                 return
@@ -94,25 +95,25 @@ class TreeYielder:
                     for z in self.run(gotValue, memo=memo):
                         yield z
                 except RuntimeError:
-                    raise Exception(f"Maximum recursion on:\n{self.currentLevel()}")
+                    raise Exception(f'Maximum recursion on:\n{self.currentLevel()}')
                 self.stackVals.pop()
 
         self.currentStack.pop()
 
     def currentLevel(self):
-        currentStr = ""
+        currentStr = ''
         for stackType, stackValue in self.stackVals:
             if stackType == 'dict':
                 if isinstance(stackValue, str):
                     currentStr += "['" + stackValue + "']"
                 else:  # numeric key...
-                    currentStr += "[" + str(stackValue) + "]"
+                    currentStr += '[' + str(stackValue) + ']'
             elif stackType == 'listLike':
-                currentStr += "[" + str(stackValue) + "]"
+                currentStr += '[' + str(stackValue) + ']'
             elif stackType == 'getattr':
                 currentStr += ".__getattribute__('" + stackValue + "')"
             else:
-                raise Exception(f"Cannot get attribute of type {stackType}")
+                raise Exception(f'Cannot get attribute of type {stackType}')
         return currentStr
 
 
@@ -159,7 +160,7 @@ def testMIDIParse():
     v.setupSerializationScaffold()
 
     def mockType(x):
-        return x.__class__.__name__ == 'weakref'
+        return isinstance(x, weakref.ReferenceType)
 
     ty = TreeYielder(mockType)
     for val in ty.run(c):
