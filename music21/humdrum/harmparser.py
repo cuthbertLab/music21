@@ -5,7 +5,7 @@
 #
 # Authors:      Nestor Napoles Lopez
 #
-# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -15,7 +15,7 @@ The `**harm` representation is described here: https://www.humdrum.org/rep/harm/
 '''
 import re
 import unittest
-from typing import Dict, Any
+import typing as t
 
 def convertHarmToRoman(harmStr):
     # noinspection PyShadowingNames
@@ -63,7 +63,7 @@ def convertHarmToRoman(harmStr):
     if not harm:
         return None
 
-    if harm['root'] == "Gn":
+    if harm['root'] == 'Gn':
         degree = 'Ger'
         harm['intervals'] = ['7']
     elif harm['root'] == 'Lt':
@@ -201,8 +201,9 @@ class HarmParser:
         self.harmRegExp = re.compile(HarmParser.defs.harmExpression, re.VERBOSE)
         self.impliedRegExp = re.compile(HarmParser.defs.implied, re.VERBOSE)
 
-    def parse(self, harmExpression) -> Dict[str, Any]:
+    def parse(self, harmExpression) -> t.Dict[str, t.Any]:
         # Check for implied harmony
+        m: t.Dict[str, t.Any]
         impliedMatch = self.impliedRegExp.match(harmExpression)
         if impliedMatch:
             # This is implied harmony
@@ -216,7 +217,7 @@ class HarmParser:
             # Normal expression
             matchHarmRegExp = self.harmRegExp.match(harmExpression)
             if matchHarmRegExp:
-                m: Dict[str, Any] = matchHarmRegExp.groupdict()
+                m = matchHarmRegExp.groupdict()
                 m['implied'] = False
                 # Finding alternative harmony
                 if m['alternative'] is not None:

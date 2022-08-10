@@ -5,7 +5,7 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2019 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -66,7 +66,7 @@ class TabChord:
 
     def _changeRepresentation(self):
         '''
-        Converts the representation type of a TabChord between the music21 and DCML conventions,
+        Converts the representationType of a TabChord between the music21 and DCML conventions,
         especially for the different handling of expectations in minor.
 
         First, let's set up a TabChord().
@@ -268,7 +268,7 @@ class TsvHandler:
     >>> m21Chord1.figure
     'I'
 
-    And for our last trick, we can put the whole lot in a music21 stream.
+    And for our last trick, we can put the whole collection in a music21 stream.
 
     >>> out_stream = handler.toM21Stream()
     >>> out_stream.parts[0].measure(1)[0].figure
@@ -443,7 +443,7 @@ class M21toTSV:
 
         tsvData = []
 
-        for thisRN in self.m21Stream.recurse().getElementsByClass('RomanNumeral'):
+        for thisRN in self.m21Stream[roman.RomanNumeral]:
 
             relativeroot = None
             if thisRN.secondaryRomanNumeral:
@@ -461,7 +461,7 @@ class M21toTSV:
             thisEntry.measure = thisRN.measureNumber
             thisEntry.beat = thisRN.beat
             thisEntry.totbeat = None
-            thisEntry.timesig = thisRN.getContextByClass('TimeSignature').ratioString
+            thisEntry.timesig = thisRN.getContextByClass(meter.TimeSignature).ratioString
             thisEntry.op = self.m21Stream.metadata.opusNumber
             thisEntry.no = self.m21Stream.metadata.number
             thisEntry.mov = self.m21Stream.metadata.movementNumber

@@ -4,7 +4,7 @@
 # Purpose:      Defines standard resolutions for possibility instances
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -25,7 +25,7 @@ arguments, the methods only :meth:`~music21.pitch.Pitch.transpose` each
 :class:`~music21.pitch.Pitch` in a possibility by the appropriate interval.
 '''
 import unittest
-from typing import List, Optional
+import typing as t
 
 from music21 import exceptions21
 from music21 import chord
@@ -757,7 +757,7 @@ def _resolvePitches(possibToResolve, howToResolve):
 
 def _unpackSeventhChord(
     seventhChord: 'music21.chord.Chord'
-) -> List[Optional['music21.pitch.Pitch']]:
+) -> t.List[t.Optional['music21.pitch.Pitch']]:
     '''
     Takes in a Chord and returns a list of Pitches (or Nones) corresponding
     to the bass, root, fifth, seventh.

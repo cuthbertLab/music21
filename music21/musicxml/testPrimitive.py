@@ -3576,6 +3576,465 @@ restsDurations02a = '''<?xml version="1.0" encoding="UTF-8"?>
 
 '''
 
+arpeggio32d = '''<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="2.0">
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">Different Arpeggio directions
+          (normal, up, down, non-arpeggiate)</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name></part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <!-- Different Arpeggiate styles: neutral, up, down and non-arpeggiate (bracket) -->
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>C</step><octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate/></notations>
+        <lyric number="1"><text>normal</text></lyric>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>E</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate/></notations>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>G</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate/></notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate direction="up"/></notations>
+        <lyric number="1"><text>up</text></lyric>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>E</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate direction="up"/></notations>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>G</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate direction="up"/></notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate/></notations>
+        <lyric number="1"><text>normal</text></lyric>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>E</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate/></notations>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>G</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate/></notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate direction="down"/></notations>
+        <lyric number="1"><text>down</text></lyric>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>E</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate direction="down"/></notations>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>G</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate direction="down"/></notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate/></notations>
+        <lyric number="1"><text>normal</text></lyric>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>E</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate/></notations>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>G</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate/></notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><non-arpeggiate type="bottom"/></notations>
+        <lyric number="1"><text>non-arp.</text></lyric>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>E</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>G</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><non-arpeggiate type="top"/></notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step><octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate/></notations>
+        <lyric number="1"><text>normal</text></lyric>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>E</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate/></notations>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>G</step><octave>5</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <notations><arpeggiate/></notations>
+      </note>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
+    </measure>
+  </part>
+</score-partwise>
+'''
+
+multiStaffArpeggios = '''<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE score-partwise  PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+  <movement-title>Music21 Fragment</movement-title>
+  <identification>
+    <creator type="composer">Music21</creator>
+    <encoding>
+      <encoding-date>2022-07-06</encoding-date>
+      <software>music21 v.8.0.0a3</software>
+    </encoding>
+  </identification>
+  <defaults>
+    <scaling>
+      <millimeters>7</millimeters>
+      <tenths>40</tenths>
+    </scaling>
+  </defaults>
+  <part-list>
+    <score-part id="P5ae6baff5d1f6789c9d35d65c9ea2176">
+      <part-name />
+    </score-part>
+  </part-list>
+  <!--=========================== Part 1 ===========================-->
+  <part id="P5ae6baff5d1f6789c9d35d65c9ea2176">
+    <!--========================= Measure 1 ==========================-->
+    <measure number="1">
+      <attributes>
+        <divisions>10080</divisions>
+        <staves>2</staves>
+        <clef number="1">
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+        <clef number="2">
+          <sign>F</sign>
+          <line>4</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>10080</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>1</staff>
+        <notations>
+          <arpeggiate />
+        </notations>
+      </note>
+      <note>
+        <chord />
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>10080</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>1</staff>
+        <notations>
+          <arpeggiate />
+        </notations>
+      </note>
+      <note>
+        <chord />
+        <pitch>
+          <step>G</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>10080</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>1</staff>
+        <notations>
+          <arpeggiate />
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>10080</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>1</staff>
+        <notations>
+          <arpeggiate number="1" />
+        </notations>
+      </note>
+      <note>
+        <chord />
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>10080</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>1</staff>
+        <notations>
+          <arpeggiate number="1" />
+        </notations>
+      </note>
+      <note>
+        <chord />
+        <pitch>
+          <step>G</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>10080</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>1</staff>
+        <notations>
+          <arpeggiate number="1" />
+        </notations>
+      </note>
+      <backup>
+        <duration>60480</duration>
+      </backup>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>10080</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>2</staff>
+        <notations>
+          <arpeggiate />
+        </notations>
+      </note>
+      <note>
+        <chord />
+        <pitch>
+          <step>E</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>10080</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>2</staff>
+        <notations>
+          <arpeggiate />
+        </notations>
+      </note>
+      <note>
+        <chord />
+        <pitch>
+          <step>G</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>10080</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>2</staff>
+        <notations>
+          <arpeggiate />
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>10080</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>2</staff>
+        <notations>
+          <arpeggiate number="1" />
+        </notations>
+      </note>
+      <note>
+        <chord />
+        <pitch>
+          <step>E</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>10080</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>2</staff>
+        <notations>
+          <arpeggiate number="1" />
+        </notations>
+      </note>
+      <note>
+        <chord />
+        <pitch>
+          <step>G</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>10080</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <staff>2</staff>
+        <notations>
+          <arpeggiate number="1" />
+        </notations>
+      </note>
+      <barline location="right">
+        <bar-style>regular</bar-style>
+      </barline>
+    </measure>
+  </part>
+</score-partwise>
+'''
 
 rhythmDurations03a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
@@ -18115,6 +18574,59 @@ pianoStaffPolymeter = '''<?xml version="1.0" encoding="ISO-8859-1" standalone="n
 </score-partwise>
 '''
 
+# pianoStaffPolymeterWithClefOctaveChange is a copy of pianoStaffPolymeter (above)
+#   with clef #2 changed from BassClef to Treble8vbClef.
+
+pianoStaffPolymeterWithClefOctaveChange = (
+    '''<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6b Partwise//EN"
+ "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise>
+    <identification>
+        <miscellaneous>
+            <miscellaneous-field name="description">Polymeter on a grand staff</miscellaneous-field>
+        </miscellaneous>
+    </identification>
+    <part-list>
+        <score-part id="P1">
+            <part-name>MusicXML Part</part-name>
+        </score-part>
+    </part-list>
+    <part id="P1">
+        <measure number="1">
+            <attributes>
+                <divisions>96</divisions>
+                <key><fifths>0</fifths></key>
+                <time number="1"><beats>4</beats><beat-type>4</beat-type></time>
+                <time number="2"><beats>2</beats><beat-type>2</beat-type></time>
+                <staves>2</staves>
+                <clef number="1"><sign>G</sign><line>2</line></clef>
+                <clef number="2">
+                    <sign>G</sign>
+                    <line>2</line>
+                    <clef-octave-change>-1</clef-octave-change>
+                </clef>
+            </attributes>
+            <note>
+                <pitch><step>F</step><octave>4</octave></pitch>
+                <duration>384</duration>
+                <voice>1</voice>
+                <type>whole</type>
+                <staff>1</staff>
+            </note>
+            <backup><duration>384</duration></backup>
+            <note>
+                <pitch><step>B</step><octave>2</octave></pitch>
+                <duration>384</duration>
+                <voice>2</voice>
+                <type>whole</type>
+                <staff>2</staff>
+            </note>
+        </measure>
+    </part>
+</score-partwise>
+''')
+
 
 ALL = [
     articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a,  # 0
@@ -18131,7 +18643,8 @@ ALL = [
     mixedVoices1a, mixedVoices1b, mixedVoices2,  # 37
     colors01, triplets01, textBoxes01, octaveShifts33d,  # 40
     unicodeStrNoNonAscii, unicodeStrWithNonAscii,  # 44
-    tremoloTest, hiddenRests, multiDigitEnding, tupletsImplied, pianoStaffPolymeter  # 46
+    tremoloTest, hiddenRests, multiDigitEnding, tupletsImplied, pianoStaffPolymeter,  # 46
+    arpeggio32d, multiStaffArpeggios  # 51
 ]
 
 
@@ -18168,7 +18681,7 @@ class Test(unittest.TestCase):
 
     def testMidMeasureClef1(self):
         '''
-        Tests if there are mid-measure clefs clefs: single staff
+        Tests if there are mid-measure clefs: single staff
         '''
         from music21 import stream
         from music21 import note
@@ -18183,14 +18696,14 @@ class Test(unittest.TestCase):
         orig_stream.repeatAppend(note.Note('C4'), 2)
         orig_stream.append(clef.BassClef())
         orig_stream.repeatAppend(note.Note('C4'), 2)
-        orig_clefs = orig_stream.flatten().getElementsByClass('Clef')
+        orig_clefs = orig_stream.flatten().getElementsByClass(clef.Clef)
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
         self.assertEqual(xml.count(b'<clef>'), 2)  # clefs got out
         self.assertEqual(xml.count(b'<measure'), 1)  # in one measure
 
         new_stream = converter.parse(xml)
-        new_clefs = new_stream.flatten().getElementsByClass('Clef')
+        new_clefs = new_stream.flatten().getElementsByClass(clef.Clef)
 
         self.assertEqual(len(new_clefs), len(orig_clefs))
         self.assertEqual([c.offset for c in new_clefs], [c.offset for c in orig_clefs])
@@ -18198,7 +18711,7 @@ class Test(unittest.TestCase):
 
     def testMidMeasureClefs2(self):
         '''
-        Tests if there are mid-measure clefs clefs: multiple staves.
+        Tests if there are mid-measure clefs: multiple staves.
         '''
         from music21 import clef
         from music21 import converter
@@ -18220,14 +18733,14 @@ class Test(unittest.TestCase):
                      clef.TrebleClef(), note.Note('C4')]:
             orig_stream[1].append(item)
 
-        orig_clefs = [staff.flatten().getElementsByClass('Clef').stream() for staff in
-                      orig_stream.getElementsByClass('Part')]
+        orig_clefs = [staff.flatten().getElementsByClass(clef.Clef).stream() for staff in
+                      orig_stream.getElementsByClass(stream.Part)]
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
 
         new_stream = converter.parse(xml.decode('utf-8'))
-        new_clefs = [staff.flatten().getElementsByClass('Clef').stream() for staff in
-                     new_stream.getElementsByClass('Part')]
+        new_clefs = [staff.flatten().getElementsByClass(clef.Clef).stream() for staff in
+                     new_stream.getElementsByClass(stream.Part)]
 
         self.assertEqual([len(clefs) for clefs in new_clefs],
                          [len(clefs) for clefs in orig_clefs])
@@ -18235,6 +18748,30 @@ class Test(unittest.TestCase):
                          [c.offset for c in orig_clefs])
         self.assertEqual([c.classes for c in new_clefs],
                          [c.classes for c in orig_clefs])
+
+    def testMidMeasureClefs3(self):
+        '''
+        Test midmeasure clef changes outside voices
+        '''
+        from music21 import clef
+        from music21 import note
+        from music21 import musicxml
+        from music21 import stream
+
+        v1 = stream.Voice()
+        v2 = stream.Voice()
+        quarter = note.Note()
+        v1.repeatAppend(quarter, 4)
+        v2.repeatAppend(quarter, 4)
+        m = stream.Measure([v1, v2])
+        m.insert(1.0, clef.BassClef())
+        p = stream.Part(m)
+        p.makeNotation(inPlace=True)
+
+        tree = musicxml.test_m21ToXml.Test().getET(p)
+        self.assertEqual(len(tree.findall('.//clef')), 1)
+        # One backup from the clef back to voice 1, then another back to voice 2
+        self.assertEqual(len(tree.findall('.//backup')), 2)
 
 # ------------------------------------------------------------------------------
 

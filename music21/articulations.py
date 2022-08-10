@@ -3,19 +3,19 @@
 # Name:         articulations.py
 # Purpose:      music21 classes for representing articulations
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2013 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 '''
 Classes for representing and processing articulations.
-Specific articulations are modeled as :class:`~music21.articulation.Articulation` subclasses.
+Specific articulations are modeled as :class:`~music21.articulations.Articulation` subclasses.
 
 A :class:`~music21.note.Note` object has a :attr:`~music21.note.Note.articulations` attribute.
-This list can be used to store one or more :class:`music21.articulation.Articulation` subclasses.
+This list can be used to store one or more :class:`music21.articulations.Articulation` subclasses.
 
 As much as possible, MusicXML names are used for Articulation classes,
 with xxx-yyy changed to XxxYyy.  For instance, "strong-accent" in
@@ -78,7 +78,9 @@ A longer test showing the utility of the module:
     :width: 628
 
 '''
-from typing import Optional
+from __future__ import annotations
+
+import typing as t
 import unittest
 
 from music21 import base
@@ -88,9 +90,10 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import style
 
-_MOD = 'articulations'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('articulations')
 
+if t.TYPE_CHECKING:
+    from music21 import interval
 
 
 class ArticulationException(exceptions21.Music21Exception):
@@ -107,7 +110,7 @@ class Articulation(base.Music21Object):
     >>> x.displayText = '>'
 
     '''
-    _styleClass = style.TextStyle
+    _styleClass: t.Type[style.Style] = style.TextStyle
 
     def __init__(self):
         super().__init__()
@@ -116,7 +119,7 @@ class Articulation(base.Music21Object):
         self._volumeShift: float = 0.0
         self.lengthShift: float = 1.0
         self.tieAttach: str = 'first'  # attach to first or last or all notes after split
-        self.displayText: Optional[str] = None
+        self.displayText: t.Optional[str] = None
 
     def _reprInternal(self):
         return ''
@@ -143,7 +146,7 @@ class Articulation(base.Music21Object):
     # def __eq__(self, other):
     #     '''
     #     Equality. Based only on the class name,
-    #     as other other attributes are independent of context and deployment.
+    #     as other attributes are independent of context and deployment.
     #
     #
     #     >>> at1 = articulations.StrongAccent()
@@ -590,10 +593,10 @@ class PullOff(FretIndication):
     pass
 
 class FretBend(FretIndication):
-    bendAlter = None  # music21.interval.Interval object
-    preBend = None
-    release = None
-    withBar = None
+    bendAlter: t.Optional[interval.IntervalBase] = None
+    preBend: t.Any = None
+    release: t.Any = None
+    withBar: t.Any = None
 
 class FretTap(FretIndication):
     pass

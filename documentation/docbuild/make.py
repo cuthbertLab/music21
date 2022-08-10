@@ -5,9 +5,9 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #               Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-17 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2013-17 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
@@ -92,7 +92,7 @@ class DocBuilder:
             import sphinx
         except ImportError:
             message = 'Sphinx is required to build documentation; '
-            message += 'download from http://sphinx-doc.org'
+            message += 'run pip install Sphinx'
             raise ImportError(message)
 
         target = self.command

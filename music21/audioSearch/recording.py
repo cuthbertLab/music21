@@ -4,9 +4,9 @@
 # Purpose:      routines for making recordings from microphone input
 #
 # Authors:      Jordi Bartolome
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -24,12 +24,11 @@ from importlib.util import find_spec
 import unittest
 import wave
 
-
 from music21 import exceptions21
+from music21.common.types import DocOrder
 
 from music21 import environment
-_MOD = "audioSearch.recording"
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('audioSearch.recording')
 
 
 ###
@@ -55,14 +54,14 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     Returns a list of samples.
     '''
     # noinspection PyPackageRequirements
-    import pyaudio  # @UnresolvedImport  # pylint: disable=import-error
+    import pyaudio  # type: ignore  # pylint: disable=import-error
     recordFormatDefault = pyaudio.paInt16
 
     if recordFormat is None:
         recordFormat = recordFormatDefault
 
     if recordFormat == pyaudio.paInt8:
-        raise RecordingException("cannot perform samplesFromRecording on 8-bit samples")
+        raise RecordingException('cannot perform samplesFromRecording on 8-bit samples')
 
     p_audio = pyaudio.PyAudio()
     st = p_audio.open(format=recordFormat,
@@ -99,7 +98,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
             wf.writeframes(data)
             wf.close()
         except IOError:
-            raise RecordingException(f"Cannot open {waveFilename} for writing.")
+            raise RecordingException(f'Cannot open {waveFilename} for writing.')
     return storedWaveSampleList
 
 
@@ -132,7 +131,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: DocOrder = []
 
 
 if __name__ == '__main__':

@@ -3,10 +3,10 @@
 # Name:         vexflow/toMusic21j.py
 # Purpose:      music21 classes for converting music21 objects to music21j
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               based on an earlier version by Christopher Reyes
 #
-# Copyright:    Copyright © 2012-14 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-14 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -129,7 +129,7 @@ class VexflowPickler:
     def splitLongJSON(self, jsonString, chunkSize=110):
         allJSONList = []
         for i in range(0, len(jsonString), chunkSize):
-            allJSONList.append('\'' + jsonString[i:i + chunkSize] + '\'')
+            allJSONList.append("'" + jsonString[i:i + chunkSize] + "'")
         return ' + \n    '.join(allJSONList)
 
     def getLoadTemplate(self, urls=None):

@@ -3,10 +3,10 @@
 # Name:         testRunner.py
 # Purpose:      Music21 testing suite
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2006-2016 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -50,8 +50,8 @@ def addDocAttrTestsToSuite(suite,
     >>> s1TestsAfter = len(s1._tests)
     >>> s1TestsAfter - s1TestsBefore
     2
-    >>> t = s1._tests[-1]
-    >>> t
+    >>> lastTest = s1._tests[-1]
+    >>> lastTest
     isRest ()
     '''
     dtp = doctest.DocTestParser()

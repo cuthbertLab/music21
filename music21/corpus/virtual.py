@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010, 2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -20,12 +20,12 @@ TURNED OFF in 2017 -- to be recreated with a bigger test set.
 TODO: Demonstrate with JRP.
 '''
 
+import typing as t
 import unittest
 
 from music21 import common
 from music21 import environment
-_MOD = 'converter.virtual'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('corpus.virtual')
 
 
 class VirtualWork:
@@ -37,7 +37,7 @@ class VirtualWork:
         # this path must be unique for each work
         self.corpusPath = None
 
-        # a list of URLs in order of best usage
+        # a list of URLs in order of their best usage
         # these probably should all be the same format
         self.urlList = []
 
@@ -52,7 +52,7 @@ class VirtualWork:
 #         return dir / ('m21-' + common.getMd5(self.title) + '.p')
 
     def getUrlByExt(self, extList=None):
-        '''Given a request for an extension, find a best match for a URL from
+        '''Given a request for an extension, find the best match for a URL from
         the list of known URLs. If ext is None, return the first URL.
         '''
         if not common.isListLike(extList):
@@ -116,7 +116,7 @@ class BachBWV773(VirtualWork):
 
 
 class ColtraneGiantSteps(VirtualWork):
-    # post operation: needs make accidentals
+    # post operation: needs to make accidentals
     def __init__(self):
         super().__init__()
 
@@ -208,7 +208,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: t.List[type] = []
 
 if __name__ == '__main__':
     import music21

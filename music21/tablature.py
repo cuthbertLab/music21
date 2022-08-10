@@ -5,7 +5,7 @@
 #
 # Authors:      Luke Poeppel
 #
-# Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2016 Michael Scott Asato Cuthbert and the music21 Project
 # Licence:      BSD, see licence.txt
 # ------------------------------------------------------------------------------
 '''
@@ -16,7 +16,7 @@ Chord from Figure
 Chord from FretBoard Object with tuning.
 '''
 import unittest
-from typing import List, Optional
+import typing as t
 
 from music21 import common
 from music21 import exceptions21
@@ -227,7 +227,7 @@ class FretBoard(prebase.ProtoM21Object):
                     self.numStrings
                 ))
 
-        pitchList: List[Optional['music21.pitch.Pitch']] = [None] * self.numStrings
+        pitchList: t.List[t.Optional['music21.pitch.Pitch']] = [None] * self.numStrings
 
         if not self.fretNotes:
             return pitchList
@@ -259,7 +259,7 @@ class FirstFret:
     given chord position.
     '''
 
-    def __init__(self, fretNum, location="right"):
+    def __init__(self, fretNum, location='right'):
         self.fretNum = fretNum
         self.location = location
 
@@ -300,7 +300,7 @@ class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
 
 # -------------------------------------------------------------------------------
 #
-# The following classes are some basic fretted instruments that are commonly used in
+# The following classes are some fretted instruments that are commonly used in
 # Tablature notation.
 #
 

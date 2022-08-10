@@ -3,14 +3,14 @@
 # Name:         common/classTools.py
 # Purpose:      Utilities for classes
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import contextlib
-from typing import Any, Type, Dict
+import typing as t
 
 # from music21 import exceptions21
 __all__ = [
@@ -19,7 +19,7 @@ __all__ = [
 ]
 
 
-def isNum(usrData: Any) -> bool:
+def isNum(usrData: t.Any) -> bool:
     '''
     check if usrData is a number (float, int, long, Decimal),
     return boolean
@@ -63,16 +63,16 @@ def isNum(usrData: Any) -> bool:
         return False
 
 
-def isListLike(usrData: Any) -> bool:
+def isListLike(usrData: t.Any) -> bool:
     '''
-    Returns True if is a List or Tuple
+    Returns True if is a List or Tuple or their subclasses.
 
     Formerly allowed for set here, but that does not allow for
     subscripting (`set([1, 2, 3])[0]` is undefined).
 
     Differs from isinstance(collections.abc.Sequence()) in that
     we do not want Streams included even if __contains__, __reversed__,
-    and count are added.
+    and count are added, and we do not want to include str or bytes.
 
     >>> common.isListLike([])
     True
@@ -88,7 +88,7 @@ def isListLike(usrData: Any) -> bool:
     return isinstance(usrData, (list, tuple))
 
 
-def isIterable(usrData: Any) -> bool:
+def isIterable(usrData: t.Any) -> bool:
     '''
     Returns True if is the object can be iter'd over
     and is NOT a string
@@ -106,15 +106,24 @@ def isIterable(usrData: Any) -> bool:
 
     >>> common.isIterable(range(20))
     True
+
+    Classes are not iterable even if their instances are:
+
+    >>> common.isIterable(stream.Stream)
+    False
+
+    Changed in v7.3 -- Classes (not instances) are not iterable
     '''
     if isinstance(usrData, (str, bytes)):
         return False
     if hasattr(usrData, '__iter__'):
+        if usrData.__class__ is type:
+            return False
         return True
     return False
 
 
-def classToClassStr(classObj: Type) -> str:
+def classToClassStr(classObj: t.Type) -> str:
     '''Convert a class object to a class string.
 
     >>> common.classToClassStr(note.Note)
@@ -128,7 +137,7 @@ def classToClassStr(classObj: Type) -> str:
 
 def getClassSet(instance, classNameTuple=None):
     '''
-    Return the classSet for an instance (whether a Music21Object or something else.
+    Return the classSet for an instance (whether a Music21Object or something else).
     See base.Music21Object.classSet for more details.
 
     >>> p = pitch.Pitch()
@@ -221,7 +230,7 @@ def saveAttributes(obj, *attributeList):
 
     New in v7.
     '''
-    tempStorage: Dict[str, Any] = {}
+    tempStorage: t.Dict[str, t.Any] = {}
     for attribute in attributeList:
         tempStorage[attribute] = getattr(obj, attribute)
     try:

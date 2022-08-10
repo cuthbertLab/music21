@@ -30,3 +30,7 @@ per-file-ignores =
   music21/search/__init__.py:F403
 
 max-line-length=100
+
+inline-quotes = single
+multiline-quotes = '''
+docstring-quotes = '''

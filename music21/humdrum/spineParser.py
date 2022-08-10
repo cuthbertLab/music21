@@ -3,9 +3,9 @@
 # Name:         humdrum.spineParser.py
 # Purpose:      Conversion and Utility functions for Humdrum and kern in particular
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -43,12 +43,14 @@ SpineParsing consists of several steps.
 * Stream elements are moved into their measures within a Stream
 * Measures are searched for elements with voice groups and Voice objects are created
 '''
+from __future__ import annotations
+
 import copy
 import math
 import re
 import unittest
 
-from typing import List, Optional, Type
+import typing as t
 
 from music21 import articulations
 from music21 import bar
@@ -60,6 +62,7 @@ from music21 import dynamics
 from music21 import duration
 from music21 import exceptions21
 from music21 import expressions
+from music21 import instrument
 from music21 import key
 from music21 import note
 from music21 import meter
@@ -75,8 +78,7 @@ from music21.humdrum import harmparser
 from music21.humdrum import instruments
 
 from music21 import environment
-_MOD = 'humdrum.spineParser'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('humdrum.spineParser')
 
 flavors = {'JRP': False}
 
@@ -165,7 +167,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
             raise HumdrumException('Need a list of lines (dataStream) to parse!')
 
         hasOpus, dataCollections = self.determineIfDataStreamIsOpus(dataStream)
-        if hasOpus is True:  # Palestrina data collection, maybe others
+        if hasOpus is True:  # True for the Palestrina data collection, maybe others
             return self.parseOpusDataCollections(dataCollections)
         else:
             return self.parseNonOpus(dataStream)
@@ -183,7 +185,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         self.parsePositionInStream = 0
         self.parseEventListFromDataStream(dataStream)  # sets self.eventList and fileLength
         try:
-            assert(self.parsePositionInStream == self.fileLength)
+            assert self.parsePositionInStream == self.fileLength
         except AssertionError:  # pragma: no cover
             raise HumdrumException('getEventListFromDataStream failed: did not parse entire file')
         self.parseProtoSpinesAndEventCollections()
@@ -423,7 +425,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         So self.eventCollections and self.protoSpines can each be
         thought of as a two-dimensional sheet of cells, but where
         the first index of the former is the vertical position in
-        the dataStream and the first index of the later is the
+        the dataStream and the first index of the latter is the
         horizontal position in the dataStream.  The contents of
         each cell is a SpineEvent object or None (if there's no
         data at that point).  Even '.' (continuation events) get
@@ -751,7 +753,7 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
 #                                    '(well, maybe it is...file a bug report if you ' +
 #                                    'have doubled checked your data)')
 #         elif self.spineCollection.spines[0].stream is None:
-#             raise HumdrumException('okay, you got at least one spine, but it aint got ' +
+#             raise HumdrumException('okay, you got at least one spine, but it ain\'t got ' +
 #                                    'a stream in it; (check your data or file a bug report)')
 #         else:
 #             masterStream = stream.Score()
@@ -773,10 +775,9 @@ class HumdrumDataCollection(prebase.ProtoM21Object):
         s.metadata = md
         grToRemove = []
 
-        for gr in s.recurse().getElementsByClass('GlobalReference'):
-            wasParsed = gr.updateMetadata(md)
-            if wasParsed:
-                grToRemove.append(gr)
+        for gr in s[GlobalReference]:
+            gr.updateMetadata(md)
+            grToRemove.append(gr)
 
         if grToRemove:
             s.remove(grToRemove, recurse=True)
@@ -1040,8 +1041,8 @@ class HumdrumSpine(prebase.ProtoM21Object):
     <music21.stream.Part ...>
     '''
 
-    def __init__(self, spineId=0, eventList=None, streamClass=stream.Stream):
-        self.id = spineId
+    def __init__(self, spineId: int = 0, eventList=None, streamClass=stream.Stream):
+        self.id: int = spineId
         if eventList is None:
             eventList = []
         for event in eventList:
@@ -1054,8 +1055,8 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self.parentSpine = None
         self.newSpine = None
         self.isLastSpine = False
-        self.childSpines = []
-        self.childSpineInsertPoints = {}
+        self.childSpines: t.List[HumdrumSpine] = []
+        self.childSpineInsertPoints: t.Dict[int, t.Tuple[HumdrumSpine, ...]] = {}
 
         self.parsed = False
         self.measuresMoved = False
@@ -1064,7 +1065,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
         self._spineCollection = None
         self._spineType = None
 
-        self.isFirstVoice = None
+        self.isFirstVoice: t.Union[bool, None] = None
         self.iterIndex = None
 
     def _reprInternal(self):
@@ -1230,7 +1231,7 @@ class HumdrumSpine(prebase.ProtoM21Object):
             streamOut.append(currentMeasure)
 
         # move beginning stuff (Clefs, KeySig, etc.) to first measure...
-        measureElements = streamOut.getElementsByClass('Measure')
+        measureElements = streamOut.getElementsByClass(stream.Measure)
         if measureElements:
             m1 = measureElements[0]
             if not hasMeasureOne:  # pickup measure is not measure1
@@ -1291,7 +1292,7 @@ class KernSpine(HumdrumSpine):
     are kern notes
     '''
 
-    def __init__(self, spineId=0, eventList=None, streamClass=stream.Stream):
+    def __init__(self, spineId: int = 0, eventList=None, streamClass=stream.Stream):
         super().__init__(spineId, eventList, streamClass)
         self.lastContainer = None
         self.inTuplet = None
@@ -1340,8 +1341,10 @@ class KernSpine(HumdrumSpine):
             except Exception as e:  # pylint: disable=broad-except  # pragma: no cover
                 import traceback
                 environLocal.warn(
-                    "Error in parsing event (%r) at position %r for spine %r: %s" % (
-                        event.contents, event.position, event.spineId, str(e)))
+                    f'Error in parsing event ({event.contents!r}) '
+                    f'at position {event.position!r} '
+                    f'for spine {event.spineId}: {e}'
+                )
                 tb = traceback.format_exc()
                 environLocal.printDebug(f'Traceback for the exception: \n{tb}')
                 # traceback... environLocal.printDebug()
@@ -1536,7 +1539,7 @@ class SpineEvent(prebase.ProtoM21Object):
     '''
     A SpineEvent is an event in a HumdrumSpine or ProtoSpine.
 
-    It's .contents property contains the contents of the spine or
+    It's .contents property contains the contents of the spine, or
     it could be '.', in which case it means that a
     particular event appears after the last event in a different spine.
     It could also be "None" indicating that there is no event at all
@@ -1565,12 +1568,11 @@ class SpineEvent(prebase.ProtoM21Object):
     >>> n
     <music21.note.Note E->
     '''
-    protoSpineId = 0
-    spineId = None
-
     def __init__(self, contents=None, position=0):
         self.contents = contents
         self.position = position
+        self.protoSpineId: int = 0
+        self.spineId: t.Optional[int] = None
 
     def _reprInternal(self):
         return str(self.contents)
@@ -1580,7 +1582,7 @@ class SpineEvent(prebase.ProtoM21Object):
 
     def toNote(self, convertString=None):
         r'''
-        parse the object as a \*\*kern note and return the a
+        parse the object as a \*\*kern note and return a
         :class:`~music21.note.Note` object (or Rest, or Chord)
 
 
@@ -1631,7 +1633,7 @@ class SpineCollection(prebase.ProtoM21Object):
         self.iterIndex -= 1
         return thisSpine
 
-    def addSpine(self, streamClass: Type[stream.Stream] = stream.Part):
+    def addSpine(self, streamClass: t.Type[stream.Stream] = stream.Part):
         '''
         creates a new spine in the collection and returns it.
 
@@ -1756,7 +1758,7 @@ class SpineCollection(prebase.ProtoM21Object):
         firstStreamForEachInstrument = {}
         for thisSpine in self.spines:
             spineStream = thisSpine.stream
-            instrumentsStream = spineStream.getElementsByClass('Instrument')
+            instrumentsStream = spineStream.getElementsByClass(instrument.Instrument)
             if not instrumentsStream:
                 spineInstrument = None
             else:
@@ -1896,7 +1898,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 thisSpine.stream = thisSpine.moveElementsIntoMeasures(thisSpine.stream)
 
                 # fix tuplet groups
-                for m in thisSpine.stream.getElementsByClass('Measure'):
+                for m in thisSpine.stream.getElementsByClass(stream.Measure):
                     tf.setStream(m)
                     tupletGroups = tf.findTupletGroups(incorporateGroupings=True)
                     for tg in tupletGroups:
@@ -1916,7 +1918,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 continue
             if thisSpine.spineType != 'kern':
                 continue
-            for tandem in thisSpine.stream.getElementsByClass('MiscTandem'):
+            for tandem in thisSpine.stream.getElementsByClass(MiscTandem):
                 if not tandem.tandem.startswith('*staff'):
                     continue
                 staffInfo = int(tandem.tandem[6:])  # single staff
@@ -1931,7 +1933,7 @@ class SpineCollection(prebase.ProtoM21Object):
 
             stavesAppliedTo = []
             prioritiesToSearch = {}
-            for tandem in thisSpine.stream.recurse().getElementsByClass('MiscTandem'):
+            for tandem in thisSpine.stream[MiscTandem]:
                 if tandem.tandem.startswith('*staff'):
                     staffInfo = tandem.tandem[6:]  # could be multiple staves
                     stavesAppliedTo = [int(x) for x in staffInfo.split('/')]
@@ -1993,7 +1995,7 @@ class SpineCollection(prebase.ProtoM21Object):
             if thisSpine.spineType != 'kern' or thisSpine.parentSpine is not None:
                 continue
             thisStream = thisSpine.stream
-            for el in thisStream.getElementsByClass('Measure'):
+            for el in thisStream.getElementsByClass(stream.Measure):
                 hasVoices = False
                 lowestVoiceOffset = 0
                 for mEl in el:
@@ -2004,7 +2006,7 @@ class SpineCollection(prebase.ProtoM21Object):
                 if not hasVoices:
                     continue
 
-                voices: List[Optional[stream.Voice]] = [None for i in range(10)]
+                voices: t.List[t.Optional[stream.Voice]] = [None for i in range(10)]
                 measureElements = el.elements
                 for mEl in measureElements:
                     mElGroups = mEl.groups
@@ -2284,7 +2286,7 @@ def hdStringToNote(contents):
         # generic ornament
 
     # 3.2.4 Articulation Marks
-    if contents.count('\''):
+    if contents.count("'"):
         thisObject.articulations.append(articulations.Staccato())
     if contents.count('"'):
         thisObject.articulations.append(articulations.Pizzicato())
@@ -2355,7 +2357,7 @@ def hdStringToNote(contents):
             newTup.durationActual = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
             newTup.durationNormal = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
 
-            gcd = common.euclidGCD(int(dT), baseValue)
+            gcd = math.gcd(int(dT), int(baseValue))
             newTup.numberNotesActual = int(dT / gcd)
             newTup.numberNotesNormal = int(float(baseValue) / gcd)
 
@@ -2424,7 +2426,7 @@ def hdStringToMeasure(contents, previousMeasure=None):
 
     if contents.count('-'):
         barline.type = 'none'
-    elif contents.count('\''):
+    elif contents.count("'"):
         barline.type = 'short'
     elif contents.count('`'):
         barline.type = 'tick'
@@ -2584,12 +2586,12 @@ def kernTandemToObject(tandem):
         return MiscTandem(tandem)
         # TODO: DO SOMETHING WITH TRANSPOSING INSTRUMENTS; not in hum2xml
     elif tandem.startswith('*I'):  # order has to be last
-        instrument = tandem[2:]
+        instrumentStr = tandem[2:]
         try:
-            iObj = instruments.fromHumdrumInstrument(instrument)
+            iObj = instruments.fromHumdrumInstrument(instrumentStr)
             return iObj
         except instruments.HumdrumInstrumentException:
-            return MiscTandem(instrument)
+            return MiscTandem(instrumentStr)
     elif tandem.startswith('*k'):
         numSharps = tandem.count('#')
         if numSharps == 0:
@@ -2726,6 +2728,116 @@ class GlobalReference(base.Music21Object):
         if '@' in self.code:
             self.code, self.language = self.code.split('@')
 
+    humdrumKeyToUniqueName: dict = {
+        # dict value is music21's unique name or '' (if there is no supported equivalent)
+        # Authorship information:
+        'COM': 'composer',              # composer's name
+        'COA': 'attributedComposer',    # attributed composer
+        'COS': 'suspectedComposer',     # suspected composer
+        'COL': 'composerAlias',         # composer's abbreviated, alias, or stage name
+        'COC': 'composerCorporate',     # composer's corporate name
+        'CDT': '',  # composer's birth and death dates (**zeit format)
+        'CBL': '',  # composer's birth location
+        'CDL': '',  # composer's death location
+        'CNT': '',  # composer's nationality
+        'LYR': 'lyricist',  # lyricist's name
+        'LIB': 'librettist',    # librettist's name
+        'LAR': 'arranger',  # music arranger's name
+        'LOR': 'orchestrator',  # orchestrator's name
+        'TXO': 'textOriginalLanguage',  # original language of vocal/choral text
+        'TXL': 'textLanguage',  # language of the encoded vocal/choral text
+        # Recording information (if the Humdrum encodes information pertaining
+        # to an audio recording)
+        'TRN': 'translator',  # translator of the text
+        'RTL': '',  # album title
+        'RMM': 'manufacturer',  # manufacturer or sponsoring company
+        'RC#': '',  # recording company's catalog number of album
+        'RRD': 'dateIssued',  # release date (**date format)
+        'RLC': '',  # place of recording
+        'RNP': 'producer',  # producer's name
+        'RDT': '',  # date of recording (**date format)
+        'RT#': '',  # track number
+        # Performance information (if the Humdrum encodes, say, a MIDI performance)
+        'MGN': '',  # ensemble's name
+        'MPN': '',  # performer's name
+        'MPS': '',  # suspected performer
+        'MRD': '',  # date of performance (**date format)
+        'MLC': '',  # place of performance
+        'MCN': 'conductor',  # conductor's name
+        'MPD': '',  # date of first performance (**date format)
+        'MDT': '',  # unknown, but I've seen 'em (another way to say date of performance?)
+        # Work identification information
+        'OTL': 'title',  # title
+        'OTP': 'popularTitle',  # popular title
+        'OTA': 'alternativeTitle',  # alternative title
+        'OPR': 'parentTitle',  # title of parent work
+        'OAC': 'actNumber',  # act number (e.g. '2' or 'Act 2')
+        'OSC': 'sceneNumber',  # scene number (e.g. '3' or 'Scene 3')
+        'OMV': 'movementNumber',  # movement number (e.g. '4', or 'mov. 4', or...)
+        'OMD': 'movementName',  # movement name
+        'OPS': 'opusNumber',  # opus number (e.g. '23', or 'Opus 23')
+        'ONM': 'number',  # number (e.g. number of song within ABC multi-song file)
+        'OVM': 'volumeNumber',  # volume number (e.g. '6' or 'Vol. 6')
+        'ODE': 'dedicatedTo',  # dedicated to
+        'OCO': 'commission',  # commissioned by
+        'OCL': 'transcriber',  # collected/transcribed by
+        'ONB': '',  # free form note (nota bene) related to title or identity of work
+        'ODT': 'dateCreated',  # date or period of composition (**date or **zeit format)
+        'OCY': 'countryOfComposition',  # country of composition
+        'OPC': 'localeOfComposition',  # city, town, or village of composition
+        # Group information
+        'GTL': 'groupTitle',  # group title (e.g. 'The Seasons')
+        'GAW': 'associatedWork',  # associated work, such as a play or film
+        'GCO': 'collectionDesignation',  # collection designation (e.g. 'Norton Scores')
+        # Imprint information
+        'PUB': '',  # publication status 'published'/'unpublished'
+        'PED': '',  # publication editor
+        'PPR': 'firstPublisher',  # first publisher
+        'PDT': 'dateFirstPublished',  # date first published (**date format)
+        'PTL': 'publicationTitle',  # publication (volume) title
+        'PPP': 'placeFirstPublished',  # place first published
+        'PC#': 'publishersCatalogNumber',  # publisher's catalog number (NOT scholarly catalog)
+        'SCT': 'scholarlyCatalogAbbreviation',  # scholarly catalog abbrev/number (e.g. 'BWV 551')
+        'SCA': 'scholarlyCatalogName',  # scholarly catalog (unabbreviated) (e.g. 'Koechel 117')
+        'SMS': 'manuscriptSourceName',  # unpublished manuscript source name
+        'SML': 'manuscriptLocation',  # unpublished manuscript location
+        'SMA': 'manuscriptAccessAcknowledgement',  # acknowledgment of manuscript access
+        'YEP': 'electronicPublisher',  # publisher of electronic edition
+        'YEC': 'copyright',  # date and owner of electronic copyright
+        'YER': 'electronicReleaseDate',  # date electronic edition released
+        'YEM': '',  # copyright message (e.g. 'All rights reserved')
+        'YEN': '',  # country of copyright
+        'YOR': '',  # original document from which encoded document was prepared
+        'YOO': 'originalDocumentOwner',  # original document owner
+        'YOY': '',  # original copyright year
+        'YOE': 'originalEditor',  # original editor
+        'EED': 'electronicEditor',  # electronic editor
+        'ENC': 'electronicEncoder',  # electronic encoder (person)
+        'END': '',  # encoding date
+        'EMD': '',  # electronic document modification description (one per modificiation)
+        'EEV': '',  # electronic edition version
+        'EFL': '',  # file number e.g. '1/4' for one of four
+        'EST': '',  # encoding status (free form, normally eliminated prior to distribution)
+        'VTS': '',  # checksum (excluding the VTS line itself)
+        # Analytic information
+        'ACO': '',  # collection designation
+        'AFR': '',  # form designation
+        'AGN': '',  # genre designation
+        'AST': '',  # style, period, or type of work designation
+        'AMD': '',  # mode classification e.g. '5; Lydian'
+        'AMT': '',  # metric classification, must be one of eight specific names
+        'AIN': '',  # instrumentation; alphabetically ordered list of *I abbrevs, space-delimited
+        'ARE': '',  # geographical region of origin (list of 'narrowing down' names of regions)
+        'ARL': '',  # geographical location of origin (lat/long)
+        # Historical and background information
+        'HAO': '',  # aural history (lots of text, stories about the work)
+        'HTX': '',  # freeform translation of vocal text
+        # Representation information
+        'RLN': '',  # Extended ASCII language code
+        'RNB': '',  # a note about the representation
+        'RWB': ''  # a warning about the representation
+    }
+
     def updateMetadata(self, md):
         '''
         update a metadata object according to information in this GlobalReference
@@ -2734,41 +2846,16 @@ class GlobalReference(base.Music21Object):
         '''
         c = self.code
         v = self.value
-        wasParsed = True
 
-        contributorNames = {
-            'COM': 'composer',
-            'COA': 'attributed composer',
-            'COS': 'suspected composer',
-            'COL': 'composer alias',
-            'COC': 'corporate composer',
-            'LYR': 'lyricist',
-            'LIB': 'librettist',
-            'LAR': 'arranger',
-            'LOR': 'orchestrator',
-            'TRN': 'translator',
-            'YOO': 'original document owner',
-            'YOE': 'original editor',
-            'EED': 'electronic editor',
-            'ENC': 'electronic encoder'
-        }
-
-        if c in contributorNames:
-            contrib = metadata.Contributor()
-            contrib.role = contributorNames[c]
-            contrib.name = v
-            md.addContributor(contrib)
-
-        elif c.lower() in md.workIdAbbreviationDict:
-            md.setWorkId(c, v)
-
-        elif c == 'YEC':  # electronic edition copyright.
-            md.copyright = metadata.Copyright(v)
-
+        uniqueName: str = self.humdrumKeyToUniqueName.get(c, '')
+        if uniqueName:
+            md.add(uniqueName, v)
+        elif c in self.humdrumKeyToUniqueName:
+            # it's a humdrum key, but unsupported
+            md.addCustom('humdrum:' + c, v)
         else:
-            wasParsed = False
-
-        return wasParsed
+            # it's a free-form key
+            md.addCustom(c, v)
 
     def _reprInternal(self):
         return f'{self.code} {self.value!r}'
@@ -2932,7 +3019,7 @@ class Test(unittest.TestCase):
         s = hf1.stream  # .show()
         p = s.parts[2]  # last part has a comment
         comments = []
-        for c in p.flatten().getElementsByClass('SpineComment'):
+        for c in p[SpineComment]:
             comments.append(c.comment)
         self.assertTrue('spine comment' in comments)
         # s.show('text')
@@ -2969,7 +3056,7 @@ class Test(unittest.TestCase):
             32.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
             33.0: ('I in c minor', [0, 4, 7], 'C', 'C', 53, False)
         }
-        for harm in s.flatten().getElementsByClass('RomanNumeral'):
+        for harm in s.flatten().getElementsByClass(roman.RomanNumeral):
             figureAndKey = harm.figureAndKey
             pitchClasses = harm.pitchClasses
             root = harm.root().name
@@ -3024,7 +3111,7 @@ class Test(unittest.TestCase):
             42.0: ('V43 in a minor', [11, 2, 4, 8], 'E', 'B', 43, True),
             43.0: ('i in a minor', [9, 0, 4], 'A', 'A', 53, False)
         }
-        for harm in s.flatten().getElementsByClass('RomanNumeral'):
+        for harm in s.flatten().getElementsByClass(roman.RomanNumeral):
             figureAndKey = harm.figureAndKey
             pitchClasses = harm.pitchClasses
             root = harm.root().name
@@ -3046,6 +3133,7 @@ class Test(unittest.TestCase):
         hf1.parse()
         s = hf1.stream
         groundTruth = {
+            # Aug6, Italian, French, German
             0.0: (False, False, False, False),
             1.0: (False, False, False, False),
             2.0: (False, False, False, False),
@@ -3073,7 +3161,7 @@ class Test(unittest.TestCase):
             32.0: (False, False, False, False),
             33.0: (False, False, False, False)
         }
-        for harm in s.flatten().getElementsByClass('RomanNumeral'):
+        for harm in s.flatten().getElementsByClass(roman.RomanNumeral):
             isAugmentedSixth = harm.isAugmentedSixth()
             isItalianAugmentedSixth = harm.isItalianAugmentedSixth()
             isFrenchAugmentedSixth = harm.isFrenchAugmentedSixth()

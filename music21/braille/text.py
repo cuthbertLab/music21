@@ -3,9 +3,9 @@
 # Name:         text.py
 # Purpose:      music21 class which allows for accurate formatting of braille transcription
 # Authors:      Jose Cabal-Ugaz
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011, 2016 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest
@@ -118,10 +118,6 @@ class BrailleText(prebase.ProtoM21Object):
         '''
         Adds an expression long enough that it is split at
         each space symbol such that line wrapping could occur.
-
-
-        >>> bt = braille.text.BrailleText(lineLength=10)
-        >>>
         '''
         for brailleExpr in longExpr.split(symbols['space']):
             self.appendOrInsertCurrent(brailleExpr)
@@ -182,24 +178,23 @@ class BrailleText(prebase.ProtoM21Object):
             self.makeNewLine()
             self.currentLine.insert(2, brailleExpr)
 
-    # def addInaccord(self, inaccord):
-    #     addSpace = self.optionalAddKeyboardSymbolsAndDots(inaccord)
-    #
-    #     try:
-    #         self.currentLine.append(inaccord, addSpace=addSpace)
-    #     except BrailleTextException:
-    #         self.makeNewLine()
-    #         if self.rightHandSymbol or self.leftHandSymbol:
-    #             if self.rightHandSymbol:
-    #                 self.currentLine.insert(2, symbols['rh_keyboard'])
-    #             elif self.leftHandSymbol:
-    #                 self.currentLine.insert(2, symbols['lh_keyboard'])
-    #             for dot in yieldDots(inaccord[0]):
-    #                 self.currentLine.append(dot, addSpace=False)
-    #             self.currentLine.append(inaccord, addSpace=False)
-    #         else:
-    #             self.currentLine.insert(2, inaccord)
-    #     self.currentLine.containsNoteGrouping = True
+    def addInaccord(self, inaccord):
+        addSpace = self.optionalAddKeyboardSymbolsAndDots(inaccord)
+        try:
+            self.currentLine.append(inaccord, addSpace=addSpace)
+        except BrailleTextException:
+            self.makeNewLine()
+            if self.rightHandSymbol or self.leftHandSymbol:
+                if self.rightHandSymbol:
+                    self.currentLine.insert(2, symbols['rh_keyboard'])
+                elif self.leftHandSymbol:
+                    self.currentLine.insert(2, symbols['lh_keyboard'])
+                for dot in yieldDots(inaccord[0]):
+                    self.currentLine.append(dot, addSpace=False)
+                self.currentLine.append(inaccord, addSpace=False)
+            else:
+                self.currentLine.insert(2, inaccord)
+        self.currentLine.containsNoteGrouping = True
 
     def addMeasureNumber(self, measureNumber):
         '''
@@ -463,7 +458,7 @@ class BrailleTextLine(prebase.ProtoM21Object):
     >>> print(str(btl))
     ⠀⠈⠉
     '''
-    def __init__(self, lineLength=40):
+    def __init__(self, lineLength: int = 40):
         self.isHeading = False
         self.containsNoteGrouping = False
         self.lineLength = lineLength
@@ -635,7 +630,7 @@ class BrailleTextLine(prebase.ProtoM21Object):
         the last appender thought it would be helpful, such as
         to put more characters into a line.  But in case it
         is not, then this method will change that last character
-        to a space and set textLocation back one character
+        to a space and set textLocation back one character,
         so it is not printed.
 
         >>> bt = braille.text.BrailleTextLine(10)

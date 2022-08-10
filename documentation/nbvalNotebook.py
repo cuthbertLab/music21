@@ -9,9 +9,9 @@ Created on May 24, 2017
 import sys
 import subprocess
 # noinspection PyPackageRequirements
-import pytest  # @UnusedImport  # pylint: disable=unused-import,import-error
+import pytest  # pylint: disable=unused-import,import-error
 # noinspection PyPackageRequirements
-import nbval  # @UnusedImport  # pylint: disable=unused-import,import-error
+import nbval  # pylint: disable=unused-import,import-error
 
 from music21 import environment
 from music21 import common
@@ -35,7 +35,7 @@ def runAll():
 
 
     for f in goodFiles:
-        print("Running: ", str(f))
+        print('Running: ', str(f))
         try:
             retVal = runOne(f)
         except KeyboardInterrupt:

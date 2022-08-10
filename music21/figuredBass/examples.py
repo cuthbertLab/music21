@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         examples.py
-# Purpose:      music21 class which allows running of test cases
+# Purpose:      Figured bass test cases
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -73,8 +73,8 @@ def exampleA():
         :width: 700
     '''
     from music21 import converter
-    s = converter.parse("tinynotation: 3/2 C2 D2_6 E2_6 F2_6 C#2_b7,5,3 D2 "
-                        "BB2_#6,5,3 C2_6 AA#2_7,5,#3 BB1_6,4 BB2_7,#5,#3 E1.",
+    s = converter.parse('tinynotation: 3/2 C2 D2_6 E2_6 F2_6 C#2_b7,5,3 D2 '
+                        'BB2_#6,5,3 C2_6 AA#2_7,5,#3 BB1_6,4 BB2_7,#5,#3 E1.',
                         makeNotation=False)
     return realizer.figuredBassFromStream(s)
 
@@ -94,7 +94,6 @@ def exampleD():
     The following is a realization of fbLine in four parts using the default rules set.
     The soprano part is limited to stepwise motion, and the alto and tenor parts are
     limited to motions within a perfect octave.
-
 
     >>> from music21.figuredBass import rules
     >>> fbRules = rules.Rules()
@@ -138,8 +137,8 @@ def exampleD():
     '''
     from music21 import converter
     from music21 import key
-    s = converter.parse("tinynotation: 3/4 BB4 C#4_#6 D4_6 E2 E#4_7,5,#3 F#2_6,4 "
-                        "F#4_5,#3 G2 E4_6 F#2_6,4 E4_#4,2 D2_6 EE4_7,5,#3 AA2.",
+    s = converter.parse('tinynotation: 3/4 BB4 C#4_#6 D4_6 E2 E#4_7,5,#3 F#2_6,4 '
+                        'F#4_5,#3 G2 E4_6 F#2_6,4 E4_#4,2 D2_6 EE4_7,5,#3 AA2.',
                         makeNotation=False)
     s.insert(0, key.Key('b'))
     return realizer.figuredBassFromStream(s)
@@ -185,7 +184,7 @@ def exampleB():
     '''
     from music21 import converter
     from music21 import key
-    s = converter.parse("tinynotation: 4/4 D4 A4_7,5,#3 B-4 F4_6 G4_6 AA4_7,5,#3 D2",
+    s = converter.parse('tinynotation: 4/4 D4 A4_7,5,#3 B-4 F4_6 G4_6 AA4_7,5,#3 D2',
                         makeNotation=False)
     s.insert(0, key.Key('d'))
     return realizer.figuredBassFromStream(s)
@@ -231,7 +230,7 @@ def exampleC():
     '''
     from music21 import converter
     from music21 import key
-    s = converter.parse("tinynotation: 4/4 FF#4 GG#4_#6 AA4_6 FF#4 BB4_6,5 C#4_7,5,#3 F#2",
+    s = converter.parse('tinynotation: 4/4 FF#4 GG#4_#6 AA4_6 FF#4 BB4_6,5 C#4_7,5,#3 F#2',
                         makeNotation=False)
     s.insert(0, key.Key('f#'))
     return realizer.figuredBassFromStream(s)
@@ -253,7 +252,7 @@ def V43ResolutionExample():
     '''
     from music21 import converter
     from music21 import key
-    s = converter.parse("tinynotation: 4/4 D2 E2_4,3 D2_5,3 E2_4,3 F#1_6,3", makeNotation=False)
+    s = converter.parse('tinynotation: 4/4 D2 E2_4,3 D2_5,3 E2_4,3 F#1_6,3', makeNotation=False)
     s.insert(0, key.Key('D'))
     return realizer.figuredBassFromStream(s)
 
@@ -284,7 +283,7 @@ def viio65ResolutionExample():
     '''
     from music21 import converter
     from music21 import key
-    s = converter.parse("tinyNotation: 4/4 D2 E2_6,b5 D2 E2_6,b5 F#1_6", makeNotation=False)
+    s = converter.parse('tinyNotation: 4/4 D2 E2_6,b5 D2 E2_6,b5 F#1_6', makeNotation=False)
     s.insert(0, key.Key('D'))
     return realizer.figuredBassFromStream(s)
 
@@ -293,7 +292,6 @@ def augmentedSixthResolutionExample():
     '''
     This example was retrieved from page 61 of *The Music Theory Handbook* by Marjorie Merryman.
 
-
     Italian (8,#6,3), French (#6,4,3), German (#6,5,3), and Swiss (#6,#4,3)
     augmented sixth resolutions to
     either the major dominant or the major/minor tonic 6,4 are supported.
@@ -301,6 +299,7 @@ def augmentedSixthResolutionExample():
     resolutions to the dominant in the order above, while the last bar
     shows the German augmented sixth
     resolving to the tonic.
+
     >>> from music21.figuredBass import examples
     >>> fbLine = examples.augmentedSixthResolutionExample()
     >>> fbRealization = fbLine.realize()
@@ -311,9 +310,9 @@ def augmentedSixthResolutionExample():
     '''
     from music21 import converter
     from music21 import key
-    s = converter.parse("tinynotation: 4/4 D4 BB-4_8,#6,3 AA2_# D4 BB-4_#6,4,3 "
-                        "AA2_# D4 BB-4_#6,5,3 AA2_# D4 BB-4_#6,#4,3 AA2_# D4 "
-                        "BB-4_#6,5,3 AA2_6,4",
+    s = converter.parse('tinynotation: 4/4 D4 BB-4_8,#6,3 AA2_# D4 BB-4_#6,4,3 '
+                        'AA2_# D4 BB-4_#6,5,3 AA2_# D4 BB-4_#6,#4,3 AA2_# D4 '
+                        'BB-4_#6,5,3 AA2_6,4',
                         makeNotation=False)
     s.insert(0, key.Key('d'))
     return realizer.figuredBassFromStream(s)
@@ -359,7 +358,7 @@ def italianA6ResolutionExample():
     from music21 import converter
     from music21 import key
     s = converter.parse(
-        "tinynotation: D4 BB-4_#6,3 AA2_# D4 BB-4_#6,3 AA2_6,4 D4 BB-4_#6,3 AA2_#6,4",
+        'tinynotation: D4 BB-4_#6,3 AA2_# D4 BB-4_#6,3 AA2_6,4 D4 BB-4_#6,3 AA2_#6,4',
         makeNotation=False)
     s.insert(0, key.Key('d'))
     return realizer.figuredBassFromStream(s)
@@ -367,17 +366,11 @@ def italianA6ResolutionExample():
 
 def twelveBarBlues():
     '''
-    This is an progression in Bb major based on the twelve bar blues. The progression used is:
+    This is a progression in Bb major based on the twelve bar blues. The progression used is:
 
-
-    I  |  IV  |  I  |  I7
-
-
-    IV |  IV  |  I  |  I7
-
-
-    V7 |  IV6 |  I  |  I
-
+        I  |  IV  |  I  |  I7
+        IV |  IV  |  I  |  I7
+        V7 |  IV6 |  I  |  I
 
     >>> from music21.figuredBass import examples
     >>> from music21.figuredBass import rules
@@ -401,13 +394,13 @@ def twelveBarBlues():
     from music21 import converter
     from music21 import key
     s = converter.parse(
-        "tinynotation: BB-1 E-1 BB-1 BB-1_7 E-1 E-1 BB-1 BB-1_7 F1_7 G1_6 BB-1 BB-1",
+        'tinynotation: BB-1 E-1 BB-1 BB-1_7 E-1 E-1 BB-1 BB-1_7 F1_7 G1_6 BB-1 BB-1',
         makeNotation=False)
     s.insert(0, key.Key('B-'))
     return realizer.figuredBassFromStream(s)
 
 # -----------------------------------------------------------------
-# METHODS FOR GENERATION OF BLUES VAMPS
+# Functions that generate Boogie/Blues vamps.
 
 
 def generateBoogieVamp(blRealization=None, numRepeats=5):
@@ -436,7 +429,7 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
         blRealization = bluesLine.realize(fbRules)
 
     sampleScore = blRealization.generateRandomRealizations(numRepeats)
-    boogieBassLine = converter.parse("tinynotation: BB-8. D16 F8. G16 A-8. G16 F8. D16",
+    boogieBassLine = converter.parse('tinynotation: BB-8. D16 F8. G16 A-8. G16 F8. D16',
                                      makeNotation=False)
 
     newBassLine = stream.Part()
@@ -485,7 +478,7 @@ def generateTripletBlues(blRealization=None, numRepeats=5):  # 12/8
         blRealization = bluesLine.realize(fbRules)
 
     sampleScore = blRealization.generateRandomRealizations(numRepeats)
-    tripletBassLine = converter.parse("tinynotation: BB-4 BB-8 D4 D8 F4 F8 A-8 G8 F8",
+    tripletBassLine = converter.parse('tinynotation: BB-4 BB-8 D4 D8 F4 F8 A-8 G8 F8',
                                       makeNotation=False)
 
     newBassLine = stream.Part()
@@ -504,7 +497,7 @@ def generateTripletBlues(blRealization=None, numRepeats=5):  # 12/8
         newTopLine.append(sampleChordCopy)
 
     newScore = stream.Score()
-    newScore.append(meter.TimeSignature("12/8"))  # Time signature
+    newScore.append(meter.TimeSignature('12/8'))  # Time signature
     newScore.append(sampleScore[1][1])  # Key signature
     newScore.insert(0, newTopLine)
     newScore.insert(0, newBassLine)

@@ -68,12 +68,13 @@ class Test(unittest.TestCase):
         '''
         from music21 import articulations
         from music21 import converter
+        from music21 import stream
 
         partStream = converter.parse('dichterliebe1.xml')
         # for part in partStream.partData:
         # a part stream could have an iterator that partitions itself
         # into measure-length part streams
-        for measure in partStream.getElementsByClass('Measure')():  # () ?
+        for measure in partStream.getElementsByClass(stream.Measure)():  # () ?
             # measure is a partStream isolated for just the desired measure
             # assuming only one meter per measure
             meterObj = measure['meter']
@@ -93,7 +94,7 @@ class Test(unittest.TestCase):
 
     def xtest004(self):
         '''
-        Align and display all of the bass lines for all of the variations concurrently.
+        Align and display all the bass lines for all the variations concurrently.
         '''
         pass
 
@@ -112,11 +113,11 @@ class Test(unittest.TestCase):
 #            # pages might be represented as a stream of Page objects
 #            # this could be contained w/n a part stream
 #            pageStream = partStream['pages']
-#            # assuming we have have classes for things on pages, such as
+#            # assuming we have classes for things on pages, such as
 #            # titles and other tex annotations
 #            # here, we get these only from the first page
 #            titleCandidates += pageStream[0].getElementsByClass(TextAnnotation)
-#            # an additional slot might be used to store meta data, also
+#            # an additional slot might be used to store metadata, also
 #            # as a stream
 #            metaStream = partStream['meta']
 #            titleCandidates += metaStream.getElementsByClass(TextAnnotation)
@@ -128,7 +129,7 @@ class Test(unittest.TestCase):
 #    def xtest006(self):
 #        '''Amalgamate arpeggios into chords and display as notation.
 #
-#        How are the arpeggios delineated? Is it a a part with only arpeggios, or
+#        How are the arpeggios delineated? Is it a part with only arpeggios, or
 #        are they intermingled?
 #        '''
 #        from music21 import analysis
@@ -266,10 +267,10 @@ class Test(unittest.TestCase):
         # returns a list of Tuples intervals = interval.generateFromNotePairs(notePairs)
         intervals2 = defaultdict(lambda: 0)
         for thisInt in intervals2:
-            if thisInt.name != "P1":
+            if thisInt.name != 'P1':
                 intervals2[thisInt.name] += 1
 
-        for key in intervals2.sort(key='simpleName'):
+        for key in intervals2.keys().sort(key='simpleName'):
             print(key, intervals2[key])
 
     def test016(self):
@@ -426,7 +427,7 @@ class Test(unittest.TestCase):
 #     1.    Above G4 do higher pitches tend to be louder?
 #     2.    Add explicit breath marks after each phrase.
 #     3.    Add key velocities to some MIDI data that reflect accent levels arising from the meter.
-#     4.    Align and display all of the bass lines for all of the variations concurrently.
+#     4.    Align and display all the bass lines for all the variations concurrently.
 #     5.    Alphabetize a list of titles.
 #     6.    Amalgamate arpeggios into chords and display as notation.
 #     7.    Annotate a score identifying possible cadential 6-4 chords.
@@ -602,7 +603,7 @@ class Test(unittest.TestCase):
 #     147.    Extract the string parts and the oboe part.
 #     148.    Extract the tenor part from a score.
 #     149.    Extract the Trio section from a score.
-#     150.    Extract the upper-most part.
+#     150.    Extract the uppermost part.
 #     151.    Extract the vocal parts.
 #     152.    Extract the vocal text from a score.
 #     153.    Extract the woodwind parts from a score.

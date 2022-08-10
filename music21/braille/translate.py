@@ -4,7 +4,7 @@
 # Purpose:      music21 class which allows transcription of music21 data to braille
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -40,7 +40,7 @@ Keywords:
 
 
 The rest of the keywords are segment keywords. A segment is "a group of measures occupying
-more than one braille line." Music is divided into segments so as to "present the music to
+more than one braille line." Music is divided into segments to "present the music to
 the reader in a meaningful manner and to give him convenient reference points to use in
 memorization" (BMTM, 71). Some of these keywords are changed automatically in context.
 
@@ -92,8 +92,9 @@ memorization" (BMTM, 71). Some of these keywords are changed automatically in co
 import re
 import unittest
 
-from typing import Optional
+import typing as t
 
+from music21 import base
 from music21 import exceptions21
 from music21 import metadata
 from music21 import stream
@@ -104,8 +105,7 @@ from music21.braille import segment
 
 
 # -----------------------------------------------------------------------------
-
-def objectToBraille(music21Obj,
+def objectToBraille(music21Obj: base.Music21Object,
                     *,
                     inPlace=False,
                     debug=False,
@@ -118,7 +118,7 @@ def objectToBraille(music21Obj,
                     showFirstMeasureNumber=True,
                     showHand=None,
                     showHeading=True,
-                    showLongSlursAndTiesTogether: Optional[bool] = None,
+                    showLongSlursAndTiesTogether: t.Optional[bool] = None,
                     showShortSlursAndTiesTogether=False,
                     slurLongPhraseWithBrackets=True,
                     suppressOctaveMarks=False,
@@ -160,29 +160,25 @@ def objectToBraille(music21Obj,
     >>> print(translate.objectToBraille(sampleDynamic))
     ⠜⠋⠋⠋
 
-    Not currently supported: generic `stream.Stream` objects:
-
-    >>> sample_generic_stream = stream.Stream([note.Note()])
-    >>> translate.objectToBraille(sample_generic_stream)
-    Traceback (most recent call last):
-    music21.braille.translate.BrailleTranslateException: Stream cannot be translated to Braille.
-
-    OMIT_FROM_DOCS
-
-    Not currently working: extracting music from voices
-
     >>> sample_voice = stream.Voice([note.Note()])
     >>> sample_measure = stream.Measure([sample_voice])
     >>> print(translate.objectToBraille(sample_measure))
-    ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠁⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-    ⠼⠚
+    ⠀⠼⠁⠲⠀
+    ⠼⠚⠀⠐⠹
+
     >>> empty_measure = stream.Measure()
     >>> print(translate.objectToBraille(empty_measure))
     ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
     ⠼⠚
 
+    Not currently supported: generic `stream.Stream` objects or `stream.Voice` objects:
+
+    >>> sample_generic_stream = stream.Stream([note.Note()])
+    >>> translate.objectToBraille(sample_generic_stream)
+    Traceback (most recent call last):
+    music21.braille.translate.BrailleTranslateException: Stream cannot be translated to Braille.
     '''
-    if isinstance(music21Obj, stream.Stream) and not isinstance(music21Obj, stream.Voice):
+    if isinstance(music21Obj, (stream.Opus, stream.Score, stream.Part, stream.Measure)):
         return streamToBraille(music21Obj,
                                inPlace=inPlace,
                                debug=debug,
@@ -201,6 +197,8 @@ def objectToBraille(music21Obj,
                                suppressOctaveMarks=suppressOctaveMarks,
                                upperFirstInNoteFingering=upperFirstInNoteFingering,
                                )
+    elif isinstance(music21Obj, stream.Stream):
+        raise BrailleTranslateException('Stream cannot be translated to Braille.')
     else:
         music21Measure = stream.Measure()
         music21Measure.append(music21Obj)
@@ -223,7 +221,7 @@ def objectToBraille(music21Obj,
                                 upperFirstInNoteFingering=upperFirstInNoteFingering,
                                 )
 
-def streamToBraille(music21Stream,
+def streamToBraille(music21Stream: t.Union[stream.Measure, stream.Part, stream.Score, stream.Opus],
                     *,
                     inPlace=False,
                     debug=False,
@@ -236,14 +234,24 @@ def streamToBraille(music21Stream,
                     showFirstMeasureNumber=True,
                     showHand=None,
                     showHeading=True,
-                    showLongSlursAndTiesTogether: Optional[bool] = None,
+                    showLongSlursAndTiesTogether: t.Optional[bool] = None,
                     showShortSlursAndTiesTogether=False,
                     slurLongPhraseWithBrackets=True,
                     suppressOctaveMarks=False,
                     upperFirstInNoteFingering=True,
                     ):
     '''
-    Translates a :class:`~music21.stream.Stream` to braille.
+    Translates a :class:`~music21.stream.Measure`.
+    :class:`~music21.stream.Part`,
+    :class:`~music21.stream.Score`, or
+    :class:`~music21.stream.Opus` to braille.
+
+    Note: generic :class:`~music21.stream.Stream` instances are not supported.
+
+    >>> s = stream.Stream(note.Note())
+    >>> braille.translate.streamToBraille(s)
+    Traceback (most recent call last):
+    music21.braille.translate.BrailleTranslateException: Stream cannot be translated to Braille.
     '''
     if isinstance(music21Stream, stream.Part):
         return partToBraille(music21Stream,
@@ -283,26 +291,6 @@ def streamToBraille(music21Stream,
                                 suppressOctaveMarks=suppressOctaveMarks,
                                 upperFirstInNoteFingering=upperFirstInNoteFingering,
                                 )
-    keyboardParts = music21Stream.getElementsByClass(stream.PartStaff)
-    if len(keyboardParts) == 2:
-        return keyboardPartsToBraille(music21Stream,
-                                      inPlace=inPlace,
-                                      debug=debug,
-                                      cancelOutgoingKeySig=cancelOutgoingKeySig,
-                                      descendingChords=descendingChords,
-                                      dummyRestLength=dummyRestLength,
-                                      maxLineLength=maxLineLength,
-                                      segmentBreaks=segmentBreaks,
-                                      showClefSigns=showClefSigns,
-                                      showFirstMeasureNumber=showFirstMeasureNumber,
-                                      showHand=showHand,
-                                      showHeading=showHeading,
-                                      showLongSlursAndTiesTogether=showLongSlursAndTiesTogether,
-                                      showShortSlursAndTiesTogether=showShortSlursAndTiesTogether,
-                                      slurLongPhraseWithBrackets=slurLongPhraseWithBrackets,
-                                      suppressOctaveMarks=suppressOctaveMarks,
-                                      upperFirstInNoteFingering=upperFirstInNoteFingering,
-                                      )
     elif isinstance(music21Stream, stream.Score):
         return scoreToBraille(music21Stream,
                               inPlace=inPlace,
@@ -341,6 +329,30 @@ def streamToBraille(music21Stream,
                              suppressOctaveMarks=suppressOctaveMarks,
                              upperFirstInNoteFingering=upperFirstInNoteFingering,
                              )
+    # Prior to v7.3, generic `Stream` instances containing two and only two stream.PartStaff
+    # objects representing one keyboard instrument were permitted.
+    # The following call maintains backward compatibility,
+    # even though this functionality is not documented or promised.
+    keyboardParts = music21Stream.getElementsByClass(stream.PartStaff)
+    if len(keyboardParts) == 2:
+        return scoreToBraille(music21Stream,
+                              inPlace=inPlace,
+                              debug=debug,
+                              cancelOutgoingKeySig=cancelOutgoingKeySig,
+                              descendingChords=descendingChords,
+                              dummyRestLength=dummyRestLength,
+                              maxLineLength=maxLineLength,
+                              segmentBreaks=segmentBreaks,
+                              showClefSigns=showClefSigns,
+                              showFirstMeasureNumber=showFirstMeasureNumber,
+                              showHand=showHand,
+                              showHeading=showHeading,
+                              showLongSlursAndTiesTogether=showLongSlursAndTiesTogether,
+                              showShortSlursAndTiesTogether=showShortSlursAndTiesTogether,
+                              slurLongPhraseWithBrackets=slurLongPhraseWithBrackets,
+                              suppressOctaveMarks=suppressOctaveMarks,
+                              upperFirstInNoteFingering=upperFirstInNoteFingering,
+                              )
     raise BrailleTranslateException('Stream cannot be translated to Braille.')
 
 
@@ -357,7 +369,7 @@ def scoreToBraille(music21Score,
                    showFirstMeasureNumber=True,
                    showHand=None,
                    showHeading=True,
-                   showLongSlursAndTiesTogether: Optional[bool] = None,
+                   showLongSlursAndTiesTogether: t.Optional[bool] = None,
                    showShortSlursAndTiesTogether=False,
                    slurLongPhraseWithBrackets=True,
                    suppressOctaveMarks=False,
@@ -368,9 +380,15 @@ def scoreToBraille(music21Score,
     '''
     allBrailleLines = []
     for music21Metadata in music21Score.getElementsByClass(metadata.Metadata):
-        allBrailleLines.append(metadataToString(music21Metadata, returnBrailleUnicode=True))
-    for p in music21Score.getElementsByClass(stream.Part):
-        braillePart = partToBraille(p,
+        allBrailleLines.append(metadataToString(music21Metadata, returnBrailleUnicode=not debug))
+
+    unprocessed_partStaff: t.Optional[stream.PartStaff] = None
+
+    def process_unmatched_part_staff_as_single_part():
+        nonlocal unprocessed_partStaff
+        if unprocessed_partStaff is None:
+            return
+        braillePrt2 = partToBraille(unprocessed_partStaff,
                                     inPlace=inPlace,
                                     debug=debug,
                                     cancelOutgoingKeySig=cancelOutgoingKeySig,
@@ -388,7 +406,60 @@ def scoreToBraille(music21Score,
                                     suppressOctaveMarks=suppressOctaveMarks,
                                     upperFirstInNoteFingering=upperFirstInNoteFingering,
                                     )
-        allBrailleLines.append(braillePart)
+        allBrailleLines.append(braillePrt2)
+        unprocessed_partStaff = None
+
+    for p in music21Score.getElementsByClass(stream.Part):  # also finds stream.PartStaff
+        if isinstance(p, stream.PartStaff):
+            if unprocessed_partStaff is not None:
+                keyboard_parts = keyboardPartsToBraille(
+                    stream.Score([unprocessed_partStaff, p]),
+                    inPlace=inPlace,
+                    debug=debug,
+                    cancelOutgoingKeySig=cancelOutgoingKeySig,
+                    descendingChords=descendingChords,
+                    dummyRestLength=dummyRestLength,
+                    maxLineLength=maxLineLength,
+                    segmentBreaks=segmentBreaks,
+                    showClefSigns=showClefSigns,
+                    showFirstMeasureNumber=showFirstMeasureNumber,
+                    showHand=showHand,
+                    showHeading=showHeading,
+                    showLongSlursAndTiesTogether=showLongSlursAndTiesTogether,
+                    showShortSlursAndTiesTogether=showShortSlursAndTiesTogether,
+                    slurLongPhraseWithBrackets=slurLongPhraseWithBrackets,
+                    suppressOctaveMarks=suppressOctaveMarks,
+                    upperFirstInNoteFingering=upperFirstInNoteFingering,
+                )
+                allBrailleLines.append(keyboard_parts)
+                unprocessed_partStaff = None
+            else:
+                unprocessed_partStaff = p
+                continue
+        else:
+            process_unmatched_part_staff_as_single_part()
+            braillePart = partToBraille(p,
+                                        inPlace=inPlace,
+                                        debug=debug,
+                                        cancelOutgoingKeySig=cancelOutgoingKeySig,
+                                        descendingChords=descendingChords,
+                                        dummyRestLength=dummyRestLength,
+                                        maxLineLength=maxLineLength,
+                                        segmentBreaks=segmentBreaks,
+                                        showClefSigns=showClefSigns,
+                                        showFirstMeasureNumber=showFirstMeasureNumber,
+                                        showHand=showHand,
+                                        showHeading=showHeading,
+                                        showLongSlursAndTiesTogether=showLongSlursAndTiesTogether,
+                                        showShortSlursAndTiesTogether=showShortSlursAndTiesTogether,
+                                        slurLongPhraseWithBrackets=slurLongPhraseWithBrackets,
+                                        suppressOctaveMarks=suppressOctaveMarks,
+                                        upperFirstInNoteFingering=upperFirstInNoteFingering,
+                                        )
+            allBrailleLines.append(braillePart)
+
+    process_unmatched_part_staff_as_single_part()
+
     return '\n'.join(allBrailleLines)
 
 
@@ -396,29 +467,46 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
     '''
     >>> from music21.braille import translate
     >>> corelli = corpus.parse('monteverdi/madrigal.3.1.rntxt')
-    >>> mdObject = corelli.getElementsByClass('Metadata').first()
+    >>> mdObject = corelli.getElementsByClass(metadata.Metadata).first()
     >>> mdObject.__class__
     <class 'music21.metadata.Metadata'>
     >>> print(translate.metadataToString(mdObject))
     Alternative Title: 3.1
+    Composer: Claudio Monteverdi
     Title: La Giovinetta Pianta
 
     >>> print(translate.metadataToString(mdObject, returnBrailleUnicode=True))
     ⠠⠁⠇⠞⠑⠗⠝⠁⠞⠊⠧⠑⠀⠠⠞⠊⠞⠇⠑⠒⠀⠼⠉⠲⠁
+    ⠠⠉⠕⠍⠏⠕⠎⠑⠗⠒⠀⠠⠉⠇⠁⠥⠙⠊⠕⠀⠠⠍⠕⠝⠞⠑⠧⠑⠗⠙⠊
     ⠠⠞⠊⠞⠇⠑⠒⠀⠠⠇⠁⠀⠠⠛⠊⠕⠧⠊⠝⠑⠞⠞⠁⠀⠠⠏⠊⠁⠝⠞⠁
     '''
     allBrailleLines = []
-    for key in music21Metadata._workIds:
-        value = music21Metadata._workIds[key]
-        if value is not None:
-            n = ' '.join(re.findall(r'([A-Z]*[a-z]+)', key))
-            outString = f'{n.title()}: {value}'
-            if returnBrailleUnicode:
-                outTemp = []
-                for word in outString.split():
-                    outTemp.append(wordToBraille(word))
-                outString = alphabet[' '].join(outTemp)
-            allBrailleLines.append(outString)
+    for uniqueName, value in music21Metadata.all(returnPrimitives=True, returnSorted=False):
+        if value is None:
+            # we don't put None values in braille output
+            continue
+
+        if uniqueName == 'software':
+            # we don't put software versions in braille output
+            continue
+
+        namespaceName: t.Optional[str] = music21Metadata.uniqueNameToNamespaceName(uniqueName)
+        if not namespaceName:
+            # we don't put custom metadata in braille output
+            continue
+
+        if namespaceName.startswith('m21FileInfo:'):
+            # we don't put fileInfo in braille output
+            continue
+
+        n = ' '.join(re.findall(r'([A-Z]*[a-z]+)', uniqueName))
+        outString = f'{n.title()}: {value}'
+        if returnBrailleUnicode:
+            outTemp = []
+            for word in outString.split():
+                outTemp.append(wordToBraille(word))
+            outString = alphabet[' '].join(outTemp)
+        allBrailleLines.append(outString)
     return '\n'.join(sorted(allBrailleLines))
 
 
@@ -435,7 +523,7 @@ def opusToBraille(music21Opus,
                   showFirstMeasureNumber=True,
                   showHand=None,
                   showHeading=True,
-                  showLongSlursAndTiesTogether: Optional[bool] = None,
+                  showLongSlursAndTiesTogether: t.Optional[bool] = None,
                   showShortSlursAndTiesTogether=False,
                   slurLongPhraseWithBrackets=True,
                   suppressOctaveMarks=False,
@@ -482,7 +570,7 @@ def measureToBraille(music21Measure,
                      showFirstMeasureNumber=False,  # observe False!
                      showHand=None,
                      showHeading=False,  # observe False!
-                     showLongSlursAndTiesTogether: Optional[bool] = None,
+                     showLongSlursAndTiesTogether: t.Optional[bool] = None,
                      showShortSlursAndTiesTogether=False,
                      slurLongPhraseWithBrackets=True,
                      suppressOctaveMarks=False,
@@ -544,7 +632,7 @@ def partToBraille(music21Part,
                   showFirstMeasureNumber=True,
                   showHand=None,
                   showHeading=True,
-                  showLongSlursAndTiesTogether: Optional[bool] = None,
+                  showLongSlursAndTiesTogether: t.Optional[bool] = None,
                   showShortSlursAndTiesTogether=False,
                   slurLongPhraseWithBrackets=True,
                   suppressOctaveMarks=False,
@@ -604,7 +692,7 @@ def keyboardPartsToBraille(keyboardScore,
                            showFirstMeasureNumber=True,
                            showHand=None,
                            showHeading=True,
-                           showLongSlursAndTiesTogether: Optional[bool] = None,
+                           showLongSlursAndTiesTogether: t.Optional[bool] = None,
                            showShortSlursAndTiesTogether=False,
                            slurLongPhraseWithBrackets=True,
                            suppressOctaveMarks=False,
@@ -708,6 +796,12 @@ class Test(unittest.TestCase):
         s = converter.parse('tinyNotation: 2/4 c4 d e f8 g a2 B2 c4. d8 e2')
         x = objectToBraille(s, maxLineLength=10)
         self.assertEqual([len(line) for line in x.splitlines()], [10, 10, 7, 10])
+
+    def testFullScoreWithPiano(self):
+        from music21 import corpus
+        s = corpus.parse('beach')
+        full_score_measure_1 = s.measure(1)
+        _ = objectToBraille(full_score_measure_1)
 
 
 if __name__ == '__main__':

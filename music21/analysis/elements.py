@@ -3,9 +3,9 @@
 # Name:         analysis/elements.py
 # Purpose:      Tools for analyzing general elements
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017-22 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import collections
@@ -19,14 +19,18 @@ def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.
 
     >>> from music21 import corpus
     >>> bach = corpus.parse('bach/bwv324.xml')
-    >>> bachIter = bach.parts[0].recurse().getElementsByClass('Note')
+    >>> bachIter = bach.parts[0].recurse().getElementsByClass(note.Note)
     >>> qlCount = analysis.elements.attributeCount(bachIter, 'quarterLength')
     >>> qlCount.most_common(3)
     [(1.0, 12), (2.0, 11), (4.0, 2)]
 
-    Changed in 4.0: Returns a collections.Counter object.
+    Changed in v4: Returns a collections.Counter object.
     '''
-    post = collections.Counter()
+    # TODO: when 3.9 is the minimum version, set return code to collections.Counter[t.Any]
+    # above, and replace next line with this:
+    # post: collections.Counter[t.Any] = collections.Counter()
+
+    post: collections.Counter = collections.Counter()
     for e in streamOrStreamIter:
         if hasattr(e, attrName):
             k = getattr(e, attrName)

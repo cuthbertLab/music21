@@ -5,9 +5,9 @@
 #
 # Authors:      Christopher Ariza
 #               Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -169,7 +169,7 @@ def parse(workName,
             number=None,
             fileExtensions=None,
             forceSource=False,
-            format=None  # @ReservedAssignment
+            format=None
           ):
     filePath = getWork(workName=workName,
                         movementNumber=movementNumber,
@@ -362,17 +362,33 @@ def listSearchFields():
     >>> for field in corpus.manager.listSearchFields():
     ...     field
     ...
-    'actNumber'
-    'alternativeTitle'
-    'ambitus'
-    'associatedWork'
-    'collectionDesignation'
-    'commission'
+    'abstract'
+    'accessRights'
+    'accompanyingMaterialWriter'
+    ...
     'composer'
-    'copyright'
+    'composerAlias'
+    'composerCorporate'
+    'conceptor'
+    'conductor'
+    ...
+    'dateCreated'
+    'dateFirstPublished'
+    'dateIssued'
+    'dateModified'
+    'dateSubmitted'
+    'dateValid'
+    ...
+    'tempoFirst'
+    'tempos'
+    'textLanguage'
+    'textOriginalLanguage'
+    'timeSignatureFirst'
+    'timeSignatures'
+    'title'
     ...
     '''
-    return tuple(sorted(metadata.RichMetadata.searchAttributes))
+    return metadata.bundles.MetadataBundle.listSearchFields()
 
 # -----------------------------------------------------------------------------
 

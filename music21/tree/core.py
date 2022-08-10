@@ -4,9 +4,9 @@
 # Purpose:      Core AVLTree object.  To be optimized the hell out of.
 #
 # Authors:      Josiah Wolf Oberholtzer
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2013-16 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -16,8 +16,9 @@ These are the lowest level tools for working with self-balancing AVL trees.
 There's an overhead to creating an AVL tree, but for a large score it is
 absolutely balanced by having O(log n) search times.
 '''
-from typing import Optional
+import typing as t
 
+from music21 import prebase
 from music21.exceptions21 import TreeException
 from music21 import common
 
@@ -58,7 +59,7 @@ class AVLNode(common.SlottedObjectMixin):
         'rightChild',
     )
 
-    _DOC_ATTR = {
+    _DOC_ATTR: t.Dict[str, str] = {
         'balance': '''
         Returns the current state of the difference in heights of the
         two subtrees rooted on this node.
@@ -475,7 +476,7 @@ class AVLNode(common.SlottedObjectMixin):
 
 # ---------------------------------------------------------------------------
 
-class AVLTree:
+class AVLTree(prebase.ProtoM21Object):
     r'''
     Data structure for working with tree.node.AVLNode objects.
 
@@ -512,7 +513,7 @@ class AVLTree:
         <AVLNode: Start:12 Height:0 L:None R:None>
 
         Note: for this example to be stable, we can't shuffle the nodes, since there are
-        numerous different possible configurations that meet the AVLTree constraints, some
+        numerous possible configurations that meet the AVLTree constraints, some
         of height 2 and some of height 3
         '''
         def recurse(node):
@@ -527,13 +528,14 @@ class AVLTree:
         return recurse(self.rootNode)
 
     def populateFromSortedList(self, listOfTuples):
+        # noinspection PyShadowingNames
         '''
         Populate this tree from a sorted list of two-tuples of (position, payload).
 
         This is about an order of magnitude faster (3ms vs 21ms for 1000 items;
         31 vs. 300ms for 10,000 items) than running createNodeAtPosition()
         for each element in a list if it is
-        already sorted.  Thus it should be used when converting a
+        already sorted.  Thus, it should be used when converting a
         Stream where .isSorted is True into a tree.
 
         This method assumes that the current tree is empty (or will be wiped) and
@@ -548,14 +550,14 @@ class AVLTree:
         >>> listOfTuples = [(i, str(i)) for i in range(1000)]
         >>> listOfTuples[10]
         (10, '10')
-        >>> t = tree.core.AVLTree()
-        >>> t.rootNode is None
+        >>> avlTree = tree.core.AVLTree()
+        >>> avlTree.rootNode is None
         True
-        >>> t.populateFromSortedList(listOfTuples)
-        >>> t.rootNode
+        >>> avlTree.populateFromSortedList(listOfTuples)
+        >>> avlTree.rootNode
         <AVLNode: Start:500 Height:9 L:8 R:8>
 
-        >>> n = t.rootNode
+        >>> n = avlTree.rootNode
         >>> while n is not None:
         ...    print(n, repr(n.payload))
         ...    n = n.leftChild
@@ -570,7 +572,7 @@ class AVLTree:
         <AVLNode: Start:1 Height:1 L:0 R:0> '1'
         <AVLNode: Start:0 Height:0 L:None R:None> '0'
         '''
-        def recurse(subListOfTuples) -> Optional[AVLNode]:
+        def recurse(subListOfTuples) -> t.Optional[AVLNode]:
             '''
             Divide and conquer.
             '''
@@ -786,7 +788,7 @@ class AVLTree:
         >>> score = corpus.parse('bwv66.6')
         >>> scoreTree = score.asTimespans()
 
-        100 is beyond the end so it will get the last node in piece
+        100 is beyond the end, so it will get the last node in piece.
 
         >>> scoreTree.getNodeBefore(100)
         <OffsetNode 36.0 Indices:191,191,195,195 Length:4>

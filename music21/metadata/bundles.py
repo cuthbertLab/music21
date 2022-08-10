@@ -4,11 +4,11 @@
 # Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Josiah Oberholtzer
 #
 # Copyright:    Copyright © 2010, 2012-14, '17, '19-20
-#               Michael Scott Cuthbert and the music21 Project
+#               Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 import gzip
@@ -66,7 +66,7 @@ class MetadataEntry(prebase.ProtoM21Object):
     The metadata property contains its :class:`~music21.metadata.RichMetadata` object:
 
     >>> metadataEntry.metadata
-    <music21.metadata.RichMetadata id=0x...>
+    <music21.metadata.RichMetadata object at 0x...>
 
     Note that the id is not necessarily the current memory location.
 
@@ -1058,34 +1058,23 @@ class MetadataBundle(prebase.ProtoM21Object):
         >>> for field in metadata.bundles.MetadataBundle.listSearchFields():
         ...     field
         ...
-        'actNumber'
-        'alternativeTitle'
-        'ambitus'
-        'associatedWork'
-        'collectionDesignation'
-        'commission'
+        'abstract'
+        'accessRights'
+        'accompanyingMaterialWriter'
+        ...
         'composer'
-        'copyright'
-        'countryOfComposition'
-        'date'
-        'dedication'
-        'groupTitle'
-        'keySignatureFirst'
-        'keySignatures'
-        'localeOfComposition'
-        'movementName'
-        'movementNumber'
-        'noteCount'
-        'number'
-        'numberOfParts'
-        'opusNumber'
-        'parentTitle'
-        'pitchHighest'
-        'pitchLowest'
-        'popularTitle'
-        'quarterLength'
-        'sceneNumber'
-        'sourcePath'
+        'composerAlias'
+        'composerCorporate'
+        'conceptor'
+        'conductor'
+        ...
+        'dateCreated'
+        'dateFirstPublished'
+        'dateIssued'
+        'dateModified'
+        'dateSubmitted'
+        'dateValid'
+        ...
         'tempoFirst'
         'tempos'
         'textLanguage'
@@ -1093,10 +1082,14 @@ class MetadataBundle(prebase.ProtoM21Object):
         'timeSignatureFirst'
         'timeSignatures'
         'title'
-        'volume'
+        ...
         '''
         from music21 import metadata
-        return tuple(sorted(metadata.RichMetadata.searchAttributes))
+        return tuple(sorted(
+            metadata.properties.ALL_UNIQUE_NAMES
+            + metadata.properties.ALL_MUSIC21_WORK_IDS
+            + list(metadata.RichMetadata.additionalRichMetadataAttributes)
+        ))
 
     def read(self, filePath=None):
         r'''
@@ -1325,7 +1318,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
             validatedPaths.add(metadataEntry.sourcePath)
         for key in invalidatedKeys:
-            del(self._metadataEntries[key])
+            del self._metadataEntries[key]
         message = f'MetadataBundle: finished validating in {timer} seconds.'
         environLocal.printDebug(message)
         return len(invalidatedKeys)

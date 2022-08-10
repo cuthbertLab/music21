@@ -55,7 +55,7 @@ Install Jupyter with::
 
     pip3 install jupyter
 
-And then run it by changing directory to the direction you want to edit and run::
+And then run it by changing directory to the one you want to edit and run::
 
     jupyter notebook
 

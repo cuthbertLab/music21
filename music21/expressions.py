@@ -1,30 +1,32 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         expressions.py
-# Purpose:      notation mods
+# Purpose:      Expressions such as Fermatas, etc.
 #
-# Authors:      Michael Scott Cuthbert
+# Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #               Neena Parikh
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module provides object representations of expressions, that is
 notational symbols such as Fermatas, Mordents, Trills, Turns, etc.
-which are stored under a Music21Object's .expressions attribute
+which are stored under a Music21Object's .expressions attribute.
 
-It also includes representations of things such as TextExpressions which
-are better attached to the Stream itself.
+A sub-category of Expressions are Ornaments.
 
-TODO: replace .size with a string representing interval and then
-    create interval.Interval objects only when necessary.
+Unlike articulations, expressions can be attached to the Stream itself.
+For instance, TextExpressions.
 '''
+# TODO: replace .size with a string representing interval and then
+#     create interval.Interval objects only when necessary.
+
 import copy
 import string
 import unittest
-from typing import List, Optional, Tuple
+import typing as t
 
 from music21 import base
 from music21 import common
@@ -41,7 +43,6 @@ def realizeOrnaments(srcObject):
     given a Music21Object with Ornament expressions,
     convert them into a list of objects that represents
     the performed version of the object:
-
 
     >>> n1 = note.Note('D5')
     >>> n1.quarterLength = 1
@@ -168,7 +169,7 @@ class RehearsalMark(Expression):
         return repr(self.content)
 
     @staticmethod
-    def _getNumberingFromContent(c) -> Optional[str]:
+    def _getNumberingFromContent(c) -> t.Optional[str]:
         '''
         if numbering was not set, get it from the content
 
@@ -310,6 +311,11 @@ class TextExpression(Expression):
     >>> te = expressions.TextExpression('Con fuoco')
     >>> te.content
     'Con fuoco'
+
+    Most configuration of style is done
+    on the `.style` :class:`~music21.style.TextStyle` object
+    itself.
+
     >>> te.style.fontSize = 24.0
     >>> te.style.fontSize
     24
@@ -322,8 +328,17 @@ class TextExpression(Expression):
     classSortOrder = -30
     _styleClass = style.TextStyle
 
-    _DOC_ATTR = {
-        'placement': "Staff placement: 'above', 'below', or None.",
+    _DOC_ATTR: t.Dict[str, str] = {
+        'placement': '''
+            Staff placement: 'above', 'below', or None.
+
+            A setting of None implies that the placement will be determined
+            by notation software and no particular placement is demanded.
+
+            This is not placed in the `.style` property, since for some
+            expressions, the placement above or below an object has semantic
+            meaning and is not purely presentational.
+            ''',
     }
 
     def __init__(self, content=None):
@@ -336,8 +351,6 @@ class TextExpression(Expression):
         else:
             self._content = content
 
-        self._enclosure = None
-
         # this does not do anything if default y is defined
         self.placement = None
 
@@ -349,6 +362,38 @@ class TextExpression(Expression):
             return repr(self._content)
         else:
             return ''
+
+    @property
+    def enclosure(self) -> t.Optional[style.Enclosure]:
+        '''
+        Returns or sets the enclosure on the Style object
+        stored on .style.
+
+        Exposed directly on the expression for backwards
+        compatibility.  Does not create a .style object if
+        one does not exist and the value is None.
+
+        >>> te = expressions.TextExpression('Bridge')
+        >>> te.enclosure is None
+        True
+        >>> te.enclosure = style.Enclosure.RECTANGLE
+        >>> te.enclosure
+        <Enclosure.RECTANGLE>
+
+        Note that this is also set on `.style`.
+
+        >>> te.style.enclosure
+        <Enclosure.RECTANGLE>
+        '''
+        if not self.hasStyleInformation:
+            return None
+        return self.style.enclosure
+
+    @enclosure.setter
+    def enclosure(self, value: t.Optional[style.Enclosure]):
+        if not self.hasStyleInformation and value is None:
+            return
+        self.style.enclosure = value
 
     def _getContent(self):
         return self._content
@@ -387,7 +432,7 @@ class TextExpression(Expression):
                 # this will transfer all positional/formatting settings
                 re.setTextExpression(copy.deepcopy(self))
                 return re
-        # if cannot be expressed as a repeat expression
+        # Return None if it cannot be expressed as a repeat expression
         return None
 
     def getTempoText(self):
@@ -417,7 +462,7 @@ class Ornament(Expression):
     def fillListOfRealizedNotes(
         self,
         srcObj: 'music21.note.Note',
-        fillObjects: List['music21.note.Note'],
+        fillObjects: t.List['music21.note.Note'],
         transposeInterval
     ):
         '''
@@ -495,7 +540,7 @@ class GeneralMordent(Ornament):
             transposeInterval = self.size.reverse()
         else:
             transposeInterval = self.size
-        mordNotes = []
+        mordNotes: t.List['music21.note.Note'] = []
         self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
@@ -693,7 +738,7 @@ class Trill(Ornament):
     def realize(
         self,
         srcObj: 'music21.note.Note'
-    ) -> Tuple[List['music21.note.Note'], None, List['music21.note.Note']]:
+    ) -> t.Tuple[t.List['music21.note.Note'], None, t.List['music21.note.Note']]:
         '''
         realize a trill.
 
@@ -808,12 +853,13 @@ class Trill(Ornament):
         if self.nachschlag:
             numberOfTrillNotes -= 2
 
-        trillNotes = []
+        trillNotes: t.List['music21.note.Note'] = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval)
 
         currentKeySig = None
-        if self._setAccidentalFromKeySig:
+        setAccidentalFromKeySig = self._setAccidentalFromKeySig
+        if setAccidentalFromKeySig:
             currentKeySig = srcObj.getContextByClass(key.KeySignature)
             if currentKeySig is None:
                 currentKeySig = key.KeySignature(0)
@@ -834,7 +880,7 @@ class Trill(Ornament):
             secondNoteNachschlag.transpose(transposeIntervalReverse,
                                            inPlace=True)
 
-            if self._setAccidentalFromKeySig:
+            if setAccidentalFromKeySig and currentKeySig:
                 firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
                     firstNoteNachschlag.step)
                 secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
@@ -1153,19 +1199,17 @@ class Tremolo(Ornament):
     A tremolo ornament represents a single-note tremolo, whether measured or unmeasured.
 
     >>> n = note.Note(type='quarter')
-    >>> t = expressions.Tremolo()
-    >>> t.measured = True  # default
-    >>> t.numberOfMarks = 3  # default
+    >>> trem = expressions.Tremolo()
+    >>> trem.measured = True  # default
+    >>> trem.numberOfMarks = 3  # default
 
-
-    >>> t.numberOfMarks = 'Hi'
+    >>> trem.numberOfMarks = 'Hi'
     Traceback (most recent call last):
     music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
 
-    >>> t.numberOfMarks = -1
+    >>> trem.numberOfMarks = -1
     Traceback (most recent call last):
     music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
-
 
     TODO: (someday) realize triplet Tremolos, etc. differently from other tremolos.
     TODO: deal with unmeasured tremolos.
@@ -1200,22 +1244,22 @@ class Tremolo(Ornament):
         Realize the ornament
 
         >>> n = note.Note(type='quarter')
-        >>> t = expressions.Tremolo()
-        >>> t.measured = True  # default
-        >>> t.numberOfMarks = 3  # default
-        >>> t.realize(n)
+        >>> trem = expressions.Tremolo()
+        >>> trem.measured = True  # default
+        >>> trem.numberOfMarks = 3  # default
+        >>> trem.realize(n)
         ([<music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>,
           <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>,
           <music21.note.Note C>, <music21.note.Note C>], None, [])
-        >>> c2 = t.realize(n)[0]
+        >>> c2 = trem.realize(n)[0]
         >>> [ts.quarterLength for ts in c2]
         [0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125]
 
         Same thing with Streams:
 
         >>> n = note.Note(type='quarter')
-        >>> t = expressions.Tremolo()
-        >>> n.expressions.append(t)
+        >>> trem = expressions.Tremolo()
+        >>> n.expressions.append(trem)
         >>> s = stream.Stream()
         >>> s.append(n)
         >>> s.show('text')
@@ -1233,7 +1277,7 @@ class Tremolo(Ornament):
         {0.875} <music21.note.Note C>
 
 
-        >>> t.numberOfMarks = 1
+        >>> trem.numberOfMarks = 1
         >>> y = stream.makeNotation.realizeOrnaments(s)
         >>> y.show('text')
         {0.0} <music21.note.Note C>
@@ -1263,7 +1307,6 @@ class Fermata(Expression):
     To override this (for Fermatas or for any
     expression) set .tieAttach to 'all' or 'first'
     instead of 'last'.
-
 
     >>> p1 = stream.Part()
     >>> p1.append(meter.TimeSignature('6/8'))
@@ -1308,8 +1351,9 @@ class TrillExtension(spanner.Spanner):
     >>> print(te)
     <music21.expressions.TrillExtension <music21.note.Note C><music21.note.Note C>>
     '''
-    # musicxml defines a start, stop, and a continue; will try to avoid continue
-    # note that this always includes a trill symbol
+    # musicxml defines a "start", "stop", and a "continue" type;
+    # We will try to avoid "continue".
+    # N.B. this extension always includes a trill symbol
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
@@ -1333,6 +1377,9 @@ class TrillExtension(spanner.Spanner):
         >>> te.placement = 'above'
         >>> te.placement
         'above'
+
+        A setting of None implies that the placement will be determined
+        by notation software and no particular placement is demanded.
         ''')
 
 
@@ -1352,7 +1399,8 @@ class TremoloSpanner(spanner.Spanner):
     Traceback (most recent call last):
     music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
     '''
-    # musicxml defines a start, stop, and a continue; will try to avoid continue
+    # musicxml defines a "start", "stop", and a "continue" type.
+    # We will try to avoid using the "continue" type.
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
@@ -1376,6 +1424,93 @@ class TremoloSpanner(spanner.Spanner):
             self._numberOfMarks = num
         except ValueError as ve:
             raise TremoloException('Number of marks must be a number from 0 to 8') from ve
+
+
+class ArpeggioMark(Expression):
+    '''
+    ArpeggioMark must be applied to a Chord (not to a single Note).
+
+    The parameter arpeggioType can be 'normal' (a squiggly line), 'up' (a squiggly line
+    with an up arrow), 'down' (a squiggly line with a down arrow), or 'non-arpeggio' (a
+    bracket instead of a squiggly line, used to indicate a non-arpeggiated chord
+    intervening in a sequence of arpeggiated ones).
+
+    >>> am = expressions.ArpeggioMark('normal')
+    >>> am.type
+    'normal'
+
+    >>> am = expressions.ArpeggioMark('down')
+    >>> am.type
+    'down'
+    '''
+    def __init__(self, arpeggioType: t.Optional[str] = None):
+        super().__init__()
+        if arpeggioType is None:
+            arpeggioType = 'normal'
+        if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
+            raise ValueError(
+                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
+            )
+        self.type = arpeggioType
+
+
+class ArpeggioMarkSpanner(spanner.Spanner):
+    '''
+    ArpeggioMarkSpanner is a multi-staff or multi-voice (i.e. multi-chord) arpeggio.
+    The spanner should contain all the simultaneous Chords that are to be
+    arpeggiated together.  If there is only one arpeggiated note in a particular staff
+    or voice (i.e. the rest are in other staves/voices), then in that case only the
+    spanner can contain a Note.  Do not ever put a Note that is within a Chord into a
+    spanner; put the Chord in instead.  And do not ever put an ArpeggioMark in a note
+    or chord's .expressions.
+
+    The parameter arpeggioType can be 'normal' (a squiggly line), 'up' (a squiggly line
+    with an up arrow), 'down' (a squiggly line with a down arrow), or 'non-arpeggio' (a
+    bracket instead of a squiggly line, used to indicate a non-arpeggiated multi-chord
+    intervening in a sequence of arpeggiated ones).
+
+    >>> ams = expressions.ArpeggioMarkSpanner(arpeggioType='non-arpeggio')
+    >>> c1 = chord.Chord('C3 E3 G3')
+    >>> c2 = chord.Chord('C4 E4 G4')
+    >>> ams.addSpannedElements([c1, c2])
+    >>> ams.type
+    'non-arpeggio'
+    >>> ams
+    <music21.expressions.ArpeggioMarkSpanner
+     <music21.chord.Chord C3 E3 G3><music21.chord.Chord C4 E4 G4>>
+    '''
+    def __init__(self, *arguments, **keywords):
+        super().__init__(*arguments, **keywords)
+        arpeggioType: t.Optional[str] = keywords.get('arpeggioType', None)
+        if arpeggioType is None:
+            arpeggioType = 'normal'
+        if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
+            raise ValueError(
+                'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
+            )
+        self.type = arpeggioType
+
+    def noteExtremes(self) -> t.Tuple[t.Optional['music21.note.Note'],
+                                      t.Optional['music21.note.Note']]:
+        '''
+        Return the lowest and highest note spanned by the element,
+        extracting them from Chords if need be.
+
+        >>> ch = chord.Chord(['C4', 'E4', 'G4'])
+        >>> n = note.Note('C#3')
+        >>> nonArp = expressions.ArpeggioMarkSpanner([ch, n])
+        >>> nonArp.noteExtremes()
+        (<music21.note.Note C#>, <music21.note.Note G>)
+        '''
+        from music21 import chord
+        from music21 import note
+        notes = []
+        for n_or_ch in self:
+            if isinstance(n_or_ch, note.Note):
+                notes.append(n_or_ch)
+            elif isinstance(n_or_ch, chord.Chord):
+                notes.extend(n_or_ch.notes)
+        return (min(notes), max(notes))
 
 
 # ------------------------------------------------------------------------------
@@ -1532,7 +1667,7 @@ class Test(unittest.TestCase):
         unp = note.Unpitched()
         mord = Mordent()
         with self.assertRaises(TypeError):
-            mord.realize(unp)
+            mord.realize(unp)  # type: ignore
 
 
 # class TestExternal(unittest.TestCase):

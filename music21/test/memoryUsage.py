@@ -4,7 +4,8 @@ from music21 import corpus
 
 if __name__ == '__main__':
     try:
-        import guppy
+        # noinspection PyPackageRequirements
+        import guppy  # type: ignore
     except ImportError:
         raise exceptions21.Music21Exception('memoryUsage.py requires guppy')
 

@@ -4,10 +4,10 @@
 # Purpose:      Neo-Riemannian Chord Transformations
 #
 # Authors:      Maura Church
-#               Michael Scott Cuthbert
+#               Michael Scott Asato Cuthbert
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2017-19 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2017-19 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -23,8 +23,7 @@ from music21 import chord
 from music21.analysis import enharmonics
 
 from music21 import environment
-_MOD = 'analysis.neoRiemannian'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('analysis.neoRiemannian')
 
 # TODO: change doctests from passing on exceptions to raising them and trapping them.
 
@@ -33,6 +32,7 @@ class LRPException(exceptions21.Music21Exception):
     pass
 
 def _simplerEnharmonics(c):
+    # noinspection PyShadowingNames
     '''
     Returns a copy of chord `c` with pitches simplified.
 
@@ -195,6 +195,7 @@ def _singlePitchTransform(c, transposeInterval, changingPitch):
 # ------------------------------------------------------------------------------
 
 def isNeoR(c1, c2, transforms='LRP'):
+    # noinspection PyShadowingNames
     '''
     Tests if two chords are related by a single L, P, R transformation,
     and returns that transform if so (otherwise, False).
@@ -252,6 +253,7 @@ def isNeoR(c1, c2, transforms='LRP'):
     return False  # If neither an exception, nor any of the called L, R, or P transforms
 
 def isChromaticMediant(c1, c2):
+    # noinspection PyShadowingNames
     '''
     Tests if there is a chromatic mediant relation between two chords
     and returns the type if so (otherwise, False).
@@ -299,7 +301,7 @@ def LRP_combinations(c,
     orthography).
 
     By default, `leftOrdered` is False, so transformations progress towards the right.
-    Thus 'LPR' will start by transforming the chord by L, then P, then R.
+    Thus, 'LPR' will start by transforming the chord by L, then P, then R.
 
     If `leftOrdered` is True, the operations work in the opposite direction (right to left), so
     'LPR' indicates the result of the chord transformed by R, then P, then L.
@@ -307,7 +309,7 @@ def LRP_combinations(c,
     `simplifyEnharmonics` replaces multiple sharps and flats where they arise from
     combined transformations with the simpler enharmonic equivalent (e.g. C for D--).
     If simplifyEnharmonics is True, the resulting chord will be simplified
-    to notes with at most 1 flat or 1 sharp, in their most common form.
+    to a collection of notes with at most 1 flat or 1 sharp, in their most common form.
 
     >>> c1 = chord.Chord('C4 E4 G4')
     >>> c2 = analysis.neoRiemannian.LRP_combinations(c1, 'LP')
@@ -337,7 +339,7 @@ def LRP_combinations(c,
     >>> c6
     <music21.chord.Chord G#4 B#3 D#5>
 
-    Optionally: return all of the chords creating by the given string in order.
+    Optionally: return all chords creating by the given string in order.
 
     >>> c7 = chord.Chord('C4 E4 G4')
     >>> c8 = analysis.neoRiemannian.LRP_combinations(
@@ -437,42 +439,43 @@ def completeHexatonic(c, simplifyEnharmonics=False, raiseException=True):
                 'Cannot perform transformations on this chord: not a major or minor triad')
 
 def hexatonicSystem(c):
+    # noinspection GrazieInspection
     '''
-    Returns a lowercase string representing the
-    "hexatonic system" that the chord `c` belongs to
-    as classified by Richard Cohn, "Maximally Smooth Cycles,
-    Hexatonic Systems, and the Analysis of Late-Romantic
-    Triadic Progressions," *Music Analysis*, 15.1 (1996), 9-40,
-    at p. 17.  Possible values are 'northern', 'western', 'eastern', or 'southern'
+        Returns a lowercase string representing the
+        "hexatonic system" that the chord `c` belongs to
+        as classified by Richard Cohn, "Maximally Smooth Cycles,
+        Hexatonic Systems, and the Analysis of Late-Romantic
+        Triadic Progressions," *Music Analysis*, 15.1 (1996), 9-40,
+        at p. 17.  Possible values are 'northern', 'western', 'eastern', or 'southern'
 
-    >>> cMaj = chord.Chord('C E G')
-    >>> analysis.neoRiemannian.hexatonicSystem(cMaj)
-    'northern'
+        >>> cMaj = chord.Chord('C E G')
+        >>> analysis.neoRiemannian.hexatonicSystem(cMaj)
+        'northern'
 
-    >>> gMin = chord.Chord('G B- D')
-    >>> analysis.neoRiemannian.hexatonicSystem(gMin)
-    'western'
+        >>> gMin = chord.Chord('G B- D')
+        >>> analysis.neoRiemannian.hexatonicSystem(gMin)
+        'western'
 
-    Each chord in the :func:`~music21.analysis.neoRiemannian.completeHexatonic` of that chord
-    is in the same hexatonic system, by definition or tautology.
+        Each chord in the :func:`~music21.analysis.neoRiemannian.completeHexatonic` of that chord
+        is in the same hexatonic system, by definition or tautology.
 
-    >>> for ch in analysis.neoRiemannian.completeHexatonic(cMaj):
-    ...     print(analysis.neoRiemannian.hexatonicSystem(ch))
-    northern
-    northern
-    northern
-    northern
-    northern
-    northern
+        >>> for ch in analysis.neoRiemannian.completeHexatonic(cMaj):
+        ...     print(analysis.neoRiemannian.hexatonicSystem(ch))
+        northern
+        northern
+        northern
+        northern
+        northern
+        northern
 
-    Note that the classification looks only at the
-    pitch class of the root of the chord.  Seventh chords,
-    diminished triads, etc. will also be classified.
+        Note that the classification looks only at the
+        pitch class of the root of the chord.  Seventh chords,
+        diminished triads, etc. will also be classified.
 
-    >>> dDom65 = chord.Chord('F#4 D5 A5 C6')
-    >>> analysis.neoRiemannian.hexatonicSystem(dDom65)
-    'southern'
-    '''
+        >>> dDom65 = chord.Chord('F#4 D5 A5 C6')
+        >>> analysis.neoRiemannian.hexatonicSystem(dDom65)
+        'southern'
+        '''
     root = c.root()
     rootPC = root.pitchClass
 

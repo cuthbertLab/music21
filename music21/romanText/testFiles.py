@@ -5,19 +5,20 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Objects for processing roman numeral analysis text files,
 as defined and demonstrated by Dmitri Tymoczko.
 '''
+import typing as t
 import unittest
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
-monteverdi_3_13 = """
+monteverdi_3_13 = '''
 Composer: Claudio Monteverdi
 Madrigal: 3.13
 Title: Ch'io non t'ami, cor mio
@@ -113,10 +114,10 @@ m101 III b4 i6
 m102 VII
 m103 I
 m107 V
-"""
+'''
 
 
-riemenschneider001 = """Composer: J. S. Bach
+riemenschneider001 = '''Composer: J. S. Bach
 BWV: 269
 Title: Aus meines Herzens Grunde
 
@@ -178,10 +179,10 @@ m19 V6 b3 IV6
 
 m20 vi b2 ii6/5 b3 V b3.5 V7
 
-m21 I"""
+m21 I'''
 
 
-swv23 = """Composer: Heinrich Schutz
+swv23 = '''Composer: Heinrich Schutz
 Piece: Warum toben die Heiden, Psalmen Davids no. 2, SWV 23
 Analyst: Saraswathi Shukla
 Proofreader:
@@ -340,9 +341,9 @@ m134 b2 g: i
 m137 V b2 V6 b2.5 i
 m138 V
 m139 I
-"""
+'''
 
-mozartK279 = """Composer: Mozart
+mozartK279 = '''Composer: Mozart
 Piece: K279
 Analyst: Dmitri Tymoczko
 Proofreader: David Castro
@@ -635,7 +636,7 @@ m146 ii6 b2 I6/4 b2.5 V
 m147-156 = m46-55
 m157 I b2 V7
 m158 I
-"""
+'''
 
 mozartK283_2_opening = '''Composer: Mozart
 Piece: K283
@@ -699,7 +700,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = []
+_DOC_ORDER: t.List[type] = []
 
 
 if __name__ == '__main__':

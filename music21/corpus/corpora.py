@@ -5,14 +5,14 @@
 #
 # Authors:      Josiah Wolf Oberholtzer
 #
-# Copyright:    Copyright © 2009-2012, 2014 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2009-2012, 2014 Michael Scott Asato Cuthbert and the music21
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 
 import abc
 import pathlib
-from typing import List
+import typing as t
 
 from music21 import common
 # from music21.corpus import virtual
@@ -43,9 +43,9 @@ class Corpus(prebase.ProtoM21Object):
     _allExtensions = tuple(common.flattenList([common.findInputExtension(x)
                                                for x in _acceptableExtensions]))
 
-    _pathsCache = {}
+    _pathsCache: t.Dict[t.Tuple[str, t.Tuple[str]], pathlib.Path] = {}
 
-    _directoryInformation = ()  # a tuple of triples -- see coreCorpus
+    _directoryInformation: t.Union[t.Tuple[()], t.Sequence[t.Tuple[str, str, bool]]] = ()
 
     parseUsingCorpus = True
 
@@ -62,12 +62,12 @@ class Corpus(prebase.ProtoM21Object):
                 keysToRemove.append(key)
 
         for key in keysToRemove:
-            del(Corpus._pathsCache[key])
+            del Corpus._pathsCache[key]
 
     def _findPaths(
         self,
         rootDirectoryPath: pathlib.Path,
-        fileExtensions: List[str]
+        fileExtensions: t.List[str]
     ):
         '''
         Given a root filePath file path, recursively search all contained paths
@@ -81,7 +81,7 @@ class Corpus(prebase.ProtoM21Object):
 
         Generally cached.
         '''
-        rdp = common.cleanpath(rootDirectoryPath, returnPathlib=True)
+        rdp = t.cast(pathlib.Path, common.cleanpath(rootDirectoryPath, returnPathlib=True))
         matched = []
 
         for filename in sorted(rdp.rglob('*')):
@@ -376,7 +376,7 @@ class Corpus(prebase.ProtoM21Object):
     @property
     def directoryInformation(self):
         '''
-        Returns a tuple of DirectoryInformation objects for a
+        Returns a tuple of DirectoryInformation objects for
         each directory in self._directoryInformation.
 
         >>> core = corpus.corpora.CoreCorpus()
@@ -513,7 +513,7 @@ class CoreCorpus(Corpus):
 
     # noinspection SpellCheckingInspection
     _directoryInformation = (  # filepath, composer/collection name, isComposer
-        ('airdsAirs', 'Aird\'s Airs', False),
+        ('airdsAirs', "Aird's Airs", False),
         ('bach', 'Johann Sebastian Bach', True),
         ('beach', 'Amy Beach', True),
         ('beethoven', 'Ludwig van Beethoven', True),
@@ -533,9 +533,9 @@ class CoreCorpus(Corpus):
         ('monteverdi', 'Claudio Monteverdi', True),
         ('mozart', 'Wolfgang Amadeus Mozart', True),
         ('nottingham-dataset', 'Nottingham Music Database (partial)', False),
-        ('oneills1850', 'Oneill\'s 1850 Collection', False),
+        ('oneills1850', "Oneill's 1850 Collection", False),
         ('palestrina', 'Giovanni Palestrina', True),
-        ('ryansMammoth', 'Ryan\'s Mammoth Collection', False),
+        ('ryansMammoth', "Ryan's Mammoth Collection", False),
         ('schoenberg', 'Arnold Schoenberg', True),
         ('schubert', 'Franz Schubert', True),
         ('schumann', 'Robert Schumann', True),
@@ -569,7 +569,7 @@ class CoreCorpus(Corpus):
         extension provided by an argument.
 
         If `expandExtensions` is True, a format for an extension, and related
-        extensions, will replaced by all known input extensions.
+        extensions, will be replaced by all known input extensions.
 
         This is convenient when an input format might match for multiple
         extensions.
@@ -688,7 +688,7 @@ class LocalCorpus(Corpus):
 
     # CLASS VARIABLES #
 
-    _temporaryLocalPaths = {}
+    _temporaryLocalPaths: t.Dict[str, set] = {}
 
     parseUsingCorpus = False
     # INITIALIZER #
@@ -846,16 +846,30 @@ class LocalCorpus(Corpus):
 
         If that path is included in the list of persisted paths for the given
         corpus, it will be removed permanently.
+
+        >>> testCorpus = corpus.corpora.LocalCorpus(name='test')
+        >>> testCorpus.addPath('~/Desktop')
+        >>> len(testCorpus.directoryPaths)
+        1
+        >>> testCorpus.removePath('~/Desktop')
+        >>> testCorpus.directoryPaths
+        ()
+
+        TODO: test for corpus persisted to disk without actually reindexing
+        files on user's Desktop.
         '''
         temporaryPaths = LocalCorpus._temporaryLocalPaths.get(
             self.name, [])
-        directoryPath = common.cleanpath(directoryPath)
-        if directoryPath in temporaryPaths:
-            temporaryPaths.remove(directoryPath)
+        directoryPathObj: pathlib.Path = common.cleanpath(directoryPath, returnPathlib=True)
+        if directoryPathObj in temporaryPaths:
+            temporaryPaths.remove(directoryPathObj)
+        # Also need string version because LocalCorpusSettings is a list-like
+        # container of strings (see comments in environment.py)
+        directoryPathStr = str(directoryPathObj)
         if self.existsInSettings:
             settings = self._getSettings()
-            if settings is not None and directoryPath in settings:
-                settings.remove(directoryPath)
+            if settings is not None and directoryPathStr in settings:
+                settings.remove(directoryPathStr)
             self.save()
         self._removeNameFromCache(self.name)
 
