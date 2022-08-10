@@ -24,7 +24,7 @@ from music21 import environment
 from music21 import exceptions21
 
 
-environLocal = environment.Environment("tree.spans")
+environLocal = environment.Environment('tree.spans')
 # -----------------------------------------------------------------------------
 
 
@@ -162,7 +162,7 @@ class Timespan:
                 or (other.endTime == self.offset)):
             message = f'Cannot merge {self} with {other}: not contiguous'
             return (False, message)
-        return (True, "")
+        return (True, '')
 
     def mergeWith(self, other):
         r'''

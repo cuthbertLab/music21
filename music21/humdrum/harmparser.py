@@ -63,7 +63,7 @@ def convertHarmToRoman(harmStr):
     if not harm:
         return None
 
-    if harm['root'] == "Gn":
+    if harm['root'] == 'Gn':
         degree = 'Ger'
         harm['intervals'] = ['7']
     elif harm['root'] == 'Lt':

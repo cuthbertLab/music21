@@ -513,7 +513,7 @@ class CoreCorpus(Corpus):
 
     # noinspection SpellCheckingInspection
     _directoryInformation = (  # filepath, composer/collection name, isComposer
-        ('airdsAirs', 'Aird\'s Airs', False),
+        ('airdsAirs', "Aird's Airs", False),
         ('bach', 'Johann Sebastian Bach', True),
         ('beach', 'Amy Beach', True),
         ('beethoven', 'Ludwig van Beethoven', True),
@@ -533,9 +533,9 @@ class CoreCorpus(Corpus):
         ('monteverdi', 'Claudio Monteverdi', True),
         ('mozart', 'Wolfgang Amadeus Mozart', True),
         ('nottingham-dataset', 'Nottingham Music Database (partial)', False),
-        ('oneills1850', 'Oneill\'s 1850 Collection', False),
+        ('oneills1850', "Oneill's 1850 Collection", False),
         ('palestrina', 'Giovanni Palestrina', True),
-        ('ryansMammoth', 'Ryan\'s Mammoth Collection', False),
+        ('ryansMammoth', "Ryan's Mammoth Collection", False),
         ('schoenberg', 'Arnold Schoenberg', True),
         ('schubert', 'Franz Schubert', True),
         ('schumann', 'Robert Schumann', True),

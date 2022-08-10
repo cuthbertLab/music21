@@ -559,12 +559,12 @@ def nearestMultiple(n: float, unit: float) -> t.Tuple[float, float, float]:
 
     >>> common.nearestMultiple(-0.5, 0.125)
     Traceback (most recent call last):
-    ValueError: n (-0.5) is less than zero. Thus cannot find the nearest
+    ValueError: n (-0.5) is less than zero. Thus, cannot find the nearest
         multiple for a value less than the unit, 0.125
     '''
     if n < 0:
         raise ValueError(f'n ({n}) is less than zero. '
-                         + 'Thus cannot find the nearest multiple for a value '
+                         + 'Thus, cannot find the nearest multiple for a value '
                          + f'less than the unit, {unit}')
 
     mult = math.floor(n / unit)  # can start with the floor
@@ -640,7 +640,7 @@ def decimalToTuplet(decNum: float) -> t.Tuple[int, int]:
     ZeroDivisionError: number must be greater than zero
     '''
     def findSimpleFraction(inner_working):
-        'Utility function.'
+        '''Utility function.'''
         for index in range(1, 1000):
             for j in range(index, index * 2):
                 if isclose(inner_working, j / index, abs_tol=1e-7):

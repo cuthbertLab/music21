@@ -53,9 +53,9 @@ def makeBrailleDictionary():
         bList = []
         for pos, trueOrFalse in enumerate(bTuple):
             posBackOffset = 6 - pos
-            bList.append(str(posBackOffset) if trueOrFalse is True else "")
+            bList.append(str(posBackOffset) if trueOrFalse is True else '')
         bText = ''.join(reversed(bList))
-        bVal = int(bText) if bText != "" else 0
+        bVal = int(bText) if bText != '' else 0
         currentStrValue = chr(_BRAILLE_START + i)
         braille_dict[bVal] = currentStrValue
         # print(bVal, currentStrValue)
@@ -409,7 +409,7 @@ ascii_chars = {
     _B[1]: 'A',
     _B[2]: '1',
     _B[12]: 'B',
-    _B[3]: '\'',
+    _B[3]: "'",  # single quote
     _B[13]: 'K',
     _B[23]: '2',
     _B[123]: 'L',

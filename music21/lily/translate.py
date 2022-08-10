@@ -145,7 +145,7 @@ class LilypondConverter:
                    'start-repeat': '|:',
                    'end-repeat': ':|',
                    # no music21 support for |.| lightHeavyLight yet
-                   'tick': '\'',
+                   'tick': "'",
                    # 'short': '',  # no lilypond support??
                    'none': '',
                    }
@@ -1521,7 +1521,7 @@ class LilypondConverter:
             octaveModChars = ',' * correctedOctave  # C2 = c,  C1 = c,,
         else:
             correctedOctave = implicitOctave - 3
-            octaveModChars = '\'' * correctedOctave  # C4 = c', C5 = c''  etc.
+            octaveModChars = "'" * correctedOctave  # C4 = c', C5 = c''  etc.
         return octaveModChars
 
     def lyMultipliedDurationFromDuration(

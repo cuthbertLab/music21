@@ -129,7 +129,7 @@ class VexflowPickler:
     def splitLongJSON(self, jsonString, chunkSize=110):
         allJSONList = []
         for i in range(0, len(jsonString), chunkSize):
-            allJSONList.append('\'' + jsonString[i:i + chunkSize] + '\'')
+            allJSONList.append("'" + jsonString[i:i + chunkSize] + "'")
         return ' + \n    '.join(allJSONList)
 
     def getLoadTemplate(self, urls=None):

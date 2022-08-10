@@ -3714,11 +3714,11 @@ class Test(unittest.TestCase):
         self.assertEqual(str(unitSpec(d)), "(Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')")
 
     def testTupletDurations(self):
-        """
+        '''
         Test tuplet durations are assigned with proper duration
 
         This test was written while adding support for dotted tuplet notes
-        """
+        '''
         # Before the fix, the duration was "Quarter Tuplet of 5/3rds (3/5 QL)"
         self.assertEqual(
             'Eighth Triplet (1/3 QL)',
