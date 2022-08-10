@@ -2882,15 +2882,12 @@ class PartExporter(XMLExporterBase):
                 part.makeBeams(inPlace=True)
             except exceptions21.StreamException as se:  # no measures or no time sig?
                 warnings.warn(MusicXMLWarning, str(se))
-        # Should we always make tuplet brackets, since
-        # splitAtDurations() may have created some?
-        # this was a merge conflict from another place (MSAC)
-        # leaving with older version that checks streamStatus.tuplets
-        # first
-        if not part.streamStatus.tuplets:
-            for m in measures:
-                for m_or_v in [m, *m.voices]:
-                    stream.makeNotation.makeTupletBrackets(m_or_v, inPlace=True)
+        # tuplets should be processed anyway (affected by earlier makeRests)
+        # technically, beams could be affected also, but we don't want to destroy
+        # existing beam information (e.g. single-syllable vocal flags)
+        for m in measures:
+            for m_or_v in [m, *m.voices]:
+                stream.makeNotation.makeTupletBrackets(m_or_v, inPlace=True)
 
         if not self.spannerBundle:
             self.spannerBundle = part.spannerBundle
