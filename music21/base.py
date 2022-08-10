@@ -2454,7 +2454,7 @@ class Music21Object(prebase.ProtoM21Object):
             if activeSite is None:
                 # it has died since last visit, as is the case with short-lived streams like
                 # .getElementsByClass, so we will return the most recent position
-                return self._activeSiteStoredOffset or 0
+                return self._activeSiteStoredOffset or 0.0
 
             try:
                 o = activeSite.elementOffset(self)

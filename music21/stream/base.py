@@ -12635,8 +12635,8 @@ class Measure(Stream):
         # position; paddingRight defines a QL from the end of the time signature
         # to the last valid offset
         # paddingLeft is used to define pickup/anacrusis bars
-        self.paddingLeft = 0
-        self.paddingRight = 0
+        self.paddingLeft: OffsetQL = 0.0
+        self.paddingRight: OffsetQL = 0.0
 
         self.numberSuffix = None  # for measure 14a would be 'a'
         if 'number' in keywords:
