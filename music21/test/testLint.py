@@ -120,7 +120,7 @@ def main(fnAccept=None, strict=False):
         'consider-using-dict-items',  # readability improvement depends on excellent variable names
 
         'invalid-name',      # these are good music21 names; fix the regexp instead...
-        'no-self-use',       # maybe later
+        # 'no-self-use',       # no-self-use was moved to an optional extension
         'too-few-public-methods',  # never remove or set to 1
 
         'trailing-whitespace',  # should ignore blank lines with tabs
