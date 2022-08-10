@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -16,8 +16,8 @@ by advanced programmers who need the highest speed in programming.
 
 Nothing here promises to be stable.  The music21 team can make
 any changes here for efficiency reasons while being considered
-backwards compatible so long as the public methods that call this
-remain stable.
+backwards compatible so long as the public methods that call these
+methods remain stable.
 
 All functions here will eventually begin with `.core`.
 '''
@@ -514,7 +514,7 @@ class StreamCore(Music21Object):
             <ElementTimespan (8.0 to 8.0) <music21.bar.Barline type=final>>
         '''
         hashedAttributes = hash((tuple(classList or ()), flatten))
-        cacheKey = "timespanTree" + str(hashedAttributes)
+        cacheKey = 'timespanTree' + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedTimespanTree = tree.fromStream.asTimespans(self,
                                                              flatten=flatten,
@@ -549,7 +549,7 @@ class StreamCore(Music21Object):
                                   flatten,
                                   useTimespans,
                                   groupOffsets))
-        cacheKey = "elementTree" + str(hashedAttributes)
+        cacheKey = 'elementTree' + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedElementTree = tree.fromStream.asTree(self,
                                                        flatten=flatten,

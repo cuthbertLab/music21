@@ -548,7 +548,7 @@ class _EnvironmentCore:
                     uid = os.getuid()
                     dir_path = pathlib.Path(tempfile.gettempdir()) / f'music21-userid-{uid}'
                 else:
-                    dir_path = pathlib.Path(tempfile.mkdtemp(prefix="music21-"))
+                    dir_path = pathlib.Path(tempfile.mkdtemp(prefix='music21-'))
 
                 if self._checkAccessibility(dir_path):
                     self.defaultRootTempDir = dir_path

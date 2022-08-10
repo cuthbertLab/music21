@@ -68,8 +68,8 @@ class SortTuple(namedtuple('SortTuple', (
     True
 
     >>> ts = bar.Barline('double')
-    >>> t = stream.Stream()
-    >>> t.storeAtEnd(ts)
+    >>> s2 = stream.Stream()
+    >>> s2.storeAtEnd(ts)
     >>> ts_st = ts.sortTuple()
     >>> ts_st
     SortTuple(atEnd=1, offset=0.0, priority=0, classSortOrder=-5, isNotGrace=1, insertIndex=...)

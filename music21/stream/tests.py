@@ -4462,8 +4462,6 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.keySignature.sharps, sharpsInKey)
 
     def testMakeTies(self):
-
-
         def collectAccidentalDisplayStatus(s_inner):
             post = []
             for e in s_inner.flatten().notesAndRests:
@@ -4532,6 +4530,30 @@ class Test(unittest.TestCase):
                           ('F#', None), ('F#', None), ('B#', None), ('B#', None),
                           ('C#', None), ('C#', None)]
                          )
+
+    def testMakeTiesAddNewMeasure(self):
+        '''
+        Test that makeTies adds a new measure when the last note is too long,
+        both when called directly and when called from makeNotation
+        '''
+        p = Part()
+        m = Measure(number=1)
+        m.append(meter.TimeSignature('4/4'))
+        m.append(note.Note(type='breve'))
+        p.append(m)
+        p_makeTies = p.makeTies()
+        self.assertEqual(len(p_makeTies[Measure]), 2)
+        n1 = p_makeTies[Measure].first().notes.first()
+        n2 = p_makeTies[Measure].last().notes.first()
+        self.assertEqual(n1.duration.quarterLength, 4.0)
+        self.assertEqual(n1.duration.quarterLength, 4.0)
+        self.assertIsNotNone(n1.tie)
+        self.assertIsNotNone(n2.tie)
+        self.assertEqual(n1.tie.type, 'start')
+        self.assertEqual(n2.tie.type, 'stop')
+
+        p_makeNotation = p.makeNotation()
+        self.assertEqual(len(p_makeNotation[Measure]), 2)
 
     def testMeasuresAndMakeMeasures(self):
         s = converter.parse('tinynotation: 2/8 g8 e f g e f g a')
@@ -6567,6 +6589,7 @@ class Test(unittest.TestCase):
         s.insert(key.Key('Gb'))
         s.insert(0, note.Note('D-5'))
         s.insert(0, note.Note('D-4'))
+        self.assertFalse(s.haveAccidentalsBeenMade())
         post = s.makeNotation()  # makes voices, makes measures, makes accidentals
         self.assertEqual(len(post.recurse().getElementsByClass(Voice)), 2)
         self.assertTrue(post.haveAccidentalsBeenMade())
@@ -7056,7 +7079,8 @@ class Test(unittest.TestCase):
                         + ", 'voiceIndex': " + str(ob['voiceIndex'])
                         + ", 'element': " + str(ob['element'])
                         + ", 'offsetSeconds': " + str(ob['offsetSeconds'])
-                        + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + '}, ')
+                        + ", 'endTimeSeconds': " + str(ob['endTimeSeconds'])
+                        + '}, ')
         sMapStr = sMapStr[0:-2]
         sMapStr += ']'
 
@@ -7069,7 +7093,7 @@ class Test(unittest.TestCase):
                          + "'offsetSeconds': 0.0, 'endTimeSeconds': 1.0}, "
                          + "{'durationSeconds': 1.0, 'voiceIndex': None, "
                          + "'element': <music21.note.Note C>, "
-                         + "'offsetSeconds': 1.0, 'endTimeSeconds': 2.0}]""")
+                         + "'offsetSeconds': 1.0, 'endTimeSeconds': 2.0}]")
 
         s = Stream()
         s.repeatAppend(note.Note(), 2)
@@ -7082,7 +7106,8 @@ class Test(unittest.TestCase):
                         + ", 'voiceIndex': " + str(ob['voiceIndex'])
                         + ", 'element': " + str(ob['element'])
                         + ", 'offsetSeconds': " + str(ob['offsetSeconds'])
-                        + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + "}, ")
+                        + ", 'endTimeSeconds': " + str(ob['endTimeSeconds'])
+                        + '}, ')
         sMapStr = sMapStr[0:-2]
         sMapStr += ']'
 
@@ -7095,7 +7120,7 @@ class Test(unittest.TestCase):
                          + "'offsetSeconds': 0.0, 'endTimeSeconds': 4.0}, "
                          + "{'durationSeconds': 4.0, 'voiceIndex': None, "
                          + "'element': <music21.note.Note C>, "
-                         + "'offsetSeconds': 4.0, 'endTimeSeconds': 8.0}]""")
+                         + "'offsetSeconds': 4.0, 'endTimeSeconds': 8.0}]")
 
         s = Stream()
         s.repeatAppend(note.Note(), 2)
@@ -7109,7 +7134,8 @@ class Test(unittest.TestCase):
                         + ", 'voiceIndex': " + str(ob['voiceIndex'])
                         + ", 'element': " + str(ob['element'])
                         + ", 'offsetSeconds': " + str(ob['offsetSeconds'])
-                        + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + "}, ")
+                        + ", 'endTimeSeconds': " + str(ob['endTimeSeconds'])
+                        + '}, ')
         sMapStr = sMapStr[0:-2]
         sMapStr += ']'
 
@@ -7139,7 +7165,8 @@ class Test(unittest.TestCase):
                         + ", 'voiceIndex': " + str(ob['voiceIndex'])
                         + ", 'element': " + str(ob['element'])
                         + ", 'offsetSeconds': " + str(ob['offsetSeconds'])
-                        + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + "}, ")
+                        + ", 'endTimeSeconds': " + str(ob['endTimeSeconds'])
+                        + '}, ')
         sMapStr = sMapStr[0:-2]
         sMapStr += ']'
 
@@ -8279,11 +8306,11 @@ class Test(unittest.TestCase):
 
     @staticmethod
     def get_beams_from_stream(srcList):
-        """Helper function to return beam list for all notes and rests in the stream."""
+        '''Helper function to return beam list for all notes and rests in the stream.'''
         return [n.beams for n in srcList if isinstance(n, GeneralNote)]
 
     def test_makeBeams__all_quarters(self):
-        """Test that for a measure full of quarters, there are no beams"""
+        '''Test that for a measure full of quarters, there are no beams'''
         m = Measure()
         m.timeSignature = meter.TimeSignature('4/4')
         m.repeatAppend(note.Note(quarterLength=1), 4)
@@ -8294,7 +8321,7 @@ class Test(unittest.TestCase):
         self.assertEqual([beam.Beams(), beam.Beams(), beam.Beams(), beam.Beams()], beams)
 
     def test_makeBeams__all_eighths(self):
-        """Test a full measure full of eighth is grouped by beams into couples"""
+        '''Test a full measure full of eighth is grouped by beams into couples'''
         m = Measure()
         m.timeSignature = meter.TimeSignature('4/4')
         m.repeatAppend(note.Note(quarterLength=0.5), 8)
@@ -8323,7 +8350,7 @@ class Test(unittest.TestCase):
         self.assertEqual(second_note_beams, beams[7])
 
     def test_makeBeams__eighth_rests_and_eighth(self):
-        """Test a full measure of 8th rest followed by 8th note"""
+        '''Test a full measure of 8th rest followed by 8th note'''
         m = Measure()
         m.timeSignature = meter.TimeSignature('4/4')
         for i in range(4):
@@ -8336,11 +8363,11 @@ class Test(unittest.TestCase):
         self.assertEqual([beam.Beams(), ] * 8, beams)
 
     def test_makeBeams__repeated_1_e_a(self):
-        """
+        '''
         Test that the pattern of "1 e a" repeated more than once has correct beams.
 
         Note: proper beams repr: https://share.getcloudapp.com/12uE7eBA
-        """
+        '''
         m = Measure()
         m.timeSignature = meter.TimeSignature('2/4')
         for i in range(2):
@@ -8373,7 +8400,7 @@ class Test(unittest.TestCase):
         self.assertEqual(third_note_beams, beams[5])
 
     def test_makeBeams__1_e_n_a(self):
-        """Test that 4 16th notes have proper beams across them all."""
+        '''Test that 4 16th notes have proper beams across them all.'''
         m = Measure()
         m.timeSignature = meter.TimeSignature('1/4')
         m.repeatAppend(note.Note(quarterLength=0.25), 4)
@@ -8405,9 +8432,9 @@ class Test(unittest.TestCase):
         self.assertEqual(fourth_note_beams, beams[3])
 
     def test_makeBeams__1_e__after_16th_note(self):
-        """
+        '''
         Test that a 16th+8th notes after a 16th notes have proper beams.
-        """
+        '''
         m = Measure()
         m.timeSignature = meter.TimeSignature('2/4')
 

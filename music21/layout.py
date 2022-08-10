@@ -19,7 +19,7 @@ pages, the geometry of page and system margins, the distance between staves, etc
 The model for these layout objects is taken directly (perhaps too directly?)
 from MusicXML.  These objects all inherit from a BaseLayout class, primarily
 as an aid to finding all of these objects as a group.  ScoreLayouts give defaults
-for each page, system, and staff.  Thus they contain PageLayout, SystemLayout, and
+for each page, system, and staff.  Thus, they contain PageLayout, SystemLayout, and
 currently one or more StaffLayout objects (but probably just one. MusicXML allows more than
 StaffLayout object because multiple staves can be in a Part.  Music21 uses
 the concept of a PartStaff for a Part that is played by the same performer as another.
@@ -1024,7 +1024,7 @@ class LayoutScore(stream.Opus):
         This distance is specified with respect to the top of the system.
 
         Staff scaling (<staff-details> in musicxml inside an <attributes> object) is
-        taken into account, but not non-five-line staves.  Thus a normally sized staff
+        taken into account, but not non-five-line staves.  Thus, a normally sized staff
         is always of height 40 (4 spaces of 10-tenths each)
 
         >>> lt = corpus.parse('demos/layoutTest.xml')
@@ -1073,7 +1073,7 @@ class LayoutScore(stream.Opus):
         (117.0, 165.0)
 
         Page 1 (0), System 4 (3), Staff 2 (1) is a hidden ("optimized") system.
-        Thus its staffLayout notes this:
+        Thus, its staffLayout notes this:
 
         >>> staffLayout031 = ls.pages[0].systems[3].staves[1].staffLayout
         >>> staffLayout031

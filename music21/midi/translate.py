@@ -527,7 +527,7 @@ def midiEventsToChord(
     # noinspection PyShadowingNames
     '''
     Creates a Chord from a list of :class:`~music21.midi.DeltaTime` or integers
-    and :class:`~music21.midi.MidiEvent` objects grouped as follows:
+    and :class:`~music21.midi.MidiEvent` objects grouped as follows::
 
         [((time_pitch1_on, pitch1_note_on_event),
           (time_pitch1_off, pitch1_note_off_event)
@@ -535,8 +535,8 @@ def midiEventsToChord(
          ((time_pitch2_on, pitch2_note_on_event),
           (time_pitch2_off, pitch2_note_off_event)
           ),
-          ...etc...
 
+    ...etc...
 
     :func:`~music21.midi.translate.midiEventsToNote`.
 
@@ -847,7 +847,7 @@ def midiEventsToInstrument(eventList):
     try:
         if isinstance(event.data, bytes):
             # MuseScore writes MIDI files with null-terminated
-            # instrument names.  Thus stop before the byte-0x0
+            # instrument names.  Thus, stop before the byte-0x0
             decoded = event.data.decode('utf-8').split('\x00')[0]
             decoded = decoded.strip()
             i = instrument.fromString(decoded)
@@ -3787,7 +3787,7 @@ class Test(unittest.TestCase):
 
         mts = streamHierarchyToMidiTracks(s)
         # mts[0] is the conductor track
-        self.assertIn("SET_TEMPO", repr(mts[0].events))
+        self.assertIn('SET_TEMPO', repr(mts[0].events))
         mtsRepr = repr(mts[1].events) + repr(mts[2].events)
         self.assertGreater(mtsRepr.count('velocity=51'), 2)
         self.assertGreater(mtsRepr.count('velocity=102'), 2)

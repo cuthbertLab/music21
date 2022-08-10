@@ -15,7 +15,7 @@ Editorial objects store comments and other metadata associated with specific
 :class:`~music21.base.Music21Object` elements such as Notes.
 
 Some aspects of :class:`~music21.editorial.Editorial` objects
-represent very early (pre-v0.1) versions of music21.  Thus some
+represent very early (pre-v0.1) versions of music21.  Thus, some
 pre-defined aspects might be removed from documentation in the future.
 
 Access an editorial object by calling `.editorial` on any music21 object:
@@ -132,7 +132,7 @@ class Editorial(prebase.ProtoM21Object, dict):
         if name in self:
             del self[name]
         else:
-            raise AttributeError("No such attribute: " + name)
+            raise AttributeError('No such attribute: ' + name)
 
 
 # -----------------------------------------------------------------------------

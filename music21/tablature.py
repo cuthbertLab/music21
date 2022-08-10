@@ -251,7 +251,7 @@ class FirstFret:
     given chord position.
     '''
 
-    def __init__(self, fretNum, location="right"):
+    def __init__(self, fretNum, location='right'):
         self.fretNum = fretNum
         self.location = location
 

@@ -270,6 +270,9 @@ class Spanner(base.Music21Object):
             # there used to be a bug here where spannerStorage would
             # try to append twice.  I've removed the guardrail here in v7.
             # because I'm pretty sure we have solved it.
+            # disable pylint check until this inheritance bug is solved:
+            # https://github.com/PyCQA/astroid/issues/457
+            # pylint: disable=no-member
             for c in self.spannerStorage._elements:
                 new.spannerStorage.coreAppend(c)
             new.spannerStorage.coreElementsChanged(updateIsFlat=False)

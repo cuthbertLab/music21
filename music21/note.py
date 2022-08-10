@@ -16,6 +16,7 @@ Classes and functions for creating Notes, Rests, and Lyrics.
 The :class:`~music21.pitch.Pitch` object is stored within,
 and used to configure, :class:`~music21.note.Note` objects.
 '''
+from __future__ import annotations
 
 import copy
 import unittest
@@ -991,6 +992,7 @@ class NotRest(GeneralNote):
         new = super().__deepcopy__(memo=memo)
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
+        # pylint: disable=no-member
         if self._volume is not None:
             new.volume.client = new  # update with new instance
         return new
@@ -1532,6 +1534,15 @@ class Note(NotRest):
             return self.pitch >= other.pitch
         except AttributeError:
             return NotImplemented
+
+    def __deepcopy__(self: Note, memo=None) -> Note:
+        '''
+        After doing a deepcopy of the pitch, be sure to set the client
+        '''
+        new = super().__deepcopy__(memo=memo)
+        # noinspection PyProtectedMember
+        new.pitch._client = new  # pylint: disable=no-member
+        return new
 
     # --------------------------------------------------------------------------
     # property access

@@ -177,10 +177,11 @@ class ChordBase(note.NotRest):
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
         # noinspection PyProtectedMember
-        for d in new._notes:
+        for n in new._notes:  # pylint: disable=no-member
+            n._chordAttached = new
             # if .volume is called, a new Volume obj will be created
-            if d.hasVolumeInformation():
-                d.volume.client = new  # update with new instance
+            if n.hasVolumeInformation():
+                n.volume.client = new  # update with new instance
         return new
 
     # TODO: __getitem__
@@ -206,6 +207,8 @@ class ChordBase(note.NotRest):
         be passed in which is used for the first note of the chord or as many pitches
         as can use it -- it's all an optimization step to create as few duration objects
         as is necessary.
+
+        Does not clear any caches.
 
         Also requires that notes be iterable.
         '''
@@ -259,11 +262,11 @@ class ChordBase(note.NotRest):
         notes,
     ) -> None:
         '''
-        Add a note, pitch, the notes of another chord, or string representing a pitch,
+        Add a Note, Pitch, the `.notes` of another chord,
+        or string representing a Pitch,
         or a list of any-of-the-above types to a Chord or PercussionChord.
 
-        If runSort is True (default=True) then after appending, the
-        chord will be sorted.
+        Does no sorting.  That is on the Chord object.
 
         >>> c = chord.Chord('C4 E4 G4')
         >>> c.add('B3')
@@ -299,6 +302,7 @@ class ChordBase(note.NotRest):
         if not common.isIterable(notes):
             notes = [notes]
         self._add_core_or_init(notes, useDuration=False)
+        self.clearCache()
 
     def remove(self, removeItem):
         '''
@@ -379,6 +383,9 @@ class ChordBase(note.NotRest):
         except ValueError:
             raise ValueError('Chord.remove(x), x not in chord')
 
+    @property
+    def notes(self) -> t.Tuple[note.NotRest, ...]:
+        return ()
 
     @property
     def tie(self):
@@ -1051,7 +1058,8 @@ class Chord(ChordBase):
         runSort=True
     ) -> None:
         '''
-        Add a note, pitch, the notes of another chord, or string representing a pitch,
+        Add a Note, Pitch, the `.notes` of another chord,
+        or string representing a pitch,
         or a list of any-of-the-above types to a Chord.
 
         If `runSort` is True (default=True) then after appending, the
@@ -1443,7 +1451,7 @@ class Chord(ChordBase):
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave,
+        forceOctave: t.Optional[int],
         inPlace: t.Literal[True],
         leaveRedundantPitches=False
     ) -> None:
@@ -1453,18 +1461,18 @@ class Chord(ChordBase):
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave=None,
+        forceOctave: t.Optional[int] = None,
         inPlace: t.Literal[False] = False,
-        leaveRedundantPitches=False
+        leaveRedundantPitches: bool = False
     ) -> _ChordType:
         return self
 
     def closedPosition(
         self: _ChordType,
         *,
-        forceOctave=None,
-        inPlace=False,
-        leaveRedundantPitches=False
+        forceOctave: t.Optional[int] = None,
+        inPlace: t.Union[t.Literal[True], t.Literal[False]] = False,
+        leaveRedundantPitches: bool = False
     ) -> t.Optional[_ChordType]:
         '''
         Returns a new Chord object with the same pitch classes,
@@ -2185,7 +2193,7 @@ class Chord(ChordBase):
         if testRoot is None:
             testRoot = self.root()
             if testRoot is None:
-                raise ChordException("Cannot run hasRepeatedChordStep without a root")
+                raise ChordException('Cannot run hasRepeatedChordStep without a root')
 
         first = self.intervalFromChordStep(chordStep)
         for thisPitch in self.pitches:
@@ -2216,9 +2224,9 @@ class Chord(ChordBase):
             try:
                 testRoot = self.root()
             except ChordException:
-                raise ChordException("Cannot run intervalFromChordStep without a root")
+                raise ChordException('Cannot run intervalFromChordStep without a root')
             if testRoot is None:
-                raise ChordException("Cannot run intervalFromChordStep without a root")
+                raise ChordException('Cannot run intervalFromChordStep without a root')
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(testRoot, thisPitch)
             if thisInterval.diatonic.generic.mod7 == chordStep:
@@ -2379,7 +2387,7 @@ class Chord(ChordBase):
             try:
                 int_newInversion = int(newInversion)
             except (ValueError, TypeError):
-                raise ChordException(f"Inversion must be an integer, got: {type(newInversion)}")
+                raise ChordException(f'Inversion must be an integer, got: {type(newInversion)}')
             self._setInversion(int_newInversion, rootPitch, transposeOnSet)
             return None
         elif ('inversion' not in self._overrides and find) or testRoot is not None:
@@ -3935,7 +3943,33 @@ class Chord(ChordBase):
         else:
             return None
 
-    def semiClosedPosition(self, *, forceOctave=None, inPlace=False, leaveRedundantPitches=False):
+    @overload
+    def semiClosedPosition(
+        self: _ChordType,
+        *,
+        forceOctave,
+        inPlace: t.Literal[True],
+        leaveRedundantPitches=False
+    ) -> None:
+        return None
+
+    @overload
+    def semiClosedPosition(
+        self: _ChordType,
+        *,
+        forceOctave=None,
+        inPlace: t.Literal[False] = False,
+        leaveRedundantPitches=False
+    ) -> _ChordType:
+        return self
+
+    def semiClosedPosition(
+        self: _ChordType,
+        *,
+        forceOctave: t.Optional[int] = None,
+        inPlace: t.Union[t.Literal[True], t.Literal[False]] = False,
+        leaveRedundantPitches: bool = False
+    ) -> t.Union[None, _ChordType]:
         # noinspection PyShadowingNames
         '''
         Similar to :meth:`~music21.chord.Chord.ClosedPosition` in that it
@@ -3969,9 +4003,14 @@ class Chord(ChordBase):
 
         '''
         c2 = self.closedPosition(forceOctave=forceOctave,
-                                 inPlace=inPlace, leaveRedundantPitches=leaveRedundantPitches)
+                                 inPlace=inPlace,
+                                 leaveRedundantPitches=leaveRedundantPitches)
         if inPlace is True:
             c2 = self
+
+        if t.TYPE_CHECKING:
+            from music21 import stream
+            assert isinstance(c2, stream.Stream)
         # startOctave = c2.bass().octave
         remainingPitches = copy.copy(c2.pitches)  # no deepcopy needed
 
@@ -3986,6 +4025,7 @@ class Chord(ChordBase):
                     newRemainingPitches.append(p)
             remainingPitches = newRemainingPitches
 
+        c2.clearCache()
         c2.sortAscending(inPlace=True)
 
         if inPlace is False:
@@ -4001,7 +4041,7 @@ class Chord(ChordBase):
         does not change the Chord.root object.  We use these methods to figure
         out what the root of the triad is.
 
-        Currently there is a bug that in the case of a triply diminished third
+        Currently, there is a bug that in the case of a triply diminished third
         (e.g., "c" => "e----"), this function will incorrectly claim no third
         exists.  Perhaps this should be construed as a feature.
 
@@ -4531,11 +4571,15 @@ class Chord(ChordBase):
         Changed in v.6 -- if inPlace is True do not return anything.
         '''
         if inPlace:
+            if self._cache.get('isSortedAscendingDiatonic', False):
+                return None
             returnObj = self
             self.clearCache()
         else:
+            # cache is not copied to the new item.
             returnObj = copy.deepcopy(self)
         returnObj._notes.sort(key=lambda x: (x.pitch.diatonicNoteNum, x.pitch.ps))
+        returnObj._cache['isSortedAscendingDiatonic'] = True
 
         if not inPlace:
             return returnObj
@@ -5182,7 +5226,7 @@ class Chord(ChordBase):
         return len(self.pitchClasses)
 
     @property
-    def notes(self):
+    def notes(self) -> t.Tuple[note.Note, ...]:
         '''
         Return a tuple (immutable) of the notes contained in the chord.
 
@@ -5244,7 +5288,7 @@ class Chord(ChordBase):
         return tuple(self._notes)
 
     @notes.setter
-    def notes(self, newNotes):
+    def notes(self, newNotes: t.Iterable[note.Note]) -> None:
         '''
         sets notes to an iterable of Note objects
         '''
@@ -5466,7 +5510,7 @@ class Chord(ChordBase):
         >>> c2a.pitchedCommonName
         'Cb-major triad'
 
-        Other forms might have the pitch elsewhere.  Thus this is a method for display,
+        Other forms might have the pitch elsewhere.  Thus, this is a method for display,
         not for extracting information:
 
         >>> c3 = chord.Chord('A#2 D3 F3')
@@ -5805,9 +5849,9 @@ class Chord(ChordBase):
         '''
         from music21 import scale
         # roman numerals have this built in as the key attribute
-        if hasattr(self, 'key') and self.key is not None:
+        if hasattr(self, 'key') and self.key is not None:  # pylint: disable=no-member
             # Key is a subclass of scale.DiatonicScale
-            sc = self.key
+            sc = self.key  # pylint: disable=no-member
         else:
             sc = self.getContextByClass(scale.Scale, sortByCreationTime=True)
             if sc is None:
@@ -6763,6 +6807,13 @@ class Test(unittest.TestCase):
             # noinspection PyTypeChecker
             Chord([note.Unpitched()])  # type: ignore
 
+    def testCacheClearedOnAdd(self):
+        ch = Chord('C4 E4 G4')
+        self.assertTrue(ch.isConsonant())
+        # value is now cached.
+        ch.add('C#5', runSort=False)
+        # value should no longer be cached.
+        self.assertFalse(ch.isConsonant())
 
 # ------------------------------------------------------------------------------
 

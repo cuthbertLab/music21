@@ -99,8 +99,8 @@ def getDocumentationFromAutoGen(fullModulePath):
                 allCodeExpects.append((lastCode, childText))
                 lastCode = None
         else:
-            if lastCode not in (None, ""):
-                allCodeExpects.append((lastCode, ""))
+            if lastCode not in (None, ''):
+                allCodeExpects.append((lastCode, ''))
             lastCode = None  # unneeded but clear
             childTextSplit = childText.split('\n')
             if len(childTextSplit) == 0:
@@ -132,8 +132,8 @@ def getDocumentationFromAutoGen(fullModulePath):
                         childTextArray.append(line)
                 else:
                     lastCode = '\n'.join(childTextArray)
-                    if lastCode not in (None, ""):
-                        allCodeExpects.append((lastCode, ""))
+                    if lastCode not in (None, ''):
+                        allCodeExpects.append((lastCode, ''))
                         lastCode = None
                     childTextArray = [line]
             lastCode = '\n'.join(childTextArray)
@@ -156,8 +156,8 @@ def getDocumentationFiles(runOne=False):
     buildDocRstDir = music21basedir / 'documentation' / 'source'
     if not buildDocRstDir.exists():
         raise Music21Exception(
-            "Cannot run tests on documentation because the rst files "
-            + "in documentation/source do not exist")
+            'Cannot run tests on documentation because the rst files '
+            + 'in documentation/source do not exist')
 
     allModules = []
     for root, unused_dir_names, filenames in os.walk(str(buildDocRstDir)):
@@ -201,7 +201,7 @@ def main(runOne: t.Union[str, bool] = False):
     for mt in getDocumentationFiles(runOne):
         # if 'examples' in mt.module:
         #     continue
-        print(mt.module + ": ", end="")
+        print(mt.module + ': ', end='')
         try:
             if mt.autoGen is False:
                 (failCount, testCount) = doctest.testfile(
@@ -216,7 +216,7 @@ def main(runOne: t.Union[str, bool] = False):
                 # ## this was an attempt to run the ipynb through the doctest, but
                 # ## it required too many compromises in how we'd like to write a user's
                 # ## guide -- i.e., dicts can change order, etc.  better just to
-                # ## monthly run through the User's Guide line by line and update.
+                # ## monthly run through the User's Guide, line by line and update.
                 # examples = getDocumentationFromAutoGen(mt.fullModulePath)
                 # dt = doctest.DocTest([doctest.Example(e[0], e[1]) for e in examples], {},
                 #                      mt.moduleNoExtension, mt.fullModulePath, 0, None)
@@ -224,22 +224,22 @@ def main(runOne: t.Union[str, bool] = False):
 
 
             if failCount > 0:
-                print(f"{mt.module} had {failCount} failures in {testCount} tests")
+                print(f'{mt.module} had {failCount} failures in {testCount} tests')
             elif testCount == 0:
-                print("no tests")
+                print('no tests')
             else:
-                print(f"all {testCount} tests ran successfully")
+                print(f'all {testCount} tests ran successfully')
             totalTests += testCount
             totalFailures += failCount
         except Exception as e:  # pylint: disable=broad-except
-            print(f"failed miserably! {str(e)}")
+            print(f'failed miserably! {e}')
             import traceback
             tb = traceback.format_exc()
             print(f"Here's the traceback for the exception: \n{tb}")
 
 
     elapsedTime = time.time() - timeStart
-    print(f"Ran {totalTests} tests ({totalFailures} failed) in {elapsedTime:.4f} seconds")
+    print(f'Ran {totalTests} tests ({totalFailures} failed) in {elapsedTime:.4f} seconds')
 
 
 if __name__ == '__main__':

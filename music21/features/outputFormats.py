@@ -25,6 +25,9 @@ class OutputFormat:
         '''
         pass  # define in subclass
 
+    def getString(self, includeClassLabel=True, includeId=True, lineBreak=None):
+        pass  # define in subclass
+
     def write(self, fp=None, includeClassLabel=True, includeId=True):
         '''
         Write the file. If not file path is given, a temporary file will be written.

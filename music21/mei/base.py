@@ -223,22 +223,22 @@ _IGNORE_UNPROCESSED = (
 # Exceptions
 # -----------------------------------------------------------------------------
 class MeiValidityError(exceptions21.Music21Exception):
-    'When there is an otherwise-unspecified validity error that prevents parsing.'
+    '''When there is an otherwise-unspecified validity error that prevents parsing.'''
     pass
 
 
 class MeiValueError(exceptions21.Music21Exception):
-    'When an attribute has an invalid value.'
+    '''When an attribute has an invalid value.'''
     pass
 
 
 class MeiAttributeError(exceptions21.Music21Exception):
-    'When an element has an invalid attribute.'
+    '''When an element has an invalid attribute.'''
     pass
 
 
 class MeiElementError(exceptions21.Music21Exception):
-    'When an element itself is invalid.'
+    '''When an element itself is invalid.'''
     pass
 
 
@@ -1180,7 +1180,7 @@ def addSlurs(elem, obj, slurBundle):
     addedSlur = False
 
     def wrapGetByIdLocal(theId):
-        "Avoid crashing when getByIdLocl() doesn't find the slur"
+        '''Avoid crashing when getByIdLocl() doesn't find the slur'''
         try:
             slurBundle.getByIdLocal(theId)[0].addSpannedElements(obj)
             return True
@@ -1291,17 +1291,17 @@ def metaSetTitle(work, meta):
     :return: The ``meta`` argument, having relevant metadata added.
     '''
     # title, subtitle, and movement name
+    subtitle = None
     for title in work.findall(f'./{MEI_NS}titleStmt/{MEI_NS}title'):
-        if title.get('type', '') == 'subtitle':
-            meta.subtitle = title.text
+        if title.get('type', '') == 'subtitle':  # or 'subordinate', right?
+            subtitle = title.text
         elif meta.title is None:
             meta.title = title.text
 
-    if hasattr(meta, 'subtitle'):
+    if subtitle:
         # Since m21.Metadata doesn't actually have a "subtitle" attribute, we'll put the subtitle
         # in the title
-        meta.title = f'{meta.title} ({meta.subtitle})'
-        del meta.subtitle
+        meta.title = f'{meta.title} ({subtitle})'
 
     tempo = work.find(f'./{MEI_NS}tempo')
     if tempo is not None:
@@ -1332,7 +1332,7 @@ def metaSetComposer(work, meta):
     if len(composers) == 1:
         meta.composer = composers[0]
     elif len(composers) > 1:
-        meta.composer = composers
+        meta.composers = composers
 
     return meta
 
@@ -1356,12 +1356,12 @@ def metaSetDate(work, meta):
             except ValueError:
                 environLocal.warn(_MISSED_DATE.format(dateStr))
             else:
-                meta.date = theDate
+                meta.dateCreated = theDate
         else:
             dateStart = date.get('notbefore') if date.get('notbefore') else date.get('startdate')
             dateEnd = date.get('notafter') if date.get('notafter') else date.get('enddate')
             if dateStart and dateEnd:
-                meta.date = metadata.DateBetween((dateStart, dateEnd))
+                meta.dateCreated = metadata.DateBetween((dateStart, dateEnd))
 
     return meta
 

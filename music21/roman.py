@@ -750,7 +750,7 @@ def romanNumeralFromChord(
     >>> romanNumeral2
     <music21.roman.RomanNumeral V65 in F major>
 
-    Note that vi and vii in minor signifies what you might think of
+    Note that vi and vii in minor, by default, signifies what you might think of
     alternatively as #vi and #vii:
 
     >>> romanNumeral3 = roman.romanNumeralFromChord(
@@ -1115,35 +1115,56 @@ class Minor67Default(enum.Enum):
     keyword arguments `sixthMinor` and `seventhMinor` to define how Roman numerals
     on the sixth and seventh scale degrees are parsed in minor.
 
-    Showing how `sixthMinor` affects the interpretation of `vi`:
+    Showing how `sixthMinor` affects the interpretation of `vi`, using
+    a helper function that creates the chord in c-minor with the given
+    `sixthMinor` interpretation:
 
     >>> vi = lambda sixChord, quality: ' '.join(p.name for p in roman.RomanNumeral(
     ...                                   sixChord, 'c',
     ...                                   sixthMinor=quality).pitches)
+
+    The default for new chords is `QUALITY`, which means that the chord quality
+    (major, minor, diminished) determines what note is the root, lowered ^6
+    or raised ^6:
+
     >>> vi('vi', roman.Minor67Default.QUALITY)
     'A C E'
-    >>> vi('vi', roman.Minor67Default.FLAT)
-    'A- C- E-'
-    >>> vi('vi', roman.Minor67Default.SHARP)
-    'A C E'
-
     >>> vi('VI', roman.Minor67Default.QUALITY)
     'A- C E-'
+
+    The enumeration `FLAT` means that lowered ^6 is used for the root no matter what.
+    (note that `FLAT` does not mean that the root will have a flat sign on it,
+    for instance, in f-sharp minor, lowered ^6 is D natural. and in a-sharp minor,
+    lowered ^6 is F#.)
+
+    >>> vi('vi', roman.Minor67Default.FLAT)
+    'A- C- E-'
     >>> vi('VI', roman.Minor67Default.FLAT)
     'A- C E-'
+
+    Conversely, `SHARP` implies that raised ^6 is used no matter what.
+
+    >>> vi('vi', roman.Minor67Default.SHARP)
+    'A C E'
     >>> vi('VI', roman.Minor67Default.SHARP)
     'A C# E'
 
-    For FLAT assumes lowered ^6 no matter what, while SHARP assumes raised
-    ^6 no matter what.  So #vi is needed in FLAT and bVI is needed in SHARP
+    Since `FLAT` assumes lowered ^6 whether the chord is major or minor (or anything else),
+    to get a raised ^6 with the `FLAT` enumeration add a sharp before the name:
 
     >>> vi('#vi', roman.Minor67Default.FLAT)
     'A C E'
+
+    Likewise, with `SHARP`, a flat sign is needed to get lowered ^6:
+
     >>> vi('bVI', roman.Minor67Default.SHARP)
     'A- C E-'
 
-
-    CAUTIONARY ignores the `#` in #vi and the `b` in bVI:
+    The enumeration of `CAUTIONARY` is identical to `QUALITY` except that it
+    ignores the `#` in #vi and the `b` in bVI, allowing users to write these
+    chords in two different way.  `CAUTIONARY` is recommended in the case where
+    users from different systems of training are working together, and no
+    exotic chords (such as major triads on raised ^6) are used.
 
     >>> vi('#vi', roman.Minor67Default.CAUTIONARY)
     'A C E'
@@ -1154,9 +1175,9 @@ class Minor67Default(enum.Enum):
     >>> vi('VI', roman.Minor67Default.CAUTIONARY)
     'A- C E-'
 
-    Whereas QUALITY is closer to what a computer would produce, since vi is already
-    sharpened, #vi raises it even more.  And since VI is already flattened, bVI lowers
-    it even further:
+    Whereas `QUALITY` follows a strict interpretation of what preceeding sharp and flat
+    signs mean.  With `QUALITY`, since vi is already sharpened, #vi raises it even more.
+    And since VI is already flattened, bVI lowers it even further:
 
     >>> vi('vi', roman.Minor67Default.QUALITY)
     'A C E'
@@ -1167,30 +1188,49 @@ class Minor67Default(enum.Enum):
     >>> vi('bVI', roman.Minor67Default.QUALITY)
     'A-- C- E--'
 
-    To get these odd chords with CAUTIONARY, add another sharp or flat.
+    If you are using the `CAUTIONARY` enum, these odd chords can still be created, but
+    an additional sharp or flat should be used.
 
     >>> vi('##vi', roman.Minor67Default.CAUTIONARY)
     'A# C# E#'
     >>> vi('bbVI', roman.Minor67Default.CAUTIONARY)
     'A-- C- E--'
 
-
     For other odd chords that are contrary to the standard minor interpretation
-    in the "wrong" direction, the interpretation is the same as `QUALITY`
+    in the "wrong" direction, the interpretation is the same as `QUALITY`.
 
-    a major triad on raised 6?
+    For instance, here is a major triad on raised ^6 (what might be generally
+    conceived of as V/ii), in the `QUALITY` and `CAUTIONARY` systems:
 
     >>> vi('#VI', roman.Minor67Default.QUALITY)
     'A C# E'
     >>> vi('#VI', roman.Minor67Default.CAUTIONARY)
     'A C# E'
 
-    a minor triad on lowered 6?
+    And a minor triad on lowered ^6.
 
     >>> vi('bvi', roman.Minor67Default.QUALITY)
     'A- C- E-'
     >>> vi('bvi', roman.Minor67Default.CAUTIONARY)
     'A- C- E-'
+
+    All these examples use ^6, but the same concepts apply to ^7 using
+    `seventhMinor` instead.
+
+    This enumeration applies to secondary chords built on ^6 or ^7:
+
+    >>> vi('V/vi', roman.Minor67Default.QUALITY)
+    'E G# B'
+    >>> vi('V/VI', roman.Minor67Default.QUALITY)
+    'E- G B-'
+
+    >>> vi('V/vi', roman.Minor67Default.FLAT)
+    'E- G B-'
+    >>> vi('V/VI', roman.Minor67Default.FLAT)
+    'E- G B-'
+
+    Changed in v8 -- previously `sixthMinor` and `seventhMinor` did
+    not carry over to secondary roman numerals.
     '''
     QUALITY = 1
     CAUTIONARY = 2
@@ -1218,12 +1258,35 @@ class RomanNumeral(harmony.Harmony):
     :class:`~music21.harmony.Harmony` object that stores the function and scale
     degree of a chord within a :class:`~music21.key.Key`.
 
-    If no Key is given then it exists as a theoretical, keyless RomanNumeral;
-    e.g., V in any key. but when realized, keyless RomanNumerals are
-    treated as if they are in C major).
+    >>> ivInE = roman.RomanNumeral('IV', key.Key('E'))
+    >>> ivInE.pitches
+    (<music21.pitch.Pitch A4>, <music21.pitch.Pitch C#5>, <music21.pitch.Pitch E5>)
 
-    >>> from music21 import roman
-    >>> V = roman.RomanNumeral('V')  # could also use 5
+    Octaves assigned are arbitrary (generally C-4 or above) and just exist
+    to keep the pitches properly sorted.
+
+    Major and minor are written with capital and lowercase numerals respectively.
+    Inversions and seventh-, ninth-, etc. chords are specified by putting the
+    figured bass symbols directly after the chord.  Keys can be specified with
+    Key objects or (less efficiently) a string.
+
+    Dominant-seventh chord in c minor.
+
+    >>> roman.RomanNumeral('V7', 'c').pitches
+    (<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>,
+     <music21.pitch.Pitch D5>, <music21.pitch.Pitch F5>)
+
+    Minor chord on the fifth scale degree, in second inversion:
+
+    >>> roman.RomanNumeral('v64', 'c').pitches
+    (<music21.pitch.Pitch D4>, <music21.pitch.Pitch G4>, <music21.pitch.Pitch B-4>)
+
+
+    If no Key is given then it exists as a theoretical, keyless RomanNumeral;
+    e.g., V in any key.  But when realized, keyless RomanNumerals are
+    treated as if they are in C major.
+
+    >>> V = roman.RomanNumeral('V')
     >>> V.quality
     'major'
 
@@ -1244,7 +1307,9 @@ class RomanNumeral(harmony.Harmony):
     <music21.pitch.Pitch B4>
     <music21.pitch.Pitch D5>
 
-    >>> neapolitan = roman.RomanNumeral('N6', 'c#')  # could also use 'bII6' or 'N'
+    Neapolitan chords can be written as 'N6', 'bII6', or simply 'N'
+
+    >>> neapolitan = roman.RomanNumeral('N6', 'c#')
     >>> neapolitan.key
     <music21.key.Key of c# minor>
 
@@ -1254,7 +1319,7 @@ class RomanNumeral(harmony.Harmony):
     >>> neapolitan.scaleDegreeWithAlteration
     (2, <music21.pitch.Accidental flat>)
 
-    >>> for p in neapolitan.pitches:  # default octaves
+    >>> for p in neapolitan.pitches:
     ...     p
     <music21.pitch.Pitch F#4>
     <music21.pitch.Pitch A4>
@@ -1267,27 +1332,29 @@ class RomanNumeral(harmony.Harmony):
     >>> neapolitan2.scaleDegree
     2
 
-    Here's a dominant seventh chord in minor:
+    Here's another dominant seventh chord in minor:
 
     >>> em = key.Key('e')
     >>> dominantV = roman.RomanNumeral('V7', em)
     >>> [str(p) for p in dominantV.pitches]
     ['B4', 'D#5', 'F#5', 'A5']
 
+    Now using the older terminology where the case does not determine the
+    quality, it becomes a minor-seventh chord:
+
     >>> minorV = roman.RomanNumeral('V43', em, caseMatters=False)
     >>> [str(p) for p in minorV.pitches]
     ['F#4', 'A4', 'B4', 'D5']
 
-    (We will do this `str(p) for p in...` thing enough that let's make a helper function:
+    (We will do this `str(p) for p in...` thing enough that let's make a helper function:)
 
     >>> def cp(rn_in):  # cp = chord pitches
     ...     return [str(p) for p in rn_in.pitches]
     >>> cp(minorV)
     ['F#4', 'A4', 'B4', 'D5']
 
-
-    In minor -- VII and VI are assumed to refer to the flattened scale degree.
-    vii, viio, viio7, viiø7 and vi, vio, vio7, viø7 refer to the sharpened scale
+    In minor -- VII and VI are assumed to refer to the flattened scale degree, while
+    vii, viio, viio7, viiø7 and vi, vio, vio7, and viø7 all refer to the sharpened scale
     degree.  To get a minor triad on lowered 6 for instance, you will need to use 'bvi'
     while to get a major triad on raised 6, use '#VI'.
 
@@ -1339,12 +1406,10 @@ class RomanNumeral(harmony.Harmony):
     >>> cp(minHarmonicSix)
     ['C#5', 'E5', 'G#5']
 
-
-    See the docs for :class:`~music21.roman.Minor67Default`
-    for more information on configuring sixth and seventh interpretation in minor
+    See the docs for :class:`~music21.roman.Minor67Default` for more information on
+    configuring sixth and seventh interpretation in minor
     along with the useful `CAUTIONARY` setting where CAUTIONARY sharp and flat accidentals
     are allowed but not required.
-
 
     Either of these is the same way of getting a minor iii in a minor key:
 
@@ -1357,6 +1422,7 @@ class RomanNumeral(harmony.Harmony):
     ['G4', 'B-4', 'D5']
 
     `caseMatters=False` will prevent `sixthMinor` or `seventhMinor` from having effect.
+
     >>> vii = roman.RomanNumeral('viio', 'a', caseMatters=False,
     ...                           seventhMinor=roman.Minor67Default.QUALITY)
     >>> cp(vii)
@@ -1376,16 +1442,35 @@ class RomanNumeral(harmony.Harmony):
     >>> sharp3.figure
     '#III6'
 
-    Figures can be changed and pitches will change.
+    Figures can be changed and pitches will change. (Caution: there are still some bugs on this
+    for extreme edge cases).
 
     >>> sharp3.figure = 'V'
     >>> cp(sharp3)
     ['A-4', 'C5', 'E-5']
 
+    A diminished chord is specified with an `o` (the letter-O) or `°` symbol:
+
     >>> leadingToneSeventh = roman.RomanNumeral(
     ...     'viio', scale.MajorScale('F'))
     >>> cp(leadingToneSeventh)
     ['E5', 'G5', 'B-5']
+    >>> cp(roman.RomanNumeral('vii°7', 'F'))
+    ['E5', 'G5', 'B-5', 'D-6']
+
+    Note in the above example we passed in a Scale object not a Key.  This can be used
+    in the theoretical case of applying roman numerals in 7-note scales that are not
+    major or minor.  (see the documentation for the
+    :attr:`~music21.roman.RomanNumeral.scaleCardinality attribute for scales other than
+    7-note scales).
+
+    Half-diminished seventh chords can be written with either `ø` or `/o` symbol:
+
+    >>> cp(roman.RomanNumeral('viiø7', 'F'))
+    ['E5', 'G5', 'B-5', 'D6']
+    >>> cp(roman.RomanNumeral('vii/o7', 'F'))
+    ['E5', 'G5', 'B-5', 'D6']
+
 
     A little modal mixture:
 
@@ -1450,7 +1535,6 @@ class RomanNumeral(harmony.Harmony):
     >>> openFifthInv = roman.RomanNumeral('V64[no3]', key.Key('F'))
     >>> openFifthInv.pitches
     (<music21.pitch.Pitch G4>, <music21.pitch.Pitch C5>)
-
 
     Some theoretical traditions express a viio7 as a V9 chord with omitted
     root. Music21 allows that:
@@ -1667,6 +1751,24 @@ class RomanNumeral(harmony.Harmony):
     degree (i.e., '-II' becomes 'bII') as this is what people expect in looking at
     the figure.
 
+    Changed in v8 -- Figures are now validated as alphanumeric or containing one of
+    the following symbols (after the example "V"):
+
+    >>> specialCharacterFigure = roman.RomanNumeral('V#+-/[]')
+    >>> specialCharacterFigure
+    <music21.roman.RomanNumeral V#+-/[]>
+
+    And degree symbols (`°`) convert to `o`:
+
+    >>> dimSeventh = roman.RomanNumeral('vii°7', 'c')
+    >>> dimSeventh
+    <music21.roman.RomanNumeral viio7 in c minor>
+
+    Otherwise, an invalid figure raises `RomanNumeralException`:
+
+    >>> roman.RomanNumeral("V64==53")
+    Traceback (most recent call last):
+    music21.roman.RomanNumeralException: Invalid figure: V64==53
 
     OMIT_FROM_DOCS
 
@@ -1716,6 +1818,11 @@ class RomanNumeral(harmony.Harmony):
     >>> r = roman.RomanNumeral('V754', key.Key('C'))
     >>> cp(r)
     ['G4', 'C5', 'D5', 'F5']
+
+    A symbol that looks like the degree symbol but isn't:
+
+    >>> roman.RomanNumeral('viiº')
+    <music21.roman.RomanNumeral viio>
 
     (NOTE: all this is omitted -- look at OMIT_FROM_DOCS above)
     '''
@@ -2122,13 +2229,17 @@ class RomanNumeral(harmony.Harmony):
         # immediately fix low-preference figures
         if isinstance(figure, str):
             figure = figure.replace('0', 'o')  # viio7
-
-        if isinstance(figure, str):
+            figure = figure.replace('º', 'o')
+            figure = figure.replace('°', 'o')
             # /o is just a shorthand for ø -- so it should not be stored.
             figure = figure.replace('/o', 'ø')
-
+        else:
+            raise TypeError(f'Expected str or int: got {type(figure)}')
         # end immediate fixes
 
+        if not all(char.isalnum() or char in '#°+-/[]' for char in figure):
+            # V, b, ø, no, etc. already covered by isalnum()
+            raise RomanNumeralException(f'Invalid figure: {figure}')
 
         # Store raw figure before calling setKeyOrScale:
         self._figure = figure
@@ -2481,6 +2592,8 @@ class RomanNumeral(harmony.Harmony):
                 secondaryFigure,
                 useScale,
                 caseMatters=self.caseMatters,
+                sixthMinor=self.sixthMinor,
+                seventhMinor=self.seventhMinor,
             )
             self.secondaryRomanNumeral = secondaryRomanNumeral
             if secondaryRomanNumeral.quality == 'minor':
@@ -2989,7 +3102,7 @@ class RomanNumeral(harmony.Harmony):
 
         OMIT_FROM_DOCS
 
-        >>> rn.romanNumeral = None
+        >>> rn.romanNumeral = 'V'
         Traceback (most recent call last):
         ValueError: Cannot set romanNumeral property of RomanNumeral objects
         '''
@@ -3009,6 +3122,7 @@ class RomanNumeral(harmony.Harmony):
     def figure(self):
         '''
         Gets or sets the entire figure (the whole enchilada).
+        (these docs are overridden below)
         '''
         return self._figure
 
@@ -3982,7 +4096,7 @@ class Test(unittest.TestCase):
             self.assertEqual(rn.figure, rn_out.figure, f'{aug6}: {rn_out}')
 
     def testSetFigureAgain(self):
-        """Setting the figure again doesn't double the alterations"""
+        '''Setting the figure again doesn't double the alterations'''
         ger = RomanNumeral('Ger7')
         pitches_before = ger.pitches
         ger.figure = 'Ger7'

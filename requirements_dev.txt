@@ -1,0 +1,11 @@
+-r requirements.txt
+pylint
+flake8
+flake8-quotes
+mypy
+coveralls
+scipy
+sphinx
+python-Levenshtein
+setuptools
+coverage

@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'8.0.0a3'
+'8.0.0a9'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -43,6 +43,7 @@ import sys
 import types
 import unittest
 import warnings
+import weakref
 
 from collections import namedtuple
 from importlib.util import find_spec
@@ -348,7 +349,7 @@ class Music21Object(prebase.ProtoM21Object):
         # do not call super().__init__() since it just wastes time
         self._id = None
         # None is stored as the internal location of an obj w/o any sites
-        self._activeSite: t.Optional['music21.stream.Stream'] = None
+        self._activeSite: t.Union['music21.stream.Stream', weakref.ReferenceType, None] = None
         # offset when no activeSite is available
         self._naiveOffset: t.Union[float, fractions.Fraction] = 0.0
 
@@ -1639,7 +1640,7 @@ class Music21Object(prebase.ProtoM21Object):
                 # might be raised by selfSortTuple; should not be by contextSortTuple.
                 # It just means that selfSortTuple isn't in the same stream
                 # as contextSortTuple, such as
-                # when crossing measure borders.  Thus it's well-formed.
+                # when crossing measure borders.  Thus, it's well-formed.
                 return True
 
             if getElementMethod in BEFORE_METHODS and selfSortTuple < contextSortTuple:
@@ -1910,7 +1911,7 @@ class Music21Object(prebase.ProtoM21Object):
             callerFirst = self
             if self.isStream and self not in memo:
                 streamSelf = t.cast('music21.stream.Stream', self)
-                recursionType = streamSelf.recursionType
+                recursionType = streamSelf.recursionType  # pylint: disable=no-member
                 environLocal.printDebug(
                     f'Caller first is {callerFirst} with offsetAppend {offsetAppend}')
                 if returnSortTuples:
@@ -3348,7 +3349,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         '''
         atm = self.duration.aggregateTupletMultiplier()
-        quarterLengthList = [c.quarterLength * atm for c in self.duration.components]
+        quarterLengthList = [opFrac(c.quarterLength * atm) for c in self.duration.components]
         splitList = self.splitByQuarterLengths(quarterLengthList)
         return splitList
     # -------------------------------------------------------------------------
@@ -3368,7 +3369,7 @@ class Music21Object(prebase.ProtoM21Object):
         If an object belongs to multiple measures (not in the same hierarchy...)
         then it returns the
         measure number of the :meth:`~music21.base.Music21Object.activeSite` if that is a
-        :class:`~music21.stream.Measure` object.  Otherwise it will use
+        :class:`~music21.stream.Measure` object.  Otherwise, it will use
         :meth:`~music21.base.Music21Object.getContextByClass`
         to find the number of the measure it was most recently added to.
 
@@ -3569,7 +3570,7 @@ class Music21Object(prebase.ProtoM21Object):
         7/3
 
         If there is no TimeSignature object in sites then returns the special float
-        'nan' meaning "Not a Number":
+        `nan` meaning "Not a Number":
 
         >>> isolatedNote = note.Note('E4')
         >>> isolatedNote.beat
@@ -3580,7 +3581,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> isolatedNote.beat == isolatedNote.beat
         False
 
-        Instead to test for nan, import the math module and use `isnan()`:
+        Instead, to test for `nan`, import the math module and use `isnan()`:
 
         >>> import math
         >>> math.isnan(isolatedNote.beat)

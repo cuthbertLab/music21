@@ -87,7 +87,7 @@ def extractHarmonies(music21Stream):
     >>> from music21.figuredBass import checker
     >>> allHarmonies = checker.extractHarmonies(score)
     >>> for (offsets, notes) in sorted(allHarmonies.items()):
-    ...    print("{0!s:15}[{1!s:23}{2!s:23}{3!s:22}]".format(offsets, notes[0], notes[1], notes[2]))
+    ...    print('{0!s:15}[{1!s:23}{2!s:23}{3!s:22}]'.format(offsets, notes[0], notes[1], notes[2]))
     (0.0, 1.5)     [<music21.note.Note C>  <music21.note.Note A>  <music21.note.Note F> ]
     (1.5, 2.0)     [<music21.note.Note C>  <music21.note.Note A>  <music21.note.Note F> ]
     (2.0, 3.0)     [<music21.note.Note B-> <music21.note.Note G>  <music21.note.Note G> ]
@@ -126,7 +126,7 @@ def createOffsetMapping(music21Part):
     >>> v0 = score[0]
     >>> offsetMapping = checker.createOffsetMapping(v0)
     >>> for (offsets, notes) in sorted(offsetMapping.items()):
-    ...    print("{0!s:15}[{1!s:22}]".format(offsets, notes[0]))
+    ...    print('{0!s:15}[{1!s:22}]'.format(offsets, notes[0]))
     (0.0, 1.5)     [<music21.note.Note C> ]
     (1.5, 2.0)     [<music21.note.Note C> ]
     (2.0, 3.0)     [<music21.note.Note B->]
@@ -161,7 +161,7 @@ def correlateHarmonies(currentMapping, music21Part):
     >>> v1 = score[1]
     >>> newMapping = checker.correlateHarmonies(offsetMapping, v1)
     >>> for (offsets, notes) in sorted(newMapping.items()):
-    ...    print("{0!s:15}[{1!s:23}{2!s:21}]".format(offsets, notes[0], notes[1]))
+    ...    print('{0!s:15}[{1!s:23}{2!s:21}]'.format(offsets, notes[0], notes[1]))
     (0.0, 1.5)     [<music21.note.Note C>  <music21.note.Note A>]
     (1.5, 2.0)     [<music21.note.Note C>  <music21.note.Note A>]
     (2.0, 3.0)     [<music21.note.Note B-> <music21.note.Note G>]
@@ -205,7 +205,7 @@ def correlateHarmonies(currentMapping, music21Part):
 # Generic functions for checking for composition rule violations in streams
 
 
-def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
+def checkSinglePossibilities(music21Stream, functionToApply, color='#FF0000', debug=False):
     # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Score` and a functionToApply which takes in a possibility
@@ -243,7 +243,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
     '''
     debugInfo = []
     if debug is True:
-        debugInfo.append("Function To Apply: " + functionToApply.__name__)
+        debugInfo.append('Function To Apply: ' + functionToApply.__name__)
         debugInfo.append(f"{'(Offset, End Time):'!s:25}Part Numbers:")
 
     allHarmonies = sorted(list(extractHarmonies(music21Stream).items()))
@@ -261,16 +261,16 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
                         mustBeginInSpan=False)[0]
                     noteA.style.color = color
             if debug is True:
-                debugInfo.append(f"{offsets!s:25}{partNumberTuple!s}")
+                debugInfo.append(f'{offsets!s:25}{partNumberTuple!s}')
 
     if debug is True:
         if len(debugInfo) == 2:
-            debugInfo.append("No violations to report.")
+            debugInfo.append('No violations to report.')
         for lineInfo in debugInfo:
             print(lineInfo)
 
 
-def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
+def checkConsecutivePossibilities(music21Stream, functionToApply, color='#FF0000', debug=False):
     # noinspection PyShadowingNames
     '''
     Takes in a :class:`~music21.stream.Score` and a functionToApply which takes in two consecutive
@@ -333,7 +333,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
                     noteA.style.color = color
                     noteB.style.color = color
             if debug is True:
-                debugInfo.append(f"{previousOffsets!s:25}{offsets!s:25}{partNumberTuple!s}")
+                debugInfo.append(f'{previousOffsets!s:25}{offsets!s:25}{partNumberTuple!s}')
         # Current vlm becomes previous
         previousOffsets = offsets
         vlmA = vlmB
@@ -341,7 +341,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
 
     if debug is True:
         if len(debugInfo) == 2:
-            debugInfo.append("No violations to report.")
+            debugInfo.append('No violations to report.')
         for lineInfo in debugInfo:
             print(lineInfo)
 
@@ -734,7 +734,7 @@ def generalNoteToPitch(music21GeneralNote):
     if music21GeneralNote.isNote:
         return music21GeneralNote.pitch
     else:
-        return "RT"
+        return 'RT'
 
 
 _DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments,
