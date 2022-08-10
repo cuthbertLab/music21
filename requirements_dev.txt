@@ -9,3 +9,8 @@ sphinx
 python-Levenshtein
 setuptools
 coverage
+nbconvert
+jupyter
+nbval
+pytest
+docutils
