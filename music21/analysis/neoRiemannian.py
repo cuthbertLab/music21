@@ -301,7 +301,7 @@ def LRP_combinations(c,
     orthography).
 
     By default, `leftOrdered` is False, so transformations progress towards the right.
-    Thus 'LPR' will start by transforming the chord by L, then P, then R.
+    Thus, 'LPR' will start by transforming the chord by L, then P, then R.
 
     If `leftOrdered` is True, the operations work in the opposite direction (right to left), so
     'LPR' indicates the result of the chord transformed by R, then P, then L.

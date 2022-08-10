@@ -535,7 +535,7 @@ class AVLTree(prebase.ProtoM21Object):
         This is about an order of magnitude faster (3ms vs 21ms for 1000 items;
         31 vs. 300ms for 10,000 items) than running createNodeAtPosition()
         for each element in a list if it is
-        already sorted.  Thus it should be used when converting a
+        already sorted.  Thus, it should be used when converting a
         Stream where .isSorted is True into a tree.
 
         This method assumes that the current tree is empty (or will be wiped) and

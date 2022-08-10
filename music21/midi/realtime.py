@@ -106,9 +106,15 @@ class StreamPlayer:  # pragma: no cover
 
         self.streamIn = streamIn
 
-    def play(self, busyFunction=None, busyArgs=None,
-             endFunction=None, endArgs=None, busyWaitMilliseconds=50,
-             *, playForMilliseconds=float("inf"), blocked=True):
+    def play(self,
+             busyFunction=None,
+             busyArgs=None,
+             endFunction=None,
+             endArgs=None,
+             busyWaitMilliseconds=50,
+             *,
+             playForMilliseconds=float('inf'),
+             blocked=True):
         '''
         busyFunction is a function that is called with busyArgs when the music is busy every
         busyWaitMilliseconds.
@@ -134,7 +140,7 @@ class StreamPlayer:  # pragma: no cover
     def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None,
                          endFunction=None, endArgs=None, busyWaitMilliseconds=50,
                          *,
-                         playForMilliseconds=float("inf"), blocked=True):
+                         playForMilliseconds=float('inf'), blocked=True):
         '''
         busyFunction is a function that is called with busyArgs when the music is busy every
         busyWaitMilliseconds.

@@ -419,9 +419,13 @@ class Test(unittest.TestCase):
         s = stream.Score([converter.parse('tinyNotation: 4/4 c4')])
         s[stream.Measure].first().paddingLeft = 2.0
         s[stream.Measure].first().paddingRight = 1.0
+        # workaround until getET() helper starts calling fromGeneralObject
+        s = GeneralObjectExporter().fromGeneralObject(s)
         tree = self.getET(s)
         self.assertEqual(len(tree.findall('.//rest')), 0)
         s[stream.Measure].first().paddingLeft = 1.0
+        # workaround until getET() helper starts calling fromGeneralObject
+        s = GeneralObjectExporter().fromGeneralObject(s)
         tree = self.getET(s)
         self.assertEqual(len(tree.findall('.//rest')), 1)
 
@@ -455,6 +459,7 @@ class Test(unittest.TestCase):
         m.insert(2, tempo.MetronomeMark('slow', 40))
 
         gex = GeneralObjectExporter()
+        gex.makeNotation = False
         tree = self.getET(gex.fromGeneralObject(m))
         self.assertFalse(tree.findall('.//forward'))
         self.assertEqual(
@@ -594,6 +599,7 @@ class Test(unittest.TestCase):
 
     def testExportChordSymbolsWithRealizedDurations(self):
         gex = GeneralObjectExporter()
+        gex.makeNotation = False
 
         def realizeDurationsAndAssertTags(mm: stream.Measure, forwardTag=False, offsetTag=False):
             mm = copy.deepcopy(mm)
@@ -640,7 +646,7 @@ class Test(unittest.TestCase):
         realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
 
     def test_inexpressible_hidden_rests_become_forward_tags(self):
-        """Express hidden rests with inexpressible durations as <forward> tags."""
+        '''Express hidden rests with inexpressible durations as <forward> tags.'''
         m = stream.Measure()
         # 7 eighths in the space of 4 eighths, imported as 137/480
         # (137/480) * 7 = 1.9979, not 2.0

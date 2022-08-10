@@ -1751,6 +1751,24 @@ class RomanNumeral(harmony.Harmony):
     degree (i.e., '-II' becomes 'bII') as this is what people expect in looking at
     the figure.
 
+    Changed in v8 -- Figures are now validated as alphanumeric or containing one of
+    the following symbols (after the example "V"):
+
+    >>> specialCharacterFigure = roman.RomanNumeral('V#+-/[]')
+    >>> specialCharacterFigure
+    <music21.roman.RomanNumeral V#+-/[]>
+
+    And degree symbols (`°`) convert to `o`:
+
+    >>> dimSeventh = roman.RomanNumeral('vii°7', 'c')
+    >>> dimSeventh
+    <music21.roman.RomanNumeral viio7 in c minor>
+
+    Otherwise, an invalid figure raises `RomanNumeralException`:
+
+    >>> roman.RomanNumeral("V64==53")
+    Traceback (most recent call last):
+    music21.roman.RomanNumeralException: Invalid figure: V64==53
 
     OMIT_FROM_DOCS
 
@@ -1800,6 +1818,11 @@ class RomanNumeral(harmony.Harmony):
     >>> r = roman.RomanNumeral('V754', key.Key('C'))
     >>> cp(r)
     ['G4', 'C5', 'D5', 'F5']
+
+    A symbol that looks like the degree symbol but isn't:
+
+    >>> roman.RomanNumeral('viiº')
+    <music21.roman.RomanNumeral viio>
 
     (NOTE: all this is omitted -- look at OMIT_FROM_DOCS above)
     '''
@@ -2206,13 +2229,17 @@ class RomanNumeral(harmony.Harmony):
         # immediately fix low-preference figures
         if isinstance(figure, str):
             figure = figure.replace('0', 'o')  # viio7
-
-        if isinstance(figure, str):
+            figure = figure.replace('º', 'o')
+            figure = figure.replace('°', 'o')
             # /o is just a shorthand for ø -- so it should not be stored.
             figure = figure.replace('/o', 'ø')
-
+        else:
+            raise TypeError(f'Expected str or int: got {type(figure)}')
         # end immediate fixes
 
+        if not all(char.isalnum() or char in '#°+-/[]' for char in figure):
+            # V, b, ø, no, etc. already covered by isalnum()
+            raise RomanNumeralException(f'Invalid figure: {figure}')
 
         # Store raw figure before calling setKeyOrScale:
         self._figure = figure
@@ -4069,7 +4096,7 @@ class Test(unittest.TestCase):
             self.assertEqual(rn.figure, rn_out.figure, f'{aug6}: {rn_out}')
 
     def testSetFigureAgain(self):
-        """Setting the figure again doesn't double the alterations"""
+        '''Setting the figure again doesn't double the alterations'''
         ger = RomanNumeral('Ger7')
         pitches_before = ger.pitches
         ger.figure = 'Ger7'

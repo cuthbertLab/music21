@@ -40,15 +40,15 @@ articleReference = {
     # german
     'de': ['der', 'die', 'das', 'des', 'dem', 'den', 'ein', 'eine', 'einer', 'einem', 'einen'],
     # dutch
-    'nl': ['de', 'het', '\'t', 'een'],
+    'nl': ['de', 'het', "'t", 'een'],
     # spanish
     'es': ['el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas'],
     # portuguese
     'pt': ['o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas'],
     # french
-    'fr': ['le', 'la', 'les', 'l\'', 'un', 'une', 'des', 'du', 'de la', 'des'],
+    'fr': ['le', 'la', 'les', "l'", 'un', 'une', 'des', 'du', 'de la', 'des'],
     # italian
-    'it': ['il', 'lo', 'la', 'l\'', 'i', 'gli', 'le', 'un\'', 'un', 'uno', 'una',
+    'it': ['il', 'lo', 'la', "l'", 'i', 'gli', 'le', "un'", 'un', 'uno', 'una',
            'del', 'dello', 'della', 'dei', 'degli', 'delle'],
 }
 

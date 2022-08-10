@@ -29,7 +29,7 @@ from music21 import exceptions21
 from music21.tree import spans, trees
 
 from music21 import environment
-environLocal = environment.Environment("tree.timespanTree")
+environLocal = environment.Environment('tree.timespanTree')
 
 
 # -----------------------------------------------------------------------------
@@ -583,8 +583,8 @@ class TimespanTree(trees.OffsetTree):
 
         n = int(n)
         if n <= 0:
-            message = "The number of verticalities in the group must be at "
-            message += f"least one. Got {n}"
+            message = 'The number of verticalities in the group must be at '
+            message += f'least one. Got {n}'
             raise TimespanTreeException(message)
 
         sentinelVerticality = Verticality(self.endTime, timespanTree=self)

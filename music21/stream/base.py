@@ -1809,36 +1809,38 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         return self._removeIteration(elFilter)
 
     # pylint: disable=no-member
-    def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
+    def _deepcopySubclassable(self: StreamType,
+                              memo=None,
+                              ignoreAttributes=None,
+                              removeFromIgnore=None
+                              ) -> StreamType:
         # NOTE: this is a performance critical operation
-        defaultIgnoreSet = {'_offsetDict', 'streamStatus', '_elements', '_endElements', '_cache',
-                            }
+        defaultIgnoreSet = {
+            '_offsetDict', 'streamStatus', '_elements', '_endElements', '_cache',
+        }
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
         else:  # pragma: no cover
             ignoreAttributes = ignoreAttributes | defaultIgnoreSet
-        new = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
+
+        # PyCharm seems to think that this is a StreamCore
+        # noinspection PyTypeChecker
+        new: StreamType = super()._deepcopySubclassable(memo, ignoreAttributes, removeFromIgnore)
 
         if removeFromIgnore is not None:  # pragma: no cover
             ignoreAttributes = ignoreAttributes - removeFromIgnore
 
-        if '_offsetDict' in ignoreAttributes:
-            newValue = {}
-            setattr(new, '_offsetDict', newValue)
-        # all subclasses of Music21Object that define their own
-        # __deepcopy__ methods must be sure to not try to copy activeSite
-        if '_offsetDict' in self.__dict__:
-            newValue = {}
-            setattr(new, '_offsetDict', newValue)
+        # new._offsetDict will get filled when ._elements is copied.
+        newOffsetDict: t.Dict[int, t.Tuple[OffsetQLSpecial, base.Music21Object]] = {}
+        new._offsetDict = newOffsetDict
+
         if 'streamStatus' in ignoreAttributes:
             # update the client
-            if self.streamStatus is not None:
-                # storedClient = self.streamStatus.client  # Should be self.
-                # self.streamStatus.client = None
-                newValue = copy.deepcopy(self.streamStatus)
-                newValue.client = new
-                setattr(new, 'streamStatus', newValue)
-                # self.streamStatus.client = storedClient
+            # self.streamStatus.client = None
+            newStreamStatus = copy.deepcopy(self.streamStatus)
+            newStreamStatus.client = new
+            setattr(new, 'streamStatus', newStreamStatus)
+            # self.streamStatus.client = storedClient
         if '_elements' in ignoreAttributes:
             # must manually add elements to new Stream
             for e in self._elements:
@@ -1878,7 +1880,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         return new
 
-    def __deepcopy__(self, memo=None):
+    def __deepcopy__(self: StreamType, memo=None) -> StreamType:
         '''
         Deepcopy the stream from copy.deepcopy()
         '''
