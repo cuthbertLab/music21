@@ -14,3 +14,4 @@ jupyter
 nbval
 pytest
 docutils
+types-requests

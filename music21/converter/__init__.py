@@ -746,10 +746,10 @@ class Converter:
         directory = environLocal.getRootTempDir()
         fp = self._getDownloadFp(directory, ext, url)  # returns pathlib.Path
 
-        if forceSource is True or not dst.exists():
-            environLocal.printDebug([f'downloading to: {dst}'])
+        if forceSource is True or not fp.exists():
+            environLocal.printDebug([f'downloading to: {fp}'])
             r = requests.get(url, allow_redirects=True)
-            if r.status_code != requests.codes.OK:
+            if r.status_code != 200:
                 raise ConverterException(
                     f'Could not download {url}, error: {r.status_code} {responses[r.status_code]}')
             fp.write_bytes(r.content)
@@ -2102,6 +2102,9 @@ class Test(unittest.TestCase):
             parse('nonexistent_path_ending_in_correct_extension.musicxml')
 
     def testParseURL(self):
+        '''
+        This should be the only test that requires an internet connection.
+        '''
         from music21.humdrum.spineParser import HumdrumException
 
         urlBase = 'https://raw.githubusercontent.com/craigsapp/chopin-preludes/'
@@ -2121,7 +2124,12 @@ class Test(unittest.TestCase):
         with self.assertRaises(HumdrumException):
             s = parseURL(url, forceSource=False)
 
+        # make sure that forceSource still overrides the system.
         s = parseURL(url, forceSource=True)
+        self.assertEqual(len(s.parts), 2)
+
+        # make sure that the normal parse system can handle URLs, not just parseURL.
+        s = parse(url)
         self.assertEqual(len(s.parts), 2)
 
         os.remove(destFp)
