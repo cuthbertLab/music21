@@ -433,7 +433,7 @@ class Test(unittest.TestCase):
 
         from music21 import converter
 
-        testOpusString = """Composer: Fake composer
+        testOpusString = '''Composer: Fake composer
         Piece: Fake piece
         Movement: 1
         m1 C: I b3 IV b4 V
@@ -449,7 +449,7 @@ class Test(unittest.TestCase):
         m1 C: I
         m2 V
         m3 I
-        """
+        '''
 
         testOpus = converter.parse('romantext: ' + testOpusString)
         self.assertIsInstance(testOpus, stream.Opus)

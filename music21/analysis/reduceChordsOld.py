@@ -255,9 +255,9 @@ class ChordReducer:
                 p.coreAppend(m)
 
             if self.printDebug:
-                print(i, " ", end="")
+                print(i, ' ', end='')
                 if i % 20 == 0 and i != 0:
-                    print("")
+                    print('')
         p.coreElementsChanged()
         m = p.getElementsByClass(stream.Measure).first()
         if m:
@@ -309,7 +309,7 @@ class ChordReducer:
             firstPitched = m[0]
             if self._lastPitchedObject.isNote and firstPitched.isNote:
                 if self._lastPitchedObject.pitch == firstPitched.pitch:
-                    self._lastPitchedObject.tie = tie.Tie("start")
+                    self._lastPitchedObject.tie = tie.Tie('start')
             elif self._lastPitchedObject.isChord and firstPitched.isChord:
                 if len(self._lastPitchedObject) == len(firstPitched):
                     allSame = True

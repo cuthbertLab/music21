@@ -646,7 +646,7 @@ class Test(unittest.TestCase):
         realizeDurationsAndAssertTags(m, forwardTag=False, offsetTag=False)
 
     def test_inexpressible_hidden_rests_become_forward_tags(self):
-        """Express hidden rests with inexpressible durations as <forward> tags."""
+        '''Express hidden rests with inexpressible durations as <forward> tags.'''
         m = stream.Measure()
         # 7 eighths in the space of 4 eighths, imported as 137/480
         # (137/480) * 7 = 1.9979, not 2.0

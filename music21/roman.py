@@ -2234,12 +2234,12 @@ class RomanNumeral(harmony.Harmony):
             # /o is just a shorthand for ø -- so it should not be stored.
             figure = figure.replace('/o', 'ø')
         else:
-            raise TypeError(f"Expected str or int: got {type(figure)}")
+            raise TypeError(f'Expected str or int: got {type(figure)}')
         # end immediate fixes
 
-        if not all(char.isalnum() or char in "#°+-/[]" for char in figure):
+        if not all(char.isalnum() or char in '#°+-/[]' for char in figure):
             # V, b, ø, no, etc. already covered by isalnum()
-            raise RomanNumeralException(f"Invalid figure: {figure}")
+            raise RomanNumeralException(f'Invalid figure: {figure}')
 
         # Store raw figure before calling setKeyOrScale:
         self._figure = figure
@@ -4096,7 +4096,7 @@ class Test(unittest.TestCase):
             self.assertEqual(rn.figure, rn_out.figure, f'{aug6}: {rn_out}')
 
     def testSetFigureAgain(self):
-        """Setting the figure again doesn't double the alterations"""
+        '''Setting the figure again doesn't double the alterations'''
         ger = RomanNumeral('Ger7')
         pitches_before = ger.pitches
         ger.figure = 'Ger7'

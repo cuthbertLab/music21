@@ -93,7 +93,7 @@ class KeyAnalyzer:
         # could be wrong for endings, etc.
         self.numMeasures = len(p.getElementsByClass(stream.Measure))
         if self.numMeasures == 0:
-            raise FloatingKeyException("Stream must have Measures inside it")
+            raise FloatingKeyException('Stream must have Measures inside it')
 
     def run(self):
         self.getRawKeyByMeasure()

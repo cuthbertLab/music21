@@ -757,7 +757,7 @@ def _getDefaultTokenMap() -> typing.List[
             typing.Type[Token]
         ]
 ]:
-    """
+    '''
     Returns the default tokenMap for TinyNotation.
 
     Based on the following grammar (in Extended Backus-Naur form)
@@ -822,7 +822,7 @@ def _getDefaultTokenMap() -> typing.List[
     ALPHANUMERIC = ? At least one alphanumeric character. So "a-z", "A-Z", or "0-9" ? ;
     EQUALS-DATA = ? At least one non-whitespace, non-"_" character. ? ;
     UNDERSCORE-DATA = ? At least one non-whitespace, non-"=" character. ? ;
-    """
+    '''
     sharpsFlatsOrNaturalRegex = r'#+|-+|n'
     editorialRegex = fr'\((?:{sharpsFlatsOrNaturalRegex})\)'
     accidentalRegex = fr'{editorialRegex}|(?:{sharpsFlatsOrNaturalRegex})'

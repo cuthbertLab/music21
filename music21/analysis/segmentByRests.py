@@ -101,14 +101,14 @@ class Segmenter:
 class Test(unittest.TestCase):
 
     def testGetSegmentsList(self):
-        ex = converter.parse("tinyNotation: E4 r F G A r g c r c")
+        ex = converter.parse('tinyNotation: E4 r F G A r g c r c')
         segments = Segmenter.getSegmentsList(ex)
 
         self.assertIsInstance(segments[0], list)
         self.assertEqual(segments[1][0].name, 'F')
 
     def testGetIntervalList(self):
-        ex = converter.parse("tinyNotation: E4 r F G A r g c r c")
+        ex = converter.parse('tinyNotation: E4 r F G A r g c r c')
         intervalList = Segmenter.getIntervalList(ex)
 
         self.assertEqual(intervalList[0].name, 'M2')

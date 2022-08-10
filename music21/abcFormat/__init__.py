@@ -2365,8 +2365,8 @@ class ABCHandler:
                     # continue conditions after alpha:
                     # , register modification (, ') or number, rhythm indication
                     # number, /,
-                    elif self.strSrc[j].isdigit() or self.strSrc[j] in ',/,\'':
-                        if self.strSrc[j] in ',\'':  # Register (octave) modification
+                    elif self.strSrc[j].isdigit() or self.strSrc[j] in ",/,'":
+                        if self.strSrc[j] in ",'":  # Register (octave) modification
                             abcPitch += self.strSrc[j]
                         j += 1
                         continue
