@@ -74,11 +74,11 @@ class ChordReducer:
             forbiddenChords=None,
             maximumNumberOfChords=3):
         if not isinstance(inputScore, stream.Score):
-            raise ChordReducerException("Must be called on a stream.Score")
+            raise ChordReducerException('Must be called on a stream.Score')
 
         if allowableChords is not None:
             if not all(isinstance(x, chord.Chord) for x in allowableChords):
-                raise ChordReducerException("All allowableChords must be Chords")
+                raise ChordReducerException('All allowableChords must be Chords')
             intervalClassSets = []
             for x in allowableChords:
                 intervalClassSet = self._getIntervalClassSet(x.pitches)
@@ -87,7 +87,7 @@ class ChordReducer:
 
         if forbiddenChords is not None:
             if not all(isinstance(x, chord.Chord) for x in forbiddenChords):
-                raise ChordReducerException("All forbiddenChords must be Chords")
+                raise ChordReducerException('All forbiddenChords must be Chords')
             intervalClassSets = []
             for x in allowableChords:
                 intervalClassSet = self._getIntervalClassSet(x.pitches)

@@ -25,6 +25,7 @@ from music21.figuredBass import realizerScale
 from music21.figuredBass import resolution
 from music21.figuredBass import rules
 
+# used below
 _MOD = 'figuredBass.segment'
 
 _defaultRealizerScale: t.Dict[str, t.Optional[realizerScale.FiguredBassScale]] = {

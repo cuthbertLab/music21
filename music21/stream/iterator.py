@@ -48,7 +48,7 @@ class StreamIteratorException(StreamException):
     pass
 
 
-class StreamIteratorInefficientWarning(PendingDeprecationWarning):
+class StreamIteratorInefficientWarning(UserWarning):
     pass
 
 
@@ -221,9 +221,10 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
         self.cleanup()
         raise StopIteration
 
-    @common.deprecated('v8', 'v9', 'Call .stream() before attribute access for efficiency.')
     def __getattr__(self, attr):
         '''
+        DEPRECATED in v8 -- will be removed in v9.
+
         In case an attribute is defined on Stream but not on a StreamIterator,
         create a Stream and then return that attribute.  This is NOT performance
         optimized -- calling this repeatedly will mean creating a lot of different

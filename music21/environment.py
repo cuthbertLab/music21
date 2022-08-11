@@ -38,6 +38,7 @@ from xml.sax import saxutils
 from music21 import exceptions21
 from music21 import common
 
+# used below
 _MOD = 'environment'
 
 
@@ -548,7 +549,7 @@ class _EnvironmentCore:
                     uid = os.getuid()
                     dir_path = pathlib.Path(tempfile.gettempdir()) / f'music21-userid-{uid}'
                 else:
-                    dir_path = pathlib.Path(tempfile.mkdtemp(prefix="music21-"))
+                    dir_path = pathlib.Path(tempfile.mkdtemp(prefix='music21-'))
 
                 if self._checkAccessibility(dir_path):
                     self.defaultRootTempDir = dir_path

@@ -12,7 +12,6 @@ import unittest
 import math
 
 from music21 import exceptions21
-_MOD = 'analysis.patel'
 
 
 def nPVI(streamForAnalysis):

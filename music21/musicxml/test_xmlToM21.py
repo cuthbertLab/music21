@@ -1074,9 +1074,9 @@ class Test(unittest.TestCase):
 
     def testChordInversion(self):
         from xml.etree.ElementTree import fromstring as EL
-        h = EL("""
+        h = EL('''
         <harmony><root><root-step>C</root-step></root>
-        <kind>major</kind><inversion>1</inversion></harmony>""")
+        <kind>major</kind><inversion>1</inversion></harmony>''')
         mp = MeasureParser()
         cs = mp.xmlToChordSymbol(h)
         self.assertEqual(cs.inversion(), 1)
@@ -1257,7 +1257,7 @@ class Test(unittest.TestCase):
         self.assertListEqual(repeatBrackets[0].getNumberList(), [1, 2])
         self.assertListEqual(repeatBrackets[1].getNumberList(), [3])
 
-        nonconformingInput = testPrimitive.multiDigitEnding.replace("1,2", "ad lib.")
+        nonconformingInput = testPrimitive.multiDigitEnding.replace('1,2', 'ad lib.')
         score2 = converter.parse(nonconformingInput)
         repeatBracket = score2.recurse().getElementsByClass(spanner.RepeatBracket).first()
         self.assertListEqual(repeatBracket.getNumberList(), [1])
@@ -1274,7 +1274,7 @@ class Test(unittest.TestCase):
         # Check that we parsed a modification
         self.assertTrue(len(cs.getChordStepModifications()) == 1)
         # And that it affected the correct pitch in the right way
-        self.assertTrue(pitch.Pitch("G-3") == cs.pitches[2])
+        self.assertTrue(pitch.Pitch('G-3') == cs.pitches[2])
 
     def testCompositeLyrics(self):
         '''

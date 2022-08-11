@@ -42,7 +42,7 @@ def inGoogleColabNotebook():
         # get_ipython is loaded into global scope in IPython and Google Colab
         # because we already returned False above, the NameError should never
         # be triggered, but better safe than sorry.  And helps type checkers.
-        return get_ipython().__class__.__module__ == "google.colab._shell"
+        return get_ipython().__class__.__module__ == 'google.colab._shell'
     except NameError:
         return False
 

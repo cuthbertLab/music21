@@ -10,8 +10,6 @@
 # ------------------------------------------------------------------------------
 import collections
 
-_MOD = 'analysis.elements'
-
 def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.Counter:
     '''
     Return a collections.Counter of attribute usage for elements in a stream

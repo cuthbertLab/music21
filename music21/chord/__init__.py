@@ -2193,7 +2193,7 @@ class Chord(ChordBase):
         if testRoot is None:
             testRoot = self.root()
             if testRoot is None:
-                raise ChordException("Cannot run hasRepeatedChordStep without a root")
+                raise ChordException('Cannot run hasRepeatedChordStep without a root')
 
         first = self.intervalFromChordStep(chordStep)
         for thisPitch in self.pitches:
@@ -2224,9 +2224,9 @@ class Chord(ChordBase):
             try:
                 testRoot = self.root()
             except ChordException:
-                raise ChordException("Cannot run intervalFromChordStep without a root")
+                raise ChordException('Cannot run intervalFromChordStep without a root')
             if testRoot is None:
-                raise ChordException("Cannot run intervalFromChordStep without a root")
+                raise ChordException('Cannot run intervalFromChordStep without a root')
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(testRoot, thisPitch)
             if thisInterval.diatonic.generic.mod7 == chordStep:
@@ -2387,7 +2387,7 @@ class Chord(ChordBase):
             try:
                 int_newInversion = int(newInversion)
             except (ValueError, TypeError):
-                raise ChordException(f"Inversion must be an integer, got: {type(newInversion)}")
+                raise ChordException(f'Inversion must be an integer, got: {type(newInversion)}')
             self._setInversion(int_newInversion, rootPitch, transposeOnSet)
             return None
         elif ('inversion' not in self._overrides and find) or testRoot is not None:

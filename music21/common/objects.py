@@ -196,7 +196,7 @@ class SlottedObjectMixin:
         slots = self._getSlotsRecursive()
         for slot in slots:
             sValue = getattr(self, slot, None)
-            if isinstance(sValue, weakref.ref):
+            if isinstance(sValue, weakref.ReferenceType):
                 sValue = sValue()
                 print(f'Warning: uncaught weakref found in {self!r} - {slot}, '
                       + 'will not be wrapped again')
@@ -217,7 +217,7 @@ class SlottedObjectMixin:
         >>> b = beam.Beam()
         >>> sSet = b._getSlotsRecursive()
 
-        sSet is a set -- independent order.  Thus for the doctest
+        sSet is a set -- independent order.  Thus, for the doctest
         we need to preserve the order:
 
         >>> sorted(list(sSet))
