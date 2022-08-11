@@ -12886,7 +12886,7 @@ class Measure(Stream):
         >>> m.insert(2.0, n)
         >>> m.padAsAnacrusis()
         >>> m.paddingLeft
-        0
+        0.0
 
         If useInitialRests is True, then rests at the beginning of the measure
         are removed.  This is especially useful for formats that don't give a

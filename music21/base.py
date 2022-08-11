@@ -3450,7 +3450,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> [n._getMeasureOffset() for n in m.notes]
         [0.0, 0.5, 1.0, 1.5]
 
-        >>> m.paddingLeft = 2
+        >>> m.paddingLeft = 2.0
         >>> [n._getMeasureOffset() for n in m.notes]
         [2.0, 2.5, 3.0, 3.5]
         >>> [n._getMeasureOffset(includeMeasurePadding=False) for n in m.notes]
