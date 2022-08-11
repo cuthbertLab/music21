@@ -183,33 +183,26 @@ def expandShortHand(shorthand):
 
     >>> roman.expandShortHand('64')
     ['6', '4']
-
     >>> roman.expandShortHand('973')
     ['9', '7', '3']
-
     >>> roman.expandShortHand('11b3')
     ['11', 'b3']
-
     >>> roman.expandShortHand('b13#9-6')
     ['b13', '#9', '-6']
-
     >>> roman.expandShortHand('-')
     ['5', '-3']
 
-
-    Slashes don't matter
+    Slashes don't matter:
 
     >>> roman.expandShortHand('6/4')
     ['6', '4']
 
-    Note that this is not where abbreviations get expanded
+    Note that this is not where abbreviations get expanded:
 
     >>> roman.expandShortHand('')
     []
-
     >>> roman.expandShortHand('7')  # not 7, 5, 3
     ['7']
-
     >>> roman.expandShortHand('4/3')  # not 6, 4, 3
     ['4', '3']
 
@@ -217,7 +210,6 @@ def expandShortHand(shorthand):
 
     >>> roman.expandShortHand('6')
     ['6']
-
 
     Returns a list of individual shorthands.
     '''
@@ -1461,7 +1453,7 @@ class RomanNumeral(harmony.Harmony):
     Note in the above example we passed in a Scale object not a Key.  This can be used
     in the theoretical case of applying roman numerals in 7-note scales that are not
     major or minor.  (see the documentation for the
-    :attr:`~music21.roman.RomanNumeral.scaleCardinality attribute for scales other than
+    :attr:`~music21.roman.RomanNumeral.scaleCardinality` attribute for scales other than
     7-note scales).
 
     Half-diminished seventh chords can be written with either `ø` or `/o` symbol:
