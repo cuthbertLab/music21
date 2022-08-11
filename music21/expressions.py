@@ -36,8 +36,6 @@ from music21 import spanner
 from music21 import style
 from music21.common.types import OffsetQL
 
-_NoteType = t.TypeVar('_NoteType', bound='music21.note.Note')
-
 def realizeOrnaments(srcObject):
     '''
     given a Music21Object with Ornament expressions,
@@ -458,10 +456,12 @@ class Ornament(Expression):
         # should follow directly on previous; true for most "ornaments".
 
     def realize(self,
-                srcObj: _NoteType,
+                srcObj: 'music21.note.Note',
                 *,
                 inPlace: bool = False
-                ) -> t.Tuple[t.List[_NoteType], t.Optional[_NoteType], t.List[_NoteType]]:
+                ) -> t.Tuple[t.List['music21.note.Note'],
+                             t.Optional['music21.note.Note'],
+                             t.List['music21.note.Note']]:
         '''
         subclassable method call that takes a sourceObject
         and returns a three-element tuple of a list of notes before the
@@ -520,7 +520,7 @@ class GeneralMordent(Ornament):
         self.quarterLength = 0.125  # 32nd note default
         self.size = interval.GenericInterval(2)
 
-    def realize(self, srcObj: _NoteType, *, inPlace=False):
+    def realize(self, srcObj: 'music21.note.Note', *, inPlace=False):
         '''
         Realize a mordent.
 
@@ -768,10 +768,10 @@ class Trill(Ornament):
 
     def realize(
         self,
-        srcObj: _NoteType,
+        srcObj: 'music21.note.Note',
         *,
         inPlace=False
-    ) -> t.Tuple[t.List[_NoteType], None, t.List[_NoteType]]:
+    ) -> t.Tuple[t.List['music21.note.Note'], None, t.List['music21.note.Note']]:
         '''
         realize a trill.
 
@@ -866,7 +866,7 @@ class Trill(Ornament):
         ([<music21.note.Note D>,
           <music21.note.Note E>], None, [])
 
-        inPlace is not used for Trills
+        inPlace is not used for Trills.
         '''
         from music21 import key
 
@@ -889,7 +889,7 @@ class Trill(Ornament):
         if self.nachschlag:
             numberOfTrillNotes -= 2
 
-        trillNotes: t.List[_NoteType] = []
+        trillNotes: t.List['music21.note.Note'] = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval, useQL=useQL)
 
@@ -1034,7 +1034,7 @@ class Turn(Ornament):
         self.tieAttach = 'all'
         self.quarterLength = 0.25
 
-    def realize(self, srcObj: _NoteType, *, inPlace=False):
+    def realize(self, srcObj: 'music21.note.Note', *, inPlace=False):
         # noinspection PyShadowingNames
         '''
         realize a turn.
@@ -1120,7 +1120,7 @@ class Turn(Ornament):
         transposeIntervalUp = self.size
         transposeIntervalDown = self.size.reverse()
 
-        turnNotes: t.List[_NoteType] = []
+        turnNotes: t.List['music21.note.Note'] = []
 
         firstNote = copy.deepcopy(srcObj)
         firstNote.expressions = []
@@ -1183,7 +1183,7 @@ class GeneralAppoggiatura(Ornament):
         super().__init__()
         self.size = interval.Interval(2)
 
-    def realize(self, srcObj: _NoteType, *, inPlace=False):
+    def realize(self, srcObj: 'music21.note.Note', *, inPlace=False):
         '''
         realize an appoggiatura
 
@@ -1322,7 +1322,7 @@ class Tremolo(Ornament):
                 'Number of marks must be a number from 0 to 8'
             ) from ve
 
-    def realize(self, srcObj: _NoteType, *, inPlace=False):
+    def realize(self, srcObj: 'music21.note.Note', *, inPlace=False):
         '''
         Realize the ornament
 

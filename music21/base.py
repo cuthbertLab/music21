@@ -4058,11 +4058,10 @@ class ElementWrapper(Music21Object):
         return object.__getattribute__(storedObj, name)
 
 
-
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Music21Object, ElementWrapper]
+
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
