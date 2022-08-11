@@ -469,7 +469,9 @@ class Ornament(Expression):
         the "main note" itself (or None) to keep processing for ornaments,
         and a list of notes after the "main note".
 
-        Added in v.8 -- inPlace boolean.
+        Added in v.8 -- inPlace boolean; note that some ornaments
+        might not return a Note in the second position at all (such as trills)
+        so inPlace does nothing.
         '''
         if not inPlace:
             srcObj = copy.deepcopy(srcObj)
