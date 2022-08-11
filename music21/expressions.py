@@ -866,7 +866,7 @@ class Trill(Ornament):
         ([<music21.note.Note D>,
           <music21.note.Note E>], None, [])
 
-        inPlace is not used for Trills
+        inPlace is not used for Trills.
         '''
         from music21 import key
 
