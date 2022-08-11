@@ -490,8 +490,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         3.0
 
 
-        If a class (or iterable of classes) is given, then an iterator of elements
-        that match the requested class(es) is returned, similar
+        If a class is given, then a :class:`~music21.stream.iterator.RecursiveIterator`
+        of elements matching the requested class is returned, similar
         to `Stream().recurse().getElementsByClass()`.
 
         >>> len(s)
@@ -500,8 +500,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         2
         >>> len(s[note.Note])
         6
-        >>> len(s[note.Note, note.Rest])
-        8
 
         >>> for n in s[note.Note]:
         ...     print(n.name, end=' ')
@@ -516,6 +514,18 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> len(s[note.Note])
         7
 
+        Multiple classes can be provided, separated by commas. Any element matching
+        any of the requested classes will be matched.
+
+        >>> len(s[note.Note, note.Rest])
+        9
+
+        >>> for note_or_rest in s[note.Note, note.Rest]:
+        ...     if isinstance(note_or_rest, note.Note):
+        ...         print(note_or_rest.name, end=' ')
+        ...     else:
+        ...         print("Rest", end = ' ')
+        C C# D E Rest F G Rest A
 
         The actual object returned by `s[module.Class]` is a
         :class:`~music21.stream.iterator.RecursiveIterator` and has all the functions
@@ -615,12 +625,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
             return t.cast(M21ObjType, searchElements[k])
 
-        elif all(
-            isinstance(maybeType, type) and issubclass(maybeType, base.Music21Object)
-            for maybeType in (
-                k if common.isIterable(k) else [k]  # type: ignore
-            )
-        ):
+        elif isinstance(k, type):
+            return self.recurse().getElementsByClass(k)
+
+        elif common.isIterable(k) and all(isinstance(maybe_type, type) for maybe_type in k):
             return self.recurse().getElementsByClass(k)
 
         elif isinstance(k, str):
