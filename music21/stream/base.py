@@ -6824,19 +6824,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         qLenTotal = returnObj.duration.quarterLength
         elements = list(returnObj.getElementsByClass(objClass))
 
-        # print(elements[-1], qLenTotal, elements[-1].duration)
-        # print(_MOD, elements)
         for i in range(len(elements) - 1):
-            # print(i, len(elements))
             span = returnObj.elementOffset(elements[i + 1]) - returnObj.elementOffset(elements[i])
             elements[i].duration.quarterLength = span
 
         # handle last element
-        # print(elements[-1], qLenTotal, elements[-1].duration)
         if elements:
             elements[-1].duration.quarterLength = (qLenTotal
                                                    - returnObj.elementOffset(elements[-1]))
-            # print(elements[-1], elements[-1].duration)
         if not inPlace:
             return returnObj
 
@@ -10227,7 +10222,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         post = {}
         for i in range(len(layeringMap)):
-            # print('examining i:', i)
             indices = layeringMap[i]
             if not indices:
                 continue
@@ -10235,7 +10229,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             srcElementObj = flatStream[i]
             srcOffset = srcElementObj.offset
             dstOffset = None
-            # print('found indices', indices)
             # check indices
             for j in indices:  # indices of other elements that overlap
                 elementObj = flatStream[j]
@@ -10254,7 +10247,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 if dstOffset is None:
                     dstOffset = srcOffset
                 if store:
-                    # print('storing offset', dstOffset)
                     if dstOffset not in post:
                         post[dstOffset] = []  # create dictionary entry
                     post[dstOffset].append(elementObj)
@@ -10272,9 +10264,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     dstOffset = srcOffset
                 if dstOffset not in post:
                     post[dstOffset] = []  # create dictionary entry
-                # print('storing offset', dstOffset)
                 post[dstOffset].append(srcElementObj)
-        # print(post)
         return post
 
     def findGaps(self):
@@ -12657,8 +12647,8 @@ class Measure(Stream):
         # position; paddingRight defines a QL from the end of the time signature
         # to the last valid offset
         # paddingLeft is used to define pickup/anacrusis bars
-        self.paddingLeft = 0
-        self.paddingRight = 0
+        self.paddingLeft: OffsetQL = 0.0
+        self.paddingRight: OffsetQL = 0.0
 
         self.numberSuffix = None  # for measure 14a would be 'a'
         if 'number' in keywords:
@@ -12908,7 +12898,7 @@ class Measure(Stream):
         >>> m.insert(2.0, n)
         >>> m.padAsAnacrusis()
         >>> m.paddingLeft
-        0
+        0.0
 
         If useInitialRests is True, then rests at the beginning of the measure
         are removed.  This is especially useful for formats that don't give a

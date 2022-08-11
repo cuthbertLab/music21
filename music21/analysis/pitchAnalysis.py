@@ -10,8 +10,6 @@
 # ------------------------------------------------------------------------------
 import collections
 
-_MOD = 'analysis.pitchAnalysis'
-
 def pitchAttributeCount(s, pitchAttr='name'):
     '''
     Return a collections.Counter of pitch class usage (count)

@@ -1426,7 +1426,6 @@ class Test(unittest.TestCase):
         allResults1 = likelyKeysMajor1 + likelyKeysMinor1
         # post = []
         unused_post = sorted([(y, x) for x, y in allResults1])
-        # print(post)
 
         p.process(s2.flatten())
         likelyKeysMajor2, likelyKeysMinor2 = p._likelyKeys(s2.flatten())
@@ -1435,24 +1434,19 @@ class Test(unittest.TestCase):
         allResults2 = likelyKeysMajor2 + likelyKeysMinor2
         # post = []
         unused_post = sorted([(y, x) for x, y in allResults2])
-        # print(post)
 
         likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3.flatten())
         likelyKeysMajor3.sort()
         likelyKeysMinor3.sort()
         allResults3 = likelyKeysMajor3 + likelyKeysMinor3
-        # post = []
         unused_post = sorted([(y, x) for x, y in allResults3])
-        # print(post)
 
         avg = []
         for i in range(len(allResults1)):
             p, count1 = allResults1[i]
             p, count2 = allResults2[i]
             avg.append((p, (count1 + count2) / 2.0))
-        # post = []
         unused_post = sorted([(y, x) for x, y in avg])
-        # print(post)
 
     def testIntervalDiversity(self):
         from music21 import stream

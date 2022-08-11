@@ -787,7 +787,6 @@ class TestExternal(unittest.TestCase):
     #     s2 = corpus.parse('schoenberg', 2).parts[0]
     #     # hashes2 = h.hashStream(s2.recurse())
     #     s3 = corpus.parse('bwv66.6').parts[0]
-    #     # print(type(s3.recurse()))
     #     hashes3 = h.hashStream(s3)
     #     # s4 = corpus.parse('bwv66.6').parts[0].transpose('M2')
     #     # s4 = s5.parts[0].transpose('M2')
