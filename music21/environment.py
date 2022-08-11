@@ -38,6 +38,7 @@ from xml.sax import saxutils
 from music21 import exceptions21
 from music21 import common
 
+# used below
 _MOD = 'environment'
 
 

@@ -142,8 +142,7 @@ from music21 import tie
 from music21.romanText import rtObjects
 
 from music21 import environment
-_MOD = 'romanText.translate'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('romanText.translate')
 
 ROMANTEXT_VERSION = 1.0
 
