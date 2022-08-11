@@ -269,7 +269,8 @@ class TabChordBase(abc.ABC):
                     self.extra.get('chord_type', '') == 'Mm7'
                     and self.numeral != 'V'
                 ):
-                    self.chord = re.sub(r'(\d)', r'd\1', self.chord)
+                    # we need to make sure not to match [add4] and the like
+                    self.chord = re.sub(r'(\d+)(?!])', r'd\1', self.chord)
 
         # Local - relative and figure
         if isMinor(self.local_key):
@@ -671,7 +672,7 @@ class TsvHandler:
                 s.metadata.movementNumber = firstEntry.extra['mov']
                 title.append('Mov' + s.metadata.movementNumber)
             if title:
-                s.metadata.title = "_".join(title)
+                s.metadata.title = '_'.join(title)
 
         startingKeySig = str(self.chordList[0].global_key)
         ks = key.Key(startingKeySig)
@@ -965,27 +966,44 @@ def handleAddedTones(dcmlChord: str) -> str:
     figure = m.group('figure')
     if primary == 'V' and added_tones == '64':
         return 'Cad64' + secondary
-    added_tone_tuples: t.List[t.Tuple[str, str, str, str, str]] = list(
-        # after https://github.com/johentsch/ms3/blob/main/src/ms3/utils.py
-        re.findall(r'((\+|-)?(\^|v)?(#+|b+)?(1\d|\d))', added_tones)
+    added_tone_tuples: t.List[t.Tuple[str, str, str, str]] = re.findall(
+        r'''
+            (\+|-)?  # indicates whether to add or remove chord factor
+            (\^|v)?  # indicates whether tone replaces chord factor above/below
+            (\#+|b+)?  # alteration
+            (1\d|\d)  # figures 0-19, in practice 1-14
+        ''',
+        added_tones,
+        re.VERBOSE
     )
     additions: t.List[str] = []
     omissions: t.List[str] = []
-    if figure in ('', '5', '53', '5/3', '3'):
-        threshold = 7
+    if figure in ('', '5', '53', '5/3', '3', '7'):
+        omission_threshold = 7
     else:
-        threshold = 8
-    for _, added_or_removed, above_or_below, alteration, factor in added_tone_tuples:
+        omission_threshold = 8
+    for added_or_removed, above_or_below, alteration, factor_str in added_tone_tuples:
         if added_or_removed == '-':
-            omissions.append(f'[no{factor}]')
+            omissions.append(f'[no{factor_str}]')
             continue
-        if added_or_removed != '+' and int(factor) < threshold:
-            if above_or_below == 'v' or alteration in ('b', ''):
-                increment = -1
+        factor = int(factor_str)
+        if added_or_removed == '+' or factor >= omission_threshold:
+            replace_above = None
+        elif factor in (1, 3, 5):
+            replace_above = None
+        elif factor in (2, 4, 6):
+            # added scale degrees 2, 4, 6 replace lower neighbor unless
+            #   - alteration = #
+            #   - above_or_below = ^
+            replace_above = alteration == '#' or above_or_below == '^'
+        else:
+            # Do we need to handle double sharps/flats?
+            replace_above = alteration != 'b' and above_or_below != 'v'
+        if replace_above is not None:
+            if replace_above:
+                omissions.append(f'[no{factor + 1}]')
             else:
-                increment = 1
-            replaced_factor = str(int(factor) + increment)
-            omissions.append(f'[no{replaced_factor}]')
+                omissions.append(f'[no{factor - 1}]')
         additions.append(f'[add{alteration}{factor}]')
     return primary + ''.join(omissions) + ''.join(additions) + secondary
 
