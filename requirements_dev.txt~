@@ -1,9 +1,0 @@
--r requirements.txt
-pylint
-pylint-quotes
-coveralls
-scipy
-sphinx
-python-Levenshtein
-setuptools
-coverage

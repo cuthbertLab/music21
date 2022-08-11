@@ -35,28 +35,19 @@ the temp folder on the disk.
 '''
 import collections.abc
 import copy
+from http.client import responses
 import io
+from math import isclose
 import os
 import re
 import pathlib
 import sys
 import types
+import typing as t
 import unittest
-import urllib.request
 import zipfile
 
-from math import isclose
-import typing as t
-
-__all__ = [
-    'subConverters', 'ArchiveManagerException', 'PickleFilterException',
-    'ConverterException', 'ConverterFileException',
-    'ArchiveManager', 'PickleFilter', 'resetSubconverters',
-    'registerSubconverter', 'unregisterSubconverter',
-    'Converter', 'parseFile', 'parseData', 'parseURL',
-    'parse', 'freeze', 'thaw', 'freezeStr', 'thawStr',
-
-]
+import requests
 
 from music21.converter import subConverters
 
@@ -68,6 +59,17 @@ from music21 import metadata
 from music21 import musedata as musedataModule
 from music21 import stream
 from music21.metadata import bundles
+
+
+__all__ = [
+    'subConverters', 'ArchiveManagerException', 'PickleFilterException',
+    'ConverterException', 'ConverterFileException',
+    'ArchiveManager', 'PickleFilter', 'resetSubconverters',
+    'registerSubconverter', 'unregisterSubconverter',
+    'Converter', 'parseFile', 'parseData', 'parseURL',
+    'parse', 'freeze', 'thaw', 'freezeStr', 'thawStr',
+
+]
 
 environLocal = environment.Environment('converter')
 
@@ -322,7 +324,7 @@ class PickleFilter:
 
     def status(self) -> t.Tuple[pathlib.Path, bool, t.Optional[pathlib.Path]]:
         '''
-        Given a file path specified with __init__, look for an up to date pickled
+        Given a file path specified with __init__, look for an up-to-date pickled
         version of this file path. If it exists, return its fp, otherwise return the
         original file path.
 
@@ -713,8 +715,8 @@ class Converter:
         Use `forceSource=True` to download every time rather than
         re-reading from a cached file.
 
-        >>> joplinURL = ('https://github.com/cuthbertLab/music21/raw/master' +
-        ...        '/music21/corpus/joplin/maple_leaf_rag.mxl')
+        >>> joplinURL = ('https://github.com/cuthbertLab/music21/raw/master'
+        ...              + '/music21/corpus/joplin/maple_leaf_rag.mxl')
         >>> c = converter.Converter()
         >>> #_DOCS_SHOW c.parseURL(joplinURL)
         >>> #_DOCS_SHOW joplinStream = c.stream
@@ -723,11 +725,10 @@ class Converter:
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload in ('deny', 'ask'):
-            message = 'Automatic downloading of URLs is presently set to {!r}; '
+            message = f'Automatic downloading of URLs is presently set to {autoDownload!r}; '
             message += 'configure your Environment "autoDownload" setting to '
             message += '"allow" to permit automatic downloading: '
             message += "environment.set('autoDownload', 'allow')"
-            message = message.format(autoDownload)
             raise ConverterException(message)
 
         # this format check is here first to see if we can find the format
@@ -743,18 +744,17 @@ class Converter:
                 ext = '.txt'
 
         directory = environLocal.getRootTempDir()
-        dst = self._getDownloadFp(directory, ext, url)  # returns pathlib.Path
-        urlretrieve = urllib.request.urlretrieve
+        fp = self._getDownloadFp(directory, ext, url)  # returns pathlib.Path
 
-        if forceSource is True or not dst.exists():
-            try:
-                environLocal.printDebug(['downloading to:', str(dst)])
-                fp, unused_headers = urlretrieve(url, filename=str(dst))
-            except IOError:
-                raise ConverterException(f'cannot access file: {url}')
+        if forceSource is True or not fp.exists():
+            environLocal.printDebug([f'downloading to: {fp}'])
+            r = requests.get(url, allow_redirects=True)
+            if r.status_code != 200:
+                raise ConverterException(
+                    f'Could not download {url}, error: {r.status_code} {responses[r.status_code]}')
+            fp.write_bytes(r.content)
         else:
-            environLocal.printDebug(['using already downloaded file:', str(dst)])
-            fp = dst
+            environLocal.printDebug([f'using already downloaded file: {fp}'])
 
         # update format based on downloaded fp
         if format is None:  # if not provided as an argument
@@ -2102,6 +2102,9 @@ class Test(unittest.TestCase):
             parse('nonexistent_path_ending_in_correct_extension.musicxml')
 
     def testParseURL(self):
+        '''
+        This should be the only test that requires an internet connection.
+        '''
         from music21.humdrum.spineParser import HumdrumException
 
         urlBase = 'https://raw.githubusercontent.com/craigsapp/chopin-preludes/'
@@ -2121,7 +2124,12 @@ class Test(unittest.TestCase):
         with self.assertRaises(HumdrumException):
             s = parseURL(url, forceSource=False)
 
+        # make sure that forceSource still overrides the system.
         s = parseURL(url, forceSource=True)
+        self.assertEqual(len(s.parts), 2)
+
+        # make sure that the normal parse system can handle URLs, not just parseURL.
+        s = parse(url)
         self.assertEqual(len(s.parts), 2)
 
         os.remove(destFp)

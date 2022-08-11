@@ -20,33 +20,32 @@ from music21.metadata.primitives import (DateSingle, Text, Contributor, Copyrigh
 @dataclass
 class PropertyDescription:
     '''
-        Describes a single standard metadata property.
+    Describes a single standard metadata property.
 
-        name: str is the namespace's name of the property (the tail of the property term URI).
-        namespace: str is a shortened form of the URI for the set of terms.
-            'dcterms' means the property term is from the Dublin Core terms,
-                defined at <http://purl.org/dc/terms/>
-            'marcrel' means the property term is from the MARC Relator terms,
-                defined at <http://www.loc.gov/loc.terms/relators/>
-            'humdrum' means the property term is from the Humdrum reference record terms,
-                defined at <https://www.humdrum.org/reference-records/#>
-        isContributor: bool is whether the property describes a contributor.
-        needsArticleNormalization: bool is whether the property values might
-            benefit from article normalization when getting as a string (this is
-            generally True for various kinds of titles).
-        oldMusic21Abbrev: str is the backward compatible music21 abbreviation for this
-            property.
-        oldMusic21WorkId: str is the backward compatible music21 name for this property.
-        uniqueName: str is the official music21 name for this property, that is unique
-            within the list of properties. There is always a unique name, but the
-            uniqueName field is only set if name is not unique enough.
-            To get the unique name from a particular PropertyDescription, we do:
-                (desc.uniqueName if desc.uniqueName
-                    else desc.name)
-        valueType: Type is the actual type of the value that will be stored in the metadata.
-            This allows auto-conversion to take place when clients store items in the
-            metadata, and is the tuple element type clients will always receive from
-            md['uniqueName'] or md['namespace:name'].
+    * name: str is the namespace's name of the property (the tail of the property term URI).
+    * namespace: str is a shortened form of the URI for the set of terms.
+        * 'dcterms' means the property term is from the Dublin Core terms,
+            defined at <http://purl.org/dc/terms/>
+        * 'marcrel' means the property term is from the MARC Relator terms,
+            defined at <http://www.loc.gov/loc.terms/relators/>
+        * 'humdrum' means the property term is from the Humdrum reference record terms,
+            defined at <https://www.humdrum.org/reference-records/#>
+    * isContributor: bool is whether the property describes a contributor.
+    * needsArticleNormalization: bool is whether the property values might
+        benefit from article normalization when getting as a string (this is
+        generally True for various kinds of titles).
+    * oldMusic21Abbrev: str is the backward compatible music21 abbreviation for this
+        property.
+    * oldMusic21WorkId: str is the backward compatible music21 name for this property.
+    * uniqueName: str is the official music21 name for this property, that is unique
+        within the list of properties. There is always a unique name, but the
+        uniqueName field is only set if name is not unique enough.
+        To get the unique name from a particular PropertyDescription, call:
+        `(desc.uniqueName if desc.uniqueName else desc.name)`
+    * valueType: Type is the actual type of the value that will be stored in the metadata.
+        This allows auto-conversion to take place when clients store items in the
+        metadata, and is the tuple element type clients will always receive from
+        md['uniqueName'] or md['namespace:name'].
     '''
     uniqueName: t.Optional[str] = None
     name: str = ''

@@ -2454,7 +2454,7 @@ class Music21Object(prebase.ProtoM21Object):
             if activeSite is None:
                 # it has died since last visit, as is the case with short-lived streams like
                 # .getElementsByClass, so we will return the most recent position
-                return self._activeSiteStoredOffset or 0
+                return self._activeSiteStoredOffset or 0.0
 
             try:
                 o = activeSite.elementOffset(self)
@@ -3450,7 +3450,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> [n._getMeasureOffset() for n in m.notes]
         [0.0, 0.5, 1.0, 1.5]
 
-        >>> m.paddingLeft = 2
+        >>> m.paddingLeft = 2.0
         >>> [n._getMeasureOffset() for n in m.notes]
         [2.0, 2.5, 3.0, 3.5]
         >>> [n._getMeasureOffset(includeMeasurePadding=False) for n in m.notes]
