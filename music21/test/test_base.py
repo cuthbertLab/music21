@@ -1144,6 +1144,8 @@ class Test(unittest.TestCase):
         with self.assertWarnsRegex(Warning, msg):
             obj2.id = obj.id
 
+
+#-------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
