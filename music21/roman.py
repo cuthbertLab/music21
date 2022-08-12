@@ -3075,6 +3075,12 @@ class RomanNumeral(harmony.Harmony):
                 while addedPitch.ps < bassPitch.ps:
                     addedPitch.octave += 1
 
+                if (addedPitch.ps == bassPitch.ps
+                        and addedPitch.diatonicNoteNum < bassPitch.diatonicNoteNum):
+                    # RN('IV[add#7]', 'C') would otherwise result
+                    # in E#4 as bass, not E#5 as highest note.
+                    addedPitch.octave += 1
+
                 if addedPitch not in self.pitches:
                     self.add(addedPitch)
 
@@ -4280,7 +4286,14 @@ class Test(unittest.TestCase):
         self.assertEqual(rn4.figure, 'iv42[#7]')
         new_fig_equals_old_figure(rn4, 'g')
 
-
+    def test_addedPitch_sharp7(self):
+        '''
+        Fixes issue #1369
+        '''
+        rn = RomanNumeral('IV[add#7]', 'C')
+        self.assertEqual(rn.bass().nameWithOctave, 'F4')
+        self.assertEqual([p.nameWithOctave for p in rn.pitches],
+                         ['F4', 'A4', 'C5', 'E#5'])
 
 class TestExternal(unittest.TestCase):
     show = True
