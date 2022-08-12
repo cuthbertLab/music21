@@ -952,7 +952,11 @@ def handleAddedTones(dcmlChord: str) -> str:
     >>> romanText.tsvConverter.handleAddedTones('ii6(11#7b6)')
     'ii6[no8][no5][add11][add#7][addb6]'
 
-
+    '0' can be used to indicate root-replacement by 7 in a root-position chord.
+    We need to change '0' to '7' because music21 changes the 0 to 'o' (i.e.,
+    a diminished chord).
+    >>> romanText.tsvConverter.handleAddedTones('i(#0)')
+    'i[no1][add#7]'
     '''
     m = re.match(
         r'(?P<primary>.*?(?P<figure>\d*(?:/\d+)*))\((?P<added_tones>.*)\)(?P<secondary>/.*)?',
@@ -971,7 +975,7 @@ def handleAddedTones(dcmlChord: str) -> str:
             (\+|-)?  # indicates whether to add or remove chord factor
             (\^|v)?  # indicates whether tone replaces chord factor above/below
             (\#+|b+)?  # alteration
-            (1\d|\d)  # figures 0-19, in practice 1-14
+            (1\d|\d)  # figures 0-19, in practice 0-14
         ''',
         added_tones,
         re.VERBOSE
@@ -1004,6 +1008,8 @@ def handleAddedTones(dcmlChord: str) -> str:
                 omissions.append(f'[no{factor + 1}]')
             else:
                 omissions.append(f'[no{factor - 1}]')
+        if factor == 0:
+            factor = 7
         additions.append(f'[add{alteration}{factor}]')
     return primary + ''.join(omissions) + ''.join(additions) + secondary
 
