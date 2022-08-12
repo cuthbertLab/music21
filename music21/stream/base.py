@@ -434,17 +434,36 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     @overload
     def __getitem__(
         self,
-        k: t.Union[t.Type[ChangedM21ObjType], t.Collection[t.Type[ChangedM21ObjType]]]
+        k: t.Type[ChangedM21ObjType]
     ) -> iterator.RecursiveIterator[ChangedM21ObjType]:
         x = t.cast(iterator.RecursiveIterator[ChangedM21ObjType], self.recurse())
         return x  # dummy code
+
+    @overload
+    def __getitem__(
+        self,
+        k: t.Type  # getting something that is a subclass of something that is not a m21 object
+    ) -> iterator.RecursiveIterator[M21ObjType]:
+        x = t.cast(iterator.RecursiveIterator[M21ObjType], self.recurse())
+        return x  # dummy code
+
+
+    @overload
+    def __getitem__(
+        self,
+        k: t.Collection[t.Type]
+    ) -> iterator.RecursiveIterator[M21ObjType]:
+        # Remove this code and replace with ... once Astroid #1015 is fixed.
+        x: iterator.RecursiveIterator[M21ObjType] = self.recurse()
+        return x
+
 
     def __getitem__(self,
                     k: t.Union[str,
                                int,
                                slice,
                                t.Type[ChangedM21ObjType],
-                               t.Collection[t.Type[ChangedM21ObjType]]]
+                               t.Collection[t.Type]]
                     ) -> t.Union[iterator.RecursiveIterator[M21ObjType],
                                  iterator.RecursiveIterator[ChangedM21ObjType],
                                  M21ObjType,
@@ -505,14 +524,19 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...     print(n.name, end=' ')
         C D E F G A
 
-        Note that this iterator is recursive by default.
+        Note that this iterator is recursive: it will find elements inside of streams
+        within this stream:
 
         >>> c_sharp = note.Note('C#')
-        >>> v = stream.Voice([c_sharp])
-        >>> s.insert(0.5, c_sharp)
-
+        >>> v = stream.Voice()
+        >>> v.insert(0, c_sharp)
+        >>> s.insert(0.5, v)
         >>> len(s[note.Note])
         7
+
+        When using a single Music21 class in this way, your type checker will
+        be able to infer that the only objects in any loop are in fact `note.Note`
+        objects, and catch programming errors before running.
 
         Multiple classes can be provided, separated by commas. Any element matching
         any of the requested classes will be matched.
@@ -524,7 +548,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...     if isinstance(note_or_rest, note.Note):
         ...         print(note_or_rest.name, end=' ')
         ...     else:
-        ...         print("Rest", end = ' ')
+        ...         print('Rest', end=' ')
         C C# D E Rest F G Rest A
 
         The actual object returned by `s[module.Class]` is a
@@ -4746,7 +4770,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # Replace old measures in spanners with new measures
         # Example: out is a Part, out.spannerBundle has RepeatBrackets spanning measures
-        # TODO: when dropping support for Py3.9 add strict=True
+        # TODO: when dropping support for Py3.9 (min=3.10) add strict=True
         for oldM, newM in zip(
             self.getElementsByClass(Measure),
             out.getElementsByClass(Measure)
@@ -7729,26 +7753,27 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     @overload
     def recurse(self,
                 *,
-                streamsOnly: t.Literal[True],
-                restoreActiveSites=True,
-                classFilter=(),
-                includeSelf=None) -> iterator.RecursiveIterator[Stream]:
-        return iterator.RecursiveIterator(self).getElementsByClass(Stream)
-
-    @overload
-    def recurse(self,
-                *,
                 streamsOnly: t.Literal[False] = False,
                 restoreActiveSites=True,
                 classFilter=(),
                 includeSelf=None) -> iterator.RecursiveIterator[M21ObjType]:
-        return iterator.RecursiveIterator(self)
+        return t.cast(iterator.RecursiveIterator[M21ObjType], iterator.RecursiveIterator(self))
 
-    def recurse(self: StreamType,
+    @overload
+    def recurse(self,
                 *,
-                streamsOnly=False,
+                streamsOnly: t.Literal[True],
                 restoreActiveSites=True,
                 classFilter=(),
+                includeSelf=None) -> iterator.RecursiveIterator[Stream]:
+        return t.cast(iterator.RecursiveIterator[Stream],
+                      iterator.RecursiveIterator(self).getElementsByClass(Stream))
+
+    def recurse(self,
+                *,
+                streamsOnly: bool = False,
+                restoreActiveSites: bool = True,
+                classFilter: t.Tuple = (),
                 includeSelf=None) -> t.Union[iterator.RecursiveIterator[M21ObjType],
                                              iterator.RecursiveIterator[Stream]]:
         '''
@@ -7897,6 +7922,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         )
         if classFilter:
             ri = ri.getElementsByClass(classFilter)
+
+        if t.TYPE_CHECKING and streamsOnly:
+            return t.cast(iterator.RecursiveIterator[Stream], ri)
         return ri
 
     def containerInHierarchy(
