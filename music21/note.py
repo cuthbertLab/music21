@@ -1573,18 +1573,17 @@ class Note(NotRest):
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.nameWithOctave`.
         ''')
 
-    def _getStep(self) -> StepName:
-        return self.pitch.step
-
-    def _setStep(self, value: StepName):
-        self.pitch.step = value
-
-    step = property(_getStep,
-                    _setStep,
-                    doc='''
+    @property
+    def step(self) -> StepName:
+        '''
         Return or set the pitch step from the :class:`~music21.pitch.Pitch` object.
         See :attr:`~music21.pitch.Pitch.step`.
-        ''')
+        '''
+        return self.pitch.step
+
+    @step.setter
+    def step(self, value: StepName):
+        self.pitch.step = value
 
     def _getOctave(self) -> t.Optional[int]:
         return self.pitch.octave
