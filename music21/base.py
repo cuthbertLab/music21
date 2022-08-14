@@ -2635,9 +2635,10 @@ class Music21Object(prebase.ProtoM21Object):
 
     @duration.setter
     def duration(self, durationObj: Duration):
-        durationObjAlreadyExists = not (self._duration is None)
-        if durationObjAlreadyExists:
+        durationObjAlreadyExists = False
+        if self._duration is not None:
             self._duration.client = None
+            durationObjAlreadyExists = True
 
         try:
             ql = durationObj.quarterLength

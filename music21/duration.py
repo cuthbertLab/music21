@@ -74,6 +74,8 @@ DENOM_LIMIT = defaults.limitOffsetDenominator
 
 POSSIBLE_DOTS_IN_TUPLETS = (0, 1)
 
+TupletType = t.Literal['start', 'stop', 'startStop', False, None]
+TupletShowOptions = t.Literal['number', 'type', 'both', None]
 
 class DurationException(exceptions21.Music21Exception):
     pass
@@ -1044,68 +1046,57 @@ class Tuplet(prebase.ProtoM21Object):
     # TODO: use __setattr__ to freeze all properties, and make a metaclass
     # exceptions: tuplet type, tuplet id: things that don't affect length
     '''
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 numberNotesActual: int = 3,
+                 numberNotesNormal: int = 2,
+                 durationActual: t.Union[Duration, DurationTuple, str, t.Tuple[str, int], None] = None,
+                 durationNormal: t.Union[Duration, DurationTuple, str, t.Tuple[str, int], None] = None,
+                 *,
+                 tupletId: int = 0,
+                 nestedLevel: int = 1,
+                 type: TupletType = None,
+                 bracket: t.Literal[True, False, 'slur'] = True,
+                 placement: t.Literal['above', 'below'] = 'above',
+                 tupletActualShow: TupletShowOptions = 'number',
+                 tupletNormalShow: TupletShowOptions = None,
+                 **keywords):
         self.frozen = False
         # environLocal.printDebug(['creating Tuplet instance'])
 
-        self._durationNormal = None
-        self._durationActual = None
+        self._durationNormal: t.Optional[Duration] = None
+        self._durationActual: t.Optional[Duration] = None
 
         # necessary for some complex tuplets, interrupted, for instance
-        if len(arguments) == 3:
-            keywords['numberNotesActual'] = arguments[0]
-            keywords['numberNotesNormal'] = arguments[1]
-            keywords['durationActual'] = arguments[2]
-            keywords['durationNormal'] = arguments[2]
-        elif len(arguments) == 2:
-            keywords['numberNotesActual'] = arguments[0]
-            keywords['numberNotesNormal'] = arguments[1]
-
-        if 'tupletId' in keywords:
-            self.tupletId = keywords['tupletId']
-        else:
-            self.tupletId = 0
-
-        if 'nestedLevel' in keywords:
-            self.nestedLevel = keywords['nestedLevel']
-        else:
-            self.nestedLevel = 1
+        self.tupletId = tupletId
+        self.nestedLevel = nestedLevel
 
         # actual is the count of notes that happen in this space
         # this is not the previous/expected duration of notes that happen
-        if 'numberNotesActual' in keywords:
-            self.numberNotesActual = keywords['numberNotesActual']
-        else:
-            self.numberNotesActual = 3
+        self.numberNotesActual: int = numberNotesActual
 
+        self.durationActual: Duration
         # this stores a durationTuple
-        if 'durationActual' in keywords and keywords['durationActual'] is not None:
-            if isinstance(keywords['durationActual'], str):
-                self.durationActual = durationTupleFromTypeDots(keywords['durationActual'], 0)
-            elif common.isIterable(keywords['durationActual']):
-                self.durationActual = durationTupleFromTypeDots(keywords['durationActual'][0],
-                                                                keywords['durationActual'][1])
+        if durationActual is not None:
+            if isinstance(durationActual, str):
+                self.durationActual = durationTupleFromTypeDots(durationActual, 0)
+            elif common.isIterable(durationActual):
+                self.durationActual = durationTupleFromTypeDots(durationActual[0],
+                                                                durationActual[1])
             else:
-                self.durationActual = keywords['durationActual']
-        else:
-            self.durationActual = None
+                self.durationActual = durationActual
 
         # normal is the space that would normally be occupied by the tuplet span
-        if 'numberNotesNormal' in keywords:
-            self.numberNotesNormal = keywords['numberNotesNormal']
-        else:
-            self.numberNotesNormal = 2
+        self.numberNotesNormal: int = numberNotesNormal
+        self.durationNormal: Duration
 
-        if 'durationNormal' in keywords and keywords['durationNormal'] is not None:
-            if isinstance(keywords['durationNormal'], str):
-                self.durationNormal = durationTupleFromTypeDots(keywords['durationNormal'], 0)
-            elif common.isIterable(keywords['durationNormal']):
-                self.durationNormal = durationTupleFromTypeDots(keywords['durationNormal'][0],
-                                                                keywords['durationNormal'][1])
+        if durationNormal is not None:
+            if isinstance(durationNormal, str):
+                self.durationNormal = durationTupleFromTypeDots(durationNormal, 0)
+            elif common.isIterable(durationNormal):
+                self.durationNormal = durationTupleFromTypeDots(durationNormal[0],
+                                                                durationNormal[1])
             else:
-                self.durationNormal = keywords['durationNormal']
-        else:
-            self.durationNormal = None
+                self.durationNormal = durationNormal
 
         # Type is 'start', 'stop', 'startStop', False or None: determines whether to start or stop
         # the bracket/group drawing
@@ -1113,11 +1104,11 @@ class Tuplet(prebase.ProtoM21Object):
         # as two notations (start + stop) in musicxml
         # type of None means undetermined,
         # False means definitely neither start nor stop (not yet used)
-        self.type = None
-        self.bracket = True  # True or False or 'slur'
-        self.placement = 'above'  # above or below
-        self.tupletActualShow = 'number'  # could be 'number', 'type', 'both', or None
-        self.tupletNormalShow = None  # for ratios. Options are same as above.
+        self.type: TupletType = type
+        self.bracket: t.Literal[True, False, 'slur'] = bracket  # True or False or 'slur'
+        self.placement: t.Literal['above', 'below'] = placement  # 'above' or 'below' (TODO: 'by-context')
+        self.tupletActualShow: TupletShowOptions = tupletActualShow  # could be 'number', 'type', 'both', or None
+        self.tupletNormalShow: TupletShowOptions = tupletNormalShow  # for ratios. Options are same as above.
 
         # this attribute is not yet used anywhere
         # self.nestedInside = ''  # could be a tuplet object
@@ -1368,7 +1359,7 @@ class Tuplet(prebase.ProtoM21Object):
 
     # PUBLIC PROPERTIES #
     @property
-    def durationActual(self):
+    def durationActual(self) -> t.Optional[DurationTuple]:
         '''
         durationActual is a DurationTuple that represents the notes that are
         actually present and counted in a tuplet.  For instance, in a 7
@@ -1376,6 +1367,8 @@ class Tuplet(prebase.ProtoM21Object):
         the duration actual would be...
 
         >>> d = duration.Tuplet(7, 2)
+        >>> print(d.durationActual)
+        None
         >>> d.durationActual = duration.Duration('eighth', dots=1)
 
         Notice that the Duration object gets converted to a DurationTuple
@@ -1390,7 +1383,7 @@ class Tuplet(prebase.ProtoM21Object):
         return self._durationActual
 
     @durationActual.setter
-    def durationActual(self, dA: t.Union[DurationTuple, 'Duration']):
+    def durationActual(self, dA: t.Union[DurationTuple, Duration]):
         self._checkFrozen()
 
         if isinstance(dA, DurationTuple):
@@ -1404,7 +1397,7 @@ class Tuplet(prebase.ProtoM21Object):
             self._durationActual = durationTupleFromTypeDots(dA, dots=0)
 
     @property
-    def durationNormal(self) -> DurationTuple:
+    def durationNormal(self) -> t.Optional[DurationTuple]:
         '''
         durationNormal is a DurationTuple that represents the notes that
         would be present in the space normally (if there were no tuplets).  For instance, in a 7
@@ -1412,6 +1405,8 @@ class Tuplet(prebase.ProtoM21Object):
         the durationNormal would be...
 
         >>> d = duration.Tuplet(7, 2)
+        >>> print(d.durationNormal)
+        None
         >>> d.durationNormal = duration.Duration('quarter', dots=2)
 
         Notice that the Duration object gets converted to a DurationTuple
