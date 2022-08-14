@@ -1083,8 +1083,6 @@ class Tuplet(prebase.ProtoM21Object):
                                                                 durationActual[1])
             else:
                 self.durationActual = durationActual
-        else:
-            self.durationActual = None
 
         # normal is the space that would normally be occupied by the tuplet span
         self.numberNotesNormal: int = numberNotesNormal
@@ -1097,8 +1095,6 @@ class Tuplet(prebase.ProtoM21Object):
                                                                 durationNormal[1])
             else:
                 self.durationNormal = durationNormal
-        else:
-            self.durationNormal = None
 
         # Type is 'start', 'stop', 'startStop', False or None: determines whether to start or stop
         # the bracket/group drawing
@@ -1385,10 +1381,10 @@ class Tuplet(prebase.ProtoM21Object):
         return self._durationActual
 
     @durationActual.setter
-    def durationActual(self, dA: t.Union[DurationTuple, Duration]):
+    def durationActual(self, dA: t.Union[DurationTuple, Duration, str, None]):
         self._checkFrozen()
 
-        if isinstance(dA, DurationTuple):
+        if isinstance(dA, DurationTuple) or dA is None:
             self._durationActual = dA
         elif isinstance(dA, Duration):
             if len(dA.components) > 1:
@@ -1423,9 +1419,9 @@ class Tuplet(prebase.ProtoM21Object):
         return self._durationNormal
 
     @durationNormal.setter
-    def durationNormal(self, dN: t.Union[DurationTuple, Duration, str]):
+    def durationNormal(self, dN: t.Union[DurationTuple, Duration, str, None]):
         self._checkFrozen()
-        if isinstance(dN, DurationTuple):
+        if isinstance(dN, DurationTuple) or dN is None:
             self._durationNormal = dN
         elif isinstance(dN, Duration):
             if len(dN.components) > 1:
