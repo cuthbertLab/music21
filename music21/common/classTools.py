@@ -27,12 +27,13 @@ def isNum(usrData: t.Any) -> TypeGuard[numbers.Number]:
 
     unlike `isinstance(usrData, Number)` does not return True for `True, False`.
 
-    Does not use `isinstance(usrData, Number)` which is 6 times slower
+    Does not use `isinstance(usrData, Number)` which is twice as times slow
     than calling this function (except in the case of Fraction, when
-    it's 6 times faster, but that's rarer)
+    it's 6 times faster, but that's rarer).  Prior to Python 3.9, it was
+    six times slower, which was a big deal.
 
     Runs by adding 0 to the "number" -- so anything that implements
-    add to a scalar works
+    add to a scalar works:
 
     >>> common.isNum(3.0)
     True
