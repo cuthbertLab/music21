@@ -393,7 +393,9 @@ class Test(unittest.TestCase):
     def testTupletBracketsMadeOnComponents(self):
         s = stream.Stream()
         s.insert(0, note.Note(quarterLength=(5 / 6)))
-        tree = self.getET(s)
+        # Use GEX to go through wellformed object conversion
+        gex = GeneralObjectExporter(s)
+        tree = et_fromstring(gex.parse().decode('utf-8'))
         # 3 sixteenth-triplets + 2 sixteenth-triplets
         # tuplet start, tuplet stop, tuplet start, tuplet stop
         self.assertEqual(len(tree.findall('.//tuplet')), 4)
