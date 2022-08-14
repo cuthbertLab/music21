@@ -19,8 +19,6 @@ from music21 import _version
 # note: this module should not import any higher level modules
 StepName = t.Literal['C', 'D', 'E', 'F', 'G', 'A', 'B']  # restating so as not to import.
 
-_MOD = 'defaults'
-
 
 # TODO: defaults should check the environment object to see
 # if there are any preferences set for values used here

@@ -69,7 +69,7 @@ disable=
     too-many-lines,  # yes, someday
     too-many-return-statements,  # we'll see
     too-many-instance-attributes,  # maybe later
-    no-self-use,  # it might be later.
+    # no-self-use,  # moved to optional extension.
     invalid-name,  # these are good music21 names; fix the regexp instead...
     too-few-public-methods,  # never remove or set to 1
     trailing-whitespace,  # should ignore blank lines with tabs

@@ -11,6 +11,7 @@
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 
+import builtins
 import inspect
 import re
 import types
@@ -391,7 +392,6 @@ class ClassDocumenter(ObjectDocumenter):
        :columns: 3
        - :attr:`~music21.base.Music21Object.classSortOrder`
        - :attr:`~music21.base.Music21Object.groups`
-       - :attr:`~music21.base.Music21Object.id`
        - :attr:`~music21.base.Music21Object.isStream`
     '''
 
@@ -438,7 +438,7 @@ class ClassDocumenter(ObjectDocumenter):
         find all attributes in self.referent and set classes appropriately.
         '''
 
-        attrs = inspect.classify_class_attrs(self.referent)
+        attrs: t.List[inspect.Attribute] = inspect.classify_class_attrs(self.referent)
         for attr in attrs:
             self.findOneAttribute(attr)
 
@@ -460,9 +460,9 @@ class ClassDocumenter(ObjectDocumenter):
             documenters.sort(key=keyLambda)
 
 
-    def findOneAttribute(self, attr):
+    def findOneAttribute(self, attr: inspect.Attribute):
         # Ignore definitions derived directly from builtins (object, list, etc.)
-        if attr.defining_class in __builtins__.values():
+        if attr.defining_class in builtins.__dict__.values():
             return
         # Ignore private members ('_') and special members ('__')
         elif attr.name.startswith('_') and attr.name not in self._allowedSpecialMethods:
@@ -642,7 +642,7 @@ class ClassDocumenter(ObjectDocumenter):
         ...
         <docbuild.documenters.ClassDocumenter: music21.base.Music21Object>
         <docbuild.documenters.ClassDocumenter: music21.prebase.ProtoM21Object>
-        <docbuild.documenters.ClassDocumenter: music21.stream.Stream>
+        <docbuild.documenters.ClassDocumenter: music21.stream.base.Stream>
         '''
         # if one of the _DOC_ATTRs is exactly the same as the previous base class,
         # only show it once.
@@ -685,19 +685,19 @@ class ClassDocumenter(ObjectDocumenter):
         music21.prebase.ProtoM21Object:
         - music21.prebase.ProtoM21Object.classSet
         - music21.prebase.ProtoM21Object.classes
-        music21.stream.Stream:
-        - music21.stream.Stream.beat
-        - music21.stream.Stream.beatDuration
-        - music21.stream.Stream.beatStr
-        - music21.stream.Stream.beatStrength
-        - music21.stream.Stream.flat
-        - music21.stream.Stream.highestOffset
-        - music21.stream.Stream.highestTime
-        - music21.stream.Stream.isGapless
-        - music21.stream.Stream.iter
-        - music21.stream.Stream.lowestOffset
-        music21.stream.core.StreamCoreMixin:
-        - music21.stream.core.StreamCoreMixin.spannerBundle
+        music21.stream.base.Stream:
+        - music21.stream.base.Stream.beat
+        - music21.stream.base.Stream.beatDuration
+        - music21.stream.base.Stream.beatStr
+        - music21.stream.base.Stream.beatStrength
+        - music21.stream.base.Stream.flat
+        - music21.stream.base.Stream.highestOffset
+        - music21.stream.base.Stream.highestTime
+        - music21.stream.base.Stream.isGapless
+        - music21.stream.base.Stream.lowestOffset
+        - music21.stream.base.Stream.notes
+        music21.stream.core.StreamCore:
+        - music21.stream.core.StreamCore.spannerBundle
         '''
         return self._inheritedReadonlyPropertiesMapping
 
@@ -713,11 +713,9 @@ class ClassDocumenter(ObjectDocumenter):
         >>> mapping = documenter.inheritedMethodsMapping
         >>> sortBy = lambda x: x.referentPackageSystemPath
         >>> for classDocumenter in sorted(mapping, key=sortBy):
-        ...     print('{0}:'.format(
-        ...         classDocumenter.referentPackageSystemPath))
+        ...     print(f'{classDocumenter.referentPackageSystemPath}:')
         ...     for attributeDocumenter in mapping[classDocumenter][:5]:
-        ...         print('- {0}'.format(
-        ...             attributeDocumenter.referentPackageSystemPath))
+        ...         print(f'- {attributeDocumenter.referentPackageSystemPath}')
         ...
         music21.base.Music21Object:
         - music21.base.Music21Object.clearCache
@@ -727,18 +725,18 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.getContextByClass
         music21.prebase.ProtoM21Object:
         - music21.prebase.ProtoM21Object.isClassOrSubclass
-        music21.stream.Stream:
-        - music21.stream.Stream.activateVariants
-        - music21.stream.Stream.addGroupForElements
-        - music21.stream.Stream.allPlayingWhileSounding
-        - music21.stream.Stream.analyze
-        - music21.stream.Stream.append
-        music21.stream.core.StreamCoreMixin:
-        - music21.stream.core.StreamCoreMixin.asTimespans
-        - music21.stream.core.StreamCoreMixin.asTree
-        - music21.stream.core.StreamCoreMixin.coreAppend
-        - music21.stream.core.StreamCoreMixin.coreElementsChanged
-        - music21.stream.core.StreamCoreMixin.coreGatherMissingSpanners
+        music21.stream.base.Stream:
+        - music21.stream.base.Stream.__getitem__
+        - music21.stream.base.Stream.activateVariants
+        - music21.stream.base.Stream.addGroupForElements
+        - music21.stream.base.Stream.allPlayingWhileSounding
+        - music21.stream.base.Stream.analyze
+        music21.stream.core.StreamCore:
+        - music21.stream.core.StreamCore.asTimespans
+        - music21.stream.core.StreamCore.asTree
+        - music21.stream.core.StreamCore.coreAppend
+        - music21.stream.core.StreamCore.coreCopyAsDerivation
+        - music21.stream.core.StreamCore.coreElementsChanged
         '''
         return self._inheritedMethodsMapping
 
@@ -762,20 +760,16 @@ class ClassDocumenter(ObjectDocumenter):
         - music21.base.Music21Object.activeSite
         - music21.base.Music21Object.derivation
         - music21.base.Music21Object.editorial
-        - music21.base.Music21Object.offset
-        - music21.base.Music21Object.priority
-        - music21.base.Music21Object.quarterLength
+        - music21.base.Music21Object.id
+        ...
         - music21.base.Music21Object.style
-        music21.stream.Stream:
-        - music21.stream.Stream.atSoundingPitch
-        - music21.stream.Stream.clef
-        - music21.stream.Stream.duration
-        - music21.stream.Stream.elements
-        - music21.stream.Stream.finalBarline
-        - music21.stream.Stream.keySignature
-        - music21.stream.Stream.metadata
-        - music21.stream.Stream.seconds
-        - music21.stream.Stream.timeSignature
+        music21.stream.base.Stream:
+        - music21.stream.base.Stream.atSoundingPitch
+        - music21.stream.base.Stream.clef
+        ...
+        - music21.stream.base.Stream.seconds
+        - music21.stream.base.Stream.staffLines
+        - music21.stream.base.Stream.timeSignature
 
         '''
         return self._inheritedReadwritePropertiesMapping
@@ -792,25 +786,25 @@ class ClassDocumenter(ObjectDocumenter):
         ...     method
         ...
         <docbuild.documenters.MethodDocumenter:
-            music21.stream.Stream.activateVariants>
+            music21.stream.base.Stream.__getitem__>
         <docbuild.documenters.MethodDocumenter:
-            music21.stream.Stream.addGroupForElements>
+            music21.stream.base.Stream.activateVariants>
         <docbuild.documenters.MethodDocumenter:
-            music21.stream.Stream.allPlayingWhileSounding>
+            music21.stream.base.Stream.addGroupForElements>
         <docbuild.documenters.MethodDocumenter:
-            music21.stream.Stream.analyze>
+            music21.stream.base.Stream.allPlayingWhileSounding>
         <docbuild.documenters.MethodDocumenter:
-            music21.stream.Stream.append>
+            music21.stream.base.Stream.analyze>
         <docbuild.documenters.MethodDocumenter:
-            music21.stream.Stream.attachIntervalsBetweenStreams>
+            music21.stream.base.Stream.append>
         <docbuild.documenters.MethodDocumenter:
-            music21.stream.Stream.attachMelodicIntervals>
+            music21.stream.base.Stream.attachIntervalsBetweenStreams>
         <docbuild.documenters.MethodDocumenter:
-            music21.stream.Stream.augmentOrDiminish>
+            music21.stream.base.Stream.attachMelodicIntervals>
         <docbuild.documenters.MethodDocumenter:
-            music21.stream.Stream.beatAndMeasureFromOffset>
+            music21.stream.base.Stream.augmentOrDiminish>
         <docbuild.documenters.MethodDocumenter:
-            music21.stream.Stream.chordify>
+            music21.stream.base.Stream.beatAndMeasureFromOffset>
         '''
         return self._methods
 
@@ -825,24 +819,12 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for attr in documenter.readonlyProperties:
         ...     attr
         ...
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.beat>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.beatDuration>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.beatStr>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.beatStrength>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.flat>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.highestOffset>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.highestTime>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.isGapless>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.iter>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.lowestOffset>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.notes>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.notesAndRests>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.pitches>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.secondsMap>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.semiFlat>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.sorted>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.spanners>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.voices>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.beat>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.beatDuration>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.beatStr>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.beatStrength>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.flat>
+        ...
         '''
         return self._readonlyProperties
 
@@ -857,17 +839,16 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for prop in documenter.readwriteProperties:
         ...     prop
         ...
-        <docbuild.documenters.AttributeDocumenter:
-            music21.stream.Stream.atSoundingPitch>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.clef>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.duration>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.elements>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.finalBarline>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.keySignature>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.metadata>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.seconds>
-        <docbuild.documenters.AttributeDocumenter: music21.stream.Stream.timeSignature>
-
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.atSoundingPitch>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.clef>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.duration>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.elements>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.finalBarline>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.keySignature>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.metadata>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.seconds>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.staffLines>
+        <docbuild.documenters.AttributeDocumenter: music21.stream.base.Stream.timeSignature>
         '''
         return self._readwriteProperties
 
@@ -981,6 +962,7 @@ class ClassDocumenter(ObjectDocumenter):
         '.. hlist::'
         '   :columns: 3'
         ''
+        '   - :meth:`~music21.note.NotRest.getInstrument`'
         '   - :meth:`~music21.note.NotRest.hasVolumeInformation`'
         ''
         'Methods inherited from :class:`~music21.note.GeneralNote`:'
@@ -1001,7 +983,6 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :meth:`~music21.base.Music21Object.clearCache`'
         '   - :meth:`~music21.base.Music21Object.containerHierarchy`'
         '   - :meth:`~music21.base.Music21Object.contextSites`'
-        '   - :meth:`~music21.base.Music21Object.getAllContextsByClass`'
         ...
         ''
 
@@ -1074,6 +1055,7 @@ class ClassDocumenter(ObjectDocumenter):
         '   :columns: 3'
         ''
         '   - :attr:`~music21.note.GeneralNote.lyric`'
+        '   - :attr:`~music21.note.GeneralNote.pitches`'
         ''
         'Read/write properties inherited from :class:`~music21.base.Music21Object`:'
         ''
@@ -1084,6 +1066,7 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.derivation`'
         '   - :attr:`~music21.base.Music21Object.duration`'
         '   - :attr:`~music21.base.Music21Object.editorial`'
+        '   - :attr:`~music21.base.Music21Object.id`'
         '   - :attr:`~music21.base.Music21Object.offset`'
         '   - :attr:`~music21.base.Music21Object.priority`'
         '   - :attr:`~music21.base.Music21Object.quarterLength`'
@@ -1121,6 +1104,7 @@ class ClassDocumenter(ObjectDocumenter):
         '.. hlist::'
         '   :columns: 3'
         ''
+        '   - :meth:`~music21.scale.ConcreteScale.__eq__`'
         '   - :meth:`~music21.scale.ConcreteScale.derive`'
         '   - :meth:`~music21.scale.ConcreteScale.deriveAll`'
         ...
@@ -1241,6 +1225,7 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.derivation`'
         '   - :attr:`~music21.base.Music21Object.duration`'
         '   - :attr:`~music21.base.Music21Object.editorial`'
+        '   - :attr:`~music21.base.Music21Object.id`'
         '   - :attr:`~music21.base.Music21Object.offset`'
         '   - :attr:`~music21.base.Music21Object.priority`'
         '   - :attr:`~music21.base.Music21Object.quarterLength`'
@@ -1414,10 +1399,9 @@ class ModuleDocumenter(ObjectDocumenter):
         >>> for functionDocumenter in modDocumenter.functionDocumenters:
         ...     print(functionDocumenter.referentPackageSystemPath)
         ...
-        music21.serial.getHistoricalRowByName
         music21.serial.pcToToneRow
         music21.serial.rowToMatrix
-
+        music21.serial.getHistoricalRowByName
         '''
         result = []
         functionDocumenters = {}

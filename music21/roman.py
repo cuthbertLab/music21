@@ -183,33 +183,26 @@ def expandShortHand(shorthand):
 
     >>> roman.expandShortHand('64')
     ['6', '4']
-
     >>> roman.expandShortHand('973')
     ['9', '7', '3']
-
     >>> roman.expandShortHand('11b3')
     ['11', 'b3']
-
     >>> roman.expandShortHand('b13#9-6')
     ['b13', '#9', '-6']
-
     >>> roman.expandShortHand('-')
     ['5', '-3']
 
-
-    Slashes don't matter
+    Slashes don't matter:
 
     >>> roman.expandShortHand('6/4')
     ['6', '4']
 
-    Note that this is not where abbreviations get expanded
+    Note that this is not where abbreviations get expanded:
 
     >>> roman.expandShortHand('')
     []
-
     >>> roman.expandShortHand('7')  # not 7, 5, 3
     ['7']
-
     >>> roman.expandShortHand('4/3')  # not 6, 4, 3
     ['4', '3']
 
@@ -217,7 +210,6 @@ def expandShortHand(shorthand):
 
     >>> roman.expandShortHand('6')
     ['6']
-
 
     Returns a list of individual shorthands.
     '''
@@ -1461,7 +1453,7 @@ class RomanNumeral(harmony.Harmony):
     Note in the above example we passed in a Scale object not a Key.  This can be used
     in the theoretical case of applying roman numerals in 7-note scales that are not
     major or minor.  (see the documentation for the
-    :attr:`~music21.roman.RomanNumeral.scaleCardinality attribute for scales other than
+    :attr:`~music21.roman.RomanNumeral.scaleCardinality` attribute for scales other than
     7-note scales).
 
     Half-diminished seventh chords can be written with either `ø` or `/o` symbol:
@@ -1597,7 +1589,8 @@ class RomanNumeral(harmony.Harmony):
     >>> rn_minor_64_secondary.secondaryRomanNumeral
     <music21.roman.RomanNumeral V in e minor>
 
-    Dominant 7ths can be specified by putting d7 at end:
+    Dominant 7ths can be specified by the character 'd' followed by the figure
+    indicating the inversion of the chord:
 
     >>> r = roman.RomanNumeral('bVIId7', key.Key('B-'))
     >>> r.figure
@@ -1606,13 +1599,20 @@ class RomanNumeral(harmony.Harmony):
     >>> cp(r)
     ['A-5', 'C6', 'E-6', 'G-6']
 
-    >>> r = roman.RomanNumeral('VId7')
+    >>> r = roman.RomanNumeral('VId42')
     >>> r.figure
-    'VId7'
+    'VId42'
 
     >>> r.key = key.Key('B-')
     >>> cp(r)
-    ['G5', 'B5', 'D6', 'F6']
+    ['F5', 'G5', 'B5', 'D6']
+
+    >>> r = roman.RomanNumeral('IVd43', key.Key('B-'))
+    >>> r.figure
+    'IVd43'
+
+    >>> cp(r)
+    ['B-4', 'D-5', 'E-5', 'G5']
 
     >>> r2 = roman.RomanNumeral('V42/V7/vi', key.Key('C'))
     >>> cp(r2)
@@ -1802,6 +1802,11 @@ class RomanNumeral(harmony.Harmony):
     >>> r.key = key.Key('B-')
     >>> cp(r)
     ['G5', 'B5', 'D6', 'F6']
+
+    >>> r = roman.RomanNumeral('IVd6/5')
+    >>> r.key = key.Key('Eb')
+    >>> cp(r)
+    ['C5', 'E-5', 'G-5', 'A-5']
 
     >>> r = roman.RomanNumeral('vio', em)
     >>> cp(r)
@@ -2361,10 +2366,14 @@ class RomanNumeral(harmony.Harmony):
             workingFigure = workingFigure[1:]
             impliedQuality = 'augmented'
             # impliedQualitySymbol = '+'
-        elif workingFigure.endswith('d7'):
+        elif 'd' in workingFigure:
+            m = re.match(r'(?P<leading>.*)d(?P<figure>7|6/?5|4/?3|4/?2|2)$', workingFigure)
+            if m is None:
+                raise RomanException(
+                    f'Cannot make a dominant-seventh chord out of {workingFigure}. '
+                    "Figure should be in ('7', '65', '43', '42', '2').")
             # this one is different
-            # # TODO(msc): what about d65, etc.?
-            workingFigure = workingFigure[:-2] + '7'
+            workingFigure = m.group('leading') + m.group('figure')
             impliedQuality = 'dominant-seventh'
             # impliedQualitySymbol = '(dom7)'
         elif self.caseMatters and self.romanNumeralAlone.upper() == self.romanNumeralAlone:
@@ -3064,6 +3073,12 @@ class RomanNumeral(harmony.Harmony):
                     addedPitch.accidental = pitch.Accidental(alteration)
 
                 while addedPitch.ps < bassPitch.ps:
+                    addedPitch.octave += 1
+
+                if (addedPitch.ps == bassPitch.ps
+                        and addedPitch.diatonicNoteNum < bassPitch.diatonicNoteNum):
+                    # RN('IV[add#7]', 'C') would otherwise result
+                    # in E#4 as bass, not E#5 as highest note.
                     addedPitch.octave += 1
 
                 if addedPitch not in self.pitches:
@@ -4271,7 +4286,14 @@ class Test(unittest.TestCase):
         self.assertEqual(rn4.figure, 'iv42[#7]')
         new_fig_equals_old_figure(rn4, 'g')
 
-
+    def test_addedPitch_sharp7(self):
+        '''
+        Fixes issue #1369
+        '''
+        rn = RomanNumeral('IV[add#7]', 'C')
+        self.assertEqual(rn.bass().nameWithOctave, 'F4')
+        self.assertEqual([p.nameWithOctave for p in rn.pitches],
+                         ['F4', 'A4', 'C5', 'E#5'])
 
 class TestExternal(unittest.TestCase):
     show = True
