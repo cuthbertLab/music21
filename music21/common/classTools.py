@@ -6,11 +6,12 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import contextlib
 import typing as t
+from typing_extensions import TypeGuard  # move to typing when 3.10 is minimum
 
 # from music21 import exceptions21
 __all__ = [
@@ -18,8 +19,7 @@ __all__ = [
     'tempAttribute', 'saveAttributes',
 ]
 
-
-def isNum(usrData: t.Any) -> bool:
+def isNum(usrData: t.Any) -> TypeGuard[Number]:
     '''
     check if usrData is a number (float, int, long, Decimal),
     return boolean
@@ -63,7 +63,7 @@ def isNum(usrData: t.Any) -> bool:
         return False
 
 
-def isListLike(usrData: t.Any) -> bool:
+def isListLike(usrData: t.Any) -> TypeGuard[t.Union[List[t.Any], Tuple[t.Any, ...]]]:
     '''
     Returns True if is a List or Tuple or their subclasses.
 
@@ -88,7 +88,7 @@ def isListLike(usrData: t.Any) -> bool:
     return isinstance(usrData, (list, tuple))
 
 
-def isIterable(usrData: t.Any) -> bool:
+def isIterable(usrData: t.Any) -> TypeGuard[t.Union[t.Iterable, range]]:
     '''
     Returns True if is the object can be iter'd over
     and is NOT a string
@@ -112,7 +112,7 @@ def isIterable(usrData: t.Any) -> bool:
     >>> common.isIterable(stream.Stream)
     False
 
-    Changed in v7.3 -- Classes (not instances) are not iterable
+    Changed in v7.3 -- Classes are not iterable, only instances are.
     '''
     if isinstance(usrData, (str, bytes)):
         return False
@@ -242,7 +242,6 @@ def saveAttributes(obj, *attributeList):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-# _DOC_ORDER = [fromRoman, toRoman]
 
 if __name__ == '__main__':
     import music21
