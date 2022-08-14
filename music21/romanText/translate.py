@@ -1635,7 +1635,6 @@ m2: I :||
         _repeat_tester(end_repeat, 'end', 3.0, 2)
         _test_expanded(s, 12.0)
 
-        # TODO flake quotes
         single_bar_repeats = '''Time Signature: 2/4
 m1: ||: I :||
 '''
