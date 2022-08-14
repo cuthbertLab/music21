@@ -2885,7 +2885,7 @@ class PartExporter(XMLExporterBase):
         for m in measures:
             for m_or_v in [m, *m.voices]:
                 stream.makeNotation.makeTupletBrackets(m_or_v, inPlace=True)
-                if not m.streamStatus.tuplets:
+                if not m_or_v.streamStatus.tuplets:
                     stream.makeNotation.makeTupletBrackets(m_or_v, inPlace=True)
 
         if not self.spannerBundle:
