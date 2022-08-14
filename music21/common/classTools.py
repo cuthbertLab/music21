@@ -10,6 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import contextlib
+import numbers
 import typing as t
 from typing_extensions import TypeGuard  # move to typing when 3.10 is minimum
 
@@ -19,10 +20,10 @@ __all__ = [
     'tempAttribute', 'saveAttributes',
 ]
 
-def isNum(usrData: t.Any) -> TypeGuard[Number]:
+def isNum(usrData: t.Any) -> TypeGuard[numbers.Number]:
     '''
     check if usrData is a number (float, int, long, Decimal),
-    return boolean
+    return boolean, and type it as a numbers.Number
 
     unlike `isinstance(usrData, Number)` does not return True for `True, False`.
 
@@ -63,7 +64,7 @@ def isNum(usrData: t.Any) -> TypeGuard[Number]:
         return False
 
 
-def isListLike(usrData: t.Any) -> TypeGuard[t.Union[List[t.Any], Tuple[t.Any, ...]]]:
+def isListLike(usrData: t.Any) -> TypeGuard[t.Union[t.List[t.Any], t.Tuple[t.Any, ...]]]:
     '''
     Returns True if is a List or Tuple or their subclasses.
 
