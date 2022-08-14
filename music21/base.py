@@ -38,6 +38,7 @@ under the module "base":
 '''
 from __future__ import annotations
 
+import builtins
 import copy
 import warnings
 import weakref
@@ -55,14 +56,13 @@ from music21.common.enums import ElementSearch, OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21.common.types import OffsetQL, OffsetQLIn
 from music21 import environment
-from music21 import editorial
+from music21.editorial import Editorial
 from music21 import defaults
 from music21.derivation import Derivation
 from music21.duration import Duration, DurationException
 from music21 import prebase
-from music21 import sites
-from music21 import style  # pylint: disable=unused-import
-from music21.sites import SitesException
+from music21.sites import Sites, SitesException, WEAKREF_ACTIVE
+from music21.style import Style  # pylint: disable=unused-import
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 # needed for temporal manipulations; not music21 objects
 from music21 import tie
@@ -265,9 +265,9 @@ class Music21Object(prebase.ProtoM21Object):
 
     1.  id: identification string unique to the object's container (optional).
         Defaults to the `id()` of the element.
-    2.  groups: a Groups object: which is a list of strings identifying
-        internal sub-collections (voices, parts, selections) to which this
-        element belongs
+    2.  groups: a :class:`~music21.base.Groups` object: which is a
+        list of strings identifying internal sub-collections
+        (voices, parts, selections) to which this element belongs
     3.  duration: Duration object representing the length of the object
     4.  activeSite: a reference to the currently active Stream or None
     5.  offset: a floating point value, generally in quarter lengths,
@@ -285,7 +285,6 @@ class Music21Object(prebase.ProtoM21Object):
     10. editorial: a :class:`~music21.editorial.Editorial` object
 
 
-
     Each of these may be passed in as a named keyword to any music21 object.
 
     Some of these may be intercepted by the subclassing object (e.g., duration
@@ -296,16 +295,18 @@ class Music21Object(prebase.ProtoM21Object):
     # these values permit fast class comparisons for performance critical cases
     isStream = False
 
-    _styleClass: t.Type[style.Style] = style.Style
+    _styleClass: t.Type[Style] = Style
 
     # define order for presenting names in documentation; use strings
     _DOC_ORDER: t.List[str] = []
 
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR: t.Dict[str, str] = {
-        'groups': '''An instance of a :class:`~music21.base.Group`
+        'groups': '''An instance of a :class:`~music21.base.Groups`
             object which describes
             arbitrary `Groups` that this object belongs to.''',
+        'sites': '''a :class:`~music21.sites.Sites` object that stores
+            references to Streams that hold this object.''',
         'isStream': '''Boolean value for quickly identifying
             :class:`~music21.stream.Stream` objects (False by default).''',
         'classSortOrder': '''Property which returns an number (int or otherwise)
@@ -342,13 +343,24 @@ class Music21Object(prebase.ProtoM21Object):
             ''',
     }
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 *arguments,
+                 id: t.Union[str, int, None] = None,
+                 groups: t.Optional[Groups] = None,
+                 sites: t.Optional[Sites] = None,
+                 duration: t.Optional[Duration] = None,
+                 activeSite: t.Optional['music21.stream.Stream'] = None,
+                 style: t.Optional[Style] = None,
+                 editorial: t.Optional[Editorial] = None,
+                 offset: OffsetQL = 0.0,
+                 quarterLength: t.Optional[OffsetQLIn] = None,
+                 **keywords):
         # do not call super().__init__() since it just wastes time
-        self._id = None
+        self._id: t.Union[str, int, None] = id
         # None is stored as the internal location of an obj w/o any sites
         self._activeSite: t.Union['music21.stream.Stream', weakref.ReferenceType, None] = None
         # offset when no activeSite is available
-        self._naiveOffset: t.Union[float, fractions.Fraction] = 0.0
+        self._naiveOffset: OffsetQL = offset
 
         # offset when activeSite is already garbage collected/dead,
         # as in short-lived sites
@@ -359,8 +371,8 @@ class Music21Object(prebase.ProtoM21Object):
         # pass a reference to this object
         self._derivation: t.Optional[Derivation] = None
 
-        self._style: t.Optional[style.Style] = None
-        self._editorial: t.Optional[editorial.Editorial] = None
+        self._style: t.Optional[Style] = style
+        self._editorial: t.Optional[Editorial] = None
 
         # private duration storage; managed by property
         self._duration: t.Optional[Duration] = None
@@ -369,29 +381,17 @@ class Music21Object(prebase.ProtoM21Object):
         # store cached values here:
         self._cache: t.Dict[str, t.Any] = {}
 
-        if 'id' in keywords:
-            self._id = keywords['id']
-
-        if 'groups' in keywords and keywords['groups'] is not None:
-            self.groups = keywords['groups']
-        else:
-            self.groups = Groups()
-
-        if 'sites' in keywords:
-            self.sites = keywords['sites']
-        else:
-            self.sites = sites.Sites()
+        self.groups = groups or Groups()
+        self.sites = sites or Sites()
 
         # a duration object is not created until the .duration property is
         # accessed with _getDuration(); this is a performance optimization
-        if 'duration' in keywords:
-            self.duration = keywords['duration']
-        if 'activeSite' in keywords:
-            self.activeSite = keywords['activeSite']
-        if 'style' in keywords:
-            self.style = keywords['style']
-        if 'editorial' in keywords:
-            self.editorial = keywords['editorial']
+        if activeSite is not None:
+            self.activeSite = activeSite
+        if quarterLength is not None:
+            self.duration.quarterLength = quarterLength
+        elif duration is not None:
+            self.duration = duration
 
     @property
     def id(self) -> t.Union[int, str]:
@@ -407,7 +407,7 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         if self._id is not None:
             return self._id
-        return id(self)
+        return builtins.id(self)
 
     @id.setter
     def id(self, new_id: t.Union[int, str]):
@@ -673,7 +673,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         # anytime something is changed here, change in style.StyleMixin and vice-versa
         if self._editorial is None:
-            self._editorial = editorial.Editorial()
+            self._editorial = Editorial()
         return self._editorial
 
     @editorial.setter
@@ -705,7 +705,7 @@ class Music21Object(prebase.ProtoM21Object):
         return not (self._style is None)
 
     @property
-    def style(self) -> 'music21.style.Style':
+    def style(self) -> Style:
         '''
         Returns (or Creates and then Returns) the Style object
         associated with this object, or sets a new
@@ -727,8 +727,6 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n.style.absoluteX is None
         True
         '''
-        # Dev note: because property style shadows module style,
-        # typing has to be in quotes.
         # anytime something is changed here, change in style.StyleMixin and vice-versa
         if not self.hasStyleInformation:
             StyleClass = self._styleClass
@@ -737,7 +735,7 @@ class Music21Object(prebase.ProtoM21Object):
         return self._style
 
     @style.setter
-    def style(self, newStyle: t.Optional['music21.style.Style']):
+    def style(self, newStyle: t.Optional[Style]):
         # Dev note: because property style shadows module style,
         # typing has to be in quotes.
         self._style = newStyle
@@ -2268,7 +2266,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def _getActiveSite(self):
         # can be None
-        if sites.WEAKREF_ACTIVE:
+        if WEAKREF_ACTIVE:
             if self._activeSite is None:  # leave None
                 return None
             else:  # even if current activeSite is not a weakref, this will work
@@ -2300,7 +2298,7 @@ class Music21Object(prebase.ProtoM21Object):
         else:
             self._activeSiteStoredOffset = None
 
-        if sites.WEAKREF_ACTIVE:
+        if WEAKREF_ACTIVE:
             if site is None:  # leave None alone
                 self._activeSite = None
             else:
@@ -2638,6 +2636,8 @@ class Music21Object(prebase.ProtoM21Object):
     @duration.setter
     def duration(self, durationObj: Duration):
         durationObjAlreadyExists = not (self._duration is None)
+        if durationObjAlreadyExists:
+            self._duration.client = None
 
         try:
             ql = durationObj.quarterLength

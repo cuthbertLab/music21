@@ -573,20 +573,22 @@ class Test(unittest.TestCase):
     def testStreamDurationRecalculated(self):
         from fractions import Fraction
 
-        a = Stream()
+        s = Stream()
         n = note.Note(quarterLength=1.0)
-        a.append(n)
-        self.assertEqual(a.duration.quarterLength, 1.0)
+        s.append(n)
+        self.assertEqual(s.duration.quarterLength, 1.0)
 
         tup = duration.Tuplet()
         n.duration.tuplets = (tup,)
-        self.assertEqual(a.duration.quarterLength, Fraction(2, 3))
+        self.assertEqual(n.duration.quarterLength, Fraction(2, 3))
+        self.assertEqual(s.duration.quarterLength, Fraction(2, 3))
 
         # Also (regression) test clearing the cache
         # https://github.com/cuthbertLab/music21/issues/957
         n.duration.tuplets = (tup, tup)
-        a.coreElementsChanged()
-        self.assertEqual(a.duration.quarterLength, Fraction(4, 9))
+        self.assertEqual(s.duration.quarterLength, Fraction(4, 9))
+        s.coreElementsChanged()
+        self.assertEqual(s.duration.quarterLength, Fraction(4, 9))
 
     def testMeasureStream(self):
         '''An approach to setting TimeSignature measures in offsets and durations
