@@ -345,7 +345,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     def __init__(self,
                  *arguments,
-                 id: t.Union[str, int, None] = None,
+                 id: t.Union[str, int, None] = None,  # pylint: disable=redefined-builtin
                  groups: t.Optional[Groups] = None,
                  sites: t.Optional[Sites] = None,
                  duration: t.Optional[Duration] = None,
