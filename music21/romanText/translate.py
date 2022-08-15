@@ -123,6 +123,7 @@ OMIT_FROM_DOCS
 ['F#5', 'A5', 'C6']
 '''
 import copy
+import textwrap
 import traceback
 import typing as t
 import unittest
@@ -784,7 +785,7 @@ class PartTranslator:
         elif isinstance(a, rtObjects.RTRepeat):
             if isinstance(a, rtObjects.RTRepeatStop) and isLastAtomInMeasure:
                 # This condition needs to be moved here because it is possible
-                #   and indeed likely that a end repeat will have an offset of
+                #   and indeed likely that an end repeat will have an offset of
                 #   0 in the case that there is 0 or 1 harmonies in the measure.
                 # Is it ok, however, that this condition will match if self.tsCurrent
                 #   is None? Previously, that case was excluded below.
@@ -1624,74 +1625,108 @@ m1 C: I'''
             self.assertTrue(e.repeatBarsAreCoherent())
             p2 = e.process()
             self.assertEqual(p2.quarterLength, quarterLength)
+        
+        def _test_ending_contents(
+            rb: spanner.RepeatBracket, expectedMeasures: t.List[str]
+        ) -> None:
+            try:
+                measure_nos = [m.measureNumberWithSuffix() for m in rb[stream.Measure]]
+                self.assertEqual(measure_nos, expectedMeasures)
+            except:
+                import traceback, sys
+                exc_type, exc_value, exc_traceback = sys.exc_info()
+                traceback.print_exception(
+                    exc_type, exc_value, exc_traceback, file=sys.stdout)
+                breakpoint()
 
         # Test simple repeats
-        simple_repeats = '''Time Signature: 3/4
-m1: ||: V
-m2: I :||
-'''
+        simple_repeats = textwrap.dedent('''
+            Time Signature: 3/4
+            m1: ||: V
+            m2: I :||
+        ''')
         s = converter.parse(simple_repeats, format='romanText')
-        start_repeat, end_repeat = s[bar.Repeat]
+        br_iter = s[bar.Repeat]
+        self.assertEqual(len(br_iter), 2)
+        start_repeat, end_repeat = br_iter
         _repeat_tester(start_repeat, 'start', 0.0, 1)
         _repeat_tester(end_repeat, 'end', 3.0, 2)
         _test_expanded(s, 12.0)
 
-        single_bar_repeats = '''Time Signature: 2/4
-m1: ||: I :||
-'''
+        single_bar_repeats = textwrap.dedent('''
+            Time Signature: 2/4
+            m1: ||: I :||
+        ''')
         s = converter.parse(single_bar_repeats, format='romanText')
-        start_repeat, end_repeat = s[bar.Repeat]
+        br_iter = s[bar.Repeat]
+        self.assertEqual(len(br_iter), 2)
+        start_repeat, end_repeat = br_iter
         _repeat_tester(start_repeat, 'start', 0.0, 1)
         _repeat_tester(end_repeat, 'end', 2.0, 1)
         _test_expanded(s, 4.0)
 
-        empty_bars_with_repeats = '''Time Signature: 2/4
-m1: I
-m2: ||:
-m3: :||
-m4: ||: :||'''
+        empty_bars_with_repeats = textwrap.dedent('''
+            Time Signature: 2/4
+            m1: I
+            m2: ||:
+            m3: :||
+            m4: ||: :||
+        ''')
         s = converter.parse(empty_bars_with_repeats, format='romanText')
-        start_repeat1, end_repeat1, start_repeat2, end_repeat2 = s[bar.Repeat]
+        br_iter = s[bar.Repeat]
+        self.assertEqual(len(br_iter), 4)
+        start_repeat1, end_repeat1, start_repeat2, end_repeat2 = br_iter
         _repeat_tester(start_repeat1, 'start', 0.0, 2)
         _repeat_tester(end_repeat1, 'end', 2.0, 3)
         _repeat_tester(start_repeat2, 'start', 0.0, 4)
         _repeat_tester(end_repeat2, 'end', 2.0, 4)
         _test_expanded(s, 14.0)
 
-        three_endings = '''Time Signature: 3/4
-m1: ||: I
-m2a: IV :||
-m2b: V :||
-m2c: I'''
+        three_endings = textwrap.dedent('''
+            Time Signature: 3/4
+            m1: ||: I
+            m2a: IV :||
+            m2b: V :||
+            m2c: I
+        ''')
         s = converter.parse(three_endings, format='romanText')
-        start_repeat, end_repeat1, end_repeat2 = s[bar.Repeat]
+        br_iter = s[bar.Repeat]
+        self.assertEqual(len(br_iter), 3)
+        start_repeat, end_repeat1, end_repeat2 = br_iter
         _repeat_tester(start_repeat, 'start', 0.0, 1)
         _repeat_tester(end_repeat1, 'end', 3.0, 2)
         _repeat_tester(end_repeat2, 'end', 3.0, 2)
-        first_ending, second_ending, third_ending = s[spanner.RepeatBracket]  # pylint: disable=unused-variable
-        # TODO the following tests don't work; repr(first_ending) gives
-        #   '<music21.spanner.RepeatBracket 1 <music21.stream.Measure 2a offset=3.0>>'
-        #   but first_ending.getNumberList() returns [1]
-        #   What is the correct approach to checking that the measures are as we
-        #   expect? Or should we just forget about it since _test_expanded passes?
-        # self.assertEqual(first_ending.getNumberList(), ['2a'])
-        # self.assertEqual(second_ending.getNumberList(), ['2b'])
+        rb_iter = s[spanner.RepeatBracket]
+        self.assertEqual(len(rb_iter), 3)
+        first_ending, second_ending, third_ending = rb_iter
+        _test_ending_contents(first_ending, ['2a'])
+        _test_ending_contents(second_ending, ['2b'])
+        _test_ending_contents(third_ending, ['2c'])
         _test_expanded(s, 18.0)
 
-        more_complex_example = '''TimeSignature: 3/4
-m1: ||: I
-m2a: IV
-m3a: V :||
-m2b: V :||
-m2c: IV
-m3c: V
-m4: I'''
+        more_complex_example = textwrap.dedent('''
+            TimeSignature: 3/4
+            m1: ||: I
+            m2a: IV
+            m3a: V :||
+            m2b: V :||
+            m2c: IV
+            m3c: V
+            m4: I
+        ''')
         s = converter.parse(more_complex_example, format='romanText')
+        br_iter = s[bar.Repeat]
+        self.assertEqual(len(br_iter), 3)
         start_repeat, end_repeat1, end_repeat2 = s[bar.Repeat]
         _repeat_tester(start_repeat, 'start', 0.0, 1)
         _repeat_tester(end_repeat1, 'end', 3.0, 3)
         _repeat_tester(end_repeat2, 'end', 3.0, 2)
-        first_ending, second_ending, third_ending = s[spanner.RepeatBracket]  # pylint: disable=unused-variable
+        rb_iter = s[spanner.RepeatBracket]
+        self.assertEqual(len(rb_iter), 3)
+        first_ending, second_ending, third_ending = rb_iter
+        _test_ending_contents(first_ending, ['2a', '3a'])
+        _test_ending_contents(second_ending, ['2b'])
+        _test_ending_contents(third_ending, ['2c', '3c'])
         _test_expanded(s, 27.0)
 
 
