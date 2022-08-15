@@ -93,7 +93,9 @@ Conventions:
   - prefer f-strings to `.format()`.  The `%` interpolation is no longer allowed.
   - annotating types is required in new code, and encouraged to be added to older code.
     - e.g. `self.counter: int = 0` or `def makeNoises() -> t.List['noise.Noise']:`
-    - The typing library should always be imported as `t`.
+    - The typing library should always be imported as `t`, 
+      i.e, with `import typing as t` in the imports then using `t.Optional` (for example) 
+      as needed instead of specifying exactly which types to import in each file.
     - Until `music21` no longer supports Python 3.8, use `t.List[]` rather than `list[]`.
     - Until `music21` no longer supports Python 3.9, use `t.Optional[x]` rather than `x|None`.
   - prefer enums to string configurations
