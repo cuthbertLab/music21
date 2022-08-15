@@ -1049,12 +1049,14 @@ class Tuplet(prebase.ProtoM21Object):
     def __init__(self,
                  numberNotesActual: int = 3,
                  numberNotesNormal: int = 2,
-                 durationActual: t.Union[Duration, DurationTuple, str, t.Tuple[str, int], None] = None,
-                 durationNormal: t.Union[Duration, DurationTuple, str, t.Tuple[str, int], None] = None,
+                 durationActual: t.Union[DurationTuple, Duration,
+                                         str, t.Tuple[str, int], None] = None,
+                 durationNormal: t.Union[DurationTuple, Duration,
+                                         str, t.Tuple[str, int], None] = None,
                  *,
                  tupletId: int = 0,
                  nestedLevel: int = 1,
-                 type: TupletType = None,
+                 type: TupletType = None,  # pylint: disable=redefined-builtin
                  bracket: t.Literal[True, False, 'slur'] = True,
                  placement: t.Literal['above', 'below'] = 'above',
                  tupletActualShow: TupletShowOptions = 'number',
@@ -1063,8 +1065,8 @@ class Tuplet(prebase.ProtoM21Object):
         self.frozen = False
         # environLocal.printDebug(['creating Tuplet instance'])
 
-        self._durationNormal: t.Optional[Duration] = None
-        self._durationActual: t.Optional[Duration] = None
+        self._durationNormal: t.Optional[DurationTuple] = None
+        self._durationActual: t.Optional[DurationTuple] = None
 
         # necessary for some complex tuplets, interrupted, for instance
         self.tupletId = tupletId
@@ -1074,6 +1076,11 @@ class Tuplet(prebase.ProtoM21Object):
         # this is not the previous/expected duration of notes that happen
         self.numberNotesActual: int = numberNotesActual
 
+        if durationActual is not None and durationNormal is None:
+            durationNormal = durationActual
+        elif durationActual is None and durationNormal is not None:
+            durationActual = durationNormal
+
         # this stores a durationTuple
         if durationActual is not None:
             if isinstance(durationActual, str):
@@ -1082,7 +1089,8 @@ class Tuplet(prebase.ProtoM21Object):
                 self.durationActual = durationTupleFromTypeDots(durationActual[0],
                                                                 durationActual[1])
             else:
-                self.durationActual = durationActual
+                # type ignore until https://github.com/python/mypy/issues/3004 resolved
+                self.durationActual = durationActual  # type: ignore
 
         # normal is the space that would normally be occupied by the tuplet span
         self.numberNotesNormal: int = numberNotesNormal
@@ -1094,7 +1102,8 @@ class Tuplet(prebase.ProtoM21Object):
                 self.durationNormal = durationTupleFromTypeDots(durationNormal[0],
                                                                 durationNormal[1])
             else:
-                self.durationNormal = durationNormal
+                # type ignore until https://github.com/python/mypy/issues/3004 resolved
+                self.durationNormal = durationNormal  # type: ignore
 
         # Type is 'start', 'stop', 'startStop', False or None: determines whether to start or stop
         # the bracket/group drawing
@@ -1103,10 +1112,14 @@ class Tuplet(prebase.ProtoM21Object):
         # type of None means undetermined,
         # False means definitely neither start nor stop (not yet used)
         self.type: TupletType = type
-        self.bracket: t.Literal[True, False, 'slur'] = bracket  # True or False or 'slur'
-        self.placement: t.Literal['above', 'below'] = placement  # 'above' or 'below' (TODO: 'by-context')
-        self.tupletActualShow: TupletShowOptions = tupletActualShow  # could be 'number', 'type', 'both', or None
-        self.tupletNormalShow: TupletShowOptions = tupletNormalShow  # for ratios. Options are same as above.
+        # True or False or 'slur'
+        self.bracket: t.Literal[True, False, 'slur'] = bracket
+        # 'above' or 'below' (TODO: 'by-context')
+        self.placement: t.Literal['above', 'below'] = placement
+        # could be 'number', 'type', 'both', or None
+        self.tupletActualShow: TupletShowOptions = tupletActualShow
+        # for ratios. Options are same as above.
+        self.tupletNormalShow: TupletShowOptions = tupletNormalShow
 
         # this attribute is not yet used anywhere
         # self.nestedInside = ''  # could be a tuplet object
@@ -1557,7 +1570,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     # CLASS VARIABLES #
 
-    isGrace = False
+    isGrace = False  # grace is stored as separate class.
 
     __slots__ = (
         '_linked',
@@ -1628,14 +1641,17 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         self.expressionIsInferred = False
         if typeOrDuration is not None:
-            if common.isNum(typeOrDuration) and quarterLength is None:
+            if isinstance(typeOrDuration, (int, float, fractions.Fraction)
+                          ) and quarterLength is None:
                 quarterLength = typeOrDuration
             elif isinstance(typeOrDuration, str) and type is None:
                 type = typeOrDuration
             elif isinstance(typeOrDuration, DurationTuple) and durationTuple is None:
                 durationTuple = typeOrDuration
             else:
-                raise TypeError(f'Cannot parse argument {typeOrDuration} or conflicts with keywords')
+                raise TypeError(
+                    f'Cannot parse argument {typeOrDuration} or conflicts with keywords'
+                )
 
         if durationTuple is not None:
             self.addDurationTuple(durationTuple)
@@ -1646,7 +1662,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             storeDots = 0
 
         if components is not None:
-            self.components = components
+            self.components = t.cast(t.Tuple[DurationTuple, ...], components)
             # this is set in _setComponents
             # self._quarterLengthNeedsUpdating = True
 

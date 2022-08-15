@@ -45,14 +45,15 @@ def addDocAttrTestsToSuite(suite,
     >>> import doctest
     >>> s1 = doctest.DocTestSuite(chord)
     >>> s1TestsBefore = len(s1._tests)
+    >>> before = set(s1._tests)
     >>> allLocals = [getattr(chord, x) for x in dir(chord)]
     >>> test.testRunner.addDocAttrTestsToSuite(s1, allLocals)
     >>> s1TestsAfter = len(s1._tests)
     >>> s1TestsAfter - s1TestsBefore
-    2
+    3
     >>> lastTest = s1._tests[-1]
     >>> lastTest
-    isRest ()
+    expressionIsInferred ()
     '''
     dtp = doctest.DocTestParser()
     if globs is False:
