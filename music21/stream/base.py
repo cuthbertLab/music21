@@ -339,8 +339,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if givenElements is None:
             return
 
-        if isinstance(givenElements, base.Music21Object) or not common.isIterable(givenElements):
-            givenElements = [givenElements]
+        if isinstance(givenElements, base.Music21Object):
+            givenElements = t.cast(t.List[base.Music21Object], [givenElements])
 
         # Append rather than insert if every offset is 0.0
         # but not if every element is a stream subclass other than a Measure or Score
@@ -7087,7 +7087,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     and isinstance(nInner, chord.Chord)
                     and isinstance(nLast, chord.Chord)
                     and None not in [inner_p.tie for inner_p in nInner.notes]
-                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}
+                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}  # type: ignore
                     and len(nLast.pitches) == len(nInner.pitches)):
                 return True
 

@@ -558,7 +558,6 @@ class GeneralNote(base.Music21Object):
     _DOC_ATTR: t.Dict[str, str] = {
         'isChord': 'Boolean read-only value describing if this object is a Chord.',
         'lyrics': 'A list of :class:`~music21.note.Lyric` objects.',
-        'tie': 'either None or a :class:`~music21.note.Tie` object.',
         'expressions': '''a list of expressions (such
             as :class:`~music21.expressions.Fermata`, etc.)
             that are stored on this Note.''',
@@ -597,7 +596,7 @@ class GeneralNote(base.Music21Object):
             self.addLyric(lyric)
 
         # note: Chords handle ties differently
-        self.tie: t.Optional[tie.Tie] = None  # store a Tie object
+        self._tie: t.Optional[tie.Tie] = None  # store a Tie object
 
     def __eq__(self, other):
         '''
@@ -628,6 +627,22 @@ class GeneralNote(base.Music21Object):
         return True
 
     # --------------------------------------------------------------------------
+    @property
+    def tie(self) -> t.Optional[tie.Tie]:
+        '''
+        Return and set a :class:`~music21.note.Tie` object, or None.
+
+        >>> n = note.Note()
+        >>> n.tie is None
+        True
+        >>> n.tie = tie.Tie('start')
+        '''
+        return self._tie
+
+    @tie.setter
+    def tie(self, value: t.Optional[tie.Tie]):
+        self._tie = value
+
     def _getLyric(self) -> t.Optional[str]:
         if not self.lyrics:
             return None
