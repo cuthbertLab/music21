@@ -108,6 +108,10 @@ Conventions:
       this is not the convention.  Do not leave out underscores in the member names; it makes
       it hard for people whose native language is not English to parse and impossible for
       screen readers.
+    - This is part of a general (object-oriented) preference for using objects over strings. 
+      For example, when calling `getElementsByClass()`, 
+      although passing the string name of the class is supported, 
+      use the class object as argument where possible.
   - methods:
     - no more than three positional arguments (in addition to `self`)
     - keyword arguments should be keyword-only by using `*`
