@@ -461,7 +461,15 @@ class PartReduction:
     If the `normalize` parameter is False, no normalization will take place. The default is True.
 
     '''
-    def __init__(self, srcScore=None, *args, **keywords):
+    def __init__(self,
+                 srcScore=None,
+                 *args,
+                 partGroups: t.Optional[t.Dict[str, t.Any]] = None,
+                 fillByMeasure: bool = True,
+                 segmentByTarget: bool = True,
+                 normalize: bool = True,
+                 normalizeByPart: bool = False,
+                 **keywords):
         if srcScore is None:
             return
         if not isinstance(srcScore, stream.Score):
@@ -475,26 +483,14 @@ class PartReduction:
 
         # define how parts are grouped
         # a list of dictionaries, with keys for name, color, and a match list
-        self._partGroups = None
-        if 'partGroups' in keywords:
-            self._partGroups = keywords['partGroups']
+        self._partGroups = partGroups
 
-        self._fillByMeasure = True
-        if 'fillByMeasure' in keywords:
-            self._fillByMeasure = keywords['fillByMeasure']
+        self._fillByMeasure = fillByMeasure
 
         # We re-partition if the spans change
-        self._segmentByTarget = True
-        if 'segmentByTarget' in keywords:
-            self._segmentByTarget = keywords['segmentByTarget']
-
-        self._normalizeByPart = False  # norm by all parts is default
-        if 'normalizeByPart' in keywords:
-            self._normalizeByPart = keywords['normalizeByPart']
-
-        self._normalizeToggle = True
-        if 'normalize' in keywords:
-            self._normalizeToggle = keywords['normalize']
+        self._segmentByTarget = segmentByTarget
+        self._normalizeByPart = normalizeByPart  # norm by all parts is default
+        self._normalizeToggle = normalize
 
         # check that there are measures
         for p in self._score.parts:

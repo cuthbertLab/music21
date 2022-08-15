@@ -468,11 +468,17 @@ class ConverterLilypond(SubConverter):
                                          'svg': ''}  # sic! (Why?)
     codecWrite = True
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+    def write(self,
+              obj,
+              fmt,
+              fp=None,
+              subformats=None,
+              *,
+              coloredVariants: bool = False,
+              **keywords):  # pragma: no cover
         from music21 import lily
         conv = lily.translate.LilypondConverter()
-        if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
-            conv.coloredVariants = True
+        conv.coloredVariants = coloredVariants
 
         if subformats is not None and 'pdf' in subformats:
             conv.loadFromMusic21Object(obj)
@@ -543,14 +549,16 @@ class ConverterVexflow(SubConverter):
     registerFormats = ('vexflow',)
     registerOutputExtensions = ('html',)
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+    def write(self,
+              obj,
+              fmt,
+              fp=None,
+              subformats=None,
+              *,
+              local: bool = False
+              **keywords):  # pragma: no cover
         # from music21 import vexflow
         from music21.vexflow import toMusic21j as vexflow
-        if 'local' in keywords:
-            local = keywords['local']
-        else:
-            local = False
-
         dataStr = vexflow.fromObject(obj, mode='html', local=local)
         fp = self.writeDataStream(fp, dataStr)
         return fp

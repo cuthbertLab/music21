@@ -1191,6 +1191,9 @@ def parseURL(url,
 
 def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
           *args,
+          forceSource: bool = False,
+          number: t.Optional[int] = None,
+          format: t.Optional[str] = None,  # pylint: disable=redefined-builtin
           **keywords) -> t.Union[stream.Score, stream.Part, stream.Opus]:
     r'''
     Given a file path, encoded data in a Python string, or a URL, attempt to
@@ -1241,25 +1244,7 @@ def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
         possibility and has been removed.
     '''
     # environLocal.printDebug(['attempting to parse()', value])
-    if 'forceSource' in keywords:
-        forceSource = keywords['forceSource']
-        del keywords['forceSource']
-    else:
-        forceSource = False
-
     # see if a work number is defined; for multi-work collections
-    if 'number' in keywords:
-        number = keywords['number']
-        del keywords['number']
-    else:
-        number = None
-
-    if 'format' in keywords:
-        m21Format = keywords['format']
-        del keywords['format']
-    else:
-        m21Format = None
-
     valueStr: str
     if isinstance(value, bytes):
         valueStr = value.decode('utf-8', 'ignore')
@@ -1281,7 +1266,7 @@ def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
             and value[1] is None
             and _osCanLoad(str(value[0]))):
         # comes from corpus.search
-        return parseFile(value[0], format=m21Format, **keywords)
+        return parseFile(value[0], format=format, **keywords)
     elif (common.isListLike(value)
           and isinstance(value, collections.abc.Sequence)
           and len(value) == 2
@@ -1297,26 +1282,26 @@ def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
                 'If using a two-element list, the second value must be an integer number, '
                 f'not {value[1]!r}'
             )
-        sc = parseFile(value[0], format=m21Format, **keywords)
+        sc = parseFile(value[0], format=format, **keywords)
         if isinstance(sc, stream.Opus):
             return sc.getScoreByNumber(value[1])
         else:
             return sc
     # a midi string, must come before os.path.exists test
     elif not isinstance(value, bytes) and valueStr.startswith('MThd'):
-        return parseData(value, number=number, format=m21Format, **keywords)
+        return parseData(value, number=number, format=format, **keywords)
     elif (not isinstance(value, bytes)
           and _osCanLoad(valueStr)):
-        return parseFile(valueStr, number=number, format=m21Format,
+        return parseFile(valueStr, number=number, format=format,
                          forceSource=forceSource, **keywords)
     elif (not isinstance(value, bytes)
           and _osCanLoad(common.cleanpath(valueStr))):
-        return parseFile(common.cleanpath(valueStr), number=number, format=m21Format,
+        return parseFile(common.cleanpath(valueStr), number=number, format=format,
                          forceSource=forceSource, **keywords)
     elif not isinstance(valueStr, bytes) and (valueStr.startswith('http://')
                                               or valueStr.startswith('https://')):
         # it's a url; may need to broaden these criteria
-        return parseURL(value, number=number, format=m21Format,
+        return parseURL(value, number=number, format=format,
                         forceSource=forceSource, **keywords)
     elif isinstance(value, pathlib.Path):
         raise FileNotFoundError(f'Cannot find file in {str(value)}')
@@ -1325,7 +1310,7 @@ def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
         raise FileNotFoundError(f'Cannot find file in {str(value)}')
     else:
         # all else, including MidiBytes
-        return parseData(value, number=number, format=m21Format, **keywords)
+        return parseData(value, number=number, format=format, **keywords)
 
 
 def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') -> pathlib.Path:
