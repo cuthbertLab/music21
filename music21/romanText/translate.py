@@ -1625,19 +1625,12 @@ m1 C: I'''
             self.assertTrue(e.repeatBarsAreCoherent())
             p2 = e.process()
             self.assertEqual(p2.quarterLength, quarterLength)
-        
+
         def _test_ending_contents(
             rb: spanner.RepeatBracket, expectedMeasures: t.List[str]
         ) -> None:
-            try:
-                measure_nos = [m.measureNumberWithSuffix() for m in rb[stream.Measure]]
-                self.assertEqual(measure_nos, expectedMeasures)
-            except:
-                import traceback, sys
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                traceback.print_exception(
-                    exc_type, exc_value, exc_traceback, file=sys.stdout)
-                breakpoint()
+            measure_nos = [m.measureNumberWithSuffix() for m in rb[stream.Measure]]
+            self.assertEqual(measure_nos, expectedMeasures)
 
         # Test simple repeats
         simple_repeats = textwrap.dedent('''
