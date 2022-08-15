@@ -130,7 +130,6 @@ import unittest
 from music21 import bar
 from music21 import base
 from music21 import common
-from music21 import converter
 from music21 import exceptions21
 from music21 import harmony
 from music21 import key
@@ -1608,6 +1607,8 @@ m1 C: I'''
         self.assertEqual(n2.duration.quarterLength, common.opFrac(13 / 6))
 
     def testRepeats(self) -> None:
+        from music21 import converter
+
         def _repeat_tester(
             repeat_bar: bar.Repeat, direction: str, offset: float, mNumber: int
         ) -> None:
