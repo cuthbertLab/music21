@@ -28,7 +28,9 @@ environLocal = environment.Environment('romanText.rtObjects')
 
 # alternate endings might end with a, b, c for
 # nonzero or more for everything after the first number
-reMeasureTag = re.compile(r'm[0-9]+[a-b]*-*[0-9]*[a-b]*')
+# letterToNumDict in romanText/translate.py implies that reMeasureTag should
+#   match a-h (at least), not a-b
+reMeasureTag = re.compile(r'm[0-9]+[a-h]*-*[0-9]*[a-h]*')
 reVariant = re.compile(r'var[0-9]+')
 reVariantLetter = re.compile(r'var([A-Z]+)')
 
