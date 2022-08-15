@@ -115,6 +115,9 @@ Conventions:
   - dependencies:
     - Music21 supports all core python modules ... but nothing more, 
       so avoid external dependencies such as numpy.
+  - assignments:
+    - use 2+ lines instead of multiple assignments like `(a, b = c, d)`.
+    - use explicit parentheses when left and right side are not balanced in number of assignments.
   - methods:
     - no more than three positional arguments (in addition to `self`)
     - keyword arguments should be keyword-only by using `*`
