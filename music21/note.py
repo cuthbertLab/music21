@@ -597,7 +597,7 @@ class GeneralNote(base.Music21Object):
             self.addLyric(lyric)
 
         # note: Chords handle ties differently
-        self.tie = None  # store a Tie object
+        self.tie: t.Optional[tie.Tie] = None  # store a Tie object
 
     def __eq__(self, other):
         '''

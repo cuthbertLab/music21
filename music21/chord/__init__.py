@@ -388,7 +388,7 @@ class ChordBase(note.NotRest):
         return ()
 
     @property
-    def tie(self):
+    def tie(self) -> t.Optional[tie.Tie]:
         '''
         Get or set a single tie based on all the ties in this Chord.
 
@@ -412,7 +412,7 @@ class ChordBase(note.NotRest):
         return None
 
     @tie.setter
-    def tie(self, value):
+    def tie(self, value: t.Optional[tie.Tie]):
         for d in self._notes:
             d.tie = value
             # set the same instance for each pitch
