@@ -852,9 +852,9 @@ class Verticality(prebase.ProtoM21Object):
             if oldNoteTie is None:
                 notesToAdd[pitchKey] = possibleNewNote  # a better note to add
             elif {oldNoteTie.type, possibleNewNote.tie.type} == startStopSet:
-                t = notesToAdd[pitchKey].tie
-                if t is not None:  # this test is not needed, except for mypy.
-                    t.type = 'continue'
+                other_t = notesToAdd[pitchKey].tie
+                if other_t is not None:  # this test is not needed, except for mypy.
+                    other_t.type = 'continue'
             elif possibleNewNote.tie.type == 'continue':
                 notesToAdd[pitchKey] = possibleNewNote  # a better note to add
             elif possibleNewNote.tie.type == oldNoteTie.type:

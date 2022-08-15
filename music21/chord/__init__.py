@@ -102,14 +102,12 @@ class ChordBase(note.NotRest):
 
         self._notes: t.List[note.NotRest] = []
         # here, pitch and duration data is extracted from notes
-        # if provided
+        # if provided.
 
         super().__init__(**keywords)
 
         # inherit Duration object from GeneralNote
         # keep it here in case we have no notes
-        # self.duration = None  # inefficient, since note.Note.__init__ set it
-        # del self.pitch
         durationKeyword = None
         if 'duration' in keywords:
             durationKeyword = keywords['duration']
@@ -121,17 +119,6 @@ class ChordBase(note.NotRest):
         elif 'type' in keywords or 'quarterLength' in keywords:  # dots dont cut it
             self.duration = Duration(**keywords)
 
-        # elif len(notes) > 0:
-        #     for thisNote in notes:
-        #         # get duration from first note
-        #         # but should other notes have the same duration?
-        #         self.duration = notes[0].duration
-        #         break
-
-        if 'beams' in keywords:
-            self.beams = keywords['beams']
-        else:
-            self.beams = beam.Beams()
 
     def __eq__(self, other):
         '''
@@ -199,7 +186,10 @@ class ChordBase(note.NotRest):
         '''
         return len(self._notes)
 
-    def _add_core_or_init(self, notes, *, useDuration=None):
+    def _add_core_or_init(self,
+                          notes,
+                          *,
+                          useDuration: t.Union[None, t.Literal[False], duration.Duration] = None):
         '''
         This is the private append method called by .add and called by __init__.
 
