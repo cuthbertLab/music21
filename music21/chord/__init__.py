@@ -189,7 +189,7 @@ class ChordBase(note.NotRest):
     def _add_core_or_init(self,
                           notes,
                           *,
-                          useDuration: t.Union[None, t.Literal[False], duration.Duration] = None):
+                          useDuration: t.Union[None, t.Literal[False], Duration] = None):
         '''
         This is the private append method called by .add and called by __init__.
 
@@ -209,6 +209,7 @@ class ChordBase(note.NotRest):
             useDuration = self.duration
             quickDuration = True
 
+        newNote: note.NotRest
         for n in notes:
             if isinstance(n, pitch.Pitch):
                 # assign pitch to a new Note
@@ -1445,6 +1446,7 @@ class Chord(ChordBase):
         inPlace: t.Literal[True],
         leaveRedundantPitches=False
     ) -> None:
+        # astroid 1003
         return None
 
     @overload
@@ -1455,6 +1457,7 @@ class Chord(ChordBase):
         inPlace: t.Literal[False] = False,
         leaveRedundantPitches: bool = False
     ) -> _ChordType:
+        # astroid 1003
         return self
 
     def closedPosition(

@@ -987,6 +987,7 @@ class NotRest(GeneralNote):
         else:
             self.beams = beam.Beams()
         self._storedInstrument: t.Optional['music21.instrument.Instrument'] = None
+        self._chordAttached: t.Optional['music21.chord.ChordBase'] = None
 
     # ==============================================================================================
     # Special functions
@@ -1464,7 +1465,7 @@ class Note(NotRest):
                  nameWithOctave: t.Optional[str] = None,
                  **keywords):
         super().__init__(**keywords)
-        self._chordAttached: t.Optional['music21.chord.Chord'] = None
+        self._chordAttached: t.Optional['music21.chord.Chord']
 
         if pitch is not None:
             if isinstance(pitch, Pitch):
