@@ -112,6 +112,9 @@ Conventions:
       For example, when calling `getElementsByClass()`, 
       although passing the string name of the class is supported, 
       use the class object as argument where possible.
+  - dependencies:
+    - Music21 supports all core python modules ... but nothing more, 
+      so avoid external dependencies such as numpy.
   - methods:
     - no more than three positional arguments (in addition to `self`)
     - keyword arguments should be keyword-only by using `*`
