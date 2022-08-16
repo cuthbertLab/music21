@@ -269,10 +269,10 @@ class SubConverter:
         Calls .writeDataStream on the repr of obj, and returns the fp returned by it.
         '''
         dataStr = repr(obj)
-        fp = self.writeDataStream(fp, dataStr)
+        fp = self.writeDataStream(fp, dataStr, **keywords)
         return fp
 
-    def writeDataStream(self, fp, dataStr):  # pragma: no cover
+    def writeDataStream(self, fp, dataStr, **keywords):  # pragma: no cover
         '''
         Writes the data stream to `fp` or to a temporary file and returns the
         filename written.
@@ -1023,7 +1023,10 @@ class ConverterMusicXML(SubConverter):
             return pathlib.Path(fpOut)
         # common.cropImageFromPath(fp)
 
-    def writeDataStream(self, fp, dataBytes: bytes) -> pathlib.Path:  # pragma: no cover
+    def writeDataStream(self,
+                        fp,
+                        dataBytes: bytes,
+                        **keywords) -> pathlib.Path:  # pragma: no cover
         # noinspection PyShadowingNames
         '''
         Writes `dataBytes` to `fp`.
@@ -1068,6 +1071,7 @@ class ConverterMusicXML(SubConverter):
               fmt,
               fp=None,
               subformats=None,
+              *,
               makeNotation=True,
               compress: t.Optional[bool] = None,
               **keywords):

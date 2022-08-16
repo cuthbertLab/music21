@@ -85,6 +85,7 @@ unadjusted measure width and not their actual measure width in the MusicXML.
 
 SmartScore Pro tends to produce very good MusicXML layout data.
 '''
+from __future__ import annotations
 
 # may need to have an object to convert between size units
 import copy
@@ -330,7 +331,8 @@ class StaffLayout(LayoutBase):
     5
 
     staffSize is a percentage of the base staff size, so
-    this defines a staff 13% larger than normal.
+    this defines a staff 13% larger than normal.  Note that it is always converted to
+    a floating point number.
 
     >>> sl.staffSize
     113.0
@@ -376,7 +378,7 @@ class StaffLayout(LayoutBase):
         # this is the distance between adjacent staves
         self.distance = distance
         self.staffNumber = staffNumber
-        self.staffSize = staffSize
+        self.staffSize: t.Optional[float] = None if staffSize is None else float(staffSize)
         self.staffLines = staffLines
         self.hidden = hidden  # True = hidden; False = shown; None = inherit
         self.staffType: StaffType = staffType
