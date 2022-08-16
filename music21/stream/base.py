@@ -9025,11 +9025,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def quantize(
         self,
-        quarterLengthDivisors=None,
-        processOffsets=True,
-        processDurations=True,
-        inPlace=False,
-        recurse=False,
+        quarterLengthDivisors: t.Iterable[int] = (),
+        processOffsets: bool = True,
+        processDurations: bool = True,
+        inPlace: bool = False,
+        recurse: bool = False,
     ):
         # noinspection PyShadowingNames
         '''
@@ -9069,7 +9069,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> nShort.quarterLength = 0.26
         >>> s.repeatInsert(nShort, [1.49, 1.76])
 
-        >>> s.quantize([4], processOffsets=True, processDurations=True, inPlace=True)
+        >>> s.quantize((4,), processOffsets=True, processDurations=True, inPlace=True)
         >>> [e.offset for e in s]
         [0.0, 0.5, 1.0, 1.5, 1.75]
         >>> [e.duration.quarterLength for e in s]
@@ -9155,7 +9155,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> [e.duration.quarterLength for e in v]
         [0.5, 0.5, 0.5, 0.25, 0.25]
         '''
-        if quarterLengthDivisors is None:
+        if not quarterLengthDivisors:
             quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
 
         # this presently is not trying to avoid overlaps that

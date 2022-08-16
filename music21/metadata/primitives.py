@@ -440,7 +440,7 @@ class DateSingle(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, data: t.Any = '', relevance='certain'):
+    def __init__(self, data: str = '', relevance='certain'):
         self._data: t.List[Date] = []
         self._relevance = None  # managed by property
         # not yet implemented
@@ -478,7 +478,7 @@ class DateSingle(prebase.ProtoM21Object):
 
     # PRIVATE METHODS #
 
-    def _prepareData(self, data):
+    def _prepareData(self, data: str):
         r'''
         Assume a string is supplied as argument
         '''
@@ -998,37 +998,46 @@ class Contributor(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, *args, **keywords):
+    def __init__(self,
+                 *args,
+                 name: t.Optional[str] = None,
+                 names: t.Iterable[str] = (),
+                 role: t.Optional[str] = None,
+                 birth: t.Union[None, DateSingle, str] = None,
+                 death: t.Union[None, DateSingle, str] = None,
+                 **keywords):
         self._role = None
-        if 'role' in keywords:
+        if role:
             # stored in self._role
-            self.role = keywords['role']  # validated with property
+            self.role = role  # validated with property
         else:
             self.role = None
         # a list of Text objects to support various spellings or
         # language translations
         self._names: t.List[Text] = []
-        if 'name' in keywords:  # a single
-            self._names.append(Text(keywords['name']))
-        if 'names' in keywords:  # many
-            for n in keywords['names']:
+        if name:  # a single
+            self._names.append(Text(name))
+        if names:  # many
+            for n in names:
                 self._names.append(Text(n))
         # store the nationality, if known
         self._nationality = []
 
-        self.birth = None
-        self.death = None
+        self.birth: t.Optional[DateSingle] = None
+        self.death: t.Optional[DateSingle] = None
 
-        if 'birth' in keywords:
-            birth = keywords['birth']
+        if birth is not None:
             if not isinstance(birth, DateSingle):
-                birth = DateSingle(birth)
-            self.birth = birth
-        if 'death' in keywords:
-            death = keywords['death']
+                birthDS = DateSingle(birth)
+            else:
+                birthDS = birth
+            self.birth = birthDS
+        if death is not None:
             if not isinstance(death, DateSingle):
-                death = DateSingle(death)
-            self.death = death
+                deathDS = DateSingle(death)
+            else:
+                deathDS = death
+            self.death = deathDS
 
     def _reprInternal(self):
         return f'{self.role}:{self.name}'

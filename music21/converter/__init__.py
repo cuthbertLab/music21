@@ -263,6 +263,8 @@ class PickleFilter:
                  fp: t.Union[str, pathlib.Path],
                  forceSource: bool = False,
                  number: t.Optional[int] = None,
+                 # quantizePost: bool = False,
+                 # quarterLengthDivisors: t.Optional[t.Iterable[int]] = None,
                  **keywords):
         self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
         self.forceSource: bool = forceSource
@@ -295,7 +297,7 @@ class PickleFilter:
 
         pathNameToParse = str(self.fp)
 
-        quantization = []
+        quantization: t.List[str] = []
         if 'quantizePost' in self.keywords and self.keywords['quantizePost'] is False:
             quantization.append('noQtz')
         elif 'quarterLengthDivisors' in self.keywords:
@@ -2016,7 +2018,7 @@ class Test(unittest.TestCase):
         from music21 import omr
 
         midiFp = omr.correctors.pathName + os.sep + 'k525short.mid'
-        midiStream = parse(midiFp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
+        midiStream = parse(midiFp, forceSource=True, storePickle=False, quarterLengthDivisors=(2,))
         # midiStream.show()
         for n in midiStream[note.Note]:
             self.assertTrue(isclose(n.quarterLength % 0.5, 0.0, abs_tol=1e-7))
@@ -2035,7 +2037,7 @@ class Test(unittest.TestCase):
         streamFpNotQuantized = parse(fp, quantizePost=False)
         self.assertIn(0.875, streamFpNotQuantized.flatten()._uniqueOffsetsAndEndTimes())
 
-        streamFpCustomQuantized = parse(fp, quarterLengthDivisors=[2])
+        streamFpCustomQuantized = parse(fp, quarterLengthDivisors=(2,))
         self.assertNotIn(0.75, streamFpCustomQuantized.flatten()._uniqueOffsetsAndEndTimes())
 
         # Also check raw data: https://github.com/cuthbertLab/music21/issues/546
@@ -2050,7 +2052,7 @@ class Test(unittest.TestCase):
         pf1.removePickle()
         pf2 = PickleFilter(fp, quantizePost=False)
         pf2.removePickle()
-        pf3 = PickleFilter(fp, quarterLengthDivisors=[2])
+        pf3 = PickleFilter(fp, quarterLengthDivisors=(2,))
         pf3.removePickle()
 
     def testIncorrectNotCached(self):

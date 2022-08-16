@@ -1266,7 +1266,7 @@ class RepeatBracket(Spanner):
 
     '''
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self, *arguments, number: t.Optional[int] = None, **keywords):
         super().__init__(*arguments, **keywords)
 
         self._number = None
@@ -1275,8 +1275,8 @@ class RepeatBracket(Spanner):
         self._numberSpanIsContiguous = None
         self.overrideDisplay = None
 
-        if 'number' in keywords:
-            self.number = keywords['number']
+        if number is not None:
+            self.number = number
 
     # property to enforce numerical numbers
     def _getNumber(self):
@@ -1456,13 +1456,14 @@ class Ottava(Spanner):
     '''
     validOttavaTypes = ('8va', '8vb', '15ma', '15mb', '22da', '22db')
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 *arguments,
+                 type: str = '8va',
+                 # transposing: bool =
+                 **keywords):
         super().__init__(*arguments, **keywords)
         self._type = None  # can be 8va, 8vb, 15ma, 15mb
-        if 'type' in keywords:
-            self.type = keywords['type']  # use property
-        else:  # use 8 as a default
-            self.type = '8va'
+        self.type = type
 
         self.placement = 'above'  # can above or below, after musicxml
         if 'transposing' in keywords and keywords['transposing'] in (True, False):
@@ -1636,11 +1637,12 @@ class Ottava(Spanner):
                 p.transpose(myInterval, inPlace=True)
 
 
+
 class Line(Spanner):
-    '''A line or bracket represented as a spanner above two Notes.
+    '''
+    A line or bracket represented as a spanner above two Notes.
 
     Brackets can take many line types.
-
 
     >>> b = spanner.Line()
     >>> b.lineType = 'dotted'
@@ -1649,37 +1651,50 @@ class Line(Spanner):
     >>> b = spanner.Line(endHeight=20)
     >>> b.endHeight
     20
-
     '''
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
     validTickTypes = ('up', 'down', 'arrow', 'both', 'none')
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(
+        self,
+        *arguments,
+        lineType: str = 'solid',
+        tick: str = 'down',
+        startTick: str = 'down',
+        endTick: str = 'down',
+        startHeight: t.Optional[t.Union[int, float]] = None,
+        endHeight: t.Optional[t.Union[int, float]] = None,
+        **keywords
+    ):
         super().__init__(*arguments, **keywords)
 
-        self._endTick = 'down'  # can ne up/down/arrow/both/None
-        self._startTick = 'down'  # can ne up/down/arrow/both/None
+        DEFAULT_TICK = 'down'
+        self._endTick = DEFAULT_TICK  # can ne up/down/arrow/both/None
+        self._startTick = DEFAULT_TICK  # can ne up/down/arrow/both/None
 
         self._endHeight = None  # for up/down, specified in tenths
         self._startHeight = None  # for up/down, specified in tenths
 
-        self._lineType = 'solid'  # can be solid, dashed, dotted, wavy
-        self.placement = 'above'  # can above or below, after musicxml
+        DEFAULT_LINE_TYPE = 'solid'
+        self._lineType = DEFAULT_LINE_TYPE  # can be solid, dashed, dotted, wavy
 
-        if 'lineType' in keywords:
-            self.lineType = keywords['lineType']  # use property
+        DEFAULT_PLACEMENT = 'above'
+        self.placement = DEFAULT_PLACEMENT  # can above or below, after musicxml
 
-        if 'startTick' in keywords:
-            self.startTick = keywords['startTick']  # use property
-        if 'endTick' in keywords:
-            self.endTick = keywords['endTick']  # use property
-        if 'tick' in keywords:
-            self.tick = keywords['tick']  # use property
+        if lineType != DEFAULT_LINE_TYPE:
+            self.lineType = lineType  # use property
 
-        if 'endHeight' in keywords:
-            self.endHeight = keywords['endHeight']  # use property
-        if 'startHeight' in keywords:
-            self.startHeight = keywords['startHeight']  # use property
+        if startTick != DEFAULT_TICK:
+            self.startTick = startTick  # use property
+        if endTick != DEFAULT_TICK:
+            self.endTick = endTick  # use property
+        if tick != DEFAULT_TICK:
+            self.tick = tick  # use property
+
+        if endHeight is not None:
+            self.endHeight = endHeight  # use property
+        if startHeight is not None:
+            self.startHeight = startHeight  # use property
 
     def _getEndTick(self):
         return self._endTick
@@ -1805,7 +1820,11 @@ class Glissando(Spanner):
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
     validSlideTypes = ('chromatic', 'continuous', 'diatonic', 'white', 'black')
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 *arguments,
+                 lineType: str = 'wavy',
+                 label: t.Optional[str],
+                 **keywords):
         super().__init__(*arguments, **keywords)
 
         self._lineType = 'wavy'
@@ -1813,10 +1832,10 @@ class Glissando(Spanner):
 
         self.label = None
 
-        if 'lineType' in keywords:
-            self.lineType = keywords['lineType']  # use property
-        if 'label' in keywords:
-            self.label = keywords['label']  # use property
+        if lineType != GLISSANDO_DEFAULT_LINETYPE:
+            self.lineType = lineType  # use property
+        if label is not None:
+            self.label = label  # use property
 
     def _getLineType(self):
         return self._lineType
