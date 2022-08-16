@@ -441,7 +441,9 @@ class Test(unittest.TestCase):
         )
         self.checkUniqueNamedItem('bibliographicCitation', 'dcterms')
         self.checkUniqueNamedItem('conformsTo', 'dcterms')
-        self.checkUniqueNamedItem('dateCreated', 'dcterms:created', valueType=metadata.DatePrimitive)
+        self.checkUniqueNamedItem('dateCreated',
+                                  'dcterms:created',
+                                  valueType=metadata.DatePrimitive)
         self.checkUniqueNamedItem('otherDate', 'dcterms:date', valueType=metadata.DatePrimitive)
         self.checkUniqueNamedItem('dateAccepted', 'dcterms', valueType=metadata.DatePrimitive)
         self.checkUniqueNamedItem('dateCopyrighted', 'dcterms', valueType=metadata.DatePrimitive)
@@ -460,7 +462,9 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem('isReferencedBy', 'dcterms')
         self.checkUniqueNamedItem('isReplacedBy', 'dcterms')
         self.checkUniqueNamedItem('isRequiredBy', 'dcterms')
-        self.checkUniqueNamedItem('dateIssued', 'dcterms:issued', valueType=metadata.DatePrimitive)
+        self.checkUniqueNamedItem('dateIssued',
+                                  'dcterms:issued',
+                                  valueType=metadata.DatePrimitive)
         self.checkUniqueNamedItem('isVersionOf', 'dcterms')
         self.checkUniqueNamedItem('language', 'dcterms')
         self.checkUniqueNamedItem('license', 'dcterms')
@@ -483,7 +487,9 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem('tableOfContents', 'dcterms')
         self.checkUniqueNamedItem('title', 'dcterms')
         self.checkUniqueNamedItem('type', 'dcterms')
-        self.checkUniqueNamedItem('dateValid', 'dcterms:valid', valueType=metadata.DatePrimitive)
+        self.checkUniqueNamedItem('dateValid',
+                                  'dcterms:valid',
+                                  valueType=metadata.DatePrimitive)
         self.checkUniqueNamedItem('adapter', 'marcrel:ADP')
         self.checkUniqueNamedItem('analyst', 'marcrel:ANL')
         self.checkUniqueNamedItem('annotator', 'marcrel:ANN')
@@ -633,9 +639,8 @@ class Test(unittest.TestCase):
             valueType=int
         )
 
+
 # -----------------------------------------------------------------------------
-
-
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test, 'noDocTest')

@@ -2710,9 +2710,9 @@ class RichMetadata(Metadata):
             return True
         return False
 
+
 # -----------------------------------------------------------------------------
 # tests are in test/test_metadata
-
 _DOC_ORDER: t.List[type] = []
 
 
