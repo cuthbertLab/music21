@@ -1012,7 +1012,7 @@ class Metadata(base.Music21Object):
                 result.append(contrib)
         return tuple(result)
 
-    def search(self, query=None, field=None, **kwargs):
+    def search(self, query=None, field=None, **keywords):
         r'''
         Search one or all fields with a query, given either as a string or a
         regular expression match.
@@ -1080,10 +1080,10 @@ class Metadata(base.Music21Object):
         #    field (so that 'Joplin' would return 'Joplin, Scott')
         reQuery = None
         valueFieldPairs = []
-        if query is None and field is None and not kwargs:
+        if query is None and field is None and not keywords:
             return (False, None)
-        elif query is None and field is None and kwargs:
-            field, query = kwargs.popitem()
+        elif query is None and field is None and keywords:
+            field, query = keywords.popitem()
 
         if field is not None:
             field = field.lower()

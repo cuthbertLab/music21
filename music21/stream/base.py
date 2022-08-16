@@ -245,7 +245,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     be allowed, because craziness and givenElements are required::
 
         class CrazyStream(Stream):
-            def __init__(self, givenElements, craziness, *args, **kwargs):
+            def __init__(self, givenElements, craziness, *args, **keywords):
                 ...
 
     New in v.7 -- smart appending
@@ -9985,7 +9985,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         N.B. for chords, currently, only the first pitch is tested for unison.
         this is a bug TODO: FIX
 
-        (\*\*kwargs is there so that other methods that pass along dicts to
+        (\*\*keywords is there so that other methods that pass along dicts to
         findConsecutiveNotes don't have to remove
         their own args; this method is used in melodicIntervals.)
 

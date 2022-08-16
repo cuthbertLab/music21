@@ -956,15 +956,12 @@ class Iterator:
     (currentNumber, highestNumber, numberingSystem). For example
     corpus.chorales.Iterator(1, 26,'riemenschneider') iterates
     through the riemenschneider numbered chorales from 1 to 26.
-    Additionally, the following kwargs can be set:
+    Additionally, the following keywords can be set:
 
-    returnType = either 'stream' (default) or 'filename'
-
-    iterationType = either 'number' or 'index'
-
-    titleList = [list, of, titles]
-
-    numberList = [list, of, numbers]
+    * `returnType` = either 'stream' (default) or 'filename'
+    * `iterationType` = either 'number' or 'index'
+    * `titleList` = [list, of, titles]
+    * `numberList` = [list, of, numbers]
 
     >>> from music21 import corpus
     >>> for chorale in corpus.chorales.Iterator(1, 4, returnType='filename'):
@@ -973,7 +970,6 @@ class Iterator:
     bach/bwv347
     bach/bwv153.1
     bach/bwv86.6
-
 
     >>> BCI = corpus.chorales.Iterator()
     >>> BCI.numberingSystem
@@ -985,9 +981,8 @@ class Iterator:
     >>> BCI.highestNumber
     371
 
-    An exception will be raised if the number set is not in the
-    numbering system selected, or if the
-    numbering system selected is not valid.
+    An Exception will be raised if the number set is not in the
+    numbering system selected, or if the numbering system selected is not valid.
 
     >>> BCI.currentNumber = 377
     Traceback (most recent call last):
@@ -1022,8 +1017,9 @@ class Iterator:
     note that the first chorale in the given
     numberList will not be part of the iteration because the
     first currentNumber is set to 2 at the
-    start by the first argument. (If iterationType = 'index' setting the currentNumber to 1 and the
-    highestNumber to 7 would have the same effect as the given example.
+    start by the first argument. (If `iterationType=='index'`,
+    setting the currentNumber to 1 and the highestNumber to 7
+    would have the same effect as the given example.
 
     >>> BCI = corpus.chorales.Iterator(2, 371, numberingSystem='riemenschneider',
     ...                                numberList=[1, 2, 3, 4, 6, 190, 371, 500],
@@ -1054,7 +1050,6 @@ class Iterator:
     >>> print(corpus.chorales.Iterator(returnType='filename')[55])
     bach/bwv121.6
 
-
     For the first 20 chorales in the Riemenschneider numbering system, there are professionally
     annotated roman numeral analyses in romanText format, courtesy of Dmitri Tymoczko of Princeton
     University.  To get them as an additional part to the score set returnType to "stream", and
@@ -1074,7 +1069,7 @@ class Iterator:
                  currentNumber=None,
                  highestNumber=None,
                  numberingSystem='riemenschneider',
-                 **kwargs):
+                 **keywords):
         '''
         By default: numberingSystem = 'riemenschneider', currentNumber = 1,
         highestNumber = 371, iterationType = 'number',
@@ -1102,19 +1097,19 @@ class Iterator:
         self._choraleList1 = ChoraleList()  # For budapest, baerenreiter
         self._choraleList2 = ChoraleListRKBWV()  # for kalmus, riemenschneider, title, and bwv
 
-        self.numberingSystem = numberingSystem  # This assignment must come before the kwargs
+        self.numberingSystem = numberingSystem  # This assignment must come before the keywords
 
-        for key in kwargs:
+        for key in keywords:
             if key == 'returnType':
-                self.returnType = kwargs[key]
+                self.returnType = keywords[key]
             elif key == 'numberList':
-                self.numberList = kwargs[key]
+                self.numberList = keywords[key]
             elif key == 'titleList':
-                self.titleList = kwargs[key]
+                self.titleList = keywords[key]
             elif key == 'iterationType':
-                self.iterationType = kwargs[key]
+                self.iterationType = keywords[key]
             elif key == 'analysis':
-                self.analysis = kwargs[key]
+                self.analysis = keywords[key]
 
         # These assignments must come after .iterationType
 
