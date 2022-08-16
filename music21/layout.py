@@ -120,7 +120,7 @@ class LayoutBase(base.Music21Object):
     classSortOrder = -10
 
     def __init__(self, *args, **keywords):
-        super().__init__()
+        super().__init__(**keywords)
 
     def _reprInternal(self):
         return ''
@@ -146,41 +146,37 @@ class ScoreLayout(LayoutBase):
     True
 
     This object represents both <print new-page> and <page-layout>
-    elements in musicxml
+    elements in musicxml.  The appearance tag is handled in the `.style`
+    for the stream (it was here in v7 and before, but did nothing).
 
-    TODO -- make sure that the first pageLayout and systemLayout
-    for each page are working together.
+    Note that the appearance and style elements are subject to change during
+    and after the v8 releases.
     '''
+    # TODO -- make sure that the first pageLayout and systemLayout
+    #     for each page are working together.
 
-    def __init__(self, *args, **keywords):
-        super().__init__()
+    def __init__(self,
+                 *args,
+                 scalingMillimeters: t.Union[int, float, None] = None,
+                 scalingTenths: t.Union[int, float, None] = None,
+                 musicFont: t.Optional[str] = None,
+                 wordFont: t.Optional[str] = None,
+                 pageLayout: t.Optional[PageLayout] = None,
+                 systemLayout: t.Optional[SystemLayout] = None,
+                 staffLayoutList: t.Optional[t.List[StaffLayout]] = None,
+                 **keywords):
+        super().__init__(**keywords)
 
-        self.scalingMillimeters = None
-        self.scalingTenths = None
-        self.pageLayout = None
-        self.systemLayout = None
-        self.staffLayoutList = []
-        self.appearance = None
-        self.musicFont = None
-        self.wordFont = None
+        self.scalingMillimeters = scalingMillimeters
+        self.scalingTenths = scalingTenths
+        self.pageLayout: t.Optional[PageLayout] = pageLayout
+        self.systemLayout: t.Optional[SystemLayout] = systemLayout
+        self.staffLayoutList: t.List[StaffLayout] = []
+        self.musicFont = musicFont
+        self.wordFont = wordFont
 
-        for key in keywords:
-            if key.lower() == 'scalingmillimeters':
-                self.scalingMillimeters = keywords[key]
-            elif key.lower() == 'scalingtenths':
-                self.scalingTenths = keywords[key]
-            elif key.lower() == 'pagelayout':
-                self.rightMargin = keywords[key]
-            elif key.lower() == 'systemlayout':
-                self.systemLayout = keywords[key]
-            elif key.lower() == 'stafflayout':
-                self.staffLayoutList = keywords[key]
-            elif key.lower() == 'appearance':
-                self.appearance = keywords[key]
-            elif key.lower() == 'musicfont':
-                self.musicFont = keywords[key]
-            elif key.lower() == 'wordfont':
-                self.wordFont = keywords[key]
+        if staffLayoutList is not None:
+            self.staffLayoutList = staffLayoutList
 
     def tenthsToMillimeters(self, tenths):
         '''
@@ -232,37 +228,30 @@ class PageLayout(LayoutBase):
 
     '''
 
-    def __init__(self, *args, **keywords):
-        super().__init__()
+    def __init__(self,
+                 *args,
+                 pageNumber: t.Optional[int] = None,
+                 leftMargin: t.Union[int, float, None] = None,
+                 rightMargin: t.Union[int, float, None] = None,
+                 topMargin: t.Union[int, float, None] = None,
+                 bottomMargin: t.Union[int, float, None] = None,
+                 pageHeight: t.Union[int, float, None] = None,
+                 pageWidth: t.Union[int, float, None] = None,
+                 isNew: t.Union[bool, None] = None,
+                 **keywords):
+        super().__init__(**keywords)
 
-        self.pageNumber = None
-        self.leftMargin = None
-        self.rightMargin = None
-        self.topMargin = None
-        self.bottomMargin = None
-        self.pageHeight = None
-        self.pageWidth = None
+        self.pageNumber = pageNumber
+        self.leftMargin = leftMargin
+        self.rightMargin = rightMargin
+        self.topMargin = topMargin
+        self.bottomMargin = bottomMargin
+        self.pageHeight = pageHeight
+        self.pageWidth = pageWidth
 
         # store if this is the start of a new page
-        self.isNew = None
+        self.isNew = isNew
 
-        for key in keywords:
-            if key.lower() == 'pagenumber':
-                self.pageNumber = keywords[key]
-            elif key.lower() == 'leftmargin':
-                self.leftMargin = keywords[key]
-            elif key.lower() == 'rightmargin':
-                self.rightMargin = keywords[key]
-            elif key.lower() == 'topmargin':
-                self.topMargin = keywords[key]
-            elif key.lower() == 'bottommargin':
-                self.bottomMargin = keywords[key]
-            elif key.lower() == 'pageheight':
-                self.pageHeight = keywords[key]
-            elif key.lower() == 'pagewidth':
-                self.pageWidth = keywords[key]
-            elif key.lower() == 'isnew':
-                self.isNew = keywords[key]
 
 # ------------------------------------------------------------------------------
 
@@ -289,32 +278,26 @@ class SystemLayout(LayoutBase):
     True
     '''
 
-    def __init__(self, *args, **keywords):
-        super().__init__()
+    def __init__(self,
+                 *args,
+                 leftMargin: t.Union[int, float, None] = None,
+                 rightMargin: t.Union[int, float, None] = None,
+                 distance: t.Union[int, float, None] = None,
+                 topDistance: t.Union[int, float, None] = None,
+                 isNew: t.Union[bool, None] = None,
+                 **keywords):
+        super().__init__(**keywords)
 
-        self.leftMargin = None
-        self.rightMargin = None
+        self.leftMargin = leftMargin
+        self.rightMargin = rightMargin
         # no top or bottom margins
 
         # this is probably the distance between adjacent systems
-        self.distance = None
-        self.topDistance = None
+        self.distance = distance
+        self.topDistance = topDistance
 
         # store if this is the start of a new system
-        self.isNew = None
-
-        for key in keywords:
-            if key.lower() == 'leftmargin':
-                self.leftMargin = keywords[key]
-            elif key.lower() == 'rightmargin':
-                self.rightMargin = keywords[key]
-
-            elif key.lower() == 'distance':
-                self.distance = keywords[key]
-            elif key.lower() == 'topdistance':
-                self.topDistance = keywords[key]
-            elif key.lower() == 'isnew':
-                self.isNew = keywords[key]
+        self.isNew = isNew
 
 
 class StaffLayout(LayoutBase):
@@ -379,33 +362,24 @@ class StaffLayout(LayoutBase):
             <StaffType.CUE: 'cue'>
             ''',
     }
-    def __init__(self, *args, **keywords):
-        super().__init__()
+    def __init__(self,
+                 *args,
+                 distance: t.Union[int, float, None] = None,
+                 staffNumber: t.Union[int, float, None] = None,
+                 staffSize: t.Union[int, float, None] = None,
+                 staffLines: t.Optional[int] = None,
+                 hidden: t.Union[bool, None] = None,
+                 staffType: StaffType = StaffType.REGULAR,
+                 **keywords):
+        super().__init__(**keywords)
 
         # this is the distance between adjacent staves
-        self.distance = None
-        self.staffNumber = None
-        self.staffSize = None
-        self.staffLines = None
-        self.hidden = None  # True = hidden; False = shown; None = inherit
-        self.staffType: StaffType = StaffType.REGULAR
-
-        for key in keywords:
-            keyLower = key.lower()
-            if keyLower == 'distance':
-                self.distance = keywords[key]
-            elif keyLower == 'staffnumber':
-                self.staffNumber = keywords[key]
-            elif keyLower == 'staffsize':
-                if keywords[key] is not None:
-                    self.staffSize = float(keywords[key])
-            elif keyLower == 'stafflines':
-                self.staffLines = keywords[key]
-            elif keyLower == 'hidden':
-                if keywords[key] is not False and keywords[key] is not None:
-                    self.hidden = True
-            elif keyLower == 'staffType':
-                self.staffType = keywords[key]
+        self.distance = distance
+        self.staffNumber = staffNumber
+        self.staffSize = staffSize
+        self.staffLines = staffLines
+        self.hidden = hidden  # True = hidden; False = shown; None = inherit
+        self.staffType: StaffType = staffType
 
     def _reprInternal(self):
         return (f'distance {self.distance!r}, staffNumber {self.staffNumber!r}, '

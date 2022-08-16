@@ -16,7 +16,6 @@ class for easily iterating through the chorale collection.
 '''
 import copy
 import typing as t
-import warnings
 import unittest
 
 from music21 import exceptions21
@@ -1447,7 +1446,7 @@ class Iterator:
                 if v in self._choraleList2.byTitle:
                     self._titleList.append(v)
                 else:
-                    warnings.warn(f'{v} will be skipped because it is not a recognized title')
+                    print(f'{v} will be skipped because it is not a recognized title')
         if not self._titleList:
             self._titleList = None
 
@@ -1478,7 +1477,7 @@ class Iterator:
                 if v in self._choraleList2.byRiemenschneider:
                     self._numberList.append(v)
                 else:
-                    warnings.warn(
+                    print(
                         f'{v} will be skipped because it is not in the numberingSystem '
                         + self.numberingSystem
                     )
@@ -1488,7 +1487,7 @@ class Iterator:
                 if v in self._choraleList2.byKalmus and v != 0:
                     self._numberList.append(v)
                 else:
-                    warnings.warn(
+                    print(
                         f'{v} will be skipped because it is not in the numberingSystem '
                         + self.numberingSystem
                     )
@@ -1498,7 +1497,7 @@ class Iterator:
                 if v in self._choraleList2.byBWV:
                     self._numberList.append(v)
                 else:
-                    warnings.warn(
+                    print(
                         f'{v} will be skipped because it is not in the numberingSystem '
                         + self.numberingSystem
                     )
@@ -1508,7 +1507,7 @@ class Iterator:
                 if v in self._choraleList1.byBudapest:
                     self._numberList.append(v)
                 else:
-                    warnings.warn(
+                    print(
                         f'{v} will be skipped because it is not in the numberingSystem '
                         + self.numberingSystem
                     )
@@ -1518,7 +1517,7 @@ class Iterator:
                 if v in self._choraleList1.byBaerenreiter:
                     self._numberList.append(v)
                 else:
-                    warnings.warn(
+                    print(
                         f'{v} will be skipped because it is not in the numberingSystem '
                         + self.numberingSystem
                     )
