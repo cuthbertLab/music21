@@ -77,7 +77,7 @@ class Date(prebase.ProtoM21Object):
     '''
 
     # CLASS VARIABLES #
-
+    # TODO: these are basically Humdrum specific and should be moved there.
     approximateSymbols = ('~', 'x')
     uncertainSymbols = ('?', 'z')
     priorTimeSymbols = ('<', '{', '>', '}')
@@ -213,7 +213,7 @@ class Date(prebase.ProtoM21Object):
         if value.lower() in Date.uncertainSymbols + ('uncertain',):
             return Date.uncertainSymbols[0]
 
-    def load(self, value):
+    def load(self, value: DateParseType):
         r'''
         Load values by string, datetime object, or Date object:
 
@@ -421,7 +421,7 @@ class DatePrimitive(prebase.ProtoM21Object):
         # store an array of values marking if date data itself
         # is certain, approximate, or uncertain
         # here, dataError is relevance
-        self._dataError: t.List[str] = []
+        self._dataUncertainty: t.List[t.Union[str, None]] = []
         self.relevance = relevance  # will use property
 
     # SPECIAL METHODS #
@@ -440,7 +440,7 @@ class DatePrimitive(prebase.ProtoM21Object):
         '''
         return (type(self) is type(other)
                     and self._data == other._data
-                    and self._dataError == other._dataError
+                    and self._dataUncertainty == other._dataUncertainty
                     and self.relevance == other.relevance)
 
     def _reprInternal(self) -> str:
@@ -483,9 +483,9 @@ class DatePrimitive(prebase.ProtoM21Object):
     def relevance(self, value):
         if value in ('certain', 'approximate', 'uncertain'):
             self._relevance = value
-            self._dataError = []
+            self._dataUncertainty = []
             # only here is dataError the same as relevance
-            self._dataError.append(value)
+            self._dataUncertainty.append(value)
         else:
             raise exceptions21.MetadataException(
                 f'Relevance value is not supported by this object: {value!r}')
@@ -513,20 +513,21 @@ class DateSingle(DatePrimitive):
     >>> str(dd)
     '1805/03/12'
     '''
-    def __init__(self, data: str = '', relevance='certain'):
+    def __init__(self, data: DateParseType = '', relevance='certain'):
         super().__init__(relevance)
         self._prepareData(data)
 
     def __str__(self):
         return str(self._data[0])
 
-    def _prepareData(self, data: str):
+    def _prepareData(self, data: DateParseType):
         r'''
         Assume a string is supplied as argument
         '''
         # here, using a list to store one object; this provides more
         # compatibility  w/ other formats
         self._data = []  # clear list
+        self._dataUncertainty = [self.relevance]
         self._data.append(Date())
         self._data[0].load(data)
 
@@ -535,7 +536,7 @@ class DateSingle(DatePrimitive):
 # -----------------------------------------------------------------------------
 
 
-class DateRelative(DateSingle):
+class DateRelative(DatePrimitive):
     r'''
     Store a relative date, sometime `prior` or sometime `after`, `onorbefore`, or onorafter`.
 
@@ -557,7 +558,8 @@ class DateRelative(DateSingle):
 
     def __init__(self, data='', relevance='after'):
         # not a useless constructor because default value for relevance changed
-        super().__init__(data, relevance)  # pylint: disable=useless-super-delegation
+        super().__init__(relevance)
+        self._prepareData(data)
 
     # PUBLIC PROPERTIES #
 
@@ -592,7 +594,16 @@ class DateRelative(DateSingle):
                 f'Relevance value is not supported by this object: {value!r}')
         self._relevance = value.lower()
 
-
+    def _prepareData(self, data: DateParseType):
+        r'''
+        Assume a string is supplied as argument
+        '''
+        # here, using a list to store one object; this provides more
+        # compatibility  w/ other formats
+        self._data = []  # clear list
+        self._dataUncertainty = [None]
+        self._data.append(Date())
+        self._data[0].load(data)
 # -----------------------------------------------------------------------------
 
 
@@ -611,9 +622,7 @@ class DateBetween(DatePrimitive):
     '''
     # INITIALIZER #
 
-    def __init__(self, data: t.Optional[t.Iterable[str]] = None, relevance='between'):
-        if data is None:
-            data = []
+    def __init__(self, data: t.Iterable[DateParseType] = (), relevance='between'):
         super().__init__(relevance)
         self._prepareData(data)
 
@@ -627,18 +636,18 @@ class DateBetween(DatePrimitive):
 
     # PRIVATE METHODS #
 
-    def _prepareData(self, data):
+    def _prepareData(self, data: t.Iterable[DateParseType]):
         r'''
         Assume a list of dates as strings is supplied as argument
         '''
         self._data = []
-        self._dataError = []
+        self._dataUncertainty = []
         for part in data:
             d = Date()
             d.load(part)
             self._data.append(d)  # a list of Date objects
             # can look at Date and determine overall error
-            self._dataError.append(None)
+            self._dataUncertainty.append(None)
 
     # PUBLIC PROPERTIES #
 
@@ -689,11 +698,9 @@ class DateSelection(DatePrimitive):
     # INITIALIZER #
 
     def __init__(self,
-                 data: t.Optional[t.Iterable[str]] = None,
+                 data: t.Iterable[DateParseType] = (),
                  relevance='or'):
         super().__init__(relevance)
-        if data is None:
-            data = []
         self._prepareData(data)
 
     # SPECIAL METHODS #
@@ -706,18 +713,18 @@ class DateSelection(DatePrimitive):
 
     # PRIVATE METHODS #
 
-    def _prepareData(self, data):
+    def _prepareData(self, data: t.Iterable[DateParseType]):
         r'''
         Assume a list of dates as strings is supplied as argument.
         '''
         self._data = []
-        self._dataError = []
+        self._dataUncertainty = []
         for part in data:
             d = Date()
             d.load(part)
             self._data.append(d)  # a list of Date objects
             # can look at Date and determine overall error
-            self._dataError.append(None)
+            self._dataUncertainty.append(None)
 
     # PUBLIC PROPERTIES #
 
@@ -998,9 +1005,9 @@ class Contributor(prebase.ProtoM21Object):
 
     def __init__(self,
                  *args,
-                 name: t.Optional[str] = None,
-                 names: t.Iterable[str] = (),
-                 role: t.Optional[str] = None,
+                 name: t.Union[str, Text, None] = None,
+                 names: t.Iterable[t.Union[str, Text]] = (),
+                 role: t.Union[str, Text, None] = None,
                  birth: t.Union[None, DateSingle, str] = None,
                  death: t.Union[None, DateSingle, str] = None,
                  **keywords):
@@ -1014,10 +1021,16 @@ class Contributor(prebase.ProtoM21Object):
         # language translations
         self._names: t.List[Text] = []
         if name:  # a single
-            self._names.append(Text(name))
+            if isinstance(name, Text):
+                self._names.append(name)
+            else:
+                self._names.append(Text(name))
         if names:  # many
             for n in names:
-                self._names.append(Text(n))
+                if isinstance(n, Text):
+                    self._names.append(n)
+                else:
+                    self._names.append(Text(n))
         # store the nationality, if known (not currently used)
         self._nationality: t.List[Text] = []
 
@@ -1444,7 +1457,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(dateSingle), '2009/12/31')
         self.assertEqual(len(dateSingle._data), 1)
         self.assertEqual(dateSingle._relevance, 'approximate')
-        self.assertEqual(dateSingle._dataError, ['approximate'])
+        self.assertEqual(dateSingle._dataUncertainty, ['approximate'])
 
     def testDateRelative(self):
         from music21 import metadata
@@ -1453,7 +1466,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(dateRelative), 'prior to 2001/12/31')
         self.assertEqual(dateRelative.relevance, 'prior')
         self.assertEqual(len(dateRelative._data), 1)
-        self.assertEqual(dateRelative._dataError, [])
+        self.assertEqual(dateRelative._dataUncertainty, [])
 
     def testDateBetween(self):
         from music21 import metadata
@@ -1462,7 +1475,7 @@ class Test(unittest.TestCase):
             ('2009/12/31', '2010/1/28'))
         self.assertEqual(str(dateBetween), '2009/12/31 to 2010/01/28')
         self.assertEqual(dateBetween.relevance, 'between')
-        self.assertEqual(dateBetween._dataError, [None, None])
+        self.assertEqual(dateBetween._dataUncertainty, [None, None])
         self.assertEqual(len(dateBetween._data), 2)
 
     def testDateSelection(self):
@@ -1475,7 +1488,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(dateSelection),
                          '2009/12/31 or 2010/01/28 or 1894/01/28')
         self.assertEqual(dateSelection.relevance, 'or')
-        self.assertEqual(dateSelection._dataError, [None, None, None])
+        self.assertEqual(dateSelection._dataUncertainty, [None, None, None])
         self.assertEqual(len(dateSelection._data), 3)
 
 
@@ -1493,7 +1506,7 @@ _DOC_ORDER = (
     Copyright,
 )
 
-
+DateParseType = t.Union[Date, datetime.datetime, str]
 ValueType = t.Union[DateSingle, DateRelative, DateBetween, DateSelection,
                     Text, Contributor, Copyright, int]
 

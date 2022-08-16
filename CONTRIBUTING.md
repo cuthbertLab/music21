@@ -40,7 +40,8 @@ or Stack Overflow.
 ## Submitting Pull Requests ##
 
 Open an issue to propose a feature or report a bug before raising a pull request.
-You can include a diff or link to your own repo if you've already started some of the work.
+You can include a diff or link to your own repo if you've 
+already started some of the work.
 (Changes where the motivation is self-evident, like handling exceptions or increasing
 test coverage, don't need issue tickets.)
 
@@ -75,12 +76,13 @@ be in camelCase.
 Conventions:
 
   - **strings MUST be 'single-quoted', but "double quotes" are allowed internally**
-    -  this rule applies to triple quotes and doc strings also, contrary to PEP 257.
-    -  when there is a hyphen or single quote in the string, double quotes should be used, not escaping/backslashing.
-    -  For long streams of TinyNotation or Lilypond code, which both use single quotes to indicate octave,
+    - this rule applies to triple quotes and doc strings also, contrary to PEP 257.
+    - when there is a hyphen or single quote in the string, double quotes should be used, 
+      not escaping/backslashing.
+    - For long streams of TinyNotation or Lilypond code, which both use single quotes to indicate octave,
        triple single quotes around the string are better than double quotes.  Internal whitespace
        rarely matters in those formats.
-    -  Documentation should follow quoting in American English grammar when not 
+    - Documentation should follow quoting in American English grammar when not 
        discussing code.  So for instance, a quotation in documentation is in double quotes.
   - variable names:
     - need to be unambiguous, even if rather long.
@@ -110,9 +112,10 @@ Conventions:
     - no more than three positional arguments (in addition to `self`)
     - keyword arguments should be keyword-only by using `*`
       to consume any other positional arguments: `def makeNoise(self, volume, *, color=noise.PINK):`
-    - avoid generic `**kwargs`; make keywords explicit. 
+    - avoid generic `**keywords`; make keywords explicit. 
       (This rule does not necessarily apply for subclass inheritance where you want to allow the superclass
       to add more features later.  But see the Liskov principle next.)
+      See also https://github.com/cuthbertLab/music21/issues/1389
     - prefer methods that by default do not alter the object passed in and instead return a new one.
       It is permitted and encouraged to have an `inPlace: bool = False` argument that allows for
       manipulation of the original object.  When `inPlace` is True, nothing should be returned
@@ -151,7 +154,7 @@ browser windows or playing music).
 Pull requests that increase or improve coverage of existing features are very welcome.
 Coverage reports can be found at [Coveralls](https://coveralls.io/github/cuthbertLab/music21).
 Pull requests that lower overall coverage are likely to be rejected (exception: replace
-30 covered lines with 5 covered lines that do the same job more efficiently and you've
+30 covered lines with 5 covered lines that do the same job more efficiently, and you've
 lowered the overall coverage, but that's okay).
 
 For changes to file parsing, please test both import and export (when supported for

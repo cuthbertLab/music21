@@ -1188,7 +1188,7 @@ class ConverterMidi(SubConverter):
         in defaults.quantizationQuarterLengthDivisors. (Default: (4, 3)).
         '''
         from music21.midi import translate as midiTranslate
-        midiTranslate.midiFilePathToStream(filePath, self.stream, **keywords)
+        midiTranslate.midiFilePathToStream(filePath, inputM21=self.stream, **keywords)
 
     def write(self,
               obj,
