@@ -24,7 +24,6 @@ Speed notes:
    (But then PyPy probably won't work.)
 
 '''
-import copy
 import difflib
 import json
 import math

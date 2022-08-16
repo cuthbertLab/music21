@@ -2671,8 +2671,9 @@ def streamToMidiFile(
 
 def midiFilePathToStream(
     filePath,
+    *,
     inputM21=None,
-    **keywords
+    **keywords,
 ):
     '''
     Used by music21.converter:
@@ -2693,13 +2694,15 @@ def midiFilePathToStream(
     >>> streamScore = midi.translate.midiFilePathToStream(fp)
     >>> streamScore
     <music21.stream.Score ...>
+
+    Changed in v8: inputM21 is keyword only.
     '''
     from music21 import midi as midiModule
     mf = midiModule.MidiFile()
     mf.open(filePath)
     mf.read()
     mf.close()
-    return midiFileToStream(mf, inputM21, **keywords)
+    return midiFileToStream(mf, inputM21=inputM21, **keywords)
 
 
 def midiAsciiStringToBinaryString(

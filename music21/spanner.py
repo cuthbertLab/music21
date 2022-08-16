@@ -1406,11 +1406,11 @@ class Ottava(Spanner):
     >>> print(ottava)
     <music21.spanner.Ottava 8vb transposing>
 
-
     An Ottava spanner can either be transposing or non-transposing.
-    In a transposing Ottava spanner, the notes should be in their
-    written octave (as if the spanner were not there) and all the
-    notes in the spanner will be transposed on Stream.toSoundingPitch()
+    In a transposing Ottava spanner, the notes in the stream should be
+    in their written octave (as if the spanner were not there) and all the
+    notes in the spanner will be transposed on Stream.toSoundingPitch().
+
     A non-transposing spanner has notes that are at the pitch that
     they would sound (therefore the Ottava spanner is a decorative
     line).
@@ -1421,6 +1421,7 @@ class Ottava(Spanner):
     >>> n2 = note.Note('E4')
     >>> n2.offset = 2.0
     >>> ottava.addSpannedElements([n1, n2])
+
     >>> s = stream.Stream([ottava, n1, n2])
     >>> s.atSoundingPitch = False
     >>> s2 = s.toSoundingPitch()
@@ -1434,7 +1435,7 @@ class Ottava(Spanner):
     D3
     E3
 
-    All valid types
+    All valid types are given below:
 
     >>> ottava.validOttavaTypes
     ('8va', '8vb', '15ma', '15mb', '22da', '22db')
@@ -1458,18 +1459,16 @@ class Ottava(Spanner):
 
     def __init__(self,
                  *arguments,
-                 type: str = '8va',
-                 # transposing: bool =
+                 type: str = '8va',  # pylint: disable=redefined-builtin
+                 transposing: bool = True,
+                 placement: t.Literal['above', 'below'] = 'above',
                  **keywords):
         super().__init__(*arguments, **keywords)
         self._type = None  # can be 8va, 8vb, 15ma, 15mb
         self.type = type
 
-        self.placement = 'above'  # can above or below, after musicxml
-        if 'transposing' in keywords and keywords['transposing'] in (True, False):
-            self.transposing = keywords['transposing']
-        else:
-            self.transposing = True
+        self.placement = placement  # can above or below, after musicxml
+        self.transposing = transposing
 
     def _getType(self):
         return self._type
@@ -1506,12 +1505,12 @@ class Ottava(Spanner):
         (such as 8va or 15mb) or with a pair specifying size and direction.
 
         >>> os = spanner.Ottava()
-        >>> os.type = 15, 'down'
-        >>> os.type
-        '15mb'
         >>> os.type = '8vb'
         >>> os.type
         '8vb'
+        >>> os.type = 15, 'down'
+        >>> os.type
+        '15mb'
         ''')
 
     def _reprInternal(self):
@@ -1622,7 +1621,6 @@ class Ottava(Spanner):
         True
         >>> n1.nameWithOctave
         'D#3'
-
         '''
         if self.transposing:
             return
@@ -1823,11 +1821,12 @@ class Glissando(Spanner):
     def __init__(self,
                  *arguments,
                  lineType: str = 'wavy',
-                 label: t.Optional[str],
+                 label: t.Optional[str] = None,
                  **keywords):
         super().__init__(*arguments, **keywords)
 
-        self._lineType = 'wavy'
+        GLISSANDO_DEFAULT_LINETYPE = 'wavy'
+        self._lineType = GLISSANDO_DEFAULT_LINETYPE
         self._slideType = 'chromatic'
 
         self.label = None
