@@ -288,7 +288,7 @@ def formatStr(msg,
                     msg[i] = x.decode('utf-8')
                 except AttributeError:
                     msg[i] = ''
-    if formatType == 'block':
+    if format == 'block':
         return '\n*** '.join(msg) + '\n'
     else:  # catch all others
         return ' '.join(msg) + '\n'

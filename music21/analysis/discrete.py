@@ -1288,7 +1288,8 @@ def analyzeStream(
     streamObj: 'music21.stream.Stream',
     method: str,
     *args,
-    **keywords):
+    **keywords
+):
     '''
     Public interface to discrete analysis methods to be applied
     to a Stream given as an argument. Methods return process-specific data format.

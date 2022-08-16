@@ -478,9 +478,10 @@ class PartReduction:
         self._score = srcScore
         # an ordered list of dictionaries for
         # part id, part color, and a list of Part objs
-        self._partBundles = []
+        # TODO: typed dict
+        self._partBundles: t.List[t.Dict[str, t.Any]] = []
         # a dictionary of part id to a list of events
-        self._eventSpans = {}
+        self._eventSpans: t.Dict[t.Union[str, int], t.List[t.Any]] = {}
 
         # define how parts are grouped
         # a list of dictionaries, with keys for name, color, and a match list
@@ -744,10 +745,10 @@ class PartReduction:
                         finalBundle.append(dsFirst)
                         continue
                     # create new spans for each target in this segment
-                    for i, t in enumerate(match):
-                        targetStart = t.getOffsetBySite(flatRef)
+                    for i, tar in enumerate(match):
+                        targetStart = tar.getOffsetBySite(flatRef)
                         # can use extended duration
-                        targetSpan = t.duration.quarterLength
+                        targetSpan = tar.duration.quarterLength
                         # if dur of target is greater tn this span
                         # end at this span
                         if targetStart + targetSpan > offsetEnd:
@@ -1321,8 +1322,8 @@ class TestExternal(unittest.TestCase):
     show = True
 
     def testPartReductionB(self):
-        t = Test()
-        t.testPartReductionB(show=self.show)
+        test = Test()
+        test.testPartReductionB(show=self.show)
 
 
 # ------------------------------------------------------------------------------

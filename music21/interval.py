@@ -2880,9 +2880,9 @@ class Interval(IntervalBase):
     def __init__(self,
                  *arguments,
                  diatonic: t.Optional[DiatonicInterval] = None,
-                 chromatic:  t.Optional[ChromaticInterval] = None,
-                 noteStart: t.Optional[note.Note] = None,
-                 noteEnd: t.Optional[note.Note] = None,
+                 chromatic: t.Optional[ChromaticInterval] = None,
+                 noteStart: t.Optional['music21.note.Note'] = None,
+                 noteEnd: t.Optional['music21.note.Note'] = None,
                  name: t.Optional[str] = None,
                  **keywords):
         #     requires either (1) a string ('P5' etc.) or

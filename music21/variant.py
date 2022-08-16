@@ -90,16 +90,23 @@ class Variant(base.Music21Object):
     classSortOrder = stream.Stream.classSortOrder - 2  # variants should always come first?
 
     # this copies the init of Streams
-    def __init__(self, givenElements=None, *args, **keywords):
+    def __init__(self,
+                 givenElements: t.Union[None,
+                                        base.Music21Object,
+                                        t.Sequence[base.Music21Object]] = None,
+                 *args,
+                 name: t.Optional[str] = None,
+                 **keywords):
         super().__init__()
         self.exposeTime = False
         self._stream = stream.VariantStorage(givenElements=givenElements,
-                                             *args, **keywords)
+                                             *args,
+                                             **keywords)
 
         self._replacementDuration = None
 
-        if 'name' in keywords:
-            self.groups.append(keywords['name'])
+        if name is not None:
+            self.groups.append(name)
 
 
     def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):

@@ -458,13 +458,13 @@ class StaffGroup(spanner.Spanner):
     def __init__(self,
                  *arguments,
                  name: t.Optional[str] = None,
-                 barTogether:  t.Literal[True, False, None, 'Mensurstrich'] = True,
+                 barTogether: t.Literal[True, False, None, 'Mensurstrich'] = True,
                  abbreviation: t.Optional[str] = None,
                  symbol: t.Literal['bracket', 'line', 'grace', 'square'] = None,
                  **keywords):
         super().__init__(*arguments, **keywords)
 
-        self.name = name or abbreviation # if this group has a name
+        self.name = name or abbreviation  # if this group has a name
         self.abbreviation = abbreviation
         self._symbol = None  # Choices: bracket, line, brace, square
         self.symbol = symbol
@@ -484,7 +484,7 @@ class StaffGroup(spanner.Spanner):
             self._barTogether = True
         elif value in ['no', False]:
             self._barTogether = False
-        elif hasattr(value, 'lower') and value.lower() == 'mensurstrich':
+        elif isinstance(value, str) and value.lower() == 'mensurstrich':
             self._barTogether = 'Mensurstrich'
         else:
             raise StaffGroupException(f'the bar together value {value} is not acceptable')
