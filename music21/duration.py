@@ -3089,8 +3089,10 @@ class GraceDuration(Duration):
     )
     # INITIALIZER #
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self,
+                 typeOrDuration: t.Union[str, OffsetQLIn, DurationTuple, None] = None,
+                 **keywords):
+        super().__init__(typeOrDuration, **keywords)
         # update components to derive types; this sets ql, but this
         # will later be removed
         if self._componentsNeedUpdating:
@@ -3154,8 +3156,10 @@ class AppoggiaturaDuration(GraceDuration):
 
     # INITIALIZER #
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self,
+                 typeOrDuration: t.Union[str, OffsetQLIn, DurationTuple, None] = None,
+                 **keywords):
+        super().__init__(typeOrDuration, **keywords)
         self.slash = False  # can be True, False, or None; make None go to True?
         self.makeTime = True
 

@@ -542,7 +542,6 @@ class GeneralNote(base.Music21Object):
     objects directly, and not use this underlying
     structure.
 
-
     >>> gn = note.GeneralNote(type='16th', dots=2)
     >>> gn.quarterLength
     0.4375
@@ -566,7 +565,6 @@ class GeneralNote(base.Music21Object):
     }
 
     def __init__(self,
-                 *arguments,
                  duration: t.Optional[Duration] = None,
                  lyric: t.Union[None, str, Lyric] = None,
                  **keywords
@@ -973,7 +971,6 @@ class NotRest(GeneralNote):
     }
 
     def __init__(self,
-                 *arguments,
                  beams: t.Optional[beam.Beams] = None,
                  **keywords):
         super().__init__(**keywords)

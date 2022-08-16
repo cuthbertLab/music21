@@ -666,22 +666,8 @@ class TwelveToneRow(ToneRow):
     '''
     A Stream representation of a twelve-tone row, capable of producing a 12-tone matrix.
     '''
-    # row = None
-
-    # _DOC_ATTR: t.Dict[str, str] = {
-    # 'row': 'A list representing the pitch class values of the row.',
-    # }
-
     _DOC_ORDER = ['matrix', 'isAllInterval',
                   'getLinkClassification', 'isLinkChord', 'areCombinatorial']
-
-    # def __init__(self, *arguments, **keywords):
-    #     super().__init__(*arguments, **keywords)
-    #     # environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
-    #
-    #     # if self.row != None:
-    #     #    for pc in self.row:
-    #     #        self.append(pitch.Pitch(pc))
 
     def matrix(self):
         # noinspection PyShadowingNames

@@ -344,7 +344,6 @@ class Music21Object(prebase.ProtoM21Object):
     }
 
     def __init__(self,
-                 *arguments,
                  id: t.Union[str, int, None] = None,  # pylint: disable=redefined-builtin
                  groups: t.Optional[Groups] = None,
                  sites: t.Optional[Sites] = None,
@@ -1802,7 +1801,6 @@ class Music21Object(prebase.ProtoM21Object):
         ContextTuple(site=<music21.stream.Measure 3333 offset=0.0>,
                      offset=0.0,
                      recurseType='elementsFirst')
-
 
         >>> partIterator = c.parts
         >>> m3 = partIterator[1].measure(3)
