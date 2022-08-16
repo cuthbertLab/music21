@@ -290,8 +290,8 @@ class ToneRow(stream.Stream):
                   'zeroCenteredTransformation', 'originalCenteredTransformation',
                   'findZeroCenteredTransformations', 'findOriginalCenteredTransformations']
 
-    def __init__(self, row=None, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, row=None, **keywords):
+        super().__init__(**keywords)
         if row is not None:
             self.row = row
         else:
@@ -1096,8 +1096,9 @@ class HistoricalTwelveToneRow(TwelveToneRow):
                  composer: t.Union[None, str] = None,
                  opus: t.Union[None, str] = None,
                  title: t.Union[None, str] = None,
-                 row=None):
-        super().__init__(row)
+                 row=None,
+                 **keywords):
+        super().__init__(row, **keywords)
         self.composer = composer
         self.opus = opus
         self.title = title

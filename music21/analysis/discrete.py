@@ -1287,7 +1287,6 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
 def analyzeStream(
     streamObj: 'music21.stream.Stream',
     method: str,
-    *args,
     **keywords
 ):
     '''

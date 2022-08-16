@@ -167,9 +167,9 @@ class BrailleElementGrouping(ProtoM21Object):
         'withHyphen': 'If True, this grouping will end with a music hyphen.',
         'numRepeats': 'The number of times this grouping is repeated.'
     }
-    def __init__(self, *args):
+    def __init__(self, *listElements):
         '''
-        A BrailleElementGrouping is a superclass of list of objects which should be displayed
+        A BrailleElementGrouping mimics a list of objects which should be displayed
         without a space in braille.
 
         >>> from music21.braille import segment
@@ -209,8 +209,7 @@ class BrailleElementGrouping(ProtoM21Object):
         >>> bg.numRepeats
         0
         '''
-        super().__init__()
-        self.internalList = list(*args)
+        self.internalList = list(*listElement)
         setGroupingGlobals()
 
         self.keySignature = GROUPING_GLOBALS['keySignature']

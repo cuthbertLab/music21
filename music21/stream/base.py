@@ -245,7 +245,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     be allowed, because craziness and givenElements are required::
 
         class CrazyStream(Stream):
-            def __init__(self, givenElements, craziness, *args, **keywords):
+            def __init__(self, givenElements, craziness, **keywords):
                 ...
 
     New in v.7 -- smart appending
@@ -312,11 +312,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                  givenElements: t.Union[None,
                                         base.Music21Object,
                                         t.Sequence[base.Music21Object]] = None,
-                 *arguments,
+                 *,
                  appendOrInsert: t.Literal['append', 'insert', 'offsets'] = 'offsets',
                  **keywords):
         # restrictClass: t.Type[M21ObjType] = base.Music21Object,
-        super().__init__(self, *arguments, **keywords)
+        super().__init__(self, **keywords)
 
         self.streamStatus = streamStatus.StreamStatus(self)
         self._unlinkedDuration = None

@@ -1192,7 +1192,7 @@ def parseURL(url,
 
 
 def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
-          *args,
+          *,
           forceSource: bool = False,
           number: t.Optional[int] = None,
           format: t.Optional[str] = None,  # pylint: disable=redefined-builtin

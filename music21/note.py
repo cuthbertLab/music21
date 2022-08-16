@@ -1952,7 +1952,7 @@ class Rest(GeneralNote):
                 ''',
     }
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self, **keywords):
         super().__init__(**keywords)
         self.stepShift = 0  # display line
         self.fullMeasure = 'auto'  # see docs; True, False, 'always',
@@ -1972,7 +1972,6 @@ class Rest(GeneralNote):
         '''
         A Music21 rest is equal to another object if that object is also a rest which
         has the same duration.
-
 
         >>> r1 = note.Rest()
         >>> r2 = note.Rest()
