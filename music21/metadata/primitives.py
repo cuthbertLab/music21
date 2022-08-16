@@ -1507,8 +1507,7 @@ _DOC_ORDER = (
 )
 
 DateParseType = t.Union[Date, datetime.datetime, str]
-ValueType = t.Union[DateSingle, DateRelative, DateBetween, DateSelection,
-                    Text, Contributor, Copyright, int]
+ValueType = t.Union[DatePrimitive, Text, Contributor, Copyright, int]
 
 
 if __name__ == '__main__':

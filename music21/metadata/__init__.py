@@ -152,7 +152,8 @@ from music21.metadata.properties import PropertyDescription
 from music21.metadata import bundles
 from music21.metadata import caching
 from music21.metadata import primitives
-from music21.metadata.primitives import (Date, DateSingle, DateRelative, DateBetween,
+from music21.metadata.primitives import (Date, DatePrimitive,
+                                         DateSingle, DateRelative, DateBetween,
                                          DateSelection, Text, Contributor, Creator,
                                          Imprint, Copyright, ValueType)
 
@@ -2311,21 +2312,26 @@ class Metadata(base.Music21Object):
             raise exceptions21.MetadataException(
                 f'invalid type for Copyright: {type(value).__name__}')
 
-        if valueType is DateSingle:
+        if valueType is DatePrimitive:
+            # note -- this may return something other than DateSingle depending
+            #    on the context.
             if isinstance(value, Text):
                 value = str(value)
-            if isinstance(value, (str, datetime.datetime, Date)):
+
+            if isinstance(value, DatePrimitive):
                 # If you want other DateSingle-derived types (DateRelative,
                 # DateBetween, or DateSelection), you have to create those
                 # yourself before adding/setting them.
+                return value
 
+            if isinstance(value, (str, datetime.datetime, Date)):
                 # noinspection PyBroadException
                 # pylint: disable=bare-except
                 try:
                     return DateSingle(value)
                 except:
-                    # Couldn't convert; just return unconverted value
-                    return originalValue
+                    # Couldn't convert; just return a generic text.
+                    return Text(str(originalValue))
                 # pylint: enable=bare-except
 
             raise exceptions21.MetadataException(
