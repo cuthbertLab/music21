@@ -205,8 +205,11 @@ class Spanner(base.Music21Object):
     >>> sp1.completeStatus = True
     '''
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__()
+    def __init__(self,
+                 *spannedElements: t.Union[base.Music21Object,
+                                           t.Sequence[base.Music21Object]],
+                 **keywords):
+        super().__init__(**keywords)
 
         # store a Stream inside of Spanner
         from music21 import stream
@@ -224,18 +227,13 @@ class Spanner(base.Music21Object):
         self.spannerStorage.autoSort = False
 
         # add arguments as a list or single item
-        proc = []
-        for arg in arguments:
-            if common.isListLike(arg):
-                proc += arg
+        proc: t.List[base.Music21Object] = []
+        for spannedElement in spannedElements:
+            if isinstance(spannedElement, base.Music21Object):
+                proc.append(spannedElement)
             else:
-                proc.append(arg)
-        self.addSpannedElements(proc)
-        # if len(arguments) > 1:
-        #     self.spannerStorage.append(arguments)
-        # elif len(arguments) == 1:  # assume a list is first arg
-        #         self.spannerStorage.append(c)
-
+                proc += spannedElement
+            self.addSpannedElements(proc)
         # parameters that spanners need in loading and processing
         # local id is the id for the local area; used by musicxml
         self.idLocal = None
@@ -618,7 +616,7 @@ class SpannerBundle(prebase.ProtoM21Object):
     '''
     An advanced utility object for collecting and processing
     collections of Spanner objects. This is necessary because
-    often processing routines that happen at many different
+    often processing routines that happen at many
     levels still need access to the same collection of spanners.
 
     Because SpannerBundles are so commonly used with
@@ -928,7 +926,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         The `maxId` parameter sets the largest number that is available for this
         class.  In MusicXML it is 6.
 
-        Currently this method just iterates over the spanners of this class
+        Currently, this method just iterates over the spanners of this class
         and counts the number from 1-6 and then recycles numbers.  It does
         not check whether more than 6 overlapping spanners of the same type
         exist, nor does it reset the count to 1 after all spanners of that
@@ -1846,13 +1844,13 @@ class Glissando(Spanner):
                  **keywords):
         super().__init__(*arguments, **keywords)
 
-        GLISSANDO_DEFAULT_LINETYPE = 'wavy'
-        self._lineType = GLISSANDO_DEFAULT_LINETYPE
+        GLISSANDO_DEFAULT_LINE_TYPE = 'wavy'
+        self._lineType = GLISSANDO_DEFAULT_LINE_TYPE
         self._slideType = 'chromatic'
 
         self.label = None
 
-        if lineType != GLISSANDO_DEFAULT_LINETYPE:
+        if lineType != GLISSANDO_DEFAULT_LINE_TYPE:
             self.lineType = lineType  # use property
         if label is not None:
             self.label = label  # use property
