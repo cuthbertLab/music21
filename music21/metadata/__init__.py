@@ -156,8 +156,6 @@ from music21.metadata.primitives import (Date, DatePrimitive,
                                          DateSingle, DateRelative, DateBetween,
                                          DateSelection, Text, Contributor, Creator,
                                          Imprint, Copyright, ValueType)
-
-from music21.metadata import testMetadata
 # -----------------------------------------------------------------------------
 
 __all__ = [
@@ -676,15 +674,12 @@ class Metadata(base.Music21Object):
          ('software', 'music21 v...'))
 
         >>> c.metadata.all(returnPrimitives=True, returnSorted=False)
-        (('software', <music21.metadata.primitives.Text music21 v.8.0.0a9>),
-         ('software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
-         ('software', <music21.metadata.primitives.Text Dolet Light for Finale 2014>),
+        (('software', <music21.metadata.primitives.Text music21 v...>),
+         ('software', <music21.metadata.primitives.Text Finale ...>),
+         ('software', <music21.metadata.primitives.Text Dolet Light...>),
          ('movementName', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
          ('composer', <music21.metadata.primitives.Contributor composer:Arcangelo Corelli>),
-         ('arranger', <music21.metadata.primitives.Contributor arranger:Michael Scott Cuthbert>),
-         ('copyright', <...Copyright © 2014, Creative Commons License (CC-BY)>),
-         ('filePath', <...Text ...corelli/opus3no1/1grave.xml>),
-         ('fileFormat', <music21.metadata.primitives.Text musicxml>),
+         ...
          ('dateCreated', <music21.metadata.primitives.DateRelative 1689/--/-- or earlier>),
          ('localeOfComposition', <music21.metadata.primitives.Text Rome>))
 
@@ -2623,20 +2618,7 @@ class RichMetadata(Metadata):
             AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
          ('arranger', 'Michael Scott Cuthbert'),
          ('composer', 'Arcangelo Corelli'),
-         ('copyright', '© 2014, Creative Commons License (CC-BY)'),
-         ('fileFormat', 'musicxml'),
-         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
-         ('keySignatureFirst', -1),
-         ('keySignatures', [-1]),
-         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'),
-         ('noteCount', 259),
-         ('numberOfParts', 3),
-         ('pitchHighest', 'C6'),
-         ('pitchLowest', 'C2'),
-         ('quarterLength', 76.0),
-         ('software', 'Dolet Light for Finale 2014'),
-         ('software', 'Finale 2014 for Mac'),
-         ('software', 'music21 v.8.0.0a9'),
+         ...
          ('sourcePath', 'corelli/opus3no1/1grave.xml'),
          ('tempoFirst', None), ('tempos', []),
          ('timeSignatureFirst', '4/4'),
@@ -2658,30 +2640,12 @@ class RichMetadata(Metadata):
          ('timeSignatures', ['4/4']))
 
         >>> rmd.all(returnPrimitives=True, returnSorted=False)
-        (('software', <music21.metadata.primitives.Text music21 v.8.0.0a9>),
+        (('software', <music21.metadata.primitives.Text music21 ...>),
          ('software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
          ('software', <music21.metadata.primitives.Text Dolet Light for Finale 2014>),
          ('movementName', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
          ('composer', <music21.metadata.primitives.Contributor composer:Arcangelo Corelli>),
-         ('arranger', <music21.metadata.primitives.Contributor arranger:Michael Scott Cuthbert>),
-         ('copyright', <...Copyright © 2014, Creative Commons License (CC-BY)>),
-         ('filePath', <...Text ...corelli/opus3no1/1grave.xml>),
-         ('fileFormat', <music21.metadata.primitives.Text musicxml>),
-         ('dateCreated', <music21.metadata.primitives.DateRelative 1689/--/-- or earlier>),
-         ('localeOfComposition', <music21.metadata.primitives.Text Rome>),
-         ('ambitus',
-          AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
-         ('keySignatureFirst', -1),
-         ('keySignatures', [-1]),
-         ('noteCount', 259),
-         ('numberOfParts', 3),
-         ('pitchHighest', 'C6'),
-         ('pitchLowest', 'C2'),
-         ('quarterLength', 76.0),
-         ('sourcePath', 'corelli/opus3no1/1grave.xml'),
-         ('tempoFirst', None),
-         ('tempos', []),
-         ('timeSignatureFirst', '4/4'),
+         ...
          ('timeSignatures', ['4/4']))
 
         >>> rmd.all(skipNonContributors=True, returnPrimitives=True, returnSorted=True)
@@ -2747,18 +2711,14 @@ class RichMetadata(Metadata):
         return False
 
 # -----------------------------------------------------------------------------
+# tests are in test/test_metadata
 
-class Test(unittest.TestCase):
-    pass
-
-
-# -----------------------------------------------------------------------------
 _DOC_ORDER: t.List[type] = []
 
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest()
 
 
 # -----------------------------------------------------------------------------

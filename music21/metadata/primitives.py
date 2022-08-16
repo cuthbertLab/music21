@@ -447,7 +447,12 @@ class DatePrimitive(prebase.ProtoM21Object):
         return str(self)
 
     def __str__(self):
-        return str([str(d) for d in self._data])
+        if len(self._data) == 0:
+            return ''
+        elif len(self._data) == 1:
+            return str(self._data[0])
+        else:
+            return str([str(d) for d in self._data])
 
     # PUBLIC PROPERTIES #
 
@@ -1466,7 +1471,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(dateRelative), 'prior to 2001/12/31')
         self.assertEqual(dateRelative.relevance, 'prior')
         self.assertEqual(len(dateRelative._data), 1)
-        self.assertEqual(dateRelative._dataUncertainty, [])
+        self.assertEqual(dateRelative._dataUncertainty, [None])
 
     def testDateBetween(self):
         from music21 import metadata

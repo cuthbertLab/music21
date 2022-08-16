@@ -79,6 +79,9 @@ del minPythonVersionStr
 
 
 __all__ = [
+    # testing routines
+    'mainTest',
+
     'prebase',  # before all
     'base',  # top...
     'sites',  # important
@@ -189,7 +192,6 @@ from music21.base import VERSION_STR  # noqa: E402
 
 __version__ = VERSION_STR
 
-# legacy reason why it's here...
 from music21.test.testRunner import mainTest  # noqa: E402
 
 # -----------------------------------------------------------------------------

@@ -228,6 +228,9 @@ class ModuleGather:
                             'musicxml/xmlToM21',
 
                             'romanText/translate',
+                            'corpus/testCorpus',
+                            'audioSearch/transcriber',
+                            'audioSearch/__init__',
                             'alpha/theoryAnalysis/theoryAnalyzer',
                             ]
 
