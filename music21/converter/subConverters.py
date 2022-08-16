@@ -272,10 +272,13 @@ class SubConverter:
         fp = self.writeDataStream(fp, dataStr, **keywords)
         return fp
 
-    def writeDataStream(self, fp, dataStr, **keywords):  # pragma: no cover
+    def writeDataStream(self,
+                        fp,
+                        dataStr: t.Union[str, bytes],
+                        **keywords) -> pathlib.Path:  # pragma: no cover
         '''
         Writes the data stream to `fp` or to a temporary file and returns the
-        filename written.
+        Path object of the filename written.
         '''
         if fp is None:
             fp = self.getTemporaryFile()
@@ -1025,11 +1028,11 @@ class ConverterMusicXML(SubConverter):
 
     def writeDataStream(self,
                         fp,
-                        dataBytes: bytes,
+                        dataStr: t.Union[str, bytes],
                         **keywords) -> pathlib.Path:  # pragma: no cover
         # noinspection PyShadowingNames
         '''
-        Writes `dataBytes` to `fp`.
+        Writes `dataStr` which must be bytes to `fp`.
         Adds `.musicxml` suffix to `fp` if it does not already contain some suffix.
 
         Changed in v7 -- returns a pathlib.Path
@@ -1051,20 +1054,25 @@ class ConverterMusicXML(SubConverter):
         True
         >>> os.remove(outFp)
         '''
-        if fp is None:
-            fp = self.getTemporaryFile()
-        else:
-            fp = common.cleanpath(fp, returnPathlib=True)
+        if not isinstance(dataStr, bytes):
+            raise ValueError(f'{dataStr} must be bytes to write to this format')
+        dataBytes = dataStr
 
-        if not fp.suffix or fp.suffix == '.mxl':
-            fp = fp.with_suffix('.musicxml')
+        fpPath: pathlib.Path
+        if fp is None:
+            fpPath = self.getTemporaryFile()
+        else:
+            fpPath = common.cleanpath(fp, returnPathlib=True)
+
+        if not fpPath.suffix or fpPath.suffix == '.mxl':
+            fpPath = fpPath.with_suffix('.musicxml')
 
         writeFlags = 'wb'
 
-        with open(fp, writeFlags) as f:
+        with open(fpPath, writeFlags) as f:
             f.write(dataBytes)  # type: ignore
 
-        return fp
+        return fpPath
 
     def write(self,
               obj: music21.Music21Object,

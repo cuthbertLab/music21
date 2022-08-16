@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'8.0.0a9'
+'8.0.0a10'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -68,8 +68,6 @@ from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
 from music21 import tie
 from music21 import exceptions21
 from music21._version import __version__, __version_info__
-from music21.test.testRunner import mainTest
-
 
 _M21T = t.TypeVar('_M21T', bound='music21.base.Music21Object')
 
@@ -93,7 +91,6 @@ __all__ = [
 
     'VERSION',
     'VERSION_STR',
-    'mainTest',
 ]
 
 # N.B. for PyDev "all" import working, we need to list this
