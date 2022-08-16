@@ -465,7 +465,7 @@ class PartReduction:
     def __init__(self,
                  srcScore=None,
                  *args,
-                 partGroups: t.Optional[t.Dict[str, t.Any]] = None,
+                 partGroups: t.Optional[t.List[t.Dict[str, t.Any]]] = None,
                  fillByMeasure: bool = True,
                  segmentByTarget: bool = True,
                  normalize: bool = True,
@@ -766,7 +766,7 @@ class PartReduction:
                             # as the start of this existing span
                             # dsFirst['eStart'] = targetStart
                             dsFirst['span'] = targetSpan
-                            dsFirst['weight'] = targetToWeight(t)
+                            dsFirst['weight'] = targetToWeight(tar)
                             finalBundle.append(dsFirst)
                         elif t == 0 and ds['eStart'] != targetStart:
                             # add two, one for the empty region, one for target
@@ -777,13 +777,13 @@ class PartReduction:
                             dsNext = copy.deepcopy(ds)
                             dsNext['eStart'] = targetStart
                             dsNext['span'] = targetSpan
-                            dsNext['weight'] = targetToWeight(t)
+                            dsNext['weight'] = targetToWeight(tar)
                             finalBundle.append(dsNext)
                         else:  # for all other cases, create segment for each
                             dsNext = copy.deepcopy(ds)
                             dsNext['eStart'] = targetStart
                             dsNext['span'] = targetSpan
-                            dsNext['weight'] = targetToWeight(t)
+                            dsNext['weight'] = targetToWeight(tar)
                             finalBundle.append(dsNext)
                 # after iterating all ds spans, reassign
                 self._eventSpans[partBundle['pGroupId']] = finalBundle
