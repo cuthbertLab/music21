@@ -555,7 +555,7 @@ class ConverterVexflow(SubConverter):
               fp=None,
               subformats=None,
               *,
-              local: bool = False
+              local: bool = False,
               **keywords):  # pragma: no cover
         # from music21 import vexflow
         from music21.vexflow import toMusic21j as vexflow
@@ -953,6 +953,8 @@ class ConverterMusicXML(SubConverter):
     def runThroughMusescore(self,
                             fp,
                             subformats=None,
+                            *,
+                            dpi: t.Optional[int] = None,
                             **keywords) -> pathlib.Path:  # pragma: no cover
         '''
         Take the output of the conversion process and run it through musescore to convert it
@@ -979,8 +981,8 @@ class ConverterMusicXML(SubConverter):
         fpOut += subformatExtension
 
         musescoreRun = [str(musescorePath), fp, '-o', fpOut, '-T', '0']
-        if 'dpi' in keywords:
-            musescoreRun.extend(['-r', str(keywords['dpi'])])
+        if dpi is not None:
+            musescoreRun.extend(['-r', str(dpi)])
 
         prior_qt = os.getenv('QT_QPA_PLATFORM')
         prior_xdg = os.getenv('XDG_RUNTIME_DIR')
@@ -1188,16 +1190,19 @@ class ConverterMidi(SubConverter):
         from music21.midi import translate as midiTranslate
         midiTranslate.midiFilePathToStream(filePath, self.stream, **keywords)
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+    def write(self,
+              obj,
+              fmt,
+              fp=None,
+              subformats=None,
+              *,
+              addStartDelay: bool = False,
+              **keywords):  # pragma: no cover
         from music21.midi import translate as midiTranslate
         if fp is None:
             fp = self.getTemporaryFile()
 
-        midiTranslateKeywords = {}
-        if 'addStartDelay' in keywords:
-            midiTranslateKeywords['addStartDelay'] = keywords['addStartDelay']
-
-        mf = midiTranslate.music21ObjectToMidiFile(obj, **midiTranslateKeywords)
+        mf = midiTranslate.music21ObjectToMidiFile(obj, addStartDelay=addStartDelay)
         mf.open(fp, 'wb')  # write binary
         mf.write()
         mf.close()

@@ -454,34 +454,30 @@ class StaffGroup(spanner.Spanner):
 
     .. image:: images/layout_StaffGroup_01.*
         :width: 400
-
     '''
-
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 *arguments,
+                 name: t.Optional[str] = None,
+                 barTogether:  t.Literal[True, False, None, 'Mensurstrich'] = True,
+                 abbreviation: t.Optional[str] = None,
+                 symbol: t.Literal['bracket', 'line', 'grace', 'square'] = None,
+                 **keywords):
         super().__init__(*arguments, **keywords)
 
-        self.name = None  # if this group has a name
-        self.abbreviation = None
+        self.name = name or abbreviation # if this group has a name
+        self.abbreviation = abbreviation
         self._symbol = None  # Choices: bracket, line, brace, square
+        self.symbol = symbol
         # determines if barlines are grouped through; this is group barline
         # in musicxml
-        self._barTogether = True
-
-        if 'symbol' in keywords:
-            self.symbol = keywords['symbol']  # user property
-        if 'barTogether' in keywords:
-            self.barTogether = keywords['barTogether']  # user property
-        if 'name' in keywords:
-            self.name = keywords['name']  # user property
-        if 'abbreviation' in keywords:
-            self.name = keywords['abbreviation']  # user property
+        self._barTogether = barTogether
 
     # --------------------------------------------------------------------------
 
-    def _getBarTogether(self):
+    def _getBarTogether(self) -> t.Literal[True, False, None, 'Mensurstrich']:
         return self._barTogether
 
-    def _setBarTogether(self, value):
+    def _setBarTogether(self, value: t.Literal[True, False, None, 'Mensurstrich', 'yes', 'no']):
         if value is None:
             pass  # do nothing for now; could set a default
         elif value in ['yes', True]:
@@ -498,8 +494,7 @@ class StaffGroup(spanner.Spanner):
         or yes or no strings.  Or the string 'Mensurstrich' which
         indicates barring between staves but not in staves.
 
-        Currently Mensurstrich i
-
+        Currently Mensurstrich is not supported by most exporters.
 
         >>> sg = layout.StaffGroup()
         >>> sg.barTogether = 'yes'
@@ -523,7 +518,6 @@ class StaffGroup(spanner.Spanner):
 
     symbol = property(_getSymbol, _setSymbol, doc='''
         Get or set the symbol value, with either Boolean values or yes or no strings.
-
 
         >>> sg = layout.StaffGroup()
         >>> sg.symbol = 'Brace'

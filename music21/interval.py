@@ -2877,7 +2877,14 @@ class Interval(IntervalBase):
     >>> aInterval.isStep
     True
     '''
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 *arguments,
+                 diatonic: t.Optional[DiatonicInterval] = None,
+                 chromatic:  t.Optional[ChromaticInterval] = None,
+                 noteStart: t.Optional[note.Note] = None,
+                 noteEnd: t.Optional[note.Note] = None,
+                 name: t.Optional[str] = None,
+                 **keywords):
         #     requires either (1) a string ('P5' etc.) or
         #     (2) named arguments:
         #     (2a) either both of
@@ -2891,19 +2898,21 @@ class Interval(IntervalBase):
 
         # both self.diatonic and self.chromatic can still both be None if an
         # empty Interval class is being created, such as in deepcopy
-        self.diatonic: t.Optional[DiatonicInterval] = None
-        self.chromatic: t.Optional[ChromaticInterval] = None
+        self.diatonic: t.Optional[DiatonicInterval] = diatonic
+        self.chromatic: t.Optional[ChromaticInterval] = chromatic
 
         # these can be accessed through noteStart and noteEnd properties
-        self._noteStart = None
-        self._noteEnd = None
+        self._noteStart = noteStart
+        self._noteEnd = noteEnd
 
         self.type = ''  # harmonic or melodic
         self.implicitDiatonic = False  # is this basically a ChromaticInterval object in disguise?
 
-        if len(arguments) == 1 and isinstance(arguments[0], str):
+        if len(arguments) == 1 and isinstance(arguments[0], str) or name is not None:
             # convert common string representations
-            dInterval, cInterval = _stringToDiatonicChromatic(arguments[0])
+            if name is None:
+                name = arguments[0]
+            dInterval, cInterval = _stringToDiatonicChromatic(name)
             self.diatonic = dInterval
             self.chromatic = cInterval
 
@@ -2932,19 +2941,6 @@ class Interval(IntervalBase):
               and arguments[1].isNote is True):
             self._noteStart = arguments[0]
             self._noteEnd = arguments[1]
-
-        if 'diatonic' in keywords:
-            self.diatonic = keywords['diatonic']
-        if 'chromatic' in keywords:
-            self.chromatic = keywords['chromatic']
-        if 'noteStart' in keywords:
-            self._noteStart = keywords['noteStart']
-        if 'noteEnd' in keywords:
-            self._noteEnd = keywords['noteEnd']
-        if 'name' in keywords:
-            dInterval, cInterval = _stringToDiatonicChromatic(keywords['name'])
-            self.diatonic = dInterval
-            self.chromatic = cInterval
 
         # catch case where only one Note is provided
         if (self.diatonic is None and self.chromatic is None

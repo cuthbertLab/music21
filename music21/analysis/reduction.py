@@ -15,9 +15,10 @@ and one or more reductive representation lines.
 
 Used by graph.PlotHorizontalBarWeighted()
 '''
-import re
-import unittest
 import copy
+import re
+import typing as t
+import unittest
 
 from music21 import exceptions21
 
