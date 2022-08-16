@@ -682,7 +682,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             return t.cast(M21ObjType, searchElements[k])
 
         elif isinstance(k, type):
-            return self.recurse().getElementsByClass(k)
+            if issubclass(k, base.Music21Object):
+                return self.recurse().getElementsByClass(k)
+            else:
+                # this is explicitly NOT true, but we're pretending
+                # it is a Music21Object for now, because the only things returnable
+                # from getElementsByClass are Music21Objects that also inherit from k.
+                m21Type = t.cast(t.Type[M21ObjType], k)  # type: ignore
+                return self.recurse().getElementsByClass(m21Type)
 
         elif common.isIterable(k) and all(isinstance(maybe_type, type) for maybe_type in k):
             return self.recurse().getElementsByClass(k)
@@ -9181,7 +9188,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         useStreams = [returnStream]
         if recurse is True:
-            useStreams = returnStream.recurse(streamsOnly=True, includeSelf=True)
+            useStreams = list(returnStream.recurse(streamsOnly=True, includeSelf=True))
 
         rests_lacking_durations: t.List[note.Rest] = []
         for useStream in useStreams:

@@ -1223,7 +1223,6 @@ class RepeatBracket(Spanner):
     `ouvert` and `clos` for medieval music.  However, if you use it for something like '1-3'
     be sure to set number properly too.
 
-
     >>> m = stream.Measure()
     >>> sp = spanner.RepeatBracket(m, number=1)
     >>> sp  # can be one or more measures
@@ -1237,43 +1236,65 @@ class RepeatBracket(Spanner):
     >>> sp.number
     '3'
 
-    >>> sp.number = '1-3'  # range of repeats
+    Range of repeats as string:
+
+    >>> sp.number = '1-3'
     >>> sp.getNumberList()
     [1, 2, 3]
     >>> sp.number
     '1-3'
 
-    >>> sp.number = [2, 3]  # range of repeats
+    Range of repeats as list:
+
+    >>> sp.number = [2, 3]
     >>> sp.getNumberList()
     [2, 3]
     >>> sp.number
     '2, 3'
 
-    >>> sp.number = '1, 2, 3'  # comma separated
+    Comma separated numbers:
+
+    >>> sp.number = '1, 2, 3'
     >>> sp.getNumberList()
     [1, 2, 3]
     >>> sp.number
     '1-3'
 
+    Disjunct numbers:
 
-    >>> sp.number = '1, 2, 3, 7'  # disjunct
+    >>> sp.number = '1, 2, 3, 7'
     >>> sp.getNumberList()
     [1, 2, 3, 7]
     >>> sp.number
     '1, 2, 3, 7'
-    >>> sp.overrideDisplay = '1-3, 7'  # does not work for number.
 
+    Override the display.
 
+    >>> sp.overrideDisplay = '1-3, 7'
+    >>> sp
+    <music21.spanner.RepeatBracket 1-3, 7
+         <music21.stream.Measure 0 offset=0.0>>
+
+    number is not affected by display overrides:
+
+    >>> sp.number
+    '1, 2, 3, 7'
     '''
-
-    def __init__(self, *arguments, number: t.Optional[int] = None, **keywords):
+    def __init__(self,
+                 *arguments,
+                 number: t.Optional[int] = None,
+                 overrideDisplay: t.Optional[str] = None,
+                 **keywords):
         super().__init__(*arguments, **keywords)
 
-        self._number = None
-        self._numberRange = []  # store a range, inclusive of the single number assignment
-        self._numberSpanIsAdjacent = None
-        self._numberSpanIsContiguous = None
-        self.overrideDisplay = None
+        self._number: t.Optional[int] = None
+        # store a range, inclusive of the single number assignment
+        self._numberRange: t.List[int] = []
+        # are there exactly two numbers that should be written as  3, 4 not 3-4.
+        self._numberSpanIsAdjacent: bool = False
+        # can we write as '3, 4' or '5-10' and not as '1, 5, 6, 11'
+        self._numberSpanIsContiguous: bool = True
+        self.overrideDisplay = overrideDisplay
 
         if number is not None:
             self.number = number
@@ -1289,7 +1310,7 @@ class RepeatBracket(Spanner):
         elif len(self._numberRange) == 1:
             return str(self._number)
         else:
-            if self._numberSpanIsContiguous is False:
+            if not self._numberSpanIsContiguous:
                 return ', '.join([str(x) for x in self._numberRange])
             elif self._numberSpanIsAdjacent:
                 return f'{self._numberRange[0]}, {self._numberRange[-1]}'

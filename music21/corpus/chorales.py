@@ -14,9 +14,10 @@ This file makes it easier to access Bach's chorales through various
 numbering schemes and filters and includes the corpus.chorales.Iterator()
 class for easily iterating through the chorale collection.
 '''
-
-import unittest
 import copy
+import typing as t
+import warnings
+import unittest
 
 from music21 import exceptions21
 from music21 import environment
@@ -950,6 +951,9 @@ class Iterator:
     .highestNumber to the highest in the range. This can either be done by catalogue number
     (iterationType = 'number') or by index (iterationType = 'index').
 
+    Note that these numbers are 1-indexed (as most catalogues are) and
+    unlike Python's range feature, the final number is included.
+
     Changing the numberingSystem will reset the iterator and
     change the range values to span the entire numberList.
     The iterator can be initialized with three parameters
@@ -1066,10 +1070,16 @@ class Iterator:
                   'titleList', 'numberList', 'returnType', 'iterationType']
 
     def __init__(self,
-                 currentNumber=None,
-                 highestNumber=None,
-                 numberingSystem='riemenschneider',
-                 **keywords):
+                 currentNumber: t.Optional[int] = None,
+                 highestNumber: t.Optional[int] = None,
+                 *,
+                 numberingSystem: str = 'riemenschneider',
+                 returnType: str = 'stream',
+                 iterationType: str = 'number',
+                 analysis: bool = False,
+                 numberList: t.Optional[t.List[int]] = None,
+                 titleList: t.Optional[t.List[str]] = None,
+                 ):
         '''
         By default: numberingSystem = 'riemenschneider', currentNumber = 1,
         highestNumber = 371, iterationType = 'number',
@@ -1092,24 +1102,23 @@ class Iterator:
         self._numberingSystem = None
         self._returnType = 'stream'
         self._iterationType = 'number'
-        self.analysis = False
+        self.analysis = analysis
 
         self._choraleList1 = ChoraleList()  # For budapest, baerenreiter
         self._choraleList2 = ChoraleListRKBWV()  # for kalmus, riemenschneider, title, and bwv
 
         self.numberingSystem = numberingSystem  # This assignment must come before the keywords
 
-        for key in keywords:
-            if key == 'returnType':
-                self.returnType = keywords[key]
-            elif key == 'numberList':
-                self.numberList = keywords[key]
-            elif key == 'titleList':
-                self.titleList = keywords[key]
-            elif key == 'iterationType':
-                self.iterationType = keywords[key]
-            elif key == 'analysis':
-                self.analysis = keywords[key]
+        self.returnType = returnType
+        self.iterationType = iterationType
+
+        if numberList is not None:
+            # TODO: overly complex order of setting...
+            self.numberList = numberList
+
+        if titleList is not None:
+            # TODO: overly complex order of setting...
+            self.titleList = titleList
 
         # These assignments must come after .iterationType
 
@@ -1167,7 +1176,8 @@ class Iterator:
         self._currentIndex += 1
         return nextChorale
 
-    # ### Functions
+    # ### Private Methods
+
     def _returnChorale(self, choraleIndex=None):
         # noinspection SpellCheckingInspection
         '''
@@ -1178,7 +1188,6 @@ class Iterator:
         of the current iteration. If the numberingSystem == 'title',
         the chorale is instead queried by Title
         from the titleList and the numberList is ignored.
-
 
         >>> from music21 import corpus
         >>> BCI = corpus.chorales.Iterator()
@@ -1294,7 +1303,6 @@ class Iterator:
         '''
         This takes a string such as '69.6-a' and returns a float for sorting.
         '''
-
         out = ''
         for char in bwv:
             if char.isdigit() or char == '.':
@@ -1439,7 +1447,7 @@ class Iterator:
                 if v in self._choraleList2.byTitle:
                     self._titleList.append(v)
                 else:
-                    print(f'{v} will be skipped because it is not a recognized title')
+                    warnings.warn(f'{v} will be skipped because it is not a recognized title')
         if not self._titleList:
             self._titleList = None
 
@@ -1470,7 +1478,7 @@ class Iterator:
                 if v in self._choraleList2.byRiemenschneider:
                     self._numberList.append(v)
                 else:
-                    print(
+                    warnings.warn(
                         f'{v} will be skipped because it is not in the numberingSystem '
                         + self.numberingSystem
                     )
@@ -1480,7 +1488,7 @@ class Iterator:
                 if v in self._choraleList2.byKalmus and v != 0:
                     self._numberList.append(v)
                 else:
-                    print(
+                    warnings.warn(
                         f'{v} will be skipped because it is not in the numberingSystem '
                         + self.numberingSystem
                     )
@@ -1490,7 +1498,7 @@ class Iterator:
                 if v in self._choraleList2.byBWV:
                     self._numberList.append(v)
                 else:
-                    print(
+                    warnings.warn(
                         f'{v} will be skipped because it is not in the numberingSystem '
                         + self.numberingSystem
                     )
@@ -1500,7 +1508,7 @@ class Iterator:
                 if v in self._choraleList1.byBudapest:
                     self._numberList.append(v)
                 else:
-                    print(
+                    warnings.warn(
                         f'{v} will be skipped because it is not in the numberingSystem '
                         + self.numberingSystem
                     )
@@ -1510,7 +1518,7 @@ class Iterator:
                 if v in self._choraleList1.byBaerenreiter:
                     self._numberList.append(v)
                 else:
-                    print(
+                    warnings.warn(
                         f'{v} will be skipped because it is not in the numberingSystem '
                         + self.numberingSystem
                     )
@@ -1518,13 +1526,12 @@ class Iterator:
         if self._numberList is None:
             self.currentNumber = 0
             self.highestNumber = 0
+        elif self.iterationType == 'number':
+            self.currentNumber = self._numberList[0]
+            self.highestNumber = self._numberList[-1]
         else:
-            if self.iterationType == 'number':
-                self.currentNumber = self._numberList[0]
-                self.highestNumber = self._numberList[-1]
-            else:
-                self.currentNumber = 0
-                self.highestNumber = len(self._numberList) - 1
+            self.currentNumber = 0
+            self.highestNumber = len(self._numberList) - 1
 
     numberList = property(_getNumberList, _setNumberList,
                           doc='''Allows access to the catalogue numbers
@@ -1773,9 +1780,6 @@ def getByTitle(title):
 class BachException(exceptions21.Music21Exception):
     pass
 
-
-# class Test(unittest.TestCase):
-#     pass
 
 class TestExternal(unittest.TestCase):
     show = True

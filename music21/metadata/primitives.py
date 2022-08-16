@@ -46,7 +46,6 @@ environLocal = environment.Environment(os.path.basename(__file__))
 
 # -----------------------------------------------------------------------------
 
-
 class Date(prebase.ProtoM21Object):
     r'''
     A single date value, specified by year, month, day, hour, minute, and
@@ -409,38 +408,13 @@ class Date(prebase.ProtoM21Object):
 
 
 # -----------------------------------------------------------------------------
-
-
-class DateSingle(prebase.ProtoM21Object):
-    r'''
-    Store a date, either as certain, approximate, or uncertain relevance.
-
-    The relevance attribute is limited within each DateSingle subclass
-    depending on the design of the class. Alternative relevance types should be
-    configured as other DateSingle subclasses.
-
-    >>> dd = metadata.DateSingle('2009/12/31', 'approximate')
-    >>> dd
-    <music21.metadata.primitives.DateSingle 2009/12/31>
-
-    >>> str(dd)
-    '2009/12/31'
-
-    >>> dd.relevance
-    'approximate'
-
-    >>> dd = metadata.DateSingle('1805/3/12', 'uncertain')
-    >>> str(dd)
-    '1805/03/12'
+class DatePrimitive(prebase.ProtoM21Object):
     '''
-
-    # CLASS VARIABLES #
-
-    isSingle = True
-
+    A default class for all date objects, which can have different types.
+    '''
     # INITIALIZER #
 
-    def __init__(self, data: str = '', relevance='certain'):
+    def __init__(self, relevance='certain'):
         self._data: t.List[Date] = []
         self._relevance = None  # managed by property
         # not yet implemented
@@ -448,7 +422,6 @@ class DateSingle(prebase.ProtoM21Object):
         # is certain, approximate, or uncertain
         # here, dataError is relevance
         self._dataError: t.List[str] = []
-        self._prepareData(data)
         self.relevance = relevance  # will use property
 
     # SPECIAL METHODS #
@@ -474,19 +447,7 @@ class DateSingle(prebase.ProtoM21Object):
         return str(self)
 
     def __str__(self):
-        return str(self._data[0])  # always the first
-
-    # PRIVATE METHODS #
-
-    def _prepareData(self, data: str):
-        r'''
-        Assume a string is supplied as argument
-        '''
-        # here, using a list to store one object; this provides more
-        # compatibility  w/ other formats
-        self._data = []  # clear list
-        self._data.append(Date())
-        self._data[0].load(data)
+        return str([str(d) for d in self._data])
 
     # PUBLIC PROPERTIES #
 
@@ -530,6 +491,47 @@ class DateSingle(prebase.ProtoM21Object):
                 f'Relevance value is not supported by this object: {value!r}')
 
 
+class DateSingle(DatePrimitive):
+    r'''
+    Store a date, either as certain, approximate, or uncertain relevance.
+
+    The relevance attribute is limited within each DateSingle subclass
+    depending on the design of the class. Alternative relevance types should be
+    configured as other DateSingle subclasses.
+
+    >>> dd = metadata.DateSingle('2009/12/31', 'approximate')
+    >>> dd
+    <music21.metadata.primitives.DateSingle 2009/12/31>
+
+    >>> str(dd)
+    '2009/12/31'
+
+    >>> dd.relevance
+    'approximate'
+
+    >>> dd = metadata.DateSingle('1805/3/12', 'uncertain')
+    >>> str(dd)
+    '1805/03/12'
+    '''
+    def __init__(self, data: str = '', relevance='certain'):
+        super().__init__(relevance)
+        self._prepareData(data)
+
+    def __str__(self):
+        return str(self._data[0])
+
+    def _prepareData(self, data: str):
+        r'''
+        Assume a string is supplied as argument
+        '''
+        # here, using a list to store one object; this provides more
+        # compatibility  w/ other formats
+        self._data = []  # clear list
+        self._data.append(Date())
+        self._data[0].load(data)
+
+
+
 # -----------------------------------------------------------------------------
 
 
@@ -551,14 +553,11 @@ class DateRelative(DateSingle):
         supported by this object: 'certain'
     '''
 
-    # CLASS VARIABLES #
-
-    isSingle = True
-
     # INITIALIZER #
 
-    def __init__(self, data='', relevance='after'):  # pylint: disable=useless-super-delegation
-        super().__init__(data, relevance)
+    def __init__(self, data='', relevance='after'):
+        # not a useless constructor because default value for relevance changed
+        super().__init__(data, relevance)  # pylint: disable=useless-super-delegation
 
     # PUBLIC PROPERTIES #
 
@@ -597,7 +596,7 @@ class DateRelative(DateSingle):
 # -----------------------------------------------------------------------------
 
 
-class DateBetween(DateSingle):
+class DateBetween(DatePrimitive):
     r'''
     Store a relative date, sometime between two dates:
 
@@ -610,17 +609,13 @@ class DateBetween(DateSingle):
     music21.exceptions21.MetadataException: Relevance value is not
         supported by this object: 'certain'
     '''
-
-    # CLASS VARIABLES #
-
-    isSingle = False
-
     # INITIALIZER #
 
     def __init__(self, data: t.Optional[t.Iterable[str]] = None, relevance='between'):
         if data is None:
             data = []
-        super().__init__(data, relevance)
+        super().__init__(relevance)
+        self._prepareData(data)
 
     # SPECIAL METHODS #
 
@@ -666,7 +661,7 @@ class DateBetween(DateSingle):
 # -----------------------------------------------------------------------------
 
 
-class DateSelection(DateSingle):
+class DateSelection(DatePrimitive):
     r'''
     Store a selection of dates, or a collection of dates that might all be
     possible
@@ -695,8 +690,11 @@ class DateSelection(DateSingle):
 
     def __init__(self,
                  data: t.Optional[t.Iterable[str]] = None,
-                 relevance='or'):  # pylint: disable=useless-super-delegation
-        super().__init__(data, relevance)
+                 relevance='or'):
+        super().__init__(relevance)
+        if data is None:
+            data = []
+        self._prepareData(data)
 
     # SPECIAL METHODS #
 
@@ -717,7 +715,7 @@ class DateSelection(DateSingle):
         for part in data:
             d = Date()
             d.load(part)
-            self._data.append(d)  # a lost of Date objects
+            self._data.append(d)  # a list of Date objects
             # can look at Date and determine overall error
             self._dataError.append(None)
 
@@ -1020,8 +1018,8 @@ class Contributor(prebase.ProtoM21Object):
         if names:  # many
             for n in names:
                 self._names.append(Text(n))
-        # store the nationality, if known
-        self._nationality = []
+        # store the nationality, if known (not currently used)
+        self._nationality: t.List[Text] = []
 
         self.birth: t.Optional[DateSingle] = None
         self.death: t.Optional[DateSingle] = None
