@@ -271,7 +271,7 @@ class RnWriter(prebase.ProtoM21Object):
                     measureString += f' {chordString}'
 
             if measureString != 'm' + thisMeasureNumber:  # not if empty (number only)
-                    self.combinedList.append(measureString)
+                self.combinedList.append(measureString)
 
     def getChordString(self,
                        rn: roman.RomanNumeral):
