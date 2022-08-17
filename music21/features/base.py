@@ -350,7 +350,7 @@ class StreamForms:
                 prepared = self.keysToMethods[lastKey](self, prepared)
             elif lastKey.startswith('getElementsByClass('):
                 classToGet: str = lastKey[len('getElementsByClass('):-1]
-                prepared = prepared.getElementsByClass(classToGet)
+                prepared = prepared.getElementsByClass(classToGet).stream()
             else:
                 raise AttributeError(f'no such attribute: {lastKey} in {key}')
             self.forms[subKey] = prepared
@@ -361,8 +361,8 @@ class StreamForms:
         # note that this does not optimize and cache part presentations
         histo = [0] * 128
         # if we have parts, must add one at a time
-        if self.prepared.hasPartLikeStreams():
-            parts = self.prepared.parts
+        if isinstance(self.prepared, stream.Score):
+            parts = list(self.prepared.parts)
         else:
             parts = [self.prepared]  # emulate a list
         for p in parts:
