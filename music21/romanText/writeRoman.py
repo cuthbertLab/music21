@@ -276,7 +276,7 @@ class RnWriter(prebase.ProtoM21Object):
     def getChordString(self,
                        rn: roman.RomanNumeral):
         '''
-        Produce a string from a Roman number with the chord and
+        Produce a string from a Roman numeral with the chord and
         the key if that key constitutes a change from the foregoing context.
 
         >>> p = stream.Part()
