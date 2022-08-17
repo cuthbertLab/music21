@@ -243,6 +243,22 @@ class RnWriter(prebase.ProtoM21Object):
         >>> testCase.combinedList[-1]  # Last entry, after the metadata
         'm1 G: V'
 
+        This follows the wider rntxt syntax in supporting
+        Time Signature (:class:`~music21.meter.TimeSignature`) changes and
+        Repeats marks (:class:`~music21.bar.Repeat`)
+        but only (currently) between measures.
+        Mid-measure repeats are an open issue (much wider than rntxt).
+
+        >>> m2 = stream.Measure(number=2)
+        >>> m2.insert(0, meter.TimeSignature('3/4'))
+        >>> m2.leftBarline = bar.Repeat(direction='start')
+        >>> m2.rightBarline = bar.Repeat(direction='end')
+        >>> m2.insert(0, roman.RomanNumeral('I', 'G'))
+        >>> p.insert(m2)
+        >>> testCase = romanText.writeRoman.RnWriter(p)
+        >>> testCase.combinedList[-1]
+        'm2 ||: I :||'
+
         '''
 
         for thisMeasure in self.container.getElementsByClass(stream.Measure):
@@ -261,6 +277,11 @@ class RnWriter(prebase.ProtoM21Object):
             thisMeasureNumber = thisMeasure.measureNumberWithSuffix()  # now str
             measureString = 'm' + thisMeasureNumber
 
+            # Start repeat
+            if thisMeasure.leftBarline:
+                if 'Repeat' in thisMeasure.leftBarline.classes:
+                    measureString += ' ||:'  # immediately after measure number
+
             # Roman Numerals
             rnsThisMeasure = thisMeasure.getElementsByClass(roman.RomanNumeral)
             for rn in rnsThisMeasure:
@@ -269,6 +290,11 @@ class RnWriter(prebase.ProtoM21Object):
                     if rn.beat != 1:  # b1 not needed
                         measureString += f' b{intBeat(rn.beat)}'
                     measureString += f' {chordString}'
+
+            # End repeat
+            if thisMeasure.rightBarline:
+                if 'Repeat' in thisMeasure.rightBarline.classes:
+                    measureString += ' :||'  # EOL
 
             if measureString != 'm' + thisMeasureNumber:  # not if empty (number only)
                 self.combinedList.append(measureString)
