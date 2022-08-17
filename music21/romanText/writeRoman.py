@@ -235,13 +235,13 @@ class RnWriter(prebase.ProtoM21Object):
         adding this to the (already prepared) metadata preamble ready for printing.
 
         >>> p = stream.Part()
-        >>> m = stream.Measure()
+        >>> m = stream.Measure(number=1)
         >>> m.insert(0, meter.TimeSignature('4/4'))
         >>> m.insert(0, roman.RomanNumeral('V', 'G'))
-        >>> p.insert(0, m)
+        >>> p.insert(m)
         >>> testCase = romanText.writeRoman.RnWriter(p)
         >>> testCase.combinedList[-1]  # Last entry, after the metadata
-        'm0 G: V'
+        'm1 G: V'
 
         '''
 
