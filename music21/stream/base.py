@@ -7074,10 +7074,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             else:
                 return  # exit
 
-        # need to just get .notesAndRests, as there may be other objects in the Measure
+        # need to just get .notesAndRests with a nonzero duration,
+        # as there may be other objects in the Measure
         # that come before the first Note, such as a SystemLayout object
+        # or there could be ChordSymbols with zero (unrealized) durations
         f = returnObj.flatten()
-        notes_and_rests = f.notesAndRests.stream()
+        notes_and_rests = f.notesAndRests.addFilter(
+            lambda el, iterator: el.quarterLength > 0
+        ).stream()
 
         posConnected = []  # temporary storage for index of tied notes
         posDelete = []  # store deletions to be processed later

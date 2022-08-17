@@ -405,4 +405,3 @@ _DOC_ORDER: t.List[type] = []
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

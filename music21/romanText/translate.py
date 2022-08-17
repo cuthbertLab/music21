@@ -123,6 +123,7 @@ OMIT_FROM_DOCS
 ['F#5', 'A5', 'C6']
 '''
 import copy
+import textwrap
 import traceback
 import typing as t
 import unittest
@@ -136,7 +137,9 @@ from music21 import key
 from music21 import metadata
 from music21 import meter
 from music21 import note
+from music21 import repeat
 from music21 import roman
+from music21 import spanner
 from music21 import stream
 from music21 import tie
 from music21.romanText import rtObjects
@@ -674,7 +677,6 @@ class PartTranslator:
         self.numberOfAtomsInCurrentMeasure = len(measureToken.atoms)
         # first RomanNumeral object after a key change should have this set to True
         self.setKeyChangeToken = False
-
         for i, a in enumerate(measureToken.atoms):
             isLastAtomInMeasure = (i == self.numberOfAtomsInCurrentMeasure - 1)
             self.translateSingleMeasureAtom(a, m, isLastAtomInMeasure=isLastAtomInMeasure)
@@ -781,15 +783,21 @@ class PartTranslator:
         elif isinstance(a, rtObjects.RTChord):
             self.processRTChord(a, m, self.currentOffsetInMeasure)
         elif isinstance(a, rtObjects.RTRepeat):
-            if self.currentOffsetInMeasure == 0:
+            if isinstance(a, rtObjects.RTRepeatStop) and isLastAtomInMeasure:
+                # This condition needs to be moved here because it is possible
+                #   and indeed likely that an end repeat will have an offset of
+                #   0 in the case that there is 0 or 1 harmonies in the measure.
+                # Is it ok, however, that this condition will match if self.tsCurrent
+                #   is None? Previously, that case was excluded below.
+                m.rightBarline = bar.Repeat(direction='end')
+            elif self.currentOffsetInMeasure == 0:
                 if isinstance(a, rtObjects.RTRepeatStart):
                     m.leftBarline = bar.Repeat(direction='start')
                 else:
                     rtt = RomanTextUnprocessedToken(a)
                     m.coreInsert(self.currentOffsetInMeasure, rtt)
             elif (self.tsCurrent is not None
-                    and (self.tsCurrent.barDuration.quarterLength == self.currentOffsetInMeasure
-                         or isLastAtomInMeasure)):
+                    and self.tsCurrent.barDuration.quarterLength == self.currentOffsetInMeasure):
                 if isinstance(a, rtObjects.RTRepeatStop):
                     m.rightBarline = bar.Repeat(direction='end')
                 else:
@@ -1041,7 +1049,6 @@ def _addRepeatsFromRepeatEndings(s, repeatEndings):
     '''
     given a Stream and the repeatEndings dict, add repeats to the stream...
     '''
-    from music21 import spanner
     consolidatedRepeats = _consolidateRepeatEndings(repeatEndings)
     for repeatEndingTuple in consolidatedRepeats:
         measureList, endingNumber = repeatEndingTuple[0], repeatEndingTuple[1]
@@ -1574,13 +1581,8 @@ m1 C: I'''
         m25 = p.getElementsByClass(stream.Measure)[24]
         self.assertEqual(m25.getOffsetBySite(p), 88.0)
 
-    def testEndings(self):
-        # has first and second endings...
-
-        from music21.romanText import testFiles
-        from music21 import converter
-        unused_s = converter.parse(testFiles.mozartK283_2_opening, format='romanText')
-        # s.show('text')
+    # testEndings (which was incomplete in any case) has been superseded by
+    #   testRepeats below
 
     def testTuplets(self):
         from music21 import converter
@@ -1604,6 +1606,121 @@ m1 C: I'''
         self.assertEqual(n1.duration.quarterLength, common.opFrac(11 / 6))
         self.assertEqual(n2.offset, common.opFrac(11 / 6))
         self.assertEqual(n2.duration.quarterLength, common.opFrac(13 / 6))
+
+    def testRepeats(self) -> None:
+        from music21 import converter
+
+        def _repeat_tester(
+            repeat_bar: bar.Repeat, direction: str, offset: float, mNumber: int
+        ) -> None:
+            self.assertEqual(repeat_bar.direction, direction)
+            self.assertEqual(repeat_bar.offset, offset)
+            self.assertEqual(repeat_bar.activeSite.number, mNumber)
+
+        def _test_expanded(s: stream.Stream, quarterLength: float) -> None:
+            # NB repeat.Expander does not work on stream, only on part. Is this
+            #   expected behavior?
+            p = next(s[stream.Part])
+            e = repeat.Expander(p)
+            self.assertTrue(e.repeatBarsAreCoherent())
+            p2 = e.process()
+            self.assertEqual(p2.quarterLength, quarterLength)
+
+        def _test_ending_contents(
+            rb: spanner.RepeatBracket, expectedMeasures: t.List[str]
+        ) -> None:
+            measure_nos = [m.measureNumberWithSuffix() for m in rb[stream.Measure]]
+            self.assertEqual(measure_nos, expectedMeasures)
+
+        # Test simple repeats
+        simple_repeats = textwrap.dedent('''
+            Time Signature: 3/4
+            m1: ||: V
+            m2: I :||
+        ''')
+        s = converter.parse(simple_repeats, format='romanText')
+        br_iter = s[bar.Repeat]
+        self.assertEqual(len(br_iter), 2)
+        start_repeat, end_repeat = br_iter
+        _repeat_tester(start_repeat, 'start', 0.0, 1)
+        _repeat_tester(end_repeat, 'end', 3.0, 2)
+        _test_expanded(s, 12.0)
+
+        single_bar_repeats = textwrap.dedent('''
+            Time Signature: 2/4
+            m1: ||: I :||
+        ''')
+        s = converter.parse(single_bar_repeats, format='romanText')
+        br_iter = s[bar.Repeat]
+        self.assertEqual(len(br_iter), 2)
+        start_repeat, end_repeat = br_iter
+        _repeat_tester(start_repeat, 'start', 0.0, 1)
+        _repeat_tester(end_repeat, 'end', 2.0, 1)
+        _test_expanded(s, 4.0)
+
+        empty_bars_with_repeats = textwrap.dedent('''
+            Time Signature: 2/4
+            m1: I
+            m2: ||:
+            m3: :||
+            m4: ||: :||
+        ''')
+        s = converter.parse(empty_bars_with_repeats, format='romanText')
+        br_iter = s[bar.Repeat]
+        self.assertEqual(len(br_iter), 4)
+        start_repeat1, end_repeat1, start_repeat2, end_repeat2 = br_iter
+        _repeat_tester(start_repeat1, 'start', 0.0, 2)
+        _repeat_tester(end_repeat1, 'end', 2.0, 3)
+        _repeat_tester(start_repeat2, 'start', 0.0, 4)
+        _repeat_tester(end_repeat2, 'end', 2.0, 4)
+        _test_expanded(s, 14.0)
+
+        three_endings = textwrap.dedent('''
+            Time Signature: 3/4
+            m1: ||: I
+            m2a: IV :||
+            m2b: V :||
+            m2c: I
+        ''')
+        s = converter.parse(three_endings, format='romanText')
+        br_iter = s[bar.Repeat]
+        self.assertEqual(len(br_iter), 3)
+        start_repeat, end_repeat1, end_repeat2 = br_iter
+        _repeat_tester(start_repeat, 'start', 0.0, 1)
+        _repeat_tester(end_repeat1, 'end', 3.0, 2)
+        _repeat_tester(end_repeat2, 'end', 3.0, 2)
+        rb_iter = s[spanner.RepeatBracket]
+        self.assertEqual(len(rb_iter), 3)
+        first_ending, second_ending, third_ending = rb_iter
+        _test_ending_contents(first_ending, ['2a'])
+        _test_ending_contents(second_ending, ['2b'])
+        _test_ending_contents(third_ending, ['2c'])
+        _test_expanded(s, 18.0)
+
+        more_complex_example = textwrap.dedent('''
+            TimeSignature: 3/4
+            m1: ||: I
+            m2a: IV
+            m3a: V :||
+            m2b: V :||
+            m2c: IV
+            m3c: V
+            m4: I
+        ''')
+        s = converter.parse(more_complex_example, format='romanText')
+        br_iter = s[bar.Repeat]
+        self.assertEqual(len(br_iter), 3)
+        start_repeat, end_repeat1, end_repeat2 = s[bar.Repeat]
+        _repeat_tester(start_repeat, 'start', 0.0, 1)
+        _repeat_tester(end_repeat1, 'end', 3.0, 3)
+        _repeat_tester(end_repeat2, 'end', 3.0, 2)
+        rb_iter = s[spanner.RepeatBracket]
+        self.assertEqual(len(rb_iter), 3)
+        first_ending, second_ending, third_ending = rb_iter
+        _test_ending_contents(first_ending, ['2a', '3a'])
+        _test_ending_contents(second_ending, ['2b'])
+        _test_ending_contents(third_ending, ['2c', '3c'])
+        _test_expanded(s, 27.0)
 
 
 # ------------------------------------------------------------------------------

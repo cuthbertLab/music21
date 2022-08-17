@@ -2766,5 +2766,3 @@ _DOC_ORDER: t.List[type] = [Spanner]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-
