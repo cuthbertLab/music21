@@ -2890,6 +2890,8 @@ class Interval(IntervalBase):
                  *,
                  diatonic: t.Optional[DiatonicInterval] = None,
                  chromatic: t.Optional[ChromaticInterval] = None,
+                 pitchStart: t.Optional['music21.pitch.Pitch'] = None,
+                 pitchEnd: t.Optional['music21.pitch.Pitch'] = None,
                  noteStart: t.Union['music21.note.Note', 'music21.pitch.Pitch', None] = None,
                  noteEnd: t.Union['music21.note.Note', 'music21.pitch.Pitch', None] = None,
                  name: t.Optional[str] = None,
@@ -2910,20 +2912,21 @@ class Interval(IntervalBase):
         self.diatonic: t.Optional[DiatonicInterval] = diatonic
         self.chromatic: t.Optional[ChromaticInterval] = chromatic
 
-        # these can be accessed through noteStart and noteEnd properties
-        self._noteStart: t.Optional['music21.note.Note'] = None
-        self._noteEnd: t.Optional['music21.note.Note'] = None
-        for attr, possible in (('_noteStart', noteStart), ('_noteEnd', noteEnd)):
-            forcedNote: t.Optional['music21.note.Note']
-            if possible is None:
-                forcedNote = None
-            elif hasattr(possible, 'classes') and 'Pitch' in possible.classes:
-                from music21 import note
-                forcedNote = note.Note(pitch=possible, duration=self.duration)
-                self.duration.client = self
+        # these can be accessed through pitchStart and pitchEnd properties
+        self._pitchStart: t.Optional['music21.pitch.Pitch'] = None
+        self._pitchEnd: t.Optional['music21.pitch.Pitch'] = None
+        for attr, possiblePitch, possibleNote in (('_pitchStart', pitchStart, noteStart),
+                                                  ('_pitchEnd', pitchEnd, noteEnd)):
+            forcedPitch: t.Optional['music21.pitch.Pitch']
+            if possiblePitch is None and possibleNote is None:
+                forcedPitch = None
             else:
-                forcedNote = t.cast('music21.note.Note', possible)
-            setattr(self, attr, forcedNote)
+                possible = possiblePitch if possiblePitch is not None else possibleNote
+                if hasattr(possible, 'classes') and 'Pitch' in possible.classes:
+                    forcedPitch = t.cast('music21.pitch.Pitch', possible)
+                else:
+                    forcedPitch = t.cast('music21.note.Note', possible).pitch
+            setattr(self, attr, forcedPitch)
 
         self.type = ''  # harmonic or melodic
         self.implicitDiatonic = False  # is this basically a ChromaticInterval object in disguise?
@@ -2947,30 +2950,28 @@ class Interval(IntervalBase):
               and hasattr(arg1, 'classes')
               and 'Pitch' in arg0.classes
               and 'Pitch' in arg1.classes):
-            from music21 import note
-            self._noteStart = note.Note(pitch=arg0, duration=self.duration)
-            self._noteEnd = note.Note(pitch=arg1, duration=self.duration)
-            self.duration.client = self
+            self._pitchStart = t.cast('music21.pitch.Pitch', arg0)
+            self._pitchEnd = t.cast('music21.pitch.Pitch', arg1)
 
         elif (hasattr(arg0, 'isNote')
               and hasattr(arg1, 'isNote')
               and arg0.isNote is True
               and arg1.isNote is True):
-            self._noteStart = arg0
-            self._noteEnd = arg1
+            self._pitchStart =  t.cast('music21.pitch.Note', arg0).pitch
+            self._pitchEnd = t.cast('music21.pitch.Note', arg1).pitch
 
         # catch case where only one Note is provided
         if (self.diatonic is None and self.chromatic is None
-                and ((self._noteStart is not None and self._noteEnd is None)
-                    or (self._noteEnd is not None and self._noteStart is None))):
+                and ((self._pitchStart is not None and self._pitchEnd is None)
+                    or (self._pitchEnd is not None and self._pitchStart is None))):
             raise IntervalException(
-                'either both the starting and the ending note must be '
+                'either both the starting and the ending pitch must be '
                 + 'given or neither can be given.  You cannot have one without the other.'
             )
 
-        if self._noteStart is not None and self._noteEnd is not None:
-            genericInterval = notesToGeneric(self._noteStart, self._noteEnd)
-            chromaticInterval = notesToChromatic(self._noteStart, self._noteEnd)
+        if self._pitchStart is not None and self._noteEnd is not None:
+            genericInterval = notesToGeneric(self._pitchStart, self._noteEnd)
+            chromaticInterval = notesToChromatic(self._pitchStart, self._noteEnd)
             diatonicInterval = intervalsToDiatonic(genericInterval, chromaticInterval)
             if self.diatonic is not None and diatonicInterval.name != self.diatonic.name:
                 raise IntervalException(
@@ -2998,9 +2999,9 @@ class Interval(IntervalBase):
             self.chromatic = self.diatonic.getChromatic()
 
         if self.diatonic is not None:
-            if self._noteStart is not None and self._noteEnd is None:
-                self.noteStart = self._noteStart  # this sets noteEnd by property
-            elif self._noteEnd is not None and self._noteStart is None:
+            if self._pitchStart is not None and self._noteEnd is None:
+                self.noteStart = self._pitchStart  # this sets noteEnd by property
+            elif self._noteEnd is not None and self._pitchStart is None:
                 self.noteEnd = self._noteEnd  # this sets noteStart by property
 
 
@@ -3284,8 +3285,8 @@ class Interval(IntervalBase):
         >>> aInterval.cents
         400.0
 
-        >>> n1 = note.Note('C4')
-        >>> n2 = note.Note('D4')
+        >>> n1 = pitch.Pitch('C4')
+        >>> n2 = pitch.Pitch('D4')
         >>> n2.pitch.microtone = 30
         >>> microtoneInterval = interval.Interval(noteStart=n1, noteEnd=n2)
         >>> microtoneInterval.cents
@@ -3481,11 +3482,11 @@ class Interval(IntervalBase):
     def reverse(self):
         '''
         Return an reversed version of this interval.
-        If :class:`~music21.note.Note` objects are stored as
+        If :class:`~music21.pitch.Pitch` objects are stored as
         `noteStart` and `noteEnd`, these notes are reversed.
 
-        >>> n1 = note.Note('c3')
-        >>> n2 = note.Note('g3')
+        >>> n1 = pitch.Pitch('c3')
+        >>> n2 = pitch.Pitch('g3')
         >>> aInterval = interval.Interval(noteStart=n1, noteEnd=n2)
         >>> aInterval
         <music21.interval.Interval P5>
@@ -3499,90 +3500,89 @@ class Interval(IntervalBase):
         >>> aInterval.reverse()
         <music21.interval.Interval m-3>
         '''
-        if self._noteStart is not None and self._noteEnd is not None:
-            return Interval(noteStart=self._noteEnd, noteEnd=self._noteStart)
+        if self._pitchStart is not None and self._noteEnd is not None:
+            return Interval(noteStart=self._noteEnd, noteEnd=self._pitchStart)
         else:
             return Interval(diatonic=self.diatonic.reverse(),
                             chromatic=self.chromatic.reverse())
 
-    def _getNoteStart(self):
+    def _getPitchStart(self):
         '''
-        returns self._noteStart
+        returns self._pitchStart
         '''
-        return self._noteStart
+        return self._pitchStart
 
-    def _setNoteStart(self, n):
+    def _setPitchStart(self, p):
         '''
         Assuming that this interval is defined,
-        we can set a new start note (_noteStart) and
-        automatically have the end note (_noteEnd).
+        we can set a new start Pitch (_pitchStart) and
+        automatically set the end Pitch (_pitchEnd).
         '''
         # this is based on the procedure found in transposePitch() and
         # transposeNote() but offers a more object-oriented approach
-        pitch2 = self.transposePitch(n.pitch)
-        self._noteStart = n
+        pitch2 = self.transposePitch(p)
+        self._pitchStart = p
         # prefer to copy the existing noteEnd if it exists, or noteStart if not
-        self._noteEnd = copy.deepcopy(self._noteEnd or self._noteStart)
-        self._noteEnd.pitch = pitch2
+        self._pitchEnd = pitch2
 
-    noteStart = property(_getNoteStart, _setNoteStart,
+    pitchStart = property(_getPitchStart, _setPitchStart,
                          doc='''
-        Assuming this Interval has been defined, set the start note to a new value;
-        this will adjust the value of the end note (`noteEnd`).
+        Assuming this Interval has been defined, set the start pitch to a new value;
+        this will adjust the value of the end pitch (`pitchEnd`).
 
         >>> aInterval = interval.Interval('M3')
-        >>> aInterval.noteStart = note.Note('c4')
-        >>> aInterval.noteEnd.nameWithOctave
+        >>> aInterval.pitchStart = pitch.Pitch('c4')
+        >>> aInterval.pitchEnd.nameWithOctave
         'E4'
 
-        >>> n1 = note.Note('c3')
-        >>> n2 = note.Note('g#3')
+        >>> n1 = pitch.Pitch('c3')
+        >>> n2 = pitch.Pitch('g#3')
         >>> aInterval = interval.Interval(n1, n2)
         >>> aInterval.name
         'A5'
-        >>> aInterval.noteStart = note.Note('g4')
-        >>> aInterval.noteEnd.nameWithOctave
+        >>> aInterval.pitchStart = pitch.Pitch('g4')
+        >>> aInterval.pitchEnd.nameWithOctave
         'D#5'
 
         >>> aInterval = interval.Interval('-M3')
-        >>> aInterval.noteStart = note.Note('c4')
-        >>> aInterval.noteEnd.nameWithOctave
+        >>> aInterval.pitchStart = pitch.Pitch('c4')
+        >>> aInterval.pitchEnd.nameWithOctave
         'A-3'
 
         >>> aInterval = interval.Interval('M-2')
-        >>> aInterval.noteStart = note.Note('A#3')
-        >>> aInterval.noteEnd.nameWithOctave
+        >>> aInterval.pitchStart = pitch.Pitch('A#3')
+        >>> aInterval.pitchEnd.nameWithOctave
         'G#3'
 
         >>> aInterval = interval.Interval('h')
         >>> aInterval.directedName
         'm2'
-        >>> aInterval.noteStart = note.Note('F#3')
-        >>> aInterval.noteEnd.nameWithOctave
+        >>> aInterval.pitchStart = pitch.Pitch('F#3')
+        >>> aInterval.pitchEnd.nameWithOctave
         'G3'
         ''')
 
     def _setNoteEnd(self, n):
         '''
         Assuming that this interval is defined, we can
-        set a new end note (_noteEnd) and automatically have the start note (_noteStart).
+        set a new end note (_pitchEnd) and automatically have the start note (_noteStart).
         '''
         # this is based on the procedure found in transposePitch() but offers
         # a more object-oriented approach
         pitch1 = self.transposePitch(n.pitch, reverse=True)
 
-        self._noteEnd = n
-        # prefer to copy the noteStart if it exists, or noteEnd if not
-        self._noteStart = copy.deepcopy(self._noteStart or self._noteEnd)
+        self._pitchEnd = n
+        # prefer to copy the noteStart if it exists, or pitchEnd if not
+        self._noteStart = copy.deepcopy(self._noteStart or self._pitchEnd)
         self._noteStart.pitch = pitch1
 
     def _getNoteEnd(self):
         '''
-        returns self._noteEnd
+        returns self._pitchEnd
         '''
-        return self._noteEnd
+        return self._pitchEnd
 
-    noteEnd = property(_getNoteEnd, _setNoteEnd,
+    pitchEnd = property(_getNoteEnd, _setNoteEnd,
                        doc='''
         Assuming this Interval has been defined, set the
         end note to a new value; this will adjust
@@ -3590,26 +3590,26 @@ class Interval(IntervalBase):
 
 
         >>> aInterval = interval.Interval('M3')
-        >>> aInterval.noteEnd = note.Note('E4')
+        >>> aInterval.pitchEnd = pitch.Pitch('E4')
         >>> aInterval.noteStart.nameWithOctave
         'C4'
 
         >>> aInterval = interval.Interval('m2')
-        >>> aInterval.noteEnd = note.Note('A#3')
+        >>> aInterval.pitchEnd = pitch.Pitch('A#3')
         >>> aInterval.noteStart.nameWithOctave
         'G##3'
 
-        >>> n1 = note.Note('G#3')
-        >>> n2 = note.Note('C3')
+        >>> n1 = pitch.Pitch('G#3')
+        >>> n2 = pitch.Pitch('C3')
         >>> aInterval = interval.Interval(n1, n2)
         >>> aInterval.directedName  # downward augmented fifth
         'A-5'
-        >>> aInterval.noteEnd = note.Note('C4')
+        >>> aInterval.pitchEnd = pitch.Pitch('C4')
         >>> aInterval.noteStart.nameWithOctave
         'G#4'
 
         >>> aInterval = interval.Interval('M3')
-        >>> aInterval.noteEnd = note.Note('A-3')
+        >>> aInterval.pitchEnd = pitch.Pitch('A-3')
         >>> aInterval.noteStart.nameWithOctave
         'F-3'
         ''')
@@ -3654,7 +3654,7 @@ def getWrittenHigherNote(note1, note2):
 
 def getAbsoluteHigherNote(note1, note2):
     '''
-    Given two :class:`~music21.note.Note` objects,
+    Given two :class:`~music21.note.Note` or :class:`~music21.pitch.Pitch` objects,
     returns the higher note based on actual frequency.
     If both pitches are the same, returns the first note given.
 
@@ -3681,15 +3681,15 @@ def getWrittenLowerNote(note1, note2):
     the same, or the first note if pitch is also the same.
 
 
-    >>> aNote = note.Note('c#3')
-    >>> bNote = note.Note('d--3')
+    >>> aNote = pitch.Pitch('c#3')
+    >>> bNote = pitch.Pitch('d--3')
     >>> interval.getWrittenLowerNote(aNote, bNote)
-    <music21.note.Note C#>
+    <music21.pitch.Pitch C#3>
 
-    >>> aNote = note.Note('c#3')
-    >>> bNote = note.Note('d-3')
+    >>> aNote = pitch.Pitch('c#3')
+    >>> bNote = pitch.Pitch('d-3')
     >>> interval.getWrittenLowerNote(aNote, bNote)
-    <music21.note.Note C#>
+    <music21.pitch.Pitch C#3>
     '''
     (p1, p2) = (_extractPitch(note1), _extractPitch(note2))
 
@@ -3705,15 +3705,15 @@ def getWrittenLowerNote(note1, note2):
 
 def getAbsoluteLowerNote(note1, note2):
     '''
-    Given two :class:`~music21.note.Note` objects, returns
-    the lower note based on actual pitch.
+    Given two :class:`~music21.note.Note` or :class:`~music21.pitch.Pitch` objects, returns
+    the lower pitch based on actual pitch.
     If both pitches are the same, returns the first note given.
 
 
-    >>> aNote = note.Note('c#3')
-    >>> bNote = note.Note('d--3')
+    >>> aNote = pitch.Pitch('c#3')
+    >>> bNote = pitch.Pitch('d--3')
     >>> interval.getAbsoluteLowerNote(aNote, bNote)
-    <music21.note.Note D-->
+    <music21.pitch.Pitch D--3>
     '''
     chromatic = notesToChromatic(note1, note2)
     semitones = chromatic.semitones
@@ -3811,9 +3811,6 @@ def notesToInterval(n1, n2=None):
 
     Works equally well with :class:`~music21.pitch.Pitch` objects.
 
-    N.B.: MOVE TO PRIVATE USE.  Use: interval.Interval(noteStart=aNote, noteEnd=bNote) instead.
-    Do not remove because used in interval.Interval()!
-
     >>> aNote = note.Note('c4')
     >>> bNote = note.Note('g5')
     >>> aInterval = interval.notesToInterval(aNote, bNote)
@@ -3851,7 +3848,9 @@ def notesToInterval(n1, n2=None):
     >>> interval.notesToInterval(pitch.Pitch('e##4'), pitch.Pitch('f--5'))
     <music21.interval.Interval dddd9>
     '''
-    # note to self:  what's going on with the Note() representation in help?
+    # N.B.: MOVE TO PRIVATE USE.  Use: interval.Interval(noteStart=aNote, noteEnd=bNote) instead.
+    # Do not remove because used in interval.Interval()!
+
     if n2 is None:
         # this is not done in the constructor originally because of looping problems
         # with tinyNotationNote
@@ -3865,8 +3864,8 @@ def notesToInterval(n1, n2=None):
     gInt = notesToGeneric(n1, n2)
     cInt = notesToChromatic(n1, n2)
     intObj = intervalFromGenericAndChromatic(gInt, cInt)
-    intObj._noteStart = n1  # use private so as not to trigger resetting behavior
-    intObj._noteEnd = n2
+    intObj._pitchStart = n1.pitch  # use private so as not to trigger resetting behavior
+    intObj._pitchEnd = n2.pitch
     return intObj
 
 
