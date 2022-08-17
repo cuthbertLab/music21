@@ -262,10 +262,11 @@ def getMd5(value=None) -> str:
 
 
 def formatStr(msg,
-              *args,
-              format: t.Optional[str] = None,  # pylint: disable=redefined-builtin
+              *rest_of_message,
               **keywords) -> str:
     '''
+    DEPRECATED: do not use.  May be removed at any time.
+
     Format one or more data elements into string suitable for printing
     straight to stderr or other outputs
 
@@ -274,8 +275,7 @@ def formatStr(msg,
     test 1 2 3
     <BLANKLINE>
     '''
-
-    msg = [msg] + list(args)
+    msg = [msg, *rest_of_message]
     for i in range(len(msg)):
         x = msg[i]
         if isinstance(x, bytes):
@@ -288,10 +288,7 @@ def formatStr(msg,
                     msg[i] = x.decode('utf-8')
                 except AttributeError:
                     msg[i] = ''
-    if format == 'block':
-        return '\n*** '.join(msg) + '\n'
-    else:  # catch all others
-        return ' '.join(msg) + '\n'
+    return ' '.join(msg) + '\n'
 
 
 def stripAccents(inputString: str) -> str:

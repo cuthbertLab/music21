@@ -4116,7 +4116,6 @@ class Pitch(prebase.ProtoM21Object):
 
         However, isEnharmonic() for A## and B certainly returns True.
 
-
         >>> p = pitch.Pitch('d#')
         >>> print(p.getEnharmonic())
         E-
@@ -4178,6 +4177,7 @@ class Pitch(prebase.ProtoM21Object):
                 post.getHigherEnharmonic(inPlace=True)
 
         if inPlace:
+            self.informClient()
             return None
         else:
             return post

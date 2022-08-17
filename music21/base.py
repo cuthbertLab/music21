@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'8.0.0a10'
+'8.0.0a11'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -1160,11 +1160,11 @@ class Music21Object(prebase.ProtoM21Object):
             if obj is None:  # pragma: no cover
                 continue
             if spannerClassList is None:
-                post.append(obj.spannerParent)
+                post.append(obj.client)
             else:
                 for spannerClass in spannerClassList:
-                    if spannerClass in obj.spannerParent.classSet:
-                        post.append(obj.spannerParent)
+                    if spannerClass in obj.client.classSet:
+                        post.append(obj.client)
                         break
 
         return post
@@ -2364,7 +2364,7 @@ class Music21Object(prebase.ProtoM21Object):
         thus the place where `.offset` looks to find its number.
 
         >>> m2 = stream.Measure()
-        >>> m2.insert(3.0/5, n1)
+        >>> m2.insert(3/5, n1)
         >>> m2.number = 5
         >>> n1.offset
         Fraction(3, 5)
@@ -2385,19 +2385,16 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n1.offset
         10.0
 
-
         The property can also set the offset for the object if no
         container has been set:
 
-
         >>> n1 = note.Note()
         >>> n1.id = 'hi'
-        >>> n1.offset = 20/3.
+        >>> n1.offset = 20/3
         >>> n1.offset
         Fraction(20, 3)
         >>> float(n1.offset)
         6.666...
-
 
         >>> s1 = stream.Stream()
         >>> s1.append(n1)

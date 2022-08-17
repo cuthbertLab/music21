@@ -125,7 +125,7 @@ class Graph(prebase.ProtoM21Object):
         'xTickLabelVerticalAlignment',
     )
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         extm = getExtendedModules()
         self.plt = extm.plt  # wrapper to matplotlib.pyplot
 
@@ -600,11 +600,11 @@ class GraphNetworkxGraph(Graph):
         'networkxGraph', 'hideLeftBottomSpines',
     )
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.networkxGraph = None
         self.hideLeftBottomSpines = True
 
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
         extm = getExtendedModules()
 
@@ -695,9 +695,9 @@ class GraphColorGrid(Graph):
     figureSizeDefault = (9, 6)
     keywordConfigurables = Graph.keywordConfigurables + ('hideLeftBottomSpines',)
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.hideLeftBottomSpines = True
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
     def renderSubplot(self, subplot):  # do not need a grid for the outer container
 
@@ -802,10 +802,10 @@ class GraphColorGridLegend(Graph):
     figureSizeDefault = (5, 1.5)
     keywordConfigurables = Graph.keywordConfigurables + ('hideLeftBottomSpines',)
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.hideLeftBottomSpines = True
 
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
         if 'title' not in keywords:
             self.title = 'Legend'
@@ -968,11 +968,11 @@ class GraphHorizontalBar(Graph):
         'margin',
     )
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.barSpace = 8
         self.margin = 2
 
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
         if 'alpha' not in keywords:
             self.alpha = 0.6
@@ -1077,11 +1077,11 @@ class GraphHorizontalBarWeighted(Graph):
         'margin',
     )
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.barSpace = 8
         self.margin = 0.25  # was 8; determines space between channels
 
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
         # this default alpha is used if not specified per bar
         if 'alpha' not in keywords:
@@ -1220,11 +1220,11 @@ class GraphScatterWeighted(Graph):
 
     keywordConfigurables = Graph.keywordConfigurables + ('maxDiameter', 'minDiameter')
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.maxDiameter = 1.25
         self.minDiameter = 0.25
 
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
         if 'alpha' not in keywords:
             self.alpha = 0.6
@@ -1422,12 +1422,9 @@ class GraphHistogram(Graph):
     graphType = 'histogram'
     keywordConfigurables = Graph.keywordConfigurables + ('binWidth',)
 
-    def __init__(self, *args, **keywords):
-        self.binWidth = 0.8
-        super().__init__(*args, **keywords)
-
-        if 'alpha' not in keywords:
-            self.alpha = 0.8
+    def __init__(self, *, binWidth: float = 0.8, alpha: float = 0.8, **keywords):
+        self.binWidth = binWidth
+        super().__init__(alpha=alpha, **keywords)
 
     def renderSubplot(self, subplot):
         self.figure.subplots_adjust(left=0.15)
@@ -1472,12 +1469,12 @@ class GraphGroupedVerticalBar(Graph):
     keywordConfigurables = Graph.keywordConfigurables + (
         'binWidth', 'roundDigits', 'groupLabelHeight',)
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.binWidth = 1
         self.roundDigits = 1
         self.groupLabelHeight = 0.0
 
-        super().__init__(*args, **keywords)
+        super().__init__(**keywords)
 
     def labelBars(self, subplot, rects):
         # attach some text labels
@@ -1570,10 +1567,8 @@ class Graph3DBars(Graph):
     graphType = '3DBars'
     axisKeys = ('x', 'y', 'z')
 
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
-        if 'alpha' not in keywords:
-            self.alpha = 0.8
+    def __init__(self, *, alpha: float = 0.8, **keywords):
+        super().__init__(alpha=alpha, **keywords)
         if 'colors' not in keywords:
             self.colors = ['#ff0000', '#00ff00', '#6666ff']
 

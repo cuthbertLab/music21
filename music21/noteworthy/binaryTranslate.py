@@ -105,7 +105,7 @@ class NWCConverter:
     >>> nwcc.staves
     []
     '''
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.fileContents = None
         self.parsePosition = 0
         self.version = 200

@@ -22,6 +22,8 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 (for algorithmic key detection) and
 :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) provide examples.
 '''
+from __future__ import annotations
+
 # TODO: make an analysis.base for the Discrete and analyzeStream aspects, then create
 #     range and key modules in analysis
 
@@ -1326,10 +1328,10 @@ def analyzeStream(
         # this synonym is being added for compatibility
         method = 'span'
 
-    match: t.Optional[t.Callable] = analysisClassFromMethodName(method)
+    analysisClassName: t.Optional[t.Type[DiscreteAnalysis]] = analysisClassFromMethodName(method)
 
-    if match is not None:
-        obj = match()  # NOTE: Cuthbert, this was previously analysisClassName()? - out of scope
+    if analysisClassName is not None:
+        obj = analysisClassName()
         # environLocal.printDebug(['analysis method used:', obj])
         return obj.getSolution(streamObj)
 
@@ -1338,7 +1340,7 @@ def analyzeStream(
 
 
 # noinspection SpellCheckingInspection
-def analysisClassFromMethodName(method: str):
+def analysisClassFromMethodName(method: str) -> t.Optional[t.Type[DiscreteAnalysis]]:
     '''
     Returns an analysis class given a method name, or None if none can be found
 
@@ -1359,7 +1361,7 @@ def analysisClassFromMethodName(method: str):
     >>> print(repr(acfmn('unknown-format')))
     None
     '''
-    analysisClasses = [
+    analysisClasses: t.List[t.Type[DiscreteAnalysis]] = [
         Ambitus,
         KrumhanslSchmuckler,
         AardenEssen,
@@ -1367,7 +1369,7 @@ def analysisClassFromMethodName(method: str):
         BellmanBudge,
         TemperleyKostkaPayne,
     ]
-    match = None
+    match: t.Optional[t.Type[DiscreteAnalysis]] = None
     for analysisClass in analysisClasses:
         # this is a very loose matching, as there are few classes now
         if (method.lower() in analysisClass.__name__.lower()

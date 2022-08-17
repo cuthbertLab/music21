@@ -139,7 +139,7 @@ class FeatureExtractor:
     Usage of a DataInstance offers significant performance advantages, as common forms of
     the Stream are cached for easy processing.
     '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
+    def __init__(self, dataOrStream=None, **keywords):
         self.stream = None  # the original Stream, or None
         self.data: t.Optional[DataInstance] = None  # a DataInstance object: use to get data
         self.setData(dataOrStream)
@@ -179,8 +179,8 @@ class FeatureExtractor:
                 self.data = dataOrStream
 
     def getAttributeLabels(self):
-        '''Return a list of string in a form that is appropriate for data storage.
-
+        '''
+        Return a list of string in a form that is appropriate for data storage.
 
         >>> fe = features.jSymbolic.AmountOfArpeggiationFeature()
         >>> fe.getAttributeLabels()
@@ -236,13 +236,15 @@ class FeatureExtractor:
         self.feature.prepareVectors()  # will vector with necessary zeros
 
     def process(self):
-        '''Do processing necessary, storing result in _feature.
+        '''
+        Do processing necessary, storing result in _feature.
         '''
         # do work in subclass, calling on self.data
         pass
 
     def extract(self, source=None):
-        '''Extract the feature and return the result.
+        '''
+        Extract the feature and return the result.
         '''
         if source is not None:
             self.stream = source
@@ -293,10 +295,8 @@ class StreamForms:
     of the stream which is the main power of this routine, making
     it simple to add additional feature extractors at low additional
     time cost.
-
     '''
-
-    def __init__(self, streamObj, prepareStream=True):
+    def __init__(self, streamObj: stream.Stream, prepareStream=True):
         self.stream = streamObj
         if self.stream is not None:
             if prepareStream:

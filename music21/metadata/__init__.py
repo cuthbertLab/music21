@@ -236,21 +236,27 @@ class Metadata(base.Music21Object):
 
     # INITIALIZER #
 
-    def __init__(self, *args, **keywords):
-        super().__init__()
-
-        self._contents: t.Dict[str, t.List[ValueType]] = {}
-
-        # TODO: check pickling, etc.
+    def __init__(self, **keywords):
+        m21BaseKeywords = {}
+        myKeywords = {}
 
         # We allow the setting of metadata values (attribute-style) via **keywords.
         # Any keywords that are uniqueNames, grandfathered workIds, or grandfathered
         # workId abbreviations can be set this way.
-        for attr in keywords:
+        for attr, value in keywords.items():
             if attr in properties.ALL_LEGAL_ATTRIBUTES:
-                setattr(self, attr, keywords[attr])
+                myKeywords[attr] = value
+            else:
+                m21BaseKeywords[attr] = value
+
+        super().__init__(**m21BaseKeywords)
+        self._contents: t.Dict[str, t.List[ValueType]] = {}
+
+        for attr, value in myKeywords.items():
+            setattr(self, attr, value)
 
         self['software'] = [defaults.software]
+        # TODO: check pickling, etc.
 
 # -----------------------------------------------------------------------------
 # Public APIs
@@ -2402,8 +2408,8 @@ class RichMetadata(Metadata):
 
     # INITIALIZER #
 
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         self.ambitus = None
         self.keySignatureFirst = None
         self.keySignatures = []

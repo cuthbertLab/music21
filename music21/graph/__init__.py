@@ -213,21 +213,20 @@ class Test(unittest.TestCase):
         s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(note.Note('c5', quarterLength=3))
 
-        for args in [
-            ('histogram', 'pitch'),
-            ('histogram', 'pitchclass'),
-            ('histogram', 'quarterlength'),
+        for plotType, xValue, yValue in [
+            ('histogram', 'pitch', None),
+            ('histogram', 'pitchclass', None),
+            ('histogram', 'quarterlength', None),
             ('scatter', 'pitch', 'quarterlength'),
             ('scatter', 'pitchspace', 'offset'),
             ('scatter', 'pitch', 'offset'),
-            ('scatter', 'dynamics'),
-            ('bar', 'pitch'),
-            ('bar', 'pc'),
+            ('scatter', 'dynamics', None),
+            ('bar', 'pitch', None),
+            ('bar', 'pc', None),
             ('weighted', 'pc', 'duration'),
-            ('weighted', 'dynamics'),
+            ('weighted', 'dynamics', None),
         ]:
-            # s.plot(*args, doneAction='write')
-            s.plot(*args, doneAction=None)
+            s.plot(plotType, xValue=xValue, yValue=yValue, doneAction=None)
 
     def testHorizontalInstrumentationB(self):
         from music21 import corpus

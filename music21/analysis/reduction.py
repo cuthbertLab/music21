@@ -113,7 +113,7 @@ class ReductiveNote(prebase.ProtoM21Object):
     def __getitem__(self, key):
         return self._parameters[key]
 
-    def _parseSpecification(self, spec):
+    def _parseSpecification(self, spec: str):
         # start with the defaults
         self._parameters = copy.deepcopy(self._defaultParameters)
         spec = spec.strip()
@@ -133,7 +133,7 @@ class ReductiveNote(prebase.ProtoM21Object):
                 self._parameters[attr] = value
         self._isParsed = True
 
-    def isParsed(self):
+    def isParsed(self) -> bool:
         return self._isParsed
 
     def getNoteAndTextExpression(self):
@@ -199,7 +199,7 @@ class ScoreReduction:
     '''
     An object to reduce a score.
     '''
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         # store a list of one or more reductions
         self._reductiveNotes = {}
         self._reductiveVoices = []
@@ -464,7 +464,7 @@ class PartReduction:
     '''
     def __init__(self,
                  srcScore=None,
-                 *args,
+                 *,
                  partGroups: t.Optional[t.List[t.Dict[str, t.Any]]] = None,
                  fillByMeasure: bool = True,
                  segmentByTarget: bool = True,

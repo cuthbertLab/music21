@@ -975,7 +975,7 @@ class IntervalNetwork:
             raise IntervalNetworkException('failed to match any edges', nObj)
         return collection
 
-    def degreeModulus(self, degree):
+    def degreeModulus(self, degree: int) -> int:
         '''
         Return the degree modulus degreeMax - degreeMin.
 
@@ -1009,6 +1009,7 @@ class IntervalNetwork:
 
     def nodeNameToNodes(self,
                         nodeId: t.Union[Node, int, Terminus, None],
+                        *,
                         equateTermini=True,
                         permitDegreeModuli=True):
         '''
@@ -1131,7 +1132,12 @@ class IntervalNetwork:
         postNode = [self.nodes[nId] for nId in postNodeId]
         return postEdge, postNode
 
-    def processAlteredNodes(self, alteredDegrees, n, p, direction):
+    def processAlteredNodes(self,
+                            alteredDegrees,
+                            n,
+                            p,
+                            *,
+                            direction):
         '''
         Return an altered pitch for given node, if an alteration is specified
         in the alteredDegrees dictionary
@@ -1173,6 +1179,7 @@ class IntervalNetwork:
         self,
         pitchObj,
         nodeObj,
+        *,
         direction=Direction.BI,
         alteredDegrees=None
     ) -> pitch.Pitch:
@@ -1196,6 +1203,7 @@ class IntervalNetwork:
         pitchReference: t.Union[pitch.Pitch, str],
         nodeName: t.Union[Node, int, Terminus, None],
         pitchOrigin: t.Union[pitch.Pitch, str],
+        *,
         direction: Direction = Direction.ASCENDING,
         stepSize=1,
         alteredDegrees=None,
@@ -1208,23 +1216,35 @@ class IntervalNetwork:
         The `nodeName` parameter may be a :class:`~music21.scale.intervalNetwork.Node` object,
         a node degree, a Terminus Enum, or a None (indicating Terminus.LOW).
 
-        The `stepSize` parameter can be configured to permit different sized steps
-        in the specified direction.
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
-        >>> net.nextPitch('g', 1, 'f#5', scale.Direction.ASCENDING)
+        >>> net.nextPitch('g', 1, 'f#5', direction=scale.Direction.ASCENDING)
         <music21.pitch.Pitch G5>
-        >>> net.nextPitch('g', 1, 'f#5', scale.Direction.DESCENDING)
+        >>> net.nextPitch('g', 1, 'f#5', direction=scale.Direction.DESCENDING)
         <music21.pitch.Pitch E5>
-        >>> net.nextPitch('g', 1, 'f#5', scale.Direction.ASCENDING, 2)  # two steps
+
+        The `stepSize` parameter can be configured to permit different sized steps
+        in the specified direction.
+
+        >>> net.nextPitch('g', 1, 'f#5',
+        ...               direction=scale.Direction.ASCENDING,
+        ...               stepSize=2)
         <music21.pitch.Pitch A5>
+
+        Altered degrees can be given to temporarily change the pitches returned
+        without affecting the network as a whole.
+
         >>> alteredDegrees = {2: {'direction': scale.Direction.BI,
         ...                       'interval': interval.Interval('-a1')}}
-        >>> net.nextPitch('g', 1, 'g2', scale.Direction.ASCENDING, alteredDegrees=alteredDegrees)
+        >>> net.nextPitch('g', 1, 'g2',
+        ...               direction=scale.Direction.ASCENDING,
+        ...               alteredDegrees=alteredDegrees)
         <music21.pitch.Pitch A-2>
-        >>> net.nextPitch('g', 1, 'a-2', scale.Direction.ASCENDING, alteredDegrees=alteredDegrees)
+        >>> net.nextPitch('g', 1, 'a-2',
+        ...               direction=scale.Direction.ASCENDING,
+        ...               alteredDegrees=alteredDegrees)
         <music21.pitch.Pitch B2>
         '''
         if pitchOrigin is None:
@@ -1341,6 +1361,7 @@ class IntervalNetwork:
         pitchReference: pitch.Pitch,
         minPitch: t.Optional[pitch.Pitch],
         maxPitch: t.Optional[pitch.Pitch],
+        *,
         includeFirst: bool,
         reverse: t.Optional[bool] = None,  # only meaningful for descending
     ) -> CacheKey:
@@ -1370,6 +1391,7 @@ class IntervalNetwork:
         nodeId: t.Union[Node, int, Terminus, None] = None,
         minPitch: t.Union[pitch.Pitch, str, None] = None,
         maxPitch: t.Union[pitch.Pitch, str, None] = None,
+        *,
         alteredDegrees=None,
         fillMinMaxIfNone=False
     ) -> t.Tuple[t.List[pitch.Pitch], t.List[t.Union[Terminus, int]]]:
@@ -1534,6 +1556,7 @@ class IntervalNetwork:
         nodeId: t.Union[Node, int, Terminus, None] = None,
         minPitch: t.Union[pitch.Pitch, str, None] = None,
         maxPitch: t.Union[pitch.Pitch, str, None] = None,
+        *,
         alteredDegrees=None,
         includeFirst=False,
         fillMinMaxIfNone=False,
@@ -1637,10 +1660,10 @@ class IntervalNetwork:
         if self.deterministic:
             ck = self._getCacheKey(nodeObj,
                                    pitchRef,
-                                   minPitchObj,
-                                   maxPitchObj,
-                                   includeFirst,
-                                   reverse,
+                                   minPitch=minPitchObj,
+                                   maxPitch=maxPitchObj,
+                                   includeFirst=includeFirst,
+                                   reverse=reverse,
                                    )
             if ck in self._descendingCache:
                 return self._descendingCache[ck]
@@ -2307,7 +2330,6 @@ class IntervalNetwork:
         return g
 
     def plot(self,
-             *args,
              **keywords):
         '''
         Given a method and keyword configuration arguments, create and display a plot.
@@ -2336,6 +2358,7 @@ class IntervalNetwork:
         pitchReference: t.Union[pitch.Pitch, str],
         nodeId: t.Union[Node, int, Terminus, None],
         pitchTarget: t.Union[pitch.Pitch, note.Note, str],
+        *,
         comparisonAttribute: str = 'ps',
         direction: Direction = Direction.ASCENDING,
         alteredDegrees=None
@@ -2364,9 +2387,9 @@ class IntervalNetwork:
         0
         >>> net.getRelativeNodeId('a', 1, 'c#4')
         1
-        >>> net.getRelativeNodeId('a', 1, 'c4', comparisonAttribute = 'step')
+        >>> net.getRelativeNodeId('a', 1, 'c4', comparisonAttribute='step')
         1
-        >>> net.getRelativeNodeId('a', 1, 'c', comparisonAttribute = 'step')
+        >>> net.getRelativeNodeId('a', 1, 'c', comparisonAttribute='step')
         1
         >>> net.getRelativeNodeId('a', 1, 'b-4') is None
         True

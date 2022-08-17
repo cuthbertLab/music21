@@ -45,6 +45,7 @@ environLocal = environment.Environment('search.segment')
 # noinspection SpellCheckingInspection
 def translateMonophonicPartToSegments(
     inputStream,
+    *,
     segmentLengths=30,
     overlap=12,
     algorithm=None,
@@ -113,7 +114,7 @@ def translateMonophonicPartToSegments(
 
 
 # noinspection SpellCheckingInspection
-def indexScoreParts(scoreFile, *args, **keywords):
+def indexScoreParts(scoreFile, **keywords):
     r'''
     Creates segment and measure lists for each part of a score
     Returns list of dictionaries of segment and measure lists
@@ -129,7 +130,7 @@ def indexScoreParts(scoreFile, *args, **keywords):
     indexedList = []
     for part in scoreFileParts:
         segmentList, measureList = translateMonophonicPartToSegments(
-            part, *args, **keywords)
+            part, **keywords)
         indexedList.append({
             'segmentList': segmentList,
             'measureList': measureList,
@@ -137,7 +138,7 @@ def indexScoreParts(scoreFile, *args, **keywords):
     return indexedList
 
 
-def _indexSingleMulticore(filePath, *args, failFast=False, **keywords):
+def _indexSingleMulticore(filePath, failFast=False, **keywords):
     '''
     Index one path in the context of multicore.
     '''
@@ -147,7 +148,7 @@ def _indexSingleMulticore(filePath, *args, failFast=False, **keywords):
     shortFp = filePath.name
 
     try:
-        indexOutput = indexOnePath(filePath, *args, **keywords)
+        indexOutput = indexOnePath(filePath, **keywords)
     except Exception as e:  # pylint: disable=broad-except
         if not failFast:
             print(f'Failed on parse/index for, {filePath}: {e}')
@@ -163,8 +164,8 @@ def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
 
 # noinspection SpellCheckingInspection
 def indexScoreFilePaths(scoreFilePaths,
+                        *,
                         giveUpdates=False,
-                        *args,
                         runMulticore=True,
                         **keywords):
     # noinspection PyShadowingNames
@@ -193,7 +194,7 @@ def indexScoreFilePaths(scoreFilePaths,
     else:
         updateFunction = None
 
-    indexFunc = partial(_indexSingleMulticore, *args, **keywords)
+    indexFunc = partial(_indexSingleMulticore, **keywords)
 
     for i in range(len(scoreFilePaths)):
         if not isinstance(scoreFilePaths[i], pathlib.Path):
@@ -224,7 +225,7 @@ def indexScoreFilePaths(scoreFilePaths,
     return scoreDict
 
 
-def indexOnePath(filePath, *args, **keywords):
+def indexOnePath(filePath, **keywords):
     '''
     Index a single path.  Returns a scoreDictEntry
     '''
@@ -236,7 +237,7 @@ def indexOnePath(filePath, *args, **keywords):
     else:
         scoreObj = converter.parse(filePath)
 
-    scoreDictEntry = indexScoreParts(scoreObj, *args, **keywords)
+    scoreDictEntry = indexScoreParts(scoreObj, **keywords)
     return scoreDictEntry
 
 

@@ -2772,7 +2772,7 @@ class Interval(IntervalBase):
     >>> aInterval.semiSimpleName
     'P8'
 
-    An interval can also be specified directly
+    An interval can also be specified directly:
 
     >>> aInterval = interval.Interval('m3')
     >>> aInterval
@@ -2790,6 +2790,8 @@ class Interval(IntervalBase):
     False
     >>> aInterval.isStep
     False
+
+    Some ways of creating half-steps.
 
     >>> aInterval = interval.Interval('half')
     >>> aInterval
@@ -2878,14 +2880,21 @@ class Interval(IntervalBase):
     True
     '''
     def __init__(self,
-                 *arguments,
+                 arg0: t.Union[str,
+                               int,
+                               float,
+                               'music21.pitch.Pitch',
+                               'music21.note.Note',
+                               None] = None,
+                 arg1: t.Union['music21.pitch.Pitch', 'music21.note.Note', None] = None,
+                 *,
                  diatonic: t.Optional[DiatonicInterval] = None,
                  chromatic: t.Optional[ChromaticInterval] = None,
-                 noteStart: t.Optional['music21.note.Note'] = None,
-                 noteEnd: t.Optional['music21.note.Note'] = None,
+                 noteStart: t.Union['music21.note.Note', 'music21.pitch.Pitch', None] = None,
+                 noteEnd: t.Union['music21.note.Note', 'music21.pitch.Pitch', None] = None,
                  name: t.Optional[str] = None,
                  **keywords):
-        #     requires either (1) a string ('P5' etc.) or
+        #     requires either (1) a string ('P5' etc.) or int/float
         #     (2) named arguments:
         #     (2a) either both of
         #        diatonic  = DiatonicInterval object
@@ -2902,45 +2911,53 @@ class Interval(IntervalBase):
         self.chromatic: t.Optional[ChromaticInterval] = chromatic
 
         # these can be accessed through noteStart and noteEnd properties
-        self._noteStart = noteStart
-        self._noteEnd = noteEnd
+        self._noteStart: t.Optional['music21.note.Note'] = None
+        self._noteEnd: t.Optional['music21.note.Note'] = None
+        for attr, possible in (('_noteStart', noteStart), ('_noteEnd', noteEnd)):
+            forcedNote: t.Optional['music21.note.Note']
+            if possible is None:
+                forcedNote = None
+            elif hasattr(possible, 'classes') and 'Pitch' in possible.classes:
+                from music21 import note
+                forcedNote = note.Note(pitch=possible, duration=self.duration)
+                self.duration.client = self
+            else:
+                forcedNote = t.cast('music21.note.Note', possible)
+            setattr(self, attr, forcedNote)
 
         self.type = ''  # harmonic or melodic
         self.implicitDiatonic = False  # is this basically a ChromaticInterval object in disguise?
 
-        if len(arguments) == 1 and isinstance(arguments[0], str) or name is not None:
+        if (arg1 is None and isinstance(arg0, str)) or name is not None:
             # convert common string representations
             if name is None:
-                name = arguments[0]
+                name = arg0
             dInterval, cInterval = _stringToDiatonicChromatic(name)
             self.diatonic = dInterval
             self.chromatic = cInterval
 
         # if we get a first argument that is a number, treat it as a chromatic
         # interval creation argument
-        elif len(arguments) == 1 and common.isNum(arguments[0]):
-            self.chromatic = ChromaticInterval(arguments[0])
+        elif arg1 is None and chromatic is None and common.isNum(arg0):
+            self.chromatic = ChromaticInterval(arg0)
 
         # permit pitches instead of Notes
         # this requires importing note, which is a bit circular, but necessary
-        elif (len(arguments) == 2
-              and hasattr(arguments[0], 'classes')
-              and hasattr(arguments[1], 'classes')
-              and 'Pitch' in arguments[0].classes
-              and 'Pitch' in arguments[1].classes):
+        elif (hasattr(arg0, 'classes')
+              and hasattr(arg1, 'classes')
+              and 'Pitch' in arg0.classes
+              and 'Pitch' in arg1.classes):
             from music21 import note
-            self._noteStart = note.Note()
-            self._noteStart.pitch = arguments[0]
-            self._noteEnd = note.Note()
-            self._noteEnd.pitch = arguments[1]
+            self._noteStart = note.Note(pitch=arg0, duration=self.duration)
+            self._noteEnd = note.Note(pitch=arg1, duration=self.duration)
+            self.duration.client = self
 
-        elif (len(arguments) == 2
-              and hasattr(arguments[0], 'isNote')
-              and hasattr(arguments[1], 'isNote')
-              and arguments[0].isNote is True
-              and arguments[1].isNote is True):
-            self._noteStart = arguments[0]
-            self._noteEnd = arguments[1]
+        elif (hasattr(arg0, 'isNote')
+              and hasattr(arg1, 'isNote')
+              and arg0.isNote is True
+              and arg1.isNote is True):
+            self._noteStart = arg0
+            self._noteEnd = arg1
 
         # catch case where only one Note is provided
         if (self.diatonic is None and self.chromatic is None
@@ -3296,7 +3313,7 @@ class Interval(IntervalBase):
         return cCents - dCents
 
     def transposePitch(self,
-                       p,
+                       p: 'music21.pitch.Pitch',
                        *,
                        reverse=False,
                        maxAccidental=4,

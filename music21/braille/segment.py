@@ -209,7 +209,7 @@ class BrailleElementGrouping(ProtoM21Object):
         >>> bg.numRepeats
         0
         '''
-        self.internalList = list(*listElement)
+        self.internalList = list(*listElements)
         setGroupingGlobals()
 
         self.keySignature = GROUPING_GLOBALS['keySignature']

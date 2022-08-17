@@ -1059,7 +1059,7 @@ class Environment:
     def formatToKey(self, m21Format):
         return envSingleton().formatToKey(m21Format)
 
-    def printDebug(self, msg, statusLevel=common.DEBUG_USER, debugFormat=None):
+    def printDebug(self, msg, statusLevel=common.DEBUG_USER):
         '''
         Format one or more data elements into string, and print it to stderr.
         The first arg can be a list of strings or a string; lists are
@@ -1071,7 +1071,7 @@ class Environment:
             if msg[0] != self.modNameParent and self.modNameParent is not None:
                 msg = [self.modNameParent + ':'] + msg
             # pass list to common.formatStr
-            msg = common.formatStr(*msg, format=debugFormat)
+            msg = common.formatStr(*msg)
             sys.stderr.write(msg)
 
     def read(self, filePath=None):

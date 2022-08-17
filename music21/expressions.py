@@ -1440,8 +1440,8 @@ class TrillExtension(spanner.Spanner):
     # We will try to avoid "continue".
     # N.B. this extension always includes a trill symbol
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, *spannedElements, **keywords):
+        super().__init__(*spannedElements, **keywords)
         self._placement = None  # can above or below or None, after musicxml
 
     def _getPlacement(self):
@@ -1487,8 +1487,8 @@ class TremoloSpanner(spanner.Spanner):
     # musicxml defines a "start", "stop", and a "continue" type.
     # We will try to avoid using the "continue" type.
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, *spannedElements, **keywords):
+        super().__init__(*spannedElements, **keywords)
         self.placement = None
         self.measured = True
         self._numberOfMarks = 3
@@ -1564,11 +1564,11 @@ class ArpeggioMarkSpanner(spanner.Spanner):
     <music21.expressions.ArpeggioMarkSpanner
      <music21.chord.Chord C3 E3 G3><music21.chord.Chord C4 E4 G4>>
     '''
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
-        arpeggioType: t.Optional[str] = keywords.get('arpeggioType', None)
-        if arpeggioType is None:
-            arpeggioType = 'normal'
+    def __init__(self,
+                 *spannedElements, 
+                 arpeggioType: str = 'normal',
+                 **keywords):
+        super().__init__(*spannedElements, **keywords)
         if arpeggioType not in ('normal', 'up', 'down', 'non-arpeggio'):
             raise ValueError(
                 'Arpeggio type must be "normal", "up", "down", or "non-arpeggio"'
