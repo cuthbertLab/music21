@@ -242,10 +242,12 @@ class RnWriter(prebase.ProtoM21Object):
         >>> testCase = romanText.writeRoman.RnWriter(p)
         >>> testCase.combinedList[-1]  # Last entry, after the metadata
         'm0 G: V'
+
         '''
 
         for thisMeasure in self.container.getElementsByClass(stream.Measure):
-            # TimeSignatures  # TODO KeySignatures
+
+            # TimeSignatures (extra elements supported between measures, see also Repeats)
             tsThisMeasure = thisMeasure.getElementsByClass(meter.TimeSignature)
             if tsThisMeasure:
                 firstTS = tsThisMeasure[0]
@@ -255,22 +257,21 @@ class RnWriter(prebase.ProtoM21Object):
                     msg = f'further time signature change(s) unprocessed: {unprocessedTSs}'
                     self.combinedList.append(f'Note: {msg}')
 
-            # RomanNumerals
-            measureString = ''  # Clear for each measure
+            # Initialise measure
+            thisMeasureNumber = thisMeasure.measureNumberWithSuffix()  # now str
+            measureString = 'm' + thisMeasureNumber
 
+            # Roman Numerals
             rnsThisMeasure = thisMeasure.getElementsByClass(roman.RomanNumeral)
-
             for rn in rnsThisMeasure:
-                if rn.tie is None or rn.tie.type == 'start':  # Ignore tied to Roman numerals
+                if rn.tie is None or rn.tie.type == 'start':  # Ignore tied-to Roman numerals
                     chordString = self.getChordString(rn)
-                    measureString = rnString(measureNumber=thisMeasure.measureNumber,  # Suffix?
-                                             beat=rn.beat,
-                                             chordString=chordString,
-                                             inString=measureString,  # Creating update
-                                             )
+                    if rn.beat != 1:  # b1 not needed
+                        measureString += f' b{intBeat(rn.beat)}'
+                    measureString += f' {chordString}'
 
-            if measureString:
-                self.combinedList.append(measureString)
+            if measureString != 'm' + thisMeasureNumber:  # not if empty (number only)
+                    self.combinedList.append(measureString)
 
     def getChordString(self,
                        rn: roman.RomanNumeral):
@@ -302,53 +303,6 @@ class RnWriter(prebase.ProtoM21Object):
 
 
 # ------------------------------------------------------------------------------
-
-def rnString(measureNumber: int,
-             beat: t.Union[str, int, float, fractions.Fraction],
-             chordString: str,
-             inString: t.Optional[str] = ''):
-    '''
-    Creates or extends a string of RomanText such that the output corresponds to a single
-    measure line.
-
-    If the inString is not given, None, or an empty string then this function starts a new line.
-
-    >>> lineStarter = romanText.writeRoman.rnString(14, 1, 'G: I')
-    >>> lineStarter
-    'm14 G: I'
-
-    For any other inString, that string is the start of a measure line continued by the new values
-
-    >>> continuation = romanText.writeRoman.rnString(14, 2, 'viio6', 'm14 G: I')
-    >>> continuation
-    'm14 G: I b2 viio6'
-
-    Naturally, this function requires the measure number of any such continuation to match
-    that of the inString and raises an error where that is not the case.
-
-    As these examples show, the chordString can be a Roman numeral alone (e.g. 'viio6')
-    or one prefixed by a change of key ('G: I').
-
-    '''
-
-    if inString:
-        inStringMeasureNumber = int(inString.split(' ')[0][1:])
-        if inStringMeasureNumber != measureNumber:
-            msg = f'The current measureNumber is given as {measureNumber}, but '
-            msg += f'the contextual inString ({inString}) refers to '
-            msg += 'measure number {measureNumber}. They should match.'
-            raise ValueError(msg)
-    else:  # inString and therefore start new line
-        inString = f'm{measureNumber}'
-
-    bt = intBeat(beat)
-    if bt == 1:
-        newString = f'{inString} {chordString}'  # no 'b1' needed for beat 1
-    else:
-        newString = f'{inString} b{bt} {chordString}'
-
-    return newString
-
 
 def intBeat(beat: t.Union[str, int, float, fractions.Fraction],
             roundValue: int = 2):
@@ -412,7 +366,7 @@ class Test(unittest.TestCase):
     Tests for two analysis cases (the smallest rntxt files in the music21 corpus)
     along with two test by modifying those scores.
 
-    Additional tests for the standalone functions rnString and intBeat and
+    Additional tests for the standalone intBeat function and
     for handling the special case of opus objects.
     '''
 
@@ -541,19 +495,6 @@ class Test(unittest.TestCase):
 
         rn = roman.RomanNumeral('viio6', 'G')
         RnWriter(rn)  # and even (perhaps dubiously) directly on other music21 objects
-
-# ------------------------------------------------------------------------------
-
-    def testRnString(self):
-
-        test = rnString(1, 1, 'G: I')
-        self.assertEqual(test, 'm1 G: I')  # no beat number given for b1
-
-        test = rnString(0, 4, 'b: V')
-        self.assertEqual(test, 'm0 b4 b: V')  # beat number is given for all other cases
-
-        with self.assertRaises(ValueError):  # error when the measure numbers don't match
-            rnString(15, 1, 'viio6', 'm14 G: I')
 
 # ------------------------------------------------------------------------------
 
