@@ -61,6 +61,7 @@
         <list>
           <option value="type" />
           <option value="format" />
+          <option value="id" />
         </list>
       </option>
     </inspection_tool>

@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 import re
 import unittest
-from typing import Type
+import typing as t
+
+from music21 import converter
+from music21 import corpus
 from music21 import metadata
+from music21.musicxml import testFiles as mTF
 
 
 class Test(unittest.TestCase):
@@ -10,9 +14,6 @@ class Test(unittest.TestCase):
     maxDiff = None
 
     def testMetadataLoadCorpus(self):
-        from music21 import converter
-        from music21.musicxml import testFiles as mTF
-
         c = converter.parse(mTF.mozartTrioK581Excerpt)
         md = c.metadata
 
@@ -45,9 +46,6 @@ class Test(unittest.TestCase):
         )
 
     def testMetadataLoadCorpusBackwardCompatible(self):
-        from music21 import converter
-        from music21.musicxml import testFiles as mTF
-
         c = converter.parse(mTF.mozartTrioK581Excerpt)
         md = c.metadata
 
@@ -81,9 +79,6 @@ class Test(unittest.TestCase):
         )
 
     def testJSONSerializationMetadata(self):
-        from music21 import converter
-        from music21.musicxml import testFiles as mTF
-
         md = metadata.Metadata(
             title='Concerto in F',
             date='2010',
@@ -120,8 +115,6 @@ class Test(unittest.TestCase):
         )
 
     def testRichMetadata01(self):
-        from music21 import corpus
-
         score = corpus.parse('jactatur')
         self.assertEqual(score.metadata.composer, 'Johannes Ciconia')
 
@@ -151,8 +144,6 @@ class Test(unittest.TestCase):
         self.assertEqual(str(richMetadata.timeSignatureFirst), '4/4')
 
     def testWorkIds(self):
-        from music21 import corpus
-
         opus = corpus.parse('essenFolksong/teste')
         self.assertEqual(len(opus.scores), 8)
 
@@ -172,7 +163,6 @@ class Test(unittest.TestCase):
         )
 
     def testMetadataSearch(self):
-        from music21 import corpus
         score = corpus.parse('ciconia')
         self.assertEqual(
             score.metadata.search(
@@ -196,8 +186,6 @@ class Test(unittest.TestCase):
         )
 
     def testRichMetadata02(self):
-        from music21 import corpus
-
         score = corpus.parse('bwv66.6')
         richMetadata = metadata.RichMetadata()
         richMetadata.merge(score.metadata)
@@ -210,7 +198,7 @@ class Test(unittest.TestCase):
             uniqueName: str,
             namespaceName: str,
             contributorRole: str = None,
-            valueType: Type = metadata.Text):
+            valueType: t.Type = metadata.Text):
 
         if ':' not in namespaceName:
             # It's just the namespace because name == uniqueName,
@@ -240,7 +228,7 @@ class Test(unittest.TestCase):
             itemTuple = md[namespaceName]
             self.assertEqual(itemTuple, tuple())
 
-        if valueType is metadata.DateSingle:
+        if valueType is metadata.DatePrimitive:
             md[namespaceName] = ['1978/6/11']
             self.assertEqual(
                 getattr(md, uniqueName),
@@ -313,9 +301,10 @@ class Test(unittest.TestCase):
             self.fail('internal test error: invalid valueType')
 
 
-        if valueType is metadata.DateSingle:
-            md.add(namespaceName, [metadata.DateBetween(['1978', '1980']),
-                metadata.DateSingle('1979/6/11/4:50:32')])
+        if valueType is metadata.DatePrimitive:
+            md.add(namespaceName,
+                   [metadata.DateBetween(['1978', '1980']),
+                    metadata.DateSingle('1979/6/11/4:50:32')])
             self.assertEqual(
                 getattr(md, uniqueName),
                 '1979/06/11, 1978/--/-- to 1980/--/--, 1979/06/11/04/50/032.00'
@@ -448,15 +437,17 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem(
             'dateAvailable',
             'dcterms:available',
-            valueType=metadata.DateSingle
+            valueType=metadata.DatePrimitive
         )
         self.checkUniqueNamedItem('bibliographicCitation', 'dcterms')
         self.checkUniqueNamedItem('conformsTo', 'dcterms')
-        self.checkUniqueNamedItem('dateCreated', 'dcterms:created', valueType=metadata.DateSingle)
-        self.checkUniqueNamedItem('otherDate', 'dcterms:date', valueType=metadata.DateSingle)
-        self.checkUniqueNamedItem('dateAccepted', 'dcterms', valueType=metadata.DateSingle)
-        self.checkUniqueNamedItem('dateCopyrighted', 'dcterms', valueType=metadata.DateSingle)
-        self.checkUniqueNamedItem('dateSubmitted', 'dcterms', valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('dateCreated',
+                                  'dcterms:created',
+                                  valueType=metadata.DatePrimitive)
+        self.checkUniqueNamedItem('otherDate', 'dcterms:date', valueType=metadata.DatePrimitive)
+        self.checkUniqueNamedItem('dateAccepted', 'dcterms', valueType=metadata.DatePrimitive)
+        self.checkUniqueNamedItem('dateCopyrighted', 'dcterms', valueType=metadata.DatePrimitive)
+        self.checkUniqueNamedItem('dateSubmitted', 'dcterms', valueType=metadata.DatePrimitive)
         self.checkUniqueNamedItem('description', 'dcterms')
         self.checkUniqueNamedItem('educationLevel', 'dcterms')
         self.checkUniqueNamedItem('extent', 'dcterms')
@@ -471,7 +462,9 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem('isReferencedBy', 'dcterms')
         self.checkUniqueNamedItem('isReplacedBy', 'dcterms')
         self.checkUniqueNamedItem('isRequiredBy', 'dcterms')
-        self.checkUniqueNamedItem('dateIssued', 'dcterms:issued', valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('dateIssued',
+                                  'dcterms:issued',
+                                  valueType=metadata.DatePrimitive)
         self.checkUniqueNamedItem('isVersionOf', 'dcterms')
         self.checkUniqueNamedItem('language', 'dcterms')
         self.checkUniqueNamedItem('license', 'dcterms')
@@ -479,7 +472,7 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem(
             'dateModified',
             'dcterms:modified',
-            valueType=metadata.DateSingle
+            valueType=metadata.DatePrimitive
         )
         self.checkUniqueNamedItem('provenance', 'dcterms')
         self.checkUniqueNamedItem('publisher', 'dcterms', valueType=metadata.Contributor)
@@ -494,7 +487,9 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem('tableOfContents', 'dcterms')
         self.checkUniqueNamedItem('title', 'dcterms')
         self.checkUniqueNamedItem('type', 'dcterms')
-        self.checkUniqueNamedItem('dateValid', 'dcterms:valid', valueType=metadata.DateSingle)
+        self.checkUniqueNamedItem('dateValid',
+                                  'dcterms:valid',
+                                  valueType=metadata.DatePrimitive)
         self.checkUniqueNamedItem('adapter', 'marcrel:ADP')
         self.checkUniqueNamedItem('analyst', 'marcrel:ANL')
         self.checkUniqueNamedItem('annotator', 'marcrel:ANN')
@@ -588,7 +583,7 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem(
             'dateFirstPublished',
             'humdrum:PDT',
-            valueType=metadata.DateSingle
+            valueType=metadata.DatePrimitive
         )
         self.checkUniqueNamedItem('publicationTitle', 'humdrum:PTL')
         self.checkUniqueNamedItem('placeFirstPublished', 'humdrum:PPP')
@@ -626,7 +621,7 @@ class Test(unittest.TestCase):
         self.checkUniqueNamedItem(
             'electronicReleaseDate',
             'humdrum:YER',
-            valueType=metadata.DateSingle
+            valueType=metadata.DatePrimitive
         )
         self.checkUniqueNamedItem(
             'fileFormat',
@@ -644,9 +639,8 @@ class Test(unittest.TestCase):
             valueType=int
         )
 
+
 # -----------------------------------------------------------------------------
-
-
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test, 'noDocTest')

@@ -695,9 +695,9 @@ class GraphColorGrid(Graph):
     figureSizeDefault = (9, 6)
     keywordConfigurables = Graph.keywordConfigurables + ('hideLeftBottomSpines',)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **keywords):
         self.hideLeftBottomSpines = True
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **keywords)
 
     def renderSubplot(self, subplot):  # do not need a grid for the outer container
 

@@ -45,14 +45,15 @@ def addDocAttrTestsToSuite(suite,
     >>> import doctest
     >>> s1 = doctest.DocTestSuite(chord)
     >>> s1TestsBefore = len(s1._tests)
+    >>> before = set(s1._tests)
     >>> allLocals = [getattr(chord, x) for x in dir(chord)]
     >>> test.testRunner.addDocAttrTestsToSuite(s1, allLocals)
     >>> s1TestsAfter = len(s1._tests)
     >>> s1TestsAfter - s1TestsBefore
-    2
+    3
     >>> lastTest = s1._tests[-1]
     >>> lastTest
-    isRest ()
+    expressionIsInferred ()
     '''
     dtp = doctest.DocTestParser()
     if globs is False:
@@ -129,7 +130,7 @@ def stripAddresses(textString, replacement='ADDRESS') -> str:
 
 # ------------------------------------------------------------------------------
 
-def mainTest(*testClasses, **kwargs):
+def mainTest(*testClasses, **keywords):
     '''
     Takes as its arguments modules (or a string 'noDocTest' or 'verbose')
     and runs all of these modules through a unittest suite
@@ -163,7 +164,7 @@ def mainTest(*testClasses, **kwargs):
     runAllTests = True
 
     # default -- is fail fast.
-    failFast = bool(kwargs.get('failFast', True))
+    failFast = bool(keywords.get('failFast', True))
     if failFast:
         optionflags = (
             doctest.ELLIPSIS
@@ -180,7 +181,7 @@ def mainTest(*testClasses, **kwargs):
     if ('noDocTest' in testClasses
             or 'noDocTest' in sys.argv
             or 'nodoctest' in sys.argv
-            or bool(kwargs.get('noDocTest', False))):
+            or bool(keywords.get('noDocTest', False))):
         skipDoctest = True
     else:
         skipDoctest = False
@@ -194,14 +195,14 @@ def mainTest(*testClasses, **kwargs):
         # here we use '__main__' instead of a module
         if ('moduleRelative' in testClasses
                 or 'moduleRelative' in sys.argv
-                or bool(kwargs.get('moduleRelative', False))):
+                or bool(keywords.get('moduleRelative', False))):
             pass
         else:
             for di in defaultImports:
                 globs = __import__(di).__dict__.copy()
             if ('importPlusRelative' in testClasses
                     or 'importPlusRelative' in sys.argv
-                    or bool(kwargs.get('importPlusRelative', False))):
+                    or bool(keywords.get('importPlusRelative', False))):
                 globs.update(inspect.stack()[1][0].f_globals)
 
         try:
@@ -218,14 +219,14 @@ def mainTest(*testClasses, **kwargs):
     verbosity = 1
     if ('verbose' in testClasses
             or 'verbose' in sys.argv
-            or bool(kwargs.get('verbose', False))):
+            or bool(keywords.get('verbose', False))):
         verbosity = 2  # this seems to hide most display
 
     displayNames = False
     if ('list' in sys.argv
             or 'display' in sys.argv
-            or bool(kwargs.get('display', False))
-            or bool(kwargs.get('list', False))):
+            or bool(keywords.get('display', False))
+            or bool(keywords.get('list', False))):
         displayNames = True
         runAllTests = False
 
@@ -235,13 +236,13 @@ def mainTest(*testClasses, **kwargs):
         if arg not in ('list', 'display', 'verbose', 'nodoctest'):
             # run a test directly named in this module
             runThisTest = sys.argv[1]
-    if bool(kwargs.get('runTest', False)):
-        runThisTest = kwargs.get('runTest', False)
+    if bool(keywords.get('runTest', False)):
+        runThisTest = keywords.get('runTest', False)
 
     # -f, --failfast
     if ('onlyDocTest' in sys.argv
             or 'onlyDocTest' in testClasses
-            or bool(kwargs.get('onlyDocTest', False))):
+            or bool(keywords.get('onlyDocTest', False))):
         testClasses = []  # remove cases
     for t in testClasses:
         if not isinstance(t, str):

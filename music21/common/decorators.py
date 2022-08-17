@@ -26,7 +26,7 @@ def optional_arg_decorator(fn):
     a decorator for decorators.  Allows them to either have or not have arguments.
     '''
     @wraps(fn)
-    def wrapped_decorator(*args, **kwargs):
+    def wrapped_decorator(*args, **keywords):
         is_bound_method = hasattr(args[0], fn.__name__) if args else False
         klass = None
 
@@ -35,7 +35,7 @@ def optional_arg_decorator(fn):
             args = args[1:]
 
         # If no arguments were passed...
-        if len(args) == 1 and not kwargs and callable(args[0]):
+        if len(args) == 1 and not keywords and callable(args[0]):
             if is_bound_method:
                 return fn(klass, args[0])
             else:
@@ -44,9 +44,9 @@ def optional_arg_decorator(fn):
         else:
             def real_decorator(toBeDecorated):
                 if is_bound_method:
-                    return fn(klass, toBeDecorated, *args, **kwargs)
+                    return fn(klass, toBeDecorated, *args, **keywords)
                 else:
-                    return fn(toBeDecorated, *args, **kwargs)
+                    return fn(toBeDecorated, *args, **keywords)
             return real_decorator
     return wrapped_decorator
 
@@ -129,7 +129,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
                 'message': m}
 
     @wraps(method)
-    def func_wrapper(*args, **kwargs):
+    def func_wrapper(*args, **keywords):
         if len(args) > 1 and args[1] in ('_ipython_canary_method_should_not_exist_',
                                          '_repr_mimebundle_',
                                          '_is_coroutine',
@@ -147,7 +147,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
                           exceptions21.Music21DeprecationWarning,
                           stacklevel=2)
             callInfo['calledAlready'] = True
-        return method(*args, **kwargs)
+        return method(*args, **keywords)
 
     return func_wrapper
 
@@ -175,11 +175,11 @@ def cacheMethod(method):
         funcName = method.__name__
 
     @wraps(method)
-    def inner(instance, *args, **kwargs):
+    def inner(instance, *args, **keywords):
         if funcName in instance._cache:
             return instance._cache[funcName]
 
-        instance._cache[funcName] = method(instance, *args, **kwargs)
+        instance._cache[funcName] = method(instance, *args, **keywords)
         return instance._cache[funcName]
 
     return inner

@@ -180,8 +180,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     >>> s.first()
     <music21.meter.TimeSignature 4/4>
 
-    New in v7 -- providing a list of objects or Measures or Scores (but not other Stream
-    subclasses such as Parts or Voices) now positions sequentially, i.e. appends:
+    Providing a list of objects or Measures or Scores (but not other Stream
+    subclasses such as Parts or Voices) positions sequentially, i.e. appends, if they
+    all have offset 0.0 currently:
 
     >>> s2 = stream.Measure([note.Note(), note.Note(), bar.Barline()])
     >>> s2.show('text')
@@ -189,7 +190,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     {1.0} <music21.note.Note C>
     {2.0} <music21.bar.Barline type=regular>
 
-    A list of measures will let each be appended:
+    A list of measures will thus each be appended:
 
     >>> m1 = stream.Measure(n1, number=1)
     >>> m2 = stream.Measure(note.Rest(), number=2)
@@ -200,7 +201,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     {1.5} <music21.stream.Measure 2 offset=1.5>
         {0.0} <music21.note.Rest quarter>
 
-    Here, every element is a Stream that's not a Measure, so we instead insert:
+    Here, every element is a Stream that's not a Measure (or Score), so it
+    will be inserted at 0.0, rather than appending:
 
     >>> s4 = stream.Score([stream.PartStaff(n1), stream.PartStaff(note.Rest())])
     >>> s4.show('text')
@@ -217,6 +219,25 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.chord.Chord C2 A2>
 
+    This behavior can be modified by the `appendOrInsert` keyword to go against norms:
+
+    >>> s6 = stream.Stream([note.Note('C'), note.Note('D')], appendOrInsert='insert')
+    >>> s6.show('text')  # all notes at offset 0.0
+    {0.0} <music21.note.Note C>
+    {0.0} <music21.note.Note D>
+
+    >>> p1 = stream.Part(stream.Measure(note.Note('C')), id='p1')
+    >>> p2 = stream.Part(stream.Measure(note.Note('D')), id='p2')
+    >>> s7 = stream.Score([p1, p2], appendOrInsert='append')
+    >>> s7.show('text')  # parts following each other (not recommended)
+    {0.0} <music21.stream.Part p1>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note C>
+    {1.0} <music21.stream.Part p2>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note D>
+
+
     For developers of subclasses, please note that because of how Streams
     are copied, there cannot be
     required parameters (i.e., without defaults) in initialization.
@@ -224,8 +245,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     be allowed, because craziness and givenElements are required::
 
         class CrazyStream(Stream):
-            def __init__(self, givenElements, craziness, *args, **kwargs):
+            def __init__(self, givenElements, craziness, *args, **keywords):
                 ...
+
+    New in v.7 -- smart appending
+    New in v.8 -- appendOrInsert keyword configures the smart appending.
     '''
     # this static attributes offer a performance boost over other
     # forms of checking class
@@ -285,11 +309,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         #     ''',
     }
     def __init__(self,
-                 givenElements=None,
-                 *args,
-                 # restrictClass: t.Type[M21ObjType] = base.Music21Object,
+                 givenElements: t.Union[None,
+                                        base.Music21Object,
+                                        t.Sequence[base.Music21Object]] = None,
+                 *arguments,
+                 appendOrInsert: t.Literal['append', 'insert', 'offsets'] = 'offsets',
                  **keywords):
-        super().__init__(self, *args, **keywords)
+        # restrictClass: t.Type[M21ObjType] = base.Music21Object,
+        super().__init__(self, *arguments, **keywords)
 
         self.streamStatus = streamStatus.StreamStatus(self)
         self._unlinkedDuration = None
@@ -312,26 +339,31 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if givenElements is None:
             return
 
-        if isinstance(givenElements, base.Music21Object) or not common.isIterable(givenElements):
-            givenElements = [givenElements]
+        if isinstance(givenElements, base.Music21Object):
+            givenElements = t.cast(t.List[base.Music21Object], [givenElements])
 
         # Append rather than insert if every offset is 0.0
         # but not if every element is a stream subclass other than a Measure or Score
         # (i.e. Part or Voice generally, but even Opus theoretically)
         # because these classes usually represent synchrony
-        append: bool = False
-        try:
-            append = all(e.offset == 0.0 for e in givenElements)
-        except AttributeError:
-            pass  # appropriate failure will be raised by coreGuardBeforeAddElement()
-        if append and all(
-                (e.isStream and e.classSet.isdisjoint((Measure, Score)))
-                for e in givenElements):
-            append = False
+        appendBool = True
+        if appendOrInsert == 'offsets':
+            try:
+                appendBool = all(e.offset == 0.0 for e in givenElements)
+            except AttributeError:
+                pass  # appropriate failure will be raised by coreGuardBeforeAddElement()
+            if appendBool and all(
+                    (e.isStream and e.classSet.isdisjoint((Measure, Score)))
+                    for e in givenElements):
+                appendBool = False
+        elif appendOrInsert == 'insert':
+            appendBool = False
+        else:
+            appendBool = True
 
         for e in givenElements:
             self.coreGuardBeforeAddElement(e)
-            if append:
+            if appendBool:
                 self.coreAppend(e)
             else:
                 self.coreInsert(e.offset, e)
@@ -650,7 +682,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             return t.cast(M21ObjType, searchElements[k])
 
         elif isinstance(k, type):
-            return self.recurse().getElementsByClass(k)
+            if issubclass(k, base.Music21Object):
+                return self.recurse().getElementsByClass(k)
+            else:
+                # this is explicitly NOT true, but we're pretending
+                # it is a Music21Object for now, because the only things returnable
+                # from getElementsByClass are Music21Objects that also inherit from k.
+                m21Type = t.cast(t.Type[M21ObjType], k)  # type: ignore
+                return self.recurse().getElementsByClass(m21Type)
 
         elif common.isIterable(k) and all(isinstance(maybe_type, type) for maybe_type in k):
             return self.recurse().getElementsByClass(k)
@@ -7059,7 +7098,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     and isinstance(nInner, chord.Chord)
                     and isinstance(nLast, chord.Chord)
                     and None not in [inner_p.tie for inner_p in nInner.notes]
-                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}
+                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}  # type: ignore
                     and len(nLast.pitches) == len(nInner.pitches)):
                 return True
 
@@ -8997,11 +9036,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def quantize(
         self,
-        quarterLengthDivisors=None,
-        processOffsets=True,
-        processDurations=True,
-        inPlace=False,
-        recurse=False,
+        quarterLengthDivisors: t.Iterable[int] = (),
+        processOffsets: bool = True,
+        processDurations: bool = True,
+        inPlace: bool = False,
+        recurse: bool = False,
     ):
         # noinspection PyShadowingNames
         '''
@@ -9041,7 +9080,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> nShort.quarterLength = 0.26
         >>> s.repeatInsert(nShort, [1.49, 1.76])
 
-        >>> s.quantize([4], processOffsets=True, processDurations=True, inPlace=True)
+        >>> s.quantize((4,), processOffsets=True, processDurations=True, inPlace=True)
         >>> [e.offset for e in s]
         [0.0, 0.5, 1.0, 1.5, 1.75]
         >>> [e.duration.quarterLength for e in s]
@@ -9127,7 +9166,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> [e.duration.quarterLength for e in v]
         [0.5, 0.5, 0.5, 0.25, 0.25]
         '''
-        if quarterLengthDivisors is None:
+        if not quarterLengthDivisors:
             quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
 
         # this presently is not trying to avoid overlaps that
@@ -9153,7 +9192,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         useStreams = [returnStream]
         if recurse is True:
-            useStreams = returnStream.recurse(streamsOnly=True, includeSelf=True)
+            useStreams = list(returnStream.recurse(streamsOnly=True, includeSelf=True))
 
         rests_lacking_durations: t.List[note.Rest] = []
         for useStream in useStreams:
@@ -9957,7 +9996,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         N.B. for chords, currently, only the first pitch is tested for unison.
         this is a bug TODO: FIX
 
-        (\*\*kwargs is there so that other methods that pass along dicts to
+        (\*\*keywords is there so that other methods that pass along dicts to
         findConsecutiveNotes don't have to remove
         their own args; this method is used in melodicIntervals.)
 
@@ -12659,9 +12698,9 @@ class Measure(Stream):
             for the amount of padding on the right side of a region.)''',
     }
 
-    def __init__(self, *args, **keywords):
-        if len(args) == 1 and isinstance(args[0], int) and 'number' not in keywords:
-            keywords['number'] = args[0]
+    def __init__(self, *args, number: t.Union[int, str] = 0, **keywords):
+        if len(args) == 1 and isinstance(args[0], int) and number == 0:
+            number = args[0]
             args = ()
 
         super().__init__(*args, **keywords)
@@ -12683,17 +12722,13 @@ class Measure(Stream):
         self.paddingRight: OffsetQL = 0.0
 
         self.numberSuffix = None  # for measure 14a would be 'a'
-        if 'number' in keywords:
-            num = keywords['number']
-            if isinstance(num, str):
-                realNum, suffix = common.getNumFromStr(num)
-                self.number = int(realNum)
-                if suffix:
-                    self.numberSuffix = suffix
-            else:
-                self.number = keywords['number']
+        if isinstance(number, str):
+            realNum, suffix = common.getNumFromStr(number)
+            self.number = int(realNum)
+            if suffix:
+                self.numberSuffix = suffix
         else:
-            self.number = 0  # 0 means undefined or pickup
+            self.number = number
         # we can request layout width, using the same units used
         # in layout.py for systems; most musicxml readers do not support this
         # on input
@@ -14185,12 +14220,9 @@ class SpannerStorage(Stream):
     TODO v7: rename spannerParent to client.
     '''
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self, *arguments, spannerParent=None, **keywords):
         # No longer need store as weakref since Py2.3 and better references
-        self.spannerParent = None
-        if 'spannerParent' in keywords:
-            self.spannerParent = keywords['spannerParent']
-            del keywords['spannerParent']
+        self.spannerParent = spannerParent
         super().__init__(*arguments, **keywords)
 
         # must provide a keyword argument with a reference to the spanner

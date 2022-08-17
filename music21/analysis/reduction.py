@@ -15,9 +15,10 @@ and one or more reductive representation lines.
 
 Used by graph.PlotHorizontalBarWeighted()
 '''
-import re
-import unittest
 import copy
+import re
+import typing as t
+import unittest
 
 from music21 import exceptions21
 
@@ -461,7 +462,15 @@ class PartReduction:
     If the `normalize` parameter is False, no normalization will take place. The default is True.
 
     '''
-    def __init__(self, srcScore=None, *args, **keywords):
+    def __init__(self,
+                 srcScore=None,
+                 *args,
+                 partGroups: t.Optional[t.List[t.Dict[str, t.Any]]] = None,
+                 fillByMeasure: bool = True,
+                 segmentByTarget: bool = True,
+                 normalize: bool = True,
+                 normalizeByPart: bool = False,
+                 **keywords):
         if srcScore is None:
             return
         if not isinstance(srcScore, stream.Score):
@@ -469,32 +478,21 @@ class PartReduction:
         self._score = srcScore
         # an ordered list of dictionaries for
         # part id, part color, and a list of Part objs
-        self._partBundles = []
+        # TODO: typed dict
+        self._partBundles: t.List[t.Dict[str, t.Any]] = []
         # a dictionary of part id to a list of events
-        self._eventSpans = {}
+        self._eventSpans: t.Dict[t.Union[str, int], t.List[t.Any]] = {}
 
         # define how parts are grouped
         # a list of dictionaries, with keys for name, color, and a match list
-        self._partGroups = None
-        if 'partGroups' in keywords:
-            self._partGroups = keywords['partGroups']
+        self._partGroups = partGroups
 
-        self._fillByMeasure = True
-        if 'fillByMeasure' in keywords:
-            self._fillByMeasure = keywords['fillByMeasure']
+        self._fillByMeasure = fillByMeasure
 
         # We re-partition if the spans change
-        self._segmentByTarget = True
-        if 'segmentByTarget' in keywords:
-            self._segmentByTarget = keywords['segmentByTarget']
-
-        self._normalizeByPart = False  # norm by all parts is default
-        if 'normalizeByPart' in keywords:
-            self._normalizeByPart = keywords['normalizeByPart']
-
-        self._normalizeToggle = True
-        if 'normalize' in keywords:
-            self._normalizeToggle = keywords['normalize']
+        self._segmentByTarget = segmentByTarget
+        self._normalizeByPart = normalizeByPart  # norm by all parts is default
+        self._normalizeToggle = normalize
 
         # check that there are measures
         for p in self._score.parts:
@@ -747,10 +745,10 @@ class PartReduction:
                         finalBundle.append(dsFirst)
                         continue
                     # create new spans for each target in this segment
-                    for i, t in enumerate(match):
-                        targetStart = t.getOffsetBySite(flatRef)
+                    for i, tar in enumerate(match):
+                        targetStart = tar.getOffsetBySite(flatRef)
                         # can use extended duration
-                        targetSpan = t.duration.quarterLength
+                        targetSpan = tar.duration.quarterLength
                         # if dur of target is greater tn this span
                         # end at this span
                         if targetStart + targetSpan > offsetEnd:
@@ -768,7 +766,7 @@ class PartReduction:
                             # as the start of this existing span
                             # dsFirst['eStart'] = targetStart
                             dsFirst['span'] = targetSpan
-                            dsFirst['weight'] = targetToWeight(t)
+                            dsFirst['weight'] = targetToWeight(tar)
                             finalBundle.append(dsFirst)
                         elif t == 0 and ds['eStart'] != targetStart:
                             # add two, one for the empty region, one for target
@@ -779,13 +777,13 @@ class PartReduction:
                             dsNext = copy.deepcopy(ds)
                             dsNext['eStart'] = targetStart
                             dsNext['span'] = targetSpan
-                            dsNext['weight'] = targetToWeight(t)
+                            dsNext['weight'] = targetToWeight(tar)
                             finalBundle.append(dsNext)
                         else:  # for all other cases, create segment for each
                             dsNext = copy.deepcopy(ds)
                             dsNext['eStart'] = targetStart
                             dsNext['span'] = targetSpan
-                            dsNext['weight'] = targetToWeight(t)
+                            dsNext['weight'] = targetToWeight(tar)
                             finalBundle.append(dsNext)
                 # after iterating all ds spans, reassign
                 self._eventSpans[partBundle['pGroupId']] = finalBundle
@@ -1324,8 +1322,8 @@ class TestExternal(unittest.TestCase):
     show = True
 
     def testPartReductionB(self):
-        t = Test()
-        t.testPartReductionB(show=self.show)
+        test = Test()
+        test.testPartReductionB(show=self.show)
 
 
 # ------------------------------------------------------------------------------

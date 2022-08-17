@@ -52,8 +52,8 @@ def derivationMethod(function):
     <Derivation of <music21.note.Note D-> from <music21.note.Note C#> via 'allGreen'>
     '''
     @functools.wraps(function)
-    def wrapper(self, *args, **kwargs):
-        result = function(self, *args, **kwargs)
+    def wrapper(self, *args, **keywords):
+        result = function(self, *args, **keywords)
         result.derivation.origin = self
         result.derivation.method = function.__name__
         return result

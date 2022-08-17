@@ -1284,7 +1284,12 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
 # -----------------------------------------------------------------------------
 # public access function
 
-def analyzeStream(streamObj, *args, **keywords):
+def analyzeStream(
+    streamObj: 'music21.stream.Stream',
+    method: str,
+    *args,
+    **keywords
+):
     '''
     Public interface to discrete analysis methods to be applied
     to a Stream given as an argument. Methods return process-specific data format.
@@ -1316,21 +1321,13 @@ def analyzeStream(streamObj, *args, **keywords):
     <music21.key.Key of f# minor>
     >>> s.analyze('span')
     <music21.interval.Interval m21>
-
     '''
-    method = None
-    if 'method' in keywords:
-        method = keywords['method']
-
-    if args:
-        method = args[0]
-
     if method == 'range':
         # getPitchRanges() was removed in v7
         # this synonym is being added for compatibility
         method = 'span'
 
-    match = analysisClassFromMethodName(method)
+    match: t.Optional[t.Callable] = analysisClassFromMethodName(method)
 
     if match is not None:
         obj = match()  # NOTE: Cuthbert, this was previously analysisClassName()? - out of scope
@@ -1342,7 +1339,7 @@ def analyzeStream(streamObj, *args, **keywords):
 
 
 # noinspection SpellCheckingInspection
-def analysisClassFromMethodName(method):
+def analysisClassFromMethodName(method: str):
     '''
     Returns an analysis class given a method name, or None if none can be found
 
