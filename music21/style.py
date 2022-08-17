@@ -617,7 +617,8 @@ class StyleMixin(common.SlottedObjectMixin):
     __slots__ = ('_style', '_editorial')
 
     def __init__(self):
-        #  no need to call super().__init__() on SlottedObjectMixin
+        # no need to call super().__init__() on SlottedObjectMixin
+        # This might be dangerous though
         self._style: t.Optional[Style] = None
         self._editorial: t.Optional['music21.editorial.Editorial'] = None
 

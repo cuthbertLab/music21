@@ -152,11 +152,10 @@ from music21.metadata.properties import PropertyDescription
 from music21.metadata import bundles
 from music21.metadata import caching
 from music21.metadata import primitives
-from music21.metadata.primitives import (Date, DateSingle, DateRelative, DateBetween,
+from music21.metadata.primitives import (Date, DatePrimitive,
+                                         DateSingle, DateRelative, DateBetween,
                                          DateSelection, Text, Contributor, Creator,
                                          Imprint, Copyright, ValueType)
-
-from music21.metadata import testMetadata
 # -----------------------------------------------------------------------------
 
 __all__ = [
@@ -675,15 +674,12 @@ class Metadata(base.Music21Object):
          ('software', 'music21 v...'))
 
         >>> c.metadata.all(returnPrimitives=True, returnSorted=False)
-        (('software', <music21.metadata.primitives.Text music21 v.8.0.0a9>),
-         ('software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
-         ('software', <music21.metadata.primitives.Text Dolet Light for Finale 2014>),
+        (('software', <music21.metadata.primitives.Text music21 v...>),
+         ('software', <music21.metadata.primitives.Text Finale ...>),
+         ('software', <music21.metadata.primitives.Text Dolet Light...>),
          ('movementName', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
          ('composer', <music21.metadata.primitives.Contributor composer:Arcangelo Corelli>),
-         ('arranger', <music21.metadata.primitives.Contributor arranger:Michael Scott Cuthbert>),
-         ('copyright', <...Copyright © 2014, Creative Commons License (CC-BY)>),
-         ('filePath', <...Text ...corelli/opus3no1/1grave.xml>),
-         ('fileFormat', <music21.metadata.primitives.Text musicxml>),
+         ...
          ('dateCreated', <music21.metadata.primitives.DateRelative 1689/--/-- or earlier>),
          ('localeOfComposition', <music21.metadata.primitives.Text Rome>))
 
@@ -1012,7 +1008,7 @@ class Metadata(base.Music21Object):
                 result.append(contrib)
         return tuple(result)
 
-    def search(self, query=None, field=None, **kwargs):
+    def search(self, query=None, field=None, **keywords):
         r'''
         Search one or all fields with a query, given either as a string or a
         regular expression match.
@@ -1080,10 +1076,10 @@ class Metadata(base.Music21Object):
         #    field (so that 'Joplin' would return 'Joplin, Scott')
         reQuery = None
         valueFieldPairs = []
-        if query is None and field is None and not kwargs:
+        if query is None and field is None and not keywords:
             return (False, None)
-        elif query is None and field is None and kwargs:
-            field, query = kwargs.popitem()
+        elif query is None and field is None and keywords:
+            field, query = keywords.popitem()
 
         if field is not None:
             field = field.lower()
@@ -2311,21 +2307,26 @@ class Metadata(base.Music21Object):
             raise exceptions21.MetadataException(
                 f'invalid type for Copyright: {type(value).__name__}')
 
-        if valueType is DateSingle:
+        if valueType is DatePrimitive:
+            # note -- this may return something other than DateSingle depending
+            #    on the context.
             if isinstance(value, Text):
                 value = str(value)
-            if isinstance(value, (str, datetime.datetime, Date)):
+
+            if isinstance(value, DatePrimitive):
                 # If you want other DateSingle-derived types (DateRelative,
                 # DateBetween, or DateSelection), you have to create those
                 # yourself before adding/setting them.
+                return value
 
+            if isinstance(value, (str, datetime.datetime, Date)):
                 # noinspection PyBroadException
                 # pylint: disable=bare-except
                 try:
                     return DateSingle(value)
                 except:
-                    # Couldn't convert; just return unconverted value
-                    return originalValue
+                    # Couldn't convert; just return a generic text.
+                    return Text(str(originalValue))
                 # pylint: enable=bare-except
 
             raise exceptions21.MetadataException(
@@ -2617,20 +2618,7 @@ class RichMetadata(Metadata):
             AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
          ('arranger', 'Michael Scott Cuthbert'),
          ('composer', 'Arcangelo Corelli'),
-         ('copyright', '© 2014, Creative Commons License (CC-BY)'),
-         ('fileFormat', 'musicxml'),
-         ('filePath', '...corpus/corelli/opus3no1/1grave.xml'),
-         ('keySignatureFirst', -1),
-         ('keySignatures', [-1]),
-         ('movementName', 'Sonata da Chiesa, No. I (opus 3, no. 1)'),
-         ('noteCount', 259),
-         ('numberOfParts', 3),
-         ('pitchHighest', 'C6'),
-         ('pitchLowest', 'C2'),
-         ('quarterLength', 76.0),
-         ('software', 'Dolet Light for Finale 2014'),
-         ('software', 'Finale 2014 for Mac'),
-         ('software', 'music21 v.8.0.0a9'),
+         ...
          ('sourcePath', 'corelli/opus3no1/1grave.xml'),
          ('tempoFirst', None), ('tempos', []),
          ('timeSignatureFirst', '4/4'),
@@ -2652,30 +2640,12 @@ class RichMetadata(Metadata):
          ('timeSignatures', ['4/4']))
 
         >>> rmd.all(returnPrimitives=True, returnSorted=False)
-        (('software', <music21.metadata.primitives.Text music21 v.8.0.0a9>),
+        (('software', <music21.metadata.primitives.Text music21 ...>),
          ('software', <music21.metadata.primitives.Text Finale 2014 for Mac>),
          ('software', <music21.metadata.primitives.Text Dolet Light for Finale 2014>),
          ('movementName', <...Text Sonata da Chiesa, No. I (opus 3, no. 1)>),
          ('composer', <music21.metadata.primitives.Contributor composer:Arcangelo Corelli>),
-         ('arranger', <music21.metadata.primitives.Contributor arranger:Michael Scott Cuthbert>),
-         ('copyright', <...Copyright © 2014, Creative Commons License (CC-BY)>),
-         ('filePath', <...Text ...corelli/opus3no1/1grave.xml>),
-         ('fileFormat', <music21.metadata.primitives.Text musicxml>),
-         ('dateCreated', <music21.metadata.primitives.DateRelative 1689/--/-- or earlier>),
-         ('localeOfComposition', <music21.metadata.primitives.Text Rome>),
-         ('ambitus',
-          AmbitusShort(semitones=48, diatonic='P1', pitchLowest='C2', pitchHighest='C6')),
-         ('keySignatureFirst', -1),
-         ('keySignatures', [-1]),
-         ('noteCount', 259),
-         ('numberOfParts', 3),
-         ('pitchHighest', 'C6'),
-         ('pitchLowest', 'C2'),
-         ('quarterLength', 76.0),
-         ('sourcePath', 'corelli/opus3no1/1grave.xml'),
-         ('tempoFirst', None),
-         ('tempos', []),
-         ('timeSignatureFirst', '4/4'),
+         ...
          ('timeSignatures', ['4/4']))
 
         >>> rmd.all(skipNonContributors=True, returnPrimitives=True, returnSorted=True)
@@ -2740,19 +2710,15 @@ class RichMetadata(Metadata):
             return True
         return False
 
-# -----------------------------------------------------------------------------
-
-class Test(unittest.TestCase):
-    pass
-
 
 # -----------------------------------------------------------------------------
+# tests are in test/test_metadata
 _DOC_ORDER: t.List[type] = []
 
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
+    music21.mainTest()
 
 
 # -----------------------------------------------------------------------------

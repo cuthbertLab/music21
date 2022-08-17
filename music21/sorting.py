@@ -95,9 +95,9 @@ class SortTuple(namedtuple('SortTuple', (
     '1.0 <0.20.323>'
 
     '''
-    def __new__(cls, *tupEls, **kw):
+    def __new__(cls, *tupEls, **keywords):
         # noinspection PyTypeChecker
-        return super(SortTuple, cls).__new__(cls, *tupEls, **kw)
+        return super(SortTuple, cls).__new__(cls, *tupEls, **keywords)
 
     def __eq__(self, other):
         if isinstance(other, tuple):
@@ -176,7 +176,7 @@ class SortTuple(namedtuple('SortTuple', (
         reprParts.append('>')
         return ''.join(reprParts)
 
-    def modify(self, **kw):
+    def modify(self, **keywords):
         '''
         return a new SortTuple identical to the previous, except with
         the given keyword modified.  Works only with keywords.
@@ -201,7 +201,7 @@ class SortTuple(namedtuple('SortTuple', (
         Changing offset, but nothing else, helps in creating .flatten() positions.
         '''
         # _fields are the namedtuple attributes
-        outList = [kw.get(attr, getattr(self, attr)) for attr in self._fields]
+        outList = [keywords.get(attr, getattr(self, attr)) for attr in self._fields]
         return self.__class__(*outList)
 
     def add(self, other):

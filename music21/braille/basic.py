@@ -19,6 +19,7 @@ from music21 import clef
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
+from music21 import expressions
 from music21 import interval
 from music21 import note
 from music21 import tempo  # for typing
@@ -870,7 +871,7 @@ def handleExpressions(music21Note: note.GeneralNote, noteTrans: t.List[str]):
     # expressions (so far, just fermata)
     # ----------------------------------
     for expr in music21Note.expressions:
-        if 'Fermata' in expr.classes:
+        if isinstance(expr, expressions.Fermata):
             try:
                 fermataBraille = lookup.fermatas['shape'][expr.shape]
                 noteTrans.append(fermataBraille)

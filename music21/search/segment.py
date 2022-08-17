@@ -24,7 +24,6 @@ Speed notes:
    (But then PyPy probably won't work.)
 
 '''
-import copy
 import difflib
 import json
 import math
@@ -138,23 +137,19 @@ def indexScoreParts(scoreFile, *args, **keywords):
     return indexedList
 
 
-def _indexSingleMulticore(filePath, *args, **keywords):
+def _indexSingleMulticore(filePath, *args, failFast=False, **keywords):
     '''
     Index one path in the context of multicore.
     '''
-    keywords2 = copy.copy(keywords)
-    if 'failFast' in keywords2:
-        del keywords2['failFast']
-
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
 
     shortFp = filePath.name
 
     try:
-        indexOutput = indexOnePath(filePath, *args, **keywords2)
+        indexOutput = indexOnePath(filePath, *args, **keywords)
     except Exception as e:  # pylint: disable=broad-except
-        if 'failFast' not in keywords or keywords['failFast'] is False:
+        if not failFast:
             print(f'Failed on parse/index for, {filePath}: {e}')
             indexOutput = ''
         else:

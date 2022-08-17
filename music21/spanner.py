@@ -1223,7 +1223,6 @@ class RepeatBracket(Spanner):
     `ouvert` and `clos` for medieval music.  However, if you use it for something like '1-3'
     be sure to set number properly too.
 
-
     >>> m = stream.Measure()
     >>> sp = spanner.RepeatBracket(m, number=1)
     >>> sp  # can be one or more measures
@@ -1237,46 +1236,68 @@ class RepeatBracket(Spanner):
     >>> sp.number
     '3'
 
-    >>> sp.number = '1-3'  # range of repeats
+    Range of repeats as string:
+
+    >>> sp.number = '1-3'
     >>> sp.getNumberList()
     [1, 2, 3]
     >>> sp.number
     '1-3'
 
-    >>> sp.number = [2, 3]  # range of repeats
+    Range of repeats as list:
+
+    >>> sp.number = [2, 3]
     >>> sp.getNumberList()
     [2, 3]
     >>> sp.number
     '2, 3'
 
-    >>> sp.number = '1, 2, 3'  # comma separated
+    Comma separated numbers:
+
+    >>> sp.number = '1, 2, 3'
     >>> sp.getNumberList()
     [1, 2, 3]
     >>> sp.number
     '1-3'
 
+    Disjunct numbers:
 
-    >>> sp.number = '1, 2, 3, 7'  # disjunct
+    >>> sp.number = '1, 2, 3, 7'
     >>> sp.getNumberList()
     [1, 2, 3, 7]
     >>> sp.number
     '1, 2, 3, 7'
-    >>> sp.overrideDisplay = '1-3, 7'  # does not work for number.
 
+    Override the display.
 
+    >>> sp.overrideDisplay = '1-3, 7'
+    >>> sp
+    <music21.spanner.RepeatBracket 1-3, 7
+         <music21.stream.Measure 0 offset=0.0>>
+
+    number is not affected by display overrides:
+
+    >>> sp.number
+    '1, 2, 3, 7'
     '''
-
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 *arguments,
+                 number: t.Optional[int] = None,
+                 overrideDisplay: t.Optional[str] = None,
+                 **keywords):
         super().__init__(*arguments, **keywords)
 
-        self._number = None
-        self._numberRange = []  # store a range, inclusive of the single number assignment
-        self._numberSpanIsAdjacent = None
-        self._numberSpanIsContiguous = None
-        self.overrideDisplay = None
+        self._number: t.Optional[int] = None
+        # store a range, inclusive of the single number assignment
+        self._numberRange: t.List[int] = []
+        # are there exactly two numbers that should be written as  3, 4 not 3-4.
+        self._numberSpanIsAdjacent: bool = False
+        # can we write as '3, 4' or '5-10' and not as '1, 5, 6, 11'
+        self._numberSpanIsContiguous: bool = True
+        self.overrideDisplay = overrideDisplay
 
-        if 'number' in keywords:
-            self.number = keywords['number']
+        if number is not None:
+            self.number = number
 
     # property to enforce numerical numbers
     def _getNumber(self):
@@ -1289,7 +1310,7 @@ class RepeatBracket(Spanner):
         elif len(self._numberRange) == 1:
             return str(self._number)
         else:
-            if self._numberSpanIsContiguous is False:
+            if not self._numberSpanIsContiguous:
                 return ', '.join([str(x) for x in self._numberRange])
             elif self._numberSpanIsAdjacent:
                 return f'{self._numberRange[0]}, {self._numberRange[-1]}'
@@ -1406,11 +1427,11 @@ class Ottava(Spanner):
     >>> print(ottava)
     <music21.spanner.Ottava 8vb transposing>
 
-
     An Ottava spanner can either be transposing or non-transposing.
-    In a transposing Ottava spanner, the notes should be in their
-    written octave (as if the spanner were not there) and all the
-    notes in the spanner will be transposed on Stream.toSoundingPitch()
+    In a transposing Ottava spanner, the notes in the stream should be
+    in their written octave (as if the spanner were not there) and all the
+    notes in the spanner will be transposed on Stream.toSoundingPitch().
+
     A non-transposing spanner has notes that are at the pitch that
     they would sound (therefore the Ottava spanner is a decorative
     line).
@@ -1421,6 +1442,7 @@ class Ottava(Spanner):
     >>> n2 = note.Note('E4')
     >>> n2.offset = 2.0
     >>> ottava.addSpannedElements([n1, n2])
+
     >>> s = stream.Stream([ottava, n1, n2])
     >>> s.atSoundingPitch = False
     >>> s2 = s.toSoundingPitch()
@@ -1434,7 +1456,7 @@ class Ottava(Spanner):
     D3
     E3
 
-    All valid types
+    All valid types are given below:
 
     >>> ottava.validOttavaTypes
     ('8va', '8vb', '15ma', '15mb', '22da', '22db')
@@ -1456,19 +1478,18 @@ class Ottava(Spanner):
     '''
     validOttavaTypes = ('8va', '8vb', '15ma', '15mb', '22da', '22db')
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 *arguments,
+                 type: str = '8va',  # pylint: disable=redefined-builtin
+                 transposing: bool = True,
+                 placement: t.Literal['above', 'below'] = 'above',
+                 **keywords):
         super().__init__(*arguments, **keywords)
         self._type = None  # can be 8va, 8vb, 15ma, 15mb
-        if 'type' in keywords:
-            self.type = keywords['type']  # use property
-        else:  # use 8 as a default
-            self.type = '8va'
+        self.type = type
 
-        self.placement = 'above'  # can above or below, after musicxml
-        if 'transposing' in keywords and keywords['transposing'] in (True, False):
-            self.transposing = keywords['transposing']
-        else:
-            self.transposing = True
+        self.placement = placement  # can above or below, after musicxml
+        self.transposing = transposing
 
     def _getType(self):
         return self._type
@@ -1505,12 +1526,12 @@ class Ottava(Spanner):
         (such as 8va or 15mb) or with a pair specifying size and direction.
 
         >>> os = spanner.Ottava()
-        >>> os.type = 15, 'down'
-        >>> os.type
-        '15mb'
         >>> os.type = '8vb'
         >>> os.type
         '8vb'
+        >>> os.type = 15, 'down'
+        >>> os.type
+        '15mb'
         ''')
 
     def _reprInternal(self):
@@ -1621,7 +1642,6 @@ class Ottava(Spanner):
         True
         >>> n1.nameWithOctave
         'D#3'
-
         '''
         if self.transposing:
             return
@@ -1636,11 +1656,12 @@ class Ottava(Spanner):
                 p.transpose(myInterval, inPlace=True)
 
 
+
 class Line(Spanner):
-    '''A line or bracket represented as a spanner above two Notes.
+    '''
+    A line or bracket represented as a spanner above two Notes.
 
     Brackets can take many line types.
-
 
     >>> b = spanner.Line()
     >>> b.lineType = 'dotted'
@@ -1649,37 +1670,50 @@ class Line(Spanner):
     >>> b = spanner.Line(endHeight=20)
     >>> b.endHeight
     20
-
     '''
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
     validTickTypes = ('up', 'down', 'arrow', 'both', 'none')
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(
+        self,
+        *arguments,
+        lineType: str = 'solid',
+        tick: str = 'down',
+        startTick: str = 'down',
+        endTick: str = 'down',
+        startHeight: t.Optional[t.Union[int, float]] = None,
+        endHeight: t.Optional[t.Union[int, float]] = None,
+        **keywords
+    ):
         super().__init__(*arguments, **keywords)
 
-        self._endTick = 'down'  # can ne up/down/arrow/both/None
-        self._startTick = 'down'  # can ne up/down/arrow/both/None
+        DEFAULT_TICK = 'down'
+        self._endTick = DEFAULT_TICK  # can ne up/down/arrow/both/None
+        self._startTick = DEFAULT_TICK  # can ne up/down/arrow/both/None
 
         self._endHeight = None  # for up/down, specified in tenths
         self._startHeight = None  # for up/down, specified in tenths
 
-        self._lineType = 'solid'  # can be solid, dashed, dotted, wavy
-        self.placement = 'above'  # can above or below, after musicxml
+        DEFAULT_LINE_TYPE = 'solid'
+        self._lineType = DEFAULT_LINE_TYPE  # can be solid, dashed, dotted, wavy
 
-        if 'lineType' in keywords:
-            self.lineType = keywords['lineType']  # use property
+        DEFAULT_PLACEMENT = 'above'
+        self.placement = DEFAULT_PLACEMENT  # can above or below, after musicxml
 
-        if 'startTick' in keywords:
-            self.startTick = keywords['startTick']  # use property
-        if 'endTick' in keywords:
-            self.endTick = keywords['endTick']  # use property
-        if 'tick' in keywords:
-            self.tick = keywords['tick']  # use property
+        if lineType != DEFAULT_LINE_TYPE:
+            self.lineType = lineType  # use property
 
-        if 'endHeight' in keywords:
-            self.endHeight = keywords['endHeight']  # use property
-        if 'startHeight' in keywords:
-            self.startHeight = keywords['startHeight']  # use property
+        if startTick != DEFAULT_TICK:
+            self.startTick = startTick  # use property
+        if endTick != DEFAULT_TICK:
+            self.endTick = endTick  # use property
+        if tick != DEFAULT_TICK:
+            self.tick = tick  # use property
+
+        if endHeight is not None:
+            self.endHeight = endHeight  # use property
+        if startHeight is not None:
+            self.startHeight = startHeight  # use property
 
     def _getEndTick(self):
         return self._endTick
@@ -1805,18 +1839,23 @@ class Glissando(Spanner):
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
     validSlideTypes = ('chromatic', 'continuous', 'diatonic', 'white', 'black')
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 *arguments,
+                 lineType: str = 'wavy',
+                 label: t.Optional[str] = None,
+                 **keywords):
         super().__init__(*arguments, **keywords)
 
-        self._lineType = 'wavy'
+        GLISSANDO_DEFAULT_LINETYPE = 'wavy'
+        self._lineType = GLISSANDO_DEFAULT_LINETYPE
         self._slideType = 'chromatic'
 
         self.label = None
 
-        if 'lineType' in keywords:
-            self.lineType = keywords['lineType']  # use property
-        if 'label' in keywords:
-            self.label = keywords['label']  # use property
+        if lineType != GLISSANDO_DEFAULT_LINETYPE:
+            self.lineType = lineType  # use property
+        if label is not None:
+            self.label = label  # use property
 
     def _getLineType(self):
         return self._lineType

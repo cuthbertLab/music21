@@ -214,7 +214,7 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
         streamObj.corpusFilepath = filePath
 
 
-def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwargs):
+def search(query=None, field=None, corpusNames=None, fileExtensions=None, **keywords):
     '''
     Search all stored metadata bundles and return a list of file paths.
 
@@ -278,7 +278,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     for corpusName in corpusNames:
         c = fromName(corpusName)
         searchResults = c.metadataBundle.search(
-            query, field, fileExtensions=fileExtensions, **kwargs)
+            query, field, fileExtensions=fileExtensions, **keywords)
         allSearchResults = allSearchResults.union(searchResults)
 
     return allSearchResults
