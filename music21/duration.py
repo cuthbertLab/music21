@@ -3102,7 +3102,7 @@ class GraceDuration(Duration):
         newComponents = []
         for c in self.components:
             newComponents.append(DurationTuple(c.type, c.dots, 0.0))
-        self.components = newComponents  # set new components
+        self.components = tuple(newComponents)  # set new components
 
         # make time is encoded in musicxml as divisions; here it can
         # be encoded as a duration; but should it be the duration suggested by the grace?

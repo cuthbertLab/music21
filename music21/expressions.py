@@ -1565,7 +1565,7 @@ class ArpeggioMarkSpanner(spanner.Spanner):
      <music21.chord.Chord C3 E3 G3><music21.chord.Chord C4 E4 G4>>
     '''
     def __init__(self,
-                 *spannedElements, 
+                 *spannedElements,
                  arpeggioType: str = 'normal',
                  **keywords):
         super().__init__(*spannedElements, **keywords)

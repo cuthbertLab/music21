@@ -11,15 +11,16 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
+from collections import Counter
+from collections.abc import KeysView
 import os
 import pathlib
 import pickle
 import typing as t
 import unittest
 
-from collections import Counter
-
 from music21 import common
+from music21.common.types import StreamType
 from music21 import converter
 from music21 import corpus
 from music21 import exceptions21
@@ -307,13 +308,13 @@ class StreamForms:
             self.prepared = None
 
         # basic data storage is a dictionary
-        self.forms = {}
+        self.forms: t.Dict[str, stream.Stream] = {}
 
-    def keys(self):
+    def keys(self) -> KeysView[str]:
         # will only return forms that are established
         return self.forms.keys()
 
-    def _prepareStream(self, streamObj):
+    def _prepareStream(self, streamObj: StreamType) -> StreamType:
         '''
         Common routines done on Streams prior to processing. Returns a new Stream
 
@@ -323,7 +324,7 @@ class StreamForms:
         streamObj = streamObj.stripTies(inPlace=False)
         return streamObj
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> stream.Stream:
         '''
         Get a form of this Stream, using a cached version if available.
         '''
@@ -356,7 +357,7 @@ class StreamForms:
 
         return prepared
 
-    def _getIntervalHistogram(self, algorithm='midi'):
+    def _getIntervalHistogram(self, algorithm='midi') -> t.List[int]:
         # note that this does not optimize and cache part presentations
         histo = [0] * 128
         # if we have parts, must add one at a time
@@ -384,7 +385,7 @@ class StreamForms:
         return histo
 # ----------------------------------------------------------------------------
 
-    def formPartitionByInstrument(self, prepared):
+    def formPartitionByInstrument(self, prepared: stream.Stream):
         from music21 import instrument
         return instrument.partitionByInstrument(prepared)
 
