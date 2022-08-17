@@ -409,12 +409,14 @@ class Test(unittest.TestCase):
         self.assertIsInstance(testOpus, stream.Opus)
 
         testOpusRnWriter = RnWriter(testOpus)
-        self.assertIn('Title: Fake piece - No.1:', testOpusRnWriter.combinedList)
-        self.assertIn('Title: Fake piece - No.2:', testOpusRnWriter.combinedList)
-        self.assertIn('Title: Fake piece - No.3:', testOpusRnWriter.combinedList)
-        self.assertIn('m2 I', testOpusRnWriter.combinedList)  # mvt 1
-        self.assertIn('m5 I', testOpusRnWriter.combinedList)  # mvt 2
-        self.assertIn('m3 I', testOpusRnWriter.combinedList)  # mvt 3
+        for x in ['Title: Fake piece - No.1:',
+                  'Title: Fake piece - No.2:',
+                  'Title: Fake piece - No.3:',
+                  'm2 I',  # mvt 1
+                  'm5 I',  # mvt 2
+                  'm3 I',  # mvt 3
+                  ]:
+            self.assertIn(x, testOpusRnWriter.combinedList)
 
     def testTwoCorpusPiecesAndTwoCorruptions(self):
         '''
