@@ -73,47 +73,67 @@ class Date(prebase.ProtoM21Object):
     >>> a = metadata.Date(year='1843?')
     >>> a.yearError
     'uncertain'
-    '''
 
+    >>> d = metadata.Date(year=1805, month=3, monthError='approximate')
+    >>> str(d)
+    '1805/03~/--'
+
+    Note that milliseconds are not retained, as this is a tool for musicology
+    and not for file timestamps.  However, unlike datetime objects, dates
+    in the distant past are supported (though not currently BC/BCE dates).
+    '''
     # CLASS VARIABLES #
-    # TODO: these are basically Humdrum specific and should be moved there.
     approximateSymbols = ('~', 'x')
     uncertainSymbols = ('?', 'z')
     priorTimeSymbols = ('<', '{', '>', '}')
 
     # INITIALIZER #
 
-    def __init__(self, **keywords):
-        self.year = None
-        self.month = None
-        self.day = None
-        self.hour = None
-        self.minute = None
-        self.second = None
+    def __init__(self,
+                 *,
+                 year: t.Union[int, str, None] = None,
+                 month: t.Union[int, str, None] = None,
+                 day: t.Union[int, str, None] = None,
+                 hour: t.Union[int, str, None] = None,
+                 minute: t.Union[int, str, None] = None,
+                 second: t.Union[int, float, str, None] = None,
+                 yearError: t.Union[str, None] = None,
+                 monthError: t.Union[str, None] = None,
+                 dayError: t.Union[str, None] = None,
+                 hourError: t.Union[str, None] = None,
+                 minuteError: t.Union[str, None] = None,
+                 secondError: t.Union[str, None] = None):
+        if year is not None and yearError is None:
+            year, yearError = self._stripError(year)
+        if month is not None and monthError is None:
+            month, monthError = self._stripError(month)
+        if day is not None and dayError is None:
+            day, dayError = self._stripError(day)
+        if hour is not None and hourError is None:
+            hour, hourError = self._stripError(hour)
+        if minute is not None and minuteError is None:
+            minute, minuteError = self._stripError(minute)
+        if second is not None and secondError is None:
+            second, secondError = self._stripError(second)
 
-        # error: can be 'approximate', 'uncertain'
+        self._sanityCheck(year=year, month=month, day=day, hour=hour, minute=minute, second=second)
+
+        self.year = t.cast(t.Optional[int], year)
+        self.month = t.cast(t.Optional[int], month)
+        self.day = t.cast(t.Optional[int], day)
+        self.hour = t.cast(t.Optional[int], hour)
+        self.minute = t.cast(t.Optional[int], minute)
+        self.second = t.cast(t.Optional[int], second)
+
+        # error: can be 'approximate', 'uncertain' or None.
         # None is assumed to be certain
-        self.yearError = None
-        self.monthError = None
-        self.dayError = None
-        self.hourError = None
-        self.minuteError = None
-        self.secondError = None
-        self.attrNames = ['year', 'month', 'day', 'hour', 'minute', 'second']
-        # format strings for data components
-        self.attrStrFormat = [
-            '%04.i', '%02.i', '%02.i', '%02.i', '%02.i', '%006.2f']
-        # set any keywords supplied
-        for attr in self.attrNames:
-            if attr in keywords:
-                value, error = self._stripError(keywords[attr])
-                setattr(self, attr, value)
-                if error is not None:
-                    setattr(self, attr + 'Error', error)
-        for attr in self.attrNames:
-            attr = attr + 'Error'
-            if attr in keywords:
-                setattr(self, attr, keywords[attr])
+        self.yearError: t.Optional[str] = yearError
+        self.monthError: t.Optional[str] = monthError
+        self.dayError: t.Optional[str] = dayError
+        self.hourError: t.Optional[str] = hourError
+        self.minuteError: t.Optional[str] = minuteError
+        self.secondError: t.Optional[str] = secondError
+        self.attrNames = ('year', 'month', 'day', 'hour', 'minute', 'second')
 
     # SPECIAL METHODS #
     def __eq__(self, other) -> bool:
@@ -128,71 +148,98 @@ class Date(prebase.ProtoM21Object):
         >>> str(d)
         '1030?/12~/04?'
         '''
-        # datetime.strftime('%Y.%m.%d')
-        # cannot use this, as it does not support dates lower than 1900!
+        # Note, cannot use datetime.strftime('%Y.%m.%d') even if all are not-None,
+        # as it does not support dates lower than 1900!
         msg = []
         if self.hour is None and self.minute is None and self.second is None:
             breakIndex = 3  # index
         else:
-            breakIndex = 99999
+            breakIndex = 7
 
-        for i in range(len(self.attrNames)):
+        for i, attr in enumerate(self.attrNames):
             if i >= breakIndex:
                 break
-            attr = self.attrNames[i]
-            value = getattr(self, attr)
-            error = getattr(self, attr + 'Error')
+            value = t.cast(str, getattr(self, attr))
+            error = t.cast(str, getattr(self, attr + 'Error'))
             if value is None:
                 msg.append('--')
             else:
-                fmt = self.attrStrFormat[i]
-                if error is not None:
-                    sub = fmt % value + Date.errorToSymbol(error)
+                if attr == 'year':
+                    fmt = '%04.i'
                 else:
-                    sub = fmt % value
+                    fmt = '%02.i'
+                sub = fmt % value
+                if error is not None:
+                    sub += Date.errorToSymbol(error)
                 sub = str(sub)
                 msg.append(sub)
-        return '/'.join(msg)
+        out = '/'.join(msg[:4])
+        if len(msg) > 4:
+            out += ':' + ':'.join(msg[4:])
+        return out
 
     # PRIVATE METHODS #
-
-    def _stripError(self, value):
+    def _stripError(self,
+                    value: t.Union[int, float, str],
+                    ) -> t.Tuple[int, t.Optional[str]]:
         r'''
         Strip error symbols from a numerical value. Return cleaned source and
         sym. Only one error symbol is expected per string.
 
         >>> d = metadata.Date()
         >>> d._stripError('1247~')
-        ('1247', 'approximate')
+        (1247, 'approximate')
 
-        >>> d._stripError('234.43?')
-        ('234.43', 'uncertain')
+        >>> d._stripError('63?')
+        (63, 'uncertain')
 
-        >>> d._stripError('234.43')
-        ('234.43', None)
+        Milliseconds are not retained -- this is for musicology, not computers...
 
+        >>> d._stripError('4.43')
+        (4, None)
         '''
-        if common.isNum(value):  # if a number, let pass
-            return value, None
-        else:
-            dateStr = value
-        sym = self.approximateSymbols + self.uncertainSymbols + self.priorTimeSymbols
-        found = None
-        for char in dateStr:
-            if char in sym:
-                found = char
-                break
-        if found is None:
-            return dateStr, None
-        elif found in self.approximateSymbols:
-            dateStr = dateStr.replace(found, '')
-            return dateStr, 'approximate'
-        elif found in self.uncertainSymbols:
-            dateStr = dateStr.replace(found, '')
-            return dateStr, 'uncertain'
-        elif found in self.priorTimeSymbols:
-            dateStr = dateStr.replace(found, '')
-            return dateStr, 'priority'
+        uncertainty: t.Optional[str] = None
+        if isinstance(value, str):  # if a number, let pass
+            sym = self.approximateSymbols + self.uncertainSymbols + self.priorTimeSymbols
+            found = None
+            for char in value:
+                if char in sym:
+                    found = char
+                    break
+            if found in self.approximateSymbols:
+                value = value.replace(found, '')
+                uncertainty = 'approximate'
+            elif found in self.uncertainSymbols:
+                value = value.replace(found, '')
+                uncertainty = 'uncertain'
+            elif found in self.priorTimeSymbols:
+                value = value.replace(found, '')
+                uncertainty = 'priority'
+
+        # cannot convert string '4.43' directly to int...
+        value = float(value)
+        return int(value), uncertainty
+
+    def _sanityCheck(self, *, year, month, day, hour, minute, second):
+        def month_fail(m, d, y):
+            # not checking Gregorian leap year viability, as it changes historically.
+            return ((month in (4, 6, 9, 11) and day == 31)
+                    or (month == 2 and day > 29)
+                    or (month == 2 and day == 29 and year is not None and year % 4))
+
+        if month is not None and (month < 1 or month > 12):
+            raise ValueError(f'Month must be between 1 and 12, not {month}.')
+        if day is not None and (
+                day > 31
+                or day < 1
+                or month is not None and month_fail(month, day, year)):
+            raise ValueError(f'Day {day} is not possible with month {month}.')
+        if hour is not None and (hour < 0 or hour > 23):
+            raise ValueError('Hour must be between 0 and 23')
+        if minute is not None and (minute < 0 or minute > 59):
+            raise ValueError('Minute must be between 0 and 59')
+        if second is not None and (second < 0 or second > 59):
+            raise ValueError('Second must be between 0 and 59')
 
     # PUBLIC METHODS #
 
@@ -221,17 +268,31 @@ class Date(prebase.ProtoM21Object):
         >>> b.load(a)
         >>> b.year
         1843
+
+        If there is an error, a ValueError is raised, but the
+        incorrect values are retained:
+
+        >>> d = metadata.Date()
+        >>> d.load('1999/14/32/25:60:61')
+        Traceback (most recent call last):
+        ValueError: Month must be between 1 and 12, not 14.
+        >>> str(d)
+        '1999/14/32/25:60:61'
         '''
         if isinstance(value, datetime.datetime):
             self.loadDatetime(value)
         elif isinstance(value, str):
             self.loadStr(value)
+        elif isinstance(value, int):
+            self.loadStr(str(value))
         elif isinstance(value, Date):
             self.loadOther(value)
         else:
             raise exceptions21.MetadataException(f'Cannot load data: {value}')
+        self._sanityCheck(year=self.year, month=self.month, day=self.day,
+                          hour=self.hour, minute=self.minute, second=self.second)
 
-    def loadDatetime(self, dt):
+    def loadDatetime(self, dt: datetime.datetime) -> None:
         # noinspection PyShadowingNames
         r'''
         Load time data from a datetime object:
@@ -253,9 +314,10 @@ class Date(prebase.ProtoM21Object):
                 if value not in (0, None):
                     setattr(self, attr, value)
 
-    def loadOther(self, other):
+    def loadOther(self, other: Date) -> None:
         r'''
-        Load values based on another Date object:
+        Load values based on another Date object.  (the "Other" in "loadOther"
+        means another Date object, not just anything.
 
         >>> a = metadata.Date(year=1843, month=3, day=3, yearError='approximate')
         >>> b = metadata.Date()
@@ -272,9 +334,10 @@ class Date(prebase.ProtoM21Object):
                 if getattr(other, errorAttr) is not None:
                     setattr(self, errorAttr, getattr(other, errorAttr))
 
-    def loadStr(self, dateStr):
+    def loadStr(self, dateStr: str) -> None:
         r'''
-        Load a string date representation.
+        Load a string date representation, which might have approximate
+        symbols.
 
         Assume `year/month/day/hour:minute:second`:
 
@@ -297,22 +360,17 @@ class Date(prebase.ProtoM21Object):
         >>> d.minute, d.second
         (50, 32)
         '''
-        def intOrNone(inner_value: str) -> t.Optional[int]:
-            if not inner_value or inner_value == '--':
-                return None
-            return int(inner_value)
-
-        post = []
-        postError = []
+        post: t.List[t.Optional[int]] = []
+        postError: t.List[t.Optional[str]] = []
         dateStr = dateStr.replace(':', '/')
         dateStr = dateStr.replace(' ', '')
         for chunk in dateStr.split('/'):
-            value, error = self._stripError(chunk)
+            if chunk == '--':
+                value, error = None, None
+            else:
+                value, error = self._stripError(chunk)
             post.append(value)
             postError.append(error)
-        # as error is stripped, we can now convert to numbers
-        if post and post[0] != '':
-            post = [intOrNone(x) for x in post]
         # assume in order in post list
         for i in range(len(self.attrNames)):
             if len(post) > i:  # only assign for those specified
@@ -409,7 +467,12 @@ class Date(prebase.ProtoM21Object):
 # -----------------------------------------------------------------------------
 class DatePrimitive(prebase.ProtoM21Object):
     '''
-    A default class for all date objects, which can have different types.
+    A default class for all date objects, which can have different types
+    and different "relevance" values.
+
+    Note that the interaction between uncertainty on an entire DatePrimitive object
+    vs uncertainty on a particular Date value, like month, is ill-defined
+    and needs work.
     '''
     # INITIALIZER #
 
@@ -551,7 +614,6 @@ class DateRelative(DatePrimitive):
     >>> str(dd)
     'after 2009/12/31'
 
-
     >>> dd = metadata.DateRelative('2009/12/31', 'certain')
     Traceback (most recent call last):
     music21.exceptions21.MetadataException: Relevance value is not
@@ -560,7 +622,7 @@ class DateRelative(DatePrimitive):
 
     # INITIALIZER #
 
-    def __init__(self, data='', relevance='after'):
+    def __init__(self, data: DateParseType = '', relevance='after'):
         # not a useless constructor because default value for relevance changed
         super().__init__(relevance)
         self._prepareData(data)
@@ -623,6 +685,12 @@ class DateBetween(DatePrimitive):
     Traceback (most recent call last):
     music21.exceptions21.MetadataException: Relevance value is not
         supported by this object: 'certain'
+
+    >>> d1 = metadata.Date(year=1605)
+    >>> d2 = metadata.Date(year=1608, month='11?')
+    >>> dd = metadata.DateBetween([d1, d2])
+    >>> str(dd)
+    '1605/--/-- to 1608/11?/--'
     '''
     # INITIALIZER #
 
@@ -681,10 +749,16 @@ class DateSelection(DatePrimitive):
 
     >>> dd = metadata.DateSelection(
     ...     ['2009/12/31', '2010/1/28', '1894/1/28'],
-    ...     'or',
     ...     )
     >>> str(dd)
     '2009/12/31 or 2010/01/28 or 1894/01/28'
+
+    >>> dd = metadata.DateSelection(
+    ...     [1750, '1775/03?'],
+    ...     'and'
+    ...     )
+    >>> str(dd)
+    '1750/--/-- and 1775/03?/--'
 
     >>> dd = metadata.DateSelection(
     ...     ['2009/12/31', '2010/1/28'],
@@ -693,6 +767,8 @@ class DateSelection(DatePrimitive):
     Traceback (most recent call last):
     music21.exceptions21.MetadataException: Relevance value is not
         supported by this object: 'certain'
+
+    Note that '1350 or 1351 and 1375' is not supported yet.
     '''
 
     # CLASS VARIABLES #
@@ -713,7 +789,7 @@ class DateSelection(DatePrimitive):
         msg = []
         for d in self._data:
             msg.append(str(d))
-        return ' or '.join(msg)
+        return f' {self._relevance} '.join(msg)
 
     # PRIVATE METHODS #
 
@@ -735,14 +811,14 @@ class DateSelection(DatePrimitive):
     @property
     def relevance(self):
         '''
-        The relevance attribute takes only one value:
-        `'or'`.
+        The relevance attribute takes only two values:
+        `'or'` or `'and'`.
         '''
         return self._relevance
 
     @relevance.setter
     def relevance(self, value):
-        if value != 'or':
+        if value not in ('or', 'and'):
             raise exceptions21.MetadataException(
                 f'Relevance value is not supported by this object: {value!r}')
         self._relevance = value
@@ -1449,8 +1525,33 @@ class Test(unittest.TestCase):
         self.assertEqual(date1.year, 1843)
         self.assertEqual(date1.yearError, 'approximate')
 
-        self.assertEqual(date2.year, '1843')
+        self.assertEqual(date2.year, 1843)
         self.assertEqual(date2.yearError, 'uncertain')
+
+    def testDateValueError(self):
+        with self.assertRaisesRegex(ValueError, 'Month must be.*not 13'):
+            Date(month=13)
+
+        for d, m, y in ((32, None, None),
+                        (0, None, None),
+                        (31, 4, None),
+                        (30, 2, None),
+                        (29, 2, 1999),
+                        ):
+            with self.assertRaisesRegex(ValueError, 'Day.*is not possible'):
+                Date(year=y, month=m, day=d)
+
+        with self.assertRaisesRegex(ValueError, 'Hour'):
+            Date(hour=24)
+        with self.assertRaisesRegex(ValueError, 'Minute'):
+            Date(minute=61)
+        with self.assertRaisesRegex(ValueError, 'Second'):
+            Date(second=-1)
+
+        self.assertIsNotNone(Date(year=2000, month=2, day=29))
+        self.assertIsNotNone(Date(month=2, day=29))
+        self.assertIsNotNone(Date(month=12, day=31))
+        self.assertIsNotNone(Date(hour=23, minute=59, second=59))
 
     def testDateSingle(self):
         from music21 import metadata
