@@ -322,7 +322,7 @@ def _extractPitch(
     If given a Note, also sets the client of the Pitch to be the Note if not already done
     (for safety, since the Note will be discarded.)
     '''
-    if hasattr(nOrP, 'classes') and 'Pitch' in possible.classes:
+    if hasattr(nOrP, 'classes') and 'Pitch' in nOrP.classes:
         return t.cast('music21.pitch.Pitch', nOrP)
     n = t.cast('music21.note.Note', nOrP)
     if nOrP.pitch._client is not nOrP:
@@ -871,7 +871,7 @@ class GenericInterval(IntervalBase):
     Changed in v.6 -- large intervals get abbreviations
     '''
     def __init__(self,
-                 value: t.Union[int, str] = 'Unison'
+                 value: t.Union[int, str] = 'Unison',
                  **keywords):
         super().__init__(**keywords)
         self._value: int = 1
@@ -3010,8 +3010,8 @@ class Interval(IntervalBase):
         if pitchStart and pitchEnd:  # second check unnecessary except for typing
             if chromatic or diatonic:
                 raise ValueError('Either supply intervals or pitches/notes not both')
-            genericInterval = notesToGeneric(self._pitchStart, self._noteEnd)
-            chromaticInterval = notesToChromatic(self._pitchStart, self._noteEnd)
+            genericInterval = notesToGeneric(pitchStart, pitchEnd)
+            chromaticInterval = notesToChromatic(pitchStart, pitchEnd)
             diatonicInterval = intervalsToDiatonic(genericInterval, chromaticInterval)
 
         if name:
@@ -3025,7 +3025,7 @@ class Interval(IntervalBase):
         elif diatonic and not chromatic:
             chromatic = diatonic.getChromatic()
         else:
-            diatonic = DiatonicInterval('P1')
+            diatonic = DiatonicInterval('P', 1)
             chromatic = ChromaticInterval(0)
 
         # both self.diatonic and self.chromatic can still both be None if an
@@ -3545,8 +3545,8 @@ class Interval(IntervalBase):
         # prefer to copy the existing noteEnd if it exists, or noteStart if not
         self._pitchEnd = pitch2
 
-    @pitchEnd
-    def _getNoteEnd(self):
+    @property
+    def pitchEnd(self):
         '''
         Set the
         end pitch to a new value; this will adjust
@@ -3582,7 +3582,7 @@ class Interval(IntervalBase):
     def pitchEnd(self, p: music21.pitch.Pitch):
         '''
         Assuming that this interval is defined, we can
-        set a new end note (_pitchEnd) and automatically have the start note (_noteStart).
+        set a new end note (_pitchEnd) and automatically have the start pitch (_pitchStart).
         '''
         # this is based on the procedure found in transposePitch() but offers
         # a more object-oriented approach
@@ -3593,12 +3593,15 @@ class Interval(IntervalBase):
 
 
 # ------------------------------------------------------------------------------
-def getWrittenHigherNote(note1, note2):
+def getWrittenHigherNote(note1: t.Union['music21.note.Note', 'music21.pitch.Pitch'],
+                         note2: t.Union['music21.note.Note', 'music21.pitch.Pitch']
+                         ) -> t.Union['music21.note.Note', 'music21.pitch.Pitch']:
     '''
     Given two :class:`~music21.pitch.Pitch` or :class:`~music21.note.Note` objects,
-    this function returns the higher object based on diatonic note
-    numbers. Returns the note higher in pitch if the diatonic number is
-    the same, or the first note if pitch is also the same.
+    this function returns the higher element based on diatonic note
+    numbers. If the diatonic numbers are
+    the same, returns the sounding higher element,
+    or the first element if that is also the same.
 
     >>> cis = pitch.Pitch('C#')
     >>> deses = pitch.Pitch('D--')
@@ -3606,15 +3609,15 @@ def getWrittenHigherNote(note1, note2):
     >>> higher is deses
     True
 
-    >>> aNote = note.Note('c#3')
-    >>> bNote = note.Note('d-3')
-    >>> interval.getWrittenHigherNote(aNote, bNote)
-    <music21.note.Note D->
+    >>> aPitch = pitch.Pitch('c#3')
+    >>> bPitch = pitch.Pitch('d-3')
+    >>> interval.getWrittenHigherNote(aPitch, bPitch)
+    <music21.pitch.Pitch D-3>
 
     >>> aNote = note.Note('c#3')
-    >>> bNote = note.Note('d--3')
-    >>> interval.getWrittenHigherNote(aNote, bNote)
-    <music21.note.Note D-->
+    >>> bNote = note.Note('c3')
+    >>> interval.getWrittenHigherNote(aNote, bNote) is aNote
+    True
     '''
     (p1, p2) = (_extractPitch(note1), _extractPitch(note2))
 
@@ -3628,11 +3631,13 @@ def getWrittenHigherNote(note1, note2):
         return getAbsoluteHigherNote(note1, note2)
 
 
-def getAbsoluteHigherNote(note1, note2):
+def getAbsoluteHigherNote(note1: t.Union['music21.note.Note', 'music21.pitch.Pitch'],
+                          note2: t.Union['music21.note.Note', 'music21.pitch.Pitch']
+                          ) -> t.Union['music21.note.Note', 'music21.pitch.Pitch']:
     '''
     Given two :class:`~music21.pitch.Pitch` or :class:`~music21.note.Note` objects,
-    returns the higher note based on actual frequency.
-    If both pitches are the same, returns the first note given.
+    returns the higher element based on sounding pitch.
+    If both sounding pitches are the same, returns the first element given.
 
     >>> aNote = note.Note('c#3')
     >>> bNote = note.Note('d--3')
@@ -3649,12 +3654,15 @@ def getAbsoluteHigherNote(note1, note2):
         return note1
 
 
-def getWrittenLowerNote(note1, note2):
+def getWrittenLowerNote(note1: t.Union['music21.note.Note', 'music21.pitch.Pitch'],
+                        note2: t.Union['music21.note.Note', 'music21.pitch.Pitch']
+                        ) -> t.Union['music21.note.Note', 'music21.pitch.Pitch']:
     '''
     Given two :class:`~music21.pitch.Pitch` or :class:`~music21.note.Note` objects,
-    returns the lower pitch based on diatonic note
-    number. Returns the pitch lower if the diatonic number is
-    the same, or the first pitch if pitch is also the same.
+    returns the lower element based on diatonic note
+    number. If the diatonic number is
+    the same returns the sounding lower element,
+    or the first element if sounding pitch is also the same.
 
     >>> aNote = pitch.Pitch('c#3')
     >>> bNote = pitch.Pitch('d--3')
@@ -3678,12 +3686,13 @@ def getWrittenLowerNote(note1, note2):
         return getAbsoluteLowerNote(note1, note2)
 
 
-def getAbsoluteLowerNote(note1, note2):
+def getAbsoluteLowerNote(note1: t.Union['music21.note.Note', 'music21.pitch.Pitch'],
+                         note2: t.Union['music21.note.Note', 'music21.pitch.Pitch']
+                         ) -> t.Union['music21.note.Note', 'music21.pitch.Pitch']:
     '''
     Given two :class:`~music21.note.Note` or :class:`~music21.pitch.Pitch` objects, returns
-    the lower pitch based on actual pitch.
-    If both pitches are the same, returns the first note given.
-
+    the lower element based on actual pitch.
+    If both pitches are the same, returns the first element given.
 
     >>> aNote = pitch.Pitch('c#3')
     >>> bNote = pitch.Pitch('d--3')
