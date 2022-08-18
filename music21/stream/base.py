@@ -9945,7 +9945,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     # --------------------------------------------------------------------------
     # interval routines
-
+    # TODO: override routine to show that if noNone is True that there is no None
+    #    and if noNone and skipChords is True, then it can be typed as list[note.Note]
+    
     def findConsecutiveNotes(
         self,
         *,

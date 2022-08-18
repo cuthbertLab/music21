@@ -361,6 +361,7 @@ class StreamForms:
         # note that this does not optimize and cache part presentations
         histo = [0] * 128
         # if we have parts, must add one at a time
+        parts: t.List[stream.Stream]
         if isinstance(self.prepared, stream.Score):
             parts = list(self.prepared.parts)
         else:
@@ -370,8 +371,13 @@ class StreamForms:
 
             # noNone means that we will see all connections, even w/ a gap
             post = p.findConsecutiveNotes(skipRests=True,
-                                          skipChords=True, skipGaps=True, noNone=True)
+                                          skipChords=True,
+                                          skipGaps=True,
+                                          noNone=True)
             for i, n in enumerate(post):
+                if t.TYPE_CHECKING:
+                    assert isinstance(n, note.Note)
+
                 if i < len(post) - 1:  # if not last
                     iNext = i + 1
                     nNext = post[iNext]
