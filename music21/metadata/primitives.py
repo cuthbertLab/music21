@@ -221,24 +221,26 @@ class Date(prebase.ProtoM21Object):
         return int(value), uncertainty
 
     def _sanityCheck(self, *, year, month, day, hour, minute, second):
+        def month_fail(m, d, y):
+            return ((month in (4, 6, 9, 11) and day == 31)
+                    or (month == 2 and day > 29)
+                    or (month == 2 and day == 29 and year is not None and year % 4))
+
         if month is not None and (month < 1 or month > 12):
             raise ValueError(f'Month must be between 1 and 12, not {month}.')
         if day is not None and (
                 day > 31
                 or day < 1
-                or month is not None and (
-                    (month in (4, 6, 9, 11) and day == 31)
-                    or (month == 2 and day > 29)
-                    or (month == 2 and day == 29 and year is not None and year % 4)
+                or month is not None and month_fail(month, day, year)
                     # not checking Gregorian leap year viability, as it changes historically.
-                )):
+                ):
             raise ValueError(f'Day {day} is not possible with month {month}.')
         if hour is not None and (hour < 0 or hour > 23):
-            raise ValueError(f'Hour must be between 0 and 23')
+            raise ValueError('Hour must be between 0 and 23')
         if minute is not None and (minute < 0 or minute > 59):
-            raise ValueError(f'Minute must be between 0 and 59')
+            raise ValueError('Minute must be between 0 and 59')
         if second is not None and (second < 0 or second > 59):
-            raise ValueError(f'Second must be between 0 and 59')
+            raise ValueError('Second must be between 0 and 59')
 
     # PUBLIC METHODS #
 
@@ -1547,10 +1549,10 @@ class Test(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Second'):
             Date(second=-1)
 
-        _unused = Date(year=2000, month=2, day=29)
-        _unused = Date(month=2, day=29)
-        _unused = Date(month=12, day=31)
-        _unused = Date(hour=23, minute=59, second=59)
+        self.assertIsNotNone(Date(year=2000, month=2, day=29))
+        self.assertIsNotNone(Date(month=2, day=29))
+        self.assertIsNotNone(Date(month=12, day=31))
+        self.assertIsNotNone(Date(hour=23, minute=59, second=59))
 
     def testDateSingle(self):
         from music21 import metadata
