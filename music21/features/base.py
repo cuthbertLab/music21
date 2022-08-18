@@ -374,10 +374,8 @@ class StreamForms:
                                           skipChords=True,
                                           skipGaps=True,
                                           noNone=True)
-            for i, n in enumerate(post):
-                if t.TYPE_CHECKING:
-                    assert isinstance(n, note.Note)
 
+            for i, n in enumerate(post):
                 if i < len(post) - 1:  # if not last
                     iNext = i + 1
                     nNext = post[iNext]

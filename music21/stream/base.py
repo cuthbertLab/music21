@@ -9945,21 +9945,67 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     # --------------------------------------------------------------------------
     # interval routines
-    # TODO: override routine to show that if noNone is True that there is no None
-    #    and if noNone and skipChords is True, then it can be typed as list[note.Note]
-    
+    @overload
     def findConsecutiveNotes(
         self,
         *,
-        skipRests=False,
-        skipChords=False,
-        skipUnisons=False,
-        skipOctaves=False,
-        skipGaps=False,
-        getOverlaps=False,
-        noNone=False,
+        skipRests: bool = False,
+        skipChords: t.Literal[False] = False,
+        skipUnisons: bool = False,
+        skipOctaves: bool = False,
+        skipGaps: bool = False,
+        getOverlaps: bool = False,
+        noNone: t.Literal[True],
+        **keywords
+    ) -> t.List[note.NotRest]:
+        return []
+
+    @overload
+    def findConsecutiveNotes(
+        self,
+        *,
+        skipRests: bool = False,
+        skipChords: t.Literal[True],
+        skipUnisons: bool = False,
+        skipOctaves: bool = False,
+        skipGaps: bool = False,
+        getOverlaps: bool = False,
+        noNone: t.Literal[True],
+        **keywords
+    ) -> t.List[note.Note]:
+        return []
+
+    @overload
+    def findConsecutiveNotes(
+        self,
+        *,
+        skipRests: bool = False,
+        skipChords: bool = False,
+        skipUnisons: bool = False,
+        skipOctaves: bool = False,
+        skipGaps: bool = False,
+        getOverlaps: bool = False,
+        noNone: t.Literal[False] = False,
         **keywords
     ) -> t.List[t.Union[note.NotRest, None]]:
+        return []
+
+    def findConsecutiveNotes(
+        self,
+        *,
+        skipRests: bool = False,
+        skipChords: bool = False,
+        skipUnisons: bool = False,
+        skipOctaves: bool = False,
+        skipGaps: bool = False,
+        getOverlaps: bool = False,
+        noNone: bool = False,
+        **keywords
+    ) -> t.Union[
+            t.List[t.Union[note.NotRest, None]],
+            t.List[note.NotRest],
+            t.List[note.Note],
+    ]:
         r'''
         Returns a list of consecutive *pitched* Notes in a Stream.
 
