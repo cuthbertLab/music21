@@ -222,6 +222,7 @@ class Date(prebase.ProtoM21Object):
 
     def _sanityCheck(self, *, year, month, day, hour, minute, second):
         def month_fail(m, d, y):
+            # not checking Gregorian leap year viability, as it changes historically.
             return ((month in (4, 6, 9, 11) and day == 31)
                     or (month == 2 and day > 29)
                     or (month == 2 and day == 29 and year is not None and year % 4))
@@ -231,9 +232,7 @@ class Date(prebase.ProtoM21Object):
         if day is not None and (
                 day > 31
                 or day < 1
-                or month is not None and month_fail(month, day, year)
-                    # not checking Gregorian leap year viability, as it changes historically.
-                ):
+                or month is not None and month_fail(month, day, year)):
             raise ValueError(f'Day {day} is not possible with month {month}.')
         if hour is not None and (hour < 0 or hour > 23):
             raise ValueError('Hour must be between 0 and 23')
