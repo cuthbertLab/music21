@@ -43,8 +43,8 @@ class StreamCore(Music21Object):
     Core aspects of a Stream's behavior.  Any of these can change at any time.
     Users are encouraged only to create stream.Stream objects.
     '''
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, **keywords):
+        super().__init__(**keywords)
         # hugely important -- keeps track of where the _elements are
         # the _offsetDict is a dictionary where id(element) is the
         # index and the value is a tuple of offset and element.

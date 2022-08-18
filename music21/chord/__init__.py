@@ -3597,6 +3597,8 @@ class Chord(ChordBase):
         False
 
         >>> incorrectlySpelled.pitches[1].getEnharmonic(inPlace=True)
+        >>> incorrectlySpelled
+        <music21.chord.Chord C E- G>
         >>> incorrectlySpelled.isTriad()
         True
 

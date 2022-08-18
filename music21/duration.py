@@ -3089,8 +3089,10 @@ class GraceDuration(Duration):
     )
     # INITIALIZER #
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self,
+                 typeOrDuration: t.Union[str, OffsetQLIn, DurationTuple, None] = None,
+                 **keywords):
+        super().__init__(typeOrDuration, **keywords)
         # update components to derive types; this sets ql, but this
         # will later be removed
         if self._componentsNeedUpdating:
@@ -3100,7 +3102,7 @@ class GraceDuration(Duration):
         newComponents = []
         for c in self.components:
             newComponents.append(DurationTuple(c.type, c.dots, 0.0))
-        self.components = newComponents  # set new components
+        self.components = tuple(newComponents)  # set new components
 
         # make time is encoded in musicxml as divisions; here it can
         # be encoded as a duration; but should it be the duration suggested by the grace?
@@ -3154,8 +3156,10 @@ class AppoggiaturaDuration(GraceDuration):
 
     # INITIALIZER #
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self,
+                 typeOrDuration: t.Union[str, OffsetQLIn, DurationTuple, None] = None,
+                 **keywords):
+        super().__init__(typeOrDuration, **keywords)
         self.slash = False  # can be True, False, or None; make None go to True?
         self.makeTime = True
 

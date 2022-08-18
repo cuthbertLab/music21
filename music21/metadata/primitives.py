@@ -73,7 +73,6 @@ class Date(prebase.ProtoM21Object):
     >>> a = metadata.Date(year='1843?')
     >>> a.yearError
     'uncertain'
-
     '''
 
     # CLASS VARIABLES #
@@ -84,7 +83,7 @@ class Date(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, *args, **keywords):
+    def __init__(self, **keywords):
         self.year = None
         self.month = None
         self.day = None
@@ -1009,7 +1008,7 @@ class Contributor(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self,
-                 *args,
+                 *,
                  name: t.Union[str, Text, None] = None,
                  names: t.Iterable[t.Union[str, Text]] = (),
                  role: t.Union[str, Text, None] = None,
@@ -1349,8 +1348,7 @@ class Imprint(prebase.ProtoM21Object):
     r'''
     An object representation of imprint, or publication.
     '''
-    def __init__(self, *args, **keywords):
-        self.args = args
+    def __init__(self, **keywords):
         self.keywords = keywords
 
 # !!!PUB: Publication status.

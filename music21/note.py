@@ -36,7 +36,7 @@ from music21 import prebase
 from music21 import style
 from music21 import tie
 from music21 import volume
-from music21.common.types import StepName
+from music21.common.types import StepName, OffsetQLIn
 from music21 import environment
 environLocal = environment.Environment('note')
 
@@ -542,7 +542,6 @@ class GeneralNote(base.Music21Object):
     objects directly, and not use this underlying
     structure.
 
-
     >>> gn = note.GeneralNote(type='16th', dots=2)
     >>> gn.quarterLength
     0.4375
@@ -566,13 +565,13 @@ class GeneralNote(base.Music21Object):
     }
 
     def __init__(self,
-                 *arguments,
+                 *,
                  duration: t.Optional[Duration] = None,
                  lyric: t.Union[None, str, Lyric] = None,
                  **keywords
                  ):
         if duration is None:
-            # ensure music21base not automatically create a duration.
+            # ensure music21base not automatically create a zero duration before we can.
             if not keywords or ('type' not in keywords and 'quarterLength' not in keywords):
                 tempDuration = Duration(1.0)
             else:
@@ -973,7 +972,6 @@ class NotRest(GeneralNote):
     }
 
     def __init__(self,
-                 *arguments,
                  beams: t.Optional[beam.Beams] = None,
                  **keywords):
         super().__init__(**keywords)
@@ -1898,7 +1896,6 @@ class Rest(GeneralNote):
     However, the property :attr:`~music21.stream.Stream.notesAndRests` of Streams
     gets rests as well.
 
-
     >>> r = note.Rest()
     >>> r.isRest
     True
@@ -1924,6 +1921,14 @@ class Rest(GeneralNote):
     >>> r2 = note.Rest(type='whole')
     >>> r2.duration.quarterLength
     4.0
+
+    Or they can just be specified in without a type, and they'll be evaluated automatically
+
+    >>> r3, r4 = note.Rest('half'), note.Rest(2.0)
+    >>> r3 == r4
+    True
+    >>> r3.duration.quarterLength
+    2.0
     '''
     isRest = True
     name = 'rest'
@@ -1945,8 +1950,6 @@ class Rest(GeneralNote):
                 update automatically to match the time signature context; and is True.
                 Does not work yet -- functions as True.
 
-                # TODO: get it to work.
-
                 "auto" is the default, where if the rest value happens to match the current
                 time signature context, then display it as a whole rest, centered, etc.
                 otherwise will display normally.
@@ -1955,10 +1958,21 @@ class Rest(GeneralNote):
                 ''',
     }
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 length: t.Union[str, OffsetQLIn, None] = None,
+                 *,
+                 stepShift: int = 0,
+                 fullMeasure: t.Literal[True, False, 'auto', 'always'] = 'auto',
+                 **keywords):
+        if length is not None:
+            if isinstance(length, str) and 'type' not in keywords:
+                keywords['type'] = length
+            elif 'quarterLength' not in keywords:
+                keywords['quarterLength'] = length
         super().__init__(**keywords)
-        self.stepShift = 0  # display line
-        self.fullMeasure = 'auto'  # see docs; True, False, 'always',
+        self.stepShift = stepShift  # display line
+        # TODO: fullMeasure=='always' does not work properly
+        self.fullMeasure = fullMeasure  # see docs; True, False, 'always',
 
     def _reprInternal(self):
         duration_name = self.duration.fullName.lower()
@@ -1976,7 +1990,6 @@ class Rest(GeneralNote):
         A Music21 rest is equal to another object if that object is also a rest which
         has the same duration.
 
-
         >>> r1 = note.Rest()
         >>> r2 = note.Rest()
         >>> r1 == r2
@@ -1984,7 +1997,7 @@ class Rest(GeneralNote):
         >>> r1 != r2
         False
 
-        >>> r2.duration.quarterLength = 4.0/3
+        >>> r2.duration.quarterLength = 4/3
         >>> r1 == r2
         False
         >>> r1 == note.Note()
@@ -2424,4 +2437,3 @@ if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
-

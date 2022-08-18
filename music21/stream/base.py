@@ -245,7 +245,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     be allowed, because craziness and givenElements are required::
 
         class CrazyStream(Stream):
-            def __init__(self, givenElements, craziness, *args, **keywords):
+            def __init__(self, givenElements, craziness, **keywords):
                 ...
 
     New in v.7 -- smart appending
@@ -312,11 +312,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                  givenElements: t.Union[None,
                                         base.Music21Object,
                                         t.Sequence[base.Music21Object]] = None,
-                 *arguments,
+                 *,
                  appendOrInsert: t.Literal['append', 'insert', 'offsets'] = 'offsets',
                  **keywords):
         # restrictClass: t.Type[M21ObjType] = base.Music21Object,
-        super().__init__(self, *arguments, **keywords)
+        super().__init__(**keywords)
 
         self.streamStatus = streamStatus.StreamStatus(self)
         self._unlinkedDuration = None
@@ -3322,7 +3322,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # --------------------------------------------------------------------------
     # display methods; in the same manner as show() and write()
 
-    def plot(self, *args, **keywords):
+    def plot(self,
+             plotFormat: str,
+             xValue: t.Optional[str] = None,
+             yValue: t.Optional[str] = None,
+             zValue: t.Optional[str] = None,
+             **keywords):
         '''
         Given a method and keyword configuration arguments, create and display a plot.
 
@@ -3343,9 +3348,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # import is here to avoid import of matplotlib problems
         from music21 import graph
         # first ordered arg can be method type
-        return graph.plotStream(self, *args, **keywords)
+        return graph.plotStream(self,
+                                plotFormat,
+                                xValue=xValue,
+                                yValue=yValue,
+                                zValue=zValue,
+                                **keywords)
 
-    def analyze(self, *args, **keywords):
+    def analyze(self, method: str, **keywords):
         '''
         Runs a particular analytical method on the contents of the
         stream to find its ambitus (range) or key.
@@ -3358,7 +3368,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         :func:`~music21.analysis.discrete.analyzeStream`.
 
         Example:
-
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> s.analyze('ambitus')
@@ -3409,7 +3418,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         from music21.analysis import discrete
         # pass this stream to the analysis procedure
-        return discrete.analyzeStream(self, *args, **keywords)
+        return discrete.analyzeStream(self, method, **keywords)
 
     # --------------------------------------------------------------------------
     # methods that act on individual elements without requiring
@@ -9936,19 +9945,67 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     # --------------------------------------------------------------------------
     # interval routines
+    @overload
+    def findConsecutiveNotes(
+        self,
+        *,
+        skipRests: bool = False,
+        skipChords: t.Literal[False] = False,
+        skipUnisons: bool = False,
+        skipOctaves: bool = False,
+        skipGaps: bool = False,
+        getOverlaps: bool = False,
+        noNone: t.Literal[True],
+        **keywords
+    ) -> t.List[note.NotRest]:
+        return []
+
+    @overload
+    def findConsecutiveNotes(
+        self,
+        *,
+        skipRests: bool = False,
+        skipChords: t.Literal[True],
+        skipUnisons: bool = False,
+        skipOctaves: bool = False,
+        skipGaps: bool = False,
+        getOverlaps: bool = False,
+        noNone: t.Literal[True],
+        **keywords
+    ) -> t.List[note.Note]:
+        return []
+
+    @overload
+    def findConsecutiveNotes(
+        self,
+        *,
+        skipRests: bool = False,
+        skipChords: bool = False,
+        skipUnisons: bool = False,
+        skipOctaves: bool = False,
+        skipGaps: bool = False,
+        getOverlaps: bool = False,
+        noNone: t.Literal[False] = False,
+        **keywords
+    ) -> t.List[t.Union[note.NotRest, None]]:
+        return []
 
     def findConsecutiveNotes(
         self,
         *,
-        skipRests=False,
-        skipChords=False,
-        skipUnisons=False,
-        skipOctaves=False,
-        skipGaps=False,
-        getOverlaps=False,
-        noNone=False,
+        skipRests: bool = False,
+        skipChords: bool = False,
+        skipUnisons: bool = False,
+        skipOctaves: bool = False,
+        skipGaps: bool = False,
+        getOverlaps: bool = False,
+        noNone: bool = False,
         **keywords
-    ) -> t.List[t.Union[note.NotRest, None]]:
+    ) -> t.Union[
+            t.List[t.Union[note.NotRest, None]],
+            t.List[note.NotRest],
+            t.List[note.Note],
+    ]:
         r'''
         Returns a list of consecutive *pitched* Notes in a Stream.
 
@@ -10093,7 +10150,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             returnList.pop()  # removes the last-added element
         return returnList
 
-    def melodicIntervals(self, *skipArgs, **skipKeywords):
+    def melodicIntervals(self, **skipKeywords):
         '''
         Returns a Stream of :class:`~music21.interval.Interval` objects
         between Notes (and by default, Chords) that follow each other in a stream.
@@ -10116,7 +10173,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Returns an empty Stream if there are not at least two elements found by
         findConsecutiveNotes.
-
 
         >>> s1 = converter.parse("tinynotation: 3/4 c4 d' r b b'", makeNotation=False)
         >>> #_DOCS_SHOW s1.show()
@@ -14214,16 +14270,15 @@ class SpannerStorage(Stream):
     object's .sites and find any and all
     locations that are SpannerStorage objects.
 
-    A `spannerParent` keyword argument must be
-    provided by the Spanner in creation.
+    A `client` keyword argument must be provided by the Spanner in creation.
 
-    TODO v7: rename spannerParent to client.
+    Changed in v8: spannerParent is renamed client.
     '''
 
-    def __init__(self, *arguments, spannerParent=None, **keywords):
+    def __init__(self, givenElements=None, *, client: 'music21.spanner.Spanner', **keywords):
         # No longer need store as weakref since Py2.3 and better references
-        self.spannerParent = spannerParent
-        super().__init__(*arguments, **keywords)
+        self.client = client
+        super().__init__(givenElements, **keywords)
 
         # must provide a keyword argument with a reference to the spanner
         # parent could name spannerContainer or other?

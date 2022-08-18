@@ -120,9 +120,6 @@ class LayoutBase(base.Music21Object):
     '''
     classSortOrder = -10
 
-    def __init__(self, *args, **keywords):
-        super().__init__(**keywords)
-
     def _reprInternal(self):
         return ''
 
@@ -133,7 +130,6 @@ class ScoreLayout(LayoutBase):
     '''Parameters for configuring a score's layout.
 
     PageLayout objects may be found on Measure or Part Streams.
-
 
     >>> pl = layout.PageLayout(pageNumber=4, leftMargin=234, rightMargin=124,
     ...                        pageHeight=4000, pageWidth=3000, isNew=True)
@@ -157,7 +153,7 @@ class ScoreLayout(LayoutBase):
     #     for each page are working together.
 
     def __init__(self,
-                 *args,
+                 *,
                  scalingMillimeters: t.Union[int, float, None] = None,
                  scalingTenths: t.Union[int, float, None] = None,
                  musicFont: t.Optional[str] = None,
@@ -222,15 +218,13 @@ class PageLayout(LayoutBase):
     True
 
     This object represents both <print new-page> and <page-layout>
-    elements in musicxml
-
-    ## TODO -- make sure that the first pageLayout and systemLayout
-    for each page are working together.
-
+    elements in musicxml.
     '''
+    # TODO -- make sure that the first pageLayout and systemLayout
+    #     for each page are working together.
 
     def __init__(self,
-                 *args,
+                 *,
                  pageNumber: t.Optional[int] = None,
                  leftMargin: t.Union[int, float, None] = None,
                  rightMargin: t.Union[int, float, None] = None,
@@ -278,9 +272,8 @@ class SystemLayout(LayoutBase):
     >>> sl.isNew
     True
     '''
-
     def __init__(self,
-                 *args,
+                 *,
                  leftMargin: t.Union[int, float, None] = None,
                  rightMargin: t.Union[int, float, None] = None,
                  distance: t.Union[int, float, None] = None,
@@ -365,7 +358,7 @@ class StaffLayout(LayoutBase):
             ''',
     }
     def __init__(self,
-                 *args,
+                 *,
                  distance: t.Union[int, float, None] = None,
                  staffNumber: t.Union[int, float, None] = None,
                  staffSize: t.Union[int, float, None] = None,
@@ -432,13 +425,13 @@ class StaffGroup(spanner.Spanner):
         :width: 400
     '''
     def __init__(self,
-                 *arguments,
+                 *spannedElements,
                  name: t.Optional[str] = None,
                  barTogether: t.Literal[True, False, None, 'Mensurstrich'] = True,
                  abbreviation: t.Optional[str] = None,
                  symbol: t.Literal['bracket', 'line', 'grace', 'square'] = None,
                  **keywords):
-        super().__init__(*arguments, **keywords)
+        super().__init__(*spannedElements, **keywords)
 
         self.name = name or abbreviation  # if this group has a name
         self.abbreviation = abbreviation
@@ -754,8 +747,8 @@ class LayoutScore(stream.Opus):
     it is much faster as it uses a cache.
     '''
 
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
+    def __init__(self, givenElements=None, **keywords):
+        super().__init__(givenElements, **keywords)
         self.scoreLayout = None
         self.measureStart = None
         self.measureEnd = None
@@ -1514,8 +1507,8 @@ class Page(stream.Opus):
     belongs on a single notated page.
     '''
 
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
+    def __init__(self, givenElements=None, **keywords):
+        super().__init__(givenElements, **keywords)
         self.pageNumber = 1
         self.measureStart = None
         self.measureEnd = None
@@ -1553,8 +1546,8 @@ class System(stream.Score):
     Attribute systemNumbering says at what point the numbering of
     systems resets.  It can be either "Score" (default), "Opus", or "Page".
     '''
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
+    def __init__(self, givenElements=None, **keywords):
+        super().__init__(givenElements, **keywords)
         self.systemNumber = 0
 
         self.pageNumber = 0
@@ -1579,8 +1572,8 @@ class Staff(stream.Part):
     belongs on a single Staff.
     '''
 
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
+    def __init__(self, givenElements=None, **keywords):
+        super().__init__(givenElements, **keywords)
         self.staffNumber = 1  # number in this system NOT GLOBAL
 
         self.scoreStaffNumber = 0
@@ -1686,5 +1679,3 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='getStaffLayoutFromStaff')
-
-
