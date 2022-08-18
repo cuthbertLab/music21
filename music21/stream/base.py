@@ -7080,7 +7080,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # or there could be ChordSymbols with zero (unrealized) durations
         f = returnObj.flatten()
         notes_and_rests = f.notesAndRests.addFilter(
-            lambda el, iterator: el.quarterLength > 0
+            lambda el, _iterator: el.quarterLength > 0
         ).stream()
 
         posConnected = []  # temporary storage for index of tied notes
@@ -8855,13 +8855,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         else:
             post = self
 
-        intv: 'music21.interval.IntervalBase'
+        intv: interval.IntervalBase
         if isinstance(value, (int, str)):
-            from music21 import interval
             intv = interval.Interval(value)
         else:
             intv = value
-
 
         # for p in post.pitches:  # includes chords
         #     # do inplace transpositions on the deepcopy
@@ -8875,7 +8873,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if recurse is True:
             sIterator = post.recurse()
         else:
-            sIterator = iter(post)
+            sIterator = post.iter()
 
         if classFilterList:
             sIterator = sIterator.addFilter(filters.ClassFilter(classFilterList))
@@ -8884,13 +8882,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if e.isStream:
                 continue
             if hasattr(e, 'transpose'):
-                if 'GenericInterval' in intv.classes:
+                if isinstance(intv, interval.GenericInterval):
                     # do not transpose KeySignatures w/ Generic Intervals
                     if not isinstance(e, key.KeySignature) and hasattr(e, 'pitches'):
                         k = e.getContextByClass(key.KeySignature)
                         p: pitch.Pitch
                         for p in e.pitches:  # type: ignore
-                            intv.transposePitchKeyAware(p, k, inPlace=True)  # type: ignore
+                            intv.transposePitchKeyAware(p, k, inPlace=True)
                 else:
                     e.transpose(value, inPlace=True)
         if not inPlace:

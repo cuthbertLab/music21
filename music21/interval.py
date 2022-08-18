@@ -2753,7 +2753,7 @@ def intervalFromGenericAndChromatic(
     <music21.interval.Interval A1 (-50c)>
 
     '''
-    gIntv: GenericInterval
+    gIntV: GenericInterval
     if not isinstance(gInt, GenericInterval):
         gIntV = GenericInterval(gInt)
     else:
@@ -2866,7 +2866,8 @@ class Interval(IntervalBase):
     ValueError: either both the starting and the ending pitch (or note) must be given
         or neither can be given. You cannot have one without the other.
 
-    An Interval can be constructed from a DiatonicInterval and ChromaticInterval object (or just one)
+    An Interval can be constructed from a DiatonicInterval and ChromaticInterval
+    object (or just one):
 
     >>> diaInterval = interval.DiatonicInterval('major', 'third')
     >>> chrInterval = interval.ChromaticInterval(4)
