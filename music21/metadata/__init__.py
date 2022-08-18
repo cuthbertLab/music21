@@ -2523,7 +2523,7 @@ class RichMetadata(Metadata):
 
         environLocal.printDebug(['RichMetadata: update(): start'])
 
-        flat = streamObj.flatten().sorted()
+        flat = streamObj.flatten()
 
         self.numberOfParts = len(streamObj.parts)
         self.keySignatureFirst = None

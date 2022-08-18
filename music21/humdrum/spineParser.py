@@ -35,7 +35,8 @@ SpineParsing consists of several steps.
 * All reclassed HumdrumSpines are filled with music21 objects in their .stream property.
     Measures are put into the spine but are empty containers.  The resulting
     HumdrumSpine.stream objects
-    look like Stream.semiFlat versions in many ways.
+    look like Stream.flatten(retainContainers=True)
+    versions in many ways.
 * For HumdrumSpines with parent spines their .stream contents are then
     inserted into their parent spines with
     voice tagged as a music21 Group property.

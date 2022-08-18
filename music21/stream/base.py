@@ -1974,7 +1974,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # only proceed if there are spanners, otherwise creating semiFlat
         if not newSpannerBundle:
             return
-        # iterate over complete semi-flat (need containers); find
+        # iterate over complete semiflat (need containers); find
         # all new/old pairs
         for e in new.recurse(includeSelf=False):
             # update based on id of old object, and ref to new object
@@ -6909,8 +6909,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def stripTies(
         self,
-        inPlace=False,
-        matchByPitch=True
+        *,
+        inPlace: bool = False,
+        matchByPitch: bool = True
     ):
         # noinspection PyShadowingNames
         '''
@@ -7042,6 +7043,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> stripped5 = m2.stripTies(matchByPitch=False)
         >>> stripped5.elements
         (<music21.note.Note C>, <music21.chord.Chord C4 E4 G4>)
+
+        Changed in v8: all arguments are keyword only.
         '''
         # environLocal.printDebug(['calling stripTies'])
         if not inPlace:  # make a copy
@@ -7285,7 +7288,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if not inPlace:
             return returnObj
 
-    def extendTies(self, ignoreRests=False, pitchAttr='nameWithOctave'):
+    def extendTies(self, *, ignoreRests=False, pitchAttr='nameWithOctave'):
         '''
         Connect any adjacent pitch space values that are the
         same with a Tie. Adjacent pitches can be Chords, Notes, or Voices.
@@ -7295,6 +7298,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         The `pitchAttr` determines the pitch attribute that is
         used for comparison. Any valid pitch attribute name can be used.
+
+        Changed in v8: arguments are keyword only.
         '''
         def _getNextElements(srcStream, currentIndex, targetOffset):
             # need to find next event that start at the appropriate offset
@@ -7366,10 +7371,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         TimeSignatures).
 
         Note that Streams automatically sort themselves unless
-        autoSort is set to False (as in the example below)
+        autoSort is set to False (as in the example below), so you will not
+        need to call this.
 
         If `force` is True, a sort will be attempted regardless of any other parameters.
-
 
         >>> n1 = note.Note('A')
         >>> n2 = note.Note('B')
@@ -7503,7 +7508,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         self._cache['sorted'] = s
         return s
 
-    def flatten(self: StreamType, retainContainers=False) -> StreamType:
+    def flatten(self: StreamType,
+                retainContainers=False
+                *,
+                semiFlat=False
+                ) -> StreamType:
         '''
         A very important method that returns a new Stream
         that has all sub-containers "flattened" within it,
@@ -7583,7 +7592,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> len(bwv66.recurse().notes)
         165
 
-        If `retainContainers=True` then a "semiFlat" version of the stream
+        If `retainContainers=True` (or the synonym, semiFlat=True)
+        then a "semiFlat" version of the stream
         is returned where Streams are also included in the output stream.
 
         In general, you will not need to use this because `.recurse()` is
@@ -7721,6 +7731,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> r.flatten()[124].offset
         444.0
         '''
+        if semiFlat:
+            retainContainers = True
+
         # environLocal.printDebug(['flatten(): self', self,
         #  'self.activeSite', self.activeSite])
         if retainContainers:
@@ -7784,6 +7797,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     @property
     def flat(self):
         '''
+        DEPRECATED -- use `.flatten()` instead.
+
         A property that returns the same flattened representation as `.flatten()`
         as of music21 v7.
 
@@ -7792,15 +7807,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         This property will be deprecated in v8 and removed in v9.
         '''
         return self.flatten(retainContainers=False)
-
-    @property
-    def semiFlat(self):
-        '''
-        The same as `.flatten(retainContainers=True)`.  This
-        property should be rarely used, in favor of `.recurse()`, and will
-        be removed as a property in version 8.
-        '''
-        return self.flatten(retainContainers=True)
 
     @overload
     def recurse(self,
