@@ -2190,7 +2190,7 @@ class Chord(ChordBase):
 
         first = self.intervalFromChordStep(chordStep)
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(testRoot, thisPitch)
+            thisInterval = interval.Interval(testRoot, thisPitch)
             if thisInterval.diatonic.generic.mod7 == chordStep:
                 if thisInterval.chromatic.mod12 - first.chromatic.mod12 != 0:
                     return True
@@ -2221,7 +2221,7 @@ class Chord(ChordBase):
             if testRoot is None:
                 raise ChordException('Cannot run intervalFromChordStep without a root')
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(testRoot, thisPitch)
+            thisInterval = interval.Interval(testRoot, thisPitch)
             if thisInterval.diatonic.generic.mod7 == chordStep:
                 return thisInterval
         return None
@@ -2447,8 +2447,8 @@ class Chord(ChordBase):
         tempRootPitch = copy.deepcopy(rootPitch)
         tempRootPitch.octave = 2
 
-        bassToRoot = interval.notesToInterval(tempBassPitch,
-                                              tempRootPitch).generic.simpleDirected
+        bassToRoot = interval.notesToGeneric(tempBassPitch,
+                                             tempRootPitch).simpleDirected
         # print('bassToRoot', bassToRoot)
         if bassToRoot == 1:
             inv = 0
@@ -2702,7 +2702,7 @@ class Chord(ChordBase):
         >>> c14
         <music21.chord.Chord A4 B4>
 
-        >>> i14 = interval.notesToInterval(c14.pitches[0], c14.pitches[1])
+        >>> i14 = interval.Interval(c14.pitches[0], c14.pitches[1])
         >>> i14
         <music21.interval.Interval M2>
 
@@ -2720,7 +2720,7 @@ class Chord(ChordBase):
             c3 = self.closedPosition()
             # to get from lowest to highest for P4 protection
             c4 = c3.removeRedundantPitches(inPlace=False)
-            i = interval.notesToInterval(c4.pitches[0], c4.pitches[1])
+            i = interval.Interval(c4.pitches[0], c4.pitches[1])
             return i.isConsonant()
         elif len(c2.pitches) == 3:
             if ((self.isMajorTriad() is True or self.isMinorTriad() is True)
@@ -2776,7 +2776,7 @@ class Chord(ChordBase):
         root = self.root()
 
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(root, thisPitch)
+            thisInterval = interval.Interval(root, thisPitch)
             if thisInterval.chromatic.mod12 not in intervalArray:
                 return False
         return True
@@ -3054,7 +3054,7 @@ class Chord(ChordBase):
             return False
 
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
+            thisInterval = interval.Interval(self.root(), thisPitch)
             if thisInterval.chromatic.mod12 not in (0, 4):
                 return False
 
@@ -3100,7 +3100,7 @@ class Chord(ChordBase):
             return False
 
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
+            thisInterval = interval.Interval(self.root(), thisPitch)
             if thisInterval.chromatic.mod12 not in (0, 3):
                 return False
 

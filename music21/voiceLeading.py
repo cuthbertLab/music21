@@ -245,7 +245,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note D>
         ''')
 
-
     def _getV2n1(self):
         return self._v2n1
 
@@ -275,10 +274,14 @@ class VoiceLeadingQuartet(base.Music21Object):
         ''')
 
     def _findIntervals(self):
-        self.vIntervals.append(interval.notesToInterval(self.v1n1, self.v2n1))
-        self.vIntervals.append(interval.notesToInterval(self.v1n2, self.v2n2))
-        self.hIntervals.append(interval.notesToInterval(self.v1n1, self.v1n2))
-        self.hIntervals.append(interval.notesToInterval(self.v2n1, self.v2n2))
+        self.vIntervals.append(interval.Interval(self.v1n1, self.v2n1))
+        self.vIntervals.append(interval.Interval(self.v1n2, self.v2n2))
+        self.hIntervals.append(interval.Interval(self.v1n1, self.v1n2))
+        self.hIntervals.append(interval.Interval(self.v2n1, self.v2n2))
+        for vIntv in self.vIntervals:
+            vIntv.intervalType = 'harmonic'
+        for hIntv in self.hIntervals:
+            hIntv.intervalType = 'melodic'
 
     def motionType(self, *, allowAntiParallel=False):
         '''

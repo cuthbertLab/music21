@@ -362,7 +362,7 @@ def base40ActualInterval(base40NumA, base40NumB):
     noteB.pitch = pitchB
 
     try:
-        return interval.notesToInterval(noteA, noteB)
+        return interval.Interval(noteA, noteB)
     except IndexError:
         raise Base40Exception('Unusual interval- Limitation of music21.interval')
 

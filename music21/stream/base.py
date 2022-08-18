@@ -10673,7 +10673,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 for simultNote in simultEls.notes:
                     interval1 = None
                     try:
-                        interval1 = interval.notesToInterval(n, simultNote)
+                        interval1 = interval.Interval(n, simultNote)
+                        interval1.intervalType = 'harmonic'
                         n.editorial.harmonicInterval = interval1
                     except exceptions21.Music21Exception:
                         pass
@@ -10726,8 +10727,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if (previousObject is not None
                     and isinstance(currentObject, note.Note)
                     and isinstance(previousObject, note.Note)):
-                currentObject.editorial.melodicInterval = interval.notesToInterval(
-                    previousObject, currentObject)
+                melodicInterval = interval.Interval(previousObject, currentObject)
+                melodicInterval.intervalType = 'melodic'
+                currentObject.editorial.melodicInterval = melodicInterval
             previousObject = currentObject
             currentObject = currentObject.next()
 

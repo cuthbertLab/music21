@@ -2855,7 +2855,7 @@ class Interval(IntervalBase):
 
     If giving a starting pitch, an ending pitch has to be specified.
 
-    >>> aInterval = interval.Interval(pitchStart=n1)
+    >>> aInterval = interval.Interval(pitchStart=p1)
     Traceback (most recent call last):
     ValueError: either both the starting and the ending pitch (or note) must be given
         or neither can be given. You cannot have one without the other.
@@ -3008,23 +3008,34 @@ class Interval(IntervalBase):
                 + 'given or neither can be given.  You cannot have one without the other.'
             )
         if pitchStart and pitchEnd:  # second check unnecessary except for typing
-            if chromatic or diatonic:
-                raise ValueError('Either supply intervals or pitches/notes not both')
             genericInterval = notesToGeneric(pitchStart, pitchEnd)
-            chromaticInterval = notesToChromatic(pitchStart, pitchEnd)
-            diatonicInterval = intervalsToDiatonic(genericInterval, chromaticInterval)
+            chromaticNew = notesToChromatic(pitchStart, pitchEnd)
+            diatonicNew = intervalsToDiatonic(genericInterval, chromaticNew)
+            if (chromatic or diatonic) and chromatic != chromaticNew:
+                # it is okay for no diatonic match. Notes will pick this up.
+                raise ValueError(
+                    'Do not pass in pitches/notes and diatonic/chromatic '
+                    + 'interval objects, unless they represent the same interval.'
+                )
+            chromatic = chromaticNew
+            diatonic = diatonicNew
 
         if name:
-            if chromatic or diatonic:
-                raise ValueError('Do not pass in a name and Diatonic/Chromatic interval objects.')
-            diatonic, chromatic, inferred = _stringToDiatonicChromatic(name)
+            diatonicNew, chromaticNew, inferred = _stringToDiatonicChromatic(name)
+            if (chromatic or diatonic) and (chromatic != chromaticNew or diatonic != diatonicNew):
+                raise ValueError(
+                    'Do not pass in a name and pitches/notes or diatonic/chromatic '
+                    + 'interval objects, unless they represent the same interval.'
+                )
+            chromatic = chromaticNew
+            diatonic = diatonicNew
             self.implicitDiatonic = inferred
         elif chromatic and not diatonic:
             diatonic = chromatic.getDiatonic()
             self.implicitDiatonic = True
         elif diatonic and not chromatic:
             chromatic = diatonic.getChromatic()
-        else:
+        elif not diatonic and not chromatic:
             diatonic = DiatonicInterval('P', 1)
             chromatic = ChromaticInterval(0)
 
@@ -3262,10 +3273,10 @@ class Interval(IntervalBase):
         >>> aInterval.cents
         400.0
 
-        >>> n1 = pitch.Pitch('C4')
-        >>> n2 = pitch.Pitch('D4')
-        >>> n2.pitch.microtone = 30
-        >>> microtoneInterval = interval.Interval(noteStart=n1, noteEnd=n2)
+        >>> p1 = pitch.Pitch('C4')
+        >>> p2 = pitch.Pitch('D4')
+        >>> p2.microtone = 30
+        >>> microtoneInterval = interval.Interval(pitchStart=p1, pitchEnd=p2)
         >>> microtoneInterval.cents
         230.0
 
@@ -3291,7 +3302,7 @@ class Interval(IntervalBase):
                        p: 'music21.pitch.Pitch',
                        *,
                        reverse=False,
-                       maxAccidental=4,
+                       maxAccidental: t.Optional[int] = 4,
                        inPlace=False):
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new,
@@ -3344,6 +3355,7 @@ class Interval(IntervalBase):
         changed to keyword only.
 
         OMIT_FROM_DOCS
+
         TODO: More tests here, esp. on fundamental.
 
         >>> p1 = pitch.Pitch('C4')
@@ -3470,7 +3482,7 @@ class Interval(IntervalBase):
         >>> intvP5 = interval.Interval(pitchStart=p1, pitchEnd=p2)
         >>> intvP5
         <music21.interval.Interval P5>
-        >>> revInterval = interval.reverse()
+        >>> revInterval = intvP5.reverse()
         >>> revInterval
         <music21.interval.Interval P-5>
         >>> revInterval.pitchStart is intvP5.pitchEnd
@@ -3590,6 +3602,46 @@ class Interval(IntervalBase):
 
         self._pitchEnd = p
         self._pitchStart = pitch1
+
+    @property
+    def noteStart(self) -> t.Optional[music21.note.Note]:
+        '''
+        Return or set the Note that pitchStart is attached to.  For
+        backwards compatibility
+        '''
+        p = self.pitchStart
+        if p and p._client:
+            return p._client
+        elif p:
+            from music21 import note
+            return note.Note(pitch=p)
+
+    @noteStart.setter
+    def noteStart(self, n: t.Optional[music21.note.Note]):
+        if n:
+            self.pitchStart = n.pitch
+        else:
+            self.pitchStart = None
+
+    @property
+    def noteEnd(self) -> t.Optional[music21.note.Note]:
+        '''
+        Return or set the Note that pitchEnd is attached to.  For
+        backwards compatibility
+        '''
+        p = self.pitchEnd
+        if p and p._client:
+            return p._client
+        elif p:
+            from music21 import note
+            return note.Note(pitch=p)
+
+    @noteEnd.setter
+    def noteEnd(self, n: t.Optional[music21.note.Note]):
+        if n:
+            self.pitchEnd = n.pitch
+        else:
+            self.pitchEnd = None
 
 
 # ------------------------------------------------------------------------------
@@ -3896,6 +3948,23 @@ def subtract(intervalList):
 
 
 class Test(unittest.TestCase):
+
+    def testConstructorPitches(self):
+        from music21 import interval
+        from music21 import pitch
+        p1 = pitch.Pitch('A4')
+        p2 = pitch.Pitch('E5')
+        intv = interval.Interval(p1, p2)
+        self.assertEqual(intv.name, 'P5')
+        self.assertIs(intv.pitchStart, p1)
+        self.assertIs(intv.pitchEnd, p2)
+
+        # same with keywords, but reversed
+        intv = interval.Interval(pitchStart=p2, pitchEnd=p1)
+        self.assertEqual(intv.name, 'P5')
+        self.assertEqual(intv.directedName, 'P-5')
+        self.assertIs(intv.pitchStart, p2)
+        self.assertIs(intv.pitchEnd, p1)
 
     def testFirst(self):
         from music21.note import Note
@@ -4254,21 +4323,49 @@ class Test(unittest.TestCase):
         n2 = ns.transpose(i)
         self.assertEqual(n2.nameWithOctave, 'F4')
 
+    def testRepeatedTransposePitch(self):
+        from music21 import interval
+        from music21 import pitch
+        p = pitch.Pitch('C1')
+        intv = interval.Interval('P5')
+        out = []
+        for _ in range(33):
+            out.append(p.nameWithOctave)
+            intv.transposePitch(p, maxAccidental=None, inPlace=True)
+        self.assertEqual(
+            out,
+            ['C1', 'G1', 'D2', 'A2', 'E3', 'B3', 'F#4',
+             'C#5', 'G#5', 'D#6', 'A#6', 'E#7', 'B#7', 'F##8',
+             'C##9', 'G##9', 'D##10', 'A##10', 'E##11', 'B##11', 'F###12',
+             'C###13', 'G###13', 'D###14', 'A###14', 'E###15', 'B###15', 'F####16',
+             'C####17', 'G####17', 'D####18', 'A####18', 'E####19',
+             ]
+        )
+        with self.assertRaisesRegex(pitch.AccidentalException,
+                                     '5.0 is not a supported accidental type'):
+            intv.transposePitch(p, maxAccidental=None)
+        p2 = intv.transposePitch(p)
+        self.assertEqual(p2.nameWithOctave, 'B-20')
+
+
     def testIntervalWithOneNoteGiven(self):
         from music21 import interval
         from music21 import note
         noteC = note.Note('C4')
-        i = interval.Interval(name='P4', noteStart=noteC)
+        with self.assertRaises(ValueError):
+            i = interval.Interval(name='P4', noteStart=noteC)
+        i = interval.Interval(name='P4')
+        i.noteStart = noteC
         self.assertEqual(i.noteEnd.nameWithOctave, 'F4')
         noteF = i.noteEnd
 
         # giving noteStart and noteEnd and a name where the name does not match
         # the notes is an exception.
-        with self.assertRaises(interval.IntervalException):
+        with self.assertRaises(ValueError):
             interval.Interval(name='d5', noteStart=noteC, noteEnd=noteF)
 
         # same with chromatic only intervals
-        with self.assertRaises(interval.IntervalException):
+        with self.assertRaises(ValueError):
             interval.Interval(chromatic=interval.ChromaticInterval(6),
                               noteStart=noteC,
                               noteEnd=noteF)
@@ -4290,14 +4387,16 @@ class Test(unittest.TestCase):
 
 
     def testEmptyIntervalProperties(self):
+        '''
+        As of v8, an empty Interval is equal to P1
+        '''
         empty = DiatonicInterval()
         self.assertEqual(empty.cents, 0.0)
 
         empty = Interval()
-        self.assertEqual(empty.complement, empty)
-        self.assertIsNot(empty.complement, empty)
         self.assertEqual(empty.cents, 0.0)
         self.assertEqual(empty.intervalClass, 0)
+        self.assertEqual(empty.name, 'P1')
 
 
 # ------------------------------------------------------------------------------
