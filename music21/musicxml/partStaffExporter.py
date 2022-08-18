@@ -1078,8 +1078,8 @@ class Test(unittest.TestCase):
         from music21 import defaults
         from music21 import layout
 
-        ps1 = stream.PartStaff(chord.Chord("C E G"))
-        ps2 = stream.PartStaff(chord.Chord("D F A"))
+        ps1 = stream.PartStaff(chord.Chord('C E G'))
+        ps2 = stream.PartStaff(chord.Chord('D F A'))
         sg = layout.StaffGroup([ps1, ps2])
         s = stream.Score([sg, ps1, ps2])
 
