@@ -2222,12 +2222,12 @@ def partitionByInstrument(streamObj: 'music21.stream.Stream') -> 'music21.stream
     if not streamObj.hasPartLikeStreams():
         # place in a score for uniform operations
         s = stream.Score()
-        s.insert(0, streamObj.flatten())
+        s.insert(0, streamObj.flatten().stream())
     else:
         s = stream.Score()
         # append flat parts
         for sub in streamObj.getElementsByClass(stream.Stream):
-            s.insert(0, sub.flatten())
+            s.insert(0, sub.flatten().stream())
 
     # first, let's extend the duration of each instrument to match stream
     for sub in s.getElementsByClass(stream.Stream):

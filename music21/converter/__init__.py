@@ -1527,20 +1527,19 @@ class Test(unittest.TestCase):
     def testConversionMX(self):
         from music21.musicxml import testPrimitive
         from music21 import dynamics
+        from music21 import expressions
         from music21 import note
 
         mxString = testPrimitive.pitches01a
         a = parse(mxString)
-        a = a.flatten()
-        b = a.getElementsByClass(note.Note)
+        b = a[note.Note]
         # there should be 102 notes
         self.assertEqual(len(b), 102)
 
         # test directions, dynamics, wedges
         mxString = testPrimitive.directions31a
         a = parse(mxString)
-        a = a.flatten()
-        b = a.getElementsByClass(dynamics.Dynamic)
+        b = a[dynamics.Dynamic]
         # there should be 27 dynamics found in this file
         self.assertEqual(len(b), 27)
         c = a.getElementsByClass(note.Note)
@@ -1553,8 +1552,7 @@ class Test(unittest.TestCase):
         # test lyrics
         mxString = testPrimitive.lyricsMelisma61d
         a = parse(mxString)
-        a = a.flatten()
-        b = a.getElementsByClass(note.Note)
+        b = a[note.Note]
         found = []
         for noteObj in b:
             for obj in noteObj.lyrics:
@@ -1564,15 +1562,14 @@ class Test(unittest.TestCase):
         # test we are getting rests
         mxString = testPrimitive.restsDurations02a
         a = parse(mxString)
-        a = a.flatten()
-        b = a.getElementsByClass(note.Rest)
+        b = a[note.Rest]
         self.assertEqual(len(b), 19)
 
         # test if we can get trills
         mxString = testPrimitive.notations32a
         a = parse(mxString)
-        a = a.flatten()
-        b = a.getElementsByClass(note.Note)
+        b = a[expressions.Trill]
+        self.assertTrue(b)
 
         mxString = testPrimitive.rhythmDurations03a
         a = parse(mxString)
@@ -1588,15 +1585,14 @@ class Test(unittest.TestCase):
 
         # print(a.recurseRepr())
 
-        # # get the third movement
+        # # get the third movement -- too slow
         # mxFile = corpus.getWork('opus18no1')[2]
         # a = parse(mxFile)
-        # a = a.flatten()
-        # b = a.getElementsByClass(dynamics.Dynamic)
+        # b = a[dynamics.Dynamic]
         # # 110 dynamics
         # self.assertEqual(len(b), 110)
         #
-        # c = a.getElementsByClass(note.Note)
+        # c = a[note.Note]
         # # over 1000 notes
         # self.assertEqual(len(c), 1289)
 
@@ -1693,8 +1689,8 @@ class Test(unittest.TestCase):
                  "<class 'music21.articulations.Accent'>",
                  "<class 'music21.articulations.Staccato'>",
                  "<class 'music21.articulations.Tenuto'>"]
-        for i in range(len(notes)):
-            post.append(str(notes[i].articulations[0].__class__))
+        for n in notes:
+            post.append(str(n.articulations[0].__class__))
         self.assertEqual(post, match)
         # a.show()
 
@@ -2032,20 +2028,24 @@ class Test(unittest.TestCase):
 
         # Don't forceSource: test that pickles contemplate quantization keywords
         streamFpQuantized = parse(fp)
-        self.assertNotIn(0.875, streamFpQuantized.flatten()._uniqueOffsetsAndEndTimes())
+        self.assertNotIn(0.875,
+                         streamFpQuantized.flatten().stream()._uniqueOffsetsAndEndTimes())
 
         streamFpNotQuantized = parse(fp, quantizePost=False)
-        self.assertIn(0.875, streamFpNotQuantized.flatten()._uniqueOffsetsAndEndTimes())
+        self.assertIn(0.875,
+                      streamFpNotQuantized.flatten().stream()._uniqueOffsetsAndEndTimes())
 
         streamFpCustomQuantized = parse(fp, quarterLengthDivisors=(2,))
-        self.assertNotIn(0.75, streamFpCustomQuantized.flatten()._uniqueOffsetsAndEndTimes())
+        self.assertNotIn(0.75,
+                         streamFpCustomQuantized.flatten().stream()._uniqueOffsetsAndEndTimes())
 
         # Also check raw data: https://github.com/cuthbertLab/music21/issues/546
         with fp.open('rb') as f:
             data = f.read()
         self.assertIsInstance(data, bytes)
         streamDataNotQuantized = parse(data, quantizePost=False)
-        self.assertIn(0.875, streamDataNotQuantized.flatten()._uniqueOffsetsAndEndTimes())
+        self.assertIn(0.875,
+                      streamDataNotQuantized.flatten().stream()._uniqueOffsetsAndEndTimes())
 
         # Remove pickles so that failures are possible in future
         pf1 = PickleFilter(fp)

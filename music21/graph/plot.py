@@ -1572,7 +1572,7 @@ class TestExternalManual(unittest.TestCase):  # pragma: no cover
         b.run()
 
     def testScatterWeightedPitchSpaceQuarterLength(self):
-        a = corpus.parse('bach/bwv57.8').parts[0].flatten()
+        a = corpus.parse('bach/bwv57.8').parts[0].flatten().stream()
         for xLog in [True, False]:
             b = ScatterWeightedPitchSpaceQuarterLength(
                 a, title='Pitch Space Bach (soprano voice)',

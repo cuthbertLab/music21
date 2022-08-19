@@ -435,7 +435,7 @@ def makeMeasures(
             # parts containing voices are less likely to occur since MIDI parsing changes in v7
             srcObj = s
         else:
-            srcObj = s.flatten()
+            srcObj = s.flatten().stream()
         if not srcObj.isSorted:
             srcObj = srcObj.sorted()
         if not inPlace:

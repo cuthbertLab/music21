@@ -65,7 +65,7 @@ class ActivityMatch:
             objNameDst = dynamics.Dynamic
 
         post = []
-        streamFlat = self.streamObj.flatten()
+        streamFlat = self.streamObj.flatten().stream()
 
         streamFlat = streamFlat.extendDuration(objNameDst)
 

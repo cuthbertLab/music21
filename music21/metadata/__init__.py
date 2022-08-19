@@ -2523,8 +2523,6 @@ class RichMetadata(Metadata):
 
         environLocal.printDebug(['RichMetadata: update(): start'])
 
-        flat = streamObj.flatten()
-
         self.numberOfParts = len(streamObj.parts)
         self.keySignatureFirst = None
         self.keySignatures = []
@@ -2537,7 +2535,7 @@ class RichMetadata(Metadata):
 
         # We combine element searching into a single loop to prevent
         # multiple traversals of the flattened stream.
-        for element in flat:
+        for element in streamObj.flatten():
             if isinstance(element, meter.TimeSignature):
                 ratioString = element.ratioString
                 if ratioString not in self.timeSignatures:
@@ -2575,8 +2573,8 @@ class RichMetadata(Metadata):
         # self.pitchLowest = str(self.pitchLowest)
         # self.pitchHighest = str(self.pitchHighest)
 
-        self.noteCount = len(flat.notesAndRests)
-        self.quarterLength = flat.highestTime
+        self.noteCount = len(streamObj.recurse().notesAndRests)
+        self.quarterLength = streamObj.highestTime
 
         # commenting out temporarily due to memory error
         # with corpus/beethoven/opus132.xml

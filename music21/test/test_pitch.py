@@ -375,7 +375,8 @@ class Test(unittest.TestCase):
         cautionaryNotImmediateRepeat=False
         and key signature conflicts.
         '''
-        bm = converter.parse("tinynotation: 4/4 fn1 fn1 e-8 e'-8 fn4 en4 e'n4").flatten()
+        bm = converter.parse("tinynotation: 4/4 fn1 fn1 e-8 e'-8 fn4 en4 e'n4"
+                             ).flatten().stream()
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         notes = bm[note.Note]

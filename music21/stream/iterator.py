@@ -157,6 +157,7 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
         self.restoreActiveSites: bool = restoreActiveSites
 
         self.overrideDerivation: t.Optional[str] = None
+        self.derivationPrefix: str = ''  # to put on before any filters.  Should not end in `.`
 
         if filterList is None:
             filterList = []
@@ -878,6 +879,8 @@ class StreamIterator(prebase.ProtoM21Object, t.Sequence[M21ObjType]):
             found.derivation.method = self.overrideDerivation
         else:
             derivationMethods = []
+            if self.derivationPrefix:
+                derivationMethods.append(self.derivationPrefix)
             for f in self.filters:
                 if isinstance(f, filters.StreamFilter):
                     dStr = f.derivationStr
@@ -2132,6 +2135,7 @@ class FlatIterator(StreamIterator, t.Sequence[M21ObjType]):
                          )
         self.retainContainers = retainContainers
         self.heap: t.List[t.Tuple[OffsetQL, int, M21ObjType]] = []
+        self.derivationPrefix = 'flat.' if not retainContainers else 'semiFlat.'
 
     def reset(self) -> None:
         super().reset()
@@ -2147,7 +2151,7 @@ class FlatIterator(StreamIterator, t.Sequence[M21ObjType]):
                     from music21 import stream
                     assert isinstance(e, stream.Stream)
                 for sub_el in e:
-                    new_o = o.modify(offset=common.numberTools.opFrac(o.offset + sub_el.offset))
+                    new_o = sub_el.sortTuple().modify(offset=common.numberTools.opFrac(o.offset + sub_el.offset))
                     heapq.heappush(self.heap, (new_o, id(sub_el), sub_el))
                 if not self.retainContainers:
                     continue
@@ -2158,6 +2162,21 @@ class FlatIterator(StreamIterator, t.Sequence[M21ObjType]):
         self.cleanup()
         raise StopIteration
 
+    @overload
+    def stream(self, returnStreamSubClass: t.Literal[False]) -> 'music21.stream.Stream':
+        # ignore this code -- just here until Astroid bug #1015 is fixed
+        x: 'music21.stream.Stream' = self.streamObj
+        return x
+
+    @overload
+    def stream(self, returnStreamSubClass: t.Literal[True] = True) -> StreamType:
+        x: StreamType = self.streamObj
+        return x
+
+    def stream(self, returnStreamSubClass=True) -> t.Union['music21.stream.Stream', StreamType]:
+        out = super().stream(returnStreamSubClass=returnStreamSubClass)
+        out.id = str(self.srcStream.id) + ('_semiFlat' if self.retainContainers else '_flat')
+        return out
 
 class Test(unittest.TestCase):
     def testSimpleClone(self):

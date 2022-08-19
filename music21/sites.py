@@ -703,7 +703,7 @@ class Sites(common.SlottedObjectMixin):
         >>> s.append(a)
         >>> a.sites.getSiteCount()
         1
-        >>> sf = s.flatten()
+        >>> sf = s.flatten().stream()
         >>> a.sites.getSiteCount()
         2
         '''

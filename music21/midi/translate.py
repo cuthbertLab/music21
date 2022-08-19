@@ -2423,7 +2423,7 @@ def packetStorageFromSubstreamList(
     packetStorage = {}
 
     for trackId, subs in enumerate(substreamList):  # Conductor track is track 0
-        subs = subs.flatten()
+        subs = subs.flatten().stream()
 
         # get a first instrument; iterate over rest
         instrumentStream = subs.getElementsByClass(instrument.Instrument)
@@ -3235,7 +3235,7 @@ class Test(unittest.TestCase):
     def testOverlappedEventsA(self):
         from music21 import corpus
         s = corpus.parse('bwv66.6')
-        sFlat = s.flatten()
+        sFlat = s.flatten().stream()
         mtList = streamHierarchyToMidiTracks(sFlat)
         self.assertEqual(len(mtList), 2)
 

@@ -543,14 +543,14 @@ class PartReduction:
         # create flat representation of all parts in a bundle
         for partBundle in self._partBundles:
             if len(partBundle['parts']) == 1:
-                partBundle['parts.flat'] = partBundle['parts'][0].flatten()
+                partBundle['parts.flat'] = partBundle['parts'][0].flatten().stream()
             else:
                 # align all parts and flatten
                 # this takes a flat presentation of all parts
                 s = stream.Stream()
                 for p in partBundle['parts']:
                     s.insert(0, p)
-                partBundle['parts.flat'] = s.flatten()
+                partBundle['parts.flat'] = s.flatten().stream()
 
 
     def _createEventSpans(self):
@@ -911,7 +911,7 @@ class Test(unittest.TestCase):
         new_stream = stream.Stream()
         for m in three_measures:
             new_stream.append(m)
-        flat_stream = new_stream.flatten()
+        flat_stream = new_stream.flatten().stream()
         match = [(repr(e), e.offset, e.duration.quarterLength) for e in flat_stream.notesAndRests]
         self.maxDiff = None
         self.assertEqual(match,

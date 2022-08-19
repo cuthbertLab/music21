@@ -58,7 +58,7 @@ class WindowedAnalysis:
         if not isinstance(streamObj, stream.Stream):
             raise WindowedAnalysisException('non-stream provided as argument')
         if streamObj.hasPartLikeStreams():
-            streamObj = streamObj.flatten()  # part-like substreams not supported.
+            streamObj = streamObj.flatten().stream()  # part-like substreams not supported.
         self._srcStream = streamObj
         # store a windowed Stream, partitioned into bars of 1/4
         self._windowedStream = self.getMinimumWindowStream()
@@ -94,7 +94,7 @@ class WindowedAnalysis:
         the stream.  So these two calls are equivalent:
 
         >>> wa1 = analysis.windowed.WindowedAnalysis(s, p)
-        >>> wa2 = analysis.windowed.WindowedAnalysis(s.flatten(), p)
+        >>> wa2 = analysis.windowed.WindowedAnalysis(s.flatten().stream(), p)
 
         '''
         # create a stream that contains just a 1/4 time signature; this is
@@ -131,7 +131,7 @@ class WindowedAnalysis:
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
-        >>> wa = analysis.windowed.WindowedAnalysis(s.flatten(), p)
+        >>> wa = analysis.windowed.WindowedAnalysis(s.flatten().stream(), p)
         >>> len(wa._windowedStream)
         36
         >>> a, b = wa.analyze(1)
@@ -375,7 +375,7 @@ class Test(unittest.TestCase):
 
             # get windowing object, provide a stream for analysis as well as
             # the processor
-            wa = WindowedAnalysis(s.flatten(), p)
+            wa = WindowedAnalysis(s.flatten().stream(), p)
             # do smallest and larges
             for i in list(range(1, 4)) + [None]:
                 unused_x, unused_y, unused_z = wa.process(i, i)
@@ -446,9 +446,10 @@ class Test(unittest.TestCase):
         p = discrete.KrumhanslSchmuckler()
         s = corpus.parse('bach/bwv66.6')
 
-        unused_wa = WindowedAnalysis(s.flatten(), p)
+        unused_wa = WindowedAnalysis(s.flatten().stream(), p)
 
-        plot = graph.plot.WindowedKey(s.flatten(), doneAction=None,
+        plot = graph.plot.WindowedKey(s.flatten().stream(),
+                                      doneAction=None,
                                       windowStep=4, windowType='overlap')
         plot.run()
         # plot.write()

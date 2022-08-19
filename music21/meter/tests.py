@@ -501,7 +501,8 @@ class Test(unittest.TestCase):
 
     def testMixedDurationBeams2(self):
         from music21 import converter
-        bm = converter.parse('tinyNotation: 3/8 b8 c16 r e. d32').flatten()
+        bm = converter.parse('tinyNotation: 3/8 b8 c16 r e. d32'
+                             ).flatten().stream()  # necessary?
         bm2 = bm.makeNotation()
         beamList = [n.beams for n in bm2.recurse().notes]
         self.assertEqual(
