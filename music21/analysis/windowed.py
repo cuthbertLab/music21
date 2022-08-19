@@ -358,7 +358,7 @@ class TestMockProcessor:
     def process(self, subStream):
         '''Simply count the number of notes found
         '''
-        return len(subStream.flatten().notesAndRests), None
+        return len(subStream.recurse().notesAndRests), None
 
 
 class Test(unittest.TestCase):
