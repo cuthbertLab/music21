@@ -4407,14 +4407,12 @@ class Pitch(prebase.ProtoM21Object):
         >>> newPitch
         <music21.pitch.Pitch B3>
 
-
         >>> aPitch
         <music21.pitch.Pitch G4>
 
         >>> aPitch.transpose(aInterval, inPlace=True)
         >>> aPitch
         <music21.pitch.Pitch C#4>
-
 
         Implicit octaves remain implicit:
 
@@ -4423,7 +4421,6 @@ class Pitch(prebase.ProtoM21Object):
         G#
         >>> print(anyGSharp.transpose('P5'))
         D#
-
 
         If the accidental of a pitch is chosen by music21, not
         given by the user, then after transposing, music21 will
@@ -4437,8 +4434,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> pc6.transpose('-m2')
         <music21.pitch.Pitch F>
 
-
-
         OMIT_FROM_DOCS
 
         Test to make sure that extreme ranges work
@@ -4447,7 +4442,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> lowC = dPitch.transpose('m-23')
         >>> lowC
         <music21.pitch.Pitch C#-1>
-
 
         >>> otherPitch = pitch.Pitch('D2')
         >>> otherPitch.transpose('m-23', inPlace=True)

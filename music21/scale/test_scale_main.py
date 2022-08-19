@@ -10,6 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from pprint import pformat
+from textwrap import dedent
 import unittest
 
 from music21 import common
@@ -352,7 +353,8 @@ class Test(unittest.TestCase):
         # self.assertEqual(mm.nextPitch('g2', Direction.DESCENDING).nameWithOctave, 'f2')
 
     def testMelodicMinorB(self):
-        '''Need to test descending form of getting pitches with no defined min and max
+        '''
+        Need to test descending form of getting pitches with no defined min and max
         '''
         mm = scale.MelodicMinorScale('a')
         # self.assertEqual(str(mm.getPitches(None, None, direction=Direction.ASCENDING)),
@@ -635,24 +637,24 @@ class Test(unittest.TestCase):
 
     def testScalaScaleA(self):
         # noinspection SpellCheckingInspection
-        msg = '''! fj-12tet.scl
-!
-Franck Jedrzejewski continued fractions approx. of 12-tet
- 12
-!
-89/84
-55/49
-44/37
-63/50
-4/3
-99/70
-442/295
-27/17
-37/22
-98/55
-15/8
-2/1
-'''
+        msg = dedent('''! fj-12tet.scl
+            !
+            Franck Jedrzejewski continued fractions approx. of 12-tet
+             12
+            !
+            89/84
+            55/49
+            44/37
+            63/50
+            4/3
+            99/70
+            442/295
+            27/17
+            37/22
+            98/55
+            15/8
+            2/1
+            ''')
         # provide a raw scala string
         sc = scale.ScalaScale('c4', msg)
         self.assertEqual(str(sc), '<music21.scale.ScalaScale C Scala: fj-12tet.scl>')
@@ -671,18 +673,18 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         ss = sc.getScalaData()
         self.assertEqual(ss.pitchCount, 7)
         msg = '''!
-<music21.scale.MajorScale C major>
-7
-!
-200.0
-400.0
-500.0
-700.0
-900.0
-1100.0
-1200.0
-'''
-        self.assertEqual(ss.getFileString(), msg)
+            <music21.scale.MajorScale C major>
+            7
+            !
+            200.0
+            400.0
+            500.0
+            700.0
+            900.0
+            1100.0
+            1200.0
+            '''
+        self.assertTrue(common.whitespaceEqual(ss.getFileString(), msg), ss.getFileString())
 
     # noinspection SpellCheckingInspection
 

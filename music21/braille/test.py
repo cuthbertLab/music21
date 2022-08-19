@@ -1059,8 +1059,8 @@ class Test(unittest.TestCase):
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass(stream.Measure)
         m[0].pop(0)
-        m[1].transpose(value='P8', inPlace=True)
-        m[2].transpose(value='P8', inPlace=True)
+        m[1].transpose('P8', inPlace=True)
+        m[2].transpose('P8', inPlace=True)
         self.s = bm
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀

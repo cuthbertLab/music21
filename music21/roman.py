@@ -501,7 +501,7 @@ def figureTupleSolo(
     '''
     unused_scaleStep, scaleAccidental = keyObj.getScaleDegreeAndAccidentalFromPitch(pitchObj)
 
-    thisInterval = interval.notesToInterval(bass, pitchObj)
+    thisInterval = interval.Interval(bass, pitchObj)
     aboveBass = thisInterval.diatonic.generic.mod7
     if scaleAccidental is None:
         rootAlterationString = ''

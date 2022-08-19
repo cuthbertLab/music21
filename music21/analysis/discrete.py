@@ -1249,7 +1249,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
 
                 if nNext is not None:
                     # environLocal.printDebug(['creating interval from notes:', n, nNext, i])
-                    i = interval.notesToInterval(n, nNext)
+                    i = interval.Interval(n, nNext)
                     if ignoreUnison:  # will apply to enharmonic eq unisons
                         if i.chromatic.semitones == 0:
                             continue

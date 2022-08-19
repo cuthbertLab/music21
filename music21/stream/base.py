@@ -7080,7 +7080,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # or there could be ChordSymbols with zero (unrealized) durations
         f = returnObj.flatten()
         notes_and_rests = f.notesAndRests.addFilter(
-            lambda el, iterator: el.quarterLength > 0
+            lambda el, _iterator: el.quarterLength > 0
         ).stream()
 
         posConnected = []  # temporary storage for index of tied notes
@@ -8801,7 +8801,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def transpose(
         self,
-        value,
+        value: t.Union[str, int, 'music21.interval.IntervalBase'],
+        /,
+        *,
         inPlace=False,
         recurse=True,
         classFilterList=None
@@ -8844,12 +8846,21 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> cStream.flatten().transpose(aInterval, inPlace=True)
         >>> [str(p) for p in cStream.pitches[:10]]
         ['F6', 'A-6', 'F6', 'F6', 'F6', 'F6', 'G-6', 'F6', 'E-6', 'E-6']
+
+        Changed in v8: first value is position only, all other values are keyword only
         '''
         # only change the copy
         if not inPlace:
             post = self.coreCopyAsDerivation('transpose')
         else:
             post = self
+
+        intv: interval.IntervalBase
+        if isinstance(value, (int, str)):
+            intv = interval.Interval(value)
+        else:
+            intv = value
+
         # for p in post.pitches:  # includes chords
         #     # do inplace transpositions on the deepcopy
         #     p.transpose(value, inPlace=True)
@@ -8858,10 +8869,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         #     e.transpose(value, inPlace=True)
 
         # this will get all elements at this level and downward.
+        sIterator: iterator.StreamIterator
         if recurse is True:
             sIterator = post.recurse()
         else:
-            sIterator = iter(post)
+            sIterator = post.iter()
 
         if classFilterList:
             sIterator = sIterator.addFilter(filters.ClassFilter(classFilterList))
@@ -8870,13 +8882,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if e.isStream:
                 continue
             if hasattr(e, 'transpose'):
-                if (hasattr(value, 'classes')
-                        and 'GenericInterval' in value.classes):
+                if isinstance(intv, interval.GenericInterval):
                     # do not transpose KeySignatures w/ Generic Intervals
                     if not isinstance(e, key.KeySignature) and hasattr(e, 'pitches'):
                         k = e.getContextByClass(key.KeySignature)
-                        for p in e.pitches:
-                            value.transposePitchKeyAware(p, k, inPlace=True)
+                        p: pitch.Pitch
+                        for p in e.pitches:  # type: ignore
+                            intv.transposePitchKeyAware(p, k, inPlace=True)
                 else:
                     e.transpose(value, inPlace=True)
         if not inPlace:
@@ -10645,7 +10657,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Example usage:
 
-
         >>> s1 = converter.parse('tinynotation: 7/4 C4 d8 e f# g A2 d2', makeNotation=False)
         >>> s2 = converter.parse('tinynotation: 7/4 g4 e8 d c4   a2 r2', makeNotation=False)
         >>> s1.attachIntervalsBetweenStreams(s2)
@@ -10662,23 +10673,25 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         P8
         None
         '''
-        for n in self.notes:
+        # TODO: this can be replaced by two different O(n) iterators, without
+        #   an O(n*2) lookup.
+        for n in self.getElementsByClass(note.Note):
             # clear any previous result
             n.editorial.harmonicInterval = None
             # get simultaneous elements from other stream
             simultEls = cmpStream.getElementsByOffset(self.elementOffset(n),
                                                       mustBeginInSpan=False,
                                                       mustFinishInSpan=False)
-            if simultEls:
-                for simultNote in simultEls.notes:
-                    interval1 = None
-                    try:
-                        interval1 = interval.notesToInterval(n, simultNote)
-                        n.editorial.harmonicInterval = interval1
-                    except exceptions21.Music21Exception:
-                        pass
-                    if interval1 is not None:
-                        break  # inner loop
+            for simultNote in simultEls.getElementsByClass(note.Note):
+                interval1 = None
+                try:
+                    interval1 = interval.Interval(n, simultNote)
+                    interval1.intervalType = 'harmonic'
+                    n.editorial.harmonicInterval = interval1
+                except exceptions21.Music21Exception:
+                    pass
+                if interval1 is not None:
+                    break  # inner loop
 
     def attachMelodicIntervals(self):
         '''
@@ -10726,8 +10739,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if (previousObject is not None
                     and isinstance(currentObject, note.Note)
                     and isinstance(previousObject, note.Note)):
-                currentObject.editorial.melodicInterval = interval.notesToInterval(
-                    previousObject, currentObject)
+                melodicInterval = interval.Interval(previousObject, currentObject)
+                melodicInterval.intervalType = 'melodic'
+                currentObject.editorial.melodicInterval = melodicInterval
             previousObject = currentObject
             currentObject = currentObject.next()
 
