@@ -18,6 +18,7 @@ StreamIterators are explicitly allowed to access private methods on streams.
 from __future__ import annotations
 
 import copy
+import heapq
 import typing as t
 from typing import overload
 import unittest
@@ -2108,6 +2109,55 @@ class RecursiveIterator(StreamIterator, t.Sequence[M21ObjType]):
         else:
             return t.cast(RecursiveIterator[M21ObjType], out)
 
+class FlatIterator(StreamIterator, t.Sequence[M21ObjType]):
+    '''
+    A breadth-first search on the stream
+    '''
+    def __init__(self,
+                 srcStream,
+                 *,
+                 # restrictClass: t.Type[M21ObjType] = base.Music21Object,
+                 filterList=None,
+                 restoreActiveSites=True,
+                 activeInformation=None,
+                 retainContainers=False,
+                 ignoreSorting=False,
+                 ):  # , parentIterator=None):
+        super().__init__(srcStream,
+                         # restrictClass=restrictClass,
+                         filterList=filterList,
+                         restoreActiveSites=restoreActiveSites,
+                         activeInformation=activeInformation,
+                         ignoreSorting=ignoreSorting,
+                         )
+        self.retainContainers = retainContainers
+        self.heap: t.List[t.Tuple[OffsetQL, int, M21ObjType]] = []
+
+    def reset(self) -> None:
+        super().reset()
+        self.heap = [(el.sortTuple(), id(el), el) for el in self.srcStream]
+        if not self.srcStream.isSorted:
+            heapq.heapify(self.heap)
+
+    def __next__(self) -> M21ObjType:
+        while self.heap:
+            o, _id, e = heapq.heappop(self.heap)
+            if e.isStream:
+                if t.TYPE_CHECKING:
+                    from music21 import stream
+                    assert isinstance(e, stream.Stream)
+                for sub_el in e:
+                    new_o = o.modify(offset=common.numberTools.opFrac(o.offset + sub_el.offset))
+                    heapq.heappush(self.heap, (new_o, id(sub_el), sub_el))
+                if not self.retainContainers:
+                    continue
+            e.activeSite = None
+            e.offset = o.offset
+            if self.matchesFilters(e):
+                return e
+        self.cleanup()
+        raise StopIteration
+
 
 class Test(unittest.TestCase):
     def testSimpleClone(self):
@@ -2190,7 +2240,7 @@ class Test(unittest.TestCase):
 
 
 
-_DOC_ORDER = [StreamIterator, RecursiveIterator, OffsetIterator]
+_DOC_ORDER = [StreamIterator, RecursiveIterator, OffsetIterator, FlatIterator]
 
 if __name__ == '__main__':
     import music21
