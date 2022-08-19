@@ -595,7 +595,7 @@ def convertSemitoneToSpecifierGenericMicrotone(
     return (spec, (generic + (octave * 7)) * dirScale, cents)
 
 
-def convertSemitoneToSpecifierGeneric(count: int) -> t.Tuple[Specifier, int]:
+def convertSemitoneToSpecifierGeneric(count: t.Union[int, float]) -> t.Tuple[Specifier, int]:
     '''
     Given a number of semitones, return a default diatonic specifier, and
     a number that can be used as a GenericInterval
@@ -623,6 +623,13 @@ def convertSemitoneToSpecifierGeneric(count: int) -> t.Tuple[Specifier, int]:
 
     >>> interval.convertSemitoneToSpecifierGeneric(6)
     (<Specifier.DIMINISHED>, 5)
+
+    Microtones are rounded here:
+
+    >>> interval.convertSemitoneToSpecifierGeneric(0.4)
+    (<Specifier.PERFECT>, 1)
+    >>> interval.convertSemitoneToSpecifierGeneric(0.6)
+    (<Specifier.MINOR>, 2)
     '''
     # strip off microtone
     return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
@@ -2418,8 +2425,8 @@ class ChromaticInterval(IntervalBase):
         >>> aInterval.getDiatonic()
         <music21.interval.DiatonicInterval M7>
         '''
-        # ignoring microtone here
-        specifier, generic = convertSemitoneToSpecifierGeneric(int(self.semitones))
+        # microtones get rounded here.
+        specifier, generic = convertSemitoneToSpecifierGeneric(self.semitones)
         return DiatonicInterval(specifier, generic)
 
     def transposePitch(self, p: 'music21.pitch.Pitch', *, inPlace=False):
@@ -3440,7 +3447,8 @@ class Interval(IntervalBase):
         pitch2.step = newStep
         pitch2.octave = newOctave
         pitch2.accidental = None
-        # leave microtone alone.
+        # if this is not set to None then terrible things happen
+        pitch2.microtone = None  # type: ignore
 
         # We have the right note name but not the right accidental
         interval2 = Interval(pitch1, pitch2)
