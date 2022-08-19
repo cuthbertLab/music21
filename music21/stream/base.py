@@ -1974,7 +1974,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # only proceed if there are spanners, otherwise creating semiFlat
         if not newSpannerBundle:
             return
-        # iterate over complete semi-flat (need containers); find
+        # iterate over complete semiflat (need containers); find
         # all new/old pairs
         for e in new.recurse(includeSelf=False):
             # update based on id of old object, and ref to new object
@@ -6909,8 +6909,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def stripTies(
         self,
-        inPlace=False,
-        matchByPitch=True
+        *,
+        inPlace: bool = False,
+        matchByPitch: bool = True
     ):
         # noinspection PyShadowingNames
         '''
@@ -7042,6 +7043,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> stripped5 = m2.stripTies(matchByPitch=False)
         >>> stripped5.elements
         (<music21.note.Note C>, <music21.chord.Chord C4 E4 G4>)
+
+        Changed in v8: all arguments are keyword only.
         '''
         # environLocal.printDebug(['calling stripTies'])
         if not inPlace:  # make a copy
@@ -7285,7 +7288,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if not inPlace:
             return returnObj
 
-    def extendTies(self, ignoreRests=False, pitchAttr='nameWithOctave'):
+    def extendTies(self, *, ignoreRests=False, pitchAttr='nameWithOctave'):
         '''
         Connect any adjacent pitch space values that are the
         same with a Tie. Adjacent pitches can be Chords, Notes, or Voices.
@@ -7295,6 +7298,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         The `pitchAttr` determines the pitch attribute that is
         used for comparison. Any valid pitch attribute name can be used.
+
+        Changed in v8: arguments are keyword only.
         '''
         def _getNextElements(srcStream, currentIndex, targetOffset):
             # need to find next event that start at the appropriate offset
@@ -7366,10 +7371,10 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         TimeSignatures).
 
         Note that Streams automatically sort themselves unless
-        autoSort is set to False (as in the example below)
+        autoSort is set to False (as in the example below), so you will not
+        need to call this.
 
         If `force` is True, a sort will be attempted regardless of any other parameters.
-
 
         >>> n1 = note.Note('A')
         >>> n2 = note.Note('B')
@@ -7503,7 +7508,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         self._cache['sorted'] = s
         return s
 
-    def flatten(self: StreamType, retainContainers=False) -> StreamType:
+    def flatten(self: StreamType,
+                retainContainers=False
+                *,
+                semiFlat=False
+                ) -> StreamType:
         '''
         A very important method that returns a new Stream
         that has all sub-containers "flattened" within it,
@@ -7583,7 +7592,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> len(bwv66.recurse().notes)
         165
 
-        If `retainContainers=True` then a "semiFlat" version of the stream
+        If `retainContainers=True` (or the synonym, semiFlat=True)
+        then a "semiFlat" version of the stream
         is returned where Streams are also included in the output stream.
 
         In general, you will not need to use this because `.recurse()` is
@@ -7721,6 +7731,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> r.flatten()[124].offset
         444.0
         '''
+        if semiFlat:
+            retainContainers = True
+
         # environLocal.printDebug(['flatten(): self', self,
         #  'self.activeSite', self.activeSite])
         if retainContainers:
@@ -7784,6 +7797,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     @property
     def flat(self):
         '''
+        DEPRECATED -- use `.flatten()` instead.
+
         A property that returns the same flattened representation as `.flatten()`
         as of music21 v7.
 
@@ -7792,15 +7807,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         This property will be deprecated in v8 and removed in v9.
         '''
         return self.flatten(retainContainers=False)
-
-    @property
-    def semiFlat(self):
-        '''
-        The same as `.flatten(retainContainers=True)`.  This
-        property should be rarely used, in favor of `.recurse()`, and will
-        be removed as a property in version 8.
-        '''
-        return self.flatten(retainContainers=True)
 
     @overload
     def recurse(self,
@@ -8884,8 +8890,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         else:
             return None
 
-    def scaleOffsets(self, amountToScale, *, anchorZero='lowest',
-                     anchorZeroRecurse=None, inPlace=False):
+    def scaleOffsets(self,
+                     amountToScale: OffsetQLIn,
+                     *,
+                     anchorZero: t.Literal['lowest', 'highest', 'zero'] = 'lowest',
+                     anchorZeroRecurse: t.Literal['lowest', 'highest', 'zero'] = 'zero',
+                     inPlace=False):
         '''
         Scale all offsets by a multiplication factor given
         in `amountToScale`. Durations are not altered.
@@ -8915,8 +8925,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         To shift all the elements in a Stream, see the
         :meth:`~music21.stream.Stream.shiftElements` method.
 
-        Changed in v.5 -- inPlace is default False, and anchorZero, anchorZeroRecurse
-        and inPlace are keyword only arguments.
+        * Changed in v.5 -- inPlace is default False, and anchorZero, anchorZeroRecurse
+            and inPlace are keyword only arguments.
+        * Changed in v.8 -- anchorZero and anchorZeroRecurse None renamed to 'zero'
         '''
         # if we have offsets at 0, 2, 4
         # we scale by 2, getting offsets at 0, 4, 8
@@ -8934,12 +8945,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             returnObj = self
 
         # first, get the offset shift requested
-        if anchorZero in ['lowest']:
-            offsetShift = Fraction(returnObj.lowestOffset)
-        elif anchorZero in ['highest']:
-            offsetShift = Fraction(returnObj.highestOffset)
-        elif anchorZero in [None]:
-            offsetShift = Fraction(0, 1)
+        if anchorZero == 'lowest':
+            offsetShift = opFrac(returnObj.lowestOffset)
+        elif anchorZero == 'highest':
+            offsetShift = opFrac(returnObj.highestOffset)
+        elif anchorZero in ('zero', None):  # remove None possibility in v9. transition
+            offsetShift = 0.0
         else:
             raise StreamException(f'an anchorZero value of {anchorZero} is not accepted')
 
@@ -8949,7 +8960,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             # then apply the amountToScale
             o = (returnObj.elementOffset(e) - offsetShift) * amountToScale
             # after scaling, return the shift taken away
-            o += offsetShift
+            o = opFrac(o + offsetShift)
 
             # environLocal.printDebug(['changing offset', o, scalar, offsetShift])
 
@@ -8992,7 +9003,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if inPlace is not True:
             return returnObj
 
-    def augmentOrDiminish(self, amountToScale, *, inPlace=False):
+    def augmentOrDiminish(self, amountToScale: OffsetQLIn, *, inPlace=False):
         '''
         Given a number greater than zero,
         multiplies the current quarterLength of the
@@ -9002,19 +9013,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         set to True, modifies the durations of each
         element within the stream.
 
-
         A number of 0.5 will halve the durations and relative
         offset positions; a number of 2 will double the
         durations and relative offset positions.
-
-
 
         Note that the default for inPlace is the opposite
         of what it is for augmentOrDiminish on a Duration.
         This is done purposely to reflect the most common
         usage.
-
-
 
         >>> s = stream.Stream()
         >>> n = note.Note()
@@ -9037,7 +9043,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # inPlace is True as a copy has already been made if nec
         returnObj.scaleOffsets(amountToScale=amountToScale, anchorZero='lowest',
-                               anchorZeroRecurse=None, inPlace=True)
+                               anchorZeroRecurse='zero', inPlace=True)
         returnObj.scaleDurations(amountToScale=amountToScale, inPlace=True)
 
         # do not need to call elements changed, as called in sub methods
@@ -9046,6 +9052,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     def quantize(
         self,
         quarterLengthDivisors: t.Iterable[int] = (),
+        *,
         processOffsets: bool = True,
         processDurations: bool = True,
         inPlace: bool = False,
@@ -9076,10 +9083,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         If `recurse` is True, then all substreams are also quantized.
         If False (default), then only the highest level of the Stream is quantized.
-
-        Changed in v.7:
-           - `recurse` defaults False
-           - look-ahead approach to choosing divisors to avoid gaps when processing durations
 
         >>> n = note.Note()
         >>> n.quarterLength = 0.49
@@ -9150,6 +9153,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             {1.0 - 1.5} <music21.note.Note C>
             {1.5 - 1.8333} <music21.note.Note C>
 
+
+        * Changed in v.7:
+           - `recurse` defaults False
+           - look-ahead approach to choosing divisors to avoid gaps when processing durations
+        * Changed in v.8:
+           - all arguments except the first are keyword only.
+
         OMIT_FROM_DOCS
 
         Test changing defaults, running, and changing back...
@@ -9174,6 +9184,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         [0.0, 0.5, 1.0, 1.5, 1.75]
         >>> [e.duration.quarterLength for e in v]
         [0.5, 0.5, 0.5, 0.25, 0.25]
+
+        This is OMITTED -- post changes above.
         '''
         if not quarterLengthDivisors:
             quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
@@ -9269,9 +9281,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         deepcopies of all contained elements at all levels.
 
         Uses the :class:`~music21.repeat.Expander` object in the `repeat` module.
-
-        TODO: DOC TEST
         '''
+        # TODO: DOC TEST
         if not self.hasMeasures():
             raise StreamException(
                 'cannot process repeats on Stream that does not contain measures'
@@ -9308,8 +9319,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # --------------------------------------------------------------------------
     # slicing and recasting a note as many notes
 
-    def sliceByQuarterLengths(self, quarterLengthList, *, target=None,
-                              addTies=True, inPlace=False):
+    def sliceByQuarterLengths(self,
+                              quarterLengthList,
+                              *,
+                              target=None,
+                              addTies=True,
+                              inPlace=False):
         '''
         Slice all :class:`~music21.duration.Duration` objects on all Notes and Rests
         of this Stream.
@@ -9332,7 +9347,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             m: Measure
             for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByQuarterLengths(quarterLengthList,
-                                        target=target, addTies=addTies, inPlace=True)
+                                        target=target,
+                                        addTies=addTies,
+                                        inPlace=True)
             returnObj.coreElementsChanged()
             return returnObj  # exit
 
