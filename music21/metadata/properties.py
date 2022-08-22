@@ -14,39 +14,38 @@
 import typing as t
 from dataclasses import dataclass
 
-from music21.metadata.primitives import (DateSingle, Text, Contributor, Copyright, ValueType)
+from music21.metadata.primitives import (DatePrimitive, Text, Contributor, Copyright, ValueType)
 
 
 @dataclass
 class PropertyDescription:
     '''
-        Describes a single standard metadata property.
+    Describes a single standard metadata property.
 
-        name: str is the namespace's name of the property (the tail of the property term URI).
-        namespace: str is a shortened form of the URI for the set of terms.
-            'dcterms' means the property term is from the Dublin Core terms,
-                defined at <http://purl.org/dc/terms/>
-            'marcrel' means the property term is from the MARC Relator terms,
-                defined at <http://www.loc.gov/loc.terms/relators/>
-            'humdrum' means the property term is from the Humdrum reference record terms,
-                defined at <https://www.humdrum.org/reference-records/#>
-        isContributor: bool is whether the property describes a contributor.
-        needsArticleNormalization: bool is whether the property values might
-            benefit from article normalization when getting as a string (this is
-            generally True for various kinds of titles).
-        oldMusic21Abbrev: str is the backward compatible music21 abbreviation for this
-            property.
-        oldMusic21WorkId: str is the backward compatible music21 name for this property.
-        uniqueName: str is the official music21 name for this property, that is unique
-            within the list of properties. There is always a unique name, but the
-            uniqueName field is only set if name is not unique enough.
-            To get the unique name from a particular PropertyDescription, we do:
-                (desc.uniqueName if desc.uniqueName
-                    else desc.name)
-        valueType: Type is the actual type of the value that will be stored in the metadata.
-            This allows auto-conversion to take place when clients store items in the
-            metadata, and is the tuple element type clients will always receive from
-            md['uniqueName'] or md['namespace:name'].
+    * name: str is the namespace's name of the property (the tail of the property term URI).
+    * namespace: str is a shortened form of the URI for the set of terms.
+        * 'dcterms' means the property term is from the Dublin Core terms,
+            defined at <http://purl.org/dc/terms/>
+        * 'marcrel' means the property term is from the MARC Relator terms,
+            defined at <http://www.loc.gov/loc.terms/relators/>
+        * 'humdrum' means the property term is from the Humdrum reference record terms,
+            defined at <https://www.humdrum.org/reference-records/#>
+    * isContributor: bool is whether the property describes a contributor.
+    * needsArticleNormalization: bool is whether the property values might
+        benefit from article normalization when getting as a string (this is
+        generally True for various kinds of titles).
+    * oldMusic21Abbrev: str is the backward compatible music21 abbreviation for this
+        property.
+    * oldMusic21WorkId: str is the backward compatible music21 name for this property.
+    * uniqueName: str is the official music21 name for this property, that is unique
+        within the list of properties. There is always a unique name, but the
+        uniqueName field is only set if name is not unique enough.
+        To get the unique name from a particular PropertyDescription, call:
+        `(desc.uniqueName if desc.uniqueName else desc.name)`
+    * valueType: Type is the actual type of the value that will be stored in the metadata.
+        This allows auto-conversion to take place when clients store items in the
+        metadata, and is the tuple element type clients will always receive from
+        md['uniqueName'] or md['namespace:name'].
     '''
     uniqueName: t.Optional[str] = None
     name: str = ''
@@ -95,7 +94,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='dateAvailable',
         name='available',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # bibliographicCitation: A bibliographic reference for the resource.
@@ -116,7 +115,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         name='created',
         namespace='dcterms',
         oldMusic21WorkId='date',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # otherDate: A point or period of time associated with an event in the lifecycle
@@ -125,28 +124,28 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='otherDate',
         name='date',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # dateAccepted: Date of acceptance of the resource.
     PropertyDescription(
         name='dateAccepted',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # dateCopyrighted: Date of copyright of the resource.
     PropertyDescription(
         name='dateCopyrighted',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # dateSubmitted: Date of submission of the resource.
     PropertyDescription(
         name='dateSubmitted',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # description: An account of the resource.
@@ -249,7 +248,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='dateIssued',
         name='issued',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # isVersionOf: A related resource of which the described resource is a
@@ -283,7 +282,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='dateModified',
         name='modified',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # provenance: A statement of any changes in ownership and custody of
@@ -382,7 +381,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='dateValid',
         name='valid',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # The following 'marcrel' property terms are MARC Relator terms,
@@ -1010,7 +1009,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='dateFirstPublished',
         name='PDT',
         namespace='humdrum',
-        valueType=DateSingle,
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # publicationTitle: Title of the publication (volume) from which the work
@@ -1122,7 +1121,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='electronicReleaseDate',
         name='YER',
         namespace='humdrum',
-        valueType=DateSingle,
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # The following properties are in the music21 namespace, and are specific to

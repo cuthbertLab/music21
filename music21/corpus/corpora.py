@@ -343,7 +343,7 @@ class Corpus(prebase.ProtoM21Object):
                query,
                field=None,
                fileExtensions=None,
-               **kwargs):
+               **keywords):
         r'''
         Search this corpus for metadata entries, returning a metadataBundle
 
@@ -368,7 +368,7 @@ class Corpus(prebase.ProtoM21Object):
             query,
             field=field,
             fileExtensions=fileExtensions,
-            **kwargs
+            **keywords
         )
 
     # PUBLIC PROPERTIES #

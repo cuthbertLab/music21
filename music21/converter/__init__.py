@@ -35,28 +35,19 @@ the temp folder on the disk.
 '''
 import collections.abc
 import copy
+from http.client import responses
 import io
+from math import isclose
 import os
 import re
 import pathlib
 import sys
 import types
+import typing as t
 import unittest
-import urllib.request
 import zipfile
 
-from math import isclose
-import typing as t
-
-__all__ = [
-    'subConverters', 'ArchiveManagerException', 'PickleFilterException',
-    'ConverterException', 'ConverterFileException',
-    'ArchiveManager', 'PickleFilter', 'resetSubconverters',
-    'registerSubconverter', 'unregisterSubconverter',
-    'Converter', 'parseFile', 'parseData', 'parseURL',
-    'parse', 'freeze', 'thaw', 'freezeStr', 'thawStr',
-
-]
+import requests
 
 from music21.converter import subConverters
 
@@ -68,6 +59,17 @@ from music21 import metadata
 from music21 import musedata as musedataModule
 from music21 import stream
 from music21.metadata import bundles
+
+
+__all__ = [
+    'subConverters', 'ArchiveManagerException', 'PickleFilterException',
+    'ConverterException', 'ConverterFileException',
+    'ArchiveManager', 'PickleFilter', 'resetSubconverters',
+    'registerSubconverter', 'unregisterSubconverter',
+    'Converter', 'parseFile', 'parseData', 'parseURL',
+    'parse', 'freeze', 'thaw', 'freezeStr', 'thawStr',
+
+]
 
 environLocal = environment.Environment('converter')
 
@@ -261,6 +263,8 @@ class PickleFilter:
                  fp: t.Union[str, pathlib.Path],
                  forceSource: bool = False,
                  number: t.Optional[int] = None,
+                 # quantizePost: bool = False,
+                 # quarterLengthDivisors: t.Optional[t.Iterable[int]] = None,
                  **keywords):
         self.fp: pathlib.Path = common.cleanpath(fp, returnPathlib=True)
         self.forceSource: bool = forceSource
@@ -293,7 +297,7 @@ class PickleFilter:
 
         pathNameToParse = str(self.fp)
 
-        quantization = []
+        quantization: t.List[str] = []
         if 'quantizePost' in self.keywords and self.keywords['quantizePost'] is False:
             quantization.append('noQtz')
         elif 'quarterLengthDivisors' in self.keywords:
@@ -322,7 +326,7 @@ class PickleFilter:
 
     def status(self) -> t.Tuple[pathlib.Path, bool, t.Optional[pathlib.Path]]:
         '''
-        Given a file path specified with __init__, look for an up to date pickled
+        Given a file path specified with __init__, look for an up-to-date pickled
         version of this file path. If it exists, return its fp, otherwise return the
         original file path.
 
@@ -713,8 +717,8 @@ class Converter:
         Use `forceSource=True` to download every time rather than
         re-reading from a cached file.
 
-        >>> joplinURL = ('https://github.com/cuthbertLab/music21/raw/master' +
-        ...        '/music21/corpus/joplin/maple_leaf_rag.mxl')
+        >>> joplinURL = ('https://github.com/cuthbertLab/music21/raw/master'
+        ...              + '/music21/corpus/joplin/maple_leaf_rag.mxl')
         >>> c = converter.Converter()
         >>> #_DOCS_SHOW c.parseURL(joplinURL)
         >>> #_DOCS_SHOW joplinStream = c.stream
@@ -723,11 +727,10 @@ class Converter:
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload in ('deny', 'ask'):
-            message = 'Automatic downloading of URLs is presently set to {!r}; '
+            message = f'Automatic downloading of URLs is presently set to {autoDownload!r}; '
             message += 'configure your Environment "autoDownload" setting to '
             message += '"allow" to permit automatic downloading: '
             message += "environment.set('autoDownload', 'allow')"
-            message = message.format(autoDownload)
             raise ConverterException(message)
 
         # this format check is here first to see if we can find the format
@@ -743,18 +746,17 @@ class Converter:
                 ext = '.txt'
 
         directory = environLocal.getRootTempDir()
-        dst = self._getDownloadFp(directory, ext, url)  # returns pathlib.Path
-        urlretrieve = urllib.request.urlretrieve
+        fp = self._getDownloadFp(directory, ext, url)  # returns pathlib.Path
 
-        if forceSource is True or not dst.exists():
-            try:
-                environLocal.printDebug(['downloading to:', str(dst)])
-                fp, unused_headers = urlretrieve(url, filename=str(dst))
-            except IOError:
-                raise ConverterException(f'cannot access file: {url}')
+        if forceSource is True or not fp.exists():
+            environLocal.printDebug([f'downloading to: {fp}'])
+            r = requests.get(url, allow_redirects=True)
+            if r.status_code != 200:
+                raise ConverterException(
+                    f'Could not download {url}, error: {r.status_code} {responses[r.status_code]}')
+            fp.write_bytes(r.content)
         else:
-            environLocal.printDebug(['using already downloaded file:', str(dst)])
-            fp = dst
+            environLocal.printDebug([f'using already downloaded file: {fp}'])
 
         # update format based on downloaded fp
         if format is None:  # if not provided as an argument
@@ -1190,7 +1192,10 @@ def parseURL(url,
 
 
 def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
-          *args,
+          *,
+          forceSource: bool = False,
+          number: t.Optional[int] = None,
+          format: t.Optional[str] = None,  # pylint: disable=redefined-builtin
           **keywords) -> t.Union[stream.Score, stream.Part, stream.Opus]:
     r'''
     Given a file path, encoded data in a Python string, or a URL, attempt to
@@ -1241,25 +1246,7 @@ def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
         possibility and has been removed.
     '''
     # environLocal.printDebug(['attempting to parse()', value])
-    if 'forceSource' in keywords:
-        forceSource = keywords['forceSource']
-        del keywords['forceSource']
-    else:
-        forceSource = False
-
     # see if a work number is defined; for multi-work collections
-    if 'number' in keywords:
-        number = keywords['number']
-        del keywords['number']
-    else:
-        number = None
-
-    if 'format' in keywords:
-        m21Format = keywords['format']
-        del keywords['format']
-    else:
-        m21Format = None
-
     valueStr: str
     if isinstance(value, bytes):
         valueStr = value.decode('utf-8', 'ignore')
@@ -1281,7 +1268,7 @@ def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
             and value[1] is None
             and _osCanLoad(str(value[0]))):
         # comes from corpus.search
-        return parseFile(value[0], format=m21Format, **keywords)
+        return parseFile(value[0], format=format, **keywords)
     elif (common.isListLike(value)
           and isinstance(value, collections.abc.Sequence)
           and len(value) == 2
@@ -1297,26 +1284,26 @@ def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
                 'If using a two-element list, the second value must be an integer number, '
                 f'not {value[1]!r}'
             )
-        sc = parseFile(value[0], format=m21Format, **keywords)
+        sc = parseFile(value[0], format=format, **keywords)
         if isinstance(sc, stream.Opus):
             return sc.getScoreByNumber(value[1])
         else:
             return sc
     # a midi string, must come before os.path.exists test
     elif not isinstance(value, bytes) and valueStr.startswith('MThd'):
-        return parseData(value, number=number, format=m21Format, **keywords)
+        return parseData(value, number=number, format=format, **keywords)
     elif (not isinstance(value, bytes)
           and _osCanLoad(valueStr)):
-        return parseFile(valueStr, number=number, format=m21Format,
+        return parseFile(valueStr, number=number, format=format,
                          forceSource=forceSource, **keywords)
     elif (not isinstance(value, bytes)
           and _osCanLoad(common.cleanpath(valueStr))):
-        return parseFile(common.cleanpath(valueStr), number=number, format=m21Format,
+        return parseFile(common.cleanpath(valueStr), number=number, format=format,
                          forceSource=forceSource, **keywords)
     elif not isinstance(valueStr, bytes) and (valueStr.startswith('http://')
                                               or valueStr.startswith('https://')):
         # it's a url; may need to broaden these criteria
-        return parseURL(value, number=number, format=m21Format,
+        return parseURL(value, number=number, format=format,
                         forceSource=forceSource, **keywords)
     elif isinstance(value, pathlib.Path):
         raise FileNotFoundError(f'Cannot find file in {str(value)}')
@@ -1325,7 +1312,7 @@ def parse(value: t.Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
         raise FileNotFoundError(f'Cannot find file in {str(value)}')
     else:
         # all else, including MidiBytes
-        return parseData(value, number=number, format=m21Format, **keywords)
+        return parseData(value, number=number, format=format, **keywords)
 
 
 def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') -> pathlib.Path:
@@ -2031,7 +2018,7 @@ class Test(unittest.TestCase):
         from music21 import omr
 
         midiFp = omr.correctors.pathName + os.sep + 'k525short.mid'
-        midiStream = parse(midiFp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
+        midiStream = parse(midiFp, forceSource=True, storePickle=False, quarterLengthDivisors=(2,))
         # midiStream.show()
         for n in midiStream[note.Note]:
             self.assertTrue(isclose(n.quarterLength % 0.5, 0.0, abs_tol=1e-7))
@@ -2050,7 +2037,7 @@ class Test(unittest.TestCase):
         streamFpNotQuantized = parse(fp, quantizePost=False)
         self.assertIn(0.875, streamFpNotQuantized.flatten()._uniqueOffsetsAndEndTimes())
 
-        streamFpCustomQuantized = parse(fp, quarterLengthDivisors=[2])
+        streamFpCustomQuantized = parse(fp, quarterLengthDivisors=(2,))
         self.assertNotIn(0.75, streamFpCustomQuantized.flatten()._uniqueOffsetsAndEndTimes())
 
         # Also check raw data: https://github.com/cuthbertLab/music21/issues/546
@@ -2065,7 +2052,7 @@ class Test(unittest.TestCase):
         pf1.removePickle()
         pf2 = PickleFilter(fp, quantizePost=False)
         pf2.removePickle()
-        pf3 = PickleFilter(fp, quarterLengthDivisors=[2])
+        pf3 = PickleFilter(fp, quarterLengthDivisors=(2,))
         pf3.removePickle()
 
     def testIncorrectNotCached(self):
@@ -2102,6 +2089,9 @@ class Test(unittest.TestCase):
             parse('nonexistent_path_ending_in_correct_extension.musicxml')
 
     def testParseURL(self):
+        '''
+        This should be the only test that requires an internet connection.
+        '''
         from music21.humdrum.spineParser import HumdrumException
 
         urlBase = 'https://raw.githubusercontent.com/craigsapp/chopin-preludes/'
@@ -2121,7 +2111,12 @@ class Test(unittest.TestCase):
         with self.assertRaises(HumdrumException):
             s = parseURL(url, forceSource=False)
 
+        # make sure that forceSource still overrides the system.
         s = parseURL(url, forceSource=True)
+        self.assertEqual(len(s.parts), 2)
+
+        # make sure that the normal parse system can handle URLs, not just parseURL.
+        s = parse(url)
         self.assertEqual(len(s.parts), 2)
 
         os.remove(destFp)

@@ -102,14 +102,12 @@ class ChordBase(note.NotRest):
 
         self._notes: t.List[note.NotRest] = []
         # here, pitch and duration data is extracted from notes
-        # if provided
+        # if provided.
 
         super().__init__(**keywords)
 
         # inherit Duration object from GeneralNote
         # keep it here in case we have no notes
-        # self.duration = None  # inefficient, since note.Note.__init__ set it
-        # del self.pitch
         durationKeyword = None
         if 'duration' in keywords:
             durationKeyword = keywords['duration']
@@ -121,17 +119,6 @@ class ChordBase(note.NotRest):
         elif 'type' in keywords or 'quarterLength' in keywords:  # dots dont cut it
             self.duration = Duration(**keywords)
 
-        # elif len(notes) > 0:
-        #     for thisNote in notes:
-        #         # get duration from first note
-        #         # but should other notes have the same duration?
-        #         self.duration = notes[0].duration
-        #         break
-
-        if 'beams' in keywords:
-            self.beams = keywords['beams']
-        else:
-            self.beams = beam.Beams()
 
     def __eq__(self, other):
         '''
@@ -199,7 +186,10 @@ class ChordBase(note.NotRest):
         '''
         return len(self._notes)
 
-    def _add_core_or_init(self, notes, *, useDuration=None):
+    def _add_core_or_init(self,
+                          notes,
+                          *,
+                          useDuration: t.Union[None, t.Literal[False], Duration] = None):
         '''
         This is the private append method called by .add and called by __init__.
 
@@ -219,6 +209,7 @@ class ChordBase(note.NotRest):
             useDuration = self.duration
             quickDuration = True
 
+        newNote: note.NotRest
         for n in notes:
             if isinstance(n, pitch.Pitch):
                 # assign pitch to a new Note
@@ -388,7 +379,7 @@ class ChordBase(note.NotRest):
         return ()
 
     @property
-    def tie(self):
+    def tie(self) -> t.Optional[tie.Tie]:
         '''
         Get or set a single tie based on all the ties in this Chord.
 
@@ -412,7 +403,7 @@ class ChordBase(note.NotRest):
         return None
 
     @tie.setter
-    def tie(self, value):
+    def tie(self, value: t.Optional[tie.Tie]):
         for d in self._notes:
             d.tie = value
             # set the same instance for each pitch
@@ -1455,6 +1446,7 @@ class Chord(ChordBase):
         inPlace: t.Literal[True],
         leaveRedundantPitches=False
     ) -> None:
+        # astroid 1003
         return None
 
     @overload
@@ -1465,6 +1457,7 @@ class Chord(ChordBase):
         inPlace: t.Literal[False] = False,
         leaveRedundantPitches: bool = False
     ) -> _ChordType:
+        # astroid 1003
         return self
 
     def closedPosition(
@@ -2197,7 +2190,7 @@ class Chord(ChordBase):
 
         first = self.intervalFromChordStep(chordStep)
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(testRoot, thisPitch)
+            thisInterval = interval.Interval(testRoot, thisPitch)
             if thisInterval.diatonic.generic.mod7 == chordStep:
                 if thisInterval.chromatic.mod12 - first.chromatic.mod12 != 0:
                     return True
@@ -2228,7 +2221,7 @@ class Chord(ChordBase):
             if testRoot is None:
                 raise ChordException('Cannot run intervalFromChordStep without a root')
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(testRoot, thisPitch)
+            thisInterval = interval.Interval(testRoot, thisPitch)
             if thisInterval.diatonic.generic.mod7 == chordStep:
                 return thisInterval
         return None
@@ -2454,8 +2447,8 @@ class Chord(ChordBase):
         tempRootPitch = copy.deepcopy(rootPitch)
         tempRootPitch.octave = 2
 
-        bassToRoot = interval.notesToInterval(tempBassPitch,
-                                              tempRootPitch).generic.simpleDirected
+        bassToRoot = interval.notesToGeneric(tempBassPitch,
+                                             tempRootPitch).simpleDirected
         # print('bassToRoot', bassToRoot)
         if bassToRoot == 1:
             inv = 0
@@ -2709,7 +2702,7 @@ class Chord(ChordBase):
         >>> c14
         <music21.chord.Chord A4 B4>
 
-        >>> i14 = interval.notesToInterval(c14.pitches[0], c14.pitches[1])
+        >>> i14 = interval.Interval(c14.pitches[0], c14.pitches[1])
         >>> i14
         <music21.interval.Interval M2>
 
@@ -2727,7 +2720,7 @@ class Chord(ChordBase):
             c3 = self.closedPosition()
             # to get from lowest to highest for P4 protection
             c4 = c3.removeRedundantPitches(inPlace=False)
-            i = interval.notesToInterval(c4.pitches[0], c4.pitches[1])
+            i = interval.Interval(c4.pitches[0], c4.pitches[1])
             return i.isConsonant()
         elif len(c2.pitches) == 3:
             if ((self.isMajorTriad() is True or self.isMinorTriad() is True)
@@ -2783,7 +2776,7 @@ class Chord(ChordBase):
         root = self.root()
 
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(root, thisPitch)
+            thisInterval = interval.Interval(root, thisPitch)
             if thisInterval.chromatic.mod12 not in intervalArray:
                 return False
         return True
@@ -3061,7 +3054,7 @@ class Chord(ChordBase):
             return False
 
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
+            thisInterval = interval.Interval(self.root(), thisPitch)
             if thisInterval.chromatic.mod12 not in (0, 4):
                 return False
 
@@ -3107,7 +3100,7 @@ class Chord(ChordBase):
             return False
 
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
+            thisInterval = interval.Interval(self.root(), thisPitch)
             if thisInterval.chromatic.mod12 not in (0, 3):
                 return False
 
@@ -3604,6 +3597,8 @@ class Chord(ChordBase):
         False
 
         >>> incorrectlySpelled.pitches[1].getEnharmonic(inPlace=True)
+        >>> incorrectlySpelled
+        <music21.chord.Chord C E- G>
         >>> incorrectlySpelled.isTriad()
         True
 

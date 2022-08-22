@@ -145,7 +145,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
 
     modGather = commonTest.ModuleGather(useExtended=True)
 
-    maxTimeout = 200
+    maxTimeout = 100
     pathsToRun = modGather.modulePaths  # [30:60]
     # print(pathsToRun)
 

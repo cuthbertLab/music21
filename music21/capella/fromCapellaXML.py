@@ -38,10 +38,6 @@ from music21 import pitch
 from music21 import stream
 from music21 import tie
 
-# from music21 import environment
-# _MOD = 'capella.fromCapellaXML.py'
-# environLocal = environment.Environment(_MOD)
-
 # capellaDynamics = {'r': 'ppp',
 #                   'q': 'pp',
 #                   'p': 'p',

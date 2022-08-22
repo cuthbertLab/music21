@@ -5,8 +5,7 @@ This file contains Music21's version number information.
 As of v.2.0.0, Music21 uses something close to the principles of Semantic Versioning, we'll
 try very hard so that X.Y.Z have meanings about changes to the system.
 Changes in X represent changes that will break old features.
-New Y numbers add new features; Z -- bug fixes.  This means that the X number
-will change more often than before.
+New Y numbers add new features; Z -- bug fixes.  The X number change about once per year.
 
 Differences with strict semantic versioning: I won't make 100% guarantees that we'll never
 break anything without a change in the major number, esp. if the change affects a tiny
@@ -42,7 +41,7 @@ When changing, update the single test case in base.py.
 Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''
 
-__version_info__ = (8, 0, 0, 'a9')  # can be 4-tuple: (7, 0, 5, 'a2')
+__version_info__ = (8, 0, 0, 'a12')  # can be 3-tuple or 4+-tuple: (7, 0, 5, 'a2')
 
 v = '.'.join(str(x) for x in __version_info__[0:3])
 if len(__version_info__) > 3 and __version_info__[3]:  # type: ignore

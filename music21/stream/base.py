@@ -180,8 +180,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     >>> s.first()
     <music21.meter.TimeSignature 4/4>
 
-    New in v7 -- providing a list of objects or Measures or Scores (but not other Stream
-    subclasses such as Parts or Voices) now positions sequentially, i.e. appends:
+    Providing a list of objects or Measures or Scores (but not other Stream
+    subclasses such as Parts or Voices) positions sequentially, i.e. appends, if they
+    all have offset 0.0 currently:
 
     >>> s2 = stream.Measure([note.Note(), note.Note(), bar.Barline()])
     >>> s2.show('text')
@@ -189,7 +190,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     {1.0} <music21.note.Note C>
     {2.0} <music21.bar.Barline type=regular>
 
-    A list of measures will let each be appended:
+    A list of measures will thus each be appended:
 
     >>> m1 = stream.Measure(n1, number=1)
     >>> m2 = stream.Measure(note.Rest(), number=2)
@@ -200,7 +201,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     {1.5} <music21.stream.Measure 2 offset=1.5>
         {0.0} <music21.note.Rest quarter>
 
-    Here, every element is a Stream that's not a Measure, so we instead insert:
+    Here, every element is a Stream that's not a Measure (or Score), so it
+    will be inserted at 0.0, rather than appending:
 
     >>> s4 = stream.Score([stream.PartStaff(n1), stream.PartStaff(note.Rest())])
     >>> s4.show('text')
@@ -217,6 +219,25 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         {0.0} <music21.stream.Measure 0 offset=0.0>
             {0.0} <music21.chord.Chord C2 A2>
 
+    This behavior can be modified by the `appendOrInsert` keyword to go against norms:
+
+    >>> s6 = stream.Stream([note.Note('C'), note.Note('D')], appendOrInsert='insert')
+    >>> s6.show('text')  # all notes at offset 0.0
+    {0.0} <music21.note.Note C>
+    {0.0} <music21.note.Note D>
+
+    >>> p1 = stream.Part(stream.Measure(note.Note('C')), id='p1')
+    >>> p2 = stream.Part(stream.Measure(note.Note('D')), id='p2')
+    >>> s7 = stream.Score([p1, p2], appendOrInsert='append')
+    >>> s7.show('text')  # parts following each other (not recommended)
+    {0.0} <music21.stream.Part p1>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note C>
+    {1.0} <music21.stream.Part p2>
+        {0.0} <music21.stream.Measure 0 offset=0.0>
+            {0.0} <music21.note.Note D>
+
+
     For developers of subclasses, please note that because of how Streams
     are copied, there cannot be
     required parameters (i.e., without defaults) in initialization.
@@ -224,8 +245,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     be allowed, because craziness and givenElements are required::
 
         class CrazyStream(Stream):
-            def __init__(self, givenElements, craziness, *args, **kwargs):
+            def __init__(self, givenElements, craziness, **keywords):
                 ...
+
+    New in v.7 -- smart appending
+    New in v.8 -- appendOrInsert keyword configures the smart appending.
     '''
     # this static attributes offer a performance boost over other
     # forms of checking class
@@ -285,11 +309,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         #     ''',
     }
     def __init__(self,
-                 givenElements=None,
-                 *args,
-                 # restrictClass: t.Type[M21ObjType] = base.Music21Object,
+                 givenElements: t.Union[None,
+                                        base.Music21Object,
+                                        t.Sequence[base.Music21Object]] = None,
+                 *,
+                 appendOrInsert: t.Literal['append', 'insert', 'offsets'] = 'offsets',
                  **keywords):
-        super().__init__(self, *args, **keywords)
+        # restrictClass: t.Type[M21ObjType] = base.Music21Object,
+        super().__init__(**keywords)
 
         self.streamStatus = streamStatus.StreamStatus(self)
         self._unlinkedDuration = None
@@ -312,26 +339,31 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         if givenElements is None:
             return
 
-        if isinstance(givenElements, base.Music21Object) or not common.isIterable(givenElements):
-            givenElements = [givenElements]
+        if isinstance(givenElements, base.Music21Object):
+            givenElements = t.cast(t.List[base.Music21Object], [givenElements])
 
         # Append rather than insert if every offset is 0.0
         # but not if every element is a stream subclass other than a Measure or Score
         # (i.e. Part or Voice generally, but even Opus theoretically)
         # because these classes usually represent synchrony
-        append: bool = False
-        try:
-            append = all(e.offset == 0.0 for e in givenElements)
-        except AttributeError:
-            pass  # appropriate failure will be raised by coreGuardBeforeAddElement()
-        if append and all(
-                (e.isStream and e.classSet.isdisjoint((Measure, Score)))
-                for e in givenElements):
-            append = False
+        appendBool = True
+        if appendOrInsert == 'offsets':
+            try:
+                appendBool = all(e.offset == 0.0 for e in givenElements)
+            except AttributeError:
+                pass  # appropriate failure will be raised by coreGuardBeforeAddElement()
+            if appendBool and all(
+                    (e.isStream and e.classSet.isdisjoint((Measure, Score)))
+                    for e in givenElements):
+                appendBool = False
+        elif appendOrInsert == 'insert':
+            appendBool = False
+        else:
+            appendBool = True
 
         for e in givenElements:
             self.coreGuardBeforeAddElement(e)
-            if append:
+            if appendBool:
                 self.coreAppend(e)
             else:
                 self.coreInsert(e.offset, e)
@@ -439,8 +471,31 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         x = t.cast(iterator.RecursiveIterator[ChangedM21ObjType], self.recurse())
         return x  # dummy code
 
+    @overload
+    def __getitem__(
+        self,
+        k: t.Type  # getting something that is a subclass of something that is not a m21 object
+    ) -> iterator.RecursiveIterator[M21ObjType]:
+        x = t.cast(iterator.RecursiveIterator[M21ObjType], self.recurse())
+        return x  # dummy code
+
+
+    @overload
+    def __getitem__(
+        self,
+        k: t.Collection[t.Type]
+    ) -> iterator.RecursiveIterator[M21ObjType]:
+        # Remove this code and replace with ... once Astroid #1015 is fixed.
+        x: iterator.RecursiveIterator[M21ObjType] = self.recurse()
+        return x
+
+
     def __getitem__(self,
-                    k: t.Union[str, int, slice, t.Type[ChangedM21ObjType]]
+                    k: t.Union[str,
+                               int,
+                               slice,
+                               t.Type[ChangedM21ObjType],
+                               t.Collection[t.Type]]
                     ) -> t.Union[iterator.RecursiveIterator[M21ObjType],
                                  iterator.RecursiveIterator[ChangedM21ObjType],
                                  M21ObjType,
@@ -486,8 +541,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         3.0
 
 
-        If a class is given then an iterator of elements
-        that match the requested class(es) is returned, similar
+        If a class is given, then a :class:`~music21.stream.iterator.RecursiveIterator`
+        of elements matching the requested class is returned, similar
         to `Stream().recurse().getElementsByClass()`.
 
         >>> len(s)
@@ -501,15 +556,32 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         ...     print(n.name, end=' ')
         C D E F G A
 
-        Note that this iterator is recursive by default.
+        Note that this iterator is recursive: it will find elements inside of streams
+        within this stream:
 
         >>> c_sharp = note.Note('C#')
-        >>> v = stream.Voice([c_sharp])
-        >>> s.insert(0.5, c_sharp)
-
+        >>> v = stream.Voice()
+        >>> v.insert(0, c_sharp)
+        >>> s.insert(0.5, v)
         >>> len(s[note.Note])
         7
 
+        When using a single Music21 class in this way, your type checker will
+        be able to infer that the only objects in any loop are in fact `note.Note`
+        objects, and catch programming errors before running.
+
+        Multiple classes can be provided, separated by commas. Any element matching
+        any of the requested classes will be matched.
+
+        >>> len(s[note.Note, note.Rest])
+        9
+
+        >>> for note_or_rest in s[note.Note, note.Rest]:
+        ...     if isinstance(note_or_rest, note.Note):
+        ...         print(note_or_rest.name, end=' ')
+        ...     else:
+        ...         print('Rest', end=' ')
+        C C# D E Rest F G Rest A
 
         The actual object returned by `s[module.Class]` is a
         :class:`~music21.stream.iterator.RecursiveIterator` and has all the functions
@@ -556,7 +628,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         >>> s[0.5]
         Traceback (most recent call last):
-        TypeError: Streams can get items by int, slice, class, or string query; got <class 'float'>
+        TypeError: Streams can get items by int, slice, class, class iterable, or string query;
+         got <class 'float'>
 
         Changed in v7:
           - out of range indexes now raise an IndexError, not StreamException
@@ -573,6 +646,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             .recurse().getElementsByClass to get the earlier behavior.  Old behavior
             still works until v9.  This is an attempt to unify __getitem__ behavior in
             StreamIterators and Streams.
+          - allowed iterables of qualified class names, e.g. `[note.Note, note.Rest]`
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
@@ -607,7 +681,17 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
             return t.cast(M21ObjType, searchElements[k])
 
-        elif isinstance(k, type) and issubclass(k, base.Music21Object):
+        elif isinstance(k, type):
+            if issubclass(k, base.Music21Object):
+                return self.recurse().getElementsByClass(k)
+            else:
+                # this is explicitly NOT true, but we're pretending
+                # it is a Music21Object for now, because the only things returnable
+                # from getElementsByClass are Music21Objects that also inherit from k.
+                m21Type = t.cast(t.Type[M21ObjType], k)  # type: ignore
+                return self.recurse().getElementsByClass(m21Type)
+
+        elif common.isIterable(k) and all(isinstance(maybe_type, type) for maybe_type in k):
             return self.recurse().getElementsByClass(k)
 
         elif isinstance(k, str):
@@ -619,7 +703,8 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 return querySelectorIterator
 
         raise TypeError(
-            f'Streams can get items by int, slice, class, or string query; got {type(k)}'
+            'Streams can get items by int, slice, class, class iterable, or string query; '
+            f'got {type(k)}'
         )
 
     def first(self) -> t.Optional[M21ObjType]:
@@ -3237,7 +3322,12 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # --------------------------------------------------------------------------
     # display methods; in the same manner as show() and write()
 
-    def plot(self, *args, **keywords):
+    def plot(self,
+             plotFormat: str,
+             xValue: t.Optional[str] = None,
+             yValue: t.Optional[str] = None,
+             zValue: t.Optional[str] = None,
+             **keywords):
         '''
         Given a method and keyword configuration arguments, create and display a plot.
 
@@ -3258,9 +3348,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         # import is here to avoid import of matplotlib problems
         from music21 import graph
         # first ordered arg can be method type
-        return graph.plotStream(self, *args, **keywords)
+        return graph.plotStream(self,
+                                plotFormat,
+                                xValue=xValue,
+                                yValue=yValue,
+                                zValue=zValue,
+                                **keywords)
 
-    def analyze(self, *args, **keywords):
+    def analyze(self, method: str, **keywords):
         '''
         Runs a particular analytical method on the contents of the
         stream to find its ambitus (range) or key.
@@ -3273,7 +3368,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         :func:`~music21.analysis.discrete.analyzeStream`.
 
         Example:
-
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> s.analyze('ambitus')
@@ -3324,7 +3418,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         from music21.analysis import discrete
         # pass this stream to the analysis procedure
-        return discrete.analyzeStream(self, *args, **keywords)
+        return discrete.analyzeStream(self, method, **keywords)
 
     # --------------------------------------------------------------------------
     # methods that act on individual elements without requiring
@@ -4724,7 +4818,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         # Replace old measures in spanners with new measures
         # Example: out is a Part, out.spannerBundle has RepeatBrackets spanning measures
-        # TODO: when dropping support for Py3.9 add strict=True
+        # TODO: when dropping support for Py3.9 (min=3.10) add strict=True
         for oldM, newM in zip(
             self.getElementsByClass(Measure),
             out.getElementsByClass(Measure)
@@ -6802,19 +6896,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         qLenTotal = returnObj.duration.quarterLength
         elements = list(returnObj.getElementsByClass(objClass))
 
-        # print(elements[-1], qLenTotal, elements[-1].duration)
-        # print(_MOD, elements)
         for i in range(len(elements) - 1):
-            # print(i, len(elements))
             span = returnObj.elementOffset(elements[i + 1]) - returnObj.elementOffset(elements[i])
             elements[i].duration.quarterLength = span
 
         # handle last element
-        # print(elements[-1], qLenTotal, elements[-1].duration)
         if elements:
             elements[-1].duration.quarterLength = (qLenTotal
                                                    - returnObj.elementOffset(elements[-1]))
-            # print(elements[-1], elements[-1].duration)
         if not inPlace:
             return returnObj
 
@@ -6985,10 +7074,14 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             else:
                 return  # exit
 
-        # need to just get .notesAndRests, as there may be other objects in the Measure
+        # need to just get .notesAndRests with a nonzero duration,
+        # as there may be other objects in the Measure
         # that come before the first Note, such as a SystemLayout object
+        # or there could be ChordSymbols with zero (unrealized) durations
         f = returnObj.flatten()
-        notes_and_rests = f.notesAndRests.stream()
+        notes_and_rests = f.notesAndRests.addFilter(
+            lambda el, _iterator: el.quarterLength > 0
+        ).stream()
 
         posConnected = []  # temporary storage for index of tied notes
         posDelete = []  # store deletions to be processed later
@@ -7014,7 +7107,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     and isinstance(nInner, chord.Chord)
                     and isinstance(nLast, chord.Chord)
                     and None not in [inner_p.tie for inner_p in nInner.notes]
-                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}
+                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}  # type: ignore
                     and len(nLast.pitches) == len(nInner.pitches)):
                 return True
 
@@ -7712,26 +7805,27 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     @overload
     def recurse(self,
                 *,
-                streamsOnly: t.Literal[True],
-                restoreActiveSites=True,
-                classFilter=(),
-                includeSelf=None) -> iterator.RecursiveIterator[Stream]:
-        return iterator.RecursiveIterator(self).getElementsByClass(Stream)
-
-    @overload
-    def recurse(self,
-                *,
                 streamsOnly: t.Literal[False] = False,
                 restoreActiveSites=True,
                 classFilter=(),
                 includeSelf=None) -> iterator.RecursiveIterator[M21ObjType]:
-        return iterator.RecursiveIterator(self)
+        return t.cast(iterator.RecursiveIterator[M21ObjType], iterator.RecursiveIterator(self))
 
-    def recurse(self: StreamType,
+    @overload
+    def recurse(self,
                 *,
-                streamsOnly=False,
+                streamsOnly: t.Literal[True],
                 restoreActiveSites=True,
                 classFilter=(),
+                includeSelf=None) -> iterator.RecursiveIterator[Stream]:
+        return t.cast(iterator.RecursiveIterator[Stream],
+                      iterator.RecursiveIterator(self).getElementsByClass(Stream))
+
+    def recurse(self,
+                *,
+                streamsOnly: bool = False,
+                restoreActiveSites: bool = True,
+                classFilter: t.Tuple = (),
                 includeSelf=None) -> t.Union[iterator.RecursiveIterator[M21ObjType],
                                              iterator.RecursiveIterator[Stream]]:
         '''
@@ -7880,6 +7974,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         )
         if classFilter:
             ri = ri.getElementsByClass(classFilter)
+
+        if t.TYPE_CHECKING and streamsOnly:
+            return t.cast(iterator.RecursiveIterator[Stream], ri)
         return ri
 
     def containerInHierarchy(
@@ -8704,7 +8801,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def transpose(
         self,
-        value,
+        value: t.Union[str, int, 'music21.interval.IntervalBase'],
+        /,
+        *,
         inPlace=False,
         recurse=True,
         classFilterList=None
@@ -8747,12 +8846,21 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> cStream.flatten().transpose(aInterval, inPlace=True)
         >>> [str(p) for p in cStream.pitches[:10]]
         ['F6', 'A-6', 'F6', 'F6', 'F6', 'F6', 'G-6', 'F6', 'E-6', 'E-6']
+
+        Changed in v8: first value is position only, all other values are keyword only
         '''
         # only change the copy
         if not inPlace:
             post = self.coreCopyAsDerivation('transpose')
         else:
             post = self
+
+        intv: interval.IntervalBase
+        if isinstance(value, (int, str)):
+            intv = interval.Interval(value)
+        else:
+            intv = value
+
         # for p in post.pitches:  # includes chords
         #     # do inplace transpositions on the deepcopy
         #     p.transpose(value, inPlace=True)
@@ -8761,10 +8869,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         #     e.transpose(value, inPlace=True)
 
         # this will get all elements at this level and downward.
+        sIterator: iterator.StreamIterator
         if recurse is True:
             sIterator = post.recurse()
         else:
-            sIterator = iter(post)
+            sIterator = post.iter()
 
         if classFilterList:
             sIterator = sIterator.addFilter(filters.ClassFilter(classFilterList))
@@ -8773,13 +8882,13 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if e.isStream:
                 continue
             if hasattr(e, 'transpose'):
-                if (hasattr(value, 'classes')
-                        and 'GenericInterval' in value.classes):
+                if isinstance(intv, interval.GenericInterval):
                     # do not transpose KeySignatures w/ Generic Intervals
                     if not isinstance(e, key.KeySignature) and hasattr(e, 'pitches'):
                         k = e.getContextByClass(key.KeySignature)
-                        for p in e.pitches:
-                            value.transposePitchKeyAware(p, k, inPlace=True)
+                        p: pitch.Pitch
+                        for p in e.pitches:  # type: ignore
+                            intv.transposePitchKeyAware(p, k, inPlace=True)
                 else:
                     e.transpose(value, inPlace=True)
         if not inPlace:
@@ -8948,11 +9057,11 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     def quantize(
         self,
-        quarterLengthDivisors=None,
-        processOffsets=True,
-        processDurations=True,
-        inPlace=False,
-        recurse=False,
+        quarterLengthDivisors: t.Iterable[int] = (),
+        processOffsets: bool = True,
+        processDurations: bool = True,
+        inPlace: bool = False,
+        recurse: bool = False,
     ):
         # noinspection PyShadowingNames
         '''
@@ -8992,7 +9101,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> nShort.quarterLength = 0.26
         >>> s.repeatInsert(nShort, [1.49, 1.76])
 
-        >>> s.quantize([4], processOffsets=True, processDurations=True, inPlace=True)
+        >>> s.quantize((4,), processOffsets=True, processDurations=True, inPlace=True)
         >>> [e.offset for e in s]
         [0.0, 0.5, 1.0, 1.5, 1.75]
         >>> [e.duration.quarterLength for e in s]
@@ -9078,7 +9187,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         >>> [e.duration.quarterLength for e in v]
         [0.5, 0.5, 0.5, 0.25, 0.25]
         '''
-        if quarterLengthDivisors is None:
+        if not quarterLengthDivisors:
             quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
 
         # this presently is not trying to avoid overlaps that
@@ -9104,7 +9213,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         useStreams = [returnStream]
         if recurse is True:
-            useStreams = returnStream.recurse(streamsOnly=True, includeSelf=True)
+            useStreams = list(returnStream.recurse(streamsOnly=True, includeSelf=True))
 
         rests_lacking_durations: t.List[note.Rest] = []
         for useStream in useStreams:
@@ -9848,19 +9957,67 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
     # --------------------------------------------------------------------------
     # interval routines
+    @overload
+    def findConsecutiveNotes(
+        self,
+        *,
+        skipRests: bool = False,
+        skipChords: t.Literal[False] = False,
+        skipUnisons: bool = False,
+        skipOctaves: bool = False,
+        skipGaps: bool = False,
+        getOverlaps: bool = False,
+        noNone: t.Literal[True],
+        **keywords
+    ) -> t.List[note.NotRest]:
+        return []
+
+    @overload
+    def findConsecutiveNotes(
+        self,
+        *,
+        skipRests: bool = False,
+        skipChords: t.Literal[True],
+        skipUnisons: bool = False,
+        skipOctaves: bool = False,
+        skipGaps: bool = False,
+        getOverlaps: bool = False,
+        noNone: t.Literal[True],
+        **keywords
+    ) -> t.List[note.Note]:
+        return []
+
+    @overload
+    def findConsecutiveNotes(
+        self,
+        *,
+        skipRests: bool = False,
+        skipChords: bool = False,
+        skipUnisons: bool = False,
+        skipOctaves: bool = False,
+        skipGaps: bool = False,
+        getOverlaps: bool = False,
+        noNone: t.Literal[False] = False,
+        **keywords
+    ) -> t.List[t.Union[note.NotRest, None]]:
+        return []
 
     def findConsecutiveNotes(
         self,
         *,
-        skipRests=False,
-        skipChords=False,
-        skipUnisons=False,
-        skipOctaves=False,
-        skipGaps=False,
-        getOverlaps=False,
-        noNone=False,
+        skipRests: bool = False,
+        skipChords: bool = False,
+        skipUnisons: bool = False,
+        skipOctaves: bool = False,
+        skipGaps: bool = False,
+        getOverlaps: bool = False,
+        noNone: bool = False,
         **keywords
-    ) -> t.List[t.Union[note.NotRest, None]]:
+    ) -> t.Union[
+            t.List[t.Union[note.NotRest, None]],
+            t.List[note.NotRest],
+            t.List[note.Note],
+    ]:
         r'''
         Returns a list of consecutive *pitched* Notes in a Stream.
 
@@ -9908,7 +10065,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         N.B. for chords, currently, only the first pitch is tested for unison.
         this is a bug TODO: FIX
 
-        (\*\*kwargs is there so that other methods that pass along dicts to
+        (\*\*keywords is there so that other methods that pass along dicts to
         findConsecutiveNotes don't have to remove
         their own args; this method is used in melodicIntervals.)
 
@@ -10005,7 +10162,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             returnList.pop()  # removes the last-added element
         return returnList
 
-    def melodicIntervals(self, *skipArgs, **skipKeywords):
+    def melodicIntervals(self, **skipKeywords):
         '''
         Returns a Stream of :class:`~music21.interval.Interval` objects
         between Notes (and by default, Chords) that follow each other in a stream.
@@ -10028,7 +10185,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Returns an empty Stream if there are not at least two elements found by
         findConsecutiveNotes.
-
 
         >>> s1 = converter.parse("tinynotation: 3/4 c4 d' r b b'", makeNotation=False)
         >>> #_DOCS_SHOW s1.show()
@@ -10205,7 +10361,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         post = {}
         for i in range(len(layeringMap)):
-            # print('examining i:', i)
             indices = layeringMap[i]
             if not indices:
                 continue
@@ -10213,7 +10368,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             srcElementObj = flatStream[i]
             srcOffset = srcElementObj.offset
             dstOffset = None
-            # print('found indices', indices)
             # check indices
             for j in indices:  # indices of other elements that overlap
                 elementObj = flatStream[j]
@@ -10232,7 +10386,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                 if dstOffset is None:
                     dstOffset = srcOffset
                 if store:
-                    # print('storing offset', dstOffset)
                     if dstOffset not in post:
                         post[dstOffset] = []  # create dictionary entry
                     post[dstOffset].append(elementObj)
@@ -10250,9 +10403,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
                     dstOffset = srcOffset
                 if dstOffset not in post:
                     post[dstOffset] = []  # create dictionary entry
-                # print('storing offset', dstOffset)
                 post[dstOffset].append(srcElementObj)
-        # print(post)
         return post
 
     def findGaps(self):
@@ -10506,7 +10657,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         Example usage:
 
-
         >>> s1 = converter.parse('tinynotation: 7/4 C4 d8 e f# g A2 d2', makeNotation=False)
         >>> s2 = converter.parse('tinynotation: 7/4 g4 e8 d c4   a2 r2', makeNotation=False)
         >>> s1.attachIntervalsBetweenStreams(s2)
@@ -10523,23 +10673,25 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
         P8
         None
         '''
-        for n in self.notes:
+        # TODO: this can be replaced by two different O(n) iterators, without
+        #   an O(n*2) lookup.
+        for n in self.getElementsByClass(note.Note):
             # clear any previous result
             n.editorial.harmonicInterval = None
             # get simultaneous elements from other stream
             simultEls = cmpStream.getElementsByOffset(self.elementOffset(n),
                                                       mustBeginInSpan=False,
                                                       mustFinishInSpan=False)
-            if simultEls:
-                for simultNote in simultEls.notes:
-                    interval1 = None
-                    try:
-                        interval1 = interval.notesToInterval(n, simultNote)
-                        n.editorial.harmonicInterval = interval1
-                    except exceptions21.Music21Exception:
-                        pass
-                    if interval1 is not None:
-                        break  # inner loop
+            for simultNote in simultEls.getElementsByClass(note.Note):
+                interval1 = None
+                try:
+                    interval1 = interval.Interval(n, simultNote)
+                    interval1.intervalType = 'harmonic'
+                    n.editorial.harmonicInterval = interval1
+                except exceptions21.Music21Exception:
+                    pass
+                if interval1 is not None:
+                    break  # inner loop
 
     def attachMelodicIntervals(self):
         '''
@@ -10587,8 +10739,9 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
             if (previousObject is not None
                     and isinstance(currentObject, note.Note)
                     and isinstance(previousObject, note.Note)):
-                currentObject.editorial.melodicInterval = interval.notesToInterval(
-                    previousObject, currentObject)
+                melodicInterval = interval.Interval(previousObject, currentObject)
+                melodicInterval.intervalType = 'melodic'
+                currentObject.editorial.melodicInterval = melodicInterval
             previousObject = currentObject
             currentObject = currentObject.next()
 
@@ -12615,9 +12768,9 @@ class Measure(Stream):
             for the amount of padding on the right side of a region.)''',
     }
 
-    def __init__(self, *args, **keywords):
-        if len(args) == 1 and isinstance(args[0], int) and 'number' not in keywords:
-            keywords['number'] = args[0]
+    def __init__(self, *args, number: t.Union[int, str] = 0, **keywords):
+        if len(args) == 1 and isinstance(args[0], int) and number == 0:
+            number = args[0]
             args = ()
 
         super().__init__(*args, **keywords)
@@ -12635,21 +12788,17 @@ class Measure(Stream):
         # position; paddingRight defines a QL from the end of the time signature
         # to the last valid offset
         # paddingLeft is used to define pickup/anacrusis bars
-        self.paddingLeft = 0
-        self.paddingRight = 0
+        self.paddingLeft: OffsetQL = 0.0
+        self.paddingRight: OffsetQL = 0.0
 
         self.numberSuffix = None  # for measure 14a would be 'a'
-        if 'number' in keywords:
-            num = keywords['number']
-            if isinstance(num, str):
-                realNum, suffix = common.getNumFromStr(num)
-                self.number = int(realNum)
-                if suffix:
-                    self.numberSuffix = suffix
-            else:
-                self.number = keywords['number']
+        if isinstance(number, str):
+            realNum, suffix = common.getNumFromStr(number)
+            self.number = int(realNum)
+            if suffix:
+                self.numberSuffix = suffix
         else:
-            self.number = 0  # 0 means undefined or pickup
+            self.number = number
         # we can request layout width, using the same units used
         # in layout.py for systems; most musicxml readers do not support this
         # on input
@@ -12886,7 +13035,7 @@ class Measure(Stream):
         >>> m.insert(2.0, n)
         >>> m.padAsAnacrusis()
         >>> m.paddingLeft
-        0
+        0.0
 
         If useInitialRests is True, then rests at the beginning of the measure
         are removed.  This is especially useful for formats that don't give a
@@ -14135,19 +14284,15 @@ class SpannerStorage(Stream):
     object's .sites and find any and all
     locations that are SpannerStorage objects.
 
-    A `spannerParent` keyword argument must be
-    provided by the Spanner in creation.
+    A `client` keyword argument must be provided by the Spanner in creation.
 
-    TODO v7: rename spannerParent to client.
+    Changed in v8: spannerParent is renamed client.
     '''
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self, givenElements=None, *, client: 'music21.spanner.Spanner', **keywords):
         # No longer need store as weakref since Py2.3 and better references
-        self.spannerParent = None
-        if 'spannerParent' in keywords:
-            self.spannerParent = keywords['spannerParent']
-            del keywords['spannerParent']
-        super().__init__(*arguments, **keywords)
+        self.client = client
+        super().__init__(givenElements, **keywords)
 
         # must provide a keyword argument with a reference to the spanner
         # parent could name spannerContainer or other?

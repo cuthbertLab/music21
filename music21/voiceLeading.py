@@ -245,7 +245,6 @@ class VoiceLeadingQuartet(base.Music21Object):
         <music21.note.Note D>
         ''')
 
-
     def _getV2n1(self):
         return self._v2n1
 
@@ -275,10 +274,14 @@ class VoiceLeadingQuartet(base.Music21Object):
         ''')
 
     def _findIntervals(self):
-        self.vIntervals.append(interval.notesToInterval(self.v1n1, self.v2n1))
-        self.vIntervals.append(interval.notesToInterval(self.v1n2, self.v2n2))
-        self.hIntervals.append(interval.notesToInterval(self.v1n1, self.v1n2))
-        self.hIntervals.append(interval.notesToInterval(self.v2n1, self.v2n2))
+        self.vIntervals.append(interval.Interval(self.v1n1, self.v2n1))
+        self.vIntervals.append(interval.Interval(self.v1n2, self.v2n2))
+        self.hIntervals.append(interval.Interval(self.v1n1, self.v1n2))
+        self.hIntervals.append(interval.Interval(self.v2n1, self.v2n2))
+        for vIntv in self.vIntervals:
+            vIntv.intervalType = 'harmonic'
+        for hIntv in self.hIntervals:
+            hIntv.intervalType = 'melodic'
 
     def motionType(self, *, allowAntiParallel=False):
         '''
@@ -1251,13 +1254,24 @@ class VoiceLeadingQuartet(base.Music21Object):
         True
         '''
         from music21 import roman
-        c1 = chord.Chord([self.vIntervals[0].noteStart, self.vIntervals[0].noteEnd])
-        c2 = chord.Chord([self.vIntervals[1].noteStart, self.vIntervals[1].noteEnd])
+        v0 = self.vIntervals[0]
+        v1 = self.vIntervals[1]
+        v0ns = v0.noteStart
+        v0ne = v0.noteEnd
+        v1ns = v1.noteStart
+        v1ne = v1.noteEnd
+
+        if t.TYPE_CHECKING:
+            assert v0ns is not None and v0ne is not None
+            assert v1ns is not None and v1ne is not None
+
+        c1 = chord.Chord([v0ns, v0ne])
+        c2 = chord.Chord([v1ns, v1ne])
         r1 = roman.identifyAsTonicOrDominant(c1, self.key)
         r2 = roman.identifyAsTonicOrDominant(c2, self.key)
         openings = ['P1', 'P5', 'I', 'V']
-        return not ((self.vIntervals[0].simpleName in openings
-                        or self.vIntervals[1].simpleName in openings)
+        return not ((v0.simpleName in openings
+                        or v1.simpleName in openings)
                       and (r1[0].upper() in openings if r1 is not False else False
                            or r2[0].upper() in openings if r2 is not False else False))
 

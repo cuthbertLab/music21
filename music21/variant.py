@@ -59,7 +59,6 @@ class Variant(base.Music21Object):
 
     To use Variants from a Stream, see the :func:`~music21.stream.Stream.activateVariants` method.
 
-
     >>> v = variant.Variant()
     >>> v.repeatAppend(note.Note(), 8)
     >>> len(v.notes)
@@ -90,16 +89,24 @@ class Variant(base.Music21Object):
     classSortOrder = stream.Stream.classSortOrder - 2  # variants should always come first?
 
     # this copies the init of Streams
-    def __init__(self, givenElements=None, *args, **keywords):
-        super().__init__()
+    def __init__(
+        self,
+        givenElements: t.Union[None,
+                               base.Music21Object,
+                               t.Sequence[base.Music21Object]] = None,
+        name: t.Optional[str] = None,
+        appendOrInsert: t.Literal['append', 'insert', 'offsets'] = 'offsets',
+        **music21ObjectKeywords,
+    ):
+        super().__init__(**music21ObjectKeywords)
         self.exposeTime = False
         self._stream = stream.VariantStorage(givenElements=givenElements,
-                                             *args, **keywords)
+                                             appendOrInsert=appendOrInsert)
 
         self._replacementDuration = None
 
-        if 'name' in keywords:
-            self.groups.append(keywords['name'])
+        if name is not None:
+            self.groups.append(name)
 
 
     def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
@@ -158,7 +165,6 @@ class Variant(base.Music21Object):
     def __getitem__(self, key):
         return self._stream.__getitem__(key)
 
-
     def __len__(self):
         return len(self._stream)
 
@@ -169,7 +175,6 @@ class Variant(base.Music21Object):
         if 'elementIds' not in self._cache or self._cache['elementIds'] is None:
             self._cache['elementIds'] = [id(c) for c in self._stream._elements]
         return self._cache['elementIds']
-
 
     def replaceElement(self, old, new):
         '''
@@ -1734,8 +1739,8 @@ def getMeasureHashes(s):
     # noinspection PyShadowingNames
     '''
     Takes in a stream containing measures and returns a list of hashes,
-    one for each measure. Currently
-    implemented with search.translateStreamToString()
+    one for each measure. This is currently implemented
+    with search.translateStreamToString()
 
     >>> s = converter.parse("tinynotation: 2/4 c4 d8. e16 FF4 a'4 b-2")
     >>> sm = s.makeMeasures()

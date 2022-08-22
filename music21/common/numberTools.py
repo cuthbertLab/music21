@@ -765,22 +765,18 @@ def weightedSelection(values: t.List[int],
 
 
 @deprecated('v8', 'v9', 'use math.gcd(a, b) instead.')
-def euclidGCD(a: int, b: int) -> int:
+def euclidGCD(a: int, b: int) -> int:  # pragma: no cover
     '''
     Deprecated: use math.gcd(a, b) instead
 
     use Euclid's algorithm to find the GCD of a and b::
 
-    ```
-    common.euclidGCD(2, 4)
-    2
-
-    common.euclidGCD(20, 8)
-    4
-
-    common.euclidGCD(20, 16)
-    4
-    ```
+        common.euclidGCD(2, 4)
+        2
+        common.euclidGCD(20, 8)
+        4
+        common.euclidGCD(20, 16)
+        4
     '''
     if b == 0:
         return a

@@ -269,13 +269,16 @@ class SubConverter:
         Calls .writeDataStream on the repr of obj, and returns the fp returned by it.
         '''
         dataStr = repr(obj)
-        fp = self.writeDataStream(fp, dataStr)
+        fp = self.writeDataStream(fp, dataStr, **keywords)
         return fp
 
-    def writeDataStream(self, fp, dataStr):  # pragma: no cover
+    def writeDataStream(self,
+                        fp,
+                        dataStr: t.Union[str, bytes],
+                        **keywords) -> pathlib.Path:  # pragma: no cover
         '''
         Writes the data stream to `fp` or to a temporary file and returns the
-        filename written.
+        Path object of the filename written.
         '''
         if fp is None:
             fp = self.getTemporaryFile()
@@ -468,11 +471,17 @@ class ConverterLilypond(SubConverter):
                                          'svg': ''}  # sic! (Why?)
     codecWrite = True
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+    def write(self,
+              obj,
+              fmt,
+              fp=None,
+              subformats=None,
+              *,
+              coloredVariants: bool = False,
+              **keywords):  # pragma: no cover
         from music21 import lily
         conv = lily.translate.LilypondConverter()
-        if 'coloredVariants' in keywords and keywords['coloredVariants'] is True:
-            conv.coloredVariants = True
+        conv.coloredVariants = coloredVariants
 
         if subformats is not None and 'pdf' in subformats:
             conv.loadFromMusic21Object(obj)
@@ -543,14 +552,16 @@ class ConverterVexflow(SubConverter):
     registerFormats = ('vexflow',)
     registerOutputExtensions = ('html',)
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+    def write(self,
+              obj,
+              fmt,
+              fp=None,
+              subformats=None,
+              *,
+              local: bool = False,
+              **keywords):  # pragma: no cover
         # from music21 import vexflow
         from music21.vexflow import toMusic21j as vexflow
-        if 'local' in keywords:
-            local = keywords['local']
-        else:
-            local = False
-
         dataStr = vexflow.fromObject(obj, mode='html', local=local)
         fp = self.writeDataStream(fp, dataStr)
         return fp
@@ -945,6 +956,8 @@ class ConverterMusicXML(SubConverter):
     def runThroughMusescore(self,
                             fp,
                             subformats=None,
+                            *,
+                            dpi: t.Optional[int] = None,
                             **keywords) -> pathlib.Path:  # pragma: no cover
         '''
         Take the output of the conversion process and run it through musescore to convert it
@@ -971,8 +984,8 @@ class ConverterMusicXML(SubConverter):
         fpOut += subformatExtension
 
         musescoreRun = [str(musescorePath), fp, '-o', fpOut, '-T', '0']
-        if 'dpi' in keywords:
-            musescoreRun.extend(['-r', str(keywords['dpi'])])
+        if dpi is not None:
+            musescoreRun.extend(['-r', str(dpi)])
 
         prior_qt = os.getenv('QT_QPA_PLATFORM')
         prior_xdg = os.getenv('XDG_RUNTIME_DIR')
@@ -1013,10 +1026,13 @@ class ConverterMusicXML(SubConverter):
             return pathlib.Path(fpOut)
         # common.cropImageFromPath(fp)
 
-    def writeDataStream(self, fp, dataBytes: bytes) -> pathlib.Path:  # pragma: no cover
+    def writeDataStream(self,
+                        fp,
+                        dataStr: t.Union[str, bytes],
+                        **keywords) -> pathlib.Path:  # pragma: no cover
         # noinspection PyShadowingNames
         '''
-        Writes `dataBytes` to `fp`.
+        Writes `dataStr` which must be bytes to `fp`.
         Adds `.musicxml` suffix to `fp` if it does not already contain some suffix.
 
         Changed in v7 -- returns a pathlib.Path
@@ -1038,26 +1054,32 @@ class ConverterMusicXML(SubConverter):
         True
         >>> os.remove(outFp)
         '''
-        if fp is None:
-            fp = self.getTemporaryFile()
-        else:
-            fp = common.cleanpath(fp, returnPathlib=True)
+        if not isinstance(dataStr, bytes):
+            raise ValueError(f'{dataStr} must be bytes to write to this format')
+        dataBytes = dataStr
 
-        if not fp.suffix or fp.suffix == '.mxl':
-            fp = fp.with_suffix('.musicxml')
+        fpPath: pathlib.Path
+        if fp is None:
+            fpPath = self.getTemporaryFile()
+        else:
+            fpPath = common.cleanpath(fp, returnPathlib=True)
+
+        if not fpPath.suffix or fpPath.suffix == '.mxl':
+            fpPath = fpPath.with_suffix('.musicxml')
 
         writeFlags = 'wb'
 
-        with open(fp, writeFlags) as f:
+        with open(fpPath, writeFlags) as f:
             f.write(dataBytes)  # type: ignore
 
-        return fp
+        return fpPath
 
     def write(self,
               obj: music21.Music21Object,
               fmt,
               fp=None,
               subformats=None,
+              *,
               makeNotation=True,
               compress: t.Optional[bool] = None,
               **keywords):
@@ -1178,18 +1200,21 @@ class ConverterMidi(SubConverter):
         in defaults.quantizationQuarterLengthDivisors. (Default: (4, 3)).
         '''
         from music21.midi import translate as midiTranslate
-        midiTranslate.midiFilePathToStream(filePath, self.stream, **keywords)
+        midiTranslate.midiFilePathToStream(filePath, inputM21=self.stream, **keywords)
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+    def write(self,
+              obj,
+              fmt,
+              fp=None,
+              subformats=None,
+              *,
+              addStartDelay: bool = False,
+              **keywords):  # pragma: no cover
         from music21.midi import translate as midiTranslate
         if fp is None:
             fp = self.getTemporaryFile()
 
-        midiTranslateKeywords = {}
-        if 'addStartDelay' in keywords:
-            midiTranslateKeywords['addStartDelay'] = keywords['addStartDelay']
-
-        mf = midiTranslate.music21ObjectToMidiFile(obj, **midiTranslateKeywords)
+        mf = midiTranslate.music21ObjectToMidiFile(obj, addStartDelay=addStartDelay)
         mf.open(fp, 'wb')  # write binary
         mf.write()
         mf.close()

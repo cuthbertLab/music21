@@ -42,12 +42,16 @@ class Test(unittest.TestCase):
         bytesOutUnicode = bytesOut.decode('utf-8')
         return bytesOutUnicode
 
-    def getET(self, obj):
+    def getET(self, obj, makeNotation=True):
         '''
         Return a <score-partwise> ElementTree.
-        Does NOT call makeNotation() like most calls to show() and write().
         '''
+        if makeNotation:
+            gex = GeneralObjectExporter()
+            obj = gex.fromGeneralObject(obj)
+
         SX = ScoreExporter(obj)
+        SX.makeNotation = makeNotation
         mxScore = SX.parse()
         helpers.indent(mxScore)
         return mxScore
@@ -533,10 +537,10 @@ class Test(unittest.TestCase):
         m.append(meter.TimeSignature('1/4'))
         m.append(note.Rest())
         m.insert(2, tempo.MetronomeMark('slow', 40))
+        p = stream.Part([m])
+        s = stream.Score([p])
 
-        gex = GeneralObjectExporter()
-        gex.makeNotation = False
-        tree = self.getET(gex.fromGeneralObject(m))
+        tree = self.getET(s, makeNotation=False)
         self.assertFalse(tree.findall('.//forward'))
         self.assertEqual(
             int(tree.findall('.//direction/offset')[0].text),
@@ -674,14 +678,13 @@ class Test(unittest.TestCase):
 
 
     def testExportChordSymbolsWithRealizedDurations(self):
-        gex = GeneralObjectExporter()
-        gex.makeNotation = False
 
         def realizeDurationsAndAssertTags(mm: stream.Measure, forwardTag=False, offsetTag=False):
             mm = copy.deepcopy(mm)
             harmony.realizeChordSymbolDurations(mm)
-            obj = gex.fromGeneralObject(mm)
-            tree = self.getET(obj)
+            p = stream.Part([mm])
+            s = stream.Score([p])
+            tree = self.getET(s, makeNotation=False)
             self.assertIs(bool(tree.findall('.//forward')), forwardTag)
             self.assertIs(bool(tree.findall('.//offset')), offsetTag)
 

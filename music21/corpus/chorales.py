@@ -14,9 +14,9 @@ This file makes it easier to access Bach's chorales through various
 numbering schemes and filters and includes the corpus.chorales.Iterator()
 class for easily iterating through the chorale collection.
 '''
-
-import unittest
 import copy
+import typing as t
+import unittest
 
 from music21 import exceptions21
 from music21 import environment
@@ -950,21 +950,21 @@ class Iterator:
     .highestNumber to the highest in the range. This can either be done by catalogue number
     (iterationType = 'number') or by index (iterationType = 'index').
 
+    Note that these numbers are 1-indexed (as most catalogues are) and
+    unlike Python's range feature, the final number is included.
+
     Changing the numberingSystem will reset the iterator and
     change the range values to span the entire numberList.
     The iterator can be initialized with three parameters
     (currentNumber, highestNumber, numberingSystem). For example
     corpus.chorales.Iterator(1, 26,'riemenschneider') iterates
     through the riemenschneider numbered chorales from 1 to 26.
-    Additionally, the following kwargs can be set:
+    Additionally, the following keywords can be set:
 
-    returnType = either 'stream' (default) or 'filename'
-
-    iterationType = either 'number' or 'index'
-
-    titleList = [list, of, titles]
-
-    numberList = [list, of, numbers]
+    * `returnType` = either 'stream' (default) or 'filename'
+    * `iterationType` = either 'number' or 'index'
+    * `titleList` = [list, of, titles]
+    * `numberList` = [list, of, numbers]
 
     >>> from music21 import corpus
     >>> for chorale in corpus.chorales.Iterator(1, 4, returnType='filename'):
@@ -973,7 +973,6 @@ class Iterator:
     bach/bwv347
     bach/bwv153.1
     bach/bwv86.6
-
 
     >>> BCI = corpus.chorales.Iterator()
     >>> BCI.numberingSystem
@@ -985,9 +984,8 @@ class Iterator:
     >>> BCI.highestNumber
     371
 
-    An exception will be raised if the number set is not in the
-    numbering system selected, or if the
-    numbering system selected is not valid.
+    An Exception will be raised if the number set is not in the
+    numbering system selected, or if the numbering system selected is not valid.
 
     >>> BCI.currentNumber = 377
     Traceback (most recent call last):
@@ -1022,8 +1020,9 @@ class Iterator:
     note that the first chorale in the given
     numberList will not be part of the iteration because the
     first currentNumber is set to 2 at the
-    start by the first argument. (If iterationType = 'index' setting the currentNumber to 1 and the
-    highestNumber to 7 would have the same effect as the given example.
+    start by the first argument. (If `iterationType=='index'`,
+    setting the currentNumber to 1 and the highestNumber to 7
+    would have the same effect as the given example.
 
     >>> BCI = corpus.chorales.Iterator(2, 371, numberingSystem='riemenschneider',
     ...                                numberList=[1, 2, 3, 4, 6, 190, 371, 500],
@@ -1054,7 +1053,6 @@ class Iterator:
     >>> print(corpus.chorales.Iterator(returnType='filename')[55])
     bach/bwv121.6
 
-
     For the first 20 chorales in the Riemenschneider numbering system, there are professionally
     annotated roman numeral analyses in romanText format, courtesy of Dmitri Tymoczko of Princeton
     University.  To get them as an additional part to the score set returnType to "stream", and
@@ -1071,10 +1069,16 @@ class Iterator:
                   'titleList', 'numberList', 'returnType', 'iterationType']
 
     def __init__(self,
-                 currentNumber=None,
-                 highestNumber=None,
-                 numberingSystem='riemenschneider',
-                 **kwargs):
+                 currentNumber: t.Optional[int] = None,
+                 highestNumber: t.Optional[int] = None,
+                 *,
+                 numberingSystem: str = 'riemenschneider',
+                 returnType: str = 'stream',
+                 iterationType: str = 'number',
+                 analysis: bool = False,
+                 numberList: t.Optional[t.List[int]] = None,
+                 titleList: t.Optional[t.List[str]] = None,
+                 ):
         '''
         By default: numberingSystem = 'riemenschneider', currentNumber = 1,
         highestNumber = 371, iterationType = 'number',
@@ -1097,24 +1101,23 @@ class Iterator:
         self._numberingSystem = None
         self._returnType = 'stream'
         self._iterationType = 'number'
-        self.analysis = False
+        self.analysis = analysis
 
         self._choraleList1 = ChoraleList()  # For budapest, baerenreiter
         self._choraleList2 = ChoraleListRKBWV()  # for kalmus, riemenschneider, title, and bwv
 
-        self.numberingSystem = numberingSystem  # This assignment must come before the kwargs
+        self.numberingSystem = numberingSystem  # This assignment must come before the keywords
 
-        for key in kwargs:
-            if key == 'returnType':
-                self.returnType = kwargs[key]
-            elif key == 'numberList':
-                self.numberList = kwargs[key]
-            elif key == 'titleList':
-                self.titleList = kwargs[key]
-            elif key == 'iterationType':
-                self.iterationType = kwargs[key]
-            elif key == 'analysis':
-                self.analysis = kwargs[key]
+        self.returnType = returnType
+        self.iterationType = iterationType
+
+        if numberList is not None:
+            # TODO: overly complex order of setting...
+            self.numberList = numberList
+
+        if titleList is not None:
+            # TODO: overly complex order of setting...
+            self.titleList = titleList
 
         # These assignments must come after .iterationType
 
@@ -1172,7 +1175,8 @@ class Iterator:
         self._currentIndex += 1
         return nextChorale
 
-    # ### Functions
+    # ### Private Methods
+
     def _returnChorale(self, choraleIndex=None):
         # noinspection SpellCheckingInspection
         '''
@@ -1183,7 +1187,6 @@ class Iterator:
         of the current iteration. If the numberingSystem == 'title',
         the chorale is instead queried by Title
         from the titleList and the numberList is ignored.
-
 
         >>> from music21 import corpus
         >>> BCI = corpus.chorales.Iterator()
@@ -1299,7 +1302,6 @@ class Iterator:
         '''
         This takes a string such as '69.6-a' and returns a float for sorting.
         '''
-
         out = ''
         for char in bwv:
             if char.isdigit() or char == '.':
@@ -1523,13 +1525,12 @@ class Iterator:
         if self._numberList is None:
             self.currentNumber = 0
             self.highestNumber = 0
+        elif self.iterationType == 'number':
+            self.currentNumber = self._numberList[0]
+            self.highestNumber = self._numberList[-1]
         else:
-            if self.iterationType == 'number':
-                self.currentNumber = self._numberList[0]
-                self.highestNumber = self._numberList[-1]
-            else:
-                self.currentNumber = 0
-                self.highestNumber = len(self._numberList) - 1
+            self.currentNumber = 0
+            self.highestNumber = len(self._numberList) - 1
 
     numberList = property(_getNumberList, _setNumberList,
                           doc='''Allows access to the catalogue numbers
@@ -1778,9 +1779,6 @@ def getByTitle(title):
 class BachException(exceptions21.Music21Exception):
     pass
 
-
-# class Test(unittest.TestCase):
-#     pass
 
 class TestExternal(unittest.TestCase):
     show = True

@@ -2089,7 +2089,7 @@ def instrumentFromMidiProgram(number: int) -> Instrument:
     return inst
 
 
-def partitionByInstrument(streamObj):
+def partitionByInstrument(streamObj: 'music21.stream.Stream') -> 'music21.stream.Stream':
     # noinspection PyShadowingNames
     '''
     Given a single Stream, or a Score or similar multi-part structure,
@@ -2212,6 +2212,8 @@ def partitionByInstrument(streamObj):
             {0.0} <music21.note.Note C#>
             {4.0} <music21.bar.Barline type=final>
 
+    Changes in v8: returns the original stream if there are no instruments.
+
     TODO: parts should be in Score Order. Coincidence that this almost works.
     TODO: use proper recursion to make a copy of the stream.
     TODO: final barlines should be aligned.
@@ -2232,12 +2234,11 @@ def partitionByInstrument(streamObj):
         sub.extendDuration('Instrument', inPlace=True)
 
     # first, find all unique instruments
-    instrumentIterator = s.recurse().getElementsByClass(Instrument)
+    instrumentIterator = s[Instrument]
     if not instrumentIterator:
-        # TODO(msc): v7 return s.
-        return None  # no partition is available
+        return s  # no partition is available
 
-    names = OrderedDict()  # store unique names
+    names: t.OrderedDict[str, t.Dict[str, t.Any]] = OrderedDict()  # store unique names
     for instrumentObj in instrumentIterator:
         # matching here by instrument name
         if instrumentObj.instrumentName not in names:

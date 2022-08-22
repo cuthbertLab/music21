@@ -126,9 +126,9 @@ class MetadataEntry(prebase.ProtoM21Object):
         score = self.parse()
         score.show(showFormat)
 
-    def search(self, query=None, field=None, **kwargs):
+    def search(self, query=None, field=None, **keywords):
         # runs search on the RichMetadata object
-        return self.metadata.search(query, field, **kwargs)
+        return self.metadata.search(query, field, **keywords)
 
     # PUBLIC PROPERTIES #
 
@@ -1141,7 +1141,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         ])
         return self
 
-    def search(self, query=None, field=None, fileExtensions=None, **kwargs):
+    def search(self, query=None, field=None, fileExtensions=None, **keywords):
         r'''
         Perform search, on all stored metadata, permit regular expression
         matching.
@@ -1193,9 +1193,9 @@ class MetadataBundle(prebase.ProtoM21Object):
 
         newMetadataBundle = MetadataBundle()
         if query is None and field is None:
-            if not kwargs:
+            if not keywords:
                 raise MetadataBundleException('Query cannot be empty')
-            field, query = kwargs.popitem()
+            field, query = keywords.popitem()
 
         for key in self._metadataEntries:
             metadataEntry = self._metadataEntries[key]
@@ -1226,8 +1226,8 @@ class MetadataBundle(prebase.ProtoM21Object):
             sorted(list(newMetadataBundle._metadataEntries.items()),
                                                         key=lambda mde: mde[1].sourcePath))
 
-        if kwargs:
-            return newMetadataBundle.search(**kwargs)
+        if keywords:
+            return newMetadataBundle.search(**keywords)
 
         return newMetadataBundle
 

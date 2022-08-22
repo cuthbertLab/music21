@@ -500,19 +500,31 @@ class Test(unittest.TestCase):
         net.fillMelodicMinor()
 
         # ascending from known pitches
-        self.assertEqual(str(net.nextPitch('c4', 1, 'g4', Direction.ASCENDING)), 'A4')
-        self.assertEqual(str(net.nextPitch('c4', 1, 'a4', Direction.ASCENDING)), 'B4')
-        self.assertEqual(str(net.nextPitch('c4', 1, 'b4', Direction.ASCENDING)), 'C5')
+        self.assertEqual(str(net.nextPitch('c4', 1, 'g4', direction=Direction.ASCENDING)),
+                         'A4')
+        self.assertEqual(str(net.nextPitch('c4', 1, 'a4', direction=Direction.ASCENDING)),
+                         'B4')
+        self.assertEqual(str(net.nextPitch('c4', 1, 'b4', direction=Direction.ASCENDING)),
+                         'C5')
 
         # descending
-        self.assertEqual(str(net.nextPitch('c4', 1, 'c5', Direction.DESCENDING)), 'B-4')
-        self.assertEqual(str(net.nextPitch('c4', 1, 'b-4', Direction.DESCENDING)), 'A-4')
-        self.assertEqual(str(net.nextPitch('c4', 1, 'a-4', Direction.DESCENDING)), 'G4')
+        self.assertEqual(str(net.nextPitch('c4', 1, 'c5', direction=Direction.DESCENDING)),
+                         'B-4')
+        self.assertEqual(str(net.nextPitch('c4', 1, 'b-4', direction=Direction.DESCENDING)),
+                         'A-4')
+        self.assertEqual(str(net.nextPitch('c4', 1, 'a-4',
+                                           direction=Direction.DESCENDING)),
+                         'G4')
 
         # larger degree sizes
-        self.assertEqual(str(net.nextPitch('c4', 1, 'c5', Direction.DESCENDING, stepSize=2)),
+        self.assertEqual(str(net.nextPitch('c4', 1, 'c5',
+                                           direction=Direction.DESCENDING,
+                                           stepSize=2)),
                          'A-4')
-        self.assertEqual(str(net.nextPitch('c4', 1, 'a4', Direction.ASCENDING, stepSize=2)), 'C5')
+        self.assertEqual(str(net.nextPitch('c4', 1, 'a4',
+                                           direction=Direction.ASCENDING,
+                                           stepSize=2)),
+                         'C5')
 
         # moving from a non-scale degree
 
@@ -520,34 +532,41 @@ class Test(unittest.TestCase):
         self.assertEqual(
             str(
                 net.nextPitch(
-                    'c4', 1, 'c#4', Direction.ASCENDING, getNeighbor=Direction.ASCENDING
+                    'c4', 1, 'c#4',
+                    direction=Direction.ASCENDING,
+                    getNeighbor=Direction.ASCENDING
                 )
             ),
             'E-4'
         )
 
         # if we get the descending neighbor, we move from c to d
-        self.assertEqual(str(net.nextPitch('c4', 1, 'c#4', Direction.ASCENDING,
+        self.assertEqual(str(net.nextPitch('c4', 1, 'c#4',
+                                           direction=Direction.ASCENDING,
                                            getNeighbor=Direction.DESCENDING)),
                          'D4')
 
         # if on a- and get ascending neighbor, move from a to b-
-        self.assertEqual(str(net.nextPitch('c4', 1, 'a-', Direction.ASCENDING,
+        self.assertEqual(str(net.nextPitch('c4', 1, 'a-',
+                                           direction=Direction.ASCENDING,
                                            getNeighbor=Direction.ASCENDING)),
                          'B4')
 
         # if on a- and get descending neighbor, move from g to a
-        self.assertEqual(str(net.nextPitch('c4', 1, 'a-', Direction.ASCENDING,
+        self.assertEqual(str(net.nextPitch('c4', 1, 'a-',
+                                           direction=Direction.ASCENDING,
                                            getNeighbor=Direction.DESCENDING)),
                          'A4')
 
         # if on b, ascending neighbor, move from c to b-
-        self.assertEqual(str(net.nextPitch('c4', 1, 'b3', Direction.DESCENDING,
+        self.assertEqual(str(net.nextPitch('c4', 1, 'b3',
+                                           direction=Direction.DESCENDING,
                                            getNeighbor=Direction.ASCENDING)),
                          'B-3')
 
         # if on c-4, use mode derivation instead of neighbor, move from b4 to c4
-        self.assertEqual(str(net.nextPitch('c4', 1, 'c-4', Direction.ASCENDING)),
+        self.assertEqual(str(net.nextPitch('c4', 1, 'c-4',
+                                           direction=Direction.ASCENDING)),
                          'C4')
 
         self.assertEqual(
@@ -565,8 +584,13 @@ class Test(unittest.TestCase):
             (6, Terminus.HIGH)
         )
 
-        self.assertEqual(net.getNeighborNodeIds(
-            pitchReference='c4', nodeName=1, pitchTarget='b-'), (4, 6))
+        self.assertEqual(
+            net.getNeighborNodeIds(
+                pitchReference='c4',
+                nodeName=1,
+                pitchTarget='b-'),
+            (4, 6)
+        )
 
         self.assertEqual(
             net.getNeighborNodeIds(
@@ -590,7 +614,7 @@ class Test(unittest.TestCase):
                 'c4',
                 1,
                 'b4',
-                Direction.DESCENDING,
+                direction=Direction.DESCENDING,
                 getNeighbor=Direction.DESCENDING)),
             'A-4')
 

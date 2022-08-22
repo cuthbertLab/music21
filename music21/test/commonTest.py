@@ -60,15 +60,15 @@ def testImports():
 def defaultDoctestSuite(name=None):
     globs = __import__('music21').__dict__.copy()
     docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
-    kwArgs = {
+    keywords = {
         'globs': globs,
         'optionflags': docTestOptions,
     }
     # in case there are any tests here, get a suite to load up later
     if name is not None:
-        s1 = doctest.DocTestSuite(name, **kwArgs)
+        s1 = doctest.DocTestSuite(name, **keywords)
     else:
-        s1 = doctest.DocTestSuite(**kwArgs)
+        s1 = doctest.DocTestSuite(**keywords)
     return s1
 
 # from testRunner...
@@ -228,6 +228,9 @@ class ModuleGather:
                             'musicxml/xmlToM21',
 
                             'romanText/translate',
+                            'corpus/testCorpus',
+                            'audioSearch/transcriber',
+                            'audioSearch/__init__',
                             'alpha/theoryAnalysis/theoryAnalyzer',
                             ]
 

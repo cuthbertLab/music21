@@ -437,7 +437,7 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
     newBassLine.append(sampleScore[1][1])  # Key signature
 
     for n in sampleScore[1].notes:
-        i = interval.notesToInterval(boogieBassLine[0], n)
+        i = interval.Interval(boogieBassLine[0], n)
         tp = boogieBassLine.transpose(i)
         for lyr in n.lyrics:
             tp.notes.first().addLyric(lyr.text)
@@ -483,7 +483,7 @@ def generateTripletBlues(blRealization=None, numRepeats=5):  # 12/8
 
     newBassLine = stream.Part()
     for n in sampleScore[1].notes:
-        i = interval.notesToInterval(tripletBassLine[0], n)
+        i = interval.Interval(tripletBassLine[0], n)
         tp = tripletBassLine.transpose(i)
         for lyr in n.lyrics:
             tp.notes.first().addLyric(lyr.text)

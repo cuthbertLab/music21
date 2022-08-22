@@ -5,3 +5,4 @@ matplotlib
 more_itertools
 numpy
 webcolors>=1.5
+requests

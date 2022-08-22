@@ -743,7 +743,12 @@ class PartStaffExporterMixin:
 
         # Create <backup>
         amountToBackup: int = 0
-        for dur in otherMeasure.findall('note/duration'):
+        for note in otherMeasure.findall('note'):
+            if note.find('chord') is not None:
+                continue
+            dur = note.find('duration')
+            if dur is None:
+                continue
             backupDurText = dur.text
             if backupDurText is not None:
                 amountToBackup += int(backupDurText)
@@ -1128,6 +1133,23 @@ class Test(unittest.TestCase):
         ps1[stream.Measure].last().number = 0  # was measure 2
         root = self.getET(s)
         self.assertEqual(len(root.findall('part/measure/attributes/time')), 3)
+
+    def testBackupAmount(self):
+        '''Regression test for chord members causing too-large backup amounts.'''
+        from music21 import chord
+        from music21 import defaults
+        from music21 import layout
+
+        ps1 = stream.PartStaff(chord.Chord('C E G'))
+        ps2 = stream.PartStaff(chord.Chord('D F A'))
+        sg = layout.StaffGroup([ps1, ps2])
+        s = stream.Score([sg, ps1, ps2])
+
+        root = self.getET(s)
+        self.assertEqual(
+            root.findall('part/measure/backup/duration')[0].text,
+            str(defaults.divisionsPerQuarter)
+        )
 
 
 if __name__ == '__main__':

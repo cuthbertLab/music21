@@ -684,7 +684,6 @@ class ABCMetadata(ABCToken):
             else:  # assume we just have a quarter definition, e.g., Q:90
                 number = float(nonText)
 
-        # print(nonText, tempoStr)
         if tempoStr or number is not None:
             mmObj = tempo.MetronomeMark(text=tempoStr or None,
                                         number=number if number != -1 else None,
@@ -3528,9 +3527,6 @@ class Test(unittest.TestCase):
                         (-2, '[1', ':|'),
                         (-1, '[2', '|'),
                         ]:
-            # print('expecting', i, l, r, ahm[i].tokens)
-            # print('have', ahm[i].leftBarToken, ahm[i].rightBarToken)
-            # print()
             if l is None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:
@@ -3554,7 +3550,6 @@ class Test(unittest.TestCase):
                         (1, None, '|'),
                         (-1, '||', None),  # trailing lyric metadata
                         ]:
-            # print(i, l, r, ahm[i].tokens)
             if l is None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:
@@ -3573,7 +3568,6 @@ class Test(unittest.TestCase):
         for i, l, r in [(0, None, None),  # metadata
                         (-1, None, None),  # note data, but no bars
                         ]:
-            # print(i, l, r, ahm[i].tokens)
             if l is None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:

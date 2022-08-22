@@ -19,6 +19,7 @@ from music21 import clef
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
+from music21 import expressions
 from music21 import interval
 from music21 import note
 from music21 import tempo  # for typing
@@ -185,7 +186,7 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
                 f'Accidental {currentPitch.accidental} of '
                 + f'chord {music21Chord} cannot be transcribed to braille.'
             )
-        intervalDistance = interval.notesToInterval(basePitch, currentPitch).generic.undirected
+        intervalDistance = interval.notesToGeneric(basePitch, currentPitch).undirected
         if intervalDistance > 8:
             intervalDistance = (intervalDistance - 1) % 7 + 1
             if currentPitchIndex == 1:
@@ -195,8 +196,8 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
                     f'Octave {currentPitch.octave} {brailleOctave}')
             else:
                 previousPitch = allPitches[currentPitchIndex - 1]
-                relativeIntervalDist = interval.notesToInterval(previousPitch,
-                                                                currentPitch).generic.undirected
+                relativeIntervalDist = interval.notesToGeneric(previousPitch,
+                                                               currentPitch).undirected
                 if relativeIntervalDist >= 8:
                     brailleOctave = pitchToOctave(currentPitch)
                     chordTrans.append(brailleOctave)
@@ -870,7 +871,7 @@ def handleExpressions(music21Note: note.GeneralNote, noteTrans: t.List[str]):
     # expressions (so far, just fermata)
     # ----------------------------------
     for expr in music21Note.expressions:
-        if 'Fermata' in expr.classes:
+        if isinstance(expr, expressions.Fermata):
             try:
                 fermataBraille = lookup.fermatas['shape'][expr.shape]
                 noteTrans.append(fermataBraille)
@@ -1159,7 +1160,7 @@ def showOctaveWithNote(previousNote, currentNote):
     '''
     if previousNote is None:
         return True
-    i = interval.notesToInterval(previousNote, currentNote)
+    i = interval.Interval(previousNote, currentNote)
     isSixthOrGreater = i.generic.undirected >= 6
     isFourthOrFifth = i.generic.undirected in (4, 5)
     sameOctaveAsPrevious = previousNote.octave == currentNote.octave
