@@ -146,7 +146,7 @@ class Test(unittest.TestCase):
         v1.id = 234
         xmlOut = self.getXml(m)
         self.assertIn('<voice>234</voice>', xmlOut)
-        self.assertIn('<voice>1</voice>', xmlOut)  # is v2 now!
+        self.assertIn('<voice>235</voice>', xmlOut)
         v2.id = 'hello'
         xmlOut = self.getXml(m)
         self.assertIn('<voice>hello</voice>', xmlOut)
@@ -188,44 +188,6 @@ class Test(unittest.TestCase):
             staff = mxNote.find('staff')
             # Because there is one voice per staff/measure, voicenum == staffnum
             self.assertEqual(voice.text, staff.text)
-
-    def testZipMeasures(self):
-        p0 = stream.Part()
-        p1 = stream.Part()
-        m1 = stream.Measure(number='1')
-        m1a = stream.Measure(number='1a')
-        m1b = stream.Measure(number='1b')
-        mm1 = stream.Measure(number='1')
-        mm1a = stream.Measure(number='1a')
-        mm1b = stream.Measure(number='1b')
-        m2 = stream.Measure(number='2')
-        m2a = stream.Measure(number='2a')
-        m2b = stream.Measure(number='2b')
-        mm2 = stream.Measure(number='2')
-        mm2a = stream.Measure(number='2a')
-        mm2b = stream.Measure(number='2b')
-        p0.append([m1, m1a, m1b, m2, m2a, m2b])
-        p1.append([mm1, mm1a, mm1b, mm2, mm2a, mm2b])
-        expectedNums = ['1', '1a', '1b', '2', '2a', '2b']
-        for mnum, measures in enumerate(ScoreExporter.zipMeasures([p0, p1])):
-            self.assertEqual(len(measures), 2)
-            for m in measures:
-                self.assertEqual(m.measureNumberWithSuffix(), expectedNums[mnum])
-
-        p1 = stream.Part()
-        p1.append([mm1, mm2])
-        expectedNumsPart0 = ['1', '1a', '1b', '2', '2a', '2b']
-        expectedNumsPart1 = ['1', None, None, '2', None, None]
-        for mnum, measures in enumerate(ScoreExporter.zipMeasures([p0, p1])):
-            self.assertEqual(len(measures), 2)
-            for partIdx, m in enumerate(measures):
-                if partIdx == 0:
-                    self.assertEqual(m.measureNumberWithSuffix(), expectedNumsPart0[mnum])
-                else:  # partIdx == 1
-                    if expectedNumsPart1[mnum] is None:
-                        self.assertIsNone(m)
-                    else:
-                        self.assertEqual(m.measureNumberWithSuffix(), expectedNumsPart1[mnum])
 
     def testCompositeLyrics(self):
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
