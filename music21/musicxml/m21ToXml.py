@@ -1514,6 +1514,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             # before attempting to identify and count instruments
             self._populatePartExporterList()
             self.groupsToJoin = self.joinableGroups()
+            self.setPartExporterStaffGroups()
+            self.renumberVoicesWithinStaffGroups()
             self.parsePartlikeScore()
         else:
             self.parseFlatScore()
@@ -1727,6 +1729,60 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         pp = PartExporter(s, parent=self)
         pp.parse()
         self.partExporterList.append(pp)
+
+    def setPartExporterStaffGroups(self):
+        '''
+        Figures out the containing StaffGroup for every PartExporter that has one.
+
+        Called automatically by .parse()
+        '''
+        for partExp in self.partExporterList:
+            joinableGroup = None
+            for sg in self.groupsToJoin:
+                if partExp.stream in sg:
+                    joinableGroup = sg
+                    break
+
+            partExp.staffGroup = joinableGroup
+
+    def renumberVoicesWithinStaffGroups(self):
+        '''
+        Renumbers voices (as appropriate) in each StaffGroup, so that
+        voices have unique numbers across the entire group.
+
+        Called automatically by .parse()
+        '''
+        staffGroupsProcessed: t.List = []
+        for partExp in self.partExporterList:
+            if partExp.staffGroup is None:
+                # no staffGroup to process
+                continue
+
+            if partExp.staffGroup in staffGroupsProcessed:
+                # we already processed this one
+                continue
+
+            # renumber the voices in this StaffGroup
+            staffGroupScore = stream.Score(partExp.staffGroup.getSpannedElements())
+            measuresStream = staffGroupScore.recurse().getElementsByClass(stream.Measure).stream()
+            nextVoiceId: int = 1
+            for measureStack in OffsetIterator(measuresStream):
+                for m in measureStack:
+                    for v in m[stream.Voice]:
+                        if not isinstance(v.id, int):
+                            # it's not an integer, leave it as is, and don't move nextVoiceId
+                            continue
+                        elif v.id < defaults.minIdNumberToConsiderMemoryLocation:
+                            # it's a low integer, leave it as is, and jump nextVoiceId to v.id + 1
+                            nextVoiceId = v.id + 1
+                        else:
+                            # it's a memory location, set v.id to nextVoiceId and increment
+                            v.id = nextVoiceId
+                            nextVoiceId += 1
+
+            # remember we did this one, so we don't do it again
+            staffGroupsProcessed.append(partExp.staffGroup)
+
 
     def postPartProcess(self):
         '''
@@ -2612,6 +2668,9 @@ class PartExporter(XMLExporterBase):
         # has changed
         self.lastDivisions = None
 
+        # The staffGroup to which this part belongs (if it belongs to one)
+        self.staffGroup: t.Optional[layout.StaffGroup] = None
+
         self.spannerBundle = partObj.spannerBundle
 
     def parse(self):
@@ -3084,8 +3143,8 @@ class MeasureExporter(XMLExporterBase):
         self.measureOffsetStart = 0.0
         self.offsetInMeasure = 0.0
         self.currentVoiceId: t.Optional[int] = None
-        self.nextFreeVoiceNumber = 1
-        self.nextArpeggioNumber = 1
+        self.nextFreeVoiceNumber: int = 1
+        self.nextArpeggioNumber: int = 1
         self.arpeggioNumbers: t.Dict[expressions.ArpeggioMarkSpanner, int] = {}
 
         self.rbSpanners: t.List[spanner.RepeatBracket] = []  # repeatBracket spanners
@@ -3161,7 +3220,10 @@ class MeasureExporter(XMLExporterBase):
             m: stream.Voice
             if isinstance(m.id, int) and m.id < defaults.minIdNumberToConsiderMemoryLocation:
                 voiceId = m.id
+                self.nextFreeVoiceNumber = voiceId + 1
             elif isinstance(m.id, int):
+                # This voice id is actually a memory location, so we need to change it
+                # to a low number so it can be used in MusicXML.
                 voiceId = self.nextFreeVoiceNumber
                 self.nextFreeVoiceNumber += 1
             else:
