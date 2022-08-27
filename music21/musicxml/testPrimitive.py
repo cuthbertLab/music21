@@ -18972,7 +18972,8 @@ ALL = [
     colors01, triplets01, textBoxes01, octaveShifts33d,  # 40
     unicodeStrNoNonAscii, unicodeStrWithNonAscii,  # 44
     tremoloTest, hiddenRests, multiDigitEnding, tupletsImplied, pianoStaffPolymeter,  # 46
-    arpeggio32d, multiStaffArpeggios  # 51
+    arpeggio32d, multiStaffArpeggios, multiMeasureEnding,   # 51
+    pianoStaffPolymeterWithClefOctaveChange,  # 54
 ]
 
 
