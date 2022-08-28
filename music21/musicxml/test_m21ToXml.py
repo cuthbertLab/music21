@@ -451,32 +451,33 @@ class Test(unittest.TestCase):
         self.assertEqual(len(measures), 8)
         for measure in measures:
             measNumber = measure.get('number')
-            expectLeftBarline = bool(expectedEndings[measNumber][0] is not None)
-            expectRightBarline = bool(expectedEndings[measNumber][1] is not None)
+            with self.subTest(measureNumber=measNumber):
+                expectLeftBarline = bool(expectedEndings[measNumber][0] is not None)
+                expectRightBarline = bool(expectedEndings[measNumber][1] is not None)
 
-            gotLeftBarline = False
-            gotRightBarline = False
-            barlines = measure.findall('.//barline')
-            for i, barline in enumerate(barlines):
-                if barline.get('location') == 'left':
-                    gotLeftBarline = True
-                    leftEndingType = None
-                    leftEnding = barline.find('ending')
-                    if leftEnding is not None:
-                        leftEndingType = leftEnding.get('type')
-                    self.assertEqual(leftEndingType, expectedEndings[measNumber][0])
-                elif barline.get('location') == 'right':
-                    gotRightBarline = True
-                    rightEndingType = None
-                    rightEnding = barline.find('ending')
-                    if rightEnding is not None:
-                        rightEndingType = rightEnding.get('type')
-                    self.assertEqual(rightEndingType, expectedEndings[measNumber][1])
+                gotLeftBarline = False
+                gotRightBarline = False
+                barlines = measure.findall('.//barline')
+                for i, barline in enumerate(barlines):
+                    if barline.get('location') == 'left':
+                        gotLeftBarline = True
+                        leftEndingType = None
+                        leftEnding = barline.find('ending')
+                        if leftEnding is not None:
+                            leftEndingType = leftEnding.get('type')
+                        self.assertEqual(leftEndingType, expectedEndings[measNumber][0])
+                    elif barline.get('location') == 'right':
+                        gotRightBarline = True
+                        rightEndingType = None
+                        rightEnding = barline.find('ending')
+                        if rightEnding is not None:
+                            rightEndingType = rightEnding.get('type')
+                        self.assertEqual(rightEndingType, expectedEndings[measNumber][1])
 
-            if expectLeftBarline:
-                self.assertTrue(gotLeftBarline)
-            if expectRightBarline:
-                self.assertTrue(gotRightBarline)
+                if expectLeftBarline:
+                    self.assertTrue(gotLeftBarline)
+                if expectRightBarline:
+                    self.assertTrue(gotRightBarline)
 
     def testTextExpressionOffset(self):
         '''Transfer element offset after calling getTextExpression().'''
