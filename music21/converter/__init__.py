@@ -750,7 +750,7 @@ class Converter:
 
         if forceSource is True or not fp.exists():
             environLocal.printDebug([f'downloading to: {fp}'])
-            r = requests.get(url, allow_redirects=True)
+            r = requests.get(url, allow_redirects=True, timeout=20)
             if r.status_code != 200:
                 raise ConverterException(
                     f'Could not download {url}, error: {r.status_code} {responses[r.status_code]}')
