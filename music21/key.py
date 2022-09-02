@@ -77,7 +77,7 @@ def convertKeyStringToMusic21KeyString(textString):
         textString = 'b-'
     elif textString == 'Bb':
         textString = 'B-'
-    elif len(textString) == 2 and textString[-1] == '-':
+    elif len(textString) == 2 and textString[-1] == 'b':
         textString = textString[:1] + '-'
     elif textString.endswith('b'):
         m = re.match(r'''
