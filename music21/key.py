@@ -72,22 +72,19 @@ def convertKeyStringToMusic21KeyString(textString):
     'B--'
     >>> key.convertKeyStringToMusic21KeyString('bbb')
     'b--'
+    >>> key.convertKeyStringToMusic21KeyString('Ebb')
+    'E--'
     '''
-    if textString == 'bb':
+    if (not textString[-1] == 'b') or textString == 'b':
+        pass
+    elif textString == 'bb':
         textString = 'b-'
     elif textString == 'Bb':
         textString = 'B-'
     elif len(textString) == 2 and textString[-1] == 'b':
-        textString = textString[:1] + '-'
-    elif textString.endswith('b'):
-        m = re.match(r'''
-                (?P<leading_chars>.[^b]*) # matches at least one leading character
-                (?P<flats>b+)
-            ''',
-            textString,
-            flags=re.VERBOSE)
-        if m:
-            textString = m.group('leading_chars') + '-' * len(m.group('flats'))
+        textString = textString[0] + '-'
+    elif set(textString[1:]) == {'b'}:
+        textString = textString[0] + '-' * (len(textString) - 1)
     return textString
 
 
