@@ -75,7 +75,7 @@ if __name__ == '__main__':
         url='https://github.com/cuthbertLab/music21',
         classifiers=classifiers,
         download_url=f'{download_base}v{m21version}/music21-{m21version}.tar.gz',
-        packages=setuptools.find_packages(exclude=['ez_setup']),
+        packages=setuptools.find_namespace_packages(),
         install_requires=INSTALL_REQUIRES,
         include_package_data=True,
         zip_safe=False,
