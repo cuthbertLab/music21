@@ -75,7 +75,7 @@ def convertKeyStringToMusic21KeyString(textString):
     >>> key.convertKeyStringToMusic21KeyString('Ebb')
     'E--'
     '''
-    if (not textString[-1] == 'b') or textString == 'b':
+    if (not textString.endswith('b')) or textString == 'b':
         pass
     elif textString == 'bb':
         textString = 'b-'
