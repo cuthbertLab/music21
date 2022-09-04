@@ -308,6 +308,8 @@ def _getKeyAndPrefix(rtKeyOrString):
     (<music21.key.Key of b- minor>, 'b-: ')
     >>> romanText.translate._getKeyAndPrefix('b#')
     (<music21.key.Key of b# minor>, 'b#: ')
+    >>> romanText.translate._getKeyAndPrefix('Bbb')
+    (<music21.key.Key of B-- major>, 'B--: ')
     '''
     if isinstance(rtKeyOrString, str):
         rtKeyOrString = key.convertKeyStringToMusic21KeyString(rtKeyOrString)

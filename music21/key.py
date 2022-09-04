@@ -68,13 +68,23 @@ def convertKeyStringToMusic21KeyString(textString):
     'b#'
     >>> key.convertKeyStringToMusic21KeyString('c')
     'c'
+    >>> key.convertKeyStringToMusic21KeyString('Bbb')
+    'B--'
+    >>> key.convertKeyStringToMusic21KeyString('bbb')
+    'b--'
+    >>> key.convertKeyStringToMusic21KeyString('Ebb')
+    'E--'
     '''
-    if textString == 'bb':
+    if (not textString.endswith('b')) or textString == 'b':
+        pass
+    elif textString == 'bb':
         textString = 'b-'
     elif textString == 'Bb':
         textString = 'B-'
-    elif textString.endswith('b') and not textString.startswith('b'):
-        textString = textString.rstrip('b') + '-'
+    elif len(textString) == 2 and textString[-1] == 'b':
+        textString = textString[0] + '-'
+    elif set(textString[1:]) == {'b'}:
+        textString = textString[0] + '-' * (len(textString) - 1)
     return textString
 
 
