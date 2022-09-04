@@ -159,7 +159,7 @@ class Test(unittest.TestCase):
         self.assertEqual(expected.octave, actual.octave)
 
     def testSafePitch3(self):
-        '''safePitch(): when ``name`` is not given, but there are various kwargs'''
+        '''safePitch(): when ``name`` is not given, but there are various **keywords'''
         expected = pitch.Pitch('D#6')
         actual = base.safePitch(name='D', accidental='#', octave='6')
         self.assertEqual(expected.name, actual.name)
@@ -4335,7 +4335,7 @@ class Test(unittest.TestCase):
     def testCoreUnit1(self, mockStaffDFE, mockScoreDFE, mockSectionFE, mockMeasureFE):
         '''
         sectionScoreCore(): everything basic, as called by scoreFromElement()
-            - no kwargs
+            - no keywords
                 - and the <measure> has no @n; it would be set to "1" automatically
             - one of everything (<section>, <scoreDef>, and <staffDef>)
             - that the <measure> in here won't be processed (<measure> must be in a <section>)
@@ -4412,7 +4412,7 @@ class Test(unittest.TestCase):
     def testCoreIntegration1(self):
         '''
         sectionScoreCore(): everything basic, as called by scoreFromElement()
-            - no kwargs
+            - no keywords
                 - and the <measure> has no @n; it would be set to "1" automatically
             - one of everything (<section>, <scoreDef>, and <staffDef>)
             - that the <measure> in here won't be processed (<measure> must be in a <section>)
@@ -4471,7 +4471,7 @@ class Test(unittest.TestCase):
     def testCoreUnit2(self, mockStaffDFE, mockScoreDFE, mockSectionFE, mockMeasureFE):
         '''
         sectionScoreCore(): everything basic, as called by sectionFromElement()
-            - no kwargs
+            - no keywords
                 - but the <measure> elements do have @n so those values should be used
             - one of most things (<section>, <scoreDef>, and <staffDef>)
             - two of <measure> (one in a <section>)
@@ -4569,7 +4569,7 @@ class Test(unittest.TestCase):
     def testCoreIntegration2(self):
         '''
         sectionScoreCore(): everything basic, as called by sectionFromElement()
-            - no kwargs
+            - no keywords
                 - but the <measure> elements do have @n so those values should be used
             - one of most things (<section>, <scoreDef>, and <staffDef>)
             - two of <measure> (one in a <section>)
@@ -4649,7 +4649,7 @@ class Test(unittest.TestCase):
     def testCoreUnit3(self, mockStaffDFE, mockScoreDFE, mockSectionFE, mockMeasureFE):
         '''
         sectionScoreCore(): everything basic, as called by sectionFromElement()
-            - all kwargs
+            - all keywords
                 - and the <measure> has no @n; it should use the backupNum
                 - activeMeter = a MagicMock (we expect this returned)
                 - nextMeasureLeft = 'next left measure' (expected in the Measure)
@@ -4712,7 +4712,7 @@ class Test(unittest.TestCase):
     def testCoreIntegration3(self):
         '''
         sectionScoreCore(): everything basic, as called by sectionFromElement()
-            - all kwargs
+            - all keywords
                 - and the <measure> has no @n; it should use the backupNum
                 - activeMeter = a MagicMock (we expect this returned)
                 - nextMeasureLeft = 'next left measure' (expected in the Measure)

@@ -24,7 +24,6 @@ Speed notes:
    (But then PyPy probably won't work.)
 
 '''
-import copy
 import difflib
 import json
 import math
@@ -46,6 +45,7 @@ environLocal = environment.Environment('search.segment')
 # noinspection SpellCheckingInspection
 def translateMonophonicPartToSegments(
     inputStream,
+    *,
     segmentLengths=30,
     overlap=12,
     algorithm=None,
@@ -114,7 +114,7 @@ def translateMonophonicPartToSegments(
 
 
 # noinspection SpellCheckingInspection
-def indexScoreParts(scoreFile, *args, **keywords):
+def indexScoreParts(scoreFile, **keywords):
     r'''
     Creates segment and measure lists for each part of a score
     Returns list of dictionaries of segment and measure lists
@@ -130,7 +130,7 @@ def indexScoreParts(scoreFile, *args, **keywords):
     indexedList = []
     for part in scoreFileParts:
         segmentList, measureList = translateMonophonicPartToSegments(
-            part, *args, **keywords)
+            part, **keywords)
         indexedList.append({
             'segmentList': segmentList,
             'measureList': measureList,
@@ -138,23 +138,19 @@ def indexScoreParts(scoreFile, *args, **keywords):
     return indexedList
 
 
-def _indexSingleMulticore(filePath, *args, **keywords):
+def _indexSingleMulticore(filePath, failFast=False, **keywords):
     '''
     Index one path in the context of multicore.
     '''
-    keywords2 = copy.copy(keywords)
-    if 'failFast' in keywords2:
-        del keywords2['failFast']
-
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
 
     shortFp = filePath.name
 
     try:
-        indexOutput = indexOnePath(filePath, *args, **keywords2)
+        indexOutput = indexOnePath(filePath, **keywords)
     except Exception as e:  # pylint: disable=broad-except
-        if 'failFast' not in keywords or keywords['failFast'] is False:
+        if not failFast:
             print(f'Failed on parse/index for, {filePath}: {e}')
             indexOutput = ''
         else:
@@ -168,8 +164,8 @@ def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
 
 # noinspection SpellCheckingInspection
 def indexScoreFilePaths(scoreFilePaths,
+                        *,
                         giveUpdates=False,
-                        *args,
                         runMulticore=True,
                         **keywords):
     # noinspection PyShadowingNames
@@ -198,7 +194,7 @@ def indexScoreFilePaths(scoreFilePaths,
     else:
         updateFunction = None
 
-    indexFunc = partial(_indexSingleMulticore, *args, **keywords)
+    indexFunc = partial(_indexSingleMulticore, **keywords)
 
     for i in range(len(scoreFilePaths)):
         if not isinstance(scoreFilePaths[i], pathlib.Path):
@@ -229,7 +225,7 @@ def indexScoreFilePaths(scoreFilePaths,
     return scoreDict
 
 
-def indexOnePath(filePath, *args, **keywords):
+def indexOnePath(filePath, **keywords):
     '''
     Index a single path.  Returns a scoreDictEntry
     '''
@@ -241,7 +237,7 @@ def indexOnePath(filePath, *args, **keywords):
     else:
         scoreObj = converter.parse(filePath)
 
-    scoreDictEntry = indexScoreParts(scoreObj, *args, **keywords)
+    scoreDictEntry = indexScoreParts(scoreObj, **keywords)
     return scoreDictEntry
 
 
@@ -409,4 +405,3 @@ _DOC_ORDER: t.List[type] = []
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

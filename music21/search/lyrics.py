@@ -55,11 +55,11 @@ class IndexedLyric(namedtuple(
                 + f'measure={self.measure!r}, lyric={self.lyric!r}, text={self.text!r}, '
                 + f'identifier={self.identifier!r})')
 
-    def modify(self, **kw):
+    def modify(self, **keywords):
         '''
         see docs for SortTuple for what this does
         '''
-        outList = [kw.get(attr, getattr(self, attr)) for attr in _attrList]
+        outList = [keywords.get(attr, getattr(self, attr)) for attr in _attrList]
         return self.__class__(*outList)
 
 

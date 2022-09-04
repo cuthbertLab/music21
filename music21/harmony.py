@@ -214,7 +214,7 @@ class Harmony(chord.Chord):
                  updatePitches: bool = True,
                  **keywords
                  ):
-        super().__init__()
+        super().__init__(**keywords)
         self._writeAsChord = False
         # TODO: Deal with the roman numeral property of harmonies.
         #       MusicXML documentation is ambiguous:
@@ -249,13 +249,6 @@ class Harmony(chord.Chord):
                 or 'bass' in self._overrides):
             self._updatePitches()
         self._updateFromParameters(root=root, bass=bass, inversion=inversion)
-
-        # TODO(jtw): make these kwargs explicit somehow
-        # once there is a general solution for this with GeneralNote
-        ql = keywords.get('duration', None)
-        ql = keywords.get('quarterLength', ql)
-        if ql:
-            self.duration = duration.Duration(ql)
 
     # SPECIAL METHODS #
 

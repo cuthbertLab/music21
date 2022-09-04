@@ -573,20 +573,22 @@ class Test(unittest.TestCase):
     def testStreamDurationRecalculated(self):
         from fractions import Fraction
 
-        a = Stream()
+        s = Stream()
         n = note.Note(quarterLength=1.0)
-        a.append(n)
-        self.assertEqual(a.duration.quarterLength, 1.0)
+        s.append(n)
+        self.assertEqual(s.duration.quarterLength, 1.0)
 
         tup = duration.Tuplet()
         n.duration.tuplets = (tup,)
-        self.assertEqual(a.duration.quarterLength, Fraction(2, 3))
+        self.assertEqual(n.duration.quarterLength, Fraction(2, 3))
+        self.assertEqual(s.duration.quarterLength, Fraction(2, 3))
 
         # Also (regression) test clearing the cache
         # https://github.com/cuthbertLab/music21/issues/957
         n.duration.tuplets = (tup, tup)
-        a.coreElementsChanged()
-        self.assertEqual(a.duration.quarterLength, Fraction(4, 9))
+        self.assertEqual(s.duration.quarterLength, Fraction(4, 9))
+        s.coreElementsChanged()
+        self.assertEqual(s.duration.quarterLength, Fraction(4, 9))
 
     def testMeasureStream(self):
         '''An approach to setting TimeSignature measures in offsets and durations
@@ -1548,6 +1550,29 @@ class Test(unittest.TestCase):
             '(<music21.chord.Chord F#4 B4>, '
             + '<music21.chord.Chord G4 C5>, <music21.chord.Chord C4 F4>)'
         )  # previously was 1 element
+
+    def testStripTiesIgnoresUnrealizedChordSymbol(self):
+        from music21 import harmony
+
+        n0 = note.Note('C')
+        n0.tie = tie.Tie('start')
+        n1 = note.Note('C')
+        n1.tie = tie.Tie('stop')
+
+        # Create ChordSymbol having one pitch only
+        cs0 = harmony.ChordSymbol()
+        cs0.bass('C', allow_add=True)
+        s = Stream()
+        s.insert(0.0, n0)
+        s.insert(1.0, cs0)
+        s.insert(1.0, n1)
+        s.makeNotation(inPlace=True)
+        stripped = s.stripTies(matchByPitch=True)
+
+        self.assertEqual(len(stripped[note.Note]), 1)
+        self.assertEqual(stripped[note.Note].first().quarterLength, 2)
+        self.assertEqual(len(stripped[harmony.ChordSymbol]), 1)
+        self.assertEqual(stripped[harmony.ChordSymbol].first().quarterLength, 0)
 
     def testTwoStreamMethods(self):
         from music21.note import Note

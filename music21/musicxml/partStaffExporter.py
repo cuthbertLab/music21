@@ -743,7 +743,12 @@ class PartStaffExporterMixin:
 
         # Create <backup>
         amountToBackup: int = 0
-        for dur in otherMeasure.findall('note/duration'):
+        for note in otherMeasure.findall('note'):
+            if note.find('chord') is not None:
+                continue
+            dur = note.find('duration')
+            if dur is None:
+                continue
             backupDurText = dur.text
             if backupDurText is not None:
                 amountToBackup += int(backupDurText)
@@ -894,6 +899,12 @@ class Test(unittest.TestCase):
         s.insert(0, layout.StaffGroup([ps1, ps2]))
         root = self.getET(s)
         notes = root.findall('.//note')
+
+        # since there are no voices in either PartStaff, the voice number of each note
+        # should be the same as the staff number.
+        for mxNote in notes:
+            self.assertEqual(mxNote.find('voice').text, mxNote.find('staff').text)
+
         forward = root.find('.//forward')
         backup = root.find('.//backup')
         amountToBackup = (
@@ -949,6 +960,62 @@ class Test(unittest.TestCase):
         # dump(root)
         self.assertEqual(len(measures), 2)
         self.assertEqual(len(notes), 12)
+
+    def testJoinPartStaffsD2(self):
+        '''
+        Add measures and voices and check for unique voice numbers across the StaffGroup.
+        '''
+        from music21 import layout
+        from music21 import note
+        s = stream.Score()
+        ps1 = stream.PartStaff()
+        m1 = stream.Measure()
+        ps1.insert(0, m1)
+        v1 = stream.Voice()
+        v2 = stream.Voice()
+        m1.insert(0, v1)
+        m1.insert(0, v2)
+        v1.repeatAppend(note.Note('C4'), 4)
+        v2.repeatAppend(note.Note('E4'), 4)
+        ps1.makeNotation(inPlace=True)  # makeNotation to freeze notation
+
+        ps2 = stream.PartStaff()
+        m2 = stream.Measure()
+        ps2.insert(0, m2)
+        v3 = stream.Voice()
+        v4 = stream.Voice()
+        m2.insert(0, v3)
+        m2.insert(0, v4)
+        v3.repeatAppend(note.Note('C3'), 4)
+        v4.repeatAppend(note.Note('G3'), 4)
+        ps2.makeNotation(inPlace=True)  # makeNotation to freeze notation
+
+        s.insert(0, ps2)
+        s.insert(0, ps1)
+        s.insert(0, layout.StaffGroup([ps1, ps2]))
+        root = self.getET(s)
+        measures = root.findall('.//measure')
+        notes = root.findall('.//note')
+        # from music21.musicxml.helpers import dump
+        # dump(root)
+        self.assertEqual(len(measures), 1)
+        self.assertEqual(len(notes), 16)
+
+        # check those voice and staff numbers
+        for mxNote in notes:
+            mxPitch = mxNote.find('pitch')
+            if mxPitch.find('step').text == 'C' and mxPitch.find('octave').text == '4':
+                self.assertEqual(mxNote.find('voice').text, '1')
+                self.assertEqual(mxNote.find('staff').text, '1')
+            elif mxPitch.find('step').text == 'E' and mxPitch.find('octave').text == '4':
+                self.assertEqual(mxNote.find('voice').text, '2')
+                self.assertEqual(mxNote.find('staff').text, '1')
+            elif mxPitch.find('step').text == 'C' and mxPitch.find('octave').text == '3':
+                self.assertEqual(mxNote.find('voice').text, '3')
+                self.assertEqual(mxNote.find('staff').text, '2')
+            elif mxPitch.find('step').text == 'G' and mxPitch.find('octave').text == '3':
+                self.assertEqual(mxNote.find('voice').text, '4')
+                self.assertEqual(mxNote.find('staff').text, '2')
 
     def testJoinPartStaffsE(self):
         '''
@@ -1066,6 +1133,23 @@ class Test(unittest.TestCase):
         ps1[stream.Measure].last().number = 0  # was measure 2
         root = self.getET(s)
         self.assertEqual(len(root.findall('part/measure/attributes/time')), 3)
+
+    def testBackupAmount(self):
+        '''Regression test for chord members causing too-large backup amounts.'''
+        from music21 import chord
+        from music21 import defaults
+        from music21 import layout
+
+        ps1 = stream.PartStaff(chord.Chord('C E G'))
+        ps2 = stream.PartStaff(chord.Chord('D F A'))
+        sg = layout.StaffGroup([ps1, ps2])
+        s = stream.Score([sg, ps1, ps2])
+
+        root = self.getET(s)
+        self.assertEqual(
+            root.findall('part/measure/backup/duration')[0].text,
+            str(defaults.divisionsPerQuarter)
+        )
 
 
 if __name__ == '__main__':

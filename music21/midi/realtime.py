@@ -73,35 +73,22 @@ class StreamPlayer:  # pragma: no cover
     '''
     mixerInitialized = False
 
-    def __init__(self, streamIn, **keywords):
+    def __init__(
+        self,
+        streamIn: stream.Stream,
+        reinitMixer: bool = False,
+        mixerFreq: int = 44100,
+        mixerBitSize: int = -16,
+        mixerChannels: int = 2,
+        mixerBuffer: int = 1024,
+    ):
         try:
             # noinspection PyPackageRequirements
             import pygame  # type: ignore
             self.pygame = pygame
         except ImportError:
             raise StreamPlayerException('StreamPlayer requires pygame.  Install first')
-        if (self.mixerInitialized is False
-                or ('reinitMixer' in keywords and keywords['reinitMixer'] is not False)):
-            if 'mixerFreq' in keywords:
-                mixerFreq = keywords['mixerFreq']
-            else:
-                mixerFreq = 44100
-
-            if 'mixerBitSize' in keywords:
-                mixerBitSize = keywords['mixerBitSize']
-            else:
-                mixerBitSize = -16
-
-            if 'mixerChannels' in keywords:
-                mixerChannels = keywords['mixerChannels']
-            else:
-                mixerChannels = 2
-
-            if 'mixerBuffer' in keywords:
-                mixerBuffer = keywords['mixerBuffer']
-            else:
-                mixerBuffer = 1024
-
+        if self.mixerInitialized is False or reinitMixer:
             pygame.mixer.init(mixerFreq, mixerBitSize, mixerChannels, mixerBuffer)
 
         self.streamIn = streamIn
@@ -128,9 +115,14 @@ class StreamPlayer:  # pragma: no cover
         you to completely control whether to stop it. Ignore every other arguments
         '''
         streamStringIOFile = self.getStringOrBytesIOFile()
-        self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs,
-                              endFunction, endArgs, busyWaitMilliseconds,
-                              playForMilliseconds=playForMilliseconds, blocked=blocked)
+        self.playStringIOFile(streamStringIOFile,
+                              busyFunction=busyFunction,
+                              busyArgs=busyArgs,
+                              endFunction=endFunction,
+                              endArgs=endArgs,
+                              busyWaitMilliseconds=busyWaitMilliseconds,
+                              playForMilliseconds=playForMilliseconds,
+                              blocked=blocked)
 
     def getStringOrBytesIOFile(self):
         streamMidiFile = midiTranslate.streamToMidiFile(self.streamIn)

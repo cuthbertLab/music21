@@ -1796,6 +1796,15 @@ class Pitch(prebase.ProtoM21Object):
 
     def __init__(self,
                  name: t.Optional[t.Union[str, int, float]] = None,
+                 *,
+                 step: t.Optional[StepName] = None,
+                 octave: t.Optional[int] = None,
+                 accidental: t.Union[Accidental, str, int, float, None] = None,
+                 microtone: t.Union[Microtone, int, float, None] = None,
+                 pitchClass: t.Optional[t.Union[int, PitchClassString]] = None,
+                 midi: t.Optional[int] = None,
+                 ps: t.Optional[float] = None,
+                 fundamental: t.Optional[Pitch] = None,
                  **keywords):
         # No need for super().__init__() on protoM21Object
         self._groups: t.Optional[base.Groups] = None
@@ -1843,36 +1852,31 @@ class Pitch(prebase.ProtoM21Object):
                 self.spellingIsInferred = True
                 if name >= 12:  # is not a pitchClass
                     self._octave = int(name / 12) - 1
+        elif step is not None:
+            self.step = step
 
-        # override just about everything with keywords
-        # necessary for ImmutablePitch objects
-        if keywords:
-            if 'name' in keywords:
-                # noinspection PyArgumentList
-                self.name = keywords['name']  # set based on string
-            if 'step' in keywords:
-                self.step = keywords['step']
-            if 'octave' in keywords:
-                self._octave = keywords['octave']
-            if 'accidental' in keywords:
-                if isinstance(keywords['accidental'], Accidental):
-                    self.accidental = keywords['accidental']
-                else:
-                    self.accidental = Accidental(keywords['accidental'])
-            if 'microtone' in keywords:
-                mt = keywords['microtone']
-                if isinstance(mt, Microtone):
-                    self.microtone = mt
-                else:
-                    self.microtone = Microtone(mt)
-            if 'pitchClass' in keywords:
-                self.pitchClass = keywords['pitchClass']
-            if 'fundamental' in keywords:
-                self.fundamental = keywords['fundamental']
-            if 'midi' in keywords:
-                self.midi = keywords['midi']
-            if 'ps' in keywords:
-                self.ps = keywords['ps']
+        if octave is not None:
+            self._octave = octave
+
+        if accidental is not None:
+            if isinstance(accidental, Accidental):
+                self.accidental = accidental
+            else:
+                self.accidental = Accidental(accidental)
+        if microtone is not None:
+            if isinstance(microtone, Microtone):
+                self.microtone = microtone
+            else:
+                self.microtone = Microtone(microtone)
+        if pitchClass is not None:
+            # type ignore until https://github.com/python/mypy/issues/3004 resolved
+            self.pitchClass = pitchClass  # type: ignore
+        if fundamental is not None:
+            self.fundamental = fundamental
+        if midi is not None:
+            self.midi = midi
+        if ps is not None:
+            self.ps = ps
 
     def _reprInternal(self):
         return str(self)
@@ -4112,7 +4116,6 @@ class Pitch(prebase.ProtoM21Object):
 
         However, isEnharmonic() for A## and B certainly returns True.
 
-
         >>> p = pitch.Pitch('d#')
         >>> print(p.getEnharmonic())
         E-
@@ -4174,6 +4177,7 @@ class Pitch(prebase.ProtoM21Object):
                 post.getHigherEnharmonic(inPlace=True)
 
         if inPlace:
+            self.informClient()
             return None
         else:
             return post
@@ -4403,14 +4407,12 @@ class Pitch(prebase.ProtoM21Object):
         >>> newPitch
         <music21.pitch.Pitch B3>
 
-
         >>> aPitch
         <music21.pitch.Pitch G4>
 
         >>> aPitch.transpose(aInterval, inPlace=True)
         >>> aPitch
         <music21.pitch.Pitch C#4>
-
 
         Implicit octaves remain implicit:
 
@@ -4419,7 +4421,6 @@ class Pitch(prebase.ProtoM21Object):
         G#
         >>> print(anyGSharp.transpose('P5'))
         D#
-
 
         If the accidental of a pitch is chosen by music21, not
         given by the user, then after transposing, music21 will
@@ -4433,8 +4434,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> pc6.transpose('-m2')
         <music21.pitch.Pitch F>
 
-
-
         OMIT_FROM_DOCS
 
         Test to make sure that extreme ranges work
@@ -4443,7 +4442,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> lowC = dPitch.transpose('m-23')
         >>> lowC
         <music21.pitch.Pitch C#-1>
-
 
         >>> otherPitch = pitch.Pitch('D2')
         >>> otherPitch.transpose('m-23', inPlace=True)

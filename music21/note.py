@@ -27,16 +27,16 @@ from typing import overload
 from music21 import base
 from music21 import beam
 from music21 import common
-from music21 import duration
+from music21.duration import Duration
 from music21 import exceptions21
 from music21 import expressions
 from music21 import interval
-from music21 import pitch
+from music21.pitch import Pitch
 from music21 import prebase
 from music21 import style
 from music21 import tie
 from music21 import volume
-from music21.common.types import StepName
+from music21.common.types import StepName, OffsetQLIn
 from music21 import environment
 environLocal = environment.Environment('note')
 
@@ -101,7 +101,9 @@ class NotRestException(exceptions21.Music21Exception):
 
 
 # ------------------------------------------------------------------------------
-SYLLABIC_CHOICES: t.List[t.Optional[str]] = [
+SyllabicChoices = t.Literal[None, 'begin', 'single', 'end', 'middle', 'composite']
+
+SYLLABIC_CHOICES: t.List[SyllabicChoices] = [
     None, 'begin', 'single', 'end', 'middle', 'composite',
 ]
 
@@ -191,27 +193,33 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
 
     # INITIALIZER #
 
-    def __init__(self, text='', number=1, **kwargs):
+    def __init__(self,
+                 text: str = '',
+                 number: int = 1,
+                 *,
+                 applyRaw: bool = False,
+                 syllabic: SyllabicChoices = None,
+                 identifier: t.Optional[str] = None,
+                 **keywords):
         super().__init__()
         self._identifier: t.Optional[str] = None
         self._number: int = 1
         self._text: str = ''
-        self._syllabic = None
+        self._syllabic: SyllabicChoices = None
         self.components: t.Optional[t.List['music21.note.Lyric']] = None
         self.elisionBefore = ' '
-
-        applyRaw = kwargs.get('applyRaw', False)
 
         # these are set by setTextAndSyllabic
         if text:
             self.setTextAndSyllabic(text, applyRaw)
 
         # given as begin, middle, end, or single
-        if 'syllabic' in kwargs:
-            self.syllabic = kwargs['syllabic']
-
+        if syllabic is not None:
+            self.syllabic = syllabic
         self.number = number
-        self.identifier = kwargs.get('identifier', None)
+
+        # type ignore until https://github.com/python/mypy/issues/3004 resolved
+        self.identifier = identifier  # type: ignore
 
     # PRIVATE METHODS #
 
@@ -283,7 +291,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._text = newText
 
     @property
-    def syllabic(self) -> t.Optional[str]:
+    def syllabic(self) -> SyllabicChoices:
         '''
         Returns or sets the syllabic property of a lyric.
 
@@ -311,7 +319,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
 
 
     @syllabic.setter
-    def syllabic(self, newSyllabic):
+    def syllabic(self, newSyllabic: SyllabicChoices):
         if newSyllabic not in SYLLABIC_CHOICES:
             raise LyricException(
                 f'Syllabic value {newSyllabic!r} is not in '
@@ -336,6 +344,11 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         >>> l.identifier = 'Rainbow'
         >>> l.identifier
         'Rainbow'
+
+        Default value is the same as default for number, that is, 1:
+
+        >>> note.Lyric().identifier
+        1
         '''
         if self._identifier is None:
             return self._number
@@ -343,7 +356,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             return self._identifier
 
     @identifier.setter
-    def identifier(self, value: str):
+    def identifier(self, value: t.Union[str, None]):
         self._identifier = value
 
     @property
@@ -529,7 +542,6 @@ class GeneralNote(base.Music21Object):
     objects directly, and not use this underlying
     structure.
 
-
     >>> gn = note.GeneralNote(type='16th', dots=2)
     >>> gn.quarterLength
     0.4375
@@ -545,7 +557,6 @@ class GeneralNote(base.Music21Object):
     _DOC_ATTR: t.Dict[str, str] = {
         'isChord': 'Boolean read-only value describing if this object is a Chord.',
         'lyrics': 'A list of :class:`~music21.note.Lyric` objects.',
-        'tie': 'either None or a :class:`~music21.note.Tie` object.',
         'expressions': '''a list of expressions (such
             as :class:`~music21.expressions.Fermata`, etc.)
             that are stored on this Note.''',
@@ -553,13 +564,18 @@ class GeneralNote(base.Music21Object):
             as :class:`~music21.articulations.Staccato`, etc.) that are stored on this Note.'''
     }
 
-    def __init__(self, *arguments, **keywords):
-        if 'duration' not in keywords:
-            # ensure music21base not automatically create a duration.
-            if not keywords:
-                tempDuration = duration.Duration(1.0)
+    def __init__(self,
+                 *,
+                 duration: t.Optional[Duration] = None,
+                 lyric: t.Union[None, str, Lyric] = None,
+                 **keywords
+                 ):
+        if duration is None:
+            # ensure music21base not automatically create a zero duration before we can.
+            if not keywords or ('type' not in keywords and 'quarterLength' not in keywords):
+                tempDuration = Duration(1.0)
             else:
-                tempDuration = duration.Duration(**keywords)
+                tempDuration = Duration(**keywords)
                 # only apply default if components are empty
                 # looking at currentComponents so as not to trigger
                 # _updateComponents
@@ -567,19 +583,19 @@ class GeneralNote(base.Music21Object):
                         and not tempDuration.currentComponents()):
                     tempDuration.quarterLength = 1.0
         else:
-            tempDuration = keywords['duration']
+            tempDuration = duration
         # this sets the stored duration defined in Music21Object
         super().__init__(duration=tempDuration)
 
         self.lyrics: t.List[Lyric] = []  # a list of lyric objects
-        self.expressions = []
-        self.articulations = []
+        self.expressions: t.List[expressions.Expression] = []
+        self.articulations: t.List['music21.articulations.Articulation'] = []
 
-        if 'lyric' in keywords and keywords['lyric'] is not None:
-            self.addLyric(keywords['lyric'])
+        if lyric is not None:
+            self.addLyric(lyric)
 
         # note: Chords handle ties differently
-        self.tie = None  # store a Tie object
+        self._tie: t.Optional[tie.Tie] = None  # store a Tie object
 
     def __eq__(self, other):
         '''
@@ -610,6 +626,22 @@ class GeneralNote(base.Music21Object):
         return True
 
     # --------------------------------------------------------------------------
+    @property
+    def tie(self) -> t.Optional[tie.Tie]:
+        '''
+        Return and set a :class:`~music21.note.Tie` object, or None.
+
+        >>> n = note.Note()
+        >>> n.tie is None
+        True
+        >>> n.tie = tie.Tie('start')
+        '''
+        return self._tie
+
+    @tie.setter
+    def tie(self, value: t.Optional[tie.Tie]):
+        self._tie = value
+
     def _getLyric(self) -> t.Optional[str]:
         if not self.lyrics:
             return None
@@ -802,7 +834,7 @@ class GeneralNote(base.Music21Object):
         return self.classes[0]  # override in subclasses
 
     @property
-    def pitches(self) -> t.Tuple[pitch.Pitch, ...]:
+    def pitches(self) -> t.Tuple[Pitch, ...]:
         '''
         Returns an empty tuple.  (Useful for iterating over NotRests since they
         include Notes and Chords.)
@@ -810,7 +842,7 @@ class GeneralNote(base.Music21Object):
         return ()
 
     @pitches.setter
-    def pitches(self, _value: t.Iterable[pitch.Pitch]):
+    def pitches(self, _value: t.Iterable[Pitch]):
         pass
 
 
@@ -939,20 +971,21 @@ class NotRest(GeneralNote):
             information about the beaming of this note.''',
     }
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 beams: t.Optional[beam.Beams] = None,
+                 **keywords):
         super().__init__(**keywords)
         self._notehead: str = 'normal'
-        self._noteheadFill = None
+        self._noteheadFill: t.Optional[bool] = None
         self._noteheadParenthesis: bool = False
         self._stemDirection: str = 'unspecified'
         self._volume: t.Optional[volume.Volume] = None  # created on demand
-        # replace
-        self.linkage = 'tie'
-        if 'beams' in keywords:
-            self.beams = keywords['beams']
+        if beams is not None:
+            self.beams = beams
         else:
             self.beams = beam.Beams()
         self._storedInstrument: t.Optional['music21.instrument.Instrument'] = None
+        self._chordAttached: t.Optional['music21.chord.ChordBase'] = None
 
     # ==============================================================================================
     # Special functions
@@ -1091,7 +1124,7 @@ class NotRest(GeneralNote):
         self._notehead = value
 
     @property
-    def noteheadFill(self) -> bool:
+    def noteheadFill(self) -> t.Union[bool, None]:
         '''
         Get or set the note head fill status of this NotRest. Valid note head fill values are
         True, False, or None (meaning default).  "yes" and "no" are converted to True
@@ -1113,6 +1146,7 @@ class NotRest(GeneralNote):
 
     @noteheadFill.setter
     def noteheadFill(self, value: t.Union[bool, None, str]):
+        boolValue: t.Optional[bool]
         if value in ('none', None, 'default'):
             boolValue = None  # allow setting to none or None
         elif value in (True, 'filled', 'yes'):
@@ -1397,6 +1431,16 @@ class Note(NotRest):
 
     >>> note.Note('C4') == note.Note('C4')
     True
+
+    All keyword args that are valid for Duration or Pitch objects
+    are valid (as well as those for superclasses, NotRest, GeneralNote,
+    Music21Object):
+
+    >>> n = note.Note(step='C', accidental='sharp', octave=2, id='csharp', type='eighth', dots=2)
+    >>> n.nameWithOctave
+    'C#2'
+    >>> n.duration
+    <music21.duration.Duration 0.875>
     '''
     isNote = True
 
@@ -1412,28 +1456,26 @@ class Note(NotRest):
     }
 
     # Accepts an argument for pitch
-    def __init__(self, pitchName: t.Union[str, pitch.Pitch, int, None] = None, **keywords):
+    def __init__(self,
+                 pitch: t.Union[str, int, Pitch, None] = None,
+                 *,
+                 name: t.Optional[str] = None,
+                 nameWithOctave: t.Optional[str] = None,
+                 **keywords):
         super().__init__(**keywords)
-        self._chordAttached: t.Optional['music21.chord.Chord'] = None
+        self._chordAttached: t.Optional['music21.chord.Chord']
 
-        if 'pitch' in keywords and pitchName is None:
-            pitchName = keywords['pitch']
-            del keywords['pitch']
-
-        if pitchName is not None:
-            if isinstance(pitchName, pitch.Pitch):
-                self.pitch = pitchName
+        if pitch is not None:
+            if isinstance(pitch, Pitch):
+                self.pitch = pitch
             else:  # assume first argument is pitch
-                self.pitch = pitch.Pitch(pitchName, **keywords)
+                self.pitch = Pitch(pitch, **keywords)
         else:  # supply a default pitch
-            name = 'C4'
-            if 'name' in keywords:
-                name = keywords['name']
-                del keywords['name']
-            elif 'nameWithOctave' in keywords:
-                name = keywords['nameWithOctave']
-                del keywords['nameWithOctave']
-            self.pitch = pitch.Pitch(name, **keywords)
+            if nameWithOctave is not None:
+                name = nameWithOctave
+            elif not name:
+                name = 'C4'
+            self.pitch = Pitch(name, **keywords)
 
         # noinspection PyProtectedMember
         self.pitch._client = self
@@ -1599,7 +1641,7 @@ class Note(NotRest):
         ''')
 
     @property
-    def pitches(self) -> t.Tuple[pitch.Pitch]:
+    def pitches(self) -> t.Tuple[Pitch, ...]:
         '''
         Return the single :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
@@ -1641,7 +1683,7 @@ class Note(NotRest):
         return (self.pitch,)
 
     @pitches.setter
-    def pitches(self, value: t.Sequence[pitch.Pitch]):
+    def pitches(self, value: t.Sequence[Pitch]):
         if common.isListLike(value) and value:
             self.pitch = value[0]
         else:
@@ -1784,14 +1826,16 @@ class Unpitched(NotRest):
     AttributeError: 'Unpitched' object has no attribute 'pitch'
     '''
 
-    def __init__(self, displayName=None, **keywords):
+    def __init__(self,
+                 displayName=None,
+                 **keywords):
         super().__init__(**keywords)
         self._chordAttached: t.Optional['music21.percussion.PercussionChord'] = None
 
         self.displayStep: StepName = 'B'
         self.displayOctave: int = 4
         if displayName:
-            display_pitch = pitch.Pitch(displayName)
+            display_pitch = Pitch(displayName)
             self.displayStep = display_pitch.step
             self.displayOctave = display_pitch.octave
 
@@ -1816,7 +1860,7 @@ class Unpitched(NotRest):
 
     storedInstrument = property(_getStoredInstrument, _setStoredInstrument)
 
-    def displayPitch(self) -> pitch.Pitch:
+    def displayPitch(self) -> Pitch:
         '''
         returns a pitch object that is the same as the displayStep and displayOctave.
         it will never have an accidental.
@@ -1827,10 +1871,7 @@ class Unpitched(NotRest):
         >>> unp.displayPitch()
         <music21.pitch.Pitch E4>
         '''
-        p = pitch.Pitch()
-        p.step = self.displayStep
-        p.octave = self.displayOctave
-        return p
+        return Pitch(step=self.displayStep, octave=self.displayOctave)
 
     @property
     def displayName(self) -> str:
@@ -1855,7 +1896,6 @@ class Rest(GeneralNote):
     However, the property :attr:`~music21.stream.Stream.notesAndRests` of Streams
     gets rests as well.
 
-
     >>> r = note.Rest()
     >>> r.isRest
     True
@@ -1869,6 +1909,26 @@ class Rest(GeneralNote):
 
     >>> r.name
     'rest'
+
+    And their .pitches is an empty tuple
+
+    >>> r.pitches
+    ()
+
+
+    All arguments to Duration are valid in constructing:
+
+    >>> r2 = note.Rest(type='whole')
+    >>> r2.duration.quarterLength
+    4.0
+
+    Or they can just be specified in without a type, and they'll be evaluated automatically
+
+    >>> r3, r4 = note.Rest('half'), note.Rest(2.0)
+    >>> r3 == r4
+    True
+    >>> r3.duration.quarterLength
+    2.0
     '''
     isRest = True
     name = 'rest'
@@ -1890,8 +1950,6 @@ class Rest(GeneralNote):
                 update automatically to match the time signature context; and is True.
                 Does not work yet -- functions as True.
 
-                # TODO: get it to work.
-
                 "auto" is the default, where if the rest value happens to match the current
                 time signature context, then display it as a whole rest, centered, etc.
                 otherwise will display normally.
@@ -1900,10 +1958,21 @@ class Rest(GeneralNote):
                 ''',
     }
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self,
+                 length: t.Union[str, OffsetQLIn, None] = None,
+                 *,
+                 stepShift: int = 0,
+                 fullMeasure: t.Literal[True, False, 'auto', 'always'] = 'auto',
+                 **keywords):
+        if length is not None:
+            if isinstance(length, str) and 'type' not in keywords:
+                keywords['type'] = length
+            elif 'quarterLength' not in keywords:
+                keywords['quarterLength'] = length
         super().__init__(**keywords)
-        self.stepShift = 0  # display line
-        self.fullMeasure = 'auto'  # see docs; True, False, 'always',
+        self.stepShift = stepShift  # display line
+        # TODO: fullMeasure=='always' does not work properly
+        self.fullMeasure = fullMeasure  # see docs; True, False, 'always',
 
     def _reprInternal(self):
         duration_name = self.duration.fullName.lower()
@@ -1921,7 +1990,6 @@ class Rest(GeneralNote):
         A Music21 rest is equal to another object if that object is also a rest which
         has the same duration.
 
-
         >>> r1 = note.Rest()
         >>> r2 = note.Rest()
         >>> r1 == r2
@@ -1929,7 +1997,7 @@ class Rest(GeneralNote):
         >>> r1 != r2
         False
 
-        >>> r2.duration.quarterLength = 4.0/3
+        >>> r2.duration.quarterLength = 4/3
         >>> r1 == r2
         False
         >>> r1 == note.Note()
@@ -2034,10 +2102,11 @@ class Test(unittest.TestCase):
 
     def testComplex(self):
         from music21 import note
+        from music21.duration import DurationTuple
         note1 = note.Note()
         note1.duration.clear()
-        d1 = duration.DurationTuple('whole', 0, 4.0)
-        d2 = duration.DurationTuple('quarter', 0, 1.0)
+        d1 = DurationTuple('whole', 0, 4.0)
+        d2 = DurationTuple('quarter', 0, 1.0)
         note1.duration.addDurationTuple(d1)
         note1.duration.addDurationTuple(d2)
         self.assertEqual(note1.duration.quarterLength, 5.0)
@@ -2368,4 +2437,3 @@ if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
-

@@ -261,8 +261,12 @@ def getMd5(value=None) -> str:
     return m.hexdigest()
 
 
-def formatStr(msg, *arguments, **keywords) -> str:
+def formatStr(msg,
+              *rest_of_message,
+              **keywords) -> str:
     '''
+    DEPRECATED: do not use.  May be removed at any time.
+
     Format one or more data elements into string suitable for printing
     straight to stderr or other outputs
 
@@ -271,12 +275,7 @@ def formatStr(msg, *arguments, **keywords) -> str:
     test 1 2 3
     <BLANKLINE>
     '''
-    if 'format' in keywords:
-        formatType = keywords['format']
-    else:
-        formatType = None
-
-    msg = [msg] + list(arguments)
+    msg = [msg, *rest_of_message]
     for i in range(len(msg)):
         x = msg[i]
         if isinstance(x, bytes):
@@ -289,10 +288,7 @@ def formatStr(msg, *arguments, **keywords) -> str:
                     msg[i] = x.decode('utf-8')
                 except AttributeError:
                     msg[i] = ''
-    if formatType == 'block':
-        return '\n*** '.join(msg) + '\n'
-    else:  # catch all others
-        return ' '.join(msg) + '\n'
+    return ' '.join(msg) + '\n'
 
 
 def stripAccents(inputString: str) -> str:

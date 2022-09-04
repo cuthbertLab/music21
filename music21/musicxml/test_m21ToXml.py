@@ -42,12 +42,16 @@ class Test(unittest.TestCase):
         bytesOutUnicode = bytesOut.decode('utf-8')
         return bytesOutUnicode
 
-    def getET(self, obj):
+    def getET(self, obj, makeNotation=True):
         '''
         Return a <score-partwise> ElementTree.
-        Does NOT call makeNotation() like most calls to show() and write().
         '''
+        if makeNotation:
+            gex = GeneralObjectExporter()
+            obj = gex.fromGeneralObject(obj)
+
         SX = ScoreExporter(obj)
+        SX.makeNotation = makeNotation
         mxScore = SX.parse()
         helpers.indent(mxScore)
         return mxScore
@@ -142,10 +146,48 @@ class Test(unittest.TestCase):
         v1.id = 234
         xmlOut = self.getXml(m)
         self.assertIn('<voice>234</voice>', xmlOut)
-        self.assertIn('<voice>1</voice>', xmlOut)  # is v2 now!
+        self.assertIn('<voice>235</voice>', xmlOut)
         v2.id = 'hello'
         xmlOut = self.getXml(m)
         self.assertIn('<voice>hello</voice>', xmlOut)
+
+    def testVoiceNumberOffsetsThreeStaffsInGroup(self):
+        n1_1 = note.Note()
+        v1_1 = stream.Voice([n1_1])
+        m1_1 = stream.Measure([v1_1])
+        n1_2 = note.Note()
+        v1_2 = stream.Voice([n1_2])
+        m1_2 = stream.Measure([v1_2])
+        ps1 = stream.PartStaff([m1_1, m1_2])
+
+        n2_1 = note.Note()
+        v2_1 = stream.Voice([n2_1])
+        m2_1 = stream.Measure([v2_1])
+        n2_2 = note.Note()
+        v2_2 = stream.Voice([n2_2])
+        m2_2 = stream.Measure([v2_2])
+        ps2 = stream.PartStaff([m2_1, m2_2])
+
+        n3_1 = note.Note()
+        v3_1 = stream.Voice([n3_1])
+        m3_1 = stream.Measure([v3_1])
+        n3_2 = note.Note()
+        v3_2 = stream.Voice([n3_2])
+        m3_2 = stream.Measure([v3_2])
+        ps3 = stream.PartStaff([m3_1, m3_2])
+
+        s = stream.Score([ps1, ps2, ps3])
+        staffGroup = layout.StaffGroup([ps1, ps2, ps3])
+        s.insert(0, staffGroup)
+
+        tree = self.getET(s)
+        # helpers.dump(tree)
+        mxNotes = tree.findall('part/measure/note')
+        for mxNote in mxNotes:
+            voice = mxNote.find('voice')
+            staff = mxNote.find('staff')
+            # Because there is one voice per staff/measure, voicenum == staffnum
+            self.assertEqual(voice.text, staff.text)
 
     def testCompositeLyrics(self):
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
@@ -467,10 +509,10 @@ class Test(unittest.TestCase):
         m.append(meter.TimeSignature('1/4'))
         m.append(note.Rest())
         m.insert(2, tempo.MetronomeMark('slow', 40))
+        p = stream.Part([m])
+        s = stream.Score([p])
 
-        gex = GeneralObjectExporter()
-        gex.makeNotation = False
-        tree = self.getET(gex.fromGeneralObject(m))
+        tree = self.getET(s, makeNotation=False)
         self.assertFalse(tree.findall('.//forward'))
         self.assertEqual(
             int(tree.findall('.//direction/offset')[0].text),
@@ -608,14 +650,13 @@ class Test(unittest.TestCase):
 
 
     def testExportChordSymbolsWithRealizedDurations(self):
-        gex = GeneralObjectExporter()
-        gex.makeNotation = False
 
         def realizeDurationsAndAssertTags(mm: stream.Measure, forwardTag=False, offsetTag=False):
             mm = copy.deepcopy(mm)
             harmony.realizeChordSymbolDurations(mm)
-            obj = gex.fromGeneralObject(mm)
-            tree = self.getET(obj)
+            p = stream.Part([mm])
+            s = stream.Score([p])
+            tree = self.getET(s, makeNotation=False)
             self.assertIs(bool(tree.findall('.//forward')), forwardTag)
             self.assertIs(bool(tree.findall('.//offset')), offsetTag)
 

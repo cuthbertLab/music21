@@ -26,9 +26,10 @@ def isNum(usrData: t.Any) -> bool:
 
     unlike `isinstance(usrData, Number)` does not return True for `True, False`.
 
-    Does not use `isinstance(usrData, Number)` which is 6 times slower
+    Does not use `isinstance(usrData, Number)` which is 2-6 times slower
     than calling this function (except in the case of Fraction, when
-    it's 6 times faster, but that's rarer)
+    it's 6 times faster, but that's rarer).  (6 times slower on Py3.4, now
+    only 2x slower in Python 3.10)
 
     Runs by adding 0 to the "number" -- so anything that implements
     add to a scalar works
@@ -242,7 +243,6 @@ def saveAttributes(obj, *attributeList):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-# _DOC_ORDER = [fromRoman, toRoman]
 
 if __name__ == '__main__':
     import music21

@@ -85,6 +85,7 @@ unadjusted measure width and not their actual measure width in the MusicXML.
 
 SmartScore Pro tends to produce very good MusicXML layout data.
 '''
+from __future__ import annotations
 
 # may need to have an object to convert between size units
 import copy
@@ -119,9 +120,6 @@ class LayoutBase(base.Music21Object):
     '''
     classSortOrder = -10
 
-    def __init__(self, *args, **keywords):
-        super().__init__()
-
     def _reprInternal(self):
         return ''
 
@@ -132,7 +130,6 @@ class ScoreLayout(LayoutBase):
     '''Parameters for configuring a score's layout.
 
     PageLayout objects may be found on Measure or Part Streams.
-
 
     >>> pl = layout.PageLayout(pageNumber=4, leftMargin=234, rightMargin=124,
     ...                        pageHeight=4000, pageWidth=3000, isNew=True)
@@ -146,41 +143,37 @@ class ScoreLayout(LayoutBase):
     True
 
     This object represents both <print new-page> and <page-layout>
-    elements in musicxml
+    elements in musicxml.  The appearance tag is handled in the `.style`
+    for the stream (it was here in v7 and before, but did nothing).
 
-    TODO -- make sure that the first pageLayout and systemLayout
-    for each page are working together.
+    Note that the appearance and style elements are subject to change during
+    and after the v8 releases.
     '''
+    # TODO -- make sure that the first pageLayout and systemLayout
+    #     for each page are working together.
 
-    def __init__(self, *args, **keywords):
-        super().__init__()
+    def __init__(self,
+                 *,
+                 scalingMillimeters: t.Union[int, float, None] = None,
+                 scalingTenths: t.Union[int, float, None] = None,
+                 musicFont: t.Optional[str] = None,
+                 wordFont: t.Optional[str] = None,
+                 pageLayout: t.Optional[PageLayout] = None,
+                 systemLayout: t.Optional[SystemLayout] = None,
+                 staffLayoutList: t.Optional[t.List[StaffLayout]] = None,
+                 **keywords):
+        super().__init__(**keywords)
 
-        self.scalingMillimeters = None
-        self.scalingTenths = None
-        self.pageLayout = None
-        self.systemLayout = None
-        self.staffLayoutList = []
-        self.appearance = None
-        self.musicFont = None
-        self.wordFont = None
+        self.scalingMillimeters = scalingMillimeters
+        self.scalingTenths = scalingTenths
+        self.pageLayout: t.Optional[PageLayout] = pageLayout
+        self.systemLayout: t.Optional[SystemLayout] = systemLayout
+        self.staffLayoutList: t.List[StaffLayout] = []
+        self.musicFont = musicFont
+        self.wordFont = wordFont
 
-        for key in keywords:
-            if key.lower() == 'scalingmillimeters':
-                self.scalingMillimeters = keywords[key]
-            elif key.lower() == 'scalingtenths':
-                self.scalingTenths = keywords[key]
-            elif key.lower() == 'pagelayout':
-                self.rightMargin = keywords[key]
-            elif key.lower() == 'systemlayout':
-                self.systemLayout = keywords[key]
-            elif key.lower() == 'stafflayout':
-                self.staffLayoutList = keywords[key]
-            elif key.lower() == 'appearance':
-                self.appearance = keywords[key]
-            elif key.lower() == 'musicfont':
-                self.musicFont = keywords[key]
-            elif key.lower() == 'wordfont':
-                self.wordFont = keywords[key]
+        if staffLayoutList is not None:
+            self.staffLayoutList = staffLayoutList
 
     def tenthsToMillimeters(self, tenths):
         '''
@@ -225,44 +218,35 @@ class PageLayout(LayoutBase):
     True
 
     This object represents both <print new-page> and <page-layout>
-    elements in musicxml
-
-    ## TODO -- make sure that the first pageLayout and systemLayout
-    for each page are working together.
-
+    elements in musicxml.
     '''
+    # TODO -- make sure that the first pageLayout and systemLayout
+    #     for each page are working together.
 
-    def __init__(self, *args, **keywords):
-        super().__init__()
+    def __init__(self,
+                 *,
+                 pageNumber: t.Optional[int] = None,
+                 leftMargin: t.Union[int, float, None] = None,
+                 rightMargin: t.Union[int, float, None] = None,
+                 topMargin: t.Union[int, float, None] = None,
+                 bottomMargin: t.Union[int, float, None] = None,
+                 pageHeight: t.Union[int, float, None] = None,
+                 pageWidth: t.Union[int, float, None] = None,
+                 isNew: t.Union[bool, None] = None,
+                 **keywords):
+        super().__init__(**keywords)
 
-        self.pageNumber = None
-        self.leftMargin = None
-        self.rightMargin = None
-        self.topMargin = None
-        self.bottomMargin = None
-        self.pageHeight = None
-        self.pageWidth = None
+        self.pageNumber = pageNumber
+        self.leftMargin = leftMargin
+        self.rightMargin = rightMargin
+        self.topMargin = topMargin
+        self.bottomMargin = bottomMargin
+        self.pageHeight = pageHeight
+        self.pageWidth = pageWidth
 
         # store if this is the start of a new page
-        self.isNew = None
+        self.isNew = isNew
 
-        for key in keywords:
-            if key.lower() == 'pagenumber':
-                self.pageNumber = keywords[key]
-            elif key.lower() == 'leftmargin':
-                self.leftMargin = keywords[key]
-            elif key.lower() == 'rightmargin':
-                self.rightMargin = keywords[key]
-            elif key.lower() == 'topmargin':
-                self.topMargin = keywords[key]
-            elif key.lower() == 'bottommargin':
-                self.bottomMargin = keywords[key]
-            elif key.lower() == 'pageheight':
-                self.pageHeight = keywords[key]
-            elif key.lower() == 'pagewidth':
-                self.pageWidth = keywords[key]
-            elif key.lower() == 'isnew':
-                self.isNew = keywords[key]
 
 # ------------------------------------------------------------------------------
 
@@ -288,33 +272,26 @@ class SystemLayout(LayoutBase):
     >>> sl.isNew
     True
     '''
+    def __init__(self,
+                 *,
+                 leftMargin: t.Union[int, float, None] = None,
+                 rightMargin: t.Union[int, float, None] = None,
+                 distance: t.Union[int, float, None] = None,
+                 topDistance: t.Union[int, float, None] = None,
+                 isNew: t.Union[bool, None] = None,
+                 **keywords):
+        super().__init__(**keywords)
 
-    def __init__(self, *args, **keywords):
-        super().__init__()
-
-        self.leftMargin = None
-        self.rightMargin = None
+        self.leftMargin = leftMargin
+        self.rightMargin = rightMargin
         # no top or bottom margins
 
         # this is probably the distance between adjacent systems
-        self.distance = None
-        self.topDistance = None
+        self.distance = distance
+        self.topDistance = topDistance
 
         # store if this is the start of a new system
-        self.isNew = None
-
-        for key in keywords:
-            if key.lower() == 'leftmargin':
-                self.leftMargin = keywords[key]
-            elif key.lower() == 'rightmargin':
-                self.rightMargin = keywords[key]
-
-            elif key.lower() == 'distance':
-                self.distance = keywords[key]
-            elif key.lower() == 'topdistance':
-                self.topDistance = keywords[key]
-            elif key.lower() == 'isnew':
-                self.isNew = keywords[key]
+        self.isNew = isNew
 
 
 class StaffLayout(LayoutBase):
@@ -347,7 +324,8 @@ class StaffLayout(LayoutBase):
     5
 
     staffSize is a percentage of the base staff size, so
-    this defines a staff 13% larger than normal.
+    this defines a staff 13% larger than normal.  Note that it is always converted to
+    a floating point number.
 
     >>> sl.staffSize
     113.0
@@ -379,33 +357,24 @@ class StaffLayout(LayoutBase):
             <StaffType.CUE: 'cue'>
             ''',
     }
-    def __init__(self, *args, **keywords):
-        super().__init__()
+    def __init__(self,
+                 *,
+                 distance: t.Union[int, float, None] = None,
+                 staffNumber: t.Union[int, float, None] = None,
+                 staffSize: t.Union[int, float, None] = None,
+                 staffLines: t.Optional[int] = None,
+                 hidden: t.Union[bool, None] = None,
+                 staffType: StaffType = StaffType.REGULAR,
+                 **keywords):
+        super().__init__(**keywords)
 
         # this is the distance between adjacent staves
-        self.distance = None
-        self.staffNumber = None
-        self.staffSize = None
-        self.staffLines = None
-        self.hidden = None  # True = hidden; False = shown; None = inherit
-        self.staffType: StaffType = StaffType.REGULAR
-
-        for key in keywords:
-            keyLower = key.lower()
-            if keyLower == 'distance':
-                self.distance = keywords[key]
-            elif keyLower == 'staffnumber':
-                self.staffNumber = keywords[key]
-            elif keyLower == 'staffsize':
-                if keywords[key] is not None:
-                    self.staffSize = float(keywords[key])
-            elif keyLower == 'stafflines':
-                self.staffLines = keywords[key]
-            elif keyLower == 'hidden':
-                if keywords[key] is not False and keywords[key] is not None:
-                    self.hidden = True
-            elif keyLower == 'staffType':
-                self.staffType = keywords[key]
+        self.distance = distance
+        self.staffNumber = staffNumber
+        self.staffSize: t.Optional[float] = None if staffSize is None else float(staffSize)
+        self.staffLines = staffLines
+        self.hidden = hidden  # True = hidden; False = shown; None = inherit
+        self.staffType: StaffType = staffType
 
     def _reprInternal(self):
         return (f'distance {self.distance!r}, staffNumber {self.staffNumber!r}, '
@@ -454,41 +423,37 @@ class StaffGroup(spanner.Spanner):
 
     .. image:: images/layout_StaffGroup_01.*
         :width: 400
-
     '''
+    def __init__(self,
+                 *spannedElements,
+                 name: t.Optional[str] = None,
+                 barTogether: t.Literal[True, False, None, 'Mensurstrich'] = True,
+                 abbreviation: t.Optional[str] = None,
+                 symbol: t.Literal['bracket', 'line', 'grace', 'square'] = None,
+                 **keywords):
+        super().__init__(*spannedElements, **keywords)
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
-
-        self.name = None  # if this group has a name
-        self.abbreviation = None
+        self.name = name or abbreviation  # if this group has a name
+        self.abbreviation = abbreviation
         self._symbol = None  # Choices: bracket, line, brace, square
+        self.symbol = symbol
         # determines if barlines are grouped through; this is group barline
         # in musicxml
-        self._barTogether = True
-
-        if 'symbol' in keywords:
-            self.symbol = keywords['symbol']  # user property
-        if 'barTogether' in keywords:
-            self.barTogether = keywords['barTogether']  # user property
-        if 'name' in keywords:
-            self.name = keywords['name']  # user property
-        if 'abbreviation' in keywords:
-            self.name = keywords['abbreviation']  # user property
+        self._barTogether = barTogether
 
     # --------------------------------------------------------------------------
 
-    def _getBarTogether(self):
+    def _getBarTogether(self) -> t.Literal[True, False, None, 'Mensurstrich']:
         return self._barTogether
 
-    def _setBarTogether(self, value):
+    def _setBarTogether(self, value: t.Literal[True, False, None, 'Mensurstrich', 'yes', 'no']):
         if value is None:
             pass  # do nothing for now; could set a default
         elif value in ['yes', True]:
             self._barTogether = True
         elif value in ['no', False]:
             self._barTogether = False
-        elif hasattr(value, 'lower') and value.lower() == 'mensurstrich':
+        elif isinstance(value, str) and value.lower() == 'mensurstrich':
             self._barTogether = 'Mensurstrich'
         else:
             raise StaffGroupException(f'the bar together value {value} is not acceptable')
@@ -498,8 +463,7 @@ class StaffGroup(spanner.Spanner):
         or yes or no strings.  Or the string 'Mensurstrich' which
         indicates barring between staves but not in staves.
 
-        Currently Mensurstrich i
-
+        Currently Mensurstrich is not supported by most exporters.
 
         >>> sg = layout.StaffGroup()
         >>> sg.barTogether = 'yes'
@@ -523,7 +487,6 @@ class StaffGroup(spanner.Spanner):
 
     symbol = property(_getSymbol, _setSymbol, doc='''
         Get or set the symbol value, with either Boolean values or yes or no strings.
-
 
         >>> sg = layout.StaffGroup()
         >>> sg.symbol = 'Brace'
@@ -784,8 +747,8 @@ class LayoutScore(stream.Opus):
     it is much faster as it uses a cache.
     '''
 
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
+    def __init__(self, givenElements=None, **keywords):
+        super().__init__(givenElements, **keywords)
         self.scoreLayout = None
         self.measureStart = None
         self.measureEnd = None
@@ -1544,8 +1507,8 @@ class Page(stream.Opus):
     belongs on a single notated page.
     '''
 
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
+    def __init__(self, givenElements=None, **keywords):
+        super().__init__(givenElements, **keywords)
         self.pageNumber = 1
         self.measureStart = None
         self.measureEnd = None
@@ -1583,8 +1546,8 @@ class System(stream.Score):
     Attribute systemNumbering says at what point the numbering of
     systems resets.  It can be either "Score" (default), "Opus", or "Page".
     '''
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
+    def __init__(self, givenElements=None, **keywords):
+        super().__init__(givenElements, **keywords)
         self.systemNumber = 0
 
         self.pageNumber = 0
@@ -1609,8 +1572,8 @@ class Staff(stream.Part):
     belongs on a single Staff.
     '''
 
-    def __init__(self, *args, **keywords):
-        super().__init__(*args, **keywords)
+    def __init__(self, givenElements=None, **keywords):
+        super().__init__(givenElements, **keywords)
         self.staffNumber = 1  # number in this system NOT GLOBAL
 
         self.scoreStaffNumber = 0
@@ -1716,5 +1679,3 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='getStaffLayoutFromStaff')
-
-

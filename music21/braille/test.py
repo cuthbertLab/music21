@@ -1059,8 +1059,8 @@ class Test(unittest.TestCase):
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass(stream.Measure)
         m[0].pop(0)
-        m[1].transpose(value='P8', inPlace=True)
-        m[2].transpose(value='P8', inPlace=True)
+        m[1].transpose('P8', inPlace=True)
+        m[2].transpose('P8', inPlace=True)
         self.s = bm
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠼⠙⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -2706,7 +2706,10 @@ Barline final ⠣⠅
 
     def xtest_example13_3(self):
         # Problem: How to plug in wedges into music21?
-        bm = converter.parse('tinynotation: a1 a1 a1 a1', 'c').flatten()
+        bm = converter.parse('tinynotation: 4/4 a1 a1 a1 a1').flatten()
+        commonTime = bm[meter.TimeSignature].first()
+        if commonTime is not None:  # it is not None, but for typing
+            commonTime.symbol = 'common'
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass(stream.Measure)
         ml[-1].rightBarline = None

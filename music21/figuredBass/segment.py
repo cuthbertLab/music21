@@ -766,7 +766,9 @@ class Segment:
         if not (self._maxPitch == segmentB._maxPitch):
             raise SegmentException('Two segments with unequal maxPitch cannot be compared.')
         self._specialResolutionRuleChecking = _compileRules(
-            self.specialResolutionRules(self.fbRules), 3)
+            self.specialResolutionRules(self.fbRules),
+            3
+        )
         for (resolutionMethod, args) in self._specialResolutionRuleChecking[True]:
             return resolutionMethod(segmentB, *args)
         return self._resolveOrdinarySegment(segmentB)

@@ -290,8 +290,8 @@ class ToneRow(stream.Stream):
                   'zeroCenteredTransformation', 'originalCenteredTransformation',
                   'findZeroCenteredTransformations', 'findOriginalCenteredTransformations']
 
-    def __init__(self, row=None, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, row=None, **keywords):
+        super().__init__(**keywords)
         if row is not None:
             self.row = row
         else:
@@ -666,22 +666,8 @@ class TwelveToneRow(ToneRow):
     '''
     A Stream representation of a twelve-tone row, capable of producing a 12-tone matrix.
     '''
-    # row = None
-
-    # _DOC_ATTR: t.Dict[str, str] = {
-    # 'row': 'A list representing the pitch class values of the row.',
-    # }
-
     _DOC_ORDER = ['matrix', 'isAllInterval',
                   'getLinkClassification', 'isLinkChord', 'areCombinatorial']
-
-    # def __init__(self, *arguments, **keywords):
-    #     super().__init__(*arguments, **keywords)
-    #     # environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
-    #
-    #     # if self.row != None:
-    #     #    for pc in self.row:
-    #     #        self.append(pitch.Pitch(pc))
 
     def matrix(self):
         # noinspection PyShadowingNames
@@ -1110,8 +1096,9 @@ class HistoricalTwelveToneRow(TwelveToneRow):
                  composer: t.Union[None, str] = None,
                  opus: t.Union[None, str] = None,
                  title: t.Union[None, str] = None,
-                 row=None):
-        super().__init__(row)
+                 row=None,
+                 **keywords):
+        super().__init__(row, **keywords)
         self.composer = composer
         self.opus = opus
         self.title = title
@@ -1463,8 +1450,8 @@ class Test(unittest.TestCase):
     #         if thisRow[0].pitchClass == 0:
     #             cRows += 1
     #
-    #          if interval.notesToInterval(thisRow[0],
-    #                                 thisRow[6]).intervalClass == 6:
+    #          if interval.Interval(thisRow[0],
+    #                               thisRow[6]).intervalClass == 6:
     #           # between element 1 and element 7 is there a TriTone?
     #           rowsWithTTRelations += 1
 

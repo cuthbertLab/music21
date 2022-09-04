@@ -317,14 +317,14 @@ class AbstractScale(Scale):
             raise ScaleException(f'Cannot build a network from this pitch list: {pitchList}')
         intervalList = []
         for i in range(len(pitchList) - 1):
-            intervalList.append(interval.notesToInterval(pitchList[i], pitchList[i + 1]))
+            intervalList.append(interval.Interval(pitchList[i], pitchList[i + 1]))
         if pitchList[-1].name == pitchList[0].name:  # the completion of the scale has been given.
             # print('hi %s ' % pitchList)
             # this scale is only octave duplicating if the top note is exactly
             # 1 octave above the bottom; if it spans more than one octave,
             # all notes must be identical in each octave
             # if abs(pitchList[-1].ps - pitchList[0].ps) == 12:
-            span = interval.notesToInterval(pitchList[0], pitchList[-1])
+            span = interval.Interval(pitchList[0], pitchList[-1])
             # environLocal.printDebug(['got span', span, span.name])
             if span.name == 'P8':
                 self.octaveDuplicating = True
@@ -341,8 +341,8 @@ class AbstractScale(Scale):
                 while p.ps > pitchList[-1].ps:
                     p.octave += -1
 
-            intervalList.append(interval.notesToInterval(pitchList[-1], p))
-            span = interval.notesToInterval(pitchList[0], p)
+            intervalList.append(interval.Interval(pitchList[-1], p))
+            span = interval.Interval(pitchList[0], p)
             # environLocal.printDebug(['got span', span, span.name])
             if span.name == 'P8':
                 self.octaveDuplicating = True

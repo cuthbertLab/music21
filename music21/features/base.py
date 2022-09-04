@@ -11,15 +11,16 @@
 # ------------------------------------------------------------------------------
 from __future__ import annotations
 
+from collections import Counter
+from collections.abc import KeysView
 import os
 import pathlib
 import pickle
 import typing as t
 import unittest
 
-from collections import Counter
-
 from music21 import common
+from music21.common.types import StreamType
 from music21 import converter
 from music21 import corpus
 from music21 import exceptions21
@@ -139,7 +140,7 @@ class FeatureExtractor:
     Usage of a DataInstance offers significant performance advantages, as common forms of
     the Stream are cached for easy processing.
     '''
-    def __init__(self, dataOrStream=None, *arguments, **keywords):
+    def __init__(self, dataOrStream=None, **keywords):
         self.stream = None  # the original Stream, or None
         self.data: t.Optional[DataInstance] = None  # a DataInstance object: use to get data
         self.setData(dataOrStream)
@@ -179,8 +180,8 @@ class FeatureExtractor:
                 self.data = dataOrStream
 
     def getAttributeLabels(self):
-        '''Return a list of string in a form that is appropriate for data storage.
-
+        '''
+        Return a list of string in a form that is appropriate for data storage.
 
         >>> fe = features.jSymbolic.AmountOfArpeggiationFeature()
         >>> fe.getAttributeLabels()
@@ -236,13 +237,15 @@ class FeatureExtractor:
         self.feature.prepareVectors()  # will vector with necessary zeros
 
     def process(self):
-        '''Do processing necessary, storing result in _feature.
+        '''
+        Do processing necessary, storing result in _feature.
         '''
         # do work in subclass, calling on self.data
         pass
 
     def extract(self, source=None):
-        '''Extract the feature and return the result.
+        '''
+        Extract the feature and return the result.
         '''
         if source is not None:
             self.stream = source
@@ -293,10 +296,8 @@ class StreamForms:
     of the stream which is the main power of this routine, making
     it simple to add additional feature extractors at low additional
     time cost.
-
     '''
-
-    def __init__(self, streamObj, prepareStream=True):
+    def __init__(self, streamObj: stream.Stream, prepareStream=True):
         self.stream = streamObj
         if self.stream is not None:
             if prepareStream:
@@ -307,13 +308,13 @@ class StreamForms:
             self.prepared = None
 
         # basic data storage is a dictionary
-        self.forms = {}
+        self.forms: t.Dict[str, stream.Stream] = {}
 
-    def keys(self):
+    def keys(self) -> KeysView[str]:
         # will only return forms that are established
         return self.forms.keys()
 
-    def _prepareStream(self, streamObj):
+    def _prepareStream(self, streamObj: StreamType) -> StreamType:
         '''
         Common routines done on Streams prior to processing. Returns a new Stream
 
@@ -323,7 +324,7 @@ class StreamForms:
         streamObj = streamObj.stripTies(inPlace=False)
         return streamObj
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> stream.Stream:
         '''
         Get a form of this Stream, using a cached version if available.
         '''
@@ -349,19 +350,20 @@ class StreamForms:
                 prepared = self.keysToMethods[lastKey](self, prepared)
             elif lastKey.startswith('getElementsByClass('):
                 classToGet: str = lastKey[len('getElementsByClass('):-1]
-                prepared = prepared.getElementsByClass(classToGet)
+                prepared = prepared.getElementsByClass(classToGet).stream()
             else:
                 raise AttributeError(f'no such attribute: {lastKey} in {key}')
             self.forms[subKey] = prepared
 
         return prepared
 
-    def _getIntervalHistogram(self, algorithm='midi'):
+    def _getIntervalHistogram(self, algorithm='midi') -> t.List[int]:
         # note that this does not optimize and cache part presentations
         histo = [0] * 128
         # if we have parts, must add one at a time
-        if self.prepared.hasPartLikeStreams():
-            parts = self.prepared.parts
+        parts: t.List[stream.Stream]
+        if isinstance(self.prepared, stream.Score):
+            parts = list(self.prepared.parts)
         else:
             parts = [self.prepared]  # emulate a list
         for p in parts:
@@ -369,7 +371,10 @@ class StreamForms:
 
             # noNone means that we will see all connections, even w/ a gap
             post = p.findConsecutiveNotes(skipRests=True,
-                                          skipChords=True, skipGaps=True, noNone=True)
+                                          skipChords=True,
+                                          skipGaps=True,
+                                          noNone=True)
+
             for i, n in enumerate(post):
                 if i < len(post) - 1:  # if not last
                     iNext = i + 1
@@ -384,7 +389,7 @@ class StreamForms:
         return histo
 # ----------------------------------------------------------------------------
 
-    def formPartitionByInstrument(self, prepared):
+    def formPartitionByInstrument(self, prepared: stream.Stream):
         from music21 import instrument
         return instrument.partitionByInstrument(prepared)
 

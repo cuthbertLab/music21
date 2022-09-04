@@ -1872,6 +1872,7 @@ def midiTrackToStream(
     inputM21=None,
     conductorPart: t.Optional[stream.Part] = None,
     isFirst: bool = False,
+    quarterLengthDivisors: t.Sequence[int] = (),
     **keywords
 ) -> stream.Part:
     # noinspection PyShadowingNames
@@ -1968,9 +1969,7 @@ def midiTrackToStream(
     iGathered = []  # store a list of indexes of gathered values put into chords
     voicesRequired = False
 
-    if 'quarterLengthDivisors' in keywords:
-        quarterLengthDivisors = keywords['quarterLengthDivisors']
-    else:
+    if not quarterLengthDivisors:
         quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
 
     if len(notes) > 1:
@@ -2672,8 +2671,9 @@ def streamToMidiFile(
 
 def midiFilePathToStream(
     filePath,
+    *,
     inputM21=None,
-    **keywords
+    **keywords,
 ):
     '''
     Used by music21.converter:
@@ -2694,13 +2694,15 @@ def midiFilePathToStream(
     >>> streamScore = midi.translate.midiFilePathToStream(fp)
     >>> streamScore
     <music21.stream.Score ...>
+
+    Changed in v8: inputM21 is keyword only.
     '''
     from music21 import midi as midiModule
     mf = midiModule.MidiFile()
     mf.open(filePath)
     mf.read()
     mf.close()
-    return midiFileToStream(mf, inputM21, **keywords)
+    return midiFileToStream(mf, inputM21=inputM21, **keywords)
 
 
 def midiAsciiStringToBinaryString(
@@ -2823,6 +2825,7 @@ def midiStringToStream(strData, **keywords):
 
 def midiFileToStream(
     mf: 'music21.midi.MidiFile',
+    *,
     inputM21=None,
     quantizePost=True,
     **keywords
@@ -2856,6 +2859,8 @@ def midiFileToStream(
     <music21.stream.Score ...>
     >>> len(s.flatten().notesAndRests)
     14
+
+    Changed in v8: inputM21 and quantizePost are keyword only.
     '''
     # environLocal.printDebug(['got midi file: tracks:', len(mf.tracks)])
     if inputM21 is None:
@@ -2865,9 +2870,6 @@ def midiFileToStream(
 
     if not mf.tracks:
         raise exceptions21.StreamException('no tracks are defined in this MIDI file.')
-
-    if 'quantizePost' in keywords:
-        quantizePost = keywords.pop('quantizePost')
 
     # create a stream for each track
     # may need to check if tracks actually have event data

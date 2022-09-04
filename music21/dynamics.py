@@ -355,11 +355,12 @@ class Dynamic(base.Music21Object):
 
 # ------------------------------------------------------------------------------
 class DynamicWedge(spanner.Spanner):
-    '''Common base-class for Crescendo and Diminuendo.
+    '''
+    Common base-class for Crescendo and Diminuendo.
     '''
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, *spannedElements, **keywords):
+        super().__init__(*spannedElements, **keywords)
 
         self.type = None  # crescendo or diminuendo
         self.placement = 'below'  # can above or below, after musicxml
@@ -368,7 +369,8 @@ class DynamicWedge(spanner.Spanner):
 
 
 class Crescendo(DynamicWedge):
-    '''A spanner crescendo wedge.
+    '''
+    A spanner crescendo wedge.
 
     >>> from music21 import dynamics
     >>> d = dynamics.Crescendo()
@@ -381,13 +383,14 @@ class Crescendo(DynamicWedge):
     'crescendo'
     '''
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, *spannedElements, **keywords):
+        super().__init__(*spannedElements, **keywords)
         self.type = 'crescendo'
 
 
 class Diminuendo(DynamicWedge):
-    '''A spanner diminuendo wedge.
+    '''
+    A spanner diminuendo wedge.
 
     >>> from music21 import dynamics
     >>> d = dynamics.Diminuendo()
@@ -396,8 +399,8 @@ class Diminuendo(DynamicWedge):
     20
     '''
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, *spannedElements, **keywords):
+        super().__init__(*spannedElements, **keywords)
         self.type = 'diminuendo'
 
 # ------------------------------------------------------------------------------
@@ -412,7 +415,8 @@ class TestExternal(unittest.TestCase):
             a.show()
 
     def testBasic(self):
-        '''present each dynamic in a single measure
+        '''
+        present each dynamic in a single measure
         '''
         from music21 import stream
         a = stream.Stream()
@@ -429,7 +433,8 @@ class TestExternal(unittest.TestCase):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import copy
         import sys
@@ -511,7 +516,6 @@ class Test(unittest.TestCase):
                 d = Dynamic('mf')
                 d.style.absoluteY = 20
                 m.insert(o, d)
-
         # s.show()
 
 
@@ -522,4 +526,3 @@ _DOC_ORDER = [Dynamic, dynamicStrFromDecimal]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

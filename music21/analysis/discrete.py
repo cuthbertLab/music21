@@ -22,6 +22,8 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 (for algorithmic key detection) and
 :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) provide examples.
 '''
+from __future__ import annotations
+
 # TODO: make an analysis.base for the Discrete and analyzeStream aspects, then create
 #     range and key modules in analysis
 
@@ -1247,7 +1249,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
 
                 if nNext is not None:
                     # environLocal.printDebug(['creating interval from notes:', n, nNext, i])
-                    i = interval.notesToInterval(n, nNext)
+                    i = interval.Interval(n, nNext)
                     if ignoreUnison:  # will apply to enharmonic eq unisons
                         if i.chromatic.semitones == 0:
                             continue
@@ -1284,7 +1286,11 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
 # -----------------------------------------------------------------------------
 # public access function
 
-def analyzeStream(streamObj, *args, **keywords):
+def analyzeStream(
+    streamObj: 'music21.stream.Stream',
+    method: str,
+    **keywords
+):
     '''
     Public interface to discrete analysis methods to be applied
     to a Stream given as an argument. Methods return process-specific data format.
@@ -1316,24 +1322,16 @@ def analyzeStream(streamObj, *args, **keywords):
     <music21.key.Key of f# minor>
     >>> s.analyze('span')
     <music21.interval.Interval m21>
-
     '''
-    method = None
-    if 'method' in keywords:
-        method = keywords['method']
-
-    if args:
-        method = args[0]
-
     if method == 'range':
         # getPitchRanges() was removed in v7
         # this synonym is being added for compatibility
         method = 'span'
 
-    match = analysisClassFromMethodName(method)
+    analysisClassName: t.Optional[t.Type[DiscreteAnalysis]] = analysisClassFromMethodName(method)
 
-    if match is not None:
-        obj = match()  # NOTE: Cuthbert, this was previously analysisClassName()? - out of scope
+    if analysisClassName is not None:
+        obj = analysisClassName()
         # environLocal.printDebug(['analysis method used:', obj])
         return obj.getSolution(streamObj)
 
@@ -1342,7 +1340,7 @@ def analyzeStream(streamObj, *args, **keywords):
 
 
 # noinspection SpellCheckingInspection
-def analysisClassFromMethodName(method):
+def analysisClassFromMethodName(method: str) -> t.Optional[t.Type[DiscreteAnalysis]]:
     '''
     Returns an analysis class given a method name, or None if none can be found
 
@@ -1363,7 +1361,7 @@ def analysisClassFromMethodName(method):
     >>> print(repr(acfmn('unknown-format')))
     None
     '''
-    analysisClasses = [
+    analysisClasses: t.List[t.Type[DiscreteAnalysis]] = [
         Ambitus,
         KrumhanslSchmuckler,
         AardenEssen,
@@ -1371,7 +1369,7 @@ def analysisClassFromMethodName(method):
         BellmanBudge,
         TemperleyKostkaPayne,
     ]
-    match = None
+    match: t.Optional[t.Type[DiscreteAnalysis]] = None
     for analysisClass in analysisClasses:
         # this is a very loose matching, as there are few classes now
         if (method.lower() in analysisClass.__name__.lower()

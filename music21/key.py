@@ -1141,7 +1141,7 @@ class Key(KeySignature, scale.DiatonicScale):
         return ret
 
 
-    def _tonalCertaintyCorrelationCoefficient(self, *args, **keywords):
+    def _tonalCertaintyCorrelationCoefficient(self):
         # possible measures:
         if not self.alternateInterpretations:
             raise KeySignatureException(
@@ -1169,10 +1169,7 @@ class Key(KeySignature, scale.DiatonicScale):
         # estimate range as 2, normalize between zero and 1
         return (absMagnitude * 1) + (leaderSpan * 2)
 
-    def tonalCertainty(self,
-                       method='correlationCoefficient',
-                       *args,
-                       **keywords) -> float:
+    def tonalCertainty(self, method='correlationCoefficient') -> float:
         '''
         Provide a measure of tonal ambiguity for Key
         determined with one of many methods.
@@ -1216,8 +1213,7 @@ class Key(KeySignature, scale.DiatonicScale):
         []
         '''
         if method == 'correlationCoefficient':
-            return self._tonalCertaintyCorrelationCoefficient(
-                args, keywords)
+            return self._tonalCertaintyCorrelationCoefficient()
         else:
             raise ValueError(f'Unknown method: {method}')
 

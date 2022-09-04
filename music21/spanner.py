@@ -64,7 +64,6 @@ class Spanner(base.Music21Object):
     as Elliott Carter uses in his second string quartet (he marks them
     with an arrow).
 
-
     >>> class CarterAccelerandoSign(spanner.Spanner):
     ...    pass
     >>> n1 = note.Note('C4')
@@ -98,7 +97,6 @@ class Spanner(base.Music21Object):
     <music21.note.Note D>
     <music21.note.Note E>
 
-
     (2) we can get a stream of spanners (equiv. to getElementsByClass(spanner.Spanner))
         by calling the .spanner property on the stream.
 
@@ -106,7 +104,6 @@ class Spanner(base.Music21Object):
     >>> for thisSpanner in spannerCollection:
     ...     print(thisSpanner)
     <music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
-
 
     (3) we can get the spanner by looking at the list getSpannerSites() on
     any object that has a spanner:
@@ -176,22 +173,20 @@ class Spanner(base.Music21Object):
     (the Carter example would not print an arrow since that
     element has no corresponding musicxml representation).
 
-
-    Implementation notes:
+    *Implementation notes:*
 
     The elements that are included in a spanner are stored in a
     Stream subclass called :class:`~music21.stream.SpannerStorage`
     found as the `.spannerStorage` attribute.  That Stream has an
-    attribute called `spannerParent` which links to the original spanner.
+    attribute called `client` which links to the original spanner.
     Thus, `spannerStorage` is smart enough to know where it's stored, but
     it makes deleting/garbage-collecting a spanner a tricky operation:
 
     Ex. Prove that the spannedElement Stream is linked to container via
-    `spannerParent`:
+    `client`:
 
-    >>> sp1.spannerStorage.spannerParent is sp1
+    >>> sp1.spannerStorage.client is sp1
     True
-
 
     Spanners have a `.completeStatus` attribute which can be used to find out if
     all spanned elements have been added yet. It's up to the processing agent to
@@ -205,8 +200,11 @@ class Spanner(base.Music21Object):
     >>> sp1.completeStatus = True
     '''
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__()
+    def __init__(self,
+                 *spannedElements: t.Union[base.Music21Object,
+                                           t.Sequence[base.Music21Object]],
+                 **keywords):
+        super().__init__(**keywords)
 
         # store a Stream inside of Spanner
         from music21 import stream
@@ -216,7 +214,7 @@ class Spanner(base.Music21Object):
         # directly
 
         # TODO: Move here! along with VariantStorage to variant.
-        self.spannerStorage = stream.SpannerStorage(spannerParent=self)
+        self.spannerStorage = stream.SpannerStorage(client=self)
 
         # we do not want to auto sort based on offset or class, as
         # both are meaningless inside this Stream (and only have meaning
@@ -224,17 +222,13 @@ class Spanner(base.Music21Object):
         self.spannerStorage.autoSort = False
 
         # add arguments as a list or single item
-        proc = []
-        for arg in arguments:
-            if common.isListLike(arg):
-                proc += arg
-            else:
-                proc.append(arg)
+        proc: t.List[base.Music21Object] = []
+        for spannedElement in spannedElements:
+            if isinstance(spannedElement, base.Music21Object):
+                proc.append(spannedElement)
+            elif spannedElement is not None:
+                proc += spannedElement
         self.addSpannedElements(proc)
-        # if len(arguments) > 1:
-        #     self.spannerStorage.append(arguments)
-        # elif len(arguments) == 1:  # assume a list is first arg
-        #         self.spannerStorage.append(c)
 
         # parameters that spanners need in loading and processing
         # local id is the id for the local area; used by musicxml
@@ -412,8 +406,7 @@ class Spanner(base.Music21Object):
         self,
         spannedElements: t.Union[t.Sequence[base.Music21Object],
                                  base.Music21Object],
-        *arguments,
-        **keywords
+        *otherElements: base.Music21Object,
     ):
         '''
         Associate one or more elements with this Spanner.
@@ -438,11 +431,11 @@ class Spanner(base.Music21Object):
         # add mypy disables because isListLike() performs type-narrowing
         if not common.isListLike(spannedElements):
             spannedElements = [spannedElements]  # type: ignore[list-item]
-        if arguments:
+        if otherElements:
             # copy
             spannedElements = spannedElements[:]  # type: ignore[index]
-            # assume all other arguments are spanners
-            spannedElements += arguments  # type: ignore[operator]
+            # assume all other arguments are music21 objects
+            spannedElements += otherElements  # type: ignore[operator]
         for c in spannedElements:  # type: ignore[union-attr]
             if c is None:
                 continue
@@ -618,7 +611,7 @@ class SpannerBundle(prebase.ProtoM21Object):
     '''
     An advanced utility object for collecting and processing
     collections of Spanner objects. This is necessary because
-    often processing routines that happen at many different
+    often processing routines that happen at many
     levels still need access to the same collection of spanners.
 
     Because SpannerBundles are so commonly used with
@@ -928,7 +921,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         The `maxId` parameter sets the largest number that is available for this
         class.  In MusicXML it is 6.
 
-        Currently this method just iterates over the spanners of this class
+        Currently, this method just iterates over the spanners of this class
         and counts the number from 1-6 and then recycles numbers.  It does
         not check whether more than 6 overlapping spanners of the same type
         exist, nor does it reset the count to 1 after all spanners of that
@@ -1131,8 +1124,8 @@ class Slur(Spanner):
     Slurs have `.placement` options ('above' or 'below') and `.lineType` ('dashed' or None)
     '''
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, *spannedElements, **keywords):
+        super().__init__(*spannedElements, **keywords)
         self.placement = None  # can above or below, after musicxml
         self.lineType = None  # can be 'dashed' or None
 
@@ -1169,8 +1162,8 @@ class MultiMeasureRest(Spanner):
             ''',
     }
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self, *spannedElements, **keywords):
+        super().__init__(*spannedElements, **keywords)
         self._overriddenNumber = None
         self.useSymbols = keywords.get('useSymbols', defaults.multiMeasureRestUseSymbols)
         self.maxSymbols = keywords.get('maxSymbols', defaults.multiMeasureRestMaxSymbols)
@@ -1223,7 +1216,6 @@ class RepeatBracket(Spanner):
     `ouvert` and `clos` for medieval music.  However, if you use it for something like '1-3'
     be sure to set number properly too.
 
-
     >>> m = stream.Measure()
     >>> sp = spanner.RepeatBracket(m, number=1)
     >>> sp  # can be one or more measures
@@ -1237,46 +1229,68 @@ class RepeatBracket(Spanner):
     >>> sp.number
     '3'
 
-    >>> sp.number = '1-3'  # range of repeats
+    Range of repeats as string:
+
+    >>> sp.number = '1-3'
     >>> sp.getNumberList()
     [1, 2, 3]
     >>> sp.number
     '1-3'
 
-    >>> sp.number = [2, 3]  # range of repeats
+    Range of repeats as list:
+
+    >>> sp.number = [2, 3]
     >>> sp.getNumberList()
     [2, 3]
     >>> sp.number
     '2, 3'
 
-    >>> sp.number = '1, 2, 3'  # comma separated
+    Comma separated numbers:
+
+    >>> sp.number = '1, 2, 3'
     >>> sp.getNumberList()
     [1, 2, 3]
     >>> sp.number
     '1-3'
 
+    Disjunct numbers:
 
-    >>> sp.number = '1, 2, 3, 7'  # disjunct
+    >>> sp.number = '1, 2, 3, 7'
     >>> sp.getNumberList()
     [1, 2, 3, 7]
     >>> sp.number
     '1, 2, 3, 7'
-    >>> sp.overrideDisplay = '1-3, 7'  # does not work for number.
 
+    Override the display.
 
+    >>> sp.overrideDisplay = '1-3, 7'
+    >>> sp
+    <music21.spanner.RepeatBracket 1-3, 7
+         <music21.stream.Measure 0 offset=0.0>>
+
+    number is not affected by display overrides:
+
+    >>> sp.number
+    '1, 2, 3, 7'
     '''
+    def __init__(self,
+                 *spannedElements,
+                 number: t.Optional[int] = None,
+                 overrideDisplay: t.Optional[str] = None,
+                 **keywords):
+        super().__init__(*spannedElements, **keywords)
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+        self._number: t.Optional[int] = None
+        # store a range, inclusive of the single number assignment
+        self._numberRange: t.List[int] = []
+        # are there exactly two numbers that should be written as  3, 4 not 3-4.
+        self._numberSpanIsAdjacent: bool = False
+        # can we write as '3, 4' or '5-10' and not as '1, 5, 6, 11'
+        self._numberSpanIsContiguous: bool = True
+        self.overrideDisplay = overrideDisplay
 
-        self._number = None
-        self._numberRange = []  # store a range, inclusive of the single number assignment
-        self._numberSpanIsAdjacent = None
-        self._numberSpanIsContiguous = None
-        self.overrideDisplay = None
-
-        if 'number' in keywords:
-            self.number = keywords['number']
+        if number is not None:
+            self.number = number
 
     # property to enforce numerical numbers
     def _getNumber(self):
@@ -1289,7 +1303,7 @@ class RepeatBracket(Spanner):
         elif len(self._numberRange) == 1:
             return str(self._number)
         else:
-            if self._numberSpanIsContiguous is False:
+            if not self._numberSpanIsContiguous:
                 return ', '.join([str(x) for x in self._numberRange])
             elif self._numberSpanIsAdjacent:
                 return f'{self._numberRange[0]}, {self._numberRange[-1]}'
@@ -1406,11 +1420,11 @@ class Ottava(Spanner):
     >>> print(ottava)
     <music21.spanner.Ottava 8vb transposing>
 
-
     An Ottava spanner can either be transposing or non-transposing.
-    In a transposing Ottava spanner, the notes should be in their
-    written octave (as if the spanner were not there) and all the
-    notes in the spanner will be transposed on Stream.toSoundingPitch()
+    In a transposing Ottava spanner, the notes in the stream should be
+    in their written octave (as if the spanner were not there) and all the
+    notes in the spanner will be transposed on Stream.toSoundingPitch().
+
     A non-transposing spanner has notes that are at the pitch that
     they would sound (therefore the Ottava spanner is a decorative
     line).
@@ -1421,6 +1435,7 @@ class Ottava(Spanner):
     >>> n2 = note.Note('E4')
     >>> n2.offset = 2.0
     >>> ottava.addSpannedElements([n1, n2])
+
     >>> s = stream.Stream([ottava, n1, n2])
     >>> s.atSoundingPitch = False
     >>> s2 = s.toSoundingPitch()
@@ -1434,7 +1449,7 @@ class Ottava(Spanner):
     D3
     E3
 
-    All valid types
+    All valid types are given below:
 
     >>> ottava.validOttavaTypes
     ('8va', '8vb', '15ma', '15mb', '22da', '22db')
@@ -1456,19 +1471,18 @@ class Ottava(Spanner):
     '''
     validOttavaTypes = ('8va', '8vb', '15ma', '15mb', '22da', '22db')
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self,
+                 *spannedElements,
+                 type: str = '8va',  # pylint: disable=redefined-builtin
+                 transposing: bool = True,
+                 placement: t.Literal['above', 'below'] = 'above',
+                 **keywords):
+        super().__init__(*spannedElements, **keywords)
         self._type = None  # can be 8va, 8vb, 15ma, 15mb
-        if 'type' in keywords:
-            self.type = keywords['type']  # use property
-        else:  # use 8 as a default
-            self.type = '8va'
+        self.type = type
 
-        self.placement = 'above'  # can above or below, after musicxml
-        if 'transposing' in keywords and keywords['transposing'] in (True, False):
-            self.transposing = keywords['transposing']
-        else:
-            self.transposing = True
+        self.placement = placement  # can above or below, after musicxml
+        self.transposing = transposing
 
     def _getType(self):
         return self._type
@@ -1505,12 +1519,12 @@ class Ottava(Spanner):
         (such as 8va or 15mb) or with a pair specifying size and direction.
 
         >>> os = spanner.Ottava()
-        >>> os.type = 15, 'down'
-        >>> os.type
-        '15mb'
         >>> os.type = '8vb'
         >>> os.type
         '8vb'
+        >>> os.type = 15, 'down'
+        >>> os.type
+        '15mb'
         ''')
 
     def _reprInternal(self):
@@ -1621,7 +1635,6 @@ class Ottava(Spanner):
         True
         >>> n1.nameWithOctave
         'D#3'
-
         '''
         if self.transposing:
             return
@@ -1636,11 +1649,12 @@ class Ottava(Spanner):
                 p.transpose(myInterval, inPlace=True)
 
 
+
 class Line(Spanner):
-    '''A line or bracket represented as a spanner above two Notes.
+    '''
+    A line or bracket represented as a spanner above two Notes.
 
     Brackets can take many line types.
-
 
     >>> b = spanner.Line()
     >>> b.lineType = 'dotted'
@@ -1649,37 +1663,50 @@ class Line(Spanner):
     >>> b = spanner.Line(endHeight=20)
     >>> b.endHeight
     20
-
     '''
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
     validTickTypes = ('up', 'down', 'arrow', 'both', 'none')
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(
+        self,
+        *spannedElements,
+        lineType: str = 'solid',
+        tick: str = 'down',
+        startTick: str = 'down',
+        endTick: str = 'down',
+        startHeight: t.Optional[t.Union[int, float]] = None,
+        endHeight: t.Optional[t.Union[int, float]] = None,
+        **keywords
+    ):
+        super().__init__(*spannedElements, **keywords)
 
-        self._endTick = 'down'  # can ne up/down/arrow/both/None
-        self._startTick = 'down'  # can ne up/down/arrow/both/None
+        DEFAULT_TICK = 'down'
+        self._endTick = DEFAULT_TICK  # can ne up/down/arrow/both/None
+        self._startTick = DEFAULT_TICK  # can ne up/down/arrow/both/None
 
         self._endHeight = None  # for up/down, specified in tenths
         self._startHeight = None  # for up/down, specified in tenths
 
-        self._lineType = 'solid'  # can be solid, dashed, dotted, wavy
-        self.placement = 'above'  # can above or below, after musicxml
+        DEFAULT_LINE_TYPE = 'solid'
+        self._lineType = DEFAULT_LINE_TYPE  # can be solid, dashed, dotted, wavy
 
-        if 'lineType' in keywords:
-            self.lineType = keywords['lineType']  # use property
+        DEFAULT_PLACEMENT = 'above'
+        self.placement = DEFAULT_PLACEMENT  # can above or below, after musicxml
 
-        if 'startTick' in keywords:
-            self.startTick = keywords['startTick']  # use property
-        if 'endTick' in keywords:
-            self.endTick = keywords['endTick']  # use property
-        if 'tick' in keywords:
-            self.tick = keywords['tick']  # use property
+        if lineType != DEFAULT_LINE_TYPE:
+            self.lineType = lineType  # use property
 
-        if 'endHeight' in keywords:
-            self.endHeight = keywords['endHeight']  # use property
-        if 'startHeight' in keywords:
-            self.startHeight = keywords['startHeight']  # use property
+        if startTick != DEFAULT_TICK:
+            self.startTick = startTick  # use property
+        if endTick != DEFAULT_TICK:
+            self.endTick = endTick  # use property
+        if tick != DEFAULT_TICK:
+            self.tick = tick  # use property
+
+        if endHeight is not None:
+            self.endHeight = endHeight  # use property
+        if startHeight is not None:
+            self.startHeight = startHeight  # use property
 
     def _getEndTick(self):
         return self._endTick
@@ -1805,18 +1832,23 @@ class Glissando(Spanner):
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
     validSlideTypes = ('chromatic', 'continuous', 'diatonic', 'white', 'black')
 
-    def __init__(self, *arguments, **keywords):
-        super().__init__(*arguments, **keywords)
+    def __init__(self,
+                 *spannedElements,
+                 lineType: str = 'wavy',
+                 label: t.Optional[str] = None,
+                 **keywords):
+        super().__init__(*spannedElements, **keywords)
 
-        self._lineType = 'wavy'
+        GLISSANDO_DEFAULT_LINE_TYPE = 'wavy'
+        self._lineType = GLISSANDO_DEFAULT_LINE_TYPE
         self._slideType = 'chromatic'
 
         self.label = None
 
-        if 'lineType' in keywords:
-            self.lineType = keywords['lineType']  # use property
-        if 'label' in keywords:
-            self.label = keywords['label']  # use property
+        if lineType != GLISSANDO_DEFAULT_LINE_TYPE:
+            self.lineType = lineType  # use property
+        if label is not None:
+            self.label = label  # use property
 
     def _getLineType(self):
         return self._lineType
@@ -2734,5 +2766,3 @@ _DOC_ORDER: t.List[type] = [Spanner]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-

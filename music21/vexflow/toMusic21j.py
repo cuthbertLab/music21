@@ -26,7 +26,7 @@ supportedDisplayModes = [
 ]
 
 
-def fromObject(thisObject, mode='html', local=False):
+def fromObject(thisObject, *, mode='html', local=False):
     '''
     returns a string of data for a given Music21Object such as a Score, Note, etc. that
     can be displayed in a browser using the music21j package.  Called by .show('vexflow').
@@ -68,6 +68,8 @@ def fromObject(thisObject, mode='html', local=False):
     <body>
     </body>
     </html>
+
+    Changed in v.8 -- mode and useLocal are keyword only.
     '''
     conv = VexflowPickler()
     conv.mode = mode

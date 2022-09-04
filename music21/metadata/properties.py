@@ -14,7 +14,7 @@
 import typing as t
 from dataclasses import dataclass
 
-from music21.metadata.primitives import (DateSingle, Text, Contributor, Copyright, ValueType)
+from music21.metadata.primitives import (DatePrimitive, Text, Contributor, Copyright, ValueType)
 
 
 @dataclass
@@ -94,7 +94,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='dateAvailable',
         name='available',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # bibliographicCitation: A bibliographic reference for the resource.
@@ -115,7 +115,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         name='created',
         namespace='dcterms',
         oldMusic21WorkId='date',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # otherDate: A point or period of time associated with an event in the lifecycle
@@ -124,28 +124,28 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='otherDate',
         name='date',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # dateAccepted: Date of acceptance of the resource.
     PropertyDescription(
         name='dateAccepted',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # dateCopyrighted: Date of copyright of the resource.
     PropertyDescription(
         name='dateCopyrighted',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # dateSubmitted: Date of submission of the resource.
     PropertyDescription(
         name='dateSubmitted',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # description: An account of the resource.
@@ -248,7 +248,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='dateIssued',
         name='issued',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # isVersionOf: A related resource of which the described resource is a
@@ -282,7 +282,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='dateModified',
         name='modified',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # provenance: A statement of any changes in ownership and custody of
@@ -381,7 +381,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='dateValid',
         name='valid',
         namespace='dcterms',
-        valueType=DateSingle,   # including DateRelative, DateBetween, DateSelection
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # The following 'marcrel' property terms are MARC Relator terms,
@@ -1009,7 +1009,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='dateFirstPublished',
         name='PDT',
         namespace='humdrum',
-        valueType=DateSingle,
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # publicationTitle: Title of the publication (volume) from which the work
@@ -1121,7 +1121,7 @@ STANDARD_PROPERTY_DESCRIPTIONS: t.Tuple[PropertyDescription, ...] = (
         uniqueName='electronicReleaseDate',
         name='YER',
         namespace='humdrum',
-        valueType=DateSingle,
+        valueType=DatePrimitive,  # including DateSingle, DateRelative, DateBetween, DateSelection
         isContributor=False),
 
     # The following properties are in the music21 namespace, and are specific to
