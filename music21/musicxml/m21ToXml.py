@@ -5678,22 +5678,22 @@ class MeasureExporter(XMLExporterBase):
         # Ignore any spanned GeneralNotes, and simply append the appropriate wedge start/stop
         # direction elements right here.
         mxWedgeStart: Element = Element('wedge')
-        _synchronizeIds(mxWedgeStart, d)
+        _synchronizeIds(mxWedgeStart, dw)
         mxWedgeStart.set('type', dw.type)
         if dw.type == 'crescendo':
-            mxWedgeStart.set('spread', 0)
+            mxWedgeStart.set('spread', '0')
             if dw.niente:
                 mxWedgeStart.set('niente', 'yes')
         else:
-            mxWedgeStart.set('spread', sp.spread)
+            mxWedgeStart.set('spread', dw.spread)
 
         mxWedgeStop: Element = Element('wedge')
-        _synchronizeIds(mxWedgeStop, d)
+        _synchronizeIds(mxWedgeStop, dw)
         mxWedgeStop.set('type', 'stop')
         if dw.type == 'crescendo':
-            mxWedgeStop.set('spread', sp.spread)
+            mxWedgeStop.set('spread', dw.spread)
         else:
-            mxWedgeStop.set('spread', 0)
+            mxWedgeStop.set('spread', '0')
             if dw.niente:
                 mxWedgeStop.set('niente', 'yes')
 
@@ -5704,7 +5704,7 @@ class MeasureExporter(XMLExporterBase):
         mxDirection2 = self.placeInDirection(  # also handles offset
             mxWedgeStop,
             dw,
-            offset = dw.offset + dw.quarterLength
+            offset=dw.offset + dw.quarterLength
         )
 
         # Put any dw.editorial content on the wedge 'start' (mxDirection1)
