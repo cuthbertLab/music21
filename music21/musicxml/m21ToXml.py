@@ -5685,13 +5685,13 @@ class MeasureExporter(XMLExporterBase):
             if dw.niente:
                 mxWedgeStart.set('niente', 'yes')
         else:
-            mxWedgeStart.set('spread', dw.spread)
+            mxWedgeStart.set('spread', str(dw.spread))
 
         mxWedgeStop: Element = Element('wedge')
         _synchronizeIds(mxWedgeStop, dw)
         mxWedgeStop.set('type', 'stop')
         if dw.type == 'crescendo':
-            mxWedgeStop.set('spread', dw.spread)
+            mxWedgeStop.set('spread', str(dw.spread))
         else:
             mxWedgeStop.set('spread', '0')
             if dw.niente:
