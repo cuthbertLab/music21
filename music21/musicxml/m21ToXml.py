@@ -42,6 +42,7 @@ from music21 import bar
 from music21 import clef
 from music21 import chord
 from music21 import duration
+from music21 import dynamics
 from music21 import expressions
 from music21 import harmony
 from music21 import instrument
@@ -57,6 +58,7 @@ from music21 import stream
 from music21 import style
 from music21 import tempo
 from music21 import tie
+from music21.common.numberTools import OffsetQL
 from music21.stream.iterator import OffsetIterator
 
 from music21.musicxml import helpers
@@ -3105,6 +3107,7 @@ class MeasureExporter(XMLExporterBase):
             ('Unpitched', 'unpitchedToXml'),
             ('Rest', 'restToXml'),
             ('Dynamic', 'dynamicToXml'),
+            ('DynamicWedge', 'dynamicWedgeToXml'),
             ('Segno', 'segnoToXml'),
             ('Coda', 'codaToXml'),
             ('MetronomeMark', 'tempoIndicationToXml'),
@@ -3141,7 +3144,7 @@ class MeasureExporter(XMLExporterBase):
         self.transpositionInterval = None
         self.mxTranspose = None
         self.measureOffsetStart = 0.0
-        self.offsetInMeasure = 0.0
+        self.offsetInMeasure: OffsetQL = 0.0
         self.currentVoiceId: t.Optional[int] = None
         self.nextFreeVoiceNumber: int = 1
         self.nextArpeggioNumber: int = 1
@@ -3377,6 +3380,10 @@ class MeasureExporter(XMLExporterBase):
         for m21spannerClass, infoTuple in paramsSet.items():
             mxTag, parameterSet = infoTuple
             for thisSpanner in spannerBundle.getByClass(m21spannerClass):
+                if m21spannerClass == 'DynamicWedge' and thisSpanner.hasOffsetAndDuration:
+                    # DynamicWedges with hasOffsetAndDuration set to True will be handled
+                    # in dynamicWedgeToXml.
+                    continue
                 for posSub in getProc(thisSpanner, target):
                     # create new tag
                     mxElement = Element(mxTag)
@@ -5326,7 +5333,7 @@ class MeasureExporter(XMLExporterBase):
             raise MusicXMLExportException("NoChord object's chordKindStr must be non-empty")
         mxKind.set('text', cs.chordKindStr)
 
-        self.setOffsetOptional(cs, mxHarmony)
+        self.setOffsetOptional(cs.offset, mxHarmony)
         self.setEditorial(mxHarmony, cs)
 
         self.xmlRoot.append(mxHarmony)
@@ -5541,24 +5548,24 @@ class MeasureExporter(XMLExporterBase):
             # TODO: attrGroup: print-style
 
         # TODO: frame -- fretboard
-        self.setOffsetOptional(cs, mxHarmony)
+        self.setOffsetOptional(cs.offset, mxHarmony)
         self.setEditorial(mxHarmony, cs)
         # staff: see joinPartStaffs()
 
         self.xmlRoot.append(mxHarmony)
         return mxHarmony
 
-    def setOffsetOptional(self, m21Obj, mxObj=None, *, setSound=True):
+    def setOffsetOptional(self, offset: OffsetQL, mxObj=None, *, setSound=True):
         '''
-        If this object has an offset different from self.offsetInMeasure,
+        If offset is different from self.offsetInMeasure,
         then create and return an offset Element.
 
         If mxObj is not None then the offset element will be appended to it.
         '''
-        if m21Obj.offset == self.offsetInMeasure:
+        if offset == self.offsetInMeasure:
             return None
-        offsetDifferenceInQl = m21Obj.offset - self.offsetInMeasure
-        offsetDifferenceInDivisions = int(offsetDifferenceInQl * self.currentDivisions)
+        offsetDifferenceInQl: OffsetQL = offset - self.offsetInMeasure
+        offsetDifferenceInDivisions: int = int(offsetDifferenceInQl * self.currentDivisions)
         if mxObj is not None:
             mxOffset = SubElement(mxObj, 'offset')
         else:
@@ -5568,7 +5575,7 @@ class MeasureExporter(XMLExporterBase):
             mxOffset.set('sound', 'yes')  # always affects sound at location in measure.
         return mxOffset
 
-    def placeInDirection(self, mxObj, m21Obj=None, *, setSound=True):
+    def placeInDirection(self, mxObj, m21Obj=None, *, setSound=True, offset=None):
         '''
         Places the mxObj <element> inside <direction><direction-type>
         and sets <offset> if needed.
@@ -5581,7 +5588,9 @@ class MeasureExporter(XMLExporterBase):
         if m21Obj is not None:
             if hasattr(m21Obj, 'placement') and m21Obj.placement is not None:
                 mxDirection.set('placement', m21Obj.placement)
-            self.setOffsetOptional(m21Obj, mxDirection, setSound=setSound)
+            if offset is None:
+                offset = m21Obj.offset
+            self.setOffsetOptional(offset, mxDirection, setSound=setSound)
 
         return mxDirection
 
@@ -5659,6 +5668,51 @@ class MeasureExporter(XMLExporterBase):
 
         self.xmlRoot.append(mxDirection)
         return mxDirection
+
+    def dynamicWedgeToXml(self, dw: dynamics.DynamicWedge):
+        if not dw.hasOffsetAndDuration:
+            # DynamicWedges with hasOffsetAndDuration set to False will be handled in
+            # prePostObjectSpanners.
+            return None
+
+        # Ignore any spanned GeneralNotes, and simply append the appropriate wedge start/stop
+        # direction elements right here.
+        mxWedgeStart: Element = Element('wedge')
+        _synchronizeIds(mxWedgeStart, d)
+        mxWedgeStart.set('type', dw.type)
+        if dw.type == 'crescendo':
+            mxWedgeStart.set('spread', 0)
+            if dw.niente:
+                mxWedgeStart.set('niente', 'yes')
+        else:
+            mxWedgeStart.set('spread', sp.spread)
+
+        mxWedgeStop: Element = Element('wedge')
+        _synchronizeIds(mxWedgeStop, d)
+        mxWedgeStop.set('type', 'stop')
+        if dw.type == 'crescendo':
+            mxWedgeStop.set('spread', sp.spread)
+        else:
+            mxWedgeStop.set('spread', 0)
+            if dw.niente:
+                mxWedgeStop.set('niente', 'yes')
+
+        mxDirection1: Element = self.placeInDirection(  # also handles offset
+            mxWedgeStart,
+            dw
+        )
+        mxDirection2 = self.placeInDirection(  # also handles offset
+            mxWedgeStop,
+            dw,
+            offset = dw.offset + dw.quarterLength
+        )
+
+        # Put any dw.editorial content on the wedge 'start' (mxDirection1)
+        self.setEditorial(mxDirection1, dw)
+
+        self.xmlRoot.append(mxDirection1)
+        self.xmlRoot.append(mxDirection2)
+        return (mxDirection1, mxDirection2)
 
     def segnoToXml(self, segno):
         '''

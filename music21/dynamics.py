@@ -367,6 +367,15 @@ class DynamicWedge(spanner.Spanner):
         self.spread = 15  # this unit is in tenths
         self.niente = False
 
+        # DynamicWedges are positioned in the stream (offset and duration) according
+        # to the offset and duration of the one or two spanned notes.  If you want more
+        # control over offset and duration, set hasOffsetAndDuration to True, set
+        # the DynamicWedge's duration, and insert the DynamicWedge into the
+        # stream at the offset desired.  If you want, you can also add spanned notes
+        # to a DynamicWedge that has hasOffsetAndDuration set to True, but they will
+        # be ignored.
+        self.hasOffsetAndDuration = False
+
 
 class Crescendo(DynamicWedge):
     '''
