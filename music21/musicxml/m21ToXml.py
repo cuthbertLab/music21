@@ -6244,22 +6244,26 @@ class MeasureExporter(XMLExporterBase):
         # TODO: coda
         # TODO: fermata
 
-        if self.rbSpanners:  # and self.rbSpanners[0].isFirst(m)???
-            mxEnding = Element('ending')
-            if position == 'left':
+        if self.rbSpanners:
+            if position == 'left' and self.rbSpanners[0].isFirst(self.stream):
                 endingType = 'start'
-            else:
+            elif position == 'right' and self.rbSpanners[0].isLast(self.stream):
                 endingType = 'stop'
-            numberList = self.rbSpanners[0].getNumberList()
-            numberStr = str(numberList[0])
-            # 0 is not a valid "ending-number"
-            if numberStr == '0':
-                numberStr = ''
-            for num in numberList[1:]:
-                numberStr += ',' + str(num)  # comma-separated ending numbers
-            mxEnding.set('number', numberStr)
-            mxEnding.set('type', endingType)
-            mxBarline.append(mxEnding)  # make sure it is after fermata but before repeat.
+            else:
+                endingType = ''
+
+            if endingType:
+                mxEnding = Element('ending')
+                numberList = self.rbSpanners[0].getNumberList()
+                numberStr = str(numberList[0])
+                # 0 is not a valid "ending-number"
+                if numberStr == '0':
+                    numberStr = ''
+                for num in numberList[1:]:
+                    numberStr += ',' + str(num)  # comma-separated ending numbers
+                mxEnding.set('number', numberStr)
+                mxEnding.set('type', endingType)
+                mxBarline.append(mxEnding)  # make sure it is after fermata but before repeat.
 
         if mxRepeat is not None:
             mxBarline.append(mxRepeat)
