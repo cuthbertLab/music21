@@ -1767,8 +1767,8 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             # renumber the voices in this StaffGroup
             staffGroupScore = stream.Score(partExp.staffGroup.getSpannedElements())
             measuresStream = staffGroupScore.recurse().getElementsByClass(stream.Measure).stream()
-            nextVoiceId: int = 1
             for measureStack in OffsetIterator(measuresStream):
+                nextVoiceId: int = 1
                 for m in measureStack:
                     for v in m[stream.Voice]:
                         if not isinstance(v.id, int):

@@ -180,7 +180,7 @@ class Test(unittest.TestCase):
         staffGroup = layout.StaffGroup([ps1, ps2, ps3])
         s.insert(0, staffGroup)
 
-        tree = self.getET(s)
+        tree = self.getET(s, makeNotation=False)
         # helpers.dump(tree)
         mxNotes = tree.findall('part/measure/note')
         for mxNote in mxNotes:
