@@ -17,6 +17,7 @@ import abc
 import csv
 import fractions
 import re
+import string
 import types
 import typing as t
 import unittest
@@ -28,6 +29,7 @@ from music21 import key
 from music21 import metadata
 from music21 import meter
 from music21 import roman
+from music21 import spanner
 from music21 import stream
 
 from music21 import exceptions21
@@ -55,9 +57,6 @@ V1_HEADERS = types.MappingProxyType({
     'beat': float,
     'totbeat': str,
     'timesig': str,
-    # 'op': str,
-    # 'no': str,
-    # 'mov': str,
     'length': float,
     'global_key': str,
     'local_key': str,
@@ -89,6 +88,7 @@ V2_HEADERS = types.MappingProxyType({
     'mn': int,
     'mn_onset': _float_or_frac,
     'timesig': str,
+    'volta': str,
     'globalkey': str,
     'localkey': str,
     'pedal': str,
@@ -384,9 +384,6 @@ class TabChordBase(abc.ABC):
         #   similar to the following three lines for every attribute (with
         #   attributes specific to subclasses in their own methods that would
         #   then call __super__()).
-        # if 'chord' in head_indices:
-        #     i, type_to_coerce_to = head_indices['chord']
-        #     self.chord = type_to_coerce_to(row[i])
         for col_name, (i, type_to_coerce_to) in headIndices.items():
             if not hasattr(self, col_name):
                 pass  # would it be appropriate to emit a warning here?
@@ -419,6 +416,7 @@ class TabChordV2(TabChordBase):
         super().__init__()
         self.mn = None
         self.mn_onset = None
+        self.volta = None
         self.globalkey = None
         self.localkey = None
         self.dcml_version = 2
@@ -577,13 +575,7 @@ class TsvHandler:
         # this method replaces the previously stand-alone makeTabChord function
         thisEntry = self._tab_chord_cls()
         thisEntry.populateFromRow(row, self._head_indices, self._extra_indices)
-        # for col_name, (i, type_to_coerce_to) in self._head_indices.items():
-        #     # set attributes of thisEntry according to values in row
-        #     setattr(thisEntry, col_name, type_to_coerce_to(row[i]))
-        # thisEntry.extra = {
-        #     col_name: row[i] for i, col_name in self._extra_indices.items() if row[i]
-        # }
-        thisEntry.representationType = 'DCML'  # Addeds
+        thisEntry.representationType = 'DCML'  # Added
 
         return thisEntry
 
@@ -624,7 +616,12 @@ class TsvHandler:
 
         for thisChord in self.chordList:
             offsetInMeasure = thisChord.beat - 1  # beats always measured in quarter notes
-            measureNumber = thisChord.measure
+            if thisChord.volta:
+                measureNumber = (
+                    f'{thisChord.measure}{string.ascii_lowercase[int(thisChord.volta) - 1]}'
+                )
+            else:
+                measureNumber = thisChord.measure
             m21Measure = p.measure(measureNumber)
             if m21Measure is None:
                 raise ValueError('m21Measure should not be None')
@@ -685,18 +682,41 @@ class TsvHandler:
         currentOffset: t.Union[float, fractions.Fraction] = 0.0
 
         previousMeasure: int = self.chordList[0].measure - 1  # Covers pickups
+        previousVolta: str = ''
+        repeatBracket: t.Optional[spanner.RepeatBracket] = None
         for entry in self.chordList:
-            if entry.measure == previousMeasure:
+            if self.dcml_version == 2 and entry.volta != previousVolta:
+                if entry.volta:
+                    # ending_i += 1
+                    repeatBracket = spanner.RepeatBracket(number=entry.volta)
+                    # According to the docs, "the convention is to put the
+                    #   spanner at the beginning of the innermost Stream that
+                    #   contains all the Spanners"
+                    p.insert(0, repeatBracket)
+                else:
+                    # ending_i = -1
+                    repeatBracket = None
+                previousVolta = entry.volta
+            elif entry.measure == previousMeasure:
+                # NB we only want to continue here if the 'volta' (ending) has
+                #   not changed
                 continue
-            elif entry.measure != previousMeasure + 1:  # Not every measure has a chord change.
+            if entry.measure > previousMeasure + 1:  # Not every measure has a chord change.
                 for mNo in range(previousMeasure + 1, entry.measure + 1):
                     m = stream.Measure(number=mNo)
                     m.offset = currentOffset + currentMeasureLength
+
                     p.insert(m)
                     currentOffset = m.offset
                     previousMeasure = mNo
-            else:  # entry.measure = previousMeasure + 1
-                m = stream.Measure(number=entry.measure)
+            else:  # entry.measure <= previousMeasure + 1
+                if entry.volta:
+                    measureNumber = (
+                        f'{entry.measure}{string.ascii_lowercase[int(entry.volta) - 1]}'
+                    )
+                else:
+                    measureNumber = entry.measure
+                m = stream.Measure(number=measureNumber)
                 # 'totbeat' column (containing the current offset) has been
                 # removed from v2 so instead we calculate the offset directly
                 # to be portable across versions
@@ -709,6 +729,8 @@ class TsvHandler:
                     currentMeasureLength = newTS.barDuration.quarterLength
 
                 previousMeasure = entry.measure
+            if repeatBracket is not None:
+                repeatBracket.addSpannedElements(m)
 
         s.append(p)
         first_measure = s[stream.Measure].first()
@@ -1219,6 +1241,8 @@ class Test(unittest.TestCase):
 
                 forward1 = TsvHandler(path, dcml_version=version)
                 stream1 = forward1.toM21Stream()
+                if version == 2:
+                    breakpoint()
 
                 # Write back to tsv
                 temp_tsv2 = envLocal.getTempFile()
@@ -1310,11 +1334,38 @@ class Test(unittest.TestCase):
 
         self.assertIsInstance(veryLocalKey, str)
         self.assertEqual(veryLocalKey, 'b')
+    
+    def testRepeats(self):
+        def _test_ending_contents(
+            rb: spanner.RepeatBracket, expectedMeasures: t.List[str]
+        ) -> None:
+            measure_nos = [m.measureNumberWithSuffix() for m in rb[stream.Measure]]
+            self.assertEqual(measure_nos, expectedMeasures)
+
+        path = common.getSourceFilePath() / 'romanText' / 'tsvEg_v2_repeats.tsv'
+
+        # The test file corresponds to the following romanText but is somewhat
+        #   harder to read:
+        # Time Signature: 2/4
+        # m1 C: I
+        # m2a V :||
+        # m2b I
+
+        handler = TsvHandler(path, dcml_version=2)
+        stream1 = handler.toM21Stream()
+        rb_iter = stream1[spanner.RepeatBracket]
+        self.assertEqual(len(rb_iter), 2)
+        first_ending, second_ending = rb_iter
+        _test_ending_contents(first_ending, ['2a'])
+        _test_ending_contents(second_ending, ['2b'])
+
 
 
 # ------------------------------------------------------------------------------
 
 
 if __name__ == '__main__':
-    import music21
-    music21.mainTest(Test)
+    Test().testRepeats()
+    # import music21
+    # TODO
+    # music21.mainTest(Test)
