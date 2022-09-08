@@ -1241,8 +1241,6 @@ class Test(unittest.TestCase):
 
                 forward1 = TsvHandler(path, dcml_version=version)
                 stream1 = forward1.toM21Stream()
-                if version == 2:
-                    breakpoint()
 
                 # Write back to tsv
                 temp_tsv2 = envLocal.getTempFile()
@@ -1334,7 +1332,7 @@ class Test(unittest.TestCase):
 
         self.assertIsInstance(veryLocalKey, str)
         self.assertEqual(veryLocalKey, 'b')
-    
+
     def testRepeats(self):
         def _test_ending_contents(
             rb: spanner.RepeatBracket, expectedMeasures: t.List[str]
@@ -1358,7 +1356,6 @@ class Test(unittest.TestCase):
         first_ending, second_ending = rb_iter
         _test_ending_contents(first_ending, ['2a'])
         _test_ending_contents(second_ending, ['2b'])
-
 
 
 # ------------------------------------------------------------------------------
