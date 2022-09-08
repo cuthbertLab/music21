@@ -616,7 +616,7 @@ class TsvHandler:
 
         for thisChord in self.chordList:
             offsetInMeasure = thisChord.beat - 1  # beats always measured in quarter notes
-            if thisChord.volta:
+            if self.dcml_version == 2 and thisChord.volta:
                 measureNumber = (
                     f'{thisChord.measure}{string.ascii_lowercase[int(thisChord.volta) - 1]}'
                 )
@@ -710,7 +710,7 @@ class TsvHandler:
                     currentOffset = m.offset
                     previousMeasure = mNo
             else:  # entry.measure <= previousMeasure + 1
-                if entry.volta:
+                if self.dcml_version == 2 and entry.volta:
                     measureNumber = (
                         f'{entry.measure}{string.ascii_lowercase[int(entry.volta) - 1]}'
                     )
@@ -1362,7 +1362,7 @@ class Test(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    Test().testRepeats()
-    # import music21
     # TODO
-    # music21.mainTest(Test)
+    # Test().testRepeats()
+    import music21
+    music21.mainTest(Test)
