@@ -42,6 +42,8 @@ environLocal = environment.Environment('roman')
 
 # TODO: setting inversion should change the figure
 
+T = t.TypeVar('T', bound='RomanNumeral')
+
 # -----------------------------------------------------------------------------
 
 
@@ -3088,6 +3090,28 @@ class RomanNumeral(harmony.Harmony):
             raise RomanNumeralException(
                 f'_updatePitches() was unable to derive pitches from the figure: {self.figure!r}'
             )  # pragma: no cover
+
+    def transpose(self, value, *, inPlace=False) -> t.Optional[T]:
+        '''
+        Overrides :meth:`~music21.harmony.Harmony.transpose` so that `key`
+        attribute is transposed as well.
+
+        >>> rn = roman.RomanNumeral('I', 'C')
+        >>> rn
+        <music21.roman.RomanNumeral I in C major>
+        >>> rn.transpose(4)
+        <music21.roman.RomanNumeral I in E major>
+        >>> rn.transpose(-4, inPlace=True)
+        >>> rn
+        <music21.roman.RomanNumeral I in A- major>
+        '''
+        post = super().transpose(value, inPlace=inPlace)
+        if not inPlace:
+            post.key = self.key.transpose(value, inPlace=False)
+            return post
+        else:
+            self.key.transpose(value, inPlace=True)
+            return None
 
 
     # PUBLIC PROPERTIES #
