@@ -2943,7 +2943,6 @@ class PartExporter(XMLExporterBase):
                 warnings.warn(MusicXMLWarning, str(se))
         for m in measures:
             for m_or_v in [m, *m.voices]:
-                stream.makeNotation.makeTupletBrackets(m_or_v, inPlace=True)
                 if not m_or_v.streamStatus.tuplets:
                     stream.makeNotation.makeTupletBrackets(m_or_v, inPlace=True)
 
