@@ -1323,9 +1323,14 @@ class ConverterRomanText(SubConverter):
         if fp is None:
             fp = self.getTemporaryFile()
 
-        with open(fp, 'w', encoding='utf-8') as text_file:
+        if not hasattr(fp, 'write'):
+            with open(fp, 'w', encoding='utf-8') as text_file:
+                for entry in writeRoman.RnWriter(obj).combinedList:
+                    text_file.write(entry + '\n')
+        else:
+            # file-like object
             for entry in writeRoman.RnWriter(obj).combinedList:
-                text_file.write(entry + '\n')
+                fp.write(entry + '\n')
 
         return fp
 
@@ -1687,6 +1692,19 @@ class Test(unittest.TestCase):
             self.assertIn('<music21.braille.segment BrailleSegment>', f.read())
         os.remove(out)
 
+    def testWriteRomanText(self):
+        import textwrap
+        from io import StringIO
+        from music21 import converter
+
+        rntxt = textwrap.dedent('''
+            Time Signature: 3/4
+            m1 C: I
+        ''')
+        s = converter.parse(rntxt, format='romanText')
+        text_stream = StringIO()
+        s.write('romanText', text_stream)
+        self.assertTrue(text_stream.getvalue().endswith(rntxt))
 
 class TestExternal(unittest.TestCase):
     show = True
