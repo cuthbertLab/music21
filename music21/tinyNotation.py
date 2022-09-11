@@ -226,6 +226,8 @@ and set it up once to use the mappings above.   See
 :class:`~music21.alpha.trecento.notation.TrecentoTinyConverter` (especially the code)
 for details on how to do that.
 '''
+from __future__ import annotations
+
 import collections
 import copy
 import fractions
@@ -233,6 +235,7 @@ import re
 import typing  # not importing as t, because of extensive preexisting use of `t` as token
 import unittest
 
+from music21.base import Music21Object  # for typing only.
 from music21 import note
 from music21 import duration
 from music21 import exceptions21
@@ -280,7 +283,7 @@ class State:
         '''
         pass
 
-    def end(self) -> None:
+    def end(self) -> typing.Optional[Music21Object]:
         '''
         called just after removing state
         '''
@@ -870,6 +873,11 @@ def _getDefaultTokenMap() -> typing.List[
     ]
 
 
+_stateDictDefault = {
+    'currentTimeSignature': None,
+    'lastDuration': 1.0
+}
+
 class Converter:
     '''
     Main conversion object for TinyNotation.
@@ -1113,11 +1121,11 @@ class Converter:
         raiseExceptions: bool = False,
         **_keywords
     ):
-        self.stream = None
-        self.stateDict = None
+        self.stream = stream.Part()
+        self.stateDict = copy.copy(_stateDictDefault)
         self.stringRep = stringRep
-        self.activeStates = []
-        self.preTokens = None
+        self.activeStates: typing.List[State] = []
+        self.preTokens: typing.List[str] = []
 
         self.generalBracketStateRe = re.compile(r'(\w+){')
         self.tieStateRe = re.compile(r'~')
@@ -1132,15 +1140,10 @@ class Converter:
 
         self.makeNotation = makeNotation
         self.raiseExceptions = raiseExceptions
-
-        self.stateDictDefault = {'currentTimeSignature': None,
-                                 'lastDuration': 1.0
-                                 }
-        self.load(stringRep)
         # will be filled by self.setupRegularExpressions()
-        self._tokenMapRe = None
+        self._tokenMapRe: typing.List[typing.Tuple[typing.Pattern, typing.Type]] = []
 
-    def load(self, stringRep: str):
+    def load(self, stringRep: str) -> None:
         '''
         Loads a stringRepresentation into `.stringRep`
         and resets the parsing state.
@@ -1159,11 +1162,13 @@ class Converter:
         >>> len(ns2)
         4
         '''
+        # NOTE(msc): any changes here have to be reflected in the constructor
+        #    which does not call this routine.
         self.stream = stream.Part()
-        self.stateDict = copy.copy(self.stateDictDefault)
-        self.stringRep = stringRep
+        self.stateDict = copy.copy(_stateDictDefault)
         self.activeStates = []
         self.preTokens = []
+        self.stringRep = stringRep
 
     def splitPreTokens(self):
         '''
@@ -1197,9 +1202,9 @@ class Converter:
         splitPreTokens, setupRegularExpressions, then runs
         through each preToken, and runs postParse.
         '''
-        if self.preTokens == [] and self.stringRep != '':
+        if not self.preTokens and self.stringRep != '':
             self.splitPreTokens()
-        if self._tokenMapRe is None:
+        if not self._tokenMapRe:
             self.setupRegularExpressions()
 
         for i, t in enumerate(self.preTokens):
@@ -1267,8 +1272,7 @@ class Converter:
         if numberOfStatesToEnd > len(self.activeStates):
             if self.raiseExceptions:
                 raise TinyNotationException(f'Token {t_orig!r} closes more states than are open.')
-            else:
-                numberOfStatesToEnd = len(self.activeStates)
+            numberOfStatesToEnd = len(self.activeStates)
 
         for i in range(numberOfStatesToEnd):
             stateToRemove = self.activeStates.pop()
@@ -1421,16 +1425,33 @@ class Test(unittest.TestCase):
         c = Converter(self.parseTest)
         c.parse()
         s = c.stream
-        sfn = s.flatten().notes
-        self.assertEqual(sfn[0].tie.type, 'start')
-        self.assertEqual(sfn[1].tie.type, 'continue')
-        self.assertEqual(sfn[2].tie.type, 'stop')
+        sfn = s.flatten().getElementsByClass(note.Note)
+        t0 = sfn[0].tie
+        t1 = sfn[1].tie
+        t2 = sfn[2].tie
+        if typing.TYPE_CHECKING:
+            assert t0 is not None
+            assert t1 is not None
+            assert t2 is not None
+
+        self.assertIsInstance(t0, tie.Tie)
+        self.assertIsInstance(t1, tie.Tie)
+        self.assertIsInstance(t2, tie.Tie)
+        self.assertEqual(t0.type, 'start')
+        self.assertEqual(t1.type, 'continue')
+        self.assertEqual(t2.type, 'stop')
         self.assertEqual(sfn[0].step, 'C')
         self.assertEqual(sfn[0].octave, 3)
         self.assertEqual(sfn[1].lyric, 'hello')
         self.assertEqual(sfn[2].id, 'mine')
-        self.assertEqual(sfn[6].pitch.accidental.alter, 1)
-        self.assertEqual(sfn[7].pitch.accidental.alter, -2)
+
+        acc6 = sfn[6].pitch.accidental
+        acc7 = sfn[7].pitch.accidental
+        if typing.TYPE_CHECKING:
+            assert acc6 is not None
+            assert acc7 is not None
+        self.assertEqual(acc6.alter, 1)
+        self.assertEqual(acc7.alter, -2)
         self.assertEqual(sfn[9].editorial.ficta.alter, 0)
         self.assertEqual(sfn[12].duration.quarterLength, 1.0)
         self.assertEqual(sfn[12].expressions[0].classes, expressions.Fermata().classes)
