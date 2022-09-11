@@ -16,7 +16,7 @@ music, but it is pretty useful for a lot of short examples, so we have
 made it a generally supported music21 format.
 
 
-N.B.: TinyNotation is not meant to expand to cover every single case.  Instead
+N.B.: TinyNotation is not meant to expand to cover every single case.  Instead,
 it is meant to be subclassable to extend to the cases *your* project needs.
 
 Here are the most important rules by default:
@@ -226,15 +226,18 @@ and set it up once to use the mappings above.   See
 :class:`~music21.alpha.trecento.notation.TrecentoTinyConverter` (especially the code)
 for details on how to do that.
 '''
+from __future__ import annotations
+
 import collections
 import copy
+import fractions
 import re
-import typing
+import typing  # not importing as t, because of extensive preexisting use of `t` as token
 import unittest
 
+from music21.base import Music21Object  # for typing only.
 from music21 import note
 from music21 import duration
-from music21 import common
 from music21 import exceptions21
 from music21 import stream
 from music21 import tie
@@ -270,7 +273,7 @@ class State:
 
     def __init__(self, parent=None, stateInfo=None):
         self.affectedTokens = []
-        self.parent = common.wrapWeakref(parent)
+        self.parent = parent
         self.stateInfo = stateInfo
         # print('Adding state', self, parent.activeStates)
 
@@ -280,7 +283,7 @@ class State:
         '''
         pass
 
-    def end(self):
+    def end(self) -> typing.Optional[Music21Object]:
         '''
         called just after removing state
         '''
@@ -310,7 +313,12 @@ class State:
             if len(self.affectedTokens) == self.autoExpires:
                 self.end()
                 # this is a hack that should be done away with...
-                p = common.unwrapWeakref(self.parent)
+                p = self.parent
+
+                # I thought this was potentially O(n^2) but it's actually
+                # just O(n) on activeStates and on pop() operation.
+                # most of the time, backCount will be -1 and pop(-1)
+                # is O(1).  in fact pop(-m) seems to be O(m) not O(n)!
                 for i in range(len(p.activeStates)):
                     backCount = -1 * (i + 1)
                     if p.activeStates[backCount] is self:
@@ -395,7 +403,7 @@ class Modifier:
     def __init__(self, modifierData, modifierString, parent):
         self.modifierData = modifierData
         self.modifierString = modifierString
-        self.parent = common.wrapWeakref(parent)
+        self.parent = parent
 
     def preParse(self, tokenString):
         '''
@@ -865,6 +873,11 @@ def _getDefaultTokenMap() -> typing.List[
     ]
 
 
+_stateDictDefault = {
+    'currentTimeSignature': None,
+    'lastDuration': 1.0
+}
+
 class Converter:
     '''
     Main conversion object for TinyNotation.
@@ -875,10 +888,38 @@ class Converter:
        measures, Clefs, etc.
     * `raiseExceptions=True` to make errors become exceptions.
 
+    Generally, users should just use the general music21 converter (lowercase c) parse
+    function and do not need to be in this module at all:
+
+    >>> part = converter.parse('4/4 C4 D4 E2 F1', format='tinyNotation')
+    >>> part.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.BassClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+        {2.0} <music21.note.Note E>
+    {4.0} <music21.stream.Measure 2 offset=4.0>
+        {0.0} <music21.note.Note F>
+        {4.0} <music21.bar.Barline type=final>
+
+    But for advanced work, create a tinyNotation.Converter object as shown:
 
     >>> tnc = tinyNotation.Converter('4/4 C##4 D e-8 f~ f f# g4 trip{f8 e d} C2=hello')
+
+    Run the parsing routine with `.parse()`
+
     >>> tnc.parse()
     <music21.tinyNotation.Converter object at 0x10aeefbe0>
+
+    And now the `.stream` attribute of the converter object
+    has the Stream (generally Part) ready to send out:
+
+    >>> tnc.stream
+    <music21.stream.Part 0x10acee860>
+
+    And all normal Stream methods are available on it:
+
     >>> tnc.stream.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
@@ -916,14 +957,20 @@ class Converter:
     ['4/4', 'C##4', 'D', 'e-8', 'f~', 'f', 'f#', 'g4', 'trip{f8', 'e', 'd}', 'C2=hello']
     >>> tnc.setupRegularExpressions()
 
-    Then we parse the time signature:
-
+    Then we parse the time signature.
     >>> tnc.parseOne(0, tnc.preTokens[0])
     >>> tnc.stream.coreElementsChanged()
     >>> tnc.stream.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
 
-    Then the first note:
+    (Note that because we are calling
+    `show()` after each note in these docs, but TinyNotation
+    uses high efficiency `stream.core` routines, we need to set the stream
+    to a stable-state by calling `coreElementsChanged` after each call.
+    You would not need to do this in your own subclasses, since that would
+    lose the `O(n)` efficiency when parsing)
+
+    Then parse the first actual note:
 
     >>> tnc.parseOne(1, tnc.preTokens[1])
     >>> tnc.stream.coreElementsChanged()
@@ -966,6 +1013,15 @@ class Converter:
     >>> tnc.activeStates[0].affectedTokens
     [<music21.note.Note F>, <music21.note.Note E>]
 
+    The :class:`~music21.tinyNotation.TripletState` state adds
+    tuplets along the way, but does not set their type.
+
+    >>> f_starts_tuplet = tnc.activeStates[0].affectedTokens[0]
+    >>> f_starts_tuplet.duration.tuplets
+    (<music21.duration.Tuplet 3/2/eighth>,)
+    >>> f_starts_tuplet.duration.tuplets[0].type is None
+    True
+
     But the next token closes the state:
 
     >>> tnc.preTokens[10]
@@ -973,6 +1029,12 @@ class Converter:
     >>> tnc.parseOne(10, tnc.preTokens[10])
     >>> tnc.activeStates
     []
+
+    And this sets the tupet types for the F and D properly:
+
+    >>> f_starts_tuplet.duration.tuplets[0].type
+    'start'
+
     >>> tnc.stream.coreElementsChanged()
     >>> tnc.stream.show('text')
     {0.0} <music21.meter.TimeSignature 4/4>
@@ -996,7 +1058,10 @@ class Converter:
     >>> tnc.stream[-1].id
     'hello'
 
-    Then calling tnc.postParse() runs the makeNotation:
+    At this point the flattened stream is ready, if Converter.makeNotation
+    is False, then not much more needs to happen, but it is True by default.
+
+    So, then calling tnc.postParse() runs the makeNotation:
 
     >>> tnc.postParse()
     >>> tnc.stream.show('text')
@@ -1017,7 +1082,9 @@ class Converter:
         {2.0} <music21.note.Note C>
         {4.0} <music21.bar.Barline type=final>
 
-    Normally invalid notes or other tokens pass freely and drop the token:
+    Let's look at edge cases. Normally, invalid notes or
+    other bad tokens pass freely by dropping the unparseable token.
+    Here `3` is not a valid duration, so `d3` will be dropped.
 
     >>> x = converter.parse('tinyNotation: 4/4 c2 d3 e2')
     >>> x.show('text')
@@ -1029,7 +1096,7 @@ class Converter:
         {4.0} <music21.bar.Barline type=final>
 
     But with the keyword 'raiseExceptions=True' a `TinyNotationException`
-    is raised:
+    is raised if any token cannot be parsed.
 
     >>> x = converter.parse('tinyNotation: 4/4 c2 d3 e2', raiseExceptions=True)
     Traceback (most recent call last):
@@ -1046,12 +1113,19 @@ class Converter:
     _modifierSquareRe = re.compile(r'\[(.*?)]')
     _modifierUnderscoreRe = re.compile(r'_(.*)')
 
-    def __init__(self, stringRep='', **keywords):
-        self.stream = None
-        self.stateDict = None
+    def __init__(
+        self,
+        stringRep: str = '',
+        *,
+        makeNotation: bool = True,
+        raiseExceptions: bool = False,
+        **_keywords
+    ):
+        self.stream = stream.Part()
+        self.stateDict = copy.copy(_stateDictDefault)
         self.stringRep = stringRep
-        self.activeStates = []
-        self.preTokens = None
+        self.activeStates: typing.List[State] = []
+        self.preTokens: typing.List[str] = []
 
         self.generalBracketStateRe = re.compile(r'(\w+){')
         self.tieStateRe = re.compile(r'~')
@@ -1064,20 +1138,12 @@ class Converter:
         self.modifierSquare = None
         self.modifierUnderscore = LyricModifier
 
-        self.keywords = keywords
-
-        self.makeNotation = keywords.get('makeNotation', True)
-        self.raiseExceptions = keywords.get('raiseExceptions', False)
-
-
-        self.stateDictDefault = {'currentTimeSignature': None,
-                                 'lastDuration': 1.0
-                                 }
-        self.load(stringRep)
+        self.makeNotation = makeNotation
+        self.raiseExceptions = raiseExceptions
         # will be filled by self.setupRegularExpressions()
-        self._tokenMapRe = None
+        self._tokenMapRe: typing.List[typing.Tuple[typing.Pattern, typing.Type]] = []
 
-    def load(self, stringRep):
+    def load(self, stringRep: str) -> None:
         '''
         Loads a stringRepresentation into `.stringRep`
         and resets the parsing state.
@@ -1096,11 +1162,13 @@ class Converter:
         >>> len(ns2)
         4
         '''
+        # NOTE(msc): any changes here have to be reflected in the constructor
+        #    which does not call this routine.
         self.stream = stream.Part()
-        self.stateDict = copy.copy(self.stateDictDefault)
-        self.stringRep = stringRep
+        self.stateDict = copy.copy(_stateDictDefault)
         self.activeStates = []
         self.preTokens = []
+        self.stringRep = stringRep
 
     def splitPreTokens(self):
         '''
@@ -1134,9 +1202,9 @@ class Converter:
         splitPreTokens, setupRegularExpressions, then runs
         through each preToken, and runs postParse.
         '''
-        if self.preTokens == [] and self.stringRep != '':
+        if not self.preTokens and self.stringRep != '':
             self.splitPreTokens()
-        if self._tokenMapRe is None:
+        if not self._tokenMapRe:
             self.setupRegularExpressions()
 
         for i, t in enumerate(self.preTokens):
@@ -1145,13 +1213,14 @@ class Converter:
         return self
 
 
-    def parseOne(self, i, t):
+    def parseOne(self, i: int, t: str):
         '''
         parse a single token at position i, with
         text t, possibly adding it to the stream.
 
         Checks for state changes, modifiers, tokens, and end-state brackets.
         '''
+        t_orig = t
         t = self.parseStartStates(t)
         t, numberOfStatesToEnd = self.parseEndStates(t)
         t, activeModifiers = self.parseModifiers(t)
@@ -1180,10 +1249,10 @@ class Converter:
                     break
             except TinyNotationException as excep:
                 if self.raiseExceptions:
-                    raise TinyNotationException(f'Could not parse token: {t!r}') from excep
+                    raise TinyNotationException(f'Could not parse token: {t_orig!r}') from excep
 
         if not hasMatch and self.raiseExceptions:
-            raise TinyNotationException(f'Could not parse token: {t!r}')
+            raise TinyNotationException(f'Could not parse token: {t_orig!r}')
 
         if m21Obj is not None:
             for stateObj in self.activeStates[:]:  # iterate over copy so we can remove.
@@ -1200,6 +1269,11 @@ class Converter:
         if m21Obj is not None:
             self.stream.coreAppend(m21Obj)
 
+        if numberOfStatesToEnd > len(self.activeStates):
+            if self.raiseExceptions:
+                raise TinyNotationException(f'Token {t_orig!r} closes more states than are open.')
+            numberOfStatesToEnd = len(self.activeStates)
+
         for i in range(numberOfStatesToEnd):
             stateToRemove = self.activeStates.pop()
             possibleObj = stateToRemove.end()
@@ -1207,8 +1281,8 @@ class Converter:
                 self.stream.coreAppend(possibleObj)
 
 
-    def parseStartStates(self, t):
-        # noinspection PyShadowingNames
+    def parseStartStates(self, t: str) -> str:
+        # noinspection PyShadowingNames,GrazieInspection
         '''
         Changes the states in self.activeStates, and starts the state given the current data.
         Returns a newly processed token.
@@ -1237,9 +1311,7 @@ class Converter:
         >>> tieState
         <music21.tinyNotation.TieState object at 0x10afab048>
 
-        >>> tieState.parent
-        <weakref at 0x10adb31d8; to 'Converter' at 0x10adb42e8>
-        >>> tieState.parent() is tnc
+        >>> tieState.parent is tnc
         True
         >>> tieState.stateInfo
         '~'
@@ -1291,9 +1363,10 @@ class Converter:
 
         return t
 
-    def parseEndStates(self, t):
+    def parseEndStates(self, t: str) -> typing.Tuple[str, int]:
+        # noinspection GrazieInspection
         '''
-        Trims the endState token ('}') from the t string
+        Trims the endState token (`}`) from the t string
         and then returns a two-tuple of the new token and number
         of states to remove:
 
@@ -1352,16 +1425,33 @@ class Test(unittest.TestCase):
         c = Converter(self.parseTest)
         c.parse()
         s = c.stream
-        sfn = s.flatten().notes
-        self.assertEqual(sfn[0].tie.type, 'start')
-        self.assertEqual(sfn[1].tie.type, 'continue')
-        self.assertEqual(sfn[2].tie.type, 'stop')
+        sfn = s.flatten().getElementsByClass(note.Note)
+        t0 = sfn[0].tie
+        t1 = sfn[1].tie
+        t2 = sfn[2].tie
+        if typing.TYPE_CHECKING:
+            assert t0 is not None
+            assert t1 is not None
+            assert t2 is not None
+
+        self.assertIsInstance(t0, tie.Tie)
+        self.assertIsInstance(t1, tie.Tie)
+        self.assertIsInstance(t2, tie.Tie)
+        self.assertEqual(t0.type, 'start')
+        self.assertEqual(t1.type, 'continue')
+        self.assertEqual(t2.type, 'stop')
         self.assertEqual(sfn[0].step, 'C')
         self.assertEqual(sfn[0].octave, 3)
         self.assertEqual(sfn[1].lyric, 'hello')
         self.assertEqual(sfn[2].id, 'mine')
-        self.assertEqual(sfn[6].pitch.accidental.alter, 1)
-        self.assertEqual(sfn[7].pitch.accidental.alter, -2)
+
+        acc6 = sfn[6].pitch.accidental
+        acc7 = sfn[7].pitch.accidental
+        if typing.TYPE_CHECKING:
+            assert acc6 is not None
+            assert acc7 is not None
+        self.assertEqual(acc6.alter, 1)
+        self.assertEqual(acc7.alter, -2)
         self.assertEqual(sfn[9].editorial.ficta.alter, 0)
         self.assertEqual(sfn[12].duration.quarterLength, 1.0)
         self.assertEqual(sfn[12].expressions[0].classes, expressions.Fermata().classes)
@@ -1458,6 +1548,20 @@ class Test(unittest.TestCase):
                 )
             )
 
+    def test_too_many_states(self):
+        c = Converter('2/4 trip{c8 d e}} f4', makeNotation=False)
+        c.parse()
+        s = c.stream
+        self.assertEqual(s.notes[-2].duration.quarterLength, fractions.Fraction(1, 3))
+        self.assertEqual(s.notes.last().duration.quarterLength, 1.0)
+
+        c = Converter('2/4 trip{c8 d e}} f4', makeNotation=False)
+        c.raiseExceptions = True
+        with self.assertRaisesRegex(
+            TinyNotationException,
+            "Token 'e}}' closes more states than are open"
+        ):
+            c.parse()
 
 
 class TestExternal(unittest.TestCase):
