@@ -778,9 +778,11 @@ class PartStaffExporterMixin:
                 for midMeasureClef in elem.findall('clef'):
                     midMeasureClef.set('number', str(staffNumber))
             if elem.tag == 'barline':
-                # Remove existing <barline>, if any
+                # Remove existing <barline> with the same direction, if any
+                thisBarlineLocation = elem.get('location')
                 for existingBarline in otherMeasure.findall('barline'):
-                    otherMeasure.remove(existingBarline)
+                    if existingBarline.get('location') == thisBarlineLocation:
+                        otherMeasure.remove(existingBarline)
             if elem.tag == 'note':
                 voice = elem.find('voice')
                 if voice is not None:
@@ -1149,6 +1151,30 @@ class Test(unittest.TestCase):
         self.assertEqual(
             root.findall('part/measure/backup/duration')[0].text,
             str(defaults.divisionsPerQuarter)
+        )
+
+    def testForwardRepeatMarks(self):
+        '''Regression test for losing forward repeat marks.'''
+        from music21 import bar
+        from music21 import layout
+        from music21 import note
+
+        measureRH = stream.Measure(
+            [bar.Repeat(direction='start'), note.Note(type='whole')])
+        measureRH.storeAtEnd(bar.Repeat(direction='end'))
+        measureLH = stream.Measure(
+            [bar.Repeat(direction='start'), note.Note(type='whole')])
+        measureLH.storeAtEnd(bar.Repeat(direction='end'))
+
+        ps1 = stream.PartStaff(measureRH)
+        ps2 = stream.PartStaff(measureLH)
+        sg = layout.StaffGroup([ps1, ps2])
+        s = stream.Score([sg, ps1, ps2])
+
+        root = self.getET(s)
+        self.assertEqual(
+            [r.get('direction') for r in root.findall('.//repeat')],
+            ['forward', 'backward']
         )
 
 
