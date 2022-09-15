@@ -383,9 +383,9 @@ class Sites(common.SlottedObjectMixin):
     @overload
     def yieldSites(self,
                    *,
+                   excludeNone: t.Literal[True],
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   excludeNone: t.Literal[True] = False
                    ) -> t.Generator['music21.stream.Stream', None, None]:
         from music21 import stream
         yield stream.Stream()
@@ -393,17 +393,17 @@ class Sites(common.SlottedObjectMixin):
     @overload
     def yieldSites(self,
                    *,
+                   excludeNone: bool = False,
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   excludeNone: bool = False
                    ) -> t.Generator[t.Union['music21.stream.Stream', None], None, None]:
         yield None
 
     def yieldSites(self,
                    *,
+                   excludeNone: bool = False,
                    sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   excludeNone: bool = False
                    ) -> t.Generator[t.Union['music21.stream.Stream', None], None, None]:
         # noinspection PyDunderSlots
         '''
