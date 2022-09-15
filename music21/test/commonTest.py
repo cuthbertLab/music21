@@ -235,8 +235,8 @@ class ModuleGather:
                             'analysis/windowed',
                             'converter/__init__',
 
-                            'musicxml/m21ToXml',
-                            'musicxml/xmlToM21',
+                            'musicxml/test_m21ToXml',
+                            'musicxml/test_xmlToM21',
 
                             'romanText/translate',
                             'corpus/testCorpus',
