@@ -35,6 +35,7 @@ from music21 import meter
 from music21 import note
 from music21 import search
 from music21 import stream
+from music21.stream.enums import GivenElementsBehavior
 
 environLocal = environment.Environment('variant')
 
@@ -95,13 +96,13 @@ class Variant(base.Music21Object):
                                base.Music21Object,
                                t.Sequence[base.Music21Object]] = None,
         name: t.Optional[str] = None,
-        appendOrInsert: t.Literal['append', 'insert', 'offsets'] = 'offsets',
+        givenElementsBehavior: GivenElementsBehavior = GivenElementsBehavior.OFFSETS,
         **music21ObjectKeywords,
     ):
         super().__init__(**music21ObjectKeywords)
         self.exposeTime = False
         self._stream = stream.VariantStorage(givenElements=givenElements,
-                                             appendOrInsert=appendOrInsert)
+                                             givenElementsBehavior=givenElementsBehavior)
 
         self._replacementDuration = None
 

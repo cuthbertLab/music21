@@ -9,6 +9,7 @@
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 import enum
+from music21.common.enums import StrEnum
 
 class StaffType(enum.Enum):
     '''
@@ -37,6 +38,18 @@ class StaffType(enum.Enum):
     EDITORIAL = 'editorial'
     ALTERNATE = 'alternate'
     OTHER = 'other'
+
+
+class GivenElementsBehavior(StrEnum):
+    APPEND = 'append'
+    OFFSETS = 'offsets'
+    INSERT = 'insert'
+
+
+class RecursionType(StrEnum):
+    ELEMENTS_FIRST = 'elementsFirst'
+    FLATTEN = 'flatten'
+    ELEMENTS_ONLY = 'elementsOnly'
 
 
 if __name__ == '__main__':
