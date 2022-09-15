@@ -16,6 +16,7 @@ import collections
 import unittest
 import weakref
 import typing as t
+from typing import overload  # for some reason does not work in PyCharm if not directly imported
 
 from music21 import common
 from music21 import exceptions21
@@ -379,10 +380,31 @@ class Sites(common.SlottedObjectMixin):
         self.siteDict = collections.OrderedDict([(None, _NoneSiteRef), ])
         self._lastID = -1  # cannot be None
 
+    @overload
     def yieldSites(self,
-                   sortByCreationTime: t.Union[str, bool] = False,
+                   *,
+                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
                    priorityTarget=None,
-                   excludeNone=False):
+                   excludeNone: t.Literal[True] = False
+                   ) -> t.Generator['music21.stream.Stream', None, None]:
+        from music21 import stream
+        yield stream.Stream()
+
+    @overload
+    def yieldSites(self,
+                   *,
+                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   priorityTarget=None,
+                   excludeNone: bool = False
+                   ) -> t.Generator[t.Union['music21.stream.Stream', None], None, None]:
+        yield None
+
+    def yieldSites(self,
+                   *,
+                   sortByCreationTime: t.Union[bool, t.Literal['reverse']] = False,
+                   priorityTarget=None,
+                   excludeNone: bool = False
+                   ) -> t.Generator[t.Union['music21.stream.Stream', None], None, None]:
         # noinspection PyDunderSlots
         '''
         Yield references; order, based on dictionary keys, is from least
@@ -409,13 +431,11 @@ class Sites(common.SlottedObjectMixin):
         >>> aSites.add(aObj)
         >>> aSites.add(bObj)
 
-        Returns a generator (The ellipsis in the repr here is
-        because Python 3.5+ gives a fully qualified name to a generator object):
-
+        Returns a generator:
 
         >>> ys = aSites.yieldSites()
         >>> ys
-        <generator object ...yieldSites at 0x1058085e8>
+        <generator object Sites.yieldSites at 0x1058085e8>
 
         That's no help, so iterate over it instead:
 
@@ -434,11 +454,10 @@ class Sites(common.SlottedObjectMixin):
         b
         a
 
-        *Changes:*
-
-        # v.3: changed dramatically from previously unused version
-        # `sortByCreationTime='reverse'` is removed, since the ordered dict takes
-        care of it and was not working
+        Changed in v.3: changed dramatically from previously unused version
+            `sortByCreationTime='reverse'` is removed, since the ordered dict takes
+            care of it and was not working.
+        Changed in v.8: arguments are keyword only
         '''
         keyRepository = list(self.siteDict.keys())
         if sortByCreationTime is True:
@@ -509,7 +528,9 @@ class Sites(common.SlottedObjectMixin):
 
         * Changed in v5.5: keyword only.
         '''
-        post = list(self.yieldSites(sortByCreationTime, priorityTarget, excludeNone))
+        post = list(self.yieldSites(sortByCreationTime=sortByCreationTime,
+                                    priorityTarget=priorityTarget,
+                                    excludeNone=excludeNone))
 
         # we do this resorting again, because the priority target might not match id, and we
         # want to be extra safe.  If you want fast, use .yieldSites

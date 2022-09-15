@@ -43,7 +43,6 @@ import copy
 import warnings
 import weakref
 
-from collections import namedtuple
 from importlib.util import find_spec
 
 # for type annotation only
@@ -128,7 +127,10 @@ class ElementException(exceptions21.Music21Exception):
 
 # -----------------------------------------------------------------------------
 # for contextSites searches...
-ContextTuple = namedtuple('ContextTuple', ['site', 'offset', 'recurseType'])
+class ContextTuple(t.NamedTuple):
+    site: 'music21.stream.Stream'
+    offset: OffsetQL
+    recurseType: 'music21.stream.enums.RecursionType'
 
 
 # pseudo class for returning splitAtX() type commands.
@@ -1723,18 +1725,18 @@ class Music21Object(prebase.ProtoM21Object):
 
         Each tuple contains three elements:
 
-        .site --  Stream object,
+        .site --  Stream object
         .offset -- the offset or position (sortTuple) of this element in that Stream
-        .recurseType -- the method of searching that should be applied to search for a context.
+        .recurseType -- the way of searching that should be applied to search for a context.
 
-        The recurseType methods are:
+        The recurseType values are all music21.stream.enums.RecurseType:
 
-            * 'flatten' -- flatten the stream and then look from this offset backwards.
+            * FLATTEN -- flatten the stream and then look from this offset backwards.
 
-            * 'elementsOnly' -- only search the stream's personal
+            * ELEMENTS_ONLY -- only search the stream's personal
                elements from this offset backwards
 
-            * 'elementsFirst' -- search this stream backwards,
+            * ELEMENTS_FIRST -- search this stream backwards,
                and then flatten and search backwards
 
         >>> c = corpus.parse('bwv66.6')
@@ -1749,9 +1751,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> for csTuple in n.contextSites(returnSortTuples=True):
         ...      yClearer = (csTuple.site, csTuple.offset.shortRepr(), csTuple.recurseType)
         ...      print(yClearer)
-        (<music21.stream.Measure 3 offset=9.0>, '0.5 <0.20...>', 'elementsFirst')
-        (<music21.stream.Part Alto>, '9.5 <0.20...>', 'flatten')
-        (<music21.stream.Score bach>, '9.5 <0.20...>', 'elementsOnly')
+        (<music21.stream.Measure 3 offset=9.0>, '0.5 <0.20...>', <RecursionType.ELEMENTS_FIRST>)
+        (<music21.stream.Part Alto>, '9.5 <0.20...>', <RecursionType.FLATTEN>)
+        (<music21.stream.Score bach>, '9.5 <0.20...>', <RecursionType.ELEMENTS_ONLY>)
 
         Streams have themselves as the first element in their context sites, at position
         zero and classSortOrder negative infinity.
@@ -1767,9 +1769,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> for csTuple in m.contextSites(returnSortTuples=True):
         ...      yClearer = (csTuple.site, csTuple.offset.shortRepr(), csTuple.recurseType)
         ...      print(yClearer)
-        (<music21.stream.Measure 3 offset=9.0>, '0.0 <-inf.-20...>', 'elementsFirst')
-        (<music21.stream.Part Alto>, '9.0 <0.-20...>', 'flatten')
-        (<music21.stream.Score bach>, '9.0 <0.-20...>', 'elementsOnly')
+        (<music21.stream.Measure 3 offset=9.0>, '0.0 <-inf.-20...>', <RecursionType.ELEMENTS_FIRST>)
+        (<music21.stream.Part Alto>, '9.0 <0.-20...>', <RecursionType.FLATTEN>)
+        (<music21.stream.Score bach>, '9.0 <0.-20...>', <RecursionType.ELEMENTS_ONLY>)
 
         Here we make a copy of the earlier measure, and we see that its contextSites
         follow the derivationChain from the original measure and still find the Part
@@ -1783,13 +1785,13 @@ class Music21Object(prebase.ProtoM21Object):
         ...      print(csTuple, mCopy in csTuple.site)
         ContextTuple(site=<music21.stream.Measure 3333 offset=0.0>,
                      offset=0.0,
-                     recurseType='elementsFirst') False
+                     recurseType=<RecursionType.ELEMENTS_FIRST>) False
         ContextTuple(site=<music21.stream.Part Alto>,
                      offset=9.0,
-                     recurseType='flatten') False
+                     recurseType=<RecursionType.FLATTEN>) False
         ContextTuple(site=<music21.stream.Score bach>,
                      offset=9.0,
-                     recurseType='elementsOnly') False
+                     recurseType=<RecursionType.ELEMENTS_ONLY>) False
 
         If followDerivation were False, then the Part and Score would not be found.
 
@@ -1797,7 +1799,7 @@ class Music21Object(prebase.ProtoM21Object):
         ...     print(csTuple)
         ContextTuple(site=<music21.stream.Measure 3333 offset=0.0>,
                      offset=0.0,
-                     recurseType='elementsFirst')
+                     recurseType=<RecursionType.ELEMENTS_FIRST>)
 
         >>> partIterator = c.parts
         >>> m3 = partIterator[1].measure(3)
@@ -1805,13 +1807,13 @@ class Music21Object(prebase.ProtoM21Object):
         ...      print(csTuple)
         ContextTuple(site=<music21.stream.Measure 3 offset=9.0>,
                      offset=0.0,
-                     recurseType='elementsFirst')
+                     recurseType=<RecursionType.ELEMENTS_FIRST>)
         ContextTuple(site=<music21.stream.Part Alto>,
                      offset=9.0,
-                     recurseType='flatten')
+                     recurseType=<RecursionType.FLATTEN>)
         ContextTuple(site=<music21.stream.Score bach>,
                      offset=9.0,
-                     recurseType='elementsOnly')
+                     recurseType=<RecursionType.ELEMENTS_ONLY>)
 
         Sorting order:
 
@@ -2469,7 +2471,14 @@ class Music21Object(prebase.ProtoM21Object):
         else:
             self._naiveOffset = offset
 
-    def sortTuple(self, useSite=False, raiseExceptionOnMiss=False):
+    def sortTuple(self,
+                  useSite: t.Union[
+                      t.Literal[False],
+                      None,
+                      'music21.stream.Stream',
+                  ] = False,
+                  raiseExceptionOnMiss: bool = False
+                  ) -> SortTuple:
         '''
         Returns a collections.namedtuple called SortTuple(atEnd, offset, priority, classSortOrder,
         isNotGrace, insertIndex)

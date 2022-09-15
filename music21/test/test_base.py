@@ -948,10 +948,12 @@ class Test(unittest.TestCase):
         for y in n.contextSites():
             yTup = (y.site, y.offset, y.recurseType)
             siteList.append(repr(yTup))
-        self.assertEqual(siteList,
-                         ["(<music21.stream.Measure 3 offset=9.0>, 0.5, 'elementsFirst')",
-                          "(<music21.stream.Part Alto>, 9.5, 'flatten')",
-                          "(<music21.stream.Score bach>, 9.5, 'elementsOnly')"])
+        self.assertEqual(
+            siteList,
+            ['(<music21.stream.Measure 3 offset=9.0>, 0.5, <RecursionType.ELEMENTS_FIRST>)',
+             '(<music21.stream.Part Alto>, 9.5, <RecursionType.FLATTEN>)',
+             '(<music21.stream.Score bach>, 9.5, <RecursionType.ELEMENTS_ONLY>)']
+        )
 
         m = c[2][4]
         self.assertEqual(repr(m), '<music21.stream.Measure 3 offset=9.0>')
@@ -960,10 +962,12 @@ class Test(unittest.TestCase):
         for y in m.contextSites():
             yTup = (y.site, y.offset, y.recurseType)
             siteList.append(repr(yTup))
-        self.assertEqual(siteList,
-                         ["(<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')",
-                          "(<music21.stream.Part Alto>, 9.0, 'flatten')",
-                          "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
+        self.assertEqual(
+            siteList,
+            ['(<music21.stream.Measure 3 offset=9.0>, 0.0, <RecursionType.ELEMENTS_FIRST>)',
+             '(<music21.stream.Part Alto>, 9.0, <RecursionType.FLATTEN>)',
+             '(<music21.stream.Score bach>, 9.0, <RecursionType.ELEMENTS_ONLY>)']
+        )
 
         m2 = copy.deepcopy(m)
         m2.number = 3333
@@ -971,10 +975,12 @@ class Test(unittest.TestCase):
         for y in m2.contextSites():
             yTup = (y.site, y.offset, y.recurseType)
             siteList.append(repr(yTup))
-        self.assertEqual(siteList,
-                         ["(<music21.stream.Measure 3333 offset=0.0>, 0.0, 'elementsFirst')",
-                          "(<music21.stream.Part Alto>, 9.0, 'flatten')",
-                          "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
+        self.assertEqual(
+            siteList,
+            ['(<music21.stream.Measure 3333 offset=0.0>, 0.0, <RecursionType.ELEMENTS_FIRST>)',
+             '(<music21.stream.Part Alto>, 9.0, <RecursionType.FLATTEN>)',
+             '(<music21.stream.Score bach>, 9.0, <RecursionType.ELEMENTS_ONLY>)']
+        )
         siteList = []
 
         cParts = c.parts.stream()  # need this otherwise it could possibly be garbage collected.
@@ -986,11 +992,13 @@ class Test(unittest.TestCase):
             yTup = (y.site, y.offset, y.recurseType)
             siteList.append(repr(yTup))
 
-        self.assertEqual(siteList,
-                         ["(<music21.stream.Measure 3 offset=9.0>, 0.0, 'elementsFirst')",
-                          "(<music21.stream.Part Alto>, 9.0, 'flatten')",
-                          "(<music21.stream.Score partStream>, 9.0, 'elementsOnly')",
-                          "(<music21.stream.Score bach>, 9.0, 'elementsOnly')"])
+        self.assertEqual(
+            siteList,
+            ['(<music21.stream.Measure 3 offset=9.0>, 0.0, <RecursionType.ELEMENTS_FIRST>)',
+             '(<music21.stream.Part Alto>, 9.0, <RecursionType.FLATTEN>)',
+             '(<music21.stream.Score partStream>, 9.0, <RecursionType.ELEMENTS_ONLY>)',
+             '(<music21.stream.Score bach>, 9.0, <RecursionType.ELEMENTS_ONLY>)']
+        )
 
     def testContextSitesB(self):
         p1 = stream.Part()
