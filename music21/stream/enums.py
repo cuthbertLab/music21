@@ -45,10 +45,12 @@ class GivenElementsBehavior(StrEnum):
     OFFSETS = 'offsets'
     INSERT = 'insert'
 
+
 class RecursionType(StrEnum):
     ELEMENTS_FIRST = 'elementsFirst'
     FLATTEN = 'flatten'
     ELEMENTS_ONLY = 'elementsOnly'
+
 
 if __name__ == '__main__':
     from music21 import mainTest

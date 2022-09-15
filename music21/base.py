@@ -1719,13 +1719,13 @@ class Music21Object(prebase.ProtoM21Object):
         self,
         *,
         returnSortTuples: t.Literal[True],
-        callerFirst = None,
-        memo = None,
+        callerFirst=None,
+        memo=None,
         offsetAppend: OffsetQL = 0.0,
         sortByCreationTime: t.Union[t.Literal['reverse'], bool] = False,
-        priorityTarget = None,
-        followDerivation = True,
-        priorityTargetOnly = False,
+        priorityTarget=None,
+        followDerivation=True,
+        priorityTargetOnly=False,
     ) -> t.Generator[ContextSortTuple, None, None]:
         pass
 
@@ -1733,14 +1733,14 @@ class Music21Object(prebase.ProtoM21Object):
     def contextSites(
         self,
         *,
-        callerFirst = None,
-        memo = None,
+        callerFirst=None,
+        memo=None,
         offsetAppend: OffsetQL = 0.0,
         sortByCreationTime: t.Union[t.Literal['reverse'], bool] = False,
-        priorityTarget = None,
+        priorityTarget=None,
         returnSortTuples: t.Literal[False] = False,
-        followDerivation = True,
-        priorityTargetOnly = False,
+        followDerivation=True,
+        priorityTargetOnly=False,
     ) -> t.Generator[ContextTuple, None, None]:
         pass
 
