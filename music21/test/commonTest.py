@@ -38,7 +38,11 @@ def load_source(name: str, path: str) -> types.ModuleType:
     important missing "spec.loader.exec_module(module)" line.
     '''
     spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise FileNotFoundError(f'No such file or directory: {path!r}')
     module = importlib.util.module_from_spec(spec)
+    if module is None:
+        raise FileNotFoundError(f'No such file or directory: {path!r}')
     spec.loader.exec_module(module)
     return module
 
