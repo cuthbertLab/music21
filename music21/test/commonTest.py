@@ -218,8 +218,8 @@ class ModuleGather:
             'abcFormat/testFiles.py',
         ]
         # run these first...
-        self.slowModules = ['metadata/caching',
-                            'metadata/bundles',
+        self.slowModules = ['metadata/bundles',
+                            'metadata/caching',
                             'features',
                             'graph',
                             'graph/plot',
@@ -240,6 +240,7 @@ class ModuleGather:
 
                             'romanText/translate',
                             'corpus/testCorpus',
+                            'corpus/corpora',
                             'audioSearch/transcriber',
                             'audioSearch/__init__',
                             'alpha/theoryAnalysis/theoryAnalyzer',

@@ -405,6 +405,7 @@ class Test(unittest.TestCase):
     def testFreezeThaw(self):
         from music21 import converter
         from music21 import stream
+        from music21.bar import Barline  # avoid not same class error
 
         b = Barline()
         self.assertNotIn('StyleMixin', b.classes)
