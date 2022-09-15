@@ -37,6 +37,7 @@ class Test(unittest.TestCase):
             for skip in ['_', '__', 'Test', 'Exception']:
                 if part.startswith(skip) or part.endswith(skip):
                     match = True
+                    break
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
