@@ -2422,22 +2422,8 @@ class Test(unittest.TestCase):
         VoiceLeadingQuartet()
 
     def testCopyAndDeepcopy(self):
-        # Test copying all objects defined in this module
-        import copy
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception', 'MotionType']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            obj = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(obj) and not isinstance(obj, types.FunctionType):
-                copy.copy(obj)
-                copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def test_unifiedTest(self):
         c4 = note.Note('C4')

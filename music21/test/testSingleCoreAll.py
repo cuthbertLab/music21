@@ -38,7 +38,7 @@ cov = coverageM21.getCoverage()
 
 def main(testGroup: t.Sequence[str] = ('test',),
          restoreEnvironmentDefaults=False,
-         limit=None,
+         limit: t.Optional[bool] = None,
          verbosity=2,
          show: bool = True,
          ):

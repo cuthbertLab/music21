@@ -3440,26 +3440,8 @@ class TestExternal(unittest.TestCase):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:
-                    continue
-                copy.copy(obj)
-                copy.deepcopy(obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testTuple(self):
         # create a tuplet with 5 dotted eighths in the place of 3 double-dotted

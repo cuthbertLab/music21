@@ -12,14 +12,17 @@
 '''
 Things that are common to testing...
 '''
+import copy
+import doctest
 import importlib
 import importlib.util
-from unittest.signals import registerResult
-
-import doctest
 import os
+import sys
+import typing
 import types
+import unittest
 import unittest.runner
+from unittest.signals import registerResult
 import warnings
 
 import music21
@@ -27,6 +30,35 @@ from music21 import environment
 from music21 import common
 
 environLocal = environment.Environment('test.commonTest')
+
+def testCopyAll(testInstance: unittest.TestCase, globals_: typing.Dict[str, typing.Any]):
+    my_module = testInstance.__class__.__module__
+    for part, obj in globals_.items():
+        match = False
+        for skip in ['_', 'Test', 'Exception']:
+            if part.startswith(skip) or part.endswith(skip):
+                match = True
+        if match:
+            continue
+        # noinspection PyTypeChecker
+        if not callable(obj) or isinstance(obj, types.FunctionType):
+            continue
+        if not hasattr(obj, '__module__') or obj.__module__ != my_module:
+            continue
+
+        try:  # see if obj can be made w/o args
+            instance = obj()
+        except TypeError:
+            continue
+
+        try:
+            copy.copy(instance)
+        except Exception as e:  # pylint: disable=broad-except
+            test_instance.fail(f'Could not copy obj {part}: {e}')
+        try:
+            copy.deepcopy(instance)
+        except Exception as e:  # pylint: disable=broad-except
+            test_instance.fail(f'Could not deepcopy obj {part}: {e}')
 
 
 def load_source(name: str, path: str) -> types.ModuleType:
@@ -40,10 +72,14 @@ def load_source(name: str, path: str) -> types.ModuleType:
     spec = importlib.util.spec_from_file_location(name, path)
     if spec is None or spec.loader is None:
         raise FileNotFoundError(f'No such file or directory: {path!r}')
-    module = importlib.util.module_from_spec(spec)
-    if module is None:
-        raise FileNotFoundError(f'No such file or directory: {path!r}')
-    spec.loader.exec_module(module)
+    if name in sys.modules:
+        module = spec.loader.exec_module(sys.modules[name])
+    else:
+        module = importlib.util.module_from_spec(spec)
+        if module is None:
+            raise FileNotFoundError(f'No such file or directory: {path!r}')
+        spec.loader.exec_module(module)
+
     return module
 
 # noinspection PyPackageRequirements
@@ -379,14 +415,10 @@ class ModuleGather:
         if skip:
             return None
 
-        # for importlib
         name = self._getNamePeriod(fp, addM21=False)
 
-        # print(name, os.path.dirname(fp))
         try:
             with warnings.catch_warnings():
-                # warnings.simplefilter('ignore', RuntimeWarning)
-                # importlib is messing with coverage...
                 mod = load_source(name, fp)
         except Exception as excp:  # pylint: disable=broad-except
             environLocal.warn(['failed import:', fp, '\n',
