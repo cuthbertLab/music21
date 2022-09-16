@@ -260,7 +260,6 @@ class FeatureExtractor:
         '''
         Return a properly configured plain feature as a placeholder
 
-        >>> from music21 import features
         >>> fe = features.jSymbolic.InitialTimeSignatureFeature()
         >>> fe.name
         'Initial Time Signature'

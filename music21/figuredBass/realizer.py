@@ -16,7 +16,6 @@ bass line is a few lines of music21 code,
 from start to finish. See :class:`~music21.figuredBass.realizer.FiguredBassLine` for more details.
 
 >>> from music21.figuredBass import realizer
->>> from music21 import note
 >>> fbLine = realizer.FiguredBassLine()
 >>> fbLine.addElement(note.Note('C3'))
 >>> fbLine.addElement(note.Note('D3'), '4,3')
@@ -168,7 +167,6 @@ def addLyricsToBassNote(bassNote, notationString=None):
     useful when displaying the figured bass in external software.
 
     >>> from music21.figuredBass import realizer
-    >>> from music21 import note
     >>> n1 = note.Note('G3')
     >>> realizer.addLyricsToBassNote(n1, '6,4')
     >>> n1.lyrics[0].text
@@ -208,8 +206,6 @@ class FiguredBassLine:
     `inTime` defaults to 4/4.
 
     >>> from music21.figuredBass import realizer
-    >>> from music21 import key
-    >>> from music21 import meter
     >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
     >>> fbLine.inKey
     <music21.key.Key of B major>
@@ -250,9 +246,6 @@ class FiguredBassLine:
 
 
         >>> from music21.figuredBass import realizer
-        >>> from music21 import key
-        >>> from music21 import meter
-        >>> from music21 import note
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
         >>> fbLine.addElement(note.Note('B2'))
         >>> fbLine.addElement(note.Note('C#3'), '6')
@@ -290,9 +283,6 @@ class FiguredBassLine:
         Generates the bass line as a :class:`~music21.stream.Score`.
 
         >>> from music21.figuredBass import realizer
-        >>> from music21 import key
-        >>> from music21 import meter
-        >>> from music21 import note
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
         >>> fbLine.addElement(note.Note('B2'))
         >>> fbLine.addElement(note.Note('C#3'), '6')
@@ -303,7 +293,6 @@ class FiguredBassLine:
             :width: 200
 
 
-        >>> from music21 import corpus
         >>> sBach = corpus.parse('bach/bwv307')
         >>> sBach.parts.last().measure(0).show('text')
         {0.0} ...
@@ -419,9 +408,6 @@ class FiguredBassLine:
 
         >>> from music21.figuredBass import realizer
         >>> from music21.figuredBass import rules
-        >>> from music21 import key
-        >>> from music21 import meter
-        >>> from music21 import note
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
         >>> fbLine.addElement(note.Note('B2'))
         >>> fbLine.addElement(note.Note('C#3'), '6')

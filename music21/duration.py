@@ -2544,7 +2544,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         is itself dotted.  Worth 9 eighth notes (dotted-half tied to dotted-quarter).  It
         is not the same as a double-dotted half note, which is only worth 7 eighth notes.
 
-        >>> from music21 import duration
         >>> a = duration.Duration()
         >>> a.type = 'half'
         >>> a.dotGroups

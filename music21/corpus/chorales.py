@@ -37,7 +37,6 @@ class ChoraleList:
     which does not have all chorales in the Bärenreitter-Kirnberger or Riemenschneider
     numberings since it only includes BWV 250-438.
 
-    >>> from music21 import corpus
     >>> bcl = corpus.chorales.ChoraleList()
     >>> info358 = bcl.byBudapest[358]
     >>> for key in sorted(list(info358)):
@@ -500,8 +499,6 @@ class ChoraleListRKBWV:
     all chorales in the corpus, but only had numbers for the `kalmus`,
     `riemenschneider`, and `bwv` numbering systems.
 
-
-    >>> from music21 import corpus
     >>> bcl = corpus.chorales.ChoraleListRKBWV()
     >>> info155 = bcl.byRiemenschneider[155]
     >>> for key in sorted(list(info155)):
@@ -966,7 +963,6 @@ class Iterator:
     * `titleList` = [list, of, titles]
     * `numberList` = [list, of, numbers]
 
-    >>> from music21 import corpus
     >>> for chorale in corpus.chorales.Iterator(1, 4, returnType='filename'):
     ...    print(chorale)
     bach/bwv269
@@ -1188,7 +1184,6 @@ class Iterator:
         the chorale is instead queried by Title
         from the titleList and the numberList is ignored.
 
-        >>> from music21 import corpus
         >>> BCI = corpus.chorales.Iterator()
         >>> riemenschneider1 = BCI._returnChorale()
         >>> riemenschneider1.metadata.title
@@ -1330,7 +1325,6 @@ class Iterator:
         is set to None, and the currentNumber and highestNumber are set
         to the lowest and highest indices in the titleList.
 
-        >>> from music21 import corpus
         >>> BCI = corpus.chorales.Iterator()
         >>> BCI.numberingSystem = 'riemenschneider'
         >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])

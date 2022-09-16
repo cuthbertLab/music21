@@ -261,7 +261,6 @@ class TextBox(base.Music21Object):
     parameters, enclosure attributes, and the ability to convert to
     RepeatExpressions and TempoTexts.
 
-    >>> from music21 import text, stream
     >>> y = 1000  # set a fixed vertical distance
     >>> s = stream.Stream()
 

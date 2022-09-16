@@ -9913,7 +9913,6 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
 
         N.B., TODO: This may turn to an Iterator soon.
 
-        >>> from music21 import corpus
         >>> a = corpus.parse('bach/bwv324.xml')
         >>> partOnePitches = a.parts[0].pitches
         >>> len(partOnePitches)
@@ -14165,7 +14164,6 @@ class Opus(Stream):
         This method will treat each contained Score as a Part,
         merging and returning a single Score with merged Metadata.
 
-        >>> from music21 import corpus
         >>> o = corpus.parse('josquin/milleRegrets')
         >>> s = o.mergeScores()
         >>> s.metadata.title

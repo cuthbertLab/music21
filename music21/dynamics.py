@@ -372,7 +372,6 @@ class Crescendo(DynamicWedge):
     '''
     A spanner crescendo wedge.
 
-    >>> from music21 import dynamics
     >>> d = dynamics.Crescendo()
     >>> d.spread
     15
@@ -392,7 +391,6 @@ class Diminuendo(DynamicWedge):
     '''
     A spanner diminuendo wedge.
 
-    >>> from music21 import dynamics
     >>> d = dynamics.Diminuendo()
     >>> d.spread = 20
     >>> d.spread

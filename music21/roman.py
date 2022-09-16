@@ -277,7 +277,6 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
 
     If keyObj is none, it uses the root as a major key:
 
-    >>> from music21 import roman
     >>> roman.postFigureFromChordAndKey(
     ...     chord.Chord(['F#2', 'D3', 'A-3', 'C#4']),
     ...     key.Key('C'),
@@ -403,7 +402,6 @@ def figureTuples(chordObject, keyObject):
 
     For instance, in C major, F# D A- C# would be:
 
-    >>> from music21 import roman
     >>> roman.figureTuples(
     ...     chord.Chord(['F#2', 'D3', 'A-3', 'C#4']),
     ...     key.Key('C'),
@@ -530,7 +528,6 @@ def identifyAsTonicOrDominant(
     dominant, but only two pitches are provided in the chord. If neither tonic
     nor dominant is possibly correct, False is returned
 
-    >>> from music21 import roman
     >>> roman.identifyAsTonicOrDominant(['B2', 'F5'], key.Key('C'))
     'V65'
 
@@ -3099,7 +3096,6 @@ class RomanNumeral(harmony.Harmony):
         II) or the frontAlterationAccidental.modifier (with 'b' for '-') + romanNumeralAlone
         (e.g. #II, bII)
 
-        >>> from music21 import roman
         >>> rn = roman.RomanNumeral('#II7')
         >>> rn.romanNumeral
         '#II'
@@ -3154,7 +3150,6 @@ class RomanNumeral(harmony.Harmony):
         '''
         Returns the figure and the key and mode as a string
 
-        >>> from music21 import roman
         >>> rn = roman.RomanNumeral('V65/V', 'e')
         >>> rn.figureAndKey
         'V65/V in e minor'
@@ -3193,7 +3188,6 @@ class RomanNumeral(harmony.Harmony):
 
         If a new key is set, then the pitches will probably change:
 
-        >>> from music21 import roman
         >>> r1 = roman.RomanNumeral('V')
 
         (No key means an implicit C-major)
@@ -3315,7 +3309,6 @@ class RomanNumeral(harmony.Harmony):
         :class:`music21.figuredBass.notation.Notation`
         return the scaleDegree of the bass.
 
-        >>> from music21 import figuredBass, roman
         >>> fbn = figuredBass.notation.Notation('6,3')
         >>> V = roman.RomanNumeral('V')
         >>> V.bassScaleDegreeFromNotation(fbn)
@@ -3380,7 +3373,6 @@ class RomanNumeral(harmony.Harmony):
 
         Numbers are ordinal, not cardinal.
 
-        >>> from music21 import roman
         >>> rn1 = roman.RomanNumeral('V7')
         >>> rn1.functionalityScore
         80

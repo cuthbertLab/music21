@@ -768,7 +768,6 @@ class MetronomeMark(TempoIndication):
         Return the duration in seconds for each quarter length
         (not necessarily the referent) of this MetronomeMark.
 
-        >>> from music21 import tempo
         >>> mm1 = tempo.MetronomeMark(referent=1.0, number=60.0)
         >>> mm1.secondsPerQuarter()
         1.0
@@ -790,7 +789,6 @@ class MetronomeMark(TempoIndication):
         quarter length, return the resultant time in seconds at the tempo specified by
         this MetronomeMark.
 
-        >>> from music21 import tempo
         >>> mm1 = tempo.MetronomeMark(referent=1.0, number=60.0)
         >>> mm1.durationToSeconds(60)
         60.0
@@ -809,7 +807,6 @@ class MetronomeMark(TempoIndication):
         Given a duration in seconds,
         return a :class:`~music21.duration.Duration` object equal to that time.
 
-        >>> from music21 import tempo
         >>> mm1 = tempo.MetronomeMark(referent=1.0, number=60.0)
         >>> mm1.secondsToDuration(0.25)
         <music21.duration.Duration 0.25>
