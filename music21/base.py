@@ -40,15 +40,14 @@ from __future__ import annotations
 
 import builtins
 import copy
-import warnings
-import weakref
-
-from importlib.util import find_spec
-
 # for type annotation only
 import fractions
+from importlib.util import find_spec
 import typing as t
 from typing import overload
+import unittest
+import warnings
+import weakref
 
 from music21 import common
 from music21.common.enums import ElementSearch, OffsetSpecial
@@ -4119,6 +4118,15 @@ class ElementWrapper(Music21Object):
         if storedObj is None:
             raise AttributeError(f'Could not get attribute {name!r} in an object-less element')
         return object.__getattribute__(storedObj, name)
+
+
+class Test(unittest.TestCase):
+    '''
+    All other tests moved to test/test_base.py
+    '''
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # ------------------------------------------------------------------------------

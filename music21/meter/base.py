@@ -19,6 +19,7 @@ import copy
 from math import gcd
 import fractions
 import typing as t
+import unittest
 
 from music21 import base
 from music21 import beam
@@ -2045,11 +2046,18 @@ class SenzaMisuraTimeSignature(TimeSignatureBase):
 
 
 # TODO: Implement or delete...
-
 # class NonPowerOfTwoTimeSignature(TimeSignature):
 #     pass
 # class AutoAdjustTimeSignature(TimeSignature):
 #     automatically adjusts to fit its measure context.
+
+class Test(unittest.TestCase):
+    '''
+    All other tests moved to meter.tests
+    '''
+    def testCopyAndDeepcopy(self):
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # -----------------------------------------------------------------------------

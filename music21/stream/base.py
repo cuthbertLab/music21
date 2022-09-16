@@ -28,7 +28,6 @@ import math
 import os
 import pathlib
 import unittest
-import sys
 import warnings
 
 from collections import namedtuple
@@ -14353,23 +14352,9 @@ class Test(unittest.TestCase):
     '''
     Note: most Stream tests are found in stream.tests
     '''
-
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
-        '''
-        for part in sys.modules[self.__module__].__dict__:
-            if part.startswith('_') or part.startswith('__'):
-                continue
-            elif part in ['Test', 'TestExternal']:
-                continue
-            elif callable(part):  # pragma: no cover
-                # environLocal.printDebug(['testing copying on', part])
-                # noinspection PyTypeChecker
-                obj = getattr(self.__module__, part)()
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
-                self.assertNotEqual(a, obj)
-                self.assertNotEqual(b, obj)
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
 
 # -----------------------------------------------------------------------------

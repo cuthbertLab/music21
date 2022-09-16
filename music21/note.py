@@ -2064,30 +2064,9 @@ class TestExternal(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
     def testCopyAndDeepcopy(self):
-        '''
-        Test copying all objects defined in this module
-        '''
-        import sys
-        import types
-        for part in sys.modules[self.__module__].__dict__:
-            match = False
-            for skip in ['_', '__', 'Test', 'Exception']:
-                if part.startswith(skip) or part.endswith(skip):
-                    match = True
-            if match:
-                continue
-            name = getattr(sys.modules[self.__module__], part)
-            # noinspection PyTypeChecker
-            if callable(name) and not isinstance(name, types.FunctionType):
-                try:  # see if obj can be made w/ args
-                    obj = name()
-                except TypeError:  # pragma: no cover
-                    continue
-                a = copy.copy(obj)
-                b = copy.deepcopy(obj)
-                self.assertNotEqual(id(a), id(b))
+        from music21.test.commonTest import testCopyAll
+        testCopyAll(self, globals())
 
     def testLyricRepr(self):
         from music21 import note
