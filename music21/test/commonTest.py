@@ -380,7 +380,7 @@ class ModuleGather:
             return None
 
         # for importlib
-        name = self._getNamePeriod(fp, addM21=True)
+        name = self._getNamePeriod(fp, addM21=False)
 
         # print(name, os.path.dirname(fp))
         try:
