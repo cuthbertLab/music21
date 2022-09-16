@@ -11,11 +11,14 @@
 #               Michael Scott Asato Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
+from __future__ import annotations
+
 import gzip
 import os
 import pathlib
 import pickle
 import time
+import typing as t
 import unittest
 
 from collections import OrderedDict
@@ -264,7 +267,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
     def __init__(self, expr=None):
         from music21 import corpus
-        self._metadataEntries = OrderedDict()
+        self._metadataEntries: t.OrderedDict[str, MetadataEntry] = OrderedDict()
         if not isinstance(expr, (str, corpus.corpora.Corpus, type(None))):
             raise MetadataBundleException('Need to take a string, corpus, or None as expression')
 
@@ -279,7 +282,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
     # SPECIAL METHODS #
 
-    def __and__(self, metadataBundle):
+    def __and__(self, metadataBundle: MetadataBundle):
         r'''
         Compute the set-wise `and` of two metadata bundles:
 
@@ -333,7 +336,7 @@ class MetadataBundle(prebase.ProtoM21Object):
                 return True
         return False
 
-    def __ge__(self, metadataBundle):
+    def __ge__(self, metadataBundle: MetadataBundle):
         '''
         True when one metadata bundle is either a superset or an identical set
         to another bundle:
@@ -373,7 +376,7 @@ class MetadataBundle(prebase.ProtoM21Object):
     def __getitem__(self, i):
         return list(self._metadataEntries.values())[i]
 
-    def __gt__(self, metadataBundle):
+    def __gt__(self, metadataBundle: MetadataBundle):
         '''
         True when one metadata bundle is either a subset or an identical set to
         another bundle:
@@ -411,7 +414,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         '''
         return self._apply_set_predicate(metadataBundle, '__gt__')
 
-    def __le__(self, metadataBundle):
+    def __le__(self, metadataBundle: MetadataBundle):
         '''
         True when one metadata bundle is either a subset or an identical set to
         another bundle:
@@ -452,7 +455,7 @@ class MetadataBundle(prebase.ProtoM21Object):
     def __len__(self):
         return len(self._metadataEntries)
 
-    def __lt__(self, metadataBundle):
+    def __lt__(self, metadataBundle: MetadataBundle):
         '''
         True when one metadata bundle is a subset of another bundle:
 
@@ -579,21 +582,23 @@ class MetadataBundle(prebase.ProtoM21Object):
 
     # PRIVATE METHODS #
 
-    def _apply_set_operation(self, metadataBundle, operator):
+    def _apply_set_operation(self, metadataBundle: MetadataBundle, operator: str):
         if not isinstance(metadataBundle, type(self)):
             raise MetadataBundleException('metadataBundle must be a MetadataBundle')
         selfKeys = set(self._metadataEntries.keys())
         otherKeys = set(metadataBundle._metadataEntries.keys())
-        resultKeys = getattr(selfKeys, operator)(otherKeys)
-        resultBundle = type(self)()
+        resultKeys: t.List[str] = getattr(selfKeys, operator)(otherKeys)
+        resultBundle: MetadataBundle = type(self)()
         for key in resultKeys:
+            metadataEntry: MetadataEntry
             if key in self._metadataEntries:
                 metadataEntry = self._metadataEntries[key]
             else:
                 metadataEntry = metadataBundle._metadataEntries[key]
             resultBundle._metadataEntries[key] = metadataEntry
 
-        mdbItems = list(resultBundle._metadataEntries.items())
+        # noinspection PyTypeChecker
+        mdbItems: t.List[t.Tuple[str, MetadataEntry]] = list(resultBundle._metadataEntries.items())
         resultBundle._metadataEntries = OrderedDict(sorted(mdbItems,
                                                            key=lambda mde: mde[1].sourcePath))
         return resultBundle
@@ -1176,8 +1181,7 @@ class MetadataBundle(prebase.ProtoM21Object):
                 raise MetadataBundleException('Query cannot be empty')
             field, query = keywords.popitem()
 
-        for key in self._metadataEntries:
-            metadataEntry = self._metadataEntries[key]
+        for key, metadataEntry in self._metadataEntries.items():
             # ignore stub entries
             if metadataEntry.metadata is None:
                 continue
