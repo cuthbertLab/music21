@@ -54,11 +54,11 @@ def testCopyAll(testInstance: unittest.TestCase, globals_: typing.Dict[str, typi
         try:
             copy.copy(instance)
         except Exception as e:  # pylint: disable=broad-except
-            test_instance.fail(f'Could not copy obj {part}: {e}')
+            testInstance.fail(f'Could not copy obj {part}: {e}')
         try:
             copy.deepcopy(instance)
         except Exception as e:  # pylint: disable=broad-except
-            test_instance.fail(f'Could not deepcopy obj {part}: {e}')
+            testInstance.fail(f'Could not deepcopy obj {part}: {e}')
 
 
 def load_source(name: str, path: str) -> types.ModuleType:
@@ -73,7 +73,8 @@ def load_source(name: str, path: str) -> types.ModuleType:
     if spec is None or spec.loader is None:
         raise FileNotFoundError(f'No such file or directory: {path!r}')
     if name in sys.modules:
-        module = spec.loader.exec_module(sys.modules[name])
+        module = sys.modules[name]
+        spec.loader.exec_module(module)
     else:
         module = importlib.util.module_from_spec(spec)
         if module is None:

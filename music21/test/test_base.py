@@ -10,8 +10,6 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy
-import sys
-import types
 import unittest
 
 from music21 import bar

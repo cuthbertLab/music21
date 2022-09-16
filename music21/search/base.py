@@ -1121,7 +1121,6 @@ class Test(unittest.TestCase):
         testCopyAll(self, globals())
 
 
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [

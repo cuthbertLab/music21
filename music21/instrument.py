@@ -21,10 +21,8 @@ or instrument family, such as string pitches, etc.  Information about instrument
 ensembles is also included here though it may later be separated out into its own
 ensemble.py module.
 '''
-import copy
 import importlib
 import unittest
-import sys
 from collections import OrderedDict
 import typing as t
 

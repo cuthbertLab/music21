@@ -18,7 +18,6 @@ Serial searching methods that were previously here have been moved to
 :mod:`~music21.search.serial`.
 '''
 import unittest
-import copy
 import typing as t
 
 from music21 import exceptions21

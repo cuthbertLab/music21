@@ -10,7 +10,6 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest
-import copy
 
 from music21 import pitch
 from music21 import exceptions21
@@ -203,6 +202,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
+
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation

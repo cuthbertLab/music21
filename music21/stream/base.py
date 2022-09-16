@@ -28,7 +28,6 @@ import math
 import os
 import pathlib
 import unittest
-import sys
 import warnings
 
 from collections import namedtuple
@@ -14356,6 +14355,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
+
 
 # -----------------------------------------------------------------------------
 # define presented order in documentation

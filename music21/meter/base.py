@@ -2046,7 +2046,6 @@ class SenzaMisuraTimeSignature(TimeSignatureBase):
 
 
 # TODO: Implement or delete...
-
 # class NonPowerOfTwoTimeSignature(TimeSignature):
 #     pass
 # class AutoAdjustTimeSignature(TimeSignature):
@@ -2059,6 +2058,7 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         from music21.test.commonTest import testCopyAll
         testCopyAll(self, globals())
+
 
 # -----------------------------------------------------------------------------
 # define presented order in documentation
