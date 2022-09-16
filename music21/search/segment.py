@@ -61,7 +61,6 @@ def translateMonophonicPartToSegments(
     If algorithm is None then a default algorithm of music21.search.translateStreamToStringNoRhythm
     is used
 
-    >>> from music21 import *
     >>> luca = corpus.parse('luca/gloria')
     >>> lucaCantus = luca.parts[0]
     >>> segments, measureLists = search.segment.translateMonophonicPartToSegments(lucaCantus)

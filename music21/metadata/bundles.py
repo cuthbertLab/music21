@@ -51,7 +51,6 @@ class MetadataEntry(prebase.ProtoM21Object):
     and can be parsed to reconstitute the score object the metadata was
     derived from:
 
-    >>> from music21 import metadata
     >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
     >>> metadataEntry = coreBundle.search('bwv66.6')[0]
     >>> metadataEntry
@@ -164,7 +163,6 @@ class MetadataBundle(prebase.ProtoM21Object):
     An object that provides access to, searches within, and stores and loads
     multiple Metadata objects.
 
-    >>> from music21 import corpus, metadata
     >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
     >>> coreBundle
     <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
@@ -285,7 +283,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise `and` of two metadata bundles:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -311,7 +308,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         True if `expr` is of the same type, and contains an identical set of
         entries, otherwise false:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -342,7 +338,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         True when one metadata bundle is either a superset or an identical set
         to another bundle:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -383,7 +378,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         True when one metadata bundle is either a subset or an identical set to
         another bundle:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -422,7 +416,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         True when one metadata bundle is either a subset or an identical set to
         another bundle:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -463,7 +456,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         '''
         True when one metadata bundle is a subset of another bundle:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -500,7 +492,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise `or` of two metadata bundles:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -538,7 +529,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise `subtraction` of two metadata bundles:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -566,7 +556,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise `exclusive or` of two metadata bundles:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -629,7 +618,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         The `corpus.corpora.Corpus` object associated with the metadata
         bundle's name.
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> coreBundle
         <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
@@ -699,7 +687,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         The names 'core' and 'local' refer to the core and local
         corpora respectively: (virtual corpus is currently offline)
 
-        >>> from music21 import metadata
         >>> metadata.bundles.MetadataBundle().name is None
         True
         >>> corpus.corpora.CoreCorpus().metadataBundle.name
@@ -732,7 +719,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         Returns a list of file paths with errors and stores the extracted
         metadata in `self._metadataEntries`.
 
-        >>> from music21 import corpus, metadata
         >>> metadataBundle = metadata.bundles.MetadataBundle()
         >>> p = corpus.corpora.CoreCorpus().getWorkList('bach/bwv66.6')
         >>> metadataBundle.addFromPaths(
@@ -826,7 +812,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Clear all keys in a metadata bundle:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -848,7 +833,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Given a file path or corpus path, return the metadata key:
 
-        >>> from music21 import metadata
         >>> mb = metadata.bundles.MetadataBundle()
         >>> key = mb.corpusPathToKey('bach/bwv1007/prelude')
         >>> key.endswith('bach_bwv1007_prelude')
@@ -904,7 +888,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise difference of two metadata bundles:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
 
         >>> bachBundle = coreBundle.search(
@@ -932,7 +915,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise intersection of two metadata bundles:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
 
         >>> bachBundle = coreBundle.search(
@@ -961,7 +943,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         True if the set of keys in one metadata bundle are disjoint with
         the set of keys in another:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
 
         >>> bachBundle = coreBundle.search(
@@ -997,7 +978,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         True if the set of keys in one metadata bundle are a subset of
         the keys in another:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
 
         >>> bachBundle = coreBundle.search(
@@ -1026,7 +1006,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         True if the set of keys in one metadata bundle are a superset of
         the keys in another:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
 
         >>> bachBundle = coreBundle.search(
@@ -1235,7 +1214,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         r'''
         Compute the set-wise symmetric difference of two metadata bundles:
 
-        >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
         >>> bachBundle = coreBundle.search(
         ...     'bach',
@@ -1331,7 +1309,6 @@ class MetadataBundle(prebase.ProtoM21Object):
 
         Returns the metadata bundle.
 
-        >>> from music21 import metadata
         >>> bachBundle = corpus.corpora.CoreCorpus().metadataBundle.search(
         ...     'bach',
         ...     'composer',
@@ -1340,7 +1317,6 @@ class MetadataBundle(prebase.ProtoM21Object):
         True
 
         >>> import os
-        >>> from music21 import environment
         >>> e = environment.Environment()
         >>> tempFilePath = e.getTempFile()
         >>> bachBundle.write(filePath=tempFilePath)

@@ -15,7 +15,6 @@ def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.
     Return a collections.Counter of attribute usage for elements in a stream
     or StreamIterator
 
-    >>> from music21 import corpus
     >>> bach = corpus.parse('bach/bwv324.xml')
     >>> bachIter = bach.parts[0].recurse().getElementsByClass(note.Note)
     >>> qlCount = analysis.elements.attributeCount(bachIter, 'quarterLength')

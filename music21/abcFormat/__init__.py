@@ -417,8 +417,6 @@ class ABCMetadata(ABCToken):
         Extract key signature parameters,
         returning the number of sharps and the mode.
 
-        >>> from music21 import abcFormat
-
         >>> am = abcFormat.ABCMetadata('K:Eb Lydian')
         >>> am.preParse()
         >>> am.getKeySignatureParameters()

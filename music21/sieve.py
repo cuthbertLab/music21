@@ -416,7 +416,6 @@ def _lcmRecurse(filterList):
     Given a list of values, find the LCM of all the values by iteratively
     looking doing an LCM comparison to the values in the list.
 
-    >>> from music21 import sieve
     >>> sieve._lcmRecurse([2, 3])
     6
     >>> sieve._lcmRecurse([2, 3, 12])

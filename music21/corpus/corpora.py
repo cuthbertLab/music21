@@ -243,7 +243,6 @@ class Corpus(prebase.ProtoM21Object):
 
         If no matches are found, an empty list is returned.
 
-        >>> from music21 import corpus
         >>> coreCorpus = corpus.corpora.CoreCorpus()
 
         # returns 1 even though there is a '.mus' file, which cannot be read...
@@ -408,7 +407,6 @@ class Corpus(prebase.ProtoM21Object):
         r'''
         The metadata bundle for a corpus:
 
-        >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().metadataBundle
         <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
 
@@ -428,7 +426,6 @@ class Corpus(prebase.ProtoM21Object):
         This is a synonym for the metadataBundle property, but easier to understand
         what it does.
 
-        >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().all()
         <music21.metadata.bundles.MetadataBundle 'core': {151... entries}>
         '''
@@ -447,7 +444,6 @@ class Corpus(prebase.ProtoM21Object):
 
         Note that xml and mxl are treated equivalently.
 
-        >>> from music21 import corpus
         >>> coreCorpus = corpus.corpora.CoreCorpus()
         >>> a = coreCorpus.getComposer('bach')
         >>> len(a) > 100
@@ -574,7 +570,6 @@ class CoreCorpus(Corpus):
         This is convenient when an input format might match for multiple
         extensions.
 
-        >>> from music21 import corpus
         >>> coreCorpus = corpus.corpora.CoreCorpus()
         >>> corpusFilePaths = coreCorpus.getPaths()
         >>> 3000 < len(corpusFilePaths) < 4000
@@ -650,10 +645,8 @@ class CoreCorpus(Corpus):
         '''
         Return True or False if this is a `corpus` or `noCorpus` distribution.
 
-        >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().noCorpus
         False
-
         '''
         if CoreCorpus._noCorpus is None:
             # assume that there will always be a 'bach' dir
@@ -924,7 +917,6 @@ class LocalCorpus(Corpus):
         The name of a given local corpus.  Either 'local' for the unnamed corpus
         or a name for a named corpus
 
-        >>> from music21 import corpus
         >>> corpus.corpora.LocalCorpus().name
         'local'
 

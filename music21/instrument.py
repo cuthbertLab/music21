@@ -2324,7 +2324,6 @@ def fromString(instrumentString: str,
     for example), attempts to return an appropriate
     :class:`~music21.instrument.Instrument`.
 
-    >>> from music21 import instrument
     >>> t1 = instrument.fromString('Clarinet 2 in A')
     >>> t1
     <music21.instrument.Clarinet 'Clarinet 2 in A'>
