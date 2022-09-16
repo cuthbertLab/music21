@@ -73,7 +73,7 @@ def runOneModuleWithoutImp(args):
         return ModuleResponse(returnCode='NotInTree', fp=fp, success=success)
 
     try:
-        moduleName = modGath._getName(fp)
+        moduleName = modGath._getNamePeriod(fp, addM21=False)
 
         s1 = commonTest.defaultDoctestSuite()
 
@@ -174,7 +174,6 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                     if newResult.moduleName is not None:
                         mn = newResult.moduleName
                         mn = mn.replace('___init__', '')
-                        mn = mn.replace('_', '.')
                     else:
                         mn = ''
                     rt = newResult.runTime

@@ -13,6 +13,7 @@
 Things that are common to testing...
 '''
 import importlib
+import importlib.util
 from unittest.signals import registerResult
 
 import doctest
@@ -25,15 +26,25 @@ import music21
 from music21 import environment
 from music21 import common
 
-# import importlib
-with warnings.catch_warnings():
-    warnings.simplefilter('ignore', DeprecationWarning)
-    warnings.simplefilter('ignore', PendingDeprecationWarning)
-    import imp  # pylint: disable=deprecated-module
-
-
 environLocal = environment.Environment('test.commonTest')
 
+
+def load_source(name: str, path: str) -> types.ModuleType:
+    '''
+    Replacement for deprecated imp.load_source()
+
+    Thanks to:
+    https://github.com/epfl-scitas/spack for pointing out the
+    important missing "spec.loader.exec_module(module)" line.
+    '''
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise FileNotFoundError(f'No such file or directory: {path!r}')
+    module = importlib.util.module_from_spec(spec)
+    if module is None:
+        raise FileNotFoundError(f'No such file or directory: {path!r}')
+    spec.loader.exec_module(module)
+    return module
 
 # noinspection PyPackageRequirements
 def testImports():
@@ -207,8 +218,8 @@ class ModuleGather:
             'abcFormat/testFiles.py',
         ]
         # run these first...
-        self.slowModules = ['metadata/caching',
-                            'metadata/bundles',
+        self.slowModules = ['metadata/bundles',
+                            'metadata/caching',
                             'features',
                             'graph',
                             'graph/plot',
@@ -229,6 +240,7 @@ class ModuleGather:
 
                             'romanText/translate',
                             'corpus/testCorpus',
+                            'corpus/corpora',
                             'audioSearch/transcriber',
                             'audioSearch/__init__',
                             'alpha/theoryAnalysis/theoryAnalyzer',
@@ -367,17 +379,15 @@ class ModuleGather:
         if skip:
             return None
 
-        name = self._getName(fp)
         # for importlib
-        # name = self._getNamePeriod(fp, addM21=True)
+        name = self._getNamePeriod(fp, addM21=True)
 
         # print(name, os.path.dirname(fp))
         try:
             with warnings.catch_warnings():
                 # warnings.simplefilter('ignore', RuntimeWarning)
                 # importlib is messing with coverage...
-                mod = imp.load_source(name, fp)
-                # mod = importlib.import_module(name)
+                mod = load_source(name, fp)
         except Exception as excp:  # pylint: disable=broad-except
             environLocal.warn(['failed import:', fp, '\n',
                                '\tEXCEPTION:', str(excp).strip()])

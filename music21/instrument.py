@@ -2424,7 +2424,6 @@ def fromString(instrumentString: str,
     >>> t12
     <music21.instrument.Clarinet 'Klarinette'>
 
-
     This case works because the name 'Klarinette' is a recognised instrument name in German
     and appears in the German language list.
     If you search for a German name like 'Klarinette' on the French list (language='french'),
@@ -2434,7 +2433,6 @@ def fromString(instrumentString: str,
     'english', 'french', 'german', 'italian', 'russian', 'spanish', and 'abbreviation'.
 
     Note that the language string is not case-sensitive, so 'French' is also fine.
-
     '''
     from music21.languageExcerpts import instrumentLookup
 
