@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2001-11 Christopher Ariza
-# Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-22 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 

@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               Mark Gotham
 #
-# Copyright:    Copyright © 2011-2012, 2019-20 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012, 2019-20 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 

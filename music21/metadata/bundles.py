@@ -8,7 +8,7 @@
 #               Josiah Oberholtzer
 #
 # Copyright:    Copyright © 2010, 2012-14, '17, '19-20
-#               Michael Scott Asato Cuthbert and the music21 Project
+#               Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 from __future__ import annotations

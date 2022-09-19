@@ -4,7 +4,7 @@
 # Purpose:      rule checking functions for a "possibility" represented as a tuple.
 # Authors:      Jose Cabal-Ugaz
 #
-# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

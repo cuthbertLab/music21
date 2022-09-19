@@ -7,7 +7,7 @@
 #               Michael Scott Asato Cuthbert
 #               (Will Ware -- see docs)
 #
-# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2013, 2019 Michael Scott Asato Cuthbert
 #               Some parts of this module are in the Public Domain, see details.
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------

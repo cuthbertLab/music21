@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -58,9 +58,9 @@ the announcement while it's running.
     Don't forget the "v" in the release tag.
     Sanity check that the correct commit was tagged: git log
 
-17. Push tags: git push upstream --tags
+17. Push tags: git push --tags  (or git push upstream --tags if not on main branch)
 
-18. Create a new release on GitHub and upload the TWO files created here and docs.
+18. Create a new release on GitHub and upload the TWO non-wheel files created here and docs.
     Drag in this order: .tar.gz, documentation, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.

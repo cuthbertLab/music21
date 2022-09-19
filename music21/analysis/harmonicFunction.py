@@ -5,7 +5,7 @@
 #
 # Authors:      Mark Gotham
 #
-# Copyright:    Copyright © 2022 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2022 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import typing as t

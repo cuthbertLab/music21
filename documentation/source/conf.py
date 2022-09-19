@@ -48,7 +48,7 @@ master_doc = 'index'
 project = 'music21'
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-copyright = '2006-2022, Michael Scott Asato Cuthbert and cuthbertLab'
+copyright = '2006-2022, Michael Scott Asato Cuthbert'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -241,7 +241,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'music21', 'music21 Documentation',
-     ['Michael Scott Asato Cuthbert and cuthbertLab'], 1)
+     ['Michael Scott Asato Cuthbert'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -255,7 +255,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     ('index', 'music21', 'music21 Documentation',
-     'Michael Scott Asato Cuthbert and cuthbertLab', 'music21', 'One line description of project.',
+     'Michael Scott Asato Cuthbert', 'music21', 'One line description of project.',
      'Miscellaneous'),
 ]
 
