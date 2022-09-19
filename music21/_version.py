@@ -57,7 +57,9 @@ def get_version_tuple(vv):
         v.append(beta)
     return tuple(v)
 
+
 __version__ = '8.0.0rc2'
+
 __version_info__ = get_version_tuple(__version__)
 
 del get_version_tuple
