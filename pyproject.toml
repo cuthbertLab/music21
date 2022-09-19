@@ -9,7 +9,7 @@ name = "music21"
 dynamic = [
     "version",
 ]
-description = "A Toolkit for Computer-Aided Musical Analysis."
+description = "A Toolkit for Computer-Aided Musical Analysis and Computational Musicology."
 readme = "README.md"
 license = "BSD-3-Clause"
 requires-python = ">=3.8"
@@ -35,6 +35,8 @@ classifiers = [
     "Topic :: Multimedia :: Sound/Audio :: MIDI",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+
+# when hatch-requirements-txt is stable, replace with that
 dependencies = [
     "chardet",
     "joblib",
@@ -60,8 +62,5 @@ path = "music21/_version.py"
 [tool.hatch.build.targets.sdist]
 include = [
     "music21",
-]
-
-exclude = [
-    "*/py.typed"
+    "py.typed",  # indicates source is typed.
 ]

@@ -13,14 +13,15 @@ Trust us that it should work.
 Downloading Python 3 from python.org
 ---------------------------------------
 
-Though Macs come with Python, it's a very old version.  We recommend
-updating that by going to https://www.python.org/downloads and getting
-Python 3.9 or later.
+Though most Macs come with Python, it's usually a very old version.
+We recommend updating that by going to https://www.python.org/downloads
+and getting the latest version.
 
 (The `music21` team strongly recommends using the version of
 Python 3 from the python.org website and not the Conda version
-(or Enthought Canopy) because it is fully compatible with
-`matplotlib`.  If you have no plans on plotting functions,
+(or Enthought Canopy) because music21 is fully compatible with
+`matplotlib` on the python.org site.
+If you have no plans on plotting functions,
 feel free to use any flavor of Python 3.)
 
 
@@ -65,7 +66,7 @@ it should display in Terminal something like the following:
 .. image:: images/macScreenPythonVersion.*
     :width: 650
 
-If it says 3.7 or higher (or possibly a number like 3.9.2), you're okay.
+If it says 3.8 or higher (or possibly a number like 3.10.7), you're okay.
 If it says 2.7 or 3.4 or something,
 go to https://www.python.org/downloads/
 and download a newer version.  Multiple versions of Python can exist
@@ -88,56 +89,24 @@ Exit python by typing `quit()`.
 Starting the Configuration Assistant
 -----------------------------------------------------
 
-If you downloaded the `music21` project from Github, the project folder will
-contain a script that runs a configuration assistant. Double click on the
-installer.command file to start. This should open a Terminal window and run
-the Configuration Assistant. As this is a program downloaded from the Internet,
-the System will likely warn you about running it. Go ahead and click "Open".
+If you only installed the `music21` package with `pip` (for
+instance, by running `sudo pip3 install music21`), you should run
+the assistant from a command prompt::
 
-More likely, if you only installed the `music21` package with `pip` (for
-instance, by running `sudo pip3 install music21`), you may run the Configuration
-Assistant from a Python shell after importing `music21`, like this::
+    python3 -m music21.configure
+
+You can also run the Configuration Assistant from a Python shell
+ like this::
 
     import music21
     music21.configure.run()
-
-Otherwise, you may launch the assistant from a command prompt::
-
-    python3 -m music21.configure
 
 After waiting a few moments to load modules, the Configuration Assistant begins.
 
 .. image:: images/macScreenConfigAssistantStart.*
     :width: 650
 
-The first option is to install `music21` in its standard location
-(see below, The Installation Destination). Enter "y" or "yes", or
-press return to accept the default of "yes".  If you installed via pip, you
-won't be asked this question.
-
-Before installation begins you may be asked for your Mac password. (The cursor
-won't move or display any letters when you type in the password.  Just rest assured
-that the characters are being transmitted).
-As Python packages are stored in a System directory, you need to give permission
-to write files to that location.
-
-(If you don't get a prompt but instead start getting
-a lot of errors, you probably do not have an administrator account on your Mac.
-To make yourself one, quit the installation program (just close the window), open
-System Preferences from the Apple menu in the upper left corner of your screen, click on
-Users and Groups (4th Row).  Click on the lock on the lower-left corner -- you'll need
-your Mac password.  Then click "Allow user to administer this computer".  Then
-close System Preferences and click the music21 `installer.command` button again and
-go back one step.)
-
-During installation, a large amount of text will display showing files being copied.
-Sorry about the mess.  Just ignore it!  It means it's working.
-
-.. image:: images/macScreenConfigAssistantStart.*
-    :width: 650
-
-After installation the Configuration Assistant will try to
-configure your setup. If you have never used `music21` before,
+If you have never used `music21` before,
 following these prompts is recommended.
 
 Selecting a MusicXML reader is the first step.
@@ -149,7 +118,7 @@ The Configuration Assistant will attempt to find a MusicXML
 reader on your system. If it can't find any, you will be asked
 to open a URL to download MuseScore, a simple and free
 MusicXML reader and easy writer. Installing MuseScore is
-recommended for users who do not have Finale, Sibelius, MuseScore,
+recommended for users who do not have Finale, Sibelius, Dorico, MuseScore,
 or another MusicXML reader.
 
 If one or more MusicXML readers are found, skip ahead to the next instructions.
