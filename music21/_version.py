@@ -63,7 +63,7 @@ def get_version_tuple(vv):
     return tuple(v)
 
 
-__version__ = '8.0.0rc3'
+__version__ = '8.1.0'
 
 __version_info__ = get_version_tuple(__version__)
 

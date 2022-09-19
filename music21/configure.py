@@ -22,8 +22,6 @@ import typing as t
 
 from importlib import reload  # Python 3.4
 
-import io
-
 # assume that we will manually add this dir to sys.path top get access to
 # all modules before installation
 from music21 import common
@@ -1575,12 +1573,6 @@ class Test(unittest.TestCase):
 
     def testConfigurationAssistant(self):
         unused_ca = ConfigurationAssistant(simulate=True)
-
-    def testAskInstall(self):
-        unused_d = AskInstall()
-        # d.askUser()
-        # d.getResult()
-        # d.performAction()
 
     def testGetUserData(self):
         unused_d = AskSendInstallationReport()
