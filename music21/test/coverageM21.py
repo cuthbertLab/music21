@@ -13,7 +13,6 @@ import sys
 
 omit_modules = [
     'dist/dist.py',
-    'installer.py',
     'music21/test/*',
     'music21/configure.py',
     'music21/figuredBass/examples.py',

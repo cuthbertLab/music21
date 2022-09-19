@@ -19,6 +19,17 @@ own projects that import and extend `music21`.
 [Code of Conduct](README.md)
 
 
+## Preparing to Contribute ##
+
+Be sure to install all of the requirements in `requirements_dev.txt` via:
+
+```
+pip3 install -r requirements_dev.txt
+```
+
+There are several tools needed for fully testing music21 that aren't included
+in the standard `requirements.txt`.
+
 ## Issue Tickets ##
 
 Please use the provided templates for bug reports or feature proposals. For issues

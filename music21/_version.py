@@ -20,20 +20,25 @@ to wait for 2.1.  Even numbered first decimal releases (e.g. 5.4) are also beta.
 
 Q: Why is this here and not in music21/__init__.py?
 
-A: Keeping the information here makes it available to Music21's setup.py file
-by simply reading this file in and evaluating its contents.
+A: Keeping the information here makes it available to package managers and others who
+have not yet installed all of music21, by simply reading this file in and evaluating its contents.
 
-Importantly, that means that Music21's setup.py *doesn't* need to import any
-part of Music21's code during the installation process.  Not importing any part
+Importantly, that means that Music21's setup system (currently Hatch)
+*doesn't* need to import any part of Music21's code during the installation process.
+Not importing any part
 of Music21 makes installation cleaner, and also helps other software - like
 package managers in various Linux distributions - work with Music21 without
 complaint.
+
+
+Thanks to Andrew Hankinson for suggesting this way of dealing with versions to begin with.
+
 
 Changing Versions
 ==================
 
 When it's time to update Music21's version, just change the numbers in the
-tuple assigned to __version_info__, and the __version__ string will be
+tuple assigned to __version__ string and the __version_info__ tuple will be
 updated along with it.
 
 When changing, update the single test case in base.py.
@@ -58,7 +63,7 @@ def get_version_tuple(vv):
     return tuple(v)
 
 
-__version__ = '8.0.0rc2'
+__version__ = '8.1.0'
 
 __version_info__ = get_version_tuple(__version__)
 
