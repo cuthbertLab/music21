@@ -41,14 +41,25 @@ When changing, update the single test case in base.py.
 Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''
 
-__version_info__ = (8, 0, 0, 'rc1')  # can be 3-tuple or 4+-tuple: (7, 0, 5, 'a2')
+def get_version_tuple(vv):
+    v = vv.split('.')
+    last_v = v[-1]
+    v[-1] = ''
+    beta = ''
+    in_patch = True
+    for ch in last_v:
+        if in_patch and ch.isdigit():
+            v[-1] += ch
+        else:
+            in_patch = False
+            beta += ch
+    if beta:
+        v.append(beta)
+    return tuple(v)
 
-v = '.'.join(str(x) for x in __version_info__[0:3])
-if len(__version_info__) > 3 and __version_info__[3]:  # type: ignore
-    v += __version_info__[3]  # type: ignore
-if len(__version_info__) > 4:
-    v += '.' + '.'.join(__version_info__[4:])
 
-__version__ = v
+__version__ = '8.0.0rc2'
 
-del v
+__version_info__ = get_version_tuple(__version__)
+
+del get_version_tuple
