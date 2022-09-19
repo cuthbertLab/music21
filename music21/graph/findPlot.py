@@ -23,7 +23,7 @@ from music21.graph import plot
 from music21.graph import primitives
 
 # shortcuts that get a PlotClass directly
-PLOTCLASS_SHORTCUTS = {
+PLOTCLASS_SHORTCUTS: t.Dict[str, t.Type[plot.PlotStreamMixin]] = {
     'ambitus': plot.WindowedAmbitus,
     'dolan': plot.Dolan,
     'instruments': plot.Dolan,
@@ -47,7 +47,7 @@ FORMAT_SYNONYMS: t.List[t.Tuple[str, ...]] = [
 FORMATS = [syn[0] for syn in FORMAT_SYNONYMS]
 
 
-def getPlotClasses():
+def getPlotClasses() -> t.List[t.Type[plot.PlotStreamMixin]]:
     '''
     return a list of all PlotStreamMixin subclasses...  returns sorted list by name
 
@@ -59,7 +59,7 @@ def getPlotClasses():
      <class 'music21.graph.plot.HistogramPitchSpace'>,
      ...]
     '''
-    allPlot = []
+    allPlot: t.List[t.Type[plot.PlotStreamMixin]] = []
     for i in sorted(plot.__dict__):
         name = getattr(plot, i)
         # noinspection PyTypeChecker
@@ -68,7 +68,7 @@ def getPlotClasses():
                 and hasattr(name, '__mro__')
                 and plot.PlotStreamMixin in name.__mro__
                 and primitives.Graph in name.__mro__):
-            allPlot.append(name)
+            allPlot.append(t.cast(t.Type[plot.PlotStreamMixin], name))
     return allPlot
 
 
@@ -332,6 +332,7 @@ def getPlotsToMake(graphFormat: t.Optional[str] = None,
     if [graphFormat, xValue, yValue, zValue] == [None] * 4:
         graphFormat = 'pianoroll'
 
+    graphClasses: t.List[t.Type[plot.PlotStreamMixin]]
     if graphFormat in PLOTCLASS_SHORTCUTS:
         graphClasses = [PLOTCLASS_SHORTCUTS[graphFormat]]
     else:

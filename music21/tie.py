@@ -27,7 +27,7 @@ class TieException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
-    # pylint: disable-next=line-too-long
+    # pylint: disable=line-too-long
     '''
     An object added to Notes that are tied to other notes. The `type` value is one
     of start, stop, or continue.
