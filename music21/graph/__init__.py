@@ -44,6 +44,7 @@ __all__ = [
     'plotStream',
 ]
 
+import typing as t
 import unittest
 
 from music21 import common
@@ -59,8 +60,8 @@ environLocal = environment.Environment('graph')
 
 
 def plotStream(
-    streamObj,
-    graphFormat=None,
+    streamObj: 'music21.stream.Stream',
+    graphFormat: t.Optional[str] = None,
     xValue=None,
     yValue=None,
     zValue=None,

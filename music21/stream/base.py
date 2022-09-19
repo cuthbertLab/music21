@@ -3326,7 +3326,7 @@ class Stream(core.StreamCore, t.Generic[M21ObjType]):
     # display methods; in the same manner as show() and write()
 
     def plot(self,
-             plotFormat: str,
+             plotFormat: t.Optional[str] = None,
              xValue: t.Optional[str] = None,
              yValue: t.Optional[str] = None,
              zValue: t.Optional[str] = None,

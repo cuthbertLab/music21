@@ -389,8 +389,10 @@ class PlotStreamMixin(prebase.ProtoM21Object):
 
 
 # ------------------------------------------------------------------------------
-
 class PlotStream(primitives.Graph, PlotStreamMixin):
+    '''
+    A generic stream plotter.
+    '''
     def __init__(self, streamObj=None, **keywords):
         primitives.Graph.__init__(self, **keywords)
         PlotStreamMixin.__init__(self, streamObj, **keywords)

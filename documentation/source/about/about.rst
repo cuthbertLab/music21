@@ -76,7 +76,7 @@ working on other music and technology projects, in particular:
   contributing to the knowledge of music since 1984, and
   publishers of *Computing in Musicology*.
 
-.. _David Huron: https://www.musiccognition.osu.edu/people/david-huron/
+.. _David Huron: https://music.osu.edu/people/david-huron
 .. _Humdrum: https://www.humdrum.org
 .. _Michael Good: https://www.musicxml.com
 .. _Center for Computer-Assisted Research in the Humanities: http://www.ccarh.org/
@@ -137,7 +137,7 @@ to this project.  Their contributions and generosity are greatly appreciated.
 * `Project Gutenberg`_ houses public domain music, including the quartets of Beethoven,
   Haydn, and Mozart, in musicxml format which we have been able to include in music21.
 
-.. _Donald Byrd: https://homes.luddy.indiana.edu/donbyrd/CMNExtremes.htm
+.. _Donald Byrd: https://web.archive.org/web/20220610200930/https://homes.luddy.indiana.edu/donbyrd/CMNExtremes.htm
 .. _Laura E. Conrad: http://www.serpentpublications.org/drupal7/
 .. _MuseScore: https://musescore.com/
 .. _Bryen Travis: http://www.bachcentral.com/

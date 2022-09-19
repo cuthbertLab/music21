@@ -25,11 +25,11 @@ class PropertyDescription:
     * name: str is the namespace's name of the property (the tail of the property term URI).
     * namespace: str is a shortened form of the URI for the set of terms.
         * 'dcterms' means the property term is from the Dublin Core terms,
-            defined at <http://purl.org/dc/terms/>
+            defined at <https://www.dublincore.org/specifications/dublin-core/dcmi-terms/>
         * 'marcrel' means the property term is from the MARC Relator terms,
-            defined at <http://www.loc.gov/loc.terms/relators/>
+            defined at <https://id.loc.gov/vocabulary/relators.html>
         * 'humdrum' means the property term is from the Humdrum reference record terms,
-            defined at <https://www.humdrum.org/reference-records/#>
+            defined at <https://www.humdrum.org/reference-records/>
     * isContributor: bool is whether the property describes a contributor.
     * needsArticleNormalization: bool is whether the property values might
         benefit from article normalization when getting as a string (this is
