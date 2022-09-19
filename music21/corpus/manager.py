@@ -7,7 +7,7 @@
 #               Josiah Wolf Oberholtzer
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''

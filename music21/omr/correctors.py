@@ -6,7 +6,7 @@
 # Authors:      Maura Church
 #               Michael Scott Asato Cuthbert
 #
-# Copyright:    Copyright © 2014 Maura Church, Michael Scott Asato Cuthbert, and the music21 Project
+# Copyright:    Copyright © 2014 Maura Church, Michael Scott Asato Cuthbert,
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy

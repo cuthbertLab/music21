@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:         corpus/essenFolksong/license.txt
-# Purpose:      The music21 Project assumes no copyright or change in licensing
+# Purpose:      The music21 creators assume no copyright or change in licensing
 #               for content distributed in the corpus.
 #
 #-------------------------------------------------------------------------------

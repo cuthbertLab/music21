@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Asato Cuthbert
 #               based on an earlier version by Christopher Reyes
 #
-# Copyright:    Copyright © 2012-14 Michael Scott Asato Cuthbert and the music21 Project
+# Copyright:    Copyright © 2012-14 Michael Scott Asato Cuthbert
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''

@@ -7,7 +7,6 @@
 #               Michael Scott Asato Cuthbert
 #
 # Copyright:    Copyright © 2009-2022 Michael Scott Asato Cuthbert
-#               and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 import copy

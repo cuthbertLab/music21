@@ -2,7 +2,7 @@
 
 music21 -- A Toolkit for Computational Musicology
 
-Copyright © 2006-2022, Michael Scott Asato Cuthbert and cuthbertLab
+Copyright © 2006-2022, Michael Scott Asato Cuthbert
 
 For more information, visit:
 https://web.mit.edu/music21
@@ -16,8 +16,7 @@ https://web.mit.edu/music21/doc/usersGuide/usersGuide_01_installing.html
 Music21 runs on Python 3.8+.  Use version 4 on Python 2 or Py3.4, version 5
 on Py3.5, version 6 on Py3.6, version 7 on Py3.7.
 
-Released under the BSD (3-clause) license. Music21 may also be used
-under the LGPL license.  See LICENSE.
+Released under the BSD (3-clause) license. See LICENSE.
 Externally provided software (including the MIT licensed Lilypond/MusicXML test Suite) and
 music encoding in the corpus may have different licenses and/or copyrights. 
 A no-corpus version of music21 is available also on GitHub.
